@@ -164,7 +164,7 @@ CREATE TABLE IF NOT EXISTS ledger.legal_entity (
     fiscal_year_start_month           integer NOT NULL,
     region_ids                        text[],
     is_active                         boolean,
-    scope_path                        text
+    scope_path                        ltree
 );
 
 -- One side of a double-entry movement. Renamed from entry, which sat beside journal_entry and
@@ -243,7 +243,7 @@ CREATE TABLE IF NOT EXISTS ledger.settlement (
     difference                        numeric(18,4),
     ingested_at                       timestamptz NOT NULL,
     completed_at                      timestamptz,
-    scope_path                        text
+    scope_path                        ltree
 );
 
 -- A settlement that did not match. The queue somebody works, not an error log

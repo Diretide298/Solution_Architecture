@@ -31,7 +31,7 @@ $$;
 -- True when the row sits at or beneath one of the granted paths. An empty grant list matches
 -- nothing — deny is the default, and it is the default because it is the absence of a grant
 -- rather than the presence of a denial.
-CREATE OR REPLACE FUNCTION platform.in_scope(row_scope_path text)
+CREATE OR REPLACE FUNCTION platform.in_scope(row_scope_path ltree)
     RETURNS boolean
     LANGUAGE sql
     STABLE
@@ -39,7 +39,7 @@ CREATE OR REPLACE FUNCTION platform.in_scope(row_scope_path text)
 AS $$
     SELECT row_scope_path IS NOT NULL
        AND cardinality(platform.current_scope_paths()) > 0
-       AND row_scope_path::ltree <@ ANY (platform.current_scope_paths());
+       AND row_scope_path <@ ANY (platform.current_scope_paths());
 $$;
 
 -- Applies the standard policy to a table.
@@ -70,18 +70,33 @@ $$;
 -- A venue id is resolved to its path through the scope tree rather than assumed. **The subquery is
 -- the price of not carrying a redundant `scope_path` column on sixty tables**, and `platform.scope`
 -- is small, cached and indexed on `id`.
+--
+-- **A null `venue_id` is a tenant-level row, and until 24 September nobody could see it** — not
+-- even head office, because the function opened with `row_venue_id IS NOT NULL`. It now follows
+-- the same rule as `in_scope`: such a row sits at the tenant root, so it is visible exactly when a
+-- grant *is* that root — the one `platform.scope` row whose `level` is `tenant` (ADR-0011; the
+-- node the cell creates at provisioning, `parentId` null). A brand, region or venue grant is
+-- beneath the root, not at it, and still sees none of it. No grants, still nothing.
 CREATE OR REPLACE FUNCTION platform.venue_in_scope(row_venue_id uuid)
     RETURNS boolean
     LANGUAGE sql
     STABLE
     PARALLEL SAFE
 AS $$
-    SELECT row_venue_id IS NOT NULL
-       AND cardinality(platform.current_scope_paths()) > 0
-       AND EXISTS (
-            SELECT 1 FROM platform.scope s
-             WHERE s.id = row_venue_id
-               AND s.path::ltree <@ ANY (platform.current_scope_paths()));
+    SELECT cardinality(platform.current_scope_paths()) > 0
+       AND CASE
+             WHEN row_venue_id IS NULL THEN EXISTS (
+                  SELECT 1 FROM platform.scope s
+                   WHERE s.level = 'tenant'
+                     AND s.path::ltree = ANY (platform.current_scope_paths()))
+                  -- one tenant per database (CF-161); if that ever stops being true, a null-venue
+                  -- row has no single tenant to belong to, so it is hidden rather than shown to all
+                  AND (SELECT count(*) FROM platform.scope s WHERE s.level = 'tenant') = 1
+             ELSE EXISTS (
+                  SELECT 1 FROM platform.scope s
+                   WHERE s.id = row_venue_id
+                     AND s.path::ltree <@ ANY (platform.current_scope_paths()))
+           END;
 $$;
 
 CREATE OR REPLACE FUNCTION platform.apply_venue_rls(target regclass)
@@ -100,7 +115,7 @@ BEGIN
 END
 $$;
 
--- **244 tables carry `scope_path` and 58 carry `venue_id` instead, out of 574.**
+-- **256 tables carry `scope_path` and 58 carry `venue_id` instead, out of 586.**
 -- Both are protected. A table with neither is not scoped -- it is reference data, a
 -- registry, or the migration log itself, and a policy on it would deny every row to
 -- everybody.
@@ -165,15 +180,22 @@ SELECT platform.apply_scope_rls('catalogue.event_reschedule'::regclass);
 SELECT platform.apply_scope_rls('catalogue.event_resource_plan'::regclass);
 SELECT platform.apply_scope_rls('catalogue.event_schedule'::regclass);
 SELECT platform.apply_scope_rls('catalogue.event_type'::regclass);
+SELECT platform.apply_scope_rls('catalogue.group_package'::regclass);
 SELECT platform.apply_scope_rls('catalogue.import_job'::regclass);
 SELECT platform.apply_scope_rls('catalogue.prepaid_minutes'::regclass);
 SELECT platform.apply_scope_rls('catalogue.product'::regclass);
 SELECT platform.apply_scope_rls('catalogue.product_category'::regclass);
+SELECT platform.apply_scope_rls('catalogue.product_eligibility_rule'::regclass);
 SELECT platform.apply_scope_rls('catalogue.session_template'::regclass);
 SELECT platform.apply_scope_rls('catalogue.space'::regclass);
 SELECT platform.apply_scope_rls('fnb.corrective_action'::regclass);
+SELECT platform.apply_scope_rls('fnb.delivery_policy'::regclass);
 SELECT platform.apply_scope_rls('fnb.modifier_group'::regclass);
+SELECT platform.apply_scope_rls('fnb.order_fulfilment'::regclass);
 SELECT platform.apply_scope_rls('fnb.product_recommendation'::regclass);
+SELECT platform.apply_scope_rls('fnb.reservation_policy'::regclass);
+SELECT platform.apply_scope_rls('fnb.service_charge_policy'::regclass);
+SELECT platform.apply_scope_rls('fnb.temperature_checkpoint'::regclass);
 SELECT platform.apply_scope_rls('games.attraction_type'::regclass);
 SELECT platform.apply_scope_rls('games.authorisation'::regclass);
 SELECT platform.apply_scope_rls('games.card_expiry_rules'::regclass);
@@ -211,6 +233,8 @@ SELECT platform.apply_scope_rls('marketing.challenge'::regclass);
 SELECT platform.apply_scope_rls('marketing.duplicate_candidate'::regclass);
 SELECT platform.apply_scope_rls('marketing.form_definition'::regclass);
 SELECT platform.apply_scope_rls('marketing.guest_attribute_model'::regclass);
+SELECT platform.apply_scope_rls('marketing.guest_match_decision'::regclass);
+SELECT platform.apply_scope_rls('marketing.guest_match_policy'::regclass);
 SELECT platform.apply_scope_rls('marketing.guest_relationship'::regclass);
 SELECT platform.apply_scope_rls('marketing.identity_rules'::regclass);
 SELECT platform.apply_scope_rls('marketing.invitation'::regclass);
@@ -224,12 +248,15 @@ SELECT platform.apply_scope_rls('marketing.retention_policy'::regclass);
 SELECT platform.apply_scope_rls('marketing.sla_policy'::regclass);
 SELECT platform.apply_scope_rls('marketing.suppression'::regclass);
 SELECT platform.apply_scope_rls('orders.b2b_credit'::regclass);
+SELECT platform.apply_scope_rls('orders.deposit_policy'::regclass);
 SELECT platform.apply_scope_rls('orders.fraud_rule'::regclass);
 SELECT platform.apply_scope_rls('orders.payment_link'::regclass);
 SELECT platform.apply_scope_rls('orders.pos_shift'::regclass);
+SELECT platform.apply_scope_rls('orders.resale_fee_policy'::regclass);
 SELECT platform.apply_scope_rls('orders.resale_listing'::regclass);
 SELECT platform.apply_scope_rls('orders.sales_order'::regclass);
 SELECT platform.apply_scope_rls('orders.stored_value_authorisation'::regclass);
+SELECT platform.apply_scope_rls('orders.visit_reminder'::regclass);
 SELECT platform.apply_scope_rls('orders.wallet_pass'::regclass);
 SELECT platform.apply_scope_rls('payments.authentication_policy'::regclass);
 SELECT platform.apply_scope_rls('payments.chargeback_evidence'::regclass);

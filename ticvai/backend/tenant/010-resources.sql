@@ -8,7 +8,7 @@ CREATE TABLE IF NOT EXISTS resources.allocation_policy (
     respect_resource_priority         boolean,
     scoring_weights                   jsonb,
     allow_partial_allocation          boolean,
-    scope_path                        text,
+    scope_path                        ltree,
     id                                uuid PRIMARY KEY NOT NULL
 );
 
@@ -28,7 +28,7 @@ CREATE TABLE IF NOT EXISTS resources.attribute_definition (
     maximum                           numeric(18,4),
     validation_expression             text,
     searchable                        boolean,
-    scope_path                        text
+    scope_path                        ltree
 );
 
 -- A resource held for a window (BL-040, BL-041). Setup and teardown sit outside the booking, which
@@ -61,7 +61,7 @@ CREATE TABLE IF NOT EXISTS resources.qualification (
     expires_at                        date,
     issuer                            text,
     document_asset_id                 uuid,
-    scope_path                        text,
+    scope_path                        ltree,
     id                                uuid PRIMARY KEY NOT NULL
 );
 
@@ -73,7 +73,7 @@ CREATE TABLE IF NOT EXISTS resources.resource (
     name                              text NOT NULL,
     kind                              text NOT NULL,
     venue_id                          uuid NOT NULL,
-    scope_path                        text,
+    scope_path                        ltree,
     parent_resource_id                uuid,
     principal_id                      uuid,
     attributes                        jsonb,
@@ -100,7 +100,7 @@ CREATE TABLE IF NOT EXISTS resources.resource_audit (
     source_channel                    text,
     api_origin                        text,
     correlation_id                    text,
-    scope_path                        text
+    scope_path                        ltree
 );
 
 -- Holds 8 columns. No description has been written for this table — the name is the only thing
@@ -113,7 +113,7 @@ CREATE TABLE IF NOT EXISTS resources.resource_block (
     reason                            text NOT NULL,
     note                              text,
     created_by                        uuid,
-    scope_path                        text
+    scope_path                        ltree
 );
 
 -- Holds 14 columns. No description has been written for this table — the name is the only thing
@@ -131,7 +131,7 @@ CREATE TABLE IF NOT EXISTS resources.resource_category (
     cost_centre                       text,
     default_attributes                jsonb,
     default_approval_workflow_id      uuid,
-    scope_path                        text,
+    scope_path                        ltree,
     is_active                         boolean
 );
 
@@ -149,7 +149,7 @@ CREATE TABLE IF NOT EXISTS resources.resource_dependency (
     effective_from                    date,
     effective_to                      date,
     venue_id                          uuid,
-    scope_path                        text
+    scope_path                        ltree
 );
 
 -- Holds 13 columns. No description has been written for this table — the name is the only thing
@@ -167,7 +167,7 @@ CREATE TABLE IF NOT EXISTS resources.resource_package (
     maximum_minutes                   integer,
     requires_approval                 boolean,
     internal_cost                     numeric(18,4),
-    scope_path                        text
+    scope_path                        ltree
 );
 
 -- Holds 6 columns. No description has been written for this table — the name is the only thing
@@ -177,7 +177,7 @@ CREATE TABLE IF NOT EXISTS resources.resource_relation (
     relation                          text NOT NULL,
     effective_from                    date,
     priority                          integer,
-    scope_path                        text,
+    scope_path                        ltree,
     id                                uuid PRIMARY KEY NOT NULL
 );
 
@@ -193,7 +193,7 @@ CREATE TABLE IF NOT EXISTS resources.resource_requirement (
     required_qualifications           text[],
     required_attributes               jsonb,
     substitute_resource_ids           text[],
-    scope_path                        text
+    scope_path                        ltree
 );
 
 -- Holds 8 columns. No description has been written for this table — the name is the only thing
@@ -205,7 +205,7 @@ CREATE TABLE IF NOT EXISTS resources.resource_schedule (
     minimum_booking_minutes           integer,
     maximum_booking_minutes           integer,
     advance_booking_days              integer,
-    scope_path                        text,
+    scope_path                        ltree,
     id                                uuid PRIMARY KEY NOT NULL
 );
 
@@ -229,7 +229,7 @@ CREATE TABLE IF NOT EXISTS resources.resource_type (
     check_in_out_supported            boolean,
     deposit_applicable                boolean,
     customer_selectable               boolean,
-    scope_path                        text,
+    scope_path                        ltree,
     is_active                         boolean
 );
 
@@ -257,7 +257,7 @@ CREATE TABLE IF NOT EXISTS resources.venue_assignment (
     transfer_required                 boolean,
     effective_from                    date,
     effective_to                      date,
-    scope_path                        text,
+    scope_path                        ltree,
     id                                uuid PRIMARY KEY NOT NULL
 );
 

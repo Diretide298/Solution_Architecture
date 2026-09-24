@@ -24,7 +24,7 @@ CREATE TABLE IF NOT EXISTS retail.merchandise (
     category_id                       uuid,
     variant_id                        uuid NOT NULL,
     inventory_item_id                 uuid,
-    price                             numeric(18,4) NOT NULL,
+    list_price                        numeric(18,4) NOT NULL,
     on_hand                           numeric(18,4) NOT NULL,
     is_returnable                     boolean,
     return_window_days                integer,
@@ -37,7 +37,7 @@ CREATE TABLE IF NOT EXISTS retail.merchandise (
 -- saying what it is
 CREATE TABLE IF NOT EXISTS retail.product_recommendation (
     id                                uuid PRIMARY KEY,
-    scope_path                        text,
+    scope_path                        ltree,
     source_product_id                 uuid NOT NULL,
     source_variant_id                 uuid,
     type                              text NOT NULL,
@@ -130,7 +130,7 @@ CREATE TABLE IF NOT EXISTS retail.sale (
     outlet_id                         uuid NOT NULL,
     shift_id                          text,
     subject_id                        uuid,
-    subtotal                          numeric(18,4),
+    net_amount                        numeric(18,4),
     discount_amount                   numeric(18,4),
     tax_amount                        numeric(18,4),
     gross_amount                      numeric(18,4) NOT NULL,

@@ -232,6 +232,64 @@ WHAT = {
     "fnb.service_order": (
         "**Food and drink ordered**, wherever from — a counter, a table, a lounger, the app. The "
         "kitchen ticket is what the pass sees; this is what the guest bought."),
+    "fnb.reservation_policy": (
+        "**How long a table is held, by party size, and what sits between seatings.** "
+        "`fnb.table_reservation.duration_minutes` was set per booking with no default behind it, "
+        "and a turn time is the single most tuned number in a restaurant — a two-top and a table "
+        "of eight do not turn at the same speed. The booking keeps its own duration as the snapshot, "
+        "so a turn time revised in March cannot shorten a reservation made in February."),
+    "fnb.temperature_checkpoint": (
+        "**A unit that gets read, and the range it must hold.** `fnb.temperature_log.check_point_id` "
+        "was NOT NULL and referenced no table in the package — every HACCP reading was obliged to "
+        "name a definition nothing modelled, and the safe range was written onto each reading with no "
+        "source. **`TemperatureLog` calls HACCP records a UAE regulatory obligation that is "
+        "inspected**, and an inspector asking what range a freezer must hold cannot be answered by the "
+        "readings that happened — least of all about the reading nobody took. "
+        "`check_frequency_minutes` is there for that second question."),
+    # Design gaps closed 23 September: the Guest Booking design had these and the contracts did not.
+    "marketing.guest_match_policy": (
+        "**How a returning guest is recognised at checkout: by email, mobile or either.** One per venue. "
+        "The match is offered to the guest, never applied for them."),
+    "marketing.guest_match_decision": (
+        "**Every offered profile match and the guest's answer.** Kept so a merge done later by staff can "
+        "see that the guest once said *not me*."),
+    "catalogue.product_eligibility_rule": (
+        "**Who may take part in a product: age, height, supervision, swim ability.** Declared by the "
+        "guest at booking, checked by staff at the gate; whether a guest who fails there is refunded is "
+        "a column, because the design says they are not."),
+    "catalogue.group_package": (
+        "**What makes a product a school-trip format or a party package**: participants, duration, "
+        "hosts, free leaders per pupils and how it is paid. The product row still carries the price."),
+    "orders.deposit_policy": (
+        "**What a deposit booking takes now and when the balance is due**, with the refund cut-off. "
+        "Parties and some dining bookings; nothing said how much or when before this."),
+    "fnb.delivery_policy": (
+        "**An outlet's takeaway and delivery rules**: minimum order, fee, free-above threshold, radius, "
+        "slot length. Enforced at order time rather than only shown, which is what the design did."),
+    "fnb.order_fulfilment": (
+        "**How a guest's order leaves the kitchen**: collected at a time, delivered to an address in a "
+        "window, or taken to a place in the venue. The address is here and nowhere else."),
+    "orders.visit_reminder": (
+        "**One reminder per booking, set by the guest.** `GST-018 Add to Calendar / Reminders` had "
+        "nothing behind its reminders half. A row says how long before each session to remind and on "
+        "which channels; the sender skips any channel the guest has since withdrawn consent for, "
+        "because a reminder is not a reason to message somebody who said no."),
+    "orders.resale_fee_policy": (
+        "**What a resale costs and how high it may be priced.** `orders.resale_listing` stored "
+        "`seller_fee_percent`, `buyer_fee_percent` and `price_cap_percent` on every listing with "
+        "nothing producing them, so two listings a minute apart could carry different commercials and "
+        "record no reason. The listing keeps its columns as the snapshot — the same rule-and-record "
+        "split `payments.fee_rule` and `orders.order_fee` already use, because a commission changed "
+        "later must not restate a completed sale."),
+    "fnb.service_charge_policy": (
+        "**What the service charge on a bill is, and on what.** `fnb.sub_bill.service_charge` was "
+        "stored with nothing anywhere holding the rate, and `F29` recomputes it per bill on a "
+        "split — so a number was applied twice over a visit from a value that existed only in "
+        "somebody's head. **`is_discretionary` is the field a regulator reads first**: a charge a "
+        "guest cannot decline is a price, and a price belongs in the displayed total. "
+        "`distribution` carries `orders`' own separation of a service charge from a tip into "
+        "payroll, because it is revenue in most jurisdictions and pooling the two is how a "
+        "payroll dispute starts."),
     "fnb.menu_item": (
         "**A product seen through a menu.** Catalogue owns whether it can be sold; F&B owns what a "
         "kitchen needs to make it \u2014 station, prep time, allergens, and the 86 flag."),

@@ -7,7 +7,7 @@ CREATE TABLE IF NOT EXISTS seating.accessible (
     seat_map_id                       uuid,
     eligibility                       text,
     minimum_provision_percent         numeric(18,4),
-    scope_path                        text,
+    scope_path                        ltree,
     id                                uuid PRIMARY KEY NOT NULL
 );
 
@@ -28,7 +28,7 @@ CREATE TABLE IF NOT EXISTS seating.group_request (
     quote_expires_at                  timestamptz,
     deposit_amount                    numeric(18,4),
     order_id                          text,
-    scope_path                        text
+    scope_path                        ltree
 );
 
 -- Holds 13 columns. No description has been written for this table — the name is the only thing
@@ -46,7 +46,7 @@ CREATE TABLE IF NOT EXISTS seating.hold_pool (
     release_at                        timestamptz,
     status                            text,
     created_by                        uuid,
-    scope_path                        text
+    scope_path                        ltree
 );
 
 -- Holds 11 columns. No description has been written for this table — the name is the only thing
@@ -62,7 +62,7 @@ CREATE TABLE IF NOT EXISTS seating.hold_type (
     release_to                        text,
     counts_against_capacity           boolean,
     visible_to_guest                  boolean,
-    scope_path                        text
+    scope_path                        ltree
 );
 
 -- A seat map read from a plan or a manifest. It proposes a draft; a person accepts it (ADR-0020)
@@ -93,7 +93,7 @@ CREATE TABLE IF NOT EXISTS seating.reassignment (
     guest_notified_at                 timestamptz,
     performed_by                      uuid,
     at                                timestamptz,
-    scope_path                        text
+    scope_path                        ltree
 );
 
 -- Holds 6 columns. No description has been written for this table — the name is the only thing
@@ -103,7 +103,7 @@ CREATE TABLE IF NOT EXISTS seating.recommendation_rules (
     performance_id                    uuid,
     reverse_row_order                 boolean,
     explain_to_guest                  boolean,
-    scope_path                        text,
+    scope_path                        ltree,
     id                                uuid PRIMARY KEY NOT NULL
 );
 
@@ -133,7 +133,7 @@ CREATE TABLE IF NOT EXISTS seating.seat_block (
     created_at                        timestamptz NOT NULL,
     release_at                        timestamptz,
     released_at                       timestamptz,
-    scope_path                        text
+    scope_path                        ltree
 );
 
 -- Holds 4 columns. No description has been written for this table — the name is the only thing
@@ -163,7 +163,7 @@ CREATE TABLE IF NOT EXISTS seating.seat_hold (
     seat_ids                          text[] NOT NULL,
     buffered_seat_ids                 text[],
     status                            text NOT NULL,
-    total_price                       numeric(18,4),
+    gross_amount                      numeric(18,4),
     held_by_principal_id              uuid,
     subject_id                        uuid,
     extension_count                   integer,
@@ -220,7 +220,7 @@ CREATE TABLE IF NOT EXISTS seating.seat_rules (
     buffer_rule                       jsonb,
     companion_rule                    jsonb,
     flexible_spacing                  jsonb,
-    scope_path                        text,
+    scope_path                        ltree,
     id                                uuid PRIMARY KEY NOT NULL
 );
 
@@ -243,7 +243,7 @@ CREATE TABLE IF NOT EXISTS seating.section (
     name                              text NOT NULL,
     row_count                         integer NOT NULL,
     seat_count                        integer NOT NULL,
-    scope_path                        text,
+    scope_path                        ltree,
     id                                uuid PRIMARY KEY NOT NULL
 );
 

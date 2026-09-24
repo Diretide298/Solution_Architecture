@@ -13731,7 +13731,8 @@ screens:
   - error
   - loading
   offlineState: false
-  entryParams: []
+  entryParams:
+  - caseId<-navigation
   goesTo:
   - ADM-599
   boardFrames: null

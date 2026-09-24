@@ -746,7 +746,6 @@ paths:
         - "P09 ADM-369 Commercial Command Center"
         - "P09 ADM-370 Customer Subscription & Commercial Portfolio"
         - "P09 ADM-374 Trial & Conversion Monitor"
-        - "P13 CMS-001 Tenant Workspace"
       x-ticvai-audience:
       - staff
       x-ticvai-read-routing: replica
@@ -790,7 +789,6 @@ paths:
       x-ticvai-consumed-by:
         - "P09 ADM-005 Tenant Directory"
         - "P09 ADM-419 Provisioning Command Center"
-        - "P13 CMS-001 Tenant Workspace"
       x-ticvai-audience:
       - staff
       summary: Create a tenant
@@ -846,7 +844,6 @@ paths:
         - "P09 ADM-011 Licence & Seat Management"
         - "P09 ADM-012 Tenant Isolation & Resource Pool"
         - "P09 ADM-015 API Rate Limit & Quota Management"
-        - "P13 CMS-001 Tenant Workspace"
       x-ticvai-audience:
       - staff
       x-ticvai-read-routing: replica
@@ -871,7 +868,6 @@ paths:
       x-ticvai-consumed-by:
         - "P09 ADM-005 Tenant Directory"
         - "P09 ADM-006 Tenant Hierarchy Explorer"
-        - "P13 CMS-001 Tenant Workspace"
       x-ticvai-audience:
       - staff
       summary: Amend tenant details
@@ -921,7 +917,6 @@ paths:
       operationId: suspendTenant
       x-ticvai-consumed-by:
         - "P09 ADM-005 Tenant Directory"
-        - "P13 CMS-001 Tenant Workspace"
       x-ticvai-audience:
       - staff
       summary: Suspend a tenant
@@ -980,7 +975,6 @@ paths:
       operationId: reactivateTenant
       x-ticvai-consumed-by:
         - "P09 ADM-005 Tenant Directory"
-        - "P13 CMS-001 Tenant Workspace"
       x-ticvai-audience:
       - staff
       summary: Lift a suspension
@@ -1017,7 +1011,6 @@ paths:
       operationId: terminateTenant
       x-ticvai-consumed-by:
         - "P09 ADM-005 Tenant Directory"
-        - "P13 CMS-001 Tenant Workspace"
       x-ticvai-audience:
       - staff
       summary: Begin termination
@@ -1224,7 +1217,6 @@ paths:
         - "P09 ADM-369 Commercial Command Center"
         - "P09 ADM-371 Customer Commercial 360°"
         - "P09 ADM-418 Subscription Lifecycle & Trial-to-Paid Handoff"
-        - "P13 CMS-001 Tenant Workspace"
       x-ticvai-audience:
       - staff
       x-ticvai-read-routing: replica
@@ -1252,7 +1244,6 @@ paths:
         - "P09 ADM-410 Contract & Billing Cycle Selection"
         - "P09 ADM-417 Subscription Confirmation & Commercial Activation"
         - "P09 ADM-463 Subscription & Commercial Change Management"
-        - "P13 CMS-001 Tenant Workspace"
         - "P17 SGN-019 Contract & Billing Cycle Selection"
         - "P17 SGN-024 Subscription Confirmation & Commercial Activation"
       x-ticvai-audience:
@@ -1311,7 +1302,6 @@ paths:
         - "P09 ADM-011 Licence & Seat Management"
         - "P09 ADM-414 Order & Commercial Pricing Review"
         - "P09 ADM-463 Subscription & Commercial Change Management"
-        - "P13 CMS-001 Tenant Workspace"
         - "P17 SGN-022 Order & Commercial Pricing Review"
       x-ticvai-audience:
       - staff
@@ -1364,7 +1354,6 @@ paths:
         - "P09 ADM-015 API Rate Limit & Quota Management"
         - "P09 ADM-422 Administrator & Security Initialization"
         - "P09 ADM-450 Entitlement & License Inventory"
-        - "P13 CMS-001 Tenant Workspace"
       x-ticvai-audience:
       - staff
       x-ticvai-read-routing: primary
@@ -1404,7 +1393,6 @@ paths:
         - "P09 ADM-007 Module & Feature Entitlement"
         - "P09 ADM-011 Licence & Seat Management"
         - "P09 ADM-422 Administrator & Security Initialization"
-        - "P13 CMS-001 Tenant Workspace"
       x-ticvai-audience:
       - staff
       summary: License a module outside the plan
@@ -1439,7 +1427,6 @@ paths:
         - "P09 ADM-005 Tenant Directory"
         - "P09 ADM-007 Module & Feature Entitlement"
         - "P09 ADM-011 Licence & Seat Management"
-        - "P13 CMS-001 Tenant Workspace"
       x-ticvai-audience:
       - staff
       summary: Remove an add-on
@@ -1504,7 +1491,6 @@ paths:
         - "P09 ADM-371 Customer Commercial 360°"
         - "P09 ADM-449 Usage & License Command Center"
         - "P09 ADM-457 AI Usage Forecast & Commercial Optimization"
-        - "P13 CMS-001 Tenant Workspace"
       x-ticvai-audience:
       - staff
       x-ticvai-read-routing: analytical
@@ -1547,7 +1533,6 @@ paths:
         - "P09 ADM-011 Licence & Seat Management"
         - "P09 ADM-012 Tenant Isolation & Resource Pool"
         - "P09 ADM-015 API Rate Limit & Quota Management"
-        - "P13 CMS-001 Tenant Workspace"
       x-ticvai-audience:
       - staff
       x-ticvai-read-routing: replica
@@ -1573,7 +1558,6 @@ paths:
       x-ticvai-consumed-by:
         - "P09 ADM-005 Tenant Directory"
         - "P09 ADM-012 Tenant Isolation & Resource Pool"
-        - "P13 CMS-001 Tenant Workspace"
       x-ticvai-audience:
       - staff
       summary: Provision a cell for a region
@@ -2285,7 +2269,6 @@ paths:
         - "P09 ADM-010 Usage Metering"
         - "P09 ADM-451 Commercial Consumption & Billable Event Metering"
         - "P09 ADM-458 License, Metering & Commercial Synchronization Audit"
-        - "P13 CMS-001 Tenant Workspace"
       x-ticvai-audience:
       - staff
       x-ticvai-read-routing: analytical
@@ -2576,7 +2559,6 @@ paths:
         - "P09 ADM-009 Tenant Billing & Invoicing"
         - "P09 ADM-459 Billing & Commercial Command Center"
         - "P09 ADM-462 Invoice & Payment Management"
-        - "P13 CMS-001 Tenant Workspace"
       x-ticvai-audience:
       - staff
       x-ticvai-read-routing: replica
@@ -2618,7 +2600,6 @@ paths:
         - "P09 ADM-008 Subscription & Plan Management"
         - "P09 ADM-009 Tenant Billing & Invoicing"
         - "P09 ADM-460 Billing Calculation & Charge Breakdown"
-        - "P13 CMS-001 Tenant Workspace"
       x-ticvai-audience:
       - staff
       summary: Generate an invoice for a period
@@ -6134,6 +6115,7 @@ components:
           items:
             type: string
         price:
+          x-ticvai-column: list_price
           $ref: ../shared/common.yaml#/components/schemas/Money
         pricingBasis:
           type: string
@@ -6462,6 +6444,7 @@ components:
         quantity:
           type: integer
         price:
+          x-ticvai-column: list_price
           $ref: ../shared/common.yaml#/components/schemas/Money
         validFrom:
           type: string
@@ -6586,39 +6569,7 @@ components:
       additionalProperties:
         type: string
     ModuleKey:
-      type: string
-      description: 'What a tenant buys, and what a screen belongs to. **One vocabulary for both sides
-        of the join**, because two lists that must agree are one list somebody forgets to update.
-
-        **Grain chosen to match how a venue buys, not how the package is built.** `fnb` is one module
-        even though it spans four contracts; `ticketing` and `access` are separate because a venue can
-        run a museum with no gates and a stadium with no shop.
-
-        '
-      enum:
-      - core
-      - ticketing
-      - access
-      - fnb
-      - retail
-      - inventory
-      - seating
-      - membership
-      - marketing
-      - resources
-      - queue
-      - games
-      - maintenance
-      - accreditation
-      - partner
-      - developerApi
-      - analytics
-      - ai
-      x-ticvai-note: '**`core` is listed and cannot be unlicensed.** It exists so a screen can say it
-        belongs to no optional module rather than leaving the field empty — **an empty field and *always
-        on* look identical, and only one of them is a decision.**
-
-        '
+      $ref: ../shared/common.yaml#/components/schemas/ModuleKey
     OnboardingApplication:
       type: object
       x-ticvai-persistence: control.onboarding_application
@@ -7656,6 +7607,7 @@ components:
           items:
             $ref: '#/components/schemas/EntitlementLimit'
         price:
+          x-ticvai-column: list_price
           $ref: ../shared/common.yaml#/components/schemas/Money
         validFrom:
           type: string
@@ -8667,10 +8619,12 @@ components:
               amount:
                 $ref: ../shared/common.yaml#/components/schemas/Money
         subtotal:
+          x-ticvai-column: net_amount
           $ref: ../shared/common.yaml#/components/schemas/Money
         taxAmount:
           $ref: ../shared/common.yaml#/components/schemas/Money
         total:
+          x-ticvai-column: gross_amount
           $ref: ../shared/common.yaml#/components/schemas/Money
         planVersionUsed:
           type: string

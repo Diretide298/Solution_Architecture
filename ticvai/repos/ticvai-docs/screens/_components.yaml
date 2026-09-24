@@ -180,7 +180,12 @@ components:
       lie a manager will act on.
 
   - kind: chart
-    description: Line, bar, pie, gauge. Rendered from a report definition.
+    description: >-
+      Any mark in `reporting.DashboardTile.visualisation` — twenty as of 22 September. Rendered from
+      a report definition. **Read the list from the contract, not from here**: this line said "line,
+      bar, pie, gauge" while the contract held eight marks and the source specification eighteen,
+      so three layers of the package gave three different answers to what could be drawn. Slicers
+      and narrative text are not charts — see the enum's `x-ticvai-refuses`.
     states: [loading, empty, error, stale]
     notes: >
       `stale` is required — reporting reads a lag-tolerant replica, and the screen must be

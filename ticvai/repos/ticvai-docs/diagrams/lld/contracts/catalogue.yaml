@@ -1,5 +1,5 @@
 id: LLD-catalogue
-title: catalogue — 199 operations
+title: catalogue — 205 operations
 generatedBy: tools/derive-diagrams.py
 index: diagrams/hld/03-contracts.yaml
 tier: spine
@@ -107,6 +107,19 @@ operations:
   - cache:idempotency
   - catalogue.performance
   - platform.outbox
+- operation: checkBookingEligibility
+  verb: POST
+  path: /eligibility-checks
+  scope: venue
+  permission: PRODUCT_VIEW
+  audience:
+  - guest
+  - staff
+  offline: false
+  reads:
+  - catalogue.product
+  - catalogue.product_eligibility_rule
+  writes: []
 - operation: cloneEvent
   verb: POST
   path: /events/{eventId}/clone
@@ -384,6 +397,18 @@ operations:
   reads:
   - catalogue.event_resource_plan
   writes: []
+- operation: getGroupPackageDefinition
+  verb: GET
+  path: /products/{productId}/group-package
+  scope: venue
+  permission: PRODUCT_VIEW
+  audience:
+  - staff
+  - guest
+  offline: false
+  reads:
+  - catalogue.group_package
+  writes: []
 - operation: getLatestBundle
   verb: GET
   path: /catalogue/bundles/latest
@@ -457,6 +482,18 @@ operations:
   offline: true
   reads:
   - catalogue.product
+  writes: []
+- operation: getProductEligibilityRule
+  verb: GET
+  path: /products/{productId}/eligibility-rule
+  scope: venue
+  permission: PRODUCT_VIEW
+  audience:
+  - staff
+  - guest
+  offline: false
+  reads:
+  - catalogue.product_eligibility_rule
   writes: []
 - operation: importProductCatalogue
   verb: POST
@@ -924,6 +961,18 @@ operations:
   - staff
   offline: false
   reads: []
+  writes: []
+- operation: listGroupPackages
+  verb: GET
+  path: /group-packages
+  scope: venue
+  permission: PRODUCT_VIEW
+  audience:
+  - guest
+  - staff
+  offline: false
+  reads:
+  - catalogue.group_package
   writes: []
 - operation: listGuestMemberships
   verb: GET
@@ -1918,6 +1967,18 @@ operations:
   offline: false
   reads: []
   writes: []
+- operation: setGroupPackageDefinition
+  verb: PUT
+  path: /products/{productId}/group-package
+  scope: venue
+  permission: PRODUCT_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - catalogue.group_package
+  writes:
+  - catalogue.group_package
 - operation: setLifecycleStatuWorkflow
   verb: PUT
   path: /lifecycle-statu-workflow
@@ -2092,6 +2153,18 @@ operations:
   offline: false
   reads: []
   writes: []
+- operation: setProductEligibilityRule
+  verb: PUT
+  path: /products/{productId}/eligibility-rule
+  scope: venue
+  permission: PRODUCT_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - catalogue.product_eligibility_rule
+  writes:
+  - catalogue.product_eligibility_rule
 - operation: setProductServicePrice
   verb: PUT
   path: /product-service-price

@@ -284,6 +284,7 @@
   "app": "guest-web",
   "route": "/discovery-and-browse/event-attraction-detail",
   "operations": [
+   "getProductEligibilityRule",
    "getProduct",
    "listPerformances",
    "getAvailability",
@@ -294,13 +295,15 @@
    "VenueOpsService"
   ],
   "stores": [
-   "postgres"
+   "postgres",
+   "redis"
   ],
   "reads": [
    "catalogue.channel_capacity",
    "catalogue.inventory_hold",
    "catalogue.performance",
    "catalogue.product",
+   "catalogue.product_eligibility_rule",
    "queue.entry",
    "queue.queue",
    "queue.reading"
@@ -442,6 +445,7 @@
   "app": "guest-web",
   "route": "/booking-and-selection/date-and-session-selection",
   "operations": [
+   "checkBookingEligibility",
    "getAvailability",
    "acquireInventoryHold",
    "getPerformance"
@@ -458,6 +462,8 @@
    "catalogue.channel_capacity",
    "catalogue.inventory_hold",
    "catalogue.performance",
+   "catalogue.product",
+   "catalogue.product_eligibility_rule",
    "platform.workstation"
   ],
   "writes": [
@@ -1055,6 +1061,8 @@
   "app": "guest-web",
   "route": "/cart-and-checkout/checkout-payment",
   "operations": [
+   "checkGuestCheckoutMatch",
+   "decideGuestCheckoutMatch",
    "transferOrderTickets",
    "createOrder",
    "createPayment",
@@ -1062,6 +1070,7 @@
    "inquirePaymentStatus"
   ],
   "services": [
+   "MarketingService",
    "OrderService"
   ],
   "stores": [
@@ -1072,6 +1081,10 @@
    "access.entitlement",
    "cache:idempotency",
    "ledger.fx_rate",
+   "marketing.guest_match_decision",
+   "marketing.guest_match_policy",
+   "marketing.guest_profile",
+   "orders.cart",
    "orders.order_line",
    "orders.payment",
    "orders.sales_order",
@@ -1082,6 +1095,8 @@
    "cache:idempotency",
    "ledger.journal_entry",
    "ledger.posting",
+   "marketing.guest_match_decision",
+   "orders.cart",
    "orders.order_line",
    "orders.payment",
    "orders.sales_order",
@@ -2100,6 +2115,10 @@
   "app": "guest-web",
   "route": "/membership-loyalty-and-value/membership-management",
   "operations": [
+   "listBillingStatements",
+   "getBillingStatement",
+   "listMyPaymentIssues",
+   "retryMyDunningPayment",
    "transferOrderTickets",
    "getMyMemberships",
    "listGuestMemberships"
@@ -2118,13 +2137,16 @@
    "catalogue.entitlement_template",
    "catalogue.product",
    "marketing.loyalty_position",
+   "orders.payment",
    "orders.sales_order",
-   "orders.ticket_transfer"
+   "orders.ticket_transfer",
+   "payments.dunning_case"
   ],
   "writes": [
    "access.entitlement",
    "cache:idempotency",
-   "orders.ticket_transfer"
+   "orders.ticket_transfer",
+   "payments.dunning_case"
   ],
   "storedProcedures": [],
   "wave": 2,
@@ -2708,6 +2730,9 @@
   "app": "guest-web",
   "route": "/my-reservations",
   "operations": [
+   "listGroupPackages",
+   "getGroupPackageDefinition",
+   "requestGroupBooking",
    "listReservations",
    "getReservation",
    "cancelReservation",
@@ -2716,6 +2741,7 @@
    "updateTableReservation"
   ],
   "services": [
+   "CatalogueService",
    "FnbService",
    "OrderService",
    "VenueOpsService"
@@ -2726,6 +2752,8 @@
   ],
   "reads": [
    "cache:idempotency",
+   "catalogue.group_package",
+   "catalogue.product",
    "fnb.reservation_table",
    "fnb.table_reservation",
    "maintenance.work_order",
@@ -2740,7 +2768,9 @@
    "cache:idempotency",
    "fnb.reservation_table",
    "fnb.table_reservation",
-   "orders.reservation"
+   "orders.group_booking",
+   "orders.reservation",
+   "orders.sales_order"
   ],
   "storedProcedures": [],
   "wave": 2,
@@ -3036,6 +3066,8 @@
   "app": "guest-web",
   "route": "/fandb--browse-and-order",
   "operations": [
+   "getFnbDeliveryPolicy",
+   "listFulfilmentSlots",
    "getGuestMenu",
    "listDiningOutlets",
    "listModifierGroups",
@@ -3053,11 +3085,13 @@
   "stores": [
    "derived",
    "postgres",
+   "postgres-analytical",
    "redis"
   ],
   "reads": [
    "cache:idempotency",
    "fnb.delivery_location",
+   "fnb.delivery_policy",
    "fnb.dining_table",
    "fnb.kitchen_ticket",
    "fnb.location_session",
@@ -3077,6 +3111,7 @@
    "cache:idempotency",
    "fnb.kitchen_ticket",
    "fnb.location_session",
+   "fnb.order_fulfilment",
    "fnb.reservation_table",
    "fnb.service_order",
    "fnb.table_reservation",
@@ -3910,6 +3945,7 @@
   "app": "guest-app",
   "route": "/general/attraction-details",
   "operations": [
+   "getProductEligibilityRule",
    "getProduct",
    "getAvailability",
    "getWaitTimes",
@@ -3920,13 +3956,15 @@
    "VenueOpsService"
   ],
   "stores": [
-   "postgres"
+   "postgres",
+   "redis"
   ],
   "reads": [
    "catalogue.channel_capacity",
    "catalogue.inventory_hold",
    "catalogue.performance",
    "catalogue.product",
+   "catalogue.product_eligibility_rule",
    "queue.entry",
    "queue.queue",
    "queue.reading"
@@ -4110,6 +4148,7 @@
   "app": "guest-app",
   "route": "/general/select-date-and-time",
   "operations": [
+   "checkBookingEligibility",
    "listPerformances",
    "getAvailability"
   ],
@@ -4117,12 +4156,15 @@
    "CatalogueService"
   ],
   "stores": [
-   "postgres"
+   "postgres",
+   "redis"
   ],
   "reads": [
    "catalogue.channel_capacity",
    "catalogue.inventory_hold",
-   "catalogue.performance"
+   "catalogue.performance",
+   "catalogue.product",
+   "catalogue.product_eligibility_rule"
   ],
   "writes": [],
   "storedProcedures": [],
@@ -4243,6 +4285,8 @@
   "app": "guest-app",
   "route": "/general/review-and-payment",
   "operations": [
+   "checkGuestCheckoutMatch",
+   "decideGuestCheckoutMatch",
    "transferOrderTickets",
    "createPayment",
    "inquirePaymentStatus",
@@ -4255,6 +4299,7 @@
   ],
   "services": [
    "CatalogueService",
+   "MarketingService",
    "OrderService"
   ],
   "stores": [
@@ -4267,6 +4312,9 @@
    "catalogue.channel_capacity",
    "catalogue.inventory_hold",
    "ledger.fx_rate",
+   "marketing.guest_match_decision",
+   "marketing.guest_match_policy",
+   "marketing.guest_profile",
    "orders.cart",
    "orders.cart_line",
    "orders.order_line",
@@ -4286,6 +4334,7 @@
    "catalogue.inventory_hold",
    "ledger.journal_entry",
    "ledger.posting",
+   "marketing.guest_match_decision",
    "orders.cart",
    "orders.order_line",
    "orders.payment",
@@ -4742,6 +4791,10 @@
   "app": "guest-app",
   "route": "/general/memberships",
   "operations": [
+   "listBillingStatements",
+   "getBillingStatement",
+   "listMyPaymentIssues",
+   "retryMyDunningPayment",
    "getMyMemberships",
    "listDelegations",
    "grantDelegation",
@@ -4750,7 +4803,8 @@
   ],
   "services": [
    "CatalogueService",
-   "IdentityService"
+   "IdentityService",
+   "OrderService"
   ],
   "stores": [
    "postgres",
@@ -4764,12 +4818,15 @@
    "identity.delegated_access",
    "marketing.guest_profile",
    "marketing.loyalty_position",
+   "orders.payment",
    "orders.sales_order",
+   "payments.dunning_case",
    "pii.subject"
   ],
   "writes": [
    "cache:idempotency",
-   "identity.delegated_access"
+   "identity.delegated_access",
+   "payments.dunning_case"
   ],
   "storedProcedures": [],
   "wave": 2,
@@ -4989,6 +5046,9 @@
   "app": "guest-app",
   "route": "/general/add-to-calendar-reminders",
   "operations": [
+   "getOrderCalendarEvent",
+   "getVisitReminder",
+   "setVisitReminder",
    "getOrder",
    "listOrders",
    "issueWalletPass"
@@ -5007,10 +5067,13 @@
    "orders.payment",
    "orders.sales_order",
    "orders.ticket_template",
-   "orders.wallet_pass"
+   "orders.visit_reminder",
+   "orders.wallet_pass",
+   "platform.scope"
   ],
   "writes": [
    "cache:idempotency",
+   "orders.visit_reminder",
    "orders.wallet_pass"
   ],
   "storedProcedures": [],
@@ -5469,6 +5532,8 @@
   "app": "guest-app",
   "route": "/general/fandb-browse-and-order",
   "operations": [
+   "getFnbDeliveryPolicy",
+   "listFulfilmentSlots",
    "listDiningOutlets",
    "getGuestMenu",
    "claimLocationSession",
@@ -5484,11 +5549,13 @@
   "stores": [
    "derived",
    "postgres",
+   "postgres-analytical",
    "redis"
   ],
   "reads": [
    "cache:idempotency",
    "fnb.delivery_location",
+   "fnb.delivery_policy",
    "fnb.kitchen_ticket",
    "fnb.location_session",
    "fnb.menu",
@@ -5504,6 +5571,7 @@
    "cache:idempotency",
    "fnb.kitchen_ticket",
    "fnb.location_session",
+   "fnb.order_fulfilment",
    "fnb.service_order",
    "fnb.table_session"
   ],
@@ -6193,6 +6261,7 @@
    "catalogue.performance",
    "catalogue.variant",
    "fnb.delivery_location",
+   "fnb.delivery_policy",
    "fnb.kitchen_ticket",
    "fnb.location_session",
    "fnb.menu_item",
@@ -6217,6 +6286,7 @@
    "cache:idempotency",
    "catalogue.inventory_hold",
    "fnb.kitchen_ticket",
+   "fnb.order_fulfilment",
    "fnb.service_order",
    "marketing.conversation",
    "marketing.conversation_message",
@@ -8029,9 +8099,13 @@
   "app": "guest-app",
   "route": "/general/dynamic-qr-ticket",
   "operations": [
+   "listMyEntitlements",
+   "getEntitlement",
+   "getEntitlementCredential",
    "transferOrderTickets"
   ],
   "services": [
+   "AccessService",
    "OrderService"
   ],
   "stores": [
@@ -8041,6 +8115,9 @@
   "reads": [
    "access.entitlement",
    "cache:idempotency",
+   "catalogue.entitlement_template",
+   "catalogue.product",
+   "identity.delegated_access",
    "orders.ticket_transfer"
   ],
   "writes": [
@@ -9069,6 +9146,9 @@
   "app": "guest-app",
   "route": "/account/share-group-booking",
   "operations": [
+   "listGroupPackages",
+   "getGroupPackageDefinition",
+   "requestGroupBooking",
    "shareEntitlement",
    "getGroupBooking",
    "respondToInvitation",
@@ -9076,6 +9156,7 @@
    "getMyChallenges"
   ],
   "services": [
+   "CatalogueService",
    "MarketingService",
    "OrderService"
   ],
@@ -9087,6 +9168,8 @@
    "access.entitlement",
    "cache:idempotency",
    "catalogue.entitlement_template",
+   "catalogue.group_package",
+   "catalogue.product",
    "identity.delegated_access",
    "marketing.challenge",
    "marketing.challenge_progress",
@@ -9105,7 +9188,9 @@
    "cache:idempotency",
    "identity.delegated_access",
    "marketing.invitation",
-   "marketing.referral"
+   "marketing.referral",
+   "orders.group_booking",
+   "orders.sales_order"
   ],
   "storedProcedures": [],
   "wave": 2,
@@ -9217,6 +9302,7 @@
   "app": "venue-pos",
   "route": "/sign-in",
   "operations": [
+   "changeOwnCredential",
    "login",
    "listActiveSessions",
    "forceLogout",
@@ -9234,6 +9320,7 @@
    "cache:idempotency",
    "cache:resolution",
    "identity.delegated_access",
+   "identity.password_policy",
    "identity.principal",
    "identity.principal_credential",
    "identity.role",
@@ -9242,6 +9329,7 @@
   "writes": [
    "cache:idempotency",
    "cache:resolution",
+   "identity.principal_credential",
    "identity.session"
   ],
   "storedProcedures": [],
@@ -13931,6 +14019,7 @@
   ],
   "reads": [
    "cache:idempotency",
+   "fnb.delivery_policy",
    "fnb.location_session",
    "fnb.menu_item",
    "fnb.modifier_group",
@@ -13940,6 +14029,7 @@
   "writes": [
    "cache:idempotency",
    "fnb.kitchen_ticket",
+   "fnb.order_fulfilment",
    "fnb.service_order"
   ],
   "storedProcedures": [],
@@ -23831,6 +23921,8 @@
   "app": "venue-management-web",
   "route": "/venue-operations/packages-bundles",
   "operations": [
+   "getGroupPackageDefinition",
+   "setGroupPackageDefinition",
    "listCatalogueBundles",
    "getLatestBundle",
    "publishBundle",
@@ -23846,6 +23938,7 @@
   ],
   "reads": [
    "cache:idempotency",
+   "catalogue.group_package",
    "catalogue.product",
    "catalogue.published_bundle",
    "promotions.allocation_component",
@@ -23855,6 +23948,7 @@
   ],
   "writes": [
    "cache:idempotency",
+   "catalogue.group_package",
    "catalogue.published_bundle",
    "promotions.allocation_component",
    "promotions.bundle",
@@ -25404,6 +25498,9 @@
   "app": "venue-management-web",
   "route": "/venue-operations/group-bookings",
   "operations": [
+   "createGroupBooking",
+   "getGroupBooking",
+   "updateGroupBooking",
    "listOrders",
    "createOrder",
    "applyManualDiscount",
@@ -25429,15 +25526,18 @@
   "reads": [
    "cache:idempotency",
    "ledger.posting",
+   "orders.group_booking",
    "orders.order_line",
    "orders.payment",
    "orders.refund",
-   "orders.sales_order"
+   "orders.sales_order",
+   "pii.subject"
   ],
   "writes": [
    "cache:idempotency",
    "ledger.journal_entry",
    "ledger.posting",
+   "orders.group_booking",
    "orders.order_line",
    "orders.payment",
    "orders.refund",
@@ -27408,6 +27508,8 @@
   "app": "venue-management-web",
   "route": "/venue-operations/f-b-outlets",
   "operations": [
+   "getFnbDeliveryPolicy",
+   "setFnbDeliveryPolicy",
    "listOutlets",
    "getGuestMenu",
    "createOutlet",
@@ -27430,7 +27532,9 @@
    "TenancyService"
   ],
   "stores": [
+   "derived",
    "postgres",
+   "postgres-analytical",
    "redis"
   ],
   "reads": [
@@ -27438,6 +27542,7 @@
    "cache:resolution",
    "fnb.cold_chain_event",
    "fnb.corrective_action",
+   "fnb.delivery_policy",
    "fnb.dining_table",
    "fnb.menu_item",
    "fnb.modifier_group",
@@ -27456,6 +27561,7 @@
    "cache:idempotency",
    "cache:resolution",
    "fnb.corrective_action",
+   "fnb.delivery_policy",
    "fnb.dining_table",
    "inventory.movement",
    "platform.outlet",
@@ -28388,6 +28494,7 @@
   "app": "venue-management-web",
   "route": "/venue-operations/staff-directory",
   "operations": [
+   "resetPrincipalCredential",
    "listPrincipals",
    "getPrincipal",
    "createPrincipal",
@@ -28402,11 +28509,14 @@
   ],
   "reads": [
    "cache:idempotency",
-   "identity.principal"
+   "identity.principal",
+   "identity.principal_credential"
   ],
   "writes": [
    "cache:idempotency",
-   "identity.principal"
+   "identity.principal",
+   "identity.principal_credential",
+   "identity.session"
   ],
   "storedProcedures": [],
   "wave": 1,
@@ -38324,17 +38434,24 @@
   "app": "venue-management-web",
   "route": "/access-venue/guest-companion-eligibility-rules-bo-161",
   "operations": [
+   "getProductEligibilityRule",
+   "setProductEligibilityRule",
    "listGuestCompanionEligibility"
   ],
   "services": [
-   "AccessService"
+   "AccessService",
+   "CatalogueService"
   ],
   "stores": [
    "postgres",
    "redis"
   ],
-  "reads": [],
-  "writes": [],
+  "reads": [
+   "catalogue.product_eligibility_rule"
+  ],
+  "writes": [
+   "catalogue.product_eligibility_rule"
+  ],
   "storedProcedures": [],
   "wave": 3,
   "offline": false,
@@ -47315,6 +47432,8 @@
   "app": "venue-management-web",
   "route": "/orders-money/deposit-partial-payment-outstanding-balance-management-bo-327",
   "operations": [
+   "getDepositPolicy",
+   "setDepositPolicy",
    "listDepositPartialPayment",
    "listDepositActivity",
    "recordDepositActivity"
@@ -47327,9 +47446,11 @@
    "redis"
   ],
   "reads": [
+   "orders.deposit_policy",
    "payments.deposit_activity"
   ],
   "writes": [
+   "orders.deposit_policy",
    "payments.deposit_activity"
   ],
   "storedProcedures": [],
@@ -48358,17 +48479,29 @@
   "app": "venue-management-web",
   "route": "/access-venue/pdf-printable-pos-ticket-designer-bo-346",
   "operations": [
+   "listTicketTemplates",
+   "createTicketTemplate",
+   "updateTicketTemplate",
+   "printTicketProof",
    "setPdfPrintablePos"
   ],
   "services": [
-   "AccessService"
+   "AccessService",
+   "OrderService"
   ],
   "stores": [
    "postgres",
    "redis"
   ],
-  "reads": [],
-  "writes": [],
+  "reads": [
+   "cache:idempotency",
+   "catalogue.product",
+   "orders.ticket_template"
+  ],
+  "writes": [
+   "cache:idempotency",
+   "orders.ticket_template"
+  ],
   "storedProcedures": [],
   "wave": 3,
   "offline": false,
@@ -71067,6 +71200,8 @@
   "app": "venue-management-web",
   "route": "/engagement-support/duplicate-review-merge-bo-746",
   "operations": [
+   "getGuestMatchPolicy",
+   "setGuestMatchPolicy",
    "listDuplicateCandidates",
    "decideDuplicateCandidate",
    "mergeGuests"
@@ -71082,11 +71217,13 @@
    "cache:idempotency",
    "marketing.consent_record",
    "marketing.duplicate_candidate",
+   "marketing.guest_match_policy",
    "marketing.guest_profile",
    "pii.subject"
   ],
   "writes": [
    "cache:idempotency",
+   "marketing.guest_match_policy",
    "marketing.guest_profile",
    "pii.subject"
   ],
@@ -85678,7 +85815,9 @@
   "reads": [
    "seating.seat_hold"
   ],
-  "writes": [],
+  "writes": [
+   "seating.seat_hold"
+  ],
   "storedProcedures": [],
   "wave": 3,
   "offline": false,
@@ -89440,9 +89579,12 @@
   "app": "venue-management-web",
   "route": "/access-venue/currency-timezone-channels-bo-1065",
   "operations": [
+   "listDenominations",
+   "setDenominations",
    "updateRegionSettings"
   ],
   "services": [
+   "OrderService",
    "TenancyService"
   ],
   "stores": [
@@ -89451,11 +89593,13 @@
   ],
   "reads": [
    "cache:idempotency",
+   "platform.denomination",
    "platform.region_settings"
   ],
   "writes": [
    "cache:idempotency",
    "cache:resolution",
+   "platform.denomination",
    "platform.region_settings"
   ],
   "storedProcedures": [],
@@ -98294,7 +98438,8 @@
   ],
   "writes": [
    "cache:idempotency",
-   "identity.principal"
+   "identity.principal",
+   "identity.principal_credential"
   ],
   "storedProcedures": [],
   "wave": 1,
@@ -120905,7 +121050,8 @@
   "writes": [
    "cache:idempotency",
    "identity.password_policy",
-   "identity.principal"
+   "identity.principal",
+   "identity.principal_credential"
   ],
   "storedProcedures": [],
   "wave": 3,
@@ -134849,7 +134995,8 @@
   ],
   "writes": [
    "cache:idempotency",
-   "identity.principal"
+   "identity.principal",
+   "identity.principal_credential"
   ],
   "storedProcedures": [],
   "wave": 2,
@@ -140485,61 +140632,41 @@
   "app": "venue-management-web",
   "route": "/white-label/tenant-workspace",
   "operations": [
-   "getSsoConfig",
-   "listTenants",
-   "setSsoConfig",
-   "addLicenceAddOn",
-   "createTenant",
-   "generateInvoice",
-   "getEntitlementUsage",
-   "getSubscription",
-   "getTenant",
-   "getTenantLicences",
-   "getUsageMetering",
-   "listSubscriptionInvoices",
-   "listTenantCells",
-   "previewSubscriptionChange",
-   "provisionCell",
-   "reactivateTenant",
-   "removeLicenceAddOn",
-   "setSubscription",
-   "suspendTenant",
-   "terminateTenant",
-   "updateTenant"
+   "getTenantAppStatus",
+   "getTenantConfig",
+   "getModuleEnablement",
+   "getFeatureToggles",
+   "setModuleEnablement",
+   "setFeatureToggles",
+   "setMaintenanceMode"
   ],
   "services": [
-   "IdentityService",
-   "PlatformService"
+   "WhiteLabelService"
   ],
   "stores": [
    "postgres",
    "redis"
   ],
   "reads": [
-   "access.entitlement",
    "cache:idempotency",
-   "control.cell",
-   "control.invoice",
-   "control.invoice_line",
+   "cache:resolution",
+   "control.footer_config",
    "control.licence_add_on",
-   "control.tenant",
-   "control.usage_record",
-   "identity.sso_group_mapping",
-   "identity.sso_provider",
-   "platform.tenant",
    "subscription.contract",
-   "subscription.plan"
+   "subscription.plan",
+   "whitelabel.config_version",
+   "whitelabel.feature_toggle",
+   "whitelabel.homepage_section",
+   "whitelabel.module_enablement",
+   "whitelabel.navigation_item",
+   "whitelabel.tenant_config"
   ],
   "writes": [
    "cache:idempotency",
-   "control.cell",
-   "control.invoice",
-   "control.licence_add_on",
-   "control.tenant",
-   "identity.sso_group_mapping",
-   "identity.sso_provider",
-   "platform.outbox",
-   "subscription.contract"
+   "cache:resolution",
+   "whitelabel.feature_toggle",
+   "whitelabel.module_enablement",
+   "whitelabel.tenant_config"
   ],
   "storedProcedures": [],
   "wave": 2,
@@ -140554,7 +140681,7 @@
    "CMS-081",
    "CMS-091"
   ],
-  "pattern": "listDetail",
+  "pattern": "statusTracker",
   "entryFrom": [],
   "transitions": [
    {
@@ -140601,29 +140728,7 @@
    "emptyNoResults": "The filter narrowed it and the tenant are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** \u2014 that reads as *there is no data* and sends somebody to support with the wrong question."
   },
-  "overlays": [
-   {
-    "id": "confirmRemoveLicenceAddOn",
-    "component": "confirmDialog",
-    "trigger": "Remove",
-    "body": "**Names what `removeLicenceAddOn` changes and what it leaves alone**, in the consequence rather than the verb. A tenant this affects should be identified in the dialog, not just counted.",
-    "provenance": "contract subscription.yaml DELETE /tenants/{tenantId}/licences/add-ons"
-   },
-   {
-    "id": "confirmSuspendTenant",
-    "component": "confirmDialog",
-    "trigger": "Suspend",
-    "body": "**Names what `suspendTenant` changes and what it leaves alone**, in the consequence rather than the verb. A tenant this affects should be identified in the dialog, not just counted.",
-    "provenance": "contract subscription.yaml POST /tenants/{tenantId}/suspend"
-   },
-   {
-    "id": "confirmTerminateTenant",
-    "component": "confirmDialog",
-    "trigger": "Terminate",
-    "body": "**Names what `terminateTenant` changes and what it leaves alone**, in the consequence rather than the verb. A tenant this affects should be identified in the dialog, not just counted.",
-    "provenance": "contract subscription.yaml POST /tenants/{tenantId}/terminate"
-   }
-  ]
+  "overlays": []
  },
  "CMS-002": {
   "name": "Brand Kit",
@@ -140805,16 +140910,13 @@
   "app": "venue-management-web",
   "route": "/white-label/logo-assets",
   "operations": [
-   "listAssets",
-   "getAsset",
-   "createAsset",
-   "getAssetHistory",
-   "lookupAsset",
-   "setAssetStatus",
-   "updateAsset"
+   "getBrandIdentity",
+   "getAppIcons",
+   "setAppIcons",
+   "setBrandIdentity"
   ],
   "services": [
-   "VenueOpsService"
+   "WhiteLabelService"
   ],
   "stores": [
    "postgres",
@@ -140822,13 +140924,11 @@
   ],
   "reads": [
    "cache:idempotency",
-   "maintenance.asset",
-   "maintenance.preventive_plan",
-   "maintenance.work_order"
+   "whitelabel.tenant_config"
   ],
   "writes": [
    "cache:idempotency",
-   "maintenance.asset"
+   "whitelabel.tenant_config"
   ],
   "storedProcedures": [],
   "wave": 2,
@@ -140839,7 +140939,7 @@
    "CMS-002",
    "CMS-003"
   ],
-  "pattern": "listDetail",
+  "pattern": "statusTracker",
   "entryFrom": [],
   "transitions": [
    {
@@ -141074,6 +141174,10 @@
   "app": "venue-management-web",
   "route": "/white-label/page-builder",
   "operations": [
+   "listContentPages",
+   "createContentPage",
+   "updateContentPage",
+   "setFooter",
    "getHomepageLayout",
    "setHomepageLayout"
   ],
@@ -141086,10 +141190,15 @@
   ],
   "reads": [
    "cache:idempotency",
+   "control.footer_config",
+   "whitelabel.content_page",
    "whitelabel.homepage_section"
   ],
   "writes": [
    "cache:idempotency",
+   "cache:resolution",
+   "control.footer_config",
+   "whitelabel.content_page",
    "whitelabel.homepage_section"
   ],
   "storedProcedures": [],
@@ -141156,6 +141265,11 @@
   "app": "venue-management-web",
   "route": "/white-label/content-blocks",
   "operations": [
+   "createBanner",
+   "updateBanner",
+   "createPromoBlock",
+   "updatePromoBlock",
+   "deletePromoBlock",
    "listPromoBlocks",
    "listBanners"
   ],
@@ -141163,13 +141277,19 @@
    "WhiteLabelService"
   ],
   "stores": [
-   "postgres"
+   "postgres",
+   "redis"
   ],
   "reads": [
+   "cache:idempotency",
    "whitelabel.banner",
    "whitelabel.promo_block"
   ],
-  "writes": [],
+  "writes": [
+   "cache:idempotency",
+   "whitelabel.banner",
+   "whitelabel.promo_block"
+  ],
   "storedProcedures": [],
   "wave": 2,
   "offline": false,
@@ -141847,6 +141967,8 @@
   "app": "venue-management-web",
   "route": "/white-label/site-settings",
   "operations": [
+   "getBookingFlowConfig",
+   "setBookingFlowConfig",
    "getTenantConfig"
   ],
   "services": [
@@ -141857,6 +141979,7 @@
    "redis"
   ],
   "reads": [
+   "cache:idempotency",
    "cache:resolution",
    "control.footer_config",
    "whitelabel.feature_toggle",
@@ -141866,7 +141989,9 @@
    "whitelabel.tenant_config"
   ],
   "writes": [
-   "cache:resolution"
+   "cache:idempotency",
+   "cache:resolution",
+   "whitelabel.tenant_config"
   ],
   "storedProcedures": [],
   "wave": 2,
@@ -142009,20 +142134,14 @@
   "app": "venue-management-web",
   "route": "/white-label/consent-legal",
   "operations": [
-   "getGuestConsents",
-   "getConsentHistory",
-   "recordConsent",
-   "adjustLoyaltyPoints",
-   "getGuestLoyalty",
-   "getGuestProfile",
-   "getWishlist",
-   "listGuestDevices",
-   "mergeGuestProfiles",
-   "searchGuests",
-   "updateGuestProfile"
+   "listPolicies",
+   "setPolicy",
+   "listConsentPurposes",
+   "setConsentPurposes"
   ],
   "services": [
-   "MarketingService"
+   "MarketingService",
+   "WhiteLabelService"
   ],
   "stores": [
    "postgres",
@@ -142030,21 +142149,15 @@
   ],
   "reads": [
    "cache:idempotency",
+   "cache:resolution",
    "marketing.consent_purpose",
-   "marketing.consent_record",
-   "marketing.guest_device",
-   "marketing.guest_profile",
-   "marketing.loyalty_points",
-   "marketing.loyalty_position",
-   "marketing.wishlist_item",
-   "pii.subject",
-   "pii.subject_contact"
+   "whitelabel.policy"
   ],
   "writes": [
    "cache:idempotency",
-   "marketing.guest_profile",
-   "marketing.loyalty_points",
-   "marketing.loyalty_position"
+   "cache:resolution",
+   "marketing.consent_purpose",
+   "whitelabel.policy"
   ],
   "storedProcedures": [],
   "wave": 2,
@@ -142096,15 +142209,7 @@
    "emptyNoResults": "The filter narrowed it and the consent legal are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** \u2014 that reads as *there is no data* and sends somebody to support with the wrong question."
   },
-  "overlays": [
-   {
-    "id": "confirmMergeGuestProfiles",
-    "component": "confirmDialog",
-    "trigger": "Merge",
-    "body": "**Names what `mergeGuestProfiles` changes and what it leaves alone**, in the consequence rather than the verb. A consent legal this affects should be identified in the dialog, not just counted.",
-    "provenance": "contract marketing-crm.yaml POST /guests/{subjectId}/merge"
-   }
-  ]
+  "overlays": []
  },
  "CMS-019": {
   "name": "User Access",
@@ -147947,6 +148052,7 @@
   "app": "venue-management-web",
   "route": "/analytics/executive-command-center",
   "operations": [
+   "getCommandCentre",
    "getDashboard",
    "listAlerts",
    "requestSuggestion",
@@ -147957,6 +148063,7 @@
    "ReportingService"
   ],
   "stores": [
+   "derived",
    "postgres",
    "postgres-analytical",
    "redis"

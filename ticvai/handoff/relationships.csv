@@ -149,6 +149,7 @@ catalogue.event_reschedule,approval_request_id,approvals.request,reference,conve
 catalogue.event_reschedule,new_space_id,catalogue.space,reference,convention,,yes
 catalogue.event_resource_plan,event_id,catalogue.event,child,convention,,yes
 catalogue.event_schedule,event_id,catalogue.event,child,convention,,yes
+catalogue.group_package,product_id,catalogue.product,reference,convention,,yes
 catalogue.import_job,via commitCatalogueImport,catalogue.product,ambient,lineage,,
 catalogue.import_job,via commitCatalogueImport,catalogue.variant,ambient,lineage,,
 catalogue.inventory_hold,channel_capacity_id,catalogue.channel_capacity,reference,convention,,yes
@@ -189,6 +190,7 @@ catalogue.product,via cloneProduct,catalogue.variant,ambient,lineage,,
 catalogue.product,via restoreProductVersion,catalogue.product_version,ambient,lineage,,
 catalogue.product,via transitionProductLifecycle,platform.outbox,ambient,lineage,yes,
 catalogue.product_category,image_asset_id,assets.media_asset,reference,convention,yes,yes
+catalogue.product_eligibility_rule,product_id,catalogue.product,child,convention,,yes
 catalogue.product_version,product_id,catalogue.product,child,declared,,yes
 catalogue.product_version,published_by_principal_id,identity.principal,reference,convention,yes,yes
 catalogue.product_version,via publishMenu,fnb.menu,ambient,lineage,yes,
@@ -305,6 +307,7 @@ fnb.delivery_location,table_id,fnb.dining_table,reference,declared,,yes
 fnb.delivery_location,venue_id,platform.scope,reference,declared,yes,yes
 fnb.delivery_location_outlet,location_id,fnb.delivery_location,child,declared,,yes
 fnb.delivery_location_outlet,outlet_id,platform.outlet,reference,declared,yes,yes
+fnb.delivery_policy,outlet_id,platform.outlet,reference,convention,yes,yes
 fnb.dining_table,outlet_id,platform.outlet,reference,declared,yes,yes
 fnb.ingredient_substitute,from_inventory_item_id,inventory.item,reference,convention,yes,yes
 fnb.ingredient_substitute,to_inventory_item_id,inventory.item,reference,convention,yes,yes
@@ -316,6 +319,8 @@ fnb.kitchen_station,outlet_id,platform.outlet,reference,declared,yes,yes
 fnb.kitchen_ticket,order_id,orders.sales_order,reference,declared,yes,yes
 fnb.kitchen_ticket,outlet_id,platform.outlet,reference,declared,yes,yes
 fnb.kitchen_ticket,prioritised_by_principal_id,identity.principal,reference,declared,yes,yes
+fnb.kitchen_ticket,via createGuestFnbOrder,fnb.order_fulfilment,ambient,lineage,,
+fnb.kitchen_ticket,via createGuestFnbOrder,fnb.service_order,ambient,lineage,,
 fnb.kitchen_ticket,via moveTableVisit,fnb.table_visit,ambient,lineage,,
 fnb.kitchen_ticket,via setKitchenTicketStatus,platform.outbox,ambient,lineage,yes,
 fnb.kitchen_ticket_line,kitchen_ticket_id,fnb.kitchen_ticket,child,declared,,yes
@@ -354,6 +359,7 @@ fnb.recipe,menu_item_id,fnb.menu_item,reference,declared,,yes
 fnb.recipe,via setRecipe,fnb.recipe_ingredient,ambient,lineage,,
 fnb.recipe_ingredient,inventory_item_id,inventory.item,reference,declared,yes,yes
 fnb.recipe_ingredient,recipe_id,fnb.recipe,child,declared,,yes
+fnb.reservation_policy,outlet_id,platform.outlet,reference,convention,yes,yes
 fnb.reservation_table,reservation_id,fnb.table_reservation,reference,convention,,yes
 fnb.reservation_table,table_id,fnb.dining_table,reference,declared,,yes
 fnb.reservation_table,via createTableReservation,fnb.table_reservation,ambient,lineage,,
@@ -363,7 +369,6 @@ fnb.service_order,outlet_id,platform.outlet,reference,declared,yes,yes
 fnb.service_order,sales_order_id,orders.sales_order,reference,convention,yes,yes
 fnb.service_order,table_visit_id,fnb.table_visit,reference,declared,,yes
 fnb.service_order,via closeTableVisit,fnb.table_visit,ambient,lineage,,
-fnb.service_order,via createGuestFnbOrder,fnb.kitchen_ticket,ambient,lineage,,
 fnb.service_order,via markOrderCollected,fnb.kitchen_ticket,ambient,lineage,,
 fnb.service_order,via mergeTableVisits,fnb.table_visit,ambient,lineage,,
 fnb.service_order,via openTableVisit,fnb.table_visit,ambient,lineage,,
@@ -393,6 +398,7 @@ fnb.table_visit,server_principal_id,identity.principal,reference,declared,yes,ye
 fnb.table_visit,subject_id,pii.subject,reference,declared,yes,yes
 fnb.table_visit,table_id,fnb.dining_table,reference,declared,,yes
 fnb.table_visit,via transferOrderItems,orders.order_line,ambient,lineage,yes,
+fnb.temperature_checkpoint,outlet_id,platform.outlet,reference,convention,yes,yes
 fnb.temperature_log,check_point_id,venuemap.point,reference,convention,yes,yes
 fnb.temperature_log,corrective_action_id,fnb.corrective_action,reference,convention,,yes
 fnb.temperature_log,recorded_by_principal_id,identity.principal,reference,convention,yes,yes
@@ -465,15 +471,18 @@ identity.mfa_method,principal_id,identity.principal,reference,declared,,yes
 identity.mfa_method,via enrolMfaMethod,identity.mfa_recovery_code,ambient,lineage,,
 identity.mfa_recovery_code,principal_id,identity.principal,reference,declared,,yes
 identity.module,parent_module_id,identity.module,reference,convention,,yes
-identity.module_access,granted_by_principal_id,identity.principal,reference,convention,,
-identity.module_access,principal_id,identity.principal,reference,convention,,
+identity.module_access,granted_by_principal_id,identity.principal,reference,convention,,yes
+identity.module_access,principal_id,identity.principal,reference,convention,,yes
 identity.otp_challenge,subject_id,pii.subject,reference,declared,yes,yes
 identity.otp_challenge,via verifyGuestEmail,marketing.message_dispatch,ambient,lineage,yes,
 identity.otp_challenge,via verifyGuestEmail,pii.subject,ambient,lineage,yes,
 identity.permission,module_id,identity.module,reference,convention,,yes
 identity.principal,home_scope_id,platform.scope,reference,declared,yes,yes
 identity.principal,primary_role_id,identity.role,reference,declared,,yes
+identity.principal,via createPrincipal,identity.principal_credential,ambient,lineage,,
 identity.principal_credential,principal_id,identity.principal,child,declared,,yes
+identity.principal_credential,via changeOwnCredential,identity.session,ambient,lineage,,
+identity.principal_credential,via resetPrincipalCredential,identity.session,ambient,lineage,,
 identity.refresh_token,principal_id,identity.principal,reference,convention,,yes
 identity.refresh_token,replaced_by_token_id,payments.token,reference,convention,yes,yes
 identity.role,inherits_from_role_id,identity.role,reference,convention,,yes
@@ -718,6 +727,9 @@ marketing.guest_document,subject_id,pii.subject,reference,declared,yes,yes
 marketing.guest_document,uploaded_by_principal_id,identity.principal,reference,convention,yes,yes
 marketing.guest_extra_field,via setGuestExtraFields,marketing.guest_extra_option,ambient,lineage,,
 marketing.guest_extra_value,customer_id,marketing.customer_badge,reference,convention,,yes
+marketing.guest_match_decision,cart_id,orders.cart,reference,convention,yes,yes
+marketing.guest_match_decision,matched_profile_id,marketing.guest_profile,reference,convention,,yes
+marketing.guest_match_decision,via decideGuestCheckoutMatch,orders.cart,ambient,lineage,yes,
 marketing.guest_profile,guest_link_id,platform.guest_link,reference,declared,yes,yes
 marketing.guest_profile,loyalty,marketing.loyalty_position,reference,declared,,yes
 marketing.guest_profile,segment_id,marketing.segment,reference,declared,,yes
@@ -841,6 +853,7 @@ orders.discount,order_id,orders.sales_order,reference,declared,,yes
 orders.discount,promotion_id,promotions.promotion,reference,convention,yes,yes
 orders.group_booking,leader_subject_id,pii.subject,reference,convention,yes,yes
 orders.group_booking,order_id,orders.sales_order,reference,declared,,yes
+orders.group_booking,via requestGroupBooking,orders.sales_order,ambient,lineage,,
 orders.invitation,cost_center_id,ledger.cost_center,reference,declared,yes,yes
 orders.invitation,issued_by_principal_id,identity.principal,reference,convention,yes,yes
 orders.invitation,offered_by_principal_id,identity.principal,reference,convention,yes,yes
@@ -895,6 +908,8 @@ orders.refund,requested_by_principal_id,identity.principal,reference,declared,ye
 orders.refund,secondary_principal_id,identity.principal,reference,declared,yes,yes
 orders.refund,tax_reversal_entry_id,queue.entry,reference,convention,yes,yes
 orders.refund_policy,venue_id,platform.scope,reference,declared,yes,yes
+orders.resale_fee_policy,event_id,catalogue.event,reference,convention,yes,yes
+orders.resale_fee_policy,product_id,catalogue.product,reference,declared,yes,yes
 orders.resale_listing,entitlement_id,access.entitlement,reference,declared,yes,yes
 orders.resale_listing,seller_subject_id,pii.subject,reference,convention,yes,yes
 orders.resale_listing,sold_to_subject_id,pii.subject,reference,convention,yes,yes
@@ -919,6 +934,8 @@ orders.upgrade,order_id,orders.sales_order,reference,declared,,yes
 orders.upgrade,original_order_line_id,orders.order_line,reference,convention,,yes
 orders.upgrade,requested_by_principal_id,identity.principal,reference,convention,yes,yes
 orders.upgrade,rule_id,approvals.rule,reference,convention,yes,yes
+orders.visit_reminder,order_id,orders.sales_order,reference,declared,,yes
+orders.visit_reminder,subject_id,pii.subject,reference,convention,yes,yes
 orders.wallet_pass,entitlement_id,access.entitlement,reference,declared,yes,yes
 payments.authentication_policy,mandate_text_asset_id,assets.media_asset,reference,convention,yes,yes
 payments.chargeback_evidence,chargeback_id,orders.chargeback,reference,convention,yes,yes

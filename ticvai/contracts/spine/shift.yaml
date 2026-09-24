@@ -2,7 +2,7 @@ openapi: 3.1.0
 info:
   title: TICVAI Shift & Till
   version: 1.0.0
-  x-ticvai-screen-count: 19
+  x-ticvai-screen-count: 20
   x-ticvai-tier: spine
   x-ticvai-module: "2 — Ticketing Sales (cash handling)"
   x-ticvai-capabilities: [C01]
@@ -208,6 +208,7 @@ paths:
         - "P04 POS-011 Returns, Refunds & Exchanges"
         - "P04 POS-012 Omnichannel Order & Fulfilment Center"
         - "P04 POS-013 Mobile POS, Event Sales & Offline Operations"
+        - "P08 BO-1065 Currency, Timezone & Channels"
       summary: The notes and coins a till counts
       description: >
         Raised by Tanmay in the 20 August review, and **the table was built and nothing read it** —
@@ -238,6 +239,55 @@ paths:
               schema:
                 type: array
                 items: { $ref: '#/components/schemas/Denomination' }
+
+    put:
+      operationId: setDenominations
+      x-ticvai-consumed-by:
+        - "P08 BO-1065 Currency, Timezone & Channels"
+      summary: Set the notes and coins a region's tills count
+      description: >
+        **`listDenominations` read a table nothing wrote**, so every till's count screen was empty
+        until somebody inserted rows by hand, and the UAE seed Tanmay supplied had no way in.
+
+        **Region scope, because a currency is.** A note in circulation in the UAE is in circulation
+        at every UAE venue; a venue that could set its own list could count a note its neighbour
+        cannot, and the cash-ups would not add up across the region.
+
+        **Replaces the list for one currency and never deletes.** A denomination left out is
+        deactivated, not removed, because deleting it would rewrite every past cash-up that counted it.
+      tags: [shift]
+      x-ticvai-permission: REGION_CONFIGURE
+      x-ticvai-audience: [staff]
+      x-ticvai-scope-level: region
+      x-ticvai-config-scope: region
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/SetDenominationsRequest' }
+      responses:
+        '200':
+          description: The currency's denominations, in counting order, including the ones deactivated
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/Denomination' }
+        '400':
+          $ref: '../shared/common.yaml#/components/responses/BadRequest'
+        '403':
+          $ref: '../shared/common.yaml#/components/responses/Forbidden'
+        '422':
+          description: >
+            A zero or negative value, or two entries with the same value and kind. The zero-valued
+            coin in the original seed is exactly this.
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
 
   /deposit-boxes:
     get:
@@ -1096,7 +1146,7 @@ components:
         the order they sit in the drawer, and `sortOrder` is what makes the count screen match the
         physical tray."
       type: object
-      required: [value, count]
+      required: [currencyCode, kind, value]
       properties:
         id: { type: string, format: uuid }
         currencyCode: { type: string }
@@ -1116,13 +1166,27 @@ components:
             and stays in the count history — **a JSON blob cannot deactivate anything**, and
             deleting the value would rewrite every past cash-up that used it.
         value:
+          x-ticvai-column: face_value_amount
           $ref: '../shared/common.yaml#/components/schemas/Money'
-        count:
-          type: integer
-          minimum: 0
-          description: >
-            Units of this denomination. The server computes the total — a client-computed
-            total cannot be reconciled against the count.
+    SetDenominationsRequest:
+      type: object
+      description: Request only. One currency's complete list; anything not in it is deactivated.
+      required: [currencyCode, denominations]
+      properties:
+        currencyCode: { type: string, minLength: 3, maxLength: 3 }
+        denominations:
+          type: array
+          minItems: 1
+          items:
+            type: object
+            required: [displayName, kind, value, sortOrder]
+            properties:
+              displayName: { type: string, maxLength: 60 }
+              kind: { type: string, enum: [note, coin] }
+              value:
+                $ref: '../shared/common.yaml#/components/schemas/Money'
+              sortOrder: { type: integer, minimum: 0 }
+              isActive: { type: boolean, default: true }
 
     DenominationCount:
       type: array

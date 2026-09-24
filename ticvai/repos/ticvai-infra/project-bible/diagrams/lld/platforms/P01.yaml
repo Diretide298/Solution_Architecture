@@ -39,15 +39,15 @@ modulesUsed:
   screens: 1
 servicesCalled:
 - service: MarketingService
-  operationCalls: 58
+  operationCalls: 60
 - service: OrderService
-  operationCalls: 40
+  operationCalls: 45
 - service: CatalogueService
-  operationCalls: 36
+  operationCalls: 40
 - service: IdentityService
   operationCalls: 24
 - service: FnbService
-  operationCalls: 18
+  operationCalls: 20
 - service: VenueOpsService
   operationCalls: 15
 - service: AccessService
@@ -170,6 +170,7 @@ screens:
   operations:
   - getAvailability
   - getProduct
+  - getProductEligibilityRule
   - getWaitTimes
   - listPerformances
   states:
@@ -229,6 +230,7 @@ screens:
   density: compact
   operations:
   - acquireInventoryHold
+  - checkBookingEligibility
   - getAvailability
   - getPerformance
   states:
@@ -433,8 +435,10 @@ screens:
   wave: 1
   density: compact
   operations:
+  - checkGuestCheckoutMatch
   - createOrder
   - createPayment
+  - decideGuestCheckoutMatch
   - getOrder
   - inquirePaymentStatus
   - transferOrderTickets
@@ -791,8 +795,12 @@ screens:
   wave: 2
   density: compact
   operations:
+  - getBillingStatement
   - getMyMemberships
+  - listBillingStatements
   - listGuestMemberships
+  - listMyPaymentIssues
+  - retryMyDunningPayment
   - transferOrderTickets
   states:
   - emptyFirstRun
@@ -804,6 +812,8 @@ screens:
   offlineState: true
   entryParams:
   - orderId<-deepLink
+  - caseId<-navigation
+  - statementId<-navigation
   goesTo:
   - WEB-001
   - WEB-021
@@ -1029,9 +1039,12 @@ screens:
   operations:
   - cancelReservation
   - getGroupBooking
+  - getGroupPackageDefinition
   - getReservation
   - getResourceAvailability
+  - listGroupPackages
   - listReservations
+  - requestGroupBooking
   - updateTableReservation
   states:
   - emptyFirstRun
@@ -1045,6 +1058,7 @@ screens:
   - reservationId<-deepLink
   - groupBookingId<-navigation
   - resourceId<-navigation
+  - productId<-navigation
   goesTo:
   - WEB-001
   - WEB-030
@@ -1167,11 +1181,13 @@ screens:
   - claimTableSession
   - createGuestFnbOrder
   - createTableReservation
+  - getFnbDeliveryPolicy
   - getGuestMenu
   - getGuestOrderStatus
   - joinRestaurantWaitlist
   - listDeliveryLocations
   - listDiningOutlets
+  - listFulfilmentSlots
   - listModifierGroups
   states:
   - emptyFirstRun

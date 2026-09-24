@@ -55,21 +55,21 @@ servicesCalled:
 - service: VenueOpsService
   operationCalls: 438
 - service: CatalogueService
-  operationCalls: 352
+  operationCalls: 356
 - service: TenancyService
   operationCalls: 272
 - service: OrderService
-  operationCalls: 224
+  operationCalls: 235
 - service: AccessService
   operationCalls: 203
 - service: MarketingService
-  operationCalls: 190
+  operationCalls: 192
 - service: WalletService
   operationCalls: 144
 - service: InventoryService
   operationCalls: 79
 - service: FnbService
-  operationCalls: 73
+  operationCalls: 75
 - service: ReportingService
   operationCalls: 72
 - service: LedgerService
@@ -77,7 +77,7 @@ servicesCalled:
 - service: PlatformService
   operationCalls: 58
 - service: IdentityService
-  operationCalls: 17
+  operationCalls: 18
 - service: RetailService
   operationCalls: 16
 - service: AiService
@@ -490,10 +490,12 @@ screens:
   density: compact
   operations:
   - createBundle
+  - getGroupPackageDefinition
   - getLatestBundle
   - listCatalogueBundles
   - publishBundle
   - reportBundleApplied
+  - setGroupPackageDefinition
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -503,6 +505,7 @@ screens:
   offlineState: false
   entryParams:
   - version<-deepLink
+  - productId<-navigation
   goesTo:
   - BO-001
   - BO-007
@@ -1016,9 +1019,11 @@ screens:
   density: compact
   operations:
   - applyManualDiscount
+  - createGroupBooking
   - createOrder
   - createRefund
   - exchangeOrderLines
+  - getGroupBooking
   - getOrder
   - getOrderStatement
   - holdOrder
@@ -1028,6 +1033,7 @@ screens:
   - reprintOrder
   - rescheduleOrder
   - resumeOrder
+  - updateGroupBooking
   - voidOrder
   states:
   - emptyFirstRun
@@ -1038,6 +1044,7 @@ screens:
   offlineState: false
   entryParams:
   - orderId<-deepLink
+  - groupBookingId<-navigation
   goesTo:
   - BO-001
   - BO-007
@@ -1633,6 +1640,7 @@ screens:
   density: compact
   operations:
   - createOutlet
+  - getFnbDeliveryPolicy
   - getGuestMenu
   - getHaccpStatus
   - getOutletStock
@@ -1643,6 +1651,7 @@ screens:
   - listOutlets
   - recordWaste
   - reserveMerchandise
+  - setFnbDeliveryPolicy
   - setReturnPolicy
   - setTableLayout
   - signCorrectiveAction
@@ -1978,6 +1987,7 @@ screens:
   - createPrincipal
   - getPrincipal
   - listPrincipals
+  - resetPrincipalCredential
   - updatePrincipal
   states:
   - emptyFirstRun
@@ -5177,14 +5187,17 @@ screens:
   wave: 3
   density: compact
   operations:
+  - getProductEligibilityRule
   - listGuestCompanionEligibility
+  - setProductEligibilityRule
   states:
   - emptyFirstRun
   - emptyNoAccess
   - error
   - loading
   offlineState: false
-  entryParams: []
+  entryParams:
+  - productId<-navigation
   goesTo:
   - BO-154
   boardFrames: null
@@ -8942,9 +8955,11 @@ screens:
   wave: 3
   density: compact
   operations:
+  - getDepositPolicy
   - listDepositActivity
   - listDepositPartialPayment
   - recordDepositActivity
+  - setDepositPolicy
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -8952,7 +8967,8 @@ screens:
   - error
   - loading
   offlineState: false
-  entryParams: []
+  entryParams:
+  - depositId<-navigation
   goesTo:
   - BO-324
   boardFrames: null
@@ -9374,14 +9390,19 @@ screens:
   wave: 3
   density: compact
   operations:
+  - createTicketTemplate
+  - listTicketTemplates
+  - printTicketProof
   - setPdfPrintablePos
+  - updateTicketTemplate
   states:
   - emptyFirstRun
   - emptyNoAccess
   - error
   - loading
   offlineState: false
-  entryParams: []
+  entryParams:
+  - templateId<-navigation
   goesTo:
   - BO-344
   boardFrames: null
@@ -18775,8 +18796,10 @@ screens:
   density: compact
   operations:
   - decideDuplicateCandidate
+  - getGuestMatchPolicy
   - listDuplicateCandidates
   - mergeGuests
+  - setGuestMatchPolicy
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -26341,6 +26364,8 @@ screens:
   wave: 3
   density: compact
   operations:
+  - listDenominations
+  - setDenominations
   - updateRegionSettings
   states:
   - emptyFirstRun

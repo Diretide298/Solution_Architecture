@@ -1,5 +1,5 @@
 id: LLD-FnbService
-title: FnbService — 102 operations, 37 tables
+title: FnbService — 111 operations, 42 tables
 generatedBy: tools/derive-diagrams.py
 tier: operations
 index: diagrams/hld/02-services.yaml
@@ -9,20 +9,20 @@ why: '**96 operations and 34 tables — the largest single domain after marketin
 scale: Write-heavy during service, idle between. **Two peaks a day, sharply.**
 ifDown: Down means the kitchen falls back to paper. Offline-capable by design.
 coverage:
-  operations: 102
+  operations: 111
   inAFlow: 70
   percent: 73%
   note: '**Flow coverage is how much of this service a journey has walked.** A service under 40% is
     unwalked rather than under-documented.'
 schemas:
 - schema: fnb
-  tables: 37
+  tables: 42
   stores:
   - postgres
   largestTable: fnb.product_recommendation
 operationsByContract:
 - contract: fnb
-  count: 102
+  count: 111
   operations:
   - operation: acceptFnbOrder
     verb: POST
@@ -158,8 +158,8 @@ operationsByContract:
     scope: venue
     permission: null
     offline: false
-    reads: 4
-    writes: 3
+    reads: 5
+    writes: 4
   - operation: createMenu
     verb: POST
     path: /menus
@@ -224,6 +224,14 @@ operationsByContract:
     offline: true
     reads: 3
     writes: 0
+  - operation: getFnbDeliveryPolicy
+    verb: GET
+    path: /fnb-delivery-policy
+    scope: venue
+    permission: PRODUCT_VIEW
+    offline: false
+    reads: 1
+    writes: 0
   - operation: getFnbOrder
     verb: GET
     path: /fnb-orders/{orderId}
@@ -231,6 +239,22 @@ operationsByContract:
     permission: ORDER_VIEW
     offline: true
     reads: 2
+    writes: 0
+  - operation: getFnbReservationPolicy
+    verb: GET
+    path: /reservation-policy
+    scope: venue
+    permission: PRODUCT_VIEW
+    offline: true
+    reads: 1
+    writes: 0
+  - operation: getFnbServiceChargePolicy
+    verb: GET
+    path: /service-charge-policy
+    scope: venue
+    permission: PRODUCT_VIEW
+    offline: true
+    reads: 1
     writes: 0
   - operation: getGuestBill
     verb: GET
@@ -352,6 +376,14 @@ operationsByContract:
     offline: false
     reads: 1
     writes: 0
+  - operation: listFulfilmentSlots
+    verb: GET
+    path: /outlets/{outletId}/fulfilment-slots
+    scope: venue
+    permission: null
+    offline: false
+    reads: 2
+    writes: 0
   - operation: listIngredientSubstitutes
     verb: GET
     path: /recipes/{recipeId}/substitutes
@@ -415,6 +447,14 @@ operationsByContract:
     permission: FNB_OPERATE
     offline: true
     reads: 3
+    writes: 0
+  - operation: listTemperatureCheckpoints
+    verb: GET
+    path: /food-safety/checkpoints
+    scope: venue
+    permission: PRODUCT_VIEW
+    offline: true
+    reads: 1
     writes: 0
   - operation: logColdChain
     verb: POST
@@ -672,6 +712,30 @@ operationsByContract:
     offline: false
     reads: 1
     writes: 2
+  - operation: setFnbDeliveryPolicy
+    verb: PUT
+    path: /fnb-delivery-policy
+    scope: venue
+    permission: PRODUCT_CONFIGURE
+    offline: false
+    reads: 1
+    writes: 1
+  - operation: setFnbReservationPolicy
+    verb: PUT
+    path: /reservation-policy
+    scope: venue
+    permission: PRODUCT_CONFIGURE
+    offline: false
+    reads: 1
+    writes: 1
+  - operation: setFnbServiceChargePolicy
+    verb: PUT
+    path: /service-charge-policy
+    scope: venue
+    permission: PRODUCT_CONFIGURE
+    offline: false
+    reads: 1
+    writes: 1
   - operation: setIngredientSubstitutes
     verb: PUT
     path: /recipes/{recipeId}/substitutes
@@ -768,6 +832,14 @@ operationsByContract:
     offline: false
     reads: 2
     writes: 2
+  - operation: setTemperatureCheckpoint
+    verb: PUT
+    path: /food-safety/checkpoints
+    scope: venue
+    permission: PRODUCT_CONFIGURE
+    offline: false
+    reads: 1
+    writes: 1
   - operation: signCorrectiveAction
     verb: POST
     path: /food-safety/corrective-actions/{actionId}/sign
@@ -902,6 +974,13 @@ tables:
   parent: fnb.delivery_location
   writtenBy: []
   foreignWriters: null
+- table: fnb.delivery_policy
+  columns: 16
+  store: postgres
+  parent: null
+  writtenBy:
+  - fnb
+  foreignWriters: null
 - table: fnb.dining_table
   columns: 7
   store: postgres
@@ -998,6 +1077,13 @@ tables:
   writtenBy:
   - fnb
   foreignWriters: null
+- table: fnb.order_fulfilment
+  columns: 9
+  store: postgres
+  parent: null
+  writtenBy:
+  - fnb
+  foreignWriters: null
 - table: fnb.product_recommendation
   columns: 17
   store: postgres
@@ -1032,8 +1118,22 @@ tables:
   writtenBy:
   - fnb
   foreignWriters: null
+- table: fnb.reservation_policy
+  columns: 7
+  store: postgres
+  parent: null
+  writtenBy:
+  - fnb
+  foreignWriters: null
 - table: fnb.reservation_table
   columns: 4
+  store: postgres
+  parent: null
+  writtenBy:
+  - fnb
+  foreignWriters: null
+- table: fnb.service_charge_policy
+  columns: 15
   store: postgres
   parent: null
   writtenBy:
@@ -1092,6 +1192,13 @@ tables:
   writtenBy:
   - fnb
   foreignWriters: null
+- table: fnb.temperature_checkpoint
+  columns: 10
+  store: postgres
+  parent: null
+  writtenBy:
+  - fnb
+  foreignWriters: null
 - table: fnb.temperature_log
   columns: 11
   store: postgres
@@ -1112,7 +1219,7 @@ readsFrom:
 - service: InventoryService
   operations: 6
 - service: TenancyService
-  operations: 5
+  operations: 6
 - service: OrderService
   operations: 4
 - service: CatalogueService

@@ -125,10 +125,10 @@ CREATE INDEX IF NOT EXISTS ix_usage_record_venue_id ON control.usage_record (ven
 CREATE INDEX IF NOT EXISTS ix_webhook_delivery_event_id ON control.webhook_delivery (event_id);
 -- crosses the database boundary: control.webhook_delivery.subscription_id -> subscription.contract
 CREATE INDEX IF NOT EXISTS ix_webhook_delivery_subscription_id ON control.webhook_delivery (subscription_id);
-CREATE INDEX IF NOT EXISTS ix_channel_listing_scope ON control.channel_listing (scope_path text_pattern_ops);
-CREATE INDEX IF NOT EXISTS ix_content_block_scope ON control.content_block (scope_path text_pattern_ops);
-CREATE INDEX IF NOT EXISTS ix_footer_config_scope ON control.footer_config (scope_path text_pattern_ops);
-CREATE INDEX IF NOT EXISTS ix_migration_plan_scope ON control.migration_plan (scope_path text_pattern_ops);
-CREATE INDEX IF NOT EXISTS ix_seo_metadata_scope ON control.seo_metadata (scope_path text_pattern_ops);
-CREATE INDEX IF NOT EXISTS ix_support_notice_scope ON control.support_notice (scope_path text_pattern_ops);
-CREATE INDEX IF NOT EXISTS ix_url_redirect_scope ON control.url_redirect (scope_path text_pattern_ops);
+CREATE INDEX IF NOT EXISTS ix_channel_listing_scope ON control.channel_listing USING gist (scope_path);
+CREATE INDEX IF NOT EXISTS ix_content_block_scope ON control.content_block USING gist (scope_path);
+CREATE INDEX IF NOT EXISTS ix_footer_config_scope ON control.footer_config USING gist (scope_path);
+CREATE INDEX IF NOT EXISTS ix_migration_plan_scope ON control.migration_plan USING gist (scope_path);
+CREATE INDEX IF NOT EXISTS ix_seo_metadata_scope ON control.seo_metadata USING gist (scope_path);
+CREATE INDEX IF NOT EXISTS ix_support_notice_scope ON control.support_notice USING gist (scope_path);
+CREATE INDEX IF NOT EXISTS ix_url_redirect_scope ON control.url_redirect USING gist (scope_path);

@@ -1178,6 +1178,12 @@
  ],
  "documents": [
   {
+   "file": "docs\\active\\action-register-22-september.md",
+   "title": "Action register \u2014 22 September 2026",
+   "status": "",
+   "mentions": 6
+  },
+  {
    "file": "docs\\active\\ai-scope-for-confirmation.md",
    "title": "AI scope \u2014 for confirmation",
    "status": "",
@@ -1585,7 +1591,7 @@
   "tables": 51,
   "screens": 40,
   "flows": 11,
-  "documents": 37,
+  "documents": 38,
   "openConflicts": 1
  }
 }

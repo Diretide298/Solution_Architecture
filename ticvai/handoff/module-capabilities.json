@@ -593,7 +593,7 @@
      "key": "PRODUCT_CONFIGURE",
      "label": null,
      "group": "Catalogue",
-     "operationCount": 52,
+     "operationCount": 54,
      "operations": [
       "approvePricingWorkflowAuthority",
       "approveReviewDecision",
@@ -609,14 +609,14 @@
      "key": "PRODUCT_VIEW",
      "label": null,
      "group": "Catalogue",
-     "operationCount": 104,
+     "operationCount": 108,
      "operations": [
+      "checkBookingEligibility",
       "getAvailability",
       "getChannelAllocations",
       "getEvent",
-      "getLatestBundle",
-      "getMyMemberships",
-      "getPerformance"
+      "getGroupPackageDefinition",
+      "getLatestBundle"
      ],
      "elevated": false,
      "segregationConstrained": false
@@ -812,7 +812,7 @@
   "fnb": {
    "title": "7 — F&B POS  ·  5 — F&B & Guest Management (service)",
    "capabilityCount": 8,
-   "unguardedOperations": 10,
+   "unguardedOperations": 11,
    "capabilities": [
     {
      "key": "INCIDENT_MANAGE",
@@ -901,7 +901,7 @@
      "key": "PRODUCT_CONFIGURE",
      "label": null,
      "group": "Catalogue",
-     "operationCount": 30,
+     "operationCount": 34,
      "operations": [
       "applyMenuActions",
       "attachModifierGroup",
@@ -917,14 +917,14 @@
      "key": "PRODUCT_VIEW",
      "label": null,
      "group": "Catalogue",
-     "operationCount": 11,
+     "operationCount": 15,
      "operations": [
+      "getFnbDeliveryPolicy",
+      "getFnbReservationPolicy",
+      "getFnbServiceChargePolicy",
       "getMenu",
       "getProductionRun",
-      "list86Events",
-      "listFnbRecommendations",
-      "listIngredientSubstitutes",
-      "listKitchenStations"
+      "list86Events"
      ],
      "elevated": false,
      "segregationConstrained": false
@@ -1064,7 +1064,7 @@
   "identity": {
    "title": "19 — Guest Mobile App & Branding (auth) + cross-cutting staff auth",
    "capabilityCount": 10,
-   "unguardedOperations": 23,
+   "unguardedOperations": 24,
    "capabilities": [
     {
      "key": "GUEST_MANAGE",
@@ -1188,16 +1188,16 @@
      "key": "USER_MANAGE",
      "label": "create, edit, deactivate principals",
      "group": "Session and identity",
-     "operationCount": 6,
+     "operationCount": 7,
      "operations": [
       "createPrincipal",
       "getPrincipal",
       "getSsoConfig",
       "listPrincipals",
-      "setSsoConfig",
-      "updatePrincipal"
+      "resetPrincipalCredential",
+      "setSsoConfig"
      ],
-     "elevated": false,
+     "elevated": true,
      "segregationConstrained": false
     }
    ]
@@ -1488,7 +1488,7 @@
   "marketing-crm": {
    "title": "22 — Marketing & CRM",
    "capabilityCount": 11,
-   "unguardedOperations": 17,
+   "unguardedOperations": 19,
    "capabilities": [
     {
      "key": "CASE_MANAGE",
@@ -1606,7 +1606,7 @@
      "key": "MARKETING_MANAGE",
      "label": "create and amend",
      "group": "Guest engagement",
-     "operationCount": 45,
+     "operationCount": 46,
      "operations": [
       "activateAudience",
       "approvePrivacyTesting",
@@ -1636,14 +1636,14 @@
      "key": "MARKETING_VIEW",
      "label": "segments, campaigns, loyalty, reviews",
      "group": "Guest engagement",
-     "operationCount": 73,
+     "operationCount": 74,
      "operations": [
       "getAudienceOverlap",
       "getCampaign",
       "getCampaignPerformance",
+      "getGuestMatchPolicy",
       "getJourneyPerformance",
-      "getLoyaltyRules",
-      "getMarketingSubscription"
+      "getLoyaltyRules"
      ],
      "elevated": false,
      "segregationConstrained": false
@@ -1652,8 +1652,8 @@
   },
   "orders": {
    "title": "2 — Ticketing Sales",
-   "capabilityCount": 18,
-   "unguardedOperations": 15,
+   "capabilityCount": 20,
+   "unguardedOperations": 16,
    "capabilities": [
     {
      "key": "CREDIT_MANAGE",
@@ -1703,7 +1703,7 @@
      "key": "ORDER_CREATE",
      "label": null,
      "group": "Selling",
-     "operationCount": 41,
+     "operationCount": 42,
      "operations": [
       "appendEntitlementToMedia",
       "approveExceptionServiceRecovery",
@@ -1742,7 +1742,7 @@
      "key": "ORDER_MODIFY",
      "label": null,
      "group": "Selling",
-     "operationCount": 12,
+     "operationCount": 13,
      "operations": [
       "addTip",
       "convertToTermProduct",
@@ -1816,14 +1816,14 @@
      "key": "ORDER_VIEW",
      "label": null,
      "group": "Selling",
-     "operationCount": 88,
+     "operationCount": 92,
      "operations": [
       "getB2bCredit",
       "getGroupBooking",
       "getMediaEntitlements",
       "getOrder",
-      "getOrderStatement",
-      "getPaymentLink"
+      "getOrderCalendarEvent",
+      "getOrderStatement"
      ],
      "elevated": false,
      "segregationConstrained": false
@@ -1846,6 +1846,32 @@
      "operationCount": 1,
      "operations": [
       "voidPayment"
+     ],
+     "elevated": false,
+     "segregationConstrained": false
+    },
+    {
+     "key": "PRODUCT_CONFIGURE",
+     "label": null,
+     "group": "Catalogue",
+     "operationCount": 4,
+     "operations": [
+      "createTicketTemplate",
+      "setDepositPolicy",
+      "setResaleFeePolicy",
+      "updateTicketTemplate"
+     ],
+     "elevated": false,
+     "segregationConstrained": false
+    },
+    {
+     "key": "PRODUCT_VIEW",
+     "label": null,
+     "group": "Catalogue",
+     "operationCount": 2,
+     "operations": [
+      "getDepositPolicy",
+      "listTicketTemplates"
      ],
      "elevated": false,
      "segregationConstrained": false
@@ -1877,7 +1903,7 @@
   "payments": {
    "title": "4 — Bundles and Promotions",
    "capabilityCount": 5,
-   "unguardedOperations": 0,
+   "unguardedOperations": 2,
    "capabilities": [
     {
      "key": "CREDIT_MANAGE",
@@ -2445,14 +2471,14 @@
      "key": "REPORT_VIEW_VENUE",
      "label": null,
      "group": "Reporting",
-     "operationCount": 20,
+     "operationCount": 21,
      "operations": [
       "acknowledgeAlert",
       "askReportingQuestion",
       "cancelReportExecution",
+      "getCommandCentre",
       "getDashboard",
-      "getKpiValues",
-      "getReport"
+      "getKpiValues"
      ],
      "elevated": false,
      "segregationConstrained": false
@@ -2733,7 +2759,7 @@
   },
   "shift": {
    "title": "2 — Ticketing Sales (cash handling)",
-   "capabilityCount": 9,
+   "capabilityCount": 10,
    "unguardedOperations": 0,
    "capabilities": [
     {
@@ -2766,6 +2792,17 @@
      "operationCount": 1,
      "operations": [
       "acceptShiftVariance"
+     ],
+     "elevated": false,
+     "segregationConstrained": false
+    },
+    {
+     "key": "REGION_CONFIGURE",
+     "label": "currency, decimals, time zone, fiscal year",
+     "group": "Organisation",
+     "operationCount": 1,
+     "operations": [
+      "setDenominations"
      ],
      "elevated": false,
      "segregationConstrained": false
@@ -3281,7 +3318,7 @@
      "key": "TENANT_CONFIGURE",
      "label": "edit branding, content, navigation, modules",
      "group": "Tenant experience",
-     "operationCount": 46,
+     "operationCount": 48,
      "operations": [
       "claimCustomDomain",
       "createBanner",
@@ -3657,10 +3694,10 @@
     "approveReviewDecision"
    ],
    "PRODUCT_VIEW": [
+    "checkBookingEligibility",
     "compareQuotations",
     "diffSeatMapVersions",
-    "explainRecommendation",
-    "getAvailability"
+    "explainRecommendation"
    ],
    "QUEUE_VIEW": [
     "getQueue",
@@ -3687,7 +3724,7 @@
     "acknowledgeAlert",
     "askReportingQuestion",
     "cancelReportExecution",
-    "getDashboard"
+    "getCommandCentre"
    ],
    "REPORT_VIEW_WORKSTATION": [
     "getShift",

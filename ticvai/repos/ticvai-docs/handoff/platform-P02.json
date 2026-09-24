@@ -7,15 +7,15 @@
  "audience": "guest",
  "formFactor": "mobileApp",
  "offlineCapable": true,
- "generated": "2026-09-21",
+ "generated": "2026-09-24",
  "note": "Derived by tools/derive-platform.py. **The gaps section is the point** \u2014 a page listing what exists is a directory; one listing what is missing is a worklist.",
  "counts": {
   "screens": 71,
-  "operations": 154,
-  "contracts": 17,
+  "operations": 170,
+  "contracts": 18,
   "modules": 16,
   "undrawn": 0,
-  "operationsWithNoScreen": 12
+  "operationsWithNoScreen": 10
  },
  "waves": {
   "wave1": 20,
@@ -146,12 +146,12 @@
  ],
  "contracts": [
   {
-   "contract": "marketing-crm",
-   "operations": 30
+   "contract": "orders",
+   "operations": 35
   },
   {
-   "contract": "orders",
-   "operations": 29
+   "contract": "marketing-crm",
+   "operations": 32
   },
   {
    "contract": "identity",
@@ -159,11 +159,11 @@
   },
   {
    "contract": "catalogue",
-   "operations": 13
+   "operations": 17
   },
   {
    "contract": "fnb",
-   "operations": 12
+   "operations": 14
   },
   {
    "contract": "access",
@@ -182,15 +182,15 @@
    "operations": 4
   },
   {
-   "contract": "ai",
-   "operations": 4
-  },
-  {
    "contract": "wallet",
    "operations": 4
   },
   {
    "contract": "retail",
+   "operations": 4
+  },
+  {
+   "contract": "ai",
    "operations": 4
   },
   {
@@ -202,11 +202,15 @@
    "operations": 2
   },
   {
-   "contract": "games",
-   "operations": 1
+   "contract": "payments",
+   "operations": 2
   },
   {
    "contract": "finance",
+   "operations": 1
+  },
+  {
+   "contract": "games",
    "operations": 1
   },
   {
@@ -248,7 +252,7 @@
    "module": "Discovery & Browse",
    "wave": 1,
    "route": "/general/attraction-details",
-   "operations": 4,
+   "operations": 5,
    "drawn": true
   },
   {
@@ -275,7 +279,7 @@
    "module": "Booking & Selection",
    "wave": 1,
    "route": "/general/select-date-and-time",
-   "operations": 2,
+   "operations": 3,
    "drawn": true
   },
   {
@@ -293,7 +297,7 @@
    "module": "Cart & Checkout",
    "wave": 1,
    "route": "/general/review-and-payment",
-   "operations": 9,
+   "operations": 11,
    "drawn": true
   },
   {
@@ -347,7 +351,7 @@
    "module": "Membership, Loyalty & Value",
    "wave": 2,
    "route": "/general/memberships",
-   "operations": 5,
+   "operations": 9,
    "drawn": true
   },
   {
@@ -374,7 +378,7 @@
    "module": "Account & Self-Service",
    "wave": 3,
    "route": "/general/add-to-calendar-reminders",
-   "operations": 3,
+   "operations": 6,
    "drawn": true
   },
   {
@@ -428,7 +432,7 @@
    "module": "In-venue Services",
    "wave": 2,
    "route": "/general/fandb-browse-and-order",
-   "operations": 8,
+   "operations": 10,
    "drawn": true
   },
   {
@@ -707,7 +711,7 @@
    "module": "Account & Self-Service",
    "wave": 1,
    "route": "/general/dynamic-qr-ticket",
-   "operations": 1,
+   "operations": 4,
    "drawn": true
   },
   {
@@ -842,7 +846,7 @@
    "module": "Booking & Selection",
    "wave": 2,
    "route": "/account/share-group-booking",
-   "operations": 5,
+   "operations": 8,
    "drawn": true
   },
   {
@@ -910,18 +914,6 @@
     "contract": "marketing-crm",
     "verb": "PUT",
     "summary": "Choose the name shown on the board"
-   },
-   {
-    "operation": "getBillingStatement",
-    "contract": "orders",
-    "verb": "GET",
-    "summary": "One statement, with its lines"
-   },
-   {
-    "operation": "listBillingStatements",
-    "contract": "orders",
-    "verb": "GET",
-    "summary": "What was charged, when, and against which agreement"
    },
    {
     "operation": "recordRecommendationOutcome",

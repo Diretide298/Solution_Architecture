@@ -1,5 +1,5 @@
 id: LLD-fnb
-title: fnb — 102 operations
+title: fnb — 111 operations
 generatedBy: tools/derive-diagrams.py
 index: diagrams/hld/03-contracts.yaml
 tier: satellite
@@ -266,12 +266,14 @@ operations:
   offline: false
   reads:
   - cache:idempotency
+  - fnb.delivery_policy
   - fnb.location_session
   - fnb.menu_item
   - inventory.stock_level
   writes:
   - cache:idempotency
   - fnb.kitchen_ticket
+  - fnb.order_fulfilment
   - fnb.service_order
 - operation: createMenu
   verb: POST
@@ -396,6 +398,18 @@ operations:
   - fnb.table_session
   - orders.payment
   writes: []
+- operation: getFnbDeliveryPolicy
+  verb: GET
+  path: /fnb-delivery-policy
+  scope: venue
+  permission: PRODUCT_VIEW
+  audience:
+  - staff
+  - guest
+  offline: false
+  reads:
+  - fnb.delivery_policy
+  writes: []
 - operation: getFnbOrder
   verb: GET
   path: /fnb-orders/{orderId}
@@ -407,6 +421,28 @@ operations:
   reads:
   - fnb.service_order
   - fnb.service_order_line
+  writes: []
+- operation: getFnbReservationPolicy
+  verb: GET
+  path: /reservation-policy
+  scope: venue
+  permission: PRODUCT_VIEW
+  audience:
+  - staff
+  offline: true
+  reads:
+  - fnb.reservation_policy
+  writes: []
+- operation: getFnbServiceChargePolicy
+  verb: GET
+  path: /service-charge-policy
+  scope: venue
+  permission: PRODUCT_VIEW
+  audience:
+  - staff
+  offline: true
+  reads:
+  - fnb.service_charge_policy
   writes: []
 - operation: getGuestBill
   verb: GET
@@ -600,6 +636,18 @@ operations:
   reads:
   - fnb.product_recommendation
   writes: []
+- operation: listFulfilmentSlots
+  verb: GET
+  path: /outlets/{outletId}/fulfilment-slots
+  scope: venue
+  permission: null
+  audience:
+  - guest
+  offline: false
+  reads:
+  - fnb.delivery_policy
+  - platform.outlet
+  writes: []
 - operation: listIngredientSubstitutes
   verb: GET
   path: /recipes/{recipeId}/substitutes
@@ -697,6 +745,17 @@ operations:
   - fnb.dining_table
   - fnb.reservation_table
   - fnb.table_reservation
+  writes: []
+- operation: listTemperatureCheckpoints
+  verb: GET
+  path: /food-safety/checkpoints
+  scope: venue
+  permission: PRODUCT_VIEW
+  audience:
+  - staff
+  offline: true
+  reads:
+  - fnb.temperature_checkpoint
   writes: []
 - operation: logColdChain
   verb: POST
@@ -1190,6 +1249,42 @@ operations:
   writes:
   - cache:idempotency
   - cache:resolution
+- operation: setFnbDeliveryPolicy
+  verb: PUT
+  path: /fnb-delivery-policy
+  scope: venue
+  permission: PRODUCT_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - fnb.delivery_policy
+  writes:
+  - fnb.delivery_policy
+- operation: setFnbReservationPolicy
+  verb: PUT
+  path: /reservation-policy
+  scope: venue
+  permission: PRODUCT_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - fnb.reservation_policy
+  writes:
+  - fnb.reservation_policy
+- operation: setFnbServiceChargePolicy
+  verb: PUT
+  path: /service-charge-policy
+  scope: venue
+  permission: PRODUCT_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - fnb.service_charge_policy
+  writes:
+  - fnb.service_charge_policy
 - operation: setIngredientSubstitutes
   verb: PUT
   path: /recipes/{recipeId}/substitutes
@@ -1368,6 +1463,18 @@ operations:
   writes:
   - cache:idempotency
   - fnb.dining_table
+- operation: setTemperatureCheckpoint
+  verb: PUT
+  path: /food-safety/checkpoints
+  scope: venue
+  permission: PRODUCT_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - fnb.temperature_checkpoint
+  writes:
+  - fnb.temperature_checkpoint
 - operation: signCorrectiveAction
   verb: POST
   path: /food-safety/corrective-actions/{actionId}/sign

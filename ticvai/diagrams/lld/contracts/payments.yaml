@@ -1,5 +1,5 @@
 id: LLD-payments
-title: payments — 39 operations
+title: payments — 41 operations
 generatedBy: tools/derive-diagrams.py
 index: diagrams/hld/03-contracts.yaml
 tier: satellite
@@ -150,6 +150,17 @@ operations:
   reads:
   - payments.merchant_account
   writes: []
+- operation: listMyPaymentIssues
+  verb: GET
+  path: /guests/me/payment-issues
+  scope: tenant
+  permission: null
+  audience:
+  - guest
+  offline: false
+  reads:
+  - payments.dunning_case
+  writes: []
 - operation: listPaymentMethods
   verb: GET
   path: /payment-methods
@@ -239,6 +250,20 @@ operations:
   reads:
   - payments.dunning_case
   writes: []
+- operation: retryMyDunningPayment
+  verb: POST
+  path: /dunning-cases/{caseId}/retry
+  scope: tenant
+  permission: null
+  audience:
+  - guest
+  offline: false
+  reads:
+  - cache:idempotency
+  - payments.dunning_case
+  writes:
+  - cache:idempotency
+  - payments.dunning_case
 - operation: setB2bPaymentTerms
   verb: PUT
   path: /b2b-credit-accounts/{accountId}/terms

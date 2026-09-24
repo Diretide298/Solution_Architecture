@@ -45,7 +45,7 @@ schemas:
   tables: 21
   stores:
   - postgres
-  largestTable: games.entitlement
+  largestTable: games.game
 - schema: rental
   tables: 23
   stores:
@@ -2257,7 +2257,7 @@ tables:
   - rental
   foreignWriters: null
 - table: rental.fee_policy
-  columns: 10
+  columns: 14
   store: postgres
   parent: null
   writtenBy:
@@ -2829,7 +2829,6 @@ screens:
 - P09:ADM-587 Terminal Health, Maintenance & Incident Center\t57
 - P12:SUP-020 Queue Configuration & Management
 - P13:CMS-002 Brand Kit
-- P13:CMS-004 Logo & Assets
 - P13:CMS-010 Media Library
 - P13:CMS-061 Digital Asset Management Command Center
 - P13:CMS-062 Central Digital Asset Library

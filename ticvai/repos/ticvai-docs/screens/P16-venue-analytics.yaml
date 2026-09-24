@@ -263,6 +263,11 @@ screens:
     emptyNoAccess: You do not have reporting permission at this scope. **Sections you cannot see are not
       shown** rather than greyed out.
   apis:
+  - operationId: getCommandCentre
+    contract: reporting
+    purpose: The modules this login is entitled to, and each module's dashboards
+    trigger: onLoad
+    provenance: command-centre decision, 22 September 2026
   - operationId: getDashboard
     contract: reporting
     purpose: Read a dashboard with tile data

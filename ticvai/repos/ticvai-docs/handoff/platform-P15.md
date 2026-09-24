@@ -9,12 +9,12 @@
 | Contracts | 3 |
 | Modules | 1 |
 | Undrawn | 0 |
-| Operations with no screen | 31 |
+| Operations with no screen | 37 |
 | Waves | wave2 10 |
 
 ## Gaps
 
-### 31 operations with no screen here
+### 37 operations with no screen here
 
 **In a contract this platform uses, callable by its audience, and reaching no screen on any platform serving that audience.** Either a screen is missing or the endpoint should not exist — and the second is worth considering first.
 
@@ -26,17 +26,23 @@
 | `createModifierGroup` | fnb | POST | Create a modifier group |
 | `createTable` | fnb | POST | A table as a thing, not an inference |
 | `escalateCorrectiveAction` | fnb | POST | Escalate a finding |
+| `getFnbReservationPolicy` | fnb | GET | How long a table is held, by party size |
+| `getFnbServiceChargePolicy` | fnb | GET | The service charge a venue applies, and on what |
 | `listFnbRecommendations` | fnb | GET | Upsell and pairing suggestions for F&B |
 | `listIngredientSubstitutes` | fnb | GET | Approved substitutions for a recipe's ingredients |
+| `listTemperatureCheckpoints` | fnb | GET | The units that get read, and the range each must hold |
 | `rebalanceStationLoad` | fnb | POST | Move work between stations mid-service |
 | `recordCorrectiveAction` | fnb | POST | Record what was done about a finding |
 | `resolveBookingConflict` | fnb | GET | Two bookings, one table — and what to do about it |
 | `sendBookingConfirmation` | fnb | POST | Confirm a booking, and ask them to confirm back |
 | `sendOrderNotification` | fnb | POST | Tell the guest where their order is |
 | `setComboSlots` | fnb | PUT | What the guest chooses, and what it costs extra |
+| `setFnbReservationPolicy` | fnb | PUT | Set turn times and seating buffers |
+| `setFnbServiceChargePolicy` | fnb | PUT | Set the service charge |
 | `setIngredientSubstitutes` | fnb | PUT | Define approved substitutions |
 | `setKitchenSla` | fnb | PUT | How long a ticket may sit before it is late |
 | `setSectionLayout` | fnb | PUT | Divide the floor into sections and give each a server |
+| `setTemperatureCheckpoint` | fnb | PUT | Define a checkpoint and its safe range |
 | `updateTable` | fnb | PUT | Change what a table is |
 | `deleteDashboard` | reporting | DELETE | Archive a dashboard |
 | `deleteReportSchedule` | reporting | DELETE | Delete a schedule |

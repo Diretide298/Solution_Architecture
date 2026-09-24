@@ -1,5 +1,5 @@
 id: LLD-MarketingService
-title: MarketingService — 205 operations, 62 tables
+title: MarketingService — 209 operations, 64 tables
 generatedBy: tools/derive-diagrams.py
 tier: engagement
 index: diagrams/hld/02-services.yaml
@@ -12,20 +12,20 @@ why: '**93 operations and 37 tables — the biggest thing in the package, and pr
 scale: Bursty on send, read-heavy otherwise. **The one to watch for a split.**
 ifDown: Down stops campaigns and guest lookup. Neither stops trading.
 coverage:
-  operations: 205
+  operations: 209
   inAFlow: 39
   percent: 41%
   note: '**Flow coverage is how much of this service a journey has walked.** A service under 40% is
     unwalked rather than under-documented.'
 schemas:
 - schema: marketing
-  tables: 62
+  tables: 64
   stores:
   - postgres
   largestTable: marketing.guest_profile
 operationsByContract:
 - contract: marketing-crm
-  count: 205
+  count: 209
   operations:
   - operation: accrueLoyaltyPoints
     verb: POST
@@ -115,6 +115,14 @@ operationsByContract:
     offline: false
     reads: 1
     writes: 1
+  - operation: checkGuestCheckoutMatch
+    verb: POST
+    path: /guest-checkout/profile-match
+    scope: venue
+    permission: null
+    offline: false
+    reads: 3
+    writes: 0
   - operation: claimConversation
     verb: POST
     path: /conversations/{conversationId}/claim
@@ -235,6 +243,14 @@ operationsByContract:
     offline: false
     reads: 1
     writes: 0
+  - operation: decideGuestCheckoutMatch
+    verb: POST
+    path: /guest-checkout/profile-match/decision
+    scope: venue
+    permission: null
+    offline: false
+    reads: 4
+    writes: 3
   - operation: endKioskAssist
     verb: POST
     path: /kiosk-assists/{sessionId}/end
@@ -336,6 +352,14 @@ operationsByContract:
     path: /guests/{subjectId}/loyalty
     scope: venue
     permission: GUEST_VIEW
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: getGuestMatchPolicy
+    verb: GET
+    path: /guest-match-policy
+    scope: venue
+    permission: MARKETING_VIEW
     offline: false
     reads: 1
     writes: 0
@@ -1411,6 +1435,14 @@ operationsByContract:
     offline: false
     reads: 1
     writes: 1
+  - operation: setGuestMatchPolicy
+    verb: PUT
+    path: /guest-match-policy
+    scope: venue
+    permission: MARKETING_MANAGE
+    offline: false
+    reads: 1
+    writes: 1
   - operation: setGuestRelationships
     verb: PUT
     path: /guests/{guestId}/relationships
@@ -1857,6 +1889,20 @@ tables:
   writtenBy:
   - marketing-crm
   foreignWriters: null
+- table: marketing.guest_match_decision
+  columns: 7
+  store: postgres
+  parent: null
+  writtenBy:
+  - marketing-crm
+  foreignWriters: null
+- table: marketing.guest_match_policy
+  columns: 4
+  store: postgres
+  parent: null
+  writtenBy:
+  - marketing-crm
+  foreignWriters: null
 - table: marketing.guest_profile
   columns: 22
   store: postgres
@@ -2127,7 +2173,7 @@ readsFrom:
 - service: CatalogueService
   operations: 6
 - service: OrderService
-  operations: 3
+  operations: 5
 - service: AccessService
   operations: 2
 - service: PlatformService
@@ -2140,18 +2186,19 @@ writesOutside:
 - service: IdentityService
   operations: 2
   why: '**The owner defines the row; this service may only append to it.**'
+- service: OrderService
+  operations: 2
+  why: '**The owner defines the row; this service may only append to it.**'
 - service: PlatformService
   operations: 2
   why: '**The owner defines the row; this service may only append to it.**'
 - service: TenancyService
   operations: 1
   why: '**The owner defines the row; this service may only append to it.**'
-- service: OrderService
-  operations: 1
-  why: '**The owner defines the row; this service may only append to it.**'
 screens:
 - P01:WEB-009 Wishlist
 - P01:WEB-011 Guest Details & Attendee Forms
+- P01:WEB-012 Checkout — Payment
 - P01:WEB-017 My Account Dashboard
 - P01:WEB-020 Profile & Preferences
 - P01:WEB-024 Devices, Wishlist & Consent
@@ -2162,6 +2209,7 @@ screens:
 - P01:WEB-043 Loyalty & Rewards
 - P01:WEB-044 AI Concierge – Home
 - P02:GST-001 Home – Default
+- P02:GST-009 Review & Payment
 - P02:GST-020 Saved Items / Wishlist
 - P02:GST-031 AI Concierge – Home
 - P02:GST-032 AI Concierge – Chat

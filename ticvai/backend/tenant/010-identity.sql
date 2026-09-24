@@ -10,7 +10,7 @@ CREATE TABLE IF NOT EXISTS identity.access_decision (
     decided_by                        text,
     principal_id                      uuid,
     permission                        text,
-    scope_path                        text,
+    scope_path                        ltree,
     observed_attributes               jsonb,
     override_id                       uuid,
     latency_ms                        integer,
@@ -22,7 +22,7 @@ CREATE TABLE IF NOT EXISTS identity.access_decision (
 CREATE TABLE IF NOT EXISTS identity.access_override (
     id                                uuid PRIMARY KEY,
     principal_id                      uuid,
-    scope_path                        text,
+    scope_path                        ltree,
     permissions                       text[],
     reason                            text,
     created_by                        uuid,
@@ -44,7 +44,7 @@ CREATE TABLE IF NOT EXISTS identity.access_policy (
     combining                         text,
     effect                            text NOT NULL,
     priority                          integer,
-    scope_path                        text,
+    scope_path                        ltree,
     applies_to_role_ids               text[],
     status                            text,
     version                           integer,
@@ -64,7 +64,7 @@ CREATE TABLE IF NOT EXISTS identity.access_policy_version (
     approved_by                       uuid,
     previous                          uuid,
     current                           uuid,
-    scope_path                        text,
+    scope_path                        ltree,
     id                                uuid PRIMARY KEY NOT NULL
 );
 
@@ -90,13 +90,15 @@ CREATE TABLE IF NOT EXISTS identity.benefit_usage (
     notes                             text
 );
 
+-- Holds 6 columns. No description has been written for this table — the name is the only thing
+-- saying what it is
 CREATE TABLE IF NOT EXISTS identity.capability_template (
     id                                uuid PRIMARY KEY,
     code                              text NOT NULL,
     name                              text NOT NULL,
     description                       text,
     capabilities                      text[] NOT NULL,
-    scope_path                        text
+    scope_path                        ltree
 );
 
 -- Holds 12 columns. No description has been written for this table — the name is the only thing
@@ -130,7 +132,7 @@ CREATE TABLE IF NOT EXISTS identity.delegated_access (
     delegation_kind                   text,
     quota                             integer,
     is_revocable_by_subject           boolean,
-    scope_path                        text NOT NULL,
+    scope_path                        ltree NOT NULL,
     effect                            text NOT NULL,
     permission_id                     uuid,
     revoked_at                        timestamptz,
@@ -198,10 +200,12 @@ CREATE TABLE IF NOT EXISTS identity.module (
     updated_at                        timestamptz
 );
 
+-- Holds 8 columns. No description has been written for this table — the name is the only thing
+-- saying what it is
 CREATE TABLE IF NOT EXISTS identity.module_access (
     principal_id                      uuid,
     module                            text NOT NULL,
-    scope_path                        text NOT NULL,
+    scope_path                        ltree NOT NULL,
     capabilities                      text[] NOT NULL,
     applied_template                  text,
     granted_by_principal_id           uuid,
@@ -220,7 +224,7 @@ CREATE TABLE IF NOT EXISTS identity.otp_challenge (
 -- habit — length beats composition, and forced rotation makes passwords worse
 CREATE TABLE IF NOT EXISTS identity.password_policy (
     id                                uuid PRIMARY KEY NOT NULL,
-    scope_path                        text NOT NULL,
+    scope_path                        ltree NOT NULL,
     min_length                        integer NOT NULL,
     require_breach_check              boolean,
     max_age_days                      integer,
@@ -266,8 +270,8 @@ CREATE TABLE IF NOT EXISTS identity.principal (
 );
 
 -- a credential hash has no response it belongs in Hangs off: a child of identity.principal;
--- reaches identity.principal through its keys; references identity.principal. Reached by: 1
--- operations read it and 0 write it.
+-- reaches identity.principal through its keys; references identity.principal. Reached by: 3
+-- operations read it and 3 write it.
 CREATE TABLE IF NOT EXISTS identity.principal_credential (
     id                                uuid PRIMARY KEY NOT NULL,
     principal_id                      uuid
@@ -324,7 +328,7 @@ CREATE TABLE IF NOT EXISTS identity.segregation_rule (
     rationale                         text,
     scope_sensitive                   boolean,
     allow_with_compensating_control   boolean,
-    scope_path                        text
+    scope_path                        ltree
 );
 
 -- Which provider group becomes which role. The join that stops SSO meaning manual role assignment
@@ -332,7 +336,7 @@ CREATE TABLE IF NOT EXISTS identity.sso_group_mapping (
     id                                uuid PRIMARY KEY,
     external_group                    text NOT NULL,
     role_id                           uuid NOT NULL,
-    scope_path                        text,
+    scope_path                        ltree,
     provider_id                       uuid,
     scope_id                          uuid
 );
@@ -341,7 +345,7 @@ CREATE TABLE IF NOT EXISTS identity.sso_group_mapping (
 -- email never is
 CREATE TABLE IF NOT EXISTS identity.sso_provider (
     icon_asset_ref                    text,
-    scope_path                        text,
+    scope_path                        ltree,
     id                                uuid PRIMARY KEY NOT NULL,
     display_name                      text NOT NULL,
     protocol                          text NOT NULL,

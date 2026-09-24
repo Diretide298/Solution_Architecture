@@ -42,7 +42,7 @@ CREATE TABLE IF NOT EXISTS platform.cell_endpoint (
 CREATE TABLE IF NOT EXISTS platform.configuration_profile (
     id                                uuid PRIMARY KEY NOT NULL,
     name                              text NOT NULL,
-    scope_path                        text,
+    scope_path                        ltree,
     venue_kind_scope                  text[] NOT NULL,
     version                           integer NOT NULL,
     settings                          jsonb,
@@ -55,7 +55,7 @@ CREATE TABLE IF NOT EXISTS platform.configuration_profile (
 -- because symmetric ones make it flap across a marginal connection
 CREATE TABLE IF NOT EXISTS platform.connectivity_policy (
     id                                uuid PRIMARY KEY NOT NULL,
-    scope_path                        text NOT NULL,
+    scope_path                        ltree NOT NULL,
     failures_before_offline           integer,
     probe_interval_seconds            integer,
     probe_timeout_ms                  integer,
@@ -101,7 +101,7 @@ CREATE TABLE IF NOT EXISTS platform.dead_letter (
     last_error                        text,
     last_attempt_at                   timestamptz,
     replay_count                      integer,
-    scope_path                        text,
+    scope_path                        ltree,
     created_at                        timestamptz
 );
 
@@ -110,13 +110,12 @@ CREATE TABLE IF NOT EXISTS platform.dead_letter (
 -- JSON blob cannot deactivate anything
 CREATE TABLE IF NOT EXISTS platform.denomination (
     id                                uuid PRIMARY KEY,
-    currency_code                     text,
+    currency_code                     text NOT NULL,
     display_name                      text,
-    kind                              text,
+    kind                              text NOT NULL,
     sort_order                        integer,
     is_active                         boolean,
-    value                             numeric(18,4) NOT NULL,
-    count                             integer NOT NULL
+    face_value_amount                 numeric(18,4) NOT NULL
 );
 
 -- A physical thing that authenticates and does not authorise — a scanner, a printer, a kitchen
@@ -179,7 +178,7 @@ CREATE TABLE IF NOT EXISTS platform.guest_link (
 -- through its keys. Reached by: 1 operations read it and 1 write it.
 CREATE TABLE IF NOT EXISTS platform.offline_policy (
     id                                uuid PRIMARY KEY NOT NULL,
-    scope_path                        text NOT NULL,
+    scope_path                        ltree NOT NULL,
     max_offline_hours                 integer,
     allowed_offline                   text[],
     offline_value_ceiling             numeric(18,4),
@@ -198,7 +197,7 @@ CREATE TABLE IF NOT EXISTS platform.outbox (
     aggregate_type                    text,
     aggregate_id                      uuid,
     payload                           jsonb NOT NULL,
-    scope_path                        text,
+    scope_path                        ltree,
     sequence                          integer,
     published_at                      timestamptz,
     attempts                          integer,
@@ -355,7 +354,7 @@ CREATE TABLE IF NOT EXISTS platform.workstation (
     venue_id                          uuid NOT NULL,
     region_id                         uuid NOT NULL,
     department_id                     uuid,
-    scope_path                        text NOT NULL,
+    scope_path                        ltree NOT NULL,
     sale_board                        jsonb NOT NULL,
     access_point_id                   uuid,
     time_zone                         text NOT NULL,

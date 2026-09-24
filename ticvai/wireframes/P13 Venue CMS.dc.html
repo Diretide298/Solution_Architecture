@@ -153,17 +153,17 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
             
             <div class="canvas">
               <div class="kpis"><div class="kpi"><b>Total</b><span>1,248</span></div><div class="kpi"><b>Active</b><span>978</span></div><div class="kpi"><b>Attention</b><span>142</span></div><div class="kpi"><b>Offline</b><span>12</span></div></div>
-              <div class="two"><div class="grow"><div class="panel"><span class="kind">detailPanel</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">Structure from the wireframe board. Components not yet enumerated.</span></div><div class="panel"><span class="kind">dataTable</span><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div><span class="why">**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue&#x27;s busiest hour is a list that skips rows.</span></div><div class="panel"><b>Save sso config</b><div class="chip cta">Save sso config</div></div></div><div class="side"><div class="panel"><b>Remove licence add on</b><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">**Always confirms, never the default focus.** The consequence goes in the body — *cancel 3 orders worth AED 480* is a confirmation, *are you sure* is not.</span></div><div class="panel"><b>Cancel</b><div class="chip">Cancel</div><span class="why">**A screen that can submit must be leaveable without submitting.**</span></div></div></div>
+              <div class="two"><div class="grow"><div class="panel"><b>The selected tenant</b><div class="rows"><div class="bar"><i style="width:64%"></i></div></div></div><div class="panel"><span class="kind">dataTable</span><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div><span class="why">Implied by the detail template — not declared on the screen.</span></div></div></div>
             </div>
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; getSsoConfig · listTenants · setSsoConfig · addLicenceAddOn +17</div>
+          <div><b>OPERATIONS</b> &middot; getTenantAppStatus · getTenantConfig · getModuleEnablement · getFeatureToggles +3</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess</span></div>
-          <div><b>ARRIVES WITH</b> &middot; tenantId&larr;session</div>
+          
           <div><b>GOES TO</b> &middot; entry point · <a href="#cms-002">CMS-002</a>  &mdash; <i>Brand Kit</i><br><a href="#cms-003">CMS-003</a>  &mdash; <i>Typography</i><br><a href="#cms-004">CMS-004</a>  &mdash; <i>Logo &amp; Assets</i><br><a href="#cms-061">CMS-061</a>  &mdash; <i>Digital Asset Management Command Center</i><br><a href="#cms-071">CMS-071</a>  &mdash; <i>AI Asset Intelligence Command Center</i><br><a href="#cms-081">CMS-081</a>  &mdash; <i>DAM Governance &amp; Rights Command Center</i><br><a href="#cms-091">CMS-091</a>  &mdash; <i>Asset Distribution &amp; Delivery Command Center</i></div>
           
-          <div><b>OVERLAYS</b><div class="ov"><b>confirmDialog</b> confirmRemoveLicenceAddOn &middot; <i>Remove</i></div><div class="ov"><b>confirmDialog</b> confirmSuspendTenant &middot; <i>Suspend</i></div><div class="ov"><b>confirmDialog</b> confirmTerminateTenant &middot; <i>Terminate</i></div></div>
+          
         </div>
       </div>
       <div id="cms-002" class="scr">
@@ -243,14 +243,14 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
             
             <div class="canvas">
               <div class="kpis"><div class="kpi"><b>Total</b><span>1,248</span></div><div class="kpi"><b>Active</b><span>978</span></div><div class="kpi"><b>Attention</b><span>142</span></div><div class="kpi"><b>Offline</b><span>12</span></div></div>
-              <div class="two"><div class="grow"><div class="panel"><span class="kind">detailPanel</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">Structure from the wireframe board. Components not yet enumerated.</span></div><div class="panel"><span class="kind">dataTable</span><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div><span class="why">**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue&#x27;s busiest hour is a list that skips rows.</span></div><div class="panel"><b>Create asset</b><div class="chip cta">Create asset</div></div></div><div class="side"><div class="panel"><b>Search</b><div class="chip">Search</div><span class="why">A search that returns nothing must say so differently from a search not yet run.</span></div><div class="panel"><b>Cancel</b><div class="chip">Cancel</div><span class="why">**A screen that can submit must be leaveable without submitting.**</span></div></div></div>
+              <div class="two"><div class="grow"><div class="panel"><b>The selected logo assets</b><div class="rows"><div class="bar"><i style="width:64%"></i></div></div></div><div class="panel"><span class="kind">dataTable</span><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div><span class="why">Implied by the detail template — not declared on the screen.</span></div></div></div>
             </div>
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; listAssets · getAsset · createAsset · getAssetHistory +3</div>
+          <div><b>OPERATIONS</b> &middot; getBrandIdentity · getAppIcons · setAppIcons · setBrandIdentity</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess</span></div>
-          <div><b>ARRIVES WITH</b> &middot; assetId&larr;deepLink</div>
+          
           <div><b>GOES TO</b> &middot; <a href="#cms-001">CMS-001</a>  &mdash; <i>Tenant Workspace</i> <span class="car">tenantId</span><br><a href="#cms-002">CMS-002</a>  &mdash; <i>Brand Kit</i> <span class="car">uploadId</span><br><a href="#cms-003">CMS-003</a>  &mdash; <i>Typography</i> <span class="car">bannerId · pageId · policyKind · version</span></div>
           
           
@@ -339,9 +339,9 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; getHomepageLayout · setHomepageLayout</div>
+          <div><b>OPERATIONS</b> &middot; listContentPages · createContentPage · updateContentPage · setFooter +2</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess</span></div>
-          
+          <div><b>ARRIVES WITH</b> &middot; pageId&larr;navigation</div>
           <div><b>GOES TO</b> &middot; <a href="#cms-001">CMS-001</a>  &mdash; <i>Tenant Workspace</i> <span class="car">tenantId</span><br><a href="#cms-002">CMS-002</a>  &mdash; <i>Brand Kit</i> <span class="car">uploadId</span><br><a href="#cms-003">CMS-003</a>  &mdash; <i>Typography</i> <span class="car">bannerId · pageId · policyKind · version</span><br><a href="#cms-012">CMS-012</a>  &mdash; <i>Previews in both directions</i></div>
           
           
@@ -369,9 +369,9 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; listPromoBlocks · listBanners</div>
+          <div><b>OPERATIONS</b> &middot; createBanner · updateBanner · createPromoBlock · updatePromoBlock +3</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess</span></div>
-          
+          <div><b>ARRIVES WITH</b> &middot; bannerId&larr;navigation, promoBlockId&larr;navigation</div>
           <div><b>GOES TO</b> &middot; <a href="#cms-001">CMS-001</a>  &mdash; <i>Tenant Workspace</i> <span class="car">tenantId</span><br><a href="#cms-002">CMS-002</a>  &mdash; <i>Brand Kit</i> <span class="car">uploadId</span><br><a href="#cms-003">CMS-003</a>  &mdash; <i>Typography</i> <span class="car">bannerId · pageId · policyKind · version</span></div>
           
           
@@ -610,7 +610,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; getTenantConfig</div>
+          <div><b>OPERATIONS</b> &middot; getBookingFlowConfig · setBookingFlowConfig · getTenantConfig</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess</span></div>
           
           <div><b>GOES TO</b> &middot; <a href="#cms-001">CMS-001</a>  &mdash; <i>Tenant Workspace</i> <span class="car">tenantId</span><br><a href="#cms-002">CMS-002</a>  &mdash; <i>Brand Kit</i> <span class="car">uploadId</span><br><a href="#cms-003">CMS-003</a>  &mdash; <i>Typography</i> <span class="car">bannerId · pageId · policyKind · version</span></div>
@@ -665,17 +665,17 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
             
             <div class="canvas">
               <div class="kpis"><div class="kpi"><b>Total</b><span>1,248</span></div><div class="kpi"><b>Active</b><span>978</span></div><div class="kpi"><b>Attention</b><span>142</span></div><div class="kpi"><b>Offline</b><span>12</span></div></div>
-              <div class="two"><div class="grow"><div class="panel"><span class="kind">detailPanel</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">Structure from the wireframe board. Components not yet enumerated.</span></div><div class="panel"><span class="kind">dataTable</span><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div><span class="why">**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue&#x27;s busiest hour is a list that skips rows.</span></div><div class="panel"><b>Search</b><div class="chip">Search</div><span class="why">A search that returns nothing must say so differently from a search not yet run.</span></div></div><div class="side"><div class="panel"><b>Cancel</b><div class="chip">Cancel</div><span class="why">**A screen that can submit must be leaveable without submitting.**</span></div></div></div>
+              <div class="two"><div class="grow"><div class="panel"><b>Every consent legal</b><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div></div></div></div>
             </div>
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; getGuestConsents · getConsentHistory · recordConsent · adjustLoyaltyPoints +7</div>
+          <div><b>OPERATIONS</b> &middot; listPolicies · setPolicy · listConsentPurposes · setConsentPurposes</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess</span></div>
-          <div><b>ARRIVES WITH</b> &middot; subjectId&larr;session</div>
+          <div><b>ARRIVES WITH</b> &middot; policyKind&larr;navigation</div>
           <div><b>GOES TO</b> &middot; <a href="#cms-001">CMS-001</a>  &mdash; <i>Tenant Workspace</i> <span class="car">tenantId</span><br><a href="#cms-002">CMS-002</a>  &mdash; <i>Brand Kit</i> <span class="car">uploadId</span><br><a href="#cms-003">CMS-003</a>  &mdash; <i>Typography</i> <span class="car">bannerId · pageId · policyKind · version</span></div>
           
-          <div><b>OVERLAYS</b><div class="ov"><b>confirmDialog</b> confirmMergeGuestProfiles &middot; <i>Merge</i></div></div>
+          
         </div>
       </div>
       <div id="cms-019" class="scr">

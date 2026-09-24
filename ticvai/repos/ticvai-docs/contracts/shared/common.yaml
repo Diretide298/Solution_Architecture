@@ -183,6 +183,47 @@ components:
       - backOffice
       - b2b
       - ota
+    ModuleKey:
+      type: string
+      description: 'What a tenant buys, and what a screen belongs to. **One vocabulary for both sides
+        of the join**, because two lists that must agree are one list somebody forgets to update.
+
+        **Grain chosen to match how a venue buys, not how the package is built.** `fnb` is one module
+        even though it spans four contracts; `ticketing` and `access` are separate because a venue can
+        run a museum with no gates and a stadium with no shop.
+
+        **Moved here from `subscription` on 22 September**, which now references it. The dashboard
+        command centre needed the same list to bind a dashboard to a module, and a satellite cannot
+        reference another satellite — so the choice was a second copy or a shared one. **A second copy
+        is the defect this schema''s own first sentence warns against**, and `SalesChannel` above
+        exists for the same reason. A `$ref` is checked by `check-package` rule 34; a mirror is
+        checked by nothing, which is the position `ScopeLevel` below is in.
+
+        '
+      enum:
+      - core
+      - ticketing
+      - access
+      - fnb
+      - retail
+      - inventory
+      - seating
+      - membership
+      - marketing
+      - resources
+      - queue
+      - games
+      - maintenance
+      - accreditation
+      - partner
+      - developerApi
+      - analytics
+      - ai
+      x-ticvai-note: '**`core` is listed and cannot be unlicensed.** It exists so a screen can say it
+        belongs to no optional module rather than leaving the field empty — **an empty field and *always
+        on* look identical, and only one of them is a decision.**
+
+        '
     ScopeLevel:
       type: string
       description: '**The eight organisational levels, and the shared copy of them.** Restored 24 August.

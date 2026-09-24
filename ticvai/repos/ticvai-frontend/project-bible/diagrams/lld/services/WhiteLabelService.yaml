@@ -1,5 +1,5 @@
 id: LLD-WhiteLabelService
-title: WhiteLabelService — 50 operations, 13 tables
+title: WhiteLabelService — 52 operations, 13 tables
 generatedBy: tools/derive-diagrams.py
 tier: platform
 index: diagrams/hld/02-services.yaml
@@ -9,7 +9,7 @@ why: Branding, content, navigation and the tenant's own app configuration. Separ
 scale: Read-heavy and heavily cached. Published, not queried.
 ifDown: Down freezes the current published config. Guests see the last good version.
 coverage:
-  operations: 50
+  operations: 52
   inAFlow: 22
   percent: 44%
   note: '**Flow coverage is how much of this service a journey has walked.** A service under 40% is
@@ -22,7 +22,7 @@ schemas:
   largestTable: whitelabel.tenant_config
 operationsByContract:
 - contract: white-label
-  count: 50
+  count: 52
   operations:
   - operation: claimCustomDomain
     verb: POST
@@ -112,6 +112,14 @@ operationsByContract:
     offline: false
     reads: 1
     writes: 0
+  - operation: getBookingFlowConfig
+    verb: GET
+    path: /tenant-config/booking-flow
+    scope: tenant
+    permission: TENANT_CONFIGURE
+    offline: false
+    reads: 1
+    writes: 0
   - operation: getBrandIdentity
     verb: GET
     path: /tenant-config/brand
@@ -150,7 +158,7 @@ operationsByContract:
     scope: tenant
     permission: TENANT_CONFIGURE
     offline: false
-    reads: 2
+    reads: 5
     writes: 1
   - operation: getNavigation
     verb: GET
@@ -262,8 +270,8 @@ operationsByContract:
     scope: tenant
     permission: TENANT_CONFIGURE
     offline: false
-    reads: 0
-    writes: 0
+    reads: 1
+    writes: 1
   - operation: restoreConfigVersion
     verb: POST
     path: /tenant-config/versions/{version}/restore
@@ -280,6 +288,14 @@ operationsByContract:
     offline: false
     reads: 2
     writes: 2
+  - operation: setBookingFlowConfig
+    verb: PUT
+    path: /tenant-config/booking-flow
+    scope: tenant
+    permission: TENANT_CONFIGURE
+    offline: false
+    reads: 2
+    writes: 3
   - operation: setBrandIdentity
     verb: PUT
     path: /tenant-config/brand
@@ -358,7 +374,7 @@ operationsByContract:
     scope: tenant
     permission: TENANT_CONFIGURE
     offline: false
-    reads: 2
+    reads: 5
     writes: 3
   - operation: setNavigation
     verb: PUT
@@ -524,7 +540,7 @@ tables:
   - white-label
   foreignWriters: null
 - table: whitelabel.tenant_config
-  columns: 17
+  columns: 18
   store: postgres
   parent: platform.tenant
   writtenBy:
@@ -532,7 +548,7 @@ tables:
   foreignWriters: null
 readsFrom:
 - service: PlatformService
-  operations: 6
+  operations: 8
 - service: IdentityService
   operations: 1
 - service: MarketingService
@@ -569,8 +585,10 @@ screens:
 - P09:ADM-017 Domain & Certificate Management
 - P09:ADM-018 Localisation & Language Pack
 - P12:SUP-006 Knowledge Base Search
+- P13:CMS-001 Tenant Workspace
 - P13:CMS-002 Brand Kit
 - P13:CMS-003 Typography
+- P13:CMS-004 Logo & Assets
 - P13:CMS-005 Theme Editor
 - P13:CMS-006 Component Preview
 - P13:CMS-007 Page Builder
@@ -581,6 +599,7 @@ screens:
 - P13:CMS-015 Version History
 - P13:CMS-016 Site Settings
 - P13:CMS-017 Domain & Certificate
+- P13:CMS-018 Consent & Legal
 - P13:CMS-020 Change Log
 flows:
 - F01 Guest buys a ticket online

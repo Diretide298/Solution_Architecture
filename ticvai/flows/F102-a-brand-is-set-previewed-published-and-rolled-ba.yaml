@@ -20,15 +20,13 @@ offlineBehaviour: '**None of it offline.** A brand published to some surfaces an
 steps:
 - step: 1
   screen: CMS-001
-  action: Tenant Workspace.
+  action: Tenant Workspace. See what is live before changing the brand.
   operations:
-  - addLicenceAddOn
-  - generateInvoice
-  - getEntitlementUsage
-  - getSsoConfig
-  - getSubscription
-  - getTenant
-  outcome: 15 operations, 15 of them previously unwalked.
+  - getTenantAppStatus
+  - getTenantConfig
+  - getModuleEnablement
+  outcome: The current published state is known, so a change can be compared against it. Rewired 23 September
+    (L7) from subscription and billing operations, which the screen no longer declares.
 - step: 2
   screen: CMS-003
   action: Typography.

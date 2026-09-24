@@ -2,7 +2,7 @@ openapi: 3.1.0
 info:
   title: TICVAI Reporting & Analytics
   version: 0.1.0
-  x-ticvai-screen-count: 39
+  x-ticvai-screen-count: 40
   x-ticvai-tier: satellite
   x-ticvai-module: 8 — Unified Operations Dashboard  ·  cross-cutting
   x-ticvai-requirements: 332
@@ -1042,6 +1042,46 @@ paths:
                 $ref: '#/components/schemas/ReportExport'
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
+  /command-centre:
+    get:
+      operationId: getCommandCentre
+      x-ticvai-consumed-by:
+        - "P16 ANL-001 Executive Command Center"
+      x-ticvai-audience:
+      - staff
+      x-ticvai-read-routing: analytical
+      summary: The dashboards this login may see, grouped by module
+      description: '**The command centre is one shell, and what it contains depends on who is
+        looking.** Decided 22 September: a single dashboard surface showing each login the dashboards
+        of the modules it is entitled to, with drag-and-drop authoring for building module-specific
+        dashboards inside it.
+
+        **A module appears when both halves of the entitlement hold** — the tenant has licensed it
+        (`subscription`), and the principal holds at least one permission grouped under it in the
+        module tree (`identity.listModules`, `listPermissions?moduleId`). `core` always appears.
+        **Resolved here, on the server, per request** — a client that filters a full list has already
+        been sent the dashboards it should not see.
+
+        **Within a module**: shared dashboards and the caller''s own, never another principal''s
+        private one, never an archived one. Shared first, then the caller''s, each by name.
+
+        **A module with no dashboard still appears, with an empty list** — that is the prompt to
+        build one, and silently dropping it would hide the entitlement the caller actually holds.
+
+        '
+      tags:
+      - dashboard
+      x-ticvai-permission: REPORT_VIEW_VENUE
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      responses:
+        '200':
+          description: The command centre for the caller
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CommandCentre'
   /dashboards:
     get:
       operationId: listDashboards
@@ -1059,6 +1099,14 @@ paths:
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
+      parameters:
+      - name: module
+        in: query
+        required: false
+        schema:
+          $ref: ../shared/common.yaml#/components/schemas/ModuleKey
+        description: '**Narrows the library to one module.** Entitlement still applies — asking for a
+          module the caller cannot see returns an empty list, not the module''s dashboards.'
       responses:
         '200':
           description: Dashboards
@@ -1107,6 +1155,16 @@ paths:
                 $ref: '#/components/schemas/Dashboard'
         '400':
           description: Aggregate refresh cost exceeds the configured budget
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
+        '409':
+          description: '**The caller is not entitled to the dashboard''s module** — the tenant has not
+            licensed it, or the principal holds no permission in it. Refused here rather than hidden in
+            the client, because hiding an option enforces nothing.
+
+            '
           content:
             application/problem+json:
               schema:
@@ -1195,6 +1253,16 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Dashboard'
+        '409':
+          description: '**Moving a dashboard to a module the caller is not entitled to.** The same
+            guard as `createDashboard` — without it, an update would be the way round the create
+            check.
+
+            '
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
     delete:
       operationId: deleteDashboard
       summary: Archive a dashboard
@@ -3256,15 +3324,63 @@ components:
           format: uuid
         visualisation:
           type: string
+          description: '**Extended 22 September from eight marks to twenty** against
+            `Ticketing_Platform_Native_Dashboard_Visualization_Requirements.pdf`, which names eighteen
+            components and marks every one MVP. Nine were genuinely missing — `combo`, `matrix`,
+            `funnel`, `waterfall`, `treemap`, `scatter`, `map`, `ribbon`, `decompositionTree` — and
+            three are layout variants of marks already here: `area` beside `line`, `donut` beside
+            `pie`, `stackedBar100` beside `stackedBar`.
+
+            **`number` is the source''s KPI / card.** Its comparison, variance, trend sparkline and
+            status icon are tile parameters rather than separate marks.
+
+            **Two of the eighteen are deliberately not here** — see `x-ticvai-refuses`. The source
+            lists them as components; the platform already models each of them elsewhere, and a
+            second model of either is the drift this enum exists to prevent.
+
+            '
           enum:
           - number
           - line
+          - area
           - bar
           - stackedBar
+          - stackedBar100
+          - combo
           - pie
+          - donut
           - table
+          - matrix
           - gauge
           - heatmap
+          - funnel
+          - waterfall
+          - treemap
+          - scatter
+          - map
+          - ribbon
+          - decompositionTree
+          x-ticvai-refuses:
+            slicer: '**A control, not a mark.** The source''s slicer / filter is already
+              `ReportFilter.isParameter` plus `ReportParameter` — a run-time prompt bound to the report.
+              A slicer on the canvas places that parameter; it does not render a result, so it is not a
+              visualisation and a second filter model beside `ReportFilter` would be one somebody keeps
+              in step by hand.'
+            narrative: '**Generated prose belongs with `ai.Suggestion`.** The source''s narrative /
+              insight text (*"Admissions are 12% above last Tuesday"*) is model output with traceability
+              requirements, not a way of drawing a query result.'
+            cohort: '**Not one of the eighteen.** It appears once in the source as a *usage* — *"the
+              Customer & Membership dashboard shall use cards, cohort and trend charts"* — never as a
+              specified component. A cohort view is a `matrix` or `heatmap` over a cohort dimension.'
+          x-ticvai-note: '**These marks cannot yet bind data.** `ReportColumn` carries `field`,
+            `label`, `aggregation` and `format` and **no encoding role** — no axis, series, size or
+            colour. A `number` needs none and an eight-mark enum survived without one; a `scatter`
+            needs x, y, size and colour, and a `combo` needs a secondary axis with stated units.
+            **Adding `ReportColumn.role` is the harder half of this decision and is deliberately not
+            made here** — it is the field-wells model the source''s builder specifies, and it belongs
+            with the engine and semantic-layer split that needs an ADR first.
+
+            '
         parameters:
           type: object
           additionalProperties: true
@@ -3296,11 +3412,29 @@ components:
       type: object
       required:
       - name
+      - module
       - tiles
       properties:
         name:
           type: string
           maxLength: 200
+        module:
+          $ref: ../shared/common.yaml#/components/schemas/ModuleKey
+          description: '**Which module this dashboard belongs to, and therefore who may see it.**
+            Added 22 September for the command centre: one shell that shows each login the dashboards
+            of the modules it is entitled to. **A dashboard with no module could not be placed in that
+            shell at all** — the field the whole design hangs on did not exist.
+
+            **Required, and `core` is the answer for a dashboard that belongs to no optional module.**
+            An empty field and *belongs everywhere* look identical, and only one of them is a decision
+            — the rule `ModuleKey` already states for screens.
+
+            **Creating one is gated twice**, by `REPORT_MANAGE` and by the module: a principal cannot
+            build a dashboard for a module the tenant has not licensed or that the principal holds no
+            permission in. The server refuses with `409`; a client that hides the option has not
+            enforced anything.
+
+            '
         description:
           type: string
           maxLength: 1000
@@ -3355,6 +3489,44 @@ components:
           createdAt:
             type: string
             format: date-time
+    CommandCentre:
+      x-ticvai-persistence: none — computed per caller from `reporting.dashboard`, the tenant's
+        licensed modules and the principal's permissions
+      type: object
+      description: '**What one login sees in the command centre.** Not stored: two principals in the
+        same venue receive different command centres, and a stored one would be wrong the moment a
+        role or a licence changed.'
+      required:
+      - modules
+      - resolvedAt
+      properties:
+        modules:
+          type: array
+          items:
+            type: object
+            required:
+            - module
+            - dashboards
+            properties:
+              module:
+                $ref: ../shared/common.yaml#/components/schemas/ModuleKey
+              dashboards:
+                type: array
+                description: Shared first, then the caller's own, each by name. Tile data is not
+                  included — `getDashboard` reads one with its data when it is opened.
+                items:
+                  $ref: '#/components/schemas/Dashboard'
+              canAuthor:
+                type: boolean
+                description: '**Whether the caller may build a dashboard for this module** —
+                  `REPORT_MANAGE` plus entitlement to the module. Returned so the shell can offer the
+                  drag-and-drop authoring entry point only where `createDashboard` would accept it; the
+                  server still enforces it on the write.'
+        resolvedAt:
+          type: string
+          format: date-time
+          description: When the entitlement was evaluated. A licence or role change after this is not
+            reflected until the next read.
     DashboardData:
       x-ticvai-persistence: none — computed
       allOf:

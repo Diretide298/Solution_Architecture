@@ -75,6 +75,11 @@ def load_contracts() -> dict[str, tuple[str, dict]]:
     return out
 
 
+def _is_alias(body) -> bool:
+    """A schema that is nothing but a pointer to another — `{"$ref": ...}`, perhaps described."""
+    return isinstance(body, dict) and "$ref" in body and set(body) <= {"$ref", "description"}
+
+
 def resolve_type(spec: dict, schemas: dict, persisted: dict) -> tuple[str, str | None]:
     """Return (postgres type, referenced table or None)."""
     if not isinstance(spec, dict):
@@ -91,6 +96,12 @@ def resolve_type(spec: dict, schemas: dict, persisted: dict) -> tuple[str, str |
         if name in persisted:
             return "uuid", persisted[name]
         target = schemas.get(name)
+        # Follow an alias to what it points at. Bounded, because two aliases naming each other
+        # would otherwise loop — the registry above makes that unlikely, not impossible.
+        for _ in range(4):
+            if not _is_alias(target):
+                break
+            target = schemas.get(target["$ref"].rsplit("/", 1)[-1])
         if isinstance(target, dict):
             if "enum" in target:
                 return "text", None
@@ -231,7 +242,16 @@ def main() -> int:
     retired: dict[str, set[str]] = {}       # table -> columns the contract has withdrawn
     for name, (_, doc) in contracts.items():
         for sname, body in ((doc.get("components") or {}).get("schemas") or {}).items():
-            all_schemas.setdefault(sname, body)
+            # **An alias does not claim a name over a definition.** `subscription.ModuleKey` became a
+            # bare `$ref` to `common.ModuleKey` on 22 September, and because `satellite/` loads
+            # before `shared/`, first-wins registered the alias — a body with no `enum` and no
+            # `type` — as *the* `ModuleKey`. Every reference then fell through to `jsonb`, and
+            # `whitelabel.module_enablement.module_key` regressed from `text NOT NULL` without a
+            # line of `white-label.yaml` changing. **A pure-`$ref` schema is legal OpenAPI**; the
+            # fault was the registry treating a pointer as a definition.
+            prev = all_schemas.get(sname)
+            if prev is None or (_is_alias(prev) and not _is_alias(body)):
+                all_schemas[sname] = body
             if isinstance(body, dict):
                 table = persistence_of(body)
                 if isinstance(table, str) and "." in table and "—" not in table:
@@ -386,7 +406,8 @@ def main() -> int:
             if not ptype:
                 continue
             cols.append({
-                "column": snake(prop), "type": ptype,
+                "column": (pspec.get("x-ticvai-column") if isinstance(pspec, dict) else None) or snake(prop),
+                "type": ptype,
                 "required": "yes" if prop in req else "no",
                 "source": f"{owner.get(child, '')}.{parent_schema}.{key}[].{prop}",
                 "description": (pspec.get("description") or "").strip().replace("\n", " ")[:220]
@@ -443,7 +464,10 @@ def main() -> int:
             if not ptype:
                 continue
             cols.append({
-                "column": snake(prop),
+                # **`x-ticvai-column` names the column when the field's name would break the standard**
+                # (24 September): naming-and-style 5.1 bans `total`, `price` and `value` alone, so
+                # `PurchaseOrder.total` lands as `gross_amount` while the wire keeps `total`.
+                "column": (spec.get("x-ticvai-column") if isinstance(spec, dict) else None) or snake(prop),
                 "type": ptype,
                 "required": "yes" if prop in required else "no",
                 "source": f"{owner.get(table, '')}.{sname}.{prop}",

@@ -2,7 +2,7 @@ openapi: 3.1.0
 info:
   title: TICVAI Catalogue & Entitlement
   version: 0.1.0
-  x-ticvai-screen-count: 177
+  x-ticvai-screen-count: 183
   x-ticvai-tier: spine
   x-ticvai-module: 1 — Ticketing Catalogue
   x-ticvai-requirements: 312
@@ -1213,6 +1213,243 @@ paths:
           $ref: ../shared/common.yaml#/components/responses/BadRequest
         '403':
           $ref: ../shared/common.yaml#/components/responses/Forbidden
+  /products/{productId}/eligibility-rule:
+    get:
+      operationId: getProductEligibilityRule
+      x-ticvai-consumed-by:
+        - "P01 WEB-004 Attraction Details"
+        - "P02 GST-004 Attraction Details"
+        - "P08 BO-161 Guest, Companion & Eligibility Rules"
+      summary: 'Who may take part: age, height, supervision'
+      tags:
+      - product
+      x-ticvai-permission: PRODUCT_VIEW
+      x-ticvai-audience:
+      - staff
+      - guest
+      x-ticvai-scope-level: venue
+      x-ticvai-read-routing: replica
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      responses:
+        '200':
+          description: The current setting
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProductEligibilityRule'
+        '403':
+          $ref: ../shared/common.yaml#/components/responses/Forbidden
+      x-ticvai-guest-callable: true
+      parameters:
+      - name: productId
+        in: path
+        required: true
+        schema:
+          type: string
+    put:
+      operationId: setProductEligibilityRule
+      x-ticvai-consumed-by:
+        - "P08 BO-161 Guest, Companion & Eligibility Rules"
+      summary: Set age, height and supervision limits
+      description: '**Design gap, 23 September.** The design gates rides, slides and kids'' sessions on
+        height and age before booking (*Height & age eligibility gate*, *Swim ability & height gate*). The
+        catalogue had no place for the limits; only games, queues and rentals did.
+
+
+        **Declared, then checked at the gate.** The guest declares a band at booking; staff verify on arrival.
+        Whether an ineligible guest is refunded at the gate is a setting, because the design says they are
+        not.
+
+        '
+      tags:
+      - product
+      x-ticvai-permission: PRODUCT_CONFIGURE
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      x-ticvai-config-scope: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      - name: productId
+        in: path
+        required: true
+        schema:
+          type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProductEligibilityRule'
+      responses:
+        '200':
+          description: Saved
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProductEligibilityRule'
+        '400':
+          $ref: ../shared/common.yaml#/components/responses/BadRequest
+        '403':
+          $ref: ../shared/common.yaml#/components/responses/Forbidden
+        '404':
+          $ref: ../shared/common.yaml#/components/responses/NotFound
+  /eligibility-checks:
+    post:
+      operationId: checkBookingEligibility
+      x-ticvai-consumed-by:
+        - "P01 WEB-006 Date & Session Selection"
+        - "P02 GST-007 Select Date & Time"
+      summary: Can this party take part
+      description: 'Checks a party''s declared ages and heights against every product in the booking before
+        payment, and says per guest who cannot take part and why, and whether a guardian signature or waiver
+        is needed. **It refuses nothing itself**: checkout refuses a line with an ineligible guest, so the
+        answer here and the refusal there cannot disagree.
+
+        '
+      tags:
+      - product
+      x-ticvai-permission: PRODUCT_VIEW
+      x-ticvai-guest-callable: true
+      x-ticvai-audience:
+      - guest
+      - staff
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EligibilityCheckRequest'
+      responses:
+        '200':
+          description: Per-guest result
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EligibilityCheckResult'
+  /products/{productId}/group-package:
+    get:
+      operationId: getGroupPackageDefinition
+      x-ticvai-consumed-by:
+        - "P01 WEB-031 My Reservations"
+        - "P02 GST-072 Share & Group Booking"
+        - "P08 BO-011 Packages & Bundles"
+      summary: A school-trip format or party package
+      tags:
+      - product
+      x-ticvai-permission: PRODUCT_VIEW
+      x-ticvai-audience:
+      - staff
+      - guest
+      x-ticvai-scope-level: venue
+      x-ticvai-read-routing: replica
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      responses:
+        '200':
+          description: The current setting
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GroupPackageDefinition'
+        '403':
+          $ref: ../shared/common.yaml#/components/responses/Forbidden
+      x-ticvai-guest-callable: true
+      parameters:
+      - name: productId
+        in: path
+        required: true
+        schema:
+          type: string
+    put:
+      operationId: setGroupPackageDefinition
+      x-ticvai-consumed-by:
+        - "P08 BO-011 Packages & Bundles"
+      summary: Define a school-trip format or party package
+      description: '**Design gap, 23 September.** The kids club sells school trips (half-day, full-day,
+        curriculum day, priced per pupil) and birthday parties (Explorer to Exclusive hire, priced per package,
+        with hosts). The product carries the price; this carries what makes it a group package.
+
+        '
+      tags:
+      - product
+      x-ticvai-permission: PRODUCT_CONFIGURE
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      x-ticvai-config-scope: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      - name: productId
+        in: path
+        required: true
+        schema:
+          type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GroupPackageDefinition'
+      responses:
+        '200':
+          description: Saved
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GroupPackageDefinition'
+        '400':
+          $ref: ../shared/common.yaml#/components/responses/BadRequest
+        '403':
+          $ref: ../shared/common.yaml#/components/responses/Forbidden
+        '404':
+          $ref: ../shared/common.yaml#/components/responses/NotFound
+  /group-packages:
+    get:
+      operationId: listGroupPackages
+      x-ticvai-consumed-by:
+        - "P01 WEB-031 My Reservations"
+        - "P02 GST-072 Share & Group Booking"
+      summary: The school-trip formats or party packages on offer
+      tags:
+      - product
+      x-ticvai-permission: PRODUCT_VIEW
+      x-ticvai-guest-callable: true
+      x-ticvai-audience:
+      - guest
+      - staff
+      x-ticvai-scope-level: venue
+      x-ticvai-read-routing: replica
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+      - name: kind
+        in: query
+        required: false
+        schema:
+          type: string
+          enum:
+          - school
+          - party
+      - $ref: ../shared/common.yaml#/components/parameters/PageSize
+      - $ref: ../shared/common.yaml#/components/parameters/PageCursor
+      responses:
+        '200':
+          description: Packages
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/GroupPackageDefinition'
   /products/{productId}:
     parameters:
     - name: productId
@@ -9672,6 +9909,7 @@ components:
         minutes:
           type: integer
         price:
+          x-ticvai-column: list_price
           $ref: ../shared/common.yaml#/components/schemas/Money
         creditTypeId:
           type: string
@@ -10576,6 +10814,203 @@ components:
           type: string
           format: date-time
           readOnly: true
+    ProductEligibilityRule:
+      type: object
+      x-ticvai-persistence: catalogue.product_eligibility_rule
+      description: Participation limits for one product. Absent means anyone may take part.
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        productId:
+          type: string
+          readOnly: true
+        minAgeYears:
+          type: integer
+          minimum: 0
+          nullable: true
+        maxAgeYears:
+          type: integer
+          minimum: 0
+          nullable: true
+        minHeightCm:
+          type: integer
+          minimum: 50
+          maximum: 250
+          nullable: true
+        maxHeightCm:
+          type: integer
+          minimum: 50
+          maximum: 250
+          nullable: true
+        heightBandsCm:
+          type: array
+          items:
+            type: integer
+          default:
+          - 120
+          - 140
+          description: Band edges the guest chooses between, e.g. under 1.20 m, 1.20–1.40 m, 1.40 m and over.
+        accompaniedBelowAge:
+          type: integer
+          nullable: true
+          description: Under this age an adult must be present, e.g. 8 at the kids club.
+        guardianSignatureAgeFrom:
+          type: integer
+          nullable: true
+        guardianSignatureAgeTo:
+          type: integer
+          nullable: true
+          description: Ages needing a guardian's signature, e.g. 12–15 on a thrill ride.
+        waiverRequired:
+          type: boolean
+          default: false
+        swimAbility:
+          type: string
+          enum:
+          - notRequired
+          - confident
+          default: notRequired
+        refundableIfIneligibleAtGate:
+          type: boolean
+          default: false
+        scopePath:
+          type: string
+          readOnly: true
+          description: '**The partition key** (ADR-0005). Operations write it at `venue` scope.'
+    EligibilityCheckRequest:
+      type: object
+      description: Request only.
+      required:
+      - productIds
+      - party
+      properties:
+        productIds:
+          type: array
+          minItems: 1
+          items:
+            type: string
+        party:
+          type: array
+          minItems: 1
+          items:
+            $ref: '#/components/schemas/EligibilityDeclaration'
+    EligibilityDeclaration:
+      type: object
+      description: What a guest declares about one member of the party. Declared, not measured.
+      properties:
+        ageBand:
+          type: string
+          enum:
+          - infant
+          - child
+          - junior
+          - adult
+          - senior
+          description: Infant under 3, child 3–12, junior 13–17, adult 18–59, senior 60+.
+        ageYears:
+          type: integer
+          nullable: true
+        heightBandIndex:
+          type: integer
+          nullable: true
+          description: Which band of the rule's `heightBandsCm`, counting from 0.
+        confidentSwimmer:
+          type: boolean
+          nullable: true
+        guardianSigned:
+          type: boolean
+          default: false
+    EligibilityCheckResult:
+      type: object
+      x-ticvai-persistence: none — computed per request
+      required:
+      - eligible
+      properties:
+        eligible:
+          type: boolean
+        guests:
+          type: array
+          items:
+            type: object
+            properties:
+              index:
+                type: integer
+              eligible:
+                type: boolean
+              reasons:
+                type: array
+                items:
+                  type: string
+                  enum:
+                  - tooYoung
+                  - tooOld
+                  - tooShort
+                  - tooTall
+                  - needsAdult
+                  - needsGuardianSignature
+                  - needsSwimmer
+        waiverRequired:
+          type: boolean
+    GroupPackageDefinition:
+      type: object
+      x-ticvai-persistence: catalogue.group_package
+      required:
+      - kind
+      - maxParticipants
+      - durationMinutes
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        productId:
+          type: string
+          readOnly: true
+        kind:
+          type: string
+          enum:
+          - school
+          - party
+        maxParticipants:
+          type: integer
+          minimum: 1
+          description: Pupils or children, e.g. 30 or 10.
+        durationMinutes:
+          type: integer
+          minimum: 15
+        hostCount:
+          type: integer
+          minimum: 0
+          default: 1
+          description: Party hosts included.
+        pricingBasis:
+          type: string
+          enum:
+          - perParticipant
+          - perPackage
+        freeLeaderRatio:
+          type: integer
+          nullable: true
+          default: 10
+          description: 'Schools: one teacher or assistant enters free per this many pupils.'
+        paymentMode:
+          type: string
+          enum:
+          - invoice
+          - deposit
+          - full
+          description: Schools are invoiced; parties take a deposit (see `DepositPolicy`).
+        includes:
+          type: array
+          items:
+            type: string
+            maxLength: 120
+        scopePath:
+          type: string
+          readOnly: true
+          description: '**The partition key** (ADR-0005). Operations write it at `venue` scope.'
     Product:
       x-ticvai-persistence: catalogue.product
       type: object

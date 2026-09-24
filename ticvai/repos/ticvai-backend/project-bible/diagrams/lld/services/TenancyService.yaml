@@ -1575,11 +1575,13 @@ tables:
   foreignWriters:
   - platform-ops
 - table: platform.denomination
-  columns: 8
+  columns: 7
   store: postgres
   parent: null
-  writtenBy: []
-  foreignWriters: null
+  writtenBy:
+  - shift
+  foreignWriters:
+  - shift
 - table: platform.device
   columns: 22
   store: postgres
@@ -1886,7 +1888,7 @@ tables:
   - workforce
   foreignWriters: null
 - table: workforce.staffing_rules
-  columns: 8
+  columns: 11
   store: postgres
   parent: null
   writtenBy:

@@ -52,6 +52,9 @@ python3 tools/derive-lineage.py --apply
 # from the contracts every run. Its note said 520 tables while the package held 623,
 # and five tools read this file -- including the service allocation.
 python3 tools/derive-service-counts.py --apply
+# **The first-release slice: what the four platforms call, and the setup that feeds it.** Reads the
+# lineage, so it runs after it; services are frozen at 1.0.0 against this list, not typed from memory.
+python3 tools/derive-delivery-slice.py
 python3 tools/derive-schema.py
 python3 tools/derive-relationships.py
 python3 tools/derive-ddl.py --apply
@@ -161,6 +164,13 @@ python3 tools/link-screens-contracts.py
 # column comes from — generate it before that and every newly-wired operation shows no
 # consumer for a whole cycle, which is the staleness they are being rescued from.
 python3 tools/build-api-list.py
+# **The first-release documentation and task sheet**, from the slice derived above. After the schema
+# workbook (it reads schema-reference.json) and after link-screens-contracts (it reads consumers), so a
+# service that gains an operation has its documentation regenerate rather than go stale.
+python3 tools/build-service-docs.py
+# **The client questions, flagged by what the first release needs** (23 September). Reads the
+# slice, so it runs after it; before this it was run by hand and went stale within a day.
+python3 tools/build-client-questions-workbook.py
 python3 tools/build-linkage.py
 # **Four artefacts derived from the finished screens, none of which was ever in this script.**
 # Their dates are the argument for putting them here: the ledger was last built 4 September, the

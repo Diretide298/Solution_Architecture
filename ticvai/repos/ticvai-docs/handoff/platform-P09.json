@@ -7,7 +7,7 @@
  "audience": "platformAdmin",
  "formFactor": "web",
  "offlineCapable": false,
- "generated": "2026-09-21",
+ "generated": "2026-09-24",
  "note": "Derived by tools/derive-platform.py. **The gaps section is the point** \u2014 a page listing what exists is a directory; one listing what is missing is a worklist.",
  "counts": {
   "screens": 676,
@@ -15,7 +15,7 @@
   "contracts": 19,
   "modules": 14,
   "undrawn": 0,
-  "operationsWithNoScreen": 210
+  "operationsWithNoScreen": 197
  },
  "waves": {
   "wave1": 12,
@@ -194,11 +194,11 @@
    "operations": 3
   },
   {
-   "contract": "workforce",
+   "contract": "wallet",
    "operations": 2
   },
   {
-   "contract": "wallet",
+   "contract": "workforce",
    "operations": 2
   },
   {
@@ -6907,22 +6907,16 @@
     "summary": "Extend a reservation"
    },
    {
-    "operation": "getBillingStatement",
+    "operation": "getResaleFeePolicy",
     "contract": "orders",
     "verb": "GET",
-    "summary": "One statement, with its lines"
+    "summary": "The commission and price cap a resale listing is created under"
    },
    {
     "operation": "issueInvitation",
     "contract": "orders",
     "verb": "POST",
     "summary": "Issue a complimentary entitlement, with no payment expected"
-   },
-   {
-    "operation": "listBillingStatements",
-    "contract": "orders",
-    "verb": "GET",
-    "summary": "What was charged, when, and against which agreement"
    },
    {
     "operation": "listDeposits",
@@ -6979,12 +6973,6 @@
     "summary": "A credit limit for an individual booking ahead"
    },
    {
-    "operation": "printTicketProof",
-    "contract": "orders",
-    "verb": "POST",
-    "summary": "Print a sample without selling anything"
-   },
-   {
     "operation": "pushWalletPassUpdate",
     "contract": "orders",
     "verb": "POST",
@@ -7001,6 +6989,12 @@
     "contract": "orders",
     "verb": "PUT",
     "summary": ""
+   },
+   {
+    "operation": "setResaleFeePolicy",
+    "contract": "orders",
+    "verb": "PUT",
+    "summary": "Set resale commission and the price ceiling"
    },
    {
     "operation": "skipRolloutCell",
@@ -7327,18 +7321,6 @@
     "summary": "Freeze a wallet"
    },
    {
-    "operation": "createBanner",
-    "contract": "white-label",
-    "verb": "POST",
-    "summary": "Create a banner"
-   },
-   {
-    "operation": "createPromoBlock",
-    "contract": "white-label",
-    "verb": "POST",
-    "summary": "Create a promotional block"
-   },
-   {
     "operation": "deleteBanner",
     "contract": "white-label",
     "verb": "DELETE",
@@ -7349,24 +7331,6 @@
     "contract": "white-label",
     "verb": "DELETE",
     "summary": "Delete a content page"
-   },
-   {
-    "operation": "deletePromoBlock",
-    "contract": "white-label",
-    "verb": "DELETE",
-    "summary": "Delete a promotional block"
-   },
-   {
-    "operation": "getFeatureToggles",
-    "contract": "white-label",
-    "verb": "GET",
-    "summary": "Read tenant feature toggles"
-   },
-   {
-    "operation": "getModuleEnablement",
-    "contract": "white-label",
-    "verb": "GET",
-    "summary": "Read module enablement"
    },
    {
     "operation": "getNavigation",
@@ -7381,58 +7345,16 @@
     "summary": "Publish now, or schedule it"
    },
    {
-    "operation": "setFeatureToggles",
-    "contract": "white-label",
-    "verb": "PUT",
-    "summary": "Set feature toggles"
-   },
-   {
-    "operation": "setFooter",
-    "contract": "white-label",
-    "verb": "PUT",
-    "summary": "Footer columns, legal links and social"
-   },
-   {
     "operation": "setHeader",
     "contract": "white-label",
     "verb": "PUT",
     "summary": "Configure the header"
    },
    {
-    "operation": "setMaintenanceMode",
-    "contract": "white-label",
-    "verb": "PUT",
-    "summary": "Enable or clear maintenance mode"
-   },
-   {
-    "operation": "setModuleEnablement",
-    "contract": "white-label",
-    "verb": "PUT",
-    "summary": "Enable or disable modules"
-   },
-   {
     "operation": "setNavigation",
     "contract": "white-label",
     "verb": "PUT",
     "summary": "Set main and overflow navigation"
-   },
-   {
-    "operation": "updateBanner",
-    "contract": "white-label",
-    "verb": "PATCH",
-    "summary": "Amend or activate a banner"
-   },
-   {
-    "operation": "updateContentPage",
-    "contract": "white-label",
-    "verb": "PUT",
-    "summary": "Amend a content page"
-   },
-   {
-    "operation": "updatePromoBlock",
-    "contract": "white-label",
-    "verb": "PATCH",
-    "summary": "Amend a promotional block"
    },
    {
     "operation": "broadcastToGuests",

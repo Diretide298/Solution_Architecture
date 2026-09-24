@@ -50,7 +50,7 @@ CREATE TABLE IF NOT EXISTS inventory.goods_receipt (
     purchase_order_id                 text NOT NULL,
     location_id                       uuid NOT NULL,
     delivery_note_reference           text,
-    total_value                       numeric(18,4),
+    net_value_amount                  numeric(18,4),
     received_by_principal_id          uuid NOT NULL,
     journal_entry_id                  text,
     created_at                        timestamptz NOT NULL,
@@ -128,7 +128,7 @@ CREATE TABLE IF NOT EXISTS inventory.movement (
     recorded_at                       timestamptz,
     balance_after                     numeric(18,4),
     unit_cost                         numeric(18,4),
-    total_cost                        numeric(18,4),
+    net_cost_amount                   numeric(18,4),
     principal_id                      uuid,
     source_type                       text,
     source_id                         uuid,
@@ -151,15 +151,15 @@ CREATE TABLE IF NOT EXISTS inventory.purchase_order (
     match_status                      text,
     status                            text NOT NULL,
     deliver_to_location_id            uuid,
-    subtotal                          numeric(18,4),
+    net_amount                        numeric(18,4),
     tax_amount                        numeric(18,4),
-    total                             numeric(18,4) NOT NULL,
+    gross_amount                      numeric(18,4) NOT NULL,
     expected_delivery                 date,
     raised_by_principal_id            uuid,
     created_at                        timestamptz NOT NULL,
     closed_at                         timestamptz,
     venue_id                          uuid,
-    scope_path                        text
+    scope_path                        ltree
 );
 
 -- One item ordered, at a unit price
@@ -186,10 +186,10 @@ CREATE TABLE IF NOT EXISTS inventory.quotation (
     id                                uuid PRIMARY KEY,
     supplier_id                       uuid,
     supplier_name                     text,
-    total                             numeric(18,4),
+    gross_amount                      numeric(18,4),
     is_selected                       boolean,
     received_at                       timestamptz,
-    scope_path                        text
+    scope_path                        ltree
 );
 
 -- One item quoted. Hangs off: a child of inventory.quotation; reaches inventory.item through its
@@ -296,7 +296,7 @@ CREATE TABLE IF NOT EXISTS inventory.supplier (
     currency                          text,
     account_id                        uuid,
     is_active                         boolean,
-    scope_path                        text
+    scope_path                        ltree
 );
 
 -- Holds 12 columns. No description has been written for this table — the name is the only thing
@@ -327,7 +327,7 @@ CREATE TABLE IF NOT EXISTS inventory.transfer (
     received_by_principal_id          uuid,
     dispatched_at                     timestamptz NOT NULL,
     received_at                       timestamptz,
-    scope_path                        text
+    scope_path                        ltree
 );
 
 -- One item moving, which is in neither location until it arrives

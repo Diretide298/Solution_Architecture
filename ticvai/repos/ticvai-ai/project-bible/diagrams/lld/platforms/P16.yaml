@@ -40,7 +40,7 @@ modulesUsed:
   screens: 1
 servicesCalled:
 - service: ReportingService
-  operationCalls: 101
+  operationCalls: 102
 - service: AiService
   operationCalls: 5
 - service: InventoryService
@@ -71,6 +71,7 @@ screens:
   wave: 3
   density: compact
   operations:
+  - getCommandCentre
   - getDashboard
   - listAlerts
   - requestSuggestion

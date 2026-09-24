@@ -5,16 +5,16 @@
 | | |
 |---|---|
 | Screens | 69 |
-| Operations | 53 |
+| Operations | 54 |
 | Contracts | 11 |
 | Modules | 1 |
 | Undrawn | 0 |
-| Operations with no screen | 136 |
+| Operations with no screen | 135 |
 | Waves | wave3 69 |
 
 ## Gaps
 
-### 136 operations with no screen here
+### 135 operations with no screen here
 
 **In a contract this platform uses, callable by its audience, and reaching no screen on any platform serving that audience.** Either a screen is missing or the endpoint should not exist — and the second is worth considering first.
 
@@ -60,7 +60,7 @@
 | `createEmergencyAccessOverride` | identity | POST | Bypass the policy, loudly |
 | `evaluateAccess` | identity | POST | Decide, now, and say why |
 | `getAccessPolicy` | identity | GET | One policy, at a version |
-| … | | | 96 more |
+| … | | | 95 more |
 
 ## Modules
 
@@ -72,7 +72,7 @@
 
 | | Name | Module | Wave | Ops | Drawn |
 |---|---|---|---|---|---|
-| `ANL-001` | Executive Command Center | Analytics | 3 | 4 | yes |
+| `ANL-001` | Executive Command Center | Analytics | 3 | 5 | yes |
 | `ANL-002` | Sales, Revenue & Channel | Analytics | 3 | 2 | yes |
 | `ANL-003` | Operational Performance | Analytics | 3 | 5 | yes |
 | `ANL-004` | Product Performance | Analytics | 3 | 3 | yes |

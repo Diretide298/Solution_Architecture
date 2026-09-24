@@ -1,5 +1,5 @@
 id: LLD-white-label
-title: white-label — 50 operations
+title: white-label — 52 operations
 generatedBy: tools/derive-diagrams.py
 index: diagrams/hld/03-contracts.yaml
 tier: satellite
@@ -155,6 +155,17 @@ operations:
   reads:
   - whitelabel.tenant_config
   writes: []
+- operation: getBookingFlowConfig
+  verb: GET
+  path: /tenant-config/booking-flow
+  scope: tenant
+  permission: TENANT_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - whitelabel.tenant_config
+  writes: []
 - operation: getBrandIdentity
   verb: GET
   path: /tenant-config/brand
@@ -211,6 +222,9 @@ operations:
   offline: false
   reads:
   - cache:resolution
+  - control.licence_add_on
+  - subscription.contract
+  - subscription.plan
   - whitelabel.module_enablement
   writes:
   - cache:resolution
@@ -392,8 +406,10 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
-  writes: []
+  reads:
+  - whitelabel.custom_domain
+  writes:
+  - whitelabel.custom_domain
 - operation: restoreConfigVersion
   verb: POST
   path: /tenant-config/versions/{version}/restore
@@ -431,6 +447,21 @@ operations:
   - whitelabel.tenant_config
   writes:
   - cache:idempotency
+  - whitelabel.tenant_config
+- operation: setBookingFlowConfig
+  verb: PUT
+  path: /tenant-config/booking-flow
+  scope: tenant
+  permission: TENANT_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - cache:idempotency
+  - whitelabel.tenant_config
+  writes:
+  - cache:idempotency
+  - cache:resolution
   - whitelabel.tenant_config
 - operation: setBrandIdentity
   verb: PUT
@@ -572,6 +603,9 @@ operations:
   offline: false
   reads:
   - cache:idempotency
+  - control.licence_add_on
+  - subscription.contract
+  - subscription.plan
   - whitelabel.module_enablement
   writes:
   - cache:idempotency

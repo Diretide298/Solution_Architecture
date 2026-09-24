@@ -45,7 +45,7 @@ servicesCalled:
 - service: ReportingService
   operationCalls: 10
 - service: IdentityService
-  operationCalls: 7
+  operationCalls: 8
 - service: VenueOpsService
   operationCalls: 6
 - service: MarketingService
@@ -72,6 +72,7 @@ screens:
   wave: 1
   density: touchLarge
   operations:
+  - changeOwnCredential
   - forceLogout
   - getCurrentSession
   - listActiveSessions

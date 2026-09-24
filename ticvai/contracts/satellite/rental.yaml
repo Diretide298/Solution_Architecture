@@ -3049,6 +3049,36 @@ components:
             the asset retired; without a threshold the fee accrues forever and nobody decides.
 
             '
+        damageFeeMaximum:
+          $ref: ../shared/common.yaml#/components/schemas/Money
+          description: '**A ceiling, not a rate.** Added 22 September: `rental.settlement.damage_fee`
+            was stored with nothing bounding it. **A dent is assessed, not tabulated** — the amount is
+            entered per incident against the actual damage, so the control is how high an operator may
+            go, the same shape `maximumDailyCharge` already gives the late fee.
+
+            '
+        damageFeeApprovalAbove:
+          $ref: ../shared/common.yaml#/components/schemas/Money
+          description: '**Above this, a second person signs it off.** A damage fee is the one charge on
+            a settlement that a single operator decides alone, and the one a guest is most likely to
+            dispute. The shape is `orders.RefundPolicy.requiresApprovalAbove`, applied to the other
+            direction of money.
+
+            '
+        missingItemFeeBasis:
+          type: string
+          enum:
+          - replacementCost
+          - fixedAmount
+          description: '**What an unreturned item costs.** `replacementCost` reads the item''s own
+            replacement value, which is what the fee usually is; `fixedAmount` uses
+            `missingItemFeeAmount`. Added 22 September — `rental.settlement.missing_item_fee` was
+            stored with no source.
+
+            '
+        missingItemFeeAmount:
+          $ref: ../shared/common.yaml#/components/schemas/Money
+          description: Used when `missingItemFeeBasis` is `fixedAmount`.
         scopePath:
           type: string
     RentalOverride:
@@ -3552,6 +3582,7 @@ components:
         missingItemFee:
           $ref: ../shared/common.yaml#/components/schemas/Money
         totalCharged:
+          x-ticvai-column: gross_charged_amount
           $ref: ../shared/common.yaml#/components/schemas/Money
         depositCaptured:
           $ref: ../shared/common.yaml#/components/schemas/Money

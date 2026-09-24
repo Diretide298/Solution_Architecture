@@ -9,12 +9,12 @@
 | Contracts | 8 |
 | Modules | 2 |
 | Undrawn | 0 |
-| Operations with no screen | 11 |
+| Operations with no screen | 9 |
 | Waves | wave2 17 |
 
 ## Gaps
 
-### 11 operations with no screen here
+### 9 operations with no screen here
 
 **In a contract this platform uses, callable by its audience, and reaching no screen on any platform serving that audience.** Either a screen is missing or the endpoint should not exist — and the second is worth considering first.
 
@@ -28,8 +28,6 @@
 | `listLeaderboard` | marketing-crm | GET | Standings, by nickname |
 | `listRewards` | marketing-crm | GET | What points can be turned into |
 | `setLeaderboardNickname` | marketing-crm | PUT | Choose the name shown on the board |
-| `getBillingStatement` | orders | GET | One statement, with its lines |
-| `listBillingStatements` | orders | GET | What was charged, when, and against which agreement |
 | `recordRecommendationOutcome` | promotions | POST | Shown, clicked, accepted or dismissed |
 
 ## Modules

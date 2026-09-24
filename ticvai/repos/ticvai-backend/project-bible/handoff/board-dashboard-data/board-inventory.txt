@@ -1,0 +1,1121 @@
+G10 BOARD INVENTORY - RETAIL design pack (6 rendered pages)
+Product shell (identical on every page): TICVAI / Retail Management
+
+LEFT NAVIGATION RAIL (as rendered on RETAIL-p01; section headings vary per page)
+  RETAIL (p01) / OVERVIEW (p02-p06)
+    Retail Overview
+    Board 1: Store Config        (p01)   - "Board 1: Store & Ops Config" on p04
+                                          - "Board 1: Store & POS Config" on p05
+    Board 2: Products & Pricing  (p01)   - "Board 2: Product & Catalog" on p02-p06
+    Board 3: POS & Sales
+    Board 4: Inventory & Stock
+    Board 5: Promotions & Channels (p01) - "Board 5: Promotions & Comm." on p02-p06
+    Board 6: Analytics & AI
+  OPERATIONS
+    F&B Management
+    Ticketing
+    Resource Management
+    Guest Management
+    Loyalty & Membership
+  ADMINISTRATION
+    Users & Roles
+    Approval Center
+    Audit Logs
+    System Settings
+  User card: Ahmed Manager - Retail Director - Online
+
+=====================================================================
+PAGE: RETAIL-p01
+Board (highlighted nav item): Board 1: Store Config
+Page header: Retail Command Center - "Real-time overview of all retail operations"
+Frames:
+   1  Retail Command Center
+   2  Store Management
+   3  Create / Edit Retail Store
+   4  Store Types & Templates
+   5  Operating Hours & Sales Periods
+   6  POS & Device Assignment
+   7  Sales Channel Configuration
+   8  Store Inventory & Replenishment Configuration
+  10  Retail Global Settings & Controls
+  NOTE: no frame numbered 9 appears on this page; the last frame badge reads 10.
+
+=====================================================================
+PAGE: RETAIL-p02
+Board (highlighted nav item): Board 2: Product & Catalog
+Page header: Retail Product & Catalog Command Center -
+             "Manage products, catalogs, pricing and merchandising across all channels"
+Frames:
+   1  Retail Product & Catalog Command Center
+   2  Product / SKU Master
+   3  Variants, Attributes, Barcode & RFID
+   4  Category, Brand & Hierarchy
+   5  Catalog Builder & Store Assortment
+   6  Price Book & Retail Pricing
+   7  Bundle, Kit & Gift Set Builder
+   8  Merchandising & Product Presentation
+   9  Availability, Lifecycle & Publishing
+  10  Import, Governance & AI Assistant
+Footer: Last Data Refresh: May 21, 2025 10:30 AM / All Systems Operational
+
+=====================================================================
+PAGE: RETAIL-p03
+Board (highlighted nav item): Board 3: POS & Sales
+Page header: Retail Sales & POS Command Center -
+             "Real-time overview of retail sales, POS activity and operations"
+Frames:
+   1  Retail Sales & POS Command Center
+   2  Retail POS Workspace
+   3  Guest & Loyalty
+   4  Promotions & Discounts
+   5  Payment & Receipt
+   6  Transaction Search & History
+   7  Returns, Refunds & Exchanges
+   8  Omnichannel Order & Fulfilment
+   9  Mobile POS & Offline Queue
+  10  Exceptions & Action Center
+Footer: Last Data Refresh: May 21, 2025 10:30 AM / All Systems Operational
+
+=====================================================================
+PAGE: RETAIL-p04
+Board (highlighted nav item): Board 4: Inventory & Stock
+Page header: Store Stock, Transfers & Operational Inventory -
+             "Real-time retail inventory operations and stock management"
+Frames:
+   1  Store Stock, Transfers & Operational Inventory
+   2  Store Stock & SKU Availability
+   3  Requisition & Smart Replenishment
+   4  Store-to-Store & Warehouse Transfers
+   5  Receiving & Store Put-Away
+   6  Stock Count & Cycle Count
+   7  Damage, Loss & Stock Adjustment
+   8  Reservation, Allocation & Omnichannel
+   9  Barcode, RFID & Serialized Stock
+  10  Inventory Exceptions & AI Replenishment
+Footer: Last Data Refresh: May 21, 2025 10:30 AM / All Systems Operational
+
+=====================================================================
+PAGE: RETAIL-p05
+Board (highlighted nav item): Board 5: Promotions & Comm.
+Page header: Promotions, Omnichannel Commerce & Guest Engagement -
+             "Create, manage and analyze promotions, campaigns and guest engagement across all channels"
+Frames:
+   1  Promotions, Omnichannel Commerce & Guest Engagement
+   2  Promotion & Offer Builder
+   3  Eligibility, Priority & Conflict Rules
+   4  Campaign & Audience Management
+   5  Coupons, Vouchers & Promo Codes
+   6  Cross-Sell, Upsell & Recommendations
+   7  Omnichannel Commerce & Journey
+   8  Ticketing, Event & Experience Integration
+   9  Personalized Offers & Guest Engagement
+  10  Performance, AI Optimization & Action Center
+Footer: Last Data Refresh: May 21, 2025 10:30 AM / All Systems Operational
+
+=====================================================================
+PAGE: RETAIL-p06
+Board (highlighted nav item): Board 6: Analytics & AI
+Page header (frame badge 6): Retail Intelligence, Analytics & AI Optimization -
+             "Real-time insights, forecasting and AI-powered recommendations for data-driven decisions"
+Frames: this page carries ONE numbered frame badge (6, on the page header); the
+remaining panels are unnumbered. Panels, in reading order:
+   -  KPI strip (Net Sales, Transactions, Average Transaction Value, Units Sold,
+      Gross Margin %, Retail Conversion %, Promotion Revenue, Return Rate,
+      Inventory Value, Stock Availability, Health Score)
+   -  Sales Performance Trend
+   -  Sales by Channel (Today)
+   -  Top 5 Stores by Net Sales
+   -  Sales by Category (Today)
+   -  Promotion Performance (Top 5)
+   -  Inventory Health Overview
+   -  Top & Bottom Products (Today)
+   -  AI Insights Summary
+   -  Guest Conversion Funnel (Today)
+   -  Demand Forecast (Next 7 Days)
+   -  Performance vs Targets
+   -  AI Recommendations (Top 5)
+   -  What-If Simulation
+Footer: Last Data Refresh: May 21, 2025 10:30 AM / All Systems Operational
+BOARD INVENTORY - POS Frontline Operations design pack (POSFRONT-p01 .. POSFRONT-p06)
+Extraction group: G11
+Source: rendered board/dashboard design pages (PNG). Every line below is read off the page.
+
+=====================================================================
+PAGE: POSFRONT-p01
+Board (left rail): POS Workstation Management
+Left nav items (in order): Dashboard | Workstations | Workstation Groups |
+  Devices & Hardware | Live Health | Software & Config | Users & Roles |
+  Permissions | Incidents & Alerts | Audit Logs | Settings | Collapse
+Highlighted nav item varies by frame: 1A Dashboard, 1B Workstations,
+  1D Workstation Groups, 1E Live Health, 1F Software & Config
+Frames:
+  1A. Workstation Overview Dashboard
+  1B. Workstation Registry
+  1C. Workstation Details & Configuration
+  1D. Hardware & Peripherals Management
+  1E. Live Workstation Health Monitor
+  1F. Software, Configuration & Version Management
+
+=====================================================================
+PAGE: POSFRONT-p02
+Board (left rail): Cash & Till Management
+Left nav items (in order): Dashboard | Cash Dashboard | Opening Float |
+  Cash In / Out | Safe Drop / Transfer | Live Cash Position | Till Count |
+  Reconciliation | Shift / EOD Closing | Audit & Reports | Exceptions | Settings
+Highlighted nav item varies by frame: 2A Dashboard, 2B Till Count,
+  2D Cash In / Out, 2E Live Cash Position, 2F Reconciliation
+Frames:
+  2A. Cash Operations Dashboard
+  2B. Till Configuration
+  2C. Opening Float Management
+  2D. Cash In / Cash Out Operations
+  2E. Safe Drop & Cash Transfer Management
+  2F. Cash Reconciliation & Variance Management
+
+=====================================================================
+PAGE: POSFRONT-p03
+Board (left rail): Shift & Operator Management
+Left nav items (in order): Dashboard | Workstations | Shift Dashboard |
+  Shift Templates | Operator Assignment | Shift Opening / Login |
+  Shift Exceptions | Shift Closing | Reports & Analytics | Supervisor Control |
+  Permissions | Audit Logs | Settings
+Highlighted nav item: Shift Dashboard (3A, 3D)
+Frames:
+  3A. Shift & Operator Dashboard
+      subtitle: "Real-time overview of shifts, operators and workstation status."
+  3B. Operator & Workstation Assignment
+      subtitle: "Assign operators to shifts and workstations."
+  3C. Shift Templates & Policies
+      subtitle: "Create and manage shift templates, break rules and policies."
+  3D. Shift Opening & Login
+      subtitle: "Operators open shifts and log in to assigned workstations."
+  3E. Shift Exceptions & Alerts
+      subtitle: "Monitor and manage shift related exceptions in real time."
+  3F. Shift Closing & Settlements
+      subtitle: "Close shift, settle cash and complete end of day."
+
+=====================================================================
+PAGE: POSFRONT-p04   (layout is 2 columns x 3 rows, not 3 x 2)
+Board (left rail): POS Experience
+Left nav items (in order): Dashboard | POS Profiles | Layout Builder |
+  Product & Categories | Sales Rules | Discounts & Promotions |
+  Payment & Checkout | Customer & Membership | Receipt & Fulfilment |
+  Deployment | Audit & History | Settings
+Highlighted nav item varies by frame: 4A Dashboard, 4B POS Profiles,
+  4C/4D Product & Categories, 4E Sales Rules, 4F Deployment
+Frames:
+  4A. POS Experience Dashboard
+      subtitle: "Overview of POS profiles, deployments and configuration coverage."
+  4B. POS Profile Management
+      subtitle: "Create, edit and manage reusable POS profiles."
+  4C. Layout & Journey Builder
+      subtitle: "Design the POS user interface and transaction journey."
+  4D. Product & Category Button Configuration
+      subtitle: "Manage categories, products and button properties."
+  4E. Sales Rules, Discounts & Promotions
+      subtitle: "Configure pricing rules, validations, discounts and promotions."
+  4F. Deployment, Preview & Audit
+      subtitle: "Deploy configurations to workstations with preview and audit tracking."
+
+=====================================================================
+PAGE: POSFRONT-p05
+Board (left rail): Offline Operations
+Left nav items (in order): Dashboard | Workstations | Offline Operations (expandable) |
+  Offline Dashboard | Policy & Rules | Data Cache | Connectivity |
+  Transactions Monitor | Sync Queue | Conflicts | Reconciliation |
+  Alerts & Limits | Audit & Analytics | Settings
+Highlighted nav item varies by frame: 5A Offline Dashboard, 5B Policy & Rules,
+  5E Transactions Monitor
+Frames:
+  5A. Offline Operations Dashboard
+  5B. Offline Policy & Rules Configuration
+  5C. Offline Product & Data Cache Management
+  5D. Connectivity & Auto-Switch Settings
+  5E. Offline Transaction Monitor & Sync Queue
+  5F. Offline Alerts, Limits & Audit
+
+=====================================================================
+PAGE: POSFRONT-p06
+Board (left rail): Enterprise Frontline Operations
+Left nav items (in order): Dashboard | Venues | Departments | Workstations |
+  Shifts & Operators | Cash & Tills | Transactions | Devices & Health |
+  Offline Operations | Alerts & Incidents | Reports & Analytics |
+  Audit Logs | Settings
+Highlighted nav item varies by frame: 6A Dashboard, 6B Venues,
+  6D Workstations, 6F Offline Operations
+Frames:
+  6A. Enterprise Frontline Operations Dashboard
+      subtitle: "Real-time overview across all brands, regions and venues"
+  6B. Venue Operations Dashboard
+      subtitle: "Operational overview for a selected venue"
+  6C. Department & Sub-Department Dashboard
+      subtitle: "Drill down into department and sub-department performance"
+  6D. Workstation Operations Dashboard
+      subtitle: "360 view of a selected workstation"
+  6E. Transaction & Exception Monitoring
+      subtitle: "Monitor transactions and exceptions across the hierarchy"
+  6F. Frontline Analytics, AI Insights & Audit
+      subtitle: "Analytics, insights and complete audit trail"
+
+=====================================================================
+STRUCTURAL NOTES
+- 6 pages x 6 frames = 36 frames; frames numbered <page number><A..F>.
+- Every page carries the TICVAI logo with the strapline "Powered by Intelligence"
+  in the dark left rail.
+- Filter chrome repeats across boards: Tenant (TICVAI Group) / Brand (Dubai Parks) /
+  Region (Dubai) / Venue (Dubai Parks) / Date (13 May 2025), plus Refresh.
+- Hierarchy used throughout: Tenant > Brand > Region > Venue > Department >
+  Sub Department > Workstation > Till > Device.
+- Personas named on the pages: Cashier, Agent, Operator, Supervisor
+  (via "Supervisor Control", "Require Supervisor Approval", "Supervisor Overrides").
+- Named operators appearing as data: Ahmed Khan (OP-001/OP-1001), Sara Ahmed (OP-002),
+  James D'souza (OP-003), Fatima Noor (OP-004), Omar Ali (Agent), Priya Nair (OP-006),
+  Ali Hassan (OP-007), Rashed Al Mansoori (OP-008).
+- Currency throughout is AED.
+
+LEGIBILITY NOTES (regions not fully readable)
+- POSFRONT-p01 frame 1B: one of the four list filter dropdowns (between
+  "All Departments" and "All Sub Departments") could not be read with certainty and
+  was NOT recorded.
+- POSFRONT-p01 frame 1E: the numeric labels inside the "Health by Department"
+  stacked bars are too small to read; only the department names and the legend
+  (Online / Warning / Offline / Out of Service) were recorded.
+- POSFRONT-p02 frame 2A: the absolute AED amounts in the "Cash by Payment Type"
+  legend are only partly legible; percentages were recorded, amounts were not.
+- POSFRONT-p04 frame 4C: the POS canvas category rail and the component colour
+  hex values are small; the rail items and #001F5E / #FFFFFF were read but the
+  4D button colour hex was not recorded.
+- POSFRONT-p06 frame 6B: the "Workstations by Department" legend counts are
+  inconsistent at this resolution; only the legend categories were recorded.
+- No page was blank, empty or truncated.
+G12 BOARD INVENTORY — Resource Management design pack (RESMGMT-p01 .. RESMGMT-p11)
+Source: rendered design-pack PNGs only. Frame titles transcribed as printed.
+Product wordmark on every page: TICVAI.
+
+================================================================================
+RESMGMT-p01
+Board / page header: "Resource Management" — "View, assign and manage resources
+across all locations."  (Not a numbered-frame board; one full application screen.)
+Left rail (highlighted item): Calendar
+Left rail items: Dashboard | Calendar | Resources | Staff | Bookings | Assignments |
+  Rentals | Events | Requests | Approvals | Reports | Alerts | Settings
+  Quick Add: New Resource / New Staff / New Booking / New Event
+Signed-in user shown: John Carter — Cashier
+Panels (unnumbered):
+  - KPI strip: Total Resources / Today's Bookings / Utilization Rate / Active Staff /
+    Pending Requests
+  - Resource calendar (Day|Week|Month|Agenda, Filters, resource-type tabs)
+  - Quick Assign Resource
+  - Upcoming Bookings
+  - Recent Assignments
+  - Resource Alerts
+  - AI Suggestions
+
+================================================================================
+RESMGMT-p02
+Board name: BOARD 1 - RESOURCE MASTER DATA & CONFIGURATION
+Subtitle: "Establish and govern all resource types, categories, attributes,
+  relationships and lifecycle."
+Left rail highlighted section: Resources (Overview, Types, Categories, Attributes,
+  Hierarchy, Dependencies, Packages, Venues, Lifecycle, Audit)
+Frames:
+  01  Resource Management Command Center   [in-frame title: "Resource Command Center"]
+  02  Resource Type Configuration          [in-frame: "Resource Types"]
+  03  Resource Category Management         [in-frame: "Resource Categories"]
+  04  Resource Creation & Profile          [in-frame: "New Resource"]
+  05  Configurable Attribute Builder       [in-frame: "Attribute Builder"]
+  06  Resource Hierarchy & Relationships   [in-frame: "Resource Hierarchy"]
+  07  Resource Dependency Rules            [in-frame: "Dependency Rules"]
+  08  Resource Package & Bundle Configuration [in-frame: "Resource Packages"]
+  09  Multi-Venue Resource Assignment      [in-frame: "Venue Assignment"]
+  10  Resource Lifecycle, Governance & Audit [in-frame: "Resource Lifecycle"]
+
+================================================================================
+RESMGMT-p03
+Board name: BOARD 2 - RESOURCE CALENDAR, AVAILABILITY & RESERVATIONS
+Subtitle: "Manage resource availability, reservations, conflicts and assignments."
+Signed-in user shown: John Carter — Administrator
+Frames:
+  01  Resource Calendar Command Center
+  02  Calendar Filters, Search & Smart Discovery
+  03  Resource Availability Schedule Configuration
+  04  Resource Time-Slot Configuration
+  05  Advance Reservation Management
+  06  Recurring Reservation Configuration
+  07  Conflict Detection & Resolution Center
+  08  Operational Time & Resource Blocking
+  09  Multi-Event Resource Planning
+  10  Smart Assignment & Drag-and-Drop Reallocation
+
+================================================================================
+RESMGMT-p04
+Board name: BOARD 3 - STAFF RESOURCE & WORKFORCE CONFIGURATION
+Subtitle: "Configure staff profiles, skills, certifications, availability, shifts,
+  leave and integration."
+Left rail highlighted section: Staff (Directory, Profiles, Skills, Certifications,
+  Qualifications, Availability, Shifts, Leave & Absence, Overtime Rules, Integrations)
+Frames:
+  01  Staff Resource Directory
+  02  Staff Resource Profile
+  03  Skills & Competency Management
+  04  Certification & Expiry Management
+  05  Qualification & Assignment Rule Engine
+  06  Staff Availability & Working Pattern
+  07  Shift Template & Assignment Configuration
+  08  Break, Leave & Absence Configuration
+  09  Overtime & Working-Hour Rules
+  10  Workforce Integration & Synchronization Center
+
+================================================================================
+RESMGMT-p05
+Board name: BOARD 4 - WORKFORCE ROSTERING, ATTENDANCE & STAFFING CONTROL
+Subtitle: "Plan, manage and monitor your workforce operations in real time."
+Signed-in user shown: John Carter — Workforce Manager
+Footer: "All times are in (UTC+04:00) Dubai. Data is real-time and auto-refreshes
+  every 30 seconds."
+Frames:
+  01  Workforce Roster Command Center
+  02  Attraction & Operational Staffing Roster
+  03  Minimum Staffing & Coverage Rule Configuration
+  04  Staffing Gap & Coverage Control Center
+  05  Shift Marketplace & Workforce Requests
+  06  Attendance & Live Workforce Command Center
+  07  Staff Check-In, Check-Out & Exceptions
+  08  Workforce Compliance Validation Center
+  09  Labor Cost & Staffing Budget Control
+  10  AI Workforce Planner & Roster Optimization
+
+================================================================================
+RESMGMT-p06
+Board name: BOARD 5 - EXPERIENCE, TICKET & DYNAMIC RESOURCE ASSIGNMENT
+Subtitle: "Connect experiences with the right resources and assign automatically."
+Signed-in user shown: John Carter — Resource Admin
+Left rail highlighted section: Experience & Assignment (Requirement Builder,
+  Qualification Rules, Customer Selection, Dynamic Assignment, Reassignment)
+Frames:
+  01  Experience Resource Requirement Builder
+  02  Staff-to-Experience Qualification Mapping
+  03  Resource Combination Builder
+  04  Ticket Demand & Resource Capacity Mapping
+  05  Customer Resource Selection Configuration
+  06  Skill-Based & Smart Resource Selection
+  07  Customer / Cashier Resource Assignment Experience
+  08  Dynamic Resource Allocation Engine
+  09  Priority, Scoring & Allocation Policy
+  10  Automatic Replacement & Assignment Recovery
+
+================================================================================
+RESMGMT-p07
+Board name: BOARD 6 - EQUIPMENT, ASSETS, RENTAL & MAINTENANCE MANAGEMENT
+Subtitle: "Manage physical resources from inventory to retirement."
+Signed-in user shown: John Carter — Operations Manager
+Left rail highlighted section: Equipment & Assets (Command Center, Rental
+  Configuration, Inventory & Availability, Checkout, Assignments, Returns,
+  Deposits, Maintenance, Inspections, Lifecycle)
+Shortcuts panel: Add Resource / Quick Checkout / Record Return / Transfer Inventory /
+  Report Damage
+Footer: "All times are in (UTC+04:00) Dubai, UAE."
+Frames:
+  01  Equipment & Asset Command Center
+  02  Rental Resource Configuration
+  03  Rental Inventory & Availability Control
+  04  Resource Checkout Workspace
+  05  Guest & Resource Assignment
+  06  Rental Duration, Extension & Return Management
+  07  Deposit & Rental Financial Control
+  08  Maintenance & Resource Blocking
+  09  Inspection, Condition & Compliance
+  10  Asset Lifecycle, Depreciation & Retirement
+
+================================================================================
+RESMGMT-p08
+Board name: BOARD 7 - EVENT RESOURCE PLANNING & ALLOCATION
+Subtitle: "Plan, allocate and optimize all resources required to deliver successful
+  events."
+Signed-in user shown: John Carter — Event Manager
+Left rail highlighted section: Event Resources (Command Center, Requirements,
+  Templates, Forecasting, Allocations, Conflicts & Optimizer, Approvals)
+Frames:
+  01  Event Resource Planning Command Center
+  02  Event Resource Requirement Builder
+  03  Venue & Space Allocation
+  04  Equipment & Asset Allocation
+  05  Event Staff & Personnel Allocation
+  06  Event Resource Template Library
+  07  AI Event Resource Forecasting
+  08  Event Resource Cost Estimator
+  09  Multi-Event Allocation & Conflict Optimizer
+  10  Event Resource Approval & Readiness Gate
+
+================================================================================
+RESMGMT-p09
+Board name: BOARD 8 - AI RESOURCE OPTIMIZATION & FORECASTING
+Subtitle: "AI-powered insights to predict demand, optimize resources and maximize
+  efficiency."
+Signed-in user shown: John Carter — Operations Director
+Left rail highlighted section: AI Intelligence (AI Command Center, Recommendations,
+  Forecasting, Optimization, Scenario Simulator, AI Copilot)
+Footer: "AI recommendations are generated based on current data and configured
+  business rules. Final decisions are subject to approval."  /  "All times are in
+  (UTC+04:00) Dubai, UAE."
+Frames:
+  01  AI Resource Intelligence Command Center
+  02  Optimal Resource Recommendation Engine
+  03  AI Staff Recommendation & Workforce Matching
+  04  Resource Demand Forecasting
+  05  AI Staffing Requirement Forecast
+  06  AI Conflict Resolution Assistant
+  07  Automatic Schedule Optimization
+  08  Alternative Resource Recommendations
+  09  Scenario Simulator & Digital Twin
+  10  AI Copilot (Conversational Assistant)   [with a Recent Queries side panel]
+
+================================================================================
+RESMGMT-p10
+Board name: BOARD 9 - MOBILE RESOURCE OPERATIONS & EMPLOYEE SELF-SERVICE
+Subtitle: "Real-time mobile operations for staff, instructors and frontline teams.
+  Connected. Simple. Secure."
+Header tags: Resource Management | Employee App | AI-Powered
+Strapline: "Smarter Operations. Stronger Experiences."
+(No left rail — ten mobile phone mockups.)
+Frames:
+  01  My Resource Operations Home        — "Personalized operational dashboard"
+  02  My Schedule & Calendar             — "View and manage your assignments"
+  03  Assignment Detail                  — "Full operational brief for each assignment"
+  04  Staff Check-In / Check-Out         — "Fast and secure attendance"
+  05  Resource Collection & Return       — "Scan, collect and return equipment"
+  06  Employee Requests                  — "Request support, report issues"
+  07  Shift Change / Swap / Pickup       — "Self-service workforce actions"
+  08  Manager Approval Center            — "Approve operational requests on mobile"
+  09  Operational Notifications          — "Real-time mobile alerts"
+  10  Mobile Operations Control          — "Offline mode & sync status"
+
+================================================================================
+RESMGMT-p11
+Board name: BOARD 10 - ANALYTICS, GOVERNANCE & RESOURCE CONTIOL CENTER
+  (printed exactly as shown, including the "CONTIOL" spelling)
+Subtitle: "Measure performance. Govern operations. Drive continuous improvement."
+Signed-in user shown: John Carter — Operations Director
+Left rail highlighted section: Analytics & Control (Command Center, Utilization
+  Analytics, Cost & Efficiency, Forecast Performance, KPI & SLA, Governance Center,
+  Approvals & Exceptions, Audit Trail, Integration Health, Executive Intelligence)
+Footer strip: Data-Driven Decisions | Role-Based Governance | AI-Powered Insights |
+  Continuous Improvement | Secure & Compliant | Audit-Ready | Real-Time Control  /
+  "All times are in (UTC+04:00) Dubai, UAE."
+Frames:
+  01  Resource Analytics Command Center
+  02  Resource Utilization & Capacity Analytics
+  03  Resource Cost, Revenue & Efficiency Analytics
+  04  Demand Forecast Accuracy & Planning Performance
+      (frame badge is printed "00", not "04" — apparent artwork error)
+  05  KPI, SLA & Performance Framework
+  06  Resource Governance & Policy Center
+  07  Approvals, Exceptions & Overrides
+  08  Audit Trail & Resource Decision History
+  09  Integration & System Health Center
+  10  Executive Resource Intelligence & AI Improvement Center
+
+================================================================================
+ILLEGIBLE / LOW-CONFIDENCE REGIONS (no labels invented)
+- RESMGMT-p04 frame 09 (Overtime & Working-Hour Rules): two field labels beside the
+  values "12 Hours" and "10 Hours" could not be read with certainty.
+- RESMGMT-p05 frame 07 (Staff Check-In / Check-Out & Exceptions): the "Time &
+  Attendance" field labels are below legible resolution; only the panel name and the
+  record value "No Show" are certain.
+- RESMGMT-p06 frame 04 (Ticket Demand & Resource Capacity Mapping): the five
+  "Capacity Calculation (Live Preview)" column captions are illegible; only the
+  values 24, 1:8, 3, 5 and "40 Participants" are readable.
+- RESMGMT-p06 frame 05 (Customer Resource Selection Configuration): three of the
+  ticked "Display Information to Customer" options are illegible; only "Photo",
+  "Internal ID", "Employment Type" and "Cost / Salary" are certain.
+- RESMGMT-p02 frame 07 (Dependency Rules): rule-list entries are partly illegible.
+G13 BOARD INVENTORY - TICKETTYPES design pack (12 pages, 120 frames)
+Source: scratchpad/blind/raw/screens/TICKETTYPES-p01..p12.png
+Every page carries the same application chrome: TICVAI brand mark top-left, a dark
+left navigation rail, a global context bar (Tenant / Brand / Venue / ... / Effective
+Date), search, notification bell with badge, help, and a "Super Admin" user avatar.
+Pages 04-12 also carry a footer with a status Legend, a Data Sources list, a
+"Last updated: 27-Apr-2025 10:32 (UTC+4)" stamp and a "Refresh All" action.
+
+=====================================================================
+PAGE: TICKETTYPES-p01
+BOARD: BOARD 1 - TICKET CATALOGUE: PRODUCT CREATION & FOUNDATIONS
+Matrix Coverage: 1.1.39, 1.1.41-49
+Left rail: icon-only on this page (no readable labels)
+Global filters: Tenant: TICVAI Group | Brand: Yas Experience | Venue: All |
+  Region: UAE | Legal Entity: TICVAI FZ | Language: English | Effective Date: 27-Apr-2025
+Frames:
+  01  Catalogue Command Center
+  02  Ticket Product Directory
+  03  Create Product Wizard
+  04  Identity & Classification
+  05  Category & Hierarchy Manager
+  06  Content & Localization
+  07  Attribute & Metadata Schema
+  08  Templates, Clone & Duplicate
+  09  Product Preview & Preflight
+  10  Import, AI Draft & Product API
+
+=====================================================================
+PAGE: TICKETTYPES-p02
+BOARD: BOARD 2 - TICKET TYPES & PRODUCT BEHAVIORS
+Matrix Coverage: 1.1.1-8, 1.1.12-13, 1.1.26, 1.1.42-46
+Breadcrumb: Ticket Catalogue / Product Creation & Foundations
+Left rail (highlighted item = Ticket Types): Command Center, Products, Ticket Types,
+  Categories, Validity, Capacity, Entitlements, Media, Pricing, Promotions,
+  Approvals, Reports, Settings
+Frames:
+  01  Ticket Type Library
+  02  Open-Dated Ticket Setup
+  03  Dated & Special-Day Setup
+  04  Timeslot Ticket Type
+  05  Multi-Day & Consecutive Use
+  06  Pass, Membership & Subscription Type
+  07  Camp & Recurring-Day Pattern
+  08  Variant Dimensions
+  09  Property Combination Matrix
+  10  Ownership & Assignment Model
+
+=====================================================================
+PAGE: TICKETTYPES-p03
+BOARD: BOARD 3 - VALIDITY MANAGEMENT & EXPIRY RULES
+Matrix Coverage: 1.1.9, 1.1.78-92
+Breadcrumb: Ticket Catalogue / Validity Management
+Footer badges: Audit Enabled | Version Controlled | Permission Controlled | Integrated Services
+Frames:
+  01  Validity Rule Library
+  02  Fixed & Variable Period
+  03  Date & Time Range
+  04  Weekday & Calendar Rules
+  05  First-Use Activation
+  06  Performance-Based Validity
+  07  Number-of-Days Validity
+  08  Monthly & Annual Validity
+  09  Dynamic Expiry Calculation
+  10  Blackouts, Grace & Exceptions
+
+=====================================================================
+PAGE: TICKETTYPES-p04
+BOARD: BOARD 4 - SCHEDULES, TIMESLOTS & PERFORMANCES
+Matrix Coverage: 1.1.2-4, 1.1.19, 1.1.24-25, 1.1.85-86
+Breadcrumb: Schedules / Overview
+Left rail (highlighted = Schedules): Command Center, Products, Ticket Types, Schedules,
+  Capacity, Entitlements, Pricing, Sales Channels, Reservations, Reports, Settings
+Extra context: Attraction / Event, Venue, Timezone Asia/Dubai (UTC+4), date range
+Frames:
+  01  Schedule Overview
+  02  Timeslot Template
+  03  Calendar & Recurrence
+  04  Slot Frequency & Windows
+  05  Entry Buffers & Scan Window
+  06  Capacity per Timeslot
+  07  Demand-Based Slot Generation
+  08  Performance Association
+  09  Clone & Bulk Schedule Edit
+  10  Reservation & Waitlist Rules
+Footer data sources: Schedules, Reservations, Access Control, POS, Inventory
+
+=====================================================================
+PAGE: TICKETTYPES-p05
+BOARD: BOARD 5 - CAPACITY MANAGEMENT & INVENTORY CONTROL
+Matrix Coverage: 1.1.10, 1.1.25, 1.1.32, 1.1.117, 1.1.127
+Left rail (highlighted = Capacity); Shortcuts: Create Allocation, Forecast Capacity,
+  Capacity Override, Reconciliation
+Frames:
+  01  Capacity Command Center
+  02  Sales Capacity
+  03  Admission Capacity
+  04  Inventory Pool Association
+  05  Allocations, Holds & Quotas
+  06  Capacity Hierarchy & Precedence
+  07  Cancellation & Reopen Rules
+  08  Forecasted Capacity Adjustment
+  09  Override & Emergency Control
+  10  Utilization, Alerts & Reconciliation
+Footer data sources: POS, Kiosk, App, Access Control, CRM, Inventory, Finance
+
+=====================================================================
+PAGE: TICKETTYPES-p06
+BOARD: BOARD 6 - ENTITLEMENTS & RIGHTS CONFIGURATION
+Matrix Coverage: 1.1.11, 1.1.50-64
+Left rail (highlighted = Entitlements); Shortcuts: Entitlement Templates, Access Areas,
+  Wallets, Loyalty Programs, Redemption Locations
+Frames:
+  01  Entitlement Builder
+  02  Admission Entitlement
+  03  Redeemable Product Entitlement
+  04  F&B & Merchandise Entitlements
+  05  Stored Value & Loyalty Entitlements
+  06  Referral, Earned & Complimentary Benefits
+  07  Access Areas & Entry Quantity
+  08  Check-in / Check-out Control
+  09  Consumption & Remaining Balance
+  10  Entitlement Audit & Offline Payload
+Footer data sources: POS, Access Control, CRM, Wallet, Inventory, Loyalty, Finance, Schedules
+
+=====================================================================
+PAGE: TICKETTYPES-p07
+BOARD: BOARD 7 - ELIGIBILITY & RESTRICTIONS MANAGEMENT
+Matrix Coverage: 1.1.38, 1.1.121-127
+Shortcuts: Rule Library, Test Scenarios, Exception Queue, Audit History
+Frames:
+  01  Eligibility Rule Studio
+  02  Age & Height Eligibility
+  03  Residency, Nationality & Geography
+  04  Membership, Loyalty & Entitlement Eligibility
+  05  Guest Profile Conditions
+  06  Quantity & Purchase Limits
+  07  Channel Restrictions
+  08  Blackouts & Business Restrictions
+  09  Ownership & Transfer Eligibility
+  10  Rule Simulation & Exception Review
+Footer data sources: CRM, Membership, Loyalty, Identity Service, POS, Access Control, Schedules
+
+=====================================================================
+PAGE: TICKETTYPES-p08
+BOARD: BOARD 8 - SPECIAL PRODUCTS, MEMBERSHIPS & STORED VALUE
+Matrix Coverage: 1.1.5-7, 1.1.28-31, 1.1.93-120
+Left rail (highlighted = Special Products); Shortcuts: Memberships, Corporate Accounts,
+  Wallet Accounts, Billing & Finance
+Frames:
+  01  Special Product Portfolio
+  02  Group Ticket Configuration
+  03  Family Ticket Configuration
+  04  Corporate Allocations
+  05  Membership Product Management
+  06  Membership Lifecycle Rules
+  07  Family & Corporate Memberships
+  08  Subscription Billing & Renewal Link
+  09  Stored-Value Ticket Product
+  10  Attendee Data & Group Entry
+Footer data sources: CRM, Membership, Loyalty, Wallet, Finance, Schedules, Capacity, Access Control
+
+=====================================================================
+PAGE: TICKETTYPES-p09
+BOARD: BOARD 9 - PRODUCT RELATIONSHIPS, BUNDLES & DONATIONS
+Matrix Coverage: 1.1.8, 1.1.17-18, 1.1.34-35, 1.1.43, 1.1.128-135
+Left rail (highlighted = Relationships); Shortcuts: Bundles, Campaigns, Donations, Reports
+Frames:
+  01  Product Relationship Map
+  02  Bundle Builder
+  03  Multi-Attraction & Multi-Venue
+  04  Add-on Catalogue
+  05  Cross-Sell & Upsell Rules
+  06  Donation Campaign Manager
+  07  Donation Amount Methods
+  08  Checkout & Channel Donations
+  09  Campaign Product Association
+  10  Donation Finance, Audit & Reporting
+Footer data sources: Products, Schedules, Capacity, Inventory, Membership, Wallet, Finance, Access Control
+
+=====================================================================
+PAGE: TICKETTYPES-p10
+BOARD: BOARD 10 - TICKET SERVICE POLICIES & MODIFICATION RULES
+Matrix Coverage: 1.1.19-23, 1.1.27, 1.1.96-100, 1.1.113
+Left rail (highlighted = Service Policies); Shortcuts: Service Cases, Policy Library,
+  Fee Policies, Approvals
+Frames:
+  01  Ticket Service Policy Hub
+  02  Reschedule Rules
+  03  Exchange Rules
+  04  Upgrade Rules
+  05  Downgrade Rules
+  06  Convert to Membership or Pass
+  07  Ownership Transfer
+  08  Fees & Price Difference Association
+  09  Approval & Exception Workflow
+  10  Guest Self-Service Preview
+Footer data sources: Products, Pricing, Membership, Finance, Access Control, CRM, Schedules
+
+=====================================================================
+PAGE: TICKETTYPES-p11
+BOARD: BOARD 11 - PRODUCT ASSOCIATIONS & DELIVERY
+Matrix Coverage: 1.1.15-16, 1.1.37, 1.1.39 + Ticket Media
+Left rail (highlighted = Associations); Product / Variant context selectors in header
+  (YAS Explorer Pass (3 Parks) / Standard Adult)
+Frames:
+  01  Association Overview
+  02  Pricing Profile Link
+  03  Tax, Fee & Finance Links
+  04  Promotion & Discount Link
+  05  Sales Channel Availability
+  06  Ticket Media Profile
+  07  Wallet & Digital Pass Association
+  08  Physical Media & Wearables
+  09  Distribution & Delivery Rules
+  10  Association Impact Preview
+Footer data sources: Pricing, Tax, Finance, Promotions, Channels, Inventory, Ticket Media, Membership
+
+=====================================================================
+PAGE: TICKETTYPES-p12
+BOARD: BOARD 12 - PRODUCT LIFECYCLE, AI & INTEGRATION GOVERNANCE
+Matrix Coverage: 1.1.14, 1.1.33-41, 1.1.47-49, 1.1.104, 1.1.135
+Left rail (highlighted = Lifecycle & Gov.); Shortcuts: Approvals, Change Requests,
+  Service Cases, Audit Trail, Integration Monitor
+Frames:
+  01  Lifecycle Command Center
+  02  Draft & Edit Workspace
+  03  Multi-Level Approval
+  04  Publish, Suspend & Archive
+  05  Version History & Compare
+  06  Rollback & Corrective Version
+  07  AI Document-to-Product
+  08  AI Product Recommendations
+  09  API & Integration Monitor
+  10  Audit, Analytics & Governance
+Footer data sources: Pricing, Tax, Finance, Inventory, Reservations, Access Control,
+  Channels, Ticket Media, Membership
+
+=====================================================================
+ILLEGIBLE / UNCERTAIN REGIONS (not extracted, or extracted at low confidence)
+- p01: left navigation rail is icon-only at this render size; no nav labels were
+  readable, so no nav rows were recorded for p01.
+- p04 frame 01 "Highlights" strip: two of the four exception labels could not be
+  read even at 4x zoom (only "Overlaps" and "2 Gaps" are legible). The calendar
+  cell values inside the Schedule Overview grid are also not legible.
+- p04 frame 02: "Publication Horizon" value could not be read.
+- p11: the last left-rail item below "Sales Channels / Reservations / Reports /
+  Settings" reads as "Delivery" but is partly obscured by the frame overlay (Low).
+- p12 frame 07 "Extracted Data" table: three of the seven extracted attribute
+  labels and all seven confidence percentages are too small to read reliably;
+  only Type, Validity and Attractions were recorded.
+# G7 board / dashboard / screen inventory — one distinct named surface per line
+# format: <name> | <source file> | <page>
+
+## Ticketing_Platform_Native_Dashboard_Visualization_Requirements
+Operations board (wall-display operations board) | Ticketing_Platform_Native_Dashboard_Visualization_Requirements | p3
+Executive Performance (dashboard) | Ticketing_Platform_Native_Dashboard_Visualization_Requirements | p8
+Sales & Channel (dashboard) | Ticketing_Platform_Native_Dashboard_Visualization_Requirements | p8
+Admissions & Capacity (dashboard) | Ticketing_Platform_Native_Dashboard_Visualization_Requirements | p8
+Product & Pricing (dashboard) | Ticketing_Platform_Native_Dashboard_Visualization_Requirements | p8
+Customer & Membership (dashboard) | Ticketing_Platform_Native_Dashboard_Visualization_Requirements | p8
+Finance & Reconciliation (dashboard) | Ticketing_Platform_Native_Dashboard_Visualization_Requirements | p8
+Operations Control Room (dashboard) | Ticketing_Platform_Native_Dashboard_Visualization_Requirements | p8
+B2B / OTA Partner (dashboard) | Ticketing_Platform_Native_Dashboard_Visualization_Requirements | p8
+F&B / Retail (dashboard) | Ticketing_Platform_Native_Dashboard_Visualization_Requirements | p8
+
+## TICVAI_POS_Frontline_Operations_Professional_Dashboard_Reference — boards
+Board 1 — Workstation & Device Management | TICVAI_POS_Frontline_Operations_Professional_Dashboard_Reference | p2, p3, p4
+Board 2 — Cash Management & Till Control | TICVAI_POS_Frontline_Operations_Professional_Dashboard_Reference | p2, p3, p11
+Board 3 — Shift & Operator Management | TICVAI_POS_Frontline_Operations_Professional_Dashboard_Reference | p2, p3, p18
+Board 4 — POS Experience & Sales Configuration | TICVAI_POS_Frontline_Operations_Professional_Dashboard_Reference | p2, p3, p25
+Board 5 — Offline POS & Synchronization | TICVAI_POS_Frontline_Operations_Professional_Dashboard_Reference | p2, p3, p32
+Board 6 — Enterprise Frontline Operations & Analytics | TICVAI_POS_Frontline_Operations_Professional_Dashboard_Reference | p2, p3, p39
+
+## TICVAI_POS_Frontline_Operations_Professional_Dashboard_Reference — screens (36)
+1A Workstation Overview Dashboard | TICVAI_POS_Frontline_Operations_Professional_Dashboard_Reference | p5
+1B Workstation Registry | TICVAI_POS_Frontline_Operations_Professional_Dashboard_Reference | p6
+1C Workstation Details & Configuration | TICVAI_POS_Frontline_Operations_Professional_Dashboard_Reference | p7
+1D Hardware & Peripherals Management | TICVAI_POS_Frontline_Operations_Professional_Dashboard_Reference | p8
+1E Live Workstation Health Monitor | TICVAI_POS_Frontline_Operations_Professional_Dashboard_Reference | p9
+1F Software, Configuration & Version Management | TICVAI_POS_Frontline_Operations_Professional_Dashboard_Reference | p10
+2A Cash Operations Dashboard | TICVAI_POS_Frontline_Operations_Professional_Dashboard_Reference | p12
+2B Till Configuration | TICVAI_POS_Frontline_Operations_Professional_Dashboard_Reference | p13
+2C Opening Float Management | TICVAI_POS_Frontline_Operations_Professional_Dashboard_Reference | p14
+2D Cash In / Cash Out Operations | TICVAI_POS_Frontline_Operations_Professional_Dashboard_Reference | p15
+2E Safe Drop & Cash Transfer Management | TICVAI_POS_Frontline_Operations_Professional_Dashboard_Reference | p16
+2F Cash Reconciliation & Variance Management | TICVAI_POS_Frontline_Operations_Professional_Dashboard_Reference | p17
+3A Shift & Operator Dashboard | TICVAI_POS_Frontline_Operations_Professional_Dashboard_Reference | p19
+3B Operator & Workstation Assignment | TICVAI_POS_Frontline_Operations_Professional_Dashboard_Reference | p20
+3C Shift Templates & Policies | TICVAI_POS_Frontline_Operations_Professional_Dashboard_Reference | p21
+3D Shift Opening & Login | TICVAI_POS_Frontline_Operations_Professional_Dashboard_Reference | p22
+3E Shift Exceptions & Alerts | TICVAI_POS_Frontline_Operations_Professional_Dashboard_Reference | p23
+3F Shift Closing & Settlements | TICVAI_POS_Frontline_Operations_Professional_Dashboard_Reference | p24
+4A POS Experience Dashboard | TICVAI_POS_Frontline_Operations_Professional_Dashboard_Reference | p26
+4B POS Profile Management | TICVAI_POS_Frontline_Operations_Professional_Dashboard_Reference | p27
+4C Layout & Journey Builder | TICVAI_POS_Frontline_Operations_Professional_Dashboard_Reference | p28
+4D Product & Category Button Configuration | TICVAI_POS_Frontline_Operations_Professional_Dashboard_Reference | p29
+4E Sales Rules, Discounts & Promotions | TICVAI_POS_Frontline_Operations_Professional_Dashboard_Reference | p30
+4F Deployment, Preview & Audit | TICVAI_POS_Frontline_Operations_Professional_Dashboard_Reference | p31
+5A Offline Operations Dashboard | TICVAI_POS_Frontline_Operations_Professional_Dashboard_Reference | p33
+5B Offline Policy & Rules Configuration | TICVAI_POS_Frontline_Operations_Professional_Dashboard_Reference | p34
+5C Offline Product & Data Cache Management | TICVAI_POS_Frontline_Operations_Professional_Dashboard_Reference | p35
+5D Connectivity & Auto-Switch Settings | TICVAI_POS_Frontline_Operations_Professional_Dashboard_Reference | p36
+5E Offline Transaction Monitor & Sync Queue | TICVAI_POS_Frontline_Operations_Professional_Dashboard_Reference | p37
+5F Offline Alerts, Limits & Audit | TICVAI_POS_Frontline_Operations_Professional_Dashboard_Reference | p38
+6A Enterprise Frontline Operations Dashboard | TICVAI_POS_Frontline_Operations_Professional_Dashboard_Reference | p40
+6B Venue Operations Dashboard | TICVAI_POS_Frontline_Operations_Professional_Dashboard_Reference | p41
+6C Department & Sub-Department Dashboard | TICVAI_POS_Frontline_Operations_Professional_Dashboard_Reference | p42
+6D Workstation Operations Dashboard | TICVAI_POS_Frontline_Operations_Professional_Dashboard_Reference | p43
+6E Transaction & Exception Monitoring | TICVAI_POS_Frontline_Operations_Professional_Dashboard_Reference | p44
+6F Frontline Analytics, AI Insights & Audit | TICVAI_POS_Frontline_Operations_Professional_Dashboard_Reference | p45
+G8 BOARD INVENTORY — F&B Management design pack (FB-p01 .. FB-p06)
+Product header on every page: "TICVAI / F&B Management"
+Source: rendered board screens only. Frame titles quoted as printed on the page.
+
+===============================================================================
+FB-p01 — Board 1: Configuration  (left rail highlighted item: "F&B")
+Left rail: F&B | Overview | MASTER & CONFIGURATION: Outlets, Outlet Templates,
+Operating Hours | SALES & SERVICE: POS & Devices, Service Channels |
+KITCHEN: Kitchens & Stations, Routing Rules | CONFIGURATION: Global Settings
+Signed-in user: "Admin User / F&B Admin"
+  Frame 1  — F&B Command Center
+  Frame 2  — Outlet Management
+  Frame 3  — Create / Edit Outlet
+  Frame 4  — Outlet Types & Templates
+  Frame 5  — Operating Hours & Service Periods
+  Frame 6  — POS & Device Assignment
+  Frame 7  — Service Channel Configuration
+  Frame 8  — Kitchen & Preparation Stations
+  Frame 9  — Order Routing & KDS / Printer Rules
+  Frame 10 — F&B Global Settings & Controls
+
+===============================================================================
+FB-p02 — Board 2: Menu & Recipe  (left rail highlighted: "Board 2: Menu & Recipe")
+Left rail: F&B Overview, Menus & Products, Recipes & Ingredients, Kitchen
+Operations, Tables & Reservations, Operations & Stock, Analytics & Performance |
+BOARDS: Board 1: Configuration, Board 2: Menu & Recipe, Board 3: Kitchen & Orders,
+Board 4: Tables & Guests, Board 5: Stock & Ops, Board 6: Analytics & AI |
+Reports, Approval Center, Data Exports, Settings
+Signed-in user: "Ahmed Manager / F&B Director"
+  Frame 1  — Menu & Product Command Center
+  Frame 2  — Menu Builder & POS Layout Designer
+  Frame 3  — Product / PLU Master
+  Frame 4  — Variants, Modifiers & Special Selling Rules
+  Frame 5  — Combo & Meal Builder
+  Frame 6  — Recipe & BOM Management
+  Frame 7  — Ingredient Substitution, Allergen & Nutrition
+  Frame 8  — Production Planning & Production Sheets
+  Frame 10 — Availability, Pricing, Channels & Publishing
+  (no frame numbered 9 is printed on this page; the bottom row runs 7, 8, 10)
+
+===============================================================================
+FB-p03 — Board 3: Kitchen & Orders  (left rail highlighted: "Board 3: Kitchen & Orders")
+Left rail: F&B Overview | OPERATIONS: Menus & Products, Recipes & Ingredients,
+Board 3: Kitchen & Orders, Tables & Guests, Board 5: Stock & Ops |
+INTELLIGENCE: Board 6: Analytics & AI | ADMINISTRATION: Reports, Approval Center,
+Alerts & Actions, Settings
+Signed-in user: "Ahmed Manager / F&B Director"
+  Frame 1  — Kitchen Operations Command Center
+  Frame 2  — Kitchen Display System (KDS) - Grill Station
+  Frame 3  — Order Firing & Course Management
+  Frame 4  — Active Order Management
+  Frame 5  — Kitchen Station Workload & Dynamic Routing
+  Frame 6  — Expeditor & Order Assembly
+  Frame 7  — Guest Collection & Notification
+  Frame 8  — Exceptions, Re-Fire & Unavailable Items
+  Frame 9  — SLA, Priority & Service Rules
+  Frame 10 — Kitchen Performance, AI & Optimization
+
+===============================================================================
+FB-p04 — Board 4: Tables & Service  (left rail highlighted: "Dashboard" under
+BOARD 4 - TABLES & SERVICE)
+Left rail: F&B Overview | BOARD 1 - SETUP: Outlets & Kitchens, Service Channels |
+BOARD 2 - MENU & PRODUCTS: Menus, Products, Recipes | BOARD 3 - KITCHEN OPS: KDS,
+Active Orders, Stations | BOARD 4 - TABLES & SERVICE: Dashboard, Floor Plan,
+Reservations, Walk-In / Waitlist, Guest Profiles, Table Service,
+Billing & Payments, Analytics | Settings
+Signed-in user: "Admin User / F&B Admin"
+  Frame 1  — Restaurant Service Command Center
+  Frame 2  — Interactive Floor Plan & Table Map
+  Frame 3  — Table & Seating Configuration
+  Frame 4  — Reservation Calendar & Timeline
+  Frame 5  — Create / Edit Reservation
+  Frame 6  — Walk-In & Waitlist Management
+  Frame 7  — Guest Profile & Dining History
+  Frame 8  — Live Table & Service Management
+  Frame 9  — Table Order, Bill & Payment Management
+  Frame 10 — Reservation & Table Performance
+  (note: the badge on the "Live Table & Service Management" frame renders as 8
+   and the next frame also renders as 9; sequence read as 7, 8, 9, 10)
+
+===============================================================================
+FB-p05 — Board 5: Stock & Ops  (left rail highlighted: "Board 5: Stock & Ops")
+Left rail: F&B Overview, Menus & Products, Recipes & Ingredients, Kitchen & Orders,
+Tables & Guests, Board 5: Stock & Ops, Board 6: Analytics & AI |
+OPERATIONS: Production, Wastage, Transfers, Requisitions, Stock Counts,
+Availability (86), Food Safety | ADMINISTRATION: Suppliers (via Procurement),
+Warehouses (via Inventory), Approval Center, Alerts & Actions, Reports, Settings
+Signed-in user: "Ahmed Manager / F&B Director"
+  Frame 1  — F&B Stock & Operations Command Center
+  Frame 2  — Outlet Stock & Ingredient Availability
+  Frame 3  — Recipe Consumption & Theoretical Inventory
+  Frame 4  — Production Execution & Batch Management
+  Frame 5  — Wastage, Spoilage, Returns & Write-Off
+  Frame 6  — Requisition & Smart Replenishment
+  Frame 7  — Transfers, Distribution & Outlet Receiving
+  Frame 8  — Stock Count, Reconciliation & Variance
+  Frame 9  — Product Availability, 86 & Food Safety
+  Frame 10 — Operational Alerts, AI Replenishment & Action Center
+
+===============================================================================
+FB-p06 — Board 6: Intelligence  (left rail highlighted: "Board 6: Intelligence")
+Left rail: OVERVIEW: F&B Overview, Executive Summary | ANALYTICS: Sales & Revenue,
+Outlet Performance, Product Performance, Cost & Profitability,
+Inventory Intelligence, Kitchen Performance, Guest Analytics, Board 6: Intelligence,
+AI & Forecasting, Alerts & Action Center | CONFIGURATION: Dashboards,
+Reports & Exports, KPI Library, Data Sources | ADMINISTRATION: Users & Roles,
+Approval Center, Audit Logs, Settings
+Signed-in user: "Ahmed Manager / F&B Director"
+  Frame 1  — F&B Executive Command Center
+  Frame 2  — Sales by Channel
+  Frame 3  — Hourly Sales Heatmap
+  Frame 4  — Top 10 Products by Revenue
+  Frame 5  — Margin Waterfall (Today)
+  Frame 6  — Forecast vs Actual
+  Frame 7  — AI Recommendations
+  Frame 8  — What-If Simulation
+  Frame 10 — AI Assistant
+  (no frame numbered 9 is printed on this page; the bottom row runs 6, 7, 8, 10)
+  Page footer: "Last Data Refresh: May 21, 2025 10:30 AM",
+  "All Systems Operational", "Data Sources: POS, Kitchen, Inventory, Production,
+  Reservations, CRM, Ticketing, Finance"
+
+===============================================================================
+PERSONAS NAMED ACROSS THE PACK
+F&B Admin (Admin User) | F&B Director (Ahmed Manager) | Supervisor | Manager |
+Finance | F&B Manager | Cost Controller | Executive Chef | Chef Karim |
+Waiter (Waiter Ahmed, Waiter Sara) | Chef-Omar | Cashier (Ahmed, Sara, Raj, Ali,
+Fatima, Omar) | Expeditor | Guest (John Smith, Gold Member) | Runner
+G9 — BOARD INVENTORY: Inventory & Procurement design pack (INVPROC-p01 .. INVPROC-p07)
+Product chrome common to every page: TICVAI / "Inventory & Procurement"; top bar = tenant selector
+("All Tenants"), site selector ("Dubai Park"), date range ("May 21 – May 21, 2025"), notification bell
+with badge, help icon, user chip ("Ahmed Manager"); footer "© 2025 TICVAI Technologies  v2.4.0".
+
+================================================================================
+INVPROC-p01
+Board name (page header): BOARD 1: INVENTORY MASTER & STOCK CONTROL – ALL 10 PAGES
+Left rail (highlighted item): "Inventory Master & Stock Control"
+Left rail items: Dashboard | Inventory Master & Stock Control | Warehouse Operations |
+  Transfers & Counts | Procurement (PR) | Sourcing & PO | Receiving & GRN |
+  Planning & Analytics | Reports | Settings
+User chip role on this page: Inventory Manager
+Frames:
+   1  Inventory Command Center
+   2  Inventory Item Master
+   3  Categories & Classification
+   4  Units of Measure (UOM) Management
+   5  Location & Warehouse Structure
+   6  Stock Position
+   7  Batch, Lot & Expiry Tracking
+   8  Inventory Movements & Transactions
+   9  Reorder & Alert Configuration
+  10  Inventory Audit & History
+
+================================================================================
+INVPROC-p02
+Board name (page header): BOARD 2: WAREHOUSE, LOCATION & FULFILMENT OPERATIONS – ALL 10 PAGES
+Left rail (highlighted item): "Board 2: Warehouse"
+Left rail items: Dashboard | Inventory Master & … | Board 2: Warehouse |
+  Board 3: Transfers & Counts | Board 4: Procurement (PR) | Board 5: Sourcing & PO |
+  Board 6: Receiving & GRN | Board 7: Planning & Analytics | Reports | Settings
+  plus "Switch Warehouse" selector (F&B Cold Store)
+Frames:
+   1  Warehouse Operations Command Center
+   2  Warehouse & Location Master
+   3  Location (Zone & Bin) Hierarchy
+   4  Receiving Management
+   5  Put-away Management
+   6  Picking & Fulfilment
+   7  Packing & Dispatch
+   8  Transfers Between Locations
+   9  Inventory Counting
+  10  Exceptions & Alerts
+
+================================================================================
+INVPROC-p03
+Board name (page header): BOARD 3: TRANSFERS, COUNTS, ADJUSTMENTS & RECONCILIATION – ALL 10 PAGES
+Left rail (highlighted item): "Board 3 / Transfers, Counts, Adjustments"
+Left rail groups & items:
+  DASHBOARD: Dashboard
+  INVENTORY & PROCUREMENT: Inventory Master | Warehouse Operations |
+    Board 1 (Inventory Master & Stock) | Board 2 (Warehouse & Locations) |
+    Board 3 (Transfers, Counts, Adjustments) | Board 4 (Supplier & PR) |
+    Board 5 (Sourcing & PO) | Board 6 (Receiving & GRN) | Board 7 (Planning & Analytics)
+  REPORTS: Inventory Reports | Procurement Reports | Supplier Performance | Audit Logs
+  ADMINISTRATION: Users & Roles | Approval Workflows | System Settings
+  Warehouse Switcher: Central Warehouse — Online
+Frames:
+   1  Inventory Control Command Center
+   2  Inventory Transfers Management
+   3  Cycle Count Management
+   4  Inventory Adjustments
+   5  Reconciliations
+   6  Stock Reservations & Allocations
+   7  Stock Status & Aging Analysis
+   8  Negative Stock & Overdue Items
+   9  Audit Trail & Change History
+  10  Inventory Control Settings
+
+================================================================================
+INVPROC-p04
+Board name (page header): BOARD 4: SUPPLIER & PURCHASE REQUEST MANAGEMENT – ALL 10 PAGES
+Left rail (highlighted item): "Board 4 / Supplier & PR"
+User chip role on this page: Procurement Manager
+Frames:
+   1  Supplier Command Center
+   2  Supplier Master
+   3  Supplier Details
+   4  Supplier Categories & Items
+   5  Supplier Documents & Compliance
+   6  Supplier Performance Scorecard
+   7  Purchase Request (PR) Dashboard
+   8  Create / Edit Purchase Request
+   9  PR Approval Workflow
+  10  PR Reports & Analytics
+
+================================================================================
+INVPROC-p05
+Board name (page header): BOARD 5: SOURCING & PURCHASE ORDER MANAGEMENT – ALL 10 PAGES
+Left rail (highlighted item): "Board 5 / Sourcing & PO"
+User chip role on this page: Procurement Manager
+Frames:
+   1  Sourcing Dashboard
+   2  RFQ Management
+   3  Supplier Search & Discovery
+   4  RFQ Evaluations & Comparison
+   5  Purchase Order Management
+   6  Contract Management
+   7  Approval Workflow   [title glyphs partly degraded in the render; subtitle reads
+                            "Manages approval flow for POs, Contracts, and Supplier actions."]
+   -  (no frame numbered 8 appears on this page — numbering jumps 7 -> 9)
+   9  Supplier Onboarding
+  10  Sourcing Analytics & Savings
+
+================================================================================
+INVPROC-p06
+Board name (page header): BOARD 6: PROCUREMENT SPEND, SAVINGS & COMMERCIAL ANALYTICS – ALL 10 PAGES
+Left rail (highlighted item): "Board 6 / Spend, Savings & Analytics"
+User chip role on this page: Procurement Manager
+Frames:
+   1  Spend Overview Dashboard
+   2  Spend Analysis
+   3  Supplier Spend Analysis
+   4  Savings & Cost Avoidance
+   5  Price Variance Analysis
+   6  Contract Spend & Compliance
+   7  Budget vs Actual Spend
+   8  Supplier Negotiation & Savings Tracker
+   9  Commercial Performance Dashboard
+  10  Commercial Analytics & Insights
+
+================================================================================
+INVPROC-p07
+Board name (page header): BOARD 7: PLANNING, FORECASTING & REPLENISHMENT – ALL 10 PAGES
+Left rail (highlighted item): "Board 7 / Planning & Forecasting"
+User chip role on this page: Planning Manager
+Frames:
+   1  Planning Overview Dashboard
+   2  Demand Forecasting
+   3  Replenishment & Planning
+   4  Safety Stock & Service Levels
+   5  Reorder Point Management
+   6  Planning Calendar
+   7  Scenario & What-if Planner
+   8  Replenishment Plan Approval
+   9  Forecast Accuracy & Performance
+  10  AI Demand Intelligence
+
+================================================================================
+NOTES ON LEGIBILITY
+- The left-rail caption for Board 6 differs between pages: "Receiving & GRN" (p01–p04 style rails)
+  vs "Spend, Savings & Analytics" (p06). Board 7 likewise: "Planning & Analytics" vs
+  "Planning & Forecasting" (p07). Both variants are recorded.
+- INVPROC-p01 frame 9 (Reorder & Alert Configuration): the second reorder-settings row label and
+  the notification-channel labels are too blurred in the render to read with certainty; only
+  "Reorder Method", "Maximum Stock", "Min / Max", "Reorder Quantity", "Safety Stock",
+  "Reorder Point", "Review Period", "Daily", "Channels", "Status" and "WhatsApp" were legible.
+- INVPROC-p03 frame 4 donut ("Adjustment Reasons") and frame 7 percentage columns are partly
+  illegible; percentages were not transcribed.
+- INVPROC-p05 frame 7 stage-list heading renders as "Spend by Category", which appears to be a
+  rendering artefact over the approval-stage list; it was not extracted as a label.

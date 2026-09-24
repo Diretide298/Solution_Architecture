@@ -3051,6 +3051,7 @@ components:
           unitCost:
             $ref: ../shared/common.yaml#/components/schemas/Money
           totalCost:
+            x-ticvai-column: net_cost_amount
             $ref: ../shared/common.yaml#/components/schemas/Money
           principalId:
             type: string
@@ -3610,6 +3611,7 @@ components:
           supplierName:
             type: string
           total:
+            x-ticvai-column: gross_amount
             $ref: ../shared/common.yaml#/components/schemas/Money
           isSelected:
             type: boolean
@@ -3837,10 +3839,12 @@ components:
               lineTotal:
                 $ref: ../shared/common.yaml#/components/schemas/Money
         subtotal:
+          x-ticvai-column: net_amount
           $ref: ../shared/common.yaml#/components/schemas/Money
         taxAmount:
           $ref: ../shared/common.yaml#/components/schemas/Money
         total:
+          x-ticvai-column: gross_amount
           $ref: ../shared/common.yaml#/components/schemas/Money
         expectedDelivery:
           type: string
@@ -3965,6 +3969,7 @@ components:
               unitCost:
                 $ref: ../shared/common.yaml#/components/schemas/Money
         totalValue:
+          x-ticvai-column: net_value_amount
           $ref: ../shared/common.yaml#/components/schemas/Money
         receivedByPrincipalId:
           type: string

@@ -221,7 +221,7 @@ CREATE TABLE IF NOT EXISTS control.channel_listing (
     push_interval_minutes             integer,
     guest_data_scope                  text,
     last_pushed_at                    timestamptz,
-    scope_path                        text
+    scope_path                        ltree
 );
 
 -- Authored content with a schedule (BL-172). The CMS modelled configuration and not authoring — a
@@ -238,7 +238,7 @@ CREATE TABLE IF NOT EXISTS control.content_block (
     expire_at                         timestamptz,
     audience_segment_id               uuid,
     approved_by_principal_id          uuid,
-    scope_path                        text
+    scope_path                        ltree
 );
 
 -- A developer organisation (13.1.6–13.1.9). An organisation, because an integration outlives the
@@ -272,7 +272,7 @@ CREATE TABLE IF NOT EXISTS control.environment (
 -- legal links are held separately so a tenant cannot remove the privacy notice by accident
 CREATE TABLE IF NOT EXISTS control.footer_config (
     id                                uuid PRIMARY KEY NOT NULL,
-    scope_path                        text NOT NULL,
+    scope_path                        ltree NOT NULL,
     legal_links                       jsonb,
     copyright_text                    text
 );
@@ -301,9 +301,9 @@ CREATE TABLE IF NOT EXISTS control.invoice (
     period_start                      date NOT NULL,
     period_end                        date NOT NULL,
     status                            text NOT NULL,
-    subtotal                          numeric(18,4),
+    net_amount                        numeric(18,4),
     tax_amount                        numeric(18,4),
-    total                             numeric(18,4) NOT NULL,
+    gross_amount                      numeric(18,4) NOT NULL,
     plan_version_used                 text,
     issued_at                         timestamptz,
     due_at                            date,
@@ -323,10 +323,10 @@ CREATE TABLE IF NOT EXISTS control.invoice_line (
 );
 
 -- Something bought beyond the plan. Hangs off: reaches control.cell through its keys; references
--- subscription.plan. Reached by: 4 operations read it and 2 write it.
+-- subscription.plan. Reached by: 6 operations read it and 2 write it.
 CREATE TABLE IF NOT EXISTS control.licence_add_on (
     module_key                        text NOT NULL,
-    price                             numeric(18,4),
+    list_price                        numeric(18,4),
     valid_from                        date,
     valid_to                          date,
     note                              text,
@@ -359,7 +359,7 @@ CREATE TABLE IF NOT EXISTS control.migration_plan (
     all_reversible                    boolean NOT NULL,
     irreversible                      text[],
     total_estimated_lock_ms           integer,
-    scope_path                        text
+    scope_path                        ltree
 );
 
 -- One cell in a plan, and its own readiness
@@ -490,7 +490,7 @@ CREATE TABLE IF NOT EXISTS control.partner_user (
     id                                uuid PRIMARY KEY NOT NULL,
     partner_id                        uuid NOT NULL,
     principal_id                      uuid NOT NULL,
-    branch_scope_path                 text NOT NULL,
+    branch_scope_path                 ltree NOT NULL,
     allocation_quota                  integer,
     credit_limit_override             numeric(18,4),
     can_manage_users                  boolean
@@ -623,7 +623,7 @@ CREATE TABLE IF NOT EXISTS control.seo_metadata (
     open_graph                        jsonb,
     is_auto_generated                 boolean,
     no_index                          boolean,
-    scope_path                        text
+    scope_path                        ltree
 );
 
 -- Something the platform is telling tenants, scheduled or in progress
@@ -635,7 +635,7 @@ CREATE TABLE IF NOT EXISTS control.support_notice (
     affected_tenant_ids               text[],
     published_by_principal_id         uuid,
     published_at                      timestamptz NOT NULL,
-    scope_path                        text
+    scope_path                        ltree
 );
 
 -- A customer of the platform — the root of the org tree. platform.tenant is a one-column
@@ -725,7 +725,7 @@ CREATE TABLE IF NOT EXISTS control.url_redirect (
     created_at                        timestamptz,
     hit_count                         integer,
     is_active                         boolean,
-    scope_path                        text
+    scope_path                        ltree
 );
 
 -- What a tenant consumed, which is what an invoice is computed from

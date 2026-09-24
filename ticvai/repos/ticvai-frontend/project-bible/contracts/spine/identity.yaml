@@ -2,7 +2,7 @@ openapi: 3.1.0
 info:
   title: TICVAI Identity & Authorisation
   version: 1.0.0
-  x-ticvai-screen-count: 47
+  x-ticvai-screen-count: 49
   x-ticvai-tier: spine
   x-ticvai-module: 19 — Guest Mobile App & Branding (auth) + cross-cutting staff auth
   x-ticvai-requirements: 107
@@ -857,6 +857,61 @@ paths:
                 $ref: '#/components/schemas/TokenPair'
         '401':
           $ref: ../shared/common.yaml#/components/responses/Unauthorized
+  /auth/credential:
+    post:
+      operationId: changeOwnCredential
+      x-ticvai-consumed-by:
+        - "P04 POS-000 Sign In"
+      x-ticvai-self-service: true
+      x-ticvai-audience:
+      - staff
+      - partner
+      tags:
+      - identity
+      security:
+      - bearerAuth: []
+      x-ticvai-self-scoped: principal
+      x-ticvai-permission: null
+      x-ticvai-scope-level: tenant
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      summary: Change the caller's own password or PIN
+      description: '**`createPrincipal` defaults `mustChangeCredential` to true and nothing could change
+        a credential**, so every new member of staff was issued an initial secret they could never
+        replace: the first sign-in could not complete. `identity.principal_credential` was read by
+        `login` and written by nothing after creation.
+
+        **The current credential is required even inside a session.** A till left signed in is a
+        session somebody else can use, and changing its PIN without knowing the old one is how that
+        session becomes theirs permanently.
+
+        Held to `setPasswordPolicy` (length, breach check); a PIN is held to the length rule only,
+        because it is valid only on a registered workstation (see `LoginRequest.method`). **Every other
+        session of the principal is ended** on success, since a credential changed because it leaked
+        is not fixed while the leaked one is still signed in.
+
+        '
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ChangeCredentialRequest'
+      responses:
+        '204':
+          description: Changed. Other sessions of this principal are ended.
+        '400':
+          $ref: ../shared/common.yaml#/components/responses/BadRequest
+        '401':
+          $ref: ../shared/common.yaml#/components/responses/Unauthorized
+        '422':
+          description: The new credential fails the password policy, or is the same as the current one.
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
   /auth/logout:
     post:
       operationId: logout
@@ -1055,6 +1110,55 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+  /principals/{principalId}/credential-reset:
+    parameters:
+    - name: principalId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    post:
+      operationId: resetPrincipalCredential
+      x-ticvai-consumed-by:
+        - "P08 BO-053 Staff Directory"
+      x-ticvai-audience:
+      - staff
+      tags:
+      - administration
+      x-ticvai-permission: USER_MANAGE
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      x-ticvai-step-up: mfa
+      x-ticvai-step-up-reason: Replaces somebody else's secret, which is the whole of an account takeover.
+      summary: Reset a member of staff's password or PIN
+      description: '**A cashier who forgets a PIN had no path back but a new account**, which loses their
+        history, their shift record and every audit row that names them. Recovery for guests exists
+        (`PasswordPolicy.recoveryMethods`); for staff it did not.
+
+        **The reset is always temporary.** The principal must change it at next sign-in
+        (`changeOwnCredential`), so the supervisor who set it never knows the credential in use. All
+        sessions of the principal are ended, and the reset is audited with `reason`.
+
+        '
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ResetCredentialRequest'
+      responses:
+        '204':
+          description: Reset. The principal must change it at next sign-in; their sessions are ended.
+        '400':
+          $ref: ../shared/common.yaml#/components/responses/BadRequest
+        '403':
+          $ref: ../shared/common.yaml#/components/responses/Forbidden
+        '404':
+          $ref: ../shared/common.yaml#/components/responses/NotFound
   /principals/{principalId}:
     parameters:
     - name: principalId
@@ -2012,7 +2116,6 @@ paths:
         - "P09 ADM-011 Licence & Seat Management"
         - "P09 ADM-012 Tenant Isolation & Resource Pool"
         - "P09 ADM-015 API Rate Limit & Quota Management"
-        - "P13 CMS-001 Tenant Workspace"
       x-ticvai-audience:
       - staff
       x-ticvai-read-routing: replica
@@ -2036,7 +2139,6 @@ paths:
       operationId: setSsoConfig
       x-ticvai-consumed-by:
         - "P09 ADM-005 Tenant Directory"
-        - "P13 CMS-001 Tenant Workspace"
       x-ticvai-audience:
       - staff
       x-ticvai-config-scope: tenant
@@ -3921,6 +4023,54 @@ components:
             in on a phone and a laptop at once.
 
             '
+    ChangeCredentialRequest:
+      type: object
+      description: 'Request only. The credential itself is stored hashed in `identity.principal_credential`
+        and is never returned by any operation (`handoff/schema-storage-only.md`).
+
+        '
+      required:
+      - method
+      - currentCredential
+      - newCredential
+      properties:
+        method:
+          type: string
+          enum:
+          - password
+          - pin
+          description: Which credential is being changed. Card, RFID and SSO are not secrets the principal
+            holds, so they are not changed here.
+        currentCredential:
+          type: string
+          maxLength: 512
+          writeOnly: true
+        newCredential:
+          type: string
+          maxLength: 512
+          writeOnly: true
+    ResetCredentialRequest:
+      type: object
+      description: Request only; see `ChangeCredentialRequest`.
+      required:
+      - method
+      - temporaryCredential
+      - reason
+      properties:
+        method:
+          type: string
+          enum:
+          - password
+          - pin
+        temporaryCredential:
+          type: string
+          maxLength: 512
+          writeOnly: true
+          description: Issued to the principal out of band. Must be changed at next sign-in.
+        reason:
+          type: string
+          minLength: 3
+          maxLength: 500
     PasswordPolicy:
       type: object
       x-ticvai-persistence: identity.password_policy

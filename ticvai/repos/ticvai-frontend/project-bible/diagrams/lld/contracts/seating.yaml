@@ -540,8 +540,10 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
-  writes: []
+  reads:
+  - seating.seat_hold
+  writes:
+  - seating.seat_hold
 - operation: setAccessibleSeating
   verb: PUT
   path: /accessible-seating

@@ -5,16 +5,16 @@
 | | |
 |---|---|
 | Screens | 71 |
-| Operations | 154 |
-| Contracts | 17 |
+| Operations | 170 |
+| Contracts | 18 |
 | Modules | 16 |
 | Undrawn | 0 |
-| Operations with no screen | 12 |
+| Operations with no screen | 10 |
 | Waves | wave1 20 · wave2 35 · wave3 16 |
 
 ## Gaps
 
-### 12 operations with no screen here
+### 10 operations with no screen here
 
 **In a contract this platform uses, callable by its audience, and reaching no screen on any platform serving that audience.** Either a screen is missing or the endpoint should not exist — and the second is worth considering first.
 
@@ -29,8 +29,6 @@
 | `listLeaderboard` | marketing-crm | GET | Standings, by nickname |
 | `listRewards` | marketing-crm | GET | What points can be turned into |
 | `setLeaderboardNickname` | marketing-crm | PUT | Choose the name shown on the board |
-| `getBillingStatement` | orders | GET | One statement, with its lines |
-| `listBillingStatements` | orders | GET | What was charged, when, and against which agreement |
 | `recordRecommendationOutcome` | promotions | POST | Shown, clicked, accepted or dismissed |
 
 ### 6 modules split across waves
@@ -72,27 +70,27 @@
 | `GST-001` | Home – Default | Discovery & Browse | 1 | 5 | yes |
 | `GST-002` | Explore Categories | Discovery & Browse | 1 | 1 | yes |
 | `GST-003` | Event & Attraction Listing | Discovery & Browse | 1 | 4 | yes |
-| `GST-004` | Attraction Details | Discovery & Browse | 1 | 4 | yes |
+| `GST-004` | Attraction Details | Discovery & Browse | 1 | 5 | yes |
 | `GST-005` | What's On | Discovery & Browse | 1 | 2 | yes |
 | `GST-006` | Event / Exhibition Details | Discovery & Browse | 1 | 2 | yes |
-| `GST-007` | Select Date & Time | Booking & Selection | 1 | 2 | yes |
+| `GST-007` | Select Date & Time | Booking & Selection | 1 | 3 | yes |
 | `GST-008` | Tickets & Add-ons | Booking & Selection | 1 | 1 | yes |
-| `GST-009` | Review & Payment | Cart & Checkout | 1 | 9 | yes |
+| `GST-009` | Review & Payment | Cart & Checkout | 1 | 11 | yes |
 | `GST-010` | Booking Confirmation | Cart & Checkout | 1 | 3 | yes |
 | `GST-011` | Wallet Overview | Membership, Loyalty & Value | 2 | 2 | yes |
 | `GST-012` | My Tickets | Account & Self-Service | 1 | 6 | yes |
 | `GST-013` | Ticket Details | Account & Self-Service | 1 | 4 | yes |
 | `GST-014` | Ticket Transfer | Ticketing | 2 | 3 | yes |
-| `GST-015` | Memberships | Membership, Loyalty & Value | 2 | 5 | yes |
+| `GST-015` | Memberships | Membership, Loyalty & Value | 2 | 9 | yes |
 | `GST-016` | My Reservations | Ticketing | 2 | 3 | yes |
 | `GST-017` | Reservation Details | Ticketing | 2 | 2 | yes |
-| `GST-018` | Add to Calendar / Reminders | Account & Self-Service | 3 | 3 | yes |
+| `GST-018` | Add to Calendar / Reminders | Account & Self-Service | 3 | 6 | yes |
 | `GST-019` | Order History | Account & Self-Service | 2 | 4 | yes |
 | `GST-020` | Saved Items / Wishlist | Account & Self-Service | 3 | 3 | yes |
 | `GST-021` | Interactive Map | In-venue Services | 2 | 4 | yes |
 | `GST-022` | Attraction Wait Times | In-venue Services | 2 | 1 | yes |
 | `GST-023` | Virtual Queue | In-venue Services | 3 | 5 | yes |
-| `GST-024` | F&B – Browse & Order | In-venue Services | 2 | 8 | yes |
+| `GST-024` | F&B – Browse & Order | In-venue Services | 2 | 10 | yes |
 | `GST-025` | F&B – Order Tracking | In-venue Services | 2 | 3 | yes |
 | `GST-026` | Retail / Merchandise | Retail | 2 | 4 | yes |
 | `GST-027` | Parking – Reserve & Pay | In-venue Services | 3 | 3 | yes |
@@ -123,7 +121,7 @@
 | `GST-052` | Suggested Itineraries | Engagement & Support | 3 | 3 | yes |
 | `GST-053` | Build Your Own Itinerary | Engagement & Support | 3 | 4 | yes |
 | `GST-054` | AI Optimized Itinerary | Engagement & Support | 3 | 4 | yes |
-| `GST-055` | Dynamic QR Ticket | Account & Self-Service | 1 | 1 | yes |
+| `GST-055` | Dynamic QR Ticket | Account & Self-Service | 1 | 4 | yes |
 | `GST-056` | Bundle Package | Booking & Selection | 2 | 3 | yes |
 | `GST-057` | Accessibility Information | Discovery & Browse | 2 | 1 | yes |
 | `GST-058` | Resource Availability (Cabana) | Booking & Selection | 3 | 2 | yes |
@@ -138,6 +136,6 @@
 | `GST-069` | Face Pass | Account & Self-Service | 2 | 3 | yes |
 | `GST-070` | Reserve a Table or Cabana | In-venue Services | 2 | 6 | yes |
 | `GST-071` | Payment Methods | Account & Self-Service | 2 | 5 | yes |
-| `GST-072` | Share & Group Booking | Booking & Selection | 2 | 5 | yes |
+| `GST-072` | Share & Group Booking | Booking & Selection | 2 | 8 | yes |
 | `GST-073` | Security & Sign-in | Account & Self-Service | 2 | 5 | yes |
 

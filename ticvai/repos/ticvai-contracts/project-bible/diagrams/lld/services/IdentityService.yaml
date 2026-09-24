@@ -1,5 +1,5 @@
 id: LLD-IdentityService
-title: IdentityService — 68 operations, 32 tables
+title: IdentityService — 70 operations, 32 tables
 generatedBy: tools/derive-diagrams.py
 tier: foundation
 index: diagrams/hld/02-services.yaml
@@ -9,7 +9,7 @@ why: '**Twelve contracts read it and it reads almost nothing.** The one service 
 scale: Read-heavy, latency-critical, cached hard. Every request resolves a principal.
 ifDown: '**A restart is an outage everywhere.** Deploys go out first and alone.'
 coverage:
-  operations: 68
+  operations: 70
   inAFlow: 21
   percent: 48%
   note: '**Flow coverage is how much of this service a journey has walked.** A service under 40% is
@@ -28,8 +28,16 @@ schemas:
   largestTable: pii.subject
 operationsByContract:
 - contract: identity
-  count: 68
+  count: 70
   operations:
+  - operation: changeOwnCredential
+    verb: POST
+    path: /auth/credential
+    scope: tenant
+    permission: null
+    offline: false
+    reads: 4
+    writes: 3
   - operation: completeSsoAuthorization
     verb: POST
     path: /auth/sso/{providerId}/callback
@@ -77,7 +85,7 @@ operationsByContract:
     permission: USER_MANAGE
     offline: false
     reads: 2
-    writes: 2
+    writes: 3
   - operation: createRole
     verb: POST
     path: /roles
@@ -438,6 +446,14 @@ operationsByContract:
     offline: false
     reads: 2
     writes: 2
+  - operation: resetPrincipalCredential
+    verb: POST
+    path: /principals/{principalId}/credential-reset
+    scope: venue
+    permission: USER_MANAGE
+    offline: false
+    reads: 3
+    writes: 3
   - operation: resolvePermissions
     verb: POST
     path: /permissions/resolve
@@ -694,7 +710,7 @@ tables:
 - table: identity.module_access
   columns: 8
   store: postgres
-  parent: null
+  parent: identity.principal
   writtenBy:
   - identity
   foreignWriters: null
@@ -729,7 +745,8 @@ tables:
   columns: 2
   store: postgres
   parent: identity.principal
-  writtenBy: []
+  writtenBy:
+  - identity
   foreignWriters: null
 - table: identity.refresh_token
   columns: 10
@@ -878,7 +895,6 @@ screens:
 - P10:PTR-003 Profile & Company Details
 - P10:PTR-020 Sub-Agent Management
 - P12:SUP-001 Venue Management Sign In
-- P13:CMS-001 Tenant Workspace
 - P13:CMS-019 User Access
 - P13:CMS-086 Role-Based Asset Access & Permission Management
 - P16:ANL-003 Operational Performance
@@ -886,7 +902,6 @@ screens:
 flows:
 - F06 Guest enters the venue
 - F08 Steward works a shift on the employee app
-- F102 A brand is set, previewed, published and rolled back
 - F104 A platform operator signs in under MFA
 - F105 A rate limit is set and a developer hits it
 - F106 A security dashboard surfaces something and it is investigated

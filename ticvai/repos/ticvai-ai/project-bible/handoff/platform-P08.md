@@ -5,16 +5,16 @@
 | | |
 |---|---|
 | Screens | 1182 |
-| Operations | 1083 |
+| Operations | 1103 |
 | Contracts | 31 |
 | Modules | 13 |
 | Undrawn | 0 |
-| Operations with no screen | 244 |
+| Operations with no screen | 237 |
 | Waves | wave1 60 · wave2 79 · wave3 1043 |
 
 ## Gaps
 
-### 244 operations with no screen here
+### 237 operations with no screen here
 
 **In a contract this platform uses, callable by its audience, and reaching no screen on any platform serving that audience.** Either a screen is missing or the endpoint should not exist — and the second is worth considering first.
 
@@ -60,7 +60,7 @@
 | `updateDonationCampaign` | catalogue | PATCH | Amend or close a campaign |
 | `calculateTax` | finance | POST | Compute tax for a set of lines |
 | `disputeObligation` | finance | POST | One entity disagrees with the amount |
-| … | | | 204 more |
+| … | | | 197 more |
 
 ### 8 modules split across waves
 
@@ -107,7 +107,7 @@
 | `BO-008` | Product Detail & Variants | Orders & Money | 1 | 4 | yes |
 | `BO-009` | Pricing Rules | Sell | 1 | 7 | yes |
 | `BO-010` | Promotions & Coupons | Sell | 2 | 19 | yes |
-| `BO-011` | Packages & Bundles | Sell | 2 | 5 | yes |
+| `BO-011` | Packages & Bundles | Sell | 2 | 7 | yes |
 | `BO-012` | Membership Products | Sell | 2 | 12 | yes |
 | `BO-013` | Channel & Distribution | Sell | 2 | 10 | yes |
 | `BO-014` | Catalogue Publishing | Sell | 1 | 13 | yes |
@@ -122,7 +122,7 @@
 | `BO-023` | Refunds & Exchanges | Orders & Money | 1 | 15 | yes |
 | `BO-024` | Payment Exceptions | Orders & Money | 1 | 6 | yes |
 | `BO-025` | Chargebacks & Disputes | Orders & Money | 2 | 5 | yes |
-| `BO-026` | Group Bookings | Orders & Money | 2 | 14 | yes |
+| `BO-026` | Group Bookings | Orders & Money | 2 | 17 | yes |
 | `BO-027` | Reissue & Media Replacement | Orders & Money | 2 | 4 | yes |
 | `BO-028` | Refund Approval Queue | Orders & Money | 1 | 1 | yes |
 | `BO-029` | Report Builder | Orders & Money | 2 | 9 | yes |
@@ -140,7 +140,7 @@
 | `BO-041` | Cash Movements | Orders & Money | 2 | 13 | yes |
 | `BO-042` | Banking & Safe | Orders & Money | 2 | 13 | yes |
 | `BO-043` | Daily Reconciliation | Orders & Money | 1 | 7 | yes |
-| `BO-044` | F&B Outlets | Venue Operations | 2 | 15 | yes |
+| `BO-044` | F&B Outlets | Venue Operations | 2 | 17 | yes |
 | `BO-045` | Menu Management | Food & Beverage | 1 | 10 | yes |
 | `BO-046` | Kitchen Display | Food & Beverage | 1 | 5 | yes |
 | `BO-047` | Order Corrections & Exceptions | Orders & Money | 2 | 14 | yes |
@@ -149,7 +149,7 @@
 | `BO-050` | Stock Position & Valuation | Stock & Supply | 2 | 2 | yes |
 | `BO-051` | Purchase Orders | Orders & Money | 2 | 13 | yes |
 | `BO-052` | Goods Receipt | Stock & Supply | 2 | 12 | yes |
-| `BO-053` | Staff Directory | People & Access Rights | 1 | 4 | yes |
+| `BO-053` | Staff Directory | People & Access Rights | 1 | 5 | yes |
 | `BO-054` | Role Assignment | People & Access Rights | 1 | 2 | yes |
 | `BO-055` | Rota & Scheduling | People & Access Rights | 2 | 4 | yes |
 | `BO-056` | Time & Attendance | People & Access Rights | 2 | 3 | yes |
@@ -268,7 +268,7 @@
 | `BO-1062` | Tenant & Brand Context | Access & Venue | 3 | 1 | yes |
 | `BO-1063` | Venue-Specific Configuration | Access & Venue | 3 | 2 | yes |
 | `BO-1064` | Naming, Numbering & Localization | Access & Venue | 3 | 2 | yes |
-| `BO-1065` | Currency, Timezone & Channels | Access & Venue | 3 | 1 | yes |
+| `BO-1065` | Currency, Timezone & Channels | Access & Venue | 3 | 3 | yes |
 | `BO-1066` | Roles, Permissions & Masking | Access & Venue | 3 | 3 | yes |
 | `BO-1067` | Seat Approval Workflows | Access & Venue | 3 | 1 | yes |
 | `BO-1068` | Lifecycle & Environment Promotion | Access & Venue | 3 | 1 | yes |
@@ -440,7 +440,7 @@
 | `BO-158` | Access Validity & Time Rules | Access & Venue | 3 | 1 | yes |
 | `BO-159` | Entitlement Consumption Engine | Access & Venue | 3 | 1 | yes |
 | `BO-160` | Multi-Park & Crossover Rules | Access & Venue | 3 | 2 | yes |
-| `BO-161` | Guest, Companion & Eligibility Rules | Access & Venue | 3 | 1 | yes |
+| `BO-161` | Guest, Companion & Eligibility Rules | Access & Venue | 3 | 3 | yes |
 | `BO-162` | Group Admission & Quantity Validation | Access & Venue | 3 | 1 | yes |
 | `BO-163` | Rule Simulation, Conflict Check & Publication | Access & Venue | 3 | 1 | yes |
 | `BO-164` | Digital Credential Security Command Center | Access & Venue | 3 | 2 | yes |
@@ -606,7 +606,7 @@
 | `BO-324` | Payment & Order Financial Command Center | Orders & Money | 3 | 1 | yes |
 | `BO-325` | Order Payment Detail & Transaction Ledger | Orders & Money | 3 | 1 | yes |
 | `BO-326` | Multi-Payment, Split Tender & Payment Allocation Configuration | Orders & Money | 3 | 1 | yes |
-| `BO-327` | Deposit, Partial Payment & Outstanding Balance Management | Orders & Money | 3 | 3 | yes |
+| `BO-327` | Deposit, Partial Payment & Outstanding Balance Management | Orders & Money | 3 | 5 | yes |
 | `BO-328` | Order Split, Merge & Transaction Relationship Management | Orders & Money | 3 | 1 | yes |
 | `BO-329` | Related Order & Transaction Relationship Explorer | Orders & Money | 3 | 1 | yes |
 | `BO-330` | External Payment, Partner & Settlement Reference Mapping | Orders & Money | 3 | 1 | yes |
@@ -625,7 +625,7 @@
 | `BO-343` | Virtual Ticket Architecture Testing, Governance & Audit | Access & Venue | 3 | 1 | yes |
 | `BO-344` | Media Design Studio Command Center | Access & Venue | 3 | 1 | yes |
 | `BO-345` | Digital QR & Barcode Ticket Designer | Access & Venue | 3 | 1 | yes |
-| `BO-346` | PDF, Printable & POS Ticket Designer | Access & Venue | 3 | 1 | yes |
+| `BO-346` | PDF, Printable & POS Ticket Designer | Access & Venue | 3 | 5 | yes |
 | `BO-347` | Apple Wallet Pass Designer | Access & Venue | 3 | 1 | yes |
 | `BO-348` | Google Wallet Pass Designer | Access & Venue | 3 | 1 | yes |
 | `BO-349` | RFID, NFC, Card & Wristband Media Designer | Access & Venue | 3 | 1 | yes |
@@ -1025,7 +1025,7 @@
 | `BO-743` | AI Guest Intelligence | Engagement & Support | 3 | 2 | yes |
 | `BO-744` | Data Governance Center | Engagement & Support | 3 | 2 | yes |
 | `BO-745` | Identity Resolution Rules | Engagement & Support | 3 | 2 | yes |
-| `BO-746` | Duplicate Review & Merge | Engagement & Support | 3 | 3 | yes |
+| `BO-746` | Duplicate Review & Merge | Engagement & Support | 3 | 5 | yes |
 | `BO-747` | Consent Policy Configuration | Engagement & Support | 3 | 2 | yes |
 | `BO-748` | Consent Capture & Versions | Engagement & Support | 3 | 2 | yes |
 | `BO-749` | Guest Preference Center | Engagement & Support | 3 | 2 | yes |

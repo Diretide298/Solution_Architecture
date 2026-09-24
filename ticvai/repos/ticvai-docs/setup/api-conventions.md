@@ -87,7 +87,7 @@ Redocly rules reject any operation missing the first four.
 - Sub-resources over actions: `POST /orders/{id}/refunds`, not `/orders/{id}/refund`
 - Actions only where genuinely not a resource: `/sessions/{id}/force-logout`
 - `operationId` camelCase verbNoun: `createSalesOrder`
-- Every 4xx and 5xx documented with its problem `type`
+- **Shared errors are implicit** (decided 24 September). Every operation may return the shared responses in `contracts/shared/common.yaml` without listing them: 400 `Problem` (validation), 401 `Unauthorized`, 403 `Forbidden`, 404 `NotFound` where it addresses a resource, and 429 and 5xx as `Problem`. A contract lists only the errors that belong to that operation (for example 409 when a purchase order is raised without an approved requisition), each with its problem `type`. **An operation that lists no errors is not missing any.**
 
 ---
 

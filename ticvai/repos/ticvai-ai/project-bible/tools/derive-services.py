@@ -278,7 +278,7 @@ def main() -> int:
                 tables.add(t)
                 cols = {c["column"] for c in sch["cols"][t]}
                 if "scope_path" in cols:
-                    r.append(f"SELECT * FROM {t} WHERE scope_path LIKE $1 LIMIT 50")
+                    r.append(f"SELECT * FROM {t} WHERE scope_path <@ $1::ltree LIMIT 50")
                 else:
                     r.append(f"SELECT * FROM {t} LIMIT 50")
             if r:
@@ -308,7 +308,7 @@ def main() -> int:
                 if not key:
                     continue
                 if "scope_path" in cols:
-                    w.append(f"SELECT {key} FROM {t} WHERE scope_path LIKE $1 "
+                    w.append(f"SELECT {key} FROM {t} WHERE scope_path <@ $1::ltree "
                              f"ORDER BY {key} LIMIT 1 FOR UPDATE")
                 else:
                     w.append(f"SELECT {key} FROM {t} ORDER BY {key} LIMIT 1 FOR UPDATE")

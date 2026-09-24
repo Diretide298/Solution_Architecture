@@ -41,7 +41,7 @@ CHECKS = [
     "check-authored-inputs", "check-output-paths", "audit-screenless-operations",
     "audit-unwired-tables", "audit-duplicate-tables", "audit-array-relationships",
     "audit-links", "audit-workbooks", "audit-pack-citations", "audit-contracts",
-    "audit-screen-estate", "index-sources",
+    "audit-screen-estate", "audit-uncontrolled-values", "index-sources", "check-contract-compat",
 ]
 
 # Report, do not gate. Each needs its reason stated here or it does not belong in this list.
@@ -57,6 +57,10 @@ REPORT_ONLY = {
         "runs as a baseline; --strict is the gating form and fails on unbound boilerplate",
     "check-contract-split":
         "reports concentration drift for a person to read; there is no threshold to fail on",
+    "audit-uncontrolled-values":
+        "whether a charge with no configuration is a missing control or an amount a provider "
+        "set is a judgement; the answers live in handoff/values-without-configuration.md and "
+        "the tool reads them back, so an answered row stops being reported",
 }
 
 

@@ -13,7 +13,7 @@
 | **Tables** | 51 |
 | **Screens** | 40 |
 | **Flows** | 11 |
-| **Documents** | 37 |
+| **Documents** | 38 |
 | **Open conflicts** | 1 |
 
 ## Reached outside the contract
@@ -230,6 +230,7 @@
 
 | Document | Status | Mentions |
 |---|---|---|
+| [Action register — 22 September 2026](..\docs\active\action-register-22-september.md) |  | 6 |
 | [AI scope — for confirmation](..\docs\active\ai-scope-for-confirmation.md) |  | 1 |
 | [BL-073 — cookie consent: what to buy, what to build, what is ours either way](..\docs\active\bl-073-cookie-consent-20-september.md) |  | 1 |
 | [Build plan — 20 September 2026](..\docs\active\build-plan-20-september.md) |  | 1 |

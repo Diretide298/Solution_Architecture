@@ -2,7 +2,7 @@ openapi: 3.1.0
 info:
   title: TICVAI Food & Beverage
   version: 0.1.0
-  x-ticvai-screen-count: 84
+  x-ticvai-screen-count: 87
   x-ticvai-tier: satellite
   x-ticvai-module: 7 — F&B POS  ·  5 — F&B & Guest Management (service)
   x-ticvai-requirements: 151
@@ -71,6 +71,142 @@ tags:
 - name: kitchen
 - name: production
 paths:
+  /reservation-policy:
+    get:
+      operationId: getFnbReservationPolicy
+      summary: How long a table is held, by party size
+      description: '**`fnb.table_reservation.duration_minutes` was set per booking with no default
+        behind it.** A turn time is the single most tuned number in a restaurant — it differs by party
+        size, by service and by day — and every reservation was choosing its own.
+
+        **Found by `tools/audit-uncontrolled-values.py`.** It cannot confirm this fix itself: the
+        column is `duration_minutes`, and `duration` is too generic a stem to pair on, so the verdict
+        is recorded by hand in `handoff/values-without-configuration.md` with this operation as its
+        citation.
+
+        '
+      tags:
+      - fnb
+      x-ticvai-permission: PRODUCT_VIEW
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: true
+      x-ticvai-conflict-policy: serverWins
+      x-ticvai-read-routing: replica
+      parameters:
+      - name: outletId
+        in: query
+        required: false
+        schema:
+          type: string
+          format: uuid
+        description: The outlet's own policy if it has one, otherwise the venue default.
+      responses:
+        '200':
+          description: The policy in force
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FnbReservationPolicy'
+    put:
+      operationId: setFnbReservationPolicy
+      summary: Set turn times and seating buffers
+      description: '**The booking keeps its own duration as the snapshot.** A turn time revised in
+        March must not shorten a reservation already made in February — the same rule-and-record
+        split as `fnb.service_charge_policy` and `orders.order_fee`.
+
+        '
+      tags:
+      - fnb
+      x-ticvai-permission: PRODUCT_CONFIGURE
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      x-ticvai-config-scope: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FnbReservationPolicy'
+      responses:
+        '200':
+          description: Set
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FnbReservationPolicy'
+  /service-charge-policy:
+    get:
+      operationId: getFnbServiceChargePolicy
+      summary: The service charge a venue applies, and on what
+      description: '**`fnb.sub_bill.service_charge` was stored and nothing said what the rate was.**
+        `F29` recomputes tax and service charge per bill on a split rather than apportioning them, so
+        a rate was being applied at least twice over a single visit and lived only in whatever the
+        implementer assumed.
+
+        **Found by `tools/audit-uncontrolled-values.py`**, which pairs an applied value against the
+        configuration that sets it and reported this one as having none. `rental.fee_policy` is the
+        shape being followed here.
+
+        '
+      tags:
+      - fnb
+      x-ticvai-permission: PRODUCT_VIEW
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: true
+      x-ticvai-conflict-policy: serverWins
+      x-ticvai-read-routing: replica
+      responses:
+        '200':
+          description: The policy in force
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FnbServiceChargePolicy'
+    put:
+      operationId: setFnbServiceChargePolicy
+      summary: Set the service charge
+      description: '**A service charge is revenue, not a tip** — `orders` already separates the two
+        deliberately, *"it is revenue in most jurisdictions, and pooling it with tips is how a payroll
+        dispute starts."* `distribution` carries that distinction into the configuration rather than
+        leaving it to whoever writes the payroll export.
+
+        **`isDiscretionary` is the field a regulator reads first.** A charge a guest cannot decline is
+        a price, and a price has to be in the displayed total.
+
+        '
+      tags:
+      - fnb
+      x-ticvai-permission: PRODUCT_CONFIGURE
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      x-ticvai-config-scope: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FnbServiceChargePolicy'
+      responses:
+        '200':
+          description: Set
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FnbServiceChargePolicy'
   /substitution-rules:
     put:
       operationId: setSubstitutionRules
@@ -2396,6 +2532,75 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/TableVisit'
+  /food-safety/checkpoints:
+    get:
+      operationId: listTemperatureCheckpoints
+      summary: The units that get read, and the range each must hold
+      description: '**`TemperatureLog.checkPointId` is required and pointed at nothing.** No
+        `fnb.check_point` existed in 628 tables, so every HACCP reading was obliged to reference a
+        definition the package had never modelled — and `minCelsius` and `maxCelsius` were written onto
+        each reading with no source.
+
+        **This is a compliance gap, not a modelling preference.** `TemperatureLog` says it itself:
+        *"HACCP records are a UAE regulatory obligation, they are inspected."* An inspector asks what
+        range a freezer is required to hold, and a range that exists only on the readings that happened
+        cannot answer — least of all for the reading nobody took.
+
+        '
+      tags:
+      - fnb
+      x-ticvai-permission: PRODUCT_VIEW
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: true
+      x-ticvai-conflict-policy: serverWins
+      x-ticvai-read-routing: replica
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/PageSize
+      - $ref: ../shared/common.yaml#/components/parameters/PageCursor
+      responses:
+        '200':
+          description: The checkpoints in scope
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/TemperatureCheckpoint'
+    put:
+      operationId: setTemperatureCheckpoint
+      summary: Define a checkpoint and its safe range
+      description: '**The range is the configuration; the reading is the record.** `TemperatureLog`
+        keeps `minCelsius` and `maxCelsius` as the snapshot in force when it was taken, for the reason
+        the log already gives — *"deleting a bad reading is the one thing an inspector looks for"*, and
+        silently restating the range a past reading was judged against is the same act by other means.
+
+        '
+      tags:
+      - fnb
+      x-ticvai-permission: PRODUCT_CONFIGURE
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      x-ticvai-config-scope: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TemperatureCheckpoint'
+      responses:
+        '200':
+          description: Set
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TemperatureCheckpoint'
   /food-safety/temperature-logs:
     post:
       operationId: logTemperature
@@ -3474,6 +3679,128 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+  /fnb-delivery-policy:
+    get:
+      operationId: getFnbDeliveryPolicy
+      x-ticvai-consumed-by:
+        - "P01 WEB-036 F&B – Browse & Order"
+        - "P02 GST-024 F&B – Browse & Order"
+        - "P08 BO-044 F&B Outlets"
+      summary: How an outlet does takeaway and delivery
+      tags:
+      - guestOrdering
+      x-ticvai-permission: PRODUCT_VIEW
+      x-ticvai-audience:
+      - staff
+      - guest
+      x-ticvai-scope-level: venue
+      x-ticvai-read-routing: replica
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      responses:
+        '200':
+          description: The current setting
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FnbDeliveryPolicy'
+        '403':
+          $ref: ../shared/common.yaml#/components/responses/Forbidden
+      x-ticvai-guest-callable: true
+    put:
+      operationId: setFnbDeliveryPolicy
+      x-ticvai-consumed-by:
+        - "P08 BO-044 F&B Outlets"
+      summary: Set takeaway and delivery rules
+      description: '**Design gap, 23 September.** The dining design offers takeaway with a collection time
+        and delivery to an address with a delivery window, a minimum order, a fee, free delivery above a
+        threshold and a radius. **The design only displays those rules; this makes them enforceable**, and
+        `createGuestFnbOrder` refuses an order that breaks them. Delivery before this was to places inside
+        the venue only (`listDeliveryLocations`).
+
+        '
+      tags:
+      - guestOrdering
+      x-ticvai-permission: PRODUCT_CONFIGURE
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      x-ticvai-config-scope: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FnbDeliveryPolicy'
+      responses:
+        '200':
+          description: Saved
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FnbDeliveryPolicy'
+        '400':
+          $ref: ../shared/common.yaml#/components/responses/BadRequest
+        '403':
+          $ref: ../shared/common.yaml#/components/responses/Forbidden
+  /outlets/{outletId}/fulfilment-slots:
+    get:
+      operationId: listFulfilmentSlots
+      x-ticvai-consumed-by:
+        - "P01 WEB-036 F&B – Browse & Order"
+        - "P02 GST-024 F&B – Browse & Order"
+      summary: Collection times or delivery windows still open
+      description: 'Computed from the outlet''s `FnbDeliveryPolicy` and its current load: ASAP plus fixed
+        slots. A slot closes when the kitchen cannot make it, so the guest never picks a time that will
+        be missed.
+
+        '
+      tags:
+      - guestOrdering
+      x-ticvai-permission: null
+      x-ticvai-audience:
+      - guest
+      x-ticvai-scope-level: venue
+      x-ticvai-self-scoped: subject
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      security:
+      - guestAuth: []
+      responses:
+        '200':
+          description: Open slots
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FulfilmentSlots'
+      x-ticvai-read-routing: replica
+      parameters:
+      - name: outletId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: mode
+        in: query
+        required: true
+        schema:
+          type: string
+          enum:
+          - collection
+          - delivery
+      - name: date
+        in: query
+        required: false
+        schema:
+          type: string
+          format: date
+      - $ref: ../shared/common.yaml#/components/parameters/PageSize
+      - $ref: ../shared/common.yaml#/components/parameters/PageCursor
   /guest-orders:
     post:
       operationId: createGuestFnbOrder
@@ -5315,6 +5642,204 @@ paths:
                   $ref: '#/components/schemas/FnbProductRecommendation'
 components:
   schemas:
+    FnbReservationPolicy:
+      type: object
+      x-ticvai-persistence: fnb.reservation_policy
+      description: '**How long a table is held, and what sits between one seating and the next.** The
+        source of `TableReservation.durationMinutes`, which keeps its own value as the snapshot.'
+      required:
+      - defaultTurnMinutes
+      - isActive
+      properties:
+        id:
+          type: string
+          format: uuid
+        outletId:
+          type: string
+          format: uuid
+          nullable: true
+          description: Null is the venue default; an outlet's own policy overrides it.
+        defaultTurnMinutes:
+          type: integer
+          minimum: 15
+          description: The turn time when no party-size band matches.
+        turnTimeBands:
+          type: array
+          description: '**Turn time by party size** — a two-top and a table of eight do not turn at the
+            same speed, and a single default is how a restaurant ends up double-booking its large
+            tables. The first band whose range contains the party size wins.'
+          items:
+            type: object
+            required:
+            - fromPartySize
+            - turnMinutes
+            properties:
+              fromPartySize:
+                type: integer
+                minimum: 1
+              toPartySize:
+                type: integer
+                nullable: true
+                description: Null means no upper bound.
+              turnMinutes:
+                type: integer
+                minimum: 15
+        seatingBufferMinutes:
+          type: integer
+          minimum: 0
+          default: 0
+          description: '**The reset between seatings** — clearing, laying and a moment for the floor.
+            Zero is a legitimate answer and a stated one.'
+        maximumDurationMinutes:
+          type: integer
+          nullable: true
+          description: '**The ceiling on a single booking.** A reservation extended by hand past this
+            needs the manager, because the table after it is somebody else''s booking.'
+        isActive:
+          type: boolean
+        scopePath:
+          type: string
+    TemperatureCheckpoint:
+      type: object
+      x-ticvai-persistence: fnb.temperature_checkpoint
+      description: '**A unit that gets read, and the range it is required to hold.** The entity
+        `TemperatureLog.checkPointId` has always been required to name and that nothing defined.
+
+        **The safe range belongs here and is snapshotted onto each reading**, so that a range revised
+        in March cannot silently re-judge a reading taken in January.'
+      required:
+      - id
+      - kind
+      - label
+      - isActive
+      properties:
+        id:
+          type: string
+          format: uuid
+        outletId:
+          type: string
+          format: uuid
+          nullable: true
+        kind:
+          type: string
+          enum:
+          - fridge
+          - freezer
+          - holdingCabinet
+          - blastChiller
+          - coreProbe
+          - delivery
+          - displayCounter
+          - ambient
+          description: The same closed set `TemperatureLog.checkPointKind` records.
+        label:
+          type: string
+          description: '**What the person reading it calls it** — *Walk-in 2*, *Dessert counter*. A
+            checkpoint identified only by a uuid is one somebody will read the wrong unit for.'
+        minCelsius:
+          type: number
+          nullable: true
+        maxCelsius:
+          type: number
+          nullable: true
+          description: '**Null at either end is legitimate** — a core probe has a floor and no ceiling.
+            Both null is not, and is what an unconfigured checkpoint looks like.'
+        checkFrequencyMinutes:
+          type: integer
+          nullable: true
+          description: '**How often it must be read.** The gap this leaves open otherwise is the one an
+            inspector finds: not a bad reading, but a missing one.'
+        requiresCorrectiveActionOnBreach:
+          type: boolean
+        isActive:
+          type: boolean
+        scopePath:
+          type: string
+    FnbServiceChargePolicy:
+      type: object
+      x-ticvai-persistence: fnb.service_charge_policy
+      description: '**What the service charge on a bill is, and where it came from.** Every field here
+        answers a question `fnb.sub_bill.service_charge` was being asked and could not answer.
+
+        **Tax and service charge recompute per bill on a split** (`F29`), so the policy is resolved per
+        bill rather than apportioned from the visit — which only works if there is a policy to resolve.'
+      required:
+      - basis
+      - isTaxable
+      - isDiscretionary
+      - distribution
+      properties:
+        id:
+          type: string
+          format: uuid
+        basis:
+          type: string
+          enum:
+          - none
+          - percentOfSubtotal
+          - fixedPerCover
+          - fixedPerBill
+          description: '`none` is a real answer and the default. **A venue that does not levy one should
+            say so**, rather than leaving a null that reads as unconfigured.'
+        ratePercent:
+          type: number
+          nullable: true
+          description: Set when `basis` is `percentOfSubtotal`.
+        amount:
+          $ref: ../shared/common.yaml#/components/schemas/Money
+        minimumPartySize:
+          type: integer
+          nullable: true
+          description: '**The common case for an automatic charge** — parties of six and above. Null
+            applies it to every cover.'
+        serviceTypes:
+          type: array
+          items:
+            type: string
+            enum:
+            - dineIn
+            - takeaway
+            - delivery
+            - roomService
+          description: '**A delivery order charged a dine-in service charge is a complaint.** Empty means
+            every service type.'
+        isTaxable:
+          type: boolean
+          description: '**Whether VAT applies to the charge itself.** It does in the UAE, and a bill that
+            taxes the subtotal but not the charge is understated.'
+        includedInDisplayPrice:
+          type: boolean
+          description: '**Menu-price inclusive or added at the bill.** The pair of this and
+            `shownSeparately` is what a guest is entitled to see before ordering.'
+        shownSeparately:
+          type: boolean
+        isDiscretionary:
+          type: boolean
+          description: '**Whether a guest may have it removed.** A charge that cannot be declined is a
+            price; a charge that can is a request, and the bill has to say which.'
+        distribution:
+          type: string
+          enum:
+          - venueRevenue
+          - staffPool
+          - split
+          description: '**Not a tip.** `orders` separates `serviceCharge` from a gratuity because it is
+            revenue in most jurisdictions and pooling the two is how a payroll dispute starts. This is
+            the field that carries the distinction into payroll.'
+        staffPoolPercent:
+          type: number
+          nullable: true
+          description: Set when `distribution` is `split`.
+        effectiveFrom:
+          type: string
+          format: date-time
+          nullable: true
+        effectiveTo:
+          type: string
+          format: date-time
+          nullable: true
+        scopePath:
+          type: string
     FnbIngredientSubstitute:
       type: object
       x-ticvai-persistence: fnb.ingredient_substitute
@@ -5635,6 +6160,7 @@ components:
           additionalProperties:
             type: string
         price:
+          x-ticvai-column: list_price
           $ref: ../shared/common.yaml#/components/schemas/Money
         slots:
           type: array
@@ -5828,12 +6354,14 @@ components:
             type: string
             format: uuid
         subtotal:
+          x-ticvai-column: net_amount
           $ref: ../shared/common.yaml#/components/schemas/Money
         taxAmount:
           $ref: ../shared/common.yaml#/components/schemas/Money
         serviceCharge:
           $ref: ../shared/common.yaml#/components/schemas/Money
         total:
+          x-ticvai-column: gross_amount
           $ref: ../shared/common.yaml#/components/schemas/Money
         status:
           type: string
@@ -6657,6 +7185,147 @@ components:
             on the ticket.
 
             '
+    FnbDeliveryPolicy:
+      type: object
+      x-ticvai-persistence: fnb.delivery_policy
+      required:
+      - outletId
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        outletId:
+          type: string
+          format: uuid
+        collectionEnabled:
+          type: boolean
+          default: true
+        deliveryEnabled:
+          type: boolean
+          default: false
+        collectionPoint:
+          type: string
+          maxLength: 200
+          nullable: true
+        collectionHoldMinutes:
+          type: integer
+          default: 20
+        asapCollectionMinutes:
+          type: integer
+          default: 25
+        asapDeliveryMinutes:
+          type: integer
+          default: 45
+        slotMinutes:
+          type: integer
+          default: 30
+        minimumOrder:
+          allOf:
+          - $ref: ../shared/common.yaml#/components/schemas/Money
+          nullable: true
+        deliveryFee:
+          allOf:
+          - $ref: ../shared/common.yaml#/components/schemas/Money
+          nullable: true
+        freeDeliveryAbove:
+          allOf:
+          - $ref: ../shared/common.yaml#/components/schemas/Money
+          nullable: true
+        radiusKm:
+          type: number
+          minimum: 0
+          nullable: true
+        emiratesServed:
+          type: array
+          items:
+            type: string
+        cutleryOptIn:
+          type: boolean
+          default: true
+          description: Cutlery only when asked for, as in the design.
+        scopePath:
+          type: string
+          readOnly: true
+          description: '**The partition key** (ADR-0005). Operations write it at `venue` scope.'
+    FulfilmentSlots:
+      type: object
+      x-ticvai-persistence: none — computed per request
+      properties:
+        slots:
+          type: array
+          items:
+            type: object
+            properties:
+              start:
+                type: string
+                format: date-time
+              end:
+                type: string
+                format: date-time
+                nullable: true
+              isAsap:
+                type: boolean
+    GuestOrderFulfilment:
+      type: object
+      x-ticvai-persistence: fnb.order_fulfilment
+      description: 'How a guest''s order leaves the kitchen: collected, delivered to an address, or taken
+        to a place in the venue.'
+      required:
+      - mode
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        mode:
+          type: string
+          enum:
+          - collection
+          - delivery
+          - inVenue
+        collectionAt:
+          type: string
+          format: date-time
+          nullable: true
+        windowStart:
+          type: string
+          format: date-time
+          nullable: true
+        windowEnd:
+          type: string
+          format: date-time
+          nullable: true
+        deliveryAddress:
+          type: object
+          nullable: true
+          properties:
+            building:
+              type: string
+              maxLength: 200
+            unit:
+              type: string
+              maxLength: 60
+              nullable: true
+            emirate:
+              type: string
+              maxLength: 60
+            directions:
+              type: string
+              maxLength: 500
+              nullable: true
+        deliveryFee:
+          allOf:
+          - $ref: ../shared/common.yaml#/components/schemas/Money
+          readOnly: true
+          nullable: true
+        cutlery:
+          type: boolean
+          default: false
+        scopePath:
+          type: string
+          readOnly: true
+          description: '**The partition key** (ADR-0005). Operations write it at `venue` scope.'
     CreateGuestOrderRequest:
       type: object
       required:
@@ -6680,6 +7349,12 @@ components:
           format: uuid
           nullable: true
           description: Required for collection. Ignored where a table session is supplied.
+        fulfilment:
+          allOf:
+          - $ref: '#/components/schemas/GuestOrderFulfilment'
+          nullable: true
+          description: Required for takeaway and address delivery; refused with 422 when it breaks the outlet's
+            `FnbDeliveryPolicy`.
         lines:
           type: array
           minItems: 1
@@ -6924,6 +7599,7 @@ components:
           type: string
           nullable: true
         price:
+          x-ticvai-column: list_price
           $ref: ../shared/common.yaml#/components/schemas/Money
         sortOrder:
           type: integer
@@ -7498,10 +8174,12 @@ components:
                 items:
                   type: string
               subtotal:
+                x-ticvai-column: net_amount
                 $ref: ../shared/common.yaml#/components/schemas/Money
               taxAmount:
                 $ref: ../shared/common.yaml#/components/schemas/Money
               total:
+                x-ticvai-column: gross_amount
                 $ref: ../shared/common.yaml#/components/schemas/Money
               status:
                 type: string

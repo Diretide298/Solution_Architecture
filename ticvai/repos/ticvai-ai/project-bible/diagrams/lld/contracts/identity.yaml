@@ -1,10 +1,28 @@
 id: LLD-identity
-title: identity — 68 operations
+title: identity — 70 operations
 generatedBy: tools/derive-diagrams.py
 index: diagrams/hld/03-contracts.yaml
 tier: spine
 service: IdentityService
 operations:
+- operation: changeOwnCredential
+  verb: POST
+  path: /auth/credential
+  scope: tenant
+  permission: null
+  audience:
+  - staff
+  - partner
+  offline: false
+  reads:
+  - cache:idempotency
+  - identity.password_policy
+  - identity.principal
+  - identity.principal_credential
+  writes:
+  - cache:idempotency
+  - identity.principal_credential
+  - identity.session
 - operation: completeSsoAuthorization
   verb: POST
   path: /auth/sso/{providerId}/callback
@@ -90,6 +108,7 @@ operations:
   writes:
   - cache:idempotency
   - identity.principal
+  - identity.principal_credential
 - operation: createRole
   verb: POST
   path: /roles
@@ -690,6 +709,22 @@ operations:
   writes:
   - cache:idempotency
   - identity.otp_challenge
+- operation: resetPrincipalCredential
+  verb: POST
+  path: /principals/{principalId}/credential-reset
+  scope: venue
+  permission: USER_MANAGE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - cache:idempotency
+  - identity.principal
+  - identity.principal_credential
+  writes:
+  - cache:idempotency
+  - identity.principal_credential
+  - identity.session
 - operation: resolvePermissions
   verb: POST
   path: /permissions/resolve

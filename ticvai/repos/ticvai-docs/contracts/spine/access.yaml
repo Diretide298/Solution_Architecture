@@ -183,6 +183,7 @@ paths:
         - "P01 WEB-018 My Tickets"
         - "P02 GST-001 Home – Default"
         - "P02 GST-012 My Tickets"
+        - "P02 GST-055 Dynamic QR Ticket"
         - "P04 POS-002 Sell — Ticket Catalogue"
       summary: Every ticket, pass and membership this guest holds
       description: '**Raised in review by Pranay and Deep, independently, on four screens.** `GST-012
@@ -254,6 +255,7 @@ paths:
         - "P01 WEB-018 My Tickets"
         - "P02 GST-012 My Tickets"
         - "P02 GST-013 Ticket Details"
+        - "P02 GST-055 Dynamic QR Ticket"
       summary: One entitlement, with what remains on it
       description: '**Entries used against entries allowed, and the validity after any freeze.** A guest
         looking at a ten-entry pass wants the number left, and until `access.entitlement` existed nothing
@@ -303,6 +305,7 @@ paths:
         - "P01 WEB-018 My Tickets"
         - "P02 GST-012 My Tickets"
         - "P02 GST-013 Ticket Details"
+        - "P02 GST-055 Dynamic QR Ticket"
       summary: The thing that gets scanned
       description: 'The QR payload, wallet pass reference or wristband serial. **Separated from `getEntitlement`
         because it is the sensitive half** — a list of a guest''s tickets is a convenience, and the credential

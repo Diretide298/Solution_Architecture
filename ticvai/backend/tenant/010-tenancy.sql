@@ -8,13 +8,13 @@ CREATE TABLE IF NOT EXISTS tenancy.device_assignment (
     owner_org_unit_id                 uuid,
     custodian_principal_id            uuid,
     assigned_workstation_id           uuid,
-    location_scope_path               text,
+    location_scope_path               ltree,
     last_seen_location                text,
     asset_tag                         text,
     acquired_at                       date,
     warranty_expires_at               date,
     assigned_at                       timestamptz,
-    scope_path                        text,
+    scope_path                        ltree,
     id                                uuid PRIMARY KEY NOT NULL
 );
 
@@ -31,7 +31,7 @@ CREATE TABLE IF NOT EXISTS tenancy.device_audit (
     new_value                         text,
     source_ip                         text,
     correlation_id                    text,
-    scope_path                        text
+    scope_path                        ltree
 );
 
 -- Holds 9 columns. No description has been written for this table — the name is the only thing
@@ -45,7 +45,7 @@ CREATE TABLE IF NOT EXISTS tenancy.device_credential (
     expires_at                        timestamptz,
     revoked_at                        timestamptz,
     revocation_reason                 text,
-    scope_path                        text
+    scope_path                        ltree
 );
 
 -- Holds 10 columns. No description has been written for this table — the name is the only thing
@@ -68,14 +68,14 @@ CREATE TABLE IF NOT EXISTS tenancy.device_firmware (
 CREATE TABLE IF NOT EXISTS tenancy.device_rollout (
     id                                uuid PRIMARY KEY,
     firmware_id                       uuid NOT NULL,
-    target_scope_path                 text,
+    target_scope_path                 ltree,
     target_device_ids                 text[],
     maintenance_window                jsonb,
     previous_version_retained         boolean,
     status                            text,
     succeeded_count                   integer,
     failed_count                      integer,
-    scope_path                        text
+    scope_path                        ltree
 );
 
 -- Holds 10 columns. No description has been written for this table — the name is the only thing
@@ -90,7 +90,7 @@ CREATE TABLE IF NOT EXISTS tenancy.device_tamper_event (
     resolved_at                       timestamptz,
     resolved_by                       uuid,
     resolution                        text,
-    scope_path                        text
+    scope_path                        ltree
 );
 
 -- Holds 13 columns. No description has been written for this table — the name is the only thing
@@ -107,7 +107,7 @@ CREATE TABLE IF NOT EXISTS tenancy.device_telemetry (
     storage_free_mb                   integer,
     consumables                       jsonb,
     uptime_seconds                    integer,
-    scope_path                        text,
+    scope_path                        ltree,
     id                                uuid PRIMARY KEY NOT NULL
 );
 

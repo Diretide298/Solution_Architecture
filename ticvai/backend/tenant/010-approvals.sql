@@ -27,7 +27,7 @@ CREATE TABLE IF NOT EXISTS approvals.approver_availability (
     delegation_id                     uuid,
     reason                            text,
     applies_to_request_kinds          text[],
-    scope_path                        text,
+    scope_path                        ltree,
     id                                uuid PRIMARY KEY NOT NULL
 );
 
@@ -45,7 +45,7 @@ CREATE TABLE IF NOT EXISTS approvals.control_policy (
     requires_step_up                  boolean,
     requires_signature                boolean,
     break_glass_allowed               boolean,
-    scope_path                        text,
+    scope_path                        ltree,
     is_active                         boolean
 );
 
@@ -81,7 +81,7 @@ CREATE TABLE IF NOT EXISTS approvals.decision_record (
     previous_record_hash              text,
     record_hash                       text,
     integrity                         text,
-    scope_path                        text,
+    scope_path                        ltree,
     id                                uuid PRIMARY KEY NOT NULL
 );
 
@@ -97,7 +97,7 @@ CREATE TABLE IF NOT EXISTS approvals.delegation (
     "to"                              timestamptz NOT NULL,
     reason                            text,
     is_active                         boolean,
-    scope_path                        text
+    scope_path                        ltree
 );
 
 -- Who was asked, when, and why it moved up. The original approver stays in the record Hangs off:
@@ -121,7 +121,7 @@ CREATE TABLE IF NOT EXISTS approvals.evidence_package (
     status                            text,
     asset_id                          uuid,
     expires_at                        timestamptz,
-    scope_path                        text
+    scope_path                        ltree
 );
 
 -- What requires approval where. Versioned, because a request must be decided by the rules it was
@@ -131,7 +131,7 @@ CREATE TABLE IF NOT EXISTS approvals.matrix (
     id                                uuid PRIMARY KEY,
     kind                              text NOT NULL,
     scope_level                       text NOT NULL,
-    scope_path                        text,
+    scope_path                        ltree,
     version                           integer,
     is_active                         boolean
 );
@@ -151,7 +151,7 @@ CREATE TABLE IF NOT EXISTS approvals.request (
     subject_contract                  text,
     subject_type                      text,
     subject_id                        uuid,
-    scope_path                        text,
+    scope_path                        ltree,
     summary                           text,
     amount                            numeric(18,4),
     justification                     text,
@@ -180,7 +180,7 @@ CREATE TABLE IF NOT EXISTS approvals.retention_policy (
     on_expiry                         text,
     overrides_privacy_deletion        boolean,
     legal_basis                       text,
-    scope_path                        text
+    scope_path                        ltree
 );
 
 -- Ordered within a matrix. First match wins, so adding a rule cannot silently change another Hangs
@@ -218,7 +218,7 @@ CREATE TABLE IF NOT EXISTS approvals.signature (
     signature                         text,
     certificate_subject               text,
     step_up_verified                  boolean,
-    scope_path                        text
+    scope_path                        ltree
 );
 
 -- Holds 10 columns. No description has been written for this table — the name is the only thing
@@ -233,7 +233,7 @@ CREATE TABLE IF NOT EXISTS approvals.sla_policy (
     on_breach                         text,
     auto_action_allowed               boolean,
     escalation_group_id               uuid,
-    scope_path                        text
+    scope_path                        ltree
 );
 
 -- Holds 8 columns. No description has been written for this table — the name is the only thing

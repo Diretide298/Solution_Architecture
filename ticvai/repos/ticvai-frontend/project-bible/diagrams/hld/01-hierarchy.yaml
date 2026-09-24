@@ -34,8 +34,8 @@ levels:
 - level: tenant
   branch: root
   parent: null
-  operations: 424
-  configurations: 70
+  operations: 429
+  configurations: 71
   configuredBy:
   - claimCustomDomain
   - createAccessPolicy
@@ -68,17 +68,17 @@ levels:
 - level: region
   branch: organisational
   parent: brand
-  operations: 54
-  configurations: 11
+  operations: 55
+  configurations: 12
   configuredBy:
   - createSeatMapTemplate
   - createUpsellRule
   - listAiProviders
   - setAccountMappings
   - setAiProvider
+  - setDenominations
   - setFxProvider
   - setFxRate
-  - setScalingPolicy
   owns:
   - Currency and decimal scale
   - Tax authority
@@ -91,8 +91,8 @@ levels:
 - level: venue
   branch: organisational
   parent: region
-  operations: 1530
-  configurations: 97
+  operations: 1564
+  configurations: 108
   configuredBy:
   - configureQueueFeed
   - configureWorkstation

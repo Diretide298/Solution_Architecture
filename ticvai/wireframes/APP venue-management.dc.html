@@ -1423,9 +1423,9 @@ border-radius:9px;font:800 13px/1.5 Manrope,system-ui,sans-serif;letter-spacing:
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; listGuestCompanionEligibility</div>
+          <div><b>OPERATIONS</b> &middot; getProductEligibilityRule · setProductEligibilityRule · listGuestCompanionEligibility</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoAccess</span></div>
-          
+          <div><b>ARRIVES WITH</b> &middot; productId&larr;navigation</div>
           <div><b>GOES TO</b> &middot; <a href="#bo-154">BO-154</a>  &mdash; <i>Returns to the board&#x27;s landing screen</i></div>
           
           
@@ -4873,9 +4873,9 @@ border-radius:9px;font:800 13px/1.5 Manrope,system-ui,sans-serif;letter-spacing:
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; setPdfPrintablePos</div>
+          <div><b>OPERATIONS</b> &middot; listTicketTemplates · createTicketTemplate · updateTicketTemplate · printTicketProof +1</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoAccess</span></div>
-          
+          <div><b>ARRIVES WITH</b> &middot; templateId&larr;navigation</div>
           <div><b>GOES TO</b> &middot; <a href="#bo-344">BO-344</a>  &mdash; <i>Returns to the board&#x27;s landing screen</i></div>
           
           
@@ -11143,7 +11143,7 @@ border-radius:9px;font:800 13px/1.5 Manrope,system-ui,sans-serif;letter-spacing:
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; updateRegionSettings</div>
+          <div><b>OPERATIONS</b> &middot; listDenominations · setDenominations · updateRegionSettings</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess</span></div>
           <div><b>ARRIVES WITH</b> &middot; regionId&larr;navigation</div>
           <div><b>GOES TO</b> &middot; <a href="#bo-1061">BO-1061</a>  &mdash; <i>Back to Platform Command Center</i></div>
@@ -11714,9 +11714,9 @@ border-radius:9px;font:800 13px/1.5 Manrope,system-ui,sans-serif;letter-spacing:
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; listCatalogueBundles · getLatestBundle · publishBundle · reportBundleApplied +1</div>
+          <div><b>OPERATIONS</b> &middot; getGroupPackageDefinition · setGroupPackageDefinition · listCatalogueBundles · getLatestBundle +3</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess</span></div>
-          <div><b>ARRIVES WITH</b> &middot; version&larr;deepLink</div>
+          <div><b>ARRIVES WITH</b> &middot; version&larr;deepLink, productId&larr;navigation</div>
           <div><b>GOES TO</b> &middot; <a href="#bo-001">BO-001</a>  &mdash; <i>Queue Directory</i> <span class="car">eventId · feedId · queueId</span><br><a href="#bo-007">BO-007</a>  &mdash; <i>Product Directory</i> <span class="car">productId</span><br><a href="#bo-008">BO-008</a>  &mdash; <i>Product Detail &amp; Variants</i> <span class="car">productId · venueId</span><br><a href="#bo-009">BO-009</a>  &mdash; <i>Pricing Rules</i> <span class="car">priceListId</span></div>
           
           
@@ -15017,9 +15017,9 @@ border-radius:9px;font:800 13px/1.5 Manrope,system-ui,sans-serif;letter-spacing:
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; listOrders · createOrder · applyManualDiscount · createRefund +10</div>
+          <div><b>OPERATIONS</b> &middot; createGroupBooking · getGroupBooking · updateGroupBooking · listOrders +13</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess</span></div>
-          <div><b>ARRIVES WITH</b> &middot; orderId&larr;deepLink</div>
+          <div><b>ARRIVES WITH</b> &middot; orderId&larr;deepLink, groupBookingId&larr;navigation</div>
           <div><b>GOES TO</b> &middot; <a href="#bo-001">BO-001</a>  &mdash; <i>Queue Directory</i> <span class="car">eventId · feedId · queueId</span><br><a href="#bo-007">BO-007</a>  &mdash; <i>Product Directory</i> <span class="car">productId</span><br><a href="#bo-008">BO-008</a>  &mdash; <i>Product Detail &amp; Variants</i> <span class="car">productId · venueId</span><br><a href="#bo-009">BO-009</a>  &mdash; <i>Pricing Rules</i> <span class="car">priceListId</span></div>
           
           <div><b>OVERLAYS</b><div class="ov"><b>confirmDialog</b> confirmVoidOrder &middot; <i>Void</i></div></div>
@@ -16427,7 +16427,7 @@ border-radius:9px;font:800 13px/1.5 Manrope,system-ui,sans-serif;letter-spacing:
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; listDepositPartialPayment · listDepositActivity · recordDepositActivity</div>
+          <div><b>OPERATIONS</b> &middot; getDepositPolicy · setDepositPolicy · listDepositPartialPayment · listDepositActivity +1</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess</span></div>
           <div><b>ARRIVES WITH</b> &middot; depositId&larr;navigation</div>
           <div><b>GOES TO</b> &middot; <a href="#bo-324">BO-324</a>  &mdash; <i>Returns to the board&#x27;s landing screen</i></div>
@@ -19969,7 +19969,7 @@ border-radius:9px;font:800 13px/1.5 Manrope,system-ui,sans-serif;letter-spacing:
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; listOutlets · getGuestMenu · createOutlet · getOutletStock +11</div>
+          <div><b>OPERATIONS</b> &middot; getFnbDeliveryPolicy · setFnbDeliveryPolicy · listOutlets · getGuestMenu +13</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess</span></div>
           <div><b>ARRIVES WITH</b> &middot; outletId&larr;deepLink, actionId&larr;deepLink</div>
           <div><b>GOES TO</b> &middot; <a href="#bo-001">BO-001</a>  &mdash; <i>Queue Directory</i> <span class="car">eventId · feedId · queueId</span><br><a href="#bo-007">BO-007</a>  &mdash; <i>Product Directory</i> <span class="car">productId</span><br><a href="#bo-008">BO-008</a>  &mdash; <i>Product Detail &amp; Variants</i> <span class="car">productId · venueId</span><br><a href="#bo-009">BO-009</a>  &mdash; <i>Pricing Rules</i> <span class="car">priceListId</span></div>
@@ -21739,7 +21739,7 @@ border-radius:9px;font:800 13px/1.5 Manrope,system-ui,sans-serif;letter-spacing:
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; listPrincipals · getPrincipal · createPrincipal · updatePrincipal</div>
+          <div><b>OPERATIONS</b> &middot; resetPrincipalCredential · listPrincipals · getPrincipal · createPrincipal +1</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess</span></div>
           <div><b>ARRIVES WITH</b> &middot; principalId&larr;session</div>
           <div><b>GOES TO</b> &middot; <a href="#bo-001">BO-001</a>  &mdash; <i>Queue Directory</i> <span class="car">eventId · feedId · queueId</span><br><a href="#bo-007">BO-007</a>  &mdash; <i>Product Directory</i> <span class="car">productId</span><br><a href="#bo-008">BO-008</a>  &mdash; <i>Product Detail &amp; Variants</i> <span class="car">productId · venueId</span><br><a href="#bo-009">BO-009</a>  &mdash; <i>Pricing Rules</i> <span class="car">priceListId</span></div>
@@ -32390,7 +32390,7 @@ border-radius:9px;font:800 13px/1.5 Manrope,system-ui,sans-serif;letter-spacing:
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; listDuplicateCandidates · decideDuplicateCandidate · mergeGuests</div>
+          <div><b>OPERATIONS</b> &middot; getGuestMatchPolicy · setGuestMatchPolicy · listDuplicateCandidates · decideDuplicateCandidate +1</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess</span></div>
           <div><b>ARRIVES WITH</b> &middot; candidateId&larr;navigation</div>
           <div><b>GOES TO</b> &middot; <a href="#bo-744">BO-744</a>  &mdash; <i>Back to Data Governance Center</i></div>
@@ -36465,17 +36465,17 @@ border-radius:9px;font:800 13px/1.5 Manrope,system-ui,sans-serif;letter-spacing:
             
             <div class="canvas">
               <div class="kpis"><div class="kpi"><b>Total</b><span>1,248</span></div><div class="kpi"><b>Active</b><span>978</span></div><div class="kpi"><b>Attention</b><span>142</span></div><div class="kpi"><b>Offline</b><span>12</span></div></div>
-              <div class="two"><div class="grow"><div class="panel"><span class="kind">detailPanel</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">Structure from the wireframe board. Components not yet enumerated.</span></div><div class="panel"><span class="kind">dataTable</span><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div><span class="why">**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue&#x27;s busiest hour is a list that skips rows.</span></div><div class="panel"><b>Save sso config</b><div class="chip cta">Save sso config</div></div></div><div class="side"><div class="panel"><b>Remove licence add on</b><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">**Always confirms, never the default focus.** The consequence goes in the body — *cancel 3 orders worth AED 480* is a confirmation, *are you sure* is not.</span></div><div class="panel"><b>Cancel</b><div class="chip">Cancel</div><span class="why">**A screen that can submit must be leaveable without submitting.**</span></div></div></div>
+              <div class="two"><div class="grow"><div class="panel"><b>The selected tenant</b><div class="rows"><div class="bar"><i style="width:64%"></i></div></div></div><div class="panel"><span class="kind">dataTable</span><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div><span class="why">Implied by the detail template — not declared on the screen.</span></div></div></div>
             </div>
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; getSsoConfig · listTenants · setSsoConfig · addLicenceAddOn +17</div>
+          <div><b>OPERATIONS</b> &middot; getTenantAppStatus · getTenantConfig · getModuleEnablement · getFeatureToggles +3</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess</span></div>
-          <div><b>ARRIVES WITH</b> &middot; tenantId&larr;session</div>
+          
           <div><b>GOES TO</b> &middot; entry point · <a href="#cms-002">CMS-002</a>  &mdash; <i>Brand Kit</i><br><a href="#cms-003">CMS-003</a>  &mdash; <i>Typography</i><br><a href="#cms-004">CMS-004</a>  &mdash; <i>Logo &amp; Assets</i><br><a href="#cms-061">CMS-061</a>  &mdash; <i>Digital Asset Management Command Center</i><br><a href="#cms-071">CMS-071</a>  &mdash; <i>AI Asset Intelligence Command Center</i><br><a href="#cms-081">CMS-081</a>  &mdash; <i>DAM Governance &amp; Rights Command Center</i><br><a href="#cms-091">CMS-091</a>  &mdash; <i>Asset Distribution &amp; Delivery Command Center</i></div>
           
-          <div><b>OVERLAYS</b><div class="ov"><b>confirmDialog</b> confirmRemoveLicenceAddOn &middot; <i>Remove</i></div><div class="ov"><b>confirmDialog</b> confirmSuspendTenant &middot; <i>Suspend</i></div><div class="ov"><b>confirmDialog</b> confirmTerminateTenant &middot; <i>Terminate</i></div></div>
+          
         </div>
       </div>
       <div id="cms-002" class="scr">
@@ -36555,14 +36555,14 @@ border-radius:9px;font:800 13px/1.5 Manrope,system-ui,sans-serif;letter-spacing:
             
             <div class="canvas">
               <div class="kpis"><div class="kpi"><b>Total</b><span>1,248</span></div><div class="kpi"><b>Active</b><span>978</span></div><div class="kpi"><b>Attention</b><span>142</span></div><div class="kpi"><b>Offline</b><span>12</span></div></div>
-              <div class="two"><div class="grow"><div class="panel"><span class="kind">detailPanel</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">Structure from the wireframe board. Components not yet enumerated.</span></div><div class="panel"><span class="kind">dataTable</span><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div><span class="why">**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue&#x27;s busiest hour is a list that skips rows.</span></div><div class="panel"><b>Create asset</b><div class="chip cta">Create asset</div></div></div><div class="side"><div class="panel"><b>Search</b><div class="chip">Search</div><span class="why">A search that returns nothing must say so differently from a search not yet run.</span></div><div class="panel"><b>Cancel</b><div class="chip">Cancel</div><span class="why">**A screen that can submit must be leaveable without submitting.**</span></div></div></div>
+              <div class="two"><div class="grow"><div class="panel"><b>The selected logo assets</b><div class="rows"><div class="bar"><i style="width:64%"></i></div></div></div><div class="panel"><span class="kind">dataTable</span><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div><span class="why">Implied by the detail template — not declared on the screen.</span></div></div></div>
             </div>
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; listAssets · getAsset · createAsset · getAssetHistory +3</div>
+          <div><b>OPERATIONS</b> &middot; getBrandIdentity · getAppIcons · setAppIcons · setBrandIdentity</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess</span></div>
-          <div><b>ARRIVES WITH</b> &middot; assetId&larr;deepLink</div>
+          
           <div><b>GOES TO</b> &middot; <a href="#cms-001">CMS-001</a>  &mdash; <i>Tenant Workspace</i> <span class="car">tenantId</span><br><a href="#cms-002">CMS-002</a>  &mdash; <i>Brand Kit</i> <span class="car">uploadId</span><br><a href="#cms-003">CMS-003</a>  &mdash; <i>Typography</i> <span class="car">bannerId · pageId · policyKind · version</span></div>
           
           
@@ -36651,9 +36651,9 @@ border-radius:9px;font:800 13px/1.5 Manrope,system-ui,sans-serif;letter-spacing:
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; getHomepageLayout · setHomepageLayout</div>
+          <div><b>OPERATIONS</b> &middot; listContentPages · createContentPage · updateContentPage · setFooter +2</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess</span></div>
-          
+          <div><b>ARRIVES WITH</b> &middot; pageId&larr;navigation</div>
           <div><b>GOES TO</b> &middot; <a href="#cms-001">CMS-001</a>  &mdash; <i>Tenant Workspace</i> <span class="car">tenantId</span><br><a href="#cms-002">CMS-002</a>  &mdash; <i>Brand Kit</i> <span class="car">uploadId</span><br><a href="#cms-003">CMS-003</a>  &mdash; <i>Typography</i> <span class="car">bannerId · pageId · policyKind · version</span><br><a href="#cms-012">CMS-012</a>  &mdash; <i>Previews in both directions</i></div>
           
           
@@ -36681,9 +36681,9 @@ border-radius:9px;font:800 13px/1.5 Manrope,system-ui,sans-serif;letter-spacing:
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; listPromoBlocks · listBanners</div>
+          <div><b>OPERATIONS</b> &middot; createBanner · updateBanner · createPromoBlock · updatePromoBlock +3</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess</span></div>
-          
+          <div><b>ARRIVES WITH</b> &middot; bannerId&larr;navigation, promoBlockId&larr;navigation</div>
           <div><b>GOES TO</b> &middot; <a href="#cms-001">CMS-001</a>  &mdash; <i>Tenant Workspace</i> <span class="car">tenantId</span><br><a href="#cms-002">CMS-002</a>  &mdash; <i>Brand Kit</i> <span class="car">uploadId</span><br><a href="#cms-003">CMS-003</a>  &mdash; <i>Typography</i> <span class="car">bannerId · pageId · policyKind · version</span></div>
           
           
@@ -36922,7 +36922,7 @@ border-radius:9px;font:800 13px/1.5 Manrope,system-ui,sans-serif;letter-spacing:
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; getTenantConfig</div>
+          <div><b>OPERATIONS</b> &middot; getBookingFlowConfig · setBookingFlowConfig · getTenantConfig</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess</span></div>
           
           <div><b>GOES TO</b> &middot; <a href="#cms-001">CMS-001</a>  &mdash; <i>Tenant Workspace</i> <span class="car">tenantId</span><br><a href="#cms-002">CMS-002</a>  &mdash; <i>Brand Kit</i> <span class="car">uploadId</span><br><a href="#cms-003">CMS-003</a>  &mdash; <i>Typography</i> <span class="car">bannerId · pageId · policyKind · version</span></div>
@@ -36977,17 +36977,17 @@ border-radius:9px;font:800 13px/1.5 Manrope,system-ui,sans-serif;letter-spacing:
             
             <div class="canvas">
               <div class="kpis"><div class="kpi"><b>Total</b><span>1,248</span></div><div class="kpi"><b>Active</b><span>978</span></div><div class="kpi"><b>Attention</b><span>142</span></div><div class="kpi"><b>Offline</b><span>12</span></div></div>
-              <div class="two"><div class="grow"><div class="panel"><span class="kind">detailPanel</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">Structure from the wireframe board. Components not yet enumerated.</span></div><div class="panel"><span class="kind">dataTable</span><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div><span class="why">**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue&#x27;s busiest hour is a list that skips rows.</span></div><div class="panel"><b>Search</b><div class="chip">Search</div><span class="why">A search that returns nothing must say so differently from a search not yet run.</span></div></div><div class="side"><div class="panel"><b>Cancel</b><div class="chip">Cancel</div><span class="why">**A screen that can submit must be leaveable without submitting.**</span></div></div></div>
+              <div class="two"><div class="grow"><div class="panel"><b>Every consent legal</b><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div></div></div></div>
             </div>
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; getGuestConsents · getConsentHistory · recordConsent · adjustLoyaltyPoints +7</div>
+          <div><b>OPERATIONS</b> &middot; listPolicies · setPolicy · listConsentPurposes · setConsentPurposes</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess</span></div>
-          <div><b>ARRIVES WITH</b> &middot; subjectId&larr;session</div>
+          <div><b>ARRIVES WITH</b> &middot; policyKind&larr;navigation</div>
           <div><b>GOES TO</b> &middot; <a href="#cms-001">CMS-001</a>  &mdash; <i>Tenant Workspace</i> <span class="car">tenantId</span><br><a href="#cms-002">CMS-002</a>  &mdash; <i>Brand Kit</i> <span class="car">uploadId</span><br><a href="#cms-003">CMS-003</a>  &mdash; <i>Typography</i> <span class="car">bannerId · pageId · policyKind · version</span></div>
           
-          <div><b>OVERLAYS</b><div class="ov"><b>confirmDialog</b> confirmMergeGuestProfiles &middot; <i>Merge</i></div></div>
+          
         </div>
       </div>
       <div id="cms-019" class="scr">
@@ -39472,7 +39472,7 @@ border-radius:9px;font:800 13px/1.5 Manrope,system-ui,sans-serif;letter-spacing:
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; getDashboard · listAlerts · requestSuggestion · runReport</div>
+          <div><b>OPERATIONS</b> &middot; getCommandCentre · getDashboard · listAlerts · requestSuggestion +1</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess</span></div>
           <div><b>ARRIVES WITH</b> &middot; venueId&larr;session, domain&larr;session, dashboardId&larr;deepLink</div>
           <div><b>GOES TO</b> &middot; entry point · <a href="#anl-002">ANL-002</a>  &mdash; <i>Sales, Revenue &amp; Channel</i><br><a href="#anl-003">ANL-003</a>  &mdash; <i>Operational Performance</i><br><a href="#anl-004">ANL-004</a>  &mdash; <i>Product Performance</i><br><a href="#anl-005">ANL-005</a>  &mdash; <i>Cost, Margin &amp; Profitability</i><br><a href="#anl-006">ANL-006</a>  &mdash; <i>Inventory &amp; Waste Intelligence</i><br><a href="#anl-007">ANL-007</a>  &mdash; <i>Guest &amp; Conversion Intelligence</i><br><a href="#anl-008">ANL-008</a>  &mdash; <i>Demand Forecasting</i><br><a href="#anl-009">ANL-009</a>  &mdash; <i>AI Assistant &amp; Action Center</i><br><a href="#anl-010">ANL-010</a>  &mdash; <i>Suggestions &amp; Advice</i><br><a href="#anl-012">ANL-012</a>  &mdash; <i>Live Operations Dashboard</i><br><a href="#anl-013">ANL-013</a>  &mdash; <i>Revenue Pulse</i><br><a href="#anl-014">ANL-014</a>  &mdash; <i>Attendance &amp; Footfall Intelligence</i><br><a href="#anl-015">ANL-015</a>  &mdash; <i>Capacity &amp; Utilization Monitor</i><br><a href="#anl-016">ANL-016</a>  &mdash; <i>Sales &amp; Channel Performance</i><br><a href="#anl-017">ANL-017</a>  &mdash; <i>Customer, Membership &amp; Loyalty Pulse</i><br><a href="#anl-018">ANL-018</a>  &mdash; <i>Alerts &amp; Exception Center</i><br><a href="#anl-019">ANL-019</a>  &mdash; <i>AI Management Insights</i><br><a href="#anl-020">ANL-020</a>  &mdash; <i>Multi-Site &amp; Performance Comparison</i><br><a href="#anl-021">ANL-021</a>  &mdash; <i>Dashboard Library</i><br><a href="#anl-031">ANL-031</a>  &mdash; <i>Report Catalogue &amp; Library</i><br><a href="#anl-041">ANL-041</a>  &mdash; <i>Reporting Governance Command Center</i><br><a href="#anl-051">ANL-051</a>  &mdash; <i>AI Analytics Command Center</i><br><a href="#anl-061">ANL-061</a>  &mdash; <i>BI &amp; Analytics Administration Command Center</i></div>

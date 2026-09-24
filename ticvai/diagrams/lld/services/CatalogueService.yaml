@@ -1,5 +1,5 @@
 id: LLD-CatalogueService
-title: CatalogueService — 398 operations, 69 tables
+title: CatalogueService — 404 operations, 71 tables
 generatedBy: tools/derive-diagrams.py
 tier: commerce
 index: diagrams/hld/02-services.yaml
@@ -15,14 +15,14 @@ why: '**What is sold, at what price, in which seat.** Promotions and seating are
 scale: Read-heavy, bundle-published to tills. **The catalogue bundle is this service's output** (ADR-0013).
 ifDown: A bad publish reaches every workstation. Versioned and rollback-able for that reason.
 coverage:
-  operations: 398
+  operations: 404
   inAFlow: 57
   percent: 43%
   note: '**Flow coverage is how much of this service a journey has walked.** A service under 40% is
     unwalked rather than under-documented.'
 schemas:
 - schema: catalogue
-  tables: 30
+  tables: 32
   stores:
   - postgres
   largestTable: catalogue.entitlement_template
@@ -43,7 +43,7 @@ schemas:
   largestTable: seating.group_request
 operationsByContract:
 - contract: catalogue
-  count: 199
+  count: 205
   operations:
   - operation: acquireInventoryHold
     verb: POST
@@ -109,6 +109,14 @@ operationsByContract:
     offline: false
     reads: 2
     writes: 3
+  - operation: checkBookingEligibility
+    verb: POST
+    path: /eligibility-checks
+    scope: venue
+    permission: PRODUCT_VIEW
+    offline: false
+    reads: 2
+    writes: 0
   - operation: cloneEvent
     verb: POST
     path: /events/{eventId}/clone
@@ -277,6 +285,14 @@ operationsByContract:
     offline: false
     reads: 1
     writes: 0
+  - operation: getGroupPackageDefinition
+    verb: GET
+    path: /products/{productId}/group-package
+    scope: venue
+    permission: PRODUCT_VIEW
+    offline: false
+    reads: 1
+    writes: 0
   - operation: getLatestBundle
     verb: GET
     path: /catalogue/bundles/latest
@@ -323,6 +339,14 @@ operationsByContract:
     scope: venue
     permission: PRODUCT_VIEW
     offline: true
+    reads: 1
+    writes: 0
+  - operation: getProductEligibilityRule
+    verb: GET
+    path: /products/{productId}/eligibility-rule
+    scope: venue
+    permission: PRODUCT_VIEW
+    offline: false
     reads: 1
     writes: 0
   - operation: importProductCatalogue
@@ -676,6 +700,14 @@ operationsByContract:
     permission: PRODUCT_VIEW
     offline: false
     reads: 0
+    writes: 0
+  - operation: listGroupPackages
+    verb: GET
+    path: /group-packages
+    scope: venue
+    permission: PRODUCT_VIEW
+    offline: false
+    reads: 1
     writes: 0
   - operation: listGuestMemberships
     verb: GET
@@ -1397,6 +1429,14 @@ operationsByContract:
     offline: false
     reads: 0
     writes: 0
+  - operation: setGroupPackageDefinition
+    verb: PUT
+    path: /products/{productId}/group-package
+    scope: venue
+    permission: PRODUCT_CONFIGURE
+    offline: false
+    reads: 1
+    writes: 1
   - operation: setLifecycleStatuWorkflow
     verb: PUT
     path: /lifecycle-statu-workflow
@@ -1517,6 +1557,14 @@ operationsByContract:
     offline: false
     reads: 0
     writes: 0
+  - operation: setProductEligibilityRule
+    verb: PUT
+    path: /products/{productId}/eligibility-rule
+    scope: venue
+    permission: PRODUCT_CONFIGURE
+    offline: false
+    reads: 1
+    writes: 1
   - operation: setProductServicePrice
     verb: PUT
     path: /product-service-price
@@ -3145,8 +3193,8 @@ operationsByContract:
     scope: venue
     permission: ORDER_CREATE
     offline: false
-    reads: 0
-    writes: 0
+    reads: 1
+    writes: 1
   - operation: setAccessibleSeating
     verb: PUT
     path: /accessible-seating
@@ -3334,6 +3382,13 @@ tables:
   writtenBy:
   - catalogue
   foreignWriters: null
+- table: catalogue.group_package
+  columns: 11
+  store: postgres
+  parent: null
+  writtenBy:
+  - catalogue
+  foreignWriters: null
 - table: catalogue.import_job
   columns: 7
   store: postgres
@@ -3415,6 +3470,13 @@ tables:
   columns: 10
   store: postgres
   parent: null
+  writtenBy:
+  - catalogue
+  foreignWriters: null
+- table: catalogue.product_eligibility_rule
+  columns: 14
+  store: postgres
+  parent: catalogue.product
   writtenBy:
   - catalogue
   foreignWriters: null
@@ -3769,6 +3831,7 @@ screens:
 - P01:WEB-010 Shopping Cart
 - P01:WEB-022 Membership Plans
 - P01:WEB-023 Membership Management
+- P01:WEB-031 My Reservations
 - P01:WEB-032 Offers & Promotions
 - P01:WEB-035 Multi-Currency & Pricing
 - P01:WEB-040 Virtual Queue
@@ -3800,6 +3863,7 @@ screens:
 - P02:GST-059 Plan My Day – In Progress
 - P02:GST-063 Search
 - P02:GST-070 Reserve a Table or Cabana
+- P02:GST-072 Share & Group Booking
 - P04:POS-002 Sell — Ticket Catalogue
 - P04:POS-003 Sell — Timed Entry
 - P04:POS-004 Sell — Seat Map
@@ -3895,6 +3959,7 @@ screens:
 - P08:BO-117 Product Import, Governance & AI Configuration Assistant
 - P08:BO-119 Cross-Sell, Upsell & Recommendation Rules
 - P08:BO-125 Product & Category Button Configuration
+- P08:BO-161 Guest, Companion & Eligibility Rules
 - P08:BO-374 Approval Decision Workspace
 - P08:BO-441 Price Priority & Conflict Rules
 - P08:BO-443 Pricing Audit, Approval & Publication

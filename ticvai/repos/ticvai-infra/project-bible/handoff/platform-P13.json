@@ -7,15 +7,15 @@
  "audience": "staff",
  "formFactor": "web",
  "offlineCapable": false,
- "generated": "2026-09-21",
+ "generated": "2026-09-24",
  "note": "Derived by tools/derive-platform.py. **The gaps section is the point** \u2014 a page listing what exists is a directory; one listing what is missing is a worklist.",
  "counts": {
   "screens": 100,
-  "operations": 140,
-  "contracts": 8,
+  "operations": 123,
+  "contracts": 7,
   "modules": 3,
   "undrawn": 0,
-  "operationsWithNoScreen": 127
+  "operationsWithNoScreen": 100
  },
  "waves": {
   "wave2": 20,
@@ -46,36 +46,32 @@
  ],
  "contracts": [
   {
+   "contract": "white-label",
+   "operations": 43
+  },
+  {
    "contract": "marketing-crm",
-   "operations": 52
+   "operations": 42
   },
   {
    "contract": "assets",
    "operations": 26
   },
   {
-   "contract": "white-label",
-   "operations": 23
-  },
-  {
-   "contract": "subscription",
-   "operations": 19
-  },
-  {
-   "contract": "maintenance",
-   "operations": 7
-  },
-  {
-   "contract": "identity",
-   "operations": 6
-  },
-  {
    "contract": "fnb",
    "operations": 5
   },
   {
+   "contract": "identity",
+   "operations": 4
+  },
+  {
    "contract": "orders",
    "operations": 2
+  },
+  {
+   "contract": "maintenance",
+   "operations": 1
   }
  ],
  "screens": [
@@ -85,7 +81,7 @@
    "module": "White Label",
    "wave": 2,
    "route": "/white-label/tenant-workspace",
-   "operations": 21,
+   "operations": 7,
    "drawn": true
   },
   {
@@ -112,7 +108,7 @@
    "module": "White Label",
    "wave": 2,
    "route": "/white-label/logo-assets",
-   "operations": 7,
+   "operations": 4,
    "drawn": true
   },
   {
@@ -139,7 +135,7 @@
    "module": "White Label",
    "wave": 2,
    "route": "/white-label/page-builder",
-   "operations": 2,
+   "operations": 6,
    "drawn": true
   },
   {
@@ -148,7 +144,7 @@
    "module": "White Label",
    "wave": 2,
    "route": "/white-label/content-blocks",
-   "operations": 2,
+   "operations": 7,
    "drawn": true
   },
   {
@@ -220,7 +216,7 @@
    "module": "White Label",
    "wave": 2,
    "route": "/white-label/site-settings",
-   "operations": 1,
+   "operations": 3,
    "drawn": true
   },
   {
@@ -238,7 +234,7 @@
    "module": "White Label",
    "wave": 2,
    "route": "/white-label/consent-legal",
-   "operations": 11,
+   "operations": 4,
    "drawn": true
   },
   {
@@ -1019,6 +1015,18 @@
     "summary": "Escalate a finding"
    },
    {
+    "operation": "getFnbReservationPolicy",
+    "contract": "fnb",
+    "verb": "GET",
+    "summary": "How long a table is held, by party size"
+   },
+   {
+    "operation": "getFnbServiceChargePolicy",
+    "contract": "fnb",
+    "verb": "GET",
+    "summary": "The service charge a venue applies, and on what"
+   },
+   {
     "operation": "listFnbRecommendations",
     "contract": "fnb",
     "verb": "GET",
@@ -1029,6 +1037,12 @@
     "contract": "fnb",
     "verb": "GET",
     "summary": "Approved substitutions for a recipe's ingredients"
+   },
+   {
+    "operation": "listTemperatureCheckpoints",
+    "contract": "fnb",
+    "verb": "GET",
+    "summary": "The units that get read, and the range each must hold"
    },
    {
     "operation": "rebalanceStationLoad",
@@ -1067,6 +1081,18 @@
     "summary": "What the guest chooses, and what it costs extra"
    },
    {
+    "operation": "setFnbReservationPolicy",
+    "contract": "fnb",
+    "verb": "PUT",
+    "summary": "Set turn times and seating buffers"
+   },
+   {
+    "operation": "setFnbServiceChargePolicy",
+    "contract": "fnb",
+    "verb": "PUT",
+    "summary": "Set the service charge"
+   },
+   {
     "operation": "setIngredientSubstitutes",
     "contract": "fnb",
     "verb": "PUT",
@@ -1083,6 +1109,12 @@
     "contract": "fnb",
     "verb": "PUT",
     "summary": "Divide the floor into sections and give each a server"
+   },
+   {
+    "operation": "setTemperatureCheckpoint",
+    "contract": "fnb",
+    "verb": "PUT",
+    "summary": "Define a checkpoint and its safe range"
    },
    {
     "operation": "updateTable",
@@ -1421,22 +1453,16 @@
     "summary": "Extend a reservation"
    },
    {
-    "operation": "getBillingStatement",
+    "operation": "getResaleFeePolicy",
     "contract": "orders",
     "verb": "GET",
-    "summary": "One statement, with its lines"
+    "summary": "The commission and price cap a resale listing is created under"
    },
    {
     "operation": "issueInvitation",
     "contract": "orders",
     "verb": "POST",
     "summary": "Issue a complimentary entitlement, with no payment expected"
-   },
-   {
-    "operation": "listBillingStatements",
-    "contract": "orders",
-    "verb": "GET",
-    "summary": "What was charged, when, and against which agreement"
    },
    {
     "operation": "listDeposits",
@@ -1493,12 +1519,6 @@
     "summary": "A credit limit for an individual booking ahead"
    },
    {
-    "operation": "printTicketProof",
-    "contract": "orders",
-    "verb": "POST",
-    "summary": "Print a sample without selling anything"
-   },
-   {
     "operation": "pushWalletPassUpdate",
     "contract": "orders",
     "verb": "POST",
@@ -1517,136 +1537,10 @@
     "summary": ""
    },
    {
-    "operation": "cancelSubscription",
-    "contract": "subscription",
-    "verb": "POST",
-    "summary": "Terminate a tenant subscription"
-   },
-   {
-    "operation": "createPartnerUser",
-    "contract": "subscription",
-    "verb": "POST",
-    "summary": "Add a user to a partner branch"
-   },
-   {
-    "operation": "decommissionBurstEnvironment",
-    "contract": "subscription",
-    "verb": "POST",
-    "summary": "Tear it down"
-   },
-   {
-    "operation": "drainBurstEnvironment",
-    "contract": "subscription",
-    "verb": "POST",
-    "summary": "Stop taking orders, let in-flight ones finish"
-   },
-   {
-    "operation": "executeTenantMigration",
-    "contract": "subscription",
-    "verb": "POST",
-    "summary": "Move the tenant"
-   },
-   {
-    "operation": "exportPartnerInvoice",
-    "contract": "subscription",
-    "verb": "POST",
-    "summary": "Partner invoice and settlement, in an ERP format"
-   },
-   {
-    "operation": "getPlanTiers",
-    "contract": "subscription",
-    "verb": "GET",
-    "summary": "What a plan tier allows and includes"
-   },
-   {
-    "operation": "launchCellCluster",
-    "contract": "subscription",
-    "verb": "POST",
-    "summary": "Launch an identical cluster"
-   },
-   {
-    "operation": "listBurstEnvironments",
-    "contract": "subscription",
-    "verb": "GET",
-    "summary": "On-sale environments"
-   },
-   {
-    "operation": "listCellClusters",
-    "contract": "subscription",
-    "verb": "GET",
-    "summary": "Clusters in a region"
-   },
-   {
-    "operation": "listPartnerUsers",
-    "contract": "subscription",
-    "verb": "GET",
-    "summary": "Users beneath a partner, by branch"
-   },
-   {
-    "operation": "listTenantMigrations",
-    "contract": "subscription",
-    "verb": "GET",
-    "summary": "Tenant moves between cells"
-   },
-   {
-    "operation": "planTenantMigration",
-    "contract": "subscription",
-    "verb": "POST",
-    "summary": "Plan moving a tenant to another cell"
-   },
-   {
-    "operation": "reconcileBurstEnvironment",
-    "contract": "subscription",
-    "verb": "POST",
-    "summary": "Move the orders into the permanent platform"
-   },
-   {
-    "operation": "registerPartner",
-    "contract": "subscription",
-    "verb": "POST",
-    "summary": "A business applies to become a partner"
-   },
-   {
-    "operation": "requestBurstEnvironment",
-    "contract": "subscription",
-    "verb": "POST",
-    "summary": "Stand one up for a performance"
-   },
-   {
-    "operation": "resolveInvoiceDispute",
-    "contract": "subscription",
-    "verb": "POST",
-    "summary": "Resolve a dispute"
-   },
-   {
-    "operation": "rollbackTenantMigration",
-    "contract": "subscription",
-    "verb": "POST",
-    "summary": "Roll a cutover back"
-   },
-   {
-    "operation": "setPlanTiers",
-    "contract": "subscription",
+    "operation": "setResaleFeePolicy",
+    "contract": "orders",
     "verb": "PUT",
-    "summary": "Set a plan tier's allowances and modules"
-   },
-   {
-    "operation": "settleAiUsage",
-    "contract": "subscription",
-    "verb": "POST",
-    "summary": "Turn metered AI interactions into a billable usage record"
-   },
-   {
-    "operation": "createBanner",
-    "contract": "white-label",
-    "verb": "POST",
-    "summary": "Create a banner"
-   },
-   {
-    "operation": "createPromoBlock",
-    "contract": "white-label",
-    "verb": "POST",
-    "summary": "Create a promotional block"
+    "summary": "Set resale commission and the price ceiling"
    },
    {
     "operation": "deleteBanner",
@@ -1661,24 +1555,6 @@
     "summary": "Delete a content page"
    },
    {
-    "operation": "deletePromoBlock",
-    "contract": "white-label",
-    "verb": "DELETE",
-    "summary": "Delete a promotional block"
-   },
-   {
-    "operation": "getFeatureToggles",
-    "contract": "white-label",
-    "verb": "GET",
-    "summary": "Read tenant feature toggles"
-   },
-   {
-    "operation": "getModuleEnablement",
-    "contract": "white-label",
-    "verb": "GET",
-    "summary": "Read module enablement"
-   },
-   {
     "operation": "getNavigation",
     "contract": "white-label",
     "verb": "GET",
@@ -1691,58 +1567,16 @@
     "summary": "Publish now, or schedule it"
    },
    {
-    "operation": "setFeatureToggles",
-    "contract": "white-label",
-    "verb": "PUT",
-    "summary": "Set feature toggles"
-   },
-   {
-    "operation": "setFooter",
-    "contract": "white-label",
-    "verb": "PUT",
-    "summary": "Footer columns, legal links and social"
-   },
-   {
     "operation": "setHeader",
     "contract": "white-label",
     "verb": "PUT",
     "summary": "Configure the header"
    },
    {
-    "operation": "setMaintenanceMode",
-    "contract": "white-label",
-    "verb": "PUT",
-    "summary": "Enable or clear maintenance mode"
-   },
-   {
-    "operation": "setModuleEnablement",
-    "contract": "white-label",
-    "verb": "PUT",
-    "summary": "Enable or disable modules"
-   },
-   {
     "operation": "setNavigation",
     "contract": "white-label",
     "verb": "PUT",
     "summary": "Set main and overflow navigation"
-   },
-   {
-    "operation": "updateBanner",
-    "contract": "white-label",
-    "verb": "PATCH",
-    "summary": "Amend or activate a banner"
-   },
-   {
-    "operation": "updateContentPage",
-    "contract": "white-label",
-    "verb": "PUT",
-    "summary": "Amend a content page"
-   },
-   {
-    "operation": "updatePromoBlock",
-    "contract": "white-label",
-    "verb": "PATCH",
-    "summary": "Amend a promotional block"
    }
   ],
   "modulesSplitAcrossWaves": [],

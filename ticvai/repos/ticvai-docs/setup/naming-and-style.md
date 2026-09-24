@@ -120,11 +120,13 @@ Always the `Money` type — `{ amount, currency, scale }`.
 
 - **Never** a float, in any language, at any layer
 - **Never** a fixed `decimal(18,2)` — OMR uses 3 decimal places, AED uses 2
-- SQL columns are `numeric(18,4)` with the scale carried alongside
+- SQL columns are `numeric(18,4)` and hold the amount only. **Currency and scale are not stored per row; they resolve** from what denominates the amount (ADR-0018): a ledger posting from `ledger.account.currency`, a payment from its `tender_currency`, a wallet from `wallet.wallet.currency`, everything else from the venue's frozen trading currency. Only tables whose currency genuinely differs from their venue store one (`orders.payment`, `inventory.supplier`, `ledger.account`, `control.partner_agreement`, `ledger.settlement`). They stay on the wire, so a client never walks a hierarchy to read a figure (24 September)
 - Wire format is a decimal **string**
 
 Column naming: `gross_amount`, `net_amount`, `tax_amount`, `refunded_amount`. Never
 `price`, `value`, `total` alone — they don't say gross or net.
+
+A price somebody enters (a menu item, a merchandise item, a bundle, a licence) is `list_price`: whether it includes tax is set by the tax rule's `taxInclusive`, not by the column, so gross or net would be wrong for some venues. A calculated `subtotal` is `net_amount` and a `total` is `gross_amount`. When the contract's field keeps its wire name, `x-ticvai-column` on the field names the column (24 September: 27 columns renamed this way, listed in `handoff/money-column-names.md`).
 
 ### 5.2 Time
 
@@ -147,6 +149,8 @@ both, and reporting that uses the wrong one misstates revenue by trading day.
 
 Every tenant-scoped table carries `scope_path ltree` plus the denormalised
 `venue_id`, `region_id`, `brand_id` needed for partitioning and reporting.
+
+`scope_path` (and any `*_scope_path`) is typed `ltree` in the DDL, indexed with GiST, and row-level security compares it with `<@`. So a row is visible to a grant at or above it. **A venue-scoped user sees its venue's rows and not tenant-level ones** (`venue_id` null, path at the tenant), which sit above the venue: a venue's list excludes head-office records unless the operation says otherwise. Head-office users see everything beneath them (decided 24 September).
 
 ---
 

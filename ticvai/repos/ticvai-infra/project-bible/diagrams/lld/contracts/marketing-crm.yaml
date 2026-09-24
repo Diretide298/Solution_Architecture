@@ -1,5 +1,5 @@
 id: LLD-marketing-crm
-title: marketing-crm — 205 operations
+title: marketing-crm — 209 operations
 generatedBy: tools/derive-diagrams.py
 index: diagrams/hld/03-contracts.yaml
 tier: satellite
@@ -152,6 +152,19 @@ operations:
   - marketing.customer_badge
   writes:
   - marketing.customer_badge
+- operation: checkGuestCheckoutMatch
+  verb: POST
+  path: /guest-checkout/profile-match
+  scope: venue
+  permission: null
+  audience:
+  - guest
+  offline: false
+  reads:
+  - marketing.guest_match_policy
+  - marketing.guest_profile
+  - orders.cart
+  writes: []
 - operation: claimConversation
   verb: POST
   path: /conversations/{conversationId}/claim
@@ -377,6 +390,23 @@ operations:
   reads:
   - marketing.duplicate_candidate
   writes: []
+- operation: decideGuestCheckoutMatch
+  verb: POST
+  path: /guest-checkout/profile-match/decision
+  scope: venue
+  permission: null
+  audience:
+  - guest
+  offline: false
+  reads:
+  - cache:idempotency
+  - marketing.guest_match_decision
+  - marketing.guest_profile
+  - orders.cart
+  writes:
+  - cache:idempotency
+  - marketing.guest_match_decision
+  - orders.cart
 - operation: endKioskAssist
   verb: POST
   path: /kiosk-assists/{sessionId}/end
@@ -534,6 +564,17 @@ operations:
   offline: false
   reads:
   - marketing.loyalty_position
+  writes: []
+- operation: getGuestMatchPolicy
+  verb: GET
+  path: /guest-match-policy
+  scope: venue
+  permission: MARKETING_VIEW
+  audience:
+  - staff
+  offline: false
+  reads:
+  - marketing.guest_match_policy
   writes: []
 - operation: getGuestProfile
   verb: GET
@@ -2107,6 +2148,18 @@ operations:
   - marketing.guest_extra_value
   writes:
   - marketing.guest_extra_value
+- operation: setGuestMatchPolicy
+  verb: PUT
+  path: /guest-match-policy
+  scope: venue
+  permission: MARKETING_MANAGE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - marketing.guest_match_policy
+  writes:
+  - marketing.guest_match_policy
 - operation: setGuestRelationships
   verb: PUT
   path: /guests/{guestId}/relationships

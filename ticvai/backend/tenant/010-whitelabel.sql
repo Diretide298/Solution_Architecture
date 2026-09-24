@@ -27,7 +27,7 @@ CREATE TABLE IF NOT EXISTS whitelabel.config_version (
     is_current                        boolean NOT NULL,
     scheduled_for                     timestamptz,
     content_hash                      text,
-    scope_path                        text,
+    scope_path                        ltree,
     id                                uuid PRIMARY KEY NOT NULL
 );
 
@@ -43,14 +43,14 @@ CREATE TABLE IF NOT EXISTS whitelabel.content_page (
     category_code                     text,
     sort_order                        integer,
     is_referenced                     boolean,
-    scope_path                        text
+    scope_path                        ltree
 );
 
 -- A tenant's own hostname and its certificate (24 August). No domain or certificate operation
 -- existed anywhere in 1,010 — and ADM-017 Domain & Certificate Management declared 41 operations,
 -- none of them about a domain. Verification before issuance, always. Hangs off: reaches
--- whitelabel.tenant_config through its keys; references whitelabel.tenant_config. Reached by: 3
--- operations read it and 2 write i
+-- whitelabel.tenant_config through its keys; references whitelabel.tenant_config. Reached by: 4
+-- operations read it and 3 write i
 CREATE TABLE IF NOT EXISTS whitelabel.custom_domain (
     id                                uuid PRIMARY KEY NOT NULL,
     tenant_id                         uuid NOT NULL,
@@ -70,7 +70,7 @@ CREATE TABLE IF NOT EXISTS whitelabel.faq_category (
     code                              text NOT NULL,
     name                              jsonb NOT NULL,
     sort_order                        integer,
-    scope_path                        text,
+    scope_path                        ltree,
     id                                uuid PRIMARY KEY NOT NULL
 );
 
@@ -133,7 +133,7 @@ CREATE TABLE IF NOT EXISTS whitelabel.policy (
     effective_from                    date NOT NULL,
     published_by_principal_id         uuid,
     published_at                      timestamptz NOT NULL,
-    scope_path                        text,
+    scope_path                        ltree,
     id                                uuid PRIMARY KEY NOT NULL
 );
 
@@ -149,7 +149,7 @@ CREATE TABLE IF NOT EXISTS whitelabel.promo_block (
     ends_at                           timestamptz,
     state                             text,
     sort_order                        integer,
-    scope_path                        text
+    scope_path                        ltree
 );
 
 -- Everything a tenant has branded or switched on. Versioned, published, and the reason a guest
@@ -160,6 +160,7 @@ CREATE TABLE IF NOT EXISTS whitelabel.tenant_config (
     is_draft                          boolean,
     brand                             jsonb NOT NULL,
     app_icons                         jsonb,
+    booking_flow                      jsonb,
     theme                             jsonb NOT NULL,
     fonts                             jsonb NOT NULL,
     footer                            uuid,

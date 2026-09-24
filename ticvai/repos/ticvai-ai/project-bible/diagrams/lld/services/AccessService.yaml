@@ -1600,6 +1600,7 @@ screens:
 - P02:GST-013 Ticket Details
 - P02:GST-027 Parking – Reserve & Pay
 - P02:GST-028 Parking – Reservation Confirmed
+- P02:GST-055 Dynamic QR Ticket
 - P02:GST-069 Face Pass
 - P04:POS-002 Sell — Ticket Catalogue
 - P04:POS-013 Mobile POS, Event Sales & Offline Operations

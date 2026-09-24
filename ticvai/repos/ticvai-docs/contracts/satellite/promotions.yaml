@@ -6630,6 +6630,7 @@ components:
           format: uuid
           nullable: true
         value:
+          x-ticvai-column: attributed_gross_amount
           $ref: ../shared/common.yaml#/components/schemas/Money
         holdout:
           type: boolean
@@ -7606,6 +7607,7 @@ components:
         kind:
           $ref: '#/components/schemas/BundleKind'
         price:
+          x-ticvai-column: list_price
           $ref: ../shared/common.yaml#/components/schemas/Money
         components:
           type: array

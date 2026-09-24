@@ -11,7 +11,7 @@ CREATE TABLE IF NOT EXISTS reporting.alert (
     status                            text NOT NULL,
     observed_value                    numeric(18,4),
     threshold                         numeric(18,4),
-    scope_path                        text,
+    scope_path                        ltree,
     acknowledged_by_principal_id      uuid,
     acknowledged_at                   timestamptz,
     resolved_at                       timestamptz,
@@ -33,7 +33,7 @@ CREATE TABLE IF NOT EXISTS reporting.alert_rule (
     recipient_role_ids                text[],
     cooldown_minutes                  integer,
     is_active                         boolean NOT NULL,
-    scope_path                        text
+    scope_path                        ltree
 );
 
 -- Holds 11 columns. No description has been written for this table — the name is the only thing
@@ -42,7 +42,7 @@ CREATE TABLE IF NOT EXISTS reporting.anomaly (
     id                                uuid PRIMARY KEY,
     kpi_id                            uuid,
     metric                            text,
-    scope_path                        text,
+    scope_path                        ltree,
     detected_at                       timestamptz,
     observed                          numeric(18,4),
     expected                          numeric(18,4),
@@ -55,6 +55,7 @@ CREATE TABLE IF NOT EXISTS reporting.anomaly (
 -- An arrangement of tiles, each resolving its own source
 CREATE TABLE IF NOT EXISTS reporting.dashboard (
     name                              text,
+    module                            text,
     description                       text,
     venue_id                          uuid,
     is_shared                         boolean,
@@ -89,7 +90,7 @@ CREATE TABLE IF NOT EXISTS reporting.delivery (
     failure_reason                    text,
     retry_count                       integer,
     contained_personal_data           boolean,
-    scope_path                        text
+    scope_path                        ltree
 );
 
 -- One run of a report definition. The result set is cached in object storage, not here
@@ -139,7 +140,7 @@ CREATE TABLE IF NOT EXISTS reporting.kpi_definition (
     higher_is_better                  boolean,
     default_period                    text,
     owner                             uuid,
-    scope_path                        text,
+    scope_path                        ltree,
     is_active                         boolean
 );
 
@@ -147,7 +148,7 @@ CREATE TABLE IF NOT EXISTS reporting.kpi_definition (
 -- saying what it is
 CREATE TABLE IF NOT EXISTS reporting.kpi_target (
     kpi_id                            uuid,
-    scope_path                        text,
+    scope_path                        ltree,
     period                            text,
     target                            numeric(18,4),
     amber_at                          numeric(18,4),
@@ -171,7 +172,7 @@ CREATE TABLE IF NOT EXISTS reporting.pipeline (
     status                            text,
     last_error                        text,
     rows_last_run                     integer,
-    scope_path                        text
+    scope_path                        ltree
 );
 
 -- One column of a definition, with its aggregation
@@ -205,7 +206,7 @@ CREATE TABLE IF NOT EXISTS reporting.report_definition (
     created_by_principal_id           uuid,
     created_at                        timestamptz,
     last_run_at                       timestamptz,
-    scope_path                        text
+    scope_path                        ltree
 );
 
 -- A condition applied before aggregation. Hangs off: a child of reporting.report_definition;
@@ -269,7 +270,7 @@ CREATE TABLE IF NOT EXISTS reporting.schedule_recipient (
 CREATE TABLE IF NOT EXISTS reporting.semantic_model (
     version                           integer,
     published_at                      timestamptz,
-    scope_path                        text,
+    scope_path                        ltree,
     id                                uuid PRIMARY KEY NOT NULL
 );
 
@@ -284,6 +285,6 @@ CREATE TABLE IF NOT EXISTS reporting.subscription (
     includes_personal_data            boolean,
     runs_as_principal_id              uuid,
     active                            boolean,
-    scope_path                        text
+    scope_path                        ltree
 );
 

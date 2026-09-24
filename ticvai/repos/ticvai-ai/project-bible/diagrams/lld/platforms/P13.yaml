@@ -20,30 +20,22 @@ deployment:
 why: null
 modulesUsed:
 - module: core
-  screens: 95
-- module: membership
-  screens: 1
-- module: maintenance
-  screens: 1
+  screens: 98
 - module: fnb
   screens: 1
 - module: ticketing
   screens: 1
-- module: marketing
-  screens: 1
 servicesCalled:
 - service: VenueOpsService
-  operationCalls: 77
-- service: MarketingService
-  operationCalls: 54
+  operationCalls: 70
 - service: WhiteLabelService
-  operationCalls: 32
-- service: PlatformService
-  operationCalls: 19
-- service: IdentityService
-  operationCalls: 6
+  operationCalls: 56
+- service: MarketingService
+  operationCalls: 45
 - service: FnbService
   operationCalls: 5
+- service: IdentityService
+  operationCalls: 4
 - service: OrderService
   operationCalls: 2
 coverage:
@@ -56,31 +48,17 @@ screens:
 - screen: CMS-001
   name: Tenant Workspace
   module: White Label
-  requiresModule: membership
+  requiresModule: core
   wave: 2
   density: compact
   operations:
-  - addLicenceAddOn
-  - createTenant
-  - generateInvoice
-  - getEntitlementUsage
-  - getSsoConfig
-  - getSubscription
-  - getTenant
-  - getTenantLicences
-  - getUsageMetering
-  - listSubscriptionInvoices
-  - listTenantCells
-  - listTenants
-  - previewSubscriptionChange
-  - provisionCell
-  - reactivateTenant
-  - removeLicenceAddOn
-  - setSsoConfig
-  - setSubscription
-  - suspendTenant
-  - terminateTenant
-  - updateTenant
+  - getFeatureToggles
+  - getModuleEnablement
+  - getTenantAppStatus
+  - getTenantConfig
+  - setFeatureToggles
+  - setMaintenanceMode
+  - setModuleEnablement
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -88,8 +66,7 @@ screens:
   - error
   - loading
   offlineState: false
-  entryParams:
-  - tenantId<-session
+  entryParams: []
   goesTo:
   - CMS-002
   - CMS-003
@@ -167,17 +144,14 @@ screens:
 - screen: CMS-004
   name: Logo & Assets
   module: White Label
-  requiresModule: maintenance
+  requiresModule: core
   wave: 2
   density: compact
   operations:
-  - createAsset
-  - getAsset
-  - getAssetHistory
-  - listAssets
-  - lookupAsset
-  - setAssetStatus
-  - updateAsset
+  - getAppIcons
+  - getBrandIdentity
+  - setAppIcons
+  - setBrandIdentity
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -185,8 +159,7 @@ screens:
   - error
   - loading
   offlineState: false
-  entryParams:
-  - assetId<-deepLink
+  entryParams: []
   goesTo:
   - CMS-001
   - CMS-002
@@ -259,8 +232,12 @@ screens:
   wave: 2
   density: compact
   operations:
+  - createContentPage
   - getHomepageLayout
+  - listContentPages
+  - setFooter
   - setHomepageLayout
+  - updateContentPage
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -268,7 +245,8 @@ screens:
   - error
   - loading
   offlineState: false
-  entryParams: []
+  entryParams:
+  - pageId<-navigation
   goesTo:
   - CMS-001
   - CMS-002
@@ -285,8 +263,13 @@ screens:
   wave: 2
   density: compact
   operations:
+  - createBanner
+  - createPromoBlock
+  - deletePromoBlock
   - listBanners
   - listPromoBlocks
+  - updateBanner
+  - updatePromoBlock
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -294,7 +277,9 @@ screens:
   - error
   - loading
   offlineState: false
-  entryParams: []
+  entryParams:
+  - bannerId<-navigation
+  - promoBlockId<-navigation
   goesTo:
   - CMS-001
   - CMS-002
@@ -498,7 +483,9 @@ screens:
   wave: 2
   density: compact
   operations:
+  - getBookingFlowConfig
   - getTenantConfig
+  - setBookingFlowConfig
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -544,21 +531,14 @@ screens:
 - screen: CMS-018
   name: Consent & Legal
   module: White Label
-  requiresModule: marketing
+  requiresModule: core
   wave: 2
   density: compact
   operations:
-  - adjustLoyaltyPoints
-  - getConsentHistory
-  - getGuestConsents
-  - getGuestLoyalty
-  - getGuestProfile
-  - getWishlist
-  - listGuestDevices
-  - mergeGuestProfiles
-  - recordConsent
-  - searchGuests
-  - updateGuestProfile
+  - listConsentPurposes
+  - listPolicies
+  - setConsentPurposes
+  - setPolicy
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -567,7 +547,7 @@ screens:
   - loading
   offlineState: false
   entryParams:
-  - subjectId<-session
+  - policyKind<-navigation
   goesTo:
   - CMS-001
   - CMS-002

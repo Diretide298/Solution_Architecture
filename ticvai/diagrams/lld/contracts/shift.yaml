@@ -1,5 +1,5 @@
 id: LLD-shift
-title: shift — 19 operations
+title: shift — 20 operations
 generatedBy: tools/derive-diagrams.py
 index: diagrams/hld/03-contracts.yaml
 tier: spine
@@ -250,6 +250,20 @@ operations:
   writes:
   - cache:idempotency
   - orders.pos_shift
+- operation: setDenominations
+  verb: PUT
+  path: /denominations
+  scope: region
+  permission: REGION_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - cache:idempotency
+  - platform.denomination
+  writes:
+  - cache:idempotency
+  - platform.denomination
 - operation: suspendShift
   verb: POST
   path: /shifts/{shiftId}/suspend

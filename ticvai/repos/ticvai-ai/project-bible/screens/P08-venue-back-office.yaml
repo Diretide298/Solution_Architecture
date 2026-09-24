@@ -2818,6 +2818,14 @@ screens:
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
   apis:
+  - operationId: getGroupPackageDefinition
+    contract: catalogue
+    purpose: A school-trip format or party package
+    trigger: onLoad
+  - operationId: setGroupPackageDefinition
+    contract: catalogue
+    purpose: Define a school-trip format or party package
+    trigger: onAction
   - operationId: listCatalogueBundles
     contract: catalogue
     purpose: List published bundles
@@ -2848,6 +2856,8 @@ screens:
     params:
     - name: version
       from: deepLink
+    - name: productId
+      from: navigation
     coldEntry: '**A version link is expected to point at something superseded — that is what versions
       are for.** The screen opens the requested version read-only, says it is not current, and links to
       the one that is. **An old version is history, not an error.** Arrives with `version`.'
@@ -6538,6 +6548,20 @@ screens:
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
   apis:
+  - operationId: createGroupBooking
+    contract: orders
+    purpose: Turn an order into a group booking
+    trigger: onAction
+  - operationId: getGroupBooking
+    contract: orders
+    purpose: The group, its leader and its manifest
+    trigger: onLoad
+  - operationId: updateGroupBooking
+    contract: orders
+    purpose: Confirm numbers, change the leader or cancel
+    trigger: onAction
+    invalidates:
+    - getGroupBooking
   - operationId: listOrders
     contract: orders
     purpose: List orders
@@ -6618,6 +6642,8 @@ screens:
     params:
     - name: orderId
       from: deepLink
+    - name: groupBookingId
+      from: navigation
     coldEntry: '**A guest opening an order link weeks later.** Shows the order if it still resolves; if
       it was refunded or the performance passed, says which and offers the order list rather than an error.'
     preloaded:
@@ -10745,6 +10771,14 @@ screens:
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
   apis:
+  - operationId: getFnbDeliveryPolicy
+    contract: fnb
+    purpose: Takeaway and delivery rules
+    trigger: onLoad
+  - operationId: setFnbDeliveryPolicy
+    contract: fnb
+    purpose: Set takeaway and delivery rules
+    trigger: onAction
   - operationId: listOutlets
     contract: tenancy
     purpose: List outlets
@@ -12901,6 +12935,10 @@ screens:
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
   apis:
+  - operationId: resetPrincipalCredential
+    contract: identity
+    purpose: Reset a forgotten password or PIN
+    trigger: onAction
   - operationId: listPrincipals
     contract: identity
     purpose: List principals
@@ -30274,6 +30312,14 @@ screens:
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
   apis:
+  - operationId: getProductEligibilityRule
+    contract: catalogue
+    purpose: A product's age, height and supervision limits
+    trigger: onLoad
+  - operationId: setProductEligibilityRule
+    contract: catalogue
+    purpose: Set age, height and supervision limits
+    trigger: onAction
   - operationId: listGuestCompanionEligibility
     contract: access
     purpose: Guest, Companion & Eligibility Rules
@@ -30287,6 +30333,10 @@ screens:
     bound to a contract property; 12 of 27 pack bullets carried onto the screen — the rest are acceptance
     prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than
     here.
+  entryState:
+    params:
+    - name: productId
+      from: navigation
 - id: BO-162
   name: Group Admission & Quantity Validation
   module: Access & Venue
@@ -48831,6 +48881,14 @@ screens:
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
   apis:
+  - operationId: getDepositPolicy
+    contract: orders
+    purpose: How deposits work
+    trigger: onLoad
+  - operationId: setDepositPolicy
+    contract: orders
+    purpose: Set deposit amount, balance due and refund cut-off
+    trigger: onAction
   - operationId: listDepositPartialPayment
     contract: orders
     purpose: Deposit, Partial Payment & Outstanding Balance Management
@@ -51180,6 +51238,26 @@ screens:
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
   apis:
+  - operationId: listTicketTemplates
+    contract: orders
+    purpose: The templates this venue issues from
+    trigger: onLoad
+  - operationId: createTicketTemplate
+    contract: orders
+    purpose: Create a template
+    trigger: onAction
+    invalidates:
+    - listTicketTemplates
+  - operationId: updateTicketTemplate
+    contract: orders
+    purpose: Change or retire a template
+    trigger: onAction
+    invalidates:
+    - listTicketTemplates
+  - operationId: printTicketProof
+    contract: orders
+    purpose: Print a sample without selling anything
+    trigger: onAction
   - operationId: setPdfPrintablePos
     contract: access
     purpose: PDF, Printable & POS Ticket Designer
@@ -51193,6 +51271,10 @@ screens:
     26. 0 of 0 labels bound to a contract property; 22 of 35 pack bullets carried onto the screen — the
     rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts
     rather than here.
+  entryState:
+    params:
+    - name: templateId
+      from: navigation
 - id: BO-347
   name: Apple Wallet Pass Designer
   module: Access & Venue
@@ -89351,6 +89433,14 @@ screens:
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
   apis:
+  - operationId: getGuestMatchPolicy
+    contract: marketing-crm
+    purpose: How returning guests are recognised
+    trigger: onLoad
+  - operationId: setGuestMatchPolicy
+    contract: marketing-crm
+    purpose: Match returning guests by email, mobile or either
+    trigger: onAction
   - operationId: listDuplicateCandidates
     contract: marketing-crm
     purpose: Side by side
@@ -120965,6 +121055,16 @@ screens:
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
   apis:
+  - operationId: listDenominations
+    contract: shift
+    purpose: The notes and coins tills count
+    trigger: onLoad
+  - operationId: setDenominations
+    contract: shift
+    purpose: Set a currency's notes and coins
+    trigger: onAction
+    invalidates:
+    - listDenominations
   - operationId: updateRegionSettings
     contract: tenancy
     purpose: Currency, timezone and channels

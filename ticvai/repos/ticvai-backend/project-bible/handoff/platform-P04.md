@@ -5,16 +5,16 @@
 | | |
 |---|---|
 | Screens | 30 |
-| Operations | 140 |
+| Operations | 141 |
 | Contracts | 20 |
 | Modules | 4 |
 | Undrawn | 0 |
-| Operations with no screen | 189 |
+| Operations with no screen | 194 |
 | Waves | wave1 27 · wave2 3 |
 
 ## Gaps
 
-### 189 operations with no screen here
+### 194 operations with no screen here
 
 **In a contract this platform uses, callable by its audience, and reaching no screen on any platform serving that audience.** Either a screen is missing or the endpoint should not exist — and the second is worth considering first.
 
@@ -60,7 +60,7 @@
 | `createCombo` | fnb | POST | A meal deal, priced as one thing |
 | `createModifierGroup` | fnb | POST | Create a modifier group |
 | `createTable` | fnb | POST | A table as a thing, not an inference |
-| … | | | 149 more |
+| … | | | 154 more |
 
 ### 2 modules split across waves
 
@@ -82,7 +82,7 @@
 
 | | Name | Module | Wave | Ops | Drawn |
 |---|---|---|---|---|---|
-| `POS-000` | Sign In | Shift | 1 | 5 | yes |
+| `POS-000` | Sign In | Shift | 1 | 6 | yes |
 | `POS-001` | Begin Shift | Shift | 1 | 17 | yes |
 | `POS-002` | Sell — Ticket Catalogue | Sell | 1 | 42 | yes |
 | `POS-003` | Sell — Timed Entry | Sell | 1 | 10 | yes |

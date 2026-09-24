@@ -1,4 +1,4 @@
--- catalogue — 30 tables
+-- catalogue — 32 tables
 -- **Derived. Do not hand-edit.**
 
 -- Another way to name the same product — a barcode, a supplier code, a legacy id
@@ -42,7 +42,7 @@ CREATE TABLE IF NOT EXISTS catalogue.channel_capacity (
 );
 
 -- Fixed, free or round-up. Posts to a liability account, not revenue — money collected for a
--- charity is not the venue’s to recognise Hangs off: reaches catalogue.event through its keys;
+-- charity is not the venue’s to recognise Hangs off: reaches catalogue.product through its keys;
 -- references ledger.account, platform.scope. Reached by: 3 operations read it and 2 write it.
 CREATE TABLE IF NOT EXISTS catalogue.donation_campaign (
     id                                uuid PRIMARY KEY,
@@ -101,7 +101,7 @@ CREATE TABLE IF NOT EXISTS catalogue.entitlement_template (
     renewal_variant_id                uuid,
     crosses_cells                     boolean,
     is_active                         boolean,
-    scope_path                        text,
+    scope_path                        ltree,
     admission_profile_id              uuid NOT NULL
 );
 
@@ -112,7 +112,7 @@ CREATE TABLE IF NOT EXISTS catalogue.event (
     code                              text NOT NULL,
     name                              text NOT NULL,
     venue_id                          uuid NOT NULL,
-    scope_path                        text NOT NULL,
+    scope_path                        ltree NOT NULL,
     parent_event_id                   uuid,
     performance_count                 integer,
     is_active                         boolean
@@ -131,7 +131,7 @@ CREATE TABLE IF NOT EXISTS catalogue.event_capacity_profile (
     companion_seats                   integer,
     overbook_percent                  numeric(18,4),
     seat_map_id                       uuid,
-    scope_path                        text,
+    scope_path                        ltree,
     id                                uuid PRIMARY KEY NOT NULL
 );
 
@@ -143,7 +143,7 @@ CREATE TABLE IF NOT EXISTS catalogue.event_registration (
     form_id                           uuid,
     capture_per_attendee              boolean,
     admission_policy                  jsonb,
-    scope_path                        text,
+    scope_path                        ltree,
     id                                uuid PRIMARY KEY NOT NULL
 );
 
@@ -163,7 +163,7 @@ CREATE TABLE IF NOT EXISTS catalogue.event_reschedule (
     affected_orders                   integer,
     affected_guests                   integer,
     approval_request_id               uuid,
-    scope_path                        text
+    scope_path                        ltree
 );
 
 -- Holds 4 columns. No description has been written for this table — the name is the only thing
@@ -171,7 +171,7 @@ CREATE TABLE IF NOT EXISTS catalogue.event_reschedule (
 CREATE TABLE IF NOT EXISTS catalogue.event_resource_plan (
     event_id                          uuid,
     readiness                         text,
-    scope_path                        text,
+    scope_path                        ltree,
     id                                uuid PRIMARY KEY NOT NULL
 );
 
@@ -182,7 +182,7 @@ CREATE TABLE IF NOT EXISTS catalogue.event_schedule (
     duration_is_dynamic               boolean,
     maximum_overrun_minutes           integer,
     cascade_overrun                   boolean,
-    scope_path                        text,
+    scope_path                        ltree,
     id                                uuid PRIMARY KEY NOT NULL
 );
 
@@ -200,12 +200,28 @@ CREATE TABLE IF NOT EXISTS catalogue.event_type (
     requires_accreditation            boolean,
     seating_modes_allowed             text[],
     default_lifecycle                 text[],
-    scope_path                        text
+    scope_path                        ltree
+);
+
+-- What makes a product a school-trip format or a party package: participants, duration, hosts,
+-- free leaders per pupils and how it is paid. The product row still carries the price
+CREATE TABLE IF NOT EXISTS catalogue.group_package (
+    id                                uuid PRIMARY KEY,
+    product_id                        text,
+    kind                              text NOT NULL,
+    max_participants                  integer NOT NULL,
+    duration_minutes                  integer NOT NULL,
+    host_count                        integer,
+    pricing_basis                     text,
+    free_leader_ratio                 integer,
+    payment_mode                      text,
+    includes                          text[],
+    scope_path                        ltree
 );
 
 -- Two-phase catalogue import (BL-057), following seating.ImportJob. A job that parses zero
--- products is not a parsed job. Hangs off: reaches catalogue.event through its keys. Reached by: 2
--- operations read it and 2 write it.
+-- products is not a parsed job. Hangs off: reaches catalogue.product through its keys. Reached by:
+-- 2 operations read it and 2 write it.
 CREATE TABLE IF NOT EXISTS catalogue.import_job (
     id                                uuid PRIMARY KEY NOT NULL,
     status                            text NOT NULL,
@@ -213,7 +229,7 @@ CREATE TABLE IF NOT EXISTS catalogue.import_job (
     parsed_count                      integer NOT NULL,
     create_count                      integer,
     update_count                      integer,
-    scope_path                        text
+    scope_path                        ltree
 );
 
 -- A short-lived claim on contended stock while somebody decides. A seat in a basket is held, not
@@ -300,7 +316,7 @@ CREATE TABLE IF NOT EXISTS catalogue.prepaid_minutes (
     code                              text NOT NULL,
     name                              text,
     minutes                           integer NOT NULL,
-    price                             numeric(18,4),
+    list_price                        numeric(18,4),
     credit_type_id                    uuid,
     rounding_minutes                  integer,
     minimum_draw_minutes              integer,
@@ -308,7 +324,7 @@ CREATE TABLE IF NOT EXISTS catalogue.prepaid_minutes (
     validity_months                   integer,
     transferable_within_household     boolean,
     applicable_space_ids              text[],
-    scope_path                        text
+    scope_path                        ltree
 );
 
 -- What something costs on one price list. A change here never rewrites what somebody already paid
@@ -340,7 +356,7 @@ CREATE TABLE IF NOT EXISTS catalogue.product (
     description                       text,
     kind                              text NOT NULL,
     venue_id                          uuid NOT NULL,
-    scope_path                        text NOT NULL,
+    scope_path                        ltree NOT NULL,
     created_by_principal_id           uuid,
     approved_by_principal_id          uuid,
     responsible_department_id         uuid,
@@ -369,10 +385,30 @@ CREATE TABLE IF NOT EXISTS catalogue.product_category (
     name_localised                    jsonb,
     kind                              text NOT NULL,
     parent_id                         uuid,
-    scope_path                        text,
+    scope_path                        ltree,
     display_order                     integer,
     image_asset_id                    uuid,
     is_active                         boolean
+);
+
+-- Who may take part in a product: age, height, supervision, swim ability. Declared by the guest at
+-- booking, checked by staff at the gate; whether a guest who fails there is refunded is a column,
+-- because the design says they are not
+CREATE TABLE IF NOT EXISTS catalogue.product_eligibility_rule (
+    id                                uuid PRIMARY KEY,
+    product_id                        text,
+    min_age_years                     integer,
+    max_age_years                     integer,
+    min_height_cm                     integer,
+    max_height_cm                     integer,
+    height_bands_cm                   text[],
+    accompanied_below_age             integer,
+    guardian_signature_age_from       integer,
+    guardian_signature_age_to         integer,
+    waiver_required                   boolean,
+    swim_ability                      text,
+    refundable_if_ineligible_at_gate  boolean,
+    scope_path                        ltree
 );
 
 -- Version history for a product (BL-030, BL-047, BL-058). A restore creates a new version rather
@@ -415,7 +451,7 @@ CREATE TABLE IF NOT EXISTS catalogue.session_template (
     turnaround_minutes                integer,
     concurrent_capacity               integer,
     walk_in                           jsonb,
-    scope_path                        text
+    scope_path                        ltree
 );
 
 -- Holds 14 columns. No description has been written for this table — the name is the only thing
@@ -434,7 +470,7 @@ CREATE TABLE IF NOT EXISTS catalogue.space (
     teardown_minutes                  integer,
     access_rules                      jsonb,
     bookable                          boolean,
-    scope_path                        text
+    scope_path                        ltree
 );
 
 -- One sellable configuration of a product — a size, a colour, a tier. Varies along the dimensions
@@ -460,8 +496,9 @@ CREATE TABLE IF NOT EXISTS catalogue.variant_dimension (
 );
 
 -- Who asked to be told when a sold-out session frees up. Not a queue — a queue is people standing
--- at a ride Hangs off: reaches catalogue.event through its keys; references catalogue.performance,
--- catalogue.variant, pii.subject. Reached by: 4 operations read it and 3 write it.
+-- at a ride Hangs off: reaches catalogue.product through its keys; references
+-- catalogue.performance, catalogue.variant, pii.subject. Reached by: 4 operations read it and 3
+-- write it.
 CREATE TABLE IF NOT EXISTS catalogue.waitlist_entry (
     id                                uuid PRIMARY KEY,
     performance_id                    uuid NOT NULL,

@@ -1,5 +1,5 @@
 id: LLD-reporting
-title: reporting — 43 operations
+title: reporting — 44 operations
 generatedBy: tools/derive-diagrams.py
 index: diagrams/hld/03-contracts.yaml
 tier: satellite
@@ -203,6 +203,18 @@ operations:
   - staff
   offline: false
   reads: []
+  writes: []
+- operation: getCommandCentre
+  verb: GET
+  path: /command-centre
+  scope: venue
+  permission: REPORT_VIEW_VENUE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - reporting.dashboard
+  - reporting.dashboard_tile
   writes: []
 - operation: getDashboard
   verb: GET

@@ -7,7 +7,7 @@
  "audience": "staff",
  "formFactor": "web",
  "offlineCapable": false,
- "generated": "2026-09-21",
+ "generated": "2026-09-24",
  "note": "Derived by tools/derive-platform.py. **The gaps section is the point** \u2014 a page listing what exists is a directory; one listing what is missing is a worklist.",
  "counts": {
   "screens": 28,
@@ -15,7 +15,7 @@
   "contracts": 7,
   "modules": 5,
   "undrawn": 0,
-  "operationsWithNoScreen": 93
+  "operationsWithNoScreen": 81
  },
  "waves": {
   "wave2": 2,
@@ -76,7 +76,7 @@
    "operations": 1
   },
   {
-   "contract": "ai",
+   "contract": "queue",
    "operations": 1
   },
   {
@@ -84,7 +84,7 @@
    "operations": 1
   },
   {
-   "contract": "queue",
+   "contract": "ai",
    "operations": 1
   }
  ],
@@ -795,18 +795,6 @@
     "summary": "Amend, pause or resume a schedule"
    },
    {
-    "operation": "createBanner",
-    "contract": "white-label",
-    "verb": "POST",
-    "summary": "Create a banner"
-   },
-   {
-    "operation": "createPromoBlock",
-    "contract": "white-label",
-    "verb": "POST",
-    "summary": "Create a promotional block"
-   },
-   {
     "operation": "deleteBanner",
     "contract": "white-label",
     "verb": "DELETE",
@@ -817,24 +805,6 @@
     "contract": "white-label",
     "verb": "DELETE",
     "summary": "Delete a content page"
-   },
-   {
-    "operation": "deletePromoBlock",
-    "contract": "white-label",
-    "verb": "DELETE",
-    "summary": "Delete a promotional block"
-   },
-   {
-    "operation": "getFeatureToggles",
-    "contract": "white-label",
-    "verb": "GET",
-    "summary": "Read tenant feature toggles"
-   },
-   {
-    "operation": "getModuleEnablement",
-    "contract": "white-label",
-    "verb": "GET",
-    "summary": "Read module enablement"
    },
    {
     "operation": "getNavigation",
@@ -849,58 +819,16 @@
     "summary": "Publish now, or schedule it"
    },
    {
-    "operation": "setFeatureToggles",
-    "contract": "white-label",
-    "verb": "PUT",
-    "summary": "Set feature toggles"
-   },
-   {
-    "operation": "setFooter",
-    "contract": "white-label",
-    "verb": "PUT",
-    "summary": "Footer columns, legal links and social"
-   },
-   {
     "operation": "setHeader",
     "contract": "white-label",
     "verb": "PUT",
     "summary": "Configure the header"
    },
    {
-    "operation": "setMaintenanceMode",
-    "contract": "white-label",
-    "verb": "PUT",
-    "summary": "Enable or clear maintenance mode"
-   },
-   {
-    "operation": "setModuleEnablement",
-    "contract": "white-label",
-    "verb": "PUT",
-    "summary": "Enable or disable modules"
-   },
-   {
     "operation": "setNavigation",
     "contract": "white-label",
     "verb": "PUT",
     "summary": "Set main and overflow navigation"
-   },
-   {
-    "operation": "updateBanner",
-    "contract": "white-label",
-    "verb": "PATCH",
-    "summary": "Amend or activate a banner"
-   },
-   {
-    "operation": "updateContentPage",
-    "contract": "white-label",
-    "verb": "PUT",
-    "summary": "Amend a content page"
-   },
-   {
-    "operation": "updatePromoBlock",
-    "contract": "white-label",
-    "verb": "PATCH",
-    "summary": "Amend a promotional block"
    }
   ],
   "modulesSplitAcrossWaves": [],

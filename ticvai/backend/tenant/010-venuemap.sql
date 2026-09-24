@@ -22,7 +22,7 @@ CREATE TABLE IF NOT EXISTS venuemap.map (
     id                                uuid PRIMARY KEY NOT NULL,
     name                              text NOT NULL,
     venue_id                          uuid NOT NULL,
-    scope_path                        text,
+    scope_path                        ltree,
     kind                              text,
     floor_level                       integer,
     status                            text NOT NULL,

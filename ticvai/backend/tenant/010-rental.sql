@@ -54,7 +54,7 @@ CREATE TABLE IF NOT EXISTS rental.agreement_rules (
     e_signature_required              boolean,
     guardian_signature_for_minor      boolean,
     group_waiver_mode                 text,
-    scope_path                        text,
+    scope_path                        ltree,
     id                                uuid PRIMARY KEY NOT NULL
 );
 
@@ -70,7 +70,7 @@ CREATE TABLE IF NOT EXISTS rental.agreement_signature (
     document_asset_id                 uuid,
     signed_at                         timestamptz,
     ip_address                        text,
-    scope_path                        text
+    scope_path                        ltree
 );
 
 -- Holds 6 columns. No description has been written for this table — the name is the only thing
@@ -80,7 +80,7 @@ CREATE TABLE IF NOT EXISTS rental.availability_rules (
     hold_minutes                      integer,
     release_on_payment_failure        boolean,
     overbook_percent                  numeric(18,4),
-    scope_path                        text,
+    scope_path                        ltree,
     id                                uuid PRIMARY KEY NOT NULL
 );
 
@@ -94,7 +94,7 @@ CREATE TABLE IF NOT EXISTS rental.blackout (
     "to"                              timestamptz NOT NULL,
     reason                            text NOT NULL,
     capacity_percent                  integer,
-    scope_path                        text
+    scope_path                        ltree
 );
 
 -- Holds 17 columns. No description has been written for this table — the name is the only thing
@@ -116,7 +116,7 @@ CREATE TABLE IF NOT EXISTS rental.booking (
     returned_at                       timestamptz,
     deposit_authorisation_id          uuid,
     accrued_late_fee                  numeric(18,4),
-    scope_path                        text
+    scope_path                        ltree
 );
 
 -- Holds 10 columns. No description has been written for this table — the name is the only thing
@@ -131,7 +131,7 @@ CREATE TABLE IF NOT EXISTS rental.damage_assessment (
     approved_by                       uuid,
     customer_acknowledgement          text,
     work_order_id                     uuid,
-    scope_path                        text
+    scope_path                        ltree
 );
 
 -- Holds 17 columns. No description has been written for this table — the name is the only thing
@@ -153,7 +153,7 @@ CREATE TABLE IF NOT EXISTS rental.deposit_policy (
     partial_capture_permitted         boolean,
     supervisor_approval_threshold     numeric(18,4),
     waiver_eligible                   boolean,
-    scope_path                        text
+    scope_path                        ltree
 );
 
 -- Holds 11 columns. No description has been written for this table — the name is the only thing
@@ -168,7 +168,7 @@ CREATE TABLE IF NOT EXISTS rental.duration_rules (
     maximum_extension_minutes         integer,
     same_day_return_required          boolean,
     overnight_allowed                 boolean,
-    scope_path                        text,
+    scope_path                        ltree,
     id                                uuid PRIMARY KEY NOT NULL
 );
 
@@ -182,7 +182,7 @@ CREATE TABLE IF NOT EXISTS rental.equipment_assignment (
     assigned_manually                 boolean,
     assigned_at                       timestamptz,
     returned_at                       timestamptz,
-    scope_path                        text
+    scope_path                        ltree
 );
 
 -- Holds 10 columns. No description has been written for this table — the name is the only thing
@@ -197,7 +197,11 @@ CREATE TABLE IF NOT EXISTS rental.fee_policy (
     extension_price_per_increment     numeric(18,4),
     extension_increment_minutes       integer,
     not_returned_after_hours          integer,
-    scope_path                        text
+    damage_fee_maximum                numeric(18,4),
+    damage_fee_approval_above         numeric(18,4),
+    missing_item_fee_basis            text,
+    missing_item_fee_amount           numeric(18,4),
+    scope_path                        ltree
 );
 
 -- Holds 12 columns. No description has been written for this table — the name is the only thing
@@ -214,7 +218,7 @@ CREATE TABLE IF NOT EXISTS rental.incident (
     photo_asset_ids                   text[],
     work_order_id                     uuid,
     authority_notified                boolean,
-    scope_path                        text
+    scope_path                        ltree
 );
 
 -- Holds 9 columns. No description has been written for this table — the name is the only thing
@@ -228,7 +232,7 @@ CREATE TABLE IF NOT EXISTS rental.inspection (
     photo_asset_ids                   text[],
     inspected_by                      uuid,
     inspected_at                      timestamptz,
-    scope_path                        text
+    scope_path                        ltree
 );
 
 -- Holds 9 columns. No description has been written for this table — the name is the only thing
@@ -256,7 +260,7 @@ CREATE TABLE IF NOT EXISTS rental.inventory_model (
     allow_manual_assignment           boolean,
     allow_substitution                boolean,
     allow_equipment_swap              boolean,
-    scope_path                        text,
+    scope_path                        ltree,
     id                                uuid PRIMARY KEY NOT NULL
 );
 
@@ -271,7 +275,7 @@ CREATE TABLE IF NOT EXISTS rental.location_rule (
     inventory_allocation              integer,
     inventory_buffer                  integer,
     operating_hours                   jsonb,
-    scope_path                        text,
+    scope_path                        ltree,
     id                                uuid PRIMARY KEY NOT NULL
 );
 
@@ -296,7 +300,7 @@ CREATE TABLE IF NOT EXISTS rental.operational_rules (
     return_location_restricted        boolean,
     partial_return_allowed            boolean,
     staff_approval_required           boolean,
-    scope_path                        text,
+    scope_path                        ltree,
     id                                uuid PRIMARY KEY NOT NULL
 );
 
@@ -313,7 +317,7 @@ CREATE TABLE IF NOT EXISTS rental.override (
     approved_by                       uuid,
     approval_request_id               uuid,
     at                                timestamptz,
-    scope_path                        text
+    scope_path                        ltree
 );
 
 -- Holds 9 columns. No description has been written for this table — the name is the only thing
@@ -354,7 +358,7 @@ CREATE TABLE IF NOT EXISTS rental.pricing_profile (
     effective_from                    date,
     effective_to                      date,
     status                            text,
-    scope_path                        text
+    scope_path                        ltree
 );
 
 -- Holds 18 columns. No description has been written for this table — the name is the only thing
@@ -370,7 +374,7 @@ CREATE TABLE IF NOT EXISTS rental.product (
     tags                              text[],
     tenant_id                         uuid,
     venue_id                          uuid NOT NULL,
-    scope_path                        text,
+    scope_path                        ltree,
     tracking_model                    text,
     catalogue_product_id              uuid,
     resource_type_id                  uuid,
@@ -391,12 +395,12 @@ CREATE TABLE IF NOT EXISTS rental.settlement (
     late_fee                          numeric(18,4),
     damage_fee                        numeric(18,4),
     missing_item_fee                  numeric(18,4),
-    total_charged                     numeric(18,4),
+    gross_charged_amount              numeric(18,4),
     deposit_captured                  numeric(18,4),
     deposit_released                  numeric(18,4),
     balance_due                       numeric(18,4),
     outcome                           text,
-    scope_path                        text,
+    scope_path                        ltree,
     id                                uuid PRIMARY KEY NOT NULL
 );
 

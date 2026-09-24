@@ -1,4 +1,4 @@
--- fnb — 36 tables
+-- fnb — 41 tables
 -- **Derived. Do not hand-edit.**
 
 -- How one table’s bill was divided. A party of six paying separately is the ordinary case
@@ -29,7 +29,7 @@ CREATE TABLE IF NOT EXISTS fnb.combo (
     outlet_id                         uuid,
     name                              text NOT NULL,
     name_localised                    jsonb,
-    price                             numeric(18,4) NOT NULL,
+    list_price                        numeric(18,4) NOT NULL,
     availability                      jsonb,
     is_active                         boolean
 );
@@ -59,7 +59,7 @@ CREATE TABLE IF NOT EXISTS fnb.corrective_action (
     signed_by_principal_id            uuid,
     signed_at                         timestamptz,
     escalated_to_principal_id         uuid,
-    scope_path                        text
+    scope_path                        ltree
 );
 
 -- Where food goes that is not a table — a lounger, a cabana, a suite, a stand. Served by outlets
@@ -84,6 +84,27 @@ CREATE TABLE IF NOT EXISTS fnb.delivery_location_outlet (
     id                                uuid PRIMARY KEY NOT NULL,
     location_id                       uuid,
     outlet_id                         uuid
+);
+
+-- An outlet's takeaway and delivery rules: minimum order, fee, free-above threshold, radius, slot
+-- length. Enforced at order time rather than only shown, which is what the design did
+CREATE TABLE IF NOT EXISTS fnb.delivery_policy (
+    id                                uuid PRIMARY KEY,
+    outlet_id                         uuid NOT NULL,
+    collection_enabled                boolean,
+    delivery_enabled                  boolean,
+    collection_point                  text,
+    collection_hold_minutes           integer,
+    asap_collection_minutes           integer,
+    asap_delivery_minutes             integer,
+    slot_minutes                      integer,
+    minimum_order                     numeric(18,4),
+    delivery_fee                      numeric(18,4),
+    free_delivery_above               numeric(18,4),
+    radius_km                         numeric(18,4),
+    emirates_served                   text[],
+    cutlery_opt_in                    boolean,
+    scope_path                        ltree
 );
 
 -- A physical table with a capacity and a position. What may combine with what is declared rather
@@ -206,7 +227,7 @@ CREATE TABLE IF NOT EXISTS fnb.menu_item (
     product_variant_id                uuid NOT NULL,
     name                              text NOT NULL,
     description                       text,
-    price                             numeric(18,4) NOT NULL,
+    list_price                        numeric(18,4) NOT NULL,
     sort_order                        integer,
     modifier_group_ids                text[],
     station_id                        uuid,
@@ -245,7 +266,7 @@ CREATE TABLE IF NOT EXISTS fnb.modifier_group (
     name                              text NOT NULL,
     min_selections                    integer NOT NULL,
     max_selections                    integer NOT NULL,
-    scope_path                        text
+    scope_path                        ltree
 );
 
 -- One choice within a group, with its own price delta
@@ -258,11 +279,25 @@ CREATE TABLE IF NOT EXISTS fnb.modifier_option (
     is_available                      boolean
 );
 
+-- How a guest's order leaves the kitchen: collected at a time, delivered to an address in a
+-- window, or taken to a place in the venue. The address is here and nowhere else
+CREATE TABLE IF NOT EXISTS fnb.order_fulfilment (
+    id                                uuid PRIMARY KEY,
+    mode                              text NOT NULL,
+    collection_at                     timestamptz,
+    window_start                      timestamptz,
+    window_end                        timestamptz,
+    delivery_address                  jsonb,
+    delivery_fee                      numeric(18,4),
+    cutlery                           boolean,
+    scope_path                        ltree
+);
+
 -- Holds 17 columns. No description has been written for this table — the name is the only thing
 -- saying what it is
 CREATE TABLE IF NOT EXISTS fnb.product_recommendation (
     id                                uuid PRIMARY KEY,
-    scope_path                        text,
+    scope_path                        ltree,
     source_product_id                 uuid NOT NULL,
     source_variant_id                 uuid,
     type                              text NOT NULL,
@@ -324,6 +359,21 @@ CREATE TABLE IF NOT EXISTS fnb.recipe_ingredient (
     id                                uuid PRIMARY KEY NOT NULL
 );
 
+-- How long a table is held, by party size, and what sits between seatings.
+-- fnb.table_reservation.duration_minutes was set per booking with no default behind it, and a turn
+-- time is the single most tuned number in a restaurant — a two-top and a table of eight do not
+-- turn at the same speed. The booking keeps its own duration as the snapshot, so a turn time
+-- revised in March cannot shorten a reservation
+CREATE TABLE IF NOT EXISTS fnb.reservation_policy (
+    id                                uuid PRIMARY KEY,
+    outlet_id                         uuid,
+    default_turn_minutes              integer NOT NULL,
+    seating_buffer_minutes            integer,
+    maximum_duration_minutes          integer,
+    is_active                         boolean NOT NULL,
+    scope_path                        ltree
+);
+
 -- Holds 4 columns. No description has been written for this table — the name is the only thing
 -- saying what it is
 CREATE TABLE IF NOT EXISTS fnb.reservation_table (
@@ -331,6 +381,29 @@ CREATE TABLE IF NOT EXISTS fnb.reservation_table (
     table_id                          uuid NOT NULL,
     created_at                        timestamptz NOT NULL,
     id                                uuid PRIMARY KEY NOT NULL
+);
+
+-- What the service charge on a bill is, and on what. fnb.sub_bill.service_charge was stored with
+-- nothing anywhere holding the rate, and F29 recomputes it per bill on a split — so a number was
+-- applied twice over a visit from a value that existed only in somebody's head. is_discretionary
+-- is the field a regulator reads first: a charge a guest cannot decline is a price, and a price
+-- belongs in the displa
+CREATE TABLE IF NOT EXISTS fnb.service_charge_policy (
+    id                                uuid PRIMARY KEY,
+    basis                             text NOT NULL,
+    rate_percent                      numeric(18,4),
+    amount                            numeric(18,4),
+    minimum_party_size                integer,
+    service_types                     text[],
+    is_taxable                        boolean NOT NULL,
+    included_in_display_price         boolean,
+    shown_separately                  boolean,
+    is_discretionary                  boolean NOT NULL,
+    distribution                      text NOT NULL,
+    staff_pool_percent                numeric(18,4),
+    effective_from                    timestamptz,
+    effective_to                      timestamptz,
+    scope_path                        ltree
 );
 
 -- Food and drink ordered, wherever from — a counter, a table, a lounger, the app. The kitchen
@@ -392,10 +465,10 @@ CREATE TABLE IF NOT EXISTS fnb.sub_bill (
     visit_id                          uuid NOT NULL,
     label                             text,
     line_ids                          text[],
-    subtotal                          numeric(18,4),
+    net_amount                        numeric(18,4),
     tax_amount                        numeric(18,4),
     service_charge                    numeric(18,4),
-    total                             numeric(18,4) NOT NULL,
+    gross_amount                      numeric(18,4) NOT NULL,
     status                            text
 );
 
@@ -466,6 +539,24 @@ CREATE TABLE IF NOT EXISTS fnb.table_visit (
     running_total                     numeric(18,4),
     opened_at                         timestamptz NOT NULL,
     closed_at                         timestamptz
+);
+
+-- A unit that gets read, and the range it must hold. fnb.temperature_log.check_point_id was NOT
+-- NULL and referenced no table in the package — every HACCP reading was obliged to name a
+-- definition nothing modelled, and the safe range was written onto each reading with no source.
+-- TemperatureLog calls HACCP records a UAE regulatory obligation that is inspected, and an
+-- inspector asking what range a freez
+CREATE TABLE IF NOT EXISTS fnb.temperature_checkpoint (
+    id                                uuid PRIMARY KEY NOT NULL,
+    outlet_id                         uuid,
+    kind                              text NOT NULL,
+    label                             text NOT NULL,
+    min_celsius                       numeric(18,4),
+    max_celsius                       numeric(18,4),
+    check_frequency_minutes           integer,
+    requires_corrective_action_on_breachboolean,
+    is_active                         boolean NOT NULL,
+    scope_path                        ltree
 );
 
 -- HACCP temperature checks (client board 5J, 20 August). A regulatory obligation nothing in the

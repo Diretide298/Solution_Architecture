@@ -79,6 +79,11 @@ IS_CONFIG = re.compile(
     # is configuration.
     r"JobTitle|ShiftPattern|Tier|Badge|Reward|PlanBenefit|MembershipBenefit|Substitute|"
     r"IntegrationSource|FieldOwnership|ExtraField|ExtraValue|LoyaltyCampaign|"
+    # **Widened 22 September** for `setTemperatureCheckpoint`. A checkpoint is the same shape as
+    # `JobTitle` and `ShiftPattern` above it: a thing defined once that other rows resolve
+    # against. `fnb.temperature_log` is the record written against it, and only the first is
+    # configuration. The tag announced itself here exactly as the skip branch intends.
+    r"Checkpoint|"
     # **Widened 19 September** for ten operations that carried a scope the rules could not
     # see. A *Type* is the clearest case: a credit type, a wallet type, an attraction type
     # and an event type are each a thing a venue defines once and everything else resolves

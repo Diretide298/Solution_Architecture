@@ -1,6 +1,6 @@
 {
  "generatedBy": "tools/derive-design-manifest.py",
- "generated": "2026-09-21",
+ "generated": "2026-09-24",
  "note": "The Claude Design work list. Status is read off wireframes/frames/ every run and never stored, so a batch cannot claim to be finished and not be. Batches with thin screens sort last: a screen with fewer than 4 components cannot be drawn from what it declares, and drawing it invents requirements.",
  "batchSize": 10,
  "drawableAt": 4,
@@ -23,7 +23,7 @@
    "drawn": 46,
    "locked": 30
   },
-  "fullyDrawableBatches": 48
+  "fullyDrawableBatches": 47
  },
  "batches": [
   {
@@ -664,28 +664,6 @@
    "status": "pending"
   },
   {
-   "id": "P13-white-label-01",
-   "kind": "module",
-   "label": "P13 · White Label (1 of 2)",
-   "platform": "P13",
-   "screens": [
-    "CMS-001",
-    "CMS-002",
-    "CMS-003",
-    "CMS-004",
-    "CMS-005",
-    "CMS-006",
-    "CMS-007",
-    "CMS-008",
-    "CMS-009",
-    "CMS-010"
-   ],
-   "drawable": 10,
-   "thin": 0,
-   "frames": 0,
-   "status": "pending"
-  },
-  {
    "id": "P14-developer-api-01",
    "kind": "module",
    "label": "P14 · Developer & API",
@@ -1024,6 +1002,28 @@
     "SUP-003"
    ],
    "drawable": 1,
+   "thin": 1,
+   "frames": 0,
+   "status": "pending"
+  },
+  {
+   "id": "P13-white-label-01",
+   "kind": "module",
+   "label": "P13 · White Label (1 of 2)",
+   "platform": "P13",
+   "screens": [
+    "CMS-001",
+    "CMS-002",
+    "CMS-003",
+    "CMS-004",
+    "CMS-005",
+    "CMS-006",
+    "CMS-007",
+    "CMS-008",
+    "CMS-009",
+    "CMS-010"
+   ],
+   "drawable": 9,
    "thin": 1,
    "frames": 0,
    "status": "pending"

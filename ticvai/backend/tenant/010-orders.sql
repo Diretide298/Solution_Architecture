@@ -1,4 +1,4 @@
--- orders — 32 tables
+-- orders — 35 tables
 -- **Derived. Do not hand-edit.**
 
 -- A partner’s credit line, drawn against and settled periodically
@@ -14,12 +14,13 @@ CREATE TABLE IF NOT EXISTS orders.b2b_credit (
     payment_terms_days                integer,
     oldest_unpaid_invoice_at          timestamptz,
     days_overdue                      integer,
-    scope_path                        text
+    scope_path                        ltree
 );
 
 -- A cart holds leases; an order holds money. Retained after expiry so a recovery link lands on
 -- something Hangs off: reaches orders.sales_order through its keys; references pii.subject,
--- platform.scope. Reached by: 13 operations read it and 6 write it; 2 tables reference it.
+-- platform.scope. Reached by: 15 operations read it and 7 write it; 3 tables reference it; written
+-- by 2 contracts — marketing-crm, orders.
 CREATE TABLE IF NOT EXISTS orders.cart (
     id                                uuid PRIMARY KEY NOT NULL,
     token                             text,
@@ -27,10 +28,10 @@ CREATE TABLE IF NOT EXISTS orders.cart (
     channel                           text NOT NULL,
     subject_id                        uuid,
     status                            text NOT NULL,
-    subtotal                          numeric(18,4),
+    net_amount                        numeric(18,4),
     discount_total                    numeric(18,4),
     tax_total                         numeric(18,4),
-    total                             numeric(18,4),
+    gross_amount                      numeric(18,4),
     applied_promotion_ids             text[],
     expires_at                        timestamptz,
     extensions_used                   integer,
@@ -166,6 +167,21 @@ CREATE TABLE IF NOT EXISTS orders.deposit_box (
     closed_at                         timestamptz
 );
 
+-- What a deposit booking takes now and when the balance is due, with the refund cut-off. Parties
+-- and some dining bookings; nothing said how much or when before this
+CREATE TABLE IF NOT EXISTS orders.deposit_policy (
+    id                                uuid PRIMARY KEY,
+    applies_to                        text[],
+    basis                             text NOT NULL,
+    amount                            numeric(18,4),
+    percent                           numeric(18,4),
+    band_size                         numeric(18,4),
+    balance_due                       text,
+    balance_due_days_before           integer,
+    refundable_until_hours            integer,
+    scope_path                        ltree
+);
+
 -- Holds 9 columns. No description has been written for this table — the name is the only thing
 -- saying what it is
 CREATE TABLE IF NOT EXISTS orders.discount (
@@ -189,13 +205,23 @@ CREATE TABLE IF NOT EXISTS orders.fraud_rule (
     action                            text NOT NULL,
     risk_weight                       integer,
     is_active                         boolean NOT NULL,
-    scope_path                        text
+    scope_path                        ltree
 );
 
 -- A group with a leader and an attendee manifest (BL-028). A school booking forty places has one
 -- person who pays and forty who need names collecting, and a generic order has one guest
 CREATE TABLE IF NOT EXISTS orders.group_booking (
     id                                uuid PRIMARY KEY NOT NULL,
+    kind                              text,
+    package_product_id                text,
+    year_group                        text,
+    access_and_dietary_needs          text,
+    celebrant_name                    text,
+    celebrant_turning_age             integer,
+    allergies_and_requests            text,
+    final_headcount_due_by            timestamptz,
+    quote_sent_at                     timestamptz,
+    risk_assessment_sent_at           timestamptz,
     order_id                          text NOT NULL,
     leader_subject_id                 uuid NOT NULL,
     organisation_name                 text,
@@ -349,7 +375,7 @@ CREATE TABLE IF NOT EXISTS orders.payment_link (
     paid_at                           timestamptz,
     resend_count                      integer,
     issued_by_principal_id            uuid,
-    scope_path                        text
+    scope_path                        ltree
 );
 
 -- tips post to a liability, not to sales Hangs off: a child of orders.payment; reaches
@@ -365,7 +391,7 @@ CREATE TABLE IF NOT EXISTS orders.pos_shift (
     id                                text PRIMARY KEY NOT NULL,
     workstation_id                    uuid NOT NULL,
     venue_id                          uuid NOT NULL,
-    scope_path                        text NOT NULL,
+    scope_path                        ltree NOT NULL,
     principal_id                      uuid NOT NULL,
     principal_display_name            text,
     status                            text NOT NULL,
@@ -416,6 +442,26 @@ CREATE TABLE IF NOT EXISTS orders.refund_policy (
     variance_threshold                numeric(18,4)
 );
 
+-- What a resale costs and how high it may be priced. orders.resale_listing stored
+-- seller_fee_percent, buyer_fee_percent and price_cap_percent on every listing with nothing
+-- producing them, so two listings a minute apart could carry different commercials and record no
+-- reason. The listing keeps its columns as the snapshot — the same rule-and-record split
+-- payments.fee_rule and orders.order_fee already u
+CREATE TABLE IF NOT EXISTS orders.resale_fee_policy (
+    id                                uuid PRIMARY KEY,
+    event_id                          uuid,
+    product_id                        uuid,
+    seller_fee_percent                numeric(18,4) NOT NULL,
+    buyer_fee_percent                 numeric(18,4) NOT NULL,
+    price_cap_percent                 numeric(18,4),
+    minimum_ask_price                 numeric(18,4),
+    fees_shown_to_seller              boolean,
+    effective_from                    timestamptz,
+    effective_to                      timestamptz,
+    is_active                         boolean NOT NULL,
+    scope_path                        ltree
+);
+
 -- An entitlement listed for resale (BL-060). A resale is a transfer with money attached and the
 -- venue stays in the middle — the seller entitlement is voided and a new one issued, so the ticket
 -- that admits is always one the venue issued
@@ -431,7 +477,7 @@ CREATE TABLE IF NOT EXISTS orders.resale_listing (
     listed_at                         timestamptz,
     sold_to_subject_id                uuid,
     payout_status                     text,
-    scope_path                        text
+    scope_path                        ltree
 );
 
 -- A held place that is not yet a sale — a table, a cabana, a slot
@@ -451,7 +497,7 @@ CREATE TABLE IF NOT EXISTS orders.sales_order (
     order_number                      text,
     channel                           text NOT NULL,
     venue_id                          uuid NOT NULL,
-    scope_path                        text NOT NULL,
+    scope_path                        ltree NOT NULL,
     status                            text NOT NULL,
     gross_amount                      numeric(18,4) NOT NULL,
     tax_amount                        numeric(18,4) NOT NULL,
@@ -480,12 +526,12 @@ CREATE TABLE IF NOT EXISTS orders.stored_value_authorisation (
     captured_amount                   numeric(18,4),
     expires_at                        timestamptz,
     reference                         text,
-    scope_path                        text
+    scope_path                        ltree
 );
 
 -- Ticket artwork and media selection (BL-102). A venue changing its artwork had no path that was
--- not a code change. Hangs off: reaches orders.sales_order through its keys. Reached by: 2
--- operations read it and 0 write it.
+-- not a code change. Hangs off: reaches orders.sales_order through its keys. Reached by: 5
+-- operations read it and 2 write it.
 CREATE TABLE IF NOT EXISTS orders.ticket_template (
     id                                uuid PRIMARY KEY NOT NULL,
     name                              text NOT NULL,
@@ -534,6 +580,20 @@ CREATE TABLE IF NOT EXISTS orders.upgrade (
     cancelled_at                      timestamptz
 );
 
+-- One reminder per booking, set by the guest. GST-018 Add to Calendar / Reminders had nothing
+-- behind its reminders half. A row says how long before each session to remind and on which
+-- channels; the sender skips any channel the guest has since withdrawn consent for, because a
+-- reminder is not a reason to message somebody who said no
+CREATE TABLE IF NOT EXISTS orders.visit_reminder (
+    id                                uuid PRIMARY KEY,
+    order_id                          text,
+    subject_id                        uuid,
+    enabled                           boolean NOT NULL,
+    lead_time_minutes                 integer,
+    channels                          text[],
+    scope_path                        ltree
+);
+
 -- An Apple or Google wallet pass (BL-029). A live object, not a download — a pass that cannot be
 -- pushed to is a screenshot with better rounding
 CREATE TABLE IF NOT EXISTS orders.wallet_pass (
@@ -545,6 +605,6 @@ CREATE TABLE IF NOT EXISTS orders.wallet_pass (
     status                            text NOT NULL,
     last_pushed_at                    timestamptz,
     device_registrations              integer,
-    scope_path                        text
+    scope_path                        ltree
 );
 

@@ -5,16 +5,16 @@
 | | |
 |---|---|
 | Screens | 100 |
-| Operations | 140 |
-| Contracts | 8 |
+| Operations | 123 |
+| Contracts | 7 |
 | Modules | 3 |
 | Undrawn | 0 |
-| Operations with no screen | 127 |
+| Operations with no screen | 100 |
 | Waves | wave2 20 · wave3 80 |
 
 ## Gaps
 
-### 127 operations with no screen here
+### 100 operations with no screen here
 
 **In a contract this platform uses, callable by its audience, and reaching no screen on any platform serving that audience.** Either a screen is missing or the endpoint should not exist — and the second is worth considering first.
 
@@ -26,17 +26,23 @@
 | `createModifierGroup` | fnb | POST | Create a modifier group |
 | `createTable` | fnb | POST | A table as a thing, not an inference |
 | `escalateCorrectiveAction` | fnb | POST | Escalate a finding |
+| `getFnbReservationPolicy` | fnb | GET | How long a table is held, by party size |
+| `getFnbServiceChargePolicy` | fnb | GET | The service charge a venue applies, and on what |
 | `listFnbRecommendations` | fnb | GET | Upsell and pairing suggestions for F&B |
 | `listIngredientSubstitutes` | fnb | GET | Approved substitutions for a recipe's ingredients |
+| `listTemperatureCheckpoints` | fnb | GET | The units that get read, and the range each must hold |
 | `rebalanceStationLoad` | fnb | POST | Move work between stations mid-service |
 | `recordCorrectiveAction` | fnb | POST | Record what was done about a finding |
 | `resolveBookingConflict` | fnb | GET | Two bookings, one table — and what to do about it |
 | `sendBookingConfirmation` | fnb | POST | Confirm a booking, and ask them to confirm back |
 | `sendOrderNotification` | fnb | POST | Tell the guest where their order is |
 | `setComboSlots` | fnb | PUT | What the guest chooses, and what it costs extra |
+| `setFnbReservationPolicy` | fnb | PUT | Set turn times and seating buffers |
+| `setFnbServiceChargePolicy` | fnb | PUT | Set the service charge |
 | `setIngredientSubstitutes` | fnb | PUT | Define approved substitutions |
 | `setKitchenSla` | fnb | PUT | How long a ticket may sit before it is late |
 | `setSectionLayout` | fnb | PUT | Divide the floor into sections and give each a server |
+| `setTemperatureCheckpoint` | fnb | PUT | Define a checkpoint and its safe range |
 | `updateTable` | fnb | PUT | Change what a table is |
 | `createEmergencyAccessOverride` | identity | POST | Bypass the policy, loudly |
 | `evaluateAccess` | identity | POST | Decide, now, and say why |
@@ -54,13 +60,7 @@
 | `listPermissions` | identity | GET | Every permission key the contracts enforce |
 | `listSegregationRules` | identity | GET | Read the conflicting-permission rules back |
 | `listSegregationViolations` | identity | GET | Who already holds a conflicting pair |
-| `recordBenefitUsage` | identity | POST | Consume a benefit |
-| `setAccessPolicyState` | identity | POST | Submit, approve, activate or retire a policy |
-| `setCapabilityTemplate` | identity | PUT | Save a tick-set under a name |
-| `setPrincipalModuleAccess` | identity | PUT | Tick what they may do |
-| `updateAccessPolicy` | identity | PUT | Change a policy, as a new version |
-| `addGuestNote` | marketing-crm | POST | What the floor needs to know about this table |
-| … | | | 87 more |
+| … | | | 60 more |
 
 ## Modules
 
@@ -74,14 +74,14 @@
 
 | | Name | Module | Wave | Ops | Drawn |
 |---|---|---|---|---|---|
-| `CMS-001` | Tenant Workspace | White Label | 2 | 21 | yes |
+| `CMS-001` | Tenant Workspace | White Label | 2 | 7 | yes |
 | `CMS-002` | Brand Kit | White Label | 2 | 4 | yes |
 | `CMS-003` | Typography | White Label | 2 | 4 | yes |
-| `CMS-004` | Logo & Assets | White Label | 2 | 7 | yes |
+| `CMS-004` | Logo & Assets | White Label | 2 | 4 | yes |
 | `CMS-005` | Theme Editor | White Label | 2 | 2 | yes |
 | `CMS-006` | Component Preview | White Label | 2 | 5 | yes |
-| `CMS-007` | Page Builder | White Label | 2 | 2 | yes |
-| `CMS-008` | Content Blocks | White Label | 2 | 2 | yes |
+| `CMS-007` | Page Builder | White Label | 2 | 6 | yes |
+| `CMS-008` | Content Blocks | White Label | 2 | 7 | yes |
 | `CMS-009` | Navigation & Menus | White Label | 2 | 5 | yes |
 | `CMS-010` | Media Library | White Label | 2 | 12 | yes |
 | `CMS-011` | Translations | White Label | 2 | 1 | yes |
@@ -89,9 +89,9 @@
 | `CMS-013` | SEO & Metadata | White Label | 2 | 1 | yes |
 | `CMS-014` | Publishing Workflow | White Label | 2 | 3 | yes |
 | `CMS-015` | Version History | White Label | 2 | 3 | yes |
-| `CMS-016` | Site Settings | White Label | 2 | 1 | yes |
+| `CMS-016` | Site Settings | White Label | 2 | 3 | yes |
 | `CMS-017` | Domain & Certificate | White Label | 2 | 4 | yes |
-| `CMS-018` | Consent & Legal | White Label | 2 | 11 | yes |
+| `CMS-018` | Consent & Legal | White Label | 2 | 4 | yes |
 | `CMS-019` | User Access | White Label | 2 | 2 | yes |
 | `CMS-020` | Change Log | White Label | 2 | 1 | yes |
 | `CMS-021` | Privacy & Consent Configuration Command Center | Policy | 3 | 2 | yes |

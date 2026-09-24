@@ -41,19 +41,19 @@ modulesUsed:
   screens: 1
 servicesCalled:
 - service: OrderService
-  operationCalls: 52
+  operationCalls: 60
 - service: CatalogueService
-  operationCalls: 47
+  operationCalls: 51
 - service: MarketingService
-  operationCalls: 36
+  operationCalls: 38
 - service: IdentityService
   operationCalls: 24
 - service: FnbService
-  operationCalls: 22
+  operationCalls: 24
 - service: VenueOpsService
   operationCalls: 21
 - service: AccessService
-  operationCalls: 17
+  operationCalls: 20
 - service: AiService
   operationCalls: 10
 - service: WhiteLabelService
@@ -162,6 +162,7 @@ screens:
   operations:
   - getAvailability
   - getProduct
+  - getProductEligibilityRule
   - getWaitTimes
   - listPerformances
   states:
@@ -243,6 +244,7 @@ screens:
   wave: 1
   density: comfortable
   operations:
+  - checkBookingEligibility
   - getAvailability
   - listPerformances
   states:
@@ -294,9 +296,11 @@ screens:
   density: comfortable
   operations:
   - acquireInventoryHold
+  - checkGuestCheckoutMatch
   - checkoutCart
   - createOrder
   - createPayment
+  - decideGuestCheckoutMatch
   - getCart
   - getPaymentLink
   - inquirePaymentStatus
@@ -478,11 +482,15 @@ screens:
   wave: 2
   density: comfortable
   operations:
+  - getBillingStatement
   - getMyMemberships
   - grantDelegation
+  - listBillingStatements
   - listDelegations
   - listGuestMemberships
+  - listMyPaymentIssues
   - listProducts
+  - retryMyDunningPayment
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -494,6 +502,8 @@ screens:
   entryParams:
   - guestLinkId<-deepLink
   - subjectId<-GST-001
+  - caseId<-navigation
+  - statementId<-navigation
   goesTo:
   - GST-001
   - GST-002
@@ -566,8 +576,11 @@ screens:
   density: comfortable
   operations:
   - getOrder
+  - getOrderCalendarEvent
+  - getVisitReminder
   - issueWalletPass
   - listOrders
+  - setVisitReminder
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -744,10 +757,12 @@ screens:
   - claimLocationSession
   - claimTableSession
   - createGuestFnbOrder
+  - getFnbDeliveryPolicy
   - getGuestMenu
   - getGuestOrderStatus
   - listDeliveryLocations
   - listDiningOutlets
+  - listFulfilmentSlots
   - listModifierGroups
   states:
   - emptyFirstRun
@@ -1637,6 +1652,9 @@ screens:
   wave: 1
   density: comfortable
   operations:
+  - getEntitlement
+  - getEntitlementCredential
+  - listMyEntitlements
   - transferOrderTickets
   states:
   - emptyFirstRun
@@ -1647,6 +1665,7 @@ screens:
   offlineState: true
   entryParams:
   - orderId<-deepLink
+  - entitlementId<-navigation
   goesTo:
   - GST-001
   - GST-002
@@ -2031,7 +2050,10 @@ screens:
   operations:
   - createReferral
   - getGroupBooking
+  - getGroupPackageDefinition
   - getMyChallenges
+  - listGroupPackages
+  - requestGroupBooking
   - respondToInvitation
   - shareEntitlement
   states:
@@ -2047,6 +2069,7 @@ screens:
   - groupBookingId<-deepLink
   - subjectId<-session
   - token<-deepLink
+  - productId<-navigation
   goesTo:
   - GST-039
   boardFrames: null

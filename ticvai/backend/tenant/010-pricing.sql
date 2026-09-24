@@ -34,7 +34,7 @@ CREATE TABLE IF NOT EXISTS pricing.dynamic_price_rule (
     name                              text NOT NULL,
     product_id                        uuid,
     price_list_id                     uuid,
-    scope_path                        text,
+    scope_path                        ltree,
     channel_id                        uuid,
     priority                          integer NOT NULL,
     valid_from                        timestamptz,

@@ -52,7 +52,7 @@ CREATE TABLE IF NOT EXISTS maintenance.asset_category (
     default_waiver_required           boolean,
     default_deposit_policy_id         uuid,
     overridable_fields                text[],
-    scope_path                        text,
+    scope_path                        ltree,
     is_active                         boolean
 );
 
@@ -204,7 +204,7 @@ CREATE TABLE IF NOT EXISTS maintenance.work_order (
     attachment_refs                   text[],
     labour_cost                       numeric(18,4),
     parts_cost                        numeric(18,4),
-    total_cost                        numeric(18,4),
+    net_cost_amount                   numeric(18,4),
     verified_by_principal_id          uuid
 );
 

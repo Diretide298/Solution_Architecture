@@ -224,8 +224,46 @@ CONFLICTS = [
 ]
 
 
+# **Which questions the first release waits on.** The questions cover every platform, and the first
+# release (POS, Guest App web and mobile, White Labelling) needs only some of them answered. Pack
+# questions are counted from the delivery slice; these are judged from what each conflict touches.
+FIRST_RELEASE = {
+    "CF-35": "Yes: Face Pass enrolment is on the guest mobile app",
+    "CF-127": "Yes: the guest web storefront",
+    "CF-133": "Yes: POS receipts and refunds",
+    "CF-140": "Yes: the order everything is built in",
+    "CF-162": "Later",
+    "CF-165": "Yes: guest profiles and account deletion on the guest apps",
+    "CF-169": "Later: back-office dashboards",
+    "CF-170": "Later: none of the five screens is in the first release",
+    "SC-1": "Later", "SC-2": "Later", "SC-3": "Later", "SC-4": "Later",
+    "SC-5": "Yes: every table", "SC-6": "Yes: every table",
+}
+RELEASE = "First release (POS, Guest App, White Labelling)"
+
+
+def read_slice():
+    """The first-release operations, from handoff/delivery-slice.json. Empty if it is not there."""
+    import json
+    path = os.path.join(ROOT, "handoff", "delivery-slice.json")
+    if not os.path.exists(path):
+        return set()
+    return set(json.load(io.open(path, encoding="utf-8"))["operations"])
+
+
+def count_operations():
+    n = 0
+    for f in glob.glob(os.path.join(ROOT, "contracts", "*", "*.yaml")):
+        for ms in (yaml.safe_load(io.open(f, encoding="utf-8").read()).get("paths") or {}).values():
+            n += sum(1 for o in (ms or {}).values() if isinstance(o, dict) and "operationId" in o)
+    return n
+
+
 def main():
     prov = read_provisional()
+    first = read_slice()
+    n_ops = count_operations()
+    prov_first = sorted(r["operationId"] for r in prov if r["operationId"] in first)
     shells = read_shell_screens()
     by_pack = collections.defaultdict(list)
     for r in prov:
@@ -245,10 +283,20 @@ def main():
     ws = wb.active
     ws.title = "Ask the client"
     head(ws, ["#", "Theme", "The question", "Why we are asking", "What it blocks",
-              "Affects", "Who answers", "Answer", "Answered on"],
-         [5, 24, 56, 62, 56, 30, 16, 40, 13])
+              "Affects", RELEASE, "Who answers", "Answer", "Answered on"],
+         [7, 24, 56, 62, 56, 30, 26, 16, 40, 13])
     r = 2
     for cid, theme, q, why, blocks, affects, who in CONFLICTS:
+        if cid == "CF-171":
+            q = ("Will you review the %d operations we drafted from your design packs, pack by pack?"
+                 % len(prov))
+            blocks = ("They are %d%% of the %d operations and exactly the ones with no data lineage. "
+                      "Nothing behind them can be built until they are agreed."
+                      % (round(100.0 * len(prov) / n_ops), n_ops))
+            release = ("Yes, %d of them: %s" % (len(prov_first), ", ".join(prov_first)) if prov_first
+                       else "Later: none is in the first release")
+        else:
+            release = FIRST_RELEASE.get(cid, "")
         band = r % 2 == 0
         put(ws, r, 1, cid, bold=True, band=band)
         put(ws, r, 2, theme, band=band)
@@ -256,9 +304,10 @@ def main():
         put(ws, r, 4, why, band=band)
         put(ws, r, 5, blocks, band=band)
         put(ws, r, 6, affects, band=band)
-        put(ws, r, 7, who, band=band)
-        put(ws, r, 8, "", fill=BLANK)
+        put(ws, r, 7, release, bold=release.startswith("Yes"), band=band)
+        put(ws, r, 8, who, band=band)
         put(ws, r, 9, "", fill=BLANK)
+        put(ws, r, 10, "", fill=BLANK)
         r += 1
 
     packs = sorted(by_pack.items(), key=lambda kv: -len(kv[1]))
@@ -282,9 +331,12 @@ def main():
         put(ws, r, 5, "%d operations stay unagreed, and none of them can have its tables "
                       "resolved until the shape is settled." % len(items), band=band)
         put(ws, r, 6, pf or "-", band=band)
-        put(ws, r, 7, "Client", band=band)
-        put(ws, r, 8, "", fill=BLANK)
+        in_first = sorted(i["operationId"] for i in items if i["operationId"] in first)
+        release = "Yes, %d: %s" % (len(in_first), ", ".join(in_first)) if in_first else "Later"
+        put(ws, r, 7, release, bold=bool(in_first), band=band)
+        put(ws, r, 8, "Client", band=band)
         put(ws, r, 9, "", fill=BLANK)
+        put(ws, r, 10, "", fill=BLANK)
         r += 1
 
     n_ai = sum(len(v) for k, v in shells.items() if k != "Other")
@@ -347,17 +399,20 @@ def main():
         put(ws, r, 4, why, band=band)
         put(ws, r, 5, blocks, band=band)
         put(ws, r, 6, affects, band=band)
-        put(ws, r, 7, who, band=band)
-        put(ws, r, 8, "", fill=BLANK)
+        release = FIRST_RELEASE.get(sid, "")
+        put(ws, r, 7, release, bold=release.startswith("Yes"), band=band)
+        put(ws, r, 8, who, band=band)
         put(ws, r, 9, "", fill=BLANK)
+        put(ws, r, 10, "", fill=BLANK)
         r += 1
     n_questions = r - 2
+    n_first = sum(1 for row in range(2, r) if str(ws.cell(row, 7).value or "").startswith("Yes"))
 
     # ---- By pack -----------------------------------------------------------------------------
     ws = wb.create_sheet("By pack")
     head(ws, ["Client design pack", "Screens drafted", "Pages cited", "Bullets read as fields",
-              "Bullets set aside", "Contracts", "Platforms"],
-         [46, 14, 26, 18, 16, 30, 26])
+              "Bullets set aside", "Contracts", "Platforms", "In the first release"],
+         [46, 14, 26, 18, 16, 30, 26, 14])
     for i, (pack, items) in enumerate(packs, 2):
         band = i % 2 == 0
         pages = sorted({x["page"] for x in items if x["page"]})
@@ -370,12 +425,13 @@ def main():
         put(ws, i, 6, ", ".join(sorted({x["contract"] for x in items})), band=band)
         put(ws, i, 7, ", ".join("%s (%d)" % (p, n)
                                 for p, n in pack_platforms[pack].most_common(4)), band=band)
+        put(ws, i, 8, sum(1 for x in items if x["operationId"] in first) or "", band=band)
 
     # ---- Screens -----------------------------------------------------------------------------
     ws = wb.create_sheet("Screens")
     head(ws, ["Pack", "Page", "Screen / operation", "What your screen says", "Contract",
-              "Fields read", "Bullets set aside", "Operation id", "Answer"],
-         [34, 7, 40, 74, 15, 11, 13, 30, 34])
+              "Fields read", "Bullets set aside", "Operation id", "In the first release", "Answer"],
+         [34, 7, 40, 74, 15, 11, 13, 30, 12, 34])
     order = sorted(prov, key=lambda x: (x["pack"], x["page"] or 0))
     for i, x in enumerate(order, 2):
         band = i % 2 == 0
@@ -387,7 +443,8 @@ def main():
         put(ws, i, 6, x["fields"], band=band)
         put(ws, i, 7, x["dropped"], band=band, fill=ASK if x["dropped"] > x["fields"] else None)
         put(ws, i, 8, x["operationId"], band=band)
-        put(ws, i, 9, "", fill=BLANK)
+        put(ws, i, 9, "yes" if x["operationId"] in first else "", bold=True, band=band)
+        put(ws, i, 10, "", fill=BLANK)
 
     # ---- No contract -------------------------------------------------------------------------
     ws = wb.create_sheet("No contract")
@@ -408,6 +465,7 @@ def main():
     wb.save(OUT)
     tot_f = sum(x["fields"] for x in prov)
     tot_d = sum(x["dropped"] for x in prov)
+    print("  %d of them needed for the first release" % n_first)
     print("  %d question(s) · %d pack(s) · %d screen(s) to confirm · %d screen(s) with no contract"
           % (n_questions, len(packs), len(prov), sum(len(v) for v in shells.values())))
     print("  %d bullet(s) read as fields, %d set aside as prose" % (tot_f, tot_d))

@@ -664,7 +664,19 @@
   "payments.dunning_case": "2026-09-21",
   "payments.dunning_policy": "2026-09-21",
   "identity.capability_template": "2026-09-21",
-  "identity.module_access": "2026-09-21"
+  "identity.module_access": "2026-09-21",
+  "fnb.service_charge_policy": "2026-09-22",
+  "fnb.temperature_checkpoint": "2026-09-22",
+  "orders.resale_fee_policy": "2026-09-22",
+  "fnb.reservation_policy": "2026-09-23",
+  "orders.visit_reminder": "2026-09-23",
+  "catalogue.group_package": "2026-09-23",
+  "catalogue.product_eligibility_rule": "2026-09-23",
+  "fnb.delivery_policy": "2026-09-23",
+  "fnb.order_fulfilment": "2026-09-23",
+  "marketing.guest_match_decision": "2026-09-23",
+  "marketing.guest_match_policy": "2026-09-23",
+  "orders.deposit_policy": "2026-09-23"
  },
  "renames": [
   {
@@ -806,5 +818,5 @@
   "whitelabel.seo_setting": "2026-09-20"
  },
  "baseline": "2026-09-19",
- "generated": "2026-09-21"
+ "generated": "2026-09-24"
 }

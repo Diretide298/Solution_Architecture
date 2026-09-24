@@ -2091,6 +2091,7 @@ components:
         holdBalance:
           type: number
         totalBalance:
+          x-ticvai-column: balance_amount
           type: number
         currencyCode:
           type: string
@@ -2749,6 +2750,7 @@ components:
           items:
             $ref: '#/components/schemas/SharedWalletMember'
         totalBudget:
+          x-ticvai-column: budget_amount
           $ref: ../shared/common.yaml#/components/schemas/Money
         approvalAboveAmount:
           $ref: ../shared/common.yaml#/components/schemas/Money

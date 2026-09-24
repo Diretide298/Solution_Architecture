@@ -1,0 +1,859 @@
+# TICVAI in OpenProject: preview
+
+Nothing has been pushed. This is `tasks.csv` laid out the way OpenProject would hold it, under the existing TICVAI project (#153).
+
+| | |
+|---|---:|
+| Epics | 24 |
+| Features | 133 |
+| Tasks | 659 |
+| Points (tasks) | 2455 |
+| Frontend tasks | 338 |
+| Backend tasks | 257 |
+| Database tasks | 48 |
+| Onboarding tasks | 9 |
+| DevOps tasks | 7 |
+
+**How it maps.**
+
+- **Hierarchy:** Epic, then Feature, then Task, using OpenProject's parent link. All three types already exist in TICVAI.
+- **Frontend or backend:** the prefix on every subject: [FE], [BE], [DB] (database migration), [DevOps], [Onboarding], [FE+BE]. TICVAI has no categories today; a project admin could add Frontend, Backend, Database and DevOps categories to filter by as well.
+- **Order:** `#` is the sequence, the order work can start: first release before Venue Management, then wave, then dependency depth. `q` is the place in that person's own queue. Each dependency becomes a *follows* relation.
+- **Waves:** TICVAI has no versions today. Wave 1, Wave 2, Wave 3 and Venue Management as versions would give each board a milestone filter.
+- **Existing tickets are untouched:** the 14 Greenleaf `test:` tasks stay where they are.
+
+## Existing (unchanged)
+
+- #17646 test: Borrow a book: POST /loans · Ready for QA · Hrushikant Patkar
+- #17647 test: Return a book: POST /loans/{loanId}/return · Ready for QA · Hrushikant Patkar
+- #17648 test: List a member's loans: GET /members/{memberId}/loans · Closed · Hrushikant Patkar
+- #17649 test: Renew a loan: POST /loans/{loanId}/renew · Ready for QA · Hrushikant Patkar
+- #17650 test: Add a book: POST /books · Closed · Hrushikant Patkar
+- #17651 test: Search books: GET /books/search · Ready for QA · Hrushikant Patkar
+- #17652 test: Register a member: POST /members · New · Hrushikant Patkar
+- #17653 test: Overdue report: GET /loans/overdue · New · Hrushikant Patkar
+- #17654 test: Reserve a book: POST /books/{bookId}/reserve · New · Hrushikant Patkar
+- #17655 test: Cancel a reservation: DELETE /reservations/{reservationId} · New · Hrushikant Patkar
+- #17656 test: One member with what they have out: GET /members/{memberId} · New · Hrushikant Patkar
+- #17657 test: Book catalogue page - list and search · New · Hrushikant Patkar
+- #17658 test: Member desk page - who has what, borrow and return · New · Hrushikant Patkar
+- #17659 test: Add a book page - form with validation · New · Hrushikant Patkar
+
+## New
+
+- `#1` **[Setup] Setup: environments, pipelines, database, seed data and sign-in** · Epic · 16 children · W1
+  - `#2` [DevOps] CI pipelines for the backend and frontend repositories · Hrushikant Patkar (q1) · 3 pts · W1
+  - `#3` [DevOps] Dev and staging environments (Terraform, ADR-0007 infra repository) · Hrushikant Patkar (q2) · 5 pts · W1
+  - `#4` [Onboarding] Onboard Chinmay Patkar: run adam-setup (full stack) · Chinmay Patkar (q1) · 1 pts · W1
+  - `#5` [Onboarding] Onboard Chitrangi Mestry: run adam-setup (frontend) · Chitrangi Mestry (q1) · 1 pts · W1
+  - `#6` [Onboarding] Onboard Deep Khanvilkar: run adam-setup (backend) · Deep Khanvilkar (q1) · 1 pts · W1
+  - `#7` [Onboarding] Onboard Hrushikant Patkar: run adam-setup (backend) · Hrushikant Patkar (q3) · 1 pts · W1
+  - `#8` [Onboarding] Onboard Pallavi Sawant: run adam-setup (full stack) · Pallavi Sawant (q1) · 1 pts · W1
+  - `#9` [Onboarding] Onboard Pradnya Yeram: run adam-setup (frontend) · Pradnya Yeram (q1) · 1 pts · W1
+  - `#10` [Onboarding] Onboard Pranay Shinde: run adam-setup (backend) · Pranay Shinde (q1) · 1 pts · W1
+  - `#11` [Onboarding] Onboard Sanket Keluskar: run adam-setup (full stack) · Sanket Keluskar (q1) · 1 pts · W1
+  - `#12` [Onboarding] Onboard Tanmay Dukhande: run adam-setup (backend) · Tanmay Dukhande (q1) · 1 pts · W1
+  - `#104` [DevOps] Generate the typed API clients from contracts/ for the frontend workspace · Hrushikant Patkar (q4) · 3 pts · W1 · follows SETUP-CI
+  - `#105` [DevOps] PostgreSQL (tenant and control databases) and a forward-only migration runner that applies the MIG epic in order and runs each ROLLBACK in CI · Hrushikant Patkar (q5) · 5 pts · W1 · follows SETUP-ENV
+  - `#106` [DevOps] Logging and monitoring basics · Hrushikant Patkar (q6) · 2 pts · W1 · follows SETUP-ENV
+  - `#140` [DevOps] Sign-in working end to end against IdentityService · Hrushikant Patkar (q14) · 5 pts · W1 · follows MIG-BASELINE, MIG-IDENTITY, MIG-PII +1
+  - `#335` [DevOps] Seed data: a demo venue with products, prices, events, tills, staff, roles and UAE denominations, so apps can be built before the Back Office setup screens exist · Hrushikant Patkar (q38) · 5 pts · W1 · follows MIG-ACCESS, MIG-AI, MIG-APPROVALS +27
+- `#13` **[DB] Database migrations for the first release (242 tables, 28 schemas)** · Epic · 30 children · W1
+  - `#107` [DB] Migration baseline: schemas, extensions, migration register, RLS helper functions and the venue partition helper · Hrushikant Patkar (q7) · 3 pts · W1 · follows SETUP-DB
+  - `#109` [DB] Migration V0002__control.sql: control (4 tables) · Tanmay Dukhande (q2) · 3 pts · W1 · follows MIG-BASELINE
+  - `#110` [DB] Migration V0004__pii.sql: pii (4 tables) · Tanmay Dukhande (q3) · 2 pts · W1 · follows MIG-BASELINE
+  - `#111` [DB] Migration V0003__subscription.sql: subscription (2 tables) · Tanmay Dukhande (q4) · 2 pts · W1 · follows MIG-BASELINE
+  - `#113` [DB] Migration V0005__games.sql: games (2 tables) · Pranay Shinde (q2) · 2 pts · W1 · follows MIG-BASELINE, MIG-PII
+  - `#114` [DB] Migration V0006__identity.sql: identity (11 tables) · Tanmay Dukhande (q5) · 5 pts · W1 · follows MIG-BASELINE, MIG-PII
+  - `#115` [DB] Migration V0009__ai.sql: ai (11 tables) · Pranay Shinde (q3) · 8 pts · W1 · follows MIG-BASELINE, MIG-IDENTITY, MIG-PII
+  - `#116` [DB] Migration V0007__approvals.sql: approvals (5 tables) · Hrushikant Patkar (q8) · 3 pts · W1 · follows MIG-BASELINE, MIG-IDENTITY, MIG-PII
+  - `#117` [DB] Migration V0010__assets.sql: assets (4 tables) · Pranay Shinde (q4) · 3 pts · W1 · follows MIG-BASELINE, MIG-IDENTITY
+  - `#118` [DB] Migration V0012__resources.sql: resources (2 tables) · Pranay Shinde (q5) · 2 pts · W1 · follows MIG-BASELINE, MIG-IDENTITY, MIG-PII
+  - `#119` [DB] Migration V0013__wallet.sql: wallet (3 tables) · Tanmay Dukhande (q6) · 2 pts · W1 · follows MIG-BASELINE, MIG-IDENTITY, MIG-PII
+  - `#120` [DB] Migration V0014__whitelabel.sql: whitelabel (13 tables) · Hrushikant Patkar (q9) · 8 pts · W1 · follows MIG-BASELINE, MIG-IDENTITY
+  - `#121` [DB] Migration V0015__workforce.sql: workforce (1 tables) · Hrushikant Patkar (q10) · 2 pts · W1 · follows MIG-BASELINE, MIG-IDENTITY
+  - `#130` [DB] Migration V0011__payments.sql: payments (4 tables) · Pranay Shinde (q7) · 3 pts · W1 · follows MIG-AI, MIG-BASELINE, MIG-PII
+  - `#131` [DB] Migration V0016__platform.sql: platform (13 tables) · Hrushikant Patkar (q11) · 8 pts · W1 · follows MIG-APPROVALS, MIG-BASELINE
+  - `#132` [DB] Migration V0008__reporting.sql: reporting (10 tables) · Hrushikant Patkar (q12) · 5 pts · W1 · follows MIG-APPROVALS, MIG-BASELINE, MIG-IDENTITY
+  - `#141` [DB] Migration V0017__ledger.sql: ledger (9 tables) · Pranay Shinde (q9) · 5 pts · W1 · follows MIG-AI, MIG-BASELINE, MIG-IDENTITY +1
+  - `#142` [DB] Migration V0019__maintenance.sql: maintenance (4 tables) · Pranay Shinde (q10) · 5 pts · W1 · follows MIG-BASELINE, MIG-IDENTITY, MIG-PLATFORM +1
+  - `#143` [DB] Migration V0018__seating.sql: seating (5 tables) · Hrushikant Patkar (q15) · 3 pts · W1 · follows MIG-BASELINE, MIG-IDENTITY, MIG-PII +1
+  - `#144` [DB] Migration V0020__venuemap.sql: venuemap (4 tables) · Pranay Shinde (q11) · 3 pts · W1 · follows MIG-BASELINE, MIG-PLATFORM
+  - `#160` [DB] Migration V0021__catalogue.sql: catalogue (16 tables) · Hrushikant Patkar (q19) · 8 pts · W1 · follows MIG-BASELINE, MIG-IDENTITY, MIG-LEDGER +3
+  - `#167` [DB] Migration V0022__orders.sql: orders (22 tables) · Pranay Shinde (q13) · 8 pts · W1 · follows MIG-BASELINE, MIG-CATALOGUE, MIG-IDENTITY +3
+  - `#181` [DB] Migration V0023__access.sql: access (7 tables) · Pranay Shinde (q14) · 5 pts · W1 · follows MIG-BASELINE, MIG-CATALOGUE, MIG-IDENTITY +3
+  - `#212` [DB] Migration V0024__fnb.sql: fnb (25 tables) · Tanmay Dukhande (q11) · 8 pts · W1 · follows MIG-ACCESS, MIG-BASELINE, MIG-CATALOGUE +5
+  - `#213` [DB] Migration V0026__queue.sql: queue (4 tables) · Pranay Shinde (q26) · 3 pts · W1 · follows MIG-ACCESS, MIG-BASELINE, MIG-CATALOGUE +3
+  - `#233` [DB] Migration V0025__inventory.sql: inventory (10 tables) · Hrushikant Patkar (q28) · 8 pts · W1 · follows MIG-AI, MIG-BASELINE, MIG-FNB +3
+  - `#234` [DB] Migration V0027__marketing.sql: marketing (28 tables) · Tanmay Dukhande (q12) · 8 pts · W1 · follows MIG-AI, MIG-BASELINE, MIG-CATALOGUE +6
+  - `#265` [DB] Migration V0028__promotions.sql: promotions (9 tables) · Hrushikant Patkar (q29) · 5 pts · W1 · follows MIG-BASELINE, MIG-CATALOGUE, MIG-LEDGER +4
+  - `#266` [DB] Migration V0029__retail.sql: retail (10 tables) · Tanmay Dukhande (q20) · 5 pts · W1 · follows MIG-ACCESS, MIG-BASELINE, MIG-CATALOGUE +6
+  - `#297` [DB] Migration V0030__cross_schema_foreign_keys.sql (37 keys) · Hrushikant Patkar (q32) · 3 pts · W1 · follows MIG-ACCESS, MIG-AI, MIG-APPROVALS +25
+- `#14` **[BE] AccessService: first-release slice (21 operations) to 1.0.0** · Epic · 4 children · Pranay Shinde · 34 pts · W1
+  - `#15` **[BE] AccessService / access** · Feature · 3 children · Pranay Shinde · 18 pts · W1
+    - `#214` [BE] AccessService: getEntitlementHistory, getFacePassEnrolment, listEntitlements, listMyEntitlements · Pranay Shinde (q27) · 5 pts · W1 · follows MIG-ACCESS, MIG-CATALOGUE, MIG-IDENTITY +1
+    - `#267` [BE] AccessService: createParkingEntitlement, enrolFacePass, getEntitlement, getEntitlementCredential · Pranay Shinde (q39) · 8 pts · W1 · follows MIG-ACCESS, MIG-CATALOGUE, MIG-IDENTITY +3
+    - `#473` [BE] AccessService: listParkingFacilities, revokeFacePass, setParkingFacility, updateParkingEntitlement · Pranay Shinde (q46) · 5 pts · W2 · follows MIG-ACCESS, MIG-PII
+  - `#16` **[BE] AccessService / accessPoint** · Feature · 2 children · Pranay Shinde · 13 pts · W1
+    - `#215` [BE] AccessService: addBlacklistEntry, createAccessPoint, createAdmissionRules, setAccessPointGeofence · Pranay Shinde (q28) · 8 pts · W1 · follows MIG-ACCESS
+    - `#216` [BE] AccessService: setTurnstileMode, updateAccessPoint, updateAdmissionRules · Pranay Shinde (q29) · 5 pts · W1 · follows MIG-ACCESS
+  - `#17` **[BE] AccessService / drafted** · Feature · 1 children · Pranay Shinde · 1 pts · W1
+    - `#112` [BE] AccessService: setReaderScannerPeripheral · Deep Khanvilkar (q2) · 1 pts · W1 · follows MIG-BASELINE
+  - `#18` **[BE] AccessService / sync** · Feature · 1 children · Pranay Shinde · 2 pts · W1
+    - `#217` [BE] AccessService: getOfflinePackage · Deep Khanvilkar (q8) · 2 pts · W1 · follows MIG-ACCESS, MIG-CATALOGUE, MIG-IDENTITY +1
+- `#19` **[BE] CatalogueService: first-release slice (69 operations) to 1.0.0** · Epic · 17 children · Hrushikant Patkar · 103 pts · W1
+  - `#20` **[BE] CatalogueService / bundle** · Feature · 2 children · Hrushikant Patkar · 13 pts · W1
+    - `#298` [BE] CatalogueService: createBundle, getBundle, getLatestBundle, listCatalogueBundles · Hrushikant Patkar (q33) · 8 pts · W1 · follows MIG-CATALOGUE, MIG-PROMOTIONS
+    - `#299` [BE] CatalogueService: publishBundle, updateBundle · Hrushikant Patkar (q34) · 5 pts · W1 · follows MIG-CATALOGUE, MIG-PROMOTIONS
+  - `#21` **[BE] CatalogueService / capacity** · Feature · 1 children · Hrushikant Patkar · 3 pts · W1
+    - `#168` [BE] CatalogueService: createChannelCapacity, getAvailability, updateChannelCapacity · Sanket Keluskar (q10) · 3 pts · W1 · follows MIG-CATALOGUE
+  - `#22` **[BE] CatalogueService / catalogue** · Feature · 3 children · Hrushikant Patkar · 14 pts · W1
+    - `#169` [BE] CatalogueService: searchCatalogue · Chinmay Patkar (q8) · 1 pts · W1 · follows MIG-CATALOGUE
+    - `#182` [BE] CatalogueService: joinWaitlist, leaveWaitlist, listGuestMemberships, restoreProductVersion · Hrushikant Patkar (q26) · 5 pts · W1 · follows MIG-CATALOGUE, MIG-ORDERS
+    - `#268` [BE] CatalogueService: bulkChangePrices, cloneProduct, commitCatalogueImport, getMyMemberships · Hrushikant Patkar (q30) · 8 pts · W1 · follows MIG-ACCESS, MIG-CATALOGUE, MIG-MARKETING
+  - `#23` **[BE] CatalogueService / coupon** · Feature · 1 children · Hrushikant Patkar · 5 pts · W1
+    - `#300` [BE] CatalogueService: createCouponCampaign, generateCouponCodes, getCouponCode · Hrushikant Patkar (q35) · 5 pts · W1 · follows MIG-PROMOTIONS
+  - `#24` **[BE] CatalogueService / entitlement** · Feature · 1 children · Hrushikant Patkar · 2 pts · W1
+    - `#170` [BE] CatalogueService: createEntitlementTemplate · Chinmay Patkar (q9) · 2 pts · W1 · follows MIG-CATALOGUE
+  - `#25` **[BE] CatalogueService / evaluation** · Feature · 1 children · Hrushikant Patkar · 2 pts · W1
+    - `#301` [BE] CatalogueService: evaluatePromotions · Deep Khanvilkar (q11) · 2 pts · W1 · follows MIG-CATALOGUE, MIG-PROMOTIONS
+  - `#26` **[BE] CatalogueService / event** · Feature · 2 children · Hrushikant Patkar · 6 pts · W1
+    - `#171` [BE] CatalogueService: createEvent, getPerformance, listPerformances, updateEvent · Hrushikant Patkar (q20) · 5 pts · W1 · follows MIG-CATALOGUE
+    - `#463` [BE] CatalogueService: updatePerformance · Chinmay Patkar (q54) · 1 pts · W2 · follows MIG-CATALOGUE
+  - `#27` **[BE] CatalogueService / lease** · Feature · 1 children · Hrushikant Patkar · 5 pts · W1
+    - `#172` [BE] CatalogueService: acquireInventoryHold, listInventoryHolds, relinquishInventoryHold, renewInventoryHold · Hrushikant Patkar (q21) · 5 pts · W1 · follows MIG-CATALOGUE, MIG-PLATFORM
+  - `#28` **[BE] CatalogueService / pricing** · Feature · 1 children · Hrushikant Patkar · 5 pts · W1
+    - `#173` [BE] CatalogueService: copyPriceList, createPriceList, setPrices, updatePriceList · Hrushikant Patkar (q22) · 5 pts · W1 · follows MIG-CATALOGUE
+  - `#29` **[BE] CatalogueService / product** · Feature · 4 children · Hrushikant Patkar · 18 pts · W1
+    - `#174` [BE] CatalogueService: checkBookingEligibility, createProduct, getGroupPackageDefinition, getProduct · Hrushikant Patkar (q23) · 5 pts · W1 · follows MIG-CATALOGUE
+    - `#175` [BE] CatalogueService: getProductEligibilityRule, listAlternativeCodes, listGroupPackages, listProductVariants · Sanket Keluskar (q11) · 3 pts · W1 · follows MIG-CATALOGUE
+    - `#176` [BE] CatalogueService: listProducts, resolveProductByCode, setAlternativeCodes, setGroupPackageDefinition · Hrushikant Patkar (q24) · 5 pts · W1 · follows MIG-CATALOGUE
+    - `#177` [BE] CatalogueService: setProductEligibilityRule, transitionProductLifecycle, updateProduct · Hrushikant Patkar (q25) · 5 pts · W1 · follows MIG-CATALOGUE, MIG-PLATFORM
+  - `#30` **[BE] CatalogueService / promotion** · Feature · 2 children · Hrushikant Patkar · 16 pts · W1
+    - `#302` [BE] CatalogueService: analysePromotionConflicts, createPromotion, getPromotion, getPromotionUsage · Hrushikant Patkar (q36) · 8 pts · W1 · follows MIG-PROMOTIONS
+    - `#303` [BE] CatalogueService: listPromotions, publishPromotion, updatePromotion · Hrushikant Patkar (q37) · 8 pts · W1 · follows MIG-PROMOTIONS
+  - `#31` **[BE] CatalogueService / promotions** · Feature · 1 children · Hrushikant Patkar · 1 pts · W1
+    - `#304` [BE] CatalogueService: setPromotionVariants · Chinmay Patkar (q23) · 1 pts · W1 · follows MIG-PROMOTIONS
+  - `#360` **[BE] CatalogueService / availability** · Feature · 1 children · Hrushikant Patkar · 1 pts · W2
+    - `#450` [BE] CatalogueService: getSeatAvailability · Chinmay Patkar (q50) · 1 pts · W2 · follows MIG-SEATING
+  - `#361` **[BE] CatalogueService / category** · Feature · 1 children · Hrushikant Patkar · 1 pts · W2
+    - `#451` [BE] CatalogueService: createSeatCategory · Chinmay Patkar (q51) · 1 pts · W2 · follows MIG-SEATING
+  - `#362` **[BE] CatalogueService / hold** · Feature · 1 children · Hrushikant Patkar · 5 pts · W2
+    - `#452` [BE] CatalogueService: createSeatHold, extendSeatHold, getSeatHold, relinquishSeatHold · Hrushikant Patkar (q50) · 5 pts · W2 · follows MIG-SEATING
+  - `#363` **[BE] CatalogueService / recommendation** · Feature · 1 children · Hrushikant Patkar · 1 pts · W2
+    - `#464` [BE] CatalogueService: recommendSeats · Deep Khanvilkar (q21) · 1 pts · W2 · follows MIG-CATALOGUE
+  - `#364` **[BE] CatalogueService / upsell** · Feature · 1 children · Hrushikant Patkar · 5 pts · W2
+    - `#510` [BE] CatalogueService: createUpsellRule, deleteUpsellRule, getUpsellSuggestions · Hrushikant Patkar (q52) · 5 pts · W2 · follows MIG-CATALOGUE, MIG-PROMOTIONS
+- `#32` **[BE] FnbService: first-release slice (57 operations) to 1.0.0** · Epic · 8 children · Tanmay Dukhande · 110 pts · W1
+  - `#33` **[BE] FnbService / bill** · Feature · 1 children · Tanmay Dukhande · 2 pts · W1
+    - `#235` [BE] FnbService: closeTableVisit · Chinmay Patkar (q16) · 2 pts · W1 · follows MIG-FNB
+  - `#34` **[BE] FnbService / fnb** · Feature · 6 children · Tanmay Dukhande · 45 pts · W1
+    - `#236` [BE] FnbService: setTableCombinations, signCorrectiveAction, updateTableReservation · Tanmay Dukhande (q13) · 5 pts · W1 · follows MIG-FNB, MIG-IDENTITY
+    - `#269` [BE] FnbService: listTableReservations, logColdChain, logKitchenException, logTemperature · Tanmay Dukhande (q21) · 8 pts · W1 · follows MIG-FNB, MIG-INVENTORY, MIG-PLATFORM
+    - `#270` [BE] FnbService: markOrderCollected, moveTableVisit, notifyServer, printOrderLabel · Tanmay Dukhande (q22) · 8 pts · W1 · follows MIG-FNB, MIG-IDENTITY, MIG-MARKETING
+    - `#271` [BE] FnbService: recallKitchenTicket, refireItem, seatTableReservation, setCourseRules · Tanmay Dukhande (q23) · 8 pts · W1 · follows MIG-FNB, MIG-INVENTORY
+    - `#477` [BE] FnbService: chaseStation, createTableReservation, escalateCorrectiveAction, fireCourse · Tanmay Dukhande (q40) · 8 pts · W2 · follows MIG-FNB, MIG-IDENTITY
+    - `#478` [BE] FnbService: getHaccpStatus, holdCourse, joinRestaurantWaitlist, list86Events · Tanmay Dukhande (q41) · 8 pts · W2 · follows MIG-FNB, MIG-PLATFORM
+  - `#35` **[BE] FnbService / guestOrdering** · Feature · 3 children · Tanmay Dukhande · 21 pts · W1
+    - `#237` [BE] FnbService: getGuestBill, getGuestMenu, getGuestOrderStatus, listDeliveryLocations · Tanmay Dukhande (q14) · 5 pts · W1 · follows MIG-FNB, MIG-ORDERS
+    - `#238` [BE] FnbService: listDiningOutlets, listFulfilmentSlots, recordOrderHandover, setFnbDeliveryPolicy · Tanmay Dukhande (q15) · 8 pts · W1 · follows MIG-FNB, MIG-PLATFORM
+    - `#479` [BE] FnbService: claimLocationSession, claimTableSession, createGuestFnbOrder, getFnbDeliveryPolicy · Tanmay Dukhande (q42) · 8 pts · W2 · follows MIG-FNB
+  - `#36` **[BE] FnbService / kitchen** · Feature · 2 children · Tanmay Dukhande · 8 pts · W1
+    - `#239` [BE] FnbService: listKitchenStations, listKitchenTickets, prioritiseKitchenTicket, setKitchenStations · Tanmay Dukhande (q16) · 5 pts · W1 · follows MIG-FNB
+    - `#240` [BE] FnbService: setKitchenTicketStatus · Sanket Keluskar (q13) · 3 pts · W1 · follows MIG-FNB, MIG-PLATFORM
+  - `#37` **[BE] FnbService / menu** · Feature · 2 children · Tanmay Dukhande · 13 pts · W1
+    - `#241` [BE] FnbService: createMenu, getMenu, listMenus, setItemAvailability · Tanmay Dukhande (q17) · 8 pts · W1 · follows MIG-FNB
+    - `#480` [BE] FnbService: setMenuSections, updateMenu · Tanmay Dukhande (q43) · 5 pts · W2 · follows MIG-FNB
+  - `#38` **[BE] FnbService / modifier** · Feature · 1 children · Tanmay Dukhande · 3 pts · W1
+    - `#242` [BE] FnbService: createModifierGroup, listModifierGroups · Sanket Keluskar (q14) · 3 pts · W1 · follows MIG-FNB
+  - `#39` **[BE] FnbService / order** · Feature · 1 children · Tanmay Dukhande · 8 pts · W1
+    - `#243` [BE] FnbService: createFnbOrder, getFnbOrder, listFnbOrders · Tanmay Dukhande (q18) · 8 pts · W1 · follows MIG-FNB
+  - `#40` **[BE] FnbService / table** · Feature · 2 children · Tanmay Dukhande · 10 pts · W1
+    - `#244` [BE] FnbService: clearTable, getTableMap, mergeTableVisits, openTableVisit · Tanmay Dukhande (q19) · 8 pts · W1 · follows MIG-FNB
+    - `#245` [BE] FnbService: setTableLayout · Deep Khanvilkar (q9) · 2 pts · W1 · follows MIG-FNB
+- `#41` **[BE] IdentityService: first-release slice (36 operations) to 1.0.0** · Epic · 6 children · Tanmay Dukhande · 51 pts · W1
+  - `#42` **[BE] IdentityService / administration** · Feature · 2 children · Tanmay Dukhande · 6 pts · W1
+    - `#122` [BE] IdentityService: createPrincipal, createRole, listPrincipals, listRoles · Tanmay Dukhande (q7) · 5 pts · W1 · follows MIG-IDENTITY
+    - `#123` [BE] IdentityService: updatePrincipal · Chinmay Patkar (q3) · 1 pts · W1 · follows MIG-IDENTITY
+  - `#43` **[BE] IdentityService / guestAuth** · Feature · 3 children · Tanmay Dukhande · 15 pts · W1
+    - `#124` [BE] IdentityService: verifyGuestOtp · Sanket Keluskar (q2) · 2 pts · W1 · follows MIG-IDENTITY, MIG-PII
+    - `#145` [BE] IdentityService: deleteGuestAccount, getGuestSession, guestLogout, guestSocialLogin · Tanmay Dukhande (q9) · 5 pts · W1 · follows MIG-PII, MIG-PLATFORM
+    - `#183` [BE] IdentityService: guestUaePassLogin, linkGuestCheckout, registerGuest, requestGuestOtp · Tanmay Dukhande (q10) · 8 pts · W1 · follows MIG-IDENTITY, MIG-ORDERS, MIG-PII
+  - `#44` **[BE] IdentityService / identity** · Feature · 3 children · Tanmay Dukhande · 18 pts · W1
+    - `#272` [BE] IdentityService: changeOwnCredential, exportSubjectData, forceLogout, getCurrentSession · Tanmay Dukhande (q24) · 5 pts · W1 · follows MIG-ACCESS, MIG-IDENTITY, MIG-MARKETING +2
+    - `#273` [BE] IdentityService: grantDelegation, listDelegations, login, refreshToken · Tanmay Dukhande (q25) · 8 pts · W1 · follows MIG-IDENTITY, MIG-MARKETING, MIG-PII
+    - `#274` [BE] IdentityService: selectRole, setPasswordPolicy, verifyGuestEmail · Tanmay Dukhande (q26) · 5 pts · W1 · follows MIG-IDENTITY, MIG-MARKETING, MIG-PII
+  - `#45` **[BE] IdentityService / mfa** · Feature · 2 children · Tanmay Dukhande · 6 pts · W1
+    - `#125` [BE] IdentityService: createMfaChallenge, enrolMfaMethod, listMfaMethods, removeMfaMethod · Sanket Keluskar (q3) · 3 pts · W1 · follows MIG-IDENTITY
+    - `#126` [BE] IdentityService: verifyMfaChallenge, verifyMfaEnrolment · Sanket Keluskar (q4) · 3 pts · W1 · follows MIG-IDENTITY
+  - `#46` **[BE] IdentityService / session** · Feature · 1 children · Tanmay Dukhande · 1 pts · W1
+    - `#127` [BE] IdentityService: listActiveSessions · Deep Khanvilkar (q3) · 1 pts · W1 · follows MIG-IDENTITY
+  - `#47` **[BE] IdentityService / sso** · Feature · 1 children · Tanmay Dukhande · 5 pts · W1
+    - `#128` [BE] IdentityService: completeSsoAuthorization, listSsoProviders, setSsoConfig, startSsoAuthorization · Tanmay Dukhande (q8) · 5 pts · W1 · follows MIG-IDENTITY
+- `#48` **[BE] InventoryService: first-release slice (6 operations) to 1.0.0** · Epic · 3 children · Hrushikant Patkar · 13 pts · W1
+  - `#49` **[BE] InventoryService / inventory** · Feature · 1 children · Hrushikant Patkar · 3 pts · W1
+    - `#275` [BE] InventoryService: bulkUpdateProducts, listSerialisedItems · Sanket Keluskar (q15) · 3 pts · W1 · follows MIG-CATALOGUE, MIG-INVENTORY
+  - `#50` **[BE] InventoryService / item** · Feature · 1 children · Hrushikant Patkar · 5 pts · W1
+    - `#276` [BE] InventoryService: createInventoryItem, updateInventoryItem · Hrushikant Patkar (q31) · 5 pts · W1 · follows MIG-INVENTORY
+  - `#365` **[BE] InventoryService / receipt** · Feature · 1 children · Hrushikant Patkar · 5 pts · W2
+    - `#487` [BE] InventoryService: createGoodsReceipt, rejectReceivedGoods · Hrushikant Patkar (q51) · 5 pts · W2 · follows MIG-INVENTORY, MIG-PLATFORM
+- `#51` **[BE] LedgerService: first-release slice (7 operations) to 1.0.0** · Epic · 4 children · Pranay Shinde · 10 pts · W1
+  - `#52` **[BE] LedgerService / finance** · Feature · 1 children · Pranay Shinde · 3 pts · W1
+    - `#161` [BE] LedgerService: ingestFxRates, setFxProvider · Sanket Keluskar (q8) · 3 pts · W1 · follows MIG-LEDGER, MIG-PLATFORM
+  - `#53` **[BE] LedgerService / ledger** · Feature · 1 children · Pranay Shinde · 3 pts · W1
+    - `#162` [BE] LedgerService: listFxRates, setFxRate · Sanket Keluskar (q9) · 3 pts · W1 · follows MIG-LEDGER
+  - `#366` **[BE] LedgerService / accounts** · Feature · 1 children · Pranay Shinde · 3 pts · W2
+    - `#453` [BE] LedgerService: createAccount, updateAccount · Sanket Keluskar (q25) · 3 pts · W2 · follows MIG-LEDGER
+  - `#367` **[BE] LedgerService / reporting** · Feature · 1 children · Pranay Shinde · 1 pts · W2
+    - `#454` [BE] LedgerService: getFinancialReport · Deep Khanvilkar (q20) · 1 pts · W2 · follows MIG-LEDGER
+- `#54` **[BE] MarketingService: first-release slice (42 operations) to 1.0.0** · Epic · 7 children · Tanmay Dukhande · 60 pts · W1
+  - `#55` **[BE] MarketingService / case** · Feature · 1 children · Tanmay Dukhande · 3 pts · W1
+    - `#277` [BE] MarketingService: createCase, listCases · Sanket Keluskar (q16) · 3 pts · W1 · follows MIG-MARKETING
+  - `#56` **[BE] MarketingService / consent** · Feature · 1 children · Tanmay Dukhande · 5 pts · W1
+    - `#278` [BE] MarketingService: getGuestConsents, listConsentPurposes, recordConsent, setConsentPurposes · Tanmay Dukhande (q27) · 5 pts · W1 · follows MIG-MARKETING, MIG-PII
+  - `#57` **[BE] MarketingService / guest** · Feature · 2 children · Tanmay Dukhande · 10 pts · W1
+    - `#279` [BE] MarketingService: addToWishlist, getGuestProfile, getWishlist, listGuestDevices · Tanmay Dukhande (q28) · 5 pts · W1 · follows MIG-MARKETING, MIG-PII
+    - `#280` [BE] MarketingService: registerGuestDevice, removeFromWishlist, revokeGuestDevice, searchGuests · Tanmay Dukhande (q29) · 5 pts · W1 · follows MIG-MARKETING
+  - `#58` **[BE] MarketingService / guests** · Feature · 1 children · Tanmay Dukhande · 3 pts · W1
+    - `#281` [BE] MarketingService: checkGuestCheckoutMatch, decideGuestCheckoutMatch, setGuestMatchPolicy · Sanket Keluskar (q17) · 3 pts · W1 · follows MIG-MARKETING, MIG-ORDERS
+  - `#59` **[BE] MarketingService / loyalty** · Feature · 1 children · Tanmay Dukhande · 3 pts · W1
+    - `#282` [BE] MarketingService: createLoyaltyProgramme, listLoyaltyProgrammes · Sanket Keluskar (q18) · 3 pts · W1 · follows MIG-MARKETING
+  - `#60` **[BE] MarketingService / marketing** · Feature · 6 children · Tanmay Dukhande · 34 pts · W1
+    - `#283` [BE] MarketingService: getLoyaltyPosition, getMarketingSubscription, getMyChallenges, getWaiverStatus · Tanmay Dukhande (q30) · 5 pts · W1 · follows MIG-ACCESS, MIG-CATALOGUE, MIG-MARKETING
+    - `#284` [BE] MarketingService: handoverToAgent, identifyGuest, listMyCases, raiseMyCase · Tanmay Dukhande (q31) · 8 pts · W1 · follows MIG-ACCESS, MIG-MARKETING, MIG-PII +1
+    - `#285` [BE] MarketingService: redeemLoyaltyPoints, replyToMyCase, respondToInvitation, sendConversationMessage · Tanmay Dukhande (q32) · 5 pts · W1 · follows MIG-MARKETING, MIG-ORDERS
+    - `#286` [BE] MarketingService: setAgentAvailability, setMarketingSubscription, setSeoMetadata, updateGuestPreferences · Tanmay Dukhande (q33) · 5 pts · W1 · follows MIG-CATALOGUE, MIG-CONTROL, MIG-IDENTITY +1
+    - `#287` [BE] MarketingService: updateMyProfile, uploadGuestDocument · Sanket Keluskar (q19) · 3 pts · W1 · follows MIG-MARKETING, MIG-PII
+    - `#305` [BE] MarketingService: createChallenge, createForm, createInvitationCampaign, createReferral · Tanmay Dukhande (q34) · 8 pts · W1 · follows MIG-CATALOGUE, MIG-MARKETING, MIG-PROMOTIONS
+  - `#549` **[BE] MarketingService / feedback** · Feature · 1 children · Tanmay Dukhande · 2 pts · W3
+    - `#553` [BE] MarketingService: submitReview · Chinmay Patkar (q88) · 2 pts · W3 · follows MIG-MARKETING
+- `#61` **[BE] OrderService: first-release slice (78 operations) to 1.0.0** · Epic · 11 children · Pranay Shinde · 152 pts · W1
+  - `#62` **[BE] OrderService / cart** · Feature · 3 children · Pranay Shinde · 19 pts · W1
+    - `#184` [BE] OrderService: abandonCart, addCartLine, checkoutCart, claimCart · Pranay Shinde (q15) · 8 pts · W1 · follows MIG-CATALOGUE, MIG-ORDERS, MIG-PII
+    - `#185` [BE] OrderService: updateCartLine · Sanket Keluskar (q12) · 3 pts · W1 · follows MIG-CATALOGUE, MIG-ORDERS
+    - `#306` [BE] OrderService: createCart, extendCart, getCart, removeCartLine · Pranay Shinde (q41) · 8 pts · W1 · follows MIG-CATALOGUE, MIG-ORDERS, MIG-PII +2
+  - `#63` **[BE] OrderService / cash** · Feature · 1 children · Pranay Shinde · 5 pts · W1
+    - `#186` [BE] OrderService: createCashMovement, listCashMovements · Pranay Shinde (q16) · 5 pts · W1 · follows MIG-ORDERS
+  - `#64` **[BE] OrderService / order** · Feature · 5 children · Pranay Shinde · 40 pts · W1
+    - `#187` [BE] OrderService: getOrderStatement, getVisitReminder, holdOrder, listOrders · Pranay Shinde (q17) · 8 pts · W1 · follows MIG-LEDGER, MIG-ORDERS
+    - `#188` [BE] OrderService: modifyOrder, reprintOrder, rescheduleOrder, resumeOrder · Pranay Shinde (q18) · 8 pts · W1 · follows MIG-ORDERS
+    - `#218` [BE] OrderService: appendEntitlementToMedia, applyManualDiscount, claimTicketTransfer, createOrder · Pranay Shinde (q30) · 8 pts · W1 · follows MIG-ACCESS, MIG-ORDERS
+    - `#219` [BE] OrderService: exchangeOrderLines, getMediaEntitlements, getOrder, getOrderCalendarEvent · Pranay Shinde (q31) · 8 pts · W1 · follows MIG-ACCESS, MIG-CATALOGUE, MIG-ORDERS +2
+    - `#220` [BE] OrderService: setVisitReminder, transferOrderTickets, voidOrder · Pranay Shinde (q32) · 8 pts · W1 · follows MIG-ACCESS, MIG-ORDERS
+  - `#65` **[BE] OrderService / orders** · Feature · 4 children · Pranay Shinde · 29 pts · W1
+    - `#221` [BE] OrderService: createResaleListing, createTicketTemplate, getBillingStatement, getGroupBooking · Pranay Shinde (q33) · 8 pts · W1 · follows MIG-ACCESS, MIG-CATALOGUE, MIG-ORDERS +2
+    - `#222` [BE] OrderService: getPaymentLink, issueWalletPass, listBillingStatements, listMyOrders · Pranay Shinde (q34) · 5 pts · W1 · follows MIG-ACCESS, MIG-ORDERS, MIG-PAYMENTS +2
+    - `#223` [BE] OrderService: listPaymentTokens, payByLink, reissueEntitlement, requestGroupBooking · Pranay Shinde (q35) · 8 pts · W1 · follows MIG-ACCESS, MIG-CATALOGUE, MIG-ORDERS +1
+    - `#288` [BE] OrderService: setPaymentProvider, shareEntitlement, storePaymentToken, updateTicketTemplate · Pranay Shinde (q40) · 8 pts · W1 · follows MIG-ACCESS, MIG-CATALOGUE, MIG-IDENTITY +3
+  - `#66` **[BE] OrderService / payment** · Feature · 1 children · Pranay Shinde · 8 pts · W1
+    - `#189` [BE] OrderService: addTip, capturePayment, createPayment, inquirePaymentStatus · Pranay Shinde (q19) · 8 pts · W1 · follows MIG-LEDGER, MIG-ORDERS, MIG-PLATFORM
+  - `#67` **[BE] OrderService / policy** · Feature · 1 children · Pranay Shinde · 2 pts · W1
+    - `#190` [BE] OrderService: setRefundPolicy · Deep Khanvilkar (q7) · 2 pts · W1 · follows MIG-ORDERS
+  - `#68` **[BE] OrderService / refund** · Feature · 1 children · Pranay Shinde · 5 pts · W1
+    - `#191` [BE] OrderService: createRefund, createRefundRequest, listOrderRefunds · Pranay Shinde (q20) · 5 pts · W1 · follows MIG-LEDGER, MIG-ORDERS, MIG-PLATFORM
+  - `#69` **[BE] OrderService / shift** · Feature · 5 children · Pranay Shinde · 37 pts · W1
+    - `#192` [BE] OrderService: acceptShiftVariance, adjustDepositBoxFloat, allocateDepositBox, approveShiftOpen · Pranay Shinde (q21) · 8 pts · W1 · follows MIG-IDENTITY, MIG-ORDERS, MIG-PLATFORM
+    - `#193` [BE] OrderService: closeDepositBoxes, closeShift, getCurrentShift, getShift · Pranay Shinde (q22) · 8 pts · W1 · follows MIG-LEDGER, MIG-ORDERS, MIG-PLATFORM
+    - `#194` [BE] OrderService: listDenominations, listDepositBoxes, listShifts, openShift · Pranay Shinde (q23) · 8 pts · W1 · follows MIG-IDENTITY, MIG-ORDERS, MIG-PLATFORM
+    - `#195` [BE] OrderService: recordNoSale, reopenShift, resumeShift, setDenominations · Pranay Shinde (q24) · 8 pts · W1 · follows MIG-ORDERS, MIG-PLATFORM
+    - `#196` [BE] OrderService: suspendShift, withdrawFromDepositBox · Pranay Shinde (q25) · 5 pts · W1 · follows MIG-ORDERS
+  - `#70` **[BE] OrderService / sync** · Feature · 1 children · Pranay Shinde · 2 pts · W1
+    - `#197` [BE] OrderService: syncOrders · Chinmay Patkar (q10) · 2 pts · W1 · follows MIG-ORDERS
+  - `#368` **[BE] OrderService / dunning** · Feature · 1 children · Pranay Shinde · 2 pts · W2
+    - `#425` [BE] OrderService: listMyPaymentIssues, retryMyDunningPayment · Deep Khanvilkar (q19) · 2 pts · W2 · follows MIG-PAYMENTS
+  - `#369` **[BE] OrderService / reservation** · Feature · 1 children · Pranay Shinde · 3 pts · W2
+    - `#469` [BE] OrderService: cancelReservation, getReservation, listReservations · Sanket Keluskar (q26) · 3 pts · W2 · follows MIG-ORDERS
+- `#71` **[BE] ReportingService: first-release slice (11 operations) to 1.0.0** · Epic · 5 children · Hrushikant Patkar · 21 pts · W1
+  - `#72` **[BE] ReportingService / execution** · Feature · 1 children · Hrushikant Patkar · 1 pts · W1
+    - `#146` [BE] ReportingService: runReport · Chinmay Patkar (q5) · 1 pts · W1 · follows MIG-REPORTING
+  - `#73` **[BE] ReportingService / reporting** · Feature · 1 children · Hrushikant Patkar · 2 pts · W1
+    - `#147` [BE] ReportingService: listAlerts, setAlertRule · Deep Khanvilkar (q5) · 2 pts · W1 · follows MIG-IDENTITY, MIG-REPORTING
+  - `#375` **[BE] ReportingService / catalogue** · Feature · 1 children · Hrushikant Patkar · 5 pts · W2
+    - `#427` [BE] ReportingService: deleteReport, getReport, listReports · Hrushikant Patkar (q46) · 5 pts · W2 · follows MIG-REPORTING
+  - `#376` **[BE] ReportingService / dashboard** · Feature · 1 children · Hrushikant Patkar · 5 pts · W2
+    - `#428` [BE] ReportingService: createDashboard, getDashboard, updateDashboard · Hrushikant Patkar (q47) · 5 pts · W2 · follows MIG-REPORTING
+  - `#377` **[BE] ReportingService / naturalLanguage** · Feature · 1 children · Hrushikant Patkar · 8 pts · W2
+    - `#429` [BE] ReportingService: askReportingQuestion, saveNaturalLanguageQuery · Hrushikant Patkar (q48) · 8 pts · W2 · follows MIG-AI, MIG-REPORTING
+- `#74` **[BE] RetailService: first-release slice (14 operations) to 1.0.0** · Epic · 4 children · Tanmay Dukhande · 24 pts · W1
+  - `#75` **[BE] RetailService / floor** · Feature · 1 children · Tanmay Dukhande · 3 pts · W1
+    - `#307` [BE] RetailService: lookupMerchandise, lookupShopAndDrop, reserveMerchandise · Sanket Keluskar (q20) · 3 pts · W1 · follows MIG-RETAIL
+  - `#76` **[BE] RetailService / merchandise** · Feature · 1 children · Tanmay Dukhande · 5 pts · W1
+    - `#308` [BE] RetailService: createMerchandise, listMerchandise, updateMerchandise · Tanmay Dukhande (q35) · 5 pts · W1 · follows MIG-RETAIL
+  - `#77` **[BE] RetailService / return** · Feature · 1 children · Tanmay Dukhande · 8 pts · W1
+    - `#309` [BE] RetailService: createRetailReturn, getReturnPolicy, lookupRetailSale, setReturnPolicy · Tanmay Dukhande (q36) · 8 pts · W1 · follows MIG-RETAIL
+  - `#78` **[BE] RetailService / sale** · Feature · 1 children · Tanmay Dukhande · 8 pts · W1
+    - `#310` [BE] RetailService: createRetailSale, getRetailSale, listRetailSales, reprintReceipt · Tanmay Dukhande (q37) · 8 pts · W1 · follows MIG-RETAIL
+- `#79` **[BE] TenancyService: first-release slice (23 operations) to 1.0.0** · Epic · 8 children · Hrushikant Patkar · 41 pts · W1
+  - `#80` **[BE] TenancyService / delegation** · Feature · 1 children · Hrushikant Patkar · 2 pts · W1
+    - `#133` [BE] TenancyService: createApprovalDelegation · Chinmay Patkar (q4) · 2 pts · W1 · follows MIG-APPROVALS, MIG-IDENTITY
+  - `#81` **[BE] TenancyService / matrix** · Feature · 1 children · Hrushikant Patkar · 3 pts · W1
+    - `#134` [BE] TenancyService: setApprovalMatrix · Sanket Keluskar (q5) · 3 pts · W1 · follows MIG-APPROVALS
+  - `#82` **[BE] TenancyService / region** · Feature · 1 children · Hrushikant Patkar · 2 pts · W1
+    - `#148` [BE] TenancyService: updateRegionSettings · Chinmay Patkar (q6) · 2 pts · W1 · follows MIG-PLATFORM
+  - `#83` **[BE] TenancyService / request** · Feature · 1 children · Hrushikant Patkar · 8 pts · W1
+    - `#149` [BE] TenancyService: createApprovalRequest, decideApprovalRequest, evaluateApprovalRequirement · Hrushikant Patkar (q16) · 8 pts · W1 · follows MIG-APPROVALS, MIG-IDENTITY, MIG-PLATFORM
+  - `#84` **[BE] TenancyService / rota** · Feature · 1 children · Hrushikant Patkar · 3 pts · W1
+    - `#150` [BE] TenancyService: createRotaAssignment, listRotaAssignments · Sanket Keluskar (q6) · 3 pts · W1 · follows MIG-IDENTITY, MIG-PLATFORM, MIG-WORKFORCE
+  - `#85` **[BE] TenancyService / scope** · Feature · 1 children · Hrushikant Patkar · 2 pts · W1
+    - `#151` [BE] TenancyService: createOrgUnit, updateOrgUnit · Deep Khanvilkar (q6) · 2 pts · W1 · follows MIG-PLATFORM
+  - `#86` **[BE] TenancyService / tenancy** · Feature · 1 children · Hrushikant Patkar · 5 pts · W1
+    - `#224` [BE] TenancyService: getVenueSettings, getWorkstationHealth, setVenueSettings · Hrushikant Patkar (q27) · 5 pts · W1 · follows MIG-ACCESS, MIG-PLATFORM
+  - `#87` **[BE] TenancyService / workstation** · Feature · 3 children · Hrushikant Patkar · 16 pts · W1
+    - `#152` [BE] TenancyService: configureWorkstation, createOutlet, createSaleBoard, listDevices · Hrushikant Patkar (q17) · 8 pts · W1 · follows MIG-PLATFORM
+    - `#153` [BE] TenancyService: listOutlets, listSaleBoards, listWorkstations, recordDeviceHeartbeat · Hrushikant Patkar (q18) · 5 pts · W1 · follows MIG-PLATFORM
+    - `#154` [BE] TenancyService: updateOutlet, updateSaleBoard · Sanket Keluskar (q7) · 3 pts · W1 · follows MIG-PLATFORM
+- `#88` **[BE] VenueOpsService: first-release slice (33 operations) to 1.0.0** · Epic · 11 children · Pranay Shinde · 55 pts · W1
+  - `#89` **[BE] VenueOpsService / asset** · Feature · 2 children · Pranay Shinde · 10 pts · W1
+    - `#135` [BE] VenueOpsService: deleteMediaAsset, getMediaAsset, replaceMediaAsset, searchMedia · Pranay Shinde (q8) · 8 pts · W1 · follows MIG-ASSETS
+    - `#405` [BE] VenueOpsService: updateMediaAsset · Chinmay Patkar (q35) · 2 pts · W2 · follows MIG-ASSETS
+  - `#90` **[BE] VenueOpsService / card** · Feature · 1 children · Pranay Shinde · 5 pts · W1
+    - `#129` [BE] VenueOpsService: getGameCard, issueGameCard, transferGameCard · Pranay Shinde (q6) · 5 pts · W1 · follows MIG-GAMES
+  - `#91` **[BE] VenueOpsService / entry** · Feature · 1 children · Pranay Shinde · 5 pts · W1
+    - `#246` [BE] VenueOpsService: getWaitingGuest, joinQueue, leaveQueue, listQueueEntries · Pranay Shinde (q37) · 5 pts · W1 · follows MIG-QUEUE
+  - `#92` **[BE] VenueOpsService / feed** · Feature · 1 children · Pranay Shinde · 2 pts · W1
+    - `#247` [BE] VenueOpsService: configureQueueFeed, getQueueFeedHealth · Chinmay Patkar (q17) · 2 pts · W1 · follows MIG-QUEUE
+  - `#93` **[BE] VenueOpsService / queue** · Feature · 1 children · Pranay Shinde · 8 pts · W1
+    - `#248` [BE] VenueOpsService: createQueue, getQueue, listQueues, updateQueue · Pranay Shinde (q38) · 8 pts · W1 · follows MIG-QUEUE
+  - `#94` **[BE] VenueOpsService / venueMap** · Feature · 2 children · Pranay Shinde · 13 pts · W1
+    - `#163` [BE] VenueOpsService: createVenueMap, getVenueMap, getVenueMapGraph, importVenueGeometry · Pranay Shinde (q12) · 8 pts · W1 · follows MIG-ASSETS, MIG-PLATFORM, MIG-VENUEMAP
+    - `#225` [BE] VenueOpsService: publishVenueMap, setVenuePoint · Pranay Shinde (q36) · 5 pts · W1 · follows MIG-ACCESS, MIG-ASSETS, MIG-CATALOGUE +2
+  - `#95` **[BE] VenueOpsService / waitTime** · Feature · 1 children · Pranay Shinde · 1 pts · W1
+    - `#249` [BE] VenueOpsService: getWaitTimes · Deep Khanvilkar (q10) · 1 pts · W1 · follows MIG-QUEUE
+  - `#378` **[BE] VenueOpsService / collection** · Feature · 1 children · Pranay Shinde · 2 pts · W2
+    - `#406` [BE] VenueOpsService: createCollection, listCollections · Deep Khanvilkar (q15) · 2 pts · W2 · follows MIG-ASSETS
+  - `#379` **[BE] VenueOpsService / resources** · Feature · 1 children · Pranay Shinde · 5 pts · W2
+    - `#455` [BE] VenueOpsService: createResource, getResourceAvailability, updateResource · Pranay Shinde (q45) · 5 pts · W2 · follows MIG-MAINTENANCE, MIG-PLATFORM, MIG-RESOURCES
+  - `#380` **[BE] VenueOpsService / rights** · Feature · 1 children · Pranay Shinde · 1 pts · W2
+    - `#407` [BE] VenueOpsService: getExpiringRights · Chinmay Patkar (q36) · 1 pts · W2 · follows MIG-ASSETS
+  - `#381` **[BE] VenueOpsService / upload** · Feature · 1 children · Pranay Shinde · 3 pts · W2
+    - `#408` [BE] VenueOpsService: completeUpload, createUpload · Sanket Keluskar (q21) · 3 pts · W2 · follows MIG-ASSETS
+- `#96` **[BE] WalletService: first-release slice (5 operations) to 1.0.0** · Epic · 4 children · Tanmay Dukhande · 7 pts · W1
+  - `#97` **[BE] WalletService / card** · Feature · 1 children · Tanmay Dukhande · 2 pts · W1
+    - `#136` [BE] WalletService: loadGameCredits · Deep Khanvilkar (q4) · 2 pts · W1 · follows MIG-GAMES, MIG-WALLET
+  - `#382` **[BE] WalletService / giftCard** · Feature · 1 children · Tanmay Dukhande · 1 pts · W2
+    - `#409` [BE] WalletService: getGiftCard · Deep Khanvilkar (q16) · 1 pts · W2 · follows MIG-WALLET
+  - `#383` **[BE] WalletService / retail** · Feature · 1 children · Tanmay Dukhande · 2 pts · W2
+    - `#410` [BE] WalletService: transferWalletBalance · Chinmay Patkar (q37) · 2 pts · W2 · follows MIG-PII, MIG-WALLET
+  - `#384` **[BE] WalletService / wallet** · Feature · 1 children · Tanmay Dukhande · 2 pts · W2
+    - `#411` [BE] WalletService: getWallet, listWalletTransactions · Deep Khanvilkar (q17) · 2 pts · W2 · follows MIG-WALLET
+- `#98` **[BE] WhiteLabelService: first-release slice (45 operations) to 1.0.0** · Epic · 10 children · Hrushikant Patkar · 59 pts · W1
+  - `#99` **[BE] WhiteLabelService / overview** · Feature · 1 children · Hrushikant Patkar · 5 pts · W1
+    - `#137` [BE] WhiteLabelService: getTenantAppStatus, getTenantConfig, setMaintenanceMode · Hrushikant Patkar (q13) · 5 pts · W1 · follows MIG-CONTROL, MIG-WHITELABEL
+  - `#385` **[BE] WhiteLabelService / brand** · Feature · 1 children · Hrushikant Patkar · 5 pts · W2
+    - `#412` [BE] WhiteLabelService: getAppIcons, getBrandIdentity, setAppIcons, setBrandIdentity · Hrushikant Patkar (q39) · 5 pts · W2 · follows MIG-WHITELABEL
+  - `#386` **[BE] WhiteLabelService / branding** · Feature · 1 children · Hrushikant Patkar · 3 pts · W2
+    - `#413` [BE] WhiteLabelService: getBookingFlowConfig, setBookingFlowConfig · Sanket Keluskar (q22) · 3 pts · W2 · follows MIG-WHITELABEL
+  - `#387` **[BE] WhiteLabelService / content** · Feature · 4 children · Hrushikant Patkar · 18 pts · W2
+    - `#414` [BE] WhiteLabelService: createBanner, createContentPage, createPromoBlock, deletePromoBlock · Hrushikant Patkar (q40) · 5 pts · W2 · follows MIG-WHITELABEL
+    - `#415` [BE] WhiteLabelService: listBanners, listContentPages, listFaqs, listPolicies · Hrushikant Patkar (q41) · 5 pts · W2 · follows MIG-WHITELABEL
+    - `#416` [BE] WhiteLabelService: listPromoBlocks, setFaqs, setPolicy, updateBanner · Hrushikant Patkar (q42) · 5 pts · W2 · follows MIG-WHITELABEL
+    - `#417` [BE] WhiteLabelService: updateContentPage, updatePromoBlock · Sanket Keluskar (q23) · 3 pts · W2 · follows MIG-WHITELABEL
+  - `#388` **[BE] WhiteLabelService / homepage** · Feature · 1 children · Hrushikant Patkar · 2 pts · W2
+    - `#418` [BE] WhiteLabelService: getHomepageLayout, setHomepageLayout · Chinmay Patkar (q38) · 2 pts · W2 · follows MIG-WHITELABEL
+  - `#389` **[BE] WhiteLabelService / modules** · Feature · 2 children · Hrushikant Patkar · 4 pts · W2
+    - `#419` [BE] WhiteLabelService: getFeatureToggles, getModuleEnablement, setFeatureToggles, setLanguages · Sanket Keluskar (q24) · 3 pts · W2 · follows MIG-CONTROL, MIG-SUBSCRIPTION, MIG-WHITELABEL
+    - `#420` [BE] WhiteLabelService: setModuleEnablement · Deep Khanvilkar (q18) · 1 pts · W2 · follows MIG-CONTROL, MIG-SUBSCRIPTION, MIG-WHITELABEL
+  - `#390` **[BE] WhiteLabelService / publishing** · Feature · 2 children · Hrushikant Patkar · 10 pts · W2
+    - `#421` [BE] WhiteLabelService: restoreConfigVersion, validateTenantConfig · Hrushikant Patkar (q43) · 5 pts · W2 · follows MIG-CONTROL, MIG-WHITELABEL
+    - `#430` [BE] WhiteLabelService: createPreview, diffConfigVersion, listConfigVersions, publishTenantConfig · Hrushikant Patkar (q49) · 5 pts · W2 · follows MIG-PLATFORM, MIG-WHITELABEL
+  - `#391` **[BE] WhiteLabelService / theme** · Feature · 1 children · Hrushikant Patkar · 5 pts · W2
+    - `#422` [BE] WhiteLabelService: getFonts, getTheme, setFonts, setTheme · Hrushikant Patkar (q44) · 5 pts · W2 · follows MIG-WHITELABEL
+  - `#392` **[BE] WhiteLabelService / white-label** · Feature · 1 children · Hrushikant Patkar · 5 pts · W2
+    - `#423` [BE] WhiteLabelService: claimCustomDomain, listCustomDomains, relinquishCustomDomain, verifyCustomDomain · Hrushikant Patkar (q45) · 5 pts · W2 · follows MIG-CONTROL, MIG-WHITELABEL
+  - `#393` **[BE] WhiteLabelService / whiteLabel** · Feature · 1 children · Hrushikant Patkar · 2 pts · W2
+    - `#399` [BE] WhiteLabelService: setFooter · Chinmay Patkar (q34) · 2 pts · W2 · follows MIG-CONTROL
+- `#100` **[FE] Guest App - Mobile: 71 screens** · Epic · 71 children · 229 pts · W1
+  - `#108` [FE] GST-043 Arabic / RTL Experience · Chinmay Patkar (q2) · 2 pts · W1 · follows SETUP-CLIENTS
+  - `#155` [FE] GST-047 Maintenance / Upgrade Page · Chitrangi Mestry (q2) · 2 pts · W1 · follows SETUP-CLIENTS, SVC-WHITELABEL-OVERVIEW-1
+  - `#198` [FE] GST-002 Explore Categories · Chinmay Patkar (q11) · 3 pts · W1 · follows SETUP-CLIENTS, SVC-CATALOGUE-PRODUCT-3
+  - `#199` [FE] GST-005 What's On · Chitrangi Mestry (q4) · 3 pts · W1 · follows SETUP-CLIENTS, SVC-CATALOGUE-EVENT-1, SVC-CATALOGUE-PRODUCT-3
+  - `#200` [FE] GST-006 Event / Exhibition Details · Chinmay Patkar (q12) · 3 pts · W1 · follows SETUP-CLIENTS, SVC-CATALOGUE-EVENT-1, SVC-CATALOGUE-PRODUCT-1
+  - `#201` [FE] GST-007 Select Date & Time · Chitrangi Mestry (q5) · 3 pts · W1 · follows SETUP-CLIENTS, SVC-CATALOGUE-CAPACITY-1, SVC-CATALOGUE-EVENT-1 +1
+  - `#202` [FE] GST-063 Search · Chinmay Patkar (q13) · 3 pts · W1 · follows SETUP-CLIENTS, SVC-CATALOGUE-CATALOGUE-3
+  - `#250` [FE] GST-008 Tickets & Add-ons · Chinmay Patkar (q18) · 2 pts · W1 · follows SETUP-CLIENTS, SVC-ORDER-ORDER-5
+  - `#251` [FE] GST-010 Booking Confirmation · Chitrangi Mestry (q8) · 3 pts · W1 · follows SETUP-CLIENTS, SVC-ORDER-ORDER-2, SVC-ORDER-ORDER-4 +1
+  - `#289` [FE] GST-003 Event & Attraction Listing · Chitrangi Mestry (q11) · 3 pts · W1 · follows SETUP-CLIENTS, SVC-CATALOGUE-CATALOGUE-3, SVC-CATALOGUE-EVENT-1 +2
+  - `#290` [FE] GST-004 Attraction Details · Chinmay Patkar (q21) · 3 pts · W1 · follows SETUP-CLIENTS, SVC-CATALOGUE-CAPACITY-1, SVC-CATALOGUE-EVENT-1 +3
+  - `#291` [FE] GST-046 Branded Queue / Waiting Room · Chitrangi Mestry (q12) · 3 pts · W1 · follows SETUP-CLIENTS, SVC-VENUEOPS-ENTRY-1, SVC-VENUEOPS-WAITTIME-1
+  - `#311` [FE] GST-001 Home – Default · Chinmay Patkar (q24) · 3 pts · W1 · follows SETUP-CLIENTS, SVC-ACCESS-ACCESS-2, SVC-CATALOGUE-CATALOGUE-3 +2
+  - `#312` [FE] GST-012 My Tickets · Chinmay Patkar (q25) · 3 pts · W1 · follows SETUP-CLIENTS, SVC-ACCESS-ACCESS-1, SVC-ACCESS-ACCESS-2 +1
+  - `#313` [FE] GST-013 Ticket Details · Chinmay Patkar (q26) · 3 pts · W1 · follows SETUP-CLIENTS, SVC-ACCESS-ACCESS-1, SVC-ACCESS-ACCESS-2 +1
+  - `#314` [FE] GST-039 Profile · Chinmay Patkar (q27) · 3 pts · W1 · follows SETUP-CLIENTS, SVC-MARKETING-CONSENT-1, SVC-MARKETING-MARKETING-6
+  - `#315` [FE] GST-042 Simple Registration & OTP · Chitrangi Mestry (q14) · 8 pts · W1 · follows SETUP-CLIENTS, SVC-IDENTITY-GUESTAUTH-1, SVC-IDENTITY-GUESTAUTH-2 +5
+  - `#316` [FE] GST-055 Dynamic QR Ticket · Chitrangi Mestry (q15) · 3 pts · W1 · follows SETUP-CLIENTS, SVC-ACCESS-ACCESS-1, SVC-ACCESS-ACCESS-2 +1
+  - `#336` [FE] GST-009 Review & Payment · Chitrangi Mestry (q19) · 5 pts · W1 · follows SETUP-CLIENTS, SVC-CATALOGUE-LEASE-1, SVC-MARKETING-GUESTS-1 +7
+  - `#337` [FE] GST-041 Checkout Entry · Chitrangi Mestry (q20) · 5 pts · W1 · follows SETUP-CLIENTS, SVC-CATALOGUE-PRODUCT-2, SVC-ORDER-CART-1 +2
+  - `#431` [FE] GST-011 Wallet Overview · Chinmay Patkar (q40) · 3 pts · W2 · follows SETUP-CLIENTS, SVC-WALLET-WALLET-1
+  - `#432` [FE] GST-033 AI Concierge – Contextual Help · Chinmay Patkar (q41) · 2 pts · W2 · follows SETUP-CLIENTS, SVC-AI-ASSIST-1
+  - `#433` [FE] GST-057 Accessibility Information · Chinmay Patkar (q42) · 3 pts · W2 · follows SETUP-CLIENTS, SVC-WHITELABEL-CONTENT-2
+  - `#470` [FE] GST-044 Multi-Currency & Pricing · Chinmay Patkar (q55) · 3 pts · W2 · follows SETUP-CLIENTS, SVC-CATALOGUE-PRODUCT-3, SVC-LEDGER-LEDGER-1
+  - `#471` [FE] GST-049 Interactive Seat Selection · Chinmay Patkar (q56) · 3 pts · W2 · follows SETUP-CLIENTS, SVC-CATALOGUE-AVAILABILITY-1, SVC-CATALOGUE-HOLD-1 +1
+  - `#474` [FE] GST-016 My Reservations · Chitrangi Mestry (q32) · 3 pts · W2 · follows SETUP-CLIENTS, SVC-ORDER-RESERVATION-1
+  - `#475` [FE] GST-017 Reservation Details · Chinmay Patkar (q58) · 3 pts · W2 · follows SETUP-CLIENTS, SVC-ORDER-RESERVATION-1
+  - `#481` [FE] GST-014 Ticket Transfer · Chitrangi Mestry (q33) · 3 pts · W2 · follows SETUP-CLIENTS, SVC-ORDER-ORDER-1, SVC-ORDER-ORDER-3 +1
+  - `#482` [FE] GST-019 Order History · Chinmay Patkar (q59) · 3 pts · W2 · follows SETUP-CLIENTS, SVC-ORDER-ORDER-2, SVC-ORDER-ORDER-3 +2
+  - `#483` [FE] GST-045 Ticket Delivery & Sharing · Chitrangi Mestry (q34) · 2 pts · W2 · follows SETUP-CLIENTS, SVC-ORDER-ORDER-5
+  - `#488` [FE] GST-021 Interactive Map · Chinmay Patkar (q61) · 3 pts · W2 · follows SETUP-CLIENTS, SVC-CATALOGUE-PRODUCT-3, SVC-VENUEOPS-VENUEMAP-1 +1
+  - `#489` [FE] GST-022 Attraction Wait Times · Chinmay Patkar (q62) · 3 pts · W2 · follows SETUP-CLIENTS, SVC-VENUEOPS-WAITTIME-1
+  - `#490` [FE] GST-024 F&B – Browse & Order · Chitrangi Mestry (q35) · 5 pts · W2 · follows SETUP-CLIENTS, SVC-FNB-GUESTORDERING-1, SVC-FNB-GUESTORDERING-2 +2
+  - `#491` [FE] GST-025 F&B – Order Tracking · Chinmay Patkar (q63) · 3 pts · W2 · follows SETUP-CLIENTS, SVC-FNB-GUESTORDERING-1, SVC-FNB-GUESTORDERING-2
+  - `#492` [FE] GST-029 Venue Info & Services · Chinmay Patkar (q64) · 3 pts · W2 · follows SETUP-CLIENTS, SVC-FNB-GUESTORDERING-2, SVC-FNB-GUESTORDERING-3
+  - `#493` [FE] GST-030 In-Venue Notifications · Chitrangi Mestry (q36) · 3 pts · W2 · follows SETUP-CLIENTS, SVC-FNB-GUESTORDERING-1
+  - `#494` [FE] GST-061 Menu Item Detail · Chinmay Patkar (q65) · 3 pts · W2 · follows SETUP-CLIENTS, SVC-FNB-GUESTORDERING-2, SVC-FNB-MODIFIER-1
+  - `#495` [FE] GST-070 Reserve a Table or Cabana · Chitrangi Mestry (q37) · 5 pts · W2 · follows SETUP-CLIENTS, SVC-CATALOGUE-CATALOGUE-2, SVC-FNB-FNB-1 +3
+  - `#511` [FE] GST-015 Memberships · Chitrangi Mestry (q43) · 5 pts · W2 · follows SETUP-CLIENTS, SVC-CATALOGUE-CATALOGUE-1, SVC-CATALOGUE-CATALOGUE-2 +5
+  - `#512` [FE] GST-031 AI Concierge – Home · Chinmay Patkar (q70) · 3 pts · W2 · follows SETUP-CLIENTS, SVC-AI-AI-1, SVC-AI-ASSIST-1 +2
+  - `#513` [FE] GST-034 Lost & Found · Chinmay Patkar (q71) · 3 pts · W2 · follows SETUP-CLIENTS, SVC-MARKETING-MARKETING-3, SVC-MARKETING-MARKETING-4
+  - `#514` [FE] GST-040 Help & Support · Chitrangi Mestry (q44) · 5 pts · W2 · follows SETUP-CLIENTS, SVC-MARKETING-MARKETING-3, SVC-MARKETING-MARKETING-4 +1
+  - `#515` [FE] GST-066 Privacy & My Data · Chinmay Patkar (q72) · 3 pts · W2 · follows SETUP-CLIENTS, SVC-IDENTITY-GUESTAUTH-1, SVC-IDENTITY-IDENTITY-1 +3
+  - `#516` [FE] GST-067 Refunds & Resale · Chitrangi Mestry (q45) · 3 pts · W2 · follows SETUP-CLIENTS, SVC-MARKETING-MARKETING-2, SVC-ORDER-ORDERS-1 +1
+  - `#517` [FE] GST-068 Help & My Cases · Chinmay Patkar (q73) · 3 pts · W2 · follows SETUP-CLIENTS, SVC-AI-ASSIST-1, SVC-MARKETING-CASE-1
+  - `#518` [FE] GST-069 Face Pass · Chitrangi Mestry (q46) · 3 pts · W2 · follows SETUP-CLIENTS, SVC-ACCESS-ACCESS-1, SVC-ACCESS-ACCESS-2 +1
+  - `#519` [FE] GST-071 Payment Methods · Chinmay Patkar (q74) · 3 pts · W2 · follows SETUP-CLIENTS, SVC-MARKETING-MARKETING-4, SVC-ORDER-ORDERS-3 +3
+  - `#520` [FE] GST-073 Security & Sign-in · Chitrangi Mestry (q47) · 3 pts · W2 · follows SETUP-CLIENTS, SVC-IDENTITY-IDENTITY-3, SVC-IDENTITY-MFA-1 +2
+  - `#536` [FE] GST-026 Retail / Merchandise · Chinmay Patkar (q79) · 3 pts · W2 · follows SETUP-CLIENTS, SVC-RETAIL-FLOOR-1, SVC-RETAIL-MERCHANDISE-1 +1
+  - `#537` [FE] GST-032 AI Concierge – Chat · Chitrangi Mestry (q52) · 5 pts · W2 · follows SETUP-CLIENTS, SVC-AI-ASSIST-1, SVC-FNB-GUESTORDERING-1 +5
+  - `#538` [FE] GST-036 Loyalty & Rewards · Chinmay Patkar (q80) · 3 pts · W2 · follows SETUP-CLIENTS, SVC-CATALOGUE-EVALUATION-1, SVC-CATALOGUE-PROMOTION-2 +2
+  - `#539` [FE] GST-037 Offers & Promotions · Chinmay Patkar (q81) · 3 pts · W2 · follows SETUP-CLIENTS, SVC-CATALOGUE-COUPON-1, SVC-CATALOGUE-EVALUATION-1 +2
+  - `#540` [FE] GST-048 Upsell / Cross-Sell · Chinmay Patkar (q82) · 3 pts · W2 · follows SETUP-CLIENTS, SVC-CATALOGUE-UPSELL-1, SVC-ORDER-CART-1
+  - `#541` [FE] GST-056 Bundle Package · Chitrangi Mestry (q53) · 3 pts · W2 · follows SETUP-CLIENTS, SVC-CATALOGUE-BUNDLE-1, SVC-ORDER-CART-1
+  - `#542` [FE] GST-072 Share & Group Booking · Chitrangi Mestry (q54) · 5 pts · W2 · follows SETUP-CLIENTS, SVC-CATALOGUE-PRODUCT-1, SVC-CATALOGUE-PRODUCT-2 +6
+  - `#550` [FE] GST-058 Resource Availability (Cabana) · Chinmay Patkar (q86) · 3 pts · W3 · follows SETUP-CLIENTS, SVC-CATALOGUE-CAPACITY-1, SVC-CATALOGUE-PRODUCT-3
+  - `#551` [FE] GST-050 Resource Booking – Cabana · Chitrangi Mestry (q57) · 3 pts · W3 · follows SETUP-CLIENTS, SVC-CATALOGUE-CAPACITY-1, SVC-CATALOGUE-PRODUCT-3 +1
+  - `#552` [FE] GST-018 Add to Calendar / Reminders · Chinmay Patkar (q87) · 3 pts · W3 · follows SETUP-CLIENTS, SVC-ORDER-ORDER-2, SVC-ORDER-ORDER-3 +2
+  - `#554` [FE] GST-023 Virtual Queue · Chitrangi Mestry (q58) · 3 pts · W3 · follows SETUP-CLIENTS, SVC-VENUEOPS-ENTRY-1, SVC-VENUEOPS-QUEUE-1 +1
+  - `#555` [FE] GST-038 Digital Companion Mode · Chinmay Patkar (q89) · 3 pts · W3 · follows SETUP-CLIENTS, SVC-CATALOGUE-PRODUCT-3, SVC-VENUEOPS-WAITTIME-1 +1
+  - `#556` [FE] GST-051 Plan Your Adventure – Start · Chitrangi Mestry (q59) · 3 pts · W3 · follows SETUP-CLIENTS, SVC-CATALOGUE-PRODUCT-3, SVC-VENUEOPS-WAITTIME-1
+  - `#557` [FE] GST-054 AI Optimized Itinerary · Chinmay Patkar (q90) · 3 pts · W3 · follows SETUP-CLIENTS, SVC-AI-AI-1, SVC-AI-ASSIST-1 +2
+  - `#558` [FE] GST-059 Plan My Day – In Progress · Chitrangi Mestry (q60) · 3 pts · W3 · follows SETUP-CLIENTS, SVC-AI-AI-1, SVC-CATALOGUE-PRODUCT-3 +1
+  - `#559` [FE] GST-020 Saved Items / Wishlist · Chinmay Patkar (q91) · 3 pts · W3 · follows SETUP-CLIENTS, SVC-MARKETING-GUEST-1, SVC-MARKETING-GUEST-2
+  - `#560` [FE] GST-027 Parking – Reserve & Pay · Chitrangi Mestry (q61) · 3 pts · W3 · follows SETUP-CLIENTS, SVC-ACCESS-ACCESS-1, SVC-ACCESS-ACCESS-3
+  - `#561` [FE] GST-028 Parking – Reservation Confirmed · Chinmay Patkar (q92) · 3 pts · W3 · follows SETUP-CLIENTS, SVC-ACCESS-ACCESS-1, SVC-ACCESS-ACCESS-3
+  - `#562` [FE] GST-035 Feedback & Ratings · Chitrangi Mestry (q62) · 3 pts · W3 · follows SETUP-CLIENTS, SVC-MARKETING-FEEDBACK-1, SVC-MARKETING-MARKETING-3
+  - `#563` [FE] GST-065 Newsletter & Preferences · Chinmay Patkar (q93) · 3 pts · W3 · follows SETUP-CLIENTS, SVC-MARKETING-CONSENT-1, SVC-MARKETING-MARKETING-2 +1
+  - `#568` [FE] GST-052 Suggested Itineraries · Chitrangi Mestry (q65) · 3 pts · W3 · follows SETUP-CLIENTS, SVC-AI-AI-1, SVC-CATALOGUE-BUNDLE-1 +1
+  - `#569` [FE] GST-053 Build Your Own Itinerary · Chinmay Patkar (q96) · 3 pts · W3 · follows SETUP-CLIENTS, SVC-CATALOGUE-PRODUCT-3, SVC-ORDER-CART-1 +2
+  - `#570` [FE] GST-062 Shop & Drop Collection · Chitrangi Mestry (q66) · 3 pts · W3 · follows SETUP-CLIENTS, SVC-RETAIL-FLOOR-1
+- `#101` **[FE] Point of Sale: 40 screens** · Epic · 40 children · 191 pts · W1
+  - `#203` [FE] POS-003 Sell — Timed Entry · Pradnya Yeram (q2) · 5 pts · W1 · follows SETUP-CLIENTS, SVC-CATALOGUE-CAPACITY-1, SVC-CATALOGUE-LEASE-1 +3
+  - `#226` [FE] POS-015 Cash Operations Dashboard · Pradnya Yeram (q3) · 3 pts · W1 · follows SETUP-CLIENTS, SVC-ORDER-CASH-1, SVC-ORDER-SHIFT-3
+  - `#227` [FE] POS-016 Till Configuration · Pradnya Yeram (q4) · 5 pts · W1 · follows SETUP-CLIENTS, SVC-ACCESS-DRAFTED-1, SVC-ORDER-SHIFT-1 +2
+  - `#228` [FE] POS-017 Cash In / Cash Out Operations · Pradnya Yeram (q5) · 3 pts · W1 · follows SETUP-CLIENTS, SVC-ORDER-CASH-1
+  - `#229` [FE] POS-018 Safe Drop & Cash Transfer Management · Pradnya Yeram (q6) · 3 pts · W1 · follows SETUP-CLIENTS, SVC-IDENTITY-ADMINISTRATION-1, SVC-ORDER-CASH-1 +2
+  - `#230` [FE] POS-020 Shift Exceptions & Alerts · Pradnya Yeram (q7) · 5 pts · W1 · follows SETUP-CLIENTS, SVC-ORDER-SHIFT-4, SVC-REPORTING-EXECUTION-1 +2
+  - `#252` [FE] POS-006 Held Orders · Pradnya Yeram (q8) · 8 pts · W1 · follows SETUP-CLIENTS, SVC-ORDER-ORDER-1, SVC-ORDER-ORDER-2 +4
+  - `#253` [FE] POS-013 Mobile POS, Event Sales & Offline Operations · Pradnya Yeram (q9) · 5 pts · W1 · follows SETUP-CLIENTS, SVC-ACCESS-SYNC-1, SVC-ORDER-CASH-1 +5
+  - `#254` [FE] POS-014 Sales Exceptions, Controls & Operational Actions · Pradnya Yeram (q10) · 3 pts · W1 · follows SETUP-CLIENTS, SVC-ORDER-ORDER-1, SVC-ORDER-ORDER-5 +1
+  - `#255` [FE] POS-019 Shift Templates & Policies · Pradnya Yeram (q11) · 3 pts · W1 · follows SETUP-CLIENTS, SVC-ORDER-SHIFT-3, SVC-TENANCY-TENANCY-1
+  - `#256` [FE] POS-025 Till Home · Pradnya Yeram (q12) · 5 pts · W1 · follows SETUP-CLIENTS, SVC-ORDER-SHIFT-2, SVC-REPORTING-REPORTING-1 +3
+  - `#292` [FE] POS-024 Outlet Setup · Pradnya Yeram (q13) · 5 pts · W1 · follows SETUP-CLIENTS, SVC-FNB-FNB-6, SVC-FNB-MENU-1 +2
+  - `#293` [FE] POS-029 Order Queue · Pradnya Yeram (q14) · 3 pts · W1 · follows SETUP-CLIENTS, SVC-FNB-ORDER-1, SVC-VENUEOPS-ENTRY-1 +2
+  - `#317` [FE] POS-000 Sign In · Pradnya Yeram (q15) · 5 pts · W1 · follows SETUP-CLIENTS, SVC-IDENTITY-IDENTITY-1, SVC-IDENTITY-IDENTITY-2 +2
+  - `#318` [FE] POS-001 Begin Shift · Pradnya Yeram (q16) · 8 pts · W1 · follows SETUP-CLIENTS, SVC-IDENTITY-IDENTITY-3, SVC-ORDER-CASH-1 +6
+  - `#319` [FE] POS-022 Send to Kitchen · Pradnya Yeram (q17) · 5 pts · W1 · follows SETUP-CLIENTS, SVC-FNB-FNB-4, SVC-FNB-KITCHEN-1 +2
+  - `#320` [FE] POS-027 Guest Lookup · Pradnya Yeram (q18) · 3 pts · W1 · follows SETUP-CLIENTS, SVC-MARKETING-GUEST-2, SVC-MARKETING-MARKETING-3
+  - `#321` [FE] POS-028 Table Service · Pradnya Yeram (q19) · 5 pts · W1 · follows SETUP-CLIENTS, SVC-FNB-BILL-1, SVC-FNB-FNB-3 +3
+  - `#338` [FE] POS-002 Sell — Ticket Catalogue · Pradnya Yeram (q20) · 8 pts · W1 · follows SETUP-CLIENTS, SVC-ACCESS-ACCESS-2, SVC-CATALOGUE-BUNDLE-1 +26
+  - `#339` [FE] POS-005 Payment · Pradnya Yeram (q21) · 8 pts · W1 · follows SETUP-CLIENTS, SVC-MARKETING-MARKETING-4, SVC-ORDER-ORDER-1 +3
+  - `#340` [FE] POS-007 Close Shift · Pradnya Yeram (q22) · 8 pts · W1 · follows SETUP-CLIENTS, SVC-ORDER-CASH-1, SVC-ORDER-SHIFT-1 +5
+  - `#341` [FE] POS-010 Add to Existing Ticket · Pradnya Yeram (q23) · 5 pts · W1 · follows SETUP-CLIENTS, SVC-ORDER-CART-2, SVC-ORDER-ORDER-1 +2
+  - `#342` [FE] POS-011 Returns, Refunds & Exchanges · Pradnya Yeram (q24) · 5 pts · W1 · follows SETUP-CLIENTS, SVC-INVENTORY-INVENTORY-1, SVC-ORDER-ORDER-2 +5
+  - `#343` [FE] POS-012 Omnichannel Order & Fulfilment Center · Pradnya Yeram (q25) · 5 pts · W1 · follows SETUP-CLIENTS, SVC-FNB-GUESTORDERING-3, SVC-ORDER-ORDER-3 +4
+  - `#344` [FE] POS-021 Sell — Food & Drink · Pradnya Yeram (q26) · 5 pts · W1 · follows SETUP-CLIENTS, SVC-CATALOGUE-EVALUATION-1, SVC-FNB-GUESTORDERING-2 +3
+  - `#345` [FE] POS-023 Sell — Merchandise · Pradnya Yeram (q27) · 5 pts · W1 · follows SETUP-CLIENTS, SVC-CATALOGUE-EVALUATION-1, SVC-ORDER-CART-1 +3
+  - `#346` [FE] POS-026 Receipt & Reprint · Pradnya Yeram (q28) · 3 pts · W1 · follows SETUP-CLIENTS, SVC-ORDER-ORDER-4, SVC-ORDER-ORDERS-3 +1
+  - `#456` [FE] KIT-010 Kitchen Performance, AI & Operational Optimization · Pradnya Yeram (q29) · 3 pts · W2 · follows SETUP-CLIENTS, SVC-REPORTING-DASHBOARD-1, SVC-REPORTING-NATURALLANGUAGE-1
+  - `#465` [FE] POS-008 Reports · Pradnya Yeram (q30) · 5 pts · W2 · follows SETUP-CLIENTS, SVC-LEDGER-REPORTING-1, SVC-REPORTING-CATALOGUE-1 +2
+  - `#476` [FE] POS-009 Staff Roster · Pradnya Yeram (q31) · 8 pts · W2 · follows SETUP-CLIENTS, SVC-ORDER-CASH-1, SVC-ORDER-SHIFT-1 +7
+  - `#484` [FE] POS-004 Sell — Seat Map · Pradnya Yeram (q32) · 8 pts · W2 · follows SETUP-CLIENTS, SVC-CATALOGUE-AVAILABILITY-1, SVC-CATALOGUE-EVENT-1 +6
+  - `#496` [FE] KIT-001 Kitchen Operations Command Center · Pradnya Yeram (q33) · 5 pts · W2 · follows SETUP-CLIENTS, SVC-FNB-KITCHEN-1, SVC-FNB-ORDER-1
+  - `#497` [FE] KIT-004 Active Order Management & Fulfilment Journey · Pradnya Yeram (q34) · 3 pts · W2 · follows SETUP-CLIENTS, SVC-FNB-KITCHEN-1, SVC-FNB-ORDER-1
+  - `#498` [FE] KIT-005 Kitchen Station Workload & Dynamic Routing · Pradnya Yeram (q35) · 3 pts · W2 · follows SETUP-CLIENTS, SVC-FNB-KITCHEN-1
+  - `#499` [FE] KIT-007 Guest Collection, Buzzer & Digital Notification · Pradnya Yeram (q36) · 3 pts · W2 · follows SETUP-CLIENTS, SVC-FNB-GUESTORDERING-3, SVC-FNB-KITCHEN-1
+  - `#500` [FE] KIT-009 SLA, Priority & Service Rules · Pradnya Yeram (q37) · 3 pts · W2 · follows SETUP-CLIENTS, SVC-FNB-KITCHEN-1, SVC-TENANCY-TENANCY-1
+  - `#521` [FE] KIT-002 Kitchen Display System (KDS) · Pradnya Yeram (q38) · 5 pts · W2 · follows SETUP-CLIENTS, SVC-FNB-FNB-1, SVC-FNB-FNB-2 +4
+  - `#522` [FE] KIT-003 Order Firing & Course Management · Pradnya Yeram (q39) · 3 pts · W2 · follows SETUP-CLIENTS, SVC-FNB-FNB-1, SVC-FNB-FNB-2 +3
+  - `#523` [FE] KIT-006 Expeditor & Order Assembly · Pradnya Yeram (q40) · 5 pts · W2 · follows SETUP-CLIENTS, SVC-FNB-FNB-1, SVC-FNB-FNB-4 +2
+  - `#524` [FE] KIT-008 Exceptions, Re-Fire & Unavailable Items · Pradnya Yeram (q41) · 3 pts · W2 · follows SETUP-CLIENTS, SVC-FNB-FNB-2, SVC-FNB-FNB-3 +2
+- `#102` **[FE] Back Office and Admin setup screens (45), slice only** · Epic · 45 children · 57 pts · W1
+  - `#138` [FE] BO-053 Staff Directory (setup: 2 operations) · Pallavi Sawant (q2) · 1 pts · W1 · follows SVC-IDENTITY-ADMINISTRATION-1, SVC-IDENTITY-ADMINISTRATION-2
+  - `#139` [FE] BO-054 Role Assignment (setup: 1 operations) · Pallavi Sawant (q3) · 1 pts · W1 · follows SVC-IDENTITY-ADMINISTRATION-1
+  - `#156` [FE] BO-086 Approval Matrix (setup: 1 operations) · Pallavi Sawant (q4) · 1 pts · W1 · follows SVC-TENANCY-MATRIX-1
+  - `#157` [FE] BO-087 Approval Delegations (setup: 1 operations) · Pallavi Sawant (q5) · 1 pts · W1 · follows SVC-TENANCY-DELEGATION-1
+  - `#164` [FE] ADM-005 Tenant Directory (setup: 7 operations) · Pallavi Sawant (q6) · 3 pts · W1 · follows SVC-IDENTITY-SSO-1, SVC-PLATFORM-LICENSING-1, SVC-PLATFORM-TENANT-1 +1
+  - `#165` [FE] BO-124 Layout & Journey Builder (setup: 1 operations) · Pallavi Sawant (q7) · 1 pts · W1 · follows SVC-TENANCY-WORKSTATION-1
+  - `#166` [FE] BO-133 Offline Alerts, Limits & Audit (setup: 1 operations) · Pallavi Sawant (q8) · 1 pts · W1 · follows SVC-REPORTING-REPORTING-1
+  - `#178` [FE] BO-077 FX Rates & Variances (setup: 2 operations) · Pallavi Sawant (q9) · 1 pts · W1 · follows SVC-LEDGER-FINANCE-1, SVC-LEDGER-LEDGER-1
+  - `#179` [FE] BO-092 Venue Maps (setup: 1 operations) · Pallavi Sawant (q10) · 1 pts · W1 · follows SVC-VENUEOPS-VENUEMAP-1
+  - `#180` [FE] BO-093 Map Import & Labelling (setup: 1 operations) · Pallavi Sawant (q11) · 1 pts · W1 · follows SVC-VENUEOPS-VENUEMAP-1
+  - `#204` [FE] BO-012 Membership Products (setup: 1 operations) · Pallavi Sawant (q12) · 1 pts · W1 · follows SVC-CATALOGUE-ENTITLEMENT-1
+  - `#205` [FE] BO-013 Channel & Distribution (setup: 2 operations) · Pallavi Sawant (q13) · 1 pts · W1 · follows SVC-CATALOGUE-CAPACITY-1
+  - `#206` [FE] BO-161 Guest, Companion & Eligibility Rules (setup: 1 operations) · Pallavi Sawant (q14) · 1 pts · W1 · follows SVC-CATALOGUE-PRODUCT-4
+  - `#207` [FE] PTR-006 Product Catalog (B2B Pricing) (setup: 8 operations) · Pallavi Sawant (q15) · 3 pts · W1 · follows SVC-CATALOGUE-PRICING-1, SVC-CATALOGUE-PRODUCT-1, SVC-CATALOGUE-PRODUCT-3 +1
+  - `#231` [FE] BO-062 Venue Profile (setup: 1 operations) · Pallavi Sawant (q16) · 1 pts · W1 · follows SVC-ORDER-POLICY-1
+  - `#232` [FE] BO-1065 Currency, Timezone & Channels (setup: 2 operations) · Pallavi Sawant (q17) · 1 pts · W1 · follows SVC-ORDER-SHIFT-4, SVC-TENANCY-REGION-1
+  - `#257` [FE] BO-032 Admission Profiles (setup: 2 operations) · Pallavi Sawant (q18) · 1 pts · W1 · follows SVC-ACCESS-ACCESSPOINT-1, SVC-ACCESS-ACCESSPOINT-2
+  - `#258` [FE] BO-033 Blacklist Management (setup: 1 operations) · Pallavi Sawant (q19) · 1 pts · W1 · follows SVC-ACCESS-ACCESSPOINT-1
+  - `#259` [FE] BO-064 Zones & Areas (setup: 6 operations) · Pallavi Sawant (q20) · 3 pts · W1 · follows SVC-ACCESS-ACCESSPOINT-1, SVC-ACCESS-ACCESSPOINT-2, SVC-TENANCY-SCOPE-1
+  - `#260` [FE] BO-094 Map Editor & Publish (setup: 2 operations) · Pallavi Sawant (q21) · 1 pts · W1 · follows SVC-VENUEOPS-VENUEMAP-2
+  - `#294` [FE] BO-001 Queue Directory (setup: 5 operations) · Pallavi Sawant (q22) · 2 pts · W1 · follows SVC-CATALOGUE-EVENT-1, SVC-VENUEOPS-FEED-1, SVC-VENUEOPS-QUEUE-1
+  - `#322` [FE] ADM-412 Payment Method & Settlement Setup (setup: 1 operations) · Pallavi Sawant (q23) · 1 pts · W1 · follows SVC-ORDER-ORDERS-4
+  - `#323` [FE] ADM-421 Venue & Operational Structure Creation (setup: 1 operations) · Pallavi Sawant (q24) · 1 pts · W1 · follows SVC-IDENTITY-IDENTITY-3
+  - `#324` [FE] BO-081 Inventory Items (setup: 2 operations) · Pallavi Sawant (q25) · 1 pts · W1 · follows SVC-INVENTORY-ITEM-1
+  - `#325` [FE] BO-346 PDF, Printable & POS Ticket Designer (setup: 2 operations) · Pallavi Sawant (q26) · 1 pts · W1 · follows SVC-ORDER-ORDERS-1, SVC-ORDER-ORDERS-4
+  - `#326` [FE] BO-746 Duplicate Review & Merge (setup: 1 operations) · Pallavi Sawant (q27) · 1 pts · W1 · follows SVC-MARKETING-GUESTS-1
+  - `#327` [FE] BO-827 Points & Activity Rules (setup: 1 operations) · Pallavi Sawant (q28) · 1 pts · W1 · follows SVC-MARKETING-LOYALTY-1
+  - `#347` [FE] BO-007 Product Directory (setup: 2 operations) · Pallavi Sawant (q29) · 1 pts · W1 · follows SVC-INVENTORY-INVENTORY-1, SVC-RETAIL-MERCHANDISE-1
+  - `#348` [FE] BO-010 Promotions & Coupons (setup: 5 operations) · Pallavi Sawant (q30) · 2 pts · W1 · follows SVC-CATALOGUE-COUPON-1, SVC-CATALOGUE-PROMOTION-1, SVC-CATALOGUE-PROMOTION-2
+  - `#349` [FE] BO-011 Packages & Bundles (setup: 3 operations) · Pallavi Sawant (q31) · 2 pts · W1 · follows SVC-CATALOGUE-BUNDLE-1, SVC-CATALOGUE-BUNDLE-2, SVC-CATALOGUE-PRODUCT-3
+  - `#350` [FE] BO-044 F&B Outlets (setup: 5 operations) · Pallavi Sawant (q32) · 2 pts · W1 · follows SVC-FNB-FNB-6, SVC-FNB-GUESTORDERING-3, SVC-RETAIL-RETURN-1 +2
+  - `#351` [FE] BO-116 Merchandising & Product Presentation (setup: 2 operations) · Pallavi Sawant (q33) · 1 pts · W1 · follows SVC-RETAIL-MERCHANDISE-1, SVC-TENANCY-WORKSTATION-3
+  - `#352` [FE] BO-825 Challenge Builder (setup: 1 operations) · Pallavi Sawant (q34) · 1 pts · W1 · follows SVC-MARKETING-MARKETING-1
+  - `#400` [FE] ADM-008 Subscription & Plan Management (setup: 3 operations) · Pallavi Sawant (q35) · 2 pts · W2 · follows SVC-PLATFORM-PLAN-1, SVC-PLATFORM-SUBSCRIPTION-1
+  - `#434` [FE] ADM-037 AI Provider & Credentials (setup: 2 operations) · Pallavi Sawant (q36) · 1 pts · W2 · follows SVC-AI-AI-1, SVC-AI-CONFIG-1
+  - `#435` [FE] BO-091 AI Policy & Spend (setup: 1 operations) · Pallavi Sawant (q37) · 1 pts · W2 · follows SVC-AI-CONFIG-1
+  - `#457` [FE] ADM-031 Security & Compliance Dashboard (setup: 2 operations) · Pallavi Sawant (q38) · 1 pts · W2 · follows SVC-REPORTING-DASHBOARD-1
+  - `#466` [FE] BO-074 Chart of Accounts (setup: 2 operations) · Pallavi Sawant (q39) · 1 pts · W2 · follows SVC-LEDGER-ACCOUNTS-1
+  - `#467` [FE] BO-1045 Price Bands & Categories (setup: 1 operations) · Pallavi Sawant (q40) · 1 pts · W2 · follows SVC-CATALOGUE-CATEGORY-1
+  - `#468` [FE] BO-857 Resource Creation & Profile (setup: 2 operations) · Pallavi Sawant (q41) · 1 pts · W2 · follows SVC-VENUEOPS-RESOURCES-1
+  - `#485` [FE] BO-006 Parking Configuration (setup: 1 operations) · Pallavi Sawant (q42) · 1 pts · W2 · follows SVC-ACCESS-ACCESS-3
+  - `#525` [FE] EMP-062 Store Stock & SKU Availability (setup: 1 operations) · Pallavi Sawant (q43) · 1 pts · W2 · follows SVC-FNB-FNB-3
+  - `#526` [FE] EMP-065 Receiving & Store Put-Away (setup: 3 operations) · Pallavi Sawant (q44) · 2 pts · W2 · follows SVC-FNB-FNB-3, SVC-INVENTORY-RECEIPT-1
+  - `#527` [FE] SUP-002 Agent Dashboard (setup: 1 operations) · Pallavi Sawant (q45) · 1 pts · W2 · follows SVC-MARKETING-MARKETING-5
+  - `#543` [FE] BO-618 Accreditation Form Builder (setup: 1 operations) · Pallavi Sawant (q46) · 1 pts · W2 · follows SVC-MARKETING-MARKETING-1
+- `#103` **[FE] Guest App - Web: 46 screens** · Epic · 46 children · 152 pts · W1
+  - `#158` [FE] WEB-028 Contact & Venue Information · Chinmay Patkar (q7) · 2 pts · W1 · follows SETUP-CLIENTS, SVC-WHITELABEL-OVERVIEW-1
+  - `#159` [FE] WEB-029 Error / Sold Out / Maintenance · Chitrangi Mestry (q3) · 2 pts · W1 · follows SETUP-CLIENTS, SVC-WHITELABEL-OVERVIEW-1
+  - `#208` [FE] WEB-001 Home / Landing · Chinmay Patkar (q14) · 5 pts · W1 · follows SETUP-CLIENTS, SVC-CATALOGUE-PRODUCT-3, SVC-WHITELABEL-OVERVIEW-1
+  - `#209` [FE] WEB-003 Search Results · Chitrangi Mestry (q6) · 2 pts · W1 · follows SETUP-CLIENTS, SVC-CATALOGUE-CATALOGUE-3, SVC-CATALOGUE-PRODUCT-3
+  - `#210` [FE] WEB-006 Date & Session Selection · Chitrangi Mestry (q7) · 3 pts · W1 · follows SETUP-CLIENTS, SVC-CATALOGUE-CAPACITY-1, SVC-CATALOGUE-EVENT-1 +2
+  - `#211` [FE] WEB-035 Multi-Currency & Pricing · Chinmay Patkar (q15) · 2 pts · W1 · follows SETUP-CLIENTS, SVC-CATALOGUE-PRODUCT-3, SVC-LEDGER-LEDGER-1
+  - `#261` [FE] WEB-013 Booking Confirmation · Chitrangi Mestry (q9) · 3 pts · W1 · follows SETUP-CLIENTS, SVC-ORDER-ORDER-2, SVC-ORDER-ORDER-4 +1
+  - `#262` [FE] WEB-014 Pay for a Booking · Chinmay Patkar (q19) · 2 pts · W1 · follows SETUP-CLIENTS, SVC-ORDER-ORDERS-2, SVC-ORDER-ORDERS-3
+  - `#263` [FE] WEB-019 Order History · Chinmay Patkar (q20) · 3 pts · W1 · follows SETUP-CLIENTS, SVC-ORDER-ORDER-2, SVC-ORDER-ORDER-3 +3
+  - `#264` [FE] WEB-030 Ticket Transfer · Chitrangi Mestry (q10) · 3 pts · W1 · follows SETUP-CLIENTS, SVC-ORDER-ORDER-1, SVC-ORDER-ORDER-3 +2
+  - `#295` [FE] WEB-002 Event & Attraction Listing · Chitrangi Mestry (q13) · 3 pts · W1 · follows SETUP-CLIENTS, SVC-CATALOGUE-CATALOGUE-3, SVC-CATALOGUE-EVENT-1 +2
+  - `#296` [FE] WEB-004 Attraction Details · Chinmay Patkar (q22) · 3 pts · W1 · follows SETUP-CLIENTS, SVC-CATALOGUE-CAPACITY-1, SVC-CATALOGUE-EVENT-1 +3
+  - `#328` [FE] WEB-011 Guest Details & Attendee Forms · Chinmay Patkar (q28) · 5 pts · W1 · follows SETUP-CLIENTS, SVC-MARKETING-CONSENT-1, SVC-MARKETING-GUEST-1 +2
+  - `#329` [FE] WEB-012 Checkout — Payment · Chitrangi Mestry (q16) · 3 pts · W1 · follows SETUP-CLIENTS, SVC-MARKETING-GUESTS-1, SVC-ORDER-ORDER-1 +3
+  - `#330` [FE] WEB-016 Login / Register · Chitrangi Mestry (q17) · 8 pts · W1 · follows SETUP-CLIENTS, SVC-IDENTITY-GUESTAUTH-1, SVC-IDENTITY-GUESTAUTH-2 +6
+  - `#331` [FE] WEB-017 My Account Dashboard · Chinmay Patkar (q29) · 5 pts · W1 · follows SETUP-CLIENTS, SVC-MARKETING-CONSENT-1, SVC-MARKETING-GUEST-1 +3
+  - `#332` [FE] WEB-018 My Tickets · Chinmay Patkar (q30) · 3 pts · W1 · follows SETUP-CLIENTS, SVC-ACCESS-ACCESS-1, SVC-ACCESS-ACCESS-2 +3
+  - `#333` [FE] WEB-020 Profile & Preferences · Chitrangi Mestry (q18) · 3 pts · W1 · follows SETUP-CLIENTS, SVC-IDENTITY-IDENTITY-3, SVC-MARKETING-CONSENT-1 +3
+  - `#334` [FE] WEB-025 Help Centre / FAQ · Chinmay Patkar (q31) · 3 pts · W1 · follows SETUP-CLIENTS, SVC-MARKETING-CASE-1, SVC-WHITELABEL-OVERVIEW-1
+  - `#353` [FE] WEB-005 Ticket Type Selection · Chinmay Patkar (q32) · 3 pts · W1 · follows SETUP-CLIENTS, SVC-CATALOGUE-EVALUATION-1, SVC-CATALOGUE-PRODUCT-2
+  - `#354` [FE] WEB-010 Shopping Cart · Chitrangi Mestry (q21) · 5 pts · W1 · follows SETUP-CLIENTS, SVC-CATALOGUE-COUPON-1, SVC-CATALOGUE-EVALUATION-1 +3
+  - `#436` [FE] WEB-045 Help Centre & Accessibility · Chitrangi Mestry (q22) · 2 pts · W2 · follows SETUP-CLIENTS, SVC-WHITELABEL-CONTENT-2
+  - `#472` [FE] WEB-007 Interactive Seat Selection · Chinmay Patkar (q57) · 3 pts · W2 · follows SETUP-CLIENTS, SVC-CATALOGUE-AVAILABILITY-1, SVC-CATALOGUE-HOLD-1 +1
+  - `#501` [FE] WEB-015 Branded Queue / Waiting Room · Chitrangi Mestry (q38) · 2 pts · W2 · follows SETUP-CLIENTS, SVC-VENUEOPS-ENTRY-1, SVC-VENUEOPS-WAITTIME-1
+  - `#502` [FE] WEB-031 My Reservations · Chitrangi Mestry (q39) · 5 pts · W2 · follows SETUP-CLIENTS, SVC-CATALOGUE-PRODUCT-1, SVC-CATALOGUE-PRODUCT-2 +5
+  - `#503` [FE] WEB-036 F&B – Browse & Order · Chinmay Patkar (q66) · 5 pts · W2 · follows SETUP-CLIENTS, SVC-FNB-FNB-1, SVC-FNB-FNB-2 +4
+  - `#504` [FE] WEB-037 Menu Item Detail · Chinmay Patkar (q67) · 2 pts · W2 · follows SETUP-CLIENTS, SVC-FNB-GUESTORDERING-2, SVC-FNB-MODIFIER-1
+  - `#505` [FE] WEB-038 F&B – Order Tracking · Chitrangi Mestry (q40) · 2 pts · W2 · follows SETUP-CLIENTS, SVC-FNB-GUESTORDERING-1, SVC-FNB-GUESTORDERING-2
+  - `#506` [FE] WEB-039 Venue Map & Wait Times · Chitrangi Mestry (q41) · 3 pts · W2 · follows SETUP-CLIENTS, SVC-VENUEOPS-QUEUE-1, SVC-VENUEOPS-VENUEMAP-1 +1
+  - `#507` [FE] WEB-040 Virtual Queue · Chinmay Patkar (q68) · 3 pts · W2 · follows SETUP-CLIENTS, SVC-CATALOGUE-CATALOGUE-2, SVC-VENUEOPS-ENTRY-1 +1
+  - `#508` [FE] WEB-046 In-Venue Notifications · Chinmay Patkar (q69) · 2 pts · W2 · follows SETUP-CLIENTS, SVC-FNB-GUESTORDERING-1
+  - `#528` [FE] WEB-021 Wallet & Gift Cards · Chinmay Patkar (q75) · 3 pts · W2 · follows SETUP-CLIENTS, SVC-ORDER-ORDERS-3, SVC-ORDER-ORDERS-4 +4
+  - `#529` [FE] WEB-022 Membership Plans · Chinmay Patkar (q76) · 3 pts · W2 · follows SETUP-CLIENTS, SVC-CATALOGUE-CATALOGUE-1, SVC-CATALOGUE-CATALOGUE-2 +2
+  - `#530` [FE] WEB-023 Membership Management · Chitrangi Mestry (q48) · 3 pts · W2 · follows SETUP-CLIENTS, SVC-CATALOGUE-CATALOGUE-1, SVC-CATALOGUE-CATALOGUE-2 +4
+  - `#531` [FE] WEB-027 Newsletter Subscription · Chitrangi Mestry (q49) · 5 pts · W2 · follows SETUP-CLIENTS, SVC-MARKETING-CONSENT-1, SVC-MARKETING-GUEST-1 +3
+  - `#532` [FE] WEB-041 Parking – Reserve & Pay · Chinmay Patkar (q77) · 3 pts · W2 · follows SETUP-CLIENTS, SVC-ACCESS-ACCESS-1, SVC-ACCESS-ACCESS-3
+  - `#533` [FE] WEB-044 AI Concierge – Home · Chitrangi Mestry (q50) · 3 pts · W2 · follows SETUP-CLIENTS, SVC-AI-AI-1, SVC-AI-ASSIST-1 +3
+  - `#544` [FE] WEB-008 Add-ons & Upsell · Chinmay Patkar (q83) · 3 pts · W2 · follows SETUP-CLIENTS, SVC-CATALOGUE-BUNDLE-1, SVC-CATALOGUE-UPSELL-1 +1
+  - `#545` [FE] WEB-032 Offers & Promotions · Chitrangi Mestry (q55) · 3 pts · W2 · follows SETUP-CLIENTS, SVC-CATALOGUE-EVALUATION-1, SVC-CATALOGUE-PROMOTION-1 +1
+  - `#546` [FE] WEB-033 Shop · Chinmay Patkar (q84) · 3 pts · W2 · follows SETUP-CLIENTS, SVC-ORDER-CART-1, SVC-RETAIL-FLOOR-1 +1
+  - `#547` [FE] WEB-042 Retail & Shop and Drop · Chitrangi Mestry (q56) · 3 pts · W2 · follows SETUP-CLIENTS, SVC-RETAIL-FLOOR-1, SVC-RETAIL-MERCHANDISE-1
+  - `#548` [FE] WEB-043 Loyalty & Rewards · Chinmay Patkar (q85) · 3 pts · W2 · follows SETUP-CLIENTS, SVC-CATALOGUE-EVALUATION-1, SVC-CATALOGUE-PROMOTION-2 +4
+  - `#564` [FE] WEB-009 Wishlist · Chinmay Patkar (q94) · 3 pts · W3 · follows SETUP-CLIENTS, SVC-MARKETING-GUEST-1, SVC-MARKETING-GUEST-2
+  - `#565` [FE] WEB-024 Devices, Wishlist & Consent · Chitrangi Mestry (q63) · 8 pts · W3 · follows SETUP-CLIENTS, SVC-ACCESS-ACCESS-2, SVC-ACCESS-ACCESS-3 +7
+  - `#566` [FE] WEB-026 Survey & Feedback · Chinmay Patkar (q95) · 3 pts · W3 · follows SETUP-CLIENTS, SVC-MARKETING-FEEDBACK-1
+  - `#567` [FE] WEB-034 Lost & Found · Chitrangi Mestry (q64) · 3 pts · W3 · follows SETUP-CLIENTS, SVC-MARKETING-MARKETING-3, SVC-MARKETING-MARKETING-4
+- `#355` **[BE] AiService: first-release slice (9 operations) to 1.0.0** · Epic · 4 children · Pranay Shinde · 17 pts · W2
+  - `#356` **[BE] AiService / ai** · Feature · 1 children · Pranay Shinde · 5 pts · W2
+    - `#401` [BE] AiService: requestSuggestion, setAiCredential, setSuggestionProvider · Pranay Shinde (q42) · 5 pts · W2 · follows MIG-AI
+  - `#357` **[BE] AiService / assist** · Feature · 1 children · Pranay Shinde · 5 pts · W2
+    - `#402` [BE] AiService: createAiConversation, listAiConversations, sendAiMessage · Pranay Shinde (q43) · 5 pts · W2 · follows MIG-AI
+  - `#358` **[BE] AiService / config** · Feature · 1 children · Pranay Shinde · 5 pts · W2
+    - `#403` [BE] AiService: setAiPolicy, setAiProvider · Pranay Shinde (q44) · 5 pts · W2 · follows MIG-AI
+  - `#359` **[BE] AiService / retrieval** · Feature · 1 children · Pranay Shinde · 2 pts · W2
+    - `#404` [BE] AiService: ingestKnowledgeDocument · Deep Khanvilkar (q14) · 2 pts · W2 · follows MIG-AI
+- `#370` **[BE] PlatformService: first-release slice (9 operations) to 1.0.0** · Epic · 4 children · Tanmay Dukhande · 14 pts · W2
+  - `#371` **[BE] PlatformService / licensing** · Feature · 1 children · Tanmay Dukhande · 2 pts · W2
+    - `#395` [BE] PlatformService: addLicenceAddOn · Chinmay Patkar (q33) · 2 pts · W2 · follows MIG-CONTROL
+  - `#372` **[BE] PlatformService / plan** · Feature · 1 children · Tanmay Dukhande · 5 pts · W2
+    - `#396` [BE] PlatformService: createPlan, createPlanVersion · Tanmay Dukhande (q38) · 5 pts · W2 · follows MIG-SUBSCRIPTION
+  - `#373` **[BE] PlatformService / subscription** · Feature · 1 children · Tanmay Dukhande · 1 pts · W2
+    - `#397` [BE] PlatformService: setSubscription · Deep Khanvilkar (q12) · 1 pts · W2 · follows MIG-SUBSCRIPTION
+  - `#374` **[BE] PlatformService / tenant** · Feature · 2 children · Tanmay Dukhande · 6 pts · W2
+    - `#398` [BE] PlatformService: updateTenant · Deep Khanvilkar (q13) · 1 pts · W2 · follows MIG-CONTROL
+    - `#426` [BE] PlatformService: createTenant, reactivateTenant, suspendTenant, terminateTenant · Tanmay Dukhande (q39) · 5 pts · W2 · follows MIG-CONTROL, MIG-PLATFORM, MIG-SUBSCRIPTION
+- `#394` **[FE] White Labelling: 23 screens** · Epic · 23 children · 73 pts · W2
+  - `#424` [FE] CMS-019 User Access · Chinmay Patkar (q39) · 2 pts · W2 · follows SETUP-CLIENTS, SVC-IDENTITY-ADMINISTRATION-1
+  - `#437` [FE] ADM-017 Domain & Certificate Management · Chitrangi Mestry (q23) · 3 pts · W2 · follows SETUP-CLIENTS, SVC-WHITELABEL-WHITE-LABEL-1
+  - `#438` [FE] ADM-018 Localisation & Language Pack · Chitrangi Mestry (q24) · 3 pts · W2 · follows SETUP-CLIENTS, SVC-WHITELABEL-CONTENT-2, SVC-WHITELABEL-CONTENT-3 +1
+  - `#439` [FE] CMS-001 Tenant Workspace · Chinmay Patkar (q43) · 5 pts · W2 · follows SETUP-CLIENTS, SVC-WHITELABEL-MODULES-1, SVC-WHITELABEL-MODULES-2 +1
+  - `#440` [FE] CMS-002 Brand Kit · Chinmay Patkar (q44) · 3 pts · W2 · follows SETUP-CLIENTS, SVC-VENUEOPS-UPLOAD-1, SVC-WHITELABEL-BRAND-1
+  - `#441` [FE] CMS-003 Typography · Chitrangi Mestry (q25) · 3 pts · W2 · follows SETUP-CLIENTS, SVC-WHITELABEL-THEME-1
+  - `#442` [FE] CMS-004 Logo & Assets · Chinmay Patkar (q45) · 3 pts · W2 · follows SETUP-CLIENTS, SVC-WHITELABEL-BRAND-1
+  - `#443` [FE] CMS-005 Theme Editor · Chitrangi Mestry (q26) · 3 pts · W2 · follows SETUP-CLIENTS, SVC-WHITELABEL-THEME-1
+  - `#444` [FE] CMS-007 Page Builder · Chinmay Patkar (q46) · 3 pts · W2 · follows SETUP-CLIENTS, SVC-WHITELABEL-CONTENT-1, SVC-WHITELABEL-CONTENT-2 +3
+  - `#445` [FE] CMS-008 Content Blocks · Chitrangi Mestry (q27) · 3 pts · W2 · follows SETUP-CLIENTS, SVC-WHITELABEL-CONTENT-1, SVC-WHITELABEL-CONTENT-2 +2
+  - `#446` [FE] CMS-011 Translations · Chinmay Patkar (q47) · 2 pts · W2 · follows SETUP-CLIENTS, SVC-WHITELABEL-MODULES-1
+  - `#447` [FE] CMS-012 RTL Preview · Chinmay Patkar (q48) · 3 pts · W2 · follows SETUP-CLIENTS, SVC-WHITELABEL-OVERVIEW-1, SVC-WHITELABEL-PUBLISHING-2
+  - `#448` [FE] CMS-016 Site Settings · Chinmay Patkar (q49) · 2 pts · W2 · follows SETUP-CLIENTS, SVC-WHITELABEL-BRANDING-1, SVC-WHITELABEL-OVERVIEW-1
+  - `#449` [FE] CMS-017 Domain & Certificate · Chitrangi Mestry (q28) · 3 pts · W2 · follows SETUP-CLIENTS, SVC-WHITELABEL-WHITE-LABEL-1
+  - `#458` [FE] ADM-016 White-Label Branding Management · Chitrangi Mestry (q29) · 5 pts · W2 · follows SETUP-CLIENTS, SVC-WHITELABEL-BRAND-1, SVC-WHITELABEL-PUBLISHING-1 +2
+  - `#459` [FE] CMS-006 Component Preview · Chinmay Patkar (q52) · 5 pts · W2 · follows SETUP-CLIENTS, SVC-WHITELABEL-PUBLISHING-1, SVC-WHITELABEL-PUBLISHING-2
+  - `#460` [FE] CMS-014 Publishing Workflow · Chitrangi Mestry (q30) · 3 pts · W2 · follows SETUP-CLIENTS, SVC-WHITELABEL-OVERVIEW-1, SVC-WHITELABEL-PUBLISHING-1 +1
+  - `#461` [FE] CMS-015 Version History · Chinmay Patkar (q53) · 3 pts · W2 · follows SETUP-CLIENTS, SVC-WHITELABEL-PUBLISHING-1, SVC-WHITELABEL-PUBLISHING-2
+  - `#462` [FE] CMS-020 Change Log · Chitrangi Mestry (q31) · 2 pts · W2 · follows SETUP-CLIENTS, SVC-WHITELABEL-PUBLISHING-1
+  - `#486` [FE] CMS-010 Media Library · Chinmay Patkar (q60) · 5 pts · W2 · follows SETUP-CLIENTS, SVC-ORDER-ORDER-1, SVC-ORDER-ORDER-2 +5
+  - `#509` [FE] CMS-009 Navigation & Menus · Chitrangi Mestry (q42) · 3 pts · W2 · follows SETUP-CLIENTS, SVC-FNB-MENU-1, SVC-FNB-MENU-2
+  - `#534` [FE] CMS-013 SEO & Metadata · Chitrangi Mestry (q51) · 3 pts · W2 · follows SETUP-CLIENTS, SVC-MARKETING-MARKETING-5
+  - `#535` [FE] CMS-018 Consent & Legal · Chinmay Patkar (q78) · 3 pts · W2 · follows SETUP-CLIENTS, SVC-MARKETING-CONSENT-1, SVC-WHITELABEL-CONTENT-2 +1
+- `#571` **[FE+BE] Venue Management, waves 1-2: 113 screens and 219 operations beyond the first release (full stack)** · Epic · 23 children · 807 pts · W1
+  - `#640` **[FE] Venue Management screens: People & Access Rights** · Feature · 6 children · Pallavi Sawant · 18 pts · W2
+    - `#572` [FE] BO-084 Approval Inbox · Pallavi Sawant (q47) · 3 pts · W1 · follows SETUP-CLIENTS, SVC-TENANCY-REQUEST-1, VM-TENANCY-REQUEST-1
+    - `#573` [FE] BO-085 Approval Request · Pallavi Sawant (q48) · 3 pts · W1 · follows SETUP-CLIENTS, SVC-TENANCY-REQUEST-1, VM-TENANCY-REQUEST-1
+    - `#599` [FE] BO-106 People & Access Rights · Sanket Keluskar (q33) · 3 pts · W1 · follows SETUP-CLIENTS, SVC-IDENTITY-ADMINISTRATION-1, SVC-TENANCY-TENANCY-1
+    - `#684` [FE] BO-055 Rota & Scheduling · Pallavi Sawant (q78) · 3 pts · W2 · follows SETUP-CLIENTS, SVC-TENANCY-ROTA-1, VM-TENANCY-ROTA-1
+    - `#685` [FE] BO-066 Notification Settings · Sanket Keluskar (q50) · 3 pts · W2 · follows SETUP-CLIENTS, VM-TENANCY-ANNOUNCEMENTS-1
+    - `#741` [FE] BO-056 Time & Attendance · Pallavi Sawant (q91) · 3 pts · W2 · follows SETUP-CLIENTS, VM-TENANCY-ATTENDANCE-1
+  - `#643` **[FE] Venue Management screens: Venue Operations** · Feature · 12 children · Pallavi Sawant · 44 pts · W2
+    - `#574` [FE] BO-058 Reporting Home · Pallavi Sawant (q49) · 5 pts · W1 · follows SETUP-CLIENTS, SVC-LEDGER-REPORTING-1, SVC-REPORTING-CATALOGUE-1 +5
+    - `#596` [FE] BO-100 Venue Home (first batch) · Pallavi Sawant (q65) · 3 pts · W1 · follows SETUP-CLIENTS, SVC-ORDER-SHIFT-3, SVC-TENANCY-TENANCY-1
+    - `#600` [FE] BO-108 Venue Operations · Pallavi Sawant (q68) · 3 pts · W1 · follows SETUP-CLIENTS, SVC-TENANCY-TENANCY-1, VM-VENUEOPS-ASSET-1 +2
+    - `#601` [FE] BO-130 Offline Policy & Rules Configuration · Sanket Keluskar (q34) · 3 pts · W1 · follows SETUP-CLIENTS, SVC-ORDER-ORDER-1, SVC-ORDER-SYNC-1 +2
+    - `#657` [FE] BO-067 Integrations · Sanket Keluskar (q47) · 3 pts · W2 · follows SETUP-CLIENTS, VM-PLATFORM-PUBLICAPI-1, VM-PLATFORM-PUBLICAPI-2
+    - `#688` [FE] BO-127 Hardware & Peripherals Management · Pallavi Sawant (q80) · 2 pts · W2 · follows SETUP-CLIENTS, SVC-TENANCY-WORKSTATION-1, SVC-TENANCY-WORKSTATION-2 +1
+    - `#710` [FE] BO-131 Connectivity & Auto-Switch Settings · Pallavi Sawant (q84) · 2 pts · W2 · follows SETUP-CLIENTS, VM-TENANCY-TENANCY-1
+    - `#730` [FE] BO-132 Offline Transaction Monitor & Sync Queue · Pallavi Sawant (q89) · 2 pts · W2 · follows SETUP-CLIENTS, SVC-ORDER-SYNC-1, VM-ORDER-SYNC-1
+    - `#742` [FE] BO-060 Attendance & Footfall · Sanket Keluskar (q67) · 8 pts · W2 · follows SETUP-CLIENTS, SVC-ACCESS-SYNC-1, SVC-LEDGER-REPORTING-1 +6
+    - `#745` [FE] BO-128 Live Workstation Health Monitor · Pallavi Sawant (q93) · 2 pts · W2 · follows SETUP-CLIENTS, SVC-TENANCY-TENANCY-1, SVC-TENANCY-WORKSTATION-2 +1
+    - `#746` [FE] BO-129 Software, Configuration & Version Management · Pallavi Sawant (q94) · 3 pts · W2 · follows SETUP-CLIENTS, SVC-TENANCY-TENANCY-1, SVC-TENANCY-WORKSTATION-1 +2
+    - `#799` [FE] BO-036 Device Registry · Sanket Keluskar (q82) · 8 pts · W2 · follows SETUP-CLIENTS, SVC-MARKETING-CONSENT-1, SVC-MARKETING-GUEST-1 +10
+  - `#639` **[FE] Venue Management screens: Orders & Money** · Feature · 25 children · Pallavi Sawant · 122 pts · W2
+    - `#575` [FE] BO-059 Sales Reports · Pallavi Sawant (q50) · 5 pts · W1 · follows SETUP-CLIENTS, SVC-LEDGER-REPORTING-1, SVC-REPORTING-CATALOGUE-1 +3
+    - `#576` [FE] BO-090 Period Close · Pallavi Sawant (q51) · 3 pts · W1 · follows SETUP-CLIENTS, VM-LEDGER-FISCAL-1, VM-LEDGER-LEDGER-1 +1
+    - `#582` [FE] BO-043 Daily Reconciliation · Pallavi Sawant (q57) · 5 pts · W1 · follows SETUP-CLIENTS, VM-LEDGER-LEDGER-1, VM-LEDGER-SETTLEMENT-1 +1
+    - `#583` [FE] BO-075 Account Mapping · Sanket Keluskar (q27) · 5 pts · W1 · follows SETUP-CLIENTS, VM-LEDGER-ACCOUNTS-1, VM-LEDGER-TAX-1 +1
+    - `#584` [FE] BO-089 Journal Entries · Pallavi Sawant (q58) · 3 pts · W1 · follows SETUP-CLIENTS, VM-LEDGER-JOURNAL-1, VM-LEDGER-JOURNAL-2 +1
+    - `#585` [FE] BO-008 Product Detail & Variants · Pallavi Sawant (q59) · 3 pts · W1 · follows SETUP-CLIENTS, SVC-CATALOGUE-PRODUCT-1, SVC-CATALOGUE-PRODUCT-2 +2
+    - `#587` [FE] BO-024 Payment Exceptions · Pallavi Sawant (q60) · 5 pts · W1 · follows SETUP-CLIENTS, SVC-ORDER-PAYMENT-1, SVC-ORDER-SHIFT-2 +1
+    - `#588` [FE] BO-028 Refund Approval Queue · Sanket Keluskar (q29) · 2 pts · W1 · follows SETUP-CLIENTS, SVC-ORDER-REFUND-1
+    - `#589` [FE] BO-039 Shift Directory (first batch) · Pallavi Sawant (q61) · 5 pts · W1 · follows SETUP-CLIENTS, SVC-ORDER-CASH-1, SVC-ORDER-SHIFT-1 +4
+    - `#590` [FE] BO-040 Variance Approval (first batch) · Pallavi Sawant (q62) · 5 pts · W1 · follows SETUP-CLIENTS, SVC-ORDER-CASH-1, SVC-ORDER-SHIFT-1 +4
+    - `#591` [FE] BO-022 Order Detail · Sanket Keluskar (q30) · 8 pts · W1 · follows SETUP-CLIENTS, SVC-ORDER-ORDER-1, SVC-ORDER-ORDER-2 +4
+    - `#592` [FE] BO-023 Refunds & Exchanges · Pallavi Sawant (q63) · 8 pts · W1 · follows SETUP-CLIENTS, SVC-ORDER-ORDER-1, SVC-ORDER-ORDER-2 +5
+    - `#597` [FE] BO-101 Orders & Money · Pallavi Sawant (q66) · 3 pts · W1 · follows SETUP-CLIENTS, SVC-ORDER-ORDER-3, SVC-TENANCY-TENANCY-1 +1
+    - `#609` [FE] BO-065 Venue Configuration · Sanket Keluskar (q38) · 3 pts · W1 · follows SETUP-CLIENTS, SVC-FNB-GUESTORDERING-2, SVC-FNB-GUESTORDERING-3 +3
+    - `#704` [FE] BO-029 Report Builder · Sanket Keluskar (q54) · 5 pts · W2 · follows SETUP-CLIENTS, SVC-LEDGER-REPORTING-1, SVC-REPORTING-CATALOGUE-1 +3
+    - `#720` [FE] BO-025 Chargebacks & Disputes · Pallavi Sawant (q86) · 3 pts · W2 · follows SETUP-CLIENTS, VM-LEDGER-SETTLEMENT-1, VM-LEDGER-SETTLEMENT-2
+    - `#726` [FE] BO-041 Cash Movements · Sanket Keluskar (q61) · 5 pts · W2 · follows SETUP-CLIENTS, SVC-ORDER-CASH-1, SVC-ORDER-SHIFT-1 +4
+    - `#727` [FE] BO-042 Banking & Safe · Pallavi Sawant (q88) · 5 pts · W2 · follows SETUP-CLIENTS, SVC-ORDER-CASH-1, SVC-ORDER-SHIFT-1 +4
+    - `#728` [FE] BO-076 Revenue Recognition · Sanket Keluskar (q62) · 3 pts · W2 · follows SETUP-CLIENTS, VM-LEDGER-FINANCE-1, VM-LEDGER-RECOGNITION-1
+    - `#738` [FE] BO-027 Reissue & Media Replacement · Sanket Keluskar (q65) · 3 pts · W2 · follows SETUP-CLIENTS, SVC-ORDER-ORDER-1, SVC-ORDER-ORDER-2 +1
+    - `#739` [FE] BO-047 Order Corrections & Exceptions · Pallavi Sawant (q90) · 8 pts · W2 · follows SETUP-CLIENTS, SVC-ORDER-ORDER-1, SVC-ORDER-ORDER-2 +4
+    - `#740` [FE] BO-051 Purchase Orders · Sanket Keluskar (q66) · 8 pts · W2 · follows SETUP-CLIENTS, SVC-ORDER-ORDER-1, SVC-ORDER-ORDER-2 +4
+    - `#743` [FE] BO-070 Work Orders · Pallavi Sawant (q92) · 8 pts · W2 · follows SETUP-CLIENTS, SVC-ORDER-ORDER-1, SVC-ORDER-ORDER-2 +4
+    - `#800` [FE] BO-048 Retail Products · Pallavi Sawant (q102) · 3 pts · W2 · follows SETUP-CLIENTS, SVC-RETAIL-FLOOR-1, SVC-RETAIL-MERCHANDISE-1
+    - `#814` [FE] BO-026 Group Bookings · Pallavi Sawant (q110) · 8 pts · W2 · follows SETUP-CLIENTS, SVC-ORDER-ORDER-1, SVC-ORDER-ORDER-2 +7
+  - `#641` **[FE] Venue Management screens: Sell** · Feature · 28 children · Pallavi Sawant · 93 pts · W2
+    - `#577` [FE] BO-009 Pricing Rules · Pallavi Sawant (q52) · 5 pts · W1 · follows SETUP-CLIENTS, SVC-CATALOGUE-PRICING-1, VM-CATALOGUE-PRICING-1
+    - `#578` [FE] BO-015 Session Calendar · Pallavi Sawant (q53) · 5 pts · W1 · follows SETUP-CLIENTS, SVC-CATALOGUE-AVAILABILITY-1, SVC-CATALOGUE-EVENT-1 +3
+    - `#579` [FE] BO-016 Session Template · Pallavi Sawant (q54) · 5 pts · W1 · follows SETUP-CLIENTS, SVC-CATALOGUE-AVAILABILITY-1, SVC-CATALOGUE-EVENT-1 +3
+    - `#586` [FE] BO-017 Capacity Management · Sanket Keluskar (q28) · 5 pts · W1 · follows SETUP-CLIENTS, SVC-CATALOGUE-CAPACITY-1, VM-CATALOGUE-CAPACITY-1
+    - `#595` [FE] BO-063 Opening Hours & Calendar · Sanket Keluskar (q32) · 5 pts · W1 · follows SETUP-CLIENTS, SVC-CATALOGUE-AVAILABILITY-1, SVC-CATALOGUE-EVENT-1 +5
+    - `#613` [FE] BO-014 Catalogue Publishing · Sanket Keluskar (q40) · 5 pts · W1 · follows SETUP-CLIENTS, SVC-CATALOGUE-BUNDLE-2, SVC-CATALOGUE-PRODUCT-1 +6
+    - `#614` [FE] BO-037 Offline Package Status · Pallavi Sawant (q75) · 5 pts · W1 · follows SETUP-CLIENTS, SVC-ACCESS-SYNC-1, SVC-CATALOGUE-BUNDLE-1 +6
+    - `#618` [FE] BO-102 Sell · Sanket Keluskar (q43) · 3 pts · W1 · follows SETUP-CLIENTS, SVC-CATALOGUE-UPSELL-1, SVC-TENANCY-TENANCY-1 +1
+    - `#687` [FE] BO-122 POS Experience Dashboard · Sanket Keluskar (q51) · 2 pts · W2 · follows SETUP-CLIENTS, SVC-TENANCY-WORKSTATION-2
+    - `#708` [FE] BO-123 POS Profile Management · Pallavi Sawant (q83) · 2 pts · W2 · follows SETUP-CLIENTS, SVC-TENANCY-WORKSTATION-2, VM-TENANCY-TENANCY-1
+    - `#709` [FE] BO-126 Deployment, Preview & Audit · Sanket Keluskar (q56) · 5 pts · W2 · follows SETUP-CLIENTS, SVC-REPORTING-EXECUTION-1, SVC-TENANCY-WORKSTATION-2 +3
+    - `#718` [FE] BO-018 Allocation & Holds · Pallavi Sawant (q85) · 3 pts · W2 · follows SETUP-CLIENTS, SVC-CATALOGUE-LEASE-1, VM-CATALOGUE-LEASE-1
+    - `#719` [FE] BO-019 Closures & Blackouts · Sanket Keluskar (q59) · 5 pts · W2 · follows SETUP-CLIENTS, SVC-CATALOGUE-AVAILABILITY-1, SVC-CATALOGUE-EVENT-1 +4
+    - `#729` [FE] BO-115 Category, Brand & Merchandise Hierarchy · Sanket Keluskar (q63) · 3 pts · W2 · follows SETUP-CLIENTS, SVC-AI-AI-1, SVC-REPORTING-EXECUTION-1 +2
+    - `#744` [FE] BO-125 Product & Category Button Configuration · Sanket Keluskar (q68) · 3 pts · W2 · follows SETUP-CLIENTS, SVC-CATALOGUE-PRODUCT-3, SVC-REPORTING-REPORTING-1 +4
+    - `#747` [FE] BO-143 Retail Global Settings & Controls · Sanket Keluskar (q69) · 2 pts · W2 · follows SETUP-CLIENTS, SVC-TENANCY-TENANCY-1
+    - `#766` [FE] BO-109 Menu Builder & POS Layout Designer · Sanket Keluskar (q73) · 2 pts · W2 · follows SETUP-CLIENTS, SVC-FNB-MENU-1, SVC-FNB-MENU-2 +1
+    - `#789` [FE] BO-110 Recipe & BOM Management · Sanket Keluskar (q78) · 2 pts · W2 · follows SETUP-CLIENTS, VM-FNB-PRODUCTION-1
+    - `#790` [FE] BO-111 Ingredient Substitution, Allergen & Nutrition · Pallavi Sawant (q98) · 3 pts · W2 · follows SETUP-CLIENTS, SVC-FNB-MENU-2, VM-FNB-FNB-4 +1
+    - `#791` [FE] BO-112 Production Planning & Production Sheets · Sanket Keluskar (q79) · 3 pts · W2 · follows SETUP-CLIENTS, VM-FNB-FNB-2
+    - `#792` [FE] BO-113 Central Kitchen & Commissary Management · Pallavi Sawant (q99) · 3 pts · W2 · follows SETUP-CLIENTS, VM-FNB-FNB-1, VM-FNB-FNB-2
+    - `#806` [FE] BO-114 Variants, Attributes, Barcode & RFID Management · Pallavi Sawant (q106) · 2 pts · W2 · follows SETUP-CLIENTS, SVC-INVENTORY-INVENTORY-1, SVC-RETAIL-FLOOR-1
+    - `#807` [FE] BO-117 Product Import, Governance & AI Configuration Assistant · Sanket Keluskar (q85) · 3 pts · W2 · follows SETUP-CLIENTS, SVC-AI-AI-1, SVC-TENANCY-WORKSTATION-2 +3
+    - `#808` [FE] BO-118 Campaign & Audience Management · Pallavi Sawant (q107) · 3 pts · W2 · follows SETUP-CLIENTS, SVC-REPORTING-EXECUTION-1, SVC-TENANCY-WORKSTATION-2 +4
+    - `#809` [FE] BO-119 Cross-Sell, Upsell & Recommendation Rules · Sanket Keluskar (q86) · 2 pts · W2 · follows SETUP-CLIENTS, SVC-CATALOGUE-UPSELL-1, VM-CATALOGUE-PROMOTIONS-1
+    - `#810` [FE] BO-120 Omnichannel Commerce & Journey Configuration · Pallavi Sawant (q108) · 2 pts · W2 · follows SETUP-CLIENTS, VM-MARKETING-MARKETING-1
+    - `#811` [FE] BO-121 Personalized Offers & Guest Engagement · Sanket Keluskar (q87) · 2 pts · W2 · follows SETUP-CLIENTS, VM-MARKETING-CAMPAIGN-1, VM-MARKETING-SEGMENT-1
+    - `#816` [FE] BO-142 Store Rules, Controls & Permissions · Sanket Keluskar (q90) · 3 pts · W2 · follows SETUP-CLIENTS, SVC-IDENTITY-ADMINISTRATION-1, SVC-TENANCY-TENANCY-1 +1
+  - `#636` **[FE] Venue Management screens: Access & Venue** · Feature · 17 children · Pallavi Sawant · 71 pts · W2
+    - `#580` [FE] BO-030 Work Order Verification · Pallavi Sawant (q55) · 5 pts · W1 · follows SETUP-CLIENTS, VM-VENUEOPS-MAINTENANCE-1, VM-VENUEOPS-WORK-1 +2
+    - `#581` [FE] BO-031 Asset Register · Pallavi Sawant (q56) · 5 pts · W1 · follows SETUP-CLIENTS, VM-VENUEOPS-ASSET-1, VM-VENUEOPS-ASSET-2
+    - `#593` [FE] BO-034 Scan Activity · Sanket Keluskar (q31) · 5 pts · W1 · follows SETUP-CLIENTS, SVC-ACCESS-SYNC-1, VM-ACCESS-SYNC-1 +1
+    - `#594` [FE] BO-035 Override Audit · Pallavi Sawant (q64) · 5 pts · W1 · follows SETUP-CLIENTS, SVC-ACCESS-SYNC-1, VM-ACCESS-SYNC-1 +2
+    - `#598` [FE] BO-103 Access & Venue · Pallavi Sawant (q67) · 3 pts · W1 · follows SETUP-CLIENTS, SVC-TENANCY-TENANCY-1, VM-ACCESS-ACCESSPOINT-1 +1
+    - `#602` [FE] BO-002 Queue Configuration · Pallavi Sawant (q69) · 8 pts · W1 · follows SETUP-CLIENTS, SVC-CATALOGUE-AVAILABILITY-1, SVC-CATALOGUE-EVENT-1 +9
+    - `#603` [FE] BO-003 Queue Integration Setup · Sanket Keluskar (q35) · 3 pts · W1 · follows SETUP-CLIENTS, SVC-VENUEOPS-FEED-1, VM-VENUEOPS-FEED-1
+    - `#604` [FE] BO-004 Manual Wait Time Entry · Sanket Keluskar (q36) · 5 pts · W1 · follows SETUP-CLIENTS, SVC-VENUEOPS-ENTRY-1, SVC-VENUEOPS-QUEUE-1 +5
+    - `#607` [FE] BO-038 Reconciliation Queue · Sanket Keluskar (q37) · 5 pts · W1 · follows SETUP-CLIENTS, SVC-VENUEOPS-ENTRY-1, SVC-VENUEOPS-QUEUE-1 +4
+    - `#612` [FE] BO-005 Queue Monitor · Pallavi Sawant (q74) · 8 pts · W1 · follows SETUP-CLIENTS, SVC-VENUEOPS-ENTRY-1, SVC-VENUEOPS-QUEUE-1 +7
+    - `#686` [FE] BO-098 Qualifications · Pallavi Sawant (q79) · 2 pts · W2 · follows SETUP-CLIENTS, VM-VENUEOPS-RESOURCES-2
+    - `#706` [FE] BO-072 Incident Log · Pallavi Sawant (q82) · 3 pts · W2 · follows SETUP-CLIENTS, VM-VENUEOPS-INCIDENT-1, VM-VENUEOPS-INCIDENT-2
+    - `#707` [FE] BO-095 Resources · Sanket Keluskar (q55) · 2 pts · W2 · follows SETUP-CLIENTS, SVC-VENUEOPS-RESOURCES-1, VM-VENUEOPS-RESOURCES-2
+    - `#721` [FE] BO-069 Asset Register · Pallavi Sawant (q87) · 5 pts · W2 · follows SETUP-CLIENTS, VM-VENUEOPS-ASSET-1, VM-VENUEOPS-ASSET-2 +2
+    - `#787` [FE] BO-096 Resource Calendar · Sanket Keluskar (q77) · 2 pts · W2 · follows SETUP-CLIENTS, SVC-VENUEOPS-RESOURCES-1, VM-VENUEOPS-RESOURCES-1
+    - `#788` [FE] BO-099 Session Manifest · Pallavi Sawant (q97) · 2 pts · W2 · follows SETUP-CLIENTS, VM-VENUEOPS-RESOURCES-1, VM-VENUEOPS-RESOURCES-2
+    - `#815` [FE] BO-097 Check Out & Check In · Sanket Keluskar (q89) · 3 pts · W2 · follows SETUP-CLIENTS, VM-ORDER-ORDERS-1, VM-VENUEOPS-RESOURCES-1
+  - `#637` **[FE] Venue Management screens: Food & Beverage** · Feature · 8 children · Pallavi Sawant · 25 pts · W2
+    - `#605` [FE] BO-020 F&B Order Management · Pallavi Sawant (q70) · 5 pts · W1 · follows SETUP-CLIENTS, SVC-FNB-KITCHEN-1, SVC-FNB-KITCHEN-2 +3
+    - `#606` [FE] BO-021 Order Search (first batch) · Pallavi Sawant (q71) · 2 pts · W1 · follows SETUP-CLIENTS, SVC-FNB-GUESTORDERING-2, SVC-FNB-GUESTORDERING-3
+    - `#608` [FE] BO-046 Kitchen Display · Pallavi Sawant (q72) · 3 pts · W1 · follows SETUP-CLIENTS, SVC-FNB-KITCHEN-1, SVC-FNB-KITCHEN-2
+    - `#610` [FE] BO-104 Food & Beverage · Pallavi Sawant (q73) · 3 pts · W1 · follows SETUP-CLIENTS, SVC-FNB-MENU-1, SVC-TENANCY-TENANCY-1
+    - `#611` [FE] BO-045 Menu Management · Sanket Keluskar (q39) · 5 pts · W1 · follows SETUP-CLIENTS, SVC-FNB-MENU-1, SVC-FNB-MENU-2 +4
+    - `#767` [FE] BO-134 Kitchen & Preparation Stations · Pallavi Sawant (q95) · 2 pts · W2 · follows SETUP-CLIENTS, SVC-FNB-KITCHEN-1
+    - `#768` [FE] BO-135 Order Routing & KDS/Printer Rules · Sanket Keluskar (q74) · 2 pts · W2 · follows SETUP-CLIENTS, SVC-FNB-KITCHEN-1, SVC-TENANCY-WORKSTATION-2
+    - `#793` [FE] BO-136 F&B Global Settings & Controls · Sanket Keluskar (q80) · 3 pts · W2 · follows SETUP-CLIENTS, SVC-TENANCY-TENANCY-1, VM-FNB-FNB-1 +2
+  - `#642` **[FE] Venue Management screens: Stock & Supply** · Feature · 14 children · Pallavi Sawant · 47 pts · W2
+    - `#615` [FE] BO-078 Requisitions · Sanket Keluskar (q41) · 5 pts · W1 · follows SETUP-CLIENTS, VM-INVENTORY-INVENTORY-1, VM-INVENTORY-PROCUREMENT-1 +4
+    - `#616` [FE] BO-079 Stock Count · Pallavi Sawant (q76) · 5 pts · W1 · follows SETUP-CLIENTS, VM-FNB-FNB-1, VM-FNB-FNB-3 +2
+    - `#617` [FE] BO-082 Stock Movements · Sanket Keluskar (q42) · 3 pts · W1 · follows SETUP-CLIENTS, SVC-ORDER-ORDER-3, VM-INVENTORY-MOVEMENT-1 +1
+    - `#619` [FE] BO-105 Stock & Supply · Pallavi Sawant (q77) · 5 pts · W1 · follows SETUP-CLIENTS, SVC-INVENTORY-ITEM-1, SVC-TENANCY-TENANCY-1 +2
+    - `#786` [FE] BO-050 Stock Position & Valuation · Pallavi Sawant (q96) · 2 pts · W2 · follows SETUP-CLIENTS, VM-INVENTORY-STOCK-1
+    - `#794` [FE] BO-138 Production Execution & Batch Management · Pallavi Sawant (q100) · 2 pts · W2 · follows SETUP-CLIENTS, VM-FNB-FNB-1, VM-FNB-FNB-2 +1
+    - `#795` [FE] BO-139 Wastage, Spoilage, Returns & Write-Off · Sanket Keluskar (q81) · 2 pts · W2 · follows SETUP-CLIENTS, VM-FNB-PRODUCTION-1
+    - `#796` [FE] BO-140 Product Availability, 86 & Operational Food Safety · Pallavi Sawant (q101) · 2 pts · W2 · follows SETUP-CLIENTS, SVC-FNB-MENU-1, VM-INVENTORY-INVENTORY-1
+    - `#801` [FE] BO-049 Stock Levels · Pallavi Sawant (q103) · 5 pts · W2 · follows SETUP-CLIENTS, SVC-FNB-MENU-1, VM-INVENTORY-MOVEMENT-1 +2
+    - `#802` [FE] BO-052 Goods Receipt · Sanket Keluskar (q83) · 5 pts · W2 · follows SETUP-CLIENTS, SVC-INVENTORY-RECEIPT-1, VM-INVENTORY-INVENTORY-1 +5
+    - `#804` [FE] BO-080 Stock Transfers · Pallavi Sawant (q105) · 3 pts · W2 · follows SETUP-CLIENTS, SVC-INVENTORY-RECEIPT-1, VM-INVENTORY-INVENTORY-1 +1
+    - `#805` [FE] BO-083 Suppliers · Sanket Keluskar (q84) · 3 pts · W2 · follows SETUP-CLIENTS, VM-INVENTORY-INVENTORY-1, VM-INVENTORY-SUPPLIER-1 +1
+    - `#812` [FE] BO-137 Recipe Consumption & Theoretical Inventory · Pallavi Sawant (q109) · 3 pts · W2 · follows SETUP-CLIENTS, VM-FNB-FNB-2, VM-FNB-PRODUCTION-1 +1
+    - `#813` [FE] BO-141 Operational Alerts, AI Replenishment & Action Center · Sanket Keluskar (q88) · 2 pts · W2 · follows SETUP-CLIENTS, SVC-REPORTING-REPORTING-1, VM-INVENTORY-REQUISITION-1 +1
+  - `#638` **[FE] Venue Management screens: Guests & Marketing** · Feature · 3 children · Pallavi Sawant · 8 pts · W2
+    - `#620` [FE] BO-107 Guests & Marketing · Sanket Keluskar (q44) · 2 pts · W1 · follows SETUP-CLIENTS, SVC-TENANCY-TENANCY-1, VM-MARKETING-CAMPAIGN-1 +1
+    - `#705` [FE] BO-068 Audit Log · Pallavi Sawant (q81) · 3 pts · W2 · follows SETUP-CLIENTS, VM-IDENTITY-ADMINISTRATION-1, VM-TENANCY-TENANCY-1
+    - `#803` [FE] BO-073 Lost & Found Register · Pallavi Sawant (q104) · 3 pts · W2 · follows SETUP-CLIENTS, VM-MARKETING-MARKETING-1
+  - `#621` **[DB] Venue Management: database migrations** · Feature · 18 children · 34 pts · W2
+    - `#644` [DB] Migration: sync for Venue Management (1 tables) · Tanmay Dukhande (q44) · 1 pts · W2 · follows MIG-BASELINE
+    - `#645` [DB] Migration: control for Venue Management (6 tables) · Tanmay Dukhande (q45) · 3 pts · W2 · follows MIG-CONTROL
+    - `#647` [DB] Migration: games for Venue Management (2 tables) · Pranay Shinde (q47) · 2 pts · W2 · follows MIG-GAMES
+    - `#648` [DB] Migration: identity for Venue Management (1 tables) · Tanmay Dukhande (q46) · 1 pts · W2 · follows MIG-IDENTITY
+    - `#652` [DB] Migration: approvals for Venue Management (1 tables) · Hrushikant Patkar (q53) · 1 pts · W2 · follows MIG-APPROVALS
+    - `#653` [DB] Migration: resources for Venue Management (2 tables) · Pranay Shinde (q48) · 1 pts · W2 · follows MIG-RESOURCES
+    - `#654` [DB] Migration: workforce for Venue Management (4 tables) · Hrushikant Patkar (q54) · 2 pts · W2 · follows MIG-WORKFORCE
+    - `#658` [DB] Migration: platform for Venue Management (6 tables) · Hrushikant Patkar (q55) · 3 pts · W2 · follows MIG-PLATFORM
+    - `#659` [DB] Migration: reporting for Venue Management (1 tables) · Hrushikant Patkar (q56) · 1 pts · W2 · follows MIG-REPORTING
+    - `#668` [DB] Migration: ledger for Venue Management (7 tables) · Pranay Shinde (q49) · 3 pts · W2 · follows MIG-LEDGER
+    - `#669` [DB] Migration: maintenance for Venue Management (2 tables) · Pranay Shinde (q50) · 1 pts · W2 · follows MIG-MAINTENANCE
+    - `#670` [DB] Migration: seating for Venue Management (2 tables) · Hrushikant Patkar (q61) · 1 pts · W2 · follows MIG-SEATING
+    - `#689` [DB] Migration: catalogue for Venue Management (3 tables) · Hrushikant Patkar (q63) · 2 pts · W2 · follows MIG-CATALOGUE
+    - `#731` [DB] Migration: fnb for Venue Management (5 tables) · Tanmay Dukhande (q48) · 2 pts · W2 · follows MIG-FNB
+    - `#748` [DB] Migration: inventory for Venue Management (8 tables) · Hrushikant Patkar (q67) · 5 pts · W2 · follows MIG-INVENTORY
+    - `#749` [DB] Migration: marketing for Venue Management (7 tables) · Tanmay Dukhande (q50) · 3 pts · W2 · follows MIG-MARKETING
+    - `#769` [DB] Migration: promotions for Venue Management (1 tables) · Hrushikant Patkar (q70) · 1 pts · W2 · follows MIG-PROMOTIONS
+    - `#770` [DB] Migration: retail for Venue Management (1 tables) · Tanmay Dukhande (q56) · 1 pts · W2 · follows MIG-RETAIL
+  - `#622` **[BE] Venue Management backend: AccessService** · Feature · 3 children · 13 pts · W2
+    - `#722` [BE] AccessService: listAccessPoints · Chinmay Patkar (q108) · 2 pts · W2 · follows MIG-ACCESS
+    - `#723` [BE] AccessService: listScans, syncScans · Sanket Keluskar (q60) · 3 pts · W2 · follows MIG-ACCESS, VM-MIG-SYNC
+    - `#724` [BE] AccessService: lookupTicket, overrideAccess, validateAccess, validateGroupAccess · Pranay Shinde (q61) · 8 pts · W2 · follows MIG-ACCESS, MIG-CATALOGUE, MIG-IDENTITY +3
+  - `#623` **[BE] Venue Management backend: AiService** · Feature · 1 children · 3 pts · W2
+    - `#771` [BE] AiService: generateConfiguration · Sanket Keluskar (q75) · 3 pts · W2 · follows MIG-AI, MIG-CATALOGUE, MIG-MARKETING +5
+  - `#624` **[BE] Venue Management backend: CatalogueService** · Feature · 9 children · 21 pts · W2
+    - `#690` [BE] CatalogueService: reportBundleApplied · Deep Khanvilkar (q29) · 1 pts · W2 · follows MIG-CATALOGUE
+    - `#691` [BE] CatalogueService: cancelPerformance, createPerformances, getEvent, listEvents · Hrushikant Patkar (q64) · 5 pts · W2 · follows MIG-CATALOGUE, MIG-PLATFORM
+    - `#692` [BE] CatalogueService: forceReleaseInventoryHold · Chinmay Patkar (q104) · 1 pts · W2 · follows MIG-CATALOGUE
+    - `#693` [BE] CatalogueService: getPriceList, listPriceLists, listPrices · Sanket Keluskar (q52) · 3 pts · W2 · follows MIG-CATALOGUE
+    - `#711` [BE] CatalogueService: getChannelAllocations, listChannelCapacities, relinquishChannelAllocation, setChannelAllocations · Hrushikant Patkar (q65) · 5 pts · W2 · follows MIG-CATALOGUE, VM-MIG-CATALOGUE
+    - `#712` [BE] CatalogueService: importProductCatalogue, listProductCategories, setProductCategories · Sanket Keluskar (q57) · 3 pts · W2 · follows MIG-CATALOGUE, VM-MIG-CATALOGUE
+    - `#713` [BE] CatalogueService: setProductAttributes · Chinmay Patkar (q106) · 1 pts · W2 · follows VM-MIG-CATALOGUE
+    - `#772` [BE] CatalogueService: getRecommendations · Deep Khanvilkar (q37) · 1 pts · W2 · follows MIG-CATALOGUE, MIG-MARKETING, MIG-ORDERS +1
+    - `#773` [BE] CatalogueService: listUpsellRules · Chinmay Patkar (q114) · 1 pts · W2 · follows MIG-PROMOTIONS
+  - `#625` **[BE] Venue Management backend: FnbService** · Feature · 7 children · 35 pts · W2
+    - `#732` [BE] FnbService: amendFnbOrder · Deep Khanvilkar (q33) · 2 pts · W2 · follows MIG-FNB
+    - `#733` [BE] FnbService: acceptFnbOrder, cancelFnbOrder · Tanmay Dukhande (q49) · 5 pts · W2 · follows MIG-FNB
+    - `#750` [BE] FnbService: applyMenuActions, buildProductionPlan, completeProductionRun, enterCountLine · Tanmay Dukhande (q51) · 8 pts · W2 · follows MIG-AI, MIG-CATALOGUE, MIG-FNB +2
+    - `#751` [BE] FnbService: getProductionRun, listProductionRuns, planProductionRun, publishMenu · Tanmay Dukhande (q52) · 8 pts · W2 · follows MIG-CATALOGUE, MIG-FNB, MIG-INVENTORY +2
+    - `#752` [BE] FnbService: releaseProductionPlan, requestRecount, rollbackMenu, scheduleMenuPublish · Tanmay Dukhande (q53) · 5 pts · W2 · follows MIG-FNB, VM-MIG-FNB
+    - `#753` [BE] FnbService: setSubstitutionRules, verifyAllergens · Deep Khanvilkar (q35) · 2 pts · W2 · follows MIG-FNB, VM-MIG-FNB
+    - `#754` [BE] FnbService: listRecipes, recordWaste, setRecipe · Tanmay Dukhande (q54) · 5 pts · W2 · follows MIG-FNB, MIG-INVENTORY, MIG-PLATFORM +1
+  - `#626` **[BE] Venue Management backend: IdentityService** · Feature · 1 children · 1 pts · W2
+    - `#660` [BE] IdentityService: resolvePermissions · Chinmay Patkar (q98) · 1 pts · W2 · follows MIG-IDENTITY, MIG-PLATFORM, VM-MIG-IDENTITY
+  - `#627` **[BE] Venue Management backend: InventoryService** · Feature · 13 children · 55 pts · W2
+    - `#755` [BE] InventoryService: getStockTransfer, listExpiringBatches, updateRequisitionLines, updateSupplier · Hrushikant Patkar (q68) · 5 pts · W2 · follows MIG-FNB, MIG-INVENTORY, VM-MIG-PLATFORM
+    - `#756` [BE] InventoryService: listInventoryItems · Chinmay Patkar (q111) · 2 pts · W2 · follows MIG-INVENTORY
+    - `#757` [BE] InventoryService: createStockMovement, listStockMovements · Sanket Keluskar (q70) · 3 pts · W2 · follows MIG-INVENTORY
+    - `#758` [BE] InventoryService: acknowledgePurchaseOrder, cancelRequisition, closePurchaseOrderShort, rejectRequisition · Sanket Keluskar (q71) · 3 pts · W2 · follows MIG-INVENTORY
+    - `#759` [BE] InventoryService: returnRequisition, sendPurchaseOrder · Deep Khanvilkar (q36) · 2 pts · W2 · follows MIG-INVENTORY
+    - `#760` [BE] InventoryService: listGoodsReceipts · Chinmay Patkar (q112) · 1 pts · W2 · follows MIG-INVENTORY
+    - `#761` [BE] InventoryService: getStockPositions, getStockValuation, listStockLocations · Hrushikant Patkar (q69) · 5 pts · W2 · follows MIG-INVENTORY, MIG-LEDGER
+    - `#774` [BE] InventoryService: cancelStockCount, getCountVariance, listStockCounts, postStockCount · Hrushikant Patkar (q71) · 5 pts · W2 · follows MIG-PLATFORM, VM-MIG-INVENTORY
+    - `#775` [BE] InventoryService: recountStockCount, startStockCount · Sanket Keluskar (q76) · 3 pts · W2 · follows VM-MIG-INVENTORY
+    - `#776` [BE] InventoryService: cancelPurchaseOrder, createPurchaseOrder, getPurchaseOrder, listPurchaseOrders · Hrushikant Patkar (q72) · 8 pts · W2 · follows MIG-INVENTORY, VM-MIG-INVENTORY
+    - `#777` [BE] InventoryService: approveRequisition, createRequisition, getSuggestedRequisitions, listRequisitions · Hrushikant Patkar (q73) · 8 pts · W2 · follows MIG-INVENTORY, VM-MIG-INVENTORY
+    - `#778` [BE] InventoryService: compareQuotations, createSupplier, listSuppliers, recordQuotation · Hrushikant Patkar (q74) · 5 pts · W2 · follows MIG-INVENTORY, VM-MIG-INVENTORY
+    - `#779` [BE] InventoryService: closeTransferShort, createStockTransfer, listStockTransfers, receiveStockTransfer · Hrushikant Patkar (q75) · 5 pts · W2 · follows VM-MIG-INVENTORY
+  - `#628` **[BE] Venue Management backend: LedgerService** · Feature · 12 children · 45 pts · W2
+    - `#671` [BE] LedgerService: closeFiscalPeriod, listFiscalPeriods · Chinmay Patkar (q99) · 2 pts · W2 · follows MIG-LEDGER, MIG-PLATFORM
+    - `#672` [BE] LedgerService: abandonPeriodClose, beginPeriodClose, getTrialBalance, listLedgerEntries · Pranay Shinde (q51) · 5 pts · W2 · follows MIG-LEDGER
+    - `#673` [BE] LedgerService: rejectJournal, reopenPeriod · Deep Khanvilkar (q25) · 2 pts · W2 · follows MIG-LEDGER
+    - `#674` [BE] LedgerService: updateTaxCode · Chinmay Patkar (q100) · 1 pts · W2 · follows MIG-LEDGER
+    - `#694` [BE] LedgerService: listAccountMappings, setAccountMappings · Deep Khanvilkar (q30) · 2 pts · W2 · follows VM-MIG-LEDGER
+    - `#695` [BE] LedgerService: settleDeposit, validateRecognitionSchedules · Sanket Keluskar (q53) · 3 pts · W2 · follows MIG-CATALOGUE, MIG-LEDGER, VM-MIG-LEDGER
+    - `#696` [BE] LedgerService: approveJournalEntry, createJournalEntry, getJournalEntry, listJournalEntries · Pranay Shinde (q54) · 8 pts · W2 · follows MIG-LEDGER, MIG-PLATFORM, VM-MIG-LEDGER
+    - `#697` [BE] LedgerService: reverseJournalEntry · Chinmay Patkar (q105) · 2 pts · W2 · follows MIG-LEDGER, VM-MIG-LEDGER
+    - `#698` [BE] LedgerService: getSettlement, ingestSettlementFile, listSettlementExceptions, listSettlements · Pranay Shinde (q55) · 8 pts · W2 · follows VM-MIG-LEDGER
+    - `#699` [BE] LedgerService: resolveSettlementException · Deep Khanvilkar (q31) · 2 pts · W2 · follows VM-MIG-LEDGER
+    - `#700` [BE] LedgerService: createTaxCode, createTaxExemption, listTaxCodes, listTaxExemptions · Pranay Shinde (q56) · 5 pts · W2 · follows MIG-LEDGER, VM-MIG-LEDGER
+    - `#714` [BE] LedgerService: createRecognitionSchedule, getDeferredRevenue, listRecognitionSchedules, runRecognition · Pranay Shinde (q60) · 5 pts · W2 · follows MIG-LEDGER, MIG-ORDERS, VM-MIG-LEDGER
+  - `#629` **[BE] Venue Management backend: MarketingService** · Feature · 8 children · 29 pts · W2
+    - `#762` [BE] MarketingService: getConsentHistory · Chinmay Patkar (q113) · 1 pts · W2 · follows MIG-MARKETING
+    - `#763` [BE] MarketingService: mergeGuestProfiles, updateGuestProfile · Tanmay Dukhande (q55) · 3 pts · W2 · follows MIG-MARKETING
+    - `#780` [BE] MarketingService: createCampaign, getCampaign, getCampaignPerformance, launchCampaign · Tanmay Dukhande (q57) · 8 pts · W2 · follows MIG-MARKETING, VM-MIG-MARKETING
+    - `#781` [BE] MarketingService: listCampaigns, pauseCampaign, stopCampaign, testSendCampaign · Tanmay Dukhande (q58) · 5 pts · W2 · follows MIG-MARKETING, VM-MIG-MARKETING
+    - `#782` [BE] MarketingService: unscheduleCampaign, updateCampaign · Tanmay Dukhande (q59) · 3 pts · W2 · follows MIG-MARKETING, VM-MIG-MARKETING
+    - `#783` [BE] MarketingService: adjustLoyaltyPoints, getGuestLoyalty · Tanmay Dukhande (q60) · 3 pts · W2 · follows MIG-MARKETING, VM-MIG-MARKETING
+    - `#784` [BE] MarketingService: createJourney, listJourneys, listLostItems, matchLostItem · Tanmay Dukhande (q61) · 5 pts · W2 · follows MIG-MARKETING, MIG-VENUEMAP, VM-MIG-MARKETING
+    - `#785` [BE] MarketingService: listSegments · Deep Khanvilkar (q38) · 1 pts · W2 · follows MIG-MARKETING, VM-MIG-MARKETING
+  - `#630` **[BE] Venue Management backend: OrderService** · Feature · 5 children · 17 pts · W2
+    - `#646` [BE] OrderService: listSyncRejections · Deep Khanvilkar (q22) · 2 pts · W2 · follows VM-MIG-SYNC
+    - `#715` [BE] OrderService: updateGroupBooking · Chinmay Patkar (q107) · 2 pts · W2 · follows MIG-ORDERS, MIG-PII
+    - `#716` [BE] OrderService: getRefundPolicy · Deep Khanvilkar (q32) · 2 pts · W2 · follows MIG-ORDERS
+    - `#717` [BE] OrderService: approveRefund, createBulkRefund · Sanket Keluskar (q58) · 3 pts · W2 · follows MIG-ORDERS
+    - `#797` [BE] OrderService: authoriseStoredValue, captureStoredValue, createGroupBooking, relinquishStoredValue · Pranay Shinde (q63) · 8 pts · W2 · follows MIG-ORDERS, MIG-PII, MIG-WALLET +1
+  - `#631` **[BE] Venue Management backend: PlatformService** · Feature · 3 children · 7 pts · W2
+    - `#649` [BE] PlatformService: createApiClient, createWebhookSubscription, listApiClients, listWebhookDeliveries · Tanmay Dukhande (q47) · 5 pts · W2 · follows VM-MIG-CONTROL
+    - `#650` [BE] PlatformService: listWebhookSubscriptions · Chinmay Patkar (q97) · 1 pts · W2 · follows VM-MIG-CONTROL
+    - `#651` [BE] PlatformService: startRollout · Deep Khanvilkar (q23) · 1 pts · W2 · follows VM-MIG-CONTROL
+  - `#632` **[BE] Venue Management backend: ReportingService** · Feature · 4 children · 14 pts · W2
+    - `#661` [BE] ReportingService: createReport, updateReport · Hrushikant Patkar (q57) · 8 pts · W2 · follows MIG-REPORTING
+    - `#662` [BE] ReportingService: listReportExecutions · Deep Khanvilkar (q24) · 1 pts · W2 · follows MIG-REPORTING
+    - `#675` [BE] ReportingService: createReportSchedule · Deep Khanvilkar (q26) · 2 pts · W2 · follows MIG-REPORTING, VM-MIG-REPORTING
+    - `#764` [BE] ReportingService: acknowledgeAlert, getSupplierPerformance · Sanket Keluskar (q72) · 3 pts · W2 · follows MIG-IDENTITY, MIG-INVENTORY, MIG-REPORTING
+  - `#633` **[BE] Venue Management backend: RetailService** · Feature · 1 children · 2 pts · W2
+    - `#798` [BE] RetailService: listStoreRules, setStoreRules · Chinmay Patkar (q115) · 2 pts · W2 · follows VM-MIG-RETAIL
+  - `#634` **[BE] Venue Management backend: TenancyService** · Feature · 7 children · 33 pts · W2
+    - `#663` [BE] TenancyService: acknowledgeAnnouncement, getAnnouncementReach, listAnnouncements, publishAnnouncement · Hrushikant Patkar (q58) · 5 pts · W2 · follows MIG-IDENTITY, MIG-PLATFORM, MIG-WORKFORCE +1
+    - `#664` [BE] TenancyService: escalateApprovalRequest, listApprovalRequests, resubmitApprovalRequest, withdrawApprovalRequest · Hrushikant Patkar (q59) · 8 pts · W2 · follows MIG-APPROVALS, VM-MIG-APPROVALS
+    - `#665` [BE] TenancyService: requestShiftSwap, updateRotaAssignment · Sanket Keluskar (q48) · 3 pts · W2 · follows MIG-APPROVALS, MIG-IDENTITY, MIG-WORKFORCE +1
+    - `#666` [BE] TenancyService: getWorkstation, registerDevice · Hrushikant Patkar (q60) · 5 pts · W2 · follows MIG-PLATFORM
+    - `#676` [BE] TenancyService: deployConfigurationProfile, listAuditRecords, setConfigurationProfile, setConnectivityThresholds · Hrushikant Patkar (q62) · 5 pts · W2 · follows MIG-IDENTITY, MIG-PLATFORM, VM-MIG-PLATFORM
+    - `#677` [BE] TenancyService: setOfflinePolicy · Chinmay Patkar (q101) · 2 pts · W2 · follows VM-MIG-PLATFORM
+    - `#725` [BE] TenancyService: amendAttendance, listAttendance, recordAttendance · Hrushikant Patkar (q66) · 5 pts · W2 · follows MIG-ACCESS, MIG-WORKFORCE, VM-MIG-WORKFORCE
+  - `#635` **[BE] Venue Management backend: VenueOpsService** · Feature · 17 children · 70 pts · W2
+    - `#655` [BE] VenueOpsService: listGames, updateGame · Sanket Keluskar (q45) · 3 pts · W2 · follows VM-MIG-GAMES
+    - `#656` [BE] VenueOpsService: recordGamePlay, syncGamePlays · Sanket Keluskar (q46) · 3 pts · W2 · follows MIG-GAMES, VM-MIG-GAMES, VM-MIG-SYNC
+    - `#667` [BE] VenueOpsService: listResources, reorderSessionManifest, setResourceQualifications · Sanket Keluskar (q49) · 3 pts · W2 · follows MIG-IDENTITY, MIG-RESOURCES, VM-MIG-RESOURCES
+    - `#678` [BE] VenueOpsService: getIncident, listIncidents, recordAuthorityNotification, reportIncident · Pranay Shinde (q52) · 8 pts · W2 · follows MIG-MAINTENANCE
+    - `#679` [BE] VenueOpsService: updateIncident · Deep Khanvilkar (q27) · 2 pts · W2 · follows MIG-MAINTENANCE
+    - `#680` [BE] VenueOpsService: setPathClosure · Chinmay Patkar (q102) · 2 pts · W2 · follows MIG-VENUEMAP
+    - `#681` [BE] VenueOpsService: cancelWorkOrder · Deep Khanvilkar (q28) · 2 pts · W2 · follows MIG-MAINTENANCE
+    - `#682` [BE] VenueOpsService: completeWorkOrder, createWorkOrder, getWorkOrder, listWorkOrders · Pranay Shinde (q53) · 8 pts · W2 · follows MIG-MAINTENANCE, MIG-PLATFORM
+    - `#683` [BE] VenueOpsService: verifyWorkOrder · Chinmay Patkar (q103) · 2 pts · W2 · follows MIG-MAINTENANCE, MIG-PLATFORM
+    - `#701` [BE] VenueOpsService: createAsset, getAsset, getAssetHistory, listAssets · Pranay Shinde (q57) · 8 pts · W2 · follows MIG-MAINTENANCE, VM-MIG-MAINTENANCE
+    - `#702` [BE] VenueOpsService: lookupAsset, setAssetStatus, updateAsset · Pranay Shinde (q58) · 8 pts · W2 · follows MIG-MAINTENANCE, VM-MIG-MAINTENANCE
+    - `#703` [BE] VenueOpsService: acceptWorkOrder, attachWorkOrderEvidence, closeWorkOrder · Pranay Shinde (q59) · 5 pts · W2 · follows MIG-ASSETS, MIG-MAINTENANCE, VM-MIG-MAINTENANCE
+    - `#734` [BE] VenueOpsService: callNextParties · Chinmay Patkar (q109) · 1 pts · W2 · follows MIG-QUEUE
+    - `#735` [BE] VenueOpsService: listQueueFeeds, testQueueFeed · Deep Khanvilkar (q34) · 2 pts · W2 · follows MIG-QUEUE
+    - `#736` [BE] VenueOpsService: setQueueStatus · Sanket Keluskar (q64) · 3 pts · W2 · follows MIG-QUEUE
+    - `#737` [BE] VenueOpsService: setWaitTime · Chinmay Patkar (q110) · 2 pts · W2 · follows MIG-QUEUE
+    - `#765` [BE] VenueOpsService: bookResource, checkInResource, checkOutResource, getSessionManifest · Pranay Shinde (q62) · 8 pts · W2 · follows MIG-MARKETING, MIG-ORDERS, MIG-PII +2

@@ -1,4 +1,4 @@
--- marketing — 62 tables
+-- marketing — 64 tables
 -- **Derived. Do not hand-edit.**
 
 -- Available, busy, away or offline, with a concurrency limit. Expires — an agent who forgets to go
@@ -42,7 +42,7 @@ CREATE TABLE IF NOT EXISTS marketing.audience_activation (
     status                            text,
     last_synced_at                    timestamptz,
     last_sync_errors                  integer,
-    scope_path                        text
+    scope_path                        ltree
 );
 
 -- Holds 17 columns. No description has been written for this table — the name is the only thing
@@ -64,7 +64,7 @@ CREATE TABLE IF NOT EXISTS marketing.audience_list (
     purpose                           text,
     consent_basis                     text,
     expires_at                        date,
-    scope_path                        text
+    scope_path                        ltree
 );
 
 -- Holds 9 columns. No description has been written for this table — the name is the only thing
@@ -171,7 +171,7 @@ CREATE TABLE IF NOT EXISTS marketing.challenge (
     starts_at                         timestamptz,
     ends_at                           timestamptz,
     status                            text NOT NULL,
-    scope_path                        text
+    scope_path                        ltree
 );
 
 -- How far a guest is (22.6.15). Progress is shown, not just the outcome — a guest two visits from
@@ -284,7 +284,7 @@ CREATE TABLE IF NOT EXISTS marketing.duplicate_candidate (
     status                            text,
     decided_by                        uuid,
     decided_at                        timestamptz,
-    scope_path                        text
+    scope_path                        ltree
 );
 
 -- A waiver, survey or capture form (CF-129). One mechanism, three uses — three implementations
@@ -304,7 +304,7 @@ CREATE TABLE IF NOT EXISTS marketing.form_definition (
     status                            text NOT NULL,
     legal_reviewed_by                 text,
     legal_reviewed_at                 timestamptz,
-    scope_path                        text
+    scope_path                        ltree
 );
 
 -- The acceptance record, and it is evidence (2.15.13). Bound to the version accepted, not to the
@@ -330,7 +330,7 @@ CREATE TABLE IF NOT EXISTS marketing.form_submission (
 CREATE TABLE IF NOT EXISTS marketing.guest_attribute_model (
     version                           integer,
     published_at                      timestamptz,
-    scope_path                        text,
+    scope_path                        ltree,
     id                                uuid PRIMARY KEY NOT NULL
 );
 
@@ -400,6 +400,27 @@ CREATE TABLE IF NOT EXISTS marketing.guest_extra_value (
     updated_at                        timestamptz
 );
 
+-- Every offered profile match and the guest's answer. Kept so a merge done later by staff can see
+-- that the guest once said *not me*
+CREATE TABLE IF NOT EXISTS marketing.guest_match_decision (
+    id                                uuid PRIMARY KEY,
+    cart_id                           text,
+    matched_profile_id                uuid,
+    matched_on                        text,
+    decision                          text NOT NULL,
+    decided_at                        timestamptz,
+    scope_path                        ltree
+);
+
+-- How a returning guest is recognised at checkout: by email, mobile or either. One per venue. The
+-- match is offered to the guest, never applied for them
+CREATE TABLE IF NOT EXISTS marketing.guest_match_policy (
+    id                                uuid PRIMARY KEY,
+    match_by                          text NOT NULL,
+    offer_at_checkout                 boolean,
+    scope_path                        ltree
+);
+
 -- What a venue knows about a guest that is not their identity — preferences, lifetime value,
 -- segments, consent. Twenty operations touch it and it references pii.subject rather than
 -- duplicating it
@@ -440,7 +461,7 @@ CREATE TABLE IF NOT EXISTS marketing.guest_relationship (
     effective_to                      date,
     shared_benefits                   boolean,
     verified_at                       timestamptz,
-    scope_path                        text
+    scope_path                        ltree
 );
 
 -- Holds 7 columns. No description has been written for this table — the name is the only thing
@@ -451,7 +472,7 @@ CREATE TABLE IF NOT EXISTS marketing.identity_rules (
     excluded_sources                  text[],
     jurisdiction_restrictions         text[],
     auto_merge_allowed                boolean,
-    scope_path                        text,
+    scope_path                        ltree,
     id                                uuid PRIMARY KEY NOT NULL
 );
 
@@ -472,7 +493,7 @@ CREATE TABLE IF NOT EXISTS marketing.invitation (
     cost_center_id                    uuid,
     entitlement_ids                   text[],
     issued_at                         timestamptz NOT NULL,
-    scope_path                        text
+    scope_path                        ltree
 );
 
 -- A quota-bounded addressed invitation (BL-150). A campaign broadcasts; an invitation expects a
@@ -488,7 +509,7 @@ CREATE TABLE IF NOT EXISTS marketing.invitation_campaign (
     accepted_count                    integer,
     respond_by_at                     timestamptz,
     status                            text NOT NULL,
-    scope_path                        text
+    scope_path                        ltree
 );
 
 -- An automated multi-step journey (22.3.1b–22.3.10b, CF-137). A MessageTrigger is one step of it —
@@ -502,7 +523,7 @@ CREATE TABLE IF NOT EXISTS marketing.journey (
     status                            text NOT NULL,
     max_duration_days                 integer,
     reentry_policy                    text,
-    scope_path                        text
+    scope_path                        ltree
 );
 
 -- A guest inside a journey, at a step. Pausing does not evict them, because a half-finished
@@ -517,7 +538,7 @@ CREATE TABLE IF NOT EXISTS marketing.journey_enrollment (
     step_entered_at                   timestamptz,
     next_action_at                    timestamptz,
     exited_at                         timestamptz,
-    scope_path                        text
+    scope_path                        ltree
 );
 
 -- Holds 14 columns. No description has been written for this table — the name is the only thing
@@ -693,7 +714,7 @@ CREATE TABLE IF NOT EXISTS marketing.message_trigger (
     anchor                            text,
     priority                          text,
     is_active                         boolean NOT NULL,
-    scope_path                        text
+    scope_path                        ltree
 );
 
 -- One level, with its threshold and benefits
@@ -738,7 +759,7 @@ CREATE TABLE IF NOT EXISTS marketing.privacy_incident (
     subjects_notified_at              timestamptz,
     not_notified_rationale            text,
     status                            text NOT NULL,
-    scope_path                        text
+    scope_path                        ltree
 );
 
 -- Holds 9 columns. No description has been written for this table — the name is the only thing
@@ -767,7 +788,7 @@ CREATE TABLE IF NOT EXISTS marketing.referral (
     referrer_reward_id                uuid,
     referee_reward_id                 uuid,
     expires_at                        timestamptz,
-    scope_path                        text
+    scope_path                        ltree
 );
 
 -- Holds 13 columns. No description has been written for this table — the name is the only thing
@@ -785,7 +806,7 @@ CREATE TABLE IF NOT EXISTS marketing.retention_policy (
     fraud_exception_months            integer,
     approval_required                 boolean,
     schedule                          text,
-    scope_path                        text
+    scope_path                        ltree
 );
 
 -- What a guest said afterwards, with the venue’s response and whether it is public
@@ -877,7 +898,7 @@ CREATE TABLE IF NOT EXISTS marketing.segment_criterion (
 -- saying what it is
 CREATE TABLE IF NOT EXISTS marketing.sla_policy (
     id                                uuid PRIMARY KEY,
-    scope_path                        text,
+    scope_path                        ltree,
     code                              text NOT NULL,
     name                              text NOT NULL,
     priority                          text,
@@ -911,7 +932,7 @@ CREATE TABLE IF NOT EXISTS marketing.suppression (
     reason                            text NOT NULL,
     suppressed_at                     timestamptz NOT NULL,
     suppressed_by_principal_id        uuid,
-    scope_path                        text
+    scope_path                        ltree
 );
 
 -- One marketing touch (BL-177). The platform records touches and does not pick an attribution

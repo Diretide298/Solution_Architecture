@@ -7,15 +7,15 @@
  "audience": "staff",
  "formFactor": "web",
  "offlineCapable": false,
- "generated": "2026-09-21",
+ "generated": "2026-09-24",
  "note": "Derived by tools/derive-platform.py. **The gaps section is the point** \u2014 a page listing what exists is a directory; one listing what is missing is a worklist.",
  "counts": {
   "screens": 1182,
-  "operations": 1083,
+  "operations": 1103,
   "contracts": 31,
   "modules": 13,
   "undrawn": 0,
-  "operationsWithNoScreen": 244
+  "operationsWithNoScreen": 237
  },
  "waves": {
   "wave1": 60,
@@ -135,26 +135,26 @@
   },
   {
    "contract": "marketing-crm",
-   "operations": 121
+   "operations": 123
   },
   {
    "contract": "orders",
-   "operations": 80
+   "operations": 89
   },
   {
    "contract": "catalogue",
-   "operations": 71
+   "operations": 75
   },
   {
    "contract": "seating",
    "operations": 52
   },
   {
-   "contract": "resources",
+   "contract": "inventory",
    "operations": 48
   },
   {
-   "contract": "inventory",
+   "contract": "resources",
    "operations": 48
   },
   {
@@ -163,7 +163,7 @@
   },
   {
    "contract": "fnb",
-   "operations": 43
+   "operations": 45
   },
   {
    "contract": "wallet",
@@ -211,7 +211,7 @@
   },
   {
    "contract": "shift",
-   "operations": 14
+   "operations": 16
   },
   {
    "contract": "queue",
@@ -219,7 +219,7 @@
   },
   {
    "contract": "identity",
-   "operations": 11
+   "operations": 12
   },
   {
    "contract": "retail",
@@ -351,7 +351,7 @@
    "module": "Sell",
    "wave": 2,
    "route": "/venue-operations/packages-bundles",
-   "operations": 5,
+   "operations": 7,
    "drawn": true
   },
   {
@@ -486,7 +486,7 @@
    "module": "Orders & Money",
    "wave": 2,
    "route": "/venue-operations/group-bookings",
-   "operations": 14,
+   "operations": 17,
    "drawn": true
   },
   {
@@ -648,7 +648,7 @@
    "module": "Venue Operations",
    "wave": 2,
    "route": "/venue-operations/f-b-outlets",
-   "operations": 15,
+   "operations": 17,
    "drawn": true
   },
   {
@@ -729,7 +729,7 @@
    "module": "People & Access Rights",
    "wave": 1,
    "route": "/venue-operations/staff-directory",
-   "operations": 4,
+   "operations": 5,
    "drawn": true
   },
   {
@@ -1800,7 +1800,7 @@
    "module": "Access & Venue",
    "wave": 3,
    "route": "/access-venue/currency-timezone-channels-bo-1065",
-   "operations": 1,
+   "operations": 3,
    "drawn": true
   },
   {
@@ -3348,7 +3348,7 @@
    "module": "Access & Venue",
    "wave": 3,
    "route": "/access-venue/guest-companion-eligibility-rules-bo-161",
-   "operations": 1,
+   "operations": 3,
    "drawn": true
   },
   {
@@ -4842,7 +4842,7 @@
    "module": "Orders & Money",
    "wave": 3,
    "route": "/orders-money/deposit-partial-payment-outstanding-balance-management-bo-327",
-   "operations": 3,
+   "operations": 5,
    "drawn": true
   },
   {
@@ -5013,7 +5013,7 @@
    "module": "Access & Venue",
    "wave": 3,
    "route": "/access-venue/pdf-printable-pos-ticket-designer-bo-346",
-   "operations": 1,
+   "operations": 5,
    "drawn": true
   },
   {
@@ -8613,7 +8613,7 @@
    "module": "Engagement & Support",
    "wave": 3,
    "route": "/engagement-support/duplicate-review-merge-bo-746",
-   "operations": 3,
+   "operations": 5,
    "drawn": true
   },
   {
@@ -11209,6 +11209,18 @@
     "summary": "Escalate a finding"
    },
    {
+    "operation": "getFnbReservationPolicy",
+    "contract": "fnb",
+    "verb": "GET",
+    "summary": "How long a table is held, by party size"
+   },
+   {
+    "operation": "getFnbServiceChargePolicy",
+    "contract": "fnb",
+    "verb": "GET",
+    "summary": "The service charge a venue applies, and on what"
+   },
+   {
     "operation": "listFnbRecommendations",
     "contract": "fnb",
     "verb": "GET",
@@ -11219,6 +11231,12 @@
     "contract": "fnb",
     "verb": "GET",
     "summary": "Approved substitutions for a recipe's ingredients"
+   },
+   {
+    "operation": "listTemperatureCheckpoints",
+    "contract": "fnb",
+    "verb": "GET",
+    "summary": "The units that get read, and the range each must hold"
    },
    {
     "operation": "rebalanceStationLoad",
@@ -11257,6 +11275,18 @@
     "summary": "What the guest chooses, and what it costs extra"
    },
    {
+    "operation": "setFnbReservationPolicy",
+    "contract": "fnb",
+    "verb": "PUT",
+    "summary": "Set turn times and seating buffers"
+   },
+   {
+    "operation": "setFnbServiceChargePolicy",
+    "contract": "fnb",
+    "verb": "PUT",
+    "summary": "Set the service charge"
+   },
+   {
     "operation": "setIngredientSubstitutes",
     "contract": "fnb",
     "verb": "PUT",
@@ -11273,6 +11303,12 @@
     "contract": "fnb",
     "verb": "PUT",
     "summary": "Divide the floor into sections and give each a server"
+   },
+   {
+    "operation": "setTemperatureCheckpoint",
+    "contract": "fnb",
+    "verb": "PUT",
+    "summary": "Define a checkpoint and its safe range"
    },
    {
     "operation": "updateTable",
@@ -11623,22 +11659,16 @@
     "summary": "Extend a reservation"
    },
    {
-    "operation": "getBillingStatement",
+    "operation": "getResaleFeePolicy",
     "contract": "orders",
     "verb": "GET",
-    "summary": "One statement, with its lines"
+    "summary": "The commission and price cap a resale listing is created under"
    },
    {
     "operation": "issueInvitation",
     "contract": "orders",
     "verb": "POST",
     "summary": "Issue a complimentary entitlement, with no payment expected"
-   },
-   {
-    "operation": "listBillingStatements",
-    "contract": "orders",
-    "verb": "GET",
-    "summary": "What was charged, when, and against which agreement"
    },
    {
     "operation": "listDeposits",
@@ -11695,12 +11725,6 @@
     "summary": "A credit limit for an individual booking ahead"
    },
    {
-    "operation": "printTicketProof",
-    "contract": "orders",
-    "verb": "POST",
-    "summary": "Print a sample without selling anything"
-   },
-   {
     "operation": "pushWalletPassUpdate",
     "contract": "orders",
     "verb": "POST",
@@ -11717,6 +11741,12 @@
     "contract": "orders",
     "verb": "PUT",
     "summary": ""
+   },
+   {
+    "operation": "setResaleFeePolicy",
+    "contract": "orders",
+    "verb": "PUT",
+    "summary": "Set resale commission and the price ceiling"
    },
    {
     "operation": "skipRolloutCell",
@@ -12133,18 +12163,6 @@
     "summary": "Freeze a wallet"
    },
    {
-    "operation": "createBanner",
-    "contract": "white-label",
-    "verb": "POST",
-    "summary": "Create a banner"
-   },
-   {
-    "operation": "createPromoBlock",
-    "contract": "white-label",
-    "verb": "POST",
-    "summary": "Create a promotional block"
-   },
-   {
     "operation": "deleteBanner",
     "contract": "white-label",
     "verb": "DELETE",
@@ -12155,24 +12173,6 @@
     "contract": "white-label",
     "verb": "DELETE",
     "summary": "Delete a content page"
-   },
-   {
-    "operation": "deletePromoBlock",
-    "contract": "white-label",
-    "verb": "DELETE",
-    "summary": "Delete a promotional block"
-   },
-   {
-    "operation": "getFeatureToggles",
-    "contract": "white-label",
-    "verb": "GET",
-    "summary": "Read tenant feature toggles"
-   },
-   {
-    "operation": "getModuleEnablement",
-    "contract": "white-label",
-    "verb": "GET",
-    "summary": "Read module enablement"
    },
    {
     "operation": "getNavigation",
@@ -12187,58 +12187,16 @@
     "summary": "Publish now, or schedule it"
    },
    {
-    "operation": "setFeatureToggles",
-    "contract": "white-label",
-    "verb": "PUT",
-    "summary": "Set feature toggles"
-   },
-   {
-    "operation": "setFooter",
-    "contract": "white-label",
-    "verb": "PUT",
-    "summary": "Footer columns, legal links and social"
-   },
-   {
     "operation": "setHeader",
     "contract": "white-label",
     "verb": "PUT",
     "summary": "Configure the header"
    },
    {
-    "operation": "setMaintenanceMode",
-    "contract": "white-label",
-    "verb": "PUT",
-    "summary": "Enable or clear maintenance mode"
-   },
-   {
-    "operation": "setModuleEnablement",
-    "contract": "white-label",
-    "verb": "PUT",
-    "summary": "Enable or disable modules"
-   },
-   {
     "operation": "setNavigation",
     "contract": "white-label",
     "verb": "PUT",
     "summary": "Set main and overflow navigation"
-   },
-   {
-    "operation": "updateBanner",
-    "contract": "white-label",
-    "verb": "PATCH",
-    "summary": "Amend or activate a banner"
-   },
-   {
-    "operation": "updateContentPage",
-    "contract": "white-label",
-    "verb": "PUT",
-    "summary": "Amend a content page"
-   },
-   {
-    "operation": "updatePromoBlock",
-    "contract": "white-label",
-    "verb": "PATCH",
-    "summary": "Amend a promotional block"
    },
    {
     "operation": "broadcastToGuests",

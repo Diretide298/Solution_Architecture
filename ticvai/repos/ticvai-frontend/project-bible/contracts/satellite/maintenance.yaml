@@ -110,7 +110,6 @@ paths:
         - "P08 BO-108 Venue Operations"
         - "P08 BO-505 Serialized Equipment Registry"
         - "P08 BO-903 Equipment & Asset Command Center"
-        - "P13 CMS-004 Logo & Assets"
         - "P13 CMS-071 AI Asset Intelligence Command Center"
       x-ticvai-audience: [staff]
       x-ticvai-read-routing: replica
@@ -156,7 +155,6 @@ paths:
       x-ticvai-consumed-by:
         - "P08 BO-031 Asset Register"
         - "P08 BO-069 Asset Register"
-        - "P13 CMS-004 Logo & Assets"
       x-ticvai-audience: [staff]
       summary: Register an asset
       description: >
@@ -200,7 +198,6 @@ paths:
         - "P08 BO-069 Asset Register"
         - "P08 BO-506 Equipment / Asset Profile"
         - "P08 BO-508 Equipment Status & Condition Management"
-        - "P13 CMS-004 Logo & Assets"
       x-ticvai-audience: [staff]
       x-ticvai-read-routing: replica
       summary: Read an asset with history and documents
@@ -226,7 +223,6 @@ paths:
         - "P08 BO-031 Asset Register"
         - "P08 BO-069 Asset Register"
         - "P08 BO-506 Equipment / Asset Profile"
-        - "P13 CMS-004 Logo & Assets"
       x-ticvai-audience: [staff]
       summary: Amend an asset
       tags: [asset]
@@ -268,7 +264,6 @@ paths:
         - "P08 BO-069 Asset Register"
         - "P08 BO-509 QR / Barcode Equipment Identification"
         - "P08 BO-548 Equipment Scan & Validation"
-        - "P13 CMS-004 Logo & Assets"
       x-ticvai-audience: [staff]
       x-ticvai-read-routing: replica
       summary: Find an asset by tag or QR
@@ -310,7 +305,6 @@ paths:
         - "P08 BO-508 Equipment Status & Condition Management"
         - "P08 BO-573 Return Completion & Equipment Disposition"
         - "P08 BO-582 Asset Retirement, Write-Off & Replacement Recommendation"
-        - "P13 CMS-004 Logo & Assets"
       x-ticvai-audience: [staff]
       summary: Take an asset out of service or return it
       description: >
@@ -360,7 +354,6 @@ paths:
         - "P08 BO-582 Asset Retirement, Write-Off & Replacement Recommendation"
         - "P08 BO-587 Inventory & Equipment Performance Analytics"
         - "P08 BO-912 Asset Lifecycle, Depreciation & Retirement"
-        - "P13 CMS-004 Logo & Assets"
       x-ticvai-audience: [staff]
       x-ticvai-read-routing: analytical
       summary: Service history
@@ -2049,7 +2042,7 @@ components:
                   cost: { $ref: '../shared/common.yaml#/components/schemas/Money' }
             labourCost: { $ref: '../shared/common.yaml#/components/schemas/Money' }
             partsCost: { $ref: '../shared/common.yaml#/components/schemas/Money' }
-            totalCost: { $ref: '../shared/common.yaml#/components/schemas/Money' }
+            totalCost: { $ref: '../shared/common.yaml#/components/schemas/Money', x-ticvai-column: net_cost_amount }
             verifiedByPrincipalId: { type: string, format: uuid, nullable: true }
 
     MaintenancePlan:

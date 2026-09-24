@@ -2,7 +2,7 @@ openapi: 3.1.0
 info:
   title: TICVAI Marketing & CRM
   version: 0.1.0
-  x-ticvai-screen-count: 171
+  x-ticvai-screen-count: 175
   x-ticvai-tier: satellite
   x-ticvai-module: 22 — Marketing & CRM
   x-ticvai-requirements: 319
@@ -233,6 +233,163 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Case'
+  /guest-match-policy:
+    get:
+      operationId: getGuestMatchPolicy
+      x-ticvai-consumed-by:
+        - "P08 BO-746 Duplicate Review & Merge"
+      summary: How returning guests are recognised at checkout
+      tags:
+      - guests
+      x-ticvai-permission: MARKETING_VIEW
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      x-ticvai-read-routing: replica
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      responses:
+        '200':
+          description: The current setting
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GuestMatchPolicy'
+        '403':
+          $ref: ../shared/common.yaml#/components/responses/Forbidden
+    put:
+      operationId: setGuestMatchPolicy
+      x-ticvai-consumed-by:
+        - "P08 BO-746 Duplicate Review & Merge"
+      summary: Set how returning guests are recognised
+      description: '**Design gap, 23 September.** The booking design matches a guest checking out without
+        an account to an existing profile, by email, mobile or either, and asks them whether it is them.
+        `matchGuest` existed for staff and nothing decided the key or offered the guest the choice.
+
+
+        **The guest decides, never the system.** A match is an offer, because two people share a family
+        email far more often than one person uses two. Declined matches stay separate and staff can merge
+        them later (`mergeGuests`).
+
+        '
+      tags:
+      - guests
+      x-ticvai-permission: MARKETING_MANAGE
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      x-ticvai-config-scope: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GuestMatchPolicy'
+      responses:
+        '200':
+          description: Saved
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GuestMatchPolicy'
+        '400':
+          $ref: ../shared/common.yaml#/components/responses/BadRequest
+        '403':
+          $ref: ../shared/common.yaml#/components/responses/Forbidden
+  /guest-checkout/profile-match:
+    post:
+      operationId: checkGuestCheckoutMatch
+      x-ticvai-consumed-by:
+        - "P01 WEB-012 Checkout — Payment"
+        - "P02 GST-009 Review & Payment"
+      summary: Does this contact already have a profile here
+      description: 'Called at the payment step of a guest checkout, **after the contact has been proven
+        with a one-time code** (ADR-0045); an unproven contact is refused, because answering would tell
+        anyone who types an email whether that person has been to the venue. Uses the venue''s `GuestMatchPolicy`.
+        Returns what the design shows: what it matched on, how many past orders, and the profile type, never
+        the other profile''s details.
+
+        '
+      tags:
+      - guests
+      x-ticvai-permission: null
+      x-ticvai-audience:
+      - guest
+      x-ticvai-scope-level: venue
+      x-ticvai-self-scoped: subject
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      security:
+      - guestAuth: []
+      responses:
+        '200':
+          description: Whether a profile exists
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GuestCheckoutMatch'
+        '403':
+          description: The contact has not been proven with a one-time code.
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GuestCheckoutMatchRequest'
+  /guest-checkout/profile-match/decision:
+    post:
+      operationId: decideGuestCheckoutMatch
+      x-ticvai-consumed-by:
+        - "P01 WEB-012 Checkout — Payment"
+        - "P02 GST-009 Review & Payment"
+      summary: Use the existing profile or keep this booking separate
+      description: '`useExisting` puts this booking under the matched customer record, so past orders and
+        this one sit together. `keepSeparate` creates a new guest profile; staff can merge it later. **The
+        decision is recorded either way**, so a merge done later can see that the guest once said no.
+
+        '
+      tags:
+      - guests
+      x-ticvai-permission: null
+      x-ticvai-audience:
+      - guest
+      x-ticvai-scope-level: venue
+      x-ticvai-self-scoped: subject
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      security:
+      - guestAuth: []
+      responses:
+        '200':
+          description: Recorded
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GuestMatchDecision'
+        '409':
+          description: The match has expired or was already decided.
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GuestMatchDecisionRequest'
   /guests/match:
     post:
       operationId: matchGuest
@@ -2477,7 +2634,6 @@ paths:
         - "P08 BO-036 Device Registry"
         - "P08 BO-734 CRM Command Center"
         - "P08 BO-735 Guest Directory"
-        - "P13 CMS-018 Consent & Legal"
       x-ticvai-audience:
       - staff
       x-ticvai-read-routing: replica
@@ -2546,7 +2702,6 @@ paths:
         - "P08 BO-738 Activity Timeline"
         - "P08 BO-740 Family & Guardians"
         - "P09 ADM-680 Customer Recommendation Profile"
-        - "P13 CMS-018 Consent & Legal"
       x-ticvai-audience:
       - staff
       - guest
@@ -2576,7 +2731,6 @@ paths:
       operationId: updateGuestProfile
       x-ticvai-consumed-by:
         - "P08 BO-036 Device Registry"
-        - "P13 CMS-018 Consent & Legal"
       x-ticvai-audience:
       - staff
       summary: Amend a guest profile
@@ -2630,7 +2784,6 @@ paths:
       operationId: mergeGuestProfiles
       x-ticvai-consumed-by:
         - "P08 BO-036 Device Registry"
-        - "P13 CMS-018 Consent & Legal"
       x-ticvai-audience:
       - staff
       summary: Merge a duplicate profile into this one
@@ -2695,7 +2848,6 @@ paths:
         - "P02 GST-066 Privacy & My Data"
         - "P08 BO-036 Device Registry"
         - "P08 BO-749 Guest Preference Center"
-        - "P13 CMS-018 Consent & Legal"
       x-ticvai-audience:
       - staff
       - guest
@@ -2732,7 +2884,6 @@ paths:
         - "P02 GST-039 Profile"
         - "P02 GST-065 Newsletter & Preferences"
         - "P08 BO-748 Consent Capture & Versions"
-        - "P13 CMS-018 Consent & Legal"
       x-ticvai-audience:
       - guest
       security:
@@ -2797,7 +2948,6 @@ paths:
       operationId: getConsentHistory
       x-ticvai-consumed-by:
         - "P08 BO-036 Device Registry"
-        - "P13 CMS-018 Consent & Legal"
       x-ticvai-audience:
       - staff
       x-ticvai-read-routing: analytical
@@ -2834,6 +2984,7 @@ paths:
         - "P01 WEB-020 Profile & Preferences"
         - "P02 GST-065 Newsletter & Preferences"
         - "P08 BO-747 Consent Policy Configuration"
+        - "P13 CMS-018 Consent & Legal"
       x-ticvai-audience:
       - staff
       - guest
@@ -2861,6 +3012,7 @@ paths:
       operationId: setConsentPurposes
       x-ticvai-consumed-by:
         - "P08 BO-747 Consent Policy Configuration"
+        - "P13 CMS-018 Consent & Legal"
         - "P13 CMS-023 Consent Purpose & Consent Type Builder"
       x-ticvai-audience:
       - staff
@@ -3001,7 +3153,6 @@ paths:
         - "P01 WEB-027 Newsletter Subscription"
         - "P02 GST-020 Saved Items / Wishlist"
         - "P08 BO-036 Device Registry"
-        - "P13 CMS-018 Consent & Legal"
       x-ticvai-audience:
       - guest
       x-ticvai-read-routing: replica
@@ -3173,7 +3324,6 @@ paths:
         - "P01 WEB-027 Newsletter Subscription"
         - "P02 GST-073 Security & Sign-in"
         - "P08 BO-036 Device Registry"
-        - "P13 CMS-018 Consent & Legal"
       x-ticvai-audience:
       - guest
       summary: A guest's registered devices
@@ -4574,7 +4724,6 @@ paths:
       operationId: getGuestLoyalty
       x-ticvai-consumed-by:
         - "P08 BO-036 Device Registry"
-        - "P13 CMS-018 Consent & Legal"
       x-ticvai-audience:
       - staff
       x-ticvai-read-routing: replica
@@ -4606,7 +4755,6 @@ paths:
       operationId: adjustLoyaltyPoints
       x-ticvai-consumed-by:
         - "P08 BO-036 Device Registry"
-        - "P13 CMS-018 Consent & Legal"
       x-ticvai-audience:
       - staff
       summary: Manually adjust points
@@ -12762,6 +12910,129 @@ components:
       - callCentre
       - import
       - agentRecorded
+    GuestMatchPolicy:
+      type: object
+      x-ticvai-persistence: marketing.guest_match_policy
+      description: How a guest checking out without an account is recognised. One per venue.
+      required:
+      - matchBy
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        matchBy:
+          type: string
+          enum:
+          - email
+          - mobile
+          - emailOrMobile
+          default: email
+          description: 'The key a returning guest is matched on. Design control: *Match returning guests by*.'
+        offerAtCheckout:
+          type: boolean
+          default: true
+          description: Whether the guest is offered the match at the payment step. Off means staff merge later
+            only.
+        scopePath:
+          type: string
+          readOnly: true
+          description: '**The partition key** (ADR-0005). Operations write it at `venue` scope.'
+    GuestCheckoutMatchRequest:
+      type: object
+      description: Request only.
+      required:
+      - cartId
+      properties:
+        cartId:
+          type: string
+        email:
+          type: string
+          format: email
+          nullable: true
+        mobile:
+          type: string
+          nullable: true
+    GuestCheckoutMatch:
+      type: object
+      x-ticvai-persistence: none — computed per request
+      required:
+      - matched
+      properties:
+        matched:
+          type: boolean
+        matchedOn:
+          type: string
+          enum:
+          - email
+          - mobile
+          nullable: true
+        pastOrderCount:
+          type: integer
+          nullable: true
+        firstOrderAt:
+          type: string
+          format: date-time
+          nullable: true
+        profileType:
+          type: string
+          enum:
+          - guestNoLogin
+          - account
+          nullable: true
+        matchToken:
+          type: string
+          nullable: true
+          description: Opaque, short-lived. The only way to act on the match; it never names the profile.
+    GuestMatchDecisionRequest:
+      type: object
+      description: Request only.
+      required:
+      - matchToken
+      - decision
+      properties:
+        matchToken:
+          type: string
+        decision:
+          type: string
+          enum:
+          - useExisting
+          - keepSeparate
+    GuestMatchDecision:
+      type: object
+      x-ticvai-persistence: marketing.guest_match_decision
+      description: Every offered match and the guest's answer, kept so a later merge can see it.
+      required:
+      - decision
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        cartId:
+          type: string
+        matchedProfileId:
+          type: string
+          format: uuid
+          readOnly: true
+        matchedOn:
+          type: string
+          enum:
+          - email
+          - mobile
+        decision:
+          type: string
+          enum:
+          - useExisting
+          - keepSeparate
+        decidedAt:
+          type: string
+          format: date-time
+          readOnly: true
+        scopePath:
+          type: string
+          readOnly: true
+          description: '**The partition key** (ADR-0005). Operations write it at `venue` scope.'
     GuestProfile:
       x-ticvai-persistence: marketing.guest_profile
       type: object

@@ -34,7 +34,7 @@ tiers:
     ifDown: Same as identity — nothing runs without a scope.
     ref: diagrams/lld/services/TenancyService.yaml
   - service: IdentityService
-    operations: 68
+    operations: 70
     tables: 32
     schemas:
     - identity
@@ -49,8 +49,8 @@ tiers:
   meaning: The sale path. Highest availability and the highest write rate in the platform.
   services:
   - service: CatalogueService
-    operations: 398
-    tables: 69
+    operations: 404
+    tables: 71
     schemas:
     - catalogue
     - pricing
@@ -66,8 +66,8 @@ tiers:
     ifDown: A bad publish reaches every workstation. Versioned and rollback-able for that reason.
     ref: diagrams/lld/services/CatalogueService.yaml
   - service: OrderService
-    operations: 233
-    tables: 58
+    operations: 249
+    tables: 61
     schemas:
     - orders
     - payments
@@ -146,8 +146,8 @@ tiers:
     ifDown: Down degrades venue operations. Selling and admitting continue.
     ref: diagrams/lld/services/VenueOpsService.yaml
   - service: FnbService
-    operations: 102
-    tables: 37
+    operations: 111
+    tables: 42
     schemas:
     - fnb
     contracts:
@@ -183,8 +183,8 @@ tiers:
     property and one that should be tested rather than assumed.
   services:
   - service: MarketingService
-    operations: 205
-    tables: 62
+    operations: 209
+    tables: 64
     schemas:
     - marketing
     contracts:
@@ -223,7 +223,7 @@ tiers:
     ifDown: Down blocks provisioning and the developer API. **Trading is unaffected.**
     ref: diagrams/lld/services/PlatformService.yaml
   - service: WhiteLabelService
-    operations: 50
+    operations: 52
     tables: 13
     schemas:
     - whitelabel
@@ -234,7 +234,7 @@ tiers:
     ifDown: Down freezes the current published config. Guests see the last good version.
     ref: diagrams/lld/services/WhiteLabelService.yaml
   - service: ReportingService
-    operations: 43
+    operations: 44
     tables: 20
     schemas:
     - reporting
@@ -278,13 +278,13 @@ crossServiceWrites:
   kind: strong
 - from: OrderService
   to: TenancyService
-  writes: 5
-  reads: 8
+  writes: 6
+  reads: 10
   kind: strong
 - from: OrderService
   to: CatalogueService
   writes: 5
-  reads: 19
+  reads: 21
   kind: strong
 - from: FnbService
   to: MarketingService
@@ -324,7 +324,7 @@ crossServiceWrites:
 - from: WhiteLabelService
   to: PlatformService
   writes: 3
-  reads: 6
+  reads: 12
   kind: ordinary
 - from: AccessService
   to: IdentityService
@@ -355,6 +355,11 @@ crossServiceWrites:
   to: IdentityService
   writes: 2
   reads: 15
+  kind: ordinary
+- from: MarketingService
+  to: OrderService
+  writes: 2
+  reads: 5
   kind: ordinary
 - from: MarketingService
   to: PlatformService
@@ -404,7 +409,7 @@ crossServiceWrites:
 - from: FnbService
   to: TenancyService
   writes: 1
-  reads: 5
+  reads: 6
   kind: ordinary
 - from: IdentityService
   to: OrderService
@@ -426,11 +431,6 @@ crossServiceWrites:
   writes: 1
   reads: 1
   kind: ordinary
-- from: MarketingService
-  to: OrderService
-  writes: 1
-  reads: 3
-  kind: ordinary
 - from: OrderService
   to: WalletService
   writes: 1
@@ -439,7 +439,7 @@ crossServiceWrites:
 - from: OrderService
   to: IdentityService
   writes: 1
-  reads: 14
+  reads: 16
   kind: ordinary
 - from: PlatformService
   to: IdentityService

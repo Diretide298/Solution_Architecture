@@ -93,7 +93,7 @@ CREATE TABLE IF NOT EXISTS workforce.field_ownership (
     master                            text NOT NULL,
     source_id                         uuid,
     on_conflict                       text,
-    scope_path                        text
+    scope_path                        ltree
 );
 
 -- Holds 9 columns. No description has been written for this table — the name is the only thing
@@ -107,7 +107,7 @@ CREATE TABLE IF NOT EXISTS workforce.integration_source (
     authentication_status             text,
     last_synchronised_at              timestamptz,
     status                            text NOT NULL,
-    scope_path                        text
+    scope_path                        ltree
 );
 
 -- Holds 8 columns. No description has been written for this table — the name is the only thing
@@ -149,7 +149,7 @@ CREATE TABLE IF NOT EXISTS workforce.leave_request (
     reason                            text,
     status                            text,
     approval_request_id               text,
-    scope_path                        text
+    scope_path                        ltree
 );
 
 -- Holds 8 columns. No description has been written for this table — the name is the only thing
@@ -183,7 +183,7 @@ CREATE TABLE IF NOT EXISTS workforce.open_shift (
     status                            text,
     claimed_by                        uuid,
     claimed_at                        timestamptz,
-    scope_path                        text
+    scope_path                        ltree
 );
 
 -- A person expected somewhere at a time. Not a shift — a shift is a cash session, and most people
@@ -252,7 +252,7 @@ CREATE TABLE IF NOT EXISTS workforce.shift_template (
     role_code                         text,
     cost_centre                       text,
     hourly_rate                       numeric(18,4),
-    scope_path                        text
+    scope_path                        ltree
 );
 
 -- Holds 8 columns. No description has been written for this table — the name is the only thing
@@ -264,7 +264,10 @@ CREATE TABLE IF NOT EXISTS workforce.staffing_rules (
     maximum_consecutive_days          integer,
     overtime                          jsonb,
     minimum_age_for_night_shift       integer,
-    scope_path                        text,
+    default_incentive_rate_multiplier numeric(18,4),
+    maximum_incentive_rate_multiplier numeric(18,4),
+    incentive_approval_above          numeric(18,4),
+    scope_path                        ltree,
     id                                uuid PRIMARY KEY NOT NULL
 );
 
@@ -283,7 +286,7 @@ CREATE TABLE IF NOT EXISTS workforce.sync_conflict (
     raised_at                         timestamptz NOT NULL,
     resolved_at                       timestamptz,
     resolved_by_principal_id          uuid,
-    scope_path                        text
+    scope_path                        ltree
 );
 
 -- Holds 12 columns. No description has been written for this table — the name is the only thing
@@ -300,7 +303,7 @@ CREATE TABLE IF NOT EXISTS workforce.sync_run (
     warning_count                     integer,
     mapping_error_count               integer,
     trigger                           text,
-    scope_path                        text
+    scope_path                        ltree
 );
 
 -- Holds 8 columns. No description has been written for this table — the name is the only thing
@@ -322,7 +325,7 @@ CREATE TABLE IF NOT EXISTS workforce.work_assignment (
     id                                uuid PRIMARY KEY,
     employee_id                       uuid NOT NULL,
     job_title_id                      uuid NOT NULL,
-    scope_path                        text,
+    scope_path                        ltree,
     venue_id                          uuid,
     department_id                     uuid,
     outlet_id                         uuid,

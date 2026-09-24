@@ -1,6 +1,6 @@
 {
  "generatedBy": "tools/audit-guest-parity.py",
- "generated": "2026-09-21",
+ "generated": "2026-09-24",
  "screens": {
   "P01": 46,
   "P02": 71
@@ -12,17 +12,17 @@
   "appOnly": 7
  },
  "severity": {
-  "high": 28,
-  "medium": 116,
+  "high": 29,
+  "medium": 122,
   "low": 197,
-  "info": 4
+  "info": 3
  },
  "findings": [
   {
    "severity": "high",
    "dimension": "coverage",
    "where": "add-to-calendar",
-   "detail": "GST-018 Add to Calendar / Reminders — app only (gap). Adding a visit to a calendar is as much a desktop act as a phone one, and issueWalletPass is already on the web's My Tickets.",
+   "detail": "GST-018 Add to Calendar / Reminders — app only (gap). Adding a visit to a calendar is as much a desktop act as a phone one, and issueWalletPass is already on the web's My Tickets. Not callable on the web: getOrderCalendarEvent, getVisitReminder, setVisitReminder.",
    "fix": "add the screen to the web"
   },
   {
@@ -122,6 +122,13 @@
    "where": "wallet-and-payment-methods (WEB-021 ↔ GST-011/GST-071)",
    "detail": "web requires ['retail'], app requires ['core', 'retail'] — a tenant licensed for one and not the other sees it on one shell only",
    "fix": "one requiresModule for the capability"
+  },
+  {
+   "severity": "high",
+   "dimension": "operations",
+   "where": "app only",
+   "detail": "enrolFacePass, getOrderCalendarEvent, getVisitReminder, setVisitReminder",
+   "fix": ""
   },
   {
    "severity": "high",
@@ -364,15 +371,36 @@
   {
    "severity": "medium",
    "dimension": "design bundles",
+   "where": "P01-booking-selection-01",
+   "detail": "1 of 5 screens differ from the YAML (WEB-006)",
+   "fix": "python3 tools/export-design-batch.py P01-booking-selection-01"
+  },
+  {
+   "severity": "medium",
+   "dimension": "design bundles",
    "where": "P01-cart-checkout-01",
-   "detail": "1 of 5 screens differ from the YAML (WEB-010)",
+   "detail": "2 of 5 screens differ from the YAML (WEB-010, WEB-012)",
    "fix": "python3 tools/export-design-batch.py P01-cart-checkout-01"
   },
   {
    "severity": "medium",
    "dimension": "design bundles",
+   "where": "P01-discovery-browse-01",
+   "detail": "1 of 4 screens differ from the YAML (WEB-004)",
+   "fix": "python3 tools/export-design-batch.py P01-discovery-browse-01"
+  },
+  {
+   "severity": "medium",
+   "dimension": "design bundles",
+   "where": "P01-in-venue-services-01",
+   "detail": "1 of 6 screens differ from the YAML (WEB-036)",
+   "fix": "python3 tools/export-design-batch.py P01-in-venue-services-01"
+  },
+  {
+   "severity": "medium",
+   "dimension": "design bundles",
    "where": "P01-membership-loyalty-value-01",
-   "detail": "1 of 5 screens differ from the YAML (WEB-021)",
+   "detail": "2 of 5 screens differ from the YAML (WEB-021, WEB-023)",
    "fix": "python3 tools/export-design-batch.py P01-membership-loyalty-value-01"
   },
   {
@@ -385,6 +413,13 @@
   {
    "severity": "medium",
    "dimension": "design bundles",
+   "where": "P02-account-self-service-01",
+   "detail": "2 of 10 screens differ from the YAML (GST-018, GST-055)",
+   "fix": "python3 tools/export-design-batch.py P02-account-self-service-01"
+  },
+  {
+   "severity": "medium",
+   "dimension": "design bundles",
    "where": "P02-account-self-service-02",
    "detail": "1 of 4 screens differ from the YAML (GST-071)",
    "fix": "python3 tools/export-design-batch.py P02-account-self-service-02"
@@ -392,22 +427,36 @@
   {
    "severity": "medium",
    "dimension": "design bundles",
+   "where": "P02-booking-selection-01",
+   "detail": "2 of 8 screens differ from the YAML (GST-007, GST-072)",
+   "fix": "python3 tools/export-design-batch.py P02-booking-selection-01"
+  },
+  {
+   "severity": "medium",
+   "dimension": "design bundles",
    "where": "P02-cart-checkout-01",
-   "detail": "1 of 3 screens differ from the YAML (GST-041)",
+   "detail": "2 of 3 screens differ from the YAML (GST-009, GST-041)",
    "fix": "python3 tools/export-design-batch.py P02-cart-checkout-01"
   },
   {
    "severity": "medium",
    "dimension": "design bundles",
+   "where": "P02-discovery-browse-01",
+   "detail": "1 of 7 screens differ from the YAML (GST-004)",
+   "fix": "python3 tools/export-design-batch.py P02-discovery-browse-01"
+  },
+  {
+   "severity": "medium",
+   "dimension": "design bundles",
    "where": "P02-in-venue-services-01",
-   "detail": "1 of 10 screens differ from the YAML (GST-070)",
+   "detail": "2 of 10 screens differ from the YAML (GST-024, GST-070)",
    "fix": "python3 tools/export-design-batch.py P02-in-venue-services-01"
   },
   {
    "severity": "medium",
    "dimension": "design bundles",
    "where": "P02-membership-loyalty-value-01",
-   "detail": "1 of 3 screens differ from the YAML (GST-011)",
+   "detail": "2 of 3 screens differ from the YAML (GST-011, GST-015)",
    "fix": "python3 tools/export-design-batch.py P02-membership-loyalty-value-01"
   },
   {
@@ -484,7 +533,7 @@
    "severity": "medium",
    "dimension": "entry parameters",
    "where": "memberships (WEB-022/WEB-023 ↔ GST-015)",
-   "detail": "web opens with ['orderId', 'productId'], app with ['guestLinkId', 'subjectId'] — one shared link cannot open both",
+   "detail": "web opens with ['caseId', 'orderId', 'productId', 'statementId'], app with ['caseId', 'guestLinkId', 'statementId', 'subjectId'] — one shared link cannot open both",
    "fix": "one deep-link shape per capability"
   },
   {
@@ -526,7 +575,7 @@
    "severity": "medium",
    "dimension": "entry parameters",
    "where": "reservations (WEB-031 ↔ GST-016/GST-017)",
-   "detail": "web opens with ['groupBookingId', 'reservationId', 'resourceId'], app with ['reservationId'] — one shared link cannot open both",
+   "detail": "web opens with ['groupBookingId', 'productId', 'reservationId', 'resourceId'], app with ['reservationId'] — one shared link cannot open both",
    "fix": "one deep-link shape per capability"
   },
   {
@@ -855,7 +904,7 @@
    "severity": "medium",
    "dimension": "operations",
    "where": "reservations (WEB-031 ↔ GST-016/GST-017)",
-   "detail": "the web calls getGroupBooking, getResourceAvailability, updateTableReservation here; the app calls getGroupBooking on GST-072; getResourceAvailability on GST-070; updateTableReservation on GST-070",
+   "detail": "the web calls getGroupBooking, getGroupPackageDefinition, getResourceAvailability, listGroupPackages, requestGroupBooking, updateTableReservation here; the app calls getGroupBooking on GST-072; getGroupPackageDefinition on GST-072; getResourceAvailability on GST-070; listGroupPackages on GST-072; requestGroupBooking on GST-072; updateTableReservation on GST-070",
    "fix": "same operations on the same capability, so a guest finds it in the same place"
   },
   {
@@ -1359,7 +1408,7 @@
    "severity": "low",
    "dimension": "components",
    "where": "date-and-session (WEB-006 ↔ GST-007)",
-   "detail": "web only ['cardList', 'datePicker', 'primaryButton'], app only ['dataTable'] (4 vs 1 components)",
+   "detail": "web only ['cardList', 'datePicker'], app only ['dataTable', 'secondaryButton'] (4 vs 3 components)",
    "fix": ""
   },
   {
@@ -2417,13 +2466,6 @@
    "dimension": "coverage",
    "where": "face-pass",
    "detail": "GST-069 Face Pass — app only (deliberate). enrolFacePass needs a camera and a liveness check (apply-web-parity.py). Viewing and revoking an enrolment are on the web's Devices, Wishlist & Consent. Not callable on the web: enrolFacePass.",
-   "fix": ""
-  },
-  {
-   "severity": "info",
-   "dimension": "operations",
-   "where": "app only",
-   "detail": "enrolFacePass — camera and liveness, deliberate (apply-web-parity.py)",
    "fix": ""
   },
   {

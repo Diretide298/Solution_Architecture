@@ -7,7 +7,7 @@
  "audience": "guest",
  "formFactor": "kiosk",
  "offlineCapable": false,
- "generated": "2026-09-21",
+ "generated": "2026-09-24",
  "note": "Derived by tools/derive-platform.py. **The gaps section is the point** \u2014 a page listing what exists is a directory; one listing what is missing is a worklist.",
  "counts": {
   "screens": 17,
@@ -15,7 +15,7 @@
   "contracts": 8,
   "modules": 2,
   "undrawn": 0,
-  "operationsWithNoScreen": 11
+  "operationsWithNoScreen": 9
  },
  "waves": {
   "wave2": 17
@@ -62,11 +62,11 @@
    "operations": 2
   },
   {
-   "contract": "promotions",
+   "contract": "ai",
    "operations": 1
   },
   {
-   "contract": "ai",
+   "contract": "promotions",
    "operations": 1
   }
  ],
@@ -274,18 +274,6 @@
     "contract": "marketing-crm",
     "verb": "PUT",
     "summary": "Choose the name shown on the board"
-   },
-   {
-    "operation": "getBillingStatement",
-    "contract": "orders",
-    "verb": "GET",
-    "summary": "One statement, with its lines"
-   },
-   {
-    "operation": "listBillingStatements",
-    "contract": "orders",
-    "verb": "GET",
-    "summary": "What was charged, when, and against which agreement"
    },
    {
     "operation": "recordRecommendationOutcome",

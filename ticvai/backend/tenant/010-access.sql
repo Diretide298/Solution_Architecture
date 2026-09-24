@@ -22,7 +22,7 @@ CREATE TABLE IF NOT EXISTS access.access_point (
     code                              text NOT NULL,
     name                              text NOT NULL,
     venue_id                          uuid NOT NULL,
-    scope_path                        text,
+    scope_path                        ltree,
     operating_mode                    text,
     vehicle_location_capture          boolean,
     mode                              text NOT NULL,
@@ -44,7 +44,7 @@ CREATE TABLE IF NOT EXISTS access.admission_rules (
     requires_exit_before_reentry      boolean,
     max_reentries                     integer,
     allowed_access_point_ids          text[],
-    scope_path                        text
+    scope_path                        ltree
 );
 
 -- Who may not be admitted, and by whose authority
@@ -54,7 +54,7 @@ CREATE TABLE IF NOT EXISTS access.blacklist (
     added_at                          timestamptz NOT NULL,
     added_by_principal_id             uuid NOT NULL,
     expires_at                        timestamptz,
-    scope_path                        text,
+    scope_path                        ltree,
     id                                uuid PRIMARY KEY NOT NULL
 );
 
@@ -71,7 +71,7 @@ CREATE TABLE IF NOT EXISTS access.entitlement (
     order_line_id                     uuid,
     subject_id                        uuid NOT NULL,
     venue_id                          uuid,
-    scope_path                        text,
+    scope_path                        ltree,
     media_code                        text,
     status                            text NOT NULL,
     status_note                       text,
@@ -143,7 +143,7 @@ CREATE TABLE IF NOT EXISTS access.scan_event (
     id                                text PRIMARY KEY NOT NULL,
     access_point_id                   uuid NOT NULL,
     venue_id                          uuid NOT NULL,
-    scope_path                        text,
+    scope_path                        ltree,
     ticket_id                         text,
     media_code                        text,
     outcome                           text NOT NULL,

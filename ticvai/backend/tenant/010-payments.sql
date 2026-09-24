@@ -11,7 +11,7 @@ CREATE TABLE IF NOT EXISTS payments.authentication_policy (
     token_retention_months            integer,
     recurring_mandate_required        boolean,
     mandate_text_asset_id             uuid,
-    scope_path                        text,
+    scope_path                        ltree,
     id                                uuid PRIMARY KEY NOT NULL
 );
 
@@ -23,7 +23,7 @@ CREATE TABLE IF NOT EXISTS payments.chargeback_evidence (
     submitted_at                      timestamptz,
     deadline_at                       timestamptz,
     outcome                           text,
-    scope_path                        text,
+    scope_path                        ltree,
     id                                uuid PRIMARY KEY NOT NULL
 );
 
@@ -39,7 +39,7 @@ CREATE TABLE IF NOT EXISTS payments.credit_account (
     available_credit                  numeric(18,4),
     status                            text,
     over_limit                        boolean,
-    scope_path                        text
+    scope_path                        ltree
 );
 
 -- Holds 12 columns. No description has been written for this table — the name is the only thing
@@ -47,7 +47,7 @@ CREATE TABLE IF NOT EXISTS payments.credit_account (
 CREATE TABLE IF NOT EXISTS payments.currency_rule (
     id                                uuid PRIMARY KEY,
     payment_policy_id                 uuid NOT NULL,
-    scope_path                        text,
+    scope_path                        ltree,
     channel_id                        uuid,
     code                              text NOT NULL,
     settlement_currency_code          text,
@@ -74,7 +74,7 @@ CREATE TABLE IF NOT EXISTS payments.deposit_activity (
 );
 
 -- Holds 12 columns. No description has been written for this table — the name is the only thing
--- saying what it is. Reached by: 2 operations read it and 0 write it.
+-- saying what it is
 CREATE TABLE IF NOT EXISTS payments.dunning_case (
     id                                uuid PRIMARY KEY NOT NULL,
     subject_id                        uuid,
@@ -89,11 +89,11 @@ CREATE TABLE IF NOT EXISTS payments.dunning_case (
     resolution                        text,
     resolution_note                   text,
     resolved_by_principal_id          uuid,
-    scope_path                        text
+    scope_path                        ltree
 );
 
 -- Holds 7 columns. No description has been written for this table — the name is the only thing
--- saying what it is. Reached by: 2 operations read it and 1 write it.
+-- saying what it is
 CREATE TABLE IF NOT EXISTS payments.dunning_policy (
     id                                uuid PRIMARY KEY,
     max_attempts                      integer NOT NULL,
@@ -101,7 +101,7 @@ CREATE TABLE IF NOT EXISTS payments.dunning_policy (
     minimum_hours_between_attempts    integer,
     notify_guest_on_each_attempt      boolean,
     terminal_action                   text NOT NULL,
-    scope_path                        text
+    scope_path                        ltree
 );
 
 -- Holds 14 columns. No description has been written for this table — the name is the only thing
@@ -110,7 +110,7 @@ CREATE TABLE IF NOT EXISTS payments.eligibility_rule (
     id                                uuid PRIMARY KEY,
     payment_policy_id                 uuid NOT NULL,
     payment_method_id                 uuid NOT NULL,
-    scope_path                        text,
+    scope_path                        ltree,
     channel_id                        uuid,
     business_area                     text,
     currency_code                     text,
@@ -131,7 +131,7 @@ CREATE TABLE IF NOT EXISTS payments.failover_policy (
     backoff_ms                        integer,
     failover_to_next_provider         boolean,
     circuit_breaker                   jsonb,
-    scope_path                        text,
+    scope_path                        ltree,
     id                                uuid PRIMARY KEY NOT NULL
 );
 
@@ -166,7 +166,7 @@ CREATE TABLE IF NOT EXISTS payments.hosted_checkout (
     session_timeout_minutes           integer,
     orphan_reconciliation_window_minutesinteger,
     branding_asset_id                 uuid,
-    scope_path                        text,
+    scope_path                        ltree,
     id                                uuid PRIMARY KEY NOT NULL
 );
 
@@ -179,7 +179,7 @@ CREATE TABLE IF NOT EXISTS payments.matching_rules (
     date_window_days                  integer,
     net_of_fees                       boolean,
     auto_resolve_below_minor          integer,
-    scope_path                        text,
+    scope_path                        ltree,
     id                                uuid PRIMARY KEY NOT NULL
 );
 
@@ -193,7 +193,7 @@ CREATE TABLE IF NOT EXISTS payments.merchant_account (
     settlement_calendar               text,
     settlement_delay_days             integer,
     bank_account_reference            text,
-    scope_path                        text
+    scope_path                        ltree
 );
 
 -- Holds 16 columns. No description has been written for this table — the name is the only thing
@@ -213,7 +213,7 @@ CREATE TABLE IF NOT EXISTS payments.method (
     refundable                        boolean,
     partial_refund_supported          boolean,
     display_order                     integer,
-    scope_path                        text,
+    scope_path                        ltree,
     is_active                         boolean
 );
 
@@ -223,7 +223,7 @@ CREATE TABLE IF NOT EXISTS payments.method_config (
     id                                uuid PRIMARY KEY,
     payment_policy_id                 uuid NOT NULL,
     payment_method_id                 uuid NOT NULL,
-    scope_path                        text,
+    scope_path                        ltree,
     channel_id                        uuid,
     currency_code                     text,
     is_enabled                        boolean NOT NULL,
@@ -241,7 +241,7 @@ CREATE TABLE IF NOT EXISTS payments.mixed_tender_rules (
     tender_order                      text[],
     partial_payment_allowed           boolean,
     on_partial_failure                text,
-    scope_path                        text,
+    scope_path                        ltree,
     id                                uuid PRIMARY KEY NOT NULL
 );
 
@@ -257,7 +257,7 @@ CREATE TABLE IF NOT EXISTS payments.payment_terms (
     balance_due                       text,
     at_limit                          text,
     override_approval_role            text,
-    scope_path                        text,
+    scope_path                        ltree,
     id                                uuid PRIMARY KEY NOT NULL
 );
 
@@ -276,7 +276,7 @@ CREATE TABLE IF NOT EXISTS payments.provider (
     terminal                          jsonb,
     credential_ref                    text,
     scope_level                       text,
-    scope_path                        text,
+    scope_path                        ltree,
     is_active                         boolean NOT NULL
 );
 
@@ -293,7 +293,7 @@ CREATE TABLE IF NOT EXISTS payments.provider_connection (
     merchant_account_id               uuid,
     status                            text,
     last_tested_at                    timestamptz,
-    scope_path                        text
+    scope_path                        ltree
 );
 
 -- Holds 10 columns. No description has been written for this table — the name is the only thing
@@ -308,13 +308,13 @@ CREATE TABLE IF NOT EXISTS payments.reconciliation_source (
     expected_by_time                  text,
     alert_if_missing                  boolean,
     field_mapping                     jsonb,
-    scope_path                        text
+    scope_path                        ltree
 );
 
 -- Holds 2 columns. No description has been written for this table — the name is the only thing
 -- saying what it is
 CREATE TABLE IF NOT EXISTS payments.risk_rules (
-    scope_path                        text,
+    scope_path                        ltree,
     id                                uuid PRIMARY KEY NOT NULL
 );
 
@@ -328,7 +328,7 @@ CREATE TABLE IF NOT EXISTS payments.routing_rule (
     priority                          integer,
     conditions                        jsonb,
     strategy                          text,
-    scope_path                        text,
+    scope_path                        ltree,
     is_active                         boolean
 );
 
@@ -343,7 +343,7 @@ CREATE TABLE IF NOT EXISTS payments.stored_forward (
     status                            text,
     attempts                          integer,
     rejection_reason                  text,
-    scope_path                        text
+    scope_path                        ltree
 );
 
 -- Holds 11 columns. No description has been written for this table — the name is the only thing
@@ -358,7 +358,7 @@ CREATE TABLE IF NOT EXISTS payments.terminal (
     pin_bypass_allowed                boolean,
     store_and_forward                 jsonb,
     status                            text,
-    scope_path                        text,
+    scope_path                        ltree,
     id                                uuid PRIMARY KEY NOT NULL
 );
 

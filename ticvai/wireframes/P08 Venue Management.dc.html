@@ -1420,9 +1420,9 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; listGuestCompanionEligibility</div>
+          <div><b>OPERATIONS</b> &middot; getProductEligibilityRule · setProductEligibilityRule · listGuestCompanionEligibility</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoAccess</span></div>
-          
+          <div><b>ARRIVES WITH</b> &middot; productId&larr;navigation</div>
           <div><b>GOES TO</b> &middot; <a href="#bo-154">BO-154</a>  &mdash; <i>Returns to the board&#x27;s landing screen</i></div>
           
           
@@ -4870,9 +4870,9 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; setPdfPrintablePos</div>
+          <div><b>OPERATIONS</b> &middot; listTicketTemplates · createTicketTemplate · updateTicketTemplate · printTicketProof +1</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoAccess</span></div>
-          
+          <div><b>ARRIVES WITH</b> &middot; templateId&larr;navigation</div>
           <div><b>GOES TO</b> &middot; <a href="#bo-344">BO-344</a>  &mdash; <i>Returns to the board&#x27;s landing screen</i></div>
           
           
@@ -11140,7 +11140,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; updateRegionSettings</div>
+          <div><b>OPERATIONS</b> &middot; listDenominations · setDenominations · updateRegionSettings</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess</span></div>
           <div><b>ARRIVES WITH</b> &middot; regionId&larr;navigation</div>
           <div><b>GOES TO</b> &middot; <a href="#bo-1061">BO-1061</a>  &mdash; <i>Back to Platform Command Center</i></div>
@@ -11711,9 +11711,9 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; listCatalogueBundles · getLatestBundle · publishBundle · reportBundleApplied +1</div>
+          <div><b>OPERATIONS</b> &middot; getGroupPackageDefinition · setGroupPackageDefinition · listCatalogueBundles · getLatestBundle +3</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess</span></div>
-          <div><b>ARRIVES WITH</b> &middot; version&larr;deepLink</div>
+          <div><b>ARRIVES WITH</b> &middot; version&larr;deepLink, productId&larr;navigation</div>
           <div><b>GOES TO</b> &middot; <a href="#bo-001">BO-001</a>  &mdash; <i>Queue Directory</i> <span class="car">eventId · feedId · queueId</span><br><a href="#bo-007">BO-007</a>  &mdash; <i>Product Directory</i> <span class="car">productId</span><br><a href="#bo-008">BO-008</a>  &mdash; <i>Product Detail &amp; Variants</i> <span class="car">productId · venueId</span><br><a href="#bo-009">BO-009</a>  &mdash; <i>Pricing Rules</i> <span class="car">priceListId</span></div>
           
           
@@ -15014,9 +15014,9 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; listOrders · createOrder · applyManualDiscount · createRefund +10</div>
+          <div><b>OPERATIONS</b> &middot; createGroupBooking · getGroupBooking · updateGroupBooking · listOrders +13</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess</span></div>
-          <div><b>ARRIVES WITH</b> &middot; orderId&larr;deepLink</div>
+          <div><b>ARRIVES WITH</b> &middot; orderId&larr;deepLink, groupBookingId&larr;navigation</div>
           <div><b>GOES TO</b> &middot; <a href="#bo-001">BO-001</a>  &mdash; <i>Queue Directory</i> <span class="car">eventId · feedId · queueId</span><br><a href="#bo-007">BO-007</a>  &mdash; <i>Product Directory</i> <span class="car">productId</span><br><a href="#bo-008">BO-008</a>  &mdash; <i>Product Detail &amp; Variants</i> <span class="car">productId · venueId</span><br><a href="#bo-009">BO-009</a>  &mdash; <i>Pricing Rules</i> <span class="car">priceListId</span></div>
           
           <div><b>OVERLAYS</b><div class="ov"><b>confirmDialog</b> confirmVoidOrder &middot; <i>Void</i></div></div>
@@ -16424,7 +16424,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; listDepositPartialPayment · listDepositActivity · recordDepositActivity</div>
+          <div><b>OPERATIONS</b> &middot; getDepositPolicy · setDepositPolicy · listDepositPartialPayment · listDepositActivity +1</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess</span></div>
           <div><b>ARRIVES WITH</b> &middot; depositId&larr;navigation</div>
           <div><b>GOES TO</b> &middot; <a href="#bo-324">BO-324</a>  &mdash; <i>Returns to the board&#x27;s landing screen</i></div>
@@ -19966,7 +19966,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; listOutlets · getGuestMenu · createOutlet · getOutletStock +11</div>
+          <div><b>OPERATIONS</b> &middot; getFnbDeliveryPolicy · setFnbDeliveryPolicy · listOutlets · getGuestMenu +13</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess</span></div>
           <div><b>ARRIVES WITH</b> &middot; outletId&larr;deepLink, actionId&larr;deepLink</div>
           <div><b>GOES TO</b> &middot; <a href="#bo-001">BO-001</a>  &mdash; <i>Queue Directory</i> <span class="car">eventId · feedId · queueId</span><br><a href="#bo-007">BO-007</a>  &mdash; <i>Product Directory</i> <span class="car">productId</span><br><a href="#bo-008">BO-008</a>  &mdash; <i>Product Detail &amp; Variants</i> <span class="car">productId · venueId</span><br><a href="#bo-009">BO-009</a>  &mdash; <i>Pricing Rules</i> <span class="car">priceListId</span></div>
@@ -21736,7 +21736,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; listPrincipals · getPrincipal · createPrincipal · updatePrincipal</div>
+          <div><b>OPERATIONS</b> &middot; resetPrincipalCredential · listPrincipals · getPrincipal · createPrincipal +1</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess</span></div>
           <div><b>ARRIVES WITH</b> &middot; principalId&larr;session</div>
           <div><b>GOES TO</b> &middot; <a href="#bo-001">BO-001</a>  &mdash; <i>Queue Directory</i> <span class="car">eventId · feedId · queueId</span><br><a href="#bo-007">BO-007</a>  &mdash; <i>Product Directory</i> <span class="car">productId</span><br><a href="#bo-008">BO-008</a>  &mdash; <i>Product Detail &amp; Variants</i> <span class="car">productId · venueId</span><br><a href="#bo-009">BO-009</a>  &mdash; <i>Pricing Rules</i> <span class="car">priceListId</span></div>
@@ -32387,7 +32387,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; listDuplicateCandidates · decideDuplicateCandidate · mergeGuests</div>
+          <div><b>OPERATIONS</b> &middot; getGuestMatchPolicy · setGuestMatchPolicy · listDuplicateCandidates · decideDuplicateCandidate +1</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess</span></div>
           <div><b>ARRIVES WITH</b> &middot; candidateId&larr;navigation</div>
           <div><b>GOES TO</b> &middot; <a href="#bo-744">BO-744</a>  &mdash; <i>Back to Data Governance Center</i></div>

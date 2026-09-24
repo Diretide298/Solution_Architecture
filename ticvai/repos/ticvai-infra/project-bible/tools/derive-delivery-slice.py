@@ -1,0 +1,194 @@
+#!/usr/bin/env python3
+"""Derive the delivery slice: which operations must exist before the first four platforms work.
+
+**Services are built to a slice, frozen at 1.0.0, then extended additively** (decided 23 September,
+docs/active/service-docs-and-task-sheet-plan-23-september.md). This tool computes that slice, so it
+never has to be typed.
+
+The slice has two parts:
+
+  core   every operation a screen of the in-scope platforms calls.
+  setup  operations that write a table a core operation reads, when nothing in the slice writes it.
+         A till that lists products needs something that creates products, and that screen lives in
+         the Back Office. Followed to a fixpoint, since setup operations read tables too.
+
+**A writer is setup only if it configures rather than trades.** `catalogue.product` is written by
+`createProduct` (setup) and a gate's `access.scan_event` is written by `validateAccess`, which is
+another platform's daily work. A guest screen showing visit history still works the day it ships;
+it shows nothing until the scanner does. Those tables are reported as `fedElsewhere`, not pulled in.
+
+Tables that no operation writes at all are reported as `noWriter`. Most are child lines
+(`retail.sale_line`) written inside their parent's operation and missing from the lineage.
+
+Run: python3 tools/derive-delivery-slice.py
+Writes: handoff/delivery-slice.json
+"""
+from __future__ import annotations
+
+import json
+import re
+import sys
+from collections import defaultdict
+from pathlib import Path
+
+import yaml
+
+try:
+    sys.stdout.reconfigure(encoding="utf-8", errors="replace")
+except Exception:
+    pass
+
+ROOT = Path(__file__).resolve().parents[1]
+OUT = ROOT / "handoff" / "delivery-slice.json"
+
+# The four platforms of the first release. White Labelling is a module, not a platform: the CMS
+# screens in its module, and the admin-console screens that call its contract.
+PLATFORMS = {
+    # Kitchen Display is part of POS (Chinmay, 23 September): the pass and stations are the till's kitchen end.
+    "POS": {"name": "Point of Sale", "file": ("P04", "P15"), "pick": None},
+    "WEB": {"name": "Guest App - Web", "file": "P01", "pick": None},
+    "MOB": {"name": "Guest App - Mobile", "file": "P02", "pick": None},
+    "WL": {"name": "White Labelling", "file": ("P13", "P09"), "pick": "white-label"},
+}
+
+# Verbs that move a record through its life rather than define it. An operation named this way is
+# somebody's daily work, whatever table it writes.
+TRADING_VERB = re.compile(
+    r"^(accept|abandon|acknowledge|activate|assign|begin|block|book|call|cancel|check|close|"
+    r"collect|complete|dispose|override|pause|record|redeem|refire|reopen|report|revoke|settle|"
+    r"submit|sync|validate|void|issue|remove|end|unschedule|preview|test|recordUsage)"
+)
+# Nouns that are an event in a venue's day even when the verb is `create` or `set`: a work order is
+# a breakdown, a wait time is a reading, a path closure is a spill on a walkway.
+TRADING_NOUN = re.compile(r"WorkOrder|WaitTime|QueueStatus|PathClosure")
+# **Not `_APPROVE` or `_DECIDE`.** `setFxRate` carries LEDGER_APPROVE because a rate is sensitive,
+# not because setting one is trading; excluding it left every multi-currency price unreadable.
+TRADING_PERM = re.compile(r"_(EXECUTE|VALIDATE|BOOK|CREATE|MODIFY)$")
+
+
+def screens(code: str) -> list[dict]:
+    f = next((ROOT / "screens").glob(f"{code}-*.yaml"))
+    return yaml.safe_load(f.read_text(encoding="utf-8"))["screens"]
+
+
+def ops_of(s: dict) -> list[str]:
+    return [a["operationId"] for a in (s.get("apis") or []) if a.get("operationId")]
+
+
+def platform_screens(p: dict) -> list[dict]:
+    if p["pick"] is None:
+        files = p["file"] if isinstance(p["file"], tuple) else (p["file"],)
+        return [s for f in files for s in screens(f)]
+    cms, admin = p["file"]
+    return ([s for s in screens(cms) if s.get("module") == "White Label"]
+            + [s for s in screens(admin)
+               if any(a.get("contract") == p["pick"] for a in (s.get("apis") or []))])
+
+
+def is_setup(op: str, lin: dict) -> bool:
+    return (not TRADING_VERB.match(op) and not TRADING_NOUN.search(op)
+            and not TRADING_PERM.search(lin.get("perm") or ""))
+
+
+def main() -> int:
+    lineage = json.loads((ROOT / "handoff" / "api-data-lineage.json").read_text(encoding="utf-8"))
+
+    called_by: dict[str, set[str]] = defaultdict(set)
+    for f in sorted((ROOT / "screens").glob("P*.yaml")):
+        for s in yaml.safe_load(f.read_text(encoding="utf-8"))["screens"]:
+            for o in ops_of(s):
+                called_by[o].add(s["id"])
+
+    core: dict[str, set[str]] = defaultdict(set)
+    plat_screens = {}
+    for key, p in PLATFORMS.items():
+        ss = platform_screens(p)
+        plat_screens[key] = [s["id"] for s in ss]
+        for s in ss:
+            for o in ops_of(s):
+                core[o].add(key)
+
+    missing = sorted(o for o in core if o not in lineage)
+    writers: dict[str, set[str]] = defaultdict(set)
+    for o, d in lineage.items():
+        for t in d.get("writes") or []:
+            if not t.startswith("cache:"):
+                writers[t].add(o)
+
+    slice_ = set(core)
+    setup_for: dict[str, set[str]] = defaultdict(set)  # setup op -> tables it makes non-empty
+    while True:
+        read = {t for o in slice_ for t in (lineage.get(o, {}).get("reads") or [])
+                if not t.startswith("cache:")}
+        add = set()
+        for t in read:
+            if writers[t] & slice_:
+                continue
+            for w in writers[t]:
+                if is_setup(w, lineage[w]):
+                    add.add(w)
+                    setup_for[w].add(t)
+        add -= slice_
+        if not add:
+            break
+        slice_ |= add
+
+    fed_elsewhere, no_writer = {}, []
+    for t in sorted(read):
+        if writers[t] & slice_:
+            continue
+        if writers[t]:
+            fed_elsewhere[t] = sorted(writers[t])
+        else:
+            no_writer.append(t)
+
+    ops = {}
+    for o in sorted(slice_):
+        d = lineage[o]
+        ops[o] = {
+            "part": "core" if o in core else "setup",
+            "service": d.get("service"),
+            "contract": d.get("contract"),
+            "verb": d.get("verb"),
+            "path": d.get("path"),
+            "perm": d.get("perm"),
+            "platforms": sorted(core.get(o, ())),
+            "screens": sorted(called_by.get(o, ())),
+            "enables": sorted(setup_for.get(o, ())),
+        }
+
+    by_service: dict[str, dict[str, int]] = defaultdict(lambda: {"core": 0, "setup": 0})
+    for o in ops.values():
+        by_service[o["service"]][o["part"]] += 1
+    total = defaultdict(int)
+    for d in lineage.values():
+        total[d.get("service")] += 1
+
+    out = {
+        "note": "Derived by tools/derive-delivery-slice.py. Do not hand-edit.",
+        "platforms": {k: {"name": p["name"], "screens": plat_screens[k]} for k, p in PLATFORMS.items()},
+        "counts": {"core": sum(1 for o in ops.values() if o["part"] == "core"),
+                   "setup": sum(1 for o in ops.values() if o["part"] == "setup"),
+                   "allOperations": len(lineage)},
+        "services": {s: {**c, "total": total[s]} for s, c in sorted(by_service.items())},
+        "operations": ops,
+        "fedElsewhere": fed_elsewhere,
+        "noWriter": no_writer,
+        "missingFromLineage": missing,
+    }
+    OUT.write_text(json.dumps(out, indent=1, ensure_ascii=False) + "\n", encoding="utf-8")
+
+    c = out["counts"]
+    print(f"slice: {c['core']} core + {c['setup']} setup = {c['core'] + c['setup']} of {c['allOperations']} operations")
+    for s, v in out["services"].items():
+        print(f"  {s:22} core {v['core']:4}  setup {v['setup']:4}  of {v['total']}")
+    print(f"fed by other platforms: {len(fed_elsewhere)} tables; no writer at all: {len(no_writer)}")
+    if missing:
+        print(f"ERROR: {len(missing)} called operations missing from lineage: {missing[:5]}")
+        return 1
+    print(f"-> {OUT.relative_to(ROOT)}")
+    return 0
+
+
+if __name__ == "__main__":
+    sys.exit(main())

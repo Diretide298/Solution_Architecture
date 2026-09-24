@@ -11,7 +11,7 @@ CREATE TABLE IF NOT EXISTS ai.activity (
     audience                          text,
     subject_id                        uuid,
     billable_to_tenant_id             uuid,
-    scope_path                        text,
+    scope_path                        ltree,
     capability                        text NOT NULL,
     prompt                            text,
     response                          text,
@@ -42,7 +42,7 @@ CREATE TABLE IF NOT EXISTS ai.chunk_ref (
 CREATE TABLE IF NOT EXISTS ai.conversation (
     id                                uuid PRIMARY KEY NOT NULL,
     principal_id                      uuid NOT NULL,
-    scope_path                        text,
+    scope_path                        ltree,
     module                            text NOT NULL,
     locale                            text,
     message_count                     integer,
@@ -123,7 +123,7 @@ CREATE TABLE IF NOT EXISTS ai.knowledge_collection (
     name                              text NOT NULL,
     description                       text,
     scope_level                       text NOT NULL,
-    scope_path                        text,
+    scope_path                        ltree,
     document_count                    integer,
     shard_key                         text,
     retrieval                         text,
@@ -161,7 +161,7 @@ CREATE TABLE IF NOT EXISTS ai.layout_draft (
     categories_proposed               text[],
     unresolved                        text[],
     trace_id                          text,
-    scope_path                        text,
+    scope_path                        ltree,
     asset_id                          uuid NOT NULL
 );
 
@@ -248,7 +248,7 @@ CREATE TABLE IF NOT EXISTS ai.provider (
     degrade_gracefully                boolean,
     priority                          integer NOT NULL,
     scope_level                       text,
-    scope_path                        text,
+    scope_path                        ltree,
     tenant_id                         uuid,
     credential_ref                    text,
     credential_rotated_at             timestamptz,
@@ -270,7 +270,7 @@ CREATE TABLE IF NOT EXISTS ai.suggestion (
     id                                uuid PRIMARY KEY NOT NULL,
     kind                              text NOT NULL,
     basis                             text NOT NULL,
-    scope_path                        text,
+    scope_path                        ltree,
     subject_ref                       text,
     value                             jsonb,
     confidence                        numeric(18,4),

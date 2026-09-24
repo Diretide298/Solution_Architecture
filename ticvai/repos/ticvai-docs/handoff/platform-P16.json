@@ -7,15 +7,15 @@
  "audience": "staff",
  "formFactor": "web",
  "offlineCapable": false,
- "generated": "2026-09-21",
+ "generated": "2026-09-24",
  "note": "Derived by tools/derive-platform.py. **The gaps section is the point** \u2014 a page listing what exists is a directory; one listing what is missing is a worklist.",
  "counts": {
   "screens": 69,
-  "operations": 53,
+  "operations": 54,
   "contracts": 11,
   "modules": 1,
   "undrawn": 0,
-  "operationsWithNoScreen": 136
+  "operationsWithNoScreen": 135
  },
  "waves": {
   "wave3": 69
@@ -32,7 +32,7 @@
  "contracts": [
   {
    "contract": "reporting",
-   "operations": 35
+   "operations": 36
   },
   {
    "contract": "ai",
@@ -59,10 +59,6 @@
    "operations": 1
   },
   {
-   "contract": "catalogue",
-   "operations": 1
-  },
-  {
    "contract": "orders",
    "operations": 1
   },
@@ -73,6 +69,10 @@
   {
    "contract": "approvals",
    "operations": 1
+  },
+  {
+   "contract": "catalogue",
+   "operations": 1
   }
  ],
  "screens": [
@@ -82,7 +82,7 @@
    "module": "Analytics",
    "wave": 3,
    "route": "/analytics/executive-command-center",
-   "operations": 4,
+   "operations": 5,
    "drawn": true
   },
   {
@@ -1265,22 +1265,16 @@
     "summary": "Extend a reservation"
    },
    {
-    "operation": "getBillingStatement",
+    "operation": "getResaleFeePolicy",
     "contract": "orders",
     "verb": "GET",
-    "summary": "One statement, with its lines"
+    "summary": "The commission and price cap a resale listing is created under"
    },
    {
     "operation": "issueInvitation",
     "contract": "orders",
     "verb": "POST",
     "summary": "Issue a complimentary entitlement, with no payment expected"
-   },
-   {
-    "operation": "listBillingStatements",
-    "contract": "orders",
-    "verb": "GET",
-    "summary": "What was charged, when, and against which agreement"
    },
    {
     "operation": "listDeposits",
@@ -1337,12 +1331,6 @@
     "summary": "A credit limit for an individual booking ahead"
    },
    {
-    "operation": "printTicketProof",
-    "contract": "orders",
-    "verb": "POST",
-    "summary": "Print a sample without selling anything"
-   },
-   {
     "operation": "pushWalletPassUpdate",
     "contract": "orders",
     "verb": "POST",
@@ -1359,6 +1347,12 @@
     "contract": "orders",
     "verb": "PUT",
     "summary": ""
+   },
+   {
+    "operation": "setResaleFeePolicy",
+    "contract": "orders",
+    "verb": "PUT",
+    "summary": "Set resale commission and the price ceiling"
    },
    {
     "operation": "assignCoupon",

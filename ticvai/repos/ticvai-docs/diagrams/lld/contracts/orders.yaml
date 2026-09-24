@@ -1,5 +1,5 @@
 id: LLD-orders
-title: orders — 175 operations
+title: orders — 188 operations
 generatedBy: tools/derive-diagrams.py
 index: diagrams/hld/03-contracts.yaml
 tier: spine
@@ -322,6 +322,22 @@ operations:
   writes:
   - cache:idempotency
   - orders.cart
+- operation: createGroupBooking
+  verb: POST
+  path: /group-bookings
+  scope: venue
+  permission: ORDER_CREATE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - cache:idempotency
+  - orders.group_booking
+  - orders.sales_order
+  - pii.subject
+  writes:
+  - cache:idempotency
+  - orders.group_booking
 - operation: createListingSeller
   verb: POST
   path: /listing-seller
@@ -466,6 +482,20 @@ operations:
   writes:
   - cache:idempotency
   - orders.reservation
+- operation: createTicketTemplate
+  verb: POST
+  path: /ticket-templates
+  scope: venue
+  permission: PRODUCT_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - cache:idempotency
+  - orders.ticket_template
+  writes:
+  - cache:idempotency
+  - orders.ticket_template
 - operation: createUpgradeCredentialRegeneration
   verb: POST
   path: /upgrade-credential-regeneration
@@ -544,7 +574,10 @@ operations:
   - guest
   - staff
   offline: false
-  reads: []
+  reads:
+  - orders.payment
+  - orders.sales_order
+  - payments.dunning_case
   writes: []
 - operation: getCart
   verb: GET
@@ -561,6 +594,17 @@ operations:
   - orders.cart
   - orders.cart_line
   - promotions.promotion
+  writes: []
+- operation: getDepositPolicy
+  verb: GET
+  path: /deposit-policy
+  scope: venue
+  permission: PRODUCT_VIEW
+  audience:
+  - staff
+  offline: false
+  reads:
+  - orders.deposit_policy
   writes: []
 - operation: getGroupBooking
   verb: GET
@@ -606,6 +650,20 @@ operations:
   - orders.payment
   - orders.sales_order
   writes: []
+- operation: getOrderCalendarEvent
+  verb: GET
+  path: /orders/{orderId}/calendar-event
+  scope: venue
+  permission: ORDER_VIEW
+  audience:
+  - guest
+  - staff
+  offline: false
+  reads:
+  - orders.order_line
+  - orders.sales_order
+  - platform.scope
+  writes: []
 - operation: getOrderStatement
   verb: GET
   path: /orders/{orderId}/statement
@@ -650,6 +708,17 @@ operations:
   - orders.refund_policy
   writes:
   - cache:resolution
+- operation: getResaleFeePolicy
+  verb: GET
+  path: /resale-fee-policy
+  scope: venue
+  permission: ORDER_VIEW
+  audience:
+  - staff
+  offline: false
+  reads:
+  - orders.resale_fee_policy
+  writes: []
 - operation: getReservation
   verb: GET
   path: /reservations/{reservationId}
@@ -661,6 +730,17 @@ operations:
   offline: false
   reads:
   - orders.reservation
+  writes: []
+- operation: getVisitReminder
+  verb: GET
+  path: /orders/{orderId}/reminder
+  scope: venue
+  permission: ORDER_VIEW
+  audience:
+  - guest
+  offline: false
+  reads:
+  - orders.visit_reminder
   writes: []
 - operation: holdOrder
   verb: POST
@@ -776,7 +856,10 @@ operations:
   - guest
   - staff
   offline: false
-  reads: []
+  reads:
+  - orders.payment
+  - orders.sales_order
+  - payments.dunning_case
   writes: []
 - operation: listBulkGroupAssisted
   verb: GET
@@ -1514,6 +1597,17 @@ operations:
   offline: false
   reads: []
   writes: []
+- operation: listTicketTemplates
+  verb: GET
+  path: /ticket-templates
+  scope: venue
+  permission: PRODUCT_VIEW
+  audience:
+  - staff
+  offline: false
+  reads:
+  - orders.ticket_template
+  writes: []
 - operation: listUpgradeConversion
   verb: GET
   path: /upgrade-conversion
@@ -1783,6 +1877,23 @@ operations:
   writes:
   - cache:idempotency
   - orders.sales_order
+- operation: requestGroupBooking
+  verb: POST
+  path: /group-booking-requests
+  scope: venue
+  permission: null
+  audience:
+  - guest
+  offline: false
+  reads:
+  - cache:idempotency
+  - catalogue.group_package
+  - catalogue.product
+  - orders.group_booking
+  writes:
+  - cache:idempotency
+  - orders.group_booking
+  - orders.sales_order
 - operation: rescheduleOrder
   verb: POST
   path: /orders/{orderId}/reschedule
@@ -1907,6 +2018,18 @@ operations:
   offline: false
   reads: []
   writes: []
+- operation: setDepositPolicy
+  verb: PUT
+  path: /deposit-policy
+  scope: venue
+  permission: PRODUCT_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - orders.deposit_policy
+  writes:
+  - orders.deposit_policy
 - operation: setFraudRules
   verb: PUT
   path: /fraud-rules
@@ -2052,6 +2175,18 @@ operations:
   offline: false
   reads: []
   writes: []
+- operation: setResaleFeePolicy
+  verb: PUT
+  path: /resale-fee-policy
+  scope: venue
+  permission: ORDER_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - orders.resale_fee_policy
+  writes:
+  - orders.resale_fee_policy
 - operation: setResaleMarketplaceRecommendation
   verb: PUT
   path: /resale-marketplace-recommendation
@@ -2082,6 +2217,18 @@ operations:
   offline: false
   reads: []
   writes: []
+- operation: setVisitReminder
+  verb: PUT
+  path: /orders/{orderId}/reminder
+  scope: venue
+  permission: ORDER_VIEW
+  audience:
+  - guest
+  offline: false
+  reads:
+  - orders.visit_reminder
+  writes:
+  - orders.visit_reminder
 - operation: shareEntitlement
   verb: POST
   path: /entitlements/{entitlementId}/share
@@ -2181,6 +2328,35 @@ operations:
   - cache:idempotency
   - catalogue.inventory_hold
   - orders.cart_line
+- operation: updateGroupBooking
+  verb: PATCH
+  path: /group-bookings/{groupBookingId}
+  scope: venue
+  permission: ORDER_MODIFY
+  audience:
+  - staff
+  offline: false
+  reads:
+  - cache:idempotency
+  - orders.group_booking
+  - pii.subject
+  writes:
+  - cache:idempotency
+  - orders.group_booking
+- operation: updateTicketTemplate
+  verb: PATCH
+  path: /ticket-templates/{templateId}
+  scope: venue
+  permission: PRODUCT_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - cache:idempotency
+  - orders.ticket_template
+  writes:
+  - cache:idempotency
+  - orders.ticket_template
 - operation: voidOrder
   verb: POST
   path: /orders/{orderId}/voids

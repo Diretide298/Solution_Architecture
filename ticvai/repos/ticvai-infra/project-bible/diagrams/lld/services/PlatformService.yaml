@@ -28,7 +28,7 @@ schemas:
   tables: 13
   stores:
   - postgres
-  largestTable: subscription.module_listing
+  largestTable: subscription.plan
 operationsByContract:
 - contract: subscription
   count: 129
@@ -2173,7 +2173,6 @@ screens:
 - P10:PTR-049 Partner Disputes, Cases & Service Management
 - P10:PTR-050 Partner Performance Scorecard & Risk Monitoring
 - P10:PTR-051 Partner AI Intelligence & Relationship Optimization
-- P13:CMS-001 Tenant Workspace
 - P14:DEV-001 API Reference
 - P14:DEV-002 Register & Organisation
 - P14:DEV-003 Clients & Credentials
@@ -2206,7 +2205,6 @@ screens:
 - P17:SGN-024 Subscription Confirmation & Commercial Activation
 flows:
 - F04 Platform admin ships a release
-- F102 A brand is set, previewed, published and rolled back
 - F104 A platform operator signs in under MFA
 - F105 A rate limit is set and a developer hits it
 - F109 A tenant gets its first administrator

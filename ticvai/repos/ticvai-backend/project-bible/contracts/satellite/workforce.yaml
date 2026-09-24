@@ -2348,6 +2348,34 @@ components:
         minimumAgeForNightShift:
           type: integer
           nullable: true
+        defaultIncentiveRateMultiplier:
+          type: number
+          nullable: true
+          minimum: 1
+          description: '**What an open shift pays above base when it is released.** Added 22 September:
+            `workforce.open_shift.incentive_rate_multiplier` was set per shift with nothing behind it,
+            so two identical shifts could price differently and record no reason. The shift still
+            carries its own value — **as the snapshot**, the rule-and-record split `payments.fee_rule`
+            and `orders.order_fee` use — and this is where it comes from.
+
+            **Top-level rather than beside `overtime`** so the value is its own column. Nested in an
+            object it would be a key inside a JSON blob, which nothing can index, constrain or pair to
+            the shift that uses it.
+
+            '
+        maximumIncentiveRateMultiplier:
+          type: number
+          nullable: true
+          minimum: 1
+          description: '**The ceiling on an incentive.** A shift nobody claims is the moment somebody
+            raises the multiplier in a hurry — the same reason `maximumDailyCharge` bounds a late fee.'
+        incentiveApprovalAbove:
+          type: number
+          nullable: true
+          minimum: 1
+          description: '**Above this multiplier a second person approves the release.** Routed as an
+            approval, not a boolean — `overtime.requiresApproval` beside it is one of 26 approval flags
+            across the contracts that no approval kind, matrix row or SLA reaches.'
         scopePath:
           type: string
     StaffingCoverage:

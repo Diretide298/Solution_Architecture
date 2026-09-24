@@ -30,6 +30,7 @@ contracts:
 - identity
 - marketing-crm
 - orders
+- payments
 - promotions
 - queue
 - resources

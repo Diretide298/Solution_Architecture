@@ -2,7 +2,7 @@ openapi: 3.1.0
 info:
   title: TICVAI — Payment Orchestration
   version: 1.0.0
-  x-ticvai-screen-count: 39
+  x-ticvai-screen-count: 41
   x-ticvai-tier: satellite
   x-ticvai-module: 4 — Bundles and Promotions
   x-ticvai-platforms:
@@ -130,6 +130,99 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+  /guests/me/payment-issues:
+    get:
+      operationId: listMyPaymentIssues
+      x-ticvai-consumed-by:
+        - "P01 WEB-023 Membership Management"
+        - "P02 GST-015 Memberships"
+      summary: A guest's own failed recurring payments
+      description: '**Design gap, 23 September.** The membership billing statement in the design shows a
+        declined renewal and lets the guest retry it. The recovery cases existed (BL-100) and only staff
+        could see them. A soft decline (`declineClass: soft`) is retried on the venue''s schedule anyway;
+        this lets the guest act first.
+
+        '
+      tags:
+      - dunning
+      x-ticvai-permission: null
+      x-ticvai-audience:
+      - guest
+      x-ticvai-scope-level: tenant
+      x-ticvai-self-scoped: subject
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      security:
+      - guestAuth: []
+      responses:
+        '200':
+          description: Open cases, newest first
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/DunningCase'
+      x-ticvai-read-routing: replica
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/PageSize
+      - $ref: ../shared/common.yaml#/components/parameters/PageCursor
+  /dunning-cases/{caseId}/retry:
+    post:
+      operationId: retryMyDunningPayment
+      x-ticvai-consumed-by:
+        - "P01 WEB-023 Membership Management"
+        - "P02 GST-015 Memberships"
+      summary: Retry a declined membership payment now
+      description: 'Charges the case''s amount again, on a different saved card if one is given. **A hard
+        decline is never retried on the same card**, because the bank has said that card will not pay; the
+        guest must choose another. Success resolves the case and the membership continues without a gap.
+
+        '
+      tags:
+      - dunning
+      x-ticvai-permission: null
+      x-ticvai-audience:
+      - guest
+      x-ticvai-scope-level: tenant
+      x-ticvai-self-scoped: subject
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      security:
+      - guestAuth: []
+      responses:
+        '200':
+          description: The case after the attempt
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DunningCase'
+        '409':
+          description: The case is already resolved, or the decline is hard and no other card was given.
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
+        '422':
+          description: The payment was declined again.
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      - name: caseId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RetryDunningPaymentRequest'
   /dunning-cases:
     get:
       operationId: listDunningCases
@@ -1549,6 +1642,15 @@ components:
           description: >
             **The partition key** (ADR-0005). Written at `tenant` scope.
 
+    RetryDunningPaymentRequest:
+      type: object
+      description: Request only.
+      properties:
+        paymentMethodId:
+          type: string
+          format: uuid
+          nullable: true
+          description: A saved card other than the one that failed. Required after a hard decline.
     DunningCase:
       x-ticvai-persistence: payments.dunning_case
       type: object

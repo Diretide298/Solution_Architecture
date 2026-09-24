@@ -31,7 +31,7 @@ $$;
 -- True when the row sits at or beneath one of the granted paths. An empty grant list matches
 -- nothing — deny is the default, and it is the default because it is the absence of a grant
 -- rather than the presence of a denial.
-CREATE OR REPLACE FUNCTION platform.in_scope(row_scope_path text)
+CREATE OR REPLACE FUNCTION platform.in_scope(row_scope_path ltree)
     RETURNS boolean
     LANGUAGE sql
     STABLE
@@ -39,7 +39,7 @@ CREATE OR REPLACE FUNCTION platform.in_scope(row_scope_path text)
 AS $$
     SELECT row_scope_path IS NOT NULL
        AND cardinality(platform.current_scope_paths()) > 0
-       AND row_scope_path::ltree <@ ANY (platform.current_scope_paths());
+       AND row_scope_path <@ ANY (platform.current_scope_paths());
 $$;
 
 -- Applies the standard policy to a table.
@@ -61,44 +61,6 @@ BEGIN
 END
 $$;
 
--- **59 tables carry `venue_id` and no `scope_path`, and a policy set built on `scope_path` alone
--- leaves every one of them open.** `check-migrations` has said so since it was written — *"checking
--- only scope_path missed 41 tables that carry venue_id instead; they would have passed with no
--- policy at all"* — and the hand-written baseline never closed it because it protected three
--- tables in total.
---
--- A venue id is resolved to its path through the scope tree rather than assumed. **The subquery is
--- the price of not carrying a redundant `scope_path` column on sixty tables**, and `platform.scope`
--- is small, cached and indexed on `id`.
-CREATE OR REPLACE FUNCTION platform.venue_in_scope(row_venue_id uuid)
-    RETURNS boolean
-    LANGUAGE sql
-    STABLE
-    PARALLEL SAFE
-AS $$
-    SELECT row_venue_id IS NOT NULL
-       AND cardinality(platform.current_scope_paths()) > 0
-       AND EXISTS (
-            SELECT 1 FROM platform.scope s
-             WHERE s.id = row_venue_id
-               AND s.path::ltree <@ ANY (platform.current_scope_paths()));
-$$;
-
-CREATE OR REPLACE FUNCTION platform.apply_venue_rls(target regclass)
-    RETURNS void
-    LANGUAGE plpgsql
-AS $$
-DECLARE
-    policy_name text := 'venue_isolation';
-BEGIN
-    EXECUTE format('ALTER TABLE %s ENABLE ROW LEVEL SECURITY', target);
-    EXECUTE format('ALTER TABLE %s FORCE ROW LEVEL SECURITY', target);
-    EXECUTE format('DROP POLICY IF EXISTS %I ON %s', policy_name, target);
-    EXECUTE format(
-        'CREATE POLICY %I ON %s USING (platform.venue_in_scope(venue_id)) '
-        'WITH CHECK (platform.venue_in_scope(venue_id))', policy_name, target);
-END
-$$;
 
 -- **7 tables carry `scope_path` and 1 carry `venue_id` instead, out of 49.**
 -- Both are protected. A table with neither is not scoped -- it is reference data, a
@@ -115,5 +77,5 @@ SELECT platform.apply_scope_rls('control.seo_metadata'::regclass);
 SELECT platform.apply_scope_rls('control.support_notice'::regclass);
 SELECT platform.apply_scope_rls('control.url_redirect'::regclass);
 
--- Scoped by venue, resolved through the scope tree.
-SELECT platform.apply_venue_rls('control.usage_record'::regclass);
+-- Carries venue_id but not scoped here: the control database has no scope tree to resolve a venue against, and these are operator records read across tenants.
+--   control.usage_record

@@ -12,7 +12,7 @@ CREATE TABLE IF NOT EXISTS accreditation.access_profile (
     operational_areas                 text[],
     escort_required                   boolean,
     holder_count                      integer,
-    scope_path                        text
+    scope_path                        ltree
 );
 
 -- Holds 15 columns. No description has been written for this table — the name is the only thing
@@ -32,7 +32,7 @@ CREATE TABLE IF NOT EXISTS accreditation.application (
     holder_id                         uuid,
     submitted_at                      timestamptz,
     decided_at                        timestamptz,
-    scope_path                        text
+    scope_path                        ltree
 );
 
 -- Holds 13 columns. No description has been written for this table — the name is the only thing
@@ -50,7 +50,7 @@ CREATE TABLE IF NOT EXISTS accreditation.audit (
     previous_record_hash              text,
     record_hash                       text,
     integrity                         text,
-    scope_path                        text
+    scope_path                        ltree
 );
 
 -- Holds 12 columns. No description has been written for this table — the name is the only thing
@@ -67,7 +67,7 @@ CREATE TABLE IF NOT EXISTS accreditation.badge_template (
     show_validity                     boolean,
     background_asset_id               uuid,
     security_features                 text[],
-    scope_path                        text
+    scope_path                        ltree
 );
 
 -- Holds 13 columns. No description has been written for this table — the name is the only thing
@@ -85,7 +85,7 @@ CREATE TABLE IF NOT EXISTS accreditation.credential (
     status                            text,
     replaces_credential_id            uuid,
     replacement_count                 integer,
-    scope_path                        text
+    scope_path                        ltree
 );
 
 -- Holds 12 columns. No description has been written for this table — the name is the only thing
@@ -102,7 +102,7 @@ CREATE TABLE IF NOT EXISTS accreditation.document (
     verified_at                       timestamptz,
     rejection_reason                  text,
     expires_at                        date,
-    scope_path                        text
+    scope_path                        ltree
 );
 
 -- Holds 17 columns. No description has been written for this table — the name is the only thing
@@ -124,7 +124,7 @@ CREATE TABLE IF NOT EXISTS accreditation.holder (
     valid_from                        date,
     valid_to                          date,
     completeness_percent              integer,
-    scope_path                        text
+    scope_path                        ltree
 );
 
 -- Holds 5 columns. No description has been written for this table — the name is the only thing
@@ -133,7 +133,7 @@ CREATE TABLE IF NOT EXISTS accreditation.holder_access (
     holder_id                         uuid,
     access_profile_ids                text[],
     effective_zones                   text[],
-    scope_path                        text,
+    scope_path                        ltree,
     id                                uuid PRIMARY KEY NOT NULL
 );
 
@@ -141,7 +141,7 @@ CREATE TABLE IF NOT EXISTS accreditation.holder_access (
 -- saying what it is
 CREATE TABLE IF NOT EXISTS accreditation.notification_rules (
     programme_id                      uuid,
-    scope_path                        text,
+    scope_path                        ltree,
     id                                uuid PRIMARY KEY NOT NULL
 );
 
@@ -155,7 +155,7 @@ CREATE TABLE IF NOT EXISTS accreditation.print_job (
     status                            text,
     printed                           integer,
     failed                            integer,
-    scope_path                        text
+    scope_path                        ltree
 );
 
 -- Holds 11 columns. No description has been written for this table — the name is the only thing
@@ -171,14 +171,14 @@ CREATE TABLE IF NOT EXISTS accreditation.programme (
     applications_close_at             timestamptz,
     approval_workflow_id              uuid,
     status                            text,
-    scope_path                        text
+    scope_path                        ltree
 );
 
 -- Holds 3 columns. No description has been written for this table — the name is the only thing
 -- saying what it is
 CREATE TABLE IF NOT EXISTS accreditation.requirements (
     programme_id                      uuid,
-    scope_path                        text,
+    scope_path                        ltree,
     id                                uuid PRIMARY KEY NOT NULL
 );
 
@@ -192,7 +192,7 @@ CREATE TABLE IF NOT EXISTS accreditation.validity (
     renewal_requires_reverification   boolean,
     on_expiry                         text,
     grace_period_days                 integer,
-    scope_path                        text,
+    scope_path                        ltree,
     id                                uuid PRIMARY KEY NOT NULL
 );
 

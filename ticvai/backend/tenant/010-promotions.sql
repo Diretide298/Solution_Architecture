@@ -29,7 +29,7 @@ CREATE TABLE IF NOT EXISTS promotions.bundle (
     description                       text,
     venue_id                          uuid,
     kind                              text,
-    price                             numeric(18,4),
+    list_price                        numeric(18,4),
     allocation                        jsonb,
     valid_from                        timestamptz,
     valid_to                          timestamptz,
@@ -94,7 +94,7 @@ CREATE TABLE IF NOT EXISTS promotions.coupon_code (
     valid_to                          timestamptz,
     redeemed_at                       timestamptz,
     redeemed_order_id                 text,
-    scope_path                        text,
+    scope_path                        ltree,
     id                                uuid PRIMARY KEY NOT NULL
 );
 
@@ -110,7 +110,7 @@ CREATE TABLE IF NOT EXISTS promotions.product_relationship (
     strength                          numeric(18,4),
     effective_from                    date,
     effective_to                      date,
-    scope_path                        text
+    scope_path                        ltree
 );
 
 -- A rule that changes a price, with eligibility and a budget. Evaluated at the basket rather than
@@ -152,7 +152,7 @@ CREATE TABLE IF NOT EXISTS promotions.recommendation_experiment (
     ended_at                          timestamptz,
     status                            text,
     winning_variant                   text,
-    scope_path                        text
+    scope_path                        ltree
 );
 
 -- Holds 8 columns. No description has been written for this table — the name is the only thing
@@ -162,9 +162,9 @@ CREATE TABLE IF NOT EXISTS promotions.recommendation_outcome (
     outcome                           text NOT NULL,
     at                                timestamptz,
     order_id                          text,
-    value                             numeric(18,4),
+    attributed_gross_amount           numeric(18,4),
     holdout                           boolean,
-    scope_path                        text,
+    scope_path                        ltree,
     id                                uuid PRIMARY KEY NOT NULL
 );
 
@@ -187,13 +187,13 @@ CREATE TABLE IF NOT EXISTS promotions.recommendation_strategy (
     status                            text,
     effective_from                    date,
     effective_to                      date,
-    scope_path                        text
+    scope_path                        ltree
 );
 
 -- Holds 6 columns. No description has been written for this table — the name is the only thing
 -- saying what it is
 CREATE TABLE IF NOT EXISTS promotions.recommendation_suppression (
-    scope_path                        text,
+    scope_path                        ltree,
     max_impressions_per_product_per_dayinteger,
     max_impressions_per_guest_per_sessioninteger,
     cooldown_after_dismiss_days       integer,

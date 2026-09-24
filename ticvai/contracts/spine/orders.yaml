@@ -2,7 +2,7 @@ openapi: 3.1.0
 info:
   title: TICVAI Order & Payment
   version: 0.1.0
-  x-ticvai-screen-count: 155
+  x-ticvai-screen-count: 169
   x-ticvai-tier: spine
   x-ticvai-module: 2 — Ticketing Sales
   x-ticvai-requirements: 343
@@ -246,6 +246,173 @@ paths:
               schema:
                 type: object
                 additionalProperties: true
+  /group-bookings:
+    post:
+      operationId: createGroupBooking
+      x-ticvai-consumed-by:
+        - "P08 BO-026 Group Bookings"
+      summary: Turn an order into a group booking
+      description: 'BL-028. **`getGroupBooking` read a table nothing wrote**, so `BO-026 Group Bookings`
+        still ran on generic order operations: no leader, no expected size, no names to collect.
+
+        **A group booking wraps an order; it does not replace one.** The order holds the tickets and
+        the money; this holds the leader, the size and the name-capture duty. One order carries at most
+        one group booking.
+
+        Starts `provisional`, or `namesPending` when `attendeeCaptureRequired` is set.
+
+        '
+      tags:
+      - orders
+      x-ticvai-permission: ORDER_CREATE
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateGroupBookingRequest'
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GroupBooking'
+        '400':
+          $ref: ../shared/common.yaml#/components/responses/BadRequest
+        '403':
+          $ref: ../shared/common.yaml#/components/responses/Forbidden
+        '409':
+          description: The order already has a group booking, or is voided.
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
+  /group-booking-requests:
+    post:
+      operationId: requestGroupBooking
+      x-ticvai-consumed-by:
+        - "P01 WEB-031 My Reservations"
+        - "P02 GST-072 Share & Group Booking"
+      summary: Ask for a school trip or a birthday party
+      description: '**Design gap, 23 September.** The guest-facing half of `createGroupBooking`: a school
+        or a parent asks online, the date is held at once, and the booking starts `provisional`.
+
+
+        - **School:** paid by invoice; a quote and a risk assessment are sent within two working days; the
+        final headcount is due five days before (`finalHeadcountDueBy`); one group pass is issued.
+
+        - **Party:** a deposit is taken under the venue''s `DepositPolicy`, the balance is due on the day,
+        and it is refundable in full up to the policy''s cut-off.
+
+        '
+      tags:
+      - orders
+      x-ticvai-permission: null
+      x-ticvai-audience:
+      - guest
+      x-ticvai-scope-level: venue
+      x-ticvai-self-scoped: subject
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      security:
+      - guestAuth: []
+      responses:
+        '201':
+          description: The held booking
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GroupBooking'
+        '409':
+          description: The date or package is no longer available.
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
+        '422':
+          description: More participants than the package allows.
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GroupBookingRequest'
+  /deposit-policy:
+    get:
+      operationId: getDepositPolicy
+      x-ticvai-consumed-by:
+        - "P08 BO-327 Deposit, Partial Payment & Outstanding Balance Management"
+      summary: What a deposit booking takes now and when the rest is due
+      tags:
+      - order
+      x-ticvai-permission: PRODUCT_VIEW
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      x-ticvai-read-routing: replica
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      responses:
+        '200':
+          description: The current setting
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DepositPolicy'
+        '403':
+          $ref: ../shared/common.yaml#/components/responses/Forbidden
+    put:
+      operationId: setDepositPolicy
+      x-ticvai-consumed-by:
+        - "P08 BO-327 Deposit, Partial Payment & Outstanding Balance Management"
+      summary: Set how deposits work
+      description: '**Design gap, 23 September.** Parties and some dining bookings take a deposit now and
+        the balance on the day, refundable up to 24 hours ahead. Nothing in the orders contract said how
+        much or when.
+
+        '
+      tags:
+      - order
+      x-ticvai-permission: PRODUCT_CONFIGURE
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      x-ticvai-config-scope: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DepositPolicy'
+      responses:
+        '200':
+          description: Saved
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DepositPolicy'
+        '400':
+          $ref: ../shared/common.yaml#/components/responses/BadRequest
+        '403':
+          $ref: ../shared/common.yaml#/components/responses/Forbidden
   /group-bookings/{groupBookingId}:
     parameters:
     - name: groupBookingId
@@ -259,6 +426,7 @@ paths:
       x-ticvai-consumed-by:
         - "P01 WEB-031 My Reservations"
         - "P02 GST-072 Share & Group Booking"
+        - "P08 BO-026 Group Bookings"
       summary: A group, its leader and its manifest
       description: 'BL-028. **`orders.group_booking` had ten columns and nothing read it** — a table built
         and never surfaced.
@@ -289,6 +457,52 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/GroupBooking'
+    patch:
+      operationId: updateGroupBooking
+      x-ticvai-consumed-by:
+        - "P08 BO-026 Group Bookings"
+      summary: Confirm numbers, change the leader or cancel a group
+      description: '**`confirmedSize` against `minimumSize` is where the money is decided.** Confirming
+        below the minimum is allowed and recorded, because the group has already arrived. Whether the
+        group rate still applies is for pricing to decide, not for this operation to refuse.
+
+        Status moves forward only (provisional, confirmed, namesPending, complete) or to cancelled.
+        Cancelling the group does not refund the order; that is `createRefund` against it.
+
+        '
+      tags:
+      - orders
+      x-ticvai-permission: ORDER_MODIFY
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateGroupBookingRequest'
+      responses:
+        '200':
+          description: Updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GroupBooking'
+        '403':
+          $ref: ../shared/common.yaml#/components/responses/Forbidden
+        '404':
+          $ref: ../shared/common.yaml#/components/responses/NotFound
+        '409':
+          description: The status change goes backwards, or the group is already cancelled or complete.
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
   /payment-links/{token}:
     parameters:
     - name: token
@@ -895,6 +1109,73 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/WalletPass'
+  /resale-fee-policy:
+    get:
+      operationId: getResaleFeePolicy
+      summary: The commission and price cap a resale listing is created under
+      description: '**`orders.resale_listing` stored `sellerFeePercent`, `buyerFeePercent` and
+        `priceCapPercent` on every listing and nothing produced them.** Two listings created a minute
+        apart could carry different commercials with nothing recording why.
+
+        **The backlog already asked for this** — the resale entry closes with *"price-cap configuration
+        and a fee definition, both small"*, and neither was built. `ADM-283 Resale Fees, Commission &
+        Seller Proceeds` draws the numbers and is `x-ticvai-persistence: none`, so the screen reads
+        state that did not exist.
+
+        **The columns on the listing stay**, and are the snapshot. That is the shape `payments.fee_rule`
+        and `orders.order_fee` already use: a rule says what to charge, and the row records what was
+        charged, because a rule changed afterwards must not restate a sale.
+
+        '
+      tags:
+      - orders
+      x-ticvai-permission: ORDER_VIEW
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      x-ticvai-read-routing: replica
+      responses:
+        '200':
+          description: The policy in force
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResaleFeePolicy'
+    put:
+      operationId: setResaleFeePolicy
+      summary: Set resale commission and the price ceiling
+      description: '**`priceCapPercent` is regulated in several jurisdictions and the package has said
+        so**: the resale backlog entry records that anti-scalping limits bind in some markets and that
+        whether they bind in the UAE and Oman is a research item. **A cap that lives on each listing
+        cannot be evidenced to a regulator**; one that lives here, with an effective date, can.
+
+        '
+      tags:
+      - orders
+      x-ticvai-permission: PRODUCT_CONFIGURE
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      x-ticvai-config-scope: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ResaleFeePolicy'
+      responses:
+        '200':
+          description: Set
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResaleFeePolicy'
   /resale-listings:
     post:
       operationId: createResaleListing
@@ -1024,6 +1305,153 @@ paths:
                       answer.
 
                       '
+  /ticket-templates:
+    get:
+      operationId: listTicketTemplates
+      x-ticvai-consumed-by:
+        - "P08 BO-346 PDF, Printable & POS Ticket Designer"
+      summary: The ticket templates a venue issues from
+      description: 'BL-102. **`orders.ticket_template` was read by `printTicketProof` and `issueWalletPass`
+        and written by nothing**, so the proof operation had nothing to print and a venue changing its
+        artwork was still a code change.
+
+        Inactive templates are returned only when asked for: a template retired last season still
+        explains a ticket issued from it.
+
+        '
+      tags:
+      - orders
+      x-ticvai-permission: PRODUCT_VIEW
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      x-ticvai-read-routing: replica
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+      - name: mediaType
+        in: query
+        required: false
+        schema:
+          type: string
+      - name: includeInactive
+        in: query
+        required: false
+        schema:
+          type: boolean
+          default: false
+      - $ref: ../shared/common.yaml#/components/parameters/PageSize
+      - $ref: ../shared/common.yaml#/components/parameters/PageCursor
+      responses:
+        '200':
+          description: Templates, by selection priority
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/TicketTemplate'
+    post:
+      operationId: createTicketTemplate
+      x-ticvai-consumed-by:
+        - "P08 BO-346 PDF, Printable & POS Ticket Designer"
+      summary: Create a ticket template
+      description: '**Selection is automatic.** `selectionPriority`, `mediaType`, `appliesToProductKinds`
+        and `appliesToChannels` decide which template a sale issues from, so the caller never chooses
+        one. Two active templates with the same priority for the same product kind, channel and media
+        type are refused, because the choice between them would be an accident of row order.
+
+        Check the artwork with `printTicketProof` before activating.
+
+        '
+      tags:
+      - orders
+      x-ticvai-permission: PRODUCT_CONFIGURE
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      x-ticvai-config-scope: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TicketTemplateRequest'
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TicketTemplate'
+        '400':
+          $ref: ../shared/common.yaml#/components/responses/BadRequest
+        '403':
+          $ref: ../shared/common.yaml#/components/responses/Forbidden
+        '409':
+          description: Another active template has the same priority for the same product kind, channel
+            and media type.
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
+  /ticket-templates/{templateId}:
+    parameters:
+    - name: templateId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    patch:
+      operationId: updateTicketTemplate
+      x-ticvai-consumed-by:
+        - "P08 BO-346 PDF, Printable & POS Ticket Designer"
+      summary: Change or retire a ticket template
+      description: '**Tickets already issued keep the template they were issued from.** Changing artwork
+        affects the next ticket, never one a guest already holds. Retire with `isActive: false` rather
+        than deleting, so an issued ticket can still be explained.
+
+        '
+      tags:
+      - orders
+      x-ticvai-permission: PRODUCT_CONFIGURE
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      x-ticvai-config-scope: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TicketTemplateRequest'
+      responses:
+        '200':
+          description: Updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TicketTemplate'
+        '403':
+          $ref: ../shared/common.yaml#/components/responses/Forbidden
+        '404':
+          $ref: ../shared/common.yaml#/components/responses/NotFound
+        '409':
+          description: Another active template has the same priority for the same product kind, channel
+            and media type.
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
   /ticket-templates/{templateId}/proof:
     parameters:
     - name: templateId
@@ -1034,6 +1462,8 @@ paths:
         format: uuid
     post:
       operationId: printTicketProof
+      x-ticvai-consumed-by:
+        - "P08 BO-346 PDF, Printable & POS Ticket Designer"
       summary: Print a sample without selling anything
       description: '2.16.6. **Artwork is checked by looking at it, and the only way to look at it was
         to sell something.**
@@ -2212,6 +2642,9 @@ paths:
   /billing-statements:
     get:
       operationId: listBillingStatements
+      x-ticvai-consumed-by:
+        - "P01 WEB-023 Membership Management"
+        - "P02 GST-015 Memberships"
       x-ticvai-audience:
       - guest
       - staff
@@ -2263,6 +2696,9 @@ paths:
   /billing-statements/{statementId}:
     get:
       operationId: getBillingStatement
+      x-ticvai-consumed-by:
+        - "P01 WEB-023 Membership Management"
+        - "P02 GST-015 Memberships"
       x-ticvai-audience:
       - guest
       - staff
@@ -2517,6 +2953,129 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Order'
+        '404':
+          $ref: ../shared/common.yaml#/components/responses/NotFound
+  /orders/{orderId}/calendar-event:
+    parameters:
+    - name: orderId
+      in: path
+      required: true
+      schema:
+        type: string
+        pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+    get:
+      operationId: getOrderCalendarEvent
+      x-ticvai-consumed-by:
+        - "P02 GST-018 Add to Calendar / Reminders"
+      summary: The visit as a calendar entry
+      description: '**`GST-018 Add to Calendar / Reminders` had no calendar operation**, only the order
+        and a wallet pass, so the screen named after a calendar could not put anything in one.
+
+        Returns an iCalendar (RFC 5545) event per dated line: the venue, the session start and end, and
+        a link back to the booking. **The event carries no ticket and no QR code**, because a calendar
+        is synced to places a ticket should not go. Rescheduling the order changes the event UID''s
+        sequence, so a calendar that re-imports it updates the entry rather than adding a second one.
+
+        '
+      tags:
+      - order
+      x-ticvai-permission: ORDER_VIEW
+      x-ticvai-guest-callable: true
+      x-ticvai-audience:
+      - guest
+      - staff
+      x-ticvai-scope-level: venue
+      x-ticvai-read-routing: replica
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      responses:
+        '200':
+          description: One VEVENT per dated line of the order.
+          content:
+            text/calendar:
+              schema:
+                type: string
+        '404':
+          $ref: ../shared/common.yaml#/components/responses/NotFound
+        '409':
+          description: The order has no dated line, so there is nothing to put in a calendar.
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
+  /orders/{orderId}/reminder:
+    parameters:
+    - name: orderId
+      in: path
+      required: true
+      schema:
+        type: string
+        pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+    get:
+      operationId: getVisitReminder
+      x-ticvai-consumed-by:
+        - "P02 GST-018 Add to Calendar / Reminders"
+      summary: The guest's reminder for this booking
+      description: Returns the reminder, or one with `enabled` false when the guest has never set one.
+      tags:
+      - order
+      x-ticvai-permission: ORDER_VIEW
+      x-ticvai-guest-callable: true
+      x-ticvai-audience:
+      - guest
+      x-ticvai-scope-level: venue
+      x-ticvai-read-routing: replica
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      responses:
+        '200':
+          description: The reminder
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VisitReminder'
+        '404':
+          $ref: ../shared/common.yaml#/components/responses/NotFound
+    put:
+      operationId: setVisitReminder
+      x-ticvai-consumed-by:
+        - "P02 GST-018 Add to Calendar / Reminders"
+      summary: Turn a visit reminder on or off
+      description: '**The reminders half of `GST-018` had nothing behind it.** A guest can ask to be
+        reminded a chosen time before each dated line of the booking, on the channels they pick.
+
+        **Only channels the guest has consented to are used.** A channel chosen here but withdrawn in
+        their communication preferences is skipped rather than sent, because a reminder is not a reason
+        to message somebody who said no. Sent through the notification catalogue; a rescheduled
+        booking moves its reminder with it.
+
+        '
+      tags:
+      - order
+      x-ticvai-permission: ORDER_VIEW
+      x-ticvai-guest-callable: true
+      x-ticvai-audience:
+      - guest
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/VisitReminder'
+      responses:
+        '200':
+          description: Saved
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VisitReminder'
+        '400':
+          $ref: ../shared/common.yaml#/components/responses/BadRequest
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
   /orders/{orderId}/hold:
@@ -9108,6 +9667,293 @@ components:
           default: edge
         isCriticalPath:
           type: boolean
+    CreateGroupBookingRequest:
+      type: object
+      description: Request only. Persisted as `GroupBooking`.
+      required:
+      - orderId
+      - leaderSubjectId
+      - expectedSize
+      properties:
+        kind:
+          type: string
+          enum:
+          - general
+          - school
+          - corporate
+          - party
+          default: general
+        packageProductId:
+          type: string
+          nullable: true
+          description: The school-trip format or party package.
+        yearGroup:
+          type: string
+          maxLength: 40
+          nullable: true
+        accessAndDietaryNeeds:
+          type: string
+          maxLength: 1000
+          nullable: true
+        celebrantName:
+          type: string
+          maxLength: 120
+          nullable: true
+          description: The birthday child.
+        celebrantTurningAge:
+          type: integer
+          minimum: 1
+          maximum: 18
+          nullable: true
+        allergiesAndRequests:
+          type: string
+          maxLength: 1000
+          nullable: true
+        finalHeadcountDueBy:
+          type: string
+          format: date-time
+          nullable: true
+        orderId:
+          type: string
+          format: uuid
+        leaderSubjectId:
+          type: string
+          format: uuid
+          description: The person who pays, is called if the coach is late, and collects the names.
+        organisationName:
+          type: string
+          maxLength: 200
+          nullable: true
+        expectedSize:
+          type: integer
+          minimum: 2
+        minimumSize:
+          type: integer
+          minimum: 1
+          nullable: true
+        attendeeCaptureRequired:
+          type: boolean
+          default: false
+        attendeeCaptureDueBy:
+          type: string
+          format: date-time
+          nullable: true
+    UpdateGroupBookingRequest:
+      type: object
+      description: Request only. Every field optional; absent means unchanged.
+      properties:
+        packageProductId:
+          type: string
+          nullable: true
+          description: The school-trip format or party package.
+        yearGroup:
+          type: string
+          maxLength: 40
+          nullable: true
+        accessAndDietaryNeeds:
+          type: string
+          maxLength: 1000
+          nullable: true
+        celebrantName:
+          type: string
+          maxLength: 120
+          nullable: true
+          description: The birthday child.
+        celebrantTurningAge:
+          type: integer
+          minimum: 1
+          maximum: 18
+          nullable: true
+        allergiesAndRequests:
+          type: string
+          maxLength: 1000
+          nullable: true
+        finalHeadcountDueBy:
+          type: string
+          format: date-time
+          nullable: true
+        leaderSubjectId:
+          type: string
+          format: uuid
+        organisationName:
+          type: string
+          maxLength: 200
+          nullable: true
+        expectedSize:
+          type: integer
+          minimum: 2
+        confirmedSize:
+          type: integer
+          minimum: 0
+        minimumSize:
+          type: integer
+          minimum: 1
+          nullable: true
+        attendeeCaptureRequired:
+          type: boolean
+        attendeeCaptureDueBy:
+          type: string
+          format: date-time
+          nullable: true
+        status:
+          type: string
+          enum:
+          - confirmed
+          - namesPending
+          - complete
+          - cancelled
+    VisitReminder:
+      type: object
+      x-ticvai-persistence: orders.visit_reminder
+      description: '**One reminder per booking, set by the guest.** Not a marketing message: it is sent
+        only for a booking the guest holds, and only on channels they still consent to.
+
+        '
+      required:
+      - enabled
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        orderId:
+          type: string
+          readOnly: true
+        subjectId:
+          type: string
+          format: uuid
+          readOnly: true
+          description: The guest who set it. A booking shared with others reminds only the guest who asked.
+        enabled:
+          type: boolean
+        leadTimeMinutes:
+          type: integer
+          minimum: 15
+          maximum: 10080
+          default: 1440
+          description: How long before each session starts. A day by default; a week at most.
+        channels:
+          type: array
+          items:
+            type: string
+            enum:
+            - push
+            - email
+            - sms
+          default:
+          - push
+        scopePath:
+          type: string
+          readOnly: true
+          description: '**The partition key** (ADR-0005). Operations write it at `venue` scope.'
+    GroupBookingRequest:
+      type: object
+      description: Request only. The caller is the leader.
+      required:
+      - kind
+      - packageProductId
+      - preferredDate
+      - expectedSize
+      properties:
+        kind:
+          type: string
+          enum:
+          - school
+          - party
+          - general
+        packageProductId:
+          type: string
+        preferredDate:
+          type: string
+          format: date
+        expectedSize:
+          type: integer
+          minimum: 2
+        organisationName:
+          type: string
+          maxLength: 200
+          nullable: true
+          description: The school.
+        yearGroup:
+          type: string
+          maxLength: 40
+          nullable: true
+        accessAndDietaryNeeds:
+          type: string
+          maxLength: 1000
+          nullable: true
+        celebrantName:
+          type: string
+          maxLength: 120
+          nullable: true
+          description: The birthday child.
+        celebrantTurningAge:
+          type: integer
+          minimum: 1
+          maximum: 18
+          nullable: true
+        allergiesAndRequests:
+          type: string
+          maxLength: 1000
+          nullable: true
+    DepositPolicy:
+      type: object
+      x-ticvai-persistence: orders.deposit_policy
+      required:
+      - basis
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        appliesTo:
+          type: array
+          items:
+            type: string
+            enum:
+            - party
+            - dining
+            - school
+            - event
+        basis:
+          type: string
+          enum:
+          - fixedPerBooking
+          - fixedPerGuest
+          - percentOfTotal
+          - perBand
+        amount:
+          allOf:
+          - $ref: ../shared/common.yaml#/components/schemas/Money
+          nullable: true
+        percent:
+          type: number
+          minimum: 0
+          maximum: 100
+          nullable: true
+        bandSize:
+          allOf:
+          - $ref: ../shared/common.yaml#/components/schemas/Money
+          nullable: true
+          description: '`perBand`: one `amount` per this much of the total, e.g. AED 100 per AED 400.'
+        balanceDue:
+          type: string
+          enum:
+          - onTheDay
+          - daysBefore
+          default: onTheDay
+        balanceDueDaysBefore:
+          type: integer
+          minimum: 0
+          nullable: true
+        refundableUntilHours:
+          type: integer
+          minimum: 0
+          default: 24
+        scopePath:
+          type: string
+          readOnly: true
+          description: '**The partition key** (ADR-0005). Operations write it at `venue` scope.'
     GroupBooking:
       type: object
       x-ticvai-persistence: orders.group_booking
@@ -9129,6 +9975,54 @@ components:
         id:
           type: string
           format: uuid
+        kind:
+          type: string
+          enum:
+          - general
+          - school
+          - corporate
+          - party
+          default: general
+        packageProductId:
+          type: string
+          nullable: true
+          description: The school-trip format or party package.
+        yearGroup:
+          type: string
+          maxLength: 40
+          nullable: true
+        accessAndDietaryNeeds:
+          type: string
+          maxLength: 1000
+          nullable: true
+        celebrantName:
+          type: string
+          maxLength: 120
+          nullable: true
+          description: The birthday child.
+        celebrantTurningAge:
+          type: integer
+          minimum: 1
+          maximum: 18
+          nullable: true
+        allergiesAndRequests:
+          type: string
+          maxLength: 1000
+          nullable: true
+        finalHeadcountDueBy:
+          type: string
+          format: date-time
+          nullable: true
+        quoteSentAt:
+          type: string
+          format: date-time
+          nullable: true
+          readOnly: true
+        riskAssessmentSentAt:
+          type: string
+          format: date-time
+          nullable: true
+          readOnly: true
         orderId:
           type: string
           format: uuid
@@ -9238,6 +10132,68 @@ components:
 
 
             **Operations write it at `venue` scope.**'
+    ResaleFeePolicy:
+      type: object
+      x-ticvai-persistence: orders.resale_fee_policy
+      description: '**What a resale costs and how high it may be priced.** The listing snapshots these
+        onto itself at creation; this is where they come from.
+
+        **A rule and its snapshot are two rows on purpose.** `payments.fee_rule` and `orders.order_fee`
+        already work this way — changing a commission must not restate what somebody already sold at.'
+      required:
+      - sellerFeePercent
+      - buyerFeePercent
+      - isActive
+      properties:
+        id:
+          type: string
+          format: uuid
+        eventId:
+          type: string
+          format: uuid
+          nullable: true
+          description: '**The narrowest match wins.** Null is the venue default; a policy naming an
+            event overrides it for that event, because a final and a Tuesday fixture do not resell
+            on the same terms.'
+        productId:
+          type: string
+          format: uuid
+          nullable: true
+        sellerFeePercent:
+          type: number
+          description: Deducted from the seller's proceeds.
+        buyerFeePercent:
+          type: number
+          description: Added to what the buyer pays.
+        priceCapPercent:
+          type: number
+          nullable: true
+          description: '**A ceiling as a percentage of face value.** Null means uncapped, which stays a
+            venue decision rather than a default — the wording `ResaleListing.priceCapPercent` already
+            uses, kept identical so the snapshot and its source cannot drift apart in meaning.
+
+            **Anti-scalping limits are regulated in several jurisdictions**; whether they bind in the
+            UAE and Oman is recorded as a research item on the resale backlog entry and is not settled
+            here.'
+        minimumAskPrice:
+          $ref: ../shared/common.yaml#/components/schemas/Money
+        feesShownToSeller:
+          type: boolean
+          description: '**Whether the seller sees the deduction before listing.** A seller who learns
+            the commission at payout is a complaint, and `ListingCreationSellerConfiguration` already
+            draws an `estimatedProceeds` that needs this to be true to mean anything.'
+        effectiveFrom:
+          type: string
+          format: date-time
+          nullable: true
+        effectiveTo:
+          type: string
+          format: date-time
+          nullable: true
+        isActive:
+          type: boolean
+        scopePath:
+          type: string
     ResaleListing:
       type: object
       x-ticvai-persistence: orders.resale_listing
@@ -9319,6 +10275,49 @@ components:
 
 
             **Operations write it at `venue` scope.**'
+    TicketTemplateRequest:
+      type: object
+      description: Request only; persisted as `TicketTemplate`. On update every field is optional and
+        absent means unchanged. On create, `name` and `mediaType` are required and the operation enforces it.
+      properties:
+        name:
+          type: string
+          maxLength: 200
+        mediaType:
+          type: string
+          enum:
+          - thermalTicket
+          - a4Pdf
+          - wristband
+          - rfidCard
+          - walletPass
+          - qrOnly
+          - sms
+        isRecyclable:
+          type: boolean
+        recycleAfterDays:
+          type: integer
+          minimum: 0
+          nullable: true
+        appliesToProductKinds:
+          type: array
+          items:
+            type: string
+        appliesToChannels:
+          type: array
+          items:
+            $ref: ../shared/common.yaml#/components/schemas/SalesChannel
+        selectionPriority:
+          type: integer
+        layoutRef:
+          type: string
+          description: The artwork, as a media-asset reference.
+        localeVariants:
+          type: object
+          additionalProperties:
+            type: string
+        isActive:
+          type: boolean
     TicketTemplate:
       type: object
       x-ticvai-persistence: orders.ticket_template
@@ -10612,7 +11611,7 @@ components:
             card needs replacing.
 
     BillingStatement:
-      x-ticvai-persistence: none — computed from orders.order_payment and payments.dunning_case
+      x-ticvai-persistence: none — computed from orders.payment and payments.dunning_case
       type: object
       description: >
         2.14.19-2.14.23, 5.7.96, BL-100. **What a guest was charged over a period, and
@@ -10743,6 +11742,33 @@ components:
         quantity:
           type: integer
           minimum: 1
+        eligibilityDeclaration:
+          type: array
+          nullable: true
+          items:
+            type: object
+            properties:
+              ageBand:
+                type: string
+                enum:
+                - infant
+                - child
+                - junior
+                - adult
+                - senior
+                description: Infant under 3, child 3–12, junior 13–17, adult 18–59, senior 60+.
+              ageYears:
+                type: integer
+                nullable: true
+              heightBandIndex:
+                type: integer
+                nullable: true
+              confidentSwimmer:
+                type: boolean
+                nullable: true
+              guardianSigned:
+                type: boolean
+          description: What was declared for each guest on this line, kept as the record staff check at the gate.
         quotedUnitPrice:
           allOf:
           - $ref: ../shared/common.yaml#/components/schemas/Money
@@ -10961,12 +11987,14 @@ components:
           items:
             $ref: '#/components/schemas/CartConflict'
         subtotal:
+          x-ticvai-column: net_amount
           $ref: ../shared/common.yaml#/components/schemas/Money
         discountTotal:
           $ref: ../shared/common.yaml#/components/schemas/Money
         taxTotal:
           $ref: ../shared/common.yaml#/components/schemas/Money
         total:
+          x-ticvai-column: gross_amount
           $ref: ../shared/common.yaml#/components/schemas/Money
         appliedPromotionIds:
           type: array

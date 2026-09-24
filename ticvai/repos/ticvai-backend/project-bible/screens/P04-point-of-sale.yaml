@@ -204,6 +204,10 @@ screens:
         notes: 'Shown when `LoginResponse.requiresRoleSelection` is true. **The role decides the surface**:
           a cashier lands on POS-001, kitchen staff on KIT-002. Same app, different door out.'
   apis:
+  - operationId: changeOwnCredential
+    contract: identity
+    purpose: Replace a temporary PIN or password at first sign-in
+    trigger: onAction
   - operationId: login
     contract: identity
     purpose: Authenticate the operator at this terminal

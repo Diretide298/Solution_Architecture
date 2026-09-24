@@ -90,3 +90,27 @@ Member-level bans go in `BannedSymbols.txt` with `BannedApiAnalyzers` — compil
 ### Brace expansion in `sh`
 
 `/bin/sh` is dash in most containers. `mkdir -p src/{a,b,c}` creates one directory literally named `{a,b,c}`. Use `bash` or explicit paths.
+
+### A correct contract edit fails the suite
+
+You change one contract, the YAML is valid, and `check-package` fails — on diagrams, on the
+schema workbook, on six mirrors. **The checkers read derived artefacts, not what you edited.** A
+contract feeds `schema-reference.json`, `api-data-lineage.json`, `relationship-graph.json`,
+`backend/tenant/*.sql`, `TICVAI_Schema_Reference.xlsx` and the diagrams, and every root file ends
+up in six mirrors under `repos/`.
+
+It is not only contracts. Changing **one number** inside `handoff/service-decomposition.json` made
+all 198 diagrams stale. A file in `tools/` is mirrored too.
+
+Run the derive sequence in `tools/refresh.sh` order, **`derive-mirrors.py` last**, then check.
+Picking derivers by what looks relevant is how this is missed — it was missed three times in one
+session that way. **Never run a deriver while `run-checks.py` is running**: they write the files it
+reads. **Never hand-edit `backend/tenant/*.sql` or `920-row-level-security.sql`** — both say
+*Derived. Do not hand-edit* and `derive-ddl.py` regenerates them from the contract.
+
+### A document that quotes a defect fails the check for that defect
+
+`check-package` scans every `docs/` and `handoff/` markdown file for platform codes. A register
+that quotes an offending string to record it reproduces the error it records. `conflicts.md` and
+`conflict-status.md` are exempt because they must quote history; anything else should **describe
+the defect rather than quote it**, not be added to the exemption.

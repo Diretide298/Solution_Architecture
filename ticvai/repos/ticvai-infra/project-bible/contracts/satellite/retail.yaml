@@ -1246,7 +1246,7 @@ components:
           description: >
             The stock item depleted on sale. Null means the item sells but never runs out,
             which is almost always a configuration error.
-        price: { $ref: '../shared/common.yaml#/components/schemas/Money' }
+        price: { $ref: '../shared/common.yaml#/components/schemas/Money', x-ticvai-column: list_price }
         onHand: { type: number }
         isReturnable: { type: boolean, default: true }
         returnWindowDays: { type: integer, nullable: true }
@@ -1366,7 +1366,7 @@ components:
                 type: boolean
                 description: False once the window has passed or the line is fully returned.
               notReturnableReason: { type: string, nullable: true }
-        subtotal: { $ref: '../shared/common.yaml#/components/schemas/Money' }
+        subtotal: { $ref: '../shared/common.yaml#/components/schemas/Money', x-ticvai-column: net_amount }
         discountAmount: { $ref: '../shared/common.yaml#/components/schemas/Money' }
         taxAmount: { $ref: '../shared/common.yaml#/components/schemas/Money' }
         grossAmount: { $ref: '../shared/common.yaml#/components/schemas/Money' }

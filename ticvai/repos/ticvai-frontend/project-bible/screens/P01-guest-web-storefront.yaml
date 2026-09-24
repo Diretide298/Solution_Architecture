@@ -626,6 +626,10 @@ screens:
       Anything that spends money, holds capacity or changes the account waits for the connection, and
       its button says so rather than failing.'
   apis:
+  - operationId: getProductEligibilityRule
+    contract: catalogue
+    purpose: Age and height limits
+    trigger: onLoad
   - operationId: getProduct
     contract: catalogue
     purpose: Read a product
@@ -902,6 +906,10 @@ screens:
       Anything that spends money, holds capacity or changes the account waits for the connection, and
       its button says so rather than failing.'
   apis:
+  - operationId: checkBookingEligibility
+    contract: catalogue
+    purpose: Check the party's ages and heights
+    trigger: onAction
   - operationId: getAvailability
     contract: catalogue
     purpose: Live remaining capacity
@@ -1961,6 +1969,14 @@ screens:
     offline: '**Not available, and the offline banner says why.** A payment needs the gateway, and pretending
       otherwise takes money nobody can confirm. What was typed stays on screen so nothing is entered twice.'
   apis:
+  - operationId: checkGuestCheckoutMatch
+    contract: marketing-crm
+    purpose: Does this contact already have a profile here
+    trigger: onAction
+  - operationId: decideGuestCheckoutMatch
+    contract: marketing-crm
+    purpose: Use the existing profile or keep separate
+    trigger: onAction
   - operationId: transferOrderTickets
     contract: orders
     purpose: Transfer tickets to another guest
@@ -3931,6 +3947,22 @@ screens:
       Anything that spends money, holds capacity or changes the account waits for the connection, and
       its button says so rather than failing.'
   apis:
+  - operationId: listBillingStatements
+    contract: orders
+    purpose: Membership billing statements
+    trigger: onLoad
+  - operationId: getBillingStatement
+    contract: orders
+    purpose: One statement, line by line
+    trigger: onLoad
+  - operationId: listMyPaymentIssues
+    contract: payments
+    purpose: Declined renewals waiting on the guest
+    trigger: onLoad
+  - operationId: retryMyDunningPayment
+    contract: payments
+    purpose: Retry a declined payment, on another card if needed
+    trigger: onAction
   - operationId: transferOrderTickets
     contract: orders
     purpose: Transfer tickets to another guest
@@ -3949,6 +3981,10 @@ screens:
     params:
     - name: orderId
       from: deepLink
+    - name: caseId
+      from: navigation
+    - name: statementId
+      from: navigation
     coldEntry: '**A guest opening an order link weeks later.** Shows the order if it still resolves; if
       it was refunded or the performance passed, says which and offers the order list rather than an error.'
     preloaded:
@@ -5106,6 +5142,18 @@ screens:
       changing and cancelling need the connection — a table held offline is a table two people think they
       have.'
   apis:
+  - operationId: listGroupPackages
+    contract: catalogue
+    purpose: School-trip formats and party packages
+    trigger: onLoad
+  - operationId: getGroupPackageDefinition
+    contract: catalogue
+    purpose: What a package includes
+    trigger: onLoad
+  - operationId: requestGroupBooking
+    contract: orders
+    purpose: Ask for a school trip or a birthday party
+    trigger: onAction
   - operationId: listReservations
     contract: orders
     purpose: List reservations
@@ -5139,6 +5187,8 @@ screens:
     - name: groupBookingId
       from: navigation
     - name: resourceId
+      from: navigation
+    - name: productId
       from: navigation
     coldEntry: '**A guest arriving cold on a link that no longer resolves is shown what happened and one
       way onward — never a 404.** A shared ticket, a forwarded confirmation and a push notification opened
@@ -5851,6 +5901,14 @@ screens:
     offline: '**The offline banner shows.** The menu already loaded stays with its age. Ordering, claiming
       a table and booking wait for the connection — an order placed offline is food nobody is making.'
   apis:
+  - operationId: getFnbDeliveryPolicy
+    contract: fnb
+    purpose: Minimum order, delivery fee and area
+    trigger: onLoad
+  - operationId: listFulfilmentSlots
+    contract: fnb
+    purpose: Collection times or delivery windows still open
+    trigger: onLoad
   - operationId: getGuestMenu
     contract: fnb
     purpose: The menu a guest sees

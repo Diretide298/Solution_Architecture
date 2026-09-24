@@ -218,7 +218,9 @@ def check_file(path: Path, known_schemas: set[str]) -> set[str]:
         # which is the same class of hole as a checker validating a truncated file.
         has_scope_path = re.search(r"^\s+scope_path\s", head, re.M) is not None
         has_venue_id = re.search(r"^\s+venue_id\s", head, re.M) is not None
-        needs_rls = has_scope_path or has_venue_id
+        # **A control table scoped only by venue_id is exempt** (24 September): the control database has
+        # no scope tree to resolve a venue against, and its venue tables are operator records.
+        needs_rls = has_scope_path or (has_venue_id and not table.startswith("control."))
 
         # **Satisfied either longhand or by `apply_scope_rls`**, which does all three in one call
         # and is how the generated series protects 249 tables. The longhand form stays accepted

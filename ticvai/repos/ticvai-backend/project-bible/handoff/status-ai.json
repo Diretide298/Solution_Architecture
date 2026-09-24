@@ -38,7 +38,7 @@
   "redis": 4,
   "qdrant": 1
  },
- "generated": "2026-09-21",
+ "generated": "2026-09-24",
  "note": "Derived by closure from the contract, not listed. See handoff/README.md \u2014 the hand-maintained version of this drifted four times in one day.",
  "counts": {
   "operations": 33,
@@ -48,7 +48,7 @@
   "tables": 51,
   "screens": 40,
   "flows": 11,
-  "documents": 37,
+  "documents": 38,
   "openConflicts": 1
  },
  "metrics": {
@@ -176,6 +176,11 @@
  },
  "unmodelledLifecycles": [],
  "documents": [
+  {
+   "file": "docs\\active\\action-register-22-september.md",
+   "title": "Action register \u2014 22 September 2026",
+   "status": ""
+  },
   {
    "file": "docs\\active\\ai-scope-for-confirmation.md",
    "title": "AI scope \u2014 for confirmation",

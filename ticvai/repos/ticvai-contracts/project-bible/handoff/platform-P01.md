@@ -5,16 +5,16 @@
 | | |
 |---|---|
 | Screens | 46 |
-| Operations | 154 |
-| Contracts | 17 |
+| Operations | 167 |
+| Contracts | 18 |
 | Modules | 13 |
 | Undrawn | 0 |
-| Operations with no screen | 12 |
+| Operations with no screen | 10 |
 | Waves | wave1 21 · wave2 21 · wave3 4 |
 
 ## Gaps
 
-### 12 operations with no screen here
+### 10 operations with no screen here
 
 **In a contract this platform uses, callable by its audience, and reaching no screen on any platform serving that audience.** Either a screen is missing or the endpoint should not exist — and the second is worth considering first.
 
@@ -29,8 +29,6 @@
 | `listLeaderboard` | marketing-crm | GET | Standings, by nickname |
 | `listRewards` | marketing-crm | GET | What points can be turned into |
 | `setLeaderboardNickname` | marketing-crm | PUT | Choose the name shown on the board |
-| `getBillingStatement` | orders | GET | One statement, with its lines |
-| `listBillingStatements` | orders | GET | What was charged, when, and against which agreement |
 | `recordRecommendationOutcome` | promotions | POST | Shown, clicked, accepted or dismissed |
 
 ### 5 modules split across waves
@@ -68,15 +66,15 @@
 | `WEB-001` | Home / Landing | Discovery & Browse | 1 | 3 | yes |
 | `WEB-002` | Event & Attraction Listing | Discovery & Browse | 1 | 4 | yes |
 | `WEB-003` | Search Results | Discovery & Browse | 1 | 2 | yes |
-| `WEB-004` | Attraction Details | Discovery & Browse | 1 | 4 | yes |
+| `WEB-004` | Attraction Details | Discovery & Browse | 1 | 5 | yes |
 | `WEB-005` | Ticket Type Selection | Booking & Selection | 1 | 2 | yes |
-| `WEB-006` | Date & Session Selection | Booking & Selection | 1 | 3 | yes |
+| `WEB-006` | Date & Session Selection | Booking & Selection | 1 | 4 | yes |
 | `WEB-007` | Interactive Seat Selection | Booking & Selection | 2 | 3 | yes |
 | `WEB-008` | Add-ons & Upsell | Booking & Selection | 2 | 4 | yes |
 | `WEB-009` | Wishlist | Booking & Selection | 3 | 3 | yes |
 | `WEB-010` | Shopping Cart | Cart & Checkout | 1 | 10 | yes |
 | `WEB-011` | Guest Details & Attendee Forms | Cart & Checkout | 1 | 11 | yes |
-| `WEB-012` | Checkout — Payment | Cart & Checkout | 1 | 5 | yes |
+| `WEB-012` | Checkout — Payment | Cart & Checkout | 1 | 7 | yes |
 | `WEB-013` | Booking Confirmation | Cart & Checkout | 1 | 3 | yes |
 | `WEB-014` | Pay for a Booking | Cart & Checkout | 1 | 2 | yes |
 | `WEB-015` | Branded Queue / Waiting Room | High-Demand Access | 2 | 3 | yes |
@@ -87,7 +85,7 @@
 | `WEB-020` | Profile & Preferences | Account & Self-Service | 1 | 6 | yes |
 | `WEB-021` | Wallet & Gift Cards | Membership, Loyalty & Value | 2 | 7 | yes |
 | `WEB-022` | Membership Plans | Membership, Loyalty & Value | 2 | 4 | yes |
-| `WEB-023` | Membership Management | Membership, Loyalty & Value | 2 | 3 | yes |
+| `WEB-023` | Membership Management | Membership, Loyalty & Value | 2 | 7 | yes |
 | `WEB-024` | Devices, Wishlist & Consent | Membership, Loyalty & Value | 3 | 15 | yes |
 | `WEB-025` | Help Centre / FAQ | Engagement & Support | 1 | 3 | yes |
 | `WEB-026` | Survey & Feedback | Engagement & Support | 3 | 1 | yes |
@@ -95,12 +93,12 @@
 | `WEB-028` | Contact & Venue Information | Engagement & Support | 1 | 1 | yes |
 | `WEB-029` | Error / Sold Out / Maintenance | System States | 1 | 1 | yes |
 | `WEB-030` | Ticket Transfer | Ticketing | 1 | 4 | yes |
-| `WEB-031` | My Reservations | Ticketing | 2 | 6 | yes |
+| `WEB-031` | My Reservations | Ticketing | 2 | 9 | yes |
 | `WEB-032` | Offers & Promotions | Promotions | 2 | 3 | yes |
 | `WEB-033` | Shop | Retail | 2 | 4 | yes |
 | `WEB-034` | Lost & Found | Support | 3 | 3 | yes |
 | `WEB-035` | Multi-Currency & Pricing | Ticketing | 1 | 2 | yes |
-| `WEB-036` | F&B – Browse & Order | In-venue Services | 2 | 10 | yes |
+| `WEB-036` | F&B – Browse & Order | In-venue Services | 2 | 12 | yes |
 | `WEB-037` | Menu Item Detail | In-venue Services | 2 | 2 | yes |
 | `WEB-038` | F&B – Order Tracking | In-venue Services | 2 | 3 | yes |
 | `WEB-039` | Venue Map & Wait Times | In-venue Services | 2 | 4 | yes |

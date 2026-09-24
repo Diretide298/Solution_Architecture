@@ -4082,14 +4082,15 @@
   ],
   "writes": [
    "cache:idempotency",
-   "identity.principal"
+   "identity.principal",
+   "identity.principal_credential"
   ],
   "routing": "",
   "scope": "venue",
   "perm": "USER_MANAGE",
   "offline": false,
   "summary": "Create a principal",
-  "source": "derived",
+  "source": "hand-mapped",
   "service": "IdentityService",
   "stores": [
    "postgres",
@@ -8554,12 +8555,14 @@
    "cache:idempotency",
    "fnb.location_session",
    "fnb.menu_item",
-   "inventory.stock_level"
+   "inventory.stock_level",
+   "fnb.delivery_policy"
   ],
   "writes": [
    "cache:idempotency",
-   "fnb.service_order",
-   "fnb.kitchen_ticket"
+   "fnb.kitchen_ticket",
+   "fnb.order_fulfilment",
+   "fnb.service_order"
   ],
   "routing": "",
   "scope": "venue",
@@ -17180,6 +17183,9 @@
   "path": "/tenant-config/modules",
   "reads": [
    "cache:resolution",
+   "control.licence_add_on",
+   "subscription.contract",
+   "subscription.plan",
    "whitelabel.module_enablement"
   ],
   "writes": [
@@ -17190,7 +17196,7 @@
   "perm": "TENANT_CONFIGURE",
   "offline": false,
   "summary": "Read module enablement",
-  "source": "derived",
+  "source": "hand-mapped",
   "service": "WhiteLabelService",
   "stores": [
    "postgres",
@@ -17206,6 +17212,9 @@
   "path": "/tenant-config/modules",
   "reads": [
    "cache:idempotency",
+   "control.licence_add_on",
+   "subscription.contract",
+   "subscription.plan",
    "whitelabel.module_enablement"
   ],
   "writes": [
@@ -17218,7 +17227,7 @@
   "perm": "TENANT_CONFIGURE",
   "offline": false,
   "summary": "Enable or disable modules",
-  "source": "derived",
+  "source": "hand-mapped",
   "service": "WhiteLabelService",
   "stores": [
    "postgres",
@@ -39899,14 +39908,18 @@
   "contract": "white-label",
   "verb": "DELETE",
   "path": "/tenant-domains/{domainId}",
-  "reads": [],
-  "writes": [],
+  "reads": [
+   "whitelabel.custom_domain"
+  ],
+  "writes": [
+   "whitelabel.custom_domain"
+  ],
   "routing": null,
   "scope": "tenant",
   "perm": "TENANT_CONFIGURE",
   "offline": false,
   "summary": "Give the domain up",
-  "source": "derived",
+  "source": "hand-mapped",
   "audience": [
    "staff"
   ],
@@ -39965,14 +39978,18 @@
   "contract": "seating",
   "verb": "DELETE",
   "path": "/seat-holds/{holdId}",
-  "reads": [],
-  "writes": [],
+  "reads": [
+   "seating.seat_hold"
+  ],
+  "writes": [
+   "seating.seat_hold"
+  ],
   "routing": null,
   "scope": "venue",
   "perm": "ORDER_CREATE",
   "offline": false,
   "summary": "Release a hold",
-  "source": "derived",
+  "source": "hand-mapped",
   "audience": [
    "staff"
   ],
@@ -50240,14 +50257,18 @@
   "contract": "orders",
   "verb": "GET",
   "path": "/billing-statements/{statementId}",
-  "reads": [],
+  "reads": [
+   "orders.payment",
+   "payments.dunning_case",
+   "orders.sales_order"
+  ],
   "writes": [],
   "routing": "replica",
   "scope": "tenant",
   "perm": null,
   "offline": false,
   "summary": "One statement, with its lines",
-  "source": "derived",
+  "source": "hand-mapped",
   "audience": [
    "guest",
    "staff"
@@ -50284,14 +50305,18 @@
   "contract": "orders",
   "verb": "GET",
   "path": "/billing-statements",
-  "reads": [],
+  "reads": [
+   "orders.payment",
+   "payments.dunning_case",
+   "orders.sales_order"
+  ],
   "writes": [],
   "routing": "replica",
   "scope": "tenant",
   "perm": null,
   "offline": false,
   "summary": "What was charged, when, and against which agreement",
-  "source": "derived",
+  "source": "hand-mapped",
   "audience": [
    "guest",
    "staff"
@@ -50547,6 +50572,1037 @@
    "staff"
   ],
   "service": "IdentityService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "getFnbServiceChargePolicy": {
+  "contract": "fnb",
+  "verb": "GET",
+  "path": "/service-charge-policy",
+  "reads": [
+   "fnb.service_charge_policy"
+  ],
+  "writes": [],
+  "routing": "replica",
+  "scope": "venue",
+  "perm": "PRODUCT_VIEW",
+  "offline": true,
+  "summary": "The service charge a venue applies, and on what",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "FnbService",
+  "stores": [
+   "derived",
+   "postgres",
+   "postgres-analytical",
+   "redis"
+  ]
+ },
+ "setFnbServiceChargePolicy": {
+  "contract": "fnb",
+  "verb": "PUT",
+  "path": "/service-charge-policy",
+  "reads": [
+   "fnb.service_charge_policy"
+  ],
+  "writes": [
+   "fnb.service_charge_policy"
+  ],
+  "routing": null,
+  "scope": "venue",
+  "perm": "PRODUCT_CONFIGURE",
+  "offline": false,
+  "summary": "Set the service charge",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "FnbService",
+  "stores": [
+   "derived",
+   "postgres",
+   "postgres-analytical",
+   "redis"
+  ]
+ },
+ "getResaleFeePolicy": {
+  "contract": "orders",
+  "verb": "GET",
+  "path": "/resale-fee-policy",
+  "reads": [
+   "orders.resale_fee_policy"
+  ],
+  "writes": [],
+  "routing": "replica",
+  "scope": "venue",
+  "perm": "ORDER_VIEW",
+  "offline": false,
+  "summary": "The commission and price cap a resale listing is created under",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "OrderService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "listTemperatureCheckpoints": {
+  "contract": "fnb",
+  "verb": "GET",
+  "path": "/food-safety/checkpoints",
+  "reads": [
+   "fnb.temperature_checkpoint"
+  ],
+  "writes": [],
+  "routing": "replica",
+  "scope": "venue",
+  "perm": "PRODUCT_VIEW",
+  "offline": true,
+  "summary": "The units that get read, and the range each must hold",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "FnbService",
+  "stores": [
+   "derived",
+   "postgres",
+   "postgres-analytical",
+   "redis"
+  ]
+ },
+ "setResaleFeePolicy": {
+  "contract": "orders",
+  "verb": "PUT",
+  "path": "/resale-fee-policy",
+  "reads": [
+   "orders.resale_fee_policy"
+  ],
+  "writes": [
+   "orders.resale_fee_policy"
+  ],
+  "routing": null,
+  "scope": "venue",
+  "perm": "ORDER_CONFIGURE",
+  "offline": false,
+  "summary": "Set resale commission and the price ceiling",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "OrderService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "setTemperatureCheckpoint": {
+  "contract": "fnb",
+  "verb": "PUT",
+  "path": "/food-safety/checkpoints",
+  "reads": [
+   "fnb.temperature_checkpoint"
+  ],
+  "writes": [
+   "fnb.temperature_checkpoint"
+  ],
+  "routing": null,
+  "scope": "venue",
+  "perm": "PRODUCT_CONFIGURE",
+  "offline": false,
+  "summary": "Define a checkpoint and its safe range",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "FnbService",
+  "stores": [
+   "derived",
+   "postgres",
+   "postgres-analytical",
+   "redis"
+  ]
+ },
+ "getCommandCentre": {
+  "contract": "reporting",
+  "verb": "GET",
+  "path": "/command-centre",
+  "reads": [
+   "reporting.dashboard",
+   "reporting.dashboard_tile"
+  ],
+  "writes": [],
+  "routing": "analytical",
+  "scope": "venue",
+  "perm": "REPORT_VIEW_VENUE",
+  "offline": false,
+  "summary": "The dashboards this login may see, grouped by module",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "ReportingService",
+  "stores": [
+   "derived",
+   "postgres",
+   "postgres-analytical",
+   "redis"
+  ]
+ },
+ "getFnbReservationPolicy": {
+  "contract": "fnb",
+  "verb": "GET",
+  "path": "/reservation-policy",
+  "reads": [
+   "fnb.reservation_policy"
+  ],
+  "writes": [],
+  "routing": "replica",
+  "scope": "venue",
+  "perm": "PRODUCT_VIEW",
+  "offline": true,
+  "summary": "How long a table is held, by party size",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "FnbService",
+  "stores": [
+   "derived",
+   "postgres",
+   "postgres-analytical",
+   "redis"
+  ]
+ },
+ "setFnbReservationPolicy": {
+  "contract": "fnb",
+  "verb": "PUT",
+  "path": "/reservation-policy",
+  "reads": [
+   "fnb.reservation_policy"
+  ],
+  "writes": [
+   "fnb.reservation_policy"
+  ],
+  "routing": null,
+  "scope": "venue",
+  "perm": "PRODUCT_CONFIGURE",
+  "offline": false,
+  "summary": "Set turn times and seating buffers",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "FnbService",
+  "stores": [
+   "derived",
+   "postgres",
+   "postgres-analytical",
+   "redis"
+  ]
+ },
+ "changeOwnCredential": {
+  "contract": "identity",
+  "verb": "POST",
+  "path": "/auth/credential",
+  "reads": [
+   "cache:idempotency",
+   "identity.principal",
+   "identity.principal_credential",
+   "identity.password_policy"
+  ],
+  "writes": [
+   "cache:idempotency",
+   "identity.principal_credential",
+   "identity.session"
+  ],
+  "routing": null,
+  "scope": "tenant",
+  "perm": null,
+  "offline": false,
+  "summary": "Change the caller's own password or PIN",
+  "source": "hand-mapped",
+  "audience": [
+   "staff",
+   "partner"
+  ],
+  "service": "IdentityService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "createGroupBooking": {
+  "contract": "orders",
+  "verb": "POST",
+  "path": "/group-bookings",
+  "reads": [
+   "cache:idempotency",
+   "orders.group_booking",
+   "orders.sales_order",
+   "pii.subject"
+  ],
+  "writes": [
+   "cache:idempotency",
+   "orders.group_booking"
+  ],
+  "routing": null,
+  "scope": "venue",
+  "perm": "ORDER_CREATE",
+  "offline": false,
+  "summary": "Turn an order into a group booking",
+  "source": "hand-mapped",
+  "audience": [
+   "staff"
+  ],
+  "service": "OrderService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "createTicketTemplate": {
+  "contract": "orders",
+  "verb": "POST",
+  "path": "/ticket-templates",
+  "reads": [
+   "cache:idempotency",
+   "orders.ticket_template"
+  ],
+  "writes": [
+   "cache:idempotency",
+   "orders.ticket_template"
+  ],
+  "routing": null,
+  "scope": "venue",
+  "perm": "PRODUCT_CONFIGURE",
+  "offline": false,
+  "summary": "Create a ticket template",
+  "source": "hand-mapped",
+  "audience": [
+   "staff"
+  ],
+  "service": "OrderService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "listTicketTemplates": {
+  "contract": "orders",
+  "verb": "GET",
+  "path": "/ticket-templates",
+  "reads": [
+   "orders.ticket_template"
+  ],
+  "writes": [],
+  "routing": "replica",
+  "scope": "venue",
+  "perm": "PRODUCT_VIEW",
+  "offline": false,
+  "summary": "The ticket templates a venue issues from",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "OrderService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "resetPrincipalCredential": {
+  "contract": "identity",
+  "verb": "POST",
+  "path": "/principals/{principalId}/credential-reset",
+  "reads": [
+   "cache:idempotency",
+   "identity.principal",
+   "identity.principal_credential"
+  ],
+  "writes": [
+   "cache:idempotency",
+   "identity.principal_credential",
+   "identity.session"
+  ],
+  "routing": null,
+  "scope": "venue",
+  "perm": "USER_MANAGE",
+  "offline": false,
+  "summary": "Reset a member of staff's password or PIN",
+  "source": "hand-mapped",
+  "audience": [
+   "staff"
+  ],
+  "service": "IdentityService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "setDenominations": {
+  "contract": "shift",
+  "verb": "PUT",
+  "path": "/denominations",
+  "reads": [
+   "cache:idempotency",
+   "platform.denomination"
+  ],
+  "writes": [
+   "cache:idempotency",
+   "platform.denomination"
+  ],
+  "routing": null,
+  "scope": "region",
+  "perm": "REGION_CONFIGURE",
+  "offline": false,
+  "summary": "Set the notes and coins a region's tills count",
+  "source": "hand-mapped",
+  "audience": [
+   "staff"
+  ],
+  "service": "OrderService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "updateGroupBooking": {
+  "contract": "orders",
+  "verb": "PATCH",
+  "path": "/group-bookings/{groupBookingId}",
+  "reads": [
+   "cache:idempotency",
+   "orders.group_booking",
+   "pii.subject"
+  ],
+  "writes": [
+   "cache:idempotency",
+   "orders.group_booking"
+  ],
+  "routing": null,
+  "scope": "venue",
+  "perm": "ORDER_MODIFY",
+  "offline": false,
+  "summary": "Confirm numbers, change the leader or cancel a group",
+  "source": "hand-mapped",
+  "audience": [
+   "staff"
+  ],
+  "service": "OrderService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "updateTicketTemplate": {
+  "contract": "orders",
+  "verb": "PATCH",
+  "path": "/ticket-templates/{templateId}",
+  "reads": [
+   "cache:idempotency",
+   "orders.ticket_template"
+  ],
+  "writes": [
+   "cache:idempotency",
+   "orders.ticket_template"
+  ],
+  "routing": null,
+  "scope": "venue",
+  "perm": "PRODUCT_CONFIGURE",
+  "offline": false,
+  "summary": "Change or retire a ticket template",
+  "source": "hand-mapped",
+  "audience": [
+   "staff"
+  ],
+  "service": "OrderService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "getOrderCalendarEvent": {
+  "contract": "orders",
+  "verb": "GET",
+  "path": "/orders/{orderId}/calendar-event",
+  "reads": [
+   "orders.sales_order",
+   "orders.order_line",
+   "platform.scope"
+  ],
+  "writes": [],
+  "routing": "replica",
+  "scope": "venue",
+  "perm": "ORDER_VIEW",
+  "offline": false,
+  "summary": "The visit as a calendar entry",
+  "source": "hand-mapped",
+  "audience": [
+   "guest",
+   "staff"
+  ],
+  "service": "OrderService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "getVisitReminder": {
+  "contract": "orders",
+  "verb": "GET",
+  "path": "/orders/{orderId}/reminder",
+  "reads": [
+   "orders.visit_reminder"
+  ],
+  "writes": [],
+  "routing": "replica",
+  "scope": "venue",
+  "perm": "ORDER_VIEW",
+  "offline": false,
+  "summary": "The guest's reminder for this booking",
+  "source": "derived",
+  "audience": [
+   "guest"
+  ],
+  "service": "OrderService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "setVisitReminder": {
+  "contract": "orders",
+  "verb": "PUT",
+  "path": "/orders/{orderId}/reminder",
+  "reads": [
+   "orders.visit_reminder"
+  ],
+  "writes": [
+   "orders.visit_reminder"
+  ],
+  "routing": null,
+  "scope": "venue",
+  "perm": "ORDER_VIEW",
+  "offline": false,
+  "summary": "Turn a visit reminder on or off",
+  "source": "derived",
+  "audience": [
+   "guest"
+  ],
+  "service": "OrderService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "checkBookingEligibility": {
+  "contract": "catalogue",
+  "verb": "POST",
+  "path": "/eligibility-checks",
+  "reads": [
+   "catalogue.product_eligibility_rule",
+   "catalogue.product"
+  ],
+  "writes": [],
+  "routing": null,
+  "scope": "venue",
+  "perm": "PRODUCT_VIEW",
+  "offline": false,
+  "summary": "Can this party take part",
+  "source": "hand-mapped",
+  "audience": [
+   "guest",
+   "staff"
+  ],
+  "service": "CatalogueService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "checkGuestCheckoutMatch": {
+  "contract": "marketing-crm",
+  "verb": "POST",
+  "path": "/guest-checkout/profile-match",
+  "reads": [
+   "marketing.guest_match_policy",
+   "marketing.guest_profile",
+   "orders.cart"
+  ],
+  "writes": [],
+  "routing": null,
+  "scope": "venue",
+  "perm": null,
+  "offline": false,
+  "summary": "Does this contact already have a profile here",
+  "source": "hand-mapped",
+  "audience": [
+   "guest"
+  ],
+  "service": "MarketingService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "decideGuestCheckoutMatch": {
+  "contract": "marketing-crm",
+  "verb": "POST",
+  "path": "/guest-checkout/profile-match/decision",
+  "reads": [
+   "cache:idempotency",
+   "marketing.guest_match_decision",
+   "marketing.guest_profile",
+   "orders.cart"
+  ],
+  "writes": [
+   "cache:idempotency",
+   "marketing.guest_match_decision",
+   "orders.cart"
+  ],
+  "routing": null,
+  "scope": "venue",
+  "perm": null,
+  "offline": false,
+  "summary": "Use the existing profile or keep this booking separate",
+  "source": "hand-mapped",
+  "audience": [
+   "guest"
+  ],
+  "service": "MarketingService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "getBookingFlowConfig": {
+  "contract": "white-label",
+  "verb": "GET",
+  "path": "/tenant-config/booking-flow",
+  "reads": [
+   "whitelabel.tenant_config"
+  ],
+  "writes": [],
+  "routing": "replica",
+  "scope": "tenant",
+  "perm": "TENANT_CONFIGURE",
+  "offline": false,
+  "summary": "How the guest booking flow looks and steps",
+  "source": "hand-mapped",
+  "audience": [
+   "staff"
+  ],
+  "service": "WhiteLabelService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "getDepositPolicy": {
+  "contract": "orders",
+  "verb": "GET",
+  "path": "/deposit-policy",
+  "reads": [
+   "orders.deposit_policy"
+  ],
+  "writes": [],
+  "routing": "replica",
+  "scope": "venue",
+  "perm": "PRODUCT_VIEW",
+  "offline": false,
+  "summary": "What a deposit booking takes now and when the rest is due",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "OrderService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "getFnbDeliveryPolicy": {
+  "contract": "fnb",
+  "verb": "GET",
+  "path": "/fnb-delivery-policy",
+  "reads": [
+   "fnb.delivery_policy"
+  ],
+  "writes": [],
+  "routing": "replica",
+  "scope": "venue",
+  "perm": "PRODUCT_VIEW",
+  "offline": false,
+  "summary": "How an outlet does takeaway and delivery",
+  "source": "derived",
+  "audience": [
+   "staff",
+   "guest"
+  ],
+  "service": "FnbService",
+  "stores": [
+   "derived",
+   "postgres",
+   "postgres-analytical",
+   "redis"
+  ]
+ },
+ "getGroupPackageDefinition": {
+  "contract": "catalogue",
+  "verb": "GET",
+  "path": "/products/{productId}/group-package",
+  "reads": [
+   "catalogue.group_package"
+  ],
+  "writes": [],
+  "routing": "replica",
+  "scope": "venue",
+  "perm": "PRODUCT_VIEW",
+  "offline": false,
+  "summary": "A school-trip format or party package",
+  "source": "derived",
+  "audience": [
+   "staff",
+   "guest"
+  ],
+  "service": "CatalogueService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "getGuestMatchPolicy": {
+  "contract": "marketing-crm",
+  "verb": "GET",
+  "path": "/guest-match-policy",
+  "reads": [
+   "marketing.guest_match_policy"
+  ],
+  "writes": [],
+  "routing": "replica",
+  "scope": "venue",
+  "perm": "MARKETING_VIEW",
+  "offline": false,
+  "summary": "How returning guests are recognised at checkout",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "MarketingService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "getProductEligibilityRule": {
+  "contract": "catalogue",
+  "verb": "GET",
+  "path": "/products/{productId}/eligibility-rule",
+  "reads": [
+   "catalogue.product_eligibility_rule"
+  ],
+  "writes": [],
+  "routing": "replica",
+  "scope": "venue",
+  "perm": "PRODUCT_VIEW",
+  "offline": false,
+  "summary": "Who may take part: age, height, supervision",
+  "source": "derived",
+  "audience": [
+   "staff",
+   "guest"
+  ],
+  "service": "CatalogueService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "listFulfilmentSlots": {
+  "contract": "fnb",
+  "verb": "GET",
+  "path": "/outlets/{outletId}/fulfilment-slots",
+  "reads": [
+   "fnb.delivery_policy",
+   "platform.outlet"
+  ],
+  "writes": [],
+  "routing": "replica",
+  "scope": "venue",
+  "perm": null,
+  "offline": false,
+  "summary": "Collection times or delivery windows still open",
+  "source": "hand-mapped",
+  "audience": [
+   "guest"
+  ],
+  "service": "FnbService",
+  "stores": [
+   "derived",
+   "postgres",
+   "postgres-analytical",
+   "redis"
+  ]
+ },
+ "listGroupPackages": {
+  "contract": "catalogue",
+  "verb": "GET",
+  "path": "/group-packages",
+  "reads": [
+   "catalogue.group_package"
+  ],
+  "writes": [],
+  "routing": "replica",
+  "scope": "venue",
+  "perm": "PRODUCT_VIEW",
+  "offline": false,
+  "summary": "The school-trip formats or party packages on offer",
+  "source": "derived",
+  "audience": [
+   "guest",
+   "staff"
+  ],
+  "service": "CatalogueService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "listMyPaymentIssues": {
+  "contract": "payments",
+  "verb": "GET",
+  "path": "/guests/me/payment-issues",
+  "reads": [
+   "payments.dunning_case"
+  ],
+  "writes": [],
+  "routing": "replica",
+  "scope": "tenant",
+  "perm": null,
+  "offline": false,
+  "summary": "A guest's own failed recurring payments",
+  "source": "derived",
+  "audience": [
+   "guest"
+  ],
+  "service": "OrderService",
+  "stores": [
+   "postgres"
+  ]
+ },
+ "requestGroupBooking": {
+  "contract": "orders",
+  "verb": "POST",
+  "path": "/group-booking-requests",
+  "reads": [
+   "cache:idempotency",
+   "catalogue.group_package",
+   "catalogue.product",
+   "orders.group_booking"
+  ],
+  "writes": [
+   "cache:idempotency",
+   "orders.group_booking",
+   "orders.sales_order"
+  ],
+  "routing": null,
+  "scope": "venue",
+  "perm": null,
+  "offline": false,
+  "summary": "Ask for a school trip or a birthday party",
+  "source": "hand-mapped",
+  "audience": [
+   "guest"
+  ],
+  "service": "OrderService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "retryMyDunningPayment": {
+  "contract": "payments",
+  "verb": "POST",
+  "path": "/dunning-cases/{caseId}/retry",
+  "reads": [
+   "cache:idempotency",
+   "payments.dunning_case"
+  ],
+  "writes": [
+   "cache:idempotency",
+   "payments.dunning_case"
+  ],
+  "routing": null,
+  "scope": "tenant",
+  "perm": null,
+  "offline": false,
+  "summary": "Retry a declined membership payment now",
+  "source": "hand-mapped",
+  "audience": [
+   "guest"
+  ],
+  "service": "OrderService",
+  "stores": [
+   "postgres"
+  ]
+ },
+ "setBookingFlowConfig": {
+  "contract": "white-label",
+  "verb": "PUT",
+  "path": "/tenant-config/booking-flow",
+  "reads": [
+   "cache:idempotency",
+   "whitelabel.tenant_config"
+  ],
+  "writes": [
+   "cache:idempotency",
+   "cache:resolution",
+   "whitelabel.tenant_config"
+  ],
+  "routing": null,
+  "scope": "tenant",
+  "perm": "TENANT_CONFIGURE",
+  "offline": false,
+  "summary": "Set how the guest booking flow looks and steps",
+  "source": "hand-mapped",
+  "audience": [
+   "staff"
+  ],
+  "service": "WhiteLabelService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "setDepositPolicy": {
+  "contract": "orders",
+  "verb": "PUT",
+  "path": "/deposit-policy",
+  "reads": [
+   "orders.deposit_policy"
+  ],
+  "writes": [
+   "orders.deposit_policy"
+  ],
+  "routing": null,
+  "scope": "venue",
+  "perm": "PRODUCT_CONFIGURE",
+  "offline": false,
+  "summary": "Set how deposits work",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "OrderService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "setFnbDeliveryPolicy": {
+  "contract": "fnb",
+  "verb": "PUT",
+  "path": "/fnb-delivery-policy",
+  "reads": [
+   "fnb.delivery_policy"
+  ],
+  "writes": [
+   "fnb.delivery_policy"
+  ],
+  "routing": null,
+  "scope": "venue",
+  "perm": "PRODUCT_CONFIGURE",
+  "offline": false,
+  "summary": "Set takeaway and delivery rules",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "FnbService",
+  "stores": [
+   "derived",
+   "postgres",
+   "postgres-analytical",
+   "redis"
+  ]
+ },
+ "setGroupPackageDefinition": {
+  "contract": "catalogue",
+  "verb": "PUT",
+  "path": "/products/{productId}/group-package",
+  "reads": [
+   "catalogue.group_package"
+  ],
+  "writes": [
+   "catalogue.group_package"
+  ],
+  "routing": null,
+  "scope": "venue",
+  "perm": "PRODUCT_CONFIGURE",
+  "offline": false,
+  "summary": "Define a school-trip format or party package",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "CatalogueService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "setGuestMatchPolicy": {
+  "contract": "marketing-crm",
+  "verb": "PUT",
+  "path": "/guest-match-policy",
+  "reads": [
+   "marketing.guest_match_policy"
+  ],
+  "writes": [
+   "marketing.guest_match_policy"
+  ],
+  "routing": null,
+  "scope": "venue",
+  "perm": "MARKETING_MANAGE",
+  "offline": false,
+  "summary": "Set how returning guests are recognised",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "MarketingService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "setProductEligibilityRule": {
+  "contract": "catalogue",
+  "verb": "PUT",
+  "path": "/products/{productId}/eligibility-rule",
+  "reads": [
+   "catalogue.product_eligibility_rule"
+  ],
+  "writes": [
+   "catalogue.product_eligibility_rule"
+  ],
+  "routing": null,
+  "scope": "venue",
+  "perm": "PRODUCT_CONFIGURE",
+  "offline": false,
+  "summary": "Set age, height and supervision limits",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "CatalogueService",
   "stores": [
    "postgres",
    "redis"

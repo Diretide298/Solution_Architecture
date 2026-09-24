@@ -3,7 +3,7 @@
 -- its use** — orders reaches catalogue, catalogue reaches platform, and something
 -- reaches back. Tables first, constraints last, is the only ordering that terminates.
 --
--- 616 of 658 declared references. The ones that reach the
+-- 618 of 660 declared references. The ones that reach the
 -- other database are in ../990-cross-database-references.sql and are not constraints
 -- any more.
 
@@ -399,6 +399,7 @@ ALTER TABLE orders.refund ADD CONSTRAINT fk_refund_order_id FOREIGN KEY (order_i
 ALTER TABLE orders.refund ADD CONSTRAINT fk_refund_requested_by_principal_id FOREIGN KEY (requested_by_principal_id) REFERENCES identity.principal(id);
 ALTER TABLE orders.refund ADD CONSTRAINT fk_refund_secondary_principal_id FOREIGN KEY (secondary_principal_id) REFERENCES identity.principal(id);
 ALTER TABLE orders.refund_policy ADD CONSTRAINT fk_refund_policy_venue_id FOREIGN KEY (venue_id) REFERENCES platform.scope(id);
+ALTER TABLE orders.resale_fee_policy ADD CONSTRAINT fk_resale_fee_policy_product_id FOREIGN KEY (product_id) REFERENCES catalogue.product(id);
 ALTER TABLE orders.resale_listing ADD CONSTRAINT fk_resale_listing_entitlement_id FOREIGN KEY (entitlement_id) REFERENCES access.entitlement(id);
 ALTER TABLE orders.reservation ADD CONSTRAINT fk_reservation_converted_order_id FOREIGN KEY (converted_order_id) REFERENCES orders.sales_order(id);
 ALTER TABLE orders.reservation ADD CONSTRAINT fk_reservation_venue_id FOREIGN KEY (venue_id) REFERENCES platform.scope(id);
@@ -411,6 +412,7 @@ ALTER TABLE orders.ticket_transfer ADD CONSTRAINT fk_ticket_transfer_from_subjec
 ALTER TABLE orders.ticket_transfer ADD CONSTRAINT fk_ticket_transfer_order_id FOREIGN KEY (order_id) REFERENCES orders.sales_order(id);
 ALTER TABLE orders.ticket_transfer ADD CONSTRAINT fk_ticket_transfer_to_subject_id FOREIGN KEY (to_subject_id) REFERENCES pii.subject(id);
 ALTER TABLE orders.upgrade ADD CONSTRAINT fk_upgrade_order_id FOREIGN KEY (order_id) REFERENCES orders.sales_order(id);
+ALTER TABLE orders.visit_reminder ADD CONSTRAINT fk_visit_reminder_order_id FOREIGN KEY (order_id) REFERENCES orders.sales_order(id);
 ALTER TABLE orders.wallet_pass ADD CONSTRAINT fk_wallet_pass_entitlement_id FOREIGN KEY (entitlement_id) REFERENCES access.entitlement(id);
 ALTER TABLE payments.deposit_activity ADD CONSTRAINT fk_deposit_activity_payment_id FOREIGN KEY (payment_id) REFERENCES orders.payment(id);
 ALTER TABLE payments.dunning_case ADD CONSTRAINT fk_dunning_case_order_id FOREIGN KEY (order_id) REFERENCES orders.sales_order(id);

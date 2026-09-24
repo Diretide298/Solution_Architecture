@@ -2,7 +2,7 @@ openapi: 3.1.0
 info:
   title: TICVAI White Label Builder
   version: 0.1.0
-  x-ticvai-screen-count: 32
+  x-ticvai-screen-count: 46
   x-ticvai-tier: satellite
   x-ticvai-module: 19 — Guest Mobile App & Branding (builder)
   x-ticvai-requirements: 107
@@ -243,6 +243,8 @@ paths:
   /footer:
     put:
       operationId: setFooter
+      x-ticvai-consumed-by:
+        - "P13 CMS-007 Page Builder"
       summary: Footer columns, legal links and social
       description: 'BL-002. **A header is chrome and a footer is a link surface**, which is why this is
         not `setHeader` with different fields.
@@ -370,6 +372,7 @@ paths:
         - "P05 KSK-002 Language Select"
         - "P08 BO-599 Manual Configuration Center"
         - "P08 BO-834 Digital Experience Center"
+        - "P13 CMS-001 Tenant Workspace"
         - "P13 CMS-012 RTL Preview"
         - "P13 CMS-016 Site Settings"
       x-ticvai-audience:
@@ -416,6 +419,7 @@ paths:
         - "P02 GST-038 Digital Companion Mode"
         - "P02 GST-047 Maintenance / Upgrade Page"
         - "P05 KSK-002 Language Select"
+        - "P13 CMS-001 Tenant Workspace"
         - "P13 CMS-014 Publishing Workflow"
       x-ticvai-audience:
       - device
@@ -441,6 +445,8 @@ paths:
                 $ref: '#/components/schemas/TenantAppStatus'
     put:
       operationId: setMaintenanceMode
+      x-ticvai-consumed-by:
+        - "P13 CMS-001 Tenant Workspace"
       x-ticvai-audience:
       - staff
       summary: Enable or clear maintenance mode
@@ -485,6 +491,7 @@ paths:
       x-ticvai-consumed-by:
         - "P09 ADM-016 White-Label Branding Management"
         - "P13 CMS-002 Brand Kit"
+        - "P13 CMS-004 Logo & Assets"
       x-ticvai-audience:
       - staff
       x-ticvai-read-routing: replica
@@ -508,6 +515,7 @@ paths:
         - "P08 BO-836 Design System & Components"
         - "P09 ADM-016 White-Label Branding Management"
         - "P13 CMS-002 Brand Kit"
+        - "P13 CMS-004 Logo & Assets"
       x-ticvai-audience:
       - staff
       summary: Set logo, favicon and splash
@@ -548,6 +556,7 @@ paths:
       operationId: getAppIcons
       x-ticvai-consumed-by:
         - "P09 ADM-016 White-Label Branding Management"
+        - "P13 CMS-004 Logo & Assets"
       x-ticvai-audience:
       - staff
       x-ticvai-read-routing: replica
@@ -569,6 +578,7 @@ paths:
       operationId: setAppIcons
       x-ticvai-consumed-by:
         - "P09 ADM-016 White-Label Branding Management"
+        - "P13 CMS-004 Logo & Assets"
       x-ticvai-audience:
       - staff
       summary: Set app icons
@@ -611,6 +621,69 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+  /tenant-config/booking-flow:
+    get:
+      operationId: getBookingFlowConfig
+      x-ticvai-consumed-by:
+        - "P13 CMS-016 Site Settings"
+      summary: How the guest booking flow looks and steps
+      tags:
+      - branding
+      x-ticvai-permission: TENANT_CONFIGURE
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: tenant
+      x-ticvai-read-routing: replica
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      responses:
+        '200':
+          description: The current setting
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BookingFlowConfig'
+        '403':
+          $ref: ../shared/common.yaml#/components/responses/Forbidden
+    put:
+      operationId: setBookingFlowConfig
+      x-ticvai-consumed-by:
+        - "P13 CMS-016 Site Settings"
+      summary: Set how the guest booking flow looks and steps
+      description: '**Design gap, 23 September.** The booking design has a white-label engine drawer (preset,
+        step indicator, card and cart layout, extras step, seat picker, map view, density, embed mode) and
+        White Labelling had no setting or screen for any of it. **Part of the published tenant config**,
+        like the theme: a change goes live through `publishTenantConfig`, never directly.
+
+        '
+      tags:
+      - branding
+      x-ticvai-permission: TENANT_CONFIGURE
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: tenant
+      x-ticvai-config-scope: tenant
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BookingFlowConfig'
+      responses:
+        '200':
+          description: Saved
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BookingFlowConfig'
+        '400':
+          $ref: ../shared/common.yaml#/components/responses/BadRequest
+        '403':
+          $ref: ../shared/common.yaml#/components/responses/Forbidden
   /tenant-config/theme:
     get:
       operationId: getTheme
@@ -922,6 +995,8 @@ paths:
                         $ref: '#/components/schemas/Banner'
     post:
       operationId: createBanner
+      x-ticvai-consumed-by:
+        - "P13 CMS-008 Content Blocks"
       x-ticvai-audience:
       - staff
       summary: Create a banner
@@ -960,6 +1035,8 @@ paths:
         format: uuid
     patch:
       operationId: updateBanner
+      x-ticvai-consumed-by:
+        - "P13 CMS-008 Content Blocks"
       x-ticvai-audience:
       - staff
       summary: Amend or activate a banner
@@ -1028,6 +1105,8 @@ paths:
         format: uuid
     patch:
       operationId: updatePromoBlock
+      x-ticvai-consumed-by:
+        - "P13 CMS-008 Content Blocks"
       x-ticvai-audience:
       - staff
       summary: Amend a promotional block
@@ -1083,6 +1162,8 @@ paths:
           $ref: ../shared/common.yaml#/components/responses/NotFound
     delete:
       operationId: deletePromoBlock
+      x-ticvai-consumed-by:
+        - "P13 CMS-008 Content Blocks"
       x-ticvai-audience:
       - staff
       summary: Delete a promotional block
@@ -1125,6 +1206,8 @@ paths:
                   $ref: '#/components/schemas/PromoBlock'
     post:
       operationId: createPromoBlock
+      x-ticvai-consumed-by:
+        - "P13 CMS-008 Content Blocks"
       x-ticvai-audience:
       - staff
       summary: Create a promotional block
@@ -1161,6 +1244,7 @@ paths:
         - "P02 GST-040 Help & Support"
         - "P02 GST-057 Accessibility Information"
         - "P08 BO-837 Page & Landing Builder"
+        - "P13 CMS-007 Page Builder"
       x-ticvai-audience:
       - staff
       - guest
@@ -1203,6 +1287,7 @@ paths:
       operationId: createContentPage
       x-ticvai-consumed-by:
         - "P08 BO-837 Page & Landing Builder"
+        - "P13 CMS-007 Page Builder"
       x-ticvai-audience:
       - staff
       summary: Create a content page
@@ -1243,6 +1328,8 @@ paths:
         format: uuid
     put:
       operationId: updateContentPage
+      x-ticvai-consumed-by:
+        - "P13 CMS-007 Page Builder"
       x-ticvai-audience:
       - staff
       summary: Amend a content page
@@ -1374,6 +1461,7 @@ paths:
       x-ticvai-consumed-by:
         - "P08 BO-243 Policy Approval, Audit, Analytics & AI Optimization"
         - "P09 ADM-018 Localisation & Language Pack"
+        - "P13 CMS-018 Consent & Legal"
       x-ticvai-audience:
       - staff
       x-ticvai-read-routing: replica
@@ -1404,6 +1492,7 @@ paths:
       operationId: setPolicy
       x-ticvai-consumed-by:
         - "P09 ADM-018 Localisation & Language Pack"
+        - "P13 CMS-018 Consent & Legal"
       x-ticvai-audience:
       - staff
       x-ticvai-config-scope: tenant
@@ -1458,6 +1547,8 @@ paths:
   /tenant-config/modules:
     get:
       operationId: getModuleEnablement
+      x-ticvai-consumed-by:
+        - "P13 CMS-001 Tenant Workspace"
       x-ticvai-audience:
       - staff
       x-ticvai-read-routing: replica
@@ -1483,6 +1574,8 @@ paths:
                   $ref: '#/components/schemas/ModuleEnablement'
     put:
       operationId: setModuleEnablement
+      x-ticvai-consumed-by:
+        - "P13 CMS-001 Tenant Workspace"
       x-ticvai-audience:
       - staff
       x-ticvai-config-scope: tenant
@@ -1539,6 +1632,8 @@ paths:
   /tenant-config/features:
     get:
       operationId: getFeatureToggles
+      x-ticvai-consumed-by:
+        - "P13 CMS-001 Tenant Workspace"
       x-ticvai-audience:
       - staff
       x-ticvai-read-routing: replica
@@ -1560,6 +1655,8 @@ paths:
                   $ref: '#/components/schemas/FeatureToggle'
     put:
       operationId: setFeatureToggles
+      x-ticvai-consumed-by:
+        - "P13 CMS-001 Tenant Workspace"
       x-ticvai-audience:
       - staff
       x-ticvai-config-scope: tenant
@@ -2341,6 +2438,103 @@ components:
         requiresRebuild:
           type: boolean
           readOnly: true
+    BookingFlowConfig:
+      type: object
+      x-ticvai-persistence: none — embedded in tenant_config
+      properties:
+        preset:
+          type: string
+          enum:
+          - auto
+          - ticketBox
+          - playCentre
+          - venueSite
+          - marketplace
+          - singleEvent
+          - season
+          - custom
+          default: auto
+          description: L1 Ticket box … L6 Season. `auto` picks by venue type; `custom` applies none.
+        stepIndicator:
+          type: string
+          enum:
+          - bar
+          - numbered
+          - dots
+          - segmented
+          - breadcrumb
+          - pills
+          - ticks
+          - none
+          default: bar
+        cartLayout:
+          type: string
+          enum:
+          - sidebarRight
+          - sidebarLeft
+          - slideInRight
+          - slideUpBottom
+          - singleColumn
+          default: sidebarRight
+        cardLayout:
+          type: string
+          maxLength: 40
+          nullable: true
+        cardSize:
+          type: string
+          enum:
+          - compact
+          - regular
+          - large
+          nullable: true
+        extrasStep:
+          type: string
+          enum:
+          - auto
+          - always
+          - never
+          default: auto
+        seatPicker:
+          type: string
+          enum:
+          - bowl
+          - zonesThenSeats
+          - zonesOnly
+          - seatsOnly
+          nullable: true
+        mapView:
+          type: string
+          enum:
+          - 2d
+          - 3d
+          default: 3d
+        density:
+          type: string
+          enum:
+          - compact
+          - comfortable
+          - airy
+          default: comfortable
+        embedMode:
+          type: string
+          enum:
+          - fullPage
+          - embedded
+          default: fullPage
+          description: '`embedded` hides the hero banner, event page and venue header, for a flow placed inside
+            the venue''s own site.'
+        heroBanner:
+          type: boolean
+          default: true
+        searchInBanner:
+          type: boolean
+          default: true
+        singleEventPage:
+          type: boolean
+          default: false
+        quantitiesOnAddOns:
+          type: boolean
+          default: true
     Theme:
       x-ticvai-persistence: none — embedded in tenant_config
       type: object
@@ -3200,6 +3394,8 @@ components:
           $ref: '#/components/schemas/BrandIdentity'
         appIcons:
           $ref: '#/components/schemas/AppIcons'
+        bookingFlow:
+          $ref: '#/components/schemas/BookingFlowConfig'
         theme:
           $ref: '#/components/schemas/Theme'
         fonts:

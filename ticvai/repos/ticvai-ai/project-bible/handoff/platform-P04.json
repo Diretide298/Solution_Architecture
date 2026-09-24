@@ -7,15 +7,15 @@
  "audience": "staff",
  "formFactor": "posTerminal",
  "offlineCapable": true,
- "generated": "2026-09-21",
+ "generated": "2026-09-24",
  "note": "Derived by tools/derive-platform.py. **The gaps section is the point** \u2014 a page listing what exists is a directory; one listing what is missing is a worklist.",
  "counts": {
   "screens": 30,
-  "operations": 140,
+  "operations": 141,
   "contracts": 20,
   "modules": 4,
   "undrawn": 0,
-  "operationsWithNoScreen": 189
+  "operationsWithNoScreen": 194
  },
  "waves": {
   "wave1": 27,
@@ -83,11 +83,11 @@
    "operations": 7
   },
   {
-   "contract": "seating",
-   "operations": 6
+   "contract": "identity",
+   "operations": 7
   },
   {
-   "contract": "identity",
+   "contract": "seating",
    "operations": 6
   },
   {
@@ -103,28 +103,20 @@
    "operations": 3
   },
   {
-   "contract": "queue",
-   "operations": 3
-  },
-  {
    "contract": "approvals",
    "operations": 3
   },
   {
-   "contract": "games",
-   "operations": 2
+   "contract": "queue",
+   "operations": 3
   },
   {
    "contract": "workforce",
    "operations": 2
   },
   {
-   "contract": "wallet",
-   "operations": 1
-  },
-  {
-   "contract": "assets",
-   "operations": 1
+   "contract": "games",
+   "operations": 2
   },
   {
    "contract": "finance",
@@ -132,6 +124,14 @@
   },
   {
    "contract": "inventory",
+   "operations": 1
+  },
+  {
+   "contract": "wallet",
+   "operations": 1
+  },
+  {
+   "contract": "assets",
    "operations": 1
   }
  ],
@@ -142,7 +142,7 @@
    "module": "Shift",
    "wave": 1,
    "route": "/sign-in",
-   "operations": 5,
+   "operations": 6,
    "drawn": true
   },
   {
@@ -656,6 +656,18 @@
     "summary": "Escalate a finding"
    },
    {
+    "operation": "getFnbReservationPolicy",
+    "contract": "fnb",
+    "verb": "GET",
+    "summary": "How long a table is held, by party size"
+   },
+   {
+    "operation": "getFnbServiceChargePolicy",
+    "contract": "fnb",
+    "verb": "GET",
+    "summary": "The service charge a venue applies, and on what"
+   },
+   {
     "operation": "listFnbRecommendations",
     "contract": "fnb",
     "verb": "GET",
@@ -666,6 +678,12 @@
     "contract": "fnb",
     "verb": "GET",
     "summary": "Approved substitutions for a recipe's ingredients"
+   },
+   {
+    "operation": "listTemperatureCheckpoints",
+    "contract": "fnb",
+    "verb": "GET",
+    "summary": "The units that get read, and the range each must hold"
    },
    {
     "operation": "rebalanceStationLoad",
@@ -704,6 +722,18 @@
     "summary": "What the guest chooses, and what it costs extra"
    },
    {
+    "operation": "setFnbReservationPolicy",
+    "contract": "fnb",
+    "verb": "PUT",
+    "summary": "Set turn times and seating buffers"
+   },
+   {
+    "operation": "setFnbServiceChargePolicy",
+    "contract": "fnb",
+    "verb": "PUT",
+    "summary": "Set the service charge"
+   },
+   {
     "operation": "setIngredientSubstitutes",
     "contract": "fnb",
     "verb": "PUT",
@@ -720,6 +750,12 @@
     "contract": "fnb",
     "verb": "PUT",
     "summary": "Divide the floor into sections and give each a server"
+   },
+   {
+    "operation": "setTemperatureCheckpoint",
+    "contract": "fnb",
+    "verb": "PUT",
+    "summary": "Define a checkpoint and its safe range"
    },
    {
     "operation": "updateTable",
@@ -1070,22 +1106,16 @@
     "summary": "Extend a reservation"
    },
    {
-    "operation": "getBillingStatement",
+    "operation": "getResaleFeePolicy",
     "contract": "orders",
     "verb": "GET",
-    "summary": "One statement, with its lines"
+    "summary": "The commission and price cap a resale listing is created under"
    },
    {
     "operation": "issueInvitation",
     "contract": "orders",
     "verb": "POST",
     "summary": "Issue a complimentary entitlement, with no payment expected"
-   },
-   {
-    "operation": "listBillingStatements",
-    "contract": "orders",
-    "verb": "GET",
-    "summary": "What was charged, when, and against which agreement"
    },
    {
     "operation": "listDeposits",
@@ -1142,12 +1172,6 @@
     "summary": "A credit limit for an individual booking ahead"
    },
    {
-    "operation": "printTicketProof",
-    "contract": "orders",
-    "verb": "POST",
-    "summary": "Print a sample without selling anything"
-   },
-   {
     "operation": "pushWalletPassUpdate",
     "contract": "orders",
     "verb": "POST",
@@ -1164,6 +1188,12 @@
     "contract": "orders",
     "verb": "PUT",
     "summary": ""
+   },
+   {
+    "operation": "setResaleFeePolicy",
+    "contract": "orders",
+    "verb": "PUT",
+    "summary": "Set resale commission and the price ceiling"
    },
    {
     "operation": "assignCoupon",

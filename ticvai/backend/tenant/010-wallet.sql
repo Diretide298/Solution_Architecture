@@ -5,7 +5,7 @@
 -- saying what it is
 CREATE TABLE IF NOT EXISTS wallet.accounting_mapping (
     breakage_policy                   jsonb,
-    scope_path                        text,
+    scope_path                        ltree,
     id                                uuid PRIMARY KEY NOT NULL
 );
 
@@ -21,7 +21,7 @@ CREATE TABLE IF NOT EXISTS wallet.adjustment (
     performed_by                      uuid,
     approved_by                       uuid,
     at                                timestamptz,
-    scope_path                        text
+    scope_path                        ltree
 );
 
 -- Holds 9 columns. No description has been written for this table — the name is the only thing
@@ -31,7 +31,7 @@ CREATE TABLE IF NOT EXISTS wallet.balance (
     wallet_id                         uuid NOT NULL,
     available_balance                 numeric(18,4) NOT NULL,
     hold_balance                      numeric(18,4) NOT NULL,
-    total_balance                     numeric(18,4) NOT NULL,
+    balance_amount                    numeric(18,4) NOT NULL,
     currency_code                     text NOT NULL,
     version                           integer NOT NULL,
     updated_at                        timestamptz NOT NULL,
@@ -49,7 +49,7 @@ CREATE TABLE IF NOT EXISTS wallet.channel_rules (
     offline_floor_limit               numeric(18,4),
     offline_maximum_age_minutes       integer,
     acceptance_point_ids              text[],
-    scope_path                        text,
+    scope_path                        ltree,
     id                                uuid PRIMARY KEY NOT NULL
 );
 
@@ -60,7 +60,7 @@ CREATE TABLE IF NOT EXISTS wallet.configuration_version (
     published_at                      timestamptz,
     published_by                      uuid,
     note                              text,
-    scope_path                        text,
+    scope_path                        ltree,
     id                                uuid PRIMARY KEY NOT NULL
 );
 
@@ -72,7 +72,7 @@ CREATE TABLE IF NOT EXISTS wallet.consumption_policy (
     within_type_order                 text,
     allow_split_tender                boolean,
     allow_guest_choice                boolean,
-    scope_path                        text,
+    scope_path                        ltree,
     id                                uuid PRIMARY KEY NOT NULL
 );
 
@@ -87,7 +87,7 @@ CREATE TABLE IF NOT EXISTS wallet.credential (
     unlinked_at                       timestamptz,
     status                            text,
     replaced_by_credential_id         uuid,
-    scope_path                        text
+    scope_path                        ltree
 );
 
 -- Holds 11 columns. No description has been written for this table — the name is the only thing
@@ -102,7 +102,7 @@ CREATE TABLE IF NOT EXISTS wallet.credit_eligibility (
     minimum_spend                     numeric(18,4),
     maximum_percent_of_basket         numeric(18,4),
     valid_days_of_week                text[],
-    scope_path                        text,
+    scope_path                        ltree,
     id                                uuid PRIMARY KEY NOT NULL
 );
 
@@ -120,7 +120,7 @@ CREATE TABLE IF NOT EXISTS wallet.credit_lot (
     source_reference                  text,
     terms_snapshot                    jsonb,
     status                            text,
-    scope_path                        text
+    scope_path                        ltree
 );
 
 -- Holds 15 columns. No description has been written for this table — the name is the only thing
@@ -139,7 +139,7 @@ CREATE TABLE IF NOT EXISTS wallet.credit_type (
     breakage_eligible                 boolean,
     ledger_account_code               text,
     priority                          integer,
-    scope_path                        text,
+    scope_path                        ltree,
     is_active                         boolean
 );
 
@@ -156,7 +156,7 @@ CREATE TABLE IF NOT EXISTS wallet.dispute (
     status                            text,
     resolution                        text,
     adjustment_id                     uuid,
-    scope_path                        text
+    scope_path                        ltree
 );
 
 -- Holds 11 columns. No description has been written for this table — the name is the only thing
@@ -171,7 +171,7 @@ CREATE TABLE IF NOT EXISTS wallet.funding_rules (
     recurring_funding                 jsonb,
     approval_above_amount             numeric(18,4),
     velocity_limits                   jsonb,
-    scope_path                        text,
+    scope_path                        ltree,
     id                                uuid PRIMARY KEY NOT NULL
 );
 
@@ -205,7 +205,7 @@ CREATE TABLE IF NOT EXISTS wallet.gift_card_product (
     activation_required               boolean,
     credit_type_id                    uuid,
     physical                          boolean,
-    scope_path                        text
+    scope_path                        ltree
 );
 
 -- Holds 12 columns. No description has been written for this table — the name is the only thing
@@ -233,7 +233,7 @@ CREATE TABLE IF NOT EXISTS wallet.refund_policy (
     restore_to_original_lots          boolean,
     restore_original_expiry           boolean,
     wallet_refund_bonus_percent       numeric(18,4),
-    scope_path                        text,
+    scope_path                        ltree,
     id                                uuid PRIMARY KEY NOT NULL
 );
 
@@ -249,13 +249,13 @@ CREATE TABLE IF NOT EXISTS wallet.restriction (
     applied_by                        uuid,
     applied_at                        timestamptz,
     expires_at                        timestamptz,
-    scope_path                        text
+    scope_path                        ltree
 );
 
 -- Holds 2 columns. No description has been written for this table — the name is the only thing
 -- saying what it is
 CREATE TABLE IF NOT EXISTS wallet.risk_rules (
-    scope_path                        text,
+    scope_path                        ltree,
     id                                uuid PRIMARY KEY NOT NULL
 );
 
@@ -267,9 +267,9 @@ CREATE TABLE IF NOT EXISTS wallet.shared_wallet (
     kind                              text NOT NULL,
     owner_principal_id                uuid,
     organisation_id                   uuid,
-    total_budget                      numeric(18,4),
+    budget_amount                     numeric(18,4),
     approval_above_amount             numeric(18,4),
-    scope_path                        text
+    scope_path                        ltree
 );
 
 -- Holds 11 columns. No description has been written for this table — the name is the only thing
@@ -298,7 +298,7 @@ CREATE TABLE IF NOT EXISTS wallet.transfer_rules (
     approval_above_amount             numeric(18,4),
     both_parties_identified           boolean,
     within_shared_wallet_only         boolean,
-    scope_path                        text,
+    scope_path                        ltree,
     id                                uuid PRIMARY KEY NOT NULL
 );
 
@@ -316,7 +316,7 @@ CREATE TABLE IF NOT EXISTS wallet.voucher_type (
     valid_from                        date,
     valid_to                          date,
     issue_limit                       integer,
-    scope_path                        text
+    scope_path                        ltree
 );
 
 -- Holds 9 columns. No description has been written for this table — the name is the only thing
@@ -373,7 +373,7 @@ CREATE TABLE IF NOT EXISTS wallet.wallet_type (
     shared_structure_allowed          boolean,
     lifecycle_states                  text[],
     numbering_pattern                 text,
-    scope_path                        text,
+    scope_path                        ltree,
     is_active                         boolean
 );
 

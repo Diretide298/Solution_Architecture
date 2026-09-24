@@ -7,7 +7,7 @@
  "audience": "staff",
  "formFactor": "kiosk",
  "offlineCapable": true,
- "generated": "2026-09-21",
+ "generated": "2026-09-24",
  "note": "Derived by tools/derive-platform.py. **The gaps section is the point** \u2014 a page listing what exists is a directory; one listing what is missing is a worklist.",
  "counts": {
   "screens": 10,
@@ -15,7 +15,7 @@
   "contracts": 3,
   "modules": 1,
   "undrawn": 0,
-  "operationsWithNoScreen": 31
+  "operationsWithNoScreen": 37
  },
  "waves": {
   "wave2": 10
@@ -174,6 +174,18 @@
     "summary": "Escalate a finding"
    },
    {
+    "operation": "getFnbReservationPolicy",
+    "contract": "fnb",
+    "verb": "GET",
+    "summary": "How long a table is held, by party size"
+   },
+   {
+    "operation": "getFnbServiceChargePolicy",
+    "contract": "fnb",
+    "verb": "GET",
+    "summary": "The service charge a venue applies, and on what"
+   },
+   {
     "operation": "listFnbRecommendations",
     "contract": "fnb",
     "verb": "GET",
@@ -184,6 +196,12 @@
     "contract": "fnb",
     "verb": "GET",
     "summary": "Approved substitutions for a recipe's ingredients"
+   },
+   {
+    "operation": "listTemperatureCheckpoints",
+    "contract": "fnb",
+    "verb": "GET",
+    "summary": "The units that get read, and the range each must hold"
    },
    {
     "operation": "rebalanceStationLoad",
@@ -222,6 +240,18 @@
     "summary": "What the guest chooses, and what it costs extra"
    },
    {
+    "operation": "setFnbReservationPolicy",
+    "contract": "fnb",
+    "verb": "PUT",
+    "summary": "Set turn times and seating buffers"
+   },
+   {
+    "operation": "setFnbServiceChargePolicy",
+    "contract": "fnb",
+    "verb": "PUT",
+    "summary": "Set the service charge"
+   },
+   {
     "operation": "setIngredientSubstitutes",
     "contract": "fnb",
     "verb": "PUT",
@@ -238,6 +268,12 @@
     "contract": "fnb",
     "verb": "PUT",
     "summary": "Divide the floor into sections and give each a server"
+   },
+   {
+    "operation": "setTemperatureCheckpoint",
+    "contract": "fnb",
+    "verb": "PUT",
+    "summary": "Define a checkpoint and its safe range"
    },
    {
     "operation": "updateTable",

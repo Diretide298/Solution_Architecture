@@ -3917,6 +3917,7 @@ components:
           - released
           - expired
         totalPrice:
+          x-ticvai-column: gross_amount
           $ref: ../shared/common.yaml#/components/schemas/Money
         heldByPrincipalId:
           type: string

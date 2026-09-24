@@ -1,0 +1,9100 @@
+{
+ "note": "Derived by tools/derive-delivery-slice.py. Do not hand-edit.",
+ "platforms": {
+  "POS": {
+   "name": "Point of Sale",
+   "screens": [
+    "POS-000",
+    "POS-001",
+    "POS-002",
+    "POS-003",
+    "POS-004",
+    "POS-005",
+    "POS-006",
+    "POS-007",
+    "POS-008",
+    "POS-009",
+    "POS-010",
+    "POS-011",
+    "POS-012",
+    "POS-013",
+    "POS-014",
+    "POS-015",
+    "POS-016",
+    "POS-017",
+    "POS-018",
+    "POS-019",
+    "POS-020",
+    "POS-021",
+    "POS-022",
+    "POS-023",
+    "POS-024",
+    "POS-025",
+    "POS-026",
+    "POS-027",
+    "POS-028",
+    "POS-029",
+    "KIT-001",
+    "KIT-002",
+    "KIT-003",
+    "KIT-004",
+    "KIT-005",
+    "KIT-006",
+    "KIT-007",
+    "KIT-008",
+    "KIT-009",
+    "KIT-010"
+   ]
+  },
+  "WEB": {
+   "name": "Guest App - Web",
+   "screens": [
+    "WEB-001",
+    "WEB-002",
+    "WEB-003",
+    "WEB-004",
+    "WEB-005",
+    "WEB-006",
+    "WEB-007",
+    "WEB-008",
+    "WEB-009",
+    "WEB-010",
+    "WEB-011",
+    "WEB-012",
+    "WEB-013",
+    "WEB-014",
+    "WEB-015",
+    "WEB-016",
+    "WEB-017",
+    "WEB-018",
+    "WEB-019",
+    "WEB-020",
+    "WEB-021",
+    "WEB-022",
+    "WEB-023",
+    "WEB-024",
+    "WEB-025",
+    "WEB-026",
+    "WEB-027",
+    "WEB-028",
+    "WEB-029",
+    "WEB-030",
+    "WEB-031",
+    "WEB-032",
+    "WEB-033",
+    "WEB-034",
+    "WEB-035",
+    "WEB-036",
+    "WEB-037",
+    "WEB-038",
+    "WEB-039",
+    "WEB-040",
+    "WEB-041",
+    "WEB-042",
+    "WEB-043",
+    "WEB-044",
+    "WEB-045",
+    "WEB-046"
+   ]
+  },
+  "MOB": {
+   "name": "Guest App - Mobile",
+   "screens": [
+    "GST-001",
+    "GST-002",
+    "GST-003",
+    "GST-004",
+    "GST-005",
+    "GST-006",
+    "GST-007",
+    "GST-008",
+    "GST-009",
+    "GST-010",
+    "GST-011",
+    "GST-012",
+    "GST-013",
+    "GST-014",
+    "GST-015",
+    "GST-016",
+    "GST-017",
+    "GST-018",
+    "GST-019",
+    "GST-020",
+    "GST-021",
+    "GST-022",
+    "GST-023",
+    "GST-024",
+    "GST-025",
+    "GST-026",
+    "GST-027",
+    "GST-028",
+    "GST-029",
+    "GST-030",
+    "GST-031",
+    "GST-032",
+    "GST-033",
+    "GST-034",
+    "GST-035",
+    "GST-036",
+    "GST-037",
+    "GST-038",
+    "GST-039",
+    "GST-040",
+    "GST-041",
+    "GST-042",
+    "GST-043",
+    "GST-044",
+    "GST-045",
+    "GST-046",
+    "GST-047",
+    "GST-048",
+    "GST-049",
+    "GST-050",
+    "GST-051",
+    "GST-052",
+    "GST-053",
+    "GST-054",
+    "GST-055",
+    "GST-056",
+    "GST-057",
+    "GST-058",
+    "GST-059",
+    "GST-061",
+    "GST-062",
+    "GST-063",
+    "GST-065",
+    "GST-066",
+    "GST-067",
+    "GST-068",
+    "GST-069",
+    "GST-070",
+    "GST-071",
+    "GST-072",
+    "GST-073"
+   ]
+  },
+  "WL": {
+   "name": "White Labelling",
+   "screens": [
+    "CMS-001",
+    "CMS-002",
+    "CMS-003",
+    "CMS-004",
+    "CMS-005",
+    "CMS-006",
+    "CMS-007",
+    "CMS-008",
+    "CMS-009",
+    "CMS-010",
+    "CMS-013",
+    "CMS-011",
+    "CMS-012",
+    "CMS-014",
+    "CMS-015",
+    "CMS-016",
+    "CMS-017",
+    "CMS-018",
+    "CMS-019",
+    "CMS-020",
+    "ADM-016",
+    "ADM-017",
+    "ADM-018"
+   ]
+  }
+ },
+ "counts": {
+  "core": 356,
+  "setup": 109,
+  "allOperations": 2113
+ },
+ "services": {
+  "AccessService": {
+   "core": 13,
+   "setup": 8,
+   "total": 182
+  },
+  "AiService": {
+   "core": 4,
+   "setup": 5,
+   "total": 31
+  },
+  "CatalogueService": {
+   "core": 38,
+   "setup": 31,
+   "total": 404
+  },
+  "FnbService": {
+   "core": 51,
+   "setup": 6,
+   "total": 111
+  },
+  "IdentityService": {
+   "core": 31,
+   "setup": 5,
+   "total": 70
+  },
+  "InventoryService": {
+   "core": 1,
+   "setup": 5,
+   "total": 51
+  },
+  "LedgerService": {
+   "core": 2,
+   "setup": 5,
+   "total": 56
+  },
+  "MarketingService": {
+   "core": 36,
+   "setup": 6,
+   "total": 209
+  },
+  "OrderService": {
+   "core": 73,
+   "setup": 5,
+   "total": 249
+  },
+  "PlatformService": {
+   "core": 0,
+   "setup": 9,
+   "total": 184
+  },
+  "ReportingService": {
+   "core": 8,
+   "setup": 3,
+   "total": 44
+  },
+  "RetailService": {
+   "core": 11,
+   "setup": 3,
+   "total": 25
+  },
+  "TenancyService": {
+   "core": 14,
+   "setup": 9,
+   "total": 156
+  },
+  "VenueOpsService": {
+   "core": 24,
+   "setup": 9,
+   "total": 221
+  },
+  "WalletService": {
+   "core": 5,
+   "setup": 0,
+   "total": 50
+  },
+  "WhiteLabelService": {
+   "core": 45,
+   "setup": 0,
+   "total": 52
+  }
+ },
+ "operations": {
+  "abandonCart": {
+   "part": "core",
+   "service": "OrderService",
+   "contract": "orders",
+   "verb": "DELETE",
+   "path": "/carts/{cartId}",
+   "perm": null,
+   "platforms": [
+    "MOB",
+    "WEB"
+   ],
+   "screens": [
+    "GST-041",
+    "WEB-010"
+   ],
+   "enables": []
+  },
+  "acceptShiftVariance": {
+   "part": "core",
+   "service": "OrderService",
+   "contract": "shift",
+   "verb": "POST",
+   "path": "/shifts/{shiftId}/accept-variance",
+   "perm": "OVERSHORT_ACCEPT",
+   "platforms": [
+    "POS"
+   ],
+   "screens": [
+    "BO-039",
+    "BO-040",
+    "BO-041",
+    "BO-042",
+    "EMP-003",
+    "EMP-009",
+    "POS-001",
+    "POS-007",
+    "POS-009"
+   ],
+   "enables": []
+  },
+  "acquireInventoryHold": {
+   "part": "core",
+   "service": "CatalogueService",
+   "contract": "catalogue",
+   "verb": "POST",
+   "path": "/inventory-holds",
+   "perm": "ORDER_CREATE",
+   "platforms": [
+    "MOB",
+    "POS",
+    "WEB"
+   ],
+   "screens": [
+    "BO-018",
+    "GST-009",
+    "KSK-005",
+    "POS-003",
+    "WEB-006"
+   ],
+   "enables": []
+  },
+  "addBlacklistEntry": {
+   "part": "setup",
+   "service": "AccessService",
+   "contract": "access",
+   "verb": "POST",
+   "path": "/blacklist",
+   "perm": "ACCESS_POINT_CONFIGURE",
+   "platforms": [],
+   "screens": [
+    "BO-033"
+   ],
+   "enables": [
+    "access.blacklist"
+   ]
+  },
+  "addCartLine": {
+   "part": "core",
+   "service": "OrderService",
+   "contract": "orders",
+   "verb": "POST",
+   "path": "/carts/{cartId}/lines",
+   "perm": null,
+   "platforms": [
+    "MOB",
+    "POS",
+    "WEB"
+   ],
+   "screens": [
+    "GST-032",
+    "GST-048",
+    "GST-050",
+    "GST-053",
+    "GST-056",
+    "KSK-006",
+    "KSK-017",
+    "POS-002",
+    "POS-021",
+    "POS-023",
+    "PTR-010",
+    "WEB-008",
+    "WEB-010",
+    "WEB-033"
+   ],
+   "enables": []
+  },
+  "addLicenceAddOn": {
+   "part": "setup",
+   "service": "PlatformService",
+   "contract": "subscription",
+   "verb": "POST",
+   "path": "/tenants/{tenantId}/licences/add-ons",
+   "perm": "PLATFORM_TENANT_MANAGE",
+   "platforms": [],
+   "screens": [
+    "ADM-005",
+    "ADM-007",
+    "ADM-011",
+    "ADM-422"
+   ],
+   "enables": [
+    "control.licence_add_on"
+   ]
+  },
+  "addTip": {
+   "part": "core",
+   "service": "OrderService",
+   "contract": "orders",
+   "verb": "POST",
+   "path": "/payments/{paymentId}/tip",
+   "perm": "ORDER_MODIFY",
+   "platforms": [
+    "POS"
+   ],
+   "screens": [
+    "BO-024",
+    "EMP-035",
+    "POS-005",
+    "PTR-012"
+   ],
+   "enables": []
+  },
+  "addToWishlist": {
+   "part": "core",
+   "service": "MarketingService",
+   "contract": "marketing-crm",
+   "verb": "POST",
+   "path": "/guests/{subjectId}/wishlist",
+   "perm": null,
+   "platforms": [
+    "MOB",
+    "WEB"
+   ],
+   "screens": [
+    "GST-020",
+    "WEB-009",
+    "WEB-011",
+    "WEB-017",
+    "WEB-024",
+    "WEB-027"
+   ],
+   "enables": []
+  },
+  "adjustDepositBoxFloat": {
+   "part": "core",
+   "service": "OrderService",
+   "contract": "shift",
+   "verb": "POST",
+   "path": "/deposit-boxes/{boxId}/adjust-float",
+   "perm": "CASH_ADD",
+   "platforms": [
+    "POS"
+   ],
+   "screens": [
+    "POS-001",
+    "POS-007",
+    "POS-011",
+    "POS-012",
+    "POS-013"
+   ],
+   "enables": []
+  },
+  "allocateDepositBox": {
+   "part": "core",
+   "service": "OrderService",
+   "contract": "shift",
+   "verb": "POST",
+   "path": "/deposit-boxes",
+   "perm": "SHIFT_OPEN",
+   "platforms": [
+    "POS"
+   ],
+   "screens": [
+    "POS-016"
+   ],
+   "enables": []
+  },
+  "analysePromotionConflicts": {
+   "part": "core",
+   "service": "CatalogueService",
+   "contract": "promotions",
+   "verb": "GET",
+   "path": "/promotions/{promotionId}/conflicts",
+   "perm": "PRICE_VIEW",
+   "platforms": [
+    "POS"
+   ],
+   "screens": [
+    "BO-010",
+    "POS-002",
+    "PTR-010"
+   ],
+   "enables": []
+  },
+  "appendEntitlementToMedia": {
+   "part": "core",
+   "service": "OrderService",
+   "contract": "orders",
+   "verb": "POST",
+   "path": "/media/{mediaCode}/entitlements",
+   "perm": "ORDER_CREATE",
+   "platforms": [
+    "POS",
+    "WL"
+   ],
+   "screens": [
+    "BO-027",
+    "CMS-010",
+    "EMP-036",
+    "POS-010"
+   ],
+   "enables": []
+  },
+  "applyManualDiscount": {
+   "part": "core",
+   "service": "OrderService",
+   "contract": "orders",
+   "verb": "POST",
+   "path": "/orders/{orderId}/discounts",
+   "perm": "ORDER_DISCOUNT",
+   "platforms": [
+    "POS"
+   ],
+   "screens": [
+    "BO-022",
+    "BO-023",
+    "BO-026",
+    "BO-047",
+    "BO-051",
+    "BO-070",
+    "EMP-014",
+    "EMP-034",
+    "POS-002",
+    "POS-006",
+    "POS-014",
+    "PTR-002",
+    "PTR-005",
+    "PTR-008",
+    "PTR-015",
+    "PTR-016"
+   ],
+   "enables": []
+  },
+  "approveShiftOpen": {
+   "part": "core",
+   "service": "OrderService",
+   "contract": "shift",
+   "verb": "POST",
+   "path": "/shifts/{shiftId}/approve-open",
+   "perm": "SHIFT_APPROVE_OPEN",
+   "platforms": [
+    "POS"
+   ],
+   "screens": [
+    "BO-039",
+    "BO-040",
+    "BO-041",
+    "BO-042",
+    "EMP-003",
+    "EMP-009",
+    "POS-001",
+    "POS-007",
+    "POS-009"
+   ],
+   "enables": []
+  },
+  "askReportingQuestion": {
+   "part": "core",
+   "service": "ReportingService",
+   "contract": "reporting",
+   "verb": "POST",
+   "path": "/reports/ask",
+   "perm": "REPORT_VIEW_VENUE",
+   "platforms": [
+    "POS"
+   ],
+   "screens": [
+    "ANL-008",
+    "ANL-009",
+    "ANL-019",
+    "ANL-052",
+    "ANL-056",
+    "BO-029",
+    "BO-058",
+    "BO-059",
+    "BO-060",
+    "BO-061",
+    "BO-593",
+    "KIT-010",
+    "POS-008",
+    "PTR-018",
+    "SUP-008"
+   ],
+   "enables": []
+  },
+  "bulkChangePrices": {
+   "part": "setup",
+   "service": "CatalogueService",
+   "contract": "catalogue",
+   "verb": "POST",
+   "path": "/products/bulk-price",
+   "perm": "PRODUCT_CONFIGURE",
+   "platforms": [],
+   "screens": [],
+   "enables": [
+    "catalogue.price_list"
+   ]
+  },
+  "bulkUpdateProducts": {
+   "part": "setup",
+   "service": "InventoryService",
+   "contract": "inventory",
+   "verb": "POST",
+   "path": "/products/bulk",
+   "perm": "PRODUCT_CONFIGURE",
+   "platforms": [],
+   "screens": [
+    "BO-007"
+   ],
+   "enables": [
+    "catalogue.product",
+    "inventory.item"
+   ]
+  },
+  "cancelReservation": {
+   "part": "core",
+   "service": "OrderService",
+   "contract": "orders",
+   "verb": "DELETE",
+   "path": "/reservations/{reservationId}",
+   "perm": "ORDER_CANCEL",
+   "platforms": [
+    "MOB",
+    "WEB"
+   ],
+   "screens": [
+    "GST-016",
+    "GST-017",
+    "WEB-031"
+   ],
+   "enables": []
+  },
+  "capturePayment": {
+   "part": "core",
+   "service": "OrderService",
+   "contract": "orders",
+   "verb": "POST",
+   "path": "/payments/{paymentId}/capture",
+   "perm": "ORDER_CREATE",
+   "platforms": [
+    "POS"
+   ],
+   "screens": [
+    "BO-024",
+    "EMP-035",
+    "POS-005",
+    "PTR-012"
+   ],
+   "enables": []
+  },
+  "changeOwnCredential": {
+   "part": "core",
+   "service": "IdentityService",
+   "contract": "identity",
+   "verb": "POST",
+   "path": "/auth/credential",
+   "perm": null,
+   "platforms": [
+    "POS"
+   ],
+   "screens": [
+    "POS-000"
+   ],
+   "enables": []
+  },
+  "chaseStation": {
+   "part": "core",
+   "service": "FnbService",
+   "contract": "fnb",
+   "verb": "POST",
+   "path": "/kitchen-stations/{stationId}/chase",
+   "perm": "ORDER_MODIFY",
+   "platforms": [
+    "POS"
+   ],
+   "screens": [
+    "KIT-006"
+   ],
+   "enables": []
+  },
+  "checkBookingEligibility": {
+   "part": "core",
+   "service": "CatalogueService",
+   "contract": "catalogue",
+   "verb": "POST",
+   "path": "/eligibility-checks",
+   "perm": "PRODUCT_VIEW",
+   "platforms": [
+    "MOB",
+    "WEB"
+   ],
+   "screens": [
+    "GST-007",
+    "WEB-006"
+   ],
+   "enables": []
+  },
+  "checkGuestCheckoutMatch": {
+   "part": "core",
+   "service": "MarketingService",
+   "contract": "marketing-crm",
+   "verb": "POST",
+   "path": "/guest-checkout/profile-match",
+   "perm": null,
+   "platforms": [
+    "MOB",
+    "WEB"
+   ],
+   "screens": [
+    "GST-009",
+    "WEB-012"
+   ],
+   "enables": []
+  },
+  "checkoutCart": {
+   "part": "core",
+   "service": "OrderService",
+   "contract": "orders",
+   "verb": "POST",
+   "path": "/carts/{cartId}/checkout",
+   "perm": null,
+   "platforms": [
+    "MOB",
+    "WEB"
+   ],
+   "screens": [
+    "GST-009",
+    "GST-032",
+    "GST-041",
+    "KSK-006",
+    "PTR-010",
+    "WEB-010"
+   ],
+   "enables": []
+  },
+  "claimCart": {
+   "part": "core",
+   "service": "OrderService",
+   "contract": "orders",
+   "verb": "POST",
+   "path": "/carts/{cartId}/claim",
+   "perm": null,
+   "platforms": [
+    "MOB",
+    "WEB"
+   ],
+   "screens": [
+    "GST-041",
+    "WEB-016"
+   ],
+   "enables": []
+  },
+  "claimCustomDomain": {
+   "part": "core",
+   "service": "WhiteLabelService",
+   "contract": "white-label",
+   "verb": "POST",
+   "path": "/tenant-domains",
+   "perm": "TENANT_CONFIGURE",
+   "platforms": [
+    "WL"
+   ],
+   "screens": [
+    "ADM-017",
+    "BO-835",
+    "CMS-017"
+   ],
+   "enables": []
+  },
+  "claimLocationSession": {
+   "part": "core",
+   "service": "FnbService",
+   "contract": "fnb",
+   "verb": "POST",
+   "path": "/location-sessions",
+   "perm": null,
+   "platforms": [
+    "MOB",
+    "WEB"
+   ],
+   "screens": [
+    "GST-024",
+    "GST-030",
+    "WEB-036",
+    "WEB-046"
+   ],
+   "enables": []
+  },
+  "claimTableSession": {
+   "part": "core",
+   "service": "FnbService",
+   "contract": "fnb",
+   "verb": "POST",
+   "path": "/table-sessions",
+   "perm": null,
+   "platforms": [
+    "MOB",
+    "WEB"
+   ],
+   "screens": [
+    "GST-024",
+    "GST-025",
+    "WEB-036",
+    "WEB-038"
+   ],
+   "enables": []
+  },
+  "claimTicketTransfer": {
+   "part": "core",
+   "service": "OrderService",
+   "contract": "orders",
+   "verb": "POST",
+   "path": "/ticket-transfers/{transferId}/claim",
+   "perm": null,
+   "platforms": [
+    "MOB",
+    "WEB"
+   ],
+   "screens": [
+    "GST-014",
+    "WEB-030"
+   ],
+   "enables": []
+  },
+  "clearTable": {
+   "part": "core",
+   "service": "FnbService",
+   "contract": "fnb",
+   "verb": "POST",
+   "path": "/tables/{tableId}/clear",
+   "perm": "ORDER_MODIFY",
+   "platforms": [
+    "POS"
+   ],
+   "screens": [
+    "POS-028"
+   ],
+   "enables": []
+  },
+  "cloneProduct": {
+   "part": "setup",
+   "service": "CatalogueService",
+   "contract": "catalogue",
+   "verb": "POST",
+   "path": "/products/{productId}/clone",
+   "perm": "PRODUCT_CONFIGURE",
+   "platforms": [],
+   "screens": [],
+   "enables": [
+    "catalogue.product",
+    "catalogue.variant"
+   ]
+  },
+  "closeDepositBoxes": {
+   "part": "core",
+   "service": "OrderService",
+   "contract": "shift",
+   "verb": "POST",
+   "path": "/deposit-boxes/close",
+   "perm": "SHIFT_CLOSE",
+   "platforms": [
+    "POS"
+   ],
+   "screens": [
+    "BO-024",
+    "POS-007"
+   ],
+   "enables": []
+  },
+  "closeShift": {
+   "part": "core",
+   "service": "OrderService",
+   "contract": "shift",
+   "verb": "POST",
+   "path": "/shifts/{shiftId}/close",
+   "perm": "SHIFT_CLOSE",
+   "platforms": [
+    "POS"
+   ],
+   "screens": [
+    "BO-039",
+    "BO-040",
+    "BO-041",
+    "BO-042",
+    "EMP-003",
+    "EMP-009",
+    "POS-001",
+    "POS-007",
+    "POS-009"
+   ],
+   "enables": []
+  },
+  "closeTableVisit": {
+   "part": "core",
+   "service": "FnbService",
+   "contract": "fnb",
+   "verb": "POST",
+   "path": "/table-visits/{visitId}/close",
+   "perm": "ORDER_CREATE",
+   "platforms": [
+    "POS"
+   ],
+   "screens": [
+    "EMP-059",
+    "POS-028"
+   ],
+   "enables": []
+  },
+  "commitCatalogueImport": {
+   "part": "setup",
+   "service": "CatalogueService",
+   "contract": "catalogue",
+   "verb": "POST",
+   "path": "/products/import/{jobId}/commit",
+   "perm": "PRODUCT_CONFIGURE",
+   "platforms": [],
+   "screens": [],
+   "enables": [
+    "catalogue.product",
+    "catalogue.variant"
+   ]
+  },
+  "completeSsoAuthorization": {
+   "part": "core",
+   "service": "IdentityService",
+   "contract": "identity",
+   "verb": "POST",
+   "path": "/auth/sso/{providerId}/callback",
+   "perm": null,
+   "platforms": [
+    "MOB",
+    "WEB"
+   ],
+   "screens": [
+    "GST-042",
+    "WEB-016"
+   ],
+   "enables": []
+  },
+  "completeUpload": {
+   "part": "core",
+   "service": "VenueOpsService",
+   "contract": "assets",
+   "verb": "POST",
+   "path": "/media/uploads/{uploadId}/complete",
+   "perm": "ASSET_LIBRARY_MANAGE",
+   "platforms": [
+    "WL"
+   ],
+   "screens": [
+    "CMS-002",
+    "CMS-010",
+    "CMS-063"
+   ],
+   "enables": []
+  },
+  "configureQueueFeed": {
+   "part": "setup",
+   "service": "VenueOpsService",
+   "contract": "queue",
+   "verb": "PUT",
+   "path": "/queue-feeds",
+   "perm": "QUEUE_MANAGE",
+   "platforms": [],
+   "screens": [
+    "BO-001",
+    "BO-003"
+   ],
+   "enables": [
+    "queue.feed"
+   ]
+  },
+  "configureWorkstation": {
+   "part": "core",
+   "service": "TenancyService",
+   "contract": "tenancy",
+   "verb": "PUT",
+   "path": "/workstations/{workstationId}",
+   "perm": "WORKSTATION_CONFIGURE",
+   "platforms": [
+    "POS"
+   ],
+   "screens": [
+    "BO-036",
+    "BO-129",
+    "BO-602",
+    "POS-016"
+   ],
+   "enables": []
+  },
+  "copyPriceList": {
+   "part": "setup",
+   "service": "CatalogueService",
+   "contract": "catalogue",
+   "verb": "POST",
+   "path": "/price-lists/{priceListId}/copy",
+   "perm": "PRICE_CONFIGURE",
+   "platforms": [],
+   "screens": [
+    "BO-009",
+    "PTR-006"
+   ],
+   "enables": [
+    "catalogue.price_list"
+   ]
+  },
+  "createAccessPoint": {
+   "part": "setup",
+   "service": "AccessService",
+   "contract": "access",
+   "verb": "POST",
+   "path": "/access-points",
+   "perm": "ACCESS_POINT_CONFIGURE",
+   "platforms": [],
+   "screens": [
+    "BO-064"
+   ],
+   "enables": [
+    "access.access_point"
+   ]
+  },
+  "createAccount": {
+   "part": "setup",
+   "service": "LedgerService",
+   "contract": "finance",
+   "verb": "POST",
+   "path": "/accounts",
+   "perm": "ACCOUNT_CONFIGURE",
+   "platforms": [],
+   "screens": [
+    "BO-074"
+   ],
+   "enables": [
+    "ledger.account"
+   ]
+  },
+  "createAdmissionRules": {
+   "part": "setup",
+   "service": "AccessService",
+   "contract": "access",
+   "verb": "POST",
+   "path": "/admission-rules",
+   "perm": "ACCESS_POINT_CONFIGURE",
+   "platforms": [],
+   "screens": [
+    "BO-032"
+   ],
+   "enables": [
+    "access.admission_rules"
+   ]
+  },
+  "createAiConversation": {
+   "part": "core",
+   "service": "AiService",
+   "contract": "ai",
+   "verb": "POST",
+   "path": "/conversations",
+   "perm": "AI_USE",
+   "platforms": [
+    "MOB",
+    "WEB"
+   ],
+   "screens": [
+    "EMP-019",
+    "EMP-020",
+    "GST-031",
+    "WEB-044"
+   ],
+   "enables": []
+  },
+  "createApprovalDelegation": {
+   "part": "setup",
+   "service": "TenancyService",
+   "contract": "approvals",
+   "verb": "POST",
+   "path": "/delegations",
+   "perm": "APPROVAL_DECIDE",
+   "platforms": [],
+   "screens": [
+    "BO-087"
+   ],
+   "enables": [
+    "approvals.delegation"
+   ]
+  },
+  "createApprovalRequest": {
+   "part": "core",
+   "service": "TenancyService",
+   "contract": "approvals",
+   "verb": "POST",
+   "path": "/approval-requests",
+   "perm": "APPROVAL_REQUEST",
+   "platforms": [
+    "POS"
+   ],
+   "screens": [
+    "ADM-567",
+    "BO-1010",
+    "BO-1031",
+    "BO-1080",
+    "BO-1181",
+    "BO-718",
+    "BO-771",
+    "BO-922",
+    "POS-002",
+    "POS-020"
+   ],
+   "enables": []
+  },
+  "createBanner": {
+   "part": "core",
+   "service": "WhiteLabelService",
+   "contract": "white-label",
+   "verb": "POST",
+   "path": "/tenant-config/banners",
+   "perm": "TENANT_CONFIGURE",
+   "platforms": [
+    "WL"
+   ],
+   "screens": [
+    "CMS-008"
+   ],
+   "enables": []
+  },
+  "createBundle": {
+   "part": "setup",
+   "service": "CatalogueService",
+   "contract": "promotions",
+   "verb": "POST",
+   "path": "/bundles",
+   "perm": "PRODUCT_CONFIGURE",
+   "platforms": [],
+   "screens": [
+    "BO-011"
+   ],
+   "enables": [
+    "promotions.allocation_component",
+    "promotions.bundle",
+    "promotions.bundle_choice_group",
+    "promotions.bundle_component"
+   ]
+  },
+  "createCart": {
+   "part": "core",
+   "service": "OrderService",
+   "contract": "orders",
+   "verb": "POST",
+   "path": "/carts",
+   "perm": null,
+   "platforms": [
+    "WEB"
+   ],
+   "screens": [
+    "WEB-010"
+   ],
+   "enables": []
+  },
+  "createCase": {
+   "part": "core",
+   "service": "MarketingService",
+   "contract": "marketing-crm",
+   "verb": "POST",
+   "path": "/cases",
+   "perm": "CASE_MANAGE",
+   "platforms": [
+    "MOB",
+    "WEB"
+   ],
+   "screens": [
+    "BO-806",
+    "EMP-028",
+    "EMP-029",
+    "GST-068",
+    "PTR-021",
+    "SUP-002",
+    "SUP-004",
+    "SUP-005",
+    "WEB-025"
+   ],
+   "enables": []
+  },
+  "createCashMovement": {
+   "part": "core",
+   "service": "OrderService",
+   "contract": "shift",
+   "verb": "POST",
+   "path": "/shifts/{shiftId}/cash-movements",
+   "perm": "CASH_LIFT",
+   "platforms": [
+    "POS"
+   ],
+   "screens": [
+    "BO-039",
+    "BO-040",
+    "BO-041",
+    "BO-042",
+    "EMP-009",
+    "POS-001",
+    "POS-007",
+    "POS-013",
+    "POS-017",
+    "POS-018"
+   ],
+   "enables": []
+  },
+  "createChallenge": {
+   "part": "setup",
+   "service": "MarketingService",
+   "contract": "marketing-crm",
+   "verb": "POST",
+   "path": "/challenges",
+   "perm": "MARKETING_MANAGE",
+   "platforms": [],
+   "screens": [
+    "BO-825",
+    "BO-826",
+    "BO-829"
+   ],
+   "enables": [
+    "marketing.challenge"
+   ]
+  },
+  "createChannelCapacity": {
+   "part": "setup",
+   "service": "CatalogueService",
+   "contract": "catalogue",
+   "verb": "POST",
+   "path": "/channel-capacities",
+   "perm": "CAPACITY_CONFIGURE",
+   "platforms": [],
+   "screens": [
+    "BO-013",
+    "BO-017",
+    "EMP-033",
+    "PTR-005"
+   ],
+   "enables": [
+    "catalogue.channel_capacity"
+   ]
+  },
+  "createCollection": {
+   "part": "core",
+   "service": "VenueOpsService",
+   "contract": "assets",
+   "verb": "POST",
+   "path": "/media/collections",
+   "perm": "ASSET_LIBRARY_MANAGE",
+   "platforms": [
+    "WL"
+   ],
+   "screens": [
+    "CMS-010",
+    "CMS-064"
+   ],
+   "enables": []
+  },
+  "createContentPage": {
+   "part": "core",
+   "service": "WhiteLabelService",
+   "contract": "white-label",
+   "verb": "POST",
+   "path": "/tenant-config/pages",
+   "perm": "TENANT_CONFIGURE",
+   "platforms": [
+    "WL"
+   ],
+   "screens": [
+    "BO-837",
+    "CMS-007"
+   ],
+   "enables": []
+  },
+  "createCouponCampaign": {
+   "part": "setup",
+   "service": "CatalogueService",
+   "contract": "promotions",
+   "verb": "POST",
+   "path": "/coupon-campaigns",
+   "perm": "PRICE_CONFIGURE",
+   "platforms": [],
+   "screens": [
+    "BO-010"
+   ],
+   "enables": [
+    "promotions.coupon_campaign"
+   ]
+  },
+  "createDashboard": {
+   "part": "setup",
+   "service": "ReportingService",
+   "contract": "reporting",
+   "verb": "POST",
+   "path": "/dashboards",
+   "perm": "REPORT_MANAGE",
+   "platforms": [],
+   "screens": [
+    "ADM-031",
+    "ANL-021",
+    "ANL-022",
+    "ANL-053"
+   ],
+   "enables": [
+    "reporting.dashboard",
+    "reporting.dashboard_tile"
+   ]
+  },
+  "createEntitlementTemplate": {
+   "part": "setup",
+   "service": "CatalogueService",
+   "contract": "catalogue",
+   "verb": "POST",
+   "path": "/entitlement-templates",
+   "perm": "PRODUCT_CONFIGURE",
+   "platforms": [],
+   "screens": [
+    "BO-012"
+   ],
+   "enables": [
+    "catalogue.entitlement_template"
+   ]
+  },
+  "createEvent": {
+   "part": "setup",
+   "service": "CatalogueService",
+   "contract": "catalogue",
+   "verb": "POST",
+   "path": "/events",
+   "perm": "EVENT_CONFIGURE",
+   "platforms": [],
+   "screens": [
+    "BO-001",
+    "BO-015",
+    "BO-016",
+    "BO-019",
+    "BO-063"
+   ],
+   "enables": [
+    "catalogue.event"
+   ]
+  },
+  "createFnbOrder": {
+   "part": "core",
+   "service": "FnbService",
+   "contract": "fnb",
+   "verb": "POST",
+   "path": "/fnb-orders",
+   "perm": "ORDER_CREATE",
+   "platforms": [
+    "POS"
+   ],
+   "screens": [
+    "BO-020",
+    "EMP-058",
+    "EMP-059",
+    "POS-022"
+   ],
+   "enables": []
+  },
+  "createForm": {
+   "part": "setup",
+   "service": "MarketingService",
+   "contract": "marketing-crm",
+   "verb": "POST",
+   "path": "/forms",
+   "perm": "MARKETING_MANAGE",
+   "platforms": [],
+   "screens": [
+    "BO-618",
+    "BO-815",
+    "BO-817",
+    "BO-838"
+   ],
+   "enables": [
+    "marketing.form_definition"
+   ]
+  },
+  "createGoodsReceipt": {
+   "part": "setup",
+   "service": "InventoryService",
+   "contract": "inventory",
+   "verb": "POST",
+   "path": "/goods-receipts",
+   "perm": "PRODUCT_CONFIGURE",
+   "platforms": [],
+   "screens": [
+    "BO-052",
+    "BO-080",
+    "EMP-065"
+   ],
+   "enables": [
+    "inventory.goods_receipt"
+   ]
+  },
+  "createGuestFnbOrder": {
+   "part": "core",
+   "service": "FnbService",
+   "contract": "fnb",
+   "verb": "POST",
+   "path": "/guest-orders",
+   "perm": null,
+   "platforms": [
+    "MOB",
+    "WEB"
+   ],
+   "screens": [
+    "GST-024",
+    "GST-032",
+    "KSK-016",
+    "WEB-036"
+   ],
+   "enables": []
+  },
+  "createInventoryItem": {
+   "part": "setup",
+   "service": "InventoryService",
+   "contract": "inventory",
+   "verb": "POST",
+   "path": "/inventory-items",
+   "perm": "PRODUCT_CONFIGURE",
+   "platforms": [],
+   "screens": [
+    "BO-081",
+    "BO-105"
+   ],
+   "enables": [
+    "inventory.item"
+   ]
+  },
+  "createInvitationCampaign": {
+   "part": "setup",
+   "service": "MarketingService",
+   "contract": "marketing-crm",
+   "verb": "POST",
+   "path": "/invitation-campaigns",
+   "perm": "MARKETING_MANAGE",
+   "platforms": [],
+   "screens": [],
+   "enables": [
+    "marketing.invitation_campaign"
+   ]
+  },
+  "createLoyaltyProgramme": {
+   "part": "setup",
+   "service": "MarketingService",
+   "contract": "marketing-crm",
+   "verb": "POST",
+   "path": "/loyalty/programmes",
+   "perm": "MARKETING_MANAGE",
+   "platforms": [],
+   "screens": [
+    "BO-827",
+    "BO-828"
+   ],
+   "enables": [
+    "marketing.loyalty_programme",
+    "marketing.points_earning_rule"
+   ]
+  },
+  "createMenu": {
+   "part": "core",
+   "service": "FnbService",
+   "contract": "fnb",
+   "verb": "POST",
+   "path": "/menus",
+   "perm": "PRODUCT_CONFIGURE",
+   "platforms": [
+    "WL"
+   ],
+   "screens": [
+    "BO-045",
+    "BO-104",
+    "CMS-009"
+   ],
+   "enables": []
+  },
+  "createMerchandise": {
+   "part": "setup",
+   "service": "RetailService",
+   "contract": "retail",
+   "verb": "POST",
+   "path": "/merchandise",
+   "perm": "PRODUCT_CONFIGURE",
+   "platforms": [],
+   "screens": [
+    "BO-007",
+    "BO-048"
+   ],
+   "enables": [
+    "retail.merchandise"
+   ]
+  },
+  "createMfaChallenge": {
+   "part": "core",
+   "service": "IdentityService",
+   "contract": "identity",
+   "verb": "POST",
+   "path": "/auth/mfa/challenge",
+   "perm": null,
+   "platforms": [
+    "MOB",
+    "WEB"
+   ],
+   "screens": [
+    "GST-073",
+    "WEB-016"
+   ],
+   "enables": []
+  },
+  "createModifierGroup": {
+   "part": "setup",
+   "service": "FnbService",
+   "contract": "fnb",
+   "verb": "POST",
+   "path": "/modifier-groups",
+   "perm": "PRODUCT_CONFIGURE",
+   "platforms": [],
+   "screens": [],
+   "enables": [
+    "fnb.modifier_group",
+    "fnb.modifier_option"
+   ]
+  },
+  "createOrder": {
+   "part": "core",
+   "service": "OrderService",
+   "contract": "orders",
+   "verb": "POST",
+   "path": "/orders",
+   "perm": "ORDER_CREATE",
+   "platforms": [
+    "MOB",
+    "POS",
+    "WEB"
+   ],
+   "screens": [
+    "BO-022",
+    "BO-023",
+    "BO-026",
+    "BO-047",
+    "BO-051",
+    "BO-070",
+    "BO-130",
+    "EMP-014",
+    "EMP-034",
+    "GST-009",
+    "POS-002",
+    "POS-004",
+    "POS-005",
+    "POS-006",
+    "POS-013",
+    "PTR-002",
+    "PTR-005",
+    "PTR-008",
+    "PTR-015",
+    "PTR-016",
+    "WEB-012"
+   ],
+   "enables": []
+  },
+  "createOrgUnit": {
+   "part": "setup",
+   "service": "TenancyService",
+   "contract": "tenancy",
+   "verb": "POST",
+   "path": "/org-units",
+   "perm": "SCOPE_MANAGE",
+   "platforms": [],
+   "screens": [
+    "ADM-006",
+    "ADM-420",
+    "BO-064"
+   ],
+   "enables": [
+    "platform.scope"
+   ]
+  },
+  "createOutlet": {
+   "part": "setup",
+   "service": "TenancyService",
+   "contract": "tenancy",
+   "verb": "POST",
+   "path": "/outlets",
+   "perm": "REGION_CONFIGURE",
+   "platforms": [],
+   "screens": [
+    "BO-044"
+   ],
+   "enables": [
+    "platform.outlet"
+   ]
+  },
+  "createParkingEntitlement": {
+   "part": "core",
+   "service": "AccessService",
+   "contract": "access",
+   "verb": "POST",
+   "path": "/parking-entitlements",
+   "perm": null,
+   "platforms": [
+    "MOB",
+    "WEB"
+   ],
+   "screens": [
+    "GST-027",
+    "GST-028",
+    "WEB-041"
+   ],
+   "enables": []
+  },
+  "createPayment": {
+   "part": "core",
+   "service": "OrderService",
+   "contract": "orders",
+   "verb": "POST",
+   "path": "/payments",
+   "perm": "ORDER_CREATE",
+   "platforms": [
+    "MOB",
+    "POS",
+    "WEB"
+   ],
+   "screens": [
+    "BO-024",
+    "EMP-035",
+    "EMP-059",
+    "GST-009",
+    "KSK-007",
+    "POS-002",
+    "POS-004",
+    "POS-005",
+    "PTR-012",
+    "WEB-012"
+   ],
+   "enables": []
+  },
+  "createPlan": {
+   "part": "setup",
+   "service": "PlatformService",
+   "contract": "subscription",
+   "verb": "POST",
+   "path": "/plans",
+   "perm": "PLATFORM_PLAN_MANAGE",
+   "platforms": [],
+   "screens": [
+    "ADM-008",
+    "ADM-019",
+    "ADM-392"
+   ],
+   "enables": [
+    "subscription.plan"
+   ]
+  },
+  "createPlanVersion": {
+   "part": "setup",
+   "service": "PlatformService",
+   "contract": "subscription",
+   "verb": "POST",
+   "path": "/plans/{planId}",
+   "perm": "PLATFORM_PLAN_MANAGE",
+   "platforms": [],
+   "screens": [
+    "ADM-008",
+    "ADM-019",
+    "ADM-398"
+   ],
+   "enables": [
+    "subscription.plan"
+   ]
+  },
+  "createPreview": {
+   "part": "core",
+   "service": "WhiteLabelService",
+   "contract": "white-label",
+   "verb": "POST",
+   "path": "/tenant-config/preview",
+   "perm": "TENANT_CONFIGURE",
+   "platforms": [
+    "WL"
+   ],
+   "screens": [
+    "ADM-016",
+    "CMS-006"
+   ],
+   "enables": []
+  },
+  "createPriceList": {
+   "part": "setup",
+   "service": "CatalogueService",
+   "contract": "catalogue",
+   "verb": "POST",
+   "path": "/price-lists",
+   "perm": "PRICE_CONFIGURE",
+   "platforms": [],
+   "screens": [
+    "BO-009",
+    "PTR-006"
+   ],
+   "enables": [
+    "catalogue.price_list"
+   ]
+  },
+  "createPrincipal": {
+   "part": "setup",
+   "service": "IdentityService",
+   "contract": "identity",
+   "verb": "POST",
+   "path": "/principals",
+   "perm": "USER_MANAGE",
+   "platforms": [],
+   "screens": [
+    "ADM-020",
+    "ADM-421",
+    "BO-053",
+    "PTR-003"
+   ],
+   "enables": [
+    "identity.principal"
+   ]
+  },
+  "createProduct": {
+   "part": "setup",
+   "service": "CatalogueService",
+   "contract": "catalogue",
+   "verb": "POST",
+   "path": "/products",
+   "perm": "PRODUCT_CONFIGURE",
+   "platforms": [],
+   "screens": [
+    "ADM-119",
+    "BO-007",
+    "BO-012",
+    "BO-014",
+    "PTR-006"
+   ],
+   "enables": [
+    "catalogue.product"
+   ]
+  },
+  "createPromoBlock": {
+   "part": "core",
+   "service": "WhiteLabelService",
+   "contract": "white-label",
+   "verb": "POST",
+   "path": "/tenant-config/promo-blocks",
+   "perm": "TENANT_CONFIGURE",
+   "platforms": [
+    "WL"
+   ],
+   "screens": [
+    "CMS-008"
+   ],
+   "enables": []
+  },
+  "createPromotion": {
+   "part": "setup",
+   "service": "CatalogueService",
+   "contract": "promotions",
+   "verb": "POST",
+   "path": "/promotions",
+   "perm": "PRICE_CONFIGURE",
+   "platforms": [],
+   "screens": [
+    "BO-010"
+   ],
+   "enables": [
+    "promotions.promotion"
+   ]
+  },
+  "createQueue": {
+   "part": "setup",
+   "service": "VenueOpsService",
+   "contract": "queue",
+   "verb": "POST",
+   "path": "/queues",
+   "perm": "QUEUE_MANAGE",
+   "platforms": [],
+   "screens": [
+    "BO-001",
+    "BO-002",
+    "BO-004",
+    "BO-005",
+    "BO-038"
+   ],
+   "enables": [
+    "queue.queue"
+   ]
+  },
+  "createReferral": {
+   "part": "core",
+   "service": "MarketingService",
+   "contract": "marketing-crm",
+   "verb": "POST",
+   "path": "/referrals",
+   "perm": "MARKETING_MANAGE",
+   "platforms": [
+    "MOB",
+    "WEB"
+   ],
+   "screens": [
+    "BO-830",
+    "GST-072",
+    "WEB-043"
+   ],
+   "enables": []
+  },
+  "createRefund": {
+   "part": "core",
+   "service": "OrderService",
+   "contract": "orders",
+   "verb": "POST",
+   "path": "/orders/{orderId}/refunds",
+   "perm": "ORDER_REFUND",
+   "platforms": [
+    "POS"
+   ],
+   "screens": [
+    "ADM-616",
+    "BO-022",
+    "BO-023",
+    "BO-026",
+    "BO-047",
+    "BO-1147",
+    "EMP-014",
+    "EMP-034",
+    "POS-002",
+    "POS-006",
+    "POS-011",
+    "PTR-008",
+    "PTR-015"
+   ],
+   "enables": []
+  },
+  "createRefundRequest": {
+   "part": "core",
+   "service": "OrderService",
+   "contract": "orders",
+   "verb": "POST",
+   "path": "/refund-requests",
+   "perm": null,
+   "platforms": [
+    "MOB",
+    "WEB"
+   ],
+   "screens": [
+    "ADM-610",
+    "BO-028",
+    "GST-067",
+    "WEB-019"
+   ],
+   "enables": []
+  },
+  "createResaleListing": {
+   "part": "core",
+   "service": "OrderService",
+   "contract": "orders",
+   "verb": "POST",
+   "path": "/resale-listings",
+   "perm": "ORDER_CREATE",
+   "platforms": [
+    "MOB",
+    "WEB"
+   ],
+   "screens": [
+    "GST-067",
+    "WEB-030"
+   ],
+   "enables": []
+  },
+  "createResource": {
+   "part": "setup",
+   "service": "VenueOpsService",
+   "contract": "resources",
+   "verb": "POST",
+   "path": "/resources",
+   "perm": "RESOURCE_MANAGE",
+   "platforms": [],
+   "screens": [
+    "BO-095",
+    "BO-857"
+   ],
+   "enables": [
+    "resources.resource"
+   ]
+  },
+  "createRetailReturn": {
+   "part": "core",
+   "service": "RetailService",
+   "contract": "retail",
+   "verb": "POST",
+   "path": "/retail-returns",
+   "perm": "ORDER_REFUND",
+   "platforms": [
+    "POS"
+   ],
+   "screens": [
+    "POS-002",
+    "POS-011"
+   ],
+   "enables": []
+  },
+  "createRetailSale": {
+   "part": "core",
+   "service": "RetailService",
+   "contract": "retail",
+   "verb": "POST",
+   "path": "/retail-sales",
+   "perm": "ORDER_CREATE",
+   "platforms": [
+    "POS"
+   ],
+   "screens": [
+    "POS-002",
+    "POS-005",
+    "POS-023"
+   ],
+   "enables": []
+  },
+  "createRole": {
+   "part": "setup",
+   "service": "IdentityService",
+   "contract": "identity",
+   "verb": "POST",
+   "path": "/roles",
+   "perm": "ROLE_MANAGE",
+   "platforms": [],
+   "screens": [
+    "ADM-021",
+    "BO-054"
+   ],
+   "enables": [
+    "identity.role"
+   ]
+  },
+  "createRotaAssignment": {
+   "part": "core",
+   "service": "TenancyService",
+   "contract": "workforce",
+   "verb": "POST",
+   "path": "/rota-assignments",
+   "perm": "WORKFORCE_MANAGE",
+   "platforms": [
+    "POS"
+   ],
+   "screens": [
+    "BO-055",
+    "BO-712",
+    "BO-884",
+    "BO-917",
+    "POS-009",
+    "POS-018"
+   ],
+   "enables": []
+  },
+  "createSaleBoard": {
+   "part": "setup",
+   "service": "TenancyService",
+   "contract": "tenancy",
+   "verb": "POST",
+   "path": "/sale-boards",
+   "perm": "WORKSTATION_CONFIGURE",
+   "platforms": [],
+   "screens": [
+    "BO-124"
+   ],
+   "enables": [
+    "platform.sale_board"
+   ]
+  },
+  "createSeatCategory": {
+   "part": "setup",
+   "service": "CatalogueService",
+   "contract": "seating",
+   "verb": "POST",
+   "path": "/seat-categories",
+   "perm": "CAPACITY_CONFIGURE",
+   "platforms": [],
+   "screens": [
+    "BO-1045",
+    "BO-985"
+   ],
+   "enables": [
+    "seating.seat_category"
+   ]
+  },
+  "createSeatHold": {
+   "part": "core",
+   "service": "CatalogueService",
+   "contract": "seating",
+   "verb": "POST",
+   "path": "/seat-holds",
+   "perm": "ORDER_CREATE",
+   "platforms": [
+    "MOB",
+    "POS",
+    "WEB"
+   ],
+   "screens": [
+    "BO-994",
+    "GST-049",
+    "POS-004",
+    "WEB-007"
+   ],
+   "enables": []
+  },
+  "createTableReservation": {
+   "part": "core",
+   "service": "FnbService",
+   "contract": "fnb",
+   "verb": "POST",
+   "path": "/table-reservations",
+   "perm": null,
+   "platforms": [
+    "MOB",
+    "WEB"
+   ],
+   "screens": [
+    "EMP-055",
+    "GST-070",
+    "WEB-036"
+   ],
+   "enables": []
+  },
+  "createTenant": {
+   "part": "setup",
+   "service": "PlatformService",
+   "contract": "subscription",
+   "verb": "POST",
+   "path": "/tenants",
+   "perm": "PLATFORM_TENANT_MANAGE",
+   "platforms": [],
+   "screens": [
+    "ADM-005",
+    "ADM-419"
+   ],
+   "enables": [
+    "control.tenant"
+   ]
+  },
+  "createTicketTemplate": {
+   "part": "setup",
+   "service": "OrderService",
+   "contract": "orders",
+   "verb": "POST",
+   "path": "/ticket-templates",
+   "perm": "PRODUCT_CONFIGURE",
+   "platforms": [],
+   "screens": [
+    "BO-346"
+   ],
+   "enables": [
+    "orders.ticket_template"
+   ]
+  },
+  "createUpload": {
+   "part": "core",
+   "service": "VenueOpsService",
+   "contract": "assets",
+   "verb": "POST",
+   "path": "/media/uploads",
+   "perm": "ASSET_LIBRARY_MANAGE",
+   "platforms": [
+    "WL"
+   ],
+   "screens": [
+    "CMS-002",
+    "CMS-010",
+    "CMS-063"
+   ],
+   "enables": []
+  },
+  "createUpsellRule": {
+   "part": "setup",
+   "service": "CatalogueService",
+   "contract": "promotions",
+   "verb": "POST",
+   "path": "/upsell-rules",
+   "perm": "PRODUCT_CONFIGURE",
+   "platforms": [],
+   "screens": [],
+   "enables": [
+    "promotions.upsell_rule"
+   ]
+  },
+  "createVenueMap": {
+   "part": "setup",
+   "service": "VenueOpsService",
+   "contract": "venue-map",
+   "verb": "POST",
+   "path": "/venue-maps",
+   "perm": "VENUE_MAP_MANAGE",
+   "platforms": [],
+   "screens": [
+    "BO-092"
+   ],
+   "enables": [
+    "venuemap.map"
+   ]
+  },
+  "decideApprovalRequest": {
+   "part": "core",
+   "service": "TenancyService",
+   "contract": "approvals",
+   "verb": "POST",
+   "path": "/approval-requests/{requestId}/decide",
+   "perm": "APPROVAL_DECIDE",
+   "platforms": [
+    "POS"
+   ],
+   "screens": [
+    "ACC-007",
+    "ADM-145",
+    "BO-084",
+    "BO-085",
+    "BO-133",
+    "BO-367",
+    "BO-377",
+    "BO-378",
+    "BO-940",
+    "POS-020"
+   ],
+   "enables": []
+  },
+  "decideGuestCheckoutMatch": {
+   "part": "core",
+   "service": "MarketingService",
+   "contract": "marketing-crm",
+   "verb": "POST",
+   "path": "/guest-checkout/profile-match/decision",
+   "perm": null,
+   "platforms": [
+    "MOB",
+    "WEB"
+   ],
+   "screens": [
+    "GST-009",
+    "WEB-012"
+   ],
+   "enables": []
+  },
+  "deleteGuestAccount": {
+   "part": "core",
+   "service": "IdentityService",
+   "contract": "identity",
+   "verb": "DELETE",
+   "path": "/auth/guest/account",
+   "perm": null,
+   "platforms": [
+    "MOB",
+    "WEB"
+   ],
+   "screens": [
+    "GST-066",
+    "WEB-024"
+   ],
+   "enables": []
+  },
+  "deleteMediaAsset": {
+   "part": "core",
+   "service": "VenueOpsService",
+   "contract": "assets",
+   "verb": "DELETE",
+   "path": "/media/{mediaId}",
+   "perm": "ASSET_LIBRARY_MANAGE",
+   "platforms": [
+    "WL"
+   ],
+   "screens": [
+    "CMS-010",
+    "CMS-075"
+   ],
+   "enables": []
+  },
+  "deletePromoBlock": {
+   "part": "core",
+   "service": "WhiteLabelService",
+   "contract": "white-label",
+   "verb": "DELETE",
+   "path": "/tenant-config/promo-blocks/{promoBlockId}",
+   "perm": "TENANT_CONFIGURE",
+   "platforms": [
+    "WL"
+   ],
+   "screens": [
+    "CMS-008"
+   ],
+   "enables": []
+  },
+  "deleteReport": {
+   "part": "core",
+   "service": "ReportingService",
+   "contract": "reporting",
+   "verb": "DELETE",
+   "path": "/reports/{reportId}",
+   "perm": "REPORT_MANAGE",
+   "platforms": [
+    "POS"
+   ],
+   "screens": [
+    "BO-029",
+    "BO-058",
+    "BO-059",
+    "BO-060",
+    "BO-061",
+    "POS-008",
+    "PTR-018",
+    "SUP-008"
+   ],
+   "enables": []
+  },
+  "deleteUpsellRule": {
+   "part": "setup",
+   "service": "CatalogueService",
+   "contract": "promotions",
+   "verb": "DELETE",
+   "path": "/upsell-rules/{ruleId}",
+   "perm": "PRODUCT_CONFIGURE",
+   "platforms": [],
+   "screens": [],
+   "enables": [
+    "promotions.upsell_rule"
+   ]
+  },
+  "diffConfigVersion": {
+   "part": "core",
+   "service": "WhiteLabelService",
+   "contract": "white-label",
+   "verb": "GET",
+   "path": "/tenant-config/versions/{version}/diff",
+   "perm": "TENANT_CONFIGURE",
+   "platforms": [
+    "WL"
+   ],
+   "screens": [
+    "ADM-016",
+    "CMS-006",
+    "CMS-015"
+   ],
+   "enables": []
+  },
+  "enrolFacePass": {
+   "part": "core",
+   "service": "AccessService",
+   "contract": "access",
+   "verb": "POST",
+   "path": "/face-pass/enrolments",
+   "perm": "GUEST_MANAGE",
+   "platforms": [
+    "MOB"
+   ],
+   "screens": [
+    "GST-069"
+   ],
+   "enables": []
+  },
+  "enrolMfaMethod": {
+   "part": "core",
+   "service": "IdentityService",
+   "contract": "identity",
+   "verb": "POST",
+   "path": "/auth/mfa/methods",
+   "perm": null,
+   "platforms": [
+    "MOB",
+    "WEB"
+   ],
+   "screens": [
+    "GST-042",
+    "WEB-016"
+   ],
+   "enables": []
+  },
+  "escalateCorrectiveAction": {
+   "part": "setup",
+   "service": "FnbService",
+   "contract": "fnb",
+   "verb": "POST",
+   "path": "/food-safety/corrective-actions/{actionId}/escalate",
+   "perm": "INCIDENT_MANAGE",
+   "platforms": [],
+   "screens": [],
+   "enables": [
+    "fnb.corrective_action"
+   ]
+  },
+  "evaluateApprovalRequirement": {
+   "part": "core",
+   "service": "TenancyService",
+   "contract": "approvals",
+   "verb": "POST",
+   "path": "/approval-requests/evaluate",
+   "perm": "APPROVAL_VIEW",
+   "platforms": [
+    "POS"
+   ],
+   "screens": [
+    "ADM-337",
+    "BO-085",
+    "BO-368",
+    "POS-002",
+    "POS-004"
+   ],
+   "enables": []
+  },
+  "evaluatePromotions": {
+   "part": "core",
+   "service": "CatalogueService",
+   "contract": "promotions",
+   "verb": "POST",
+   "path": "/promotions/evaluate",
+   "perm": "PRICE_VIEW",
+   "platforms": [
+    "MOB",
+    "POS",
+    "WEB"
+   ],
+   "screens": [
+    "BO-010",
+    "GST-036",
+    "GST-037",
+    "KSK-006",
+    "POS-002",
+    "POS-021",
+    "POS-023",
+    "PTR-010",
+    "WEB-005",
+    "WEB-010",
+    "WEB-032",
+    "WEB-043"
+   ],
+   "enables": []
+  },
+  "exchangeOrderLines": {
+   "part": "core",
+   "service": "OrderService",
+   "contract": "orders",
+   "verb": "POST",
+   "path": "/orders/{orderId}/exchanges",
+   "perm": "ORDER_EXCHANGE",
+   "platforms": [
+    "POS"
+   ],
+   "screens": [
+    "BO-022",
+    "BO-023",
+    "BO-026",
+    "BO-047",
+    "BO-051",
+    "BO-070",
+    "EMP-014",
+    "EMP-034",
+    "POS-002",
+    "POS-006",
+    "POS-010",
+    "POS-011",
+    "PTR-002",
+    "PTR-005",
+    "PTR-008",
+    "PTR-015",
+    "PTR-016"
+   ],
+   "enables": []
+  },
+  "exportSubjectData": {
+   "part": "core",
+   "service": "IdentityService",
+   "contract": "identity",
+   "verb": "POST",
+   "path": "/guests/{subjectId}/data-export",
+   "perm": "GUEST_VIEW_PII",
+   "platforms": [
+    "MOB",
+    "WEB"
+   ],
+   "screens": [
+    "GST-066",
+    "WEB-024"
+   ],
+   "enables": []
+  },
+  "extendCart": {
+   "part": "core",
+   "service": "OrderService",
+   "contract": "orders",
+   "verb": "POST",
+   "path": "/carts/{cartId}/extend",
+   "perm": null,
+   "platforms": [
+    "MOB",
+    "WEB"
+   ],
+   "screens": [
+    "GST-041",
+    "WEB-010"
+   ],
+   "enables": []
+  },
+  "extendSeatHold": {
+   "part": "core",
+   "service": "CatalogueService",
+   "contract": "seating",
+   "verb": "POST",
+   "path": "/seat-holds/{holdId}/extend",
+   "perm": "ORDER_CREATE",
+   "platforms": [
+    "POS"
+   ],
+   "screens": [
+    "BO-998",
+    "POS-004"
+   ],
+   "enables": []
+  },
+  "fireCourse": {
+   "part": "core",
+   "service": "FnbService",
+   "contract": "fnb",
+   "verb": "POST",
+   "path": "/kitchen-tickets/{ticketId}/fire",
+   "perm": "ORDER_MODIFY",
+   "platforms": [
+    "POS"
+   ],
+   "screens": [
+    "EMP-058",
+    "KIT-002",
+    "KIT-003"
+   ],
+   "enables": []
+  },
+  "forceLogout": {
+   "part": "core",
+   "service": "IdentityService",
+   "contract": "identity",
+   "verb": "POST",
+   "path": "/auth/sessions/{sessionId}/force-logout",
+   "perm": "SESSION_FORCE_LOGOUT",
+   "platforms": [
+    "POS"
+   ],
+   "screens": [
+    "ADM-001",
+    "POS-000",
+    "PTR-001",
+    "SUP-001"
+   ],
+   "enables": []
+  },
+  "generateCouponCodes": {
+   "part": "setup",
+   "service": "CatalogueService",
+   "contract": "promotions",
+   "verb": "POST",
+   "path": "/coupon-campaigns/{campaignId}/codes",
+   "perm": "PRICE_CONFIGURE",
+   "platforms": [],
+   "screens": [
+    "BO-010"
+   ],
+   "enables": [
+    "promotions.coupon_code"
+   ]
+  },
+  "getAppIcons": {
+   "part": "core",
+   "service": "WhiteLabelService",
+   "contract": "white-label",
+   "verb": "GET",
+   "path": "/tenant-config/app-icons",
+   "perm": "TENANT_CONFIGURE",
+   "platforms": [
+    "WL"
+   ],
+   "screens": [
+    "ADM-016",
+    "CMS-004"
+   ],
+   "enables": []
+  },
+  "getAvailability": {
+   "part": "core",
+   "service": "CatalogueService",
+   "contract": "catalogue",
+   "verb": "GET",
+   "path": "/availability",
+   "perm": "PRODUCT_VIEW",
+   "platforms": [
+    "MOB",
+    "POS",
+    "WEB"
+   ],
+   "screens": [
+    "GST-004",
+    "GST-007",
+    "GST-050",
+    "GST-058",
+    "KSK-004",
+    "KSK-005",
+    "KSK-015",
+    "POS-003",
+    "PTR-007",
+    "WEB-004",
+    "WEB-006"
+   ],
+   "enables": []
+  },
+  "getBillingStatement": {
+   "part": "core",
+   "service": "OrderService",
+   "contract": "orders",
+   "verb": "GET",
+   "path": "/billing-statements/{statementId}",
+   "perm": null,
+   "platforms": [
+    "MOB",
+    "WEB"
+   ],
+   "screens": [
+    "GST-015",
+    "WEB-023"
+   ],
+   "enables": []
+  },
+  "getBookingFlowConfig": {
+   "part": "core",
+   "service": "WhiteLabelService",
+   "contract": "white-label",
+   "verb": "GET",
+   "path": "/tenant-config/booking-flow",
+   "perm": "TENANT_CONFIGURE",
+   "platforms": [
+    "WL"
+   ],
+   "screens": [
+    "CMS-016"
+   ],
+   "enables": []
+  },
+  "getBrandIdentity": {
+   "part": "core",
+   "service": "WhiteLabelService",
+   "contract": "white-label",
+   "verb": "GET",
+   "path": "/tenant-config/brand",
+   "perm": "TENANT_CONFIGURE",
+   "platforms": [
+    "WL"
+   ],
+   "screens": [
+    "ADM-016",
+    "CMS-002",
+    "CMS-004"
+   ],
+   "enables": []
+  },
+  "getBundle": {
+   "part": "core",
+   "service": "CatalogueService",
+   "contract": "promotions",
+   "verb": "GET",
+   "path": "/bundles/{bundleId}",
+   "perm": "PRODUCT_VIEW",
+   "platforms": [
+    "MOB",
+    "WEB"
+   ],
+   "screens": [
+    "GST-056",
+    "WEB-008"
+   ],
+   "enables": []
+  },
+  "getCart": {
+   "part": "core",
+   "service": "OrderService",
+   "contract": "orders",
+   "verb": "GET",
+   "path": "/carts/{cartId}",
+   "perm": null,
+   "platforms": [
+    "MOB",
+    "POS",
+    "WEB"
+   ],
+   "screens": [
+    "GST-009",
+    "GST-032",
+    "GST-041",
+    "GST-053",
+    "KSK-006",
+    "POS-010",
+    "PTR-010",
+    "WEB-010"
+   ],
+   "enables": []
+  },
+  "getCouponCode": {
+   "part": "core",
+   "service": "CatalogueService",
+   "contract": "promotions",
+   "verb": "GET",
+   "path": "/coupon-codes/{code}",
+   "perm": "PRICE_VIEW",
+   "platforms": [
+    "MOB",
+    "WEB"
+   ],
+   "screens": [
+    "GST-037",
+    "WEB-010"
+   ],
+   "enables": []
+  },
+  "getCurrentSession": {
+   "part": "core",
+   "service": "IdentityService",
+   "contract": "identity",
+   "verb": "GET",
+   "path": "/auth/session",
+   "perm": null,
+   "platforms": [
+    "POS"
+   ],
+   "screens": [
+    "ADM-001",
+    "EMP-001",
+    "EMP-002",
+    "EMP-042",
+    "POS-000",
+    "PTR-001",
+    "SCN-001",
+    "SUP-001"
+   ],
+   "enables": []
+  },
+  "getCurrentShift": {
+   "part": "core",
+   "service": "OrderService",
+   "contract": "shift",
+   "verb": "GET",
+   "path": "/shifts/current",
+   "perm": "SHIFT_OPEN",
+   "platforms": [
+    "POS"
+   ],
+   "screens": [
+    "BO-039",
+    "BO-040",
+    "BO-041",
+    "BO-042",
+    "EMP-003",
+    "EMP-008",
+    "EMP-009",
+    "EMP-022",
+    "POS-001",
+    "POS-007",
+    "POS-009",
+    "POS-012",
+    "POS-025",
+    "SCN-001"
+   ],
+   "enables": []
+  },
+  "getDashboard": {
+   "part": "core",
+   "service": "ReportingService",
+   "contract": "reporting",
+   "verb": "GET",
+   "path": "/dashboards/{dashboardId}",
+   "perm": "REPORT_VIEW_VENUE",
+   "platforms": [
+    "POS"
+   ],
+   "screens": [
+    "ADM-031",
+    "ANL-001",
+    "ANL-002",
+    "ANL-003",
+    "ANL-004",
+    "ANL-005",
+    "ANL-006",
+    "ANL-007",
+    "ANL-008",
+    "ANL-021",
+    "ANL-023",
+    "ANL-030",
+    "BO-010",
+    "KIT-010"
+   ],
+   "enables": []
+  },
+  "getEntitlement": {
+   "part": "core",
+   "service": "AccessService",
+   "contract": "access",
+   "verb": "GET",
+   "path": "/entitlements/{entitlementId}",
+   "perm": "ORDER_VIEW",
+   "platforms": [
+    "MOB",
+    "WEB"
+   ],
+   "screens": [
+    "GST-012",
+    "GST-013",
+    "GST-055",
+    "WEB-018"
+   ],
+   "enables": []
+  },
+  "getEntitlementCredential": {
+   "part": "core",
+   "service": "AccessService",
+   "contract": "access",
+   "verb": "GET",
+   "path": "/entitlements/{entitlementId}/credential",
+   "perm": "ORDER_VIEW",
+   "platforms": [
+    "MOB",
+    "WEB"
+   ],
+   "screens": [
+    "GST-012",
+    "GST-013",
+    "GST-055",
+    "WEB-018"
+   ],
+   "enables": []
+  },
+  "getEntitlementHistory": {
+   "part": "core",
+   "service": "AccessService",
+   "contract": "access",
+   "verb": "GET",
+   "path": "/entitlements/{entitlementId}/history",
+   "perm": "ORDER_VIEW",
+   "platforms": [
+    "MOB",
+    "WEB"
+   ],
+   "screens": [
+    "GST-012",
+    "GST-013",
+    "WEB-018"
+   ],
+   "enables": []
+  },
+  "getExpiringRights": {
+   "part": "core",
+   "service": "VenueOpsService",
+   "contract": "assets",
+   "verb": "GET",
+   "path": "/media/rights-expiring",
+   "perm": "ASSET_LIBRARY_VIEW",
+   "platforms": [
+    "WL"
+   ],
+   "screens": [
+    "CMS-010",
+    "CMS-081",
+    "CMS-088",
+    "CMS-090"
+   ],
+   "enables": []
+  },
+  "getFacePassEnrolment": {
+   "part": "core",
+   "service": "AccessService",
+   "contract": "access",
+   "verb": "GET",
+   "path": "/face-pass/enrolments/{enrolmentId}",
+   "perm": "GUEST_VIEW",
+   "platforms": [
+    "MOB",
+    "WEB"
+   ],
+   "screens": [
+    "GST-069",
+    "WEB-024"
+   ],
+   "enables": []
+  },
+  "getFeatureToggles": {
+   "part": "core",
+   "service": "WhiteLabelService",
+   "contract": "white-label",
+   "verb": "GET",
+   "path": "/tenant-config/features",
+   "perm": "TENANT_CONFIGURE",
+   "platforms": [
+    "WL"
+   ],
+   "screens": [
+    "CMS-001"
+   ],
+   "enables": []
+  },
+  "getFinancialReport": {
+   "part": "core",
+   "service": "LedgerService",
+   "contract": "finance",
+   "verb": "GET",
+   "path": "/reports/financial",
+   "perm": "REPORT_VIEW_VENUE",
+   "platforms": [
+    "POS"
+   ],
+   "screens": [
+    "BO-029",
+    "BO-058",
+    "BO-059",
+    "BO-060",
+    "BO-061",
+    "POS-008",
+    "PTR-018",
+    "SUP-008"
+   ],
+   "enables": []
+  },
+  "getFnbDeliveryPolicy": {
+   "part": "core",
+   "service": "FnbService",
+   "contract": "fnb",
+   "verb": "GET",
+   "path": "/fnb-delivery-policy",
+   "perm": "PRODUCT_VIEW",
+   "platforms": [
+    "MOB",
+    "WEB"
+   ],
+   "screens": [
+    "BO-044",
+    "GST-024",
+    "WEB-036"
+   ],
+   "enables": []
+  },
+  "getFnbOrder": {
+   "part": "core",
+   "service": "FnbService",
+   "contract": "fnb",
+   "verb": "GET",
+   "path": "/fnb-orders/{orderId}",
+   "perm": "ORDER_VIEW",
+   "platforms": [
+    "POS"
+   ],
+   "screens": [
+    "BO-020",
+    "KIT-004"
+   ],
+   "enables": []
+  },
+  "getFonts": {
+   "part": "core",
+   "service": "WhiteLabelService",
+   "contract": "white-label",
+   "verb": "GET",
+   "path": "/tenant-config/fonts",
+   "perm": "TENANT_CONFIGURE",
+   "platforms": [
+    "WL"
+   ],
+   "screens": [
+    "CMS-003"
+   ],
+   "enables": []
+  },
+  "getGameCard": {
+   "part": "core",
+   "service": "VenueOpsService",
+   "contract": "games",
+   "verb": "GET",
+   "path": "/game-cards/{cardCode}",
+   "perm": null,
+   "platforms": [
+    "MOB",
+    "WEB"
+   ],
+   "screens": [
+    "BO-396",
+    "BO-454",
+    "BO-455",
+    "BO-457",
+    "BO-462",
+    "BO-486",
+    "GST-026",
+    "WEB-021"
+   ],
+   "enables": []
+  },
+  "getGiftCard": {
+   "part": "core",
+   "service": "WalletService",
+   "contract": "wallet",
+   "verb": "GET",
+   "path": "/gift-cards/{cardCode}",
+   "perm": "ORDER_VIEW",
+   "platforms": [
+    "MOB",
+    "WEB"
+   ],
+   "screens": [
+    "GST-071",
+    "WEB-021"
+   ],
+   "enables": []
+  },
+  "getGroupBooking": {
+   "part": "core",
+   "service": "OrderService",
+   "contract": "orders",
+   "verb": "GET",
+   "path": "/group-bookings/{groupBookingId}",
+   "perm": "ORDER_VIEW",
+   "platforms": [
+    "MOB",
+    "WEB"
+   ],
+   "screens": [
+    "BO-026",
+    "GST-072",
+    "WEB-031"
+   ],
+   "enables": []
+  },
+  "getGroupPackageDefinition": {
+   "part": "core",
+   "service": "CatalogueService",
+   "contract": "catalogue",
+   "verb": "GET",
+   "path": "/products/{productId}/group-package",
+   "perm": "PRODUCT_VIEW",
+   "platforms": [
+    "MOB",
+    "WEB"
+   ],
+   "screens": [
+    "BO-011",
+    "GST-072",
+    "WEB-031"
+   ],
+   "enables": []
+  },
+  "getGuestBill": {
+   "part": "core",
+   "service": "FnbService",
+   "contract": "fnb",
+   "verb": "GET",
+   "path": "/table-sessions/{sessionId}/bill",
+   "perm": null,
+   "platforms": [
+    "MOB",
+    "WEB"
+   ],
+   "screens": [
+    "GST-025",
+    "WEB-038"
+   ],
+   "enables": []
+  },
+  "getGuestConsents": {
+   "part": "core",
+   "service": "MarketingService",
+   "contract": "marketing-crm",
+   "verb": "GET",
+   "path": "/guests/{subjectId}/consents",
+   "perm": "GUEST_VIEW",
+   "platforms": [
+    "MOB",
+    "WEB"
+   ],
+   "screens": [
+    "BO-036",
+    "BO-749",
+    "GST-066",
+    "WEB-024"
+   ],
+   "enables": []
+  },
+  "getGuestMenu": {
+   "part": "core",
+   "service": "FnbService",
+   "contract": "fnb",
+   "verb": "GET",
+   "path": "/outlets/{outletId}/guest-menu",
+   "perm": null,
+   "platforms": [
+    "MOB",
+    "POS",
+    "WEB"
+   ],
+   "screens": [
+    "BO-044",
+    "GST-024",
+    "GST-031",
+    "GST-061",
+    "KSK-016",
+    "POS-021",
+    "WEB-036",
+    "WEB-037",
+    "WEB-044"
+   ],
+   "enables": []
+  },
+  "getGuestOrderStatus": {
+   "part": "core",
+   "service": "FnbService",
+   "contract": "fnb",
+   "verb": "GET",
+   "path": "/guest-orders/{orderId}",
+   "perm": null,
+   "platforms": [
+    "MOB",
+    "WEB"
+   ],
+   "screens": [
+    "BO-021",
+    "GST-024",
+    "GST-025",
+    "GST-032",
+    "WEB-036",
+    "WEB-038"
+   ],
+   "enables": []
+  },
+  "getGuestProfile": {
+   "part": "core",
+   "service": "MarketingService",
+   "contract": "marketing-crm",
+   "verb": "GET",
+   "path": "/guests/{subjectId}",
+   "perm": "GUEST_VIEW",
+   "platforms": [
+    "MOB",
+    "WEB"
+   ],
+   "screens": [
+    "ADM-680",
+    "BO-036",
+    "BO-735",
+    "BO-738",
+    "BO-740",
+    "EMP-057",
+    "GST-001",
+    "WEB-011",
+    "WEB-020"
+   ],
+   "enables": []
+  },
+  "getGuestSession": {
+   "part": "core",
+   "service": "IdentityService",
+   "contract": "identity",
+   "verb": "GET",
+   "path": "/auth/guest/session",
+   "perm": null,
+   "platforms": [
+    "MOB",
+    "WEB"
+   ],
+   "screens": [
+    "GST-042",
+    "WEB-016"
+   ],
+   "enables": []
+  },
+  "getHaccpStatus": {
+   "part": "core",
+   "service": "FnbService",
+   "contract": "fnb",
+   "verb": "GET",
+   "path": "/food-safety/status",
+   "perm": "INCIDENT_VIEW",
+   "platforms": [
+    "POS"
+   ],
+   "screens": [
+    "BO-044",
+    "EMP-062",
+    "KIT-008"
+   ],
+   "enables": []
+  },
+  "getHomepageLayout": {
+   "part": "core",
+   "service": "WhiteLabelService",
+   "contract": "white-label",
+   "verb": "GET",
+   "path": "/tenant-config/homepage",
+   "perm": "TENANT_CONFIGURE",
+   "platforms": [
+    "WL"
+   ],
+   "screens": [
+    "CMS-007"
+   ],
+   "enables": []
+  },
+  "getLatestBundle": {
+   "part": "core",
+   "service": "CatalogueService",
+   "contract": "catalogue",
+   "verb": "GET",
+   "path": "/catalogue/bundles/latest",
+   "perm": "PRODUCT_VIEW",
+   "platforms": [
+    "POS"
+   ],
+   "screens": [
+    "BO-011",
+    "BO-037",
+    "EMP-018",
+    "POS-002"
+   ],
+   "enables": []
+  },
+  "getLoyaltyPosition": {
+   "part": "core",
+   "service": "MarketingService",
+   "contract": "marketing-crm",
+   "verb": "GET",
+   "path": "/loyalty/position",
+   "perm": null,
+   "platforms": [
+    "MOB",
+    "POS",
+    "WEB"
+   ],
+   "screens": [
+    "BO-831",
+    "GST-036",
+    "POS-002",
+    "WEB-043"
+   ],
+   "enables": []
+  },
+  "getMarketingSubscription": {
+   "part": "core",
+   "service": "MarketingService",
+   "contract": "marketing-crm",
+   "verb": "GET",
+   "path": "/marketing-subscriptions",
+   "perm": "MARKETING_VIEW",
+   "platforms": [
+    "MOB",
+    "WEB"
+   ],
+   "screens": [
+    "BO-788",
+    "GST-065",
+    "WEB-027"
+   ],
+   "enables": []
+  },
+  "getMediaAsset": {
+   "part": "core",
+   "service": "VenueOpsService",
+   "contract": "assets",
+   "verb": "GET",
+   "path": "/media/{mediaId}",
+   "perm": "ASSET_LIBRARY_VIEW",
+   "platforms": [
+    "POS",
+    "WL"
+   ],
+   "screens": [
+    "BO-027",
+    "CMS-010",
+    "CMS-068",
+    "CMS-082",
+    "EMP-036",
+    "POS-010"
+   ],
+   "enables": []
+  },
+  "getMediaEntitlements": {
+   "part": "core",
+   "service": "OrderService",
+   "contract": "orders",
+   "verb": "GET",
+   "path": "/media/{mediaCode}/entitlements",
+   "perm": "ORDER_VIEW",
+   "platforms": [
+    "POS",
+    "WL"
+   ],
+   "screens": [
+    "BO-027",
+    "CMS-010",
+    "EMP-036",
+    "POS-010"
+   ],
+   "enables": []
+  },
+  "getMenu": {
+   "part": "core",
+   "service": "FnbService",
+   "contract": "fnb",
+   "verb": "GET",
+   "path": "/menus/{menuId}",
+   "perm": "PRODUCT_VIEW",
+   "platforms": [
+    "WL"
+   ],
+   "screens": [
+    "BO-045",
+    "CMS-009"
+   ],
+   "enables": []
+  },
+  "getModuleEnablement": {
+   "part": "core",
+   "service": "WhiteLabelService",
+   "contract": "white-label",
+   "verb": "GET",
+   "path": "/tenant-config/modules",
+   "perm": "TENANT_CONFIGURE",
+   "platforms": [
+    "WL"
+   ],
+   "screens": [
+    "CMS-001"
+   ],
+   "enables": []
+  },
+  "getMyChallenges": {
+   "part": "core",
+   "service": "MarketingService",
+   "contract": "marketing-crm",
+   "verb": "GET",
+   "path": "/guests/me/challenges",
+   "perm": "MARKETING_VIEW",
+   "platforms": [
+    "MOB",
+    "WEB"
+   ],
+   "screens": [
+    "BO-824",
+    "GST-072",
+    "WEB-017"
+   ],
+   "enables": []
+  },
+  "getMyMemberships": {
+   "part": "core",
+   "service": "CatalogueService",
+   "contract": "catalogue",
+   "verb": "GET",
+   "path": "/guests/me/memberships",
+   "perm": "PRODUCT_VIEW",
+   "platforms": [
+    "MOB",
+    "WEB"
+   ],
+   "screens": [
+    "GST-015",
+    "WEB-022",
+    "WEB-023"
+   ],
+   "enables": []
+  },
+  "getOfflinePackage": {
+   "part": "core",
+   "service": "AccessService",
+   "contract": "access",
+   "verb": "GET",
+   "path": "/access/offline-package",
+   "perm": "ACCESS_VALIDATE",
+   "platforms": [
+    "POS"
+   ],
+   "screens": [
+    "BO-034",
+    "BO-035",
+    "BO-037",
+    "BO-060",
+    "EMP-010",
+    "EMP-015",
+    "EMP-017",
+    "POS-013",
+    "SCN-003",
+    "SCN-007",
+    "SCN-008",
+    "SCN-009",
+    "SCN-013",
+    "SCN-014",
+    "SCN-015"
+   ],
+   "enables": []
+  },
+  "getOrder": {
+   "part": "core",
+   "service": "OrderService",
+   "contract": "orders",
+   "verb": "GET",
+   "path": "/orders/{orderId}",
+   "perm": "ORDER_VIEW",
+   "platforms": [
+    "MOB",
+    "POS",
+    "WEB"
+   ],
+   "screens": [
+    "BO-022",
+    "BO-023",
+    "BO-026",
+    "BO-047",
+    "BO-051",
+    "BO-070",
+    "EMP-014",
+    "EMP-034",
+    "GST-010",
+    "GST-018",
+    "GST-019",
+    "KSK-009",
+    "KSK-011",
+    "POS-002",
+    "POS-006",
+    "PTR-002",
+    "PTR-005",
+    "PTR-008",
+    "PTR-015",
+    "PTR-016",
+    "WEB-012",
+    "WEB-013",
+    "WEB-019"
+   ],
+   "enables": []
+  },
+  "getOrderCalendarEvent": {
+   "part": "core",
+   "service": "OrderService",
+   "contract": "orders",
+   "verb": "GET",
+   "path": "/orders/{orderId}/calendar-event",
+   "perm": "ORDER_VIEW",
+   "platforms": [
+    "MOB"
+   ],
+   "screens": [
+    "GST-018"
+   ],
+   "enables": []
+  },
+  "getOrderStatement": {
+   "part": "core",
+   "service": "OrderService",
+   "contract": "orders",
+   "verb": "GET",
+   "path": "/orders/{orderId}/statement",
+   "perm": "ORDER_VIEW",
+   "platforms": [
+    "POS"
+   ],
+   "screens": [
+    "BO-022",
+    "BO-023",
+    "BO-026",
+    "BO-047",
+    "BO-051",
+    "BO-070",
+    "EMP-014",
+    "EMP-034",
+    "POS-002",
+    "POS-006",
+    "PTR-002",
+    "PTR-005",
+    "PTR-008",
+    "PTR-015",
+    "PTR-016"
+   ],
+   "enables": []
+  },
+  "getPaymentLink": {
+   "part": "core",
+   "service": "OrderService",
+   "contract": "orders",
+   "verb": "GET",
+   "path": "/payment-links/{token}",
+   "perm": "ORDER_VIEW",
+   "platforms": [
+    "MOB",
+    "WEB"
+   ],
+   "screens": [
+    "ADM-593",
+    "GST-009",
+    "WEB-014"
+   ],
+   "enables": []
+  },
+  "getPerformance": {
+   "part": "core",
+   "service": "CatalogueService",
+   "contract": "catalogue",
+   "verb": "GET",
+   "path": "/performances/{performanceId}",
+   "perm": "PRODUCT_VIEW",
+   "platforms": [
+    "MOB",
+    "POS",
+    "WEB"
+   ],
+   "screens": [
+    "BO-002",
+    "BO-015",
+    "BO-016",
+    "BO-019",
+    "BO-063",
+    "GST-006",
+    "POS-004",
+    "WEB-006"
+   ],
+   "enables": []
+  },
+  "getProduct": {
+   "part": "core",
+   "service": "CatalogueService",
+   "contract": "catalogue",
+   "verb": "GET",
+   "path": "/products/{productId}",
+   "perm": "PRODUCT_VIEW",
+   "platforms": [
+    "MOB",
+    "POS",
+    "WEB"
+   ],
+   "screens": [
+    "BO-007",
+    "BO-008",
+    "BO-012",
+    "BO-014",
+    "EMP-034",
+    "GST-004",
+    "GST-006",
+    "POS-002",
+    "POS-003",
+    "PTR-006",
+    "WEB-004",
+    "WEB-022"
+   ],
+   "enables": []
+  },
+  "getProductEligibilityRule": {
+   "part": "core",
+   "service": "CatalogueService",
+   "contract": "catalogue",
+   "verb": "GET",
+   "path": "/products/{productId}/eligibility-rule",
+   "perm": "PRODUCT_VIEW",
+   "platforms": [
+    "MOB",
+    "WEB"
+   ],
+   "screens": [
+    "BO-161",
+    "GST-004",
+    "WEB-004"
+   ],
+   "enables": []
+  },
+  "getPromotion": {
+   "part": "core",
+   "service": "CatalogueService",
+   "contract": "promotions",
+   "verb": "GET",
+   "path": "/promotions/{promotionId}",
+   "perm": "PRICE_VIEW",
+   "platforms": [
+    "MOB",
+    "POS",
+    "WEB"
+   ],
+   "screens": [
+    "BO-010",
+    "GST-037",
+    "POS-002",
+    "PTR-010",
+    "WEB-032"
+   ],
+   "enables": []
+  },
+  "getPromotionUsage": {
+   "part": "core",
+   "service": "CatalogueService",
+   "contract": "promotions",
+   "verb": "GET",
+   "path": "/promotions/{promotionId}/usage",
+   "perm": "PRICE_VIEW",
+   "platforms": [
+    "POS"
+   ],
+   "screens": [
+    "ADM-138",
+    "BO-010",
+    "POS-002",
+    "PTR-010"
+   ],
+   "enables": []
+  },
+  "getQueue": {
+   "part": "core",
+   "service": "VenueOpsService",
+   "contract": "queue",
+   "verb": "GET",
+   "path": "/queues/{queueId}",
+   "perm": "QUEUE_VIEW",
+   "platforms": [
+    "POS"
+   ],
+   "screens": [
+    "BO-001",
+    "BO-002",
+    "BO-004",
+    "BO-005",
+    "BO-038",
+    "EMP-031",
+    "EMP-032",
+    "POS-029"
+   ],
+   "enables": []
+  },
+  "getQueueFeedHealth": {
+   "part": "core",
+   "service": "VenueOpsService",
+   "contract": "queue",
+   "verb": "GET",
+   "path": "/queue-feeds/{feedId}/health",
+   "perm": "QUEUE_MANAGE",
+   "platforms": [
+    "POS"
+   ],
+   "screens": [
+    "BO-001",
+    "BO-003",
+    "POS-029"
+   ],
+   "enables": []
+  },
+  "getReport": {
+   "part": "core",
+   "service": "ReportingService",
+   "contract": "reporting",
+   "verb": "GET",
+   "path": "/reports/{reportId}",
+   "perm": "REPORT_VIEW_VENUE",
+   "platforms": [
+    "POS"
+   ],
+   "screens": [
+    "BO-029",
+    "BO-058",
+    "BO-059",
+    "BO-060",
+    "BO-061",
+    "POS-008",
+    "PTR-018",
+    "SUP-008"
+   ],
+   "enables": []
+  },
+  "getReservation": {
+   "part": "core",
+   "service": "OrderService",
+   "contract": "orders",
+   "verb": "GET",
+   "path": "/reservations/{reservationId}",
+   "perm": "ORDER_VIEW",
+   "platforms": [
+    "MOB",
+    "WEB"
+   ],
+   "screens": [
+    "GST-016",
+    "GST-017",
+    "WEB-031"
+   ],
+   "enables": []
+  },
+  "getResourceAvailability": {
+   "part": "core",
+   "service": "VenueOpsService",
+   "contract": "resources",
+   "verb": "GET",
+   "path": "/resources/{resourceId}/availability",
+   "perm": "RESOURCE_VIEW",
+   "platforms": [
+    "MOB",
+    "WEB"
+   ],
+   "screens": [
+    "BO-096",
+    "GST-070",
+    "WEB-031"
+   ],
+   "enables": []
+  },
+  "getRetailSale": {
+   "part": "core",
+   "service": "RetailService",
+   "contract": "retail",
+   "verb": "GET",
+   "path": "/retail-sales/{saleId}",
+   "perm": "ORDER_VIEW",
+   "platforms": [
+    "POS"
+   ],
+   "screens": [
+    "POS-005"
+   ],
+   "enables": []
+  },
+  "getReturnPolicy": {
+   "part": "core",
+   "service": "RetailService",
+   "contract": "retail",
+   "verb": "GET",
+   "path": "/outlets/{outletId}/return-policy",
+   "perm": "ORDER_VIEW",
+   "platforms": [
+    "POS"
+   ],
+   "screens": [
+    "BO-044",
+    "POS-011"
+   ],
+   "enables": []
+  },
+  "getSeatAvailability": {
+   "part": "core",
+   "service": "CatalogueService",
+   "contract": "seating",
+   "verb": "GET",
+   "path": "/performances/{performanceId}/seat-availability",
+   "perm": "PRODUCT_VIEW",
+   "platforms": [
+    "MOB",
+    "POS",
+    "WEB"
+   ],
+   "screens": [
+    "BO-002",
+    "BO-015",
+    "BO-016",
+    "BO-019",
+    "BO-063",
+    "BO-1000",
+    "BO-986",
+    "BO-994",
+    "BO-996",
+    "GST-049",
+    "POS-004",
+    "WEB-007"
+   ],
+   "enables": []
+  },
+  "getSeatHold": {
+   "part": "core",
+   "service": "CatalogueService",
+   "contract": "seating",
+   "verb": "GET",
+   "path": "/seat-holds/{holdId}",
+   "perm": "ORDER_VIEW",
+   "platforms": [
+    "POS"
+   ],
+   "screens": [
+    "BO-987",
+    "BO-999",
+    "POS-004"
+   ],
+   "enables": []
+  },
+  "getShift": {
+   "part": "core",
+   "service": "OrderService",
+   "contract": "shift",
+   "verb": "GET",
+   "path": "/shifts/{shiftId}",
+   "perm": "REPORT_VIEW_WORKSTATION",
+   "platforms": [
+    "POS"
+   ],
+   "screens": [
+    "BO-039",
+    "BO-040",
+    "BO-041",
+    "BO-042",
+    "EMP-003",
+    "EMP-008",
+    "EMP-009",
+    "POS-001",
+    "POS-007",
+    "POS-009"
+   ],
+   "enables": []
+  },
+  "getTableMap": {
+   "part": "core",
+   "service": "FnbService",
+   "contract": "fnb",
+   "verb": "GET",
+   "path": "/outlets/{outletId}/tables",
+   "perm": "ORDER_VIEW",
+   "platforms": [
+    "POS"
+   ],
+   "screens": [
+    "BO-044",
+    "EMP-051",
+    "EMP-052",
+    "EMP-060",
+    "POS-028"
+   ],
+   "enables": []
+  },
+  "getTenantAppStatus": {
+   "part": "core",
+   "service": "WhiteLabelService",
+   "contract": "white-label",
+   "verb": "GET",
+   "path": "/tenant-config/status",
+   "perm": null,
+   "platforms": [
+    "MOB",
+    "WEB",
+    "WL"
+   ],
+   "screens": [
+    "CMS-001",
+    "CMS-014",
+    "GST-001",
+    "GST-038",
+    "GST-047",
+    "KSK-002",
+    "WEB-001",
+    "WEB-025",
+    "WEB-028",
+    "WEB-029"
+   ],
+   "enables": []
+  },
+  "getTenantConfig": {
+   "part": "core",
+   "service": "WhiteLabelService",
+   "contract": "white-label",
+   "verb": "GET",
+   "path": "/tenant-config",
+   "perm": "TENANT_CONFIGURE",
+   "platforms": [
+    "MOB",
+    "WEB",
+    "WL"
+   ],
+   "screens": [
+    "BO-599",
+    "BO-834",
+    "CMS-001",
+    "CMS-012",
+    "CMS-016",
+    "GST-001",
+    "KSK-002",
+    "WEB-001"
+   ],
+   "enables": []
+  },
+  "getTheme": {
+   "part": "core",
+   "service": "WhiteLabelService",
+   "contract": "white-label",
+   "verb": "GET",
+   "path": "/tenant-config/theme",
+   "perm": "TENANT_CONFIGURE",
+   "platforms": [
+    "WL"
+   ],
+   "screens": [
+    "ADM-016",
+    "CMS-003",
+    "CMS-005"
+   ],
+   "enables": []
+  },
+  "getUpsellSuggestions": {
+   "part": "core",
+   "service": "CatalogueService",
+   "contract": "promotions",
+   "verb": "POST",
+   "path": "/upsell-suggestions",
+   "perm": "PRODUCT_VIEW",
+   "platforms": [
+    "MOB",
+    "WEB"
+   ],
+   "screens": [
+    "BO-102",
+    "BO-119",
+    "GST-048",
+    "WEB-008"
+   ],
+   "enables": []
+  },
+  "getVenueMap": {
+   "part": "core",
+   "service": "VenueOpsService",
+   "contract": "venue-map",
+   "verb": "GET",
+   "path": "/venue-maps/{mapId}",
+   "perm": "VENUE_MAP_VIEW",
+   "platforms": [
+    "MOB",
+    "WEB"
+   ],
+   "screens": [
+    "BO-094",
+    "EMP-030",
+    "GST-021",
+    "WEB-039"
+   ],
+   "enables": []
+  },
+  "getVenueMapGraph": {
+   "part": "core",
+   "service": "VenueOpsService",
+   "contract": "venue-map",
+   "verb": "GET",
+   "path": "/venue-maps/{mapId}/graph",
+   "perm": "VENUE_MAP_VIEW",
+   "platforms": [
+    "MOB",
+    "WEB"
+   ],
+   "screens": [
+    "BO-094",
+    "GST-021",
+    "WEB-039"
+   ],
+   "enables": []
+  },
+  "getVenueSettings": {
+   "part": "core",
+   "service": "TenancyService",
+   "contract": "tenancy",
+   "verb": "GET",
+   "path": "/venues/{venueId}/settings",
+   "perm": "TENANT_VIEW",
+   "platforms": [
+    "POS"
+   ],
+   "screens": [
+    "BO-063",
+    "BO-100",
+    "BO-101",
+    "BO-102",
+    "BO-103",
+    "BO-104",
+    "BO-105",
+    "BO-106",
+    "BO-1063",
+    "BO-107",
+    "BO-108",
+    "BO-136",
+    "BO-142",
+    "BO-143",
+    "POS-019"
+   ],
+   "enables": []
+  },
+  "getVisitReminder": {
+   "part": "core",
+   "service": "OrderService",
+   "contract": "orders",
+   "verb": "GET",
+   "path": "/orders/{orderId}/reminder",
+   "perm": "ORDER_VIEW",
+   "platforms": [
+    "MOB"
+   ],
+   "screens": [
+    "GST-018"
+   ],
+   "enables": []
+  },
+  "getWaitTimes": {
+   "part": "core",
+   "service": "VenueOpsService",
+   "contract": "queue",
+   "verb": "GET",
+   "path": "/queues/wait-times",
+   "perm": null,
+   "platforms": [
+    "MOB",
+    "WEB"
+   ],
+   "screens": [
+    "BO-001",
+    "BO-002",
+    "BO-004",
+    "BO-005",
+    "BO-038",
+    "EMP-031",
+    "EMP-032",
+    "GST-003",
+    "GST-004",
+    "GST-021",
+    "GST-022",
+    "GST-023",
+    "GST-038",
+    "GST-046",
+    "GST-051",
+    "GST-053",
+    "GST-054",
+    "GST-059",
+    "WEB-002",
+    "WEB-004",
+    "WEB-015",
+    "WEB-039",
+    "WEB-040"
+   ],
+   "enables": []
+  },
+  "getWaitingGuest": {
+   "part": "core",
+   "service": "VenueOpsService",
+   "contract": "queue",
+   "verb": "GET",
+   "path": "/waiting-guests/{entryId}",
+   "perm": null,
+   "platforms": [
+    "MOB",
+    "WEB"
+   ],
+   "screens": [
+    "GST-023",
+    "GST-046",
+    "WEB-015",
+    "WEB-040"
+   ],
+   "enables": []
+  },
+  "getWaiverStatus": {
+   "part": "core",
+   "service": "MarketingService",
+   "contract": "marketing-crm",
+   "verb": "GET",
+   "path": "/guests/{subjectId}/waiver-status",
+   "perm": "GUEST_VIEW",
+   "platforms": [
+    "MOB",
+    "WEB"
+   ],
+   "screens": [
+    "BO-852",
+    "GST-067",
+    "WEB-024"
+   ],
+   "enables": []
+  },
+  "getWallet": {
+   "part": "core",
+   "service": "WalletService",
+   "contract": "wallet",
+   "verb": "GET",
+   "path": "/wallets/{subjectId}",
+   "perm": "ORDER_VIEW",
+   "platforms": [
+    "MOB",
+    "WEB"
+   ],
+   "screens": [
+    "BO-1086",
+    "BO-414",
+    "BO-416",
+    "BO-448",
+    "BO-487",
+    "GST-011",
+    "WEB-021"
+   ],
+   "enables": []
+  },
+  "getWishlist": {
+   "part": "core",
+   "service": "MarketingService",
+   "contract": "marketing-crm",
+   "verb": "GET",
+   "path": "/guests/{subjectId}/wishlist",
+   "perm": null,
+   "platforms": [
+    "MOB",
+    "WEB"
+   ],
+   "screens": [
+    "BO-036",
+    "GST-020",
+    "WEB-009",
+    "WEB-011",
+    "WEB-017",
+    "WEB-024",
+    "WEB-027"
+   ],
+   "enables": []
+  },
+  "getWorkstationHealth": {
+   "part": "core",
+   "service": "TenancyService",
+   "contract": "tenancy",
+   "verb": "GET",
+   "path": "/workstations/{workstationId}/health",
+   "perm": "DEVICE_VIEW",
+   "platforms": [
+    "POS"
+   ],
+   "screens": [
+    "BO-036",
+    "BO-1069",
+    "BO-125",
+    "BO-128",
+    "BO-129",
+    "POS-001",
+    "POS-025"
+   ],
+   "enables": []
+  },
+  "grantDelegation": {
+   "part": "core",
+   "service": "IdentityService",
+   "contract": "identity",
+   "verb": "POST",
+   "path": "/guests/{subjectId}/delegations",
+   "perm": "GUEST_MANAGE",
+   "platforms": [
+    "MOB",
+    "WEB"
+   ],
+   "screens": [
+    "GST-015",
+    "WEB-024"
+   ],
+   "enables": []
+  },
+  "guestLogout": {
+   "part": "core",
+   "service": "IdentityService",
+   "contract": "identity",
+   "verb": "DELETE",
+   "path": "/auth/guest/session",
+   "perm": null,
+   "platforms": [
+    "MOB",
+    "WEB"
+   ],
+   "screens": [
+    "GST-042",
+    "WEB-016"
+   ],
+   "enables": []
+  },
+  "guestSocialLogin": {
+   "part": "core",
+   "service": "IdentityService",
+   "contract": "identity",
+   "verb": "POST",
+   "path": "/auth/guest/social",
+   "perm": null,
+   "platforms": [
+    "MOB",
+    "WEB"
+   ],
+   "screens": [
+    "GST-042",
+    "WEB-016"
+   ],
+   "enables": []
+  },
+  "guestUaePassLogin": {
+   "part": "core",
+   "service": "IdentityService",
+   "contract": "identity",
+   "verb": "POST",
+   "path": "/auth/guest/uae-pass",
+   "perm": null,
+   "platforms": [
+    "MOB",
+    "WEB"
+   ],
+   "screens": [
+    "GST-042",
+    "WEB-016"
+   ],
+   "enables": []
+  },
+  "handoverToAgent": {
+   "part": "core",
+   "service": "MarketingService",
+   "contract": "marketing-crm",
+   "verb": "POST",
+   "path": "/conversations/{conversationId}/handover",
+   "perm": null,
+   "platforms": [
+    "MOB",
+    "WEB"
+   ],
+   "screens": [
+    "BO-799",
+    "GST-031",
+    "GST-032",
+    "KSK-015",
+    "WEB-044"
+   ],
+   "enables": []
+  },
+  "holdCourse": {
+   "part": "core",
+   "service": "FnbService",
+   "contract": "fnb",
+   "verb": "POST",
+   "path": "/kitchen-tickets/{ticketId}/hold",
+   "perm": "ORDER_MODIFY",
+   "platforms": [
+    "POS"
+   ],
+   "screens": [
+    "EMP-058",
+    "KIT-002",
+    "KIT-003"
+   ],
+   "enables": []
+  },
+  "holdOrder": {
+   "part": "core",
+   "service": "OrderService",
+   "contract": "orders",
+   "verb": "POST",
+   "path": "/orders/{orderId}/hold",
+   "perm": "ORDER_MODIFY",
+   "platforms": [
+    "POS"
+   ],
+   "screens": [
+    "BO-022",
+    "BO-023",
+    "BO-026",
+    "BO-047",
+    "BO-051",
+    "BO-070",
+    "EMP-014",
+    "EMP-034",
+    "POS-002",
+    "POS-006",
+    "PTR-002",
+    "PTR-005",
+    "PTR-008",
+    "PTR-015",
+    "PTR-016"
+   ],
+   "enables": []
+  },
+  "identifyGuest": {
+   "part": "core",
+   "service": "MarketingService",
+   "contract": "marketing-crm",
+   "verb": "POST",
+   "path": "/guests/identify",
+   "perm": "GUEST_VIEW",
+   "platforms": [
+    "POS"
+   ],
+   "screens": [
+    "POS-002",
+    "POS-027"
+   ],
+   "enables": []
+  },
+  "importVenueGeometry": {
+   "part": "setup",
+   "service": "VenueOpsService",
+   "contract": "venue-map",
+   "verb": "POST",
+   "path": "/venue-maps/{mapId}/import",
+   "perm": "VENUE_MAP_MANAGE",
+   "platforms": [],
+   "screens": [
+    "BO-093"
+   ],
+   "enables": [
+    "venuemap.path",
+    "venuemap.point"
+   ]
+  },
+  "ingestFxRates": {
+   "part": "setup",
+   "service": "LedgerService",
+   "contract": "finance",
+   "verb": "POST",
+   "path": "/fx-rates/ingest",
+   "perm": "LEDGER_APPROVE",
+   "platforms": [],
+   "screens": [
+    "BO-077"
+   ],
+   "enables": [
+    "ledger.fx_rate"
+   ]
+  },
+  "ingestKnowledgeDocument": {
+   "part": "setup",
+   "service": "AiService",
+   "contract": "ai",
+   "verb": "POST",
+   "path": "/collections/{collectionId}/documents",
+   "perm": "AI_CONFIGURE",
+   "platforms": [],
+   "screens": [],
+   "enables": [
+    "ai.knowledge_document"
+   ]
+  },
+  "inquirePaymentStatus": {
+   "part": "core",
+   "service": "OrderService",
+   "contract": "orders",
+   "verb": "POST",
+   "path": "/payments/{paymentId}/inquiry",
+   "perm": "ORDER_CREATE",
+   "platforms": [
+    "MOB",
+    "POS",
+    "WEB"
+   ],
+   "screens": [
+    "ADM-595",
+    "ADM-597",
+    "ADM-615",
+    "BO-024",
+    "EMP-035",
+    "GST-009",
+    "KSK-008",
+    "POS-005",
+    "PTR-012",
+    "WEB-012"
+   ],
+   "enables": []
+  },
+  "issueGameCard": {
+   "part": "core",
+   "service": "VenueOpsService",
+   "contract": "games",
+   "verb": "POST",
+   "path": "/game-cards",
+   "perm": "ORDER_CREATE",
+   "platforms": [
+    "POS"
+   ],
+   "screens": [
+    "POS-002"
+   ],
+   "enables": []
+  },
+  "issueWalletPass": {
+   "part": "core",
+   "service": "OrderService",
+   "contract": "orders",
+   "verb": "POST",
+   "path": "/wallet-passes",
+   "perm": "ORDER_VIEW",
+   "platforms": [
+    "MOB",
+    "WEB"
+   ],
+   "screens": [
+    "GST-018",
+    "WEB-018"
+   ],
+   "enables": []
+  },
+  "joinQueue": {
+   "part": "core",
+   "service": "VenueOpsService",
+   "contract": "queue",
+   "verb": "POST",
+   "path": "/waiting-guests",
+   "perm": null,
+   "platforms": [
+    "MOB",
+    "WEB"
+   ],
+   "screens": [
+    "GST-023",
+    "GST-046",
+    "WEB-015",
+    "WEB-040"
+   ],
+   "enables": []
+  },
+  "joinRestaurantWaitlist": {
+   "part": "core",
+   "service": "FnbService",
+   "contract": "fnb",
+   "verb": "POST",
+   "path": "/waitlist",
+   "perm": "FNB_SERVE",
+   "platforms": [
+    "MOB",
+    "WEB"
+   ],
+   "screens": [
+    "EMP-056",
+    "EMP-058",
+    "GST-070",
+    "WEB-036"
+   ],
+   "enables": []
+  },
+  "joinWaitlist": {
+   "part": "core",
+   "service": "CatalogueService",
+   "contract": "catalogue",
+   "verb": "POST",
+   "path": "/waitlist-entries",
+   "perm": null,
+   "platforms": [
+    "MOB",
+    "WEB"
+   ],
+   "screens": [
+    "GST-070",
+    "WEB-040"
+   ],
+   "enables": []
+  },
+  "leaveQueue": {
+   "part": "core",
+   "service": "VenueOpsService",
+   "contract": "queue",
+   "verb": "DELETE",
+   "path": "/waiting-guests/{entryId}",
+   "perm": null,
+   "platforms": [
+    "MOB",
+    "WEB"
+   ],
+   "screens": [
+    "GST-023",
+    "WEB-040"
+   ],
+   "enables": []
+  },
+  "leaveWaitlist": {
+   "part": "core",
+   "service": "CatalogueService",
+   "contract": "catalogue",
+   "verb": "DELETE",
+   "path": "/waitlist-entries/{entryId}",
+   "perm": null,
+   "platforms": [
+    "MOB",
+    "WEB"
+   ],
+   "screens": [
+    "GST-070",
+    "WEB-040"
+   ],
+   "enables": []
+  },
+  "linkGuestCheckout": {
+   "part": "core",
+   "service": "IdentityService",
+   "contract": "identity",
+   "verb": "POST",
+   "path": "/auth/guest/link-checkout",
+   "perm": null,
+   "platforms": [
+    "MOB",
+    "WEB"
+   ],
+   "screens": [
+    "GST-042",
+    "WEB-016"
+   ],
+   "enables": []
+  },
+  "list86Events": {
+   "part": "core",
+   "service": "FnbService",
+   "contract": "fnb",
+   "verb": "GET",
+   "path": "/outlets/{outletId}/86-events",
+   "perm": "PRODUCT_VIEW",
+   "platforms": [
+    "POS"
+   ],
+   "screens": [
+    "KIT-008"
+   ],
+   "enables": []
+  },
+  "listActiveSessions": {
+   "part": "core",
+   "service": "IdentityService",
+   "contract": "identity",
+   "verb": "GET",
+   "path": "/auth/sessions",
+   "perm": "SESSION_FORCE_LOGOUT",
+   "platforms": [
+    "POS"
+   ],
+   "screens": [
+    "ADM-001",
+    "POS-000",
+    "PTR-001",
+    "SUP-001"
+   ],
+   "enables": []
+  },
+  "listAiConversations": {
+   "part": "core",
+   "service": "AiService",
+   "contract": "ai",
+   "verb": "GET",
+   "path": "/conversations",
+   "perm": "AI_USE",
+   "platforms": [
+    "MOB",
+    "WEB"
+   ],
+   "screens": [
+    "EMP-019",
+    "EMP-020",
+    "GST-068",
+    "WEB-044"
+   ],
+   "enables": []
+  },
+  "listAlerts": {
+   "part": "core",
+   "service": "ReportingService",
+   "contract": "reporting",
+   "verb": "GET",
+   "path": "/alerts",
+   "perm": "REPORT_VIEW_VENUE",
+   "platforms": [
+    "POS"
+   ],
+   "screens": [
+    "ANL-001",
+    "ANL-003",
+    "ANL-009",
+    "ANL-012",
+    "BO-036",
+    "BO-125",
+    "BO-133",
+    "BO-141",
+    "BO-472",
+    "EMP-070",
+    "POS-009",
+    "POS-020",
+    "POS-025"
+   ],
+   "enables": []
+  },
+  "listAlternativeCodes": {
+   "part": "core",
+   "service": "CatalogueService",
+   "contract": "catalogue",
+   "verb": "GET",
+   "path": "/products/{productId}/alternative-codes",
+   "perm": "PRODUCT_VIEW",
+   "platforms": [
+    "POS"
+   ],
+   "screens": [
+    "BO-007",
+    "BO-012",
+    "BO-014",
+    "EMP-034",
+    "POS-002",
+    "POS-003",
+    "PTR-006"
+   ],
+   "enables": []
+  },
+  "listBanners": {
+   "part": "core",
+   "service": "WhiteLabelService",
+   "contract": "white-label",
+   "verb": "GET",
+   "path": "/tenant-config/banners",
+   "perm": "TENANT_CONFIGURE",
+   "platforms": [
+    "WL"
+   ],
+   "screens": [
+    "CMS-008"
+   ],
+   "enables": []
+  },
+  "listBillingStatements": {
+   "part": "core",
+   "service": "OrderService",
+   "contract": "orders",
+   "verb": "GET",
+   "path": "/billing-statements",
+   "perm": null,
+   "platforms": [
+    "MOB",
+    "WEB"
+   ],
+   "screens": [
+    "GST-015",
+    "WEB-023"
+   ],
+   "enables": []
+  },
+  "listCases": {
+   "part": "core",
+   "service": "MarketingService",
+   "contract": "marketing-crm",
+   "verb": "GET",
+   "path": "/cases",
+   "perm": "CASE_VIEW",
+   "platforms": [
+    "MOB",
+    "WEB"
+   ],
+   "screens": [
+    "BO-804",
+    "BO-805",
+    "BO-813",
+    "EMP-028",
+    "EMP-029",
+    "GST-068",
+    "PTR-021",
+    "SUP-002",
+    "SUP-004",
+    "SUP-005",
+    "WEB-025"
+   ],
+   "enables": []
+  },
+  "listCashMovements": {
+   "part": "core",
+   "service": "OrderService",
+   "contract": "shift",
+   "verb": "GET",
+   "path": "/shifts/{shiftId}/cash-movements",
+   "perm": "REPORT_VIEW_WORKSTATION",
+   "platforms": [
+    "POS"
+   ],
+   "screens": [
+    "BO-039",
+    "BO-040",
+    "BO-041",
+    "BO-042",
+    "EMP-003",
+    "EMP-008",
+    "EMP-009",
+    "POS-001",
+    "POS-007",
+    "POS-009",
+    "POS-013",
+    "POS-015"
+   ],
+   "enables": []
+  },
+  "listCatalogueBundles": {
+   "part": "core",
+   "service": "CatalogueService",
+   "contract": "catalogue",
+   "verb": "GET",
+   "path": "/catalogue/bundles",
+   "perm": "PRODUCT_VIEW",
+   "platforms": [
+    "MOB",
+    "WEB"
+   ],
+   "screens": [
+    "BO-011",
+    "BO-037",
+    "EMP-018",
+    "GST-052",
+    "GST-056",
+    "WEB-008"
+   ],
+   "enables": []
+  },
+  "listCollections": {
+   "part": "core",
+   "service": "VenueOpsService",
+   "contract": "assets",
+   "verb": "GET",
+   "path": "/media/collections",
+   "perm": "ASSET_LIBRARY_VIEW",
+   "platforms": [
+    "WL"
+   ],
+   "screens": [
+    "CMS-010",
+    "CMS-062",
+    "CMS-064"
+   ],
+   "enables": []
+  },
+  "listConfigVersions": {
+   "part": "core",
+   "service": "WhiteLabelService",
+   "contract": "white-label",
+   "verb": "GET",
+   "path": "/tenant-config/versions",
+   "perm": "TENANT_CONFIGURE",
+   "platforms": [
+    "WL"
+   ],
+   "screens": [
+    "ADM-016",
+    "CMS-006",
+    "CMS-015",
+    "CMS-020"
+   ],
+   "enables": []
+  },
+  "listConsentPurposes": {
+   "part": "core",
+   "service": "MarketingService",
+   "contract": "marketing-crm",
+   "verb": "GET",
+   "path": "/consent-purposes",
+   "perm": "GUEST_VIEW",
+   "platforms": [
+    "MOB",
+    "WEB",
+    "WL"
+   ],
+   "screens": [
+    "BO-747",
+    "CMS-018",
+    "GST-065",
+    "WEB-011",
+    "WEB-020"
+   ],
+   "enables": []
+  },
+  "listContentPages": {
+   "part": "core",
+   "service": "WhiteLabelService",
+   "contract": "white-label",
+   "verb": "GET",
+   "path": "/tenant-config/pages",
+   "perm": "TENANT_CONFIGURE",
+   "platforms": [
+    "MOB",
+    "WEB",
+    "WL"
+   ],
+   "screens": [
+    "BO-837",
+    "CMS-007",
+    "GST-040",
+    "GST-057",
+    "WEB-045"
+   ],
+   "enables": []
+  },
+  "listCustomDomains": {
+   "part": "core",
+   "service": "WhiteLabelService",
+   "contract": "white-label",
+   "verb": "GET",
+   "path": "/tenant-domains",
+   "perm": "TENANT_CONFIGURE",
+   "platforms": [
+    "WL"
+   ],
+   "screens": [
+    "ADM-017",
+    "CMS-017"
+   ],
+   "enables": []
+  },
+  "listDelegations": {
+   "part": "core",
+   "service": "IdentityService",
+   "contract": "identity",
+   "verb": "GET",
+   "path": "/guests/{subjectId}/delegations",
+   "perm": "GUEST_VIEW",
+   "platforms": [
+    "MOB",
+    "WEB"
+   ],
+   "screens": [
+    "BO-385",
+    "GST-015",
+    "WEB-024"
+   ],
+   "enables": []
+  },
+  "listDeliveryLocations": {
+   "part": "core",
+   "service": "FnbService",
+   "contract": "fnb",
+   "verb": "GET",
+   "path": "/venues/{venueId}/delivery-locations",
+   "perm": null,
+   "platforms": [
+    "MOB",
+    "WEB"
+   ],
+   "screens": [
+    "BO-062",
+    "BO-065",
+    "EMP-030",
+    "GST-024",
+    "GST-029",
+    "WEB-036"
+   ],
+   "enables": []
+  },
+  "listDenominations": {
+   "part": "core",
+   "service": "OrderService",
+   "contract": "shift",
+   "verb": "GET",
+   "path": "/denominations",
+   "perm": "SHIFT_OPEN",
+   "platforms": [
+    "POS"
+   ],
+   "screens": [
+    "BO-1065",
+    "POS-001",
+    "POS-007",
+    "POS-011",
+    "POS-012",
+    "POS-013"
+   ],
+   "enables": []
+  },
+  "listDepositBoxes": {
+   "part": "core",
+   "service": "OrderService",
+   "contract": "shift",
+   "verb": "GET",
+   "path": "/deposit-boxes",
+   "perm": "SHIFT_OPEN",
+   "platforms": [
+    "POS"
+   ],
+   "screens": [
+    "POS-015"
+   ],
+   "enables": []
+  },
+  "listDevices": {
+   "part": "core",
+   "service": "TenancyService",
+   "contract": "tenancy",
+   "verb": "GET",
+   "path": "/devices",
+   "perm": "DEVICE_VIEW",
+   "platforms": [
+    "POS"
+   ],
+   "screens": [
+    "ADM-580",
+    "ANL-003",
+    "BO-036",
+    "BO-124",
+    "BO-127",
+    "EMP-043",
+    "POS-016",
+    "POS-025"
+   ],
+   "enables": []
+  },
+  "listDiningOutlets": {
+   "part": "core",
+   "service": "FnbService",
+   "contract": "fnb",
+   "verb": "GET",
+   "path": "/venues/{venueId}/dining",
+   "perm": null,
+   "platforms": [
+    "MOB",
+    "WEB"
+   ],
+   "screens": [
+    "BO-062",
+    "BO-065",
+    "EMP-030",
+    "GST-024",
+    "GST-029",
+    "WEB-036"
+   ],
+   "enables": []
+  },
+  "listEntitlements": {
+   "part": "core",
+   "service": "AccessService",
+   "contract": "access",
+   "verb": "GET",
+   "path": "/my/entitlements/all",
+   "perm": "",
+   "platforms": [
+    "MOB",
+    "WEB"
+   ],
+   "screens": [
+    "GST-012",
+    "WEB-018"
+   ],
+   "enables": []
+  },
+  "listFaqs": {
+   "part": "core",
+   "service": "WhiteLabelService",
+   "contract": "white-label",
+   "verb": "GET",
+   "path": "/tenant-config/faqs",
+   "perm": "TENANT_CONFIGURE",
+   "platforms": [
+    "MOB",
+    "WEB",
+    "WL"
+   ],
+   "screens": [
+    "ADM-018",
+    "GST-040",
+    "SUP-006",
+    "WEB-045"
+   ],
+   "enables": []
+  },
+  "listFnbOrders": {
+   "part": "core",
+   "service": "FnbService",
+   "contract": "fnb",
+   "verb": "GET",
+   "path": "/fnb-orders",
+   "perm": "ORDER_VIEW",
+   "platforms": [
+    "POS"
+   ],
+   "screens": [
+    "BO-020",
+    "BO-044",
+    "EMP-051",
+    "KIT-001",
+    "POS-029"
+   ],
+   "enables": []
+  },
+  "listFulfilmentSlots": {
+   "part": "core",
+   "service": "FnbService",
+   "contract": "fnb",
+   "verb": "GET",
+   "path": "/outlets/{outletId}/fulfilment-slots",
+   "perm": null,
+   "platforms": [
+    "MOB",
+    "WEB"
+   ],
+   "screens": [
+    "GST-024",
+    "WEB-036"
+   ],
+   "enables": []
+  },
+  "listFxRates": {
+   "part": "core",
+   "service": "LedgerService",
+   "contract": "finance",
+   "verb": "GET",
+   "path": "/fx-rates",
+   "perm": "LEDGER_VIEW",
+   "platforms": [
+    "MOB",
+    "WEB"
+   ],
+   "screens": [
+    "BO-077",
+    "GST-044",
+    "WEB-035"
+   ],
+   "enables": []
+  },
+  "listGroupPackages": {
+   "part": "core",
+   "service": "CatalogueService",
+   "contract": "catalogue",
+   "verb": "GET",
+   "path": "/group-packages",
+   "perm": "PRODUCT_VIEW",
+   "platforms": [
+    "MOB",
+    "WEB"
+   ],
+   "screens": [
+    "GST-072",
+    "WEB-031"
+   ],
+   "enables": []
+  },
+  "listGuestDevices": {
+   "part": "core",
+   "service": "MarketingService",
+   "contract": "marketing-crm",
+   "verb": "GET",
+   "path": "/guests/{subjectId}/devices",
+   "perm": null,
+   "platforms": [
+    "MOB",
+    "WEB"
+   ],
+   "screens": [
+    "BO-036",
+    "GST-073",
+    "WEB-011",
+    "WEB-017",
+    "WEB-024",
+    "WEB-027"
+   ],
+   "enables": []
+  },
+  "listGuestMemberships": {
+   "part": "core",
+   "service": "CatalogueService",
+   "contract": "catalogue",
+   "verb": "GET",
+   "path": "/guest/memberships",
+   "perm": "PRODUCT_VIEW",
+   "platforms": [
+    "MOB",
+    "WEB"
+   ],
+   "screens": [
+    "GST-015",
+    "WEB-022",
+    "WEB-023"
+   ],
+   "enables": []
+  },
+  "listInventoryHolds": {
+   "part": "core",
+   "service": "CatalogueService",
+   "contract": "catalogue",
+   "verb": "GET",
+   "path": "/inventory-holds",
+   "perm": "PRODUCT_VIEW",
+   "platforms": [
+    "POS"
+   ],
+   "screens": [
+    "BO-018",
+    "BO-1057",
+    "POS-003"
+   ],
+   "enables": []
+  },
+  "listKitchenStations": {
+   "part": "core",
+   "service": "FnbService",
+   "contract": "fnb",
+   "verb": "GET",
+   "path": "/kitchen/stations",
+   "perm": "PRODUCT_VIEW",
+   "platforms": [
+    "POS"
+   ],
+   "screens": [
+    "BO-020",
+    "BO-046",
+    "BO-134",
+    "KIT-001",
+    "KIT-005"
+   ],
+   "enables": []
+  },
+  "listKitchenTickets": {
+   "part": "core",
+   "service": "FnbService",
+   "contract": "fnb",
+   "verb": "GET",
+   "path": "/kitchen/tickets",
+   "perm": "ORDER_VIEW",
+   "platforms": [
+    "POS"
+   ],
+   "screens": [
+    "BO-020",
+    "BO-046",
+    "BO-731",
+    "KIT-001",
+    "KIT-002",
+    "KIT-004",
+    "KIT-006",
+    "KIT-007",
+    "POS-022"
+   ],
+   "enables": []
+  },
+  "listLoyaltyProgrammes": {
+   "part": "core",
+   "service": "MarketingService",
+   "contract": "marketing-crm",
+   "verb": "GET",
+   "path": "/loyalty/programmes",
+   "perm": "MARKETING_VIEW",
+   "platforms": [
+    "MOB",
+    "WEB"
+   ],
+   "screens": [
+    "BO-833",
+    "GST-036",
+    "WEB-043"
+   ],
+   "enables": []
+  },
+  "listMenus": {
+   "part": "core",
+   "service": "FnbService",
+   "contract": "fnb",
+   "verb": "GET",
+   "path": "/menus",
+   "perm": "PRODUCT_VIEW",
+   "platforms": [
+    "POS",
+    "WL"
+   ],
+   "screens": [
+    "BO-007",
+    "BO-045",
+    "BO-104",
+    "BO-109",
+    "BO-729",
+    "BO-730",
+    "CMS-009",
+    "POS-021",
+    "POS-024"
+   ],
+   "enables": []
+  },
+  "listMerchandise": {
+   "part": "core",
+   "service": "RetailService",
+   "contract": "retail",
+   "verb": "GET",
+   "path": "/merchandise",
+   "perm": "PRODUCT_VIEW",
+   "platforms": [
+    "MOB",
+    "POS",
+    "WEB"
+   ],
+   "screens": [
+    "BO-007",
+    "BO-044",
+    "BO-048",
+    "BO-116",
+    "GST-026",
+    "KSK-017",
+    "POS-002",
+    "POS-023",
+    "WEB-033",
+    "WEB-042"
+   ],
+   "enables": []
+  },
+  "listMfaMethods": {
+   "part": "core",
+   "service": "IdentityService",
+   "contract": "identity",
+   "verb": "GET",
+   "path": "/auth/mfa/methods",
+   "perm": null,
+   "platforms": [
+    "MOB",
+    "WEB"
+   ],
+   "screens": [
+    "ADM-001",
+    "ADM-342",
+    "EMP-001",
+    "EMP-002",
+    "EMP-042",
+    "GST-042",
+    "PTR-001",
+    "SCN-001",
+    "SUP-001",
+    "WEB-016"
+   ],
+   "enables": []
+  },
+  "listModifierGroups": {
+   "part": "core",
+   "service": "FnbService",
+   "contract": "fnb",
+   "verb": "GET",
+   "path": "/modifier-groups",
+   "perm": "PRODUCT_VIEW",
+   "platforms": [
+    "MOB",
+    "POS",
+    "WEB"
+   ],
+   "screens": [
+    "GST-024",
+    "GST-061",
+    "POS-021",
+    "WEB-036",
+    "WEB-037"
+   ],
+   "enables": []
+  },
+  "listMyCases": {
+   "part": "core",
+   "service": "MarketingService",
+   "contract": "marketing-crm",
+   "verb": "GET",
+   "path": "/my/cases",
+   "perm": "",
+   "platforms": [
+    "MOB",
+    "WEB"
+   ],
+   "screens": [
+    "BO-804",
+    "BO-813",
+    "GST-034",
+    "GST-040",
+    "WEB-034"
+   ],
+   "enables": []
+  },
+  "listMyEntitlements": {
+   "part": "core",
+   "service": "AccessService",
+   "contract": "access",
+   "verb": "GET",
+   "path": "/guests/me/entitlements",
+   "perm": "ORDER_VIEW",
+   "platforms": [
+    "MOB",
+    "POS",
+    "WEB"
+   ],
+   "screens": [
+    "GST-001",
+    "GST-012",
+    "GST-055",
+    "POS-002",
+    "WEB-018"
+   ],
+   "enables": []
+  },
+  "listMyOrders": {
+   "part": "core",
+   "service": "OrderService",
+   "contract": "orders",
+   "verb": "GET",
+   "path": "/my/orders",
+   "perm": "",
+   "platforms": [
+    "MOB",
+    "WEB"
+   ],
+   "screens": [
+    "GST-019",
+    "WEB-019"
+   ],
+   "enables": []
+  },
+  "listMyPaymentIssues": {
+   "part": "core",
+   "service": "OrderService",
+   "contract": "payments",
+   "verb": "GET",
+   "path": "/guests/me/payment-issues",
+   "perm": null,
+   "platforms": [
+    "MOB",
+    "WEB"
+   ],
+   "screens": [
+    "GST-015",
+    "WEB-023"
+   ],
+   "enables": []
+  },
+  "listOrderRefunds": {
+   "part": "core",
+   "service": "OrderService",
+   "contract": "orders",
+   "verb": "GET",
+   "path": "/orders/{orderId}/refunds",
+   "perm": "ORDER_VIEW",
+   "platforms": [
+    "POS"
+   ],
+   "screens": [
+    "ADM-609",
+    "BO-022",
+    "BO-023",
+    "BO-026",
+    "BO-047",
+    "BO-051",
+    "BO-070",
+    "EMP-014",
+    "EMP-034",
+    "POS-002",
+    "POS-006",
+    "PTR-002",
+    "PTR-005",
+    "PTR-008",
+    "PTR-015",
+    "PTR-016"
+   ],
+   "enables": []
+  },
+  "listOrders": {
+   "part": "core",
+   "service": "OrderService",
+   "contract": "orders",
+   "verb": "GET",
+   "path": "/orders",
+   "perm": "ORDER_VIEW",
+   "platforms": [
+    "MOB",
+    "POS",
+    "WEB"
+   ],
+   "screens": [
+    "ANL-009",
+    "BO-022",
+    "BO-023",
+    "BO-026",
+    "BO-047",
+    "BO-051",
+    "BO-070",
+    "BO-082",
+    "BO-101",
+    "EMP-014",
+    "EMP-034",
+    "EMP-057",
+    "GST-014",
+    "GST-018",
+    "GST-019",
+    "POS-002",
+    "POS-006",
+    "POS-012",
+    "PTR-002",
+    "PTR-005",
+    "PTR-008",
+    "PTR-015",
+    "PTR-016",
+    "WEB-019",
+    "WEB-030"
+   ],
+   "enables": []
+  },
+  "listOutlets": {
+   "part": "core",
+   "service": "TenancyService",
+   "contract": "tenancy",
+   "verb": "GET",
+   "path": "/outlets",
+   "perm": "SCOPE_VIEW",
+   "platforms": [
+    "POS"
+   ],
+   "screens": [
+    "BO-044",
+    "BO-727",
+    "BO-728",
+    "BO-732",
+    "POS-011",
+    "POS-024"
+   ],
+   "enables": []
+  },
+  "listParkingFacilities": {
+   "part": "core",
+   "service": "AccessService",
+   "contract": "access",
+   "verb": "GET",
+   "path": "/parking-facilities",
+   "perm": "ACCESS_POINT_CONFIGURE",
+   "platforms": [
+    "MOB",
+    "WEB"
+   ],
+   "screens": [
+    "BO-006",
+    "GST-027",
+    "GST-028",
+    "WEB-041"
+   ],
+   "enables": []
+  },
+  "listPaymentTokens": {
+   "part": "core",
+   "service": "OrderService",
+   "contract": "orders",
+   "verb": "GET",
+   "path": "/payment-tokens",
+   "perm": "ORDER_VIEW",
+   "platforms": [
+    "MOB",
+    "WEB"
+   ],
+   "screens": [
+    "GST-071",
+    "WEB-021"
+   ],
+   "enables": []
+  },
+  "listPerformances": {
+   "part": "core",
+   "service": "CatalogueService",
+   "contract": "catalogue",
+   "verb": "GET",
+   "path": "/events/{eventId}/performances",
+   "perm": "PRODUCT_VIEW",
+   "platforms": [
+    "MOB",
+    "WEB"
+   ],
+   "screens": [
+    "BO-001",
+    "BO-015",
+    "BO-016",
+    "BO-019",
+    "BO-063",
+    "GST-003",
+    "GST-004",
+    "GST-005",
+    "GST-007",
+    "WEB-002",
+    "WEB-004"
+   ],
+   "enables": []
+  },
+  "listPolicies": {
+   "part": "core",
+   "service": "WhiteLabelService",
+   "contract": "white-label",
+   "verb": "GET",
+   "path": "/tenant-config/policies",
+   "perm": "TENANT_CONFIGURE",
+   "platforms": [
+    "WL"
+   ],
+   "screens": [
+    "ADM-018",
+    "BO-243",
+    "CMS-018"
+   ],
+   "enables": []
+  },
+  "listPrincipals": {
+   "part": "core",
+   "service": "IdentityService",
+   "contract": "identity",
+   "verb": "GET",
+   "path": "/principals",
+   "perm": "USER_MANAGE",
+   "platforms": [
+    "POS",
+    "WL"
+   ],
+   "screens": [
+    "ADM-020",
+    "ANL-003",
+    "BO-053",
+    "BO-057",
+    "BO-873",
+    "CMS-019",
+    "POS-018",
+    "PTR-003"
+   ],
+   "enables": []
+  },
+  "listProductVariants": {
+   "part": "core",
+   "service": "CatalogueService",
+   "contract": "catalogue",
+   "verb": "GET",
+   "path": "/products/{productId}/variants",
+   "perm": "PRODUCT_VIEW",
+   "platforms": [
+    "MOB",
+    "POS",
+    "WEB"
+   ],
+   "screens": [
+    "BO-007",
+    "BO-008",
+    "BO-012",
+    "BO-014",
+    "EMP-034",
+    "GST-041",
+    "KSK-004",
+    "POS-002",
+    "POS-003",
+    "PTR-006",
+    "WEB-005"
+   ],
+   "enables": []
+  },
+  "listProducts": {
+   "part": "core",
+   "service": "CatalogueService",
+   "contract": "catalogue",
+   "verb": "GET",
+   "path": "/products",
+   "perm": "PRODUCT_VIEW",
+   "platforms": [
+    "MOB",
+    "POS",
+    "WEB"
+   ],
+   "screens": [
+    "ANL-004",
+    "BO-007",
+    "BO-012",
+    "BO-013",
+    "BO-014",
+    "BO-125",
+    "EMP-034",
+    "GST-002",
+    "GST-003",
+    "GST-005",
+    "GST-015",
+    "GST-021",
+    "GST-038",
+    "GST-044",
+    "GST-050",
+    "GST-051",
+    "GST-052",
+    "GST-053",
+    "GST-054",
+    "GST-058",
+    "GST-059",
+    "KSK-003",
+    "KSK-015",
+    "POS-002",
+    "POS-003",
+    "PTR-006",
+    "WEB-001",
+    "WEB-002",
+    "WEB-003",
+    "WEB-022",
+    "WEB-035"
+   ],
+   "enables": []
+  },
+  "listPromoBlocks": {
+   "part": "core",
+   "service": "WhiteLabelService",
+   "contract": "white-label",
+   "verb": "GET",
+   "path": "/tenant-config/promo-blocks",
+   "perm": "TENANT_CONFIGURE",
+   "platforms": [
+    "WL"
+   ],
+   "screens": [
+    "CMS-008"
+   ],
+   "enables": []
+  },
+  "listPromotions": {
+   "part": "core",
+   "service": "CatalogueService",
+   "contract": "promotions",
+   "verb": "GET",
+   "path": "/promotions",
+   "perm": "PRICE_VIEW",
+   "platforms": [
+    "MOB",
+    "POS",
+    "WEB"
+   ],
+   "screens": [
+    "ADM-138",
+    "ADM-140",
+    "ADM-145",
+    "BO-010",
+    "GST-036",
+    "GST-037",
+    "POS-002",
+    "PTR-010",
+    "WEB-032",
+    "WEB-043"
+   ],
+   "enables": []
+  },
+  "listQueueEntries": {
+   "part": "core",
+   "service": "VenueOpsService",
+   "contract": "queue",
+   "verb": "GET",
+   "path": "/queues/{queueId}/entries",
+   "perm": "QUEUE_VIEW",
+   "platforms": [
+    "POS"
+   ],
+   "screens": [
+    "BO-001",
+    "BO-002",
+    "BO-004",
+    "BO-005",
+    "BO-038",
+    "EMP-031",
+    "EMP-032",
+    "POS-029"
+   ],
+   "enables": []
+  },
+  "listQueues": {
+   "part": "core",
+   "service": "VenueOpsService",
+   "contract": "queue",
+   "verb": "GET",
+   "path": "/queues",
+   "perm": "QUEUE_VIEW",
+   "platforms": [
+    "MOB",
+    "WEB"
+   ],
+   "screens": [
+    "BO-001",
+    "BO-002",
+    "BO-004",
+    "BO-005",
+    "BO-038",
+    "EMP-031",
+    "EMP-032",
+    "GST-023",
+    "SUP-020",
+    "WEB-039"
+   ],
+   "enables": []
+  },
+  "listReports": {
+   "part": "core",
+   "service": "ReportingService",
+   "contract": "reporting",
+   "verb": "GET",
+   "path": "/reports",
+   "perm": "REPORT_VIEW_VENUE",
+   "platforms": [
+    "POS"
+   ],
+   "screens": [
+    "ANL-031",
+    "BO-029",
+    "BO-058",
+    "BO-059",
+    "BO-060",
+    "BO-061",
+    "POS-008",
+    "PTR-018",
+    "SUP-008"
+   ],
+   "enables": []
+  },
+  "listReservations": {
+   "part": "core",
+   "service": "OrderService",
+   "contract": "orders",
+   "verb": "GET",
+   "path": "/reservations",
+   "perm": "ORDER_VIEW",
+   "platforms": [
+    "MOB",
+    "WEB"
+   ],
+   "screens": [
+    "GST-016",
+    "WEB-031"
+   ],
+   "enables": []
+  },
+  "listRetailSales": {
+   "part": "core",
+   "service": "RetailService",
+   "contract": "retail",
+   "verb": "GET",
+   "path": "/retail-sales",
+   "perm": "ORDER_VIEW",
+   "platforms": [
+    "POS"
+   ],
+   "screens": [
+    "POS-005"
+   ],
+   "enables": []
+  },
+  "listRoles": {
+   "part": "core",
+   "service": "IdentityService",
+   "contract": "identity",
+   "verb": "GET",
+   "path": "/roles",
+   "perm": "ROLE_MANAGE",
+   "platforms": [
+    "WL"
+   ],
+   "screens": [
+    "ADM-021",
+    "BO-054",
+    "BO-106",
+    "BO-142",
+    "CMS-019",
+    "EMP-002"
+   ],
+   "enables": []
+  },
+  "listRotaAssignments": {
+   "part": "core",
+   "service": "TenancyService",
+   "contract": "workforce",
+   "verb": "GET",
+   "path": "/rota-assignments",
+   "perm": "WORKFORCE_VIEW",
+   "platforms": [
+    "POS"
+   ],
+   "screens": [
+    "BO-055",
+    "BO-882",
+    "BO-883",
+    "EMP-021",
+    "EMP-022",
+    "EMP-023",
+    "POS-009",
+    "POS-018"
+   ],
+   "enables": []
+  },
+  "listSaleBoards": {
+   "part": "core",
+   "service": "TenancyService",
+   "contract": "tenancy",
+   "verb": "GET",
+   "path": "/sale-boards",
+   "perm": "SCOPE_VIEW",
+   "platforms": [
+    "POS"
+   ],
+   "screens": [
+    "BO-115",
+    "BO-116",
+    "BO-117",
+    "BO-118",
+    "BO-122",
+    "BO-123",
+    "BO-126",
+    "POS-002",
+    "POS-025"
+   ],
+   "enables": []
+  },
+  "listSerialisedItems": {
+   "part": "core",
+   "service": "InventoryService",
+   "contract": "inventory",
+   "verb": "GET",
+   "path": "/serialised-items",
+   "perm": "PRODUCT_VIEW",
+   "platforms": [
+    "POS"
+   ],
+   "screens": [
+    "BO-114",
+    "BO-505",
+    "EMP-069",
+    "POS-011"
+   ],
+   "enables": []
+  },
+  "listShifts": {
+   "part": "core",
+   "service": "OrderService",
+   "contract": "shift",
+   "verb": "GET",
+   "path": "/shifts",
+   "perm": "REPORT_VIEW_WORKSTATION",
+   "platforms": [
+    "POS"
+   ],
+   "screens": [
+    "BO-039",
+    "BO-040",
+    "BO-041",
+    "BO-042",
+    "BO-100",
+    "EMP-003",
+    "EMP-008",
+    "EMP-009",
+    "POS-001",
+    "POS-007",
+    "POS-009",
+    "POS-019"
+   ],
+   "enables": []
+  },
+  "listSsoProviders": {
+   "part": "core",
+   "service": "IdentityService",
+   "contract": "identity",
+   "verb": "GET",
+   "path": "/auth/sso/providers",
+   "perm": null,
+   "platforms": [
+    "MOB",
+    "WEB"
+   ],
+   "screens": [
+    "ADM-001",
+    "EMP-001",
+    "EMP-002",
+    "EMP-042",
+    "GST-042",
+    "PTR-001",
+    "SCN-001",
+    "SUP-001",
+    "WEB-016"
+   ],
+   "enables": []
+  },
+  "listTableReservations": {
+   "part": "core",
+   "service": "FnbService",
+   "contract": "fnb",
+   "verb": "GET",
+   "path": "/table-reservations",
+   "perm": "FNB_OPERATE",
+   "platforms": [
+    "POS"
+   ],
+   "screens": [
+    "EMP-051",
+    "EMP-054",
+    "EMP-060",
+    "POS-028"
+   ],
+   "enables": []
+  },
+  "listWalletTransactions": {
+   "part": "core",
+   "service": "WalletService",
+   "contract": "wallet",
+   "verb": "GET",
+   "path": "/wallets/{subjectId}/transactions",
+   "perm": "ORDER_VIEW",
+   "platforms": [
+    "MOB",
+    "WEB"
+   ],
+   "screens": [
+    "BO-1093",
+    "BO-1102",
+    "BO-1142",
+    "BO-1143",
+    "BO-414",
+    "BO-423",
+    "BO-469",
+    "GST-011",
+    "WEB-021"
+   ],
+   "enables": []
+  },
+  "listWorkstations": {
+   "part": "core",
+   "service": "TenancyService",
+   "contract": "tenancy",
+   "verb": "GET",
+   "path": "/workstations",
+   "perm": "SCOPE_VIEW",
+   "platforms": [
+    "POS"
+   ],
+   "screens": [
+    "BO-036",
+    "BO-037",
+    "BO-116",
+    "BO-126",
+    "BO-128",
+    "BO-129",
+    "BO-135",
+    "POS-009"
+   ],
+   "enables": []
+  },
+  "loadGameCredits": {
+   "part": "core",
+   "service": "WalletService",
+   "contract": "wallet",
+   "verb": "POST",
+   "path": "/game-cards/{cardCode}/load",
+   "perm": "ORDER_CREATE",
+   "platforms": [
+    "POS"
+   ],
+   "screens": [
+    "POS-002"
+   ],
+   "enables": []
+  },
+  "logColdChain": {
+   "part": "setup",
+   "service": "FnbService",
+   "contract": "fnb",
+   "verb": "POST",
+   "path": "/food-safety/cold-chain",
+   "perm": "INCIDENT_REPORT",
+   "platforms": [],
+   "screens": [
+    "EMP-065"
+   ],
+   "enables": [
+    "fnb.cold_chain_event",
+    "fnb.corrective_action"
+   ]
+  },
+  "logKitchenException": {
+   "part": "core",
+   "service": "FnbService",
+   "contract": "fnb",
+   "verb": "POST",
+   "path": "/kitchen-exceptions",
+   "perm": "INCIDENT_REPORT",
+   "platforms": [
+    "POS"
+   ],
+   "screens": [
+    "KIT-008"
+   ],
+   "enables": []
+  },
+  "logTemperature": {
+   "part": "setup",
+   "service": "FnbService",
+   "contract": "fnb",
+   "verb": "POST",
+   "path": "/food-safety/temperature-logs",
+   "perm": "INCIDENT_REPORT",
+   "platforms": [],
+   "screens": [
+    "EMP-062",
+    "EMP-067"
+   ],
+   "enables": [
+    "fnb.corrective_action",
+    "fnb.temperature_log"
+   ]
+  },
+  "login": {
+   "part": "core",
+   "service": "IdentityService",
+   "contract": "identity",
+   "verb": "POST",
+   "path": "/auth/login",
+   "perm": null,
+   "platforms": [
+    "MOB",
+    "POS",
+    "WEB"
+   ],
+   "screens": [
+    "ADM-001",
+    "EMP-001",
+    "GST-042",
+    "POS-000",
+    "PTR-001",
+    "SCN-001",
+    "SUP-001",
+    "WEB-016"
+   ],
+   "enables": []
+  },
+  "lookupMerchandise": {
+   "part": "core",
+   "service": "RetailService",
+   "contract": "retail",
+   "verb": "GET",
+   "path": "/merchandise/lookup",
+   "perm": "PRODUCT_VIEW",
+   "platforms": [
+    "MOB",
+    "POS",
+    "WEB"
+   ],
+   "screens": [
+    "BO-048",
+    "BO-114",
+    "EMP-069",
+    "GST-026",
+    "KSK-017",
+    "POS-002",
+    "POS-023",
+    "WEB-033",
+    "WEB-042"
+   ],
+   "enables": []
+  },
+  "lookupRetailSale": {
+   "part": "core",
+   "service": "RetailService",
+   "contract": "retail",
+   "verb": "GET",
+   "path": "/retail-sales/lookup",
+   "perm": "ORDER_VIEW",
+   "platforms": [
+    "POS"
+   ],
+   "screens": [
+    "POS-005",
+    "POS-011"
+   ],
+   "enables": []
+  },
+  "lookupShopAndDrop": {
+   "part": "core",
+   "service": "RetailService",
+   "contract": "retail",
+   "verb": "GET",
+   "path": "/shop-and-drop/lookup",
+   "perm": "ORDER_VIEW",
+   "platforms": [
+    "MOB",
+    "WEB"
+   ],
+   "screens": [
+    "GST-062",
+    "KSK-011",
+    "WEB-042"
+   ],
+   "enables": []
+  },
+  "markOrderCollected": {
+   "part": "core",
+   "service": "FnbService",
+   "contract": "fnb",
+   "verb": "POST",
+   "path": "/orders/{orderId}/collected",
+   "perm": "ORDER_MODIFY",
+   "platforms": [
+    "POS"
+   ],
+   "screens": [
+    "KIT-006",
+    "POS-022"
+   ],
+   "enables": []
+  },
+  "mergeTableVisits": {
+   "part": "core",
+   "service": "FnbService",
+   "contract": "fnb",
+   "verb": "POST",
+   "path": "/table-visits/{visitId}/merge",
+   "perm": "ORDER_MODIFY",
+   "platforms": [
+    "POS"
+   ],
+   "screens": [
+    "EMP-058",
+    "POS-028"
+   ],
+   "enables": []
+  },
+  "modifyOrder": {
+   "part": "core",
+   "service": "OrderService",
+   "contract": "orders",
+   "verb": "POST",
+   "path": "/orders/{orderId}/modify",
+   "perm": "ORDER_MODIFY",
+   "platforms": [
+    "POS"
+   ],
+   "screens": [
+    "BO-022",
+    "BO-023",
+    "BO-026",
+    "BO-047",
+    "BO-051",
+    "BO-070",
+    "EMP-014",
+    "EMP-034",
+    "POS-002",
+    "POS-006",
+    "PTR-002",
+    "PTR-005",
+    "PTR-008",
+    "PTR-015",
+    "PTR-016"
+   ],
+   "enables": []
+  },
+  "moveTableVisit": {
+   "part": "core",
+   "service": "FnbService",
+   "contract": "fnb",
+   "verb": "POST",
+   "path": "/table-visits/{visitId}/move",
+   "perm": "ORDER_MODIFY",
+   "platforms": [
+    "POS"
+   ],
+   "screens": [
+    "EMP-058",
+    "POS-028"
+   ],
+   "enables": []
+  },
+  "notifyServer": {
+   "part": "core",
+   "service": "FnbService",
+   "contract": "fnb",
+   "verb": "POST",
+   "path": "/table-visits/{visitId}/notify-server",
+   "perm": "ORDER_MODIFY",
+   "platforms": [
+    "POS"
+   ],
+   "screens": [
+    "EMP-058",
+    "KIT-002"
+   ],
+   "enables": []
+  },
+  "openShift": {
+   "part": "core",
+   "service": "OrderService",
+   "contract": "shift",
+   "verb": "POST",
+   "path": "/shifts",
+   "perm": "SHIFT_OPEN",
+   "platforms": [
+    "POS"
+   ],
+   "screens": [
+    "BO-039",
+    "BO-040",
+    "BO-041",
+    "BO-042",
+    "EMP-003",
+    "EMP-009",
+    "POS-001",
+    "POS-007",
+    "POS-009",
+    "POS-012"
+   ],
+   "enables": []
+  },
+  "openTableVisit": {
+   "part": "core",
+   "service": "FnbService",
+   "contract": "fnb",
+   "verb": "POST",
+   "path": "/table-visits",
+   "perm": "ORDER_CREATE",
+   "platforms": [
+    "POS"
+   ],
+   "screens": [
+    "EMP-058",
+    "POS-028"
+   ],
+   "enables": []
+  },
+  "payByLink": {
+   "part": "core",
+   "service": "OrderService",
+   "contract": "orders",
+   "verb": "POST",
+   "path": "/payment-links/{token}/pay",
+   "perm": "ORDER_CREATE",
+   "platforms": [
+    "MOB",
+    "WEB"
+   ],
+   "screens": [
+    "GST-009",
+    "WEB-014"
+   ],
+   "enables": []
+  },
+  "printOrderLabel": {
+   "part": "core",
+   "service": "FnbService",
+   "contract": "fnb",
+   "verb": "POST",
+   "path": "/kitchen-tickets/{ticketId}/label",
+   "perm": "ORDER_VIEW",
+   "platforms": [
+    "POS"
+   ],
+   "screens": [
+    "KIT-006"
+   ],
+   "enables": []
+  },
+  "prioritiseKitchenTicket": {
+   "part": "core",
+   "service": "FnbService",
+   "contract": "fnb",
+   "verb": "POST",
+   "path": "/kitchen/tickets/{ticketId}/prioritise",
+   "perm": "ORDER_MODIFY",
+   "platforms": [
+    "POS"
+   ],
+   "screens": [
+    "BO-020",
+    "BO-046",
+    "KIT-003",
+    "KIT-009"
+   ],
+   "enables": []
+  },
+  "publishBundle": {
+   "part": "setup",
+   "service": "CatalogueService",
+   "contract": "catalogue",
+   "verb": "POST",
+   "path": "/catalogue/bundles",
+   "perm": "PRODUCT_CONFIGURE",
+   "platforms": [],
+   "screens": [
+    "BO-011",
+    "BO-013",
+    "BO-014",
+    "BO-037"
+   ],
+   "enables": [
+    "catalogue.published_bundle"
+   ]
+  },
+  "publishPromotion": {
+   "part": "setup",
+   "service": "CatalogueService",
+   "contract": "promotions",
+   "verb": "POST",
+   "path": "/promotions/{promotionId}/publish",
+   "perm": "PRICE_CONFIGURE",
+   "platforms": [],
+   "screens": [
+    "BO-010"
+   ],
+   "enables": [
+    "promotions.promotion"
+   ]
+  },
+  "publishTenantConfig": {
+   "part": "core",
+   "service": "WhiteLabelService",
+   "contract": "white-label",
+   "verb": "POST",
+   "path": "/tenant-config/publish",
+   "perm": "TENANT_PUBLISH",
+   "platforms": [
+    "WL"
+   ],
+   "screens": [
+    "ADM-016",
+    "BO-843",
+    "CMS-006",
+    "CMS-014"
+   ],
+   "enables": []
+  },
+  "publishVenueMap": {
+   "part": "setup",
+   "service": "VenueOpsService",
+   "contract": "venue-map",
+   "verb": "POST",
+   "path": "/venue-maps/{mapId}/publish",
+   "perm": "VENUE_MAP_PUBLISH",
+   "platforms": [],
+   "screens": [
+    "BO-094"
+   ],
+   "enables": [
+    "venuemap.map"
+   ]
+  },
+  "raiseMyCase": {
+   "part": "core",
+   "service": "MarketingService",
+   "contract": "marketing-crm",
+   "verb": "POST",
+   "path": "/my/cases",
+   "perm": "",
+   "platforms": [
+    "MOB",
+    "WEB"
+   ],
+   "screens": [
+    "BO-938",
+    "GST-034",
+    "GST-035",
+    "GST-040",
+    "WEB-034"
+   ],
+   "enables": []
+  },
+  "reactivateTenant": {
+   "part": "setup",
+   "service": "PlatformService",
+   "contract": "subscription",
+   "verb": "POST",
+   "path": "/tenants/{tenantId}/reactivate",
+   "perm": "PLATFORM_TENANT_MANAGE",
+   "platforms": [],
+   "screens": [
+    "ADM-005"
+   ],
+   "enables": [
+    "control.tenant"
+   ]
+  },
+  "recallKitchenTicket": {
+   "part": "core",
+   "service": "FnbService",
+   "contract": "fnb",
+   "verb": "POST",
+   "path": "/kitchen-tickets/{ticketId}/recall",
+   "perm": "ORDER_MODIFY",
+   "platforms": [
+    "POS"
+   ],
+   "screens": [
+    "KIT-002"
+   ],
+   "enables": []
+  },
+  "recommendSeats": {
+   "part": "core",
+   "service": "CatalogueService",
+   "contract": "seating",
+   "verb": "POST",
+   "path": "/performances/{performanceId}/seat-recommendations",
+   "perm": "PRODUCT_VIEW",
+   "platforms": [
+    "MOB",
+    "POS",
+    "WEB"
+   ],
+   "screens": [
+    "BO-002",
+    "BO-015",
+    "BO-016",
+    "BO-019",
+    "BO-063",
+    "BO-1001",
+    "BO-1002",
+    "BO-1039",
+    "GST-049",
+    "POS-004",
+    "WEB-007"
+   ],
+   "enables": []
+  },
+  "recordConsent": {
+   "part": "core",
+   "service": "MarketingService",
+   "contract": "marketing-crm",
+   "verb": "POST",
+   "path": "/guests/{subjectId}/consents",
+   "perm": null,
+   "platforms": [
+    "MOB",
+    "WEB"
+   ],
+   "screens": [
+    "BO-748",
+    "GST-039",
+    "GST-065",
+    "WEB-011",
+    "WEB-017",
+    "WEB-020",
+    "WEB-024",
+    "WEB-027"
+   ],
+   "enables": []
+  },
+  "recordDeviceHeartbeat": {
+   "part": "core",
+   "service": "TenancyService",
+   "contract": "tenancy",
+   "verb": "POST",
+   "path": "/devices/{deviceId}/heartbeat",
+   "perm": null,
+   "platforms": [
+    "POS"
+   ],
+   "screens": [
+    "BO-036",
+    "BO-124",
+    "BO-125",
+    "BO-127",
+    "POS-016"
+   ],
+   "enables": []
+  },
+  "recordNoSale": {
+   "part": "core",
+   "service": "OrderService",
+   "contract": "shift",
+   "verb": "POST",
+   "path": "/shifts/{shiftId}/no-sale",
+   "perm": "SHIFT_SUSPEND",
+   "platforms": [
+    "POS"
+   ],
+   "screens": [
+    "BO-039",
+    "BO-040",
+    "BO-041",
+    "BO-042",
+    "EMP-003",
+    "EMP-009",
+    "POS-001",
+    "POS-007",
+    "POS-009",
+    "POS-014",
+    "POS-020"
+   ],
+   "enables": []
+  },
+  "recordOrderHandover": {
+   "part": "core",
+   "service": "FnbService",
+   "contract": "fnb",
+   "verb": "POST",
+   "path": "/guest-orders/{orderId}/delivery",
+   "perm": "ORDER_MODIFY",
+   "platforms": [
+    "POS"
+   ],
+   "screens": [
+    "BO-021",
+    "KIT-007",
+    "POS-012"
+   ],
+   "enables": []
+  },
+  "redeemLoyaltyPoints": {
+   "part": "core",
+   "service": "MarketingService",
+   "contract": "marketing-crm",
+   "verb": "POST",
+   "path": "/loyalty/redemptions",
+   "perm": "LOYALTY_REDEEM",
+   "platforms": [
+    "MOB",
+    "POS",
+    "WEB"
+   ],
+   "screens": [
+    "GST-071",
+    "POS-002",
+    "POS-005",
+    "WEB-043"
+   ],
+   "enables": []
+  },
+  "refireItem": {
+   "part": "core",
+   "service": "FnbService",
+   "contract": "fnb",
+   "verb": "POST",
+   "path": "/kitchen-tickets/{ticketId}/refire",
+   "perm": "ORDER_MODIFY",
+   "platforms": [
+    "POS"
+   ],
+   "screens": [
+    "KIT-002"
+   ],
+   "enables": []
+  },
+  "refreshToken": {
+   "part": "core",
+   "service": "IdentityService",
+   "contract": "identity",
+   "verb": "POST",
+   "path": "/auth/refresh",
+   "perm": null,
+   "platforms": [
+    "MOB",
+    "WEB"
+   ],
+   "screens": [
+    "GST-042",
+    "WEB-016"
+   ],
+   "enables": []
+  },
+  "registerGuest": {
+   "part": "core",
+   "service": "IdentityService",
+   "contract": "identity",
+   "verb": "POST",
+   "path": "/auth/guest/register",
+   "perm": null,
+   "platforms": [
+    "MOB",
+    "WEB"
+   ],
+   "screens": [
+    "GST-042",
+    "WEB-016"
+   ],
+   "enables": []
+  },
+  "registerGuestDevice": {
+   "part": "core",
+   "service": "MarketingService",
+   "contract": "marketing-crm",
+   "verb": "POST",
+   "path": "/guests/{subjectId}/devices",
+   "perm": null,
+   "platforms": [
+    "MOB",
+    "WEB"
+   ],
+   "screens": [
+    "GST-073",
+    "WEB-011",
+    "WEB-017",
+    "WEB-024",
+    "WEB-027"
+   ],
+   "enables": []
+  },
+  "reissueEntitlement": {
+   "part": "core",
+   "service": "OrderService",
+   "contract": "orders",
+   "verb": "POST",
+   "path": "/entitlements/{entitlementId}/reissue",
+   "perm": "ORDER_EXCHANGE",
+   "platforms": [
+    "POS"
+   ],
+   "screens": [
+    "POS-026"
+   ],
+   "enables": []
+  },
+  "rejectReceivedGoods": {
+   "part": "setup",
+   "service": "InventoryService",
+   "contract": "inventory",
+   "verb": "POST",
+   "path": "/goods-receipts/{receiptId}/reject",
+   "perm": "PRODUCT_CONFIGURE",
+   "platforms": [],
+   "screens": [
+    "BO-052",
+    "EMP-065"
+   ],
+   "enables": [
+    "inventory.goods_receipt"
+   ]
+  },
+  "relinquishCustomDomain": {
+   "part": "core",
+   "service": "WhiteLabelService",
+   "contract": "white-label",
+   "verb": "DELETE",
+   "path": "/tenant-domains/{domainId}",
+   "perm": "TENANT_CONFIGURE",
+   "platforms": [
+    "WL"
+   ],
+   "screens": [
+    "ADM-017",
+    "CMS-017"
+   ],
+   "enables": []
+  },
+  "relinquishInventoryHold": {
+   "part": "core",
+   "service": "CatalogueService",
+   "contract": "catalogue",
+   "verb": "DELETE",
+   "path": "/inventory-holds/{inventoryHoldId}",
+   "perm": "ORDER_CREATE",
+   "platforms": [
+    "POS"
+   ],
+   "screens": [
+    "BO-018",
+    "POS-003"
+   ],
+   "enables": []
+  },
+  "relinquishSeatHold": {
+   "part": "core",
+   "service": "CatalogueService",
+   "contract": "seating",
+   "verb": "DELETE",
+   "path": "/seat-holds/{holdId}",
+   "perm": "ORDER_CREATE",
+   "platforms": [
+    "POS"
+   ],
+   "screens": [
+    "BO-998",
+    "BO-999",
+    "POS-004"
+   ],
+   "enables": []
+  },
+  "removeCartLine": {
+   "part": "core",
+   "service": "OrderService",
+   "contract": "orders",
+   "verb": "DELETE",
+   "path": "/carts/{cartId}/lines/{lineId}",
+   "perm": null,
+   "platforms": [
+    "MOB",
+    "WEB"
+   ],
+   "screens": [
+    "GST-041",
+    "PTR-010",
+    "WEB-010"
+   ],
+   "enables": []
+  },
+  "removeFromWishlist": {
+   "part": "core",
+   "service": "MarketingService",
+   "contract": "marketing-crm",
+   "verb": "DELETE",
+   "path": "/guests/{subjectId}/wishlist/{itemId}",
+   "perm": null,
+   "platforms": [
+    "MOB",
+    "WEB"
+   ],
+   "screens": [
+    "GST-020",
+    "WEB-009",
+    "WEB-011",
+    "WEB-017",
+    "WEB-024",
+    "WEB-027"
+   ],
+   "enables": []
+  },
+  "removeMfaMethod": {
+   "part": "core",
+   "service": "IdentityService",
+   "contract": "identity",
+   "verb": "DELETE",
+   "path": "/auth/mfa/methods/{methodId}",
+   "perm": null,
+   "platforms": [
+    "MOB",
+    "WEB"
+   ],
+   "screens": [
+    "GST-042",
+    "WEB-016"
+   ],
+   "enables": []
+  },
+  "renewInventoryHold": {
+   "part": "core",
+   "service": "CatalogueService",
+   "contract": "catalogue",
+   "verb": "POST",
+   "path": "/inventory-holds/{inventoryHoldId}/renew",
+   "perm": "ORDER_CREATE",
+   "platforms": [
+    "POS"
+   ],
+   "screens": [
+    "BO-018",
+    "POS-003"
+   ],
+   "enables": []
+  },
+  "reopenShift": {
+   "part": "core",
+   "service": "OrderService",
+   "contract": "shift",
+   "verb": "POST",
+   "path": "/shifts/{shiftId}/reopen",
+   "perm": "SHIFT_REOPEN",
+   "platforms": [
+    "POS"
+   ],
+   "screens": [
+    "BO-039",
+    "BO-040",
+    "BO-041",
+    "BO-042",
+    "EMP-003",
+    "EMP-009",
+    "POS-001",
+    "POS-007",
+    "POS-009"
+   ],
+   "enables": []
+  },
+  "replaceMediaAsset": {
+   "part": "core",
+   "service": "VenueOpsService",
+   "contract": "assets",
+   "verb": "POST",
+   "path": "/media/{mediaId}/replace",
+   "perm": "ASSET_LIBRARY_MANAGE",
+   "platforms": [
+    "WL"
+   ],
+   "screens": [
+    "BO-027",
+    "CMS-010",
+    "CMS-076",
+    "CMS-095"
+   ],
+   "enables": []
+  },
+  "replyToMyCase": {
+   "part": "core",
+   "service": "MarketingService",
+   "contract": "marketing-crm",
+   "verb": "POST",
+   "path": "/my/cases/{caseId}/messages",
+   "perm": "",
+   "platforms": [
+    "MOB",
+    "WEB"
+   ],
+   "screens": [
+    "GST-034",
+    "GST-040",
+    "WEB-034"
+   ],
+   "enables": []
+  },
+  "reprintOrder": {
+   "part": "core",
+   "service": "OrderService",
+   "contract": "orders",
+   "verb": "POST",
+   "path": "/orders/{orderId}/reprints",
+   "perm": "ORDER_REPRINT",
+   "platforms": [
+    "MOB",
+    "POS",
+    "WEB"
+   ],
+   "screens": [
+    "BO-022",
+    "BO-023",
+    "BO-026",
+    "BO-047",
+    "BO-051",
+    "BO-070",
+    "EMP-014",
+    "EMP-034",
+    "GST-010",
+    "POS-002",
+    "POS-006",
+    "POS-026",
+    "PTR-002",
+    "PTR-005",
+    "PTR-008",
+    "PTR-015",
+    "PTR-016",
+    "WEB-013"
+   ],
+   "enables": []
+  },
+  "reprintReceipt": {
+   "part": "core",
+   "service": "RetailService",
+   "contract": "retail",
+   "verb": "POST",
+   "path": "/retail-sales/{saleId}/reprint",
+   "perm": "ORDER_REPRINT",
+   "platforms": [
+    "POS"
+   ],
+   "screens": [
+    "POS-005",
+    "POS-007",
+    "POS-026"
+   ],
+   "enables": []
+  },
+  "requestGroupBooking": {
+   "part": "core",
+   "service": "OrderService",
+   "contract": "orders",
+   "verb": "POST",
+   "path": "/group-booking-requests",
+   "perm": null,
+   "platforms": [
+    "MOB",
+    "WEB"
+   ],
+   "screens": [
+    "GST-072",
+    "WEB-031"
+   ],
+   "enables": []
+  },
+  "requestGuestOtp": {
+   "part": "core",
+   "service": "IdentityService",
+   "contract": "identity",
+   "verb": "POST",
+   "path": "/auth/guest/otp",
+   "perm": null,
+   "platforms": [
+    "MOB",
+    "WEB"
+   ],
+   "screens": [
+    "GST-042",
+    "WEB-016"
+   ],
+   "enables": []
+  },
+  "requestSuggestion": {
+   "part": "core",
+   "service": "AiService",
+   "contract": "ai",
+   "verb": "POST",
+   "path": "/ai/suggestions",
+   "perm": "AI_USE",
+   "platforms": [
+    "MOB",
+    "WEB"
+   ],
+   "screens": [
+    "ANL-001",
+    "ANL-010",
+    "BO-115",
+    "BO-117",
+    "GST-031",
+    "GST-052",
+    "GST-054",
+    "GST-059",
+    "WEB-044"
+   ],
+   "enables": []
+  },
+  "rescheduleOrder": {
+   "part": "core",
+   "service": "OrderService",
+   "contract": "orders",
+   "verb": "POST",
+   "path": "/orders/{orderId}/reschedule",
+   "perm": "ORDER_RESCHEDULE",
+   "platforms": [
+    "POS"
+   ],
+   "screens": [
+    "BO-022",
+    "BO-023",
+    "BO-026",
+    "BO-047",
+    "BO-051",
+    "BO-070",
+    "EMP-014",
+    "EMP-034",
+    "POS-002",
+    "POS-006",
+    "PTR-002",
+    "PTR-005",
+    "PTR-008",
+    "PTR-015",
+    "PTR-016"
+   ],
+   "enables": []
+  },
+  "reserveMerchandise": {
+   "part": "core",
+   "service": "RetailService",
+   "contract": "retail",
+   "verb": "POST",
+   "path": "/outlets/{outletId}/reserve",
+   "perm": "ORDER_CREATE",
+   "platforms": [
+    "MOB",
+    "POS",
+    "WEB"
+   ],
+   "screens": [
+    "BO-044",
+    "EMP-068",
+    "GST-026",
+    "KSK-017",
+    "POS-012",
+    "WEB-033",
+    "WEB-042"
+   ],
+   "enables": []
+  },
+  "resolveProductByCode": {
+   "part": "core",
+   "service": "CatalogueService",
+   "contract": "catalogue",
+   "verb": "GET",
+   "path": "/products/resolve",
+   "perm": "PRODUCT_VIEW",
+   "platforms": [
+    "POS"
+   ],
+   "screens": [
+    "BO-007",
+    "BO-012",
+    "BO-014",
+    "EMP-034",
+    "POS-002",
+    "POS-003",
+    "PTR-006"
+   ],
+   "enables": []
+  },
+  "respondToInvitation": {
+   "part": "core",
+   "service": "MarketingService",
+   "contract": "marketing-crm",
+   "verb": "POST",
+   "path": "/invitations/{token}/respond",
+   "perm": "GUEST_VIEW",
+   "platforms": [
+    "MOB",
+    "WEB"
+   ],
+   "screens": [
+    "GST-072",
+    "WEB-017"
+   ],
+   "enables": []
+  },
+  "restoreConfigVersion": {
+   "part": "core",
+   "service": "WhiteLabelService",
+   "contract": "white-label",
+   "verb": "POST",
+   "path": "/tenant-config/versions/{version}/restore",
+   "perm": "TENANT_PUBLISH",
+   "platforms": [
+    "WL"
+   ],
+   "screens": [
+    "ADM-016",
+    "CMS-006",
+    "CMS-015"
+   ],
+   "enables": []
+  },
+  "restoreProductVersion": {
+   "part": "setup",
+   "service": "CatalogueService",
+   "contract": "catalogue",
+   "verb": "POST",
+   "path": "/products/{productId}/versions/{version}/restore",
+   "perm": "PRODUCT_CONFIGURE",
+   "platforms": [],
+   "screens": [],
+   "enables": [
+    "catalogue.product"
+   ]
+  },
+  "resumeOrder": {
+   "part": "core",
+   "service": "OrderService",
+   "contract": "orders",
+   "verb": "POST",
+   "path": "/orders/{orderId}/resume",
+   "perm": "ORDER_MODIFY",
+   "platforms": [
+    "POS"
+   ],
+   "screens": [
+    "BO-022",
+    "BO-023",
+    "BO-026",
+    "BO-047",
+    "BO-051",
+    "BO-070",
+    "EMP-014",
+    "EMP-034",
+    "POS-002",
+    "POS-006",
+    "PTR-002",
+    "PTR-005",
+    "PTR-008",
+    "PTR-015",
+    "PTR-016"
+   ],
+   "enables": []
+  },
+  "resumeShift": {
+   "part": "core",
+   "service": "OrderService",
+   "contract": "shift",
+   "verb": "POST",
+   "path": "/shifts/{shiftId}/resume",
+   "perm": "SHIFT_OPEN",
+   "platforms": [
+    "POS"
+   ],
+   "screens": [
+    "BO-039",
+    "BO-040",
+    "BO-041",
+    "BO-042",
+    "EMP-003",
+    "EMP-009",
+    "POS-001",
+    "POS-007",
+    "POS-009"
+   ],
+   "enables": []
+  },
+  "retryMyDunningPayment": {
+   "part": "core",
+   "service": "OrderService",
+   "contract": "payments",
+   "verb": "POST",
+   "path": "/dunning-cases/{caseId}/retry",
+   "perm": null,
+   "platforms": [
+    "MOB",
+    "WEB"
+   ],
+   "screens": [
+    "GST-015",
+    "WEB-023"
+   ],
+   "enables": []
+  },
+  "revokeFacePass": {
+   "part": "core",
+   "service": "AccessService",
+   "contract": "access",
+   "verb": "DELETE",
+   "path": "/face-pass/enrolments/{enrolmentId}",
+   "perm": "GUEST_MANAGE",
+   "platforms": [
+    "MOB",
+    "WEB"
+   ],
+   "screens": [
+    "GST-069",
+    "WEB-024"
+   ],
+   "enables": []
+  },
+  "revokeGuestDevice": {
+   "part": "core",
+   "service": "MarketingService",
+   "contract": "marketing-crm",
+   "verb": "DELETE",
+   "path": "/guests/{subjectId}/devices/{deviceId}",
+   "perm": null,
+   "platforms": [
+    "MOB",
+    "WEB"
+   ],
+   "screens": [
+    "GST-073",
+    "WEB-011",
+    "WEB-017",
+    "WEB-024",
+    "WEB-027"
+   ],
+   "enables": []
+  },
+  "runReport": {
+   "part": "core",
+   "service": "ReportingService",
+   "contract": "reporting",
+   "verb": "POST",
+   "path": "/reports/{reportId}/run",
+   "perm": "REPORT_VIEW_VENUE",
+   "platforms": [
+    "POS"
+   ],
+   "screens": [
+    "ANL-001",
+    "ANL-002",
+    "ANL-003",
+    "ANL-004",
+    "ANL-005",
+    "ANL-006",
+    "ANL-007",
+    "ANL-009",
+    "ANL-039",
+    "ANL-040",
+    "BO-010",
+    "BO-029",
+    "BO-058",
+    "BO-059",
+    "BO-060",
+    "BO-061",
+    "BO-1059",
+    "BO-1082",
+    "BO-115",
+    "BO-118",
+    "BO-126",
+    "BO-133",
+    "POS-008",
+    "POS-020",
+    "PTR-018",
+    "SUP-008"
+   ],
+   "enables": []
+  },
+  "saveNaturalLanguageQuery": {
+   "part": "core",
+   "service": "ReportingService",
+   "contract": "reporting",
+   "verb": "POST",
+   "path": "/reports/ask/{conversationId}/save",
+   "perm": "REPORT_MANAGE",
+   "platforms": [
+    "POS"
+   ],
+   "screens": [
+    "ANL-052",
+    "BO-029",
+    "BO-058",
+    "BO-059",
+    "BO-060",
+    "BO-061",
+    "POS-008",
+    "PTR-018",
+    "SUP-008"
+   ],
+   "enables": []
+  },
+  "searchCatalogue": {
+   "part": "core",
+   "service": "CatalogueService",
+   "contract": "catalogue",
+   "verb": "GET",
+   "path": "/search",
+   "perm": null,
+   "platforms": [
+    "MOB",
+    "WEB"
+   ],
+   "screens": [
+    "GST-001",
+    "GST-003",
+    "GST-063",
+    "WEB-002",
+    "WEB-003"
+   ],
+   "enables": []
+  },
+  "searchGuests": {
+   "part": "core",
+   "service": "MarketingService",
+   "contract": "marketing-crm",
+   "verb": "GET",
+   "path": "/guests",
+   "perm": "GUEST_VIEW",
+   "platforms": [
+    "POS"
+   ],
+   "screens": [
+    "BO-036",
+    "BO-734",
+    "BO-735",
+    "POS-027"
+   ],
+   "enables": []
+  },
+  "searchMedia": {
+   "part": "core",
+   "service": "VenueOpsService",
+   "contract": "assets",
+   "verb": "GET",
+   "path": "/media",
+   "perm": "ASSET_LIBRARY_VIEW",
+   "platforms": [
+    "WL"
+   ],
+   "screens": [
+    "BO-838",
+    "CMS-010",
+    "CMS-061",
+    "CMS-062",
+    "CMS-067",
+    "CMS-073"
+   ],
+   "enables": []
+  },
+  "seatTableReservation": {
+   "part": "core",
+   "service": "FnbService",
+   "contract": "fnb",
+   "verb": "POST",
+   "path": "/table-reservations/{reservationId}/seat",
+   "perm": "FNB_OPERATE",
+   "platforms": [
+    "POS"
+   ],
+   "screens": [
+    "EMP-058",
+    "POS-028"
+   ],
+   "enables": []
+  },
+  "selectRole": {
+   "part": "core",
+   "service": "IdentityService",
+   "contract": "identity",
+   "verb": "POST",
+   "path": "/auth/select-role",
+   "perm": null,
+   "platforms": [
+    "POS"
+   ],
+   "screens": [
+    "EMP-002",
+    "POS-000",
+    "POS-001",
+    "SCN-001"
+   ],
+   "enables": []
+  },
+  "sendAiMessage": {
+   "part": "core",
+   "service": "AiService",
+   "contract": "ai",
+   "verb": "POST",
+   "path": "/conversations/{conversationId}/messages",
+   "perm": "AI_USE",
+   "platforms": [
+    "MOB",
+    "WEB"
+   ],
+   "screens": [
+    "EMP-019",
+    "EMP-020",
+    "GST-031",
+    "GST-032",
+    "GST-033",
+    "GST-054",
+    "KSK-015",
+    "WEB-044"
+   ],
+   "enables": []
+  },
+  "sendConversationMessage": {
+   "part": "core",
+   "service": "MarketingService",
+   "contract": "marketing-crm",
+   "verb": "POST",
+   "path": "/conversations/{conversationId}/messages",
+   "perm": "CASE_MANAGE",
+   "platforms": [
+    "MOB",
+    "WEB"
+   ],
+   "screens": [
+    "BO-799",
+    "GST-032",
+    "SUP-005",
+    "WEB-044"
+   ],
+   "enables": []
+  },
+  "setAccessPointGeofence": {
+   "part": "setup",
+   "service": "AccessService",
+   "contract": "access",
+   "verb": "PUT",
+   "path": "/access-points/{accessPointId}/geofence",
+   "perm": "ACCESS_POINT_CONFIGURE",
+   "platforms": [],
+   "screens": [
+    "BO-064"
+   ],
+   "enables": [
+    "access.access_point"
+   ]
+  },
+  "setAgentAvailability": {
+   "part": "setup",
+   "service": "MarketingService",
+   "contract": "marketing-crm",
+   "verb": "PUT",
+   "path": "/agent-availability",
+   "perm": "CASE_MANAGE",
+   "platforms": [],
+   "screens": [
+    "SUP-002",
+    "SUP-003"
+   ],
+   "enables": [
+    "marketing.agent_availability"
+   ]
+  },
+  "setAiCredential": {
+   "part": "setup",
+   "service": "AiService",
+   "contract": "ai",
+   "verb": "PUT",
+   "path": "/ai-providers/{providerId}/credential",
+   "perm": "AI_CONFIGURE",
+   "platforms": [],
+   "screens": [
+    "ADM-037"
+   ],
+   "enables": [
+    "ai.provider"
+   ]
+  },
+  "setAiPolicy": {
+   "part": "setup",
+   "service": "AiService",
+   "contract": "ai",
+   "verb": "PUT",
+   "path": "/policy",
+   "perm": "AI_CONFIGURE",
+   "platforms": [],
+   "screens": [
+    "BO-091"
+   ],
+   "enables": [
+    "ai.policy"
+   ]
+  },
+  "setAiProvider": {
+   "part": "setup",
+   "service": "AiService",
+   "contract": "ai",
+   "verb": "PUT",
+   "path": "/providers",
+   "perm": "AI_CONFIGURE",
+   "platforms": [],
+   "screens": [
+    "ADM-037"
+   ],
+   "enables": [
+    "ai.provider"
+   ]
+  },
+  "setAlertRule": {
+   "part": "setup",
+   "service": "ReportingService",
+   "contract": "reporting",
+   "verb": "PUT",
+   "path": "/alert-rules",
+   "perm": "REPORT_MANAGE",
+   "platforms": [],
+   "screens": [
+    "ANL-009",
+    "BO-133"
+   ],
+   "enables": [
+    "reporting.alert_rule"
+   ]
+  },
+  "setAlternativeCodes": {
+   "part": "setup",
+   "service": "CatalogueService",
+   "contract": "catalogue",
+   "verb": "PUT",
+   "path": "/products/{productId}/alternative-codes",
+   "perm": "PRODUCT_CONFIGURE",
+   "platforms": [],
+   "screens": [
+    "BO-007",
+    "BO-012",
+    "BO-014",
+    "EMP-034",
+    "PTR-006"
+   ],
+   "enables": [
+    "catalogue.alternative_code"
+   ]
+  },
+  "setAppIcons": {
+   "part": "core",
+   "service": "WhiteLabelService",
+   "contract": "white-label",
+   "verb": "PUT",
+   "path": "/tenant-config/app-icons",
+   "perm": "TENANT_CONFIGURE",
+   "platforms": [
+    "WL"
+   ],
+   "screens": [
+    "ADM-016",
+    "CMS-004"
+   ],
+   "enables": []
+  },
+  "setApprovalMatrix": {
+   "part": "setup",
+   "service": "TenancyService",
+   "contract": "approvals",
+   "verb": "PUT",
+   "path": "/approval-matrices",
+   "perm": "APPROVAL_CONFIGURE",
+   "platforms": [],
+   "screens": [
+    "ADM-330",
+    "ADM-331",
+    "ADM-332",
+    "ADM-333",
+    "ADM-334",
+    "ADM-335",
+    "BO-086",
+    "BO-639"
+   ],
+   "enables": [
+    "approvals.matrix",
+    "approvals.rule"
+   ]
+  },
+  "setBookingFlowConfig": {
+   "part": "core",
+   "service": "WhiteLabelService",
+   "contract": "white-label",
+   "verb": "PUT",
+   "path": "/tenant-config/booking-flow",
+   "perm": "TENANT_CONFIGURE",
+   "platforms": [
+    "WL"
+   ],
+   "screens": [
+    "CMS-016"
+   ],
+   "enables": []
+  },
+  "setBrandIdentity": {
+   "part": "core",
+   "service": "WhiteLabelService",
+   "contract": "white-label",
+   "verb": "PUT",
+   "path": "/tenant-config/brand",
+   "perm": "TENANT_CONFIGURE",
+   "platforms": [
+    "WL"
+   ],
+   "screens": [
+    "ADM-016",
+    "BO-836",
+    "CMS-002",
+    "CMS-004"
+   ],
+   "enables": []
+  },
+  "setConsentPurposes": {
+   "part": "core",
+   "service": "MarketingService",
+   "contract": "marketing-crm",
+   "verb": "PUT",
+   "path": "/consent-purposes",
+   "perm": "GUEST_MANAGE",
+   "platforms": [
+    "WL"
+   ],
+   "screens": [
+    "BO-747",
+    "CMS-018",
+    "CMS-023"
+   ],
+   "enables": []
+  },
+  "setCourseRules": {
+   "part": "core",
+   "service": "FnbService",
+   "contract": "fnb",
+   "verb": "PUT",
+   "path": "/outlets/{outletId}/course-rules",
+   "perm": "PRODUCT_CONFIGURE",
+   "platforms": [
+    "POS"
+   ],
+   "screens": [
+    "KIT-003"
+   ],
+   "enables": []
+  },
+  "setDenominations": {
+   "part": "setup",
+   "service": "OrderService",
+   "contract": "shift",
+   "verb": "PUT",
+   "path": "/denominations",
+   "perm": "REGION_CONFIGURE",
+   "platforms": [],
+   "screens": [
+    "BO-1065"
+   ],
+   "enables": [
+    "platform.denomination"
+   ]
+  },
+  "setFaqs": {
+   "part": "core",
+   "service": "WhiteLabelService",
+   "contract": "white-label",
+   "verb": "PUT",
+   "path": "/tenant-config/faqs",
+   "perm": "TENANT_CONFIGURE",
+   "platforms": [
+    "WL"
+   ],
+   "screens": [
+    "ADM-018"
+   ],
+   "enables": []
+  },
+  "setFeatureToggles": {
+   "part": "core",
+   "service": "WhiteLabelService",
+   "contract": "white-label",
+   "verb": "PUT",
+   "path": "/tenant-config/features",
+   "perm": "TENANT_CONFIGURE",
+   "platforms": [
+    "WL"
+   ],
+   "screens": [
+    "CMS-001"
+   ],
+   "enables": []
+  },
+  "setFnbDeliveryPolicy": {
+   "part": "setup",
+   "service": "FnbService",
+   "contract": "fnb",
+   "verb": "PUT",
+   "path": "/fnb-delivery-policy",
+   "perm": "PRODUCT_CONFIGURE",
+   "platforms": [],
+   "screens": [
+    "BO-044"
+   ],
+   "enables": [
+    "fnb.delivery_policy"
+   ]
+  },
+  "setFonts": {
+   "part": "core",
+   "service": "WhiteLabelService",
+   "contract": "white-label",
+   "verb": "PUT",
+   "path": "/tenant-config/fonts",
+   "perm": "TENANT_CONFIGURE",
+   "platforms": [
+    "WL"
+   ],
+   "screens": [
+    "CMS-003"
+   ],
+   "enables": []
+  },
+  "setFooter": {
+   "part": "core",
+   "service": "WhiteLabelService",
+   "contract": "white-label",
+   "verb": "PUT",
+   "path": "/footer",
+   "perm": "TENANT_CONFIGURE",
+   "platforms": [
+    "WL"
+   ],
+   "screens": [
+    "CMS-007"
+   ],
+   "enables": []
+  },
+  "setFxProvider": {
+   "part": "setup",
+   "service": "LedgerService",
+   "contract": "finance",
+   "verb": "PUT",
+   "path": "/fx-rates/providers",
+   "perm": "LEDGER_APPROVE",
+   "platforms": [],
+   "screens": [],
+   "enables": [
+    "platform.region_settings"
+   ]
+  },
+  "setFxRate": {
+   "part": "setup",
+   "service": "LedgerService",
+   "contract": "finance",
+   "verb": "PUT",
+   "path": "/fx-rates",
+   "perm": "LEDGER_APPROVE",
+   "platforms": [],
+   "screens": [
+    "BO-077"
+   ],
+   "enables": [
+    "ledger.fx_rate"
+   ]
+  },
+  "setGroupPackageDefinition": {
+   "part": "setup",
+   "service": "CatalogueService",
+   "contract": "catalogue",
+   "verb": "PUT",
+   "path": "/products/{productId}/group-package",
+   "perm": "PRODUCT_CONFIGURE",
+   "platforms": [],
+   "screens": [
+    "BO-011"
+   ],
+   "enables": [
+    "catalogue.group_package"
+   ]
+  },
+  "setGuestMatchPolicy": {
+   "part": "setup",
+   "service": "MarketingService",
+   "contract": "marketing-crm",
+   "verb": "PUT",
+   "path": "/guest-match-policy",
+   "perm": "MARKETING_MANAGE",
+   "platforms": [],
+   "screens": [
+    "BO-746"
+   ],
+   "enables": [
+    "marketing.guest_match_policy"
+   ]
+  },
+  "setHomepageLayout": {
+   "part": "core",
+   "service": "WhiteLabelService",
+   "contract": "white-label",
+   "verb": "PUT",
+   "path": "/tenant-config/homepage",
+   "perm": "TENANT_CONFIGURE",
+   "platforms": [
+    "WL"
+   ],
+   "screens": [
+    "BO-840",
+    "CMS-007"
+   ],
+   "enables": []
+  },
+  "setItemAvailability": {
+   "part": "core",
+   "service": "FnbService",
+   "contract": "fnb",
+   "verb": "PUT",
+   "path": "/menu-items/{itemId}/availability",
+   "perm": "PRODUCT_CONFIGURE",
+   "platforms": [
+    "POS"
+   ],
+   "screens": [
+    "BO-014",
+    "BO-049",
+    "BO-140",
+    "EMP-062",
+    "KIT-008",
+    "POS-021",
+    "POS-024"
+   ],
+   "enables": []
+  },
+  "setKitchenStations": {
+   "part": "core",
+   "service": "FnbService",
+   "contract": "fnb",
+   "verb": "PUT",
+   "path": "/kitchen/stations",
+   "perm": "PRODUCT_CONFIGURE",
+   "platforms": [
+    "POS"
+   ],
+   "screens": [
+    "BO-020",
+    "BO-046",
+    "BO-134",
+    "BO-135",
+    "KIT-005"
+   ],
+   "enables": []
+  },
+  "setKitchenTicketStatus": {
+   "part": "core",
+   "service": "FnbService",
+   "contract": "fnb",
+   "verb": "PUT",
+   "path": "/kitchen/tickets/{ticketId}/status",
+   "perm": "ORDER_MODIFY",
+   "platforms": [
+    "POS"
+   ],
+   "screens": [
+    "BO-020",
+    "BO-046",
+    "KIT-002",
+    "KIT-003",
+    "KIT-006",
+    "KIT-008",
+    "POS-022"
+   ],
+   "enables": []
+  },
+  "setLanguages": {
+   "part": "core",
+   "service": "WhiteLabelService",
+   "contract": "white-label",
+   "verb": "PUT",
+   "path": "/tenant-config/languages",
+   "perm": "TENANT_CONFIGURE",
+   "platforms": [
+    "WL"
+   ],
+   "screens": [
+    "ADM-018",
+    "CMS-011"
+   ],
+   "enables": []
+  },
+  "setMaintenanceMode": {
+   "part": "core",
+   "service": "WhiteLabelService",
+   "contract": "white-label",
+   "verb": "PUT",
+   "path": "/tenant-config/status",
+   "perm": "TENANT_CONFIGURE",
+   "platforms": [
+    "WL"
+   ],
+   "screens": [
+    "CMS-001"
+   ],
+   "enables": []
+  },
+  "setMarketingSubscription": {
+   "part": "core",
+   "service": "MarketingService",
+   "contract": "marketing-crm",
+   "verb": "PUT",
+   "path": "/marketing-subscriptions",
+   "perm": "MARKETING_VIEW",
+   "platforms": [
+    "MOB",
+    "WEB"
+   ],
+   "screens": [
+    "BO-788",
+    "GST-065",
+    "WEB-027"
+   ],
+   "enables": []
+  },
+  "setMenuSections": {
+   "part": "core",
+   "service": "FnbService",
+   "contract": "fnb",
+   "verb": "PUT",
+   "path": "/menus/{menuId}/sections",
+   "perm": "PRODUCT_CONFIGURE",
+   "platforms": [
+    "WL"
+   ],
+   "screens": [
+    "BO-045",
+    "BO-109",
+    "CMS-009"
+   ],
+   "enables": []
+  },
+  "setModuleEnablement": {
+   "part": "core",
+   "service": "WhiteLabelService",
+   "contract": "white-label",
+   "verb": "PUT",
+   "path": "/tenant-config/modules",
+   "perm": "TENANT_CONFIGURE",
+   "platforms": [
+    "WL"
+   ],
+   "screens": [
+    "CMS-001"
+   ],
+   "enables": []
+  },
+  "setParkingFacility": {
+   "part": "setup",
+   "service": "AccessService",
+   "contract": "access",
+   "verb": "PUT",
+   "path": "/parking-facilities",
+   "perm": "PARKING_CONFIGURE",
+   "platforms": [],
+   "screens": [
+    "BO-006"
+   ],
+   "enables": [
+    "access.parking_facility"
+   ]
+  },
+  "setPasswordPolicy": {
+   "part": "setup",
+   "service": "IdentityService",
+   "contract": "identity",
+   "verb": "PUT",
+   "path": "/password-policy",
+   "perm": "TENANT_CONFIGURE",
+   "platforms": [],
+   "screens": [
+    "ADM-421"
+   ],
+   "enables": [
+    "identity.password_policy"
+   ]
+  },
+  "setPaymentProvider": {
+   "part": "setup",
+   "service": "OrderService",
+   "contract": "orders",
+   "verb": "PUT",
+   "path": "/payment-providers",
+   "perm": "TENANT_CONFIGURE",
+   "platforms": [],
+   "screens": [
+    "ADM-412",
+    "SGN-021"
+   ],
+   "enables": [
+    "payments.provider"
+   ]
+  },
+  "setPolicy": {
+   "part": "core",
+   "service": "WhiteLabelService",
+   "contract": "white-label",
+   "verb": "PUT",
+   "path": "/tenant-config/policies/{policyKind}",
+   "perm": "TENANT_CONFIGURE",
+   "platforms": [
+    "WL"
+   ],
+   "screens": [
+    "ADM-018",
+    "CMS-018"
+   ],
+   "enables": []
+  },
+  "setPrices": {
+   "part": "setup",
+   "service": "CatalogueService",
+   "contract": "catalogue",
+   "verb": "PUT",
+   "path": "/price-lists/{priceListId}/prices",
+   "perm": "PRICE_CONFIGURE",
+   "platforms": [],
+   "screens": [
+    "BO-009",
+    "BO-601",
+    "PTR-006"
+   ],
+   "enables": [
+    "catalogue.price_list"
+   ]
+  },
+  "setProductEligibilityRule": {
+   "part": "setup",
+   "service": "CatalogueService",
+   "contract": "catalogue",
+   "verb": "PUT",
+   "path": "/products/{productId}/eligibility-rule",
+   "perm": "PRODUCT_CONFIGURE",
+   "platforms": [],
+   "screens": [
+    "BO-161"
+   ],
+   "enables": [
+    "catalogue.product_eligibility_rule"
+   ]
+  },
+  "setPromotionVariants": {
+   "part": "setup",
+   "service": "CatalogueService",
+   "contract": "promotions",
+   "verb": "PUT",
+   "path": "/promotions/{promotionId}/variants",
+   "perm": "PRICE_CONFIGURE",
+   "platforms": [],
+   "screens": [],
+   "enables": [
+    "promotions.promotion"
+   ]
+  },
+  "setReaderScannerPeripheral": {
+   "part": "core",
+   "service": "AccessService",
+   "contract": "access",
+   "verb": "PUT",
+   "path": "/reader-scanner-peripheral",
+   "perm": "ACCESS_POINT_CONFIGURE",
+   "platforms": [
+    "POS"
+   ],
+   "screens": [
+    "BO-199",
+    "POS-016"
+   ],
+   "enables": []
+  },
+  "setRefundPolicy": {
+   "part": "setup",
+   "service": "OrderService",
+   "contract": "orders",
+   "verb": "PUT",
+   "path": "/venues/{venueId}/refund-policy",
+   "perm": "REGION_CONFIGURE",
+   "platforms": [],
+   "screens": [
+    "ADM-611",
+    "BO-062",
+    "BO-065",
+    "BO-1146",
+    "BO-318"
+   ],
+   "enables": [
+    "orders.refund_policy"
+   ]
+  },
+  "setReturnPolicy": {
+   "part": "setup",
+   "service": "RetailService",
+   "contract": "retail",
+   "verb": "PUT",
+   "path": "/outlets/{outletId}/return-policy",
+   "perm": "REGION_CONFIGURE",
+   "platforms": [],
+   "screens": [
+    "BO-044"
+   ],
+   "enables": [
+    "retail.return_policy"
+   ]
+  },
+  "setSeoMetadata": {
+   "part": "core",
+   "service": "MarketingService",
+   "contract": "marketing-crm",
+   "verb": "PUT",
+   "path": "/seo-metadata",
+   "perm": "MARKETING_MANAGE",
+   "platforms": [
+    "WL"
+   ],
+   "screens": [
+    "BO-842",
+    "CMS-013"
+   ],
+   "enables": []
+  },
+  "setSsoConfig": {
+   "part": "setup",
+   "service": "IdentityService",
+   "contract": "identity",
+   "verb": "PUT",
+   "path": "/tenants/sso-config",
+   "perm": "USER_MANAGE",
+   "platforms": [],
+   "screens": [
+    "ADM-005"
+   ],
+   "enables": [
+    "identity.sso_provider"
+   ]
+  },
+  "setSubscription": {
+   "part": "setup",
+   "service": "PlatformService",
+   "contract": "subscription",
+   "verb": "PUT",
+   "path": "/tenants/{tenantId}/subscription",
+   "perm": "PLATFORM_TENANT_MANAGE",
+   "platforms": [],
+   "screens": [
+    "ADM-008",
+    "ADM-011",
+    "ADM-410",
+    "ADM-417",
+    "ADM-463",
+    "SGN-019",
+    "SGN-024"
+   ],
+   "enables": [
+    "subscription.contract"
+   ]
+  },
+  "setSuggestionProvider": {
+   "part": "setup",
+   "service": "AiService",
+   "contract": "ai",
+   "verb": "PUT",
+   "path": "/ai/suggestion-providers",
+   "perm": "AI_CONFIGURE",
+   "platforms": [],
+   "screens": [],
+   "enables": [
+    "ai.policy"
+   ]
+  },
+  "setTableCombinations": {
+   "part": "core",
+   "service": "FnbService",
+   "contract": "fnb",
+   "verb": "PUT",
+   "path": "/outlets/{outletId}/table-combinations",
+   "perm": "PRODUCT_CONFIGURE",
+   "platforms": [
+    "POS"
+   ],
+   "screens": [
+    "EMP-058",
+    "POS-024"
+   ],
+   "enables": []
+  },
+  "setTableLayout": {
+   "part": "core",
+   "service": "FnbService",
+   "contract": "fnb",
+   "verb": "PUT",
+   "path": "/outlets/{outletId}/tables",
+   "perm": "PRODUCT_CONFIGURE",
+   "platforms": [
+    "POS"
+   ],
+   "screens": [
+    "BO-044",
+    "EMP-052",
+    "EMP-053",
+    "POS-024"
+   ],
+   "enables": []
+  },
+  "setTheme": {
+   "part": "core",
+   "service": "WhiteLabelService",
+   "contract": "white-label",
+   "verb": "PUT",
+   "path": "/tenant-config/theme",
+   "perm": "TENANT_CONFIGURE",
+   "platforms": [
+    "WL"
+   ],
+   "screens": [
+    "ADM-016",
+    "CMS-003",
+    "CMS-005"
+   ],
+   "enables": []
+  },
+  "setTurnstileMode": {
+   "part": "setup",
+   "service": "AccessService",
+   "contract": "access",
+   "verb": "PUT",
+   "path": "/access-points/{accessPointId}/mode",
+   "perm": "TURNSTILE_MODE_SET",
+   "platforms": [],
+   "screens": [
+    "BO-064",
+    "SCN-002",
+    "SCN-016"
+   ],
+   "enables": [
+    "access.access_point"
+   ]
+  },
+  "setVenuePoint": {
+   "part": "setup",
+   "service": "VenueOpsService",
+   "contract": "venue-map",
+   "verb": "POST",
+   "path": "/venue-maps/{mapId}/points",
+   "perm": "VENUE_MAP_MANAGE",
+   "platforms": [],
+   "screens": [
+    "BO-094"
+   ],
+   "enables": [
+    "venuemap.point"
+   ]
+  },
+  "setVenueSettings": {
+   "part": "core",
+   "service": "TenancyService",
+   "contract": "tenancy",
+   "verb": "PUT",
+   "path": "/venues/{venueId}/settings",
+   "perm": "TENANT_CONFIGURE",
+   "platforms": [
+    "POS"
+   ],
+   "screens": [
+    "BO-065",
+    "BO-1063",
+    "BO-116",
+    "BO-136",
+    "BO-143",
+    "BO-600",
+    "KIT-009",
+    "POS-019"
+   ],
+   "enables": []
+  },
+  "setVisitReminder": {
+   "part": "core",
+   "service": "OrderService",
+   "contract": "orders",
+   "verb": "PUT",
+   "path": "/orders/{orderId}/reminder",
+   "perm": "ORDER_VIEW",
+   "platforms": [
+    "MOB"
+   ],
+   "screens": [
+    "GST-018"
+   ],
+   "enables": []
+  },
+  "shareEntitlement": {
+   "part": "core",
+   "service": "OrderService",
+   "contract": "orders",
+   "verb": "POST",
+   "path": "/entitlements/{entitlementId}/share",
+   "perm": "ORDER_MODIFY",
+   "platforms": [
+    "MOB",
+    "WEB"
+   ],
+   "screens": [
+    "GST-072",
+    "WEB-018"
+   ],
+   "enables": []
+  },
+  "signCorrectiveAction": {
+   "part": "setup",
+   "service": "FnbService",
+   "contract": "fnb",
+   "verb": "POST",
+   "path": "/food-safety/corrective-actions/{actionId}/sign",
+   "perm": "INCIDENT_MANAGE",
+   "platforms": [],
+   "screens": [
+    "BO-044",
+    "EMP-067"
+   ],
+   "enables": [
+    "fnb.corrective_action"
+   ]
+  },
+  "startSsoAuthorization": {
+   "part": "core",
+   "service": "IdentityService",
+   "contract": "identity",
+   "verb": "GET",
+   "path": "/auth/sso/{providerId}/authorize",
+   "perm": null,
+   "platforms": [
+    "MOB",
+    "WEB"
+   ],
+   "screens": [
+    "GST-042",
+    "WEB-016"
+   ],
+   "enables": []
+  },
+  "storePaymentToken": {
+   "part": "core",
+   "service": "OrderService",
+   "contract": "orders",
+   "verb": "POST",
+   "path": "/payment-tokens",
+   "perm": "ORDER_CREATE",
+   "platforms": [
+    "MOB",
+    "WEB"
+   ],
+   "screens": [
+    "GST-071",
+    "WEB-021"
+   ],
+   "enables": []
+  },
+  "submitReview": {
+   "part": "core",
+   "service": "MarketingService",
+   "contract": "marketing-crm",
+   "verb": "POST",
+   "path": "/reviews",
+   "perm": null,
+   "platforms": [
+    "MOB",
+    "WEB"
+   ],
+   "screens": [
+    "GST-035",
+    "WEB-026"
+   ],
+   "enables": []
+  },
+  "suspendShift": {
+   "part": "core",
+   "service": "OrderService",
+   "contract": "shift",
+   "verb": "POST",
+   "path": "/shifts/{shiftId}/suspend",
+   "perm": "SHIFT_SUSPEND",
+   "platforms": [
+    "POS"
+   ],
+   "screens": [
+    "BO-039",
+    "BO-040",
+    "BO-041",
+    "BO-042",
+    "EMP-003",
+    "EMP-008",
+    "EMP-009",
+    "POS-001",
+    "POS-007",
+    "POS-009"
+   ],
+   "enables": []
+  },
+  "suspendTenant": {
+   "part": "setup",
+   "service": "PlatformService",
+   "contract": "subscription",
+   "verb": "POST",
+   "path": "/tenants/{tenantId}/suspend",
+   "perm": "PLATFORM_TENANT_MANAGE",
+   "platforms": [],
+   "screens": [
+    "ADM-005"
+   ],
+   "enables": [
+    "control.tenant"
+   ]
+  },
+  "syncOrders": {
+   "part": "core",
+   "service": "OrderService",
+   "contract": "orders",
+   "verb": "POST",
+   "path": "/sync/orders",
+   "perm": "ORDER_CREATE",
+   "platforms": [
+    "POS"
+   ],
+   "screens": [
+    "BO-037",
+    "BO-130",
+    "BO-132",
+    "EMP-017",
+    "POS-002",
+    "POS-013",
+    "SCN-014"
+   ],
+   "enables": []
+  },
+  "terminateTenant": {
+   "part": "setup",
+   "service": "PlatformService",
+   "contract": "subscription",
+   "verb": "POST",
+   "path": "/tenants/{tenantId}/terminate",
+   "perm": "PLATFORM_TENANT_TERMINATE",
+   "platforms": [],
+   "screens": [
+    "ADM-005"
+   ],
+   "enables": [
+    "control.tenant",
+    "subscription.contract"
+   ]
+  },
+  "transferGameCard": {
+   "part": "core",
+   "service": "VenueOpsService",
+   "contract": "games",
+   "verb": "POST",
+   "path": "/game-cards/{cardCode}/transfer",
+   "perm": "ORDER_MODIFY",
+   "platforms": [
+    "POS"
+   ],
+   "screens": [
+    "POS-002"
+   ],
+   "enables": []
+  },
+  "transferOrderTickets": {
+   "part": "core",
+   "service": "OrderService",
+   "contract": "orders",
+   "verb": "POST",
+   "path": "/orders/{orderId}/transfer",
+   "perm": null,
+   "platforms": [
+    "MOB",
+    "WEB"
+   ],
+   "screens": [
+    "GST-008",
+    "GST-009",
+    "GST-010",
+    "GST-012",
+    "GST-013",
+    "GST-014",
+    "GST-019",
+    "GST-045",
+    "GST-055",
+    "KSK-009",
+    "KSK-010",
+    "KSK-012",
+    "WEB-012",
+    "WEB-013",
+    "WEB-018",
+    "WEB-019",
+    "WEB-023",
+    "WEB-030"
+   ],
+   "enables": []
+  },
+  "transferWalletBalance": {
+   "part": "core",
+   "service": "WalletService",
+   "contract": "wallet",
+   "verb": "POST",
+   "path": "/wallets/{walletId}/transfer",
+   "perm": "WALLET_MANAGE",
+   "platforms": [
+    "MOB",
+    "WEB"
+   ],
+   "screens": [
+    "BO-1116",
+    "BO-1121",
+    "GST-071",
+    "WEB-021"
+   ],
+   "enables": []
+  },
+  "transitionProductLifecycle": {
+   "part": "setup",
+   "service": "CatalogueService",
+   "contract": "catalogue",
+   "verb": "POST",
+   "path": "/products/{productId}/lifecycle",
+   "perm": "PRODUCT_CONFIGURE",
+   "platforms": [],
+   "screens": [
+    "BO-007",
+    "BO-012",
+    "BO-014",
+    "EMP-034",
+    "PTR-006"
+   ],
+   "enables": [
+    "catalogue.product"
+   ]
+  },
+  "updateAccessPoint": {
+   "part": "setup",
+   "service": "AccessService",
+   "contract": "access",
+   "verb": "PATCH",
+   "path": "/access-points/{accessPointId}",
+   "perm": "ACCESS_POINT_CONFIGURE",
+   "platforms": [],
+   "screens": [
+    "BO-006",
+    "BO-064"
+   ],
+   "enables": [
+    "access.access_point"
+   ]
+  },
+  "updateAccount": {
+   "part": "setup",
+   "service": "LedgerService",
+   "contract": "finance",
+   "verb": "PATCH",
+   "path": "/accounts/{accountId}",
+   "perm": "ACCOUNT_CONFIGURE",
+   "platforms": [],
+   "screens": [
+    "BO-074"
+   ],
+   "enables": [
+    "ledger.account"
+   ]
+  },
+  "updateAdmissionRules": {
+   "part": "setup",
+   "service": "AccessService",
+   "contract": "access",
+   "verb": "PUT",
+   "path": "/admission-rules/{profileId}",
+   "perm": "ACCESS_POINT_CONFIGURE",
+   "platforms": [],
+   "screens": [
+    "BO-032"
+   ],
+   "enables": [
+    "access.admission_rules"
+   ]
+  },
+  "updateBanner": {
+   "part": "core",
+   "service": "WhiteLabelService",
+   "contract": "white-label",
+   "verb": "PATCH",
+   "path": "/tenant-config/banners/{bannerId}",
+   "perm": "TENANT_CONFIGURE",
+   "platforms": [
+    "WL"
+   ],
+   "screens": [
+    "CMS-008"
+   ],
+   "enables": []
+  },
+  "updateBundle": {
+   "part": "setup",
+   "service": "CatalogueService",
+   "contract": "promotions",
+   "verb": "PATCH",
+   "path": "/bundles/{bundleId}",
+   "perm": "PRODUCT_CONFIGURE",
+   "platforms": [],
+   "screens": [],
+   "enables": [
+    "promotions.allocation_component",
+    "promotions.bundle",
+    "promotions.bundle_component"
+   ]
+  },
+  "updateCartLine": {
+   "part": "core",
+   "service": "OrderService",
+   "contract": "orders",
+   "verb": "PATCH",
+   "path": "/carts/{cartId}/lines/{lineId}",
+   "perm": null,
+   "platforms": [
+    "MOB",
+    "WEB"
+   ],
+   "screens": [
+    "GST-041",
+    "PTR-010",
+    "WEB-010"
+   ],
+   "enables": []
+  },
+  "updateChannelCapacity": {
+   "part": "setup",
+   "service": "CatalogueService",
+   "contract": "catalogue",
+   "verb": "PATCH",
+   "path": "/channel-capacities/{channelCapacityId}",
+   "perm": "CAPACITY_CONFIGURE",
+   "platforms": [],
+   "screens": [
+    "BO-013",
+    "BO-017",
+    "EMP-033",
+    "PTR-005"
+   ],
+   "enables": [
+    "catalogue.channel_capacity"
+   ]
+  },
+  "updateContentPage": {
+   "part": "core",
+   "service": "WhiteLabelService",
+   "contract": "white-label",
+   "verb": "PUT",
+   "path": "/tenant-config/pages/{pageId}",
+   "perm": "TENANT_CONFIGURE",
+   "platforms": [
+    "WL"
+   ],
+   "screens": [
+    "CMS-007"
+   ],
+   "enables": []
+  },
+  "updateDashboard": {
+   "part": "setup",
+   "service": "ReportingService",
+   "contract": "reporting",
+   "verb": "PUT",
+   "path": "/dashboards/{dashboardId}",
+   "perm": "REPORT_MANAGE",
+   "platforms": [],
+   "screens": [
+    "ADM-031",
+    "ANL-023",
+    "ANL-027",
+    "ANL-028",
+    "ANL-029"
+   ],
+   "enables": [
+    "reporting.dashboard",
+    "reporting.dashboard_tile"
+   ]
+  },
+  "updateEvent": {
+   "part": "setup",
+   "service": "CatalogueService",
+   "contract": "catalogue",
+   "verb": "PATCH",
+   "path": "/events/{eventId}",
+   "perm": "EVENT_CONFIGURE",
+   "platforms": [],
+   "screens": [
+    "BO-001",
+    "BO-015",
+    "BO-016",
+    "BO-019",
+    "BO-063"
+   ],
+   "enables": [
+    "catalogue.event"
+   ]
+  },
+  "updateGuestPreferences": {
+   "part": "core",
+   "service": "MarketingService",
+   "contract": "marketing-crm",
+   "verb": "PUT",
+   "path": "/guests/{subjectId}/preferences",
+   "perm": "GUEST_MANAGE",
+   "platforms": [
+    "MOB",
+    "WEB"
+   ],
+   "screens": [
+    "BO-740",
+    "GST-066",
+    "WEB-020"
+   ],
+   "enables": []
+  },
+  "updateInventoryItem": {
+   "part": "setup",
+   "service": "InventoryService",
+   "contract": "inventory",
+   "verb": "PATCH",
+   "path": "/inventory-items/{itemId}",
+   "perm": "PRODUCT_CONFIGURE",
+   "platforms": [],
+   "screens": [
+    "BO-081"
+   ],
+   "enables": [
+    "inventory.item"
+   ]
+  },
+  "updateMediaAsset": {
+   "part": "core",
+   "service": "VenueOpsService",
+   "contract": "assets",
+   "verb": "PATCH",
+   "path": "/media/{mediaId}",
+   "perm": "ASSET_LIBRARY_MANAGE",
+   "platforms": [
+    "WL"
+   ],
+   "screens": [
+    "CMS-010",
+    "CMS-082"
+   ],
+   "enables": []
+  },
+  "updateMenu": {
+   "part": "core",
+   "service": "FnbService",
+   "contract": "fnb",
+   "verb": "PATCH",
+   "path": "/menus/{menuId}",
+   "perm": "PRODUCT_CONFIGURE",
+   "platforms": [
+    "WL"
+   ],
+   "screens": [
+    "BO-045",
+    "BO-111",
+    "CMS-009"
+   ],
+   "enables": []
+  },
+  "updateMerchandise": {
+   "part": "setup",
+   "service": "RetailService",
+   "contract": "retail",
+   "verb": "PATCH",
+   "path": "/merchandise/{merchandiseId}",
+   "perm": "PRODUCT_CONFIGURE",
+   "platforms": [],
+   "screens": [
+    "BO-048",
+    "BO-116"
+   ],
+   "enables": [
+    "retail.merchandise"
+   ]
+  },
+  "updateMyProfile": {
+   "part": "core",
+   "service": "MarketingService",
+   "contract": "marketing-crm",
+   "verb": "PATCH",
+   "path": "/guests/me/profile",
+   "perm": "GUEST_VIEW",
+   "platforms": [
+    "MOB",
+    "WEB"
+   ],
+   "screens": [
+    "GST-039",
+    "WEB-011",
+    "WEB-020"
+   ],
+   "enables": []
+  },
+  "updateOrgUnit": {
+   "part": "setup",
+   "service": "TenancyService",
+   "contract": "tenancy",
+   "verb": "PATCH",
+   "path": "/org-units/{orgUnitId}",
+   "perm": "SCOPE_MANAGE",
+   "platforms": [],
+   "screens": [
+    "BO-064"
+   ],
+   "enables": [
+    "platform.scope"
+   ]
+  },
+  "updateOutlet": {
+   "part": "setup",
+   "service": "TenancyService",
+   "contract": "tenancy",
+   "verb": "PATCH",
+   "path": "/outlets/{outletId}",
+   "perm": "REGION_CONFIGURE",
+   "platforms": [],
+   "screens": [
+    "BO-044",
+    "BO-063"
+   ],
+   "enables": [
+    "platform.outlet"
+   ]
+  },
+  "updateParkingEntitlement": {
+   "part": "core",
+   "service": "AccessService",
+   "contract": "access",
+   "verb": "PATCH",
+   "path": "/parking-entitlements/{entitlementId}",
+   "perm": null,
+   "platforms": [
+    "MOB",
+    "WEB"
+   ],
+   "screens": [
+    "GST-027",
+    "WEB-041"
+   ],
+   "enables": []
+  },
+  "updatePerformance": {
+   "part": "core",
+   "service": "CatalogueService",
+   "contract": "catalogue",
+   "verb": "PATCH",
+   "path": "/performances/{performanceId}",
+   "perm": "PERFORMANCE_CONFIGURE",
+   "platforms": [
+    "POS"
+   ],
+   "screens": [
+    "BO-002",
+    "BO-015",
+    "BO-016",
+    "BO-019",
+    "BO-063",
+    "POS-004"
+   ],
+   "enables": []
+  },
+  "updatePriceList": {
+   "part": "setup",
+   "service": "CatalogueService",
+   "contract": "catalogue",
+   "verb": "PATCH",
+   "path": "/price-lists/{priceListId}",
+   "perm": "PRICE_CONFIGURE",
+   "platforms": [],
+   "screens": [
+    "BO-009",
+    "PTR-006"
+   ],
+   "enables": [
+    "catalogue.price_list"
+   ]
+  },
+  "updatePrincipal": {
+   "part": "setup",
+   "service": "IdentityService",
+   "contract": "identity",
+   "verb": "PATCH",
+   "path": "/principals/{principalId}",
+   "perm": "USER_MANAGE",
+   "platforms": [],
+   "screens": [
+    "ADM-020",
+    "BO-053",
+    "PTR-003"
+   ],
+   "enables": [
+    "identity.principal"
+   ]
+  },
+  "updateProduct": {
+   "part": "setup",
+   "service": "CatalogueService",
+   "contract": "catalogue",
+   "verb": "PATCH",
+   "path": "/products/{productId}",
+   "perm": "PRODUCT_CONFIGURE",
+   "platforms": [],
+   "screens": [
+    "BO-007",
+    "BO-008",
+    "BO-012",
+    "BO-014",
+    "PTR-006"
+   ],
+   "enables": [
+    "catalogue.product"
+   ]
+  },
+  "updatePromoBlock": {
+   "part": "core",
+   "service": "WhiteLabelService",
+   "contract": "white-label",
+   "verb": "PATCH",
+   "path": "/tenant-config/promo-blocks/{promoBlockId}",
+   "perm": "TENANT_CONFIGURE",
+   "platforms": [
+    "WL"
+   ],
+   "screens": [
+    "CMS-008"
+   ],
+   "enables": []
+  },
+  "updatePromotion": {
+   "part": "setup",
+   "service": "CatalogueService",
+   "contract": "promotions",
+   "verb": "PATCH",
+   "path": "/promotions/{promotionId}",
+   "perm": "PRICE_CONFIGURE",
+   "platforms": [],
+   "screens": [
+    "BO-010"
+   ],
+   "enables": [
+    "promotions.promotion"
+   ]
+  },
+  "updateQueue": {
+   "part": "setup",
+   "service": "VenueOpsService",
+   "contract": "queue",
+   "verb": "PATCH",
+   "path": "/queues/{queueId}",
+   "perm": "QUEUE_MANAGE",
+   "platforms": [],
+   "screens": [
+    "BO-001",
+    "BO-002",
+    "BO-004",
+    "BO-005",
+    "BO-038"
+   ],
+   "enables": [
+    "queue.queue"
+   ]
+  },
+  "updateRegionSettings": {
+   "part": "setup",
+   "service": "TenancyService",
+   "contract": "tenancy",
+   "verb": "PUT",
+   "path": "/regions/{regionId}/settings",
+   "perm": "REGION_CONFIGURE",
+   "platforms": [],
+   "screens": [
+    "ADM-425",
+    "BO-1065"
+   ],
+   "enables": [
+    "platform.region_settings"
+   ]
+  },
+  "updateResource": {
+   "part": "setup",
+   "service": "VenueOpsService",
+   "contract": "resources",
+   "verb": "PUT",
+   "path": "/resources/{resourceId}",
+   "perm": "RESOURCE_MANAGE",
+   "platforms": [],
+   "screens": [
+    "BO-857"
+   ],
+   "enables": [
+    "resources.resource"
+   ]
+  },
+  "updateSaleBoard": {
+   "part": "setup",
+   "service": "TenancyService",
+   "contract": "tenancy",
+   "verb": "PUT",
+   "path": "/sale-boards/{saleBoardId}",
+   "perm": "WORKSTATION_CONFIGURE",
+   "platforms": [],
+   "screens": [
+    "BO-109",
+    "BO-116",
+    "BO-117",
+    "BO-118",
+    "BO-124",
+    "BO-125",
+    "BO-126"
+   ],
+   "enables": [
+    "platform.sale_board"
+   ]
+  },
+  "updateTableReservation": {
+   "part": "core",
+   "service": "FnbService",
+   "contract": "fnb",
+   "verb": "PATCH",
+   "path": "/table-reservations/{reservationId}",
+   "perm": null,
+   "platforms": [
+    "MOB",
+    "WEB"
+   ],
+   "screens": [
+    "GST-070",
+    "WEB-031"
+   ],
+   "enables": []
+  },
+  "updateTenant": {
+   "part": "setup",
+   "service": "PlatformService",
+   "contract": "subscription",
+   "verb": "PATCH",
+   "path": "/tenants/{tenantId}",
+   "perm": "PLATFORM_TENANT_MANAGE",
+   "platforms": [],
+   "screens": [
+    "ADM-005",
+    "ADM-006"
+   ],
+   "enables": [
+    "control.tenant"
+   ]
+  },
+  "updateTicketTemplate": {
+   "part": "setup",
+   "service": "OrderService",
+   "contract": "orders",
+   "verb": "PATCH",
+   "path": "/ticket-templates/{templateId}",
+   "perm": "PRODUCT_CONFIGURE",
+   "platforms": [],
+   "screens": [
+    "BO-346"
+   ],
+   "enables": [
+    "orders.ticket_template"
+   ]
+  },
+  "uploadGuestDocument": {
+   "part": "core",
+   "service": "MarketingService",
+   "contract": "marketing-crm",
+   "verb": "POST",
+   "path": "/guest-documents",
+   "perm": "GUEST_VIEW_PII",
+   "platforms": [
+    "MOB",
+    "WEB"
+   ],
+   "screens": [
+    "BO-743",
+    "GST-066",
+    "WEB-011"
+   ],
+   "enables": []
+  },
+  "validateTenantConfig": {
+   "part": "core",
+   "service": "WhiteLabelService",
+   "contract": "white-label",
+   "verb": "POST",
+   "path": "/tenant-config/validate",
+   "perm": "TENANT_CONFIGURE",
+   "platforms": [
+    "WL"
+   ],
+   "screens": [
+    "CMS-012",
+    "CMS-014"
+   ],
+   "enables": []
+  },
+  "verifyCustomDomain": {
+   "part": "core",
+   "service": "WhiteLabelService",
+   "contract": "white-label",
+   "verb": "POST",
+   "path": "/tenant-domains/{domainId}/verify",
+   "perm": "TENANT_CONFIGURE",
+   "platforms": [
+    "WL"
+   ],
+   "screens": [
+    "ADM-017",
+    "CMS-017"
+   ],
+   "enables": []
+  },
+  "verifyGuestEmail": {
+   "part": "core",
+   "service": "IdentityService",
+   "contract": "identity",
+   "verb": "POST",
+   "path": "/auth/guest/verify-email",
+   "perm": "GUEST_VIEW",
+   "platforms": [
+    "MOB",
+    "WEB"
+   ],
+   "screens": [
+    "GST-073",
+    "WEB-020"
+   ],
+   "enables": []
+  },
+  "verifyGuestOtp": {
+   "part": "core",
+   "service": "IdentityService",
+   "contract": "identity",
+   "verb": "POST",
+   "path": "/auth/guest/otp/verify",
+   "perm": null,
+   "platforms": [
+    "MOB",
+    "WEB"
+   ],
+   "screens": [
+    "GST-042",
+    "WEB-016"
+   ],
+   "enables": []
+  },
+  "verifyMfaChallenge": {
+   "part": "core",
+   "service": "IdentityService",
+   "contract": "identity",
+   "verb": "POST",
+   "path": "/auth/mfa/challenge/{challengeId}/verify",
+   "perm": null,
+   "platforms": [
+    "MOB",
+    "WEB"
+   ],
+   "screens": [
+    "GST-042",
+    "WEB-016"
+   ],
+   "enables": []
+  },
+  "verifyMfaEnrolment": {
+   "part": "core",
+   "service": "IdentityService",
+   "contract": "identity",
+   "verb": "POST",
+   "path": "/auth/mfa/methods/{methodId}",
+   "perm": null,
+   "platforms": [
+    "MOB",
+    "WEB"
+   ],
+   "screens": [
+    "GST-042",
+    "WEB-016"
+   ],
+   "enables": []
+  },
+  "voidOrder": {
+   "part": "core",
+   "service": "OrderService",
+   "contract": "orders",
+   "verb": "POST",
+   "path": "/orders/{orderId}/voids",
+   "perm": "ORDER_VOID",
+   "platforms": [
+    "POS"
+   ],
+   "screens": [
+    "BO-022",
+    "BO-023",
+    "BO-026",
+    "BO-047",
+    "BO-051",
+    "BO-070",
+    "EMP-014",
+    "EMP-034",
+    "POS-002",
+    "POS-006",
+    "POS-014",
+    "PTR-002",
+    "PTR-005",
+    "PTR-008",
+    "PTR-015",
+    "PTR-016"
+   ],
+   "enables": []
+  },
+  "withdrawFromDepositBox": {
+   "part": "core",
+   "service": "OrderService",
+   "contract": "shift",
+   "verb": "POST",
+   "path": "/deposit-boxes/{boxId}/withdraw",
+   "perm": "CASH_LIFT",
+   "platforms": [
+    "POS"
+   ],
+   "screens": [
+    "POS-013",
+    "POS-018"
+   ],
+   "enables": []
+  }
+ },
+ "fedElsewhere": {
+  "access.scan_event": [
+   "overrideAccess",
+   "syncScans",
+   "validateAccess",
+   "validateGroupAccess"
+  ],
+  "games.credit_ledger": [
+   "syncGamePlays"
+  ],
+  "ledger.fiscal_period": [
+   "abandonPeriodClose",
+   "beginPeriodClose",
+   "closeFiscalPeriod",
+   "reopenPeriod"
+  ],
+  "maintenance.work_order": [
+   "acceptWorkOrder",
+   "cancelWorkOrder",
+   "closeWorkOrder",
+   "completeWorkOrder",
+   "createWorkOrder",
+   "pauseWorkOrder",
+   "recordWorkOrderParts",
+   "recordWorkOrderTime",
+   "rejectWorkOrder",
+   "resumeWorkOrder",
+   "startWorkOrder",
+   "updateWorkOrder",
+   "verifyWorkOrder"
+  ],
+  "marketing.form_submission": [
+   "submitForm"
+  ],
+  "orders.invitation": [
+   "issueInvitation"
+  ],
+  "queue.reading": [
+   "submitQueueReading",
+   "testQueueFeed"
+  ],
+  "reporting.alert": [
+   "acknowledgeAlert"
+  ],
+  "resources.booking": [
+   "bookResource",
+   "checkInResource",
+   "checkOutResource"
+  ],
+  "retail.shop_and_drop": [
+   "collectShopAndDrop",
+   "createShopAndDrop",
+   "disposeShopAndDrop"
+  ],
+  "seating.seat": [
+   "assignSeats"
+  ],
+  "wallet.gift_card": [
+   "activateGiftCard",
+   "blockGiftCard",
+   "issueGiftCard",
+   "redeemGiftCard"
+  ]
+ },
+ "noWriter": [
+  "ai.chunk_ref",
+  "fnb.delivery_location",
+  "fnb.service_order_line",
+  "fnb.sold_out_item",
+  "inventory.goods_receipt_line",
+  "inventory.serialised_item",
+  "inventory.stock_batch",
+  "inventory.stock_level",
+  "ledger.event_budget",
+  "marketing.challenge_progress",
+  "platform.device_heartbeat",
+  "retail.reservation_line",
+  "retail.return_line",
+  "retail.sale_line",
+  "retail.shop_and_drop_line"
+ ],
+ "missingFromLineage": []
+}

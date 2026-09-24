@@ -9,7 +9,7 @@ CREATE TABLE IF NOT EXISTS assets.approval (
     approved_by                       uuid,
     comment                           text,
     at                                timestamptz,
-    scope_path                        text,
+    scope_path                        ltree,
     id                                uuid PRIMARY KEY NOT NULL
 );
 
@@ -25,7 +25,7 @@ CREATE TABLE IF NOT EXISTS assets.asset_version (
     created_at                        timestamptz,
     note                              text,
     is_current                        boolean,
-    scope_path                        text,
+    scope_path                        ltree,
     id                                uuid PRIMARY KEY NOT NULL
 );
 
@@ -39,7 +39,7 @@ CREATE TABLE IF NOT EXISTS assets.audit (
     actor_id                          uuid,
     recipient                         text,
     detail                            text,
-    scope_path                        text
+    scope_path                        ltree
 );
 
 -- Holds 10 columns. No description has been written for this table — the name is the only thing
@@ -53,7 +53,7 @@ CREATE TABLE IF NOT EXISTS assets.distribution_channel (
     default_rendition                 text,
     fallback_asset_id                 uuid,
     on_rights_expiry                  text,
-    scope_path                        text,
+    scope_path                        ltree,
     id                                uuid PRIMARY KEY NOT NULL
 );
 
@@ -130,7 +130,7 @@ CREATE TABLE IF NOT EXISTS assets.rendition (
     status                            text,
     failure_reason                    text,
     url                               text,
-    scope_path                        text
+    scope_path                        ltree
 );
 
 -- Holds 12 columns. No description has been written for this table — the name is the only thing
@@ -147,7 +147,7 @@ CREATE TABLE IF NOT EXISTS assets.share (
     revoked_at                        timestamptz,
     url                               text,
     opened_count                      integer,
-    scope_path                        text
+    scope_path                        ltree
 );
 
 -- Holds 9 columns. No description has been written for this table — the name is the only thing
@@ -160,14 +160,14 @@ CREATE TABLE IF NOT EXISTS assets.tag (
     accepted                          boolean,
     added_by                          uuid,
     added_at                          timestamptz,
-    scope_path                        text,
+    scope_path                        ltree,
     id                                uuid PRIMARY KEY NOT NULL
 );
 
 -- Holds 2 columns. No description has been written for this table — the name is the only thing
 -- saying what it is
 CREATE TABLE IF NOT EXISTS assets.taxonomy (
-    scope_path                        text,
+    scope_path                        ltree,
     id                                uuid PRIMARY KEY NOT NULL
 );
 
