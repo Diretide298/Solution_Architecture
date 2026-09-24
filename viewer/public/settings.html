@@ -80,23 +80,29 @@
       </div>
     </main>
 
-    <div id="settings" class="set-layout" hidden>
-      <!-- ── the section list ─────────────────────────────────────── -->
-      <nav class="set-nav" aria-label="Settings sections">
-        <h1 class="set-nav-title">Settings</h1>
-        <div class="set-nav-list">
-          <a href="#account">Account</a>
-          <a href="#password">Password</a>
-          <div class="set-nav-group">Connections</div>
-          <a href="#openproject">OpenProject</a>
-          <a href="#git">Git identity</a>
-          <a href="#connector">Claude connector</a>
-          <a href="#agents">Agent activity</a>
-          <div class="set-nav-group">Security</div>
-          <a href="#sessions">Sessions</a>
-          <div class="set-nav-group" id="nav-admin-group" hidden>Admin</div>
-          <a href="#admin" id="nav-admin" hidden>Administration</a>
-        </div>
+    <div id="settings" class="set-page" hidden>
+      <!-- One section at a time, on a tab strip.
+
+           A column of links beside a long scroll made this a page where the
+           answer to "where do I change my password" was "somewhere above". The
+           sections are different kinds of thing - a password, a live credential
+           to another system, a list of machines - and they are not a document.
+           Each section keeps its id, so /settings.html#openproject still opens
+           that one. -->
+      <header class="set-head">
+        <h1 class="set-h1">Settings</h1>
+        <p class="set-lede">Everything you configure about yourself.</p>
+      </header>
+
+      <nav class="set-tabs" id="set-tabs" aria-label="Settings sections">
+        <button type="button" data-tab="account">Account</button>
+        <button type="button" data-tab="password">Password</button>
+        <button type="button" data-tab="openproject">OpenProject</button>
+        <button type="button" data-tab="git">Git identity</button>
+        <button type="button" data-tab="connector">Claude connector</button>
+        <button type="button" data-tab="agents">Agent activity</button>
+        <button type="button" data-tab="sessions">Sessions</button>
+        <button type="button" data-tab="admin" id="nav-admin" hidden>Administration</button>
       </nav>
 
       <main class="set-content">
@@ -114,6 +120,34 @@
           <dl class="set-facts">
             <dt>What your role can do</dt>
             <dd id="me-role-says"></dd>
+          </dl>
+
+          <!-- The matrix answers the question the sentence could not: not just
+               what you can do, but what the role next to yours can do, which is
+               what somebody asking has actually come to find out. -->
+          <div class="set-flow">
+            <div class="set-flow-cap">Who can do what</div>
+            <table class="set-matrix" id="me-matrix">
+              <thead>
+                <tr>
+                  <th scope="col">Capability</th>
+                  <th scope="col" data-col="client">Client</th>
+                  <th scope="col" data-col="reviewer">Reviewer</th>
+                  <th scope="col" data-col="dev">Developer</th>
+                  <th scope="col" data-col="admin">Admin</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr data-caps="client reviewer dev admin"><th scope="row">Read the package</th></tr>
+                <tr data-caps="reviewer dev admin"><th scope="row">Raise a change request</th></tr>
+                <tr data-caps="reviewer admin"><th scope="row">Record a verdict</th></tr>
+                <tr data-caps="dev admin"><th scope="row">Work a ticket</th></tr>
+                <tr data-caps="admin"><th scope="row">Invite people and set roles</th></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <dl class="set-facts">
             <dt>Name and address</dt>
             <dd>Set when your invitation was accepted. The address is what you sign in with.</dd>
           </dl>
@@ -125,6 +159,32 @@
              their own password at all. -->
         <section class="admin-panel set-section" id="password">
           <h2 class="admin-heading">Password</h2>
+          <div class="set-flow">
+            <div class="set-flow-cap">After you change it</div>
+            <div class="set-flow-row">
+            <div class="set-node">
+              <span class="set-node-tile"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><path d="M3 4h10v6.5H3zM1.5 12.5h13"/></svg></span>
+              <span class="set-node-title">This browser</span>
+              <span class="set-node-sub">Stays signed in</span>
+            </div>
+            <div class="set-node" data-tone="red">
+              <span class="set-node-tile"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><path d="M3 4h10v6.5H3zM1.5 12.5h13"/></svg></span>
+              <span class="set-node-title">Other browsers</span>
+              <span class="set-node-sub">Signed out</span>
+            </div>
+            <div class="set-node" data-tone="red">
+              <span class="set-node-tile"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 1.8h6v12.4H5zM7.2 12h1.6"/></svg></span>
+              <span class="set-node-title">Phone</span>
+              <span class="set-node-sub">Signed out</span>
+            </div>
+            <div class="set-node" data-tone="red">
+              <span class="set-node-tile"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3.5h12v9H2zM4.5 6.5l2 1.5-2 1.5M8 10h3"/></svg></span>
+              <span class="set-node-title">Claude connector</span>
+              <span class="set-node-sub">Needs the new one</span>
+            </div>
+            </div>
+          </div>
+
           <p class="auth-note set-lede">
             At least 12 characters. Changing it signs out every other session on your account —
             which is the point, if you think somebody else has it. If you use the Claude connector,
@@ -149,6 +209,35 @@
           <h2 class="admin-heading">
             OpenProject <span id="op-state" class="set-badge" data-on="no">not connected</span>
           </h2>
+          <div class="set-flow">
+            <div class="set-flow-cap">How the token is used</div>
+            <div class="set-flow-row">
+            <div class="set-node">
+              <span class="set-node-tile"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><path d="M8 8a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5zM3 13.5c.6-2.4 2.6-3.5 5-3.5s4.4 1.1 5 3.5"/></svg></span>
+              <span class="set-node-title">You</span>
+              <span class="set-node-sub">Paste your token</span>
+            </div>
+            <div class="set-conn">
+              <span class="set-conn-label">encrypted</span>
+              <span class="set-conn-line"><i></i><svg viewBox="0 0 7 10" aria-hidden="true"><path d="M0 0l7 5-7 5z"/></svg></span>
+            </div>
+            <div class="set-node">
+              <span class="set-node-tile"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><path d="M8 1.8 13.5 5v6L8 14.2 2.5 11V5zM2.5 5 8 8.2 13.5 5M8 8.2v6"/></svg></span>
+              <span class="set-node-title">ADAM</span>
+              <span class="set-node-sub">Keeps it, shows last 4</span>
+            </div>
+            <div class="set-conn">
+              <span class="set-conn-label">acts as you</span>
+              <span class="set-conn-line"><svg viewBox="0 0 7 10" aria-hidden="true"><path d="M7 0 0 5l7 5z"/></svg><i></i><svg viewBox="0 0 7 10" aria-hidden="true"><path d="M0 0l7 5-7 5z"/></svg></span>
+            </div>
+            <div class="set-node">
+              <span class="set-node-tile"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><path d="M2.5 3h11v10h-11zM6 3v10M10 3v6"/></svg></span>
+              <span class="set-node-title">OpenProject</span>
+              <span class="set-node-sub">History says your name</span>
+            </div>
+            </div>
+          </div>
+
           <p class="auth-note set-lede">
             <strong>Your own token, not a shared one.</strong> Anything ADAM does in the PMS is done
             as you, so the history there names a person rather than a robot. It is encrypted before

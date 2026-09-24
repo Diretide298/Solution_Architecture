@@ -11,7 +11,7 @@ import { readFile, writeFile } from 'node:fs/promises';
 //   node server.mjs                     # the viewer, on 4173
 //   node checks/updates-check.mjs
 
-const V = 'http://localhost:4173';
+const V = process.env.VIEWER ?? 'http://localhost:4173';
 const NOTES = new URL('../public/updates.md', import.meta.url);
 let pass = 0, fail = 0;
 const check = (n, ok, d = '') => { console.log(`${ok ? 'PASS' : 'FAIL'}  ${n}${d ? ` — ${d}` : ''}`); ok ? pass++ : fail++; };

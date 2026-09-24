@@ -3424,3 +3424,175 @@ textarea.rt-sendback-note {
 @media (max-width: 900px) {
   #cp-panel { display: none; }
 }
+
+/* ── settings: one section at a time ─────────────────────────────────────────
+   Tokens from the design handoff. The page was a 210px nav column beside a long
+   scroll; it is now a title, a tab strip and exactly one section. */
+.set-page {
+  max-width: 1080px;
+  margin: 0 auto;
+  padding: 26px 24px 80px;
+}
+.set-head { display: flex; flex-direction: column; gap: 6px; margin-bottom: 18px; }
+.set-h1 { margin: 0; font-size: 24px; font-weight: 700; letter-spacing: -.01em; color: var(--text); }
+.set-lede { margin: 0; font-size: 14px; color: var(--text-dim); max-width: 680px; }
+
+.set-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-bottom: 20px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--line);
+}
+.set-tabs button {
+  height: 32px;
+  padding: 0 13px;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--text-dim);
+  font: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+}
+.set-tabs button:hover { background: var(--bg-hover); color: var(--text); }
+.set-tabs button[aria-current='true'] {
+  background: var(--accent-soft);
+  border-color: color-mix(in srgb, var(--accent) 45%, transparent);
+  color: var(--accent-text);
+}
+.set-tabs button[hidden] { display: none; }
+
+/* The section itself is no longer one of a stack, so it carries the page rather
+   than sitting in a column of identical cards. */
+.set-page .set-content { display: grid; gap: 16px; padding-bottom: 0; }
+.set-page .set-section[hidden] { display: none; }
+
+/* ── the flow diagram on a settings section ──────────────────────────────────
+   What happens to the thing on this page, drawn once, instead of a paragraph
+   saying it. Nodes are fixed-width and the connectors take the slack, so the
+   diagram shrinks to fit and never scrolls sideways. */
+.set-flow {
+  background: var(--bg-panel, var(--bg-card));
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  padding: 18px 20px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+.set-flow-cap {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: var(--text-faint);
+}
+.set-flow-row { display: flex; align-items: flex-start; }
+.set-node {
+  flex: 0 1 104px;
+  min-width: 64px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  text-align: center;
+}
+.set-node-tile {
+  width: 46px;
+  height: 46px;
+  border-radius: 12px;
+  display: grid;
+  place-items: center;
+  background: var(--accent-soft);
+  border: 1px solid color-mix(in srgb, var(--accent) 55%, transparent);
+  color: var(--accent);
+}
+.set-node-tile svg { width: 20px; height: 20px; }
+.set-node[data-tone='dim'] .set-node-tile {
+  background: var(--bg-card);
+  border-color: color-mix(in srgb, var(--text-faint) 55%, transparent);
+  color: var(--text-dim);
+}
+.set-node[data-tone='red'] .set-node-tile {
+  background: color-mix(in srgb, var(--error) 18%, transparent);
+  border-color: color-mix(in srgb, var(--error) 50%, transparent);
+  color: var(--error);
+}
+.set-node-title { font-size: 12.5px; font-weight: 700; color: var(--text); }
+.set-node-sub { font-size: 11.5px; line-height: 1.35; color: var(--text-faint); }
+
+.set-conn {
+  flex: 1 1 40px;
+  min-width: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+  padding-top: 9px;
+}
+.set-conn-label {
+  font-size: 11px;
+  line-height: 1.2;
+  text-align: center;
+  min-height: 13px;
+  color: var(--text-faint);
+}
+.set-conn-line { width: 100%; display: flex; align-items: center; }
+.set-conn-line i { flex: 1; border-top: 1.5px dashed color-mix(in srgb, var(--text-faint) 55%, transparent); }
+.set-conn-line svg { flex: none; width: 7px; height: 10px; fill: color-mix(in srgb, var(--text-faint) 55%, transparent); }
+
+/* ── what each role can do ───────────────────────────────────────────────────
+   A matrix rather than a sentence: "what your role can do" was one line of prose
+   that could not say what the next role along can do, which is the question
+   people actually have. */
+.set-matrix { width: 100%; border-collapse: collapse; font-size: 12.5px; }
+.set-matrix th, .set-matrix td { padding: 9px 10px; border-bottom: 1px solid var(--line); }
+.set-matrix thead th {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  color: var(--text-faint);
+  text-align: center;
+}
+.set-matrix thead th:first-child { text-align: left; }
+.set-matrix tbody th { font-weight: 500; color: var(--text-dim); text-align: left; }
+.set-matrix td { text-align: center; }
+.set-matrix [data-you] { background: var(--accent-soft); }
+.set-you-tag {
+  display: inline-block;
+  margin-left: 6px;
+  padding: 1px 6px;
+  border-radius: 10px;
+  background: var(--accent-soft);
+  color: var(--accent-text);
+  font-size: 10px;
+  font-weight: 700;
+}
+.set-dot { display: inline-block; width: 12px; height: 12px; border-radius: 50%; }
+.set-dot[data-on='1'] { background: var(--accent); box-shadow: 0 0 0 3px var(--accent-soft); }
+.set-dot[data-on='0'] { border: 1.5px solid color-mix(in srgb, var(--text-faint) 55%, transparent); }
+
+/* Long explanation, folded away. */
+.set-more > summary {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  height: 46px;
+  cursor: pointer;
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--text-dim);
+  list-style: none;
+}
+.set-more > summary::-webkit-details-marker { display: none; }
+.set-more > summary svg { width: 12px; height: 12px; transition: transform .15s; }
+.set-more[open] > summary svg { transform: rotate(90deg); }
+
+@media (max-width: 720px) {
+  .set-flow-row { flex-wrap: wrap; gap: 12px; }
+  .set-conn { display: none; }
+}

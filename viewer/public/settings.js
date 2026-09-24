@@ -27,7 +27,6 @@ import {
   changePassword, signOut, logoutAll, project, isAdmin, isOwner,
   connectorFleet, servedBuild,
 } from '/validation.js';
-import { followSections } from '/sections.js';
 
 const $ = (id) => document.getElementById(id);
 
@@ -88,7 +87,6 @@ function drawAccount(state, who) {
   const admin = isAdmin({ role });
   $('admin').hidden = !admin;
   $('nav-admin').hidden = !admin;
-  $('nav-admin-group').hidden = !admin;
   // Inside the admin section and narrower than it: the allowlist and the log of
   // where people sign in from are the super admin's, and an admin opening that
   // page is told so rather than shown an empty one.
@@ -140,6 +138,43 @@ function drawOpenProject(state) {
  * both shells treat literally. `-s user` so the connector is there in every repo
  * a developer opens, not only in the directory they happened to run this from.
  */
+/**
+ * Fill in the capability matrix, and mark the column that is yours.
+ *
+ * The rows carry the roles that hold each capability, so the dots are drawn from
+ * one list rather than from five hand-written columns that would drift apart the
+ * first time a permission moved. It is a summary and says so: the service is the
+ * thing that refuses, not this table.
+ */
+function drawMatrix(role) {
+  const table = $('me-matrix');
+  if (!table) return;
+  const cols = [...table.querySelectorAll('thead th[data-col]')].map((th) => th.dataset.col);
+  // The System Architect and an admin hold the same things here; a column each
+  // would be two identical columns.
+  const mine = role === 'owner' || role === 'pm' || role === 'lead' ? 'admin' : role;
+
+  for (const th of table.querySelectorAll('thead th[data-col]')) {
+    if (th.dataset.col !== mine) continue;
+    th.setAttribute('data-you', '');
+    th.append(el('span', 'set-you-tag', 'You'));
+  }
+  for (const tr of table.querySelectorAll('tbody tr')) {
+    const holds = new Set((tr.dataset.caps ?? '').split(' ').filter(Boolean));
+    for (const col of cols) {
+      const td = el('td');
+      if (col === mine) td.setAttribute('data-you', '');
+      const dot = el('span', 'set-dot');
+      dot.dataset.on = holds.has(col) ? '1' : '0';
+      // Said out loud: a dot is not readable, and this is a permissions table.
+      dot.setAttribute('role', 'img');
+      dot.setAttribute('aria-label', holds.has(col) ? 'yes' : 'no');
+      td.append(dot);
+      tr.append(td);
+    }
+  }
+}
+
 function drawConnector(state) {
   $('mcp-line').textContent =
     // ADAM_PROJECT picks the package, and so the OpenProject project the
@@ -232,6 +267,7 @@ async function drawFleet() {
 async function load() {
   const state = await mySettings();
   drawAccount(state, account());
+  drawMatrix(account()?.role ?? '');
   $('git-email').value = state.gitEmail ?? '';
   drawOpenProject(state);
   drawConnector(state);
@@ -240,7 +276,40 @@ async function load() {
 
 /** Marks the section being read in the list on the left. Shared with the admin
  *  and tasks pages, which are the same page shape. */
-const followScroll = () => followSections('account');
+/**
+ * One section at a time.
+ *
+ * The address still names the section, so /settings.html#openproject opens that
+ * tab and a link somebody pasted into a message a month ago still works. Going
+ * between tabs replaces the hash rather than pushing it, so Back leaves the
+ * settings page instead of walking you through every tab you looked at.
+ */
+function tabs(start) {
+  const strip = $('set-tabs');
+  const buttons = [...strip.querySelectorAll('button')];
+  const names = buttons.map((b) => b.dataset.tab);
+
+  const show = (name, push) => {
+    const pick = names.includes(name) && !buttons[names.indexOf(name)].hidden ? name : 'account';
+    for (const b of buttons) {
+      const on = b.dataset.tab === pick;
+      b.setAttribute('aria-current', on ? 'true' : 'false');
+    }
+    for (const n of names) {
+      const section = $(n);
+      if (section) section.hidden = n !== pick;
+    }
+    if (push) history.replaceState(null, '', `#${pick}`);
+    // Back to the top of the section, not to wherever the last one was scrolled.
+    window.scrollTo({ top: 0 });
+  };
+
+  for (const b of buttons) b.onclick = () => show(b.dataset.tab, true);
+  addEventListener('hashchange', () => show(location.hash.slice(1), false));
+  show(start, false);
+}
+
+const followScroll = () => tabs(location.hash.slice(1) || 'account');
 
 function wirePassword() {
   $('pw-submit').addEventListener('click', async () => {
@@ -380,9 +449,6 @@ if (await requireSignIn()) {
     wireConnections();
     wireSessions();
     followScroll();
-    // The page was hidden when the browser tried to jump to the #section in the
-    // address, so the jump is made again now that there is something to land on.
-    if (location.hash) $(location.hash.slice(1))?.scrollIntoView();
   } catch (error) {
     // Signed in, and the settings would not load — a different fault from being
     // signed out, and it must not present as one.
