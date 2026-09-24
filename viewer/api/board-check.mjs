@@ -114,6 +114,37 @@ check('and the backlog one has neither', !byKey['7004']?.dueDate && !byKey['7004
 check('one is genuinely overdue, so the first section is not vacuous',
   new Date(byKey['7001'].dueDate) < new Date(), byKey['7001'].dueDate);
 
+// ── the module a ticket is from, and the subtasks under it ───────────
+//
+// "What is on my board" is answered as a table of tasks against the epic each
+// belongs to, so the epic has to be resolved by walking the parent chain to
+// the top — OpenProject's `parent` link is one hop and names the feature, not
+// the module.
+
+check('every ticket says which module it is from',
+  byKey['7001']?.module?.key === '900' && byKey['7003']?.module?.key === '901',
+  `7001 -> ${byKey['7001']?.module?.key}, 7003 -> ${byKey['7003']?.module?.key}`);
+check('and names it, because a number is not a module',
+  byKey['7001']?.module?.subject === 'M1 Checkout', byKey['7001']?.module?.subject);
+check('the board says the tree was read, so a blank module is never ambiguous',
+  mine.data?.modulesKnown === true, String(mine.data?.modulesKnown));
+
+// Pulled with the board rather than fetched later, and reaching past the first
+// hop: 7013 hangs off 7012 which hangs off 7003.
+const under = byKey['7003']?.subtasks ?? [];
+check('subtasks come back with the ticket', under.length === 3,
+  under.map((t) => t.key).join(' ') || 'none');
+check('including one two levels down',
+  under.find((t) => t.key === '7013')?.depth === 2,
+  under.map((t) => `${t.key}:${t.depth}`).join(' '));
+check('a ticket with nothing under it gets an empty list, not a missing field',
+  Array.isArray(byKey['7001']?.subtasks) && byKey['7001'].subtasks.length === 0,
+  JSON.stringify(byKey['7001']?.subtasks));
+// The distinction the whole thing rests on: the subtasks are carried, and they
+// are still not rows on the board.
+check('and the subtasks are not board rows themselves',
+  !keys(mine).includes('7011') && !keys(mine).includes('7013'), keys(mine).join(' '));
+
 // The timeline needs these two, and they are the reason it can be drawn at all
 // without ADAM storing a schedule of its own.
 const overview = await as('boss', 'GET', '/api/board/overview');

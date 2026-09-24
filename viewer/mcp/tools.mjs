@@ -738,11 +738,23 @@ export const TOOLS = [
   {
     name: 'adam_board',
     description:
-      'What is open and assigned to you in OpenProject, and which package artefacts each item '
-      + 'touches. Use at the start of a session to see what you are meant to be doing, or when a '
-      + 'branch name or a ticket number turns up and you need the context behind it.',
-    inputSchema: { type: 'object', properties: {} },
-    async run(client) {
+      'What is open and assigned to you in OpenProject, as a table of tasks and the epic or '
+      + 'module each one comes from. Use at the start of a session to see what you are meant to '
+      + 'be doing, or when a branch name or a ticket number turns up and you need the context '
+      + 'behind it. Subtasks and the artefacts each ticket touches come back with it and are '
+      + 'held rather than shown — ask for them by ticket when you want them.',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        subtasks: {
+          type: 'boolean',
+          description:
+            'Show the subtasks rather than only counting them. They are fetched either way; '
+            + 'this decides whether they are put in front of the person.',
+        },
+      },
+    },
+    async run(client, args = {}) {
       const answer = await client.service(`/api/board/mine?${await scoped(client)}`);
       // 428 is "connect OpenProject first" — a thing to go and do, not a
       // failure. Relayed as the sentence the server wrote rather than flattened
@@ -753,6 +765,38 @@ export const TOOLS = [
       if (!answer.ok) return { found: false, error: answer.data?.detail ?? `HTTP ${answer.status}` };
 
       const board = answer.data;
+      const items = board.items ?? [];
+
+      // **The table is the answer, and it is deliberately five columns.** The
+      // board used to hand back every field OpenProject knows about every
+      // ticket — lock versions, timestamps, spent hours, the lot — which is a
+      // page of JSON to answer "what am I doing today". What is kept is what
+      // somebody reads down a list: which ticket, what it is, what it is part
+      // of, where it has got to, when it is due.
+      const rows = items.map((t) => ({
+        ticket: t.key,
+        task: t.subject,
+        module: t.module ? `${t.module.key} — ${t.module.subject}` : '—',
+        status: t.status,
+        due: t.dueDate ?? '',
+        percent: t.percentDone ?? 0,
+        subtasks: (t.subtasks ?? []).length,
+      }));
+
+      // Held back rather than left out. Fetching them costs nothing extra —
+      // they come from the same project read — so the choice is only about
+      // what goes on screen, and a board answer buried in forty subtask rows
+      // is not a board answer.
+      const held = {};
+      for (const t of items) {
+        if ((t.subtasks ?? []).length) held[t.key] = t.subtasks;
+      }
+      const touching = {};
+      for (const t of items) {
+        if ((t.touches ?? []).length) touching[t.key] = t.touches;
+      }
+
+      const wanted = args?.subtasks === true;
       return {
         found: board.total > 0,
         total: board.total,
@@ -762,7 +806,22 @@ export const TOOLS = [
         // Which OpenProject project this board is read from, so "nothing
         // assigned" is never mistaken for "nothing assigned anywhere".
         ...(board.openproject ? { openprojectProject: board.openproject } : {}),
-        items: board.items,
+        columns: ['ticket', 'task', 'module', 'status', 'due'],
+        rows,
+        // Said when it is false, so a column of dashes is read as "could not
+        // ask" rather than as "these belong to nothing".
+        ...(board.modulesKnown === false
+          ? { moduleNote: 'The project tree could not be read, so no module could be named.' }
+          : {}),
+        ...(wanted ? { subtasks: held } : {}),
+        ...(wanted ? {} : { subtasksHeld: Object.keys(held).length }),
+        touches: touching,
+        display: wanted
+          ? 'Show `rows` as a markdown table using `columns`, then the subtasks under their ticket.'
+          : 'Show `rows` as a markdown table using `columns`, and nothing else. Do not list the '
+            + 'subtasks or the touched artefacts, and do not summarise them — the `subtasks` '
+            + 'column already gives the count. Call this tool again with subtasks: true if the '
+            + 'person asks to see them.',
       };
     },
   },

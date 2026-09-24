@@ -2033,17 +2033,48 @@ def my_board(
         touching.setdefault(row["external_key"], []).append(
             {"kind": row["target_kind"], "id": row["target_id"]})
 
+    # What each ticket is part of, and what hangs under it. Best-effort: the
+    # board is "what am I holding" and it has answered that question without
+    # this for as long as it has existed, so a project read that fails leaves
+    # the rows intact and unadorned rather than taking the board down with it.
+    by_key: dict = {}
+    kids: dict = {}
+    tree_read = True
+    try:
+        by_key, kids = _project_tree(account, scope)
+    except HTTPException:
+        tree_read = False
+
+    def dressed(item: dict) -> dict:
+        module = _module_of(item["key"], by_key) if tree_read else None
+        return {
+            **item,
+            "touches": touching.get(item["key"], []),
+            # The top of the tree, which is the epic or module this is from.
+            # Null when the ticket is itself top-level, which is a real answer.
+            "module": None if not module else {
+                "key": module["key"], "subject": module["subject"],
+                "type": module["type"], "url": module["url"],
+            },
+            # Pulled whether or not anybody asked, because the round trip to
+            # fetch them later costs more than carrying them now.
+            "subtasks": _subtasks_of(item["key"], kids) if tree_read else [],
+        }
+
     return {
         "total": len(items),
         "endpoint": endpoint,
         "project": scope["project"],
+        # Said out loud when the tree could not be read, so a board where every
+        # module reads "none" is not mistaken for a project with no epics.
+        "modulesKnown": tree_read,
         "openproject": {
             "id": scope["pmsId"],
             "identifier": scope["pmsIdentifier"],
             "name": scope["pmsName"],
             "url": f"{endpoint}/projects/{scope['pmsIdentifier']}" if scope["pmsIdentifier"] else "",
         },
-        "items": [{**item, "touches": touching.get(item["key"], [])} for item in items],
+        "items": [dressed(item) for item in items],
         # The window is chosen here rather than asked of OpenProject: see
         # openproject.mine_finished for why a date filter is the wrong thing to
         # send to a 2019 instance.
@@ -2135,6 +2166,89 @@ def _overview_payload(account: dict, scope: dict) -> dict:
                 f"The OpenProject project '{scope['pmsName'] or scope['pmsIdentifier']}' "
                 f"has no work packages yet.",
     }
+
+
+# ── where a ticket sits in the tree ──────────────────────────────────
+#
+# A board is a list of tickets, and a ticket on its own does not say what it is
+# part of. OpenProject answers that with `parent`, which is one link up — enough
+# to name the feature, not enough to name the module. So the chain is walked
+# here, against the project read the overview and the plan already cache.
+#
+# **The whole project, rather than a fetch per ticket.** Resolving twenty board
+# items one at a time is twenty round trips on every board, and the answer is
+# already sitting in `_overview_cache` most of the time. The cost of a miss is
+# one paged read, shared with the next caller for five minutes.
+
+
+def _project_tree(account: dict, scope: dict) -> tuple:
+    """Every ticket in the project, keyed, with its children gathered."""
+    key = (scope["project"], scope["pmsId"])
+    now = time.monotonic()
+    held = _overview_cache.get(key)
+    if held and now - held["at"] < OVERVIEW_TTL_SECONDS:
+        payload = held["payload"]
+    else:
+        payload = _overview_payload(account, scope)
+        _overview_cache[key] = {"at": now, "asOf": security.stamp(), "payload": payload}
+    items = payload["items"]
+    by_key = {item["key"]: item for item in items}
+    kids: dict = {}
+    for item in items:
+        parent = str(item["parent"]) if item.get("parent") else ""
+        if parent and parent in by_key:
+            kids.setdefault(parent, []).append(item)
+    return by_key, kids
+
+
+def _module_of(key: str, by_key: dict) -> Optional[dict]:
+    """The top of the tree this ticket hangs under, or None if it is the top.
+
+    None rather than the ticket itself: "which module is this from" has no
+    answer for something that is not under one, and answering with its own name
+    would put a row on the board claiming to be its own parent.
+
+    Visit-guarded, because a parent chain is data from another system and a
+    cycle here would not return.
+    """
+    at = by_key.get(key)
+    if not at:
+        return None
+    seen = {key}
+    while True:
+        parent = str(at["parent"]) if at.get("parent") else ""
+        if not parent or parent not in by_key or parent in seen:
+            break
+        seen.add(parent)
+        at = by_key[parent]
+    return None if at["key"] == key else at
+
+
+def _subtasks_of(key: str, kids: dict) -> list:
+    """Everything underneath a ticket, flattened, nearest first.
+
+    All descendants rather than only the immediate children: a subtask of a
+    subtask is still work under this ticket, and it has no other way of being
+    reached from a board that only lists what is assigned to you.
+    """
+    out, queue, seen = [], [(child, 1) for child in kids.get(key, [])], {key}
+    while queue:
+        child, depth = queue.pop(0)
+        if child["key"] in seen:
+            continue
+        seen.add(child["key"])
+        out.append({
+            "key": child["key"],
+            "subject": child["subject"],
+            "status": child["status"],
+            "assignee": child["assignee"],
+            "percentDone": child["percentDone"],
+            "dueDate": child["dueDate"],
+            "depth": depth,
+            "url": child["url"],
+        })
+        queue.extend((grand, depth + 1) for grand in kids.get(child["key"], []))
+    return out
 
 
 @app.get("/api/board/overview")

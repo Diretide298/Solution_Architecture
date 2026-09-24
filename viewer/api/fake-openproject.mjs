@@ -127,10 +127,23 @@ own(7006, { subject: 'Shipped and closed', status: 12, done: 100, start: day(-60
 // draw. 900 and 901 are scheduled automatically, the way OpenProject leaves a
 // parent by default; 902 has been taken off it by hand, so the chart has one
 // of each and "this bar will switch to manual scheduling" is testable.
-own(900, { subject: 'M1 Checkout', done: 30, start: day(-20), due: day(3) });
-own(901, { subject: 'M2 Refunds', done: 20, start: day(-10), due: day(40) });
-own(902, { subject: 'M0 Groundwork', status: 12, done: 100, start: day(-60), due: day(-40) });
+// Assigned to a user nobody in the harness connects as, deliberately. An epic
+// that belongs to a developer turns up on their board, and a board is a list of
+// work to do rather than of the containers that work sits in -- which is
+// exactly the distinction the module column exists to draw.
+own(900, { subject: 'M1 Checkout', done: 30, start: day(-20), due: day(3), user: 9 });
+own(901, { subject: 'M2 Refunds', done: 20, start: day(-10), due: day(40), user: 9 });
+own(902, { subject: 'M0 Groundwork', status: 12, done: 100, start: day(-60), due: day(-40), user: 9 });
 packages.get('902').scheduleManually = true;
+
+// Subtasks under a board ticket, and one under a subtask. Assigned away from
+// both harness users on purpose: if they were the developer's they would be
+// board rows in their own right, and then "the board pulls subtasks without
+// listing them" would be indistinguishable from "the board lists everything".
+// 7013 is two levels down, so the walk has to be a walk and not one hop.
+own(7011, { subject: 'Refund: partial amounts', parent: 7003, user: 9, due: day(12) });
+own(7012, { subject: 'Refund: audit trail', parent: 7003, user: 9 });
+own(7013, { subject: 'Refund audit: retention window', parent: 7012, user: 9 });
 
 // Somebody else's, to prove a board is only ever your own.
 own(7100, { subject: 'Not yours', start: day(-2), due: day(9), user: 6, spent: 'PT6H' });
