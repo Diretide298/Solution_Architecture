@@ -154,6 +154,29 @@ const mascot = await page.evaluate(() => {
 check('the mascot frame loads', mascot.w === 256 && mascot.h === 204, `${mascot.w}x${mascot.h}`);
 check('and is drawn on the page', mascot.drawn > 0, `${mascot.drawn}px wide`);
 
+// ── the page is readable ─────────────────────────────────────────────
+//
+// This is here because every other assertion in this file passed while the page
+// was a 210px ribbon of text down the middle of a 1440px window: `.set-layout`
+// is a two-column grid whose first track is the navigation, and a page with no
+// navigation in it puts its content there. Checking that the words are present
+// says nothing about whether anybody can read them.
+const layout = await page.evaluate(() => {
+  const col = document.querySelector('#updates .set-content') ?? document.getElementById('updates');
+  const p = document.querySelector('#up-body .md-p');
+  return {
+    column: Math.round(col.getBoundingClientRect().width),
+    viewport: document.documentElement.clientWidth,
+    para: p ? Math.round(p.getBoundingClientRect().width) : 0,
+    // A horizontal scrollbar on a page of prose means something is too wide.
+    overflow: document.documentElement.scrollWidth > document.documentElement.clientWidth + 1,
+  };
+});
+check('the column is a column of prose, not a ribbon',
+  layout.column > 600, `${layout.column}px of a ${layout.viewport}px viewport`);
+check('and the paragraphs fill it', layout.para > 500, `${layout.para}px`);
+check('nothing overflows sideways', layout.overflow === false);
+
 check('nothing shouted on the way', noise.length === 0, noise.slice(0, 2).join(' | '));
 await browser.close();
 console.log(`\n${pass} passed, ${fail} failed`);

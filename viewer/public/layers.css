@@ -3093,6 +3093,16 @@ textarea.rt-sendback-note {
   color: var(--accent);
 }
 
+/* The release notes are one column, so they get a container that is one column.
+   `.set-layout` is a grid whose first track is the 210px nav, and a page with no
+   nav in it drops its content into that track -- a 210px ribbon of text down the
+   middle of a 1440px window. */
+.up-layout {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 26px 22px 80px;
+}
+
 /* The mascot on the release notes. A fixed width rather than a share of the
    column, so it is the same size wherever it is used and two pages cannot show
    the same character at two sizes. Hidden on a narrow screen: it is decoration,
