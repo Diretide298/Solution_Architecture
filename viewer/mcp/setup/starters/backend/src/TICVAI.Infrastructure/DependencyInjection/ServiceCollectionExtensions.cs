@@ -1,7 +1,9 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using TICVAI.Application.Abstractions.Persistence;
 using TICVAI.Infrastructure.Configuration;
+using TICVAI.Infrastructure.Idempotency;
 using TICVAI.Infrastructure.Persistence.DbContexts;
 
 namespace TICVAI.Infrastructure.DependencyInjection;
@@ -29,6 +31,9 @@ public static class ServiceCollectionExtensions
         {
             options.UseNpgsql(connectionString);
         });
+
+        services.AddSingleton(TimeProvider.System);
+        services.AddSingleton<IIdempotencyStore, InMemoryIdempotencyStore>();
 
         return services;
     }

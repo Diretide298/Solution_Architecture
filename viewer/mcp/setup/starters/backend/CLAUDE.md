@@ -41,8 +41,9 @@ Read these when the work calls for them, not before:
 
 In one session, a document already read does not need reading again.
 
-Those documents were written when the platform targeted .NET 8. **This repository is
-.NET 10**; where a document names a version, use 10. Everything else in them applies.
+The kernel those documents name is here: `Money` and `Ulid` (Domain), `ITenantContext`,
+`ICurrentPrincipal` and `IIdempotencyStore` (Application), `SqlMigrationRunner` (Infrastructure).
+`Directory.Build.props` treats warnings as errors and bans server-local time.
 
 ## Hard rules
 
@@ -66,6 +67,25 @@ ADAM is connected for this folder. It holds the contracts, tables and screens; O
 3. Add tests for the success case and each error the contract lists. `dotnet test` must pass.
 4. `adam_propose` the ticket: **Ready for QA**, 100% (see the statuses below; never Closed), and a 2-4 line comment on what was built and
    that the tests pass. Show the proposal and **wait for a yes** before `adam_apply`.
+
+## Ticket kinds
+
+"Working a ticket" above is the [BE] path: a contract-backed operation. The other kinds differ in
+what "built" and "tested" mean:
+
+| Ticket | Built means | Tested means | Propose |
+|---|---|---|---|
+| **[BE]** (`SVC-*`) | the operations the ticket names, as the contract says | a test for the success case and each listed error; `dotnet test` passes | Ready for QA |
+| **[DB]** (`MIG-*`) | the ticket's numbered SQL file(s) in `db/<database>/`, from the package's `backend/` DDL | `SqlMigrationRunner` applies the folder to an empty PostgreSQL, and a second run applies nothing | Ready for QA |
+| **[DevOps]** (`SETUP-*`) | the pipeline, environment or seed the description names, in the repository it names | it runs once end to end; say in the comment what QA can re-run | Ready for QA |
+| **[Onboarding]** | nothing to build: the step is done when the connector answers in this folder | `adam_board` returns your board | Ready for QA with that as evidence |
+
+A setup ticket links no contract or screen; that is normal, not a gap.
+
+## Searching pulled files
+
+`.adam/` is git-ignored, so **Grep skips it unless told not to**: search pulled files with
+`--no-ignore` (or read them directly). Read works as usual.
 
 ## When the package is wrong
 

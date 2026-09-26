@@ -1,0 +1,4 @@
+P:System.DateTime.Now;Server-local time is meaningless across venues: use DateTimeOffset.UtcNow or TimeProvider
+P:System.DateTime.Today;Server-local date: use TimeProvider and the venue's time zone
+P:System.DateTime.UtcNow;Use DateTimeOffset.UtcNow (or TimeProvider) so the offset travels with the value
+P:System.DateTimeOffset.Now;Server-local offset: use DateTimeOffset.UtcNow or TimeProvider

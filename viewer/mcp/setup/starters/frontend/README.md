@@ -1,6 +1,6 @@
 # TICVAI frontend
 
-Nx workspace: five React Native apps, one web app, and four shared packages.
+Nx workspace: the package's 13 apps and four shared packages.
 
 ## Run it
 

@@ -1,10 +1,11 @@
 /**
  * Offline outbox.
  *
- * Every mutating operation on POS, scanner and employee apps is written here
- * first, then drained to the server. This is the single implementation for all
- * six apps — six copies of a sync engine is six divergent bug surfaces, which is
- * the reason the frontend is a monorepo while the runtimes are not.
+ * Every write a contract marks x-ticvai-offline-capable, in an app tagged offline:yes
+ * (venue-pos, venue-scanner, venue-staff-app, guest-app, kitchen-display), is written
+ * here first, then drained to the server. Other writes call the api-client directly
+ * (frontend-patterns 4.4). This is the single implementation for every offline app —
+ * several copies of a sync engine is several divergent bug surfaces.
  *
  * Guarantees, from the 31 Jul 2026 offline architecture decision:
  *   - sequential per device, preserving order
@@ -18,14 +19,19 @@ import { newUlid } from './ulid';
 
 export type OutboxStatus = 'pending' | 'inFlight' | 'synced' | 'failed' | 'rejected';
 
-/** Declared per entity. There is no global default — see `ConflictPolicy` notes. */
+/**
+ * Declared per operation by the contract's x-ticvai-conflict-policy (ADR-0022). There is
+ * no global default: pass what the operation declares.
+ */
 export type ConflictPolicy =
-  /** Sales and scans: never conflict, the server appends. */
-  | 'append'
   /** Configuration: the server's version wins, the local change is discarded. */
   | 'serverWins'
+  /** Sales and scans: never conflict, the server appends. */
+  | 'append'
+  /** The later recordedAt wins, which is why recordedAt is the device's time, not the server's. */
+  | 'lastWriterWins'
   /** Requires human resolution; surfaced in the UI rather than resolved silently. */
-  | 'manual';
+  | 'manualMerge';
 
 export interface OutboxEntry {
   /** Client-generated ULID. Also the server-side idempotency key. */
@@ -50,6 +56,14 @@ export interface OutboxEntry {
 }
 
 export interface EnqueueRequest {
+  /**
+   * The ULID the caller already gave the entity (the body's id), when there is one. It is also
+   * the Idempotency-Key, so the request carries one key, not two that could disagree.
+   * Left out, the outbox mints one.
+   */
+  id?: string;
+  /** When the device recorded the write, if earlier than now (a queued form). */
+  recordedAt?: string;
   entity: string;
   operation: OutboxEntry['operation'];
   endpoint: string;
@@ -104,9 +118,9 @@ export class Outbox {
    * reconciles later, which is what makes offline selling feel instantaneous.
    */
   async enqueue(request: EnqueueRequest): Promise<OutboxEntry> {
-    const id = newUlid();
+    const id = request.id ?? newUlid();
     const sequence = await this.nextSequence();
-    const recordedAt = new Date().toISOString();
+    const recordedAt = request.recordedAt ?? new Date().toISOString();
 
     const entry: OutboxEntry = {
       id,

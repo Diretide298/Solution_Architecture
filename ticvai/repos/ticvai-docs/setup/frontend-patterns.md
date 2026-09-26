@@ -50,7 +50,12 @@ export function useShiftState(workstationId: string): ShiftState {
 
 ### 4.4 Offline
 
-- Every mutating call goes through the `offline-core` outbox. No direct fetch on a write path.
+- **A write the contract marks `x-ticvai-offline-capable: true`, in an offline app** (the apps
+  tagged `offline:yes`: venue-pos, venue-scanner, venue-staff-app, guest-app, kitchen-display),
+  goes through the `offline-core` outbox. No direct fetch on that path.
+- **Every other write** — `offline-capable: false`, or any web app — calls `@ticvai/api-client`
+  directly and is disabled while offline, with the reason on screen. Queuing a write the server
+  will not accept later is worse than refusing it now.
 - Conflict policy is declared per entity at the call site. There is no global default.
 - The offline indicator reflects real transport state, never an optimistic guess.
 

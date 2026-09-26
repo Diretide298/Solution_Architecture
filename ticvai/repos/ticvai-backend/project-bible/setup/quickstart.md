@@ -25,7 +25,7 @@
 3. **Seed the reference fixture** — two brands, three regions across two countries, AED and OMR. **Never develop against a single-venue fixture.**
 4. **Run migrations** — `dotnet run --project src/Ticvai.Migrations`.
 5. **Mock server** — `make mock` in `ticvai-contracts`. Prism on :4010.
-6. **Frontend** — `pnpm install && pnpm nx serve backoffice`. Points at the mock by default.
+6. **Frontend** — `pnpm install && pnpm nx serve venue-management-web` (or the app your ticket names). Points at the mock by default.
 7. **Verify** — architecture tests must pass: `dotnet test tests/Ticvai.ArchitectureTests`. If they fail on a clean clone, something is wrong with the environment, not your code.
 
 ## Read next

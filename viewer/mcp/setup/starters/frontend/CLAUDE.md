@@ -1,15 +1,37 @@
 # TICVAI frontend
 
-Nx 20 workspace, pnpm, TypeScript (strict). React Native apps and a React web app share four packages.
+Nx 20 workspace, pnpm, TypeScript (strict). 13 apps (React Native and React web) share four packages.
 
 | Path | What it is |
 |---|---|
-| `apps/backoffice`, `apps/employee`, `apps/guest`, `apps/pos`, `apps/scanner` | React Native apps (`platform:react-native`) |
-| `apps/web-b2c` | the public web app |
 | `packages/api-client` | the typed client for the API contracts |
 | `packages/design-tokens` | colours, type, spacing - depends on nothing |
 | `packages/ui` | shared components |
 | `packages/offline-core` | the one offline store: SQLite adapter, outbox, sync, ULIDs |
+
+<!-- apps:begin (sync-frontend-apps.py) -->
+The apps are the package's own (`ticvai/frontend/*.yaml`), named by who operates them. A screen's
+`implementation.app` is the folder it goes in; its platform code (P01...) maps to an app here.
+
+| App | Runtime | Offline | Serves | Screens |
+|---|---|---|---|---|
+| `apps/accreditation-web` | React web (web) | no | P11 | 8 |
+| `apps/developer-portal-web` | React web (web) | no | P14 |  |
+| `apps/guest-app` | React Native (mobileApp) | **yes** | P02, P05 | 80 |
+| `apps/guest-web` | React web (web) | no | P01 | 35 |
+| `apps/kitchen-display` | React web (kiosk) | **yes** | P15 |  |
+| `apps/partner-web` | React web (web) | no | P10 | 21 |
+| `apps/signup-web` | React web (web) | no | P17 |  |
+| `apps/ticvai-web` | React web (web) | no | P09 | 37 |
+| `apps/venue-management-web` | React web (web) | no | P08, P13, P16 | 111 |
+| `apps/venue-pos` | React Native (posTerminal) | **yes** | P04 | 10 |
+| `apps/venue-scanner` | React Native (handheld) | **yes** | P07 | 16 |
+| `apps/venue-staff-app` | React Native (mobileApp) | **yes** | P06 | 50 |
+| `apps/venue-support-web` | React web (web) | no | P12 | 8 |
+
+**Adding an app:** the package adds its manifest first; then `python viewer/mcp/setup/starters/sync-frontend-apps.py`
+in the ADAM repo scaffolds it here. Do not create an app folder by hand - it would not match the screens.
+<!-- apps:end -->
 
 Import a package as `@ticvai/<name>` (see `tsconfig.base.json`).
 
@@ -65,6 +87,26 @@ ADAM is connected for this folder. It holds the screens, journeys and contracts;
 3. Add tests next to the code (`*.test.ts[x]`). `pnpm lint`, `pnpm typecheck` and `pnpm test` must pass.
 4. `adam_propose` the ticket: **Ready for QA**, 100% (see the statuses below; never Closed), and a 2-4 line comment on what was built and
    that the checks pass. Show the proposal and **wait for a yes** before `adam_apply`.
+
+## Ticket kinds
+
+| Ticket | Built means | Tested means |
+|---|---|---|
+| **[FE]** (`APP-*`) | the screen in the app its `implementation.app` names, with every state the screen lists | component tests per state; `pnpm lint`, `pnpm typecheck`, `pnpm test` pass |
+| **[DevOps]** / **[Onboarding]** | see the description; nothing is linked, and that is normal | as the description says |
+
+**The API client is generated, not written.** `packages/api-client` is filled from the contracts by
+the `SETUP-CLIENTS` ticket. Until it lands, a screen ticket builds against the client's generated
+types as the contract names them and stubs the calls; do not hand-write a client.
+
+**Wireframes.** Build from a screen's wireframe only when its record says it is client-verified.
+Otherwise build the logic (calls, state, offline) with a placeholder layout, and never from a
+wireframe that did not come through ADAM.
+
+## Searching pulled files
+
+`.adam/` is git-ignored, so **Grep skips it unless told not to**: search pulled files with
+`--no-ignore` (or read them directly). Read works as usual.
 
 ## When the package is wrong
 
