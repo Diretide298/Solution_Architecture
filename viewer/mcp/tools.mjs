@@ -1164,7 +1164,9 @@ export const TOOLS = [
             : answer.text.slice(0, 300),
         };
       }
-      const all = answer.text.split('\n');
+      // CRLF too: the package's files are Windows line endings, and a `\r` left on each line stops
+      // `.` matching in the heading test below, so no anchor was ever found.
+      const all = answer.text.split(/\r?\n/);
       let start = Math.max(1, Number(from) || 1);
       let matches;
       if (find) {
@@ -1218,7 +1220,7 @@ export const TOOLS = [
       + 'every open ticket assigned to you and writes .adam/board.md grouped by milestone. **Use '
       + 'this at the start of work on a ticket**, then read the files you need instead of holding '
       + 'everything in the conversation. Always pass `dir`: the absolute path of the folder you are '
-      + 'working in. .adam/ is git-ignored.',
+      + 'working in. .adam/ is git-ignored, so Grep skips it unless you pass --no-ignore; Read works as usual.',
     inputSchema: {
       type: 'object',
       properties: {

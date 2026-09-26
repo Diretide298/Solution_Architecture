@@ -399,6 +399,12 @@ function applyMigrations(tables, columns, migrations, problems) {
       if (key) column.keyTable = key.toTable;
       const declared = ddl.columns.find((c) => c.name === column.name);
       if (declared?.generated) column.generated = true;
+      // The DDL's type too: the workbook says `text` for scope_path where the DDL declares
+      // `ltree`, and the reader cannot tell which is true (audit R007).
+      if (declared?.type && declared.type.toLowerCase() !== String(column.type ?? '').toLowerCase()) {
+        column.workbookType = column.type;
+        column.type = declared.type;
+      }
     }
   }
 
