@@ -132,3 +132,6 @@ ticvai/_review-*/
 # `tools/avatar/` is the toolchain that built it and is still tracked, so the
 # page can be rebuilt if it is ever wanted back.
 /_retired/
+
+# Pull audit: scripts, credentials, developer folders and results stay local
+audit/
