@@ -28,6 +28,27 @@
 import { readdir, readFile } from 'node:fs/promises';
 import path from 'node:path';
 
+/** RFC 4180 rows: quoted fields may hold commas, quotes ("") and newlines. */
+function csvRows(text) {
+  const rows = [];
+  let row = [], field = '', quoted = false;
+  for (let i = 0; i < text.length; i += 1) {
+    const ch = text[i];
+    if (quoted) {
+      if (ch === '"' && text[i + 1] === '"') { field += '"'; i += 1; }
+      else if (ch === '"') quoted = false;
+      else field += ch;
+    } else if (ch === '"') quoted = true;
+    else if (ch === ',') { row.push(field); field = ''; }
+    else if (ch === '\n' || ch === '\r') {
+      if (ch === '\r' && text[i + 1] === '\n') i += 1;
+      row.push(field); rows.push(row); row = []; field = '';
+    } else field += ch;
+  }
+  if (field || row.length) { row.push(field); rows.push(row); }
+  return rows;
+}
+
 /** Read every file in a directory once, and hand back [name, lines]. */
 async function readDir(root, dir, filter = /\.ya?ml$/i) {
   const abs = path.join(root, dir);
@@ -116,7 +137,7 @@ async function headingLine(root, rel) {
  * @param subjects  the built payloads — journeys, domain, decisions, backend, uiux, platforms
  */
 export async function buildSearch(root, subjects = {}) {
-  const { journeys, domain, decisions, backend, uiux, platforms, burst } = subjects;
+  const { journeys, domain, decisions, backend, uiux, platforms, burst, index } = subjects;
   const entries = [];
 
   const screenFiles = await readDir(root, 'screens');
@@ -124,6 +145,8 @@ export async function buildSearch(root, subjects = {}) {
   const stateFiles = await readDir(root, 'states');
   const eventFiles = await readDir(root, 'events');
   const sqlFiles = await readDir(root, 'backend', /\.sql$/i);
+  // The DDL has lived one level down since ADR-0039 split it into two databases.
+  for (const sub of ['tenant', 'control']) sqlFiles.push(...await readDir(root, `backend/${sub}`, /\.sql$/i));
 
   const screenAt = idIndex(screenFiles);
   const flowAt = idIndex(flowFiles);
@@ -366,6 +389,72 @@ export async function buildSearch(root, subjects = {}) {
       // reader has open.
       pkgHref: page.pkgHref ?? null,
       terms: `${page.name} ${page.terms}`,
+    });
+  }
+
+  // ---- contracts: operations, schemas, files, permissions ------------------
+  // adam_search said it covered contracts, operations and schemas and indexed
+  // none of them, so an operationId or a schema name came back with 0 hits and
+  // 143 tickets reported the tool broken (audit R005). Permission names had no
+  // kind at all (R017).
+  const permissionOps = new Map();
+  for (const n of index?.nodes ?? []) {
+    if (n.type === 'operation') {
+      entries.push({
+        kind: 'operation', id: n.name, name: n.title ?? n.name,
+        sub: [n.method, n.path].filter(Boolean).join(' ') || null,
+        file: n.file ?? null, line: n.line ?? null, hash: `op:${n.name}`, layer: 'contracts',
+        terms: [n.method, n.path, n.permission, n.module, ...(n.tags ?? [])].filter(Boolean).join(' '),
+      });
+      if (n.permission) {
+        if (!permissionOps.has(n.permission)) permissionOps.set(n.permission, []);
+        permissionOps.get(n.permission).push(n.name);
+      }
+    } else if (n.type === 'schema') {
+      entries.push({
+        kind: 'schema', id: n.name, name: n.name,
+        sub: n.propertyCount ? `${n.propertyCount} properties` : (n.dataType ?? null),
+        file: n.file ?? null, line: n.line ?? null, hash: `schema:${n.name}`, layer: 'contracts',
+        terms: [n.description, ...(n.properties ?? []).map((p) => p.name)].filter(Boolean).join(' '),
+      });
+    } else if (n.type === 'file') {
+      entries.push({
+        kind: 'contract', id: n.file, name: n.title ?? n.name,
+        sub: [n.tier, n.module].filter(Boolean).join(' · ') || null,
+        file: n.file ?? null, line: 1, hash: `file:${n.file}`, layer: 'contracts',
+        terms: [n.name, n.module, ...(n.tags ?? [])].filter(Boolean).join(' '),
+      });
+    }
+  }
+  for (const [permission, ops] of permissionOps) {
+    entries.push({
+      kind: 'permission', id: permission, name: permission, sub: `${ops.length} operations`,
+      file: 'contracts/shared/common.yaml', line: null, hash: `permission:${permission}`, layer: 'contracts',
+      terms: ops.join(' '),
+    });
+  }
+
+  // ---- SQL files and plan items ---------------------------------------------
+  // A DDL file, a migration key or a plan item (MIG-*, SETUP-*) searched for by
+  // name found nothing (audit R012).
+  for (const [file, lines] of sqlFiles) {
+    entries.push({
+      kind: 'sql', id: file, name: path.basename(file), sub: `${lines.length} lines`,
+      file, line: 1, hash: null, layer: 'backend', terms: file,
+    });
+  }
+  const tasks = await readFile(path.join(root, 'handoff', 'service-docs', 'tasks.csv'), 'utf8').catch(() => '');
+  const rows = csvRows(tasks);
+  const head = rows.shift() ?? [];
+  const keyAt = head.indexOf('key');
+  const subjectAt = head.indexOf('subject');
+  for (const row of keyAt < 0 ? [] : rows) {
+    const key = row[keyAt];
+    if (!key) continue;
+    const subject = row[subjectAt] ?? '';
+    entries.push({
+      kind: 'task', id: key, name: subject || key, sub: 'plan item',
+      file: 'handoff/service-docs/tasks.csv', line: null, hash: null, layer: 'plan', terms: key,
     });
   }
 

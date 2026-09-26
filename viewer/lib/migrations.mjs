@@ -296,6 +296,19 @@ export async function buildMigrations(root) {
         }
       }
     }
+    // 920 applies row-level security per table through a helper -
+    // `SELECT platform.apply_scope_rls('access.entitlement'::regclass);` - whose body
+    // enables, forces and adds the policy. Only literal ALTER TABLE was read, so one
+    // table showed RLS and ~313 showed none (audit R007). Read from the raw text:
+    // scrub() empties string literals, and the table name is one.
+    const uncommented = raw.replace(/\/\*[\s\S]*?\*\//g, ' ').replace(/--[^\n]*/g, ' ');
+    for (const call of uncommented.matchAll(/SELECT\s+[\w".]*apply_(\w+?)_rls\s*\(\s*'([\w".]+)'/gi)) {
+      const target = call[2].replace(/"/g, '');
+      const table = tables[target];
+      if (table) table.rls = { ...(table.rls ?? {}), enabled: true, forced: true, policy: `${call[1]}_isolation` };
+      if (!file.rlsTables.includes(target)) file.rlsTables.push(target);
+      file.policies++;
+    }
     files.push(file);
   }
 

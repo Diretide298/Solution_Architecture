@@ -11822,6 +11822,9 @@ function runSearch(query) {
   }
 
   for (const entry of searchEntries ?? []) {
+    // Contract entries are in the payload for the connector's adam_search, which has
+    // no index of its own; the page already drew them from state.index above.
+    if (entry.layer === 'contracts') continue;
     // The id first — `POS-006` and `ADR-0016` are what people type — then the
     // name, then everything else the entry gathered, each a step further back
     // so a match on a purpose sentence never outranks a match on an id.

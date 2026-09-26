@@ -99,6 +99,38 @@ async function treeState(dir) {
 }
 
 /** Case- and separator-insensitive: BO-102, bo102 and bo_102 are one name. */
+/**
+ * A linked record as a ticket needs it. A service answer lists every screen and table in
+ * the service - 520 screens, ~45 KB - and was written whole into each ticket touching it
+ * (audit R016). Long lists keep their first 40 and say how many there are and how to get
+ * the rest.
+ */
+function trimForPull(record, cap = 40) {
+  const out = {};
+  for (const [key, value] of Object.entries(record)) {
+    if (Array.isArray(value) && value.length > cap && typeof value[0] === 'object') {
+      out[key] = value.slice(0, cap);
+      out[`${key}Total`] = value.length;
+      out[`${key}Note`] = `first ${cap} of ${value.length}; ask ${record.from} for the rest`;
+    } else out[key] = value;
+  }
+  return out;
+}
+
+/**
+ * What to do when a ticket links nothing. For a setup, onboarding or DevOps ticket that is
+ * normal - there is no contract or screen to link - and telling the agent to search and
+ * link sent it looking for artefacts that do not exist (audit R021).
+ */
+function unlinkedHint(wp) {
+  if (/^\[(Onboarding|DevOps|Setup)\]/i.test(String(wp?.subject ?? ''))) {
+    return 'This is a setup ticket: it is about tooling and environments, not a package artefact, so '
+      + 'nothing needs linking. Work from its description and the standards in project-bible/setup/.';
+  }
+  return 'Nothing is linked to this ticket yet. Find what it is about with adam_search, record it '
+    + 'with adam_link, then run adam_pull again.';
+}
+
 const fold = (s) => String(s ?? '').toLowerCase().replace(/[^a-z0-9]+/g, '');
 
 /**
@@ -252,8 +284,7 @@ function ticketReadme(wp, files, missing, when, decisions = []) {
   if (files.length) {
     for (const f of files) out += `- ${f.kind} \`${f.id}\` - [${f.file}](${f.file})\n`;
   } else {
-    out += 'Nothing is linked to this ticket yet. Find what it is about with adam_search, record it '
-      + 'with adam_link, then run adam_pull again.\n';
+    out += `${unlinkedHint(wp)}\n`;
   }
   if (decisions.length) {
     out += `\nDecisions linked but not pulled: ${decisions.map((d) => `\`${d}\``).join(', ')}. `
@@ -315,7 +346,7 @@ async function pullOne(client, key, base, when) {
     const [toolName, args] = lookupFor(kind, id);
     const result = await BY_NAME.get(toolName).run(client, args).catch((error) => ({ found: false, error: error.message }));
     const file = `${safeName(kind)}-${safeName(id)}.json`;
-    await writeFile(path.join(folder, file), json({ kind, id, from: toolName, ...result }));
+    await writeFile(path.join(folder, file), json(trimForPull({ kind, id, from: toolName, ...result })));
     if (result.found === false) missing.push({ kind, id });
     files.push({ kind, id, file });
   }
@@ -451,7 +482,11 @@ export const TOOLS = [
       // Whole path first, then the basename without its extension, so both
       // "access" and "contracts/spine/access.yaml" land on the same file.
       const stem = (f) => fold(String(f).split('/').pop().replace(/\.(ya?ml|json)$/i, ''));
-      const file = files.find((f) => fold(f) === want) ?? files.find((f) => stem(f) === want);
+      // A trailing path too - "shared/common" for contracts/shared/common.yaml - which a
+      // README hands out and the stem-only match turned away (audit R016).
+      const tail = (f) => fold(String(f).replace(/\.(ya?ml|json)$/i, ''));
+      const file = files.find((f) => fold(f) === want) ?? files.find((f) => stem(f) === want)
+        ?? files.find((f) => tail(f).endsWith(want) && String(name).includes('/'));
       if (!file) return miss('contract', name, files.map((f) => String(f).split('/').pop()));
 
       const mine = nodes.filter((n) => n.file === file);
@@ -469,7 +504,14 @@ export const TOOLS = [
       if (wantSchema) {
         const hit = schemas.find((n) => fold(n.name) === fold(wantSchema));
         if (!hit) return miss(`schema in ${file}`, wantSchema, schemas.map((n) => n.name));
-        return { found: true, contract: file, schema: { ...hit, ...(detail[hit.id] ?? {}) } };
+        // Both asked for, both answered: `operation` used to be dropped without a word
+        // whenever `schema` came with it (audit R016).
+        const op = wantOperation ? operations.find((n) => fold(n.name) === fold(wantOperation)) : null;
+        return {
+          found: true, contract: file, schema: { ...hit, ...(detail[hit.id] ?? {}) },
+          ...(op ? { operation: { ...op, ...(detail[op.id] ?? {}) } } : {}),
+          ...(wantOperation && !op ? { note: `no operation ${wantOperation} in ${file}` } : {}),
+        };
       }
 
       if (wantOperation) {
@@ -587,14 +629,22 @@ export const TOOLS = [
       if (!want) return { found: false, error: 'give me something to look for' };
 
       const pool = kind ? entries.filter((e) => fold(e.kind) === fold(kind)) : entries;
+      // Word by word: folding the whole query into one run of letters meant "order
+      // transfer" only matched text containing "ordertransfer" (audit R022). Every word
+      // must appear; where it appears decides the rank.
+      const words = String(q).split(/[\s,/]+/).map(fold).filter(Boolean);
       const hits = [];
       for (const e of pool) {
-        const hay = fold(`${e.id} ${e.name} ${e.terms ?? ''}`);
-        if (!hay.includes(want)) continue;
-        // An exact id beats an exact name beats a substring of somebody's prose.
-        hits.push([fold(e.id) === want ? 0 : fold(e.name) === want ? 1 : 2, e]);
+        const id = fold(e.id);
+        const name = fold(e.name);
+        const hay = `${id} ${name} ${fold(e.terms ?? '')}`;
+        if (!words.every((w) => hay.includes(w))) continue;
+        // An exact id beats an exact name beats every word in the id or name beats prose.
+        const rank = id === want ? 0 : name === want ? 1
+          : words.every((w) => id.includes(w) || name.includes(w)) ? 2 : 3;
+        hits.push([rank, e]);
       }
-      hits.sort((a, b) => a[0] - b[0]);
+      hits.sort((a, b) => a[0] - b[0] || String(a[1].id).length - String(b[1].id).length);
       const cap = Math.max(1, Math.min(Number(limit) || MAX_HITS, 100));
 
       // How many hits of each kind, across the whole result and not just the
@@ -1086,6 +1136,12 @@ export const TOOLS = [
         },
         from: { type: 'integer', description: 'First line to return, 1-based. Default 1.' },
         lines: { type: 'integer', description: 'How many lines. Default 400.' },
+        find: {
+          type: 'string',
+          description: 'Jump to a section instead of paging: a heading anchor as a ticket links it '
+            + '(e.g. "#gst-043-arabic-rtl-experience"), or any text. Returns the window starting at '
+            + 'the first match and the line numbers of every other match.',
+        },
       },
       required: ['path'],
     },
@@ -1095,21 +1151,47 @@ export const TOOLS = [
      * first 400 lines with a note saying how many there are lets the caller ask
      * for the part it wants.
      */
-    async run(client, { path, from = 1, lines = 400 }) {
+    async run(client, { path, from = 1, lines = 400, find }) {
       const answer = await client.file(path);
       if (!answer.ok) {
         return {
           found: false,
           status: answer.status,
+          // The server now says what is wrong - no such file, a folder, or a kind it does not
+          // serve - instead of one 403 that read as a permission problem (audit R013).
           error: answer.status === 404 ? `no file at "${path}"`
-            : answer.status === 400 ? `"${path}" is not a readable kind — .yaml .md .json .csv .sql only`
+            : answer.status === 400 || answer.status === 415 ? (answer.text || `"${path}" is not a readable file`).slice(0, 300)
             : answer.text.slice(0, 300),
         };
       }
       const all = answer.text.split('\n');
-      const start = Math.max(1, Number(from) || 1);
+      let start = Math.max(1, Number(from) || 1);
+      let matches;
+      if (find) {
+        // A ticket links a spec section by anchor; a 6,000-line generated doc could only be
+        // paged blind to reach it (audit R009). Match the heading the anchor was made from
+        // (lower-cased, punctuation dropped, spaces as hyphens), else the text itself.
+        const slug = (t) => t.toLowerCase().replace(/[^\w\s-]/g, '').trim().replace(/\s+/g, '-');
+        const anchor = find.startsWith('#') ? find.slice(1).toLowerCase() : null;
+        const needle = find.toLowerCase();
+        matches = [];
+        all.forEach((line, i) => {
+          const heading = line.match(/^#{1,6}\s+(.*)$/);
+          if (anchor ? heading && slug(heading[1]) === anchor : line.toLowerCase().includes(needle)) matches.push(i + 1);
+        });
+        if (!matches.length) return { found: true, path, totalLines: all.length, matches: [], note: `nothing matches "${find}"` };
+        start = matches[0];
+      }
       const count = Math.max(1, Math.min(Number(lines) || 400, 2000));
-      const slice = all.slice(start - 1, start - 1 + count);
+      // Lines and bytes both: a window of 400 long lines can still overflow the tool
+      // result, and then nothing arrives at all (audit R011). Stop at ~60 KB and say where.
+      const slice = [];
+      let size = 0;
+      for (const line of all.slice(start - 1, start - 1 + count)) {
+        if (slice.length && size + line.length > 60000) break;
+        slice.push(line.length > 20000 ? `${line.slice(0, 20000)} … [line cut at 20,000 of ${line.length} characters]` : line);
+        size += Math.min(line.length, 20000) + 1;
+      }
       const end = start + slice.length - 1;
 
       return {
@@ -1117,6 +1199,7 @@ export const TOOLS = [
         path,
         totalLines: all.length,
         showing: `${start}-${end}`,
+        ...(matches && matches.length > 1 ? { otherMatches: matches.slice(1, 50) } : {}),
         ...(end < all.length
           ? { more: `${all.length - end} lines below — call again with from: ${end + 1}` }
           : {}),
@@ -1158,8 +1241,7 @@ export const TOOLS = [
           read: path.join(one.folder, 'README.md'),
           next: one.linked
             ? 'Read README.md first, then the linked files it lists as you need them.'
-            : 'Nothing is linked to this ticket yet. Use adam_search to find what it is about, '
-              + 'adam_link to record it, then adam_pull again.',
+            : unlinkedHint({ subject: one.subject }),
         };
       }
 

@@ -294,7 +294,7 @@ function resolveRoute(pathname) {
 // files and counts — and nothing that only a detail view will ask for.
 // Held out of the slim index and served per contract: an operation's parameters,
 // responses and request body are what `adam_contract` with `operation` returns.
-const DETAIL_FIELDS = ['description', 'properties', 'parameters', 'responses', 'requestBody'];
+const DETAIL_FIELDS = ['description', 'properties', 'parameters', 'responses', 'requestBody', 'body', 'security', 'extensions'];
 
 function splitDetail(full) {
   const slim = { ...full, nodes: [] };
@@ -481,7 +481,7 @@ async function refreshIndex(pkg, reason = 'startup') {
       // package" and meant "not a contract". Last, because it is built from
       // the others.
       search = await buildSearch(ROOT, {
-        journeys, domain, decisions, backend, uiux, platforms,
+        journeys, domain, decisions, backend, uiux, platforms, index,
         // Only so the flash-sale page is offered when there is a scenario to
         // open — read above for the burst lens.
         burst,
@@ -1237,8 +1237,16 @@ const server = http.createServer(async (req, res) => {
       // written down. Refusing it would leave the one kind of result whose line
       // is exact as the one kind that cannot be opened.
       const allowed = route === 'file' ? /\.(ya?ml|md|json|csv|sql)$/i : /\.ya?ml$/i;
-      if (!abs.startsWith(pkg.root + path.sep) || !allowed.test(abs)) {
-        return send(res, 403, 'refused');
+      if (!abs.startsWith(pkg.root + path.sep)) return send(res, 403, 'refused: outside the package');
+      // Say what is wrong in the terms of the request. A board, a directory and a typo
+      // all came back as 403 "refused", which the connector could only report as a
+      // permission problem - "the signed-in account may not read" (audit R013).
+      const kind = await stat(abs).then((st) => (st.isDirectory() ? 'dir' : 'file'), () => null);
+      if (!kind) return send(res, 404, `no file at ${rel}`);
+      if (kind === 'dir') return send(res, 400, `${rel} is a folder, not a file`);
+      if (!allowed.test(abs)) {
+        return send(res, 415, `${rel} is not served here: ${route === 'file' ? '.yaml .md .json .csv .sql' : '.yaml'} only`
+          + (/\.dc\.html$|wireframes\//i.test(rel) ? '. Wireframe boards open in the ADAM viewer, not through adam_file.' : ''));
       }
       // The endpoint list alone does not hold the line here. An ADR is a .md
       // file, so refusing /api/decisions and leaving this open lets a client
@@ -1251,7 +1259,14 @@ const server = http.createServer(async (req, res) => {
         if (!pkg.decisions) await refreshIndex(pkg, 'on demand');
         if (isDecisionFile(rel, decisionFiles(pkg.decisions))) return send(res, 403, 'refused');
       }
-      const text = await readFile(abs, 'utf8');
+      // A file removed between the check above and here is still a 404, never a 500 that
+      // names the server's filesystem path (audit R024).
+      let text;
+      try {
+        text = await readFile(abs, 'utf8');
+      } catch {
+        return send(res, 404, `no file at ${rel}`);
+      }
 
       if (route === 'file') return send(res, 200, text);
 

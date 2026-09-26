@@ -34,6 +34,23 @@
  * so one base URL covers both halves.
  */
 
+/**
+ * A bare 502/503/504 from the gateway, retried twice after a short wait.
+ *
+ * The first read of a session - often an adam_pull - regularly met a 502 while the
+ * service behind the proxy woke up, and every retry by hand worked (audit R018: 7 of
+ * 7 runs). Only gateway statuses: anything the service itself said is an answer.
+ */
+async function retryGateway(request, tries = 3) {
+  let answer;
+  for (let i = 0; i < tries; i += 1) {
+    answer = await request();
+    if (![502, 503, 504].includes(answer.status)) return answer;
+    await new Promise((resolve) => setTimeout(resolve, 800 * (i + 1)));
+  }
+  return answer;
+}
+
 const COOKIE = 'ticvai_session';
 
 /** A refusal by the audience filter, kept distinct from a transport failure.
@@ -150,7 +167,7 @@ export class ViewerClient {
     const headers = { cookie: `${COOKIE}=${encodeURIComponent(this.#token)}` };
     if (etag) headers['if-none-match'] = etag;
 
-    const answer = await fetch(href, { headers, redirect: 'manual' });
+    const answer = await retryGateway(() => fetch(href, { headers, redirect: 'manual' }));
 
     // The gate answers a dead session with a redirect to the sign-in page
     // rather than a 401, because its usual caller is a browser.
@@ -276,7 +293,10 @@ export class ViewerClient {
       redirect: 'manual',
     });
 
-    let answer = await send(this.#token);
+    // Only reads are retried: a POST that reached the service before the gateway gave
+    // up may already have happened, and doing it twice is worse than one clear failure.
+    const once = () => send(this.#token);
+    let answer = await (method === 'GET' ? retryGateway(once) : once());
     if (answer.status === 401 || answer.status === 302) {
       this.#token = null;
       await this.login();

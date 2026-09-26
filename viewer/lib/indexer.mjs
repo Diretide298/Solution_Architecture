@@ -263,24 +263,106 @@ function refNames(node, depth = 0, out = new Set()) {
  * (#20354, 24 September), and asked for a change request. So the list itself
  * goes out, in the detail layer beside the description.
  */
-function operationShape(op) {
-  const parameters = (Array.isArray(op.parameters) ? op.parameters : []).map((p) => (
+function operationShape(op, pathItem = {}) {
+  // Parameters declared on the path item apply to every method under it; an
+  // operation's own parameter with the same name and location overrides it.
+  // Reading only op.parameters dropped every `{orderId}` declared once at path
+  // level, and 65 tickets reported a path with no id parameter (audit R010).
+  const own = Array.isArray(op.parameters) ? op.parameters : [];
+  const keyOf = (p) => (typeof p?.$ref === 'string' ? `ref:${p.$ref}` : `${p?.in}:${p?.name}`);
+  const ownKeys = new Set(own.map(keyOf));
+  const inherited = (Array.isArray(pathItem.parameters) ? pathItem.parameters : []).filter((p) => !ownKeys.has(keyOf(p)));
+  const parameters = [...inherited, ...own].map((p) => (
     typeof p?.$ref === 'string'
       ? { ref: p.$ref.split('/').pop(), shared: true }
       : {
         name: p?.name ?? null,
         in: p?.in ?? null,
         required: Boolean(p?.required),
-        schema: p?.schema?.$ref ? p.schema.$ref.split('/').pop()
-          : [p?.schema?.type, p?.schema?.format].filter(Boolean).join(' ') || null,
+        schema: shapeOf(p?.schema),
+        ...(p?.description ? { description: p.description } : {}),
       }));
-  const responses = Object.entries(op.responses ?? {}).map(([code, r]) => ({
-    code,
-    description: typeof r?.$ref === 'string' ? r.$ref.split('/').pop() : (r?.description ?? ''),
-    schemas: [...refNames(r?.content ?? (typeof r?.$ref === 'string' ? { $ref: r.$ref } : {}))],
-  }));
-  const body = op.requestBody ? [...refNames(op.requestBody)] : [];
-  return { parameters, responses, requestBody: body };
+  const responses = Object.entries(op.responses ?? {}).map(([code, r]) => {
+    const media = r?.content ? Object.values(r.content)[0] : null;
+    return {
+      code,
+      description: typeof r?.$ref === 'string' ? r.$ref.split('/').pop() : (r?.description ?? ''),
+      schemas: [...refNames(r?.content ?? (typeof r?.$ref === 'string' ? { $ref: r.$ref } : {}))],
+      ...(media?.schema ? { schema: shapeOf(media.schema) } : {}),
+    };
+  });
+  // `requestBody` stays the list of schema names for anything reading it that
+  // way; `body` is the shape itself. An inline body used to come out as [] and a
+  // body that only nested a $ref came out as that ref - 386 findings across 360
+  // tickets said "no request body" or named the wrong one (audit R003).
+  const bodyMedia = op.requestBody?.content ? Object.values(op.requestBody.content)[0] : null;
+  const body = op.requestBody
+    ? { required: Boolean(op.requestBody.required),
+      ...(typeof op.requestBody.$ref === 'string' ? { ref: op.requestBody.$ref.split('/').pop() } : {}),
+      ...(bodyMedia?.schema ? { schema: shapeOf(bodyMedia.schema) } : {}) }
+    : null;
+  // Every x-ticvai-* extension on the operation, as written: escalated
+  // permissions, step-up, guest-callable and the rest only showed in the raw
+  // YAML (audit R020).
+  const extensions = Object.fromEntries(Object.entries(op).filter(([k]) => k.startsWith('x-ticvai-')));
+  return {
+    parameters,
+    responses,
+    requestBody: op.requestBody ? [...refNames(op.requestBody)] : [],
+    body,
+    security: Array.isArray(op.security) ? op.security : null,
+    extensions,
+  };
+}
+
+function platformsOf(op, taxonomy) {
+  const consumed = Array.isArray(op['x-ticvai-consumed-by']) ? op['x-ticvai-consumed-by'] : [];
+  const codes = [...new Set(consumed.map((c) => String(c).match(/^(P\d+)\b/)?.[1]).filter(Boolean))];
+  if (!codes.length) return taxonomy.platforms.map((p) => p.raw);
+  const label = new Map(taxonomy.platforms.filter((p) => p.code).map((p) => [p.code, p.raw]));
+  return codes.sort((a, b) => Number(a.slice(1)) - Number(b.slice(1))).map((c) => label.get(c) ?? c);
+}
+
+const SHAPE_KEYS = ['format', 'enum', 'nullable', 'pattern', 'minimum', 'maximum', 'exclusiveMinimum',
+  'exclusiveMaximum', 'minLength', 'maxLength', 'minItems', 'maxItems', 'uniqueItems', 'default',
+  'readOnly', 'writeOnly', 'multipleOf', 'additionalProperties'];
+
+/**
+ * A schema as a developer needs to read it, inline parts included: a `$ref` is
+ * its name, an object lists its properties and what is required, an array says
+ * what it holds, `allOf`/`oneOf`/`anyOf` keep their members, and constraints
+ * (enum, nullable, pattern, min/max, default) survive (audit R003, R014). A bare
+ * type with nothing else stays a short string, so simple shapes stay readable.
+ */
+export function shapeOf(node, depth = 0) {
+  if (!node || typeof node !== 'object') return null;
+  if (typeof node.$ref === 'string') return node.$ref.split('/').pop();
+  if (depth > 5) return '…';
+  for (const key of ['allOf', 'oneOf', 'anyOf']) {
+    if (Array.isArray(node[key])) {
+      const out = { [key]: node[key].map((m) => shapeOf(m, depth + 1)) };
+      if (node.description) out.description = node.description;
+      return out;
+    }
+  }
+  if (node.type === 'array' || node.items) {
+    const out = { type: 'array', items: shapeOf(node.items, depth + 1) };
+    for (const k of SHAPE_KEYS) if (node[k] !== undefined && k !== 'format') out[k] = node[k];
+    return out;
+  }
+  if (node.properties && typeof node.properties === 'object') {
+    const out = { type: 'object' };
+    if (Array.isArray(node.required) && node.required.length) out.required = node.required;
+    out.properties = Object.fromEntries(Object.entries(node.properties).map(([k, v]) => [k, shapeOf(v, depth + 1)]));
+    for (const k of SHAPE_KEYS) if (node[k] !== undefined) out[k] = node[k];
+    return out;
+  }
+  const extra = SHAPE_KEYS.filter((k) => node[k] !== undefined && k !== 'format');
+  const base = [node.type, node.format].filter(Boolean).join(' ') || (node.enum ? 'enum' : 'any');
+  if (!extra.length && !node.description) return base;
+  const out = { type: base };
+  for (const k of extra) out[k] = node[k];
+  return out;
 }
 
 /**
@@ -360,6 +442,7 @@ export async function buildIndex(root, contractsDir = 'contracts') {
     edges.push({ source, target, kind });
   };
 
+  const schemaDefs = new Map(); // schema node id -> { definition, rel }, for the allOf pass
   const permissionEnum = new Set();
   const usedPermissions = new Map(); // permission -> [opId]
   const declared = await loadDeclaredConsumers(root);
@@ -469,12 +552,17 @@ export async function buildIndex(root, contractsDir = 'contracts') {
           guestCallable: op['x-ticvai-guest-callable'] ?? null,
           consumes: io.consumes,
           produces: io.produces,
-          ...operationShape(op),
+          ...operationShape(op, pathItem),
           consumers,
           // inherited from the contract's info block, where the taxonomy lives
           module: taxonomy.module,
           tier: taxonomy.tier,
-          platforms: taxonomy.platforms.map((p) => p.raw),
+          // The platforms that actually call this operation, from its own
+          // x-ticvai-consumed-by ("P02 GST-014 ..."); the contract-wide list only
+          // when the operation names none. Copying the contract's list left out
+          // P-codes the operation's own consumers name (audit R006).
+          platforms: platformsOf(op, taxonomy),
+          contractPlatforms: taxonomy.platforms.map((p) => p.raw),
         });
         addEdge(fileId, opId, 'contains');
 
@@ -529,6 +617,7 @@ export async function buildIndex(root, contractsDir = 'contracts') {
           enumValues: Array.isArray(definition?.enum) ? definition.enum : null,
           properties: kind === 'schema' ? describeProperties(definition, rel) : [],
         });
+        if (kind === 'schema') schemaDefs.set(nodeId, { definition, rel });
         addEdge(fileId, nodeId, 'contains');
 
         for (const ref of collectRefs(definition)) {
@@ -542,6 +631,51 @@ export async function buildIndex(root, contractsDir = 'contracts') {
         }
       }
     }
+  }
+
+  // ---- allOf: a composed schema has the properties of all its parts --------
+  // Only the schema's own `properties` were read, so every `allOf` schema (a
+  // paged list, an extended resource) showed 0 properties (audit R008). Parts
+  // may live in other files, which is why this runs after every file is read.
+  const merged = new Map();
+  const mergeOf = (id, seen = new Set()) => {
+    if (merged.has(id)) return merged.get(id);
+    const entry = schemaDefs.get(id);
+    if (!entry || seen.has(id)) return { properties: [], required: [], extends: [] };
+    seen.add(id);
+    const { definition, rel } = entry;
+    const out = { properties: [...describeProperties(definition, rel)],
+      required: [...(Array.isArray(definition?.required) ? definition.required : [])], extends: [] };
+    for (const part of Array.isArray(definition?.allOf) ? definition.allOf : []) {
+      if (typeof part?.$ref === 'string') {
+        const target = resolveRef(part.$ref, rel);
+        if (!target) continue;
+        out.extends.push(target.name);
+        const inner = mergeOf(target.id, seen);
+        out.properties.push(...inner.properties);
+        out.required.push(...inner.required);
+      } else if (part && typeof part === 'object') {
+        const req = new Set(Array.isArray(part.required) ? part.required : []);
+        out.properties.push(...describeProperties(part, rel).map((p) => ({ ...p, required: p.required || req.has(p.name) })));
+        out.required.push(...req);
+      }
+    }
+    const byName = new Map(out.properties.map((p) => [p.name, p]));
+    const required = new Set(out.required);
+    out.properties = [...byName.values()].map((p) => ({ ...p, required: p.required || required.has(p.name) }));
+    out.required = [...required];
+    merged.set(id, out);
+    return out;
+  };
+  for (const [id, { definition }] of schemaDefs) {
+    if (!Array.isArray(definition?.allOf)) continue;
+    const m = mergeOf(id);
+    const node = nodes.get(id);
+    node.properties = m.properties;
+    node.required = m.required;
+    node.propertyCount = m.properties.length;
+    node.extends = m.extends;
+    node.dataType = node.dataType ?? 'object';
   }
 
   // ---- taxonomy roll-up and audit -----------------------------------------

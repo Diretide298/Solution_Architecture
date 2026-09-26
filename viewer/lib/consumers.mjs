@@ -111,7 +111,9 @@ export async function loadDeclaredConsumers(root) {
 
     if (!consumers.length) continue;
     for (const app of consumers) apps.add(app);
-    map.set(`${method} ${normalisePath(urlPath)}`, consumers);
+    // Several package app names fold into one starter app (four into backoffice), so
+    // the list repeated it - "backoffice, backoffice, backoffice" (audit R006).
+    map.set(`${method} ${normalisePath(urlPath)}`, [...new Set(consumers)]);
   }
 
   return { map, apps: [...apps].sort(), source: 'handoff/api-list.md' };

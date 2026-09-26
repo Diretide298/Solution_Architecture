@@ -81,6 +81,10 @@ function indexScreens(files, problems) {
         continue;
       }
       screens.set(screen.id, {
+        // Every field the YAML has, then the curated ones on top. The record was
+        // a fixed whitelist, so entryState, gaps, pattern, requiresModule, guard
+        // and anything added later never reached a developer (audit R015).
+        ...Object.fromEntries(Object.entries(screen).filter(([k]) => k !== 'layout')),
         id: screen.id,
         name: screen.name ?? screen.id,
         module: screen.module ?? null,
@@ -129,6 +133,7 @@ function indexScreens(files, problems) {
           // from a component list — apart from one nobody finished.
           notes: r?.notes ?? null,
           components: (r?.components ?? []).map((c) => ({
+            ...(c && typeof c === 'object' ? c : {}),
             kind: c?.kind ?? '',
             label: c?.label ?? '',
             bindsTo: c?.bindsTo ?? null,

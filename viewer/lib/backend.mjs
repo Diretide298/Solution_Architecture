@@ -372,7 +372,9 @@ function applyMigrations(tables, columns, migrations, problems) {
     }
 
     table.ddl = {
-      file: ddl.file,
+      // A path adam_file can open. The bare `tenant/010-x.sql` resolved nowhere, so 257
+      // tickets could not read the DDL behind their tables (audit R004).
+      file: `backend/${ddl.file}`,
       partitionBy: ddl.partitionBy,
       partitionOf: ddl.partitionOf,
       primaryKey: ddl.primaryKey,
@@ -433,7 +435,7 @@ function applyMigrations(tables, columns, migrations, problems) {
       problems.push({
         severity: 'info',
         kind: 'migration-written-not-claimed',
-        file: `backend/${table.ddl.file}`,
+        file: table.ddl.file,
         message: `${table.name} is created by ${table.ddl.file} but the workbook does not mark it written`,
       });
     }
