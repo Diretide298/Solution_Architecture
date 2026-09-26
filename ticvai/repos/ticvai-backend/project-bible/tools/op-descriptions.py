@@ -76,6 +76,7 @@ def build(schedule, keys):
     week = {k: min(int(v // 5), 6) + 1 for k, v in sched["start"].items()}
     who = sched["assign"]
     ops = contract_index()
+    slice_ops = set(json.loads((ROOT / "handoff" / "delivery-slice.json").read_text(encoding="utf-8"))["operations"])
     screens = {}
     for f in sorted((ROOT / "screens").glob("P*.yaml")):
         for s in yaml.safe_load(f.read_text(encoding="utf-8"))["screens"]:
@@ -135,12 +136,21 @@ def build(schedule, keys):
         if ln.get("reads") or ln.get("writes"):
             out.append(f"- **Reads:** {', '.join(ln.get('reads') or []) or 'nothing'}; "
                        f"**writes:** {', '.join(ln.get('writes') or []) or 'nothing'}")
-        out.append(f"- **Service:** {ln.get('service', '?')}; reads routed to {o.get('x-ticvai-read-routing', 'primary')}; "
-                   f"offline-capable: {'yes' if o.get('x-ticvai-offline-capable') else 'no'}"
+        # Routing only where the operation declares it, and never on a write: defaulting to
+        # "primary" contradicted replica-only reporting operations (audit R066).
+        routing = o.get("x-ticvai-read-routing") if method == "GET" else None
+        out.append(f"- **Service:** {ln.get('service', '?')}"
+                   + (f"; reads routed to {routing}" if routing else "")
+                   + f"; offline-capable: {'yes' if o.get('x-ticvai-offline-capable') else 'no'}"
                    + (f"; conflicts: {o['x-ticvai-conflict-policy']}" if o.get("x-ticvai-conflict-policy") else ""))
-        used = sorted(callers.get(op, ())) or [x for x in o.get("x-ticvai-consumed-by") or []]
-        if used:
-            out.append("- **Used by:** " + ", ".join(screen_label(s) if s in screens else s for s in used))
+        # Every consumer the contract names, the ones built in this release first (audit R042: the
+        # list used to keep only screens with a ticket and drop the rest without a word).
+        declared = [str(x) for x in o.get("x-ticvai-consumed-by") or []]
+        ticketed = sorted(callers.get(op, ()))
+        later = [x for x in declared if not any(sid in x.split() for sid in ticketed)]
+        if ticketed or later:
+            out.append("- **Used by:** " + (", ".join(screen_label(x) for x in ticketed) or "no screen in this release")
+                       + (f"; later: {', '.join(later[:12])}{' ...' if len(later) > 12 else ''}" if later else ""))
         return out
 
     def plan(key, base):
@@ -150,24 +160,73 @@ def build(schedule, keys):
         out = ["## In the plan", "",
                f"- Build order #{r['sequence']}" + (f", {assignee}'s queue" if assignee else "")]
         if wk:
-            chk = (BE_CHECK[(wk - 1) % 2] if r["track"] in ("Backend", "Database") else FE_CHECK[(wk - 1) % 5])
-            out.append(f"- Planned: Block A week {wk}; checker that week: {chk}")
+            # Wave is product priority; the week comes from dependency order, so the two can differ
+            # without either being wrong (audit R045).
+            out.append(f"- Planned: Block A week {wk}" + (f" (product wave {r['wave']}; the week follows dependency order)"
+                                                          if r.get("wave") else ""))
+            # No reviewer on setup or onboarding tickets, and never the person who built it (R058).
+            if r["track"] in ("Backend", "Database", "Frontend"):
+                pool = BE_CHECK if r["track"] in ("Backend", "Database") else FE_CHECK
+                first = (wk - 1) % len(pool)
+                chk = next((pool[(first + i) % len(pool)] for i in range(len(pool))
+                            if pool[(first + i) % len(pool)] != assignee), None)
+                if chk:
+                    out.append(f"- Reviewer that week: {chk}")
         if r["dependsOn"]:
             out.append("- Follows: " + ", ".join(r["dependsOn"].split()) + " (linked in OpenProject)")
         out.append(f"- Key: `{key}` - Track: {r['track']} - Points: {r['points'] or '-'}")
         return out
 
-    DONE_BE = ["## Done when", "",
-               "- [ ] Request, response and every listed error match the contract exactly (contract tests pass)",
-               "- [ ] Permission and scope are enforced; tests for 401 and 403",
-               "- [ ] Tests for success and for each listed error",
-               "- [ ] Reads and writes only the tables listed; row-level security holds",
-               "- [ ] Lint and typecheck pass; the PR is reviewed by this week's checker"]
-    DONE_DB = ["## Done when", "",
-               "- [ ] The migration creates the tables with their keys, indexes and row-level security",
-               "- [ ] Its ROLLBACK section undoes it cleanly, tested in CI",
-               "- [ ] It runs forward on an empty database and on the previous release's schema",
-               "- [ ] Reviewed by this week's backend checker"]
+    def auth_line(op_ids):
+        """The 401/403 checks each operation's own auth model calls for (audit R054): no 403 test on a
+        public or permission-less operation, and 'another caller's id' for self-scoped ones."""
+        kinds = set()
+        for op in op_ids:
+            o = (ops.get(op) or (None, None, None, {}))[3]
+            if isinstance(o.get("security"), list) and not o["security"]:
+                kinds.add("public")
+            elif o.get("x-ticvai-self-scoped"):
+                kinds.add("self")
+            elif o.get("x-ticvai-permission"):
+                kinds.add("perm")
+            else:
+                kinds.add("auth")
+        parts = []
+        if kinds & {"perm", "self", "auth"}:
+            parts.append("an unauthenticated call gets 401")
+        if "perm" in kinds:
+            parts.append("a caller without the permission gets 403")
+        if "self" in kinds:
+            parts.append("another caller's id gets 403 on self-scoped operations")
+        if "public" in kinds:
+            parts.append("public operations need no credential")
+        return "- [ ] Access: " + "; ".join(parts) + ", each with a test"
+
+    def done_be(op_ids):
+        return ["## Done when", "",
+                "- [ ] Request, response and every listed error match the contract exactly (tests assert the "
+                "status codes and problem codes the contract lists)",
+                auth_line(op_ids),
+                "- [ ] Tests for success and for each listed error",
+                "- [ ] Reads and writes only the tables listed; row-level security holds",
+                "- [ ] `dotnet build` passes with analyzers and warnings as errors, and `dotnet test` passes; "
+                "the PR is reviewed"]
+
+    def done_db(key):
+        """Per ticket (audit R046): what the migration must do on the database it will actually meet,
+        with nothing about a previous release or a snapshot that do not exist yet."""
+        head = ["## Done when", ""]
+        if key.endswith("-BASELINE"):
+            return head + ["- [ ] Creates the schemas, extensions, helper functions and the migration register",
+                           "- [ ] `SqlMigrationRunner` applies it to an empty database, and a second run applies nothing",
+                           "- [ ] The PR is reviewed"]
+        if key.endswith(("-FOREIGN-KEYS", "-INDEXES")):
+            return head + ["- [ ] Applies after every table migration it follows, on a database that has them",
+                           "- [ ] Every constraint or index it names exists afterwards; a second run applies nothing",
+                           "- [ ] The PR is reviewed"]
+        return head + ["- [ ] Creates its tables with their keys, indexes and row-level security",
+                       "- [ ] Applies on a database with its Follows migrations applied, and a second run applies nothing",
+                       "- [ ] The PR is reviewed"]
     FE_PART = {"build": ("Build the screen", ["- [ ] Every state is built: loading, empty, error, offline, and the "
                                              "normal view", "- [ ] Runs against the mock API from the generated client",
                                              "- [ ] Matches the design and the navigation below"]),
@@ -196,12 +255,44 @@ def build(schedule, keys):
             names = [x.get("name", x) if isinstance(x, dict) else x for x in (st if isinstance(st, list) else st.keys())]
             out.append("- **States:** " + ", ".join(str(n) for n in names))
         apis = [x["operationId"] for x in s.get("apis") or [] if x.get("operationId")]
-        if apis:
-            out.append("- **Calls:** " + ", ".join(f"`{x}` ({lineage.get(x, {}).get('verb', '')} "
-                                                   f"{lineage.get(x, {}).get('path', '')})" for x in apis))
+        now = [x for x in apis if x in slice_ops]
+        later = [x for x in apis if x not in slice_ops]
+
+        def call(x):
+            return f"`{x}` ({lineage.get(x, {}).get('verb', '')} {lineage.get(x, {}).get('path', '')})"
+
+        # Built now versus later, so a ticket titled with two operations is not read as five (audit R047).
+        if now:
+            out.append("- **Calls, built in this ticket:** " + ", ".join(call(x) for x in now))
+        if later:
+            out.append("- **Calls, later (not in this release):** " + ", ".join(f"`{x}`" for x in later)
+                       + ". Render their states from what this ticket does build; do not stub a backend for them.")
         nav = (s.get("navigation") or {}).get("exitTo") or []
         if nav:
             out.append("- **Leads to:** " + ", ".join(nav[:12]))
+        return out
+
+    def screen_done(sid):
+        """What 'done' means for this screen, from the screen itself (audit R041): each state it declares,
+        each transition's trigger and failure, and each in-release call's errors."""
+        s = screens.get(sid, {})
+        out = ["## Done when", ""]
+        st = s.get("states")
+        if isinstance(st, dict):
+            for name, text in st.items():
+                first = re.split(r"(?<=[.!?])\s", re.sub(r"\*\*", "", str(text)).strip(), maxsplit=1)[0]
+                out.append(f"- [ ] State **{name}**: {first}")
+        for t in ((s.get("navigation") or {}).get("transitions") or [])[:8]:
+            fails = ", ".join(f"{f.get('when')} -> {f.get('to')}" for f in t.get("onFailure") or [] if isinstance(f, dict))
+            out.append(f"- [ ] {t.get('trigger', 'Transition')} leads to {t.get('to')}"
+                       + (f" (only when {t['precondition']})" if t.get("precondition") else "")
+                       + (f"; on failure: {fails}" if fails else ""))
+        for x in [a["operationId"] for a in s.get("apis") or [] if a.get("operationId") in slice_ops][:8]:
+            o = (ops.get(x) or (None, None, None, {}))[3]
+            errs = [str(c) for c in (o.get("responses") or {}) if str(c)[:1] in "45"]
+            if errs:
+                out.append(f"- [ ] `{x}`: each of its errors ({', '.join(errs)}) shows the screen's error state, not a crash")
+        out.append("- [ ] `pnpm lint`, `pnpm typecheck` and `pnpm test` pass")
         return out
 
     out = {}
@@ -212,11 +303,11 @@ def build(schedule, keys):
         if r["track"] == "Backend" and r["type"] == "Task":
             op_list = [part] if part else (r["subject"].split(": ", 1)[1].split(", ") if ": " in r["subject"] else [])
             text += [("Build this endpoint to its contract." if part else
-                      f"Build these {len(op_list)} operations in {r['service']}; each has its own sub-task. "
-                      + r["description"]), ""]
+                      f"Build {'this operation' if len(op_list) == 1 else f'these {len(op_list)} operations'} "
+                      f"in {r['service']}. " + r["description"]), ""]
             for op in op_list:
                 text += op_block(op) + [""]
-            text += DONE_BE
+            text += done_be(op_list)
         elif r["track"] == "Database" and r["type"] == "Task":
             m = re.search(r"Tables: (.+?)\. Source", r["description"])
             tables = [part] if part else (m.group(1).split(", ") if m else [])
@@ -225,8 +316,11 @@ def build(schedule, keys):
             if tables:
                 text += ["## Tables", ""] + [f"- `{t}`" for t in tables] + [""]
             if src:
-                text += [f"Source DDL: `{src.group(1)}`; conventions in `backend/MIGRATIONS.md`.", ""]
-            text += DONE_DB
+                # The generated order lives in handoff/service-docs/backend/MIGRATIONS.md; the older
+                # backend/MIGRATIONS.md numbers files differently (audit R048, R051).
+                text += [f"Source DDL: `{src.group(1)}`; order and numbering in "
+                         "`handoff/service-docs/backend/MIGRATIONS.md`.", ""]
+            text += done_db(base)
         elif r["track"] == "Frontend" and base in screen_of:
             sid = screen_of[base]
             if part in FE_PART:
@@ -235,8 +329,8 @@ def build(schedule, keys):
                          "(build / connect / tests).", ""]
                 text += screen_block(sid) + ["", "## Done when", ""] + checks
             else:
-                text += [r["description"], ""] + screen_block(sid) + [
-                    "", "Three sub-tasks: build with every state, connect to the API, tests."]
+                text += [r["description"], ""] + screen_block(sid) + [""] + screen_done(sid) + [
+                    "", "Sub-tasks: build (every state), connect (the real API), tests."]
         else:
             text += [r["description"]]
             if children.get(base):
