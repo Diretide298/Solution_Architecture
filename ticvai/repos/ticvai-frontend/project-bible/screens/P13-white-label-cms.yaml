@@ -214,6 +214,7 @@ screens:
     status: notStarted
     provenance: generated
     board: wireframes/P13 Venue CMS.dc.html#cms-001
+    derivedFrom: wireframes/reference/Marketing Board 7.dc.html
     note: '**Drawn by Claude Design on `Marketing Board 7.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.**
       The frame it points at now is the generated one. This screen has been designed once and is not starting
       from nothing.'

@@ -1,0 +1,804 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+html,body{margin:0;padding:0;background:#EEF1F6;-webkit-font-smoothing:antialiased}
+*{box-sizing:border-box}
+a{color:#0D6EFD;text-decoration:none}a:hover{color:#0A55C7}
+</style>
+</helmet>
+
+<div style="font-family:Manrope,system-ui,sans-serif;color:#0B1324;padding:26px 34px 90px;max-width:1420px;margin:0 auto">
+
+  <div style="display:flex;align-items:flex-end;justify-content:space-between;gap:24px;padding-bottom:14px;border-bottom:2px solid #0B1324">
+    <div>
+      <div style="font-size:12px;font-weight:800;letter-spacing:.18em;background:linear-gradient(90deg,#0D6EFD,#00B8FF);-webkit-background-clip:text;background-clip:text;color:transparent">TICVAI</div>
+      <h1 style="font-size:21px;font-weight:800;letter-spacing:-.02em;margin:5px 0 0">Seat Management · Board 3 — Accessibility &amp; Companion Seating <span style="font-weight:600;color:#6B7280">(10 screens)</span></h1>
+    </div>
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:#6B7280;text-align:right;line-height:1.7">
+      <div>staff &amp; guest · access as inventory</div>
+      <div>1280 × 700 · <a href="TICVAI%20All%20Boards%20Index.dc.html">board index</a></div>
+    </div>
+  </div>
+
+  <p style="font-size:12.5px;color:#5A6577;max-width:82ch;margin:16px 0 0;line-height:1.65;text-wrap:pretty">Access seating fails in a predictable way: the spaces exist, but they are held off sale "just in case", released too late, or sold without the companion seat beside them. This board treats access as ordinary inventory with extra facts attached — a wheelchair space is a space with a companion seat, a transfer route and a sightline, bookable online at the same moment as every other seat, and never released by an email to one person who is on holiday.</p>
+
+  <div style="display:flex;flex-direction:column;gap:52px;margin-top:40px">
+
+    <div id="seatp-3a" data-screen-label="SEATP-3A" data-screen-id="SEATP-3A" data-screen-id-origin="board" style="display:flex;flex-direction:column;gap:13px;scroll-margin-top:24px">
+      <div>
+        <div style="display:flex;align-items:baseline;gap:9px"><span style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:#8494A8">SEATP-3A</span><span style="font-size:16.5px;font-weight:800;letter-spacing:-.015em">Access Inventory</span><span style="font-size:9px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;padding:2px 7px;border-radius:5px;background:#FDECEC;color:#A81E1E">11 spaces with no companion seat</span></div>
+        <div style="font-size:12px;color:#6B7280;margin-top:3px">Every accessible space across the estate, what it comes with, and whether a guest could actually book it online tonight.</div>
+      </div>
+      <div style="width:1280px;height:700px;display:flex;background:#F7F9FC;border:1px solid #E3E8F0;border-radius:14px;overflow:hidden;box-shadow:0 16px 38px rgba(12,35,64,.09)">
+        <aside style="flex:none;width:180px;background:#0B1324;display:flex;flex-direction:column;position:relative">
+          <div style="position:absolute;inset:0;background:radial-gradient(300px 200px at 0% 4%,rgba(0,184,255,.20),transparent 70%);pointer-events:none"></div>
+          <div style="position:relative;padding:15px 14px 13px;border-bottom:1px solid rgba(255,255,255,.08)"><img src="assets/ticvai-light-logo.png" alt="TICVAI" style="display:block;height:24px;width:auto"><div style="font-size:9.5px;color:#7FA3C9;margin-top:5px">Access &amp; inclusion</div></div>
+          <nav style="position:relative;display:flex;flex-direction:column;gap:2px;padding:11px 9px">
+            <div style="padding:8px 10px;border-radius:9px;background:linear-gradient(90deg,rgba(13,110,253,.30),rgba(0,184,255,.10));color:#fff;font-size:11.5px;font-weight:700;box-shadow:inset 2px 0 0 #00B8FF">Spaces</div>
+            <div style="padding:8px 10px;border-radius:9px;color:#8296B0;font-size:11.5px;font-weight:600">Companions</div>
+            <div style="padding:8px 10px;border-radius:9px;color:#8296B0;font-size:11.5px;font-weight:600">Routes</div>
+            <div style="padding:8px 10px;border-radius:9px;color:#8296B0;font-size:11.5px;font-weight:600">Requirements</div>
+            <div style="padding:8px 10px;border-radius:9px;color:#8296B0;font-size:11.5px;font-weight:600">Release rules</div>
+            <div style="padding:8px 10px;border-radius:9px;color:#8296B0;font-size:11.5px;font-weight:600">Assisted services</div>
+            <div style="padding:8px 10px;border-radius:9px;color:#8296B0;font-size:11.5px;font-weight:600">Reporting</div>
+          </nav>
+          <div style="position:relative;margin-top:auto;padding:12px;border-top:1px solid rgba(255,255,255,.08);font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#7FA3C9;line-height:1.7">184 spaces<br>11 incomplete</div>
+        </aside>
+        <div style="flex:1;display:flex;flex-direction:column;min-width:0">
+          <header style="flex:none;height:54px;display:flex;align-items:center;gap:12px;padding:0 18px;background:#fff;border-bottom:1px solid #E8ECF3">
+            <div><div style="font-size:13.5px;font-weight:800;letter-spacing:-.01em">Accessible spaces · all venues</div><div style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#9AA5B6">184 spaces · 173 with a companion seat · 42 not bookable online · 6 venues</div></div>
+            <div style="margin-left:auto;display:flex;gap:6px"><div style="height:32px;display:flex;align-items:center;padding:0 11px;border:1px solid #E3E8F0;border-radius:8px;font-size:11px;font-weight:700;color:#5A6577">Incomplete first</div><div style="height:32px;display:flex;align-items:center;padding:0 12px;border-radius:8px;background:#0D6EFD;color:#fff;font-size:11px;font-weight:700">Add space</div></div>
+          </header>
+          <div style="flex:1;display:flex;flex-direction:column;gap:12px;padding:14px 16px;min-height:0">
+            <div style="flex:none;display:grid;grid-template-columns:repeat(4,1fr);gap:11px">
+              <div style="background:#fff;border:1.5px solid #F5C9C9;border-radius:12px;padding:12px 14px;display:flex;flex-direction:column;gap:4px"><span style="font-size:9px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#A81E1E">No companion seat</span><span style="font-family:'IBM Plex Mono',monospace;font-size:20px;font-weight:600;color:#8A2020">11</span><span style="font-size:10.5px;color:#A81E1E">a guest cannot bring anyone</span></div>
+              <div style="background:#fff;border:1.5px solid #F2DFB8;border-radius:12px;padding:12px 14px;display:flex;flex-direction:column;gap:4px"><span style="font-size:9px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#8A6D00">Phone only</span><span style="font-family:'IBM Plex Mono',monospace;font-size:20px;font-weight:600;color:#8A6D00">42</span><span style="font-size:10.5px;color:#8A6D00">held off the website</span></div>
+              <div style="background:#fff;border:1px solid #E8ECF3;border-radius:12px;padding:12px 14px;display:flex;flex-direction:column;gap:4px"><span style="font-size:9px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#94A0B4">Spaces total</span><span style="font-family:'IBM Plex Mono',monospace;font-size:20px;font-weight:600">184</span><span style="font-size:10.5px;color:#5A6577">0.45% of 41 200 seats</span></div>
+              <div style="background:#fff;border:1px solid #CBE8DA;border-radius:12px;padding:12px 14px;display:flex;flex-direction:column;gap:4px"><span style="font-size:9px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#0B7A55">Occupancy last season</span><span style="font-family:'IBM Plex Mono',monospace;font-size:20px;font-weight:600;color:#0B5B41">61%</span><span style="font-size:10.5px;color:#0B7A55">house average 78%</span></div>
+            </div>
+            <div style="flex:1;display:grid;grid-template-columns:1.5fr 1fr;gap:12px;min-height:0">
+              <div style="background:#fff;border:1px solid #E8ECF3;border-radius:12px;display:flex;flex-direction:column;overflow:hidden;min-height:0">
+                <div style="flex:none;display:grid;grid-template-columns:1.5fr 62px 1fr 92px 1fr;padding:9px 14px;font-size:9px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:#94A0B4;border-bottom:1px solid #EDF1F6"><div>Location</div><div style="text-align:right">Spaces</div><div>Companion</div><div>Transfer</div><div>Bookable</div></div>
+                <div style="display:grid;grid-template-columns:1.5fr 62px 1fr 92px 1fr;align-items:center;padding:10px 14px;font-size:11.5px;border-bottom:1px solid #F4F6FA;background:#FDF5F5"><div><div style="font-weight:700;color:#8A2020">Northgate · upper tier</div><div style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#8A2020">rear, level entry</div></div><div style="font-family:'IBM Plex Mono',monospace;text-align:right;color:#8A2020">6</div><div style="font-size:10.5px;color:#A81E1E">none mapped</div><div style="font-size:10.5px;color:#8A2020">no</div><div style="font-size:10.5px;color:#A81E1E">phone only</div></div>
+                <div style="display:grid;grid-template-columns:1.5fr 62px 1fr 92px 1fr;align-items:center;padding:10px 14px;font-size:11.5px;border-bottom:1px solid #F4F6FA;background:#FDF5F5"><div><div style="font-weight:700;color:#8A2020">The Foundry · main room</div><div style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#8A2020">side of bar</div></div><div style="font-family:'IBM Plex Mono',monospace;text-align:right;color:#8A2020">5</div><div style="font-size:10.5px;color:#A81E1E">none mapped</div><div style="font-size:10.5px;color:#8A2020">no</div><div style="font-size:10.5px;color:#A81E1E">phone only</div></div>
+                <div style="display:grid;grid-template-columns:1.5fr 62px 1fr 92px 1fr;align-items:center;padding:10px 14px;font-size:11.5px;border-bottom:1px solid #F4F6FA"><div><div style="font-weight:600">Riverside · Hall 1 platform</div><div style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#9AA5B6">rear stalls, level</div></div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">14</div><div style="font-size:10.5px;color:#0B7A55">14 beside</div><div style="font-size:10.5px;color:#5A6577">6 seats</div><div style="font-size:10.5px;color:#0B7A55">online</div></div>
+                <div style="display:grid;grid-template-columns:1.5fr 62px 1fr 92px 1fr;align-items:center;padding:10px 14px;font-size:11.5px;border-bottom:1px solid #F4F6FA"><div><div style="font-weight:600">Riverside · Hall 1 circle</div><div style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#9AA5B6">lift, front row</div></div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">4</div><div style="font-size:10.5px;color:#0B7A55">4 beside</div><div style="font-size:10.5px;color:#5A6577">2 seats</div><div style="font-size:10.5px;color:#0B7A55">online</div></div>
+                <div style="display:grid;grid-template-columns:1.5fr 62px 1fr 92px 1fr;align-items:center;padding:10px 14px;font-size:11.5px;border-bottom:1px solid #F4F6FA"><div><div style="font-weight:600">Riverside · Hall 2</div><div style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#9AA5B6">flat floor</div></div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">12</div><div style="font-size:10.5px;color:#0B7A55">12 beside</div><div style="font-size:10.5px;color:#5A6577">all</div><div style="font-size:10.5px;color:#0B7A55">online</div></div>
+                <div style="display:grid;grid-template-columns:1.5fr 62px 1fr 92px 1fr;align-items:center;padding:10px 14px;font-size:11.5px;border-bottom:1px solid #F4F6FA;background:#FFFBF4"><div><div style="font-weight:600;color:#7A5C00">Harbour Lights · stalls</div><div style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#7A5C00">removable seats, row F</div></div><div style="font-family:'IBM Plex Mono',monospace;text-align:right;color:#7A5C00">4</div><div style="font-size:10.5px;color:#7A5C00">shared pair</div><div style="font-size:10.5px;color:#7A5C00">yes</div><div style="font-size:10.5px;color:#7A5C00">online, 48 h notice</div></div>
+                <div style="display:grid;grid-template-columns:1.5fr 62px 1fr 92px 1fr;align-items:center;padding:10px 14px;font-size:11.5px;border-bottom:1px solid #F4F6FA"><div><div style="font-weight:600">Northgate · stalls</div><div style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#9AA5B6">rear, level</div></div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">8</div><div style="font-size:10.5px;color:#0B7A55">8 beside</div><div style="font-size:10.5px;color:#5A6577">4 seats</div><div style="font-size:10.5px;color:#0B7A55">online</div></div>
+                <div style="display:grid;grid-template-columns:1.5fr 62px 1fr 92px 1fr;align-items:center;padding:10px 14px;font-size:11.5px"><div><div style="font-weight:600">Eight smaller rooms</div><div style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#9AA5B6">flat, unreserved</div></div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">131</div><div style="font-size:10.5px;color:#0B7A55">flexible</div><div style="font-size:10.5px;color:#5A6577">all</div><div style="font-size:10.5px;color:#0B7A55">online</div></div>
+                <div style="margin-top:auto;flex:none;padding:11px 14px;border-top:1px solid #EDF1F6;background:#FDF5F5;display:flex;gap:11px"><span style="width:3px;border-radius:2px;background:#DC2626;flex:none"></span><div style="flex:1;font-size:11px;color:#8A2020;line-height:1.55">Eleven spaces at Northgate and the Foundry have no companion seat recorded, so the booking flow cannot offer one and the phone line invents one each time.</div></div>
+              </div>
+              <div style="display:flex;flex-direction:column;gap:12px;min-height:0">
+                <div style="flex:none;background:#fff;border:1.5px solid #F2DFB8;border-radius:12px;padding:12px 14px;display:flex;flex-direction:column;gap:8px">
+                  <div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em;color:#8A6D00">42 spaces are phone only</div>
+                  <div style="font-size:10.5px;color:#5A6577;line-height:1.5">Held back so staff can "check requirements first". The check is a question the booking flow can ask, and the phone line is open 38 hours a week against a website open always.</div>
+                  <div style="display:flex;flex-direction:column;gap:5px;font-size:11px;color:#5A6577">
+                    <div style="display:flex;justify-content:space-between"><span>Occupancy · online spaces</span><span style="font-family:'IBM Plex Mono',monospace;color:#0B5B41">74%</span></div>
+                    <div style="display:flex;justify-content:space-between"><span>Occupancy · phone only</span><span style="font-family:'IBM Plex Mono',monospace;color:#8A2020">38%</span></div>
+                    <div style="display:flex;justify-content:space-between"><span>Calls a month</span><span style="font-family:'IBM Plex Mono',monospace;color:#0B1324">210</span></div>
+                  </div>
+                  <div style="height:30px;border-radius:9px;background:#0D6EFD;color:#fff;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700">Open the 42 for online booking</div>
+                </div>
+                <div style="flex:none;background:#fff;border:1px solid #E8ECF3;border-radius:12px;padding:12px 14px;display:flex;flex-direction:column;gap:7px">
+                  <div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em">What a space carries</div>
+                  <div style="display:flex;flex-direction:column;gap:5px;font-size:11px;color:#5A6577">
+                    <div style="display:flex;justify-content:space-between"><span>Companion seats</span><span style="font-family:'IBM Plex Mono',monospace;color:#0B1324">1 beside, 1 behind</span></div>
+                    <div style="display:flex;justify-content:space-between"><span>Clear width</span><span style="font-family:'IBM Plex Mono',monospace;color:#0B1324">900 mm</span></div>
+                    <div style="display:flex;justify-content:space-between"><span>Transfer seat</span><span style="font-family:'IBM Plex Mono',monospace;color:#0B1324">available</span></div>
+                    <div style="display:flex;justify-content:space-between"><span>Nearest accessible WC</span><span style="font-family:'IBM Plex Mono',monospace;color:#0B1324">22 m, same level</span></div>
+                    <div style="display:flex;justify-content:space-between"><span>Sightline</span><span style="font-family:'IBM Plex Mono',monospace;color:#0B1324">4 of 4</span></div>
+                  </div>
+                </div>
+                <div style="flex:1;min-height:0"></div>
+                <div style="flex:none;background:#fff;border:1px solid #E8ECF3;border-radius:12px;padding:12px 14px;display:flex;flex-direction:column;gap:7px">
+                  <div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em">Occupancy is the measure</div>
+                  <div style="font-size:10.5px;color:#5A6577;line-height:1.55">A space held empty out of caution serves nobody. The gap between 61% here and 78% across the house is the size of the problem.</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;line-height:1.85;color:#7C8899">
+        <div><b style="color:#4A5566;font-weight:600">OPERATIONS</b> · listAccessibleSpaces · getSpaceCompleteness · getAccessOccupancy · enableOnlineBooking</div>
+        <div><b style="color:#4A5566;font-weight:600">STATES</b> · loading · <b style="color:#A81E1E">companionMissing — space has no companion seat mapped</b> · phoneOnly · noticeRequired · error</div>
+        <div><b style="color:#4A5566;font-weight:600">ARRIVES WITH</b> · tenantId←context</div>
+        <div><b style="color:#4A5566;font-weight:600">GOES TO</b> · <a href="#seatp-3b">companion pairing</a> · <a href="#seatp-3e">release rules</a></div>
+      </div>
+    </div>
+
+    <div id="seatp-3b" data-screen-label="SEATP-3B" data-screen-id="SEATP-3B" data-screen-id-origin="board" style="display:flex;flex-direction:column;gap:13px;scroll-margin-top:24px">
+      <div>
+        <div style="display:flex;align-items:baseline;gap:9px"><span style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:#8494A8">SEATP-3B</span><span style="font-size:16.5px;font-weight:800;letter-spacing:-.015em">Companion Pairing</span><span style="font-size:9px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;padding:2px 7px;border-radius:5px;background:#EDF3FF;color:#0A4FB8">beside, not behind</span></div>
+        <div style="font-size:12px;color:#6B7280;margin-top:3px">Pairing each space with the seats a companion can use, in preference order. A companion seat two rows back is not a companion seat.</div>
+      </div>
+      <div style="width:1280px;height:700px;display:flex;background:#F7F9FC;border:1px solid #E3E8F0;border-radius:14px;overflow:hidden;box-shadow:0 16px 38px rgba(12,35,64,.09)">
+        <aside style="flex:none;width:180px;background:#0B1324;display:flex;flex-direction:column;position:relative">
+          <div style="position:absolute;inset:0;background:radial-gradient(300px 200px at 0% 4%,rgba(0,184,255,.20),transparent 70%);pointer-events:none"></div>
+          <div style="position:relative;padding:15px 14px 13px;border-bottom:1px solid rgba(255,255,255,.08)"><img src="assets/ticvai-light-logo.png" alt="TICVAI" style="display:block;height:24px;width:auto"><div style="font-size:9.5px;color:#7FA3C9;margin-top:5px">Access &amp; inclusion</div></div>
+          <div style="position:relative;padding:11px 12px;border-bottom:1px solid rgba(255,255,255,.08)"><div style="font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:.09em;text-transform:uppercase;color:#7FA3C9;margin-bottom:8px">Space</div><div style="display:flex;flex-direction:column;gap:4px;font-family:'IBM Plex Mono',monospace;font-size:10px;color:#DCE7F5;line-height:1.7"><div>Hall 1 · platform</div><div style="color:#00B8FF;font-weight:600">W3</div><div>14 spaces in section</div></div></div>
+          <div style="position:relative;margin-top:auto;padding:12px;border-top:1px solid rgba(255,255,255,.08);font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#7FA3C9;line-height:1.7">173 of 184 paired</div>
+        </aside>
+        <div style="flex:1;display:flex;flex-direction:column;min-width:0">
+          <header style="flex:none;height:54px;display:flex;align-items:center;gap:12px;padding:0 18px;background:#fff;border-bottom:1px solid #E8ECF3">
+            <div><div style="font-size:13.5px;font-weight:800;letter-spacing:-.01em">Space W3 · companion seats</div><div style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#9AA5B6">2 candidates beside · 3 behind · pairing decides what the booking flow offers first</div></div>
+            <div style="margin-left:auto;display:flex;gap:6px"><div style="height:32px;display:flex;align-items:center;padding:0 11px;border:1px solid #E3E8F0;border-radius:8px;font-size:11px;font-weight:700;color:#5A6577">Apply to all 14</div><div style="height:32px;display:flex;align-items:center;padding:0 12px;border-radius:8px;background:#0D6EFD;color:#fff;font-size:11px;font-weight:700">Save pairing</div></div>
+          </header>
+          <div style="flex:1;display:grid;grid-template-columns:1fr 340px;gap:12px;padding:14px 16px;min-height:0">
+            <div style="background:#EEF1F6;border:1px solid #E3E8F0;border-radius:12px;padding:14px;display:flex;flex-direction:column;gap:11px;min-height:0;overflow:hidden">
+              <div style="flex:1;position:relative;background:#fff;border:1px solid #DCE3ED;border-radius:10px;overflow:hidden;min-height:0;padding:18px">
+                <div style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#9AA5B6;letter-spacing:.1em;text-transform:uppercase">rear stalls · accessible platform</div>
+                <div style="margin-top:16px;display:flex;flex-direction:column;gap:14px">
+                  <div style="display:flex;align-items:center;gap:8px"><span style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#9AA5B6;width:22px">W</span>
+                    <div style="display:flex;gap:8px;align-items:center">
+                      <span style="width:36px;height:30px;border-radius:6px;background:#EEF2F7;border:1px solid #DCE3ED;display:flex;align-items:center;justify-content:center;font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#5A6577">W1</span>
+                      <span style="width:34px;height:30px;border-radius:6px;background:#F3FBF7;border:1px solid #CBE8DA;display:flex;align-items:center;justify-content:center;font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#0B5B41">C1</span>
+                      <span style="width:36px;height:30px;border-radius:6px;background:#EEF2F7;border:1px solid #DCE3ED;display:flex;align-items:center;justify-content:center;font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#5A6577">W2</span>
+                      <span style="width:34px;height:30px;border-radius:6px;background:#F3FBF7;border:1px solid #CBE8DA;display:flex;align-items:center;justify-content:center;font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#0B5B41">C2</span>
+                      <span style="width:36px;height:30px;border-radius:6px;background:#0D6EFD;display:flex;align-items:center;justify-content:center;font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#fff;font-weight:600">W3</span>
+                      <span style="width:34px;height:30px;border-radius:6px;background:#BBD8FF;border:1.5px solid #0D6EFD;display:flex;align-items:center;justify-content:center;font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#0A4FB8;font-weight:600">C3</span>
+                      <span style="width:36px;height:30px;border-radius:6px;background:#EEF2F7;border:1px solid #DCE3ED;display:flex;align-items:center;justify-content:center;font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#5A6577">W4</span>
+                      <span style="width:34px;height:30px;border-radius:6px;background:#F3FBF7;border:1px solid #CBE8DA;display:flex;align-items:center;justify-content:center;font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#0B5B41">C4</span>
+                    </div>
+                  </div>
+                  <div style="display:flex;align-items:center;gap:8px"><span style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#9AA5B6;width:22px">X</span>
+                    <div style="display:flex;gap:5px;align-items:center">
+                      <span style="width:26px;height:26px;border-radius:5px;background:#EEF2F7"></span><span style="width:26px;height:26px;border-radius:5px;background:#EEF2F7"></span><span style="width:26px;height:26px;border-radius:5px;background:#EEF2F7"></span><span style="width:26px;height:26px;border-radius:5px;background:#EEF2F7"></span><span style="width:26px;height:26px;border-radius:5px;background:#FFF3D6;border:1px dashed #B47C1A;display:flex;align-items:center;justify-content:center;font-family:'IBM Plex Mono',monospace;font-size:8.5px;color:#7A5C00">X5</span><span style="width:26px;height:26px;border-radius:5px;background:#EEF2F7"></span><span style="width:26px;height:26px;border-radius:5px;background:#EEF2F7"></span><span style="width:26px;height:26px;border-radius:5px;background:#EEF2F7"></span>
+                    </div>
+                  </div>
+                </div>
+                <div style="position:absolute;left:18px;right:18px;bottom:18px;display:flex;gap:14px;align-items:center">
+                  <div style="display:flex;align-items:center;gap:6px"><span style="width:12px;height:12px;border-radius:3px;background:#0D6EFD"></span><span style="font-size:10.5px;color:#5A6577">selected space</span></div>
+                  <div style="display:flex;align-items:center;gap:6px"><span style="width:12px;height:12px;border-radius:3px;background:#BBD8FF;border:1.5px solid #0D6EFD"></span><span style="font-size:10.5px;color:#5A6577">first companion</span></div>
+                  <div style="display:flex;align-items:center;gap:6px"><span style="width:12px;height:12px;border-radius:3px;background:#FFF3D6;border:1px dashed #B47C1A"></span><span style="font-size:10.5px;color:#5A6577">second choice, row behind</span></div>
+                  <span style="margin-left:auto;font-family:'IBM Plex Mono',monospace;font-size:10px;color:#9AA5B6">clear width 900 mm · level entry 4 m</span>
+                </div>
+              </div>
+              <div style="flex:none;font-size:11px;color:#5A6577;line-height:1.55">C3 sits beside W3 at the same level with no rail between them. X5 is the fallback when C3 is already sold, and the booking flow says so plainly rather than silently seating a companion behind.</div>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:12px;min-height:0">
+              <div style="flex:none;background:#fff;border:1px solid #E8ECF3;border-radius:12px;padding:12px 14px;display:flex;flex-direction:column;gap:9px">
+                <div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em">Pairing for W3</div>
+                <div style="display:flex;flex-direction:column;gap:7px;font-size:11px;color:#5A6577">
+                  <div style="display:flex;align-items:center;gap:8px;padding:7px 9px;border:1.5px solid #BBD8FF;border-radius:7px;background:#F8FBFF"><span style="font-family:'IBM Plex Mono',monospace;color:#0A4FB8;font-weight:600">1</span><span style="flex:1;color:#0A4FB8">C3 · beside, same level</span><span style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#0A4FB8">preferred</span></div>
+                  <div style="display:flex;align-items:center;gap:8px;padding:7px 9px;border:1px solid #E3E8F0;border-radius:7px"><span style="font-family:'IBM Plex Mono',monospace;color:#5A6577">2</span><span style="flex:1">C4 · beside, one space along</span><span style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#9AA5B6">if free</span></div>
+                  <div style="display:flex;align-items:center;gap:8px;padding:7px 9px;border:1px solid #E3E8F0;border-radius:7px"><span style="font-family:'IBM Plex Mono',monospace;color:#5A6577">3</span><span style="flex:1">X5 · row behind</span><span style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#7A5C00">disclosed</span></div>
+                </div>
+                <div style="font-size:10.5px;color:#5A6577;line-height:1.5">Up to three companions can be added; the flow offers them in this order and names the compromise when it reaches option three.</div>
+              </div>
+              <div style="flex:none;background:#fff;border:1px solid #E8ECF3;border-radius:12px;padding:12px 14px;display:flex;flex-direction:column;gap:8px">
+                <div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em">Rules that come with pairing</div>
+                <div style="display:flex;flex-direction:column;gap:5px;font-size:11px;color:#5A6577">
+                  <div style="display:flex;justify-content:space-between"><span>Companion price</span><span style="font-family:'IBM Plex Mono',monospace;color:#0B1324">matches the space</span></div>
+                  <div style="display:flex;justify-content:space-between"><span>Sold separately</span><span style="font-family:'IBM Plex Mono',monospace;color:#0B1324">no</span></div>
+                  <div style="display:flex;justify-content:space-between"><span>Released if space unsold</span><span style="font-family:'IBM Plex Mono',monospace;color:#0B1324">14 days before</span></div>
+                  <div style="display:flex;justify-content:space-between"><span>Max companions</span><span style="font-family:'IBM Plex Mono',monospace;color:#0B1324">3</span></div>
+                </div>
+              </div>
+              <div style="flex:1;min-height:0"></div>
+              <div style="flex:none;background:#fff;border:1px solid #E8ECF3;border-radius:12px;padding:12px 14px;display:flex;flex-direction:column;gap:7px">
+                <div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em">A pair is one decision</div>
+                <div style="font-size:10.5px;color:#5A6577;line-height:1.55">Space and companion move together through holds, reseats and refunds. Splitting them is what produces a guest sitting alone.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;line-height:1.85;color:#7C8899">
+        <div><b style="color:#4A5566;font-weight:600">OPERATIONS</b> · getSpace · listCompanionCandidates · setCompanionPreference · applyPairingToSection · setCompanionPricing</div>
+        <div><b style="color:#4A5566;font-weight:600">STATES</b> · loading · <b style="color:#8A6D00">fallbackBehindOnly — no beside seat available, compromise disclosed</b> · paired · unpaired · error</div>
+        <div><b style="color:#4A5566;font-weight:600">ARRIVES WITH</b> · spaceId←<a href="#seatp-3a">SEATP-3A</a></div>
+        <div><b style="color:#4A5566;font-weight:600">GOES TO</b> · <a href="#seatp-3c">access routes</a> · <a href="#seatp-3f">guest booking</a></div>
+      </div>
+    </div>
+
+    <div id="seatp-3c" data-screen-label="SEATP-3C" data-screen-id="SEATP-3C" data-screen-id-origin="board" style="display:flex;flex-direction:column;gap:13px;scroll-margin-top:24px">
+      <div>
+        <div style="display:flex;align-items:baseline;gap:9px"><span style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:#8494A8">SEATP-3C</span><span style="font-size:16.5px;font-weight:800;letter-spacing:-.015em">Access Routes</span><span style="font-size:9px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;padding:2px 7px;border-radius:5px;background:#FDECEC;color:#A81E1E">one route depends on a lift with no service contract</span></div>
+        <div style="font-size:12px;color:#6B7280;margin-top:3px">The path from the street to the space, step by step, with the width and gradient of each leg. This is what an access enquiry actually asks about.</div>
+      </div>
+      <div style="width:1280px;height:700px;display:flex;background:#F7F9FC;border:1px solid #E3E8F0;border-radius:14px;overflow:hidden;box-shadow:0 16px 38px rgba(12,35,64,.09)">
+        <aside style="flex:none;width:180px;background:#0B1324;display:flex;flex-direction:column;position:relative">
+          <div style="position:absolute;inset:0;background:radial-gradient(300px 200px at 0% 4%,rgba(0,184,255,.20),transparent 70%);pointer-events:none"></div>
+          <div style="position:relative;padding:15px 14px 13px;border-bottom:1px solid rgba(255,255,255,.08)"><img src="assets/ticvai-light-logo.png" alt="TICVAI" style="display:block;height:24px;width:auto"><div style="font-size:9.5px;color:#7FA3C9;margin-top:5px">Access &amp; inclusion</div></div>
+          <div style="position:relative;padding:11px 12px;border-bottom:1px solid rgba(255,255,255,.08)"><div style="font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:.09em;text-transform:uppercase;color:#7FA3C9;margin-bottom:8px">Routes</div><div style="display:flex;flex-direction:column;gap:5px"><div style="padding:7px 9px;border-radius:8px;background:rgba(13,110,253,.30);color:#fff;font-size:10.5px;font-weight:700">Street → platform</div><div style="padding:7px 9px;border-radius:8px;background:rgba(255,255,255,.06);color:#DCE7F5;font-size:10.5px;font-weight:600">Street → circle</div><div style="padding:7px 9px;border-radius:8px;background:rgba(220,38,38,.18);color:#FFC9C9;font-size:10.5px;font-weight:600">Street → upper tier</div><div style="padding:7px 9px;border-radius:8px;background:rgba(255,255,255,.06);color:#DCE7F5;font-size:10.5px;font-weight:600">Car park → foyer</div></div></div>
+          <div style="position:relative;margin-top:auto;padding:12px;border-top:1px solid rgba(255,255,255,.08);font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#7FA3C9;line-height:1.7">4 routes<br>1 at risk</div>
+        </aside>
+        <div style="flex:1;display:flex;flex-direction:column;min-width:0">
+          <header style="flex:none;height:54px;display:flex;align-items:center;gap:12px;padding:0 18px;background:#fff;border-bottom:1px solid #E8ECF3">
+            <div><div style="font-size:13.5px;font-weight:800;letter-spacing:-.01em">Street → accessible platform · Hall 1</div><div style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#9AA5B6">6 legs · 84 m · no steps · narrowest point 920 mm · steepest 1:20</div></div>
+            <div style="margin-left:auto;display:flex;gap:6px"><div style="height:32px;display:flex;align-items:center;padding:0 11px;border:1px solid #E3E8F0;border-radius:8px;font-size:11px;font-weight:700;color:#5A6577">Publish to website</div><div style="height:32px;display:flex;align-items:center;padding:0 12px;border-radius:8px;background:#0D6EFD;color:#fff;font-size:11px;font-weight:700">Save route</div></div>
+          </header>
+          <div style="flex:1;display:grid;grid-template-columns:1fr 336px;gap:12px;padding:14px 16px;min-height:0">
+            <div style="background:#fff;border:1px solid #E8ECF3;border-radius:12px;display:flex;flex-direction:column;overflow:hidden;min-height:0">
+              <div style="flex:none;display:grid;grid-template-columns:30px 1.6fr 82px 82px 1fr;padding:9px 14px;font-size:9px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:#94A0B4;border-bottom:1px solid #EDF1F6"><div></div><div>Leg</div><div style="text-align:right">Width</div><div style="text-align:right">Gradient</div><div>Note</div></div>
+              <div style="display:grid;grid-template-columns:30px 1.6fr 82px 82px 1fr;align-items:center;padding:11px 14px;font-size:11.5px;border-bottom:1px solid #F4F6FA"><div style="font-family:'IBM Plex Mono',monospace;color:#9AA5B6">1</div><div style="font-weight:600">Drop-off bay to main door · 12 m</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">2 400</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">level</div><div style="font-size:10.5px;color:#5A6577">dropped kerb, tactile paving</div></div>
+              <div style="display:grid;grid-template-columns:30px 1.6fr 82px 82px 1fr;align-items:center;padding:11px 14px;font-size:11.5px;border-bottom:1px solid #F4F6FA"><div style="font-family:'IBM Plex Mono',monospace;color:#9AA5B6">2</div><div style="font-weight:600">Main door, automatic · 1 leaf</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">1 100</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">level</div><div style="font-size:10.5px;color:#5A6577">held open at doors-open time</div></div>
+              <div style="display:grid;grid-template-columns:30px 1.6fr 82px 82px 1fr;align-items:center;padding:11px 14px;font-size:11.5px;border-bottom:1px solid #F4F6FA;background:#FFFBF4"><div style="font-family:'IBM Plex Mono',monospace;color:#7A5C00">3</div><div style="font-weight:600;color:#7A5C00">Foyer crossing, past the bar · 26 m</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right;color:#7A5C00">920</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right;color:#7A5C00">level</div><div style="font-size:10.5px;color:#7A5C00">narrowest point · queue barrier at busy times</div></div>
+              <div style="display:grid;grid-template-columns:30px 1.6fr 82px 82px 1fr;align-items:center;padding:11px 14px;font-size:11.5px;border-bottom:1px solid #F4F6FA"><div style="font-family:'IBM Plex Mono',monospace;color:#9AA5B6">4</div><div style="font-weight:600">Ramp to stalls level · 14 m</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">1 500</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">1:20</div><div style="font-size:10.5px;color:#5A6577">handrail both sides, landing halfway</div></div>
+              <div style="display:grid;grid-template-columns:30px 1.6fr 82px 82px 1fr;align-items:center;padding:11px 14px;font-size:11.5px;border-bottom:1px solid #F4F6FA"><div style="font-family:'IBM Plex Mono',monospace;color:#9AA5B6">5</div><div style="font-weight:600">Door 4 into the auditorium</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">1 050</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">level</div><div style="font-size:10.5px;color:#5A6577">staffed, opens inward</div></div>
+              <div style="display:grid;grid-template-columns:30px 1.6fr 82px 82px 1fr;align-items:center;padding:11px 14px;font-size:11.5px;border-bottom:1px solid #F4F6FA"><div style="font-family:'IBM Plex Mono',monospace;color:#9AA5B6">6</div><div style="font-weight:600">Rear aisle to the platform · 18 m</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">1 600</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">level</div><div style="font-size:10.5px;color:#5A6577">arrives beside W1–W4</div></div>
+              <div style="flex:none;padding:12px 14px;border-top:1px solid #EDF1F6;background:#F3FBF7;display:flex;gap:11px"><span style="width:3px;border-radius:2px;background:#0E9F6E;flex:none"></span><div style="flex:1;font-size:11px;color:#0B5B41;line-height:1.55">This route has no steps and no lift, so it works during a power cut and during a fire evacuation. It is the route the website should describe first.</div></div>
+              <div style="flex:none;padding:12px 14px;border-top:1px solid #EDF1F6;background:#FDF5F5;display:flex;gap:11px"><span style="width:3px;border-radius:2px;background:#DC2626;flex:none"></span><div style="flex:1;font-size:11px;color:#8A2020;line-height:1.55">The upper tier route depends on lift 2, which has no current service contract. Six spaces up there are sold on the assumption that a lift works.</div></div>
+              <div style="margin-top:auto;flex:none;padding:11px 14px;border-top:1px solid #EDF1F6;font-size:11px;color:#5A6577;line-height:1.55">Legs are measured, not estimated. "Step-free access available" is a claim; six numbered legs with widths is an answer.</div>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:12px;min-height:0">
+              <div style="flex:none;background:#fff;border:1.5px solid #F5C9C9;border-radius:12px;padding:12px 14px;display:flex;flex-direction:column;gap:8px">
+                <div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em;color:#8A2020">Lift 2 · upper tier</div>
+                <div style="display:flex;flex-direction:column;gap:5px;font-size:11px;color:#5A6577">
+                  <div style="display:flex;justify-content:space-between"><span>Spaces depending on it</span><span style="font-family:'IBM Plex Mono',monospace;color:#8A2020">6</span></div>
+                  <div style="display:flex;justify-content:space-between"><span>Last service</span><span style="font-family:'IBM Plex Mono',monospace;color:#8A2020">Feb 2025</span></div>
+                  <div style="display:flex;justify-content:space-between"><span>Failures this year</span><span style="font-family:'IBM Plex Mono',monospace;color:#8A2020">3</span></div>
+                  <div style="display:flex;justify-content:space-between"><span>Alternative route</span><span style="font-family:'IBM Plex Mono',monospace;color:#8A2020">none</span></div>
+                </div>
+                <div style="font-size:10.5px;color:#5A6577;line-height:1.5">Until there is a contract or an alternative, those six spaces should be sold with the dependency stated on the ticket.</div>
+                <div style="height:30px;border-radius:9px;background:#0D6EFD;color:#fff;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700">Flag dependency on those 6 spaces</div>
+              </div>
+              <div style="flex:none;background:#fff;border:1px solid #E8ECF3;border-radius:12px;padding:12px 14px;display:flex;flex-direction:column;gap:8px">
+                <div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em">Published to the guest as</div>
+                <div style="font-size:10.5px;color:#5A6577;line-height:1.6;padding:9px 11px;background:#FBFCFE;border:1px solid #EDF1F6;border-radius:8px">Step-free from the drop-off bay to your space: 84 m, one 1:20 ramp with handrails, narrowest doorway 1 050 mm. No lift needed. Staffed door into the auditorium.</div>
+                <div style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#9AA5B6">generated from the legs above · reviewed by the access lead</div>
+              </div>
+              <div style="flex:1;min-height:0"></div>
+              <div style="flex:none;background:#fff;border:1px solid #E8ECF3;border-radius:12px;padding:12px 14px;display:flex;flex-direction:column;gap:7px">
+                <div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em">Routes expire</div>
+                <div style="font-size:10.5px;color:#5A6577;line-height:1.55">A route is re-walked when anything on it changes: a new bar, a queue barrier, a door held shut for security. The foyer leg has changed twice this year.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;line-height:1.85;color:#7C8899">
+        <div><b style="color:#4A5566;font-weight:600">OPERATIONS</b> · listAccessRoutes · setRouteLegs · getRouteDependencies · publishRouteDescription · flagDependency</div>
+        <div><b style="color:#4A5566;font-weight:600">STATES</b> · loading · <b style="color:#A81E1E">routeDependsOnUnservicedLift</b> · narrowLegWarning · routeStale · published · error</div>
+        <div><b style="color:#4A5566;font-weight:600">ARRIVES WITH</b> · spaceId←<a href="#seatp-3b">SEATP-3B</a></div>
+        <div><b style="color:#4A5566;font-weight:600">GOES TO</b> · <a href="#seatp-3d">requirements profile</a> · <a href="#seatp-3g">evacuation plan</a></div>
+      </div>
+    </div>
+
+    <div id="seatp-3d" data-screen-label="SEATP-3D" data-screen-id="SEATP-3D" data-screen-id-origin="board" style="display:flex;flex-direction:column;gap:13px;scroll-margin-top:24px">
+      <div>
+        <div style="display:flex;align-items:baseline;gap:9px"><span style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:#8494A8">SEATP-3D</span><span style="font-size:16.5px;font-weight:800;letter-spacing:-.015em">Guest Requirements Profile</span><span style="font-size:9px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;padding:2px 7px;border-radius:5px;background:#EDF3FF;color:#0A4FB8">stored once, honoured every time</span></div>
+        <div style="font-size:12px;color:#6B7280;margin-top:3px">A guest's access needs recorded against their account so they never explain them twice, with a clear record of who can see what and for how long.</div>
+      </div>
+      <div style="width:1280px;height:700px;display:flex;background:#F7F9FC;border:1px solid #E3E8F0;border-radius:14px;overflow:hidden;box-shadow:0 16px 38px rgba(12,35,64,.09)">
+        <aside style="flex:none;width:180px;background:#0B1324;display:flex;flex-direction:column;position:relative">
+          <div style="position:absolute;inset:0;background:radial-gradient(300px 200px at 0% 4%,rgba(0,184,255,.20),transparent 70%);pointer-events:none"></div>
+          <div style="position:relative;padding:15px 14px 13px;border-bottom:1px solid rgba(255,255,255,.08)"><img src="assets/ticvai-light-logo.png" alt="TICVAI" style="display:block;height:24px;width:auto"><div style="font-size:9.5px;color:#7FA3C9;margin-top:5px">Access &amp; inclusion</div></div>
+          <div style="position:relative;padding:11px 12px;border-bottom:1px solid rgba(255,255,255,.08)"><div style="font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:.09em;text-transform:uppercase;color:#7FA3C9;margin-bottom:8px">Guest</div><div style="display:flex;flex-direction:column;gap:4px;font-family:'IBM Plex Mono',monospace;font-size:10px;color:#DCE7F5;line-height:1.7"><div style="color:#00B8FF;font-weight:600">M. Adeyemi</div><div>member since 2019</div><div>28 bookings</div></div></div>
+          <div style="position:relative;margin-top:auto;padding:12px;border-top:1px solid rgba(255,255,255,.08);font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#7FA3C9;line-height:1.7">profile confirmed<br>Mar 2026 · renews yearly</div>
+        </aside>
+        <div style="flex:1;display:flex;flex-direction:column;min-width:0">
+          <header style="flex:none;height:54px;display:flex;align-items:center;gap:12px;padding:0 18px;background:#fff;border-bottom:1px solid #E8ECF3">
+            <div><div style="font-size:13.5px;font-weight:800;letter-spacing:-.01em">Access profile · M. Adeyemi</div><div style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#9AA5B6">wheelchair space · 1 companion · hearing loop · confirmed Mar 2026 · visible to box office and duty manager</div></div>
+            <div style="margin-left:auto;display:flex;gap:6px"><div style="height:32px;display:flex;align-items:center;padding:0 11px;border:1px solid #E3E8F0;border-radius:8px;font-size:11px;font-weight:700;color:#5A6577">Access log</div><div style="height:32px;display:flex;align-items:center;padding:0 12px;border-radius:8px;background:#0D6EFD;color:#fff;font-size:11px;font-weight:700">Save profile</div></div>
+          </header>
+          <div style="flex:1;display:grid;grid-template-columns:1fr 1fr 300px;gap:12px;padding:14px 16px;min-height:0">
+            <div style="background:#fff;border:1px solid #E8ECF3;border-radius:12px;padding:13px 15px;display:flex;flex-direction:column;gap:11px;min-height:0;overflow:hidden">
+              <div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em">Needs</div>
+              <div style="display:flex;flex-direction:column;gap:7px;font-size:11px;color:#5A6577">
+                <div style="display:flex;align-items:center;gap:9px;padding:8px 10px;border:1.5px solid #BBD8FF;border-radius:8px;background:#F8FBFF"><span style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#0A4FB8">✓</span><span style="flex:1;color:#0A4FB8;font-weight:600">Wheelchair space · 900 mm</span></div>
+                <div style="display:flex;align-items:center;gap:9px;padding:8px 10px;border:1.5px solid #BBD8FF;border-radius:8px;background:#F8FBFF"><span style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#0A4FB8">✓</span><span style="flex:1;color:#0A4FB8;font-weight:600">One companion, beside</span></div>
+                <div style="display:flex;align-items:center;gap:9px;padding:8px 10px;border:1.5px solid #BBD8FF;border-radius:8px;background:#F8FBFF"><span style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#0A4FB8">✓</span><span style="flex:1;color:#0A4FB8;font-weight:600">Hearing loop coverage</span></div>
+                <div style="display:flex;align-items:center;gap:9px;padding:8px 10px;border:1px solid #E3E8F0;border-radius:8px"><span style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#9AA5B6">—</span><span style="flex:1">Transfer seat</span></div>
+                <div style="display:flex;align-items:center;gap:9px;padding:8px 10px;border:1px solid #E3E8F0;border-radius:8px"><span style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#9AA5B6">—</span><span style="flex:1">Assistance dog space</span></div>
+                <div style="display:flex;align-items:center;gap:9px;padding:8px 10px;border:1px solid #E3E8F0;border-radius:8px"><span style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#9AA5B6">—</span><span style="flex:1">Step-free with no ramp</span></div>
+              </div>
+              <div style="margin-top:auto;font-size:10.5px;color:#5A6577;line-height:1.5">Needs are chosen from a fixed list so they can drive seat matching. Free text goes in the note field, not here.</div>
+            </div>
+            <div style="background:#fff;border:1px solid #E8ECF3;border-radius:12px;padding:13px 15px;display:flex;flex-direction:column;gap:11px;min-height:0;overflow:hidden">
+              <div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em">Evidence and renewal</div>
+              <div style="display:flex;flex-direction:column;gap:6px;font-size:11px;color:#5A6577">
+                <div style="display:flex;justify-content:space-between"><span>Status</span><span style="font-family:'IBM Plex Mono',monospace;color:#0B5B41">confirmed</span></div>
+                <div style="display:flex;justify-content:space-between"><span>Confirmed on</span><span style="font-family:'IBM Plex Mono',monospace;color:#0B1324">14 Mar 2026</span></div>
+                <div style="display:flex;justify-content:space-between"><span>Confirmed by</span><span style="font-family:'IBM Plex Mono',monospace;color:#0B1324">access team</span></div>
+                <div style="display:flex;justify-content:space-between"><span>Evidence held</span><span style="font-family:'IBM Plex Mono',monospace;color:#0B1324">none required</span></div>
+                <div style="display:flex;justify-content:space-between"><span>Renews</span><span style="font-family:'IBM Plex Mono',monospace;color:#0B1324">Mar 2027</span></div>
+              </div>
+              <div style="font-size:10.5px;color:#5A6577;line-height:1.55">The house does not ask for medical evidence to book a wheelchair space. The profile records that decision explicitly so nobody asks for it at the counter.</div>
+              <div style="display:flex;flex-direction:column;gap:6px;font-size:11px;color:#5A6577;padding-top:4px;border-top:1px solid #EDF1F6">
+                <div style="font-size:9.5px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#94A0B4">Note for staff</div>
+                <div style="font-size:10.5px;color:#5A6577;line-height:1.55;padding:9px 11px;background:#FBFCFE;border:1px solid #EDF1F6;border-radius:8px">Prefers to arrive after the house opens rather than early. Do not offer to move her chair; she will ask if she needs help.</div>
+              </div>
+              <div style="margin-top:auto;font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#9AA5B6">written by the guest, editable by the guest</div>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:12px;min-height:0">
+              <div style="flex:none;background:#fff;border:1px solid #E8ECF3;border-radius:12px;padding:12px 14px;display:flex;flex-direction:column;gap:8px">
+                <div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em">Who can see this</div>
+                <div style="display:flex;flex-direction:column;gap:5px;font-size:11px;color:#5A6577">
+                  <div style="display:flex;justify-content:space-between"><span>Box office</span><span style="font-family:'IBM Plex Mono',monospace;color:#0B1324">needs only</span></div>
+                  <div style="display:flex;justify-content:space-between"><span>Duty manager</span><span style="font-family:'IBM Plex Mono',monospace;color:#0B1324">needs + note</span></div>
+                  <div style="display:flex;justify-content:space-between"><span>Ushers</span><span style="font-family:'IBM Plex Mono',monospace;color:#0B1324">seat only</span></div>
+                  <div style="display:flex;justify-content:space-between"><span>Marketing</span><span style="font-family:'IBM Plex Mono',monospace;color:#8A2020">no access</span></div>
+                </div>
+                <div style="font-size:10.5px;color:#5A6577;line-height:1.5">Every view of this profile is logged and shown to the guest on request.</div>
+              </div>
+              <div style="flex:none;background:#fff;border:1px solid #CBE8DA;border-radius:12px;padding:12px 14px;display:flex;flex-direction:column;gap:7px">
+                <div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em;color:#0B5B41">28 bookings, no re-explaining</div>
+                <div style="font-size:10.5px;color:#5A6577;line-height:1.55">Since the profile was confirmed, every booking has matched a space and a companion seat automatically. Two required a phone call, both about a lift.</div>
+              </div>
+              <div style="flex:1;min-height:0"></div>
+              <div style="flex:none;background:#fff;border:1px solid #E8ECF3;border-radius:12px;padding:12px 14px;display:flex;flex-direction:column;gap:7px">
+                <div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em">Deletable on request</div>
+                <div style="font-size:10.5px;color:#5A6577;line-height:1.55">The guest can remove the profile at any time; bookings already made keep the seat, not the reason.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;line-height:1.85;color:#7C8899">
+        <div><b style="color:#4A5566;font-weight:600">OPERATIONS</b> · getAccessProfile · setRequirements · setStaffNote · getProfileAccessLog · deleteProfile</div>
+        <div><b style="color:#4A5566;font-weight:600">STATES</b> · loading · confirmed · <b style="color:#8A6D00">renewalDue — profile older than twelve months</b> · guestEditPending · deleted · error</div>
+        <div><b style="color:#4A5566;font-weight:600">ARRIVES WITH</b> · guestId←CRM · bookingId←box office</div>
+        <div><b style="color:#4A5566;font-weight:600">GOES TO</b> · <a href="#seatp-3f">guest booking</a> · <a href="#seatp-3h">box office assist</a></div>
+      </div>
+    </div>
+
+    <div id="seatp-3e" data-screen-label="SEATP-3E" data-screen-id="SEATP-3E" data-screen-id-origin="board" style="display:flex;flex-direction:column;gap:13px;scroll-margin-top:24px">
+      <div>
+        <div style="display:flex;align-items:baseline;gap:9px"><span style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:#8494A8">SEATP-3E</span><span style="font-size:16.5px;font-weight:800;letter-spacing:-.015em">Release Rules</span><span style="font-size:9px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;padding:2px 7px;border-radius:5px;background:#FDECEC;color:#A81E1E">1 rule released seats 40 minutes before curtain</span></div>
+        <div style="font-size:12px;color:#6B7280;margin-top:3px">When held access seats go back on general sale, and when the companion seat follows. Automatic, dated, and visible to everyone rather than living in one person's inbox.</div>
+      </div>
+      <div style="width:1280px;height:700px;display:flex;background:#F7F9FC;border:1px solid #E3E8F0;border-radius:14px;overflow:hidden;box-shadow:0 16px 38px rgba(12,35,64,.09)">
+        <aside style="flex:none;width:180px;background:#0B1324;display:flex;flex-direction:column;position:relative">
+          <div style="position:absolute;inset:0;background:radial-gradient(300px 200px at 0% 4%,rgba(0,184,255,.20),transparent 70%);pointer-events:none"></div>
+          <div style="position:relative;padding:15px 14px 13px;border-bottom:1px solid rgba(255,255,255,.08)"><img src="assets/ticvai-light-logo.png" alt="TICVAI" style="display:block;height:24px;width:auto"><div style="font-size:9.5px;color:#7FA3C9;margin-top:5px">Access &amp; inclusion</div></div>
+          <nav style="position:relative;display:flex;flex-direction:column;gap:2px;padding:11px 9px">
+            <div style="padding:8px 10px;border-radius:9px;color:#8296B0;font-size:11.5px;font-weight:600">Spaces</div>
+            <div style="padding:8px 10px;border-radius:9px;color:#8296B0;font-size:11.5px;font-weight:600">Companions</div>
+            <div style="padding:8px 10px;border-radius:9px;color:#8296B0;font-size:11.5px;font-weight:600">Routes</div>
+            <div style="padding:8px 10px;border-radius:9px;color:#8296B0;font-size:11.5px;font-weight:600">Requirements</div>
+            <div style="padding:8px 10px;border-radius:9px;background:linear-gradient(90deg,rgba(13,110,253,.30),rgba(0,184,255,.10));color:#fff;font-size:11.5px;font-weight:700;box-shadow:inset 2px 0 0 #00B8FF">Release rules</div>
+            <div style="padding:8px 10px;border-radius:9px;color:#8296B0;font-size:11.5px;font-weight:600">Assisted services</div>
+            <div style="padding:8px 10px;border-radius:9px;color:#8296B0;font-size:11.5px;font-weight:600">Reporting</div>
+          </nav>
+          <div style="position:relative;margin-top:auto;padding:12px;border-top:1px solid rgba(255,255,255,.08);font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#7FA3C9;line-height:1.7">5 rules<br>1 needs changing</div>
+        </aside>
+        <div style="flex:1;display:flex;flex-direction:column;min-width:0">
+          <header style="flex:none;height:54px;display:flex;align-items:center;gap:12px;padding:0 18px;background:#fff;border-bottom:1px solid #E8ECF3">
+            <div><div style="font-size:13.5px;font-weight:800;letter-spacing:-.01em">Release rules · access inventory</div><div style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#9AA5B6">5 rules · applied to 184 spaces and 173 companion seats · last release 3 days ago</div></div>
+            <div style="margin-left:auto;display:flex;gap:6px"><div style="height:32px;display:flex;align-items:center;padding:0 11px;border:1px solid #E3E8F0;border-radius:8px;font-size:11px;font-weight:700;color:#5A6577">Release history</div><div style="height:32px;display:flex;align-items:center;padding:0 12px;border-radius:8px;background:#0D6EFD;color:#fff;font-size:11px;font-weight:700">New rule</div></div>
+          </header>
+          <div style="flex:1;display:grid;grid-template-columns:1fr 330px;gap:12px;padding:14px 16px;min-height:0">
+            <div style="background:#fff;border:1px solid #E8ECF3;border-radius:12px;display:flex;flex-direction:column;overflow:hidden;min-height:0">
+              <div style="flex:none;display:grid;grid-template-columns:1.4fr 1.1fr 1fr 88px;padding:9px 14px;font-size:9px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:#94A0B4;border-bottom:1px solid #EDF1F6"><div>Rule</div><div>Applies to</div><div>Releases</div><div style="text-align:right">Status</div></div>
+              <div style="display:grid;grid-template-columns:1.4fr 1.1fr 1fr 88px;align-items:center;padding:11px 14px;font-size:11.5px;border-bottom:1px solid #F4F6FA;background:#FDF5F5"><div><div style="font-weight:700;color:#8A2020">Companion seat release</div><div style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#8A2020">40 min before curtain</div></div><div style="font-size:10.5px;color:#8A2020">173 companion seats</div><div style="font-size:10.5px;color:#8A2020">to general sale</div><div style="text-align:right"><span style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;padding:2px 7px;border-radius:5px;background:#FDECEC;color:#A81E1E">too late</span></div></div>
+              <div style="display:grid;grid-template-columns:1.4fr 1.1fr 1fr 88px;align-items:center;padding:11px 14px;font-size:11.5px;border-bottom:1px solid #F4F6FA"><div><div style="font-weight:600">Unsold space release</div><div style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#9AA5B6">7 days before</div></div><div style="font-size:10.5px;color:#5A6577">all wheelchair spaces</div><div style="font-size:10.5px;color:#5A6577">to general sale, standing price</div><div style="text-align:right"><span style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;padding:2px 7px;border-radius:5px;background:#E8F6F0;color:#0B7A55">active</span></div></div>
+              <div style="display:grid;grid-template-columns:1.4fr 1.1fr 1fr 88px;align-items:center;padding:11px 14px;font-size:11.5px;border-bottom:1px solid #F4F6FA"><div><div style="font-weight:600">Transfer seat hold</div><div style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#9AA5B6">holds while space sold</div></div><div style="font-size:10.5px;color:#5A6577">26 transfer seats</div><div style="font-size:10.5px;color:#5A6577">never, while paired</div><div style="text-align:right"><span style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;padding:2px 7px;border-radius:5px;background:#E8F6F0;color:#0B7A55">active</span></div></div>
+              <div style="display:grid;grid-template-columns:1.4fr 1.1fr 1fr 88px;align-items:center;padding:11px 14px;font-size:11.5px;border-bottom:1px solid #F4F6FA"><div><div style="font-weight:600">Removable seat conversion</div><div style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#9AA5B6">48 h notice required</div></div><div style="font-size:10.5px;color:#5A6577">Harbour Lights · 4 spaces</div><div style="font-size:10.5px;color:#5A6577">back to 8 fixed seats</div><div style="text-align:right"><span style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;padding:2px 7px;border-radius:5px;background:#E8F6F0;color:#0B7A55">active</span></div></div>
+              <div style="display:grid;grid-template-columns:1.4fr 1.1fr 1fr 88px;align-items:center;padding:11px 14px;font-size:11.5px"><div><div style="font-weight:600">Sold-out sweep</div><div style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#9AA5B6">when house &gt; 95% sold</div></div><div style="font-size:10.5px;color:#5A6577">unsold spaces</div><div style="font-size:10.5px;color:#5A6577">stay held, alert raised</div><div style="text-align:right"><span style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;padding:2px 7px;border-radius:5px;background:#E8F6F0;color:#0B7A55">active</span></div></div>
+              <div style="margin-top:auto;flex:none;padding:12px 14px;border-top:1px solid #EDF1F6;background:#FDF5F5;display:flex;gap:11px"><span style="width:3px;border-radius:2px;background:#DC2626;flex:none"></span><div style="flex:1;font-size:11px;color:#8A2020;line-height:1.55">Releasing companion seats 40 minutes before curtain means a guest who books at the door cannot bring anyone. Nine such bookings last season each ended with a member of staff giving up a seat.</div></div>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:12px;min-height:0">
+              <div style="flex:none;background:#fff;border:1.5px solid #F5C9C9;border-radius:12px;padding:12px 14px;display:flex;flex-direction:column;gap:8px">
+                <div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em;color:#8A2020">Proposed change</div>
+                <div style="display:flex;flex-direction:column;gap:6px;font-size:11px;color:#5A6577">
+                  <div style="display:flex;justify-content:space-between"><span>Was</span><span style="font-family:'IBM Plex Mono',monospace;color:#8A2020">40 min before curtain</span></div>
+                  <div style="display:flex;justify-content:space-between"><span>Becomes</span><span style="font-family:'IBM Plex Mono',monospace;color:#0A4FB8">when the space sells, or 24 h before</span></div>
+                  <div style="display:flex;justify-content:space-between"><span>Seats affected</span><span style="font-family:'IBM Plex Mono',monospace;color:#0B1324">173</span></div>
+                  <div style="display:flex;justify-content:space-between"><span>Est. extra seats sold</span><span style="font-family:'IBM Plex Mono',monospace;color:#0B5B41">+ 120 a season</span></div>
+                </div>
+                <div style="height:30px;border-radius:9px;background:#0D6EFD;color:#fff;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700">Apply from next on-sale</div>
+              </div>
+              <div style="flex:none;background:#fff;border:1px solid #E8ECF3;border-radius:12px;padding:12px 14px;display:flex;flex-direction:column;gap:8px">
+                <div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em">Last release · 3 days ago</div>
+                <div style="display:flex;flex-direction:column;gap:5px;font-size:11px;color:#5A6577">
+                  <div style="display:flex;justify-content:space-between"><span>Spaces released</span><span style="font-family:'IBM Plex Mono',monospace;color:#0B1324">6</span></div>
+                  <div style="display:flex;justify-content:space-between"><span>Sold after release</span><span style="font-family:'IBM Plex Mono',monospace;color:#0B1324">6</span></div>
+                  <div style="display:flex;justify-content:space-between"><span>Access enquiries after</span><span style="font-family:'IBM Plex Mono',monospace;color:#8A2020">2 turned away</span></div>
+                </div>
+                <div style="font-size:10.5px;color:#5A6577;line-height:1.5">Two guests wanted a space in a house that had just released its last one. A sold-out sweep exists precisely to catch this.</div>
+              </div>
+              <div style="flex:1;min-height:0"></div>
+              <div style="flex:none;background:#fff;border:1px solid #E8ECF3;border-radius:12px;padding:12px 14px;display:flex;flex-direction:column;gap:7px">
+                <div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em">Rules, not favours</div>
+                <div style="font-size:10.5px;color:#5A6577;line-height:1.55">Access seats released by a person on request will always be released late, or not at all when that person is away. A dated rule is the whole improvement.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;line-height:1.85;color:#7C8899">
+        <div><b style="color:#4A5566;font-weight:600">OPERATIONS</b> · listReleaseRules · setReleaseTiming · previewReleaseImpact · getReleaseHistory · runSoldOutSweep</div>
+        <div><b style="color:#4A5566;font-weight:600">STATES</b> · loading · active · <b style="color:#A81E1E">releaseTooLate — companion seats released after doors open</b> · noticeRequired · sweepAlert · error</div>
+        <div><b style="color:#4A5566;font-weight:600">ARRIVES WITH</b> · tenantId←context · spaces←<a href="#seatp-3a">SEATP-3A</a></div>
+        <div><b style="color:#4A5566;font-weight:600">GOES TO</b> · <a href="#seatp-3f">guest booking</a> · <a href="#seatp-3j">access reporting</a></div>
+      </div>
+    </div>
+
+    <div id="seatp-3f" data-screen-label="SEATP-3F" data-screen-id="SEATP-3F" data-screen-id-origin="board" style="display:flex;flex-direction:column;gap:13px;scroll-margin-top:24px">
+      <div>
+        <div style="display:flex;align-items:baseline;gap:9px"><span style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:#8494A8">SEATP-3F</span><span style="font-size:16.5px;font-weight:800;letter-spacing:-.015em">Guest · Booking an Accessible Space</span><span style="font-size:9px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;padding:2px 7px;border-radius:5px;background:#EDF3FF;color:#0A4FB8">web · 1280 wide</span></div>
+        <div style="font-size:12px;color:#6B7280;margin-top:3px">The same seat map as everyone else, with access spaces shown as available inventory, the route stated in metres, and the companion seat added in the same step.</div>
+      </div>
+      <div style="width:1280px;height:700px;display:flex;flex-direction:column;background:#fff;border:1px solid #E3E8F0;border-radius:14px;overflow:hidden;box-shadow:0 16px 38px rgba(12,35,64,.09)">
+        <header style="flex:none;height:58px;display:flex;align-items:center;gap:16px;padding:0 24px;border-bottom:1px solid #EDF1F6">
+          <img src="assets/ticvai-dark-logo.png" alt="TICVAI" style="display:block;height:22px;width:auto">
+          <div style="font-size:12px;color:#5A6577">Riverside · Hall 1</div>
+          <div style="margin-left:auto;display:flex;align-items:center;gap:16px;font-size:12px;color:#5A6577"><span>Fri 4 Sep · 19:30</span><span style="font-weight:700;color:#0B1324">Access booking</span><span style="height:32px;display:flex;align-items:center;padding:0 13px;border-radius:8px;background:#0B1324;color:#fff;font-size:11.5px;font-weight:700">Basket · 2</span></div>
+        </header>
+        <div style="flex:1;display:grid;grid-template-columns:1fr 380px;min-height:0">
+          <div style="display:flex;flex-direction:column;gap:14px;padding:20px 24px;min-height:0;border-right:1px solid #EDF1F6">
+            <div style="flex:none">
+              <div style="font-size:19px;font-weight:800;letter-spacing:-.015em">Choose your space</div>
+              <div style="font-size:12.5px;color:#5A6577;margin-top:4px;line-height:1.6">Four wheelchair spaces are free on the rear platform, each with a companion seat beside it. Step-free from the drop-off bay, no lift needed.</div>
+            </div>
+            <div style="flex:1;position:relative;background:#F7F9FC;border:1px solid #E8ECF3;border-radius:12px;overflow:hidden;min-height:0;padding:16px">
+              <div style="position:absolute;left:10%;right:10%;top:8%;height:28px;border-radius:5px;background:#0B1324;display:flex;align-items:center;justify-content:center;font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.14em;color:#8FB6DE">STAGE</div>
+              <div style="position:absolute;left:10%;right:10%;top:24%;height:30%;border-radius:8px;background:#E9EEF6;border:1px solid #DCE3ED;display:flex;align-items:center;justify-content:center;font-size:11.5px;color:#8494A8">Stalls A–P · 1 280 seats</div>
+              <div style="position:absolute;left:10%;right:10%;top:60%;height:16%;border-radius:8px;background:#F3FBF7;border:1.5px solid #7BE0B8;display:flex;align-items:center;justify-content:center;gap:10px;padding:0 14px">
+                <span style="font-size:11.5px;font-weight:700;color:#0B5B41">Accessible platform · level entry</span>
+                <span style="display:flex;gap:7px">
+                  <span style="width:32px;height:26px;border-radius:6px;background:#0D6EFD;display:flex;align-items:center;justify-content:center;font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#fff;font-weight:600">W1</span>
+                  <span style="width:32px;height:26px;border-radius:6px;background:#BBD8FF;display:flex;align-items:center;justify-content:center;font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#0A4FB8">W2</span>
+                  <span style="width:32px;height:26px;border-radius:6px;background:#BBD8FF;display:flex;align-items:center;justify-content:center;font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#0A4FB8">W3</span>
+                  <span style="width:32px;height:26px;border-radius:6px;background:#BBD8FF;display:flex;align-items:center;justify-content:center;font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#0A4FB8">W4</span>
+                  <span style="width:32px;height:26px;border-radius:6px;background:#E9EEF6;display:flex;align-items:center;justify-content:center;font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#9AA5B6">sold</span>
+                </span>
+              </div>
+              <div style="position:absolute;left:10%;right:10%;bottom:8%;display:flex;align-items:center;gap:14px">
+                <div style="display:flex;align-items:center;gap:6px"><span style="width:12px;height:12px;border-radius:3px;background:#0D6EFD"></span><span style="font-size:11px;color:#5A6577">chosen</span></div>
+                <div style="display:flex;align-items:center;gap:6px"><span style="width:12px;height:12px;border-radius:3px;background:#BBD8FF"></span><span style="font-size:11px;color:#5A6577">available</span></div>
+                <div style="display:flex;align-items:center;gap:6px"><span style="width:12px;height:12px;border-radius:3px;background:#E9EEF6"></span><span style="font-size:11px;color:#5A6577">sold</span></div>
+                <a href="#seatp-3c" style="margin-left:auto;font-size:11.5px;font-weight:700">See the step-free route</a>
+              </div>
+            </div>
+            <div style="flex:none;display:grid;grid-template-columns:repeat(3,1fr);gap:11px">
+              <div style="border:1px solid #E8ECF3;border-radius:11px;padding:11px 13px;display:flex;flex-direction:column;gap:3px"><span style="font-size:9.5px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#94A0B4">Space width</span><span style="font-family:'IBM Plex Mono',monospace;font-size:13px">900 mm</span><span style="font-size:10.5px;color:#5A6577">clear of the aisle</span></div>
+              <div style="border:1px solid #E8ECF3;border-radius:11px;padding:11px 13px;display:flex;flex-direction:column;gap:3px"><span style="font-size:9.5px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#94A0B4">To your space</span><span style="font-family:'IBM Plex Mono',monospace;font-size:13px">84 m · no steps</span><span style="font-size:10.5px;color:#5A6577">one 1:20 ramp</span></div>
+              <div style="border:1px solid #E8ECF3;border-radius:11px;padding:11px 13px;display:flex;flex-direction:column;gap:3px"><span style="font-size:9.5px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#94A0B4">Accessible WC</span><span style="font-family:'IBM Plex Mono',monospace;font-size:13px">22 m</span><span style="font-size:10.5px;color:#5A6577">same level</span></div>
+            </div>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:14px;padding:20px 22px;background:#FBFCFE;min-height:0">
+            <div style="flex:none;display:flex;flex-direction:column;gap:9px">
+              <div style="font-size:14px;font-weight:800;letter-spacing:-.01em">Your booking</div>
+              <div style="border:1px solid #E8ECF3;border-radius:11px;background:#fff;padding:12px 13px;display:flex;flex-direction:column;gap:9px">
+                <div style="display:flex;justify-content:space-between;align-items:baseline"><div><div style="font-size:12.5px;font-weight:700">Wheelchair space W1</div><div style="font-size:11px;color:#5A6577">Accessible platform · level entry</div></div><span style="font-family:'IBM Plex Mono',monospace;font-size:12.5px">£38.00</span></div>
+                <div style="height:1px;background:#EDF1F6"></div>
+                <div style="display:flex;justify-content:space-between;align-items:baseline"><div><div style="font-size:12.5px;font-weight:700">Companion seat C1</div><div style="font-size:11px;color:#5A6577">Beside W1, same level</div></div><span style="font-family:'IBM Plex Mono',monospace;font-size:12.5px">£38.00</span></div>
+                <div style="font-size:11px;color:#0B5B41;background:#F3FBF7;border:1px solid #CBE8DA;border-radius:8px;padding:8px 10px;line-height:1.5">Your saved access profile matched this pair automatically. Nothing to explain, no phone call.</div>
+              </div>
+            </div>
+            <div style="flex:none;display:flex;flex-direction:column;gap:8px">
+              <div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em">Anything else for this visit?</div>
+              <div style="display:flex;flex-direction:column;gap:7px">
+                <div style="display:flex;align-items:center;gap:10px;padding:10px 12px;border:1px solid #E8ECF3;border-radius:10px;background:#fff;font-size:12px"><span style="width:16px;height:16px;border-radius:4px;border:1.5px solid #C9D3E0"></span><span style="flex:1">A second companion, row behind</span><span style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#5A6577">£38.00</span></div>
+                <div style="display:flex;align-items:center;gap:10px;padding:10px 12px;border:1px solid #E8ECF3;border-radius:10px;background:#fff;font-size:12px"><span style="width:16px;height:16px;border-radius:4px;border:1.5px solid #C9D3E0"></span><span style="flex:1">Assistance dog space</span><span style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#5A6577">free</span></div>
+                <div style="display:flex;align-items:center;gap:10px;padding:10px 12px;border:1.5px solid #BBD8FF;border-radius:10px;background:#F8FBFF;font-size:12px"><span style="width:16px;height:16px;border-radius:4px;background:#0D6EFD;display:flex;align-items:center;justify-content:center;color:#fff;font-size:10px">✓</span><span style="flex:1;color:#0A4FB8;font-weight:600">Hearing loop seat</span><span style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#0A4FB8">included</span></div>
+                <div style="display:flex;align-items:center;gap:10px;padding:10px 12px;border:1px solid #E8ECF3;border-radius:10px;background:#fff;font-size:12px"><span style="width:16px;height:16px;border-radius:4px;border:1.5px solid #C9D3E0"></span><span style="flex:1">Arrive before the house opens</span><span style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#5A6577">free</span></div>
+              </div>
+            </div>
+            <div style="flex:1;min-height:0"></div>
+            <div style="flex:none;display:flex;flex-direction:column;gap:9px">
+              <div style="display:flex;justify-content:space-between;font-size:13px;font-weight:800"><span>Total</span><span style="font-family:'IBM Plex Mono',monospace">£76.00</span></div>
+              <div style="height:44px;border-radius:11px;background:#0D6EFD;color:#fff;display:flex;align-items:center;justify-content:center;font-size:13.5px;font-weight:800">Continue to payment</div>
+              <div style="font-size:11px;color:#5A6577;line-height:1.55">No evidence or proof is needed to book a wheelchair space. If anything about your visit changes, you can move these seats free of charge up to two hours before.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;line-height:1.85;color:#7C8899">
+        <div><b style="color:#4A5566;font-weight:600">OPERATIONS</b> · getAccessAvailability · matchProfileToSpace · addSpaceWithCompanion · addAssistedService · createBasket</div>
+        <div><b style="color:#4A5566;font-weight:600">STATES</b> · loading · <b style="color:#0B7A55">profileMatched — space and companion selected from the saved profile</b> · noCompanionFree · noticeRequired · soldOut · error</div>
+        <div><b style="color:#4A5566;font-weight:600">ARRIVES WITH</b> · eventId←listing · profile←<a href="#seatp-3d">SEATP-3D</a></div>
+        <div><b style="color:#4A5566;font-weight:600">GOES TO</b> · payment · <a href="#seatp-3h">box office assist</a></div>
+      </div>
+    </div>
+
+    <div id="seatp-3g" data-screen-label="SEATP-3G" data-screen-id="SEATP-3G" data-screen-id-origin="board" style="display:flex;flex-direction:column;gap:13px;scroll-margin-top:24px">
+      <div>
+        <div style="display:flex;align-items:baseline;gap:9px"><span style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:#8494A8">SEATP-3G</span><span style="font-size:16.5px;font-weight:800;letter-spacing:-.015em">Evacuation Plan by Seat</span><span style="font-size:9px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;padding:2px 7px;border-radius:5px;background:#FDECEC;color:#A81E1E">2 spaces with no named assister tonight</span></div>
+        <div style="font-size:12px;color:#6B7280;margin-top:3px">Who takes whom, by which exit, when the alarm sounds. Built from tonight's actual bookings and tonight's actual staff rota, printed for the duty manager.</div>
+      </div>
+      <div style="width:1280px;height:700px;display:flex;background:#F7F9FC;border:1px solid #E3E8F0;border-radius:14px;overflow:hidden;box-shadow:0 16px 38px rgba(12,35,64,.09)">
+        <aside style="flex:none;width:180px;background:#0B1324;display:flex;flex-direction:column;position:relative">
+          <div style="position:absolute;inset:0;background:radial-gradient(300px 200px at 0% 4%,rgba(0,184,255,.20),transparent 70%);pointer-events:none"></div>
+          <div style="position:relative;padding:15px 14px 13px;border-bottom:1px solid rgba(255,255,255,.08)"><img src="assets/ticvai-light-logo.png" alt="TICVAI" style="display:block;height:24px;width:auto"><div style="font-size:9.5px;color:#7FA3C9;margin-top:5px">Duty manager</div></div>
+          <div style="position:relative;padding:11px 12px;border-bottom:1px solid rgba(255,255,255,.08)"><div style="font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:.09em;text-transform:uppercase;color:#7FA3C9;margin-bottom:8px">Tonight</div><div style="display:flex;flex-direction:column;gap:4px;font-family:'IBM Plex Mono',monospace;font-size:10px;color:#DCE7F5;line-height:1.7"><div>Fri 4 Sep · 19:30</div><div style="color:#00B8FF;font-weight:600">2 780 in the house</div><div>11 access bookings</div><div>18 stewards on</div></div></div>
+          <div style="position:relative;margin-top:auto;padding:12px;border-top:1px solid rgba(255,255,255,.08);font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#7FA3C9;line-height:1.7">plan generated<br>17:40 · reprint after changes</div>
+        </aside>
+        <div style="flex:1;display:flex;flex-direction:column;min-width:0">
+          <header style="flex:none;height:54px;display:flex;align-items:center;gap:12px;padding:0 18px;background:#fff;border-bottom:1px solid #E8ECF3">
+            <div><div style="font-size:13.5px;font-weight:800;letter-spacing:-.01em">Evacuation assistance · tonight</div><div style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#9AA5B6">11 guests needing assistance · 9 with a named steward · 2 unassigned · refuge capacity 6</div></div>
+            <div style="margin-left:auto;display:flex;gap:6px"><div style="height:32px;display:flex;align-items:center;padding:0 11px;border:1px solid #E3E8F0;border-radius:8px;font-size:11px;font-weight:700;color:#5A6577">Print for the folder</div><div style="height:32px;display:flex;align-items:center;padding:0 12px;border-radius:8px;background:#0D6EFD;color:#fff;font-size:11px;font-weight:700">Assign the 2</div></div>
+          </header>
+          <div style="flex:1;display:grid;grid-template-columns:1fr 340px;gap:12px;padding:14px 16px;min-height:0">
+            <div style="background:#fff;border:1px solid #E8ECF3;border-radius:12px;display:flex;flex-direction:column;overflow:hidden;min-height:0">
+              <div style="flex:none;display:grid;grid-template-columns:96px 1.2fr 1fr 1fr 84px;padding:9px 14px;font-size:9px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:#94A0B4;border-bottom:1px solid #EDF1F6"><div>Seat</div><div>Assistance needed</div><div>Steward</div><div>Exit route</div><div style="text-align:right">Refuge</div></div>
+              <div style="display:grid;grid-template-columns:96px 1.2fr 1fr 1fr 84px;align-items:center;padding:10px 14px;font-size:11.5px;border-bottom:1px solid #F4F6FA"><div style="font-family:'IBM Plex Mono',monospace">W1 + C1</div><div style="font-size:10.5px;color:#5A6577">wheelchair, self-propelling</div><div style="font-size:10.5px;color:#5A6577">K. Idris</div><div style="font-size:10.5px;color:#5A6577">Door 4 · level, 18 m</div><div style="text-align:right;font-family:'IBM Plex Mono',monospace;font-size:10px;color:#9AA5B6">not needed</div></div>
+              <div style="display:grid;grid-template-columns:96px 1.2fr 1fr 1fr 84px;align-items:center;padding:10px 14px;font-size:11.5px;border-bottom:1px solid #F4F6FA"><div style="font-family:'IBM Plex Mono',monospace">W2 + C2</div><div style="font-size:10.5px;color:#5A6577">wheelchair, assisted</div><div style="font-size:10.5px;color:#5A6577">K. Idris</div><div style="font-size:10.5px;color:#5A6577">Door 4 · level, 18 m</div><div style="text-align:right;font-family:'IBM Plex Mono',monospace;font-size:10px;color:#9AA5B6">not needed</div></div>
+              <div style="display:grid;grid-template-columns:96px 1.2fr 1fr 1fr 84px;align-items:center;padding:10px 14px;font-size:11.5px;border-bottom:1px solid #F4F6FA"><div style="font-family:'IBM Plex Mono',monospace">W3 + C3</div><div style="font-size:10.5px;color:#5A6577">wheelchair, assisted</div><div style="font-size:10.5px;color:#5A6577">D. Marsh</div><div style="font-size:10.5px;color:#5A6577">Door 4 · level, 18 m</div><div style="text-align:right;font-family:'IBM Plex Mono',monospace;font-size:10px;color:#9AA5B6">not needed</div></div>
+              <div style="display:grid;grid-template-columns:96px 1.2fr 1fr 1fr 84px;align-items:center;padding:10px 14px;font-size:11.5px;border-bottom:1px solid #F4F6FA"><div style="font-family:'IBM Plex Mono',monospace">CA4</div><div style="font-size:10.5px;color:#5A6577">limited mobility, 6 steps max</div><div style="font-size:10.5px;color:#5A6577">P. Nowak</div><div style="font-size:10.5px;color:#5A6577">Lift 1 · steward operated</div><div style="text-align:right;font-family:'IBM Plex Mono',monospace;font-size:10px;color:#0B7A55">refuge A</div></div>
+              <div style="display:grid;grid-template-columns:96px 1.2fr 1fr 1fr 84px;align-items:center;padding:10px 14px;font-size:11.5px;border-bottom:1px solid #F4F6FA"><div style="font-family:'IBM Plex Mono',monospace">CA5</div><div style="font-size:10.5px;color:#5A6577">visually impaired, guide dog</div><div style="font-size:10.5px;color:#5A6577">P. Nowak</div><div style="font-size:10.5px;color:#5A6577">Stair 2 · guided</div><div style="text-align:right;font-family:'IBM Plex Mono',monospace;font-size:10px;color:#9AA5B6">not needed</div></div>
+              <div style="display:grid;grid-template-columns:96px 1.2fr 1fr 1fr 84px;align-items:center;padding:10px 14px;font-size:11.5px;border-bottom:1px solid #F4F6FA;background:#FDF5F5"><div style="font-family:'IBM Plex Mono',monospace;color:#8A2020">UT2</div><div style="font-size:10.5px;color:#8A2020">wheelchair, upper tier</div><div style="font-size:10.5px;color:#A81E1E;font-weight:700">unassigned</div><div style="font-size:10.5px;color:#8A2020">Lift 2 · unserviced</div><div style="text-align:right;font-family:'IBM Plex Mono',monospace;font-size:10px;color:#8A2020">refuge C</div></div>
+              <div style="display:grid;grid-template-columns:96px 1.2fr 1fr 1fr 84px;align-items:center;padding:10px 14px;font-size:11.5px;border-bottom:1px solid #F4F6FA;background:#FDF5F5"><div style="font-family:'IBM Plex Mono',monospace;color:#8A2020">UT3</div><div style="font-size:10.5px;color:#8A2020">wheelchair, upper tier</div><div style="font-size:10.5px;color:#A81E1E;font-weight:700">unassigned</div><div style="font-size:10.5px;color:#8A2020">Lift 2 · unserviced</div><div style="text-align:right;font-family:'IBM Plex Mono',monospace;font-size:10px;color:#8A2020">refuge C</div></div>
+              <div style="display:grid;grid-template-columns:96px 1.2fr 1fr 1fr 84px;align-items:center;padding:10px 14px;font-size:11.5px;border-bottom:1px solid #F4F6FA"><div style="font-family:'IBM Plex Mono',monospace">Box 3</div><div style="font-size:10.5px;color:#5A6577">limited mobility × 2</div><div style="font-size:10.5px;color:#5A6577">S. Okonjo</div><div style="font-size:10.5px;color:#5A6577">Lift 1 · steward operated</div><div style="text-align:right;font-family:'IBM Plex Mono',monospace;font-size:10px;color:#0B7A55">refuge A</div></div>
+              <div style="display:grid;grid-template-columns:96px 1.2fr 1fr 1fr 84px;align-items:center;padding:10px 14px;font-size:11.5px"><div style="font-family:'IBM Plex Mono',monospace">P4 · P5</div><div style="font-size:10.5px;color:#5A6577">assistance dog × 1</div><div style="font-size:10.5px;color:#5A6577">D. Marsh</div><div style="font-size:10.5px;color:#5A6577">Door 4 · level</div><div style="text-align:right;font-family:'IBM Plex Mono',monospace;font-size:10px;color:#9AA5B6">not needed</div></div>
+              <div style="margin-top:auto;flex:none;padding:12px 14px;border-top:1px solid #EDF1F6;background:#FDF5F5;display:flex;gap:11px"><span style="width:3px;border-radius:2px;background:#DC2626;flex:none"></span><div style="flex:1;font-size:11px;color:#8A2020;line-height:1.55">Two upper tier spaces are sold with no named steward and an evacuation route through refuge C, which holds two. The plan is not signed until both have a name against them.</div></div>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:12px;min-height:0">
+              <div style="flex:none;background:#fff;border:1px solid #E8ECF3;border-radius:12px;padding:12px 14px;display:flex;flex-direction:column;gap:8px">
+                <div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em">Stewards on tonight</div>
+                <div style="display:flex;flex-direction:column;gap:5px;font-size:11px;color:#5A6577">
+                  <div style="display:flex;justify-content:space-between"><span>K. Idris · stalls</span><span style="font-family:'IBM Plex Mono',monospace;color:#0B1324">2 assigned</span></div>
+                  <div style="display:flex;justify-content:space-between"><span>D. Marsh · stalls</span><span style="font-family:'IBM Plex Mono',monospace;color:#0B1324">2 assigned</span></div>
+                  <div style="display:flex;justify-content:space-between"><span>P. Nowak · circle</span><span style="font-family:'IBM Plex Mono',monospace;color:#0B1324">2 assigned</span></div>
+                  <div style="display:flex;justify-content:space-between"><span>S. Okonjo · boxes</span><span style="font-family:'IBM Plex Mono',monospace;color:#0B1324">1 assigned</span></div>
+                  <div style="display:flex;justify-content:space-between"><span>Upper tier</span><span style="font-family:'IBM Plex Mono',monospace;color:#8A2020">nobody rostered</span></div>
+                </div>
+                <div style="height:30px;border-radius:9px;background:#0D6EFD;color:#fff;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700">Request a steward for upper tier</div>
+              </div>
+              <div style="flex:none;background:#fff;border:1px solid #E8ECF3;border-radius:12px;padding:12px 14px;display:flex;flex-direction:column;gap:7px">
+                <div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em">Refuge capacity</div>
+                <div style="display:flex;flex-direction:column;gap:6px;font-size:11px;color:#5A6577">
+                  <div style="display:flex;align-items:center;gap:9px"><span style="width:62px;flex:none">Refuge A</span><div style="flex:1;height:9px;border-radius:5px;background:#EEF2F7;overflow:hidden"><span style="display:block;width:75%;height:9px;background:#0D6EFD"></span></div><span style="font-family:'IBM Plex Mono',monospace;font-size:10px;width:34px;text-align:right">3 / 4</span></div>
+                  <div style="display:flex;align-items:center;gap:9px"><span style="width:62px;flex:none">Refuge B</span><div style="flex:1;height:9px;border-radius:5px;background:#EEF2F7;overflow:hidden"><span style="display:block;width:0%;height:9px;background:#0D6EFD"></span></div><span style="font-family:'IBM Plex Mono',monospace;font-size:10px;width:34px;text-align:right">0 / 2</span></div>
+                  <div style="display:flex;align-items:center;gap:9px"><span style="width:62px;flex:none;color:#8A2020">Refuge C</span><div style="flex:1;height:9px;border-radius:5px;background:#EEF2F7;overflow:hidden"><span style="display:block;width:100%;height:9px;background:#DC2626"></span></div><span style="font-family:'IBM Plex Mono',monospace;font-size:10px;width:34px;text-align:right;color:#8A2020">2 / 2</span></div>
+                </div>
+                <div style="font-size:10.5px;color:#5A6577;line-height:1.5">Refuge C is at capacity with tonight's two upper tier bookings. A third would have nowhere to wait.</div>
+              </div>
+              <div style="flex:1;min-height:0"></div>
+              <div style="flex:none;background:#fff;border:1px solid #E8ECF3;border-radius:12px;padding:12px 14px;display:flex;flex-direction:column;gap:7px">
+                <div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em">Generated from bookings</div>
+                <div style="font-size:10.5px;color:#5A6577;line-height:1.55">The plan rebuilds whenever an access seat is sold, moved or refunded, and the duty manager is told to reprint. A plan from last week is a plan for last week's audience.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;line-height:1.85;color:#7C8899">
+        <div><b style="color:#4A5566;font-weight:600">OPERATIONS</b> · buildEvacuationPlan · assignSteward · getRefugeCapacity · printPlan · requestRotaChange</div>
+        <div><b style="color:#4A5566;font-weight:600">STATES</b> · generating · <b style="color:#A81E1E">unassignedAssistance — a sold access seat with no named steward</b> · refugeAtCapacity · planStale · signed · error</div>
+        <div><b style="color:#4A5566;font-weight:600">ARRIVES WITH</b> · eventId←tonight · rota←workforce</div>
+        <div><b style="color:#4A5566;font-weight:600">GOES TO</b> · <a href="#seatp-3c">access routes</a> · <a href="#seatp-3i">door &amp; usher view</a></div>
+      </div>
+    </div>
+
+    <div id="seatp-3h" data-screen-label="SEATP-3H" data-screen-id="SEATP-3H" data-screen-id-origin="board" style="display:flex;flex-direction:column;gap:13px;scroll-margin-top:24px">
+      <div>
+        <div style="display:flex;align-items:baseline;gap:9px"><span style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:#8494A8">SEATP-3H</span><span style="font-size:16.5px;font-weight:800;letter-spacing:-.015em">Box Office · Access Enquiry</span><span style="font-size:9px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;padding:2px 7px;border-radius:5px;background:#EDF3FF;color:#0A4FB8">answer in one screen</span></div>
+        <div style="font-size:12px;color:#6B7280;margin-top:3px">What the person on the phone needs: the guest's saved needs, what is free tonight that matches, and the facts about the route, without opening four systems.</div>
+      </div>
+      <div style="width:1280px;height:700px;display:flex;background:#F7F9FC;border:1px solid #E3E8F0;border-radius:14px;overflow:hidden;box-shadow:0 16px 38px rgba(12,35,64,.09)">
+        <aside style="flex:none;width:180px;background:#0B1324;display:flex;flex-direction:column;position:relative">
+          <div style="position:absolute;inset:0;background:radial-gradient(300px 200px at 0% 4%,rgba(0,184,255,.20),transparent 70%);pointer-events:none"></div>
+          <div style="position:relative;padding:15px 14px 13px;border-bottom:1px solid rgba(255,255,255,.08)"><img src="assets/ticvai-light-logo.png" alt="TICVAI" style="display:block;height:24px;width:auto"><div style="font-size:9.5px;color:#7FA3C9;margin-top:5px">Box office</div></div>
+          <div style="position:relative;padding:11px 12px;border-bottom:1px solid rgba(255,255,255,.08)"><div style="font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:.09em;text-transform:uppercase;color:#7FA3C9;margin-bottom:8px">Call</div><div style="display:flex;flex-direction:column;gap:4px;font-family:'IBM Plex Mono',monospace;font-size:10px;color:#DCE7F5;line-height:1.7"><div style="color:#00B8FF;font-weight:600">02:14 on the line</div><div>M. Adeyemi</div><div>matched by phone number</div></div></div>
+          <div style="position:relative;margin-top:auto;padding:12px;border-top:1px solid rgba(255,255,255,.08);font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#7FA3C9;line-height:1.7">queue 2 waiting<br>avg 3:40</div>
+        </aside>
+        <div style="flex:1;display:flex;flex-direction:column;min-width:0">
+          <header style="flex:none;height:54px;display:flex;align-items:center;gap:12px;padding:0 18px;background:#fff;border-bottom:1px solid #E8ECF3">
+            <div><div style="font-size:13.5px;font-weight:800;letter-spacing:-.01em">M. Adeyemi · wants Fri 4 Sep</div><div style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#9AA5B6">profile confirmed Mar 2026 · wheelchair space + 1 companion beside + hearing loop</div></div>
+            <div style="margin-left:auto;display:flex;gap:6px"><div style="height:32px;display:flex;align-items:center;padding:0 11px;border:1px solid #E3E8F0;border-radius:8px;font-size:11px;font-weight:700;color:#5A6577">Send route by email</div><div style="height:32px;display:flex;align-items:center;padding:0 12px;border-radius:8px;background:#0D6EFD;color:#fff;font-size:11px;font-weight:700">Hold W1 + C1</div></div>
+          </header>
+          <div style="flex:1;display:grid;grid-template-columns:1fr 1.1fr 300px;gap:12px;padding:14px 16px;min-height:0">
+            <div style="background:#fff;border:1px solid #E8ECF3;border-radius:12px;padding:13px 15px;display:flex;flex-direction:column;gap:10px;min-height:0;overflow:hidden">
+              <div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em">Her saved needs</div>
+              <div style="display:flex;flex-direction:column;gap:6px;font-size:11px;color:#5A6577">
+                <div style="display:flex;align-items:center;gap:8px;padding:7px 9px;border:1px solid #CBE8DA;border-radius:7px;background:#F3FBF7"><span style="color:#0B5B41;font-weight:600;flex:1">Wheelchair space · 900 mm</span><span style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#0B5B41">4 free</span></div>
+                <div style="display:flex;align-items:center;gap:8px;padding:7px 9px;border:1px solid #CBE8DA;border-radius:7px;background:#F3FBF7"><span style="color:#0B5B41;font-weight:600;flex:1">One companion, beside</span><span style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#0B5B41">4 free</span></div>
+                <div style="display:flex;align-items:center;gap:8px;padding:7px 9px;border:1px solid #CBE8DA;border-radius:7px;background:#F3FBF7"><span style="color:#0B5B41;font-weight:600;flex:1">Hearing loop coverage</span><span style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#0B5B41">platform covered</span></div>
+              </div>
+              <div style="height:1px;background:#EDF1F6"></div>
+              <div style="font-size:9.5px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#94A0B4">Note from the guest</div>
+              <div style="font-size:10.5px;color:#5A6577;line-height:1.55;padding:9px 11px;background:#FBFCFE;border:1px solid #EDF1F6;border-radius:8px">Prefers to arrive after the house opens. Do not offer to move her chair; she will ask if she needs help.</div>
+              <div style="margin-top:auto;font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#9AA5B6">no evidence required · do not ask</div>
+            </div>
+            <div style="background:#fff;border:1px solid #E8ECF3;border-radius:12px;display:flex;flex-direction:column;overflow:hidden;min-height:0">
+              <div style="flex:none;display:flex;align-items:center;gap:8px;padding:11px 14px 10px;border-bottom:1px solid #EDF1F6"><div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em">Matching tonight</div><span style="margin-left:auto;font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#9AA5B6">4 pairs available</span></div>
+              <div style="display:grid;grid-template-columns:1fr 1fr 76px;align-items:center;padding:10px 14px;font-size:11.5px;border-bottom:1px solid #F4F6FA;background:#F5F9FF"><div><div style="font-weight:700">W1 + C1</div><div style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#9AA5B6">platform, level entry</div></div><div style="font-size:10.5px;color:#5A6577">84 m step-free · loop</div><div style="text-align:right;font-family:'IBM Plex Mono',monospace">£76</div></div>
+              <div style="display:grid;grid-template-columns:1fr 1fr 76px;align-items:center;padding:10px 14px;font-size:11.5px;border-bottom:1px solid #F4F6FA"><div><div style="font-weight:600">W2 + C2</div><div style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#9AA5B6">platform, level entry</div></div><div style="font-size:10.5px;color:#5A6577">84 m step-free · loop</div><div style="text-align:right;font-family:'IBM Plex Mono',monospace">£76</div></div>
+              <div style="display:grid;grid-template-columns:1fr 1fr 76px;align-items:center;padding:10px 14px;font-size:11.5px;border-bottom:1px solid #F4F6FA"><div><div style="font-weight:600">W3 + C3</div><div style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#9AA5B6">platform, level entry</div></div><div style="font-size:10.5px;color:#5A6577">84 m step-free · loop</div><div style="text-align:right;font-family:'IBM Plex Mono',monospace">£76</div></div>
+              <div style="display:grid;grid-template-columns:1fr 1fr 76px;align-items:center;padding:10px 14px;font-size:11.5px;border-bottom:1px solid #F4F6FA"><div><div style="font-weight:600">Circle CW1 + CC1</div><div style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#9AA5B6">lift 1, front row</div></div><div style="font-size:10.5px;color:#5A6577">lift needed · loop</div><div style="text-align:right;font-family:'IBM Plex Mono',monospace">£88</div></div>
+              <div style="display:grid;grid-template-columns:1fr 1fr 76px;align-items:center;padding:10px 14px;font-size:11.5px;border-bottom:1px solid #F4F6FA;background:#FDF5F5"><div><div style="font-weight:600;color:#8A2020">Upper UT2 + UT3</div><div style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#8A2020">lift 2 · unserviced</div></div><div style="font-size:10.5px;color:#8A2020">do not offer tonight</div><div style="text-align:right;font-family:'IBM Plex Mono',monospace;color:#8A2020">—</div></div>
+              <div style="margin-top:auto;flex:none;padding:11px 14px;border-top:1px solid #EDF1F6;background:#FBFCFE;font-size:11px;color:#5A6577;line-height:1.55">Options are filtered by her recorded needs and by tonight's route conditions, so nothing on this list can turn into a problem at the door.</div>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:12px;min-height:0">
+              <div style="flex:none;background:#fff;border:1px solid #E8ECF3;border-radius:12px;padding:12px 14px;display:flex;flex-direction:column;gap:8px">
+                <div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em">What to say about the route</div>
+                <div style="font-size:10.5px;color:#5A6577;line-height:1.6;padding:9px 11px;background:#FBFCFE;border:1px solid #EDF1F6;border-radius:8px">Step-free from the drop-off bay, 84 m, one gentle ramp with handrails, no lift. Door 4 is staffed from doors-open.</div>
+                <div style="height:29px;border-radius:8px;border:1px solid #E3E8F0;color:#5A6577;display:flex;align-items:center;justify-content:center;font-size:10.5px;font-weight:700">Email this to her</div>
+              </div>
+              <div style="flex:none;background:#fff;border:1px solid #E8ECF3;border-radius:12px;padding:12px 14px;display:flex;flex-direction:column;gap:7px">
+                <div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em">Also on file</div>
+                <div style="display:flex;flex-direction:column;gap:5px;font-size:11px;color:#5A6577">
+                  <div style="display:flex;justify-content:space-between"><span>Last visit</span><span style="font-family:'IBM Plex Mono',monospace;color:#0B1324">12 Jul · W2</span></div>
+                  <div style="display:flex;justify-content:space-between"><span>Preferred space</span><span style="font-family:'IBM Plex Mono',monospace;color:#0B1324">platform, aisle end</span></div>
+                  <div style="display:flex;justify-content:space-between"><span>Companion</span><span style="font-family:'IBM Plex Mono',monospace;color:#0B1324">usually the same name</span></div>
+                </div>
+              </div>
+              <div style="flex:1;min-height:0"></div>
+              <div style="flex:none;background:#fff;border:1px solid #E8ECF3;border-radius:12px;padding:12px 14px;display:flex;flex-direction:column;gap:7px">
+                <div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em">Two minutes, not twelve</div>
+                <div style="font-size:10.5px;color:#5A6577;line-height:1.55">The call is short because nothing has to be looked up, asked twice, or checked with a colleague. That is the entire design goal of this screen.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;line-height:1.85;color:#7C8899">
+        <div><b style="color:#4A5566;font-weight:600">OPERATIONS</b> · matchCallerByPhone · getAccessProfile · listMatchingPairs · holdPair · emailRouteDescription</div>
+        <div><b style="color:#4A5566;font-weight:600">STATES</b> · onCall · <b style="color:#0B7A55">profileMatched</b> · noProfile · routeConditionBlocksOption · held · error</div>
+        <div><b style="color:#4A5566;font-weight:600">ARRIVES WITH</b> · callerId←telephony · eventId←enquiry</div>
+        <div><b style="color:#4A5566;font-weight:600">GOES TO</b> · payment · <a href="#seatp-3d">requirements profile</a></div>
+      </div>
+    </div>
+
+    <div id="seatp-3i" data-screen-label="SEATP-3I" data-screen-id="SEATP-3I" data-screen-id-origin="board" style="display:flex;flex-direction:column;gap:13px;scroll-margin-top:24px">
+      <div>
+        <div style="display:flex;align-items:baseline;gap:9px"><span style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:#8494A8">SEATP-3I</span><span style="font-size:16.5px;font-weight:800;letter-spacing:-.015em">Usher · Door &amp; Seating View</span><span style="font-size:9px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;padding:2px 7px;border-radius:5px;background:#EDF3FF;color:#0A4FB8">handheld · 390 × 700</span></div>
+        <div style="font-size:12px;color:#6B7280;margin-top:3px">What the usher on door 4 sees: who is expected at the platform tonight, what assistance was booked, and nothing about anyone's medical history.</div>
+      </div>
+      <div style="width:1280px;height:700px;display:flex;gap:22px;align-items:stretch;background:#F7F9FC;border:1px solid #E3E8F0;border-radius:14px;overflow:hidden;box-shadow:0 16px 38px rgba(12,35,64,.09);padding:20px 24px">
+        <div style="flex:none;width:390px;background:#0B1324;border-radius:22px;display:flex;flex-direction:column;overflow:hidden;box-shadow:0 12px 30px rgba(12,35,64,.28)">
+          <div style="flex:none;height:34px;display:flex;align-items:center;justify-content:space-between;padding:0 16px;font-family:'IBM Plex Mono',monospace;font-size:10px;color:#7FA3C9"><span>19:14</span><span>Door 4 · K. Idris</span></div>
+          <div style="flex:none;padding:12px 16px 10px;border-bottom:1px solid rgba(255,255,255,.08)">
+            <div style="font-size:16px;font-weight:800;color:#fff;letter-spacing:-.01em">Accessible platform</div>
+            <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#7FA3C9;margin-top:3px">4 booked tonight · 2 arrived</div>
+          </div>
+          <div style="flex:1;display:flex;flex-direction:column;gap:10px;padding:14px 16px;min-height:0;overflow:hidden">
+            <div style="flex:none;background:rgba(122,224,184,.12);border:1px solid rgba(122,224,184,.35);border-radius:13px;padding:12px 13px;display:flex;flex-direction:column;gap:5px">
+              <div style="display:flex;align-items:baseline;gap:8px"><span style="font-size:15px;font-weight:800;color:#9FEBCE">W1 + C1</span><span style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#9FEBCE;margin-left:auto">arrived 19:06</span></div>
+              <div style="font-size:11.5px;color:#DCE7F5">Self-propelling · no assistance needed</div>
+            </div>
+            <div style="flex:none;background:rgba(122,224,184,.12);border:1px solid rgba(122,224,184,.35);border-radius:13px;padding:12px 13px;display:flex;flex-direction:column;gap:5px">
+              <div style="display:flex;align-items:baseline;gap:8px"><span style="font-size:15px;font-weight:800;color:#9FEBCE">W2 + C2</span><span style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#9FEBCE;margin-left:auto">arrived 19:11</span></div>
+              <div style="font-size:11.5px;color:#DCE7F5">Assistance to the space · done</div>
+            </div>
+            <div style="flex:none;background:rgba(13,110,253,.20);border:1.5px solid #0D6EFD;border-radius:13px;padding:12px 13px;display:flex;flex-direction:column;gap:6px">
+              <div style="display:flex;align-items:baseline;gap:8px"><span style="font-size:15px;font-weight:800;color:#fff">W3 + C3</span><span style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#BBD8FF;margin-left:auto">expected</span></div>
+              <div style="font-size:11.5px;color:#DCE7F5">Assistance to the space · you are named</div>
+              <div style="font-size:11px;color:#BBD8FF;line-height:1.5">Guest asks not to have her chair moved. Offer the route, not the push.</div>
+              <div style="height:40px;border-radius:11px;background:#00B8FF;color:#062135;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:800;margin-top:2px">Mark arrived</div>
+            </div>
+            <div style="flex:none;background:rgba(255,255,255,.06);border-radius:13px;padding:12px 13px;display:flex;flex-direction:column;gap:5px">
+              <div style="display:flex;align-items:baseline;gap:8px"><span style="font-size:15px;font-weight:800;color:#DCE7F5">W4 + C4</span><span style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#7FA3C9;margin-left:auto">expected</span></div>
+              <div style="font-size:11.5px;color:#B9CCE2">Assistance dog · water bowl requested</div>
+            </div>
+            <div style="flex:1;min-height:0"></div>
+            <div style="flex:none;display:flex;gap:9px">
+              <div style="flex:1;height:46px;border-radius:12px;border:1px solid rgba(255,255,255,.16);color:#DCE7F5;display:flex;align-items:center;justify-content:center;font-size:12.5px;font-weight:700">Evacuation card</div>
+              <div style="flex:1;height:46px;border-radius:12px;border:1px solid rgba(255,255,255,.16);color:#DCE7F5;display:flex;align-items:center;justify-content:center;font-size:12.5px;font-weight:700">Call duty mgr</div>
+            </div>
+          </div>
+        </div>
+        <div style="flex:1;display:flex;flex-direction:column;gap:12px;min-width:0">
+          <div style="flex:none;background:#fff;border:1px solid #E8ECF3;border-radius:12px;padding:13px 15px;display:flex;flex-direction:column;gap:9px">
+            <div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em">What the usher does not see</div>
+            <div style="font-size:11.5px;color:#5A6577;line-height:1.6;text-wrap:pretty">No diagnosis, no evidence, no free-text history. Only the seat, the assistance that was booked, and any instruction the guest chose to share. Everything else stays with the access team, and every view of a profile is logged.</div>
+          </div>
+          <div style="flex:1;display:grid;grid-template-columns:1fr 1fr;gap:12px;min-height:0">
+            <div style="background:#fff;border:1px solid #E8ECF3;border-radius:12px;padding:13px 15px;display:flex;flex-direction:column;gap:10px;min-height:0;overflow:hidden">
+              <div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em">Tonight at this door</div>
+              <div style="display:flex;flex-direction:column;gap:6px;font-size:11px;color:#5A6577">
+                <div style="display:flex;justify-content:space-between"><span>Access bookings</span><span style="font-family:'IBM Plex Mono',monospace;color:#0B1324">4 pairs</span></div>
+                <div style="display:flex;justify-content:space-between"><span>Arrived</span><span style="font-family:'IBM Plex Mono',monospace;color:#0B5B41">2</span></div>
+                <div style="display:flex;justify-content:space-between"><span>Assistance requested</span><span style="font-family:'IBM Plex Mono',monospace;color:#0B1324">3</span></div>
+                <div style="display:flex;justify-content:space-between"><span>Assistance dogs</span><span style="font-family:'IBM Plex Mono',monospace;color:#0B1324">1</span></div>
+                <div style="display:flex;justify-content:space-between"><span>You are named for</span><span style="font-family:'IBM Plex Mono',monospace;color:#0B1324">W1, W2, W3</span></div>
+              </div>
+              <div style="margin-top:auto;font-size:10.5px;color:#5A6577;line-height:1.5">The list is only tonight, only this door. Ushers on other doors see their own.</div>
+            </div>
+            <div style="background:#fff;border:1px solid #E8ECF3;border-radius:12px;padding:13px 15px;display:flex;flex-direction:column;gap:10px;min-height:0;overflow:hidden">
+              <div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em">Arrival marks matter</div>
+              <div style="font-size:11px;color:#5A6577;line-height:1.6">Marking a guest arrived does three things: it removes them from the door list, it confirms them on tonight's evacuation card, and after curtain it tells the access team which bookings actually turned up. That last number is how the 61% occupancy figure gets checked.</div>
+              <div style="margin-top:auto;display:flex;flex-direction:column;gap:5px;font-size:11px;color:#5A6577">
+                <div style="display:flex;justify-content:space-between"><span>No-shows last season</span><span style="font-family:'IBM Plex Mono',monospace;color:#0B1324">14 of 412</span></div>
+                <div style="display:flex;justify-content:space-between"><span>Marked late</span><span style="font-family:'IBM Plex Mono',monospace;color:#7A5C00">38</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;line-height:1.85;color:#7C8899">
+        <div><b style="color:#4A5566;font-weight:600">OPERATIONS</b> · getDoorAccessList · markArrived · getEvacuationCard · callDutyManager</div>
+        <div><b style="color:#4A5566;font-weight:600">STATES</b> · loading · expected · arrived · <b style="color:#8A6D00">assistanceNamedToYou</b> · noShowAfterCurtain · error</div>
+        <div><b style="color:#4A5566;font-weight:600">ARRIVES WITH</b> · doorId←rota · eventId←tonight</div>
+        <div><b style="color:#4A5566;font-weight:600">GOES TO</b> · <a href="#seatp-3g">evacuation plan</a> · <a href="#seatp-3j">access reporting</a></div>
+      </div>
+    </div>
+
+    <div id="seatp-3j" data-screen-label="SEATP-3J" data-screen-id="SEATP-3J" data-screen-id-origin="board" style="display:flex;flex-direction:column;gap:13px;scroll-margin-top:24px">
+      <div>
+        <div style="display:flex;align-items:baseline;gap:9px"><span style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:#8494A8">SEATP-3J</span><span style="font-size:16.5px;font-weight:800;letter-spacing:-.015em">Access Reporting</span><span style="font-size:9px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;padding:2px 7px;border-radius:5px;background:#EDF3FF;color:#0A4FB8">for the board and the regulator</span></div>
+        <div style="font-size:12px;color:#6B7280;margin-top:3px">The numbers an access audit asks for, produced from the same records staff use nightly rather than assembled by hand each spring.</div>
+      </div>
+      <div style="width:1280px;height:700px;display:flex;background:#F7F9FC;border:1px solid #E3E8F0;border-radius:14px;overflow:hidden;box-shadow:0 16px 38px rgba(12,35,64,.09)">
+        <aside style="flex:none;width:180px;background:#0B1324;display:flex;flex-direction:column;position:relative">
+          <div style="position:absolute;inset:0;background:radial-gradient(300px 200px at 0% 4%,rgba(0,184,255,.20),transparent 70%);pointer-events:none"></div>
+          <div style="position:relative;padding:15px 14px 13px;border-bottom:1px solid rgba(255,255,255,.08)"><img src="assets/ticvai-light-logo.png" alt="TICVAI" style="display:block;height:24px;width:auto"><div style="font-size:9.5px;color:#7FA3C9;margin-top:5px">Access &amp; inclusion</div></div>
+          <nav style="position:relative;display:flex;flex-direction:column;gap:2px;padding:11px 9px">
+            <div style="padding:8px 10px;border-radius:9px;color:#8296B0;font-size:11.5px;font-weight:600">Spaces</div>
+            <div style="padding:8px 10px;border-radius:9px;color:#8296B0;font-size:11.5px;font-weight:600">Companions</div>
+            <div style="padding:8px 10px;border-radius:9px;color:#8296B0;font-size:11.5px;font-weight:600">Routes</div>
+            <div style="padding:8px 10px;border-radius:9px;color:#8296B0;font-size:11.5px;font-weight:600">Requirements</div>
+            <div style="padding:8px 10px;border-radius:9px;color:#8296B0;font-size:11.5px;font-weight:600">Release rules</div>
+            <div style="padding:8px 10px;border-radius:9px;color:#8296B0;font-size:11.5px;font-weight:600">Assisted services</div>
+            <div style="padding:8px 10px;border-radius:9px;background:linear-gradient(90deg,rgba(13,110,253,.30),rgba(0,184,255,.10));color:#fff;font-size:11.5px;font-weight:700;box-shadow:inset 2px 0 0 #00B8FF">Reporting</div>
+          </nav>
+          <div style="position:relative;margin-top:auto;padding:12px;border-top:1px solid rgba(255,255,255,.08);font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#7FA3C9;line-height:1.7">season 2025–26<br>6 venues</div>
+        </aside>
+        <div style="flex:1;display:flex;flex-direction:column;min-width:0">
+          <header style="flex:none;height:54px;display:flex;align-items:center;gap:12px;padding:0 18px;background:#fff;border-bottom:1px solid #E8ECF3">
+            <div><div style="font-size:13.5px;font-weight:800;letter-spacing:-.01em">Access report · season 2025–26</div><div style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#9AA5B6">412 access bookings · 61% space occupancy · 210 phone calls a month · 4 formal complaints</div></div>
+            <div style="margin-left:auto;display:flex;gap:6px"><div style="height:32px;display:flex;align-items:center;padding:0 11px;border:1px solid #E3E8F0;border-radius:8px;font-size:11px;font-weight:700;color:#5A6577">Compare to 2024–25</div><div style="height:32px;display:flex;align-items:center;padding:0 12px;border-radius:8px;background:#0D6EFD;color:#fff;font-size:11px;font-weight:700">Export report</div></div>
+          </header>
+          <div style="flex:1;display:flex;flex-direction:column;gap:12px;padding:14px 16px;min-height:0">
+            <div style="flex:none;display:grid;grid-template-columns:repeat(4,1fr);gap:11px">
+              <div style="background:#fff;border:1px solid #E8ECF3;border-radius:12px;padding:12px 14px;display:flex;flex-direction:column;gap:4px"><span style="font-size:9px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#94A0B4">Access bookings</span><span style="font-family:'IBM Plex Mono',monospace;font-size:20px;font-weight:600">412</span><span style="font-size:10.5px;color:#0B7A55">up from 361</span></div>
+              <div style="background:#fff;border:1.5px solid #F2DFB8;border-radius:12px;padding:12px 14px;display:flex;flex-direction:column;gap:4px"><span style="font-size:9px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#8A6D00">Space occupancy</span><span style="font-family:'IBM Plex Mono',monospace;font-size:20px;font-weight:600;color:#8A6D00">61%</span><span style="font-size:10.5px;color:#8A6D00">house average 78%</span></div>
+              <div style="background:#fff;border:1px solid #E8ECF3;border-radius:12px;padding:12px 14px;display:flex;flex-direction:column;gap:4px"><span style="font-size:9px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#94A0B4">Booked online</span><span style="font-family:'IBM Plex Mono',monospace;font-size:20px;font-weight:600">54%</span><span style="font-size:10.5px;color:#5A6577">general admission 91%</span></div>
+              <div style="background:#fff;border:1.5px solid #F5C9C9;border-radius:12px;padding:12px 14px;display:flex;flex-direction:column;gap:4px"><span style="font-size:9px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#A81E1E">Complaints</span><span style="font-family:'IBM Plex Mono',monospace;font-size:20px;font-weight:600;color:#8A2020">4</span><span style="font-size:10.5px;color:#A81E1E">3 about a lift, 1 about a companion seat</span></div>
+            </div>
+            <div style="flex:1;display:grid;grid-template-columns:1.3fr 1fr;gap:12px;min-height:0">
+              <div style="background:#fff;border:1px solid #E8ECF3;border-radius:12px;display:flex;flex-direction:column;overflow:hidden;min-height:0">
+                <div style="flex:none;display:flex;align-items:center;gap:8px;padding:11px 14px 10px;border-bottom:1px solid #EDF1F6"><div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em">By venue</div><span style="margin-left:auto;font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#9AA5B6">spaces · occupancy · online share</span></div>
+                <div style="flex:none;display:grid;grid-template-columns:1.4fr 68px 84px 84px 1fr;padding:8px 14px;font-size:9px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:#94A0B4;border-bottom:1px solid #EDF1F6"><div>Venue</div><div style="text-align:right">Spaces</div><div style="text-align:right">Occupancy</div><div style="text-align:right">Online</div><div>Notes</div></div>
+                <div style="display:grid;grid-template-columns:1.4fr 68px 84px 84px 1fr;align-items:center;padding:10px 14px;font-size:11.5px;border-bottom:1px solid #F4F6FA"><div style="font-weight:600">Riverside · Hall 1</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">18</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right;color:#0B5B41">78%</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">88%</div><div style="font-size:10.5px;color:#5A6577">platform works, circle lift queries</div></div>
+                <div style="display:grid;grid-template-columns:1.4fr 68px 84px 84px 1fr;align-items:center;padding:10px 14px;font-size:11.5px;border-bottom:1px solid #F4F6FA"><div style="font-weight:600">Riverside · Hall 2</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">12</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right;color:#0B5B41">81%</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">94%</div><div style="font-size:10.5px;color:#5A6577">flat floor, nothing to manage</div></div>
+                <div style="display:grid;grid-template-columns:1.4fr 68px 84px 84px 1fr;align-items:center;padding:10px 14px;font-size:11.5px;border-bottom:1px solid #F4F6FA;background:#FDF5F5"><div style="font-weight:700;color:#8A2020">Northgate Playhouse</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right;color:#8A2020">14</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right;color:#8A2020">34%</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right;color:#8A2020">18%</div><div style="font-size:10.5px;color:#A81E1E">6 upper tier spaces, phone only, no companion mapped</div></div>
+                <div style="display:grid;grid-template-columns:1.4fr 68px 84px 84px 1fr;align-items:center;padding:10px 14px;font-size:11.5px;border-bottom:1px solid #F4F6FA;background:#FDF5F5"><div style="font-weight:700;color:#8A2020">The Foundry</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right;color:#8A2020">5</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right;color:#8A2020">22%</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right;color:#8A2020">0%</div><div style="font-size:10.5px;color:#A81E1E">map unsurveyed since 2023</div></div>
+                <div style="display:grid;grid-template-columns:1.4fr 68px 84px 84px 1fr;align-items:center;padding:10px 14px;font-size:11.5px;border-bottom:1px solid #F4F6FA"><div style="font-weight:600">Harbour Lights</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">4</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">64%</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">72%</div><div style="font-size:10.5px;color:#5A6577">48 h notice reduces late bookings</div></div>
+                <div style="display:grid;grid-template-columns:1.4fr 68px 84px 84px 1fr;align-items:center;padding:10px 14px;font-size:11.5px"><div style="font-weight:600">Eight smaller rooms</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">131</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">—</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">96%</div><div style="font-size:10.5px;color:#5A6577">unreserved, capacity only</div></div>
+                <div style="margin-top:auto;flex:none;padding:11px 14px;border-top:1px solid #EDF1F6;background:#FBFCFE;font-size:11px;color:#5A6577;line-height:1.55">Two venues account for the whole gap between 61% and the house average. Both have the same two causes: spaces held off the website, and no companion seat mapped.</div>
+              </div>
+              <div style="display:flex;flex-direction:column;gap:12px;min-height:0">
+                <div style="flex:none;background:#fff;border:1px solid #E8ECF3;border-radius:12px;padding:12px 14px;display:flex;flex-direction:column;gap:8px">
+                  <div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em">What the audit asks for</div>
+                  <div style="display:flex;flex-direction:column;gap:6px;font-size:11px;color:#5A6577">
+                    <div style="display:flex;justify-content:space-between"><span>Spaces as % of capacity</span><span style="font-family:'IBM Plex Mono',monospace;color:#0B5B41">0.45% · min 0.4%</span></div>
+                    <div style="display:flex;justify-content:space-between"><span>Companion seat provision</span><span style="font-family:'IBM Plex Mono',monospace;color:#8A2020">94% · target 100%</span></div>
+                    <div style="display:flex;justify-content:space-between"><span>Online bookable</span><span style="font-family:'IBM Plex Mono',monospace;color:#8A2020">77% · target 100%</span></div>
+                    <div style="display:flex;justify-content:space-between"><span>Routes published</span><span style="font-family:'IBM Plex Mono',monospace;color:#0B5B41">4 of 4</span></div>
+                    <div style="display:flex;justify-content:space-between"><span>Evacuation plans signed</span><span style="font-family:'IBM Plex Mono',monospace;color:#8A6D00">96% of nights</span></div>
+                  </div>
+                </div>
+                <div style="flex:none;background:#fff;border:1px solid #E8ECF3;border-radius:12px;padding:12px 14px;display:flex;flex-direction:column;gap:8px">
+                  <div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em">Three things, in order</div>
+                  <div style="display:flex;flex-direction:column;gap:7px;font-size:10.5px;color:#5A6577;line-height:1.5">
+                    <div style="display:flex;gap:8px"><span style="font-family:'IBM Plex Mono',monospace;color:#0A4FB8;font-weight:600">1</span><span>Map companion seats for the 11 spaces that have none.</span></div>
+                    <div style="display:flex;gap:8px"><span style="font-family:'IBM Plex Mono',monospace;color:#0A4FB8;font-weight:600">2</span><span>Put the 42 phone-only spaces online.</span></div>
+                    <div style="display:flex;gap:8px"><span style="font-family:'IBM Plex Mono',monospace;color:#0A4FB8;font-weight:600">3</span><span>Get a service contract for lift 2 or stop selling the six spaces above it.</span></div>
+                  </div>
+                  <div style="font-size:10.5px;color:#5A6577;line-height:1.5">None of the three needs new building work. All three are recorded as tasks with owners.</div>
+                </div>
+                <div style="flex:1;min-height:0"></div>
+                <div style="flex:none;background:#fff;border:1px solid #E8ECF3;border-radius:12px;padding:12px 14px;display:flex;flex-direction:column;gap:7px">
+                  <div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em">Same records, no spring panic</div>
+                  <div style="font-size:10.5px;color:#5A6577;line-height:1.55">Every figure here comes from the spaces, routes, releases and door lists staff already use. The report is a view, not an exercise.</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;line-height:1.85;color:#7C8899">
+        <div><b style="color:#4A5566;font-weight:600">OPERATIONS</b> · getAccessReport · compareSeasons · getAuditMeasures · exportReport · createRemediationTask</div>
+        <div><b style="color:#4A5566;font-weight:600">STATES</b> · loading · <b style="color:#8A6D00">belowTarget — companion provision and online bookability under 100%</b> · comparing · exported · error</div>
+        <div><b style="color:#4A5566;font-weight:600">ARRIVES WITH</b> · tenantId←context · season←picker</div>
+        <div><b style="color:#4A5566;font-weight:600">GOES TO</b> · <a href="#seatp-3a">access inventory</a> · <a href="#seatp-3e">release rules</a></div>
+      </div>
+    </div>
+
+  </div>
+
+  <div style="margin-top:56px;padding-top:16px;border-top:1px solid #DCE3ED;display:flex;justify-content:space-between;font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:#8494A8">
+    <span>Seat Management · Board 3 of 13 · 10 screens</span>
+    <span><a href="Seat%20Platform%20Board%202.dc.html">← Board 2</a> · <a href="TICVAI%20All%20Boards%20Index.dc.html">index</a></span>
+  </div>
+</div>
+
+</x-dc>
+</body>
+</html>

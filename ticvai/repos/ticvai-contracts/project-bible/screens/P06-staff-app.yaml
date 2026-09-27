@@ -10768,6 +10768,7 @@ screens:
     status: notStarted
     provenance: generated
     board: wireframes/P06 Venue Staff App.dc.html#emp-030
+    derivedFrom: wireframes/reference/Seat Board 4.dc.html
     note: '**Drawn by Claude Design on `Seat Board 4.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.**
       The frame it points at now is the generated one. This screen has been designed once and is not starting
       from nothing.'
@@ -12128,6 +12129,7 @@ screens:
     status: notStarted
     provenance: generated
     board: wireframes/P06 Venue Staff App.dc.html#emp-051
+    derivedFrom: wireframes/reference/FnB Board 4.dc.html
     note: '**Drawn by Claude Design on `FnB Board 4.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.**
       The frame it points at now is the generated one. This screen has been designed once and is not starting
       from nothing.'
@@ -12235,6 +12237,7 @@ screens:
     status: notStarted
     provenance: generated
     board: wireframes/P06 Venue Staff App.dc.html#emp-052
+    derivedFrom: wireframes/reference/FnB Board 4.dc.html
     note: '**Drawn by Claude Design on `FnB Board 4.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.**
       The frame it points at now is the generated one. This screen has been designed once and is not starting
       from nothing.'
@@ -12368,6 +12371,7 @@ screens:
     status: notStarted
     provenance: generated
     board: wireframes/P06 Venue Staff App.dc.html#emp-053
+    derivedFrom: wireframes/reference/FnB Board 4.dc.html
     note: '**Drawn by Claude Design on `FnB Board 4.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.**
       The frame it points at now is the generated one. This screen has been designed once and is not starting
       from nothing.'
@@ -12512,6 +12516,7 @@ screens:
     status: notStarted
     provenance: generated
     board: wireframes/P06 Venue Staff App.dc.html#emp-054
+    derivedFrom: wireframes/reference/FnB Board 4.dc.html
     note: '**Drawn by Claude Design on `FnB Board 4.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.**
       The frame it points at now is the generated one. This screen has been designed once and is not starting
       from nothing.'
@@ -12690,6 +12695,7 @@ screens:
     status: notStarted
     provenance: generated
     board: wireframes/P06 Venue Staff App.dc.html#emp-055
+    derivedFrom: wireframes/reference/FnB Board 4.dc.html
     note: '**Drawn by Claude Design on `FnB Board 4.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.**
       The frame it points at now is the generated one. This screen has been designed once and is not starting
       from nothing.'
@@ -12834,6 +12840,7 @@ screens:
     status: notStarted
     provenance: generated
     board: wireframes/P06 Venue Staff App.dc.html#emp-056
+    derivedFrom: wireframes/reference/FnB Board 4.dc.html
     note: '**Drawn by Claude Design on `FnB Board 4.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.**
       The frame it points at now is the generated one. This screen has been designed once and is not starting
       from nothing.'
@@ -13077,6 +13084,7 @@ screens:
     status: notStarted
     provenance: generated
     board: wireframes/P06 Venue Staff App.dc.html#emp-057
+    derivedFrom: wireframes/reference/FnB Board 4.dc.html
     note: '**Drawn by Claude Design on `FnB Board 4.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.**
       The frame it points at now is the generated one. This screen has been designed once and is not starting
       from nothing.'
@@ -13606,6 +13614,7 @@ screens:
     status: notStarted
     provenance: generated
     board: wireframes/P06 Venue Staff App.dc.html#emp-058
+    derivedFrom: wireframes/reference/FnB Board 4.dc.html
     source: Claude Design F&B pack, 24 August
     note: '**Drawn by Claude Design on `FnB Board 4.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.**
       The frame it points at now is the generated one. This screen has been designed once and is not starting
@@ -13888,6 +13897,7 @@ screens:
     status: notStarted
     provenance: generated
     board: wireframes/P06 Venue Staff App.dc.html#emp-059
+    derivedFrom: wireframes/reference/FnB Board 4.dc.html
     source: Claude Design F&B pack, 24 August
     note: '**Drawn by Claude Design on `FnB Board 4.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.**
       The frame it points at now is the generated one. This screen has been designed once and is not starting
@@ -14049,6 +14059,7 @@ screens:
     status: notStarted
     provenance: generated
     board: wireframes/P06 Venue Staff App.dc.html#emp-060
+    derivedFrom: wireframes/reference/FnB Board 4.dc.html
     source: Claude Design F&B pack, 24 August
     note: '**Drawn by Claude Design on `FnB Board 4.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.**
       The frame it points at now is the generated one. This screen has been designed once and is not starting
@@ -14231,6 +14242,7 @@ screens:
     status: notStarted
     provenance: generated
     board: wireframes/P06 Venue Staff App.dc.html#emp-061
+    derivedFrom: wireframes/reference/FnB Board 4.dc.html
     source: Claude Design F&B pack, 24 August
     note: '**Drawn by Claude Design on `FnB Board 4.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.**
       The frame it points at now is the generated one. This screen has been designed once and is not starting
@@ -14366,6 +14378,7 @@ screens:
     status: notStarted
     provenance: generated
     board: wireframes/P06 Venue Staff App.dc.html#emp-062
+    derivedFrom: wireframes/reference/FnB Board 5.dc.html
     source: Claude Design F&B pack, 24 August
     note: '**Drawn by Claude Design on `FnB Board 5.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.**
       The frame it points at now is the generated one. This screen has been designed once and is not starting
@@ -14561,6 +14574,7 @@ screens:
     status: notStarted
     provenance: generated
     board: wireframes/P06 Venue Staff App.dc.html#emp-063
+    derivedFrom: wireframes/reference/FnB Board 4.dc.html
     source: Claude Design F&B pack, 24 August
     note: '**Drawn by Claude Design on `FnB Board 4.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.**
       The frame it points at now is the generated one. This screen has been designed once and is not starting
@@ -14714,6 +14728,7 @@ screens:
     status: notStarted
     provenance: generated
     board: wireframes/P06 Venue Staff App.dc.html#emp-064
+    derivedFrom: wireframes/reference/FnB Board 4.dc.html
     source: Claude Design F&B pack, 24 August
     note: '**Drawn by Claude Design on `FnB Board 4.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.**
       The frame it points at now is the generated one. This screen has been designed once and is not starting
@@ -14930,6 +14945,7 @@ screens:
     status: notStarted
     provenance: generated
     board: wireframes/P06 Venue Staff App.dc.html#emp-065
+    derivedFrom: wireframes/reference/FnB Board 5.dc.html
     source: Claude Design F&B pack, 24 August
     note: '**Drawn by Claude Design on `FnB Board 5.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.**
       The frame it points at now is the generated one. This screen has been designed once and is not starting
@@ -15080,6 +15096,7 @@ screens:
     status: notStarted
     provenance: generated
     board: wireframes/P06 Venue Staff App.dc.html#emp-066
+    derivedFrom: wireframes/reference/Retail Board 4.dc.html
     note: '**Drawn by Claude Design on `Retail Board 4.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.**
       The frame it points at now is the generated one. This screen has been designed once and is not starting
       from nothing.'
@@ -15315,6 +15332,7 @@ screens:
     status: notStarted
     provenance: generated
     board: wireframes/P06 Venue Staff App.dc.html#emp-067
+    derivedFrom: wireframes/reference/FnB Board 5.dc.html
     source: Claude Design F&B pack, 24 August
     note: '**Drawn by Claude Design on `FnB Board 5.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.**
       The frame it points at now is the generated one. This screen has been designed once and is not starting
@@ -15497,6 +15515,7 @@ screens:
     status: notStarted
     provenance: generated
     board: wireframes/P06 Venue Staff App.dc.html#emp-068
+    derivedFrom: wireframes/reference/Retail Board 4.dc.html
     note: '**Drawn by Claude Design on `Retail Board 4.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.**
       The frame it points at now is the generated one. This screen has been designed once and is not starting
       from nothing.'
@@ -15663,6 +15682,7 @@ screens:
     status: notStarted
     provenance: generated
     board: wireframes/P06 Venue Staff App.dc.html#emp-069
+    derivedFrom: wireframes/reference/Retail Board 4.dc.html
     note: '**Drawn by Claude Design on `Retail Board 4.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.**
       The frame it points at now is the generated one. This screen has been designed once and is not starting
       from nothing.'
@@ -15846,6 +15866,7 @@ screens:
     status: notStarted
     provenance: generated
     board: wireframes/P06 Venue Staff App.dc.html#emp-070
+    derivedFrom: wireframes/reference/Inventory Board 1.dc.html
     note: '**Drawn by Claude Design on `Inventory Board 1.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.**
       The frame it points at now is the generated one. This screen has been designed once and is not starting
       from nothing.'

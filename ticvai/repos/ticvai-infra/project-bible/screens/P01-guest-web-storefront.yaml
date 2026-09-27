@@ -397,8 +397,8 @@ screens:
     - Product.description
     - Product.kind
   wireframe:
-    status: notStarted
-    provenance: generated
+    status: review
+    provenance: designed
     board: wireframes/P01 Guest Web.dc.html#web-001
   apisNote: Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop pack
     — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
@@ -605,8 +605,8 @@ screens:
     - WaitTime.status
     - WaitTime.waitMinutes
   wireframe:
-    status: notStarted
-    provenance: generated
+    status: review
+    provenance: designed
     board: wireframes/P01 Guest Web.dc.html#web-002
   apisNote: Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack
     — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
@@ -737,8 +737,8 @@ screens:
     - Money.currency
     - Money.scale
   wireframe:
-    status: notStarted
-    provenance: generated
+    status: review
+    provenance: designed
     board: wireframes/P01 Guest Web.dc.html#web-003
   apisNote: Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack
     — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
@@ -969,8 +969,8 @@ screens:
     - Performance.endsAt
     - Performance.approvalRequestId
   wireframe:
-    status: notStarted
-    provenance: generated
+    status: review
+    provenance: designed
     board: wireframes/P01 Guest Web.dc.html#web-004
   apisNote: Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack
     — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
@@ -1107,8 +1107,8 @@ screens:
     - ProductVariant.axisValues
     - ProductVariant.isActive
   wireframe:
-    status: notStarted
-    provenance: generated
+    status: review
+    provenance: designed
     board: wireframes/P01 Guest Web.dc.html#web-005
   apisNote: Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack
     — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
@@ -1273,8 +1273,8 @@ screens:
     purpose: The performance being booked
     trigger: onAction
   wireframe:
-    status: notStarted
-    provenance: generated
+    status: review
+    provenance: designed
     board: wireframes/P01 Guest Web.dc.html#web-006
   apisNote: Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack
     — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
@@ -1449,9 +1449,10 @@ screens:
     coldEntry: '**A link to a performance that has happened.** Offers the next performance of the same
       event.'
   wireframe:
-    status: notStarted
-    provenance: generated
+    status: review
+    provenance: designed
     board: wireframes/P01 Guest Web.dc.html#web-007
+    derivedFrom: wireframes/reference/Seat Board 3.dc.html
     note: '**Drawn by Claude Design on `Seat Board 3.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.**
       The frame it points at now is the generated one. This screen has been designed once and is not starting
       from nothing.'
@@ -1654,8 +1655,8 @@ screens:
       from: navigation
     coldEntry: Resolves from the session; a cold arrival is the ordinary case.
   wireframe:
-    status: notStarted
-    provenance: generated
+    status: review
+    provenance: designed
     board: wireframes/P01 Guest Web.dc.html#web-008
   apisNote: Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack
     — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
@@ -1820,8 +1821,8 @@ screens:
       names the thing, says it is expired, cancelled or withdrawn, and offers the list it came from.**
       Arrives with `itemId`.'
   wireframe:
-    status: notStarted
-    provenance: generated
+    status: review
+    provenance: designed
     board: wireframes/P01 Guest Web.dc.html#web-009
   apisNote: Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop pack
     — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
@@ -2141,8 +2142,8 @@ screens:
       Arrives with `code`, `lineId`. **A cold arrival opens the cart whatever the session is** — the identity
       fork waits until checkout (ADR-0045).'
   wireframe:
-    status: notStarted
-    provenance: generated
+    status: review
+    provenance: designed
     board: wireframes/P01 Guest Web.dc.html#web-010
   apisNote: Rebuilt 9 September 2026 from the 9 operations this screen declares, not from a workshop pack
     — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
@@ -2542,8 +2543,8 @@ screens:
     - GuestDevice.tokenFingerprint
     - GuestDevice.tokenRef
   wireframe:
-    status: notStarted
-    provenance: generated
+    status: review
+    provenance: designed
     board: wireframes/P01 Guest Web.dc.html#web-011
   apisNote: Rebuilt 9 September 2026 from the 10 operations this screen declares, not from a workshop
     pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing
@@ -2708,8 +2709,8 @@ screens:
     coldEntry: '**A guest opening an order link weeks later.** Shows the order if it still resolves; if
       it was refunded or the performance passed, says which and offers the order list rather than an error.'
   wireframe:
-    status: notStarted
-    provenance: generated
+    status: review
+    provenance: designed
     board: wireframes/P01 Guest Web.dc.html#web-012
   apisNote: Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack
     — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
@@ -2944,8 +2945,8 @@ screens:
       from: WEB-012
     coldEntry: Resolves from the session; a cold arrival is the ordinary case.
   wireframe:
-    status: notStarted
-    provenance: generated
+    status: review
+    provenance: designed
     board: wireframes/P01 Guest Web.dc.html#web-013
   apisNote: Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop pack
     — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
@@ -3098,8 +3099,8 @@ screens:
       paid and superseded are three different messages, and **404 is never one of them**: telling somebody
       their booking does not exist when it expired is how a support call starts.'
   wireframe:
-    status: notStarted
-    provenance: generated
+    status: review
+    provenance: designed
     board: wireframes/P01 Guest Web.dc.html#web-014
   apisNote: Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack
     — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
@@ -3236,8 +3237,8 @@ screens:
       names the thing, says it is expired, cancelled or withdrawn, and offers the list it came from.**
       Arrives with `entryId`.'
   wireframe:
-    status: notStarted
-    provenance: generated
+    status: review
+    provenance: designed
     board: wireframes/P01 Guest Web.dc.html#web-015
   apisNote: Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop pack
     — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
@@ -3805,8 +3806,8 @@ screens:
     - MfaMethod.maskedTarget
     - MfaMethod.isActive
   wireframe:
-    status: notStarted
-    provenance: generated
+    status: review
+    provenance: designed
     board: wireframes/P01 Guest Web.dc.html#web-016
   apisNote: Rebuilt 9 September 2026 from the 19 operations this screen declares, not from a workshop
     pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing
@@ -4122,9 +4123,10 @@ screens:
     - GuestDevice.tokenFingerprint
     - GuestDevice.tokenRef
   wireframe:
-    status: notStarted
-    provenance: generated
+    status: review
+    provenance: designed
     board: wireframes/P01 Guest Web.dc.html#web-017
+    derivedFrom: wireframes/reference/Dashboards Board.dc.html
     note: '**Drawn by Claude Design on `Dashboards Board.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.**
       The frame it points at now is the generated one. This screen has been designed once and is not starting
       from nothing.'
@@ -4359,8 +4361,8 @@ screens:
     - Entitlement.orderId
     - Entitlement.orderLineId
   wireframe:
-    status: notStarted
-    provenance: generated
+    status: review
+    provenance: designed
     board: wireframes/P01 Guest Web.dc.html#web-018
   apisNote: Rebuilt 9 September 2026 from the 6 operations this screen declares, not from a workshop pack
     — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
@@ -4588,8 +4590,8 @@ screens:
     - Order.venueId
     - Order.scopePath
   wireframe:
-    status: notStarted
-    provenance: generated
+    status: review
+    provenance: designed
     board: wireframes/P01 Guest Web.dc.html#web-019
   apisNote: Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack
     — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
@@ -4804,8 +4806,8 @@ screens:
     - ConsentPurposeConfig.channels
     - ConsentPurposeConfig.noticeVersion
   wireframe:
-    status: notStarted
-    provenance: generated
+    status: review
+    provenance: designed
     board: wireframes/P01 Guest Web.dc.html#web-020
   apisNote: Rebuilt 9 September 2026 from the 5 operations this screen declares, not from a workshop pack
     — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
@@ -5106,8 +5108,8 @@ screens:
     - WalletTransaction.balanceAfter
     - WalletTransaction.orderId
   wireframe:
-    status: notStarted
-    provenance: generated
+    status: review
+    provenance: designed
     board: wireframes/P01 Guest Web.dc.html#web-021
   apisNote: Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop pack
     — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
@@ -5330,8 +5332,8 @@ screens:
     - Product.description
     - Product.kind
   wireframe:
-    status: notStarted
-    provenance: generated
+    status: review
+    provenance: designed
     board: wireframes/P01 Guest Web.dc.html#web-022
   apisNote: Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack
     — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
@@ -5551,8 +5553,8 @@ screens:
     - BillingStatement.periodEnd
     - BillingStatement.lines
   wireframe:
-    status: notStarted
-    provenance: generated
+    status: review
+    provenance: designed
     board: wireframes/P01 Guest Web.dc.html#web-023
   apisNote: Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop pack
     — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
@@ -6003,8 +6005,8 @@ screens:
     - GuestDevice.tokenFingerprint
     - GuestDevice.tokenRef
   wireframe:
-    status: notStarted
-    provenance: generated
+    status: review
+    provenance: designed
     board: wireframes/P01 Guest Web.dc.html#web-024
   apisNote: Rebuilt 9 September 2026 from the 7 operations this screen declares, not from a workshop pack
     — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
@@ -6121,8 +6123,8 @@ screens:
     purpose: Cases this guest has open
     trigger: onLoad
   wireframe:
-    status: notStarted
-    provenance: generated
+    status: review
+    provenance: designed
     board: wireframes/P01 Guest Web.dc.html#web-025
   apisNote: Rebuilt 9 September 2026 from the 1 operation this screen declares, not from a workshop pack
     — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
@@ -6253,8 +6255,8 @@ screens:
     purpose: from page inventory
     trigger: onAction
   wireframe:
-    status: notStarted
-    provenance: generated
+    status: review
+    provenance: designed
     board: wireframes/P01 Guest Web.dc.html#web-026
   apisNote: Rebuilt 9 September 2026 from the 1 operation this screen declares, not from a workshop pack
     — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
@@ -6566,8 +6568,8 @@ screens:
     - GuestDevice.tokenFingerprint
     - GuestDevice.tokenRef
   wireframe:
-    status: notStarted
-    provenance: generated
+    status: review
+    provenance: designed
     board: wireframes/P01 Guest Web.dc.html#web-027
   apisNote: Rebuilt 9 September 2026 from the 9 operations this screen declares, not from a workshop pack
     — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
@@ -6646,8 +6648,8 @@ screens:
     purpose: App status and recent changes
     trigger: onLoad
   wireframe:
-    status: notStarted
-    provenance: generated
+    status: review
+    provenance: designed
     board: wireframes/P01 Guest Web.dc.html#web-028
   apisNote: Rebuilt 9 September 2026 from the 1 operation this screen declares, not from a workshop pack
     — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
@@ -6720,8 +6722,8 @@ screens:
     purpose: from page inventory
     trigger: onLoad
   wireframe:
-    status: notStarted
-    provenance: generated
+    status: review
+    provenance: designed
     board: wireframes/P01 Guest Web.dc.html#web-029
   apisNote: Rebuilt 9 September 2026 from the 1 operation this screen declares, not from a workshop pack
     — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
@@ -6895,8 +6897,8 @@ screens:
     - OrderSummary.grossAmount
     - OrderSummary.refundedAmount
   wireframe:
-    status: notStarted
-    provenance: generated
+    status: review
+    provenance: designed
     board: wireframes/P01 Guest Web.dc.html#web-030
   apisNote: Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop pack
     — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
@@ -7245,8 +7247,8 @@ screens:
     - Reservation.lines
     - Reservation.expiresAt
   wireframe:
-    status: notStarted
-    provenance: generated
+    status: review
+    provenance: designed
     board: wireframes/P01 Guest Web.dc.html#web-031
   apisNote: Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop pack
     — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
@@ -7385,8 +7387,8 @@ screens:
     - Promotion.venueId
     - Promotion.discount
   wireframe:
-    status: notStarted
-    provenance: generated
+    status: review
+    provenance: designed
     board: wireframes/P01 Guest Web.dc.html#web-032
   apisNote: Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop pack
     — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
@@ -7567,8 +7569,8 @@ screens:
     - MerchandiseItem.name
     - MerchandiseItem.outletId
   wireframe:
-    status: notStarted
-    provenance: generated
+    status: review
+    provenance: designed
     board: wireframes/P01 Guest Web.dc.html#web-033
   apisNote: Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack
     — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
@@ -7754,8 +7756,8 @@ screens:
     - Case.guestName
     - Case.subject
   wireframe:
-    status: notStarted
-    provenance: generated
+    status: review
+    provenance: designed
     board: wireframes/P01 Guest Web.dc.html#web-034
   apisNote: Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop pack
     — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
@@ -7937,8 +7939,8 @@ screens:
     - FxRate.rate
     - FxRate.purpose
   wireframe:
-    status: notStarted
-    provenance: generated
+    status: review
+    provenance: designed
     board: wireframes/P01 Guest Web.dc.html#web-035
   apisNote: Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack
     — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
@@ -8206,8 +8208,8 @@ screens:
     preloaded:
     - FulfilmentSlots.slots
   wireframe:
-    status: notStarted
-    provenance: generated
+    status: review
+    provenance: designed
     board: wireframes/P01 Guest Web.dc.html#web-036
   apisNote: Rebuilt 9 September 2026 from the 8 operations this screen declares, not from a workshop pack
     — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
@@ -8427,8 +8429,8 @@ screens:
     - ModifierGroup.minSelections
     - ModifierGroup.maxSelections
   wireframe:
-    status: notStarted
-    provenance: generated
+    status: review
+    provenance: designed
     board: wireframes/P01 Guest Web.dc.html#web-037
   apisNote: Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack
     — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
@@ -8536,8 +8538,8 @@ screens:
       way onward — never a 404.** A shared link, a scanned code and a forwarded confirmation all land
       here, and the person holding it did nothing wrong. Arrives with `orderId`, `sessionId`.'
   wireframe:
-    status: notStarted
-    provenance: generated
+    status: review
+    provenance: designed
     board: wireframes/P01 Guest Web.dc.html#web-038
   apisNote: Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop pack
     — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
@@ -8730,9 +8732,10 @@ screens:
     - Queue.attractionProductId
     - Queue.assetId
   wireframe:
-    status: notStarted
-    provenance: generated
+    status: review
+    provenance: designed
     board: wireframes/P01 Guest Web.dc.html#web-039
+    derivedFrom: wireframes/reference/Seat Board 3.dc.html
     note: '**Drawn by Claude Design on `Seat Board 3.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.**
       The frame it points at now is the generated one. This screen has been designed once and is not starting
       from nothing.'
@@ -8874,8 +8877,8 @@ screens:
       way onward — never a 404.** A shared link, a scanned code and a forwarded confirmation all land
       here, and the person holding it did nothing wrong. Arrives with `entryId`.'
   wireframe:
-    status: notStarted
-    provenance: generated
+    status: review
+    provenance: designed
     board: wireframes/P01 Guest Web.dc.html#web-040
   apisNote: Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack
     — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
@@ -9060,8 +9063,8 @@ screens:
     - ParkingFacility.mode
     - ParkingFacility.capacity
   wireframe:
-    status: notStarted
-    provenance: generated
+    status: review
+    provenance: designed
     board: wireframes/P01 Guest Web.dc.html#web-041
   apisNote: Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop pack
     — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
@@ -9264,8 +9267,8 @@ screens:
     - MerchandiseItem.name
     - MerchandiseItem.outletId
   wireframe:
-    status: notStarted
-    provenance: generated
+    status: review
+    provenance: designed
     board: wireframes/P01 Guest Web.dc.html#web-042
   apisNote: Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack
     — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
@@ -9424,8 +9427,8 @@ screens:
       here, and the person holding it did nothing wrong. Arrives with no parameter — the venue comes from
       the site.'
   wireframe:
-    status: notStarted
-    provenance: generated
+    status: review
+    provenance: designed
     board: wireframes/P01 Guest Web.dc.html#web-043
   apisNote: Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack
     — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
@@ -9608,8 +9611,8 @@ screens:
       way onward — never a 404.** A shared link, a scanned code and a forwarded confirmation all land
       here, and the person holding it did nothing wrong. Arrives with `conversationId`.'
   wireframe:
-    status: notStarted
-    provenance: generated
+    status: review
+    provenance: designed
     board: wireframes/P01 Guest Web.dc.html#web-044
   apisNote: Rebuilt 9 September 2026 from the 5 operations this screen declares, not from a workshop pack
     — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
@@ -9796,8 +9799,8 @@ screens:
     - FaqCategory.entries
     - FaqCategory.scopePath
   wireframe:
-    status: notStarted
-    provenance: generated
+    status: review
+    provenance: designed
     board: wireframes/P01 Guest Web.dc.html#web-045
   apisNote: Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack
     — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
@@ -9876,8 +9879,8 @@ screens:
       here, and the person holding it did nothing wrong. Arrives with no parameter — the venue comes from
       the site.'
   wireframe:
-    status: notStarted
-    provenance: generated
+    status: review
+    provenance: designed
     board: wireframes/P01 Guest Web.dc.html#web-046
   apisNote: Rebuilt 9 September 2026 from the 1 operation this screen declares, not from a workshop pack
     — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them

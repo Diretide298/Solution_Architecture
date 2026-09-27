@@ -42,7 +42,7 @@ schemas:
   tables: 25
   stores:
   - postgres
-  largestTable: payments.fee_rule
+  largestTable: payments.method
 operationsByContract:
 - contract: orders
   count: 191

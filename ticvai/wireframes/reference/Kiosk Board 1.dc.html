@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+html,body{margin:0;padding:0;background:#EEF1F6;-webkit-font-smoothing:antialiased}
+*{box-sizing:border-box}
+a{color:#0D6EFD;text-decoration:none}a:hover{color:#0A55C7}
+</style>
+</helmet>
+
+<div style="font-family:Manrope,system-ui,sans-serif;color:#0B1324;padding:26px 34px 90px;max-width:1420px;margin:0 auto">
+  <div style="display:flex;align-items:flex-end;justify-content:space-between;gap:24px;padding-bottom:14px;border-bottom:2px solid #0B1324">
+    <div>
+      <div style="font-size:12px;font-weight:800;letter-spacing:.18em;background:linear-gradient(90deg,#0D6EFD,#00B8FF);-webkit-background-clip:text;background-clip:text;color:transparent">TICVAI</div>
+      <h1 style="font-size:21px;font-weight:800;letter-spacing:-.02em;margin:5px 0 0">Guest Kiosk · Board 1 — Buy a Ticket at the Door <span style="font-weight:600;color:#6B7280">(9 screens · KSK-001 to KSK-009)</span></h1>
+    </div>
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:#6B7280;text-align:right;line-height:1.7">
+      <div>guest · unattended · 1080 × 1920 portrait</div>
+      <div>frames keyed by reference code · <a href="TICVAI%20All%20Boards%20Index.dc.html">board index</a></div>
+    </div>
+  </div>
+
+  <p style="font-size:12.5px;color:#5A6577;max-width:84ch;margin:16px 0 0;line-height:1.65;text-wrap:pretty"><b style="color:#0B1324">Frame ids here are the client's reference codes.</b> <span style="font-family:'IBM Plex Mono',monospace;font-size:11.5px">KSK-004</span> is the anchor, the label and the index link, so no mapping has to be agreed. The kiosk serves somebody standing in a queue who has already decided to come in. Every screen answers one question and offers one way forward. Controls sit in the 900–1400 mm reach band; the top third of the glass is never interactive.</p>
+
+  <div style="display:flex;flex-direction:column;gap:44px;margin-top:34px">
+
+    <div id="KSK-001" data-screen-label="KSK-001" data-screen-id="KSK-001" style="display:flex;flex-direction:column;gap:12px;scroll-margin-top:24px">
+      <div>
+        <div style="display:flex;align-items:baseline;gap:9px"><span style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:#8494A8">KSK-001</span><span style="font-size:16.5px;font-weight:800;letter-spacing:-.015em">Attract Loop</span><span style="font-size:9px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;padding:2px 7px;border-radius:5px;background:#EDF3FF;color:#0A4FB8">idle state</span></div>
+        <div style="font-size:12px;color:#6B7280;margin-top:3px">What the machine shows when nobody is there. Tonight's remaining availability, not a brand film — the useful thing a passer-by wants to know is whether they can still get in.</div>
+      </div>
+      <div style="display:flex;gap:20px;align-items:stretch;background:#F7F9FC;border:1px solid #E3E8F0;border-radius:14px;padding:20px 24px">
+        <div style="flex:none;width:300px;height:534px;background:#0B1324;border-radius:16px;display:flex;flex-direction:column;overflow:hidden;box-shadow:0 12px 30px rgba(12,35,64,.22)">
+          <div style="flex:1;display:flex;flex-direction:column;justify-content:center;gap:16px;padding:26px">
+            <div style="font-size:13px;font-weight:800;letter-spacing:.14em;color:#9BC0E8">TONIGHT</div>
+            <div style="font-size:30px;font-weight:800;color:#fff;letter-spacing:-.025em;line-height:1.1">Twelfth Night</div>
+            <div style="font-family:'IBM Plex Mono',monospace;font-size:13px;color:#9BC0E8">19:30 · Hall 1 · 34 seats left</div>
+            <div style="height:1px;background:rgba(255,255,255,.14)"></div>
+            <div style="display:flex;flex-direction:column;gap:9px">
+              <div style="display:flex;justify-content:space-between;font-size:13px;color:#DCE8F7"><span>The Winter Guest</span><span style="font-family:'IBM Plex Mono',monospace;color:#7BE0B8">available</span></div>
+              <div style="display:flex;justify-content:space-between;font-size:13px;color:#DCE8F7"><span>Late Jazz · 22:00</span><span style="font-family:'IBM Plex Mono',monospace;color:#FFCE8A">6 left</span></div>
+            </div>
+          </div>
+          <div style="flex:none;background:#1E5AA8;padding:22px;text-align:center"><div style="font-size:19px;font-weight:800;color:#fff">Touch to buy a ticket</div><div style="font-size:12px;color:#BBD8F5;margin-top:4px">or collect a booking</div></div>
+        </div>
+        <div style="flex:1;display:flex;flex-direction:column;gap:12px;min-width:0">
+          <div style="background:#fff;border:1px solid #E8ECF3;border-radius:12px;padding:14px 16px">
+            <div style="font-size:12.5px;font-weight:800;margin-bottom:7px">The loop earns its place or it goes dark</div>
+            <div style="font-size:11.5px;color:#5A6577;line-height:1.6">Availability updates every 30 seconds from the same inventory the web storefront reads. If the venue has nothing left tonight the loop says so plainly and stops inviting touches — a kiosk that takes a queue's attention and then says "sold out" four screens later is worse than a dark screen.</div>
+          </div>
+          <div style="background:#fff;border:1px solid #E8ECF3;border-radius:12px;padding:14px 16px">
+            <div style="font-size:12.5px;font-weight:800;margin-bottom:7px">Touch anywhere</div>
+            <div style="font-size:11.5px;color:#5A6577;line-height:1.6">The whole glass is the button in this state. Guests touch the poster, not the call to action; requiring an accurate first tap loses people who have never used the machine before.</div>
+          </div>
+          <div style="flex:1;background:#fff;border:1px solid #E8ECF3;border-radius:12px;padding:14px 16px">
+            <div style="font-size:12.5px;font-weight:800;margin-bottom:7px">Reach band</div>
+            <div style="font-size:11.5px;color:#5A6577;line-height:1.6">On a 1920-tall portrait screen mounted at 1150 mm, the seated reach band covers the bottom 62% of the glass. Everything above is display only — which is why the availability list, not a control, occupies it.</div>
+          </div>
+        </div>
+      </div>
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;line-height:1.85;color:#7C8899">
+        <div><b style="color:#4A5566;font-weight:600">OPERATIONS</b> · getTonightAvailability · getUpcoming · wake</div>
+        <div><b style="color:#4A5566;font-weight:600">STATES</b> · <b style="color:#0A4FB8">availability</b> · soldOut · offline · outOfService</div>
+        <div><b style="color:#4A5566;font-weight:600">GOES TO</b> · <a href="#KSK-002">language select</a> · <a href="Kiosk%20Board%202.dc.html#KSK-014">out of service</a></div>
+      </div>
+    </div>
+
+    <div id="KSK-002" data-screen-label="KSK-002" data-screen-id="KSK-002" style="display:flex;flex-direction:column;gap:12px;scroll-margin-top:24px">
+      <div>
+        <div style="display:flex;align-items:baseline;gap:9px"><span style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:#8494A8">KSK-002</span><span style="font-size:16.5px;font-weight:800;letter-spacing:-.015em">Language Select</span><span style="font-size:9px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;padding:2px 7px;border-radius:5px;background:#EDF3FF;color:#0A4FB8">one tap, skippable</span></div>
+        <div style="font-size:12px;color:#6B7280;margin-top:3px">Shown for four seconds with the venue's default already selected. A guest who ignores it continues in the default rather than waiting.</div>
+      </div>
+      <div style="display:flex;gap:20px;align-items:stretch;background:#F7F9FC;border:1px solid #E3E8F0;border-radius:14px;padding:20px 24px">
+        <div style="flex:none;width:300px;height:534px;background:#fff;border:1px solid #E3E8F0;border-radius:16px;display:flex;flex-direction:column;overflow:hidden;box-shadow:0 12px 30px rgba(12,35,64,.14)">
+          <div style="flex:none;padding:22px 22px 12px"><div style="font-size:20px;font-weight:800;letter-spacing:-.02em">Choose a language</div><div style="font-size:12px;color:#6B7280;margin-top:3px">Continuing in English in 4s</div></div>
+          <div style="flex:1;display:flex;flex-direction:column;gap:10px;padding:10px 22px 22px">
+            <div style="height:62px;border-radius:12px;background:#1E5AA8;color:#fff;display:flex;align-items:center;padding:0 18px;font-size:17px;font-weight:800">English</div>
+            <div style="height:62px;border-radius:12px;border:1.5px solid #DCE3ED;display:flex;align-items:center;padding:0 18px;font-size:17px;font-weight:700">العربية</div>
+            <div style="height:62px;border-radius:12px;border:1.5px solid #DCE3ED;display:flex;align-items:center;padding:0 18px;font-size:17px;font-weight:700">Français</div>
+            <div style="height:62px;border-radius:12px;border:1.5px solid #DCE3ED;display:flex;align-items:center;padding:0 18px;font-size:17px;font-weight:700">Deutsch</div>
+            <div style="margin-top:auto;height:58px;border-radius:12px;background:#F1F4F9;display:flex;align-items:center;justify-content:center;gap:9px;font-size:15px;font-weight:700;color:#5A6577">Staff help</div>
+          </div>
+        </div>
+        <div style="flex:1;display:flex;flex-direction:column;gap:12px;min-width:0">
+          <div style="background:#fff;border:1px solid #E8ECF3;border-radius:12px;padding:14px 16px">
+            <div style="font-size:12.5px;font-weight:800;margin-bottom:7px">Four, not fourteen</div>
+            <div style="font-size:11.5px;color:#5A6577;line-height:1.6">The tenant picks up to four languages for this screen from the full supported list. A scrolling language menu on a kiosk is a dead end for exactly the guest it is meant to serve.</div>
+          </div>
+          <div style="background:#fff;border:1px solid #E8ECF3;border-radius:12px;padding:14px 16px">
+            <div style="font-size:12.5px;font-weight:800;margin-bottom:7px">RTL is a layout, not a translation</div>
+            <div style="font-size:11.5px;color:#5A6577;line-height:1.6">Choosing Arabic mirrors the whole flow: progress runs right to left, the primary action moves to the left edge, numerals stay Western per the venue's own signage.</div>
+          </div>
+          <div style="flex:1;background:#fff;border:1px solid #E8ECF3;border-radius:12px;padding:14px 16px">
+            <div style="font-size:12.5px;font-weight:800;margin-bottom:7px">Staff help is on every screen</div>
+            <div style="font-size:11.5px;color:#5A6577;line-height:1.6">From here to the receipt, the same button sits in the same place and cannot be removed by a tenant. It raises <a href="Kiosk%20Board%202.dc.html#KSK-013">KSK-013</a> without losing the guest's progress.</div>
+          </div>
+        </div>
+      </div>
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;line-height:1.85;color:#7C8899">
+        <div><b style="color:#4A5566;font-weight:600">OPERATIONS</b> · getLanguages · setLocale · startSession</div>
+        <div><b style="color:#4A5566;font-weight:600">STATES</b> · <b style="color:#0A4FB8">choosing</b> · autoContinue · rtl</div>
+        <div><b style="color:#4A5566;font-weight:600">GOES TO</b> · <a href="#KSK-003">what are you buying</a> · <a href="Kiosk%20Board%202.dc.html#KSK-013">call staff</a></div>
+      </div>
+    </div>
+
+    <div id="KSK-003" data-screen-label="KSK-003" data-screen-id="KSK-003" style="display:flex;flex-direction:column;gap:12px;scroll-margin-top:24px">
+      <div>
+        <div style="display:flex;align-items:baseline;gap:9px"><span style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:#8494A8">KSK-003</span><span style="font-size:16.5px;font-weight:800;letter-spacing:-.015em">What are you buying</span><span style="font-size:9px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;padding:2px 7px;border-radius:5px;background:#EDF3FF;color:#0A4FB8">three doors</span></div>
+        <div style="font-size:12px;color:#6B7280;margin-top:3px">Buy, collect, or something else. The fourth option people actually want — food and shop — is deliberately below the fold on the buying path.</div>
+      </div>
+      <div style="display:flex;gap:20px;align-items:stretch;background:#F7F9FC;border:1px solid #E3E8F0;border-radius:14px;padding:20px 24px">
+        <div style="flex:none;width:300px;height:534px;background:#fff;border:1px solid #E3E8F0;border-radius:16px;display:flex;flex-direction:column;overflow:hidden;box-shadow:0 12px 30px rgba(12,35,64,.14)">
+          <div style="flex:none;padding:22px 22px 14px"><div style="font-size:20px;font-weight:800;letter-spacing:-.02em">How can we help?</div></div>
+          <div style="flex:1;display:flex;flex-direction:column;gap:11px;padding:0 22px 22px">
+            <div style="flex:none;border-radius:13px;background:#1E5AA8;padding:17px 18px;color:#fff"><div style="font-size:17px;font-weight:800">Buy tickets</div><div style="font-size:12px;color:#BBD8F5;margin-top:2px">for today or another date</div></div>
+            <div style="flex:none;border-radius:13px;border:1.5px solid #DCE3ED;padding:17px 18px"><div style="font-size:17px;font-weight:800">Collect a booking</div><div style="font-size:12px;color:#6B7280;margin-top:2px">scan the code or enter a reference</div></div>
+            <div style="flex:none;border-radius:13px;border:1.5px solid #DCE3ED;padding:17px 18px"><div style="font-size:17px;font-weight:800">Food &amp; shop</div><div style="font-size:12px;color:#6B7280;margin-top:2px">order without queueing</div></div>
+            <div style="margin-top:auto;height:58px;border-radius:12px;background:#F1F4F9;display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:700;color:#5A6577">Staff help</div>
+          </div>
+        </div>
+        <div style="flex:1;display:flex;flex-direction:column;gap:12px;min-width:0">
+          <div style="background:#fff;border:1px solid #E8ECF3;border-radius:12px;padding:14px 16px">
+            <div style="font-size:12.5px;font-weight:800;margin-bottom:7px">Collect is second, not first</div>
+            <div style="font-size:11.5px;color:#5A6577;line-height:1.6">Measured across comparable venues, buying is roughly two thirds of kiosk sessions and collection one third — but collection is the faster job, so it sits within one tap and its own path (<a href="Kiosk%20Board%202.dc.html#KSK-011">KSK-011</a>) skips every purchase screen.</div>
+          </div>
+          <div style="background:#fff;border:1px solid #E8ECF3;border-radius:12px;padding:14px 16px">
+            <div style="font-size:12.5px;font-weight:800;margin-bottom:7px">No sign-in anywhere on this board</div>
+            <div style="font-size:11.5px;color:#5A6577;line-height:1.6">A kiosk purchase is anonymous by default. The guest is offered a receipt by email at the end, not an account at the start.</div>
+          </div>
+          <div style="flex:1;background:#fff;border:1px solid #E8ECF3;border-radius:12px;padding:14px 16px">
+            <div style="font-size:12.5px;font-weight:800;margin-bottom:7px">Timeout returns, never resets silently</div>
+            <div style="font-size:11.5px;color:#5A6577;line-height:1.6">45 seconds of no touch shows a 10-second "still there?" panel before returning to the loop. Nothing is charged, nothing is held.</div>
+          </div>
+        </div>
+      </div>
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;line-height:1.85;color:#7C8899">
+        <div><b style="color:#4A5566;font-weight:600">OPERATIONS</b> · getEnabledPaths · startPurchase · startCollection</div>
+        <div><b style="color:#4A5566;font-weight:600">STATES</b> · <b style="color:#0A4FB8">choosing</b> · fnbDisabled · timeoutWarning</div>
+        <div><b style="color:#4A5566;font-weight:600">GOES TO</b> · <a href="#KSK-004">choose tickets</a> · <a href="Kiosk%20Board%202.dc.html#KSK-011">collect a booking</a> · <a href="Kiosk%20Board%202.dc.html#KSK-015">order food</a></div>
+      </div>
+    </div>
+
+    <div id="KSK-004" data-screen-label="KSK-004" data-screen-id="KSK-004" style="display:flex;flex-direction:column;gap:12px;scroll-margin-top:24px">
+      <div>
+        <div style="display:flex;align-items:baseline;gap:9px"><span style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:#8494A8">KSK-004</span><span style="font-size:16.5px;font-weight:800;letter-spacing:-.015em">Choose tickets</span><span style="font-size:9px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;padding:2px 7px;border-radius:5px;background:#EDF3FF;color:#0A4FB8">quantity by type</span></div>
+        <div style="font-size:12px;color:#6B7280;margin-top:3px">Steppers, not a dropdown of quantities. Concession eligibility is stated on the row rather than hidden behind a help icon, because at a kiosk nobody taps the help icon.</div>
+      </div>
+      <div style="display:flex;gap:20px;align-items:stretch;background:#F7F9FC;border:1px solid #E3E8F0;border-radius:14px;padding:20px 24px">
+        <div style="flex:none;width:300px;height:534px;background:#fff;border:1px solid #E3E8F0;border-radius:16px;display:flex;flex-direction:column;overflow:hidden;box-shadow:0 12px 30px rgba(12,35,64,.14)">
+          <div style="flex:none;padding:20px 20px 12px;border-bottom:1px solid #F4F6FA"><div style="font-size:17px;font-weight:800;letter-spacing:-.015em">Twelfth Night</div><div style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#6B7280;margin-top:2px">Tue 16 Sep · 19:30</div></div>
+          <div style="flex:1;display:flex;flex-direction:column;gap:12px;padding:14px 20px;overflow:hidden">
+            <div style="display:flex;align-items:center;gap:11px"><div style="flex:1"><div style="font-size:14.5px;font-weight:700">Adult</div><div style="font-size:11.5px;color:#6B7280">£28.00</div></div><div style="display:flex;align-items:center;gap:9px"><span style="width:42px;height:42px;border-radius:11px;border:1.5px solid #DCE3ED;display:flex;align-items:center;justify-content:center;font-size:19px;color:#8494A8">−</span><span style="font-family:'IBM Plex Mono',monospace;font-size:17px;font-weight:600;width:20px;text-align:center">2</span><span style="width:42px;height:42px;border-radius:11px;background:#1E5AA8;color:#fff;display:flex;align-items:center;justify-content:center;font-size:19px">+</span></div></div>
+            <div style="display:flex;align-items:center;gap:11px"><div style="flex:1"><div style="font-size:14.5px;font-weight:700">Under 26</div><div style="font-size:11.5px;color:#6B7280">£14.00 · ID at the door</div></div><div style="display:flex;align-items:center;gap:9px"><span style="width:42px;height:42px;border-radius:11px;border:1.5px solid #EEF2F7;display:flex;align-items:center;justify-content:center;font-size:19px;color:#C9D3E0">−</span><span style="font-family:'IBM Plex Mono',monospace;font-size:17px;font-weight:600;width:20px;text-align:center;color:#8494A8">0</span><span style="width:42px;height:42px;border-radius:11px;border:1.5px solid #DCE3ED;display:flex;align-items:center;justify-content:center;font-size:19px;color:#5A6577">+</span></div></div>
+            <div style="display:flex;align-items:center;gap:11px"><div style="flex:1"><div style="font-size:14.5px;font-weight:700">Wheelchair space</div><div style="font-size:11.5px;color:#0B7A55">includes a free companion</div></div><div style="display:flex;align-items:center;gap:9px"><span style="width:42px;height:42px;border-radius:11px;border:1.5px solid #EEF2F7;display:flex;align-items:center;justify-content:center;font-size:19px;color:#C9D3E0">−</span><span style="font-family:'IBM Plex Mono',monospace;font-size:17px;font-weight:600;width:20px;text-align:center;color:#8494A8">0</span><span style="width:42px;height:42px;border-radius:11px;border:1.5px solid #DCE3ED;display:flex;align-items:center;justify-content:center;font-size:19px;color:#5A6577">+</span></div></div>
+          </div>
+          <div style="flex:none;padding:16px 20px;border-top:1px solid #F4F6FA;background:#F7F9FC">
+            <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:11px"><span style="font-size:13px;color:#5A6577">2 tickets</span><span style="font-family:'IBM Plex Mono',monospace;font-size:21px;font-weight:600">£56.00</span></div>
+            <div style="height:56px;border-radius:12px;background:#1E5AA8;color:#fff;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:800">Continue</div>
+          </div>
+        </div>
+        <div style="flex:1;display:flex;flex-direction:column;gap:12px;min-width:0">
+          <div style="background:#fff;border:1px solid #E8ECF3;border-radius:12px;padding:14px 16px">
+            <div style="font-size:12.5px;font-weight:800;margin-bottom:7px">The wheelchair row is never hidden</div>
+            <div style="font-size:11.5px;color:#5A6577;line-height:1.6">It appears whenever the session has an accessible space free, at the same size as every other row, with the companion policy on the row. A tenant can rename it; they cannot bury it behind an accessibility menu.</div>
+          </div>
+          <div style="background:#fff;border:1px solid #E8ECF3;border-radius:12px;padding:14px 16px">
+            <div style="font-size:12.5px;font-weight:800;margin-bottom:7px">42 px steppers, 11 px apart</div>
+            <div style="font-size:11.5px;color:#5A6577;line-height:1.6">Above the 44 px minimum once the glass bezel offset is applied, and far enough apart that a mistaken decrement is rare. Quantity is capped at 8 per type; above that the screen offers staff help instead of a longer list.</div>
+          </div>
+          <div style="flex:1;background:#fff;border:1px solid #E8ECF3;border-radius:12px;padding:14px 16px">
+            <div style="font-size:12.5px;font-weight:800;margin-bottom:7px">Price is the last thing to move</div>
+            <div style="font-size:11.5px;color:#5A6577;line-height:1.6">The total sits directly above Continue and animates only on change, so a guest checking their maths does not have to look for it. Fees, if the tenant charges any, are named here and never added later.</div>
+          </div>
+        </div>
+      </div>
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;line-height:1.85;color:#7C8899">
+        <div><b style="color:#4A5566;font-weight:600">OPERATIONS</b> · getTicketTypes · setQuantity · priceBasket</div>
+        <div><b style="color:#4A5566;font-weight:600">STATES</b> · <b style="color:#0A4FB8">choosing</b> · capReached · accessibleUnavailable · soldOut</div>
+        <div><b style="color:#4A5566;font-weight:600">GOES TO</b> · <a href="#KSK-005">choose a session</a> · <a href="#KSK-006">review</a></div>
+      </div>
+    </div>
+
+    <div id="KSK-005" data-screen-label="KSK-005" data-screen-id="KSK-005" style="display:flex;flex-direction:column;gap:12px;scroll-margin-top:24px">
+      <div>
+        <div style="display:flex;align-items:baseline;gap:9px"><span style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:#8494A8">KSK-005</span><span style="font-size:16.5px;font-weight:800;letter-spacing:-.015em">Choose a session</span><span style="font-size:9px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;padding:2px 7px;border-radius:5px;background:#EDF3FF;color:#0A4FB8">today first</span></div>
+        <div style="font-size:12px;color:#6B7280;margin-top:3px">Times today, then the next three days. A full calendar is available but not the default, because a guest at the door is usually coming in now.</div>
+      </div>
+      <div style="display:flex;gap:20px;align-items:stretch;background:#F7F9FC;border:1px solid #E3E8F0;border-radius:14px;padding:20px 24px">
+        <div style="flex:none;width:300px;height:534px;background:#fff;border:1px solid #E3E8F0;border-radius:16px;display:flex;flex-direction:column;overflow:hidden;box-shadow:0 12px 30px rgba(12,35,64,.14)">
+          <div style="flex:none;padding:20px 20px 12px"><div style="font-size:19px;font-weight:800;letter-spacing:-.02em">When?</div><div style="font-size:12px;color:#6B7280;margin-top:2px">2 adult tickets</div></div>
+          <div style="flex:1;display:flex;flex-direction:column;gap:9px;padding:6px 20px 20px;overflow:hidden">
+            <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:#94A0B4">today · tue 16 sep</div>
+            <div style="display:flex;gap:9px">
+              <div style="flex:1;height:66px;border-radius:12px;border:1.5px solid #EEF2F7;background:#FBFCFE;display:flex;flex-direction:column;align-items:center;justify-content:center"><span style="font-family:'IBM Plex Mono',monospace;font-size:16px;color:#C9D3E0">14:00</span><span style="font-size:10px;color:#C9D3E0">started</span></div>
+              <div style="flex:1;height:66px;border-radius:12px;background:#1E5AA8;display:flex;flex-direction:column;align-items:center;justify-content:center;color:#fff"><span style="font-family:'IBM Plex Mono',monospace;font-size:16px;font-weight:600">19:30</span><span style="font-size:10px;color:#BBD8F5">34 left</span></div>
+              <div style="flex:1;height:66px;border-radius:12px;border:1.5px solid #DCE3ED;display:flex;flex-direction:column;align-items:center;justify-content:center"><span style="font-family:'IBM Plex Mono',monospace;font-size:16px;font-weight:600">22:00</span><span style="font-size:10px;color:#B8791E">6 left</span></div>
+            </div>
+            <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:#94A0B4;margin-top:6px">wed 17 sep</div>
+            <div style="display:flex;gap:9px">
+              <div style="flex:1;height:66px;border-radius:12px;border:1.5px solid #DCE3ED;display:flex;flex-direction:column;align-items:center;justify-content:center"><span style="font-family:'IBM Plex Mono',monospace;font-size:16px;font-weight:600">14:00</span><span style="font-size:10px;color:#0B7A55">available</span></div>
+              <div style="flex:1;height:66px;border-radius:12px;border:1.5px solid #DCE3ED;display:flex;flex-direction:column;align-items:center;justify-content:center"><span style="font-family:'IBM Plex Mono',monospace;font-size:16px;font-weight:600">19:30</span><span style="font-size:10px;color:#0B7A55">available</span></div>
+              <div style="flex:1;height:66px;border-radius:12px;border:1.5px solid #EEF2F7;background:#FBFCFE;display:flex;flex-direction:column;align-items:center;justify-content:center"><span style="font-family:'IBM Plex Mono',monospace;font-size:16px;color:#C9D3E0">22:00</span><span style="font-size:10px;color:#C9D3E0">sold out</span></div>
+            </div>
+            <div style="margin-top:auto;height:52px;border-radius:12px;border:1.5px solid #DCE3ED;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;color:#5A6577">Another date</div>
+          </div>
+        </div>
+        <div style="flex:1;display:flex;flex-direction:column;gap:12px;min-width:0">
+          <div style="background:#fff;border:1px solid #E8ECF3;border-radius:12px;padding:14px 16px">
+            <div style="font-size:12.5px;font-weight:800;margin-bottom:7px">Remaining counts are honest or absent</div>
+            <div style="font-size:11.5px;color:#5A6577;line-height:1.6">"6 left" means six sellable seats for the quantity in the basket, not six in total. If the tenant would rather not publish counts, the tile shows availability as a word — never an invented scarcity figure.</div>
+          </div>
+          <div style="background:#fff;border:1px solid #E8ECF3;border-radius:12px;padding:14px 16px">
+            <div style="font-size:12.5px;font-weight:800;margin-bottom:7px">A started session is shown, not removed</div>
+            <div style="font-size:11.5px;color:#5A6577;line-height:1.6">14:00 stays visible and greyed. Removing it makes the guest wonder whether they misread the poster outside.</div>
+          </div>
+          <div style="flex:1;background:#fff;border:1px solid #E8ECF3;border-radius:12px;padding:14px 16px">
+            <div style="font-size:12.5px;font-weight:800;margin-bottom:7px">Seats are allocated, not picked</div>
+            <div style="font-size:11.5px;color:#5A6577;line-height:1.6">Best-available runs on selection; there is no seat map on the kiosk. A guest who wants a specific seat is directed to staff or the web storefront, where the map exists.</div>
+          </div>
+        </div>
+      </div>
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;line-height:1.85;color:#7C8899">
+        <div><b style="color:#4A5566;font-weight:600">OPERATIONS</b> · getSessions · checkAvailability · allocateBestAvailable · holdSeats</div>
+        <div><b style="color:#4A5566;font-weight:600">STATES</b> · <b style="color:#0A4FB8">today</b> · nextDays · fullCalendar · noneAvailable</div>
+        <div><b style="color:#4A5566;font-weight:600">GOES TO</b> · <a href="#KSK-006">review</a></div>
+      </div>
+    </div>
+
+    <div id="KSK-006" data-screen-label="KSK-006" data-screen-id="KSK-006" style="display:flex;flex-direction:column;gap:12px;scroll-margin-top:24px">
+      <div>
+        <div style="display:flex;align-items:baseline;gap:9px"><span style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:#8494A8">KSK-006</span><span style="font-size:16.5px;font-weight:800;letter-spacing:-.015em">Review</span><span style="font-size:9px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;padding:2px 7px;border-radius:5px;background:#EDF3FF;color:#0A4FB8">hold timer visible</span></div>
+        <div style="font-size:12px;color:#6B7280;margin-top:3px">Everything the guest is about to pay for, the seats now held, and how long the hold lasts. The only screen on the board that offers an add-on.</div>
+      </div>
+      <div style="display:flex;gap:20px;align-items:stretch;background:#F7F9FC;border:1px solid #E3E8F0;border-radius:14px;padding:20px 24px">
+        <div style="flex:none;width:300px;height:534px;background:#fff;border:1px solid #E3E8F0;border-radius:16px;display:flex;flex-direction:column;overflow:hidden;box-shadow:0 12px 30px rgba(12,35,64,.14)">
+          <div style="flex:none;background:#0B1324;padding:14px 20px;display:flex;align-items:center;justify-content:space-between"><span style="font-size:12.5px;color:#9BC0E8">Seats held</span><span style="font-family:'IBM Plex Mono',monospace;font-size:15px;font-weight:600;color:#fff">4:38</span></div>
+          <div style="flex:1;display:flex;flex-direction:column;gap:13px;padding:18px 20px;overflow:hidden">
+            <div><div style="font-size:17px;font-weight:800;letter-spacing:-.015em">Twelfth Night</div><div style="font-family:'IBM Plex Mono',monospace;font-size:11.5px;color:#6B7280;margin-top:2px">Tue 16 Sep · 19:30 · Hall 1</div></div>
+            <div style="display:flex;flex-direction:column;gap:8px;padding:13px 0;border-top:1px solid #F4F6FA;border-bottom:1px solid #F4F6FA">
+              <div style="display:flex;justify-content:space-between;font-size:13.5px"><span>2 × Adult · N12, N13</span><span style="font-family:'IBM Plex Mono',monospace">£56.00</span></div>
+              <div style="display:flex;justify-content:space-between;font-size:12.5px;color:#6B7280"><span>Step-free access</span><span style="color:#0B7A55">yes · Door 4</span></div>
+            </div>
+            <div style="border:1.5px solid #DCE3ED;border-radius:12px;padding:13px 14px;display:flex;align-items:center;gap:12px"><div style="flex:1"><div style="font-size:13.5px;font-weight:700">Programme</div><div style="font-size:11.5px;color:#6B7280">£5.00 · collect at the door</div></div><span style="width:40px;height:40px;border-radius:11px;border:1.5px solid #DCE3ED;display:flex;align-items:center;justify-content:center;font-size:18px;color:#5A6577">+</span></div>
+            <div style="margin-top:auto;display:flex;justify-content:space-between;align-items:baseline"><span style="font-size:14px;font-weight:700">Total</span><span style="font-family:'IBM Plex Mono',monospace;font-size:24px;font-weight:600">£56.00</span></div>
+          </div>
+          <div style="flex:none;padding:0 20px 20px;display:flex;flex-direction:column;gap:9px">
+            <div style="height:58px;border-radius:12px;background:#1E5AA8;color:#fff;display:flex;align-items:center;justify-content:center;font-size:16.5px;font-weight:800">Pay £56.00</div>
+            <div style="height:48px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;color:#5A6577">Start again</div>
+          </div>
+        </div>
+        <div style="flex:1;display:flex;flex-direction:column;gap:12px;min-width:0">
+          <div style="background:#fff;border:1px solid #E8ECF3;border-radius:12px;padding:14px 16px">
+            <div style="font-size:12.5px;font-weight:800;margin-bottom:7px">Five minutes, counted down in public</div>
+            <div style="font-size:11.5px;color:#5A6577;line-height:1.6">The hold is the same mechanism the web storefront and the app use. Showing the timer on the dark bar rather than in a corner is what stops a guest wandering off to find their card and losing the seats silently.</div>
+          </div>
+          <div style="background:#fff;border:1px solid #E8ECF3;border-radius:12px;padding:14px 16px">
+            <div style="font-size:12.5px;font-weight:800;margin-bottom:7px">One add-on, after the price is settled</div>
+            <div style="font-size:11.5px;color:#5A6577;line-height:1.6">The programme is offered once, here, and it is collected at the door rather than printed. Nothing is pre-selected. Upsell before this point measurably lengthens the queue behind.</div>
+          </div>
+          <div style="flex:1;background:#fff;border:1px solid #E8ECF3;border-radius:12px;padding:14px 16px">
+            <div style="font-size:12.5px;font-weight:800;margin-bottom:7px">Seat numbers appear before payment</div>
+            <div style="font-size:11.5px;color:#5A6577;line-height:1.6">N12 and N13 with the door and the step-free answer. A guest who needs different seats finds out now, not on the printed ticket.</div>
+          </div>
+        </div>
+      </div>
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;line-height:1.85;color:#7C8899">
+        <div><b style="color:#4A5566;font-weight:600">OPERATIONS</b> · getHold · addAddon · priceBasket · beginPayment</div>
+        <div><b style="color:#4A5566;font-weight:600">STATES</b> · <b style="color:#0A4FB8">held</b> · expiringSoon · expired · addonAdded</div>
+        <div><b style="color:#4A5566;font-weight:600">GOES TO</b> · <a href="#KSK-007">payment</a> · <a href="#KSK-003">start again</a></div>
+      </div>
+    </div>
+
+    <div id="KSK-007" data-screen-label="KSK-007" data-screen-id="KSK-007" style="display:flex;flex-direction:column;gap:12px;scroll-margin-top:24px">
+      <div>
+        <div style="display:flex;align-items:baseline;gap:9px"><span style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:#8494A8">KSK-007</span><span style="font-size:16.5px;font-weight:800;letter-spacing:-.015em">Payment</span><span style="font-size:9px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;padding:2px 7px;border-radius:5px;background:#EDF3FF;color:#0A4FB8">card present</span></div>
+        <div style="font-size:12px;color:#6B7280;margin-top:3px">The screen's only job is to point at the reader and say what is happening. No progress spinner without a word next to it.</div>
+      </div>
+      <div style="display:flex;gap:20px;align-items:stretch;background:#F7F9FC;border:1px solid #E3E8F0;border-radius:14px;padding:20px 24px">
+        <div style="flex:none;width:300px;height:534px;background:#fff;border:1px solid #E3E8F0;border-radius:16px;display:flex;flex-direction:column;overflow:hidden;box-shadow:0 12px 30px rgba(12,35,64,.14)">
+          <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:20px;padding:26px;text-align:center">
+            <div style="font-family:'IBM Plex Mono',monospace;font-size:32px;font-weight:600">£56.00</div>
+            <div style="width:150px;height:96px;border-radius:14px;border:2.5px dashed #1E5AA8;display:flex;align-items:center;justify-content:center;background:#F2F7FD"><span style="font-size:13px;font-weight:800;color:#1E5AA8;letter-spacing:.04em">READER</span></div>
+            <div><div style="font-size:19px;font-weight:800;letter-spacing:-.015em">Tap or insert your card</div><div style="font-size:12.5px;color:#6B7280;margin-top:5px">Below the reader on your right</div></div>
+            <div style="display:flex;gap:8px;align-items:center;font-size:11.5px;color:#6B7280"><span>Cards</span><span>·</span><span>Apple Pay</span><span>·</span><span>Google Pay</span></div>
+          </div>
+          <div style="flex:none;padding:0 20px 20px"><div style="height:50px;border-radius:12px;border:1.5px solid #DCE3ED;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;color:#5A6577">Cancel this payment</div></div>
+        </div>
+        <div style="flex:1;display:flex;flex-direction:column;gap:12px;min-width:0">
+          <div style="background:#fff;border:1px solid #E8ECF3;border-radius:12px;padding:14px 16px">
+            <div style="font-size:12.5px;font-weight:800;margin-bottom:7px">The reader is described by position</div>
+            <div style="font-size:11.5px;color:#5A6577;line-height:1.6">"Below the reader on your right" — because on a floor-standing kiosk the reader is not where a guest looks first. The dashed outline on screen sits on the same side as the physical hardware.</div>
+          </div>
+          <div style="background:#fff;border:1px solid #E8ECF3;border-radius:12px;padding:14px 16px">
+            <div style="font-size:12.5px;font-weight:800;margin-bottom:7px">Cancel is always available until authorisation</div>
+            <div style="font-size:11.5px;color:#5A6577;line-height:1.6">Once the reader takes over, cancel greys and the copy changes to "follow the reader". A button that looks live but does nothing is how guests end up tapping twice.</div>
+          </div>
+          <div style="flex:1;background:#fff;border:1px solid #E8ECF3;border-radius:12px;padding:14px 16px">
+            <div style="font-size:12.5px;font-weight:800;margin-bottom:7px">Every ambiguous outcome goes to one place</div>
+            <div style="font-size:11.5px;color:#5A6577;line-height:1.6">Timeout, partial authorisation, reader disconnect and unknown result all land on <a href="#KSK-008">KSK-008</a> rather than a generic decline, because the guest's real question is whether they have been charged.</div>
+          </div>
+        </div>
+      </div>
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;line-height:1.85;color:#7C8899">
+        <div><b style="color:#4A5566;font-weight:600">OPERATIONS</b> · beginPayment · pollReader · authorise · cancelPayment</div>
+        <div><b style="color:#4A5566;font-weight:600">STATES</b> · <b style="color:#0A4FB8">waitingForCard</b> · reading · authorising · declined · readerOffline</div>
+        <div><b style="color:#4A5566;font-weight:600">GOES TO</b> · <a href="#KSK-009">ticket issued</a> · <a href="#KSK-008">payment unresolved</a></div>
+      </div>
+    </div>
+
+    <div id="KSK-008" data-screen-label="KSK-008" data-screen-id="KSK-008" style="display:flex;flex-direction:column;gap:12px;scroll-margin-top:24px">
+      <div>
+        <div style="display:flex;align-items:baseline;gap:9px"><span style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:#8494A8">KSK-008</span><span style="font-size:16.5px;font-weight:800;letter-spacing:-.015em">Payment unresolved</span><span style="font-size:9px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;padding:2px 7px;border-radius:5px;background:#FFF1DC;color:#8A5A12">no guess</span></div>
+        <div style="font-size:12px;color:#6B7280;margin-top:3px">The kiosk does not know whether the card was charged. It says exactly that, gives the guest a reference, and calls a member of staff without being asked.</div>
+      </div>
+      <div style="display:flex;gap:20px;align-items:stretch;background:#F7F9FC;border:1px solid #E3E8F0;border-radius:14px;padding:20px 24px">
+        <div style="flex:none;width:300px;height:534px;background:#fff;border:1px solid #E3E8F0;border-radius:16px;display:flex;flex-direction:column;overflow:hidden;box-shadow:0 12px 30px rgba(12,35,64,.14)">
+          <div style="flex:none;background:#8A5A12;padding:16px 20px"><div style="font-size:15px;font-weight:800;color:#fff">We are checking your payment</div></div>
+          <div style="flex:1;display:flex;flex-direction:column;gap:16px;padding:20px">
+            <div style="font-size:13.5px;color:#3E4757;line-height:1.6">Your card may or may not have been charged. Do not tap your card again. A member of staff has been called and can settle this at the desk.</div>
+            <div style="background:#F7F9FC;border-radius:12px;padding:14px">
+              <div style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;color:#94A0B4;margin-bottom:5px">show this reference</div>
+              <div style="font-family:'IBM Plex Mono',monospace;font-size:23px;font-weight:600;letter-spacing:.06em">K7 · 4192</div>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:7px;font-size:12.5px;color:#5A6577">
+              <div style="display:flex;justify-content:space-between"><span>Amount attempted</span><span style="font-family:'IBM Plex Mono',monospace;color:#0B1324">£56.00</span></div>
+              <div style="display:flex;justify-content:space-between"><span>Seats</span><span style="font-family:'IBM Plex Mono',monospace;color:#0B1324">held for you</span></div>
+              <div style="display:flex;justify-content:space-between"><span>Staff called</span><span style="font-family:'IBM Plex Mono',monospace;color:#0B7A55">yes · 18s ago</span></div>
+            </div>
+            <div style="margin-top:auto;font-size:11.5px;color:#6B7280;line-height:1.55">Your seats stay held until a member of staff releases or confirms them. Nothing expires while you wait.</div>
+          </div>
+        </div>
+        <div style="flex:1;display:flex;flex-direction:column;gap:12px;min-width:0">
+          <div style="background:#fff;border:1px solid #E8ECF3;border-radius:12px;padding:14px 16px">
+            <div style="font-size:12.5px;font-weight:800;margin-bottom:7px">"Do not tap again" is the whole point</div>
+            <div style="font-size:11.5px;color:#5A6577;line-height:1.6">Double charges at kiosks come almost entirely from a guest retrying an ambiguous state. The screen removes the retry, holds the seats indefinitely, and hands the problem to a person.</div>
+          </div>
+          <div style="background:#fff;border:1px solid #E8ECF3;border-radius:12px;padding:14px 16px">
+            <div style="font-size:12.5px;font-weight:800;margin-bottom:7px">The reference is short and spoken aloud</div>
+            <div style="font-size:11.5px;color:#5A6577;line-height:1.6">Four digits and a kiosk letter, formatted to be read out. Staff look it up on the handheld app; the same reference appears in the POS audit log.</div>
+          </div>
+          <div style="flex:1;background:#fff;border:1px solid #E8ECF3;border-radius:12px;padding:14px 16px">
+            <div style="font-size:12.5px;font-weight:800;margin-bottom:7px">The hold stops expiring</div>
+            <div style="font-size:11.5px;color:#5A6577;line-height:1.6">A five-minute timer running while a guest waits for staff would be an unforced error. Entering this state converts the hold to staff-released.</div>
+          </div>
+        </div>
+      </div>
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;line-height:1.85;color:#7C8899">
+        <div><b style="color:#4A5566;font-weight:600">OPERATIONS</b> · freezeHold · raiseStaffCall · getPaymentReference · logIncident</div>
+        <div><b style="color:#4A5566;font-weight:600">STATES</b> · <b style="color:#0A4FB8">unresolved</b> · staffCalled · staffPresent · resolvedPaid · resolvedUnpaid</div>
+        <div><b style="color:#4A5566;font-weight:600">GOES TO</b> · <a href="Kiosk%20Board%202.dc.html#KSK-013">call staff</a> · <a href="#KSK-009">ticket issued</a></div>
+      </div>
+    </div>
+
+    <div id="KSK-009" data-screen-label="KSK-009" data-screen-id="KSK-009" style="display:flex;flex-direction:column;gap:12px;scroll-margin-top:24px">
+      <div>
+        <div style="display:flex;align-items:baseline;gap:9px"><span style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:#8494A8">KSK-009</span><span style="font-size:16.5px;font-weight:800;letter-spacing:-.015em">Ticket issued</span><span style="font-size:9px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;padding:2px 7px;border-radius:5px;background:#E8F6F0;color:#0B7A55">paper is the default</span></div>
+        <div style="font-size:12px;color:#6B7280;margin-top:3px">Printed and in the guest's hand before any offer of a receipt. Door and step-free answer repeated on the screen so the guest can walk away without reading the paper.</div>
+      </div>
+      <div style="display:flex;gap:20px;align-items:stretch;background:#F7F9FC;border:1px solid #E3E8F0;border-radius:14px;padding:20px 24px">
+        <div style="flex:none;width:300px;height:534px;background:#fff;border:1px solid #E3E8F0;border-radius:16px;display:flex;flex-direction:column;overflow:hidden;box-shadow:0 12px 30px rgba(12,35,64,.14)">
+          <div style="flex:none;background:#0B7A55;padding:18px 20px"><div style="font-size:18px;font-weight:800;color:#fff">Take your tickets</div><div style="font-size:12px;color:#B6EBD4;margin-top:2px">Printing below the screen</div></div>
+          <div style="flex:1;display:flex;flex-direction:column;gap:14px;padding:20px">
+            <div><div style="font-size:17px;font-weight:800;letter-spacing:-.015em">Twelfth Night</div><div style="font-family:'IBM Plex Mono',monospace;font-size:11.5px;color:#6B7280;margin-top:2px">Tue 16 Sep · 19:30</div></div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:11px">
+              <div style="background:#F7F9FC;border-radius:11px;padding:12px"><div style="font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:#94A0B4">seats</div><div style="font-size:18px;font-weight:800;margin-top:2px">N12 · N13</div></div>
+              <div style="background:#F7F9FC;border-radius:11px;padding:12px"><div style="font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:#94A0B4">door</div><div style="font-size:18px;font-weight:800;margin-top:2px">Door 4</div></div>
+            </div>
+            <div style="background:#E8F6F0;border-radius:11px;padding:12px 13px;font-size:12.5px;color:#0B5C41;line-height:1.5">Step-free from the main entrance. Lift on your left after Door 4.</div>
+            <div style="margin-top:auto;border:1.5px solid #DCE3ED;border-radius:12px;padding:13px 14px"><div style="font-size:13px;font-weight:700">Want a receipt?</div><div style="font-size:11.5px;color:#6B7280;margin-top:2px">Type an email — or skip, the paper is enough</div></div>
+          </div>
+          <div style="flex:none;padding:0 20px 20px"><div style="height:54px;border-radius:12px;background:#F1F4F9;display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:700;color:#5A6577">Done</div></div>
+        </div>
+        <div style="flex:1;display:flex;flex-direction:column;gap:12px;min-width:0">
+          <div style="background:#fff;border:1px solid #E8ECF3;border-radius:12px;padding:14px 16px">
+            <div style="font-size:12.5px;font-weight:800;margin-bottom:7px">Paper first, email optional</div>
+            <div style="font-size:11.5px;color:#5A6577;line-height:1.6">The guest bought at a machine at the door; they are walking in now. Asking for an email before the ticket prints is the single most common way kiosk queues stall.</div>
+          </div>
+          <div style="background:#fff;border:1px solid #E8ECF3;border-radius:12px;padding:14px 16px">
+            <div style="font-size:12.5px;font-weight:800;margin-bottom:7px">The screen repeats what the paper says</div>
+            <div style="font-size:11.5px;color:#5A6577;line-height:1.6">Seats, door, step-free route. A guest with poor near vision can read the 18 px screen text where they cannot read thermal print.</div>
+          </div>
+          <div style="flex:1;background:#fff;border:1px solid #E8ECF3;border-radius:12px;padding:14px 16px">
+            <div style="font-size:12.5px;font-weight:800;margin-bottom:7px">If the printer fails, the sale still happened</div>
+            <div style="font-size:11.5px;color:#5A6577;line-height:1.6">Print failure is a separate screen (<a href="Kiosk%20Board%202.dc.html#KSK-010">KSK-010</a>) that never implies the payment failed, and offers the same reference staff use to reissue.</div>
+          </div>
+        </div>
+      </div>
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;line-height:1.85;color:#7C8899">
+        <div><b style="color:#4A5566;font-weight:600">OPERATIONS</b> · issueTickets · printTickets · emailReceipt · endSession</div>
+        <div><b style="color:#4A5566;font-weight:600">STATES</b> · <b style="color:#0A4FB8">printed</b> · printing · emailEntered · printFailed</div>
+        <div><b style="color:#4A5566;font-weight:600">GOES TO</b> · <a href="Kiosk%20Board%202.dc.html#KSK-010">print failure</a> · <a href="#KSK-001">attract loop</a></div>
+      </div>
+    </div>
+
+  </div>
+</div>
+</x-dc>
+</body>
+</html>

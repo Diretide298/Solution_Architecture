@@ -28,7 +28,7 @@ schemas:
   tables: 15
   stores:
   - postgres
-  largestTable: subscription.plan
+  largestTable: subscription.module_listing
 operationsByContract:
 - contract: subscription
   count: 129

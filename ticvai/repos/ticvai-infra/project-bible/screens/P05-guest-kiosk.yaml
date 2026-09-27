@@ -115,6 +115,7 @@ screens:
     status: notStarted
     provenance: generated
     board: wireframes/P05 Guest Kiosk.dc.html#ksk-001
+    derivedFrom: wireframes/reference/Kiosk Board 1.dc.html
     note: '**Drawn by Claude Design on `Kiosk Board 1.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.**
       The frame it points at now is the generated one. This screen has been designed once and is not starting
       from nothing.'
@@ -224,6 +225,7 @@ screens:
     status: notStarted
     provenance: generated
     board: wireframes/P05 Guest Kiosk.dc.html#ksk-002
+    derivedFrom: wireframes/reference/Kiosk Board 1.dc.html
     note: '**Drawn by Claude Design on `Kiosk Board 1.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.**
       The frame it points at now is the generated one. This screen has been designed once and is not starting
       from nothing.'
@@ -369,6 +371,7 @@ screens:
     status: notStarted
     provenance: generated
     board: wireframes/P05 Guest Kiosk.dc.html#ksk-003
+    derivedFrom: wireframes/reference/Kiosk Board 1.dc.html
     note: '**Drawn by Claude Design on `Kiosk Board 1.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.**
       The frame it points at now is the generated one. This screen has been designed once and is not starting
       from nothing.'
@@ -472,6 +475,7 @@ screens:
     status: notStarted
     provenance: generated
     board: wireframes/P05 Guest Kiosk.dc.html#ksk-004
+    derivedFrom: wireframes/reference/Kiosk Board 1.dc.html
     note: '**Drawn by Claude Design on `Kiosk Board 1.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.**
       The frame it points at now is the generated one. This screen has been designed once and is not starting
       from nothing.'
@@ -557,6 +561,7 @@ screens:
     status: notStarted
     provenance: generated
     board: wireframes/P05 Guest Kiosk.dc.html#ksk-005
+    derivedFrom: wireframes/reference/Kiosk Board 1.dc.html
     note: '**Drawn by Claude Design on `Kiosk Board 1.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.**
       The frame it points at now is the generated one. This screen has been designed once and is not starting
       from nothing.'
@@ -704,6 +709,7 @@ screens:
     status: notStarted
     provenance: generated
     board: wireframes/P05 Guest Kiosk.dc.html#ksk-006
+    derivedFrom: wireframes/reference/Kiosk Board 1.dc.html
     note: '**Drawn by Claude Design on `Kiosk Board 1.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.**
       The frame it points at now is the generated one. This screen has been designed once and is not starting
       from nothing.'
@@ -876,6 +882,7 @@ screens:
     status: notStarted
     provenance: generated
     board: wireframes/P05 Guest Kiosk.dc.html#ksk-007
+    derivedFrom: wireframes/reference/Kiosk Board 1.dc.html
     note: '**Drawn by Claude Design on `Kiosk Board 1.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.**
       The frame it points at now is the generated one. This screen has been designed once and is not starting
       from nothing.'
@@ -970,6 +977,7 @@ screens:
     status: notStarted
     provenance: generated
     board: wireframes/P05 Guest Kiosk.dc.html#ksk-008
+    derivedFrom: wireframes/reference/Kiosk Board 1.dc.html
     note: '**Drawn by Claude Design on `Kiosk Board 1.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.**
       The frame it points at now is the generated one. This screen has been designed once and is not starting
       from nothing.'
@@ -1077,6 +1085,7 @@ screens:
     status: notStarted
     provenance: generated
     board: wireframes/P05 Guest Kiosk.dc.html#ksk-009
+    derivedFrom: wireframes/reference/Kiosk Board 1.dc.html
     note: '**Drawn by Claude Design on `Kiosk Board 1.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.**
       The frame it points at now is the generated one. This screen has been designed once and is not starting
       from nothing.'
@@ -1184,6 +1193,7 @@ screens:
     status: notStarted
     provenance: generated
     board: wireframes/P05 Guest Kiosk.dc.html#ksk-010
+    derivedFrom: wireframes/reference/Kiosk Board 2.dc.html
     note: '**Drawn by Claude Design on `Kiosk Board 2.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.**
       The frame it points at now is the generated one. This screen has been designed once and is not starting
       from nothing.'
@@ -1298,6 +1308,7 @@ screens:
     status: notStarted
     provenance: generated
     board: wireframes/P05 Guest Kiosk.dc.html#ksk-011
+    derivedFrom: wireframes/reference/Kiosk Board 2.dc.html
     note: '**Drawn by Claude Design on `Kiosk Board 2.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.**
       The frame it points at now is the generated one. This screen has been designed once and is not starting
       from nothing.'
@@ -1382,6 +1393,7 @@ screens:
     status: notStarted
     provenance: generated
     board: wireframes/P05 Guest Kiosk.dc.html#ksk-012
+    derivedFrom: wireframes/reference/Kiosk Board 2.dc.html
     note: '**Drawn by Claude Design on `Kiosk Board 2.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.**
       The frame it points at now is the generated one. This screen has been designed once and is not starting
       from nothing.'
@@ -1461,6 +1473,7 @@ screens:
     status: notStarted
     provenance: generated
     board: wireframes/P05 Guest Kiosk.dc.html#ksk-013
+    derivedFrom: wireframes/reference/Kiosk Board 2.dc.html
     note: '**Drawn by Claude Design on `Kiosk Board 2.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.**
       The frame it points at now is the generated one. This screen has been designed once and is not starting
       from nothing.'
@@ -1518,6 +1531,7 @@ screens:
     status: notStarted
     provenance: generated
     board: wireframes/P05 Guest Kiosk.dc.html#ksk-014
+    derivedFrom: wireframes/reference/Kiosk Board 2.dc.html
     note: '**Drawn by Claude Design on `Kiosk Board 2.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.**
       The frame it points at now is the generated one. This screen has been designed once and is not starting
       from nothing.'
@@ -1674,6 +1688,7 @@ screens:
     status: notStarted
     provenance: generated
     board: wireframes/P05 Guest Kiosk.dc.html#ksk-015
+    derivedFrom: wireframes/reference/Kiosk Board 2.dc.html
     note: '**Drawn by Claude Design on `Kiosk Board 2.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.**
       The frame it points at now is the generated one. This screen has been designed once and is not starting
       from nothing.'
@@ -1809,6 +1824,7 @@ screens:
     status: notStarted
     provenance: generated
     board: wireframes/P05 Guest Kiosk.dc.html#ksk-016
+    derivedFrom: wireframes/reference/Kiosk Board 2.dc.html
     note: '**Drawn by Claude Design on `Kiosk Board 2.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.**
       The frame it points at now is the generated one. This screen has been designed once and is not starting
       from nothing.'
@@ -2015,6 +2031,7 @@ screens:
     status: notStarted
     provenance: generated
     board: wireframes/P05 Guest Kiosk.dc.html#ksk-017
+    derivedFrom: wireframes/reference/Kiosk Board 2.dc.html
     note: '**Drawn by Claude Design on `Kiosk Board 2.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.**
       The frame it points at now is the generated one. This screen has been designed once and is not starting
       from nothing.'

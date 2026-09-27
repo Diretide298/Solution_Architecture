@@ -35,7 +35,7 @@ schemas:
   tables: 5
   stores:
   - postgres
-  largestTable: venuemap.point
+  largestTable: venuemap.map
 - schema: assets
   tables: 13
   stores:

@@ -869,6 +869,7 @@ screens:
     status: notStarted
     provenance: generated
     board: wireframes/P04 Venue POS.dc.html#pos-001
+    derivedFrom: wireframes/reference/TICVAI Boards v2.dc.html
     source: Claude Design POS pack, 24 August
     note: '**Drawn by Claude Design on `TICVAI Boards v2.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.**
       The frame it points at now is the generated one. This screen has been designed once and is not starting
@@ -2316,6 +2317,7 @@ screens:
     status: notStarted
     provenance: generated
     board: wireframes/P04 Venue POS.dc.html#pos-002
+    derivedFrom: wireframes/reference/Retail Board 3.dc.html
     source: Claude Design Retail pack, 24 August
     note: '**Drawn by Claude Design on `Retail Board 3.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.**
       The frame it points at now is the generated one. This screen has been designed once and is not starting
@@ -2909,6 +2911,7 @@ screens:
     status: notStarted
     provenance: generated
     board: wireframes/P04 Venue POS.dc.html#pos-004
+    derivedFrom: wireframes/reference/Seat Board 3.dc.html
     note: '**Drawn by Claude Design on `Seat Board 3.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.**
       The frame it points at now is the generated one. This screen has been designed once and is not starting
       from nothing.'
@@ -3433,6 +3436,7 @@ screens:
     status: notStarted
     provenance: generated
     board: wireframes/P04 Venue POS.dc.html#pos-005
+    derivedFrom: wireframes/reference/Retail Board 3.dc.html
     source: Claude Design Retail pack, 24 August
     note: '**Drawn by Claude Design on `Retail Board 3.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.**
       The frame it points at now is the generated one. This screen has been designed once and is not starting
@@ -4078,6 +4082,7 @@ screens:
     status: notStarted
     provenance: generated
     board: wireframes/P04 Venue POS.dc.html#pos-006
+    derivedFrom: wireframes/reference/Retail Board 3.dc.html
     source: Claude Design Retail pack, 24 August
     note: '**Drawn by Claude Design on `Retail Board 3.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.**
       The frame it points at now is the generated one. This screen has been designed once and is not starting
@@ -4690,6 +4695,7 @@ screens:
     status: notStarted
     provenance: generated
     board: wireframes/P04 Venue POS.dc.html#pos-007
+    derivedFrom: wireframes/reference/TICVAI Boards v2.dc.html
     source: Claude Design POS pack, 24 August
     note: '**Drawn by Claude Design on `TICVAI Boards v2.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.**
       The frame it points at now is the generated one. This screen has been designed once and is not starting
@@ -5496,6 +5502,7 @@ screens:
     status: notStarted
     provenance: generated
     board: wireframes/P04 Venue POS.dc.html#pos-009
+    derivedFrom: wireframes/reference/POS Board 3.dc.html
     source: Claude Design POS pack, 24 August
     note: '**Drawn by Claude Design on `POS Board 3.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.**
       The frame it points at now is the generated one. This screen has been designed once and is not starting
@@ -6017,6 +6024,7 @@ screens:
     status: notStarted
     provenance: generated
     board: wireframes/P04 Venue POS.dc.html#pos-011
+    derivedFrom: wireframes/reference/POS Frontline Board 2.dc.html
     source: Claude Design POS pack, 24 August
     note: '**Drawn by Claude Design on `POS Frontline Board 2.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.**
       The frame it points at now is the generated one. This screen has been designed once and is not starting
@@ -6344,6 +6352,7 @@ screens:
     status: notStarted
     provenance: generated
     board: wireframes/P04 Venue POS.dc.html#pos-012
+    derivedFrom: wireframes/reference/POS Frontline Board 2.dc.html
     source: Claude Design POS pack, 24 August
     note: '**Drawn by Claude Design on `POS Frontline Board 2.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.**
       The frame it points at now is the generated one. This screen has been designed once and is not starting
@@ -6761,6 +6770,7 @@ screens:
     status: notStarted
     provenance: generated
     board: wireframes/P04 Venue POS.dc.html#pos-013
+    derivedFrom: wireframes/reference/POS Frontline Board 2.dc.html
     source: Claude Design POS pack, 24 August
     note: '**Drawn by Claude Design on `POS Frontline Board 2.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.**
       The frame it points at now is the generated one. This screen has been designed once and is not starting
@@ -7272,6 +7282,7 @@ screens:
     status: notStarted
     provenance: generated
     board: wireframes/P04 Venue POS.dc.html#pos-016
+    derivedFrom: wireframes/reference/POS Frontline Board 2.dc.html
     note: '**Drawn by Claude Design on `POS Frontline Board 2.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.**
       The frame it points at now is the generated one. This screen has been designed once and is not starting
       from nothing.'
@@ -7447,6 +7458,7 @@ screens:
     status: notStarted
     provenance: generated
     board: wireframes/P04 Venue POS.dc.html#pos-017
+    derivedFrom: wireframes/reference/POS Frontline Board 2.dc.html
     note: '**Drawn by Claude Design on `POS Frontline Board 2.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.**
       The frame it points at now is the generated one. This screen has been designed once and is not starting
       from nothing.'
@@ -7703,6 +7715,7 @@ screens:
     status: notStarted
     provenance: generated
     board: wireframes/P04 Venue POS.dc.html#pos-018
+    derivedFrom: wireframes/reference/POS Board 3.dc.html
     source: Claude Design POS pack, 24 August
     note: '**Drawn by Claude Design on `POS Board 3.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.**
       The frame it points at now is the generated one. This screen has been designed once and is not starting
@@ -7893,6 +7906,7 @@ screens:
     status: notStarted
     provenance: generated
     board: wireframes/P04 Venue POS.dc.html#pos-019
+    derivedFrom: wireframes/reference/POS Board 3.dc.html
     source: Claude Design POS pack, 24 August
     note: '**Drawn by Claude Design on `POS Board 3.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.**
       The frame it points at now is the generated one. This screen has been designed once and is not starting
@@ -8123,6 +8137,7 @@ screens:
     status: notStarted
     provenance: generated
     board: wireframes/P04 Venue POS.dc.html#pos-020
+    derivedFrom: wireframes/reference/POS Board 3.dc.html
     source: Claude Design POS pack, 24 August
     note: '**Drawn by Claude Design on `POS Board 3.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.**
       The frame it points at now is the generated one. This screen has been designed once and is not starting

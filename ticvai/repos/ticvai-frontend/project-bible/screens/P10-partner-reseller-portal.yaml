@@ -1035,6 +1035,7 @@ screens:
     status: notStarted
     provenance: generated
     board: wireframes/P10 Partner Web.dc.html#ptr-002
+    derivedFrom: wireframes/reference/Dashboards Board.dc.html
     note: '**Drawn by Claude Design on `Dashboards Board.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.**
       The frame it points at now is the generated one. This screen has been designed once and is not starting
       from nothing.'
@@ -3161,6 +3162,7 @@ screens:
     status: notStarted
     provenance: generated
     board: wireframes/P10 Partner Web.dc.html#ptr-009
+    derivedFrom: wireframes/reference/Seat Board 3.dc.html
     note: '**Drawn by Claude Design on `Seat Board 3.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.**
       The frame it points at now is the generated one. This screen has been designed once and is not starting
       from nothing.'

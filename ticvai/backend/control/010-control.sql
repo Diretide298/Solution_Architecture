@@ -527,8 +527,8 @@ CREATE TABLE IF NOT EXISTS control.partner_user (
 );
 
 -- a shipped version. Promoted through dev, staging and production; superseded by a later one Hangs
--- off: reaches control.cell through its keys; references identity.principal, subscription.plan.
--- Reached by: 5 operations read it and 3 write it; 3 tables reference it.
+-- off: reaches control.cell through its keys; references identity.principal. Reached by: 5
+-- operations read it and 3 write it; 3 tables reference it.
 CREATE TABLE IF NOT EXISTS control.release (
     version                           text NOT NULL,
     required_migrations               text[],

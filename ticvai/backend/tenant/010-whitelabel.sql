@@ -116,8 +116,7 @@ CREATE TABLE IF NOT EXISTS whitelabel.module_enablement (
 );
 
 -- One entry in a tenant’s own navigation. Hangs off: reaches whitelabel.tenant_config through its
--- keys; references whitelabel.navigation_item. Reached by: 4 operations read it and 2 write it; 1
--- tables reference it.
+-- keys. Reached by: 4 operations read it and 2 write it; 1 tables reference it.
 CREATE TABLE IF NOT EXISTS whitelabel.navigation_item (
     id                                uuid PRIMARY KEY,
     kind                              text NOT NULL CONSTRAINT navigation_item_kind_chk CHECK (kind IN ('bottomNavigation', 'drawer', 'tabs')),

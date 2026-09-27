@@ -156,7 +156,7 @@
    "operations": 5
   },
   {
-   "contract": "wallet",
+   "contract": "retail",
    "operations": 4
   },
   {
@@ -164,11 +164,11 @@
    "operations": 4
   },
   {
-   "contract": "ai",
+   "contract": "wallet",
    "operations": 4
   },
   {
-   "contract": "retail",
+   "contract": "ai",
    "operations": 4
   },
   {
@@ -184,15 +184,15 @@
    "operations": 2
   },
   {
+   "contract": "finance",
+   "operations": 1
+  },
+  {
    "contract": "games",
    "operations": 1
   },
   {
    "contract": "resources",
-   "operations": 1
-  },
-  {
-   "contract": "finance",
    "operations": 1
   }
  ],

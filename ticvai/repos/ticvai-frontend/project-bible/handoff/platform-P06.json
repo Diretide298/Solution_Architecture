@@ -84,15 +84,15 @@
    "operations": 13
   },
   {
-   "contract": "marketing-crm",
-   "operations": 11
-  },
-  {
    "contract": "workforce",
    "operations": 11
   },
   {
-   "contract": "queue",
+   "contract": "marketing-crm",
+   "operations": 11
+  },
+  {
+   "contract": "identity",
    "operations": 7
   },
   {
@@ -100,7 +100,7 @@
    "operations": 7
   },
   {
-   "contract": "identity",
+   "contract": "queue",
    "operations": 7
   },
   {
@@ -108,11 +108,7 @@
    "operations": 4
   },
   {
-   "contract": "tenancy",
-   "operations": 2
-  },
-  {
-   "contract": "venue-map",
+   "contract": "reporting",
    "operations": 2
   },
   {
@@ -120,7 +116,11 @@
    "operations": 2
   },
   {
-   "contract": "reporting",
+   "contract": "venue-map",
+   "operations": 2
+  },
+  {
+   "contract": "tenancy",
    "operations": 2
   },
   {

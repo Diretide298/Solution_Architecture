@@ -99,7 +99,7 @@
    "operations": 4
   },
   {
-   "contract": "approvals",
+   "contract": "queue",
    "operations": 3
   },
   {
@@ -107,7 +107,7 @@
    "operations": 3
   },
   {
-   "contract": "queue",
+   "contract": "approvals",
    "operations": 3
   },
   {
@@ -123,15 +123,15 @@
    "operations": 1
   },
   {
-   "contract": "wallet",
-   "operations": 1
-  },
-  {
    "contract": "inventory",
    "operations": 1
   },
   {
    "contract": "finance",
+   "operations": 1
+  },
+  {
+   "contract": "wallet",
    "operations": 1
   }
  ],

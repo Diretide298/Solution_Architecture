@@ -3,13 +3,13 @@
  "generated": "2026-09-28",
  "note": "One record per board file under `wireframes/`, keyed by content hash so an unchanged board is never re-read. **A frame in a `generated` board is the screen's own YAML rendered as boxes, not a drawing** \u2014 only `clientPack` and `claudeDesign` frames are evidence that somebody designed something.",
  "counts": {
-  "boards": 218,
+  "boards": 285,
   "boardsByProvenance": {
    "generated": 17,
    "workshop": 195,
-   "clientPack": 5,
+   "clientPack": 71,
    "claudeDesign": 0,
-   "unrecognised": 1
+   "unrecognised": 2
   },
   "packageScreens": 2427,
   "screensDrawnByClaudeDesign": 0,
@@ -12551,6 +12551,1862 @@
     "P17"
    ],
    "firstIndexed": "2026-09-11",
+   "lastSeen": "2026-09-28"
+  },
+  {
+   "file": "reference/Dashboards Board.dc.html",
+   "provenance": "clientPack",
+   "bytes": 98848,
+   "sha256": "e245cf9cd2ecd241",
+   "frames": 5,
+   "screensFramed": 5,
+   "screens": [
+    "ADM-002",
+    "ADM-003",
+    "PTR-002",
+    "SUP-002",
+    "WEB-017"
+   ],
+   "orphanFrames": [],
+   "anchors": [
+    "adm-002",
+    "adm-003",
+    "ptr-002",
+    "sup-002",
+    "web-017"
+   ],
+   "platforms": [
+    "P01",
+    "P09",
+    "P10",
+    "P12"
+   ],
+   "firstIndexed": "2026-09-28",
+   "lastSeen": "2026-09-28"
+  },
+  {
+   "file": "reference/FnB Board 1.dc.html",
+   "provenance": "clientPack",
+   "bytes": 180484,
+   "sha256": "07e362805d66c170",
+   "frames": 2,
+   "screensFramed": 2,
+   "screens": [
+    "BO-134",
+    "BO-135"
+   ],
+   "orphanFrames": [],
+   "anchors": [
+    "bo-134",
+    "bo-135",
+    "fnb-1b",
+    "fnb-1c",
+    "fnb-1d",
+    "fnb-1e",
+    "fnb-1f",
+    "fnb-1g",
+    "fnb-1h",
+    "fnb-1j",
+    "fnb-1k"
+   ],
+   "platforms": [
+    "P08"
+   ],
+   "firstIndexed": "2026-09-28",
+   "lastSeen": "2026-09-28"
+  },
+  {
+   "file": "reference/FnB Board 2.dc.html",
+   "provenance": "clientPack",
+   "bytes": 279332,
+   "sha256": "1fab7c425ad39ebc",
+   "frames": 5,
+   "screensFramed": 5,
+   "screens": [
+    "BO-045",
+    "BO-109",
+    "BO-111",
+    "BO-136",
+    "BO-137"
+   ],
+   "orphanFrames": [],
+   "anchors": [
+    "bo-045",
+    "bo-109",
+    "bo-111",
+    "bo-136",
+    "bo-137",
+    "fnb-2a",
+    "fnb-2b",
+    "fnb-2c",
+    "fnb-2d",
+    "fnb-2e",
+    "fnb-2f",
+    "fnb-2g",
+    "fnb-2h",
+    "fnb-2j",
+    "fnb-2k",
+    "fnb-2l",
+    "fnb-2m",
+    "fnb-2n"
+   ],
+   "platforms": [
+    "P08"
+   ],
+   "firstIndexed": "2026-09-28",
+   "lastSeen": "2026-09-28"
+  },
+  {
+   "file": "reference/FnB Board 3.dc.html",
+   "provenance": "clientPack",
+   "bytes": 208094,
+   "sha256": "bef4e5aa580af9b5",
+   "frames": 7,
+   "screensFramed": 7,
+   "screens": [
+    "KIT-001",
+    "KIT-002",
+    "KIT-003",
+    "KIT-005",
+    "KIT-006",
+    "KIT-008",
+    "KIT-009"
+   ],
+   "orphanFrames": [],
+   "anchors": [
+    "fnb-3a",
+    "fnb-3b",
+    "fnb-3c",
+    "fnb-3d",
+    "fnb-3e",
+    "fnb-3f",
+    "fnb-3g",
+    "fnb-3h",
+    "fnb-3j",
+    "fnb-3k",
+    "kit-001",
+    "kit-002",
+    "kit-003",
+    "kit-005",
+    "kit-006",
+    "kit-008",
+    "kit-009"
+   ],
+   "platforms": [
+    "P15"
+   ],
+   "firstIndexed": "2026-09-28",
+   "lastSeen": "2026-09-28"
+  },
+  {
+   "file": "reference/FnB Board 4.dc.html",
+   "provenance": "clientPack",
+   "bytes": 213738,
+   "sha256": "2d14d177f5d3e8b4",
+   "frames": 8,
+   "screensFramed": 8,
+   "screens": [
+    "EMP-052",
+    "EMP-055",
+    "EMP-058",
+    "EMP-059",
+    "EMP-060",
+    "EMP-061",
+    "EMP-063",
+    "EMP-064"
+   ],
+   "orphanFrames": [],
+   "anchors": [
+    "emp-052",
+    "emp-055",
+    "emp-058",
+    "emp-059",
+    "emp-060",
+    "emp-061",
+    "emp-063",
+    "emp-064",
+    "fnb-4a",
+    "fnb-4b",
+    "fnb-4c",
+    "fnb-4d",
+    "fnb-4e",
+    "fnb-4f",
+    "fnb-4g",
+    "fnb-4h",
+    "fnb-4j",
+    "fnb-4k"
+   ],
+   "platforms": [
+    "P06"
+   ],
+   "firstIndexed": "2026-09-28",
+   "lastSeen": "2026-09-28"
+  },
+  {
+   "file": "reference/FnB Board 5.dc.html",
+   "provenance": "clientPack",
+   "bytes": 205470,
+   "sha256": "1cf0d5c8a04175a4",
+   "frames": 3,
+   "screensFramed": 3,
+   "screens": [
+    "EMP-062",
+    "EMP-065",
+    "EMP-067"
+   ],
+   "orphanFrames": [],
+   "anchors": [
+    "emp-062",
+    "emp-065",
+    "emp-067",
+    "fnb-5a",
+    "fnb-5b",
+    "fnb-5c",
+    "fnb-5d",
+    "fnb-5e",
+    "fnb-5f",
+    "fnb-5g",
+    "fnb-5h",
+    "fnb-5j",
+    "fnb-5k"
+   ],
+   "platforms": [
+    "P06"
+   ],
+   "firstIndexed": "2026-09-28",
+   "lastSeen": "2026-09-28"
+  },
+  {
+   "file": "reference/FnB Board 6.dc.html",
+   "provenance": "clientPack",
+   "bytes": 182854,
+   "sha256": "a42c54e522eda032",
+   "frames": 0,
+   "screensFramed": 0,
+   "screens": [],
+   "orphanFrames": [],
+   "anchors": [
+    "fnb-6a",
+    "fnb-6b",
+    "fnb-6c",
+    "fnb-6d",
+    "fnb-6e",
+    "fnb-6f",
+    "fnb-6g",
+    "fnb-6h",
+    "fnb-6j",
+    "fnb-6k"
+   ],
+   "platforms": [],
+   "firstIndexed": "2026-09-28",
+   "lastSeen": "2026-09-28"
+  },
+  {
+   "file": "reference/Guest Mobile Board 1.dc.html",
+   "provenance": "clientPack",
+   "bytes": 58007,
+   "sha256": "3bfa057caf918ef6",
+   "frames": 1,
+   "screensFramed": 1,
+   "screens": [
+    "GST-005"
+   ],
+   "orphanFrames": [],
+   "anchors": [
+    "gm-1a",
+    "gm-1b",
+    "gm-1c",
+    "gm-1d",
+    "gm-1e",
+    "gst-005"
+   ],
+   "platforms": [
+    "P02"
+   ],
+   "firstIndexed": "2026-09-28",
+   "lastSeen": "2026-09-28"
+  },
+  {
+   "file": "reference/Guest Mobile Board 2.dc.html",
+   "provenance": "clientPack",
+   "bytes": 53046,
+   "sha256": "e3463f3dcdd36d8c",
+   "frames": 0,
+   "screensFramed": 0,
+   "screens": [],
+   "orphanFrames": [],
+   "anchors": [
+    "gm-2a",
+    "gm-2b",
+    "gm-2c",
+    "gm-2d",
+    "gm-2e"
+   ],
+   "platforms": [],
+   "firstIndexed": "2026-09-28",
+   "lastSeen": "2026-09-28"
+  },
+  {
+   "file": "reference/Guest Mobile Board 3.dc.html",
+   "provenance": "clientPack",
+   "bytes": 53794,
+   "sha256": "92e1c965980c9fd3",
+   "frames": 0,
+   "screensFramed": 0,
+   "screens": [],
+   "orphanFrames": [],
+   "anchors": [
+    "gm-3a",
+    "gm-3b",
+    "gm-3c",
+    "gm-3d",
+    "gm-3e"
+   ],
+   "platforms": [],
+   "firstIndexed": "2026-09-28",
+   "lastSeen": "2026-09-28"
+  },
+  {
+   "file": "reference/Guest Mobile Board 4.dc.html",
+   "provenance": "clientPack",
+   "bytes": 51723,
+   "sha256": "766750e4139d3467",
+   "frames": 0,
+   "screensFramed": 0,
+   "screens": [],
+   "orphanFrames": [],
+   "anchors": [
+    "gm-4a",
+    "gm-4b",
+    "gm-4c",
+    "gm-4d",
+    "gm-4e"
+   ],
+   "platforms": [],
+   "firstIndexed": "2026-09-28",
+   "lastSeen": "2026-09-28"
+  },
+  {
+   "file": "reference/Guest Mobile Board 5.dc.html",
+   "provenance": "clientPack",
+   "bytes": 51302,
+   "sha256": "1f31234960d45eb2",
+   "frames": 0,
+   "screensFramed": 0,
+   "screens": [],
+   "orphanFrames": [],
+   "anchors": [
+    "gm-5a",
+    "gm-5b",
+    "gm-5c",
+    "gm-5d",
+    "gm-5e"
+   ],
+   "platforms": [],
+   "firstIndexed": "2026-09-28",
+   "lastSeen": "2026-09-28"
+  },
+  {
+   "file": "reference/Guest Mobile Board 6.dc.html",
+   "provenance": "clientPack",
+   "bytes": 56477,
+   "sha256": "28084e411c21a925",
+   "frames": 0,
+   "screensFramed": 0,
+   "screens": [],
+   "orphanFrames": [],
+   "anchors": [
+    "gm-6a",
+    "gm-6b",
+    "gm-6c",
+    "gm-6d",
+    "gm-6e"
+   ],
+   "platforms": [],
+   "firstIndexed": "2026-09-28",
+   "lastSeen": "2026-09-28"
+  },
+  {
+   "file": "reference/Guest Mobile Board 7.dc.html",
+   "provenance": "clientPack",
+   "bytes": 53139,
+   "sha256": "97b870fcdba2b54c",
+   "frames": 0,
+   "screensFramed": 0,
+   "screens": [],
+   "orphanFrames": [],
+   "anchors": [
+    "gm-7a",
+    "gm-7b",
+    "gm-7c",
+    "gm-7d",
+    "gm-7e"
+   ],
+   "platforms": [],
+   "firstIndexed": "2026-09-28",
+   "lastSeen": "2026-09-28"
+  },
+  {
+   "file": "reference/Guest Mobile Board 8.dc.html",
+   "provenance": "clientPack",
+   "bytes": 48786,
+   "sha256": "566a12ddf6fd88ae",
+   "frames": 0,
+   "screensFramed": 0,
+   "screens": [],
+   "orphanFrames": [],
+   "anchors": [
+    "gm-8a",
+    "gm-8b",
+    "gm-8c",
+    "gm-8d",
+    "gm-8e"
+   ],
+   "platforms": [],
+   "firstIndexed": "2026-09-28",
+   "lastSeen": "2026-09-28"
+  },
+  {
+   "file": "reference/Inventory Board 1.dc.html",
+   "provenance": "clientPack",
+   "bytes": 147417,
+   "sha256": "5beb01a7cbe447b6",
+   "frames": 1,
+   "screensFramed": 0,
+   "screens": [],
+   "orphanFrames": [
+    "INV-10"
+   ],
+   "anchors": [
+    "inv-10",
+    "inv-2",
+    "inv-3",
+    "inv-4",
+    "inv-5",
+    "inv-7",
+    "inv-8",
+    "inv-9"
+   ],
+   "platforms": [],
+   "firstIndexed": "2026-09-28",
+   "lastSeen": "2026-09-28"
+  },
+  {
+   "file": "reference/Inventory Board 2.dc.html",
+   "provenance": "clientPack",
+   "bytes": 197697,
+   "sha256": "cc469f3d44972bbb",
+   "frames": 0,
+   "screensFramed": 0,
+   "screens": [],
+   "orphanFrames": [],
+   "anchors": [
+    "inv-2a",
+    "inv-2b",
+    "inv-2c",
+    "inv-2d",
+    "inv-2e",
+    "inv-2f",
+    "inv-2g",
+    "inv-2h",
+    "inv-2j",
+    "inv-2k"
+   ],
+   "platforms": [],
+   "firstIndexed": "2026-09-28",
+   "lastSeen": "2026-09-28"
+  },
+  {
+   "file": "reference/Inventory Board 3.dc.html",
+   "provenance": "clientPack",
+   "bytes": 178364,
+   "sha256": "27d2f68428266f38",
+   "frames": 0,
+   "screensFramed": 0,
+   "screens": [],
+   "orphanFrames": [],
+   "anchors": [
+    "inv-3a",
+    "inv-3b",
+    "inv-3c",
+    "inv-3d",
+    "inv-3e",
+    "inv-3f",
+    "inv-3g",
+    "inv-3h",
+    "inv-3j",
+    "inv-3k"
+   ],
+   "platforms": [],
+   "firstIndexed": "2026-09-28",
+   "lastSeen": "2026-09-28"
+  },
+  {
+   "file": "reference/Inventory Board 4.dc.html",
+   "provenance": "clientPack",
+   "bytes": 182288,
+   "sha256": "a89faa35ec8c2c10",
+   "frames": 0,
+   "screensFramed": 0,
+   "screens": [],
+   "orphanFrames": [],
+   "anchors": [
+    "inv-4a",
+    "inv-4b",
+    "inv-4c",
+    "inv-4d",
+    "inv-4e",
+    "inv-4f",
+    "inv-4g",
+    "inv-4h",
+    "inv-4j",
+    "inv-4k"
+   ],
+   "platforms": [],
+   "firstIndexed": "2026-09-28",
+   "lastSeen": "2026-09-28"
+  },
+  {
+   "file": "reference/Inventory Board 5.dc.html",
+   "provenance": "clientPack",
+   "bytes": 178821,
+   "sha256": "6f6973ea7b49bd18",
+   "frames": 0,
+   "screensFramed": 0,
+   "screens": [],
+   "orphanFrames": [],
+   "anchors": [
+    "inv-5a",
+    "inv-5b",
+    "inv-5c",
+    "inv-5d",
+    "inv-5e",
+    "inv-5f",
+    "inv-5g",
+    "inv-5h",
+    "inv-5j",
+    "inv-5k"
+   ],
+   "platforms": [],
+   "firstIndexed": "2026-09-28",
+   "lastSeen": "2026-09-28"
+  },
+  {
+   "file": "reference/Inventory Board 6.dc.html",
+   "provenance": "clientPack",
+   "bytes": 166018,
+   "sha256": "387633503da015a6",
+   "frames": 0,
+   "screensFramed": 0,
+   "screens": [],
+   "orphanFrames": [],
+   "anchors": [
+    "inv-6a",
+    "inv-6b",
+    "inv-6c",
+    "inv-6d",
+    "inv-6e",
+    "inv-6f",
+    "inv-6g",
+    "inv-6h",
+    "inv-6i",
+    "inv-6j"
+   ],
+   "platforms": [],
+   "firstIndexed": "2026-09-28",
+   "lastSeen": "2026-09-28"
+  },
+  {
+   "file": "reference/Inventory Board 7.dc.html",
+   "provenance": "clientPack",
+   "bytes": 156659,
+   "sha256": "bf5ca3f027071eaa",
+   "frames": 0,
+   "screensFramed": 0,
+   "screens": [],
+   "orphanFrames": [],
+   "anchors": [
+    "inv-7a",
+    "inv-7b",
+    "inv-7c",
+    "inv-7d",
+    "inv-7e",
+    "inv-7f",
+    "inv-7g",
+    "inv-7h",
+    "inv-7i",
+    "inv-7j"
+   ],
+   "platforms": [],
+   "firstIndexed": "2026-09-28",
+   "lastSeen": "2026-09-28"
+  },
+  {
+   "file": "reference/Kiosk Board 1.dc.html",
+   "provenance": "clientPack",
+   "bytes": 50444,
+   "sha256": "18041add2eee3a28",
+   "frames": 9,
+   "screensFramed": 9,
+   "screens": [
+    "KSK-001",
+    "KSK-002",
+    "KSK-003",
+    "KSK-004",
+    "KSK-005",
+    "KSK-006",
+    "KSK-007",
+    "KSK-008",
+    "KSK-009"
+   ],
+   "orphanFrames": [],
+   "anchors": [
+    "ksk-001",
+    "ksk-002",
+    "ksk-003",
+    "ksk-004",
+    "ksk-005",
+    "ksk-006",
+    "ksk-007",
+    "ksk-008",
+    "ksk-009"
+   ],
+   "platforms": [
+    "P05"
+   ],
+   "firstIndexed": "2026-09-28",
+   "lastSeen": "2026-09-28"
+  },
+  {
+   "file": "reference/Kiosk Board 2.dc.html",
+   "provenance": "clientPack",
+   "bytes": 45509,
+   "sha256": "eb025db7e31fa36a",
+   "frames": 8,
+   "screensFramed": 8,
+   "screens": [
+    "KSK-010",
+    "KSK-011",
+    "KSK-012",
+    "KSK-013",
+    "KSK-014",
+    "KSK-015",
+    "KSK-016",
+    "KSK-017"
+   ],
+   "orphanFrames": [],
+   "anchors": [
+    "ksk-010",
+    "ksk-011",
+    "ksk-012",
+    "ksk-013",
+    "ksk-014",
+    "ksk-015",
+    "ksk-016",
+    "ksk-017"
+   ],
+   "platforms": [
+    "P05"
+   ],
+   "firstIndexed": "2026-09-28",
+   "lastSeen": "2026-09-28"
+  },
+  {
+   "file": "reference/Marketing Board 1.dc.html",
+   "provenance": "clientPack",
+   "bytes": 149257,
+   "sha256": "a792b2ceadc16634",
+   "frames": 0,
+   "screensFramed": 0,
+   "screens": [],
+   "orphanFrames": [],
+   "anchors": [
+    "crm-1a",
+    "crm-1b",
+    "crm-1c",
+    "crm-1d",
+    "crm-1e",
+    "crm-1f",
+    "crm-1g",
+    "crm-1h",
+    "crm-1i",
+    "crm-1j"
+   ],
+   "platforms": [],
+   "firstIndexed": "2026-09-28",
+   "lastSeen": "2026-09-28"
+  },
+  {
+   "file": "reference/Marketing Board 10.dc.html",
+   "provenance": "clientPack",
+   "bytes": 147515,
+   "sha256": "f5af613630a51806",
+   "frames": 0,
+   "screensFramed": 0,
+   "screens": [],
+   "orphanFrames": [],
+   "anchors": [
+    "crm-10a",
+    "crm-10b",
+    "crm-10c",
+    "crm-10d",
+    "crm-10e",
+    "crm-10f",
+    "crm-10g",
+    "crm-10h",
+    "crm-10i",
+    "crm-10j"
+   ],
+   "platforms": [],
+   "firstIndexed": "2026-09-28",
+   "lastSeen": "2026-09-28"
+  },
+  {
+   "file": "reference/Marketing Board 11.dc.html",
+   "provenance": "clientPack",
+   "bytes": 149020,
+   "sha256": "b6a5aa4eb7b2f013",
+   "frames": 0,
+   "screensFramed": 0,
+   "screens": [],
+   "orphanFrames": [],
+   "anchors": [
+    "crm-11a",
+    "crm-11b",
+    "crm-11c",
+    "crm-11d",
+    "crm-11e",
+    "crm-11f",
+    "crm-11g",
+    "crm-11h",
+    "crm-11i",
+    "crm-11j"
+   ],
+   "platforms": [],
+   "firstIndexed": "2026-09-28",
+   "lastSeen": "2026-09-28"
+  },
+  {
+   "file": "reference/Marketing Board 12.dc.html",
+   "provenance": "clientPack",
+   "bytes": 139495,
+   "sha256": "a1a55adcb0de4a32",
+   "frames": 0,
+   "screensFramed": 0,
+   "screens": [],
+   "orphanFrames": [],
+   "anchors": [
+    "crm-12a",
+    "crm-12b",
+    "crm-12c",
+    "crm-12d",
+    "crm-12e",
+    "crm-12f",
+    "crm-12g",
+    "crm-12h",
+    "crm-12i",
+    "crm-12j"
+   ],
+   "platforms": [],
+   "firstIndexed": "2026-09-28",
+   "lastSeen": "2026-09-28"
+  },
+  {
+   "file": "reference/Marketing Board 2.dc.html",
+   "provenance": "clientPack",
+   "bytes": 138648,
+   "sha256": "60fd3bb071e8093b",
+   "frames": 0,
+   "screensFramed": 0,
+   "screens": [],
+   "orphanFrames": [],
+   "anchors": [
+    "crm-2a",
+    "crm-2b",
+    "crm-2c",
+    "crm-2d",
+    "crm-2e",
+    "crm-2f",
+    "crm-2g",
+    "crm-2h",
+    "crm-2i",
+    "crm-2j"
+   ],
+   "platforms": [],
+   "firstIndexed": "2026-09-28",
+   "lastSeen": "2026-09-28"
+  },
+  {
+   "file": "reference/Marketing Board 3.dc.html",
+   "provenance": "clientPack",
+   "bytes": 148170,
+   "sha256": "0873f5d01188e60e",
+   "frames": 0,
+   "screensFramed": 0,
+   "screens": [],
+   "orphanFrames": [],
+   "anchors": [
+    "crm-3a",
+    "crm-3b",
+    "crm-3c",
+    "crm-3d",
+    "crm-3e",
+    "crm-3f",
+    "crm-3g",
+    "crm-3h",
+    "crm-3i",
+    "crm-3j"
+   ],
+   "platforms": [],
+   "firstIndexed": "2026-09-28",
+   "lastSeen": "2026-09-28"
+  },
+  {
+   "file": "reference/Marketing Board 4.dc.html",
+   "provenance": "clientPack",
+   "bytes": 152610,
+   "sha256": "ff9f0a302f166fde",
+   "frames": 0,
+   "screensFramed": 0,
+   "screens": [],
+   "orphanFrames": [],
+   "anchors": [
+    "crm-4a",
+    "crm-4b",
+    "crm-4c",
+    "crm-4d",
+    "crm-4e",
+    "crm-4f",
+    "crm-4g",
+    "crm-4h",
+    "crm-4i",
+    "crm-4j"
+   ],
+   "platforms": [],
+   "firstIndexed": "2026-09-28",
+   "lastSeen": "2026-09-28"
+  },
+  {
+   "file": "reference/Marketing Board 5.dc.html",
+   "provenance": "clientPack",
+   "bytes": 139261,
+   "sha256": "c163dbdae3a5a619",
+   "frames": 0,
+   "screensFramed": 0,
+   "screens": [],
+   "orphanFrames": [],
+   "anchors": [
+    "crm-5a",
+    "crm-5b",
+    "crm-5c",
+    "crm-5d",
+    "crm-5e",
+    "crm-5f",
+    "crm-5g",
+    "crm-5h",
+    "crm-5i",
+    "crm-5j"
+   ],
+   "platforms": [],
+   "firstIndexed": "2026-09-28",
+   "lastSeen": "2026-09-28"
+  },
+  {
+   "file": "reference/Marketing Board 6.dc.html",
+   "provenance": "clientPack",
+   "bytes": 145353,
+   "sha256": "f22b1ad326351f99",
+   "frames": 0,
+   "screensFramed": 0,
+   "screens": [],
+   "orphanFrames": [],
+   "anchors": [
+    "crm-6a",
+    "crm-6b",
+    "crm-6c",
+    "crm-6d",
+    "crm-6e",
+    "crm-6f",
+    "crm-6g",
+    "crm-6h",
+    "crm-6i",
+    "crm-6j"
+   ],
+   "platforms": [],
+   "firstIndexed": "2026-09-28",
+   "lastSeen": "2026-09-28"
+  },
+  {
+   "file": "reference/Marketing Board 7.dc.html",
+   "provenance": "clientPack",
+   "bytes": 141240,
+   "sha256": "9b8ff5e59d86a8cb",
+   "frames": 0,
+   "screensFramed": 0,
+   "screens": [],
+   "orphanFrames": [],
+   "anchors": [
+    "crm-7a",
+    "crm-7b",
+    "crm-7c",
+    "crm-7d",
+    "crm-7e",
+    "crm-7f",
+    "crm-7g",
+    "crm-7h",
+    "crm-7i",
+    "crm-7j"
+   ],
+   "platforms": [],
+   "firstIndexed": "2026-09-28",
+   "lastSeen": "2026-09-28"
+  },
+  {
+   "file": "reference/Marketing Board 8.dc.html",
+   "provenance": "clientPack",
+   "bytes": 159216,
+   "sha256": "1ea157235538b0ed",
+   "frames": 0,
+   "screensFramed": 0,
+   "screens": [],
+   "orphanFrames": [],
+   "anchors": [
+    "crm-8a",
+    "crm-8b",
+    "crm-8c",
+    "crm-8d",
+    "crm-8e",
+    "crm-8f",
+    "crm-8g",
+    "crm-8h",
+    "crm-8i",
+    "crm-8j"
+   ],
+   "platforms": [],
+   "firstIndexed": "2026-09-28",
+   "lastSeen": "2026-09-28"
+  },
+  {
+   "file": "reference/Marketing Board 9.dc.html",
+   "provenance": "clientPack",
+   "bytes": 156833,
+   "sha256": "dbbf889e23bf0001",
+   "frames": 0,
+   "screensFramed": 0,
+   "screens": [],
+   "orphanFrames": [],
+   "anchors": [
+    "crm-9a",
+    "crm-9b",
+    "crm-9c",
+    "crm-9d",
+    "crm-9e",
+    "crm-9f",
+    "crm-9g",
+    "crm-9h",
+    "crm-9i",
+    "crm-9j"
+   ],
+   "platforms": [],
+   "firstIndexed": "2026-09-28",
+   "lastSeen": "2026-09-28"
+  },
+  {
+   "file": "reference/POS Board 1.dc.html",
+   "provenance": "clientPack",
+   "bytes": 128646,
+   "sha256": "915037040d650b81",
+   "frames": 4,
+   "screensFramed": 4,
+   "screens": [
+    "BO-036",
+    "BO-124",
+    "BO-125",
+    "BO-126"
+   ],
+   "orphanFrames": [],
+   "anchors": [
+    "bo-036",
+    "bo-124",
+    "bo-125",
+    "bo-126",
+    "pos-1a",
+    "pos-1b",
+    "pos-1c",
+    "pos-1d",
+    "pos-1e",
+    "pos-1f"
+   ],
+   "platforms": [
+    "P08"
+   ],
+   "firstIndexed": "2026-09-28",
+   "lastSeen": "2026-09-28"
+  },
+  {
+   "file": "reference/POS Board 3.dc.html",
+   "provenance": "clientPack",
+   "bytes": 118302,
+   "sha256": "685c54a2067cf285",
+   "frames": 4,
+   "screensFramed": 4,
+   "screens": [
+    "POS-009",
+    "POS-018",
+    "POS-019",
+    "POS-020"
+   ],
+   "orphanFrames": [],
+   "anchors": [
+    "pos-009",
+    "pos-018",
+    "pos-019",
+    "pos-020",
+    "pos-3a",
+    "pos-3b",
+    "pos-3c",
+    "pos-3d",
+    "pos-3e",
+    "pos-3f"
+   ],
+   "platforms": [
+    "P04"
+   ],
+   "firstIndexed": "2026-09-28",
+   "lastSeen": "2026-09-28"
+  },
+  {
+   "file": "reference/POS Board 4.dc.html",
+   "provenance": "clientPack",
+   "bytes": 121940,
+   "sha256": "0b0a579f36a96270",
+   "frames": 5,
+   "screensFramed": 5,
+   "screens": [
+    "BO-010",
+    "BO-115",
+    "BO-116",
+    "BO-117",
+    "BO-118"
+   ],
+   "orphanFrames": [],
+   "anchors": [
+    "bo-010",
+    "bo-115",
+    "bo-116",
+    "bo-117",
+    "bo-118",
+    "pos-4a",
+    "pos-4b",
+    "pos-4c",
+    "pos-4d",
+    "pos-4e",
+    "pos-4f"
+   ],
+   "platforms": [
+    "P08"
+   ],
+   "firstIndexed": "2026-09-28",
+   "lastSeen": "2026-09-28"
+  },
+  {
+   "file": "reference/POS Board 5.dc.html",
+   "provenance": "clientPack",
+   "bytes": 120314,
+   "sha256": "1825a99f5a85d71e",
+   "frames": 5,
+   "screensFramed": 5,
+   "screens": [
+    "BO-037",
+    "BO-128",
+    "BO-129",
+    "BO-130",
+    "BO-133"
+   ],
+   "orphanFrames": [],
+   "anchors": [
+    "bo-037",
+    "bo-128",
+    "bo-129",
+    "bo-130",
+    "bo-133",
+    "pos-5a",
+    "pos-5b",
+    "pos-5c",
+    "pos-5d",
+    "pos-5e",
+    "pos-5f"
+   ],
+   "platforms": [
+    "P08"
+   ],
+   "firstIndexed": "2026-09-28",
+   "lastSeen": "2026-09-28"
+  },
+  {
+   "file": "reference/POS Board 6.dc.html",
+   "provenance": "clientPack",
+   "bytes": 124835,
+   "sha256": "2c393b3fde294f9e",
+   "frames": 0,
+   "screensFramed": 0,
+   "screens": [],
+   "orphanFrames": [],
+   "anchors": [
+    "pos-6a",
+    "pos-6b",
+    "pos-6c",
+    "pos-6d",
+    "pos-6e",
+    "pos-6f"
+   ],
+   "platforms": [],
+   "firstIndexed": "2026-09-28",
+   "lastSeen": "2026-09-28"
+  },
+  {
+   "file": "reference/POS Frontline Board 2.dc.html",
+   "provenance": "clientPack",
+   "bytes": 70010,
+   "sha256": "25416068104edfaf",
+   "frames": 3,
+   "screensFramed": 3,
+   "screens": [
+    "POS-012",
+    "POS-016",
+    "POS-017"
+   ],
+   "orphanFrames": [],
+   "anchors": [
+    "pos-012",
+    "pos-016",
+    "pos-017",
+    "pos-2b",
+    "pos-2c",
+    "pos-2d",
+    "pos-2e"
+   ],
+   "platforms": [
+    "P04"
+   ],
+   "firstIndexed": "2026-09-28",
+   "lastSeen": "2026-09-28"
+  },
+  {
+   "file": "reference/Retail Board 1.dc.html",
+   "provenance": "clientPack",
+   "bytes": 139385,
+   "sha256": "71454ec9bfc582a7",
+   "frames": 3,
+   "screensFramed": 3,
+   "screens": [
+    "BO-044",
+    "BO-142",
+    "BO-143"
+   ],
+   "orphanFrames": [],
+   "anchors": [
+    "bo-044",
+    "bo-142",
+    "bo-143",
+    "ret-1b",
+    "ret-1c",
+    "ret-1d",
+    "ret-1e",
+    "ret-1f",
+    "ret-1g",
+    "ret-1h",
+    "ret-1j",
+    "ret-1k"
+   ],
+   "platforms": [
+    "P08"
+   ],
+   "firstIndexed": "2026-09-28",
+   "lastSeen": "2026-09-28"
+  },
+  {
+   "file": "reference/Retail Board 2.dc.html",
+   "provenance": "clientPack",
+   "bytes": 239537,
+   "sha256": "b3c2d9af2c6dadda",
+   "frames": 7,
+   "screensFramed": 7,
+   "screens": [
+    "BO-007",
+    "BO-008",
+    "BO-009",
+    "BO-014",
+    "BO-083",
+    "BO-112",
+    "BO-113"
+   ],
+   "orphanFrames": [],
+   "anchors": [
+    "bo-007",
+    "bo-008",
+    "bo-009",
+    "bo-014",
+    "bo-083",
+    "bo-112",
+    "bo-113",
+    "ret-2a",
+    "ret-2b",
+    "ret-2c",
+    "ret-2d",
+    "ret-2e",
+    "ret-2f",
+    "ret-2g",
+    "ret-2h",
+    "ret-2j",
+    "ret-2k",
+    "ret-2l"
+   ],
+   "platforms": [
+    "P08"
+   ],
+   "firstIndexed": "2026-09-28",
+   "lastSeen": "2026-09-28"
+  },
+  {
+   "file": "reference/Retail Board 3.dc.html",
+   "provenance": "clientPack",
+   "bytes": 192232,
+   "sha256": "e809d171e01fdb09",
+   "frames": 5,
+   "screensFramed": 5,
+   "screens": [
+    "BO-021",
+    "BO-024",
+    "POS-002",
+    "POS-005",
+    "POS-006"
+   ],
+   "orphanFrames": [],
+   "anchors": [
+    "bo-021",
+    "bo-024",
+    "pos-002",
+    "pos-005",
+    "pos-006",
+    "ret-3a",
+    "ret-3b",
+    "ret-3c",
+    "ret-3d",
+    "ret-3e",
+    "ret-3f",
+    "ret-3g",
+    "ret-3h",
+    "ret-3j",
+    "ret-3k"
+   ],
+   "platforms": [
+    "P04",
+    "P08"
+   ],
+   "firstIndexed": "2026-09-28",
+   "lastSeen": "2026-09-28"
+  },
+  {
+   "file": "reference/Retail Board 4.dc.html",
+   "provenance": "clientPack",
+   "bytes": 197744,
+   "sha256": "eea961d158a72176",
+   "frames": 9,
+   "screensFramed": 9,
+   "screens": [
+    "BO-049",
+    "BO-052",
+    "BO-078",
+    "BO-079",
+    "BO-080",
+    "BO-081",
+    "BO-082",
+    "BO-114",
+    "EMP-068"
+   ],
+   "orphanFrames": [],
+   "anchors": [
+    "bo-049",
+    "bo-052",
+    "bo-078",
+    "bo-079",
+    "bo-080",
+    "bo-081",
+    "bo-082",
+    "bo-114",
+    "emp-068",
+    "ret-4a",
+    "ret-4b",
+    "ret-4c",
+    "ret-4d",
+    "ret-4e",
+    "ret-4f",
+    "ret-4g",
+    "ret-4h",
+    "ret-4j",
+    "ret-4k"
+   ],
+   "platforms": [
+    "P06",
+    "P08"
+   ],
+   "firstIndexed": "2026-09-28",
+   "lastSeen": "2026-09-28"
+  },
+  {
+   "file": "reference/Retail Board 5.dc.html",
+   "provenance": "clientPack",
+   "bytes": 192575,
+   "sha256": "2d255a6bd6ab685d",
+   "frames": 5,
+   "screensFramed": 5,
+   "screens": [
+    "BO-011",
+    "BO-119",
+    "BO-120",
+    "BO-121",
+    "BO-122"
+   ],
+   "orphanFrames": [],
+   "anchors": [
+    "bo-011",
+    "bo-119",
+    "bo-120",
+    "bo-121",
+    "bo-122",
+    "ret-5a",
+    "ret-5b",
+    "ret-5c",
+    "ret-5d",
+    "ret-5e",
+    "ret-5f",
+    "ret-5g",
+    "ret-5h",
+    "ret-5j",
+    "ret-5k"
+   ],
+   "platforms": [
+    "P08"
+   ],
+   "firstIndexed": "2026-09-28",
+   "lastSeen": "2026-09-28"
+  },
+  {
+   "file": "reference/Retail Board 6.dc.html",
+   "provenance": "clientPack",
+   "bytes": 203088,
+   "sha256": "24f6fe8620b4c355",
+   "frames": 3,
+   "screensFramed": 3,
+   "screens": [
+    "ANL-006",
+    "BO-058",
+    "BO-068"
+   ],
+   "orphanFrames": [],
+   "anchors": [
+    "anl-006",
+    "bo-058",
+    "bo-068",
+    "ret-6a",
+    "ret-6b",
+    "ret-6c",
+    "ret-6d",
+    "ret-6e",
+    "ret-6f",
+    "ret-6g",
+    "ret-6h",
+    "ret-6j",
+    "ret-6k",
+    "ret-6l"
+   ],
+   "platforms": [
+    "P08",
+    "P16"
+   ],
+   "firstIndexed": "2026-09-28",
+   "lastSeen": "2026-09-28"
+  },
+  {
+   "file": "reference/Seat Board 1.dc.html",
+   "provenance": "clientPack",
+   "bytes": 70498,
+   "sha256": "33544d39412e204d",
+   "frames": 1,
+   "screensFramed": 1,
+   "screens": [
+    "BO-063"
+   ],
+   "orphanFrames": [],
+   "anchors": [
+    "bo-063",
+    "seat-1a",
+    "seat-1b",
+    "seat-1c"
+   ],
+   "platforms": [
+    "P08"
+   ],
+   "firstIndexed": "2026-09-28",
+   "lastSeen": "2026-09-28"
+  },
+  {
+   "file": "reference/Seat Board 2.dc.html",
+   "provenance": "clientPack",
+   "bytes": 113050,
+   "sha256": "24b4322102541920",
+   "frames": 2,
+   "screensFramed": 2,
+   "screens": [
+    "BO-002",
+    "BO-092"
+   ],
+   "orphanFrames": [],
+   "anchors": [
+    "bo-002",
+    "bo-092",
+    "seat-2a",
+    "seat-2b",
+    "seat-2c",
+    "seat-2d",
+    "seat-2e"
+   ],
+   "platforms": [
+    "P08"
+   ],
+   "firstIndexed": "2026-09-28",
+   "lastSeen": "2026-09-28"
+  },
+  {
+   "file": "reference/Seat Board 3.dc.html",
+   "provenance": "clientPack",
+   "bytes": 76826,
+   "sha256": "69f9ee147ec94e5e",
+   "frames": 2,
+   "screensFramed": 2,
+   "screens": [
+    "WEB-007",
+    "WEB-039"
+   ],
+   "orphanFrames": [],
+   "anchors": [
+    "seat-3a",
+    "seat-3b",
+    "seat-3c",
+    "seat-3d",
+    "web-007",
+    "web-039"
+   ],
+   "platforms": [
+    "P01"
+   ],
+   "firstIndexed": "2026-09-28",
+   "lastSeen": "2026-09-28"
+  },
+  {
+   "file": "reference/Seat Board 4.dc.html",
+   "provenance": "clientPack",
+   "bytes": 36622,
+   "sha256": "21d1e8d4f2bf0dc3",
+   "frames": 3,
+   "screensFramed": 3,
+   "screens": [
+    "EMP-030",
+    "GST-021",
+    "GST-049"
+   ],
+   "orphanFrames": [],
+   "anchors": [
+    "emp-030",
+    "gst-021",
+    "gst-049",
+    "seat-4a",
+    "seat-4b",
+    "seat-4c"
+   ],
+   "platforms": [
+    "P02",
+    "P06"
+   ],
+   "firstIndexed": "2026-09-28",
+   "lastSeen": "2026-09-28"
+  },
+  {
+   "file": "reference/Seat Platform Board 1.dc.html",
+   "provenance": "clientPack",
+   "bytes": 148219,
+   "sha256": "feb3a7998f3ca817",
+   "frames": 0,
+   "screensFramed": 0,
+   "screens": [],
+   "orphanFrames": [],
+   "anchors": [
+    "seatp-1a",
+    "seatp-1b",
+    "seatp-1c",
+    "seatp-1d",
+    "seatp-1e",
+    "seatp-1f",
+    "seatp-1g",
+    "seatp-1h",
+    "seatp-1i",
+    "seatp-1j"
+   ],
+   "platforms": [],
+   "firstIndexed": "2026-09-28",
+   "lastSeen": "2026-09-28"
+  },
+  {
+   "file": "reference/Seat Platform Board 10.dc.html",
+   "provenance": "clientPack",
+   "bytes": 137588,
+   "sha256": "bdd04ddd82dfff44",
+   "frames": 0,
+   "screensFramed": 0,
+   "screens": [],
+   "orphanFrames": [],
+   "anchors": [
+    "seatp-10a",
+    "seatp-10b",
+    "seatp-10c",
+    "seatp-10d",
+    "seatp-10e",
+    "seatp-10f",
+    "seatp-10g",
+    "seatp-10h",
+    "seatp-10i",
+    "seatp-10j"
+   ],
+   "platforms": [],
+   "firstIndexed": "2026-09-28",
+   "lastSeen": "2026-09-28"
+  },
+  {
+   "file": "reference/Seat Platform Board 11.dc.html",
+   "provenance": "clientPack",
+   "bytes": 130961,
+   "sha256": "c2440ddd5c6f8ad7",
+   "frames": 0,
+   "screensFramed": 0,
+   "screens": [],
+   "orphanFrames": [],
+   "anchors": [
+    "seatp-11a",
+    "seatp-11b",
+    "seatp-11c",
+    "seatp-11d",
+    "seatp-11e",
+    "seatp-11f",
+    "seatp-11g",
+    "seatp-11h",
+    "seatp-11i",
+    "seatp-11j"
+   ],
+   "platforms": [],
+   "firstIndexed": "2026-09-28",
+   "lastSeen": "2026-09-28"
+  },
+  {
+   "file": "reference/Seat Platform Board 12.dc.html",
+   "provenance": "clientPack",
+   "bytes": 149134,
+   "sha256": "1d77d0ca3aeb73a1",
+   "frames": 0,
+   "screensFramed": 0,
+   "screens": [],
+   "orphanFrames": [],
+   "anchors": [
+    "seatp-12a",
+    "seatp-12b",
+    "seatp-12c",
+    "seatp-12d",
+    "seatp-12e",
+    "seatp-12f",
+    "seatp-12g",
+    "seatp-12h",
+    "seatp-12i",
+    "seatp-12j"
+   ],
+   "platforms": [],
+   "firstIndexed": "2026-09-28",
+   "lastSeen": "2026-09-28"
+  },
+  {
+   "file": "reference/Seat Platform Board 13.dc.html",
+   "provenance": "clientPack",
+   "bytes": 144748,
+   "sha256": "0bae8dd2d56d6d09",
+   "frames": 1,
+   "screensFramed": 1,
+   "screens": [
+    "BO-067"
+   ],
+   "orphanFrames": [],
+   "anchors": [
+    "bo-067",
+    "seatp-13a",
+    "seatp-13b",
+    "seatp-13c",
+    "seatp-13d",
+    "seatp-13e",
+    "seatp-13f",
+    "seatp-13g",
+    "seatp-13h",
+    "seatp-13i",
+    "seatp-13j"
+   ],
+   "platforms": [
+    "P08"
+   ],
+   "firstIndexed": "2026-09-28",
+   "lastSeen": "2026-09-28"
+  },
+  {
+   "file": "reference/Seat Platform Board 2.dc.html",
+   "provenance": "clientPack",
+   "bytes": 142851,
+   "sha256": "3e719d7695f4b6b2",
+   "frames": 0,
+   "screensFramed": 0,
+   "screens": [],
+   "orphanFrames": [],
+   "anchors": [
+    "seatp-2a",
+    "seatp-2b",
+    "seatp-2c",
+    "seatp-2d",
+    "seatp-2e",
+    "seatp-2f",
+    "seatp-2g",
+    "seatp-2h",
+    "seatp-2i",
+    "seatp-2j"
+   ],
+   "platforms": [],
+   "firstIndexed": "2026-09-28",
+   "lastSeen": "2026-09-28"
+  },
+  {
+   "file": "reference/Seat Platform Board 3.dc.html",
+   "provenance": "clientPack",
+   "bytes": 133045,
+   "sha256": "fe334d254c65f32e",
+   "frames": 0,
+   "screensFramed": 0,
+   "screens": [],
+   "orphanFrames": [],
+   "anchors": [
+    "seatp-3a",
+    "seatp-3b",
+    "seatp-3c",
+    "seatp-3d",
+    "seatp-3e",
+    "seatp-3f",
+    "seatp-3g",
+    "seatp-3h",
+    "seatp-3i",
+    "seatp-3j"
+   ],
+   "platforms": [],
+   "firstIndexed": "2026-09-28",
+   "lastSeen": "2026-09-28"
+  },
+  {
+   "file": "reference/Seat Platform Board 4.dc.html",
+   "provenance": "clientPack",
+   "bytes": 136779,
+   "sha256": "287cabbd5dea61cc",
+   "frames": 0,
+   "screensFramed": 0,
+   "screens": [],
+   "orphanFrames": [],
+   "anchors": [
+    "seatp-4a",
+    "seatp-4b",
+    "seatp-4c",
+    "seatp-4d",
+    "seatp-4e",
+    "seatp-4f",
+    "seatp-4g",
+    "seatp-4h",
+    "seatp-4i",
+    "seatp-4j"
+   ],
+   "platforms": [],
+   "firstIndexed": "2026-09-28",
+   "lastSeen": "2026-09-28"
+  },
+  {
+   "file": "reference/Seat Platform Board 5.dc.html",
+   "provenance": "clientPack",
+   "bytes": 136925,
+   "sha256": "806aa8be35c86605",
+   "frames": 0,
+   "screensFramed": 0,
+   "screens": [],
+   "orphanFrames": [],
+   "anchors": [
+    "seatp-5a",
+    "seatp-5b",
+    "seatp-5c",
+    "seatp-5d",
+    "seatp-5e",
+    "seatp-5f",
+    "seatp-5g",
+    "seatp-5h",
+    "seatp-5i",
+    "seatp-5j"
+   ],
+   "platforms": [],
+   "firstIndexed": "2026-09-28",
+   "lastSeen": "2026-09-28"
+  },
+  {
+   "file": "reference/Seat Platform Board 6.dc.html",
+   "provenance": "clientPack",
+   "bytes": 137840,
+   "sha256": "87b60b9fcc9f204c",
+   "frames": 0,
+   "screensFramed": 0,
+   "screens": [],
+   "orphanFrames": [],
+   "anchors": [
+    "seatp-6a",
+    "seatp-6b",
+    "seatp-6c",
+    "seatp-6d",
+    "seatp-6e",
+    "seatp-6f",
+    "seatp-6g",
+    "seatp-6h",
+    "seatp-6i",
+    "seatp-6j"
+   ],
+   "platforms": [],
+   "firstIndexed": "2026-09-28",
+   "lastSeen": "2026-09-28"
+  },
+  {
+   "file": "reference/Seat Platform Board 7.dc.html",
+   "provenance": "clientPack",
+   "bytes": 130810,
+   "sha256": "7e26fafbf3c58141",
+   "frames": 1,
+   "screensFramed": 1,
+   "screens": [
+    "BO-026"
+   ],
+   "orphanFrames": [],
+   "anchors": [
+    "bo-026",
+    "seatp-7a",
+    "seatp-7b",
+    "seatp-7c",
+    "seatp-7d",
+    "seatp-7e",
+    "seatp-7f",
+    "seatp-7g",
+    "seatp-7h",
+    "seatp-7i",
+    "seatp-7j"
+   ],
+   "platforms": [
+    "P08"
+   ],
+   "firstIndexed": "2026-09-28",
+   "lastSeen": "2026-09-28"
+  },
+  {
+   "file": "reference/Seat Platform Board 8.dc.html",
+   "provenance": "clientPack",
+   "bytes": 105395,
+   "sha256": "534788c09d50f578",
+   "frames": 0,
+   "screensFramed": 0,
+   "screens": [],
+   "orphanFrames": [],
+   "anchors": [
+    "seatp-8a",
+    "seatp-8b",
+    "seatp-8c",
+    "seatp-8d",
+    "seatp-8e",
+    "seatp-8f",
+    "seatp-8g",
+    "seatp-8h",
+    "seatp-8i",
+    "seatp-8j"
+   ],
+   "platforms": [],
+   "firstIndexed": "2026-09-28",
+   "lastSeen": "2026-09-28"
+  },
+  {
+   "file": "reference/Seat Platform Board 9.dc.html",
+   "provenance": "clientPack",
+   "bytes": 121177,
+   "sha256": "f6a5dab072948a37",
+   "frames": 0,
+   "screensFramed": 0,
+   "screens": [],
+   "orphanFrames": [],
+   "anchors": [
+    "seatp-9a",
+    "seatp-9b",
+    "seatp-9c",
+    "seatp-9d",
+    "seatp-9e",
+    "seatp-9f",
+    "seatp-9g",
+    "seatp-9h",
+    "seatp-9i",
+    "seatp-9j"
+   ],
+   "platforms": [],
+   "firstIndexed": "2026-09-28",
+   "lastSeen": "2026-09-28"
+  },
+  {
+   "file": "reference/TICVAI All Boards Index.dc.html",
+   "provenance": "unrecognised",
+   "bytes": 970754,
+   "sha256": "a740e5155c830ad9",
+   "frames": 0,
+   "screensFramed": 0,
+   "screens": [],
+   "orphanFrames": [],
+   "anchors": [],
+   "platforms": [],
+   "firstIndexed": "2026-09-28",
+   "lastSeen": "2026-09-28"
+  },
+  {
+   "file": "reference/TICVAI Boards v2.dc.html",
+   "provenance": "clientPack",
+   "bytes": 136749,
+   "sha256": "5a86b744c4c97af5",
+   "frames": 2,
+   "screensFramed": 2,
+   "screens": [
+    "POS-001",
+    "POS-007"
+   ],
+   "orphanFrames": [],
+   "anchors": [
+    "fnb-1a",
+    "inv-1a",
+    "inv-6",
+    "pos-001",
+    "pos-007",
+    "pos-2a",
+    "pos-2f",
+    "ret-1a"
+   ],
+   "platforms": [
+    "P04"
+   ],
+   "firstIndexed": "2026-09-28",
    "lastSeen": "2026-09-28"
   },
   {
