@@ -27,7 +27,8 @@ puts "OpenProject #{OpenProject::VERSION}: #{texts.size} descriptions in the fil
      "what is there, #{texts.size - changed.size} already the same"
 sample = changed.keys.first
 puts "e.g. ##{sample}: #{current[sample][1].to_s.size} -> #{changed[sample].size} characters" if sample
-exit unless apply
+# MODE=status reports its plan before this point is reached, so a dry run shows it; it exits on its own.
+exit unless apply || ENV["MODE"] == "status"
 
 started = Time.now
 # updated_at moves too: OpenProject caches each work package's API representation on it, so without this
@@ -43,7 +44,7 @@ if ENV["MODE"] == "status"
   rewrite = changed.select { |i, _| statuses[i] == "New" }
   comment = changed.reject { |i, _| statuses[i] == "New" }
   puts "MODE=status: #{rewrite.size} New tickets rewritten, #{comment.size} started or closed tickets get a comment " \
-       "(#{comment.keys.map { |i| statuses[i] }.tally.map { |s, n| "#{s} #{n}" }.join(', ')})"
+       "(#{comment.keys.group_by { |i| statuses[i] }.map { |s, ids| "#{s} #{ids.size}" }.join(', ')})"  # no .tally: OpenProject 10 runs Ruby 2.6
   subjects = ENV["SUBJECTS"] && File.exist?(ENV["SUBJECTS"]) ? JSON.parse(File.read(ENV["SUBJECTS"])).transform_keys(&:to_i) : {}
   puts "retitles: #{subjects.size}" if subjects.any?
   exit unless apply
