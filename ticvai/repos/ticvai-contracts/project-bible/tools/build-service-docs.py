@@ -987,7 +987,7 @@ def main() -> int:
     table_mig = {t: mig_key[g] for g, ts in groups.items() for t in ts}
     migrations = []
     task("MIG", "", "Epic", f"Database migrations for the first release ({len(rel)} tables, {len(groups)} schemas)",
-         "One forward-only migration per schema, each with a ROLLBACK section tested in CI (backend/MIGRATIONS.md). "
+         "One forward-only migration per schema, applied forward by SqlMigrationRunner, which records each file and its checksum (handoff/service-docs/backend/MIGRATIONS.md). "
          "The tables, columns, keys, indexes and row-level security are already written in backend/ as derived DDL; "
          "each migration takes its schema's first-release tables from there. Order matters: each migration only "
          "references tables created by the ones before it.", 1, area="backend")
@@ -1196,7 +1196,7 @@ def main() -> int:
             pts = points_of(1 + 0.5 * len(ts) + n_cols / 40)
             task(k, "VM-DB", "Task", f"Migration: {sch} for Venue Management ({len(ts)} tables)",
                  "Tables: " + ", ".join(ts) + f". Source DDL: {ddl[ts[0]]['file']}. Additive to the first release; "
-                 "include ROLLBACK.", 2, pts=pts, area="VM",
+                 "applied forward by SqlMigrationRunner, and a second run applies nothing.", 2, pts=pts, area="VM",
                  assignee=vm_backend_owner(schema_owner.get(sch, ""), pts),
                  depends=prior or ["MIG-BASELINE"])
             for t in ts:

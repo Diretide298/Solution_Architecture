@@ -1,5 +1,5 @@
 {
- "note": "Reconstructed 2026-09-27 from op-descriptions.json (week and queue each ticket states); the Block A scheduler's scratch output was never committed. start = (week-1)*5 working days, which op-descriptions.py maps back to the same week.",
+ "note": "Reconstructed 2026-09-27 from op-descriptions.json (week and queue each ticket states); the Block A scheduler's scratch output was never committed. start = (week-1)*5 working days, which op-descriptions.py maps back to the same week. VM-MIG-ORDERS (new with orders.refund_batch, 28 September) placed in week 3 with the other VM migrations of its size.",
  "start": {
   "SETUP-CI": 0,
   "SETUP-ENV": 0,
@@ -659,7 +659,8 @@
   "VM-BO-141": 20,
   "VM-BO-026": 20,
   "VM-BO-097": 20,
-  "VM-BO-142": 20
+  "VM-BO-142": 20,
+  "VM-MIG-ORDERS": 10
  },
  "assign": {
   "SETUP-CI": "Hrushikant Patkar",
@@ -1454,6 +1455,7 @@
   "VM-BO-141": "Pallavi Sawant",
   "VM-BO-026": "Pallavi Sawant",
   "VM-BO-097": "Pradnya Yeram",
-  "VM-BO-142": "Sanket Keluskar"
+  "VM-BO-142": "Sanket Keluskar",
+  "VM-MIG-ORDERS": "Pranay Shinde"
  }
 }

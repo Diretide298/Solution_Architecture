@@ -128,23 +128,23 @@ Each migration only references tables created by the ones above it. Keys that wo
 | MIG-PLATFORM | `platform.device` | 23 | none |  | 5 | 2 | used by the first release |
 | MIG-PLATFORM | `platform.device_heartbeat` | 2 | none |  | 1 | 0 | used by the first release |
 | MIG-PLATFORM | `platform.dsar_request` | 7 | none |  | 0 | 1 | used by the first release |
-| MIG-PLATFORM | `platform.guest_link` | 5 | none |  | 0 | 0 | referenced by marketing.guest_profile |
+| MIG-PLATFORM | `platform.guest_link` | 5 | none |  | 0 | 0 | referenced by platform.dsar_request |
 | MIG-PLATFORM | `platform.outbox` | 11 | scope_path |  | 0 | 12 | used by the first release |
 | MIG-PLATFORM | `platform.outlet` | 9 | venue_id | yes | 8 | 2 | used by the first release |
 | MIG-PLATFORM | `platform.region_settings` | 11 | none |  | 4 | 2 | used by the first release |
 | MIG-PLATFORM | `platform.sale_board` | 6 | venue_id | yes | 3 | 2 | used by the first release |
 | MIG-PLATFORM | `platform.scope` | 8 | none |  | 9 | 2 | used by the first release |
-| MIG-PLATFORM | `platform.tenant` | 2 | none |  | 0 | 0 | referenced by subscription.contract |
+| MIG-PLATFORM | `platform.tenant` | 2 | none |  | 0 | 0 | referenced by ai.policy |
 | MIG-PLATFORM | `platform.venue_settings` | 10 | venue_id |  | 4 | 1 | used by the first release |
 | MIG-PLATFORM | `platform.workstation` | 17 | scope_path | yes | 7 | 1 | used by the first release |
 | MIG-LEDGER | `ledger.account` | 15 | none |  | 3 | 2 | used by the first release |
-| MIG-LEDGER | `ledger.cost_center` | 6 | venue_id |  | 0 | 0 | referenced by inventory.movement |
+| MIG-LEDGER | `ledger.cost_center` | 6 | venue_id |  | 0 | 0 | referenced by platform.outlet |
 | MIG-LEDGER | `ledger.event_budget` | 8 | none |  | 1 | 0 | used by the first release |
 | MIG-LEDGER | `ledger.fiscal_period` | 8 | none |  | 1 | 0 | used by the first release |
 | MIG-LEDGER | `ledger.fx_provider_assignment` | 6 | scope_path |  | 1 | 1 | used by the first release |
 | MIG-LEDGER | `ledger.fx_rate` | 12 | none |  | 7 | 2 | used by the first release |
 | MIG-LEDGER | `ledger.journal_entry` | 20 | none |  | 0 | 3 | used by the first release |
-| MIG-LEDGER | `ledger.legal_entity` | 11 | scope_path |  | 0 | 0 | referenced by ledger.account |
+| MIG-LEDGER | `ledger.legal_entity` | 11 | scope_path |  | 0 | 0 | referenced by ledger.fiscal_period |
 | MIG-LEDGER | `ledger.posting` | 12 | venue_id |  | 2 | 3 | used by the first release |
 | MIG-LEDGER | `ledger.tax_code` | 12 | none |  | 0 | 0 | referenced by catalogue.price |
 | MIG-INVENTORY | `inventory.goods_receipt` | 11 | none |  | 3 | 2 | used by the first release |
@@ -156,7 +156,7 @@ Each migration only references tables created by the ones above it. Keys that wo
 | MIG-INVENTORY | `inventory.requisition` | 20 | venue_id | yes | 0 | 0 | referenced by inventory.purchase_order |
 | MIG-INVENTORY | `inventory.serialised_item` | 9 | none |  | 1 | 0 | used by the first release |
 | MIG-INVENTORY | `inventory.stock_batch` | 10 | none |  | 1 | 0 | used by the first release |
-| MIG-INVENTORY | `inventory.supplier` | 16 | scope_path |  | 0 | 0 | referenced by maintenance.asset |
+| MIG-INVENTORY | `inventory.supplier` | 16 | scope_path |  | 0 | 0 | referenced by inventory.item |
 | MIG-MAINTENANCE | `maintenance.asset` | 29 | venue_id | yes | 0 | 0 | referenced by queue.queue |
 | MIG-MAINTENANCE | `maintenance.incident` | 26 | venue_id | yes | 0 | 0 | referenced by maintenance.work_order |
 | MIG-MAINTENANCE | `maintenance.inspection` | 14 | venue_id | yes | 0 | 0 | referenced by maintenance.work_order |
