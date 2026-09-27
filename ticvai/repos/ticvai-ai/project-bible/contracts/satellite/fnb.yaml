@@ -17,11 +17,11 @@ info:
   x-ticvai-platforms:
   - P04 POS
   - P02 Guest App
-  - KDS integration
-  description: "## What this contract covers\n**Menus, table service and kitchen handoff. KDS is an integration\
-    \ point, not a build.**\n| | | |---|---| | **Tier** | satellite | | **Matrix domain** | 7 — F&B POS\
+  - P15 Kitchen Display
+  description: "## What this contract covers\n**Menus, table service and kitchen handoff. The kitchen display\
+    \ is built here too (P15).**\n| | | |---|---| | **Tier** | satellite | | **Matrix domain** | 7 — F&B POS\
     \  ·  5 — F&B & Guest Management (service) | | **Requirements** | ~151 | | **Capabilities** | C05,\
-    \ C06, C07, C08, C27, C36, C90 | | **Consumed by** | P04 POS · P02 Guest App · KDS integration |\n\
+    \ C06, C07, C08, C27, C36, C90 | | **Consumed by** | P04 POS · P02 Guest App · P15 Kitchen Display |\n\
     ## How to read this file\n**This file is a contract.** It is hand-authored and it is the source of\
     \ truth for one bounded context: server code, client code and mock servers are generated from it,\
     \ never the other way round. If a field is not here, it does not exist.\n**Contracts are split into\
@@ -43,9 +43,10 @@ info:
     \ scripts.\n**`security` arrays hold OAuth scopes.** Empty means \"this scheme, no scopes\" — for\
     \ bearer tokens there is nothing to list. Empty is not the same as absent: absent means unauthenticated.\n\
     \n## This context\nMenus, modifiers, quick-service ordering, table service, bill splitting and kitchen\
-    \ handoff. Domains 4 and 7 — roughly 190 requirements.\nPositions this encodes:\n- **KDS is an integration\
-    \ point, not a build** (31 Jul §11). This contract sends tickets\n  to whatever kitchen display the\
-    \ venue already runs and receives status back. It does\n  not implement a kitchen display.\n- **Menus\
+    \ handoff. Domains 4 and 7 — roughly 190 requirements.\nPositions this encodes:\n- **The kitchen display is TICVAI's own** (19 Sep, replacing the 31 Jul §11 *KDS integration\
+    \ only*). P15 Kitchen Display runs on any commodity touchscreen and reads\n  `listKitchenTickets`;\
+    \ the station mapping, the routing rules and the offline fallback are ours (18 Aug\n  minute), and no\
+    \ KDS vendor is integrated.\n- **Menus\
     \ read from the local bundle** at point of sale, like the rest of the catalogue\n  (ADR-0013). The\
     \ endpoints here that a terminal calls on the transaction path are order\n  submission and table state\
     \ — not menu retrieval.\n- **A table visit is not an order.** A guest sits, orders, orders again,\
@@ -53,7 +54,14 @@ info:
     \ at close, not at order time.** By amount, by covers, or by\n  category — 03 Aug §5. A split computed\
     \ at order time falls apart the moment someone\n  orders another drink.\n- Stock depletion for recipe-linked\
     \ items is real-time, so **F&B is blocked offline\n  where inventory is tracked**, and available offline\
-    \ where it is not.\n"
+    \ where it is not.\n\n## Dates and clock times are local\n**Every `format: date` field\
+    \ and parameter here is a calendar day in the Region's time zone** (`RegionSettings.timeZone`,\n\
+    \  which every venue and outlet inherits and cannot override), running from local midnight to\n  local\
+    \ midnight. Not UTC: in the Gulf a UTC day starts at four in the morning, and a\n  reservation list\
+    \ read by UTC days moves the late sitting onto the wrong date. **Wall-clock\n  times** (`HH:mm`, such\
+    \ as `MenuAvailability.startTime`) are read in the same zone. An\n  outlet's local midnight is midnight\
+    \ in its Region's zone. Instants (`date-time`) stay\n  UTC, as everywhere else (naming-and-style\
+    \ 5.2).\n"
 servers:
 - url: https://{cellHost}/api/v1
   variables:
@@ -136,6 +144,9 @@ paths:
               $ref: '#/components/schemas/FnbReservationPolicy'
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Set
           content:
             application/json:
@@ -202,6 +213,9 @@ paths:
               $ref: '#/components/schemas/FnbServiceChargePolicy'
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Set
           content:
             application/json:
@@ -246,6 +260,9 @@ paths:
                     $ref: '#/components/schemas/SubstitutionRule'
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Set
           content:
             application/json:
@@ -372,6 +389,9 @@ paths:
               $ref: '#/components/schemas/ProductionPlan'
       responses:
         '201':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Drafted
           content:
             application/json:
@@ -416,6 +436,9 @@ paths:
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Released, with the runs it created
           content:
             application/json:
@@ -520,12 +543,14 @@ paths:
                   nullable: true
       responses:
         '202':
-          description: Sent
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: Queued for sending
           content:
             application/json:
               schema:
-                type: object
-                additionalProperties: true
+                $ref: '#/components/schemas/BookingMessageReceipt'
   /table-reservations/conflicts:
     get:
       operationId: resolveBookingConflict
@@ -554,6 +579,7 @@ paths:
       parameters:
       - name: date
         in: query
+        description: A calendar day, in the Region's time zone, not UTC.
         schema:
           type: string
           format: date
@@ -634,6 +660,9 @@ paths:
               $ref: '#/components/schemas/TableDefinition'
       responses:
         '201':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Created
           content:
             application/json:
@@ -650,9 +679,9 @@ paths:
     put:
       operationId: updateTable
       summary: Change what a table is
-      description: 'Board 4C. **Capacity, label, section, whether it is out of service.**
+      description: 'Board 4C. **Capacity, label, section, whether it is out of service** (`isOutOfService`).
 
-        **Refused while a visit is open on it.** Changing a table''s capacity under a seated party is
+        **Refused while a visit is open on it**, with `refusedReason: tableHasOpenVisit`. Changing a table''s capacity under a seated party is
         how a floor plan and a room stop agreeing, and the room wins.
 
         '
@@ -674,11 +703,26 @@ paths:
               $ref: '#/components/schemas/TableDefinition'
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Updated
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/TableDefinition'
+        '409':
+          description: A visit is open on the table. Names the visit.
+          content:
+            application/problem+json:
+              schema:
+                allOf:
+                - $ref: '#/components/schemas/FnbProblem'
+                - type: object
+                  properties:
+                    refusedReason:
+                      enum:
+                      - tableHasOpenVisit
   /menus/{menuId}/schedule:
     parameters:
     - name: menuId
@@ -687,17 +731,66 @@ paths:
       schema:
         type: string
         format: uuid
+    get:
+      operationId: listMenuSchedules
+      summary: What is scheduled to go live, and when
+      description: '**Added 26 September.** A scheduled publish was accepted and never shown again, so a
+        venue with three scheduled price changes could not see them and `cancelScheduleId` had no way
+        to be found. Flow F31 needs `scheduledPending` to be *visible as pending rather than invisible*.
+
+        Pending first, then by `effectiveAt`.
+
+        '
+      tags:
+      - menu
+      x-ticvai-permission: PRODUCT_VIEW
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      x-ticvai-read-routing: replica
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+      - name: status
+        in: query
+        schema:
+          type: string
+          enum:
+          - pending
+          - applied
+          - cancelled
+      - $ref: ../shared/common.yaml#/components/parameters/PageSize
+      - $ref: ../shared/common.yaml#/components/parameters/PageCursor
+      responses:
+        '200':
+          description: Schedules
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: ../shared/common.yaml#/components/schemas/Page
+                - type: object
+                  properties:
+                    items:
+                      type: array
+                      items:
+                        $ref: '#/components/schemas/MenuSchedule'
     post:
       operationId: scheduleMenuPublish
       x-ticvai-consumed-by:
         - "P08 BO-045 Menu Management"
       x-ticvai-config-scope: outlet
       summary: Publish it on a date, not now
-      description: 'Board 2J. **`publishMenu` takes an `effectiveAt` and nothing lists or cancels what
-        is pending.** A venue with three scheduled price changes has no way to see them.
+      description: 'Board 2J. **`publishMenu` took an `effectiveAt` and nothing listed or cancelled what
+        was pending.** A venue with three scheduled price changes had no way to see them. Pending schedules
+        are now read with `listMenuSchedules`, and `cancelScheduleId` cancels one of them.
+
+        **One schedule per menu per date.** A second schedule for a date that already has one is refused
+        with the existing schedule named (flow F31) — cancel it first.
 
         **Takes effect at the outlet''s local midnight**, not the tenant''s — a venue in Dubai and one
-        in London do not change menu at the same instant.
+        in London do not change menu at the same instant. The outlet''s zone is its Region''s time zone
+        (`RegionSettings.timeZone`); outlets have no zone of their own.
 
         '
       tags:
@@ -720,18 +813,36 @@ paths:
                 effectiveAt:
                   type: string
                   format: date-time
+                  description: Local midnight, in the Region's time zone, of the day the menu goes
+                    live, sent as a UTC instant like every date-time (for a Dubai outlet going live on
+                    1 March, 2026-02-28T20:00:00Z).
                 cancelScheduleId:
                   type: string
                   format: uuid
                   nullable: true
+                  description: A pending schedule from `listMenuSchedules`. When set, `effectiveAt` is ignored.
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Scheduled, or cancelled
           content:
             application/json:
               schema:
-                type: object
-                additionalProperties: true
+                $ref: '#/components/schemas/MenuSchedule'
+        '409':
+          description: A schedule already exists for that date. Names it in `existingScheduleId`.
+          content:
+            application/problem+json:
+              schema:
+                allOf:
+                - $ref: '#/components/schemas/FnbProblem'
+                - type: object
+                  properties:
+                    refusedReason:
+                      enum:
+                      - scheduleExistsForDate
   /menus/{menuId}/actions:
     parameters:
     - name: menuId
@@ -791,19 +902,19 @@ paths:
                         - setAvailability
                         - setTax
                       selector:
-                        type: object
-                        additionalProperties: true
+                        $ref: '#/components/schemas/MenuActionSelector'
                       value:
-                        type: object
-                        additionalProperties: true
+                        $ref: '#/components/schemas/MenuActionValue'
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: The preview, or the result
           content:
             application/json:
               schema:
-                type: object
-                additionalProperties: true
+                $ref: '#/components/schemas/MenuActionResult'
   /kitchen-tickets/{ticketId}/label:
     parameters:
     - name: ticketId
@@ -811,7 +922,7 @@ paths:
       required: true
       schema:
         type: string
-        format: uuid
+        pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
     post:
       operationId: printOrderLabel
       x-ticvai-consumed-by:
@@ -840,8 +951,7 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                additionalProperties: true
+                $ref: '#/components/schemas/OrderLabel'
   /fnb-orders/{orderId}/notify:
     parameters:
     - name: orderId
@@ -849,7 +959,7 @@ paths:
       required: true
       schema:
         type: string
-        format: uuid
+        pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
     post:
       operationId: sendOrderNotification
       summary: Tell the guest where their order is
@@ -896,6 +1006,9 @@ paths:
                   - buzzer
       responses:
         '202':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Sent
   /combos:
     post:
@@ -927,6 +1040,9 @@ paths:
               $ref: '#/components/schemas/Combo'
       responses:
         '201':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Created
           content:
             application/json:
@@ -975,6 +1091,9 @@ paths:
                     $ref: '#/components/schemas/ComboSlot'
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Set
           content:
             application/json:
@@ -1025,21 +1144,29 @@ paths:
                     format: uuid
       responses:
         '200':
-          description: Attached
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: Attached. The item with its `modifierGroupIds`
           content:
             application/json:
               schema:
-                type: object
-                additionalProperties: true
+                $ref: '#/components/schemas/MenuItem'
         '409':
-          description: '**The group adds an allergen the item does not declare.** Names both so the venue
-            can fix the claim or drop the group.
+          description: '**The group adds an allergen the item does not declare.** Names both — `modifierGroupId`
+            and `allergens` — so the venue can fix the claim or drop the group.
 
             '
           content:
             application/problem+json:
               schema:
-                $ref: ../shared/common.yaml#/components/schemas/Problem
+                allOf:
+                - $ref: '#/components/schemas/FnbProblem'
+                - type: object
+                  properties:
+                    refusedReason:
+                      enum:
+                      - modifierAddsUndeclaredAllergen
   /kitchen-stations/{stationId}/chase:
     parameters:
     - name: stationId
@@ -1058,6 +1185,7 @@ paths:
 
         **Recorded, because a chased station is a signal.** One station chased six times a service is
         understaffed or badly laid out, and the venue only finds that out if the chase leaves a trace.
+        The trace is a `KitchenException` of kind `chased`.
 
         '
       tags:
@@ -1078,16 +1206,24 @@ paths:
               type: object
               required:
               - ticketId
+              - recordedAt
               properties:
                 ticketId:
                   type: string
-                  format: uuid
+                  pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
                 lineId:
                   type: string
-                  format: uuid
+                  pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
                   nullable: true
+                recordedAt:
+                  type: string
+                  format: date-time
+                  description: Device time of the chase. Becomes `KitchenException.raisedAt`.
       responses:
         '202':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Chased
   /kitchen-stations/rebalance:
     post:
@@ -1115,38 +1251,17 @@ paths:
         content:
           application/json:
             schema:
-              type: object
-              required:
-              - moves
-              properties:
-                moves:
-                  type: array
-                  items:
-                    type: object
-                    properties:
-                      fromStationId:
-                        type: string
-                        format: uuid
-                      toStationId:
-                        type: string
-                        format: uuid
-                      categoryIds:
-                        type: array
-                        items:
-                          type: string
-                          format: uuid
-                revertAt:
-                  type: string
-                  format: date-time
-                  nullable: true
+              $ref: '#/components/schemas/StationRebalance'
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Rebalanced for this service
           content:
             application/json:
               schema:
-                type: object
-                additionalProperties: true
+                $ref: '#/components/schemas/StationRebalance'
   /kitchen-exceptions:
     post:
       operationId: logKitchenException
@@ -1179,6 +1294,8 @@ paths:
               type: object
               required:
               - kind
+              - outletId
+              - recordedAt
               properties:
                 kind:
                   type: string
@@ -1190,24 +1307,41 @@ paths:
                   - powerLoss
                   - spillage
                   - other
+                  description: '`chased` is not offered here — `chaseStation` records it.'
+                outletId:
+                  type: string
+                  format: uuid
+                  description: The outlet whose kitchen it happened in. Required because `stationId` may be absent.
                 stationId:
                   type: string
                   format: uuid
                   nullable: true
+                ticketId:
+                  type: string
+                  pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+                  nullable: true
+                  description: The ticket it happened on, where there was one.
                 durationMinutes:
                   type: integer
                   nullable: true
                 note:
                   type: string
                   nullable: true
+                recordedAt:
+                  type: string
+                  format: date-time
+                  description: '**Device time, not arrival time.** Becomes `KitchenException.raisedAt`, so a
+                    replay after a dropped network keeps when the fryer actually went down.'
       responses:
         '201':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Logged
           content:
             application/json:
               schema:
-                type: object
-                additionalProperties: true
+                $ref: '#/components/schemas/KitchenException'
   /outlets/{outletId}/kitchen-sla:
     parameters:
     - name: outletId
@@ -1225,8 +1359,9 @@ paths:
         **Per service mode, deliberately.** A delivery order and a dine-in main do not share a target,
         and one number for both makes the rail either permanently red or useless.
 
-        **`setPriorityWeights` sits here too**: what pushes a ticket up the rail — age, promise time,
-        table stage, a VIP marker — and in what proportion.
+        **`setPriorityWeights` sits here too**: what pushes a ticket up the rail — age, promise time
+        (`KitchenTicket.targetReadyAt`), table stage, a VIP marker — and in what proportion. The weights
+        are what `listKitchenTickets` orders the rail by.
 
         '
       tags:
@@ -1245,32 +1380,14 @@ paths:
         content:
           application/json:
             schema:
-              type: object
-              properties:
-                targets:
-                  type: array
-                  items:
-                    type: object
-                    properties:
-                      serviceMode:
-                        type: string
-                      targetMinutes:
-                        type: integer
-                      warnAtPercent:
-                        type: integer
-                        default: 80
-                priorityWeights:
-                  type: object
-                  additionalProperties:
-                    type: integer
+              $ref: '#/components/schemas/KitchenSla'
       responses:
         '200':
           description: Set
           content:
             application/json:
               schema:
-                type: object
-                additionalProperties: true
+                $ref: '#/components/schemas/KitchenSla'
   /outlets/{outletId}/86-events:
     parameters:
     - name: outletId
@@ -1297,6 +1414,7 @@ paths:
       parameters:
       - name: from
         in: query
+        description: First calendar day, in the Region's time zone, not UTC.
         schema:
           type: string
           format: date
@@ -1315,18 +1433,23 @@ paths:
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  type: object
-                  additionalProperties: true
+                allOf:
+                  - $ref: '../shared/common.yaml#/components/schemas/Page'
+                  - type: object
+                    properties:
+                      items:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/EightySixEvent'
   /orders/{orderId}/collected:
     parameters:
     - name: orderId
       in: path
       required: true
+      description: The F&B order (`FnbOrder.id`), which is what this closes — not a sales order.
       schema:
         type: string
-        format: uuid
+        pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
     post:
       operationId: markOrderCollected
       x-ticvai-consumed-by:
@@ -1352,11 +1475,13 @@ paths:
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       requestBody:
-        required: false
+        required: true
         content:
           application/json:
             schema:
               type: object
+              required:
+              - recordedAt
               properties:
                 verifiedBy:
                   type: string
@@ -1366,14 +1491,20 @@ paths:
                   - name
                   - qr
                   - none
+                recordedAt:
+                  type: string
+                  format: date-time
+                  description: Device time of the collection. Closes the ready-to-collected clock.
       responses:
         '200':
-          description: Collected
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: Collected. The order, now `collected`
           content:
             application/json:
               schema:
-                type: object
-                additionalProperties: true
+                $ref: '#/components/schemas/FnbOrder'
   /outlets/{outletId}/sections:
     parameters:
     - name: outletId
@@ -1408,40 +1539,17 @@ paths:
         content:
           application/json:
             schema:
-              type: object
-              required:
-              - sections
-              properties:
-                sections:
-                  type: array
-                  items:
-                    type: object
-                    required:
-                    - name
-                    - tableIds
-                    properties:
-                      name:
-                        type: string
-                      tableIds:
-                        type: array
-                        items:
-                          type: string
-                          format: uuid
-                      serverPrincipalId:
-                        type: string
-                        format: uuid
-                        nullable: true
-                      servicePeriod:
-                        type: string
-                        nullable: true
+              $ref: '#/components/schemas/SectionLayout'
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Set
           content:
             application/json:
               schema:
-                type: object
-                additionalProperties: true
+                $ref: '#/components/schemas/SectionLayout'
   /outlets/{outletId}/table-combinations:
     parameters:
     - name: outletId
@@ -1488,29 +1596,24 @@ paths:
                 combinations:
                   type: array
                   items:
-                    type: object
-                    required:
-                    - tableIds
-                    - combinedCovers
-                    properties:
-                      tableIds:
-                        type: array
-                        items:
-                          type: string
-                          format: uuid
-                      combinedCovers:
-                        type: integer
-                      setupMinutes:
-                        type: integer
-                        default: 5
+                    $ref: '#/components/schemas/TableCombination'
       responses:
         '200':
-          description: Set
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: Set. The outlet's combinations
           content:
             application/json:
               schema:
                 type: object
-                additionalProperties: true
+                required:
+                - combinations
+                properties:
+                  combinations:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/TableCombination'
   /table-visits/{visitId}/stage:
     parameters:
     - name: visitId
@@ -1518,7 +1621,7 @@ paths:
       required: true
       schema:
         type: string
-        format: uuid
+        pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
     put:
       operationId: setServiceStage
       x-ticvai-consumed-by:
@@ -1553,7 +1656,12 @@ paths:
               type: object
               required:
               - stage
+              - recordedAt
               properties:
+                recordedAt:
+                  type: string
+                  format: date-time
+                  description: Device time of the act (offline-capable; replayed in this order).
                 stage:
                   type: string
                   enum:
@@ -1569,6 +1677,9 @@ paths:
                   - cleared
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Set
           content:
             application/json:
@@ -1581,7 +1692,7 @@ paths:
       required: true
       schema:
         type: string
-        format: uuid
+        pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
     post:
       operationId: notifyServer
       x-ticvai-consumed-by:
@@ -1622,6 +1733,9 @@ paths:
                   - allergyQuery
       responses:
         '202':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Sent
   /table-visits/{visitId}/transfer-items:
     parameters:
@@ -1630,7 +1744,7 @@ paths:
       required: true
       schema:
         type: string
-        format: uuid
+        pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
     post:
       operationId: transferOrderItems
       x-ticvai-consumed-by:
@@ -1662,17 +1776,26 @@ paths:
               required:
               - toVisitId
               - lineIds
+              - recordedAt
               properties:
                 toVisitId:
                   type: string
-                  format: uuid
+                  pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
                 lineIds:
                   type: array
                   items:
                     type: string
-                    format: uuid
+                    pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+                    description: An order line (`FnbOrder.lines[].id`).
+                recordedAt:
+                  type: string
+                  format: date-time
+                  description: Device time of the act (offline-capable; replayed in this order).
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Transferred
           content:
             application/json:
@@ -1782,19 +1905,22 @@ paths:
                   default: 10
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Notified, with the hold running
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/RestaurantWaitlist'
-  /stock-counts/{countId}/lines:
+  /fnb-stock-counts/{countId}/lines:
     parameters:
     - name: countId
       in: path
       required: true
       schema:
         type: string
-        format: uuid
+        pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
     post:
       operationId: enterCountLine
       x-ticvai-consumed-by:
@@ -1831,7 +1957,12 @@ paths:
               required:
               - itemId
               - countedQuantity
+              - recordedAt
               properties:
+                recordedAt:
+                  type: string
+                  format: date-time
+                  description: Device time the line was counted. The second entry for a line replaces the first in this order.
                 itemId:
                   type: string
                   format: uuid
@@ -1867,14 +1998,14 @@ paths:
                     type: number
                   variancePercent:
                     type: number
-  /stock-counts/{countId}/recount:
+  /fnb-stock-counts/{countId}/recount:
     parameters:
     - name: countId
       in: path
       required: true
       schema:
         type: string
-        format: uuid
+        pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
     post:
       operationId: requestRecount
       x-ticvai-consumed-by:
@@ -1920,8 +2051,7 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                additionalProperties: true
+                $ref: '#/components/schemas/RecountResult'
   /menus/{menuId}/publish:
     parameters:
     - name: menuId
@@ -1941,9 +2071,12 @@ paths:
 
         **Publishing is versioned and the previous version stays readable**, which is what makes rollback
         possible — and a price change that cannot be undone is a price change nobody makes on a Friday.
+        Each publish writes a `MenuVersion`; `listMenuVersions` reads them back, and a publish with an
+        `effectiveAt` also writes the `MenuSchedule` that `listMenuSchedules` shows as pending.
 
         **A scheduled publish takes effect at the outlet''s local midnight**, not the tenant''s. A venue
-        in Dubai and one in London do not change menu at the same instant.
+        in Dubai and one in London do not change menu at the same instant. The outlet''s zone is its
+        Region''s time zone (`RegionSettings.timeZone`); outlets have no zone of their own.
 
         '
       tags:
@@ -1968,21 +2101,27 @@ paths:
                   type: string
                   format: date-time
                   nullable: true
+                  description: Absent or null publishes now. Otherwise local midnight, in the
+                    Region's time zone, of the day the menu goes live, sent as a UTC instant like
+                    every date-time.
                 channels:
                   type: array
+                  description: Where the version goes live. Empty means every channel the outlet sells on.
                   items:
-                    type: string
+                    $ref: ../shared/common.yaml#/components/schemas/SalesChannel
                 note:
                   type: string
                   nullable: true
       responses:
         '200':
-          description: Published, or scheduled
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: Published, or scheduled. The version written
           content:
             application/json:
               schema:
-                type: object
-                additionalProperties: true
+                $ref: '#/components/schemas/MenuVersion'
   /menus/{menuId}/rollback:
     parameters:
     - name: menuId
@@ -2025,14 +2164,63 @@ paths:
                 toVersion:
                   type: integer
                   nullable: true
+                  description: A `MenuVersion.version` from `listMenuVersions`. Absent means the version before the live one.
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Rolled back as a new version
           content:
             application/json:
               schema:
-                type: object
-                additionalProperties: true
+                $ref: '#/components/schemas/MenuVersion'
+  /menus/{menuId}/versions:
+    parameters:
+    - name: menuId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    get:
+      operationId: listMenuVersions
+      summary: Every published version of a menu
+      description: '**Added 26 September.** `publishMenu` promised that the previous version stays readable
+        and `rollbackMenu` takes a `toVersion`, and nothing listed the versions — so the number a rollback
+        needed could not be found, and *what were we charging at noon* had no read.
+
+        Newest first. Each version carries the sections and items as published.
+
+        '
+      tags:
+      - menu
+      x-ticvai-permission: PRODUCT_VIEW
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      x-ticvai-read-routing: replica
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/PageSize
+      - $ref: ../shared/common.yaml#/components/parameters/PageCursor
+      responses:
+        '200':
+          description: Versions
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: ../shared/common.yaml#/components/schemas/Page
+                - type: object
+                  properties:
+                    items:
+                      type: array
+                      items:
+                        $ref: '#/components/schemas/MenuVersion'
+        '404':
+          $ref: ../shared/common.yaml#/components/responses/NotFound
   /kitchen-tickets/{ticketId}/fire:
     parameters:
     - name: ticketId
@@ -2040,7 +2228,7 @@ paths:
       required: true
       schema:
         type: string
-        format: uuid
+        pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
     post:
       operationId: fireCourse
       x-ticvai-consumed-by:
@@ -2077,7 +2265,12 @@ paths:
               type: object
               required:
               - course
+              - recordedAt
               properties:
+                recordedAt:
+                  type: string
+                  format: date-time
+                  description: Device time of the act (offline-capable; replayed in this order).
                 course:
                   type: integer
                   minimum: 1
@@ -2091,6 +2284,9 @@ paths:
                     '
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Fired
           content:
             application/json:
@@ -2103,7 +2299,7 @@ paths:
       required: true
       schema:
         type: string
-        format: uuid
+        pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
     post:
       operationId: holdCourse
       x-ticvai-consumed-by:
@@ -2138,7 +2334,12 @@ paths:
               type: object
               required:
               - course
+              - recordedAt
               properties:
+                recordedAt:
+                  type: string
+                  format: date-time
+                  description: Device time of the act (offline-capable; replayed in this order).
                 course:
                   type: integer
                   minimum: 1
@@ -2152,6 +2353,9 @@ paths:
                   - other
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Held
           content:
             application/json:
@@ -2164,7 +2368,7 @@ paths:
       required: true
       schema:
         type: string
-        format: uuid
+        pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
     post:
       operationId: refireItem
       x-ticvai-consumed-by:
@@ -2199,21 +2403,18 @@ paths:
               required:
               - lineId
               - reason
+              - recordedAt
               properties:
                 lineId:
                   type: string
-                  format: uuid
+                  pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+                  description: '`KitchenTicket.lines[].lineId`. The refire is a new line carrying `refireOfLineId`.'
                 reason:
+                  $ref: '#/components/schemas/RefireReason'
+                recordedAt:
                   type: string
-                  enum:
-                  - overcooked
-                  - undercooked
-                  - wrongItem
-                  - dropped
-                  - cold
-                  - allergyRisk
-                  - guestChangedMind
-                  - lateAdd
+                  format: date-time
+                  description: Device time of the act (offline-capable; replayed in this order).
                 chargeable:
                   type: boolean
                   default: false
@@ -2224,6 +2425,9 @@ paths:
                     '
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Refired
           content:
             application/json:
@@ -2236,7 +2440,7 @@ paths:
       required: true
       schema:
         type: string
-        format: uuid
+        pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
     post:
       operationId: recallKitchenTicket
       x-ticvai-consumed-by:
@@ -2262,8 +2466,24 @@ paths:
       x-ticvai-conflict-policy: lastWriterWins
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - recordedAt
+              properties:
+                recordedAt:
+                  type: string
+                  format: date-time
+                  description: Device time of the act (offline-capable; replayed in this order).
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Back on the rail, with its original age
           content:
             application/json:
@@ -2271,13 +2491,19 @@ paths:
                 $ref: '#/components/schemas/KitchenTicket'
         '409':
           description: '**Past the recall window.** The ticket is closed and the correct act is a refire,
-            which the response names.
+            which the response names in `suggestedOperation` (`refireItem`).
 
             '
           content:
             application/problem+json:
               schema:
-                $ref: ../shared/common.yaml#/components/schemas/Problem
+                allOf:
+                - $ref: '#/components/schemas/FnbProblem'
+                - type: object
+                  properties:
+                    refusedReason:
+                      enum:
+                      - recallWindowPassed
   /outlets/{outletId}/course-rules:
     parameters:
     - name: outletId
@@ -2314,34 +2540,17 @@ paths:
         content:
           application/json:
             schema:
-              type: object
-              properties:
-                defaultCoursing:
-                  type: string
-                  enum:
-                  - none
-                  - holdAndFire
-                  - phased
-                  - timed
-                courseNames:
-                  type: array
-                  items:
-                    type: string
-                autoFireMinutes:
-                  type: integer
-                  nullable: true
-                serviceModeOverrides:
-                  type: object
-                  additionalProperties:
-                    type: string
+              $ref: '#/components/schemas/CourseRules'
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Set
           content:
             application/json:
               schema:
-                type: object
-                additionalProperties: true
+                $ref: '#/components/schemas/CourseRules'
   /table-visits/{visitId}/move:
     parameters:
     - name: visitId
@@ -2349,7 +2558,7 @@ paths:
       required: true
       schema:
         type: string
-        format: uuid
+        pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
     post:
       operationId: moveTableVisit
       x-ticvai-consumed-by:
@@ -2364,7 +2573,8 @@ paths:
         going to the old table is worse than no move at all — which is why this is one operation rather
         than an update to `tableId`.
 
-        **Refused if the target is occupied**, unless the caller is merging.
+        **Refused if the target is occupied**, and the refusal names the visit there. Seating a party
+        at an occupied table is a merge, which is `mergeTableVisits` — this operation has no merge option.
 
         '
       tags:
@@ -2385,6 +2595,7 @@ paths:
               type: object
               required:
               - toTableId
+              - recordedAt
               properties:
                 toTableId:
                   type: string
@@ -2397,22 +2608,35 @@ paths:
                   - partySizeChange
                   - serviceRecovery
                   - other
+                recordedAt:
+                  type: string
+                  format: date-time
+                  description: Device time of the act (offline-capable; replayed in this order).
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Moved
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/TableVisit'
         '409':
-          description: '**The target table is occupied.** Names the visit occupying it, because the next
-            thing the server asks is *by whom*.
+          description: '**The target table is occupied.** Names the visit occupying it in `occupyingVisitId`,
+            because the next thing the server asks is *by whom*, and `suggestedOperation` is `mergeTableVisits`.
 
             '
           content:
             application/problem+json:
               schema:
-                $ref: ../shared/common.yaml#/components/schemas/Problem
+                allOf:
+                - $ref: '#/components/schemas/FnbProblem'
+                - type: object
+                  properties:
+                    refusedReason:
+                      enum:
+                      - targetTableOccupied
   /table-visits/{visitId}/server:
     parameters:
     - name: visitId
@@ -2420,7 +2644,7 @@ paths:
       required: true
       schema:
         type: string
-        format: uuid
+        pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
     put:
       operationId: reassignServer
       x-ticvai-consumed-by:
@@ -2451,7 +2675,12 @@ paths:
               type: object
               required:
               - serverPrincipalId
+              - recordedAt
               properties:
+                recordedAt:
+                  type: string
+                  format: date-time
+                  description: Device time of the act (offline-capable; replayed in this order).
                 serverPrincipalId:
                   type: string
                   format: uuid
@@ -2460,6 +2689,9 @@ paths:
                   default: true
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Reassigned
           content:
             application/json:
@@ -2472,7 +2704,7 @@ paths:
       required: true
       schema:
         type: string
-        format: uuid
+        pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
     post:
       operationId: compItem
       x-ticvai-consumed-by:
@@ -2507,10 +2739,16 @@ paths:
               required:
               - orderLineId
               - reason
+              - recordedAt
               properties:
                 orderLineId:
                   type: string
-                  format: uuid
+                  pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+                  description: An order line (`FnbOrder.lines[].id`).
+                recordedAt:
+                  type: string
+                  format: date-time
+                  description: Device time of the act (offline-capable; replayed in this order).
                 reason:
                   type: string
                   enum:
@@ -2527,6 +2765,9 @@ paths:
                   nullable: true
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Comped
           content:
             application/json:
@@ -2565,9 +2806,14 @@ paths:
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/TemperatureCheckpoint'
+                allOf:
+                  - $ref: '../shared/common.yaml#/components/schemas/Page'
+                  - type: object
+                    properties:
+                      items:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/TemperatureCheckpoint'
     put:
       operationId: setTemperatureCheckpoint
       summary: Define a checkpoint and its safe range
@@ -2596,6 +2842,9 @@ paths:
               $ref: '#/components/schemas/TemperatureCheckpoint'
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Set
           content:
             application/json:
@@ -2637,6 +2886,9 @@ paths:
               $ref: '#/components/schemas/TemperatureLog'
       responses:
         '201':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Recorded. A corrective action is returned where one was opened.
           content:
             application/json:
@@ -2678,6 +2930,9 @@ paths:
               $ref: '#/components/schemas/ColdChainEvent'
       responses:
         '201':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Recorded
           content:
             application/json:
@@ -2784,20 +3039,29 @@ paths:
                   - returned
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Signed
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/CorrectiveAction'
         '409':
-          description: '**A critical finding signed by the principal who raised it.** Refused, with the
-            escalation path named.
+          description: '**A critical finding signed by the principal who raised it** (`CorrectiveAction.raisedByPrincipalId`).
+            Refused, with the escalation path named: `suggestedOperation` is `escalateCorrectiveAction`.
 
             '
           content:
             application/problem+json:
               schema:
-                $ref: ../shared/common.yaml#/components/schemas/Problem
+                allOf:
+                - $ref: '#/components/schemas/FnbProblem'
+                - type: object
+                  properties:
+                    refusedReason:
+                      enum:
+                      - criticalSelfSign
   /production-runs:
     get:
       operationId: listProductionRuns
@@ -2812,8 +3076,9 @@ paths:
         A run can be planned and completed and **never looked at**: no prep sheet, no yield, no batch
         list. Three board panels wanted it.
 
-        **Yield is returned with the run, not separately.** Planned against actual is the only reason
-        to read a completed run, and splitting it into a second call means two round trips for one question.
+        **Yield comes with the run, not from a second call.** Each run carries `plannedQuantity` and
+        `actualQuantity`, and the yield is derived from the two by whoever reads it — never stored
+        (`getProductionRun`). Splitting it into a second call would mean two round trips for one question.
 
         '
       tags:
@@ -2837,6 +3102,7 @@ paths:
           - commissary
       - name: from
         in: query
+        description: First calendar day, in the Region's time zone, not UTC.
         schema:
           type: string
           format: date
@@ -2851,13 +3117,18 @@ paths:
       x-ticvai-conflict-policy: serverWins
       responses:
         '200':
-          description: Runs, with their lines and their yield
+          description: Runs, each with its planned and actual quantity
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/ProductionRun'
+                allOf:
+                  - $ref: '../shared/common.yaml#/components/schemas/Page'
+                  - type: object
+                    properties:
+                      items:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/ProductionRun'
     post:
       operationId: planProductionRun
       x-ticvai-consumed-by:
@@ -2890,6 +3161,9 @@ paths:
               $ref: '#/components/schemas/ProductionRun'
       responses:
         '201':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Planned
           content:
             application/json:
@@ -2934,19 +3208,39 @@ paths:
               type: object
               required:
               - actualQuantity
+              - recordedAt
               properties:
                 actualQuantity:
                   type: number
                 varianceReason:
                   type: string
                   nullable: true
+                recordedAt:
+                  type: string
+                  format: date-time
+                  description: Device time of the act (offline-capable; replayed in this order).
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Completed
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ProductionRun'
+        '409':
+          description: The run is not `inProgress` (states/production-run.yaml). Names its current status.
+          content:
+            application/problem+json:
+              schema:
+                allOf:
+                - $ref: '#/components/schemas/FnbProblem'
+                - type: object
+                  properties:
+                    refusedReason:
+                      enum:
+                      - runNotInProgress
   /table-visits/{visitId}/transfer:
     parameters:
     - name: visitId
@@ -2954,7 +3248,7 @@ paths:
       required: true
       schema:
         type: string
-        format: uuid
+        pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
     post:
       operationId: transferTableVisit
       x-ticvai-consumed-by:
@@ -2985,6 +3279,7 @@ paths:
               required:
               - toPrincipalId
               - reason
+              - recordedAt
               properties:
                 toPrincipalId:
                   type: string
@@ -2997,14 +3292,20 @@ paths:
                   - sectionChange
                   - escalation
                   - other
+                recordedAt:
+                  type: string
+                  format: date-time
+                  description: Device time of the act (offline-capable; replayed in this order).
       responses:
         '200':
-          description: Transferred
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: Transferred. The visit, with its new server
           content:
             application/json:
               schema:
-                type: object
-                additionalProperties: true
+                $ref: '#/components/schemas/TableVisit'
   /waitlist:
     post:
       operationId: joinRestaurantWaitlist
@@ -3041,6 +3342,9 @@ paths:
               $ref: '#/components/schemas/RestaurantWaitlist'
       responses:
         '201':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Added
           content:
             application/json:
@@ -3053,7 +3357,7 @@ paths:
       required: true
       schema:
         type: string
-        format: uuid
+        pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
     post:
       operationId: requestBill
       x-ticvai-consumed-by:
@@ -3075,8 +3379,24 @@ paths:
       x-ticvai-conflict-policy: lastWriterWins
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - recordedAt
+              properties:
+                recordedAt:
+                  type: string
+                  format: date-time
+                  description: Device time of the act (offline-capable; replayed in this order).
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Bill requested
           content:
             application/json:
@@ -3093,8 +3413,10 @@ paths:
       x-ticvai-audience:
       - staff
       summary: Bookings for a service period
-      description: '5.1.1. **Live table state alongside the bookings**, because a host needs to know what
-        is booked and what is actually free, and those differ all evening.
+      description: '5.1.1. **The bookings for a service period.** A host needs to know what is booked
+        and what is actually free, and those differ all evening — the live table state is `getTableMap`
+        on the same outlet, read alongside this. A reservation carries its tables and, once seated, its
+        `tableVisitId`; it does not carry the table''s state.
 
         '
       tags:
@@ -3107,6 +3429,7 @@ paths:
           format: uuid
       - name: date
         in: query
+        description: A calendar day, in the Region's time zone, not UTC.
         schema:
           type: string
           format: date
@@ -3123,9 +3446,14 @@ paths:
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/TableReservation'
+                allOf:
+                  - $ref: '../shared/common.yaml#/components/schemas/Page'
+                  - type: object
+                    properties:
+                      items:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/TableReservation'
     post:
       operationId: createTableReservation
       x-ticvai-consumed-by:
@@ -3159,6 +3487,9 @@ paths:
               $ref: '#/components/schemas/TableReservation'
       responses:
         '201':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Booked
           content:
             application/json:
@@ -3166,14 +3497,21 @@ paths:
                 $ref: '#/components/schemas/TableReservation'
         '409':
           description: 'No cover available for that party size at that time. **The reason names the constraint**
-            — a party of eight refused when a party of two would fit is a different answer from the outlet
-            being full.
+            — a party of eight refused when a party of two would fit (`noTableForPartySize`) is a different
+            answer from the outlet being full (`outletFullAtTime`).
 
             '
           content:
             application/problem+json:
               schema:
-                $ref: ../shared/common.yaml#/components/schemas/Problem
+                allOf:
+                - $ref: '#/components/schemas/FnbProblem'
+                - type: object
+                  properties:
+                    refusedReason:
+                      enum:
+                      - noTableForPartySize
+                      - outletFullAtTime
   /table-reservations/{reservationId}:
     parameters:
     - name: reservationId
@@ -3210,6 +3548,9 @@ paths:
               $ref: '#/components/schemas/TableReservation'
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Updated
           content:
             application/json:
@@ -3232,7 +3573,11 @@ paths:
       - staff
       summary: The party arrived and has been sat down
       description: '**Where the booking becomes a visit.** The host names the actual table now, and a
-        table session opens against it — which is the moment `claimTableSession` and this contract meet.
+        table session opens against it — which is where a guest claiming the table (`claimLocationSession`)
+        joins this visit rather than starting a second.
+
+        **Seats from `booked`, `confirmed` or `noShow` only** (states/table-reservation.yaml). A seated,
+        completed or cancelled booking is refused with its current status.
 
         A party seated at a different size from the booking is recorded as such. A booking for six that
         arrives as four is a cover a restaurant could have sold.
@@ -3254,6 +3599,7 @@ paths:
               type: object
               required:
               - tableIds
+              - recordedAt
               properties:
                 tableIds:
                   type: array
@@ -3263,13 +3609,32 @@ paths:
                     format: uuid
                 actualPartySize:
                   type: integer
+                recordedAt:
+                  type: string
+                  format: date-time
+                  description: Device time of the act (offline-capable; replayed in this order).
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Seated, and a table visit opened
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/TableReservation'
+        '409':
+          description: The booking is not in a seatable state. Names its current status.
+          content:
+            application/problem+json:
+              schema:
+                allOf:
+                - $ref: '#/components/schemas/FnbProblem'
+                - type: object
+                  properties:
+                    refusedReason:
+                      enum:
+                      - reservationNotSeatable
   /venues/{venueId}/dining:
     parameters:
     - name: venueId
@@ -3325,9 +3690,14 @@ paths:
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/DiningOutlet'
+                allOf:
+                  - $ref: '../shared/common.yaml#/components/schemas/Page'
+                  - type: object
+                    properties:
+                      items:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/DiningOutlet'
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
   /outlets/{outletId}/guest-menu:
@@ -3393,11 +3763,17 @@ paths:
               schema:
                 $ref: '#/components/schemas/GuestMenu'
         '404':
-          description: No menu in force at that time. The response says when the next one starts
+          description: No menu in force at that time. The response says when the next one starts, in `nextMenuStartsAt`
           content:
             application/problem+json:
               schema:
-                $ref: ../shared/common.yaml#/components/schemas/Problem
+                allOf:
+                - $ref: '#/components/schemas/FnbProblem'
+                - type: object
+                  properties:
+                    refusedReason:
+                      enum:
+                      - noMenuInForce
   /venues/{venueId}/delivery-locations:
     parameters:
     - name: venueId
@@ -3455,9 +3831,14 @@ paths:
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/DeliveryLocation'
+                allOf:
+                  - $ref: '../shared/common.yaml#/components/schemas/Page'
+                  - type: object
+                    properties:
+                      items:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/DeliveryLocation'
   /location-sessions:
     post:
       operationId: claimLocationSession
@@ -3519,6 +3900,9 @@ paths:
                   minimum: 1
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Attached, joining an open visit where one exists
           content:
             application/json:
@@ -3529,16 +3913,31 @@ paths:
           content:
             application/problem+json:
               schema:
-                $ref: ../shared/common.yaml#/components/schemas/Problem
+                allOf:
+                - $ref: '#/components/schemas/FnbProblem'
+                - type: object
+                  properties:
+                    refusedReason:
+                      enum:
+                      - locationNotSupplied
         '409':
           description: 'Code expired or unknown, the location is out of service, or no outlet currently
-            delivers to it — a cabana is useless as an address if nothing serves it.
+            delivers to it — a cabana is useless as an address if nothing serves it. One reason per cause.
 
             '
           content:
             application/problem+json:
               schema:
-                $ref: ../shared/common.yaml#/components/schemas/Problem
+                allOf:
+                - $ref: '#/components/schemas/FnbProblem'
+                - type: object
+                  properties:
+                    refusedReason:
+                      enum:
+                      - codeExpired
+                      - codeUnknown
+                      - locationOutOfService
+                      - locationNotServed
   /guest-orders/{orderId}/delivery:
     parameters:
     - name: orderId
@@ -3590,6 +3989,10 @@ paths:
                   - delivered
                   - guestNotFound
                   - refused
+                  description: '`served`, `collected` and `delivered` move the order to the `FnbOrderStatus`
+                    of the same name. **`guestNotFound` and `refused` are recorded and leave the order `ready`**
+                    — states/fnb-order.yaml has no transition out of `ready` for them, so the order waits
+                    for a second attempt or a `cancelFnbOrder`.'
                 deliveredToLocationId:
                   type: string
                   format: uuid
@@ -3605,6 +4008,9 @@ paths:
                   format: date-time
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Recorded
           content:
             application/json:
@@ -3615,7 +4021,14 @@ paths:
           content:
             application/problem+json:
               schema:
-                $ref: ../shared/common.yaml#/components/schemas/Problem
+                allOf:
+                - $ref: '#/components/schemas/FnbProblem'
+                - type: object
+                  properties:
+                    refusedReason:
+                      enum:
+                      - orderNotReady
+                      - orderAlreadyClosed
   /table-sessions:
     post:
       operationId: claimTableSession
@@ -3627,7 +4040,14 @@ paths:
       x-ticvai-audience:
       - guest
       summary: Identify which table a guest is sitting at
-      description: 'Scanning the QR code on a table. This is the step that makes ordering to a table possible
+      deprecated: true
+      description: '**Superseded by `claimLocationSession`, 26 September.** That operation is *one operation
+        for all of them* — a table is a `DeliveryLocation` of kind `table` with its `tableId` — and it is the
+        one `CreateGuestOrderRequest.locationSessionId`, flow F11 and flow F48 use. A `TableSession` id has
+        nowhere to go on a guest order. Kept, with its path and id, for callers already built on it; new
+        screens claim with `claimLocationSession`.
+
+        Scanning the QR code on a table. This is the step that makes ordering to a table possible
         without a server — the guest tells the platform where they are.
 
         **A claim is not a booking.** It attaches the guest to a table so an order can be routed there.
@@ -3666,19 +4086,32 @@ paths:
                   minimum: 1
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Attached to the table, joining an open visit where one exists
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/TableSession'
         '409':
-          description: 'Code expired or unknown, the outlet is closed, or the table is out of service.
+          description: 'Code expired or unknown, the outlet is closed, or the table is out of service. One
+            reason per cause.
 
             '
           content:
             application/problem+json:
               schema:
-                $ref: ../shared/common.yaml#/components/schemas/Problem
+                allOf:
+                - $ref: '#/components/schemas/FnbProblem'
+                - type: object
+                  properties:
+                    refusedReason:
+                      enum:
+                      - codeExpired
+                      - codeUnknown
+                      - outletClosed
+                      - tableOutOfService
   /fnb-delivery-policy:
     get:
       operationId: getFnbDeliveryPolicy
@@ -3687,8 +4120,19 @@ paths:
         - "P02 GST-024 F&B – Browse & Order"
         - "P08 BO-044 F&B Outlets"
       summary: How an outlet does takeaway and delivery
+      description: '**One policy per outlet**, so the outlet is named. Without it the operation could not
+        say which of a venue''s outlets it was answering for.
+
+        '
       tags:
       - guestOrdering
+      parameters:
+      - name: outletId
+        in: query
+        required: true
+        schema:
+          type: string
+          format: uuid
       x-ticvai-permission: PRODUCT_VIEW
       x-ticvai-audience:
       - staff
@@ -3718,6 +4162,9 @@ paths:
         `createGuestFnbOrder` refuses an order that breaks them. Delivery before this was to places inside
         the venue only (`listDeliveryLocations`).
 
+        **Keyed on `outletId`, one policy per outlet.** The body replaces that outlet''s policy, and creates
+        it where the outlet has none — there is no separate create.
+
         '
       tags:
       - guestOrdering
@@ -3738,6 +4185,9 @@ paths:
               $ref: '#/components/schemas/FnbDeliveryPolicy'
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Saved
           content:
             application/json:
@@ -3776,7 +4226,12 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/FulfilmentSlots'
+                allOf:
+                  - $ref: '../shared/common.yaml#/components/schemas/Page'
+                  - type: object
+                    properties:
+                      items:
+                        $ref: '#/components/schemas/FulfilmentSlots'
       x-ticvai-read-routing: replica
       parameters:
       - name: outletId
@@ -3795,6 +4250,7 @@ paths:
           - delivery
       - name: date
         in: query
+        description: A calendar day, in the Region's time zone, not UTC.
         required: false
         schema:
           type: string
@@ -3816,8 +4272,11 @@ paths:
 
         **Distinct from `createFnbOrder`, which is staff-operated.** A server placing an order is trusted
         with an outlet, a table and a price. A guest is trusted with none of those: the outlet comes from
-        the table session, the price is recomputed server-side and the quoted total is checked against
-        it.
+        the location session (`claimLocationSession`), the price is recomputed server-side and the quoted
+        total is checked against it.
+
+        **An order that breaks the outlet''s `FnbDeliveryPolicy` is refused with 422**, naming the rule it
+        broke; a 409 is a state that changed under the guest.
 
         Payment is required before the kitchen sees it, unless the outlet runs a tab — a kitchen that
         cooks on an unpaid guest order is a kitchen giving food away.
@@ -3842,26 +4301,65 @@ paths:
               $ref: '#/components/schemas/CreateGuestOrderRequest'
       responses:
         '201':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Placed
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/GuestOrderResult'
         '409':
-          description: 'An item became unavailable, the quoted total no longer matches, the table session
-            expired, or the outlet stopped taking orders. The response names which.
+          description: 'An item became unavailable, the quoted total no longer matches, the location session
+            expired, or the outlet stopped taking orders. The response names which in `refusedReason`.
 
             '
           content:
             application/problem+json:
               schema:
-                $ref: '#/components/schemas/GuestOrderProblem'
+                allOf:
+                - $ref: '#/components/schemas/GuestOrderProblem'
+                - type: object
+                  properties:
+                    refusedReason:
+                      enum:
+                      - itemUnavailable
+                      - priceChanged
+                      - locationSessionExpired
+                      - locationNotServiceable
+                      - outletClosed
+                      - outletNotAcceptingOrders
+                      - modifierConstraintUnmet
+                      - orderTooLarge
+        '422':
+          description: The order breaks the outlet's `FnbDeliveryPolicy`. Names the rule in `refusedReason`.
+          content:
+            application/problem+json:
+              schema:
+                allOf:
+                - $ref: '#/components/schemas/GuestOrderProblem'
+                - type: object
+                  properties:
+                    refusedReason:
+                      enum:
+                      - collectionNotOffered
+                      - deliveryNotOffered
+                      - belowMinimumOrder
+                      - outsideDeliveryArea
+                      - fulfilmentSlotClosed
         '402':
           description: Payment required or declined
           content:
             application/problem+json:
               schema:
-                $ref: ../shared/common.yaml#/components/schemas/Problem
+                allOf:
+                - $ref: '#/components/schemas/GuestOrderProblem'
+                - type: object
+                  properties:
+                    refusedReason:
+                      enum:
+                      - paymentRequired
+                      - paymentDeclined
   /guest-orders/{orderId}:
     parameters:
     - name: orderId
@@ -3882,8 +4380,10 @@ paths:
       x-ticvai-audience:
       - guest
       summary: Track an order
-      description: 'Received, preparing, ready, served. Fed by the kitchen ticket status the KDS already
-        reports, so the guest sees what the kitchen sees rather than a timer counting down against nothing.
+      description: 'The order''s `FnbOrderStatus` — ordered, accepted, inPreparation, ready, then served,
+        collected or delivered (or cancelled, refunded) — with each line''s `KitchenTicketStatus`. Fed by the
+        kitchen ticket status the kitchen display reports, so the guest sees what the kitchen sees rather
+        than a timer counting down against nothing.
 
         **Read from the primary.** A guest refreshing to see whether their food is ready is the wrong
         place for replica lag.
@@ -4030,6 +4530,9 @@ paths:
               $ref: '#/components/schemas/CreateMenuRequest'
       responses:
         '201':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Created. Visible at terminals after the next bundle publish
           content:
             application/json:
@@ -4104,6 +4607,9 @@ paths:
                   type: boolean
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Updated
           content:
             application/json:
@@ -4153,6 +4659,9 @@ paths:
                     $ref: '#/components/schemas/MenuSection'
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Applied
           content:
             application/json:
@@ -4199,6 +4708,7 @@ paths:
               type: object
               required:
               - isAvailable
+              - recordedAt
               properties:
                 isAvailable:
                   type: boolean
@@ -4213,9 +4723,16 @@ paths:
                 restoreAt:
                   type: string
                   format: date-time
-                  description: Automatic restore, typically at next service.
+                  description: Automatic restore, typically at next service. Kept as `MenuItem.restoreAt`.
+                recordedAt:
+                  type: string
+                  format: date-time
+                  description: Device time of the act (offline-capable; replayed in this order).
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Updated
           content:
             application/json:
@@ -4250,9 +4767,14 @@ paths:
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/ModifierGroup'
+                allOf:
+                  - $ref: '../shared/common.yaml#/components/schemas/Page'
+                  - type: object
+                    properties:
+                      items:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/ModifierGroup'
       x-ticvai-audience-note: '24 August: widened to include guest. A guest choosing *no onions* reads
         the same modifier group the kitchen defined. **Reading the options is not configuring them** —
         `createModifierGroup` and `attachModifierGroup` stay staff-only.'
@@ -4282,17 +4804,27 @@ paths:
               $ref: '#/components/schemas/ModifierGroup'
       responses:
         '201':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Created
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ModifierGroup'
         '400':
-          description: Constraints are unsatisfiable — minimum exceeds available options
+          description: Constraints are unsatisfiable — minimum exceeds available options. Told apart from
+            the shared validation 400 by `refusedReason`.
           content:
             application/problem+json:
               schema:
-                $ref: ../shared/common.yaml#/components/schemas/Problem
+                allOf:
+                - $ref: '#/components/schemas/FnbProblem'
+                - type: object
+                  properties:
+                    refusedReason:
+                      enum:
+                      - selectionConstraintsUnsatisfiable
   /fnb-orders:
     get:
       operationId: listFnbOrders
@@ -4322,6 +4854,7 @@ paths:
         in: query
         schema:
           type: string
+          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
       - name: status
         in: query
         schema:
@@ -4374,7 +4907,11 @@ paths:
               $ref: '#/components/schemas/CreateFnbOrderRequest'
       responses:
         '201':
-          description: Created and sent to the kitchen where a KDS is configured
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: Created. The kitchen ticket is created when the outlet accepts it (`acceptFnbOrder`,
+            automatic where the outlet is configured for it)
           content:
             application/json:
               schema:
@@ -4383,13 +4920,21 @@ paths:
           $ref: ../shared/common.yaml#/components/responses/BadRequest
         '409':
           description: 'An item is unavailable, modifier constraints are unmet, or a tracked item was
-            ordered offline.
+            ordered offline. One reason per cause.
 
             '
           content:
             application/problem+json:
               schema:
-                $ref: ../shared/common.yaml#/components/schemas/Problem
+                allOf:
+                - $ref: '#/components/schemas/FnbProblem'
+                - type: object
+                  properties:
+                    refusedReason:
+                      enum:
+                      - itemUnavailable
+                      - modifierConstraintUnmet
+                      - trackedItemOffline
   /fnb-orders/{orderId}/accept:
     parameters:
     - name: orderId
@@ -4423,11 +4968,13 @@ paths:
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       requestBody:
-        required: false
+        required: true
         content:
           application/json:
             schema:
               type: object
+              required:
+              - recordedAt
               properties:
                 estimatedReadyAt:
                   type: string
@@ -4435,8 +4982,15 @@ paths:
                 stationId:
                   type: string
                   format: uuid
+                recordedAt:
+                  type: string
+                  format: date-time
+                  description: Device time of the act (offline-capable; replayed in this order).
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Accepted. The kitchen ticket now exists
           content:
             application/json:
@@ -4447,7 +5001,15 @@ paths:
           content:
             application/problem+json:
               schema:
-                $ref: ../shared/common.yaml#/components/schemas/Problem
+                allOf:
+                - $ref: '#/components/schemas/FnbProblem'
+                - type: object
+                  properties:
+                    refusedReason:
+                      enum:
+                      - orderAlreadyAccepted
+                      - orderCancelled
+                      - outletNotAcceptingOrders
   /fnb-orders/{orderId}/cancel:
     parameters:
     - name: orderId
@@ -4484,7 +5046,12 @@ paths:
               type: object
               required:
               - reason
+              - recordedAt
               properties:
+                recordedAt:
+                  type: string
+                  format: date-time
+                  description: Device time of the act (offline-capable; replayed in this order).
                 reason:
                   type: string
                   enum:
@@ -4504,6 +5071,9 @@ paths:
                     '
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Cancelled
           content:
             application/json:
@@ -4514,7 +5084,13 @@ paths:
           content:
             application/problem+json:
               schema:
-                $ref: ../shared/common.yaml#/components/schemas/Problem
+                allOf:
+                - $ref: '#/components/schemas/FnbProblem'
+                - type: object
+                  properties:
+                    refusedReason:
+                      enum:
+                      - orderAlreadyFulfilled
   /fnb-orders/{orderId}:
     parameters:
     - name: orderId
@@ -4554,8 +5130,8 @@ paths:
       x-ticvai-audience:
       - staff
       summary: Amend an order before it is prepared
-      description: 'Once a line is `preparing`, amendment is refused — the kitchen has started. Removing
-        it becomes a void with a reason, which is a different and auditable action.
+      description: 'Once a line is `inPreparation` (or later), amendment is refused — the kitchen has
+        started. Removing it becomes a void with a reason, which is a different and auditable action.
 
         '
       tags:
@@ -4581,19 +5157,30 @@ paths:
                   type: array
                   items:
                     type: string
+                    pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Amended
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/FnbOrder'
         '409':
-          description: A targeted line is already preparing or served
+          description: A targeted line is already `inPreparation` or served. Names the lines in `lineIds`.
           content:
             application/problem+json:
               schema:
-                $ref: ../shared/common.yaml#/components/schemas/Problem
+                allOf:
+                - $ref: '#/components/schemas/FnbProblem'
+                - type: object
+                  properties:
+                    refusedReason:
+                      enum:
+                      - lineInPreparation
+                      - lineServed
   /outlets/{outletId}/tables:
     parameters:
     - name: outletId
@@ -4644,6 +5231,11 @@ paths:
       - staff
       x-ticvai-config-scope: outlet
       summary: Configure the table layout
+      description: 'The outlet''s whole layout in one call — the outlet is the one in the path. Each table
+        is matched on `TableDefinition.id`: an id already on the outlet updates that table, a new id adds
+        one. A table whose capacity changes is refused while a visit is open on it, as `updateTable` is.
+
+        '
       tags:
       - table
       x-ticvai-permission: PRODUCT_CONFIGURE
@@ -4667,6 +5259,9 @@ paths:
                     $ref: '#/components/schemas/TableDefinition'
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Applied
           content:
             application/json:
@@ -4703,17 +5298,26 @@ paths:
               $ref: '#/components/schemas/OpenTableVisitRequest'
       responses:
         '201':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Visit opened
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/TableVisit'
         '409':
-          description: Table already occupied
+          description: Table already occupied. Names the visit in `occupyingVisitId`
           content:
             application/problem+json:
               schema:
-                $ref: ../shared/common.yaml#/components/schemas/Problem
+                allOf:
+                - $ref: '#/components/schemas/FnbProblem'
+                - type: object
+                  properties:
+                    refusedReason:
+                      enum:
+                      - tableOccupied
   /table-visits/{visitId}:
     parameters:
     - name: visitId
@@ -4770,7 +5374,9 @@ paths:
           application/json:
             schema:
               type: object
-              minProperties: 1
+              required:
+              - recordedAt
+              minProperties: 2
               properties:
                 covers:
                   type: integer
@@ -4784,19 +5390,32 @@ paths:
                 note:
                   type: string
                   maxLength: 500
+                recordedAt:
+                  type: string
+                  format: date-time
+                  description: Device time of the act (offline-capable; replayed in this order).
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Updated
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/TableVisit'
         '409':
-          description: Target table is occupied
+          description: Target table is occupied. Names the visit in `occupyingVisitId`
           content:
             application/problem+json:
               schema:
-                $ref: ../shared/common.yaml#/components/schemas/Problem
+                allOf:
+                - $ref: '#/components/schemas/FnbProblem'
+                - type: object
+                  properties:
+                    refusedReason:
+                      enum:
+                      - targetTableOccupied
   /table-visits/{visitId}/merge:
     parameters:
     - name: visitId
@@ -4836,8 +5455,12 @@ paths:
               properties:
                 sourceVisitId:
                   type: string
+                  pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Merged
           content:
             application/json:
@@ -4848,7 +5471,13 @@ paths:
           content:
             application/problem+json:
               schema:
-                $ref: ../shared/common.yaml#/components/schemas/Problem
+                allOf:
+                - $ref: '#/components/schemas/FnbProblem'
+                - type: object
+                  properties:
+                    refusedReason:
+                      enum:
+                      - visitClosed
   /table-visits/{visitId}/bill:
     parameters:
     - name: visitId
@@ -4923,23 +5552,39 @@ paths:
               $ref: '#/components/schemas/SplitBillRequest'
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Split into sub-bills
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/BillSplit'
         '400':
-          description: Split does not sum to the bill total, or a line is assigned twice
+          description: Split does not sum to the bill total, or a line is assigned twice. One reason per cause
           content:
             application/problem+json:
               schema:
-                $ref: ../shared/common.yaml#/components/schemas/Problem
+                allOf:
+                - $ref: '#/components/schemas/FnbProblem'
+                - type: object
+                  properties:
+                    refusedReason:
+                      enum:
+                      - splitDoesNotSumToTotal
+                      - lineAssignedTwice
         '409':
           description: Visit already settled
           content:
             application/problem+json:
               schema:
-                $ref: ../shared/common.yaml#/components/schemas/Problem
+                allOf:
+                - $ref: '#/components/schemas/FnbProblem'
+                - type: object
+                  properties:
+                    refusedReason:
+                      enum:
+                      - visitSettled
   /table-visits/{visitId}/close:
     parameters:
     - name: visitId
@@ -4997,6 +5642,9 @@ paths:
                   $ref: ../shared/common.yaml#/components/schemas/Money
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Settled
           content:
             application/json:
@@ -5013,11 +5661,19 @@ paths:
                     items:
                       type: string
         '409':
-          description: Payments do not cover the bill, or lines remain unserved
+          description: Payments do not cover the bill, or lines remain unserved (named in `lineIds`). One
+            reason per cause
           content:
             application/problem+json:
               schema:
-                $ref: ../shared/common.yaml#/components/schemas/Problem
+                allOf:
+                - $ref: '#/components/schemas/FnbProblem'
+                - type: object
+                  properties:
+                    refusedReason:
+                      enum:
+                      - paymentsShortOfBill
+                      - linesUnserved
   /tables/{tableId}/clear:
     parameters:
     - name: tableId
@@ -5041,8 +5697,24 @@ paths:
       x-ticvai-conflict-policy: append
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - recordedAt
+              properties:
+                recordedAt:
+                  type: string
+                  format: date-time
+                  description: Device time of the act (offline-capable; replayed in this order).
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Cleared
           content:
             application/json:
@@ -5065,8 +5737,13 @@ paths:
       - staff
       x-ticvai-read-routing: replica
       summary: Kitchen ticket queue
-      description: 'Read by the venue''s KDS, or by a fallback screen where none is configured. TICVAI
-        does not implement a kitchen display — this is the integration surface.
+      description: 'The rail. Read by P15 Kitchen Display — TICVAI''s own kitchen display on commodity
+        hardware (19 Sep; the 31 Jul *KDS integration only* position is superseded) — and by the back-office
+        and till views of the same queue.
+
+        **Rail order is the server''s.** Tickets come back ordered by `priority` and the outlet''s priority
+        weights (`setKitchenSla`: age, promise time — `targetReadyAt` —, table stage, VIP), and a display
+        renders them in the order returned rather than re-sorting by arrival or by promise time.
 
         '
       tags:
@@ -5090,13 +5767,18 @@ paths:
       x-ticvai-conflict-policy: serverWins
       responses:
         '200':
-          description: Tickets, priority order
+          description: Tickets, in rail order (priority first)
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/KitchenTicket'
+                allOf:
+                  - $ref: '../shared/common.yaml#/components/schemas/Page'
+                  - type: object
+                    properties:
+                      items:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/KitchenTicket'
   /kitchen/tickets/{ticketId}/status:
     parameters:
     - name: ticketId
@@ -5118,8 +5800,12 @@ paths:
       x-ticvai-audience:
       - staff
       summary: Advance a kitchen ticket
-      description: 'Called by the KDS or a fallback screen. Status flows back to the guest app order tracker
-        — received, preparing, ready, completed.
+      description: 'Called by P15 Kitchen Display, or the back-office and till views of the rail. Status
+        flows back to the guest app order tracker.
+
+        **Four moves only** (states/kitchen-ticket.yaml): `received` to `preparing`, `preparing` to `ready`,
+        `ready` to `recalled`, `recalled` to `preparing`. `served` is reached through `recordOrderHandover`
+        and `cancelled` through `cancelFnbOrder`; any other move is refused with the current status named.
 
         '
       tags:
@@ -5146,6 +5832,7 @@ paths:
                   type: array
                   items:
                     type: string
+                    pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
                   description: Advance specific lines. Omit for the whole ticket.
                 stationId:
                   type: string
@@ -5155,11 +5842,26 @@ paths:
                   format: date-time
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Updated
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/KitchenTicket'
+        '409':
+          description: The move is not one of the four above. Names the ticket's current status.
+          content:
+            application/problem+json:
+              schema:
+                allOf:
+                - $ref: '#/components/schemas/FnbProblem'
+                - type: object
+                  properties:
+                    refusedReason:
+                      enum:
+                      - illegalStatusTransition
   /kitchen/tickets/{ticketId}/prioritise:
     parameters:
     - name: ticketId
@@ -5209,6 +5911,9 @@ paths:
                   maximum: 100
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Prioritised
           content:
             application/json:
@@ -5230,6 +5935,12 @@ paths:
       tags:
       - kitchen
       parameters:
+      - name: outletId
+        in: query
+        description: One outlet's stations. Absent means every outlet the caller can see.
+        schema:
+          type: string
+          format: uuid
       - $ref: ../shared/common.yaml#/components/parameters/PageSize
       - $ref: ../shared/common.yaml#/components/parameters/PageCursor
       x-ticvai-permission: PRODUCT_VIEW
@@ -5242,9 +5953,14 @@ paths:
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/KitchenStation'
+                allOf:
+                  - $ref: '../shared/common.yaml#/components/schemas/Page'
+                  - type: object
+                    properties:
+                      items:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/KitchenStation'
     put:
       operationId: setKitchenStations
       x-ticvai-consumed-by:
@@ -5256,6 +5972,12 @@ paths:
       x-ticvai-audience:
       - staff
       summary: Configure stations and item routing
+      description: '**One outlet''s stations, named in `outletId`.** A venue runs several kitchens, and a
+        station set with no outlet named could be written to any of them. Each station is matched on
+        `KitchenStation.id`, and every station in the body carries the same `outletId`. A temporary move
+        of work between stations is `rebalanceStationLoad`, not this.
+
+        '
       tags:
       - kitchen
       x-ticvai-permission: PRODUCT_CONFIGURE
@@ -5263,6 +5985,13 @@ paths:
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
       parameters:
+      - name: outletId
+        in: query
+        required: true
+        description: The outlet whose stations these are.
+        schema:
+          type: string
+          format: uuid
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       requestBody:
         required: true
@@ -5279,6 +6008,9 @@ paths:
                     $ref: '#/components/schemas/KitchenStation'
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Configured
           content:
             application/json:
@@ -5307,6 +6039,18 @@ paths:
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
       parameters:
+      - name: search
+        in: query
+        description: Case-insensitive "contains" match over the menu item's name. Combined with the other
+          filters, not instead of them.
+        schema:
+          type: string
+      - name: menuItemId
+        in: query
+        description: The recipe for one menu item.
+        schema:
+          type: string
+          format: uuid
       - $ref: ../shared/common.yaml#/components/parameters/PageSize
       - $ref: ../shared/common.yaml#/components/parameters/PageCursor
       responses:
@@ -5347,6 +6091,9 @@ paths:
               $ref: '#/components/schemas/Recipe'
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Set. The item becomes stock-tracked and therefore unavailable offline
           content:
             application/json:
@@ -5430,6 +6177,9 @@ paths:
                   format: date-time
       responses:
         '201':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Recorded
           content:
             application/json:
@@ -5471,6 +6221,9 @@ paths:
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Record what was done about a finding
           content:
             application/json:
@@ -5502,6 +6255,9 @@ paths:
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Escalate a finding
           content:
             application/json:
@@ -5537,6 +6293,9 @@ paths:
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Close a signed finding
           content:
             application/json:
@@ -5572,9 +6331,14 @@ paths:
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/FnbIngredientSubstitute'
+                allOf:
+                  - $ref: '../shared/common.yaml#/components/schemas/Page'
+                  - type: object
+                    properties:
+                      items:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/FnbIngredientSubstitute'
     put:
       operationId: setIngredientSubstitutes
       summary: Define approved substitutions
@@ -5606,6 +6370,9 @@ paths:
                 $ref: '#/components/schemas/FnbIngredientSubstitute'
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Define approved substitutions
           content:
             application/json:
@@ -5613,7 +6380,7 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/FnbIngredientSubstitute'
-  /product-recommendations:
+  /fnb-recommendations:
     get:
       operationId: listFnbRecommendations
       summary: Upsell and pairing suggestions for F&B
@@ -5637,9 +6404,14 @@ paths:
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/FnbProductRecommendation'
+                allOf:
+                  - $ref: '../shared/common.yaml#/components/schemas/Page'
+                  - type: object
+                    properties:
+                      items:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/FnbProductRecommendation'
 components:
   schemas:
     FnbReservationPolicy:
@@ -6004,7 +6776,7 @@ components:
         **The rule exists so `verifyAllergens` has something to check against.** A substitution with no
         rule behind it is a decision made at the pass by whoever is standing there.
 
-        **`allergenDelta` is the field this table is for.** Swapping butter for margarine removes dairy
+        **`allergensAdded` and `allergensRemoved` are the fields this table is for.** Swapping butter for margarine removes dairy
         and may add soy — **and a dish still labelled dairy-free after a swap nobody checked is the failure
         this prevents.**
 
@@ -6033,11 +6805,11 @@ components:
         allergensAdded:
           type: array
           items:
-            type: string
+            $ref: '#/components/schemas/AllergenCode'
         allergensRemoved:
           type: array
           items:
-            type: string
+            $ref: '#/components/schemas/AllergenCode'
         conditions:
           type: array
           items:
@@ -6060,7 +6832,7 @@ components:
           default: true
     ProductionPlan:
       type: object
-      x-ticvai-persistence: fnb.production_plan
+      x-ticvai-persistence: fnb.production_plan + fnb.production_plan_line
       description: 'Board 2M. **Forecast demand against recipes, producing a prep list.** Built from `requestSuggestion(kind=prepPlan)`
         and then edited — **a forecast a chef cannot overrule is a forecast a chef ignores.**
 
@@ -6084,6 +6856,7 @@ components:
         forDate:
           type: string
           format: date
+          description: The trading day this prep list is for, in the Region's time zone.
         status:
           type: string
           enum:
@@ -6168,10 +6941,10 @@ components:
           items:
             $ref: '#/components/schemas/ComboSlot'
         availability:
-          type: object
+          allOf:
+          - $ref: '#/components/schemas/MenuAvailability'
           nullable: true
-          additionalProperties: true
-          description: 'Service periods it sells in. **A lunch deal at 9pm is a margin leak** and the
+          description: 'Service periods it sells in, in the same shape as a menu''s. **A lunch deal at 9pm is a margin leak** and the
             venue only notices at month end.
 
             '
@@ -6253,7 +7026,7 @@ components:
           nullable: true
         ticketId:
           type: string
-          format: uuid
+          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
           nullable: true
         kind:
           type: string
@@ -6466,6 +7239,13 @@ components:
         raisedAt:
           type: string
           format: date-time
+        raisedByPrincipalId:
+          type: string
+          format: uuid
+          nullable: true
+          readOnly: true
+          description: '**Who raised it, which is who may not sign it when it is critical** (`signCorrectiveAction`).
+            Null where the action was opened automatically by a reading or a cold-chain breach.'
         source:
           type: string
           enum:
@@ -6598,22 +7378,7 @@ components:
         contains:
           type: array
           items:
-            type: string
-            enum:
-            - gluten
-            - crustaceans
-            - eggs
-            - fish
-            - peanuts
-            - soybeans
-            - milk
-            - nuts
-            - celery
-            - mustard
-            - sesame
-            - sulphites
-            - lupin
-            - molluscs
+            $ref: '#/components/schemas/AllergenCode'
         mayContain:
           type: array
           description: '**Cross-contamination, which is about the kitchen rather than the recipe.** A
@@ -6621,7 +7386,7 @@ components:
 
             '
           items:
-            type: string
+            $ref: '#/components/schemas/AllergenCode'
         isVegetarian:
           type: boolean
           default: false
@@ -6673,6 +7438,12 @@ components:
         recipeId:
           type: string
           format: uuid
+        productionPlanId:
+          type: string
+          format: uuid
+          nullable: true
+          readOnly: true
+          description: The plan whose release created this run. Null for a run planned directly.
         producingOutletId:
           type: string
           format: uuid
@@ -6720,6 +7491,7 @@ components:
       - outletId
       - partySize
       - status
+      - recordedAt
       properties:
         id:
           type: string
@@ -6759,6 +7531,17 @@ components:
           type: string
           format: date-time
           nullable: true
+        recordedAt:
+          type: string
+          format: date-time
+          description: '**When the party joined, on the device.** The wait a party had is measured from here
+            to `notifiedAt` or to seating, which is the report `walkedAway` exists for. Required on a
+            join — the operation is offline-capable.'
+        syncedAt:
+          type: string
+          format: date-time
+          nullable: true
+          readOnly: true
         holdExpiresAt:
           type: string
           format: date-time
@@ -6841,7 +7624,7 @@ components:
           readOnly: true
         tableVisitId:
           type: string
-          format: uuid
+          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
           nullable: true
           readOnly: true
         createdAt:
@@ -6901,7 +7684,7 @@ components:
           type: integer
           nullable: true
           description: 'From current kitchen ticket volume, not a fixed figure. Null where the outlet
-            has no KDS reporting — an invented wait time is worse than none.
+            has no kitchen display reporting ticket status — an invented wait time is worse than none.
 
             '
         imageAssetRef:
@@ -6988,7 +7771,7 @@ components:
                       type: array
                       description: Always present. Not a field a tenant may choose to omit.
                       items:
-                        type: string
+                        $ref: '#/components/schemas/AllergenCode'
                     preparationMinutes:
                       type: integer
                       nullable: true
@@ -7080,6 +7863,7 @@ components:
       properties:
         id:
           type: string
+          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
         locationId:
           type: string
           format: uuid
@@ -7097,6 +7881,7 @@ components:
             '
         visitId:
           type: string
+          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
           nullable: true
           description: 'The table visit this session orders onto, where the location is a table. Absent
             for a cabana or a seat, which have no visit concept — the order stands alone.
@@ -7127,6 +7912,7 @@ components:
       properties:
         id:
           type: string
+          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
         outletId:
           type: string
           format: uuid
@@ -7139,6 +7925,7 @@ components:
           type: string
         visitId:
           type: string
+          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
           description: 'The table visit this session orders onto. An existing open visit is joined rather
             than duplicated — a guest seated by a server and then ordering by app is one party, one bill.
 
@@ -7278,12 +8065,21 @@ components:
           type: string
           format: uuid
           readOnly: true
+        orderId:
+          type: string
+          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+          readOnly: true
+          x-ticvai-column: service_order_id
+          description: The guest order this fulfils (`FnbOrder.id`). Set by the server from the order it arrives with.
         mode:
           type: string
           enum:
           - collection
           - delivery
           - inVenue
+          description: '`collection` from a counter, `delivery` to an address outside the venue, `inVenue` to
+            a table, seat, cabana or named location (the location session). `GuestOrderResult.fulfilment`
+            reports the same choice.'
         collectionAt:
           type: string
           format: date-time
@@ -7339,8 +8135,9 @@ components:
           pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
         locationSessionId:
           type: string
+          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
           nullable: true
-          description: 'Where the order is going. Required for delivery to a table, seat, cabana or named
+          description: 'From `claimLocationSession`. Where the order is going. Required for delivery to a table, seat, cabana or named
             location. Absent for collection, where the outlet is named instead.
 
             '
@@ -7348,7 +8145,8 @@ components:
           type: string
           format: uuid
           nullable: true
-          description: Required for collection. Ignored where a table session is supplied.
+          description: Required for collection. Ignored where a location session is supplied — the session
+            names its outlet.
         fulfilment:
           allOf:
           - $ref: '#/components/schemas/GuestOrderFulfilment'
@@ -7398,6 +8196,11 @@ components:
           - collect
           - deliverToLocation
           - tableService
+          - deliverToAddress
+          description: 'How the order reaches the guest, in the request''s terms: `collect` is
+            `GuestOrderFulfilment.mode` `collection`; `deliverToAddress` is `delivery`; `inVenue` is
+            `tableService` where the location session is a table and `deliverToLocation` for a seat, cabana
+            or named location. `KitchenTicket.serviceMode` is the kitchen''s view and uses `ServiceMode`.'
         deliveryLabel:
           type: string
           nullable: true
@@ -7465,6 +8268,17 @@ components:
             - outletNotAcceptingOrders
             - modifierConstraintUnmet
             - orderTooLarge
+            - collectionNotOffered
+            - deliveryNotOffered
+            - belowMinimumOrder
+            - outsideDeliveryArea
+            - fulfilmentSlotClosed
+            - paymentRequired
+            - paymentDeclined
+            description: 'One value per cause. The 409 values are state that changed under the guest; the 422
+              values name the `FnbDeliveryPolicy` rule the order broke (`collectionEnabled`, `deliveryEnabled`,
+              `minimumOrder`, `radiusKm` or `emiratesServed`, or a slot `listFulfilmentSlots` has closed); the
+              402 values are payment.'
           unavailableItems:
             type: array
             items:
@@ -7484,7 +8298,8 @@ components:
     MenuAvailability:
       x-ticvai-persistence: none — embedded in menu
       type: object
-      description: When this menu is in force. Absent means always.
+      description: When this menu is in force. Absent means always. Days, times and dates are
+        all read in the Region's time zone, not UTC.
       properties:
         daysOfWeek:
           type: array
@@ -7495,17 +8310,21 @@ components:
         startTime:
           type: string
           pattern: ^([01]\d|2[0-3]):[0-5]\d$
+          description: Wall-clock time, in the Region's time zone.
         endTime:
           type: string
           pattern: ^([01]\d|2[0-3]):[0-5]\d$
+          description: Wall-clock time, in the Region's time zone.
         validFrom:
           type: string
           format: date
           nullable: true
+          description: Calendar day, in the Region's time zone, not UTC.
         validTo:
           type: string
           format: date
           nullable: true
+          description: Calendar day, in the Region's time zone, not UTC.
     Menu:
       x-ticvai-persistence: fnb.menu
       type: object
@@ -7536,6 +8355,16 @@ components:
             $ref: '#/components/schemas/MenuSection'
         isActive:
           type: boolean
+        publishedVersion:
+          type: integer
+          nullable: true
+          readOnly: true
+          description: The `MenuVersion.version` live now. Null for a menu never published.
+        publishedAt:
+          type: string
+          format: date-time
+          nullable: true
+          readOnly: true
     CreateMenuRequest:
       x-ticvai-persistence: none — request only
       type: object
@@ -7563,6 +8392,10 @@ components:
       - name
       - sortOrder
       properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
         code:
           type: string
         name:
@@ -7571,6 +8404,7 @@ components:
           type: integer
         items:
           type: array
+          description: The section's items, in sale-board order. An item's membership is `MenuItem.menuSectionId`.
           items:
             $ref: '#/components/schemas/MenuItem'
     MenuItem:
@@ -7612,6 +8446,12 @@ components:
           type: string
           format: uuid
           nullable: true
+        menuSectionId:
+          type: string
+          format: uuid
+          nullable: true
+          readOnly: true
+          description: The section the item sits in, set by `setMenuSections` and `applyMenuActions` (`moveSection`).
         isStockTracked:
           type: boolean
           description: True where a recipe exists. Stock-tracked items cannot be sold offline.
@@ -7620,16 +8460,28 @@ components:
         unavailableReason:
           type: string
           nullable: true
+        restoreAt:
+          type: string
+          format: date-time
+          nullable: true
+          description: When an unavailable item comes back on its own (`setItemAvailability`). Null means by hand.
         preparationMinutes:
           type: integer
           nullable: true
         allergens:
           type: array
           items:
-            type: string
+            $ref: '#/components/schemas/AllergenCode'
     ModifierGroup:
       x-ticvai-persistence: fnb.modifier_group + fnb.modifier_option
       type: object
+      description: '**An F&B modifier is a choice added to a dish at the moment of ordering** — *no onions*,
+        *extra cheese*, *cooked medium*. **It is not an Attribute**, the axis that generates catalogue
+        variants (naming-and-style §3 lists *Modifier* as a banned synonym for that), and the two must not
+        be merged: a variant is a different product with its own stock, a modifier is an instruction on a
+        line with at most a price delta.
+
+        '
       required:
       - id
       - code
@@ -7673,6 +8525,12 @@ components:
                 type: boolean
               isAvailable:
                 type: boolean
+              allergens:
+                type: array
+                description: What choosing this option adds to the dish. `attachModifierGroup` refuses a group
+                  that adds one the item does not declare, and `verifyAllergens` reports it as `via` `modifier`.
+                items:
+                  $ref: '#/components/schemas/AllergenCode'
         scopePath:
           type: string
           description: '**The partition key** (ADR-0005). Added 31 August: the operations that write this
@@ -7768,6 +8626,7 @@ components:
           $ref: '#/components/schemas/ServiceMode'
         tableVisitId:
           type: string
+          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
           nullable: true
           description: Required for table service. Absent for quick service.
         lines:
@@ -7793,6 +8652,7 @@ components:
       properties:
         id:
           type: string
+          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
         orderNumber:
           type: string
         outletId:
@@ -7802,6 +8662,7 @@ components:
           $ref: '#/components/schemas/ServiceMode'
         tableVisitId:
           type: string
+          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
           nullable: true
         status:
           $ref: '#/components/schemas/FnbOrderStatus'
@@ -7839,6 +8700,7 @@ components:
           $ref: ../shared/common.yaml#/components/schemas/Money
         kitchenTicketId:
           type: string
+          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
           nullable: true
         estimatedReadyAt:
           type: string
@@ -7899,6 +8761,11 @@ components:
           - rectangle
           - booth
           - bar
+        isOutOfService:
+          type: boolean
+          default: false
+          description: '**Damaged, or its section closed.** `getTableMap` shows it as `outOfService` and a
+            claim on it is refused with `tableOutOfService`.'
     TableState:
       x-ticvai-persistence: none — projection over table and visit
       allOf:
@@ -7911,6 +8778,7 @@ components:
             $ref: '#/components/schemas/TableStatus'
           visitId:
             type: string
+            pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
             nullable: true
           covers:
             type: integer
@@ -7985,6 +8853,7 @@ components:
       properties:
         id:
           type: string
+          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
         tableId:
           type: string
           format: uuid
@@ -8017,13 +8886,22 @@ components:
             $ref: '#/components/schemas/FnbOrder'
         mergedIntoVisitId:
           type: string
+          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
           nullable: true
         mergedFromVisitIds:
           type: array
           items:
             type: string
+            pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
         runningTotal:
           $ref: ../shared/common.yaml#/components/schemas/Money
+        gratuity:
+          allOf:
+          - $ref: ../shared/common.yaml#/components/schemas/Money
+          nullable: true
+          readOnly: true
+          description: 'The gratuity taken at `closeTableVisit`. **Not the service charge**, which is revenue
+            (`FnbServiceChargePolicy`); this is the guest''s tip, and `reassignServer` decides who shares it.'
         openedAt:
           type: string
           format: date-time
@@ -8096,7 +8974,12 @@ components:
       type: object
       required:
       - method
+      - recordedAt
       properties:
+        recordedAt:
+          type: string
+          format: date-time
+          description: Device time of the split (offline-capable).
         method:
           $ref: '#/components/schemas/SplitMethod'
         parts:
@@ -8208,8 +9091,11 @@ components:
       properties:
         id:
           type: string
+          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
         orderId:
           type: string
+          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+          description: The F&B order the ticket was created from on acceptance (`FnbOrder.id`).
         orderNumber:
           type: string
         outletId:
@@ -8221,14 +9107,9 @@ components:
         serviceMode:
           $ref: '#/components/schemas/ServiceMode'
         coursing:
-          type: string
+          allOf:
+          - $ref: '#/components/schemas/CoursingPolicy'
           nullable: true
-          enum:
-          - fireAndForget
-          - holdAndFire
-          - phased
-          - timed
-          - delayed
           description: 'BL-131. **Starters before mains is the entire job of a kitchen pass**, and the
             model fired everything at once.
 
@@ -8267,6 +9148,7 @@ components:
             properties:
               lineId:
                 type: string
+                pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
               name:
                 type: string
               quantity:
@@ -8281,7 +9163,24 @@ components:
               allergens:
                 type: array
                 items:
-                  type: string
+                  $ref: '#/components/schemas/AllergenCode'
+              refireOfLineId:
+                type: string
+                pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+                nullable: true
+                readOnly: true
+                description: '**Set on a refire.** The line it remakes, which stays — food cost counts both,
+                  the bill counts one (`refireItem`).'
+              refireReason:
+                allOf:
+                - $ref: '#/components/schemas/RefireReason'
+                nullable: true
+                readOnly: true
+              isChargeable:
+                type: boolean
+                nullable: true
+                readOnly: true
+                description: A refire's `chargeable` flag. Null on a line that is not a refire.
               course:
                 type: integer
                 nullable: true
@@ -8327,7 +9226,9 @@ components:
         displayEndpoint:
           type: string
           nullable: true
-          description: 'Where the venue''s KDS listens. Absent where a fallback screen is used instead.
+          description: 'The P15 Kitchen Display device this station''s tickets go to (19 Sep: the display is
+            TICVAI software on commodity hardware, per station, with a fallback device where the primary
+            is down — 18 Aug minute). Absent where the station has no display assigned.
 
             '
         isActive:
@@ -8369,6 +9270,647 @@ components:
                 default: false
         costPerPortion:
           $ref: ../shared/common.yaml#/components/schemas/Money
+    FnbProblem:
+      x-ticvai-persistence: none — error shape
+      description: '**Every operation-specific error in this contract except a guest order''s.** One
+        `refusedReason` per cause, so a status with several causes can be told apart, and each response
+        narrows `refusedReason` to the values it can carry. The same pattern as `GuestOrderProblem`,
+        `StackingProblem` and `QueueJoinProblem`.
+
+        **`type` stays the shared Problem''s.** The package has no problem-type registry yet — common.yaml
+        calls `type` enumerated and lists no values — so this contract mints no type URIs of its own, and
+        clients switch on `refusedReason`.
+
+        The other fields are set only for the reasons that name them.
+
+        '
+      allOf:
+      - $ref: ../shared/common.yaml#/components/schemas/Problem
+      - type: object
+        required:
+        - refusedReason
+        properties:
+          refusedReason:
+            type: string
+            enum:
+            - tableHasOpenVisit
+            - scheduleExistsForDate
+            - modifierAddsUndeclaredAllergen
+            - recallWindowPassed
+            - targetTableOccupied
+            - criticalSelfSign
+            - runNotInProgress
+            - noTableForPartySize
+            - outletFullAtTime
+            - reservationNotSeatable
+            - noMenuInForce
+            - locationNotSupplied
+            - codeExpired
+            - codeUnknown
+            - locationOutOfService
+            - locationNotServed
+            - outletClosed
+            - tableOutOfService
+            - orderNotReady
+            - orderAlreadyClosed
+            - selectionConstraintsUnsatisfiable
+            - itemUnavailable
+            - modifierConstraintUnmet
+            - trackedItemOffline
+            - orderAlreadyAccepted
+            - orderCancelled
+            - outletNotAcceptingOrders
+            - orderAlreadyFulfilled
+            - lineInPreparation
+            - lineServed
+            - tableOccupied
+            - visitClosed
+            - splitDoesNotSumToTotal
+            - lineAssignedTwice
+            - visitSettled
+            - paymentsShortOfBill
+            - linesUnserved
+            - illegalStatusTransition
+          occupyingVisitId:
+            type: string
+            pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+            description: The visit on the table. `tableOccupied`, `targetTableOccupied`, `tableHasOpenVisit`.
+          suggestedOperation:
+            type: string
+            enum:
+            - refireItem
+            - escalateCorrectiveAction
+            - mergeTableVisits
+            description: '**The act that is allowed instead.** `recallWindowPassed` names `refireItem`,
+              `criticalSelfSign` names `escalateCorrectiveAction`, `targetTableOccupied` names `mergeTableVisits`.'
+          nextMenuStartsAt:
+            type: string
+            format: date-time
+            nullable: true
+            description: '`noMenuInForce`: when the next menu comes into force. Null where none is scheduled.'
+          existingScheduleId:
+            type: string
+            format: uuid
+            description: '`scheduleExistsForDate`: the pending `MenuSchedule` already on that date.'
+          modifierGroupId:
+            type: string
+            format: uuid
+            description: '`modifierAddsUndeclaredAllergen`: the group that adds it.'
+          allergens:
+            type: array
+            description: '`modifierAddsUndeclaredAllergen`: what the group adds that the item does not declare.'
+            items:
+              $ref: '#/components/schemas/AllergenCode'
+          lineIds:
+            type: array
+            description: '`lineInPreparation`, `lineServed`, `linesUnserved`: the lines concerned.'
+            items:
+              type: string
+              pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+          currentStatus:
+            type: string
+            description: '`illegalStatusTransition`, `reservationNotSeatable`, `runNotInProgress`: the
+              entity''s status now, as a value of its own status enum.'
+    AllergenCode:
+      type: string
+      description: '**The fourteen declarable allergens, as one closed list.** Every allergen field in this
+        contract uses it — the menu claim, the ticket line, a substitution''s delta, a modifier option,
+        the label on a bag — so a declared set and an actual set compare without anybody normalising case
+        or synonyms. It was the `Allergen.contains` enum; the other fields were free text.
+
+        '
+      enum:
+      - gluten
+      - crustaceans
+      - eggs
+      - fish
+      - peanuts
+      - soybeans
+      - milk
+      - nuts
+      - celery
+      - mustard
+      - sesame
+      - sulphites
+      - lupin
+      - molluscs
+    CoursingPolicy:
+      type: string
+      description: 'How a ticket''s courses are fired. `fireAndForget` sends every course at once, which is
+        no coursing; `holdAndFire` waits for a server to call each course; `timed` fires on a clock;
+        `phased` staggers by course. **One vocabulary for the ticket (`KitchenTicket.coursing`) and the
+        outlet default (`CourseRules.defaultCoursing`)** — the default said `none` for `fireAndForget` and
+        had no `delayed` until 26 September, so a default could not be copied onto the field it defaults.
+
+        '
+      enum:
+      - fireAndForget
+      - holdAndFire
+      - phased
+      - timed
+      - delayed
+    RefireReason:
+      type: string
+      description: Why a line was made again (`refireItem`). The reasons are the data.
+      enum:
+      - overcooked
+      - undercooked
+      - wrongItem
+      - dropped
+      - cold
+      - allergyRisk
+      - guestChangedMind
+      - lateAdd
+    CourseRules:
+      type: object
+      x-ticvai-persistence: fnb.course_rule
+      description: '**An outlet''s coursing default.** It was written to the resolution cache only, which
+        the service model calls losable without consequence — an outlet''s default vanished on a cache
+        flush. One row per outlet.
+
+        '
+      properties:
+        outletId:
+          type: string
+          format: uuid
+          readOnly: true
+          description: The outlet in the path.
+        defaultCoursing:
+          $ref: '#/components/schemas/CoursingPolicy'
+        courseNames:
+          type: array
+          items:
+            type: string
+        autoFireMinutes:
+          type: integer
+          nullable: true
+        serviceModeOverrides:
+          type: object
+          description: A different default per service mode.
+          propertyNames:
+            $ref: '#/components/schemas/ServiceMode'
+          additionalProperties:
+            $ref: '#/components/schemas/CoursingPolicy'
+        scopePath:
+          type: string
+          readOnly: true
+          description: '**The partition key** (ADR-0005). Operations write it at `outlet` scope.'
+    TableCombination:
+      type: object
+      x-ticvai-persistence: fnb.table_combination
+      description: '**Tables that can be pushed together, and what they seat together.** Declared by a host
+        rather than inferred from a floor plan — a pillar, a step or a service run stops two adjacent tables
+        combining. `setTableCombinations` writes the outlet''s set.
+
+        '
+      required:
+      - tableIds
+      - combinedCovers
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        outletId:
+          type: string
+          format: uuid
+          readOnly: true
+          description: The outlet in the path.
+        tableIds:
+          type: array
+          minItems: 2
+          items:
+            type: string
+            format: uuid
+        combinedCovers:
+          type: integer
+          minimum: 1
+        setupMinutes:
+          type: integer
+          default: 5
+        scopePath:
+          type: string
+          readOnly: true
+          description: '**The partition key** (ADR-0005). Operations write it at `outlet` scope.'
+    SectionLayout:
+      type: object
+      description: An outlet's floor divided into sections, each with its server (`setSectionLayout`).
+      required:
+      - sections
+      properties:
+        sections:
+          type: array
+          items:
+            type: object
+            required:
+            - name
+            - tableIds
+            properties:
+              name:
+                type: string
+              tableIds:
+                type: array
+                items:
+                  type: string
+                  format: uuid
+              serverPrincipalId:
+                type: string
+                format: uuid
+                nullable: true
+              servicePeriod:
+                type: string
+                nullable: true
+    KitchenSla:
+      type: object
+      description: '**How long a ticket may sit, per service mode, and what pushes it up the rail**
+        (`setKitchenSla`). The priority weights are the ones `listKitchenTickets` orders the rail by.
+
+        '
+      properties:
+        targets:
+          type: array
+          items:
+            type: object
+            required:
+            - serviceMode
+            - targetMinutes
+            properties:
+              serviceMode:
+                $ref: '#/components/schemas/ServiceMode'
+              targetMinutes:
+                type: integer
+                minimum: 1
+              warnAtPercent:
+                type: integer
+                default: 80
+        priorityWeights:
+          type: object
+          description: The weight of each signal the board names — age, promise time, table stage, a VIP marker.
+          properties:
+            age:
+              type: integer
+              minimum: 0
+            targetReadyAt:
+              type: integer
+              minimum: 0
+              description: Promise time.
+            tableStage:
+              type: integer
+              minimum: 0
+            vip:
+              type: integer
+              minimum: 0
+    StationRebalance:
+      type: object
+      description: '**A temporary move of work between stations** (`rebalanceStationLoad`). Reverts at
+        `revertAt`, or at close where that is null — a permanent change is `setKitchenStations`.
+
+        '
+      required:
+      - moves
+      properties:
+        moves:
+          type: array
+          items:
+            type: object
+            required:
+            - fromStationId
+            - toStationId
+            properties:
+              fromStationId:
+                type: string
+                format: uuid
+              toStationId:
+                type: string
+                format: uuid
+              categoryIds:
+                type: array
+                items:
+                  type: string
+                  format: uuid
+        revertAt:
+          type: string
+          format: date-time
+          nullable: true
+    OrderLabel:
+      type: object
+      x-ticvai-persistence: none — rendered from the kitchen ticket and its order
+      description: '**What goes on the bag** (`printOrderLabel`). Order number, guest name, items and **the
+        allergen flags, which are the reason the label is rendered by the server** from the same source
+        as the order rather than printed from whatever the client has.
+
+        '
+      required:
+      - ticketId
+      - orderNumber
+      - lines
+      - allergens
+      properties:
+        ticketId:
+          type: string
+          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+        orderNumber:
+          type: string
+        guestName:
+          type: string
+          nullable: true
+        serviceMode:
+          $ref: '#/components/schemas/ServiceMode'
+        deliveryLabel:
+          type: string
+          nullable: true
+          description: Where it is going, as a runner would read it.
+        buzzerCode:
+          type: string
+          nullable: true
+        lines:
+          type: array
+          items:
+            type: object
+            required:
+            - name
+            - quantity
+            properties:
+              name:
+                type: string
+              quantity:
+                type: integer
+              modifiers:
+                type: array
+                items:
+                  type: string
+              allergens:
+                type: array
+                items:
+                  $ref: '#/components/schemas/AllergenCode'
+        allergens:
+          type: array
+          description: Every allergen on the order, together. Present and possibly empty — never omitted.
+          items:
+            $ref: '#/components/schemas/AllergenCode'
+    BookingMessageReceipt:
+      type: object
+      x-ticvai-persistence: none — response shape
+      description: What `sendBookingConfirmation` queued.
+      required:
+      - reservationId
+      - kind
+      - queuedAt
+      properties:
+        reservationId:
+          type: string
+          format: uuid
+        kind:
+          type: string
+          enum:
+          - confirmation
+          - reminder
+          - reconfirmationRequest
+          - cancellation
+        channel:
+          type: string
+          nullable: true
+          enum:
+          - email
+          - sms
+          - whatsapp
+        queuedAt:
+          type: string
+          format: date-time
+        releaseIfUnconfirmedAt:
+          type: string
+          format: date-time
+          nullable: true
+          description: Where `requiresReconfirmation` was set, when the table goes back if nobody answers.
+    RecountResult:
+      type: object
+      x-ticvai-persistence: none — response shape
+      description: The lines `requestRecount` reopened.
+      required:
+      - countId
+      - reopenedLineIds
+      properties:
+        countId:
+          type: string
+          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+        reopenedLineIds:
+          type: array
+          items:
+            type: string
+            format: uuid
+        reason:
+          type: string
+          nullable: true
+    MenuVersion:
+      type: object
+      x-ticvai-persistence: fnb.menu_version
+      description: '**One published state of a menu, kept.** `publishMenu` writes one, `rollbackMenu`
+        writes a new one from an older one, and `listMenuVersions` reads them — the previous version stays
+        readable, which is what makes rollback and *what were we charging at noon* possible. **A version
+        is never edited**; a menu history that can be edited cannot answer a refund dispute.
+
+        Statuses follow flow F31: a new version is `draft` while the live one keeps selling, `scheduled`
+        once dated, `live`, and `superseded` when a later version goes live.
+
+        '
+      required:
+      - id
+      - menuId
+      - version
+      - status
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        menuId:
+          type: string
+          format: uuid
+        version:
+          type: integer
+          minimum: 1
+        status:
+          type: string
+          enum:
+          - draft
+          - scheduled
+          - live
+          - superseded
+        effectiveAt:
+          type: string
+          format: date-time
+          nullable: true
+        publishedAt:
+          type: string
+          format: date-time
+          nullable: true
+        publishedByPrincipalId:
+          type: string
+          format: uuid
+          nullable: true
+        restoredFromVersion:
+          type: integer
+          nullable: true
+          description: Set on a version written by `rollbackMenu` — the version it restored.
+        channels:
+          type: array
+          items:
+            $ref: ../shared/common.yaml#/components/schemas/SalesChannel
+        note:
+          type: string
+          nullable: true
+        availability:
+          $ref: '#/components/schemas/MenuAvailability'
+        sections:
+          type: array
+          description: The sections and items as published. The snapshot, not a reference to the live rows.
+          items:
+            $ref: '#/components/schemas/MenuSection'
+        scopePath:
+          type: string
+          readOnly: true
+          description: '**The partition key** (ADR-0005). Operations write it at `venue` scope.'
+    MenuSchedule:
+      type: object
+      x-ticvai-persistence: fnb.menu_schedule
+      description: '**A publish dated for later** (`scheduleMenuPublish`, or `publishMenu` with an
+        `effectiveAt`). Listed by `listMenuSchedules` while `pending`, so a venue with three scheduled
+        price changes can see them; one per menu per date.
+
+        '
+      required:
+      - id
+      - menuId
+      - effectiveAt
+      - status
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        menuId:
+          type: string
+          format: uuid
+        effectiveAt:
+          type: string
+          format: date-time
+        status:
+          type: string
+          enum:
+          - pending
+          - applied
+          - cancelled
+        publishedVersion:
+          type: integer
+          nullable: true
+          readOnly: true
+          description: The `MenuVersion.version` that went live when the schedule fired. Null until then.
+        createdAt:
+          type: string
+          format: date-time
+          readOnly: true
+        createdByPrincipalId:
+          type: string
+          format: uuid
+          readOnly: true
+        cancelledAt:
+          type: string
+          format: date-time
+          nullable: true
+          readOnly: true
+        scopePath:
+          type: string
+          readOnly: true
+          description: '**The partition key** (ADR-0005). Operations write it at `venue` scope.'
+    MenuActionSelector:
+      type: object
+      description: '**Which items a bulk action touches.** At least one criterion; several narrow each
+        other. *Reprice all* and *reprice all in this section* are different selectors on purpose, and the
+        preview says how many items each one reaches.
+
+        '
+      minProperties: 1
+      properties:
+        menuItemIds:
+          type: array
+          items:
+            type: string
+            format: uuid
+        sectionCodes:
+          type: array
+          description: '`MenuSection.code` values on this menu.'
+          items:
+            type: string
+        allItems:
+          type: boolean
+          description: Every item on the menu. Stated rather than implied by an empty selector.
+    MenuActionValue:
+      type: object
+      description: 'What the action sets. **One field per kind**: `reprice` takes `percentChange` or
+        `price`; `moveSection` takes `toSectionCode`; `setAvailability` takes `isAvailable`; `setTax` takes
+        `taxCode`; `retire` and `activate` take none.
+
+        '
+      properties:
+        percentChange:
+          type: number
+          description: Signed. `-5` is five per cent off.
+        price:
+          $ref: ../shared/common.yaml#/components/schemas/Money
+        toSectionCode:
+          type: string
+        isAvailable:
+          type: boolean
+        taxCode:
+          type: string
+          description: A tax code from the finance tax engine.
+    MenuActionResult:
+      type: object
+      x-ticvai-persistence: none — response shape
+      description: '**The preview, or what was applied** (`applyMenuActions`). The same shape either way,
+        so the screen that showed the preview shows the result.
+
+        '
+      required:
+      - applied
+      - actions
+      properties:
+        applied:
+          type: boolean
+          description: False for a preview (`previewOnly`), true once applied.
+        actions:
+          type: array
+          items:
+            type: object
+            required:
+            - index
+            - kind
+            - affectedItemCount
+            properties:
+              index:
+                type: integer
+                description: The action's position in the request.
+              kind:
+                type: string
+                enum:
+                - reprice
+                - retire
+                - activate
+                - moveSection
+                - setAvailability
+                - setTax
+              affectedItemCount:
+                type: integer
+                description: '**How many items it touches** — the number the preview exists to show.'
+              affectedMenuItemIds:
+                type: array
+                items:
+                  type: string
+                  format: uuid
+        appliedAt:
+          type: string
+          format: date-time
+          nullable: true
   securitySchemes:
     bearerAuth:
       type: http

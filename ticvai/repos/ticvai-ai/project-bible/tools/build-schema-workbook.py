@@ -37,12 +37,43 @@ cols=D['cols']; nomap=D['nomap']; origin=D['origin']; storage=D['storage']
 # outbound keys stop; `parent` is the table it is a child of, where one owns it.
 LINE=D.get('lineage',{})
 rels=L['rels']; tab_ops=L['tab_ops']; tab_screens=L['tab_screens']
-MIG={'platform':'V0001 / V0003 / V0003a','identity':'V0002','pii':'V0001a','sync':'V0001',
- 'marketing':'V0003b (part) / V0015','fnb':'V0003b (part) / V0011','retail':'V0003b (part) / V0013',
- 'orders':'V0005','catalogue':'V0004','access':'V0007','ledger':'V0008','seating':'V0010',
- 'inventory':'V0012','promotions':'V0014','maintenance':'V0016','queue':'V0017',
- 'whitelabel':'V0018','assets':'V0019','games':'V0020','reporting':'V0021',
- 'control':'Control Plane — separate database'}
+# **Migration ids come from the migration plan, not from a map typed here.** Until 26 September
+# this was a dict literal written in August: `catalogue` V0004, `orders` V0005, platform
+# `V0001 / V0003 / V0003a`, control "Control Plane - separate database". That V* series was
+# deleted on 21 September (handoff/schema.md, Files), and every schema the dict did not name
+# (approvals, resources, payments, ...) read `unassigned`. Meanwhile build-service-docs numbers
+# the MIG tickets itself (V0007 approvals, V0021 catalogue), so ADAM, which passes this column
+# through unchanged, and OpenProject named a different migration for every table (audit R063).
+#
+# The plan is `handoff/service-docs/tasks.csv`: each `MIG-*` task's subject carries its file
+# (`Migration V0007__approvals.sql: ...`) and its description lists its tables
+# (`Tables: a.x, a.y. Source DDL`); each `VM-MIG-*` task (Venue Management) lists its tables
+# and has no V number yet. A table in neither is in no planned migration and the cell is left
+# empty rather than given a word that reads like an id.
+#
+# **Ordering caveat:** refresh.sh runs build-service-docs after this script, so a refresh
+# reads the plan the previous refresh wrote. Run this again after build-service-docs when the
+# slice changes the plan.
+import csv as _csv
+_TASKS = _H / 'service-docs' / 'tasks.csv'
+MIG_OF = {}
+if _TASKS.exists():
+    with open(_TASKS, encoding='utf-8', newline='') as _f:
+        for _r in _csv.DictReader(_f):
+            _k = _r.get('key') or ''
+            if not (_k.startswith('MIG-') or _k.startswith('VM-MIG-')):
+                continue
+            _ts = re.search(r'Tables: (.*?)\. Source DDL', _r.get('description') or '')
+            if not _ts:
+                continue  # MIG-BASELINE and MIG-FOREIGN-KEYS create no table of their own
+            _fn = re.search(r'Migration (V\d{4}__\w+\.sql)', _r.get('subject') or '')
+            _label = f'{_fn.group(1)} ({_k})' if _fn else _k
+            for _t in _ts.group(1).split(', '):
+                # First-release migration wins over a later Venue Management one: the table is
+                # created once, by whichever runs first, and tasks.csv lists MIG-* before VM-MIG-*.
+                MIG_OF.setdefault(_t.strip(), _label)
+else:
+    print('build-schema-workbook: handoff/service-docs/tasks.csv not found; Migration column left empty')
 # No migrations are written as of 14 August — the workbook is the working artefact and DDL
 # resumes when the design settles. The Written column stays in the sheet so it means something
 # again the moment a migration lands.
@@ -310,7 +341,7 @@ ws.cell(2,1,_CAP).font=SUB
 # way to say so, which meant a reader comparing two weeks saw three vanish and three
 # appear — and the safe reading of a table vanishing is that its data was dropped.
 hdr(ws,['Module','Table','Was','Database','What it is','Service','Columns','Written','New','PII','Foreign writers','Parent','Anchors on','Derived from','Migration'],
-    [12,32,26,10,74,17,9,8,6,6,20,26,30,26,20])
+    [12,32,26,10,74,17,9,8,6,6,20,26,30,26,34])
 r=5
 for t in sorted(set(cols)|set(storage)):
     m=t.split('.')[0]; cs=cols.get(t,[])
@@ -332,7 +363,7 @@ for t in sorted(set(cols)|set(storage)):
                           'yes' if t in NEW else '','yes' if t in PII else '',
                           ', '.join(fw) or '',
                           (L.get('parent') or '—'), anchtxt or '—',
-                          src,MIG.get(m,'unassigned')],1):
+                          src,MIG_OF.get(t,'')],1):
         c=ws.cell(r,i,v); c.font=M if i in (2,3) else B; c.border=BOX
         if i==5: c.alignment=Alignment(wrap_text=True,vertical='top')
         if i in (4,7,8,9,10): c.alignment=Alignment(horizontal='center')

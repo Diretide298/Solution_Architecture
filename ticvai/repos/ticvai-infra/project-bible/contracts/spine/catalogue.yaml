@@ -104,13 +104,14 @@ paths:
       x-ticvai-conflict-policy: serverWins
       responses:
         '200':
-          description: The tree
+          description: The tree. The root categories in `displayOrder`, each carrying its `children`
+            the same way, all the way down.
           content:
             application/json:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/ProductCategory'
+                  $ref: '#/components/schemas/ProductCategoryNode'
     put:
       operationId: setProductCategories
       x-ticvai-consumed-by:
@@ -122,6 +123,11 @@ paths:
         **Refuses a cycle**, and refuses deleting a category that names products: **a category with a
         season behind it still names what was sold under it**, and removing it rewrites last year''s report.
         Deactivate instead.
+
+        **What the PUT does.** The body is the venue''s whole hierarchy, flat, each category naming its
+        parent by `parentId`, and matched on `id`: a category whose `id` is new is created, one whose
+        `id` exists is replaced by what is sent, and one left out of the body is deleted. Leaving out a
+        category that products name is the deletion refused above — send it with `isActive: false`.
 
         '
       tags:
@@ -150,6 +156,9 @@ paths:
                     $ref: '#/components/schemas/ProductCategory'
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Set
           content:
             application/json:
@@ -157,6 +166,20 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/ProductCategory'
+        '400':
+          description: The body contains a cycle — a category that is its own ancestor — or a `parentId`
+            that names no category in the body.
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
+        '409':
+          description: The body leaves out a category that products name. Send it with `isActive` false
+            rather than deleting it.
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
   /products/import/{jobId}/commit:
     parameters:
     - name: jobId
@@ -187,6 +210,9 @@ paths:
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Applied
           content:
             application/json:
@@ -263,6 +289,9 @@ paths:
         Also the export half of 1.4.3 — the same file moves a catalogue between environments, which is
         how a staging venue gets real data without hand-entry.
 
+        **The `202` carries the job in `parsing`.** Poll `getCatalogueImportJob` until it reads
+        `previewReady` (or `failed`), show its findings, then call `commitCatalogueImport`.
+
         '
       tags:
       - catalogue
@@ -292,6 +321,12 @@ paths:
                   - json
                 sourceRef:
                   type: string
+                  format: uuid
+                  description: 'The uploaded file, as the `MediaAsset.id` that `assets.completeUpload`
+                    returns after `assets.createUpload` — the reference every contract stores for a
+                    file. The file itself is never posted through this API.
+
+                    '
                 mode:
                   type: string
                   enum:
@@ -305,11 +340,61 @@ paths:
                     '
       responses:
         '202':
-          description: Parsed to a preview
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: Accepted for parsing. Poll `getCatalogueImportJob` for the preview.
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/CatalogueImportJob'
+        '409':
+          description: '`mode` is `replaceCategory` and a category the file would replace has live orders
+            against it — that is a migration, not an import. Also answered when `sourceRef` names an asset
+            that is not `ready`: still `processing`, or `quarantined` by the scan.
+
+            '
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
+  /products/import/{jobId}:
+    parameters:
+    - name: jobId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    get:
+      operationId: getCatalogueImportJob
+      summary: Progress and findings of a catalogue import
+      description: '1.4.2. **The read `importProductCatalogue` points at.** Its `202` hands back the job
+        in `parsing`; this is where the job moves to `previewReady` with its findings, or to `failed`,
+        and where an operator reads those findings before `commitCatalogueImport`. After a commit it
+        reads `committed`, or `failed` with the partial application recorded (`states/catalogue-import-job.yaml`).
+
+        **Primary, not replica:** a job polled straight after it was created must not read as missing.
+
+        '
+      tags:
+      - catalogue
+      x-ticvai-permission: PRODUCT_VIEW
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      x-ticvai-read-routing: primary
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      responses:
+        '200':
+          description: The job
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CatalogueImportJob'
+        '404':
+          $ref: ../shared/common.yaml#/components/responses/NotFound
   /guest/memberships:
     get:
       operationId: listGuestMemberships
@@ -356,9 +441,14 @@ paths:
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/GuestMembership'
+                allOf:
+                - $ref: ../shared/common.yaml#/components/schemas/Page
+                - type: object
+                  properties:
+                    items:
+                      type: array
+                      items:
+                        $ref: '#/components/schemas/GuestMembership'
   /products/{productId}/versions:
     parameters:
     - name: productId
@@ -445,6 +535,9 @@ paths:
                   maxLength: 300
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Restored as a new version
           content:
             application/json:
@@ -490,9 +583,11 @@ paths:
               - change
               properties:
                 change:
-                  type: object
-                  additionalProperties: true
+                  allOf:
+                  - $ref: '#/components/schemas/UpdateProductRequest'
                   description: The proposed patch, in the shape `updateProduct` accepts.
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       responses:
         '200':
           description: Impact
@@ -568,11 +663,20 @@ paths:
                       - absolute
                       - setTo
                     value:
-                      type: number
+                      type: string
+                      pattern: ^-?\d+(\.\d{1,4})?$
+                      description: 'A decimal string, never a float (naming-and-style 5.1). Under `percentage`
+                        it is the percentage — `7` is a 7% rise, `-10` a 10% cut. Under `absolute` and `setTo`
+                        it is an amount in the region''s currency and scale, written as `Money.amount` is
+                        (ADR-0018); the currency is not sent because it cannot differ from the region''s.
+
+                        '
                     roundTo:
-                      type: number
+                      type: string
+                      pattern: ^\d+(\.\d{1,4})?$
                       nullable: true
-                      description: '**A 7% rise gives 53.61 and nobody prices a ticket at 53.61.** Rounding
+                      description: 'An increment in the region''s currency, as a decimal string (`0.5`, `5`).
+                        **A 7% rise gives 53.61 and nobody prices a ticket at 53.61.** Rounding
                         is part of the act, not a follow-up.
 
                         '
@@ -582,6 +686,9 @@ paths:
                   nullable: true
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Impact, or the applied result
           content:
             application/json:
@@ -594,7 +701,7 @@ paths:
       required: true
       schema:
         type: string
-        format: uuid
+        pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
     post:
       operationId: reinstateEntitlement
       summary: Lift a suspension
@@ -638,12 +745,14 @@ paths:
                   maxLength: 300
       responses:
         '200':
-          description: Reinstated
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: Reinstated. The entitlement as it now stands; `validTo` is not extended.
           content:
             application/json:
               schema:
-                type: object
-                additionalProperties: true
+                $ref: ../spine/access.yaml#/components/schemas/Entitlement
   /entitlements/{entitlementId}/freeze:
     parameters:
     - name: entitlementId
@@ -651,7 +760,7 @@ paths:
       required: true
       schema:
         type: string
-        format: uuid
+        pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
     post:
       operationId: freezeEntitlement
       summary: Pause a membership at the guest's request
@@ -708,12 +817,15 @@ paths:
                   - other
       responses:
         '200':
-          description: Frozen, with the new validity window
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: Frozen. The entitlement as it now stands, with its validity window in `validTo`
+            and the days a freeze has added in `frozenDays`.
           content:
             application/json:
               schema:
-                type: object
-                additionalProperties: true
+                $ref: ../spine/access.yaml#/components/schemas/Entitlement
   /products/{productId}/clone:
     parameters:
     - name: productId
@@ -764,6 +876,9 @@ paths:
                   default: false
       responses:
         '201':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Cloned as a draft
           content:
             application/json:
@@ -906,6 +1021,9 @@ paths:
               $ref: '#/components/schemas/DonationCampaign'
       responses:
         '201':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Created
           content:
             application/json:
@@ -944,6 +1062,9 @@ paths:
               $ref: '#/components/schemas/DonationCampaign'
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Updated
           content:
             application/json:
@@ -1012,6 +1133,9 @@ paths:
               $ref: '#/components/schemas/WaitlistEntry'
       responses:
         '201':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Joined
           content:
             application/json:
@@ -1052,6 +1176,9 @@ paths:
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       responses:
         '204':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Left
   /waitlist-entries/{entryId}/offer:
     parameters:
@@ -1083,6 +1210,9 @@ paths:
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Offered, and held for the configured window
           content:
             application/json:
@@ -1129,7 +1259,10 @@ paths:
       - partner
       x-ticvai-read-routing: replica
       summary: List products
-      description: 'Back-office use. **A terminal does not call this** — it reads the local bundle.
+      description: 'For guest, partner and back-office callers. **A point-of-sale terminal does not call
+        this on the server** — on a till it is answered from the local catalogue bundle (`getLatestBundle`,
+        ADR-0013), which is what `x-ticvai-offline-capable` means here. A till screen that lists this
+        operation is reading the bundle.
 
         '
       tags:
@@ -1138,8 +1271,8 @@ paths:
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: true
       x-ticvai-offline-note: '24 August: **servable from a local cache.** The device holds enough to answer
-        without the  network and the answer may be stale — which is correct for a catalogue and wrong
-        for conte nded state. `getSeatAvailability`, `getSeatHold` and `getPromotionUsage` are deliberately  excluded
+        without the network and the answer may be stale — which is correct for a catalogue and wrong
+        for contended state. `getSeatAvailability`, `getSeatHold` and `getPromotionUsage` are deliberately excluded
         - **a stale seat is a seat sold twice.**
 
         '
@@ -1204,6 +1337,9 @@ paths:
               $ref: '#/components/schemas/CreateProductRequest'
       responses:
         '201':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Created. Not sellable until published in a bundle.
           content:
             application/json:
@@ -1221,6 +1357,12 @@ paths:
         - "P02 GST-004 Attraction Details"
         - "P08 BO-161 Guest, Companion & Eligibility Rules"
       summary: 'Who may take part: age, height, supervision'
+      description: '**A product with no rule set answers `200`, not `404`.** The schema''s own reading
+        of absence is "anyone may take part", so an unset rule comes back with every limit null and every
+        other field at its default — the body a rule that limits nothing would return. `404` means the
+        product itself is unknown or outside the caller''s scope.
+
+        '
       tags:
       - product
       x-ticvai-permission: PRODUCT_VIEW
@@ -1240,6 +1382,8 @@ paths:
                 $ref: '#/components/schemas/ProductEligibilityRule'
         '403':
           $ref: ../shared/common.yaml#/components/responses/Forbidden
+        '404':
+          $ref: ../shared/common.yaml#/components/responses/NotFound
       x-ticvai-guest-callable: true
       parameters:
       - name: productId
@@ -1286,6 +1430,9 @@ paths:
               $ref: '#/components/schemas/ProductEligibilityRule'
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Saved
           content:
             application/json:
@@ -1326,6 +1473,8 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/EligibilityCheckRequest'
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       responses:
         '200':
           description: Per-guest result
@@ -1401,6 +1550,9 @@ paths:
               $ref: '#/components/schemas/GroupPackageDefinition'
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Saved
           content:
             application/json:
@@ -1447,9 +1599,14 @@ paths:
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/GroupPackageDefinition'
+                allOf:
+                - $ref: ../shared/common.yaml#/components/schemas/Page
+                - type: object
+                  properties:
+                    items:
+                      type: array
+                      items:
+                        $ref: '#/components/schemas/GroupPackageDefinition'
   /products/{productId}:
     parameters:
     - name: productId
@@ -1485,8 +1642,8 @@ paths:
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: true
       x-ticvai-offline-note: '24 August: **servable from a local cache.** The device holds enough to answer
-        without the  network and the answer may be stale — which is correct for a catalogue and wrong
-        for conte nded state. `getSeatAvailability`, `getSeatHold` and `getPromotionUsage` are deliberately  excluded
+        without the network and the answer may be stale — which is correct for a catalogue and wrong
+        for contended state. `getSeatAvailability`, `getSeatHold` and `getPromotionUsage` are deliberately excluded
         - **a stale seat is a seat sold twice.**
 
         '
@@ -1528,6 +1685,9 @@ paths:
               $ref: '#/components/schemas/UpdateProductRequest'
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Updated. Terminals see it after the next bundle.
           content:
             application/json:
@@ -1564,6 +1724,11 @@ paths:
         Variants are **materialised**, not computed at read time — a static product table cannot express
         the combinations, and runtime expansion makes pricing queries unusable at catalogue scale.
 
+        **What the PUT does.** The body is the product''s whole set of axes. A variant is its combination
+        of value codes (`ProductVariant.axisValues`): a combination that exists before and after keeps its
+        variant, `id`, `sku` and prices; one no longer reachable is retired; a new one is added. Axis
+        codes are unique within the body and value codes unique within an axis — a duplicate is a `400`.
+
         '
       tags:
       - product
@@ -1588,6 +1753,9 @@ paths:
                     $ref: '#/components/schemas/VariantDimension'
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Axes set, variants regenerated
           content:
             application/json:
@@ -1608,6 +1776,12 @@ paths:
                       reference them.
 
                       '
+        '400':
+          description: Two axes share a code, or one axis repeats a value code.
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
         '403':
           $ref: ../shared/common.yaml#/components/responses/Forbidden
         '409':
@@ -1652,8 +1826,8 @@ paths:
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: true
       x-ticvai-offline-note: '24 August: **servable from a local cache.** The device holds enough to answer
-        without the  network and the answer may be stale — which is correct for a catalogue and wrong
-        for conte nded state. `getSeatAvailability`, `getSeatHold` and `getPromotionUsage` are deliberately  excluded
+        without the network and the answer may be stale — which is correct for a catalogue and wrong
+        for contended state. `getSeatAvailability`, `getSeatHold` and `getPromotionUsage` are deliberately excluded
         - **a stale seat is a seat sold twice.**
 
         '
@@ -1738,6 +1912,9 @@ paths:
               $ref: '#/components/schemas/CreatePriceListRequest'
       responses:
         '201':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Created
           content:
             application/json:
@@ -1825,6 +2002,9 @@ paths:
                     $ref: '#/components/schemas/SetPriceRequest'
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Applied
           content:
             application/json:
@@ -1903,6 +2083,9 @@ paths:
               $ref: '#/components/schemas/CreateEventRequest'
       responses:
         '201':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Created
           content:
             application/json:
@@ -1941,8 +2124,8 @@ paths:
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: true
       x-ticvai-offline-note: '24 August: **servable from a local cache.** The device holds enough to answer
-        without the  network and the answer may be stale — which is correct for a catalogue and wrong
-        for conte nded state. `getSeatAvailability`, `getSeatHold` and `getPromotionUsage` are deliberately  excluded
+        without the network and the answer may be stale — which is correct for a catalogue and wrong
+        for contended state. `getSeatAvailability`, `getSeatHold` and `getPromotionUsage` are deliberately excluded
         - **a stale seat is a seat sold twice.**
 
         '
@@ -1950,11 +2133,13 @@ paths:
       parameters:
       - name: from
         in: query
+        description: Only performances whose `startsAt` is at or after this instant.
         schema:
           type: string
           format: date-time
       - name: to
         in: query
+        description: Only performances whose `startsAt` is before this instant.
         schema:
           type: string
           format: date-time
@@ -1962,7 +2147,8 @@ paths:
       - $ref: ../shared/common.yaml#/components/parameters/PageCursor
       responses:
         '200':
-          description: Performances
+          description: Performances, by `startsAt` ascending with `id` as the tiebreak — the order a
+            date-and-session picker shows them in, and the key the cursor pages on.
           content:
             application/json:
               schema:
@@ -2001,6 +2187,9 @@ paths:
               $ref: '#/components/schemas/CreatePerformancesRequest'
       responses:
         '201':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Created
           content:
             application/json:
@@ -2025,7 +2214,7 @@ paths:
       - staff
       - partner
       x-ticvai-read-routing: replica
-      summary: List capacity envelopes
+      summary: List channel capacities
       tags:
       - capacity
       x-ticvai-permission: PRODUCT_VIEW
@@ -2042,7 +2231,7 @@ paths:
       - $ref: ../shared/common.yaml#/components/parameters/PageCursor
       responses:
         '200':
-          description: Envelopes
+          description: Channel capacities
           content:
             application/json:
               schema:
@@ -2064,7 +2253,7 @@ paths:
       x-ticvai-audience:
       - staff
       - partner
-      summary: Create a capacity envelope
+      summary: Create a channel capacity
       tags:
       - capacity
       x-ticvai-permission: CAPACITY_CONFIGURE
@@ -2081,6 +2270,9 @@ paths:
               $ref: '#/components/schemas/CreateEnvelopeRequest'
       responses:
         '201':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Created
           content:
             application/json:
@@ -2140,11 +2332,16 @@ paths:
       x-ticvai-audience:
       - staff
       - partner
-      summary: Allocate envelope capacity across channels
+      summary: Allocate a channel capacity across sales channels
       description: 'Allocations may not exceed envelope capacity in total. An unallocated remainder forms
         a general pool any channel may draw from once its own allocation is exhausted.
 
         Reducing an allocation below what a channel has already sold is refused — the seats are gone.
+
+        **What the PUT does.** The body is the whole allocation set for this channel capacity, one entry
+        per channel: a channel left out has no allocation of its own and draws only from the general
+        pool, and leaving out a channel that has already sold is the reduction refused above. A channel
+        sent twice is a `400`.
 
         '
       tags:
@@ -2171,13 +2368,16 @@ paths:
                     $ref: '#/components/schemas/ChannelAllocation'
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Applied
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ChannelAllocationSet'
         '400':
-          description: Allocations exceed envelope capacity
+          description: Allocations exceed the channel capacity in total, or a channel appears twice
           content:
             application/problem+json:
               schema:
@@ -2257,15 +2457,20 @@ paths:
       - staff
       - guest
       x-ticvai-read-routing: replica
-      summary: List published bundles
+      summary: List published catalogue bundles
+      description: '**A catalogue bundle is the signed snapshot of a venue''s catalogue that terminals
+        pull** (ADR-0013) — not `promotions.Bundle`, the sellable product whose price differs from the
+        sum of its parts. `promotions.listBundles` lists those.
+
+        '
       tags:
       - bundle
       x-ticvai-permission: PRODUCT_VIEW
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: true
       x-ticvai-offline-note: '24 August: **servable from a local cache.** The device holds enough to answer
-        without the  network and the answer may be stale — which is correct for a catalogue and wrong
-        for conte nded state. `getSeatAvailability`, `getSeatHold` and `getPromotionUsage` are deliberately  excluded
+        without the network and the answer may be stale — which is correct for a catalogue and wrong
+        for contended state. `getSeatAvailability`, `getSeatHold` and `getPromotionUsage` are deliberately excluded
         - **a stale seat is a seat sold twice.**
 
         '
@@ -2329,6 +2534,9 @@ paths:
                     '
       responses:
         '201':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Published
           content:
             application/json:
@@ -2443,6 +2651,9 @@ paths:
                   type: string
       responses:
         '204':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Recorded
   /inventory-holds:
     get:
@@ -2454,7 +2665,7 @@ paths:
       x-ticvai-audience:
       - staff
       x-ticvai-read-routing: primary
-      summary: List leases
+      summary: List inventory holds
       description: 'Back-office monitoring. Surfaces stranded leases — capacity held by a terminal that
         died and will not return it until TTL expiry. At a gate during peak that is visible to a queue.
 
@@ -2484,7 +2695,7 @@ paths:
       - $ref: ../shared/common.yaml#/components/parameters/PageCursor
       responses:
         '200':
-          description: Leases
+          description: Inventory holds
           content:
             application/json:
               schema:
@@ -2499,17 +2710,17 @@ paths:
     post:
       operationId: acquireInventoryHold
       x-ticvai-consumed-by:
-        - "P01 WEB-006 Date & Session Selection"
-        - "P02 GST-009 Review & Payment"
         - "P04 POS-003 Sell — Timed Entry"
-        - "P05 KSK-005 Choose a session"
         - "P08 BO-018 Allocation & Holds"
       x-ticvai-audience:
       - staff
-      - guest
-      summary: Acquire an inventory lease
+      summary: Acquire an inventory hold
       description: 'Grants the caller N units of a capacity envelope for a TTL. The holder may sell against
         them without further server contact, including offline.
+
+        **Not a guest call.** A hold belongs to a workstation, and a guest session has none (`guestAuth`).
+        A guest''s cart takes its hold through `orders.addCartLine`, which acquires it server-side, and
+        `orders.checkoutCart` carries it into the order.
 
         Unsold units return automatically on expiry. Requesting more than remains returns a partial grant
         — the caller decides whether that is enough.
@@ -2527,14 +2738,14 @@ paths:
         - "cache:idempotency"
         - "platform.workstation"
       x-ticvai-lock-excludes-note: >
-        ADR-0037. **Resolved before the transaction opens, never inside the lock.** A Postgres row l
-        ock costs microseconds and this one measured six milliseconds — the difference was a Redis r
-        ound trip and a read the decision does not use. **A lock held across a hop is a lock held fo
-        r the latency of the slowest thing on the path.**
+        ADR-0037. **Resolved before the transaction opens, never inside the lock.** A Postgres row
+        lock costs microseconds and this one measured six milliseconds — the difference was a Redis
+        round trip and a read the decision does not use. **A lock held across a hop is a lock held
+        for the latency of the slowest thing on the path.**
       x-ticvai-lock-note: 'ADR-0031. **Two callers want the same row and both cannot have it.** Optimistic
-        retry under  contention is worse than a lock — at 5,000 RPS every retry is another read, and the
-        retry st orm is the outage. **SKIP LOCKED turns contention into throughput**: a buyer who cannot
-        get  seat 14 gets seat 15 in the same query rather than failing and retrying.
+        retry under contention is worse than a lock — at 5,000 RPS every retry is another read, and the
+        retry storm is the outage. **SKIP LOCKED turns contention into throughput**: a buyer who cannot
+        get seat 14 gets seat 15 in the same query rather than failing and retrying.
 
         '
       x-ticvai-offline-capable: false
@@ -2549,6 +2760,9 @@ paths:
               $ref: '#/components/schemas/AcquireLeaseRequest'
       responses:
         '201':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: 'Granted, wholly or partially. Always check `grantedUnits` against `requestedUnits`.
 
             '
@@ -2614,8 +2828,26 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/InventoryHold'
+        '400':
+          description: '`consumedUnits` is more than `grantedUnits`, or less than the consumption already
+            reported on this hold — units reported sold stay sold.
+
+            '
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
+        '409':
+          description: 'The hold is not `active`: it was already released, force-released or has expired,
+            and its units are already back in the pool. `states/lease.yaml` releases only an active hold.
+
+            '
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
   /inventory-holds/{inventoryHoldId}/renew:
     parameters:
     - name: inventoryHoldId
@@ -2631,7 +2863,7 @@ paths:
         - "P08 BO-018 Allocation & Holds"
       x-ticvai-audience:
       - staff
-      summary: Extend a lease TTL
+      summary: Extend an inventory hold's TTL
       description: 'Reports consumption so far and extends the hold. A holder renews while the link is
         up; if the link drops, the lease expires naturally and the units return.
 
@@ -2662,13 +2894,26 @@ paths:
                   description: Request more on top of the existing hold.
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Renewed
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/InventoryHold'
+        '400':
+          description: '`consumedUnits` is more than `grantedUnits`, or less than the consumption already
+            reported on this hold.
+
+            '
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
         '409':
-          description: Lease already expired. Acquire a new one.
+          description: The hold is not `active` — it expired, or was released or force-released. Acquire
+            a new one.
           content:
             application/problem+json:
               schema:
@@ -2687,7 +2932,7 @@ paths:
         - "P08 BO-018 Allocation & Holds"
       x-ticvai-audience:
       - staff
-      summary: Reclaim a stranded lease
+      summary: Reclaim a stranded inventory hold
       description: 'Supervisor action for a lease held by a terminal that has died. Reported consumption
         is honoured; the remainder returns immediately.
 
@@ -2717,6 +2962,9 @@ paths:
                   maxLength: 500
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Reclaimed and audited
           content:
             application/json:
@@ -2777,6 +3025,7 @@ paths:
                   type: object
                   required:
                   - channelCapacityId
+                  - performanceId
                   - capacity
                   - sold
                   - leased
@@ -2785,6 +3034,11 @@ paths:
                     channelCapacityId:
                       type: string
                       format: uuid
+                    performanceId:
+                      type: string
+                      format: uuid
+                      description: The performance this channel capacity belongs to (`ChannelCapacity.performanceId`),
+                        so rows for several performances can be told apart.
                     capacity:
                       type: integer
                     sold:
@@ -2878,6 +3132,9 @@ paths:
                   format: date-time
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Transitioned
           content:
             application/json:
@@ -2955,6 +3212,12 @@ paths:
       - staff
       - partner
       summary: Set external identifiers
+      description: '**What the PUT does.** The body is the product''s whole set of alternative codes: a
+        code left out is removed, a code sent is stored as sent, and an empty `codes` removes them all.
+        A code is unique per partner. Every `variantId` must be a variant of this product; one that
+        belongs to another product is a `400`.
+
+        '
       tags:
       - product
       x-ticvai-permission: PRODUCT_CONFIGURE
@@ -2978,6 +3241,9 @@ paths:
                     $ref: '#/components/schemas/AlternativeCode'
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Set
           content:
             application/json:
@@ -2985,6 +3251,13 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/AlternativeCode'
+        '400':
+          description: A `variantId` is not a variant of this product, or the body sends one code twice
+            for the same partner.
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
         '409':
           description: Code already mapped to a different product for that partner
           content:
@@ -3079,8 +3352,9 @@ paths:
       - staff
       - partner
       summary: Amend a price list
-      description: 'Currency and scale are immutable once prices exist. Changing them would silently reinterpret
-        every price in the list.
+      description: '**Currency and scale cannot be changed here.** They are resolved from the region
+        rather than stored on the list (ADR-0018), so the body has no field for either and no price in
+        the list can be silently reinterpreted.
 
         '
       tags:
@@ -3114,17 +3388,14 @@ paths:
                   type: boolean
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Updated
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/PriceList'
-        '409':
-          description: Currency or scale change attempted after prices exist
-          content:
-            application/problem+json:
-              schema:
-                $ref: ../shared/common.yaml#/components/schemas/Problem
   /price-lists/{priceListId}/copy:
     parameters:
     - name: priceListId
@@ -3174,8 +3445,10 @@ paths:
                   type: number
                   description: Applied to every copied price. Negative reduces.
                 roundTo:
-                  type: number
-                  description: Round adjusted prices to this increment, e.g. 0.5 or 5.
+                  type: string
+                  pattern: ^\d+(\.\d{1,4})?$
+                  description: Round adjusted prices to this increment, e.g. `0.5` or `5`. A decimal string
+                    in the region's currency, never a float (naming-and-style 5.1).
                 validFrom:
                   type: string
                   format: date-time
@@ -3184,6 +3457,9 @@ paths:
                   format: date-time
       responses:
         '201':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Copied
           content:
             application/json:
@@ -3267,6 +3543,9 @@ paths:
                   type: boolean
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Updated
           content:
             application/json:
@@ -3302,8 +3581,8 @@ paths:
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: true
       x-ticvai-offline-note: '24 August: **servable from a local cache.** The device holds enough to answer
-        without the  network and the answer may be stale — which is correct for a catalogue and wrong
-        for conte nded state. `getSeatAvailability`, `getSeatHold` and `getPromotionUsage` are deliberately  excluded
+        without the network and the answer may be stale — which is correct for a catalogue and wrong
+        for contended state. `getSeatAvailability`, `getSeatHold` and `getPromotionUsage` are deliberately excluded
         - **a stale seat is a seat sold twice.**
 
         '
@@ -3366,13 +3645,18 @@ paths:
                   format: uuid
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Updated
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Performance'
         '409':
-          description: Timing change attempted on a performance with sold tickets
+          description: A timing change on a performance with sold tickets, or a `status` move the state
+            model does not allow. This call moves `scheduled` to `onSale`, `onSale` to `suspended` and
+            `suspended` back to `onSale`, and nothing else (`states/performance.yaml`).
           content:
             application/problem+json:
               schema:
@@ -3441,11 +3725,23 @@ paths:
                   default: false
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Cancelled, or exposure reported when dry run
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/PerformanceCancellationResult'
+        '409':
+          description: 'The performance is `cancelled`, `completed` or `soldOut`. `states/performance.yaml`
+            cancels only from `scheduled`, `onSale` and `suspended`.
+
+            '
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
   /channel-capacities/{channelCapacityId}:
     parameters:
     - name: channelCapacityId
@@ -3464,7 +3760,7 @@ paths:
       x-ticvai-audience:
       - staff
       - partner
-      summary: Amend an envelope
+      summary: Amend a channel capacity
       description: 'Capacity may be increased freely. Reducing it below what has already sold is refused
         — the seats are gone, and pretending otherwise oversells the next guest.
 
@@ -3493,6 +3789,9 @@ paths:
                   minimum: 0
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Updated
           content:
             application/json:
@@ -3557,6 +3856,9 @@ paths:
               $ref: '#/components/schemas/EntitlementTemplate'
       responses:
         '201':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Created
           content:
             application/json:
@@ -3611,6 +3913,9 @@ paths:
                   description: Shown to the operator at the gate.
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Updated
           content:
             application/json:
@@ -3699,6 +4004,8 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/LifecycleStatusWorkflowConfigurationInput'
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       responses:
         '200':
           description: Lifecycle Status & Workflow Configuration
@@ -3742,6 +4049,8 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/BulkProductCreationCatalogueImportInput'
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       responses:
         '200':
           description: Bulk Product Creation & Catalogue Import
@@ -3823,6 +4132,8 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/ProductContextOwnershipAssignmentInput'
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       responses:
         '200':
           description: Product Context, Ownership & Assignment
@@ -3865,6 +4176,8 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/ChannelPublicationAvailabilityInput'
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       responses:
         '200':
           description: Channel Publication & Availability
@@ -3907,6 +4220,8 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/PublicationActivationSchedulerInput'
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       responses:
         '200':
           description: Publication & Activation Scheduler
@@ -3990,6 +4305,8 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/AiCatalogueBuilderConfigurationReviewInput'
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       responses:
         '200':
           description: AI Catalogue Builder & Configuration Review
@@ -4116,6 +4433,8 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/ApprovalWorkflowDesignerInput'
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       responses:
         '200':
           description: Approval Workflow Designer
@@ -4158,6 +4477,8 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/ApprovalReviewDecisionWorkspaceInput'
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       responses:
         '200':
           description: Approval Review & Decision Workspace
@@ -4501,6 +4822,8 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/ChannelCreationProfileConfigurationInput'
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       responses:
         '200':
           description: Channel Creation & Profile Configuration
@@ -4543,6 +4866,8 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/ProductCatalogueAssignmentInput'
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       responses:
         '200':
           description: Product & Catalogue Assignment
@@ -4586,6 +4911,8 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/ChannelPricingCommercialProfileAssignmentInput'
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       responses:
         '200':
           description: Channel Pricing & Commercial Profile Assignment
@@ -4782,6 +5109,8 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/ChannelFeesPaymentFulfillmentConfigurationInput'
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       responses:
         '200':
           description: Channel Fees, Payment & Fulfillment Configuration
@@ -4824,6 +5153,8 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/ChannelPublicationReadinessAiValidationInput'
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       responses:
         '200':
           description: Channel Publication, Readiness & AI Validation
@@ -5406,6 +5737,8 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/PriceListMasterConfigurationInput'
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       responses:
         '200':
           description: Price List Master Configuration
@@ -5487,6 +5820,8 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/RateStructureBuilderInput'
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       responses:
         '200':
           description: Rate Structure Builder
@@ -5529,6 +5864,8 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/ProductServicePriceAssignmentInput'
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       responses:
         '200':
           description: Product & Service Price Assignment
@@ -5649,6 +5986,8 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/PriceHierarchyInheritanceConfigurationInput'
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       responses:
         '200':
           description: Price Hierarchy & Inheritance Configuration
@@ -6233,6 +6572,8 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/TaxProfileJurisdictionConfigurationInput'
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       responses:
         '200':
           description: Tax Profile & Jurisdiction Configuration
@@ -6276,6 +6617,8 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/TaxRuleTreatmentBuilderInput'
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       responses:
         '200':
           description: Tax Rule & Treatment Builder
@@ -6356,6 +6699,8 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/FeeApplicabilityChargingRuleBuilderInput'
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       responses:
         '200':
           description: Fee Applicability & Charging Rule Builder
@@ -6513,6 +6858,8 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/PriceBreakdownCalculationSimulationExplainabilityInput'
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       responses:
         '200':
           description: Price Breakdown, Calculation Simulation & Explainability
@@ -6680,6 +7027,8 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/PricingChangeRequestWorkspaceInput'
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       responses:
         '200':
           description: Pricing Change Request & Workspace
@@ -6837,6 +7186,8 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/PricingApprovalWorkflowAuthorityMatrixInput'
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       responses:
         '200':
           description: Pricing Approval Workflow & Authority Matrix
@@ -6879,6 +7230,8 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/PricingPublicationEffectiveDateSchedulerInput'
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       responses:
         '200':
           description: Pricing Publication & Effective-Date Scheduler
@@ -7125,6 +7478,8 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/DynamicPricingStrategyBuilderInput'
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       responses:
         '200':
           description: Dynamic Pricing Strategy Builder
@@ -7168,6 +7523,8 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/DemandOccupancyAvailabilityRuleBuilderInput'
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       responses:
         '200':
           description: Demand, Occupancy & Availability Rule Builder
@@ -7211,6 +7568,8 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/BookingVelocityTimeToEventRuleBuilderInput'
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       responses:
         '200':
           description: Booking Velocity & Time-to-Event Rule Builder
@@ -7949,6 +8308,8 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/PricingSimulationStudioInput'
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       responses:
         '200':
           description: Pricing Simulation Studio
@@ -8029,6 +8390,8 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/ABPricingExperimentStudioInput'
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       responses:
         '200':
           description: A/B Pricing Experiment Studio
@@ -8186,6 +8549,8 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/LiveDynamicPriceExecutionDeploymentMonitorInput'
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       responses:
         '200':
           description: Live Dynamic Price Execution & Deployment Monitor
@@ -8323,6 +8688,9 @@ paths:
               $ref: '#/components/schemas/EventType'
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Set
           content:
             application/json:
@@ -8426,6 +8794,9 @@ paths:
               $ref: '#/components/schemas/EventSchedule'
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Set
           content:
             application/json:
@@ -8471,6 +8842,9 @@ paths:
               $ref: '#/components/schemas/EventReschedule'
       responses:
         '202':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Applied, and guests being notified
           content:
             application/json:
@@ -8526,6 +8900,9 @@ paths:
               $ref: '#/components/schemas/Space'
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Set
           content:
             application/json:
@@ -8570,6 +8947,9 @@ paths:
               $ref: '#/components/schemas/EventCapacityProfile'
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Set
           content:
             application/json:
@@ -8615,6 +8995,9 @@ paths:
               $ref: '#/components/schemas/EventRegistration'
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Set
           content:
             application/json:
@@ -8683,6 +9066,9 @@ paths:
               $ref: '#/components/schemas/EventResourcePlan'
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Set
           content:
             application/json:
@@ -8809,6 +9195,9 @@ paths:
               $ref: '#/components/schemas/SessionTemplate'
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Set
           content:
             application/json:
@@ -8845,6 +9234,9 @@ paths:
               $ref: '#/components/schemas/PrepaidMinutePackage'
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Set
           content:
             application/json:
@@ -8951,6 +9343,9 @@ paths:
               $ref: '#/components/schemas/CatalogueMembershipProgramme'
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Set
           content:
             application/json:
@@ -9002,6 +9397,9 @@ paths:
               $ref: '#/components/schemas/CatalogueMembershipBenefit'
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Set
           content:
             application/json:
@@ -9072,6 +9470,9 @@ paths:
                 $ref: '#/components/schemas/CataloguePlanBenefit'
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Set
           content:
             application/json:
@@ -9167,6 +9568,9 @@ paths:
               $ref: '#/components/schemas/DynamicPriceRuleDetail'
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Replace a rule, its conditions and its actions
           content:
             application/json:
@@ -10027,6 +10431,8 @@ components:
             '
         scopePath:
           type: string
+          readOnly: true
+          description: Set by the server from the venue the caller acts at; not sent.
         displayOrder:
           type: integer
           default: 100
@@ -10041,6 +10447,25 @@ components:
             names the products sold under it, and removing it rewrites last year''s report.
 
             '
+    ProductCategoryNode:
+      x-ticvai-persistence: none — projection over catalogue.product_category
+      description: '**One node of the tree `listProductCategories` returns.** A `ProductCategory` with
+        its children nested under it, in `displayOrder`, so no caller reassembles the hierarchy from
+        `parentId`. `setProductCategories` still takes the flat list, because a write names each parent
+        by id.
+
+        '
+      allOf:
+      - $ref: '#/components/schemas/ProductCategory'
+      - type: object
+        required:
+        - children
+        properties:
+          children:
+            type: array
+            description: Empty on a leaf.
+            items:
+              $ref: '#/components/schemas/ProductCategoryNode'
     CatalogueImportJob:
       type: object
       x-ticvai-persistence: catalogue.import_job
@@ -10121,7 +10546,8 @@ components:
       properties:
         entitlementId:
           type: string
-          format: uuid
+          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+          description: The `access.Entitlement.id` this membership is — a ULID, like every entitlement id.
         productId:
           type: string
           format: uuid
@@ -10351,7 +10777,11 @@ components:
         bulkRefundBatchId:
           type: string
           nullable: true
-          description: Queued for approval. Refunds are not issued automatically.
+          description: '**Null on this response.** The refund batch is created by `orders` when it consumes
+            `performance.cancelled` (F09), after this call has returned, and is queued there for approval
+            — refunds are not issued automatically. Read it from orders, not from here.
+
+            '
         notificationsQueued:
           type: integer
     EntitlementTemplate:
@@ -10371,6 +10801,8 @@ components:
         id:
           type: string
           format: uuid
+          readOnly: true
+          description: Assigned by the server on create; `createEntitlementTemplate` does not take it.
         code:
           type: string
           maxLength: 64
@@ -10633,6 +11065,7 @@ components:
           type: boolean
         scopePath:
           type: string
+          readOnly: true
           description: '**The partition key** (ADR-0005). Added 31 August: the operations that write this
             table declare a scope and the table carried no column for it — **49 tables were in that state**,
             so a row could be written at venue scope and then read by anything that could reach the table.
@@ -10642,7 +11075,7 @@ components:
             `uae.dubai.marina`, and one index answers every level of the walk.
 
 
-            **Operations write it at `venue` scope.**'
+            **Operations write it at `venue` scope.** Set by the server, never taken from a body.'
     ProductKind:
       type: string
       description: '**`openDated` added 24 August** from the client''s *Create Ticket Flow* board, which
@@ -10792,7 +11225,10 @@ components:
           type: integer
           minimum: 1
         status:
-          $ref: '#/components/schemas/WaitlistStatus'
+          allOf:
+          - $ref: '#/components/schemas/WaitlistStatus'
+          readOnly: true
+          description: Set by the server. `joinWaitlist` does not take it; a new entry is `waiting`.
         position:
           type: integer
           readOnly: true
@@ -10802,10 +11238,12 @@ components:
           type: string
           format: date-time
           nullable: true
+          readOnly: true
         offerExpiresAt:
           type: string
           format: date-time
           nullable: true
+          readOnly: true
           description: '**The offer moves on when this passes.** Notifying everyone at once produces a
             race the fastest guest wins; holding indefinitely for someone asleep leaves the seat unsold.
 
@@ -10817,7 +11255,9 @@ components:
     ProductEligibilityRule:
       type: object
       x-ticvai-persistence: catalogue.product_eligibility_rule
-      description: Participation limits for one product. Absent means anyone may take part.
+      description: Participation limits for one product. Absent means anyone may take part, and
+        `getProductEligibilityRule` returns that absence as this schema with every limit null, never as
+        a `404`.
       properties:
         id:
           type: string
@@ -11091,8 +11531,13 @@ components:
           $ref: '#/components/schemas/ProductLifecycleState'
         isSellable:
           type: boolean
+          readOnly: true
           description: 'True only when live **and** carried by a published bundle. Approval and publication
             are different acts.
+
+            **Derived, never set.** It changes when `transitionProductLifecycle` moves the product and when
+            `publishBundle` carries it, so `updateProduct` does not take it — `withdraw` is how a product
+            stops selling.
 
             '
         isStockTracked:
@@ -11192,8 +11637,6 @@ components:
           maxLength: 200
         description:
           type: string
-        isSellable:
-          type: boolean
         channels:
           type: array
           items:
@@ -11307,25 +11750,29 @@ components:
           type: string
           pattern: ^[A-Z]{3}$
           x-ticvai-persisted: false
-          description: "**Resolved from the region, not stored** (ADR-0018, 24 August). Region-scoped\
-            \ and not overri dable below, so a row in a UAE region is AED and cannot be anything else.\
-            \ **Kept on the wire , removed from the table** — a client should not walk a hierarchy to\
-            \ read a figure, and the  database should not hold nine million copies of AED. Four tables\
-            \ genuinely differ from their\n region and keep a stored currency: `orders.payment.tender_currency`,\
-            \ `inventory.supplier`, \n`ledger.account`, `control.partner_agreement`.\n"
+          description: '**Resolved from the region, not stored** (ADR-0018, 24 August). Region-scoped
+            and not overridable below, so a row in a UAE region is AED and cannot be anything else.
+            **Kept on the wire, removed from the table** — a client should not walk a hierarchy to
+            read a figure, and the database should not hold nine million copies of AED. Four tables
+            genuinely differ from their region and keep a stored currency: `orders.payment.tender_currency`,
+            `inventory.supplier`, `ledger.account`, `control.partner_agreement`.
+
+            '
         currencyScale:
           type: integer
           minimum: 0
           maximum: 4
           x-ticvai-persisted: false
-          description: "**Resolved from the region, not stored** (ADR-0018, 24 August). Region-scoped\
-            \ and not overri dable below, so a row in a UAE region is AED and cannot be anything else\
-            \ — storing it per ro w is a copy of a fact that cannot differ. **Kept on the wire, removed\
-            \ from the table**: a cl ient reading a figure should not walk a hierarchy to know what it\
-            \ means, and the database sh ould not hold nine million copies of AED. Four tables genuinely\
-            \ differ from their region and\n keep a stored currency — `orders.payment.tender_currency`,\
-            \ `inventory.supplier`, `ledger.ac\ncount`, `control.partner_agreement`. **A guest paying\
-            \ USD at an AED venue is a real row; a w orkstation with its own currency is a misconfiguration.**\n"
+          description: '**Resolved from the region, not stored** (ADR-0018, 24 August). Region-scoped
+            and not overridable below, so a row in a UAE region is AED and cannot be anything else
+            — storing it per row is a copy of a fact that cannot differ. **Kept on the wire, removed
+            from the table**: a client reading a figure should not walk a hierarchy to know what it
+            means, and the database should not hold nine million copies of AED. Four tables genuinely
+            differ from their region and keep a stored currency — `orders.payment.tender_currency`,
+            `inventory.supplier`, `ledger.account`, `control.partner_agreement`. **A guest paying
+            USD at an AED venue is a real row; a workstation with its own currency is a misconfiguration.**
+
+            '
         channels:
           type: array
           items:
@@ -11445,6 +11892,8 @@ components:
           description: For grouped events.
         performanceCount:
           type: integer
+          readOnly: true
+          description: How many performances the event has. Counted by the server; never sent by a client.
         isActive:
           type: boolean
     CreateEventRequest:
@@ -11547,7 +11996,11 @@ components:
           format: uuid
         recurrence:
           type: object
-          description: Generate a series rather than a single performance.
+          description: 'Generate a series rather than a single performance. **Read in the region''s time
+            zone**: the Region owns the zone and every venue inherits it without override (tenancy), so
+            `daysOfWeek` are the region''s calendar days and `until` is compared on the region''s clock.
+
+            '
           properties:
             intervalMinutes:
               type: integer
@@ -11609,10 +12062,13 @@ components:
           minimum: 0
         sold:
           type: integer
+          readOnly: true
         leased:
           type: integer
+          readOnly: true
         remaining:
           type: integer
+          readOnly: true
         hasChannelAllocations:
           type: boolean
           description: 'True where capacity is divided across channels. Leases then draw from a channel
@@ -11627,6 +12083,8 @@ components:
             '
     CreateEnvelopeRequest:
       type: object
+      description: The body of `createChannelCapacity`. **Named before the 26 August rename** (envelope
+        to `ChannelCapacity`); the name stays because generated code is keyed on it.
       required:
       - performanceId
       - name
@@ -11715,6 +12173,8 @@ components:
     BundleSummary:
       x-ticvai-persistence: none — projection over bundle
       type: object
+      description: One published catalogue bundle — the signed snapshot terminals pull (ADR-0013). Not
+        `promotions.Bundle`, which is a sellable product made of other products.
       required:
       - version
       - venueId
@@ -11799,6 +12259,11 @@ components:
           additionalProperties: true
     LeaseStatus:
       type: string
+      description: '`states/lease.yaml`. **`expired` is set by that model''s timer transition when `expiresAt`
+        passes without a renewal**, not by any operation in this contract. The job that runs the timer is
+        the sweeper ADR-0037 defers until it is designed.
+
+        '
       enum:
       - active
       - expired
@@ -11806,6 +12271,8 @@ components:
       - forceReleased
     AcquireLeaseRequest:
       type: object
+      description: The body of `acquireInventoryHold`. **Named before the 26 August rename** (lease to
+        `InventoryHold`); the name stays because generated code is keyed on it.
       required:
       - id
       - channelCapacityId

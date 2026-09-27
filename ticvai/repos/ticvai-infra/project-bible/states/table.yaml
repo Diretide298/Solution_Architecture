@@ -10,8 +10,7 @@ enumSchema: TableStatus
 owner: fnb
 initial:
 - free
-terminal:
-- outOfService
+terminal: []
 transitions:
 - from: free
   to: seated
@@ -25,7 +24,6 @@ transitions:
   guard: First order placed
 - from: ordered
   to: billRequested
-  operation: getGuestBill
   trigger: operation
   guard: Bill asked for
 - from: billRequested

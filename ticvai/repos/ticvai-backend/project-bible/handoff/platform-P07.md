@@ -9,12 +9,12 @@
 | Contracts | 5 |
 | Modules | 1 |
 | Undrawn | 0 |
-| Operations with no screen | 52 |
+| Operations with no screen | 55 |
 | Waves | wave1 11 |
 
 ## Gaps
 
-### 52 operations with no screen here
+### 55 operations with no screen here
 
 **In a contract this platform uses, callable by its audience, and reaching no screen on any platform serving that audience.** Either a screen is missing or the endpoint should not exist — and the second is worth considering first.
 
@@ -60,7 +60,7 @@
 | `getResaleFeePolicy` | orders | GET | The commission and price cap a resale listing is created under |
 | `issueInvitation` | orders | POST | Issue a complimentary entitlement, with no payment expected |
 | `listDeposits` | orders | GET | Deposits and their authorisation state |
-| … | | | 12 more |
+| … | | | 15 more |
 
 ## Modules
 

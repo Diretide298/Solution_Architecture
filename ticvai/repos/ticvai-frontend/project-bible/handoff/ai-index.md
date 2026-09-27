@@ -7,7 +7,7 @@
 | | |
 |---|---|
 | **Operations** | 33 |
-| **Schemas** | 23 |
+| **Schemas** | 34 |
 | **States** | 11 |
 | **Events** | 11 |
 | **Tables** | 51 |
@@ -55,7 +55,7 @@
 | `decideProposedAction` | POST |  | venue |
 | `generateConfiguration` | POST |  | venue |
 | `generateVenueLayout` | POST |  | venue |
-| `getAiPolicy` | GET |  | tenant |
+| `getAiPolicy` | GET |  | venue |
 | `getAiUsage` | GET |  | tenant |
 | `ingestKnowledgeDocument` | POST |  | tenant |
 | `listAiConversations` | GET |  | venue |
@@ -76,7 +76,7 @@
 | `semanticSearch` | POST |  | venue |
 | `sendAiMessage` | POST |  | venue |
 | `setAiCredential` | PUT |  | tenant |
-| `setAiPolicy` | PUT |  | tenant |
+| `setAiPolicy` | PUT |  | venue |
 | `setAiProvider` | PUT |  | region |
 | `setIndexSource` | PUT |  | tenant |
 | `setSuggestionProvider` | PUT |  | tenant |

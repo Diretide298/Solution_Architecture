@@ -1,9 +1,9 @@
 id: LLD-MarketingService
-title: MarketingService — 209 operations, 64 tables
+title: MarketingService — 213 operations, 70 tables
 generatedBy: tools/derive-diagrams.py
 tier: engagement
 index: diagrams/hld/02-services.yaml
-why: '**93 operations and 37 tables — the biggest thing in the package, and probably two services eventually.**
+why: '**213 operations and 70 tables — the biggest thing in the package, and probably two services eventually.**
   CRM and campaigns have different write patterns: a guest profile is read constantly and written rarely;
   a campaign send is a burst of millions of rows nobody reads again.
 
@@ -12,20 +12,20 @@ why: '**93 operations and 37 tables — the biggest thing in the package, and pr
 scale: Bursty on send, read-heavy otherwise. **The one to watch for a split.**
 ifDown: Down stops campaigns and guest lookup. Neither stops trading.
 coverage:
-  operations: 209
-  inAFlow: 39
-  percent: 41%
+  operations: 213
+  inAFlow: 109
+  percent: 51%
   note: '**Flow coverage is how much of this service a journey has walked.** A service under 40% is
     unwalked rather than under-documented.'
 schemas:
 - schema: marketing
-  tables: 64
+  tables: 70
   stores:
   - postgres
   largestTable: marketing.guest_profile
 operationsByContract:
 - contract: marketing-crm
-  count: 209
+  count: 213
   operations:
   - operation: accrueLoyaltyPoints
     verb: POST
@@ -49,7 +49,7 @@ operationsByContract:
     scope: venue
     permission: MARKETING_SEND
     offline: false
-    reads: 2
+    reads: 3
     writes: 2
   - operation: addCaseMessage
     verb: POST
@@ -65,7 +65,7 @@ operationsByContract:
     scope: venue
     permission: GUEST_MANAGE
     offline: true
-    reads: 2
+    reads: 3
     writes: 1
   - operation: addSuppression
     verb: POST
@@ -129,7 +129,7 @@ operationsByContract:
     scope: tenant
     permission: CASE_MANAGE
     offline: false
-    reads: 4
+    reads: 5
     writes: 2
   - operation: closeConversation
     verb: POST
@@ -137,7 +137,7 @@ operationsByContract:
     scope: tenant
     permission: CASE_MANAGE
     offline: false
-    reads: 3
+    reads: 4
     writes: 3
   - operation: createCampaign
     verb: POST
@@ -177,8 +177,8 @@ operationsByContract:
     scope: venue
     permission: MARKETING_MANAGE
     offline: false
-    reads: 3
-    writes: 2
+    reads: 4
+    writes: 3
   - operation: createInvitationCampaign
     verb: POST
     path: /invitation-campaigns
@@ -193,16 +193,16 @@ operationsByContract:
     scope: venue
     permission: MARKETING_MANAGE
     offline: false
-    reads: 3
-    writes: 2
+    reads: 4
+    writes: 3
   - operation: createLoyaltyProgramme
     verb: POST
     path: /loyalty/programmes
     scope: tenant
     permission: MARKETING_MANAGE
     offline: false
-    reads: 3
-    writes: 3
+    reads: 4
+    writes: 4
   - operation: createMessageTemplate
     verb: POST
     path: /message-templates
@@ -305,7 +305,7 @@ operationsByContract:
     scope: venue
     permission: GUEST_VIEW
     offline: false
-    reads: 1
+    reads: 2
     writes: 0
   - operation: getConversation
     verb: GET
@@ -313,7 +313,15 @@ operationsByContract:
     scope: tenant
     permission: CASE_VIEW
     offline: false
-    reads: 3
+    reads: 4
+    writes: 0
+  - operation: getForm
+    verb: GET
+    path: /forms/{formId}
+    scope: venue
+    permission: GUEST_VIEW
+    offline: false
+    reads: 2
     writes: 0
   - operation: getGuestAttributeModel
     verb: GET
@@ -451,6 +459,22 @@ operationsByContract:
     offline: false
     reads: 2
     writes: 0
+  - operation: getMyProfile
+    verb: GET
+    path: /guests/me/profile
+    scope: subject
+    permission: GUEST_VIEW
+    offline: false
+    reads: 2
+    writes: 0
+  - operation: getSeoMetadata
+    verb: GET
+    path: /seo-metadata
+    scope: tenant
+    permission: MARKETING_VIEW
+    offline: false
+    reads: 1
+    writes: 0
   - operation: getSuppressionList
     verb: GET
     path: /consent/suppression-list
@@ -481,7 +505,7 @@ operationsByContract:
     scope: tenant
     permission: null
     offline: false
-    reads: 4
+    reads: 5
     writes: 3
   - operation: identifyGuest
     verb: POST
@@ -617,7 +641,7 @@ operationsByContract:
     scope: tenant
     permission: GUEST_VIEW
     offline: true
-    reads: 2
+    reads: 3
     writes: 1
   - operation: listContact
     verb: GET
@@ -641,7 +665,7 @@ operationsByContract:
     scope: tenant
     permission: CASE_VIEW
     offline: false
-    reads: 3
+    reads: 4
     writes: 0
   - operation: listCookieBannerPreference
     verb: GET
@@ -787,6 +811,14 @@ operationsByContract:
     offline: false
     reads: 0
     writes: 0
+  - operation: listForms
+    verb: GET
+    path: /forms
+    scope: venue
+    permission: MARKETING_VIEW
+    offline: false
+    reads: 2
+    writes: 0
   - operation: listGuestDevices
     verb: GET
     path: /guests/{subjectId}/devices
@@ -809,7 +841,7 @@ operationsByContract:
     scope: venue
     permission: MARKETING_VIEW
     offline: false
-    reads: 1
+    reads: 2
     writes: 0
   - operation: listLeaderboard
     verb: GET
@@ -849,7 +881,7 @@ operationsByContract:
     scope: venue
     permission: MARKETING_VIEW
     offline: true
-    reads: 2
+    reads: 3
     writes: 0
   - operation: listMessageTemplates
     verb: GET
@@ -1161,7 +1193,7 @@ operationsByContract:
     scope: venue
     permission: MARKETING_MANAGE
     offline: false
-    reads: 2
+    reads: 3
     writes: 2
   - operation: previewSegment
     verb: POST
@@ -1249,7 +1281,7 @@ operationsByContract:
     scope: tenant
     permission: null
     offline: false
-    reads: 2
+    reads: 3
     writes: 2
   - operation: respondToInvitation
     verb: POST
@@ -1305,8 +1337,8 @@ operationsByContract:
     scope: tenant
     permission: CASE_MANAGE
     offline: false
-    reads: 3
-    writes: 3
+    reads: 4
+    writes: 4
   - operation: sendTransactionalMessage
     verb: POST
     path: /messages
@@ -1321,7 +1353,7 @@ operationsByContract:
     scope: tenant
     permission: CASE_MANAGE
     offline: false
-    reads: 2
+    reads: 3
     writes: 2
   - operation: setBadge
     verb: PUT
@@ -1377,8 +1409,8 @@ operationsByContract:
     scope: tenant
     permission: GUEST_MANAGE
     offline: false
-    reads: 2
-    writes: 3
+    reads: 3
+    writes: 4
   - operation: setCustomerServiceCopilot
     verb: PUT
     path: /customer-service-copilot
@@ -1641,7 +1673,7 @@ operationsByContract:
     scope: tenant
     permission: CASE_MANAGE
     offline: false
-    reads: 4
+    reads: 5
     writes: 2
   - operation: unscheduleCampaign
     verb: POST
@@ -1649,7 +1681,7 @@ operationsByContract:
     scope: venue
     permission: MARKETING_MANAGE
     offline: false
-    reads: 2
+    reads: 3
     writes: 2
   - operation: updateCampaign
     verb: PATCH
@@ -1673,8 +1705,8 @@ operationsByContract:
     scope: tenant
     permission: GUEST_MANAGE
     offline: false
-    reads: 2
-    writes: 2
+    reads: 3
+    writes: 3
   - operation: updateGuestProfile
     verb: PATCH
     path: /guests/{subjectId}
@@ -1705,17 +1737,165 @@ tables:
   columns: 5
   backing: redis
   owned: false
-  why: '**Not a table and not owned by a service.** Derived from something already read, invalidated
-    by an event already consumed, losable without consequence — no migration, no backup, no owner.'
+  why: '**Not a table and not owned by a service.** Derived from something already read, losable without
+    consequence — no migration, no backup, no owner.'
+  key: The idempotency key the caller sent
+  eviction:
+  - 'expires_at: **Must exceed the longest offline window.** A scanner out for a weekend replays on
+    Monday'
+  writtenBy:
+  - accrueLoyaltyPoints
+  - activateJourney
+  - addCaseMessage
+  - addGuestNote
+  - addSuppression
+  - addToWishlist
+  - adjustLoyaltyPoints
+  - claimConversation
+  - closeConversation
+  - createCampaign
+  - createCase
+  - createChallenge
+  - createForm
+  - createInvitationCampaign
+  - createJourney
+  - createLoyaltyProgramme
+  - createMessageTemplate
+  - createReferral
+  - createSegment
+  - createUrlRedirect
+  - decideGuestCheckoutMatch
+  - endKioskAssist
+  - escalateCase
+  - handoverToAgent
+  - launchCampaign
+  - matchLostItem
+  - mergeGuestProfiles
+  - mergeGuests
+  - pauseCampaign
+  - previewSegment
+  - raiseMyCase
+  - recordConsent
+  - recordLostItem
+  - recordPrivacyIncident
+  - recordTouchPoint
+  - redeemLoyaltyPoints
+  - registerGuestDevice
+  - removeFromWishlist
+  - reopenCase
+  - replyToMyCase
+  - respondToInvitation
+  - respondToReview
+  - retryMessageDispatch
+  - revokeGuestDevice
+  - sendConversationMessage
+  - sendTransactionalMessage
+  - setAgentAvailability
+  - setCallDisposition
+  - setConsentPurposes
+  - setMessageTrigger
+  - setSeoMetadata
+  - startKioskAssist
+  - stopCampaign
+  - submitForm
+  - submitReview
+  - testSendCampaign
+  - transferConversation
+  - unscheduleCampaign
+  - updateCampaign
+  - updateCase
+  - updateGuestPreferences
+  - updateGuestProfile
+  - updateMyProfile
+  - uploadGuestDocument
+  readBy:
+  - accrueLoyaltyPoints
+  - activateJourney
+  - addCaseMessage
+  - addGuestNote
+  - addSuppression
+  - addToWishlist
+  - adjustLoyaltyPoints
+  - claimConversation
+  - closeConversation
+  - createCampaign
+  - createCase
+  - createChallenge
+  - createForm
+  - createInvitationCampaign
+  - createJourney
+  - createLoyaltyProgramme
+  - createMessageTemplate
+  - createReferral
+  - createSegment
+  - createUrlRedirect
+  - decideGuestCheckoutMatch
+  - endKioskAssist
+  - escalateCase
+  - handoverToAgent
+  - launchCampaign
+  - matchLostItem
+  - mergeGuestProfiles
+  - mergeGuests
+  - pauseCampaign
+  - previewSegment
+  - raiseMyCase
+  - recordConsent
+  - recordLostItem
+  - recordPrivacyIncident
+  - recordTouchPoint
+  - redeemLoyaltyPoints
+  - registerGuestDevice
+  - removeFromWishlist
+  - reopenCase
+  - replyToMyCase
+  - respondToInvitation
+  - respondToReview
+  - retryMessageDispatch
+  - revokeGuestDevice
+  - sendConversationMessage
+  - sendTransactionalMessage
+  - setAgentAvailability
+  - setCallDisposition
+  - setConsentPurposes
+  - setMessageTrigger
+  - setSeoMetadata
+  - startKioskAssist
+  - stopCampaign
+  - submitForm
+  - submitReview
+  - testSendCampaign
+  - transferConversation
+  - unscheduleCampaign
+  - updateCampaign
+  - updateCase
+  - updateGuestPreferences
+  - updateGuestProfile
+  - updateMyProfile
+  - uploadGuestDocument
 - store: cache:resolution
   kind: cache
   columns: 4
   backing: redis
   owned: false
-  why: '**Not a table and not owned by a service.** Derived from something already read, invalidated
-    by an event already consumed, losable without consequence — no migration, no backup, no owner.'
+  why: '**Not a table and not owned by a service.** Derived from something already read, losable without
+    consequence — no migration, no backup, no owner.'
+  key: scope_path + what is being resolved — permissions, configuration, a price list
+  eviction:
+  - 'version: Bumped by the write that evicts it. **A config change nobody evicts is a stale permission**'
+  writtenBy:
+  - createUrlRedirect
+  - listConsentPurposes
+  - setConsentPurposes
+  - setSeoMetadata
+  readBy:
+  - listConsentPurposes
+  gap: '**The lineage names this store, not the key.** Which resolution entry each writer below evicts
+    or bumps — permissions, configuration, a price list, and whether child scopes under its `scope_path`
+    are affected — is not recorded for any operation, so a writer here cannot yet be implemented from
+    the package alone.'
 - table: marketing.agent_availability
-  columns: 2
+  columns: 7
   store: postgres
   parent: null
   writtenBy:
@@ -1749,7 +1929,7 @@ tables:
   - marketing-crm
   foreignWriters: null
 - table: marketing.campaign
-  columns: 20
+  columns: 19
   store: postgres
   parent: null
   writtenBy:
@@ -1762,21 +1942,21 @@ tables:
   writtenBy: []
   foreignWriters: null
 - table: marketing.case
-  columns: 19
+  columns: 21
   store: postgres
   parent: null
   writtenBy:
   - marketing-crm
   foreignWriters: null
 - table: marketing.case_message
-  columns: 10
+  columns: 11
   store: postgres
   parent: marketing.case
   writtenBy:
   - marketing-crm
   foreignWriters: null
 - table: marketing.challenge
-  columns: 13
+  columns: 14
   store: postgres
   parent: null
   writtenBy:
@@ -1795,6 +1975,13 @@ tables:
   writtenBy:
   - marketing-crm
   foreignWriters: null
+- table: marketing.consent_purpose_channel
+  columns: 3
+  store: postgres
+  parent: marketing.consent_purpose
+  writtenBy:
+  - marketing-crm
+  foreignWriters: null
 - table: marketing.consent_record
   columns: 9
   store: postgres
@@ -1806,6 +1993,12 @@ tables:
   foreignWriters:
   - access
   - orders
+- table: marketing.consent_record_channel
+  columns: 3
+  store: postgres
+  parent: marketing.consent_record
+  writtenBy: []
+  foreignWriters: null
 - table: marketing.conversation
   columns: 21
   store: postgres
@@ -1817,6 +2010,13 @@ tables:
   columns: 8
   store: postgres
   parent: marketing.conversation
+  writtenBy:
+  - marketing-crm
+  foreignWriters: null
+- table: marketing.conversation_message_attachment
+  columns: 4
+  store: postgres
+  parent: marketing.conversation_message
   writtenBy:
   - marketing-crm
   foreignWriters: null
@@ -1840,8 +2040,15 @@ tables:
   writtenBy:
   - marketing-crm
   foreignWriters: null
-- table: marketing.form_submission
+- table: marketing.form_definition_field
   columns: 11
+  store: postgres
+  parent: marketing.form_definition
+  writtenBy:
+  - marketing-crm
+  foreignWriters: null
+- table: marketing.form_submission
+  columns: 12
   store: postgres
   parent: null
   writtenBy:
@@ -1855,7 +2062,7 @@ tables:
   - marketing-crm
   foreignWriters: null
 - table: marketing.guest_device
-  columns: 13
+  columns: 14
   store: postgres
   parent: null
   writtenBy:
@@ -1903,8 +2110,21 @@ tables:
   writtenBy:
   - marketing-crm
   foreignWriters: null
+- table: marketing.guest_note
+  columns: 9
+  store: postgres
+  parent: null
+  writtenBy: []
+  foreignWriters: null
+- table: marketing.guest_preference
+  columns: 7
+  store: postgres
+  parent: null
+  writtenBy:
+  - marketing-crm
+  foreignWriters: null
 - table: marketing.guest_profile
-  columns: 22
+  columns: 23
   store: postgres
   parent: null
   writtenBy:
@@ -1952,10 +2172,11 @@ tables:
   writtenBy: []
   foreignWriters: null
 - table: marketing.journey_step
-  columns: 14
+  columns: 20
   store: postgres
   parent: marketing.journey
-  writtenBy: []
+  writtenBy:
+  - marketing-crm
   foreignWriters: null
 - table: marketing.kiosk_assist_session
   columns: 10
@@ -1965,7 +2186,7 @@ tables:
   - marketing-crm
   foreignWriters: null
 - table: marketing.lost_item
-  columns: 14
+  columns: 17
   store: postgres
   parent: null
   writtenBy:
@@ -1979,7 +2200,7 @@ tables:
   - marketing-crm
   foreignWriters: null
 - table: marketing.loyalty_points
-  columns: 12
+  columns: 14
   store: postgres
   parent: null
   writtenBy:
@@ -2013,7 +2234,7 @@ tables:
   writtenBy: []
   foreignWriters: null
 - table: marketing.message_dispatch
-  columns: 10
+  columns: 15
   store: postgres
   parent: null
   writtenBy:
@@ -2065,7 +2286,7 @@ tables:
   - marketing-crm
   foreignWriters: null
 - table: marketing.programme_tier
-  columns: 9
+  columns: 11
   store: postgres
   parent: null
   writtenBy:
@@ -2174,9 +2395,9 @@ readsFrom:
   operations: 6
 - service: OrderService
   operations: 5
-- service: AccessService
-  operations: 2
 - service: PlatformService
+  operations: 3
+- service: AccessService
   operations: 2
 - service: VenueOpsService
   operations: 2
@@ -2185,16 +2406,57 @@ readsFrom:
 writesOutside:
 - service: IdentityService
   operations: 2
-  why: '**The owner defines the row; this service may only append to it.**'
+  rule: 'ADR-0028: the owner defines the row; a foreign writer may only append, through a path the owner
+    published.'
+  why: '**The lineage records these writes, not how they honour the rule.** It does not say whether
+    each inserts or updates, or which operation or event IdentityService published for it — check each
+    against ADR-0028.'
+  writes:
+  - operation: mergeGuests
+    tables:
+    - pii.subject
+  - operation: updateMyProfile
+    tables:
+    - pii.subject
 - service: OrderService
   operations: 2
-  why: '**The owner defines the row; this service may only append to it.**'
+  rule: 'ADR-0028: the owner defines the row; a foreign writer may only append, through a path the owner
+    published.'
+  why: '**The lineage records these writes, not how they honour the rule.** It does not say whether
+    each inserts or updates, or which operation or event OrderService published for it — check each
+    against ADR-0028.'
+  writes:
+  - operation: decideGuestCheckoutMatch
+    tables:
+    - orders.cart
+  - operation: redeemLoyaltyPoints
+    tables:
+    - orders.stored_value_authorisation
 - service: PlatformService
   operations: 2
-  why: '**The owner defines the row; this service may only append to it.**'
+  rule: 'ADR-0028: the owner defines the row; a foreign writer may only append, through a path the owner
+    published.'
+  why: '**The lineage records these writes, not how they honour the rule.** It does not say whether
+    each inserts or updates, or which operation or event PlatformService published for it — check each
+    against ADR-0028.'
+  writes:
+  - operation: createUrlRedirect
+    tables:
+    - control.url_redirect
+  - operation: setSeoMetadata
+    tables:
+    - control.seo_metadata
 - service: TenancyService
   operations: 1
-  why: '**The owner defines the row; this service may only append to it.**'
+  rule: 'ADR-0028: the owner defines the row; a foreign writer may only append, through a path the owner
+    published.'
+  why: '**The lineage records these writes, not how they honour the rule.** It does not say whether
+    each inserts or updates, or which operation or event TenancyService published for it — check each
+    against ADR-0028.'
+  writes:
+  - operation: handoverToAgent
+    tables:
+    - platform.outbox
 screens:
 - P01:WEB-009 Wishlist
 - P01:WEB-011 Guest Details & Attendee Forms

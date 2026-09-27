@@ -1,5 +1,5 @@
 id: LLD-queue
-title: queue — 21 operations
+title: queue — 22 operations
 generatedBy: tools/derive-diagrams.py
 index: diagrams/hld/03-contracts.yaml
 tier: satellite
@@ -44,9 +44,11 @@ operations:
   reads:
   - cache:idempotency
   - queue.queue
+  - queue.queue_operating_window
   writes:
   - cache:idempotency
   - queue.queue
+  - queue.queue_operating_window
 - operation: getQueue
   verb: GET
   path: /queues/{queueId}
@@ -57,6 +59,7 @@ operations:
   offline: true
   reads:
   - queue.queue
+  - queue.queue_operating_window
   writes: []
 - operation: getQueueFeedHealth
   verb: GET
@@ -145,6 +148,17 @@ operations:
   writes:
   - cache:idempotency
   - queue.entry
+- operation: listMyWaitingGuests
+  verb: GET
+  path: /waiting-guests
+  scope: venue
+  permission: null
+  audience:
+  - guest
+  offline: false
+  reads:
+  - queue.entry
+  writes: []
 - operation: listQueueEntries
   verb: GET
   path: /queues/{queueId}/entries
@@ -178,6 +192,7 @@ operations:
   offline: true
   reads:
   - queue.queue
+  - queue.queue_operating_window
   writes: []
 - operation: overrideWaitingGuest
   verb: POST
@@ -218,6 +233,7 @@ operations:
   reads:
   - cache:idempotency
   - queue.queue
+  - queue.queue_operating_window
   writes:
   - cache:idempotency
   - queue.queue
@@ -274,6 +290,7 @@ operations:
   reads:
   - cache:idempotency
   - queue.queue
+  - queue.queue_operating_window
   writes:
   - cache:idempotency
   - queue.queue

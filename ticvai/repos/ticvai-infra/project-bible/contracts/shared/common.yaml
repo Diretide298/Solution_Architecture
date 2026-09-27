@@ -43,7 +43,13 @@ components:
     PageCursor:
       name: cursor
       in: query
-      description: Opaque cursor from a previous page. Absent on first request.
+      description: 'Opaque cursor: the `nextCursor` of the previous page. Absent on first request.
+        **A keyset position, not an offset.** It names the last item returned in the list''s order,
+        with the item id as the tiebreak, so rows written between two page requests neither repeat
+        nor go missing. That drift is the reason offset paging is refused. Clients never build or
+        parse a cursor.
+
+        '
       schema:
         type: string
     IdempotencyKey:
@@ -52,6 +58,22 @@ components:
       required: true
       description: 'Client-generated ULID. Servers deduplicate on this value. Required on every mutating
         request because offline clients replay their outbox on reconnect.
+
+
+        **One key per write, and it governs replay.**
+
+        - **A replay gets the first answer.** A request that repeats a key the server has already
+        completed gets the stored original response (status and body), and nothing is written a
+        second time (backend-patterns: `IIdempotencyStore`).
+
+        - **A body ULID `id` is the same key.** An edge-created entity''s client ULID "doubles as the
+        idempotency key" (naming-and-style §4), so where a create body carries a client `id`, it
+        must equal this header. A request whose header and body `id` differ is a `400` with problem
+        type `validation`.
+
+        - **A reused key with a different request is a `409`.** The same key sent with a different
+        body, or a body `id` that already exists under another key, is the shared `Conflict`
+        response with problem type `idempotency-conflict`. It never applies the second request.
 
         '
       schema:
@@ -65,9 +87,32 @@ components:
         has caught up past this position, or to the primary. Prevents a ticket sold at the gate being
         refused by a lagging replica seconds later.
 
+
+        The value comes from the `X-Consistency-Token` response header of that write, declared once
+        as the shared header `ConsistencyToken` below.
+
         '
       schema:
         type: string
+  headers:
+    ConsistencyToken:
+      description: 'WAL LSN of the write that produced this response. A client that reads its own
+        write next passes it back as the `X-Consistency-Token` request parameter. Declared here so
+        a write response references one definition, `$ref: ''../shared/common.yaml#/components/headers/ConsistencyToken''`,
+        rather than repeating an untyped header.
+
+        '
+      schema:
+        type: string
+    RetryAfter:
+      description: 'Whole seconds to wait before retrying. **A real figure, jittered** (ADR-0032). A fixed
+        value synchronises every client into the same retry instant. An offline till treats a `429`
+        as *retry later*, never as a sync rejection.
+
+        '
+      schema:
+        type: integer
+        minimum: 0
   schemas:
     StoredValueKind:
       type: string
@@ -226,13 +271,20 @@ components:
         '
     ScopeLevel:
       type: string
-      description: '**The eight organisational levels, and the shared copy of them.** Restored 24 August.
+      description: '**The eight organisational levels, plus `subject`.** Restored 24 August.
 
-        `tenancy.yaml` holds the authoritative definition and this mirrors it so a contract can reference
+        `tenancy.yaml` holds the authoritative definition of the eight levels and this mirrors them so a contract can reference
         a level without depending on the whole tenancy surface. **Seven organisational levels plus `outlet`**
         — a commercial branch beside the organisational one (CF-138, ADR-0018). **A department has requisitions
         and rotas; an outlet has a menu and stock**, and modelling a restaurant as a department would
         put it in the staffing tree.
+
+
+        **`subject` is the one value tenancy does not have, and it is not a level.** It is here because
+        `check-package` reads this enum as the closed vocabulary for `x-ticvai-scope-level`, and some
+        operations act on one guest''s own resources, which sit in no node of the venue hierarchy.
+        So `subject` is valid as an operation''s scope level and never as a `ScopeRef.level`: every
+        `ScopeRef` is a row of `platform.scope`, and those carry one of the eight.
 
         '
       enum:
@@ -252,8 +304,8 @@ components:
 
         **The path is materialised**, so a client can test containment with a prefix match rather than
         walking parents. That is what lets navigation filter locally: a client checks its scopes against
-        a screen''s requirement without a round trip, and `platform.org_unit` — reached by 304 of 379
-        tables — never has to be queried to answer it.
+        a screen''s requirement without a round trip, and `platform.scope` (renamed from `platform.org_unit`
+        on 26 August) — reached by 304 of 379 tables — never has to be queried to answer it.
 
         '
       required:
@@ -272,11 +324,13 @@ components:
 
             '
         code:
-          type: string
-          nullable: true
+          type:
+          - string
+          - 'null'
         name:
-          type: string
-          nullable: true
+          type:
+          - string
+          - 'null'
     Money:
       type: object
       x-ticvai-persistence-kind: valueObject
@@ -329,7 +383,73 @@ components:
           maximum: 4
     Problem:
       type: object
-      description: RFC 9457 problem details. Every error response uses this shape.
+      description: 'RFC 9457 problem details. Every error response uses this shape.
+
+
+        **`type` is what a client switches on, so every cause has its own.** `status` says only how
+        bad; one `409` can be a paid order, a closed period or an expiring hold, and a client that
+        has to read `detail` to tell them apart is parsing prose. The rules:
+
+        - **Shared types are catalogued here**, in `x-ticvai-problem-types` below, and each shared
+        response names the types it can carry.
+
+        - **An operation-specific error declares its own type**, one per cause. It lists the type
+        slug in `x-ticvai-problem-types` on that response, beside its description. A response whose
+        description names several causes lists several types.
+
+        - **Every type URI has one form**: `https://api.ticvai.com/problems/<slug>`, the slug kebab-case.
+        The URI identifies the type; clients compare it, never fetch it.
+
+        - **Detail beyond these fields goes in an extension schema**, `allOf: [Problem, {...}]` with
+        the extra members, as `StackingProblem` and `SeatConflictProblem` already do. An error whose
+        description promises structured detail (which lines, which candidates, which conflict) and
+        points at the bare `Problem` has nowhere to put it.
+
+        - **`errors[]` is for field-level validation**, one entry per failing field, `code` naming
+        the rule that failed.
+
+        '
+      x-ticvai-problem-types:
+        validation:
+          status: 400
+          title: Validation failed
+          when: The request is malformed or breaks a schema rule. `errors[]` names each failing field.
+        unauthenticated:
+          status: 401
+          title: Not signed in
+          when: No session token, or one that is invalid or expired.
+        session-superseded:
+          status: 401
+          title: Session ended
+          when: The session was ended by a force-logout (ADR-0004). The client signs in again rather
+            than refreshing.
+        forbidden:
+          status: 403
+          title: Not permitted
+          when: Authenticated, but the permission is not held at the requested scope.
+        not-found:
+          status: 404
+          title: Not found
+          when: The addressed resource does not exist or is outside the caller's scope. The two
+            are deliberately indistinguishable.
+        idempotency-conflict:
+          status: 409
+          title: Idempotency key reused
+          when: An `Idempotency-Key` already used for a different request (see the `IdempotencyKey`
+            parameter).
+        concurrency-conflict:
+          status: 409
+          title: Changed since read
+          when: An optimistic-concurrency check failed. The client re-reads and retries.
+        rate-limited:
+          status: 429
+          title: Too many requests
+          when: The concurrency or rate limit is exceeded (ADR-0032). Carries `Retry-After`. Never
+            a sync rejection.
+        server-error:
+          status: 500
+          title: Server error
+          when: An unexpected failure. `traceId` is what support asks for.
       required:
       - type
       - title
@@ -338,6 +458,11 @@ components:
         type:
           type: string
           format: uri
+          description: 'The problem type URI, `https://api.ticvai.com/problems/<slug>`. The slug is one
+            of the shared types in `x-ticvai-problem-types` on this schema, or one the operation''s own
+            error response declares.
+
+            '
         title:
           type: string
         status:
@@ -378,36 +503,63 @@ components:
   responses:
     BadRequest:
       description: Validation failed
+      x-ticvai-problem-types:
+      - validation
       content:
         application/problem+json:
           schema:
             $ref: '#/components/schemas/Problem'
     Unauthorized:
       description: Missing, expired or superseded session
+      x-ticvai-problem-types:
+      - unauthenticated
+      - session-superseded
       content:
         application/problem+json:
           schema:
             $ref: '#/components/schemas/Problem'
     Forbidden:
       description: Authenticated but not permitted at the requested scope
+      x-ticvai-problem-types:
+      - forbidden
       content:
         application/problem+json:
           schema:
             $ref: '#/components/schemas/Problem'
     Conflict:
-      description: Idempotency conflict or optimistic concurrency failure
+      description: 'Idempotency conflict or optimistic concurrency failure. Two causes, so two types.
+        The idempotency case can follow any mutating request, because every one carries an
+        `Idempotency-Key`. An operation-specific `409` (a state that refuses the change) is not this
+        response. The operation lists it with its own type.
+
+        '
+      x-ticvai-problem-types:
+      - idempotency-conflict
+      - concurrency-conflict
       content:
         application/problem+json:
           schema:
             $ref: '#/components/schemas/Problem'
     NotFound:
-      description: The resource does not exist, or is outside the caller's scope
+      description: 'The resource does not exist, or is outside the caller''s scope. **This includes
+        a parent in the path.** A list or read under `/{parent}/{id}/...` whose parent id is unknown
+        or out of scope is a `404`, not an empty page. The path addresses that parent. A query
+        filter addresses nothing, so an unmatched filter value is an empty page, not a `404`.
+
+        '
+      x-ticvai-problem-types:
+      - not-found
       content:
         application/problem+json:
           schema:
             $ref: '#/components/schemas/Problem'
     TooManyRequests:
       description: Rate limit exceeded for this tenant, venue or principal
+      x-ticvai-problem-types:
+      - rate-limited
+      headers:
+        Retry-After:
+          $ref: '#/components/headers/RetryAfter'
       content:
         application/problem+json:
           schema:

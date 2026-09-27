@@ -175,6 +175,9 @@ paths:
             schema: { $ref: '#/components/schemas/CreateAssetRequest' }
       responses:
         '201':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Registered
           content:
             application/json:
@@ -245,11 +248,21 @@ paths:
                 categoryId: { type: string, format: uuid }
                 warrantyExpiresAt: { type: string, format: date }
                 supplierId: { type: string, format: uuid }
+                documents:
+                  type: array
+                  description: Replaces the asset's documents. One `asset_document` row each.
+                  items: { $ref: '#/components/schemas/AssetDocumentInput' }
                 documentRefs:
                   type: array
+                  description: >
+                    The refs alone, kept for callers that predate `documents`. Each becomes a
+                    document with no name and no kind.
                   items: { type: string }
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Updated
           content:
             application/json:
@@ -314,6 +327,9 @@ paths:
 
         Returning to service requires a completed inspection where the asset's category
         demands one. A technician cannot simply declare a ride safe.
+
+        Every change appends a `maintenance.asset_status_change` row as well as setting the
+        asset's current status — the history is the sequence, not the latest value.
       tags: [asset]
       x-ticvai-permission: ASSET_MANAGE
       x-ticvai-scope-level: venue
@@ -328,6 +344,9 @@ paths:
             schema: { $ref: '#/components/schemas/SetAssetStatusRequest' }
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Status set, with downstream effects reported
           content:
             application/json:
@@ -470,6 +489,9 @@ paths:
             schema: { $ref: '#/components/schemas/CreateWorkOrderRequest' }
       responses:
         '201':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Raised
           content:
             application/json:
@@ -537,6 +559,9 @@ paths:
                 categoryId: { type: string, format: uuid }
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Updated
           content:
             application/json:
@@ -590,6 +615,9 @@ paths:
                 recordedAt: { type: string, format: date-time }
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Recorded
           content:
             application/json:
@@ -648,6 +676,9 @@ paths:
                       locationId: { type: string, format: uuid }
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Recorded and stock issued
           content:
             application/json:
@@ -663,7 +694,7 @@ paths:
       - name: workOrderId
         in: path
         required: true
-        schema: { type: string, format: uuid }
+        schema: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
     post:
       operationId: cancelWorkOrder
       x-ticvai-consumed-by:
@@ -698,9 +729,12 @@ paths:
                   type: string
                   enum: [raisedInError, duplicate, superseded, noLongerRequired]
                 note: { type: string, maxLength: 300 }
-                supersededByWorkOrderId: { type: string, format: uuid }
+                supersededByWorkOrderId: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Cancelled
           content:
             application/json:
@@ -758,6 +792,9 @@ paths:
                 recordedAt: { type: string, format: date-time }
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Completed
           content:
             application/json:
@@ -809,6 +846,9 @@ paths:
                 note: { type: string, maxLength: 1000 }
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Verified or returned to the technician
           content:
             application/json:
@@ -825,7 +865,7 @@ paths:
       - name: workOrderId
         in: path
         required: true
-        schema: { type: string, format: uuid }
+        schema: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
     post:
       operationId: acceptWorkOrder
       x-ticvai-consumed-by:
@@ -850,6 +890,9 @@ paths:
         - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Accepted
           content:
             application/json:
@@ -865,7 +908,7 @@ paths:
       - name: workOrderId
         in: path
         required: true
-        schema: { type: string, format: uuid }
+        schema: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
     post:
       operationId: rejectWorkOrder
       x-ticvai-consumed-by:
@@ -901,6 +944,9 @@ paths:
                 note: { type: string, maxLength: 300 }
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Returned to the pool
           content:
             application/json:
@@ -911,7 +957,7 @@ paths:
       - name: workOrderId
         in: path
         required: true
-        schema: { type: string, format: uuid }
+        schema: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
     post:
       operationId: startWorkOrder
       x-ticvai-consumed-by:
@@ -948,6 +994,9 @@ paths:
                   description: Device time where the job began offline. The server records both.
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Started
           content:
             application/json:
@@ -958,7 +1007,7 @@ paths:
       - name: workOrderId
         in: path
         required: true
-        schema: { type: string, format: uuid }
+        schema: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
     post:
       operationId: pauseWorkOrder
       x-ticvai-consumed-by:
@@ -995,10 +1044,13 @@ paths:
                 note: { type: string, maxLength: 300 }
                 requisitionId:
                   type: string
-                  format: uuid
+                  pattern: '^[0-9A-HJKMNP-TV-Z]{26}$'
                   description: Where a part was ordered, so the two are linked.
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Paused, in the state the reason implies
           content:
             application/json:
@@ -1009,7 +1061,7 @@ paths:
       - name: workOrderId
         in: path
         required: true
-        schema: { type: string, format: uuid }
+        schema: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
     post:
       operationId: resumeWorkOrder
       x-ticvai-consumed-by:
@@ -1028,6 +1080,9 @@ paths:
         - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Resumed
           content:
             application/json:
@@ -1038,7 +1093,7 @@ paths:
       - name: workOrderId
         in: path
         required: true
-        schema: { type: string, format: uuid }
+        schema: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
     post:
       operationId: closeWorkOrder
       x-ticvai-consumed-by:
@@ -1077,9 +1132,12 @@ paths:
                   enum: [completedAndVerified, notReproducible, supersededByReplacement,
                          noLongerApplicable, duplicate]
                 note: { type: string, maxLength: 500 }
-                duplicateOfWorkOrderId: { type: string, format: uuid }
+                duplicateOfWorkOrderId: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Closed
           content:
             application/json:
@@ -1090,7 +1148,7 @@ paths:
       - name: workOrderId
         in: path
         required: true
-        schema: { type: string, format: uuid }
+        schema: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
     post:
       operationId: attachWorkOrderEvidence
       x-ticvai-consumed-by:
@@ -1131,6 +1189,9 @@ paths:
                 stage: { type: string, enum: [before, during, after, signOff] }
       responses:
         '201':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Attached
           content:
             application/json:
@@ -1194,6 +1255,9 @@ paths:
             schema: { $ref: '#/components/schemas/MaintenancePlan' }
       responses:
         '201':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Created
           content:
             application/json:
@@ -1237,6 +1301,9 @@ paths:
                 isActive: { type: boolean }
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Updated
           content:
             application/json:
@@ -1327,6 +1394,9 @@ paths:
             schema: { $ref: '#/components/schemas/InspectionTemplate' }
       responses:
         '201':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Created
           content:
             application/json:
@@ -1409,6 +1479,9 @@ paths:
             schema: { $ref: '#/components/schemas/SubmitInspectionRequest' }
       responses:
         '201':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Submitted, with any consequences reported
           content:
             application/json:
@@ -1485,8 +1558,9 @@ paths:
         reporting should be as low as it can be — an unreported near-miss is the one that
         recurs.
 
-        Personal details of anyone involved go to the erasable store, referenced by opaque
-        ID, so the incident record survives an erasure request intact.
+        Personal details of anyone involved go to the erasable store (`pii.subject`,
+        ADR-0023), referenced by opaque ID, so the incident record survives an erasure request
+        intact. Each involved person is a `maintenance.incident_involved_party` row.
       tags: [incident]
       x-ticvai-permission: INCIDENT_REPORT
       x-ticvai-scope-level: venue
@@ -1501,6 +1575,9 @@ paths:
             schema: { $ref: '#/components/schemas/ReportIncidentRequest' }
       responses:
         '201':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Reported
           content:
             application/json:
@@ -1575,12 +1652,15 @@ paths:
                 investigationNote: { type: string, maxLength: 10000 }
                 rootCause: { type: string, maxLength: 2000 }
                 correctiveActions: { type: string, maxLength: 5000 }
-                correctiveWorkOrderId: { type: string }
+                correctiveWorkOrderId: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
                 attachmentRefs:
                   type: array
                   items: { type: string }
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Updated
           content:
             application/json:
@@ -1611,6 +1691,9 @@ paths:
         Some incidents must be reported externally within a statutory window. This records
         that it happened, when, to whom, and with what reference — the evidence that the
         obligation was met.
+
+        Appends a `maintenance.incident_authority_notification` row; a second notification
+        adds a row rather than replacing the first.
       tags: [incident]
       x-ticvai-permission: INCIDENT_MANAGE
       x-ticvai-scope-level: venue
@@ -1635,6 +1718,9 @@ paths:
                   items: { type: string }
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Recorded
           content:
             application/json:
@@ -1661,7 +1747,7 @@ components:
       required: [id, inspectionId, itemKey]
       properties:
         id: { type: string, format: uuid }
-        inspectionId: { type: string }
+        inspectionId: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
         templateItemId:
           type: string
           format: uuid
@@ -1745,15 +1831,64 @@ components:
           description: >
             True means a completed inspection is required before return to service. A
             technician cannot simply declare a ride safe.
+        documents:
+          type: array
+          description: >
+            Manuals, procedures, certificates, each with its name and kind. Stored one row per
+            document in `maintenance.asset_document`, which is where `AssetDetail.documents`
+            reads them from.
+          items: { $ref: '#/components/schemas/AssetDocumentInput' }
         documentRefs:
           type: array
+          x-ticvai-persisted: false
+          description: >
+            **The refs alone, kept for callers that predate `documents`.** Each ref sent here is
+            stored as an `asset_document` row with no name and no kind. Returned as the refs of
+            `documents`, computed on read — there is no second copy to fall out of step.
           items: { type: string }
+
+    AssetDocumentInput:
+      x-ticvai-persistence: "none — request only"
+      type: object
+      required: [ref, kind]
+      properties:
+        ref: { type: string, description: The document in the media store. }
+        name: { type: string, maxLength: 200 }
+        kind: { $ref: '#/components/schemas/AssetDocumentKind' }
+
+    AssetDocumentKind:
+      type: string
+      enum: [manual, sop, certificate, warranty, drawing, riskAssessment]
+
+    AssetDocument:
+      x-ticvai-persistence: maintenance.asset_document
+      type: object
+      description: >
+        A document attached to an asset — manual, procedure, certificate — with the name and
+        kind a technician needs on site. **One row per document**, because `AssetDetail.documents`
+        returns a name and a kind for each and a `text[]` of refs has nowhere to hold either.
+      required: [id, assetId, ref]
+      properties:
+        id: { type: string, format: uuid }
+        assetId: { type: string, format: uuid }
+        ref: { type: string, description: The document in the media store. }
+        name: { type: string, maxLength: 200, nullable: true }
+        kind:
+          allOf:
+            - $ref: '#/components/schemas/AssetDocumentKind'
+          nullable: true
+          description: Null where the document arrived as a bare ref in `documentRefs`.
 
     Asset:
       x-ticvai-persistence: "maintenance.asset"
       allOf:
         - $ref: '#/components/schemas/CreateAssetRequest'
         - type: object
+          # `is_maintenance_overdue` is computed on read (below) and no longer stored.
+          # `document_refs` moved to one `maintenance.asset_document` row per document.
+          x-ticvai-retired-columns:
+            - is_maintenance_overdue
+            - document_refs
           required: [id, status]
           properties:
             id: { type: string, format: uuid }
@@ -1809,10 +1944,52 @@ components:
             disposalProceeds: { $ref: '../shared/common.yaml#/components/schemas/Money' }
             status: { $ref: '#/components/schemas/AssetStatus' }
             statusReason: { type: string, nullable: true }
-            openWorkOrderCount: { type: integer }
-            nextMaintenanceDueAt: { type: string, format: date-time, nullable: true }
-            isMaintenanceOverdue: { type: boolean }
-            lastInspectionAt: { type: string, format: date-time, nullable: true }
+            # **Four values on this schema are derived, and each says who keeps it.** A stored
+            # count nobody names a writer for drifts the first time a code path forgets it, and
+            # a stored boolean that depends on the clock is wrong from the minute it is written.
+            # `x-ticvai-derived` is `onWrite` (maintained in the same transaction as the write
+            # that changes it), `onRead` (computed when read, never stored) or `sweeper` (a named
+            # job). The text beside it names the source.
+            openWorkOrderCount:
+              type: integer
+              readOnly: true
+              x-ticvai-derived: onWrite
+              description: >
+                Work orders on this asset whose status is `open`, `assigned`, `inProgress`,
+                `paused` or `awaitingParts` — the same set `AssetDetail.openWorkOrders` returns.
+                **Maintained on write**: `createWorkOrder` and every transition into or out of
+                that set (complete, cancel, close, reject back to open) adjust it in the same
+                transaction as the work-order row.
+            nextMaintenanceDueAt:
+              type: string
+              format: date-time
+              nullable: true
+              readOnly: true
+              x-ticvai-derived: onWrite
+              description: >
+                The earliest `nextDueAt` among this asset's active maintenance plans; null when
+                none has one. **Maintained on write**: recomputed whenever one of those plans is
+                created, amended, suspended or has its `nextDueAt` moved by a completed work
+                order. `listAssets?maintenanceDue` filters on this column against the clock.
+            isMaintenanceOverdue:
+              type: boolean
+              readOnly: true
+              x-ticvai-persisted: false
+              x-ticvai-derived: onRead
+              description: >
+                `nextMaintenanceDueAt` is in the past at the moment of the read. **Computed on
+                read and not stored** — it depends on the clock, so a stored copy is stale the
+                minute after it is written.
+            lastInspectionAt:
+              type: string
+              format: date-time
+              nullable: true
+              readOnly: true
+              x-ticvai-derived: onWrite
+              description: >
+                `performedAt` of the latest inspection submitted against this asset. **Maintained
+                on write** by `submitInspection`, in the same transaction as the inspection row;
+                an inspection synced late with an earlier `performedAt` does not move it back.
             usageCounter:
               type: number
               nullable: true
@@ -1832,15 +2009,10 @@ components:
               items: { $ref: '#/components/schemas/MaintenancePlan' }
             documents:
               type: array
-              description: Manuals, procedures, certificates. What a technician needs on site.
-              items:
-                type: object
-                properties:
-                  ref: { type: string }
-                  name: { type: string }
-                  kind:
-                    type: string
-                    enum: [manual, sop, certificate, warranty, drawing, riskAssessment]
+              description: >
+                Manuals, procedures, certificates. What a technician needs on site. Read from
+                `maintenance.asset_document`.
+              items: { $ref: '#/components/schemas/AssetDocument' }
 
     SetAssetStatusRequest:
       x-ticvai-persistence: "none — request only"
@@ -1851,6 +2023,7 @@ components:
         reason: { type: string, minLength: 3, maxLength: 1000 }
         inspectionId:
           type: string
+          pattern: '^[0-9A-HJKMNP-TV-Z]{26}$'
           nullable: true
           description: Required for return to service where the asset demands it.
         raiseWorkOrder: { type: boolean, default: false }
@@ -1873,17 +2046,63 @@ components:
               items: { type: string, format: uuid }
             accessPointBlocked: { type: boolean }
             performancesAffected: { type: integer }
-            workOrderId: { type: string, nullable: true }
+            workOrderId: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$', nullable: true }
+
+    AssetStatusChange:
+      x-ticvai-persistence: maintenance.asset_status_change
+      type: object
+      description: >
+        **One row per status change on an asset, appended by `setAssetStatus`** and by the
+        automatic paths that change it (a work order raised with `takeAssetOutOfService`, a
+        failed safety-critical inspection item). `maintenance.asset` holds only the current
+        status; this is the sequence an insurer or a regulator asks for, and it is what
+        `WorkOrder.downtimeMinutes` is measured from.
+      required: [id, assetId, toStatus, reason, recordedAt]
+      properties:
+        id: { type: string, format: uuid }
+        assetId: { type: string, format: uuid }
+        fromStatus:
+          allOf:
+            - $ref: '#/components/schemas/AssetStatus'
+          nullable: true
+        toStatus: { $ref: '#/components/schemas/AssetStatus' }
+        reason: { type: string, maxLength: 1000 }
+        workOrderId:
+          type: string
+          pattern: '^[0-9A-HJKMNP-TV-Z]{26}$'
+          nullable: true
+          description: The work order that took the asset out, where one did.
+        inspectionId:
+          type: string
+          pattern: '^[0-9A-HJKMNP-TV-Z]{26}$'
+          nullable: true
+          description: The inspection that took it out, or that allowed its return to service.
+        changedByPrincipalId: { type: string, format: uuid, nullable: true }
+        recordedAt:
+          type: string
+          format: date-time
+          description: Device time. The change is offline-capable and appended on replay.
+        syncedAt: { type: string, format: date-time, nullable: true }
 
     AssetHistoryEntry:
-      x-ticvai-persistence: "none — union view over work orders, inspections and incidents"
+      x-ticvai-persistence: "none — union view over work orders, inspections, incidents and asset status changes"
       type: object
+      description: >
+        **Every kind has a source.** `workOrder` is a work-order row, `inspection` an inspection,
+        `incident` an incident, `statusChange` a `maintenance.asset_status_change` row.
+        `partReplaced` is a completed work order whose `resolutionCode` is `partReplaced`, and `planCompleted` a completed work order with a `sourcePlanId` — both
+        read from `maintenance.work_order`, not stored twice.
       required: [kind, occurredAt, summary]
       properties:
         kind:
           type: string
           enum: [workOrder, inspection, incident, statusChange, partReplaced, planCompleted]
-        referenceId: { type: string, nullable: true }
+        referenceId:
+          type: string
+          nullable: true
+          description: >
+            The source row's id: a work-order, inspection or incident ULID, or an
+            `asset_status_change` id.
         summary: { type: string }
         principalId: { type: string, format: uuid, nullable: true }
         occurredAt: { type: string, format: date-time }
@@ -1941,7 +2160,7 @@ components:
       required: [id, workOrderId, kind, capturedAt]
       properties:
         id: { type: string, format: uuid }
-        workOrderId: { type: string, format: uuid }
+        workOrderId: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
         kind: { type: string, enum: [photo, video, document, note, signature] }
         assetRef: { type: string, format: uuid, nullable: true }
         text: { type: string, nullable: true }
@@ -1957,6 +2176,9 @@ components:
 
     WorkOrder:
       x-ticvai-persistence: "maintenance.work_order"
+      # `is_overdue` is computed on read (see `isOverdue`) and no longer stored.
+      x-ticvai-retired-columns:
+        - is_overdue
       type: object
       required: [id, workOrderNumber, title, venueId, status, priority, kind, createdAt]
       properties:
@@ -1964,10 +2186,16 @@ components:
           type: integer
           nullable: true
           readOnly: true
+          x-ticvai-derived: onWrite
           description: >
             **Measured from out-of-service to back-in-service, not from work start to work
             end.** A ride down for six hours of which two were spent working is down six hours,
             and the gap between the two numbers is the thing worth managing.
+
+            **Maintained on write**: set when the asset returns to service, as the
+            minutes from the `maintenance.asset_status_change` row that took it out carrying
+            this work order's id to the asset's next change back to `inService`. Null while the
+            asset is still out, and for a work order that never took it out.
         rootCause:
           type: string
           nullable: true
@@ -1986,25 +2214,68 @@ components:
             **Escalation is a clock, not a decision.** A work order on a ride nobody has
             accepted after twenty minutes escalates itself, because the alternative is somebody
             noticing.
-        id: { type: string }
+        id: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
         workOrderNumber: { type: string }
         title: { type: string }
         venueId: { type: string, format: uuid }
         assetId: { type: string, format: uuid, nullable: true }
-        assetName: { type: string, nullable: true }
+        assetName:
+          type: string
+          nullable: true
+          readOnly: true
+          x-ticvai-derived: onWrite
+          description: >
+            The asset's name, copied when the work order is raised or its asset changes, and not
+            updated when the asset is later renamed — the record reads as it was raised.
         status: { $ref: '#/components/schemas/WorkOrderStatus' }
         priority: { $ref: '#/components/schemas/WorkOrderPriority' }
         kind: { $ref: '#/components/schemas/WorkOrderKind' }
         assignedToPrincipalId: { type: string, format: uuid, nullable: true }
         raisedByPrincipalId: { type: string, format: uuid }
-        elapsedMinutes: { type: integer }
-        isTimerRunning: { type: boolean }
+        categoryId:
+          type: string
+          format: uuid
+          nullable: true
+          description: >
+            As raised in `CreateWorkOrderRequest.categoryId`, amendable by `updateWorkOrder`. The
+            category is what `completeWorkOrder` reads to decide whether completion photographs
+            are required.
+        locationDescription:
+          type: string
+          maxLength: 500
+          nullable: true
+          description: >
+            Where the fault is, as raised. Needed where there is no asset — a broken tile, a
+            leak in a corridor.
+        elapsedMinutes:
+          type: integer
+          readOnly: true
+          x-ticvai-derived: onWrite
+          description: >
+            Labour minutes accumulated up to the last pause or stop. **Maintained on write** by
+            `recordWorkOrderTime`, `pauseWorkOrder` and `completeWorkOrder`; while
+            `isTimerRunning` is true the interval since the last start is not yet included.
+        isTimerRunning:
+          type: boolean
+          readOnly: true
+          x-ticvai-derived: onWrite
+          description: >
+            Maintained on write by `startWorkOrder`, `resumeWorkOrder`, `recordWorkOrderTime`,
+            `pauseWorkOrder` and `completeWorkOrder`.
         dueAt: { type: string, format: date-time, nullable: true }
-        isOverdue: { type: boolean }
+        isOverdue:
+          type: boolean
+          readOnly: true
+          x-ticvai-persisted: false
+          x-ticvai-derived: onRead
+          description: >
+            `dueAt` is in the past and the status is still `open`, `assigned`, `inProgress`,
+            `paused` or `awaitingParts`. **Computed on read and not stored** — it depends on the
+            clock. `listWorkOrders?overdueOnly` applies the same test to `due_at`.
         requiresVerification: { type: boolean }
         sourcePlanId: { type: string, format: uuid, nullable: true }
-        sourceInspectionId: { type: string, nullable: true }
-        sourceIncidentId: { type: string, nullable: true }
+        sourceInspectionId: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$', nullable: true }
+        sourceIncidentId: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$', nullable: true }
         createdAt: { type: string, format: date-time }
         recordedAt: { type: string, format: date-time }
         completedAt: { type: string, format: date-time, nullable: true }
@@ -2043,7 +2314,53 @@ components:
             labourCost: { $ref: '../shared/common.yaml#/components/schemas/Money' }
             partsCost: { $ref: '../shared/common.yaml#/components/schemas/Money' }
             totalCost: { $ref: '../shared/common.yaml#/components/schemas/Money', x-ticvai-column: net_cost_amount }
+            # **Every field the lifecycle operations accept is stored and returned here.**
+            # `cancelWorkOrder`, `completeWorkOrder`, `verifyWorkOrder` and `closeWorkOrder`
+            # took reasons, outcomes, notes and linked work orders that no column held, so the
+            # distinction the descriptions insist on — cancelled versus closed, completed
+            # versus verified — was lost the moment the request was answered.
+            completedByPrincipalId:
+              type: string
+              format: uuid
+              nullable: true
+              description: >
+                Who called `completeWorkOrder`. **What `verifyWorkOrder` compares against** — the
+                verifier may not be the technician who completed the work, and the assignee is
+                not necessarily that person.
+            followUpRequired: { type: boolean, default: false }
+            followUpNote: { type: string, maxLength: 1000, nullable: true }
+            verificationOutcome:
+              type: string
+              enum: [verified, rejected]
+              nullable: true
+              description: The latest `verifyWorkOrder` outcome.
+            verificationNote: { type: string, maxLength: 1000, nullable: true }
+            verifiedAt: { type: string, format: date-time, nullable: true }
             verifiedByPrincipalId: { type: string, format: uuid, nullable: true }
+            cancelReason:
+              type: string
+              enum: [raisedInError, duplicate, superseded, noLongerRequired]
+              nullable: true
+            cancelNote: { type: string, maxLength: 300, nullable: true }
+            supersededByWorkOrderId:
+              type: string
+              pattern: '^[0-9A-HJKMNP-TV-Z]{26}$'
+              nullable: true
+              description: Set by `cancelWorkOrder` where the reason is `superseded`.
+            cancelledAt: { type: string, format: date-time, nullable: true }
+            closeOutcome:
+              type: string
+              enum: [completedAndVerified, notReproducible, supersededByReplacement,
+                     noLongerApplicable, duplicate]
+              nullable: true
+            closeNote: { type: string, maxLength: 500, nullable: true }
+            duplicateOfWorkOrderId:
+              type: string
+              pattern: '^[0-9A-HJKMNP-TV-Z]{26}$'
+              nullable: true
+              description: Set by `closeWorkOrder` where the outcome is `duplicate`.
+            closedAt: { type: string, format: date-time, nullable: true }
+            closedByPrincipalId: { type: string, format: uuid, nullable: true }
 
     MaintenancePlan:
       x-ticvai-persistence: "maintenance.preventive_plan"
@@ -2106,7 +2423,7 @@ components:
         triggeredBy:
           type: string
           enum: [interval, usage]
-        workOrderId: { type: string, nullable: true }
+        workOrderId: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$', nullable: true }
 
     InspectionItemKind:
       type: string
@@ -2206,7 +2523,7 @@ components:
       type: object
       required: [id, templateId, venueId, outcome, performedByPrincipalId, performedAt]
       properties:
-        id: { type: string }
+        id: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
         templateId: { type: string, format: uuid }
         templateName: { type: string }
         venueId: { type: string, format: uuid }
@@ -2245,7 +2562,7 @@ components:
             assetTakenOutOfService: { type: boolean }
             workOrdersRaised:
               type: array
-              items: { type: string }
+              items: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
             productsSuspended:
               type: array
               items: { type: string, format: uuid }
@@ -2308,7 +2625,7 @@ components:
       type: object
       required: [id, incidentNumber, kind, severity, status, venueId, occurredAt, reportedByPrincipalId]
       properties:
-        id: { type: string }
+        id: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
         incidentNumber: { type: string }
         kind: { $ref: '#/components/schemas/IncidentKind' }
         severity: { $ref: '#/components/schemas/IncidentSeverity' }
@@ -2320,10 +2637,19 @@ components:
           type: boolean
           description: Requires notification to an external authority within a statutory window.
         notificationDueAt: { type: string, format: date-time, nullable: true }
-        notifiedAt: { type: string, format: date-time, nullable: true }
+        notifiedAt:
+          type: string
+          format: date-time
+          nullable: true
+          readOnly: true
+          x-ticvai-derived: onWrite
+          description: >
+            The earliest `notifiedAt` among this incident's authority notifications. **Maintained
+            on write** by `recordAuthorityNotification`; each notification itself is a row of
+            `maintenance.incident_authority_notification`.
         assignedToPrincipalId: { type: string, format: uuid, nullable: true }
         reportedByPrincipalId: { type: string, format: uuid }
-        correctiveWorkOrderId: { type: string, nullable: true }
+        correctiveWorkOrderId: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$', nullable: true }
         occurredAt: { type: string, format: date-time }
         recordedAt: { type: string, format: date-time }
         closedAt: { type: string, format: date-time, nullable: true }
@@ -2347,15 +2673,61 @@ components:
             attachmentRefs:
               type: array
               items: { type: string }
+            involvedParties:
+              type: array
+              description: >
+                Who was involved, as given in `ReportIncidentRequest.involvedSubjectIds` and
+                `involvedStaffPrincipalIds`. Read from `maintenance.incident_involved_party`.
+              items: { $ref: '#/components/schemas/IncidentInvolvedParty' }
             authorityNotifications:
               type: array
-              items:
-                type: object
-                properties:
-                  authority: { type: string }
-                  reference: { type: string, nullable: true }
-                  notifiedAt: { type: string, format: date-time }
-                  notifiedByPrincipalId: { type: string, format: uuid }
+              description: Read from `maintenance.incident_authority_notification`, oldest first.
+              items: { $ref: '#/components/schemas/IncidentAuthorityNotification' }
+
+    IncidentInvolvedParty:
+      x-ticvai-persistence: maintenance.incident_involved_party
+      type: object
+      description: >
+        **One person involved in an incident, by opaque reference.** A guest or member of the
+        public is a `pii.subject` id — personal details live there, the erasable store of
+        ADR-0023, so the incident record survives an erasure request intact. A member of staff
+        is a principal id. Exactly one of the two is set, as `kind` says.
+      required: [id, incidentId, kind]
+      properties:
+        id: { type: string, format: uuid }
+        incidentId: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
+        kind: { type: string, enum: [subject, staff] }
+        subjectId:
+          type: string
+          format: uuid
+          nullable: true
+          description: A `pii.subject` id where `kind` is `subject`.
+        principalId:
+          type: string
+          format: uuid
+          nullable: true
+          description: The staff principal where `kind` is `staff`.
+
+    IncidentAuthorityNotification:
+      x-ticvai-persistence: maintenance.incident_authority_notification
+      type: object
+      description: >
+        **One notification to an external authority, appended by
+        `recordAuthorityNotification`.** An incident may be reported to more than one authority,
+        or to the same one twice, and each is the evidence that an obligation was met — so each
+        is a row, not an overwrite of `maintenance.incident.notified_at`.
+      required: [id, incidentId, authority, notifiedAt]
+      properties:
+        id: { type: string, format: uuid }
+        incidentId: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
+        authority: { type: string, maxLength: 200 }
+        reference: { type: string, maxLength: 128, nullable: true }
+        notifiedAt: { type: string, format: date-time }
+        notifiedByPrincipalId: { type: string, format: uuid }
+        attachmentRefs:
+          type: array
+          items: { type: string }
+        recordedAt: { type: string, format: date-time }
 
   securitySchemes:
     bearerAuth:

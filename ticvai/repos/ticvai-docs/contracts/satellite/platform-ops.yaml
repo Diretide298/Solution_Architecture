@@ -105,6 +105,9 @@ paths:
                   maxLength: 300
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Skipped, and recorded
           content:
             application/json:
@@ -183,6 +186,9 @@ paths:
               $ref: '#/components/schemas/CreateReleaseRequest'
       responses:
         '201':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Created
           content:
             application/json:
@@ -268,6 +274,9 @@ paths:
                   type: string
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Done
         '409':
           description: Not in a state that permits this
@@ -315,6 +324,9 @@ paths:
                   type: string
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Done
         '409':
           description: Not in a state that permits this
@@ -377,6 +389,9 @@ paths:
                   description: Required for production. Proves a factor was presented just now.
       responses:
         '202':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Promotion started
           content:
             application/json:
@@ -548,6 +563,9 @@ paths:
                   type: string
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Done
         '409':
           description: Not in a state that permits this
@@ -597,6 +615,9 @@ paths:
                   maxLength: 500
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Paused, with the cells already updated reported
           content:
             application/json:
@@ -657,6 +678,9 @@ paths:
                     format: uuid
       responses:
         '202':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Rollback started
           content:
             application/json:
@@ -763,6 +787,9 @@ paths:
                   $ref: '#/components/schemas/EnvironmentKind'
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Plan
           content:
             application/json:
@@ -834,6 +861,9 @@ paths:
                       format: date-time
       responses:
         '202':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Run started
           content:
             application/json:
@@ -924,6 +954,9 @@ paths:
                   type: string
       responses:
         '202':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Rollback started
           content:
             application/json:
@@ -1009,6 +1042,9 @@ paths:
               $ref: '#/components/schemas/Environment'
       responses:
         '201':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Registered
           content:
             application/json:
@@ -1066,6 +1102,9 @@ paths:
               $ref: '#/components/schemas/UpgradeSchedule'
       responses:
         '201':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Scheduled
           content:
             application/json:
@@ -1134,6 +1173,9 @@ paths:
               $ref: '#/components/schemas/SupportNotice'
       responses:
         '201':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Published
           content:
             application/json:
@@ -1200,6 +1242,9 @@ paths:
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Replay accepted
           content:
             application/json:
@@ -1256,8 +1301,13 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/WafRule'
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Change the firewall policy
           content:
             application/json:
@@ -1367,8 +1417,13 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/ScalingPolicy'
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Change the scaling policy
           content:
             application/json:
@@ -1742,8 +1797,9 @@ components:
       type: object
       x-ticvai-persistence: control.rollout_tenant
       description: 'What happened to one tenant database during one run. **The same shape as `RolloutCell`
-        one level down**, and it serves the per-tenant rows of both a rollout and a migration run — which
-        is the arrangement `RolloutCell` already has with `rollout_cell` and `migration_run_cell`.
+        one level down**, and it serves the per-tenant rows of both a rollout and a migration run — the
+        arrangement `RolloutCell` had with `rollout_cell` and `migration_run_cell` until `rollout_cell` needed
+        its `rolloutId` parent key and the migration run''s cells moved to `MigrationRunCell`.
 
 
         **`databaseName` is denormalised on purpose.** After a drop the run record still has to say what it
@@ -1797,6 +1853,70 @@ components:
     RolloutCell:
       type: object
       x-ticvai-persistence: control.rollout_cell
+      description: 'One cell''s state within one rollout. **`rolloutId` is the row''s parent**: a cell takes part
+        in many rollouts over its life, and `skipRolloutCell` addresses `/rollouts/{rolloutId}/cells/{cellId}`,
+        so a row keyed on the cell alone cannot say which run it belongs to or be found by that path.
+
+
+        A migration run''s per-cell rows are the same fields under a different parent, and use `MigrationRunCell`.
+
+        '
+      required:
+      - rolloutId
+      - cellId
+      - status
+      properties:
+        rolloutId:
+          type: string
+          format: uuid
+          description: 'The rollout this row belongs to (`control.rollout`).'
+        cellId:
+          type: string
+          format: uuid
+        cellName:
+          type: string
+        regionName:
+          type: string
+        countryCode:
+          type: string
+        isCanary:
+          type: boolean
+        wave:
+          type: integer
+        status:
+          type: string
+          enum:
+          - pending
+          - running
+          - complete
+          - failed
+          - skipped
+          - rolledBack
+        fromVersion:
+          type: string
+          nullable: true
+        toVersion:
+          type: string
+          nullable: true
+        error:
+          type: string
+          nullable: true
+        startedAt:
+          type: string
+          format: date-time
+          nullable: true
+        completedAt:
+          type: string
+          format: date-time
+          nullable: true
+    MigrationRunCell:
+      type: object
+      x-ticvai-persistence: none — rows of control.migration_run_cell, stored through MigrationRun
+      description: 'One cell''s rollup within one migration run. **The fields of `RolloutCell` without its
+        `rolloutId`**: a migration run is not a rollout, and its parent key `migration_run_id` comes from
+        `MigrationRun.cells`.
+
+        '
       required:
       - cellId
       - status
@@ -2059,7 +2179,7 @@ components:
         cells:
           type: array
           items:
-            $ref: '#/components/schemas/RolloutCell'
+            $ref: '#/components/schemas/MigrationRunCell'
         tenants:
           type: array
           items:

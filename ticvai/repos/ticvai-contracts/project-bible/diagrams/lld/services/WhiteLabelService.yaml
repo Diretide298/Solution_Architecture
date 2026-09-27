@@ -10,8 +10,8 @@ scale: Read-heavy and heavily cached. Published, not queried.
 ifDown: Down freezes the current published config. Guests see the last good version.
 coverage:
   operations: 52
-  inAFlow: 22
-  percent: 44%
+  inAFlow: 24
+  percent: 46%
   note: '**Flow coverage is how much of this service a journey has walked.** A service under 40% is
     unwalked rather than under-documented.'
 schemas:
@@ -182,7 +182,7 @@ operationsByContract:
     scope: tenant
     permission: TENANT_CONFIGURE
     offline: false
-    reads: 7
+    reads: 9
     writes: 1
   - operation: getTheme
     verb: GET
@@ -278,7 +278,7 @@ operationsByContract:
     scope: tenant
     permission: TENANT_PUBLISH
     offline: false
-    reads: 7
+    reads: 9
     writes: 7
   - operation: setAppIcons
     verb: PUT
@@ -334,8 +334,8 @@ operationsByContract:
     scope: tenant
     permission: TENANT_CONFIGURE
     offline: false
-    reads: 2
-    writes: 3
+    reads: 4
+    writes: 5
   - operation: setHeader
     verb: PUT
     path: /tenant-config/header
@@ -446,15 +446,113 @@ tables:
   columns: 5
   backing: redis
   owned: false
-  why: '**Not a table and not owned by a service.** Derived from something already read, invalidated
-    by an event already consumed, losable without consequence — no migration, no backup, no owner.'
+  why: '**Not a table and not owned by a service.** Derived from something already read, losable without
+    consequence — no migration, no backup, no owner.'
+  key: The idempotency key the caller sent
+  eviction:
+  - 'expires_at: **Must exceed the longest offline window.** A scanner out for a weekend replays on
+    Monday'
+  writtenBy:
+  - claimCustomDomain
+  - createBanner
+  - createContentBlock
+  - createContentPage
+  - createPreview
+  - createPromoBlock
+  - deleteBanner
+  - deleteContentPage
+  - deletePromoBlock
+  - publishContentBlock
+  - publishTenantConfig
+  - restoreConfigVersion
+  - setAppIcons
+  - setBookingFlowConfig
+  - setBrandIdentity
+  - setFaqs
+  - setFeatureToggles
+  - setFonts
+  - setFooter
+  - setHeader
+  - setHomepageLayout
+  - setLanguages
+  - setMaintenanceMode
+  - setModuleEnablement
+  - setNavigation
+  - setPolicy
+  - setTheme
+  - updateBanner
+  - updateContentPage
+  - updatePromoBlock
+  - validateTenantConfig
+  - verifyCustomDomain
+  readBy:
+  - claimCustomDomain
+  - createBanner
+  - createContentBlock
+  - createContentPage
+  - createPreview
+  - createPromoBlock
+  - deleteBanner
+  - deleteContentPage
+  - deletePromoBlock
+  - publishContentBlock
+  - publishTenantConfig
+  - restoreConfigVersion
+  - setAppIcons
+  - setBookingFlowConfig
+  - setBrandIdentity
+  - setFaqs
+  - setFeatureToggles
+  - setFonts
+  - setFooter
+  - setHeader
+  - setHomepageLayout
+  - setLanguages
+  - setMaintenanceMode
+  - setModuleEnablement
+  - setNavigation
+  - setPolicy
+  - setTheme
+  - updateBanner
+  - updateContentPage
+  - updatePromoBlock
+  - validateTenantConfig
+  - verifyCustomDomain
 - store: cache:resolution
   kind: cache
   columns: 4
   backing: redis
   owned: false
-  why: '**Not a table and not owned by a service.** Derived from something already read, invalidated
-    by an event already consumed, losable without consequence — no migration, no backup, no owner.'
+  why: '**Not a table and not owned by a service.** Derived from something already read, losable without
+    consequence — no migration, no backup, no owner.'
+  key: scope_path + what is being resolved — permissions, configuration, a price list
+  eviction:
+  - 'version: Bumped by the write that evicts it. **A config change nobody evicts is a stale permission**'
+  writtenBy:
+  - getFeatureToggles
+  - getModuleEnablement
+  - getNavigation
+  - getTenantConfig
+  - getTheme
+  - publishContentBlock
+  - publishTenantConfig
+  - restoreConfigVersion
+  - setBookingFlowConfig
+  - setFeatureToggles
+  - setFooter
+  - setModuleEnablement
+  - setNavigation
+  - setTheme
+  readBy:
+  - getFeatureToggles
+  - getModuleEnablement
+  - getNavigation
+  - getTenantConfig
+  - getTheme
+  gap: '**The lineage names this store, not the key.** Which resolution entry each writer below evicts
+    or bumps — permissions, configuration, a price list, and whether child scopes under its `scope_path`
+    are affected — is not recorded for any operation, so a writer here cannot yet be implemented from
+    the package alone.'
 - table: whitelabel.banner
   columns: 12
   store: postgres
@@ -463,7 +561,7 @@ tables:
   - white-label
   foreignWriters: null
 - table: whitelabel.config_version
-  columns: 10
+  columns: 11
   store: postgres
   parent: null
   writtenBy:
@@ -477,7 +575,7 @@ tables:
   - white-label
   foreignWriters: null
 - table: whitelabel.custom_domain
-  columns: 10
+  columns: 11
   store: postgres
   parent: null
   writtenBy:
@@ -540,7 +638,7 @@ tables:
   - white-label
   foreignWriters: null
 - table: whitelabel.tenant_config
-  columns: 18
+  columns: 21
   store: postgres
   parent: platform.tenant
   writtenBy:
@@ -556,10 +654,34 @@ readsFrom:
 writesOutside:
 - service: PlatformService
   operations: 3
-  why: '**The owner defines the row; this service may only append to it.**'
+  rule: 'ADR-0028: the owner defines the row; a foreign writer may only append, through a path the owner
+    published.'
+  why: '**The lineage records these writes, not how they honour the rule.** It does not say whether
+    each inserts or updates, or which operation or event PlatformService published for it — check each
+    against ADR-0028.'
+  writes:
+  - operation: createContentBlock
+    tables:
+    - control.content_block
+  - operation: publishContentBlock
+    tables:
+    - control.content_block
+  - operation: setFooter
+    tables:
+    - control.footer_config
+    - control.footer_config_column
+    - control.footer_config_social_link
 - service: TenancyService
   operations: 1
-  why: '**The owner defines the row; this service may only append to it.**'
+  rule: 'ADR-0028: the owner defines the row; a foreign writer may only append, through a path the owner
+    published.'
+  why: '**The lineage records these writes, not how they honour the rule.** It does not say whether
+    each inserts or updates, or which operation or event TenancyService published for it — check each
+    against ADR-0028.'
+  writes:
+  - operation: publishTenantConfig
+    tables:
+    - platform.outbox
 screens:
 - P01:WEB-001 Home / Landing
 - P01:WEB-025 Help Centre / FAQ

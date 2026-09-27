@@ -3,7 +3,7 @@
 **10 September 2026. Fifteen of seventeen checks pass; the two that do not are named below.**
 
 ```
-2113 operations · 32 contracts · 639 tables · 1371 relationships
+2135 operations · 32 contracts · 678 tables · 1467 relationships
 125 state models · 29 events · 96 flows · 48 ADRs
 2427 screens · 16 platforms · 13 frontends · 5 apps · 218 boards
 ```
@@ -84,7 +84,7 @@ docs/adr/       44 architecture decisions
 docs/active/    the working documents — audits, briefs, handoffs
 docs/registers/ conflicts (CF-*), backlog, decisions
 
-backend/        DDL, generated — 639 tables, 635 foreign keys, 761 indexes
+backend/        DDL, generated — 678 tables, 615 foreign keys, 1468 indexes
 services/       16 FastAPI skeletons for topology benchmarking
 deploy/         four deployment configurations plus three burst variants
 tools/          the generators and the checks
@@ -169,7 +169,7 @@ specification problem and belongs in the log, not in a picture.
 **`handoff/api-data-lineage.json`** — every operation with its verb, path, scope, permission,
 audience, service, reads and writes. **The join everything else resolves through.**
 
-**`handoff/schema-reference.json`** — 639 tables, every column, every reference, and a description
+**`handoff/schema-reference.json`** — 678 tables, every column, every reference, and a description
 for all of them.
 
 **`handoff/burst-scope.json`** — what a flash-sale environment runs, and what it does not. **Thirteen

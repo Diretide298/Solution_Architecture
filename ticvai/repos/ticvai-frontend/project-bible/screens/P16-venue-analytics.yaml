@@ -110,6 +110,8 @@ screens:
     - to: ANL-021
       trigger: Dashboard Library
       provenance: structural — pack board 2 wiring, 9 September 2026
+      carries:
+      - dashboardId
     - to: ANL-031
       trigger: Report Catalogue & Library
       provenance: structural — pack board 3 wiring, 9 September 2026
@@ -122,30 +124,55 @@ screens:
     - to: ANL-002
       trigger: Sales, Revenue & Channel
       provenance: structural — ANL-001 is P16's home screen and its exits are its launcher
+      carries:
+      - dashboardId
+      - reportId
     - to: ANL-003
       trigger: Operational Performance
       provenance: structural — ANL-001 is P16's home screen and its exits are its launcher
+      carries:
+      - dashboardId
+      - reportId
     - to: ANL-004
       trigger: Product Performance
       provenance: structural — ANL-001 is P16's home screen and its exits are its launcher
+      carries:
+      - dashboardId
+      - reportId
     - to: ANL-005
       trigger: Cost, Margin & Profitability
       provenance: structural — ANL-001 is P16's home screen and its exits are its launcher
+      carries:
+      - dashboardId
+      - reportId
     - to: ANL-006
       trigger: Inventory & Waste Intelligence
       provenance: structural — ANL-001 is P16's home screen and its exits are its launcher
+      carries:
+      - dashboardId
+      - reportId
     - to: ANL-007
       trigger: Guest & Conversion Intelligence
       provenance: structural — ANL-001 is P16's home screen and its exits are its launcher
+      carries:
+      - dashboardId
+      - reportId
     - to: ANL-008
       trigger: Demand Forecasting
       provenance: structural — ANL-001 is P16's home screen and its exits are its launcher
+      carries:
+      - dashboardId
     - to: ANL-009
       trigger: AI Assistant & Action Center
       provenance: structural — ANL-001 is P16's home screen and its exits are its launcher
+      carries:
+      - alertId
+      - reportId
     - to: ANL-010
       trigger: Suggestions & Advice
       provenance: structural — ANL-001 is P16's home screen and its exits are its launcher
+      carries:
+      - suggestionId
     - to: ANL-012
       trigger: Live Operations Dashboard
       provenance: structural — ANL-001 is P16's home screen and its exits are its launcher
@@ -200,8 +227,33 @@ screens:
     - name: contentBody
       slot: collection
       components:
+      - kind: textField
+        label: Status
+        operation: listAlerts
+        notes: Sends `?status=` to `listAlerts`.
+        provenance: contract reporting.yaml GET /alerts
+      - kind: textField
+        label: Severity
+        operation: listAlerts
+        notes: Sends `?severity=` to `listAlerts`.
+        provenance: contract reporting.yaml GET /alerts
+      - kind: textField
+        label: Workstation id
+        operation: listAlerts
+        notes: Sends `?workstationId=` to `listAlerts`.
+        provenance: contract reporting.yaml GET /alerts
+      - kind: textField
+        label: Shift id
+        operation: listAlerts
+        notes: Sends `?shiftId=` to `listAlerts`.
+        provenance: contract reporting.yaml GET /alerts
+      - kind: textField
+        label: Item id
+        operation: listAlerts
+        notes: Sends `?itemId=` to `listAlerts`.
+        provenance: contract reporting.yaml GET /alerts
       - kind: dataTable
-        label: Every executive
+        label: Every alert
         bindsTo: Alert
         columns:
         - Alert.id
@@ -218,30 +270,6 @@ screens:
         - Alert.escalatedAt
         operation: listAlerts
         provenance: contract reporting.yaml GET /alerts
-    - name: contextPanel
-      slot: selection
-      components:
-      - kind: detailPanel
-        label: The selected executive
-        bindsTo: DashboardData
-        columns:
-        - DashboardData.tileData
-        operation: getDashboard
-        provenance: contract reporting.yaml GET /dashboards/{dashboardId}
-    - name: actionBar
-      slot: rowActions
-      components:
-      - kind: primaryButton
-        label: Request
-        operation: requestSuggestion
-        provenance: contract ai.yaml POST /ai/suggestions
-      - kind: secondaryButton
-        label: Run
-        operation: runReport
-        provenance: contract reporting.yaml POST /reports/{reportId}/run
-    - name: contentBody
-      slot: carried
-      components:
       - kind: multiSelect
         label: Domain
         notes: '**The selector that collapses 26 board screens into nine.** A domain is a filter on an
@@ -252,6 +280,57 @@ screens:
         notes: '**Comparison against the previous period by default.** A number with nothing beside it
           is a number nobody can act on.'
         provenance: carried from the previous definition
+    - name: contextPanel
+      slot: selection
+      components:
+      - kind: detailPanel
+        label: The selected alert
+        bindsTo: Alert
+        columns:
+        - Alert.id
+        - Alert.ruleId
+        - Alert.ruleName
+        - Alert.metric
+        - Alert.raisedAt
+        - Alert.severity
+        - Alert.status
+        - Alert.observedValue
+        - Alert.threshold
+        - Alert.scopePath
+        - Alert.workstationId
+        - Alert.shiftId
+        - Alert.itemId
+        - Alert.acknowledgedByPrincipalId
+        - Alert.acknowledgedAt
+        - Alert.acknowledgementNote
+        operation: listAlerts
+        provenance: contract reporting.yaml GET /alerts
+      - kind: detailPanel
+        label: The command centre
+        bindsTo: CommandCentre
+        columns:
+        - CommandCentre.modules
+        - CommandCentre.resolvedAt
+        operation: getCommandCentre
+        provenance: contract reporting.yaml GET /command-centre
+      - kind: detailPanel
+        label: The dashboard data
+        bindsTo: DashboardData
+        columns:
+        - DashboardData.tileData
+        operation: getDashboard
+        provenance: contract reporting.yaml GET /dashboards/{dashboardId}
+    - name: actionBar
+      slot: rowActions
+      components:
+      - kind: primaryButton
+        label: Request suggestion
+        operation: requestSuggestion
+        provenance: contract ai.yaml POST /ai/suggestions
+      - kind: secondaryButton
+        label: Run report
+        operation: runReport
+        provenance: contract reporting.yaml POST /reports/{reportId}/run
   states:
     loading: Tiles render in place; **each resolves on its own** so one slow source does not hold the
       page.
@@ -303,7 +382,11 @@ screens:
       Monday. The domain and the window come from the link where it carries them, and from the last view
       where it does not.'
     preloaded:
-    - DashboardData.tileData
+    - Alert.id
+    - Alert.ruleId
+    - Alert.ruleName
+    - Alert.metric
+    - Alert.raisedAt
   wireframe:
     status: notStarted
     provenance: generated
@@ -325,6 +408,42 @@ screens:
       shape exists.'
     source: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 3 §The system shall
       display
+  overlays:
+  - id: formRequestSuggestion
+    component: modal
+    trigger: Request suggestion
+    body: '**Collects what `requestSuggestion` sends before it is called.** Required: `kind`. Optional:
+      `subjectRef`, `horizon`, `context`. Dismissing sends nothing; the screen behind is unchanged.'
+    confirm:
+      label: Request suggestion
+      operation: requestSuggestion
+    dismiss:
+      label: Cancel
+      discards:
+      - kind
+      - subjectRef
+      - horizon
+      - context
+    provenance: contract ai.yaml POST /ai/suggestions
+  - id: formRunReport
+    component: modal
+    trigger: Run report
+    body: '**Collects what `runReport` sends before it is called.** Nothing in the body is required. Optional:
+      `parameters`, `venueId`, `dateFrom`, `dateTo`, `forceAsync`. Dismissing sends nothing; the screen
+      behind is unchanged.'
+    bindsTo: RunReportRequest
+    confirm:
+      label: Run report
+      operation: runReport
+    dismiss:
+      label: Cancel
+      discards:
+      - parameters
+      - venueId
+      - dateFrom
+      - dateTo
+      - forceAsync
+    provenance: contract reporting.yaml POST /reports/{reportId}/run
 - id: ANL-002
   name: Sales, Revenue & Channel
   module: Analytics
@@ -349,11 +468,9 @@ screens:
       trigger: Executive Command Center
       carries:
       - dashboardId
-      - domain
       - reportId
-      - venueId
-      provenance: derived — ANL-001 declares entryState.params dashboardId, domain, reportId, venueId,
-        so an edge into it must carry them
+      provenance: derived — ANL-001 declares entryState.params dashboardId, reportId and ANL-002 holds
+        dashboardId, reportId, so an edge into it carries them
   notes: '**Built 20 August. Answers 2 board screens**: Sales, Revenue & Channel Analytics; Sales, Revenue
     & Channel Analytics. **The same screen twice in the client set, word for word.** Revenue by channel
     is revenue by channel whether the line is a burger or a t-shirt. **Board repointed 24 August.** This
@@ -377,22 +494,12 @@ screens:
       slot: record
       components:
       - kind: detailPanel
-        label: The selected sales revenue channel
+        label: The dashboard data
         bindsTo: DashboardData
         columns:
         - DashboardData.tileData
         operation: getDashboard
         provenance: contract reporting.yaml GET /dashboards/{dashboardId}
-    - name: actionBar
-      slot: rowActions
-      components:
-      - kind: primaryButton
-        label: Run
-        operation: runReport
-        provenance: contract reporting.yaml POST /reports/{reportId}/run
-    - name: contentBody
-      slot: carried
-      components:
       - kind: multiSelect
         label: Domain
         notes: '**The selector that collapses 26 board screens into nine.** A domain is a filter on an
@@ -403,6 +510,13 @@ screens:
         notes: '**Comparison against the previous period by default.** A number with nothing beside it
           is a number nobody can act on.'
         provenance: carried from the previous definition
+    - name: actionBar
+      slot: rowActions
+      components:
+      - kind: primaryButton
+        label: Run report
+        operation: runReport
+        provenance: contract reporting.yaml POST /reports/{reportId}/run
   states:
     loading: Tiles render in place; **each resolves on its own** so one slow source does not hold the
       page.
@@ -446,6 +560,26 @@ screens:
   apisNote: Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack
     — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
     to the ones that matter is work a person still owes this screen.
+  overlays:
+  - id: formRunReport
+    component: modal
+    trigger: Run report
+    body: '**Collects what `runReport` sends before it is called.** Nothing in the body is required. Optional:
+      `parameters`, `venueId`, `dateFrom`, `dateTo`, `forceAsync`. Dismissing sends nothing; the screen
+      behind is unchanged.'
+    bindsTo: RunReportRequest
+    confirm:
+      label: Run report
+      operation: runReport
+    dismiss:
+      label: Cancel
+      discards:
+      - parameters
+      - venueId
+      - dateFrom
+      - dateTo
+      - forceAsync
+    provenance: contract reporting.yaml POST /reports/{reportId}/run
 - id: ANL-003
   name: Operational Performance
   module: Analytics
@@ -470,11 +604,9 @@ screens:
       trigger: Executive Command Center
       carries:
       - dashboardId
-      - domain
       - reportId
-      - venueId
-      provenance: derived — ANL-001 declares entryState.params dashboardId, domain, reportId, venueId,
-        so an edge into it must carry them
+      provenance: derived — ANL-001 declares entryState.params dashboardId, reportId and ANL-003 holds
+        dashboardId, reportId, so an edge into it carries them
   notes: '**Built 20 August. Answers 4 board screens**: Outlet, Service & Guest Performance; Store & Operational
     Performance; Venue Operations Dashboard and 1 more. **Four board screens.** Outlet, store, venue and
     department are the same question at four levels of `scope_path` — which is a filter, not four screens.
@@ -499,19 +631,39 @@ screens:
   patternReason: '`listAlerts` reads the population and `getDashboard` reads one of them — list, select,
     act'
   purpose: Operational Performance — across F&B, retail, ticketing and frontline, filtered by domain.
-  gaps:
-  - operation: listDevices
-    why: '**2 declared operations reach no component on this screen**: listDevices, listPrincipals. Either
-      the screen is missing what calls them, or the declaration is residue.'
-    source: the screen's own declarations
   layout:
     template: split
     regions:
     - name: contentBody
       slot: collection
       components:
+      - kind: textField
+        label: Status
+        operation: listAlerts
+        notes: Sends `?status=` to `listAlerts`.
+        provenance: contract reporting.yaml GET /alerts
+      - kind: textField
+        label: Severity
+        operation: listAlerts
+        notes: Sends `?severity=` to `listAlerts`.
+        provenance: contract reporting.yaml GET /alerts
+      - kind: textField
+        label: Workstation id
+        operation: listAlerts
+        notes: Sends `?workstationId=` to `listAlerts`.
+        provenance: contract reporting.yaml GET /alerts
+      - kind: textField
+        label: Shift id
+        operation: listAlerts
+        notes: Sends `?shiftId=` to `listAlerts`.
+        provenance: contract reporting.yaml GET /alerts
+      - kind: textField
+        label: Item id
+        operation: listAlerts
+        notes: Sends `?itemId=` to `listAlerts`.
+        provenance: contract reporting.yaml GET /alerts
       - kind: dataTable
-        label: Every operational performance
+        label: Every alert
         bindsTo: Alert
         columns:
         - Alert.id
@@ -528,26 +680,39 @@ screens:
         - Alert.escalatedAt
         operation: listAlerts
         provenance: contract reporting.yaml GET /alerts
-    - name: contextPanel
-      slot: selection
-      components:
-      - kind: detailPanel
-        label: The selected operational performance
-        bindsTo: DashboardData
+      - kind: dataTable
+        label: Every registered device
+        bindsTo: RegisteredDevice
         columns:
-        - DashboardData.tileData
-        operation: getDashboard
-        provenance: contract reporting.yaml GET /dashboards/{dashboardId}
-    - name: actionBar
-      slot: rowActions
-      components:
-      - kind: primaryButton
-        label: Run
-        operation: runReport
-        provenance: contract reporting.yaml POST /reports/{reportId}/run
-    - name: contentBody
-      slot: carried
-      components:
+        - RegisteredDevice.id
+        - RegisteredDevice.kind
+        - RegisteredDevice.driver
+        - RegisteredDevice.identifier
+        - RegisteredDevice.workstationId
+        - RegisteredDevice.model
+        - RegisteredDevice.pushToken
+        - RegisteredDevice.pushPlatform
+        - RegisteredDevice.pushFailureCount
+        - RegisteredDevice.offlineScope
+        - RegisteredDevice.firmwareVersion
+        - RegisteredDevice.isRequired
+        operation: listDevices
+        provenance: contract tenancy.yaml GET /devices
+      - kind: dataTable
+        label: Every principal
+        bindsTo: Principal
+        columns:
+        - Principal.id
+        - Principal.username
+        - Principal.displayName
+        - Principal.isActive
+        - Principal.validFrom
+        - Principal.validTo
+        - Principal.primaryRoleId
+        - Principal.roles
+        - Principal.lastLoginAt
+        operation: listPrincipals
+        provenance: contract identity.yaml GET /principals
       - kind: multiSelect
         label: Domain
         notes: '**The selector that collapses 26 board screens into nine.** A domain is a filter on an
@@ -558,6 +723,45 @@ screens:
         notes: '**Comparison against the previous period by default.** A number with nothing beside it
           is a number nobody can act on.'
         provenance: carried from the previous definition
+    - name: contextPanel
+      slot: selection
+      components:
+      - kind: detailPanel
+        label: The selected alert
+        bindsTo: Alert
+        columns:
+        - Alert.id
+        - Alert.ruleId
+        - Alert.ruleName
+        - Alert.metric
+        - Alert.raisedAt
+        - Alert.severity
+        - Alert.status
+        - Alert.observedValue
+        - Alert.threshold
+        - Alert.scopePath
+        - Alert.workstationId
+        - Alert.shiftId
+        - Alert.itemId
+        - Alert.acknowledgedByPrincipalId
+        - Alert.acknowledgedAt
+        - Alert.acknowledgementNote
+        operation: listAlerts
+        provenance: contract reporting.yaml GET /alerts
+      - kind: detailPanel
+        label: The dashboard data
+        bindsTo: DashboardData
+        columns:
+        - DashboardData.tileData
+        operation: getDashboard
+        provenance: contract reporting.yaml GET /dashboards/{dashboardId}
+    - name: actionBar
+      slot: rowActions
+      components:
+      - kind: primaryButton
+        label: Run report
+        operation: runReport
+        provenance: contract reporting.yaml POST /reports/{reportId}/run
   states:
     loading: Tiles render in place; **each resolves on its own** so one slow source does not hold the
       page.
@@ -606,7 +810,11 @@ screens:
       Monday. The domain and the window come from the link where it carries them, and from the last view
       where it does not.'
     preloaded:
-    - DashboardData.tileData
+    - Alert.id
+    - Alert.ruleId
+    - Alert.ruleName
+    - Alert.metric
+    - Alert.raisedAt
   wireframe:
     status: notStarted
     provenance: generated
@@ -619,6 +827,26 @@ screens:
   apisNote: Rebuilt 9 September 2026 from the 5 operations this screen declares, not from a workshop pack
     — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
     to the ones that matter is work a person still owes this screen.
+  overlays:
+  - id: formRunReport
+    component: modal
+    trigger: Run report
+    body: '**Collects what `runReport` sends before it is called.** Nothing in the body is required. Optional:
+      `parameters`, `venueId`, `dateFrom`, `dateTo`, `forceAsync`. Dismissing sends nothing; the screen
+      behind is unchanged.'
+    bindsTo: RunReportRequest
+    confirm:
+      label: Run report
+      operation: runReport
+    dismiss:
+      label: Cancel
+      discards:
+      - parameters
+      - venueId
+      - dateFrom
+      - dateTo
+      - forceAsync
+    provenance: contract reporting.yaml POST /reports/{reportId}/run
 - id: ANL-004
   name: Product Performance
   module: Analytics
@@ -641,18 +869,19 @@ screens:
       and no way to leave, so whoever landed on it was stuck. The return path is the same edge travelled
       the other way, not a guess about the product.'
     transitions:
-    - to: ANL-006
-      trigger: Inventory & Waste Intelligence
-      provenance: flow F82 step 3→4
     - to: ANL-001
       trigger: Executive Command Center
       carries:
       - dashboardId
-      - domain
       - reportId
-      - venueId
-      provenance: derived — ANL-001 declares entryState.params dashboardId, domain, reportId, venueId,
-        so an edge into it must carry them
+      provenance: derived — ANL-001 declares entryState.params dashboardId, reportId and ANL-004 holds
+        dashboardId, reportId, so an edge into it carries them
+    - to: ANL-006
+      trigger: Inventory & Waste Intelligence
+      provenance: flow F82 step 3→4
+      carries:
+      - dashboardId
+      - reportId
   notes: '**Built 20 August. Answers 2 board screens**: Product Performance & Menu Engineering; Product,
     SKU & Merchandise Performance. **Menu engineering and SKU performance are one analysis.** Both rank
     products by margin against volume; only the vocabulary differs. **Board repointed 24 August.** This
@@ -675,8 +904,23 @@ screens:
     - name: contentBody
       slot: collection
       components:
+      - kind: textField
+        label: Venue id
+        operation: listProducts
+        notes: Sends `?venueId=` to `listProducts`.
+        provenance: contract catalogue.yaml GET /products
+      - kind: textField
+        label: Kind
+        operation: listProducts
+        notes: Sends `?kind=` to `listProducts`.
+        provenance: contract catalogue.yaml GET /products
+      - kind: toggle
+        label: Is sellable
+        operation: listProducts
+        notes: Sends `?isSellable=` to `listProducts`.
+        provenance: contract catalogue.yaml GET /products
       - kind: dataTable
-        label: Every product performance
+        label: Every product
         bindsTo: Product
         columns:
         - Product.id
@@ -693,26 +937,6 @@ screens:
         - Product.onSaleTo
         operation: listProducts
         provenance: contract catalogue.yaml GET /products
-    - name: contextPanel
-      slot: selection
-      components:
-      - kind: detailPanel
-        label: The selected product performance
-        bindsTo: DashboardData
-        columns:
-        - DashboardData.tileData
-        operation: getDashboard
-        provenance: contract reporting.yaml GET /dashboards/{dashboardId}
-    - name: actionBar
-      slot: rowActions
-      components:
-      - kind: primaryButton
-        label: Run
-        operation: runReport
-        provenance: contract reporting.yaml POST /reports/{reportId}/run
-    - name: contentBody
-      slot: carried
-      components:
       - kind: multiSelect
         label: Domain
         notes: '**The selector that collapses 26 board screens into nine.** A domain is a filter on an
@@ -723,6 +947,45 @@ screens:
         notes: '**Comparison against the previous period by default.** A number with nothing beside it
           is a number nobody can act on.'
         provenance: carried from the previous definition
+    - name: contextPanel
+      slot: selection
+      components:
+      - kind: detailPanel
+        label: The selected product
+        bindsTo: Product
+        columns:
+        - Product.id
+        - Product.code
+        - Product.name
+        - Product.description
+        - Product.kind
+        - Product.venueId
+        - Product.scopePath
+        - Product.createdByPrincipalId
+        - Product.approvedByPrincipalId
+        - Product.responsibleDepartmentId
+        - Product.onSaleFrom
+        - Product.onSaleTo
+        - Product.categoryId
+        - Product.lifecycleState
+        - Product.isSellable
+        - Product.isStockTracked
+        operation: listProducts
+        provenance: contract catalogue.yaml GET /products
+      - kind: detailPanel
+        label: The dashboard data
+        bindsTo: DashboardData
+        columns:
+        - DashboardData.tileData
+        operation: getDashboard
+        provenance: contract reporting.yaml GET /dashboards/{dashboardId}
+    - name: actionBar
+      slot: rowActions
+      components:
+      - kind: primaryButton
+        label: Run report
+        operation: runReport
+        provenance: contract reporting.yaml POST /reports/{reportId}/run
   states:
     loading: Tiles render in place; **each resolves on its own** so one slow source does not hold the
       page.
@@ -763,7 +1026,11 @@ screens:
       Monday. The domain and the window come from the link where it carries them, and from the last view
       where it does not.'
     preloaded:
-    - DashboardData.tileData
+    - Product.id
+    - Product.code
+    - Product.name
+    - Product.description
+    - Product.kind
   wireframe:
     status: notStarted
     provenance: generated
@@ -774,6 +1041,26 @@ screens:
   apisNote: Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop pack
     — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
     to the ones that matter is work a person still owes this screen.
+  overlays:
+  - id: formRunReport
+    component: modal
+    trigger: Run report
+    body: '**Collects what `runReport` sends before it is called.** Nothing in the body is required. Optional:
+      `parameters`, `venueId`, `dateFrom`, `dateTo`, `forceAsync`. Dismissing sends nothing; the screen
+      behind is unchanged.'
+    bindsTo: RunReportRequest
+    confirm:
+      label: Run report
+      operation: runReport
+    dismiss:
+      label: Cancel
+      discards:
+      - parameters
+      - venueId
+      - dateFrom
+      - dateTo
+      - forceAsync
+    provenance: contract reporting.yaml POST /reports/{reportId}/run
 - id: ANL-005
   name: Cost, Margin & Profitability
   module: Analytics
@@ -795,19 +1082,20 @@ screens:
       and no way to leave, so whoever landed on it was stuck. The return path is the same edge travelled
       the other way, not a guess about the product.'
     transitions:
-    - to: ANL-007
-      trigger: Guest & Conversion Intelligence
-      provenance: flow F82 step 1→2
-      operation: getStockValuation
     - to: ANL-001
       trigger: Executive Command Center
       carries:
       - dashboardId
-      - domain
       - reportId
-      - venueId
-      provenance: derived — ANL-001 declares entryState.params dashboardId, domain, reportId, venueId,
-        so an edge into it must carry them
+      provenance: derived — ANL-001 declares entryState.params dashboardId, reportId and ANL-005 holds
+        dashboardId, reportId, so an edge into it carries them
+    - to: ANL-007
+      trigger: Guest & Conversion Intelligence
+      provenance: flow F82 step 1→2
+      operation: getStockValuation
+      carries:
+      - dashboardId
+      - reportId
   notes: '**Built 20 August. Answers 2 board screens**: Food Cost, Margin & Profitability Intelligence;
     Promotion, Pricing & Margin Intelligence. Cost against price against what actually sold. **Board repointed
     24 August.** This screen pointed at `wireframes/Retail Board 6.dc.html#ret-6f` — a frame in the client
@@ -823,11 +1111,6 @@ screens:
   patternReason: '`getDashboard` reads one record and nothing reads a population — the screen is about
     that one thing'
   purpose: Cost, Margin & Profitability — across F&B, retail, ticketing and frontline, filtered by domain.
-  gaps:
-  - operation: getStockValuation
-    why: '**1 declared operation reach no component on this screen**: getStockValuation. Either the screen
-      is missing what calls them, or the declaration is residue.'
-    source: the screen's own declarations
   layout:
     template: detail
     regions:
@@ -835,22 +1118,22 @@ screens:
       slot: record
       components:
       - kind: detailPanel
-        label: The selected cost margin profitability
+        label: The dashboard data
         bindsTo: DashboardData
         columns:
         - DashboardData.tileData
         operation: getDashboard
         provenance: contract reporting.yaml GET /dashboards/{dashboardId}
-    - name: actionBar
-      slot: rowActions
-      components:
-      - kind: primaryButton
-        label: Run
-        operation: runReport
-        provenance: contract reporting.yaml POST /reports/{reportId}/run
-    - name: contentBody
-      slot: carried
-      components:
+      - kind: detailPanel
+        label: The stock valuation
+        bindsTo: StockValuation
+        columns:
+        - StockValuation.asAt
+        - StockValuation.total
+        - StockValuation.byLocation
+        - StockValuation.byCategory
+        operation: getStockValuation
+        provenance: contract inventory.yaml GET /stock/valuation
       - kind: multiSelect
         label: Domain
         notes: '**The selector that collapses 26 board screens into nine.** A domain is a filter on an
@@ -861,6 +1144,13 @@ screens:
         notes: '**Comparison against the previous period by default.** A number with nothing beside it
           is a number nobody can act on.'
         provenance: carried from the previous definition
+    - name: actionBar
+      slot: rowActions
+      components:
+      - kind: primaryButton
+        label: Run report
+        operation: runReport
+        provenance: contract reporting.yaml POST /reports/{reportId}/run
   states:
     loading: Tiles render in place; **each resolves on its own** so one slow source does not hold the
       page.
@@ -908,6 +1198,26 @@ screens:
   apisNote: Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop pack
     — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
     to the ones that matter is work a person still owes this screen.
+  overlays:
+  - id: formRunReport
+    component: modal
+    trigger: Run report
+    body: '**Collects what `runReport` sends before it is called.** Nothing in the body is required. Optional:
+      `parameters`, `venueId`, `dateFrom`, `dateTo`, `forceAsync`. Dismissing sends nothing; the screen
+      behind is unchanged.'
+    bindsTo: RunReportRequest
+    confirm:
+      label: Run report
+      operation: runReport
+    dismiss:
+      label: Cancel
+      discards:
+      - parameters
+      - venueId
+      - dateFrom
+      - dateTo
+      - forceAsync
+    provenance: contract reporting.yaml POST /reports/{reportId}/run
 - id: ANL-006
   name: Inventory & Waste Intelligence
   module: Analytics
@@ -933,17 +1243,17 @@ screens:
       trigger: Executive Command Center
       carries:
       - dashboardId
-      - domain
       - reportId
-      - venueId
-      provenance: derived — ANL-001 declares entryState.params dashboardId, domain, reportId, venueId,
-        so an edge into it must carry them
+      provenance: derived — ANL-001 declares entryState.params dashboardId, reportId and ANL-006 holds
+        dashboardId, reportId, so an edge into it carries them
     - to: BO-058
       trigger: Reporting Home
       provenance: flow F82 step 4→5
       operation: listExpiringBatches
       crossesDevice: true
       back: false
+      carries:
+      - reportId
   notes: '**Built 20 August. Answers 2 board screens**: Inventory, Waste & Production Intelligence; Inventory,
     Sell-Through & Stock Intelligence. **Theoretical against actual is the whole analysis** — a recipe
     says 400 portions, the run says 380, and the gap is waste, theft or a wrong recipe. **Board repointed
@@ -964,19 +1274,19 @@ screens:
   patternReason: '`listExpiringBatches` reads the population and `getDashboard` reads one of them — list,
     select, act'
   purpose: Inventory & Waste Intelligence — across F&B, retail, ticketing and frontline, filtered by domain.
-  gaps:
-  - operation: getCountVariance
-    why: '**1 declared operation reach no component on this screen**: getCountVariance. Either the screen
-      is missing what calls them, or the declaration is residue.'
-    source: the screen's own declarations
   layout:
     template: split
     regions:
     - name: contentBody
       slot: collection
       components:
+      - kind: numberField
+        label: Within days
+        operation: listExpiringBatches
+        notes: Sends `?withinDays=` to `listExpiringBatches`.
+        provenance: contract inventory.yaml GET /stock-batches/expiring
       - kind: dataTable
-        label: Every inventory waste intelligence
+        label: Every stock batch
         bindsTo: StockBatch
         columns:
         - StockBatch.id
@@ -991,26 +1301,6 @@ screens:
         - StockBatch.status
         operation: listExpiringBatches
         provenance: contract inventory.yaml GET /stock-batches/expiring
-    - name: contextPanel
-      slot: selection
-      components:
-      - kind: detailPanel
-        label: The selected inventory waste intelligence
-        bindsTo: DashboardData
-        columns:
-        - DashboardData.tileData
-        operation: getDashboard
-        provenance: contract reporting.yaml GET /dashboards/{dashboardId}
-    - name: actionBar
-      slot: rowActions
-      components:
-      - kind: primaryButton
-        label: Run
-        operation: runReport
-        provenance: contract reporting.yaml POST /reports/{reportId}/run
-    - name: contentBody
-      slot: carried
-      components:
       - kind: multiSelect
         label: Domain
         notes: '**The selector that collapses 26 board screens into nine.** A domain is a filter on an
@@ -1021,6 +1311,49 @@ screens:
         notes: '**Comparison against the previous period by default.** A number with nothing beside it
           is a number nobody can act on.'
         provenance: carried from the previous definition
+    - name: contextPanel
+      slot: selection
+      components:
+      - kind: detailPanel
+        label: The selected stock batch
+        bindsTo: StockBatch
+        columns:
+        - StockBatch.id
+        - StockBatch.itemId
+        - StockBatch.locationId
+        - StockBatch.batchCode
+        - StockBatch.lotNumber
+        - StockBatch.quantity
+        - StockBatch.receivedAt
+        - StockBatch.expiresAt
+        - StockBatch.supplierId
+        - StockBatch.status
+        operation: listExpiringBatches
+        provenance: contract inventory.yaml GET /stock-batches/expiring
+      - kind: detailPanel
+        label: The count variance
+        bindsTo: CountVariance
+        columns:
+        - CountVariance.countId
+        - CountVariance.totalVarianceValue
+        - CountVariance.exceptionCount
+        - CountVariance.lines
+        operation: getCountVariance
+        provenance: contract inventory.yaml GET /stock-counts/{countId}/variance
+      - kind: detailPanel
+        label: The dashboard data
+        bindsTo: DashboardData
+        columns:
+        - DashboardData.tileData
+        operation: getDashboard
+        provenance: contract reporting.yaml GET /dashboards/{dashboardId}
+    - name: actionBar
+      slot: rowActions
+      components:
+      - kind: primaryButton
+        label: Run report
+        operation: runReport
+        provenance: contract reporting.yaml POST /reports/{reportId}/run
   states:
     loading: Tiles render in place; **each resolves on its own** so one slow source does not hold the
       page.
@@ -1067,7 +1400,11 @@ screens:
       Monday. The domain and the window come from the link where it carries them, and from the last view
       where it does not.'
     preloaded:
-    - DashboardData.tileData
+    - StockBatch.id
+    - StockBatch.itemId
+    - StockBatch.locationId
+    - StockBatch.batchCode
+    - StockBatch.lotNumber
   wireframe:
     status: notStarted
     provenance: generated
@@ -1080,6 +1417,26 @@ screens:
   apisNote: Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack
     — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
     to the ones that matter is work a person still owes this screen.
+  overlays:
+  - id: formRunReport
+    component: modal
+    trigger: Run report
+    body: '**Collects what `runReport` sends before it is called.** Nothing in the body is required. Optional:
+      `parameters`, `venueId`, `dateFrom`, `dateTo`, `forceAsync`. Dismissing sends nothing; the screen
+      behind is unchanged.'
+    bindsTo: RunReportRequest
+    confirm:
+      label: Run report
+      operation: runReport
+    dismiss:
+      label: Cancel
+      discards:
+      - parameters
+      - venueId
+      - dateFrom
+      - dateTo
+      - forceAsync
+    provenance: contract reporting.yaml POST /reports/{reportId}/run
 - id: ANL-007
   name: Guest & Conversion Intelligence
   module: Analytics
@@ -1102,18 +1459,19 @@ screens:
       and no way to leave, so whoever landed on it was stuck. The return path is the same edge travelled
       the other way, not a guess about the product.'
     transitions:
-    - to: ANL-004
-      trigger: Product Performance
-      provenance: flow F82 step 2→3
     - to: ANL-001
       trigger: Executive Command Center
       carries:
       - dashboardId
-      - domain
       - reportId
-      - venueId
-      provenance: derived — ANL-001 declares entryState.params dashboardId, domain, reportId, venueId,
-        so an edge into it must carry them
+      provenance: derived — ANL-001 declares entryState.params dashboardId, reportId and ANL-007 holds
+        dashboardId, reportId, so an edge into it carries them
+    - to: ANL-004
+      trigger: Product Performance
+      provenance: flow F82 step 2→3
+      carries:
+      - dashboardId
+      - reportId
   notes: '**Built 20 August. Answers 2 board screens**: Guest, Conversion & Basket Intelligence; Kitchen,
     Service & Fulfilment Performance. Who bought, what else they nearly bought, and how long they waited.
     **Retail board operations wired 24 August.** **Board repointed 24 August.** This screen pointed at
@@ -1136,8 +1494,13 @@ screens:
     - name: contentBody
       slot: collection
       components:
+      - kind: searchField
+        label: Search
+        operation: listSegments
+        notes: Sends `?search=` to `listSegments`.
+        provenance: contract marketing-crm.yaml GET /segments
       - kind: dataTable
-        label: Every guest conversion intelligence
+        label: Every segment
         bindsTo: Segment
         columns:
         - Segment.name
@@ -1151,34 +1514,6 @@ screens:
         - Segment.lastEvaluatedAt
         operation: listSegments
         provenance: contract marketing-crm.yaml GET /segments
-    - name: contextPanel
-      slot: selection
-      components:
-      - kind: detailPanel
-        label: The selected guest conversion intelligence
-        bindsTo: DashboardData
-        columns:
-        - DashboardData.tileData
-        operation: getDashboard
-        provenance: contract reporting.yaml GET /dashboards/{dashboardId}
-    - name: actionBar
-      slot: rowActions
-      components:
-      - kind: primaryButton
-        label: Run
-        operation: runReport
-        provenance: contract reporting.yaml POST /reports/{reportId}/run
-      - kind: secondaryButton
-        label: Create
-        operation: createSegment
-        provenance: contract marketing-crm.yaml POST /segments
-      - kind: secondaryButton
-        label: Preview
-        operation: previewSegment
-        provenance: contract marketing-crm.yaml POST /segments/{segmentId}/preview
-    - name: contentBody
-      slot: carried
-      components:
       - kind: multiSelect
         label: Domain
         notes: '**The selector that collapses 26 board screens into nine.** A domain is a filter on an
@@ -1189,6 +1524,46 @@ screens:
         notes: '**Comparison against the previous period by default.** A number with nothing beside it
           is a number nobody can act on.'
         provenance: carried from the previous definition
+    - name: contextPanel
+      slot: selection
+      components:
+      - kind: detailPanel
+        label: The selected segment
+        bindsTo: Segment
+        columns:
+        - Segment.name
+        - Segment.description
+        - Segment.venueId
+        - Segment.match
+        - Segment.criteria
+        - Segment.excludeSegmentIds
+        - Segment.id
+        - Segment.lastEvaluatedSize
+        - Segment.lastEvaluatedAt
+        operation: listSegments
+        provenance: contract marketing-crm.yaml GET /segments
+      - kind: detailPanel
+        label: The dashboard data
+        bindsTo: DashboardData
+        columns:
+        - DashboardData.tileData
+        operation: getDashboard
+        provenance: contract reporting.yaml GET /dashboards/{dashboardId}
+    - name: actionBar
+      slot: rowActions
+      components:
+      - kind: primaryButton
+        label: Run report
+        operation: runReport
+        provenance: contract reporting.yaml POST /reports/{reportId}/run
+      - kind: secondaryButton
+        label: Create segment
+        operation: createSegment
+        provenance: contract marketing-crm.yaml POST /segments
+      - kind: secondaryButton
+        label: Preview segment
+        operation: previewSegment
+        provenance: contract marketing-crm.yaml POST /segments/{segmentId}/preview
   states:
     loading: Tiles render in place; **each resolves on its own** so one slow source does not hold the
       page.
@@ -1243,7 +1618,11 @@ screens:
       Monday. The domain and the window come from the link where it carries them, and from the last view
       where it does not. A segment opened from the list.'
     preloaded:
-    - DashboardData.tileData
+    - Segment.name
+    - Segment.description
+    - Segment.venueId
+    - Segment.match
+    - Segment.criteria
   wireframe:
     status: notStarted
     provenance: generated
@@ -1254,6 +1633,46 @@ screens:
   apisNote: Rebuilt 9 September 2026 from the 5 operations this screen declares, not from a workshop pack
     — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
     to the ones that matter is work a person still owes this screen.
+  overlays:
+  - id: formRunReport
+    component: modal
+    trigger: Run report
+    body: '**Collects what `runReport` sends before it is called.** Nothing in the body is required. Optional:
+      `parameters`, `venueId`, `dateFrom`, `dateTo`, `forceAsync`. Dismissing sends nothing; the screen
+      behind is unchanged.'
+    bindsTo: RunReportRequest
+    confirm:
+      label: Run report
+      operation: runReport
+    dismiss:
+      label: Cancel
+      discards:
+      - parameters
+      - venueId
+      - dateFrom
+      - dateTo
+      - forceAsync
+    provenance: contract reporting.yaml POST /reports/{reportId}/run
+  - id: formCreateSegment
+    component: modal
+    trigger: Create segment
+    body: '**Collects what `createSegment` sends before it is called.** Required: `name`, `criteria`.
+      Optional: `description`, `venueId`, `match`, `excludeSegmentIds`. Dismissing sends nothing; the
+      screen behind is unchanged.'
+    bindsTo: CreateSegmentRequest
+    confirm:
+      label: Create segment
+      operation: createSegment
+    dismiss:
+      label: Cancel
+      discards:
+      - name
+      - criteria
+      - description
+      - venueId
+      - match
+      - excludeSegmentIds
+    provenance: contract marketing-crm.yaml POST /segments
 - id: ANL-008
   name: Demand Forecasting
   module: Analytics
@@ -1278,11 +1697,9 @@ screens:
       trigger: Executive Command Center
       carries:
       - dashboardId
-      - domain
       - reportId
-      - venueId
-      provenance: derived — ANL-001 declares entryState.params dashboardId, domain, reportId, venueId,
-        so an edge into it must carry them
+      provenance: derived — ANL-001 declares entryState.params dashboardId, reportId and ANL-008 holds
+        dashboardId, reportId, so an edge into it carries them
   notes: '**Built 20 August. Answers 2 board screens**: Demand Forecasting & Operational Planning; Demand
     Forecasting & Merchandise Planning. **A forecast is an input to a requisition, not a report.** Its
     value is that somebody orders differently because of it. **Board repointed 24 August.** This screen
@@ -1306,22 +1723,12 @@ screens:
       slot: record
       components:
       - kind: detailPanel
-        label: The selected demand forecasting
+        label: The dashboard data
         bindsTo: DashboardData
         columns:
         - DashboardData.tileData
         operation: getDashboard
         provenance: contract reporting.yaml GET /dashboards/{dashboardId}
-    - name: actionBar
-      slot: rowActions
-      components:
-      - kind: primaryButton
-        label: Ask
-        operation: askReportingQuestion
-        provenance: contract reporting.yaml POST /reports/ask
-    - name: contentBody
-      slot: carried
-      components:
       - kind: multiSelect
         label: Domain
         notes: '**The selector that collapses 26 board screens into nine.** A domain is a filter on an
@@ -1332,6 +1739,13 @@ screens:
         notes: '**Comparison against the previous period by default.** A number with nothing beside it
           is a number nobody can act on.'
         provenance: carried from the previous definition
+    - name: actionBar
+      slot: rowActions
+      components:
+      - kind: primaryButton
+        label: Ask reporting question
+        operation: askReportingQuestion
+        provenance: contract reporting.yaml POST /reports/ask
   states:
     loading: Tiles render in place; **each resolves on its own** so one slow source does not hold the
       page.
@@ -1373,6 +1787,22 @@ screens:
   apisNote: Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack
     — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
     to the ones that matter is work a person still owes this screen.
+  overlays:
+  - id: formAskReportingQuestion
+    component: modal
+    trigger: Ask reporting question
+    body: '**Collects what `askReportingQuestion` sends before it is called.** Required: `question`. Optional:
+      `conversationId`, `venueId`. Dismissing sends nothing; the screen behind is unchanged.'
+    confirm:
+      label: Ask reporting question
+      operation: askReportingQuestion
+    dismiss:
+      label: Cancel
+      discards:
+      - question
+      - conversationId
+      - venueId
+    provenance: contract reporting.yaml POST /reports/ask
 - id: ANL-009
   name: AI Assistant & Action Center
   module: Analytics
@@ -1396,17 +1826,16 @@ screens:
     - to: ANL-001
       trigger: Executive Command Center
       carries:
-      - dashboardId
-      - domain
       - reportId
-      - venueId
-      provenance: derived — ANL-001 declares entryState.params dashboardId, domain, reportId, venueId,
-        so an edge into it must carry them
+      provenance: derived — ANL-001 declares entryState.params dashboardId, reportId and ANL-009 holds
+        reportId, so an edge into it carries them
     - to: BO-010
       trigger: Promotions & Coupons
       provenance: flow F77 step 3→4
       crossesDevice: true
       back: false
+      carries:
+      - reportId
   notes: '**Built 20 August. Answers 5 board screens**: AI Recommendation, Simulation & Optimization Center;
     AI Assistant, Alerts & Management Action Center; Transaction & Exception Monitoring and 2 more. **Five
     board screens, and the collapse is the point.** Every domain drew an AI centre and an alert centre;
@@ -1431,17 +1860,37 @@ screens:
   patternReason: '`decideProposedAction` decides items that `listAlerts` queues — every row is waiting
     for a person, so the empty state is success'
   purpose: AI Assistant & Action Center — across F&B, retail, ticketing and frontline, filtered by domain.
-  gaps:
-  - operation: listOrders
-    why: '**2 declared operations reach no component on this screen**: listOrders, listProposedActions.
-      Either the screen is missing what calls them, or the declaration is residue.'
-    source: the screen's own declarations
   layout:
     template: split
     regions:
     - name: contentBody
       slot: queue
       components:
+      - kind: textField
+        label: Status
+        operation: listAlerts
+        notes: Sends `?status=` to `listAlerts`.
+        provenance: contract reporting.yaml GET /alerts
+      - kind: textField
+        label: Severity
+        operation: listAlerts
+        notes: Sends `?severity=` to `listAlerts`.
+        provenance: contract reporting.yaml GET /alerts
+      - kind: textField
+        label: Workstation id
+        operation: listAlerts
+        notes: Sends `?workstationId=` to `listAlerts`.
+        provenance: contract reporting.yaml GET /alerts
+      - kind: textField
+        label: Shift id
+        operation: listAlerts
+        notes: Sends `?shiftId=` to `listAlerts`.
+        provenance: contract reporting.yaml GET /alerts
+      - kind: textField
+        label: Item id
+        operation: listAlerts
+        notes: Sends `?itemId=` to `listAlerts`.
+        provenance: contract reporting.yaml GET /alerts
       - kind: dataTable
         label: Waiting for a decision
         bindsTo: Alert
@@ -1460,11 +1909,55 @@ screens:
         - Alert.escalatedAt
         operation: listAlerts
         provenance: contract reporting.yaml GET /alerts
+      - kind: dataTable
+        label: Every order
+        bindsTo: OrderSummary
+        columns:
+        - OrderSummary.id
+        - OrderSummary.orderNumber
+        - OrderSummary.status
+        - OrderSummary.grossAmount
+        - OrderSummary.refundedAmount
+        - OrderSummary.channel
+        - OrderSummary.lineCount
+        - OrderSummary.principalId
+        - OrderSummary.holdLabel
+        - OrderSummary.heldUntil
+        operation: listOrders
+        provenance: contract orders.yaml GET /orders
+      - kind: dataTable
+        label: Every proposed action
+        bindsTo: ProposedAction
+        columns:
+        - ProposedAction.id
+        - ProposedAction.interactionId
+        - ProposedAction.kind
+        - ProposedAction.targetContract
+        - ProposedAction.targetOperation
+        - ProposedAction.payload
+        - ProposedAction.summary
+        - ProposedAction.status
+        - ProposedAction.approvalLevel
+        - ProposedAction.decidedByPrincipalId
+        - ProposedAction.decisionReason
+        - ProposedAction.proposedAt
+        operation: listProposedActions
+        provenance: contract ai.yaml GET /proposed-actions
+      - kind: multiSelect
+        label: Domain
+        notes: '**The selector that collapses 26 board screens into nine.** A domain is a filter on an
+          analytics screen, not a copy of it — building three sets means maintaining one screen three
+          times and watching them drift.'
+        provenance: carried from the previous definition
+      - kind: chart
+        notes: '**Comparison against the previous period by default.** A number with nothing beside it
+          is a number nobody can act on.'
+        provenance: carried from the previous definition
     - name: contextPanel
       slot: item
       components:
       - kind: detailPanel
-        label: The selected assistant action
+        label: The selected alert
         bindsTo: Alert
         columns:
         - Alert.id
@@ -1485,38 +1978,25 @@ screens:
       slot: decision
       components:
       - kind: primaryButton
-        label: Ask
+        label: Ask reporting question
         operation: askReportingQuestion
         provenance: contract reporting.yaml POST /reports/ask
       - kind: secondaryButton
-        label: Acknowledge
+        label: Acknowledge alert
         operation: acknowledgeAlert
         provenance: contract reporting.yaml POST /alerts/{alertId}/acknowledge
       - kind: secondaryButton
-        label: Run
+        label: Run report
         operation: runReport
         provenance: contract reporting.yaml POST /reports/{reportId}/run
       - kind: secondaryButton
-        label: Save changes
+        label: Save alert rule
         operation: setAlertRule
         provenance: contract reporting.yaml PUT /alert-rules
       - kind: secondaryButton
-        label: Decide
+        label: Decide proposed action
         operation: decideProposedAction
         provenance: contract ai.yaml POST /proposed-actions/{actionId}/decide
-    - name: contentBody
-      slot: carried
-      components:
-      - kind: multiSelect
-        label: Domain
-        notes: '**The selector that collapses 26 board screens into nine.** A domain is a filter on an
-          analytics screen, not a copy of it — building three sets means maintaining one screen three
-          times and watching them drift.'
-        provenance: carried from the previous definition
-      - kind: chart
-        notes: '**Comparison against the previous period by default.** A number with nothing beside it
-          is a number nobody can act on.'
-        provenance: carried from the previous definition
   states:
     loading: Tiles render in place; **each resolves on its own** so one slow source does not hold the
       page.
@@ -1604,6 +2084,96 @@ screens:
   apisNote: Rebuilt 9 September 2026 from the 8 operations this screen declares, not from a workshop pack
     — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
     to the ones that matter is work a person still owes this screen.
+  overlays:
+  - id: formAskReportingQuestion
+    component: modal
+    trigger: Ask reporting question
+    body: '**Collects what `askReportingQuestion` sends before it is called.** Required: `question`. Optional:
+      `conversationId`, `venueId`. Dismissing sends nothing; the screen behind is unchanged.'
+    confirm:
+      label: Ask reporting question
+      operation: askReportingQuestion
+    dismiss:
+      label: Cancel
+      discards:
+      - question
+      - conversationId
+      - venueId
+    provenance: contract reporting.yaml POST /reports/ask
+  - id: formAcknowledgeAlert
+    component: modal
+    trigger: Acknowledge alert
+    body: '**Collects what `acknowledgeAlert` sends before it is called.** Nothing in the body is required.
+      Optional: `note`. Dismissing sends nothing; the screen behind is unchanged.'
+    confirm:
+      label: Acknowledge alert
+      operation: acknowledgeAlert
+    dismiss:
+      label: Cancel
+      discards:
+      - note
+    provenance: contract reporting.yaml POST /alerts/{alertId}/acknowledge
+  - id: formRunReport
+    component: modal
+    trigger: Run report
+    body: '**Collects what `runReport` sends before it is called.** Nothing in the body is required. Optional:
+      `parameters`, `venueId`, `dateFrom`, `dateTo`, `forceAsync`. Dismissing sends nothing; the screen
+      behind is unchanged.'
+    bindsTo: RunReportRequest
+    confirm:
+      label: Run report
+      operation: runReport
+    dismiss:
+      label: Cancel
+      discards:
+      - parameters
+      - venueId
+      - dateFrom
+      - dateTo
+      - forceAsync
+    provenance: contract reporting.yaml POST /reports/{reportId}/run
+  - id: formSetAlertRule
+    component: modal
+    trigger: Save alert rule
+    body: '**Collects what `setAlertRule` sends before it is called.** Required: `id`, `name`, `metric`,
+      `comparator`, `threshold`, `severity`, `isActive`, `scopePath`. Optional: `thresholdUpper`, `windowMinutes`,
+      `deliverTo`, `recipientRoleIds`, `cooldownMinutes`. Dismissing sends nothing; the screen behind
+      is unchanged.'
+    bindsTo: AlertRule
+    confirm:
+      label: Save alert rule
+      operation: setAlertRule
+    dismiss:
+      label: Cancel
+      discards:
+      - id
+      - name
+      - metric
+      - comparator
+      - threshold
+      - severity
+      - isActive
+      - scopePath
+      - thresholdUpper
+      - windowMinutes
+      - deliverTo
+      - recipientRoleIds
+      - cooldownMinutes
+    provenance: contract reporting.yaml PUT /alert-rules
+  - id: formDecideProposedAction
+    component: modal
+    trigger: Decide proposed action
+    body: '**Collects what `decideProposedAction` sends before it is called.** Required: `decision`. Optional:
+      `reason`. Dismissing sends nothing; the screen behind is unchanged.'
+    confirm:
+      label: Decide proposed action
+      operation: decideProposedAction
+    dismiss:
+      label: Cancel
+      discards:
+      - decision
+      - reason
+    provenance: contract ai.yaml POST /proposed-actions/{actionId}/decide
 - id: ANL-010
   name: Suggestions & Advice
   module: Analytics
@@ -1626,13 +2196,8 @@ screens:
     transitions:
     - to: ANL-001
       trigger: Executive Command Center
-      carries:
-      - dashboardId
-      - domain
-      - reportId
-      - venueId
-      provenance: derived — ANL-001 declares entryState.params dashboardId, domain, reportId, venueId,
-        so an edge into it must carry them
+      provenance: derived — ANL-001 declares entryState.params dashboardId, reportId and ANL-010 holds
+        none of them, so the edge carries nothing and ANL-001 opens cold
   notes: '**Built 24 August.** The client F&B boards drew six suggestion endpoints — price, requisition,
     replenishment, scenario, SLA, demand plan. **One screen and one operation answer all six**, because
     a suggestion surface that differs per domain is six screens to change when the model changes. **Owns
@@ -1651,11 +2216,6 @@ screens:
   patternReason: the screen declares only writes (`requestSuggestion`, `recordSuggestionOutcome`) and
     no read of a population — it is settings, not a list
   purpose: Every open suggestion, what it is based on, and whether the venue took it.
-  gaps:
-  - operation: requestSuggestion
-    why: '**`requestSuggestion` declares no request body shape**, so nothing says what this editor edits.
-      The fields cannot be derived and the screen needs the contract before it needs a designer.'
-    source: contract ai.yaml POST /ai/suggestions
   layout:
     template: form
     regions:
@@ -1663,11 +2223,11 @@ screens:
       slot: publish
       components:
       - kind: primaryButton
-        label: Request
+        label: Request suggestion
         operation: requestSuggestion
         provenance: contract ai.yaml POST /ai/suggestions
       - kind: secondaryButton
-        label: Record
+        label: Record suggestion outcome
         operation: recordSuggestionOutcome
         provenance: contract ai.yaml POST /ai/suggestions/{suggestionId}/outcome
     - name: contentBody
@@ -1693,6 +2253,23 @@ screens:
         notes: '**Records the outcome either way.** A rejected suggestion is the case the current rule
           got wrong, which is exactly what a model is trained to beat.'
         provenance: carried from the previous definition
+      - kind: textField
+        label: Kind
+        operation: requestSuggestion
+        notes: Required.
+        provenance: contract ai.yaml POST /ai/suggestions
+      - kind: textField
+        label: Subject ref
+        operation: requestSuggestion
+        provenance: contract ai.yaml POST /ai/suggestions
+      - kind: textField
+        label: Horizon
+        operation: requestSuggestion
+        provenance: contract ai.yaml POST /ai/suggestions
+      - kind: textField
+        label: Context
+        operation: requestSuggestion
+        provenance: contract ai.yaml POST /ai/suggestions
   states:
     loading: Open suggestions, newest first, grouped by kind.
     error: Could not load. **Trading is unaffected** — this advises and does not act.
@@ -1729,6 +2306,29 @@ screens:
   apisNote: Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack
     — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
     to the ones that matter is work a person still owes this screen.
+  overlays:
+  - id: formRecordSuggestionOutcome
+    component: modal
+    trigger: Record suggestion outcome
+    body: '**Collects what `recordSuggestionOutcome` sends before it is called.** Required: `id`, `suggestionId`,
+      `decision`. Optional: `actualValue`, `decidedByPrincipalId`, `decidedAt`, `realisedOutcome`, `note`.
+      Dismissing sends nothing; the screen behind is unchanged.'
+    bindsTo: SuggestionOutcome
+    confirm:
+      label: Record suggestion outcome
+      operation: recordSuggestionOutcome
+    dismiss:
+      label: Cancel
+      discards:
+      - id
+      - suggestionId
+      - decision
+      - actualValue
+      - decidedByPrincipalId
+      - decidedAt
+      - realisedOutcome
+      - note
+    provenance: contract ai.yaml POST /ai/suggestions/{suggestionId}/outcome
 - id: ANL-012
   name: Live Operations Dashboard
   module: Analytics
@@ -1758,13 +2358,8 @@ screens:
       back: true
     - to: ANL-001
       trigger: Executive Command Center
-      carries:
-      - dashboardId
-      - domain
-      - reportId
-      - venueId
-      provenance: derived — ANL-001 declares entryState.params dashboardId, domain, reportId, venueId,
-        so an edge into it must carry them
+      provenance: derived — ANL-001 declares entryState.params dashboardId, reportId and ANL-012 holds
+        none of them, so the edge carries nothing and ANL-001 opens cold
   density: compact
   purposeNote: Authorized operations users can identify the live status of each site and immediately drill
     into abnormal conditions.
@@ -1885,13 +2480,8 @@ screens:
       back: true
     - to: ANL-001
       trigger: Executive Command Center
-      carries:
-      - dashboardId
-      - domain
-      - reportId
-      - venueId
-      provenance: derived — ANL-001 declares entryState.params dashboardId, domain, reportId, venueId,
-        so an edge into it must carry them
+      provenance: derived — ANL-001 declares entryState.params dashboardId, reportId and ANL-013 holds
+        none of them, so the edge carries nothing and ANL-001 opens cold
   density: compact
   purposeNote: Management can identify revenue performance and drill down from consolidated revenue to
     site → business unit → channel → product → transaction level, subject to permissions.
@@ -2001,13 +2591,8 @@ screens:
       back: true
     - to: ANL-001
       trigger: Executive Command Center
-      carries:
-      - dashboardId
-      - domain
-      - reportId
-      - venueId
-      provenance: derived — ANL-001 declares entryState.params dashboardId, domain, reportId, venueId,
-        so an edge into it must carry them
+      provenance: derived — ANL-001 declares entryState.params dashboardId, reportId and ANL-014 holds
+        none of them, so the edge carries nothing and ANL-001 opens cold
   density: compact
   purposeNote: Users can understand historical, current and forecast visitor volumes and drill into the
     underlying attendance data.
@@ -2126,13 +2711,8 @@ screens:
       back: true
     - to: ANL-001
       trigger: Executive Command Center
-      carries:
-      - dashboardId
-      - domain
-      - reportId
-      - venueId
-      provenance: derived — ANL-001 declares entryState.params dashboardId, domain, reportId, venueId,
-        so an edge into it must carry them
+      provenance: derived — ANL-001 declares entryState.params dashboardId, reportId and ANL-015 holds
+        none of them, so the edge carries nothing and ANL-001 opens cold
   density: compact
   purposeNote: Users can identify underutilized, approaching-capacity and fully utilized locations/resources
     in real time.
@@ -2230,13 +2810,8 @@ screens:
       back: true
     - to: ANL-001
       trigger: Executive Command Center
-      carries:
-      - dashboardId
-      - domain
-      - reportId
-      - venueId
-      provenance: derived — ANL-001 declares entryState.params dashboardId, domain, reportId, venueId,
-        so an edge into it must carry them
+      provenance: derived — ANL-001 declares entryState.params dashboardId, reportId and ANL-016 holds
+        none of them, so the edge carries nothing and ANL-001 opens cold
   density: compact
   purposeNote: Management can compare channel profitability and sales performance from one dashboard.
   pattern: commandCentre
@@ -2345,13 +2920,8 @@ screens:
       back: true
     - to: ANL-001
       trigger: Executive Command Center
-      carries:
-      - dashboardId
-      - domain
-      - reportId
-      - venueId
-      provenance: derived — ANL-001 declares entryState.params dashboardId, domain, reportId, venueId,
-        so an edge into it must carry them
+      provenance: derived — ANL-001 declares entryState.params dashboardId, reportId and ANL-017 holds
+        none of them, so the edge carries nothing and ANL-001 opens cold
   density: compact
   purposeNote: Authorized users can understand customer acquisition, engagement, retention, membership
     and loyalty performance without accessing separate CRM dashboards.
@@ -2497,13 +3067,8 @@ screens:
       back: true
     - to: ANL-001
       trigger: Executive Command Center
-      carries:
-      - dashboardId
-      - domain
-      - reportId
-      - venueId
-      provenance: derived — ANL-001 declares entryState.params dashboardId, domain, reportId, venueId,
-        so an edge into it must carry them
+      provenance: derived — ANL-001 declares entryState.params dashboardId, reportId and ANL-018 holds
+        none of them, so the edge carries nothing and ANL-001 opens cold
   density: compact
   purposeNote: Management can identify and manage important business exceptions from a centralized queue.
   pattern: listDetail
@@ -2622,13 +3187,8 @@ screens:
       back: true
     - to: ANL-001
       trigger: Executive Command Center
-      carries:
-      - dashboardId
-      - domain
-      - reportId
-      - venueId
-      provenance: derived — ANL-001 declares entryState.params dashboardId, domain, reportId, venueId,
-        so an edge into it must carry them
+      provenance: derived — ANL-001 declares entryState.params dashboardId, reportId and ANL-019 holds
+        none of them, so the edge carries nothing and ANL-001 opens cold
   density: compact
   purposeNote: Users receive explainable, traceable AI insights linked to the underlying supporting data.
   pattern: listDetail
@@ -2886,15 +3446,22 @@ screens:
       trigger: Back to Executive Command Center
       provenance: structural — pack board 2 wiring, 9 September 2026
       back: true
+      carries:
+      - dashboardId
+      - reportId
     - to: ANL-030
       trigger: Dashboard Preview, Validation & Health
       provenance: structural — pack board 2 wiring, 9 September 2026
+      carries:
+      - dashboardId
     - to: ANL-022
       trigger: Dashboard Creation Wizard
       provenance: structural — pack board 2 wiring, 9 September 2026
     - to: ANL-023
       trigger: Drag-and-Drop Dashboard Canvas
       provenance: structural — pack board 2 wiring, 9 September 2026
+      carries:
+      - dashboardId
     - to: ANL-024
       trigger: Widget & Visualization Library
       provenance: structural — pack board 2 wiring, 9 September 2026
@@ -2907,12 +3474,18 @@ screens:
     - to: ANL-027
       trigger: Data & Filter Configuration
       provenance: structural — pack board 2 wiring, 9 September 2026
+      carries:
+      - dashboardId
     - to: ANL-028
       trigger: Drill-Down & Interaction Designer
       provenance: structural — pack board 2 wiring, 9 September 2026
+      carries:
+      - dashboardId
     - to: ANL-029
       trigger: Dashboard Access, Publishing & Versioning
       provenance: structural — pack board 2 wiring, 9 September 2026
+      carries:
+      - dashboardId
   density: compact
   purposeNote: Authorized users can search, filter, manage, clone and govern dashboards from one central
     catalogue.
@@ -3083,6 +3656,8 @@ screens:
       trigger: Back to Dashboard Library
       provenance: structural — pack board 2 wiring, 9 September 2026
       back: true
+      carries:
+      - dashboardId
   density: compact
   purposeNote: Users can create the initial dashboard configuration without technical/database knowledge.
   pattern: configEditor
@@ -3205,6 +3780,8 @@ screens:
       trigger: Back to Dashboard Library
       provenance: structural — pack board 2 wiring, 9 September 2026
       back: true
+      carries:
+      - dashboardId
   density: compact
   purposeNote: A business analyst can visually construct a dashboard without coding.
   pattern: listDetail
@@ -3263,7 +3840,7 @@ screens:
   - operationId: getDashboard
     contract: reporting
     purpose: The dashboard being edited
-    trigger: onLoad
+    trigger: onAction
     provenance: board reading, 19 September 2026
   wireframe:
     status: notStarted
@@ -3689,6 +4266,8 @@ screens:
       trigger: Back to Dashboard Library
       provenance: structural — pack board 2 wiring, 9 September 2026
       back: true
+      carries:
+      - dashboardId
   density: compact
   purposeNote: Users can configure dashboard data and filters without direct access to underlying production
     databases.
@@ -3828,6 +4407,8 @@ screens:
       trigger: Back to Dashboard Library
       provenance: structural — pack board 2 wiring, 9 September 2026
       back: true
+      carries:
+      - dashboardId
   density: compact
   purposeNote: Dashboard designers can visually configure analytical navigation without custom development.
   pattern: configEditor
@@ -3924,6 +4505,8 @@ screens:
       trigger: Back to Dashboard Library
       provenance: structural — pack board 2 wiring, 9 September 2026
       back: true
+      carries:
+      - dashboardId
   density: compact
   purposeNote: Only authorized and approved dashboard configurations become available to production users,
     with complete version history.
@@ -4030,6 +4613,8 @@ screens:
       trigger: Back to Dashboard Library
       provenance: structural — pack board 2 wiring, 9 September 2026
       back: true
+      carries:
+      - dashboardId
   density: compact
   purposeNote: The system prevents dashboards containing critical configuration or security errors from
     being published.
@@ -4095,7 +4680,7 @@ screens:
   - operationId: getDashboard
     contract: reporting
     purpose: Preview
-    trigger: onLoad
+    trigger: onAction
     provenance: board reading, 19 September 2026
   - operationId: listAnalyticsPipelines
     contract: reporting
@@ -5089,7 +5674,7 @@ screens:
   - operationId: getReportExecution
     contract: reporting
     purpose: How the run went
-    trigger: onLoad
+    trigger: onAction
     provenance: board reading, 19 September 2026
   - operationId: cancelReportExecution
     contract: reporting
@@ -5244,7 +5829,7 @@ screens:
   - operationId: getReportResult
     contract: reporting
     purpose: The results
-    trigger: onLoad
+    trigger: onAction
     provenance: board reading, 19 September 2026
   wireframe:
     status: notStarted
@@ -5294,6 +5879,8 @@ screens:
       trigger: Back to Executive Command Center
       provenance: structural — pack board 4 wiring, 9 September 2026
       back: true
+      carries:
+      - reportId
     - to: ANL-050
       trigger: Retention, Archive & Governance Policy
       provenance: structural — pack board 4 wiring, 9 September 2026
@@ -5896,7 +6483,7 @@ screens:
   - operationId: getReportExport
     contract: reporting
     purpose: Collect the file
-    trigger: onLoad
+    trigger: onAction
     provenance: board reading, 19 September 2026
   entryState:
     preloaded:

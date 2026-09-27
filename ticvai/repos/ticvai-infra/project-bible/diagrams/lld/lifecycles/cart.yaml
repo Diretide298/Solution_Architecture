@@ -12,7 +12,6 @@ owner: orders
 initial:
 - active
 terminal:
-- expired
 - abandoned
 - checkedOut
 transitions:

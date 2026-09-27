@@ -5,16 +5,16 @@
 | | |
 |---|---|
 | Screens | 46 |
-| Operations | 167 |
+| Operations | 166 |
 | Contracts | 18 |
 | Modules | 13 |
 | Undrawn | 0 |
-| Operations with no screen | 10 |
+| Operations with no screen | 15 |
 | Waves | wave1 21 · wave2 21 · wave3 4 |
 
 ## Gaps
 
-### 10 operations with no screen here
+### 15 operations with no screen here
 
 **In a contract this platform uses, callable by its audience, and reaching no screen on any platform serving that audience.** Either a screen is missing or the endpoint should not exist — and the second is worth considering first.
 
@@ -24,12 +24,17 @@
 | `listMembershipBenefits` | catalogue | GET | Benefits a plan can grant |
 | `listMembershipProgrammes` | catalogue | GET | Membership schemes, the level above a plan |
 | `listCustomerMemberships` | identity | GET | Memberships a customer holds |
+| `getForm` | marketing-crm | GET | One form, to fill in or to edit |
+| `getMyProfile` | marketing-crm | GET | A guest reading their own details |
 | `listBadges` | marketing-crm | GET | Badges a guest can be awarded |
 | `listCustomerBadges` | marketing-crm | GET | Badges a guest holds |
 | `listLeaderboard` | marketing-crm | GET | Standings, by nickname |
 | `listRewards` | marketing-crm | GET | What points can be turned into |
 | `setLeaderboardNickname` | marketing-crm | PUT | Choose the name shown on the board |
+| `listTicketTransfers` | orders | GET | The ticket transfers this guest sent or received |
+| `revokeEntitlementShare` | orders | POST | Take back a share |
 | `recordRecommendationOutcome` | promotions | POST | Shown, clicked, accepted or dismissed |
+| `listMyWaitingGuests` | queue | GET | The caller's own queue entries |
 
 ### 5 modules split across waves
 
@@ -94,7 +99,7 @@
 | `WEB-029` | Error / Sold Out / Maintenance | System States | 1 | 1 | yes |
 | `WEB-030` | Ticket Transfer | Ticketing | 1 | 4 | yes |
 | `WEB-031` | My Reservations | Ticketing | 2 | 9 | yes |
-| `WEB-032` | Offers & Promotions | Promotions | 2 | 3 | yes |
+| `WEB-032` | Offers & Promotions | Promotions | 2 | 2 | yes |
 | `WEB-033` | Shop | Retail | 2 | 4 | yes |
 | `WEB-034` | Lost & Found | Support | 3 | 3 | yes |
 | `WEB-035` | Multi-Currency & Pricing | Ticketing | 1 | 2 | yes |
@@ -105,7 +110,7 @@
 | `WEB-040` | Virtual Queue | In-venue Services | 2 | 6 | yes |
 | `WEB-041` | Parking – Reserve & Pay | In-venue Services | 2 | 3 | yes |
 | `WEB-042` | Retail & Shop and Drop | Retail | 2 | 4 | yes |
-| `WEB-043` | Loyalty & Rewards | Membership, Loyalty & Value | 2 | 6 | yes |
+| `WEB-043` | Loyalty & Rewards | Membership, Loyalty & Value | 2 | 5 | yes |
 | `WEB-044` | AI Concierge – Home | Engagement & Support | 2 | 7 | yes |
 | `WEB-045` | Help Centre & Accessibility | Support | 2 | 2 | yes |
 | `WEB-046` | In-Venue Notifications | Engagement & Support | 2 | 1 | yes |

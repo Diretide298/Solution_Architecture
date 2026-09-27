@@ -1,4 +1,4 @@
--- control — 49 tables
+-- control — 52 tables
 -- **Derived. Do not hand-edit.**
 
 -- The one credential model (CF-135a). 2.7.52, 7.1.25 and 7.1.30 each asserted their own. Bound to
@@ -8,11 +8,11 @@ CREATE TABLE IF NOT EXISTS control.api_client (
     developer_id                      uuid NOT NULL,
     name                              text NOT NULL,
     client_id                         text,
-    environment                       text NOT NULL,
+    environment                       text NOT NULL CONSTRAINT api_client_environment_chk CHECK (environment IN ('sandbox', 'production')),
     scopes                            text[] NOT NULL,
     allowed_tenant_ids                text[],
     ip_allow_list                     text[],
-    status                            text NOT NULL,
+    status                            text NOT NULL CONSTRAINT api_client_status_chk CHECK (status IN ('active', 'suspended', 'revoked')),
     last_used_at                      timestamptz
 );
 
@@ -39,7 +39,7 @@ CREATE TABLE IF NOT EXISTS control.api_limit (
     burst_per_second                  integer,
     daily_cap                         integer,
     per_operation_overrides           jsonb,
-    on_breach                         text
+    on_breach                         text DEFAULT 'throttle' CONSTRAINT api_limit_on_breach_chk CHECK (on_breach IN ('throttle', 'reject', 'queue'))
 );
 
 -- API versions and sunset dates (13.1.31–35, ADR-0031). With third parties a breaking change with
@@ -47,11 +47,11 @@ CREATE TABLE IF NOT EXISTS control.api_limit (
 -- Reached by: 3 operations read it and 1 write it.
 CREATE TABLE IF NOT EXISTS control.api_version (
     version                           text NOT NULL,
-    status                            text NOT NULL,
+    status                            text NOT NULL CONSTRAINT api_version_status_chk CHECK (status IN ('preview', 'current', 'deprecated', 'sunset')),
     released_at                       timestamptz,
     deprecated_at                     timestamptz,
     sunset_at                         timestamptz,
-    minimum_notice_months             integer,
+    minimum_notice_months             integer DEFAULT 12,
     migration_guide_url               text,
     active_client_count               integer,
     id                                uuid PRIMARY KEY NOT NULL
@@ -69,7 +69,7 @@ CREATE TABLE IF NOT EXISTS control.archival_job (
     target_table                      text,
     rows_archived                     integer,
     rows_purged                       integer,
-    state                             text,
+    state                             text CONSTRAINT archival_job_state_chk CHECK (state IN ('scheduled', 'running', 'succeeded', 'failed')),
     run_at                            timestamptz,
     error                             text
 );
@@ -81,10 +81,10 @@ CREATE TABLE IF NOT EXISTS control.archival_job (
 CREATE TABLE IF NOT EXISTS control.backup_run (
     id                                uuid PRIMARY KEY NOT NULL,
     cell_id                           uuid,
-    scope                             text,
+    scope                             text CONSTRAINT backup_run_scope_chk CHECK (scope IN ('cell', 'tenant')),
     started_at                        timestamptz,
     completed_at                      timestamptz,
-    state                             text,
+    state                             text CONSTRAINT backup_run_state_chk CHECK (state IN ('running', 'succeeded', 'failed')),
     size_bytes                        integer,
     restore_tested_at                 timestamptz,
     error                             text
@@ -97,11 +97,11 @@ CREATE TABLE IF NOT EXISTS control.backup_run (
 -- five timestamps are
 CREATE TABLE IF NOT EXISTS control.burst_environment (
     id                                uuid PRIMARY KEY NOT NULL,
-    status                            text NOT NULL,
+    status                            text NOT NULL CONSTRAINT burst_environment_status_chk CHECK (status IN ('requested', 'provisioning', 'warming', 'live', 'draining', 'reconciling', 'reconciled', 'decommissioned', 'failed')),
     performance_id                    uuid NOT NULL,
     cell_name                         text NOT NULL,
     snapshot_taken_at                 timestamptz,
-    price_divergence_policy           text,
+    price_divergence_policy           text CONSTRAINT burst_environment_price_divergence_policy_chk CHECK (price_divergence_policy IN ('honourSnapshot', 'honourCurrent', 'reject')),
     sequence_high                     integer,
     orders_taken                      integer,
     orders_reconciled                 integer,
@@ -111,8 +111,8 @@ CREATE TABLE IF NOT EXISTS control.burst_environment (
     drained_at                        timestamptz,
     reconciled_at                     timestamptz,
     decommissioned_at                 timestamptz,
-    auto_decommission                 boolean,
-    grace_minutes                     integer,
+    is_auto_decommission              boolean DEFAULT true,
+    grace_minutes                     integer DEFAULT 30,
     teardown_confirmed_at             timestamptz,
     usage_record_id                   uuid
 );
@@ -121,19 +121,19 @@ CREATE TABLE IF NOT EXISTS control.burst_environment (
 -- provider, region and endpoint. Only CrossRegionService reaches another one, and it moves a
 -- pseudonymous link rather than a guest
 CREATE TABLE IF NOT EXISTS control.cell (
-    id                                uuid PRIMARY KEY,
-    name                              text,
-    kind                              text,
+    id                                uuid PRIMARY KEY NOT NULL,
+    name                              text NOT NULL,
+    kind                              text CONSTRAINT cell_kind_chk CHECK (kind IN ('shared', 'dedicated', 'onPremiseIsolated', 'onPremiseConnected', 'controlPlane', 'burst')),
     cluster_id                        uuid,
-    is_reachable                      boolean,
+    is_reachable                      boolean DEFAULT true,
     last_contact_at                   timestamptz,
     licence_expires_at                timestamptz,
-    participates_in_cross_cell        boolean,
-    region_id                         uuid,
+    participates_in_cross_cell        boolean DEFAULT true,
+    region_id                         uuid NOT NULL,
     region_name                       text,
-    country_code                      text,
-    tier                              text,
-    status                            text,
+    country_code                      text NOT NULL,
+    tier                              text NOT NULL CONSTRAINT cell_tier_chk CHECK (tier IN ('shared', 'dedicated', 'isolated', 'clientHosted')),
+    status                            text NOT NULL CONSTRAINT cell_status_chk CHECK (status IN ('provisioning', 'active', 'migrating', 'suspended', 'decommissioning', 'failed')),
     cloud_provider                    text,
     cloud_region                      text,
     api_endpoint                      text,
@@ -150,11 +150,11 @@ CREATE TABLE IF NOT EXISTS control.cell_cluster (
     id                                uuid PRIMARY KEY NOT NULL,
     name                              text,
     region_id                         uuid NOT NULL,
-    kind                              text NOT NULL,
+    kind                              text NOT NULL CONSTRAINT cell_cluster_kind_chk CHECK (kind IN ('shared', 'dedicated', 'onPremiseIsolated', 'onPremiseConnected', 'controlPlane', 'burst')),
     cell_ids                          text[] NOT NULL,
     schema_version                    text,
     modelled_on_cell_id               uuid,
-    status                            text NOT NULL,
+    status                            text NOT NULL CONSTRAINT cell_cluster_status_chk CHECK (status IN ('provisioning', 'active', 'draining', 'retired')),
     accepting_new_tenants             boolean,
     tenant_count                      integer,
     provisioned_at                    timestamptz
@@ -166,9 +166,9 @@ CREATE TABLE IF NOT EXISTS control.cell_instance (
     id                                uuid PRIMARY KEY NOT NULL,
     cell_id                           uuid NOT NULL,
     name                              text NOT NULL,
-    status                            text NOT NULL,
-    role                              text,
-    supports_synchronous_replication  boolean,
+    status                            text NOT NULL CONSTRAINT cell_instance_status_chk CHECK (status IN ('provisioning', 'live', 'draining', 'retired')),
+    role                              text DEFAULT 'primary' CONSTRAINT cell_instance_role_chk CHECK (role IN ('primary', 'archive', 'burst')),
+    supports_synchronous_replication  boolean DEFAULT false,
     max_connections                   integer,
     created_at                        timestamptz,
     retired_at                        timestamptz
@@ -178,8 +178,8 @@ CREATE TABLE IF NOT EXISTS control.cell_instance (
 CREATE TABLE IF NOT EXISTS control.cell_job (
     id                                uuid PRIMARY KEY NOT NULL,
     cell_id                           uuid NOT NULL,
-    kind                              text NOT NULL,
-    status                            text NOT NULL,
+    kind                              text NOT NULL CONSTRAINT cell_job_kind_chk CHECK (kind IN ('provision', 'tierMigration', 'schemaMigration', 'backup', 'restore', 'decommission')),
+    status                            text NOT NULL CONSTRAINT cell_job_status_chk CHECK (status IN ('queued', 'running', 'completed', 'failed', 'rolledBack')),
     progress_percent                  integer,
     message                           text,
     error                             text,
@@ -199,9 +199,9 @@ CREATE TABLE IF NOT EXISTS control.cell_tenant (
     tenant_id                         uuid NOT NULL,
     instance_id                       uuid NOT NULL,
     replication_mode                  text,
-    pinned_instance                   boolean,
+    pinned_instance                   boolean DEFAULT false,
     database_name                     text NOT NULL,
-    status                            text NOT NULL,
+    status                            text NOT NULL CONSTRAINT cell_tenant_status_chk CHECK (status IN ('provisioning', 'live', 'suspended', 'draining', 'dropped')),
     provisioned_at                    timestamptz,
     dropped_at                        timestamptz
 );
@@ -210,18 +210,18 @@ CREATE TABLE IF NOT EXISTS control.cell_tenant (
 -- — so the gap between pushes is the oversell window, and the allocation bounds it
 CREATE TABLE IF NOT EXISTS control.channel_listing (
     id                                uuid PRIMARY KEY NOT NULL,
-    channel_name                      text NOT NULL,
+    channel_name                      text NOT NULL CONSTRAINT channel_listing_channel_name_chk CHECK (channel_name IN ('viator', 'klook', 'headout', 'getYourGuide', 'tiqets', 'expedia', 'other')),
     product_id                        uuid NOT NULL,
     external_product_ref              text,
-    status                            text NOT NULL,
+    status                            text NOT NULL CONSTRAINT channel_listing_status_chk CHECK (status IN ('draft', 'live', 'paused', 'delisted')),
     allocation_units                  integer,
     price_list_id                     uuid,
-    adapter                           text,
+    adapter                           text CONSTRAINT channel_listing_adapter_chk CHECK (adapter IN ('viatorApi', 'klookApi', 'headoutApi', 'getYourGuideApi', 'tiqetsApi', 'octoStandard', 'generic')),
     adapter_credential_ref            text,
-    push_interval_minutes             integer,
-    guest_data_scope                  text,
+    push_interval_minutes             integer DEFAULT 15,
+    guest_data_scope                  text DEFAULT 'nameOnly' CONSTRAINT channel_listing_guest_data_scope_chk CHECK (guest_data_scope IN ('none', 'nameOnly', 'nameAndContact', 'full')),
     last_pushed_at                    timestamptz,
-    scope_path                        ltree
+    scope_path                        ltree NOT NULL
 );
 
 -- Authored content with a schedule (BL-172). The CMS modelled configuration and not authoring — a
@@ -229,16 +229,16 @@ CREATE TABLE IF NOT EXISTS control.channel_listing (
 CREATE TABLE IF NOT EXISTS control.content_block (
     id                                uuid PRIMARY KEY NOT NULL,
     page_id                           uuid,
-    kind                              text NOT NULL,
+    kind                              text NOT NULL CONSTRAINT content_block_kind_chk CHECK (kind IN ('richText', 'image', 'video', 'gallery', 'cta', 'faq', 'form', 'embed', 'productGrid', 'countdown', 'testimonial')),
     position                          integer,
     body                              jsonb,
     locale_variants                   jsonb,
-    status                            text NOT NULL,
+    status                            text NOT NULL CONSTRAINT content_block_status_chk CHECK (status IN ('draft', 'scheduled', 'published', 'expired', 'archived')),
     publish_at                        timestamptz,
     expire_at                         timestamptz,
     audience_segment_id               uuid,
     approved_by_principal_id          uuid,
-    scope_path                        ltree
+    scope_path                        ltree NOT NULL
 );
 
 -- A developer organisation (13.1.6–13.1.9). An organisation, because an integration outlives the
@@ -250,7 +250,7 @@ CREATE TABLE IF NOT EXISTS control.developer_account (
     website_url                       text,
     country_code                      text,
     partner_id                        uuid,
-    status                            text NOT NULL,
+    status                            text NOT NULL CONSTRAINT developer_account_status_chk CHECK (status IN ('pending', 'verified', 'suspended', 'closed')),
     verified_at                       timestamptz
 );
 
@@ -258,7 +258,7 @@ CREATE TABLE IF NOT EXISTS control.developer_account (
 -- soak period
 CREATE TABLE IF NOT EXISTS control.environment (
     id                                uuid PRIMARY KEY NOT NULL,
-    kind                              text NOT NULL,
+    kind                              text NOT NULL CONSTRAINT environment_kind_chk CHECK (kind IN ('dev', 'staging', 'production')),
     name                              text NOT NULL,
     cell_ids                          text[],
     requires_approval_to_promote      boolean,
@@ -277,20 +277,37 @@ CREATE TABLE IF NOT EXISTS control.footer_config (
     copyright_text                    text
 );
 
+-- Holds 3 columns. No description has been written for this table — the name is the only thing
+-- saying what it is
+CREATE TABLE IF NOT EXISTS control.footer_config_column (
+    footer_config_id                  uuid NOT NULL,
+    heading                           text,
+    id                                uuid PRIMARY KEY NOT NULL
+);
+
+-- Holds 4 columns. No description has been written for this table — the name is the only thing
+-- saying what it is
+CREATE TABLE IF NOT EXISTS control.footer_config_social_link (
+    footer_config_id                  uuid NOT NULL,
+    platform                          text,
+    url                               text,
+    id                                uuid PRIMARY KEY NOT NULL
+);
+
 -- A published third-party integration (13.1.50). A listing, not an installation — the code runs on
 -- the developer own infrastructure
 CREATE TABLE IF NOT EXISTS control.integration_listing (
     id                                uuid PRIMARY KEY NOT NULL,
     developer_id                      uuid NOT NULL,
     name                              text NOT NULL,
-    category                          text NOT NULL,
+    category                          text NOT NULL CONSTRAINT integration_listing_category_chk CHECK (category IN ('crm', 'marketing', 'accounting', 'hotel', 'transport', 'analytics', 'accessibility', 'other')),
     description                       text,
     integration_url                   text,
     required_scopes                   text[],
-    status                            text NOT NULL,
+    status                            text NOT NULL CONSTRAINT integration_listing_status_chk CHECK (status IN ('draft', 'submitted', 'inReview', 'certified', 'rejected', 'revoked', 'delisted')),
     certified_until                   date,
     certified_against_version         text,
-    listing_fee_model                 text
+    listing_fee_model                 text CONSTRAINT integration_listing_listing_fee_model_chk CHECK (listing_fee_model IN ('none', 'flat', 'revenueShare'))
 );
 
 -- A bill to a tenant. Lines are children
@@ -300,7 +317,7 @@ CREATE TABLE IF NOT EXISTS control.invoice (
     tenant_id                         uuid NOT NULL,
     period_start                      date NOT NULL,
     period_end                        date NOT NULL,
-    status                            text NOT NULL,
+    status                            text NOT NULL CONSTRAINT invoice_status_chk CHECK (status IN ('draft', 'issued', 'paid', 'overdue', 'disputed', 'cancelled')),
     net_amount                        numeric(18,4),
     tax_amount                        numeric(18,4),
     gross_amount                      numeric(18,4) NOT NULL,
@@ -322,16 +339,28 @@ CREATE TABLE IF NOT EXISTS control.invoice_line (
     id                                uuid PRIMARY KEY NOT NULL
 );
 
--- Something bought beyond the plan. Hangs off: reaches control.cell through its keys; references
--- subscription.plan. Reached by: 6 operations read it and 2 write it.
+-- Something bought beyond the plan. Hangs off: a child of control.tenant; reaches control.cell
+-- through its keys; references control.tenant. Reached by: 6 operations read it and 2 write it; 1
+-- tables reference it.
 CREATE TABLE IF NOT EXISTS control.licence_add_on (
+    tenant_id                         uuid,
     module_key                        text NOT NULL,
     list_price                        numeric(18,4),
     valid_from                        date,
     valid_to                          date,
-    note                              text,
-    id                                uuid PRIMARY KEY NOT NULL,
-    plan_id                           uuid NOT NULL
+    note                              text CONSTRAINT licence_add_on_note_chk CHECK (char_length(note) <= 500),
+    id                                uuid PRIMARY KEY NOT NULL
+);
+
+-- Holds 6 columns. No description has been written for this table — the name is the only thing
+-- saying what it is
+CREATE TABLE IF NOT EXISTS control.licence_add_on_limit (
+    licence_add_on_id                 uuid NOT NULL,
+    metric                            text NOT NULL,
+    limit_value                       integer,
+    is_overage_allowed                boolean,
+    overage_unit_price                numeric(18,4),
+    id                                uuid PRIMARY KEY NOT NULL
 );
 
 -- A schema change with a version. Plans group them; runs record what happened per cell
@@ -356,10 +385,10 @@ CREATE TABLE IF NOT EXISTS control.migration_plan (
     target_version                    text NOT NULL,
     computed_at                       timestamptz NOT NULL,
     expires_at                        timestamptz,
-    all_reversible                    boolean NOT NULL,
+    is_all_reversible                 boolean NOT NULL,
     irreversible                      text[],
     total_estimated_lock_ms           integer,
-    scope_path                        ltree
+    scope_path                        ltree NOT NULL
 );
 
 -- One cell in a plan, and its own readiness
@@ -380,7 +409,7 @@ CREATE TABLE IF NOT EXISTS control.migration_plan_cell (
 CREATE TABLE IF NOT EXISTS control.migration_run (
     id                                uuid PRIMARY KEY NOT NULL,
     plan_id                           uuid NOT NULL,
-    status                            text NOT NULL,
+    status                            text NOT NULL CONSTRAINT migration_run_status_chk CHECK (status IN ('queued', 'canary', 'running', 'paused', 'complete', 'failed', 'rolledBack')),
     canary_cell_id                    uuid,
     canary_tenant_id                  uuid,
     tenants_total                     integer,
@@ -443,7 +472,7 @@ CREATE TABLE IF NOT EXISTS control.onboarding_application (
     country_code                      text,
     venue_type_template_id            uuid,
     requested_plan_id                 uuid,
-    status                            text NOT NULL,
+    status                            text NOT NULL CONSTRAINT onboarding_application_status_chk CHECK (status IN ('submitted', 'verifying', 'approved', 'provisioning', 'active', 'rejected', 'abandoned')),
     trial_ends_at                     timestamptz,
     rejection_reason                  text,
     provisioned_tenant_id             uuid
@@ -458,10 +487,10 @@ CREATE TABLE IF NOT EXISTS control.partner_agreement (
     partner_id                        uuid NOT NULL,
     partner_name                      text,
     version                           integer,
-    status                            text,
-    rate_mode                         text NOT NULL,
+    status                            text CONSTRAINT partner_agreement_status_chk CHECK (status IN ('pendingApproval', 'active', 'expiringSoon', 'expired', 'suspended', 'terminated')),
+    rate_mode                         text NOT NULL CONSTRAINT partner_agreement_rate_mode_chk CHECK (rate_mode IN ('netRate', 'commission')),
     commission_percent                numeric(18,4),
-    volume_window                     text,
+    volume_window                     text CONSTRAINT partner_agreement_volume_window_chk CHECK (volume_window IN ('calendarMonth', 'calendarQuarter', 'calendarYear', 'agreementYear', 'rolling12Months')),
     segment_tier                      text,
     branding_asset_id                 uuid,
     storefront_subdomain              text,
@@ -472,14 +501,15 @@ CREATE TABLE IF NOT EXISTS control.partner_agreement (
     accepted_at                       timestamptz,
     signature_ref                     text,
     settlement_currency               text,
-    fx_policy                         text,
+    fx_policy                         text DEFAULT 'rateAtSale' CONSTRAINT partner_agreement_fx_policy_chk CHECK (fx_policy IN ('rateAtSale', 'rateAtInvoice', 'fixedRate')),
     fixed_rate                        numeric(18,4),
     credit_limit                      numeric(18,4),
+    allowed_channels                  text[],
     allowed_venue_ids                 text[],
     requires_approval_above_value     numeric(18,4),
     valid_from                        date NOT NULL,
     valid_to                          date,
-    expiry_alert_days                 integer,
+    expiry_alert_days                 integer DEFAULT 30,
     approval_request_id               text,
     notes                             text
 );
@@ -493,21 +523,21 @@ CREATE TABLE IF NOT EXISTS control.partner_user (
     branch_scope_path                 ltree NOT NULL,
     allocation_quota                  integer,
     credit_limit_override             numeric(18,4),
-    can_manage_users                  boolean
+    can_manage_users                  boolean DEFAULT false
 );
 
 -- a shipped version. Promoted through dev, staging and production; superseded by a later one Hangs
 -- off: reaches control.cell through its keys; references identity.principal, subscription.plan.
 -- Reached by: 5 operations read it and 3 write it; 3 tables reference it.
 CREATE TABLE IF NOT EXISTS control.release (
-    version                           text,
+    version                           text NOT NULL,
     required_migrations               text[],
-    note                              text,
+    note                              text NOT NULL CONSTRAINT release_note_chk CHECK (char_length(note) <= 2000),
     breaking_changes                  text[],
-    id                                uuid PRIMARY KEY,
-    status                            text,
+    id                                uuid PRIMARY KEY NOT NULL,
+    status                            text NOT NULL CONSTRAINT release_status_chk CHECK (status IN ('draft', 'inDev', 'inStaging', 'inProduction', 'superseded', 'withdrawn')),
     created_by_principal_id           uuid,
-    created_at                        timestamptz,
+    created_at                        timestamptz NOT NULL,
     promoted_to_staging_at            timestamptz,
     promoted_to_production_at         timestamptz,
     plan_id                           uuid NOT NULL
@@ -526,8 +556,8 @@ CREATE TABLE IF NOT EXISTS control.release_component (
 CREATE TABLE IF NOT EXISTS control.rollout (
     id                                uuid PRIMARY KEY NOT NULL,
     reinventory_hold_id               uuid NOT NULL,
-    environment                       text NOT NULL,
-    status                            text NOT NULL,
+    environment                       text NOT NULL CONSTRAINT rollout_environment_chk CHECK (environment IN ('dev', 'staging', 'production')),
+    status                            text NOT NULL CONSTRAINT rollout_status_chk CHECK (status IN ('queued', 'canary', 'rolling', 'paused', 'complete', 'failed', 'rolledBack')),
     cells_total                       integer,
     cells_complete                    integer,
     cells_failed                      integer,
@@ -541,13 +571,14 @@ CREATE TABLE IF NOT EXISTS control.rollout (
 
 -- One cell in a rollout — its wave, whether it is the canary, and what version it moved between
 CREATE TABLE IF NOT EXISTS control.rollout_cell (
+    rollout_id                        uuid NOT NULL,
     cell_id                           uuid NOT NULL,
     cell_name                         text,
     region_name                       text,
     country_code                      text,
     is_canary                         boolean,
     wave                              integer,
-    status                            text NOT NULL,
+    status                            text NOT NULL CONSTRAINT rollout_cell_status_chk CHECK (status IN ('pending', 'running', 'complete', 'failed', 'skipped', 'rolledBack')),
     from_version                      text,
     to_version                        text,
     error                             text,
@@ -567,7 +598,7 @@ CREATE TABLE IF NOT EXISTS control.rollout_tenant (
     database_name                     text,
     is_canary                         boolean,
     wave                              integer,
-    status                            text NOT NULL,
+    status                            text NOT NULL CONSTRAINT rollout_tenant_status_chk CHECK (status IN ('pending', 'running', 'complete', 'failed', 'skipped', 'rolledBack')),
     from_version                      text,
     to_version                        text,
     error                             text,
@@ -582,9 +613,9 @@ CREATE TABLE IF NOT EXISTS control.sandbox (
     id                                uuid PRIMARY KEY NOT NULL,
     name                              text NOT NULL,
     developer_id                      uuid,
-    status                            text NOT NULL,
+    status                            text NOT NULL CONSTRAINT sandbox_status_chk CHECK (status IN ('provisioning', 'active', 'resetting', 'expired', 'deleted')),
     data_profile                      jsonb NOT NULL,
-    contains_production_data          boolean,
+    contains_production_data          boolean DEFAULT false,
     expires_at                        timestamptz,
     last_reset_at                     timestamptz
 );
@@ -606,11 +637,11 @@ CREATE TABLE IF NOT EXISTS control.scaling_policy (
 );
 
 -- Titles, canonicals, hreflang and schema markup (22.11). An attraction that does not appear in
--- search sells through OTAs at OTA commission. Hangs off: reaches control.cell through its keys;
--- references ledger.legal_entity. Reached by: 1 operations read it and 1 write it.
+-- search sells through OTAs at OTA commission. Hangs off: reaches control.cell through its keys.
+-- Reached by: 2 operations read it and 1 write it.
 CREATE TABLE IF NOT EXISTS control.seo_metadata (
     id                                uuid PRIMARY KEY NOT NULL,
-    entity_kind                       text NOT NULL,
+    entity_kind                       text NOT NULL CONSTRAINT seo_metadata_entity_kind_chk CHECK (entity_kind IN ('contentPage', 'product', 'event', 'performance', 'membership', 'promotion', 'venue')),
     entity_id                         uuid NOT NULL,
     locale                            text,
     title                             text,
@@ -621,9 +652,9 @@ CREATE TABLE IF NOT EXISTS control.seo_metadata (
     hreflang                          jsonb,
     schema_org_type                   text,
     open_graph                        jsonb,
-    is_auto_generated                 boolean,
-    no_index                          boolean,
-    scope_path                        ltree
+    is_auto_generated                 boolean DEFAULT true,
+    no_index                          boolean DEFAULT false,
+    scope_path                        ltree NOT NULL
 );
 
 -- Something the platform is telling tenants, scheduled or in progress
@@ -635,29 +666,35 @@ CREATE TABLE IF NOT EXISTS control.support_notice (
     affected_tenant_ids               text[],
     published_by_principal_id         uuid,
     published_at                      timestamptz NOT NULL,
-    scope_path                        ltree
+    scope_path                        ltree NOT NULL
 );
 
 -- A customer of the platform — the root of the org tree. platform.tenant is a one-column
 -- projection of this, so a cell can resolve its own tenant without reaching across a residency
 -- boundary
 CREATE TABLE IF NOT EXISTS control.tenant (
-    id                                uuid PRIMARY KEY,
-    code                              text,
-    name                              text,
-    status                            text,
-    suspension_mode                   text,
+    id                                uuid PRIMARY KEY NOT NULL,
+    code                              text NOT NULL,
+    name                              text NOT NULL,
+    status                            text NOT NULL CONSTRAINT tenant_status_chk CHECK (status IN ('onboarding', 'active', 'suspended', 'terminating', 'terminated')),
+    suspension_mode                   text CONSTRAINT tenant_suspension_mode_chk CHECK (suspension_mode IN ('readOnly', 'noNewSales', 'fullLockout')),
     suspension_reason                 text,
+    suspension_effective_at           timestamptz,
+    suspension_notice_message         jsonb,
+    termination_scheduled_at          timestamptz,
+    termination_retention_until       timestamptz,
+    termination_reason                text CONSTRAINT tenant_termination_reason_chk CHECK (char_length(termination_reason) <= 1000),
+    termination_requested_by_principal_id uuid,
     plan_id                           uuid,
     plan_name                         text,
     cell_count                        integer,
     venue_count                       integer,
     billing_email                     text,
+    billing_address                   text CONSTRAINT tenant_billing_address_chk CHECK (char_length(billing_address) <= 500),
     account_manager_principal_id      uuid,
-    created_at                        timestamptz,
+    created_at                        timestamptz NOT NULL,
     activated_at                      timestamptz,
-    subscription                      uuid,
-    licences                          jsonb
+    subscription_id                   uuid
 );
 
 -- a tenant moving between cells — shared to dedicated, or rebalancing Hangs off: a child of
@@ -670,10 +707,10 @@ CREATE TABLE IF NOT EXISTS control.tenant_migration (
     from_cell_id                      uuid,
     to_cell_id                        uuid,
     reason                            text,
-    status                            text NOT NULL,
+    status                            text NOT NULL CONSTRAINT tenant_migration_status_chk CHECK (status IN ('planned', 'copying', 'verifying', 'awaitingCutover', 'cuttingOver', 'complete', 'failed', 'rolledBack')),
     rows_copied                       integer,
     rows_expected                     integer,
-    verification_passed               boolean,
+    is_verification_passed            boolean,
     cutover_at                        timestamptz,
     source_retained_until             timestamptz,
     started_at                        timestamptz NOT NULL,
@@ -690,8 +727,8 @@ CREATE TABLE IF NOT EXISTS control.tenant_migration_plan (
     tenant_id                         uuid NOT NULL,
     from_cell_id                      uuid NOT NULL,
     to_cell_id                        uuid NOT NULL,
-    from_kind                         text,
-    to_kind                           text,
+    from_kind                         text CONSTRAINT tenant_migration_plan_from_kind_chk CHECK (from_kind IN ('shared', 'dedicated', 'onPremiseIsolated', 'onPremiseConnected', 'controlPlane', 'burst')),
+    to_kind                           text CONSTRAINT tenant_migration_plan_to_kind_chk CHECK (to_kind IN ('shared', 'dedicated', 'onPremiseIsolated', 'onPremiseConnected', 'controlPlane', 'burst')),
     can_proceed                       boolean NOT NULL,
     row_counts                        jsonb,
     estimated_copy_minutes            integer,
@@ -721,17 +758,17 @@ CREATE TABLE IF NOT EXISTS control.url_redirect (
     from_path                         text NOT NULL,
     to_path                           text NOT NULL,
     status_code                       text NOT NULL,
-    reason                            text,
+    reason                            text CONSTRAINT url_redirect_reason_chk CHECK (reason IN ('contentMigrated', 'pageRetired', 'campaignExpired', 'restructure', 'slugChanged')),
     created_at                        timestamptz,
     hit_count                         integer,
-    is_active                         boolean,
-    scope_path                        ltree
+    is_active                         boolean DEFAULT true,
+    scope_path                        ltree NOT NULL
 );
 
 -- What a tenant consumed, which is what an invoice is computed from
 CREATE TABLE IF NOT EXISTS control.usage_record (
     id                                text PRIMARY KEY NOT NULL,
-    metric                            text NOT NULL,
+    metric                            text NOT NULL CONSTRAINT usage_record_metric_chk CHECK (metric IN ('venues', 'workstations', 'activeUsers', 'devices', 'brandedApps', 'aiTokens', 'apiCalls', 'storageGb', 'transactions', 'guestProfiles')),
     quantity                          numeric(18,4) NOT NULL,
     venue_id                          uuid,
     capability                        text,
@@ -743,7 +780,7 @@ CREATE TABLE IF NOT EXISTS control.usage_record (
 CREATE TABLE IF NOT EXISTS control.venue_type_template (
     id                                uuid PRIMARY KEY NOT NULL,
     name                              text NOT NULL,
-    venue_kind                        text NOT NULL,
+    venue_kind                        text NOT NULL CONSTRAINT venue_type_template_venue_kind_chk CHECK (venue_kind IN ('themePark', 'waterPark', 'museum', 'theatre', 'stadium', 'arena', 'zoo', 'aquarium', 'cinema', 'attraction', 'mixed')),
     seeds_product_kinds               text[],
     seeds_roles                       text[],
     seeds_admission_profiles          text[],
@@ -756,10 +793,10 @@ CREATE TABLE IF NOT EXISTS control.waf_rule (
     id                                uuid PRIMARY KEY NOT NULL,
     cell_id                           uuid,
     name                              text,
-    action                            text,
+    action                            text CONSTRAINT waf_rule_action_chk CHECK (action IN ('allow', 'block', 'rateLimit', 'challenge')),
     match_on                          text,
     pattern                           text,
-    enabled                           boolean,
+    is_enabled                        boolean,
     hit_count24h                      integer,
     updated_at                        timestamptz
 );
@@ -771,17 +808,17 @@ CREATE TABLE IF NOT EXISTS control.webhook_delivery (
     subscription_id                   uuid NOT NULL,
     event_id                          uuid,
     event_type                        text NOT NULL,
-    status                            text NOT NULL,
+    status                            text NOT NULL CONSTRAINT webhook_delivery_status_chk CHECK (status IN ('pending', 'delivered', 'failed', 'retrying', 'abandoned')),
     attempt_count                     integer,
     response_code                     integer,
     response_body_excerpt             text,
-    is_replay                         boolean,
+    is_replay                         boolean DEFAULT false,
     delivered_at                      timestamptz
 );
 
 -- An external subscriber to business events (13.1.26, 13.3.18). The 29 events existed and nothing
 -- outside could receive one. Hangs off: reaches control.cell through its keys; references
--- control.api_client. Reached by: 3 operations read it and 1 write it.
+-- control.api_client. Reached by: 3 operations read it and 1 write it; 1 tables reference it.
 CREATE TABLE IF NOT EXISTS control.webhook_subscription (
     id                                uuid PRIMARY KEY NOT NULL,
     client_id                         uuid NOT NULL,
@@ -789,7 +826,7 @@ CREATE TABLE IF NOT EXISTS control.webhook_subscription (
     event_types                       text[] NOT NULL,
     filters                           jsonb,
     signing_secret                    text,
-    status                            text NOT NULL,
+    status                            text NOT NULL CONSTRAINT webhook_subscription_status_chk CHECK (status IN ('pendingVerification', 'active', 'paused', 'failing', 'disabled')),
     consecutive_failures              integer,
     disabled_reason                   text
 );

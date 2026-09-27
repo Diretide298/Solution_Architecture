@@ -1,31 +1,31 @@
 id: LLD-PlatformService
-title: PlatformService — 184 operations, 62 tables
+title: PlatformService — 184 operations, 67 tables
 generatedBy: tools/derive-diagrams.py
 tier: platform
 index: diagrams/hld/02-services.yaml
-why: '**Three contracts, one schema, 41 tables.** Subscription, platform operations and the public API
-  all write `control.*` — **they are one bounded context that was split into three contracts for API-surface
-  reasons, not for data reasons.**
+why: '**Three contracts, two schemas, 67 tables.** Subscription, platform operations and the public
+  API all write `control.*` — **they are one bounded context that was split into three contracts for
+  API-surface reasons, not for data reasons.**
 
 
-  Splitting them would give three services writing one schema, which is the arrangement every distributed-data
+  Splitting them would give three services writing two schemas, which is the arrangement every distributed-data
   guide warns about.'
 scale: Low volume, high consequence. Tenant provisioning and licensing.
 ifDown: Down blocks provisioning and the developer API. **Trading is unaffected.**
 coverage:
   operations: 184
-  inAFlow: 40
-  percent: 39%
+  inAFlow: 88
+  percent: 48%
   note: '**Flow coverage is how much of this service a journey has walked.** A service under 40% is
     unwalked rather than under-documented.'
 schemas:
 - schema: control
-  tables: 49
+  tables: 52
   stores:
   - postgres
   largestTable: control.partner_agreement
 - schema: subscription
-  tables: 13
+  tables: 15
   stores:
   - postgres
   largestTable: subscription.plan
@@ -48,7 +48,7 @@ operationsByContract:
     permission: PLATFORM_TENANT_MANAGE
     offline: false
     reads: 2
-    writes: 2
+    writes: 3
   - operation: approveBookingLimitCommercial
     verb: PUT
     path: /booking-limit-commercial
@@ -127,16 +127,16 @@ operationsByContract:
     scope: tenant
     permission: PLATFORM_PLAN_MANAGE
     offline: false
-    reads: 2
-    writes: 2
+    reads: 4
+    writes: 3
   - operation: createPlanVersion
     verb: POST
     path: /plans/{planId}
     scope: tenant
     permission: PLATFORM_PLAN_MANAGE
     offline: false
-    reads: 2
-    writes: 2
+    reads: 4
+    writes: 3
   - operation: createTenant
     verb: POST
     path: /tenants
@@ -271,7 +271,7 @@ operationsByContract:
     scope: tenant
     permission: PLATFORM_TENANT_VIEW
     offline: false
-    reads: 1
+    reads: 3
     writes: 0
   - operation: getPlanTiers
     verb: GET
@@ -655,7 +655,7 @@ operationsByContract:
     scope: tenant
     permission: PLATFORM_TENANT_VIEW
     offline: false
-    reads: 1
+    reads: 3
     writes: 0
   - operation: listRenewalAuto
     verb: GET
@@ -1517,15 +1517,160 @@ tables:
   columns: 5
   backing: redis
   owned: false
-  why: '**Not a table and not owned by a service.** Derived from something already read, invalidated
-    by an event already consumed, losable without consequence — no migration, no backup, no owner.'
+  why: '**Not a table and not owned by a service.** Derived from something already read, losable without
+    consequence — no migration, no backup, no owner.'
+  key: The idempotency key the caller sent
+  eviction:
+  - 'expires_at: **Must exceed the longest offline window.** A scanner out for a weekend replays on
+    Monday'
+  writtenBy:
+  - addLicenceAddOn
+  - applyMigration
+  - cancelDecommission
+  - cancelInvoice
+  - cancelSubscription
+  - certifyIntegration
+  - createApiClient
+  - createPartnerAgreement
+  - createPartnerUser
+  - createPlan
+  - createPlanVersion
+  - createRelease
+  - createSandbox
+  - createTenant
+  - createWebhookSubscription
+  - decommissionBurstEnvironment
+  - decommissionCell
+  - deprecateApiVersion
+  - disputeInvoice
+  - drainBurstEnvironment
+  - executeTenantMigration
+  - exportPartnerInvoice
+  - generateInvoice
+  - launchCellCluster
+  - pauseRollout
+  - planMigration
+  - planTenantMigration
+  - previewSubscriptionChange
+  - promoteRelease
+  - provisionCell
+  - publishSupportNotice
+  - reactivateTenant
+  - reconcileBurstEnvironment
+  - recordInvoicePayment
+  - recordUsage
+  - registerDeveloper
+  - registerEnvironment
+  - registerPartner
+  - rejectRelease
+  - removeLicenceAddOn
+  - replayDeadLetter
+  - replayEvents
+  - requestBurstEnvironment
+  - resetSandbox
+  - resolveInvoiceDispute
+  - rollbackMigrationRun
+  - rollbackRollout
+  - rollbackTenantMigration
+  - rotateApiCredential
+  - scheduleTenantUpgrade
+  - setApiLicensing
+  - setApiQuota
+  - setChannelListing
+  - setDeveloperMembers
+  - setSubscription
+  - settleAiUsage
+  - skipRolloutCell
+  - startRollout
+  - submitIntegrationListing
+  - submitOnboardingApplication
+  - suspendTenant
+  - terminateTenant
+  - updateCellTier
+  - updatePartnerAgreement
+  - updateTenant
+  - withdrawRelease
+  readBy:
+  - addLicenceAddOn
+  - applyMigration
+  - cancelDecommission
+  - cancelInvoice
+  - cancelSubscription
+  - certifyIntegration
+  - createApiClient
+  - createPartnerAgreement
+  - createPartnerUser
+  - createPlan
+  - createPlanVersion
+  - createRelease
+  - createSandbox
+  - createTenant
+  - createWebhookSubscription
+  - decommissionCell
+  - deprecateApiVersion
+  - disputeInvoice
+  - executeTenantMigration
+  - exportPartnerInvoice
+  - generateInvoice
+  - launchCellCluster
+  - pauseRollout
+  - planMigration
+  - planTenantMigration
+  - previewSubscriptionChange
+  - promoteRelease
+  - provisionCell
+  - publishSupportNotice
+  - reactivateTenant
+  - recordInvoicePayment
+  - recordUsage
+  - registerDeveloper
+  - registerEnvironment
+  - registerPartner
+  - rejectRelease
+  - removeLicenceAddOn
+  - replayEvents
+  - resetSandbox
+  - resolveInvoiceDispute
+  - revokeApiCredential
+  - rollbackMigrationRun
+  - rollbackRollout
+  - rollbackTenantMigration
+  - rotateApiCredential
+  - scheduleTenantUpgrade
+  - setApiLicensing
+  - setApiQuota
+  - setChannelListing
+  - setDeveloperMembers
+  - setSubscription
+  - settleAiUsage
+  - skipRolloutCell
+  - startRollout
+  - submitIntegrationListing
+  - submitOnboardingApplication
+  - suspendTenant
+  - terminateTenant
+  - updateCellTier
+  - updatePartnerAgreement
+  - updateTenant
+  - withdrawRelease
 - store: cache:resolution
   kind: cache
   columns: 4
   backing: redis
   owned: false
-  why: '**Not a table and not owned by a service.** Derived from something already read, invalidated
-    by an event already consumed, losable without consequence — no migration, no backup, no owner.'
+  why: '**Not a table and not owned by a service.** Derived from something already read, losable without
+    consequence — no migration, no backup, no owner.'
+  key: scope_path + what is being resolved — permissions, configuration, a price list
+  eviction:
+  - 'version: Bumped by the write that evicts it. **A config change nobody evicts is a stale permission**'
+  writtenBy:
+  - setApiLicensing
+  - setApiQuota
+  readBy: null
+  gap: '**The lineage names this store, not the key.** Which resolution entry each writer below evicts
+    or bumps — permissions, configuration, a price list, and whether child scopes under its `scope_path`
+    are affected — is not recorded for any operation, so a writer here cannot yet be implemented from
+    the package alone.'
 - table: control.api_client
   columns: 10
   store: postgres
@@ -1642,6 +1787,22 @@ tables:
   - white-label
   foreignWriters:
   - white-label
+- table: control.footer_config_column
+  columns: 3
+  store: postgres
+  parent: control.footer_config
+  writtenBy:
+  - white-label
+  foreignWriters:
+  - white-label
+- table: control.footer_config_social_link
+  columns: 4
+  store: postgres
+  parent: control.footer_config
+  writtenBy:
+  - white-label
+  foreignWriters:
+  - white-label
 - table: control.integration_listing
   columns: 11
   store: postgres
@@ -1665,7 +1826,14 @@ tables:
 - table: control.licence_add_on
   columns: 7
   store: postgres
-  parent: null
+  parent: control.tenant
+  writtenBy:
+  - subscription
+  foreignWriters: null
+- table: control.licence_add_on_limit
+  columns: 6
+  store: postgres
+  parent: control.licence_add_on
   writtenBy:
   - subscription
   foreignWriters: null
@@ -1715,7 +1883,7 @@ tables:
   - subscription
   foreignWriters: null
 - table: control.partner_agreement
-  columns: 28
+  columns: 29
   store: postgres
   parent: null
   writtenBy:
@@ -1749,9 +1917,9 @@ tables:
   - platform-ops
   foreignWriters: null
 - table: control.rollout_cell
-  columns: 13
+  columns: 14
   store: postgres
-  parent: control.cell
+  parent: control.rollout
   writtenBy:
   - platform-ops
   foreignWriters: null
@@ -1791,7 +1959,7 @@ tables:
   - platform-ops
   foreignWriters: null
 - table: control.tenant
-  columns: 16
+  columns: 22
   store: postgres
   parent: null
   writtenBy:
@@ -1814,7 +1982,7 @@ tables:
 - table: control.upgrade_schedule
   columns: 9
   store: postgres
-  parent: platform.tenant
+  parent: control.tenant
   writtenBy:
   - platform-ops
   foreignWriters: null
@@ -1884,7 +2052,7 @@ tables:
 - table: subscription.go_live_readiness
   columns: 8
   store: postgres
-  parent: null
+  parent: platform.tenant
   writtenBy: []
   foreignWriters: null
 - table: subscription.licensing_model
@@ -1914,6 +2082,19 @@ tables:
   parent: null
   writtenBy:
   - subscription
+  foreignWriters: null
+- table: subscription.plan_limit
+  columns: 6
+  store: postgres
+  parent: subscription.plan
+  writtenBy:
+  - subscription
+  foreignWriters: null
+- table: subscription.plan_module
+  columns: 3
+  store: postgres
+  parent: subscription.plan
+  writtenBy: []
   foreignWriters: null
 - table: subscription.tier_allowance
   columns: 10
@@ -1968,19 +2149,77 @@ readsFrom:
 writesOutside:
 - service: TenancyService
   operations: 6
-  why: '**The owner defines the row; this service may only append to it.**'
+  rule: 'ADR-0028: the owner defines the row; a foreign writer may only append, through a path the owner
+    published.'
+  why: '**The lineage records these writes, not how they honour the rule.** It does not say whether
+    each inserts or updates, or which operation or event TenancyService published for it — check each
+    against ADR-0028.'
+  writes:
+  - operation: createPartnerAgreement
+    tables:
+    - approvals.request
+  - operation: decommissionBurstEnvironment
+    tables:
+    - platform.outbox
+  - operation: reconcileBurstEnvironment
+    tables:
+    - platform.outbox
+  - operation: registerPartner
+    tables:
+    - approvals.request
+  - operation: replayDeadLetter
+    tables:
+    - platform.dead_letter
+    - platform.outbox
+  - operation: suspendTenant
+    tables:
+    - platform.outbox
 - service: CrossRegionService
   operations: 1
-  why: '**The owner defines the row; this service may only append to it.**'
+  rule: 'ADR-0028: the owner defines the row; a foreign writer may only append, through a path the owner
+    published.'
+  why: '**The lineage records these writes, not how they honour the rule.** It does not say whether
+    each inserts or updates, or which operation or event CrossRegionService published for it — check
+    each against ADR-0028.'
+  writes:
+  - operation: reconcileBurstEnvironment
+    tables:
+    - sync.rejection
 - service: IdentityService
   operations: 1
-  why: '**The owner defines the row; this service may only append to it.**'
+  rule: 'ADR-0028: the owner defines the row; a foreign writer may only append, through a path the owner
+    published.'
+  why: '**The lineage records these writes, not how they honour the rule.** It does not say whether
+    each inserts or updates, or which operation or event IdentityService published for it — check each
+    against ADR-0028.'
+  writes:
+  - operation: setDeveloperMembers
+    tables:
+    - identity.delegated_access
 - service: MarketingService
   operations: 1
-  why: '**The owner defines the row; this service may only append to it.**'
+  rule: 'ADR-0028: the owner defines the row; a foreign writer may only append, through a path the owner
+    published.'
+  why: '**The lineage records these writes, not how they honour the rule.** It does not say whether
+    each inserts or updates, or which operation or event MarketingService published for it — check each
+    against ADR-0028.'
+  writes:
+  - operation: deprecateApiVersion
+    tables:
+    - marketing.message_dispatch
 - service: OrderService
   operations: 1
-  why: '**The owner defines the row; this service may only append to it.**'
+  rule: 'ADR-0028: the owner defines the row; a foreign writer may only append, through a path the owner
+    published.'
+  why: '**The lineage records these writes, not how they honour the rule.** It does not say whether
+    each inserts or updates, or which operation or event OrderService published for it — check each
+    against ADR-0028.'
+  writes:
+  - operation: reconcileBurstEnvironment
+    tables:
+    - orders.order_line
+    - orders.payment
+    - orders.sales_order
 screens:
 - P08:BO-013 Channel & Distribution
 - P08:BO-067 Integrations

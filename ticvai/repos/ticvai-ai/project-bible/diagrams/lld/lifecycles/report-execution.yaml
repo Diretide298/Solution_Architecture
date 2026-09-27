@@ -12,7 +12,6 @@ owner: reporting
 initial:
 - queued
 terminal:
-- completed
 - failed
 - cancelled
 - expired

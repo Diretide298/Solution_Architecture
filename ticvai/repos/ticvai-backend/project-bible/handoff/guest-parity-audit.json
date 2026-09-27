@@ -1,6 +1,6 @@
 {
  "generatedBy": "tools/audit-guest-parity.py",
- "generated": "2026-09-24",
+ "generated": "2026-09-28",
  "screens": {
   "P01": 46,
   "P02": 71
@@ -12,9 +12,9 @@
   "appOnly": 7
  },
  "severity": {
-  "high": 29,
-  "medium": 122,
-  "low": 197,
+  "high": 30,
+  "medium": 179,
+  "low": 201,
   "info": 3
  },
  "findings": [
@@ -134,14 +134,21 @@
    "severity": "high",
    "dimension": "operations",
    "where": "cart (WEB-010 ↔ GST-041)",
-   "detail": "the web calls createCart and the app cannot call it anywhere",
+   "detail": "the web calls createCart, evaluatePromotions and the app cannot call it anywhere",
+   "fix": ""
+  },
+  {
+   "severity": "high",
+   "dimension": "operations",
+   "where": "ticket-selection (WEB-005 ↔ GST-008)",
+   "detail": "the web calls evaluatePromotions and the app cannot call it anywhere",
    "fix": ""
   },
   {
    "severity": "high",
    "dimension": "operations",
    "where": "web only",
-   "detail": "createCart",
+   "detail": "createCart, evaluatePromotions",
    "fix": ""
   },
   {
@@ -220,6 +227,153 @@
    "where": "waiting-room (WEB-015 ↔ GST-046)",
    "detail": "ships in wave 2 on the web and wave 1 on the app",
    "fix": "one wave for both, or record why one shell waits"
+  },
+  {
+   "severity": "medium",
+   "dimension": "bindings",
+   "where": "ai-concierge (WEB-044 ↔ GST-031/GST-032/GST-033)",
+   "detail": "web shows ['AiConversation'] only, app shows ['Cart', 'GuestOrderStatus'] only",
+   "fix": "bind both twins to the same schemas"
+  },
+  {
+   "severity": "medium",
+   "dimension": "bindings",
+   "where": "cart (WEB-010 ↔ GST-041)",
+   "detail": "web shows ['CouponCode', 'PromotionEvaluation'] only, app shows ['ProductVariant'] only",
+   "fix": "bind both twins to the same schemas"
+  },
+  {
+   "severity": "medium",
+   "dimension": "bindings",
+   "where": "checkout-and-payment (WEB-011/WEB-012/WEB-014 ↔ GST-009)",
+   "detail": "web shows ['ConsentPurposeConfig', 'EntitlementTemplate', 'GuestDevice', 'GuestProfileDetail', 'Order', 'PaymentLink', 'Wishlist'] only, app shows ['Cart', 'PaymentLinkView'] only",
+   "fix": "bind both twins to the same schemas"
+  },
+  {
+   "severity": "medium",
+   "dimension": "bindings",
+   "where": "date-and-session (WEB-006 ↔ GST-007)",
+   "detail": "web shows ['Availability'] only, app shows — only",
+   "fix": "bind both twins to the same schemas"
+  },
+  {
+   "severity": "medium",
+   "dimension": "bindings",
+   "where": "help-and-cases (WEB-025 ↔ GST-068)",
+   "detail": "web shows ['TenantAppStatus'] only, app shows ['AiConversation'] only",
+   "fix": "bind both twins to the same schemas"
+  },
+  {
+   "severity": "medium",
+   "dimension": "bindings",
+   "where": "help-content-and-accessibility (WEB-045 ↔ GST-040/GST-057)",
+   "detail": "web shows — only, app shows ['Case'] only",
+   "fix": "bind both twins to the same schemas"
+  },
+  {
+   "severity": "medium",
+   "dimension": "bindings",
+   "where": "home (WEB-001 ↔ GST-001)",
+   "detail": "web shows ['HomepageLayout', 'Product'] only, app shows ['Entitlement', 'GuestProfileDetail', 'Money'] only",
+   "fix": "bind both twins to the same schemas"
+  },
+  {
+   "severity": "medium",
+   "dimension": "bindings",
+   "where": "memberships (WEB-022/WEB-023 ↔ GST-015)",
+   "detail": "web shows — only, app shows ['DelegatedAccess'] only",
+   "fix": "bind both twins to the same schemas"
+  },
+  {
+   "severity": "medium",
+   "dimension": "bindings",
+   "where": "newsletter (WEB-027 ↔ GST-065)",
+   "detail": "web shows ['GuestDevice', 'Wishlist'] only, app shows ['ConsentPurposeConfig'] only",
+   "fix": "bind both twins to the same schemas"
+  },
+  {
+   "severity": "medium",
+   "dimension": "bindings",
+   "where": "offers (WEB-032 ↔ GST-037)",
+   "detail": "web shows — only, app shows ['CouponCode'] only",
+   "fix": "bind both twins to the same schemas"
+  },
+  {
+   "severity": "medium",
+   "dimension": "bindings",
+   "where": "privacy-security-devices (WEB-024 ↔ GST-066/GST-073)",
+   "detail": "web shows ['DelegatedAccess', 'FacePassEnrolment', 'Wishlist'] only, app shows — only",
+   "fix": "bind both twins to the same schemas"
+  },
+  {
+   "severity": "medium",
+   "dimension": "bindings",
+   "where": "profile (WEB-020 ↔ GST-039)",
+   "detail": "web shows ['ConsentPurposeConfig', 'GuestProfileDetail'] only, app shows ['RecordConsentRequest'] only",
+   "fix": "bind both twins to the same schemas"
+  },
+  {
+   "severity": "medium",
+   "dimension": "bindings",
+   "where": "reservations (WEB-031 ↔ GST-016/GST-017)",
+   "detail": "web shows ['GroupBooking', 'GroupPackageDefinition', 'ResourceAvailability'] only, app shows — only",
+   "fix": "bind both twins to the same schemas"
+  },
+  {
+   "severity": "medium",
+   "dimension": "bindings",
+   "where": "search (WEB-003 ↔ GST-063)",
+   "detail": "web shows ['Product'] only, app shows — only",
+   "fix": "bind both twins to the same schemas"
+  },
+  {
+   "severity": "medium",
+   "dimension": "bindings",
+   "where": "shop (WEB-033 ↔ GST-026)",
+   "detail": "web shows — only, app shows ['GameCard'] only",
+   "fix": "bind both twins to the same schemas"
+  },
+  {
+   "severity": "medium",
+   "dimension": "bindings",
+   "where": "shop-and-drop (WEB-042 ↔ GST-062)",
+   "detail": "web shows ['MerchandiseItem'] only, app shows — only",
+   "fix": "bind both twins to the same schemas"
+  },
+  {
+   "severity": "medium",
+   "dimension": "bindings",
+   "where": "ticket-selection (WEB-005 ↔ GST-008)",
+   "detail": "web shows ['ProductVariant', 'PromotionEvaluation'] only, app shows — only",
+   "fix": "bind both twins to the same schemas"
+  },
+  {
+   "severity": "medium",
+   "dimension": "bindings",
+   "where": "venue-info (WEB-028 ↔ GST-029)",
+   "detail": "web shows ['TenantAppStatus'] only, app shows ['DeliveryLocation', 'DiningOutlet'] only",
+   "fix": "bind both twins to the same schemas"
+  },
+  {
+   "severity": "medium",
+   "dimension": "bindings",
+   "where": "venue-map-and-wait-times (WEB-039 ↔ GST-021/GST-022)",
+   "detail": "web shows ['Queue'] only, app shows ['Product'] only",
+   "fix": "bind both twins to the same schemas"
+  },
+  {
+   "severity": "medium",
+   "dimension": "bindings",
+   "where": "virtual-queue (WEB-040 ↔ GST-023)",
+   "detail": "web shows — only, app shows ['Queue'] only",
+   "fix": "bind both twins to the same schemas"
+  },
+  {
+   "severity": "medium",
+   "dimension": "bindings",
+   "where": "wallet-and-payment-methods (WEB-021 ↔ GST-011/GST-071)",
+   "detail": "web shows ['GameCard'] only, app shows — only",
+   "fix": "bind both twins to the same schemas"
   },
   {
    "severity": "medium",
@@ -371,23 +525,44 @@
   {
    "severity": "medium",
    "dimension": "design bundles",
+   "where": "P01-account-self-service-01",
+   "detail": "5 of 5 screens differ from the YAML (WEB-016, WEB-017, WEB-018, WEB-019, WEB-020)",
+   "fix": "python3 tools/export-design-batch.py P01-account-self-service-01"
+  },
+  {
+   "severity": "medium",
+   "dimension": "design bundles",
    "where": "P01-booking-selection-01",
-   "detail": "1 of 5 screens differ from the YAML (WEB-006)",
+   "detail": "5 of 5 screens differ from the YAML (WEB-005, WEB-006, WEB-007, WEB-008, WEB-009)",
    "fix": "python3 tools/export-design-batch.py P01-booking-selection-01"
   },
   {
    "severity": "medium",
    "dimension": "design bundles",
    "where": "P01-cart-checkout-01",
-   "detail": "2 of 5 screens differ from the YAML (WEB-010, WEB-012)",
+   "detail": "5 of 5 screens differ from the YAML (WEB-010, WEB-011, WEB-012, WEB-013, WEB-014)",
    "fix": "python3 tools/export-design-batch.py P01-cart-checkout-01"
   },
   {
    "severity": "medium",
    "dimension": "design bundles",
    "where": "P01-discovery-browse-01",
-   "detail": "1 of 4 screens differ from the YAML (WEB-004)",
+   "detail": "4 of 4 screens differ from the YAML (WEB-001, WEB-002, WEB-003, WEB-004)",
    "fix": "python3 tools/export-design-batch.py P01-discovery-browse-01"
+  },
+  {
+   "severity": "medium",
+   "dimension": "design bundles",
+   "where": "P01-engagement-support-01",
+   "detail": "4 of 6 screens differ from the YAML (WEB-025, WEB-026, WEB-027, WEB-028)",
+   "fix": "python3 tools/export-design-batch.py P01-engagement-support-01"
+  },
+  {
+   "severity": "medium",
+   "dimension": "design bundles",
+   "where": "P01-high-demand-access-01",
+   "detail": "1 of 1 screens differ from the YAML (WEB-015)",
+   "fix": "python3 tools/export-design-batch.py P01-high-demand-access-01"
   },
   {
    "severity": "medium",
@@ -400,64 +575,169 @@
    "severity": "medium",
    "dimension": "design bundles",
    "where": "P01-membership-loyalty-value-01",
-   "detail": "2 of 5 screens differ from the YAML (WEB-021, WEB-023)",
+   "detail": "5 of 5 screens differ from the YAML (WEB-021, WEB-022, WEB-023, WEB-024, WEB-043)",
    "fix": "python3 tools/export-design-batch.py P01-membership-loyalty-value-01"
   },
   {
    "severity": "medium",
    "dimension": "design bundles",
+   "where": "P01-promotions-01",
+   "detail": "1 of 1 screens differ from the YAML (WEB-032)",
+   "fix": "python3 tools/export-design-batch.py P01-promotions-01"
+  },
+  {
+   "severity": "medium",
+   "dimension": "design bundles",
+   "where": "P01-retail-01",
+   "detail": "2 of 2 screens differ from the YAML (WEB-033, WEB-042)",
+   "fix": "python3 tools/export-design-batch.py P01-retail-01"
+  },
+  {
+   "severity": "medium",
+   "dimension": "design bundles",
+   "where": "P01-support-01",
+   "detail": "1 of 2 screens differ from the YAML (WEB-034)",
+   "fix": "python3 tools/export-design-batch.py P01-support-01"
+  },
+  {
+   "severity": "medium",
+   "dimension": "design bundles",
+   "where": "P01-system-states-01",
+   "detail": "1 of 1 screens differ from the YAML (WEB-029)",
+   "fix": "python3 tools/export-design-batch.py P01-system-states-01"
+  },
+  {
+   "severity": "medium",
+   "dimension": "design bundles",
    "where": "P01-ticketing-01",
-   "detail": "1 of 3 screens differ from the YAML (WEB-031)",
+   "detail": "3 of 3 screens differ from the YAML (WEB-030, WEB-031, WEB-035)",
    "fix": "python3 tools/export-design-batch.py P01-ticketing-01"
   },
   {
    "severity": "medium",
    "dimension": "design bundles",
    "where": "P02-account-self-service-01",
-   "detail": "2 of 10 screens differ from the YAML (GST-018, GST-055)",
+   "detail": "10 of 10 screens differ from the YAML (GST-012, GST-013, GST-018, GST-019, GST-020, GST-039, GST-042, GST-045)",
    "fix": "python3 tools/export-design-batch.py P02-account-self-service-01"
   },
   {
    "severity": "medium",
    "dimension": "design bundles",
    "where": "P02-account-self-service-02",
-   "detail": "1 of 4 screens differ from the YAML (GST-071)",
+   "detail": "4 of 4 screens differ from the YAML (GST-067, GST-069, GST-071, GST-073)",
    "fix": "python3 tools/export-design-batch.py P02-account-self-service-02"
   },
   {
    "severity": "medium",
    "dimension": "design bundles",
    "where": "P02-booking-selection-01",
-   "detail": "2 of 8 screens differ from the YAML (GST-007, GST-072)",
+   "detail": "8 of 8 screens differ from the YAML (GST-007, GST-008, GST-048, GST-049, GST-050, GST-056, GST-058, GST-072)",
    "fix": "python3 tools/export-design-batch.py P02-booking-selection-01"
   },
   {
    "severity": "medium",
    "dimension": "design bundles",
    "where": "P02-cart-checkout-01",
-   "detail": "2 of 3 screens differ from the YAML (GST-009, GST-041)",
+   "detail": "3 of 3 screens differ from the YAML (GST-009, GST-010, GST-041)",
    "fix": "python3 tools/export-design-batch.py P02-cart-checkout-01"
   },
   {
    "severity": "medium",
    "dimension": "design bundles",
+   "where": "P02-discovery-01",
+   "detail": "1 of 1 screens differ from the YAML (GST-063)",
+   "fix": "python3 tools/export-design-batch.py P02-discovery-01"
+  },
+  {
+   "severity": "medium",
+   "dimension": "design bundles",
    "where": "P02-discovery-browse-01",
-   "detail": "1 of 7 screens differ from the YAML (GST-004)",
+   "detail": "7 of 7 screens differ from the YAML (GST-001, GST-002, GST-003, GST-004, GST-005, GST-006, GST-057)",
    "fix": "python3 tools/export-design-batch.py P02-discovery-browse-01"
   },
   {
    "severity": "medium",
    "dimension": "design bundles",
+   "where": "P02-engagement-support-01",
+   "detail": "10 of 10 screens differ from the YAML (GST-030, GST-031, GST-032, GST-033, GST-035, GST-040, GST-051, GST-052)",
+   "fix": "python3 tools/export-design-batch.py P02-engagement-support-01"
+  },
+  {
+   "severity": "medium",
+   "dimension": "design bundles",
+   "where": "P02-engagement-support-02",
+   "detail": "2 of 2 screens differ from the YAML (GST-059, GST-068)",
+   "fix": "python3 tools/export-design-batch.py P02-engagement-support-02"
+  },
+  {
+   "severity": "medium",
+   "dimension": "design bundles",
+   "where": "P02-high-demand-access-01",
+   "detail": "1 of 1 screens differ from the YAML (GST-046)",
+   "fix": "python3 tools/export-design-batch.py P02-high-demand-access-01"
+  },
+  {
+   "severity": "medium",
+   "dimension": "design bundles",
+   "where": "P02-in-venue-experience-01",
+   "detail": "2 of 2 screens differ from the YAML (GST-061, GST-062)",
+   "fix": "python3 tools/export-design-batch.py P02-in-venue-experience-01"
+  },
+  {
+   "severity": "medium",
+   "dimension": "design bundles",
    "where": "P02-in-venue-services-01",
-   "detail": "2 of 10 screens differ from the YAML (GST-024, GST-070)",
+   "detail": "10 of 10 screens differ from the YAML (GST-021, GST-022, GST-023, GST-024, GST-025, GST-027, GST-028, GST-029)",
    "fix": "python3 tools/export-design-batch.py P02-in-venue-services-01"
   },
   {
    "severity": "medium",
    "dimension": "design bundles",
+   "where": "P02-marketing-01",
+   "detail": "1 of 1 screens differ from the YAML (GST-065)",
+   "fix": "python3 tools/export-design-batch.py P02-marketing-01"
+  },
+  {
+   "severity": "medium",
+   "dimension": "design bundles",
    "where": "P02-membership-loyalty-value-01",
-   "detail": "2 of 3 screens differ from the YAML (GST-011, GST-015)",
+   "detail": "3 of 3 screens differ from the YAML (GST-011, GST-015, GST-036)",
    "fix": "python3 tools/export-design-batch.py P02-membership-loyalty-value-01"
+  },
+  {
+   "severity": "medium",
+   "dimension": "design bundles",
+   "where": "P02-promotions-01",
+   "detail": "1 of 1 screens differ from the YAML (GST-037)",
+   "fix": "python3 tools/export-design-batch.py P02-promotions-01"
+  },
+  {
+   "severity": "medium",
+   "dimension": "design bundles",
+   "where": "P02-retail-01",
+   "detail": "1 of 1 screens differ from the YAML (GST-026)",
+   "fix": "python3 tools/export-design-batch.py P02-retail-01"
+  },
+  {
+   "severity": "medium",
+   "dimension": "design bundles",
+   "where": "P02-support-01",
+   "detail": "1 of 1 screens differ from the YAML (GST-034)",
+   "fix": "python3 tools/export-design-batch.py P02-support-01"
+  },
+  {
+   "severity": "medium",
+   "dimension": "design bundles",
+   "where": "P02-system-states-01",
+   "detail": "2 of 2 screens differ from the YAML (GST-043, GST-047)",
+   "fix": "python3 tools/export-design-batch.py P02-system-states-01"
+  },
+  {
+   "severity": "medium",
+   "dimension": "design bundles",
+   "where": "P02-ticketing-01",
+   "detail": "4 of 4 screens differ from the YAML (GST-014, GST-016, GST-017, GST-044)",
+   "fix": "python3 tools/export-design-batch.py P02-ticketing-01"
   },
   {
    "severity": "medium",
@@ -491,7 +771,7 @@
    "severity": "medium",
    "dimension": "entry parameters",
    "where": "date-and-session (WEB-006 ↔ GST-007)",
-   "detail": "web opens with ['performanceId'], app with ['eventId'] — one shared link cannot open both",
+   "detail": "web opens with ['cartId', 'performanceId'], app with ['eventId'] — one shared link cannot open both",
    "fix": "one deep-link shape per capability"
   },
   {
@@ -729,14 +1009,14 @@
    "severity": "medium",
    "dimension": "operations",
    "where": "ai-concierge (WEB-044 ↔ GST-031/GST-032/GST-033)",
-   "detail": "the app calls addCartLine, checkoutCart, createGuestFnbOrder, getCart, getGuestOrderStatus here; the web calls addCartLine on WEB-008/WEB-010/WEB-033; checkoutCart on WEB-010; createGuestFnbOrder on WEB-036; getCart on WEB-010; getGuestOrderStatus on WEB-036/WEB-038",
+   "detail": "the app calls addCartLine, checkoutCart, createGuestFnbOrder, getCart, getGuestOrderStatus here; the web calls addCartLine on WEB-006/WEB-008/WEB-010/WEB-033; checkoutCart on WEB-010; createGuestFnbOrder on WEB-036; getCart on WEB-010; getGuestOrderStatus on WEB-036/WEB-038",
    "fix": "same operations on the same capability, so a guest finds it in the same place"
   },
   {
    "severity": "medium",
    "dimension": "operations",
    "where": "cart (WEB-010 ↔ GST-041)",
-   "detail": "the web calls addCartLine, evaluatePromotions, getCouponCode here; the app calls addCartLine on GST-032/GST-048/GST-050/GST-053/GST-056; evaluatePromotions on GST-036/GST-037; getCouponCode on GST-037",
+   "detail": "the web calls addCartLine, getCouponCode here; the app calls addCartLine on GST-009/GST-032/GST-048/GST-050/GST-053/GST-056; getCouponCode on GST-037",
    "fix": "same operations on the same capability, so a guest finds it in the same place"
   },
   {
@@ -757,14 +1037,14 @@
    "severity": "medium",
    "dimension": "operations",
    "where": "checkout-and-payment (WEB-011/WEB-012/WEB-014 ↔ GST-009)",
-   "detail": "the app calls acquireInventoryHold, checkoutCart, getCart here; the web calls acquireInventoryHold on WEB-006; checkoutCart on WEB-010; getCart on WEB-010",
+   "detail": "the app calls addCartLine, checkoutCart, getCart here; the web calls addCartLine on WEB-006/WEB-008/WEB-010/WEB-033; checkoutCart on WEB-010; getCart on WEB-010",
    "fix": "same operations on the same capability, so a guest finds it in the same place"
   },
   {
    "severity": "medium",
    "dimension": "operations",
    "where": "date-and-session (WEB-006 ↔ GST-007)",
-   "detail": "the web calls acquireInventoryHold, getPerformance here; the app calls acquireInventoryHold on GST-009; getPerformance on GST-006",
+   "detail": "the web calls addCartLine, getPerformance here; the app calls addCartLine on GST-009/GST-032/GST-048/GST-050/GST-053/GST-056; getPerformance on GST-006",
    "fix": "same operations on the same capability, so a guest finds it in the same place"
   },
   {
@@ -918,7 +1198,7 @@
    "severity": "medium",
    "dimension": "operations",
    "where": "shop (WEB-033 ↔ GST-026)",
-   "detail": "the web calls addCartLine here; the app calls addCartLine on GST-032/GST-048/GST-050/GST-053/GST-056",
+   "detail": "the web calls addCartLine here; the app calls addCartLine on GST-009/GST-032/GST-048/GST-050/GST-053/GST-056",
    "fix": "same operations on the same capability, so a guest finds it in the same place"
   },
   {
@@ -946,7 +1226,7 @@
    "severity": "medium",
    "dimension": "operations",
    "where": "ticket-selection (WEB-005 ↔ GST-008)",
-   "detail": "the web calls evaluatePromotions, listProductVariants here; the app calls evaluatePromotions on GST-036/GST-037; listProductVariants on GST-041",
+   "detail": "the web calls listProductVariants here; the app calls listProductVariants on GST-041",
    "fix": "same operations on the same capability, so a guest finds it in the same place"
   },
   {
@@ -1029,21 +1309,35 @@
   {
    "severity": "medium",
    "dimension": "overlays",
-   "where": "cart (WEB-010 ↔ GST-041)",
+   "where": "feedback (WEB-026 ↔ GST-035)",
+   "detail": "declared on the app only",
+   "fix": ""
+  },
+  {
+   "severity": "medium",
+   "dimension": "overlays",
+   "where": "help-content-and-accessibility (WEB-045 ↔ GST-040/GST-057)",
+   "detail": "declared on the app only",
+   "fix": ""
+  },
+  {
+   "severity": "medium",
+   "dimension": "overlays",
+   "where": "loyalty (WEB-043 ↔ GST-036)",
    "detail": "declared on the web only",
    "fix": ""
   },
   {
    "severity": "medium",
    "dimension": "overlays",
-   "where": "checkout-and-payment (WEB-011/WEB-012/WEB-014 ↔ GST-009)",
+   "where": "shop-and-drop (WEB-042 ↔ GST-062)",
    "detail": "declared on the web only",
    "fix": ""
   },
   {
    "severity": "medium",
    "dimension": "overlays",
-   "where": "newsletter (WEB-027 ↔ GST-065)",
+   "where": "ticket-selection (WEB-005 ↔ GST-008)",
    "detail": "declared on the web only",
    "fix": ""
   },
@@ -1057,8 +1351,78 @@
   {
    "severity": "medium",
    "dimension": "states",
+   "where": "ai-concierge (WEB-044 ↔ GST-031/GST-032/GST-033)",
+   "detail": "web only ['emptyNoResults'], app only —",
+   "fix": ""
+  },
+  {
+   "severity": "medium",
+   "dimension": "states",
+   "where": "cart (WEB-010 ↔ GST-041)",
+   "detail": "web only —, app only ['emptyNoResults']",
+   "fix": ""
+  },
+  {
+   "severity": "medium",
+   "dimension": "states",
+   "where": "checkout-and-payment (WEB-011/WEB-012/WEB-014 ↔ GST-009)",
+   "detail": "web only ['emptyNoResults'], app only —",
+   "fix": ""
+  },
+  {
+   "severity": "medium",
+   "dimension": "states",
+   "where": "date-and-session (WEB-006 ↔ GST-007)",
+   "detail": "web only —, app only ['emptyNoResults']",
+   "fix": ""
+  },
+  {
+   "severity": "medium",
+   "dimension": "states",
+   "where": "feedback (WEB-026 ↔ GST-035)",
+   "detail": "web only ['emptyNoAccess'], app only —",
+   "fix": ""
+  },
+  {
+   "severity": "medium",
+   "dimension": "states",
+   "where": "help-and-cases (WEB-025 ↔ GST-068)",
+   "detail": "web only —, app only ['emptyNoResults']",
+   "fix": ""
+  },
+  {
+   "severity": "medium",
+   "dimension": "states",
+   "where": "in-venue-notifications (WEB-046 ↔ GST-030)",
+   "detail": "web only ['emptyNoAccess'], app only —",
+   "fix": ""
+  },
+  {
+   "severity": "medium",
+   "dimension": "states",
+   "where": "lost-and-found (WEB-034 ↔ GST-034)",
+   "detail": "web only ['emptyNoAccess'], app only —",
+   "fix": ""
+  },
+  {
+   "severity": "medium",
+   "dimension": "states",
+   "where": "order-tracking (WEB-038 ↔ GST-025)",
+   "detail": "web only ['emptyNoAccess', 'emptyNoResults'], app only —",
+   "fix": ""
+  },
+  {
+   "severity": "medium",
+   "dimension": "states",
    "where": "profile (WEB-020 ↔ GST-039)",
    "detail": "web only ['emptyNoResults'], app only —",
+   "fix": ""
+  },
+  {
+   "severity": "medium",
+   "dimension": "states",
+   "where": "search (WEB-003 ↔ GST-063)",
+   "detail": "web only ['emptyNoAccess'], app only —",
    "fix": ""
   },
   {
@@ -1071,8 +1435,50 @@
   {
    "severity": "medium",
    "dimension": "states",
+   "where": "sign-in (WEB-016 ↔ GST-042)",
+   "detail": "web only ['emptyNoAccess'], app only —",
+   "fix": ""
+  },
+  {
+   "severity": "medium",
+   "dimension": "states",
+   "where": "system-states (WEB-029 ↔ GST-047)",
+   "detail": "web only ['emptyNoAccess'], app only —",
+   "fix": ""
+  },
+  {
+   "severity": "medium",
+   "dimension": "states",
    "where": "ticket-selection (WEB-005 ↔ GST-008)",
+   "detail": "web only ['emptyNoAccess', 'emptyNoResults'], app only —",
+   "fix": ""
+  },
+  {
+   "severity": "medium",
+   "dimension": "states",
+   "where": "venue-info (WEB-028 ↔ GST-029)",
+   "detail": "web only ['emptyNoAccess'], app only ['emptyNoResults']",
+   "fix": ""
+  },
+  {
+   "severity": "medium",
+   "dimension": "states",
+   "where": "virtual-queue (WEB-040 ↔ GST-023)",
    "detail": "web only ['emptyNoResults'], app only —",
+   "fix": ""
+  },
+  {
+   "severity": "medium",
+   "dimension": "states",
+   "where": "waiting-room (WEB-015 ↔ GST-046)",
+   "detail": "web only ['emptyNoAccess'], app only —",
+   "fix": ""
+  },
+  {
+   "severity": "medium",
+   "dimension": "states",
+   "where": "wishlist (WEB-009 ↔ GST-020)",
+   "detail": "web only ['emptyNoAccess'], app only —",
    "fix": ""
   },
   {
@@ -1365,36 +1771,29 @@
   {
    "severity": "low",
    "dimension": "components",
-   "where": "add-ons (WEB-008 ↔ GST-048/GST-056)",
-   "detail": "web only ['secondaryButton'], app only ['dataTable'] (4 vs 5 components)",
-   "fix": ""
-  },
-  {
-   "severity": "low",
-   "dimension": "components",
    "where": "ai-concierge (WEB-044 ↔ GST-031/GST-032/GST-033)",
-   "detail": "web only ['cardList'], app only — (7 vs 14 components)",
+   "detail": "web only ['cardList', 'dataTable'], app only ['multiSelect', 'textField'] (9 vs 16 components)",
    "fix": ""
   },
   {
    "severity": "low",
    "dimension": "components",
    "where": "browse (WEB-002 ↔ GST-002/GST-003/GST-005)",
-   "detail": "web only ['cardList', 'datePicker', 'multiSelect', 'searchField'], app only — (6 vs 6 components)",
+   "detail": "web only ['cardList', 'multiSelect', 'searchField'], app only — (12 vs 18 components)",
    "fix": ""
   },
   {
    "severity": "low",
    "dimension": "components",
    "where": "cart (WEB-010 ↔ GST-041)",
-   "detail": "web only ['banner', 'destructiveButton', 'secondaryButton', 'textField'], app only — (11 vs 2 components)",
+   "detail": "web only ['banner', 'textField'], app only ['dataTable'] (13 vs 8 components)",
    "fix": ""
   },
   {
    "severity": "low",
    "dimension": "components",
    "where": "checkout-and-payment (WEB-011/WEB-012/WEB-014 ↔ GST-009)",
-   "detail": "web only ['banner', 'cartPanel', 'consentBlock', 'dataTable', 'destructiveButton', 'textField'], app only — (26 vs 5 components)",
+   "detail": "web only ['banner', 'cartPanel', 'consentBlock', 'dataTable', 'destructiveButton', 'textField'], app only — (33 vs 11 components)",
    "fix": ""
   },
   {
@@ -1408,189 +1807,189 @@
    "severity": "low",
    "dimension": "components",
    "where": "date-and-session (WEB-006 ↔ GST-007)",
-   "detail": "web only ['cardList', 'datePicker'], app only ['dataTable', 'secondaryButton'] (4 vs 3 components)",
+   "detail": "web only ['cardList', 'detailPanel', 'secondaryButton'], app only — (7 vs 5 components)",
    "fix": ""
   },
   {
    "severity": "low",
    "dimension": "components",
    "where": "detail (WEB-004 ↔ GST-004/GST-006)",
-   "detail": "web only ['banner', 'primaryButton'], app only — (4 vs 3 components)",
+   "detail": "web only ['banner', 'primaryButton'], app only — (10 vs 10 components)",
+   "fix": ""
+  },
+  {
+   "severity": "low",
+   "dimension": "components",
+   "where": "feedback (WEB-026 ↔ GST-035)",
+   "detail": "web only —, app only ['secondaryButton'] (9 vs 10 components)",
    "fix": ""
   },
   {
    "severity": "low",
    "dimension": "components",
    "where": "fnb-order (WEB-036 ↔ GST-024)",
-   "detail": "web only ['cardList'], app only — (7 vs 5 components)",
+   "detail": "web only ['cardList'], app only — (17 vs 13 components)",
    "fix": ""
   },
   {
    "severity": "low",
    "dimension": "components",
    "where": "help-and-cases (WEB-025 ↔ GST-068)",
-   "detail": "web only ['secondaryButton'], app only — (4 vs 3 components)",
+   "detail": "web only —, app only ['textField', 'toggle'] (3 vs 8 components)",
    "fix": ""
   },
   {
    "severity": "low",
    "dimension": "components",
    "where": "help-content-and-accessibility (WEB-045 ↔ GST-040/GST-057)",
-   "detail": "web only ['cardList'], app only ['metricTile', 'primaryButton', 'secondaryButton'] (4 vs 8 components)",
+   "detail": "web only ['cardList'], app only ['metricTile', 'primaryButton', 'secondaryButton', 'textField'] (5 vs 11 components)",
    "fix": ""
   },
   {
    "severity": "low",
    "dimension": "components",
    "where": "home (WEB-001 ↔ GST-001)",
-   "detail": "web only ['banner', 'cardList', 'iconButton', 'secondaryButton'], app only — (6 vs 2 components)",
+   "detail": "web only ['banner', 'cardList', 'iconButton', 'secondaryButton', 'textField'], app only ['selectField'] (11 vs 8 components)",
    "fix": ""
   },
   {
    "severity": "low",
    "dimension": "components",
    "where": "in-venue-notifications (WEB-046 ↔ GST-030)",
-   "detail": "web only ['cardList', 'detailPanel'], app only ['secondaryButton'] (3 vs 2 components)",
+   "detail": "web only ['cardList', 'detailPanel'], app only — (6 vs 4 components)",
    "fix": ""
   },
   {
    "severity": "low",
    "dimension": "components",
    "where": "loyalty (WEB-043 ↔ GST-036)",
-   "detail": "web only ['cardList', 'detailPanel'], app only — (4 vs 2 components)",
+   "detail": "web only ['cardList', 'primaryButton', 'secondaryButton'], app only — (7 vs 3 components)",
+   "fix": ""
+  },
+  {
+   "severity": "low",
+   "dimension": "components",
+   "where": "memberships (WEB-022/WEB-023 ↔ GST-015)",
+   "detail": "web only ['textField', 'toggle'], app only — (16 vs 11 components)",
    "fix": ""
   },
   {
    "severity": "low",
    "dimension": "components",
    "where": "menu-item (WEB-037 ↔ GST-061)",
-   "detail": "web only ['cardList'], app only ['banner', 'selectField'] (4 vs 4 components)",
+   "detail": "web only ['cardList'], app only ['banner', 'selectField'] (5 vs 5 components)",
    "fix": ""
   },
   {
    "severity": "low",
    "dimension": "components",
    "where": "newsletter (WEB-027 ↔ GST-065)",
-   "detail": "web only ['confirmDialog', 'destructiveButton'], app only — (12 vs 4 components)",
+   "detail": "web only ['confirmDialog', 'destructiveButton'], app only — (11 vs 5 components)",
    "fix": ""
   },
   {
    "severity": "low",
    "dimension": "components",
-   "where": "offers (WEB-032 ↔ GST-037)",
-   "detail": "web only ['secondaryButton'], app only — (5 vs 3 components)",
+   "where": "order-history (WEB-019 ↔ GST-019)",
+   "detail": "web only ['secondaryButton'], app only ['textField'] (6 vs 11 components)",
    "fix": ""
   },
   {
    "severity": "low",
    "dimension": "components",
    "where": "order-tracking (WEB-038 ↔ GST-025)",
-   "detail": "web only ['cardList'], app only — (4 vs 2 components)",
-   "fix": ""
-  },
-  {
-   "severity": "low",
-   "dimension": "components",
-   "where": "parking (WEB-041 ↔ GST-027/GST-028)",
-   "detail": "web only ['cardList'], app only — (6 vs 7 components)",
-   "fix": ""
-  },
-  {
-   "severity": "low",
-   "dimension": "components",
-   "where": "privacy-security-devices (WEB-024 ↔ GST-066/GST-073)",
-   "detail": "web only ['confirmDialog'], app only — (12 vs 8 components)",
-   "fix": ""
-  },
-  {
-   "severity": "low",
-   "dimension": "components",
-   "where": "profile (WEB-020 ↔ GST-039)",
-   "detail": "web only ['dataTable', 'detailPanel', 'secondaryButton'], app only ['textField'] (8 vs 7 components)",
-   "fix": ""
-  },
-  {
-   "severity": "low",
-   "dimension": "components",
-   "where": "reservations (WEB-031 ↔ GST-016/GST-017)",
-   "detail": "web only ['confirmDialog', 'secondaryButton'], app only — (7 vs 5 components)",
-   "fix": ""
-  },
-  {
-   "severity": "low",
-   "dimension": "components",
-   "where": "search (WEB-003 ↔ GST-063)",
-   "detail": "web only —, app only ['searchField'] (2 vs 3 components)",
-   "fix": ""
-  },
-  {
-   "severity": "low",
-   "dimension": "components",
-   "where": "seat-selection (WEB-007 ↔ GST-049)",
-   "detail": "web only ['banner'], app only — (6 vs 7 components)",
-   "fix": ""
-  },
-  {
-   "severity": "low",
-   "dimension": "components",
-   "where": "shop (WEB-033 ↔ GST-026)",
-   "detail": "web only ['primaryButton', 'searchField', 'secondaryButton'], app only — (7 vs 2 components)",
-   "fix": ""
-  },
-  {
-   "severity": "low",
-   "dimension": "components",
-   "where": "shop-and-drop (WEB-042 ↔ GST-062)",
-   "detail": "web only ['cardList', 'dataTable', 'detailPanel', 'secondaryButton'], app only ['banner'] (7 vs 2 components)",
-   "fix": ""
-  },
-  {
-   "severity": "low",
-   "dimension": "components",
-   "where": "ticket-selection (WEB-005 ↔ GST-008)",
-   "detail": "web only ['banner', 'cardList', 'dataTable', 'detailPanel'], app only ['secondaryButton'] (6 vs 2 components)",
-   "fix": ""
-  },
-  {
-   "severity": "low",
-   "dimension": "components",
-   "where": "venue-info (WEB-028 ↔ GST-029)",
-   "detail": "web only —, app only ['dataTable'] (1 vs 2 components)",
-   "fix": ""
-  },
-  {
-   "severity": "low",
-   "dimension": "components",
-   "where": "venue-map-and-wait-times (WEB-039 ↔ GST-021/GST-022)",
-   "detail": "web only ['cardList'], app only — (4 vs 5 components)",
-   "fix": ""
-  },
-  {
-   "severity": "low",
-   "dimension": "components",
-   "where": "virtual-queue (WEB-040 ↔ GST-023)",
    "detail": "web only ['cardList'], app only — (5 vs 3 components)",
    "fix": ""
   },
   {
    "severity": "low",
    "dimension": "components",
-   "where": "waiting-room (WEB-015 ↔ GST-046)",
-   "detail": "web only ['secondaryButton'], app only — (3 vs 2 components)",
+   "where": "parking (WEB-041 ↔ GST-027/GST-028)",
+   "detail": "web only ['cardList'], app only — (7 vs 9 components)",
    "fix": ""
   },
   {
    "severity": "low",
    "dimension": "components",
-   "where": "wallet-and-payment-methods (WEB-021 ↔ GST-011/GST-071)",
-   "detail": "web only —, app only ['primaryButton', 'secondaryButton'] (3 vs 7 components)",
+   "where": "privacy-security-devices (WEB-024 ↔ GST-066/GST-073)",
+   "detail": "web only ['confirmDialog'], app only ['textField'] (17 vs 12 components)",
+   "fix": ""
+  },
+  {
+   "severity": "low",
+   "dimension": "components",
+   "where": "profile (WEB-020 ↔ GST-039)",
+   "detail": "web only ['dataTable', 'detailPanel'], app only ['textField'] (7 vs 8 components)",
+   "fix": ""
+  },
+  {
+   "severity": "low",
+   "dimension": "components",
+   "where": "reservations (WEB-031 ↔ GST-016/GST-017)",
+   "detail": "web only ['confirmDialog', 'primaryButton', 'secondaryButton'], app only ['numberField'] (11 vs 7 components)",
+   "fix": ""
+  },
+  {
+   "severity": "low",
+   "dimension": "components",
+   "where": "seat-selection (WEB-007 ↔ GST-049)",
+   "detail": "web only ['banner'], app only — (6 vs 4 components)",
+   "fix": ""
+  },
+  {
+   "severity": "low",
+   "dimension": "components",
+   "where": "shop-and-drop (WEB-042 ↔ GST-062)",
+   "detail": "web only ['cardList', 'dataTable', 'detailPanel', 'searchField', 'secondaryButton', 'textField', 'toggle'], app only ['banner'] (11 vs 2 components)",
+   "fix": ""
+  },
+  {
+   "severity": "low",
+   "dimension": "components",
+   "where": "ticket-selection (WEB-005 ↔ GST-008)",
+   "detail": "web only ['banner', 'cardList', 'dataTable', 'detailPanel'], app only ['multiSelect', 'textField'] (6 vs 4 components)",
+   "fix": ""
+  },
+  {
+   "severity": "low",
+   "dimension": "components",
+   "where": "ticket-transfer (WEB-030 ↔ GST-014/GST-045)",
+   "detail": "web only —, app only ['multiSelect'] (11 vs 14 components)",
+   "fix": ""
+  },
+  {
+   "severity": "low",
+   "dimension": "components",
+   "where": "tickets (WEB-018 ↔ GST-012/GST-013)",
+   "detail": "web only ['secondaryButton'], app only — (10 vs 12 components)",
+   "fix": ""
+  },
+  {
+   "severity": "low",
+   "dimension": "components",
+   "where": "venue-info (WEB-028 ↔ GST-029)",
+   "detail": "web only —, app only ['dataTable', 'textField', 'toggle'] (1 vs 5 components)",
+   "fix": ""
+  },
+  {
+   "severity": "low",
+   "dimension": "components",
+   "where": "venue-map-and-wait-times (WEB-039 ↔ GST-021/GST-022)",
+   "detail": "web only ['cardList'], app only — (9 vs 9 components)",
+   "fix": ""
+  },
+  {
+   "severity": "low",
+   "dimension": "components",
+   "where": "virtual-queue (WEB-040 ↔ GST-023)",
+   "detail": "web only ['cardList'], app only ['dataTable'] (8 vs 5 components)",
    "fix": ""
   },
   {
    "severity": "low",
    "dimension": "components",
    "where": "wishlist (WEB-009 ↔ GST-020)",
-   "detail": "web only ['confirmDialog', 'secondaryButton'], app only — (7 vs 3 components)",
+   "detail": "web only ['confirmDialog'], app only — (4 vs 3 components)",
    "fix": ""
   },
   {
@@ -1617,7 +2016,7 @@
   {
    "severity": "low",
    "dimension": "documents",
-   "where": "contracts/spine/catalogue.yaml:784",
+   "where": "contracts/spine/catalogue.yaml:899",
    "detail": "\"browses by category and cannot search\" — GST-063 Search exists since 17 August",
    "fix": "rewrite to the 12 September rule"
   },
@@ -1842,7 +2241,7 @@
    "severity": "low",
    "dimension": "navigation",
    "where": "add-ons (WEB-008 ↔ GST-048/GST-056)",
-   "detail": "leads on to ['date-and-session', 'seat-selection', 'ticket-selection'] on the web only and ['browse'] on the app only",
+   "detail": "leads on to ['cart', 'date-and-session', 'seat-selection', 'ticket-selection'] on the web only and ['browse'] on the app only",
    "fix": ""
   },
   {
@@ -1926,7 +2325,7 @@
    "severity": "low",
    "dimension": "navigation",
    "where": "home (WEB-001 ↔ GST-001)",
-   "detail": "leads on to ['ai-concierge', 'fnb-order', 'help-content-and-accessibility', 'in-venue-notifications', 'loyalty', 'menu-item', 'order-tracking', 'parking', 'search', 'shop-and-drop', 'sign-in', 'venue-map-and-wait-times', 'virtual-queue'] on the web only and — on the app only",
+   "detail": "leads on to ['account-hub', 'newsletter', 'privacy-security-devices'] on the web only and ['add-to-calendar', 'cabana-booking', 'cart', 'checkout-and-payment', 'confirmation', 'date-and-session', 'digital-companion-mode', 'dynamic-qr-ticket', 'itinerary-planning', 'multi-currency', 'reservations', 'reserve-table-or-cabana', 'rtl-specimen', 'seat-selection', 'ticket-selection', 'ticket-transfer'] on the app only",
    "fix": ""
   },
   {
@@ -2017,7 +2416,7 @@
    "severity": "low",
    "dimension": "navigation",
    "where": "profile (WEB-020 ↔ GST-039)",
-   "detail": "leads on to ['account-hub', 'sign-in', 'tickets'] on the web only and ['browse', 'newsletter'] on the app only",
+   "detail": "leads on to ['account-hub', 'sign-in', 'tickets'] on the web only and ['browse', 'face-pass', 'newsletter', 'privacy-security-devices', 'wallet-and-payment-methods'] on the app only",
    "fix": ""
   },
   {
@@ -2059,7 +2458,7 @@
    "severity": "low",
    "dimension": "navigation",
    "where": "sign-in (WEB-016 ↔ GST-042)",
-   "detail": "leads on to ['account-hub', 'order-history', 'tickets'] on the web only and ['browse'] on the app only",
+   "detail": "leads on to ['account-hub', 'checkout-and-payment', 'order-history', 'tickets'] on the web only and ['browse'] on the app only",
    "fix": ""
   },
   {
@@ -2073,7 +2472,7 @@
    "severity": "low",
    "dimension": "navigation",
    "where": "ticket-selection (WEB-005 ↔ GST-008)",
-   "detail": "leads on to ['add-ons', 'cart', 'date-and-session', 'seat-selection'] on the web only and ['browse'] on the app only",
+   "detail": "leads on to ['add-ons', 'cart', 'date-and-session', 'seat-selection'] on the web only and ['browse', 'refunds-and-resale', 'share-and-group-booking'] on the app only",
    "fix": ""
   },
   {
@@ -2206,49 +2605,56 @@
    "severity": "low",
    "dimension": "state wording",
    "where": "add-ons (WEB-008 ↔ GST-048/GST-056)",
-   "detail": "4 state(s) worded differently: emptyFirstRun, emptyNoResults, error, loading",
+   "detail": "5 state(s) worded differently: emptyFirstRun, emptyNoAccess, emptyNoResults, error, loading",
    "fix": "one copy per state — the 12 September offline sync is the model"
   },
   {
    "severity": "low",
    "dimension": "state wording",
    "where": "ai-concierge (WEB-044 ↔ GST-031/GST-032/GST-033)",
-   "detail": "5 state(s) worded differently: emptyFirstRun, emptyNoAccess, emptyNoResults, error, loading",
+   "detail": "4 state(s) worded differently: emptyFirstRun, emptyNoAccess, error, loading",
    "fix": "one copy per state — the 12 September offline sync is the model"
   },
   {
    "severity": "low",
    "dimension": "state wording",
    "where": "browse (WEB-002 ↔ GST-002/GST-003/GST-005)",
-   "detail": "4 state(s) worded differently: emptyFirstRun, emptyNoResults, error, loading",
+   "detail": "5 state(s) worded differently: emptyFirstRun, emptyNoAccess, emptyNoResults, error, loading",
    "fix": "one copy per state — the 12 September offline sync is the model"
   },
   {
    "severity": "low",
    "dimension": "state wording",
    "where": "cart (WEB-010 ↔ GST-041)",
-   "detail": "5 state(s) worded differently: emptyFirstRun, emptyNoAccess, emptyNoResults, error, loading",
+   "detail": "4 state(s) worded differently: emptyFirstRun, emptyNoAccess, error, loading",
    "fix": "one copy per state — the 12 September offline sync is the model"
   },
   {
    "severity": "low",
    "dimension": "state wording",
    "where": "checkout-and-payment (WEB-011/WEB-012/WEB-014 ↔ GST-009)",
-   "detail": "5 state(s) worded differently: emptyFirstRun, emptyNoAccess, emptyNoResults, error, loading",
+   "detail": "4 state(s) worded differently: emptyFirstRun, emptyNoAccess, error, loading",
+   "fix": "one copy per state — the 12 September offline sync is the model"
+  },
+  {
+   "severity": "low",
+   "dimension": "state wording",
+   "where": "confirmation (WEB-013 ↔ GST-010)",
+   "detail": "1 state(s) worded differently: emptyNoAccess",
    "fix": "one copy per state — the 12 September offline sync is the model"
   },
   {
    "severity": "low",
    "dimension": "state wording",
    "where": "date-and-session (WEB-006 ↔ GST-007)",
-   "detail": "4 state(s) worded differently: emptyFirstRun, emptyNoResults, error, loading",
+   "detail": "4 state(s) worded differently: emptyFirstRun, emptyNoAccess, error, loading",
    "fix": "one copy per state — the 12 September offline sync is the model"
   },
   {
    "severity": "low",
    "dimension": "state wording",
    "where": "detail (WEB-004 ↔ GST-004/GST-006)",
-   "detail": "4 state(s) worded differently: emptyFirstRun, emptyNoResults, error, loading",
+   "detail": "5 state(s) worded differently: emptyFirstRun, emptyNoAccess, emptyNoResults, error, loading",
    "fix": "one copy per state — the 12 September offline sync is the model"
   },
   {
@@ -2269,7 +2675,7 @@
    "severity": "low",
    "dimension": "state wording",
    "where": "help-and-cases (WEB-025 ↔ GST-068)",
-   "detail": "4 state(s) worded differently: emptyFirstRun, emptyNoResults, error, loading",
+   "detail": "4 state(s) worded differently: emptyFirstRun, emptyNoAccess, error, loading",
    "fix": "one copy per state — the 12 September offline sync is the model"
   },
   {
@@ -2283,14 +2689,14 @@
    "severity": "low",
    "dimension": "state wording",
    "where": "home (WEB-001 ↔ GST-001)",
-   "detail": "4 state(s) worded differently: emptyFirstRun, emptyNoResults, error, loading",
+   "detail": "5 state(s) worded differently: emptyFirstRun, emptyNoAccess, emptyNoResults, error, loading",
    "fix": "one copy per state — the 12 September offline sync is the model"
   },
   {
    "severity": "low",
    "dimension": "state wording",
    "where": "in-venue-notifications (WEB-046 ↔ GST-030)",
-   "detail": "4 state(s) worded differently: emptyFirstRun, emptyNoAccess, error, loading",
+   "detail": "3 state(s) worded differently: emptyFirstRun, error, loading",
    "fix": "one copy per state — the 12 September offline sync is the model"
   },
   {
@@ -2304,7 +2710,7 @@
    "severity": "low",
    "dimension": "state wording",
    "where": "memberships (WEB-022/WEB-023 ↔ GST-015)",
-   "detail": "4 state(s) worded differently: emptyFirstRun, emptyNoResults, error, loading",
+   "detail": "5 state(s) worded differently: emptyFirstRun, emptyNoAccess, emptyNoResults, error, loading",
    "fix": "one copy per state — the 12 September offline sync is the model"
   },
   {
@@ -2317,15 +2723,36 @@
   {
    "severity": "low",
    "dimension": "state wording",
+   "where": "multi-currency (WEB-035 ↔ GST-044)",
+   "detail": "1 state(s) worded differently: emptyNoAccess",
+   "fix": "one copy per state — the 12 September offline sync is the model"
+  },
+  {
+   "severity": "low",
+   "dimension": "state wording",
    "where": "newsletter (WEB-027 ↔ GST-065)",
-   "detail": "4 state(s) worded differently: emptyFirstRun, emptyNoResults, error, loading",
+   "detail": "5 state(s) worded differently: emptyFirstRun, emptyNoAccess, emptyNoResults, error, loading",
+   "fix": "one copy per state — the 12 September offline sync is the model"
+  },
+  {
+   "severity": "low",
+   "dimension": "state wording",
+   "where": "offers (WEB-032 ↔ GST-037)",
+   "detail": "1 state(s) worded differently: emptyNoAccess",
+   "fix": "one copy per state — the 12 September offline sync is the model"
+  },
+  {
+   "severity": "low",
+   "dimension": "state wording",
+   "where": "order-history (WEB-019 ↔ GST-019)",
+   "detail": "3 state(s) worded differently: emptyFirstRun, emptyNoAccess, emptyNoResults",
    "fix": "one copy per state — the 12 September offline sync is the model"
   },
   {
    "severity": "low",
    "dimension": "state wording",
    "where": "order-tracking (WEB-038 ↔ GST-025)",
-   "detail": "5 state(s) worded differently: emptyFirstRun, emptyNoAccess, emptyNoResults, error, loading",
+   "detail": "3 state(s) worded differently: emptyFirstRun, error, loading",
    "fix": "one copy per state — the 12 September offline sync is the model"
   },
   {
@@ -2339,21 +2766,21 @@
    "severity": "low",
    "dimension": "state wording",
    "where": "privacy-security-devices (WEB-024 ↔ GST-066/GST-073)",
-   "detail": "4 state(s) worded differently: emptyFirstRun, emptyNoResults, error, loading",
+   "detail": "5 state(s) worded differently: emptyFirstRun, emptyNoAccess, emptyNoResults, error, loading",
    "fix": "one copy per state — the 12 September offline sync is the model"
   },
   {
    "severity": "low",
    "dimension": "state wording",
    "where": "profile (WEB-020 ↔ GST-039)",
-   "detail": "3 state(s) worded differently: emptyFirstRun, error, loading",
+   "detail": "4 state(s) worded differently: emptyFirstRun, emptyNoAccess, error, loading",
    "fix": "one copy per state — the 12 September offline sync is the model"
   },
   {
    "severity": "low",
    "dimension": "state wording",
    "where": "reservations (WEB-031 ↔ GST-016/GST-017)",
-   "detail": "4 state(s) worded differently: emptyFirstRun, emptyNoResults, error, loading",
+   "detail": "5 state(s) worded differently: emptyFirstRun, emptyNoAccess, emptyNoResults, error, loading",
    "fix": "one copy per state — the 12 September offline sync is the model"
   },
   {
@@ -2366,8 +2793,15 @@
   {
    "severity": "low",
    "dimension": "state wording",
+   "where": "seat-selection (WEB-007 ↔ GST-049)",
+   "detail": "1 state(s) worded differently: emptyNoAccess",
+   "fix": "one copy per state — the 12 September offline sync is the model"
+  },
+  {
+   "severity": "low",
+   "dimension": "state wording",
    "where": "shop (WEB-033 ↔ GST-026)",
-   "detail": "4 state(s) worded differently: emptyFirstRun, emptyNoResults, error, loading",
+   "detail": "5 state(s) worded differently: emptyFirstRun, emptyNoAccess, emptyNoResults, error, loading",
    "fix": "one copy per state — the 12 September offline sync is the model"
   },
   {
@@ -2381,14 +2815,14 @@
    "severity": "low",
    "dimension": "state wording",
    "where": "sign-in (WEB-016 ↔ GST-042)",
-   "detail": "4 state(s) worded differently: emptyFirstRun, emptyNoResults, error, loading",
+   "detail": "3 state(s) worded differently: emptyFirstRun, error, loading",
    "fix": "one copy per state — the 12 September offline sync is the model"
   },
   {
    "severity": "low",
    "dimension": "state wording",
    "where": "system-states (WEB-029 ↔ GST-047)",
-   "detail": "4 state(s) worded differently: emptyFirstRun, emptyNoResults, error, loading",
+   "detail": "3 state(s) worded differently: emptyFirstRun, error, loading",
    "fix": "one copy per state — the 12 September offline sync is the model"
   },
   {
@@ -2402,21 +2836,21 @@
    "severity": "low",
    "dimension": "state wording",
    "where": "ticket-transfer (WEB-030 ↔ GST-014/GST-045)",
-   "detail": "4 state(s) worded differently: emptyFirstRun, emptyNoResults, error, loading",
+   "detail": "5 state(s) worded differently: emptyFirstRun, emptyNoAccess, emptyNoResults, error, loading",
    "fix": "one copy per state — the 12 September offline sync is the model"
   },
   {
    "severity": "low",
    "dimension": "state wording",
    "where": "tickets (WEB-018 ↔ GST-012/GST-013)",
-   "detail": "4 state(s) worded differently: emptyFirstRun, emptyNoResults, error, loading",
+   "detail": "5 state(s) worded differently: emptyFirstRun, emptyNoAccess, emptyNoResults, error, loading",
    "fix": "one copy per state — the 12 September offline sync is the model"
   },
   {
    "severity": "low",
    "dimension": "state wording",
    "where": "venue-info (WEB-028 ↔ GST-029)",
-   "detail": "4 state(s) worded differently: emptyFirstRun, emptyNoResults, error, loading",
+   "detail": "3 state(s) worded differently: emptyFirstRun, error, loading",
    "fix": "one copy per state — the 12 September offline sync is the model"
   },
   {
@@ -2430,7 +2864,7 @@
    "severity": "low",
    "dimension": "state wording",
    "where": "virtual-queue (WEB-040 ↔ GST-023)",
-   "detail": "5 state(s) worded differently: emptyFirstRun, emptyNoAccess, emptyNoResults, error, loading",
+   "detail": "4 state(s) worded differently: emptyFirstRun, emptyNoAccess, error, loading",
    "fix": "one copy per state — the 12 September offline sync is the model"
   },
   {
@@ -2444,14 +2878,14 @@
    "severity": "low",
    "dimension": "state wording",
    "where": "wallet-and-payment-methods (WEB-021 ↔ GST-011/GST-071)",
-   "detail": "4 state(s) worded differently: emptyFirstRun, emptyNoResults, error, loading",
+   "detail": "5 state(s) worded differently: emptyFirstRun, emptyNoAccess, emptyNoResults, error, loading",
    "fix": "one copy per state — the 12 September offline sync is the model"
   },
   {
    "severity": "low",
    "dimension": "state wording",
    "where": "wishlist (WEB-009 ↔ GST-020)",
-   "detail": "4 state(s) worded differently: emptyFirstRun, emptyNoResults, error, loading",
+   "detail": "3 state(s) worded differently: emptyFirstRun, error, loading",
    "fix": "one copy per state — the 12 September offline sync is the model"
   },
   {

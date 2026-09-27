@@ -1,5 +1,5 @@
 id: LLD-TenancyService
-title: TenancyService — 156 operations, 82 tables
+title: TenancyService — 163 operations, 82 tables
 generatedBy: tools/derive-diagrams.py
 tier: foundation
 index: diagrams/hld/02-services.yaml
@@ -20,9 +20,9 @@ why: '**`platform.org_unit` is reached by 304 of 379 tables** — the tenancy sp
 scale: Read-heavy and highly cacheable. Config changes are rare.
 ifDown: Same as identity — nothing runs without a scope.
 coverage:
-  operations: 156
-  inAFlow: 32
-  percent: 62%
+  operations: 163
+  inAFlow: 53
+  percent: 33%
   note: '**Flow coverage is how much of this service a journey has walked.** A service under 40% is
     unwalked rather than under-documented.'
 schemas:
@@ -52,6 +52,377 @@ schemas:
   - postgres
   largestTable: tenancy.device_telemetry
 operationsByContract:
+- contract: tenancy
+  count: 46
+  operations:
+  - operation: configureWorkstation
+    verb: PUT
+    path: /workstations/{workstationId}
+    scope: venue
+    permission: WORKSTATION_CONFIGURE
+    offline: false
+    reads: 3
+    writes: 3
+  - operation: createOrgUnit
+    verb: POST
+    path: /org-units
+    scope: brand
+    permission: SCOPE_MANAGE
+    offline: false
+    reads: 2
+    writes: 3
+  - operation: createOutlet
+    verb: POST
+    path: /outlets
+    scope: venue
+    permission: REGION_CONFIGURE
+    offline: false
+    reads: 2
+    writes: 2
+  - operation: createSaleBoard
+    verb: POST
+    path: /sale-boards
+    scope: venue
+    permission: WORKSTATION_CONFIGURE
+    offline: false
+    reads: 2
+    writes: 2
+  - operation: deployConfigurationProfile
+    verb: POST
+    path: /configuration-profiles/{profileId}/deploy
+    scope: tenant
+    permission: TENANT_CONFIGURE
+    offline: false
+    reads: 4
+    writes: 3
+  - operation: enrolDevice
+    verb: POST
+    path: /devices/{deviceId}/enrolment
+    scope: venue
+    permission: DEVICE_MANAGE
+    offline: false
+    reads: 1
+    writes: 1
+  - operation: getConfigurationProfile
+    verb: GET
+    path: /configuration-profiles/{profileId}
+    scope: tenant
+    permission: TENANT_CONFIGURE
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: getConnectivityPolicy
+    verb: GET
+    path: /connectivity-policy
+    scope: venue
+    permission: TENANT_CONFIGURE
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: getDevice
+    verb: GET
+    path: /devices/{deviceId}
+    scope: venue
+    permission: DEVICE_VIEW
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: getDeviceTelemetry
+    verb: GET
+    path: /devices/{deviceId}/telemetry
+    scope: venue
+    permission: DEVICE_VIEW
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: getOfflinePolicy
+    verb: GET
+    path: /offline-policy
+    scope: venue
+    permission: TENANT_CONFIGURE
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: getOrgUnit
+    verb: GET
+    path: /org-units/{orgUnitId}
+    scope: venue
+    permission: SCOPE_VIEW
+    offline: false
+    reads: 2
+    writes: 1
+  - operation: getOutlet
+    verb: GET
+    path: /outlets/{outletId}
+    scope: venue
+    permission: SCOPE_VIEW
+    offline: true
+    reads: 1
+    writes: 0
+  - operation: getRegionSettings
+    verb: GET
+    path: /regions/{regionId}/settings
+    scope: region
+    permission: SCOPE_VIEW
+    offline: true
+    reads: 2
+    writes: 1
+  - operation: getVenueSettings
+    verb: GET
+    path: /venues/{venueId}/settings
+    scope: venue
+    permission: TENANT_VIEW
+    offline: true
+    reads: 2
+    writes: 0
+  - operation: getWorkstation
+    verb: GET
+    path: /workstations/{workstationId}
+    scope: workstation
+    permission: SCOPE_VIEW
+    offline: true
+    reads: 2
+    writes: 0
+  - operation: getWorkstationHealth
+    verb: GET
+    path: /workstations/{workstationId}/health
+    scope: tenant
+    permission: DEVICE_VIEW
+    offline: false
+    reads: 3
+    writes: 0
+  - operation: issueDeviceCredential
+    verb: POST
+    path: /devices/{deviceId}/credentials
+    scope: venue
+    permission: DEVICE_MANAGE
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: listAuditRecords
+    verb: GET
+    path: /audit-records
+    scope: venue
+    permission: AI_AUDIT_VIEW
+    offline: false
+    reads: 4
+    writes: 1
+  - operation: listCellEndpoints
+    verb: GET
+    path: /cells/{cellId}/endpoints
+    scope: tenant
+    permission: SCOPE_VIEW
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: listConfigurationProfiles
+    verb: GET
+    path: /configuration-profiles
+    scope: tenant
+    permission: TENANT_CONFIGURE
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: listDeviceAuditRecords
+    verb: GET
+    path: /devices/{deviceId}/audit
+    scope: venue
+    permission: DEVICE_VIEW
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: listDeviceFirmware
+    verb: GET
+    path: /device-firmware
+    scope: tenant
+    permission: DEVICE_VIEW
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: listDeviceTamperEvents
+    verb: GET
+    path: /device-tamper-events
+    scope: venue
+    permission: DEVICE_VIEW
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: listDevices
+    verb: GET
+    path: /devices
+    scope: venue
+    permission: DEVICE_VIEW
+    offline: true
+    reads: 1
+    writes: 0
+  - operation: listOrgUnits
+    verb: GET
+    path: /org-units
+    scope: tenant
+    permission: SCOPE_VIEW
+    offline: false
+    reads: 2
+    writes: 1
+  - operation: listOutlets
+    verb: GET
+    path: /outlets
+    scope: venue
+    permission: SCOPE_VIEW
+    offline: true
+    reads: 1
+    writes: 0
+  - operation: listProfileDeployments
+    verb: GET
+    path: /profile-deployments
+    scope: tenant
+    permission: TENANT_CONFIGURE
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: listSaleBoards
+    verb: GET
+    path: /sale-boards
+    scope: venue
+    permission: SCOPE_VIEW
+    offline: true
+    reads: 1
+    writes: 0
+  - operation: listWorkstations
+    verb: GET
+    path: /workstations
+    scope: venue
+    permission: SCOPE_VIEW
+    offline: false
+    reads: 2
+    writes: 0
+  - operation: recordDeviceHeartbeat
+    verb: POST
+    path: /devices/{deviceId}/heartbeat
+    scope: workstation
+    permission: null
+    offline: false
+    reads: 1
+    writes: 1
+  - operation: recordDeviceTamperEvent
+    verb: POST
+    path: /device-tamper-events
+    scope: venue
+    permission: DEVICE_VIEW
+    offline: true
+    reads: 1
+    writes: 1
+  - operation: registerDevice
+    verb: POST
+    path: /devices
+    scope: venue
+    permission: DEVICE_CONFIGURE
+    offline: false
+    reads: 2
+    writes: 2
+  - operation: revokeDeviceCredential
+    verb: DELETE
+    path: /devices/{deviceId}/credentials
+    scope: venue
+    permission: DEVICE_MANAGE
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: rollbackDeviceFirmware
+    verb: POST
+    path: /device-firmware/rollouts/{rolloutId}/rollback
+    scope: tenant
+    permission: DEVICE_MANAGE
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: setConfigurationProfile
+    verb: PUT
+    path: /configuration-profiles
+    scope: tenant
+    permission: TENANT_CONFIGURE
+    offline: false
+    reads: 2
+    writes: 3
+  - operation: setConnectivityThresholds
+    verb: PUT
+    path: /connectivity-policy
+    scope: venue
+    permission: TENANT_CONFIGURE
+    offline: false
+    reads: 2
+    writes: 3
+  - operation: setDeviceAssignment
+    verb: PUT
+    path: /devices/{deviceId}/assignment
+    scope: venue
+    permission: DEVICE_MANAGE
+    offline: false
+    reads: 1
+    writes: 1
+  - operation: setOfflinePolicy
+    verb: PUT
+    path: /offline-policy
+    scope: venue
+    permission: TENANT_CONFIGURE
+    offline: false
+    reads: 2
+    writes: 3
+  - operation: setRolePermissions
+    verb: PUT
+    path: /roles/{roleId}/permissions
+    scope: tenant
+    permission: ROLE_MANAGE
+    offline: false
+    reads: 4
+    writes: 4
+  - operation: setVenueSettings
+    verb: PUT
+    path: /venues/{venueId}/settings
+    scope: venue
+    permission: TENANT_CONFIGURE
+    offline: false
+    reads: 3
+    writes: 3
+  - operation: startDeviceFirmwareRollout
+    verb: POST
+    path: /device-firmware/rollouts
+    scope: tenant
+    permission: DEVICE_MANAGE
+    offline: false
+    reads: 1
+    writes: 1
+  - operation: updateOrgUnit
+    verb: PATCH
+    path: /org-units/{orgUnitId}
+    scope: brand
+    permission: SCOPE_MANAGE
+    offline: false
+    reads: 2
+    writes: 3
+  - operation: updateOutlet
+    verb: PATCH
+    path: /outlets/{outletId}
+    scope: venue
+    permission: REGION_CONFIGURE
+    offline: false
+    reads: 2
+    writes: 2
+  - operation: updateRegionSettings
+    verb: PUT
+    path: /regions/{regionId}/settings
+    scope: region
+    permission: REGION_CONFIGURE
+    offline: false
+    reads: 2
+    writes: 3
+  - operation: updateSaleBoard
+    verb: PUT
+    path: /sale-boards/{saleBoardId}
+    scope: venue
+    permission: WORKSTATION_CONFIGURE
+    offline: false
+    reads: 2
+    writes: 2
 - contract: approvals
   count: 45
   operations:
@@ -762,321 +1133,6 @@ operationsByContract:
     offline: false
     reads: 0
     writes: 0
-- contract: tenancy
-  count: 39
-  operations:
-  - operation: configureWorkstation
-    verb: PUT
-    path: /workstations/{workstationId}
-    scope: venue
-    permission: WORKSTATION_CONFIGURE
-    offline: false
-    reads: 3
-    writes: 3
-  - operation: createOrgUnit
-    verb: POST
-    path: /org-units
-    scope: brand
-    permission: SCOPE_MANAGE
-    offline: false
-    reads: 2
-    writes: 3
-  - operation: createOutlet
-    verb: POST
-    path: /outlets
-    scope: venue
-    permission: REGION_CONFIGURE
-    offline: false
-    reads: 2
-    writes: 2
-  - operation: createSaleBoard
-    verb: POST
-    path: /sale-boards
-    scope: venue
-    permission: WORKSTATION_CONFIGURE
-    offline: false
-    reads: 2
-    writes: 2
-  - operation: deployConfigurationProfile
-    verb: POST
-    path: /configuration-profiles/{profileId}/deploy
-    scope: tenant
-    permission: TENANT_CONFIGURE
-    offline: false
-    reads: 4
-    writes: 3
-  - operation: enrolDevice
-    verb: POST
-    path: /devices/{deviceId}/enrolment
-    scope: venue
-    permission: DEVICE_MANAGE
-    offline: false
-    reads: 1
-    writes: 1
-  - operation: getDeviceTelemetry
-    verb: GET
-    path: /devices/{deviceId}/telemetry
-    scope: venue
-    permission: DEVICE_VIEW
-    offline: false
-    reads: 1
-    writes: 0
-  - operation: getOrgUnit
-    verb: GET
-    path: /org-units/{orgUnitId}
-    scope: venue
-    permission: SCOPE_VIEW
-    offline: false
-    reads: 2
-    writes: 1
-  - operation: getRegionSettings
-    verb: GET
-    path: /regions/{regionId}/settings
-    scope: region
-    permission: SCOPE_VIEW
-    offline: true
-    reads: 2
-    writes: 1
-  - operation: getVenueSettings
-    verb: GET
-    path: /venues/{venueId}/settings
-    scope: venue
-    permission: TENANT_VIEW
-    offline: true
-    reads: 2
-    writes: 0
-  - operation: getWorkstation
-    verb: GET
-    path: /workstations/{workstationId}
-    scope: workstation
-    permission: SCOPE_VIEW
-    offline: true
-    reads: 2
-    writes: 0
-  - operation: getWorkstationHealth
-    verb: GET
-    path: /workstations/{workstationId}/health
-    scope: tenant
-    permission: DEVICE_VIEW
-    offline: false
-    reads: 3
-    writes: 0
-  - operation: issueDeviceCredential
-    verb: POST
-    path: /devices/{deviceId}/credentials
-    scope: venue
-    permission: DEVICE_MANAGE
-    offline: false
-    reads: 1
-    writes: 0
-  - operation: listAuditRecords
-    verb: GET
-    path: /audit-records
-    scope: venue
-    permission: AI_AUDIT_VIEW
-    offline: false
-    reads: 4
-    writes: 1
-  - operation: listCellEndpoints
-    verb: GET
-    path: /cells/{cellId}/endpoints
-    scope: tenant
-    permission: SCOPE_VIEW
-    offline: false
-    reads: 1
-    writes: 0
-  - operation: listDeviceAuditRecords
-    verb: GET
-    path: /devices/{deviceId}/audit
-    scope: venue
-    permission: DEVICE_VIEW
-    offline: false
-    reads: 1
-    writes: 0
-  - operation: listDeviceFirmware
-    verb: GET
-    path: /device-firmware
-    scope: tenant
-    permission: DEVICE_VIEW
-    offline: false
-    reads: 1
-    writes: 0
-  - operation: listDeviceTamperEvents
-    verb: GET
-    path: /device-tamper-events
-    scope: venue
-    permission: DEVICE_VIEW
-    offline: false
-    reads: 1
-    writes: 0
-  - operation: listDevices
-    verb: GET
-    path: /devices
-    scope: venue
-    permission: DEVICE_VIEW
-    offline: true
-    reads: 1
-    writes: 0
-  - operation: listOrgUnits
-    verb: GET
-    path: /org-units
-    scope: tenant
-    permission: SCOPE_VIEW
-    offline: false
-    reads: 2
-    writes: 1
-  - operation: listOutlets
-    verb: GET
-    path: /outlets
-    scope: venue
-    permission: SCOPE_VIEW
-    offline: true
-    reads: 1
-    writes: 0
-  - operation: listSaleBoards
-    verb: GET
-    path: /sale-boards
-    scope: venue
-    permission: SCOPE_VIEW
-    offline: true
-    reads: 1
-    writes: 0
-  - operation: listWorkstations
-    verb: GET
-    path: /workstations
-    scope: venue
-    permission: SCOPE_VIEW
-    offline: false
-    reads: 2
-    writes: 0
-  - operation: recordDeviceHeartbeat
-    verb: POST
-    path: /devices/{deviceId}/heartbeat
-    scope: workstation
-    permission: null
-    offline: false
-    reads: 1
-    writes: 1
-  - operation: recordDeviceTamperEvent
-    verb: POST
-    path: /device-tamper-events
-    scope: venue
-    permission: DEVICE_VIEW
-    offline: true
-    reads: 1
-    writes: 1
-  - operation: registerDevice
-    verb: POST
-    path: /devices
-    scope: venue
-    permission: DEVICE_CONFIGURE
-    offline: false
-    reads: 2
-    writes: 2
-  - operation: revokeDeviceCredential
-    verb: DELETE
-    path: /devices/{deviceId}/credentials
-    scope: venue
-    permission: DEVICE_MANAGE
-    offline: false
-    reads: 0
-    writes: 0
-  - operation: rollbackDeviceFirmware
-    verb: POST
-    path: /device-firmware/rollouts/{rolloutId}/rollback
-    scope: tenant
-    permission: DEVICE_MANAGE
-    offline: false
-    reads: 1
-    writes: 0
-  - operation: setConfigurationProfile
-    verb: PUT
-    path: /configuration-profiles
-    scope: tenant
-    permission: TENANT_CONFIGURE
-    offline: false
-    reads: 2
-    writes: 3
-  - operation: setConnectivityThresholds
-    verb: PUT
-    path: /connectivity-policy
-    scope: venue
-    permission: TENANT_CONFIGURE
-    offline: false
-    reads: 2
-    writes: 3
-  - operation: setDeviceAssignment
-    verb: PUT
-    path: /devices/{deviceId}/assignment
-    scope: venue
-    permission: DEVICE_MANAGE
-    offline: false
-    reads: 1
-    writes: 1
-  - operation: setOfflinePolicy
-    verb: PUT
-    path: /offline-policy
-    scope: venue
-    permission: TENANT_CONFIGURE
-    offline: false
-    reads: 2
-    writes: 3
-  - operation: setRolePermissions
-    verb: PUT
-    path: /roles/{roleId}/permissions
-    scope: tenant
-    permission: ROLE_MANAGE
-    offline: false
-    reads: 4
-    writes: 4
-  - operation: setVenueSettings
-    verb: PUT
-    path: /venues/{venueId}/settings
-    scope: venue
-    permission: TENANT_CONFIGURE
-    offline: false
-    reads: 3
-    writes: 3
-  - operation: startDeviceFirmwareRollout
-    verb: POST
-    path: /device-firmware/rollouts
-    scope: tenant
-    permission: DEVICE_MANAGE
-    offline: false
-    reads: 1
-    writes: 1
-  - operation: updateOrgUnit
-    verb: PATCH
-    path: /org-units/{orgUnitId}
-    scope: brand
-    permission: SCOPE_MANAGE
-    offline: false
-    reads: 2
-    writes: 3
-  - operation: updateOutlet
-    verb: PATCH
-    path: /outlets/{outletId}
-    scope: venue
-    permission: REGION_CONFIGURE
-    offline: false
-    reads: 2
-    writes: 2
-  - operation: updateRegionSettings
-    verb: PUT
-    path: /regions/{regionId}/settings
-    scope: region
-    permission: REGION_CONFIGURE
-    offline: false
-    reads: 2
-    writes: 3
-  - operation: updateSaleBoard
-    verb: PUT
-    path: /sale-boards/{saleBoardId}
-    scope: venue
-    permission: WORKSTATION_CONFIGURE
-    offline: false
-    reads: 2
-    writes: 2
 - contract: accreditation
   count: 29
   operations:
@@ -1318,15 +1374,110 @@ tables:
   columns: 5
   backing: redis
   owned: false
-  why: '**Not a table and not owned by a service.** Derived from something already read, invalidated
-    by an event already consumed, losable without consequence — no migration, no backup, no owner.'
+  why: '**Not a table and not owned by a service.** Derived from something already read, losable without
+    consequence — no migration, no backup, no owner.'
+  key: The idempotency key the caller sent
+  eviction:
+  - 'expires_at: **Must exceed the longest offline window.** A scanner out for a weekend replays on
+    Monday'
+  writtenBy:
+  - acknowledgeAnnouncement
+  - amendAttendance
+  - broadcastToGuests
+  - configureWorkstation
+  - createApprovalDelegation
+  - createApprovalRequest
+  - createOrgUnit
+  - createOutlet
+  - createRotaAssignment
+  - createSaleBoard
+  - decideApprovalRequest
+  - deployConfigurationProfile
+  - escalateApprovalRequest
+  - evaluateApprovalRequirement
+  - publishAnnouncement
+  - recordAttendance
+  - registerDevice
+  - requestShiftSwap
+  - resubmitApprovalRequest
+  - revokeApprovalDelegation
+  - setApprovalMatrix
+  - setConfigurationProfile
+  - setConnectivityThresholds
+  - setOfflinePolicy
+  - setRolePermissions
+  - setVenueSettings
+  - updateOrgUnit
+  - updateOutlet
+  - updateRegionSettings
+  - updateRotaAssignment
+  - updateSaleBoard
+  - withdrawApprovalRequest
+  readBy:
+  - acknowledgeAnnouncement
+  - amendAttendance
+  - broadcastToGuests
+  - configureWorkstation
+  - createApprovalDelegation
+  - createApprovalRequest
+  - createOrgUnit
+  - createOutlet
+  - createRotaAssignment
+  - createSaleBoard
+  - decideApprovalRequest
+  - deployConfigurationProfile
+  - escalateApprovalRequest
+  - evaluateApprovalRequirement
+  - listAuditRecords
+  - publishAnnouncement
+  - recordAttendance
+  - registerDevice
+  - requestShiftSwap
+  - resubmitApprovalRequest
+  - revokeApprovalDelegation
+  - setApprovalMatrix
+  - setConfigurationProfile
+  - setConnectivityThresholds
+  - setOfflinePolicy
+  - setRolePermissions
+  - setVenueSettings
+  - updateOrgUnit
+  - updateOutlet
+  - updateRegionSettings
+  - updateRotaAssignment
+  - updateSaleBoard
+  - withdrawApprovalRequest
 - store: cache:resolution
   kind: cache
   columns: 4
   backing: redis
   owned: false
-  why: '**Not a table and not owned by a service.** Derived from something already read, invalidated
-    by an event already consumed, losable without consequence — no migration, no backup, no owner.'
+  why: '**Not a table and not owned by a service.** Derived from something already read, losable without
+    consequence — no migration, no backup, no owner.'
+  key: scope_path + what is being resolved — permissions, configuration, a price list
+  eviction:
+  - 'version: Bumped by the write that evicts it. **A config change nobody evicts is a stale permission**'
+  writtenBy:
+  - createOrgUnit
+  - getOrgUnit
+  - getRegionSettings
+  - listOrgUnits
+  - setConfigurationProfile
+  - setConnectivityThresholds
+  - setOfflinePolicy
+  - setRolePermissions
+  - setVenueSettings
+  - updateOrgUnit
+  - updateRegionSettings
+  readBy:
+  - getOrgUnit
+  - getRegionSettings
+  - getVenueSettings
+  - listOrgUnits
+  gap: '**The lineage names this store, not the key.** Which resolution entry each writer below evicts
+    or bumps — permissions, configuration, a price list, and whether child scopes under its `scope_path`
+    are affected — is not recorded for any operation, so a writer here cannot yet be implemented from
+    the package alone.'
 - table: accreditation.access_profile
   columns: 9
   store: postgres
@@ -1427,7 +1578,7 @@ tables:
 - table: approvals.approver_availability
   columns: 9
   store: postgres
-  parent: identity.principal
+  parent: null
   writtenBy:
   - approvals
   foreignWriters: null
@@ -1452,7 +1603,7 @@ tables:
   writtenBy: []
   foreignWriters: null
 - table: approvals.delegation
-  columns: 9
+  columns: 10
   store: postgres
   parent: null
   writtenBy:
@@ -1530,7 +1681,7 @@ tables:
   - tenancy
   foreignWriters: null
 - table: platform.audit_record
-  columns: 3
+  columns: 7
   store: postgres
   parent: null
   writtenBy:
@@ -1559,7 +1710,7 @@ tables:
   - tenancy
   foreignWriters: null
 - table: platform.cross_region_entitlement
-  columns: 17
+  columns: 16
   store: postgres
   parent: null
   writtenBy:
@@ -1583,7 +1734,7 @@ tables:
   foreignWriters:
   - shift
 - table: platform.device
-  columns: 22
+  columns: 23
   store: postgres
   parent: null
   writtenBy:
@@ -1728,7 +1879,7 @@ tables:
   foreignWriters:
   - cross-region
 - table: platform.workstation
-  columns: 18
+  columns: 17
   store: postgres
   parent: null
   writtenBy:
@@ -1931,10 +2082,26 @@ readsFrom:
 writesOutside:
 - service: MarketingService
   operations: 1
-  why: '**The owner defines the row; this service may only append to it.**'
+  rule: 'ADR-0028: the owner defines the row; a foreign writer may only append, through a path the owner
+    published.'
+  why: '**The lineage records these writes, not how they honour the rule.** It does not say whether
+    each inserts or updates, or which operation or event MarketingService published for it — check each
+    against ADR-0028.'
+  writes:
+  - operation: broadcastToGuests
+    tables:
+    - marketing.message_dispatch
 - service: IdentityService
   operations: 1
-  why: '**The owner defines the row; this service may only append to it.**'
+  rule: 'ADR-0028: the owner defines the row; a foreign writer may only append, through a path the owner
+    published.'
+  why: '**The lineage records these writes, not how they honour the rule.** It does not say whether
+    each inserts or updates, or which operation or event IdentityService published for it — check each
+    against ADR-0028.'
+  writes:
+  - operation: setRolePermissions
+    tables:
+    - identity.role_permission
 screens:
 - P04:POS-001 Begin Shift
 - P04:POS-002 Sell — Ticket Catalogue

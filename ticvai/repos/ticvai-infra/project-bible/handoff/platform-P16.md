@@ -9,12 +9,12 @@
 | Contracts | 11 |
 | Modules | 1 |
 | Undrawn | 0 |
-| Operations with no screen | 135 |
+| Operations with no screen | 149 |
 | Waves | wave3 69 |
 
 ## Gaps
 
-### 135 operations with no screen here
+### 149 operations with no screen here
 
 **In a contract this platform uses, callable by its audience, and reaching no screen on any platform serving that audience.** Either a screen is missing or the endpoint should not exist — and the second is worth considering first.
 
@@ -41,6 +41,7 @@
 | `commitCatalogueImport` | catalogue | POST | Apply a parsed catalogue import |
 | `createDonationCampaign` | catalogue | POST | Create a campaign |
 | `freezeEntitlement` | catalogue | POST | Pause a membership at the guest's request |
+| `getCatalogueImportJob` | catalogue | GET | Progress and findings of a catalogue import |
 | `getDynamicPriceRule` | catalogue | GET | One rule with its conditions and actions |
 | `getPlanBenefits` | catalogue | GET | Which benefits a plan grants, and how much of each |
 | `listDonationCampaigns` | catalogue | GET | Campaigns a guest can give to |
@@ -59,8 +60,7 @@
 | `updateDonationCampaign` | catalogue | PATCH | Amend or close a campaign |
 | `createEmergencyAccessOverride` | identity | POST | Bypass the policy, loudly |
 | `evaluateAccess` | identity | POST | Decide, now, and say why |
-| `getAccessPolicy` | identity | GET | One policy, at a version |
-| … | | | 95 more |
+| … | | | 109 more |
 
 ## Modules
 

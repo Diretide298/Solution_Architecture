@@ -135,7 +135,7 @@ Rotation is the same operation. The previous key is revoked at the vault after a
 
 | Field | Type | Required | Notes |
 |---|---|---|---|
-| id | string (uuid) |  | (read-only) |
+| id | string (uuid) |  | Assigned on create. |
 | kind | AiProviderKind: enum (openai, gemini, anthropic, azureOpenai, localLlm) | yes |  |
 | capability | AiCapability: enum (chat, embedding, vision, rerank, speechToText, textToSpeech) | yes | What a capability needs, not which provider serves it. |
 | model | string |  |  |
@@ -167,6 +167,8 @@ Rotation is the same operation. The previous key is revoked at the vault after a
 **The swap, and it is a configuration change.** Per `SuggestionKind`: which producer answers it, at which version, and with what guard rails.
 **Shadow mode is why this exists rather than a feature flag.** A new model runs alongside the rule, its answers are recorded and never shown, and **the venue compares six weeks of both before anything changes on a screen.** A model promoted without that is a model nobody can defend when it is wrong.
 **A guard rail is not optional for a `model` basis.** A price suggestion outside a stated band is refused and falls back to the rule — **an unbounded model in a pricing path is one bad inference from a free lunch for a thousand guests.**
+**Where it is kept.** The assignments are stored on the tenant's `ai.policy` row, in `AiPolicy.suggestionProviders`, which is what `requestSuggestion` reads to route a kind to its producer. `setAiPolicy` does not change them; this operation is the only writer.
+**What the PUT does.** Each assignment is matched on `kind`. An assignment in the body replaces the stored one for that kind, or adds it where the kind had none; **a kind left out of the body keeps its current assignment** — a partial body never leaves a question with nobody to answer it. The response is the full set after the write.
 
 |  |  |
 |---|---|
@@ -179,7 +181,7 @@ Rotation is the same operation. The previous key is revoked at the vault after a
 | Conflict policy | serverWins |
 | Reads | `ai.policy`, `ai.provider`, `cache:idempotency` |
 | Writes | `ai.policy`, `cache:idempotency`, `cache:resolution` |
-| Called by | no screen (setup through Back Office) |
+| Called by | **no screen**: no screen lists it in its apis, so it is reachable only by API or import until one does (README, Known gaps) |
 
 **Parameters**
 
@@ -191,10 +193,21 @@ Rotation is the same operation. The previous key is revoked at the vault after a
 
 | Field | Type | Required | Notes |
 |---|---|---|---|
-| assignments | array of object | yes |  |
+| assignments | array of SuggestionProviderAssignment | yes | (min items 1) |
 | assignments[].kind | SuggestionKind: enum (price, replenishment, requisition, demandForecast, prepPlan, menuEngineering, staffing, slaTarget, …) | yes | What is being suggested. |
 | assignments[].basis | SuggestionBasis: enum (heuristic, statistical, model, hybrid, manual) | yes | How the answer was reached, and this is the field the whole design exists for. |
-| assignments[].producerRef | string | yes |  |
+| assignments[].producerRef | string | yes | The rule name, or the model id and version — the same value Suggestion.producerRef records on each answer. |
+| assignments[].shadowProducerRef | string |  | Runs alongside and is recorded, never shown. (nullable) |
+| assignments[].guardRails | object |  | Bounds the answer must fall within. (nullable) |
+
+**Response**: `object`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| assignments | array of SuggestionProviderAssignment | yes |  |
+| assignments[].kind | SuggestionKind: enum (price, replenishment, requisition, demandForecast, prepPlan, menuEngineering, staffing, slaTarget, …) | yes | What is being suggested. |
+| assignments[].basis | SuggestionBasis: enum (heuristic, statistical, model, hybrid, manual) | yes | How the answer was reached, and this is the field the whole design exists for. |
+| assignments[].producerRef | string | yes | The rule name, or the model id and version — the same value Suggestion.producerRef records on each answer. |
 | assignments[].shadowProducerRef | string |  | Runs alongside and is recorded, never shown. (nullable) |
 | assignments[].guardRails | object |  | Bounds the answer must fall within. (nullable) |
 
@@ -202,7 +215,7 @@ Rotation is the same operation. The previous key is revoked at the vault after a
 
 | Code | Shape | Meaning |
 |---|---|---|
-| 200 |  | Set |
+| 200 |  | Set. |
 
 
 ## Group: assist
@@ -214,6 +227,7 @@ Conversational assistance, grounded in the tenant's own data
 **`POST /conversations`**: Open a conversation
 
 Scoped to a module and a role, because the same question means different things to a cashier and a finance controller (8.4.6). The scope is taken from the session, never from the request — an assistant that accepts the venue it should answer about is an assistant that can be asked about someone else's.
+**The role comes from the session as well, and is not stored on the conversation.** Each `sendAiMessage` answers under the caller's resolved grants at the time it is sent, so a conversation carries its `module` and `scopePath` and no role of its own — a role copied onto the thread would go on answering as a finance controller after the grant was withdrawn.
 
 |  |  |
 |---|---|
@@ -237,7 +251,7 @@ Scoped to a module and a role, because the same question means different things 
 
 | Field | Type | Required | Notes |
 |---|---|---|---|
-| module | string | yes | Which part of the platform the conversation is about (8.4.1). |
+| module | object | yes | Which part of the platform the conversation is about (8.4.1). |
 | locale | string |  | 8.4.3. |
 
 **Response**: `AiConversation`
@@ -247,7 +261,7 @@ Scoped to a module and a role, because the same question means different things 
 | id | string (uuid) | yes |  |
 | principalId | string (uuid) | yes |  |
 | scopePath | string |  |  |
-| module | string | yes |  |
+| module | ModuleKey: enum (core, ticketing, access, fnb, retail, inventory, seating, membership, …) | yes | What a tenant buys, and what a screen belongs to. |
 | locale | string |  |  |
 | messageCount | integer |  |  |
 | startedAt | string (date-time) | yes |  |
@@ -283,7 +297,23 @@ Scoped to a module and a role, because the same question means different things 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
 | pageSize | query |  | integer |  |
-| cursor | query |  | string | Opaque cursor from a previous page. |
+| cursor | query |  | string | Opaque cursor: the nextCursor of the previous page. |
+
+**Response**: `object`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| items | array of AiConversation | yes |  |
+| items[].id | string (uuid) | yes |  |
+| items[].principalId | string (uuid) | yes |  |
+| items[].scopePath | string |  |  |
+| items[].module | ModuleKey: enum (core, ticketing, access, fnb, retail, inventory, seating, membership, …) | yes | What a tenant buys, and what a screen belongs to. |
+| items[].locale | string |  |  |
+| items[].messageCount | integer |  |  |
+| items[].startedAt | string (date-time) | yes |  |
+| items[].lastMessageAt | string (date-time) |  |  |
+| nextCursor | string |  |  |
+| hasMore | boolean | yes |  |
 
 **Responses**
 
@@ -334,7 +364,7 @@ Every response carries a trace id, the model and provider that produced it, toke
 | conversationId | string (uuid) | yes |  |
 | role | enum (user, assistant, system) | yes |  |
 | content | string | yes |  |
-| sources | array of AiSource |  |  |
+| sources | array of AiSource |  | The sources an answer was grounded in, stored with the answer (8.3.70). |
 | sources[].kind | enum (document, product, entitlement, report, record) |  |  |
 | sources[].id | string |  |  |
 | sources[].title | string |  |  |
@@ -370,7 +400,7 @@ Every response carries a trace id, the model and provider that produced it, toke
 | Code | Shape | Meaning |
 |---|---|---|
 | 200 |  | Answered |
-| 429 |  | Usage limit reached for this tenant or principal (8.3.76). |
+| 429 |  | Usage limit reached (8.3.76). |
 | 503 |  | Every configured provider failed. |
 
 
@@ -384,15 +414,17 @@ Providers, models and policy
 
 **Tenant sets the default; a venue may narrow it and never widen it** (8.4.4 and 8.4.5, adjacent requirements asking for both, which is ADR-0018's inheritance rule stated by the matrix itself).
 Masking is the part to get right. `maskedFields` names what is redacted before a prompt leaves the platform, and it defaults to every field in the `pii` schema — **a default that fails closed, because a masking list somebody forgot to fill in should send nothing rather than everything.**
+**Which row it writes.** The body's `scopeLevel` and `scopePath` name the target: `tenant` with the tenant's node writes the default, `venue` with a venue's node writes that venue's narrowing. There is one row per `scopePath`. A `scopePath` outside the caller's grants is refused (403), and a venue row that would widen the tenant's — a capability, role or guest scope the tenant does not allow, fewer masked fields, or a higher ceiling — is refused as a validation failure.
+**What the PUT does.** It replaces the whole row at that `scopePath`: a field left out takes its default, not its old value. It returns 200 where the row existed and 201 where this created it — a venue's first narrowing. `suggestionProviders` is not written here; `setSuggestionProvider` is its only writer, and it is kept as it was.
 
 |  |  |
 |---|---|
 | Permission | `AI_CONFIGURE` |
-| Scope level | tenant |
+| Scope level | venue |
 | Part of slice | setup, makes `ai.policy` non-empty |
 | Wave | 2 |
 | Offline | no |
-| Config scope | tenant |
+| Config scope | venue |
 | Conflict policy | serverWins |
 | Reads | `ai.policy`, `cache:idempotency` |
 | Writes | `ai.policy`, `cache:idempotency` |
@@ -410,6 +442,7 @@ Masking is the part to get right. `maskedFields` names what is redacted before a
 |---|---|---|---|
 | id | string (uuid) |  | Added 20 August. (read-only) |
 | scopeLevel | enum (tenant, venue) | yes | Tenant sets the default; a venue may narrow it and never widen it. |
+| scopePath | string | yes | The node this row belongs to, and the key it is written under — the tenant's node where scopeLevel is tenant, a venue's where it is venue. |
 | enabledCapabilities | array of enum (assist, search, generateConfiguration, generateLayout, summarise, explain) | yes |  |
 | allowedRoleIds | array of string (uuid) |  |  |
 | maskedFields | array of string |  | Redacted before a prompt leaves the platform (8.3.73). |
@@ -442,6 +475,7 @@ Masking is the part to get right. `maskedFields` names what is redacted before a
 | streamsByCapability | array of string |  | Time to first token and total latency are separate targets. |
 | fallbackProviderId | string (uuid) |  | BL-151: a provider outage with no fallback is every AI surface going dark at once. (nullable) |
 | guardrailShortCircuit | boolean |  | A refusal a rule can decide never reaches a model. (default True) |
+| suggestionProviders | object |  | Which producer answers each SuggestionKind, and what requestSuggestion routes by. (read-only) |
 
 **Response**: `AiPolicy`
 
@@ -449,6 +483,7 @@ Masking is the part to get right. `maskedFields` names what is redacted before a
 |---|---|---|---|
 | id | string (uuid) |  | Added 20 August. (read-only) |
 | scopeLevel | enum (tenant, venue) | yes | Tenant sets the default; a venue may narrow it and never widen it. |
+| scopePath | string | yes | The node this row belongs to, and the key it is written under — the tenant's node where scopeLevel is tenant, a venue's where it is venue. |
 | enabledCapabilities | array of enum (assist, search, generateConfiguration, generateLayout, summarise, explain) | yes |  |
 | allowedRoleIds | array of string (uuid) |  |  |
 | maskedFields | array of string |  | Redacted before a prompt leaves the platform (8.3.73). |
@@ -481,12 +516,14 @@ Masking is the part to get right. `maskedFields` names what is redacted before a
 | streamsByCapability | array of string |  | Time to first token and total latency are separate targets. |
 | fallbackProviderId | string (uuid) |  | BL-151: a provider outage with no fallback is every AI surface going dark at once. (nullable) |
 | guardrailShortCircuit | boolean |  | A refusal a rule can decide never reaches a model. (default True) |
+| suggestionProviders | object |  | Which producer answers each SuggestionKind, and what requestSuggestion routes by. (read-only) |
 
 **Responses**
 
 | Code | Shape | Meaning |
 |---|---|---|
-| 200 |  | Set |
+| 200 |  | Set — the row at scopePath existed and is replaced |
+| 201 |  | Set — this created the row at scopePath |
 
 ### setAiProvider
 
@@ -494,6 +531,7 @@ Masking is the part to get right. `maskedFields` names what is redacted before a
 
 **Region-scoped, because inference is a data transfer.** ADR-0009: a prompt containing guest data leaves the jurisdiction the moment it reaches a provider hosted elsewhere, and which providers a region may use is a residency decision rather than a preference.
 Credentials are a key-vault reference, never the key.
+**What the PUT does.** The body is one whole provider configuration, matched on `id`. With an `id`, it replaces that provider's configuration in full — a field left out takes its default or null, not its old value — and returns 200; an `id` that names no provider at the caller's scope is a 404. Without an `id`, it creates a provider and returns 201 with the new id. The other providers are never touched: this is not a replace-the-list call.
 
 |  |  |
 |---|---|
@@ -518,7 +556,7 @@ Credentials are a key-vault reference, never the key.
 
 | Field | Type | Required | Notes |
 |---|---|---|---|
-| id | string (uuid) |  | (read-only) |
+| id | string (uuid) |  | Assigned on create. |
 | kind | AiProviderKind: enum (openai, gemini, anthropic, azureOpenai, localLlm) | yes |  |
 | capability | AiCapability: enum (chat, embedding, vision, rerank, speechToText, textToSpeech) | yes | What a capability needs, not which provider serves it. |
 | model | string |  |  |
@@ -541,7 +579,7 @@ Credentials are a key-vault reference, never the key.
 
 | Field | Type | Required | Notes |
 |---|---|---|---|
-| id | string (uuid) |  | (read-only) |
+| id | string (uuid) |  | Assigned on create. |
 | kind | AiProviderKind: enum (openai, gemini, anthropic, azureOpenai, localLlm) | yes |  |
 | capability | AiCapability: enum (chat, embedding, vision, rerank, speechToText, textToSpeech) | yes | What a capability needs, not which provider serves it. |
 | model | string |  |  |
@@ -564,7 +602,9 @@ Credentials are a key-vault reference, never the key.
 
 | Code | Shape | Meaning |
 |---|---|---|
-| 200 |  | Configured |
+| 200 |  | Configured — an existing provider, named by id, replaced |
+| 201 |  | Created — the body carried no id |
+| 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
 
 
 ## Group: retrieval
@@ -577,6 +617,10 @@ Semantic search and the collections it searches
 
 8.4.11. Chunked and embedded asynchronously — `status` moves through `processing` before `indexed`, and **a document that says "added" while still processing is a document a user will search for and not find**.
 Documents carry the scope they may be retrieved at. A venue operating procedure is not an answer to a question about another venue.
+**Re-ingesting and replacing go through here too** (states/ai-knowledge-document.yaml), and the body says which. With neither field below, this adds a new document.
+- `reingestDocumentId` names an `indexed` or `failed` document to process again from the `sourceAssetId` in the body. **The same document** moves back to `processing` and keeps its id; no new document is created.
+- `supersedesDocumentId` names an `indexed` document that this new one replaces. A new document is created, and the named one moves to `superseded` when the new one reaches `indexed` — so search is never left with neither version.
+Sending both, or naming a document in another collection or in a state the transition does not start from, is refused as a validation failure.
 
 |  |  |
 |---|---|
@@ -588,7 +632,8 @@ Documents carry the scope they may be retrieved at. A venue operating procedure 
 | Conflict policy | serverWins |
 | Reads | `ai.chunk_ref`, `ai.knowledge_document`, `cache:embedding`, `cache:idempotency`, `qdrant:knowledge` |
 | Writes | `ai.knowledge_document`, `cache:embedding`, `cache:idempotency`, `qdrant:knowledge` |
-| Called by | no screen (setup through Back Office) |
+| Called by | **no screen**: no screen lists it in its apis, so it is reachable only by API or import until one does (README, Known gaps) |
+| State model | AI knowledge document ([states/ai-knowledge-document.yaml](../../../states/ai-knowledge-document.yaml)): moves `indexed` -> `processing`, `indexed` -> `superseded`, `failed` -> `processing` |
 
 **Parameters**
 
@@ -606,6 +651,8 @@ Documents carry the scope they may be retrieved at. A venue operating procedure 
 | title | string | yes |  |
 | sourceAssetId | string (uuid) | yes |  |
 | mimeType | string |  |  |
+| reingestDocumentId | string (uuid) |  | An indexed or failed document in this collection to process again from sourceAssetId. (nullable) |
+| supersedesDocumentId | string (uuid) |  | The indexed document in this collection that this one replaces. (nullable) |
 | status | enum (processing, indexed, failed, superseded) |  | (read-only) |
 | chunkCount | integer |  | (read-only) |
 | failureReason | string |  | (read-only; nullable) |
@@ -620,6 +667,8 @@ Documents carry the scope they may be retrieved at. A venue operating procedure 
 | title | string | yes |  |
 | sourceAssetId | string (uuid) | yes |  |
 | mimeType | string |  |  |
+| reingestDocumentId | string (uuid) |  | An indexed or failed document in this collection to process again from sourceAssetId. (nullable) |
+| supersedesDocumentId | string (uuid) |  | The indexed document in this collection that this one replaces. (nullable) |
 | status | enum (processing, indexed, failed, superseded) |  | (read-only) |
 | chunkCount | integer |  | (read-only) |
 | failureReason | string |  | (read-only; nullable) |
@@ -649,13 +698,14 @@ Every table this service owns that the slice reads or writes, with its columns a
 | capability | text | yes |  |
 | prompt | text | no |  |
 | response | text | no |  |
+| sources | jsonb | no |  |
 | outcome | text | yes |  |
 | refusal_reason | text | no |  |
 | provider | text | no |  |
 | model | text | no |  |
 | prompt_tokens | integer | no |  |
 | completion_tokens | integer | no |  |
-| cost_minor | integer | no | In the region's base currency |
+| cost_amount | numeric(18,4) | no | What the call cost at the provider. |
 | latency_ms | integer | no |  |
 | masked_field_count | integer | no | How many fields were redacted. |
 | trace_id | text | no |  |
@@ -690,6 +740,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 | title | text | yes |  |
 | source_asset_id | uuid | yes |  |
 | mime_type | text | no |  |
+| supersedes_document_id | uuid | no | The indexed document in this collection that this one replaces. |
 | status | text | no |  |
 | chunk_count | integer | no |  |
 | failure_reason | text | no |  |
@@ -703,9 +754,10 @@ Every table this service owns that the slice reads or writes, with its columns a
 | conversation_id | uuid | yes |  |
 | role | text | yes |  |
 | content | text | yes |  |
+| sources | jsonb | no |  |
 | confidence | numeric | no | 8.1.5, 8.3.67. |
 | rationale | text | no | 8.3.68, 8.3.69. |
-| proposed_action | uuid | no | Present where the answer suggests a change. |
+| proposed_action_id | uuid | no | Present where the answer suggests a change. |
 | trace_id | text | no |  |
 | provider | text | no |  |
 | model | text | no |  |
@@ -720,6 +772,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 |---|---|---|---|
 | id | uuid | no | Added 20 August. |
 | scope_level | text | yes | Tenant sets the default; a venue may narrow it and never widen it. |
+| scope_path | text | yes | The node this row belongs to, and the key it is written under — the tenant's node where scopeLevel is tenant, a venue's where it is venue. |
 | enabled_capabilities | text[] | yes |  |
 | allowed_role_ids | text[] | no |  |
 | masked_fields | text[] | no | Redacted before a prompt leaves the platform (8.3.73). |
@@ -743,6 +796,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 | streams_by_capability | text[] | no | Time to first token and total latency are separate targets. |
 | fallback_provider_id | uuid | no | BL-151: a provider outage with no fallback is every AI surface going dark at once. |
 | guardrail_short_circuit | boolean | no | A refusal a rule can decide never reaches a model. |
+| suggestion_providers | jsonb | no | Which producer answers each SuggestionKind, and what requestSuggestion routes by. |
 | tenant_id | uuid | yes | Points at platform.tenant. |
 
 ### `ai.proposed_action`
@@ -767,7 +821,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 
 | Column | Type | Required | Notes |
 |---|---|---|---|
-| id | uuid | no |  |
+| id | uuid | no | Assigned on create. |
 | kind | text | yes |  |
 | capability | text | yes |  |
 | model | text | no |  |

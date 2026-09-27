@@ -13,8 +13,8 @@ scale: Low volume, high scrutiny.
 ifDown: Down blocks cross-region entitlements. Each region continues alone.
 coverage:
   operations: 18
-  inAFlow: 5
-  percent: 31%
+  inAFlow: 4
+  percent: 22%
   note: '**Flow coverage is how much of this service a journey has walked.** A service under 40% is
     unwalked rather than under-documented.'
 schemas:
@@ -177,8 +177,34 @@ tables:
   columns: 5
   backing: redis
   owned: false
-  why: '**Not a table and not owned by a service.** Derived from something already read, invalidated
-    by an event already consumed, losable without consequence — no migration, no backup, no owner.'
+  why: '**Not a table and not owned by a service.** Derived from something already read, losable without
+    consequence — no migration, no backup, no owner.'
+  key: The idempotency key the caller sent
+  eviction:
+  - 'expires_at: **Must exceed the longest offline window.** A scanner out for a weekend replays on
+    Monday'
+  writtenBy:
+  - authoriseWalletSpend
+  - captureWalletAuthorisation
+  - consumeCrossRegionEntitlement
+  - createDsarRequest
+  - createGuestLink
+  - propagateCrossRegionEntitlement
+  - reconcileRedemptions
+  - revokeCrossRegionEntitlement
+  - revokeGuestLink
+  - setWalletAllocationPolicy
+  readBy:
+  - authoriseWalletSpend
+  - captureWalletAuthorisation
+  - consumeCrossRegionEntitlement
+  - createDsarRequest
+  - createGuestLink
+  - propagateCrossRegionEntitlement
+  - reconcileRedemptions
+  - revokeCrossRegionEntitlement
+  - revokeGuestLink
+  - setWalletAllocationPolicy
 - table: sync.cell_connection
   columns: 9
   store: postgres
@@ -192,7 +218,7 @@ tables:
   writtenBy: []
   foreignWriters: null
 - table: sync.rejection
-  columns: 9
+  columns: 11
   store: postgres
   parent: null
   writtenBy:
@@ -211,7 +237,42 @@ readsFrom:
 writesOutside:
 - service: TenancyService
   operations: 10
-  why: '**The owner defines the row; this service may only append to it.**'
+  rule: 'ADR-0028: the owner defines the row; a foreign writer may only append, through a path the owner
+    published.'
+  why: '**The lineage records these writes, not how they honour the rule.** It does not say whether
+    each inserts or updates, or which operation or event TenancyService published for it — check each
+    against ADR-0028.'
+  writes:
+  - operation: authoriseWalletSpend
+    tables:
+    - platform.wallet_authorisation
+  - operation: captureWalletAuthorisation
+    tables:
+    - platform.wallet_authorisation
+  - operation: consumeCrossRegionEntitlement
+    tables:
+    - platform.cross_region_entitlement
+  - operation: createDsarRequest
+    tables:
+    - platform.dsar_request
+  - operation: createGuestLink
+    tables:
+    - platform.guest_link
+  - operation: propagateCrossRegionEntitlement
+    tables:
+    - platform.cross_region_entitlement
+  - operation: reconcileRedemptions
+    tables:
+    - platform.cross_region_entitlement
+  - operation: revokeCrossRegionEntitlement
+    tables:
+    - platform.cross_region_entitlement
+  - operation: revokeGuestLink
+    tables:
+    - platform.guest_link
+  - operation: setWalletAllocationPolicy
+    tables:
+    - platform.wallet_authorisation
 screens:
 - P07:SCN-003 Ready to scan
 - P07:SCN-011 Delegated right

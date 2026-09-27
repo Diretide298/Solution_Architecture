@@ -107,6 +107,9 @@ paths:
               $ref: '#/components/schemas/CreateGuestLinkRequest'
       responses:
         '201':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Linked
           content:
             application/json:
@@ -198,6 +201,9 @@ paths:
                   - administrative
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Severed. Reports rights revoked per cell.
           content:
             application/json:
@@ -297,6 +303,9 @@ paths:
               $ref: '#/components/schemas/PropagateRightRequest'
       responses:
         '201':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Right accepted
           content:
             application/json:
@@ -360,6 +369,9 @@ paths:
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       responses:
         '204':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Revoked
         '409':
           description: 'Already fully consumed. Revocation cannot undo a redemption that has happened
@@ -428,6 +440,9 @@ paths:
                   format: date-time
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Consumed
           content:
             application/json:
@@ -495,6 +510,9 @@ paths:
                         format: date-time
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Reconciled
           content:
             application/json:
@@ -568,6 +586,9 @@ paths:
               $ref: '#/components/schemas/AuthoriseWalletRequest'
       responses:
         '201':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Held
           content:
             application/json:
@@ -634,6 +655,9 @@ paths:
                   type: string
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Captured
           content:
             application/json:
@@ -747,6 +771,9 @@ paths:
                   maximum: 100
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Policy set
           content:
             application/json:
@@ -804,6 +831,9 @@ paths:
                   maxLength: 1000
       responses:
         '202':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Accepted. Fan-out proceeds asynchronously.
           content:
             application/json:

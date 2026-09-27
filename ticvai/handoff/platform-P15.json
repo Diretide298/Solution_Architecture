@@ -7,7 +7,7 @@
  "audience": "staff",
  "formFactor": "kiosk",
  "offlineCapable": true,
- "generated": "2026-09-24",
+ "generated": "2026-09-28",
  "note": "Derived by tools/derive-platform.py. **The gaps section is the point** \u2014 a page listing what exists is a directory; one listing what is missing is a worklist.",
  "counts": {
   "screens": 10,
@@ -15,7 +15,7 @@
   "contracts": 3,
   "modules": 1,
   "undrawn": 0,
-  "operationsWithNoScreen": 37
+  "operationsWithNoScreen": 46
  },
  "waves": {
   "wave2": 10
@@ -198,6 +198,18 @@
     "summary": "Approved substitutions for a recipe's ingredients"
    },
    {
+    "operation": "listMenuSchedules",
+    "contract": "fnb",
+    "verb": "GET",
+    "summary": "What is scheduled to go live, and when"
+   },
+   {
+    "operation": "listMenuVersions",
+    "contract": "fnb",
+    "verb": "GET",
+    "summary": "Every published version of a menu"
+   },
+   {
     "operation": "listTemperatureCheckpoints",
     "contract": "fnb",
     "verb": "GET",
@@ -306,6 +318,36 @@
     "summary": "Amend, pause or resume a schedule"
    },
    {
+    "operation": "getConfigurationProfile",
+    "contract": "tenancy",
+    "verb": "GET",
+    "summary": "One profile, at its latest version or at a named one"
+   },
+   {
+    "operation": "getConnectivityPolicy",
+    "contract": "tenancy",
+    "verb": "GET",
+    "summary": "The connectivity thresholds saved at one scope node"
+   },
+   {
+    "operation": "getDevice",
+    "contract": "tenancy",
+    "verb": "GET",
+    "summary": "Read one registered device"
+   },
+   {
+    "operation": "getOfflinePolicy",
+    "contract": "tenancy",
+    "verb": "GET",
+    "summary": "The offline policy saved at one scope node"
+   },
+   {
+    "operation": "getOutlet",
+    "contract": "tenancy",
+    "verb": "GET",
+    "summary": "Read an outlet"
+   },
+   {
     "operation": "issueDeviceCredential",
     "contract": "tenancy",
     "verb": "POST",
@@ -316,6 +358,12 @@
     "contract": "tenancy",
     "verb": "GET",
     "summary": "Where each service answers inside a cell"
+   },
+   {
+    "operation": "listConfigurationProfiles",
+    "contract": "tenancy",
+    "verb": "GET",
+    "summary": "Every configuration profile, at its current version"
    },
    {
     "operation": "listDeviceAuditRecords",
@@ -334,6 +382,12 @@
     "contract": "tenancy",
     "verb": "GET",
     "summary": "Devices that report having been interfered with"
+   },
+   {
+    "operation": "listProfileDeployments",
+    "contract": "tenancy",
+    "verb": "GET",
+    "summary": "Recent deployments, with a date, a target and an outcome"
    },
    {
     "operation": "recordDeviceTamperEvent",

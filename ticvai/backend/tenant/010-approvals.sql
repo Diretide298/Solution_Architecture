@@ -11,7 +11,7 @@ CREATE TABLE IF NOT EXISTS approvals.accreditation_badge (
     approval_request_id               uuid,
     holder_name                       text,
     zones                             text[],
-    state                             text,
+    state                             text CONSTRAINT accreditation_badge_state_chk CHECK (state IN ('issued', 'collected', 'suspended', 'revoked', 'expired')),
     issued_at                         timestamptz,
     expires_at                        timestamptz,
     revoked_reason                    text
@@ -20,6 +20,7 @@ CREATE TABLE IF NOT EXISTS approvals.accreditation_badge (
 -- Holds 9 columns. No description has been written for this table — the name is the only thing
 -- saying what it is
 CREATE TABLE IF NOT EXISTS approvals.approver_availability (
+    id                                uuid PRIMARY KEY,
     principal_id                      uuid,
     unavailable_from                  timestamptz,
     unavailable_to                    timestamptz,
@@ -27,8 +28,7 @@ CREATE TABLE IF NOT EXISTS approvals.approver_availability (
     delegation_id                     uuid,
     reason                            text,
     applies_to_request_kinds          text[],
-    scope_path                        ltree,
-    id                                uuid PRIMARY KEY NOT NULL
+    scope_path                        ltree NOT NULL
 );
 
 -- Holds 13 columns. No description has been written for this table — the name is the only thing
@@ -39,14 +39,14 @@ CREATE TABLE IF NOT EXISTS approvals.control_policy (
     name                              text,
     applies_to_request_kinds          text[],
     applies_above_value               numeric(18,4),
-    control                           text NOT NULL,
+    control                           text NOT NULL CONSTRAINT control_policy_control_chk CHECK (control IN ('fourEyes', 'dualControl', 'separationFromRequester', 'separationFromExecutor')),
     required_approver_group_ids       text[],
-    minimum_approvers                 integer,
-    requires_step_up                  boolean,
-    requires_signature                boolean,
-    break_glass_allowed               boolean,
-    scope_path                        ltree,
-    is_active                         boolean
+    minimum_approvers                 integer DEFAULT 2,
+    requires_step_up                  boolean DEFAULT false,
+    requires_signature                boolean DEFAULT false,
+    is_break_glass_allowed            boolean DEFAULT false,
+    scope_path                        ltree NOT NULL,
+    is_active                         boolean DEFAULT true
 );
 
 -- Every decision at every level. Immutable once the request completes — an approval is evidence
@@ -59,7 +59,7 @@ CREATE TABLE IF NOT EXISTS approvals.decision (
     display_name                      text,
     is_delegate                       boolean,
     delegated_from                    uuid,
-    decision                          text NOT NULL,
+    decision                          text NOT NULL CONSTRAINT decision_decision_chk CHECK (decision IN ('approve', 'reject')),
     comment                           text,
     reason                            text,
     used_mfa                          boolean,
@@ -80,8 +80,8 @@ CREATE TABLE IF NOT EXISTS approvals.decision_record (
     payload_hash                      text,
     previous_record_hash              text,
     record_hash                       text,
-    integrity                         text,
-    scope_path                        ltree,
+    integrity                         text CONSTRAINT decision_record_integrity_chk CHECK (integrity IN ('intact', 'broken', 'unverifiable')),
+    scope_path                        ltree NOT NULL,
     id                                uuid PRIMARY KEY NOT NULL
 );
 
@@ -92,12 +92,13 @@ CREATE TABLE IF NOT EXISTS approvals.delegation (
     id                                uuid PRIMARY KEY,
     delegator_principal_id            uuid NOT NULL,
     delegate_principal_id             uuid NOT NULL,
+    kinds                             text[],
     max_amount                        numeric(18,4),
-    "from"                            timestamptz NOT NULL,
-    "to"                              timestamptz NOT NULL,
+    valid_from                        timestamptz NOT NULL,
+    valid_to                          timestamptz NOT NULL,
     reason                            text,
     is_active                         boolean,
-    scope_path                        ltree
+    scope_path                        ltree NOT NULL
 );
 
 -- Who was asked, when, and why it moved up. The original approver stays in the record Hangs off:
@@ -114,14 +115,14 @@ CREATE TABLE IF NOT EXISTS approvals.evidence_package (
     id                                uuid PRIMARY KEY,
     requested_by                      uuid,
     requested_at                      timestamptz,
-    "from"                            timestamptz,
-    "to"                              timestamptz,
+    valid_from                        timestamptz,
+    valid_to                          timestamptz,
     request_count                     integer,
     integrity_failures                integer,
-    status                            text,
+    status                            text CONSTRAINT evidence_package_status_chk CHECK (status IN ('assembling', 'ready', 'failed')),
     asset_id                          uuid,
     expires_at                        timestamptz,
-    scope_path                        ltree
+    scope_path                        ltree NOT NULL
 );
 
 -- What requires approval where. Versioned, because a request must be decided by the rules it was
@@ -129,41 +130,41 @@ CREATE TABLE IF NOT EXISTS approvals.evidence_package (
 -- read it and 1 write it; 1 tables reference it.
 CREATE TABLE IF NOT EXISTS approvals.matrix (
     id                                uuid PRIMARY KEY,
-    kind                              text NOT NULL,
-    scope_level                       text NOT NULL,
-    scope_path                        ltree,
+    kind                              text NOT NULL CONSTRAINT matrix_kind_chk CHECK (kind IN ('refund', 'priceOverride', 'discountOverride', 'complimentaryTicket', 'membershipCancellation', 'accessPermissionChange', 'configurationChange', 'aiRecommendation', 'shiftVariance', 'releasePromotion', 'requisition', 'stockWriteOff', 'journalEntry', 'periodReopen', 'tenantMigration')),
+    scope_level                       text NOT NULL CONSTRAINT matrix_scope_level_chk CHECK (scope_level IN ('tenant', 'region', 'venue')),
+    scope_path                        ltree NOT NULL,
     version                           integer,
     is_active                         boolean
 );
 
 -- One request per action needing authorisation. The subject is a reference, never a copy Hangs
--- off: a root — nothing above it in its schema; references identity.principal, pii.subject.
--- Reached by: 7 operations read it and 8 write it; 16 tables reference it; written by 3 contracts
--- — approvals, subscription, workforce.
+-- off: a root — nothing above it in its schema; references identity.principal. Reached by: 7
+-- operations read it and 8 write it; 16 tables reference it; written by 3 contracts — approvals,
+-- subscription, workforce.
 CREATE TABLE IF NOT EXISTS approvals.request (
     id                                text PRIMARY KEY NOT NULL,
-    kind                              text NOT NULL,
-    reroute_on_no_approver            boolean,
+    kind                              text NOT NULL CONSTRAINT request_kind_chk CHECK (kind IN ('refund', 'priceOverride', 'discountOverride', 'complimentaryTicket', 'membershipCancellation', 'accessPermissionChange', 'configurationChange', 'aiRecommendation', 'shiftVariance', 'releasePromotion', 'requisition', 'stockWriteOff', 'journalEntry', 'periodReopen', 'tenantMigration')),
+    reroute_on_no_approver            boolean DEFAULT true,
     out_of_office_delegate_id         uuid,
-    allow_email_approval              boolean,
+    allow_email_approval              boolean DEFAULT false,
     reopened_from                     uuid,
-    status                            text NOT NULL,
+    status                            text NOT NULL CONSTRAINT request_status_chk CHECK (status IN ('draft', 'pending', 'escalated', 'approved', 'rejected', 'withdrawn', 'expired', 'cancelled')),
     subject_contract                  text,
     subject_type                      text,
-    subject_id                        uuid,
-    scope_path                        ltree,
+    subject_id                        text,
+    scope_path                        ltree NOT NULL,
     summary                           text,
     amount                            numeric(18,4),
     justification                     text,
     requested_by_principal_id         uuid NOT NULL,
     matrix_version                    integer,
-    mode                              text,
+    mode                              text CONSTRAINT request_mode_chk CHECK (mode IN ('sequential', 'parallel', 'consensus', 'majority')),
     current_level                     integer,
     total_levels                      integer,
     resubmitted_from_id               text,
     reopened_from_id                  text,
     sla_due_at                        timestamptz,
-    sla_breached                      boolean,
+    is_sla_breached                   boolean,
     expires_at                        timestamptz,
     requested_at                      timestamptz NOT NULL,
     completed_at                      timestamptz
@@ -175,30 +176,30 @@ CREATE TABLE IF NOT EXISTS approvals.retention_policy (
     id                                uuid PRIMARY KEY,
     applies_to_request_kinds          text[],
     retain_years                      integer,
-    retain_signatures                 boolean,
-    retain_attachments                boolean,
-    on_expiry                         text,
-    overrides_privacy_deletion        boolean,
+    retain_signatures                 boolean DEFAULT true,
+    retain_attachments                boolean DEFAULT false,
+    on_expiry                         text DEFAULT 'archive' CONSTRAINT retention_policy_on_expiry_chk CHECK (on_expiry IN ('delete', 'anonymise', 'archive')),
+    overrides_privacy_deletion        boolean DEFAULT true,
     legal_basis                       text,
-    scope_path                        ltree
+    scope_path                        ltree NOT NULL
 );
 
 -- Ordered within a matrix. First match wins, so adding a rule cannot silently change another Hangs
 -- off: reaches approvals.request through its keys; references approvals.matrix. Reached by: 6
--- operations read it and 1 write it; 5 tables reference it.
+-- operations read it and 1 write it; 2 tables reference it.
 CREATE TABLE IF NOT EXISTS approvals.rule (
     id                                uuid PRIMARY KEY,
-    "order"                           integer NOT NULL,
+    sort_order                        integer NOT NULL,
     min_amount                        numeric(18,4),
     max_amount                        numeric(18,4),
     risk_score_above                  numeric(18,4),
     condition                         text,
     approver_role_ids                 text[] NOT NULL,
-    approver_scope_level              text,
-    mode                              text NOT NULL,
-    levels                            integer,
-    requires_mfa                      boolean,
-    requires_signature                boolean,
+    approver_scope_level              text CONSTRAINT rule_approver_scope_level_chk CHECK (approver_scope_level IN ('venue', 'department', 'region', 'tenant')),
+    mode                              text NOT NULL CONSTRAINT rule_mode_chk CHECK (mode IN ('sequential', 'parallel', 'consensus', 'majority')),
+    levels                            integer DEFAULT 1,
+    requires_mfa                      boolean DEFAULT false,
+    requires_signature                boolean DEFAULT false,
     sla_minutes                       integer,
     escalate_after_minutes            integer,
     escalate_to_role_ids              text[],
@@ -213,12 +214,12 @@ CREATE TABLE IF NOT EXISTS approvals.signature (
     request_id                        uuid,
     signed_by                         uuid,
     signed_at                         timestamptz,
-    method                            text,
+    method                            text CONSTRAINT signature_method_chk CHECK (method IN ('platformKey', 'uaePass', 'externalCertificate', 'drawnSignature')),
     payload_hash                      text,
     signature                         text,
     certificate_subject               text,
-    step_up_verified                  boolean,
-    scope_path                        ltree
+    is_step_up_verified               boolean DEFAULT false,
+    scope_path                        ltree NOT NULL
 );
 
 -- Holds 10 columns. No description has been written for this table — the name is the only thing
@@ -228,12 +229,12 @@ CREATE TABLE IF NOT EXISTS approvals.sla_policy (
     code                              text NOT NULL,
     applies_to_request_kinds          text[],
     target_minutes                    integer,
-    business_hours_only               boolean,
+    business_hours_only               boolean DEFAULT true,
     calendar_id                       uuid,
-    on_breach                         text,
-    auto_action_allowed               boolean,
+    on_breach                         text DEFAULT 'escalate' CONSTRAINT sla_policy_on_breach_chk CHECK (on_breach IN ('notifyOnly', 'escalate', 'autoApprove', 'autoReject')),
+    is_auto_action_allowed            boolean DEFAULT false,
     escalation_group_id               uuid,
-    scope_path                        ltree
+    scope_path                        ltree NOT NULL
 );
 
 -- Holds 8 columns. No description has been written for this table — the name is the only thing
@@ -242,8 +243,8 @@ CREATE TABLE IF NOT EXISTS approvals.step_up_policy (
     operation_id                      text NOT NULL,
     required                          text NOT NULL,
     contract_floor                    text,
-    scope_level                       text,
-    reason                            text,
+    scope_level                       text CONSTRAINT step_up_policy_scope_level_chk CHECK (scope_level IN ('tenant', 'region', 'venue')),
+    reason                            text CONSTRAINT step_up_policy_reason_chk CHECK (char_length(reason) <= 512),
     set_by                            uuid,
     set_at                            timestamptz,
     id                                uuid PRIMARY KEY NOT NULL

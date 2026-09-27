@@ -133,6 +133,7 @@ screens:
   - BO-003
   - BO-004
   - BO-005
+  - BO-006
   boardFrames: null
   wireframe: wireframes/P08 Venue Management.dc.html#bo-001
   inFlows:
@@ -852,7 +853,6 @@ screens:
   states:
   - emptyFirstRun
   - emptyNoAccess
-  - emptyNoResults
   - error
   - loading
   offlineState: false
@@ -1068,7 +1068,6 @@ screens:
   states:
   - emptyFirstRun
   - emptyNoAccess
-  - emptyNoResults
   - error
   - loading
   offlineState: false
@@ -1093,7 +1092,6 @@ screens:
   - createRefundRequest
   states:
   - emptyFirstRun
-  - emptyNoAccess
   - error
   - loading
   offlineState: false
@@ -1883,7 +1881,6 @@ screens:
   states:
   - emptyFirstRun
   - emptyNoAccess
-  - emptyNoResults
   - error
   - loading
   offlineState: false
@@ -3268,7 +3265,6 @@ screens:
   states:
   - emptyFirstRun
   - emptyNoAccess
-  - emptyNoResults
   - error
   - loading
   offlineState: false
@@ -3302,6 +3298,7 @@ screens:
   goesTo:
   - BO-096
   - BO-097
+  - BO-098
   boardFrames: null
   wireframe: wireframes/P08 Venue Management.dc.html#bo-095
   inFlows: null
@@ -3325,6 +3322,7 @@ screens:
   - resourceId<-BO-095
   goesTo:
   - BO-097
+  - BO-099
   boardFrames: null
   wireframe: wireframes/P08 Venue Management.dc.html#bo-096
   inFlows:
@@ -3450,6 +3448,28 @@ screens:
   - BO-1153
   - BO-1163
   - BO-1173
+  - BO-144
+  - BO-154
+  - BO-164
+  - BO-174
+  - BO-184
+  - BO-194
+  - BO-204
+  - BO-214
+  - BO-224
+  - BO-234
+  - BO-244
+  - BO-254
+  - BO-264
+  - BO-274
+  - BO-284
+  - BO-294
+  - BO-304
+  - BO-314
+  - BO-324
+  - BO-334
+  - BO-344
+  - BO-354
   - BO-364
   - BO-374
   - BO-384
@@ -4134,7 +4154,6 @@ screens:
   states:
   - emptyFirstRun
   - emptyNoAccess
-  - emptyNoResults
   - error
   - loading
   offlineState: false
@@ -4325,7 +4344,6 @@ screens:
   states:
   - emptyFirstRun
   - emptyNoAccess
-  - emptyNoResults
   - error
   - loading
   offlineState: false
@@ -4779,7 +4797,6 @@ screens:
   states:
   - emptyFirstRun
   - emptyNoAccess
-  - emptyNoResults
   - error
   - loading
   offlineState: false

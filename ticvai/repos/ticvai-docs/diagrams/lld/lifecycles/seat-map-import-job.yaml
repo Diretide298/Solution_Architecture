@@ -65,16 +65,14 @@ states:
 transitions:
 - from: queued
   to: reading
-  trigger: readingStarted
-  operation: getSeatMapImport
+  trigger: job
   guard: '**No operation moves this and none should.** The reader picks the job up; a person cannot
     start it twice and there is nothing for them to decide yet.
 
     '
 - from: reading
   to: proposed
-  trigger: draftProduced
-  operation: getSeatMapImport
+  trigger: job
   guard: 'A draft, a confidence and a list of what was unreadable. **All three, or the state does not
     advance** — a proposal with no confidence is a proposal a person cannot weigh, and a blank unreadable
     list with low confidence is a different problem from a named one.
@@ -82,8 +80,7 @@ transitions:
     '
 - from: reading
   to: failed
-  trigger: readingFailed
-  operation: getSeatMapImport
+  trigger: job
   guard: 'Nothing legible. **The reason is recorded and named** — *the scan is 90dpi*, *the sheet has
     no header row* — because a venue that knows why can send a better file.
 

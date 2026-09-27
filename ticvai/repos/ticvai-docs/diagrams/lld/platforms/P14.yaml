@@ -59,6 +59,7 @@ screens:
   goesTo:
   - DEV-002
   - DEV-004
+  - DEV-008
   boardFrames: null
   wireframe: wireframes/P14 Developer.dc.html#dev-001
   inFlows:

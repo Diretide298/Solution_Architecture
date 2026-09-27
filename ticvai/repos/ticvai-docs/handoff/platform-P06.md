@@ -9,12 +9,12 @@
 | Contracts | 18 |
 | Modules | 4 |
 | Undrawn | 0 |
-| Operations with no screen | 181 |
+| Operations with no screen | 198 |
 | Waves | wave1 25 · wave2 40 · wave3 31 |
 
 ## Gaps
 
-### 181 operations with no screen here
+### 198 operations with no screen here
 
 **In a contract this platform uses, callable by its audience, and reaching no screen on any platform serving that audience.** Either a screen is missing or the endpoint should not exist — and the second is worth considering first.
 
@@ -41,6 +41,7 @@
 | `commitCatalogueImport` | catalogue | POST | Apply a parsed catalogue import |
 | `createDonationCampaign` | catalogue | POST | Create a campaign |
 | `freezeEntitlement` | catalogue | POST | Pause a membership at the guest's request |
+| `getCatalogueImportJob` | catalogue | GET | Progress and findings of a catalogue import |
 | `getDynamicPriceRule` | catalogue | GET | One rule with its conditions and actions |
 | `getPlanBenefits` | catalogue | GET | Which benefits a plan grants, and how much of each |
 | `listDonationCampaigns` | catalogue | GET | Campaigns a guest can give to |
@@ -59,8 +60,7 @@
 | `updateDonationCampaign` | catalogue | PATCH | Amend or close a campaign |
 | `attachModifierGroup` | fnb | PUT | Give an item its choices |
 | `closeCorrectiveAction` | fnb | POST | Close a signed finding |
-| `createCombo` | fnb | POST | A meal deal, priced as one thing |
-| … | | | 141 more |
+| … | | | 158 more |
 
 ### 1 modules split across waves
 

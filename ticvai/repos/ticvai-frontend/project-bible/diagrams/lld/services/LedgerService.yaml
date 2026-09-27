@@ -1,9 +1,9 @@
 id: LLD-LedgerService
-title: LedgerService — 56 operations, 18 tables
+title: LedgerService — 56 operations, 20 tables
 generatedBy: tools/derive-diagrams.py
 tier: commerce
 index: diagrams/hld/02-services.yaml
-why: '**Money, and it is append-only.** 54 operations over 18 tables that are never updated and never
+why: '**Money, and it is append-only.** 56 operations over 20 tables that are never updated and never
   deleted — a different discipline from everything around it, and one that should not share a deploy
   with anything that does mutate.'
 scale: Write-heavy, batch-tolerant, not latency-critical. Recognition and revaluation are jobs.
@@ -12,15 +12,15 @@ ifDown: '**Correctness over availability.** A ledger that is briefly unavailable
 coverage:
   operations: 56
   inAFlow: 33
-  percent: 61%
+  percent: 59%
   note: '**Flow coverage is how much of this service a journey has walked.** A service under 40% is
     unwalked rather than under-documented.'
 schemas:
 - schema: ledger
-  tables: 18
+  tables: 20
   stores:
   - postgres
-  largestTable: ledger.settlement
+  largestTable: ledger.journal_entry
 operationsByContract:
 - contract: finance
   count: 56
@@ -31,7 +31,7 @@ operationsByContract:
     scope: region
     permission: LEDGER_APPROVE
     offline: false
-    reads: 2
+    reads: 3
     writes: 2
   - operation: approveJournalEntry
     verb: POST
@@ -47,7 +47,7 @@ operationsByContract:
     scope: region
     permission: LEDGER_APPROVE
     offline: false
-    reads: 2
+    reads: 3
     writes: 2
   - operation: calculateTax
     verb: POST
@@ -88,7 +88,7 @@ operationsByContract:
     permission: LEDGER_POST
     offline: false
     reads: 3
-    writes: 2
+    writes: 3
   - operation: createLegalEntity
     verb: POST
     path: /legal-entities
@@ -239,7 +239,7 @@ operationsByContract:
     scope: region
     permission: LEDGER_VIEW
     offline: false
-    reads: 1
+    reads: 2
     writes: 0
   - operation: listFxRates
     verb: GET
@@ -351,7 +351,7 @@ operationsByContract:
     scope: tenant
     permission: LEDGER_POST
     offline: false
-    reads: 3
+    reads: 5
     writes: 2
   - operation: rejectJournal
     verb: POST
@@ -359,7 +359,7 @@ operationsByContract:
     scope: region
     permission: LEDGER_APPROVE
     offline: false
-    reads: 2
+    reads: 3
     writes: 2
   - operation: reopenPeriod
     verb: POST
@@ -367,7 +367,7 @@ operationsByContract:
     scope: region
     permission: LEDGER_APPROVE
     offline: false
-    reads: 2
+    reads: 3
     writes: 2
   - operation: resolveObligationDispute
     verb: POST
@@ -431,8 +431,8 @@ operationsByContract:
     scope: region
     permission: LEDGER_APPROVE
     offline: false
-    reads: 1
-    writes: 2
+    reads: 2
+    writes: 3
   - operation: setFxRate
     verb: PUT
     path: /fx-rates
@@ -479,8 +479,76 @@ tables:
   columns: 5
   backing: redis
   owned: false
-  why: '**Not a table and not owned by a service.** Derived from something already read, invalidated
-    by an event already consumed, losable without consequence — no migration, no backup, no owner.'
+  why: '**Not a table and not owned by a service.** Derived from something already read, losable without
+    consequence — no migration, no backup, no owner.'
+  key: The idempotency key the caller sent
+  eviction:
+  - 'expires_at: **Must exceed the longest offline window.** A scanner out for a weekend replays on
+    Monday'
+  writtenBy:
+  - abandonPeriodClose
+  - approveJournalEntry
+  - beginPeriodClose
+  - calculateTax
+  - closeFiscalPeriod
+  - createAccount
+  - createCostCenter
+  - createJournalEntry
+  - createLegalEntity
+  - createRecognitionSchedule
+  - createTaxCode
+  - createTaxExemption
+  - disputeObligation
+  - ingestFxRates
+  - ingestSettlementFile
+  - recordDeposit
+  - recordSettlement
+  - recordWriteOff
+  - rejectJournal
+  - reopenPeriod
+  - resolveObligationDispute
+  - resolveSettlementException
+  - reverseJournalEntry
+  - reviewPriceVariance
+  - runFxRevaluation
+  - runRecognition
+  - setAccountMappings
+  - setFxProvider
+  - setFxRate
+  - settleDeposit
+  - updateAccount
+  - updateTaxCode
+  readBy:
+  - abandonPeriodClose
+  - approveJournalEntry
+  - beginPeriodClose
+  - calculateTax
+  - closeFiscalPeriod
+  - createAccount
+  - createCostCenter
+  - createJournalEntry
+  - createLegalEntity
+  - createRecognitionSchedule
+  - createTaxCode
+  - createTaxExemption
+  - disputeObligation
+  - ingestSettlementFile
+  - recordDeposit
+  - recordSettlement
+  - recordWriteOff
+  - rejectJournal
+  - reopenPeriod
+  - resolveObligationDispute
+  - resolveSettlementException
+  - reverseJournalEntry
+  - reviewPriceVariance
+  - runFxRevaluation
+  - runRecognition
+  - setAccountMappings
+  - setFxRate
+  - settleDeposit
+  - updateAccount
+  - updateTaxCode
 - table: ledger.account
   columns: 15
   store: postgres
@@ -522,6 +590,19 @@ tables:
   writtenBy:
   - finance
   foreignWriters: null
+- table: ledger.fiscal_period_event
+  columns: 7
+  store: postgres
+  parent: ledger.fiscal_period
+  writtenBy: []
+  foreignWriters: null
+- table: ledger.fx_provider_assignment
+  columns: 6
+  store: postgres
+  parent: null
+  writtenBy:
+  - finance
+  foreignWriters: null
 - table: ledger.fx_rate
   columns: 12
   store: postgres
@@ -537,7 +618,7 @@ tables:
   - finance
   foreignWriters: null
 - table: ledger.journal_entry
-  columns: 16
+  columns: 20
   store: postgres
   parent: null
   writtenBy:
@@ -551,7 +632,8 @@ tables:
   columns: 8
   store: postgres
   parent: ledger.journal_entry
-  writtenBy: []
+  writtenBy:
+  - finance
   foreignWriters: null
 - table: ledger.legal_entity
   columns: 11
@@ -586,14 +668,14 @@ tables:
   - finance
   foreignWriters: null
 - table: ledger.settlement
-  columns: 17
+  columns: 19
   store: postgres
   parent: null
   writtenBy:
   - finance
   foreignWriters: null
 - table: ledger.settlement_exception
-  columns: 10
+  columns: 11
   store: postgres
   parent: ledger.settlement
   writtenBy:
@@ -627,7 +709,21 @@ readsFrom:
 writesOutside:
 - service: TenancyService
   operations: 3
-  why: '**The owner defines the row; this service may only append to it.**'
+  rule: 'ADR-0028: the owner defines the row; a foreign writer may only append, through a path the owner
+    published.'
+  why: '**The lineage records these writes, not how they honour the rule.** It does not say whether
+    each inserts or updates, or which operation or event TenancyService published for it — check each
+    against ADR-0028.'
+  writes:
+  - operation: approveJournalEntry
+    tables:
+    - platform.outbox
+  - operation: closeFiscalPeriod
+    tables:
+    - platform.outbox
+  - operation: setFxProvider
+    tables:
+    - platform.region_settings
 screens:
 - P01:WEB-035 Multi-Currency & Pricing
 - P02:GST-044 Multi-Currency & Pricing

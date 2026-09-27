@@ -91,6 +91,7 @@ operations:
   writes:
   - cache:idempotency
   - retail.return
+  - retail.return_line
 - operation: createRetailSale
   verb: POST
   path: /retail-sales
@@ -106,6 +107,7 @@ operations:
   writes:
   - cache:idempotency
   - retail.sale
+  - retail.sale_line
 - operation: createShopAndDrop
   verb: POST
   path: /shop-and-drop
@@ -296,6 +298,7 @@ operations:
   writes:
   - cache:idempotency
   - retail.reservation
+  - retail.reservation_line
 - operation: setReturnPolicy
   verb: PUT
   path: /outlets/{outletId}/return-policy

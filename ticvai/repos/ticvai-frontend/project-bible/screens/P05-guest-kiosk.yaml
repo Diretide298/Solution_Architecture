@@ -67,6 +67,7 @@ screens:
     - KSK-002
     - KSK-003
     - KSK-004
+    - KSK-014
     inferred: true
     isEntryPoint: true
     transitions:
@@ -78,6 +79,9 @@ screens:
       provenance: structural — KSK-001 is P05's home screen and its exits are its launcher
     - to: KSK-004
       trigger: Choose tickets
+      provenance: structural — KSK-001 is P05's home screen and its exits are its launcher
+    - to: KSK-014
+      trigger: Out of service
       provenance: structural — KSK-001 is P05's home screen and its exits are its launcher
   notes: Definition derived from the wireframe board on 14 August. Components, states and operations still
     to be written. **The attract loop is the entry.** A kiosk has no login and nobody navigates to it
@@ -99,19 +103,11 @@ screens:
     template: split
     regions:
     - name: contentBody
-      slot: carried
-      components:
-      - kind: detailPanel
-        notes: Structure from the wireframe board. Components not yet enumerated.
-        provenance: carried from the previous definition
+      components: []
   states:
     loading: Not applicable — the attract loop is the idle state
     error: Falls through to KSK-014 if the kiosk cannot reach the server
     emptyFirstRun: Not applicable
-    emptyNoResults: The filter narrowed it and the attract loop are still there. Names the active filter
-      and offers to clear it.
-    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
-      data* and sends somebody to support with the wrong question.
     offline: '**Not available.** An unattended terminal selling from a stale catalogue oversells with
       nobody watching'
   apis: []
@@ -149,10 +145,8 @@ screens:
       provenance: flow F07 step 2→3, F75 step 2→3
     - to: KSK-004
       trigger: Choose tickets
-      carries:
-      - productId
-      provenance: derived — KSK-004 declares entryState.params productId, so an edge into it must carry
-        them
+      provenance: derived — KSK-004 declares entryState.params productId and KSK-002 holds none of them,
+        so the edge carries nothing and KSK-004 opens cold
   notes: Definition derived from the wireframe board on 14 August. Components, states and operations still
     to be written.
   density: touchLarge
@@ -162,11 +156,6 @@ screens:
   patternReason: '`getTenantAppStatus` reads one record and nothing reads a population — the screen is
     about that one thing'
   purpose: Ask the only question that changes everything else.
-  gaps:
-  - operation: getTenantConfig
-    why: '**1 declared operation reach no component on this screen**: getTenantConfig. Either the screen
-      is missing what calls them, or the declaration is residue.'
-    source: the screen's own declarations
   layout:
     template: detail
     regions:
@@ -174,7 +163,7 @@ screens:
       slot: record
       components:
       - kind: detailPanel
-        label: The selected language select
+        label: The tenant app status
         bindsTo: TenantAppStatus
         columns:
         - TenantAppStatus.isPublished
@@ -191,21 +180,36 @@ screens:
         - TenantAppStatus.recentChanges
         operation: getTenantAppStatus
         provenance: contract white-label.yaml GET /tenant-config/status
-    - name: contentBody
-      slot: carried
-      components:
       - kind: detailPanel
-        notes: Structure from the wireframe board. Components not yet enumerated.
-        provenance: carried from the previous definition
+        label: The tenant config
+        bindsTo: TenantConfig
+        columns:
+        - TenantConfig.isDraft
+        - TenantConfig.brand
+        - TenantConfig.appIcons
+        - TenantConfig.bookingFlow
+        - TenantConfig.theme
+        - TenantConfig.fonts
+        - TenantConfig.footer
+        - TenantConfig.notificationBranding
+        - TenantConfig.enabledPaymentMethods
+        - TenantConfig.accessibility
+        - TenantConfig.header
+        - TenantConfig.navigation
+        - TenantConfig.homepage
+        - TenantConfig.modules
+        - TenantConfig.features
+        - TenantConfig.languages
+        operation: getTenantConfig
+        provenance: contract white-label.yaml GET /tenant-config
   states:
-    loading: The language select list.
+    loading: The language select, read by `getTenantAppStatus`.
     error: Could not load. Names which read failed and leaves the language select untouched.
-    emptyFirstRun: No language select yet. Carries the create action; distinct from a filter that matched
-      nothing.
-    emptyNoResults: The filter narrowed it and the language select are still there. Names the active filter
-      and offers to clear it.
-    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
-      data* and sends somebody to support with the wrong question.
+    emptyFirstRun: No language select yet. **Offers no create action** — this screen declares no operation
+      that makes one — and says so rather than showing an empty table.
+    emptyNoAccess: Shown when the caller lacks `TENANT_CONFIGURE`, which `getTenantConfig` requires, and
+      names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody
+      to support with the wrong question.
     offline: Not available
   apis:
   - operationId: getTenantAppStatus
@@ -243,16 +247,28 @@ screens:
     - KSK-002
     - KSK-004
     - KSK-006
+    - KSK-011
+    - KSK-016
     inferred: true
     transitions:
-    - to: KSK-004
-      trigger: Chooses tickets and quantities
-      provenance: flow F07 step 3→4
-      operation: listProducts
     - to: KSK-006
       trigger: They review the basket
       provenance: flow F75 step 3→4
       operation: listProducts
+    - to: KSK-011
+      trigger: Collect a booking
+      provenance: derived — KSK-011 declares entryState.params orderId and KSK-003 holds none of them,
+        so the edge carries nothing and KSK-011 opens cold
+    - to: KSK-016
+      trigger: Order Food
+      provenance: derived — KSK-016 declares entryState.params outletId and KSK-003 holds none of them,
+        so the edge carries nothing and KSK-016 opens cold
+    - to: KSK-004
+      trigger: Chooses tickets and quantities
+      provenance: flow F07 step 3→4
+      operation: listProducts
+      carries:
+      - productId
   notes: Definition derived from the wireframe board on 14 August. Components, states and operations still
     to be written.
   density: touchLarge
@@ -268,8 +284,23 @@ screens:
     - name: contentBody
       slot: collection
       components:
+      - kind: textField
+        label: Venue id
+        operation: listProducts
+        notes: Sends `?venueId=` to `listProducts`.
+        provenance: contract catalogue.yaml GET /products
+      - kind: textField
+        label: Kind
+        operation: listProducts
+        notes: Sends `?kind=` to `listProducts`.
+        provenance: contract catalogue.yaml GET /products
+      - kind: toggle
+        label: Is sellable
+        operation: listProducts
+        notes: Sends `?isSellable=` to `listProducts`.
+        provenance: contract catalogue.yaml GET /products
       - kind: dataTable
-        label: Every what are you
+        label: Every product
         bindsTo: Product
         columns:
         - Product.id
@@ -290,7 +321,7 @@ screens:
       slot: selection
       components:
       - kind: detailPanel
-        label: The selected what are you
+        label: The selected product
         bindsTo: Product
         columns:
         - Product.id
@@ -311,27 +342,16 @@ screens:
         - Product.variantCount
         operation: listProducts
         provenance: contract catalogue.yaml GET /products
-    - name: contentBody
-      slot: carried
-      components:
-      - kind: detailPanel
-        notes: Structure from the wireframe board. Components not yet enumerated.
-        provenance: carried from the previous definition
-      - kind: cardList
-        derived: true
-        impliedBy: listProducts
-        notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
-          a venue''s busiest hour is a list that skips rows.'
-        provenance: carried from the previous definition
   states:
     loading: The what are you list.
     error: Could not load. Names which read failed and leaves the what are you untouched.
-    emptyFirstRun: No what are you yet. Carries the create action; distinct from a filter that matched
-      nothing.
-    emptyNoResults: The filter narrowed it and the what are you are still there. Names the active filter
-      and offers to clear it.
-    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
-      data* and sends somebody to support with the wrong question.
+    emptyFirstRun: No what are you yet. **Offers no create action** — this screen declares no operation
+      that makes one — and says so rather than showing an empty table.
+    emptyNoResults: Nothing matches the filter on venueId, kind, isSellable and the what are you are still
+      there. Names the active filter and offers to clear it.
+    emptyNoAccess: Shown when the caller lacks `PRODUCT_VIEW`, which `listProducts` requires, and names
+      that permission. **Never an empty table** — that reads as *there is no data* and sends somebody
+      to support with the wrong question.
     offline: Not available
   apis:
   - operationId: listProducts
@@ -372,12 +392,17 @@ screens:
     - KSK-002
     - KSK-003
     - KSK-005
+    - KSK-015
     inferred: true
     fromFlows: true
     transitions:
     - to: KSK-005
       trigger: Chooses a session
       provenance: flow F07 step 4→5
+    - to: KSK-015
+      trigger: Assistant
+      provenance: derived — KSK-015 declares entryState.params conversationId and KSK-004 holds none of
+        them, so the edge carries nothing and KSK-015 opens cold
   notes: Definition derived from the wireframe board on 14 August. Components, states and operations still
     to be written.
   density: touchLarge
@@ -389,9 +414,9 @@ screens:
   purpose: Quantities, with targets a gloved hand can hit.
   gaps:
   - operation: getAvailability
-    why: '**1 declared operation reach no component on this screen**: getAvailability. Either the screen
-      is missing what calls them, or the declaration is residue.'
-    source: the screen's own declarations
+    why: '**`getAvailability` declares its response inline**, so the component that shows it names fields
+      but binds to no schema. The contract should name the shape.'
+    source: contract catalogue.yaml GET /availability
   layout:
     template: split
     regions:
@@ -399,7 +424,7 @@ screens:
       slot: collection
       components:
       - kind: dataTable
-        label: Every choose tickets
+        label: Every product variant
         bindsTo: ProductVariant
         columns:
         - ProductVariant.id
@@ -409,27 +434,23 @@ screens:
         - ProductVariant.isActive
         operation: listProductVariants
         provenance: contract catalogue.yaml GET /products/{productId}/variants
-    - name: contentBody
-      slot: carried
-      components:
-      - kind: detailPanel
-        notes: Structure from the wireframe board. Components not yet enumerated.
-        provenance: carried from the previous definition
-      - kind: cardList
-        derived: true
-        impliedBy: listProductVariants
-        notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
-          a venue''s busiest hour is a list that skips rows.'
-        provenance: carried from the previous definition
+      - kind: dataTable
+        label: Availability
+        operation: getAvailability
+        notes: Shows `channelCapacityId`, `performanceId`, `capacity`, `sold`, `leased`, `remaining`,
+          `byChannel` from `getAvailability`'s inline response. **The response has no named schema**,
+          so this cannot bind until the contract names one.
+        provenance: contract catalogue.yaml GET /availability
   states:
     loading: The choose tickets list.
     error: Could not load. Names which read failed and leaves the choose tickets untouched.
-    emptyFirstRun: No choose tickets yet. Carries the create action; distinct from a filter that matched
-      nothing.
-    emptyNoResults: The filter narrowed it and the choose tickets are still there. Names the active filter
-      and offers to clear it.
-    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
-      data* and sends somebody to support with the wrong question.
+    emptyFirstRun: No choose tickets yet. **Offers no create action** — this screen declares no operation
+      that makes one — and says so rather than showing an empty table.
+    emptyNoResults: 'Never shown: `listProductVariants` takes no filter, so an empty list is always the
+      first-run state above.'
+    emptyNoAccess: Shown when the caller lacks `PRODUCT_VIEW`, which `getAvailability` requires, and names
+      that permission. **Never an empty table** — that reads as *there is no data* and sends somebody
+      to support with the wrong question.
     offline: Not available
   apis:
   - operationId: getAvailability
@@ -491,9 +512,9 @@ screens:
   purpose: Pick a time that still has room.
   gaps:
   - operation: getAvailability
-    why: '**1 declared operation reach no component on this screen**: getAvailability. Either the screen
-      is missing what calls them, or the declaration is residue.'
-    source: the screen's own declarations
+    why: '**`getAvailability` declares its response inline**, so the component that shows it names fields
+      but binds to no schema. The contract should name the shape.'
+    source: contract catalogue.yaml GET /availability
   layout:
     template: detail
     regions:
@@ -501,34 +522,31 @@ screens:
       slot: rowActions
       components:
       - kind: primaryButton
-        label: Acquire
-        operation: acquireInventoryHold
+        label: Acquire inventory hold
+        operation: addCartLine
         provenance: contract catalogue.yaml POST /inventory-holds
     - name: contentBody
       slot: carried
       components:
-      - kind: detailPanel
-        notes: Structure from the wireframe board. Components not yet enumerated.
-        provenance: carried from the previous definition
-      - kind: secondaryButton
-        label: Cancel
-        notes: '**A screen that can submit must be leaveable without submitting.**'
-        derived: true
-        impliedBy: acquireInventoryHold
-        provenance: carried from the previous definition
+      - kind: dataTable
+        label: Availability
+        operation: getAvailability
+        notes: Shows `channelCapacityId`, `performanceId`, `capacity`, `sold`, `leased`, `remaining`,
+          `byChannel` from `getAvailability`'s inline response. **The response has no named schema**,
+          so this cannot bind until the contract names one.
+        provenance: contract catalogue.yaml GET /availability
   states:
     loading: The choose session list.
     error: Could not load. Names which read failed and leaves the choose session untouched.
-    emptyFirstRun: No choose session yet. Carries the create action; distinct from a filter that matched
-      nothing.
-    emptyNoResults: The filter narrowed it and the choose session are still there. Names the active filter
-      and offers to clear it.
-    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
-      data* and sends somebody to support with the wrong question.
+    emptyFirstRun: No choose session yet. **Offers no create action** — this screen declares no operation
+      that makes one — and says so rather than showing an empty table.
+    emptyNoAccess: Shown when the caller lacks `PRODUCT_VIEW`, which `getAvailability` requires, and names
+      that permission. **Never an empty table** — that reads as *there is no data* and sends somebody
+      to support with the wrong question.
     offline: Not available
   apis:
-  - operationId: acquireInventoryHold
-    contract: catalogue
+  - operationId: addCartLine
+    contract: orders
     purpose: Acquire an inventory lease
     trigger: onAction
   - operationId: getAvailability
@@ -545,6 +563,30 @@ screens:
   apisNote: Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack
     — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
     to the ones that matter is work a person still owes this screen.
+  overlays:
+  - id: formAcquireInventoryHold
+    component: modal
+    trigger: Add to cart
+    body: '**Collects what `addCartLine` sends before it is called; the cart takes the hold server-side.**
+      Required: `variantId`, `quantity`. Optional: `performanceId`, `seatIds`, `parentLineId`, `attributes`.
+      Dismissing sends nothing; the screen behind is unchanged.'
+    bindsTo: AddCartLineRequest
+    confirm:
+      label: Add to cart
+      operation: addCartLine
+    dismiss:
+      label: Cancel
+      discards:
+      - id
+      - channelCapacityId
+      - requestedUnits
+      - ttlSeconds
+      - channel
+    provenance: contract catalogue.yaml POST /inventory-holds
+  entryState:
+    params:
+    - name: cartId
+      from: navigation
 - id: KSK-006
   name: Review
   module: Sell
@@ -572,6 +614,8 @@ screens:
     - to: KSK-008
       trigger: The payment does not resolve
       provenance: flow F57 step 1→2
+      carries:
+      - paymentId
     entryFrom:
     - KSK-003
   notes: Definition derived from the wireframe board on 14 August. Components, states and operations still
@@ -590,7 +634,7 @@ screens:
       slot: record
       components:
       - kind: detailPanel
-        label: The selected review
+        label: The cart
         bindsTo: Cart
         columns:
         - Cart.id
@@ -615,42 +659,24 @@ screens:
       slot: rowActions
       components:
       - kind: primaryButton
-        label: Add
+        label: Add cart line
         operation: addCartLine
         provenance: contract orders.yaml POST /carts/{cartId}/lines
       - kind: secondaryButton
-        label: Checkout
+        label: Checkout cart
         operation: checkoutCart
         provenance: contract orders.yaml POST /carts/{cartId}/checkout
       - kind: secondaryButton
-        label: Evaluate
+        label: Evaluate promotions
         operation: evaluatePromotions
         provenance: contract promotions.yaml POST /promotions/evaluate
-    - name: contentBody
-      slot: carried
-      components:
-      - kind: detailPanel
-        notes: Structure from the wireframe board. Components not yet enumerated.
-        provenance: carried from the previous definition
-      - kind: primaryButton
-        derived: true
-        impliedBy: addCartLine
-        label: Add cart line
-        provenance: carried from the previous definition
-      - kind: secondaryButton
-        label: Cancel
-        notes: '**A screen that can submit must be leaveable without submitting.**'
-        derived: true
-        impliedBy: addCartLine
-        provenance: carried from the previous definition
   states:
-    loading: The review list.
+    loading: The review, read by `getCart`.
     error: Could not load. Names which read failed and leaves the review untouched.
-    emptyFirstRun: No review yet. Carries the create action; distinct from a filter that matched nothing.
-    emptyNoResults: The filter narrowed it and the review are still there. Names the active filter and
-      offers to clear it.
-    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
-      data* and sends somebody to support with the wrong question.
+    emptyFirstRun: No review yet. Offers Add cart line (`addCartLine`).
+    emptyNoAccess: Shown when the caller lacks `PRICE_VIEW`, which `evaluatePromotions` requires, and
+      names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody
+      to support with the wrong question.
     offline: Not available
   apis:
   - operationId: getCart
@@ -684,6 +710,62 @@ screens:
   apisNote: Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack
     — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
     to the ones that matter is work a person still owes this screen.
+  overlays:
+  - id: formAddCartLine
+    component: modal
+    trigger: Add cart line
+    body: '**Collects what `addCartLine` sends before it is called.** Required: `variantId`, `quantity`.
+      Optional: `performanceId`, `seatIds`, `parentLineId`, `attributes`. Dismissing sends nothing; the
+      screen behind is unchanged.'
+    bindsTo: AddCartLineRequest
+    confirm:
+      label: Add cart line
+      operation: addCartLine
+    dismiss:
+      label: Cancel
+      discards:
+      - variantId
+      - quantity
+      - performanceId
+      - seatIds
+      - parentLineId
+      - attributes
+    provenance: contract orders.yaml POST /carts/{cartId}/lines
+  - id: formCheckoutCart
+    component: modal
+    trigger: Checkout cart
+    body: '**Collects what `checkoutCart` sends before it is called.** Nothing in the body is required.
+      Optional: `subjectId`, `attendees`. Dismissing sends nothing; the screen behind is unchanged.'
+    confirm:
+      label: Checkout cart
+      operation: checkoutCart
+    dismiss:
+      label: Cancel
+      discards:
+      - subjectId
+      - attendees
+    provenance: contract orders.yaml POST /carts/{cartId}/checkout
+  - id: formEvaluatePromotions
+    component: modal
+    trigger: Evaluate promotions
+    body: '**Collects what `evaluatePromotions` sends before it is called.** Required: `venueId`, `channel`,
+      `lines`. Optional: `subjectId`, `membershipTierId`, `couponCodes`, `evaluateAt`. Dismissing sends
+      nothing; the screen behind is unchanged.'
+    bindsTo: EvaluatePromotionsRequest
+    confirm:
+      label: Evaluate promotions
+      operation: evaluatePromotions
+    dismiss:
+      label: Cancel
+      discards:
+      - venueId
+      - channel
+      - lines
+      - subjectId
+      - membershipTierId
+      - couponCodes
+      - evaluateAt
+    provenance: contract promotions.yaml POST /promotions/evaluate
 - id: KSK-007
   name: Payment
   module: Sell
@@ -700,14 +782,23 @@ screens:
     - KSK-001
     - KSK-002
     - KSK-003
+    - KSK-008
     - KSK-009
     inferred: true
     fromFlows: true
     transitions:
+    - to: KSK-008
+      trigger: Payment unresolved
+      carries:
+      - paymentId
+      provenance: derived — KSK-008 declares entryState.params paymentId and KSK-007 holds paymentId,
+        so an edge into it carries them
     - to: KSK-009
       trigger: Takes the printed ticket
       provenance: flow F07 step 7→8, F75 step 5→6
       operation: createPayment
+      carries:
+      - orderId
   notes: 'Definition derived from the wireframe board on 14 August. Components, states and operations
     still to be written. **Card only. No foreign cash** — a kiosk accepting foreign notes needs a note
     reader and a per-currency float, and neither is specified. A guest paying by card in a foreign currency
@@ -764,33 +855,17 @@ screens:
       slot: publish
       components:
       - kind: primaryButton
-        label: Create
+        label: Create payment
         operation: createPayment
         provenance: contract orders.yaml POST /payments
-    - name: contentBody
-      slot: carried
-      components:
-      - kind: detailPanel
-        notes: Structure from the wireframe board. Components not yet enumerated.
-        provenance: carried from the previous definition
-      - kind: primaryButton
-        derived: true
-        impliedBy: createPayment
-        label: Create payment
-        provenance: carried from the previous definition
-      - kind: secondaryButton
-        label: Cancel
-        notes: '**A screen that can submit must be leaveable without submitting.**'
-        derived: true
-        impliedBy: createPayment
-        provenance: carried from the previous definition
   states:
     loading: The saved payment.
     error: Could not load. Names which read failed and leaves the payment untouched.
-    emptyFirstRun: No payment configured. Carries the create action and says what the platform does in
-      the meantime.
-    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
-      data* and sends somebody to support with the wrong question.
+    emptyFirstRun: No payment configured. The form opens empty and `createPayment` saves the first one;
+      it says what the platform does in the meantime.
+    emptyNoAccess: Shown when the caller lacks `ORDER_CREATE`, which `createPayment` requires, and names
+      that permission. **Never an empty table** — that reads as *there is no data* and sends somebody
+      to support with the wrong question.
     offline: Not available. **Card only, and card needs the acquirer**
   apis:
   - operationId: createPayment
@@ -835,6 +910,8 @@ screens:
       trigger: Or it resolves and the printer fails
       provenance: flow F57 step 2→3
       operation: inquirePaymentStatus
+      carries:
+      - orderId
   notes: Definition derived from the wireframe board on 14 August. Components, states and operations still
     to be written.
   density: touchLarge
@@ -856,28 +933,24 @@ screens:
       slot: publish
       components:
       - kind: primaryButton
-        label: Inquire
+        label: Inquire payment status
         operation: inquirePaymentStatus
         provenance: contract orders.yaml POST /payments/{paymentId}/inquiry
     - name: contentBody
-      slot: carried
       components:
-      - kind: detailPanel
-        notes: Structure from the wireframe board. Components not yet enumerated.
-        provenance: carried from the previous definition
       - kind: secondaryButton
         label: Cancel
         notes: '**A screen that can submit must be leaveable without submitting.**'
         derived: true
         impliedBy: inquirePaymentStatus
-        provenance: carried from the previous definition
   states:
     loading: The saved payment unresolved.
     error: Could not load. Names which read failed and leaves the payment unresolved untouched.
-    emptyFirstRun: No payment unresolved configured. Carries the create action and says what the platform
-      does in the meantime.
-    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
-      data* and sends somebody to support with the wrong question.
+    emptyFirstRun: No payment unresolved configured. The form opens empty and `inquirePaymentStatus` saves
+      the first one; it says what the platform does in the meantime.
+    emptyNoAccess: Shown when the caller lacks `ORDER_CREATE`, which `inquirePaymentStatus` requires,
+      and names that permission. **Never an empty table** — that reads as *there is no data* and sends
+      somebody to support with the wrong question.
     offline: Not applicable
   apis:
   - operationId: inquirePaymentStatus
@@ -919,12 +992,19 @@ screens:
     - KSK-001
     - KSK-002
     - KSK-003
+    - KSK-010
     - KSK-013
     inferred: true
     transitions:
     - to: KSK-013
       trigger: Something goes wrong and they call staff
       provenance: flow F75 step 6→7
+    - to: KSK-010
+      trigger: Print failure
+      carries:
+      - orderId
+      provenance: derived — KSK-010 declares entryState.params orderId and KSK-009 holds orderId, so an
+        edge into it carries them
   notes: Definition derived from the wireframe board on 14 August. Components, states and operations still
     to be written.
   density: touchLarge
@@ -941,7 +1021,7 @@ screens:
       slot: record
       components:
       - kind: detailPanel
-        label: The selected ticket issued
+        label: The order
         bindsTo: Order
         columns:
         - Order.id
@@ -966,30 +1046,17 @@ screens:
       slot: rowActions
       components:
       - kind: primaryButton
-        label: Transfer
+        label: Transfer order tickets
         operation: transferOrderTickets
         provenance: contract orders.yaml POST /orders/{orderId}/transfer
-    - name: contentBody
-      slot: carried
-      components:
-      - kind: detailPanel
-        notes: Structure from the wireframe board. Components not yet enumerated.
-        provenance: carried from the previous definition
-      - kind: secondaryButton
-        label: Cancel
-        notes: '**A screen that can submit must be leaveable without submitting.**'
-        derived: true
-        impliedBy: transferOrderTickets
-        provenance: carried from the previous definition
   states:
-    loading: The ticket issued list.
+    loading: The ticket issued, read by `getOrder`.
     error: Could not load. Names which read failed and leaves the ticket issued untouched.
-    emptyFirstRun: No ticket issued yet. Carries the create action; distinct from a filter that matched
-      nothing.
-    emptyNoResults: The filter narrowed it and the ticket issued are still there. Names the active filter
-      and offers to clear it.
-    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
-      data* and sends somebody to support with the wrong question.
+    emptyFirstRun: No ticket issued yet. **Offers no create action** — this screen declares no operation
+      that makes one — and says so rather than showing an empty table.
+    emptyNoAccess: Shown when the caller lacks `ORDER_VIEW`, which `getOrder` requires, and names that
+      permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support
+      with the wrong question.
     offline: Not applicable
   apis:
   - operationId: transferOrderTickets
@@ -1016,6 +1083,22 @@ screens:
   apisNote: Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack
     — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
     to the ones that matter is work a person still owes this screen.
+  overlays:
+  - id: formTransferOrderTickets
+    component: modal
+    trigger: Transfer order tickets
+    body: '**Collects what `transferOrderTickets` sends before it is called.** Required: `ticketIds`,
+      `recipient`. Optional: `message`. Dismissing sends nothing; the screen behind is unchanged.'
+    confirm:
+      label: Transfer order tickets
+      operation: transferOrderTickets
+    dismiss:
+      label: Cancel
+      discards:
+      - ticketIds
+      - recipient
+      - message
+    provenance: contract orders.yaml POST /orders/{orderId}/transfer
 - id: KSK-010
   name: Print failure
   module: Sell
@@ -1053,11 +1136,6 @@ screens:
   patternReason: the screen declares only writes (`transferOrderTickets`) and no read of a population
     — it is settings, not a list
   purpose: Recover when the paper runs out mid-sale.
-  gaps:
-  - operation: transferOrderTickets
-    why: '**`transferOrderTickets` declares no request body shape**, so nothing says what this editor
-      edits. The fields cannot be derived and the screen needs the contract before it needs a designer.'
-    source: contract orders.yaml POST /orders/{orderId}/transfer
   layout:
     template: form
     regions:
@@ -1065,28 +1143,31 @@ screens:
       slot: publish
       components:
       - kind: primaryButton
-        label: Transfer
+        label: Transfer order tickets
         operation: transferOrderTickets
         provenance: contract orders.yaml POST /orders/{orderId}/transfer
     - name: contentBody
       slot: carried
       components:
-      - kind: detailPanel
-        notes: Structure from the wireframe board. Components not yet enumerated.
-        provenance: carried from the previous definition
-      - kind: secondaryButton
-        label: Cancel
-        notes: '**A screen that can submit must be leaveable without submitting.**'
-        derived: true
-        impliedBy: transferOrderTickets
-        provenance: carried from the previous definition
+      - kind: multiSelect
+        label: Ticket ids
+        operation: transferOrderTickets
+        notes: Required.
+        provenance: contract orders.yaml POST /orders/{orderId}/transfer
+      - kind: textField
+        label: Recipient
+        operation: transferOrderTickets
+        notes: Required.
+        provenance: contract orders.yaml POST /orders/{orderId}/transfer
+      - kind: textField
+        label: Message
+        operation: transferOrderTickets
+        provenance: contract orders.yaml POST /orders/{orderId}/transfer
   states:
     loading: Sending by email and rendering the QR
     error: '**The order is paid and the ticket exists.** Email and on-screen QR, and the kiosk marks itself
       degraded rather than dead'
     emptyFirstRun: Not applicable
-    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
-      data* and sends somebody to support with the wrong question.
     offline: Not applicable
   apis:
   - operationId: transferOrderTickets
@@ -1125,12 +1206,20 @@ screens:
     - KSK-001
     - KSK-002
     - KSK-003
+    - KSK-012
     inferred: false
     entryFrom:
     - KSK-003
     notes: '**Reached from KSK-003** — collecting is an alternative to buying, offered at the start. Stated
       on 4 September: this screen exited somewhere and nothing exited to it, so it was outside the navigation
       graph entirely.'
+    transitions:
+    - to: KSK-012
+      trigger: Booking found
+      carries:
+      - orderId
+      provenance: derived — KSK-012 declares entryState.params orderId and KSK-011 holds orderId, so an
+        edge into it carries them
   notes: Definition derived from the wireframe board on 14 August. Components, states and operations still
     to be written.
   density: touchLarge
@@ -1147,7 +1236,7 @@ screens:
       slot: record
       components:
       - kind: detailPanel
-        label: The selected collect booking
+        label: The order
         bindsTo: Order
         columns:
         - Order.id
@@ -1168,40 +1257,33 @@ screens:
         - Order.principalId
         operation: getOrder
         provenance: contract orders.yaml GET /orders/{orderId}
-    - name: actionBar
-      slot: rowActions
-      components:
-      - kind: primaryButton
-        label: Lookup
-        operation: lookupShopAndDrop
-        provenance: contract retail.yaml GET /shop-and-drop/lookup
-    - name: contentBody
-      slot: carried
-      components:
-      - kind: detailPanel
-        notes: Structure from the wireframe board. Components not yet enumerated.
-        provenance: carried from the previous definition
       - kind: searchField
         derived: true
         impliedBy: lookupShopAndDrop
         label: Search
         notes: A search that returns nothing must say so differently from a search not yet run.
         provenance: carried from the previous definition
+    - name: actionBar
+      slot: rowActions
+      components:
+      - kind: primaryButton
+        label: Lookup shop and drop
+        operation: lookupShopAndDrop
+        provenance: contract retail.yaml GET /shop-and-drop/lookup
   states:
-    loading: The collect booking list.
+    loading: The collect booking, read by `getOrder`.
     error: Could not load. Names which read failed and leaves the collect booking untouched.
-    emptyFirstRun: No collect booking yet. Carries the create action; distinct from a filter that matched
-      nothing.
-    emptyNoResults: The filter narrowed it and the collect booking are still there. Names the active filter
-      and offers to clear it.
-    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
-      data* and sends somebody to support with the wrong question.
+    emptyFirstRun: No collect booking yet. **Offers no create action** — this screen declares no operation
+      that makes one — and says so rather than showing an empty table.
+    emptyNoAccess: Shown when the caller lacks `ORDER_VIEW`, which `getOrder` requires, and names that
+      permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support
+      with the wrong question.
     offline: Not available
   apis:
   - operationId: lookupShopAndDrop
     contract: retail
     purpose: Find a guest's dropped goods
-    trigger: onLoad
+    trigger: onAction
   - operationId: getOrder
     contract: orders
     purpose: Read an order
@@ -1253,11 +1335,6 @@ screens:
   patternReason: the screen declares only writes (`transferOrderTickets`) and no read of a population
     — it is settings, not a list
   purpose: Confirm it is the right booking, then print.
-  gaps:
-  - operation: transferOrderTickets
-    why: '**`transferOrderTickets` declares no request body shape**, so nothing says what this editor
-      edits. The fields cannot be derived and the screen needs the contract before it needs a designer.'
-    source: contract orders.yaml POST /orders/{orderId}/transfer
   layout:
     template: form
     regions:
@@ -1265,27 +1342,30 @@ screens:
       slot: publish
       components:
       - kind: primaryButton
-        label: Transfer
+        label: Transfer order tickets
         operation: transferOrderTickets
         provenance: contract orders.yaml POST /orders/{orderId}/transfer
     - name: contentBody
       slot: carried
       components:
-      - kind: detailPanel
-        notes: Structure from the wireframe board. Components not yet enumerated.
-        provenance: carried from the previous definition
-      - kind: secondaryButton
-        label: Cancel
-        notes: '**A screen that can submit must be leaveable without submitting.**'
-        derived: true
-        impliedBy: transferOrderTickets
-        provenance: carried from the previous definition
+      - kind: multiSelect
+        label: Ticket ids
+        operation: transferOrderTickets
+        notes: Required.
+        provenance: contract orders.yaml POST /orders/{orderId}/transfer
+      - kind: textField
+        label: Recipient
+        operation: transferOrderTickets
+        notes: Required.
+        provenance: contract orders.yaml POST /orders/{orderId}/transfer
+      - kind: textField
+        label: Message
+        operation: transferOrderTickets
+        provenance: contract orders.yaml POST /orders/{orderId}/transfer
   states:
     loading: Booking detail
     error: Not found. Offers KSK-013
     emptyFirstRun: No booking for that reference
-    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
-      data* and sends somebody to support with the wrong question.
     offline: Not available
   apis:
   - operationId: transferOrderTickets
@@ -1352,27 +1432,20 @@ screens:
       slot: publish
       components:
       - kind: primaryButton
-        label: End
+        label: End kiosk assist
         operation: endKioskAssist
         provenance: contract marketing-crm.yaml POST /kiosk-assists/{sessionId}/end
     - name: contentBody
-      slot: carried
       components:
-      - kind: detailPanel
-        notes: Structure from the wireframe board. Components not yet enumerated.
-        provenance: carried from the previous definition
       - kind: secondaryButton
         label: Cancel
         notes: '**A screen that can submit must be leaveable without submitting.**'
         derived: true
         impliedBy: endKioskAssist
-        provenance: carried from the previous definition
   states:
     loading: Alerting staff
     error: '**Cannot reach staff.** Shows the counter location and opening hours instead of a spinner'
     emptyFirstRun: Not applicable
-    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
-      data* and sends somebody to support with the wrong question.
     offline: Shows the counter location
   apis:
   - operationId: endKioskAssist
@@ -1434,19 +1507,11 @@ screens:
     template: split
     regions:
     - name: contentBody
-      slot: carried
-      components:
-      - kind: detailPanel
-        notes: Structure from the wireframe board. Components not yet enumerated.
-        provenance: carried from the previous definition
+      components: []
   states:
     loading: Not applicable
     error: This is the error state
     emptyFirstRun: Not applicable
-    emptyNoResults: The filter narrowed it and the out service are still there. Names the active filter
-      and offers to clear it.
-    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
-      data* and sends somebody to support with the wrong question.
     offline: This is the offline state. It does not attempt a cached sale
   apis: []
   wireframe:
@@ -1486,6 +1551,9 @@ screens:
       operation: handoverToAgent
       crossesDevice: true
       back: false
+      carries:
+      - caseId
+      - conversationId
   notes: 'Added 17 August for 2.1.28, which names the kiosk explicitly and was the only surface with no
     AI screen. **Scoped to `guestCapabilityScope`** — ticket selection, promotions, FAQs, recommendations
     and checkout, and nothing else. **No keyboard**: voice or a constrained touch interface, which is
@@ -1504,17 +1572,32 @@ screens:
   purpose: Help a guest choose and pay, and nothing else.
   gaps:
   - operation: getAvailability
-    why: '**1 declared operation reach no component on this screen**: getAvailability. Either the screen
-      is missing what calls them, or the declaration is residue.'
-    source: the screen's own declarations
+    why: '**`getAvailability` declares its response inline**, so the component that shows it names fields
+      but binds to no schema. The contract should name the shape.'
+    source: contract catalogue.yaml GET /availability
   layout:
     template: split
     regions:
     - name: contentBody
       slot: collection
       components:
+      - kind: textField
+        label: Venue id
+        operation: listProducts
+        notes: Sends `?venueId=` to `listProducts`.
+        provenance: contract catalogue.yaml GET /products
+      - kind: textField
+        label: Kind
+        operation: listProducts
+        notes: Sends `?kind=` to `listProducts`.
+        provenance: contract catalogue.yaml GET /products
+      - kind: toggle
+        label: Is sellable
+        operation: listProducts
+        notes: Sends `?isSellable=` to `listProducts`.
+        provenance: contract catalogue.yaml GET /products
       - kind: dataTable
-        label: Every assistant
+        label: Every product
         bindsTo: Product
         columns:
         - Product.id
@@ -1531,45 +1614,34 @@ screens:
         - Product.onSaleTo
         operation: listProducts
         provenance: contract catalogue.yaml GET /products
+      - kind: dataTable
+        label: Availability
+        operation: getAvailability
+        notes: Shows `channelCapacityId`, `performanceId`, `capacity`, `sold`, `leased`, `remaining`,
+          `byChannel` from `getAvailability`'s inline response. **The response has no named schema**,
+          so this cannot bind until the contract names one.
+        provenance: contract catalogue.yaml GET /availability
     - name: actionBar
       slot: rowActions
       components:
       - kind: primaryButton
-        label: Send
+        label: Send AI message
         operation: sendAiMessage
         provenance: contract ai.yaml POST /conversations/{conversationId}/messages
       - kind: secondaryButton
-        label: Handover
+        label: Handover to agent
         operation: handoverToAgent
         provenance: contract marketing-crm.yaml POST /conversations/{conversationId}/handover
-    - name: contentBody
-      slot: carried
-      components:
-      - kind: primaryButton
-        derived: true
-        impliedBy: sendAiMessage
-        label: Send ai message
-        provenance: carried from the previous definition
-      - kind: cardList
-        derived: true
-        impliedBy: listProducts
-        notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
-          a venue''s busiest hour is a list that skips rows.'
-        provenance: carried from the previous definition
-      - kind: secondaryButton
-        label: Cancel
-        notes: '**A screen that can submit must be leaveable without submitting.**'
-        derived: true
-        impliedBy: sendAiMessage
-        provenance: carried from the previous definition
   states:
     loading: The assistant list.
     error: Could not load. Names which read failed and leaves the assistant untouched.
-    emptyFirstRun: No assistant yet. Carries the create action; distinct from a filter that matched nothing.
-    emptyNoResults: The filter narrowed it and the assistant are still there. Names the active filter
-      and offers to clear it.
-    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
-      data* and sends somebody to support with the wrong question.
+    emptyFirstRun: No assistant yet. **Offers no create action** — this screen declares no operation that
+      makes one — and says so rather than showing an empty table.
+    emptyNoResults: Nothing matches the filter on venueId, kind, isSellable and the assistant are still
+      there. Names the active filter and offers to clear it.
+    emptyNoAccess: Shown when the caller lacks `PRODUCT_VIEW`, which `listProducts` requires, and names
+      that permission. **Never an empty table** — that reads as *there is no data* and sends somebody
+      to support with the wrong question.
   apis:
   - operationId: sendAiMessage
     contract: ai
@@ -1608,6 +1680,36 @@ screens:
   apisNote: Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack
     — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
     to the ones that matter is work a person still owes this screen.
+  overlays:
+  - id: formSendAiMessage
+    component: modal
+    trigger: Send AI message
+    body: '**Collects what `sendAiMessage` sends before it is called.** Required: `content`. Optional:
+      `collectionIds`. Dismissing sends nothing; the screen behind is unchanged.'
+    confirm:
+      label: Send AI message
+      operation: sendAiMessage
+    dismiss:
+      label: Cancel
+      discards:
+      - content
+      - collectionIds
+    provenance: contract ai.yaml POST /conversations/{conversationId}/messages
+  - id: formHandoverToAgent
+    component: modal
+    trigger: Handover to agent
+    body: '**Collects what `handoverToAgent` sends before it is called.** Required: `reason`. Optional:
+      `summary`, `preferredQueueId`. Dismissing sends nothing; the screen behind is unchanged.'
+    confirm:
+      label: Handover to agent
+      operation: handoverToAgent
+    dismiss:
+      label: Cancel
+      discards:
+      - reason
+      - summary
+      - preferredQueueId
+    provenance: contract marketing-crm.yaml POST /conversations/{conversationId}/handover
 - id: KSK-016
   name: Order Food
   module: Sell
@@ -1627,10 +1729,9 @@ screens:
     - to: KSK-017
       trigger: Shop
       carries:
-      - cartId
       - outletId
-      provenance: derived — KSK-017 declares entryState.params cartId, outletId, so an edge into it must
-        carry them
+      provenance: derived — KSK-017 declares entryState.params outletId and KSK-016 holds outletId, so
+        an edge into it carries them
   notes: BL-066. **Every operation existed and no screen called them** — `getGuestMenu` and `createGuestFnbOrder`
     are contracted and guest-callable, and P05 had fifteen screens selling neither food nor merchandise.
   density: touchLarge
@@ -1647,7 +1748,7 @@ screens:
       slot: record
       components:
       - kind: detailPanel
-        label: The selected order food
+        label: The guest menu
         bindsTo: GuestMenu
         columns:
         - GuestMenu.outletId
@@ -1659,16 +1760,6 @@ screens:
         - GuestMenu.sections
         operation: getGuestMenu
         provenance: contract fnb.yaml GET /outlets/{outletId}/guest-menu
-    - name: actionBar
-      slot: rowActions
-      components:
-      - kind: primaryButton
-        label: Create
-        operation: createGuestFnbOrder
-        provenance: contract fnb.yaml POST /guest-orders
-    - name: contentBody
-      slot: carried
-      components:
       - kind: cardList
         bindsTo: Menu
         notes: Photographs, because **a guest at a kiosk with a queue behind them is not reading descriptions**
@@ -1680,6 +1771,13 @@ screens:
       - kind: primaryButton
         label: Add to order
         provenance: carried from the previous definition
+    - name: actionBar
+      slot: rowActions
+      components:
+      - kind: primaryButton
+        label: Create guest F&B order
+        operation: createGuestFnbOrder
+        provenance: contract fnb.yaml POST /guest-orders
   states:
     loading: The menu, with the first category open
     error: Could not load the menu. **The kiosk still sells tickets** — one outlet being unreachable does
@@ -1717,6 +1815,29 @@ screens:
   apisNote: Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack
     — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
     to the ones that matter is work a person still owes this screen.
+  overlays:
+  - id: formCreateGuestFnbOrder
+    component: modal
+    trigger: Create guest F&B order
+    body: '**Collects what `createGuestFnbOrder` sends before it is called.** Required: `id`, `lines`,
+      `quotedTotal`, `recordedAt`. Optional: `locationSessionId`, `outletId`, `fulfilment`, `paymentMethod`.
+      Dismissing sends nothing; the screen behind is unchanged.'
+    bindsTo: CreateGuestOrderRequest
+    confirm:
+      label: Create guest F&B order
+      operation: createGuestFnbOrder
+    dismiss:
+      label: Cancel
+      discards:
+      - id
+      - lines
+      - quotedTotal
+      - recordedAt
+      - locationSessionId
+      - outletId
+      - fulfilment
+      - paymentMethod
+    provenance: contract fnb.yaml POST /guest-orders
 - id: KSK-017
   name: Shop
   module: Sell
@@ -1741,8 +1862,8 @@ screens:
       trigger: Order Food
       carries:
       - outletId
-      provenance: derived — KSK-016 declares entryState.params outletId, so an edge into it must carry
-        them
+      provenance: derived — KSK-016 declares entryState.params outletId and KSK-017 holds outletId, so
+        an edge into it carries them
   notes: 'BL-066, BL-019. **A guest can browse and reserve and not buy**, which is where retail stops
     for a guest surface — `createRetailSale` is a till operation. **Cross-surface parity, 31 August**:
     added addCartLine, lookupMerchandise. **A guest does not know which surface they are on** — the same
@@ -1760,8 +1881,28 @@ screens:
     - name: contentBody
       slot: collection
       components:
+      - kind: textField
+        label: Outlet id
+        operation: listMerchandise
+        notes: Sends `?outletId=` to `listMerchandise`.
+        provenance: contract retail.yaml GET /merchandise
+      - kind: textField
+        label: Category id
+        operation: listMerchandise
+        notes: Sends `?categoryId=` to `listMerchandise`.
+        provenance: contract retail.yaml GET /merchandise
+      - kind: toggle
+        label: In stock only
+        operation: listMerchandise
+        notes: Sends `?inStockOnly=` to `listMerchandise`.
+        provenance: contract retail.yaml GET /merchandise
+      - kind: searchField
+        label: Search
+        operation: listMerchandise
+        notes: Sends `?search=` to `listMerchandise`.
+        provenance: contract retail.yaml GET /merchandise
       - kind: dataTable
-        label: Every shop
+        label: Every merchandise
         bindsTo: MerchandiseItem
         columns:
         - MerchandiseItem.id
@@ -1778,11 +1919,22 @@ screens:
         - MerchandiseItem.returnWindowDays
         operation: listMerchandise
         provenance: contract retail.yaml GET /merchandise
+      - kind: multiSelect
+        label: Size
+        provenance: carried from the previous definition
+      - kind: primaryButton
+        label: Add
+        provenance: carried from the previous definition
+      - kind: secondaryButton
+        label: Reserve for collection
+        notes: BL-019. **Reserve is not buy** — the guest pays at a till or on the app, and this screen
+          is honest about which
+        provenance: carried from the previous definition
     - name: contextPanel
       slot: selection
       components:
       - kind: detailPanel
-        label: The selected shop
+        label: The selected merchandise
         bindsTo: MerchandiseItem
         columns:
         - MerchandiseItem.id
@@ -1806,31 +1958,17 @@ screens:
       slot: rowActions
       components:
       - kind: primaryButton
-        label: Reserve
+        label: Reserve merchandise
         operation: reserveMerchandise
         provenance: contract retail.yaml POST /outlets/{outletId}/reserve
       - kind: secondaryButton
-        label: Add
+        label: Add cart line
         operation: addCartLine
         provenance: contract orders.yaml POST /carts/{cartId}/lines
       - kind: secondaryButton
-        label: Lookup
+        label: Lookup merchandise
         operation: lookupMerchandise
         provenance: contract retail.yaml GET /merchandise/lookup
-    - name: contentBody
-      slot: carried
-      components:
-      - kind: multiSelect
-        label: Size
-        provenance: carried from the previous definition
-      - kind: primaryButton
-        label: Add
-        provenance: carried from the previous definition
-      - kind: secondaryButton
-        label: Reserve for collection
-        notes: BL-019. **Reserve is not buy** — the guest pays at a till or on the app, and this screen
-          is honest about which
-        provenance: carried from the previous definition
   states:
     loading: Products with stock, in-stock first
     error: Could not load. Tickets and food are unaffected.
@@ -1859,7 +1997,7 @@ screens:
   - operationId: lookupMerchandise
     contract: retail
     purpose: Price and stock check by barcode
-    trigger: onLoad
+    trigger: onAction
   entryState:
     params:
     - name: outletId
@@ -1883,3 +2021,42 @@ screens:
   apisNote: Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack
     — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
     to the ones that matter is work a person still owes this screen.
+  overlays:
+  - id: formReserveMerchandise
+    component: modal
+    trigger: Reserve merchandise
+    body: '**Collects what `reserveMerchandise` sends before it is called.** Required: `id`, `lines`,
+      `expiresAt`. Optional: `subjectId`, `collectionNote`. Dismissing sends nothing; the screen behind
+      is unchanged.'
+    confirm:
+      label: Reserve merchandise
+      operation: reserveMerchandise
+    dismiss:
+      label: Cancel
+      discards:
+      - id
+      - lines
+      - expiresAt
+      - subjectId
+      - collectionNote
+    provenance: contract retail.yaml POST /outlets/{outletId}/reserve
+  - id: formAddCartLine
+    component: modal
+    trigger: Add cart line
+    body: '**Collects what `addCartLine` sends before it is called.** Required: `variantId`, `quantity`.
+      Optional: `performanceId`, `seatIds`, `parentLineId`, `attributes`. Dismissing sends nothing; the
+      screen behind is unchanged.'
+    bindsTo: AddCartLineRequest
+    confirm:
+      label: Add cart line
+      operation: addCartLine
+    dismiss:
+      label: Cancel
+      discards:
+      - variantId
+      - quantity
+      - performanceId
+      - seatIds
+      - parentLineId
+      - attributes
+    provenance: contract orders.yaml POST /carts/{cartId}/lines

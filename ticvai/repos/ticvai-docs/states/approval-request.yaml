@@ -13,7 +13,6 @@ initial:
 - pending
 terminal:
 - approved
-- rejected
 - withdrawn
 - expired
 - cancelled

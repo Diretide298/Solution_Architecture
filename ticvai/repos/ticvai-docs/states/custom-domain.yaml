@@ -78,8 +78,7 @@ transitions:
   guard: '**Rate limited or refused.** Retryable.'
 - from: active
   to: expired
-  trigger: expire
-  operation: listCustomDomains
+  trigger: job
   guard: '**Renewal did not happen.** The domain stops serving, and that is a page a guest sees.'
 - from: expired
   to: issuing

@@ -266,6 +266,8 @@ operations:
   reads:
   - cache:resolution
   - control.footer_config
+  - control.footer_config_column
+  - control.footer_config_social_link
   - whitelabel.feature_toggle
   - whitelabel.homepage_section
   - whitelabel.module_enablement
@@ -421,6 +423,8 @@ operations:
   reads:
   - cache:idempotency
   - control.footer_config
+  - control.footer_config_column
+  - control.footer_config_social_link
   - whitelabel.feature_toggle
   - whitelabel.homepage_section
   - whitelabel.module_enablement
@@ -533,10 +537,14 @@ operations:
   reads:
   - cache:idempotency
   - control.footer_config
+  - control.footer_config_column
+  - control.footer_config_social_link
   writes:
   - cache:idempotency
   - cache:resolution
   - control.footer_config
+  - control.footer_config_column
+  - control.footer_config_social_link
 - operation: setHeader
   verb: PUT
   path: /tenant-config/header

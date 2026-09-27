@@ -341,6 +341,187 @@ def module_affinity():
     return out
 
 
+# ---------------------------------------------------------------- triggers
+
+CONTRACTS = os.path.join(ROOT, 'contracts')
+
+# **A query parameter a person types or scans.** `searchCatalogue` requires `q` (minLength 2),
+# `resolveProductByCode` requires `code`: fired on load they are a guaranteed 400, because the
+# value does not exist until somebody enters it. Range bounds (`from`, `to`, `period`) and scope
+# (`venueId`, `tenantId`) are left out on purpose: whether a report opens on a default range is a
+# product decision this rule does not make.
+TYPED_INPUTS = frozenset(['q', 'code', 'barcode', 'sku', 'cardCode', 'identifier'])
+
+# **A `lookup` resolves a key somebody typed or scanned**, even where the contract makes every
+# parameter optional: `lookupMerchandise` has optional `barcode` and `sku` and answers 400
+# *Neither barcode nor SKU supplied*. There is nothing to look up until a key is entered.
+LOOKUP_PREFIX = ('lookup',)
+
+
+def _yaml_node(cache, path):
+    if path not in cache:
+        try:
+            cache[path] = yaml.safe_load(io.open(path, encoding='utf8')) or {}
+        except (IOError, OSError, yaml.YAMLError):
+            cache[path] = {}
+    return cache[path]
+
+
+def _deref(param, base, cache):
+    ref = param.get('$ref') if isinstance(param, dict) else None
+    if not ref:
+        return param if isinstance(param, dict) else {}
+    fpart, _h, ptr = ref.partition('#')
+    target = os.path.normpath(os.path.join(os.path.dirname(base), fpart)) if fpart else base
+    node = _yaml_node(cache, target)
+    for key in [k for k in ptr.strip('/').split('/') if k]:
+        node = node.get(key.replace('~1', '/').replace('~0', '~'), {}) if isinstance(node, dict) else {}
+    return node if isinstance(node, dict) else {}
+
+
+def operation_inputs():
+    """operationId -> {method, path, path_params, required_query}, read from the contracts.
+
+    **The lineage knows the verb but not the parameters**, and the parameters are what decide
+    whether a read can run the moment a screen opens: `getBillingStatement` is a GET, and it
+    still cannot load until something names the statement.
+    """
+    cache = {}
+    out = {}
+    for f in glob.glob(os.path.join(CONTRACTS, '**', '*.yaml'), recursive=True):
+        d = _yaml_node(cache, f)
+        for path, item in (d.get('paths') or {}).items():
+            if not isinstance(item, dict):
+                continue
+            shared = item.get('parameters') or []
+            for method, op in item.items():
+                if method not in ('get', 'post', 'put', 'patch', 'delete') or not isinstance(op, dict):
+                    continue
+                oid = op.get('operationId')
+                if not oid:
+                    continue
+                req_q = []
+                for p in list(shared) + list(op.get('parameters') or []):
+                    p = _deref(p, f, cache)
+                    if p.get('in') == 'query' and p.get('required'):
+                        req_q.append(p.get('name'))
+                out[oid] = {
+                    'method': method,
+                    'path': path,
+                    'path_params': re.findall(r'\{([^}]+)\}', path),
+                    'required_query': req_q,
+                }
+    return out
+
+
+def is_mutation(info, rec):
+    """True when calling the operation changes state. A GET never does.
+
+    **The method alone over-reports.** `simulateCommercialPackage`, `quoteRentalPrice` and
+    `evaluatePromotions` are POSTs that write nothing but the idempotency cache, and a screen
+    showing a quote may reasonably ask for it on open. What decides is whether the operation
+    writes anything a person would have to undo — the lineage records that.
+    """
+    method = ((info or {}).get('method') or (rec or {}).get('verb') or '').lower()
+    if method == 'get':
+        return False
+    if rec is None:
+        return bool(method)
+    return any(not str(w).startswith('cache:') for w in (rec.get('writes') or []))
+
+
+def _collections_on_load(screen, inputs, skip_index):
+    """The paths of the collections the screen loads when it opens."""
+    out = set()
+    for i, a in enumerate(screen.get('apis') or []):
+        if i == skip_index or a.get('trigger') != 'onLoad':
+            continue
+        info = inputs.get(a.get('operationId'))
+        if info and info['method'] == 'get' and not re.search(r'\{[^}]+\}$', info['path']):
+            out.add(info['path'].rstrip('/'))
+    return out
+
+
+def unsupplied_inputs(oid, screen, inputs, screen_ids, skip_index=None):
+    """The inputs `oid` needs that nothing hands this screen before it opens.
+
+    An input counts as supplied when `entryState.params` names it and says where it comes
+    from in a way the schema recognises: `session`, or the id of the screen that hands it
+    over. `navigation`, or no declaration at all, names nothing.
+
+    **`deepLink` supplies an id unless the screen lists what the id picks from.** `BO-083
+    Suppliers` loads `listSuppliers` (`/suppliers`) and reads `getSupplierPerformance`
+    (`/suppliers/{supplierId}/performance`): the id is the row the user selects, and a deep
+    link is the exception rather than how the screen is entered. `ANL-001` reads
+    `getDashboard(dashboardId)` beside `listAlerts`, which is a different resource, and says
+    a bookmarked dashboard is the normal way in -- that one stays `onLoad`. A typed value
+    (`code`, `cardCode`) carried by a deep link is trusted only on a screen that loads no list.
+    """
+    info = inputs.get(oid)
+    if not info:
+        return []
+    src = {}
+    for p in ((screen.get('entryState') or {}).get('params') or []):
+        if isinstance(p, dict) and p.get('name'):
+            src[p['name']] = p.get('from')
+    lists = None
+    missing = []
+    wanted = list(info['path_params']) + [q for q in info['required_query']
+                                          if q in TYPED_INPUTS and q not in info['path_params']]
+    for name in wanted:
+        fr = src.get(name)
+        if fr == 'session' or (fr and fr in screen_ids):
+            continue
+        if fr == 'deepLink':
+            if lists is None:
+                lists = _collections_on_load(screen, inputs, skip_index)
+            if name in TYPED_INPUTS:
+                picked = bool(lists)
+            else:
+                cut = info['path'].find('{%s}' % name)
+                base = info['path'][:cut].rstrip('/') if cut > 0 else None
+                # the list of the same resource (`/suppliers`), or its catalogue beside it
+                # (`listSsoProviders` at `/auth/sso/providers` for `/auth/sso/{providerId}/...`)
+                picked = bool(base) and any(
+                    l == base or (l.startswith(base + '/') and not l[len(base) + 1:].startswith('{'))
+                    for l in lists)
+            if not picked:
+                continue
+        missing.append(name)
+    if not missing and oid.startswith(LOOKUP_PREFIX):
+        missing.append('a typed or scanned key')
+    return missing
+
+
+def load_trigger(oid, screen, inputs, lineage, screen_ids, skip_index=None):
+    """(trigger, reason) for an operation a screen calls — `onLoad` only when it is safe.
+
+    **The old rule was "a read is onLoad, anything else is onAction", decided by the verb in
+    the operationId.** It ignored two things. An operation that writes must never fire because
+    a page opened: `joinQueue`, `submitReview` and `setSubscription` were all left `onLoad`,
+    so opening the page would join the queue. And a read that needs a value the user has not
+    given yet — `searchCatalogue` without `q`, `getBillingStatement` without a statement —
+    cannot load; it runs when the user acts.
+
+    **An operation only a device calls runs in the `background`.** `recordDeviceHeartbeat`
+    is the peripheral reporting itself; no person on `POS-016` triggers it.
+    """
+    info = inputs.get(oid)
+    rec = lineage.get(oid)
+    if is_mutation(info, rec):
+        if rec and set(rec.get('audience') or []) == {'device'}:
+            return 'background', 'only a device calls it'
+        if rec:
+            writes = [w for w in rec.get('writes') or [] if not str(w).startswith('cache:')]
+            return 'onAction', 'it writes %s' % ', '.join(writes)
+        return 'onAction', 'it is a %s' % (info or {}).get('method', '?').upper()
+    missing = unsupplied_inputs(oid, screen, inputs, screen_ids, skip_index)
+    if missing:
+        return 'onAction', ('it needs %s, which the screen only has once the user enters or '
+                            'selects it' % ', '.join(missing))
+    return 'onLoad', 'a read with every input supplied'
+
+
 def main():
     ops = operations()
     df = build_df(ops)
@@ -432,9 +613,12 @@ def main():
         print('\n  nothing written — pass --apply')
         return
 
-    # **A read is `onLoad`, anything else is `onAction`.** The verb already decided
-    # this when the operation was named, so it is read back rather than guessed again.
-    READ_VERB = ('list', 'get', 'search', 'lookup', 'find', 'export')
+    # **The trigger is decided by `load_trigger`, not by the verb in the name.** Reading
+    # `list`/`get`/`search` as onLoad wired `searchCatalogue` to fire without its required
+    # `q` and let get-by-id reads load before anything named the record (audit R268).
+    inputs = operation_inputs()
+    lineage = {oid: r for oid, (_v, _e, r) in ops.items()}
+    screen_ids = {s.get('id') for _f, s in declared.values() if s.get('id')}
     written = 0
     for f, screens_ in sorted(per_file.items()):
         d = yaml.safe_load(io.open(f, encoding='utf8'))
@@ -448,12 +632,12 @@ def main():
                 if oid in have:
                     continue
                 r = ops[oid][2]
-                verb = re.match(r'[a-z]+', oid).group(0)
+                trigger, _why = load_trigger(oid, s, inputs, lineage, screen_ids)
                 s.setdefault('apis', []).append({
                     'operationId': oid,
                     'contract': owner.get(oid, '?'),
                     'purpose': (r.get('summary') or '').strip() or 'Derived from the screen tasks',
-                    'trigger': 'onLoad' if verb in READ_VERB else 'onAction',
+                    'trigger': trigger,
                     'provenance': 'derived — task linkage, 19 September 2026',
                 })
                 written += 1

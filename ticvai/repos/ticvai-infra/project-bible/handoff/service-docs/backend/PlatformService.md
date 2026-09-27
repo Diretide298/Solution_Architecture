@@ -52,7 +52,7 @@ A module or limit increase sold separately. Add-ons survive a plan change unless
 | Offline | no |
 | Conflict policy | serverWins |
 | Reads | `cache:idempotency`, `control.licence_add_on` |
-| Writes | `cache:idempotency`, `control.licence_add_on` |
+| Writes | `cache:idempotency`, `control.licence_add_on`, `control.licence_add_on_limit` |
 | Called by | ADM-005, ADM-007, ADM-011, ADM-422 |
 
 **Parameters**
@@ -66,6 +66,7 @@ A module or limit increase sold separately. Add-ons survive a plan change unless
 
 | Field | Type | Required | Notes |
 |---|---|---|---|
+| tenantId | string (uuid) |  | The tenant the add-on was sold to — the tenantId in the path, never the body. (read-only) |
 | moduleKey | string | yes |  |
 | limitOverrides | array of EntitlementLimit |  |  |
 | limitOverrides[].metric | UsageMetric: enum (venues, workstations, activeUsers, devices, brandedApps, aiTokens, apiCalls, storageGb, …) | yes |  |
@@ -126,8 +127,8 @@ A plan bundles licensed modules, entitlement limits and a cell tier. Plans are v
 | Wave | 2 |
 | Offline | no |
 | Conflict policy | serverWins |
-| Reads | `cache:idempotency`, `subscription.plan` |
-| Writes | `cache:idempotency`, `subscription.plan` |
+| Reads | `cache:idempotency`, `subscription.plan`, `subscription.plan_limit`, `subscription.plan_module` |
+| Writes | `cache:idempotency`, `subscription.plan`, `subscription.plan_limit` |
 | Called by | ADM-008, ADM-019, ADM-392 |
 
 **Parameters**
@@ -211,8 +212,8 @@ Existing subscribers remain on their version until migrated deliberately. A pric
 | Wave | 2 |
 | Offline | no |
 | Conflict policy | serverWins |
-| Reads | `cache:idempotency`, `subscription.plan` |
-| Writes | `cache:idempotency`, `subscription.plan` |
+| Reads | `cache:idempotency`, `subscription.plan`, `subscription.plan_limit`, `subscription.plan_module` |
+| Writes | `cache:idempotency`, `subscription.plan`, `subscription.plan_limit` |
 | Called by | ADM-008, ADM-019, ADM-398 |
 
 **Parameters**
@@ -304,6 +305,7 @@ Silently switching off a module a venue is trading on is not an acceptable conse
 | Reads | `cache:idempotency`, `subscription.contract` |
 | Writes | `cache:idempotency`, `subscription.contract` |
 | Called by | ADM-008, ADM-011, ADM-410, ADM-417, ADM-463, SGN-019, SGN-024 |
+| State model | Tenant subscription ([states/subscription.yaml](../../../states/subscription.yaml)): moves `trial` -> `active`, `pastDue` -> `active`, `cancelled` -> `active` |
 
 **Parameters**
 
@@ -367,6 +369,7 @@ Creates the record only. **No cell exists until a region is provisioned** — a 
 | Reads | `cache:idempotency`, `control.tenant` |
 | Writes | `cache:idempotency`, `control.tenant` |
 | Called by | ADM-005, ADM-419 |
+| State model | Tenant ([states/tenant.yaml](../../../states/tenant.yaml)): created as `onboarding` |
 
 **Parameters**
 
@@ -395,11 +398,18 @@ Creates the record only. **No cell exists until a region is provisioned** — a 
 | status | TenantStatus: enum (onboarding, active, suspended, terminating, terminated) | yes |  |
 | suspensionMode | SuspensionMode: enum (readOnly, noNewSales, fullLockout) |  | Access validation continues under every mode. |
 | suspensionReason | string |  | (nullable) |
+| suspensionEffectiveAt | string (date-time) |  | When the suspension takes, or took, effect — suspendTenant.effectiveAt. (nullable) |
+| suspensionNoticeMessage | LocalisedText |  | The notice shown to the tenant's users about the suspension — suspendTenant.noticeMessage. |
+| terminationScheduledAt | string (date-time) |  | When terminateTenant started the retention window. (nullable) |
+| terminationRetentionUntil | string (date-time) |  | terminationScheduledAt plus the request's retentionDays. (nullable) |
+| terminationReason | string |  | (max length 1000; nullable) |
+| terminationRequestedByPrincipalId | string (uuid) |  | (nullable) |
 | planId | string (uuid) |  | (nullable) |
 | planName | string |  | (nullable) |
 | cellCount | integer |  |  |
 | venueCount | integer |  |  |
 | billingEmail | string |  |  |
+| billingAddress | string |  | Accepted by createTenant and updateTenant; stored here so the response can return what was sent. (max length 500; nullable) |
 | accountManagerPrincipalId | string (uuid) |  | (nullable) |
 | createdAt | string (date-time) | yes |  |
 | activatedAt | string (date-time) |  | (nullable) |
@@ -426,6 +436,7 @@ Creates the record only. **No cell exists until a region is provisioned** — a 
 | Reads | `cache:idempotency`, `control.tenant` |
 | Writes | `cache:idempotency`, `control.tenant` |
 | Called by | ADM-005 |
+| State model | Cell ([states/cell.yaml](../../../states/cell.yaml)): moves `suspended` -> `active`<br/>Tenant ([states/tenant.yaml](../../../states/tenant.yaml)): moves `suspended` -> `active`, `terminating` -> `active` |
 
 **Parameters**
 
@@ -444,11 +455,18 @@ Creates the record only. **No cell exists until a region is provisioned** — a 
 | status | TenantStatus: enum (onboarding, active, suspended, terminating, terminated) | yes |  |
 | suspensionMode | SuspensionMode: enum (readOnly, noNewSales, fullLockout) |  | Access validation continues under every mode. |
 | suspensionReason | string |  | (nullable) |
+| suspensionEffectiveAt | string (date-time) |  | When the suspension takes, or took, effect — suspendTenant.effectiveAt. (nullable) |
+| suspensionNoticeMessage | LocalisedText |  | The notice shown to the tenant's users about the suspension — suspendTenant.noticeMessage. |
+| terminationScheduledAt | string (date-time) |  | When terminateTenant started the retention window. (nullable) |
+| terminationRetentionUntil | string (date-time) |  | terminationScheduledAt plus the request's retentionDays. (nullable) |
+| terminationReason | string |  | (max length 1000; nullable) |
+| terminationRequestedByPrincipalId | string (uuid) |  | (nullable) |
 | planId | string (uuid) |  | (nullable) |
 | planName | string |  | (nullable) |
 | cellCount | integer |  |  |
 | venueCount | integer |  |  |
 | billingEmail | string |  |  |
+| billingAddress | string |  | Accepted by createTenant and updateTenant; stored here so the response can return what was sent. (max length 500; nullable) |
 | accountManagerPrincipalId | string (uuid) |  | (nullable) |
 | createdAt | string (date-time) | yes |  |
 | activatedAt | string (date-time) |  | (nullable) |
@@ -478,6 +496,7 @@ Graceful and reversible. Data is retained, cells stay provisioned, and the behav
 | Reads | `cache:idempotency`, `control.tenant` |
 | Writes | `cache:idempotency`, `control.tenant`, `platform.outbox` |
 | Called by | ADM-005 |
+| State model | Cell ([states/cell.yaml](../../../states/cell.yaml)): moves `active` -> `suspended`<br/>Tenant ([states/tenant.yaml](../../../states/tenant.yaml)): moves `active` -> `suspended` |
 
 **Parameters**
 
@@ -505,11 +524,18 @@ Graceful and reversible. Data is retained, cells stay provisioned, and the behav
 | status | TenantStatus: enum (onboarding, active, suspended, terminating, terminated) | yes |  |
 | suspensionMode | SuspensionMode: enum (readOnly, noNewSales, fullLockout) |  | Access validation continues under every mode. |
 | suspensionReason | string |  | (nullable) |
+| suspensionEffectiveAt | string (date-time) |  | When the suspension takes, or took, effect — suspendTenant.effectiveAt. (nullable) |
+| suspensionNoticeMessage | LocalisedText |  | The notice shown to the tenant's users about the suspension — suspendTenant.noticeMessage. |
+| terminationScheduledAt | string (date-time) |  | When terminateTenant started the retention window. (nullable) |
+| terminationRetentionUntil | string (date-time) |  | terminationScheduledAt plus the request's retentionDays. (nullable) |
+| terminationReason | string |  | (max length 1000; nullable) |
+| terminationRequestedByPrincipalId | string (uuid) |  | (nullable) |
 | planId | string (uuid) |  | (nullable) |
 | planName | string |  | (nullable) |
 | cellCount | integer |  |  |
 | venueCount | integer |  |  |
 | billingEmail | string |  |  |
+| billingAddress | string |  | Accepted by createTenant and updateTenant; stored here so the response can return what was sent. (max length 500; nullable) |
 | accountManagerPrincipalId | string (uuid) |  | (nullable) |
 | createdAt | string (date-time) | yes |  |
 | activatedAt | string (date-time) |  | (nullable) |
@@ -538,6 +564,7 @@ A tenant with unsettled ledger balances cannot be terminated — the money has t
 | Reads | `cache:idempotency`, `subscription.contract`, `control.tenant` |
 | Writes | `cache:idempotency`, `subscription.contract`, `control.tenant` |
 | Called by | ADM-005 |
+| State model | Tenant ([states/tenant.yaml](../../../states/tenant.yaml)): moves `active` -> `terminating`, `suspended` -> `terminating` |
 
 **Parameters**
 
@@ -588,6 +615,7 @@ A tenant with unsettled ledger balances cannot be terminated — the money has t
 | Reads | `cache:idempotency`, `control.tenant` |
 | Writes | `cache:idempotency`, `control.tenant` |
 | Called by | ADM-005, ADM-006 |
+| State model | Tenant ([states/tenant.yaml](../../../states/tenant.yaml)): moves `onboarding` -> `active` |
 
 **Parameters**
 
@@ -615,11 +643,18 @@ A tenant with unsettled ledger balances cannot be terminated — the money has t
 | status | TenantStatus: enum (onboarding, active, suspended, terminating, terminated) | yes |  |
 | suspensionMode | SuspensionMode: enum (readOnly, noNewSales, fullLockout) |  | Access validation continues under every mode. |
 | suspensionReason | string |  | (nullable) |
+| suspensionEffectiveAt | string (date-time) |  | When the suspension takes, or took, effect — suspendTenant.effectiveAt. (nullable) |
+| suspensionNoticeMessage | LocalisedText |  | The notice shown to the tenant's users about the suspension — suspendTenant.noticeMessage. |
+| terminationScheduledAt | string (date-time) |  | When terminateTenant started the retention window. (nullable) |
+| terminationRetentionUntil | string (date-time) |  | terminationScheduledAt plus the request's retentionDays. (nullable) |
+| terminationReason | string |  | (max length 1000; nullable) |
+| terminationRequestedByPrincipalId | string (uuid) |  | (nullable) |
 | planId | string (uuid) |  | (nullable) |
 | planName | string |  | (nullable) |
 | cellCount | integer |  |  |
 | venueCount | integer |  |  |
 | billingEmail | string |  |  |
+| billingAddress | string |  | Accepted by createTenant and updateTenant; stored here so the response can return what was sent. (max length 500; nullable) |
 | accountManagerPrincipalId | string (uuid) |  | (nullable) |
 | createdAt | string (date-time) | yes |  |
 | activatedAt | string (date-time) |  | (nullable) |
@@ -638,34 +673,51 @@ Every table this service owns that the slice reads or writes, with its columns a
 
 | Column | Type | Required | Notes |
 |---|---|---|---|
+| tenant_id | uuid | no | The tenant the add-on was sold to — the tenantId in the path, never the body. |
 | module_key | text | yes |  |
 | list_price | numeric(18,4) | no |  |
 | valid_from | date | no |  |
 | valid_to | date | no |  |
 | note | text | no |  |
 | id | uuid | yes | Synthesised key. |
-| plan_id | uuid | yes | Points at control.subscription_plan. |
+
+### `control.licence_add_on_limit`
+
+| Column | Type | Required | Notes |
+|---|---|---|---|
+| licence_add_on_id | uuid | yes | The parent row. |
+| metric | text | yes |  |
+| limit_value | integer | no | Null means unlimited. |
+| is_overage_allowed | boolean | no |  |
+| overage_unit_price | numeric(18,4) | no |  |
+| id | uuid | yes | Synthesised key. |
 
 ### `control.tenant`
 
 | Column | Type | Required | Notes |
 |---|---|---|---|
-| id | uuid | no |  |
-| code | text | no |  |
-| name | text | no |  |
-| status | text | no |  |
+| id | uuid | yes |  |
+| code | text | yes |  |
+| name | text | yes |  |
+| status | text | yes |  |
 | suspension_mode | text | no |  |
 | suspension_reason | text | no |  |
+| suspension_effective_at | timestamptz | no | When the suspension takes, or took, effect — suspendTenant.effectiveAt. |
+| suspension_notice_message | jsonb | no | The notice shown to the tenant's users about the suspension — suspendTenant.noticeMessage. |
+| termination_scheduled_at | timestamptz | no | When terminateTenant started the retention window. |
+| termination_retention_until | timestamptz | no | terminationScheduledAt plus the request's retentionDays. |
+| termination_reason | text | no |  |
+| termination_requested_by_principal_id | uuid | no |  |
 | plan_id | uuid | no |  |
 | plan_name | text | no |  |
 | cell_count | integer | no |  |
 | venue_count | integer | no |  |
 | billing_email | text | no |  |
+| billing_address | text | no | Accepted by createTenant and updateTenant; stored here so the response can return what was sent. |
 | account_manager_principal_id | uuid | no |  |
-| created_at | timestamptz | no |  |
+| created_at | timestamptz | yes |  |
 | activated_at | timestamptz | no |  |
-| subscription | uuid | no |  |
-| licences | jsonb | no |  |
+| subscription_id | uuid | no |  |
 
 ### `subscription.contract`
 
@@ -687,19 +739,38 @@ Every table this service owns that the slice reads or writes, with its columns a
 
 | Column | Type | Required | Notes |
 |---|---|---|---|
-| code | text | no |  |
-| name | text | no |  |
+| code | text | yes |  |
+| name | text | yes |  |
 | description | text | no |  |
-| cell_tier | text | no |  |
-| base_price | numeric(18,4) | no |  |
+| cell_tier | text | yes |  |
+| base_price | numeric(18,4) | yes |  |
 | billing_period | text | no |  |
 | includes_branded_app | boolean | no | Branded native publishing carries per-tenant operational cost and is priced, not absorbed. |
 | included_ai_tokens | integer | no |  |
-| id | uuid | no |  |
-| version | text | no | Existing subscribers stay on the version they were sold. |
-| is_active | boolean | no |  |
-| subscriber_count | integer | no |  |
+| id | uuid | yes |  |
+| version | text | yes | Existing subscribers stay on the version they were sold. |
+| is_active | boolean | yes |  |
+| subscriber_count | integer | yes |  |
 | published_at | timestamptz | no |  |
+
+### `subscription.plan_limit`
+
+| Column | Type | Required | Notes |
+|---|---|---|---|
+| plan_id | uuid | yes | The parent row. |
+| metric | text | yes |  |
+| limit_value | integer | no | Null means unlimited. |
+| is_overage_allowed | boolean | no |  |
+| overage_unit_price | numeric(18,4) | no |  |
+| id | uuid | yes | Synthesised key. |
+
+### `subscription.plan_module`
+
+| Column | Type | Required | Notes |
+|---|---|---|---|
+| plan_id | uuid | yes | The parent row. |
+| licensed_module | text | yes | One value from ModuleKey. |
+| id | uuid | yes | Synthesised key. |
 
 ## Not in the first release
 

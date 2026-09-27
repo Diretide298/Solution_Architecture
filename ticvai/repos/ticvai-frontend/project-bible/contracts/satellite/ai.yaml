@@ -131,12 +131,14 @@ paths:
                     '
       responses:
         '202':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Proposed as drafts, for review
           content:
             application/json:
               schema:
-                type: object
-                additionalProperties: true
+                $ref: '#/components/schemas/TranslationProposals'
   /ai/suggestions:
     post:
       operationId: requestSuggestion
@@ -214,9 +216,15 @@ paths:
                     suggestion made from a screen uses the numbers the screen is showing — **advice computed
                     from data the manager cannot see is advice they will not trust.**
 
+                    **Open on purpose**: its keys are whatever the calling screen is showing, and it
+                    is recorded as-is into `Suggestion.inputs` so the answer can be reproduced.
+
                     '
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: The suggestion, with its basis and its reasoning
           content:
             application/json:
@@ -231,7 +239,7 @@ paths:
           content:
             application/problem+json:
               schema:
-                $ref: ../shared/common.yaml#/components/schemas/Problem
+                $ref: '#/components/schemas/InsufficientDataProblem'
   /ai/suggestions/{suggestionId}/outcome:
     parameters:
     - name: suggestionId
@@ -274,6 +282,9 @@ paths:
               $ref: '#/components/schemas/SuggestionOutcome'
       responses:
         '201':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Recorded
           content:
             application/json:
@@ -294,6 +305,15 @@ paths:
         **A guard rail is not optional for a `model` basis.** A price suggestion outside a stated band
         is refused and falls back to the rule — **an unbounded model in a pricing path is one bad inference
         from a free lunch for a thousand guests.**
+
+        **Where it is kept.** The assignments are stored on the tenant''s `ai.policy` row, in `AiPolicy.suggestionProviders`,
+        which is what `requestSuggestion` reads to route a kind to its producer. `setAiPolicy` does
+        not change them; this operation is the only writer.
+
+        **What the PUT does.** Each assignment is matched on `kind`. An assignment in the body replaces
+        the stored one for that kind, or adds it where the kind had none; **a kind left out of the
+        body keeps its current assignment** — a partial body never leaves a question with nobody to
+        answer it. The response is the full set after the write.
 
         '
       tags:
@@ -319,42 +339,26 @@ paths:
               properties:
                 assignments:
                   type: array
+                  minItems: 1
                   items:
-                    type: object
-                    required:
-                    - kind
-                    - basis
-                    - producerRef
-                    properties:
-                      kind:
-                        $ref: '#/components/schemas/SuggestionKind'
-                      basis:
-                        $ref: '#/components/schemas/SuggestionBasis'
-                      producerRef:
-                        type: string
-                      shadowProducerRef:
-                        type: string
-                        nullable: true
-                        description: 'Runs alongside and is recorded, never shown. **How a model earns
-                          its place before anybody depends on it.**
-
-                          '
-                      guardRails:
-                        type: object
-                        nullable: true
-                        additionalProperties: true
-                        description: 'Bounds the answer must fall within. **Required where basis is `model`**
-                          — refused at save otherwise.
-
-                          '
+                    $ref: '#/components/schemas/SuggestionProviderAssignment'
       responses:
         '200':
-          description: Set
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: Set. Every assignment now in force, one per kind that has one.
           content:
             application/json:
               schema:
                 type: object
-                additionalProperties: true
+                required:
+                - assignments
+                properties:
+                  assignments:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/SuggestionProviderAssignment'
   /ai/venue-map/{mapId}/propose-walkways:
     parameters:
     - name: mapId
@@ -396,14 +400,17 @@ paths:
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       responses:
         '202':
-          description: Proposed walkways, for review
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: Proposed walkways, for review. One entry per segment, each an `ai.proposed_action`
+            row whose id `venue-map.acceptWalkwayProposals` takes as `proposalId`.
           content:
             application/json:
               schema:
                 type: array
                 items:
-                  type: object
-                  additionalProperties: true
+                  $ref: '#/components/schemas/WalkwayProposal'
         '409':
           description: '**The map has vector geometry.** Refused deliberately — subtraction is available
             and better, and running a model where geometry exists is how a worse answer gets preferred
@@ -455,14 +462,17 @@ paths:
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       responses:
         '202':
-          description: Proposals, for review
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: Proposals, for review. One entry per shape, each an `ai.proposed_action` row
+            whose id `venue-map.acceptVenueLabelProposals` takes as `proposalId`.
           content:
             application/json:
               schema:
                 type: array
                 items:
-                  type: object
-                  additionalProperties: true
+                  $ref: '#/components/schemas/VenueLabelProposal'
   /ai-providers/{providerId}/credential:
     parameters:
     - name: providerId
@@ -524,6 +534,9 @@ paths:
                   description: How long the previous key stays valid, so in-flight requests survive.
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Stored, with a reference and no secret
           content:
             application/json:
@@ -564,6 +577,9 @@ paths:
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Result
           content:
             application/json:
@@ -623,9 +639,14 @@ paths:
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/AiConversation'
+                allOf:
+                  - $ref: '../shared/common.yaml#/components/schemas/Page'
+                  - type: object
+                    properties:
+                      items:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/AiConversation'
     post:
       operationId: createAiConversation
       x-ticvai-consumed-by:
@@ -647,6 +668,11 @@ paths:
         request — an assistant that accepts the venue it should answer about is an assistant that can
         be asked about someone else''s.
 
+        **The role comes from the session as well, and is not stored on the conversation.** Each
+        `sendAiMessage` answers under the caller''s resolved grants at the time it is sent, so a
+        conversation carries its `module` and `scopePath` and no role of its own — a role copied onto
+        the thread would go on answering as a finance controller after the grant was withdrawn.
+
         '
       tags:
       - assist
@@ -666,13 +692,17 @@ paths:
               - module
               properties:
                 module:
-                  type: string
+                  allOf:
+                  - $ref: ../shared/common.yaml#/components/schemas/ModuleKey
                   description: Which part of the platform the conversation is about (8.4.1).
                 locale:
                   type: string
                   description: 8.4.3. Multilingual, and Arabic is not an afterthought here.
       responses:
         '201':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Opened
           content:
             application/json:
@@ -749,20 +779,29 @@ paths:
                     format: uuid
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Answered
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/AiMessage'
         '429':
-          description: 'Usage limit reached for this tenant or principal (8.3.76). The limit is a cost
-            control, and the message says which limit rather than failing opaquely.
+          description: 'Usage limit reached (8.3.76). The limit is a cost control, and the response says
+            which limit rather than failing opaquely.
+
+            **Fires in three cases only**: the policy in force has `ceilingBehaviour: block` and `monthlyTokenCeiling`
+            is reached; it has `warnThenDisable` and the assistant has been disabled at the ceiling; or
+            the message would exceed `perRequestTokenCeiling`. **Never under the default `warn`** — there
+            the ceiling sends the venue manager a notification and the assistant keeps answering
+            (`AiPolicy.ceilingBehaviour`). There is no per-principal limit.
 
             '
           content:
             application/problem+json:
               schema:
-                $ref: ../shared/common.yaml#/components/schemas/Problem
+                $ref: '#/components/schemas/UsageLimitProblem'
         '503':
           description: 'Every configured provider failed. **Reported rather than retried indefinitely**
             — an assistant that hangs is worse than one that says it cannot answer.
@@ -831,6 +870,9 @@ paths:
                   maximum: 100
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Results
           content:
             application/json:
@@ -894,6 +936,9 @@ paths:
               $ref: '#/components/schemas/KnowledgeCollection'
       responses:
         '201':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Created
           content:
             application/json:
@@ -919,6 +964,20 @@ paths:
         Documents carry the scope they may be retrieved at. A venue operating procedure is not an answer
         to a question about another venue.
 
+        **Re-ingesting and replacing go through here too** (states/ai-knowledge-document.yaml), and
+        the body says which. With neither field below, this adds a new document.
+
+        - `reingestDocumentId` names an `indexed` or `failed` document to process again from the
+        `sourceAssetId` in the body. **The same document** moves back to `processing` and keeps its
+        id; no new document is created.
+
+        - `supersedesDocumentId` names an `indexed` document that this new one replaces. A new document
+        is created, and the named one moves to `superseded` when the new one reaches `indexed` — so
+        search is never left with neither version.
+
+        Sending both, or naming a document in another collection or in a state the transition does
+        not start from, is refused as a validation failure.
+
         '
       tags:
       - retrieval
@@ -936,6 +995,9 @@ paths:
               $ref: '#/components/schemas/KnowledgeDocument'
       responses:
         '202':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Accepted for indexing
           content:
             application/json:
@@ -969,7 +1031,8 @@ paths:
         creates rather than amends, and the two are different prompts with different risk — **amending
         touches things already sold.**
 
-        **Proposes; never applies.** Writes `ai.proposed_action` and stops. 8.1.4 requires approval before
+        **Proposes; never applies.** Writes `ai.proposed_action` and stops, and returns that row''s
+        id as `proposedActionId` for `decideProposedAction`. 8.1.4 requires approval before
         execution for anything affecting pricing or financial operations, and this is that gate — the
         same one `x-ticvai-permission-escalated` enforces for a human.
 
@@ -1018,6 +1081,9 @@ paths:
                   description: Where the clarifying questions were asked and answered.
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: A draft, plus what it needed to guess
           content:
             application/json:
@@ -1072,6 +1138,9 @@ paths:
                   maxLength: 2000
       responses:
         '202':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: 'An import job at `previewReady`. Nothing is written to the seat map until a person
             commits it.
 
@@ -1139,9 +1208,14 @@ paths:
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/AiInteraction'
+                allOf:
+                  - $ref: '../shared/common.yaml#/components/schemas/Page'
+                  - type: object
+                    properties:
+                      items:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/AiInteraction'
   /proposed-actions:
     get:
       operationId: listProposedActions
@@ -1223,6 +1297,9 @@ paths:
                   maxLength: 500
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Decided
           content:
             application/json:
@@ -1328,6 +1405,12 @@ paths:
 
         Credentials are a key-vault reference, never the key.
 
+        **What the PUT does.** The body is one whole provider configuration, matched on `id`. With
+        an `id`, it replaces that provider''s configuration in full — a field left out takes its default
+        or null, not its old value — and returns 200; an `id` that names no provider at the caller''s
+        scope is a 404. Without an `id`, it creates a provider and returns 201 with the new id. The
+        other providers are never touched: this is not a replace-the-list call.
+
         '
       tags:
       - config
@@ -1346,11 +1429,22 @@ paths:
               $ref: '#/components/schemas/AiProvider'
       responses:
         '200':
-          description: Configured
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: Configured — an existing provider, named by `id`, replaced
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/AiProvider'
+        '201':
+          description: Created — the body carried no `id`
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AiProvider'
+        '404':
+          $ref: ../shared/common.yaml#/components/responses/NotFound
   /policy:
     get:
       operationId: getAiPolicy
@@ -1362,15 +1456,33 @@ paths:
       description: '8.3.72–8.3.80. Which capabilities are enabled, which roles may use them, what is masked
         before it reaches a provider, and the usage ceiling.
 
+        **Returns the policy in force at `scopePath`** — the venue''s own row where the venue has narrowed
+        the tenant''s, the tenant''s row otherwise (nearest ancestor wins, ADR-0018). The response''s
+        `scopeLevel` and `scopePath` say which row that is. Without `scopePath`, the tenant row is returned;
+        a `scopePath` outside the caller''s grants is refused.
+
         '
       tags:
       - config
       x-ticvai-permission: AI_CONFIGURE
-      x-ticvai-scope-level: tenant
-      x-ticvai-config-scope: tenant
+      x-ticvai-scope-level: venue
+      x-ticvai-config-scope: venue
+      x-ticvai-config-scope-note: '**Two levels of one policy.** The tenant row is the default and a
+        venue row may narrow it (ADR-0018). Declared `venue` because a venue manager (BO-091) reads
+        and narrows their own venue''s row. A venue grant is shown the tenant row where it is the
+        policy in force at that venue, and cannot write it; only a tenant-level grant writes the default.
+
+        '
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
       x-ticvai-read-routing: replica
+      parameters:
+      - name: scopePath
+        in: query
+        required: false
+        description: The tenant or venue node to read the policy for. Absent means the tenant.
+        schema:
+          type: string
       responses:
         '200':
           description: Policy
@@ -1393,12 +1505,30 @@ paths:
         the platform, and it defaults to every field in the `pii` schema — **a default that fails closed,
         because a masking list somebody forgot to fill in should send nothing rather than everything.**
 
+        **Which row it writes.** The body''s `scopeLevel` and `scopePath` name the target: `tenant`
+        with the tenant''s node writes the default, `venue` with a venue''s node writes that venue''s
+        narrowing. There is one row per `scopePath`. A `scopePath` outside the caller''s grants is
+        refused (403), and a venue row that would widen the tenant''s — a capability, role or guest
+        scope the tenant does not allow, fewer masked fields, or a higher ceiling — is refused as a
+        validation failure.
+
+        **What the PUT does.** It replaces the whole row at that `scopePath`: a field left out takes
+        its default, not its old value. It returns 200 where the row existed and 201 where this created
+        it — a venue''s first narrowing. `suggestionProviders` is not written here; `setSuggestionProvider`
+        is its only writer, and it is kept as it was.
+
         '
       tags:
       - config
       x-ticvai-permission: AI_CONFIGURE
-      x-ticvai-scope-level: tenant
-      x-ticvai-config-scope: tenant
+      x-ticvai-scope-level: venue
+      x-ticvai-config-scope: venue
+      x-ticvai-config-scope-note: '**Two levels of one policy.** The tenant row is the default and a
+        venue row may narrow it (ADR-0018). Declared `venue` because a venue manager (BO-091) reads
+        and narrows their own venue''s row; a tenant-level grant still reaches the tenant row, and a
+        venue grant cannot, because the row''s `scopePath` sits above it.
+
+        '
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
       parameters:
@@ -1411,7 +1541,16 @@ paths:
               $ref: '#/components/schemas/AiPolicy'
       responses:
         '200':
-          description: Set
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: Set — the row at `scopePath` existed and is replaced
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AiPolicy'
+        '201':
+          description: Set — this created the row at `scopePath`
           content:
             application/json:
               schema:
@@ -1462,6 +1601,12 @@ paths:
         keys as though they were meaning, and a search for "annual pass" then matches a UUID. Only the
         fields a person would read are embedded; the rest becomes payload used for filtering.
 
+        **What the PUT does.** One declaration per indexed table, so the match key is `table`. A body
+        naming a table already declared replaces that declaration in full — a field left out takes
+        its default, not its old value — and returns 200; a table not yet declared is created and returns
+        201. Other declarations are never touched. A change to `textFields` or `chunkStrategy` does
+        not re-embed anything by itself; `reindexSource` does.
+
         '
       tags:
       - retrieval
@@ -1480,7 +1625,16 @@ paths:
               $ref: '#/components/schemas/IndexSource'
       responses:
         '200':
-          description: Declared
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: Declared — the table's existing declaration replaced
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IndexSource'
+        '201':
+          description: Declared — the table had no declaration
           content:
             application/json:
               schema:
@@ -1536,6 +1690,9 @@ paths:
                   - initialBuild
       responses:
         '202':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Rebuilding
           content:
             application/json:
@@ -1594,6 +1751,9 @@ paths:
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       responses:
         '204':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Removed from both stores
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
@@ -1901,7 +2061,8 @@ components:
         id:
           type: string
           format: uuid
-          readOnly: true
+          description: Assigned on create. Sent to `setAiProvider` to replace that provider; left out
+            to create one.
         kind:
           $ref: '#/components/schemas/AiProviderKind'
         capability:
@@ -1998,6 +2159,7 @@ components:
       x-ticvai-persistence: ai.policy
       required:
       - scopeLevel
+      - scopePath
       - enabledCapabilities
       properties:
         id:
@@ -2016,6 +2178,14 @@ components:
           - tenant
           - venue
           description: Tenant sets the default; a venue may narrow it and never widen it.
+        scopePath:
+          type: string
+          description: '**The node this row belongs to, and the key it is written under** — the tenant''s
+            node where `scopeLevel` is `tenant`, a venue''s where it is `venue`. One row per `scopePath`;
+            `setAiPolicy` writes the row it names and `getAiPolicy` resolves nearest ancestor first
+            (ADR-0018).
+
+            '
         enabledCapabilities:
           type: array
           items:
@@ -2037,9 +2207,15 @@ components:
           description: 'Redacted before a prompt leaves the platform (8.3.73). **Defaults to every field
             in the pii schema** — a masking list nobody filled in should send nothing rather than everything.
 
+            Each entry is a column named `schema.table.column`, as the DDL names it — `pii.subject_contact.email`.
+            **Omitted, null and an empty array all take the default**, because each of them is a list
+            nobody filled in. An entry naming no column is refused at save rather than silently masking
+            nothing.
+
             '
           items:
             type: string
+            pattern: ^[a-z][a-z0-9_]*\.[a-z][a-z0-9_]*\.[a-z][a-z0-9_]*$
         requiresApprovalFor:
           type: array
           description: 8.3.61–8.3.64. Nothing in this list executes without a decision.
@@ -2247,6 +2423,15 @@ components:
           default: true
           description: '**A refusal a rule can decide never reaches a model.** Cheaper, faster and more
             consistent than asking a model to refuse.'
+        suggestionProviders:
+          allOf:
+          - $ref: '#/components/schemas/SuggestionProviderAssignments'
+          readOnly: true
+          description: '**Which producer answers each `SuggestionKind`**, and what `requestSuggestion`
+            routes by. Written only by `setSuggestionProvider`; `setAiPolicy` leaves it as it was. Held
+            on the tenant row — a venue row does not carry its own.
+
+            '
     AiConversation:
       type: object
       x-ticvai-persistence: ai.conversation
@@ -2265,7 +2450,7 @@ components:
         scopePath:
           type: string
         module:
-          type: string
+          $ref: ../shared/common.yaml#/components/schemas/ModuleKey
         locale:
           type: string
         messageCount:
@@ -2278,7 +2463,7 @@ components:
           format: date-time
     AiSource:
       type: object
-      x-ticvai-persistence: none — embedded in the interaction
+      x-ticvai-persistence: none — stored as jsonb on the row that carries it (ai.message.sources, ai.activity.sources), through AiSourceList
       description: 'What the answer was grounded in (8.3.70). **An answer with no sources is a guess**,
         and the interface should show it as one.
 
@@ -2329,9 +2514,7 @@ components:
         content:
           type: string
         sources:
-          type: array
-          items:
-            $ref: '#/components/schemas/AiSource'
+          $ref: '#/components/schemas/AiSourceList'
         confidence:
           type: number
           nullable: true
@@ -2397,7 +2580,11 @@ components:
         payload:
           type: object
           additionalProperties: true
-          description: The request body a person would submit, ready to review.
+          description: 'The request body a person would submit, ready to review. **Open on purpose: its
+            shape is the request body of `targetOperation` in `targetContract`**, and it is validated
+            against that operation, not restated here.
+
+            '
         summary:
           type: string
         status:
@@ -2483,9 +2670,7 @@ components:
         response:
           type: string
         sources:
-          type: array
-          items:
-            $ref: '#/components/schemas/AiSource'
+          $ref: '#/components/schemas/AiSourceList'
         outcome:
           type: string
           enum:
@@ -2505,10 +2690,15 @@ components:
           type: integer
         completionTokens:
           type: integer
-        costMinor:
-          type: integer
-          description: In the region's base currency
-          minor units: null
+        cost:
+          allOf:
+          - $ref: ../shared/common.yaml#/components/schemas/Money
+          x-ticvai-column: cost_amount
+          description: 'What the call cost at the provider. **Money like every other amount** (naming-and-style
+            5.1) — it replaces an integer `costMinor` that carried no currency or scale, which AED and
+            OMR read differently.
+
+            '
         latencyMs:
           type: integer
         maskedFieldCount:
@@ -2794,6 +2984,26 @@ components:
           format: uuid
         mimeType:
           type: string
+        reingestDocumentId:
+          type: string
+          format: uuid
+          nullable: true
+          writeOnly: true
+          x-ticvai-persisted: false
+          description: 'An `indexed` or `failed` document in this collection to process again from
+            `sourceAssetId`. **The same document** returns to `processing` and keeps its id (states/ai-knowledge-document.yaml).
+            A request, not a fact about the row, so it is not stored.
+
+            '
+        supersedesDocumentId:
+          type: string
+          format: uuid
+          nullable: true
+          description: 'The `indexed` document in this collection that this one replaces. It moves to
+            `superseded` when this one reaches `indexed`, and is kept — **a technician who followed version
+            2 last week needs version 2 to still exist.**
+
+            '
         status:
           type: string
           enum:
@@ -2836,15 +3046,34 @@ components:
           type: string
     GeneratedConfiguration:
       type: object
-      x-ticvai-persistence: none — a draft, applied through the owning contract
+      x-ticvai-persistence: none — a draft, applied through the owning contract; the draft itself is the ai.proposed_action row named by proposedActionId
       required:
+      - proposedActionId
       - kind
       - targetContract
       - targetOperation
       - payload
       properties:
+        proposedActionId:
+          type: string
+          format: uuid
+          description: '**The `ai.proposed_action` row this draft was written as**, and the id `decideProposedAction`
+            takes. Without it a reviewer (BO-598) has a draft and no way to approve it.
+
+            '
         kind:
           type: string
+          enum:
+          - product
+          - membership
+          - pass
+          - promotion
+          - discountRule
+          - pricingCalendar
+          - seatingZone
+          - operatingHours
+          - campaign
+          description: The `kind` the request asked for.
         targetContract:
           type: string
         targetOperation:
@@ -2852,6 +3081,11 @@ components:
         payload:
           type: object
           additionalProperties: true
+          description: '**Open on purpose: its shape is the request body of `targetOperation` in `targetContract`**,
+            validated against that operation before it is returned — this contract does not restate
+            thirty other contracts'' request schemas.
+
+            '
         assumptions:
           type: array
           description: '**What it had to guess.** An admin reviewing a draft needs to know which fields
@@ -2960,8 +3194,8 @@ components:
                 type: integer
               completionTokens:
                 type: integer
-              costMinor:
-                type: integer
+              cost:
+                $ref: ../shared/common.yaml#/components/schemas/Money
               p95LatencyMs:
                 type: integer
               refusalRate:
@@ -3012,3 +3246,236 @@ components:
         createdAt:
           type: string
           format: date-time
+    AiSourceList:
+      type: array
+      x-ticvai-persistence-kind: valueObject
+      x-ticvai-persistence-column: jsonb
+      description: '**The sources an answer was grounded in, stored with the answer** (8.3.70). One `jsonb`
+        column on the row that carries it — `ai.message.sources` and `ai.activity.sources` — because
+        the grounding audit reads the list as it was when the answer was given, and a source is never
+        queried on its own.
+
+        '
+      items:
+        $ref: '#/components/schemas/AiSource'
+    SuggestionProviderAssignment:
+      type: object
+      description: 'Which producer answers one `SuggestionKind`, at which version, and within which
+        bounds. Written by `setSuggestionProvider`.
+
+        '
+      required:
+      - kind
+      - basis
+      - producerRef
+      properties:
+        kind:
+          $ref: '#/components/schemas/SuggestionKind'
+        basis:
+          $ref: '#/components/schemas/SuggestionBasis'
+        producerRef:
+          type: string
+          description: The rule name, or the model id and version — the same value `Suggestion.producerRef`
+            records on each answer.
+        shadowProducerRef:
+          type: string
+          nullable: true
+          description: 'Runs alongside and is recorded, never shown. **How a model earns its place before
+            anybody depends on it.**
+
+            '
+        guardRails:
+          type: object
+          nullable: true
+          additionalProperties: true
+          description: 'Bounds the answer must fall within. **Required where basis is `model`** — refused
+            at save otherwise.
+
+            '
+    SuggestionProviderAssignments:
+      type: array
+      x-ticvai-persistence-kind: valueObject
+      x-ticvai-persistence-column: jsonb
+      description: '**The routing table for `requestSuggestion`, held on the tenant''s `ai.policy` row**
+        as one `jsonb` column (`suggestion_providers`). At most one entry per `kind`.
+
+        '
+      items:
+        $ref: '#/components/schemas/SuggestionProviderAssignment'
+    TranslationProposals:
+      type: object
+      x-ticvai-persistence: none — each draft is written on the block it translates
+      description: 'What `proposeTranslations` drafted. **Every entry is a draft, never a publish** —
+        a person edits and publishes it through the contract that owns the block.
+
+        '
+      required:
+      - targetLocale
+      - drafts
+      properties:
+        targetLocale:
+          type: string
+        drafts:
+          type: array
+          items:
+            type: object
+            required:
+            - targetKind
+            - targetRef
+            - draftText
+            properties:
+              targetKind:
+                type: string
+                enum:
+                - contentBlock
+                - productName
+                - emailTemplate
+              targetRef:
+                type: string
+                description: The id of the block, product or template the draft sits on.
+              draftText:
+                type: string
+                description: The first-pass translation, as saved on the draft.
+    VenueLabelProposal:
+      type: object
+      x-ticvai-persistence: none — each proposal is an ai.proposed_action row; proposalId is its id
+      description: '1.4.24. **One shape, what the assistant thinks it is, and how sure it is.** The
+        fields are `venue-map`''s `PointProposal` plus the id `acceptVenueLabelProposals` needs — a
+        satellite cannot reference another satellite, so they are restated here.
+
+        '
+      required:
+      - proposalId
+      - shapeRef
+      - proposedKind
+      - confidence
+      properties:
+        proposalId:
+          type: string
+          format: uuid
+          description: The `ai.proposed_action` id. `venue-map.acceptVenueLabelProposals` takes it as
+            `decisions[].proposalId`.
+        shapeRef:
+          type: string
+        proposedKind:
+          type: string
+        proposedName:
+          type: string
+          nullable: true
+        confidence:
+          type: number
+          minimum: 0
+          maximum: 1
+          description: '**Shown to the operator, and low confidence is not filtered out.** A shape the
+            assistant is unsure about is the one most worth a human looking at.
+
+            '
+        sourceLayer:
+          type: string
+          nullable: true
+        reasoning:
+          type: string
+          nullable: true
+          description: 8.1.5b. Why it thinks so, so an operator can disagree with the reason rather than
+            the answer.
+    WalkwayProposal:
+      type: object
+      x-ticvai-persistence: none — each proposal is an ai.proposed_action row; proposalId is its id
+      description: '**One seen path segment, with its confidence.** Low-confidence segments are returned,
+        not hidden — they are the ones an operator must look at.
+
+        '
+      required:
+      - proposalId
+      - geometry
+      - confidence
+      properties:
+        proposalId:
+          type: string
+          format: uuid
+          description: The `ai.proposed_action` id. `venue-map.acceptWalkwayProposals` takes it as `decisions[].proposalId`.
+        geometry:
+          type: string
+          description: The centreline of the seen segment, as an encoded polyline — the encoding that
+            `venue-map` uses for `VenuePath.geometry`, so an accepted segment becomes a path without conversion.
+        distanceMetres:
+          type: number
+          nullable: true
+          description: Along the centreline. Null where the plan has no georeference.
+        confidence:
+          type: number
+          minimum: 0
+          maximum: 1
+        reasoning:
+          type: string
+          nullable: true
+    InsufficientDataProblem:
+      x-ticvai-persistence: none — error shape
+      description: '`requestSuggestion` 422. **Names what is missing and when there will be enough**,
+        so a manager is told when to ask again rather than simply refused.
+
+        '
+      allOf:
+      - $ref: ../shared/common.yaml#/components/schemas/Problem
+      - type: object
+        required:
+        - missing
+        properties:
+          missing:
+            type: array
+            minItems: 1
+            items:
+              type: object
+              required:
+              - input
+              properties:
+                input:
+                  type: string
+                  description: What the answer needs and does not have — *sales history*, *seasonality*.
+                have:
+                  type: string
+                  nullable: true
+                  description: How much there is now — *21 days*.
+                need:
+                  type: string
+                  nullable: true
+                  description: How much the producer needs — *one full year*.
+          enoughBy:
+            type: string
+            format: date-time
+            nullable: true
+            description: When there will be enough at the current rate. Null where no date can be stated.
+    UsageLimitProblem:
+      x-ticvai-persistence: none — error shape
+      description: '`sendAiMessage` 429. **Says which limit was reached**, and whether waiting will clear
+        it.
+
+        '
+      allOf:
+      - $ref: ../shared/common.yaml#/components/schemas/Problem
+      - type: object
+        required:
+        - limit
+        properties:
+          limit:
+            type: string
+            enum:
+            - monthlyTokenCeiling
+            - perRequestTokenCeiling
+            description: '`monthlyTokenCeiling` only under `ceilingBehaviour` `block`, or `warnThenDisable`
+              once the assistant is disabled. `perRequestTokenCeiling` under any behaviour.
+
+              '
+          ceilingBehaviour:
+            type: string
+            enum:
+            - warn
+            - warnThenDisable
+            - block
+            description: The behaviour in force when the limit was reached.
+          resetsAt:
+            type: string
+            format: date-time
+            nullable: true
+            description: When the monthly ceiling resets. Null for `perRequestTokenCeiling`, which a shorter
+              message clears.

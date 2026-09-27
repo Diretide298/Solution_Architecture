@@ -91,7 +91,10 @@ paths:
       - staff
       summary: Validate media at an access point and admit or deny
       description: 'The access point is inherited from the session''s workstation and is not a request
-        parameter — an operator cannot validate against a gate they are not at.
+        parameter — an operator cannot validate against a gate they are not at. **A caller whose session
+        has no workstation** — a back-office browser, a partner, a guest — **is refused `403`**: there
+        is no access point to inherit, and the operation never guesses one. Back-office screens read
+        scans through `listScans` rather than calling this.
 
         This operation is offline-capable. When executed offline the client evaluates the cached entitlement
         and deny rules locally, records the outcome, and replays through /access/scans on reconnect. The
@@ -115,6 +118,9 @@ paths:
               $ref: '#/components/schemas/ValidateRequest'
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: 'Validation completed. Check `outcome` — a denial is a successful validation, not
             an error.
 
@@ -169,13 +175,22 @@ paths:
       - $ref: ../shared/common.yaml#/components/parameters/PageCursor
       responses:
         '200':
-          description: Entitlements, newest first
+          description: '**Newest first: `id` descending.** `Entitlement.id` is a ULID minted at issue, so
+            its order is issue order and it is unique, which makes it the whole keyset — no timestamp
+            column and no tiebreak are needed. A reissue is a new entitlement with a newer id.
+
+            '
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/Entitlement'
+                allOf:
+                - $ref: ../shared/common.yaml#/components/schemas/Page
+                - type: object
+                  properties:
+                    items:
+                      type: array
+                      items:
+                        $ref: '#/components/schemas/Entitlement'
   /guests/me/entitlements:
     get:
       operationId: listMyEntitlements
@@ -239,9 +254,14 @@ paths:
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/Entitlement'
+                allOf:
+                - $ref: ../shared/common.yaml#/components/schemas/Page
+                - type: object
+                  properties:
+                    items:
+                      type: array
+                      items:
+                        $ref: '#/components/schemas/Entitlement'
   /entitlements/{entitlementId}:
     parameters:
     - name: entitlementId
@@ -249,6 +269,7 @@ paths:
       required: true
       schema:
         type: string
+        pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
     get:
       operationId: getEntitlement
       x-ticvai-consumed-by:
@@ -299,6 +320,7 @@ paths:
       required: true
       schema:
         type: string
+        pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
     get:
       operationId: getEntitlementCredential
       x-ticvai-consumed-by:
@@ -354,6 +376,7 @@ paths:
       required: true
       schema:
         type: string
+        pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
     get:
       operationId: getEntitlementHistory
       x-ticvai-consumed-by:
@@ -465,10 +488,12 @@ paths:
                   format: uuid
                 entitlementId:
                   type: string
-                  format: uuid
+                  pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+                  description: An `Entitlement.id`, which is a ULID.
                 template:
                   type: string
                   format: password
+                  writeOnly: true
                   description: '**Write-only, never returned.** A template, not an image.
 
                     '
@@ -573,7 +598,8 @@ paths:
               properties:
                 entitlementId:
                   type: string
-                  format: uuid
+                  pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+                  description: An `Entitlement.id`, which is a ULID.
                 method:
                   type: string
                   enum:
@@ -588,6 +614,7 @@ paths:
                 documentEvidence:
                   type: string
                   format: password
+                  writeOnly: true
                   description: '**Write-only and never stored.** Read by the matcher and
                     discarded; `access.scan_event` keeps the outcome and not this.
 
@@ -595,6 +622,7 @@ paths:
                 liveTemplate:
                   type: string
                   format: password
+                  writeOnly: true
                   description: '**Write-only and never stored.** A template rather than an image,
                     compared and discarded.
 
@@ -675,10 +703,12 @@ paths:
                   format: uuid
                 entitlementId:
                   type: string
-                  format: uuid
+                  pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+                  description: An `Entitlement.id`, which is a ULID.
                 template:
                   type: string
                   format: password
+                  writeOnly: true
                   description: '**Write-only, never returned.** A template, not an image — the derived
                     vector a matcher compares against, from which no face can be reconstructed.
 
@@ -717,6 +747,9 @@ paths:
                       nullable: true
       responses:
         '201':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Enrolled
           content:
             application/json:
@@ -757,6 +790,11 @@ paths:
       summary: Whether a pass has a face registered, and when
       description: '**Returns metadata and never the template.** Whether one exists, when it was captured,
         which surface enrolled it, and the consent behind it.
+
+        **Where the id comes from.** A screen opening on a guest''s pass has the entitlement, not the
+        enrolment: `Entitlement.facePassEnrolmentId` carries the id of the active `facePass` enrolment
+        on that entitlement, or null when there is none — which is itself the answer to *is a face
+        registered on this pass*. The id is also returned by `enrolFacePass`.
 
         '
       tags:
@@ -802,6 +840,9 @@ paths:
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       responses:
         '204':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Destroyed
   /parking-facilities:
     get:
@@ -818,13 +859,36 @@ paths:
       description: '3.2.30 and CF-52, settled 14 August. **Three integration modes**, and the mode decides
         what the platform must do at sale.
 
+        **Which venue.** A staff caller sees the car parks of every venue their grants reach, and
+        `venueId` narrows that to one. **A guest caller must send `venueId`** — a guest session carries
+        no venue (`guestAuth`), so without it there is no venue to answer for, and the request is a
+        `400`.
+
+        **What a guest gets back.** The permission is the staff case (ADR-0025: audience and permission
+        are orthogonal); a guest needs none, because car parks are what a guest chooses between when
+        buying parking. **A guest is never shown the integration** —
+        `vendorName`, `endpoint`, `credentialRef`, `pushLeadMinutes` and `vendorSwapTargetDays` are
+        omitted from a guest response. They are how the platform talks to a vendor, not anything a
+        guest decides on.
+
+        **The staff permission is `PARKING_CONFIGURE`**, the same one `setParkingFacility` writes
+        with. It was `ACCESS_POINT_CONFIGURE`, which let somebody who could configure a car park fail
+        to read the one they had just configured.
+
         '
       tags:
       - access
       parameters:
+      - name: venueId
+        in: query
+        required: false
+        description: Required for a guest caller; optional for staff, where it narrows the list.
+        schema:
+          type: string
+          format: uuid
       - $ref: ../shared/common.yaml#/components/parameters/PageSize
       - $ref: ../shared/common.yaml#/components/parameters/PageCursor
-      x-ticvai-permission: ACCESS_POINT_CONFIGURE
+      x-ticvai-permission: PARKING_CONFIGURE
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: true
       x-ticvai-conflict-policy: serverWins
@@ -835,9 +899,16 @@ paths:
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/ParkingFacility'
+                allOf:
+                - $ref: ../shared/common.yaml#/components/schemas/Page
+                - type: object
+                  properties:
+                    items:
+                      type: array
+                      items:
+                        $ref: '#/components/schemas/ParkingFacility'
+        '400':
+          $ref: ../shared/common.yaml#/components/responses/BadRequest
     put:
       operationId: setParkingFacility
       x-ticvai-consumed-by:
@@ -860,6 +931,13 @@ paths:
         A fourth case is out of scope: pay-per-hour parking unrelated to a ticket runs on the parking
         system''s own POS (14 August).
 
+        **PUT semantics — an upsert of one facility, keyed on the body''s `id`.** The collection path
+        carries no id, so the body names the target. **No `id`** creates a facility: the server assigns
+        the id and answers `201`. **An `id` that exists** replaces that facility whole and answers
+        `200`: a field left out takes its default or null, it does not keep its stored value. **An `id`
+        that does not exist** is a `404`, never a create with a client-chosen id. `takesPayment` and
+        `vendorSwapTargetDays` are read-only and ignored in a body.
+
         '
       tags:
       - access
@@ -878,11 +956,24 @@ paths:
               $ref: '#/components/schemas/ParkingFacility'
       responses:
         '200':
-          description: Configured
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: An existing facility, replaced
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ParkingFacility'
+        '201':
+          description: A new facility, created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ParkingFacility'
+        '400':
+          $ref: ../shared/common.yaml#/components/responses/BadRequest
+        '404':
+          $ref: ../shared/common.yaml#/components/responses/NotFound
   /parking-entitlements:
     post:
       operationId: createParkingEntitlement
@@ -894,8 +985,8 @@ paths:
       - service
       - guest
       x-ticvai-audience-note: '24 August: widened to include guest. **A guest reserves their own parking.**
-        Declared `s ervice` only, on two guest screens — `updateParkingEntitlement` was already `guest`,
-        whi ch made the asymmetry an omission rather than a design.
+        Declared `service` only, on two guest screens — `updateParkingEntitlement` was already `guest`,
+        which made the asymmetry an omission rather than a design.
 
         '
       summary: A guest bought parking
@@ -923,6 +1014,9 @@ paths:
               $ref: '#/components/schemas/ParkingEntitlement'
       responses:
         '201':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Created, and pushed where the mode requires it
           content:
             application/json:
@@ -944,7 +1038,7 @@ paths:
       required: true
       schema:
         type: string
-        format: uuid
+        pattern: '^[0-9A-HJKMNP-TV-Z]{26}$'
     patch:
       operationId: updateParkingEntitlement
       x-ticvai-consumed-by:
@@ -958,6 +1052,10 @@ paths:
 
         Revocation removes the plate from the whitelist. A refunded parking entitlement whose plate still
         opens the barrier is a car park giving away spaces.
+
+        **The body is the change, not the entitlement.** A PATCH carries only what moves — a new plate,
+        or `status: revoked` — through `UpdateParkingEntitlementRequest`. Facility, order and validity
+        window are fixed at purchase and are not resent.
 
         '
       tags:
@@ -973,14 +1071,19 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/ParkingEntitlement'
+              $ref: '#/components/schemas/UpdateParkingEntitlementRequest'
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Updated, and re-pushed
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ParkingEntitlement'
+        '400':
+          $ref: ../shared/common.yaml#/components/responses/BadRequest
   /access/override:
     post:
       operationId: overrideAccess
@@ -1041,6 +1144,9 @@ paths:
                   format: date-time
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Override recorded and entry admitted
           content:
             application/json:
@@ -1139,6 +1245,10 @@ paths:
         Deduplication is on the scan''s ULID. Replaying a batch after a crash is a no-op for entries already
         accepted.
 
+        **Workstation-scoped: the replaying scanner''s own session.** A caller whose session has no
+        workstation — a back-office browser, a partner, a guest — is refused `403`. Back-office screens
+        read what was replayed through `listScans`.
+
         '
       tags:
       - sync
@@ -1166,8 +1276,13 @@ paths:
                   maxItems: 500
                   items:
                     $ref: '#/components/schemas/OfflineScan'
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: 'Batch processed, wholly or up to the first rejection. Always inspect `results`.
 
             '
@@ -1215,8 +1330,10 @@ paths:
           format: uuid
       - name: ticketId
         in: query
+        description: An `Entitlement.id`, the ticket id every scan carries.
         schema:
           type: string
+          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
       - name: outcome
         in: query
         schema:
@@ -1235,7 +1352,11 @@ paths:
       - $ref: ../shared/common.yaml#/components/parameters/PageCursor
       responses:
         '200':
-          description: Scans
+          description: '**Newest first: `recordedAt` descending, `id` descending as the tiebreak.** The
+            cursor is a keyset on that pair. `recordedAt` is when the scan happened on the device, so a
+            scan replayed late from an offline journal lands where it happened, not where it synced.
+
+            '
           content:
             application/json:
               schema:
@@ -1278,6 +1399,10 @@ paths:
 
         `etag` supports conditional refresh — a device on a slow link should not re-download an unchanged
         package.
+
+        **Workstation-scoped: the access point is the session''s.** A caller whose session has no
+        workstation — a back-office browser, a partner, a guest — is refused `403`, because there is no
+        access point to build a package for.
 
         '
       tags:
@@ -1362,6 +1487,9 @@ paths:
                   maxLength: 200
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Mode set
           content:
             application/json:
@@ -1438,6 +1566,9 @@ paths:
               $ref: '#/components/schemas/CreateAccessPointRequest'
       responses:
         '201':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Created
           content:
             application/json:
@@ -1522,6 +1653,9 @@ paths:
                     '
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Updated
           content:
             application/json:
@@ -1589,6 +1723,9 @@ paths:
               $ref: '#/components/schemas/AdmissionRules'
       responses:
         '201':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Created
           content:
             application/json:
@@ -1613,6 +1750,11 @@ paths:
       description: 'Changes take effect at terminals after the next offline package refresh, not immediately.
         A profile change during trading is not retroactive.
 
+        **PUT semantics — replaces the profile the path names, whole.** A field left out takes its
+        default or null; it does not keep its stored value. `perProductRules` is replaced as one
+        list, never merged product by product. The body''s `id` is read-only and ignored — the path
+        decides which profile is written — and an unknown `profileId` is a `404`, never a create.
+
         '
       tags:
       - accessPoint
@@ -1630,6 +1772,9 @@ paths:
               $ref: '#/components/schemas/AdmissionRules'
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Updated
           content:
             application/json:
@@ -1711,6 +1856,9 @@ paths:
                   format: date-time
       responses:
         '201':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Added
           content:
             application/json:
@@ -1740,6 +1888,9 @@ paths:
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       responses:
         '204':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Removed
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
@@ -1768,6 +1919,14 @@ paths:
 
         Each admission decrements the group''s counter, so a group cannot re-enter beyond its size by
         scanning repeatedly.
+
+        **The counter is the group entitlement''s own.** The credential resolves to one `Entitlement`,
+        and the response reads straight off it: `groupSize` is `entriesAllowed`, `totalAdmitted` is
+        `entriesUsed` after this admission, and `remainingAdmissions` is the difference. Nothing else
+        stores a group count, and each admission is also one `access.scan_event` row.
+
+        **Workstation-scoped**, as `validateAccess`: a caller whose session has no workstation is
+        refused `403`.
 
         '
       tags:
@@ -1806,6 +1965,9 @@ paths:
                   format: date-time
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Group admission outcome
           content:
             application/json:
@@ -1826,6 +1988,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '403':
+          $ref: ../shared/common.yaml#/components/responses/Forbidden
   /access-points/{accessPointId}/geofence:
     parameters:
     - name: accessPointId
@@ -1844,8 +2008,12 @@ paths:
       description: 'Constrains where a handheld may validate for this access point. A roaming scanner
         used two hundred metres from the gate it claims to be at is either an error or something worse.
 
-        Enforcement is configurable — warn, or deny — because GPS accuracy indoors is not a thing to build
-        a hard block on without thought.
+        Enforcement is configurable — `off`, `warn` or `deny` — because GPS accuracy indoors is not a
+        thing to build a hard block on without thought. `off` keeps the fence on record and checks
+        nothing.
+
+        **PUT semantics — replaces this access point''s geofence whole.** A field left out is null, not
+        kept. The result is returned as `AccessPoint.geofence` and stored on the access point''s row.
 
         '
       tags:
@@ -1861,34 +2029,21 @@ paths:
         content:
           application/json:
             schema:
-              type: object
-              required:
-              - enforcement
-              properties:
-                latitude:
-                  type: number
-                longitude:
-                  type: number
-                radiusMetres:
-                  type: integer
-                  minimum: 5
-                  maximum: 5000
-                enforcement:
-                  type: string
-                  enum:
-                  - false
-                  - warn
-                  - deny
-                allowProximityBeacon:
-                  type: boolean
-                  description: Accept a BLE proximity assertion in place of GPS. Better indoors.
+              $ref: '#/components/schemas/AccessPointGeofence'
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Set
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/AccessPoint'
+        '400':
+          $ref: ../shared/common.yaml#/components/responses/BadRequest
+        '404':
+          $ref: ../shared/common.yaml#/components/responses/NotFound
   /virtual-ticket:
     get:
       operationId: listVirtualTicket
@@ -1899,7 +2054,7 @@ paths:
       x-ticvai-provisional: true
       summary: Virtual Ticket Command Center
       description: '**Drafted from the workshop pack; the shape below is read out of it, not invented.**
-        Ticket Media   Credential Management, page 4. The screen says: Provide administrators and operations
+        Ticket Media & Credential Management, page 4. The screen says: Provide administrators and operations
         teams with a centralized view of all Virtual Tickets and their associated media across TICVAI.
         This is the primary administrative entry point into the Virtual Ticket architecture.
 
@@ -1987,7 +2142,7 @@ paths:
       x-ticvai-provisional: true
       summary: Virtual Ticket Identity & Master Record Configuration
       description: '**Drafted from the workshop pack; the shape below is read out of it, not invented.**
-        Ticket Media   Credential Management, page 6. The screen says: Define the authoritative Virtual
+        Ticket Media & Credential Management, page 6. The screen says: Define the authoritative Virtual
         Ticket object used throughout TICVAI. This screen is extremely important because the Virtual Ticket—not
         the QR/RFID/card— is the master ticket record.
 
@@ -2013,6 +2168,8 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/VirtualTicketIdentityMasterRecordConfigurationInput'
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       responses:
         '200':
           description: Virtual Ticket Identity & Master Record Configuration
@@ -2031,7 +2188,7 @@ paths:
       x-ticvai-provisional: true
       summary: Virtual Ticket Status & Lifecycle Model
       description: '**Drafted from the workshop pack; the shape below is read out of it, not invented.**
-        Ticket Media   Credential Management, page 8. The screen says: Configure the standardized lifecycle
+        Ticket Media & Credential Management, page 8. The screen says: Configure the standardized lifecycle
         of a Virtual Ticket independently from the lifecycle of individual media.
 
 
@@ -2070,7 +2227,7 @@ paths:
       x-ticvai-provisional: true
       summary: Media Type & Credential Technology Registry
       description: '**Drafted from the workshop pack; the shape below is read out of it, not invented.**
-        Ticket Media   Credential Management, page 9. The screen says: Maintain the centralized catalogue
+        Ticket Media & Credential Management, page 9. The screen says: Maintain the centralized catalogue
         of credential technologies supported by TICVAI. This makes the credential architecture extensible
         rather than hard-coded.
 
@@ -2109,7 +2266,7 @@ paths:
       x-ticvai-provisional: true
       summary: Multi-Media Binding & Association Rules
       description: '**Drafted from the workshop pack; the shape below is read out of it, not invented.**
-        Ticket Media   Credential Management, page 11. The screen says: Configure how one Virtual Ticket
+        Ticket Media & Credential Management, page 11. The screen says: Configure how one Virtual Ticket
         can be associated with multiple media simultaneously. This is one of the most important screens
         in Area 15.
 
@@ -2148,7 +2305,7 @@ paths:
       x-ticvai-provisional: true
       summary: Credential Identity, Token & Reference Mapping
       description: '**Drafted from the workshop pack; the shape below is read out of it, not invented.**
-        Ticket Media   Credential Management, page 12. The screen says: Define how individual media identifiers
+        Ticket Media & Credential Management, page 12. The screen says: Define how individual media identifiers
         resolve securely back to the authoritative Virtual Ticket.
 
 
@@ -2186,7 +2343,7 @@ paths:
       x-ticvai-provisional: true
       summary: Entitlement & Cross-Media Synchronization Rules
       description: '**Drafted from the workshop pack; the shape below is read out of it, not invented.**
-        Ticket Media   Credential Management, page 14. The screen says: Ensure all media attached to a
+        Ticket Media & Credential Management, page 14. The screen says: Ensure all media attached to a
         Virtual Ticket share the same authoritative ticket and entitlement state.
 
 
@@ -2224,7 +2381,7 @@ paths:
       x-ticvai-provisional: true
       summary: Media Activation, Priority & Fallback Rules
       description: '**Drafted from the workshop pack; the shape below is read out of it, not invented.**
-        Ticket Media   Credential Management, page 15. The screen says: Configure when each credential
+        Ticket Media & Credential Management, page 15. The screen says: Configure when each credential
         becomes active and how alternative media behave if the preferred credential cannot be used.
 
 
@@ -2262,7 +2419,7 @@ paths:
       x-ticvai-provisional: true
       summary: Media Replacement, Revocation & Rebinding Rules
       description: '**Drafted from the workshop pack; the shape below is read out of it, not invented.**
-        Ticket Media   Credential Management, page 16. The screen says: Configure controlled handling
+        Ticket Media & Credential Management, page 16. The screen says: Configure controlled handling
         of lost, stolen, damaged, compromised or replaced credential media.
 
 
@@ -2301,7 +2458,7 @@ paths:
       x-ticvai-provisional: true
       summary: Virtual Ticket Architecture Testing, Governance & Audit
       description: '**Drafted from the workshop pack; the shape below is read out of it, not invented.**
-        Ticket Media   Credential Management, page 17. The screen says: Provide the final testing and
+        Ticket Media & Credential Management, page 17. The screen says: Provide the final testing and
         governance environment for Virtual Ticket and multi-media configurations. 17 | Pag e
 
 
@@ -2339,7 +2496,7 @@ paths:
       x-ticvai-provisional: true
       summary: Media Design Studio Command Center
       description: '**Drafted from the workshop pack; the shape below is read out of it, not invented.**
-        Ticket Media   Credential Management, page 23. The screen says: Provide administrators with the
+        Ticket Media & Credential Management, page 23. The screen says: Provide administrators with the
         central workspace for creating and managing all ticket and credential media templates. This should
         be the entry point for the entire no-code Media Design Studio.
 
@@ -2378,7 +2535,7 @@ paths:
       x-ticvai-provisional: true
       summary: Digital QR & Barcode Ticket Designer
       description: '**Drafted from the workshop pack; the shape below is read out of it, not invented.**
-        Ticket Media   Credential Management, page 24. The screen says: Provide a visual no-code designer
+        Ticket Media & Credential Management, page 24. The screen says: Provide a visual no-code designer
         specifically for digital QR and barcode tickets.
 
 
@@ -2403,6 +2560,8 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/DigitalQrBarcodeTicketDesignerInput'
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       responses:
         '200':
           description: Digital QR & Barcode Ticket Designer
@@ -2420,7 +2579,7 @@ paths:
       x-ticvai-provisional: true
       summary: PDF, Printable & POS Ticket Designer
       description: '**Drafted from the workshop pack; the shape below is read out of it, not invented.**
-        Ticket Media   Credential Management, page 26. The screen says: Design tickets intended for printing,
+        Ticket Media & Credential Management, page 26. The screen says: Design tickets intended for printing,
         PDF generation, POS, box office and other physical/document outputs.
 
 
@@ -2445,6 +2604,8 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/PdfPrintablePosTicketDesignerInput'
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       responses:
         '200':
           description: PDF, Printable & POS Ticket Designer
@@ -2462,7 +2623,7 @@ paths:
       x-ticvai-provisional: true
       summary: Apple Wallet Pass Designer
       description: '**Drafted from the workshop pack; the shape below is read out of it, not invented.**
-        Ticket Media   Credential Management, page 27. The screen says: Provide an Apple Wallet-specific
+        Ticket Media & Credential Management, page 27. The screen says: Provide an Apple Wallet-specific
         configuration experience for eligible TICVAI credentials. This should not simply be a PDF ticket
         rendered inside a wallet.
 
@@ -2488,6 +2649,8 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/AppleWalletPassDesignerInput'
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       responses:
         '200':
           description: Apple Wallet Pass Designer
@@ -2505,7 +2668,7 @@ paths:
       x-ticvai-provisional: true
       summary: Google Wallet Pass Designer
       description: '**Drafted from the workshop pack; the shape below is read out of it, not invented.**
-        Ticket Media   Credential Management, page 29. The screen says: Provide a dedicated Google Wallet
+        Ticket Media & Credential Management, page 29. The screen says: Provide a dedicated Google Wallet
         configuration environment.
 
 
@@ -2530,6 +2693,8 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/GoogleWalletPassDesignerInput'
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       responses:
         '200':
           description: Google Wallet Pass Designer
@@ -2548,7 +2713,7 @@ paths:
       x-ticvai-provisional: true
       summary: RFID, NFC, Card & Wristband Media Designer
       description: '**Drafted from the workshop pack; the shape below is read out of it, not invented.**
-        Ticket Media   Credential Management, page 30. The screen says: Configure both the visual and
+        Ticket Media & Credential Management, page 30. The screen says: Configure both the visual and
         technical profile of physical electronic credentials. This is important because RFID/NFC media
         are not merely artwork.
 
@@ -2574,6 +2739,8 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/RfidNfcCardWristbandMediaDesignerInput'
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       responses:
         '200':
           description: RFID, NFC, Card & Wristband Media Designer
@@ -2591,7 +2758,7 @@ paths:
       x-ticvai-provisional: true
       summary: Digital Card, Membership & Wearable Designer
       description: '**Drafted from the workshop pack; the shape below is read out of it, not invented.**
-        Ticket Media   Credential Management, page 31. The screen says: Provide specialized configuration
+        Ticket Media & Credential Management, page 31. The screen says: Provide specialized configuration
         for persistent credentials that may represent longer-lived relationships rather than a single
         event ticket.
 
@@ -2617,6 +2784,8 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/DigitalCardMembershipWearableDesignerInput'
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       responses:
         '200':
           description: Digital Card, Membership & Wearable Designer
@@ -2634,7 +2803,7 @@ paths:
       x-ticvai-provisional: true
       summary: Dynamic Fields, Data Mapping & Content Builder
       description: '**Drafted from the workshop pack; the shape below is read out of it, not invented.**
-        Ticket Media   Credential Management, page 32. The screen says: Create a centralized reusable
+        Ticket Media & Credential Management, page 32. The screen says: Create a centralized reusable
         field library so development team does not hard-code ticket fields separately into every media
         designer. This is another important architecture screen.
 
@@ -2660,6 +2829,8 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/DynamicFieldsDataMappingContentBuilderInput'
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       responses:
         '200':
           description: Dynamic Fields, Data Mapping & Content Builder
@@ -2677,7 +2848,7 @@ paths:
       x-ticvai-provisional: true
       summary: Branding, Localization & Template Inheritance
       description: '**Drafted from the workshop pack; the shape below is read out of it, not invented.**
-        Ticket Media   Credential Management, page 34. The screen says: Allow TICVAI''s multi-tenant clients
+        Ticket Media & Credential Management, page 34. The screen says: Allow TICVAI''s multi-tenant clients
         to control branding and localization without rebuilding every ticket template.
 
 
@@ -2715,7 +2886,7 @@ paths:
       x-ticvai-provisional: true
       summary: Multi-Media Preview, Testing, Approval & Publication
       description: '**Drafted from the workshop pack; the shape below is read out of it, not invented.**
-        Ticket Media   Credential Management, page 36. The screen says: Provide the final quality and
+        Ticket Media & Credential Management, page 36. The screen says: Provide the final quality and
         governance gate before any media template becomes operational. This should be a particularly visual
         screen.
 
@@ -2741,6 +2912,8 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/MultiMediaPreviewTestingApprovalPublicationInput'
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       responses:
         '200':
           description: Multi-Media Preview, Testing, Approval & Publication
@@ -2759,7 +2932,7 @@ paths:
       x-ticvai-provisional: true
       summary: Credential Operations Command Center
       description: '**Drafted from the workshop pack; the shape below is read out of it, not invented.**
-        Ticket Media   Credential Management, page 41. The screen says: Provide Operations, Ticketing,
+        Ticket Media & Credential Management, page 41. The screen says: Provide Operations, Ticketing,
         Customer Service and Technical teams with a real-time command center covering all issued credential
         media. This is the operational starting point for Area 15.
 
@@ -2841,7 +3014,7 @@ paths:
       x-ticvai-provisional: true
       summary: Virtual Ticket & Credential 360° Workspace
       description: '**Drafted from the workshop pack; the shape below is read out of it, not invented.**
-        Ticket Media   Credential Management, page 43. The screen says: Provide a complete operational
+        Ticket Media & Credential Management, page 43. The screen says: Provide a complete operational
         view of one Virtual Ticket and every media credential currently or historically associated with
         it. This is one of the most important operational screens.
 
@@ -2867,6 +3040,8 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/VirtualTicketCredential360WorkspaceInput'
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       responses:
         '200':
           description: Virtual Ticket & Credential 360° Workspace
@@ -2885,7 +3060,7 @@ paths:
       x-ticvai-provisional: true
       summary: Credential Generation & Issuance Monitor
       description: '**Drafted from the workshop pack; the shape below is read out of it, not invented.**
-        Ticket Media   Credential Management, page 45. The screen says: Manage and monitor generation
+        Ticket Media & Credential Management, page 45. The screen says: Manage and monitor generation
         of credential instances from approved Board 2 media templates.
 
 
@@ -2923,7 +3098,7 @@ paths:
       x-ticvai-provisional: true
       summary: Credential Delivery & Distribution Operations
       description: '**Drafted from the workshop pack; the shape below is read out of it, not invented.**
-        Ticket Media   Credential Management, page 47. The screen says: Manage how generated ticket media
+        Ticket Media & Credential Management, page 47. The screen says: Manage how generated ticket media
         are delivered or made available to customers, participants and operational staff.
 
 
@@ -2961,7 +3136,7 @@ paths:
       x-ticvai-provisional: true
       summary: Media Binding, Activation & Assignment Operations
       description: '**Drafted from the workshop pack; the shape below is read out of it, not invented.**
-        Ticket Media   Credential Management, page 48. The screen says: Manage credentials that require
+        Ticket Media & Credential Management, page 48. The screen says: Manage credentials that require
         operational assignment or activation after ticket issuance.
 
 
@@ -2986,6 +3161,8 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/MediaBindingActivationAssignmentOperationsInput'
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       responses:
         '200':
           description: Media Binding, Activation & Assignment Operations
@@ -3004,7 +3181,7 @@ paths:
       x-ticvai-provisional: true
       summary: Credential Replacement, Reissue, Revocation & Recovery
       description: '**Drafted from the workshop pack; the shape below is read out of it, not invented.**
-        Ticket Media   Credential Management, page 50. The screen says: Manage operational credential
+        Ticket Media & Credential Management, page 50. The screen says: Manage operational credential
         changes while preserving the underlying Virtual Ticket.
 
 
@@ -3042,7 +3219,7 @@ paths:
       x-ticvai-provisional: true
       summary: Failed Generation, Delivery & Credential Exception Management
       description: '**Drafted from the workshop pack; the shape below is read out of it, not invented.**
-        Ticket Media   Credential Management, page 51. The screen says: Provide one dedicated operational
+        Ticket Media & Credential Management, page 51. The screen says: Provide one dedicated operational
         queue for credential-related failures.
 
 
@@ -3080,7 +3257,7 @@ paths:
       x-ticvai-provisional: true
       summary: Credential Usage & Cross-Media Traceability
       description: '**Drafted from the workshop pack; the shape below is read out of it, not invented.**
-        Ticket Media   Credential Management, page 53. The screen says: Provide end-to-end visibility
+        Ticket Media & Credential Management, page 53. The screen says: Provide end-to-end visibility
         into how the different media attached to one Virtual Ticket have been presented or used. This
         screen is for credential traceability, while Area 16 remains responsible for the actual access-control
         decision.
@@ -3121,7 +3298,7 @@ paths:
       x-ticvai-provisional: true
       summary: Credential Security, Audit & Operational Evidence
       description: '**Drafted from the workshop pack; the shape below is read out of it, not invented.**
-        Ticket Media   Credential Management, page 54. The screen says: Maintain complete evidence of
+        Ticket Media & Credential Management, page 54. The screen says: Maintain complete evidence of
         credential creation and lifecycle activity.
 
 
@@ -3159,7 +3336,7 @@ paths:
       x-ticvai-provisional: true
       summary: Ticket Media Analytics & AI Operations Intelligence
       description: '**Drafted from the workshop pack; the shape below is read out of it, not invented.**
-        Ticket Media   Credential Management, page 56. The screen says: Provide management and operations
+        Ticket Media & Credential Management, page 56. The screen says: Provide management and operations
         with analytics and AI intelligence across Virtual Tickets and credential media. This should be
         a serious operational intelligence layer—not simply a chatbot.
 
@@ -3346,6 +3523,8 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/AccessAreaZoneBuilderInput'
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       responses:
         '200':
           description: Access Area & Zone Builder
@@ -3387,6 +3566,8 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/AttractionAccessConfigurationInput'
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       responses:
         '200':
           description: Attraction Access Configuration
@@ -3428,6 +3609,8 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/GateLaneConfigurationInput'
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       responses:
         '200':
           description: Gate & Lane Configuration
@@ -3470,6 +3653,8 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/AccessControlGraphicalMapDesignerInput'
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       responses:
         '200':
           description: Access Control Graphical Map Designer
@@ -3591,6 +3776,8 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/TopologyValidationPublicationInput'
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       responses:
         '200':
           description: Topology Validation & Publication
@@ -3672,6 +3859,8 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/VisualAccessRuleBuilderInput'
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       responses:
         '200':
           description: Visual Access Rule Builder
@@ -3986,6 +4175,8 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/RuleSimulationConflictCheckPublicationInput'
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       responses:
         '200':
           description: Rule Simulation, Conflict Check & Publication
@@ -4068,6 +4259,8 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/DynamicQrSecurityProfileBuilderInput'
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       responses:
         '200':
           description: Dynamic QR Security Profile Builder
@@ -4189,6 +4382,8 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/BleBeaconGeofenceConfigurationInput'
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       responses:
         '200':
           description: BLE Beacon & Geofence Configuration
@@ -4350,6 +4545,8 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/EmbeddedEntitlementPayloadDesignerInput'
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       responses:
         '200':
           description: Embedded Entitlement Payload Designer
@@ -4668,6 +4865,8 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/RfidNfcConfigurationInput'
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       responses:
         '200':
           description: RFID & NFC Configuration
@@ -4790,6 +4989,8 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/MediaCompatibilityTestingPublicationInput'
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       responses:
         '200':
           description: Media Compatibility, Testing & Publication
@@ -4871,6 +5072,8 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/BiometricVerificationProfileBuilderInput'
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       responses:
         '200':
           description: Biometric Verification Profile Builder
@@ -4914,6 +5117,8 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/FacePassEnrollmentConfigurationInput'
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       responses:
         '200':
           description: Face Pass Enrollment Configuration
@@ -5391,6 +5596,8 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/TurnstileLaneBehaviorConfigurationInput'
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       responses:
         '200':
           description: Turnstile & Lane Behavior Configuration
@@ -5434,6 +5641,8 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/ValidationOutcomeGuestFeedbackDesignerInput'
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       responses:
         '200':
           description: Validation Outcome & Guest Feedback Designer
@@ -5476,6 +5685,8 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/ReaderScannerPeripheralConfigurationInput'
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       responses:
         '200':
           description: Reader, Scanner & Peripheral Configuration
@@ -5518,6 +5729,8 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/HandheldMobileAccessDeviceConfigurationInput'
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       responses:
         '200':
           description: Handheld & Mobile Access Device Configuration
@@ -5600,6 +5813,8 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/DeviceSoftwareContentRemoteConfigurationInput'
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       responses:
         '200':
           description: Device Software, Content & Remote Configuration
@@ -5719,6 +5934,8 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/EdgeNodeLocalProcessingConfigurationInput'
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       responses:
         '200':
           description: Edge Node & Local Processing Configuration
@@ -5953,6 +6170,8 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/OfflineSimulationResilienceTestingInput'
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       responses:
         '200':
           description: Offline Simulation & Resilience Testing
@@ -6070,6 +6289,8 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/GroupB2bAdmissionProfileBuilderInput'
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       responses:
         '200':
           description: Group & B2B Admission Profile Builder
@@ -6205,7 +6426,7 @@ paths:
       summary: Re-entry & Temporary Exit Journey
       description: '**Drafted from the workshop pack; the shape below is read out of it, not invented.**
         Access Control Module, page 106. The screen says: Manage guests temporarily leaving and returning
-        to the venue. 106 | Pa ge The source matrix requires configurable re-entry and also describes
+        to the venue. The source matrix requires configurable re-entry and also describes
         a journey using a designated re-entry gate with both ticket verification and a UV stamp.
 
 
@@ -6590,6 +6811,8 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/ManualOverrideSupervisorApprovalInput'
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       responses:
         '200':
           description: Manual Override & Supervisor Approval
@@ -6750,6 +6973,8 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/OperationalIncidentExceptionWorkspaceInput'
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       responses:
         '200':
           description: Operational Incident & Exception Workspace
@@ -6907,6 +7132,8 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/VisualDynamicPolicyBuilderInput'
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       responses:
         '200':
           description: Visual Dynamic Policy Builder
@@ -6949,6 +7176,8 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/ContextTimeEventCapacityPolicyBuilderInput'
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       responses:
         '200':
           description: Context, Time, Event & Capacity Policy Builder
@@ -7144,6 +7373,8 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/PolicySimulationConflictImpactAnalysisInput'
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       responses:
         '200':
           description: Policy Simulation, Conflict & Impact Analysis
@@ -7453,6 +7684,8 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/RealTimeSecurityResponsePlaybookBuilderInput'
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       responses:
         '200':
           description: Real-Time Security Response & Playbook Builder
@@ -7495,6 +7728,8 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/SecurityInvestigationEvidenceWorkspaceInput'
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       responses:
         '200':
           description: Security Investigation & Evidence Workspace
@@ -8070,6 +8305,9 @@ paths:
       description: >
         **Who changed what a pass could do, and when.** An entitlement that stopped working at a
         gate is answered from here or from nowhere.
+
+        **Newest first: `changedAt` descending, `id` descending as the tiebreak**, and the cursor is
+        a keyset on that pair.
       tags:
       - access
       x-ticvai-permission: GUEST_VIEW
@@ -8125,15 +8363,27 @@ paths:
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/AccessEntryRulePoint'
+                allOf:
+                - $ref: ../shared/common.yaml#/components/schemas/Page
+                - type: object
+                  properties:
+                    items:
+                      type: array
+                      items:
+                        $ref: '#/components/schemas/AccessEntryRulePoint'
     put:
       operationId: setEntryRulePoints
       summary: Set the access points an admission rule covers
       description: >
         Set whole: a rule's coverage is decided as a set, and applying it point by point leaves
         gates admitting on a rule that is half-applied.
+
+        **PUT semantics — replaces the rule's whole set of points.** Each item is matched on
+        `accessPointId` within the rule the path names: one in the body replaces the stored row
+        (its `isActive` included), one not yet stored is added, and **a stored point missing from
+        the body is removed from the rule**. An empty array removes every point. The body's
+        `admissionProfileId`, `id` and `createdAt` are server-owned and ignored; the path decides
+        the rule.
       tags:
       - access
       x-ticvai-permission: ACCESS_POINT_CONFIGURE
@@ -8159,6 +8409,9 @@ paths:
                 $ref: '#/components/schemas/AccessEntryRulePoint'
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Set the access points an admission rule covers
           content:
             application/json:
@@ -8192,8 +8445,9 @@ components:
           maxLength: 30
         orderId:
           type: string
-          format: uuid
+          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
           nullable: true
+          description: The order's id, a ULID as in `/orders/{orderId}`.
         upgradeId:
           type: string
           format: uuid
@@ -8222,6 +8476,7 @@ components:
         admissionProfileId:
           type: string
           format: uuid
+          readOnly: true
         accessPointId:
           type: string
           format: uuid
@@ -8230,9 +8485,11 @@ components:
         createdAt:
           type: string
           format: date-time
+          readOnly: true
         id:
           type: string
           format: uuid
+          readOnly: true
     DraftedRecord:
       type: object
       x-ticvai-provisional: true
@@ -8314,6 +8571,10 @@ components:
             and independent of the media carrying it.** A guest whose wristband broke keeps the same entitlement
             with a new `mediaCode`.
 
+            **This is the ticket id.** Wherever an operation takes a `ticketId` or `ticketIds` — `lookupTicket`,
+            `listScans`, `ScanEvent`, the offline package and `transferOrderTickets` — it is this value.
+            An order line''s `entitlementIds` are the ticket ids of that line.
+
             '
         templateId:
           type: string
@@ -8327,7 +8588,8 @@ components:
           format: uuid
         orderId:
           type: string
-          format: uuid
+          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+          description: The order's id, a ULID as in `/orders/{orderId}` (`orders.sales_order.id`).
         orderLineId:
           type: string
           format: uuid
@@ -8376,8 +8638,15 @@ components:
         entriesUsed:
           type: integer
           default: 0
+          readOnly: true
+          x-ticvai-derived: onWrite
           description: '**The number `validateAccess` decrements and nothing was decrementing.** A ten-entry
             pass with no counter is a ten-entry pass that admits forever.
+
+            **Maintained on write**, in the same transaction as the admitting `access.scan_event` row: by
+            `validateAccess`, `validateGroupAccess` (by the count admitted) and `syncScans` for each
+            replayed admission the server accepts. A replayed scan the server downgrades to `denied`
+            does not count.
 
             '
         entriesAllowed:
@@ -8387,10 +8656,20 @@ components:
           type: string
           format: date-time
           nullable: true
+          readOnly: true
+          x-ticvai-derived: onWrite
+          description: '`recordedAt` of the latest admission counted in `entriesUsed`, written by the
+            same writes. A scan replayed late with an earlier `recordedAt` does not move it back.
+
+            '
         frozenDays:
           type: integer
           default: 0
-          description: 'Days added by a freeze. **Held here rather than computed from a freeze log**,
+          readOnly: true
+          x-ticvai-derived: onWrite
+          description: 'Days added by a freeze. **Maintained on write** by the freeze operation
+            (`freezeEntitlement`), in the same write that extends `validTo` by those days. **Held here
+            rather than computed from a freeze log**,
             because a gate has to answer in under 300ms and cannot replay a history to decide validity.
 
             '
@@ -8428,7 +8707,7 @@ components:
             '
         supersedesEntitlementId:
           type: string
-          format: uuid
+          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
           nullable: true
           description: 'For a reissue or a resale. **The chain is traceable** — a ticket appearing from
             nowhere is indistinguishable from a fraudulent one.
@@ -8440,6 +8719,19 @@ components:
           nullable: true
           description: 'Where the template carries stored value. **A `retail.Wallet` bound to the entitlement,
             not a balance on it** (CF-126).
+
+            '
+        facePassEnrolmentId:
+          type: string
+          format: uuid
+          nullable: true
+          readOnly: true
+          x-ticvai-persisted: false
+          x-ticvai-derived: onRead
+          description: 'The active `facePass` enrolment on this entitlement (`FacePassEnrolment.id`),
+            or null when none is. **Computed on read from `pii.subject_biometric` and not stored here** —
+            the PII split keeps the biometric on its own side, and this carries only its id. It is how a
+            screen holding a pass finds the enrolment `getFacePassEnrolment` and `revokeFacePass` take.
 
             '
     BiometricKind:
@@ -8568,17 +8860,20 @@ components:
         id:
           type: string
           format: uuid
+          readOnly: true
         subjectId:
           type: string
           format: uuid
         entitlementId:
           type: string
-          format: uuid
+          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+          description: The `Entitlement.id`, a ULID (`pii.subject_biometric.entitlement_id`).
         kind:
           $ref: '#/components/schemas/BiometricKind'
         retentionAnchor:
           allOf:
           - $ref: '#/components/schemas/BiometricRetentionAnchor'
+          x-ticvai-derived: onWrite
           description: >
             BL-106. **Derived from `kind`, never sent.** `facePass` anchors to the entitlement,
             `faceTag` to the ticket or to the close of the operating day.
@@ -8646,7 +8941,10 @@ components:
         id:
           type: string
           format: uuid
-          readOnly: true
+          description: '**Server-assigned, and the upsert key of `setParkingFacility`.** Absent in a body,
+            it creates; present, it names the facility being replaced. A client never mints one.
+
+            '
         name:
           type: string
         venueId:
@@ -8690,17 +8988,21 @@ components:
         vendorName:
           type: string
           nullable: true
+          description: Staff only — omitted from a guest's `listParkingFacilities` response.
         endpoint:
           type: string
           nullable: true
+          description: Staff only — omitted from a guest's `listParkingFacilities` response.
         credentialRef:
           type: string
           nullable: true
-          description: A vault reference, never the credential.
+          description: A vault reference, never the credential. Staff only — omitted from a guest's
+            `listParkingFacilities` response.
         pushLeadMinutes:
           type: integer
           nullable: true
-          description: 'How far ahead of the visit a plate is pushed. **Too early and the whitelist fills
+          description: 'Staff only — omitted from a guest''s `listParkingFacilities` response. How far
+            ahead of the visit a plate is pushed. **Too early and the whitelist fills
             with cars that will not arrive; too late and the guest is at the barrier.**
 
             '
@@ -8740,7 +9042,8 @@ components:
           format: uuid
         orderId:
           type: string
-          format: uuid
+          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+          description: The order's id, a ULID as in `/orders/{orderId}` (`orders.sales_order.id`).
         subjectId:
           type: string
           format: uuid
@@ -8760,20 +9063,56 @@ components:
           nullable: true
           description: The code presented in `none` and `qrHandoff` modes.
         status:
-          $ref: '#/components/schemas/ParkingEntitlementStatus'
+          allOf:
+          - $ref: '#/components/schemas/ParkingEntitlementStatus'
+          readOnly: true
+          description: Server-owned. Moves as `states/parking-entitlement.yaml` says; a create body does
+            not send it.
         pushedAt:
           type: string
           format: date-time
           nullable: true
+          readOnly: true
         pushFailureReason:
           type: string
           nullable: true
+          readOnly: true
         validFrom:
           type: string
           format: date-time
         validTo:
           type: string
           format: date-time
+    UpdateParkingEntitlementRequest:
+      type: object
+      x-ticvai-persistence: none — request only; applied to access.parking_entitlement
+      description: '**The body of `updateParkingEntitlement`: only what changes.** A partial update, so
+        a field left out keeps its stored value. Two changes are possible, one per call:
+
+        - **A plate change** — `plateNumber`, and `plateCountry` where it differs. The new plate is
+        re-pushed and the old one leaves the whitelist. Resending the current plate is how a failed
+        push is retried.
+
+        - **A revoke** — `status: revoked`. The plate leaves the whitelist and the entitlement is
+        terminal.
+
+        A body carrying both, or neither, is a `400`. Which states allow each change is
+        `states/parking-entitlement.yaml`''s to say.
+
+        '
+      minProperties: 1
+      properties:
+        plateNumber:
+          type: string
+          description: Personal data, under the same rules as `ParkingEntitlement.plateNumber`.
+        plateCountry:
+          type: string
+          nullable: true
+        status:
+          type: string
+          enum:
+          - revoked
+          description: The only status a caller may set. Every other move is the server's.
     AdmissionRules:
       x-ticvai-persistence: access.admission_rules
       type: object
@@ -8787,62 +9126,22 @@ components:
         id:
           type: string
           format: uuid
+          readOnly: true
+          description: '**Server-assigned.** Ignored in a `createAdmissionRules` or `updateAdmissionRules`
+            body; on update the profile is the one the path names.
+
+            '
         code:
           type: string
           maxLength: 64
         perProductRules:
-          type: array
+          allOf:
+          - $ref: '#/components/schemas/PerProductRuleList'
           description: 'BL-059. **Transaction rules were per profile and a ticket type could not state
             its own.** An annual pass allowing one entry per day and a single ticket allowing one entry
             ever are different rules, and forcing a profile per product multiplies profiles instead.
 
             '
-          items:
-            type: object
-            properties:
-              productId:
-                type: string
-                format: uuid
-              entriesPerDay:
-                type: integer
-                nullable: true
-              minimumGapMinutes:
-                type: integer
-                nullable: true
-                description: '**Anti-passback in minutes rather than a boolean.** A guest leaving for
-                  lunch and returning in forty minutes is normal; the same scan twice in ten seconds is
-                  a card being passed back over a fence.
-
-                  '
-              allowedAccessPointIds:
-                type: array
-                items:
-                  type: string
-                  format: uuid
-              biometricPolicy:
-                allOf:
-                - $ref: '#/components/schemas/BiometricPolicy'
-                description: >
-                  BL-105, 3.2.9. **The biometric check is a property of the product, not of the
-                  venue** — memberships checked, day tickets not. It sits here rather than on the
-                  profile because `perProductRules` is already where a ticket type states its own
-                  terms, and a profile per product would multiply profiles to carry one flag.
-
-                  **Absent means `disabled`**, and `disabled` is the answer for every product
-                  until somebody chooses otherwise. **Inert while
-                  `VenueSettings.biometrics.isEnabled` is false**, so a rules profile copied to
-                  another venue cannot begin capturing faces there.
-              maxPassesPerBiometricIdentity:
-                type: integer
-                nullable: true
-                minimum: 1
-                description: >
-                  BL-096, 2.14.7. **The annual-pass quota, keyed to biometric identity.**
-                  `enrolFacePass` already answers 409 where a face is on another annual pass; the
-                  constant behind that refusal was one and was invisible. **Null means unlimited**
-                  and is the answer for every product that is not an annual pass — a quota applied
-                  where nobody asked for one turns a family sharing a day ticket into a fraud
-                  alert.
         name:
           type: string
           maxLength: 200
@@ -9254,6 +9553,8 @@ components:
       properties:
         id:
           type: string
+          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+          description: The scan's client-generated ULID, the key offline replay deduplicates on.
         accessPointId:
           type: string
           format: uuid
@@ -9264,7 +9565,9 @@ components:
           type: string
         ticketId:
           type: string
+          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
           nullable: true
+          description: The `Entitlement.id` scanned; null where the media resolved to nothing.
         mediaCode:
           type: string
           nullable: true
@@ -9321,7 +9624,8 @@ components:
         scopePath:
           type: string
         externalCredentialSources:
-          type: array
+          allOf:
+          - $ref: '#/components/schemas/ExternalCredentialSourceList'
           description: 'BL-108. **A hotel room card admitting a guest to a water park** — externally issued,
             and the platform validates it without having sold it.
 
@@ -9329,28 +9633,9 @@ components:
             not want 400 entitlements a night for guests who never visit.
 
             '
-          items:
-            type: object
-            properties:
-              kind:
-                type: string
-                enum:
-                - hotelRoomCard
-                - corporateBadge
-                - cityPass
-                - transitCard
-                - partnerToken
-              providerName:
-                type: string
-              endpoint:
-                type: string
-              credentialRef:
-                type: string
-              grantsProductId:
-                type: string
-                format: uuid
         scanAnomalyRules:
-          type: array
+          allOf:
+          - $ref: '#/components/schemas/ScanAnomalyRuleList'
           description: 'BL-104. **Rule-based scan anomalies, separated from the parked model-based engine**
             — device sharing, simultaneous entries at two gates, an impossible walking time between them.
 
@@ -9358,27 +9643,6 @@ components:
             two entries eight seconds apart at gates four hundred metres apart is arithmetic.
 
             '
-          items:
-            type: object
-            properties:
-              rule:
-                type: string
-                enum:
-                - simultaneousEntry
-                - impossibleTravelTime
-                - rapidReentry
-                - sharedDevice
-                - velocityBreach
-              action:
-                type: string
-                enum:
-                - log
-                - flag
-                - requireSupervisor
-                - deny
-              thresholdSeconds:
-                type: integer
-                nullable: true
         operatingMode:
           type: string
           enum:
@@ -9415,12 +9679,178 @@ components:
           $ref: '#/components/schemas/Direction'
         antiPassbackEnabled:
           type: boolean
+        requiresExitBeforeReentry:
+          type: boolean
+          default: false
+          description: Written by `createAccessPoint` and `updateAccessPoint`, and returned so the edit
+            form reads back what it wrote.
+        driver:
+          type: string
+          nullable: true
+          description: 'Driver identifier for the controller behind this access point, as written by
+            `createAccessPoint` and `updateAccessPoint`. Where the reader speaks OSDP the driver is
+            standards-based; the controller layer above it is vendor-specific.
+
+            '
+        geofence:
+          allOf:
+          - $ref: '#/components/schemas/AccessPointGeofence'
+          nullable: true
+          description: 'Written by `setAccessPointGeofence`; null until one is set. **One `jsonb` column
+            on the access point row** (`access.access_point.geofence`), read with the point when a
+            handheld validates against it.
+
+            '
         isActive:
           type: boolean
         lastHeartbeatAt:
           type: string
           format: date-time
           nullable: true
+    AccessPointGeofence:
+      type: object
+      x-ticvai-persistence-kind: valueObject
+      x-ticvai-persistence-column: jsonb
+      description: 'Where a handheld may validate for one access point, and what happens outside it.
+        The body of `setAccessPointGeofence` and the value of `AccessPoint.geofence`.
+
+        '
+      required:
+      - enforcement
+      properties:
+        latitude:
+          type: number
+        longitude:
+          type: number
+        radiusMetres:
+          type: integer
+          minimum: 5
+          maximum: 5000
+        enforcement:
+          type: string
+          enum:
+          - 'off'
+          - warn
+          - deny
+          description: '`off` keeps the fence on record and checks nothing; `warn` lets a validation
+            from outside the fence through with a warning; `deny` refuses it.
+
+            '
+        allowProximityBeacon:
+          type: boolean
+          description: Accept a BLE proximity assertion in place of GPS. Better indoors.
+    PerProductRuleList:
+      type: array
+      x-ticvai-persistence-kind: valueObject
+      x-ticvai-persistence-column: jsonb
+      description: '**One `jsonb` column on the profile row** (`access.admission_rules.per_product_rules`). The
+        rules are read with the profile and a rule is never queried on its own, so a child table would
+        add a join for nothing.
+
+        '
+      items:
+        type: object
+        properties:
+          productId:
+            type: string
+            format: uuid
+          entriesPerDay:
+            type: integer
+            nullable: true
+          minimumGapMinutes:
+            type: integer
+            nullable: true
+            description: '**Anti-passback in minutes rather than a boolean.** A guest leaving for
+              lunch and returning in forty minutes is normal; the same scan twice in ten seconds is
+              a card being passed back over a fence.
+
+              '
+          allowedAccessPointIds:
+            type: array
+            items:
+              type: string
+              format: uuid
+          biometricPolicy:
+            allOf:
+            - $ref: '#/components/schemas/BiometricPolicy'
+            description: >
+              BL-105, 3.2.9. **The biometric check is a property of the product, not of the
+              venue** — memberships checked, day tickets not. It sits here rather than on the
+              profile because `perProductRules` is already where a ticket type states its own
+              terms, and a profile per product would multiply profiles to carry one flag.
+
+              **Absent means `disabled`**, and `disabled` is the answer for every product
+              until somebody chooses otherwise. **Inert while
+              `VenueSettings.biometrics.isEnabled` is false**, so a rules profile copied to
+              another venue cannot begin capturing faces there.
+          maxPassesPerBiometricIdentity:
+            type: integer
+            nullable: true
+            minimum: 1
+            description: >
+              BL-096, 2.14.7. **The annual-pass quota, keyed to biometric identity.**
+              `enrolFacePass` already answers 409 where a face is on another annual pass; the
+              constant behind that refusal was one and was invisible. **Null means unlimited**
+              and is the answer for every product that is not an annual pass — a quota applied
+              where nobody asked for one turns a family sharing a day ticket into a fraud
+              alert.
+    ExternalCredentialSourceList:
+      type: array
+      x-ticvai-persistence-kind: valueObject
+      x-ticvai-persistence-column: jsonb
+      description: '**One `jsonb` column on the access point row** (`access.access_point.external_credential_sources`).
+        Read with the access point when a credential is presented; a source is never queried on its own.
+
+        '
+      items:
+        type: object
+        properties:
+          kind:
+            type: string
+            enum:
+            - hotelRoomCard
+            - corporateBadge
+            - cityPass
+            - transitCard
+            - partnerToken
+          providerName:
+            type: string
+          endpoint:
+            type: string
+          credentialRef:
+            type: string
+          grantsProductId:
+            type: string
+            format: uuid
+    ScanAnomalyRuleList:
+      type: array
+      x-ticvai-persistence-kind: valueObject
+      x-ticvai-persistence-column: jsonb
+      description: '**One `jsonb` column on the access point row** (`access.access_point.scan_anomaly_rules`). Read
+        with the access point at validation, and a rule is never queried on its own.
+
+        '
+      items:
+        type: object
+        properties:
+          rule:
+            type: string
+            enum:
+            - simultaneousEntry
+            - impossibleTravelTime
+            - rapidReentry
+            - sharedDevice
+            - velocityBreach
+          action:
+            type: string
+            enum:
+            - log
+            - flag
+            - requireSupervisor
+            - deny
+          thresholdSeconds:
+            type: integer
+            nullable: true
     OfflinePackage:
       x-ticvai-persistence: none — generated artefact in object storage
       type: object
@@ -9460,6 +9890,8 @@ components:
             properties:
               ticketId:
                 type: string
+                pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+                description: The `Entitlement.id`.
               mediaCodes:
                 type: array
                 items:
@@ -9507,6 +9939,8 @@ components:
                 type: string
               ticketId:
                 type: string
+                pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+                description: The `Entitlement.id` in the issuing cell.
               issuingCellId:
                 type: string
               guestLinkId:
@@ -18590,7 +19024,7 @@ components:
           description: Remaining (the pack shows 7, 2)
         guestsArriving:
           type: string
-          description: Guests arriving (the pack shows 104 | Pa ge, 5)
+          description: Guests arriving (the pack shows 5)
         totalEntered:
           type: integer
           description: Total Entered (the pack shows 48)
@@ -20952,7 +21386,7 @@ components:
           description: ⚫ Offline
         guests:
           type: integer
-          description: Guests (the pack shows 171 | Pa ge, 4,821)
+          description: Guests (the pack shows 4,821)
         success:
           type: string
           description: Success (the pack shows 96.4%)

@@ -15,7 +15,6 @@ initial:
 terminal:
 - completed
 - declined
-- failed
 transitions:
 - from: pendingApproval
   to: pendingGateway

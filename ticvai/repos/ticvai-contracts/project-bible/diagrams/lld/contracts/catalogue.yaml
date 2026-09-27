@@ -1,5 +1,5 @@
 id: LLD-catalogue
-title: catalogue — 205 operations
+title: catalogue — 206 operations
 generatedBy: tools/derive-diagrams.py
 index: diagrams/hld/03-contracts.yaml
 tier: spine
@@ -349,6 +349,17 @@ operations:
   - catalogue.channel_capacity
   - catalogue.inventory_hold
   - catalogue.performance
+  writes: []
+- operation: getCatalogueImportJob
+  verb: GET
+  path: /products/import/{jobId}
+  scope: venue
+  permission: PRODUCT_VIEW
+  audience:
+  - staff
+  offline: false
+  reads:
+  - catalogue.import_job
   writes: []
 - operation: getChannelAllocations
   verb: GET

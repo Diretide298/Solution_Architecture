@@ -5,11 +5,11 @@
   "operator": "guest",
   "counts": {
    "screens": 46,
-   "operations": 167,
+   "operations": 166,
    "contracts": 18,
    "modules": 13,
    "undrawn": 0,
-   "operationsWithNoScreen": 10
+   "operationsWithNoScreen": 15
   },
   "waves": {
    "wave1": 21,
@@ -23,11 +23,11 @@
   "operator": "guest",
   "counts": {
    "screens": 71,
-   "operations": 170,
+   "operations": 168,
    "contracts": 18,
    "modules": 16,
    "undrawn": 0,
-   "operationsWithNoScreen": 10
+   "operationsWithNoScreen": 15
   },
   "waves": {
    "wave1": 20,
@@ -45,7 +45,7 @@
    "contracts": 20,
    "modules": 4,
    "undrawn": 0,
-   "operationsWithNoScreen": 194
+   "operationsWithNoScreen": 211
   },
   "waves": {
    "wave1": 27,
@@ -58,11 +58,11 @@
   "operator": "guest",
   "counts": {
    "screens": 17,
-   "operations": 23,
+   "operations": 22,
    "contracts": 8,
    "modules": 2,
    "undrawn": 0,
-   "operationsWithNoScreen": 9
+   "operationsWithNoScreen": 13
   },
   "waves": {
    "wave2": 17
@@ -78,7 +78,7 @@
    "contracts": 18,
    "modules": 4,
    "undrawn": 0,
-   "operationsWithNoScreen": 181
+   "operationsWithNoScreen": 198
   },
   "waves": {
    "wave1": 25,
@@ -96,7 +96,7 @@
    "contracts": 5,
    "modules": 1,
    "undrawn": 0,
-   "operationsWithNoScreen": 52
+   "operationsWithNoScreen": 55
   },
   "waves": {
    "wave1": 11
@@ -112,7 +112,7 @@
    "contracts": 31,
    "modules": 13,
    "undrawn": 0,
-   "operationsWithNoScreen": 237
+   "operationsWithNoScreen": 256
   },
   "waves": {
    "wave1": 60,
@@ -130,7 +130,7 @@
    "contracts": 19,
    "modules": 14,
    "undrawn": 0,
-   "operationsWithNoScreen": 197
+   "operationsWithNoScreen": 211
   },
   "waves": {
    "wave1": 12,
@@ -181,7 +181,7 @@
    "contracts": 7,
    "modules": 5,
    "undrawn": 0,
-   "operationsWithNoScreen": 81
+   "operationsWithNoScreen": 84
   },
   "waves": {
    "wave2": 2,
@@ -198,7 +198,7 @@
    "contracts": 7,
    "modules": 3,
    "undrawn": 0,
-   "operationsWithNoScreen": 100
+   "operationsWithNoScreen": 107
   },
   "waves": {
    "wave2": 20,
@@ -232,7 +232,7 @@
    "contracts": 3,
    "modules": 1,
    "undrawn": 0,
-   "operationsWithNoScreen": 37
+   "operationsWithNoScreen": 46
   },
   "waves": {
    "wave2": 10
@@ -248,7 +248,7 @@
    "contracts": 11,
    "modules": 1,
    "undrawn": 0,
-   "operationsWithNoScreen": 135
+   "operationsWithNoScreen": 149
   },
   "waves": {
    "wave3": 69

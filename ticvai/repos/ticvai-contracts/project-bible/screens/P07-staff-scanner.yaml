@@ -94,11 +94,6 @@ screens:
   patternReason: '`listMfaMethods` reads the population and `getCurrentShift` reads one of them — list,
     select, act'
   purpose: PIN or badge. Session carries the workstation.
-  gaps:
-  - operation: getCurrentSession
-    why: '**2 declared operations reach no component on this screen**: getCurrentSession, listSsoProviders.
-      Either the screen is missing what calls them, or the declaration is residue.'
-    source: the screen's own declarations
   layout:
     template: split
     regions:
@@ -106,7 +101,7 @@ screens:
       slot: collection
       components:
       - kind: dataTable
-        label: Every sign
+        label: Every MFA method
         bindsTo: MfaMethod
         columns:
         - MfaMethod.id
@@ -119,11 +114,54 @@ screens:
         - MfaMethod.lastUsedAt
         operation: listMfaMethods
         provenance: contract identity.yaml GET /auth/mfa/methods
+      - kind: dataTable
+        label: Every SSO provider
+        bindsTo: SsoProvider
+        columns:
+        - SsoProvider.id
+        - SsoProvider.displayName
+        - SsoProvider.protocol
+        - SsoProvider.iconAssetRef
+        - SsoProvider.isEnforced
+        - SsoProvider.scopePath
+        operation: listSsoProviders
+        provenance: contract identity.yaml GET /auth/sso/providers
     - name: contextPanel
       slot: selection
       components:
       - kind: detailPanel
-        label: The selected sign
+        label: The selected MFA method
+        bindsTo: MfaMethod
+        columns:
+        - MfaMethod.id
+        - MfaMethod.kind
+        - MfaMethod.label
+        - MfaMethod.maskedTarget
+        - MfaMethod.isActive
+        - MfaMethod.isPrimary
+        - MfaMethod.enrolledAt
+        - MfaMethod.lastUsedAt
+        operation: listMfaMethods
+        provenance: contract identity.yaml GET /auth/mfa/methods
+      - kind: detailPanel
+        label: The session
+        bindsTo: Session
+        columns:
+        - Session.sessionId
+        - Session.principalId
+        - Session.roleId
+        - Session.displayName
+        - Session.scope
+        - Session.effectivePermissions
+        - Session.permissionsByScope
+        - Session.saleBoardId
+        - Session.workstation
+        - Session.openedAt
+        - Session.expiresAt
+        operation: getCurrentSession
+        provenance: contract identity.yaml GET /auth/session
+      - kind: detailPanel
+        label: The shift
         bindsTo: Shift
         columns:
         - Shift.id
@@ -152,46 +190,30 @@ screens:
         operation: login
         provenance: contract identity.yaml POST /auth/login
       - kind: secondaryButton
-        label: Select
+        label: Select role
         operation: selectRole
         provenance: contract identity.yaml POST /auth/select-role
       - kind: secondaryButton
-        label: Resolve
+        label: Resolve permissions
         operation: resolvePermissions
         provenance: contract identity.yaml POST /permissions/resolve
-    - name: contentBody
-      slot: carried
-      components:
-      - kind: detailPanel
-        notes: Structure from the wireframe board. Components not yet enumerated.
-        provenance: carried from the previous definition
-      - kind: dataTable
-        derived: true
-        impliedBy: listMfaMethods
-        notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
-          a venue''s busiest hour is a list that skips rows.'
-        provenance: carried from the previous definition
-      - kind: secondaryButton
-        label: Cancel
-        notes: '**A screen that can submit must be leaveable without submitting.**'
-        derived: true
-        impliedBy: login
-        provenance: carried from the previous definition
   states:
     loading: The sign list.
     error: Could not load. Names which read failed and leaves the sign untouched.
-    emptyFirstRun: No sign yet. Carries the create action; distinct from a filter that matched nothing.
-    emptyNoResults: The filter narrowed it and the sign are still there. Names the active filter and offers
-      to clear it.
-    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
-      data* and sends somebody to support with the wrong question.
+    emptyFirstRun: No sign yet. **Offers no create action** — this screen declares no operation that makes
+      one — and says so rather than showing an empty table.
+    emptyNoResults: 'Never shown: `listMfaMethods` takes no filter, so an empty list is always the first-run
+      state above.'
+    emptyNoAccess: Shown when the caller lacks `SHIFT_OPEN`, which `getCurrentShift` requires, and names
+      that permission. **Never an empty table** — that reads as *there is no data* and sends somebody
+      to support with the wrong question.
     offline: '**Signs in against the cached principal list from the last bundle.** A steward locked out
       at 08:00 because the venue wifi is down is a gate that does not open'
   apis:
   - operationId: login
     contract: identity
     purpose: From the flow it appears in
-    trigger: onLoad
+    trigger: onAction
   - operationId: getCurrentShift
     contract: shift
     purpose: From the flow it appears in
@@ -226,11 +248,11 @@ screens:
       from: session
     coldEntry: Resolves from the session; a cold arrival is the ordinary case.
     preloaded:
-    - Shift.id
-    - Shift.workstationId
-    - Shift.venueId
-    - Shift.scopePath
-    - Shift.principalId
+    - MfaMethod.id
+    - MfaMethod.kind
+    - MfaMethod.label
+    - MfaMethod.maskedTarget
+    - MfaMethod.isActive
   wireframe:
     status: notStarted
     provenance: generated
@@ -238,6 +260,53 @@ screens:
   apisNote: Rebuilt 9 September 2026 from the 8 operations this screen declares, not from a workshop pack
     — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
     to the ones that matter is work a person still owes this screen.
+  overlays:
+  - id: formLogin
+    component: modal
+    trigger: Login
+    body: '**Collects what `login` sends before it is called.** Required: `username`, `credential`, `workstationId`.
+      Optional: `method`, `deviceFingerprint`. Dismissing sends nothing; the screen behind is unchanged.'
+    bindsTo: LoginRequest
+    confirm:
+      label: Login
+      operation: login
+    dismiss:
+      label: Cancel
+      discards:
+      - username
+      - credential
+      - workstationId
+      - method
+      - deviceFingerprint
+    provenance: contract identity.yaml POST /auth/login
+  - id: formSelectRole
+    component: modal
+    trigger: Select role
+    body: '**Collects what `selectRole` sends before it is called.** Required: `roleId`. Dismissing sends
+      nothing; the screen behind is unchanged.'
+    confirm:
+      label: Select role
+      operation: selectRole
+    dismiss:
+      label: Cancel
+      discards:
+      - roleId
+    provenance: contract identity.yaml POST /auth/select-role
+  - id: formResolvePermissions
+    component: modal
+    trigger: Resolve permissions
+    body: '**Collects what `resolvePermissions` sends before it is called.** Required: `principalId`,
+      `roleId`. Optional: `atScopePath`. Dismissing sends nothing; the screen behind is unchanged.'
+    confirm:
+      label: Resolve permissions
+      operation: resolvePermissions
+    dismiss:
+      label: Cancel
+      discards:
+      - principalId
+      - roleId
+      - atScopePath
+    provenance: contract identity.yaml POST /permissions/resolve
 - id: SCN-002
   name: Access point & direction
   module: Access
@@ -253,7 +322,9 @@ screens:
     exitTo:
     - SCN-001
     - SCN-003
+    - SCN-013
     - SCN-015
+    - SCN-016
     inferred: true
     fromFlows: true
     transitions:
@@ -262,18 +333,18 @@ screens:
       provenance: flow F06 step 2→3, F61 step 2→3
     - to: SCN-001
       trigger: Sign in
-      carries:
-      - sessionId
-      - shiftId
-      provenance: derived — SCN-001 declares entryState.params sessionId, shiftId, so an edge into it
-        must carry them
+      provenance: derived — SCN-001 declares entryState.params  and SCN-002 holds none of them, so the
+        edge carries nothing and SCN-001 opens cold
     - to: SCN-003
       trigger: Ready to scan
+      provenance: derived — SCN-003 declares entryState.params mediaCode, rightId and SCN-002 holds none
+        of them, so the edge carries nothing and SCN-003 opens cold
+    - to: SCN-016
+      trigger: Gate mode
       carries:
-      - mediaCode
-      - rightId
-      provenance: derived — SCN-003 declares entryState.params mediaCode, rightId, so an edge into it
-        must carry them
+      - accessPointId
+      provenance: derived — SCN-016 declares entryState.params accessPointId and SCN-002 holds accessPointId,
+        so an edge into it carries them
   notes: 'Definition derived from the wireframe board on 14 August. Components, states and operations
     still to be written. **Authoring operations removed 24 August**: createAccessPoint, setAccessPointGeofence,
     updateAccessPoint. **A scanner reads the gate configuration; it does not write it.** An access point
@@ -294,8 +365,13 @@ screens:
     - name: contentBody
       slot: collection
       components:
+      - kind: textField
+        label: Venue id
+        operation: listAccessPoints
+        notes: Sends `?venueId=` to `listAccessPoints`.
+        provenance: contract access.yaml GET /access-points
       - kind: dataTable
-        label: Every access point direction
+        label: Every access point
         bindsTo: AccessPoint
         columns:
         - AccessPoint.id
@@ -316,7 +392,7 @@ screens:
       slot: selection
       components:
       - kind: detailPanel
-        label: The selected access point direction
+        label: The selected access point
         bindsTo: AccessPoint
         columns:
         - AccessPoint.id
@@ -339,41 +415,19 @@ screens:
       slot: rowActions
       components:
       - kind: primaryButton
-        label: Save changes
+        label: Save turnstile mode
         operation: setTurnstileMode
         provenance: contract access.yaml PUT /access-points/{accessPointId}/mode
-    - name: contentBody
-      slot: carried
-      components:
-      - kind: detailPanel
-        notes: Structure from the wireframe board. Components not yet enumerated.
-        provenance: carried from the previous definition
-      - kind: dataTable
-        derived: true
-        impliedBy: listAccessPoints
-        notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
-          a venue''s busiest hour is a list that skips rows.'
-        provenance: carried from the previous definition
-      - kind: primaryButton
-        derived: true
-        impliedBy: setTurnstileMode
-        label: Save turnstile mode
-        provenance: carried from the previous definition
-      - kind: secondaryButton
-        label: Cancel
-        notes: '**A screen that can submit must be leaveable without submitting.**'
-        derived: true
-        impliedBy: setTurnstileMode
-        provenance: carried from the previous definition
   states:
     loading: The access point direction list.
     error: Could not load. Names which read failed and leaves the access point direction untouched.
-    emptyFirstRun: No access point direction yet. Carries the create action; distinct from a filter that
-      matched nothing.
-    emptyNoResults: The filter narrowed it and the access point direction are still there. Names the active
-      filter and offers to clear it.
-    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
-      data* and sends somebody to support with the wrong question.
+    emptyFirstRun: No access point direction yet. **Offers no create action** — this screen declares no
+      operation that makes one — and says so rather than showing an empty table.
+    emptyNoResults: Nothing matches the filter on venueId and the access point direction are still there.
+      Names the active filter and offers to clear it.
+    emptyNoAccess: Shown when the caller lacks `SCOPE_VIEW`, which `listAccessPoints` requires, and names
+      that permission. **Never an empty table** — that reads as *there is no data* and sends somebody
+      to support with the wrong question.
     offline: Fully offline. The access point list is in the bundle
   apis:
   - operationId: listAccessPoints
@@ -383,7 +437,7 @@ screens:
   - operationId: getAccessPoint
     contract: access
     purpose: Read an access point
-    trigger: onLoad
+    trigger: onAction
   - operationId: setTurnstileMode
     contract: access
     purpose: Confirm the direction this gate runs in
@@ -412,6 +466,21 @@ screens:
   apisNote: Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop pack
     — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
     to the ones that matter is work a person still owes this screen.
+  overlays:
+  - id: formSetTurnstileMode
+    component: modal
+    trigger: Save turnstile mode
+    body: '**Collects what `setTurnstileMode` sends before it is called.** Required: `mode`. Optional:
+      `reason`. Dismissing sends nothing; the screen behind is unchanged.'
+    confirm:
+      label: Save turnstile mode
+      operation: setTurnstileMode
+    dismiss:
+      label: Cancel
+      discards:
+      - mode
+      - reason
+    provenance: contract access.yaml PUT /access-points/{accessPointId}/mode
 - id: SCN-003
   name: Ready to scan
   module: Access
@@ -429,6 +498,9 @@ screens:
     - SCN-002
     - SCN-003
     - SCN-007
+    - SCN-008
+    - SCN-009
+    - SCN-011
     - SCN-014
     inferred: true
     fromFlows: true
@@ -441,30 +513,33 @@ screens:
       provenance: flow F06 step 5→6, F19 step 3→4
     - to: SCN-001
       trigger: Sign in
-      carries:
-      - sessionId
-      - shiftId
-      provenance: derived — SCN-001 declares entryState.params sessionId, shiftId, so an edge into it
-        must carry them
+      provenance: derived — SCN-001 declares entryState.params  and SCN-003 holds none of them, so the
+        edge carries nothing and SCN-001 opens cold
     - to: SCN-002
       trigger: Access point & direction
       carries:
       - accessPointId
-      provenance: derived — SCN-002 declares entryState.params accessPointId, so an edge into it must
-        carry them
+      provenance: derived — SCN-002 declares entryState.params accessPointId and SCN-003 holds accessPointId,
+        so an edge into it carries them
     - to: SCN-003
       trigger: Ready to scan
       carries:
       - mediaCode
       - rightId
-      provenance: derived — SCN-003 declares entryState.params mediaCode, rightId, so an edge into it
-        must carry them
+      provenance: derived — SCN-003 declares entryState.params mediaCode, rightId and SCN-003 holds mediaCode,
+        rightId, so an edge into it carries them
     - to: PTR-015
       trigger: Reviews usage
       provenance: flow F10 step 4→5
       operation: validateAccess
       crossesDevice: true
       back: false
+    - to: SCN-011
+      trigger: Delegated right
+      carries:
+      - rightId
+      provenance: derived — SCN-011 declares entryState.params rightId and SCN-003 holds rightId, so an
+        edge into it carries them
   notes: 'Definition derived from the wireframe board on 14 August. Components, states and operations
     still to be written. **Absorbed SCN-004, SCN-005, SCN-006, SCN-010, SCN-012 on 18 August.** A scanner
     is one screen the device sits on all day, and an outcome is a state of it — **routing to `/access/admitted`
@@ -478,19 +553,39 @@ screens:
   patternReason: '`listScans` reads the population and `getOfflinePackage` reads one of them — list, select,
     act'
   purpose: The screen the device sits on all day.
-  gaps:
-  - operation: listBlacklist
-    why: '**1 declared operation reach no component on this screen**: listBlacklist. Either the screen
-      is missing what calls them, or the declaration is residue.'
-    source: the screen's own declarations
   layout:
     template: split
     regions:
     - name: contentBody
       slot: collection
       components:
+      - kind: textField
+        label: Access point id
+        operation: listScans
+        notes: Sends `?accessPointId=` to `listScans`.
+        provenance: contract access.yaml GET /access/scans
+      - kind: textField
+        label: Ticket id
+        operation: listScans
+        notes: Sends `?ticketId=` to `listScans`.
+        provenance: contract access.yaml GET /access/scans
+      - kind: textField
+        label: Outcome
+        operation: listScans
+        notes: Sends `?outcome=` to `listScans`.
+        provenance: contract access.yaml GET /access/scans
+      - kind: datePicker
+        label: Recorded from
+        operation: listScans
+        notes: Sends `?recordedFrom=` to `listScans`.
+        provenance: contract access.yaml GET /access/scans
+      - kind: datePicker
+        label: Recorded to
+        operation: listScans
+        notes: Sends `?recordedTo=` to `listScans`.
+        provenance: contract access.yaml GET /access/scans
       - kind: dataTable
-        label: Every ready scan
+        label: Every scan event
         bindsTo: ScanEvent
         columns:
         - ScanEvent.id
@@ -507,11 +602,57 @@ screens:
         - ScanEvent.overriddenByPrincipalId
         operation: listScans
         provenance: contract access.yaml GET /access/scans
+      - kind: dataTable
+        label: Every blacklist entry
+        bindsTo: BlacklistEntry
+        columns:
+        - BlacklistEntry.mediaCode
+        - BlacklistEntry.reason
+        - BlacklistEntry.addedAt
+        - BlacklistEntry.addedByPrincipalId
+        - BlacklistEntry.expiresAt
+        - BlacklistEntry.scopePath
+        operation: listBlacklist
+        provenance: contract access.yaml GET /blacklist
+      - kind: scanTarget
+        derived: true
+        impliedBy: listScans
+        notes: '**A screen that validates a credential needs somewhere to point the camera.** `denied`
+          and `hardwareError` look different because an operator facing a guest needs to know whether
+          to try again or explain something.'
+        provenance: carried from the previous definition
+      - kind: searchField
+        derived: true
+        impliedBy: lookupTicket
+        label: Search
+        notes: A search that returns nothing must say so differently from a search not yet run.
+        provenance: carried from the previous definition
     - name: contextPanel
       slot: selection
       components:
       - kind: detailPanel
-        label: The selected ready scan
+        label: The selected scan event
+        bindsTo: ScanEvent
+        columns:
+        - ScanEvent.id
+        - ScanEvent.accessPointId
+        - ScanEvent.venueId
+        - ScanEvent.scopePath
+        - ScanEvent.ticketId
+        - ScanEvent.mediaCode
+        - ScanEvent.outcome
+        - ScanEvent.denyReason
+        - ScanEvent.direction
+        - ScanEvent.operatorPrincipalId
+        - ScanEvent.deviceId
+        - ScanEvent.overriddenByPrincipalId
+        - ScanEvent.overrideReason
+        - ScanEvent.recordedAt
+        - ScanEvent.syncedAt
+        operation: listScans
+        provenance: contract access.yaml GET /access/scans
+      - kind: detailPanel
+        label: The offline package
         bindsTo: OfflinePackage
         columns:
         - OfflinePackage.generatedAt
@@ -528,75 +669,116 @@ screens:
       slot: rowActions
       components:
       - kind: primaryButton
-        label: Sync
+        label: Sync scans
         operation: syncScans
         provenance: contract access.yaml POST /access/scans
       - kind: secondaryButton
-        label: Lookup
+        label: Lookup ticket
         operation: lookupTicket
         provenance: contract access.yaml GET /access/lookup
       - kind: destructiveButton
-        label: Override
+        label: Override access
         operation: overrideAccess
         provenance: contract access.yaml POST /access/override
       - kind: secondaryButton
-        label: Validate
+        label: Validate access
         operation: validateAccess
         provenance: contract access.yaml POST /access/validate
       - kind: secondaryButton
-        label: Validate
+        label: Validate group access
         operation: validateGroupAccess
         provenance: contract access.yaml POST /access/group-validate
       - kind: secondaryButton
-        label: Consume
+        label: Consume cross region entitlement
         operation: consumeCrossRegionEntitlement
         provenance: contract cross-region.yaml POST /cross-region-entitlements/{rightId}/consume
-    - name: contentBody
-      slot: carried
-      components:
-      - kind: detailPanel
-        notes: Structure from the wireframe board. Components not yet enumerated.
-        provenance: carried from the previous definition
-      - kind: scanTarget
-        derived: true
-        impliedBy: listScans
-        notes: '**A screen that validates a credential needs somewhere to point the camera.** `denied`
-          and `hardwareError` look different because an operator facing a guest needs to know whether
-          to try again or explain something.'
-        provenance: carried from the previous definition
-      - kind: searchField
-        derived: true
-        impliedBy: lookupTicket
-        label: Search
-        notes: A search that returns nothing must say so differently from a search not yet run.
-        provenance: carried from the previous definition
-      - kind: dataTable
-        derived: true
-        impliedBy: listBlacklist
-        notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
-          a venue''s busiest hour is a list that skips rows.'
-        provenance: carried from the previous definition
-      - kind: secondaryButton
-        label: Cancel
-        notes: '**A screen that can submit must be leaveable without submitting.**'
-        derived: true
-        impliedBy: syncScans
-        provenance: carried from the previous definition
   overlays:
   - id: confirmOverrideAccess
     component: confirmDialog
-    trigger: Override
+    trigger: Override access
     body: '**Names what `overrideAccess` changes and what it leaves alone**, in the consequence rather
-      than the verb. A ready scan this affects should be identified in the dialog, not just counted.'
+      than the verb. A ready scan this affects should be identified in the dialog, not just counted. **Collects
+      what `overrideAccess` sends before it is called.** Required: `id`, `scanId`, `reason`, `recordedAt`.'
     provenance: contract access.yaml POST /access/override
+  - id: formSyncScans
+    component: modal
+    trigger: Sync scans
+    body: '**Collects what `syncScans` sends before it is called.** Required: `deviceId`, `scans`. Dismissing
+      sends nothing; the screen behind is unchanged.'
+    confirm:
+      label: Sync scans
+      operation: syncScans
+    dismiss:
+      label: Cancel
+      discards:
+      - deviceId
+      - scans
+    provenance: contract access.yaml POST /access/scans
+  - id: formValidateAccess
+    component: modal
+    trigger: Validate access
+    body: '**Collects what `validateAccess` sends before it is called.** Required: `id`, `mediaCode`,
+      `mediaKind`, `direction`, `recordedAt`. Optional: `groupSize`, `proximityToken`. Dismissing sends
+      nothing; the screen behind is unchanged.'
+    bindsTo: ValidateRequest
+    confirm:
+      label: Validate access
+      operation: validateAccess
+    dismiss:
+      label: Cancel
+      discards:
+      - id
+      - mediaCode
+      - mediaKind
+      - direction
+      - recordedAt
+      - groupSize
+      - proximityToken
+    provenance: contract access.yaml POST /access/validate
+  - id: formValidateGroupAccess
+    component: modal
+    trigger: Validate group access
+    body: '**Collects what `validateGroupAccess` sends before it is called.** Required: `id`, `mediaCode`,
+      `admitCount`, `recordedAt`. Optional: `direction`. Dismissing sends nothing; the screen behind is
+      unchanged.'
+    confirm:
+      label: Validate group access
+      operation: validateGroupAccess
+    dismiss:
+      label: Cancel
+      discards:
+      - id
+      - mediaCode
+      - admitCount
+      - recordedAt
+      - direction
+    provenance: contract access.yaml POST /access/group-validate
+  - id: formConsumeCrossRegionEntitlement
+    component: modal
+    trigger: Consume cross region entitlement
+    body: '**Collects what `consumeCrossRegionEntitlement` sends before it is called.** Required: `id`,
+      `entries`, `scanId`, `recordedAt`. Dismissing sends nothing; the screen behind is unchanged.'
+    confirm:
+      label: Consume cross region entitlement
+      operation: consumeCrossRegionEntitlement
+    dismiss:
+      label: Cancel
+      discards:
+      - id
+      - entries
+      - scanId
+      - recordedAt
+    provenance: contract cross-region.yaml POST /cross-region-entitlements/{rightId}/consume
   states:
     loading: The ready scan list.
     error: Could not load. Names which read failed and leaves the ready scan untouched.
-    emptyFirstRun: No ready scan yet. Carries the create action; distinct from a filter that matched nothing.
-    emptyNoResults: The filter narrowed it and the ready scan are still there. Names the active filter
-      and offers to clear it.
-    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
-      data* and sends somebody to support with the wrong question.
+    emptyFirstRun: No ready scan yet. **Offers no create action** — this screen declares no operation
+      that makes one — and says so rather than showing an empty table.
+    emptyNoResults: Nothing matches the filter on accessPointId, ticketId, outcome, recordedFrom, recordedTo
+      and the ready scan are still there. Names the active filter and offers to clear it.
+    emptyNoAccess: Shown when the caller lacks `REPORT_VIEW_VENUE`, which `listScans` requires, and names
+      that permission. **Never an empty table** — that reads as *there is no data* and sends somebody
+      to support with the wrong question.
     offline: '**Same loop, different truth. Amber says so.** Was a separate screen until 18 August, and
       the screen already had an `offline` state — two places describing one condition is two places to
       disagree.'
@@ -626,7 +808,7 @@ screens:
   - operationId: lookupTicket
     contract: access
     purpose: Read-only validity check without admitting
-    trigger: onLoad
+    trigger: onAction
   - operationId: overrideAccess
     contract: access
     purpose: Admit against a failed validation
@@ -667,11 +849,11 @@ screens:
       session, never from the link**: a link cannot move somebody to a venue they do not hold. Arrives
       with `mediaCode`, `rightId`.'
     preloaded:
-    - OfflinePackage.generatedAt
-    - OfflinePackage.validFrom
-    - OfflinePackage.validTo
-    - OfflinePackage.accessPointId
-    - OfflinePackage.entitlements
+    - ScanEvent.id
+    - ScanEvent.accessPointId
+    - ScanEvent.venueId
+    - ScanEvent.scopePath
+    - ScanEvent.ticketId
   wireframe:
     status: notStarted
     provenance: generated
@@ -701,23 +883,23 @@ screens:
     notes: '**Reached from SCN-003** — a group is admitted from the scan that found it. Stated on 4 September:
       this screen exited somewhere and nothing exited to it, so it was outside the navigation graph entirely.'
     transitions:
-    - to: SCN-003
-      trigger: The session ends and the device syncs
-      provenance: flow F61 step 6→7
-      operation: listScans
     - to: SCN-001
       trigger: Sign in
-      carries:
-      - sessionId
-      - shiftId
-      provenance: derived — SCN-001 declares entryState.params sessionId, shiftId, so an edge into it
-        must carry them
+      provenance: derived — SCN-001 declares entryState.params  and SCN-007 holds none of them, so the
+        edge carries nothing and SCN-001 opens cold
     - to: SCN-002
       trigger: Access point & direction
       carries:
       - accessPointId
-      provenance: derived — SCN-002 declares entryState.params accessPointId, so an edge into it must
-        carry them
+      provenance: derived — SCN-002 declares entryState.params accessPointId and SCN-007 holds accessPointId,
+        so an edge into it carries them
+    - to: SCN-003
+      trigger: The session ends and the device syncs
+      provenance: flow F61 step 6→7
+      operation: listScans
+      carries:
+      - mediaCode
+      - rightId
   notes: Definition derived from the wireframe board on 14 August. Components, states and operations still
     to be written.
   density: comfortable
@@ -731,8 +913,33 @@ screens:
     - name: contentBody
       slot: collection
       components:
+      - kind: textField
+        label: Access point id
+        operation: listScans
+        notes: Sends `?accessPointId=` to `listScans`.
+        provenance: contract access.yaml GET /access/scans
+      - kind: textField
+        label: Ticket id
+        operation: listScans
+        notes: Sends `?ticketId=` to `listScans`.
+        provenance: contract access.yaml GET /access/scans
+      - kind: textField
+        label: Outcome
+        operation: listScans
+        notes: Sends `?outcome=` to `listScans`.
+        provenance: contract access.yaml GET /access/scans
+      - kind: datePicker
+        label: Recorded from
+        operation: listScans
+        notes: Sends `?recordedFrom=` to `listScans`.
+        provenance: contract access.yaml GET /access/scans
+      - kind: datePicker
+        label: Recorded to
+        operation: listScans
+        notes: Sends `?recordedTo=` to `listScans`.
+        provenance: contract access.yaml GET /access/scans
       - kind: dataTable
-        label: Every group admission
+        label: Every scan event
         bindsTo: ScanEvent
         columns:
         - ScanEvent.id
@@ -749,11 +956,45 @@ screens:
         - ScanEvent.overriddenByPrincipalId
         operation: listScans
         provenance: contract access.yaml GET /access/scans
+      - kind: scanTarget
+        derived: true
+        impliedBy: listScans
+        notes: '**A screen that validates a credential needs somewhere to point the camera.** `denied`
+          and `hardwareError` look different because an operator facing a guest needs to know whether
+          to try again or explain something.'
+        provenance: carried from the previous definition
+      - kind: searchField
+        derived: true
+        impliedBy: lookupTicket
+        label: Search
+        notes: A search that returns nothing must say so differently from a search not yet run.
+        provenance: carried from the previous definition
     - name: contextPanel
       slot: selection
       components:
       - kind: detailPanel
-        label: The selected group admission
+        label: The selected scan event
+        bindsTo: ScanEvent
+        columns:
+        - ScanEvent.id
+        - ScanEvent.accessPointId
+        - ScanEvent.venueId
+        - ScanEvent.scopePath
+        - ScanEvent.ticketId
+        - ScanEvent.mediaCode
+        - ScanEvent.outcome
+        - ScanEvent.denyReason
+        - ScanEvent.direction
+        - ScanEvent.operatorPrincipalId
+        - ScanEvent.deviceId
+        - ScanEvent.overriddenByPrincipalId
+        - ScanEvent.overrideReason
+        - ScanEvent.recordedAt
+        - ScanEvent.syncedAt
+        operation: listScans
+        provenance: contract access.yaml GET /access/scans
+      - kind: detailPanel
+        label: The offline package
         bindsTo: OfflinePackage
         columns:
         - OfflinePackage.generatedAt
@@ -770,72 +1011,103 @@ screens:
       slot: rowActions
       components:
       - kind: primaryButton
-        label: Validate
+        label: Validate group access
         operation: validateGroupAccess
         provenance: contract access.yaml POST /access/group-validate
       - kind: secondaryButton
-        label: Lookup
+        label: Lookup ticket
         operation: lookupTicket
         provenance: contract access.yaml GET /access/lookup
       - kind: destructiveButton
-        label: Override
+        label: Override access
         operation: overrideAccess
         provenance: contract access.yaml POST /access/override
       - kind: secondaryButton
-        label: Sync
+        label: Sync scans
         operation: syncScans
         provenance: contract access.yaml POST /access/scans
       - kind: secondaryButton
-        label: Validate
+        label: Validate access
         operation: validateAccess
         provenance: contract access.yaml POST /access/validate
-    - name: contentBody
-      slot: carried
-      components:
-      - kind: detailPanel
-        notes: Structure from the wireframe board. Components not yet enumerated.
-        provenance: carried from the previous definition
-      - kind: scanTarget
-        derived: true
-        impliedBy: listScans
-        notes: '**A screen that validates a credential needs somewhere to point the camera.** `denied`
-          and `hardwareError` look different because an operator facing a guest needs to know whether
-          to try again or explain something.'
-        provenance: carried from the previous definition
-      - kind: searchField
-        derived: true
-        impliedBy: lookupTicket
-        label: Search
-        notes: A search that returns nothing must say so differently from a search not yet run.
-        provenance: carried from the previous definition
-      - kind: secondaryButton
-        label: Cancel
-        notes: '**A screen that can submit must be leaveable without submitting.**'
-        derived: true
-        impliedBy: validateGroupAccess
-        provenance: carried from the previous definition
   overlays:
   - id: confirmOverrideAccess
     component: confirmDialog
-    trigger: Override
+    trigger: Override access
     body: '**Names what `overrideAccess` changes and what it leaves alone**, in the consequence rather
-      than the verb. A group admission this affects should be identified in the dialog, not just counted.'
+      than the verb. A group admission this affects should be identified in the dialog, not just counted.
+      **Collects what `overrideAccess` sends before it is called.** Required: `id`, `scanId`, `reason`,
+      `recordedAt`.'
     provenance: contract access.yaml POST /access/override
+  - id: formValidateGroupAccess
+    component: modal
+    trigger: Validate group access
+    body: '**Collects what `validateGroupAccess` sends before it is called.** Required: `id`, `mediaCode`,
+      `admitCount`, `recordedAt`. Optional: `direction`. Dismissing sends nothing; the screen behind is
+      unchanged.'
+    confirm:
+      label: Validate group access
+      operation: validateGroupAccess
+    dismiss:
+      label: Cancel
+      discards:
+      - id
+      - mediaCode
+      - admitCount
+      - recordedAt
+      - direction
+    provenance: contract access.yaml POST /access/group-validate
+  - id: formSyncScans
+    component: modal
+    trigger: Sync scans
+    body: '**Collects what `syncScans` sends before it is called.** Required: `deviceId`, `scans`. Dismissing
+      sends nothing; the screen behind is unchanged.'
+    confirm:
+      label: Sync scans
+      operation: syncScans
+    dismiss:
+      label: Cancel
+      discards:
+      - deviceId
+      - scans
+    provenance: contract access.yaml POST /access/scans
+  - id: formValidateAccess
+    component: modal
+    trigger: Validate access
+    body: '**Collects what `validateAccess` sends before it is called.** Required: `id`, `mediaCode`,
+      `mediaKind`, `direction`, `recordedAt`. Optional: `groupSize`, `proximityToken`. Dismissing sends
+      nothing; the screen behind is unchanged.'
+    bindsTo: ValidateRequest
+    confirm:
+      label: Validate access
+      operation: validateAccess
+    dismiss:
+      label: Cancel
+      discards:
+      - id
+      - mediaCode
+      - mediaKind
+      - direction
+      - recordedAt
+      - groupSize
+      - proximityToken
+    provenance: contract access.yaml POST /access/validate
   states:
     loading: The group admission list.
     error: Could not load. Names which read failed and leaves the group admission untouched.
-    emptyFirstRun: No group admission yet. Carries the create action; distinct from a filter that matched
-      nothing.
-    emptyNoResults: The filter narrowed it and the group admission are still there. Names the active filter
-      and offers to clear it.
-    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
-      data* and sends somebody to support with the wrong question.
+    emptyFirstRun: No group admission yet. **Offers no create action** — this screen declares no operation
+      that makes one — and says so rather than showing an empty table.
+    emptyNoResults: Nothing matches the filter on accessPointId, ticketId, outcome, recordedFrom, recordedTo
+      and the group admission are still there. Names the active filter and offers to clear it.
+    emptyNoAccess: Shown when the caller lacks `ACCESS_VALIDATE`, which `getOfflinePackage` requires,
+      and names that permission. **Never an empty table** — that reads as *there is no data* and sends
+      somebody to support with the wrong question.
     offline: Fully offline. Admits what is valid and states the shortfall
   apis:
   - operationId: validateGroupAccess
     contract: access
     purpose: From the flow it appears in
-    trigger: onLoad
+    trigger: onAction
   - operationId: getOfflinePackage
     contract: access
     purpose: Entitlement and rule set for offline validation
@@ -847,7 +1119,7 @@ screens:
   - operationId: lookupTicket
     contract: access
     purpose: Read-only validity check without admitting
-    trigger: onLoad
+    trigger: onAction
   - operationId: overrideAccess
     contract: access
     purpose: Admit against a failed validation
@@ -868,11 +1140,11 @@ screens:
     - listScans
   entryState:
     preloaded:
-    - OfflinePackage.generatedAt
-    - OfflinePackage.validFrom
-    - OfflinePackage.validTo
-    - OfflinePackage.accessPointId
-    - OfflinePackage.entitlements
+    - ScanEvent.id
+    - ScanEvent.accessPointId
+    - ScanEvent.venueId
+    - ScanEvent.scopePath
+    - ScanEvent.ticketId
   wireframe:
     status: notStarted
     provenance: generated
@@ -909,24 +1181,21 @@ screens:
       operation: lookupTicket
     - to: SCN-001
       trigger: Sign in
-      carries:
-      - sessionId
-      - shiftId
-      provenance: derived — SCN-001 declares entryState.params sessionId, shiftId, so an edge into it
-        must carry them
+      provenance: derived — SCN-001 declares entryState.params  and SCN-008 holds none of them, so the
+        edge carries nothing and SCN-001 opens cold
     - to: SCN-002
       trigger: Access point & direction
       carries:
       - accessPointId
-      provenance: derived — SCN-002 declares entryState.params accessPointId, so an edge into it must
-        carry them
+      provenance: derived — SCN-002 declares entryState.params accessPointId and SCN-008 holds accessPointId,
+        so an edge into it carries them
     - to: SCN-003
       trigger: Ready to scan
       carries:
       - mediaCode
       - rightId
-      provenance: derived — SCN-003 declares entryState.params mediaCode, rightId, so an edge into it
-        must carry them
+      provenance: derived — SCN-003 declares entryState.params mediaCode, rightId and SCN-008 holds mediaCode,
+        rightId, so an edge into it carries them
   notes: Definition derived from the wireframe board on 14 August. Components, states and operations still
     to be written.
   density: comfortable
@@ -940,8 +1209,33 @@ screens:
     - name: contentBody
       slot: collection
       components:
+      - kind: textField
+        label: Access point id
+        operation: listScans
+        notes: Sends `?accessPointId=` to `listScans`.
+        provenance: contract access.yaml GET /access/scans
+      - kind: textField
+        label: Ticket id
+        operation: listScans
+        notes: Sends `?ticketId=` to `listScans`.
+        provenance: contract access.yaml GET /access/scans
+      - kind: textField
+        label: Outcome
+        operation: listScans
+        notes: Sends `?outcome=` to `listScans`.
+        provenance: contract access.yaml GET /access/scans
+      - kind: datePicker
+        label: Recorded from
+        operation: listScans
+        notes: Sends `?recordedFrom=` to `listScans`.
+        provenance: contract access.yaml GET /access/scans
+      - kind: datePicker
+        label: Recorded to
+        operation: listScans
+        notes: Sends `?recordedTo=` to `listScans`.
+        provenance: contract access.yaml GET /access/scans
       - kind: dataTable
-        label: Every manual entry
+        label: Every scan event
         bindsTo: ScanEvent
         columns:
         - ScanEvent.id
@@ -958,11 +1252,45 @@ screens:
         - ScanEvent.overriddenByPrincipalId
         operation: listScans
         provenance: contract access.yaml GET /access/scans
+      - kind: searchField
+        derived: true
+        impliedBy: lookupTicket
+        label: Search
+        notes: A search that returns nothing must say so differently from a search not yet run.
+        provenance: carried from the previous definition
+      - kind: scanTarget
+        derived: true
+        impliedBy: listScans
+        notes: '**A screen that validates a credential needs somewhere to point the camera.** `denied`
+          and `hardwareError` look different because an operator facing a guest needs to know whether
+          to try again or explain something.'
+        provenance: carried from the previous definition
     - name: contextPanel
       slot: selection
       components:
       - kind: detailPanel
-        label: The selected manual entry
+        label: The selected scan event
+        bindsTo: ScanEvent
+        columns:
+        - ScanEvent.id
+        - ScanEvent.accessPointId
+        - ScanEvent.venueId
+        - ScanEvent.scopePath
+        - ScanEvent.ticketId
+        - ScanEvent.mediaCode
+        - ScanEvent.outcome
+        - ScanEvent.denyReason
+        - ScanEvent.direction
+        - ScanEvent.operatorPrincipalId
+        - ScanEvent.deviceId
+        - ScanEvent.overriddenByPrincipalId
+        - ScanEvent.overrideReason
+        - ScanEvent.recordedAt
+        - ScanEvent.syncedAt
+        operation: listScans
+        provenance: contract access.yaml GET /access/scans
+      - kind: detailPanel
+        label: The offline package
         bindsTo: OfflinePackage
         columns:
         - OfflinePackage.generatedAt
@@ -979,73 +1307,104 @@ screens:
       slot: rowActions
       components:
       - kind: primaryButton
-        label: Lookup
+        label: Lookup ticket
         operation: lookupTicket
         provenance: contract access.yaml GET /access/lookup
       - kind: destructiveButton
-        label: Override
+        label: Override access
         operation: overrideAccess
         provenance: contract access.yaml POST /access/override
       - kind: secondaryButton
-        label: Sync
+        label: Sync scans
         operation: syncScans
         provenance: contract access.yaml POST /access/scans
       - kind: secondaryButton
-        label: Validate
+        label: Validate access
         operation: validateAccess
         provenance: contract access.yaml POST /access/validate
       - kind: secondaryButton
-        label: Validate
+        label: Validate group access
         operation: validateGroupAccess
         provenance: contract access.yaml POST /access/group-validate
-    - name: contentBody
-      slot: carried
-      components:
-      - kind: detailPanel
-        notes: Structure from the wireframe board. Components not yet enumerated.
-        provenance: carried from the previous definition
-      - kind: searchField
-        derived: true
-        impliedBy: lookupTicket
-        label: Search
-        notes: A search that returns nothing must say so differently from a search not yet run.
-        provenance: carried from the previous definition
-      - kind: scanTarget
-        derived: true
-        impliedBy: listScans
-        notes: '**A screen that validates a credential needs somewhere to point the camera.** `denied`
-          and `hardwareError` look different because an operator facing a guest needs to know whether
-          to try again or explain something.'
-        provenance: carried from the previous definition
-      - kind: secondaryButton
-        label: Cancel
-        notes: '**A screen that can submit must be leaveable without submitting.**'
-        derived: true
-        impliedBy: overrideAccess
-        provenance: carried from the previous definition
   overlays:
   - id: confirmOverrideAccess
     component: confirmDialog
-    trigger: Override
+    trigger: Override access
     body: '**Names what `overrideAccess` changes and what it leaves alone**, in the consequence rather
-      than the verb. A manual entry this affects should be identified in the dialog, not just counted.'
+      than the verb. A manual entry this affects should be identified in the dialog, not just counted.
+      **Collects what `overrideAccess` sends before it is called.** Required: `id`, `scanId`, `reason`,
+      `recordedAt`.'
     provenance: contract access.yaml POST /access/override
+  - id: formSyncScans
+    component: modal
+    trigger: Sync scans
+    body: '**Collects what `syncScans` sends before it is called.** Required: `deviceId`, `scans`. Dismissing
+      sends nothing; the screen behind is unchanged.'
+    confirm:
+      label: Sync scans
+      operation: syncScans
+    dismiss:
+      label: Cancel
+      discards:
+      - deviceId
+      - scans
+    provenance: contract access.yaml POST /access/scans
+  - id: formValidateAccess
+    component: modal
+    trigger: Validate access
+    body: '**Collects what `validateAccess` sends before it is called.** Required: `id`, `mediaCode`,
+      `mediaKind`, `direction`, `recordedAt`. Optional: `groupSize`, `proximityToken`. Dismissing sends
+      nothing; the screen behind is unchanged.'
+    bindsTo: ValidateRequest
+    confirm:
+      label: Validate access
+      operation: validateAccess
+    dismiss:
+      label: Cancel
+      discards:
+      - id
+      - mediaCode
+      - mediaKind
+      - direction
+      - recordedAt
+      - groupSize
+      - proximityToken
+    provenance: contract access.yaml POST /access/validate
+  - id: formValidateGroupAccess
+    component: modal
+    trigger: Validate group access
+    body: '**Collects what `validateGroupAccess` sends before it is called.** Required: `id`, `mediaCode`,
+      `admitCount`, `recordedAt`. Optional: `direction`. Dismissing sends nothing; the screen behind is
+      unchanged.'
+    confirm:
+      label: Validate group access
+      operation: validateGroupAccess
+    dismiss:
+      label: Cancel
+      discards:
+      - id
+      - mediaCode
+      - admitCount
+      - recordedAt
+      - direction
+    provenance: contract access.yaml POST /access/group-validate
   states:
     loading: The manual entry list.
     error: Could not load. Names which read failed and leaves the manual entry untouched.
-    emptyFirstRun: No manual entry yet. Carries the create action; distinct from a filter that matched
-      nothing.
-    emptyNoResults: The filter narrowed it and the manual entry are still there. Names the active filter
-      and offers to clear it.
-    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
-      data* and sends somebody to support with the wrong question.
+    emptyFirstRun: No manual entry yet. **Offers no create action** — this screen declares no operation
+      that makes one — and says so rather than showing an empty table.
+    emptyNoResults: Nothing matches the filter on accessPointId, ticketId, outcome, recordedFrom, recordedTo
+      and the manual entry are still there. Names the active filter and offers to clear it.
+    emptyNoAccess: Shown when the caller lacks `ACCESS_VALIDATE`, which `getOfflinePackage` requires,
+      and names that permission. **Never an empty table** — that reads as *there is no data* and sends
+      somebody to support with the wrong question.
     offline: Searches the bundle only. A reference issued after the last sync will not be found, and the
       screen says so rather than denying
   apis:
   - operationId: lookupTicket
     contract: access
     purpose: From the flow it appears in
-    trigger: onLoad
+    trigger: onAction
   - operationId: getOfflinePackage
     contract: access
     purpose: Entitlement and rule set for offline validation
@@ -1080,11 +1439,11 @@ screens:
     - listScans
   entryState:
     preloaded:
-    - OfflinePackage.generatedAt
-    - OfflinePackage.validFrom
-    - OfflinePackage.validTo
-    - OfflinePackage.accessPointId
-    - OfflinePackage.entitlements
+    - ScanEvent.id
+    - ScanEvent.accessPointId
+    - ScanEvent.venueId
+    - ScanEvent.scopePath
+    - ScanEvent.ticketId
   wireframe:
     status: notStarted
     provenance: generated
@@ -1118,22 +1477,22 @@ screens:
       entry, lookup, and declaring the navigation non-inferred is what turned that missing edge from a
       warning into a failure.'
     transitions:
-    - to: SCN-003
-      trigger: It is valid
-      provenance: flow F62 step 2→3
     - to: SCN-001
       trigger: Sign in
-      carries:
-      - sessionId
-      - shiftId
-      provenance: derived — SCN-001 declares entryState.params sessionId, shiftId, so an edge into it
-        must carry them
+      provenance: derived — SCN-001 declares entryState.params  and SCN-009 holds none of them, so the
+        edge carries nothing and SCN-001 opens cold
     - to: SCN-002
       trigger: Access point & direction
       carries:
       - accessPointId
-      provenance: derived — SCN-002 declares entryState.params accessPointId, so an edge into it must
-        carry them
+      provenance: derived — SCN-002 declares entryState.params accessPointId and SCN-009 holds accessPointId,
+        so an edge into it carries them
+    - to: SCN-003
+      trigger: It is valid
+      provenance: flow F62 step 2→3
+      carries:
+      - mediaCode
+      - rightId
   notes: Definition derived from the wireframe board on 14 August. Components, states and operations still
     to be written.
   density: comfortable
@@ -1147,8 +1506,33 @@ screens:
     - name: contentBody
       slot: collection
       components:
+      - kind: textField
+        label: Access point id
+        operation: listScans
+        notes: Sends `?accessPointId=` to `listScans`.
+        provenance: contract access.yaml GET /access/scans
+      - kind: textField
+        label: Ticket id
+        operation: listScans
+        notes: Sends `?ticketId=` to `listScans`.
+        provenance: contract access.yaml GET /access/scans
+      - kind: textField
+        label: Outcome
+        operation: listScans
+        notes: Sends `?outcome=` to `listScans`.
+        provenance: contract access.yaml GET /access/scans
+      - kind: datePicker
+        label: Recorded from
+        operation: listScans
+        notes: Sends `?recordedFrom=` to `listScans`.
+        provenance: contract access.yaml GET /access/scans
+      - kind: datePicker
+        label: Recorded to
+        operation: listScans
+        notes: Sends `?recordedTo=` to `listScans`.
+        provenance: contract access.yaml GET /access/scans
       - kind: dataTable
-        label: Every ticket lookup
+        label: Every scan event
         bindsTo: ScanEvent
         columns:
         - ScanEvent.id
@@ -1165,11 +1549,45 @@ screens:
         - ScanEvent.overriddenByPrincipalId
         operation: listScans
         provenance: contract access.yaml GET /access/scans
+      - kind: searchField
+        derived: true
+        impliedBy: lookupTicket
+        label: Search
+        notes: A search that returns nothing must say so differently from a search not yet run.
+        provenance: carried from the previous definition
+      - kind: scanTarget
+        derived: true
+        impliedBy: listScans
+        notes: '**A screen that validates a credential needs somewhere to point the camera.** `denied`
+          and `hardwareError` look different because an operator facing a guest needs to know whether
+          to try again or explain something.'
+        provenance: carried from the previous definition
     - name: contextPanel
       slot: selection
       components:
       - kind: detailPanel
-        label: The selected ticket lookup
+        label: The selected scan event
+        bindsTo: ScanEvent
+        columns:
+        - ScanEvent.id
+        - ScanEvent.accessPointId
+        - ScanEvent.venueId
+        - ScanEvent.scopePath
+        - ScanEvent.ticketId
+        - ScanEvent.mediaCode
+        - ScanEvent.outcome
+        - ScanEvent.denyReason
+        - ScanEvent.direction
+        - ScanEvent.operatorPrincipalId
+        - ScanEvent.deviceId
+        - ScanEvent.overriddenByPrincipalId
+        - ScanEvent.overrideReason
+        - ScanEvent.recordedAt
+        - ScanEvent.syncedAt
+        operation: listScans
+        provenance: contract access.yaml GET /access/scans
+      - kind: detailPanel
+        label: The offline package
         bindsTo: OfflinePackage
         columns:
         - OfflinePackage.generatedAt
@@ -1186,72 +1604,103 @@ screens:
       slot: rowActions
       components:
       - kind: primaryButton
-        label: Lookup
+        label: Lookup ticket
         operation: lookupTicket
         provenance: contract access.yaml GET /access/lookup
       - kind: destructiveButton
-        label: Override
+        label: Override access
         operation: overrideAccess
         provenance: contract access.yaml POST /access/override
       - kind: secondaryButton
-        label: Sync
+        label: Sync scans
         operation: syncScans
         provenance: contract access.yaml POST /access/scans
       - kind: secondaryButton
-        label: Validate
+        label: Validate access
         operation: validateAccess
         provenance: contract access.yaml POST /access/validate
       - kind: secondaryButton
-        label: Validate
+        label: Validate group access
         operation: validateGroupAccess
         provenance: contract access.yaml POST /access/group-validate
-    - name: contentBody
-      slot: carried
-      components:
-      - kind: detailPanel
-        notes: Structure from the wireframe board. Components not yet enumerated.
-        provenance: carried from the previous definition
-      - kind: searchField
-        derived: true
-        impliedBy: lookupTicket
-        label: Search
-        notes: A search that returns nothing must say so differently from a search not yet run.
-        provenance: carried from the previous definition
-      - kind: scanTarget
-        derived: true
-        impliedBy: listScans
-        notes: '**A screen that validates a credential needs somewhere to point the camera.** `denied`
-          and `hardwareError` look different because an operator facing a guest needs to know whether
-          to try again or explain something.'
-        provenance: carried from the previous definition
-      - kind: secondaryButton
-        label: Cancel
-        notes: '**A screen that can submit must be leaveable without submitting.**'
-        derived: true
-        impliedBy: overrideAccess
-        provenance: carried from the previous definition
   overlays:
   - id: confirmOverrideAccess
     component: confirmDialog
-    trigger: Override
+    trigger: Override access
     body: '**Names what `overrideAccess` changes and what it leaves alone**, in the consequence rather
-      than the verb. A ticket lookup this affects should be identified in the dialog, not just counted.'
+      than the verb. A ticket lookup this affects should be identified in the dialog, not just counted.
+      **Collects what `overrideAccess` sends before it is called.** Required: `id`, `scanId`, `reason`,
+      `recordedAt`.'
     provenance: contract access.yaml POST /access/override
+  - id: formSyncScans
+    component: modal
+    trigger: Sync scans
+    body: '**Collects what `syncScans` sends before it is called.** Required: `deviceId`, `scans`. Dismissing
+      sends nothing; the screen behind is unchanged.'
+    confirm:
+      label: Sync scans
+      operation: syncScans
+    dismiss:
+      label: Cancel
+      discards:
+      - deviceId
+      - scans
+    provenance: contract access.yaml POST /access/scans
+  - id: formValidateAccess
+    component: modal
+    trigger: Validate access
+    body: '**Collects what `validateAccess` sends before it is called.** Required: `id`, `mediaCode`,
+      `mediaKind`, `direction`, `recordedAt`. Optional: `groupSize`, `proximityToken`. Dismissing sends
+      nothing; the screen behind is unchanged.'
+    bindsTo: ValidateRequest
+    confirm:
+      label: Validate access
+      operation: validateAccess
+    dismiss:
+      label: Cancel
+      discards:
+      - id
+      - mediaCode
+      - mediaKind
+      - direction
+      - recordedAt
+      - groupSize
+      - proximityToken
+    provenance: contract access.yaml POST /access/validate
+  - id: formValidateGroupAccess
+    component: modal
+    trigger: Validate group access
+    body: '**Collects what `validateGroupAccess` sends before it is called.** Required: `id`, `mediaCode`,
+      `admitCount`, `recordedAt`. Optional: `direction`. Dismissing sends nothing; the screen behind is
+      unchanged.'
+    confirm:
+      label: Validate group access
+      operation: validateGroupAccess
+    dismiss:
+      label: Cancel
+      discards:
+      - id
+      - mediaCode
+      - admitCount
+      - recordedAt
+      - direction
+    provenance: contract access.yaml POST /access/group-validate
   states:
     loading: The ticket lookup list.
     error: Could not load. Names which read failed and leaves the ticket lookup untouched.
-    emptyFirstRun: No ticket lookup yet. Carries the create action; distinct from a filter that matched
-      nothing.
-    emptyNoResults: The filter narrowed it and the ticket lookup are still there. Names the active filter
-      and offers to clear it.
-    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
-      data* and sends somebody to support with the wrong question.
+    emptyFirstRun: No ticket lookup yet. **Offers no create action** — this screen declares no operation
+      that makes one — and says so rather than showing an empty table.
+    emptyNoResults: Nothing matches the filter on accessPointId, ticketId, outcome, recordedFrom, recordedTo
+      and the ticket lookup are still there. Names the active filter and offers to clear it.
+    emptyNoAccess: Shown when the caller lacks `ACCESS_VALIDATE`, which `getOfflinePackage` requires,
+      and names that permission. **Never an empty table** — that reads as *there is no data* and sends
+      somebody to support with the wrong question.
     offline: Bundle only, and the bundle age is shown beside the results
   apis:
   - operationId: lookupTicket
     contract: access
     purpose: From the flow it appears in
-    trigger: onLoad
+    trigger: onAction
   - operationId: getOfflinePackage
     contract: access
     purpose: Entitlement and rule set for offline validation
@@ -1286,11 +1735,11 @@ screens:
     - listScans
   entryState:
     preloaded:
-    - OfflinePackage.generatedAt
-    - OfflinePackage.validFrom
-    - OfflinePackage.validTo
-    - OfflinePackage.accessPointId
-    - OfflinePackage.entitlements
+    - ScanEvent.id
+    - ScanEvent.accessPointId
+    - ScanEvent.venueId
+    - ScanEvent.scopePath
+    - ScanEvent.ticketId
   wireframe:
     status: notStarted
     provenance: generated
@@ -1323,24 +1772,18 @@ screens:
     transitions:
     - to: SCN-001
       trigger: Sign in
-      carries:
-      - sessionId
-      - shiftId
-      provenance: derived — SCN-001 declares entryState.params sessionId, shiftId, so an edge into it
-        must carry them
+      provenance: derived — SCN-001 declares entryState.params  and SCN-011 holds none of them, so the
+        edge carries nothing and SCN-001 opens cold
     - to: SCN-002
       trigger: Access point & direction
-      carries:
-      - accessPointId
-      provenance: derived — SCN-002 declares entryState.params accessPointId, so an edge into it must
-        carry them
+      provenance: derived — SCN-002 declares entryState.params accessPointId and SCN-011 holds none of
+        them, so the edge carries nothing and SCN-002 opens cold
     - to: SCN-003
       trigger: Ready to scan
       carries:
-      - mediaCode
       - rightId
-      provenance: derived — SCN-003 declares entryState.params mediaCode, rightId, so an edge into it
-        must carry them
+      provenance: derived — SCN-003 declares entryState.params mediaCode, rightId and SCN-011 holds rightId,
+        so an edge into it carries them
   notes: Definition derived from the wireframe board on 14 August. Components, states and operations still
     to be written.
   density: comfortable
@@ -1355,7 +1798,7 @@ screens:
       slot: record
       components:
       - kind: detailPanel
-        label: The selected delegated right
+        label: The cross region entitlement
         bindsTo: CrossRegionEntitlement
         columns:
         - CrossRegionEntitlement.id
@@ -1380,30 +1823,17 @@ screens:
       slot: rowActions
       components:
       - kind: primaryButton
-        label: Consume
+        label: Consume cross region entitlement
         operation: consumeCrossRegionEntitlement
         provenance: contract cross-region.yaml POST /cross-region-entitlements/{rightId}/consume
-    - name: contentBody
-      slot: carried
-      components:
-      - kind: detailPanel
-        notes: Structure from the wireframe board. Components not yet enumerated.
-        provenance: carried from the previous definition
-      - kind: secondaryButton
-        label: Cancel
-        notes: '**A screen that can submit must be leaveable without submitting.**'
-        derived: true
-        impliedBy: consumeCrossRegionEntitlement
-        provenance: carried from the previous definition
   states:
-    loading: The delegated right list.
+    loading: The delegated right, read by `getCrossRegionEntitlement`.
     error: Could not load. Names which read failed and leaves the delegated right untouched.
-    emptyFirstRun: No delegated right yet. Carries the create action; distinct from a filter that matched
-      nothing.
-    emptyNoResults: The filter narrowed it and the delegated right are still there. Names the active filter
-      and offers to clear it.
-    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
-      data* and sends somebody to support with the wrong question.
+    emptyFirstRun: No delegated right yet. **Offers no create action** — this screen declares no operation
+      that makes one — and says so rather than showing an empty table.
+    emptyNoAccess: Shown when the caller lacks `TICKET_LOOKUP`, which `getCrossRegionEntitlement` requires,
+      and names that permission. **Never an empty table** — that reads as *there is no data* and sends
+      somebody to support with the wrong question.
     offline: '**Not available offline.** A delegated right issued in another region cannot be verified
       from a local bundle, and admitting on trust is how a pass gets used twice in two countries'
   apis:
@@ -1431,6 +1861,23 @@ screens:
   apisNote: Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack
     — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
     to the ones that matter is work a person still owes this screen.
+  overlays:
+  - id: formConsumeCrossRegionEntitlement
+    component: modal
+    trigger: Consume cross region entitlement
+    body: '**Collects what `consumeCrossRegionEntitlement` sends before it is called.** Required: `id`,
+      `entries`, `scanId`, `recordedAt`. Dismissing sends nothing; the screen behind is unchanged.'
+    confirm:
+      label: Consume cross region entitlement
+      operation: consumeCrossRegionEntitlement
+    dismiss:
+      label: Cancel
+      discards:
+      - id
+      - entries
+      - scanId
+      - recordedAt
+    provenance: contract cross-region.yaml POST /cross-region-entitlements/{rightId}/consume
 - id: SCN-013
   name: Offline journal
   module: Access
@@ -1462,24 +1909,21 @@ screens:
       operation: listScans
     - to: SCN-001
       trigger: Sign in
-      carries:
-      - sessionId
-      - shiftId
-      provenance: derived — SCN-001 declares entryState.params sessionId, shiftId, so an edge into it
-        must carry them
+      provenance: derived — SCN-001 declares entryState.params  and SCN-013 holds none of them, so the
+        edge carries nothing and SCN-001 opens cold
     - to: SCN-002
       trigger: Access point & direction
       carries:
       - accessPointId
-      provenance: derived — SCN-002 declares entryState.params accessPointId, so an edge into it must
-        carry them
+      provenance: derived — SCN-002 declares entryState.params accessPointId and SCN-013 holds accessPointId,
+        so an edge into it carries them
     - to: SCN-003
       trigger: Ready to scan
       carries:
       - mediaCode
       - rightId
-      provenance: derived — SCN-003 declares entryState.params mediaCode, rightId, so an edge into it
-        must carry them
+      provenance: derived — SCN-003 declares entryState.params mediaCode, rightId and SCN-013 holds mediaCode,
+        rightId, so an edge into it carries them
   notes: Definition derived from the wireframe board on 14 August. Components, states and operations still
     to be written.
   density: comfortable
@@ -1493,8 +1937,33 @@ screens:
     - name: contentBody
       slot: collection
       components:
+      - kind: textField
+        label: Access point id
+        operation: listScans
+        notes: Sends `?accessPointId=` to `listScans`.
+        provenance: contract access.yaml GET /access/scans
+      - kind: textField
+        label: Ticket id
+        operation: listScans
+        notes: Sends `?ticketId=` to `listScans`.
+        provenance: contract access.yaml GET /access/scans
+      - kind: textField
+        label: Outcome
+        operation: listScans
+        notes: Sends `?outcome=` to `listScans`.
+        provenance: contract access.yaml GET /access/scans
+      - kind: datePicker
+        label: Recorded from
+        operation: listScans
+        notes: Sends `?recordedFrom=` to `listScans`.
+        provenance: contract access.yaml GET /access/scans
+      - kind: datePicker
+        label: Recorded to
+        operation: listScans
+        notes: Sends `?recordedTo=` to `listScans`.
+        provenance: contract access.yaml GET /access/scans
       - kind: dataTable
-        label: Every offline journal
+        label: Every scan event
         bindsTo: ScanEvent
         columns:
         - ScanEvent.id
@@ -1511,11 +1980,45 @@ screens:
         - ScanEvent.overriddenByPrincipalId
         operation: listScans
         provenance: contract access.yaml GET /access/scans
+      - kind: scanTarget
+        derived: true
+        impliedBy: listScans
+        notes: '**A screen that validates a credential needs somewhere to point the camera.** `denied`
+          and `hardwareError` look different because an operator facing a guest needs to know whether
+          to try again or explain something.'
+        provenance: carried from the previous definition
+      - kind: searchField
+        derived: true
+        impliedBy: lookupTicket
+        label: Search
+        notes: A search that returns nothing must say so differently from a search not yet run.
+        provenance: carried from the previous definition
     - name: contextPanel
       slot: selection
       components:
       - kind: detailPanel
-        label: The selected offline journal
+        label: The selected scan event
+        bindsTo: ScanEvent
+        columns:
+        - ScanEvent.id
+        - ScanEvent.accessPointId
+        - ScanEvent.venueId
+        - ScanEvent.scopePath
+        - ScanEvent.ticketId
+        - ScanEvent.mediaCode
+        - ScanEvent.outcome
+        - ScanEvent.denyReason
+        - ScanEvent.direction
+        - ScanEvent.operatorPrincipalId
+        - ScanEvent.deviceId
+        - ScanEvent.overriddenByPrincipalId
+        - ScanEvent.overrideReason
+        - ScanEvent.recordedAt
+        - ScanEvent.syncedAt
+        operation: listScans
+        provenance: contract access.yaml GET /access/scans
+      - kind: detailPanel
+        label: The offline package
         bindsTo: OfflinePackage
         columns:
         - OfflinePackage.generatedAt
@@ -1532,66 +2035,97 @@ screens:
       slot: rowActions
       components:
       - kind: primaryButton
-        label: Lookup
+        label: Lookup ticket
         operation: lookupTicket
         provenance: contract access.yaml GET /access/lookup
       - kind: destructiveButton
-        label: Override
+        label: Override access
         operation: overrideAccess
         provenance: contract access.yaml POST /access/override
       - kind: secondaryButton
-        label: Sync
+        label: Sync scans
         operation: syncScans
         provenance: contract access.yaml POST /access/scans
       - kind: secondaryButton
-        label: Validate
+        label: Validate access
         operation: validateAccess
         provenance: contract access.yaml POST /access/validate
       - kind: secondaryButton
-        label: Validate
+        label: Validate group access
         operation: validateGroupAccess
         provenance: contract access.yaml POST /access/group-validate
-    - name: contentBody
-      slot: carried
-      components:
-      - kind: detailPanel
-        notes: Structure from the wireframe board. Components not yet enumerated.
-        provenance: carried from the previous definition
-      - kind: scanTarget
-        derived: true
-        impliedBy: listScans
-        notes: '**A screen that validates a credential needs somewhere to point the camera.** `denied`
-          and `hardwareError` look different because an operator facing a guest needs to know whether
-          to try again or explain something.'
-        provenance: carried from the previous definition
-      - kind: searchField
-        derived: true
-        impliedBy: lookupTicket
-        label: Search
-        notes: A search that returns nothing must say so differently from a search not yet run.
-        provenance: carried from the previous definition
-      - kind: secondaryButton
-        label: Cancel
-        notes: '**A screen that can submit must be leaveable without submitting.**'
-        derived: true
-        impliedBy: overrideAccess
-        provenance: carried from the previous definition
   overlays:
   - id: confirmOverrideAccess
     component: confirmDialog
-    trigger: Override
+    trigger: Override access
     body: '**Names what `overrideAccess` changes and what it leaves alone**, in the consequence rather
-      than the verb. A offline journal this affects should be identified in the dialog, not just counted.'
+      than the verb. A offline journal this affects should be identified in the dialog, not just counted.
+      **Collects what `overrideAccess` sends before it is called.** Required: `id`, `scanId`, `reason`,
+      `recordedAt`.'
     provenance: contract access.yaml POST /access/override
+  - id: formSyncScans
+    component: modal
+    trigger: Sync scans
+    body: '**Collects what `syncScans` sends before it is called.** Required: `deviceId`, `scans`. Dismissing
+      sends nothing; the screen behind is unchanged.'
+    confirm:
+      label: Sync scans
+      operation: syncScans
+    dismiss:
+      label: Cancel
+      discards:
+      - deviceId
+      - scans
+    provenance: contract access.yaml POST /access/scans
+  - id: formValidateAccess
+    component: modal
+    trigger: Validate access
+    body: '**Collects what `validateAccess` sends before it is called.** Required: `id`, `mediaCode`,
+      `mediaKind`, `direction`, `recordedAt`. Optional: `groupSize`, `proximityToken`. Dismissing sends
+      nothing; the screen behind is unchanged.'
+    bindsTo: ValidateRequest
+    confirm:
+      label: Validate access
+      operation: validateAccess
+    dismiss:
+      label: Cancel
+      discards:
+      - id
+      - mediaCode
+      - mediaKind
+      - direction
+      - recordedAt
+      - groupSize
+      - proximityToken
+    provenance: contract access.yaml POST /access/validate
+  - id: formValidateGroupAccess
+    component: modal
+    trigger: Validate group access
+    body: '**Collects what `validateGroupAccess` sends before it is called.** Required: `id`, `mediaCode`,
+      `admitCount`, `recordedAt`. Optional: `direction`. Dismissing sends nothing; the screen behind is
+      unchanged.'
+    confirm:
+      label: Validate group access
+      operation: validateGroupAccess
+    dismiss:
+      label: Cancel
+      discards:
+      - id
+      - mediaCode
+      - admitCount
+      - recordedAt
+      - direction
+    provenance: contract access.yaml POST /access/group-validate
   states:
     loading: The offline journal list.
     error: Could not load. Names which read failed and leaves the offline journal untouched.
-    emptyFirstRun: No offline journal yet. Carries the create action; distinct from a filter that matched
-      nothing.
-    emptyNoResults: The filter narrowed it and the offline journal are still there. Names the active filter
-      and offers to clear it.
-    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
-      data* and sends somebody to support with the wrong question.
+    emptyFirstRun: No offline journal yet. **Offers no create action** — this screen declares no operation
+      that makes one — and says so rather than showing an empty table.
+    emptyNoResults: Nothing matches the filter on accessPointId, ticketId, outcome, recordedFrom, recordedTo
+      and the offline journal are still there. Names the active filter and offers to clear it.
+    emptyNoAccess: Shown when the caller lacks `REPORT_VIEW_VENUE`, which `listScans` requires, and names
+      that permission. **Never an empty table** — that reads as *there is no data* and sends somebody
+      to support with the wrong question.
     offline: The journal is the offline record. It is why an offline admit is recoverable
   apis:
   - operationId: listScans
@@ -1605,7 +2139,7 @@ screens:
   - operationId: lookupTicket
     contract: access
     purpose: Read-only validity check without admitting
-    trigger: onLoad
+    trigger: onAction
   - operationId: overrideAccess
     contract: access
     purpose: Admit against a failed validation
@@ -1632,11 +2166,11 @@ screens:
     - listScans
   entryState:
     preloaded:
-    - OfflinePackage.generatedAt
-    - OfflinePackage.validFrom
-    - OfflinePackage.validTo
-    - OfflinePackage.accessPointId
-    - OfflinePackage.entitlements
+    - ScanEvent.id
+    - ScanEvent.accessPointId
+    - ScanEvent.venueId
+    - ScanEvent.scopePath
+    - ScanEvent.ticketId
   wireframe:
     status: notStarted
     provenance: generated
@@ -1670,24 +2204,21 @@ screens:
     transitions:
     - to: SCN-001
       trigger: Sign in
-      carries:
-      - sessionId
-      - shiftId
-      provenance: derived — SCN-001 declares entryState.params sessionId, shiftId, so an edge into it
-        must carry them
+      provenance: derived — SCN-001 declares entryState.params  and SCN-014 holds none of them, so the
+        edge carries nothing and SCN-001 opens cold
     - to: SCN-002
       trigger: Access point & direction
       carries:
       - accessPointId
-      provenance: derived — SCN-002 declares entryState.params accessPointId, so an edge into it must
-        carry them
+      provenance: derived — SCN-002 declares entryState.params accessPointId and SCN-014 holds accessPointId,
+        so an edge into it carries them
     - to: SCN-003
       trigger: Ready to scan
       carries:
       - mediaCode
       - rightId
-      provenance: derived — SCN-003 declares entryState.params mediaCode, rightId, so an edge into it
-        must carry them
+      provenance: derived — SCN-003 declares entryState.params mediaCode, rightId and SCN-014 holds mediaCode,
+        rightId, so an edge into it carries them
     - to: ADM-003
       trigger: Reconciliation confirms it
       provenance: flow F19 step 4→5
@@ -1703,19 +2234,29 @@ screens:
   patternReason: '`listSyncRejections` reads the population and `getOfflinePackage` reads one of them
     — list, select, act'
   purpose: The screen nobody designs and everybody needs.
-  gaps:
-  - operation: listScans
-    why: '**1 declared operation reach no component on this screen**: listScans. Either the screen is
-      missing what calls them, or the declaration is residue.'
-    source: the screen's own declarations
   layout:
     template: split
     regions:
     - name: contentBody
       slot: collection
       components:
+      - kind: textField
+        label: Workstation id
+        operation: listSyncRejections
+        notes: Sends `?workstationId=` to `listSyncRejections`.
+        provenance: contract orders.yaml GET /sync/rejections
+      - kind: selectField
+        label: Kind
+        operation: listSyncRejections
+        notes: Sends `?kind=` to `listSyncRejections`.
+        provenance: contract orders.yaml GET /sync/rejections
+      - kind: toggle
+        label: Resolved
+        operation: listSyncRejections
+        notes: Sends `?resolved=` to `listSyncRejections`.
+        provenance: contract orders.yaml GET /sync/rejections
       - kind: dataTable
-        label: Every sync reconciliation
+        label: Every sync rejection
         bindsTo: SyncRejection
         columns:
         - SyncRejection.id
@@ -1729,11 +2270,59 @@ screens:
         - SyncRejection.resolvedByPrincipalId
         operation: listSyncRejections
         provenance: contract orders.yaml GET /sync/rejections
+      - kind: dataTable
+        label: Every scan event
+        bindsTo: ScanEvent
+        columns:
+        - ScanEvent.id
+        - ScanEvent.accessPointId
+        - ScanEvent.venueId
+        - ScanEvent.scopePath
+        - ScanEvent.ticketId
+        - ScanEvent.mediaCode
+        - ScanEvent.outcome
+        - ScanEvent.denyReason
+        - ScanEvent.direction
+        - ScanEvent.operatorPrincipalId
+        - ScanEvent.deviceId
+        - ScanEvent.overriddenByPrincipalId
+        operation: listScans
+        provenance: contract access.yaml GET /access/scans
+      - kind: scanTarget
+        derived: true
+        impliedBy: syncScans
+        notes: '**A screen that validates a credential needs somewhere to point the camera.** `denied`
+          and `hardwareError` look different because an operator facing a guest needs to know whether
+          to try again or explain something.'
+        provenance: carried from the previous definition
+      - kind: searchField
+        derived: true
+        impliedBy: lookupTicket
+        label: Search
+        notes: A search that returns nothing must say so differently from a search not yet run.
+        provenance: carried from the previous definition
     - name: contextPanel
       slot: selection
       components:
       - kind: detailPanel
-        label: The selected sync reconciliation
+        label: The selected sync rejection
+        bindsTo: SyncRejection
+        columns:
+        - SyncRejection.id
+        - SyncRejection.workstationId
+        - SyncRejection.kind
+        - SyncRejection.recordedAt
+        - SyncRejection.rejectedAt
+        - SyncRejection.problem
+        - SyncRejection.payload
+        - SyncRejection.resolvedAt
+        - SyncRejection.resolvedByPrincipalId
+        - SyncRejection.resolution
+        - SyncRejection.resolvedRecordId
+        operation: listSyncRejections
+        provenance: contract orders.yaml GET /sync/rejections
+      - kind: detailPanel
+        label: The offline package
         bindsTo: OfflinePackage
         columns:
         - OfflinePackage.generatedAt
@@ -1750,82 +2339,121 @@ screens:
       slot: rowActions
       components:
       - kind: primaryButton
-        label: Sync
+        label: Sync scans
         operation: syncScans
         provenance: contract access.yaml POST /access/scans
       - kind: secondaryButton
-        label: Lookup
+        label: Lookup ticket
         operation: lookupTicket
         provenance: contract access.yaml GET /access/lookup
       - kind: destructiveButton
-        label: Override
+        label: Override access
         operation: overrideAccess
         provenance: contract access.yaml POST /access/override
       - kind: secondaryButton
-        label: Sync
+        label: Sync orders
         operation: syncOrders
         provenance: contract orders.yaml POST /sync/orders
       - kind: secondaryButton
-        label: Validate
+        label: Validate access
         operation: validateAccess
         provenance: contract access.yaml POST /access/validate
       - kind: secondaryButton
-        label: Validate
+        label: Validate group access
         operation: validateGroupAccess
         provenance: contract access.yaml POST /access/group-validate
-    - name: contentBody
-      slot: carried
-      components:
-      - kind: detailPanel
-        notes: Structure from the wireframe board. Components not yet enumerated.
-        provenance: carried from the previous definition
-      - kind: scanTarget
-        derived: true
-        impliedBy: syncScans
-        notes: '**A screen that validates a credential needs somewhere to point the camera.** `denied`
-          and `hardwareError` look different because an operator facing a guest needs to know whether
-          to try again or explain something.'
-        provenance: carried from the previous definition
-      - kind: dataTable
-        derived: true
-        impliedBy: listSyncRejections
-        notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
-          a venue''s busiest hour is a list that skips rows.'
-        provenance: carried from the previous definition
-      - kind: searchField
-        derived: true
-        impliedBy: lookupTicket
-        label: Search
-        notes: A search that returns nothing must say so differently from a search not yet run.
-        provenance: carried from the previous definition
-      - kind: secondaryButton
-        label: Cancel
-        notes: '**A screen that can submit must be leaveable without submitting.**'
-        derived: true
-        impliedBy: syncScans
-        provenance: carried from the previous definition
   overlays:
   - id: confirmOverrideAccess
     component: confirmDialog
-    trigger: Override
+    trigger: Override access
     body: '**Names what `overrideAccess` changes and what it leaves alone**, in the consequence rather
-      than the verb. A sync reconciliation this affects should be identified in the dialog, not just counted.'
+      than the verb. A sync reconciliation this affects should be identified in the dialog, not just counted.
+      **Collects what `overrideAccess` sends before it is called.** Required: `id`, `scanId`, `reason`,
+      `recordedAt`.'
     provenance: contract access.yaml POST /access/override
+  - id: formSyncScans
+    component: modal
+    trigger: Sync scans
+    body: '**Collects what `syncScans` sends before it is called.** Required: `deviceId`, `scans`. Dismissing
+      sends nothing; the screen behind is unchanged.'
+    confirm:
+      label: Sync scans
+      operation: syncScans
+    dismiss:
+      label: Cancel
+      discards:
+      - deviceId
+      - scans
+    provenance: contract access.yaml POST /access/scans
+  - id: formSyncOrders
+    component: modal
+    trigger: Sync orders
+    body: '**Collects what `syncOrders` sends before it is called.** Required: `deviceId`, `orders`. Dismissing
+      sends nothing; the screen behind is unchanged.'
+    confirm:
+      label: Sync orders
+      operation: syncOrders
+    dismiss:
+      label: Cancel
+      discards:
+      - deviceId
+      - orders
+    provenance: contract orders.yaml POST /sync/orders
+  - id: formValidateAccess
+    component: modal
+    trigger: Validate access
+    body: '**Collects what `validateAccess` sends before it is called.** Required: `id`, `mediaCode`,
+      `mediaKind`, `direction`, `recordedAt`. Optional: `groupSize`, `proximityToken`. Dismissing sends
+      nothing; the screen behind is unchanged.'
+    bindsTo: ValidateRequest
+    confirm:
+      label: Validate access
+      operation: validateAccess
+    dismiss:
+      label: Cancel
+      discards:
+      - id
+      - mediaCode
+      - mediaKind
+      - direction
+      - recordedAt
+      - groupSize
+      - proximityToken
+    provenance: contract access.yaml POST /access/validate
+  - id: formValidateGroupAccess
+    component: modal
+    trigger: Validate group access
+    body: '**Collects what `validateGroupAccess` sends before it is called.** Required: `id`, `mediaCode`,
+      `admitCount`, `recordedAt`. Optional: `direction`. Dismissing sends nothing; the screen behind is
+      unchanged.'
+    confirm:
+      label: Validate group access
+      operation: validateGroupAccess
+    dismiss:
+      label: Cancel
+      discards:
+      - id
+      - mediaCode
+      - admitCount
+      - recordedAt
+      - direction
+    provenance: contract access.yaml POST /access/group-validate
   states:
     loading: The sync reconciliation list.
     error: Could not load. Names which read failed and leaves the sync reconciliation untouched.
-    emptyFirstRun: No sync reconciliation yet. Carries the create action; distinct from a filter that
-      matched nothing.
-    emptyNoResults: The filter narrowed it and the sync reconciliation are still there. Names the active
-      filter and offers to clear it.
-    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
-      data* and sends somebody to support with the wrong question.
+    emptyFirstRun: No sync reconciliation yet. **Offers no create action** — this screen declares no operation
+      that makes one — and says so rather than showing an empty table.
+    emptyNoResults: Nothing matches the filter on workstationId, kind, resolved and the sync reconciliation
+      are still there. Names the active filter and offers to clear it.
+    emptyNoAccess: Shown when the caller lacks `ORDER_VIEW`, which `listSyncRejections` requires, and
+      names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody
+      to support with the wrong question.
     offline: Not applicable. This screen exists to end the offline period
   apis:
   - operationId: syncScans
     contract: access
     purpose: From the flow it appears in
-    trigger: onLoad
+    trigger: onAction
   - operationId: listSyncRejections
     contract: orders
     purpose: From the flow it appears in
@@ -1841,7 +2469,7 @@ screens:
   - operationId: lookupTicket
     contract: access
     purpose: Read-only validity check without admitting
-    trigger: onLoad
+    trigger: onAction
   - operationId: overrideAccess
     contract: access
     purpose: Admit against a failed validation
@@ -1868,11 +2496,11 @@ screens:
     - listSyncRejections
   entryState:
     preloaded:
-    - OfflinePackage.generatedAt
-    - OfflinePackage.validFrom
-    - OfflinePackage.validTo
-    - OfflinePackage.accessPointId
-    - OfflinePackage.entitlements
+    - SyncRejection.id
+    - SyncRejection.workstationId
+    - SyncRejection.kind
+    - SyncRejection.recordedAt
+    - SyncRejection.rejectedAt
   wireframe:
     status: notStarted
     provenance: generated
@@ -1900,27 +2528,27 @@ screens:
     inferred: true
     fromFlows: true
     transitions:
-    - to: SCN-003
-      trigger: Waits at the ready screen
-      provenance: flow F06 step 3→4, F61 step 3→4
-      operation: getOfflinePackage
     - to: SCN-013
       trigger: Scans journal locally while the network is gone
       provenance: flow F63 step 1→2
       operation: getOfflinePackage
     - to: SCN-001
       trigger: Sign in
-      carries:
-      - sessionId
-      - shiftId
-      provenance: derived — SCN-001 declares entryState.params sessionId, shiftId, so an edge into it
-        must carry them
+      provenance: derived — SCN-001 declares entryState.params  and SCN-015 holds none of them, so the
+        edge carries nothing and SCN-001 opens cold
     - to: SCN-002
       trigger: Access point & direction
       carries:
       - accessPointId
-      provenance: derived — SCN-002 declares entryState.params accessPointId, so an edge into it must
-        carry them
+      provenance: derived — SCN-002 declares entryState.params accessPointId and SCN-015 holds accessPointId,
+        so an edge into it carries them
+    - to: SCN-003
+      trigger: Waits at the ready screen
+      provenance: flow F06 step 3→4, F61 step 3→4
+      operation: getOfflinePackage
+      carries:
+      - mediaCode
+      - rightId
   notes: Definition derived from the wireframe board on 14 August. Components, states and operations still
     to be written.
   density: comfortable
@@ -1934,8 +2562,33 @@ screens:
     - name: contentBody
       slot: collection
       components:
+      - kind: textField
+        label: Access point id
+        operation: listScans
+        notes: Sends `?accessPointId=` to `listScans`.
+        provenance: contract access.yaml GET /access/scans
+      - kind: textField
+        label: Ticket id
+        operation: listScans
+        notes: Sends `?ticketId=` to `listScans`.
+        provenance: contract access.yaml GET /access/scans
+      - kind: textField
+        label: Outcome
+        operation: listScans
+        notes: Sends `?outcome=` to `listScans`.
+        provenance: contract access.yaml GET /access/scans
+      - kind: datePicker
+        label: Recorded from
+        operation: listScans
+        notes: Sends `?recordedFrom=` to `listScans`.
+        provenance: contract access.yaml GET /access/scans
+      - kind: datePicker
+        label: Recorded to
+        operation: listScans
+        notes: Sends `?recordedTo=` to `listScans`.
+        provenance: contract access.yaml GET /access/scans
       - kind: dataTable
-        label: Every offline package
+        label: Every scan event
         bindsTo: ScanEvent
         columns:
         - ScanEvent.id
@@ -1952,11 +2605,45 @@ screens:
         - ScanEvent.overriddenByPrincipalId
         operation: listScans
         provenance: contract access.yaml GET /access/scans
+      - kind: scanTarget
+        derived: true
+        impliedBy: listScans
+        notes: '**A screen that validates a credential needs somewhere to point the camera.** `denied`
+          and `hardwareError` look different because an operator facing a guest needs to know whether
+          to try again or explain something.'
+        provenance: carried from the previous definition
+      - kind: searchField
+        derived: true
+        impliedBy: lookupTicket
+        label: Search
+        notes: A search that returns nothing must say so differently from a search not yet run.
+        provenance: carried from the previous definition
     - name: contextPanel
       slot: selection
       components:
       - kind: detailPanel
-        label: The selected offline package
+        label: The selected scan event
+        bindsTo: ScanEvent
+        columns:
+        - ScanEvent.id
+        - ScanEvent.accessPointId
+        - ScanEvent.venueId
+        - ScanEvent.scopePath
+        - ScanEvent.ticketId
+        - ScanEvent.mediaCode
+        - ScanEvent.outcome
+        - ScanEvent.denyReason
+        - ScanEvent.direction
+        - ScanEvent.operatorPrincipalId
+        - ScanEvent.deviceId
+        - ScanEvent.overriddenByPrincipalId
+        - ScanEvent.overrideReason
+        - ScanEvent.recordedAt
+        - ScanEvent.syncedAt
+        operation: listScans
+        provenance: contract access.yaml GET /access/scans
+      - kind: detailPanel
+        label: The offline package
         bindsTo: OfflinePackage
         columns:
         - OfflinePackage.generatedAt
@@ -1973,66 +2660,97 @@ screens:
       slot: rowActions
       components:
       - kind: primaryButton
-        label: Lookup
+        label: Lookup ticket
         operation: lookupTicket
         provenance: contract access.yaml GET /access/lookup
       - kind: destructiveButton
-        label: Override
+        label: Override access
         operation: overrideAccess
         provenance: contract access.yaml POST /access/override
       - kind: secondaryButton
-        label: Sync
+        label: Sync scans
         operation: syncScans
         provenance: contract access.yaml POST /access/scans
       - kind: secondaryButton
-        label: Validate
+        label: Validate access
         operation: validateAccess
         provenance: contract access.yaml POST /access/validate
       - kind: secondaryButton
-        label: Validate
+        label: Validate group access
         operation: validateGroupAccess
         provenance: contract access.yaml POST /access/group-validate
-    - name: contentBody
-      slot: carried
-      components:
-      - kind: detailPanel
-        notes: Structure from the wireframe board. Components not yet enumerated.
-        provenance: carried from the previous definition
-      - kind: scanTarget
-        derived: true
-        impliedBy: listScans
-        notes: '**A screen that validates a credential needs somewhere to point the camera.** `denied`
-          and `hardwareError` look different because an operator facing a guest needs to know whether
-          to try again or explain something.'
-        provenance: carried from the previous definition
-      - kind: searchField
-        derived: true
-        impliedBy: lookupTicket
-        label: Search
-        notes: A search that returns nothing must say so differently from a search not yet run.
-        provenance: carried from the previous definition
-      - kind: secondaryButton
-        label: Cancel
-        notes: '**A screen that can submit must be leaveable without submitting.**'
-        derived: true
-        impliedBy: overrideAccess
-        provenance: carried from the previous definition
   overlays:
   - id: confirmOverrideAccess
     component: confirmDialog
-    trigger: Override
+    trigger: Override access
     body: '**Names what `overrideAccess` changes and what it leaves alone**, in the consequence rather
-      than the verb. A offline package this affects should be identified in the dialog, not just counted.'
+      than the verb. A offline package this affects should be identified in the dialog, not just counted.
+      **Collects what `overrideAccess` sends before it is called.** Required: `id`, `scanId`, `reason`,
+      `recordedAt`.'
     provenance: contract access.yaml POST /access/override
+  - id: formSyncScans
+    component: modal
+    trigger: Sync scans
+    body: '**Collects what `syncScans` sends before it is called.** Required: `deviceId`, `scans`. Dismissing
+      sends nothing; the screen behind is unchanged.'
+    confirm:
+      label: Sync scans
+      operation: syncScans
+    dismiss:
+      label: Cancel
+      discards:
+      - deviceId
+      - scans
+    provenance: contract access.yaml POST /access/scans
+  - id: formValidateAccess
+    component: modal
+    trigger: Validate access
+    body: '**Collects what `validateAccess` sends before it is called.** Required: `id`, `mediaCode`,
+      `mediaKind`, `direction`, `recordedAt`. Optional: `groupSize`, `proximityToken`. Dismissing sends
+      nothing; the screen behind is unchanged.'
+    bindsTo: ValidateRequest
+    confirm:
+      label: Validate access
+      operation: validateAccess
+    dismiss:
+      label: Cancel
+      discards:
+      - id
+      - mediaCode
+      - mediaKind
+      - direction
+      - recordedAt
+      - groupSize
+      - proximityToken
+    provenance: contract access.yaml POST /access/validate
+  - id: formValidateGroupAccess
+    component: modal
+    trigger: Validate group access
+    body: '**Collects what `validateGroupAccess` sends before it is called.** Required: `id`, `mediaCode`,
+      `admitCount`, `recordedAt`. Optional: `direction`. Dismissing sends nothing; the screen behind is
+      unchanged.'
+    confirm:
+      label: Validate group access
+      operation: validateGroupAccess
+    dismiss:
+      label: Cancel
+      discards:
+      - id
+      - mediaCode
+      - admitCount
+      - recordedAt
+      - direction
+    provenance: contract access.yaml POST /access/group-validate
   states:
     loading: The offline package list.
     error: Could not load. Names which read failed and leaves the offline package untouched.
-    emptyFirstRun: No offline package yet. Carries the create action; distinct from a filter that matched
-      nothing.
-    emptyNoResults: The filter narrowed it and the offline package are still there. Names the active filter
-      and offers to clear it.
-    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
-      data* and sends somebody to support with the wrong question.
+    emptyFirstRun: No offline package yet. **Offers no create action** — this screen declares no operation
+      that makes one — and says so rather than showing an empty table.
+    emptyNoResults: Nothing matches the filter on accessPointId, ticketId, outcome, recordedFrom, recordedTo
+      and the offline package are still there. Names the active filter and offers to clear it.
+    emptyNoAccess: Shown when the caller lacks `ACCESS_VALIDATE`, which `getOfflinePackage` requires,
+      and names that permission. **Never an empty table** — that reads as *there is no data* and sends
+      somebody to support with the wrong question.
     offline: Cannot refresh. The existing bundle continues to be used and its age is shown
   apis:
   - operationId: getOfflinePackage
@@ -2046,7 +2764,7 @@ screens:
   - operationId: lookupTicket
     contract: access
     purpose: Read-only validity check without admitting
-    trigger: onLoad
+    trigger: onAction
   - operationId: overrideAccess
     contract: access
     purpose: Admit against a failed validation
@@ -2073,11 +2791,11 @@ screens:
     - listScans
   entryState:
     preloaded:
-    - OfflinePackage.generatedAt
-    - OfflinePackage.validFrom
-    - OfflinePackage.validTo
-    - OfflinePackage.accessPointId
-    - OfflinePackage.entitlements
+    - ScanEvent.id
+    - ScanEvent.accessPointId
+    - ScanEvent.venueId
+    - ScanEvent.scopePath
+    - ScanEvent.ticketId
   wireframe:
     status: notStarted
     provenance: generated
@@ -2110,24 +2828,18 @@ screens:
     transitions:
     - to: SCN-001
       trigger: Sign in
-      carries:
-      - sessionId
-      - shiftId
-      provenance: derived — SCN-001 declares entryState.params sessionId, shiftId, so an edge into it
-        must carry them
+      provenance: derived — SCN-001 declares entryState.params  and SCN-016 holds none of them, so the
+        edge carries nothing and SCN-001 opens cold
     - to: SCN-002
       trigger: Access point & direction
       carries:
       - accessPointId
-      provenance: derived — SCN-002 declares entryState.params accessPointId, so an edge into it must
-        carry them
+      provenance: derived — SCN-002 declares entryState.params accessPointId and SCN-016 holds accessPointId,
+        so an edge into it carries them
     - to: SCN-003
       trigger: Ready to scan
-      carries:
-      - mediaCode
-      - rightId
-      provenance: derived — SCN-003 declares entryState.params mediaCode, rightId, so an edge into it
-        must carry them
+      provenance: derived — SCN-003 declares entryState.params mediaCode, rightId and SCN-016 holds none
+        of them, so the edge carries nothing and SCN-003 opens cold
   notes: 'Definition derived from the wireframe board on 14 August. Components, states and operations
     still to be written. **Authoring operations removed 24 August**: createAccessPoint, setAccessPointGeofence,
     updateAccessPoint. **A scanner reads the gate configuration; it does not write it.** An access point
@@ -2144,8 +2856,13 @@ screens:
     - name: contentBody
       slot: collection
       components:
+      - kind: textField
+        label: Venue id
+        operation: listAccessPoints
+        notes: Sends `?venueId=` to `listAccessPoints`.
+        provenance: contract access.yaml GET /access-points
       - kind: dataTable
-        label: Every gate mode
+        label: Every access point
         bindsTo: AccessPoint
         columns:
         - AccessPoint.id
@@ -2166,7 +2883,7 @@ screens:
       slot: selection
       components:
       - kind: detailPanel
-        label: The selected gate mode
+        label: The selected access point
         bindsTo: AccessPoint
         columns:
         - AccessPoint.id
@@ -2189,51 +2906,30 @@ screens:
       slot: rowActions
       components:
       - kind: primaryButton
-        label: Save changes
+        label: Save turnstile mode
         operation: setTurnstileMode
         provenance: contract access.yaml PUT /access-points/{accessPointId}/mode
-    - name: contentBody
-      slot: carried
-      components:
-      - kind: detailPanel
-        notes: Structure from the wireframe board. Components not yet enumerated.
-        provenance: carried from the previous definition
-      - kind: primaryButton
-        derived: true
-        impliedBy: setTurnstileMode
-        label: Save turnstile mode
-        provenance: carried from the previous definition
-      - kind: dataTable
-        derived: true
-        impliedBy: listAccessPoints
-        notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
-          a venue''s busiest hour is a list that skips rows.'
-        provenance: carried from the previous definition
-      - kind: secondaryButton
-        label: Cancel
-        notes: '**A screen that can submit must be leaveable without submitting.**'
-        derived: true
-        impliedBy: setTurnstileMode
-        provenance: carried from the previous definition
   states:
     loading: The gate mode list.
     error: Could not load. Names which read failed and leaves the gate mode untouched.
-    emptyFirstRun: No gate mode yet. Carries the create action; distinct from a filter that matched nothing.
-    emptyNoResults: The filter narrowed it and the gate mode are still there. Names the active filter
-      and offers to clear it.
-    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
-      data* and sends somebody to support with the wrong question.
+    emptyFirstRun: No gate mode yet. **Offers no create action** — this screen declares no operation that
+      makes one — and says so rather than showing an empty table.
+    emptyNoResults: Nothing matches the filter on venueId and the gate mode are still there. Names the
+      active filter and offers to clear it.
+    emptyNoAccess: Shown when the caller lacks `SCOPE_VIEW`, which `getAccessPoint` requires, and names
+      that permission. **Never an empty table** — that reads as *there is no data* and sends somebody
+      to support with the wrong question.
     offline: '**Requests only.** Hardware control is out of contract and the vendor SDK is outstanding
       (CF-33)'
   apis:
   - operationId: setTurnstileMode
     contract: access
     purpose: From the flow it appears in
-    trigger: onLoad
+    trigger: onAction
   - operationId: getAccessPoint
     contract: access
     purpose: Read an access point
-    trigger: onLoad
+    trigger: onAction
   - operationId: listAccessPoints
     contract: access
     purpose: List access points
@@ -2260,3 +2956,18 @@ screens:
   apisNote: Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop pack
     — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
     to the ones that matter is work a person still owes this screen.
+  overlays:
+  - id: formSetTurnstileMode
+    component: modal
+    trigger: Save turnstile mode
+    body: '**Collects what `setTurnstileMode` sends before it is called.** Required: `mode`. Optional:
+      `reason`. Dismissing sends nothing; the screen behind is unchanged.'
+    confirm:
+      label: Save turnstile mode
+      operation: setTurnstileMode
+    dismiss:
+      label: Cancel
+      discards:
+      - mode
+      - reason
+    provenance: contract access.yaml PUT /access-points/{accessPointId}/mode

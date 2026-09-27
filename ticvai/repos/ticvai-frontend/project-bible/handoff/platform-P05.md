@@ -5,16 +5,16 @@
 | | |
 |---|---|
 | Screens | 17 |
-| Operations | 23 |
+| Operations | 22 |
 | Contracts | 8 |
 | Modules | 2 |
 | Undrawn | 0 |
-| Operations with no screen | 9 |
+| Operations with no screen | 13 |
 | Waves | wave2 17 |
 
 ## Gaps
 
-### 9 operations with no screen here
+### 13 operations with no screen here
 
 **In a contract this platform uses, callable by its audience, and reaching no screen on any platform serving that audience.** Either a screen is missing or the endpoint should not exist — and the second is worth considering first.
 
@@ -23,11 +23,15 @@
 | `getPlanBenefits` | catalogue | GET | Which benefits a plan grants, and how much of each |
 | `listMembershipBenefits` | catalogue | GET | Benefits a plan can grant |
 | `listMembershipProgrammes` | catalogue | GET | Membership schemes, the level above a plan |
+| `getForm` | marketing-crm | GET | One form, to fill in or to edit |
+| `getMyProfile` | marketing-crm | GET | A guest reading their own details |
 | `listBadges` | marketing-crm | GET | Badges a guest can be awarded |
 | `listCustomerBadges` | marketing-crm | GET | Badges a guest holds |
 | `listLeaderboard` | marketing-crm | GET | Standings, by nickname |
 | `listRewards` | marketing-crm | GET | What points can be turned into |
 | `setLeaderboardNickname` | marketing-crm | PUT | Choose the name shown on the board |
+| `listTicketTransfers` | orders | GET | The ticket transfers this guest sent or received |
+| `revokeEntitlementShare` | orders | POST | Take back a share |
 | `recordRecommendationOutcome` | promotions | POST | Shown, clicked, accepted or dismissed |
 
 ## Modules

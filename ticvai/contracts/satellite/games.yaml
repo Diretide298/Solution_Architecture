@@ -82,6 +82,9 @@ paths:
               $ref: '#/components/schemas/IssueGameCardRequest'
       responses:
         '201':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Issued
           content:
             application/json:
@@ -127,6 +130,9 @@ paths:
               $ref: '#/components/schemas/ReaderProfile'
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Set
           content:
             application/json:
@@ -191,9 +197,11 @@ paths:
       x-ticvai-audience:
       - staff
       summary: Move balances to another card
-      description: 'A damaged or lost card. The source is blocked and its balances move whole — split
-        transfers are not offered, because a card with a partial balance and a replacement with the rest
-        is a dispute waiting to happen.
+      description: 'A damaged or lost card. The source moves to status `transferred`, with
+        `transferredToCardCode` set to the target, and stops working immediately; its balances move whole
+        — split transfers are not offered, because a card with a partial balance and a replacement with
+        the rest is a dispute waiting to happen. `transferred` is terminal (states/game-card.yaml), so the
+        source cannot be unblocked or reused afterwards.
 
         '
       tags:
@@ -229,13 +237,19 @@ paths:
                   maxLength: 500
       responses:
         '200':
-          description: Transferred; source blocked
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: Transferred; the source card is now `transferred`
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/GameCard'
         '409':
-          description: Target already carries a balance, or either card is blocked
+          description: 'Target already carries a balance, or either card is not `active` (blocked,
+            expired or already transferred).
+
+            '
           content:
             application/problem+json:
               schema:
@@ -303,6 +317,9 @@ paths:
               $ref: '#/components/schemas/Game'
       responses:
         '201':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Registered
           content:
             application/json:
@@ -363,24 +380,43 @@ paths:
                   nullable: true
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Updated
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Game'
+        '409':
+          description: 'Refused. Either `creditCost`, `minPointsAwarded` or `maxPointsAwarded` changed
+            while plays on this game are in flight, or `status` asks for a move states/game.yaml does not
+            allow from `updateGame` (for example into `maintenance`, which only a work order does, or out
+            of `retired`, which is terminal).
+
+            '
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
   /game-plays:
     post:
       operationId: recordGamePlay
       x-ticvai-consumed-by:
         - "P08 BO-069 Asset Register"
       x-ticvai-audience:
-      - guest
+      - device
       summary: Record a play
       description: 'Posted by the machine''s card reader. Deducts credits and awards points in one operation.
 
         **Offline-capable.** An arcade floor loses signal, and a machine that stops taking a card because
         of it is a machine earning nothing. Plays replay on reconnect and are deduplicated on the play
         ID; a play against an exhausted balance is reported for reconciliation rather than silently accepted.
+
+        **One key, not two.** The body `id` is the play ID and must equal the `Idempotency-Key` header.
+        A replay with the same key returns the stored original response. A body `id` that differs from
+        the header, or a key reused with a different body, is refused with the shared 409 `Conflict`
+        (an idempotency conflict) and is never recorded as a second play.
 
         '
       tags:
@@ -402,6 +438,9 @@ paths:
               $ref: '#/components/schemas/RecordPlayRequest'
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Play recorded
           content:
             application/json:
@@ -426,6 +465,10 @@ paths:
       description: 'Ordered batch per reader, idempotent on the play ID. Plays that would overdraw a card
         are reported as divergences rather than rejected outright — the guest already played, and the
         record should say so.
+
+        **The play ID is the key here because a batch has no per-play header.** Each play keeps the ULID
+        it was recorded under, which is the same value `recordGamePlay` sends as its `Idempotency-Key`,
+        so a play that reached the server both ways is counted once, under `duplicates`.
 
         '
       tags:
@@ -456,8 +499,13 @@ paths:
                   maxItems: 500
                   items:
                     $ref: '#/components/schemas/RecordPlayRequest'
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Batch processed
           content:
             application/json:
@@ -554,6 +602,9 @@ paths:
               $ref: '#/components/schemas/Prize'
       responses:
         '201':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Created
           content:
             application/json:
@@ -597,6 +648,11 @@ paths:
                 id:
                   type: string
                   pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+                  description: 'Client-generated ULID for the redemption, returned as
+                    `PrizeRedemption.id`. Also the idempotency key: it must equal the `Idempotency-Key`
+                    header, and a mismatch is the shared 409 `Conflict`.
+
+                    '
                 cardCode:
                   type: string
                 lines:
@@ -619,6 +675,9 @@ paths:
                   format: date-time
       responses:
         '201':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Redeemed
           content:
             application/json:
@@ -680,6 +739,9 @@ paths:
               $ref: '#/components/schemas/AttractionType'
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Set
           content:
             application/json:
@@ -724,6 +786,9 @@ paths:
               $ref: '#/components/schemas/GameOperationalConfig'
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Set
           content:
             application/json:
@@ -761,6 +826,12 @@ paths:
         in: query
         schema:
           type: string
+          enum:
+          - unconfigured
+          - active
+          - offline
+          - maintenance
+          - disabled
       responses:
         '200':
           description: Readers
@@ -819,6 +890,9 @@ paths:
               $ref: '#/components/schemas/Reader'
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Set
           content:
             application/json:
@@ -886,6 +960,8 @@ paths:
       x-ticvai-audience:
       - staff
       x-ticvai-scope-level: venue
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       responses:
         '200':
           description: Per-check results
@@ -953,6 +1029,9 @@ paths:
               $ref: '#/components/schemas/GameEntitlement'
       responses:
         '201':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Created
           content:
             application/json:
@@ -1010,6 +1089,9 @@ paths:
               $ref: '#/components/schemas/GameplayValidationRules'
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Set
           content:
             application/json:
@@ -1082,6 +1164,8 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/GameplayAuthorisationRequest'
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       responses:
         '200':
           description: The trace
@@ -1171,6 +1255,9 @@ paths:
               $ref: '#/components/schemas/GamePricing'
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Set
           content:
             application/json:
@@ -1210,6 +1297,9 @@ paths:
               $ref: '#/components/schemas/RedemptionRules'
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Set
           content:
             application/json:
@@ -1253,6 +1343,9 @@ paths:
               $ref: '#/components/schemas/PrizeCost'
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Set
           content:
             application/json:
@@ -1316,6 +1409,16 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/GameCard'
+        '409':
+          description: 'The action is not a legal move from the card''s current status. `expired` and
+            `transferred` are terminal (states/game-card.yaml), so nothing reactivates, blocks or
+            replaces them.
+
+            '
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
   /game-card-expiry-rules:
     put:
       operationId: setGameCardExpiryRules
@@ -1348,6 +1451,9 @@ paths:
               $ref: '#/components/schemas/GameCardExpiryRules'
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Set
           content:
             application/json:
@@ -1393,6 +1499,10 @@ paths:
         in: query
         schema:
           type: string
+          enum:
+          - allowed
+          - refused
+          - reversed
       responses:
         '200':
           description: Transactions
@@ -1514,6 +1624,9 @@ paths:
               $ref: '#/components/schemas/GameKioskConfig'
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Set
           content:
             application/json:
@@ -1602,9 +1715,29 @@ components:
           type: integer
           nullable: true
         operatingHours:
-          type: object
+          type: array
           nullable: true
-          additionalProperties: true
+          description: 'Weekly opening windows, in venue local time, in the same window shape as
+            `GamePricing.peakPricing`. Null means the game follows the venue''s hours.
+
+            '
+          items:
+            type: object
+            required:
+            - daysOfWeek
+            - from
+            - to
+            properties:
+              daysOfWeek:
+                type: array
+                items:
+                  type: string
+              from:
+                type: string
+                description: Local time, HH:MM.
+              to:
+                type: string
+                description: Local time, HH:MM.
         scopePath:
           type: string
     Reader:
@@ -1671,7 +1804,12 @@ components:
         ioMapping:
           type: object
           additionalProperties: true
-          description: 'Board 9.6. Which output starts the game, which input reports it finished.'
+          description: 'Board 9.6. Which output starts the game, which input reports it finished.
+            **Deliberately open.** The keys are the reader model''s own I/O lines, so the shape belongs
+            to the vendor adaptor for that model (game readers are a driver, not a build — ADR-0012,
+            ADR-0015), not to this contract.
+
+            '
         status:
           type: string
           enum:
@@ -2450,6 +2588,12 @@ components:
         id:
           type: string
           pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+          description: 'Client-generated ULID for this request, and the idempotency key: it must equal
+            the `Idempotency-Key` header, and a mismatch is the shared 409 `Conflict`. **Not stored and
+            not returned** — a card is keyed by `cardCode` (`games.card`), so this identifies the
+            request, not the card.
+
+            '
         kind:
           type: string
           enum:
@@ -2600,6 +2744,11 @@ components:
         id:
           type: string
           pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+          description: 'The play ID, generated on the reader, and returned as `PlayResult.playId`. Also
+            the idempotency key: on `recordGamePlay` it must equal the `Idempotency-Key` header (a
+            mismatch is the shared 409 `Conflict`); in a `syncGamePlays` batch it is the key on its own.
+
+            '
         cardCode:
           type: string
         gameId:

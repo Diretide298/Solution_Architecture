@@ -52,6 +52,88 @@ def ref_name(x):
     return str(x).rsplit("/", 1)[-1]
 
 
+def one_line(x):
+    """Descriptions are block scalars; a trailing newline split the Responses line in two (audit R085: '; 429')."""
+    return " ".join(str(x or "").split())
+
+
+class MoneyReach:
+    """Does an operation's request or response carry Money, through any chain of $refs across the contracts?
+    Such an operation resolves currency and scale it does not store (audit R084)."""
+
+    def __init__(self):
+        self.docs, self.memo = {}, {}
+
+    def _doc(self, f):
+        if f not in self.docs:
+            try:
+                self.docs[f] = yaml.safe_load(f.read_text(encoding="utf-8")) or {}
+            except Exception:                  # unreadable or mid-edit: treat it as reaching nothing
+                self.docs[f] = {}
+        return self.docs[f]
+
+    def _target(self, f, ref):
+        file, _, ptr = str(ref).partition("#")
+        tf = (f.parent / file).resolve() if file else f
+        node = self._doc(tf)
+        for part in [x for x in ptr.split("/") if x]:
+            node = node.get(part) if isinstance(node, dict) else None
+        return tf, ptr, node
+
+    def reaches(self, f, node, seen=None):
+        seen = set() if seen is None else seen
+        if isinstance(node, list):
+            return any(self.reaches(f, x, seen) for x in node)
+        if not isinstance(node, dict):
+            return False
+        if "$ref" in node:
+            ref = str(node["$ref"])
+            if ref.endswith("/components/schemas/Money"):
+                return True
+            tf, ptr, target = self._target(f, ref)
+            key = (str(tf), ptr)
+            if key in self.memo:
+                return self.memo[key]
+            if key in seen:
+                return False
+            seen.add(key)
+            self.memo[key] = hit = self.reaches(tf, target, seen)
+            return hit
+        return any(self.reaches(f, v, seen) for k, v in node.items() if k not in ("example", "examples"))
+
+
+def emits_index():
+    """{operationId: {event: [entity from -> to, ...]}} from states/*.yaml, the package's map from an operation to
+    the events it publishes through platform.outbox (audit R157)."""
+    out = collections.defaultdict(lambda: collections.defaultdict(list))
+    for f in sorted((ROOT / "states").glob("*.yaml")):
+        if f.name.startswith("_"):
+            continue
+        try:
+            doc = yaml.safe_load(f.read_text(encoding="utf-8")) or {}
+        except Exception:
+            continue
+        for t in doc.get("transitions") or []:
+            if not isinstance(t, dict) or not t.get("operation") or not t.get("emits"):
+                continue
+            src = t.get("from")
+            src = "/".join(map(str, src)) if isinstance(src, list) else str(src)
+            for e in t["emits"]:
+                out[str(t["operation"])][str(e)].append(f"{doc.get('entity', f.stem)} {src} -> {t.get('to')}")
+    return out
+
+
+# ADR-0025: audience says who may call, permission says what a staff caller must hold. These audiences hold
+# permissions; a guest or an anonymous caller never does.
+HOLDS_PERMISSION = {"staff", "partner", "public", "service", "device"}
+GUEST_RULE = ("a guest caller needs no permission and gets only their own data - a guest token never widens to "
+              "another subject (ADR-0025; common.yaml `guestAuth`)")
+MONEY_RULE = ("currency and scale are not stored on the row: they resolve from the venue's frozen trading "
+              "currency in `platform.venue_settings` (default `platform.region_settings`), except amounts denominated "
+              "by their own account, tender or wallet and the five stored-currency tables (ADR-0018 as amended "
+              "20 September; naming-and-style 5.1). Read that source even though the list above does not name it")
+
+
 def schema_text(s):
     if not isinstance(s, dict):
         return ""
@@ -77,10 +159,14 @@ def build(schedule, keys):
     who = sched["assign"]
     ops = contract_index()
     slice_ops = set(json.loads((ROOT / "handoff" / "delivery-slice.json").read_text(encoding="utf-8"))["operations"])
+    money = MoneyReach()
+    emits = emits_index()
     screens = {}
     for f in sorted((ROOT / "screens").glob("P*.yaml")):
-        for s in yaml.safe_load(f.read_text(encoding="utf-8"))["screens"]:
-            screens[s["id"]] = dict(s, _platform=f.stem)
+        sdoc = yaml.safe_load(f.read_text(encoding="utf-8"))
+        plat = sdoc.get("platform") if isinstance(sdoc.get("platform"), dict) else {}
+        for s in sdoc["screens"]:
+            screens[s["id"]] = dict(s, _platform=f.stem, _operator=plat.get("operator"))
     screen_of = {k: m.group(1) for k, r in rows.items()
                  if r["type"] == "Task" and r["track"] == "Frontend" and (m := SCREEN.search(k))}
     callers = collections.defaultdict(set)
@@ -109,9 +195,22 @@ def build(schedule, keys):
         out.append("")
         out.append(f"- **Contract:** `{file}` (operationId `{op}`)")
         perm = o.get("x-ticvai-permission")
-        out.append(f"- **Permission:** {perm or 'none named'}" + (f", checked at {o['x-ticvai-scope-level']} level"
-                                                                   if o.get("x-ticvai-scope-level") else "")
-                   + (f"; audience {', '.join(o['x-ticvai-audience'])}" if o.get("x-ticvai-audience") else ""))
+        aud = [str(x) for x in o.get("x-ticvai-audience") or []]
+        holders = [x for x in aud if x in HOLDS_PERMISSION]
+        line = (f"- **Permission:** {perm or 'none named'}"
+                + (f" ({', '.join(holders)} callers only)" if perm and holders and len(holders) < len(aud) else "")
+                + (f", checked at {o['x-ticvai-scope-level']} level" if o.get("x-ticvai-scope-level") else "")
+                + (f"; audience {', '.join(aud)}" if aud else ""))
+        if "guest" in aud:
+            line += f"; {GUEST_RULE}"
+        if "anonymous" in aud:
+            line += "; an anonymous caller holds no permission"
+        if perm and aud and not holders:
+            # Under ADR-0025 nobody in this audience holds the permission; say so rather than build a check
+            # no caller can pass (audit R072).
+            line += (f". **The contract names {perm} but no caller in this audience holds permissions** - raise it "
+                     "with the contract owner before building a permission check")
+        out.append(line)
         params = []
         for p in o.get("parameters") or []:
             if "$ref" in p:
@@ -130,12 +229,21 @@ def build(schedule, keys):
                 resp.append(f"{code} {ref_name(r['$ref'])}")
                 continue
             sch = ((r.get("content") or {}).get("application/json") or {}).get("schema")
-            resp.append(f"{code} {r.get('description', '')}" + (f" -> {schema_text(sch)}" if sch else ""))
+            resp.append(f"{code} {one_line(r.get('description'))}" + (f" -> {schema_text(sch)}" if sch else ""))
         if resp:
             out.append("- **Responses:** " + "; ".join(resp))
+        # The lineage is approximate (audit R071, R121): derived from returned and request schemas, it misses
+        # side-effect, projection and price tables. It is a starting list, not a limit.
         if ln.get("reads") or ln.get("writes"):
-            out.append(f"- **Reads:** {', '.join(ln.get('reads') or []) or 'nothing'}; "
+            out.append(f"- **Reads (from the lineage, at least):** {', '.join(ln.get('reads') or []) or 'nothing'}; "
                        f"**writes:** {', '.join(ln.get('writes') or []) or 'nothing'}")
+        if money.reaches(ROOT / file, {"parameters": o.get("parameters"), "requestBody": o.get("requestBody"),
+                                       "responses": o.get("responses")}):
+            out.append(f"- **Money:** {MONEY_RULE}")
+        if emits.get(op):
+            out.append("- **Emits (through `platform.outbox`, in the same transaction):** "
+                       + "; ".join(f"`{e}` on {', '.join(sorted(set(ts)))}" for e, ts in sorted(emits[op].items()))
+                       + " (from states/*.yaml; the payload is in events/)")
         # Routing only where the operation declares it, and never on a write: defaulting to
         # "primary" contradicted replica-only reporting operations (audit R066).
         routing = o.get("x-ticvai-read-routing") if method == "GET" else None
@@ -183,11 +291,14 @@ def build(schedule, keys):
         kinds = set()
         for op in op_ids:
             o = (ops.get(op) or (None, None, None, {}))[3]
+            aud = [str(x) for x in o.get("x-ticvai-audience") or []]
+            if "guest" in aud:
+                kinds.add("guest")
             if isinstance(o.get("security"), list) and not o["security"]:
                 kinds.add("public")
             elif o.get("x-ticvai-self-scoped"):
                 kinds.add("self")
-            elif o.get("x-ticvai-permission"):
+            elif o.get("x-ticvai-permission") and (not aud or any(x in HOLDS_PERMISSION for x in aud)):
                 kinds.add("perm")
             else:
                 kinds.add("auth")
@@ -195,7 +306,11 @@ def build(schedule, keys):
         if kinds & {"perm", "self", "auth"}:
             parts.append("an unauthenticated call gets 401")
         if "perm" in kinds:
-            parts.append("a caller without the permission gets 403")
+            parts.append("a caller without the permission gets 403" + (" (it applies to staff and partner callers, "
+                                                                          "never to a guest)" if "guest" in kinds else ""))
+        if "guest" in kinds:
+            parts.append("a signed-in guest succeeds without any permission, and another guest's id gets 404 "
+                         "(`not-found`: outside the caller's scope)")
         if "self" in kinds:
             parts.append("another caller's id gets 403 on self-scoped operations")
         if "public" in kinds:
@@ -208,7 +323,11 @@ def build(schedule, keys):
                 "status codes and problem codes the contract lists)",
                 auth_line(op_ids),
                 "- [ ] Tests for success and for each listed error",
-                "- [ ] Reads and writes only the tables listed; row-level security holds",
+                # Not "only the tables listed": the lineage misses side-effect, projection, currency and price
+                # tables, so a hard limit forbade what the contract requires (audit R071, R084, R121).
+                "- [ ] Reads and writes at least the tables listed, plus any the contract's described behaviour "
+                "needs (the list comes from api-data-lineage.json and can miss side-effect, projection, currency "
+                "and price tables); the PR names every table beyond the list; row-level security holds",
                 "- [ ] `dotnet build` passes with analyzers and warnings as errors, and `dotnet test` passes; "
                 "the PR is reviewed"]
 
@@ -239,12 +358,25 @@ def build(schedule, keys):
                                                 "- [ ] Tests for the main flows through the screen",
                                                 "- [ ] Lint and typecheck pass"])}
 
+    def purpose_of(s):
+        """The screen's purpose, whole. Three authored purposes were cut at 200 characters mid-word while the
+        full sentence survives in notes (audit R067): finish the sentence from notes when that happens."""
+        p = str(s.get("purpose") or "").strip()
+        notes = str(s.get("notes") or "").strip()
+        if p and not re.search(r"[.!?)\"'*`]$", p) and notes.startswith(p) and len(notes) > len(p):
+            m = re.search(r"[.!?](?=\s|$)", notes[len(p):])
+            p = notes[:len(p) + m.end()] if m else notes.split("\n\n", 1)[0]
+        return p
+
+    def guest_screen(sid):
+        return screens.get(sid, {}).get("_operator") == "guest"
+
     def screen_block(sid):
         s = screens.get(sid, {})
         impl = s.get("implementation") or {}
         out = [f"### {sid} {s.get('name', '')}", ""]
         if s.get("purpose"):
-            out += [str(s["purpose"]).strip(), ""]
+            out += [purpose_of(s), ""]
         out.append(f"- **Platform:** {s.get('_platform', '')}; module: {s.get('module', '-')}; wave {s.get('wave', '-')}")
         if impl.get("route") or impl.get("component"):
             out.append(f"- **Route:** `{impl.get('route', '-')}`; component `{impl.get('component', '-')}`")
@@ -280,6 +412,11 @@ def build(schedule, keys):
         st = s.get("states")
         if isinstance(st, dict):
             for name, text in st.items():
+                if name == "emptyNoAccess" and guest_screen(sid):
+                    # A guest holds no permission (ADR-0025), so there is none to name (audit R072).
+                    out.append("- [ ] State **emptyNoAccess**: not reachable on a guest screen - a guest caller holds "
+                               "no permission (ADR-0025)")
+                    continue
                 first = re.split(r"(?<=[.!?])\s", re.sub(r"\*\*", "", str(text)).strip(), maxsplit=1)[0]
                 out.append(f"- [ ] State **{name}**: {first}")
         for t in ((s.get("navigation") or {}).get("transitions") or [])[:8]:
@@ -325,6 +462,11 @@ def build(schedule, keys):
             sid = screen_of[base]
             if part in FE_PART:
                 title, checks = FE_PART[part]
+                if part == "wire" and guest_screen(sid):
+                    checks = [c if "Permissions:" not in c else
+                              "- [ ] No staff permission applies on a guest screen (ADR-0025): the signed-in guest "
+                              "sees only their own data"
+                              for c in checks]
                 text += [f"{title}: {sid} {screens.get(sid, {}).get('name', '')}. One of three sub-tasks "
                          "(build / connect / tests).", ""]
                 text += screen_block(sid) + ["", "## Done when", ""] + checks

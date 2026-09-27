@@ -45,6 +45,13 @@ Checks:
      (CF-49); this makes that visible rather than discoverable by accident.
  10. No derived table name carries a doubled suffix — `homepage_section_section` is a deriver
      defect, not a table.
+ 46. An operation taking PageCursor returns the shared Page envelope; a list behind a
+     cursor-paginated screen takes a cursor or says in `x-ticvai-bounded` why it need not (warns).
+ 47. No method + path is declared by two contracts on the same server.
+ 48. Every mutating operation takes IdempotencyKey or carries `x-ticvai-idempotency-exempt: <reason>`.
+ 49. Every operation the lineage says writes a Postgres table declares X-Consistency-Token on a 2xx.
+ 50. Paths: kebab-case segments and one type per path parameter gate; two roots for one resource,
+     singular collection roots, singular/plural sub-resource pairs and POST on an item warn.
 
 Run: python3 tools/check-package.py
 """
@@ -103,6 +110,284 @@ def _scope_levels() -> list:
 
 
 import collections as _collections
+
+_VERBS = ("get", "post", "put", "patch", "delete")
+_MUTATING = ("post", "put", "patch", "delete")
+_ULID = "^[0-9A-HJKMNP-TV-Z]{26}$"
+
+
+def _summarise(ops_: list, n: int = 6) -> str:
+    return ", ".join(ops_[:n]) + (f" and {len(ops_) - n} more" if len(ops_) > n else "")
+
+
+def _contract_rules(C: Path, H: Path, shared: set) -> None:
+    """Rules 46-50: the contract conventions `api-conventions.md` and `naming-and-style.md` state
+    and nothing here enforced. The pull audit of 26 September found each of them broken across
+    the package with every checker passing, because no checker looked."""
+    docs: dict = {}
+    for f in sorted(C.glob("*/*.yaml")):
+        if f.name in shared or f.parent.name == "shared":
+            continue
+        try:
+            docs[f] = yaml.safe_load(f.read_text(encoding="utf-8")) or {}
+        except Exception:  # noqa: BLE001 -- a file that does not parse is reported elsewhere
+            continue
+
+    lin_p = H / "api-data-lineage.json"
+    lin = json.loads(lin_p.read_text(encoding="utf-8")) if lin_p.exists() else {}
+    sref_p = H / "schema-reference.json"
+    store = (json.loads(sref_p.read_text(encoding="utf-8")).get("store") or {}) if sref_p.exists() else {}
+
+    def _params(item: dict, op: dict) -> str:
+        return str(item.get("parameters") or "") + str(op.get("parameters") or "")
+
+    def _local(doc: dict, node, depth: int = 0):
+        """Follow a local `$ref` so a named envelope schema is read, not just its name."""
+        while isinstance(node, dict) and str(node.get("$ref", "")).startswith("#/") and depth < 5:
+            tgt = doc
+            for part in node["$ref"][2:].split("/"):
+                tgt = tgt.get(part) if isinstance(tgt, dict) else None
+            node, depth = tgt, depth + 1
+        return node
+
+    # 46. **A paged request gets a paged answer** (R076). `PageSize` and `PageCursor` take "an
+    # opaque cursor from a previous page", and the only place a next cursor exists is the shared
+    # `Page` envelope (`items`, `nextCursor`, `hasMore`). On 26 September **64 operations took the
+    # cursor and returned a bare array** beside 105 that used the envelope: a client asks for a
+    # page, gets the first 50, and has nothing to ask for the next one with.
+    #
+    # The second half is the list behind a screen whose table says *cursor pagination, never
+    # offset* and which takes no cursor at all. Some of those lists are bounded by what they hold
+    # (a venue's printers, a tenant's roles), so the answer is either the cursor or
+    # `x-ticvai-bounded: <why the list cannot grow without limit>` on the operation. That is a
+    # judgement, so it warns.
+    ops_by: dict = {}
+    for f, d in docs.items():
+        for p, item in (d.get("paths") or {}).items():
+            if not isinstance(item, dict):
+                continue
+            for v, op in item.items():
+                if v not in _VERBS or not isinstance(op, dict) or not op.get("operationId"):
+                    continue
+                ops_by[op["operationId"]] = (f, d, p, v, item, op)
+                if "PageCursor" not in _params(item, op):
+                    continue
+                r200 = (op.get("responses") or {}).get("200") or (op.get("responses") or {}).get(200)
+                r200 = _local(d, r200)
+                sch = _local(d, (((r200 or {}).get("content") or {}).get("application/json") or {})
+                             .get("schema")) if isinstance(r200, dict) else None
+                txt = str(sch)
+                if "components/schemas/Page" in txt or "nextCursor" in txt:
+                    continue
+                ERRORS.append(
+                    f"{f.stem}.{op['operationId']}: takes PageCursor and its 200 is not the shared "
+                    "Page envelope — wrap it as allOf [common.yaml#/components/schemas/Page, "
+                    "{items: ...}], or the client has no nextCursor to ask for the next page with")
+
+    unpaged: dict = {}
+    for sf in sorted((ROOT / "screens").glob("P*.yaml")):
+        try:
+            sd = yaml.safe_load(sf.read_text(encoding="utf-8")) or {}
+        except Exception:  # noqa: BLE001
+            continue
+
+        def _walk(x, sid):
+            if isinstance(x, dict):
+                if (x.get("kind") == "dataTable"
+                        and "cursor pagination" in str(x.get("notes") or "").lower()):
+                    o = x.get("impliedBy")
+                    hit = ops_by.get(o)
+                    if (hit and hit[3] == "get" and "PageCursor" not in _params(hit[4], hit[5])
+                            and not hit[5].get("x-ticvai-bounded")):
+                        unpaged.setdefault(o, (hit[0].stem, set()))[1].add(sid)
+                for y in x.values():
+                    _walk(y, sid)
+            elif isinstance(x, list):
+                for y in x:
+                    _walk(y, sid)
+
+        for s in sd.get("screens") or []:
+            _walk(s, s.get("id"))
+    for o, (stem, sids_) in sorted(unpaged.items()):
+        WARNINGS.append(
+            f"{stem}.{o}: {', '.join(sorted(sids_)[:3])} list it with cursor pagination and it "
+            "takes no PageCursor — page it, or say why it is bounded in x-ticvai-bounded")
+
+    # 47. **One route, one operation** (R176). Rule 35c finds a path key repeated inside one file;
+    # nothing looked across files. `POST /stock-counts/{countId}/recount` was declared by both
+    # `inventory` (LEDGER_APPROVE, ULID id) and `fnb` (PRODUCT_CONFIGURE, uuid id) **on the same
+    # server**, and BO-079 called both. A router serves one of them; which one is an accident of
+    # registration order. Two contracts may share a path only when their servers differ.
+    routes = _collections.defaultdict(list)
+    for f, d in docs.items():
+        servers = [s.get("url") for s in (d.get("servers") or []) if isinstance(s, dict)] or [None]
+        for p, item in (d.get("paths") or {}).items():
+            if not isinstance(item, dict):
+                continue
+            norm = re.sub(r"\{[^}]+\}", "{}", p)
+            for v, op in item.items():
+                if v in _VERBS and isinstance(op, dict):
+                    for s in servers:
+                        routes[(s, v, norm)].append(f"{f.stem}.{op.get('operationId')} ({p})")
+    for (s, v, norm), where in sorted(routes.items(), key=lambda kv: str(kv[0])):
+        if len({w.split(".")[0] for w in where}) > 1:
+            ERRORS.append(
+                f"{v.upper()} {norm} on {s} is declared by {' and '.join(where)} — one route, two "
+                "operations, and which one answers depends on registration order")
+
+    # 48. **Every mutating operation takes an Idempotency-Key, or says why not** (R142).
+    # `common.yaml`: "Required on every mutating request because offline clients replay their
+    # outbox on reconnect"; quality-gates says the same. **196 of 1,115 did not on 26 September**,
+    # and CF-96's "seven are exempt by design" named none of them, so a deliberate exemption and an
+    # omission read identically. An exemption is `x-ticvai-idempotency-exempt: <reason>` on the
+    # operation — a sync batch that dedupes per item, a heartbeat, a computation that writes
+    # nothing — and the reason is the point: a bare `true` says nothing a reviewer can check.
+    #
+    # The reverse is a warning: an operation the lineage says writes nothing, requiring a key and
+    # not marked exempt. Either the lineage misses a write or it is a computation and should say so.
+    missing = _collections.defaultdict(list)
+    for f, d in docs.items():
+        for p, item in (d.get("paths") or {}).items():
+            if not isinstance(item, dict):
+                continue
+            for v, op in item.items():
+                if v not in _MUTATING or not isinstance(op, dict) or not op.get("operationId"):
+                    continue
+                oid = op["operationId"]
+                ex = op.get("x-ticvai-idempotency-exempt")
+                has = "IdempotencyKey" in _params(item, op) or "Idempotency-Key" in _params(item, op)
+                if ex is not None and not (isinstance(ex, str) and ex.strip()):
+                    ERRORS.append(f"{f.stem}.{oid}: x-ticvai-idempotency-exempt must be the reason, "
+                                  "not a flag — say why a replay cannot duplicate this write")
+                if ex and has:
+                    ERRORS.append(f"{f.stem}.{oid}: marked idempotency-exempt and still takes "
+                                  "IdempotencyKey — one of the two is wrong")
+                if not has and not ex:
+                    missing[f.stem].append(oid)
+                if has and not ex and oid in lin:
+                    w = [t for t in (lin[oid].get("writes") or [])
+                         if not t.startswith(("cache:", "qdrant"))]
+                    if not w:
+                        WARNINGS.append(
+                            f"{f.stem}.{oid}: {v.upper()} requires an Idempotency-Key and the "
+                            "lineage says it writes nothing — add the write, or mark it "
+                            "x-ticvai-idempotency-exempt with the reason")
+    for stem, lst in sorted(missing.items()):
+        ERRORS.append(
+            f"{stem}: {len(lst)} mutating operation(s) take no IdempotencyKey and state no "
+            f"x-ticvai-idempotency-exempt reason — {_summarise(lst)}")
+
+    # 49. **A write says where it landed** (R192). api-conventions §3 puts `X-Consistency-Token`
+    # on the write response, `offline-and-sync.md` says it carries the WAL LSN, and the next read
+    # passes it back so a lagging replica cannot refuse a ticket sold seconds earlier. **Three
+    # operations of about 1,115 declared it on 26 September.** An operation owes the header when
+    # the lineage says it writes a Postgres table: a cache or vector write has no LSN to return.
+    # Declared inline or as `$ref: '../shared/common.yaml#/components/headers/ConsistencyToken'`
+    # on any 2xx response.
+    nohdr = _collections.defaultdict(list)
+    for f, d in docs.items():
+        for p, item in (d.get("paths") or {}).items():
+            if not isinstance(item, dict):
+                continue
+            for v, op in item.items():
+                if v not in _MUTATING or not isinstance(op, dict) or op.get("operationId") not in lin:
+                    continue
+                oid = op["operationId"]
+                pg = [t for t in (lin[oid].get("writes") or [])
+                      if not t.startswith(("cache:", "qdrant"))
+                      and store.get(t, "postgres") in ("postgres", "postgres-analytical")]
+                if not pg:
+                    continue
+                ok = False
+                for code, r in (op.get("responses") or {}).items():
+                    if not str(code).startswith("2"):
+                        continue
+                    r = _local(d, r)
+                    hdrs = str((r or {}).get("headers") if isinstance(r, dict) else r)
+                    if "X-Consistency-Token" in hdrs or "headers/ConsistencyToken" in hdrs:
+                        ok = True
+                        break
+                if not ok:
+                    nohdr[f.stem].append(oid)
+    for stem, lst in sorted(nohdr.items()):
+        ERRORS.append(
+            f"{stem}: {len(lst)} write(s) declare no X-Consistency-Token on their 2xx response "
+            f"(api-conventions §3) — {_summarise(lst)}")
+
+    # 50. **Paths follow naming-and-style §6.2** (R118): segments kebab-case, collections plural,
+    # one root per resource, sub-resources over verbs. None of it was checked, and on 26 September
+    # `fnb` served kitchen tickets from both `/kitchen/tickets` and `/kitchen-tickets/{id}/*`,
+    # `/guest/memberships` sat beside `/guests/me/memberships`, and `/retail-sales/{id}/reprint`
+    # beside `/orders/{id}/reprints`.
+    #
+    # The mechanical parts gate: a segment that is not kebab-case, and one path parameter typed two
+    # ways in one contract — `ticketId` a ULID on one path and a uuid on the next is a client that
+    # validates one id and rejects the other. The rest is naming, where a singleton or a genuine
+    # action can be right, so it warns.
+    def _pl(s: str) -> set:
+        out = {s + "s", s + "es"}
+        if s.endswith("y"):
+            out.add(s[:-1] + "ies")
+        return out
+
+    by_server = _collections.defaultdict(list)
+    for f, d in docs.items():
+        servers = tuple(s.get("url") for s in (d.get("servers") or []) if isinstance(s, dict))
+        ptypes = _collections.defaultdict(lambda: _collections.defaultdict(list))
+        for p, item in (d.get("paths") or {}).items():
+            if not isinstance(item, dict):
+                continue
+            by_server[servers].append((f.stem, p))
+            for seg in p.strip("/").split("/"):
+                if seg and not seg.startswith("{") and not re.fullmatch(r"[a-z0-9]+(-[a-z0-9]+)*", seg):
+                    ERRORS.append(f"{f.stem}: path {p} has segment '{seg}' — path segments are "
+                                  "kebab-case (naming-and-style §6.2)")
+            for v, op in item.items():
+                if v not in _VERBS or not isinstance(op, dict):
+                    continue
+                if v == "post" and p.rstrip("/").endswith("}"):
+                    WARNINGS.append(f"{f.stem}.{op.get('operationId')}: POST on the item {p} — a "
+                                    "create belongs on a collection, an action on a sub-resource")
+                for prm in list(item.get("parameters") or []) + list(op.get("parameters") or []):
+                    if isinstance(prm, dict) and prm.get("in") == "path":
+                        sc = prm.get("schema") or {}
+                        if sc.get("format") or sc.get("pattern") or sc.get("type") not in (None, "string"):
+                            key = (sc.get("type"), sc.get("format"),
+                                   "ULID" if sc.get("pattern") == _ULID else sc.get("pattern"))
+                            ptypes[prm["name"]][key].append(str(op.get("operationId")))
+        for name, kinds in sorted(ptypes.items()):
+            if len(kinds) > 1:
+                desc = "; ".join(f"{'/'.join(str(x) for x in k if x)} on {_summarise(sorted(set(o)), 2)}"
+                                 for k, o in sorted(kinds.items(), key=str))
+                ERRORS.append(f"{f.stem}: path parameter {name} is typed two ways — {desc}. One id, "
+                              "one type, and it is the type of the column it keys")
+    for servers, lst in by_server.items():
+        firsts = _collections.defaultdict(list)
+        tails = _collections.defaultdict(list)
+        for stem, p in lst:
+            segs = p.strip("/").split("/")
+            firsts[segs[0]].append(p)
+            if len(segs) >= 2 and segs[-2].startswith("{") and not segs[-1].startswith("{"):
+                tails[segs[-1]].append(p)
+        seen: set = set()
+        for stem, p in lst:
+            segs = p.strip("/").split("/")
+            if len(segs) >= 2 and not segs[1].startswith("{"):
+                joined = f"{segs[0]}-{segs[1]}"
+                if joined in firsts and (segs[0], segs[1]) not in seen:
+                    seen.add((segs[0], segs[1]))
+                    WARNINGS.append(f"{stem}: /{segs[0]}/{segs[1]} and /{joined} are two roots for "
+                                    f"one resource (e.g. {p} and {firsts[joined][0]}) — pick one")
+        for seg, ps in sorted(firsts.items()):
+            plural = sorted(x for x in _pl(seg) if x in firsts)
+            if plural:
+                WARNINGS.append(f"collection root /{seg} ({ps[0]}) beside /{plural[0]} "
+                                f"({firsts[plural[0]][0]}) — collections are plural, one root each")
+        for seg, ps in sorted(tails.items()):
+            plural = sorted(x for x in _pl(seg) if x in tails)
+            if plural:
+                WARNINGS.append(f"{ps[0]} ends in /{seg} where {tails[plural[0]][0]} uses "
+                                f"/{plural[0]} — one sub-resource, one spelling")
 
 
 def main() -> int:
@@ -613,6 +898,7 @@ def main() -> int:
         "payments.method_config",            # which currency a method is enabled for, per scope and channel
         "inventory.supplier_contract",       # an overseas supplier contracts in its own currency; inventory.supplier is already exempt for this reason
         "orders.deposit",                    # money actually taken, like orders.payment.tender_currency beside it
+        "orders.deposit_box_foreign_holding",  # foreign notes counted into a drawer: the currency IS the holding (audit R099)
         "wallet.balance",                    # a stored-value balance is denominated, the same reason wallet.wallet is exempt
         "wallet.hold",                       # a hold on a denominated balance carries the balance's denomination
         # **The two the 20 September amendment created, and they are the point of it.**
@@ -1389,6 +1675,8 @@ def main() -> int:
         for _m in _re.finditer(r"\]\(([^)#:]+\.md)(?:#[^)]*)?\)", _f.read_text(encoding="utf-8")):
             if not (_f.parent / _m.group(1)).exists():
                 ERRORS.append(f"{_f.name}: links to {_m.group(1)}, which does not exist")
+
+    _contract_rules(C, H, shared)
 
     print(f"{len(ops)} operations · {len(tables)} tables · {len(sids)} screens · "
           f"{len(apps)} apps · {len(plats)} platforms\n")

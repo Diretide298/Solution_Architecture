@@ -9,12 +9,12 @@
 | Contracts | 7 |
 | Modules | 3 |
 | Undrawn | 0 |
-| Operations with no screen | 100 |
+| Operations with no screen | 107 |
 | Waves | wave2 20 · wave3 80 |
 
 ## Gaps
 
-### 100 operations with no screen here
+### 107 operations with no screen here
 
 **In a contract this platform uses, callable by its audience, and reaching no screen on any platform serving that audience.** Either a screen is missing or the endpoint should not exist — and the second is worth considering first.
 
@@ -30,6 +30,8 @@
 | `getFnbServiceChargePolicy` | fnb | GET | The service charge a venue applies, and on what |
 | `listFnbRecommendations` | fnb | GET | Upsell and pairing suggestions for F&B |
 | `listIngredientSubstitutes` | fnb | GET | Approved substitutions for a recipe's ingredients |
+| `listMenuSchedules` | fnb | GET | What is scheduled to go live, and when |
+| `listMenuVersions` | fnb | GET | Every published version of a menu |
 | `listTemperatureCheckpoints` | fnb | GET | The units that get read, and the range each must hold |
 | `rebalanceStationLoad` | fnb | POST | Move work between stations mid-service |
 | `recordCorrectiveAction` | fnb | POST | Record what was done about a finding |
@@ -58,9 +60,7 @@
 | `listModuleCapabilities` | identity | GET | What a person can be allowed to do, per module |
 | `listModules` | identity | GET | The module tree permissions are grouped under |
 | `listPermissions` | identity | GET | Every permission key the contracts enforce |
-| `listSegregationRules` | identity | GET | Read the conflicting-permission rules back |
-| `listSegregationViolations` | identity | GET | Who already holds a conflicting pair |
-| … | | | 60 more |
+| … | | | 67 more |
 
 ## Modules
 

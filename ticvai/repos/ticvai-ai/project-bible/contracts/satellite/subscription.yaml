@@ -101,6 +101,9 @@ paths:
               $ref: '#/components/schemas/OnboardingApplication'
       responses:
         '201':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Submitted, pending verification
           content:
             application/json:
@@ -197,6 +200,9 @@ paths:
               $ref: '#/components/schemas/PartnerUser'
       responses:
         '201':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Created
           content:
             application/json:
@@ -257,6 +263,9 @@ paths:
               $ref: '#/components/schemas/ChannelListing'
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Listed
           content:
             application/json:
@@ -377,6 +386,9 @@ paths:
                   format: date
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Settled
           content:
             application/json:
@@ -501,6 +513,9 @@ paths:
                   maxLength: 500
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Cancelled
           content:
             application/json:
@@ -583,6 +598,9 @@ paths:
               $ref: '#/components/schemas/PartnerAgreement'
       responses:
         '201':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Created, pending approval
           content:
             application/json:
@@ -623,6 +641,9 @@ paths:
               $ref: '#/components/schemas/PartnerAgreement'
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Amended as a new version
           content:
             application/json:
@@ -674,6 +695,9 @@ paths:
                   type: string
       responses:
         '202':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Submitted for approval
           content:
             application/json:
@@ -812,6 +836,9 @@ paths:
               $ref: '#/components/schemas/CreateTenantRequest'
       responses:
         '201':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Created. Provision a region next
           content:
             application/json:
@@ -900,6 +927,9 @@ paths:
                   format: uuid
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Updated
           content:
             application/json:
@@ -958,6 +988,9 @@ paths:
                   $ref: '#/components/schemas/LocalisedText'
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Suspended
           content:
             application/json:
@@ -988,6 +1021,9 @@ paths:
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Reactivated
           content:
             application/json:
@@ -1053,6 +1089,9 @@ paths:
                   description: Must match the tenant's code. Guards against the wrong tenant.
       responses:
         '202':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Termination scheduled
           content:
             application/json:
@@ -1127,6 +1166,9 @@ paths:
               $ref: '#/components/schemas/CreatePlanRequest'
       responses:
         '201':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Created
           content:
             application/json:
@@ -1194,6 +1236,9 @@ paths:
               $ref: '#/components/schemas/CreatePlanRequest'
       responses:
         '201':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: New version published
           content:
             application/json:
@@ -1273,6 +1318,9 @@ paths:
               $ref: '#/components/schemas/SetSubscriptionRequest'
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Applied
           content:
             application/json:
@@ -1416,6 +1464,9 @@ paths:
               $ref: '#/components/schemas/LicenceAddOn'
       responses:
         '201':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Added
           content:
             application/json:
@@ -1456,6 +1507,9 @@ paths:
                   maxLength: 500
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Removed
           content:
             application/json:
@@ -1584,6 +1638,9 @@ paths:
               $ref: '#/components/schemas/ProvisionCellRequest'
       responses:
         '202':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Provisioning started
           content:
             application/json:
@@ -1684,6 +1741,9 @@ paths:
                   format: date-time
       responses:
         '202':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Migration scheduled
           content:
             application/json:
@@ -1741,6 +1801,9 @@ paths:
                   type: string
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Done
         '409':
           description: Not in a state that permits this
@@ -1793,6 +1856,9 @@ paths:
                   type: string
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Done
         '409':
           description: Not in a state that permits this
@@ -1943,6 +2009,9 @@ paths:
                   type: string
       responses:
         '202':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Launching
           content:
             application/json:
@@ -1994,6 +2063,9 @@ paths:
                   type: string
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Done
         '409':
           description: Not in a state that permits this
@@ -2088,6 +2160,9 @@ paths:
                   - complianceRequirement
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Plan
           content:
             application/json:
@@ -2157,6 +2232,9 @@ paths:
                   default: 30
       responses:
         '202':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Migration started
           content:
             application/json:
@@ -2351,6 +2429,9 @@ paths:
                     $ref: '#/components/schemas/UsageRecord'
       responses:
         '202':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Accepted
           content:
             application/json:
@@ -2401,6 +2482,9 @@ paths:
                   type: string
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Done
         '409':
           description: Not in a state that permits this
@@ -2447,6 +2531,9 @@ paths:
                   type: string
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Done
         '409':
           description: Not in a state that permits this
@@ -2491,6 +2578,9 @@ paths:
                   type: string
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Done
         '409':
           description: Not in a state that permits this
@@ -2537,6 +2627,9 @@ paths:
                   type: string
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Done
         '409':
           description: Not in a state that permits this
@@ -2636,6 +2729,9 @@ paths:
                   default: false
       responses:
         '201':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Generated
           content:
             application/json:
@@ -2797,6 +2893,9 @@ paths:
                   default: 500
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Progress
           content:
             application/json:
@@ -2835,6 +2934,9 @@ paths:
       - *id002
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Decommissioned
           content:
             application/json:
@@ -2904,8 +3006,13 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/PartnerQuote'
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Raise a quote
           content:
             application/json:
@@ -2990,6 +3097,8 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/MembershipProductTierBuilderInput'
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       responses:
         '200':
           description: Membership Product & Tier Builder
@@ -3032,6 +3141,8 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/MembershipEligibilityQualificationRuleBuilderInput'
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       responses:
         '200':
           description: Membership Eligibility & Qualification Rule Builder
@@ -3074,6 +3185,8 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/ValidityActivationExpiryConfigurationInput'
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       responses:
         '200':
           description: Validity, Activation & Expiry Configuration
@@ -3116,6 +3229,8 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/MembershipEntitlementAdmissionBenefitBuilderInput'
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       responses:
         '200':
           description: Membership Entitlement & Admission Benefit Builder
@@ -3197,6 +3312,8 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/FamilyHouseholdDependentMembershipConfigurationInput'
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       responses:
         '200':
           description: Family, Household & Dependent Membership Configuration
@@ -3279,6 +3396,8 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/RenewalAutoRenewalMembershipContinuityConfigurationInput'
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       responses:
         '200':
           description: Renewal, Auto-Renewal & Membership Continuity Configuration
@@ -3322,6 +3441,8 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/MembershipProductValidationApprovalPublicationVersioInput'
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       responses:
         '200':
           description: Membership Product Validation, Approval, Publication & Versioning
@@ -3454,6 +3575,8 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/Member360MembershipAccountWorkspaceInput'
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       responses:
         '200':
           description: Member 360° Membership Account Workspace
@@ -3929,6 +4052,8 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/PartnerProfileOrganizationSetupInput'
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       responses:
         '200':
           description: Partner Profile & Organization Setup
@@ -4086,6 +4211,8 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/PartnerBrandVenueBusinessScopeAssignmentInput'
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       responses:
         '200':
           description: Partner Brand, Venue & Business Scope Assignment
@@ -4204,6 +4331,8 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/PartnerApprovalStatusLifecycleManagementInput'
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       responses:
         '200':
           description: Partner Approval, Status & Lifecycle Management
@@ -4377,6 +4506,8 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/AgreementContractTermsBuilderInput'
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       responses:
         '200':
           description: Agreement & Contract Terms Builder
@@ -4419,6 +4550,8 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/PartnerRateNetPricingConfigurationInput'
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       responses:
         '200':
           description: Partner Rate & Net Pricing Configuration
@@ -4576,6 +4709,8 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/PaymentTermsBillingAccountConfigurationInput'
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       responses:
         '200':
           description: Payment Terms, Billing & Account Configuration
@@ -4656,6 +4791,8 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/BookingLimitsCommercialExceptionsApprovalInput'
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       responses:
         '200':
           description: Booking Limits, Commercial Exceptions & Approval
@@ -5218,6 +5355,9 @@ paths:
               $ref: '#/components/schemas/VsiModel'
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Set
           content:
             application/json:
@@ -5273,6 +5413,9 @@ paths:
               $ref: '#/components/schemas/VsiAssessment'
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Score, tier and recommendation
           content:
             application/json:
@@ -5334,6 +5477,9 @@ paths:
               $ref: '#/components/schemas/LicensingModel'
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Set
           content:
             application/json:
@@ -5401,6 +5547,9 @@ paths:
               $ref: '#/components/schemas/ModuleListing'
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Set
           content:
             application/json:
@@ -5445,6 +5594,8 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/PackageSimulationRequest'
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       responses:
         '200':
           description: The costed package and its findings
@@ -5487,6 +5638,9 @@ paths:
               $ref: '#/components/schemas/TrialConfiguration'
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Set
           content:
             application/json:
@@ -5642,6 +5796,9 @@ paths:
               $ref: '#/components/schemas/LicenceEnforcementPolicy'
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Set
           content:
             application/json:
@@ -5678,6 +5835,9 @@ paths:
               $ref: '#/components/schemas/CapacityPack'
       responses:
         '201':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Added
           content:
             application/json:
@@ -5782,6 +5942,9 @@ paths:
               $ref: '#/components/schemas/PlanTierDetail'
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Set a plan tier's allowances and modules
           content:
             application/json:
@@ -7303,6 +7466,37 @@ components:
         suspensionReason:
           type: string
           nullable: true
+        suspensionEffectiveAt:
+          type: string
+          format: date-time
+          nullable: true
+          description: 'When the suspension takes, or took, effect — `suspendTenant.effectiveAt`. **A
+            future value is a pending suspension**: the tenant stays `active` until then, and this row is
+            the only place that says a suspension is coming.'
+        suspensionNoticeMessage:
+          $ref: '#/components/schemas/LocalisedText'
+          description: The notice shown to the tenant's users about the suspension — `suspendTenant.noticeMessage`.
+        terminationScheduledAt:
+          type: string
+          format: date-time
+          nullable: true
+          description: When `terminateTenant` started the retention window. Null when no termination is
+            under way.
+        terminationRetentionUntil:
+          type: string
+          format: date-time
+          nullable: true
+          description: '`terminationScheduledAt` plus the request''s `retentionDays`. **Stored, not
+            recomputed** — the day count is client-supplied and exists nowhere else, and this is the date
+            the cells are destroyed after.'
+        terminationReason:
+          type: string
+          maxLength: 1000
+          nullable: true
+        terminationRequestedByPrincipalId:
+          type: string
+          format: uuid
+          nullable: true
         planId:
           type: string
           format: uuid
@@ -7316,6 +7510,12 @@ components:
           type: integer
         billingEmail:
           type: string
+        billingAddress:
+          type: string
+          maxLength: 500
+          nullable: true
+          description: Accepted by `createTenant` and `updateTenant`; stored here so the response can
+            return what was sent.
         accountManagerPrincipalId:
           type: string
           format: uuid
@@ -7342,7 +7542,9 @@ components:
           licences:
             $ref: '#/components/schemas/LicencePosition'
     TerminationSchedule:
-      x-ticvai-persistence: none — computed
+      x-ticvai-persistence: none — projection of control.tenant's termination columns (termination_scheduled_at,
+        termination_retention_until, termination_requested_by_principal_id); isReversible is computed
+        from the retention date
       type: object
       required:
       - tenantId
@@ -7379,7 +7581,9 @@ components:
         limit:
           type: integer
           nullable: true
-          description: Null means unlimited.
+          x-ticvai-column: limit_value
+          description: Null means unlimited. Stored as `limit_value` — `limit` is a reserved word, and
+            `subscription.tier_allowance` already names the same figure `limit_value`.
         overageAllowed:
           type: boolean
           default: false
@@ -7442,7 +7646,13 @@ components:
           type: integer
           nullable: true
     Plan:
-      x-ticvai-persistence: subscription.plan
+      x-ticvai-persistence: subscription.plan + subscription.plan_module + subscription.plan_limit
+      description: '**A plan''s modules and limits are rows, keyed on `plan_id`.** `licensedModules`
+        and `limits` are required on every plan, and `subscription.plan` alone had no column for
+        either — so the licence position, the downgrade check and every module gate had nothing to
+        read. `plan_module` holds one row per licensed `ModuleKey`; `plan_limit` one row per
+        `EntitlementLimit`. Both belong to the plan version the row is, so a subscriber on an earlier
+        version keeps the modules and limits they were sold.'
       allOf:
       - $ref: '#/components/schemas/CreatePlanRequest'
       - type: object
@@ -7595,11 +7805,22 @@ components:
             requiresMigration:
               type: boolean
     LicenceAddOn:
-      x-ticvai-persistence: control.licence_add_on
+      x-ticvai-persistence: control.licence_add_on + control.licence_add_on_limit
+      x-ticvai-retired-columns:
+      - plan_id
+      description: '**Belongs to the tenant, not the plan.** Add-ons survive a plan change unless
+        explicitly removed (`addLicenceAddOn`), so a row keyed on `plan_id` would be lost, or silently
+        re-applied to every tenant on that plan, at the first plan change. The tenant comes from the
+        path. `limitOverrides` are child rows in `control.licence_add_on_limit`.'
       type: object
       required:
       - moduleKey
       properties:
+        tenantId:
+          type: string
+          format: uuid
+          readOnly: true
+          description: The tenant the add-on was sold to — the `tenantId` in the path, never the body.
         moduleKey:
           type: string
         limitOverrides:
@@ -7620,7 +7841,9 @@ components:
           type: string
           maxLength: 500
     LicencePosition:
-      x-ticvai-persistence: none — union of plan and add-ons
+      x-ticvai-persistence: none — union of the tenant's plan (control.tenant.plan_id -> subscription.plan_module,
+        subscription.plan_limit) and its add-ons (control.licence_add_on, control.licence_add_on_limit
+        by tenant_id)
       type: object
       required:
       - tenantId

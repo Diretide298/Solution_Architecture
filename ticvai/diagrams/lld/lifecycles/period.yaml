@@ -11,8 +11,7 @@ enumSchema: PeriodStatus
 owner: ledger
 initial:
 - open
-terminal:
-- closed
+terminal: []
 transitions:
 - from: open
   to: closing

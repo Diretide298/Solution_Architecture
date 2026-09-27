@@ -189,6 +189,9 @@ paths:
               $ref: '#/components/schemas/CreateApprovalRequest'
       responses:
         '201':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Raised, and routed
           content:
             application/json:
@@ -196,13 +199,14 @@ paths:
                 $ref: '#/components/schemas/ApprovalRequest'
         '409':
           description: 'An open request already exists for this subject. Two approvals for one refund
-            is how a refund gets paid twice.
+            is how a refund gets paid twice. `refusedReason` is `openRequestExists` and `requestId`
+            names the open request, so the caller can point at it rather than raise another.
 
             '
           content:
             application/problem+json:
               schema:
-                $ref: ../shared/common.yaml#/components/schemas/Problem
+                $ref: '#/components/schemas/ApprovalStateProblem'
   /approval-requests/evaluate:
     post:
       operationId: evaluateApprovalRequirement
@@ -333,6 +337,9 @@ paths:
                   description: 11.1.57. Where the rule demands a digital signature.
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: 'Decided. On a multi-level chain the request advances to the next level rather
             than completing.
 
@@ -342,8 +349,14 @@ paths:
               schema:
                 $ref: '#/components/schemas/ApprovalRequest'
         '403':
-          description: 'The approver is the requester, lacks the permission, or is not in the resolved
-            chain.
+          description: 'The approver may not decide this request. **Always carries `refusedReason`**,
+            one value per cause — the approver is the requester (`approverIsRequester`), is not in the
+            resolved chain (`notInApproverChain`), lacks the permission the rule demands
+            (`insufficientPermission`), gave no step-up token where the rule requires MFA
+            (`mfaRequired`) or no signature where it requires one (`signatureRequired`), is deciding
+            through a delegation that has ended (`delegationExpired`), or has already decided at this
+            level (`alreadyDecidedAtThisLevel`). The shared `Forbidden`, with no `refusedReason`, is the
+            caller lacking `APPROVAL_DECIDE` at all.
 
             '
           content:
@@ -351,11 +364,15 @@ paths:
               schema:
                 $ref: '#/components/schemas/ApprovalRefusedProblem'
         '409':
-          description: Already decided, withdrawn or expired
+          description: 'The request is no longer open for a decision. `refusedReason` says which:
+            `alreadyDecided` (approved or rejected), `withdrawn`, `expired` or `cancelled`, and
+            `currentStatus` carries the status it is in.
+
+            '
           content:
             application/problem+json:
               schema:
-                $ref: ../shared/common.yaml#/components/schemas/Problem
+                $ref: '#/components/schemas/ApprovalStateProblem'
   /approval-requests/{requestId}/withdraw:
     parameters:
     - name: requestId
@@ -397,17 +414,23 @@ paths:
                   maxLength: 300
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Withdrawn
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ApprovalRequest'
         '409':
-          description: Already decided
+          description: 'Already decided. `refusedReason` is `alreadyDecided` and `currentStatus` says
+            whether it was approved or rejected.
+
+            '
           content:
             application/problem+json:
               schema:
-                $ref: ../shared/common.yaml#/components/schemas/Problem
+                $ref: '#/components/schemas/ApprovalStateProblem'
   /approval-requests/{requestId}/escalate:
     parameters:
     - name: requestId
@@ -455,6 +478,9 @@ paths:
                   maxLength: 300
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Escalated
           content:
             application/json:
@@ -506,6 +532,9 @@ paths:
                   $ref: ../shared/common.yaml#/components/schemas/Money
       responses:
         '201':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: A new request, linked to the rejected one
           content:
             application/json:
@@ -576,6 +605,17 @@ paths:
         under — **a request must be decided by the rules it was raised under**, or an approver is answering
         a question that changed while they read it.
 
+
+        **PUT semantics — keyed on `kind` and the scope, never on an id.** There is no id in the path
+        and `ApprovalMatrix.id` is read-only, so the body names its target: the matrix for `kind` at
+        `scopeLevel`, on the scope node the caller is acting at (`scopePath` is read-only and set from
+        it). Where no matrix exists for that pair, this creates version 1 and answers `201`; where one
+        does, it stores a new version and answers `200`. **The body replaces the rule set whole**: the
+        new version holds exactly the rules in `rules`, in their `order`, and a rule omitted from the
+        body is not in the new version. Rule `id`s are read-only and ignored on input — each version
+        carries its own rule rows. The previous version is kept, never edited, because requests in
+        flight still point at it.
+
         '
       tags:
       - matrix
@@ -594,20 +634,31 @@ paths:
               $ref: '#/components/schemas/ApprovalMatrix'
       responses:
         '200':
-          description: Set, as a new version
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: Set, as a new version of the existing matrix for this `kind` and scope
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApprovalMatrix'
+        '201':
+          description: Created — no matrix existed for this `kind` and scope, so this is version 1
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ApprovalMatrix'
         '409':
-          description: 'The matrix would loosen a rule set at a higher scope, or a rule is unreachable
-            behind an earlier one.
+          description: 'Refused, and nothing is stored. `refusedReason` says which: `loosensParentRule`
+            — the matrix would loosen a rule set at a higher scope; or `unreachableRule` — a rule can
+            never match because an earlier one always does. `ruleOrder` names the offending rule, and
+            `blockingRuleOrder` or `parentScopePath` names what it collides with.
 
             '
           content:
             application/problem+json:
               schema:
-                $ref: ../shared/common.yaml#/components/schemas/Problem
+                $ref: '#/components/schemas/ApprovalMatrixRefusedProblem'
   /delegations:
     get:
       operationId: listApprovalDelegations
@@ -667,17 +718,35 @@ paths:
               $ref: '#/components/schemas/ApprovalDelegation'
       responses:
         '201':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Delegated
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ApprovalDelegation'
-        '403':
-          description: The delegate does not hold the permission being delegated
+        '400':
+          description: 'The delegation is malformed. `refusedReason` is `invalidWindow` where `to` is not
+            after `from`, or `delegateIsDelegator` where both principals are the same person.
+
+            '
           content:
             application/problem+json:
               schema:
-                $ref: ../shared/common.yaml#/components/schemas/Problem
+                $ref: '#/components/schemas/DelegationRefusedProblem'
+        '403':
+          description: 'The delegation would hand over authority that is not there. `refusedReason` is
+            `delegateLacksPermission` where the delegate does not hold the permission being delegated,
+            or `exceedsDelegatorAuthority` where `kinds` or `maxAmount` go beyond what the delegator may
+            approve. The shared `Forbidden`, with no `refusedReason`, is the caller lacking
+            `APPROVAL_DECIDE`.
+
+            '
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/DelegationRefusedProblem'
   /delegations/{delegationId}:
     parameters:
     - name: delegationId
@@ -707,6 +776,9 @@ paths:
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       responses:
         '204':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Revoked
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
@@ -831,8 +903,13 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/AccreditationBadge'
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Issue a badge
           content:
             application/json:
@@ -914,6 +991,8 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/VisualBusinessRuleBuilderInput'
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       responses:
         '200':
           description: Visual Business Rule Builder
@@ -1001,6 +1080,8 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/VisualWorkflowDesignerInput'
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       responses:
         '200':
           description: Visual Workflow Designer
@@ -1043,6 +1124,8 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/ApprovalMatrixMultiLevelApprovalConfigurationInput'
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       responses:
         '200':
           description: Approval Matrix & Multi-Level Approval Configuration
@@ -1089,6 +1172,8 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/RolesAuthorityDelegationApprovalLimitsInput'
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       responses:
         '200':
           description: Roles, Authority, Delegation & Approval Limits
@@ -1176,6 +1261,8 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/TriggerActionCrossModuleOrchestrationConfigurationInput'
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       responses:
         '200':
           description: Trigger, Action & Cross-Module Orchestration Configuration
@@ -1221,6 +1308,8 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/WorkflowTestingSimulationImpactAnalysisInput'
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       responses:
         '200':
           description: Workflow Testing, Simulation & Impact Analysis
@@ -1263,6 +1352,8 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/VersioningGovernanceApprovalPublicationInput'
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       responses:
         '200':
           description: Versioning, Governance, Approval & Publication
@@ -1350,6 +1441,8 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/UnifiedApprovalInboxDecisionWorkspaceInput'
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       responses:
         '200':
           description: Unified Approval Inbox & Decision Workspace
@@ -1517,6 +1610,8 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/AutomationExecutionAutonomousActionMonitorInput'
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       responses:
         '200':
           description: Automation Execution & Autonomous Action Monitor
@@ -1797,6 +1892,13 @@ paths:
         refuses, because **a scope that can configure away a control above it is not a control.** Venues
         inherit and, by the raise-only rule, may not weaken what they inherit.
 
+
+        **PUT semantics — an upsert keyed on `operationId` and the scope.** There is no id in the
+        path; the body names its target as the policy for `operationId` at the tenant the caller is
+        acting at. Where none exists one is created and the answer is `201`; where one does, the body
+        replaces it whole and the answer is `200`. An omitted `reason` clears the stored one.
+        `contractFloor`, `setBy` and `setAt` are set by the server and ignored on input.
+
         '
       tags:
       - matrix
@@ -1811,13 +1913,34 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/StepUpPolicy'
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       responses:
         '200':
-          description: Policy as stored
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: Policy as stored — an existing policy for this `operationId`, replaced
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/StepUpPolicy'
+        '201':
+          description: Policy as stored — none existed for this `operationId`
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StepUpPolicy'
+        '409':
+          description: '`required` is below the floor the operation''s own `x-ticvai-step-up` sets.
+            `refusedReason` is `belowContractFloor`, and `contractFloor` carries the lowest strength
+            this operation accepts. Nothing is stored.
+
+            '
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/StepUpPolicyRefusedProblem'
   /approval-control-policies:
     get:
       operationId: listApprovalControlPolicies
@@ -1866,6 +1989,15 @@ paths:
         - "P09 ADM-336 Approver Group & Decision Policy"
         - "P09 ADM-341 Four-Eyes & Dual-Control Policy"
       summary: Require a second, independent pair of eyes
+      description: '**PUT semantics — an upsert keyed on `code`.** There is no id in the path, and
+        `code` is the policy''s required, stable name, so the body names its target by it at the tenant
+        the caller is acting at. Where no policy has that `code` one is created and the answer is
+        `201`; where one does, the body replaces it whole and the answer is `200`. Omitted optional
+        fields take their defaults or empty — an omitted `appliesToRequestKinds` or
+        `requiredApproverGroupIds` stores an empty list, not the previous one. `id` is set by the server
+        and ignored on input. There is no delete: a policy is switched off with `isActive: false`.
+
+        '
       tags:
       - approvals
       x-ticvai-permission: APPROVAL_CONFIGURE
@@ -1883,7 +2015,16 @@ paths:
               $ref: '#/components/schemas/ApprovalControlPolicy'
       responses:
         '200':
-          description: Set
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: Set — an existing policy with this `code`, replaced
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApprovalControlPolicy'
+        '201':
+          description: Created — no policy had this `code`
           content:
             application/json:
               schema:
@@ -1895,7 +2036,7 @@ paths:
       required: true
       schema:
         type: string
-        format: uuid
+        pattern: '^[0-9A-HJKMNP-TV-Z]{26}$'
     post:
       operationId: signApprovalDecision
       x-ticvai-consumed-by:
@@ -1953,7 +2094,7 @@ paths:
       required: true
       schema:
         type: string
-        format: uuid
+        pattern: '^[0-9A-HJKMNP-TV-Z]{26}$'
     get:
       operationId: getApprovalRecord
       x-ticvai-consumed-by:
@@ -1999,6 +2140,15 @@ paths:
         **Business hours, not elapsed hours.** A four-hour SLA starting at five in the afternoon is
         breached by nine the next morning with nobody having done anything wrong.
 
+
+        **PUT semantics — an upsert keyed on `code`.** There is no id in the path, and `code` is the
+        policy''s required, stable name, so the body names its target by it at the tenant the caller
+        is acting at. Where no policy has that `code` one is created and the answer is `201`; where one
+        does, the body replaces it whole and the answer is `200`. Omitted optional fields take their
+        defaults or empty — an omitted `reminders` list stores no reminders, not the previous ones, and
+        an omitted `calendarId` or `escalationGroupId` clears it. `id` is set by the server and ignored
+        on input.
+
         '
       tags:
       - approvals
@@ -2017,7 +2167,16 @@ paths:
               $ref: '#/components/schemas/ApprovalSlaPolicy'
       responses:
         '200':
-          description: Set
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: Set — an existing policy with this `code`, replaced
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApprovalSlaPolicy'
+        '201':
+          description: Created — no policy had this `code`
           content:
             application/json:
               schema:
@@ -2032,6 +2191,14 @@ paths:
       description: 'Approvals boards 5.3 and 5.4. **`createApprovalDelegation` names a substitute; this
         says when it applies.** A delegation somebody has to remember to turn on and off is a delegation
         that will be left on after the holiday, and every approval for a month goes to the wrong person.
+
+
+        **PUT semantics — keyed on the body''s `id`.** There is no id in the path. A body with no `id`
+        records a new period, the server assigns its `id`, and the answer is `201`; a body with the
+        `id` of an existing period replaces that period whole and the answer is `200`. Omitted optional
+        fields are cleared — an omitted `substitutePrincipalId`, `delegationId` or `reason` removes the
+        stored one, and an omitted `appliesToRequestKinds` stores an empty list. An `id` that names no
+        period is `404`.
 
         '
       tags:
@@ -2050,11 +2217,22 @@ paths:
               $ref: '#/components/schemas/ApproverAvailability'
       responses:
         '200':
-          description: Set
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: Set — the existing period with this `id`, replaced
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ApproverAvailability'
+        '201':
+          description: Recorded — a new period, with the `id` the server gave it
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApproverAvailability'
+        '404':
+          $ref: ../shared/common.yaml#/components/responses/NotFound
   /approval-retention:
     put:
       operationId: setApprovalRetentionPolicy
@@ -2068,6 +2246,13 @@ paths:
 
         **Retention here can only extend, never shorten, what privacy retention would delete** — a
         legal-hold interaction that has to be decided once rather than argued per request.
+
+
+        **PUT semantics — keyed on the body''s `id`.** There is no id in the path. A body with no `id`
+        creates a policy, the server assigns its `id`, and the answer is `201`; a body with the `id` of
+        an existing policy replaces it whole and the answer is `200`. Omitted optional fields take
+        their defaults or are cleared — an omitted `legalBasis` removes the stored one, and an omitted
+        `appliesToRequestKinds` stores an empty list. An `id` that names no policy is `404`.
 
         '
       tags:
@@ -2087,11 +2272,22 @@ paths:
               $ref: '#/components/schemas/ApprovalRetentionPolicy'
       responses:
         '200':
-          description: Set
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: Set — the existing policy with this `id`, replaced
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ApprovalRetentionPolicy'
+        '201':
+          description: Created — a new policy, with the `id` the server gave it
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApprovalRetentionPolicy'
+        '404':
+          $ref: ../shared/common.yaml#/components/responses/NotFound
   /approval-evidence-packages:
     post:
       operationId: createApprovalEvidencePackage
@@ -2132,8 +2328,9 @@ paths:
                   format: date-time
                 requestKinds:
                   type: array
+                  description: Absent means every kind.
                   items:
-                    type: string
+                    $ref: '#/components/schemas/ApprovalKind'
                 scopePath:
                   type: string
                   nullable: true
@@ -2179,7 +2376,7 @@ components:
         appliesToRequestKinds:
           type: array
           items:
-            type: string
+            $ref: '#/components/schemas/ApprovalKind'
         appliesAboveValue:
           $ref: ../shared/common.yaml#/components/schemas/Money
         control:
@@ -2334,7 +2531,7 @@ components:
         appliesToRequestKinds:
           type: array
           items:
-            type: string
+            $ref: '#/components/schemas/ApprovalKind'
         targetMinutes:
           type: integer
         businessHoursOnly:
@@ -2388,6 +2585,14 @@ components:
       x-ticvai-persistence: approvals.approver_availability
       description: 'Approvals boards 5.3 and 5.4. **Dated, so nobody has to remember to turn it off.**'
       properties:
+        id:
+          type: string
+          format: uuid
+          description: 'One period of absence. The key `setApproverAvailability` replaces by; absent on
+            input to record a new period. Already the table''s key (`approvals.approver_availability.id`),
+            and until 26 September missing from the wire, so no period could be addressed.
+
+            '
         principalId:
           type: string
           format: uuid
@@ -2411,7 +2616,7 @@ components:
         appliesToRequestKinds:
           type: array
           items:
-            type: string
+            $ref: '#/components/schemas/ApprovalKind'
         scopePath:
           type: string
     ApprovalRetentionPolicy:
@@ -2425,7 +2630,7 @@ components:
         appliesToRequestKinds:
           type: array
           items:
-            type: string
+            $ref: '#/components/schemas/ApprovalKind'
         retainYears:
           type: integer
         retainSignatures:
@@ -2645,10 +2850,21 @@ components:
         condition:
           type: string
           nullable: true
-          description: 11.1.13. Evaluated against the attributes the caller supplied.
+          description: '11.1.13. Evaluated against the attributes the caller supplied.
+
+
+            **No condition language is defined yet** (pull audit R104, 26 September): the grammar, the
+            attributes it may name and how two conditions are compared for `unreachableRule` are an
+            open decision, not something to infer from this field.
+
+            '
         approverRoleIds:
           type: array
           minItems: 1
+          description: 'Role ids from `identity.listRoles` (`Role.id`), which is where an editor gets the
+            names to show and pick from. This contract stores the ids only.
+
+            '
           items:
             type: string
             format: uuid
@@ -2681,6 +2897,7 @@ components:
           nullable: true
         escalateToRoleIds:
           type: array
+          description: Role ids from `identity.listRoles`, as `approverRoleIds`.
           items:
             type: string
             format: uuid
@@ -3018,9 +3235,15 @@ components:
         delegatorPrincipalId:
           type: string
           format: uuid
+          description: 'A principal id (`identity.Principal.id`). This contract stores the id only; the
+            name to show, and the people to pick from, come from `identity.listPrincipals` and
+            `identity.getPrincipal`.
+
+            '
         delegatePrincipalId:
           type: string
           format: uuid
+          description: A principal id, resolved to a name the same way as `delegatorPrincipalId`.
         kinds:
           type: array
           description: Absent means everything the delegator may approve.
@@ -3058,10 +3281,17 @@ components:
 
             **Operations write it at `venue` scope.**'
     ApprovalRefusedProblem:
+      description: 'Why `decideApprovalRequest` refused this approver. **`refusedReason` is always
+        present**, one value per cause, so a client can tell "you raised it" from "you need a second
+        factor" without reading `detail`. The shared `Forbidden` carries no `refusedReason`.
+
+        '
       allOf:
       - $ref: ../shared/common.yaml#/components/schemas/Problem
       - type: object
         x-ticvai-persistence: none — error shape
+        required:
+        - refusedReason
         properties:
           refusedReason:
             type: string
@@ -3073,6 +3303,110 @@ components:
             - signatureRequired
             - delegationExpired
             - alreadyDecidedAtThisLevel
+    ApprovalStateProblem:
+      x-ticvai-persistence: none — error shape
+      description: 'A request is not in a state that allows the call. Returned as `409` by
+        `createApprovalRequest` (`openRequestExists`), `decideApprovalRequest` (`alreadyDecided`,
+        `withdrawn`, `expired`, `cancelled`) and `withdrawApprovalRequest` (`alreadyDecided`). One
+        value per cause, so "someone already approved it" and "it timed out" are told apart.
+
+        '
+      allOf:
+      - $ref: ../shared/common.yaml#/components/schemas/Problem
+      - type: object
+        required:
+        - refusedReason
+        properties:
+          refusedReason:
+            type: string
+            enum:
+            - openRequestExists
+            - alreadyDecided
+            - withdrawn
+            - expired
+            - cancelled
+          requestId:
+            type: string
+            pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+            description: 'The request the refusal is about. With `openRequestExists`, the open request
+              already raised for this subject.
+
+              '
+          currentStatus:
+            allOf:
+            - $ref: '#/components/schemas/ApprovalStatus'
+            description: The status that request is in now.
+    ApprovalMatrixRefusedProblem:
+      x-ticvai-persistence: none — error shape
+      description: 'Why `setApprovalMatrix` stored nothing. One value per cause: `loosensParentRule`
+        (a venue or region may tighten what it inherits and never loosen it) or `unreachableRule` (first
+        match wins, so a rule behind one that always matches first can never apply).
+
+        '
+      allOf:
+      - $ref: ../shared/common.yaml#/components/schemas/Problem
+      - type: object
+        required:
+        - refusedReason
+        - ruleOrder
+        properties:
+          refusedReason:
+            type: string
+            enum:
+            - loosensParentRule
+            - unreachableRule
+          ruleOrder:
+            type: integer
+            description: '`order` of the rule in the body that was refused.'
+          blockingRuleOrder:
+            type: integer
+            nullable: true
+            description: With `unreachableRule`, the `order` of the earlier rule that always matches first.
+          parentScopePath:
+            type: string
+            nullable: true
+            description: With `loosensParentRule`, the scope whose matrix sets the rule being loosened.
+    DelegationRefusedProblem:
+      x-ticvai-persistence: none — error shape
+      description: 'Why `createApprovalDelegation` stored nothing. `invalidWindow` and
+        `delegateIsDelegator` come with `400`; `delegateLacksPermission` and
+        `exceedsDelegatorAuthority` with `403`.
+
+        '
+      allOf:
+      - $ref: ../shared/common.yaml#/components/schemas/Problem
+      - type: object
+        required:
+        - refusedReason
+        properties:
+          refusedReason:
+            type: string
+            enum:
+            - invalidWindow
+            - delegateIsDelegator
+            - delegateLacksPermission
+            - exceedsDelegatorAuthority
+    StepUpPolicyRefusedProblem:
+      x-ticvai-persistence: none — error shape
+      description: '`setStepUpPolicy` refused to lower a requirement below the operation''s own floor.
+        **A policy may raise a requirement and never lower it.**
+
+        '
+      allOf:
+      - $ref: ../shared/common.yaml#/components/schemas/Problem
+      - type: object
+        required:
+        - refusedReason
+        - contractFloor
+        properties:
+          refusedReason:
+            type: string
+            enum:
+            - belowContractFloor
+          operationId:
+            type: string
+          contractFloor:
+            $ref: '#/components/schemas/StepUpStrength'
     ApprovalAnalytics:
       type: object
       x-ticvai-persistence: none — aggregated from approvals.request
@@ -3085,6 +3419,13 @@ components:
           format: date
         groupBy:
           type: string
+          description: The grouping asked for, as the `groupBy` query parameter; each row's `key` is one value of it.
+          enum:
+          - kind
+          - approver
+          - venue
+          - day
+          - week
         rows:
           type: array
           items:

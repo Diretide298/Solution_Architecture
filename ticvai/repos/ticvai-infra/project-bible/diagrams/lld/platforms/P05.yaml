@@ -31,9 +31,9 @@ modulesUsed:
   screens: 1
 servicesCalled:
 - service: OrderService
-  operationCalls: 11
+  operationCalls: 12
 - service: CatalogueService
-  operationCalls: 8
+  operationCalls: 7
 - service: RetailService
   operationCalls: 4
 - service: WhiteLabelService
@@ -60,8 +60,6 @@ screens:
   operations: []
   states:
   - emptyFirstRun
-  - emptyNoAccess
-  - emptyNoResults
   - error
   - loading
   - offline
@@ -71,6 +69,7 @@ screens:
   - KSK-002
   - KSK-003
   - KSK-004
+  - KSK-014
   boardFrames:
   - Kiosk Board 1.dc.html#KSK-001
   wireframe: wireframes/P05 Guest Kiosk.dc.html#ksk-001
@@ -89,7 +88,6 @@ screens:
   states:
   - emptyFirstRun
   - emptyNoAccess
-  - emptyNoResults
   - error
   - loading
   - offline
@@ -127,6 +125,8 @@ screens:
   - KSK-002
   - KSK-004
   - KSK-006
+  - KSK-011
+  - KSK-016
   boardFrames:
   - Kiosk Board 1.dc.html#KSK-003
   wireframe: wireframes/P05 Guest Kiosk.dc.html#ksk-003
@@ -157,6 +157,7 @@ screens:
   - KSK-002
   - KSK-003
   - KSK-005
+  - KSK-015
   boardFrames:
   - Kiosk Board 1.dc.html#KSK-004
   wireframe: wireframes/P05 Guest Kiosk.dc.html#ksk-004
@@ -169,17 +170,17 @@ screens:
   wave: 2
   density: touchLarge
   operations:
-  - acquireInventoryHold
+  - addCartLine
   - getAvailability
   states:
   - emptyFirstRun
   - emptyNoAccess
-  - emptyNoResults
   - error
   - loading
   - offline
   offlineState: true
-  entryParams: []
+  entryParams:
+  - cartId<-navigation
   goesTo:
   - KSK-001
   - KSK-002
@@ -204,7 +205,6 @@ screens:
   states:
   - emptyFirstRun
   - emptyNoAccess
-  - emptyNoResults
   - error
   - loading
   - offline
@@ -244,6 +244,7 @@ screens:
   - KSK-001
   - KSK-002
   - KSK-003
+  - KSK-008
   - KSK-009
   boardFrames:
   - Kiosk Board 1.dc.html#KSK-007
@@ -290,7 +291,6 @@ screens:
   states:
   - emptyFirstRun
   - emptyNoAccess
-  - emptyNoResults
   - error
   - loading
   - offline
@@ -301,6 +301,7 @@ screens:
   - KSK-001
   - KSK-002
   - KSK-003
+  - KSK-010
   - KSK-013
   boardFrames:
   - Kiosk Board 1.dc.html#KSK-009
@@ -318,7 +319,6 @@ screens:
   - transferOrderTickets
   states:
   - emptyFirstRun
-  - emptyNoAccess
   - error
   - loading
   - offline
@@ -347,7 +347,6 @@ screens:
   states:
   - emptyFirstRun
   - emptyNoAccess
-  - emptyNoResults
   - error
   - loading
   - offline
@@ -358,6 +357,7 @@ screens:
   - KSK-001
   - KSK-002
   - KSK-003
+  - KSK-012
   boardFrames:
   - Kiosk Board 2.dc.html#KSK-011
   wireframe: wireframes/P05 Guest Kiosk.dc.html#ksk-011
@@ -372,7 +372,6 @@ screens:
   - transferOrderTickets
   states:
   - emptyFirstRun
-  - emptyNoAccess
   - error
   - loading
   - offline
@@ -397,7 +396,6 @@ screens:
   - endKioskAssist
   states:
   - emptyFirstRun
-  - emptyNoAccess
   - error
   - loading
   - offline
@@ -423,8 +421,6 @@ screens:
   operations: []
   states:
   - emptyFirstRun
-  - emptyNoAccess
-  - emptyNoResults
   - error
   - loading
   - offline

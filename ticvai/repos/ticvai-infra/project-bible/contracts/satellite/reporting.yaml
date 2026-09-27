@@ -163,6 +163,13 @@ paths:
                     type: object
                     additionalProperties:
                       type: integer
+                    description: 'Rejected receipt lines counted by rejection reason, keyed by the
+                      reason. **Sourced from the reason recorded against each rejected goods receipt
+                      line in `inventory`.** Pull audit 26 September: `inventory.goods_receipt_line`
+                      records only `rejected_quantity` and no reason, so until `inventory.yaml` carries
+                      a rejection reason per line this map has no source and is returned empty.
+
+                      '
                   priceVariancePercent:
                     type: number
                     description: 'Quoted against invoiced. **The number that finds a supplier quietly
@@ -200,6 +207,16 @@ paths:
       description: 'BL-152. **The metric comes from the closed set**, so a rule cannot watch something
         nothing produces.
 
+        **PUT semantics — an upsert of one rule, keyed on the body''s `id`.** The collection path
+        carries no id, so the body names the rule: a client-generated `id` that does not exist creates
+        the rule (`201`); an `id` that exists replaces that rule whole (`200`). **Replace means every
+        field** — an optional field left out of the body returns to its default, it does not keep its
+        stored value. Other rules are never touched; removing a rule is `isActive: false`.
+
+        **The target is the body''s `scopePath`**, which names the venue the rule watches and must
+        lie inside the caller''s scope (`403` otherwise). An `id` that exists at a scope the caller
+        cannot reach is also `403`, never a silent second rule with the same id.
+
         '
       tags:
       - reporting
@@ -220,7 +237,16 @@ paths:
               $ref: '#/components/schemas/AlertRule'
       responses:
         '200':
-          description: Set
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: Replaced — a rule with this id already existed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AlertRule'
+        '201':
+          description: Created — no rule with this id existed
           content:
             application/json:
               schema:
@@ -246,6 +272,10 @@ paths:
       description: '**The dashboard panel reads this.** Critical first, then unacknowledged, then by age
         — an alert list sorted by time puts a resolved info notice above an unacknowledged critical.
 
+        **Venue scope is the rule; the filters below narrow inside it.** A till screen asks for its own
+        workstation or shift, a replenishment screen for one item. Each alert carries its rule''s name
+        and metric, so a list can be read without a second call to `listAlertRules`.
+
         '
       tags:
       - reporting
@@ -260,7 +290,29 @@ paths:
       - name: status
         in: query
         schema:
+          $ref: '#/components/schemas/AlertStatus'
+      - name: severity
+        in: query
+        schema:
+          $ref: '#/components/schemas/AlertSeverity'
+      - name: workstationId
+        in: query
+        description: Only alerts raised for this workstation.
+        schema:
           type: string
+          format: uuid
+      - name: shiftId
+        in: query
+        description: Only alerts raised during this till shift.
+        schema:
+          type: string
+          format: uuid
+      - name: itemId
+        in: query
+        description: Only alerts raised about this inventory item.
+        schema:
+          type: string
+          format: uuid
       responses:
         '200':
           description: Alerts
@@ -291,6 +343,8 @@ paths:
         **Acknowledging does not resolve.** The metric is still out of range; somebody is now dealing
         with it.
 
+        The optional `note` is kept on the alert as `acknowledgementNote` and returned with it.
+
         '
       tags:
       - reporting
@@ -312,8 +366,12 @@ paths:
                 note:
                   type: string
                   maxLength: 300
+                  description: Stored as `Alert.acknowledgementNote`.
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Acknowledged
           content:
             application/json:
@@ -414,6 +472,9 @@ paths:
               $ref: '#/components/schemas/CreateReportRequest'
       responses:
         '201':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Created
           content:
             application/json:
@@ -491,6 +552,17 @@ paths:
       description: 'Definitions are versioned. Historic executions keep the version they ran against,
         so a report produced last quarter remains reproducible after the definition changes.
 
+        **Every publish keeps the version it replaces.** The definition as it stood is written to
+        `reporting.report_definition_version` (`ReportDefinitionVersion`) keyed on the report and
+        its version, and `reporting.report_definition` holds the current one. An execution''s
+        `definitionVersion` resolves against that history, which is what makes the promise above
+        true: the live row alone can hold one version only.
+
+        **PUT semantics — a full replace of the definition, never a create.** The body is the whole
+        new definition: columns, filters, grouping and parameters left out of it are not in the new
+        version. An unknown `reportId` is `404`; there is no create-on-PUT, `createReport` makes
+        definitions. The server assigns the new `version`.
+
         '
       tags:
       - catalogue
@@ -508,6 +580,9 @@ paths:
               $ref: '#/components/schemas/CreateReportRequest'
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: New version published
           content:
             application/json:
@@ -528,8 +603,12 @@ paths:
       - staff
       - partner
       summary: Retire a report definition
-      description: 'Retired rather than deleted where executions or schedules reference it. History must
-        continue to resolve.
+      description: 'Retired rather than deleted where executions or paused schedules reference it —
+        `isRetired` becomes true and the definition and its versions stay, because history must
+        continue to resolve. Removed only where nothing references it.
+
+        **Refused with `409` while an active (unpaused) schedule references it** — pause or delete the
+        schedule first. Both the retire and the removal answer `204`.
 
         '
       tags:
@@ -542,7 +621,10 @@ paths:
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       responses:
         '204':
-          description: Retired
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: Retired, or removed where nothing referenced it
         '409':
           description: Active schedules reference this report
           content:
@@ -649,17 +731,32 @@ paths:
               $ref: '#/components/schemas/RunReportRequest'
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Completed inline
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ReportResult'
         '202':
-          description: Queued. Poll the execution
+          description: Queued. Poll the execution with `getReportExecution` until it is `completed`,
+            then read the rows with `getReportResult`
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ReportExecution'
+          links:
+            pollExecution:
+              operationId: getReportExecution
+              parameters:
+                executionId: $response.body#/id
+              description: Status of the queued execution.
+            readResult:
+              operationId: getReportResult
+              parameters:
+                executionId: $response.body#/id
+              description: The rows, once the execution has completed.
         '400':
           description: Required parameter missing, or the date range exceeds the limit
           content:
@@ -729,9 +826,12 @@ paths:
       x-ticvai-audience:
       - staff
       x-ticvai-read-routing: analytical
-      summary: Execution status and result
+      summary: Execution status, and where its result is
       description: 'Carries the definition version, parameters and scope it ran under — everything needed
         to reproduce it. A report nobody can reproduce is not evidence.
+
+        **The status, not the rows.** This is the poll target for a `202` from `runReport`; once
+        `status` is `completed` the rows come from `getReportResult`.
 
         '
       tags:
@@ -766,6 +866,9 @@ paths:
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       responses:
         '204':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Cancelled
         '409':
           description: Already completed
@@ -875,6 +978,9 @@ paths:
               $ref: '#/components/schemas/CreateReportScheduleRequest'
       responses:
         '201':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Scheduled
           content:
             application/json:
@@ -927,6 +1033,9 @@ paths:
                   $ref: '#/components/schemas/ExportFormat'
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Updated
           content:
             application/json:
@@ -947,6 +1056,9 @@ paths:
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       responses:
         '204':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Deleted
   /report-executions/{executionId}/export:
     parameters:
@@ -1000,11 +1112,20 @@ paths:
                   description: Required when personal data is included.
       responses:
         '202':
-          description: Export queued
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: Export queued. Poll `getReportExport` until it is `ready`
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ReportExport'
+          links:
+            pollExport:
+              operationId: getReportExport
+              parameters:
+                exportId: $response.body#/id
+              description: Export status, and the download link once ready.
         '403':
           description: Personal data requested without REPORT_EXPORT_PII
           content:
@@ -1107,6 +1228,14 @@ paths:
           $ref: ../shared/common.yaml#/components/schemas/ModuleKey
         description: '**Narrows the library to one module.** Entitlement still applies — asking for a
           module the caller cannot see returns an empty list, not the module''s dashboards.'
+      - name: includeArchived
+        in: query
+        required: false
+        schema:
+          type: boolean
+          default: false
+        description: '**Archived dashboards are left out unless this is true** — the "unless asked
+          for" that `Dashboard.archivedAt` promises. Archived ones carry `archivedAt`.'
       responses:
         '200':
           description: Dashboards
@@ -1148,6 +1277,9 @@ paths:
               $ref: '#/components/schemas/CreateDashboardRequest'
       responses:
         '201':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Created
           content:
             application/json:
@@ -1232,6 +1364,13 @@ paths:
       - staff
       x-ticvai-config-scope: tenant
       summary: Update a dashboard
+      description: '**PUT semantics — a full replace of the dashboard, never a create.** The body is
+        the whole dashboard, tiles included. **Tiles are matched on `id` within this dashboard**: a
+        tile whose id is already on it is replaced whole, a new id adds a tile, and a stored tile the
+        body leaves out is removed. A tile id that belongs to another dashboard is `400`. An unknown
+        `dashboardId` is `404` — `createDashboard` makes dashboards.
+
+        '
       tags:
       - dashboard
       x-ticvai-permission: REPORT_MANAGE
@@ -1248,6 +1387,9 @@ paths:
               $ref: '#/components/schemas/CreateDashboardRequest'
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Updated
           content:
             application/json:
@@ -1320,8 +1462,8 @@ paths:
       x-ticvai-ai-capability: naturalLanguageQuery
       summary: Natural-language reporting query
       description: '**This is an AI capability and is governed as one.** It resolves its provider through
-        `ai.provider`, respects `ai.policy` including the masking list, and writes an `ai.interaction`
-        with its prompt, response, model, tokens and cost — the same audit trail as the assistant (8.3.55–8.3.57).
+        `ai.provider`, respects `ai.policy` including the masking list, and writes an `ai.activity`
+        row with its prompt, response, model, tokens and cost — the same audit trail as the assistant (8.3.55–8.3.57).
 
         Distinct from `sendAiMessage`, which retrieves from documents. **This generates a query against
         the analytical replica and returns it**, so a finance user can check the number rather than trust
@@ -1335,6 +1477,11 @@ paths:
 
         Runs under the caller''s resolved permissions. The generated query cannot widen scope, because
         scope is applied after generation, not by it.
+
+        **The generated query is kept, not just returned.** Each answer writes a
+        `reporting.natural_language_query` row (`NaturalLanguageQuery`) against its `conversationId`,
+        because `saveNaturalLanguageQuery` turns it into a definition in a later call and
+        `ai.activity` holds only free-text prompt and response.
 
         '
       tags:
@@ -1364,19 +1511,28 @@ paths:
                 venueId:
                   type: string
                   format: uuid
+                  description: 'Narrows the answer to one venue. Omitting it answers over everything the
+                    caller''s scope permits — it cannot be used to reach beyond that. The same rule as
+                    `RunReportRequest.venueId`.
+
+                    '
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Answer with its query
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/NaturalLanguageAnswer'
         '400':
-          description: Question could not be interpreted. The response suggests alternatives
+          description: Question could not be interpreted. The response suggests alternatives in
+            `suggestions`
           content:
             application/problem+json:
               schema:
-                $ref: ../shared/common.yaml#/components/schemas/Problem
+                $ref: '#/components/schemas/ReportQuestionProblem'
         '403':
           $ref: ../shared/common.yaml#/components/responses/Forbidden
   /reports/ask/{conversationId}/save:
@@ -1405,6 +1561,10 @@ paths:
       description: 'Turns a one-off question into something schedulable. The generated query becomes the
         definition, reviewable and versioned like any other.
 
+        **Reads the latest `NaturalLanguageQuery` kept for `{conversationId}`** — the query behind the
+        most recent answer in that conversation. A conversation with no kept query, or one outside the
+        caller''s scope, is `404`.
+
         '
       tags:
       - naturalLanguage
@@ -1430,6 +1590,9 @@ paths:
                   $ref: '#/components/schemas/ReportCategory'
       responses:
         '201':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Saved as a definition
           content:
             application/json:
@@ -1491,6 +1654,9 @@ paths:
               $ref: '#/components/schemas/KpiDefinition'
       responses:
         '201':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Created
           content:
             application/json:
@@ -1517,6 +1683,13 @@ paths:
         Targets are per scope and per period, because a venue''s target is not the tenant''s and January
         is not July.
 
+        **PUT semantics — replaces this KPI''s target set within the caller''s scope.** Each target is
+        matched on (`scopePath`, `period`): one in the body replaces the stored one whole, a new pair
+        adds a target, and a stored target inside the caller''s scope that the body leaves out is
+        removed. Targets outside the caller''s scope are never touched, and a body `scopePath` outside
+        it is `403`. The body''s `kpiId` on each target, where given, must equal the path''s. Always
+        `200`, including when the set was empty before.
+
         '
       tags:
       - reporting
@@ -1542,6 +1715,9 @@ paths:
                     $ref: '#/components/schemas/KpiTarget'
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Set
           content:
             application/json:
@@ -1649,13 +1825,7 @@ paths:
       - name: normaliseBy
         in: query
         schema:
-          type: string
-          enum:
-          - none
-          - perVisitor
-          - perOperatingHour
-          - perStaffedPosition
-          - perSquareMetre
+          $ref: '#/components/schemas/BenchmarkNormalisation'
       responses:
         '200':
           description: Comparison
@@ -1702,6 +1872,13 @@ paths:
       x-ticvai-consumed-by:
         - "P16 ANL-066 Semantic Model & Business Data Catalogue"
       summary: Publish the catalogue
+      description: '**PUT semantics — a full replace of the tenant''s one semantic model.** The body is
+        the whole model: a domain, dataset, field or relationship left out of it is not in the
+        published model. The server assigns `version` and `publishedAt`; values sent for them are
+        ignored. The first publish for a tenant creates the model (`201`); every later one replaces
+        it (`200`).
+
+        '
       tags:
       - reporting
       x-ticvai-permission: REPORT_MANAGE
@@ -1718,7 +1895,16 @@ paths:
               $ref: '#/components/schemas/SemanticModel'
       responses:
         '200':
-          description: Published
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: Published, replacing the previous model
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SemanticModel'
+        '201':
+          description: Published — the tenant's first model
           content:
             application/json:
               schema:
@@ -1790,7 +1976,7 @@ paths:
       - name: severity
         in: query
         schema:
-          type: string
+          $ref: '#/components/schemas/AnomalySeverity'
       responses:
         '200':
           description: Anomalies
@@ -1853,6 +2039,9 @@ paths:
               $ref: '#/components/schemas/ReportSubscription'
       responses:
         '201':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Created
           content:
             application/json:
@@ -2008,24 +2197,33 @@ components:
       type: object
       x-ticvai-persistence: reporting.kpi_target
       description: 'BI board 2.6. **The threshold is what turns a number into a status.**'
+      required:
+      - scopePath
+      - period
+      - target
       properties:
         kpiId:
           type: string
           format: uuid
         scopePath:
           type: string
+          description: The scope this target applies to. With `period`, the key `setKpiTargets` matches
+            on.
         period:
           type: string
         target:
-          type: number
+          $ref: '#/components/schemas/MetricValue'
         amberAt:
-          type: number
+          allOf:
+          - $ref: '#/components/schemas/MetricValue'
           nullable: true
         redAt:
-          type: number
+          allOf:
+          - $ref: '#/components/schemas/MetricValue'
           nullable: true
         stretch:
-          type: number
+          allOf:
+          - $ref: '#/components/schemas/MetricValue'
           nullable: true
     KpiValue:
       type: object
@@ -2043,12 +2241,14 @@ components:
         period:
           type: string
         value:
-          type: number
+          $ref: '#/components/schemas/MetricValue'
         target:
-          type: number
+          allOf:
+          - $ref: '#/components/schemas/MetricValue'
           nullable: true
         comparison:
-          type: number
+          allOf:
+          - $ref: '#/components/schemas/MetricValue'
           nullable: true
         variancePercent:
           type: number
@@ -2084,12 +2284,13 @@ components:
         label:
           type: string
         value:
-          type: number
+          $ref: '#/components/schemas/MetricValue'
         normalisedValue:
-          type: number
+          allOf:
+          - $ref: '#/components/schemas/MetricValue'
           nullable: true
         normaliseBy:
-          type: string
+          $ref: '#/components/schemas/BenchmarkNormalisation'
         rank:
           type: integer
         percentile:
@@ -2105,6 +2306,8 @@ components:
       properties:
         version:
           type: integer
+          readOnly: true
+          description: Assigned by the server on each publish.
         domains:
           type: array
           items:
@@ -2142,10 +2345,12 @@ components:
                           label:
                             type: string
                           dataType:
-                            type: string
+                            $ref: '#/components/schemas/FieldType'
                           aggregation:
-                            type: string
+                            allOf:
+                            - $ref: '#/components/schemas/Aggregation'
                             nullable: true
+                            description: The default aggregation for the field, where it has one.
                           sensitive:
                             type: boolean
                             default: false
@@ -2163,10 +2368,16 @@ components:
                 type: string
               cardinality:
                 type: string
+                enum:
+                - oneToOne
+                - oneToMany
+                - manyToOne
+                - manyToMany
         publishedAt:
           type: string
           format: date-time
           nullable: true
+          readOnly: true
         scopePath:
           type: string
     AnalyticsPipeline:
@@ -2241,18 +2452,14 @@ components:
           type: string
           format: date-time
         observed:
-          type: number
+          $ref: '#/components/schemas/MetricValue'
         expected:
-          type: number
+          $ref: '#/components/schemas/MetricValue'
         deviationSigma:
           type: number
           nullable: true
         severity:
-          type: string
-          enum:
-          - low
-          - medium
-          - high
+          $ref: '#/components/schemas/AnomalySeverity'
         candidateCauses:
           type: array
           description: '**The beginning of the question, not the end of it.**'
@@ -2476,6 +2683,7 @@ components:
       - threshold
       - severity
       - isActive
+      - scopePath
       properties:
         id:
           type: string
@@ -2498,9 +2706,10 @@ components:
           - changesBy
           - equals
         threshold:
-          type: number
+          $ref: '#/components/schemas/MetricValue'
         thresholdUpper:
-          type: number
+          allOf:
+          - $ref: '#/components/schemas/MetricValue'
           nullable: true
         windowMinutes:
           type: integer
@@ -2511,11 +2720,7 @@ components:
 
             '
         severity:
-          type: string
-          enum:
-          - info
-          - warning
-          - critical
+          $ref: '#/components/schemas/AlertSeverity'
         deliverTo:
           type: array
           description: 'CF-134. **The dashboard panel is the default and the only one that always applies.**
@@ -2555,7 +2760,12 @@ components:
             `uae.dubai.marina`, and one index answers every level of the walk.
 
 
-            **Operations write it at `venue` scope.**'
+            **Operations write it at `venue` scope.**
+
+
+            **Required, and it is the write target.** `setAlertRule` has no id in its path and a
+            caller may hold several venues, so the rule names the venue it watches here — inside the
+            caller''s scope, or the write is refused.'
     Alert:
       type: object
       x-ticvai-persistence: reporting.alert
@@ -2576,28 +2786,51 @@ components:
         ruleId:
           type: string
           format: uuid
+        ruleName:
+          type: string
+          description: '`AlertRule.name` as it stood when the alert was raised. **The line a person
+            reads** — a list of rule ids is not an alert panel, and a screen should not need
+            `listAlertRules` to label one.
+
+            '
+        metric:
+          allOf:
+          - $ref: '#/components/schemas/MetricSource'
+          description: The rule's metric, carried so the alert says what went out of range.
         raisedAt:
           type: string
           format: date-time
         severity:
-          type: string
-          enum:
-          - info
-          - warning
-          - critical
+          $ref: '#/components/schemas/AlertSeverity'
         status:
-          type: string
-          enum:
-          - raised
-          - acknowledged
-          - resolved
-          - expired
+          $ref: '#/components/schemas/AlertStatus'
         observedValue:
-          type: number
+          $ref: '#/components/schemas/MetricValue'
         threshold:
-          type: number
+          $ref: '#/components/schemas/MetricValue'
         scopePath:
           type: string
+        workstationId:
+          type: string
+          format: uuid
+          nullable: true
+          description: The workstation the reading was taken for, where the metric is measured per
+            workstation (`salesByWorkstation`). Null otherwise. `listAlerts` filters on it.
+        shiftId:
+          type: string
+          format: uuid
+          nullable: true
+          description: The till shift (`orders.pos_shift`) the reading belongs to, where it was taken
+            for a workstation with a shift open. Null otherwise. `listAlerts` filters on it.
+        itemId:
+          type: string
+          format: uuid
+          nullable: true
+          description: 'The inventory item the reading is about, where the metric is measured per item
+            (`stockAgeing`, `stockTurnover`, `wastageRate`, `inventoryValuation`). Null otherwise.
+            **What a replenishment screen prefills a requisition from.**
+
+            '
         acknowledgedByPrincipalId:
           type: string
           format: uuid
@@ -2606,6 +2839,12 @@ components:
           type: string
           format: date-time
           nullable: true
+        acknowledgementNote:
+          type: string
+          maxLength: 300
+          nullable: true
+          description: The `note` given to `acknowledgeAlert`. Kept, because an acknowledgement that
+            says what is being done about it is the one escalation can skip.
         resolvedAt:
           type: string
           format: date-time
@@ -2640,8 +2879,13 @@ components:
         | | `throughput` | `queue.waiting_guest` completions per hour | | `abandonmentRate` | Queue entries
         that left before being called |
 
-        **`salesByInstructor` is deliberately absent.** It needs the staff-assignment link that CL-01
-        covers, and naming a metric with no source is the defect this enum exists to prevent.
+        **`salesByInstructor` was deliberately absent from the first cut** because it needed the
+        staff-assignment link CL-01 covers. It was added on 18 August once `resources.Resource`
+        produced it — see `x-ticvai-extension-note` below. Naming a metric with no source is still
+        the defect this enum exists to prevent.
+
+        **Money-valued metrics are listed in `x-ticvai-money-valued`.** A reading or threshold on one
+        of them is a `Money`, never a float (`MetricValue`).
 
         '
       enum:
@@ -2674,6 +2918,17 @@ components:
       - meanTimeToRepair
       - challengeCompletionRate
       - attributedRevenue
+      x-ticvai-money-valued:
+      - inventoryValuation
+      - resaleCommission
+      - revenuePerEntitlement
+      - revenuePerVisitor
+      - attributedRevenue
+      x-ticvai-money-valued-note: '**`salesByOperator`, `salesByWorkstation` and `resaleVolume` are not
+        listed because the package does not say whether they count sales or sum their value.** Until
+        that is decided, a rule on them carries a plain number.
+
+        '
       x-ticvai-extended: 18 August 2026
       x-ticvai-extension-note: '**Nineteen metrics added when their upstream models landed**, which is
         how BL-053 was always going to close — not by changing `reporting` but by building the things
@@ -2781,8 +3036,11 @@ components:
           type: boolean
           description: Requires REPORT_EXPORT_PII to include in an export.
         requiredPermission:
-          type: string
+          allOf:
+          - $ref: ../shared/permissions.yaml#/components/schemas/Permission
           nullable: true
+          description: The permission a principal needs to see this field. Null where the report's own
+            permission is enough.
         enumValues:
           type: array
           items:
@@ -2863,9 +3121,16 @@ components:
           - contains
           - isNull
           - isNotNull
-        value: {}
+        value:
+          description: '**Open on purpose; its type is the field''s.** One value, of the `FieldType`
+            that `listReportFields` gives for `field` — a string, number, boolean, or a date, date-time
+            or uuid as a string. Absent for `in`, `notIn`, `between`, `isNull` and `isNotNull`.
+
+            '
         values:
           type: array
+          description: The values for `in` and `notIn`, or exactly two (from, to) for `between`. Each
+            of the field's `FieldType`, as `value`.
           items: {}
         isParameter:
           type: boolean
@@ -2891,7 +3156,9 @@ components:
           $ref: '#/components/schemas/FieldType'
         isRequired:
           type: boolean
-        defaultValue: {}
+        defaultValue:
+          description: Open on purpose. A value of this parameter's `type`, used when a run supplies
+            none.
     CreateReportRequest:
       x-ticvai-persistence: none — request only
       type: object
@@ -2930,9 +3197,10 @@ components:
           items:
             $ref: '#/components/schemas/ReportParameter'
         requiredPermission:
-          type: string
-          description: 'Permission needed to run this report. **The author cannot assign one they do not
-            hold** — otherwise a venue user could build themselves a tenant-wide view.
+          $ref: ../shared/permissions.yaml#/components/schemas/Permission
+          description: 'Permission needed to run this report, from the shared `Permission` vocabulary.
+            **The author cannot assign one they do not hold** — otherwise a venue user could build
+            themselves a tenant-wide view.
 
             '
         maxDateRangeDays:
@@ -2956,9 +3224,15 @@ components:
             format: uuid
           version:
             type: string
+            description: The current version. Assigned by the server on each publish; earlier ones are
+              kept as `ReportDefinitionVersion`.
           isSystem:
             type: boolean
-            description: Shipped with the platform. Cannot be amended, only cloned.
+            description: 'Shipped with the platform — seeded at provisioning (BL-053, `SeededReport`).
+              **Editable and forkable, not locked**: a venue that cannot change a system report
+              rebuilds it and maintains two.
+
+              '
           isRetired:
             type: boolean
           estimatedCost:
@@ -2992,6 +3266,51 @@ components:
 
 
               **Operations write it at `venue` scope.**'
+    ReportDefinitionVersion:
+      x-ticvai-persistence: reporting.report_definition_version
+      type: object
+      description: '**A published version of a report definition, kept whole.** Added 26 September
+        after the pull audit: `updateReport` promised that a report produced last quarter stays
+        reproducible, and `reporting.report_definition` keyed on `id` with one `version` could hold
+        only the current definition — its columns, filters and parameters had no version either.
+
+        Written by `updateReport` for the version it replaces (and by `createReport` for the first).
+        **One row per (`reportId`, `version`)**, and never updated: a version that can change is not
+        the version an execution ran against.
+
+        '
+      required:
+      - id
+      - reportId
+      - version
+      - definition
+      - publishedAt
+      properties:
+        id:
+          type: string
+          format: uuid
+        reportId:
+          type: string
+          format: uuid
+        version:
+          type: string
+          description: Matches `ReportExecution.definitionVersion` for every execution that ran against
+            it.
+        definition:
+          $ref: '#/components/schemas/CreateReportRequest'
+          description: The definition as published — data source, columns, filters, grouping,
+            parameters and required permission. Stored whole.
+        publishedByPrincipalId:
+          type: string
+          format: uuid
+          nullable: true
+        publishedAt:
+          type: string
+          format: date-time
+        scopePath:
+          type: string
+          description: '**The partition key** (ADR-0005), the report''s own. **Operations write it at
+            `venue` scope.**'
     RunReportRequest:
       x-ticvai-persistence: none — request only
       type: object
@@ -2999,6 +3318,12 @@ components:
         parameters:
           type: object
           additionalProperties: true
+          description: '**Open on purpose; its shape is the report''s.** Keyed by
+            `ReportParameter.key` of the definition being run, each value of that parameter''s
+            `type`. An `isRequired` parameter with no value here and no `defaultValue` is the
+            `400` `runReport` lists.
+
+            '
         venueId:
           type: string
           format: uuid
@@ -3054,6 +3379,8 @@ components:
         parameters:
           type: object
           additionalProperties: true
+          description: The parameters it ran with, keyed by `ReportParameter.key` of
+            `definitionVersion` — defaults filled in, so the record is complete.
         scopeApplied:
           type: array
           description: Scope paths the caller held. What constrained the result.
@@ -3110,12 +3437,19 @@ components:
                 $ref: '#/components/schemas/FieldType'
         rows:
           type: array
+          description: '**Open on purpose; the shape is `columns`.** Each row is keyed by
+            `columns[].key`, and each value is of that column''s `type` — money as a `Money`, dates,
+            date-times and uuids as strings. A report''s columns are chosen at run time, so no fixed
+            schema can name them.
+
+            '
           items:
             type: object
             additionalProperties: true
         totals:
           type: object
           additionalProperties: true
+          description: Aggregated columns only, keyed and typed as a row is.
         rowCount:
           type: integer
         nextCursor:
@@ -3163,6 +3497,12 @@ components:
     Recipient:
       x-ticvai-persistence: reporting.schedule_recipient
       type: object
+      description: 'One recipient of a schedule. **A row of `reporting.schedule_recipient`, a child of
+        `reporting.schedule`** — `ReportSchedule` declares the pair, which is what gives the table its
+        `schedule_id`. Pull audit 26 September: declared on its own, the table had no column tying a
+        recipient to its schedule.
+
+        '
       required:
       - kind
       - address
@@ -3206,6 +3546,8 @@ components:
         parameters:
           type: object
           additionalProperties: true
+          description: As `RunReportRequest.parameters` — keyed by the report's `ReportParameter.key`,
+            applied to every run.
         recipients:
           type: array
           minItems: 1
@@ -3221,7 +3563,7 @@ components:
           default: true
           description: An empty report every morning trains people to ignore the report.
     ReportSchedule:
-      x-ticvai-persistence: reporting.schedule
+      x-ticvai-persistence: reporting.schedule + reporting.schedule_recipient
       allOf:
       - $ref: '#/components/schemas/CreateReportScheduleRequest'
       - type: object
@@ -3384,6 +3726,13 @@ components:
         parameters:
           type: object
           additionalProperties: true
+          description: '**Open on purpose, and not yet specified.** Holds the tile''s run parameters
+            (keyed by the report''s `ReportParameter.key`, as `RunReportRequest.parameters`) and its
+            display settings — for `number`, the comparison, variance, sparkline and status icon.
+            The per-visualisation display shape waits on the field-wells decision in
+            `visualisation`''s `x-ticvai-note`.
+
+            '
         refreshSeconds:
           type: integer
           minimum: 30
@@ -3441,6 +3790,11 @@ components:
         venueId:
           type: string
           format: uuid
+          description: 'Narrows every tile to one venue. Omitting it shows each viewer everything their
+            own scope permits — it can never show a viewer beyond that. The same rule as
+            `RunReportRequest.venueId`.
+
+            '
         isShared:
           type: boolean
           default: false
@@ -3485,7 +3839,8 @@ components:
               configured, and `reporting.dashboard_tile` cascades — so a hard delete takes an
               afternoon's work with it and leaves nothing to say what was there.
 
-              Archived dashboards are excluded from `listDashboards` unless asked for.
+              Archived dashboards are excluded from `listDashboards` unless asked for with
+              `includeArchived=true`.
           createdAt:
             type: string
             format: date-time
@@ -3566,26 +3921,12 @@ components:
           type: string
           description: What the question was understood to mean, in plain language.
         generatedQuery:
-          type: object
+          $ref: '#/components/schemas/GeneratedQuery'
           description: 'The structured query produced — data source, columns, filters, grouping. Returned
             so the answer can be checked. An answer nobody can verify is worse than no answer.
+            **Also kept, as `NaturalLanguageQuery`**, for `saveNaturalLanguageQuery`.
 
             '
-          properties:
-            dataSource:
-              $ref: '#/components/schemas/DataSource'
-            columns:
-              type: array
-              items:
-                $ref: '#/components/schemas/ReportColumn'
-            filters:
-              type: array
-              items:
-                $ref: '#/components/schemas/ReportFilter'
-            groupBy:
-              type: array
-              items:
-                type: string
         result:
           $ref: '#/components/schemas/ReportResult'
         confidence:
@@ -3600,6 +3941,137 @@ components:
           type: string
         tokensUsed:
           type: integer
+    GeneratedQuery:
+      x-ticvai-persistence: none — embedded; stored whole in `reporting.natural_language_query`
+      type: object
+      description: 'The structured query a natural-language question produced — data source, columns,
+        filters, grouping. Named on 26 September so the answer and the kept copy are one shape.
+
+        '
+      properties:
+        dataSource:
+          $ref: '#/components/schemas/DataSource'
+        columns:
+          type: array
+          items:
+            $ref: '#/components/schemas/ReportColumn'
+        filters:
+          type: array
+          items:
+            $ref: '#/components/schemas/ReportFilter'
+        groupBy:
+          type: array
+          items:
+            type: string
+    NaturalLanguageQuery:
+      x-ticvai-persistence: reporting.natural_language_query
+      type: object
+      description: '**The generated query behind one natural-language answer, kept.** Added 26 September
+        after the pull audit: `saveNaturalLanguageQuery` turns an answer into a definition in a later
+        call, and `NaturalLanguageAnswer` is computed and gone — `ai.activity` keeps the prompt and
+        response as free text, not the query. So there was nothing to save.
+
+        Written by `askReportingQuestion`, one row per answer; `saveNaturalLanguageQuery` reads the
+        latest for its conversation.
+
+        '
+      required:
+      - id
+      - conversationId
+      - question
+      - generatedQuery
+      - askedByPrincipalId
+      - askedAt
+      properties:
+        id:
+          type: string
+          format: uuid
+        conversationId:
+          type: string
+          format: uuid
+          description: The `ai.conversation` the answer belongs to — `NaturalLanguageAnswer.conversationId`.
+        question:
+          type: string
+        interpretation:
+          type: string
+          nullable: true
+        generatedQuery:
+          $ref: '#/components/schemas/GeneratedQuery'
+          description: Stored whole.
+        askedByPrincipalId:
+          type: string
+          format: uuid
+        askedAt:
+          type: string
+          format: date-time
+        scopePath:
+          type: string
+          description: '**The partition key** (ADR-0005). **Operations write it at `venue` scope.**'
+    ReportQuestionProblem:
+      x-ticvai-persistence: none — error shape
+      description: '`askReportingQuestion` could not interpret the question. **The response suggests
+        alternatives**, and this is where they are — the shared `Problem` has no field for them.
+
+        '
+      allOf:
+      - $ref: ../shared/common.yaml#/components/schemas/Problem
+      - type: object
+        required:
+        - suggestions
+        properties:
+          suggestions:
+            type: array
+            description: Questions close to the one asked that the service can answer, most likely
+              first. May be empty.
+            items:
+              type: string
+    MetricValue:
+      x-ticvai-persistence-column: numeric(18,4)
+      description: '**A reading of a metric or KPI, or a threshold on one.** A `Money` where the metric
+        is money-valued — `MetricSource` lists those in `x-ticvai-money-valued`, and a KPI is when its
+        `unit` is `currency` — and a plain number otherwise. naming-and-style 5.1: money is never a
+        float, at any layer.
+
+        Stored as `numeric(18,4)` either way: a money value stores its amount, and currency and scale
+        resolve from the scope as they do for every `Money`.
+
+        '
+      oneOf:
+      - type: number
+      - $ref: ../shared/common.yaml#/components/schemas/Money
+    AlertSeverity:
+      type: string
+      description: How urgent an alert rule's breach is. Shared by `AlertRule`, `Alert` and the
+        `listAlerts` filter.
+      enum:
+      - info
+      - warning
+      - critical
+    AlertStatus:
+      type: string
+      description: Where a raised alert is. Shared by `Alert` and the `listAlerts` filter.
+      enum:
+      - raised
+      - acknowledged
+      - resolved
+      - expired
+    AnomalySeverity:
+      type: string
+      description: Shared by `AnalyticsAnomaly` and the `listAnalyticsAnomalies` filter.
+      enum:
+      - low
+      - medium
+      - high
+    BenchmarkNormalisation:
+      type: string
+      description: The basis a benchmark is compared on. Shared by `getAnalyticsBenchmark` and
+        `BenchmarkRow`.
+      enum:
+      - none
+      - perVisitor
+      - perOperatingHour
+      - perStaffedPosition
+      - perSquareMetre
   securitySchemes:
     bearerAuth:
       type: http

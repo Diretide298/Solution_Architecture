@@ -55,8 +55,8 @@ steps:
   action: Chooses a session
   operations:
   - getAvailability
-  - acquireInventoryHold
-  outcome: Capacity is leased before payment
+  - addCartLine
+  outcome: Capacity is leased before payment, by the cart line (addCartLine takes the hold server-side; a kiosk guest has no workstation)
 - step: 6
   screen: KSK-006
   action: Reviews the order

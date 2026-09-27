@@ -97,6 +97,9 @@ paths:
               $ref: '#/components/schemas/AccreditationProgramme'
       responses:
         '201':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Created
           content:
             application/json:
@@ -135,6 +138,9 @@ paths:
               $ref: '#/components/schemas/AccreditationRequirements'
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Set
           content:
             application/json:
@@ -211,6 +217,9 @@ paths:
               $ref: '#/components/schemas/AccreditationApplication'
       responses:
         '201':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Submitted
           content:
             application/json:
@@ -386,6 +395,9 @@ paths:
               $ref: '#/components/schemas/AccreditationHolder'
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Updated
           content:
             application/json:
@@ -423,6 +435,9 @@ paths:
               $ref: '#/components/schemas/AccreditationDocument'
       responses:
         '201':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Submitted
           content:
             application/json:
@@ -577,6 +592,9 @@ paths:
               $ref: '#/components/schemas/AccreditationCredential'
       responses:
         '201':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Issued
           content:
             application/json:
@@ -685,6 +703,9 @@ paths:
               $ref: '#/components/schemas/BadgeTemplate'
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Set
           content:
             application/json:
@@ -738,6 +759,9 @@ paths:
               $ref: '#/components/schemas/BadgePrintJob'
       responses:
         '201':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Queued
           content:
             application/json:
@@ -806,6 +830,9 @@ paths:
               $ref: '#/components/schemas/AccessProfile'
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Set
           content:
             application/json:
@@ -835,8 +862,13 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/AccessProfile'
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: The impact
           content:
             application/json:
@@ -879,6 +911,9 @@ paths:
               $ref: '#/components/schemas/HolderAccess'
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Set
           content:
             application/json:
@@ -983,6 +1018,9 @@ paths:
               $ref: '#/components/schemas/AccreditationValidity'
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Set
           content:
             application/json:
@@ -1017,6 +1055,9 @@ paths:
               $ref: '#/components/schemas/AccreditationNotificationRules'
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Set
           content:
             application/json:

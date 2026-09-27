@@ -86,7 +86,6 @@ screens:
   - login
   states:
   - emptyFirstRun
-  - emptyNoAccess
   - emptyNoResults
   - error
   - loading
@@ -172,6 +171,31 @@ screens:
   - EMP-001
   - EMP-002
   - EMP-004
+  - EMP-006
+  - EMP-008
+  - EMP-010
+  - EMP-014
+  - EMP-017
+  - EMP-019
+  - EMP-021
+  - EMP-022
+  - EMP-024
+  - EMP-025
+  - EMP-026
+  - EMP-028
+  - EMP-029
+  - EMP-030
+  - EMP-031
+  - EMP-033
+  - EMP-034
+  - EMP-037
+  - EMP-038
+  - EMP-039
+  - EMP-040
+  - EMP-042
+  - EMP-043
+  - EMP-046
+  - EMP-047
   - EMP-048
   - EMP-051
   - EMP-052
@@ -264,6 +288,7 @@ screens:
   - EMP-001
   - EMP-002
   - EMP-003
+  - EMP-049
   boardFrames: null
   wireframe: wireframes/P06 Venue Staff App.dc.html#emp-009
   inFlows:
@@ -296,6 +321,7 @@ screens:
   - EMP-001
   - EMP-002
   - EMP-003
+  - EMP-015
   boardFrames: null
   wireframe: wireframes/P06 Venue Staff App.dc.html#emp-010
   inFlows: null
@@ -397,6 +423,7 @@ screens:
   - EMP-002
   - EMP-003
   - EMP-009
+  - EMP-018
   boardFrames: null
   wireframe: wireframes/P06 Venue Staff App.dc.html#emp-017
   inFlows:
@@ -822,6 +849,7 @@ screens:
   - EMP-002
   - EMP-003
   - EMP-035
+  - EMP-036
   boardFrames: null
   wireframe: wireframes/P06 Venue Staff App.dc.html#emp-034
   inFlows:
@@ -868,7 +896,6 @@ screens:
   states:
   - emptyFirstRun
   - emptyNoAccess
-  - emptyNoResults
   - error
   - loading
   - offline
@@ -965,6 +992,7 @@ screens:
   - EMP-001
   - EMP-002
   - EMP-003
+  - EMP-050
   boardFrames: null
   wireframe: wireframes/P06 Venue Staff App.dc.html#emp-047
   inFlows:
@@ -1354,6 +1382,7 @@ screens:
   - EMP-001
   - EMP-002
   - EMP-003
+  - EMP-041
   boardFrames: null
   wireframe: wireframes/P06 Venue Staff App.dc.html#emp-040
   inFlows:
@@ -1395,7 +1424,6 @@ screens:
   - listSsoProviders
   states:
   - emptyFirstRun
-  - emptyNoAccess
   - emptyNoResults
   - error
   - loading
@@ -1434,6 +1462,8 @@ screens:
   - EMP-002
   - EMP-003
   - EMP-018
+  - EMP-044
+  - EMP-045
   boardFrames: null
   wireframe: wireframes/P06 Venue Staff App.dc.html#emp-043
   inFlows:
@@ -1447,8 +1477,6 @@ screens:
   operations: []
   states:
   - emptyFirstRun
-  - emptyNoAccess
-  - emptyNoResults
   - error
   - loading
   - offline
@@ -1470,8 +1498,6 @@ screens:
   operations: []
   states:
   - emptyFirstRun
-  - emptyNoAccess
-  - emptyNoResults
   - error
   - loading
   - offline
@@ -1494,7 +1520,6 @@ screens:
   - logout
   states:
   - emptyFirstRun
-  - emptyNoAccess
   - error
   - loading
   - offline
@@ -1572,7 +1597,6 @@ screens:
   states:
   - emptyFirstRun
   - emptyNoAccess
-  - emptyNoResults
   - error
   - loading
   - offline
@@ -1777,7 +1801,6 @@ screens:
   states:
   - emptyFirstRun
   - emptyNoAccess
-  - emptyNoResults
   - error
   - loading
   - offline
@@ -1864,7 +1887,6 @@ screens:
   states:
   - emptyFirstRun
   - emptyNoAccess
-  - emptyNoResults
   - error
   - loading
   - offline
@@ -1943,7 +1965,6 @@ screens:
   states:
   - emptyFirstRun
   - emptyNoAccess
-  - emptyNoResults
   - error
   - loading
   - offline
@@ -1975,7 +1996,6 @@ screens:
   states:
   - emptyFirstRun
   - emptyNoAccess
-  - emptyNoResults
   - error
   - loading
   - offline
@@ -2031,7 +2051,6 @@ screens:
   states:
   - emptyFirstRun
   - emptyNoAccess
-  - emptyNoResults
   - error
   - loading
   - offline

@@ -7,7 +7,7 @@
 | Tier | foundation: Read by everything, reads nothing above. Deploys first and alone. |
 | Contracts | `tenancy`, `workforce`, `approvals`, `accreditation` |
 | Schemas owned | `platform`, `workforce`, `approvals`, `accreditation`, `tenancy` |
-| Operations in the slice | 23 of 156 |
+| Operations in the slice | 23 of 163 |
 | Scale | Read-heavy and highly cacheable. Config changes are rare. |
 | If it is down | Same as identity — nothing runs without a scope. |
 
@@ -88,8 +88,8 @@ The delegate cannot exceed the delegator's own authority, and **cannot approve a
 | Field | Type | Required | Notes |
 |---|---|---|---|
 | id | string (uuid) |  | (read-only) |
-| delegatorPrincipalId | string (uuid) | yes |  |
-| delegatePrincipalId | string (uuid) | yes |  |
+| delegatorPrincipalId | string (uuid) | yes | A principal id (identity.Principal.id). |
+| delegatePrincipalId | string (uuid) | yes | A principal id, resolved to a name the same way as delegatorPrincipalId. |
 | kinds | array of ApprovalKind: enum (refund, priceOverride, discountOverride, complimentaryTicket, membershipCancellation, accessPermissionChange, configurationChange, aiRecommendation, …) |  | Absent means everything the delegator may approve. |
 | maxAmount | object |  | A delegate may be given less authority than the delegator, never more. |
 | maxAmount.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
@@ -106,8 +106,8 @@ The delegate cannot exceed the delegator's own authority, and **cannot approve a
 | Field | Type | Required | Notes |
 |---|---|---|---|
 | id | string (uuid) |  | (read-only) |
-| delegatorPrincipalId | string (uuid) | yes |  |
-| delegatePrincipalId | string (uuid) | yes |  |
+| delegatorPrincipalId | string (uuid) | yes | A principal id (identity.Principal.id). |
+| delegatePrincipalId | string (uuid) | yes | A principal id, resolved to a name the same way as delegatorPrincipalId. |
 | kinds | array of ApprovalKind: enum (refund, priceOverride, discountOverride, complimentaryTicket, membershipCancellation, accessPermissionChange, configurationChange, aiRecommendation, …) |  | Absent means everything the delegator may approve. |
 | maxAmount | object |  | A delegate may be given less authority than the delegator, never more. |
 | maxAmount.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
@@ -124,7 +124,8 @@ The delegate cannot exceed the delegator's own authority, and **cannot approve a
 | Code | Shape | Meaning |
 |---|---|---|
 | 201 |  | Delegated |
-| 403 |  | The delegate does not hold the permission being delegated |
+| 400 |  | The delegation is malformed. |
+| 403 |  | The delegation would hand over authority that is not there. |
 
 
 ## Group: matrix
@@ -137,6 +138,8 @@ What requires approval, and who grants it
 
 11.1.2. Rules are ordered and **the first match wins**, so adding a rule cannot silently change an unrelated one. A matrix with overlapping unordered rules is a matrix nobody can reason about, and the ordering is the thing that makes it reviewable.
 Changing a matrix creates a version (11.1.80). Requests in flight keep the version they were raised under — **a request must be decided by the rules it was raised under**, or an approver is answering a question that changed while they read it.
+
+**PUT semantics — keyed on `kind` and the scope, never on an id.** There is no id in the path and `ApprovalMatrix.id` is read-only, so the body names its target: the matrix for `kind` at `scopeLevel`, on the scope node the caller is acting at (`scopePath` is read-only and set from it). Where no matrix exists for that pair, this creates version 1 and answers `201`; where one does, it stores a new version and answers `200`. **The body replaces the rule set whole**: the new version holds exactly the rules in `rules`, in their `order`, and a rule omitted from the body is not in the new version. Rule `id`s are read-only and ignored on input — each version carries its own rule rows. The previous version is kept, never edited, because requests in flight still point at it.
 
 |  |  |
 |---|---|
@@ -179,7 +182,7 @@ Changing a matrix creates a version (11.1.80). Requests in flight keep the versi
 | rules[].maxAmount.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
 | rules[].riskScoreAbove | number |  | 11.1.12. (nullable) |
 | rules[].condition | string |  | 11.1.13. (nullable) |
-| rules[].approverRoleIds | array of string (uuid) | yes | (min items 1) |
+| rules[].approverRoleIds | array of string (uuid) | yes | Role ids from identity.listRoles (Role.id), which is where an editor gets the names to show and pick from. (min items 1) |
 | rules[].approverScopeLevel | enum (venue, department, region, tenant) |  | 11.1.39. |
 | rules[].mode | ApprovalMode: enum (sequential, parallel, consensus, majority) | yes | 11.1.43–11.1.46. |
 | rules[].levels | integer |  | 11.1.3. (default 1) |
@@ -187,7 +190,7 @@ Changing a matrix creates a version (11.1.80). Requests in flight keep the versi
 | rules[].requiresSignature | boolean |  | (default False) |
 | rules[].slaMinutes | integer |  | 11.1.14. (nullable) |
 | rules[].escalateAfterMinutes | integer |  | (nullable) |
-| rules[].escalateToRoleIds | array of string (uuid) |  |  |
+| rules[].escalateToRoleIds | array of string (uuid) |  | Role ids from identity.listRoles, as approverRoleIds. |
 | rules[].expiresAfterMinutes | integer |  | 11.1.53. (nullable) |
 | isActive | boolean |  |  |
 
@@ -213,7 +216,7 @@ Changing a matrix creates a version (11.1.80). Requests in flight keep the versi
 | rules[].maxAmount.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
 | rules[].riskScoreAbove | number |  | 11.1.12. (nullable) |
 | rules[].condition | string |  | 11.1.13. (nullable) |
-| rules[].approverRoleIds | array of string (uuid) | yes | (min items 1) |
+| rules[].approverRoleIds | array of string (uuid) | yes | Role ids from identity.listRoles (Role.id), which is where an editor gets the names to show and pick from. (min items 1) |
 | rules[].approverScopeLevel | enum (venue, department, region, tenant) |  | 11.1.39. |
 | rules[].mode | ApprovalMode: enum (sequential, parallel, consensus, majority) | yes | 11.1.43–11.1.46. |
 | rules[].levels | integer |  | 11.1.3. (default 1) |
@@ -221,7 +224,7 @@ Changing a matrix creates a version (11.1.80). Requests in flight keep the versi
 | rules[].requiresSignature | boolean |  | (default False) |
 | rules[].slaMinutes | integer |  | 11.1.14. (nullable) |
 | rules[].escalateAfterMinutes | integer |  | (nullable) |
-| rules[].escalateToRoleIds | array of string (uuid) |  |  |
+| rules[].escalateToRoleIds | array of string (uuid) |  | Role ids from identity.listRoles, as approverRoleIds. |
 | rules[].expiresAfterMinutes | integer |  | 11.1.53. (nullable) |
 | isActive | boolean |  |  |
 
@@ -229,8 +232,9 @@ Changing a matrix creates a version (11.1.80). Requests in flight keep the versi
 
 | Code | Shape | Meaning |
 |---|---|---|
-| 200 |  | Set, as a new version |
-| 409 |  | The matrix would loosen a rule set at a higher scope, or a rule is unreachable behind an earlier one. |
+| 200 |  | Set, as a new version of the existing matrix for this kind and scope |
+| 201 |  | Created — no matrix existed for this kind and scope, so this is version 1 |
+| 409 |  | Refused, and nothing is stored. |
 
 
 ## Group: region
@@ -240,6 +244,7 @@ Changing a matrix creates a version (11.1.80). Requests in flight keep the versi
 **`PUT /regions/{regionId}/settings`**: Update region settings
 
 Changing `currencyCode` or `currencyScale` after transactions exist is rejected. The ledger is append-only; a scale change would silently reinterpret historic amounts.
+**PUT semantics** (pull audit R103). The target is the region in the path, which has one settings row. Where it has none yet the body creates it, which is how setup fills `platform.region_settings`; otherwise the body replaces it whole, and an omitted optional field returns to its default. `placement` and `cellName` are set by the Control Plane, `readOnly`, and ignored on input. `404` means the region does not exist or is outside the caller's scope; until the first save `getRegionSettings` answers `404` as well.
 
 |  |  |
 |---|---|
@@ -300,7 +305,9 @@ Changing `currencyCode` or `currencyScale` after transactions exist is rejected.
 | Code | Shape | Meaning |
 |---|---|---|
 | 200 |  | Updated |
+| 400 | BadRequest | Validation failed |
 | 403 | Forbidden | Authenticated but not permitted at the requested scope |
+| 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
 | 409 |  | Currency or scale change rejected because transactions exist in this region. |
 
 
@@ -327,6 +334,7 @@ Draft is supported (11.1.51) for the case where a person raises it themselves an
 | Reads | `approvals.decision`, `approvals.delegation`, `approvals.matrix`, `approvals.request`, `approvals.rule`, `cache:idempotency`, `identity.principal` |
 | Writes | `approvals.request`, `cache:idempotency` |
 | Called by | ADM-567, BO-1010, BO-1031, BO-1080, BO-1181, BO-718, BO-771, BO-922, POS-002, POS-020 |
+| State model | Approval request ([states/approval-request.yaml](../../../states/approval-request.yaml)): created as `draft` or `pending`; moves `draft` -> `pending` |
 
 **Parameters**
 
@@ -436,6 +444,7 @@ A rejection requires a reason (11.1.21). An approval may carry a comment (11.1.2
 | Reads | `approvals.decision`, `approvals.request`, `approvals.rule`, `cache:idempotency`, `identity.principal` |
 | Writes | `approvals.decision`, `approvals.request`, `cache:idempotency`, `platform.outbox` |
 | Called by | ACC-007, ADM-145, BO-084, BO-085, BO-133, BO-367, BO-377, BO-378, BO-940, POS-020 |
+| State model | Approval request ([states/approval-request.yaml](../../../states/approval-request.yaml)): moves `escalated` -> `pending`, `pending` -> `approved`, `escalated` -> `approved`, `pending` -> `rejected`, `escalated` -> `rejected`<br/>Partner agreement ([states/partner-agreement.yaml](../../../states/partner-agreement.yaml)): moves `pendingApproval` -> `active`, `pendingApproval` -> `terminated`<br/>Refund ([states/refund.yaml](../../../states/refund.yaml)): moves `pendingApproval` -> `pendingGateway`, `pendingApproval` -> `declined`<br/>Shift swap ([states/shift-swap.yaml](../../../states/shift-swap.yaml)): moves `awaitingApproval` -> `approved`, `awaitingApproval` -> `rejected` |
 
 **Parameters**
 
@@ -516,8 +525,8 @@ A rejection requires a reason (11.1.21). An approval may carry a comment (11.1.2
 | Code | Shape | Meaning |
 |---|---|---|
 | 200 |  | Decided. |
-| 403 |  | The approver is the requester, lacks the permission, or is not in the resolved chain. |
-| 409 |  | Already decided, withdrawn or expired |
+| 403 |  | The approver may not decide this request. |
+| 409 |  | The request is no longer open for a decision. |
 
 ### evaluateApprovalRequirement
 
@@ -576,7 +585,7 @@ Read-only and deliberately cheap. It runs on the hot path — every refund, ever
 | matchedRule.maxAmount.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
 | matchedRule.riskScoreAbove | number |  | 11.1.12. (nullable) |
 | matchedRule.condition | string |  | 11.1.13. (nullable) |
-| matchedRule.approverRoleIds | array of string (uuid) | yes | (min items 1) |
+| matchedRule.approverRoleIds | array of string (uuid) | yes | Role ids from identity.listRoles (Role.id), which is where an editor gets the names to show and pick from. (min items 1) |
 | matchedRule.approverScopeLevel | enum (venue, department, region, tenant) |  | 11.1.39. |
 | matchedRule.mode | ApprovalMode: enum (sequential, parallel, consensus, majority) | yes | 11.1.43–11.1.46. |
 | matchedRule.levels | integer |  | 11.1.3. (default 1) |
@@ -584,7 +593,7 @@ Read-only and deliberately cheap. It runs on the hot path — every refund, ever
 | matchedRule.requiresSignature | boolean |  | (default False) |
 | matchedRule.slaMinutes | integer |  | 11.1.14. (nullable) |
 | matchedRule.escalateAfterMinutes | integer |  | (nullable) |
-| matchedRule.escalateToRoleIds | array of string (uuid) |  |  |
+| matchedRule.escalateToRoleIds | array of string (uuid) |  | Role ids from identity.listRoles, as approverRoleIds. |
 | matchedRule.expiresAfterMinutes | integer |  | 11.1.53. (nullable) |
 | matrixVersion | integer |  | (nullable) |
 | approvers | array of object |  | Resolved, with delegations applied. |
@@ -625,6 +634,7 @@ Where the position needs a till, the assignment names the workstation their shif
 | Reads | `cache:idempotency`, `identity.delegated_access`, `identity.principal`, `platform.workstation`, `workforce.rota_assignment` |
 | Writes | `cache:idempotency`, `workforce.rota_assignment` |
 | Called by | BO-055, BO-712, BO-884, BO-917, POS-009, POS-018 |
+| State model | Rota assignment ([states/rota-assignment.yaml](../../../states/rota-assignment.yaml)): created as `planned`; moves `planned` -> `published` **(not settled: see the Gaps sheet)** |
 
 **Parameters**
 
@@ -712,12 +722,40 @@ Where the position needs a till, the assignment names the workstation their shif
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
-| from | query |  | string (date) |  |
-| to | query |  | string (date) |  |
+| from | query |  | string (date) | First calendar day, in the Region's time zone, not UTC. |
+| to | query |  | string (date) | Last calendar day, in the Region's time zone, not UTC. |
 | principalId | query |  | string (uuid) |  |
 | departmentId | query |  | string (uuid) |  |
 | pageSize | query |  | integer |  |
-| cursor | query |  | string | Opaque cursor from a previous page. |
+| cursor | query |  | string | Opaque cursor: the nextCursor of the previous page. |
+
+**Response**: `object`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| items | array of RotaAssignment | yes |  |
+| items[].overtimeMinutes | integer |  | BL-044, 1.2.83. (read-only; nullable) |
+| items[].restPeriodBefore | integer |  | Minutes since the previous shift ended. (nullable) |
+| items[].breachesWorkingHourLimit | boolean |  | Flagged at assignment, not discovered at payroll. (default False; read-only) |
+| items[].labourCost | object |  | Cost at the point of scheduling. |
+| items[].labourCost.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
+| items[].labourCost.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
+| items[].labourCost.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| items[].id | string (uuid) |  | (read-only) |
+| items[].principalId | string (uuid) | yes |  |
+| items[].displayName | string |  | (read-only) |
+| items[].venueId | string (uuid) | yes |  |
+| items[].departmentId | string (uuid) |  | (nullable) |
+| items[].position | string | yes | What they are rostered to do — gate steward, cashier, lifeguard, technician. |
+| items[].requiredRoleId | string (uuid) |  | Checked on assignment. (nullable) |
+| items[].workstationId | string (uuid) |  | Where the position needs a till. (nullable) |
+| items[].startsAt | string (date-time) | yes |  |
+| items[].endsAt | string (date-time) | yes |  |
+| items[].status | RotaStatus: enum (planned, published, confirmed, swapPending, cancelled, completed, noShow) |  |  |
+| items[].breakMinutes | integer |  | (nullable) |
+| items[].note | string |  | (nullable) |
+| nextCursor | string |  |  |
+| hasMore | boolean | yes |  |
 
 **Responses**
 
@@ -779,7 +817,7 @@ Where the position needs a till, the assignment names the workstation their shif
 | 201 |  | Created |
 | 400 | BadRequest | Validation failed |
 | 403 | Forbidden | Authenticated but not permitted at the requested scope |
-| 409 | Conflict | Idempotency conflict or optimistic concurrency failure |
+| 409 | Conflict | Idempotency conflict or optimistic concurrency failure. |
 
 ### updateOrgUnit
 
@@ -831,8 +869,10 @@ Deactivating a node causes every permission query at or beneath it to resolve to
 | Code | Shape | Meaning |
 |---|---|---|
 | 200 |  | Updated |
+| 400 | BadRequest | Validation failed |
 | 403 | Forbidden | Authenticated but not permitted at the requested scope |
-| 404 | NotFound | The resource does not exist, or is outside the caller's scope |
+| 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
+| 409 | Conflict | Idempotency conflict or optimistic concurrency failure. |
 
 
 ## Group: tenancy
@@ -840,6 +880,9 @@ Deactivating a node causes every permission query at or beneath it to resolve to
 ### getVenueSettings
 
 **`GET /venues/{venueId}/settings`**: Operational settings for this venue
+
+**What this returns, and what it does not.** `VenueSettings` holds the venue's trading currency, support hours, quiet hours, biometrics, segregated access and alerting — the things `setVenueSettings` writes. It carries **no module enablement and no F&B or retail setting**, so a section landing that wants *what is enabled here*, or a store or kitchen settings screen, does not get it from this read (pull audit R279). It is gated by `TENANT_CONFIGURE`; a caller holding only a section's view permission is refused `403`.
+**A venue with nothing saved still has settings** (pull audit R175). Where `platform.venue_settings` has no row for this venue the answer is `200` with the schema defaults, no `id`, and `currencyCode` and `currencyScale` null — which already means *resolve from the region*. `404` means the venue does not exist or is outside the caller's scope.
 
 |  |  |
 |---|---|
@@ -865,36 +908,36 @@ Deactivating a node causes every permission query at or beneath it to resolve to
 | Field | Type | Required | Notes |
 |---|---|---|---|
 | id | string (uuid) |  | Added 20 August. (read-only) |
-| venueId | string (uuid) |  |  |
+| venueId | string (uuid) |  | From the path of setVenueSettings. (read-only) |
 | currencyCode | string |  | readOnly is the freeze. (pattern ^[A-Z]{3}$; read-only; nullable) |
 | currencyScale | integer |  | Scale travels with currency (ADR-0008), and so does the freeze. (min 0; max 4; read-only; nullable) |
 | supportHours | object |  | CF-100. |
 | supportHours.mode | enum (alwaysOn, businessHours, custom, none) |  |  |
-| supportHours.timezone | string |  |  |
+| supportHours.timezone | string |  | IANA zone the windows are read in. |
 | supportHours.windows | array of object |  |  |
 | supportHours.windows[].day | enum (mon, tue, wed, thu, fri, sat, sun) |  |  |
-| supportHours.windows[].from | string |  |  |
-| supportHours.windows[].to | string |  |  |
+| supportHours.windows[].from | string |  | Wall-clock time the desk opens. |
+| supportHours.windows[].to | string |  | Wall-clock time the desk closes. |
 | supportHours.outOfHoursMessage | string |  | (nullable) |
 | quietHours | object |  | When the platform does not send. (nullable) |
-| quietHours.from | string |  |  |
-| quietHours.to | string |  |  |
+| quietHours.from | string |  | Wall-clock time sending stops |
+| quietHours.to | string |  | Wall-clock time sending resumes |
 | biometrics | object |  | CF-35, BL-096, BL-105, BL-106. (nullable) |
 | biometrics.isEnabled | boolean |  | Off by default, and turning it on is refused without the two fields below. (default False) |
 | biometrics.dpiaReference | string |  | The venue's own reference for its Article 21 assessment. (max length 200; nullable) |
 | biometrics.consentNoticeAcknowledgedAt | string (date-time) |  | When somebody confirmed the consent forms are in place at the point of capture. (nullable) |
-| biometrics.acknowledgedByPrincipalId | string (uuid) |  | Who confirmed it. (nullable) |
+| biometrics.acknowledgedByPrincipalId | string (uuid) |  | Who confirmed it. (read-only; nullable) |
 | biometrics.faceTagPurgeMinutesAfterClose | integer |  | BL-106. (default 0; nullable) |
 | segregatedAccess | object |  | CF-130. (nullable) |
 | segregatedAccess.isEnabled | boolean |  | (default False) |
 | segregatedAccess.appliesToAccessPointIds | array of string (uuid) |  |  |
 | segregatedAccess.schedule | array of object |  |  |
-| segregatedAccess.schedule[].day | string |  |  |
-| segregatedAccess.schedule[].from | string |  |  |
-| segregatedAccess.schedule[].to | string |  |  |
+| segregatedAccess.schedule[].day | enum (mon, tue, wed, thu, fri, sat, sun) |  |  |
+| segregatedAccess.schedule[].from | string |  | Wall-clock time |
+| segregatedAccess.schedule[].to | string |  | Wall-clock time |
 | segregatedAccess.schedule[].admits | enum (all, women, womenAndChildren, families, members) |  |  |
 | segregatedAccess.entitlementGated | boolean |  | Always true, and stated rather than assumed. (default True; read-only) |
-| segregatedAccess.genderVerification | enum (False, staffAssisted, deviceAssisted) |  | off — the entitlement decides and a steward handles exceptions. (default False) |
+| segregatedAccess.genderVerification | enum (off, staffAssisted, deviceAssisted) |  | off — the entitlement decides and a steward handles exceptions. (default off) |
 | segregatedAccess.overrideRateAlertThreshold | number |  | Where deviceAssisted is on. (nullable) |
 | alerting | object |  | CF-134. |
 | alerting.channel | enum (dashboardPanel, dashboardAndEmail, dashboardAndWhatsapp) |  | (default dashboardPanel) |
@@ -905,7 +948,9 @@ Deactivating a node causes every permission query at or beneath it to resolve to
 
 | Code | Shape | Meaning |
 |---|---|---|
-| 200 |  | Settings |
+| 200 |  | Settings, or the defaults where none are saved |
+| 403 | Forbidden | Authenticated but not permitted at the requested scope |
+| 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
 
 ### getWorkstationHealth
 
@@ -950,6 +995,7 @@ Board 1 of the client's POS design set. **The package held `lastHeartbeatAt` and
 | Code | Shape | Meaning |
 |---|---|---|
 | 200 |  | Health |
+| 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
 
 ### setVenueSettings
 
@@ -957,6 +1003,8 @@ Board 1 of the client's POS design set. **The package held `lastHeartbeatAt` and
 
 **The four things a venue answers and no other level can** (CF-100, CF-130, CF-134).
 Support hours were an open conflict for eleven days and were never a design question — the code is identical whether a desk runs 24/7 or nine to six, and **what was missing was somewhere to put the answer.**
+**PUT semantics** (pull audit R103, R175). The target is the venue in the path, and a venue has one settings row. The first save creates it and later saves replace it whole; the answer is `200` either way, because before the first save the venue already had settings — the defaults `getVenueSettings` returns. **An omitted property returns to its default or to null.** `id`, `venueId`, `currencyCode`, `currencyScale`, `segregatedAccess.entitlementGated` and `biometrics.acknowledgedByPrincipalId` are `readOnly` and ignored on input.
+**Refused with `422`** (pull audit R078) where the body asks for something the venue cannot evidence: `biometrics.isEnabled` true without both `dpiaReference` and `consentNoticeAcknowledgedAt`, or `segregatedAccess.genderVerification: deviceAssisted` where no device in the venue reports the `genderClassification` capability.
 
 |  |  |
 |---|---|
@@ -983,36 +1031,36 @@ Support hours were an open conflict for eleven days and were never a design ques
 | Field | Type | Required | Notes |
 |---|---|---|---|
 | id | string (uuid) |  | Added 20 August. (read-only) |
-| venueId | string (uuid) |  |  |
+| venueId | string (uuid) |  | From the path of setVenueSettings. (read-only) |
 | currencyCode | string |  | readOnly is the freeze. (pattern ^[A-Z]{3}$; read-only; nullable) |
 | currencyScale | integer |  | Scale travels with currency (ADR-0008), and so does the freeze. (min 0; max 4; read-only; nullable) |
 | supportHours | object |  | CF-100. |
 | supportHours.mode | enum (alwaysOn, businessHours, custom, none) |  |  |
-| supportHours.timezone | string |  |  |
+| supportHours.timezone | string |  | IANA zone the windows are read in. |
 | supportHours.windows | array of object |  |  |
 | supportHours.windows[].day | enum (mon, tue, wed, thu, fri, sat, sun) |  |  |
-| supportHours.windows[].from | string |  |  |
-| supportHours.windows[].to | string |  |  |
+| supportHours.windows[].from | string |  | Wall-clock time the desk opens. |
+| supportHours.windows[].to | string |  | Wall-clock time the desk closes. |
 | supportHours.outOfHoursMessage | string |  | (nullable) |
 | quietHours | object |  | When the platform does not send. (nullable) |
-| quietHours.from | string |  |  |
-| quietHours.to | string |  |  |
+| quietHours.from | string |  | Wall-clock time sending stops |
+| quietHours.to | string |  | Wall-clock time sending resumes |
 | biometrics | object |  | CF-35, BL-096, BL-105, BL-106. (nullable) |
 | biometrics.isEnabled | boolean |  | Off by default, and turning it on is refused without the two fields below. (default False) |
 | biometrics.dpiaReference | string |  | The venue's own reference for its Article 21 assessment. (max length 200; nullable) |
 | biometrics.consentNoticeAcknowledgedAt | string (date-time) |  | When somebody confirmed the consent forms are in place at the point of capture. (nullable) |
-| biometrics.acknowledgedByPrincipalId | string (uuid) |  | Who confirmed it. (nullable) |
+| biometrics.acknowledgedByPrincipalId | string (uuid) |  | Who confirmed it. (read-only; nullable) |
 | biometrics.faceTagPurgeMinutesAfterClose | integer |  | BL-106. (default 0; nullable) |
 | segregatedAccess | object |  | CF-130. (nullable) |
 | segregatedAccess.isEnabled | boolean |  | (default False) |
 | segregatedAccess.appliesToAccessPointIds | array of string (uuid) |  |  |
 | segregatedAccess.schedule | array of object |  |  |
-| segregatedAccess.schedule[].day | string |  |  |
-| segregatedAccess.schedule[].from | string |  |  |
-| segregatedAccess.schedule[].to | string |  |  |
+| segregatedAccess.schedule[].day | enum (mon, tue, wed, thu, fri, sat, sun) |  |  |
+| segregatedAccess.schedule[].from | string |  | Wall-clock time |
+| segregatedAccess.schedule[].to | string |  | Wall-clock time |
 | segregatedAccess.schedule[].admits | enum (all, women, womenAndChildren, families, members) |  |  |
 | segregatedAccess.entitlementGated | boolean |  | Always true, and stated rather than assumed. (default True; read-only) |
-| segregatedAccess.genderVerification | enum (False, staffAssisted, deviceAssisted) |  | off — the entitlement decides and a steward handles exceptions. (default False) |
+| segregatedAccess.genderVerification | enum (off, staffAssisted, deviceAssisted) |  | off — the entitlement decides and a steward handles exceptions. (default off) |
 | segregatedAccess.overrideRateAlertThreshold | number |  | Where deviceAssisted is on. (nullable) |
 | alerting | object |  | CF-134. |
 | alerting.channel | enum (dashboardPanel, dashboardAndEmail, dashboardAndWhatsapp) |  | (default dashboardPanel) |
@@ -1024,36 +1072,36 @@ Support hours were an open conflict for eleven days and were never a design ques
 | Field | Type | Required | Notes |
 |---|---|---|---|
 | id | string (uuid) |  | Added 20 August. (read-only) |
-| venueId | string (uuid) |  |  |
+| venueId | string (uuid) |  | From the path of setVenueSettings. (read-only) |
 | currencyCode | string |  | readOnly is the freeze. (pattern ^[A-Z]{3}$; read-only; nullable) |
 | currencyScale | integer |  | Scale travels with currency (ADR-0008), and so does the freeze. (min 0; max 4; read-only; nullable) |
 | supportHours | object |  | CF-100. |
 | supportHours.mode | enum (alwaysOn, businessHours, custom, none) |  |  |
-| supportHours.timezone | string |  |  |
+| supportHours.timezone | string |  | IANA zone the windows are read in. |
 | supportHours.windows | array of object |  |  |
 | supportHours.windows[].day | enum (mon, tue, wed, thu, fri, sat, sun) |  |  |
-| supportHours.windows[].from | string |  |  |
-| supportHours.windows[].to | string |  |  |
+| supportHours.windows[].from | string |  | Wall-clock time the desk opens. |
+| supportHours.windows[].to | string |  | Wall-clock time the desk closes. |
 | supportHours.outOfHoursMessage | string |  | (nullable) |
 | quietHours | object |  | When the platform does not send. (nullable) |
-| quietHours.from | string |  |  |
-| quietHours.to | string |  |  |
+| quietHours.from | string |  | Wall-clock time sending stops |
+| quietHours.to | string |  | Wall-clock time sending resumes |
 | biometrics | object |  | CF-35, BL-096, BL-105, BL-106. (nullable) |
 | biometrics.isEnabled | boolean |  | Off by default, and turning it on is refused without the two fields below. (default False) |
 | biometrics.dpiaReference | string |  | The venue's own reference for its Article 21 assessment. (max length 200; nullable) |
 | biometrics.consentNoticeAcknowledgedAt | string (date-time) |  | When somebody confirmed the consent forms are in place at the point of capture. (nullable) |
-| biometrics.acknowledgedByPrincipalId | string (uuid) |  | Who confirmed it. (nullable) |
+| biometrics.acknowledgedByPrincipalId | string (uuid) |  | Who confirmed it. (read-only; nullable) |
 | biometrics.faceTagPurgeMinutesAfterClose | integer |  | BL-106. (default 0; nullable) |
 | segregatedAccess | object |  | CF-130. (nullable) |
 | segregatedAccess.isEnabled | boolean |  | (default False) |
 | segregatedAccess.appliesToAccessPointIds | array of string (uuid) |  |  |
 | segregatedAccess.schedule | array of object |  |  |
-| segregatedAccess.schedule[].day | string |  |  |
-| segregatedAccess.schedule[].from | string |  |  |
-| segregatedAccess.schedule[].to | string |  |  |
+| segregatedAccess.schedule[].day | enum (mon, tue, wed, thu, fri, sat, sun) |  |  |
+| segregatedAccess.schedule[].from | string |  | Wall-clock time |
+| segregatedAccess.schedule[].to | string |  | Wall-clock time |
 | segregatedAccess.schedule[].admits | enum (all, women, womenAndChildren, families, members) |  |  |
 | segregatedAccess.entitlementGated | boolean |  | Always true, and stated rather than assumed. (default True; read-only) |
-| segregatedAccess.genderVerification | enum (False, staffAssisted, deviceAssisted) |  | off — the entitlement decides and a steward handles exceptions. (default False) |
+| segregatedAccess.genderVerification | enum (off, staffAssisted, deviceAssisted) |  | off — the entitlement decides and a steward handles exceptions. (default off) |
 | segregatedAccess.overrideRateAlertThreshold | number |  | Where deviceAssisted is on. (nullable) |
 | alerting | object |  | CF-134. |
 | alerting.channel | enum (dashboardPanel, dashboardAndEmail, dashboardAndWhatsapp) |  | (default dashboardPanel) |
@@ -1065,6 +1113,10 @@ Support hours were an open conflict for eleven days and were never a design ques
 | Code | Shape | Meaning |
 |---|---|---|
 | 200 |  | Set |
+| 400 | BadRequest | Validation failed |
+| 403 | Forbidden | Authenticated but not permitted at the requested scope |
+| 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
+| 422 |  | An enable the venue cannot evidence. |
 
 
 ## Group: workstation
@@ -1072,6 +1124,9 @@ Support hours were an open conflict for eleven days and were never a design ques
 ### configureWorkstation
 
 **`PUT /workstations/{workstationId}`**: Configure a workstation
+
+**Configures an existing workstation; it never creates one** (pull audit R103). The target is the workstation in the path, and the body has no code, venue or region, which a new workstation would need — an unknown `workstationId` is `404`. `mediaStockRemaining` is `readOnly` and ignored on input.
+**Refused while a shift is open on this workstation** (F73, pull audit R078). Changing the rules under an open shift means it closes against rules it did not open under, so the change waits for the shift to close.
 
 |  |  |
 |---|---|
@@ -1158,6 +1213,8 @@ Support hours were an open conflict for eleven days and were never a design ques
 | 200 |  | Configured |
 | 400 | BadRequest | Validation failed |
 | 403 | Forbidden | Authenticated but not permitted at the requested scope |
+| 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
+| 409 |  | A shift is open on this workstation. |
 
 ### createOutlet
 
@@ -1185,7 +1242,7 @@ Support hours were an open conflict for eleven days and were never a design ques
 
 | Field | Type | Required | Notes |
 |---|---|---|---|
-| id | string (uuid) | yes |  |
+| id | string (uuid) | yes | (read-only) |
 | code | string | yes | (max length 64) |
 | name | string | yes | (max length 200) |
 | venueId | string (uuid) | yes |  |
@@ -1193,14 +1250,17 @@ Support hours were an open conflict for eleven days and were never a design ques
 | zone | string |  | (nullable) |
 | stockLocationId | string (uuid) |  | Where this outlet draws stock from. (nullable) |
 | costCenterId | string (uuid) |  | Revenue and cost attribution. (nullable) |
-| openingHours | array of object |  |  |
+| openingHours | array of OpeningHoursWindow |  | The weekly pattern, one entry per window. |
+| openingHours[].day | enum (mon, tue, wed, thu, fri, sat, sun) | yes |  |
+| openingHours[].from | string | yes | Local time, 24-hour HH:MM, when the outlet opens. (pattern ^([01][0-9]\|2[0-3]):[0-5][0-9]$) |
+| openingHours[].to | string | yes | Local time, 24-hour HH:MM, when the outlet closes. (pattern ^([01][0-9]\|2[0-3]):[0-5][0-9]$) |
 | isActive | boolean |  |  |
 
 **Response**: `Outlet`
 
 | Field | Type | Required | Notes |
 |---|---|---|---|
-| id | string (uuid) | yes |  |
+| id | string (uuid) | yes | (read-only) |
 | code | string | yes | (max length 64) |
 | name | string | yes | (max length 200) |
 | venueId | string (uuid) | yes |  |
@@ -1208,7 +1268,10 @@ Support hours were an open conflict for eleven days and were never a design ques
 | zone | string |  | (nullable) |
 | stockLocationId | string (uuid) |  | Where this outlet draws stock from. (nullable) |
 | costCenterId | string (uuid) |  | Revenue and cost attribution. (nullable) |
-| openingHours | array of object |  |  |
+| openingHours | array of OpeningHoursWindow |  | The weekly pattern, one entry per window. |
+| openingHours[].day | enum (mon, tue, wed, thu, fri, sat, sun) | yes |  |
+| openingHours[].from | string | yes | Local time, 24-hour HH:MM, when the outlet opens. (pattern ^([01][0-9]\|2[0-3]):[0-5][0-9]$) |
+| openingHours[].to | string | yes | Local time, 24-hour HH:MM, when the outlet closes. (pattern ^([01][0-9]\|2[0-3]):[0-5][0-9]$) |
 | isActive | boolean |  |  |
 
 **Responses**
@@ -1216,6 +1279,8 @@ Support hours were an open conflict for eleven days and were never a design ques
 | Code | Shape | Meaning |
 |---|---|---|
 | 201 |  | Created |
+| 400 | BadRequest | Validation failed |
+| 403 | Forbidden | Authenticated but not permitted at the requested scope |
 | 409 |  | Code already in use in this venue |
 
 ### createSaleBoard
@@ -1247,7 +1312,7 @@ Tiles reference catalogue variants and are grouped into pages. A cashier finds a
 
 | Field | Type | Required | Notes |
 |---|---|---|---|
-| id | string (uuid) | yes |  |
+| id | string (uuid) | yes | (read-only) |
 | code | string | yes | (max length 64) |
 | name | string | yes | (max length 200) |
 | venueId | string (uuid) | yes |  |
@@ -1268,7 +1333,7 @@ Tiles reference catalogue variants and are grouped into pages. A cashier finds a
 
 | Field | Type | Required | Notes |
 |---|---|---|---|
-| id | string (uuid) | yes |  |
+| id | string (uuid) | yes | (read-only) |
 | code | string | yes | (max length 64) |
 | name | string | yes | (max length 200) |
 | venueId | string (uuid) | yes |  |
@@ -1290,6 +1355,7 @@ Tiles reference catalogue variants and are grouped into pages. A cashier finds a
 | Code | Shape | Meaning |
 |---|---|---|
 | 201 |  | Created |
+| 403 | Forbidden | Authenticated but not permitted at the requested scope |
 | 400 |  | A tile references an unknown or unsellable variant |
 
 ### listDevices
@@ -1297,6 +1363,7 @@ Tiles reference catalogue variants and are grouped into pages. A cashier finds a
 **`GET /devices`**: List registered devices
 
 Physical devices bound to workstations. Distinct from Device Management, which covers the full estate lifecycle — this is the binding a workstation needs at boot.
+**`pushToken` is never in a row** (pull audit R164). It is `writeOnly`: a push token is a credential, and a list at venue level is not where a credential is read back.
 
 |  |  |
 |---|---|
@@ -1318,14 +1385,14 @@ Physical devices bound to workstations. Distinct from Device Management, which c
 | workstationId | query |  | string (uuid) |  |
 | kind | query |  | DeviceKind: enum (receiptPrinter, ticketPrinter, labelPrinter, cashDrawer, barcodeScanner, rfidReader, nfcReader, cardReader, …) |  |
 | pageSize | query |  | integer |  |
-| cursor | query |  | string | Opaque cursor from a previous page. |
+| cursor | query |  | string | Opaque cursor: the nextCursor of the previous page. |
 
 **Response**: `object`
 
 | Field | Type | Required | Notes |
 |---|---|---|---|
 | items | array of RegisteredDevice | yes |  |
-| items[].id | string (uuid) | yes |  |
+| items[].id | string (uuid) | yes | (read-only) |
 | items[].kind | DeviceKind: enum (receiptPrinter, ticketPrinter, labelPrinter, cashDrawer, barcodeScanner, rfidReader, nfcReader, cardReader, …) | yes |  |
 | items[].driver | string | yes | Built to an open standard where one exists — ESC/POS, UnifiedPOS, OSDP. |
 | items[].identifier | string |  | (nullable) |
@@ -1333,19 +1400,19 @@ Physical devices bound to workstations. Distinct from Device Management, which c
 | items[].model | string |  | (nullable) |
 | items[].pushToken | string (password) |  | BL-163. (nullable) |
 | items[].pushPlatform | enum (ios, android, web, windows) |  | (nullable) |
-| items[].pushFailureCount | integer |  | Consecutive failures. (default 0) |
+| items[].pushFailureCount | integer |  | Consecutive failures. (default 0; read-only) |
 | items[].offlineScope | enum (none, readOnly, sellAndScan, fullVenue) |  | BL-163. (nullable) |
-| items[].firmwareVersion | string |  | (nullable) |
+| items[].firmwareVersion | string |  | As the device last reported it on its heartbeat. (read-only; nullable) |
 | items[].isRequired | boolean |  | True blocks shift open when the device is unreachable. |
-| items[].status | enum (online, offline, error, consumableLow, needsAttention, unknown) |  |  |
-| items[].batteryPercent | integer |  | Board 1 of the client's POS design set, 20 August. (min 0; max 100; nullable) |
-| items[].lastCheckedAt | string (date-time) |  | Distinct from lastHeartbeatAt. (nullable) |
-| items[].health | enum (healthy, warning, degraded, offline, unknown) |  | Derived, not reported. (default unknown) |
-| items[].lastHeartbeatAt | string (date-time) |  | (nullable) |
-| items[].capabilities | array of DeviceCapability: enum (genderClassification) |  | BL-179. |
-| items[].enrolmentState | enum (registered, enrolled, provisioned, active, deactivated, retired) |  | BL-160. (default registered) |
-| items[].retiredAt | string (date-time) |  | Set when enrolmentState reaches retired, and null otherwise. (nullable) |
-| items[].configurationProfileId | string (uuid) |  | The profile this device was provisioned with. (nullable) |
+| items[].status | enum (online, offline, error, consumableLow, needsAttention, unknown) |  | What the device last said on its heartbeat; unknown until it has. (read-only) |
+| items[].batteryPercent | integer |  | Board 1 of the client's POS design set, 20 August. (min 0; max 100; read-only; nullable) |
+| items[].lastCheckedAt | string (date-time) |  | Distinct from lastHeartbeatAt. (read-only; nullable) |
+| items[].health | enum (healthy, warning, degraded, offline, unknown) |  | Derived, not reported. (default unknown; read-only) |
+| items[].lastHeartbeatAt | string (date-time) |  | (read-only; nullable) |
+| items[].capabilities | array of DeviceCapability: enum (genderClassification) |  | BL-179. (read-only) |
+| items[].enrolmentState | enum (registered, enrolled, provisioned, active, deactivated, retired) |  | BL-160. (default registered; read-only) |
+| items[].retiredAt | string (date-time) |  | Set when enrolmentState reaches retired, and null otherwise. (read-only; nullable) |
+| items[].configurationProfileId | string (uuid) |  | The profile this device was provisioned with. (read-only; nullable) |
 | nextCursor | string |  |  |
 | hasMore | boolean | yes |  |
 
@@ -1444,7 +1511,7 @@ The configured front ends a workstation may load. A board determines presentatio
 | venueId | query |  | string (uuid) |  |
 | saleBoardKind | query |  | SaleBoardKind: enum (ticketing, fnb, retail, mixed) |  |
 | pageSize | query |  | integer |  |
-| cursor | query |  | string | Opaque cursor from a previous page. |
+| cursor | query |  | string | Opaque cursor: the nextCursor of the previous page. |
 
 **Response**: `object`
 
@@ -1498,6 +1565,7 @@ The configured front ends a workstation may load. A board determines presentatio
 **`POST /devices/{deviceId}/heartbeat`**: Device heartbeat and status
 
 Reports reachability and consumables — paper low, drawer open, reader offline. A required device that stops reporting blocks shift open, which is better discovered before a queue forms than during one.
+**Called by the device, never by a person** (pull audit R100). The caller is the enrolled device named in the path, and the workstation this is scoped to is the one that device is bound to — there is no other workstation to resolve, and a back-office session has none. A screen that shows device state reads it through `listDevices`, `getDevice` or `getWorkstationHealth`; it does not call this.
 
 |  |  |
 |---|---|
@@ -1510,12 +1578,14 @@ Reports reachability and consumables — paper low, drawer open, reader offline.
 | Reads | `platform.device` |
 | Writes | `platform.device` |
 | Called by | BO-036, BO-124, BO-125, BO-127, POS-016 |
+| State model | Registered device ([states/registered-device.yaml](../../../states/registered-device.yaml)): moves `offline` -> `online`, `online` -> `error`, `online` -> `consumableLow`, `consumableLow` -> `online`, `error` -> `online`, `online` -> `needsAttention`, `needsAttention` -> `online`, `unknown` -> `online` |
 
 **Parameters**
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
 | deviceId | path | yes | string (uuid) |  |
+| Idempotency-Key | header | yes | string | Client-generated ULID. |
 
 **Request body**
 
@@ -1531,6 +1601,7 @@ Reports reachability and consumables — paper low, drawer open, reader offline.
 | Code | Shape | Meaning |
 |---|---|---|
 | 204 |  | Recorded |
+| 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
 
 ### updateOutlet
 
@@ -1562,14 +1633,17 @@ Reports reachability and consumables — paper low, drawer open, reader offline.
 | name | string |  | (max length 200) |
 | stockLocationId | string (uuid) |  |  |
 | costCenterId | string (uuid) |  |  |
-| openingHours | array of object |  |  |
+| openingHours | array of OpeningHoursWindow |  | Replaces the whole weekly pattern. |
+| openingHours[].day | enum (mon, tue, wed, thu, fri, sat, sun) | yes |  |
+| openingHours[].from | string | yes | Local time, 24-hour HH:MM, when the outlet opens. (pattern ^([01][0-9]\|2[0-3]):[0-5][0-9]$) |
+| openingHours[].to | string | yes | Local time, 24-hour HH:MM, when the outlet closes. (pattern ^([01][0-9]\|2[0-3]):[0-5][0-9]$) |
 | isActive | boolean |  |  |
 
 **Response**: `Outlet`
 
 | Field | Type | Required | Notes |
 |---|---|---|---|
-| id | string (uuid) | yes |  |
+| id | string (uuid) | yes | (read-only) |
 | code | string | yes | (max length 64) |
 | name | string | yes | (max length 200) |
 | venueId | string (uuid) | yes |  |
@@ -1577,7 +1651,10 @@ Reports reachability and consumables — paper low, drawer open, reader offline.
 | zone | string |  | (nullable) |
 | stockLocationId | string (uuid) |  | Where this outlet draws stock from. (nullable) |
 | costCenterId | string (uuid) |  | Revenue and cost attribution. (nullable) |
-| openingHours | array of object |  |  |
+| openingHours | array of OpeningHoursWindow |  | The weekly pattern, one entry per window. |
+| openingHours[].day | enum (mon, tue, wed, thu, fri, sat, sun) | yes |  |
+| openingHours[].from | string | yes | Local time, 24-hour HH:MM, when the outlet opens. (pattern ^([01][0-9]\|2[0-3]):[0-5][0-9]$) |
+| openingHours[].to | string | yes | Local time, 24-hour HH:MM, when the outlet closes. (pattern ^([01][0-9]\|2[0-3]):[0-5][0-9]$) |
 | isActive | boolean |  |  |
 
 **Responses**
@@ -1585,12 +1662,16 @@ Reports reachability and consumables — paper low, drawer open, reader offline.
 | Code | Shape | Meaning |
 |---|---|---|
 | 200 |  | Updated |
+| 400 | BadRequest | Validation failed |
+| 403 | Forbidden | Authenticated but not permitted at the requested scope |
+| 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
 
 ### updateSaleBoard
 
 **`PUT /sale-boards/{saleBoardId}`**: Update a sale board
 
 Changes reach terminals with the next catalogue bundle, not immediately — a board that rearranged itself mid-transaction would be worse than one that lags.
+**PUT semantics** (pull audit R103). The target is the board in the path; this never creates one. The body replaces the board whole — every page and every tile — so a page or tile left out is removed. `id` is `readOnly` and ignored on input. Tiles are checked as `createSaleBoard` checks them.
 
 |  |  |
 |---|---|
@@ -1616,7 +1697,7 @@ Changes reach terminals with the next catalogue bundle, not immediately — a bo
 
 | Field | Type | Required | Notes |
 |---|---|---|---|
-| id | string (uuid) | yes |  |
+| id | string (uuid) | yes | (read-only) |
 | code | string | yes | (max length 64) |
 | name | string | yes | (max length 200) |
 | venueId | string (uuid) | yes |  |
@@ -1637,7 +1718,7 @@ Changes reach terminals with the next catalogue bundle, not immediately — a bo
 
 | Field | Type | Required | Notes |
 |---|---|---|---|
-| id | string (uuid) | yes |  |
+| id | string (uuid) | yes | (read-only) |
 | code | string | yes | (max length 64) |
 | name | string | yes | (max length 200) |
 | venueId | string (uuid) | yes |  |
@@ -1659,6 +1740,9 @@ Changes reach terminals with the next catalogue bundle, not immediately — a bo
 | Code | Shape | Meaning |
 |---|---|---|
 | 200 |  | Updated |
+| 400 |  | A tile references an unknown or unsellable variant |
+| 403 | Forbidden | Authenticated but not permitted at the requested scope |
+| 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
 
 ## Tables
 
@@ -1687,11 +1771,12 @@ Every table this service owns that the slice reads or writes, with its columns a
 | Column | Type | Required | Notes |
 |---|---|---|---|
 | id | uuid | no |  |
-| delegator_principal_id | uuid | yes |  |
-| delegate_principal_id | uuid | yes |  |
+| delegator_principal_id | uuid | yes | A principal id (identity.Principal.id). |
+| delegate_principal_id | uuid | yes | A principal id, resolved to a name the same way as delegatorPrincipalId. |
+| kinds | text[] | no | Absent means everything the delegator may approve. |
 | max_amount | numeric(18,4) | no | A delegate may be given less authority than the delegator, never more. |
-| from | timestamptz | yes |  |
-| to | timestamptz | yes | Required. |
+| valid_from | timestamptz | yes |  |
+| valid_to | timestamptz | yes | Required. |
 | reason | text | no |  |
 | is_active | boolean | no |  |
 | scope_path | text | no | The partition key (ADR-0005). |
@@ -1720,7 +1805,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 | status | text | yes |  |
 | subject_contract | text | no |  |
 | subject_type | text | no |  |
-| subject_id | uuid | no |  |
+| subject_id | text | no |  |
 | scope_path | text | no |  |
 | summary | text | no |  |
 | amount | numeric(18,4) | no |  |
@@ -1733,7 +1818,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 | resubmitted_from_id | text | no |  |
 | reopened_from_id | text | no |  |
 | sla_due_at | timestamptz | no |  |
-| sla_breached | boolean | no |  |
+| is_sla_breached | boolean | no |  |
 | expires_at | timestamptz | no |  |
 | requested_at | timestamptz | yes |  |
 | completed_at | timestamptz | no |  |
@@ -1743,12 +1828,12 @@ Every table this service owns that the slice reads or writes, with its columns a
 | Column | Type | Required | Notes |
 |---|---|---|---|
 | id | uuid | no | Added 20 August. |
-| order | integer | yes | First match wins. |
+| sort_order | integer | yes | First match wins. |
 | min_amount | numeric(18,4) | no |  |
 | max_amount | numeric(18,4) | no |  |
 | risk_score_above | numeric | no | 11.1.12. |
 | condition | text | no | 11.1.13. |
-| approver_role_ids | text[] | yes |  |
+| approver_role_ids | text[] | yes | Role ids from identity.listRoles (Role.id), which is where an editor gets the names to show and pick from. |
 | approver_scope_level | text | no | 11.1.39. |
 | mode | text | yes |  |
 | levels | integer | no | 11.1.3. |
@@ -1756,7 +1841,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 | requires_signature | boolean | no |  |
 | sla_minutes | integer | no | 11.1.14. |
 | escalate_after_minutes | integer | no |  |
-| escalate_to_role_ids | text[] | no |  |
+| escalate_to_role_ids | text[] | no | Role ids from identity.listRoles, as approverRoleIds. |
 | expires_after_minutes | integer | no | 11.1.53. |
 | matrix_id | uuid | yes | Points at approvals.matrix. |
 
@@ -1776,13 +1861,14 @@ Every table this service owns that the slice reads or writes, with its columns a
 | push_platform | text | no |  |
 | push_failure_count | integer | no | Consecutive failures. |
 | offline_scope | text | no | BL-163. |
-| firmware_version | text | no |  |
+| firmware_version | text | no | As the device last reported it on its heartbeat. |
 | is_required | boolean | no | True blocks shift open when the device is unreachable. |
-| status | text | no |  |
+| status | text | no | What the device last said on its heartbeat; unknown until it has. |
 | battery_percent | integer | no | Board 1 of the client's POS design set, 20 August. |
 | last_checked_at | timestamptz | no | Distinct from lastHeartbeatAt. |
 | health | text | no | Derived, not reported. |
 | last_heartbeat_at | timestamptz | no |  |
+| capabilities | text[] | no | BL-179. |
 | enrolment_state | text | no | BL-160. |
 | retired_at | timestamptz | no | Set when enrolmentState reaches retired, and null otherwise. |
 | configuration_profile_id | uuid | no | The profile this device was provisioned with. |
@@ -1869,7 +1955,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 | Column | Type | Required | Notes |
 |---|---|---|---|
 | id | uuid | no | Added 20 August. |
-| venue_id | uuid | no |  |
+| venue_id | uuid | no | From the path of setVenueSettings. |
 | currency_code | text | no | readOnly is the freeze. |
 | currency_scale | integer | no | Scale travels with currency (ADR-0008), and so does the freeze. |
 | support_hours | jsonb | no | CF-100. |
@@ -1897,8 +1983,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 | edge_node_id | uuid | no | Present when deploymentProfile is venueEdge. |
 | health_score | integer | no | Board 1 of the client's POS set. |
 | configuration_profile_id | uuid | no | Which profile this workstation runs, and at which version. |
-| catalogue_state | jsonb | no |  |
-| offline_capable | boolean | no | Derived from deploymentProfile. |
+| is_offline_capable | boolean | no | Derived from deploymentProfile. |
 | is_active | boolean | no |  |
 | org_unit_id | uuid | yes | Renamed from scope_node_id on 31 August. |
 
@@ -1926,7 +2011,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 
 ## Not in the first release
 
-133 operations, added to this service in later releases without changing any of the above.
+140 operations, added to this service in later releases without changing any of the above.
 
 | Group | Operations |
 |---|---|
@@ -1944,6 +2029,6 @@ Every table this service owns that the slice reads or writes, with its columns a
 | request | `escalateApprovalRequest`, `listApprovalRequests`, `resubmitApprovalRequest`, `withdrawApprovalRequest` |
 | rota | `requestShiftSwap`, `updateRotaAssignment` |
 | scope | `getOrgUnit`, `listOrgUnits` |
-| tenancy | `deployConfigurationProfile`, `listAuditRecords`, `listCellEndpoints`, `setConfigurationProfile`, `setConnectivityThresholds`, `setOfflinePolicy` |
+| tenancy | `deployConfigurationProfile`, `getConfigurationProfile`, `getConnectivityPolicy`, `getOfflinePolicy`, `listAuditRecords`, `listCellEndpoints`, `listConfigurationProfiles`, `listProfileDeployments`, `setConfigurationProfile`, `setConnectivityThresholds`, `setOfflinePolicy` |
 | workforce | `broadcastToGuests`, `claimOpenShift`, `getEmployee`, `getFieldOwnership`, `getLabourCost`, `getStaffingCoverage`, `listEmployees`, `listIntegrationSources`, `listJobTitles`, `listLeaveBalances`, `listLeaveRequests`, `listLeaveTypes`, `listOpenShifts`, `listShiftPatterns`, `listShiftSwapRequests`, `listShiftTemplates`, `listSyncConflicts`, `listSyncRuns`, `listTrainingRecords`, `listWorkAssignments`, `requestLeave`, `resolveSyncConflict`, `setFieldOwnership`, `setIntegrationSource`, `setJobTitle`, `setLeaveType`, `setShiftPattern`, `setShiftTemplate`, `setStaffingRules`, `setWorkAssignment`, `startSync`, `validateWorkforceCompliance` |
-| workstation | `getWorkstation`, `registerDevice` |
+| workstation | `getDevice`, `getOutlet`, `getWorkstation`, `registerDevice` |

@@ -58,7 +58,7 @@
    "summary": "What the assistant may do here",
    "permission": "AI_CONFIGURE",
    "guestCallable": false,
-   "scopeLevel": "tenant"
+   "scopeLevel": "venue"
   },
   "getAiUsage": {
    "path": "/usage",
@@ -235,7 +235,7 @@
    "summary": "Set the policy",
    "permission": "AI_CONFIGURE",
    "guestCallable": false,
-   "scopeLevel": "tenant"
+   "scopeLevel": "venue"
   },
   "setAiProvider": {
    "path": "/providers",
@@ -279,21 +279,32 @@
   "AiProvider",
   "AiProviderKind",
   "AiSource",
+  "AiSourceList",
   "AiUsageReport",
   "GeneratedConfiguration",
   "IndexFailure",
   "IndexJob",
   "IndexSource",
+  "InsufficientDataProblem",
   "KnowledgeCollection",
   "KnowledgeDocument",
   "LayoutDraft",
+  "ModuleKey",
+  "Money",
+  "Page",
   "Problem",
   "ProposedAction",
   "SearchResult",
   "Suggestion",
   "SuggestionBasis",
   "SuggestionKind",
-  "SuggestionOutcome"
+  "SuggestionOutcome",
+  "SuggestionProviderAssignment",
+  "SuggestionProviderAssignments",
+  "TranslationProposals",
+  "UsageLimitProblem",
+  "VenueLabelProposal",
+  "WalkwayProposal"
  ],
  "enums": [
   "AiCapability",
@@ -1585,7 +1596,7 @@
  ],
  "counts": {
   "operations": 33,
-  "schemas": 23,
+  "schemas": 34,
   "states": 11,
   "events": 11,
   "tables": 51,

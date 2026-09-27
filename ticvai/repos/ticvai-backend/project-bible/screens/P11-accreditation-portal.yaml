@@ -134,6 +134,7 @@ screens:
     exitTo:
     - ACC-002
     - ACC-004
+    - ACC-006
     notes: '**Corrected 9 September.** The previous `exitTo` also listed `ACC-003`, which is the review
       step inside the application and cannot be reached from a landing page. Inferred navigation had made
       every P11 screen a child of this one.
@@ -145,6 +146,9 @@ screens:
       provenance: structural — ACC-001 is P11's home screen and its exits are its launcher
     - to: ACC-004
       trigger: Application Status Tracking
+      provenance: structural — ACC-001 is P11's home screen and its exits are its launcher
+    - to: ACC-006
+      trigger: Reviewer Queue
       provenance: structural — ACC-001 is P11's home screen and its exits are its launcher
   implementation:
     app: accreditation-web
@@ -285,8 +289,8 @@ screens:
       trigger: Application Review & Submit
       carries:
       - applicationRef
-      provenance: derived — ACC-003 declares entryState.params applicationRef, so an edge into it must
-        carry them
+      provenance: derived — ACC-003 declares entryState.params applicationRef and ACC-002 holds applicationRef,
+        so an edge into it carries them
   implementation:
     app: accreditation-web
     route: /applicant-journey/registration-form
@@ -408,14 +412,14 @@ screens:
       trigger: Registration Form
       carries:
       - applicationRef
-      provenance: derived — ACC-002 declares entryState.params applicationRef, so an edge into it must
-        carry them
+      provenance: derived — ACC-002 declares entryState.params applicationRef and ACC-003 holds applicationRef,
+        so an edge into it carries them
     - to: ACC-004
       trigger: Application Status Tracking
       carries:
       - applicationRef
-      provenance: derived — ACC-004 declares entryState.params applicationRef, so an edge into it must
-        carry them
+      provenance: derived — ACC-004 declares entryState.params applicationRef and ACC-003 holds applicationRef,
+        so an edge into it carries them
   implementation:
     app: accreditation-web
     route: /applicant-journey/application-review-and-submit
@@ -538,8 +542,8 @@ screens:
       trigger: Accreditation Badge
       carries:
       - applicationRef
-      provenance: derived — ACC-005 declares entryState.params applicationRef, so an edge into it must
-        carry them
+      provenance: derived — ACC-005 declares entryState.params applicationRef and ACC-004 holds applicationRef,
+        so an edge into it carries them
   implementation:
     app: accreditation-web
     route: /applicant-journey/application-status-tracking
@@ -671,8 +675,8 @@ screens:
       trigger: Application Status Tracking
       carries:
       - applicationRef
-      provenance: derived — ACC-004 declares entryState.params applicationRef, so an edge into it must
-        carry them
+      provenance: derived — ACC-004 declares entryState.params applicationRef and ACC-005 holds applicationRef,
+        so an edge into it carries them
     - to: SCN-003
       trigger: A steward scans it at a service gate
       provenance: flow F23 step 3→4
@@ -792,16 +796,12 @@ screens:
     transitions:
     - to: ACC-007
       trigger: Reviewer Application Detail
-      carries:
-      - requestId
-      provenance: derived — ACC-007 declares entryState.params requestId, so an edge into it must carry
-        them
+      provenance: derived — ACC-007 declares entryState.params requestId and ACC-006 holds none of them,
+        so the edge carries nothing and ACC-007 opens cold
     - to: ACC-008
       trigger: Credential Register
-      carries:
-      - programmeId
-      provenance: derived — ACC-008 declares entryState.params programmeId, so an edge into it must carry
-        them
+      provenance: derived — ACC-008 declares entryState.params  and ACC-006 holds none of them, so the
+        edge carries nothing and ACC-008 opens cold
   implementation:
     app: accreditation-web
     route: /reviewer-internal/reviewer-queue
@@ -939,16 +939,12 @@ screens:
       provenance: flow F23 step 2→3
     - to: ACC-006
       trigger: Reviewer Queue
-      carries:
-      - programmeId
-      provenance: derived — ACC-006 declares entryState.params programmeId, so an edge into it must carry
-        them
+      provenance: derived — ACC-006 declares entryState.params  and ACC-007 holds none of them, so the
+        edge carries nothing and ACC-006 opens cold
     - to: ACC-008
       trigger: Credential Register
-      carries:
-      - programmeId
-      provenance: derived — ACC-008 declares entryState.params programmeId, so an edge into it must carry
-        them
+      provenance: derived — ACC-008 declares entryState.params  and ACC-007 holds none of them, so the
+        edge carries nothing and ACC-008 opens cold
   implementation:
     app: accreditation-web
     route: /reviewer-internal/reviewer-application-detail
@@ -1079,16 +1075,12 @@ screens:
     transitions:
     - to: ACC-006
       trigger: Reviewer Queue
-      carries:
-      - programmeId
-      provenance: derived — ACC-006 declares entryState.params programmeId, so an edge into it must carry
-        them
+      provenance: derived — ACC-006 declares entryState.params  and ACC-008 holds none of them, so the
+        edge carries nothing and ACC-006 opens cold
     - to: ACC-007
       trigger: Reviewer Application Detail
-      carries:
-      - requestId
-      provenance: derived — ACC-007 declares entryState.params requestId, so an edge into it must carry
-        them
+      provenance: derived — ACC-007 declares entryState.params requestId and ACC-008 holds none of them,
+        so the edge carries nothing and ACC-007 opens cold
   implementation:
     app: accreditation-web
     route: /reviewer-internal/credential-register

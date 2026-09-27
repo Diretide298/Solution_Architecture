@@ -7,7 +7,7 @@
  "audience": "staff",
  "formFactor": "web",
  "offlineCapable": false,
- "generated": "2026-09-24",
+ "generated": "2026-09-28",
  "note": "Derived by tools/derive-platform.py. **The gaps section is the point** \u2014 a page listing what exists is a directory; one listing what is missing is a worklist.",
  "counts": {
   "screens": 100,
@@ -15,7 +15,7 @@
   "contracts": 7,
   "modules": 3,
   "undrawn": 0,
-  "operationsWithNoScreen": 100
+  "operationsWithNoScreen": 107
  },
  "waves": {
   "wave2": 20,
@@ -1039,6 +1039,18 @@
     "summary": "Approved substitutions for a recipe's ingredients"
    },
    {
+    "operation": "listMenuSchedules",
+    "contract": "fnb",
+    "verb": "GET",
+    "summary": "What is scheduled to go live, and when"
+   },
+   {
+    "operation": "listMenuVersions",
+    "contract": "fnb",
+    "verb": "GET",
+    "summary": "Every published version of a menu"
+   },
+   {
     "operation": "listTemperatureCheckpoints",
     "contract": "fnb",
     "verb": "GET",
@@ -1273,6 +1285,12 @@
     "summary": "A quota-bounded, addressed invitation"
    },
    {
+    "operation": "getForm",
+    "contract": "marketing-crm",
+    "verb": "GET",
+    "summary": "One form, to fill in or to edit"
+   },
+   {
     "operation": "getGuestExtraValues",
     "contract": "marketing-crm",
     "verb": "GET",
@@ -1289,6 +1307,12 @@
     "contract": "marketing-crm",
     "verb": "GET",
     "summary": "Every rule a loyalty programme runs on"
+   },
+   {
+    "operation": "getSeoMetadata",
+    "contract": "marketing-crm",
+    "verb": "GET",
+    "summary": "The metadata in force for one page"
    },
    {
     "operation": "getSuppressionList",
@@ -1313,6 +1337,12 @@
     "contract": "marketing-crm",
     "verb": "GET",
     "summary": "Badges a guest holds"
+   },
+   {
+    "operation": "listForms",
+    "contract": "marketing-crm",
+    "verb": "GET",
+    "summary": "Waivers, surveys and capture forms"
    },
    {
     "operation": "listGuestExtraFields",
@@ -1529,6 +1559,18 @@
     "contract": "orders",
     "verb": "POST",
     "summary": "Renew a membership"
+   },
+   {
+    "operation": "resolveSyncRejection",
+    "contract": "orders",
+    "verb": "POST",
+    "summary": "Record what was done about a refused entry"
+   },
+   {
+    "operation": "revokeEntitlementShare",
+    "contract": "orders",
+    "verb": "POST",
+    "summary": "Take back a share"
    },
    {
     "operation": "setFraudRules",

@@ -183,6 +183,233 @@ def load_permission_keys() -> set:
     return {k for k in keys if k}
 
 
+# ── two permission vocabularies, and the join between them ──────────────────────────────────
+#
+# **A guard used to be checked against `roles.yaml` and nothing else** (audit R278, 26 September).
+# The contracts authorise against the SCREAMING_SNAKE `Permission` enum in
+# `contracts/shared/permissions.yaml` — naming-and-style §6.4 allows no other form — while P04's
+# guards name the POS board's dotted action keys (`sale.create`, `payment.take`, `sale.resume`).
+# `roles.yaml` calls itself *the vocabulary both sides name* and never said which enum value a key
+# is, so a developer could not tell which `effectivePermissions` entry `sale.resume` means, and a
+# guard sitting on the wrong action (`payment.take` on *Send to kitchen*, whose `createFnbOrder`
+# needs ORDER_CREATE) passed.
+#
+# **The join is a `permission:` on the grant** — one enum value, or a list where one action key
+# genuinely covers several. A guard may also name the enum value directly. Either way the guard
+# resolves to enum values, and where the transition names its `operation` those are compared with
+# the operation's `x-ticvai-permission`: the server refuses the call on that, whatever the button
+# says.
+PERMISSION_ENUM: set = set()
+ROLE_KEY_PERMS: dict = {}
+OP_FACTS: dict = {}
+
+
+def load_permission_enum() -> set:
+    """The `Permission` enum, from `contracts/shared/permissions.yaml`."""
+    p = CONTRACTS / "shared" / "permissions.yaml"
+    if not p.exists():
+        return set()
+    doc = yaml.safe_load(p.read_text(encoding="utf-8")) or {}
+    node = ((doc.get("components") or {}).get("schemas") or {}).get("Permission") or {}
+    return set(node.get("enum") or [])
+
+
+def load_role_key_permissions() -> dict:
+    """`roles.yaml` action key -> the enum values its grant declares (empty when it declares none)."""
+    p = ROOT / "roles.yaml"
+    if not p.exists():
+        return {}
+    doc = yaml.safe_load(p.read_text(encoding="utf-8")) or {}
+    out: dict = {}
+    for role in (doc.get("roles") or {}).values():
+        for g in (role.get("grants") or []):
+            if isinstance(g, str):
+                out.setdefault(g, set())
+                continue
+            key = (g or {}).get("key")
+            if not key:
+                continue
+            perm = g.get("permission")
+            vals = perm if isinstance(perm, list) else ([perm] if perm else [])
+            out.setdefault(key, set()).update(str(v) for v in vals)
+    return out
+
+
+def load_operation_facts() -> dict:
+    """operationId -> contract stem, `x-ticvai-permission` and `x-ticvai-consumed-by`, read from
+    the contracts rather than the lineage, which nothing in the package regenerates."""
+    out: dict = {}
+    if not CONTRACTS.exists():
+        return out
+    for f in CONTRACTS.rglob("*.yaml"):
+        try:
+            doc = yaml.safe_load(f.read_text(encoding="utf-8")) or {}
+        except yaml.YAMLError:
+            continue
+        for item in (doc.get("paths") or {}).values():
+            if not isinstance(item, dict):
+                continue
+            for verb, op in item.items():
+                if verb in ("get", "post", "put", "patch", "delete") and isinstance(op, dict) \
+                        and op.get("operationId"):
+                    out[op["operationId"]] = {
+                        "contract": f.stem,
+                        "permission": op.get("x-ticvai-permission"),
+                        "consumedBy": op.get("x-ticvai-consumed-by"),
+                    }
+    return out
+
+
+def check_role_permissions() -> None:
+    """Every `permission:` a grant declares must be a value of the enum."""
+    if not PERMISSION_ENUM:
+        return
+    for key, perms in sorted(ROLE_KEY_PERMS.items()):
+        for v in sorted(perms - PERMISSION_ENUM):
+            ERRORS.append(f"roles.yaml: {key} maps to {v!r}, which is not a value of the Permission "
+                          f"enum in contracts/shared/permissions.yaml")
+
+
+def check_guard(name: str, where: str, g: str, t: dict) -> bool:
+    """A guard against both vocabularies and against the operation its transition calls.
+
+    Returns False when the guard names nothing at all, so the caller skips the `denied` pairing.
+    """
+    in_enum = g in PERMISSION_ENUM
+    if not in_enum and PERMISSION_KEYS and g not in PERMISSION_KEYS:
+        ERRORS.append(f"{name}: {where} is guarded by {g!r}, which is neither a Permission enum "
+                      f"value nor a key any role in roles.yaml grants — a control nobody can ever use")
+        return False
+    resolved = {g} if in_enum else set(ROLE_KEY_PERMS.get(g) or ())
+    op = t.get("operation")
+    op_perm = (OP_FACTS.get(op) or {}).get("permission") if op else None
+    if not resolved:
+        # **A warning while roles.yaml carries no mapping at all** — every P04 guard is in this
+        # state today, and failing the package for a join nobody has written yet would fail it for
+        # a decision, not a defect. It names the operation's permission where there is one, which
+        # is the value the mapping has to agree with.
+        WARNINGS.append(
+            f"{name}: {where} is guarded by {g!r}, a roles.yaml action key with no Permission "
+            f"enum value — add `permission:` to its grant (or guard on the enum value), or a "
+            f"developer cannot tell which effectivePermissions entry it means"
+            + (f"; the operation it calls, {op}, requires {op_perm}" if op_perm else ""))
+        return True
+    if op_perm and op_perm not in resolved:
+        ERRORS.append(f"{name}: {where} is guarded by {g!r} ({', '.join(sorted(resolved))}) and "
+                      f"calls {op}, which requires {op_perm} — the button and the server disagree "
+                      f"about who may press it")
+    elif not op:
+        WARNINGS.append(f"{name}: {where} is guarded by {g!r} and names no operation, so nothing "
+                        f"can check the guard against the permission the server enforces")
+    return True
+
+
+# ── operations attached by resemblance, not by purpose ──────────────────────────────────────
+#
+# **Audit R254, 26 September: 206 findings on 176 tickets traced to one cause.** Screens hold
+# operations that do not serve them, and their own notes say how — the 18 August bulk attach,
+# attachment "by module resemblance", whole contracts attached at once. `BO-036 Device Registry`
+# carried ten guest-CRM operations (`adjustLoyaltyPoints`, `mergeGuestProfiles`, `searchGuests`)
+# and marketing-crm's `x-ticvai-consumed-by` mirrored it back; `PTR-005 Inventory & Allocation
+# View` carried the whole orders contract. **Every other check passed**, because each operation
+# existed, resolved and was permitted.
+#
+# No rule can say what a screen is for. These say where the declaration shows the marks of having
+# been attached rather than chosen, and they are warnings because the fix is a person re-deriving
+# the screen's `apis` from its purpose and flows:
+#
+#   1. **A contract island** — three or more operations from one contract on a screen where
+#      another contract's operations match the screen's name and none of this contract's do, by
+#      operationId or by the purpose the screen gives them.
+#   2. **A purpose that is the operationId** — nobody said what the call does on this screen.
+#   3. **A mirror that disagrees** — `x-ticvai-consumed-by` naming a screen whose `apis` do not
+#      hold the operation, or the reverse.
+_ATTACH_STOP = {
+    "list", "get", "create", "update", "delete", "set", "add", "remove", "record", "search", "my",
+    "by", "for", "of", "and", "the", "to", "in", "on", "an", "with", "from", "resolve", "request",
+    "confirm", "cancel", "submit", "approve", "reject", "read", "upsert", "bulk", "export",
+    "import", "start", "end", "close", "open", "register", "configure", "deploy", "manage",
+    "management", "view", "detail", "details", "overview", "dashboard", "settings", "screen",
+    "centre", "center", "console", "admin", "staff", "guest", "venue", "all", "new", "edit",
+    "amend", "check", "status", "history", "report", "reports",
+}
+ISLAND_MIN = 3
+
+
+def _attach_words(text: str) -> set:
+    out = set()
+    for w in re.findall(r"[A-Z]?[a-z0-9]+|[A-Z]+(?![a-z])", text or ""):
+        w = w.lower()
+        if len(w) <= 2:
+            continue
+        if len(w) > 4 and w.endswith("ies"):
+            w = w[:-3] + "y"
+        elif len(w) > 4 and w.endswith("es") and not w.endswith("ses"):
+            w = w[:-2]
+        elif len(w) > 3 and w.endswith("s") and not w.endswith("ss"):
+            w = w[:-1]
+        if w not in _ATTACH_STOP:
+            out.add(w)
+    return out
+
+
+def check_attachment(name: str, screen: dict) -> None:
+    sid = screen["id"]
+    apis = [a for a in (screen.get("apis") or []) if isinstance(a, dict) and a.get("operationId")]
+    if not apis:
+        return
+
+    def contract_of(a: dict) -> str:
+        return (OP_FACTS.get(a["operationId"]) or {}).get("contract") or a.get("contract") or ""
+
+    ctx = _attach_words(screen.get("name") or "")
+    by_contract: dict = {}
+    for a in apis:
+        by_contract.setdefault(contract_of(a), []).append(a)
+
+    def matches(a: dict) -> bool:
+        return bool((_attach_words(a["operationId"]) | _attach_words(a.get("purpose") or "")) & ctx)
+
+    anchored = {c for c, group in by_contract.items() if any(matches(a) for a in group)}
+    if anchored and len(by_contract) > 1:
+        for c, group in sorted(by_contract.items()):
+            if c in anchored or len(group) < ISLAND_MIN:
+                continue
+            ops = [a["operationId"] for a in group]
+            WARNINGS.append(
+                f"{name}: {sid} '{screen.get('name')}' declares {len(ops)} {c} operations and "
+                f"none of them is about what the screen's name says — "
+                f"{', '.join(ops[:5])}{' …' if len(ops) > 5 else ''} — attached by resemblance "
+                f"or in bulk rather than from the purpose; re-derive apis from purpose and flows")
+
+    for a in apis:
+        if (a.get("purpose") or "").strip() == a["operationId"]:
+            WARNINGS.append(f"{name}: {sid} gives {a['operationId']} its own name as its purpose "
+                            f"— nothing says what the call does on this screen")
+        cb = (OP_FACTS.get(a["operationId"]) or {}).get("consumedBy")
+        if cb is not None:
+            named = {str(x).split()[1] for x in cb if len(str(x).split()) > 1}
+            if sid not in named:
+                WARNINGS.append(f"{name}: {sid} declares {a['operationId']} and the contract's "
+                                f"x-ticvai-consumed-by does not name {sid} — the mirror disagrees")
+
+
+def check_consumed_by_mirror(screens_by_id: dict) -> None:
+    """The other half of the mirror: a consumer named in the contract that does not call the op."""
+    for oid, facts in sorted(OP_FACTS.items()):
+        for entry in (facts.get("consumedBy") or []):
+            parts = str(entry).split()
+            if len(parts) < 2:
+                continue
+            sid = parts[1]
+            sc = screens_by_id.get(sid)
+            if sc is None:
+                WARNINGS.append(f"{oid}: x-ticvai-consumed-by names {sid}, which is not a screen")
+            elif oid not in {a.get("operationId") for a in (sc.get("apis") or [])}:
+                WARNINGS.append(f"{oid}: x-ticvai-consumed-by names {sid} and {sid} does not "
+                                f"declare it — the mirror disagrees")
+
+
 def load_navigation_schema():
     """Allowed keys for `navigation` and for one `transitions[]` entry, from `_schema.yaml`.
 
@@ -356,10 +583,7 @@ def check_navigation(name: str, screen: dict, all_ids: set, kinds: set) -> None:
 
         g = t.get("guard")
         if g:
-            if PERMISSION_KEYS and g not in PERMISSION_KEYS:
-                ERRORS.append(f"{name}: {where} is guarded by {g!r}, which no role in roles.yaml "
-                              f"grants — a control nobody can ever use")
-            elif not has_denied:
+            if check_guard(name, where, g, t) and not has_denied:
                 # **The pairing that is the whole reason roles.yaml exists.** A move that can be
                 # refused needs somewhere for the refusal to land.
                 WARNINGS.append(f"{name}: {sid} has a {g!r}-gated transition and declares no "
@@ -502,6 +726,7 @@ def check(path: Path, kinds: set[str], regions: set[str], ops: set[str], all_ids
         check_navigation(name, s, all_ids, kinds)
         check_machine(name, s, all_ids)
         check_overlay_returns(name, s, all_ids)
+        check_attachment(name, s)
         sid = s["id"]
         if sid in seen:
             ERRORS.append(f"{name}: duplicate screen id {sid}")
@@ -815,8 +1040,13 @@ def check_reachability(files) -> None:
 
 def main() -> int:
     global STAFF_OPS, PERMISSION_KEYS, NAV_KEYS, TR_KEYS, TR_REQUIRED
+    global PERMISSION_ENUM, ROLE_KEY_PERMS, OP_FACTS
     STAFF_OPS = load_staff_operations()
     PERMISSION_KEYS = load_permission_keys()
+    PERMISSION_ENUM = load_permission_enum()
+    ROLE_KEY_PERMS = load_role_key_permissions()
+    OP_FACTS = load_operation_facts()
+    check_role_permissions()
     NAV_KEYS, TR_KEYS, TR_REQUIRED = load_navigation_schema()
     files = sorted(SCREENS.glob("P*.yaml"))
     if not files:
@@ -847,6 +1077,8 @@ def main() -> int:
         WARNINGS.append("contracts not found alongside — operationId checking skipped")
 
     check_reachability(files)
+    check_consumed_by_mirror({sc["id"]: sc for f in files
+                              for sc in yaml.safe_load(f.read_text(encoding="utf-8"))["screens"]})
 
     total = 0
     for f in files:

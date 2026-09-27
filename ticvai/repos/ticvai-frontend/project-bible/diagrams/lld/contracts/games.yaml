@@ -230,6 +230,7 @@ operations:
   writes:
   - cache:idempotency
   - games.redemption
+  - games.redemption_line
 - operation: setAttractionType
   verb: PUT
   path: /attraction-types

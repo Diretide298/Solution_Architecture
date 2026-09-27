@@ -140,6 +140,9 @@ paths:
               $ref: '#/components/schemas/RentalProduct'
       responses:
         '201':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Created as a draft
           content:
             application/json:
@@ -200,6 +203,9 @@ paths:
               $ref: '#/components/schemas/RentalProduct'
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Updated
           content:
             application/json:
@@ -235,6 +241,8 @@ paths:
       x-ticvai-audience:
       - staff
       x-ticvai-scope-level: venue
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       responses:
         '200':
           description: Findings
@@ -366,6 +374,9 @@ paths:
               $ref: '#/components/schemas/RentalCategory'
       responses:
         '201':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Created
           content:
             application/json:
@@ -417,6 +428,9 @@ paths:
                     $ref: '#/components/schemas/RentalLocationRule'
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Set
           content:
             application/json:
@@ -464,6 +478,9 @@ paths:
               $ref: '#/components/schemas/RentalDurationRules'
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Set
           content:
             application/json:
@@ -507,6 +524,9 @@ paths:
               $ref: '#/components/schemas/RentalOperationalRules'
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Set
           content:
             application/json:
@@ -550,6 +570,9 @@ paths:
               $ref: '#/components/schemas/RentalAgreementRules'
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Set
           content:
             application/json:
@@ -601,6 +624,9 @@ paths:
               $ref: '#/components/schemas/RentalInventoryModel'
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Set
           content:
             application/json:
@@ -765,6 +791,9 @@ paths:
               $ref: '#/components/schemas/RentalAvailabilityRules'
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Set
           content:
             application/json:
@@ -798,6 +827,9 @@ paths:
               $ref: '#/components/schemas/RentalBlackout'
       responses:
         '201':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Created
           content:
             application/json:
@@ -874,6 +906,9 @@ paths:
               $ref: '#/components/schemas/RentalPricingProfile'
       responses:
         '201':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Created
           content:
             application/json:
@@ -910,6 +945,9 @@ paths:
               $ref: '#/components/schemas/RentalPricingProfile'
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Updated
           content:
             application/json:
@@ -944,6 +982,8 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/RentalQuoteRequest'
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       responses:
         '200':
           description: The quote
@@ -979,6 +1019,8 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/RentalQuoteRequest'
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       responses:
         '200':
           description: The trace
@@ -1023,6 +1065,9 @@ paths:
               $ref: '#/components/schemas/RentalDepositPolicy'
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Set
           content:
             application/json:
@@ -1062,6 +1107,9 @@ paths:
               $ref: '#/components/schemas/RentalFeePolicy'
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Set
           content:
             application/json:
@@ -1092,6 +1140,8 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/RentalQuoteRequest'
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       responses:
         '200':
           description: The simulated price and the findings
@@ -1139,6 +1189,9 @@ paths:
               $ref: '#/components/schemas/RentalOverride'
       responses:
         '201':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Applied, or sent for approval
           content:
             application/json:
@@ -1232,6 +1285,9 @@ paths:
               $ref: '#/components/schemas/RentalBookingRequest'
       responses:
         '201':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Reserved
           content:
             application/json:
@@ -1378,6 +1434,9 @@ paths:
               $ref: '#/components/schemas/RentalAgreementSignature'
       responses:
         '201':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Signed
           content:
             application/json:
@@ -1495,6 +1554,9 @@ paths:
                     $ref: '#/components/schemas/RentalEquipmentAssignment'
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Assigned
           content:
             application/json:
@@ -1682,6 +1744,9 @@ paths:
               $ref: '#/components/schemas/RentalReturn'
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Settled
           content:
             application/json:
@@ -1728,6 +1793,9 @@ paths:
               $ref: '#/components/schemas/RentalInspection'
       responses:
         '201':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Recorded
           content:
             application/json:
@@ -1771,6 +1839,9 @@ paths:
               $ref: '#/components/schemas/RentalDamageAssessment'
       responses:
         '201':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Assessed
           content:
             application/json:
@@ -1854,6 +1925,9 @@ paths:
               $ref: '#/components/schemas/RentalIncident'
       responses:
         '201':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Reported
           content:
             application/json:
@@ -1914,6 +1988,9 @@ paths:
               $ref: '#/components/schemas/RentalAgreementDetail'
       responses:
         '201':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Raise a rental agreement
           content:
             application/json:

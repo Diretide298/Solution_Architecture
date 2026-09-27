@@ -13,7 +13,6 @@ initial:
 - active
 terminal:
 - revoked
-- failed
 transitions:
 - from: active
   to: revoked

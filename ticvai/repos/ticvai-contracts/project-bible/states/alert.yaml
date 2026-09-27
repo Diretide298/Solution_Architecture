@@ -1,12 +1,11 @@
 # Operational alert — state model
-# Contract: reporting.Alert.status
+# Contract: reporting.AlertStatus
 
 entity: Operational alert
 contract: reporting
-enum: Alert.status
-enumKind: inline
-enumSchema: Alert
-enumProperty: status
+enum: AlertStatus
+enumKind: named
+enumSchema: AlertStatus
 owner: reporting
 initial:
 - raised

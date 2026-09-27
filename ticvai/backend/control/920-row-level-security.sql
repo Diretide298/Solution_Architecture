@@ -45,15 +45,28 @@ $$;
 -- Applies the standard policy to a table.
 -- **FORCE is the whole point.** Without it the table owner — which is what a migration and most
 -- pooled application connections run as — bypasses every policy silently.
+--
+-- **The policy is named `<table>_scope`** (naming-and-style 6.1). Until 26 September every table's
+-- policy was called `scope_isolation` or `venue_isolation`; those names are dropped here too, so
+-- re-applying the file to a database built before the rename leaves one policy, not two.
+CREATE OR REPLACE FUNCTION platform.rls_policy_name(target regclass)
+    RETURNS text
+    LANGUAGE sql
+    STABLE
+AS $$
+    SELECT left(c.relname, 57) || '_scope' FROM pg_class c WHERE c.oid = target;
+$$;
+
 CREATE OR REPLACE FUNCTION platform.apply_scope_rls(target regclass)
     RETURNS void
     LANGUAGE plpgsql
 AS $$
 DECLARE
-    policy_name text := 'scope_isolation';
+    policy_name text := platform.rls_policy_name(target);
 BEGIN
     EXECUTE format('ALTER TABLE %s ENABLE ROW LEVEL SECURITY', target);
     EXECUTE format('ALTER TABLE %s FORCE ROW LEVEL SECURITY', target);
+    EXECUTE format('DROP POLICY IF EXISTS scope_isolation ON %s', target);
     EXECUTE format('DROP POLICY IF EXISTS %I ON %s', policy_name, target);
     EXECUTE format(
         'CREATE POLICY %I ON %s USING (platform.in_scope(scope_path)) '
@@ -62,10 +75,31 @@ END
 $$;
 
 
--- **7 tables carry `scope_path` and 1 carry `venue_id` instead, out of 49.**
--- Both are protected. A table with neither is not scoped -- it is reference data, a
--- registry, or the migration log itself, and a policy on it would deny every row to
--- everybody.
+
+-- A child table protected through the declared foreign key to the row that owns it. The row is
+-- visible, and may be written, exactly when its parent is visible to the same connection.
+CREATE OR REPLACE FUNCTION platform.apply_parent_rls(target regclass, fk_column text,
+                                                     parent regclass, parent_key text)
+    RETURNS void
+    LANGUAGE plpgsql
+AS $$
+DECLARE
+    policy_name text := platform.rls_policy_name(target);
+    predicate text := format('EXISTS (SELECT 1 FROM %s parent_row WHERE parent_row.%I = %s.%I)',
+                             parent, parent_key, target, fk_column);
+BEGIN
+    EXECUTE format('ALTER TABLE %s ENABLE ROW LEVEL SECURITY', target);
+    EXECUTE format('ALTER TABLE %s FORCE ROW LEVEL SECURITY', target);
+    EXECUTE format('DROP POLICY IF EXISTS %I ON %s', policy_name, target);
+    EXECUTE format('CREATE POLICY %I ON %s USING (%s) WITH CHECK (%s)',
+                   policy_name, target, predicate, predicate);
+END
+$$;
+
+-- **52 tables: 7 scoped by `scope_path`, 0 by `venue_id`, 3 through the parent that owns them, 41 with no policy.**
+-- A table with no policy is listed at the end of this file with the reason. It is not
+-- claimed to be reference data: for most of them that is a scoping decision nobody has
+-- made yet, and they stay readable by every connection to this database until it is.
 
 
 -- Scoped by path.
@@ -79,3 +113,52 @@ SELECT platform.apply_scope_rls('control.url_redirect'::regclass);
 
 -- Carries venue_id but not scoped here: the control database has no scope tree to resolve a venue against, and these are operator records read across tenants.
 --   control.usage_record
+
+-- Scoped through the parent that owns the row (a NOT NULL declared foreign key).
+SELECT platform.apply_parent_rls('control.footer_config_column'::regclass, 'footer_config_id', 'control.footer_config'::regclass, 'id');
+SELECT platform.apply_parent_rls('control.footer_config_social_link'::regclass, 'footer_config_id', 'control.footer_config'::regclass, 'id');
+SELECT platform.apply_parent_rls('control.migration_plan_cell'::regclass, 'migration_plan_id', 'control.migration_plan'::regclass, 'id');
+
+-- No policy. Each needs a scoping decision (carry scope_path or venue_id, or a
+-- NOT NULL owning reference) before row-level security can hold for it.
+--   control.api_client  -- no scope column and no declared owner
+--   control.api_licence  -- its owner control.tenant has no policy either
+--   control.api_limit  -- no scope column and no declared owner
+--   control.api_version  -- no scope column and no declared owner
+--   control.archival_job  -- no scope column and no declared owner
+--   control.backup_run  -- no scope column and no declared owner
+--   control.burst_environment  -- no scope column and no declared owner
+--   control.cell  -- no scope column and no declared owner
+--   control.cell_cluster  -- no scope column and no declared owner
+--   control.cell_instance  -- no scope column and no declared owner
+--   control.cell_job  -- its owner control.cell has no policy either
+--   control.cell_tenant  -- no scope column and no declared owner
+--   control.developer_account  -- no scope column and no declared owner
+--   control.environment  -- its owner control.cell has no policy either
+--   control.integration_listing  -- no scope column and no declared owner
+--   control.invoice  -- no scope column and no declared owner
+--   control.invoice_line  -- its owner control.invoice has no policy either
+--   control.licence_add_on  -- no scope column and no declared owner
+--   control.licence_add_on_limit  -- its owner control.licence_add_on has no policy either
+--   control.migration  -- its owner control.release has no policy either
+--   control.migration_run  -- only nullable references (canary_cell_id -> control.cell)
+--   control.migration_run_cell  -- its owner control.migration_run has no policy either
+--   control.migration_run_tenant  -- its owner control.migration_run has no policy either
+--   control.onboarding_application  -- only nullable references (venue_type_template_id -> control.venue_type_template)
+--   control.partner_agreement  -- no scope column and no declared owner
+--   control.partner_user  -- no scope column and no declared owner
+--   control.release  -- no scope column and no declared owner
+--   control.release_component  -- its owner control.release has no policy either
+--   control.rollout  -- its owner control.release has no policy either
+--   control.rollout_cell  -- its owner control.cell has no policy either
+--   control.rollout_tenant  -- no scope column and no declared owner
+--   control.sandbox  -- no scope column and no declared owner
+--   control.scaling_policy  -- no scope column and no declared owner
+--   control.tenant  -- no scope column and no declared owner
+--   control.tenant_migration  -- its owners control.tenant, control.tenant_migration_plan have no policy either
+--   control.tenant_migration_plan  -- its owner control.tenant has no policy either
+--   control.upgrade_schedule  -- no scope column and no declared owner
+--   control.venue_type_template  -- no scope column and no declared owner
+--   control.waf_rule  -- no scope column and no declared owner
+--   control.webhook_delivery  -- no scope column and no declared owner
+--   control.webhook_subscription  -- no scope column and no declared owner

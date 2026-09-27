@@ -19,8 +19,8 @@ info:
   - C50
   x-ticvai-platforms:
   - P08 Venue Management
-  description: "## What this contract covers\n**The append-only record of everything. Corrections are\
-    \ entries, never edits.**\n| | | |---|---| | **Tier** | spine | | **Matrix domain** | 5 — F&B & Guest\
+  description: "## What this contract covers\n**The append-only record of every posting. Corrections are\
+    \ entries, never edits.**\n| | | |---|---|| **Tier** | spine | | **Matrix domain** | 5 — F&B & Guest\
     \ Management (accounting and revenue recognition) | | **Requirements** | ~327 | | **Capabilities**\
     \ | C41, C42, C43, C44, C45, C46, C47, C48, C49, C50 | | **Consumed by** | P08 Venue Management |\n\
     ## How to read this file\n**This file is a contract.** It is hand-authored and it is the source of\
@@ -48,8 +48,17 @@ info:
     \ means \"this scheme, no scopes\" — for bearer tokens there is nothing to list. Empty is not the\
     \ same as absent: absent means unauthenticated.\n\n## This context\nChart of accounts, tax, revenue\
     \ recognition, journals, settlement and financial reporting. Settled by the 12 August finance deep-dive.\n\
-    Positions this encodes:\n- **The ledger is append-only.** Nothing is deleted or edited; corrections\
-    \ are new\n  entries. Every endpoint here obeys that, and the absence of DELETE is deliberate.\n-\
+    Positions this encodes:\n- **Journal entries and postings are append-only.** A posted entry is never\
+    \ edited or deleted; corrections are new\n  entries (reversals), and the absence of DELETE is deliberate.\n\
+    - **Configuration and status rows are not append-only, and say so.** Accounts, account mappings,\
+    \ tax\n  codes, deposits, obligations, settlement exceptions and fiscal periods change in place:\
+    \ a rename,\n  a replaced mapping set, a status moving along its state model. A tax or FX rate change\
+    \ is the\n  exception: it closes the row in force and adds a new one, so history keeps the rate it\
+    \ posted at.\n  Where a change carries a reason (reject, reverse, abandon, reopen), the reason is\
+    \ stored with it.\n- **Dates are the region's calendar.** A `format: date` field or parameter (a period\
+    \ boundary,\n  a report range, an effective date) is a day in the region's time zone\n  (`platform.region_settings.time_zone`;\
+    \ a venue inherits its region's zone and cannot override it),\n  running from local midnight to\
+    \ local midnight. Instants stay `date-time` in UTC (naming-and-style 5.2).\n-\
     \ **Dual ledger.** Transaction-level entries for reconciliation, journal entries for\n  trial balance,\
     \ P&L and balance sheet.\n- **Tax is computed per line item, not on the basket total**, with compound\
     \ tax support\n  and per-country structures.\n- **Multi-venue passes recognise on redemption**, not\
@@ -132,12 +141,15 @@ paths:
                   type: string
       responses:
         '201':
-          description: Written off
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: Written off. **The journal entry the write-off posted**, with `source` `writeOff`
+            and its lines — a write-off is a posting, so it is read back as one.
           content:
             application/json:
               schema:
-                type: object
-                additionalProperties: true
+                $ref: '#/components/schemas/JournalEntry'
   /recognition-schedules/validate:
     post:
       operationId: validateRecognitionSchedules
@@ -159,6 +171,8 @@ paths:
       x-ticvai-scope-level: tenant
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       responses:
         '200':
           description: Overlaps
@@ -175,7 +189,7 @@ paths:
                       type: object
                       properties:
                         productKind:
-                          type: string
+                          $ref: ../spine/catalogue.yaml#/components/schemas/ProductKind
                         scheduleIds:
                           type: array
                           items:
@@ -243,7 +257,7 @@ paths:
                   nullable: true
                 orderId:
                   type: string
-                  format: uuid
+                  pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
                   nullable: true
                 bookingId:
                   type: string
@@ -255,6 +269,9 @@ paths:
                   nullable: true
       responses:
         '201':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Recorded as a liability
           content:
             application/json:
@@ -273,12 +290,18 @@ paths:
       x-ticvai-consumed-by:
         - "P08 BO-024 Payment Exceptions"
       summary: Convert to revenue, return it, or forfeit it
-      description: 'Three outcomes and **none of them is a refund**. Converting recognises revenue against
+      description: 'Four outcomes and **none of them is a refund**. Converting recognises revenue against
         the completed sale; returning discharges the liability; forfeiting recognises it as income under
-        the cancellation terms.
+        the cancellation terms; a partial forfeit keeps part as income and returns the rest.
 
-        **Booking any of the three as a refund misstates both the liability and the revenue**, which is
+        **Booking any of them as a refund misstates both the liability and the revenue**, which is
         why this is its own operation rather than a flag on `createRefund`.
+
+        **Only a `held` deposit settles**, once. `forfeit` and `partialForfeit` are permitted only after
+        `refundableUntil` (the deposit''s cancellation term); a deposit with no date is refundable
+        indefinitely and cannot be forfeited. `amount` is required for `partialForfeit` and is the part
+        kept as income, above zero and below the deposit, in the deposit''s currency; the other outcomes
+        settle the whole deposit and ignore it.
 
         '
       tags:
@@ -309,17 +332,47 @@ paths:
                   - forfeit
                   - partialForfeit
                 amount:
-                  $ref: ../shared/common.yaml#/components/schemas/Money
+                  allOf:
+                  - $ref: ../shared/common.yaml#/components/schemas/Money
+                  description: The part kept as income. Required for `partialForfeit`, ignored otherwise.
                 reason:
                   type: string
                   nullable: true
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Settled
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Deposit'
+        '400':
+          description: '`partialForfeit` without an `amount`, or with one that is not above zero and below
+            the deposit, or in another currency. `errors[]` names the field.
+
+            '
+          x-ticvai-problem-types:
+          - validation
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
+        '404':
+          $ref: ../shared/common.yaml#/components/responses/NotFound
+        '409':
+          description: 'The deposit is not `held` (it has already been settled), or a forfeit was asked
+            for while the deposit is still refundable.
+
+            '
+          x-ticvai-problem-types:
+          - deposit-not-held
+          - deposit-still-refundable
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
   /reconciliation/unified:
     get:
       operationId: getUnifiedReconciliation
@@ -354,12 +407,14 @@ paths:
         schema:
           type: string
           format: date
+          description: A day in the region's time zone, local midnight to local midnight.
       - name: to
         in: query
         required: true
         schema:
           type: string
           format: date
+          description: A day in the region's time zone, local midnight to local midnight.
       responses:
         '200':
           description: Sources with variances
@@ -420,11 +475,22 @@ paths:
                   maxLength: 300
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Settled, and the journal posted
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/InterEntityObligation'
+        '409':
+          description: The obligation is already `settled`. An `outstanding` or `disputed` one settles.
+          x-ticvai-problem-types:
+          - obligation-settled
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
   /inter-entity-obligations/{obligationId}/dispute:
     parameters:
     - name: obligationId
@@ -475,11 +541,24 @@ paths:
                   maxLength: 500
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Disputed
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/InterEntityObligation'
+        '409':
+          description: Only an `outstanding` obligation is disputed. It is already `disputed`, or it is
+            `settled`.
+          x-ticvai-problem-types:
+          - obligation-already-disputed
+          - obligation-settled
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
   /inter-entity-obligations/{obligationId}/resolve:
     parameters:
     - name: obligationId
@@ -521,11 +600,22 @@ paths:
                   maxLength: 500
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Resolved
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/InterEntityObligation'
+        '409':
+          description: The obligation is not `disputed`, so there is nothing to resolve.
+          x-ticvai-problem-types:
+          - obligation-not-disputed
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
   /accounts:
     get:
       operationId: listAccounts
@@ -602,6 +692,9 @@ paths:
               $ref: '#/components/schemas/CreateAccountRequest'
       responses:
         '201':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Created
           content:
             application/json:
@@ -611,6 +704,8 @@ paths:
           $ref: ../shared/common.yaml#/components/responses/BadRequest
         '409':
           description: Code already in use within this legal entity
+          x-ticvai-problem-types:
+          - account-code-in-use
           content:
             application/problem+json:
               schema:
@@ -653,8 +748,12 @@ paths:
       x-ticvai-audience:
       - staff
       summary: Rename, remap or deactivate an account
-      description: 'The code is immutable once entries exist. Deactivation prevents new postings and leaves
-        history intact.
+      description: 'The code is immutable once entries exist; until then it can be corrected here. Remapping
+        is `externalCode`, the code in the client''s own ERP chart. Deactivation prevents new postings and
+        leaves history intact.
+
+        **Changed in place.** An account is configuration, not a posting, so this edits the row rather
+        than adding one. The postings made to it are untouched.
 
         '
       tags:
@@ -673,6 +772,11 @@ paths:
               type: object
               minProperties: 1
               properties:
+                code:
+                  type: string
+                  maxLength: 64
+                  pattern: ^[A-Za-z0-9._-]+$
+                  description: Accepted only while the account has no entries.
                 name:
                   type: string
                   maxLength: 200
@@ -681,15 +785,38 @@ paths:
                   maxLength: 64
                 isActive:
                   type: boolean
+                isSuspense:
+                  type: boolean
+                subType:
+                  type: string
+                  nullable: true
+                tags:
+                  type: array
+                  items:
+                    type: string
+                notes:
+                  type: string
+                  nullable: true
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Updated
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Account'
+        '404':
+          $ref: ../shared/common.yaml#/components/responses/NotFound
         '409':
-          description: Attempt to change an immutable field after entries exist
+          description: '`code` sent for an account that already has entries, or a new code already in use
+            within the legal entity.
+
+            '
+          x-ticvai-problem-types:
+          - account-code-immutable
+          - account-code-in-use
           content:
             application/problem+json:
               schema:
@@ -722,9 +849,14 @@ paths:
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/AccountMapping'
+                allOf:
+                  - $ref: '../shared/common.yaml#/components/schemas/Page'
+                  - type: object
+                    properties:
+                      items:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/AccountMapping'
     put:
       operationId: setAccountMappings
       x-ticvai-consumed-by:
@@ -733,6 +865,11 @@ paths:
       - staff
       x-ticvai-config-scope: region
       summary: Set posting mappings
+      description: '**Replaces the region''s mapping set in place.** Mappings are configuration, not
+        postings: a posting already made keeps the accounts it was booked to, and the new set applies
+        to postings from now on.
+
+        '
       tags:
       - accounts
       x-ticvai-permission: ACCOUNT_CONFIGURE
@@ -756,6 +893,9 @@ paths:
                     $ref: '#/components/schemas/AccountMapping'
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Applied
           content:
             application/json:
@@ -765,6 +905,9 @@ paths:
                   $ref: '#/components/schemas/AccountMapping'
         '400':
           description: A required event type has no mapping, or maps to a non-postable account
+          x-ticvai-problem-types:
+          - posting-event-unmapped
+          - account-not-postable
           content:
             application/problem+json:
               schema:
@@ -840,6 +983,9 @@ paths:
                   format: uuid
       responses:
         '201':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Created
           content:
             application/json:
@@ -910,6 +1056,9 @@ paths:
               $ref: '#/components/schemas/CreateTaxCodeRequest'
       responses:
         '201':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Created
           content:
             application/json:
@@ -917,6 +1066,9 @@ paths:
                 $ref: '#/components/schemas/TaxCode'
         '400':
           description: Compound reference is circular or crosses countries
+          x-ticvai-problem-types:
+          - tax-compound-circular
+          - tax-compound-cross-country
           content:
             application/problem+json:
               schema:
@@ -938,6 +1090,16 @@ paths:
       summary: Amend a tax code
       description: 'Rate changes are versioned with an effective date, never applied retrospectively.
         Historic entries keep the rate that was in force when they were posted.
+
+        **How a rate change is versioned.** A body carrying `rate` must carry `effectiveFrom`, a day later
+        than today in the region''s time zone. The row addressed is closed from that day (its `effectiveTo`
+        is set so the two windows meet without overlapping) and **a new row is inserted** with a new `id`,
+        the same `code` and the new `rate`, in force from `effectiveFrom`; `compoundOnTaxCodeId`,
+        `isInclusive`, `accountId` and `appliesTo` carry over. **The 200 returns the new row.** This is
+        the same rule `setFxRate` follows: the old rate is never rewritten.
+
+        `name` and `isActive` alone are not a rate change: they edit the addressed row in place and the
+        200 returns it. Only the row in force (no `effectiveTo`) takes a rate change.
 
         '
       tags:
@@ -966,15 +1128,45 @@ paths:
                 effectiveFrom:
                   type: string
                   format: date
+                  description: Required with `rate`, and only meaningful with it. A day in the region's
+                    time zone, later than today.
                 isActive:
                   type: boolean
       responses:
         '200':
-          description: Updated
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: Updated. After a rate change, the new row; otherwise the row addressed.
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/TaxCode'
+        '400':
+          description: '`rate` without `effectiveFrom`, or `effectiveFrom` without `rate`. `errors[]` names
+            the field.
+
+            '
+          x-ticvai-problem-types:
+          - validation
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
+        '404':
+          $ref: ../shared/common.yaml#/components/responses/NotFound
+        '409':
+          description: 'A rate change whose `effectiveFrom` is today or earlier, which would reprice postings
+            already made; or a rate change addressed to a row that is no longer in force.
+
+            '
+          x-ticvai-problem-types:
+          - tax-rate-retrospective
+          - tax-code-superseded
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
   /tax-exemptions:
     get:
       operationId: listTaxExemptions
@@ -1000,16 +1192,21 @@ paths:
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/TaxExemption'
+                allOf:
+                  - $ref: '../shared/common.yaml#/components/schemas/Page'
+                  - type: object
+                    properties:
+                      items:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/TaxExemption'
     post:
       operationId: createTaxExemption
       x-ticvai-consumed-by:
         - "P08 BO-075 Account Mapping"
       x-ticvai-audience:
       - staff
-      summary: DelegatedAccess a tax exemption
+      summary: Grant a tax exemption
       tags:
       - tax
       x-ticvai-permission: TAX_CONFIGURE
@@ -1026,6 +1223,9 @@ paths:
               $ref: '#/components/schemas/TaxExemption'
       responses:
         '201':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Created
           content:
             application/json:
@@ -1123,11 +1323,29 @@ paths:
               $ref: '#/components/schemas/RecognitionSchedule'
       responses:
         '201':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Created
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/RecognitionSchedule'
+        '400':
+          $ref: ../shared/common.yaml#/components/responses/BadRequest
+        '409':
+          description: 'An active schedule at the same `priority` already claims one of these product kinds.
+            **Refused at save rather than resolved at run time**, because two equal claims are a silent
+            double-recognition. `validateRecognitionSchedules` lists every overlap with the schedules
+            involved.
+
+            '
+          x-ticvai-problem-types:
+          - recognition-priority-clash
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
   /deferred-revenue:
     get:
       operationId: getDeferredRevenue
@@ -1139,6 +1357,11 @@ paths:
       summary: Deferred revenue balance and ageing
       description: 'What has been paid for but not yet earned — unredeemed passes, gift cards, annual
         passes mid-term. Aged by expected recognition date so the finance team can see when it will unwind.
+
+        **One total per currency, never a sum across them.** Without `venueId` the report covers every
+        venue the caller can see, and venues can trade in different currencies; adding dirhams to rials
+        is not a balance. `totals` carries one `Money` per currency and each bucket is one ageing band in
+        one currency. `total` is filled only when everything in scope is in a single currency.
 
         '
       tags:
@@ -1153,8 +1376,10 @@ paths:
         schema:
           type: string
           format: date
+          description: A day in the region's time zone, local midnight to local midnight.
       - name: venueId
         in: query
+        description: One venue. Omitted means every venue in the caller's scope, totalled per currency.
         schema:
           type: string
           format: uuid
@@ -1177,7 +1402,9 @@ paths:
         the last run, straight-line accruals due, and breakage on entitlements that expired unredeemed.
 
         Idempotent per period. Running twice for the same period is a no-op, which matters because it
-        will be scheduled and schedules misfire.
+        will be scheduled and schedules misfire. **A second run finds nothing left to move**: it returns
+        200 with `entryCount` 0, zero totals and no `journalEntryIds`, not the first run''s figures and
+        not an error.
 
         '
       tags:
@@ -1206,6 +1433,9 @@ paths:
                   description: Compute and return without posting.
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Run complete
           content:
             application/json:
@@ -1213,6 +1443,9 @@ paths:
                 $ref: '#/components/schemas/RecognitionRunResult'
         '409':
           description: Period already closed, or a run is in progress
+          x-ticvai-problem-types:
+          - fiscal-period-closed
+          - recognition-run-in-progress
           content:
             application/problem+json:
               schema:
@@ -1292,6 +1525,9 @@ paths:
               $ref: '#/components/schemas/CreateJournalEntryRequest'
       responses:
         '201':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Created in draft, awaiting approval
           content:
             application/json:
@@ -1299,12 +1535,18 @@ paths:
                 $ref: '#/components/schemas/JournalEntry'
         '400':
           description: Lines do not balance, or an account is not postable
+          x-ticvai-problem-types:
+          - journal-unbalanced
+          - account-not-postable
           content:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
         '409':
-          description: Fiscal period is closed
+          description: The fiscal period is not `open`. Postings stop once a close begins, so a `closing`
+            period refuses them as a `closed` one does.
+          x-ticvai-problem-types:
+          - fiscal-period-not-open
           content:
             application/problem+json:
               schema:
@@ -1378,6 +1620,9 @@ paths:
                   maxLength: 500
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Approved and posted
           content:
             application/json:
@@ -1385,6 +1630,24 @@ paths:
                 $ref: '#/components/schemas/JournalEntry'
         '403':
           description: Approver is the poster, or lacks LEDGER_APPROVE
+          x-ticvai-problem-types:
+          - approver-is-preparer
+          - forbidden
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
+        '404':
+          $ref: ../shared/common.yaml#/components/responses/NotFound
+        '409':
+          description: 'The entry is not awaiting approval (it is `posted` or `reversed` already; only a `draft`
+            or `pendingApproval` entry is approved), or its fiscal period has stopped taking postings since
+            it was created.
+
+            '
+          x-ticvai-problem-types:
+          - journal-not-approvable
+          - fiscal-period-not-open
           content:
             application/problem+json:
               schema:
@@ -1399,6 +1662,7 @@ paths:
       required: true
       schema:
         type: string
+        pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
     post:
       operationId: rejectJournal
       x-ticvai-consumed-by:
@@ -1408,6 +1672,10 @@ paths:
       summary: Reject a journal awaiting approval
       description: 'Returns it to draft with comments. Approval existed and rejection did not, which left
         a preparer whose entry could be approved and never refused.
+
+        Only a `pendingApproval` entry is rejected. `reason` is the comment the preparer reads; it is
+        kept on the entry as `rejectionReason`, with who rejected it and when, until the entry is
+        approved.
 
         '
       tags:
@@ -1431,9 +1699,20 @@ paths:
                   type: string
       responses:
         '200':
-          description: Done
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: Rejected. The entry, back in `draft` and carrying the rejection.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/JournalEntry'
+        '404':
+          $ref: ../shared/common.yaml#/components/responses/NotFound
         '409':
-          description: Not in a state that permits this
+          description: The entry is not `pendingApproval`.
+          x-ticvai-problem-types:
+          - journal-not-pending-approval
           content:
             application/problem+json:
               schema:
@@ -1456,6 +1735,9 @@ paths:
       description: 'Creates a mirror-image entry referencing the original. **The original is never modified**
         — this is the only correction mechanism an append-only ledger offers, and it is the reason there
         is no DELETE anywhere in this contract.
+
+        Only a `posted` entry is reversed, once. `reason` is kept on the reversal as `reversalReason`.
+        A `draft` or `pendingApproval` entry has not reached the ledger and is rejected, not reversed.
 
         '
       tags:
@@ -1485,13 +1767,25 @@ paths:
                   description: Period to post the reversal into. Defaults to the current open period.
       responses:
         '201':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Reversal posted
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/JournalEntry'
+        '404':
+          $ref: ../shared/common.yaml#/components/responses/NotFound
         '409':
-          description: Already reversed, or the target period is closed
+          description: 'Already reversed, not yet posted, or the target period is not `open`. Three causes,
+            three types.
+
+            '
+          x-ticvai-problem-types:
+          - journal-already-reversed
+          - journal-not-posted
+          - fiscal-period-not-open
           content:
             application/problem+json:
               schema:
@@ -1547,9 +1841,14 @@ paths:
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/FxRate'
+                allOf:
+                  - $ref: '../shared/common.yaml#/components/schemas/Page'
+                  - type: object
+                    properties:
+                      items:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/FxRate'
     put:
       operationId: setFxRate
       x-ticvai-consumed-by:
@@ -1562,11 +1861,20 @@ paths:
         would mean two guests paying different dirham amounts for the same product minutes apart, and
         a cashier unable to explain either.
 
-        A rate change is a new row with its own effective window; the old one is never edited. A transaction
-        posted last Tuesday must still reconcile at last Tuesday''s rate.
+        A rate change is a new row with its own effective window; the old one''s rate is never edited. A
+        transaction posted last Tuesday must still reconcile at last Tuesday''s rate.
 
         **Tender rates carry a spread.** The rate a venue accepts dollars at is not the interbank rate,
         and pretending otherwise makes every foreign-tender sale look like a small loss.
+
+        **A new rate supersedes the one in force.** Where the rate in force for the same pair and purpose
+        is open-ended (no `effectiveTo`) and started before the new `effectiveFrom`, that row is closed at
+        the new `effectiveFrom`, which is the only change ever made to an existing row; its rate is not
+        touched. A new window that overlaps a bounded window, or starts at or before the start of the rate
+        in force, is refused. Without this an open-ended rate would block every later rate.
+
+        The server sets `source` to `manual` and `setByPrincipalId` to the caller; `fetchedAt` and
+        `providerReference` belong to `ingestFxRates` and are ignored here.
 
         '
       tags:
@@ -1585,13 +1893,19 @@ paths:
               $ref: '#/components/schemas/FxRate'
       responses:
         '201':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Set
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/FxRate'
         '409':
-          description: Effective window overlaps an existing rate for the same pair and purpose
+          description: Effective window overlaps an existing bounded rate for the same pair and purpose, or
+            does not start after the rate in force
+          x-ticvai-problem-types:
+          - fx-rate-window-overlap
           content:
             application/problem+json:
               schema:
@@ -1622,16 +1936,19 @@ paths:
         in: query
         schema:
           type: string
+          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
       - name: from
         in: query
         schema:
           type: string
           format: date
+          description: A day in the region's time zone, local midnight to local midnight.
       - name: to
         in: query
         schema:
           type: string
           format: date
+          description: A day in the region's time zone, local midnight to local midnight.
       responses:
         '200':
           description: Foreign tender
@@ -1726,8 +2043,8 @@ paths:
       x-ticvai-scope-level: region
       x-ticvai-singleton: true
       x-ticvai-singleton-note: 'ADR-0031. **With three replicas, three instances wake up.** A Postgres
-        advisory lock rather  than Redis: the work is transactional against the same database, so the
-        lock belongs there.  **A Redis lock that expires mid-transaction leaves two writers and no error.**
+        advisory lock rather than Redis: the work is transactional against the same database, so the
+        lock belongs there. **A Redis lock that expires mid-transaction leaves two writers and no error.**
 
         '
       x-ticvai-offline-capable: false
@@ -1751,13 +2068,21 @@ paths:
                   default: true
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Revaluation result
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/FxRevaluationResult'
         '409':
-          description: Period is not closing, or is already closed
+          description: 'The period is not `closing`: still `open`, or already `closed`. Revaluation runs only
+            inside a close.
+
+            '
+          x-ticvai-problem-types:
+          - fiscal-period-not-closing
           content:
             application/problem+json:
               schema:
@@ -1807,11 +2132,13 @@ paths:
         schema:
           type: string
           format: date
+          description: A day in the region's time zone, local midnight to local midnight.
       - name: postedTo
         in: query
         schema:
           type: string
           format: date
+          description: A day in the region's time zone, local midnight to local midnight.
       - $ref: ../shared/common.yaml#/components/parameters/PageSize
       - $ref: ../shared/common.yaml#/components/parameters/PageCursor
       responses:
@@ -1905,11 +2232,13 @@ paths:
         schema:
           type: string
           format: date
+          description: A day in the region's time zone, local midnight to local midnight.
       - name: occurredTo
         in: query
         schema:
           type: string
           format: date
+          description: A day in the region's time zone, local midnight to local midnight.
       - $ref: ../shared/common.yaml#/components/parameters/PageSize
       - $ref: ../shared/common.yaml#/components/parameters/PageCursor
       responses:
@@ -1971,11 +2300,27 @@ paths:
                   maxLength: 1000
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Reviewed
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/PriceVariance'
+        '404':
+          $ref: ../shared/common.yaml#/components/responses/NotFound
+        '409':
+          description: 'The variance is not awaiting review: its `reviewStatus` is `notRequired` (below the
+            venue''s threshold) or already `reviewed`.
+
+            '
+          x-ticvai-problem-types:
+          - variance-not-pending-review
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
   /settlements:
     get:
       operationId: listSettlements
@@ -2062,12 +2407,20 @@ paths:
                 periodStart:
                   type: string
                   format: date
+                  description: A day in the region's time zone, local midnight to local midnight.
                 periodEnd:
                   type: string
                   format: date
+                  description: A day in the region's time zone, local midnight to local midnight.
                 fileReference:
                   type: string
-                  description: Object storage reference. The file itself is not posted through this API.
+                  format: uuid
+                  description: '**The `id` of the `MediaAsset` holding the file**, uploaded first through
+                    `assets.createUpload` then `assets.completeUpload` (direct to object storage through a
+                    signed URL). The file itself is not posted through this API. That upload route is staff-only
+                    and needs `ASSET_LIBRARY_MANAGE`; a partner caller has no upload route yet.
+
+                    '
                 format:
                   type: string
                   enum:
@@ -2077,11 +2430,25 @@ paths:
                   - json
       responses:
         '202':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Accepted; parsing and matching proceed asynchronously
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Settlement'
+        '400':
+          description: '`fileReference` names no completed upload in the caller''s scope. `errors[]` names
+            the field.
+
+            '
+          x-ticvai-problem-types:
+          - validation
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
   /settlements/{settlementId}:
     parameters:
     - name: settlementId
@@ -2139,6 +2506,9 @@ paths:
       description: 'What auto-resolution could not classify. This is the only part of settlement a human
         should ever see — everything else matched.
 
+        **An unknown or out-of-scope `settlementId` is 404, not an empty page**: the path addresses the
+        settlement. An empty page means a settlement that exists and has no exceptions.
+
         '
       tags:
       - settlement
@@ -2163,6 +2533,8 @@ paths:
                       type: array
                       items:
                         $ref: '#/components/schemas/SettlementException'
+        '404':
+          $ref: ../shared/common.yaml#/components/responses/NotFound
     post:
       operationId: resolveSettlementException
       x-ticvai-consumed-by:
@@ -2174,6 +2546,11 @@ paths:
       - staff
       - partner
       summary: Resolve a settlement exception
+      description: 'Resolves one open exception of this settlement. The `resolution`, the `note`, who resolved
+        it and when are kept on the exception. `matchedPaymentId` is required when the resolution is
+        `matchedManually`.
+
+        '
       tags:
       - settlement
       x-ticvai-permission: SETTLEMENT_RECONCILE
@@ -2195,27 +2572,56 @@ paths:
               properties:
                 exceptionId:
                   type: string
+                  format: uuid
                 resolution:
-                  type: string
-                  enum:
-                  - matchedManually
-                  - writeOff
-                  - disputeRaised
-                  - providerError
-                  - timingDifference
+                  $ref: '#/components/schemas/SettlementResolution'
                 matchedPaymentId:
                   type: string
+                  pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
                 note:
                   type: string
                   minLength: 3
                   maxLength: 1000
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Resolved
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/SettlementException'
+        '400':
+          description: '`matchedManually` without a `matchedPaymentId`, or one that names no payment.
+            `errors[]` names the field.
+
+            '
+          x-ticvai-problem-types:
+          - validation
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
+        '404':
+          description: 'The settlement, or an exception with this `exceptionId` under it, does not exist or
+            is outside the caller''s scope.
+
+            '
+          x-ticvai-problem-types:
+          - not-found
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
+        '409':
+          description: The exception is already resolved.
+          x-ticvai-problem-types:
+          - settlement-exception-resolved
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
   /legal-entities:
     get:
       operationId: listLegalEntities
@@ -2244,9 +2650,14 @@ paths:
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/LegalEntity'
+                allOf:
+                  - $ref: '../shared/common.yaml#/components/schemas/Page'
+                  - type: object
+                    properties:
+                      items:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/LegalEntity'
     post:
       operationId: createLegalEntity
       x-ticvai-consumed-by:
@@ -2272,6 +2683,9 @@ paths:
               $ref: '#/components/schemas/LegalEntity'
       responses:
         '201':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Created
           content:
             application/json:
@@ -2311,9 +2725,14 @@ paths:
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/FiscalPeriod'
+                allOf:
+                  - $ref: '../shared/common.yaml#/components/schemas/Page'
+                  - type: object
+                    properties:
+                      items:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/FiscalPeriod'
   /fiscal-periods/{periodId}/begin-close:
     parameters:
     - name: periodId
@@ -2321,6 +2740,7 @@ paths:
       required: true
       schema:
         type: string
+        format: uuid
     post:
       operationId: beginPeriodClose
       x-ticvai-consumed-by:
@@ -2330,6 +2750,8 @@ paths:
       summary: Begin closing a period
       description: '**Postings to the period stop here**, before reconciliation starts. Without this step
         the balance moves while it is being counted, and the two never agree.
+
+        Moves an `open` period to `closing`, and records the step (who, when) in the period''s `events`.
 
         '
       tags:
@@ -2342,9 +2764,20 @@ paths:
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       responses:
         '200':
-          description: Done
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: Closing. The period, now `closing`.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FiscalPeriod'
+        '404':
+          $ref: ../shared/common.yaml#/components/responses/NotFound
         '409':
-          description: Not in a state that permits this
+          description: The period is not `open`.
+          x-ticvai-problem-types:
+          - fiscal-period-not-open
           content:
             application/problem+json:
               schema:
@@ -2356,6 +2789,7 @@ paths:
       required: true
       schema:
         type: string
+        format: uuid
     post:
       operationId: abandonPeriodClose
       x-ticvai-consumed-by:
@@ -2364,6 +2798,9 @@ paths:
       - staff
       summary: Abandon a close in progress
       description: 'An exception was found that needs the period open again. Postings resume.
+
+        Moves a `closing` period back to `open`. The `reason`, who abandoned and when are kept in the
+        period''s `events`.
 
         '
       tags:
@@ -2387,9 +2824,20 @@ paths:
                   type: string
       responses:
         '200':
-          description: Done
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: Abandoned. The period, `open` again.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FiscalPeriod'
+        '404':
+          $ref: ../shared/common.yaml#/components/responses/NotFound
         '409':
-          description: Not in a state that permits this
+          description: The period is not `closing`.
+          x-ticvai-problem-types:
+          - fiscal-period-not-closing
           content:
             application/problem+json:
               schema:
@@ -2401,6 +2849,7 @@ paths:
       required: true
       schema:
         type: string
+        format: uuid
     post:
       operationId: reopenPeriod
       x-ticvai-consumed-by:
@@ -2410,6 +2859,11 @@ paths:
       summary: Reopen a closed period
       description: '**Rare and heavily controlled.** Reopening restates figures somebody has already reported,
         so it requires an approver who is not the requester and records why.
+
+        Moves a `closed` period to `closing` (the period state model): postings stay stopped while the
+        restatement is worked, and the period closes again through `closeFiscalPeriod` or opens through
+        `abandonPeriodClose`. The `reason`, the requester, the approver and when are kept in the period''s
+        `events`.
 
         '
       tags:
@@ -2428,16 +2882,41 @@ paths:
               type: object
               required:
               - reason
+              - approverPrincipalId
               properties:
                 reason:
                   type: string
                 approverPrincipalId:
                   type: string
+                  format: uuid
+                  description: The approver. Must hold `LEDGER_APPROVE` for the period's region and must not
+                    be the caller.
       responses:
         '200':
-          description: Done
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: Reopened. The period, now `closing`.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FiscalPeriod'
+        '403':
+          description: The approver is the requester, or does not hold `LEDGER_APPROVE` there; or the caller
+            lacks it.
+          x-ticvai-problem-types:
+          - approver-is-requester
+          - forbidden
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
+        '404':
+          $ref: ../shared/common.yaml#/components/responses/NotFound
         '409':
-          description: Not in a state that permits this
+          description: The period is not `closed`.
+          x-ticvai-problem-types:
+          - fiscal-period-not-closed
           content:
             application/problem+json:
               schema:
@@ -2485,20 +2964,29 @@ paths:
                   description: Run the checks and report without locking.
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Closed, or checks reported when dry run
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/PeriodCloseResult'
+        '404':
+          $ref: ../shared/common.yaml#/components/responses/NotFound
         '409':
-          description: 'Close checks failed — unapproved journals, unreconciled settlements, open shifts,
-            or a prior period still open.
+          description: 'The period is already `closed`, or one or more of the close checks failed. The checks
+            are exactly the values of `PeriodCloseResult.checks[].check`; `failedChecks` lists each one that
+            failed with its `blockingCount`, so the screen can say what to fix without a dry run first.
 
             '
+          x-ticvai-problem-types:
+          - fiscal-period-closed
+          - period-close-checks-failed
           content:
             application/problem+json:
               schema:
-                $ref: ../shared/common.yaml#/components/schemas/Problem
+                $ref: '#/components/schemas/PeriodCloseProblem'
   /reports/financial:
     get:
       operationId: getFinancialReport
@@ -2515,9 +3003,12 @@ paths:
       - staff
       - partner
       x-ticvai-read-routing: analytical
-      summary: P&L, balance sheet or cash flow
+      summary: Financial statements, revenue and tax summaries
       description: 'Served from the reporting replica, never the primary. A month-end report running against
         the transactional database during a venue spike is the single most likely cause of an outage.
+
+        Six reports, named by `report`: profit and loss, balance sheet, cash flow, revenue by venue,
+        revenue by product, and the tax summary.
 
         '
       tags:
@@ -2531,14 +3022,7 @@ paths:
         in: query
         required: true
         schema:
-          type: string
-          enum:
-          - profitAndLoss
-          - balanceSheet
-          - cashFlow
-          - revenueByVenue
-          - revenueByProduct
-          - taxSummary
+          $ref: '#/components/schemas/FinancialReportKind'
       - name: fiscalPeriodId
         in: query
         required: true
@@ -2602,8 +3086,8 @@ paths:
       x-ticvai-scope-level: region
       x-ticvai-singleton: true
       x-ticvai-singleton-note: 'ADR-0031. **With three replicas, three instances wake up.** A Postgres
-        advisory lock rather  than Redis: the work is transactional against the same database, so the
-        lock belongs there.  **A Redis lock that expires mid-transaction leaves two writers and no error.**
+        advisory lock rather than Redis: the work is transactional against the same database, so the
+        lock belongs there. **A Redis lock that expires mid-transaction leaves two writers and no error.**
 
         '
       x-ticvai-offline-capable: false
@@ -2625,12 +3109,17 @@ paths:
                   type: array
                   items:
                     type: string
+                    pattern: ^[A-Z]{3}/[A-Z]{3}$
                   description: '`AED/USD` form. Omitted means every pair this region trades in.'
                 effectiveFrom:
                   type: string
                   format: date
                   nullable: true
-                  description: Defaults to the next business day in the region timezone.
+                  description: 'Defaults to the next business day in the region timezone. A day in the region''s
+                    time zone: the rates written take effect at local midnight at the start of it, stored as
+                    that instant in UTC on `FxRate.effectiveFrom`.
+
+                    '
                 dryRun:
                   type: boolean
                   default: false
@@ -2638,6 +3127,9 @@ paths:
                     is worth a person seeing before it prices anything.'
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: What was fetched
           content:
             application/json:
@@ -2653,14 +3145,36 @@ paths:
                   unchanged:
                     type: integer
                   largestMove:
-                    type: number
+                    type: string
+                    pattern: ^-?\d+(\.\d{1,6})?$
                     nullable: true
                     description: '**The number a person reads.** A pair that moved sharply is the one
-                      worth questioning before the day trades on it.'
+                      worth questioning before the day trades on it. The largest change against the
+                      rate in force, in percent, as a decimal string like `FxRate.rate` (a rate is never
+                      a float on the wire). Null when nothing was in force to compare with.'
                   rates:
                     type: array
                     items:
                       $ref: '#/components/schemas/FxRate'
+        '409':
+          description: No provider is assigned to this purpose in this region (`setFxProvider`).
+          x-ticvai-problem-types:
+          - fx-provider-not-assigned
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
+        '503':
+          description: '**The provider is unreachable, and nothing was written.** The last rate is not
+            reused in its place. Retry; the rates in force stay in force until then.
+
+            '
+          x-ticvai-problem-types:
+          - fx-provider-unreachable
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
   /fx-rates/providers:
     put:
       operationId: setFxProvider
@@ -2693,35 +3207,21 @@ paths:
               properties:
                 assignments:
                   type: array
+                  description: At most one per purpose.
                   items:
-                    type: object
-                    required:
-                    - purpose
-                    - source
-                    properties:
-                      purpose:
-                        $ref: '#/components/schemas/FxRatePurpose'
-                      source:
-                        $ref: '#/components/schemas/FxRateSource'
-                      credentialRef:
-                        type: string
-                        nullable: true
-                        description: BYOK — the key lives in the secret store, never here.
-                      schedule:
-                        type: string
-                        nullable: true
-                        description: Cron in the region timezone. **A daily pull at 06:00 Gulf time is
-                          not the same instant as 06:00 UTC**, and a rate stamped with the wrong business
-                          day is a reconciliation nobody can close.
+                    $ref: '#/components/schemas/FxProviderAssignment'
       responses:
         '200':
-          description: The assignments now in force
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: The assignments now in force, one per purpose that has one.
           content:
             application/json:
               schema:
                 type: array
                 items:
-                  type: object
+                  $ref: '#/components/schemas/FxProviderAssignment'
 components:
   schemas:
     AccountType:
@@ -2836,7 +3336,7 @@ components:
           nullable: true
         orderId:
           type: string
-          format: uuid
+          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
           nullable: true
         bookingId:
           type: string
@@ -2867,9 +3367,11 @@ components:
         from:
           type: string
           format: date
+          description: A day in the region's time zone, local midnight to local midnight.
         to:
           type: string
           format: date
+          description: A day in the region's time zone, local midnight to local midnight.
         sources:
           type: array
           items:
@@ -2902,8 +3404,17 @@ components:
             properties:
               between:
                 type: array
+                description: The two sources that disagree, as named in `sources[].source`.
+                minItems: 2
+                maxItems: 2
                 items:
                   type: string
+                  enum:
+                  - pos
+                  - gateway
+                  - bank
+                  - wallet
+                  - ledger
               amount:
                 $ref: ../shared/common.yaml#/components/schemas/Money
               likelyCause:
@@ -3010,6 +3521,23 @@ components:
         isPostable:
           type: boolean
           default: true
+        isSuspense:
+          type: boolean
+          default: false
+          description: See `Account.isSuspense`.
+        subType:
+          type: string
+          nullable: true
+          description: See `Account.subType`.
+        tags:
+          type: array
+          items:
+            type: string
+          description: See `Account.tags`.
+        notes:
+          type: string
+          nullable: true
+          description: See `Account.notes`.
     PostingEventType:
       type: string
       description: Every event that generates a ledger posting.
@@ -3142,9 +3670,11 @@ components:
         effectiveFrom:
           type: string
           format: date
+          description: A day in the region's time zone, local midnight to local midnight.
         effectiveTo:
           type: string
           format: date
+          description: A day in the region's time zone, local midnight to local midnight.
           nullable: true
         isActive:
           type: boolean
@@ -3183,9 +3713,15 @@ components:
         effectiveFrom:
           type: string
           format: date
+          description: A day in the region's time zone, local midnight to local midnight.
     TaxExemption:
       x-ticvai-persistence: ledger.tax_exemption
       type: object
+      description: 'Also the `createTaxExemption` body. **`id` is server-owned** (`readOnly`): a client does
+        not send it, and one sent is ignored. OpenAPI 3.1: a `readOnly` property in `required` is required
+        in responses only.
+
+        '
       required:
       - id
       - scope
@@ -3195,6 +3731,7 @@ components:
         id:
           type: string
           format: uuid
+          readOnly: true
         scope:
           type: string
           enum:
@@ -3217,9 +3754,11 @@ components:
         validFrom:
           type: string
           format: date
+          description: A day in the region's time zone, local midnight to local midnight.
         validTo:
           type: string
           format: date
+          description: A day in the region's time zone, local midnight to local midnight.
           nullable: true
     CalculateTaxRequest:
       type: object
@@ -3324,6 +3863,10 @@ components:
     RecognitionSchedule:
       x-ticvai-persistence: ledger.recognition_schedule
       type: object
+      description: 'Also the `createRecognitionSchedule` body. **`id` is server-owned** (`readOnly`): a client
+        does not send it, and one sent is ignored.
+
+        '
       required:
       - id
       - name
@@ -3333,6 +3876,7 @@ components:
         id:
           type: string
           format: uuid
+          readOnly: true
         name:
           type: string
           maxLength: 200
@@ -3386,8 +3930,14 @@ components:
             '
         productKinds:
           type: array
+          minItems: 1
+          description: The product kinds this schedule claims, from the catalogue's `ProductKind`.
           items:
+            # `type: string` beside the `allOf` keeps this a `text[]` column: an array whose items
+            # are a bare `$ref` derives as a child table.
             type: string
+            allOf:
+            - $ref: ../spine/catalogue.yaml#/components/schemas/ProductKind
         deferredAccountId:
           type: string
           format: uuid
@@ -3437,16 +3987,31 @@ components:
       type: object
       required:
       - asAt
-      - total
+      - totals
       - buckets
       properties:
         asAt:
           type: string
           format: date
+          description: A day in the region's time zone, local midnight to local midnight.
+        totals:
+          type: array
+          description: '**One `Money` per currency in scope**, never a sum across currencies. One entry
+            when every venue in scope trades in the same currency.
+
+            '
+          items:
+            $ref: ../shared/common.yaml#/components/schemas/Money
         total:
-          $ref: ../shared/common.yaml#/components/schemas/Money
+          allOf:
+          - $ref: ../shared/common.yaml#/components/schemas/Money
+          nullable: true
+          description: The single total when everything in scope is in one currency; null otherwise. Read
+            `totals`.
         buckets:
           type: array
+          description: One ageing band in one currency per entry. A band spanning two currencies is two
+            entries.
           items:
             type: object
             required:
@@ -3499,6 +4064,7 @@ components:
           type: array
           items:
             type: string
+            pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
     JournalStatus:
       type: string
       enum:
@@ -3518,6 +4084,7 @@ components:
       - settlement
       - variance
       - reversal
+      - writeOff   # posted by recordWriteOff
     JournalLine:
       type: object
       required:
@@ -3560,6 +4127,7 @@ components:
         postingDate:
           type: string
           format: date
+          description: A day in the region's time zone, local midnight to local midnight.
         description:
           type: string
           minLength: 3
@@ -3589,6 +4157,7 @@ components:
       properties:
         id:
           type: string
+          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
         entryNumber:
           type: string
         fiscalPeriodId:
@@ -3625,9 +4194,30 @@ components:
           nullable: true
         reversalOfEntryId:
           type: string
+          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
           nullable: true
         reversedByEntryId:
           type: string
+          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+          nullable: true
+        reversalReason:
+          type: string
+          nullable: true
+          description: On a reversal, the `reason` given to `reverseJournalEntry`. Null on every other entry.
+        rejectionReason:
+          type: string
+          nullable: true
+          description: 'The comment from the latest `rejectJournal`, which the preparer reads before
+            resubmitting. Null until an entry is rejected.
+
+            '
+        rejectedByPrincipalId:
+          type: string
+          format: uuid
+          nullable: true
+        rejectedAt:
+          type: string
+          format: date-time
           nullable: true
         createdAt:
           type: string
@@ -3651,6 +4241,7 @@ components:
           type: string
         journalEntryId:
           type: string
+          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
         accountId:
           type: string
           format: uuid
@@ -3750,8 +4341,10 @@ components:
       properties:
         id:
           type: string
+          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
         orderId:
           type: string
+          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
         orderLineId:
           type: string
         venueId:
@@ -3781,12 +4374,18 @@ components:
         reviewOutcome:
           type: string
           nullable: true
+          description: The `outcome` given to `reviewPriceVariance`. Null until reviewed.
+          enum:
+          - accepted
+          - investigated
+          - catalogueCorrected
         reviewedByPrincipalId:
           type: string
           format: uuid
           nullable: true
         journalEntryId:
           type: string
+          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
           nullable: true
         occurredAt:
           type: string
@@ -3802,9 +4401,24 @@ components:
       - interEntity
       - reporting
       - revaluation
+    FxRateValue:
+      x-ticvai-persistence-column: numeric(18,6)
+      type: string
+      pattern: ^\d+(\.\d{1,6})?$
+      description: '**An exchange rate: a decimal string, never a float**, for the reason `Money.amount`
+        is one (naming-and-style 5.1). Up to six decimal places — a two-place rate on a three-place
+        currency loses money on every transaction, quietly — and stored as `numeric(18,6)` so the six
+        places the wire carries survive the database.
+
+        '
     FxRate:
       type: object
       x-ticvai-persistence: ledger.fx_rate
+      description: 'Also the `setFxRate` body. **Server-owned fields are `readOnly`** and ignored if sent:
+        `id`, `setByPrincipalId`, and the provenance `ingestFxRates` writes (`source`, `providerReference`,
+        `fetchedAt`). A rate set through `setFxRate` has `source` `manual`.
+
+        '
       required:
       - fromCurrency
       - toCurrency
@@ -3823,7 +4437,8 @@ components:
           type: string
           pattern: ^[A-Z]{3}$
         rate:
-          type: number
+          allOf:
+          - $ref: '#/components/schemas/FxRateValue'
           description: 'Units of `toCurrency` per one `fromCurrency`. Six decimal places — a two-place
             rate on a three-place currency loses money on every transaction, quietly.
 
@@ -3831,7 +4446,9 @@ components:
         purpose:
           $ref: '#/components/schemas/FxRatePurpose'
         source:
-          $ref: '#/components/schemas/FxRateSource'
+          allOf:
+          - $ref: '#/components/schemas/FxRateSource'
+          readOnly: true
         effectiveFrom:
           type: string
           format: date-time
@@ -3850,6 +4467,7 @@ components:
         providerReference:
           type: string
           nullable: true
+          readOnly: true
           description: The provider's own identifier for this quote. **What makes a rate reproducible**
             — an auditor asking why a payment converted at 3.6725 gets an answer that is checkable against
             the source rather than a number somebody typed.
@@ -3857,6 +4475,7 @@ components:
           type: string
           format: date-time
           nullable: true
+          readOnly: true
           description: When the rate was pulled. **Distinct from `effectiveFrom`**, which is when it applies
             — a rate fetched at 06:00 for a business day starting at 00:00 has two different times and
             conflating them makes a late feed look like a backdated rate.
@@ -3877,6 +4496,7 @@ components:
             properties:
               shiftId:
                 type: string
+                pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
               principalId:
                 type: string
                 format: uuid
@@ -3886,10 +4506,13 @@ components:
                 type: string
                 pattern: ^[A-Z]{3}$
               foreignAmount:
-                type: number
-                description: What was physically taken. The cashier counts this in the drawer.
+                allOf:
+                - $ref: ../shared/common.yaml#/components/schemas/Money
+                description: What was physically taken, in the foreign `currency` (its `currency` and
+                  `scale` are that currency's, not the region's). The cashier counts this in the drawer.
               rateApplied:
-                type: number
+                allOf:
+                - $ref: '#/components/schemas/FxRateValue'
               baseAmount:
                 allOf:
                 - $ref: ../shared/common.yaml#/components/schemas/Money
@@ -3909,6 +4532,9 @@ components:
       properties:
         id:
           type: string
+          format: uuid
+          description: Server-created when the obligation arises, so a UUID, as the `obligationId` path
+            parameter types it.
         fromLegalEntityId:
           type: string
           format: uuid
@@ -3919,8 +4545,10 @@ components:
           description: The consuming entity, which provided the service at redemption.
         entitlementId:
           type: string
+          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
         orderId:
           type: string
+          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
         arisingAmount:
           allOf:
           - $ref: ../shared/common.yaml#/components/schemas/Money
@@ -3929,7 +4557,8 @@ components:
 
             '
         rateApplied:
-          type: number
+          allOf:
+          - $ref: '#/components/schemas/FxRateValue'
         arisingAt:
           type: string
           format: date-time
@@ -3945,7 +4574,8 @@ components:
           format: date-time
           nullable: true
         settlementRate:
-          type: number
+          allOf:
+          - $ref: '#/components/schemas/FxRateValue'
           nullable: true
         fxMovement:
           allOf:
@@ -3974,6 +4604,7 @@ components:
           $ref: ../shared/common.yaml#/components/schemas/Money
         journalEntryId:
           type: string
+          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
           nullable: true
         accountsRevalued:
           type: integer
@@ -4019,7 +4650,8 @@ components:
               openBalance:
                 $ref: ../shared/common.yaml#/components/schemas/Money
               closingRate:
-                type: number
+                allOf:
+                - $ref: '#/components/schemas/FxRateValue'
                 description: >
                   The `revaluation`-purpose rate applied. **Recorded on the result and not
                   looked up again** — a rate row can be superseded, and a close that cannot be
@@ -4065,9 +4697,27 @@ components:
         periodStart:
           type: string
           format: date
+          description: A day in the region's time zone, local midnight to local midnight.
         periodEnd:
           type: string
           format: date
+          description: A day in the region's time zone, local midnight to local midnight.
+        fileReference:
+          type: string
+          format: uuid
+          description: 'The `MediaAsset` holding the provider file, as given to `ingestSettlementFile`. **Kept
+            on the row because parsing is asynchronous**: the job that parses the file reads it from here.
+
+            '
+        format:
+          type: string
+          nullable: true
+          enum:
+          - csv
+          - fixedWidth
+          - xml
+          - json
+          description: The file format given at ingest. Null when none was given.
         status:
           $ref: '#/components/schemas/SettlementStatus'
         lineCount:
@@ -4095,6 +4745,7 @@ components:
           nullable: true
         scopePath:
           type: string
+          readOnly: true
           description: '**The partition key** (ADR-0005). Added 31 August: the operations that write this
             table declare a scope and the table carried no column for it — **49 tables were in that state**,
             so a row could be written at venue scope and then read by anything that could reach the table.
@@ -4105,6 +4756,16 @@ components:
 
 
             **Operations write it at `region` scope.**'
+    SettlementResolution:
+      type: string
+      description: How a settlement exception was explained. One vocabulary for the request and the stored
+        exception.
+      enum:
+      - matchedManually
+      - writeOff
+      - disputeRaised
+      - providerError
+      - timingDifference
     SettlementException:
       x-ticvai-persistence: ledger.settlement_exception
       type: object
@@ -4117,6 +4778,8 @@ components:
       properties:
         id:
           type: string
+          format: uuid
+          description: Server-created when parsing finds the exception, so a UUID (naming-and-style 4).
         settlementId:
           type: string
           format: uuid
@@ -4133,14 +4796,21 @@ components:
           nullable: true
         paymentId:
           type: string
+          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
           nullable: true
         amount:
           $ref: ../shared/common.yaml#/components/schemas/Money
         expectedAmount:
           $ref: ../shared/common.yaml#/components/schemas/Money
         resolution:
+          allOf:
+          - $ref: '#/components/schemas/SettlementResolution'
+          nullable: true
+          description: Null while the exception is open.
+        note:
           type: string
           nullable: true
+          description: The `note` given to `resolveSettlementException`, stored with the resolution.
         resolvedByPrincipalId:
           type: string
           format: uuid
@@ -4152,6 +4822,10 @@ components:
     LegalEntity:
       x-ticvai-persistence: ledger.legal_entity
       type: object
+      description: 'Also the `createLegalEntity` body. **`id` and `scopePath` are server-owned** (`readOnly`)
+        and ignored if sent.
+
+        '
       required:
       - id
       - code
@@ -4164,6 +4838,7 @@ components:
         id:
           type: string
           format: uuid
+          readOnly: true
         code:
           type: string
           maxLength: 64
@@ -4196,6 +4871,7 @@ components:
           type: boolean
         scopePath:
           type: string
+          readOnly: true
           description: '**The partition key** (ADR-0005). Added 31 August: the operations that write this
             table declare a scope and the table carried no column for it — **49 tables were in that state**,
             so a row could be written at venue scope and then read by anything that could reach the table.
@@ -4213,8 +4889,12 @@ components:
       - closing
       - closed
     FiscalPeriod:
-      x-ticvai-persistence: ledger.fiscal_period
+      x-ticvai-persistence: ledger.fiscal_period + ledger.fiscal_period_event
       type: object
+      description: '`startDate` and `endDate` are days in the region''s time zone: a posting belongs to the
+        period when its `postedAt`, in that zone, falls on or between them.
+
+        '
       required:
       - id
       - legalEntityId
@@ -4234,9 +4914,11 @@ components:
         startDate:
           type: string
           format: date
+          description: A day in the region's time zone, local midnight to local midnight.
         endDate:
           type: string
           format: date
+          description: A day in the region's time zone, local midnight to local midnight.
         status:
           $ref: '#/components/schemas/PeriodStatus'
         closedByPrincipalId:
@@ -4247,6 +4929,82 @@ components:
           type: string
           format: date-time
           nullable: true
+        events:
+          type: array
+          description: '**Every step of the period''s close, oldest first**: begin, abandon, close and reopen,
+            each with who, when and (for abandon and reopen) why. A reopened period restates figures
+            somebody has already reported, so the reason is kept, not just the latest status.
+
+            '
+          items:
+            $ref: '#/components/schemas/FiscalPeriodEvent'
+    FiscalPeriodEvent:
+      type: object
+      description: One step in a fiscal period's close. Written by the operation that took the step; never
+        edited.
+      required:
+      - action
+      - principalId
+      - occurredAt
+      properties:
+        action:
+          type: string
+          enum:
+          - beginClose     # beginPeriodClose
+          - abandonClose   # abandonPeriodClose
+          - close          # closeFiscalPeriod
+          - reopen         # reopenPeriod
+        reason:
+          type: string
+          nullable: true
+          description: Required by `abandonPeriodClose` and `reopenPeriod`; null for the other steps.
+        principalId:
+          type: string
+          format: uuid
+          description: Who took the step.
+        approverPrincipalId:
+          type: string
+          format: uuid
+          nullable: true
+          description: The approver of a `reopen`. Null for the other steps.
+        occurredAt:
+          type: string
+          format: date-time
+    PeriodCloseProblem:
+      x-ticvai-persistence: none — error shape
+      description: '`closeFiscalPeriod` 409. For `period-close-checks-failed`, **names each check that
+        failed**, in the shape `PeriodCloseResult.checks` uses; empty for `fiscal-period-closed`.
+
+        '
+      allOf:
+      - $ref: ../shared/common.yaml#/components/schemas/Problem
+      - type: object
+        properties:
+          failedChecks:
+            type: array
+            items:
+              type: object
+              required:
+              - check
+              - passed
+              properties:
+                check:
+                  type: string
+                  enum:
+                  - trialBalanceBalances
+                  - noUnapprovedJournals
+                  - noOpenShifts
+                  - settlementsReconciled
+                  - recognitionRunComplete
+                  - priorPeriodClosed
+                  - varianceExceptionsReviewed
+                passed:
+                  type: boolean
+                  description: Always false here.
+                detail:
+                  type: string
+                blockingCount:
+                  type: integer
     PeriodCloseResult:
       x-ticvai-persistence: none — computed
       type: object
@@ -4298,7 +5056,7 @@ components:
       - sections
       properties:
         report:
-          type: string
+          $ref: '#/components/schemas/FinancialReportKind'
         fiscalPeriodId:
           type: string
           format: uuid
@@ -4341,6 +5099,49 @@ components:
                       $ref: ../shared/common.yaml#/components/schemas/Money
               total:
                 $ref: ../shared/common.yaml#/components/schemas/Money
+    FinancialReportKind:
+      type: string
+      description: The report `getFinancialReport` returns. One vocabulary for the query and the response.
+      enum:
+      - profitAndLoss
+      - balanceSheet
+      - cashFlow
+      - revenueByVenue
+      - revenueByProduct
+      - taxSummary
+    FxProviderAssignment:
+      x-ticvai-persistence: ledger.fx_provider_assignment
+      type: object
+      description: '**Which provider serves one FX purpose in one region**, as `setFxProvider` sets it and
+        `ingestFxRates` reads it. One row per region and purpose. Region-scoped (ADR-0018): currency is a
+        region property, so the feed that prices it is too.
+
+        '
+      required:
+      - purpose
+      - source
+      properties:
+        purpose:
+          $ref: '#/components/schemas/FxRatePurpose'
+        source:
+          $ref: '#/components/schemas/FxRateSource'
+        credentialRef:
+          type: string
+          nullable: true
+          description: BYOK — the key lives in the secret store, never here. This is the store's reference
+            to it, not the key.
+        schedule:
+          type: string
+          nullable: true
+          description: Cron in the region timezone. **A daily pull at 06:00 Gulf time is
+            not the same instant as 06:00 UTC**, and a rate stamped with the wrong business
+            day is a reconciliation nobody can close.
+        scopePath:
+          type: string
+          readOnly: true
+          description: '**The partition key** (ADR-0005). **Operations write it at `region` scope.**
+
+            '
     FxRateSource:
       type: string
       description: '**Where the rate came from, and which provider specifically.** `source: provider`

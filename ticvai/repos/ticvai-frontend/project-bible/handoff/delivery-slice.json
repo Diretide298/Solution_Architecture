@@ -204,8 +204,8 @@
  },
  "counts": {
   "core": 356,
-  "setup": 109,
-  "allOperations": 2113
+  "setup": 110,
+  "allOperations": 2135
  },
  "services": {
   "AccessService": {
@@ -221,12 +221,12 @@
   "CatalogueService": {
    "core": 38,
    "setup": 31,
-   "total": 404
+   "total": 406
   },
   "FnbService": {
    "core": 51,
    "setup": 6,
-   "total": 111
+   "total": 113
   },
   "IdentityService": {
    "core": 31,
@@ -245,13 +245,13 @@
   },
   "MarketingService": {
    "core": 36,
-   "setup": 6,
-   "total": 209
+   "setup": 7,
+   "total": 213
   },
   "OrderService": {
    "core": 73,
    "setup": 5,
-   "total": 249
+   "total": 253
   },
   "PlatformService": {
    "core": 0,
@@ -271,12 +271,12 @@
   "TenancyService": {
    "core": 14,
    "setup": 9,
-   "total": 156
+   "total": 163
   },
   "VenueOpsService": {
    "core": 24,
    "setup": 9,
-   "total": 221
+   "total": 224
   },
   "WalletService": {
    "core": 5,
@@ -338,16 +338,11 @@
    "path": "/inventory-holds",
    "perm": "ORDER_CREATE",
    "platforms": [
-    "MOB",
-    "POS",
-    "WEB"
+    "POS"
    ],
    "screens": [
     "BO-018",
-    "GST-009",
-    "KSK-005",
-    "POS-003",
-    "WEB-006"
+    "POS-003"
    ],
    "enables": []
   },
@@ -379,17 +374,20 @@
     "WEB"
    ],
    "screens": [
+    "GST-009",
     "GST-032",
     "GST-048",
     "GST-050",
     "GST-053",
     "GST-056",
+    "KSK-005",
     "KSK-006",
     "KSK-017",
     "POS-002",
     "POS-021",
     "POS-023",
     "PTR-010",
+    "WEB-006",
     "WEB-008",
     "WEB-010",
     "WEB-033"
@@ -1159,6 +1157,7 @@
     "promotions.allocation_component",
     "promotions.bundle",
     "promotions.bundle_choice_group",
+    "promotions.bundle_choice_option",
     "promotions.bundle_component"
    ]
   },
@@ -1475,7 +1474,8 @@
    ],
    "enables": [
     "marketing.loyalty_programme",
-    "marketing.points_earning_rule"
+    "marketing.points_earning_rule",
+    "marketing.programme_tier"
    ]
   },
   "createMenu": {
@@ -1804,7 +1804,8 @@
     "BO-038"
    ],
    "enables": [
-    "queue.queue"
+    "queue.queue",
+    "queue.queue_operating_window"
    ]
   },
   "createReferral": {
@@ -2331,23 +2332,18 @@
    "path": "/promotions/evaluate",
    "perm": "PRICE_VIEW",
    "platforms": [
-    "MOB",
     "POS",
     "WEB"
    ],
    "screens": [
     "BO-010",
-    "GST-036",
-    "GST-037",
     "KSK-006",
     "POS-002",
     "POS-021",
     "POS-023",
     "PTR-010",
     "WEB-005",
-    "WEB-010",
-    "WEB-032",
-    "WEB-043"
+    "WEB-010"
    ],
    "enables": []
   },
@@ -7662,6 +7658,19 @@
    ],
    "enables": []
   },
+  "setLoyaltyRules": {
+   "part": "setup",
+   "service": "MarketingService",
+   "contract": "marketing-crm",
+   "verb": "PUT",
+   "path": "/loyalty/programmes/{programmeId}/rules",
+   "perm": "MARKETING_MANAGE",
+   "platforms": [],
+   "screens": [],
+   "enables": [
+    "marketing.programme_tier"
+   ]
+  },
   "setMaintenanceMode": {
    "part": "core",
    "service": "WhiteLabelService",
@@ -9052,6 +9061,9 @@
   "orders.invitation": [
    "issueInvitation"
   ],
+  "orders.reservation_line": [
+   "createReservation"
+  ],
   "queue.reading": [
    "submitQueueReading",
    "testQueueFeed"
@@ -9082,19 +9094,20 @@
  "noWriter": [
   "ai.chunk_ref",
   "fnb.delivery_location",
-  "fnb.service_order_line",
   "fnb.sold_out_item",
-  "inventory.goods_receipt_line",
   "inventory.serialised_item",
   "inventory.stock_batch",
   "inventory.stock_level",
   "ledger.event_budget",
   "marketing.challenge_progress",
+  "orders.order_line_eligibility",
+  "orders.pos_shift_approval",
+  "orders.pos_shift_incident",
+  "orders.ticket_template_channel",
   "platform.device_heartbeat",
-  "retail.reservation_line",
-  "retail.return_line",
-  "retail.sale_line",
-  "retail.shop_and_drop_line"
+  "retail.shop_and_drop_line",
+  "subscription.plan_module",
+  "wallet.credit_lot"
  ],
  "missingFromLineage": []
 }

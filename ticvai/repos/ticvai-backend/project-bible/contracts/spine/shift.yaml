@@ -82,6 +82,22 @@ info:
     Money carries an explicit scale throughout. Denomination counts are integers of a
     named denomination, never a derived total the client computed.
 
+    **Where a workstation-scoped operation finds its workstation** (26 September, pull audit
+    R100). The workstation is a scope *target*, never a permission source (ADR-0002,
+    permission-resolution R5), so:
+
+    - An operation that names a shift in its path (`/shifts/{shiftId}/…`) targets **that
+      shift's workstation**, not the caller's session. A grant held at the venue or a
+      department above it covers the workstation beneath it (permission-resolution V16), so a
+      supervisor in a browser with no till session acts on the shift by its id.
+    - `openShift` targets the `workstationId` in its body.
+    - `getCurrentShift` alone reads **the session's workstation**. A session that has none — a
+      P08 browser, a partner key, a guest — has no current shift, and gets the `404`.
+
+    **Every listed error names its problem `type`** (RFC 9457, `common.yaml` Problem). Where
+    one status covers more than one refusal, each refusal has its own type so the client can
+    tell them apart.
+
 servers:
   - url: https://{cellHost}/api/v1
     variables:
@@ -169,10 +185,14 @@ paths:
         Fails if another shift is already open on this workstation. Where the venue is
         configured to require approval on open, the shift is created in
         `pendingApproval` and cannot transact until approved.
+
+        **Online only** (F32, 26 September pull audit R257). An opening float declared offline
+        is a float nobody can reconcile against the safe; POS-001's own transition and
+        `states/shift.yaml` already said so, and this flag said the opposite until 26 September.
       tags: [shift]
       x-ticvai-permission: SHIFT_OPEN
       x-ticvai-scope-level: workstation
-      x-ticvai-offline-capable: true
+      x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: append
       parameters:
         - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
@@ -194,7 +214,8 @@ paths:
         '403': { $ref: '../shared/common.yaml#/components/responses/Forbidden' }
         '409':
           description: >
-            A shift is already open on this workstation, or a required device is absent.
+            A shift is already open on this workstation (problem type `shift-already-open`), or
+            a required device is absent (`required-device-absent`).
           content:
             application/problem+json:
               schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
@@ -255,6 +276,20 @@ paths:
 
         **Replaces the list for one currency and never deletes.** A denomination left out is
         deactivated, not removed, because deleting it would rewrite every past cash-up that counted it.
+
+        **PUT semantics** (26 September, pull audit R103). The set addressed is every
+        denomination of `currencyCode`. Each entry is matched to an existing row on **`kind` and
+        `value`** — the pair the `422` already requires to be unique. A match takes the entry's
+        `displayName`, `sortOrder` and `isActive`; an entry with no match is created; an existing
+        row of that currency that no entry matches is set `isActive: false`. Nothing is deleted.
+        Always `200` with the whole list, never `201`, because the set exists whether or not it
+        had rows.
+
+        **The target region is named in the body** (pull audit R097). `scopePath` is the region
+        whose `REGION_CONFIGURE` grant authorises the write; a caller holding it over several
+        regions says which. `currencyCode` must be that region's trading currency or one a venue
+        beneath it trades in (ADR-0018, amended 20 September); any other currency is refused, so
+        one region cannot rewrite the notes another region counts.
       tags: [shift]
       x-ticvai-permission: REGION_CONFIGURE
       x-ticvai-audience: [staff]
@@ -271,6 +306,9 @@ paths:
             schema: { $ref: '#/components/schemas/SetDenominationsRequest' }
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: The currency's denominations, in counting order, including the ones deactivated
           content:
             application/json:
@@ -283,8 +321,10 @@ paths:
           $ref: '../shared/common.yaml#/components/responses/Forbidden'
         '422':
           description: >
-            A zero or negative value, or two entries with the same value and kind. The zero-valued
-            coin in the original seed is exactly this.
+            A zero or negative value, or two entries with the same value and kind (problem type
+            `denomination-invalid`). The zero-valued coin in the original seed is exactly this. Or
+            `currencyCode` is not traded in the region `scopePath` names
+            (`denomination-currency-out-of-scope`).
           content:
             application/problem+json:
               schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
@@ -317,12 +357,17 @@ paths:
         - $ref: '../shared/common.yaml#/components/parameters/PageCursor'
       responses:
         '200':
-          description: Boxes
+          description: Boxes, one page at a time
           content:
             application/json:
               schema:
-                type: array
-                items: { $ref: '#/components/schemas/DepositBox' }
+                allOf:
+                  - $ref: '../shared/common.yaml#/components/schemas/Page'
+                  - type: object
+                    properties:
+                      items:
+                        type: array
+                        items: { $ref: '#/components/schemas/DepositBox' }
 
     post:
       operationId: allocateDepositBox
@@ -348,6 +393,9 @@ paths:
             schema: { $ref: '#/components/schemas/DepositBox' }
       responses:
         '201':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Allocated
           content:
             application/json:
@@ -392,10 +440,23 @@ paths:
                 reason: { type: string, maxLength: 300 }
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Adjusted, and recorded against the person who authorised it
           content:
             application/json:
               schema: { $ref: '#/components/schemas/DepositBox' }
+        '403': { $ref: '../shared/common.yaml#/components/responses/Forbidden' }
+        '409':
+          description: >
+            The box is being counted or has been counted — `closing`, `closed` or `reconciled`
+            (problem type `deposit-box-not-open`). `closing` stops the till taking anything
+            (`states/deposit-box.yaml`), and a float changed after the count is a variance nobody
+            can explain.
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
 
   /deposit-boxes/{boxId}/withdraw:
     parameters:
@@ -416,6 +477,18 @@ paths:
         short by the amount that was taken from them.
 
         Two people sign: the supervisor taking it and the cashier it came from.
+
+        **Recorded as one `CashMovement` of kind `lift`** (F32 step 4: a safe drop "is recorded as
+        a movement so the settlement adds up"; 26 September, pull audit R099/R104). The row
+        carries this box's `depositBoxId` and `shiftId`, the caller as `authorisedByPrincipalId`,
+        the witness, `withdrawalReason` from `reason`, and `note` as its `reason` text. It is the
+        box-level form of the same lift `createCashMovement` records — **one withdrawal is one
+        movement**, so the expected close figure falls once, and `withdrawnTotal` is the sum of
+        the box's lifts.
+
+        **`recordedAt` is the device's time** (offline-and-sync: offline data keeps both
+        `recorded_at` and `synced_at`), and `id` is the client ULID that doubles as the
+        idempotency key.
       tags: [shift]
       x-ticvai-permission: CASH_LIFT
       x-ticvai-scope-level: venue
@@ -429,18 +502,39 @@ paths:
           application/json:
             schema:
               type: object
-              required: [amount, witnessPrincipalId]
+              required: [id, amount, witnessPrincipalId, recordedAt]
               properties:
+                id:
+                  type: string
+                  pattern: '^[0-9A-HJKMNP-TV-Z]{26}$'
+                  description: Client-generated ULID of the `CashMovement` this records.
                 amount: { $ref: '../shared/common.yaml#/components/schemas/Money' }
-                witnessPrincipalId: { type: string, format: uuid }
-                reason: { type: string, enum: [banking, safeDrop, changeOrder, other] }
+                witnessPrincipalId:
+                  type: string
+                  format: uuid
+                  description: The cashier the cash came from. Kept as `CashMovement.witnessPrincipalId`.
+                reason: { $ref: '#/components/schemas/WithdrawalReason' }
                 note: { type: string, maxLength: 300 }
+                recordedAt: { type: string, format: date-time }
       responses:
         '201':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Withdrawn, and the expected close figure reduced
           content:
             application/json:
               schema: { $ref: '#/components/schemas/DepositBox' }
+        '400': { $ref: '../shared/common.yaml#/components/responses/BadRequest' }
+        '403': { $ref: '../shared/common.yaml#/components/responses/Forbidden' }
+        '409':
+          description: >
+            The box is being counted or has been counted — `closing`, `closed` or `reconciled`
+            (problem type `deposit-box-not-open`). A box being counted takes nothing in or out
+            (`states/deposit-box.yaml`).
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
 
   /deposit-boxes/close:
     post:
@@ -478,6 +572,9 @@ paths:
                 allOpenAtVenue: { type: boolean }
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Closed, with a variance per box
           content:
             application/json:
@@ -518,7 +615,9 @@ paths:
             application/json:
               schema: { $ref: '#/components/schemas/Shift' }
         '404':
-          description: No shift open on this workstation
+          description: >
+            No shift open or suspended on this workstation, or the session has no workstation
+            (problem type `no-current-shift`)
           content:
             application/problem+json:
               schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
@@ -601,12 +700,15 @@ paths:
                 reason: { type: string, minLength: 3, maxLength: 300 }
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Approved and open
           content:
             application/json:
               schema: { $ref: '#/components/schemas/Shift' }
         '409':
-          description: Shift is not awaiting approval
+          description: Shift is not `pendingApproval` (problem type `shift-not-awaiting-approval`)
           content:
             application/problem+json:
               schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
@@ -660,17 +762,22 @@ paths:
                   description: May not be the principal who closed it.
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Reopened
           content:
             application/json:
               schema: { $ref: '#/components/schemas/Shift' }
         '403':
-          description: Approver is the closing principal
+          description: Approver is the closing principal (problem type `approver-is-closer`)
           content:
             application/problem+json:
               schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
         '409':
-          description: Shift is not closed, or the fiscal period has closed over it
+          description: >
+            Shift is not closed (problem type `shift-not-closed`), or the fiscal period has closed
+            over it (`fiscal-period-closed`)
           content:
             application/problem+json:
               schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
@@ -700,6 +807,10 @@ paths:
         The break mechanism. The float and the shift stay intact; the workstation becomes
         available to another principal. Resuming requires the original principal, or a
         principal holding SHIFT_CLOSE_OTHER to close it out instead.
+
+        **Offline-capable, so it carries the device's time** (26 September, pull audit R113).
+        `recordedAt` becomes `Shift.suspendedAt` and orders the replay against the sales journalled
+        around it; `reason` is kept as `Shift.suspendReason`.
       tags: [shift]
       x-ticvai-permission: SHIFT_SUSPEND
       x-ticvai-scope-level: workstation
@@ -708,22 +819,27 @@ paths:
       parameters:
         - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       requestBody:
-        required: false
+        required: true
         content:
           application/json:
             schema:
               type: object
+              required: [recordedAt]
               properties:
                 reason: { type: string, maxLength: 200 }
+                recordedAt: { type: string, format: date-time }
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Suspended
           content:
             application/json:
               schema: { $ref: '#/components/schemas/Shift' }
         '403': { $ref: '../shared/common.yaml#/components/responses/Forbidden' }
         '409':
-          description: Shift is not in a suspendable state
+          description: Shift is not `open` (problem type `shift-not-open`)
           content:
             application/problem+json:
               schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
@@ -748,6 +864,10 @@ paths:
         - "P08 BO-042 Banking & Safe"
       x-ticvai-audience: [staff]
       summary: Resume a suspended shift
+      description: >
+        **Offline-capable, so it carries the device's time** (26 September, pull audit R113).
+        `recordedAt` orders the resume against the suspend and the sales journalled after it;
+        `Shift.suspendedAt` is cleared.
       tags: [shift]
       x-ticvai-permission: SHIFT_OPEN
       x-ticvai-scope-level: workstation
@@ -755,8 +875,20 @@ paths:
       x-ticvai-conflict-policy: append
       parameters:
         - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [recordedAt]
+              properties:
+                recordedAt: { type: string, format: date-time }
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Resumed
           content:
             application/json:
@@ -764,12 +896,14 @@ paths:
         '403':
           description: >
             Not the principal who suspended it, and the caller does not hold
-            SHIFT_CLOSE_OTHER.
+            SHIFT_CLOSE_OTHER (problem type `not-shift-holder`).
           content:
             application/problem+json:
               schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
         '409':
-          description: Another shift is now open on this workstation
+          description: >
+            Another shift is now open on this workstation (problem type `shift-already-open`), or
+            this shift is not `suspended` (`shift-not-suspended`)
           content:
             application/problem+json:
               schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
@@ -802,11 +936,18 @@ paths:
         shift moves to `pendingVariance` and requires OVERSHORT_ACCEPT to finalise.
 
         Closing a shift opened by another principal requires SHIFT_CLOSE_OTHER.
+
+        Where the venue requires approval on close, the shift waits in `pendingClosure` for
+        `approveShiftClose` (SHIFT_APPROVE_CLOSE).
+
+        **Online only** (F32, 26 September pull audit R257). Closing needs the server's total — a
+        variance computed against a stale local journal is not a variance — and POS-007 and
+        `states/shift.yaml` (`pendingClosure` is not offline-reachable) already said so.
       tags: [shift]
       x-ticvai-permission: SHIFT_CLOSE
       x-ticvai-permission-escalated: SHIFT_CLOSE_OTHER   # where the shift belongs to somebody else
       x-ticvai-scope-level: workstation
-      x-ticvai-offline-capable: true
+      x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: append
       parameters:
         - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
@@ -817,6 +958,9 @@ paths:
             schema: { $ref: '#/components/schemas/CloseShiftRequest' }
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Closed, or held pending variance acceptance or approval
           content:
             application/json:
@@ -824,7 +968,9 @@ paths:
         '400': { $ref: '../shared/common.yaml#/components/responses/BadRequest' }
         '403': { $ref: '../shared/common.yaml#/components/responses/Forbidden' }
         '409':
-          description: Shift already closed, or open orders remain
+          description: >
+            Shift is not `open` or `suspended` — already closing or closed (problem type
+            `shift-not-open`) — or open orders remain (`open-orders-remain`)
           content:
             application/problem+json:
               schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
@@ -871,11 +1017,79 @@ paths:
                   description: Retained for audit. The accepting principal is recorded.
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Accepted and finalised
           content:
             application/json:
               schema: { $ref: '#/components/schemas/Shift' }
+        '403':
+          description: >
+            The caller lacks OVERSHORT_ACCEPT at this venue, or is the cashier whose shift it is
+            (problem type `approver-is-cashier`) — a cashier signing off their own shortfall is not
+            a control (`states/variance-review.yaml`).
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+        '409':
+          description: >
+            Shift is not `pendingVariance` (problem type `shift-not-pending-variance`) — within
+            tolerance, still open, or already accepted.
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+
+  /shifts/{shiftId}/approve-close:
+    parameters:
+      - name: shiftId
+        in: path
+        required: true
+        schema: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
+    post:
+      operationId: approveShiftClose
+      x-ticvai-audience: [staff]
+      summary: Release a shift held for close approval
+      description: >
+        26 September, pull audit R207. **`ShiftStatus.pendingClosure` said "awaiting
+        SHIFT_APPROVE_CLOSE where configured" and no operation carried that permission**, so a
+        venue that configured approval on close had shifts that could never leave
+        `pendingClosure`.
+
+        Where the venue requires approval on close, the counted shift waits here for a supervisor.
+        Approval moves it to `closed` when the variance is within the configured threshold, and
+        to `pendingVariance` when it is beyond it — **approving the close is not accepting the
+        over/short**, which still needs `acceptShiftVariance` (OVERSHORT_ACCEPT). The approving
+        principal is recorded in `Shift.approvals` as kind `close`.
+      tags: [shift]
+      x-ticvai-permission: SHIFT_APPROVE_CLOSE
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [reason]
+              properties:
+                reason: { type: string, minLength: 3, maxLength: 300 }
+      responses:
+        '200':
+          description: Released — `closed`, or `pendingVariance` where the variance needs acceptance
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Shift' }
         '403': { $ref: '../shared/common.yaml#/components/responses/Forbidden' }
+        '404': { $ref: '../shared/common.yaml#/components/responses/NotFound' }
+        '409':
+          description: Shift is not `pendingClosure` (problem type `shift-not-pending-closure`)
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
 
   /shifts/{shiftId}/no-sale:
     parameters:
@@ -907,7 +1121,7 @@ paths:
         can see the count. A reason is required for the same reason it is required on a manual
         discount — attributable, not forbidden.
       tags: [shift]
-      x-ticvai-permission: SHIFT_SUSPEND
+      x-ticvai-permission: CASH_NO_SALE   # its own right, not SHIFT_SUSPEND (26 September, pull audit R199)
       x-ticvai-scope-level: workstation
       x-ticvai-offline-capable: true
       x-ticvai-conflict-policy: append
@@ -929,12 +1143,15 @@ paths:
                 recordedAt: { type: string, format: date-time }
       responses:
         '201':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Recorded
           content:
             application/json:
               schema: { $ref: '#/components/schemas/NoSaleEvent' }
         '409':
-          description: Shift is not open
+          description: Shift is not open (problem type `shift-not-open`)
           content:
             application/problem+json:
               schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
@@ -973,12 +1190,17 @@ paths:
       x-ticvai-conflict-policy: serverWins
       responses:
         '200':
-          description: Movements in sequence
+          description: Movements in sequence, one page at a time
           content:
             application/json:
               schema:
-                type: array
-                items: { $ref: '#/components/schemas/CashMovement' }
+                allOf:
+                  - $ref: '../shared/common.yaml#/components/schemas/Page'
+                  - type: object
+                    properties:
+                      items:
+                        type: array
+                        items: { $ref: '#/components/schemas/CashMovement' }
         '403': { $ref: '../shared/common.yaml#/components/responses/Forbidden' }
 
     post:
@@ -1015,6 +1237,9 @@ paths:
             schema: { $ref: '#/components/schemas/CreateCashMovementRequest' }
       responses:
         '201':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Recorded
           content:
             application/json:
@@ -1022,7 +1247,9 @@ paths:
         '400': { $ref: '../shared/common.yaml#/components/responses/BadRequest' }
         '403': { $ref: '../shared/common.yaml#/components/responses/Forbidden' }
         '409':
-          description: Shift is not open, or the lift exceeds the counted float
+          description: >
+            Shift is not open (problem type `shift-not-open`), or the lift exceeds the counted
+            float (`lift-exceeds-float`)
           content:
             application/problem+json:
               schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
@@ -1036,7 +1263,7 @@ components:
         - open
         - suspended          # break cover; float intact, workstation released
         - pendingVariance    # counted, over/short beyond threshold
-        - pendingClosure     # awaiting SHIFT_APPROVE_CLOSE where configured
+        - pendingClosure     # awaiting approveShiftClose (SHIFT_APPROVE_CLOSE) where configured
         - closed
         - autoClosed         # closed by the inactivity job, supervisor notified
 
@@ -1046,10 +1273,15 @@ components:
 
     DepositBox:
       type: object
-      x-ticvai-persistence: "orders.deposit_box"
+      x-ticvai-persistence: "orders.deposit_box + orders.deposit_box_opening_denomination + orders.deposit_box_foreign_holding"
       description: >
         5.8. **Allocated to a cashier, not to a workstation.** A cashier moving between tills takes
         their float with them, which is what makes a variance attributable to a person.
+
+        **`openingDenominations` and `foreignHoldings` are child rows** (26 September, pull audit
+        R099): `orders.deposit_box_opening_denomination` and `orders.deposit_box_foreign_holding`,
+        one row per item, keyed to the box. Until then the contract carried both and the table had
+        nowhere to put either.
       required: [cashierPrincipalId, venueId, openingFloat]
       properties:
         id: { type: string, format: uuid, readOnly: true }
@@ -1061,7 +1293,11 @@ components:
           format: uuid
           nullable: true
           description: Where it is being used now. **Changes during a shift; the box does not.**
-        shiftId: { type: string, format: uuid, nullable: true }
+        shiftId:
+          type: string
+          pattern: '^[0-9A-HJKMNP-TV-Z]{26}$'
+          nullable: true
+          description: The shift trading from this box. A ULID, as `Shift.id` is.
         status: { $ref: '#/components/schemas/DepositBoxStatus' }
         openingFloat: { $ref: '../shared/common.yaml#/components/schemas/Money' }
         openingDenominations:
@@ -1071,9 +1307,17 @@ components:
             have to re-count it into fields. POS-001 offered only denominations until 14 August.
           items:
             type: object
+            required: [denominationId, count]
             properties:
-              denomination: { type: number }
-              count: { type: integer }
+              denominationId:
+                type: string
+                format: uuid
+                description: >
+                  References `platform.denomination`, as `CashCountLine.denominationId` does. Until
+                  26 September this was `denomination: number` — a face value as a JSON float, which
+                  naming-and-style 5.1 forbids and which could disagree with the note it named
+                  (pull audit R122).
+              count: { type: integer, minimum: 0 }
         withdrawnTotal:
           allOf:
             - $ref: '../shared/common.yaml#/components/schemas/Money'
@@ -1098,14 +1342,11 @@ components:
               currency:
                 type: string
                 pattern: '^[A-Z]{3}$'
-                x-ticvai-persisted: false
                 description: >
-                  **Resolved from the region, not stored** (ADR-0018, 24 August). Region-scoped and not overri
-                  dable below, so a row in a UAE region is AED and cannot be anything else. **Kept on the wire
-                  , removed from the table** — a client should not walk a hierarchy to read a figure, and the 
-                  database should not hold nine million copies of AED. Four tables genuinely differ from their
-                   region and keep a stored currency: `orders.payment.tender_currency`, `inventory.supplier`, 
-                  `ledger.account`, `control.partner_agreement`.
+                  **Stored, because it is the one thing that is not the region's.** A foreign holding
+                  is by definition cash in a currency the till does not trade in, so it cannot resolve
+                  from the region (ADR-0018) the way the box's own amounts do; it is the key of the
+                  row, one per currency per box. The amounts on this item are in this currency.
               expectedAmount:
                 allOf:
                   - $ref: '../shared/common.yaml#/components/schemas/Money'
@@ -1128,7 +1369,12 @@ components:
           description: >
             **Flagged where it is not the holder.** A box closed without its holder present is
             allowed — the cash is counted by somebody, and who counted it is the record.
-        allocatedAt: { type: string, format: date-time }
+        allocatedAt:
+          type: string
+          format: date-time
+          description: >
+            When the device recorded the allocation. `allocateDepositBox` is offline-capable, so
+            for a box allocated offline this differs from the server's receipt time.
         closedAt: { type: string, format: date-time, nullable: true }
 
     Denomination:
@@ -1170,9 +1416,16 @@ components:
           $ref: '../shared/common.yaml#/components/schemas/Money'
     SetDenominationsRequest:
       type: object
-      description: Request only. One currency's complete list; anything not in it is deactivated.
-      required: [currencyCode, denominations]
+      description: >
+        Request only. One currency's complete list; anything not in it is deactivated. Entries
+        match existing rows on `kind` and `value` (see `setDenominations`).
+      required: [scopePath, currencyCode, denominations]
       properties:
+        scopePath:
+          type: string
+          description: >
+            The region the write is made at — the materialised path of a `region` scope node. The
+            caller's `REGION_CONFIGURE` grant must cover it.
         currencyCode: { type: string, minLength: 3, maxLength: 3 }
         denominations:
           type: array
@@ -1216,8 +1469,26 @@ components:
       required: [shiftId, denominationId, countedQuantity]
       properties:
         id: { type: string, format: uuid }
-        shiftId: { type: string, format: uuid }
+        shiftId:
+          type: string
+          pattern: '^[0-9A-HJKMNP-TV-Z]{26}$'
+          description: A ULID, as `Shift.id` and `orders.pos_shift.id` are.
         depositBoxId: { type: string, format: uuid, nullable: true }
+        countKind:
+          type: string
+          enum: [openingFloat, close, movement]
+          description: >
+            Which count this line belongs to — the opening float (`openShift`), the close
+            (`closeShift`) or a lift or add (`createCashMovement`). **Until 26 September the three
+            were indistinguishable on one shift** (pull audit R099). Set by the server from the
+            operation that wrote the line.
+        cashMovementId:
+          type: string
+          pattern: '^[0-9A-HJKMNP-TV-Z]{26}$'
+          nullable: true
+          description: >
+            The movement this line counts, where `countKind` is `movement`. How
+            `listCashMovements` rebuilds each movement's `denominations`.
         denominationId:
           type: string
           format: uuid
@@ -1261,8 +1532,9 @@ components:
           type: string
           format: date-time
           description: >
-            When the device recorded it. Differs from server receipt time for shifts opened
-            offline.
+            When the device recorded it. `openShift` is online-only (F32), so this differs from
+            server receipt time only by transit; it is kept because the shift's other device
+            writes are ordered against it.
 
     CloseShiftRequest:
       type: object
@@ -1319,7 +1591,11 @@ components:
               variance: { $ref: '../shared/common.yaml#/components/schemas/Money' }
 
     Shift:
-      x-ticvai-persistence: "orders.pos_shift"
+      x-ticvai-persistence: "orders.pos_shift + orders.pos_shift_approval + orders.pos_shift_incident"
+      description: >
+        **`approvals` and `incidents` are child rows** (26 September, pull audit R099):
+        `orders.pos_shift_approval` and `orders.pos_shift_incident`, one row per item, keyed to the
+        shift. Until then the contract carried both and `orders.pos_shift` had nowhere to put either.
       type: object
       required: [id, workstationId, venueId, scopePath, principalId, status, currency, currencyScale, openedAt]
       properties:
@@ -1379,9 +1655,45 @@ components:
         depositBoxCode: { type: string, nullable: true }
         bagNumber: { type: string, nullable: true }
         openingFloat: { $ref: '../shared/common.yaml#/components/schemas/Money' }
-        salesTotal: { $ref: '../shared/common.yaml#/components/schemas/Money' }
-        refundsTotal: { $ref: '../shared/common.yaml#/components/schemas/Money' }
-        liftsTotal: { $ref: '../shared/common.yaml#/components/schemas/Money' }
+        # Columns renamed 26 September (pull audit R177): naming-and-style 5.1 bans `total` alone,
+        # and the N7 rename of 24 September missed this table. The wire keeps its names.
+        salesTotal:
+          x-ticvai-column: gross_sales_amount
+          $ref: '../shared/common.yaml#/components/schemas/Money'
+          description: What the till took in sales, as the guest paid it — tax included.
+        refundsTotal:
+          x-ticvai-column: gross_refunded_amount
+          $ref: '../shared/common.yaml#/components/schemas/Money'
+          description: What the till paid back, as the guest was refunded it — tax included.
+        liftsTotal:
+          x-ticvai-column: lifted_amount
+          $ref: '../shared/common.yaml#/components/schemas/Money'
+          description: Cash taken out mid-shift by lifts and withdrawals. Cash, so neither gross nor net.
+        expectedCash:
+          x-ticvai-column: expected_cash_amount
+          allOf:
+            - $ref: '../shared/common.yaml#/components/schemas/Money'
+          readOnly: true
+          nullable: true
+          description: >
+            26 September, pull audit R207. **The figure the blind count was measured against**,
+            revealed once the count is in — null until then. Until this date only
+            `ShiftCloseResult` carried it, returned once by `closeShift`, so BO-040 could not show
+            the over/short it exists to accept.
+        countedCash:
+          x-ticvai-column: counted_cash_amount
+          allOf:
+            - $ref: '../shared/common.yaml#/components/schemas/Money'
+          readOnly: true
+          nullable: true
+          description: What the close count found. Null until the shift is counted.
+        variance:
+          x-ticvai-column: variance_amount
+          allOf:
+            - $ref: '../shared/common.yaml#/components/schemas/Money'
+          readOnly: true
+          nullable: true
+          description: Counted minus expected, as `ShiftCloseResult.variance`. Negative is short.
         heldLeaseCount:
           type: integer
           description: >
@@ -1391,9 +1703,21 @@ components:
         recordedAt:
           type: string
           format: date-time
-          description: When the device recorded the open. Differs from `openedAt` when offline.
+          description: When the device recorded the open. `openedAt` is the server's time.
         suspendedAt: { type: string, format: date-time, nullable: true }
+        suspendReason:
+          type: string
+          maxLength: 200
+          nullable: true
+          description: The `reason` given to `suspendShift`. Cleared on resume.
         closedAt: { type: string, format: date-time, nullable: true }
+        closedByPrincipalId:
+          type: string
+          format: uuid
+          nullable: true
+          description: >
+            Who submitted the close count. `reopenShift` refuses an approver who is this principal,
+            and until 26 September there was nothing to compare against (pull audit R099).
         syncedAt:
           type: string
           format: date-time
@@ -1408,6 +1732,9 @@ components:
               kind:
                 type: string
                 enum: [open, close, variance]
+                description: >
+                  `open` from `approveShiftOpen`, `close` from `approveShiftClose`, `variance` from
+                  `acceptShiftVariance`.
               principalId: { type: string, format: uuid }
               at: { type: string, format: date-time }
               reason: { type: string }
@@ -1415,6 +1742,15 @@ components:
     CashMovementKind:
       type: string
       enum: [openingFloat, lift, add]
+      description: >
+        `openingFloat` is written by `openShift`; `lift` by `createCashMovement` and by
+        `withdrawFromDepositBox`, which is a lift from one cashier's box; `add` by
+        `createCashMovement`.
+
+    WithdrawalReason:
+      type: string
+      description: Why a supervisor took cash out of a box. Set only on lifts `withdrawFromDepositBox` records.
+      enum: [banking, safeDrop, changeOrder, other]
 
     CreateCashMovementRequest:
       type: object
@@ -1428,6 +1764,11 @@ components:
         amount: { $ref: '../shared/common.yaml#/components/schemas/Money' }
         denominations:
           $ref: '#/components/schemas/DenominationCount'
+          x-ticvai-persisted: false
+          description: >
+            **Stored as `orders.cash_count_line` rows** with `countKind: movement` and this
+            movement's `cashMovementId`, not as a column. The jsonb blob this used to land in is
+            what `Denomination` was created to replace (26 September, pull audit R099).
         reference:
           type: string
           maxLength: 64
@@ -1440,8 +1781,8 @@ components:
       x-ticvai-persistence: "orders.no_sale_event"
       required: [id, shiftId, reason, principalId, recordedAt]
       properties:
-        id: { type: string }
-        shiftId: { type: string }
+        id: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
+        shiftId: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
         workstationId: { type: string, format: uuid }
         reason: { type: string }
         note: { type: string, nullable: true }
@@ -1460,7 +1801,25 @@ components:
         - type: object
           required: [shiftId, authorisedByPrincipalId, sequence]
           properties:
-            shiftId: { type: string }
+            shiftId:
+              type: string
+              pattern: '^[0-9A-HJKMNP-TV-Z]{26}$'
+            depositBoxId:
+              type: string
+              format: uuid
+              nullable: true
+              description: >
+                The box the cash moved in or out of. Set on every lift `withdrawFromDepositBox`
+                records (26 September, pull audit R099).
+            witnessPrincipalId:
+              type: string
+              format: uuid
+              nullable: true
+              description: The cashier who countersigned a withdrawal. Null on other movements.
+            withdrawalReason:
+              allOf:
+                - $ref: '#/components/schemas/WithdrawalReason'
+              nullable: true
             authorisedByPrincipalId:
               type: string
               format: uuid

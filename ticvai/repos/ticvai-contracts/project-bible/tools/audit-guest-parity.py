@@ -116,6 +116,21 @@ def main() -> int:
         return {a["operationId"] for i in ids if i in scr
                 for a in (scr[i].get("apis") or []) if a.get("operationId")}
 
+    def components(i) -> list:
+        return [c for r in ((scr[i].get("layout") or {}).get("regions") or [])
+                for c in (r.get("components") or []) if isinstance(c, dict)]
+
+    def called_of(ids) -> set:
+        return {c.get(k) for i in ids for c in components(i) for k in ("operation", "impliedBy")} - {None}
+
+    def unbound(i) -> list:
+        return sorted(ops_of([i]) - called_of([i]))
+
+    def schemas_of(ids) -> set:
+        # `Product.lifecycleState` and `Product[]` show a Product; compare the record, not the field
+        return {re.split(r"[.\[]", str(c["bindsTo"]))[0] for i in ids for c in components(i)
+                if c.get("bindsTo")}
+
     web_ids = [i for i in scr if shell[i] == "web"]
     app_ids = [i for i in scr if shell[i] == "app"]
     all_ops = {"web": ops_of(web_ids), "app": ops_of(app_ids)}
@@ -272,6 +287,33 @@ def main() -> int:
                 f"web only {sorted(set(kinds_w) - set(kinds_a)) or '—'}, app only "
                 f"{sorted(set(kinds_a) - set(kinds_w)) or '—'} ({sum(kinds_w.values())} vs "
                 f"{sum(kinds_a.values())} components)")
+
+        # **What each twin shows, not only which widgets it uses.** Two screens with the same
+        # component kinds can still render different records (Order on one, OrderSummary on the
+        # other), which a guest sees as two products.
+        bind_w, bind_a = schemas_of(W), schemas_of(A)
+        if bind_w != bind_a:
+            add("medium", "bindings", where,
+                f"web shows {sorted(bind_w - bind_a) or '—'} only, app shows "
+                f"{sorted(bind_a - bind_w) or '—'} only",
+                "bind both twins to the same schemas")
+
+        # **A declared operation no component calls is a claim, not a feature.** Counted per member,
+        # so the difference in operations above is not mistaken for a difference a guest can reach.
+        # medium where the twins disagree (the other shell binds it, or never declares it); low where
+        # both declare it and neither binds it — a shared gap, not a parity one.
+        for mine, theirs in ((W, A), (A, W)):
+            their_called, their_ops = called_of(theirs), ops_of(theirs)
+            for i in mine:
+                loose = unbound(i)
+                if not loose:
+                    continue
+                split = [o for o in loose if o in their_called or o not in their_ops]
+                add("medium" if split else "low", "unbound operations", where,
+                    f"{i} declares {', '.join(loose)} and no component in its layout calls "
+                    f"{'it' if len(loose) == 1 else 'them'}"
+                    + (f"; the twin binds or lacks {', '.join(split)}" if split else ""),
+                    "bind each to a component, or move it to the screen that calls it")
 
         perm_w = {scr[i].get("permission") for i in W} - {None}
         perm_a = {scr[i].get("permission") for i in A} - {None}

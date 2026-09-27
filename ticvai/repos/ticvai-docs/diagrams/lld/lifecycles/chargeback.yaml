@@ -20,7 +20,6 @@ terminal:
 transitions:
 - from: received
   to: underReview
-  operation: listChargebacks
   trigger: operation
   guard: Being worked. **The money is already gone** — this is an argument, not a reversal
 - from: underReview

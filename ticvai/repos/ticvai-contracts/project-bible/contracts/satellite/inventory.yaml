@@ -133,15 +133,27 @@ paths:
                   type: array
                   items:
                     type: object
-                    additionalProperties: true
+                    description: The same three facts `Supplier` holds for its primary contact.
+                    properties:
+                      name:
+                        type: string
+                        nullable: true
+                      email:
+                        type: string
+                        nullable: true
+                      phone:
+                        type: string
+                        nullable: true
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Updated
           content:
             application/json:
               schema:
-                type: object
-                additionalProperties: true
+                $ref: '#/components/schemas/Supplier'
   /stock-transfers/{transferId}:
     parameters:
     - name: transferId
@@ -149,7 +161,7 @@ paths:
       required: true
       schema:
         type: string
-        format: uuid
+        pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
     get:
       operationId: getStockTransfer
       x-ticvai-consumed-by:
@@ -184,8 +196,7 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                additionalProperties: true
+                $ref: '#/components/schemas/StockTransfer'
   /requisitions/{requisitionId}/lines:
     parameters:
     - name: requisitionId
@@ -193,7 +204,7 @@ paths:
       required: true
       schema:
         type: string
-        format: uuid
+        pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
     put:
       operationId: updateRequisitionLines
       x-ticvai-consumed-by:
@@ -254,14 +265,17 @@ paths:
                       reason:
                         type: string
                         nullable: true
+                        description: Why the quantity differs from the suggestion. Kept on the line.
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Updated
           content:
             application/json:
               schema:
-                type: object
-                additionalProperties: true
+                $ref: '#/components/schemas/Requisition'
         '409':
           description: '**Already approved.** The correct act is a new requisition, which the response
             names.
@@ -330,12 +344,30 @@ paths:
                     '
       responses:
         '200':
-          description: Set
+          description: Set. The daily list as it now stands
           content:
             application/json:
               schema:
                 type: object
-                additionalProperties: true
+                required:
+                - itemIds
+                - postsAdjustment
+                properties:
+                  itemIds:
+                    type: array
+                    items:
+                      type: string
+                      format: uuid
+                  locationId:
+                    type: string
+                    format: uuid
+                    nullable: true
+                  dueBy:
+                    type: string
+                    nullable: true
+                    description: Local time, e.g. 10:00
+                  postsAdjustment:
+                    type: boolean
   /products/bulk:
     post:
       operationId: bulkUpdateProducts
@@ -386,6 +418,9 @@ paths:
                   additionalProperties: true
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: The preview, or the result with per-item outcomes
           content:
             application/json:
@@ -400,9 +435,21 @@ paths:
                     type: integer
                   failures:
                     type: array
+                    description: One entry per product the change was refused for. Empty on a clean run.
                     items:
                       type: object
-                      additionalProperties: true
+                      required:
+                      - productId
+                      - code
+                      properties:
+                        productId:
+                          type: string
+                          format: uuid
+                        code:
+                          type: string
+                          description: The validation rule the product failed, as in `Problem.errors[].code`.
+                        message:
+                          type: string
   /serialised-items:
     get:
       operationId: listSerialisedItems
@@ -430,6 +477,8 @@ paths:
       parameters:
       - name: serial
         in: query
+        description: Exact match. A serial is unique within an item, not globally, so one serial can
+          return more than one item.
         schema:
           type: string
       - name: status
@@ -444,9 +493,14 @@ paths:
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/SerialisedItem'
+                allOf:
+                  - $ref: '../shared/common.yaml#/components/schemas/Page'
+                  - type: object
+                    properties:
+                      items:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/SerialisedItem'
   /stock-batches/expiring:
     get:
       operationId: listExpiringBatches
@@ -485,9 +539,14 @@ paths:
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/StockBatch'
+                allOf:
+                  - $ref: '../shared/common.yaml#/components/schemas/Page'
+                  - type: object
+                    properties:
+                      items:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/StockBatch'
   /inventory-items:
     get:
       operationId: listInventoryItems
@@ -523,8 +582,15 @@ paths:
           type: boolean
       - name: search
         in: query
+        description: 'Matched against the item''s `name`, `sku` and `barcode`, case-insensitive, anywhere
+          in the value (contains, not prefix). Combined with the other filters, not instead of them.
+          **An exact scan is `lookupInventoryItem`**, which answers one item or 404 rather than a list.
+
+          '
         schema:
           type: string
+          minLength: 1
+          maxLength: 200
       - $ref: ../shared/common.yaml#/components/parameters/PageSize
       - $ref: ../shared/common.yaml#/components/parameters/PageCursor
       responses:
@@ -571,6 +637,9 @@ paths:
               $ref: '#/components/schemas/CreateInventoryItemRequest'
       responses:
         '201':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Created
           content:
             application/json:
@@ -658,8 +727,17 @@ paths:
                   format: uuid
                 isActive:
                   type: boolean
+                costingMethod:
+                  $ref: '#/components/schemas/CostingMethod'
+                baseUnit:
+                  type: string
+                  description: Changeable only while `hasMovements` is false; the 409 below is the
+                    refusal once it is true.
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Updated
           content:
             application/json:
@@ -798,9 +876,14 @@ paths:
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/StockLocation'
+                allOf:
+                  - $ref: '../shared/common.yaml#/components/schemas/Page'
+                  - type: object
+                    properties:
+                      items:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/StockLocation'
     post:
       operationId: createStockLocation
       x-ticvai-consumed-by:
@@ -845,6 +928,9 @@ paths:
                   format: uuid
       responses:
         '201':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Created
           content:
             application/json:
@@ -986,6 +1072,9 @@ paths:
               $ref: '#/components/schemas/CreateStockMovementRequest'
       responses:
         '201':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Recorded
           content:
             application/json:
@@ -1071,6 +1160,9 @@ paths:
               $ref: '#/components/schemas/StartStockCountRequest'
       responses:
         '201':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Started. Expected quantities are withheld when blind
           content:
             application/json:
@@ -1146,6 +1238,9 @@ paths:
                         format: date-time
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Submitted
           content:
             application/json:
@@ -1185,7 +1280,7 @@ paths:
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: true
       x-ticvai-offline-note: '24 August: A count is worked offline and its variance is computed from the
-        cached count li nes. **The whole point of a count is that it happens where the stock is.**
+        cached count lines. **The whole point of a count is that it happens where the stock is.**
 
         '
       x-ticvai-conflict-policy: serverWins
@@ -1209,6 +1304,7 @@ paths:
       required: true
       schema:
         type: string
+        pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
     post:
       operationId: cancelStockCount
       x-ticvai-consumed-by:
@@ -1239,9 +1335,17 @@ paths:
               properties:
                 reason:
                   type: string
+                  description: Kept as `StockCount.cancelReason`.
       responses:
         '200':
-          description: Done
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: Cancelled
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StockCount'
         '409':
           description: Not in a state that permits this
           content:
@@ -1255,6 +1359,7 @@ paths:
       required: true
       schema:
         type: string
+        pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
     post:
       operationId: recountStockCount
       x-ticvai-consumed-by:
@@ -1285,9 +1390,17 @@ paths:
               properties:
                 reason:
                   type: string
+                  description: Kept as `StockCount.recountReason`.
       responses:
         '200':
-          description: Done
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: Sent back to counting
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StockCount'
         '409':
           description: Not in a state that permits this
           content:
@@ -1334,6 +1447,9 @@ paths:
                   maxLength: 1000
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Posted
           content:
             application/json:
@@ -1414,6 +1530,9 @@ paths:
               $ref: '#/components/schemas/CreateStockTransferRequest'
       responses:
         '201':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Dispatched
           content:
             application/json:
@@ -1432,6 +1551,7 @@ paths:
       required: true
       schema:
         type: string
+        pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
     post:
       operationId: closeTransferShort
       x-ticvai-consumed-by:
@@ -1464,9 +1584,17 @@ paths:
               properties:
                 reason:
                   type: string
+                  description: Kept as `StockTransfer.closeShortReason`.
       responses:
         '200':
-          description: Done
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: Closed short; the balance written off
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StockTransfer'
         '409':
           description: Not in a state that permits this
           content:
@@ -1530,11 +1658,21 @@ paths:
                         maxLength: 500
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Received
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/StockTransfer'
+        '409':
+          description: The transfer is not `inTransit` or `partiallyReceived` — it has already been
+            received in full, or closed short
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
   /requisitions:
     get:
       operationId: listRequisitions
@@ -1551,7 +1689,7 @@ paths:
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: true
       x-ticvai-offline-note: '24 August: A storekeeper walks a stockroom with no signal. **The list is
-        cached; raising o ne queues.**
+        cached; raising one queues.**
 
         '
       x-ticvai-conflict-policy: serverWins
@@ -1611,6 +1749,9 @@ paths:
               $ref: '#/components/schemas/CreateRequisitionRequest'
       responses:
         '201':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Raised, awaiting approval
           content:
             application/json:
@@ -1666,6 +1807,7 @@ paths:
       required: true
       schema:
         type: string
+        pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
     post:
       operationId: rejectRequisition
       x-ticvai-consumed-by:
@@ -1696,9 +1838,17 @@ paths:
               properties:
                 reason:
                   type: string
+                  description: Kept as `Requisition.rejectionReason`.
       responses:
         '200':
-          description: Done
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: Rejected
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Requisition'
         '409':
           description: Not in a state that permits this
           content:
@@ -1712,6 +1862,7 @@ paths:
       required: true
       schema:
         type: string
+        pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
     post:
       operationId: returnRequisition
       x-ticvai-consumed-by:
@@ -1742,9 +1893,17 @@ paths:
               properties:
                 question:
                   type: string
+                  description: Kept as `Requisition.returnQuestion`, so the requester sees what to answer.
       responses:
         '200':
-          description: Done
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: Returned for information
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Requisition'
         '409':
           description: Not in a state that permits this
           content:
@@ -1758,6 +1917,7 @@ paths:
       required: true
       schema:
         type: string
+        pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
     post:
       operationId: cancelRequisition
       x-ticvai-consumed-by:
@@ -1787,9 +1947,17 @@ paths:
               properties:
                 reason:
                   type: string
+                  description: Kept as `Requisition.cancelReason`.
       responses:
         '200':
-          description: Done
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: Cancelled
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Requisition'
         '409':
           description: Not in a state that permits this
           content:
@@ -1853,6 +2021,9 @@ paths:
                         minimum: 0
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Decision recorded
           content:
             application/json:
@@ -1866,6 +2037,13 @@ paths:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
         '403':
           $ref: ../shared/common.yaml#/components/responses/Forbidden
+        '409':
+          description: The requisition is not `pendingApproval`, or the caller raised it — the state
+            model's guard is that the approver is not the requester
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
   /suppliers:
     get:
       operationId: listSuppliers
@@ -1921,6 +2099,9 @@ paths:
               $ref: '#/components/schemas/Supplier'
       responses:
         '201':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Created
           content:
             application/json:
@@ -1947,9 +2128,11 @@ paths:
 
         '
       x-ticvai-not-config: true
-      x-ticvai-not-config-note: "**Not configuration.** A supplier quotation is a commercial record with\
-        \ its own lifecycle — \n      it is quoted, compared, awarded or lapses. The naming rules reach\
-        \ it because it contains `Qu\n      otation`, and the honest answer is that it configures nothing.\n"
+      x-ticvai-not-config-note: '**Not configuration.** A supplier quotation is a commercial record with
+        its own lifecycle — it is quoted, compared, awarded or lapses. The naming rules reach it because
+        it contains `Quotation`, and the honest answer is that it configures nothing.
+
+        '
       tags:
       - supplier
       x-ticvai-permission: PRODUCT_CONFIGURE
@@ -1966,6 +2149,9 @@ paths:
               $ref: '#/components/schemas/CreateQuotationRequest'
       responses:
         '201':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Recorded
           content:
             application/json:
@@ -2073,6 +2259,9 @@ paths:
               $ref: '#/components/schemas/CreatePurchaseOrderRequest'
       responses:
         '201':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Raised
           content:
             application/json:
@@ -2122,6 +2311,7 @@ paths:
       required: true
       schema:
         type: string
+        pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
     post:
       operationId: sendPurchaseOrder
       x-ticvai-consumed-by:
@@ -2143,7 +2333,14 @@ paths:
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       responses:
         '200':
-          description: Done
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: Sent
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PurchaseOrder'
         '409':
           description: Not in a state that permits this
           content:
@@ -2157,6 +2354,7 @@ paths:
       required: true
       schema:
         type: string
+        pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
     post:
       operationId: acknowledgePurchaseOrder
       x-ticvai-consumed-by:
@@ -2187,9 +2385,17 @@ paths:
               properties:
                 supplierReference:
                   type: string
+                  description: Kept as `PurchaseOrder.supplierReference`; the time is `acknowledgedAt`.
       responses:
         '200':
-          description: Done
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: Acknowledged
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PurchaseOrder'
         '409':
           description: Not in a state that permits this
           content:
@@ -2203,6 +2409,7 @@ paths:
       required: true
       schema:
         type: string
+        pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
     post:
       operationId: closePurchaseOrderShort
       x-ticvai-consumed-by:
@@ -2233,9 +2440,17 @@ paths:
               properties:
                 reason:
                   type: string
+                  description: Kept as `PurchaseOrder.closeShortReason`.
       responses:
         '200':
-          description: Done
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: Closed short
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PurchaseOrder'
         '409':
           description: Not in a state that permits this
           content:
@@ -2279,13 +2494,24 @@ paths:
                   type: string
                   minLength: 3
                   maxLength: 500
+                  description: Kept as `PurchaseOrder.cancelReason`.
       responses:
         '200':
-          description: Cancelled or closed short
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: Cancelled
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/PurchaseOrder'
+        '409':
+          description: The order is not `raised` or `sent`. An order with goods received against it
+            is closed short with `closePurchaseOrderShort`, not cancelled
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
   /goods-receipts:
     get:
       operationId: listGoodsReceipts
@@ -2306,7 +2532,7 @@ paths:
         in: query
         schema:
           type: string
-          format: uuid
+          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
       - $ref: ../shared/common.yaml#/components/parameters/PageSize
       - $ref: ../shared/common.yaml#/components/parameters/PageCursor
       responses:
@@ -2354,6 +2580,9 @@ paths:
               $ref: '#/components/schemas/CreateGoodsReceiptRequest'
       responses:
         '201':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Received; stock incremented
           content:
             application/json:
@@ -2432,11 +2661,21 @@ paths:
                   maxLength: 1000
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Rejected; stock reversed and a return raised
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/GoodsReceipt'
+        '409':
+          description: A line rejects more than was received and not already rejected on this receipt,
+            or names an item the receipt does not hold
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
   /stock-reservations:
     get:
       operationId: listStockReservations
@@ -2604,7 +2843,7 @@ components:
           format: uuid
         countId:
           type: string
-          format: uuid
+          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
         itemId:
           type: string
           format: uuid
@@ -3126,6 +3365,7 @@ components:
       properties:
         id:
           type: string
+          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
         locationId:
           type: string
           format: uuid
@@ -3166,6 +3406,14 @@ components:
           type: string
           format: date-time
           nullable: true
+        recountReason:
+          type: string
+          nullable: true
+          description: Why the count was last sent back by `recountStockCount`.
+        cancelReason:
+          type: string
+          nullable: true
+          description: Why it was abandoned, from `cancelStockCount`.
     CountVariance:
       x-ticvai-persistence: none — computed at close
       type: object
@@ -3176,6 +3424,7 @@ components:
       properties:
         countId:
           type: string
+          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
         totalVarianceValue:
           $ref: ../shared/common.yaml#/components/schemas/Money
         exceptionCount:
@@ -3280,6 +3529,7 @@ components:
       properties:
         id:
           type: string
+          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
         transferNumber:
           type: string
         fromLocationId:
@@ -3325,6 +3575,10 @@ components:
           type: string
           format: date-time
           nullable: true
+        closeShortReason:
+          type: string
+          nullable: true
+          description: Why the balance was written off, from `closeTransferShort`.
         scopePath:
           type: string
           description: '**The partition key** (ADR-0005). `fromLocationId` and `toLocationId` give the
@@ -3402,6 +3656,7 @@ components:
       properties:
         id:
           type: string
+          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
         requisitionNumber:
           type: string
         venueId:
@@ -3410,6 +3665,13 @@ components:
         departmentId:
           type: string
           format: uuid
+          nullable: true
+        costCenterId:
+          type: string
+          format: uuid
+          nullable: true
+        justification:
+          type: string
           nullable: true
         status:
           $ref: '#/components/schemas/RequisitionStatus'
@@ -3427,6 +3689,13 @@ components:
                 type: string
               requestedQuantity:
                 type: number
+              suggestedQuantity:
+                type: number
+                nullable: true
+                description: '**Kept, never overwritten** (`updateRequisitionLines`). Null on a line
+                  nobody suggested.
+
+                  '
               approvedQuantity:
                 type: number
                 nullable: true
@@ -3435,6 +3704,13 @@ components:
                 nullable: true
               unit:
                 type: string
+              reason:
+                type: string
+                nullable: true
+                description: Why the requested quantity differs from the suggestion.
+              note:
+                type: string
+                nullable: true
               estimatedCost:
                 $ref: ../shared/common.yaml#/components/schemas/Money
         estimatedTotal:
@@ -3456,6 +3732,31 @@ components:
           type: string
           format: date-time
         approvedAt:
+          type: string
+          format: date-time
+          nullable: true
+        rejectionReason:
+          type: string
+          nullable: true
+          description: From `rejectRequisition`. What the requester reads before copying it into a
+            new draft.
+        rejectedAt:
+          type: string
+          format: date-time
+          nullable: true
+        returnQuestion:
+          type: string
+          nullable: true
+          description: From `returnRequisition`. What the requester must answer before resubmitting.
+        returnedAt:
+          type: string
+          format: date-time
+          nullable: true
+        cancelReason:
+          type: string
+          nullable: true
+          description: From `cancelRequisition`.
+        cancelledAt:
           type: string
           format: date-time
           nullable: true
@@ -3538,6 +3839,20 @@ components:
           nullable: true
         isActive:
           type: boolean
+        status:
+          type: string
+          enum:
+          - active
+          - onHold
+          - suspended
+          - terminated
+          description: Set by `updateSupplier`. **A supplier on hold stops appearing in requisitions
+            and purchase orders while its history stays intact.**
+        statusReason:
+          type: string
+          nullable: true
+        minimumOrderValue:
+          $ref: ../shared/common.yaml#/components/schemas/Money
         scopePath:
           type: string
           description: '**The partition key** (ADR-0005). Added 31 August: the operations that write this
@@ -3560,6 +3875,7 @@ components:
       properties:
         requisitionId:
           type: string
+          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
         reference:
           type: string
           maxLength: 128
@@ -3631,6 +3947,7 @@ components:
       properties:
         requisitionId:
           type: string
+          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
         quotations:
           type: array
           items:
@@ -3692,6 +4009,7 @@ components:
           pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
         requisitionId:
           type: string
+          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
         supplierId:
           type: string
           format: uuid
@@ -3741,10 +4059,20 @@ components:
       properties:
         id:
           type: string
+          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
         purchaseOrderNumber:
           type: string
         requisitionId:
           type: string
+          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+          nullable: true
+          description: Null on a blanket order or an RFQ award, which are raised without one.
+        quotationId:
+          type: string
+          format: uuid
+          nullable: true
+          description: The quotation selected when the order was raised (`createPurchaseOrder` requires
+            it). **The link that shows the comparison was made**, which `rfqId` alone does not.
         supplierId:
           type: string
           format: uuid
@@ -3765,8 +4093,10 @@ components:
             '
         blanketParentId:
           type: string
-          format: uuid
+          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
           nullable: true
+          description: The blanket order this release draws against — another purchase order, so
+            the same id type.
         contractPriceValidUntil:
           type: string
           format: date
@@ -3859,6 +4189,28 @@ components:
           type: string
           format: date-time
           nullable: true
+        supplierReference:
+          type: string
+          nullable: true
+          description: The supplier's own order reference, from `acknowledgePurchaseOrder`.
+        acknowledgedAt:
+          type: string
+          format: date-time
+          nullable: true
+          description: '**Null is the supplier performance figure** — goods arriving against an order
+            never acknowledged.'
+        closeShortReason:
+          type: string
+          nullable: true
+          description: Why the balance was written off, from `closePurchaseOrderShort`.
+        cancelReason:
+          type: string
+          nullable: true
+          description: From `cancelPurchaseOrder`.
+        cancelledAt:
+          type: string
+          format: date-time
+          nullable: true
         venueId:
           type: string
           format: uuid
@@ -3883,6 +4235,7 @@ components:
           pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
         purchaseOrderId:
           type: string
+          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
         locationId:
           type: string
           format: uuid
@@ -3933,10 +4286,12 @@ components:
       properties:
         id:
           type: string
+          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
         receiptNumber:
           type: string
         purchaseOrderId:
           type: string
+          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
         locationId:
           type: string
           format: uuid

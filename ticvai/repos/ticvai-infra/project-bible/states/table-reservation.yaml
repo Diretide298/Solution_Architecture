@@ -13,7 +13,6 @@ initial:
 terminal:
 - completed
 - cancelled
-- noShow
 transitions:
 - from: booked
   to: confirmed

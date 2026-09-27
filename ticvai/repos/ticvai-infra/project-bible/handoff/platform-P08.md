@@ -9,12 +9,12 @@
 | Contracts | 31 |
 | Modules | 13 |
 | Undrawn | 0 |
-| Operations with no screen | 237 |
+| Operations with no screen | 256 |
 | Waves | wave1 60 · wave2 79 · wave3 1043 |
 
 ## Gaps
 
-### 237 operations with no screen here
+### 256 operations with no screen here
 
 **In a contract this platform uses, callable by its audience, and reaching no screen on any platform serving that audience.** Either a screen is missing or the endpoint should not exist — and the second is worth considering first.
 
@@ -42,6 +42,7 @@
 | `commitCatalogueImport` | catalogue | POST | Apply a parsed catalogue import |
 | `createDonationCampaign` | catalogue | POST | Create a campaign |
 | `freezeEntitlement` | catalogue | POST | Pause a membership at the guest's request |
+| `getCatalogueImportJob` | catalogue | GET | Progress and findings of a catalogue import |
 | `getDynamicPriceRule` | catalogue | GET | One rule with its conditions and actions |
 | `getPlanBenefits` | catalogue | GET | Which benefits a plan grants, and how much of each |
 | `listDonationCampaigns` | catalogue | GET | Campaigns a guest can give to |
@@ -59,8 +60,7 @@
 | `suspendEntitlement` | catalogue | POST | Suspend or reinstate an entitlement |
 | `updateDonationCampaign` | catalogue | PATCH | Amend or close a campaign |
 | `calculateTax` | finance | POST | Compute tax for a set of lines |
-| `disputeObligation` | finance | POST | One entity disagrees with the amount |
-| … | | | 197 more |
+| … | | | 216 more |
 
 ### 8 modules split across waves
 

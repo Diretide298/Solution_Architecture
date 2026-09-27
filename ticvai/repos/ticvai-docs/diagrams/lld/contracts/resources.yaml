@@ -1,5 +1,5 @@
 id: LLD-resources
-title: resources — 48 operations
+title: resources — 49 operations
 generatedBy: tools/derive-diagrams.py
 index: diagrams/hld/03-contracts.yaml
 tier: satellite
@@ -15,6 +15,8 @@ operations:
   offline: false
   reads:
   - resources.booking
+  - resources.resource_dependency
+  - resources.resource_requirement
   writes:
   - resources.resource_requirement
 - operation: bookResource
@@ -256,6 +258,17 @@ operations:
   offline: false
   reads:
   - resources.resource_relation
+  writes: []
+- operation: getResourceQualifications
+  verb: GET
+  path: /resources/{resourceId}/qualifications
+  scope: venue
+  permission: RESOURCE_VIEW
+  audience:
+  - staff
+  offline: false
+  reads:
+  - resources.qualification
   writes: []
 - operation: getResourceSchedule
   verb: GET

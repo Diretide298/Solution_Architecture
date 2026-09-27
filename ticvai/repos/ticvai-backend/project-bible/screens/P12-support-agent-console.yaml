@@ -1,4 +1,3 @@
-
 platform:
   code: P12
   audience: staff
@@ -77,12 +76,18 @@ screens:
     isEntryPoint: true
     inferred: true
     exitTo:
+    - ANL-001
+    - BO-001
+    - CMS-001
     - SUP-002
     - SUP-003
     - SUP-004
-    - BO-001
-    - CMS-001
-    - ANL-001
+    - SUP-005
+    - SUP-006
+    - SUP-007
+    - SUP-008
+    - SUP-009
+    - SUP-019
     transitions:
     - to: SUP-002
       trigger: Agent Dashboard
@@ -102,16 +107,37 @@ screens:
     - to: ANL-001
       trigger: Executive Command Center
       provenance: structural — SUP-001 is P12's home screen and its exits are its launcher
+    - to: SUP-005
+      trigger: Live Chat Workspace
+      provenance: derived — SUP-005 declares entryState.params caseId, conversationId and SUP-001 holds
+        none of them, so the edge carries nothing and SUP-005 opens cold
+    - to: SUP-006
+      trigger: Knowledge Base Search
+      provenance: derived — SUP-006 declares entryState.params bannerId, pageId, policyKind, version and
+        SUP-001 holds none of them, so the edge carries nothing and SUP-006 opens cold
+    - to: SUP-008
+      trigger: Agent Performance & SLA View
+      provenance: derived — SUP-008 declares entryState.params conversationId, reportId and SUP-001 holds
+        none of them, so the edge carries nothing and SUP-008 opens cold
+    - to: SUP-007
+      trigger: Canned Response Management
+      provenance: structural — SUP-001 is P12's home screen and its exits are its launcher
+    - to: SUP-009
+      trigger: Customer Service Command Center
+      provenance: structural — SUP-001 is P12's home screen and its exits are its launcher
+    - to: SUP-019
+      trigger: Contact Center Operations Command Center
+      provenance: structural — SUP-001 is P12's home screen and its exits are its launcher
   notes: '**Generalised on 10 September 2026 from `Agent Login`.** It was the only door into an application
-    of 550 screens - P08 back office, P13 CMS, P16 analytics and this console - and it was named for
-    one of the four. A venue manager signing in through a screen called *Agent Login* is being told
-    they are in the wrong place.
+    of 550 screens - P08 back office, P13 CMS, P16 analytics and this console - and it was named for one
+    of the four. A venue manager signing in through a screen called *Agent Login* is being told they are
+    in the wrong place.
 
 
     **Nothing about the screen changed except what it admits to.** It already called the whole identity
     set - `login`, `forceLogout`, `listSsoProviders`, `revokeAllSessions`, `listMfaMethods` - and its
-    purpose already read *get someone into the app, fast, on a device that may be shared*. The work
-    was the name and the exits.
+    purpose already read *get someone into the app, fast, on a device that may be shared*. The work was
+    the name and the exits.
 
 
     **`implementation.app` stays `venue-support-web`.** That is the build unit, one of twelve frontends
@@ -120,27 +146,37 @@ screens:
 
 
     **It keeps `listMfaMethods` where `POS-000` does not**, and the difference is the point: this signs
-    somebody into the ledger, the pricing and the tenant''s own content from a desk, while a till is
-    bounded by the terminal it is bolted to.'
+    somebody into the ledger, the pricing and the tenant''s own content from a desk, while a till is bounded
+    by the terminal it is bolted to.'
   density: compact
   pattern: listDetail
   patternReason: '`listActiveSessions` reads the population and `getCurrentSession` reads one of them
     — list, select, act'
-  purpose: Get someone into venue management, fast, on a device that may be shared, and resolve the
-    session the back office, the CMS and analytics all read.
-  gaps:
-  - operation: listMfaMethods
-    why: '**2 declared operations reach no component on this screen**: listMfaMethods, listSsoProviders.
-      Either the screen is missing what calls them, or the declaration is residue.'
-    source: the screen's own declarations
+  purpose: Get someone into venue management, fast, on a device that may be shared, and resolve the session
+    the back office, the CMS and analytics all read.
   layout:
     template: split
     regions:
     - name: contentBody
       slot: collection
       components:
+      - kind: textField
+        label: Venue id
+        operation: listActiveSessions
+        notes: Sends `?venueId=` to `listActiveSessions`.
+        provenance: contract identity.yaml GET /auth/sessions
+      - kind: textField
+        label: Principal id
+        operation: listActiveSessions
+        notes: Sends `?principalId=` to `listActiveSessions`.
+        provenance: contract identity.yaml GET /auth/sessions
+      - kind: textField
+        label: Workstation id
+        operation: listActiveSessions
+        notes: Sends `?workstationId=` to `listActiveSessions`.
+        provenance: contract identity.yaml GET /auth/sessions
       - kind: dataTable
-        label: Every agent login
+        label: Every active session
         bindsTo: ActiveSession
         columns:
         - ActiveSession.sessionId
@@ -157,11 +193,58 @@ screens:
         - ActiveSession.mfaSatisfied
         operation: listActiveSessions
         provenance: contract identity.yaml GET /auth/sessions
+      - kind: dataTable
+        label: Every MFA method
+        bindsTo: MfaMethod
+        columns:
+        - MfaMethod.id
+        - MfaMethod.kind
+        - MfaMethod.label
+        - MfaMethod.maskedTarget
+        - MfaMethod.isActive
+        - MfaMethod.isPrimary
+        - MfaMethod.enrolledAt
+        - MfaMethod.lastUsedAt
+        operation: listMfaMethods
+        provenance: contract identity.yaml GET /auth/mfa/methods
+      - kind: dataTable
+        label: Every SSO provider
+        bindsTo: SsoProvider
+        columns:
+        - SsoProvider.id
+        - SsoProvider.displayName
+        - SsoProvider.protocol
+        - SsoProvider.iconAssetRef
+        - SsoProvider.isEnforced
+        - SsoProvider.scopePath
+        operation: listSsoProviders
+        provenance: contract identity.yaml GET /auth/sso/providers
     - name: contextPanel
       slot: selection
       components:
       - kind: detailPanel
-        label: The selected agent login
+        label: The selected active session
+        bindsTo: ActiveSession
+        columns:
+        - ActiveSession.status
+        - ActiveSession.sessionId
+        - ActiveSession.principalId
+        - ActiveSession.principalName
+        - ActiveSession.roleId
+        - ActiveSession.roleName
+        - ActiveSession.workstationId
+        - ActiveSession.workstationName
+        - ActiveSession.venueId
+        - ActiveSession.ipAddress
+        - ActiveSession.deviceInfo
+        - ActiveSession.hasOpenShift
+        - ActiveSession.mfaSatisfied
+        - ActiveSession.startedAt
+        - ActiveSession.lastSeenAt
+        operation: listActiveSessions
+        provenance: contract identity.yaml GET /auth/sessions
+      - kind: detailPanel
+        label: The session
         bindsTo: Session
         columns:
         - Session.sessionId
@@ -185,40 +268,62 @@ screens:
         operation: login
         provenance: contract identity.yaml POST /auth/login
       - kind: destructiveButton
-        label: Force
+        label: Force logout
         operation: forceLogout
         provenance: contract identity.yaml POST /auth/sessions/{sessionId}/force-logout
       - kind: destructiveButton
-        label: Revoke
+        label: Revoke all sessions
         operation: revokeAllSessions
         provenance: contract identity.yaml POST /auth/sessions/revoke-all
   overlays:
   - id: confirmForceLogout
     component: confirmDialog
-    trigger: Force
-    body: '**Names what `forceLogout` changes and what it leaves alone**, in the consequence rather
-      than the verb. A agent login this affects should be identified in the dialog, not just counted.'
+    trigger: Force logout
+    body: '**Names what `forceLogout` changes and what it leaves alone**, in the consequence rather than
+      the verb. A agent login this affects should be identified in the dialog, not just counted. **Collects
+      what `forceLogout` sends before it is called.** Required: `reason`.'
     provenance: contract identity.yaml POST /auth/sessions/{sessionId}/force-logout
   - id: confirmRevokeAllSessions
     component: confirmDialog
-    trigger: Revoke
+    trigger: Revoke all sessions
     body: '**Names what `revokeAllSessions` changes and what it leaves alone**, in the consequence rather
-      than the verb. A agent login this affects should be identified in the dialog, not just counted.'
+      than the verb. A agent login this affects should be identified in the dialog, not just counted.
+      **Collects what `revokeAllSessions` sends before it is called.** Required: `reason`, `stepUpToken`.
+      Optional: `venueId`, `excludeSelf`.'
     provenance: contract identity.yaml POST /auth/sessions/revoke-all
+  - id: formLogin
+    component: modal
+    trigger: Login
+    body: '**Collects what `login` sends before it is called.** Required: `username`, `credential`, `workstationId`.
+      Optional: `method`, `deviceFingerprint`. Dismissing sends nothing; the screen behind is unchanged.'
+    bindsTo: LoginRequest
+    confirm:
+      label: Login
+      operation: login
+    dismiss:
+      label: Cancel
+      discards:
+      - username
+      - credential
+      - workstationId
+      - method
+      - deviceFingerprint
+    provenance: contract identity.yaml POST /auth/login
   states:
     loading: The agent login list.
     error: Could not load. Names which read failed and leaves the agent login untouched.
-    emptyFirstRun: No agent login yet. Carries the create action; distinct from a filter that matched
-      nothing.
-    emptyNoResults: The filter narrowed it and the agent login are still there. Names the active filter
-      and offers to clear it.
-    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is
-      no data* and sends somebody to support with the wrong question.
+    emptyFirstRun: No agent login yet. **Offers no create action** — this screen declares no operation
+      that makes one — and says so rather than showing an empty table.
+    emptyNoResults: Nothing matches the filter on venueId, principalId, workstationId and the agent login
+      are still there. Names the active filter and offers to clear it.
+    emptyNoAccess: Shown when the caller lacks `SESSION_FORCE_LOGOUT`, which `listActiveSessions` requires,
+      and names that permission. **Never an empty table** — that reads as *there is no data* and sends
+      somebody to support with the wrong question.
   apis:
   - operationId: login
     contract: identity
     purpose: from page inventory
-    trigger: onLoad
+    trigger: onAction
   - operationId: forceLogout
     contract: identity
     purpose: Supervisor termination of an abandoned session
@@ -251,18 +356,18 @@ screens:
     params: []
     coldEntry: Resolves from the session; a cold arrival is the ordinary case.
     preloaded:
-    - Session.sessionId
-    - Session.principalId
-    - Session.roleId
-    - Session.displayName
-    - Session.scope
+    - ActiveSession.status
+    - ActiveSession.sessionId
+    - ActiveSession.principalId
+    - ActiveSession.principalName
+    - ActiveSession.roleId
   wireframe:
     status: notStarted
     provenance: generated
     board: wireframes/P12 Venue Support.dc.html#sup-001
-  apisNote: Rebuilt 9 September 2026 from the 8 operations this screen declares, not from a workshop
-    pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing
-    them to the ones that matter is work a person still owes this screen.
+  apisNote: Rebuilt 9 September 2026 from the 8 operations this screen declares, not from a workshop pack
+    — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
+    to the ones that matter is work a person still owes this screen.
 - id: SUP-002
   name: Agent Dashboard
   module: Overview
@@ -285,22 +390,20 @@ screens:
     transitions:
     - to: SUP-001
       trigger: Agent Login
-      carries:
-      - sessionId
-      provenance: derived — SUP-001 declares entryState.params sessionId, so an edge into it must carry
-        them
+      provenance: derived — SUP-001 declares entryState.params  and SUP-002 holds none of them, so the
+        edge carries nothing and SUP-001 opens cold
     - to: SUP-004
       trigger: Conversation Queue
       carries:
       - caseId
       - conversationId
-      provenance: derived — SUP-004 declares entryState.params caseId, conversationId, so an edge into
-        it must carry them
+      provenance: derived — SUP-004 declares entryState.params caseId, conversationId and SUP-002 holds
+        caseId, conversationId, so an edge into it carries them
   notes: States derived from the screen pattern on 17 August, not individually considered — sound for
     a list, a form or a money screen, and worth revisiting where this screen is unusual. Purpose derived
     from the screen name and its operations on 17 August, not from a requirement. **Drawn 26 August**
-    — `Dashboards Board` frame `sup-002`. **One board draws five dashboards across five platforms**
-    — platform admin, partner, support, guest web and cross-tenant health. A dashboard is a shape rather
+    — `Dashboards Board` frame `sup-002`. **One board draws five dashboards across five platforms** —
+    platform admin, partner, support, guest web and cross-tenant health. A dashboard is a shape rather
     than a domain, and the pack recognised that before the package did.
   density: compact
   boardFrames:
@@ -308,19 +411,34 @@ screens:
   pattern: listDetail
   patternReason: '`listCases` reads the population and `getCase` reads one of them — list, select, act'
   purpose: The screen this app sits on. Everything else is entered from here and returns to it.
-  gaps:
-  - operation: listConversations
-    why: '**1 declared operation reach no component on this screen**: listConversations. Either the
-      screen is missing what calls them, or the declaration is residue.'
-    source: the screen's own declarations
   layout:
     template: split
     regions:
     - name: contentBody
       slot: collection
       components:
+      - kind: textField
+        label: Status
+        operation: listCases
+        notes: Sends `?status=` to `listCases`.
+        provenance: contract marketing-crm.yaml GET /cases
+      - kind: textField
+        label: Assigned to principal id
+        operation: listCases
+        notes: Sends `?assignedToPrincipalId=` to `listCases`.
+        provenance: contract marketing-crm.yaml GET /cases
+      - kind: toggle
+        label: Breached sla
+        operation: listCases
+        notes: Sends `?breachedSla=` to `listCases`.
+        provenance: contract marketing-crm.yaml GET /cases
+      - kind: textField
+        label: Priority
+        operation: listCases
+        notes: Sends `?priority=` to `listCases`.
+        provenance: contract marketing-crm.yaml GET /cases
       - kind: dataTable
-        label: Every agent
+        label: Every case
         bindsTo: Case
         columns:
         - Case.id
@@ -337,11 +455,51 @@ screens:
         - Case.slaDueAt
         operation: listCases
         provenance: contract marketing-crm.yaml GET /cases
+      - kind: dataTable
+        label: Every conversation
+        bindsTo: Conversation
+        columns:
+        - Conversation.id
+        - Conversation.telephony
+        - Conversation.assistSessionId
+        - Conversation.channel
+        - Conversation.state
+        - Conversation.subjectId
+        - Conversation.venueId
+        - Conversation.assignedPrincipalId
+        - Conversation.queueId
+        - Conversation.queuePosition
+        - Conversation.estimatedWaitSeconds
+        - Conversation.handoverReason
+        operation: listConversations
+        provenance: contract marketing-crm.yaml GET /conversations
     - name: contextPanel
       slot: selection
       components:
       - kind: detailPanel
-        label: The selected agent
+        label: The selected case
+        bindsTo: Case
+        columns:
+        - Case.id
+        - Case.caseNumber
+        - Case.subjectId
+        - Case.guestName
+        - Case.subject
+        - Case.kind
+        - Case.channel
+        - Case.recordedAt
+        - Case.syncedAt
+        - Case.categoryId
+        - Case.status
+        - Case.priority
+        - Case.assignedToPrincipalId
+        - Case.venueId
+        - Case.relatedOrderId
+        - Case.slaDueAt
+        operation: listCases
+        provenance: contract marketing-crm.yaml GET /cases
+      - kind: detailPanel
+        label: The case
         bindsTo: CaseDetail
         columns:
         - CaseDetail.id
@@ -349,6 +507,10 @@ screens:
         - CaseDetail.subjectId
         - CaseDetail.guestName
         - CaseDetail.subject
+        - CaseDetail.kind
+        - CaseDetail.channel
+        - CaseDetail.recordedAt
+        - CaseDetail.syncedAt
         - CaseDetail.categoryId
         - CaseDetail.status
         - CaseDetail.priority
@@ -356,47 +518,45 @@ screens:
         - CaseDetail.venueId
         - CaseDetail.relatedOrderId
         - CaseDetail.slaDueAt
-        - CaseDetail.isSlaBreached
-        - CaseDetail.slaPausedSeconds
-        - CaseDetail.escalationCount
-        - CaseDetail.resolvedAt
         operation: getCase
         provenance: contract marketing-crm.yaml GET /cases/{caseId}
     - name: actionBar
       slot: rowActions
       components:
       - kind: primaryButton
-        label: Add
+        label: Add case message
         operation: addCaseMessage
         provenance: contract marketing-crm.yaml POST /cases/{caseId}/messages
       - kind: secondaryButton
-        label: Create
+        label: Create case
         operation: createCase
         provenance: contract marketing-crm.yaml POST /cases
       - kind: secondaryButton
-        label: Escalate
+        label: Escalate case
         operation: escalateCase
         provenance: contract marketing-crm.yaml POST /cases/{caseId}/escalate
       - kind: secondaryButton
-        label: Reopen
+        label: Reopen case
         operation: reopenCase
         provenance: contract marketing-crm.yaml POST /cases/{caseId}/reopen
       - kind: secondaryButton
-        label: Save changes
+        label: Save case
         operation: updateCase
         provenance: contract marketing-crm.yaml PATCH /cases/{caseId}
       - kind: secondaryButton
-        label: Save changes
+        label: Save agent availability
         operation: setAgentAvailability
         provenance: contract marketing-crm.yaml PUT /agent-availability
   states:
     loading: The agent list.
     error: Could not load. Names which read failed and leaves the agent untouched.
-    emptyFirstRun: No agent yet. Carries the create action; distinct from a filter that matched nothing.
-    emptyNoResults: The filter narrowed it and the agent are still there. Names the active filter and
-      offers to clear it.
-    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is
-      no data* and sends somebody to support with the wrong question.
+    emptyFirstRun: No agent yet. Offers Add case message (`addCaseMessage`); distinct from a filter that
+      matched nothing.
+    emptyNoResults: Nothing matches the filter on status, assignedToPrincipalId, breachedSla, priority
+      and the agent are still there. Names the active filter and offers to clear it.
+    emptyNoAccess: Shown when the caller lacks `CASE_VIEW`, which `listCases` requires, and names that
+      permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support
+      with the wrong question.
   apis:
   - operationId: listCases
     contract: marketing-crm
@@ -423,7 +583,7 @@ screens:
   - operationId: getCase
     contract: marketing-crm
     purpose: Read a case with its thread
-    trigger: onLoad
+    trigger: onAction
   - operationId: reopenCase
     contract: marketing-crm
     purpose: Reopen a resolved case
@@ -450,27 +610,134 @@ screens:
     params:
     - name: caseId
       from: deepLink
-    coldEntry: '**A staff link opened cold resolves the thing or says plainly that it is gone.** No
-      silent redirect — a supervisor following a link from an alert needs to know whether the record
-      moved, closed or never existed, because those are three different next actions. **The scope is
-      resolved from the session, never from the link**: a link cannot move somebody to a venue they
-      do not hold. Arrives with `caseId`.'
+    coldEntry: '**A staff link opened cold resolves the thing or says plainly that it is gone.** No silent
+      redirect — a supervisor following a link from an alert needs to know whether the record moved, closed
+      or never existed, because those are three different next actions. **The scope is resolved from the
+      session, never from the link**: a link cannot move somebody to a venue they do not hold. Arrives
+      with `caseId`.'
     preloaded:
-    - CaseDetail.id
-    - CaseDetail.caseNumber
-    - CaseDetail.subjectId
-    - CaseDetail.guestName
-    - CaseDetail.subject
+    - Case.id
+    - Case.caseNumber
+    - Case.subjectId
+    - Case.guestName
+    - Case.subject
   wireframe:
     status: notStarted
     provenance: generated
     board: wireframes/P12 Venue Support.dc.html#sup-002
     note: '**Drawn by Claude Design on `Dashboards Board.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.**
-      The frame it points at now is the generated one. This screen has been designed once and is not
-      starting from nothing.'
-  apisNote: Rebuilt 9 September 2026 from the 9 operations this screen declares, not from a workshop
-    pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing
-    them to the ones that matter is work a person still owes this screen.
+      The frame it points at now is the generated one. This screen has been designed once and is not starting
+      from nothing.'
+  apisNote: Rebuilt 9 September 2026 from the 9 operations this screen declares, not from a workshop pack
+    — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
+    to the ones that matter is work a person still owes this screen.
+  overlays:
+  - id: formAddCaseMessage
+    component: modal
+    trigger: Add case message
+    body: '**Collects what `addCaseMessage` sends before it is called.** Required: `id`, `body`, `isInternal`,
+      `recordedAt`. Optional: `channel`, `attachmentRefs`. Dismissing sends nothing; the screen behind
+      is unchanged.'
+    confirm:
+      label: Add case message
+      operation: addCaseMessage
+    dismiss:
+      label: Cancel
+      discards:
+      - id
+      - body
+      - isInternal
+      - recordedAt
+      - channel
+      - attachmentRefs
+    provenance: contract marketing-crm.yaml POST /cases/{caseId}/messages
+  - id: formCreateCase
+    component: modal
+    trigger: Create case
+    body: '**Collects what `createCase` sends before it is called.** Required: `id`, `subject`, `description`,
+      `channel`, `recordedAt`. Optional: `subjectId`, `categoryId`, `priority`, `kind`, `venueId`, `relatedOrderId`,
+      `attachmentRefs`. Dismissing sends nothing; the screen behind is unchanged.'
+    bindsTo: CreateCaseRequest
+    confirm:
+      label: Create case
+      operation: createCase
+    dismiss:
+      label: Cancel
+      discards:
+      - id
+      - subject
+      - description
+      - channel
+      - recordedAt
+      - subjectId
+      - categoryId
+      - priority
+      - kind
+      - venueId
+      - relatedOrderId
+      - attachmentRefs
+    provenance: contract marketing-crm.yaml POST /cases
+  - id: formEscalateCase
+    component: modal
+    trigger: Escalate case
+    body: '**Collects what `escalateCase` sends before it is called.** Required: `reason`. Optional: `assignToPrincipalId`,
+      `newPriority`. Dismissing sends nothing; the screen behind is unchanged.'
+    confirm:
+      label: Escalate case
+      operation: escalateCase
+    dismiss:
+      label: Cancel
+      discards:
+      - reason
+      - assignToPrincipalId
+      - newPriority
+    provenance: contract marketing-crm.yaml POST /cases/{caseId}/escalate
+  - id: formReopenCase
+    component: modal
+    trigger: Reopen case
+    body: '**Collects what `reopenCase` sends before it is called.** Required: `reason`. Dismissing sends
+      nothing; the screen behind is unchanged.'
+    confirm:
+      label: Reopen case
+      operation: reopenCase
+    dismiss:
+      label: Cancel
+      discards:
+      - reason
+    provenance: contract marketing-crm.yaml POST /cases/{caseId}/reopen
+  - id: formUpdateCase
+    component: modal
+    trigger: Save case
+    body: '**Collects what `updateCase` sends before it is called.** Nothing in the body is required.
+      Optional: `status`, `priority`, `assignedToPrincipalId`, `categoryId`, `resolutionNote`. Dismissing
+      sends nothing; the screen behind is unchanged.'
+    confirm:
+      label: Save case
+      operation: updateCase
+    dismiss:
+      label: Cancel
+      discards:
+      - status
+      - priority
+      - assignedToPrincipalId
+      - categoryId
+      - resolutionNote
+    provenance: contract marketing-crm.yaml PATCH /cases/{caseId}
+  - id: formSetAgentAvailability
+    component: modal
+    trigger: Save agent availability
+    body: '**Collects what `setAgentAvailability` sends before it is called.** Required: `state`. Optional:
+      `maxConcurrent`, `queueIds`. Dismissing sends nothing; the screen behind is unchanged.'
+    confirm:
+      label: Save agent availability
+      operation: setAgentAvailability
+    dismiss:
+      label: Cancel
+      discards:
+      - state
+      - maxConcurrent
+      - queueIds
+    provenance: contract marketing-crm.yaml PUT /agent-availability
 - id: SUP-003
   name: Availability & Routing Settings
   module: Access & Availability
@@ -492,23 +759,16 @@ screens:
     transitions:
     - to: SUP-001
       trigger: Agent Login
-      carries:
-      - sessionId
-      provenance: derived — SUP-001 declares entryState.params sessionId, so an edge into it must carry
-        them
+      provenance: derived — SUP-001 declares entryState.params  and SUP-003 holds none of them, so the
+        edge carries nothing and SUP-001 opens cold
     - to: SUP-002
       trigger: Agent Dashboard
-      carries:
-      - caseId
-      provenance: derived — SUP-002 declares entryState.params caseId, so an edge into it must carry
-        them
+      provenance: derived — SUP-002 declares entryState.params caseId and SUP-003 holds none of them,
+        so the edge carries nothing and SUP-002 opens cold
     - to: SUP-004
       trigger: Conversation Queue
-      carries:
-      - caseId
-      - conversationId
-      provenance: derived — SUP-004 declares entryState.params caseId, conversationId, so an edge into
-        it must carry them
+      provenance: derived — SUP-004 declares entryState.params caseId, conversationId and SUP-003 holds
+        none of them, so the edge carries nothing and SUP-004 opens cold
   notes: States derived from the screen pattern on 17 August, not individually considered — sound for
     a list, a form or a money screen, and worth revisiting where this screen is unusual. Purpose derived
     from the screen name and its operations on 17 August, not from a requirement.
@@ -519,11 +779,6 @@ screens:
   patternReason: the screen declares only writes (`setAgentAvailability`) and no read of a population
     — it is settings, not a list
   purpose: Change how availability behaves here, and see which level the current value came from.
-  gaps:
-  - operation: setAgentAvailability
-    why: '**`setAgentAvailability` declares no request body shape**, so nothing says what this editor
-      edits. The fields cannot be derived and the screen needs the contract before it needs a designer.'
-    source: contract marketing-crm.yaml PUT /agent-availability
   layout:
     template: form
     regions:
@@ -531,23 +786,32 @@ screens:
       slot: publish
       components:
       - kind: primaryButton
-        label: Save changes
+        label: Save agent availability
         operation: setAgentAvailability
         provenance: contract marketing-crm.yaml PUT /agent-availability
     - name: contentBody
       components:
-      - kind: secondaryButton
-        label: Cancel
-        notes: '**A screen that can submit must be leaveable without submitting.**'
-        derived: true
-        impliedBy: setAgentAvailability
+      - kind: selectField
+        label: State
+        operation: setAgentAvailability
+        notes: Required.
+        provenance: contract marketing-crm.yaml PUT /agent-availability
+      - kind: numberField
+        label: Max concurrent
+        operation: setAgentAvailability
+        provenance: contract marketing-crm.yaml PUT /agent-availability
+      - kind: multiSelect
+        label: Queue ids
+        operation: setAgentAvailability
+        provenance: contract marketing-crm.yaml PUT /agent-availability
   states:
     loading: The saved availability routing settings.
     error: Could not load. Names which read failed and leaves the availability routing settings untouched.
-    emptyFirstRun: No availability routing settings configured. Carries the create action and says what
-      the platform does in the meantime.
-    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is
-      no data* and sends somebody to support with the wrong question.
+    emptyFirstRun: No availability routing settings configured. The form opens empty and `setAgentAvailability`
+      saves the first one; it says what the platform does in the meantime.
+    emptyNoAccess: Shown when the caller lacks `CASE_MANAGE`, which `setAgentAvailability` requires, and
+      names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody
+      to support with the wrong question.
   apis:
   - operationId: setAgentAvailability
     contract: marketing-crm
@@ -557,9 +821,9 @@ screens:
     status: notStarted
     provenance: generated
     board: wireframes/P12 Venue Support.dc.html#sup-003
-  apisNote: Rebuilt 9 September 2026 from the 1 operation this screen declares, not from a workshop
-    pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing
-    them to the ones that matter is work a person still owes this screen.
+  apisNote: Rebuilt 9 September 2026 from the 1 operation this screen declares, not from a workshop pack
+    — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
+    to the ones that matter is work a person still owes this screen.
 - id: SUP-004
   name: Conversation Queue
   module: Conversations
@@ -581,21 +845,22 @@ screens:
     - SUP-005
     inferred: true
     transitions:
-    - to: SUP-005
-      trigger: Reads the history and replies
-      provenance: flow F05 step 1→2, F24 step 3→4
     - to: SUP-001
       trigger: Agent Login
-      carries:
-      - sessionId
-      provenance: derived — SUP-001 declares entryState.params sessionId, so an edge into it must carry
-        them
+      provenance: derived — SUP-001 declares entryState.params  and SUP-004 holds none of them, so the
+        edge carries nothing and SUP-001 opens cold
     - to: SUP-002
       trigger: Agent Dashboard
       carries:
       - caseId
-      provenance: derived — SUP-002 declares entryState.params caseId, so an edge into it must carry
-        them
+      provenance: derived — SUP-002 declares entryState.params caseId and SUP-004 holds caseId, so an
+        edge into it carries them
+    - to: SUP-005
+      trigger: Reads the history and replies
+      provenance: flow F05 step 1→2, F24 step 3→4
+      carries:
+      - caseId
+      - conversationId
   notes: States derived from the screen pattern on 17 August, not individually considered — sound for
     a list, a form or a money screen, and worth revisiting where this screen is unusual. Purpose derived
     from the screen name and its operations on 17 August, not from a requirement. Pulled to Wave 2 (CF-101).
@@ -605,19 +870,34 @@ screens:
   pattern: listDetail
   patternReason: '`listCases` reads the population and `getCase` reads one of them — list, select, act'
   purpose: Find the right one quickly, and act on it without opening it.
-  gaps:
-  - operation: listConversations
-    why: '**1 declared operation reach no component on this screen**: listConversations. Either the
-      screen is missing what calls them, or the declaration is residue.'
-    source: the screen's own declarations
   layout:
     template: split
     regions:
     - name: contentBody
       slot: collection
       components:
+      - kind: textField
+        label: Status
+        operation: listCases
+        notes: Sends `?status=` to `listCases`.
+        provenance: contract marketing-crm.yaml GET /cases
+      - kind: textField
+        label: Assigned to principal id
+        operation: listCases
+        notes: Sends `?assignedToPrincipalId=` to `listCases`.
+        provenance: contract marketing-crm.yaml GET /cases
+      - kind: toggle
+        label: Breached sla
+        operation: listCases
+        notes: Sends `?breachedSla=` to `listCases`.
+        provenance: contract marketing-crm.yaml GET /cases
+      - kind: textField
+        label: Priority
+        operation: listCases
+        notes: Sends `?priority=` to `listCases`.
+        provenance: contract marketing-crm.yaml GET /cases
       - kind: dataTable
-        label: Every conversation queue
+        label: Every case
         bindsTo: Case
         columns:
         - Case.id
@@ -634,11 +914,51 @@ screens:
         - Case.slaDueAt
         operation: listCases
         provenance: contract marketing-crm.yaml GET /cases
+      - kind: dataTable
+        label: Every conversation
+        bindsTo: Conversation
+        columns:
+        - Conversation.id
+        - Conversation.telephony
+        - Conversation.assistSessionId
+        - Conversation.channel
+        - Conversation.state
+        - Conversation.subjectId
+        - Conversation.venueId
+        - Conversation.assignedPrincipalId
+        - Conversation.queueId
+        - Conversation.queuePosition
+        - Conversation.estimatedWaitSeconds
+        - Conversation.handoverReason
+        operation: listConversations
+        provenance: contract marketing-crm.yaml GET /conversations
     - name: contextPanel
       slot: selection
       components:
       - kind: detailPanel
-        label: The selected conversation queue
+        label: The selected case
+        bindsTo: Case
+        columns:
+        - Case.id
+        - Case.caseNumber
+        - Case.subjectId
+        - Case.guestName
+        - Case.subject
+        - Case.kind
+        - Case.channel
+        - Case.recordedAt
+        - Case.syncedAt
+        - Case.categoryId
+        - Case.status
+        - Case.priority
+        - Case.assignedToPrincipalId
+        - Case.venueId
+        - Case.relatedOrderId
+        - Case.slaDueAt
+        operation: listCases
+        provenance: contract marketing-crm.yaml GET /cases
+      - kind: detailPanel
+        label: The case
         bindsTo: CaseDetail
         columns:
         - CaseDetail.id
@@ -646,6 +966,10 @@ screens:
         - CaseDetail.subjectId
         - CaseDetail.guestName
         - CaseDetail.subject
+        - CaseDetail.kind
+        - CaseDetail.channel
+        - CaseDetail.recordedAt
+        - CaseDetail.syncedAt
         - CaseDetail.categoryId
         - CaseDetail.status
         - CaseDetail.priority
@@ -653,52 +977,49 @@ screens:
         - CaseDetail.venueId
         - CaseDetail.relatedOrderId
         - CaseDetail.slaDueAt
-        - CaseDetail.isSlaBreached
-        - CaseDetail.slaPausedSeconds
-        - CaseDetail.escalationCount
-        - CaseDetail.resolvedAt
         operation: getCase
         provenance: contract marketing-crm.yaml GET /cases/{caseId}
     - name: actionBar
       slot: rowActions
       components:
       - kind: primaryButton
-        label: Add
+        label: Add case message
         operation: addCaseMessage
         provenance: contract marketing-crm.yaml POST /cases/{caseId}/messages
       - kind: secondaryButton
-        label: Create
+        label: Create case
         operation: createCase
         provenance: contract marketing-crm.yaml POST /cases
       - kind: secondaryButton
-        label: Escalate
+        label: Escalate case
         operation: escalateCase
         provenance: contract marketing-crm.yaml POST /cases/{caseId}/escalate
       - kind: secondaryButton
-        label: Reopen
+        label: Reopen case
         operation: reopenCase
         provenance: contract marketing-crm.yaml POST /cases/{caseId}/reopen
       - kind: secondaryButton
-        label: Save changes
+        label: Save case
         operation: updateCase
         provenance: contract marketing-crm.yaml PATCH /cases/{caseId}
       - kind: secondaryButton
-        label: Claim
+        label: Claim conversation
         operation: claimConversation
         provenance: contract marketing-crm.yaml POST /conversations/{conversationId}/claim
       - kind: secondaryButton
-        label: Transfer
+        label: Transfer conversation
         operation: transferConversation
         provenance: contract marketing-crm.yaml POST /conversations/{conversationId}/transfer
   states:
     loading: The conversation queue list.
     error: Could not load. Names which read failed and leaves the conversation queue untouched.
-    emptyFirstRun: No conversation queue yet. Carries the create action; distinct from a filter that
-      matched nothing.
-    emptyNoResults: The filter narrowed it and the conversation queue are still there. Names the active
-      filter and offers to clear it.
-    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is
-      no data* and sends somebody to support with the wrong question.
+    emptyFirstRun: No conversation queue yet. Offers Add case message (`addCaseMessage`); distinct from
+      a filter that matched nothing.
+    emptyNoResults: Nothing matches the filter on status, assignedToPrincipalId, breachedSla, priority
+      and the conversation queue are still there. Names the active filter and offers to clear it.
+    emptyNoAccess: Shown when the caller lacks `CASE_VIEW`, which `listCases` requires, and names that
+      permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support
+      with the wrong question.
   apis:
   - operationId: listCases
     contract: marketing-crm
@@ -725,7 +1046,7 @@ screens:
   - operationId: getCase
     contract: marketing-crm
     purpose: Read a case with its thread
-    trigger: onLoad
+    trigger: onAction
   - operationId: reopenCase
     contract: marketing-crm
     purpose: Reopen a resolved case
@@ -763,11 +1084,11 @@ screens:
     coldEntry: A conversation link an agent opens from a notification. Resolves, or says it was closed
       and by whom.
     preloaded:
-    - CaseDetail.id
-    - CaseDetail.caseNumber
-    - CaseDetail.subjectId
-    - CaseDetail.guestName
-    - CaseDetail.subject
+    - Case.id
+    - Case.caseNumber
+    - Case.subjectId
+    - Case.guestName
+    - Case.subject
   wireframe:
     status: notStarted
     provenance: generated
@@ -775,6 +1096,114 @@ screens:
   apisNote: Rebuilt 9 September 2026 from the 10 operations this screen declares, not from a workshop
     pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing
     them to the ones that matter is work a person still owes this screen.
+  overlays:
+  - id: formAddCaseMessage
+    component: modal
+    trigger: Add case message
+    body: '**Collects what `addCaseMessage` sends before it is called.** Required: `id`, `body`, `isInternal`,
+      `recordedAt`. Optional: `channel`, `attachmentRefs`. Dismissing sends nothing; the screen behind
+      is unchanged.'
+    confirm:
+      label: Add case message
+      operation: addCaseMessage
+    dismiss:
+      label: Cancel
+      discards:
+      - id
+      - body
+      - isInternal
+      - recordedAt
+      - channel
+      - attachmentRefs
+    provenance: contract marketing-crm.yaml POST /cases/{caseId}/messages
+  - id: formCreateCase
+    component: modal
+    trigger: Create case
+    body: '**Collects what `createCase` sends before it is called.** Required: `id`, `subject`, `description`,
+      `channel`, `recordedAt`. Optional: `subjectId`, `categoryId`, `priority`, `kind`, `venueId`, `relatedOrderId`,
+      `attachmentRefs`. Dismissing sends nothing; the screen behind is unchanged.'
+    bindsTo: CreateCaseRequest
+    confirm:
+      label: Create case
+      operation: createCase
+    dismiss:
+      label: Cancel
+      discards:
+      - id
+      - subject
+      - description
+      - channel
+      - recordedAt
+      - subjectId
+      - categoryId
+      - priority
+      - kind
+      - venueId
+      - relatedOrderId
+      - attachmentRefs
+    provenance: contract marketing-crm.yaml POST /cases
+  - id: formEscalateCase
+    component: modal
+    trigger: Escalate case
+    body: '**Collects what `escalateCase` sends before it is called.** Required: `reason`. Optional: `assignToPrincipalId`,
+      `newPriority`. Dismissing sends nothing; the screen behind is unchanged.'
+    confirm:
+      label: Escalate case
+      operation: escalateCase
+    dismiss:
+      label: Cancel
+      discards:
+      - reason
+      - assignToPrincipalId
+      - newPriority
+    provenance: contract marketing-crm.yaml POST /cases/{caseId}/escalate
+  - id: formReopenCase
+    component: modal
+    trigger: Reopen case
+    body: '**Collects what `reopenCase` sends before it is called.** Required: `reason`. Dismissing sends
+      nothing; the screen behind is unchanged.'
+    confirm:
+      label: Reopen case
+      operation: reopenCase
+    dismiss:
+      label: Cancel
+      discards:
+      - reason
+    provenance: contract marketing-crm.yaml POST /cases/{caseId}/reopen
+  - id: formUpdateCase
+    component: modal
+    trigger: Save case
+    body: '**Collects what `updateCase` sends before it is called.** Nothing in the body is required.
+      Optional: `status`, `priority`, `assignedToPrincipalId`, `categoryId`, `resolutionNote`. Dismissing
+      sends nothing; the screen behind is unchanged.'
+    confirm:
+      label: Save case
+      operation: updateCase
+    dismiss:
+      label: Cancel
+      discards:
+      - status
+      - priority
+      - assignedToPrincipalId
+      - categoryId
+      - resolutionNote
+    provenance: contract marketing-crm.yaml PATCH /cases/{caseId}
+  - id: formTransferConversation
+    component: modal
+    trigger: Transfer conversation
+    body: '**Collects what `transferConversation` sends before it is called.** Nothing in the body is
+      required. Optional: `toPrincipalId`, `toQueueId`, `note`. Dismissing sends nothing; the screen behind
+      is unchanged.'
+    confirm:
+      label: Transfer conversation
+      operation: transferConversation
+    dismiss:
+      label: Cancel
+      discards:
+      - toPrincipalId
+      - toQueueId
+      - note
+    provenance: contract marketing-crm.yaml POST /conversations/{conversationId}/transfer
 - id: SUP-005
   name: Live Chat Workspace
   module: Conversations
@@ -800,16 +1229,14 @@ screens:
     transitions:
     - to: SUP-001
       trigger: Agent Login
-      carries:
-      - sessionId
-      provenance: derived — SUP-001 declares entryState.params sessionId, so an edge into it must carry
-        them
+      provenance: derived — SUP-001 declares entryState.params  and SUP-005 holds none of them, so the
+        edge carries nothing and SUP-001 opens cold
     - to: SUP-002
       trigger: Agent Dashboard
       carries:
       - caseId
-      provenance: derived — SUP-002 declares entryState.params caseId, so an edge into it must carry
-        them
+      provenance: derived — SUP-002 declares entryState.params caseId and SUP-005 holds caseId, so an
+        edge into it carries them
   notes: States derived from the screen pattern on 17 August, not individually considered — sound for
     a list, a form or a money screen, and worth revisiting where this screen is unusual. Purpose derived
     from the screen name and its operations on 17 August, not from a requirement. Pulled to Wave 2 (CF-101)
@@ -819,19 +1246,34 @@ screens:
   pattern: listDetail
   patternReason: '`listCases` reads the population and `getCase` reads one of them — list, select, act'
   purpose: Work with live chat workspace for this venue.
-  gaps:
-  - operation: getConversation
-    why: '**1 declared operation reach no component on this screen**: getConversation. Either the screen
-      is missing what calls them, or the declaration is residue.'
-    source: the screen's own declarations
   layout:
     template: split
     regions:
     - name: contentBody
       slot: collection
       components:
+      - kind: textField
+        label: Status
+        operation: listCases
+        notes: Sends `?status=` to `listCases`.
+        provenance: contract marketing-crm.yaml GET /cases
+      - kind: textField
+        label: Assigned to principal id
+        operation: listCases
+        notes: Sends `?assignedToPrincipalId=` to `listCases`.
+        provenance: contract marketing-crm.yaml GET /cases
+      - kind: toggle
+        label: Breached sla
+        operation: listCases
+        notes: Sends `?breachedSla=` to `listCases`.
+        provenance: contract marketing-crm.yaml GET /cases
+      - kind: textField
+        label: Priority
+        operation: listCases
+        notes: Sends `?priority=` to `listCases`.
+        provenance: contract marketing-crm.yaml GET /cases
       - kind: dataTable
-        label: Every live chat
+        label: Every case
         bindsTo: Case
         columns:
         - Case.id
@@ -852,7 +1294,51 @@ screens:
       slot: selection
       components:
       - kind: detailPanel
-        label: The selected live chat
+        label: The selected case
+        bindsTo: Case
+        columns:
+        - Case.id
+        - Case.caseNumber
+        - Case.subjectId
+        - Case.guestName
+        - Case.subject
+        - Case.kind
+        - Case.channel
+        - Case.recordedAt
+        - Case.syncedAt
+        - Case.categoryId
+        - Case.status
+        - Case.priority
+        - Case.assignedToPrincipalId
+        - Case.venueId
+        - Case.relatedOrderId
+        - Case.slaDueAt
+        operation: listCases
+        provenance: contract marketing-crm.yaml GET /cases
+      - kind: detailPanel
+        label: The conversation
+        bindsTo: Conversation
+        columns:
+        - Conversation.id
+        - Conversation.telephony
+        - Conversation.assistSessionId
+        - Conversation.channel
+        - Conversation.state
+        - Conversation.subjectId
+        - Conversation.venueId
+        - Conversation.assignedPrincipalId
+        - Conversation.queueId
+        - Conversation.queuePosition
+        - Conversation.estimatedWaitSeconds
+        - Conversation.handoverReason
+        - Conversation.handoverSummary
+        - Conversation.sentiment
+        - Conversation.intent
+        - Conversation.locale
+        operation: getConversation
+        provenance: contract marketing-crm.yaml GET /conversations/{conversationId}
+      - kind: detailPanel
+        label: The case
         bindsTo: CaseDetail
         columns:
         - CaseDetail.id
@@ -860,6 +1346,10 @@ screens:
         - CaseDetail.subjectId
         - CaseDetail.guestName
         - CaseDetail.subject
+        - CaseDetail.kind
+        - CaseDetail.channel
+        - CaseDetail.recordedAt
+        - CaseDetail.syncedAt
         - CaseDetail.categoryId
         - CaseDetail.status
         - CaseDetail.priority
@@ -867,88 +1357,187 @@ screens:
         - CaseDetail.venueId
         - CaseDetail.relatedOrderId
         - CaseDetail.slaDueAt
-        - CaseDetail.isSlaBreached
-        - CaseDetail.slaPausedSeconds
-        - CaseDetail.escalationCount
-        - CaseDetail.resolvedAt
         operation: getCase
         provenance: contract marketing-crm.yaml GET /cases/{caseId}
     - name: actionBar
       slot: rowActions
       components:
       - kind: primaryButton
-        label: Add
+        label: Add case message
         operation: addCaseMessage
         provenance: contract marketing-crm.yaml POST /cases/{caseId}/messages
       - kind: secondaryButton
-        label: Save changes
+        label: Save case
         operation: updateCase
         provenance: contract marketing-crm.yaml PATCH /cases/{caseId}
       - kind: secondaryButton
-        label: Escalate
+        label: Escalate case
         operation: escalateCase
         provenance: contract marketing-crm.yaml POST /cases/{caseId}/escalate
       - kind: secondaryButton
-        label: Create
+        label: Create case
         operation: createCase
         provenance: contract marketing-crm.yaml POST /cases
       - kind: secondaryButton
-        label: Reopen
+        label: Reopen case
         operation: reopenCase
         provenance: contract marketing-crm.yaml POST /cases/{caseId}/reopen
       - kind: secondaryButton
-        label: Send
+        label: Send conversation message
         operation: sendConversationMessage
         provenance: contract marketing-crm.yaml POST /conversations/{conversationId}/messages
       - kind: destructiveButton
-        label: Close
+        label: Close conversation
         operation: closeConversation
         provenance: contract marketing-crm.yaml POST /conversations/{conversationId}/close
       - kind: secondaryButton
-        label: Transfer
+        label: Transfer conversation
         operation: transferConversation
         provenance: contract marketing-crm.yaml POST /conversations/{conversationId}/transfer
-    - name: contentBody
-      slot: carried
-      components:
-      - kind: primaryButton
-        derived: true
-        impliedBy: addCaseMessage
-        label: Add case message
-        provenance: carried from the previous definition
-      - kind: dataTable
-        derived: true
-        impliedBy: listCases
-        notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
-          a venue''s busiest hour is a list that skips rows.'
-        provenance: carried from the previous definition
-      - kind: secondaryButton
-        label: Cancel
-        notes: '**A screen that can submit must be leaveable without submitting.**'
-        derived: true
-        impliedBy: addCaseMessage
-        provenance: carried from the previous definition
   overlays:
   - id: confirmCloseConversation
     component: confirmDialog
-    trigger: Close
+    trigger: Close conversation
     body: '**Names what `closeConversation` changes and what it leaves alone**, in the consequence rather
-      than the verb. A live chat this affects should be identified in the dialog, not just counted.'
+      than the verb. A live chat this affects should be identified in the dialog, not just counted. **Collects
+      what `closeConversation` sends before it is called.** Required: `outcome`. Optional: `caseId`.'
     provenance: contract marketing-crm.yaml POST /conversations/{conversationId}/close
+  - id: formAddCaseMessage
+    component: modal
+    trigger: Add case message
+    body: '**Collects what `addCaseMessage` sends before it is called.** Required: `id`, `body`, `isInternal`,
+      `recordedAt`. Optional: `channel`, `attachmentRefs`. Dismissing sends nothing; the screen behind
+      is unchanged.'
+    confirm:
+      label: Add case message
+      operation: addCaseMessage
+    dismiss:
+      label: Cancel
+      discards:
+      - id
+      - body
+      - isInternal
+      - recordedAt
+      - channel
+      - attachmentRefs
+    provenance: contract marketing-crm.yaml POST /cases/{caseId}/messages
+  - id: formUpdateCase
+    component: modal
+    trigger: Save case
+    body: '**Collects what `updateCase` sends before it is called.** Nothing in the body is required.
+      Optional: `status`, `priority`, `assignedToPrincipalId`, `categoryId`, `resolutionNote`. Dismissing
+      sends nothing; the screen behind is unchanged.'
+    confirm:
+      label: Save case
+      operation: updateCase
+    dismiss:
+      label: Cancel
+      discards:
+      - status
+      - priority
+      - assignedToPrincipalId
+      - categoryId
+      - resolutionNote
+    provenance: contract marketing-crm.yaml PATCH /cases/{caseId}
+  - id: formEscalateCase
+    component: modal
+    trigger: Escalate case
+    body: '**Collects what `escalateCase` sends before it is called.** Required: `reason`. Optional: `assignToPrincipalId`,
+      `newPriority`. Dismissing sends nothing; the screen behind is unchanged.'
+    confirm:
+      label: Escalate case
+      operation: escalateCase
+    dismiss:
+      label: Cancel
+      discards:
+      - reason
+      - assignToPrincipalId
+      - newPriority
+    provenance: contract marketing-crm.yaml POST /cases/{caseId}/escalate
+  - id: formCreateCase
+    component: modal
+    trigger: Create case
+    body: '**Collects what `createCase` sends before it is called.** Required: `id`, `subject`, `description`,
+      `channel`, `recordedAt`. Optional: `subjectId`, `categoryId`, `priority`, `kind`, `venueId`, `relatedOrderId`,
+      `attachmentRefs`. Dismissing sends nothing; the screen behind is unchanged.'
+    bindsTo: CreateCaseRequest
+    confirm:
+      label: Create case
+      operation: createCase
+    dismiss:
+      label: Cancel
+      discards:
+      - id
+      - subject
+      - description
+      - channel
+      - recordedAt
+      - subjectId
+      - categoryId
+      - priority
+      - kind
+      - venueId
+      - relatedOrderId
+      - attachmentRefs
+    provenance: contract marketing-crm.yaml POST /cases
+  - id: formReopenCase
+    component: modal
+    trigger: Reopen case
+    body: '**Collects what `reopenCase` sends before it is called.** Required: `reason`. Dismissing sends
+      nothing; the screen behind is unchanged.'
+    confirm:
+      label: Reopen case
+      operation: reopenCase
+    dismiss:
+      label: Cancel
+      discards:
+      - reason
+    provenance: contract marketing-crm.yaml POST /cases/{caseId}/reopen
+  - id: formSendConversationMessage
+    component: modal
+    trigger: Send conversation message
+    body: '**Collects what `sendConversationMessage` sends before it is called.** Required: `body`. Optional:
+      `attachments`. Dismissing sends nothing; the screen behind is unchanged.'
+    confirm:
+      label: Send conversation message
+      operation: sendConversationMessage
+    dismiss:
+      label: Cancel
+      discards:
+      - body
+      - attachments
+    provenance: contract marketing-crm.yaml POST /conversations/{conversationId}/messages
+  - id: formTransferConversation
+    component: modal
+    trigger: Transfer conversation
+    body: '**Collects what `transferConversation` sends before it is called.** Nothing in the body is
+      required. Optional: `toPrincipalId`, `toQueueId`, `note`. Dismissing sends nothing; the screen behind
+      is unchanged.'
+    confirm:
+      label: Transfer conversation
+      operation: transferConversation
+    dismiss:
+      label: Cancel
+      discards:
+      - toPrincipalId
+      - toQueueId
+      - note
+    provenance: contract marketing-crm.yaml POST /conversations/{conversationId}/transfer
   states:
     loading: The live chat list.
     error: Could not load. Names which read failed and leaves the live chat untouched.
-    emptyFirstRun: No live chat yet. Carries the create action; distinct from a filter that matched
-      nothing.
-    emptyNoResults: The filter narrowed it and the live chat are still there. Names the active filter
-      and offers to clear it.
-    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is
-      no data* and sends somebody to support with the wrong question.
+    emptyFirstRun: No live chat yet. Offers Add case message (`addCaseMessage`); distinct from a filter
+      that matched nothing.
+    emptyNoResults: Nothing matches the filter on status, assignedToPrincipalId, breachedSla, priority
+      and the live chat are still there. Names the active filter and offers to clear it.
+    emptyNoAccess: Shown when the caller lacks `CASE_VIEW`, which `getCase` requires, and names that permission.
+      **Never an empty table** — that reads as *there is no data* and sends somebody to support with the
+      wrong question.
   apis:
   - operationId: addCaseMessage
     contract: marketing-crm
     purpose: from page inventory
-    trigger: onLoad
+    trigger: onAction
   - operationId: getCase
     contract: marketing-crm
     purpose: Case with its thread
@@ -956,11 +1545,11 @@ screens:
   - operationId: updateCase
     contract: marketing-crm
     purpose: Assign, reprioritise, resolve
-    trigger: onLoad
+    trigger: onAction
   - operationId: escalateCase
     contract: marketing-crm
     purpose: Escalate with a reason
-    trigger: onLoad
+    trigger: onAction
   - operationId: createCase
     contract: marketing-crm
     purpose: Raise a service case
@@ -1007,11 +1596,11 @@ screens:
       from: SUP-004
     coldEntry: Resolves from the session; a cold arrival is the ordinary case.
     preloaded:
-    - CaseDetail.id
-    - CaseDetail.caseNumber
-    - CaseDetail.subjectId
-    - CaseDetail.guestName
-    - CaseDetail.subject
+    - Case.id
+    - Case.caseNumber
+    - Case.subjectId
+    - Case.guestName
+    - Case.subject
   wireframe:
     status: notStarted
     provenance: generated
@@ -1042,23 +1631,16 @@ screens:
     transitions:
     - to: SUP-001
       trigger: Agent Login
-      carries:
-      - sessionId
-      provenance: derived — SUP-001 declares entryState.params sessionId, so an edge into it must carry
-        them
+      provenance: derived — SUP-001 declares entryState.params  and SUP-006 holds none of them, so the
+        edge carries nothing and SUP-001 opens cold
     - to: SUP-002
       trigger: Agent Dashboard
-      carries:
-      - caseId
-      provenance: derived — SUP-002 declares entryState.params caseId, so an edge into it must carry
-        them
+      provenance: derived — SUP-002 declares entryState.params caseId and SUP-006 holds none of them,
+        so the edge carries nothing and SUP-002 opens cold
     - to: SUP-005
       trigger: Live Chat Workspace
-      carries:
-      - caseId
-      - conversationId
-      provenance: derived — SUP-005 declares entryState.params caseId, conversationId, so an edge into
-        it must carry them
+      provenance: derived — SUP-005 declares entryState.params caseId, conversationId and SUP-006 holds
+        none of them, so the edge carries nothing and SUP-005 opens cold
   notes: States derived from the screen pattern on 17 August, not individually considered — sound for
     a list, a form or a money screen, and worth revisiting where this screen is unusual. Purpose derived
     from the screen name and its operations on 17 August, not from a requirement. **41 operations removed
@@ -1071,11 +1653,6 @@ screens:
   patternReason: '`listKnowledgeCollections` reads a population and nothing reads one of them; the detail
     is the row until a `get` exists'
   purpose: Find something when the guest does not know what it is called.
-  gaps:
-  - operation: listFaqs
-    why: '**1 declared operation reach no component on this screen**: listFaqs. Either the screen is
-      missing what calls them, or the declaration is residue.'
-    source: the screen's own declarations
   layout:
     template: split
     regions:
@@ -1083,7 +1660,7 @@ screens:
       slot: collection
       components:
       - kind: dataTable
-        label: Every knowledge base search
+        label: Every knowledge collection
         bindsTo: KnowledgeCollection
         columns:
         - KnowledgeCollection.id
@@ -1100,11 +1677,22 @@ screens:
         - KnowledgeCollection.isActive
         operation: listKnowledgeCollections
         provenance: contract ai.yaml GET /collections
+      - kind: dataTable
+        label: Every faq category
+        bindsTo: FaqCategory
+        columns:
+        - FaqCategory.code
+        - FaqCategory.name
+        - FaqCategory.sortOrder
+        - FaqCategory.entries
+        - FaqCategory.scopePath
+        operation: listFaqs
+        provenance: contract white-label.yaml GET /tenant-config/faqs
     - name: contextPanel
       slot: selection
       components:
       - kind: detailPanel
-        label: The selected knowledge base search
+        label: The selected knowledge collection
         bindsTo: KnowledgeCollection
         columns:
         - KnowledgeCollection.id
@@ -1124,12 +1712,13 @@ screens:
   states:
     loading: The knowledge base search list.
     error: Could not load. Names which read failed and leaves the knowledge base search untouched.
-    emptyFirstRun: No knowledge base search yet. Carries the create action; distinct from a filter that
-      matched nothing.
-    emptyNoResults: The filter narrowed it and the knowledge base search are still there. Names the
-      active filter and offers to clear it.
-    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is
-      no data* and sends somebody to support with the wrong question.
+    emptyFirstRun: No knowledge base search yet. **Offers no create action** — this screen declares no
+      operation that makes one — and says so rather than showing an empty table.
+    emptyNoResults: 'Never shown: `listKnowledgeCollections` takes no filter, so an empty list is always
+      the first-run state above.'
+    emptyNoAccess: Shown when the caller lacks `AI_CONFIGURE`, which `listKnowledgeCollections` requires,
+      and names that permission. **Never an empty table** — that reads as *there is no data* and sends
+      somebody to support with the wrong question.
   apis:
   - operationId: listKnowledgeCollections
     contract: ai
@@ -1150,8 +1739,8 @@ screens:
     - name: version
       from: deepLink
     coldEntry: '**A version link is expected to point at something superseded — that is what versions
-      are for.** The screen opens the requested version read-only, says it is not current, and links
-      to the one that is. **An old version is history, not an error.** Arrives with `bannerId`, `pageId`,
+      are for.** The screen opens the requested version read-only, says it is not current, and links to
+      the one that is. **An old version is history, not an error.** Arrives with `bannerId`, `pageId`,
       `policyKind`.'
     preloaded:
     - KnowledgeCollection.id
@@ -1163,9 +1752,9 @@ screens:
     status: notStarted
     provenance: generated
     board: wireframes/P12 Venue Support.dc.html#sup-006
-  apisNote: Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop
-    pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing
-    them to the ones that matter is work a person still owes this screen.
+  apisNote: Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack
+    — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
+    to the ones that matter is work a person still owes this screen.
 - id: SUP-007
   name: Canned Response Management
   module: Knowledge & Responses
@@ -1188,16 +1777,12 @@ screens:
     transitions:
     - to: SUP-001
       trigger: Agent Login
-      carries:
-      - sessionId
-      provenance: derived — SUP-001 declares entryState.params sessionId, so an edge into it must carry
-        them
+      provenance: derived — SUP-001 declares entryState.params  and SUP-007 holds none of them, so the
+        edge carries nothing and SUP-001 opens cold
     - to: SUP-002
       trigger: Agent Dashboard
-      carries:
-      - caseId
-      provenance: derived — SUP-002 declares entryState.params caseId, so an edge into it must carry
-        them
+      provenance: derived — SUP-002 declares entryState.params caseId and SUP-007 holds none of them,
+        so the edge carries nothing and SUP-002 opens cold
   notes: States derived from the screen pattern on 17 August, not individually considered — sound for
     a list, a form or a money screen, and worth revisiting where this screen is unusual. Purpose derived
     from the screen name and its operations on 17 August, not from a requirement.
@@ -1212,8 +1797,13 @@ screens:
     - name: contentBody
       slot: collection
       components:
+      - kind: textField
+        label: Channel
+        operation: listMessageTemplates
+        notes: Sends `?channel=` to `listMessageTemplates`.
+        provenance: contract marketing-crm.yaml GET /message-templates
       - kind: dataTable
-        label: Every canned response
+        label: Every message template
         bindsTo: MessageTemplate
         columns:
         - MessageTemplate.id
@@ -1231,7 +1821,7 @@ screens:
       slot: selection
       components:
       - kind: detailPanel
-        label: The selected canned response
+        label: The selected message template
         bindsTo: MessageTemplate
         columns:
         - MessageTemplate.id
@@ -1249,18 +1839,19 @@ screens:
       slot: rowActions
       components:
       - kind: primaryButton
-        label: Create
+        label: Create message template
         operation: createMessageTemplate
         provenance: contract marketing-crm.yaml POST /message-templates
   states:
     loading: The canned response list.
     error: Could not load. Names which read failed and leaves the canned response untouched.
-    emptyFirstRun: No canned response yet. Carries the create action; distinct from a filter that matched
-      nothing.
-    emptyNoResults: The filter narrowed it and the canned response are still there. Names the active
-      filter and offers to clear it.
-    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is
-      no data* and sends somebody to support with the wrong question.
+    emptyFirstRun: No canned response yet. Offers Create message template (`createMessageTemplate`); distinct
+      from a filter that matched nothing.
+    emptyNoResults: Nothing matches the filter on channel and the canned response are still there. Names
+      the active filter and offers to clear it.
+    emptyNoAccess: Shown when the caller lacks `MARKETING_VIEW`, which `listMessageTemplates` requires,
+      and names that permission. **Never an empty table** — that reads as *there is no data* and sends
+      somebody to support with the wrong question.
   apis:
   - operationId: listMessageTemplates
     contract: marketing-crm
@@ -1283,9 +1874,33 @@ screens:
     status: notStarted
     provenance: generated
     board: wireframes/P12 Venue Support.dc.html#sup-007
-  apisNote: Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop
-    pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing
-    them to the ones that matter is work a person still owes this screen.
+  apisNote: Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack
+    — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
+    to the ones that matter is work a person still owes this screen.
+  overlays:
+  - id: formCreateMessageTemplate
+    component: modal
+    trigger: Create message template
+    body: '**Collects what `createMessageTemplate` sends before it is called.** Required: `id`, `code`,
+      `name`, `channel`, `bodies`. Optional: `subjects`, `mergeFields`, `missingLanguages`, `providerTemplateId`.
+      Dismissing sends nothing; the screen behind is unchanged.'
+    bindsTo: MessageTemplate
+    confirm:
+      label: Create message template
+      operation: createMessageTemplate
+    dismiss:
+      label: Cancel
+      discards:
+      - id
+      - code
+      - name
+      - channel
+      - bodies
+      - subjects
+      - mergeFields
+      - missingLanguages
+      - providerTemplateId
+    provenance: contract marketing-crm.yaml POST /message-templates
 - id: SUP-008
   name: Agent Performance & SLA View
   module: Overview
@@ -1308,16 +1923,14 @@ screens:
     transitions:
     - to: SUP-001
       trigger: Agent Login
-      carries:
-      - sessionId
-      provenance: derived — SUP-001 declares entryState.params sessionId, so an edge into it must carry
-        them
+      provenance: derived — SUP-001 declares entryState.params  and SUP-008 holds none of them, so the
+        edge carries nothing and SUP-001 opens cold
     - to: SUP-002
       trigger: Agent Dashboard
       carries:
       - caseId
-      provenance: derived — SUP-002 declares entryState.params caseId, so an edge into it must carry
-        them
+      provenance: derived — SUP-002 declares entryState.params caseId and SUP-008 holds caseId, so an
+        edge into it carries them
   notes: States derived from the screen pattern on 17 August, not individually considered — sound for
     a list, a form or a money screen, and worth revisiting where this screen is unusual. Purpose derived
     from the screen name and its operations on 17 August, not from a requirement.
@@ -1326,19 +1939,24 @@ screens:
   patternReason: '`listReports` reads the population and `getFinancialReport` reads one of them — list,
     select, act'
   purpose: Produce agent performance & sla view for this venue.
-  gaps:
-  - operation: getReport
-    why: '**2 declared operations reach no component on this screen**: getReport, listConversations.
-      Either the screen is missing what calls them, or the declaration is residue.'
-    source: the screen's own declarations
   layout:
     template: split
     regions:
     - name: contentBody
       slot: collection
       components:
+      - kind: textField
+        label: Category
+        operation: listReports
+        notes: Sends `?category=` to `listReports`.
+        provenance: contract reporting.yaml GET /reports
+      - kind: searchField
+        label: Search
+        operation: listReports
+        notes: Sends `?search=` to `listReports`.
+        provenance: contract reporting.yaml GET /reports
       - kind: dataTable
-        label: Every agent performance sla
+        label: Every report definition
         bindsTo: ReportDefinition
         columns:
         - ReportDefinition.name
@@ -1355,11 +1973,51 @@ screens:
         - ReportDefinition.isSystem
         operation: listReports
         provenance: contract reporting.yaml GET /reports
+      - kind: dataTable
+        label: Every conversation
+        bindsTo: Conversation
+        columns:
+        - Conversation.id
+        - Conversation.telephony
+        - Conversation.assistSessionId
+        - Conversation.channel
+        - Conversation.state
+        - Conversation.subjectId
+        - Conversation.venueId
+        - Conversation.assignedPrincipalId
+        - Conversation.queueId
+        - Conversation.queuePosition
+        - Conversation.estimatedWaitSeconds
+        - Conversation.handoverReason
+        operation: listConversations
+        provenance: contract marketing-crm.yaml GET /conversations
     - name: contextPanel
       slot: selection
       components:
       - kind: detailPanel
-        label: The selected agent performance sla
+        label: The selected report definition
+        bindsTo: ReportDefinition
+        columns:
+        - ReportDefinition.name
+        - ReportDefinition.description
+        - ReportDefinition.category
+        - ReportDefinition.dataSource
+        - ReportDefinition.columns
+        - ReportDefinition.filters
+        - ReportDefinition.groupBy
+        - ReportDefinition.parameters
+        - ReportDefinition.requiredPermission
+        - ReportDefinition.maxDateRangeDays
+        - ReportDefinition.id
+        - ReportDefinition.isSystem
+        - ReportDefinition.isRetired
+        - ReportDefinition.estimatedCost
+        - ReportDefinition.createdByPrincipalId
+        - ReportDefinition.lastRunAt
+        operation: getReport
+        provenance: contract reporting.yaml GET /reports/{reportId}
+      - kind: detailPanel
+        label: The financial report
         bindsTo: FinancialReport
         columns:
         - FinancialReport.report
@@ -1375,51 +2033,147 @@ screens:
       slot: rowActions
       components:
       - kind: primaryButton
-        label: Run
+        label: Run report
         operation: runReport
         provenance: contract reporting.yaml POST /reports/{reportId}/run
       - kind: secondaryButton
-        label: Ask
+        label: Ask reporting question
         operation: askReportingQuestion
         provenance: contract reporting.yaml POST /reports/ask
       - kind: secondaryButton
-        label: Create
+        label: Create report
         operation: createReport
         provenance: contract reporting.yaml POST /reports
       - kind: destructiveButton
-        label: Delete
+        label: Delete report
         operation: deleteReport
         provenance: contract reporting.yaml DELETE /reports/{reportId}
       - kind: secondaryButton
-        label: Save
+        label: Save natural language query
         operation: saveNaturalLanguageQuery
         provenance: contract reporting.yaml POST /reports/ask/{conversationId}/save
       - kind: secondaryButton
-        label: Save changes
+        label: Save report
         operation: updateReport
         provenance: contract reporting.yaml PUT /reports/{reportId}
   overlays:
   - id: confirmDeleteReport
     component: confirmDialog
-    trigger: Delete
-    body: '**Names what `deleteReport` changes and what it leaves alone**, in the consequence rather
-      than the verb. A agent performance sla this affects should be identified in the dialog, not just
-      counted.'
+    trigger: Delete report
+    body: '**Names what `deleteReport` changes and what it leaves alone**, in the consequence rather than
+      the verb. A agent performance sla this affects should be identified in the dialog, not just counted.'
     provenance: contract reporting.yaml DELETE /reports/{reportId}
+  - id: formRunReport
+    component: modal
+    trigger: Run report
+    body: '**Collects what `runReport` sends before it is called.** Nothing in the body is required. Optional:
+      `parameters`, `venueId`, `dateFrom`, `dateTo`, `forceAsync`. Dismissing sends nothing; the screen
+      behind is unchanged.'
+    bindsTo: RunReportRequest
+    confirm:
+      label: Run report
+      operation: runReport
+    dismiss:
+      label: Cancel
+      discards:
+      - parameters
+      - venueId
+      - dateFrom
+      - dateTo
+      - forceAsync
+    provenance: contract reporting.yaml POST /reports/{reportId}/run
+  - id: formAskReportingQuestion
+    component: modal
+    trigger: Ask reporting question
+    body: '**Collects what `askReportingQuestion` sends before it is called.** Required: `question`. Optional:
+      `conversationId`, `venueId`. Dismissing sends nothing; the screen behind is unchanged.'
+    confirm:
+      label: Ask reporting question
+      operation: askReportingQuestion
+    dismiss:
+      label: Cancel
+      discards:
+      - question
+      - conversationId
+      - venueId
+    provenance: contract reporting.yaml POST /reports/ask
+  - id: formCreateReport
+    component: modal
+    trigger: Create report
+    body: '**Collects what `createReport` sends before it is called.** Required: `name`, `category`, `dataSource`,
+      `columns`, `requiredPermission`. Optional: `description`, `filters`, `groupBy`, `parameters`, `maxDateRangeDays`.
+      Dismissing sends nothing; the screen behind is unchanged.'
+    bindsTo: CreateReportRequest
+    confirm:
+      label: Create report
+      operation: createReport
+    dismiss:
+      label: Cancel
+      discards:
+      - name
+      - category
+      - dataSource
+      - columns
+      - requiredPermission
+      - description
+      - filters
+      - groupBy
+      - parameters
+      - maxDateRangeDays
+    provenance: contract reporting.yaml POST /reports
+  - id: formSaveNaturalLanguageQuery
+    component: modal
+    trigger: Save natural language query
+    body: '**Collects what `saveNaturalLanguageQuery` sends before it is called.** Required: `name`. Optional:
+      `category`. Dismissing sends nothing; the screen behind is unchanged.'
+    confirm:
+      label: Save natural language query
+      operation: saveNaturalLanguageQuery
+    dismiss:
+      label: Cancel
+      discards:
+      - name
+      - category
+    provenance: contract reporting.yaml POST /reports/ask/{conversationId}/save
+  - id: formUpdateReport
+    component: modal
+    trigger: Save report
+    body: '**Collects what `updateReport` sends before it is called.** Required: `name`, `category`, `dataSource`,
+      `columns`, `requiredPermission`. Optional: `description`, `filters`, `groupBy`, `parameters`, `maxDateRangeDays`.
+      Dismissing sends nothing; the screen behind is unchanged.'
+    bindsTo: CreateReportRequest
+    confirm:
+      label: Save report
+      operation: updateReport
+    dismiss:
+      label: Cancel
+      discards:
+      - name
+      - category
+      - dataSource
+      - columns
+      - requiredPermission
+      - description
+      - filters
+      - groupBy
+      - parameters
+      - maxDateRangeDays
+    provenance: contract reporting.yaml PUT /reports/{reportId}
   states:
     loading: The agent performance sla list.
     error: Could not load. Names which read failed and leaves the agent performance sla untouched.
-    emptyFirstRun: No agent performance sla yet. Carries the create action; distinct from a filter that
-      matched nothing.
-    emptyNoResults: The filter narrowed it and the agent performance sla are still there. Names the
-      active filter and offers to clear it.
-    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is
-      no data* and sends somebody to support with the wrong question.
+    emptyFirstRun: No agent performance sla yet. Offers Create report (`createReport`); distinct from
+      a filter that matched nothing.
+    emptyNoResults: Nothing matches the filter on category, search and the agent performance sla are still
+      there. Names the active filter and offers to clear it.
+    emptyNoAccess: Shown when the caller lacks `REPORT_VIEW_VENUE`, which `getFinancialReport` requires,
+      and names that permission. **Never an empty table** — that reads as *there is no data* and sends
+      somebody to support with the wrong question.
   apis:
   - operationId: runReport
     contract: reporting
     purpose: from page inventory
-    trigger: onLoad
+    trigger: onAction
   - operationId: askReportingQuestion
     contract: reporting
     purpose: Natural-language reporting query
@@ -1445,7 +2199,7 @@ screens:
   - operationId: getReport
     contract: reporting
     purpose: Read a report definition
-    trigger: onLoad
+    trigger: onAction
   - operationId: listReports
     contract: reporting
     purpose: List available report definitions
@@ -1475,11 +2229,11 @@ screens:
     coldEntry: A conversation link an agent opens from a notification. Resolves, or says it was closed
       and by whom.
     preloaded:
-    - FinancialReport.report
-    - FinancialReport.fiscalPeriodId
-    - FinancialReport.legalEntityId
-    - FinancialReport.currency
-    - FinancialReport.currencyScale
+    - ReportDefinition.name
+    - ReportDefinition.description
+    - ReportDefinition.category
+    - ReportDefinition.dataSource
+    - ReportDefinition.columns
   wireframe:
     status: notStarted
     provenance: generated
@@ -1523,10 +2277,8 @@ screens:
     transitions:
     - to: SUP-001
       trigger: Agent Login
-      carries:
-      - sessionId
-      provenance: derived — SUP-001 declares entryState.params sessionId, so an edge into it must carry
-        them
+      provenance: derived — SUP-001 declares entryState.params  and SUP-009 holds none of them, so the
+        edge carries nothing and SUP-001 opens cold
     - to: SUP-010
       trigger: Works in Customer 360° Service Profile
       provenance: flow F134 step 1→2
@@ -1572,10 +2324,10 @@ screens:
     cases, tasks, SLAs, alerts and workload.
   gaps:
   - operation: null
-    why: '**The pack names 8 actions on this screen and the screen declares 1 operation.** Unserved:
-      New Case, Find Customer, Find Order, Find Ticket, Find Booking, Assign Case, Escalate, Open AI
-      Assistant. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation
-      seen from the screen side rather than the contract side.'
+    why: '**The pack names 8 actions on this screen and the screen declares 1 operation.** Unserved: New
+      Case, Find Customer, Find Order, Find Ticket, Find Booking, Assign Case, Escalate, Open AI Assistant.
+      Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen
+      from the screen side rather than the contract side.'
     source: pack Customer Service_Reference.pdf, page 3 §Quick Actions
   layout:
     template: split
@@ -1686,8 +2438,8 @@ screens:
       nothing.
     emptyNoResults: The filter narrowed it and the customer service are still there. Names the active
       filter and offers to clear it.
-    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is
-      no data* and sends somebody to support with the wrong question.
+    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
+      data* and sends somebody to support with the wrong question.
   apis:
   - operationId: listCustomerService
     contract: marketing-crm
@@ -1710,10 +2462,9 @@ screens:
     provenance: generated
     board: wireframes/P12 Venue Support.dc.html#sup-009
     workshopBoard: wireframes/WS42 Customer Service Board 1.dc.html#sup-009
-  apisNote: Regenerated 9 September 2026 from Customer Service_Reference.pdf page 3. 25 of 27 labels
-    bound to a contract property; 35 of 53 pack bullets carried onto the screen — the rest are acceptance
-    prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than
-    here.
+  apisNote: Regenerated 9 September 2026 from Customer Service_Reference.pdf page 3. 25 of 27 labels bound
+    to a contract property; 35 of 53 pack bullets carried onto the screen — the rest are acceptance prose,
+    worked examples and AI narrative, which belong to the matrix and the contracts rather than here.
 - id: SUP-010
   name: Customer 360° Service Profile
   module: Support
@@ -1735,8 +2486,8 @@ screens:
     exitTo:
     - SUP-009
     inferred: false
-    notes: '**Reached from SUP-009, the hub of its workshop board.** Stated on 4 September: the pack
-      groups its screens ten to a board behind a command centre, and that grouping is the navigation.'
+    notes: '**Reached from SUP-009, the hub of its workshop board.** Stated on 4 September: the pack groups
+      its screens ten to a board behind a command centre, and that grouping is the navigation.'
     transitions:
     - to: SUP-009
       trigger: Returns to the board's landing screen
@@ -1806,19 +2557,19 @@ screens:
         - Customer360ServiceProfileView.activeReservations
         - Customer360ServiceProfileView.futureGroupBookingWhereApplicable
         - Open Orders
-        notes: 'The pack groups this record''s detail under its own headings: “Today”, “Yesterday”,
-          “Last Month”, “Display permitted information such as”, “Sensitive information should be”,
-          “Customer Summary”.'
+        notes: 'The pack groups this record''s detail under its own headings: “Today”, “Yesterday”, “Last
+          Month”, “Display permitted information such as”, “Sensitive information should be”, “Customer
+          Summary”.'
         provenance: pack Customer Service_Reference.pdf, page 5 §Display
   states:
     loading: The customer 360° service list.
     error: Could not load. Names which read failed and leaves the customer 360° service untouched.
     emptyFirstRun: No customer 360° service yet. Carries the create action; distinct from a filter that
       matched nothing.
-    emptyNoResults: The filter narrowed it and the customer 360° service are still there. Names the
-      active filter and offers to clear it.
-    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is
-      no data* and sends somebody to support with the wrong question.
+    emptyNoResults: The filter narrowed it and the customer 360° service are still there. Names the active
+      filter and offers to clear it.
+    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
+      data* and sends somebody to support with the wrong question.
   apis:
   - operationId: listCustomerServiceProfile
     contract: marketing-crm
@@ -1841,10 +2592,9 @@ screens:
     provenance: generated
     board: wireframes/P12 Venue Support.dc.html#sup-010
     workshopBoard: wireframes/WS42 Customer Service Board 1.dc.html#sup-010
-  apisNote: Regenerated 9 September 2026 from Customer Service_Reference.pdf page 5. 16 of 19 labels
-    bound to a contract property; 19 of 42 pack bullets carried onto the screen — the rest are acceptance
-    prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than
-    here.
+  apisNote: Regenerated 9 September 2026 from Customer Service_Reference.pdf page 5. 16 of 19 labels bound
+    to a contract property; 19 of 42 pack bullets carried onto the screen — the rest are acceptance prose,
+    worked examples and AI narrative, which belong to the matrix and the contracts rather than here.
 - id: SUP-011
   name: Unified Interaction & Communication History
   module: Support
@@ -1866,16 +2616,16 @@ screens:
     exitTo:
     - SUP-009
     inferred: false
-    notes: '**Reached from SUP-009, the hub of its workshop board.** Stated on 4 September: the pack
-      groups its screens ten to a board behind a command centre, and that grouping is the navigation.'
+    notes: '**Reached from SUP-009, the hub of its workshop board.** Stated on 4 September: the pack groups
+      its screens ten to a board behind a command centre, and that grouping is the navigation.'
     transitions:
     - to: SUP-009
       trigger: Returns to the board's landing screen
       provenance: flow F134 step 4→5
       operation: listUnifiedInteractionCommunication
   density: compact
-  purposeNote: Agents can see the complete relevant conversation history without searching separate
-    communication systems.
+  purposeNote: Agents can see the complete relevant conversation history without searching separate communication
+    systems.
   pattern: configEditor
   patternReason: the pack gives this screen a configuration directory (§Capture) and no display directory
     — it is settings, not a population
@@ -1921,12 +2671,11 @@ screens:
         provenance: pack Customer Service_Reference.pdf, page 7 §Capture
   states:
     loading: The unified interaction communication configuration as saved.
-    error: Could not load. Names which read failed and leaves the unified interaction communication
-      untouched.
+    error: Could not load. Names which read failed and leaves the unified interaction communication untouched.
     emptyFirstRun: No unified interaction communication configured yet. Carries the create action and
       says what the platform does in the meantime.
-    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is
-      no data* and sends somebody to support with the wrong question.
+    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
+      data* and sends somebody to support with the wrong question.
   apis:
   - operationId: listUnifiedInteractionCommunication
     contract: marketing-crm
@@ -1938,9 +2687,8 @@ screens:
     board: wireframes/P12 Venue Support.dc.html#sup-011
     workshopBoard: wireframes/WS42 Customer Service Board 1.dc.html#sup-011
   apisNote: Regenerated 9 September 2026 from Customer Service_Reference.pdf page 7. 0 of 0 labels bound
-    to a contract property; 11 of 43 pack bullets carried onto the screen — the rest are acceptance
-    prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than
-    here.
+    to a contract property; 11 of 43 pack bullets carried onto the screen — the rest are acceptance prose,
+    worked examples and AI narrative, which belong to the matrix and the contracts rather than here.
 - id: SUP-012
   name: Case Creation, Classification & Intelligent Routing
   module: Support
@@ -1962,8 +2710,8 @@ screens:
     exitTo:
     - SUP-009
     inferred: false
-    notes: '**Reached from SUP-009, the hub of its workshop board.** Stated on 4 September: the pack
-      groups its screens ten to a board behind a command centre, and that grouping is the navigation.'
+    notes: '**Reached from SUP-009, the hub of its workshop board.** Stated on 4 September: the pack groups
+      its screens ten to a board behind a command centre, and that grouping is the navigation.'
     transitions:
     - to: SUP-009
       trigger: Returns to the board's landing screen
@@ -2035,8 +2783,8 @@ screens:
     error: Could not load. Names which read failed and leaves the case creation classification untouched.
     emptyFirstRun: No case creation classification configured yet. Carries the create action and says
       what the platform does in the meantime.
-    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is
-      no data* and sends somebody to support with the wrong question.
+    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
+      data* and sends somebody to support with the wrong question.
   apis:
   - operationId: createCaseClassificationIntelligent
     contract: marketing-crm
@@ -2048,9 +2796,8 @@ screens:
     board: wireframes/P12 Venue Support.dc.html#sup-012
     workshopBoard: wireframes/WS42 Customer Service Board 1.dc.html#sup-012
   apisNote: Regenerated 9 September 2026 from Customer Service_Reference.pdf page 9. 0 of 0 labels bound
-    to a contract property; 14 of 48 pack bullets carried onto the screen — the rest are acceptance
-    prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than
-    here.
+    to a contract property; 14 of 48 pack bullets carried onto the screen — the rest are acceptance prose,
+    worked examples and AI narrative, which belong to the matrix and the contracts rather than here.
 - id: SUP-013
   name: Case Investigation & Resolution Workspace
   module: Support
@@ -2072,8 +2819,8 @@ screens:
     exitTo:
     - SUP-009
     inferred: false
-    notes: '**Reached from SUP-009, the hub of its workshop board.** Stated on 4 September: the pack
-      groups its screens ten to a board behind a command centre, and that grouping is the navigation.'
+    notes: '**Reached from SUP-009, the hub of its workshop board.** Stated on 4 September: the pack groups
+      its screens ten to a board behind a command centre, and that grouping is the navigation.'
     transitions:
     - to: SUP-009
       trigger: Returns to the board's landing screen
@@ -2087,9 +2834,9 @@ screens:
   purpose: Provide the primary workspace in which an agent investigates and resolves a case.
   gaps:
   - operation: null
-    why: '**The pack names 1 actions on this screen and the screen declares 1 operation.** Unserved:
-      Action history. Each needs an operation, or needs removing from the screen; this is the Phase
-      3 reconciliation seen from the screen side rather than the contract side.'
+    why: '**The pack names 1 actions on this screen and the screen declares 1 operation.** Unserved: Action
+      history. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation
+      seen from the screen side rather than the contract side.'
     source: pack Customer Service_Reference.pdf, page 11 §Support
   layout:
     template: split
@@ -2144,12 +2891,12 @@ screens:
   states:
     loading: The case investigation resolution list.
     error: Could not load. Names which read failed and leaves the case investigation resolution untouched.
-    emptyFirstRun: No case investigation resolution yet. Carries the create action; distinct from a
-      filter that matched nothing.
+    emptyFirstRun: No case investigation resolution yet. Carries the create action; distinct from a filter
+      that matched nothing.
     emptyNoResults: The filter narrowed it and the case investigation resolution are still there. Names
       the active filter and offers to clear it.
-    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is
-      no data* and sends somebody to support with the wrong question.
+    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
+      data* and sends somebody to support with the wrong question.
   apis:
   - operationId: setCaseInvestigationResolution
     contract: marketing-crm
@@ -2193,8 +2940,8 @@ screens:
     exitTo:
     - SUP-009
     inferred: false
-    notes: '**Reached from SUP-009, the hub of its workshop board.** Stated on 4 September: the pack
-      groups its screens ten to a board behind a command centre, and that grouping is the navigation.'
+    notes: '**Reached from SUP-009, the hub of its workshop board.** Stated on 4 September: the pack groups
+      its screens ten to a board behind a command centre, and that grouping is the navigation.'
     transitions:
     - to: SUP-009
       trigger: Returns to the board's landing screen
@@ -2287,8 +3034,8 @@ screens:
       matched nothing.
     emptyNoResults: The filter narrowed it and the order booking ticket are still there. Names the active
       filter and offers to clear it.
-    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is
-      no data* and sends somebody to support with the wrong question.
+    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
+      data* and sends somebody to support with the wrong question.
   apis:
   - operationId: setOrderBookingTicket
     contract: marketing-crm
@@ -2332,8 +3079,8 @@ screens:
     exitTo:
     - SUP-009
     inferred: false
-    notes: '**Reached from SUP-009, the hub of its workshop board.** Stated on 4 September: the pack
-      groups its screens ten to a board behind a command centre, and that grouping is the navigation.'
+    notes: '**Reached from SUP-009, the hub of its workshop board.** Stated on 4 September: the pack groups
+      its screens ten to a board behind a command centre, and that grouping is the navigation.'
     transitions:
     - to: SUP-009
       trigger: Returns to the board's landing screen
@@ -2347,10 +3094,10 @@ screens:
   purpose: Manage cases requiring money, compensation, goodwill or policy exceptions.
   gaps:
   - operation: null
-    why: '**The pack names 8 actions on this screen and the screen declares 1 operation.** Unserved:
-      Full Refund, Partial Refund, Wallet Credit, Voucher, Complimentary Ticket, Fee Waiver, Policy
-      Exception. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation
-      seen from the screen side rather than the contract side.'
+    why: '**The pack names 8 actions on this screen and the screen declares 1 operation.** Unserved: Full
+      Refund, Partial Refund, Wallet Credit, Voucher, Complimentary Ticket, Fee Waiver, Policy Exception.
+      Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen
+      from the screen side rather than the contract side.'
     source: pack Customer Service_Reference.pdf, page 15 §Support
   layout:
     template: split
@@ -2387,8 +3134,8 @@ screens:
         - RefundCompensationServiceExceptionWorkspaceView.fees
         - RefundCompensationServiceExceptionWorkspaceView.proposedRefund
         - RefundCompensationServiceExceptionWorkspaceView.proposedCompensation
-        notes: 'The pack groups this record''s detail under its own headings: “Requested Exception”,
-          “Up to AED 200”, “Above AED 1,000”, “Compensation Budget”.'
+        notes: 'The pack groups this record''s detail under its own headings: “Requested Exception”, “Up
+          to AED 200”, “Above AED 1,000”, “Compensation Budget”.'
         provenance: pack Customer Service_Reference.pdf, page 15 §Display
     - name: actionBar
       slot: rowActions
@@ -2424,8 +3171,8 @@ screens:
       that matched nothing.
     emptyNoResults: The filter narrowed it and the refund compensation service are still there. Names
       the active filter and offers to clear it.
-    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is
-      no data* and sends somebody to support with the wrong question.
+    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
+      data* and sends somebody to support with the wrong question.
   apis:
   - operationId: setRefundCompensationService
     contract: marketing-crm
@@ -2444,10 +3191,9 @@ screens:
     provenance: generated
     board: wireframes/P12 Venue Support.dc.html#sup-015
     workshopBoard: wireframes/WS42 Customer Service Board 1.dc.html#sup-015
-  apisNote: Regenerated 9 September 2026 from Customer Service_Reference.pdf page 15. 8 of 8 labels
-    bound to a contract property; 16 of 34 pack bullets carried onto the screen — the rest are acceptance
-    prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than
-    here.
+  apisNote: Regenerated 9 September 2026 from Customer Service_Reference.pdf page 15. 8 of 8 labels bound
+    to a contract property; 16 of 34 pack bullets carried onto the screen — the rest are acceptance prose,
+    worked examples and AI narrative, which belong to the matrix and the contracts rather than here.
 - id: SUP-016
   name: Escalation, Collaboration & Internal Resolution
   module: Support
@@ -2469,8 +3215,8 @@ screens:
     exitTo:
     - SUP-009
     inferred: false
-    notes: '**Reached from SUP-009, the hub of its workshop board.** Stated on 4 September: the pack
-      groups its screens ten to a board behind a command centre, and that grouping is the navigation.'
+    notes: '**Reached from SUP-009, the hub of its workshop board.** Stated on 4 September: the pack groups
+      its screens ten to a board behind a command centre, and that grouping is the navigation.'
     transitions:
     - to: SUP-009
       trigger: Returns to the board's landing screen
@@ -2516,12 +3262,11 @@ screens:
         provenance: pack Customer Service_Reference.pdf, page 16 §Capture
   states:
     loading: The escalation collaboration internal configuration as saved.
-    error: Could not load. Names which read failed and leaves the escalation collaboration internal
-      untouched.
+    error: Could not load. Names which read failed and leaves the escalation collaboration internal untouched.
     emptyFirstRun: No escalation collaboration internal configured yet. Carries the create action and
       says what the platform does in the meantime.
-    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is
-      no data* and sends somebody to support with the wrong question.
+    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
+      data* and sends somebody to support with the wrong question.
   apis:
   - operationId: listEscalationCollaborationInternal
     contract: marketing-crm
@@ -2532,10 +3277,9 @@ screens:
     provenance: generated
     board: wireframes/P12 Venue Support.dc.html#sup-016
     workshopBoard: wireframes/WS42 Customer Service Board 1.dc.html#sup-016
-  apisNote: Regenerated 9 September 2026 from Customer Service_Reference.pdf page 16. 0 of 0 labels
-    bound to a contract property; 8 of 36 pack bullets carried onto the screen — the rest are acceptance
-    prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than
-    here.
+  apisNote: Regenerated 9 September 2026 from Customer Service_Reference.pdf page 16. 0 of 0 labels bound
+    to a contract property; 8 of 36 pack bullets carried onto the screen — the rest are acceptance prose,
+    worked examples and AI narrative, which belong to the matrix and the contracts rather than here.
 - id: SUP-017
   name: Case Resolution, Closure & Customer Feedback
   module: Support
@@ -2557,8 +3301,8 @@ screens:
     exitTo:
     - SUP-009
     inferred: false
-    notes: '**Reached from SUP-009, the hub of its workshop board.** Stated on 4 September: the pack
-      groups its screens ten to a board behind a command centre, and that grouping is the navigation.'
+    notes: '**Reached from SUP-009, the hub of its workshop board.** Stated on 4 September: the pack groups
+      its screens ten to a board behind a command centre, and that grouping is the navigation.'
     transitions:
     - to: SUP-009
       trigger: Returns to the board's landing screen
@@ -2648,8 +3392,8 @@ screens:
     error: Could not load. Names which read failed and leaves the case resolution closure untouched.
     emptyFirstRun: No case resolution closure configured yet. Carries the create action and says what
       the platform does in the meantime.
-    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is
-      no data* and sends somebody to support with the wrong question.
+    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
+      data* and sends somebody to support with the wrong question.
   apis:
   - operationId: listCaseResolutionClosure
     contract: marketing-crm
@@ -2660,10 +3404,9 @@ screens:
     provenance: generated
     board: wireframes/P12 Venue Support.dc.html#sup-017
     workshopBoard: wireframes/WS42 Customer Service Board 1.dc.html#sup-017
-  apisNote: Regenerated 9 September 2026 from Customer Service_Reference.pdf page 17. 0 of 0 labels
-    bound to a contract property; 22 of 45 pack bullets carried onto the screen — the rest are acceptance
-    prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than
-    here.
+  apisNote: Regenerated 9 September 2026 from Customer Service_Reference.pdf page 17. 0 of 0 labels bound
+    to a contract property; 22 of 45 pack bullets carried onto the screen — the rest are acceptance prose,
+    worked examples and AI narrative, which belong to the matrix and the contracts rather than here.
 - id: SUP-018
   name: AI Customer Service Copilot & Knowledge Workspace
   module: Support
@@ -2685,26 +3428,26 @@ screens:
     exitTo:
     - SUP-009
     inferred: false
-    notes: '**Reached from SUP-009, the hub of its workshop board.** Stated on 4 September: the pack
-      groups its screens ten to a board behind a command centre, and that grouping is the navigation.'
+    notes: '**Reached from SUP-009, the hub of its workshop board.** Stated on 4 September: the pack groups
+      its screens ten to a board behind a command centre, and that grouping is the navigation.'
   density: compact
   purposeNote: Agents receive explainable, context-aware AI assistance that reduces handling time and
-    improves consistency without bypassing TICVAI's policies, permissions or transactional systems.
-    Board 1 — Final Screen Register
+    improves consistency without bypassing TICVAI's policies, permissions or transactional systems. Board
+    1 — Final Screen Register
   pattern: listDetail
   patternReason: '**nothing in the pack chooses a pattern for this screen** — no metric directory, no
     display directory, no configuration directory. It falls to the default, and the fallback is recorded
     rather than passed off as a decision'
   purpose: Create the AI intelligence layer assisting agents throughout the service journey. This should
     not be a simple chatbot added to the side of the screen. It should understand the customer + transaction
-    + policy + case context. Board 1 focused on the individual customer-service agent and individual
-    customer case. Board 2 moves one level higher and provides the supervisor, contact-center manager,
-    operations manager and service leadership layer.
+    + policy + case context. Board 1 focused on the individual customer-service agent and individual customer
+    case. Board 2 moves one level higher and provides the supervisor, contact-center manager, operations
+    manager and service leadership layer.
   gaps:
   - operation: null
-    why: '**The pack names 1 actions on this screen and the screen declares 1 operation.** Unserved:
-      Review → Execute. Each needs an operation, or needs removing from the screen; this is the Phase
-      3 reconciliation seen from the screen side rather than the contract side.'
+    why: '**The pack names 1 actions on this screen and the screen declares 1 operation.** Unserved: Review
+      → Execute. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation
+      seen from the screen side rather than the contract side.'
     source: pack Customer Service_Reference.pdf, page 19 §Actions
   - operation: null
     why: '**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose,
@@ -2713,8 +3456,8 @@ screens:
       it is built.'
     source: pack Customer Service_Reference.pdf, page 19
   - operation: null
-    why: '**The pack gives this screen no display, metric or configuration directory**, so its shape
-      is a default rather than a reading. It needs a person before it is built.'
+    why: '**The pack gives this screen no display, metric or configuration directory**, so its shape is
+      a default rather than a reading. It needs a person before it is built.'
     source: pack Customer Service_Reference.pdf, page 19
   layout:
     template: split
@@ -2739,8 +3482,8 @@ screens:
       that matched nothing.
     emptyNoResults: The filter narrowed it and the customer service copilot are still there. Names the
       active filter and offers to clear it.
-    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is
-      no data* and sends somebody to support with the wrong question.
+    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
+      data* and sends somebody to support with the wrong question.
   apis:
   - operationId: setCustomerServiceCopilot
     contract: marketing-crm
@@ -2751,10 +3494,9 @@ screens:
     provenance: generated
     board: wireframes/P12 Venue Support.dc.html#sup-018
     workshopBoard: wireframes/WS42 Customer Service Board 1.dc.html#sup-018
-  apisNote: Regenerated 9 September 2026 from Customer Service_Reference.pdf page 19. 0 of 0 labels
-    bound to a contract property; 1 of 96 pack bullets carried onto the screen — the rest are acceptance
-    prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than
-    here.
+  apisNote: Regenerated 9 September 2026 from Customer Service_Reference.pdf page 19. 0 of 0 labels bound
+    to a contract property; 1 of 96 pack bullets carried onto the screen — the rest are acceptance prose,
+    worked examples and AI narrative, which belong to the matrix and the contracts rather than here.
 - id: SUP-019
   name: Contact Center Operations Command Center
   module: Support
@@ -2791,10 +3533,8 @@ screens:
     transitions:
     - to: SUP-001
       trigger: Agent Login
-      carries:
-      - sessionId
-      provenance: derived — SUP-001 declares entryState.params sessionId, so an edge into it must carry
-        them
+      provenance: derived — SUP-001 declares entryState.params  and SUP-019 holds none of them, so the
+        edge carries nothing and SUP-001 opens cold
     - to: SUP-020
       trigger: Works in Queue Configuration & Management
       provenance: flow F135 step 1→2
@@ -2835,9 +3575,8 @@ screens:
   purposeNote: Supervisors can understand the real-time operational state of Customer Service and identify
     the queues, channels and issues requiring immediate intervention.
   pattern: commandCentre
-  patternReason: the pack gives this screen a metric directory (§Display) and no per-row directory —
-    measures over a population the screen does not itself list. The tiles are the pack's, not a tenant
-    licence's
+  patternReason: the pack gives this screen a metric directory (§Display) and no per-row directory — measures
+    over a population the screen does not itself list. The tiles are the pack's, not a tenant licence's
   purpose: Provide supervisors and management with a real-time view of customer-service operations across
   layout:
     template: dashboard
@@ -2852,8 +3591,8 @@ screens:
         label: Filter by
         columns:
         - Channel → Queue → Agent → Case
-        notes: The pack filters this screen by channel → queue → agent → case — which are present is
-          a decision the pack already made.
+        notes: The pack filters this screen by channel → queue → agent → case — which are present is a
+          decision the pack already made.
         provenance: pack Customer Service_Reference.pdf, page 24 §Drill-Down
     - name: contentBody
       slot: headline
@@ -2916,12 +3655,12 @@ screens:
   states:
     loading: The contact operations list; the counts above it resolve separately.
     error: Could not load. Names which read failed and leaves the contact operations untouched.
-    emptyFirstRun: No contact operations yet. Carries the create action; distinct from a filter that
-      matched nothing.
+    emptyFirstRun: No contact operations yet. Carries the create action; distinct from a filter that matched
+      nothing.
     emptyNoResults: The filter narrowed it and the contact operations are still there. Names the active
       filter and offers to clear it.
-    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is
-      no data* and sends somebody to support with the wrong question.
+    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
+      data* and sends somebody to support with the wrong question.
   apis:
   - operationId: listContact
     contract: marketing-crm
@@ -2965,8 +3704,8 @@ screens:
     exitTo:
     - SUP-019
     inferred: false
-    notes: '**Reached from SUP-019, the hub of its workshop board.** Stated on 4 September: the pack
-      groups its screens ten to a board behind a command centre, and that grouping is the navigation.'
+    notes: '**Reached from SUP-019, the hub of its workshop board.** Stated on 4 September: the pack groups
+      its screens ten to a board behind a command centre, and that grouping is the navigation.'
     transitions:
     - to: SUP-019
       trigger: Returns to the board's landing screen
@@ -2981,10 +3720,10 @@ screens:
   purpose: Configure and operate the queues through which customer-service cases are organized.
   gaps:
   - operation: null
-    why: '**The pack names 5 actions on this screen and the screen declares 1 operation.** Unserved:
-      Payments, Membership, Wallet, Group Sales Support, Access Control. Each needs an operation, or
-      needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather
-      than the contract side.'
+    why: '**The pack names 5 actions on this screen and the screen declares 1 operation.** Unserved: Payments,
+      Membership, Wallet, Group Sales Support, Access Control. Each needs an operation, or needs removing
+      from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract
+      side.'
     source: pack Customer Service_Reference.pdf, page 25 §Support configurable queues such as
   layout:
     template: form
@@ -3075,8 +3814,8 @@ screens:
     error: Could not load. Names which read failed and leaves the queue untouched.
     emptyFirstRun: No queue configured yet. Carries the create action and says what the platform does
       in the meantime.
-    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is
-      no data* and sends somebody to support with the wrong question.
+    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
+      data* and sends somebody to support with the wrong question.
   apis:
   - operationId: listQueues
     contract: queue
@@ -3087,10 +3826,9 @@ screens:
     provenance: generated
     board: wireframes/P12 Venue Support.dc.html#sup-020
     workshopBoard: wireframes/WS43 Customer Service Board 2.dc.html#sup-020
-  apisNote: Regenerated 9 September 2026 from Customer Service_Reference.pdf page 25. 0 of 0 labels
-    bound to a contract property; 25 of 52 pack bullets carried onto the screen — the rest are acceptance
-    prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than
-    here.
+  apisNote: Regenerated 9 September 2026 from Customer Service_Reference.pdf page 25. 0 of 0 labels bound
+    to a contract property; 25 of 52 pack bullets carried onto the screen — the rest are acceptance prose,
+    worked examples and AI narrative, which belong to the matrix and the contracts rather than here.
 - id: SUP-021
   name: Intelligent Routing, Skills & Assignment Engine
   module: Support
@@ -3112,8 +3850,8 @@ screens:
     exitTo:
     - SUP-019
     inferred: false
-    notes: '**Reached from SUP-019, the hub of its workshop board.** Stated on 4 September: the pack
-      groups its screens ten to a board behind a command centre, and that grouping is the navigation.'
+    notes: '**Reached from SUP-019, the hub of its workshop board.** Stated on 4 September: the pack groups
+      its screens ten to a board behind a command centre, and that grouping is the navigation.'
     transitions:
     - to: SUP-019
       trigger: Returns to the board's landing screen
@@ -3135,8 +3873,8 @@ screens:
       it is built.'
     source: pack Customer Service_Reference.pdf, page 27
   - operation: null
-    why: '**The pack gives this screen no display, metric or configuration directory**, so its shape
-      is a default rather than a reading. It needs a person before it is built.'
+    why: '**The pack gives this screen no display, metric or configuration directory**, so its shape is
+      a default rather than a reading. It needs a person before it is built.'
     source: pack Customer Service_Reference.pdf, page 27
   layout:
     template: split
@@ -3159,10 +3897,10 @@ screens:
     error: Could not load. Names which read failed and leaves the intelligent routing skills untouched.
     emptyFirstRun: No intelligent routing skills yet. Carries the create action; distinct from a filter
       that matched nothing.
-    emptyNoResults: The filter narrowed it and the intelligent routing skills are still there. Names
-      the active filter and offers to clear it.
-    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is
-      no data* and sends somebody to support with the wrong question.
+    emptyNoResults: The filter narrowed it and the intelligent routing skills are still there. Names the
+      active filter and offers to clear it.
+    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
+      data* and sends somebody to support with the wrong question.
   apis:
   - operationId: setIntelligentRoutingSkill
     contract: marketing-crm
@@ -3173,10 +3911,9 @@ screens:
     provenance: generated
     board: wireframes/P12 Venue Support.dc.html#sup-021
     workshopBoard: wireframes/WS43 Customer Service Board 2.dc.html#sup-021
-  apisNote: Regenerated 9 September 2026 from Customer Service_Reference.pdf page 27. 0 of 0 labels
-    bound to a contract property; 0 of 39 pack bullets carried onto the screen — the rest are acceptance
-    prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than
-    here.
+  apisNote: Regenerated 9 September 2026 from Customer Service_Reference.pdf page 27. 0 of 0 labels bound
+    to a contract property; 0 of 39 pack bullets carried onto the screen — the rest are acceptance prose,
+    worked examples and AI narrative, which belong to the matrix and the contracts rather than here.
 - id: SUP-022
   name: SLA Policy & Service-Level Management
   module: Support
@@ -3198,8 +3935,8 @@ screens:
     exitTo:
     - SUP-019
     inferred: false
-    notes: '**Reached from SUP-019, the hub of its workshop board.** Stated on 4 September: the pack
-      groups its screens ten to a board behind a command centre, and that grouping is the navigation.'
+    notes: '**Reached from SUP-019, the hub of its workshop board.** Stated on 4 September: the pack groups
+      its screens ten to a board behind a command centre, and that grouping is the navigation.'
     transitions:
     - to: SUP-019
       trigger: Returns to the board's landing screen
@@ -3213,9 +3950,9 @@ screens:
   purpose: Define and monitor service-level commitments for different customer-service scenarios.
   gaps:
   - operation: null
-    why: '**The pack names 1 actions on this screen and the screen declares 1 operation.** Unserved:
-      Venue operating hours. Each needs an operation, or needs removing from the screen; this is the
-      Phase 3 reconciliation seen from the screen side rather than the contract side.'
+    why: '**The pack names 1 actions on this screen and the screen declares 1 operation.** Unserved: Venue
+      operating hours. Each needs an operation, or needs removing from the screen; this is the Phase 3
+      reconciliation seen from the screen side rather than the contract side.'
     source: pack Customer Service_Reference.pdf, page 29 §Support
   layout:
     template: form
@@ -3252,8 +3989,8 @@ screens:
     error: Could not load. Names which read failed and leaves the sla policy service-level untouched.
     emptyFirstRun: No sla policy service-level configured yet. Carries the create action and says what
       the platform does in the meantime.
-    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is
-      no data* and sends somebody to support with the wrong question.
+    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
+      data* and sends somebody to support with the wrong question.
   apis:
   - operationId: listSlaPolicyService
     contract: marketing-crm
@@ -3272,10 +4009,9 @@ screens:
     provenance: generated
     board: wireframes/P12 Venue Support.dc.html#sup-022
     workshopBoard: wireframes/WS43 Customer Service Board 2.dc.html#sup-022
-  apisNote: Regenerated 9 September 2026 from Customer Service_Reference.pdf page 29. 0 of 0 labels
-    bound to a contract property; 13 of 41 pack bullets carried onto the screen — the rest are acceptance
-    prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than
-    here.
+  apisNote: Regenerated 9 September 2026 from Customer Service_Reference.pdf page 29. 0 of 0 labels bound
+    to a contract property; 13 of 41 pack bullets carried onto the screen — the rest are acceptance prose,
+    worked examples and AI narrative, which belong to the matrix and the contracts rather than here.
 - id: SUP-023
   name: Agent Workload, Availability & Workforce Control
   module: Support
@@ -3297,8 +4033,8 @@ screens:
     exitTo:
     - SUP-019
     inferred: false
-    notes: '**Reached from SUP-019, the hub of its workshop board.** Stated on 4 September: the pack
-      groups its screens ten to a board behind a command centre, and that grouping is the navigation.'
+    notes: '**Reached from SUP-019, the hub of its workshop board.** Stated on 4 September: the pack groups
+      its screens ten to a board behind a command centre, and that grouping is the navigation.'
     transitions:
     - to: SUP-019
       trigger: Returns to the board's landing screen
@@ -3365,8 +4101,8 @@ screens:
       that matched nothing.
     emptyNoResults: The filter narrowed it and the agent workload availability are still there. Names
       the active filter and offers to clear it.
-    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is
-      no data* and sends somebody to support with the wrong question.
+    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
+      data* and sends somebody to support with the wrong question.
   apis:
   - operationId: listAgentWorkloadAvailability
     contract: marketing-crm
@@ -3410,8 +4146,8 @@ screens:
     exitTo:
     - SUP-019
     inferred: false
-    notes: '**Reached from SUP-019, the hub of its workshop board.** Stated on 4 September: the pack
-      groups its screens ten to a board behind a command centre, and that grouping is the navigation.'
+    notes: '**Reached from SUP-019, the hub of its workshop board.** Stated on 4 September: the pack groups
+      its screens ten to a board behind a command centre, and that grouping is the navigation.'
     transitions:
     - to: SUP-019
       trigger: Returns to the board's landing screen
@@ -3490,8 +4226,8 @@ screens:
       that matched nothing.
     emptyNoResults: The filter narrowed it and the escalation critical case are still there. Names the
       active filter and offers to clear it.
-    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is
-      no data* and sends somebody to support with the wrong question.
+    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
+      data* and sends somebody to support with the wrong question.
   apis:
   - operationId: listEscalationCriticalCase
     contract: marketing-crm
@@ -3535,8 +4271,8 @@ screens:
     exitTo:
     - SUP-019
     inferred: false
-    notes: '**Reached from SUP-019, the hub of its workshop board.** Stated on 4 September: the pack
-      groups its screens ten to a board behind a command centre, and that grouping is the navigation.'
+    notes: '**Reached from SUP-019, the hub of its workshop board.** Stated on 4 September: the pack groups
+      its screens ten to a board behind a command centre, and that grouping is the navigation.'
     transitions:
     - to: SUP-019
       trigger: Returns to the board's landing screen
@@ -3551,9 +4287,9 @@ screens:
   purpose: Measure whether customer-service interactions meet TICVAI's defined service-quality standards.
   gaps:
   - operation: null
-    why: '**The pack names 1 actions on this screen and the screen declares 1 operation.** Unserved:
-      Case. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation
-      seen from the screen side rather than the contract side.'
+    why: '**The pack names 1 actions on this screen and the screen declares 1 operation.** Unserved: Case.
+      Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen
+      from the screen side rather than the contract side.'
     source: pack Customer Service_Reference.pdf, page 34 §Support
   - operation: null
     why: '**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose,
@@ -3562,8 +4298,8 @@ screens:
       it is built.'
     source: pack Customer Service_Reference.pdf, page 34
   - operation: null
-    why: '**The pack gives this screen no display, metric or configuration directory**, so its shape
-      is a default rather than a reading. It needs a person before it is built.'
+    why: '**The pack gives this screen no display, metric or configuration directory**, so its shape is
+      a default rather than a reading. It needs a person before it is built.'
     source: pack Customer Service_Reference.pdf, page 34
   layout:
     template: split
@@ -3588,8 +4324,8 @@ screens:
       that matched nothing.
     emptyNoResults: The filter narrowed it and the quality agent evaluation are still there. Names the
       active filter and offers to clear it.
-    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is
-      no data* and sends somebody to support with the wrong question.
+    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
+      data* and sends somebody to support with the wrong question.
   apis:
   - operationId: listQualityAgentEvaluation
     contract: marketing-crm
@@ -3607,10 +4343,9 @@ screens:
     provenance: generated
     board: wireframes/P12 Venue Support.dc.html#sup-025
     workshopBoard: wireframes/WS43 Customer Service Board 2.dc.html#sup-025
-  apisNote: Regenerated 9 September 2026 from Customer Service_Reference.pdf page 34. 0 of 0 labels
-    bound to a contract property; 1 of 43 pack bullets carried onto the screen — the rest are acceptance
-    prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than
-    here.
+  apisNote: Regenerated 9 September 2026 from Customer Service_Reference.pdf page 34. 0 of 0 labels bound
+    to a contract property; 1 of 43 pack bullets carried onto the screen — the rest are acceptance prose,
+    worked examples and AI narrative, which belong to the matrix and the contracts rather than here.
 - id: SUP-026
   name: Customer Satisfaction, Feedback & Voice of Customer
   module: Support
@@ -3632,28 +4367,26 @@ screens:
     exitTo:
     - SUP-019
     inferred: false
-    notes: '**Reached from SUP-019, the hub of its workshop board.** Stated on 4 September: the pack
-      groups its screens ten to a board behind a command centre, and that grouping is the navigation.'
+    notes: '**Reached from SUP-019, the hub of its workshop board.** Stated on 4 September: the pack groups
+      its screens ten to a board behind a command centre, and that grouping is the navigation.'
     transitions:
     - to: SUP-019
       trigger: Returns to the board's landing screen
       provenance: flow F135 step 14→15
       operation: listCustomerSatisfactionFeedback
   density: compact
-  purposeNote: Management can understand what customers think about the service experience and trace
-    negative trends back to their underlying operational causes.
+  purposeNote: Management can understand what customers think about the service experience and trace negative
+    trends back to their underlying operational causes.
   pattern: commandCentre
-  patternReason: the pack gives this screen a metric directory (§Display) and no per-row directory —
-    measures over a population the screen does not itself list. The tiles are the pack's, not a tenant
-    licence's
-  purpose: Measure customer perception of TICVAI's support experience and identify recurring service
-    problems.
+  patternReason: the pack gives this screen a metric directory (§Display) and no per-row directory — measures
+    over a population the screen does not itself list. The tiles are the pack's, not a tenant licence's
+  purpose: Measure customer perception of TICVAI's support experience and identify recurring service problems.
   gaps:
   - operation: null
-    why: '**The pack names 3 actions on this screen and the screen declares 1 operation.** Unserved:
-      Service Rating, NPS where used, Direct Customer Comment. Each needs an operation, or needs removing
-      from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the
-      contract side.'
+    why: '**The pack names 3 actions on this screen and the screen declares 1 operation.** Unserved: Service
+      Rating, NPS where used, Direct Customer Comment. Each needs an operation, or needs removing from
+      the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract
+      side.'
     source: pack Customer Service_Reference.pdf, page 35 §Support
   layout:
     template: dashboard
@@ -3708,12 +4441,12 @@ screens:
   states:
     loading: The customer satisfaction feedback list; the counts above it resolve separately.
     error: Could not load. Names which read failed and leaves the customer satisfaction feedback untouched.
-    emptyFirstRun: No customer satisfaction feedback yet. Carries the create action; distinct from a
-      filter that matched nothing.
+    emptyFirstRun: No customer satisfaction feedback yet. Carries the create action; distinct from a filter
+      that matched nothing.
     emptyNoResults: The filter narrowed it and the customer satisfaction feedback are still there. Names
       the active filter and offers to clear it.
-    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is
-      no data* and sends somebody to support with the wrong question.
+    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
+      data* and sends somebody to support with the wrong question.
   apis:
   - operationId: listCustomerSatisfactionFeedback
     contract: marketing-crm
@@ -3732,10 +4465,9 @@ screens:
     provenance: generated
     board: wireframes/P12 Venue Support.dc.html#sup-026
     workshopBoard: wireframes/WS43 Customer Service Board 2.dc.html#sup-026
-  apisNote: Regenerated 9 September 2026 from Customer Service_Reference.pdf page 35. 8 of 8 labels
-    bound to a contract property; 11 of 46 pack bullets carried onto the screen — the rest are acceptance
-    prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than
-    here.
+  apisNote: Regenerated 9 September 2026 from Customer Service_Reference.pdf page 35. 8 of 8 labels bound
+    to a contract property; 11 of 46 pack bullets carried onto the screen — the rest are acceptance prose,
+    worked examples and AI narrative, which belong to the matrix and the contracts rather than here.
 - id: SUP-027
   name: Service Analytics & Root-Cause Intelligence
   module: Support
@@ -3757,8 +4489,8 @@ screens:
     exitTo:
     - SUP-019
     inferred: false
-    notes: '**Reached from SUP-019, the hub of its workshop board.** Stated on 4 September: the pack
-      groups its screens ten to a board behind a command centre, and that grouping is the navigation.'
+    notes: '**Reached from SUP-019, the hub of its workshop board.** Stated on 4 September: the pack groups
+      its screens ten to a board behind a command centre, and that grouping is the navigation.'
     transitions:
     - to: SUP-019
       trigger: Returns to the board's landing screen
@@ -3857,8 +4589,8 @@ screens:
       that matched nothing.
     emptyNoResults: The filter narrowed it and the service analytics root-cause are still there. Names
       the active filter and offers to clear it.
-    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is
-      no data* and sends somebody to support with the wrong question.
+    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
+      data* and sends somebody to support with the wrong question.
   apis:
   - operationId: listServiceRootCause
     contract: marketing-crm
@@ -3901,16 +4633,16 @@ screens:
     exitTo:
     - SUP-019
     inferred: false
-    notes: '**Reached from SUP-019, the hub of its workshop board.** Stated on 4 September: the pack
-      groups its screens ten to a board behind a command centre, and that grouping is the navigation.'
+    notes: '**Reached from SUP-019, the hub of its workshop board.** Stated on 4 September: the pack groups
+      its screens ten to a board behind a command centre, and that grouping is the navigation.'
   density: compact
   purposeNote: approved low-risk workflows without removing governance over customer-impacting decisions.
     Board 2 — Final Screen Register
   pattern: listDetail
   patternReason: the pack gives this screen a display directory (§Forecast) and no metric row
-  purpose: Create the management-level AI intelligence layer for Customer Service. This is different
-    from 10.1.10 AI Customer Service Copilot. Board 1 Copilot = helps one agent resolve one case. Board
-    2 AI Intelligence = improves the entire service operation.
+  purpose: Create the management-level AI intelligence layer for Customer Service. This is different from
+    10.1.10 AI Customer Service Copilot. Board 1 Copilot = helps one agent resolve one case. Board 2 AI
+    Intelligence = improves the entire service operation.
   gaps:
   - operation: null
     why: '**AI Contact Center Intelligence & Automation Studio declares no operation that writes anything**
@@ -3956,12 +4688,12 @@ screens:
   states:
     loading: The contact intelligence automation list.
     error: Could not load. Names which read failed and leaves the contact intelligence automation untouched.
-    emptyFirstRun: No contact intelligence automation yet. Carries the create action; distinct from
-      a filter that matched nothing.
-    emptyNoResults: The filter narrowed it and the contact intelligence automation are still there.
-      Names the active filter and offers to clear it.
-    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is
-      no data* and sends somebody to support with the wrong question.
+    emptyFirstRun: No contact intelligence automation yet. Carries the create action; distinct from a
+      filter that matched nothing.
+    emptyNoResults: The filter narrowed it and the contact intelligence automation are still there. Names
+      the active filter and offers to clear it.
+    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
+      data* and sends somebody to support with the wrong question.
   apis:
   - operationId: listContactAutomation
     contract: marketing-crm
@@ -3980,7 +4712,6 @@ screens:
     provenance: generated
     board: wireframes/P12 Venue Support.dc.html#sup-028
     workshopBoard: wireframes/WS43 Customer Service Board 2.dc.html#sup-028
-  apisNote: Regenerated 9 September 2026 from Customer Service_Reference.pdf page 39. 6 of 6 labels
-    bound to a contract property; 6 of 95 pack bullets carried onto the screen — the rest are acceptance
-    prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than
-    here.
+  apisNote: Regenerated 9 September 2026 from Customer Service_Reference.pdf page 39. 6 of 6 labels bound
+    to a contract property; 6 of 95 pack bullets carried onto the screen — the rest are acceptance prose,
+    worked examples and AI narrative, which belong to the matrix and the contracts rather than here.

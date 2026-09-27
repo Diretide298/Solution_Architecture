@@ -13,7 +13,6 @@ initial:
 terminal:
 - cancelled
 - closed
-- verified
 transitions:
 - from: open
   to: assigned

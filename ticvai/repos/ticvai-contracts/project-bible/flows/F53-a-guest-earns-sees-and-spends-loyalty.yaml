@@ -45,9 +45,8 @@ steps:
   action: Offers are shown against what they hold.
   operations:
   - listPromotions
-  - evaluatePromotions
-  outcome: '**Evaluated, not listed.** An offer a guest cannot use is an offer that teaches them to
-    ignore the screen.'
+  outcome: '**Listed here, evaluated at checkout.** Whether an offer applies needs a cart, which
+    GST-037 does not hold, so the cart evaluates it when the guest pays (audit R292).'
   crossesDevice: true
 - step: 4
   screen: GST-011

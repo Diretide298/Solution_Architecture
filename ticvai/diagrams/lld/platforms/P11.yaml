@@ -48,6 +48,7 @@ screens:
   goesTo:
   - ACC-002
   - ACC-004
+  - ACC-006
   boardFrames: null
   wireframe: wireframes/P11 Accreditation Web.dc.html#acc-001
   inFlows: null

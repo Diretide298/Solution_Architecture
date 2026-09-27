@@ -22,10 +22,19 @@ Checks:
   8. Offline-reachable states are a subset of the states the entity actually has.
   9. No contract declares the same path twice. YAML resolves duplicates silently, so the
      first block vanishes and every other check passes on what survives.
+ 10. A transition is not credited to a read. A GET cannot move a state; a model that says
+     `listSerialisedItems` reserves an item hands the reserve to an operation nobody will build.
+ 11. Nothing leaves a terminal state. `_schema.yaml` defines terminal as "a state nothing
+     leaves", and check 3 means nothing if a terminal state has outgoing transitions.
+ 12. A model's notes do not contradict its transitions ("no transition back to `draft`"
+     beside a transition into `draft`).
+ 13. (warning) A transition's operation writes the entity's table, per the lineage; and an
+     operation does not "move" a record to the state it is already in.
 
 Run: python3 tools/check-states.py
 """
 import json
+import re
 import sys
 from pathlib import Path
 
@@ -43,6 +52,9 @@ if not CONTRACTS.exists():
     CONTRACTS = ROOT.parent / "ticvai" / "ticvai-contracts" / "openapi"
 
 ERRORS: list[str] = []
+# "No transition back to `draft`", "no way back into `open`" -- a note that forbids a move.
+NO_TRANSITION_NOTE = re.compile(
+    r"no (?:transitions?|way|path|moves?) (?:back )?(?:to|into) `?(\w+)`?", re.I)
 WARNINGS: list[str] = []
 
 
@@ -63,8 +75,14 @@ def check_duplicate_paths() -> None:
             seen.add(m.group(1))
 
 
-def load_contracts() -> tuple[dict[str, list[str]], set[str]]:
-    """Status enums by contract.SchemaName, and every operationId."""
+OP_VERBS: dict[str, str] = {}
+
+
+def load_contracts() -> tuple[dict[str, list[str]], set[str], dict[str, set[str]]]:
+    """Status enums by contract.SchemaName, every operationId, and object schemas by contract.
+
+    Also fills OP_VERBS (operationId -> HTTP verb), which check 10 needs.
+    """
     enums: dict[str, list[str]] = {}
     object_schemas: dict[str, set[str]] = {}
     ops: set[str] = set()
@@ -94,6 +112,7 @@ def load_contracts() -> tuple[dict[str, list[str]], set[str]]:
                     if verb in ("get", "post", "put", "patch", "delete") and isinstance(op, dict):
                         if oid := op.get("operationId"):
                             ops.add(oid)
+                            OP_VERBS[oid] = verb
     return enums, ops, object_schemas
 
 
@@ -176,6 +195,46 @@ def main() -> int:
             if (o := t.get("operation")) and ops and o not in ops:
                 ERRORS.append(f"{name}: transition {t['from']}->{t['to']} names unknown operation '{o}'")
 
+        # 10. a read does not move a state. The audit of 26 September found listSerialisedItems
+        # credited with reserve, release, restock and writeOff, listCustomDomains with expiry and
+        # getPaymentLink with expiry -- check 4 passed every one, because each operation exists.
+        for t in d["transitions"]:
+            o = t.get("operation")
+            if o and OP_VERBS.get(o) == "get":
+                ERRORS.append(f"{name}: transition {t['from']}->{t['to']} is credited to '{o}', "
+                              "which is a GET -- a read cannot move a state. Name the operation "
+                              "that writes it, or drop `operation` and mark the trigger timer/job")
+
+        # 11. nothing leaves a terminal state. Journal posted->reversed, work-order verified->closed,
+        # guest-device failed->active and period closed->closing all passed check 3, because a
+        # terminal state that is left again still counts as "reached".
+        terminal = set(d["terminal"])
+        for t in d["transitions"]:
+            if t["from"] in terminal:
+                ERRORS.append(f"{name}: '{t['from']}' is declared terminal but transitions to "
+                              f"'{t['to']}' via {t.get('operation') or t.get('trigger') or '?'} -- "
+                              "either the state is not terminal or the transition is not real")
+
+        # 12. notes that contradict the transitions. journal.yaml said "no transition back to
+        # `draft`" above a rejectJournal transition pendingApproval->draft.
+        notes = d.get("notes") or ""
+        if isinstance(notes, str):
+            for m in NO_TRANSITION_NOTE.finditer(notes):
+                target = m.group(1)
+                into = [t for t in d["transitions"] if t["to"] == target]
+                if target in states and into:
+                    ops_into = ", ".join(sorted({t.get("operation") or t.get("trigger") or "?"
+                                                 for t in into}))
+                    ERRORS.append(f"{name}: notes say '{m.group(0)}' but the model declares "
+                                  f"{len(into)} transition(s) into '{target}' ({ops_into})")
+
+        # 13a. an operation that "moves" a record to where it already is
+        for t in d["transitions"]:
+            if t["from"] == t["to"] and t.get("operation"):
+                WARNINGS.append(f"{name}: {t['from']}->{t['to']} via {t['operation']} changes no "
+                                "state -- if the operation moves the record, name the state it "
+                                "moves to; if it does not, it is not a transition")
+
         # 5. emitted events are catalogued
         for t in d["transitions"]:
             for e in (t.get("emits") or []):
@@ -233,6 +292,38 @@ def main() -> int:
                         f"{f.stem}: {tr.get('from')}->{tr.get('to')} emits {ev} but {op} does not "
                         "write platform.outbox — the event and the state change must commit "
                         "together (ADR-0033)")
+
+        # 13b. the operation on a transition writes the entity's table. A transition credited to an
+        # operation whose lineage never touches the record (suspendShift moving a deposit box,
+        # revokeApprovalDelegation withdrawing a shift swap) is a transition nobody implements.
+        # Only checked where the table named after the model file is a real table in the lineage,
+        # so a model whose table has a different name is not flagged on a guess.
+        _by_name: dict[str, set[str]] = {}
+        for _v in _lin.values():
+            for _w in (_v.get("writes") or []) + (_v.get("reads") or []):
+                if isinstance(_w, str) and "." in _w and not _w.startswith("cache:"):
+                    _by_name.setdefault(_w.split(".", 1)[1], set()).add(_w)
+        for f in sorted(STATES.glob("*.yaml")):
+            if f.stem.startswith("_"):
+                continue
+            doc = yaml.safe_load(f.read_text(encoding="utf-8")) or {}
+            owned = _by_name.get(f.stem.replace("-", "_"))
+            if not owned:
+                continue
+            for tr in (doc.get("transitions") or []):
+                op = tr.get("operation")
+                if not op or op not in _lin or OP_VERBS.get(op) == "get":
+                    continue
+                writes = _lin[op].get("writes") or []
+                # pos_shift for shift, fiscal_period for period: a table that carries the stem
+                # counts, so only an operation that touches no such table is reported.
+                stem = f.stem.replace("-", "_")
+                if not owned & set(writes) and not any(stem in w for w in writes):
+                    WARNINGS.append(
+                        f"{f.stem}: {tr.get('from')}->{tr.get('to')} is credited to {op}, whose "
+                        f"lineage writes {sorted(writes) or 'nothing'} and not "
+                        f"{'/'.join(sorted(owned))} -- either the operation is wrong or its "
+                        "writes are")
 
     for w in WARNINGS:
         print(f"  WARN  {w}")

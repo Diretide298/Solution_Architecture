@@ -7,15 +7,15 @@
  "audience": "guest",
  "formFactor": "kiosk",
  "offlineCapable": false,
- "generated": "2026-09-24",
+ "generated": "2026-09-28",
  "note": "Derived by tools/derive-platform.py. **The gaps section is the point** \u2014 a page listing what exists is a directory; one listing what is missing is a worklist.",
  "counts": {
   "screens": 17,
-  "operations": 23,
+  "operations": 22,
   "contracts": 8,
   "modules": 2,
   "undrawn": 0,
-  "operationsWithNoScreen": 9
+  "operationsWithNoScreen": 13
  },
  "waves": {
   "wave2": 17
@@ -42,15 +42,15 @@
    "operations": 7
   },
   {
-   "contract": "catalogue",
-   "operations": 4
-  },
-  {
    "contract": "retail",
    "operations": 4
   },
   {
-   "contract": "fnb",
+   "contract": "catalogue",
+   "operations": 3
+  },
+  {
+   "contract": "white-label",
    "operations": 2
   },
   {
@@ -58,7 +58,7 @@
    "operations": 2
   },
   {
-   "contract": "white-label",
+   "contract": "fnb",
    "operations": 2
   },
   {
@@ -246,6 +246,18 @@
     "summary": "Membership schemes, the level above a plan"
    },
    {
+    "operation": "getForm",
+    "contract": "marketing-crm",
+    "verb": "GET",
+    "summary": "One form, to fill in or to edit"
+   },
+   {
+    "operation": "getMyProfile",
+    "contract": "marketing-crm",
+    "verb": "GET",
+    "summary": "A guest reading their own details"
+   },
+   {
     "operation": "listBadges",
     "contract": "marketing-crm",
     "verb": "GET",
@@ -274,6 +286,18 @@
     "contract": "marketing-crm",
     "verb": "PUT",
     "summary": "Choose the name shown on the board"
+   },
+   {
+    "operation": "listTicketTransfers",
+    "contract": "orders",
+    "verb": "GET",
+    "summary": "The ticket transfers this guest sent or received"
+   },
+   {
+    "operation": "revokeEntitlementShare",
+    "contract": "orders",
+    "verb": "POST",
+    "summary": "Take back a share"
    },
    {
     "operation": "recordRecommendationOutcome",

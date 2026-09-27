@@ -13,7 +13,6 @@ owner: CrossRegionService
 initial:
 - active
 terminal:
-- exhausted
 - revoked
 - expired
 transitions:

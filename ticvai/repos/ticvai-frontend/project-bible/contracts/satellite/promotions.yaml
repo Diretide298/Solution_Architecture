@@ -122,6 +122,8 @@ paths:
                 periodTo:
                   type: string
                   format: date
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       responses:
         '200':
           description: Simulation
@@ -181,22 +183,28 @@ paths:
                   minItems: 2
                   maxItems: 4
                   items:
-                    type: object
-                    properties:
-                      label:
-                        type: string
-                      trafficPercent:
-                        type: integer
-                      discountPercent:
-                        type: number
+                    $ref: '#/components/schemas/PromotionVariant'
       responses:
         '200':
-          description: Set
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: Set. The variants now stored for the promotion, replacing any set before.
           content:
             application/json:
               schema:
                 type: object
-                additionalProperties: true
+                required:
+                - promotionId
+                - variants
+                properties:
+                  promotionId:
+                    type: string
+                    format: uuid
+                  variants:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/PromotionVariant'
   /recommendations:
     post:
       operationId: getRecommendations
@@ -251,6 +259,8 @@ paths:
                 maxResults:
                   type: integer
                   default: 4
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       responses:
         '200':
           description: Recommendations
@@ -322,6 +332,9 @@ paths:
                   maxLength: 300
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Voided
           content:
             application/json:
@@ -378,7 +391,8 @@ paths:
       - $ref: ../shared/common.yaml#/components/parameters/PageCursor
       responses:
         '200':
-          description: Promotions
+          description: Promotions. **A guest caller receives `GuestPromotion` items**; staff and partner
+            callers receive `Promotion`.
           content:
             application/json:
               schema:
@@ -389,7 +403,9 @@ paths:
                     items:
                       type: array
                       items:
-                        $ref: '#/components/schemas/Promotion'
+                        oneOf:
+                        - $ref: '#/components/schemas/Promotion'
+                        - $ref: '#/components/schemas/GuestPromotion'
         '403':
           $ref: ../shared/common.yaml#/components/responses/Forbidden
     post:
@@ -420,6 +436,9 @@ paths:
               $ref: '#/components/schemas/CreatePromotionRequest'
       responses:
         '201':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Created in draft
           content:
             application/json:
@@ -467,11 +486,14 @@ paths:
       x-ticvai-conflict-policy: serverWins
       responses:
         '200':
-          description: Promotion
+          description: Promotion. **A guest caller receives `GuestPromotion`**; staff and partner callers
+            receive `Promotion`.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Promotion'
+                oneOf:
+                - $ref: '#/components/schemas/Promotion'
+                - $ref: '#/components/schemas/GuestPromotion'
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
     patch:
@@ -516,6 +538,9 @@ paths:
                   $ref: '#/components/schemas/Discount'
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Updated
           content:
             application/json:
@@ -567,6 +592,9 @@ paths:
                   type: string
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Done
         '409':
           description: Not in a state that permits this
@@ -614,6 +642,9 @@ paths:
                   type: string
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Done
         '409':
           description: Not in a state that permits this
@@ -649,6 +680,9 @@ paths:
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Done
         '409':
           description: Not in a state that permits this
@@ -687,6 +721,9 @@ paths:
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Published
           content:
             application/json:
@@ -830,6 +867,9 @@ paths:
               $ref: '#/components/schemas/CreateCouponCampaignRequest'
       responses:
         '201':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Created
           content:
             application/json:
@@ -863,6 +903,12 @@ paths:
         in: query
         schema:
           $ref: '#/components/schemas/CouponStatus'
+      - name: batchId
+        in: query
+        description: Only the codes one `generateCouponCodes` batch issued.
+        schema:
+          type: string
+          format: uuid
       - $ref: ../shared/common.yaml#/components/parameters/PageSize
       - $ref: ../shared/common.yaml#/components/parameters/PageCursor
       responses:
@@ -888,6 +934,9 @@ paths:
       summary: Generate codes in bulk
       description: 'Up to fifty thousand at a time. Generation is asynchronous and the batch is exported
         rather than returned inline — a hundred thousand codes is a file, not a response body.
+
+        **Poll `getCouponCodeBatch` with the returned `batchId`** for progress, the failure reason and,
+        once `complete`, the export''s download link. `listCouponCodes` filters by the same `batchId`.
 
         '
       tags:
@@ -929,6 +978,9 @@ paths:
                     format: uuid
       responses:
         '202':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Generation queued
           content:
             application/json:
@@ -947,6 +999,47 @@ paths:
                     - generating
                     - complete
                     - failed
+  /coupon-campaigns/{campaignId}/code-batches/{batchId}:
+    parameters:
+    - name: campaignId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    - name: batchId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    get:
+      operationId: getCouponCodeBatch
+      x-ticvai-audience:
+      - staff
+      x-ticvai-read-routing: primary
+      summary: Progress and export of a code batch
+      description: 'The read `generateCouponCodes` points at. Its 202 hands back a `batchId` and a status
+        of `queued`; this is where that status moves to `complete` or `failed`, and where the exported
+        file is fetched. **Primary, not replica:** a batch polled straight after it was queued must not
+        read as missing.
+
+        '
+      tags:
+      - coupon
+      x-ticvai-permission: PRICE_VIEW
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      responses:
+        '200':
+          description: Batch
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CouponCodeBatch'
+        '404':
+          $ref: ../shared/common.yaml#/components/responses/NotFound
   /coupon-codes/{code}:
     parameters:
     - name: code
@@ -1020,6 +1113,9 @@ paths:
                   type: string
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Done
         '409':
           description: Not in a state that permits this
@@ -1065,6 +1161,9 @@ paths:
                   maxLength: 500
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Voided
           content:
             application/json:
@@ -1135,6 +1234,9 @@ paths:
               $ref: '#/components/schemas/CreateVoucherBatchRequest'
       responses:
         '201':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Issued
           content:
             application/json:
@@ -1180,6 +1282,9 @@ paths:
                   $ref: ../shared/common.yaml#/components/schemas/Money
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Redeemed
           content:
             application/json:
@@ -1253,6 +1358,9 @@ paths:
               $ref: '#/components/schemas/CreateBundleRequest'
       responses:
         '201':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Created
           content:
             application/json:
@@ -1314,6 +1422,11 @@ paths:
       description: 'Components and allocation are immutable once the bundle has been sold. Historic orders
         reference the split that applied when they were placed, and the ledger is append-only.
 
+        **This body carries neither**, so it cannot change them: it amends the name, the price, the end
+        date and whether the bundle is on sale. The one refusal it can meet is a price that breaks the
+        split. Under a `fixedAmount` allocation the fixed amounts must sum to the bundle price (the same
+        rule `createBundle` answers 400 for), and a new price with an unchanged split no longer does.
+
         '
       tags:
       - bundle
@@ -1343,13 +1456,17 @@ paths:
                   type: boolean
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Updated
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Bundle'
-        '409':
-          description: Structural change attempted after the bundle has been sold
+        '400':
+          description: The bundle's allocation is `fixedAmount` and the new price no longer equals the
+            sum of the fixed amounts.
           content:
             application/problem+json:
               schema:
@@ -1436,6 +1553,9 @@ paths:
                     $ref: '#/components/schemas/AllocationComponent'
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Preview
           content:
             application/json:
@@ -1510,6 +1630,9 @@ paths:
               $ref: '#/components/schemas/UpsellRule'
       responses:
         '201':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Created
           content:
             application/json:
@@ -1538,6 +1661,9 @@ paths:
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       responses:
         '204':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Removed
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
@@ -1583,7 +1709,7 @@ paths:
                 placement:
                   $ref: '#/components/schemas/UpsellPlacement'
                 channel:
-                  type: string
+                  $ref: ../shared/common.yaml#/components/schemas/SalesChannel
                 subjectId:
                   type: string
                   format: uuid
@@ -1617,10 +1743,6 @@ paths:
       x-ticvai-consumed-by:
         - "P01 WEB-005 Ticket Type Selection"
         - "P01 WEB-010 Shopping Cart"
-        - "P01 WEB-032 Offers & Promotions"
-        - "P01 WEB-043 Loyalty & Rewards"
-        - "P02 GST-036 Loyalty & Rewards"
-        - "P02 GST-037 Offers & Promotions"
         - "P04 POS-002 Sell — Ticket Catalogue"
         - "P04 POS-021 Sell — Food & Drink"
         - "P04 POS-023 Sell — Merchandise"
@@ -1969,6 +2091,8 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/PromotionRuleBuilderInput'
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       responses:
         '200':
           description: Promotion Rule Builder
@@ -2321,6 +2445,8 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/RuleTestSimulationAiRecommendationWorkspaceInput'
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       responses:
         '200':
           description: Rule Test, Simulation & AI Recommendation Workspace
@@ -2363,6 +2489,8 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/CouponPromoCodeBuilderInput'
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       responses:
         '200':
           description: Coupon & Promo Code Builder
@@ -2560,6 +2688,8 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/CodeDistributionAssignmentManagerInput'
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       responses:
         '200':
           description: Code Distribution & Assignment Manager
@@ -2853,6 +2983,8 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/BuyXGetYBogoRuleBuilderInput'
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       responses:
         '200':
           description: Buy X Get Y / BOGO Rule Builder
@@ -2974,6 +3106,8 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/FixedPriceNForXOfferBuilderInput'
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       responses:
         '200':
           description: Fixed-Price & “N for X” Offer Builder
@@ -3017,6 +3151,8 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/GiftFreeProductAddedValueOfferBuilderInput'
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       responses:
         '200':
           description: Gift, Free Product & Added-Value Offer Builder
@@ -3059,6 +3195,8 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/CrossCategoryPromotionBuilderInput'
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       responses:
         '200':
           description: Cross-Category Promotion Builder
@@ -3305,6 +3443,8 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/BundleDefinitionSetupInput'
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       responses:
         '200':
           description: Bundle Definition & Setup
@@ -3347,6 +3487,8 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/BundleComponentBuilderInput'
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       responses:
         '200':
           description: Bundle Component Builder
@@ -3391,6 +3533,8 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/GuestChoiceBuildYourOwnBundleDesignerInput'
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       responses:
         '200':
           description: Guest Choice & Build-Your-Own Bundle Designer
@@ -3629,6 +3773,8 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/BundlePreviewSimulationAiRecommendationInput'
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       responses:
         '200':
           description: Bundle Preview, Simulation & AI Recommendation
@@ -4151,6 +4297,8 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/EligibilityRuleBuilderInput'
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       responses:
         '200':
           description: Eligibility Rule Builder
@@ -4575,6 +4723,8 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/PromotionStackingRuleBuilderInput'
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       responses:
         '200':
           description: Promotion Stacking Rule Builder
@@ -4923,6 +5073,8 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/CampaignBudgetFinancialLimitSetupInput'
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       responses:
         '200':
           description: Campaign Budget & Financial Limit Setup
@@ -5081,6 +5233,8 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/CampaignApprovalWorkflowDesignerInput'
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       responses:
         '200':
           description: Campaign Approval Workflow Designer
@@ -5125,6 +5279,8 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/ApprovalInboxDecisionWorkspaceInput'
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       responses:
         '200':
           description: Approval Inbox & Decision Workspace
@@ -5752,6 +5908,9 @@ paths:
               $ref: '#/components/schemas/RecommendationStrategy'
       responses:
         '201':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Created
           content:
             application/json:
@@ -5806,6 +5965,9 @@ paths:
               $ref: '#/components/schemas/RecommendationStrategy'
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Updated
           content:
             application/json:
@@ -5885,6 +6047,9 @@ paths:
                     $ref: '#/components/schemas/ProductRelationship'
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Set
           content:
             application/json:
@@ -5970,6 +6135,8 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/RecommendationContext'
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       responses:
         '200':
           description: The trace
@@ -6007,6 +6174,9 @@ paths:
               $ref: '#/components/schemas/RecommendationOutcome'
       responses:
         '202':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Recorded
   /recommendation-experiments:
     get:
@@ -6060,6 +6230,9 @@ paths:
               $ref: '#/components/schemas/RecommendationExperiment'
       responses:
         '201':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Created
           content:
             application/json:
@@ -6110,6 +6283,19 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/RecommendationExperiment'
+        '400':
+          description: '`winningVariant` does not name one of the experiment''s own variants.'
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
+        '409':
+          description: The experiment is not `running`. A draft never ran, and a concluded or abandoned
+            experiment already has its outcome.
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
   /recommendation-performance:
     get:
       operationId: getRecommendationPerformance
@@ -6200,6 +6386,9 @@ paths:
               $ref: '#/components/schemas/RecommendationSuppression'
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Set
           content:
             application/json:
@@ -6248,8 +6437,13 @@ paths:
                 sampleSize:
                   type: integer
                   default: 10000
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: What it would have done
           content:
             application/json:
@@ -6472,7 +6666,8 @@ components:
         placement:
           type: string
         channel:
-          type: string
+          allOf:
+          - $ref: ../shared/common.yaml#/components/schemas/SalesChannel
           nullable: true
         venueId:
           type: string
@@ -6872,8 +7067,9 @@ components:
           $ref: ../shared/common.yaml#/components/schemas/Money
         channels:
           type: array
+          description: Empty or absent matches every channel.
           items:
-            type: string
+            $ref: ../shared/common.yaml#/components/schemas/SalesChannel
         purchaseGate:
           type: boolean
           default: false
@@ -7042,6 +7238,75 @@ components:
             type: string
             format: date-time
             nullable: true
+    PromotionVariant:
+      x-ticvai-persistence: promotions.promotion_variant
+      type: object
+      description: 'One arm of a promotion A/B test (BL-114), written by `setPromotionVariants`. **Stored
+        as rows** because the split has to be read back at evaluation time. The body used to be a free
+        object with no table behind it, so the variants a caller set could not be persisted.
+
+        '
+      required:
+      - label
+      - trafficPercent
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        promotionId:
+          type: string
+          format: uuid
+          readOnly: true
+          description: Taken from the path.
+        label:
+          type: string
+        trafficPercent:
+          type: integer
+        discountPercent:
+          type: number
+    GuestPromotion:
+      x-ticvai-persistence: none — guest projection of promotions.promotion
+      type: object
+      description: '**What a guest may see of a promotion.** `Promotion` carries the commercial internals
+        (`budgetCap`, `maxRedemptions`, `redemptionCount`, `discountGiven`, `precedence`, `stackingGroup`),
+        and `listPromotions` and `getPromotion` are guest-audience. A guest caller receives this shape
+        instead. `additionalProperties: false` is the point: a server that adds an internal field to it
+        fails validation instead of publishing the field.
+
+        '
+      additionalProperties: false
+      required:
+      - id
+      - code
+      - name
+      - discount
+      - validFrom
+      properties:
+        id:
+          type: string
+          format: uuid
+        code:
+          type: string
+        name:
+          type: string
+        description:
+          type: string
+        discount:
+          $ref: '#/components/schemas/Discount'
+        conditions:
+          $ref: '#/components/schemas/PromotionConditions'
+        stackingMode:
+          $ref: '#/components/schemas/StackingMode'
+        validFrom:
+          type: string
+          format: date-time
+        validTo:
+          type: string
+          format: date-time
+        maxRedemptionsPerGuest:
+          type: integer
+          nullable: true
     ConflictAnalysis:
       x-ticvai-persistence: none — computed
       type: object
@@ -7094,7 +7359,17 @@ components:
             type: array
             items:
               type: object
+              required:
+              - promotionId
+              - promotionCode
               properties:
+                promotionId:
+                  type: string
+                  format: uuid
+                  description: 'The conflicting promotion, as `ConflictAnalysis.conflicts[].otherPromotionId`
+                    names it, so the publish gate can link to it without a lookup by code.
+
+                    '
                 promotionCode:
                   type: string
                 combinedDiscount:
@@ -7128,7 +7403,7 @@ components:
             type: object
             properties:
               channel:
-                type: string
+                $ref: ../shared/common.yaml#/components/schemas/SalesChannel
               redemptionCount:
                 type: integer
               discountGiven:
@@ -7199,6 +7474,66 @@ components:
             type: integer
           isActive:
             type: boolean
+    CouponCodeBatch:
+      x-ticvai-persistence: promotions.coupon_code_batch
+      type: object
+      description: 'One run of `generateCouponCodes`. **The batch is a row** because its status is read
+        after the request that queued it has returned, and its codes point back at it.
+
+        '
+      required:
+      - id
+      - campaignId
+      - quantity
+      - status
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+          description: The `batchId` that `generateCouponCodes` returned.
+        campaignId:
+          type: string
+          format: uuid
+        quantity:
+          type: integer
+          description: Codes requested.
+        generatedCount:
+          type: integer
+          description: Codes generated so far.
+        prefix:
+          type: string
+          maxLength: 16
+          nullable: true
+        length:
+          type: integer
+        status:
+          type: string
+          enum:
+          - queued
+          - generating
+          - complete
+          - failed
+        failureReason:
+          type: string
+          nullable: true
+          description: Present only where status is `failed`.
+        requestedByPrincipalId:
+          type: string
+          format: uuid
+        requestedAt:
+          type: string
+          format: date-time
+        completedAt:
+          type: string
+          format: date-time
+          nullable: true
+        downloadUrl:
+          type: string
+          nullable: true
+          x-ticvai-persisted: false
+          description: The exported file of the batch's codes. Signed and expiring, issued on each read,
+            so it is not stored. Present only while status is `complete`.
     CouponCode:
       x-ticvai-persistence: promotions.coupon_code
       type: object
@@ -7212,6 +7547,11 @@ components:
         campaignId:
           type: string
           format: uuid
+        batchId:
+          type: string
+          format: uuid
+          nullable: true
+          description: The `generateCouponCodes` batch that issued this code. Null where no batch did.
         status:
           $ref: '#/components/schemas/CouponStatus'
         assignedSubjectId:
@@ -7367,7 +7707,7 @@ components:
       - promotional
     BundleChoiceGroup:
       type: object
-      x-ticvai-persistence: promotions.bundle_choice_group
+      x-ticvai-persistence: promotions.bundle_choice_group + promotions.bundle_choice_option
       description: '**Pick n from a set** (3.5.10). The shape a dynamic bundle needs and `BundleComponent`
         could not express — it names specific variants, which describes a fixed bundle with swaps.
 
@@ -7400,11 +7740,20 @@ components:
         options:
           type: array
           minItems: 2
+          description: 'The rows of `promotions.bundle_choice_option`, one per option, each keyed to its
+            group. A required array with nowhere to be stored was a group whose choices were lost on
+            write.
+
+            '
           items:
             type: object
             required:
             - variantId
             properties:
+              id:
+                type: string
+                format: uuid
+                readOnly: true
               variantId:
                 type: string
                 format: uuid
@@ -7779,7 +8128,12 @@ components:
           type: string
           format: uuid
         channel:
-          type: string
+          allOf:
+          - $ref: ../shared/common.yaml#/components/schemas/SalesChannel
+          description: 'Where the sale is being made. Matched against `PromotionConditions.channels`,
+            so both sides use the one shared vocabulary.
+
+            '
         subjectId:
           type: string
           format: uuid
@@ -7820,8 +8174,6 @@ components:
                 $ref: ../shared/common.yaml#/components/schemas/Money
     PromotionEvaluation:
       x-ticvai-persistence: none — computed
-      parameters:
-      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       type: object
       required:
       - totalDiscount

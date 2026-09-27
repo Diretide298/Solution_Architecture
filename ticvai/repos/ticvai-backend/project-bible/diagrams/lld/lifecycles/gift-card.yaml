@@ -15,7 +15,6 @@ initial:
 terminal:
 - redeemed
 - expired
-- blocked
 transitions:
 - from: issued
   to: active

@@ -1,5 +1,5 @@
 id: LLD-CatalogueService
-title: CatalogueService — 404 operations, 71 tables
+title: CatalogueService — 406 operations, 74 tables
 generatedBy: tools/derive-diagrams.py
 tier: commerce
 index: diagrams/hld/02-services.yaml
@@ -15,9 +15,9 @@ why: '**What is sold, at what price, in which seat.** Promotions and seating are
 scale: Read-heavy, bundle-published to tills. **The catalogue bundle is this service's output** (ADR-0013).
 ifDown: A bad publish reaches every workstation. Versioned and rollback-able for that reason.
 coverage:
-  operations: 404
-  inAFlow: 57
-  percent: 43%
+  operations: 406
+  inAFlow: 263
+  percent: 65%
   note: '**Flow coverage is how much of this service a journey has walked.** A service under 40% is
     unwalked rather than under-documented.'
 schemas:
@@ -32,7 +32,7 @@ schemas:
   - postgres
   largestTable: pricing.dynamic_price_rule
 - schema: promotions
-  tables: 16
+  tables: 19
   stores:
   - postgres
   largestTable: promotions.promotion
@@ -43,7 +43,7 @@ schemas:
   largestTable: seating.group_request
 operationsByContract:
 - contract: catalogue
-  count: 205
+  count: 206
   operations:
   - operation: acquireInventoryHold
     verb: POST
@@ -252,6 +252,14 @@ operationsByContract:
     permission: PRODUCT_VIEW
     offline: false
     reads: 3
+    writes: 0
+  - operation: getCatalogueImportJob
+    verb: GET
+    path: /products/import/{jobId}
+    scope: venue
+    permission: PRODUCT_VIEW
+    offline: false
+    reads: 1
     writes: 0
   - operation: getChannelAllocations
     verb: GET
@@ -1686,7 +1694,7 @@ operationsByContract:
     reads: 2
     writes: 2
 - contract: promotions
-  count: 145
+  count: 146
   operations:
   - operation: analysePromotionConflicts
     verb: GET
@@ -1734,8 +1742,8 @@ operationsByContract:
     scope: venue
     permission: PRODUCT_CONFIGURE
     offline: false
-    reads: 5
-    writes: 5
+    reads: 6
+    writes: 6
   - operation: createCouponCampaign
     verb: POST
     path: /coupon-campaigns
@@ -1830,7 +1838,7 @@ operationsByContract:
     scope: venue
     permission: PRODUCT_VIEW
     offline: true
-    reads: 4
+    reads: 5
     writes: 0
   - operation: getCouponCode
     verb: GET
@@ -1838,6 +1846,14 @@ operationsByContract:
     scope: venue
     permission: PRICE_VIEW
     offline: true
+    reads: 1
+    writes: 0
+  - operation: getCouponCodeBatch
+    verb: GET
+    path: /coupon-campaigns/{campaignId}/code-batches/{batchId}
+    scope: venue
+    permission: PRICE_VIEW
+    offline: false
     reads: 1
     writes: 0
   - operation: getProductAffinity
@@ -2022,7 +2038,7 @@ operationsByContract:
     scope: venue
     permission: PRODUCT_VIEW
     offline: false
-    reads: 4
+    reads: 5
     writes: 0
   - operation: listCampaignCalendarTimeline
     verb: GET
@@ -2758,8 +2774,8 @@ operationsByContract:
     scope: venue
     permission: PRICE_CONFIGURE
     offline: false
-    reads: 2
-    writes: 2
+    reads: 3
+    writes: 3
   - operation: setRecommendationSuppression
     verb: PUT
     path: /recommendation-suppressions
@@ -2814,7 +2830,7 @@ operationsByContract:
     scope: venue
     permission: PRODUCT_CONFIGURE
     offline: false
-    reads: 5
+    reads: 6
     writes: 4
   - operation: updatePromotion
     verb: PATCH
@@ -3289,15 +3305,185 @@ tables:
   columns: 5
   backing: redis
   owned: false
-  why: '**Not a table and not owned by a service.** Derived from something already read, invalidated
-    by an event already consumed, losable without consequence — no migration, no backup, no owner.'
+  why: '**Not a table and not owned by a service.** Derived from something already read, losable without
+    consequence — no migration, no backup, no owner.'
+  key: The idempotency key the caller sent
+  eviction:
+  - 'expires_at: **Must exceed the longest offline window.** A scanner out for a weekend replays on
+    Monday'
+  writtenBy:
+  - acquireInventoryHold
+  - allocateBlockedSeats
+  - assignCoupon
+  - assignSeats
+  - bulkChangePrices
+  - cancelPerformance
+  - cloneProduct
+  - cloneSeatMap
+  - commitCatalogueImport
+  - commitImportJob
+  - copyPriceList
+  - copySeatMapSection
+  - createBundle
+  - createChannelCapacity
+  - createCouponCampaign
+  - createDonationCampaign
+  - createEntitlementTemplate
+  - createEvent
+  - createPerformances
+  - createPriceList
+  - createProduct
+  - createPromotion
+  - createSeatBlock
+  - createSeatCategory
+  - createSeatHold
+  - createSeatMap
+  - createSeatMapTemplate
+  - createUpsellRule
+  - createVoucherBatch
+  - deleteUpsellRule
+  - endPromotion
+  - evaluatePromotions
+  - extendSeatHold
+  - forceReleaseInventoryHold
+  - freezeEntitlement
+  - generateCouponCodes
+  - getUpsellSuggestions
+  - importProductCatalogue
+  - importSeatGeometry
+  - importSeatManifest
+  - importSeatMap
+  - joinWaitlist
+  - leaveWaitlist
+  - offerWaitlistCapacity
+  - pausePromotion
+  - previewAllocationSplit
+  - publishBundle
+  - publishPromotion
+  - publishSeatMap
+  - redeemVoucher
+  - reinstateEntitlement
+  - renewInventoryHold
+  - reportBundleApplied
+  - restoreProductVersion
+  - setAlternativeCodes
+  - setChannelAllocations
+  - setMapZones
+  - setPrices
+  - setProductAttributes
+  - setProductCategories
+  - setPromotionVariants
+  - setSeatingRules
+  - suspendEntitlement
+  - transitionProductLifecycle
+  - unschedulePromotion
+  - updateBundle
+  - updateChannelCapacity
+  - updateDonationCampaign
+  - updateEvent
+  - updatePerformance
+  - updatePriceList
+  - updateProduct
+  - updatePromotion
+  - updateSeatMap
+  - updateSeats
+  - validateSeatMap
+  - voidCouponCode
+  - voidVoucher
+  readBy:
+  - acquireInventoryHold
+  - allocateBlockedSeats
+  - assignCoupon
+  - assignSeats
+  - bulkChangePrices
+  - cancelPerformance
+  - cloneSeatMap
+  - commitCatalogueImport
+  - commitImportJob
+  - copyPriceList
+  - createBundle
+  - createChannelCapacity
+  - createCouponCampaign
+  - createDonationCampaign
+  - createEntitlementTemplate
+  - createEvent
+  - createPerformances
+  - createPriceList
+  - createProduct
+  - createPromotion
+  - createSeatBlock
+  - createSeatCategory
+  - createSeatHold
+  - createSeatMap
+  - createSeatMapTemplate
+  - createUpsellRule
+  - createVoucherBatch
+  - deleteUpsellRule
+  - endPromotion
+  - evaluatePromotions
+  - extendSeatHold
+  - forceReleaseInventoryHold
+  - generateCouponCodes
+  - getUpsellSuggestions
+  - importProductCatalogue
+  - importSeatGeometry
+  - importSeatManifest
+  - joinWaitlist
+  - leaveWaitlist
+  - offerWaitlistCapacity
+  - pausePromotion
+  - previewAllocationSplit
+  - publishBundle
+  - publishPromotion
+  - publishSeatMap
+  - redeemVoucher
+  - renewInventoryHold
+  - reportBundleApplied
+  - restoreProductVersion
+  - setAlternativeCodes
+  - setChannelAllocations
+  - setMapZones
+  - setPrices
+  - setProductAttributes
+  - setProductCategories
+  - setPromotionVariants
+  - setSeatingRules
+  - suspendEntitlement
+  - transitionProductLifecycle
+  - unschedulePromotion
+  - updateBundle
+  - updateChannelCapacity
+  - updateDonationCampaign
+  - updateEvent
+  - updatePerformance
+  - updatePriceList
+  - updateProduct
+  - updatePromotion
+  - updateSeatMap
+  - updateSeats
+  - validateSeatMap
+  - voidCouponCode
+  - voidVoucher
 - store: cache:resolution
   kind: cache
   columns: 4
   backing: redis
   owned: false
-  why: '**Not a table and not owned by a service.** Derived from something already read, invalidated
-    by an event already consumed, losable without consequence — no migration, no backup, no owner.'
+  why: '**Not a table and not owned by a service.** Derived from something already read, losable without
+    consequence — no migration, no backup, no owner.'
+  key: scope_path + what is being resolved — permissions, configuration, a price list
+  eviction:
+  - 'version: Bumped by the write that evicts it. **A config change nobody evicts is a stale permission**'
+  writtenBy:
+  - listPrices
+  - setPrices
+  - setProductCategories
+  readBy:
+  - listPrices
+  gap: '**The lineage names this store, not the key.** Which resolution entry each writer below evicts
+    or bumps — permissions, configuration, a price list, and whether child scopes under its `scope_path`
+    are affected — is not recorded for any operation, so a writer here cannot yet be implemented from
+    the package alone.'
 - table: catalogue.alternative_code
   columns: 7
   store: postgres
@@ -3320,16 +3506,16 @@ tables:
   - catalogue
   foreignWriters: null
 - table: catalogue.donation_campaign
-  columns: 14
+  columns: 15
   store: postgres
   parent: null
   writtenBy:
   - catalogue
   foreignWriters: null
 - table: catalogue.entitlement_template
-  columns: 39
+  columns: 30
   store: postgres
-  parent: access.entitlement
+  parent: null
   writtenBy:
   - catalogue
   foreignWriters: null
@@ -3397,7 +3583,7 @@ tables:
   - catalogue
   foreignWriters: null
 - table: catalogue.inventory_hold
-  columns: 15
+  columns: 14
   store: postgres
   parent: null
   writtenBy:
@@ -3420,7 +3606,7 @@ tables:
   - catalogue
   foreignWriters: null
 - table: catalogue.performance
-  columns: 10
+  columns: 9
   store: postgres
   parent: null
   writtenBy:
@@ -3451,14 +3637,14 @@ tables:
   - fnb
   - inventory
 - table: catalogue.price_list
-  columns: 7
+  columns: 8
   store: postgres
   parent: null
   writtenBy:
   - catalogue
   foreignWriters: null
 - table: catalogue.product
-  columns: 23
+  columns: 24
   store: postgres
   parent: null
   writtenBy:
@@ -3579,6 +3765,13 @@ tables:
   writtenBy:
   - promotions
   foreignWriters: null
+- table: promotions.bundle_choice_option
+  columns: 5
+  store: postgres
+  parent: promotions.bundle_choice_group
+  writtenBy:
+  - promotions
+  foreignWriters: null
 - table: promotions.bundle_component
   columns: 7
   store: postgres
@@ -3594,11 +3787,17 @@ tables:
   - promotions
   foreignWriters: null
 - table: promotions.coupon_code
-  columns: 14
+  columns: 15
   store: postgres
   parent: null
   writtenBy:
   - promotions
+  foreignWriters: null
+- table: promotions.coupon_code_batch
+  columns: 11
+  store: postgres
+  parent: null
+  writtenBy: []
   foreignWriters: null
 - table: promotions.product_relationship
   columns: 10
@@ -3611,6 +3810,13 @@ tables:
   columns: 20
   store: postgres
   parent: null
+  writtenBy:
+  - promotions
+  foreignWriters: null
+- table: promotions.promotion_variant
+  columns: 5
+  store: postgres
+  parent: promotions.promotion
   writtenBy:
   - promotions
   foreignWriters: null
@@ -3748,7 +3954,7 @@ tables:
 - table: seating.seat_hold_item
   columns: 5
   store: postgres
-  parent: seating.seat
+  parent: seating.seat_hold
   writtenBy: []
   foreignWriters: null
 - table: seating.seat_map
@@ -3815,10 +4021,35 @@ readsFrom:
 writesOutside:
 - service: AccessService
   operations: 3
-  why: '**The owner defines the row; this service may only append to it.**'
+  rule: 'ADR-0028: the owner defines the row; a foreign writer may only append, through a path the owner
+    published.'
+  why: '**The lineage records these writes, not how they honour the rule.** It does not say whether
+    each inserts or updates, or which operation or event AccessService published for it — check each
+    against ADR-0028.'
+  writes:
+  - operation: freezeEntitlement
+    tables:
+    - access.entitlement
+  - operation: reinstateEntitlement
+    tables:
+    - access.entitlement
+  - operation: suspendEntitlement
+    tables:
+    - access.entitlement
 - service: TenancyService
   operations: 2
-  why: '**The owner defines the row; this service may only append to it.**'
+  rule: 'ADR-0028: the owner defines the row; a foreign writer may only append, through a path the owner
+    published.'
+  why: '**The lineage records these writes, not how they honour the rule.** It does not say whether
+    each inserts or updates, or which operation or event TenancyService published for it — check each
+    against ADR-0028.'
+  writes:
+  - operation: cancelPerformance
+    tables:
+    - platform.outbox
+  - operation: transitionProductLifecycle
+    tables:
+    - platform.outbox
 screens:
 - P01:WEB-001 Home / Landing
 - P01:WEB-002 Event & Attraction Listing
@@ -3843,7 +4074,6 @@ screens:
 - P02:GST-005 What's On
 - P02:GST-006 Event / Exhibition Details
 - P02:GST-007 Select Date & Time
-- P02:GST-009 Review & Payment
 - P02:GST-015 Memberships
 - P02:GST-021 Interactive Map
 - P02:GST-036 Loyalty & Rewards

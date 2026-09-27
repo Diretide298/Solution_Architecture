@@ -74,6 +74,7 @@ screens:
     exitTo:
     - DEV-002
     - DEV-004
+    - DEV-008
     isEntryPoint: true
     transitions:
     - to: DEV-002
@@ -83,6 +84,12 @@ screens:
     - to: DEV-004
       trigger: Sandbox
       provenance: structural — DEV-001 is P14's home screen and its exits are its launcher
+    - to: DEV-008
+      trigger: Programme Administration
+      carries:
+      - version
+      provenance: derived — DEV-008 declares entryState.params listingId, version and DEV-001 holds version,
+        so an edge into it carries them
   notes: CF-135. **A portal over artefacts that already exist**, which is why this is frontend scope rather
     than a contract gap — the twelve domain-13 rows left open after the contract landed are all this screen
     and its siblings. **The API reference.** A developer arrives at the documentation, not at a sign-up
@@ -100,7 +107,7 @@ screens:
       slot: collection
       components:
       - kind: dataTable
-        label: Every api reference
+        label: Every API version
         bindsTo: ApiVersion
         columns:
         - ApiVersion.status
@@ -112,11 +119,32 @@ screens:
         - ApiVersion.activeClientCount
         operation: listApiVersions
         provenance: contract public-api.yaml GET /api-versions
+      - kind: detailPanel
+        bindsTo: operation
+        notes: 'Request, response, scopes and error codes. **The error codes are what a developer comes
+          back for**, and they are the section most documentation buries.
+
+          '
+        provenance: carried from the previous definition
+      - kind: codeBlock
+        notes: 'A working example per language. **Copy-paste that runs** — an example with a placeholder
+          token teaches nothing about auth, which is where integrations fail.
+
+          '
+        provenance: carried from the previous definition
+      - kind: primaryButton
+        label: Try it
+        notes: 'Runs against the sandbox, never production. **The environment is stated on the button**,
+          because a try-it that quietly hits production is how somebody refunds a real order while reading
+          the docs.
+
+          '
+        provenance: carried from the previous definition
     - name: contextPanel
       slot: selection
       components:
       - kind: detailPanel
-        label: The selected api reference
+        label: The selected API version
         bindsTo: ApiVersion
         columns:
         - ApiVersion.status
@@ -141,30 +169,6 @@ screens:
 
           '
         provenance: carried from the previous definition
-    - name: contentBody
-      slot: carried
-      components:
-      - kind: detailPanel
-        bindsTo: operation
-        notes: 'Request, response, scopes and error codes. **The error codes are what a developer comes
-          back for**, and they are the section most documentation buries.
-
-          '
-        provenance: carried from the previous definition
-      - kind: codeBlock
-        notes: 'A working example per language. **Copy-paste that runs** — an example with a placeholder
-          token teaches nothing about auth, which is where integrations fail.
-
-          '
-        provenance: carried from the previous definition
-      - kind: primaryButton
-        label: Try it
-        notes: 'Runs against the sandbox, never production. **The environment is stated on the button**,
-          because a try-it that quietly hits production is how somebody refunds a real order while reading
-          the docs.
-
-          '
-        provenance: carried from the previous definition
   states:
     loading: The operation list; the current version renders first.
     error: 'Could not load the reference. **Names which contract failed** — 28 files load independently
@@ -181,8 +185,9 @@ screens:
       called `createRefund`.
 
       '
-    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
-      data* and sends somebody to support with the wrong question.
+    emptyNoAccess: Shown when the caller lacks `DEVELOPER_VIEW`, which `listApiVersions` requires, and
+      names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody
+      to support with the wrong question.
   apis:
   - operationId: listApiVersions
     contract: public-api
@@ -269,20 +274,6 @@ screens:
         label: verifiedAt
         bindsTo: DeveloperAccount.verifiedAt
         provenance: contract public-api.yaml POST /developers
-    - name: actionBar
-      slot: publish
-      components:
-      - kind: primaryButton
-        label: Register
-        operation: registerDeveloper
-        provenance: contract public-api.yaml POST /developers
-      - kind: secondaryButton
-        label: Save changes
-        operation: setDeveloperMembers
-        provenance: contract public-api.yaml PUT /developers/{developerId}/members
-    - name: contentBody
-      slot: carried
-      components:
       - kind: textField
         label: Organisation name
         provenance: carried from the previous definition
@@ -296,6 +287,17 @@ screens:
       - kind: primaryButton
         label: Invite
         provenance: carried from the previous definition
+    - name: actionBar
+      slot: publish
+      components:
+      - kind: primaryButton
+        label: Register developer
+        operation: registerDeveloper
+        provenance: contract public-api.yaml POST /developers
+      - kind: secondaryButton
+        label: Save developer members
+        operation: setDeveloperMembers
+        provenance: contract public-api.yaml PUT /developers/{developerId}/members
   states:
     loading: The organisation and its members.
     error: Could not load. Your credentials are unaffected.
@@ -331,6 +333,20 @@ screens:
   apisNote: Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack
     — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
     to the ones that matter is work a person still owes this screen.
+  overlays:
+  - id: formSetDeveloperMembers
+    component: modal
+    trigger: Save developer members
+    body: '**Collects what `setDeveloperMembers` sends before it is called.** Required: `members`. Dismissing
+      sends nothing; the screen behind is unchanged.'
+    confirm:
+      label: Save developer members
+      operation: setDeveloperMembers
+    dismiss:
+      label: Cancel
+      discards:
+      - members
+    provenance: contract public-api.yaml PUT /developers/{developerId}/members
 - id: DEV-003
   name: Clients & Credentials
   module: Developer & API
@@ -354,10 +370,8 @@ screens:
       operation: createApiClient
     - to: DEV-005
       trigger: Webhooks
-      carries:
-      - subscriptionId
-      provenance: derived — DEV-005 declares entryState.params subscriptionId, so an edge into it must
-        carry them
+      provenance: derived — DEV-005 declares entryState.params subscriptionId and DEV-003 holds none of
+        them, so the edge carries nothing and DEV-005 opens cold
   notes: 'CF-135a. **The one credential model** — 2.7.52, 7.1.25 and 7.1.30 each asserted their own. **Rotation
     carries an overlap window and revocation does not**: one is hygiene, the other is what you reach for
     when a secret has leaked, and a grace period defeats it.
@@ -375,7 +389,7 @@ screens:
       slot: collection
       components:
       - kind: dataTable
-        label: Every clients credentials
+        label: Every API client
         bindsTo: ApiClient
         columns:
         - ApiClient.id
@@ -390,11 +404,27 @@ screens:
         - ApiClient.lastUsedAt
         operation: listApiClients
         provenance: contract public-api.yaml GET /api-clients
+      - kind: dataTable
+        bindsTo: ApiClient[]
+        notes: 'Environment is a column and not a badge. **A sandbox key and a production key that look
+          alike is how somebody uses the wrong one**, and the difference must survive a glance.
+
+          '
+        provenance: carried from the previous definition
+      - kind: primaryButton
+        label: Create client
+        provenance: carried from the previous definition
+      - kind: banner
+        notes: '**The secret is shown once.** The banner says so before it is generated, not after — a
+          system that can show you a secret later is a system that stores one.
+
+          '
+        provenance: carried from the previous definition
     - name: contextPanel
       slot: selection
       components:
       - kind: detailPanel
-        label: The selected clients credentials
+        label: The selected API client
         bindsTo: ApiClient
         columns:
         - ApiClient.id
@@ -413,43 +443,61 @@ screens:
       slot: rowActions
       components:
       - kind: primaryButton
-        label: Create
+        label: Create API client
         operation: createApiClient
         provenance: contract public-api.yaml POST /api-clients
       - kind: secondaryButton
-        label: Rotate
+        label: Rotate API credential
         operation: rotateApiCredential
         provenance: contract public-api.yaml POST /api-clients/{clientId}/credentials
       - kind: destructiveButton
-        label: Revoke
+        label: Revoke API credential
         operation: revokeApiCredential
         provenance: contract public-api.yaml DELETE /api-clients/{clientId}/credentials
-    - name: contentBody
-      slot: carried
-      components:
-      - kind: dataTable
-        bindsTo: ApiClient[]
-        notes: 'Environment is a column and not a badge. **A sandbox key and a production key that look
-          alike is how somebody uses the wrong one**, and the difference must survive a glance.
-
-          '
-        provenance: carried from the previous definition
-      - kind: primaryButton
-        label: Create client
-        provenance: carried from the previous definition
-      - kind: banner
-        notes: '**The secret is shown once.** The banner says so before it is generated, not after — a
-          system that can show you a secret later is a system that stores one.
-
-          '
-        provenance: carried from the previous definition
   overlays:
   - id: confirmRevokeApiCredential
     component: confirmDialog
-    trigger: Revoke
+    trigger: Revoke API credential
     body: '**Names what `revokeApiCredential` changes and what it leaves alone**, in the consequence rather
       than the verb. A clients credentials this affects should be identified in the dialog, not just counted.'
     provenance: contract public-api.yaml DELETE /api-clients/{clientId}/credentials
+  - id: formCreateApiClient
+    component: modal
+    trigger: Create API client
+    body: '**Collects what `createApiClient` sends before it is called.** Required: `id`, `developerId`,
+      `name`, `environment`, `scopes`, `status`. Optional: `clientId`, `allowedTenantIds`, `ipAllowList`,
+      `lastUsedAt`. Dismissing sends nothing; the screen behind is unchanged.'
+    bindsTo: ApiClient
+    confirm:
+      label: Create API client
+      operation: createApiClient
+    dismiss:
+      label: Cancel
+      discards:
+      - id
+      - developerId
+      - name
+      - environment
+      - scopes
+      - status
+      - clientId
+      - allowedTenantIds
+      - ipAllowList
+      - lastUsedAt
+    provenance: contract public-api.yaml POST /api-clients
+  - id: formRotateApiCredential
+    component: modal
+    trigger: Rotate API credential
+    body: '**Collects what `rotateApiCredential` sends before it is called.** Nothing in the body is required.
+      Optional: `overlapHours`. Dismissing sends nothing; the screen behind is unchanged.'
+    confirm:
+      label: Rotate API credential
+      operation: rotateApiCredential
+    dismiss:
+      label: Cancel
+      discards:
+      - overlapHours
+    provenance: contract public-api.yaml POST /api-clients/{clientId}/credentials
   states:
     loading: Clients, sandbox first.
     error: Could not load clients. Existing credentials keep working.
@@ -552,37 +600,6 @@ screens:
         - Sandbox.lastResetAt
         operation: listSandboxes
         provenance: contract public-api.yaml GET /sandboxes
-    - name: contextPanel
-      slot: selection
-      components:
-      - kind: detailPanel
-        label: The selected sandbox
-        bindsTo: Sandbox
-        columns:
-        - Sandbox.id
-        - Sandbox.name
-        - Sandbox.developerId
-        - Sandbox.status
-        - Sandbox.dataProfile
-        - Sandbox.containsProductionData
-        - Sandbox.expiresAt
-        - Sandbox.lastResetAt
-        operation: listSandboxes
-        provenance: contract public-api.yaml GET /sandboxes
-    - name: actionBar
-      slot: rowActions
-      components:
-      - kind: primaryButton
-        label: Create
-        operation: createSandbox
-        provenance: contract public-api.yaml POST /sandboxes
-      - kind: destructiveButton
-        label: Reset
-        operation: resetSandbox
-        provenance: contract public-api.yaml POST /sandboxes/{sandboxId}/reset
-    - name: contentBody
-      slot: carried
-      components:
       - kind: cardList
         bindsTo: Sandbox[]
         notes: Venue kind, record counts, expiry.
@@ -604,13 +621,56 @@ screens:
 
           '
         provenance: carried from the previous definition
+    - name: contextPanel
+      slot: selection
+      components:
+      - kind: detailPanel
+        label: The selected sandbox
+        bindsTo: Sandbox
+        columns:
+        - Sandbox.id
+        - Sandbox.name
+        - Sandbox.developerId
+        - Sandbox.status
+        - Sandbox.dataProfile
+        - Sandbox.containsProductionData
+        - Sandbox.expiresAt
+        - Sandbox.lastResetAt
+        operation: listSandboxes
+        provenance: contract public-api.yaml GET /sandboxes
+    - name: actionBar
+      slot: rowActions
+      components:
+      - kind: primaryButton
+        label: Create sandbox
+        operation: createSandbox
+        provenance: contract public-api.yaml POST /sandboxes
+      - kind: destructiveButton
+        label: Reset sandbox
+        operation: resetSandbox
+        provenance: contract public-api.yaml POST /sandboxes/{sandboxId}/reset
   overlays:
   - id: confirmResetSandbox
     component: confirmDialog
-    trigger: Reset
+    trigger: Reset sandbox
     body: '**Names what `resetSandbox` changes and what it leaves alone**, in the consequence rather than
       the verb. A sandbox this affects should be identified in the dialog, not just counted.'
     provenance: contract public-api.yaml POST /sandboxes/{sandboxId}/reset
+  - id: formCreateSandbox
+    component: modal
+    trigger: Create sandbox
+    body: '**Collects what `createSandbox` sends before it is called.** Required: `name`, `dataProfile`.
+      Optional: `expiresAfterDays`. Dismissing sends nothing; the screen behind is unchanged.'
+    confirm:
+      label: Create sandbox
+      operation: createSandbox
+    dismiss:
+      label: Cancel
+      discards:
+      - name
+      - dataProfile
+      - expiresAfterDays
+    provenance: contract public-api.yaml POST /sandboxes
   states:
     loading: Sandboxes with their data profile.
     error: Could not load. A running sandbox is unaffected.
@@ -687,11 +747,6 @@ screens:
   patternReason: '`listWebhookSubscriptions` reads a population and nothing reads one of them; the detail
     is the row until a `get` exists'
   purpose: Subscribe to events, see every delivery, and replay what was missed.
-  gaps:
-  - operation: listWebhookDeliveries
-    why: '**1 declared operation reach no component on this screen**: listWebhookDeliveries. Either the
-      screen is missing what calls them, or the declaration is residue.'
-    source: the screen's own declarations
   layout:
     template: split
     regions:
@@ -699,7 +754,7 @@ screens:
       slot: collection
       components:
       - kind: dataTable
-        label: Every webhooks
+        label: Every webhook subscription
         bindsTo: WebhookSubscription
         columns:
         - WebhookSubscription.id
@@ -713,11 +768,42 @@ screens:
         - WebhookSubscription.disabledReason
         operation: listWebhookSubscriptions
         provenance: contract public-api.yaml GET /webhook-subscriptions
+      - kind: dataTable
+        label: Every webhook delivery
+        bindsTo: WebhookDelivery
+        columns:
+        - WebhookDelivery.id
+        - WebhookDelivery.subscriptionId
+        - WebhookDelivery.eventId
+        - WebhookDelivery.eventType
+        - WebhookDelivery.status
+        - WebhookDelivery.attemptCount
+        - WebhookDelivery.responseCode
+        - WebhookDelivery.responseBodyExcerpt
+        - WebhookDelivery.isReplay
+        - WebhookDelivery.deliveredAt
+        operation: listWebhookDeliveries
+        provenance: contract public-api.yaml GET /webhook-subscriptions/{subscriptionId}/deliveries
+      - kind: dataTable
+        bindsTo: WebhookDelivery[]
+        notes: 'Status, attempts, response code and an excerpt of the receiver''s own error. **The excerpt
+          is what makes the log useful** — a 500 with their own message in it answers the question without
+          a support conversation.
+
+          '
+        provenance: carried from the previous definition
+      - kind: secondaryButton
+        label: Replay from…
+        notes: 'Bounded by retention, and the replay is marked in the payload. **A consumer that cannot
+          tell a replay from a live event will double-count.**
+
+          '
+        provenance: carried from the previous definition
     - name: contextPanel
       slot: selection
       components:
       - kind: detailPanel
-        label: The selected webhooks
+        label: The selected webhook subscription
         bindsTo: WebhookSubscription
         columns:
         - WebhookSubscription.id
@@ -735,11 +821,11 @@ screens:
       slot: rowActions
       components:
       - kind: primaryButton
-        label: Create
+        label: Create webhook subscription
         operation: createWebhookSubscription
         provenance: contract public-api.yaml POST /webhook-subscriptions
       - kind: secondaryButton
-        label: Replay
+        label: Replay events
         operation: replayEvents
         provenance: contract public-api.yaml POST /webhook-subscriptions/{subscriptionId}/replay
     - name: sideNav
@@ -749,24 +835,6 @@ screens:
         bindsTo: WebhookSubscription[]
         notes: 'Failing subscriptions sort first and carry the consecutive-failure count. **A developer
           is told before it is disabled, not after.**
-
-          '
-        provenance: carried from the previous definition
-    - name: contentBody
-      slot: carried
-      components:
-      - kind: dataTable
-        bindsTo: WebhookDelivery[]
-        notes: 'Status, attempts, response code and an excerpt of the receiver''s own error. **The excerpt
-          is what makes the log useful** — a 500 with their own message in it answers the question without
-          a support conversation.
-
-          '
-        provenance: carried from the previous definition
-      - kind: secondaryButton
-        label: Replay from…
-        notes: 'Bounded by retention, and the replay is marked in the payload. **A consumer that cannot
-          tell a replay from a live event will double-count.**
 
           '
         provenance: carried from the previous definition
@@ -822,6 +890,45 @@ screens:
   apisNote: Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack
     — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
     to the ones that matter is work a person still owes this screen.
+  overlays:
+  - id: formCreateWebhookSubscription
+    component: modal
+    trigger: Create webhook subscription
+    body: '**Collects what `createWebhookSubscription` sends before it is called.** Required: `id`, `clientId`,
+      `endpointUrl`, `eventTypes`, `status`. Optional: `filters`, `signingSecret`, `consecutiveFailures`,
+      `disabledReason`. Dismissing sends nothing; the screen behind is unchanged.'
+    bindsTo: WebhookSubscription
+    confirm:
+      label: Create webhook subscription
+      operation: createWebhookSubscription
+    dismiss:
+      label: Cancel
+      discards:
+      - id
+      - clientId
+      - endpointUrl
+      - eventTypes
+      - status
+      - filters
+      - signingSecret
+      - consecutiveFailures
+      - disabledReason
+    provenance: contract public-api.yaml POST /webhook-subscriptions
+  - id: formReplayEvents
+    component: modal
+    trigger: Replay events
+    body: '**Collects what `replayEvents` sends before it is called.** Required: `from`. Optional: `to`,
+      `eventTypes`. Dismissing sends nothing; the screen behind is unchanged.'
+    confirm:
+      label: Replay events
+      operation: replayEvents
+    dismiss:
+      label: Cancel
+      discards:
+      - from
+      - to
+      - eventTypes
+    provenance: contract public-api.yaml POST /webhook-subscriptions/{subscriptionId}/replay
 - id: DEV-006
   name: Usage & Limits
   module: Developer & API
@@ -859,7 +966,7 @@ screens:
       slot: record
       components:
       - kind: detailPanel
-        label: The selected usage limits
+        label: The API usage
         bindsTo: ApiUsageSummary
         columns:
         - ApiUsageSummary.totalCalls
@@ -873,9 +980,6 @@ screens:
         - ApiUsageSummary.byOperation
         operation: getApiUsage
         provenance: contract public-api.yaml GET /api-usage
-    - name: contentBody
-      slot: carried
-      components:
       - kind: metricTile
         notes: Calls, success rate, p95 latency, quota headroom.
         provenance: carried from the previous definition
@@ -946,7 +1050,7 @@ screens:
       slot: collection
       components:
       - kind: dataTable
-        label: Every marketplace listing
+        label: Every integration listing
         bindsTo: IntegrationListing
         columns:
         - IntegrationListing.id
@@ -962,11 +1066,20 @@ screens:
         - IntegrationListing.listingFeeModel
         operation: listIntegrationListings
         provenance: contract public-api.yaml GET /listings
+      - kind: primaryButton
+        label: Submit for certification
+        provenance: carried from the previous definition
+      - kind: banner
+        notes: '**Certification expires, and the date is shown.** An integration certified against v1
+          and still listed after v3 is Softlabs vouching for something nobody has looked at in two years.
+
+          '
+        provenance: carried from the previous definition
     - name: contextPanel
       slot: selection
       components:
       - kind: detailPanel
-        label: The selected marketplace listing
+        label: The selected integration listing
         bindsTo: IntegrationListing
         columns:
         - IntegrationListing.id
@@ -986,21 +1099,9 @@ screens:
       slot: rowActions
       components:
       - kind: primaryButton
-        label: Submit
+        label: Submit integration listing
         operation: submitIntegrationListing
         provenance: contract public-api.yaml POST /listings
-    - name: contentBody
-      slot: carried
-      components:
-      - kind: primaryButton
-        label: Submit for certification
-        provenance: carried from the previous definition
-      - kind: banner
-        notes: '**Certification expires, and the date is shown.** An integration certified against v1
-          and still listed after v3 is Softlabs vouching for something nobody has looked at in two years.
-
-          '
-        provenance: carried from the previous definition
   states:
     loading: Listings with their certification status.
     error: Could not load listings.
@@ -1035,6 +1136,32 @@ screens:
   apisNote: Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack
     — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
     to the ones that matter is work a person still owes this screen.
+  overlays:
+  - id: formSubmitIntegrationListing
+    component: modal
+    trigger: Submit integration listing
+    body: '**Collects what `submitIntegrationListing` sends before it is called.** Required: `id`, `developerId`,
+      `name`, `category`, `status`. Optional: `description`, `integrationUrl`, `requiredScopes`, `certifiedUntil`,
+      `certifiedAgainstVersion`, `listingFeeModel`. Dismissing sends nothing; the screen behind is unchanged.'
+    bindsTo: IntegrationListing
+    confirm:
+      label: Submit integration listing
+      operation: submitIntegrationListing
+    dismiss:
+      label: Cancel
+      discards:
+      - id
+      - developerId
+      - name
+      - category
+      - status
+      - description
+      - integrationUrl
+      - requiredScopes
+      - certifiedUntil
+      - certifiedAgainstVersion
+      - listingFeeModel
+    provenance: contract public-api.yaml POST /listings
 - id: DEV-008
   name: Programme Administration
   module: Developer & API
@@ -1104,34 +1231,6 @@ screens:
         label: onBreach
         bindsTo: ApiQuota.onBreach
         provenance: contract public-api.yaml PUT /api-quotas
-    - name: actionBar
-      slot: publish
-      components:
-      - kind: primaryButton
-        label: Save changes
-        operation: setApiQuota
-        provenance: contract public-api.yaml PUT /api-quotas
-      - kind: secondaryButton
-        label: Certify
-        operation: certifyIntegration
-        provenance: contract public-api.yaml POST /listings/{listingId}/certify
-      - kind: secondaryButton
-        label: Save changes
-        operation: setApiLicensing
-        provenance: contract public-api.yaml PUT /api-licensing
-      - kind: secondaryButton
-        label: Deprecate
-        operation: deprecateApiVersion
-        provenance: contract public-api.yaml POST /api-versions/{version}/deprecate
-    - name: sideNav
-      slot: carried
-      components:
-      - kind: treeNav
-        notes: Quotas · Certification queue · Licensing · Versions.
-        provenance: carried from the previous definition
-    - name: contentBody
-      slot: carried
-      components:
       - kind: primaryButton
         label: Approve
         provenance: carried from the previous definition
@@ -1145,6 +1244,31 @@ screens:
           will ignore.
 
           '
+        provenance: carried from the previous definition
+    - name: actionBar
+      slot: publish
+      components:
+      - kind: primaryButton
+        label: Save API quota
+        operation: setApiQuota
+        provenance: contract public-api.yaml PUT /api-quotas
+      - kind: secondaryButton
+        label: Certify integration
+        operation: certifyIntegration
+        provenance: contract public-api.yaml POST /listings/{listingId}/certify
+      - kind: secondaryButton
+        label: Save API licensing
+        operation: setApiLicensing
+        provenance: contract public-api.yaml PUT /api-licensing
+      - kind: secondaryButton
+        label: Deprecate API version
+        operation: deprecateApiVersion
+        provenance: contract public-api.yaml POST /api-versions/{version}/deprecate
+    - name: sideNav
+      slot: carried
+      components:
+      - kind: treeNav
+        notes: Quotas · Certification queue · Licensing · Versions.
         provenance: carried from the previous definition
   states:
     loading: Pending certifications first.
@@ -1187,3 +1311,55 @@ screens:
   apisNote: Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack
     — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
     to the ones that matter is work a person still owes this screen.
+  overlays:
+  - id: formCertifyIntegration
+    component: modal
+    trigger: Certify integration
+    body: '**Collects what `certifyIntegration` sends before it is called.** Required: `decision`. Optional:
+      `certifiedUntil`, `notes`. Dismissing sends nothing; the screen behind is unchanged.'
+    confirm:
+      label: Certify integration
+      operation: certifyIntegration
+    dismiss:
+      label: Cancel
+      discards:
+      - decision
+      - certifiedUntil
+      - notes
+    provenance: contract public-api.yaml POST /listings/{listingId}/certify
+  - id: formSetApiLicensing
+    component: modal
+    trigger: Save API licensing
+    body: '**Collects what `setApiLicensing` sends before it is called.** Required: `licensedModules`.
+      Optional: `id`, `callAllowancePerMonth`, `overageRatePerThousand`, `revenueSharePercent`, `effectiveFrom`,
+      `effectiveTo`. Dismissing sends nothing; the screen behind is unchanged.'
+    bindsTo: ApiLicence
+    confirm:
+      label: Save API licensing
+      operation: setApiLicensing
+    dismiss:
+      label: Cancel
+      discards:
+      - licensedModules
+      - id
+      - callAllowancePerMonth
+      - overageRatePerThousand
+      - revenueSharePercent
+      - effectiveFrom
+      - effectiveTo
+    provenance: contract public-api.yaml PUT /api-licensing
+  - id: formDeprecateApiVersion
+    component: modal
+    trigger: Deprecate API version
+    body: '**Collects what `deprecateApiVersion` sends before it is called.** Required: `sunsetAt`, `reason`.
+      Optional: `migrationGuideUrl`. Dismissing sends nothing; the screen behind is unchanged.'
+    confirm:
+      label: Deprecate API version
+      operation: deprecateApiVersion
+    dismiss:
+      label: Cancel
+      discards:
+      - sunsetAt
+      - reason
+      - migrationGuideUrl
+    provenance: contract public-api.yaml POST /api-versions/{version}/deprecate

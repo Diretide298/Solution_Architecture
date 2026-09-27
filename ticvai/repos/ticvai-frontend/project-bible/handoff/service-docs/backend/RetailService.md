@@ -63,9 +63,9 @@ The most-used operation on a shop floor. Returns price after any live promotion,
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
-| barcode | query |  | string |  |
-| sku | query |  | string |  |
-| includeSiblingOutlets | query |  | boolean |  |
+| barcode | query |  | string | Exact match on barcode, within the venue. |
+| sku | query |  | string | Exact match on sku, within the venue. |
+| includeSiblingOutlets | query |  | boolean | False leaves siblingOutlets empty. |
 
 **Response**: `PriceCheck`
 
@@ -96,7 +96,7 @@ The most-used operation on a shop floor. Returns price after any live promotion,
 |---|---|---|
 | 200 |  | Price and stock |
 | 400 |  | Neither barcode nor SKU supplied |
-| 404 | NotFound | The resource does not exist, or is outside the caller's scope |
+| 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
 
 ### lookupShopAndDrop
 
@@ -121,9 +121,9 @@ Scanned at the collection point. Accepts the entitlement, the drop reference, or
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
-| entitlementId | query |  | string |  |
-| dropReference | query |  | string |  |
-| receiptNumber | query |  | string |  |
+| entitlementId | query |  | string | Exact match on the ticket scanned at the collection point. |
+| dropReference | query |  | string | Exact match on dropReference, as printed on the slip. |
+| receiptNumber | query |  | string | Exact match on the receipt number of the sale the goods came from. |
 
 **Responses**
 
@@ -147,8 +147,9 @@ A guest who cannot carry a purchase around a venue collects it on the way out. T
 | Offline | no |
 | Conflict policy | serverWins |
 | Reads | `cache:idempotency`, `retail.reservation`, `retail.reservation_line` |
-| Writes | `cache:idempotency`, `retail.reservation` |
+| Writes | `cache:idempotency`, `retail.reservation`, `retail.reservation_line` |
 | Called by | BO-044, EMP-068, GST-026, KSK-017, POS-012, WEB-033, WEB-042 |
+| State model | Merchandise reservation ([states/merchandise-reservation.yaml](../../../states/merchandise-reservation.yaml)): created as `reserved` |
 
 **Parameters**
 
@@ -191,7 +192,7 @@ A guest who cannot carry a purchase around a venue collects it on the way out. T
 | Code | Shape | Meaning |
 |---|---|---|
 | 201 |  | Reserved |
-| 409 |  | Insufficient stock |
+| 409 |  | Insufficient stock. |
 
 
 ## Group: merchandise
@@ -227,6 +228,7 @@ Links a sellable catalogue variant to an inventory item. That link is what makes
 | sku | string | yes | (max length 64) |
 | barcode | string |  | (max length 128) |
 | name | string | yes | (max length 200) |
+| description | string |  | What the item is, in the guest's words. |
 | outletId | string (uuid) | yes |  |
 | categoryId | string (uuid) |  |  |
 | variantId | string (uuid) | yes |  |
@@ -266,13 +268,15 @@ Links a sellable catalogue variant to an inventory item. That link is what makes
 |---|---|---|
 | 201 |  | Created |
 | 400 | BadRequest | Validation failed |
-| 409 |  | Barcode already in use in this venue |
+| 409 |  | Barcode already in use in this venue. |
 
 ### listMerchandise
 
 **`GET /merchandise`**: List merchandise
 
-Back-office use. A terminal reads its merchandise catalogue from the local bundle, but checks live stock before completing a sale.
+Two callers. **The back office** lists and manages the range. **The guest shop screens** (web, guest app, kiosk) browse it. A terminal does not call this: it reads its merchandise catalogue from the local bundle and checks live stock with `lookupMerchandise` before completing a sale.
+
+**A guest gets the guest projection, not the stock record.** A staff caller receives `MerchandiseItem`. A guest caller receives `GuestMerchandiseItem`, which leaves out the inventory link, the catalogue variant, the stock count and the serial-number flag, and says only whether the item can be bought. The server chooses by the caller's audience; the client does not ask for one.
 
 |  |  |
 |---|---|
@@ -292,37 +296,18 @@ Back-office use. A terminal reads its merchandise catalogue from the local bundl
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
-| outletId | query |  | string (uuid) |  |
-| categoryId | query |  | string (uuid) |  |
-| inStockOnly | query |  | boolean |  |
-| search | query |  | string |  |
+| outletId | query |  | string (uuid) | Exact match. |
+| categoryId | query |  | string (uuid) | Exact match on categoryId. |
+| inStockOnly | query |  | boolean | True returns only items with onHand greater than zero at their own outlet. |
+| search | query |  | string | Case-insensitive "contains" match over name, sku, barcode and description. |
 | pageSize | query |  | integer |  |
-| cursor | query |  | string | Opaque cursor from a previous page. |
+| cursor | query |  | string | Opaque cursor: the nextCursor of the previous page. |
 
 **Response**: `object`
 
 | Field | Type | Required | Notes |
 |---|---|---|---|
-| items | array of MerchandiseItem | yes |  |
-| items[].description | string |  | What the item is, in the guest's words. |
-| items[].id | string (uuid) | yes |  |
-| items[].sku | string | yes |  |
-| items[].barcode | string |  | (nullable) |
-| items[].name | string | yes |  |
-| items[].outletId | string (uuid) | yes |  |
-| items[].categoryId | string (uuid) |  | (nullable) |
-| items[].variantId | string (uuid) | yes | The catalogue variant sold. |
-| items[].inventoryItemId | string (uuid) |  | The stock item depleted on sale. (nullable) |
-| items[].price | Money | yes | On the wire this is three fields; in the database it is one column. |
-| items[].price.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
-| items[].price.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
-| items[].price.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
-| items[].onHand | number | yes |  |
-| items[].isReturnable | boolean |  | (default True) |
-| items[].returnWindowDays | integer |  | (nullable) |
-| items[].requiresSerialNumber | boolean |  | (default False) |
-| items[].imageAssetRef | string |  | (nullable) |
-| items[].isActive | boolean | yes |  |
+| items | array of MerchandiseItem or GuestMerchandiseItem | yes |  |
 | nextCursor | string |  |  |
 | hasMore | boolean | yes |  |
 
@@ -330,7 +315,7 @@ Back-office use. A terminal reads its merchandise catalogue from the local bundl
 
 | Code | Shape | Meaning |
 |---|---|---|
-| 200 |  | Merchandise |
+| 200 |  | Merchandise, one page. |
 | 403 | Forbidden | Authenticated but not permitted at the requested scope |
 
 ### updateMerchandise
@@ -361,7 +346,11 @@ Back-office use. A terminal reads its merchandise catalogue from the local bundl
 | Field | Type | Required | Notes |
 |---|---|---|---|
 | name | string |  | (max length 200) |
+| description | string |  | What the item is, in the guest's words. (nullable) |
+| barcode | string |  | Must stay unique in the venue. (max length 128; nullable) |
 | categoryId | string (uuid) |  |  |
+| inventoryItemId | string (uuid) |  | Re-points the stock item a sale depletes. (nullable) |
+| imageAssetRef | string |  | (nullable) |
 | isReturnable | boolean |  |  |
 | returnWindowDays | integer |  | (min 0) |
 | requiresSerialNumber | boolean |  |  |
@@ -396,6 +385,7 @@ Back-office use. A terminal reads its merchandise catalogue from the local bundl
 | Code | Shape | Meaning |
 |---|---|---|
 | 200 |  | Updated |
+| 409 |  | The new barcode is already in use in this venue. |
 
 
 ## Group: return
@@ -407,6 +397,8 @@ Back-office use. A terminal reads its merchandise catalogue from the local bundl
 **A return is not a negative sale.** It records the condition of the goods, restores stock only where condition permits, and refunds through the venue's retail return policy — which is separate from the ticket refund policy.
 Goods returned damaged or opened are written off rather than restocked, and that write-off is a movement with a reason rather than a silent absence.
 
+**A refused return is recorded** (F34 `refusedReturn`: a refused return is a guest who may complain). The 409 writes a `RetailReturn` with `status: refused`, the `refusedReason`, nothing refunded, restocked or written off, and a new id that the server assigns and returns as `refusalId`. The request's own `id` stays unused, so the same return can be sent again, under a new `Idempotency-Key`, once the second authoriser or the approval is in hand.
+
 |  |  |
 |---|---|
 | Permission | `ORDER_REFUND` |
@@ -416,8 +408,9 @@ Goods returned damaged or opened are written off rather than restocked, and that
 | Offline | no |
 | Conflict policy | serverWins |
 | Reads | `cache:idempotency`, `retail.return`, `retail.return_line` |
-| Writes | `cache:idempotency`, `retail.return` |
+| Writes | `cache:idempotency`, `retail.return`, `retail.return_line` |
 | Called by | POS-002, POS-011 |
+| State model | SerialisedItem ([states/serialised-item.yaml](../../../states/serialised-item.yaml)): moves `sold` -> `returned` |
 
 **Parameters**
 
@@ -471,7 +464,9 @@ Goods returned damaged or opened are written off rather than restocked, and that
 | refundTender | string |  |  |
 | restockedQuantity | integer | yes |  |
 | writtenOffQuantity | integer | yes |  |
-| acceptedByPrincipalId | string (uuid) |  |  |
+| status | object | yes | (read-only) |
+| refusedReason | object |  | Set when status is refused, null otherwise. (read-only; nullable) |
+| acceptedByPrincipalId | string (uuid) |  | Who took the return at the desk. |
 | secondaryPrincipalId | string (uuid) |  | (nullable) |
 | createdAt | string (date-time) | yes |  |
 
@@ -480,7 +475,7 @@ Goods returned damaged or opened are written off rather than restocked, and that
 | Code | Shape | Meaning |
 |---|---|---|
 | 201 |  | Accepted |
-| 409 |  | Outside the return window, item is non-returnable, already returned, or a second authoriser is required. |
+| 409 |  | Refused by the return policy: outside the return window, item is non-returnable, already returned, a second authoriser or an approval is required, no receipt, or a serial number that does not match. |
 
 ### getReturnPolicy
 
@@ -528,7 +523,7 @@ Separate from the ticket refund policy. A t-shirt and a timed admission have not
 | requiresApprovalAbove.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
 | requiresApprovalAbove.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
 | requiresApprovalAbove.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
-| restockableConditions | array of ReturnCondition: enum (resaleable, opened, damaged, faulty, missingParts) |  | Conditions that return stock to sale. |
+| restockableConditions | array of object |  | Conditions that return stock to sale. |
 | nonReturnableCategoryIds | array of string (uuid) |  |  |
 
 **Responses**
@@ -536,7 +531,7 @@ Separate from the ticket refund policy. A t-shirt and a timed admission have not
 | Code | Shape | Meaning |
 |---|---|---|
 | 200 |  | Policy |
-| 404 | NotFound | The resource does not exist, or is outside the caller's scope |
+| 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
 
 ### lookupRetailSale
 
@@ -561,9 +556,9 @@ By receipt number, order number or the barcode printed on the receipt. A guest a
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
-| receiptNumber | query |  | string |  |
-| orderNumber | query |  | string |  |
-| receiptBarcode | query |  | string |  |
+| receiptNumber | query |  | string | Exact match on receiptNumber. |
+| orderNumber | query |  | string | Exact match on the order number of the order in the Order & Payment context. |
+| receiptBarcode | query |  | string | Exact match on the barcode printed on the receipt. |
 
 **Response**: `RetailSale`
 
@@ -621,7 +616,7 @@ By receipt number, order number or the barcode printed on the receipt. A guest a
 | Code | Shape | Meaning |
 |---|---|---|
 | 200 |  | Sale |
-| 404 | NotFound | The resource does not exist, or is outside the caller's scope |
+| 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
 
 ### setReturnPolicy
 
@@ -668,7 +663,7 @@ By receipt number, order number or the barcode printed on the receipt. A guest a
 | requiresApprovalAbove.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
 | requiresApprovalAbove.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
 | requiresApprovalAbove.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
-| restockableConditions | array of ReturnCondition: enum (resaleable, opened, damaged, faulty, missingParts) |  | Conditions that return stock to sale. |
+| restockableConditions | array of object |  | Conditions that return stock to sale. |
 | nonReturnableCategoryIds | array of string (uuid) |  |  |
 
 **Response**: `ReturnPolicy`
@@ -692,7 +687,7 @@ By receipt number, order number or the barcode printed on the receipt. A guest a
 | requiresApprovalAbove.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
 | requiresApprovalAbove.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
 | requiresApprovalAbove.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
-| restockableConditions | array of ReturnCondition: enum (resaleable, opened, damaged, faulty, missingParts) |  | Conditions that return stock to sale. |
+| restockableConditions | array of object |  | Conditions that return stock to sale. |
 | nonReturnableCategoryIds | array of string (uuid) |  |  |
 
 **Responses**
@@ -720,8 +715,9 @@ Creates an order in the Order & Payment context and a `saleDepletion` movement i
 | Offline | no |
 | Conflict policy | serverWins |
 | Reads | `cache:idempotency`, `retail.sale`, `retail.sale_line` |
-| Writes | `cache:idempotency`, `retail.sale` |
+| Writes | `cache:idempotency`, `retail.sale`, `retail.sale_line` |
 | Called by | POS-002, POS-005, POS-023 |
+| State model | SerialisedItem ([states/serialised-item.yaml](../../../states/serialised-item.yaml)): moves `reserved` -> `sold`, `inStock` -> `sold` |
 
 **Parameters**
 
@@ -807,7 +803,7 @@ Creates an order in the Order & Payment context and a `saleDepletion` movement i
 |---|---|---|
 | 201 |  | Sold; stock depleted |
 | 400 | BadRequest | Validation failed |
-| 409 |  | Insufficient stock, a serialised item has no serial number, or the terminal is offline. |
+| 409 |  | Insufficient stock (insufficientStock), a serialised item has no serial number (serialNumberRequired), or the terminal is offline (terminalOffline). |
 
 ### getRetailSale
 
@@ -890,7 +886,7 @@ Also the receipt lookup a returns desk starts from. Returns whether each line is
 | Code | Shape | Meaning |
 |---|---|---|
 | 200 |  | Sale |
-| 404 | NotFound | The resource does not exist, or is outside the caller's scope |
+| 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
 
 ### listRetailSales
 
@@ -913,12 +909,12 @@ Also the receipt lookup a returns desk starts from. Returns whether each line is
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
-| outletId | query |  | string (uuid) |  |
-| shiftId | query |  | string |  |
-| createdFrom | query |  | string (date-time) |  |
-| createdTo | query |  | string (date-time) |  |
+| outletId | query |  | string (uuid) | Exact match. |
+| shiftId | query |  | string | Exact match. |
+| createdFrom | query |  | string (date-time) | Sales with createdAt at or after this instant. |
+| createdTo | query |  | string (date-time) | Sales with createdAt before this instant. |
 | pageSize | query |  | integer |  |
-| cursor | query |  | string | Opaque cursor from a previous page. |
+| cursor | query |  | string | Opaque cursor: the nextCursor of the previous page. |
 
 **Response**: `object`
 
@@ -1075,7 +1071,9 @@ Every table this service owns that the slice reads or writes, with its columns a
 | refund_tender | text | no |  |
 | restocked_quantity | integer | yes |  |
 | written_off_quantity | integer | yes |  |
-| accepted_by_principal_id | uuid | no |  |
+| status | text | yes |  |
+| refused_reason | text | no | Set when status is refused, null otherwise. |
+| accepted_by_principal_id | uuid | no | Who took the return at the desk. |
 | secondary_principal_id | uuid | no |  |
 | created_at | timestamptz | yes |  |
 
@@ -1105,6 +1103,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 | self_authorise_limit | numeric(18,4) | no | Up to this, one cashier may accept a return alone. |
 | requires_second_user_above | numeric(18,4) | no |  |
 | requires_approval_above | numeric(18,4) | no |  |
+| restockable_conditions | text[] | no | Conditions that return stock to sale. |
 | non_returnable_category_ids | text[] | no |  |
 
 ### `retail.sale`
@@ -1160,7 +1159,6 @@ Every table this service owns that the slice reads or writes, with its columns a
 | collected_at | timestamptz | no |  |
 | collected_by_principal_id | uuid | no |  |
 | verified_by | text | no |  |
-| collected_by | uuid | no | Points at identity.principal. |
 | venue_id | uuid | no | Points at platform.org_unit. |
 
 ### `retail.shop_and_drop_line`
@@ -1174,7 +1172,6 @@ Every table this service owns that the slice reads or writes, with its columns a
 | quantity | integer | no |  |
 | collected_quantity | integer | no |  |
 | id | uuid | yes | Synthesised key. |
-| drop_id | text | no | Points at retail.shop_and_drop. |
 
 ## Not in the first release
 

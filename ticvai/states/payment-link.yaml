@@ -39,8 +39,7 @@ states:
 transitions:
 - from: issued
   to: viewed
-  trigger: view
-  operation: getPaymentLink
+  trigger: job
   guard: '**No operation a person calls.** Opening the link is the trigger; recording it is a side effect.'
 - from: issued
   to: paid
@@ -55,13 +54,11 @@ transitions:
   guard: The ordinary path.
 - from: issued
   to: expired
-  trigger: expire
-  operation: getPaymentLink
+  trigger: job
   guard: '**Time, not a person.** The expiry window is venue configuration.'
 - from: viewed
   to: expired
-  trigger: expire
-  operation: getPaymentLink
+  trigger: job
   guard: As above. **A viewed link expires on the same clock** — looking at it does not extend it.
 - from: issued
   to: cancelled

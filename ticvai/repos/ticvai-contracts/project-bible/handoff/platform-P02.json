@@ -7,15 +7,15 @@
  "audience": "guest",
  "formFactor": "mobileApp",
  "offlineCapable": true,
- "generated": "2026-09-24",
+ "generated": "2026-09-28",
  "note": "Derived by tools/derive-platform.py. **The gaps section is the point** \u2014 a page listing what exists is a directory; one listing what is missing is a worklist.",
  "counts": {
   "screens": 71,
-  "operations": 170,
+  "operations": 168,
   "contracts": 18,
   "modules": 16,
   "undrawn": 0,
-  "operationsWithNoScreen": 10
+  "operationsWithNoScreen": 15
  },
  "waves": {
   "wave1": 20,
@@ -159,7 +159,7 @@
   },
   {
    "contract": "catalogue",
-   "operations": 17
+   "operations": 16
   },
   {
    "contract": "fnb",
@@ -170,27 +170,27 @@
    "operations": 11
   },
   {
-   "contract": "promotions",
-   "operations": 6
-  },
-  {
    "contract": "queue",
    "operations": 5
   },
   {
-   "contract": "white-label",
-   "operations": 4
+   "contract": "promotions",
+   "operations": 5
   },
   {
    "contract": "wallet",
    "operations": 4
   },
   {
-   "contract": "retail",
+   "contract": "white-label",
    "operations": 4
   },
   {
    "contract": "ai",
+   "operations": 4
+  },
+  {
+   "contract": "retail",
    "operations": 4
   },
   {
@@ -206,15 +206,15 @@
    "operations": 2
   },
   {
-   "contract": "finance",
-   "operations": 1
-  },
-  {
    "contract": "games",
    "operations": 1
   },
   {
    "contract": "resources",
+   "operations": 1
+  },
+  {
+   "contract": "finance",
    "operations": 1
   }
  ],
@@ -540,7 +540,7 @@
    "module": "Membership, Loyalty & Value",
    "wave": 2,
    "route": "/loyalty-rewards",
-   "operations": 4,
+   "operations": 3,
    "drawn": true
   },
   {
@@ -549,7 +549,7 @@
    "module": "Promotions",
    "wave": 2,
    "route": "/general/offers-and-promotions",
-   "operations": 4,
+   "operations": 3,
    "drawn": true
   },
   {
@@ -886,6 +886,18 @@
     "summary": "Memberships a customer holds"
    },
    {
+    "operation": "getForm",
+    "contract": "marketing-crm",
+    "verb": "GET",
+    "summary": "One form, to fill in or to edit"
+   },
+   {
+    "operation": "getMyProfile",
+    "contract": "marketing-crm",
+    "verb": "GET",
+    "summary": "A guest reading their own details"
+   },
+   {
     "operation": "listBadges",
     "contract": "marketing-crm",
     "verb": "GET",
@@ -916,10 +928,28 @@
     "summary": "Choose the name shown on the board"
    },
    {
+    "operation": "listTicketTransfers",
+    "contract": "orders",
+    "verb": "GET",
+    "summary": "The ticket transfers this guest sent or received"
+   },
+   {
+    "operation": "revokeEntitlementShare",
+    "contract": "orders",
+    "verb": "POST",
+    "summary": "Take back a share"
+   },
+   {
     "operation": "recordRecommendationOutcome",
     "contract": "promotions",
     "verb": "POST",
     "summary": "Shown, clicked, accepted or dismissed"
+   },
+   {
+    "operation": "listMyWaitingGuests",
+    "contract": "queue",
+    "verb": "GET",
+    "summary": "The caller's own queue entries"
    }
   ],
   "modulesSplitAcrossWaves": [

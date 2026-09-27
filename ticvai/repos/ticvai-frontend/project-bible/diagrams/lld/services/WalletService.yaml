@@ -18,8 +18,8 @@ ifDown: '**It holds a liability owed to a customer.** A wallet that double-spend
   per caller.'
 coverage:
   operations: 50
-  inAFlow: 0
-  percent: 0%
+  inAFlow: 3
+  percent: 6%
   note: '**Flow coverage is how much of this service a journey has walked.** A service under 40% is
     unwalked rather than under-documented.'
 schemas:
@@ -46,7 +46,7 @@ operationsByContract:
     scope: venue
     permission: LEDGER_POST
     offline: false
-    reads: 3
+    reads: 4
     writes: 2
   - operation: adjustWallet
     verb: POST
@@ -54,7 +54,7 @@ operationsByContract:
     scope: venue
     permission: LEDGER_POST
     offline: false
-    reads: 2
+    reads: 3
     writes: 2
   - operation: blockGiftCard
     verb: POST
@@ -70,7 +70,7 @@ operationsByContract:
     scope: venue
     permission: ORDER_MODIFY
     offline: false
-    reads: 3
+    reads: 4
     writes: 2
   - operation: createCreditType
     verb: POST
@@ -134,7 +134,7 @@ operationsByContract:
     scope: venue
     permission: ORDER_VIEW
     offline: false
-    reads: 1
+    reads: 2
     writes: 0
   - operation: getWalletBalance
     verb: GET
@@ -254,7 +254,7 @@ operationsByContract:
     scope: workstation
     permission: ORDER_CREATE
     offline: false
-    reads: 3
+    reads: 4
     writes: 2
   - operation: publishWalletConfiguration
     verb: POST
@@ -286,7 +286,7 @@ operationsByContract:
     scope: venue
     permission: ORDER_MODIFY
     offline: false
-    reads: 2
+    reads: 3
     writes: 2
   - operation: reverseWalletFunding
     verb: POST
@@ -398,7 +398,7 @@ operationsByContract:
     scope: venue
     permission: ORDER_MODIFY
     offline: false
-    reads: 2
+    reads: 3
     writes: 2
   - operation: topUpWallet
     verb: POST
@@ -406,7 +406,7 @@ operationsByContract:
     scope: workstation
     permission: ORDER_CREATE
     offline: false
-    reads: 2
+    reads: 3
     writes: 2
   - operation: transferWalletBalance
     verb: POST
@@ -414,7 +414,7 @@ operationsByContract:
     scope: venue
     permission: WALLET_MANAGE
     offline: false
-    reads: 3
+    reads: 4
     writes: 3
   - operation: updateCreditType
     verb: PUT
@@ -438,8 +438,38 @@ tables:
   columns: 5
   backing: redis
   owned: false
-  why: '**Not a table and not owned by a service.** Derived from something already read, invalidated
-    by an event already consumed, losable without consequence — no migration, no backup, no owner.'
+  why: '**Not a table and not owned by a service.** Derived from something already read, losable without
+    consequence — no migration, no backup, no owner.'
+  key: The idempotency key the caller sent
+  eviction:
+  - 'expires_at: **Must exceed the longest offline window.** A scanner out for a weekend replays on
+    Monday'
+  writtenBy:
+  - activateGiftCard
+  - adjustGameCard
+  - adjustWallet
+  - blockGiftCard
+  - closeWallet
+  - issueGiftCard
+  - loadGameCredits
+  - redeemGiftCard
+  - reinstateWallet
+  - suspendWallet
+  - topUpWallet
+  - transferWalletBalance
+  readBy:
+  - activateGiftCard
+  - adjustGameCard
+  - adjustWallet
+  - blockGiftCard
+  - closeWallet
+  - issueGiftCard
+  - loadGameCredits
+  - redeemGiftCard
+  - reinstateWallet
+  - suspendWallet
+  - topUpWallet
+  - transferWalletBalance
 - table: wallet.accounting_mapping
   columns: 3
   store: postgres
@@ -599,7 +629,7 @@ tables:
 - table: wallet.wallet_transaction
   columns: 10
   store: postgres
-  parent: wallet.wallet
+  parent: null
   writtenBy:
   - orders
   - wallet
@@ -620,7 +650,18 @@ readsFrom:
 writesOutside:
 - service: VenueOpsService
   operations: 2
-  why: '**The owner defines the row; this service may only append to it.**'
+  rule: 'ADR-0028: the owner defines the row; a foreign writer may only append, through a path the owner
+    published.'
+  why: '**The lineage records these writes, not how they honour the rule.** It does not say whether
+    each inserts or updates, or which operation or event VenueOpsService published for it — check each
+    against ADR-0028.'
+  writes:
+  - operation: adjustGameCard
+    tables:
+    - games.card
+  - operation: loadGameCredits
+    tables:
+    - games.card
 screens:
 - P01:WEB-021 Wallet & Gift Cards
 - P02:GST-011 Wallet Overview

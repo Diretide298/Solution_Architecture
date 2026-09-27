@@ -31,6 +31,7 @@ operations:
   writes:
   - cache:idempotency
   - control.licence_add_on
+  - control.licence_add_on_limit
 - operation: approveBookingLimitCommercial
   verb: PUT
   path: /booking-limit-commercial
@@ -162,9 +163,12 @@ operations:
   reads:
   - cache:idempotency
   - subscription.plan
+  - subscription.plan_limit
+  - subscription.plan_module
   writes:
   - cache:idempotency
   - subscription.plan
+  - subscription.plan_limit
 - operation: createPlanVersion
   verb: POST
   path: /plans/{planId}
@@ -176,9 +180,12 @@ operations:
   reads:
   - cache:idempotency
   - subscription.plan
+  - subscription.plan_limit
+  - subscription.plan_module
   writes:
   - cache:idempotency
   - subscription.plan
+  - subscription.plan_limit
 - operation: createTenant
   verb: POST
   path: /tenants
@@ -394,6 +401,8 @@ operations:
   offline: false
   reads:
   - subscription.plan
+  - subscription.plan_limit
+  - subscription.plan_module
   writes: []
 - operation: getPlanTiers
   verb: GET
@@ -906,6 +915,8 @@ operations:
   offline: false
   reads:
   - subscription.plan
+  - subscription.plan_limit
+  - subscription.plan_module
   writes: []
 - operation: listRenewalAuto
   verb: GET

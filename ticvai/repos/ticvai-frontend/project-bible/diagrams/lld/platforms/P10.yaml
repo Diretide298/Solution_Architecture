@@ -77,7 +77,25 @@ screens:
   - PTR-003
   - PTR-004
   - PTR-005
+  - PTR-006
+  - PTR-007
+  - PTR-008
+  - PTR-009
+  - PTR-010
+  - PTR-011
+  - PTR-012
+  - PTR-013
+  - PTR-014
+  - PTR-015
+  - PTR-016
+  - PTR-017
+  - PTR-018
+  - PTR-019
+  - PTR-020
+  - PTR-021
   - PTR-022
+  - PTR-032
+  - PTR-042
   boardFrames: null
   wireframe: wireframes/P10 Partner Web.dc.html#ptr-001
   inFlows:
@@ -166,7 +184,6 @@ screens:
   states:
   - emptyFirstRun
   - emptyNoAccess
-  - emptyNoResults
   - error
   - loading
   offlineState: false
@@ -276,7 +293,6 @@ screens:
   states:
   - emptyFirstRun
   - emptyNoAccess
-  - emptyNoResults
   - error
   - loading
   offlineState: false
@@ -459,7 +475,6 @@ screens:
   states:
   - emptyFirstRun
   - emptyNoAccess
-  - emptyNoResults
   - error
   - loading
   offlineState: false

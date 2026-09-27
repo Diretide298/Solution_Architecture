@@ -3,24 +3,27 @@
 -- its use** — orders reaches catalogue, catalogue reaches platform, and something
 -- reaches back. Tables first, constraints last, is the only ordering that terminates.
 --
--- 17 of 660 declared references. The ones that reach the
+-- 20 of 631 declared references. The ones that reach the
 -- other database are in ../990-cross-database-references.sql and are not constraints
 -- any more.
 
-ALTER TABLE control.api_licence ADD CONSTRAINT fk_api_licence_tenant_id FOREIGN KEY (tenant_id) REFERENCES control.tenant(id);
-ALTER TABLE control.cell_job ADD CONSTRAINT fk_cell_job_cell_id FOREIGN KEY (cell_id) REFERENCES control.cell(id);
-ALTER TABLE control.environment ADD CONSTRAINT fk_environment_cell_id FOREIGN KEY (cell_id) REFERENCES control.cell(id);
-ALTER TABLE control.invoice_line ADD CONSTRAINT fk_invoice_line_invoice_id FOREIGN KEY (invoice_id) REFERENCES control.invoice(id);
-ALTER TABLE control.migration ADD CONSTRAINT fk_migration_release_id FOREIGN KEY (release_id) REFERENCES control.release(id);
-ALTER TABLE control.migration_plan_cell ADD CONSTRAINT fk_migration_plan_cell_cell_id FOREIGN KEY (cell_id) REFERENCES control.cell(id);
-ALTER TABLE control.migration_plan_cell ADD CONSTRAINT fk_migration_plan_cell_migration_plan_id FOREIGN KEY (migration_plan_id) REFERENCES control.migration_plan(id);
-ALTER TABLE control.migration_run ADD CONSTRAINT fk_migration_run_canary_cell_id FOREIGN KEY (canary_cell_id) REFERENCES control.cell(id);
-ALTER TABLE control.migration_run_cell ADD CONSTRAINT fk_migration_run_cell_migration_run_id FOREIGN KEY (migration_run_id) REFERENCES control.migration_run(id);
-ALTER TABLE control.migration_run_tenant ADD CONSTRAINT fk_migration_run_tenant_migration_run_id FOREIGN KEY (migration_run_id) REFERENCES control.migration_run(id);
-ALTER TABLE control.onboarding_application ADD CONSTRAINT fk_onboarding_application_venue_type_template_id FOREIGN KEY (venue_type_template_id) REFERENCES control.venue_type_template(id);
-ALTER TABLE control.release_component ADD CONSTRAINT fk_release_component_release_id FOREIGN KEY (release_id) REFERENCES control.release(id);
-ALTER TABLE control.rollout ADD CONSTRAINT fk_rollout_release_id FOREIGN KEY (release_id) REFERENCES control.release(id);
-ALTER TABLE control.rollout_cell ADD CONSTRAINT fk_rollout_cell_cell_id FOREIGN KEY (cell_id) REFERENCES control.cell(id);
-ALTER TABLE control.tenant_migration ADD CONSTRAINT fk_tenant_migration_plan_id FOREIGN KEY (plan_id) REFERENCES control.tenant_migration_plan(id);
-ALTER TABLE control.tenant_migration ADD CONSTRAINT fk_tenant_migration_tenant_id FOREIGN KEY (tenant_id) REFERENCES control.tenant(id);
-ALTER TABLE control.tenant_migration_plan ADD CONSTRAINT fk_tenant_migration_plan_tenant_id FOREIGN KEY (tenant_id) REFERENCES control.tenant(id);
+ALTER TABLE control.api_licence ADD CONSTRAINT api_licence_tenant_id_fkey FOREIGN KEY (tenant_id) REFERENCES control.tenant(id);
+ALTER TABLE control.cell_job ADD CONSTRAINT cell_job_cell_id_fkey FOREIGN KEY (cell_id) REFERENCES control.cell(id);
+ALTER TABLE control.environment ADD CONSTRAINT environment_cell_id_fkey FOREIGN KEY (cell_id) REFERENCES control.cell(id);
+ALTER TABLE control.footer_config_column ADD CONSTRAINT footer_config_column_footer_config_id_fkey FOREIGN KEY (footer_config_id) REFERENCES control.footer_config(id);
+ALTER TABLE control.footer_config_social_link ADD CONSTRAINT footer_config_social_link_footer_config_id_fkey FOREIGN KEY (footer_config_id) REFERENCES control.footer_config(id);
+ALTER TABLE control.invoice_line ADD CONSTRAINT invoice_line_invoice_id_fkey FOREIGN KEY (invoice_id) REFERENCES control.invoice(id);
+ALTER TABLE control.licence_add_on_limit ADD CONSTRAINT licence_add_on_limit_licence_add_on_id_fkey FOREIGN KEY (licence_add_on_id) REFERENCES control.licence_add_on(id);
+ALTER TABLE control.migration ADD CONSTRAINT migration_release_id_fkey FOREIGN KEY (release_id) REFERENCES control.release(id);
+ALTER TABLE control.migration_plan_cell ADD CONSTRAINT migration_plan_cell_cell_id_fkey FOREIGN KEY (cell_id) REFERENCES control.cell(id);
+ALTER TABLE control.migration_plan_cell ADD CONSTRAINT migration_plan_cell_migration_plan_id_fkey FOREIGN KEY (migration_plan_id) REFERENCES control.migration_plan(id);
+ALTER TABLE control.migration_run ADD CONSTRAINT migration_run_canary_cell_id_fkey FOREIGN KEY (canary_cell_id) REFERENCES control.cell(id);
+ALTER TABLE control.migration_run_cell ADD CONSTRAINT migration_run_cell_migration_run_id_fkey FOREIGN KEY (migration_run_id) REFERENCES control.migration_run(id);
+ALTER TABLE control.migration_run_tenant ADD CONSTRAINT migration_run_tenant_migration_run_id_fkey FOREIGN KEY (migration_run_id) REFERENCES control.migration_run(id);
+ALTER TABLE control.onboarding_application ADD CONSTRAINT onboarding_application_venue_type_template_id_fkey FOREIGN KEY (venue_type_template_id) REFERENCES control.venue_type_template(id);
+ALTER TABLE control.release_component ADD CONSTRAINT release_component_release_id_fkey FOREIGN KEY (release_id) REFERENCES control.release(id);
+ALTER TABLE control.rollout ADD CONSTRAINT rollout_release_id_fkey FOREIGN KEY (release_id) REFERENCES control.release(id);
+ALTER TABLE control.rollout_cell ADD CONSTRAINT rollout_cell_cell_id_fkey FOREIGN KEY (cell_id) REFERENCES control.cell(id);
+ALTER TABLE control.tenant_migration ADD CONSTRAINT tenant_migration_plan_id_fkey FOREIGN KEY (plan_id) REFERENCES control.tenant_migration_plan(id);
+ALTER TABLE control.tenant_migration ADD CONSTRAINT tenant_migration_tenant_id_fkey FOREIGN KEY (tenant_id) REFERENCES control.tenant(id);
+ALTER TABLE control.tenant_migration_plan ADD CONSTRAINT tenant_migration_plan_tenant_id_fkey FOREIGN KEY (tenant_id) REFERENCES control.tenant(id);

@@ -62,7 +62,6 @@ screens:
   states:
   - emptyFirstRun
   - emptyNoAccess
-  - emptyNoResults
   - error
   - loading
   offlineState: false
@@ -71,6 +70,17 @@ screens:
   - CMS-002
   - CMS-003
   - CMS-004
+  - CMS-008
+  - CMS-009
+  - CMS-010
+  - CMS-011
+  - CMS-016
+  - CMS-019
+  - CMS-020
+  - CMS-021
+  - CMS-031
+  - CMS-041
+  - CMS-051
   - CMS-061
   - CMS-071
   - CMS-081
@@ -94,7 +104,6 @@ screens:
   states:
   - emptyFirstRun
   - emptyNoAccess
-  - emptyNoResults
   - error
   - loading
   offlineState: false
@@ -123,7 +132,6 @@ screens:
   states:
   - emptyFirstRun
   - emptyNoAccess
-  - emptyNoResults
   - error
   - loading
   offlineState: false
@@ -155,7 +163,6 @@ screens:
   states:
   - emptyFirstRun
   - emptyNoAccess
-  - emptyNoResults
   - error
   - loading
   offlineState: false
@@ -179,7 +186,6 @@ screens:
   states:
   - emptyFirstRun
   - emptyNoAccess
-  - emptyNoResults
   - error
   - loading
   offlineState: false
@@ -188,6 +194,7 @@ screens:
   - CMS-001
   - CMS-002
   - CMS-003
+  - CMS-006
   - CMS-007
   boardFrames: null
   wireframe: wireframes/P13 Venue CMS.dc.html#cms-005
@@ -241,7 +248,6 @@ screens:
   states:
   - emptyFirstRun
   - emptyNoAccess
-  - emptyNoResults
   - error
   - loading
   offlineState: false
@@ -408,7 +414,6 @@ screens:
   states:
   - emptyFirstRun
   - emptyNoAccess
-  - emptyNoResults
   - error
   - loading
   offlineState: false
@@ -435,7 +440,6 @@ screens:
   states:
   - emptyFirstRun
   - emptyNoAccess
-  - emptyNoResults
   - error
   - loading
   offlineState: false
@@ -489,7 +493,6 @@ screens:
   states:
   - emptyFirstRun
   - emptyNoAccess
-  - emptyNoResults
   - error
   - loading
   offlineState: false
@@ -498,6 +501,9 @@ screens:
   - CMS-001
   - CMS-002
   - CMS-003
+  - CMS-013
+  - CMS-017
+  - CMS-018
   boardFrames: null
   wireframe: wireframes/P13 Venue CMS.dc.html#cms-016
   inFlows: null

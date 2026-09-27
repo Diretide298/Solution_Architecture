@@ -16,7 +16,6 @@ description: One rollout of one profile to one target set. **`ConfigurationProfi
 initial:
 - queued
 terminal:
-- completed
 - rolledBack
 states:
 - name: queued

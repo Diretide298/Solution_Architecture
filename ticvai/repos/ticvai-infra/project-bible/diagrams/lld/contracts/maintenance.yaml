@@ -93,6 +93,7 @@ operations:
   writes:
   - cache:idempotency
   - maintenance.asset
+  - maintenance.asset_document
 - operation: createInspectionTemplate
   verb: POST
   path: /inspection-templates
@@ -147,6 +148,7 @@ operations:
   offline: true
   reads:
   - maintenance.asset
+  - maintenance.asset_document
   - maintenance.preventive_plan
   - maintenance.work_order
   writes: []
@@ -183,6 +185,8 @@ operations:
   offline: false
   reads:
   - maintenance.incident
+  - maintenance.incident_authority_notification
+  - maintenance.incident_involved_party
   writes: []
 - operation: getWorkOrder
   verb: GET
@@ -272,6 +276,7 @@ operations:
   offline: true
   reads:
   - maintenance.asset
+  - maintenance.asset_document
   - maintenance.preventive_plan
   - maintenance.work_order
   writes: []
@@ -432,6 +437,7 @@ operations:
   writes:
   - cache:idempotency
   - maintenance.asset
+  - maintenance.asset_document
 - operation: updateIncident
   verb: PATCH
   path: /incidents/{incidentId}

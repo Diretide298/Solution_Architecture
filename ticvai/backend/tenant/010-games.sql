@@ -7,29 +7,29 @@ CREATE TABLE IF NOT EXISTS games.attraction_type (
     id                                uuid PRIMARY KEY,
     code                              text NOT NULL,
     name                              text NOT NULL,
-    family                            text,
-    has_ticket_payout                 boolean,
-    has_direct_pay                    boolean,
-    has_cycle_time                    boolean,
-    has_height_restriction            boolean,
-    supports_entitlements             boolean,
-    scope_path                        ltree
+    family                            text CONSTRAINT attraction_type_family_chk CHECK (family IN ('ride', 'arcadeGame', 'redemptionGame', 'crane', 'vrExperience', 'softPlay', 'attraction', 'show')),
+    has_ticket_payout                 boolean DEFAULT false,
+    has_direct_pay                    boolean DEFAULT false,
+    has_cycle_time                    boolean DEFAULT true,
+    has_height_restriction            boolean DEFAULT false,
+    supports_entitlements             boolean DEFAULT true,
+    scope_path                        ltree NOT NULL
 );
 
 -- Holds 11 columns. No description has been written for this table — the name is the only thing
 -- saying what it is
 CREATE TABLE IF NOT EXISTS games.authorisation (
     id                                uuid PRIMARY KEY,
-    decision                          text,
-    reason                            text,
+    decision                          text CONSTRAINT authorisation_decision_chk CHECK (decision IN ('allow', 'refuse')),
+    reason                            text CONSTRAINT authorisation_reason_chk CHECK (reason IN ('ok', 'cardNotFound', 'cardExpired', 'cardBlocked', 'retapTooSoon', 'heightRestriction', 'ageRestriction', 'insufficientFunds', 'entitlementExhausted', 'entitlementNotValidHere', 'cooldownActive', 'dailyCapReached', 'readerNotConfigured', 'gameUnavailable')),
     guest_message                     text,
     charged_from                      text,
     amount                            numeric(18,4),
-    entitlement_id                    text,
+    entitlement_id                    uuid,
     remaining_balance                 numeric(18,4),
     remaining_plays                   integer,
-    decided_offline                   boolean,
-    scope_path                        ltree
+    decided_offline                   boolean DEFAULT false,
+    scope_path                        ltree NOT NULL
 );
 
 -- An arcade card holding credits. The credit ledger is its history
@@ -41,7 +41,7 @@ CREATE TABLE IF NOT EXISTS games.card (
     credits                           integer NOT NULL,
     bonus_credits                     integer NOT NULL,
     points                            integer NOT NULL,
-    status                            text NOT NULL,
+    status                            text NOT NULL CONSTRAINT card_status_chk CHECK (status IN ('active', 'blocked', 'expired', 'transferred')),
     blocked_reason                    text,
     transferred_to_card_code          text,
     last_played_at                    timestamptz,
@@ -52,14 +52,14 @@ CREATE TABLE IF NOT EXISTS games.card (
 -- Holds 9 columns. No description has been written for this table — the name is the only thing
 -- saying what it is
 CREATE TABLE IF NOT EXISTS games.card_expiry_rules (
-    basis                             text,
+    basis                             text DEFAULT 'fromLastActivity' CONSTRAINT card_expiry_rules_basis_chk CHECK (basis IN ('fromIssue', 'fromLastActivity', 'fromLastRecharge')),
     validity_months                   integer,
     warn_before_days                  text[],
     warning_channels                  text[],
-    extend_on_recharge                boolean,
-    on_expiry                         text,
+    extend_on_recharge                boolean DEFAULT true,
+    on_expiry                         text DEFAULT 'holdForClaim' CONSTRAINT card_expiry_rules_on_expiry_chk CHECK (on_expiry IN ('forfeit', 'holdForClaim', 'transferToBreakage')),
     hold_for_claim_days               integer,
-    scope_path                        ltree,
+    scope_path                        ltree NOT NULL,
     id                                uuid PRIMARY KEY NOT NULL
 );
 
@@ -76,25 +76,25 @@ CREATE TABLE IF NOT EXISTS games.entitlement (
     id                                uuid PRIMARY KEY,
     code                              text NOT NULL,
     name                              text,
-    kind                              text NOT NULL,
+    kind                              text NOT NULL CONSTRAINT entitlement_kind_chk CHECK (kind IN ('allGamesPass', 'unlimitedSingleGame', 'limitedSingleGame', 'package', 'freePlay')),
     game_ids                          text[],
     attraction_type_ids               text[],
     play_count                        integer,
-    validity_kind                     text,
+    validity_kind                     text CONSTRAINT entitlement_validity_kind_chk CHECK (validity_kind IN ('sameDay', 'days', 'untilDate', 'untilUsed')),
     validity_days                     integer,
-    activation_kind                   text,
+    activation_kind                   text DEFAULT 'onFirstUse' CONSTRAINT entitlement_activation_kind_chk CHECK (activation_kind IN ('onPurchase', 'onFirstUse', 'onDate')),
     daily_play_cap                    integer,
     cooldown_minutes                  integer,
     linked_product_id                 uuid,
-    scope_path                        ltree,
-    is_active                         boolean
+    scope_path                        ltree NOT NULL,
+    is_active                         boolean DEFAULT true
 );
 
 -- A machine or attraction, with its cost in credits
 CREATE TABLE IF NOT EXISTS games.game (
     id                                uuid PRIMARY KEY NOT NULL,
-    code                              text NOT NULL,
-    name                              text NOT NULL,
+    code                              text NOT NULL CONSTRAINT game_code_chk CHECK (char_length(code) <= 64),
+    name                              text NOT NULL CONSTRAINT game_name_chk CHECK (char_length(name) <= 200),
     venue_id                          uuid NOT NULL,
     zone                              text,
     asset_id                          uuid,
@@ -103,7 +103,7 @@ CREATE TABLE IF NOT EXISTS games.game (
     min_points_awarded                integer,
     max_points_awarded                integer,
     height_requirement_cm             integer,
-    status                            text NOT NULL,
+    status                            text NOT NULL CONSTRAINT game_status_chk CHECK (status IN ('inService', 'outOfService', 'maintenance', 'retired')),
     plays_today                       integer,
     credits_taken_today               integer,
     points_awarded_today              integer
@@ -117,15 +117,15 @@ CREATE TABLE IF NOT EXISTS games.gameplay_transaction (
     game_id                           uuid,
     card_id                           uuid,
     at                                timestamptz,
-    outcome                           text,
+    outcome                           text CONSTRAINT gameplay_transaction_outcome_chk CHECK (outcome IN ('allowed', 'refused', 'reversed')),
     reason                            text,
     amount                            numeric(18,4),
     charged_from                      text,
-    entitlement_id                    text,
+    entitlement_id                    uuid,
     tickets_earned                    integer,
-    decided_offline                   boolean,
+    decided_offline                   boolean DEFAULT false,
     synced_at                         timestamptz,
-    scope_path                        ltree
+    scope_path                        ltree NOT NULL
 );
 
 -- Holds 8 columns. No description has been written for this table — the name is the only thing
@@ -135,9 +135,9 @@ CREATE TABLE IF NOT EXISTS games.kiosk_config (
     steps                             text[],
     languages                         text[],
     theme_code                        text,
-    idle_timeout_seconds              integer,
-    requires_pin_for_top_up           boolean,
-    scope_path                        ltree,
+    idle_timeout_seconds              integer DEFAULT 30,
+    requires_pin_for_top_up           boolean DEFAULT false,
+    scope_path                        ltree NOT NULL,
     id                                uuid PRIMARY KEY NOT NULL
 );
 
@@ -154,8 +154,7 @@ CREATE TABLE IF NOT EXISTS games.operational_config (
     supervision_required_below_age    integer,
     health_restrictions               text[],
     staff_positions                   integer,
-    operating_hours                   jsonb,
-    scope_path                        ltree,
+    scope_path                        ltree NOT NULL,
     id                                uuid PRIMARY KEY NOT NULL
 );
 
@@ -181,14 +180,14 @@ CREATE TABLE IF NOT EXISTS games.pricing (
     retry_price                       numeric(18,4),
     retry_window_seconds              integer,
     priority                          text[],
-    scope_path                        ltree,
+    scope_path                        ltree NOT NULL,
     id                                uuid PRIMARY KEY NOT NULL
 );
 
 -- What credits can be redeemed for, with its own stock
 CREATE TABLE IF NOT EXISTS games.prize (
     id                                uuid PRIMARY KEY NOT NULL,
-    name                              text NOT NULL,
+    name                              text NOT NULL CONSTRAINT prize_name_chk CHECK (char_length(name) <= 200),
     description                       text,
     venue_id                          uuid NOT NULL,
     merchandise_id                    uuid,
@@ -210,7 +209,7 @@ CREATE TABLE IF NOT EXISTS games.prize_cost (
     inventory_item_id                 uuid,
     direct_pay_price                  numeric(18,4),
     display_tier                      text,
-    scope_path                        ltree,
+    scope_path                        ltree NOT NULL,
     id                                uuid PRIMARY KEY NOT NULL
 );
 
@@ -221,12 +220,12 @@ CREATE TABLE IF NOT EXISTS games.reader (
     game_id                           uuid,
     reader_profile_id                 uuid,
     accepted_credit_type_ids          text[],
-    accepts_direct_pay                boolean,
-    retap_delay_seconds               integer,
+    accepts_direct_pay                boolean DEFAULT false,
+    retap_delay_seconds               integer DEFAULT 3,
     display_rules                     jsonb,
     io_mapping                        jsonb,
-    status                            text,
-    scope_path                        ltree,
+    status                            text CONSTRAINT reader_status_chk CHECK (status IN ('unconfigured', 'active', 'offline', 'maintenance', 'disabled')),
+    scope_path                        ltree NOT NULL,
     id                                uuid PRIMARY KEY NOT NULL
 );
 
@@ -239,7 +238,7 @@ CREATE TABLE IF NOT EXISTS games.reader_deployment (
     edge_package_expires_at           timestamptz,
     deployed_at                       timestamptz,
     acknowledged_at                   timestamptz,
-    status                            text,
+    status                            text CONSTRAINT reader_deployment_status_chk CHECK (status IN ('queued', 'sent', 'acknowledged', 'failed', 'stale')),
     failure_reason                    text
 );
 
@@ -253,7 +252,7 @@ CREATE TABLE IF NOT EXISTS games.reader_profile (
     retry_pricing                     jsonb,
     re_play_window_seconds            integer,
     entitlement_product_ids           text[],
-    scope_path                        ltree
+    scope_path                        ltree NOT NULL
 );
 
 -- Credits exchanged for prizes. Lines are children
@@ -283,12 +282,12 @@ CREATE TABLE IF NOT EXISTS games.redemption_line (
 -- saying what it is
 CREATE TABLE IF NOT EXISTS games.redemption_rules (
     ticket_credit_type_id             uuid,
-    ticket_eater_enabled              boolean,
-    ticketless_enabled                boolean,
-    tickets_expire                    boolean,
+    is_ticket_eater_enabled           boolean DEFAULT false,
+    is_ticketless_enabled             boolean DEFAULT true,
+    tickets_expire                    boolean DEFAULT false,
     ticket_validity_days              integer,
     counter_approval_above_tickets    integer,
-    scope_path                        ltree,
+    scope_path                        ltree NOT NULL,
     id                                uuid PRIMARY KEY NOT NULL
 );
 
@@ -297,11 +296,11 @@ CREATE TABLE IF NOT EXISTS games.redemption_rules (
 CREATE TABLE IF NOT EXISTS games.validation_rules (
     deduction_order                   text[],
     check_order                       text[],
-    allow_partial_entitlement         boolean,
+    allow_partial_entitlement         boolean DEFAULT false,
     refuse_below_balance              numeric(18,4),
-    offline_decision_allowed          boolean,
+    is_offline_decision_allowed       boolean DEFAULT true,
     offline_maximum_value             numeric(18,4),
-    scope_path                        ltree,
+    scope_path                        ltree NOT NULL,
     id                                uuid PRIMARY KEY NOT NULL
 );
 

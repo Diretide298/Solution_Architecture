@@ -88,6 +88,9 @@ paths:
               $ref: '#/components/schemas/LoginRequest'
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: 'Authenticated. When the user holds exactly one role the response is complete.
             When the user holds several, `requiresRoleSelection` is true and `availableRoles` is populated
             — the caller must call /auth/select-role before the session becomes usable.
@@ -202,6 +205,9 @@ paths:
                     '
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Sent, or verified
           content:
             application/json:
@@ -255,6 +261,9 @@ paths:
               $ref: '#/components/schemas/PasswordPolicy'
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Set
           content:
             application/json:
@@ -367,6 +376,9 @@ paths:
                 $ref: '#/components/schemas/ModuleAccess'
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Granted
           content:
             application/json:
@@ -444,6 +456,9 @@ paths:
               $ref: '#/components/schemas/CapabilityTemplate'
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Saved
           content:
             application/json:
@@ -515,6 +530,9 @@ paths:
                     $ref: '#/components/schemas/SegregationRule'
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Set
           content:
             application/json:
@@ -565,9 +583,14 @@ paths:
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/SegregationViolation'
+                allOf:
+                  - $ref: '../shared/common.yaml#/components/schemas/Page'
+                  - type: object
+                    properties:
+                      items:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/SegregationViolation'
   /guests/{subjectId}/data-export:
     parameters:
     - name: subjectId
@@ -621,12 +644,33 @@ paths:
                   default: json
       responses:
         '202':
-          description: Export started
+          description: 'Export started, as a data-subject request (`platform.dsar_request`). The same
+            shape `deleteGuestAccount` returns for an erasure request, so a guest''s two privacy requests
+            read alike.
+
+            '
           content:
             application/json:
               schema:
                 type: object
-                additionalProperties: true
+                required:
+                - requestId
+                - format
+                properties:
+                  requestId:
+                    type: string
+                    description: The data-subject request raised for this export.
+                  format:
+                    type: string
+                    enum:
+                    - json
+                    - csv
+                    - pdf
+                    description: The format asked for, or `json` when the request named none.
+                  estimatedCompletionAt:
+                    type: string
+                    format: date-time
+                    nullable: true
   /guests/{subjectId}/delegations:
     parameters:
     - name: subjectId
@@ -666,16 +710,21 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  heldByThisGuest:
-                    type: array
-                    items:
-                      $ref: '#/components/schemas/DelegatedAccess'
-                  heldOverThisGuest:
-                    type: array
-                    items:
-                      $ref: '#/components/schemas/DelegatedAccess'
+                allOf:
+                  - $ref: '../shared/common.yaml#/components/schemas/Page'
+                  - type: object
+                    properties:
+                      items:
+                        type: object
+                        properties:
+                          heldByThisGuest:
+                            type: array
+                            items:
+                              $ref: '#/components/schemas/DelegatedAccess'
+                          heldOverThisGuest:
+                            type: array
+                            items:
+                              $ref: '#/components/schemas/DelegatedAccess'
     post:
       operationId: grantDelegation
       x-ticvai-consumed-by:
@@ -749,6 +798,9 @@ paths:
                   default: true
       responses:
         '201':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Granted
           content:
             application/json:
@@ -802,6 +854,9 @@ paths:
                   format: uuid
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Role selected, session usable
           content:
             application/json:
@@ -821,10 +876,10 @@ paths:
       - partner
       - guest
       x-ticvai-audience-note: '24 August: widened to include `guest`. **MFA and token refresh act on the
-        caller''s own ses sion, whoever the caller is** — a guest enrolling a second factor is the same
-        act as a cas hier doing it, and `WEB-016 Login / Register` was calling six staff-only operations
-        becaus e no guest equivalent existed. **Declaring them staff-only did not make them staff-only;
-        i t made the guest surface look like a violation.**
+        caller''s own session, whoever the caller is** — a guest enrolling a second factor is the same
+        act as a cashier doing it, and `WEB-016 Login / Register` was calling six staff-only operations
+        because no guest equivalent existed. **Declaring them staff-only did not make them staff-only;
+        it made the guest surface look like a violation.**
 
         '
       tags:
@@ -850,6 +905,9 @@ paths:
                   type: string
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Rotated
           content:
             application/json:
@@ -901,6 +959,9 @@ paths:
               $ref: '#/components/schemas/ChangeCredentialRequest'
       responses:
         '204':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Changed. Other sessions of this principal are ended.
         '400':
           $ref: ../shared/common.yaml#/components/responses/BadRequest
@@ -934,6 +995,9 @@ paths:
       summary: Close the current session
       responses:
         '204':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Session closed
   /auth/sessions/{sessionId}/force-logout:
     post:
@@ -981,6 +1045,9 @@ paths:
                   maxLength: 500
       responses:
         '204':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Session terminated and audited
         '403':
           $ref: ../shared/common.yaml#/components/responses/Forbidden
@@ -1046,10 +1113,17 @@ paths:
       parameters:
       - name: scopePath
         in: query
+        description: 'Principals whose home scope (`identity.principal.home_scope_id`) is this node **or
+          any node beneath it** — a prefix match on the materialised path, the way `scope_path` is
+          compared everywhere (`shared/common.yaml`, ScopeRef). Omitted: every principal the caller''s
+          `USER_MANAGE` scope reaches.
+
+          '
         schema:
           type: string
       - name: isActive
         in: query
+        description: Exact match on `Principal.isActive`. Omitted returns both.
         schema:
           type: boolean
       - $ref: ../shared/common.yaml#/components/parameters/PageSize
@@ -1097,6 +1171,9 @@ paths:
               $ref: '#/components/schemas/CreatePrincipalRequest'
       responses:
         '201':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Created. Has no access until grants are assigned.
           content:
             application/json:
@@ -1152,6 +1229,9 @@ paths:
               $ref: '#/components/schemas/ResetCredentialRequest'
       responses:
         '204':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Reset. The principal must change it at next sign-in; their sessions are ended.
         '400':
           $ref: ../shared/common.yaml#/components/responses/BadRequest
@@ -1238,6 +1318,9 @@ paths:
                   format: uuid
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Updated
           content:
             application/json:
@@ -1257,8 +1340,10 @@ paths:
       - staff
       x-ticvai-read-routing: replica
       summary: List roles
-      description: 'A role is a grouping for permission management — code, name, description. Nothing
-        is predefined; privileges attach through grants.
+      description: 'A role is a grouping for permission management — code, name, description and the
+        permissions it carries (`Role.permissions`). **Seeded system roles ship with the tenant**
+        (`Role.isSystem`: editable, not deletable); every other role is created with `createRole`.
+        Grants (`createDelegatedAccess`) attach a role or a single permission to a principal at a scope.
 
         '
       tags:
@@ -1267,9 +1352,9 @@ paths:
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: true
       x-ticvai-offline-note: '24 August: **servable from a local cache.** The device holds enough to answer
-        without the  network and the answer may be stale — which is correct for a catalogue and wrong
-        for conte nded state. `getSeatAvailability`, `getSeatHold` and `getPromotionUsage` are deliberately  excluded
-        - **a stale seat is a seat sold twice.**
+        without the network and the answer may be stale. **A stale role list is safe to show**: it only
+        names roles, and what a person may do is resolved by the server at login (`Session.effectivePermissions`),
+        never from this list.
 
         '
       x-ticvai-conflict-policy: serverWins
@@ -1328,6 +1413,9 @@ paths:
                   maxLength: 500
       responses:
         '201':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Created
           content:
             application/json:
@@ -1352,11 +1440,13 @@ paths:
       parameters:
       - name: principalId
         in: query
+        description: Exact match on `DelegatedAccess.principalId`.
         schema:
           type: string
           format: uuid
       - name: roleId
         in: query
+        description: Exact match on `DelegatedAccess.roleId`.
         schema:
           type: string
           format: uuid
@@ -1407,6 +1497,9 @@ paths:
               $ref: '#/components/schemas/CreateGrantRequest'
       responses:
         '201':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Granted. Takes effect at next login unless it is a revocation.
           content:
             application/json:
@@ -1449,6 +1542,9 @@ paths:
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       responses:
         '204':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Removed
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
@@ -1492,8 +1588,8 @@ paths:
                   format: uuid
                 atScopePath:
                   type: string
-                  description: 'Optional. When supplied, returns PERMIT or DENY per permission at that
-                    node rather than the whole effective set.
+                  description: 'Optional. When supplied, the response also carries `decisionsAtScope`:
+                    PERMIT or DENY per permission at that node. `permissionsByScope` is returned either way.
 
                     '
       responses:
@@ -1524,6 +1620,26 @@ paths:
                           type: string
                         deniedAtScopePath:
                           type: string
+                  decisionsAtScope:
+                    type: array
+                    nullable: true
+                    description: 'Present only when the request supplied `atScopePath`: the verdict for each
+                      permission at that node, after deny-overrides-allow. Null otherwise.
+
+                      '
+                    items:
+                      type: object
+                      required:
+                      - permission
+                      - effect
+                      properties:
+                        permission:
+                          $ref: ../shared/permissions.yaml#/components/schemas/Permission
+                        effect:
+                          type: string
+                          enum:
+                          - PERMIT
+                          - DENY
   /auth/guest/register:
     post:
       operationId: registerGuest
@@ -1534,9 +1650,11 @@ paths:
       - anonymous
       summary: Create a guest account
       description: 'Email or mobile. Verification follows via OTP; the account exists but is unverified
-        until then, and an unverified account may browse but not transact — on the guest web and app it
-        is sent to sign-in before the cart. The full rule, including per-site guest checkout, is on
-        `verifyGuestEmail` (decided 17 September 2026).
+        until then, and an unverified account may browse and fill a cart but not transact — the gate is
+        the checkout page (`WEB-011`, `GST-041`), not the cart, and `checkoutCart` refuses until the guest
+        is verified or has proved the contact by code. The full rule, including per-site guest checkout,
+        is on `verifyGuestEmail` (decided 17 September 2026; gate moved to checkout by ADR-0045, 18
+        September 2026).
 
         '
       tags:
@@ -1556,6 +1674,9 @@ paths:
               $ref: '#/components/schemas/RegisterGuestRequest'
       responses:
         '201':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Created, pending verification
           content:
             application/json:
@@ -1624,6 +1745,9 @@ paths:
                   default: login
       responses:
         '202':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Sent if the identifier is deliverable
           content:
             application/json:
@@ -1674,6 +1798,9 @@ paths:
                   type: string
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Verified
           content:
             application/json:
@@ -1732,6 +1859,9 @@ paths:
                   type: string
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Signed in
           content:
             application/json:
@@ -1787,6 +1917,9 @@ paths:
                   type: string
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Signed in with a verified identity
           content:
             application/json:
@@ -1844,6 +1977,7 @@ paths:
       security:
       - guestAuth: []
       parameters:
+      - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       - name: allDevices
         in: query
         schema:
@@ -1851,6 +1985,9 @@ paths:
           default: false
       responses:
         '204':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Ended
   /auth/guest/link-checkout:
     post:
@@ -1861,8 +1998,11 @@ paths:
       x-ticvai-audience:
       - guest
       summary: Attach a guest checkout to an account
-      description: 'A guest who bought without an account, then registered. Orders matching the verified
-        contact detail are attached.
+      description: 'A guest who bought without an account, then registered. **The guest names one booking**
+        (`orderReference`, with `verificationCode` from its confirmation); it is attached only when its
+        contact detail matches the caller''s verified identifier, and 403 otherwise. Other guest-checkout
+        orders carrying the same verified contact detail are attached in the same call, and
+        `attachedOrderCount` counts every order attached.
 
         **Only orders whose contact detail matches the now-verified identifier.** Attaching on an unverified
         claim would hand someone else''s booking history to whoever asked for it.
@@ -1895,6 +2035,9 @@ paths:
                   description: From the booking confirmation. Proves possession of the booking.
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Attached
           content:
             application/json:
@@ -1903,6 +2046,7 @@ paths:
                 properties:
                   attachedOrderCount:
                     type: integer
+                    description: The named booking plus any other orders with the same verified contact detail.
         '403':
           description: Contact detail on the order does not match the verified identifier
           content:
@@ -1937,6 +2081,9 @@ paths:
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       responses:
         '202':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Erasure request raised
           content:
             application/json:
@@ -2086,6 +2233,9 @@ paths:
                   format: uuid
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Signed in
           content:
             application/json:
@@ -2163,6 +2313,9 @@ paths:
               $ref: '#/components/schemas/SsoProviderConfig'
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Configured
           content:
             application/json:
@@ -2194,10 +2347,10 @@ paths:
       - partner
       - guest
       x-ticvai-audience-note: '24 August: widened to include `guest`. **MFA and token refresh act on the
-        caller''s own ses sion, whoever the caller is** — a guest enrolling a second factor is the same
-        act as a cas hier doing it, and `WEB-016 Login / Register` was calling six staff-only operations
-        becaus e no guest equivalent existed. **Declaring them staff-only did not make them staff-only;
-        i t made the guest surface look like a violation.**
+        caller''s own session, whoever the caller is** — a guest enrolling a second factor is the same
+        act as a cashier doing it, and `WEB-016 Login / Register` was calling six staff-only operations
+        because no guest equivalent existed. **Declaring them staff-only did not make them staff-only;
+        it made the guest surface look like a violation.**
 
         '
       x-ticvai-read-routing: replica
@@ -2229,10 +2382,10 @@ paths:
       - partner
       - guest
       x-ticvai-audience-note: '24 August: widened to include `guest`. **MFA and token refresh act on the
-        caller''s own ses sion, whoever the caller is** — a guest enrolling a second factor is the same
-        act as a cas hier doing it, and `WEB-016 Login / Register` was calling six staff-only operations
-        becaus e no guest equivalent existed. **Declaring them staff-only did not make them staff-only;
-        i t made the guest surface look like a violation.**
+        caller''s own session, whoever the caller is** — a guest enrolling a second factor is the same
+        act as a cashier doing it, and `WEB-016 Login / Register` was calling six staff-only operations
+        because no guest equivalent existed. **Declaring them staff-only did not make them staff-only;
+        it made the guest surface look like a violation.**
 
         '
       summary: Enrol an MFA method
@@ -2265,6 +2418,9 @@ paths:
                   description: Phone or email for OTP methods.
       responses:
         '201':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Enrolment started, pending verification
           content:
             application/json:
@@ -2289,10 +2445,10 @@ paths:
       - partner
       - guest
       x-ticvai-audience-note: '24 August: widened to include `guest`. **MFA and token refresh act on the
-        caller''s own ses sion, whoever the caller is** — a guest enrolling a second factor is the same
-        act as a cas hier doing it, and `WEB-016 Login / Register` was calling six staff-only operations
-        becaus e no guest equivalent existed. **Declaring them staff-only did not make them staff-only;
-        i t made the guest surface look like a violation.**
+        caller''s own session, whoever the caller is** — a guest enrolling a second factor is the same
+        act as a cashier doing it, and `WEB-016 Login / Register` was calling six staff-only operations
+        because no guest equivalent existed. **Declaring them staff-only did not make them staff-only;
+        it made the guest surface look like a violation.**
 
         '
       summary: Complete enrolment
@@ -2318,7 +2474,14 @@ paths:
                   type: string
       responses:
         '200':
-          description: Active. Recovery codes are returned once and never again
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: 'Active. **No recovery codes here** — they were returned once, in the enrolment
+            response (`MfaEnrolment.recoveryCodes`, written by `enrolMfaMethod`), and are never returned
+            again.
+
+            '
           content:
             application/json:
               schema:
@@ -2340,10 +2503,10 @@ paths:
       - partner
       - guest
       x-ticvai-audience-note: '24 August: widened to include `guest`. **MFA and token refresh act on the
-        caller''s own ses sion, whoever the caller is** — a guest enrolling a second factor is the same
-        act as a cas hier doing it, and `WEB-016 Login / Register` was calling six staff-only operations
-        becaus e no guest equivalent existed. **Declaring them staff-only did not make them staff-only;
-        i t made the guest surface look like a violation.**
+        caller''s own session, whoever the caller is** — a guest enrolling a second factor is the same
+        act as a cashier doing it, and `WEB-016 Login / Register` was calling six staff-only operations
+        because no guest equivalent existed. **Declaring them staff-only did not make them staff-only;
+        it made the guest surface look like a violation.**
 
         '
       summary: Remove an MFA method
@@ -2363,6 +2526,9 @@ paths:
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       responses:
         '204':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Removed
         '409':
           description: Last remaining method on a role that requires MFA
@@ -2382,10 +2548,10 @@ paths:
       - partner
       - guest
       x-ticvai-audience-note: '24 August: widened to include `guest`. **MFA and token refresh act on the
-        caller''s own ses sion, whoever the caller is** — a guest enrolling a second factor is the same
-        act as a cas hier doing it, and `WEB-016 Login / Register` was calling six staff-only operations
-        becaus e no guest equivalent existed. **Declaring them staff-only did not make them staff-only;
-        i t made the guest surface look like a violation.**
+        caller''s own session, whoever the caller is** — a guest enrolling a second factor is the same
+        act as a cashier doing it, and `WEB-016 Login / Register` was calling six staff-only operations
+        because no guest equivalent existed. **Declaring them staff-only did not make them staff-only;
+        it made the guest surface look like a violation.**
 
         '
       summary: Step-up authentication for a sensitive action
@@ -2422,6 +2588,9 @@ paths:
                   format: uuid
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Challenge issued
           content:
             application/json:
@@ -2451,10 +2620,10 @@ paths:
       - partner
       - guest
       x-ticvai-audience-note: '24 August: widened to include `guest`. **MFA and token refresh act on the
-        caller''s own ses sion, whoever the caller is** — a guest enrolling a second factor is the same
-        act as a cas hier doing it, and `WEB-016 Login / Register` was calling six staff-only operations
-        becaus e no guest equivalent existed. **Declaring them staff-only did not make them staff-only;
-        i t made the guest surface look like a violation.**
+        caller''s own session, whoever the caller is** — a guest enrolling a second factor is the same
+        act as a cashier doing it, and `WEB-016 Login / Register` was calling six staff-only operations
+        because no guest equivalent existed. **Declaring them staff-only did not make them staff-only;
+        it made the guest surface look like a violation.**
 
         '
       summary: Complete a step-up challenge
@@ -2480,6 +2649,9 @@ paths:
                   type: string
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Verified. The step-up token is short-lived and single-purpose
           content:
             application/json:
@@ -2519,11 +2691,23 @@ paths:
       parameters:
       - name: venueId
         in: query
+        description: Exact match on `ActiveSession.venueId`.
         schema:
           type: string
           format: uuid
       - name: principalId
         in: query
+        description: Exact match on `ActiveSession.principalId`.
+        schema:
+          type: string
+          format: uuid
+      - name: workstationId
+        in: query
+        description: 'Exact match on `ActiveSession.workstationId` — **who holds this till**, which
+          `POS-000 Sign In` asks before offering a force-logout, without paging through every session
+          in the venue.
+
+          '
         schema:
           type: string
           format: uuid
@@ -2593,6 +2777,9 @@ paths:
                   default: true
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Revoked
           content:
             application/json:
@@ -2653,10 +2840,22 @@ paths:
       parameters:
       - name: status
         in: query
+        description: Exact match on `AccessPolicy.status`. Omitted returns every status.
         schema:
           type: string
+          enum:
+          - draft
+          - pendingApproval
+          - active
+          - suspended
+          - retired
       - name: scopePath
         in: query
+        description: 'Policies written at this node **or any node beneath it** — a prefix match on the
+          materialised path (`shared/common.yaml`, ScopeRef). To see what applies *at* a node, which
+          includes policies inherited from above, use `getAccessPolicyBundle` or `simulateAccessPolicy`.
+
+          '
         schema:
           type: string
       responses:
@@ -2700,6 +2899,9 @@ paths:
               $ref: '#/components/schemas/AccessPolicy'
       responses:
         '201':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Created as a draft
           content:
             application/json:
@@ -2760,6 +2962,9 @@ paths:
               $ref: '#/components/schemas/AccessPolicy'
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: A new version
           content:
             application/json:
@@ -2863,8 +3068,13 @@ paths:
                   type: array
                   items:
                     $ref: '#/components/schemas/AccessContext'
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: One decision per context
           content:
             application/json:
@@ -2902,6 +3112,8 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/AccessContext'
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       responses:
         '200':
           description: The decision, with its reasons
@@ -2933,11 +3145,17 @@ paths:
       parameters:
       - name: deviceId
         in: query
+        description: The device the bundle is issued to; recorded as `AccessPolicyBundle.deviceId`.
         schema:
           type: string
           format: uuid
       - name: scopePath
         in: query
+        description: 'The node the device decides at. The bundle holds the policies that **apply** there:
+          those written at this node or at any node above it, since inheritance is the prefix walk
+          (`AccessPolicy.scopePath`).
+
+          '
         schema:
           type: string
       responses:
@@ -3135,6 +3353,7 @@ paths:
           format: uuid
       - name: status
         in: query
+        description: Exact match on `IdentityCustomerMembership.status`. Omitted returns every status.
         schema:
           type: string
       responses:
@@ -3222,6 +3441,9 @@ paths:
               $ref: '#/components/schemas/IdentityBenefitUsage'
       responses:
         '201':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Recorded
           content:
             application/json:
@@ -3286,11 +3508,13 @@ paths:
       parameters:
       - name: moduleId
         in: query
+        description: Exact match on `IdentityPermission.moduleId`.
         schema:
           type: string
           format: uuid
       - name: action
         in: query
+        description: Exact match on `IdentityPermission.action`.
         schema:
           type: string
       responses:
@@ -3355,6 +3579,7 @@ components:
         id:
           type: string
           format: uuid
+          readOnly: true
         customerMembershipId:
           type: string
           format: uuid
@@ -3377,6 +3602,8 @@ components:
         remainingQuantity:
           type: number
           nullable: true
+          readOnly: true
+          description: Written on the row by the server when the usage is recorded; ignored in a request.
         notes:
           type: string
           maxLength: 500
@@ -3615,6 +3842,8 @@ components:
         id:
           type: string
           format: uuid
+          readOnly: true
+          description: Assigned by the server on `createAccessPolicy`; the path names the policy on update.
         code:
           type: string
         name:
@@ -3670,6 +3899,12 @@ components:
             format: uuid
         status:
           type: string
+          readOnly: true
+          description: '**Moved only by `setAccessPolicyState`.** A policy is created as a `draft`, and a
+            status sent in a create or update body is ignored — otherwise a write could skip the approval
+            3.3.26 requires.
+
+            '
           enum:
           - draft
           - pendingApproval
@@ -3679,6 +3914,8 @@ components:
         version:
           type: integer
           default: 1
+          readOnly: true
+          description: Set by the server; every `updateAccessPolicy` writes a new version.
         effectiveFrom:
           type: string
           format: date-time
@@ -3761,6 +3998,11 @@ components:
           - exists
         value:
           nullable: true
+          description: 'The single comparand for `equals`, `notEquals`, `greaterThan`, `lessThan`,
+            `contains` and `startsWith` — a string, number or boolean, by the attribute. Null for
+            `exists`; `in`, `notIn` and `between` use `values`.
+
+            '
         values:
           type: array
           items:
@@ -3808,7 +4050,10 @@ components:
         attributes:
           type: object
           additionalProperties: true
-          description: '**Supplied attributes are a fallback, not the source.** The evaluator resolves
+          description: '**Deliberately an open map**, keyed by attribute (the `AccessCondition.attribute`
+            vocabulary, with `key` for the `*.attribute` forms), each value the one a condition compares
+            against.
+            **Supplied attributes are a fallback, not the source.** The evaluator resolves
             what it can itself; a caller that could assert its own membership tier could assert any
             membership tier.
 
@@ -3866,6 +4111,10 @@ components:
         observedAttributes:
           type: object
           additionalProperties: true
+          description: '**Deliberately an open map**, the same keys as `AccessContext.attributes`: the value
+            of every attribute the evaluator actually read, whichever source it came from.
+
+            '
         overrideId:
           type: string
           format: uuid
@@ -3990,9 +4239,10 @@ components:
         isVerified:
           type: boolean
           description: 'False until an OTP or a verified provider identity confirms ownership. An unverified
-            account may browse but not transact: the guest web and app send it to sign-in before the cart,
-            and `checkoutCart` refuses it. UAE Pass returns a verified identity, so it starts true. Rule on
-            `verifyGuestEmail`, decided 17 September 2026.
+            account may browse and fill a cart but not transact: the gate is the checkout page
+            (ADR-0045), where `checkoutCart` refuses it until the guest verifies or proves the contact by
+            code. UAE Pass returns a verified identity, so it starts true. Rule on `verifyGuestEmail`,
+            decided 17 September 2026.
 
             '
         identityProviders:
@@ -4074,8 +4324,8 @@ components:
     PasswordPolicy:
       type: object
       x-ticvai-persistence: identity.password_policy
-      description: 'BL-144. **Settled-lane and never written.** No password policy, no lockout, no forced
-        change at first logon anywhere in the package.
+      description: 'BL-144. **Written by `setPasswordPolicy`, which returns it**, at tenant scope. Before BL-144
+        the package had no password policy, no lockout and no forced change at first logon anywhere.
 
         **Modelled on NIST SP 800-63B rather than on habit.** Length beats composition, and forced rotation
         on a schedule makes passwords worse — people increment a digit. Rotation is here because some
@@ -4090,8 +4340,13 @@ components:
         id:
           type: string
           format: uuid
+          readOnly: true
+          description: Assigned by the server. Required in the response only; ignored if a request sends it.
         scopePath:
           type: string
+          readOnly: true
+          description: '**The partition key** (ADR-0005), written by the server from the caller''s tenant
+            (`x-ticvai-config-scope: tenant`). Required in the response only; ignored if a request sends it.'
         minLength:
           type: integer
           default: 12
@@ -4237,6 +4492,7 @@ components:
           type: string
         atScopePath:
           type: string
+          nullable: true
           description: '**Where the two overlap**, and the field that makes a finding actionable:
             the answer is usually to narrow one grant rather than to remove it.
 
@@ -4401,7 +4657,9 @@ components:
             type: string
         scopePath:
           type: string
-          description: '**The partition key** (ADR-0005). Written at `tenant` scope.'
+          readOnly: true
+          description: '**The partition key** (ADR-0005). Written by the server at `tenant` scope; ignored
+            if a request sends it.'
 
     SegregationRule:
       type: object
@@ -4424,6 +4682,8 @@ components:
         id:
           type: string
           format: uuid
+          readOnly: true
+          description: Assigned by the server. Required in the response only; ignored if a request sends it.
         name:
           type: string
         permissionA:
@@ -4469,6 +4729,7 @@ components:
             '
         scopePath:
           type: string
+          readOnly: true
           description: '**The partition key** (ADR-0005). Added 31 August: the operations that write this
             table declare a scope and the table carried no column for it — **49 tables were in that state**,
             so a row could be written at venue scope and then read by anything that could reach the table.
@@ -4478,7 +4739,7 @@ components:
             `uae.dubai.marina`, and one index answers every level of the walk.
 
 
-            **Operations write it at `tenant` scope.**'
+            **Operations write it at `tenant` scope**; the server sets it and ignores it in a request.'
     RegisterGuestRequest:
       type: object
       required:
@@ -4502,6 +4763,7 @@ components:
           type: string
           minLength: 8
           maxLength: 256
+          writeOnly: true
           description: Optional. OTP-only accounts are supported and are the default.
         preferredLanguage:
           type: string
@@ -4546,6 +4808,7 @@ components:
           description: True disables password login for principals covered by this provider.
         scopePath:
           type: string
+          readOnly: true
           description: '**The partition key** (ADR-0005). Added 31 August: the operations that write this
             table declare a scope and the table carried no column for it — **49 tables were in that state**,
             so a row could be written at venue scope and then read by anything that could reach the table.
@@ -4555,7 +4818,7 @@ components:
             `uae.dubai.marina`, and one index answers every level of the walk.
 
 
-            **Operations write it at `tenant` scope.**'
+            **Operations write it at `tenant` scope**; the server sets it and ignores it in a request.'
     SsoGroupMapping:
       x-ticvai-persistence: identity.sso_group_mapping
       type: object
@@ -4702,7 +4965,11 @@ components:
           nullable: true
         recoveryCodes:
           type: array
-          description: Returned once on successful verification. Not retrievable afterwards.
+          description: 'Returned once, in this enrolment response (`enrolMfaMethod` writes them, hashed,
+            to `identity.mfa_recovery_code`). Not retrievable afterwards — `verifyMfaEnrolment` does not
+            return them.
+
+            '
           items:
             type: string
         expiresAt:
@@ -4843,6 +5110,7 @@ components:
         initialCredential:
           type: string
           maxLength: 512
+          writeOnly: true
         mustChangeCredential:
           type: boolean
           default: true
@@ -5126,6 +5394,7 @@ components:
 
             '
           maxLength: 512
+          writeOnly: true
         method:
           type: string
           description: '**`pin` is how a till is actually used.** A cashier signs in at a shared

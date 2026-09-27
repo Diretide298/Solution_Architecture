@@ -173,8 +173,7 @@ paths:
             application/json:
               schema: { $ref: '#/components/schemas/OrgUnit' }
           headers:
-            X-Consistency-Token:
-              schema: { type: string }
+            X-Consistency-Token: { $ref: '../shared/common.yaml#/components/headers/ConsistencyToken' }
         '400': { $ref: '../shared/common.yaml#/components/responses/BadRequest' }
         '403': { $ref: '../shared/common.yaml#/components/responses/Forbidden' }
         '409': { $ref: '../shared/common.yaml#/components/responses/Conflict' }
@@ -205,8 +204,15 @@ paths:
 
         **Never deletes and never edits.** The only operations on an audit record are write and
         read — which is why there is no `updateAuditRecord` here and never will be.
+
+        **Typed and paged** (pull audit R198, 26 September). The rows were free-form objects in a
+        bare array, so no screen could name a column and BO-035's *cursor pagination, never
+        offset* had nothing to page with. Each row is an `AuditRecord`, carrying exactly the
+        fields this operation filters on, and the list is the shared `Page`. **Gated by
+        `AUDIT_VIEW`, not `AI_AUDIT_VIEW`**: this is the platform trail of every principal's
+        actions, and the AI key covers only what an assistant did.
       tags: [tenancy]
-      x-ticvai-permission: AI_AUDIT_VIEW
+      x-ticvai-permission: AUDIT_VIEW
       x-ticvai-audience: [staff]
       x-ticvai-scope-level: venue
       x-ticvai-read-routing: analytical
@@ -237,16 +243,23 @@ paths:
         - name: to
           in: query
           schema: { type: string, format: date-time }
+        - $ref: '../shared/common.yaml#/components/parameters/PageSize'
+        - $ref: '../shared/common.yaml#/components/parameters/PageCursor'
       responses:
         '200':
           description: Records, most recent first
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  type: object
-                  additionalProperties: true
+                allOf:
+                  - $ref: '../shared/common.yaml#/components/schemas/Page'
+                  - type: object
+                    properties:
+                      items:
+                        type: array
+                        items: { $ref: '#/components/schemas/AuditRecord' }
+        '401': { $ref: '../shared/common.yaml#/components/responses/Unauthorized' }
+        '403': { $ref: '../shared/common.yaml#/components/responses/Forbidden' }
 
   /roles/{roleId}/permissions:
     parameters:
@@ -296,12 +309,23 @@ paths:
                 inheritsFromRoleId: { type: string, format: uuid, nullable: true }
       responses:
         '200':
-          description: Set
+          description: >
+            Set. The role's whole permission set as it now stands — the body echoed back after the
+            replace, so a screen can redraw the checklist without a second read.
           content:
             application/json:
               schema:
                 type: object
-                additionalProperties: true
+                required: [roleId, permissions]
+                properties:
+                  roleId: { type: string, format: uuid }
+                  permissions:
+                    type: array
+                    items: { $ref: '../shared/permissions.yaml#/components/schemas/Permission' }
+                  inheritsFromRoleId: { type: string, format: uuid, nullable: true }
+          headers:
+            X-Consistency-Token: { $ref: '../shared/common.yaml#/components/headers/ConsistencyToken' }
+        '404': { $ref: '../shared/common.yaml#/components/responses/NotFound' }
         '409':
           description: >
             **Breaches a segregation rule.** Names the rule and both permissions.
@@ -361,8 +385,49 @@ paths:
                         factor: { type: string, enum: [heartbeatAge, deviceOffline, deviceBattery, firmwareOutdated, syncBacklog, errorRate, profileDrift] }
                         detail: { type: string }
                         weight: { type: integer }
+        '404': { $ref: '../shared/common.yaml#/components/responses/NotFound' }
 
   /configuration-profiles:
+    get:
+      operationId: listConfigurationProfiles
+      x-ticvai-audience: [staff]
+      x-ticvai-read-routing: replica
+      summary: Every configuration profile, at its current version
+      description: >
+        26 September, pull audit R206. **`platform.configuration_profile` could be written and
+        not read.** `setConfigurationProfile` and `deployConfigurationProfile` were the only
+        operations on it, so BO-123's *every POS profile* list had nothing to list and BO-124's
+        *a profile opened from the list* had no list to open it from.
+
+        One row per profile, at its latest version. Earlier versions are read one at a time
+        through `getConfigurationProfile` with `version`.
+      tags: [tenancy]
+      x-ticvai-permission: TENANT_CONFIGURE
+      x-ticvai-scope-level: tenant
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - name: status
+          in: query
+          schema: { type: string, enum: [draft, published, deploying, deployed, superseded, rolledBack] }
+        - $ref: '../shared/common.yaml#/components/parameters/PageSize'
+        - $ref: '../shared/common.yaml#/components/parameters/PageCursor'
+      responses:
+        '200':
+          description: Profiles
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '../shared/common.yaml#/components/schemas/Page'
+                  - type: object
+                    properties:
+                      items:
+                        type: array
+                        items: { $ref: '#/components/schemas/ConfigurationProfile' }
+        '401': { $ref: '../shared/common.yaml#/components/responses/Unauthorized' }
+        '403': { $ref: '../shared/common.yaml#/components/responses/Forbidden' }
+
     put:
       operationId: setConfigurationProfile
       x-ticvai-consumed-by:
@@ -376,6 +441,23 @@ paths:
 
         **Publishing makes the version immutable.** A workstation still running v2.3 must be able to
         say what v2.3 was, and a profile edited underneath its deployments cannot.
+
+        **PUT semantics — an upsert keyed on the body's `id`** (pull audit R103). There is no id in
+        the path, so the body names its target:
+
+        - **No profile has that `id`:** the profile is created at version 1 and the answer is `201`.
+        - **Its latest version is `draft`:** the body replaces that draft whole, the version number
+          stays, and the answer is `200`.
+        - **Its latest version is `published` or later:** that version is left exactly as it is and
+          the body becomes the next version (`version` + 1), answered `200`. This is what *a change
+          makes a new version* means, and why no edit of a published version is ever refused — it
+          is never attempted.
+
+        **`status` on input is `draft` or `published`**, and sending `published` is how a version is
+        published. `deploying`, `deployed`, `superseded` and `rolledBack` belong to
+        `deployConfigurationProfile`; a body carrying one is a `400` with problem type `validation`.
+        `version`, `deployedCount` and `publishedAt` are server-owned and ignored on input. Omitted
+        optional fields are cleared, not kept.
       tags: [tenancy]
       x-ticvai-permission: TENANT_CONFIGURE
       x-ticvai-audience: [staff]
@@ -392,10 +474,94 @@ paths:
             schema: { $ref: '#/components/schemas/ConfigurationProfile' }
       responses:
         '200':
-          description: Set
+          description: Set — the draft replaced, or a new version stored after a published one
           content:
             application/json:
               schema: { $ref: '#/components/schemas/ConfigurationProfile' }
+          headers:
+            X-Consistency-Token: { $ref: '../shared/common.yaml#/components/headers/ConsistencyToken' }
+        '201':
+          description: Created — no profile had this `id`
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ConfigurationProfile' }
+          headers:
+            X-Consistency-Token: { $ref: '../shared/common.yaml#/components/headers/ConsistencyToken' }
+        '400': { $ref: '../shared/common.yaml#/components/responses/BadRequest' }
+        '403': { $ref: '../shared/common.yaml#/components/responses/Forbidden' }
+
+  /configuration-profiles/{profileId}:
+    parameters:
+      - name: profileId
+        in: path
+        required: true
+        schema: { type: string, format: uuid }
+    get:
+      operationId: getConfigurationProfile
+      x-ticvai-audience: [staff]
+      x-ticvai-read-routing: replica
+      summary: One profile, at its latest version or at a named one
+      description: >
+        26 September, pull audit R206. **A workstation still running v2.3 must be able to say what
+        v2.3 was** — the contract promised that and had no read that could answer it. `version`
+        omitted returns the latest.
+      tags: [tenancy]
+      x-ticvai-permission: TENANT_CONFIGURE
+      x-ticvai-scope-level: tenant
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - name: version
+          in: query
+          schema: { type: integer, minimum: 1 }
+      responses:
+        '200':
+          description: The profile
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ConfigurationProfile' }
+        '403': { $ref: '../shared/common.yaml#/components/responses/Forbidden' }
+        '404': { $ref: '../shared/common.yaml#/components/responses/NotFound' }
+
+  /profile-deployments:
+    get:
+      operationId: listProfileDeployments
+      x-ticvai-audience: [staff]
+      x-ticvai-read-routing: replica
+      summary: Recent deployments, with a date, a target and an outcome
+      description: >
+        26 September, pull audit R206. **`deployConfigurationProfile` said the board shows recent
+        deployments, and nothing read `platform.profile_deployment`.** Most recent first, by
+        `startedAt`.
+      tags: [tenancy]
+      x-ticvai-permission: TENANT_CONFIGURE
+      x-ticvai-scope-level: tenant
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - name: profileId
+          in: query
+          schema: { type: string, format: uuid }
+        - name: status
+          in: query
+          schema: { type: string, enum: [queued, inProgress, completed, partiallyFailed, rolledBack] }
+        - $ref: '../shared/common.yaml#/components/parameters/PageSize'
+        - $ref: '../shared/common.yaml#/components/parameters/PageCursor'
+      responses:
+        '200':
+          description: Deployments
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '../shared/common.yaml#/components/schemas/Page'
+                  - type: object
+                    properties:
+                      items:
+                        type: array
+                        items: { $ref: '#/components/schemas/ProfileDeployment' }
+        '401': { $ref: '../shared/common.yaml#/components/responses/Unauthorized' }
+        '403': { $ref: '../shared/common.yaml#/components/responses/Forbidden' }
 
   /configuration-profiles/{profileId}/deploy:
     parameters:
@@ -425,6 +591,12 @@ paths:
 
         **Failures group by reason.** Forty workstations failing for one cause is one problem, and
         forty rows is forty.
+
+        **The client names the version, the target and the strategy; the server owns the rest.**
+        `profileId` comes from the path, and `id`, `status`, the counts, `failureReasons`,
+        `startedAt` and `completedAt` are `readOnly` and ignored on input. **Only a published
+        version deploys** — a draft is still editable, and a version edited underneath its
+        deployments is what publishing exists to prevent.
       tags: [tenancy]
       x-ticvai-permission: TENANT_CONFIGURE
       x-ticvai-audience: [staff]
@@ -444,8 +616,49 @@ paths:
           content:
             application/json:
               schema: { $ref: '#/components/schemas/ProfileDeployment' }
+          headers:
+            X-Consistency-Token: { $ref: '../shared/common.yaml#/components/headers/ConsistencyToken' }
+        '404': { $ref: '../shared/common.yaml#/components/responses/NotFound' }
+        '409':
+          description: >
+            **The named version is not deployable** — it is still a `draft`, or this profile has no
+            such version. Names the version and its status.
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
 
   /offline-policy:
+    get:
+      operationId: getOfflinePolicy
+      x-ticvai-audience: [staff]
+      x-ticvai-read-routing: replica
+      summary: The offline policy saved at one scope node
+      description: >
+        26 September, pull audit R162 and R280. **The policy could be written and not read**, so
+        BO-130 had no way to show the values it was about to change.
+
+        **`scopePath` names the node**, the same key `setOfflinePolicy` upserts on. Where nothing
+        has been saved there the answer is still `200`: the schema defaults, with no `id`. A
+        policy that has never been set is the default policy, not a missing resource.
+      tags: [tenancy]
+      x-ticvai-permission: TENANT_CONFIGURE
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - name: scopePath
+          in: query
+          required: true
+          schema: { type: string, pattern: '^[a-z0-9_]+(\.[a-z0-9_]+)*$' }
+      responses:
+        '200':
+          description: The saved policy, or the defaults where none is saved
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/OfflinePolicy' }
+        '403': { $ref: '../shared/common.yaml#/components/responses/Forbidden' }
+        '404': { $ref: '../shared/common.yaml#/components/responses/NotFound' }
+
     put:
       operationId: setOfflinePolicy
       x-ticvai-consumed-by:
@@ -464,6 +677,15 @@ paths:
         **A till three days offline holding 900 unsynced sales is a reconciliation nobody can do**,
         which is what `maxOfflineHours` prevents — after it, the workstation refuses to sell rather
         than keep journalling.
+
+        **PUT semantics — one policy per scope node, upserted on the body's `scopePath`** (pull
+        audit R103, R162). There is no id in the path; `scopePath` names the target, and the
+        caller must hold the permission at or above it. Where no policy is saved at that path
+        one is created (`201`); where one is, the body replaces it whole (`200`). `id` is
+        server-owned and ignored on input. **An omitted field returns to its default** —
+        `maxOfflineHours` to 24, `onCeilingBreach` to `blockNewSales`, `requiresManagerToExtend`
+        to true — and an omitted `offlineValueCeiling`, `offlineTransactionCeiling` or
+        `allowedOffline` is cleared.
       tags: [tenancy]
       x-ticvai-permission: TENANT_CONFIGURE
       x-ticvai-audience: [staff]
@@ -480,12 +702,52 @@ paths:
             schema: { $ref: '#/components/schemas/OfflinePolicy' }
       responses:
         '200':
-          description: Set
+          description: Set — the policy at this `scopePath`, replaced
           content:
             application/json:
               schema: { $ref: '#/components/schemas/OfflinePolicy' }
+          headers:
+            X-Consistency-Token: { $ref: '../shared/common.yaml#/components/headers/ConsistencyToken' }
+        '201':
+          description: Created — no policy was saved at this `scopePath`
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/OfflinePolicy' }
+          headers:
+            X-Consistency-Token: { $ref: '../shared/common.yaml#/components/headers/ConsistencyToken' }
+        '403': { $ref: '../shared/common.yaml#/components/responses/Forbidden' }
+        '404': { $ref: '../shared/common.yaml#/components/responses/NotFound' }
 
   /connectivity-policy:
+    get:
+      operationId: getConnectivityPolicy
+      x-ticvai-audience: [staff]
+      x-ticvai-read-routing: replica
+      summary: The connectivity thresholds saved at one scope node
+      description: >
+        26 September, pull audit R280. **BO-131 loads the saved thresholds and nothing returned
+        them.** `scopePath` names the node, the same key `setConnectivityThresholds` upserts on.
+        Where nothing has been saved there the answer is `200` with the schema defaults and no
+        `id`.
+      tags: [tenancy]
+      x-ticvai-permission: TENANT_CONFIGURE
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - name: scopePath
+          in: query
+          required: true
+          schema: { type: string, pattern: '^[a-z0-9_]+(\.[a-z0-9_]+)*$' }
+      responses:
+        '200':
+          description: The saved thresholds, or the defaults where none are saved
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ConnectivityPolicy' }
+        '403': { $ref: '../shared/common.yaml#/components/responses/Forbidden' }
+        '404': { $ref: '../shared/common.yaml#/components/responses/NotFound' }
+
     put:
       operationId: setConnectivityThresholds
       x-ticvai-consumed-by:
@@ -502,6 +764,12 @@ paths:
 
         `minimumStableSeconds` is what stops it, and **it is the field a venue with poor wifi will
         actually tune.**
+
+        **PUT semantics — one set of thresholds per scope node, upserted on the body's
+        `scopePath`** (pull audit R103). There is no id in the path; `scopePath` names the target.
+        Where nothing is saved at that path a row is created (`201`); where one is, the body
+        replaces it whole (`200`). `id` is server-owned and ignored on input, and **an omitted
+        field returns to its default.**
       tags: [tenancy]
       x-ticvai-permission: TENANT_CONFIGURE
       x-ticvai-audience: [staff]
@@ -518,10 +786,21 @@ paths:
             schema: { $ref: '#/components/schemas/ConnectivityPolicy' }
       responses:
         '200':
-          description: Set
+          description: Set — the thresholds at this `scopePath`, replaced
           content:
             application/json:
               schema: { $ref: '#/components/schemas/ConnectivityPolicy' }
+          headers:
+            X-Consistency-Token: { $ref: '../shared/common.yaml#/components/headers/ConsistencyToken' }
+        '201':
+          description: Created — nothing was saved at this `scopePath`
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ConnectivityPolicy' }
+          headers:
+            X-Consistency-Token: { $ref: '../shared/common.yaml#/components/headers/ConsistencyToken' }
+        '403': { $ref: '../shared/common.yaml#/components/responses/Forbidden' }
+        '404': { $ref: '../shared/common.yaml#/components/responses/NotFound' }
 
   /venues/{venueId}/settings:
     parameters:
@@ -548,6 +827,19 @@ paths:
         - "P08 BO-142 Store Rules, Controls & Permissions"
         - "P08 BO-143 Retail Global Settings & Controls"
       summary: Operational settings for this venue
+      description: >
+        **What this returns, and what it does not.** `VenueSettings` holds the venue's trading
+        currency, support hours, quiet hours, biometrics, segregated access and alerting — the
+        things `setVenueSettings` writes. It carries **no module enablement and no F&B or retail
+        setting**, so a section landing that wants *what is enabled here*, or a store or kitchen
+        settings screen, does not get it from this read (pull audit R279). It is gated by
+        `TENANT_CONFIGURE`; a caller holding only a section's view permission is refused `403`.
+
+        **A venue with nothing saved still has settings** (pull audit R175). Where
+        `platform.venue_settings` has no row for this venue the answer is `200` with the schema
+        defaults, no `id`, and `currencyCode` and `currencyScale` null — which already means
+        *resolve from the region*. `404` means the venue does not exist or is outside the
+        caller's scope.
       tags: [tenancy]
       x-ticvai-permission: TENANT_CONFIGURE
       x-ticvai-audience: [staff]
@@ -557,10 +849,12 @@ paths:
       x-ticvai-conflict-policy: serverWins
       responses:
         '200':
-          description: Settings
+          description: Settings, or the defaults where none are saved
           content:
             application/json:
               schema: { $ref: '#/components/schemas/VenueSettings' }
+        '403': { $ref: '../shared/common.yaml#/components/responses/Forbidden' }
+        '404': { $ref: '../shared/common.yaml#/components/responses/NotFound' }
     put:
       operationId: setVenueSettings
       x-ticvai-consumed-by:
@@ -579,6 +873,19 @@ paths:
         Support hours were an open conflict for eleven days and were never a design question — the
         code is identical whether a desk runs 24/7 or nine to six, and **what was missing was
         somewhere to put the answer.**
+
+        **PUT semantics** (pull audit R103, R175). The target is the venue in the path, and a
+        venue has one settings row. The first save creates it and later saves replace it whole;
+        the answer is `200` either way, because before the first save the venue already had
+        settings — the defaults `getVenueSettings` returns. **An omitted property returns to its
+        default or to null.** `id`, `venueId`, `currencyCode`, `currencyScale`,
+        `segregatedAccess.entitlementGated` and `biometrics.acknowledgedByPrincipalId` are
+        `readOnly` and ignored on input.
+
+        **Refused with `422`** (pull audit R078) where the body asks for something the venue
+        cannot evidence: `biometrics.isEnabled` true without both `dpiaReference` and
+        `consentNoticeAcknowledgedAt`, or `segregatedAccess.genderVerification: deviceAssisted`
+        where no device in the venue reports the `genderClassification` capability.
       tags: [tenancy]
       x-ticvai-permission: TENANT_CONFIGURE
       x-ticvai-audience: [staff]
@@ -599,6 +906,20 @@ paths:
           content:
             application/json:
               schema: { $ref: '#/components/schemas/VenueSettings' }
+          headers:
+            X-Consistency-Token: { $ref: '../shared/common.yaml#/components/headers/ConsistencyToken' }
+        '400': { $ref: '../shared/common.yaml#/components/responses/BadRequest' }
+        '403': { $ref: '../shared/common.yaml#/components/responses/Forbidden' }
+        '404': { $ref: '../shared/common.yaml#/components/responses/NotFound' }
+        '422':
+          description: >
+            **An enable the venue cannot evidence.** Biometrics switched on without a DPIA
+            reference and a consent-notice acknowledgement, or device-assisted gender
+            verification where no device in the venue reports `genderClassification`. `errors[]`
+            names each missing field or the missing capability.
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
 
   /org-units/{orgUnitId}:
     parameters:
@@ -659,8 +980,16 @@ paths:
           content:
             application/json:
               schema: { $ref: '#/components/schemas/OrgUnit' }
+          headers:
+            X-Consistency-Token: { $ref: '../shared/common.yaml#/components/headers/ConsistencyToken' }
+        '400': { $ref: '../shared/common.yaml#/components/responses/BadRequest' }
         '403': { $ref: '../shared/common.yaml#/components/responses/Forbidden' }
         '404': { $ref: '../shared/common.yaml#/components/responses/NotFound' }
+        '409':
+          # Pull audit R219. The operation takes an Idempotency-Key and declared no 409, as
+          # `createOrgUnit` does. `platform.scope` has no row version, so the conflict here is
+          # the idempotency one only: a reused key with a different body.
+          $ref: '../shared/common.yaml#/components/responses/Conflict'
 
   /regions/{regionId}/settings:
     parameters:
@@ -703,6 +1032,13 @@ paths:
         Changing `currencyCode` or `currencyScale` after transactions exist is rejected.
         The ledger is append-only; a scale change would silently reinterpret historic
         amounts.
+
+        **PUT semantics** (pull audit R103). The target is the region in the path, which has one
+        settings row. Where it has none yet the body creates it, which is how setup fills
+        `platform.region_settings`; otherwise the body replaces it whole, and an omitted optional
+        field returns to its default. `placement` and `cellName` are set by the Control Plane,
+        `readOnly`, and ignored on input. `404` means the region does not exist or is outside
+        the caller's scope; until the first save `getRegionSettings` answers `404` as well.
       tags: [region]
       x-ticvai-permission: REGION_CONFIGURE
       x-ticvai-scope-level: region
@@ -721,7 +1057,11 @@ paths:
           content:
             application/json:
               schema: { $ref: '#/components/schemas/RegionSettings' }
+          headers:
+            X-Consistency-Token: { $ref: '../shared/common.yaml#/components/headers/ConsistencyToken' }
+        '400': { $ref: '../shared/common.yaml#/components/responses/BadRequest' }
         '403': { $ref: '../shared/common.yaml#/components/responses/Forbidden' }
+        '404': { $ref: '../shared/common.yaml#/components/responses/NotFound' }
         '409':
           description: >
             Currency or scale change rejected because transactions exist in this region.
@@ -793,6 +1133,11 @@ paths:
 
         Workstation determines presentation, hardware binding, till identity, access point
         and reporting dimension. It is never a permission source.
+
+        **Scope level `workstation` names where the permission must be held, not who calls.**
+        The workstation is the one in the path, so a back-office caller with no workstation of
+        its own is served when its grant sits at or above that workstation — a venue grant
+        covers every workstation beneath it (downward inheritance, permission-resolution.md).
       tags: [workstation]
       x-ticvai-permission: SCOPE_VIEW
       x-ticvai-scope-level: workstation
@@ -816,6 +1161,15 @@ paths:
       x-ticvai-audience: [staff]
       x-ticvai-config-scope: venue
       summary: Configure a workstation
+      description: >
+        **Configures an existing workstation; it never creates one** (pull audit R103). The
+        target is the workstation in the path, and the body has no code, venue or region, which
+        a new workstation would need — an unknown `workstationId` is `404`.
+        `mediaStockRemaining` is `readOnly` and ignored on input.
+
+        **Refused while a shift is open on this workstation** (F73, pull audit R078). Changing
+        the rules under an open shift means it closes against rules it did not open under, so
+        the change waits for the shift to close.
       tags: [workstation]
       x-ticvai-permission: WORKSTATION_CONFIGURE
       x-ticvai-scope-level: venue
@@ -834,8 +1188,18 @@ paths:
           content:
             application/json:
               schema: { $ref: '#/components/schemas/Workstation' }
+          headers:
+            X-Consistency-Token: { $ref: '../shared/common.yaml#/components/headers/ConsistencyToken' }
         '400': { $ref: '../shared/common.yaml#/components/responses/BadRequest' }
         '403': { $ref: '../shared/common.yaml#/components/responses/Forbidden' }
+        '404': { $ref: '../shared/common.yaml#/components/responses/NotFound' }
+        '409':
+          description: >
+            **A shift is open on this workstation.** The change is not applied; it can be made
+            once the shift has closed. Names the open shift.
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
 
   /outlets:
     get:
@@ -902,6 +1266,10 @@ paths:
           content:
             application/json:
               schema: { $ref: '#/components/schemas/Outlet' }
+          headers:
+            X-Consistency-Token: { $ref: '../shared/common.yaml#/components/headers/ConsistencyToken' }
+        '400': { $ref: '../shared/common.yaml#/components/responses/BadRequest' }
+        '403': { $ref: '../shared/common.yaml#/components/responses/Forbidden' }
         '409':
           description: Code already in use in this venue
           content:
@@ -914,6 +1282,28 @@ paths:
         in: path
         required: true
         schema: { type: string, format: uuid }
+    get:
+      operationId: getOutlet
+      x-ticvai-audience: [staff]
+      x-ticvai-read-routing: replica
+      summary: Read an outlet
+      description: >
+        26 September, pull audit R259 and R150. **An outlet could be amended and not read.**
+        `updateOutlet` edits one outlet and BO-063 opens one, and the only read was the whole
+        list.
+      tags: [workstation]
+      x-ticvai-permission: SCOPE_VIEW
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: true
+      x-ticvai-conflict-policy: serverWins
+      responses:
+        '200':
+          description: The outlet
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Outlet' }
+        '403': { $ref: '../shared/common.yaml#/components/responses/Forbidden' }
+        '404': { $ref: '../shared/common.yaml#/components/responses/NotFound' }
     patch:
       operationId: updateOutlet
       x-ticvai-consumed-by:
@@ -939,7 +1329,10 @@ paths:
                 name: { type: string, maxLength: 200 }
                 stockLocationId: { type: string, format: uuid }
                 costCenterId: { type: string, format: uuid }
-                openingHours: { type: array, items: { type: object } }
+                openingHours:
+                  type: array
+                  description: Replaces the whole weekly pattern. An empty array clears it.
+                  items: { $ref: '#/components/schemas/OpeningHoursWindow' }
                 isActive: { type: boolean }
       responses:
         '200':
@@ -947,6 +1340,11 @@ paths:
           content:
             application/json:
               schema: { $ref: '#/components/schemas/Outlet' }
+          headers:
+            X-Consistency-Token: { $ref: '../shared/common.yaml#/components/headers/ConsistencyToken' }
+        '400': { $ref: '../shared/common.yaml#/components/responses/BadRequest' }
+        '403': { $ref: '../shared/common.yaml#/components/responses/Forbidden' }
+        '404': { $ref: '../shared/common.yaml#/components/responses/NotFound' }
 
   /sale-boards:
     get:
@@ -1017,6 +1415,9 @@ paths:
           content:
             application/json:
               schema: { $ref: '#/components/schemas/SaleBoard' }
+          headers:
+            X-Consistency-Token: { $ref: '../shared/common.yaml#/components/headers/ConsistencyToken' }
+        '403': { $ref: '../shared/common.yaml#/components/responses/Forbidden' }
         '400':
           description: A tile references an unknown or unsellable variant
           content:
@@ -1045,6 +1446,11 @@ paths:
       description: >
         Changes reach terminals with the next catalogue bundle, not immediately — a board that
         rearranged itself mid-transaction would be worse than one that lags.
+
+        **PUT semantics** (pull audit R103). The target is the board in the path; this never
+        creates one. The body replaces the board whole — every page and every tile — so a page
+        or tile left out is removed. `id` is `readOnly` and ignored on input. Tiles are checked
+        as `createSaleBoard` checks them.
       tags: [workstation]
       x-ticvai-permission: WORKSTATION_CONFIGURE
       x-ticvai-scope-level: venue
@@ -1063,6 +1469,15 @@ paths:
           content:
             application/json:
               schema: { $ref: '#/components/schemas/SaleBoard' }
+          headers:
+            X-Consistency-Token: { $ref: '../shared/common.yaml#/components/headers/ConsistencyToken' }
+        '400':
+          description: A tile references an unknown or unsellable variant
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+        '403': { $ref: '../shared/common.yaml#/components/responses/Forbidden' }
+        '404': { $ref: '../shared/common.yaml#/components/responses/NotFound' }
 
   /devices:
     get:
@@ -1082,6 +1497,9 @@ paths:
       description: >
         Physical devices bound to workstations. Distinct from Device Management, which covers
         the full estate lifecycle — this is the binding a workstation needs at boot.
+
+        **`pushToken` is never in a row** (pull audit R164). It is `writeOnly`: a push token is a
+        credential, and a list at venue level is not where a credential is read back.
       tags: [workstation]
       x-ticvai-permission: DEVICE_VIEW
       x-ticvai-scope-level: venue
@@ -1122,6 +1540,12 @@ paths:
         Binds a device to a workstation and names the driver. Drivers are built to open
         standards where they exist — ESC/POS, UnifiedPOS, OSDP — so adding a vendor is a
         driver plus configuration rather than a core change (ADR-0015).
+
+        **The server assigns the id** (pull audit R079). `id` and everything the device reports
+        or the platform derives — `status`, `health`, `batteryPercent`, `firmwareVersion`,
+        `lastHeartbeatAt`, `lastCheckedAt`, `pushFailureCount`, `capabilities`,
+        `enrolmentState`, `retiredAt`, `configurationProfileId` — are `readOnly` and ignored on
+        input. A new device starts `registered`; `enrolDevice` moves it on.
       tags: [workstation]
       x-ticvai-permission: DEVICE_CONFIGURE
       x-ticvai-scope-level: venue
@@ -1140,11 +1564,44 @@ paths:
           content:
             application/json:
               schema: { $ref: '#/components/schemas/RegisteredDevice' }
+          headers:
+            X-Consistency-Token: { $ref: '../shared/common.yaml#/components/headers/ConsistencyToken' }
+        '400': { $ref: '../shared/common.yaml#/components/responses/BadRequest' }
+        '403': { $ref: '../shared/common.yaml#/components/responses/Forbidden' }
         '409':
           description: Identifier already bound to another workstation
           content:
             application/problem+json:
               schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+
+  /devices/{deviceId}:
+    parameters:
+      - name: deviceId
+        in: path
+        required: true
+        schema: { type: string, format: uuid }
+    get:
+      operationId: getDevice
+      x-ticvai-audience: [staff]
+      x-ticvai-read-routing: replica
+      summary: Read one registered device
+      description: >
+        26 September, pull audit R259. **`/devices` had a list and a register and no read of
+        one**, so a device opened from another screen by its id could be found only by paging
+        the whole list. `pushToken` is `writeOnly` and never returned.
+      tags: [workstation]
+      x-ticvai-permission: DEVICE_VIEW
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      responses:
+        '200':
+          description: The device
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/RegisteredDevice' }
+        '403': { $ref: '../shared/common.yaml#/components/responses/Forbidden' }
+        '404': { $ref: '../shared/common.yaml#/components/responses/NotFound' }
 
   /devices/{deviceId}/heartbeat:
     parameters:
@@ -1166,6 +1623,12 @@ paths:
         Reports reachability and consumables — paper low, drawer open, reader offline. A
         required device that stops reporting blocks shift open, which is better discovered
         before a queue forms than during one.
+
+        **Called by the device, never by a person** (pull audit R100). The caller is the enrolled
+        device named in the path, and the workstation this is scoped to is the one that device
+        is bound to — there is no other workstation to resolve, and a back-office session has
+        none. A screen that shows device state reads it through `listDevices`, `getDevice` or
+        `getWorkstationHealth`; it does not call this.
       tags: [workstation]
       x-ticvai-permission: null   # a registered device, authenticated by its enrolment rather than a person
       x-ticvai-scope-level: workstation
@@ -1186,8 +1649,14 @@ paths:
                 detail: { type: string, maxLength: 500 }
                 firmwareVersion: { type: string }
                 recordedAt: { type: string, format: date-time }
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       responses:
-        '204': { description: Recorded }
+        '204':
+          description: Recorded
+          headers:
+            X-Consistency-Token: { $ref: '../shared/common.yaml#/components/headers/ConsistencyToken' }
+        '404': { $ref: '../shared/common.yaml#/components/responses/NotFound' }
   /devices/{deviceId}/enrolment:
     parameters:
     - name: deviceId
@@ -1236,6 +1705,11 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/RegisteredDevice'
+          headers:
+            X-Consistency-Token:
+              $ref: ../shared/common.yaml#/components/headers/ConsistencyToken
+        '404':
+          $ref: ../shared/common.yaml#/components/responses/NotFound
         '409':
           description: The transition is not allowed from the current state
           content:
@@ -1263,6 +1737,13 @@ paths:
         **Custody is what makes a loss investigable.** A scanner that disappears is a scanner somebody
         last had, and a model that only knows its workstation cannot say who.
 
+
+        **PUT semantics** (pull audit R103). The target is the device in the path, which has one
+        assignment. The first call creates it and later calls replace it whole, answered `200`
+        either way; an omitted field is cleared to null. `deviceId` comes from the path, and
+        `lastSeenLocation` (reported by the heartbeat), `assignedAt` and `scopePath` are
+        server-owned; all four are `readOnly` and ignored on input.
+
         '
       tags:
       - devices
@@ -1285,6 +1766,11 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/DeviceAssignment'
+          headers:
+            X-Consistency-Token:
+              $ref: ../shared/common.yaml#/components/headers/ConsistencyToken
+        '404':
+          $ref: ../shared/common.yaml#/components/responses/NotFound
   /devices/{deviceId}/telemetry:
     parameters:
     - name: deviceId
@@ -1340,6 +1826,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/DeviceTelemetryPoint'
+        '404':
+          $ref: ../shared/common.yaml#/components/responses/NotFound
   /device-firmware:
     get:
       operationId: listDeviceFirmware
@@ -1408,6 +1896,9 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/DeviceFirmwareRollout'
+          headers:
+            X-Consistency-Token:
+              $ref: ../shared/common.yaml#/components/headers/ConsistencyToken
   /device-firmware/rollouts/{rolloutId}/rollback:
     parameters:
     - name: rolloutId
@@ -1422,6 +1913,11 @@ paths:
       description: '16.6.34. **The requirement that makes the rest safe.** A staged rollout is only a
         containment strategy if there is a way back, and the previous image has to still be on the device
         for that to be true — which is a constraint on the rollout, not on the rollback.
+
+
+        **Refused where the way back is gone** (pull audit R078). A rollout started with
+        `previousVersionRetained: false` kept no previous image, and a rollback of it is a `409`
+        rather than a request that silently does nothing.
 
         '
       tags:
@@ -1456,6 +1952,18 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/DeviceFirmwareRollout'
+          headers:
+            X-Consistency-Token:
+              $ref: ../shared/common.yaml#/components/headers/ConsistencyToken
+        '404':
+          $ref: ../shared/common.yaml#/components/responses/NotFound
+        '409':
+          description: The rollout kept no previous image (`previousVersionRetained` false), so there
+            is nothing to roll back to
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
   /devices/{deviceId}/credentials:
     parameters:
     - name: deviceId
@@ -1504,6 +2012,11 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/DeviceCredential'
+          headers:
+            X-Consistency-Token:
+              $ref: ../shared/common.yaml#/components/headers/ConsistencyToken
+        '404':
+          $ref: ../shared/common.yaml#/components/responses/NotFound
     delete:
       operationId: revokeDeviceCredential
       summary: Cut a device off now
@@ -1514,6 +2027,7 @@ paths:
       - staff
       x-ticvai-scope-level: venue
       parameters:
+      - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       - name: reason
         in: query
         required: true
@@ -1522,6 +2036,11 @@ paths:
       responses:
         '204':
           description: Revoked
+          headers:
+            X-Consistency-Token:
+              $ref: ../shared/common.yaml#/components/headers/ConsistencyToken
+        '404':
+          $ref: ../shared/common.yaml#/components/responses/NotFound
   /devices/{deviceId}/audit:
     parameters:
     - name: deviceId
@@ -1574,6 +2093,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/DeviceAuditRecord'
+        '404':
+          $ref: ../shared/common.yaml#/components/responses/NotFound
   /device-tamper-events:
     get:
       operationId: listDeviceTamperEvents
@@ -1631,6 +2152,9 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/DeviceTamperEvent'
+          headers:
+            X-Consistency-Token:
+              $ref: ../shared/common.yaml#/components/headers/ConsistencyToken
 
   /cells/{cellId}/endpoints:
     get:
@@ -1664,8 +2188,82 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/PlatformCellEndpoint'
+        '404':
+          $ref: ../shared/common.yaml#/components/responses/NotFound
 components:
+  # **Server-owned fields are `readOnly`, secrets are `writeOnly`** (pull audit R079, R164).
+  # createOutlet, createSaleBoard, updateSaleBoard, registerDevice, deployConfigurationProfile,
+  # the policy PUTs and setVenueSettings take these schemas as their body, and without the marks
+  # a client had to invent the id and send back what the device reports or the server derives.
+  # OpenAPI 3.1: a `readOnly` property listed in `required` is required in responses only, and a
+  # client that sends one has it ignored. A `writeOnly` property is accepted and never returned.
+  #
+  # **Wall-clock times and calendar dates are the region's** (pull audit R143). Region owns the
+  # time zone, inherited by every venue and not overridable (RegionSettings.timeZone). So an
+  # wall-clock time in an opening-hours window, a support or quiet-hours window, a segregated-
+  # access schedule or a maintenance window, and a `format: date`, are read in the time zone of the
+  # region the row sits in — except where a schema names its own zone, as `supportHours.timezone`
+  # does. `format: date-time` fields are instants in UTC, as naming-and-style 5.2 says.
   schemas:
+    AuditRecord:
+      type: object
+      x-ticvai-persistence: "platform.audit_record"
+      description: >
+        26 September, pull audit R198. **One row of the platform audit trail, as `listAuditRecords`
+        returns it.** It was a free-form object, so nothing said what an audit row carries. These
+        are the fields the operation already filters on — who, where, on which workstation, what
+        action, on what, and when — and nothing more. Written by the operations that audit
+        themselves; never edited and never deleted.
+      required: [id, action, occurredAt]
+      properties:
+        id: { type: string, format: uuid, readOnly: true }
+        principalId:
+          type: string
+          format: uuid
+          description: Who acted.
+        orgUnitId:
+          type: string
+          format: uuid
+          nullable: true
+          description: The scope node the action happened in.
+        workstationId:
+          type: string
+          format: uuid
+          nullable: true
+          description: The workstation it was done from, where there was one.
+        action:
+          type: string
+          description: What was done, as the writing operation names it.
+        subjectRef:
+          type: string
+          nullable: true
+          description: >
+            **The thing acted on** — a profile, a shift, an order. The same value the `subjectRef`
+            filter matches.
+        occurredAt:
+          type: string
+          format: date-time
+          description: When. The list is ordered by this, most recent first.
+
+    OpeningHoursWindow:
+      type: object
+      description: >
+        26 September, pull audit R088. **One weekly window an outlet is open.** `Outlet.openingHours`
+        was an array of untyped objects. The shape is the one `supportHours.windows` already uses —
+        a day and a from/to — with the times as local `HH:MM` in the region's time zone. Several
+        windows on one day are a split shift, such as lunch and dinner.
+      required: [day, from, to]
+      properties:
+        day: { type: string, enum: [mon, tue, wed, thu, fri, sat, sun] }
+        from:
+          type: string
+          pattern: '^([01][0-9]|2[0-3]):[0-5][0-9]$'
+          description: Local time, 24-hour `HH:MM`, when the outlet opens.
+        to:
+          type: string
+          pattern: '^([01][0-9]|2[0-3]):[0-5][0-9]$'
+          description: Local time, 24-hour `HH:MM`, when the outlet closes.
+
     PlatformCellEndpoint:
       type: object
       x-ticvai-persistence: platform.cell_endpoint
@@ -1723,6 +2321,8 @@ components:
         deviceId:
           type: string
           format: uuid
+          readOnly: true
+          description: From the path of `setDeviceAssignment`.
         ownerOrgUnitId:
           type: string
           format: uuid
@@ -1743,6 +2343,7 @@ components:
         lastSeenLocation:
           type: string
           nullable: true
+          readOnly: true
           description: Reported by the heartbeat; distinct from where it is supposed to be.
         assetTag:
           type: string
@@ -1751,15 +2352,19 @@ components:
           type: string
           format: date
           nullable: true
+          description: A calendar date in the region's time zone.
         warrantyExpiresAt:
           type: string
           format: date
           nullable: true
+          description: A calendar date in the region's time zone.
         assignedAt:
           type: string
           format: date-time
+          readOnly: true
         scopePath:
           type: string
+          readOnly: true
     DeviceTelemetryPoint:
       type: object
       x-ticvai-persistence: tenancy.device_telemetry
@@ -1857,6 +2462,7 @@ components:
         id:
           type: string
           format: uuid
+          readOnly: true
         firmwareId:
           type: string
           format: uuid
@@ -1891,6 +2497,9 @@ components:
         maintenanceWindow:
           type: object
           nullable: true
+          description: >
+            **When a device may be updated.** `from` and `to` are wall-clock values read in the
+            region's time zone, not UTC.
           properties:
             from:
               type: string
@@ -1905,6 +2514,7 @@ components:
             '
         status:
           type: string
+          readOnly: true
           enum:
           - scheduled
           - running
@@ -1920,6 +2530,7 @@ components:
           readOnly: true
         scopePath:
           type: string
+          readOnly: true
     DeviceCredential:
       type: object
       x-ticvai-persistence: tenancy.device_credential
@@ -2016,6 +2627,7 @@ components:
         id:
           type: string
           format: uuid
+          readOnly: true
         deviceId:
           type: string
           format: uuid
@@ -2050,6 +2662,7 @@ components:
           nullable: true
         scopePath:
           type: string
+          readOnly: true
     OutletKind:
       type: string
       enum: [shop, restaurant, bar, cafe, kiosk, gameFloor, ticketOffice, mobile]
@@ -2079,15 +2692,23 @@ components:
           items: { type: string }
         version:
           type: integer
+          readOnly: true
           description: >
             **Immutable once deployed anywhere.** A change makes a new version, and the old one
             stays readable — a workstation still running v2.3 must be able to say what v2.3 was.
+            Assigned by the server: 1 on create, and one more each time a change lands on a
+            published version (see `setConfigurationProfile`).
         settings:
           type: object
           additionalProperties: true
-        status: { type: string, enum: [draft, published, deploying, deployed, superseded, rolledBack] }
+        status:
+          type: string
+          enum: [draft, published, deploying, deployed, superseded, rolledBack]
+          description: >
+            On input only `draft` or `published`; sending `published` publishes this version. The
+            other four are set by deployment and refused on input.
         deployedCount: { type: integer, readOnly: true }
-        publishedAt: { type: string, format: date-time, nullable: true }
+        publishedAt: { type: string, format: date-time, nullable: true, readOnly: true }
 
     ProfileDeployment:
       type: object
@@ -2100,27 +2721,41 @@ components:
         simultaneously is how a venue discovers a bad profile at every till at the same moment.
       required: [id, profileId, version, status]
       properties:
-        id: { type: string, format: uuid }
-        profileId: { type: string, format: uuid }
-        version: { type: integer }
+        id: { type: string, format: uuid, readOnly: true }
+        profileId:
+          type: string
+          format: uuid
+          readOnly: true
+          description: Taken from the path of `deployConfigurationProfile`.
+        version:
+          type: integer
+          description: The published version to deploy.
         targetWorkstationIds: { type: array, items: { type: string, format: uuid } }
         targetFilter:
           type: object
           nullable: true
-          description: By department, type or venue, where the target is a set rather than a list.
-          additionalProperties: true
+          description: >
+            By department, type or venue, where the target is a set rather than a list.
+          properties:
+            venueIds: { type: array, items: { type: string, format: uuid } }
+            departmentIds: { type: array, items: { type: string, format: uuid } }
+            workstationTypes:
+              type: array
+              description: The same workstation-type values `ConfigurationProfile.venueKindScope` holds.
+              items: { type: string }
         strategy: { type: string, enum: [immediate, staged, onNextIdle], default: onNextIdle }
-        status: { type: string, enum: [queued, inProgress, completed, partiallyFailed, rolledBack] }
+        status: { type: string, enum: [queued, inProgress, completed, partiallyFailed, rolledBack], readOnly: true }
         succeededCount: { type: integer, readOnly: true }
         failedCount: { type: integer, readOnly: true }
         failureReasons:
           type: object
+          readOnly: true
           additionalProperties: { type: integer }
           description: >
             **Grouped, because 40 workstations failing for one reason is one problem** and a list of
             40 rows is forty.
-        startedAt: { type: string, format: date-time }
-        completedAt: { type: string, format: date-time, nullable: true }
+        startedAt: { type: string, format: date-time, readOnly: true }
+        completedAt: { type: string, format: date-time, nullable: true, readOnly: true }
 
     OfflinePolicy:
       type: object
@@ -2132,10 +2767,18 @@ components:
         CF-115 reframed offline into three data classes: catalogue and policy always local, contended
         inventory leased, transactional facts journalled. **This is where a venue says how far that
         goes for them.**
-      required: [id, scopePath]
+
+        **One per scope node, keyed on `scopePath`** (pull audit R162). `id` is server-owned and
+        absent where `getOfflinePolicy` returns the defaults for a node with nothing saved.
+      required: [scopePath]
       properties:
-        id: { type: string, format: uuid }
-        scopePath: { type: string }
+        id: { type: string, format: uuid, readOnly: true }
+        scopePath:
+          type: string
+          pattern: '^[a-z0-9_]+(\.[a-z0-9_]+)*$'
+          description: >
+            **The node this policy is for, and the key `setOfflinePolicy` upserts on.** The body
+            names its target here, because the path does not.
         maxOfflineHours:
           type: integer
           default: 24
@@ -2174,10 +2817,18 @@ components:
         **Going offline and coming back need different thresholds.** Symmetric ones produce a
         workstation that flaps — offline, online, offline — across a marginal connection, and each
         flap is a sync.
-      required: [id, scopePath]
+
+        **One per scope node, keyed on `scopePath`.** `id` is server-owned and absent where
+        `getConnectivityPolicy` returns the defaults for a node with nothing saved.
+      required: [scopePath]
       properties:
-        id: { type: string, format: uuid }
-        scopePath: { type: string }
+        id: { type: string, format: uuid, readOnly: true }
+        scopePath:
+          type: string
+          pattern: '^[a-z0-9_]+(\.[a-z0-9_]+)*$'
+          description: >
+            **The node these thresholds are for, and the key `setConnectivityThresholds` upserts
+            on.** The body names its target here, because the path does not.
         failuresBeforeOffline:
           type: integer
           default: 3
@@ -2206,7 +2857,7 @@ components:
       x-ticvai-persistence: "platform.outlet"
       required: [id, code, name, venueId, kind]
       properties:
-        id: { type: string, format: uuid }
+        id: { type: string, format: uuid, readOnly: true }
         code: { type: string, maxLength: 64 }
         name: { type: string, maxLength: 200 }
         venueId: { type: string, format: uuid }
@@ -2226,7 +2877,8 @@ components:
           description: Revenue and cost attribution. Outlet is the natural grain for both.
         openingHours:
           type: array
-          items: { type: object }
+          description: The weekly pattern, one entry per window. Several windows on a day are allowed.
+          items: { $ref: '#/components/schemas/OpeningHoursWindow' }
         isActive: { type: boolean }
 
     SaleBoard:
@@ -2234,7 +2886,7 @@ components:
       type: object
       required: [id, code, name, venueId, kind, pages]
       properties:
-        id: { type: string, format: uuid }
+        id: { type: string, format: uuid, readOnly: true }
         code: { type: string, maxLength: 64 }
         name: { type: string, maxLength: 200 }
         venueId: { type: string, format: uuid }
@@ -2269,7 +2921,7 @@ components:
       type: object
       required: [id, kind, driver, workstationId]
       properties:
-        id: { type: string, format: uuid }
+        id: { type: string, format: uuid, readOnly: true }
         kind: { $ref: '#/components/schemas/DeviceKind' }
         driver:
           type: string
@@ -2283,13 +2935,15 @@ components:
           type: string
           format: password
           nullable: true
+          writeOnly: true
           description: >
             BL-163. **Guest devices register for push and staff devices did not** —
             `registerGuestDevice` exists with a token, platform and failure count, and a scanner
             that cannot be told anything is a scanner somebody has to walk to.
 
-            Write-only. **A push token is a credential**, and the rule that no surface holds a
-            provider key applies here too.
+            Write-only, and marked `writeOnly`: accepted by `registerDevice` and never returned by
+            `listDevices` or `getDevice`. **A push token is a credential**, and the rule that no
+            surface holds a provider key applies here too.
         pushPlatform:
           type: string
           nullable: true
@@ -2297,6 +2951,7 @@ components:
         pushFailureCount:
           type: integer
           default: 0
+          readOnly: true
           description: >
             **Consecutive failures.** A token that has failed repeatedly is a device that was wiped
             or reassigned, and continuing to push to it is how a notification queue fills with
@@ -2312,16 +2967,23 @@ components:
             **`fullVenue` on a personal handset is a decision, not a default** — a device that can
             do everything offline is a device that carries the whole venue's data in somebody's
             pocket.
-        firmwareVersion: { type: string, nullable: true }
+        firmwareVersion:
+          type: string
+          nullable: true
+          readOnly: true
+          description: As the device last reported it on its heartbeat.
         isRequired:
           type: boolean
           description: True blocks shift open when the device is unreachable.
         status:
           type: string
+          readOnly: true
           enum: [online, offline, error, consumableLow, needsAttention, unknown]
+          description: What the device last said on its heartbeat; `unknown` until it has.
         batteryPercent:
           type: integer
           nullable: true
+          readOnly: true
           minimum: 0
           maximum: 100
           description: >
@@ -2334,6 +2996,7 @@ components:
           type: string
           format: date-time
           nullable: true
+          readOnly: true
           description: >
             **Distinct from `lastHeartbeatAt`.** A heartbeat is the workstation saying the device
             is attached; a check is the device answering. **A printer with no paper heartbeats
@@ -2342,13 +3005,15 @@ components:
           type: string
           enum: [healthy, warning, degraded, offline, unknown]
           default: unknown
+          readOnly: true
           description: >
             **Derived, not reported.** Computed from heartbeat age, battery, firmware currency and
             error rate — a device does not know whether it is healthy, and asking it produces a
             fleet that is 100% healthy and 12% broken.
-        lastHeartbeatAt: { type: string, format: date-time, nullable: true }
+        lastHeartbeatAt: { type: string, format: date-time, nullable: true, readOnly: true }
         capabilities:
           type: array
+          readOnly: true
           items:
             $ref: '#/components/schemas/DeviceCapability'
           description: >
@@ -2364,6 +3029,7 @@ components:
           type: string
           enum: [registered, enrolled, provisioned, active, deactivated, retired]
           default: registered
+          readOnly: true
           description: >
             BL-160. **Where the device is in its life, which is not the same question as whether
             it is answering.** `enrolDevice` has taken the whole matrix — registered, enrolled,
@@ -2382,6 +3048,7 @@ components:
           type: string
           format: date-time
           nullable: true
+          readOnly: true
           description: >
             **Set when `enrolmentState` reaches `retired`, and null otherwise.** Derivable from
             `tenancy.device_audit`, and kept as a column for the same reason
@@ -2391,6 +3058,7 @@ components:
           type: string
           format: uuid
           nullable: true
+          readOnly: true
           description: >
             **The profile this device was provisioned with.** `enrolDevice` has accepted one since
             16.1.3 and there was nowhere to keep it, so the answer to *"what is this reader
@@ -2467,6 +3135,11 @@ components:
 
         Only F&B and retail configuration resolves at outlet. Everything else has no outlet on
         its path and resolves from venue exactly as before.
+
+        **The shared copy in `common.yaml` adds `subject`, and that is not a ninth level**
+        (pull audit R105). It is valid only as an operation's `x-ticvai-scope-level`, for
+        operations on one guest's own resources, which sit in no node of this hierarchy. Every
+        `OrgUnit.level` is one of the eight here.
       enum: [tenant, brand, region, venue, department, subDepartment, workstation, outlet]
 
     OrgUnit:
@@ -2522,7 +3195,11 @@ components:
           readOnly: true
           description: >
             **Added 20 August.** The schema reference derives table columns from API response schemas, and a response is not a table — this one returned everything a caller needs and not the row's own identity, so the table had no key and no row could be addressed, updated or deleted. Found by an audit of all 365 tables, not by a reader.
-        venueId: { type: string, format: uuid }
+        venueId:
+          type: string
+          format: uuid
+          readOnly: true
+          description: From the path of `setVenueSettings`.
         currencyCode:
           type: string
           pattern: ^[A-Z]{3}$
@@ -2565,15 +3242,19 @@ components:
             the code is identical either way, and what was missing was somewhere to put the answer.
           properties:
             mode: { type: string, enum: [alwaysOn, businessHours, custom, none] }
-            timezone: { type: string }
+            timezone:
+              type: string
+              description: >
+                IANA zone the `windows` are read in. Absent, they are read in the region's
+                `timeZone`, like every other wall-clock time in this contract.
             windows:
               type: array
               items:
                 type: object
                 properties:
                   day: { type: string, enum: [mon, tue, wed, thu, fri, sat, sun] }
-                  from: { type: string }
-                  to: { type: string }
+                  from: { type: string, description: Wall-clock time the desk opens. }
+                  to: { type: string, description: Wall-clock time the desk closes. }
             outOfHoursMessage: { type: string, nullable: true }
         quietHours:
           type: object
@@ -2585,8 +3266,8 @@ components:
             **Operational messages ignore it** — a queue-turn alert is why a guest is holding the
             phone.
           properties:
-            from: { type: string }
-            to: { type: string }
+            from: { type: string, description: Wall-clock time sending stops, in the region's time zone. }
+            to: { type: string, description: Wall-clock time sending resumes, in the region's time zone. }
         biometrics:
           type: object
           nullable: true
@@ -2634,10 +3315,12 @@ components:
               type: string
               format: uuid
               nullable: true
+              readOnly: true
               description: >
                 **Who confirmed it.** An acknowledgement with no name behind it cannot be
                 followed up, and this is the field that makes the switch an act rather than a
-                setting.
+                setting. Recorded by the server as the caller whose save carried the
+                acknowledgement, so it cannot name somebody else.
             faceTagPurgeMinutesAfterClose:
               type: integer
               nullable: true
@@ -2681,9 +3364,9 @@ components:
               items:
                 type: object
                 properties:
-                  day: { type: string }
-                  from: { type: string }
-                  to: { type: string }
+                  day: { type: string, enum: [mon, tue, wed, thu, fri, sat, sun] }
+                  from: { type: string, description: Wall-clock time, in the region's time zone. }
+                  to: { type: string, description: Wall-clock time, in the region's time zone. }
                   admits: { type: string, enum: [all, women, womenAndChildren, families, members] }
             entitlementGated:
               type: boolean
@@ -2694,8 +3377,9 @@ components:
                 Everything below is advisory on top of that, and nothing replaces it.
             genderVerification:
               type: string
-              enum: [off, staffAssisted, deviceAssisted]
-              default: off
+              # 'off' is quoted: unquoted, YAML 1.1 reads it as boolean false (pull audit R150, R238).
+              enum: ['off', staffAssisted, deviceAssisted]
+              default: 'off'
               description: >
                 `off` — the entitlement decides and a steward handles exceptions. **The default, and
                 what is contracted.**
@@ -2864,8 +3548,6 @@ components:
 
     Workstation:
       x-ticvai-persistence: "platform.workstation"
-      parameters:
-        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       type: object
       required: [id, code, name, venueId, regionId, scopePath, saleBoard, currency, currencyScale, timeZone]
       properties:

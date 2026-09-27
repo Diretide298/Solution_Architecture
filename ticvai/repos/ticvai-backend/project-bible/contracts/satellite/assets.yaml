@@ -56,6 +56,20 @@ info:
     In a venue "asset" means physical plant, and two contracts both claiming `/assets` with
     the same operation ids is a codegen collision waiting to happen. This one is `/media`.
 
+    **"Media" in this file is not the glossary's Media.** The glossary (`docs/glossary.md`)
+    reserves *Media* for the physical or digital carrier of a Ticket, and `orders` serves that meaning at `/media/{mediaCode}/entitlements`. Here
+    the word means a file in the digital asset library: an image, a video, a document. The two
+    share a path prefix and nothing else. A `mediaId` (uuid, this file) is never a `mediaCode`
+    (a carrier's code, `orders`), and a screen that lists files from this library does not
+    read or write carrier entitlements. The paths and operation ids stay as they are because
+    tickets and generated code are keyed on them; in prose and in UI copy, call these
+    **library assets** or **media assets**, never plain "Media".
+
+    **The asset id is the file reference.** A field elsewhere that points at a file in this
+    library (`assetRef`, `*AssetRef`, `*AssetId`) holds the `id` of a `MediaAsset` produced
+    here by `createUpload` then `completeUpload`. That route is staff-only
+    (`ASSET_LIBRARY_MANAGE`); a guest has no upload route through this library.
+
     Positions this encodes:
 
     - **Assets are referenced, never embedded.** A contract carries `assetRef`, and this
@@ -192,6 +206,15 @@ paths:
         - "P13 CMS-082 Asset Ownership & Responsibility Management"
       x-ticvai-audience: [staff]
       summary: Amend metadata, tags or rights
+      description: >
+        A partial update: only the fields sent change. `collectionIds`, when sent, replaces the
+        asset's collection memberships (`MediaCollectionMember` rows) with exactly that list.
+
+        `status` moves the asset along `states/media.yaml`, and only along the transitions that
+        model gives this operation: `ready` to `archived`, `archived` to `ready`, and
+        `quarantined` to `ready` (the reversal of a scan flag, which the state model marks as
+        requiring approval). **Archiving is refused while the asset is referenced**, for the
+        same reason deletion is: an archived image on a live homepage is a broken image.
       tags: [asset]
       x-ticvai-permission: ASSET_LIBRARY_MANAGE
       x-ticvai-scope-level: venue
@@ -221,13 +244,33 @@ paths:
                 collectionIds:
                   type: array
                   items: { type: string, format: uuid }
+                  description: >
+                    Replaces the asset's collection memberships. Stored as
+                    `MediaCollectionMember` rows, one per collection.
                 rights: { $ref: '#/components/schemas/MediaRights' }
+                status:
+                  type: string
+                  enum: [ready, archived]
+                  description: >
+                    A lifecycle move from `states/media.yaml`. Any transition that model does
+                    not give `updateMediaAsset` is refused with 409 `transitionNotAllowed`.
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Updated
           content:
             application/json:
               schema: { $ref: '#/components/schemas/MediaAsset' }
+        '409':
+          description: >
+            Status change refused: archiving an asset that is still referenced (`inUse`, with
+            every reference listed), or a transition `states/media.yaml` does not allow from the
+            asset's current status (`transitionNotAllowed`)
+          content:
+            application/problem+json:
+              schema: { $ref: '#/components/schemas/MediaStatusRefusedProblem' }
 
     delete:
       operationId: deleteMediaAsset
@@ -248,7 +291,11 @@ paths:
       parameters:
         - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       responses:
-        '204': { description: Deleted }
+        '204':
+          description: Deleted
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
         '409':
           description: Asset is in use. Every reference is listed
           content:
@@ -294,15 +341,22 @@ paths:
                 note: { type: string, maxLength: 500 }
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Replaced, with affected surfaces reported
           content:
             application/json:
               schema: { $ref: '#/components/schemas/MediaReplaceResult' }
         '409':
-          description: Replacement is a different kind — an image cannot replace a document
+          description: >
+            The upload cannot be used: it is a different kind — an image cannot replace a
+            document (`kindMismatch`) — or the transfer never finished (`transferIncomplete`),
+            the upload ticket expired (`uploadExpired`), or the stored file is larger than the
+            ticket allowed (`sizeExceeded`)
           content:
             application/problem+json:
-              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+              schema: { $ref: '#/components/schemas/UploadRefusedProblem' }
 
   /media/uploads:
     post:
@@ -317,7 +371,8 @@ paths:
         Uploads go **direct to object storage**, not through this API. Large media passing
         through an application tier is latency, memory and a timeout waiting to happen.
 
-        Confirm with `POST /media/uploads/{id}/complete` once the transfer finishes.
+        Confirm with `POST /media/uploads/{id}/complete` once the transfer finishes. The
+        `MediaAsset.id` that returns is the reference every other contract stores for the file.
       tags: [upload]
       x-ticvai-permission: ASSET_LIBRARY_MANAGE
       x-ticvai-scope-level: venue
@@ -339,6 +394,9 @@ paths:
                 venueId: { type: string, format: uuid }
       responses:
         '201':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Signed URL issued
           content:
             application/json:
@@ -371,6 +429,11 @@ paths:
 
         Files are scanned before becoming available. An asset that fails scanning is quarantined,
         not published — a tenant uploading a compromised file must not have it served to guests.
+
+        **Scanning and derivatives run after this call returns** (`states/media.yaml`). The 201
+        carries the asset in `processing`; the job moves it to `ready`, `quarantined` or
+        `failed`. A failed scan is therefore an asset in `quarantined`, not a refusal here —
+        a client reads `status` rather than assuming the file is servable.
       tags: [upload]
       x-ticvai-permission: ASSET_LIBRARY_MANAGE
       x-ticvai-scope-level: venue
@@ -396,15 +459,21 @@ paths:
                 rights: { $ref: '#/components/schemas/MediaRights' }
       responses:
         '201':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Asset created. Derivatives may still be generating
           content:
             application/json:
               schema: { $ref: '#/components/schemas/MediaAsset' }
         '409':
-          description: Upload incomplete, checksum mismatch, or the file failed scanning
+          description: >
+            The transfer never finished (`transferIncomplete`), the upload ticket expired
+            (`uploadExpired`), or the stored file is larger than the ticket allowed
+            (`sizeExceeded`). A file that fails scanning is not refused here — see above
           content:
             application/problem+json:
-              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+              schema: { $ref: '#/components/schemas/UploadRefusedProblem' }
 
   /media/collections:
     get:
@@ -460,6 +529,9 @@ paths:
                 parentCollectionId: { type: string, format: uuid }
       responses:
         '201':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Created
           content:
             application/json:
@@ -547,6 +619,9 @@ paths:
               $ref: '#/components/schemas/MediaTaxonomy'
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Set
           content:
             application/json:
@@ -596,6 +671,9 @@ paths:
                     $ref: '#/components/schemas/MediaTag'
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Set
           content:
             application/json:
@@ -603,6 +681,15 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/MediaTag'
+        '400':
+          description: >
+            A tag names a closed vocabulary (`MediaTaxonomy.keywordVocabularies[].closed`) and
+            its value is not one of that vocabulary's terms. `errors[]` carries one entry per refused tag, with `field` set to
+            `tags[n].value`.
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
   /media-assets/{assetId}/analyse:
     parameters:
     - name: assetId
@@ -775,6 +862,9 @@ paths:
               $ref: '#/components/schemas/MediaRendition'
       responses:
         '202':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Queued
           content:
             application/json:
@@ -880,11 +970,11 @@ paths:
               schema:
                 $ref: '#/components/schemas/MediaAssetApproval'
         '409':
-          description: Not eligible to publish; the unmet conditions are listed
+          description: Not eligible to publish; the unmet conditions are listed in `unmet`
           content:
             application/problem+json:
               schema:
-                $ref: ../shared/common.yaml#/components/schemas/Problem
+                $ref: '#/components/schemas/MediaNotPublishableProblem'
   /media-shares:
     post:
       operationId: createMediaShare
@@ -912,6 +1002,9 @@ paths:
               $ref: '#/components/schemas/MediaShare'
       responses:
         '201':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Created
           content:
             application/json:
@@ -983,6 +1076,9 @@ paths:
               $ref: '#/components/schemas/MediaDistributionChannel'
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Set
           content:
             application/json:
@@ -1680,6 +1776,12 @@ components:
         contentType: { type: string }
         sizeBytes: { type: integer }
         title: { $ref: '#/components/schemas/LocalisedText' }
+        description:
+          allOf:
+            - $ref: '#/components/schemas/LocalisedText'
+          description: >
+            Set by `updateMediaAsset` and matched by `searchMedia`'s `search`. It was accepted
+            and searched on before it had anywhere to be stored.
         altText:
           allOf:
             - $ref: '#/components/schemas/LocalisedText'
@@ -1814,6 +1916,89 @@ components:
               type: array
               items: { $ref: '#/components/schemas/MediaUsage' }
 
+    MediaStatusRefusedProblem:
+      x-ticvai-persistence: "none — error shape"
+      description: >
+        Why `updateMediaAsset` refused a `status` change. For `inUse`, `usage` lists every
+        reference to clear first, exactly as `deleteMediaAsset` does.
+      allOf:
+        - $ref: '#/components/schemas/MediaInUseProblem'
+        - type: object
+          required: [refusedReason]
+          properties:
+            refusedReason:
+              type: string
+              enum: [inUse, transitionNotAllowed]
+            currentStatus: { $ref: '#/components/schemas/MediaStatus' }
+            requestedStatus: { $ref: '#/components/schemas/MediaStatus' }
+
+    UploadRefusedProblem:
+      x-ticvai-persistence: "none — error shape"
+      description: >
+        Why an upload could not become, or replace, an asset. `kindMismatch` is only ever
+        returned by `replaceMediaAsset`.
+      allOf:
+        - $ref: '../shared/common.yaml#/components/schemas/Problem'
+        - type: object
+          required: [refusedReason]
+          properties:
+            refusedReason:
+              type: string
+              enum: [transferIncomplete, uploadExpired, sizeExceeded, kindMismatch]
+            uploadId: { type: string, format: uuid }
+            expectedKind:
+              allOf:
+                - $ref: '#/components/schemas/MediaKind'
+              description: The kind of the asset being replaced. Set with `kindMismatch`.
+            uploadedKind:
+              allOf:
+                - $ref: '#/components/schemas/MediaKind'
+              description: The kind of the uploaded file. Set with `kindMismatch`.
+
+    MediaNotPublishableProblem:
+      x-ticvai-persistence: "none — error shape"
+      description: >
+        `setMediaAssetApproval` refused to publish. `unmet` names each of the four eligibility
+        checks that failed, in the same shape as `MediaAssetApproval.eligibility`.
+      allOf:
+        - $ref: '../shared/common.yaml#/components/schemas/Problem'
+        - type: object
+          required: [unmet]
+          properties:
+            unmet:
+              type: array
+              minItems: 1
+              items:
+                type: object
+                required: [check]
+                properties:
+                  check:
+                    type: string
+                    enum:
+                    - approved
+                    - rightsCurrent
+                    - renditionsReady
+                    - classificationComplete
+                  detail:
+                    type: string
+                    nullable: true
+
+    MediaCollectionMember:
+      x-ticvai-persistence: "assets.media_collection_member"
+      type: object
+      description: >
+        One asset in one collection. **An asset may sit in several collections**, so membership
+        is its own row rather than a column on either side. Written by `completeUpload` and
+        `updateMediaAsset` (`collectionIds`); read by `searchMedia` (`collectionId`) and
+        `getMediaAsset` (`collections`). `Collection.assetCount` counts these rows.
+      required: [id, collectionId, assetId]
+      properties:
+        id: { type: string, format: uuid, readOnly: true }
+        collectionId: { type: string, format: uuid }
+        assetId: { type: string, format: uuid }
+        addedByPrincipalId: { type: string, format: uuid, nullable: true }
+        addedAt: { type: string, format: date-time }
+
     MediaReplaceResult:
       x-ticvai-persistence: "none — computed"
       type: object
@@ -1851,6 +2036,21 @@ components:
           additionalProperties: { type: string }
         maxSizeBytes: { type: integer }
         expiresAt: { type: string, format: date-time }
+        # The four below echo what `createUpload` was told. They had nowhere to be stored, so
+        # `completeUpload` could not check the transfer against them and `replaceMediaAsset`
+        # could not tell an image upload from a document one.
+        filename: { type: string }
+        contentType: { type: string }
+        sizeBytes: { type: integer }
+        venueId: { type: string, format: uuid, nullable: true }
+        assetId:
+          type: string
+          format: uuid
+          nullable: true
+          readOnly: true
+          description: >
+            The asset this upload became — created by `completeUpload`, or the asset whose file
+            `replaceMediaAsset` swapped. Null while the transfer is outstanding.
 
     Collection:
       x-ticvai-persistence: "assets.media_collection"

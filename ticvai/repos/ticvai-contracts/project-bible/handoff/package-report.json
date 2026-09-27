@@ -1,15 +1,15 @@
 {
- "generated": "2026-09-24",
+ "generated": "2026-09-28",
  "note": "The package measured in one pass. Derived by tools/build-package-report.py from the files the refresh writes -- never from prose.",
  "counts": {
-  "operations": 2113,
+  "operations": 2135,
   "contracts": 32,
-  "tables": 639,
+  "tables": 678,
   "stores": 5,
-  "foreignKeys": 635,
-  "indexes": 761,
-  "tablesWritten": 637,
-  "relationships": 1371,
+  "foreignKeys": 615,
+  "indexes": 1468,
+  "tablesWritten": 676,
+  "relationships": 1467,
   "states": 125,
   "events": 29,
   "flows": 96,
@@ -38,30 +38,30 @@
   },
   {
    "link": "Operations declaring a service",
-   "done": 2113,
-   "total": 2113,
+   "done": 2135,
+   "total": 2135,
    "percent": 100,
    "note": "the operation is owned by one of the seventeen deployables"
   },
   {
    "link": "Operations declaring a permission",
-   "done": 2012,
-   "total": 2113,
+   "done": 2032,
+   "total": 2135,
    "percent": 95,
    "note": "the checklist a grant screen renders is built from these"
   },
   {
    "link": "Operations with resolved lineage",
-   "done": 1473,
-   "total": 2113,
+   "done": 1494,
+   "total": 2135,
    "percent": 70,
    "note": "names the tables it reads and writes -- the join the DDL cannot make itself"
   },
   {
    "link": "Operations reaching a screen",
    "done": 1853,
-   "total": 2113,
-   "percent": 88,
+   "total": 2135,
+   "percent": 87,
    "note": "sync, webhook and job operations legitimately have none"
   },
   {
@@ -73,50 +73,55 @@
   },
   {
    "link": "Tables reached by an operation",
-   "done": 619,
-   "total": 639,
-   "percent": 97,
+   "done": 654,
+   "total": 678,
+   "percent": 96,
    "note": "a table nothing reaches is a missing operation or a table that should not exist"
   },
   {
    "link": "Tables carrying a relationship",
-   "done": 568,
-   "total": 639,
-   "percent": 89,
+   "done": 610,
+   "total": 678,
+   "percent": 90,
    "note": "either end of a declared reference"
   }
  ],
  "boundaries": {
-  "edgesTotal": 1371,
-  "insideOneService": 772,
-  "crossingTwoServices": 599,
+  "edgesTotal": 1467,
+  "insideOneService": 866,
+  "crossingTwoServices": 601,
   "endpointNotOwned": 0,
   "note": "A reference inside one service is a foreign key the database enforces. A reference across two is a distributed read somebody has to design.",
   "heaviest": [
    {
     "from": "MarketingService",
     "to": "IdentityService",
-    "edges": 36
+    "edges": 43
    },
    {
     "from": "OrderService",
     "to": "IdentityService",
-    "edges": 30
-   },
-   {
-    "from": "TenancyService",
-    "to": "IdentityService",
-    "edges": 27
+    "edges": 36
    },
    {
     "from": "VenueOpsService",
     "to": "TenancyService",
+    "edges": 27
+   },
+   {
+    "from": "TenancyService",
+    "to": "IdentityService",
     "edges": 26
    },
    {
     "from": "FnbService",
     "to": "TenancyService",
-    "edges": 22
+    "edges": 24
+   },
+   {
+    "from": "VenueOpsService",
+    "to": "IdentityService",
+    "edges": 23
    },
    {
     "from": "CatalogueService",
@@ -129,7 +134,12 @@
     "edges": 18
    },
    {
-    "from": "VenueOpsService",
+    "from": "OrderService",
+    "to": "CatalogueService",
+    "edges": 17
+   },
+   {
+    "from": "FnbService",
     "to": "IdentityService",
     "edges": 15
    },
@@ -137,16 +147,6 @@
     "from": "MarketingService",
     "to": "TenancyService",
     "edges": 15
-   },
-   {
-    "from": "OrderService",
-    "to": "CatalogueService",
-    "edges": 14
-   },
-   {
-    "from": "FnbService",
-    "to": "IdentityService",
-    "edges": 12
    },
    {
     "from": "AccessService",
@@ -157,46 +157,46 @@
   "topTargets": [
    {
     "table": "identity.principal",
-    "edges": 128
+    "edges": 152
    },
    {
     "table": "platform.scope",
-    "edges": 75
+    "edges": 77
    },
    {
     "table": "pii.subject",
-    "edges": 58
+    "edges": 64
    },
    {
     "table": "platform.outlet",
-    "edges": 25
+    "edges": 27
    },
    {
     "table": "orders.sales_order",
-    "edges": 25
+    "edges": 24
    },
    {
     "table": "platform.outbox",
     "edges": 17
    },
    {
-    "table": "catalogue.product",
-    "edges": 15
+    "table": "platform.tenant",
+    "edges": 13
    },
    {
-    "table": "access.entitlement",
-    "edges": 11
+    "table": "catalogue.product",
+    "edges": 12
    },
    {
     "table": "catalogue.variant",
-    "edges": 10
+    "edges": 11
    },
    {
     "table": "assets.media_asset",
     "edges": 10
    }
   ],
-  "inTopThreeTargets": 261
+  "inTopThreeTargets": 293
  },
  "services": [
   {
@@ -204,48 +204,48 @@
    "tier": "commerce",
    "contracts": 3,
    "schemas": 4,
-   "operations": 404,
-   "tables": 71,
+   "operations": 406,
+   "tables": 74,
    "screens": 73,
    "operationsOnAScreen": 369,
-   "edgesOut": 59,
-   "edgesIn": 47
+   "edgesOut": 54,
+   "edgesIn": 46
   },
   {
    "service": "OrderService",
    "tier": "commerce",
    "contracts": 3,
    "schemas": 2,
-   "operations": 249,
-   "tables": 60,
+   "operations": 253,
+   "tables": 69,
    "screens": 101,
    "operationsOnAScreen": 230,
-   "edgesOut": 82,
-   "edgesIn": 60
+   "edgesOut": 88,
+   "edgesIn": 57
   },
   {
    "service": "VenueOpsService",
    "tier": "operations",
    "contracts": 7,
    "schemas": 7,
-   "operations": 221,
-   "tables": 90,
+   "operations": 224,
+   "tables": 97,
    "screens": 53,
    "operationsOnAScreen": 211,
-   "edgesOut": 71,
-   "edgesIn": 30
+   "edgesOut": 74,
+   "edgesIn": 25
   },
   {
    "service": "MarketingService",
    "tier": "engagement",
    "contracts": 1,
    "schemas": 1,
-   "operations": 209,
-   "tables": 64,
+   "operations": 213,
+   "tables": 70,
    "screens": 40,
    "operationsOnAScreen": 175,
-   "edgesOut": 79,
-   "edgesIn": 8
+   "edgesOut": 86,
+   "edgesIn": 7
   },
   {
    "service": "PlatformService",
@@ -253,11 +253,11 @@
    "contracts": 3,
    "schemas": 2,
    "operations": 184,
-   "tables": 62,
+   "tables": 67,
    "screens": 42,
    "operationsOnAScreen": 161,
-   "edgesOut": 30,
-   "edgesIn": 11
+   "edgesOut": 29,
+   "edgesIn": 9
   },
   {
    "service": "AccessService",
@@ -269,31 +269,31 @@
    "screens": 29,
    "operationsOnAScreen": 177,
    "edgesOut": 27,
-   "edgesIn": 22
+   "edgesIn": 15
   },
   {
    "service": "TenancyService",
    "tier": "foundation",
    "contracts": 4,
    "schemas": 5,
-   "operations": 156,
+   "operations": 163,
    "tables": 81,
    "screens": 71,
    "operationsOnAScreen": 126,
-   "edgesOut": 49,
-   "edgesIn": 157
+   "edgesOut": 44,
+   "edgesIn": 165
   },
   {
    "service": "FnbService",
    "tier": "operations",
    "contracts": 1,
    "schemas": 1,
-   "operations": 111,
-   "tables": 41,
+   "operations": 113,
+   "tables": 46,
    "screens": 57,
    "operationsOnAScreen": 87,
-   "edgesOut": 53,
-   "edgesIn": 9
+   "edgesOut": 54,
+   "edgesIn": 3
   },
   {
    "service": "IdentityService",
@@ -304,8 +304,8 @@
    "tables": 32,
    "screens": 36,
    "operationsOnAScreen": 49,
-   "edgesOut": 14,
-   "edgesIn": 193
+   "edgesOut": 12,
+   "edgesIn": 223
   },
   {
    "service": "LedgerService",
@@ -313,10 +313,10 @@
    "contracts": 1,
    "schemas": 1,
    "operations": 56,
-   "tables": 18,
+   "tables": 20,
    "screens": 20,
    "operationsOnAScreen": 48,
-   "edgesOut": 34,
+   "edgesOut": 35,
    "edgesIn": 19
   },
   {
@@ -328,7 +328,7 @@
    "tables": 13,
    "screens": 25,
    "operationsOnAScreen": 46,
-   "edgesOut": 5,
+   "edgesOut": 6,
    "edgesIn": 2
   },
   {
@@ -340,7 +340,7 @@
    "tables": 21,
    "screens": 28,
    "operationsOnAScreen": 49,
-   "edgesOut": 34,
+   "edgesOut": 26,
    "edgesIn": 19
   },
   {
@@ -352,8 +352,8 @@
    "tables": 25,
    "screens": null,
    "operationsOnAScreen": 43,
-   "edgesOut": 9,
-   "edgesIn": 5
+   "edgesOut": 10,
+   "edgesIn": 4
   },
   {
    "service": "ReportingService",
@@ -361,10 +361,10 @@
    "contracts": 1,
    "schemas": 1,
    "operations": 44,
-   "tables": 20,
+   "tables": 22,
    "screens": 31,
    "operationsOnAScreen": 40,
-   "edgesOut": 10,
+   "edgesOut": 14,
    "edgesIn": 2
   },
   {
@@ -376,8 +376,8 @@
    "tables": 16,
    "screens": 21,
    "operationsOnAScreen": 21,
-   "edgesOut": 13,
-   "edgesIn": 12
+   "edgesOut": 12,
+   "edgesIn": 2
   },
   {
    "service": "RetailService",
@@ -447,10 +447,10 @@
   },
   {
    "contract": "catalogue",
-   "operations": 205,
+   "operations": 206,
    "onAScreen": 183,
-   "withLineage": 94,
-   "withPermission": 202,
+   "withLineage": 95,
+   "withPermission": 203,
    "percentOnAScreen": 89
   },
   {
@@ -471,11 +471,11 @@
   },
   {
    "contract": "fnb",
-   "operations": 111,
+   "operations": 113,
    "onAScreen": 87,
-   "withLineage": 111,
-   "withPermission": 100,
-   "percentOnAScreen": 78
+   "withLineage": 113,
+   "withPermission": 102,
+   "percentOnAScreen": 77
   },
   {
    "contract": "games",
@@ -511,19 +511,19 @@
   },
   {
    "contract": "marketing-crm",
-   "operations": 209,
+   "operations": 213,
    "onAScreen": 175,
-   "withLineage": 136,
-   "withPermission": 190,
-   "percentOnAScreen": 84
+   "withLineage": 140,
+   "withPermission": 194,
+   "percentOnAScreen": 82
   },
   {
    "contract": "orders",
-   "operations": 188,
+   "operations": 191,
    "onAScreen": 169,
-   "withLineage": 99,
-   "withPermission": 172,
-   "percentOnAScreen": 90
+   "withLineage": 101,
+   "withPermission": 174,
+   "percentOnAScreen": 88
   },
   {
    "contract": "payments",
@@ -543,11 +543,11 @@
   },
   {
    "contract": "promotions",
-   "operations": 145,
+   "operations": 146,
    "onAScreen": 132,
-   "withLineage": 46,
-   "withPermission": 145,
-   "percentOnAScreen": 91
+   "withLineage": 47,
+   "withPermission": 146,
+   "percentOnAScreen": 90
   },
   {
    "contract": "public-api",
@@ -559,11 +559,11 @@
   },
   {
    "contract": "queue",
-   "operations": 21,
+   "operations": 22,
    "onAScreen": 16,
-   "withLineage": 21,
+   "withLineage": 22,
    "withPermission": 14,
-   "percentOnAScreen": 76
+   "percentOnAScreen": 73
   },
   {
    "contract": "rental",
@@ -583,11 +583,11 @@
   },
   {
    "contract": "resources",
-   "operations": 48,
+   "operations": 49,
    "onAScreen": 48,
-   "withLineage": 44,
-   "withPermission": 48,
-   "percentOnAScreen": 100
+   "withLineage": 45,
+   "withPermission": 49,
+   "percentOnAScreen": 98
   },
   {
    "contract": "retail",
@@ -607,11 +607,11 @@
   },
   {
    "contract": "shift",
-   "operations": 20,
+   "operations": 21,
    "onAScreen": 20,
-   "withLineage": 20,
-   "withPermission": 20,
-   "percentOnAScreen": 100
+   "withLineage": 21,
+   "withPermission": 21,
+   "percentOnAScreen": 95
   },
   {
    "contract": "subscription",
@@ -623,19 +623,19 @@
   },
   {
    "contract": "tenancy",
-   "operations": 39,
+   "operations": 46,
    "onAScreen": 30,
-   "withLineage": 38,
-   "withPermission": 38,
-   "percentOnAScreen": 77
+   "withLineage": 45,
+   "withPermission": 45,
+   "percentOnAScreen": 65
   },
   {
    "contract": "venue-map",
-   "operations": 12,
+   "operations": 13,
    "onAScreen": 11,
-   "withLineage": 12,
-   "withPermission": 12,
-   "percentOnAScreen": 92
+   "withLineage": 13,
+   "withPermission": 13,
+   "percentOnAScreen": 85
   },
   {
    "contract": "wallet",
@@ -671,7 +671,7 @@
    "operator": "guest",
    "screens": 46,
    "screensWithOperations": 46,
-   "distinctOperations": 167,
+   "distinctOperations": 166,
    "percentWithOperations": 100
   },
   {
@@ -682,7 +682,7 @@
    "operator": "guest",
    "screens": 71,
    "screensWithOperations": 70,
-   "distinctOperations": 170,
+   "distinctOperations": 168,
    "percentWithOperations": 99
   },
   {
@@ -704,7 +704,7 @@
    "operator": "guest",
    "screens": 17,
    "screensWithOperations": 15,
-   "distinctOperations": 23,
+   "distinctOperations": 22,
    "percentWithOperations": 88
   },
   {
@@ -846,12 +846,12 @@
   "requirementsGapContract": 89,
   "requirementsGapDecision": 5,
   "requirementsPartial": 44,
-  "operationsNoScreen": 260,
+  "operationsNoScreen": 282,
   "screensNoOperation": 108,
-  "operationsNoLineage": 640,
-  "tablesNotReached": 20,
-  "permissionsWithoutLabel": 72,
-  "capabilityPairs": 235,
+  "operationsNoLineage": 641,
+  "tablesNotReached": 24,
+  "permissionsWithoutLabel": 70,
+  "capabilityPairs": 237,
   "modulesWithCapabilities": 32
  }
 }

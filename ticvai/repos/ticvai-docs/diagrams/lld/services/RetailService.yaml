@@ -3,14 +3,14 @@ title: RetailService — 25 operations, 13 tables
 generatedBy: tools/derive-diagrams.py
 tier: operations
 index: diagrams/hld/02-services.yaml
-why: Merchandise, wallets and gift cards. Modest at 35 operations, and separate because **it is licensed
+why: Merchandise, wallets and gift cards. Modest at 25 operations, and separate because **it is licensed
   separately** — a venue can run ticketing with no shop.
 scale: Follows the sale. Nothing unusual.
 ifDown: Down means the shop stops; the gates and the restaurant do not.
 coverage:
   operations: 25
-  inAFlow: 15
-  percent: 43%
+  inAFlow: 13
+  percent: 52%
   note: '**Flow coverage is how much of this service a journey has walked.** A service under 40% is
     unwalked rather than under-documented.'
 schemas:
@@ -70,7 +70,7 @@ operationsByContract:
     permission: ORDER_REFUND
     offline: false
     reads: 3
-    writes: 2
+    writes: 3
   - operation: createRetailSale
     verb: POST
     path: /retail-sales
@@ -78,7 +78,7 @@ operationsByContract:
     permission: ORDER_CREATE
     offline: false
     reads: 3
-    writes: 2
+    writes: 3
   - operation: createShopAndDrop
     verb: POST
     path: /shop-and-drop
@@ -198,7 +198,7 @@ operationsByContract:
     permission: ORDER_CREATE
     offline: false
     reads: 3
-    writes: 2
+    writes: 3
   - operation: setReturnPolicy
     verb: PUT
     path: /outlets/{outletId}/return-policy
@@ -229,15 +229,59 @@ tables:
   columns: 5
   backing: redis
   owned: false
-  why: '**Not a table and not owned by a service.** Derived from something already read, invalidated
-    by an event already consumed, losable without consequence — no migration, no backup, no owner.'
+  why: '**Not a table and not owned by a service.** Derived from something already read, losable without
+    consequence — no migration, no backup, no owner.'
+  key: The idempotency key the caller sent
+  eviction:
+  - 'expires_at: **Must exceed the longest offline window.** A scanner out for a weekend replays on
+    Monday'
+  writtenBy:
+  - cancelMerchandiseReservation
+  - collectMerchandiseReservation
+  - collectShopAndDrop
+  - createMerchandise
+  - createRetailExchange
+  - createRetailReturn
+  - createRetailSale
+  - createShopAndDrop
+  - disposeShopAndDrop
+  - reprintReceipt
+  - reserveMerchandise
+  - setReturnPolicy
+  - updateMerchandise
+  readBy:
+  - cancelMerchandiseReservation
+  - collectMerchandiseReservation
+  - collectShopAndDrop
+  - createMerchandise
+  - createRetailExchange
+  - createRetailReturn
+  - createRetailSale
+  - createShopAndDrop
+  - disposeShopAndDrop
+  - reprintReceipt
+  - reserveMerchandise
+  - setReturnPolicy
+  - updateMerchandise
 - store: cache:resolution
   kind: cache
   columns: 4
   backing: redis
   owned: false
-  why: '**Not a table and not owned by a service.** Derived from something already read, invalidated
-    by an event already consumed, losable without consequence — no migration, no backup, no owner.'
+  why: '**Not a table and not owned by a service.** Derived from something already read, losable without
+    consequence — no migration, no backup, no owner.'
+  key: scope_path + what is being resolved — permissions, configuration, a price list
+  eviction:
+  - 'version: Bumped by the write that evicts it. **A config change nobody evicts is a stale permission**'
+  writtenBy:
+  - getReturnPolicy
+  - setReturnPolicy
+  readBy:
+  - getReturnPolicy
+  gap: '**The lineage names this store, not the key.** Which resolution entry each writer below evicts
+    or bumps — permissions, configuration, a price list, and whether child scopes under its `scope_path`
+    are affected — is not recorded for any operation, so a writer here cannot yet be implemented from
+    the package alone.'
 - table: retail.exchange
   columns: 8
   store: postgres
@@ -269,10 +313,11 @@ tables:
   columns: 5
   store: postgres
   parent: retail.reservation
-  writtenBy: []
+  writtenBy:
+  - retail
   foreignWriters: null
 - table: retail.return
-  columns: 12
+  columns: 14
   store: postgres
   parent: null
   writtenBy:
@@ -282,10 +327,11 @@ tables:
   columns: 9
   store: postgres
   parent: retail.return
-  writtenBy: []
+  writtenBy:
+  - retail
   foreignWriters: null
 - table: retail.return_policy
-  columns: 9
+  columns: 10
   store: postgres
   parent: null
   writtenBy:
@@ -302,23 +348,24 @@ tables:
   columns: 13
   store: postgres
   parent: retail.sale
-  writtenBy: []
+  writtenBy:
+  - retail
   foreignWriters: null
 - table: retail.shop_and_drop
-  columns: 15
+  columns: 14
   store: postgres
   parent: null
   writtenBy:
   - retail
   foreignWriters: null
 - table: retail.shop_and_drop_line
-  columns: 8
+  columns: 7
   store: postgres
   parent: retail.shop_and_drop
   writtenBy: []
   foreignWriters: null
 - table: retail.store_rule
-  columns: 8
+  columns: 10
   store: postgres
   parent: null
   writtenBy:
@@ -330,7 +377,18 @@ readsFrom:
 writesOutside:
 - service: InventoryService
   operations: 2
-  why: '**The owner defines the row; this service may only append to it.**'
+  rule: 'ADR-0028: the owner defines the row; a foreign writer may only append, through a path the owner
+    published.'
+  why: '**The lineage records these writes, not how they honour the rule.** It does not say whether
+    each inserts or updates, or which operation or event InventoryService published for it — check each
+    against ADR-0028.'
+  writes:
+  - operation: cancelMerchandiseReservation
+    tables:
+    - inventory.movement
+  - operation: collectMerchandiseReservation
+    tables:
+    - inventory.movement
 screens:
 - P01:WEB-033 Shop
 - P01:WEB-042 Retail & Shop and Drop

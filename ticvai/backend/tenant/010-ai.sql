@@ -8,20 +8,21 @@ CREATE TABLE IF NOT EXISTS ai.activity (
     id                                uuid PRIMARY KEY NOT NULL,
     conversation_id                   uuid,
     principal_id                      uuid NOT NULL,
-    audience                          text,
+    audience                          text CONSTRAINT activity_audience_chk CHECK (audience IN ('staff', 'guest')),
     subject_id                        uuid,
     billable_to_tenant_id             uuid,
-    scope_path                        ltree,
+    scope_path                        ltree NOT NULL,
     capability                        text NOT NULL,
     prompt                            text,
     response                          text,
-    outcome                           text NOT NULL,
+    sources                           jsonb,
+    outcome                           text NOT NULL CONSTRAINT activity_outcome_chk CHECK (outcome IN ('answered', 'refused', 'applied', 'rejected', 'failed')),
     refusal_reason                    text,
-    provider                          text,
+    provider                          text CONSTRAINT activity_provider_chk CHECK (provider IN ('openai', 'gemini', 'anthropic', 'azureOpenai', 'localLlm')),
     model                             text,
     prompt_tokens                     integer,
     completion_tokens                 integer,
-    cost_minor                        integer,
+    cost_amount                       numeric(18,4),
     latency_ms                        integer,
     masked_field_count                integer,
     trace_id                          text,
@@ -42,8 +43,8 @@ CREATE TABLE IF NOT EXISTS ai.chunk_ref (
 CREATE TABLE IF NOT EXISTS ai.conversation (
     id                                uuid PRIMARY KEY NOT NULL,
     principal_id                      uuid NOT NULL,
-    scope_path                        ltree,
-    module                            text NOT NULL,
+    scope_path                        ltree NOT NULL,
+    module                            text NOT NULL CONSTRAINT conversation_module_chk CHECK (module IN ('core', 'ticketing', 'access', 'fnb', 'retail', 'inventory', 'seating', 'membership', 'marketing', 'resources', 'queue', 'games', 'maintenance', 'accreditation', 'partner', 'developerApi', 'analytics', 'ai')),
     locale                            text,
     message_count                     integer,
     started_at                        timestamptz NOT NULL,
@@ -66,7 +67,7 @@ CREATE TABLE IF NOT EXISTS ai.index_failure (
     job_id                            uuid,
     source_id                         uuid,
     document_ref                      text,
-    stage                             text,
+    stage                             text CONSTRAINT index_failure_stage_chk CHECK (stage IN ('fetch', 'parse', 'chunk', 'embed', 'upsert')),
     error                             text,
     attempts                          integer,
     created_at                        timestamptz
@@ -78,9 +79,9 @@ CREATE TABLE IF NOT EXISTS ai.index_failure (
 CREATE TABLE IF NOT EXISTS ai.index_job (
     id                                uuid PRIMARY KEY NOT NULL,
     source_id                         uuid NOT NULL,
-    kind                              text,
+    kind                              text CONSTRAINT index_job_kind_chk CHECK (kind IN ('full', 'incremental', 'removal')),
     reason                            text,
-    status                            text NOT NULL,
+    status                            text NOT NULL CONSTRAINT index_job_status_chk CHECK (status IN ('queued', 'building', 'verifying', 'swapping', 'complete', 'failed')),
     records_total                     integer,
     records_embedded                  integer,
     records_failed                    integer,
@@ -94,18 +95,18 @@ CREATE TABLE IF NOT EXISTS ai.index_job (
 
 -- One declaration per indexed table. The owning service does not know it exists — the AI service
 -- consumes the event that service already publishes Hangs off: a root — nothing above it in its
--- schema; references ai.knowledge_collection. Reached by: 3 operations read it and 1 write it; 10
+-- schema; references ai.knowledge_collection. Reached by: 3 operations read it and 1 write it; 3
 -- tables reference it.
 CREATE TABLE IF NOT EXISTS ai.index_source (
     id                                uuid PRIMARY KEY,
-    "table"                           text NOT NULL,
+    table_name                        text NOT NULL,
     contract                          text,
     text_fields                       text[] NOT NULL,
     payload_fields                    text[],
     collection                        text NOT NULL,
-    scope_level                       text NOT NULL,
+    scope_level                       text NOT NULL CONSTRAINT index_source_scope_level_chk CHECK (scope_level IN ('tenant', 'region', 'venue')),
     invalidated_by                    text[],
-    chunk_strategy                    text,
+    chunk_strategy                    text CONSTRAINT index_source_chunk_strategy_chk CHECK (chunk_strategy IN ('wholeRecord', 'paragraph', 'fixedTokens', 'section', 'semanticSection', 'parentChild')),
     parent_field                      text,
     is_active                         boolean,
     entry_count                       integer,
@@ -122,27 +123,28 @@ CREATE TABLE IF NOT EXISTS ai.knowledge_collection (
     id                                uuid PRIMARY KEY,
     name                              text NOT NULL,
     description                       text,
-    scope_level                       text NOT NULL,
-    scope_path                        ltree,
+    scope_level                       text NOT NULL CONSTRAINT knowledge_collection_scope_level_chk CHECK (scope_level IN ('tenant', 'region', 'venue')),
+    scope_path                        ltree NOT NULL,
     document_count                    integer,
     shard_key                         text,
-    retrieval                         text,
+    retrieval                         text DEFAULT 'hybrid' CONSTRAINT knowledge_collection_retrieval_chk CHECK (retrieval IN ('dense', 'hybrid')),
     sparse_model                      text,
-    idf_scope                         text,
+    idf_scope                         text DEFAULT 'tenant' CONSTRAINT knowledge_collection_idf_scope_chk CHECK (idf_scope IN ('shard', 'tenant', 'venue')),
     embedding_model                   text,
     is_active                         boolean
 );
 
 -- Source, status and chunk count. The text and its vectors live in Qdrant Hangs off: reaches
--- ai.index_source through its keys; references ai.knowledge_collection, maintenance.asset. Reached
--- by: 3 operations read it and 1 write it; 1 tables reference it.
+-- ai.index_source through its keys; references ai.knowledge_collection, ai.knowledge_document.
+-- Reached by: 3 operations read it and 1 write it; 2 tables reference it.
 CREATE TABLE IF NOT EXISTS ai.knowledge_document (
     id                                uuid PRIMARY KEY,
     collection_id                     uuid,
     title                             text NOT NULL,
     source_asset_id                   uuid NOT NULL,
     mime_type                         text,
-    status                            text,
+    supersedes_document_id            uuid,
+    status                            text CONSTRAINT knowledge_document_status_chk CHECK (status IN ('processing', 'indexed', 'failed', 'superseded')),
     chunk_count                       integer,
     failure_reason                    text,
     indexed_at                        timestamptz
@@ -150,18 +152,18 @@ CREATE TABLE IF NOT EXISTS ai.knowledge_document (
 
 -- A generated seat layout awaiting review. Ends at previewReady and writes nothing to the seat map
 -- — the draft enters seating.import_job at its existing human commit step (ADR-0020) Hangs off:
--- reaches ai.index_source through its keys; references assets.media_asset, venuemap.import_job.
--- Reached by: 1 operations read it and 1 write it.
+-- reaches ai.index_source through its keys; references assets.media_asset. Reached by: 1
+-- operations read it and 1 write it.
 CREATE TABLE IF NOT EXISTS ai.layout_draft (
     id                                uuid PRIMARY KEY,
     import_job_id                     uuid NOT NULL,
-    status                            text NOT NULL,
+    status                            text NOT NULL CONSTRAINT layout_draft_status_chk CHECK (status IN ('parsing', 'previewReady', 'failed')),
     seat_count                        integer,
     section_count                     integer,
     categories_proposed               text[],
     unresolved                        text[],
     trace_id                          text,
-    scope_path                        ltree,
+    scope_path                        ltree NOT NULL,
     asset_id                          uuid NOT NULL
 );
 
@@ -171,13 +173,14 @@ CREATE TABLE IF NOT EXISTS ai.layout_draft (
 CREATE TABLE IF NOT EXISTS ai.message (
     id                                uuid PRIMARY KEY NOT NULL,
     conversation_id                   uuid NOT NULL,
-    role                              text NOT NULL,
+    role                              text NOT NULL CONSTRAINT message_role_chk CHECK (role IN ('user', 'assistant', 'system')),
     content                           text NOT NULL,
+    sources                           jsonb,
     confidence                        numeric(18,4),
     rationale                         text,
-    proposed_action                   uuid,
+    proposed_action_id                uuid,
     trace_id                          text,
-    provider                          text,
+    provider                          text CONSTRAINT message_provider_chk CHECK (provider IN ('openai', 'gemini', 'anthropic', 'azureOpenai', 'localLlm')),
     model                             text,
     prompt_tokens                     integer,
     completion_tokens                 integer,
@@ -190,30 +193,32 @@ CREATE TABLE IF NOT EXISTS ai.message (
 -- platform.tenant. Reached by: 12 operations read it and 2 write it.
 CREATE TABLE IF NOT EXISTS ai.policy (
     id                                uuid PRIMARY KEY,
-    scope_level                       text NOT NULL,
+    scope_level                       text NOT NULL CONSTRAINT policy_scope_level_chk CHECK (scope_level IN ('tenant', 'venue')),
+    scope_path                        ltree NOT NULL,
     enabled_capabilities              text[] NOT NULL,
     allowed_role_ids                  text[],
     masked_fields                     text[],
     requires_approval_for             text[],
     monthly_token_ceiling             integer,
-    ceiling_behaviour                 text,
-    ceiling_warning_percent           integer,
+    ceiling_behaviour                 text DEFAULT 'warn' CONSTRAINT policy_ceiling_behaviour_chk CHECK (ceiling_behaviour IN ('warn', 'warnThenDisable', 'block')),
+    ceiling_warning_percent           integer DEFAULT 80,
     guest_capability_scope            text[],
-    retrieve_top_k                    integer,
-    rerank_top_k                      integer,
-    cache_answers                     boolean,
-    cache_ttl_minutes                 integer,
+    retrieve_top_k                    integer DEFAULT 30,
+    rerank_top_k                      integer DEFAULT 5,
+    cache_answers                     boolean DEFAULT true,
+    cache_ttl_minutes                 integer DEFAULT 60,
     retain_interactions_days          integer,
-    semantic_cache_threshold          numeric(18,4),
-    negative_cache_ttl_seconds        integer,
+    semantic_cache_threshold          numeric(18,4) DEFAULT 0.95,
+    negative_cache_ttl_seconds        integer DEFAULT 300,
     cascade                           jsonb,
     chunking                          jsonb,
-    quantisation                      text,
+    quantisation                      text DEFAULT 'none' CONSTRAINT policy_quantisation_chk CHECK (quantisation IN ('none', 'scalar', 'binary')),
     hnsw                              jsonb,
     per_request_token_ceiling         integer,
     streams_by_capability             text[],
     fallback_provider_id              uuid,
-    guardrail_short_circuit           boolean,
+    guardrail_short_circuit           boolean DEFAULT true,
+    suggestion_providers              jsonb,
     tenant_id                         uuid NOT NULL
 );
 
@@ -223,12 +228,12 @@ CREATE TABLE IF NOT EXISTS ai.policy (
 CREATE TABLE IF NOT EXISTS ai.proposed_action (
     id                                uuid PRIMARY KEY NOT NULL,
     interaction_id                    uuid,
-    kind                              text NOT NULL,
+    kind                              text NOT NULL CONSTRAINT proposed_action_kind_chk CHECK (kind IN ('pricing', 'promotion', 'operational', 'financial', 'configuration')),
     target_contract                   text NOT NULL,
     target_operation                  text NOT NULL,
     payload                           jsonb NOT NULL,
     summary                           text,
-    status                            text NOT NULL,
+    status                            text NOT NULL CONSTRAINT proposed_action_status_chk CHECK (status IN ('proposed', 'approved', 'rejected', 'applied', 'expired')),
     approval_level                    integer,
     decided_by_principal_id           uuid,
     decision_reason                   text,
@@ -237,18 +242,18 @@ CREATE TABLE IF NOT EXISTS ai.proposed_action (
 );
 
 -- Configured providers, models and failover order. Credentials are a vault reference, never a key
--- Hangs off: reaches ai.index_source through its keys; references ai.provider, control.tenant,
--- platform.scope. Reached by: 14 operations read it and 3 write it; 5 tables reference it.
+-- Hangs off: reaches ai.index_source through its keys; references ai.provider, platform.scope,
+-- platform.tenant. Reached by: 14 operations read it and 3 write it; 2 tables reference it.
 CREATE TABLE IF NOT EXISTS ai.provider (
     id                                uuid PRIMARY KEY,
-    kind                              text NOT NULL,
-    capability                        text NOT NULL,
+    kind                              text NOT NULL CONSTRAINT provider_kind_chk CHECK (kind IN ('openai', 'gemini', 'anthropic', 'azureOpenai', 'localLlm')),
+    capability                        text NOT NULL CONSTRAINT provider_capability_chk CHECK (capability IN ('chat', 'embedding', 'vision', 'rerank', 'speechToText', 'textToSpeech')),
     model                             text,
     failover_provider_id              uuid,
-    degrade_gracefully                boolean,
+    degrade_gracefully                boolean DEFAULT true,
     priority                          integer NOT NULL,
-    scope_level                       text,
-    scope_path                        ltree,
+    scope_level                       text CONSTRAINT provider_scope_level_chk CHECK (scope_level IN ('platform', 'tenant', 'venue')),
+    scope_path                        ltree NOT NULL,
     tenant_id                         uuid,
     credential_ref                    text,
     credential_rotated_at             timestamptz,
@@ -268,9 +273,9 @@ CREATE TABLE IF NOT EXISTS ai.provider (
 -- reference it.
 CREATE TABLE IF NOT EXISTS ai.suggestion (
     id                                uuid PRIMARY KEY NOT NULL,
-    kind                              text NOT NULL,
-    basis                             text NOT NULL,
-    scope_path                        ltree,
+    kind                              text NOT NULL CONSTRAINT suggestion_kind_chk CHECK (kind IN ('price', 'replenishment', 'requisition', 'demandForecast', 'prepPlan', 'menuEngineering', 'staffing', 'slaTarget', 'waitTime', 'upsell', 'segmentation', 'anomaly', 'scenario')),
+    basis                             text NOT NULL CONSTRAINT suggestion_basis_chk CHECK (basis IN ('heuristic', 'statistical', 'model', 'hybrid', 'manual')),
+    scope_path                        ltree NOT NULL,
     subject_ref                       text,
     value                             jsonb,
     confidence                        numeric(18,4),
@@ -289,7 +294,7 @@ CREATE TABLE IF NOT EXISTS ai.suggestion (
 CREATE TABLE IF NOT EXISTS ai.suggestion_outcome (
     id                                uuid PRIMARY KEY NOT NULL,
     suggestion_id                     uuid NOT NULL,
-    decision                          text NOT NULL,
+    decision                          text NOT NULL CONSTRAINT suggestion_outcome_decision_chk CHECK (decision IN ('accepted', 'modified', 'rejected', 'ignored', 'expired')),
     actual_value                      jsonb,
     decided_by_principal_id           uuid,
     decided_at                        timestamptz,

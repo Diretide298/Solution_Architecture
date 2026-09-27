@@ -11,8 +11,7 @@ enumSchema: ContentStatus
 owner: whitelabel
 initial:
 - draft
-terminal:
-- archived
+terminal: []
 transitions:
 - from: draft
   to: published

@@ -76,6 +76,12 @@ screens:
   - SUP-002
   - SUP-003
   - SUP-004
+  - SUP-005
+  - SUP-006
+  - SUP-007
+  - SUP-008
+  - SUP-009
+  - SUP-019
   boardFrames: null
   wireframe: wireframes/P12 Venue Support.dc.html#sup-001
   inFlows:

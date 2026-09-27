@@ -1,5 +1,5 @@
 id: LLD-promotions
-title: promotions — 145 operations
+title: promotions — 146 operations
 generatedBy: tools/derive-diagrams.py
 index: diagrams/hld/03-contracts.yaml
 tier: satellite
@@ -75,12 +75,14 @@ operations:
   - promotions.allocation_component
   - promotions.bundle
   - promotions.bundle_choice_group
+  - promotions.bundle_choice_option
   - promotions.bundle_component
   writes:
   - cache:idempotency
   - promotions.allocation_component
   - promotions.bundle
   - promotions.bundle_choice_group
+  - promotions.bundle_choice_option
   - promotions.bundle_component
 - operation: createCouponCampaign
   verb: POST
@@ -245,6 +247,7 @@ operations:
   - promotions.allocation_component
   - promotions.bundle
   - promotions.bundle_choice_group
+  - promotions.bundle_choice_option
   - promotions.bundle_component
   writes: []
 - operation: getCouponCode
@@ -258,6 +261,17 @@ operations:
   offline: true
   reads:
   - promotions.coupon_code
+  writes: []
+- operation: getCouponCodeBatch
+  verb: GET
+  path: /coupon-campaigns/{campaignId}/code-batches/{batchId}
+  scope: venue
+  permission: PRICE_VIEW
+  audience:
+  - staff
+  offline: false
+  reads:
+  - promotions.coupon_code_batch
   writes: []
 - operation: getProductAffinity
   verb: GET
@@ -508,6 +522,7 @@ operations:
   - promotions.allocation_component
   - promotions.bundle
   - promotions.bundle_choice_group
+  - promotions.bundle_choice_option
   - promotions.bundle_component
   writes: []
 - operation: listCampaignCalendarTimeline
@@ -1464,9 +1479,11 @@ operations:
   reads:
   - cache:idempotency
   - promotions.promotion
+  - promotions.promotion_variant
   writes:
   - cache:idempotency
   - promotions.promotion
+  - promotions.promotion_variant
 - operation: setRecommendationSuppression
   verb: PUT
   path: /recommendation-suppressions
@@ -1552,6 +1569,7 @@ operations:
   - promotions.allocation_component
   - promotions.bundle
   - promotions.bundle_choice_group
+  - promotions.bundle_choice_option
   - promotions.bundle_component
   writes:
   - cache:idempotency

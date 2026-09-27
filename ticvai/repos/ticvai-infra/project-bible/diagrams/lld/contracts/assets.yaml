@@ -306,6 +306,7 @@ operations:
   offline: false
   reads:
   - assets.media_asset
+  - assets.media_usage
   - cache:idempotency
   writes:
   - assets.media_asset

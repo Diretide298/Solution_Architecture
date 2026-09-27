@@ -13,7 +13,6 @@ owner: ai
 initial:
 - processing
 terminal:
-- failed
 - superseded
 transitions:
 - from: processing

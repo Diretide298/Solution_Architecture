@@ -10,8 +10,8 @@ scale: Read-heavy, extreme latency sensitivity, edge-cached. **`frozenDays` is h
 ifDown: Down means the gates stop. Runs at the edge with a local decision cache.
 coverage:
   operations: 182
-  inAFlow: 17
-  percent: 57%
+  inAFlow: 163
+  percent: 90%
   note: '**Flow coverage is how much of this service a journey has walked.** A service under 40% is
     unwalked rather than under-documented.'
 schemas:
@@ -1486,15 +1486,64 @@ tables:
   columns: 5
   backing: redis
   owned: false
-  why: '**Not a table and not owned by a service.** Derived from something already read, invalidated
-    by an event already consumed, losable without consequence — no migration, no backup, no owner.'
+  why: '**Not a table and not owned by a service.** Derived from something already read, losable without
+    consequence — no migration, no backup, no owner.'
+  key: The idempotency key the caller sent
+  eviction:
+  - 'expires_at: **Must exceed the longest offline window.** A scanner out for a weekend replays on
+    Monday'
+  writtenBy:
+  - addBlacklistEntry
+  - createAccessPoint
+  - createAdmissionRules
+  - createParkingEntitlement
+  - enrolFacePass
+  - overrideAccess
+  - removeBlacklistEntry
+  - revokeFacePass
+  - setAccessPointGeofence
+  - setParkingFacility
+  - setTurnstileMode
+  - updateAccessPoint
+  - updateAdmissionRules
+  - updateParkingEntitlement
+  - validateAccess
+  - validateGroupAccess
+  readBy:
+  - addBlacklistEntry
+  - createAccessPoint
+  - createAdmissionRules
+  - createParkingEntitlement
+  - enrolFacePass
+  - overrideAccess
+  - removeBlacklistEntry
+  - revokeFacePass
+  - setAccessPointGeofence
+  - setParkingFacility
+  - setTurnstileMode
+  - updateAccessPoint
+  - updateAdmissionRules
+  - updateParkingEntitlement
+  - validateAccess
+  - validateGroupAccess
 - store: cache:resolution
   kind: cache
   columns: 4
   backing: redis
   owned: false
-  why: '**Not a table and not owned by a service.** Derived from something already read, invalidated
-    by an event already consumed, losable without consequence — no migration, no backup, no owner.'
+  why: '**Not a table and not owned by a service.** Derived from something already read, losable without
+    consequence — no migration, no backup, no owner.'
+  key: scope_path + what is being resolved — permissions, configuration, a price list
+  eviction:
+  - 'version: Bumped by the write that evicts it. **A config change nobody evicts is a stale permission**'
+  writtenBy:
+  - getOfflinePackage
+  readBy:
+  - getOfflinePackage
+  gap: '**The lineage names this store, not the key.** Which resolution entry each writer below evicts
+    or bumps — permissions, configuration, a price list, and whether child scopes under its `scope_path`
+    are affected — is not recorded for any operation, so a writer here cannot yet be implemented from
+    the package alone.'
 - table: access.access_change
   columns: 9
   store: postgres
@@ -1502,14 +1551,14 @@ tables:
   writtenBy: []
   foreignWriters: null
 - table: access.access_point
-  columns: 12
+  columns: 17
   store: postgres
   parent: null
   writtenBy:
   - access
   foreignWriters: null
 - table: access.admission_rules
-  columns: 10
+  columns: 11
   store: postgres
   parent: null
   writtenBy:
@@ -1581,16 +1630,51 @@ readsFrom:
 writesOutside:
 - service: IdentityService
   operations: 2
-  why: '**The owner defines the row; this service may only append to it.**'
+  rule: 'ADR-0028: the owner defines the row; a foreign writer may only append, through a path the owner
+    published.'
+  why: '**The lineage records these writes, not how they honour the rule.** It does not say whether
+    each inserts or updates, or which operation or event IdentityService published for it — check each
+    against ADR-0028.'
+  writes:
+  - operation: enrolFacePass
+    tables:
+    - pii.subject_biometric
+  - operation: revokeFacePass
+    tables:
+    - pii.subject_biometric
 - service: TenancyService
   operations: 1
-  why: '**The owner defines the row; this service may only append to it.**'
+  rule: 'ADR-0028: the owner defines the row; a foreign writer may only append, through a path the owner
+    published.'
+  why: '**The lineage records these writes, not how they honour the rule.** It does not say whether
+    each inserts or updates, or which operation or event TenancyService published for it — check each
+    against ADR-0028.'
+  writes:
+  - operation: validateAccess
+    tables:
+    - platform.outbox
 - service: CrossRegionService
   operations: 1
-  why: '**The owner defines the row; this service may only append to it.**'
+  rule: 'ADR-0028: the owner defines the row; a foreign writer may only append, through a path the owner
+    published.'
+  why: '**The lineage records these writes, not how they honour the rule.** It does not say whether
+    each inserts or updates, or which operation or event CrossRegionService published for it — check
+    each against ADR-0028.'
+  writes:
+  - operation: syncScans
+    tables:
+    - sync.rejection
 - service: MarketingService
   operations: 1
-  why: '**The owner defines the row; this service may only append to it.**'
+  rule: 'ADR-0028: the owner defines the row; a foreign writer may only append, through a path the owner
+    published.'
+  why: '**The lineage records these writes, not how they honour the rule.** It does not say whether
+    each inserts or updates, or which operation or event MarketingService published for it — check each
+    against ADR-0028.'
+  writes:
+  - operation: enrolFacePass
+    tables:
+    - marketing.consent_record
 screens:
 - P01:WEB-018 My Tickets
 - P01:WEB-024 Devices, Wishlist & Consent

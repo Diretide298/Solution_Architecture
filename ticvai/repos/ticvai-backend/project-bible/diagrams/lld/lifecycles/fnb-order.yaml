@@ -12,9 +12,6 @@ owner: fnb
 initial:
 - ordered
 terminal:
-- served
-- collected
-- delivered
 - cancelled
 - refunded
 transitions:

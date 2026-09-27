@@ -5,12 +5,12 @@
 -- saying what it is
 CREATE TABLE IF NOT EXISTS identity.access_decision (
     id                                uuid PRIMARY KEY,
-    effect                            text,
+    effect                            text CONSTRAINT access_decision_effect_chk CHECK (effect IN ('permit', 'deny')),
     decided_at                        timestamptz,
-    decided_by                        text,
+    decided_by                        text CONSTRAINT access_decision_decided_by_chk CHECK (decided_by IN ('central', 'deviceBundle')),
     principal_id                      uuid,
     permission                        text,
-    scope_path                        ltree,
+    scope_path                        ltree NOT NULL,
     observed_attributes               jsonb,
     override_id                       uuid,
     latency_ms                        integer,
@@ -22,7 +22,7 @@ CREATE TABLE IF NOT EXISTS identity.access_decision (
 CREATE TABLE IF NOT EXISTS identity.access_override (
     id                                uuid PRIMARY KEY,
     principal_id                      uuid,
-    scope_path                        ltree,
+    scope_path                        ltree NOT NULL,
     permissions                       text[],
     reason                            text,
     created_by                        uuid,
@@ -39,15 +39,15 @@ CREATE TABLE IF NOT EXISTS identity.access_policy (
     code                              text NOT NULL,
     name                              text NOT NULL,
     description                       text,
-    is_template                       boolean,
+    is_template                       boolean DEFAULT false,
     permissions                       text[],
-    combining                         text,
-    effect                            text NOT NULL,
-    priority                          integer,
-    scope_path                        ltree,
+    combining                         text DEFAULT 'allMustMatch' CONSTRAINT access_policy_combining_chk CHECK (combining IN ('allMustMatch', 'anyMayMatch')),
+    effect                            text NOT NULL CONSTRAINT access_policy_effect_chk CHECK (effect IN ('permit', 'deny')),
+    priority                          integer DEFAULT 0,
+    scope_path                        ltree NOT NULL,
     applies_to_role_ids               text[],
-    status                            text,
-    version                           integer,
+    status                            text CONSTRAINT access_policy_status_chk CHECK (status IN ('draft', 'pendingApproval', 'active', 'suspended', 'retired')),
+    version                           integer DEFAULT 1,
     effective_from                    timestamptz,
     effective_to                      timestamptz,
     delegated_admin_role_ids          text[]
@@ -62,9 +62,9 @@ CREATE TABLE IF NOT EXISTS identity.access_policy_version (
     changed_at                        timestamptz,
     reason                            text,
     approved_by                       uuid,
-    previous                          uuid,
-    current                           uuid,
-    scope_path                        ltree,
+    previous_id                       uuid,
+    current_id                        uuid,
+    scope_path                        ltree NOT NULL,
     id                                uuid PRIMARY KEY NOT NULL
 );
 
@@ -83,22 +83,22 @@ CREATE TABLE IF NOT EXISTS identity.benefit_usage (
     customer_membership_id            uuid NOT NULL,
     membership_benefit_id             uuid NOT NULL,
     quantity                          numeric(18,4) NOT NULL,
-    source_type                       text,
+    source_type                       text CONSTRAINT benefit_usage_source_type_chk CHECK (char_length(source_type) <= 30),
     source_order_id                   uuid,
     used_at                           timestamptz NOT NULL,
     remaining_quantity                numeric(18,4),
-    notes                             text
+    notes                             text CONSTRAINT benefit_usage_notes_chk CHECK (char_length(notes) <= 500)
 );
 
 -- Holds 6 columns. No description has been written for this table — the name is the only thing
 -- saying what it is
 CREATE TABLE IF NOT EXISTS identity.capability_template (
     id                                uuid PRIMARY KEY,
-    code                              text NOT NULL,
-    name                              text NOT NULL,
+    code                              text NOT NULL CONSTRAINT capability_template_code_chk CHECK (char_length(code) <= 64),
+    name                              text NOT NULL CONSTRAINT capability_template_name_chk CHECK (char_length(name) <= 200),
     description                       text,
     capabilities                      text[] NOT NULL,
-    scope_path                        ltree
+    scope_path                        ltree NOT NULL
 );
 
 -- Holds 12 columns. No description has been written for this table — the name is the only thing
@@ -107,12 +107,12 @@ CREATE TABLE IF NOT EXISTS identity.customer_membership (
     id                                uuid PRIMARY KEY,
     customer_id                       uuid NOT NULL,
     entitlement_template_id           uuid NOT NULL,
-    number                            text NOT NULL,
+    number                            text NOT NULL CONSTRAINT customer_membership_number_chk CHECK (char_length(number) <= 50),
     source_order_id                   uuid,
     start_at                          timestamptz NOT NULL,
     expires_at                        timestamptz,
-    status                            text NOT NULL,
-    auto_renew                        boolean NOT NULL,
+    status                            text NOT NULL CONSTRAINT customer_membership_status_chk CHECK (char_length(status) <= 30),
+    is_auto_renew                     boolean NOT NULL,
     cancelled_at                      timestamptz,
     created_at                        timestamptz NOT NULL,
     updated_at                        timestamptz
@@ -129,19 +129,19 @@ CREATE TABLE IF NOT EXISTS identity.delegated_access (
     subject_id                        uuid,
     over_subject_id                   uuid,
     over_object_ref                   text,
-    delegation_kind                   text,
+    delegation_kind                   text CONSTRAINT delegated_access_delegation_kind_chk CHECK (delegation_kind IN ('primaryHolder', 'familyMember', 'groupLeader', 'attendee', 'corporateAdmin', 'corporateMember', 'carer')),
     quota                             integer,
-    is_revocable_by_subject           boolean,
+    is_revocable_by_subject           boolean DEFAULT true,
     scope_path                        ltree NOT NULL,
-    effect                            text NOT NULL,
+    effect                            text NOT NULL CONSTRAINT delegated_access_effect_chk CHECK (effect IN ('ALLOW', 'DENY')),
     permission_id                     uuid,
     revoked_at                        timestamptz,
     valid_from                        timestamptz,
     valid_to                          timestamptz,
     created_by_principal_id           uuid,
     created_at                        timestamptz,
-    granted_by                        uuid NOT NULL,
-    revoked_by                        uuid NOT NULL,
+    granted_by_principal_id           uuid NOT NULL,
+    revoked_by_principal_id           uuid,
     scope_id                          uuid NOT NULL
 );
 
@@ -150,9 +150,9 @@ CREATE TABLE IF NOT EXISTS identity.delegated_access (
 CREATE TABLE IF NOT EXISTS identity.membership_history (
     id                                uuid PRIMARY KEY,
     customer_membership_id            uuid NOT NULL,
-    from_status                       text,
-    to_status                         text NOT NULL,
-    reason                            text,
+    from_status                       text CONSTRAINT membership_history_from_status_chk CHECK (char_length(from_status) <= 30),
+    to_status                         text NOT NULL CONSTRAINT membership_history_to_status_chk CHECK (char_length(to_status) <= 30),
+    reason                            text CONSTRAINT membership_history_reason_chk CHECK (char_length(reason) <= 500),
     changed_by_principal_id           uuid,
     changed_at                        timestamptz NOT NULL
 );
@@ -167,7 +167,7 @@ CREATE TABLE IF NOT EXISTS identity.mfa_challenge (
 -- A second factor a principal has enrolled. Guests may enrol too, from 26 August
 CREATE TABLE IF NOT EXISTS identity.mfa_method (
     id                                uuid PRIMARY KEY NOT NULL,
-    kind                              text NOT NULL,
+    kind                              text NOT NULL CONSTRAINT mfa_method_kind_chk CHECK (kind IN ('totp', 'smsOtp', 'emailOtp', 'biometric', 'hardwareToken')),
     label                             text,
     masked_target                     text,
     is_active                         boolean NOT NULL,
@@ -188,11 +188,11 @@ CREATE TABLE IF NOT EXISTS identity.mfa_recovery_code (
 -- saying what it is
 CREATE TABLE IF NOT EXISTS identity.module (
     id                                uuid PRIMARY KEY,
-    code                              text NOT NULL,
-    name                              text NOT NULL,
-    description                       text,
+    code                              text NOT NULL CONSTRAINT module_code_chk CHECK (char_length(code) <= 100),
+    name                              text NOT NULL CONSTRAINT module_name_chk CHECK (char_length(name) <= 150),
+    description                       text CONSTRAINT module_description_chk CHECK (char_length(description) <= 500),
     parent_module_id                  uuid,
-    type                              text NOT NULL,
+    type                              text NOT NULL CONSTRAINT module_type_chk CHECK (char_length(type) <= 30),
     sort_order                        integer NOT NULL,
     is_system_module                  boolean NOT NULL,
     is_active                         boolean NOT NULL,
@@ -225,16 +225,16 @@ CREATE TABLE IF NOT EXISTS identity.otp_challenge (
 CREATE TABLE IF NOT EXISTS identity.password_policy (
     id                                uuid PRIMARY KEY NOT NULL,
     scope_path                        ltree NOT NULL,
-    min_length                        integer NOT NULL,
-    require_breach_check              boolean,
+    min_length                        integer NOT NULL DEFAULT 12,
+    require_breach_check              boolean DEFAULT true,
     max_age_days                      integer,
     recovery_methods                  text[],
     max_concurrent_sessions           integer,
     device_restriction                jsonb,
-    lockout_after_attempts            integer,
-    lockout_minutes                   integer,
-    force_change_on_first_logon       boolean,
-    reuse_prevention_count            integer,
+    lockout_after_attempts            integer DEFAULT 10,
+    lockout_minutes                   integer DEFAULT 15,
+    force_change_on_first_logon       boolean DEFAULT true,
+    reuse_prevention_count            integer DEFAULT 5,
     mfa_required_for_permissions      text[]
 );
 
@@ -243,10 +243,10 @@ CREATE TABLE IF NOT EXISTS identity.password_policy (
 CREATE TABLE IF NOT EXISTS identity.permission (
     id                                uuid PRIMARY KEY,
     module_id                         uuid NOT NULL,
-    code                              text NOT NULL,
-    name                              text NOT NULL,
-    action                            text NOT NULL,
-    description                       text,
+    code                              text NOT NULL CONSTRAINT permission_code_chk CHECK (char_length(code) <= 150),
+    name                              text NOT NULL CONSTRAINT permission_name_chk CHECK (char_length(name) <= 150),
+    action                            text NOT NULL CONSTRAINT permission_action_chk CHECK (char_length(action) <= 50),
+    description                       text CONSTRAINT permission_description_chk CHECK (char_length(description) <= 500),
     is_system                         boolean NOT NULL,
     is_active                         boolean NOT NULL,
     created_at                        timestamptz NOT NULL,
@@ -282,13 +282,13 @@ CREATE TABLE IF NOT EXISTS identity.principal_credential (
 CREATE TABLE IF NOT EXISTS identity.refresh_token (
     id                                uuid PRIMARY KEY,
     principal_id                      uuid NOT NULL,
-    hash                              text NOT NULL,
+    hash                              text NOT NULL CONSTRAINT refresh_token_hash_chk CHECK (char_length(hash) <= 500),
     expires_at                        timestamptz NOT NULL,
     created_at                        timestamptz NOT NULL,
-    created_by_ip                     text,
+    created_by_ip                     text CONSTRAINT refresh_token_created_by_ip_chk CHECK (char_length(created_by_ip) <= 50),
     revoked_at                        timestamptz,
-    revoked_by_ip                     text,
-    revocation_reason                 text,
+    revoked_by_ip                     text CONSTRAINT refresh_token_revoked_by_ip_chk CHECK (char_length(revoked_by_ip) <= 50),
+    revocation_reason                 text CONSTRAINT refresh_token_revocation_reason_chk CHECK (char_length(revocation_reason) <= 250),
     replaced_by_token_id              uuid
 );
 
@@ -300,7 +300,7 @@ CREATE TABLE IF NOT EXISTS identity.role (
     name                              text NOT NULL,
     description                       text,
     inherits_from_role_id             uuid,
-    is_system                         boolean,
+    is_system                         boolean DEFAULT false,
     principal_count                   integer,
     grant_count                       integer
 );
@@ -310,10 +310,10 @@ CREATE TABLE IF NOT EXISTS identity.role (
 -- and 1 write it.
 CREATE TABLE IF NOT EXISTS identity.role_permission (
     role_id                           uuid NOT NULL,
-    permission                        text NOT NULL,
+    permission                        text NOT NULL CONSTRAINT role_permission_permission_chk CHECK (permission IN ('SESSION_FORCE_LOGOUT', 'USER_MANAGE', 'ROLE_MANAGE', 'PERMISSION_GRANT', 'PERMISSION_VIEW', 'PERMISSION_MANAGE', 'PLATFORM_TENANT_VIEW', 'PLATFORM_TENANT_MANAGE', 'PLATFORM_TENANT_TERMINATE', 'PLATFORM_PLAN_MANAGE', 'PLATFORM_CELL_VIEW', 'PLATFORM_CELL_MANAGE', 'PLATFORM_BILLING_VIEW', 'PLATFORM_BILLING_MANAGE', 'PLATFORM_RELEASE_VIEW', 'PLATFORM_RELEASE_MANAGE', 'PLATFORM_RELEASE_PROMOTE', 'PLATFORM_MIGRATION_VIEW', 'PLATFORM_MIGRATION_APPLY', 'TENANT_CONFIGURE', 'TENANT_PUBLISH', 'SCOPE_VIEW', 'SCOPE_MANAGE', 'REGION_CONFIGURE', 'WORKSTATION_CONFIGURE', 'PRODUCT_VIEW', 'PRODUCT_CONFIGURE', 'PRICE_VIEW', 'PRICE_CONFIGURE', 'EVENT_CONFIGURE', 'PERFORMANCE_CONFIGURE', 'CAPACITY_CONFIGURE', 'ORDER_VIEW', 'ORDER_VIEW_OTHER', 'ORDER_CREATE', 'ORDER_MODIFY', 'ORDER_DISCOUNT', 'ORDER_CANCEL', 'ORDER_VOID', 'ORDER_REFUND', 'ORDER_REFUND_APPROVE', 'ORDER_REFUND_BULK', 'ORDER_EXCHANGE', 'ORDER_RESCHEDULE', 'ORDER_REPRINT', 'PRICE_OVERRIDE', 'DISCOUNT_APPLY', 'CREDIT_MANAGE', 'CREDIT_OVERRIDE', 'WALLET_VIEW', 'WALLET_OPERATE', 'WALLET_CONFIGURE', 'PAYMENT_VIEW', 'PAYMENT_CONFIGURE', 'PAYMENT_PROVIDER_MANAGE', 'PAYMENT_DISPUTE', 'SHIFT_OPEN', 'SHIFT_CLOSE', 'SHIFT_SUSPEND', 'SHIFT_CLOSE_OTHER', 'SHIFT_APPROVE_OPEN', 'SHIFT_APPROVE_CLOSE', 'SHIFT_REOPEN', 'CASH_LIFT', 'CASH_ADD', 'CASH_NO_SALE', 'DEPOSIT_BOX_MODIFY_OWN', 'DEPOSIT_BOX_MODIFY_OTHER', 'OVERSHORT_ACCEPT', 'ACCESS_VALIDATE', 'ACCESS_OVERRIDE', 'ACCESS_POINT_CONFIGURE', 'TURNSTILE_MODE_SET', 'TICKET_LOOKUP', 'ACCREDITATION_VIEW', 'ACCREDITATION_APPLY', 'ACCREDITATION_APPROVE', 'ACCREDITATION_ISSUE', 'ACCREDITATION_MANAGE', 'ACCREDITATION_CONFIGURE', 'REPORT_VIEW_OWN', 'REPORT_VIEW_WORKSTATION', 'REPORT_VIEW_VENUE', 'REPORT_VIEW_REGION', 'REPORT_VIEW_TENANT', 'REPORT_EXPORT', 'REPORT_EXPORT_PII', 'REPORT_MANAGE', 'REPORT_SCHEDULE', 'LEDGER_VIEW', 'LEDGER_POST', 'LEDGER_APPROVE', 'TAX_CONFIGURE', 'ACCOUNT_CONFIGURE', 'SETTLEMENT_VIEW', 'SETTLEMENT_RECONCILE', 'GUEST_VIEW', 'GUEST_VIEW_PII', 'GUEST_MANAGE', 'VENUE_MAP_VIEW', 'VENUE_MAP_MANAGE', 'VENUE_MAP_PUBLISH', 'RESOURCE_VIEW', 'RESOURCE_BOOK', 'RESOURCE_MANAGE', 'RESOURCE_CONFIGURE', 'RENTAL_VIEW', 'RENTAL_BOOK', 'RENTAL_OPERATE', 'RENTAL_MANAGE', 'RENTAL_CONFIGURE', 'RENTAL_PRICE', 'RENTAL_APPROVE', 'RENTAL_OVERRIDE', 'DEVELOPER_VIEW', 'DEVELOPER_MANAGE', 'DEVELOPER_ADMIN', 'LOYALTY_ACCRUE', 'LOYALTY_REDEEM', 'LOYALTY_ADJUST', 'MARKETING_VIEW', 'MARKETING_MANAGE', 'MARKETING_SEND', 'CASE_VIEW', 'CASE_MANAGE', 'ASSET_LIBRARY_VIEW', 'ASSET_LIBRARY_MANAGE', 'ASSET_LIBRARY_APPROVE', 'ASSET_LIBRARY_SHARE', 'QUEUE_VIEW', 'QUEUE_MANAGE', 'QUEUE_REDEEM', 'QUEUE_OVERRIDE', 'ASSET_VIEW', 'ASSET_MANAGE', 'WORK_ORDER_VIEW', 'WORK_ORDER_MANAGE', 'WORK_ORDER_VERIFY', 'INSPECTION_VIEW', 'INSPECTION_SUBMIT', 'INSPECTION_MANAGE', 'INCIDENT_REPORT', 'INCIDENT_VIEW', 'INCIDENT_MANAGE', 'KIOSK_ATTEND', 'DEVICE_VIEW', 'DEVICE_CONFIGURE', 'DEVICE_MANAGE', 'APPROVAL_ACT', 'APPROVAL_DELEGATE', 'AI_USE', 'AI_CONFIGURE', 'AI_APPROVE', 'AI_AUDIT_VIEW', 'AUDIT_VIEW', 'APPROVAL_VIEW', 'APPROVAL_REQUEST', 'APPROVAL_DECIDE', 'APPROVAL_CONFIGURE', 'MAINTENANCE_EXECUTE', 'MAINTENANCE_APPROVE', 'WORKFORCE_VIEW', 'WORKFORCE_MANAGE', 'ATTENDANCE_RECORD', 'ANNOUNCEMENT_PUBLISH', 'PARTNER_VIEW', 'PARTNER_MANAGE', 'PARKING_CONFIGURE', 'PAYMENT_VOID')),
     granted_at                        timestamptz,
     granted_by_principal_id           uuid,
-    is_active                         boolean,
+    is_active                         boolean DEFAULT true,
     id                                uuid PRIMARY KEY NOT NULL
 );
 
@@ -324,11 +324,11 @@ CREATE TABLE IF NOT EXISTS identity.segregation_rule (
     name                              text,
     permission_a                      text NOT NULL,
     permission_b                      text NOT NULL,
-    severity                          text NOT NULL,
+    severity                          text NOT NULL CONSTRAINT segregation_rule_severity_chk CHECK (severity IN ('block', 'requireApproval', 'warn')),
     rationale                         text,
-    scope_sensitive                   boolean,
-    allow_with_compensating_control   boolean,
-    scope_path                        ltree
+    scope_sensitive                   boolean DEFAULT true,
+    allow_with_compensating_control   boolean DEFAULT false,
+    scope_path                        ltree NOT NULL
 );
 
 -- Which provider group becomes which role. The join that stops SSO meaning manual role assignment
@@ -336,7 +336,7 @@ CREATE TABLE IF NOT EXISTS identity.sso_group_mapping (
     id                                uuid PRIMARY KEY,
     external_group                    text NOT NULL,
     role_id                           uuid NOT NULL,
-    scope_path                        ltree,
+    scope_path                        ltree NOT NULL,
     provider_id                       uuid,
     scope_id                          uuid
 );
@@ -345,16 +345,16 @@ CREATE TABLE IF NOT EXISTS identity.sso_group_mapping (
 -- email never is
 CREATE TABLE IF NOT EXISTS identity.sso_provider (
     icon_asset_ref                    text,
-    scope_path                        ltree,
+    scope_path                        ltree NOT NULL,
     id                                uuid PRIMARY KEY NOT NULL,
     display_name                      text NOT NULL,
-    protocol                          text NOT NULL,
+    protocol                          text NOT NULL CONSTRAINT sso_provider_protocol_chk CHECK (protocol IN ('oidc', 'saml2')),
     metadata_url                      text,
     issuer                            text,
     client_id                         text,
     client_secret_ref                 text,
-    auto_provision_principals         boolean,
-    is_enforced                       boolean,
+    is_auto_provision_principals      boolean DEFAULT false,
+    is_enforced                       boolean DEFAULT false,
     is_active                         boolean
 );
 

@@ -104,9 +104,9 @@
 
 | To | Trigger | Carries | Guard |
 |---|---|---|---|
-| POS-001 | Begin Shift | boxId, shiftId, workstationId |  |
-| POS-025 | Till Home | workstationId |  |
-| KIT-002 | Kitchen Display System (KDS) | stationId, ticketId, venueId, visitId |  |
+| POS-001 | Begin Shift |  |  |
+| POS-025 | Till Home |  |  |
+| KIT-002 | Kitchen Display System (KDS) |  |  |
 
 ## POS-001 Begin Shift
 
@@ -139,10 +139,10 @@
 | `approveShiftOpen` | [OrderService](../backend/OrderService.md#approveshiftopen) | onAction | Approve a shift opening outside tolerance | `SHIFT_APPROVE_OPEN` |
 | `closeShift` | [OrderService](../backend/OrderService.md#closeshift) | onAction | Blind close-out | `SHIFT_CLOSE` |
 | `createCashMovement` | [OrderService](../backend/OrderService.md#createcashmovement) | onAction | Record a cash lift or add | `CASH_LIFT` |
-| `getShift` | [OrderService](../backend/OrderService.md#getshift) | onLoad | Read a shift | `REPORT_VIEW_WORKSTATION` |
-| `listCashMovements` | [OrderService](../backend/OrderService.md#listcashmovements) | onLoad | Lifts, adds and the opening float | `REPORT_VIEW_WORKSTATION` |
+| `getShift` | [OrderService](../backend/OrderService.md#getshift) | onAction | Read a shift | `REPORT_VIEW_WORKSTATION` |
+| `listCashMovements` | [OrderService](../backend/OrderService.md#listcashmovements) | onAction | Lifts, adds and the opening float | `REPORT_VIEW_WORKSTATION` |
 | `listShifts` | [OrderService](../backend/OrderService.md#listshifts) | onLoad | List shifts | `REPORT_VIEW_WORKSTATION` |
-| `recordNoSale` | [OrderService](../backend/OrderService.md#recordnosale) | onAction | Open the drawer without a sale | `SHIFT_SUSPEND` |
+| `recordNoSale` | [OrderService](../backend/OrderService.md#recordnosale) | onAction | Open the drawer without a sale | `CASH_NO_SALE` |
 | `reopenShift` | [OrderService](../backend/OrderService.md#reopenshift) | onAction | Reopen a shift closed in error | `SHIFT_REOPEN` |
 | `resumeShift` | [OrderService](../backend/OrderService.md#resumeshift) | onAction | Resume a suspended shift | `SHIFT_OPEN` |
 | `suspendShift` | [OrderService](../backend/OrderService.md#suspendshift) | onAction | Suspend a shift so another user can log in | `SHIFT_SUSPEND` |
@@ -158,8 +158,8 @@
 | loading | The begin shift list. |
 | error | Could not load. Names which read failed and leaves the begin shift untouched. |
 | emptyFirstRun | Nothing is waiting, which is the good outcome. An empty queue means every item has been decided; it offers no create action, because creating work is not what it needs. |
-| emptyNoResults | The filter narrowed it and the begin shift are still there. Names the active filter and offers to clear it. |
-| emptyNoAccess | Names the missing permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| emptyNoResults | Never shown: `listCashMovements` takes no filter, so an empty list is always the first-run state above. |
+| emptyNoAccess | Shown when the caller lacks `SHIFT_OPEN`, which `getCurrentShift` requires, and names that permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | offline | Opens locally and syncs. A gate that cannot open a till because the network is down is a gate that does not sell |
 | denied | Sign-in succeeds and the shift will not open — the operator's role does not hold `sale.create` on this terminal. The float count is kept, not discarded, and a supervisor can open the shift against the same count. |
 
@@ -175,6 +175,16 @@
 | POS-023 | Sell — Merchandise |  |  |
 | POS-024 | Outlet Setup |  |  |
 | POS-025 | Till Home |  |  |
+| POS-011 | Returns, Refunds & Exchanges |  |  |
+| POS-012 | Omnichannel Order & Fulfilment Center |  |  |
+| POS-014 | Sales Exceptions, Controls & Operational Actions | shiftId |  |
+| POS-015 | Cash Operations Dashboard | shiftId |  |
+| POS-016 | Till Configuration |  |  |
+| POS-017 | Cash In / Cash Out Operations | shiftId |  |
+| POS-018 | Safe Drop & Cash Transfer Management | boxId, shiftId |  |
+| POS-019 | Shift Templates & Policies | venueId |  |
+| POS-020 | Shift Exceptions & Alerts | shiftId |  |
+| POS-013 | Mobile POS, Event Sales & Offline Operations |  |  |
 
 ## POS-002 Sell — Ticket Catalogue
 
@@ -208,30 +218,30 @@
 | `evaluatePromotions` | [CatalogueService](../backend/CatalogueService.md#evaluatepromotions) | onAction | Live cart pricing | `PRICE_VIEW` |
 | `holdOrder` | [OrderService](../backend/OrderService.md#holdorder) | onAction | Park the sale | `ORDER_MODIFY` |
 | `applyManualDiscount` | [OrderService](../backend/OrderService.md#applymanualdiscount) | onAction | Cashier discount with a reason | `ORDER_DISCOUNT` |
-| `analysePromotionConflicts` | [CatalogueService](../backend/CatalogueService.md#analysepromotionconflicts) | onLoad | Analyse stacking against live promotions | `PRICE_VIEW` |
+| `analysePromotionConflicts` | [CatalogueService](../backend/CatalogueService.md#analysepromotionconflicts) | onAction | Analyse stacking against live promotions | `PRICE_VIEW` |
 | `createOrder` | [OrderService](../backend/OrderService.md#createorder) | onAction | Create an order | `ORDER_CREATE` |
 | `createRefund` | [OrderService](../backend/OrderService.md#createrefund) | onAction | Refund an order, wholly or in part | `ORDER_REFUND` |
 | `exchangeOrderLines` | [OrderService](../backend/OrderService.md#exchangeorderlines) | onAction | Exchange lines for different products or dates | `ORDER_EXCHANGE` |
-| `getOrder` | [OrderService](../backend/OrderService.md#getorder) | onLoad | Read an order | `ORDER_VIEW` |
-| `getOrderStatement` | [OrderService](../backend/OrderService.md#getorderstatement) | onLoad | Full financial history of an order | `ORDER_VIEW` |
-| `getProduct` | [CatalogueService](../backend/CatalogueService.md#getproduct) | onLoad | Read a product | `PRODUCT_VIEW` |
-| `getPromotion` | [CatalogueService](../backend/CatalogueService.md#getpromotion) | onLoad | Read a promotion | `PRICE_VIEW` |
-| `getPromotionUsage` | [CatalogueService](../backend/CatalogueService.md#getpromotionusage) | onLoad | Redemption count and discount given | `PRICE_VIEW` |
-| `listAlternativeCodes` | [CatalogueService](../backend/CatalogueService.md#listalternativecodes) | onLoad | External identifiers for a product | `PRODUCT_VIEW` |
-| `listOrderRefunds` | [OrderService](../backend/OrderService.md#listorderrefunds) | onLoad | List refunds against an order | `ORDER_VIEW` |
+| `getOrder` | [OrderService](../backend/OrderService.md#getorder) | onAction | Read an order | `ORDER_VIEW` |
+| `getOrderStatement` | [OrderService](../backend/OrderService.md#getorderstatement) | onAction | Full financial history of an order | `ORDER_VIEW` |
+| `getProduct` | [CatalogueService](../backend/CatalogueService.md#getproduct) | onAction | Read a product | `PRODUCT_VIEW` |
+| `getPromotion` | [CatalogueService](../backend/CatalogueService.md#getpromotion) | onAction | Read a promotion | `PRICE_VIEW` |
+| `getPromotionUsage` | [CatalogueService](../backend/CatalogueService.md#getpromotionusage) | onAction | Redemption count and discount given | `PRICE_VIEW` |
+| `listAlternativeCodes` | [CatalogueService](../backend/CatalogueService.md#listalternativecodes) | onAction | External identifiers for a product | `PRODUCT_VIEW` |
+| `listOrderRefunds` | [OrderService](../backend/OrderService.md#listorderrefunds) | onAction | List refunds against an order | `ORDER_VIEW` |
 | `listOrders` | [OrderService](../backend/OrderService.md#listorders) | onLoad | List orders | `ORDER_VIEW` |
-| `listProductVariants` | [CatalogueService](../backend/CatalogueService.md#listproductvariants) | onLoad | List generated variants | `PRODUCT_VIEW` |
+| `listProductVariants` | [CatalogueService](../backend/CatalogueService.md#listproductvariants) | onAction | List generated variants | `PRODUCT_VIEW` |
 | `listPromotions` | [CatalogueService](../backend/CatalogueService.md#listpromotions) | onLoad | List promotions | `PRICE_VIEW` |
 | `modifyOrder` | [OrderService](../backend/OrderService.md#modifyorder) | onAction | Add or remove lines on an existing order | `ORDER_MODIFY` |
 | `reprintOrder` | [OrderService](../backend/OrderService.md#reprintorder) | onAction | Reprint or resend tickets | `ORDER_REPRINT` |
 | `rescheduleOrder` | [OrderService](../backend/OrderService.md#rescheduleorder) | onAction | Move an order to another performance | `ORDER_RESCHEDULE` |
-| `resolveProductByCode` | [CatalogueService](../backend/CatalogueService.md#resolveproductbycode) | onLoad | Resolve a partner code to a product | `PRODUCT_VIEW` |
+| `resolveProductByCode` | [CatalogueService](../backend/CatalogueService.md#resolveproductbycode) | onAction | Resolve a partner code to a product | `PRODUCT_VIEW` |
 | `resumeOrder` | [OrderService](../backend/OrderService.md#resumeorder) | onAction | Bring a parked sale back to a till | `ORDER_MODIFY` |
 | `voidOrder` | [OrderService](../backend/OrderService.md#voidorder) | onAction | Void an order | `ORDER_VOID` |
 | `evaluateApprovalRequirement` | [TenancyService](../backend/TenancyService.md#evaluateapprovalrequirement) | onAction | Does this need approval, and from whom | `APPROVAL_VIEW` |
 | `createPayment` | [OrderService](../backend/OrderService.md#createpayment) | onAction | Take a payment against an order | `ORDER_CREATE` |
 | `listMerchandise` | [RetailService](../backend/RetailService.md#listmerchandise) | onLoad | List merchandise | `PRODUCT_VIEW` |
-| `lookupMerchandise` | [RetailService](../backend/RetailService.md#lookupmerchandise) | onLoad | Price and stock check by barcode | `PRODUCT_VIEW` |
+| `lookupMerchandise` | [RetailService](../backend/RetailService.md#lookupmerchandise) | onAction | Price and stock check by barcode | `PRODUCT_VIEW` |
 | `issueGameCard` | [VenueOpsService](../backend/VenueOpsService.md#issuegamecard) | onAction | Issue or activate a game card | `ORDER_CREATE` |
 | `loadGameCredits` | [WalletService](../backend/WalletService.md#loadgamecredits) | onAction | Load credits onto a card | `WALLET_OPERATE` |
 | `addCartLine` | [OrderService](../backend/OrderService.md#addcartline) | onAction | Add something | `None` |
@@ -253,9 +263,9 @@
 |---|---|
 | loading | The sell ticket catalogue list. |
 | error | Could not load. Names which read failed and leaves the sell ticket catalogue untouched. |
-| emptyFirstRun | No sell ticket catalogue yet. Carries the create action; distinct from a filter that matched nothing. |
-| emptyNoResults | The filter narrowed it and the sell ticket catalogue are still there. Names the active filter and offers to clear it. |
-| emptyNoAccess | Names the missing permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| emptyFirstRun | No sell ticket catalogue yet. Offers Create order (`createOrder`); distinct from a filter that matched nothing. |
+| emptyNoResults | Nothing matches the filter on venueId, kind, isSellable and the sell ticket catalogue are still there. Names the active filter and offers to clear it. |
+| emptyNoAccess | Shown when the caller lacks `PRODUCT_VIEW`, which `listProducts` requires, and names that permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | offline | Served from the local catalogue bundle (ADR-0013). One read path, always local — the terminal does not know whether it has a network. |
 | denied | The catalogue reads normally and Charge is refused without `payment.take`. The cart is held, not cleared, so a permitted operator can complete the same sale. |
 
@@ -266,18 +276,19 @@
 | POS-003 | Choose a date and session for a timed product | productId, visitDate, sessionTime, quantityByVariant | product.timed |
 | POS-004 | Select seats on the plan | productId, performanceId, seatPicks, zoneId, holdExpiresAt | product.seats or product.evt |
 | POS-005 | Charge, or swipe the pay control | cart, guest, discount, orderType, table, taxTotals | payment.take |
-| POS-006 | Recall held |  | sale.resume |
+| POS-006 | Recall held | orderId | sale.resume |
 | BO-045 | The new price is wrong on eleven items |  |  |
-| POS-011 | Three days later the guest returns one item |  |  |
 | POS-013 | A guest wants cash back and the drawer is heavy |  |  |
 | BO-084 | The manager sees it in their inbox |  |  |
 | BO-130 | Four transactions are rejected — a product retired while the till was offline |  |  |
 | BO-133 | The venue's offline exposure crosses a ceiling |  |  |
-| GST-026 | Checks the balance in the app |  |  |
-| POS-001 | Begin Shift | boxId, shiftId, workstationId |  |
-| POS-007 | Close Shift | boxId, saleId, shiftId |  |
-| POS-010 | Add to Existing Ticket | cartId, mediaCode, mediaId, orderId |  |
-| POS-020 | Shift Exceptions & Alerts | reportId, requestId, shiftId, workstationId |  |
+| POS-001 | Begin Shift |  |  |
+| POS-007 | Close Shift | saleId |  |
+| POS-010 | Add to Existing Ticket | orderId |  |
+| POS-020 | Shift Exceptions & Alerts |  |  |
+| POS-008 | Reports |  |  |
+| POS-011 | Three days later the guest returns one item | orderId, outletId |  |
+| GST-026 | Checks the balance in the app | cardCode |  |
 
 ## POS-003 Sell — Timed Entry
 
@@ -312,7 +323,7 @@
 | `listProducts` | [CatalogueService](../backend/CatalogueService.md#listproducts) | onLoad | List products | `PRODUCT_VIEW` |
 | `relinquishInventoryHold` | [CatalogueService](../backend/CatalogueService.md#relinquishinventoryhold) | onAction | Return unsold units | `ORDER_CREATE` |
 | `renewInventoryHold` | [CatalogueService](../backend/CatalogueService.md#renewinventoryhold) | onAction | Extend a lease TTL | `ORDER_CREATE` |
-| `resolveProductByCode` | [CatalogueService](../backend/CatalogueService.md#resolveproductbycode) | onLoad | Resolve a partner code to a product | `PRODUCT_VIEW` |
+| `resolveProductByCode` | [CatalogueService](../backend/CatalogueService.md#resolveproductbycode) | onAction | Resolve a partner code to a product | `PRODUCT_VIEW` |
 
 **States**
 
@@ -320,9 +331,9 @@
 |---|---|
 | loading | The sell timed entry list. |
 | error | Could not load. Names which read failed and leaves the sell timed entry untouched. |
-| emptyFirstRun | No sell timed entry yet. Carries the create action; distinct from a filter that matched nothing. |
-| emptyNoResults | The filter narrowed it and the sell timed entry are still there. Names the active filter and offers to clear it. |
-| emptyNoAccess | Names the missing permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| emptyFirstRun | No sell timed entry yet. Offers no create action — this screen declares no operation that makes one — and says so rather than showing an empty table. |
+| emptyNoResults | Never shown: `listProductVariants` takes no filter, so an empty list is always the first-run state above. |
+| emptyNoAccess | Shown when the caller lacks `PRODUCT_VIEW`, which `getAvailability` requires, and names that permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | offline | Availability is never served from the bundle. A lease is acquired against the server; without one the terminal sells only from its allocated lease and refuses beyond it (ADR-0013) |
 | denied | Session and date selection are readable; adding to a sale needs `payment.take` to complete. The hold is not taken until the sale can be charged. |
 
@@ -330,11 +341,11 @@
 
 | To | Trigger | Carries | Guard |
 |---|---|---|---|
-| POS-002 | Back |  |  |
+| POS-002 | Back | productId |  |
 | POS-005 | Add to sale, then charge | cart, guest, discount, visitDate, sessionTime | payment.take |
-| POS-001 | Begin Shift | boxId, shiftId, workstationId |  |
-| POS-004 | Sell — Seat Map | holdId, performanceId |  |
-| POS-006 | Held Orders | orderId |  |
+| POS-001 | Begin Shift |  |  |
+| POS-004 | Sell — Seat Map | performanceId |  |
+| POS-006 | Held Orders |  |  |
 
 ## POS-005 Payment
 
@@ -366,9 +377,9 @@
 | `reprintReceipt` | [RetailService](../backend/RetailService.md#reprintreceipt) | onAction | Reprint | `ORDER_REPRINT` |
 | `capturePayment` | [OrderService](../backend/OrderService.md#capturepayment) | onAction | Capture a previously authorised payment | `ORDER_CREATE` |
 | `createRetailSale` | [RetailService](../backend/RetailService.md#createretailsale) | onAction | Sell merchandise | `ORDER_CREATE` |
-| `getRetailSale` | [RetailService](../backend/RetailService.md#getretailsale) | onLoad | Read a retail sale | `ORDER_VIEW` |
+| `getRetailSale` | [RetailService](../backend/RetailService.md#getretailsale) | onAction | Read a retail sale | `ORDER_VIEW` |
 | `listRetailSales` | [RetailService](../backend/RetailService.md#listretailsales) | onLoad | List retail sales | `ORDER_VIEW` |
-| `lookupRetailSale` | [RetailService](../backend/RetailService.md#lookupretailsale) | onLoad | Find a sale from a receipt | `ORDER_VIEW` |
+| `lookupRetailSale` | [RetailService](../backend/RetailService.md#lookupretailsale) | onAction | Find a sale from a receipt | `ORDER_VIEW` |
 | `createOrder` | [OrderService](../backend/OrderService.md#createorder) | onAction | Create an order | `ORDER_CREATE` |
 | `redeemLoyaltyPoints` | [MarketingService](../backend/MarketingService.md#redeemloyaltypoints) | onAction | Spend points | `LOYALTY_REDEEM` |
 
@@ -378,9 +389,9 @@
 |---|---|
 | loading | The payment list. |
 | error | Could not load. Names which read failed and leaves the payment untouched. |
-| emptyFirstRun | No payment yet. Carries the create action; distinct from a filter that matched nothing. |
-| emptyNoResults | The filter narrowed it and the payment are still there. Names the active filter and offers to clear it. |
-| emptyNoAccess | Names the missing permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| emptyFirstRun | No payment yet. Offers Create payment (`createPayment`); distinct from a filter that matched nothing. |
+| emptyNoResults | Nothing matches the filter on outletId, shiftId, createdFrom, createdTo and the payment are still there. Names the active filter and offers to clear it. |
+| emptyNoAccess | Shown when the caller lacks `ORDER_VIEW`, which `getRetailSale` requires, and names that permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | offline | Cash completes locally and journals. Card does not — an offline card approval the acquirer never saw is a sale that vanishes at settlement |
 
 **Goes to**
@@ -388,12 +399,12 @@
 | To | Trigger | Carries | Guard |
 |---|---|---|---|
 | POS-002 | Back to sale | cart, guest, discount, orderType |  |
-| POS-010 | The guest asks to add a locker to the ticket they just bought |  |  |
-| POS-022 | The order goes to the pass |  |  |
-| BO-048 | Bag is dropped and tagged |  |  |
-| POS-001 | Begin Shift | boxId, shiftId, workstationId |  |
-| POS-021 | Sell — Food & Drink | cartId, itemId, outletId, workstationId |  |
-| POS-023 | Sell — Merchandise | cartId, outletId, workstationId |  |
+| POS-001 | Begin Shift | shiftId |  |
+| POS-021 | Sell — Food & Drink |  |  |
+| POS-023 | Sell — Merchandise |  |  |
+| POS-010 | The guest asks to add a locker to the ticket they just bought | orderId |  |
+| POS-022 | The order goes to the pass | orderId |  |
+| BO-048 | Bag is dropped and tagged | merchandiseId |  |
 
 ## POS-006 Held Orders
 
@@ -439,9 +450,9 @@
 |---|---|
 | loading | The held orders list. |
 | error | Could not load. Names which read failed and leaves the held orders untouched. |
-| emptyFirstRun | No held orders yet. Carries the create action; distinct from a filter that matched nothing. |
-| emptyNoResults | The filter narrowed it and the held orders are still there. Names the active filter and offers to clear it. |
-| emptyNoAccess | Names the missing permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| emptyFirstRun | No held orders yet. Offers Create order (`createOrder`); distinct from a filter that matched nothing. |
+| emptyNoResults | Nothing matches the filter on venueId, principalId, shiftId, status, createdFrom, createdTo and the held orders are still there. Names the active filter and offers to clear it. |
+| emptyNoAccess | Shown when the caller lacks `ORDER_VIEW`, which `listOrders` requires, and names that permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | offline | Orders held at this terminal are listed. Those held elsewhere are not — resuming another till's sale needs the server |
 | denied | Held sales are listed and cannot be recalled without `sale.resume`. The list is still shown, because a cashier who cannot see the held sale fetches a supervisor to the wrong screen. |
 
@@ -450,9 +461,9 @@
 | To | Trigger | Carries | Guard |
 |---|---|---|---|
 | POS-002 | Recall this held sale | cart, cartHoldExpiresAt, guest, discount, table, orderType | sale.resume |
-| POS-001 | Begin Shift | boxId, shiftId, workstationId |  |
-| POS-003 | Sell — Timed Entry | inventoryHoldId, productId |  |
-| POS-004 | Sell — Seat Map | holdId, performanceId |  |
+| POS-001 | Begin Shift |  |  |
+| POS-003 | Sell — Timed Entry |  |  |
+| POS-004 | Sell — Seat Map | performanceId |  |
 
 ## POS-007 Close Shift
 
@@ -481,7 +492,7 @@
 |---|---|---|---|---|
 | `closeShift` | [OrderService](../backend/OrderService.md#closeshift) | onAction | Submit the blind count | `SHIFT_CLOSE` |
 | `acceptShiftVariance` | [OrderService](../backend/OrderService.md#acceptshiftvariance) | onAction | Supervisor accepts a variance above threshold | `OVERSHORT_ACCEPT` |
-| `recordNoSale` | [OrderService](../backend/OrderService.md#recordnosale) | onAction | Drawer opened without a sale | `SHIFT_SUSPEND` |
+| `recordNoSale` | [OrderService](../backend/OrderService.md#recordnosale) | onAction | Drawer opened without a sale | `CASH_NO_SALE` |
 | `approveShiftOpen` | [OrderService](../backend/OrderService.md#approveshiftopen) | onAction | Approve a shift opening outside tolerance | `SHIFT_APPROVE_OPEN` |
 | `createCashMovement` | [OrderService](../backend/OrderService.md#createcashmovement) | onAction | Record a cash lift or add | `CASH_LIFT` |
 | `getCurrentShift` | [OrderService](../backend/OrderService.md#getcurrentshift) | onLoad | The open or suspended shift on the session's workstation | `SHIFT_OPEN` |
@@ -504,8 +515,8 @@
 | loading | The close shift list. |
 | error | Could not load. Names which read failed and leaves the close shift untouched. |
 | emptyFirstRun | Nothing is waiting, which is the good outcome. An empty queue means every item has been decided; it offers no create action, because creating work is not what it needs. |
-| emptyNoResults | The filter narrowed it and the close shift are still there. Names the active filter and offers to clear it. |
-| emptyNoAccess | Names the missing permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| emptyNoResults | Never shown: `listCashMovements` takes no filter, so an empty list is always the first-run state above. |
+| emptyNoAccess | Shown when the caller lacks `SHIFT_OPEN`, which `getCurrentShift` requires, and names that permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | offline | Cannot close. Closing requires the server total, and a locally computed variance is not a variance |
 | denied | The count is accepted and the close is held. A variance beyond tolerance needs `cash.variance.approve` — a supervisor PIN is captured in place and the shift closes against the same count, rather than the cashier counting twice. |
 | awaitingApproval | The close is waiting on a supervisor who is not at the till. The count is held; the drawer stays shut. |
@@ -517,8 +528,8 @@
 | POS-001 | Close and sign out | shiftId, countedCash, variance, approverPrincipalId | cash.variance.approve |
 | POS-008 | The day is reported |  |  |
 | BO-024 | The supervisor reviews the shift and the deposit reconciles |  |  |
-| POS-002 | Sell — Ticket Catalogue | cardCode, cartId, orderId, productId, promotionId, workstationId |  |
-| POS-009 | Staff Roster | shiftId |  |
+| POS-002 | Sell — Ticket Catalogue |  |  |
+| POS-009 | Staff Roster |  |  |
 
 ## POS-010 Add to Existing Ticket
 
@@ -556,23 +567,22 @@
 
 | State | Behaviour |
 |---|---|
-| loading | The add existing ticket list. |
+| loading | The add existing ticket, read by `getMediaEntitlements`. |
 | error | Could not load. Names which read failed and leaves the add existing ticket untouched. |
-| emptyFirstRun | No add existing ticket yet. Carries the create action; distinct from a filter that matched nothing. |
-| emptyNoResults | The filter narrowed it and the add existing ticket are still there. Names the active filter and offers to clear it. |
-| emptyNoAccess | Names the missing permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| emptyFirstRun | No add existing ticket yet. Offers no create action — this screen declares no operation that makes one — and says so rather than showing an empty table. |
+| emptyNoAccess | Shown when the caller lacks `ORDER_VIEW`, which `getMediaEntitlements` requires, and names that permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | offline | Not available. The entitlement set must be read live; appending to a stale picture double-sells a locker |
 
 **Goes to**
 
 | To | Trigger | Carries | Guard |
 |---|---|---|---|
-| POS-011 | They change their mind about the locker |  |  |
-| POS-001 | Begin Shift | boxId, shiftId, workstationId |  |
-| POS-002 | Sell — Ticket Catalogue | cardCode, cartId, orderId, productId, promotionId, workstationId |  |
-| POS-003 | Sell — Timed Entry | inventoryHoldId, productId |  |
-| POS-004 | Sell — Seat Map | holdId, performanceId |  |
-| POS-005 | Payment | paymentId, saleId |  |
+| POS-001 | Begin Shift |  |  |
+| POS-002 | Sell — Ticket Catalogue | orderId |  |
+| POS-003 | Sell — Timed Entry |  |  |
+| POS-004 | Sell — Seat Map | performanceId |  |
+| POS-005 | Payment | paymentId |  |
+| POS-011 | They change their mind about the locker | orderId |  |
 
 ## POS-011 Returns, Refunds & Exchanges
 
@@ -602,11 +612,11 @@
 |---|---|---|---|---|
 | `createRefund` | [OrderService](../backend/OrderService.md#createrefund) | onAction | Refund an order, wholly or in part | `ORDER_REFUND` |
 | `exchangeOrderLines` | [OrderService](../backend/OrderService.md#exchangeorderlines) | onAction | Exchange lines for different products or dates | `ORDER_EXCHANGE` |
-| `getReturnPolicy` | [RetailService](../backend/RetailService.md#getreturnpolicy) | onLoad | Read the retail return policy | `ORDER_VIEW` |
+| `getReturnPolicy` | [RetailService](../backend/RetailService.md#getreturnpolicy) | onAction | Read the retail return policy | `ORDER_VIEW` |
 | `adjustDepositBoxFloat` | [OrderService](../backend/OrderService.md#adjustdepositboxfloat) | onAction | Change the initial fund | `CASH_ADD` |
 | `listDenominations` | [OrderService](../backend/OrderService.md#listdenominations) | onLoad | listDenominations | `SHIFT_OPEN` |
 | `listOutlets` | [TenancyService](../backend/TenancyService.md#listoutlets) | onLoad | List outlets | `SCOPE_VIEW` |
-| `lookupRetailSale` | [RetailService](../backend/RetailService.md#lookupretailsale) | onLoad | Find a sale from a receipt | `ORDER_VIEW` |
+| `lookupRetailSale` | [RetailService](../backend/RetailService.md#lookupretailsale) | onAction | Find a sale from a receipt | `ORDER_VIEW` |
 | `createRetailReturn` | [RetailService](../backend/RetailService.md#createretailreturn) | onAction | Accept a return | `ORDER_REFUND` |
 | `listSerialisedItems` | [InventoryService](../backend/InventoryService.md#listserialiseditems) | onLoad | listSerialisedItems | `PRODUCT_VIEW` |
 
@@ -616,18 +626,18 @@
 |---|---|
 | loading | The returns refunds exchanges list. |
 | error | Could not load. Names which read failed and leaves the returns refunds exchanges untouched. |
-| emptyFirstRun | No returns refunds exchanges yet. Carries the create action; distinct from a filter that matched nothing. |
-| emptyNoResults | The filter narrowed it and the returns refunds exchanges are still there. Names the active filter and offers to clear it. |
-| emptyNoAccess | Names the missing permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| emptyFirstRun | No returns refunds exchanges yet. Offers Create refund (`createRefund`); distinct from a filter that matched nothing. |
+| emptyNoResults | Nothing matches the filter on includeInactive and the returns refunds exchanges are still there. Names the active filter and offers to clear it. |
+| emptyNoAccess | Shown when the caller lacks `ORDER_VIEW`, which `getReturnPolicy` requires, and names that permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | offline | Working from the local journal. The till keeps taking money; this reconciles on sync. |
 
 **Goes to**
 
 | To | Trigger | Carries | Guard |
 |---|---|---|---|
-| POS-012 | Omnichannel Order & Fulfilment Center |  |  |
 | BO-082 | The returned item is dispositioned — resaleable, damaged, or back to the supplier |  |  |
-| POS-002 | Sell — Ticket Catalogue | cardCode, cartId, orderId, productId, promotionId, workstationId |  |
+| POS-002 | Sell — Ticket Catalogue | orderId |  |
+| POS-012 | Omnichannel Order & Fulfilment Center | orderId, outletId |  |
 
 ## POS-012 Omnichannel Order & Fulfilment Center
 
@@ -669,9 +679,9 @@
 |---|---|
 | loading | The omnichannel order fulfilment list. |
 | error | Could not load. Names which read failed and leaves the omnichannel order fulfilment untouched. |
-| emptyFirstRun | No omnichannel order fulfilment yet. Carries the create action; distinct from a filter that matched nothing. |
-| emptyNoResults | The filter narrowed it and the omnichannel order fulfilment are still there. Names the active filter and offers to clear it. |
-| emptyNoAccess | Names the missing permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| emptyFirstRun | No omnichannel order fulfilment yet. Offers Record order handover (`recordOrderHandover`); distinct from a filter that matched nothing. |
+| emptyNoResults | Nothing matches the filter on venueId, principalId, shiftId, status, createdFrom, createdTo and the omnichannel order fulfilment are still there. Names the active filter and offers to clear it. |
+| emptyNoAccess | Shown when the caller lacks `ORDER_VIEW`, which `listOrders` requires, and names that permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | offline | Working from the local journal. The till keeps taking money; this reconciles on sync. |
 
 **Goes to**
@@ -679,7 +689,7 @@
 | To | Trigger | Carries | Guard |
 |---|---|---|---|
 | POS-013 | Mobile POS, Event Sales & Offline Operations |  |  |
-| POS-001 | Begin Shift | boxId, shiftId, workstationId |  |
+| POS-001 | Begin Shift | shiftId |  |
 
 ## POS-013 Mobile POS, Event Sales & Offline Operations
 
@@ -721,9 +731,9 @@
 |---|---|
 | loading | The mobile pos event list. |
 | error | Could not load. Names which read failed and leaves the mobile pos event untouched. |
-| emptyFirstRun | No mobile pos event yet. Carries the create action; distinct from a filter that matched nothing. |
-| emptyNoResults | The filter narrowed it and the mobile pos event are still there. Names the active filter and offers to clear it. |
-| emptyNoAccess | Names the missing permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| emptyFirstRun | No mobile pos event yet. Offers Create order (`createOrder`). |
+| emptyNoResults | Never shown: `listCashMovements` takes no filter, so an empty list is always the first-run state above. |
+| emptyNoAccess | Shown when the caller lacks `ACCESS_VALIDATE`, which `getOfflinePackage` requires, and names that permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | offline | Working from the local journal. The till keeps taking money; this reconciles on sync. |
 | denied | The sync queue is readable by anyone on shift. Resolving a conflict changes stock and needs `inventory.conflict.resolve`; a supervisor PIN unlocks it in place. |
 
@@ -760,7 +770,7 @@
 
 | Operation | Service | When | Purpose | Permission |
 |---|---|---|---|---|
-| `recordNoSale` | [OrderService](../backend/OrderService.md#recordnosale) | onAction | Open the drawer without a sale | `SHIFT_SUSPEND` |
+| `recordNoSale` | [OrderService](../backend/OrderService.md#recordnosale) | onAction | Open the drawer without a sale | `CASH_NO_SALE` |
 | `voidOrder` | [OrderService](../backend/OrderService.md#voidorder) | onAction | Void an order | `ORDER_VOID` |
 | `applyManualDiscount` | [OrderService](../backend/OrderService.md#applymanualdiscount) | onAction | Apply a discount a cashier chose | `ORDER_DISCOUNT` |
 
@@ -770,15 +780,15 @@
 |---|---|
 | loading | The saved sales exceptions controls. |
 | error | Could not load. Names which read failed and leaves the sales exceptions controls untouched. |
-| emptyFirstRun | No sales exceptions controls configured. Carries the create action and says what the platform does in the meantime. |
-| emptyNoAccess | Names the missing permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| emptyFirstRun | No sales exceptions controls configured. The form opens empty and `recordNoSale` saves the first one; it says what the platform does in the meantime. |
+| emptyNoAccess | Shown when the caller lacks `CASH_NO_SALE`, which `recordNoSale` requires, and names that permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | offline | Working from the local journal. The till keeps taking money; this reconciles on sync. |
 
 **Goes to**
 
 | To | Trigger | Carries | Guard |
 |---|---|---|---|
-| POS-001 | Begin Shift | boxId, shiftId, workstationId |  |
+| POS-001 | Begin Shift | shiftId |  |
 
 ## POS-015 Cash Operations Dashboard
 
@@ -813,17 +823,17 @@
 |---|---|
 | loading | The cash operations list. |
 | error | Could not load. Names which read failed and leaves the cash operations untouched. |
-| emptyFirstRun | No cash operations yet. Carries the create action; distinct from a filter that matched nothing. |
-| emptyNoResults | The filter narrowed it and the cash operations are still there. Names the active filter and offers to clear it. |
-| emptyNoAccess | Names the missing permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| emptyFirstRun | No cash operations yet. Offers no create action — this screen declares no operation that makes one — and says so rather than showing an empty table. |
+| emptyNoResults | Never shown: `listCashMovements` takes no filter, so an empty list is always the first-run state above. |
+| emptyNoAccess | Shown when the caller lacks `REPORT_VIEW_WORKSTATION`, which `listCashMovements` requires, and names that permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | offline | Working from the local journal. The till keeps taking money; this reconciles on sync. |
 
 **Goes to**
 
 | To | Trigger | Carries | Guard |
 |---|---|---|---|
-| POS-018 | Safe drop destinations are allocated |  |  |
-| POS-001 | Begin Shift | boxId, shiftId, workstationId |  |
+| POS-001 | Begin Shift | shiftId |  |
+| POS-018 | Safe drop destinations are allocated | shiftId |  |
 
 ## POS-016 Till Configuration
 
@@ -853,7 +863,7 @@
 | `configureWorkstation` | [TenancyService](../backend/TenancyService.md#configureworkstation) | onAction | Configure a workstation | `WORKSTATION_CONFIGURE` |
 | `listDevices` | [TenancyService](../backend/TenancyService.md#listdevices) | onLoad | The peripherals bound to this workstation | `DEVICE_VIEW` |
 | `setReaderScannerPeripheral` | [AccessService](../backend/AccessService.md#setreaderscannerperipheral) | onAction | Bind or replace a reader or scanner | `ACCESS_POINT_CONFIGURE` |
-| `recordDeviceHeartbeat` | [TenancyService](../backend/TenancyService.md#recorddeviceheartbeat) | onLoad | Whether each peripheral is answering | `None` |
+| `recordDeviceHeartbeat` | [TenancyService](../backend/TenancyService.md#recorddeviceheartbeat) | background | Whether each peripheral is answering | `None` |
 
 **States**
 
@@ -861,16 +871,16 @@
 |---|---|
 | loading | The saved till. |
 | error | Could not load. Names which read failed and leaves the till untouched. |
-| emptyFirstRun | No till configured. Carries the create action and says what the platform does in the meantime. |
-| emptyNoAccess | Names the missing permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| emptyFirstRun | No till configured. The form opens empty and `allocateDepositBox` saves the first one; it says what the platform does in the meantime. |
+| emptyNoAccess | Shown when the caller lacks `DEVICE_VIEW`, which `listDevices` requires, and names that permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | offline | Working from the local journal. The till keeps taking money; this reconciles on sync. |
 
 **Goes to**
 
 | To | Trigger | Carries | Guard |
 |---|---|---|---|
-| POS-019 | Shift policy is set |  |  |
-| POS-001 | Begin Shift | boxId, shiftId, workstationId |  |
+| POS-001 | Begin Shift | shiftId |  |
+| POS-019 | Shift policy is set | venueId |  |
 
 ## POS-017 Cash In / Cash Out Operations
 
@@ -904,15 +914,15 @@
 |---|---|
 | loading | The saved cash cash out. |
 | error | Could not load. Names which read failed and leaves the cash cash out untouched. |
-| emptyFirstRun | No cash cash out configured. Carries the create action and says what the platform does in the meantime. |
-| emptyNoAccess | Names the missing permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| emptyFirstRun | No cash cash out configured. The form opens empty and `createCashMovement` saves the first one; it says what the platform does in the meantime. |
+| emptyNoAccess | Shown when the caller lacks `CASH_LIFT`, which `createCashMovement` requires, and names that permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | offline | Working from the local journal. The till keeps taking money; this reconciles on sync. |
 
 **Goes to**
 
 | To | Trigger | Carries | Guard |
 |---|---|---|---|
-| POS-001 | Begin Shift | boxId, shiftId, workstationId |  |
+| POS-001 | Begin Shift | shiftId |  |
 
 ## POS-018 Safe Drop & Cash Transfer Management
 
@@ -951,16 +961,16 @@
 |---|---|
 | loading | The safe drop cash list. |
 | error | Could not load. Names which read failed and leaves the safe drop cash untouched. |
-| emptyFirstRun | No safe drop cash yet. Carries the create action; distinct from a filter that matched nothing. |
-| emptyNoResults | The filter narrowed it and the safe drop cash are still there. Names the active filter and offers to clear it. |
-| emptyNoAccess | Names the missing permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| emptyFirstRun | No safe drop cash yet. Offers Create cash movement (`createCashMovement`); distinct from a filter that matched nothing. |
+| emptyNoResults | Nothing matches the filter on scopePath, isActive and the safe drop cash are still there. Names the active filter and offers to clear it. |
+| emptyNoAccess | Shown when the caller lacks `USER_MANAGE`, which `listPrincipals` requires, and names that permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | offline | Working from the local journal. The till keeps taking money; this reconciles on sync. |
 
 **Goes to**
 
 | To | Trigger | Carries | Guard |
 |---|---|---|---|
-| POS-001 | Begin Shift | boxId, shiftId, workstationId |  |
+| POS-001 | Begin Shift | shiftId |  |
 
 ## POS-019 Shift Templates & Policies
 
@@ -996,17 +1006,17 @@
 |---|---|
 | loading | The shift templates policies list. |
 | error | Could not load. Names which read failed and leaves the shift templates policies untouched. |
-| emptyFirstRun | No shift templates policies yet. Carries the create action; distinct from a filter that matched nothing. |
-| emptyNoResults | The filter narrowed it and the shift templates policies are still there. Names the active filter and offers to clear it. |
-| emptyNoAccess | Names the missing permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| emptyFirstRun | No shift templates policies yet. Offers no create action — this screen declares no operation that makes one — and says so rather than showing an empty table. |
+| emptyNoResults | Nothing matches the filter on workstationId, status, openedFrom, openedTo and the shift templates policies are still there. Names the active filter and offers to clear it. |
+| emptyNoAccess | Shown when the caller lacks `REPORT_VIEW_WORKSTATION`, which `listShifts` requires, and names that permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | offline | Working from the local journal. The till keeps taking money; this reconciles on sync. |
 
 **Goes to**
 
 | To | Trigger | Carries | Guard |
 |---|---|---|---|
-| POS-015 | Cash limits and the drawer ceiling are set |  |  |
-| POS-001 | Begin Shift | boxId, shiftId, workstationId |  |
+| POS-001 | Begin Shift | shiftId |  |
+| POS-015 | Cash limits and the drawer ceiling are set | shiftId |  |
 
 ## POS-020 Shift Exceptions & Alerts
 
@@ -1034,7 +1044,7 @@
 
 | Operation | Service | When | Purpose | Permission |
 |---|---|---|---|---|
-| `recordNoSale` | [OrderService](../backend/OrderService.md#recordnosale) | onAction | Open the drawer without a sale | `SHIFT_SUSPEND` |
+| `recordNoSale` | [OrderService](../backend/OrderService.md#recordnosale) | onAction | Open the drawer without a sale | `CASH_NO_SALE` |
 | `listAlerts` | [ReportingService](../backend/ReportingService.md#listalerts) | onLoad | What is currently raised | `REPORT_VIEW_VENUE` |
 | `createApprovalRequest` | [TenancyService](../backend/TenancyService.md#createapprovalrequest) | onAction | Raise a request | `APPROVAL_REQUEST` |
 | `decideApprovalRequest` | [TenancyService](../backend/TenancyService.md#decideapprovalrequest) | onAction | Approve or reject | `APPROVAL_DECIDE` |
@@ -1047,8 +1057,8 @@
 | loading | The shift exceptions alerts list. |
 | error | Could not load. Names which read failed and leaves the shift exceptions alerts untouched. |
 | emptyFirstRun | Nothing is waiting, which is the good outcome. An empty queue means every item has been decided; it offers no create action, because creating work is not what it needs. |
-| emptyNoResults | The filter narrowed it and the shift exceptions alerts are still there. Names the active filter and offers to clear it. |
-| emptyNoAccess | Names the missing permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| emptyNoResults | Nothing matches the filter on status, severity, workstationId, shiftId, itemId and the shift exceptions alerts are still there. Names the active filter and offers to clear it. |
+| emptyNoAccess | Shown when the caller lacks `REPORT_VIEW_VENUE`, which `listAlerts` requires, and names that permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | offline | The till keeps taking money; this screen does not keep showing alerts. `listAlerts` reads the analytical replica (ADR-0016) and there is nothing local to read — the offline trading happens on POS-002 and POS-013, and this monitor goes quiet until the network returns. Corrected 24 August: the prose claimed continued function the wiring cannot deliver. |
 
 **Goes to**
@@ -1056,7 +1066,7 @@
 | To | Trigger | Carries | Guard |
 |---|---|---|---|
 | POS-007 | End of shift |  |  |
-| POS-002 | Sell — Ticket Catalogue | cardCode, cartId, orderId, productId, promotionId, workstationId |  |
+| POS-002 | Sell — Ticket Catalogue |  |  |
 
 ## POS-021 Sell — Food & Drink
 
@@ -1108,7 +1118,7 @@
 | To | Trigger | Carries | Guard |
 |---|---|---|---|
 | POS-005 | Charge | cart, guest, discount, orderType, table, taxTotals | payment.take |
-| POS-002 | Sell — Ticket Catalogue | cardCode, cartId, orderId, productId, promotionId, workstationId |  |
+| POS-002 | Sell — Ticket Catalogue | promotionId |  |
 
 ## POS-022 Send to Kitchen
 
@@ -1147,9 +1157,9 @@
 |---|---|
 | loading | The send kitchen list. |
 | error | Could not load. Names which read failed and leaves the send kitchen untouched. |
-| emptyFirstRun | No send kitchen yet. Carries the create action; distinct from a filter that matched nothing. |
-| emptyNoResults | The filter narrowed it and the send kitchen are still there. Names the active filter and offers to clear it. |
-| emptyNoAccess | Names the missing permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| emptyFirstRun | No send kitchen yet. Offers Create F&B order (`createFnbOrder`); distinct from a filter that matched nothing. |
+| emptyNoResults | Nothing matches the filter on stationId, status and the send kitchen are still there. Names the active filter and offers to clear it. |
+| emptyNoAccess | Shown when the caller lacks `ORDER_VIEW`, which `listKitchenTickets` requires, and names that permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | offline | Queued locally and sent on reconnect. The kitchen display is on the same LAN, so a venue-wide outage stops both and a device outage stops neither. |
 | denied | The rail is readable and Send to kitchen is refused without `payment.take`. Tickets already fired are unaffected. |
 
@@ -1158,8 +1168,8 @@
 | To | Trigger | Carries | Guard |
 |---|---|---|---|
 | POS-005 | Send to kitchen, then charge | orderId, tableLabel, courses, cart | payment.take |
-| KIT-002 | The kitchen makes it and bumps it |  |  |
-| POS-002 | Sell — Ticket Catalogue | cardCode, cartId, orderId, productId, promotionId, workstationId |  |
+| POS-002 | Sell — Ticket Catalogue | orderId |  |
+| KIT-002 | The kitchen makes it and bumps it | ticketId |  |
 
 ## POS-023 Sell — Merchandise
 
@@ -1187,7 +1197,7 @@
 | Operation | Service | When | Purpose | Permission |
 |---|---|---|---|---|
 | `listMerchandise` | [RetailService](../backend/RetailService.md#listmerchandise) | onLoad | List merchandise | `PRODUCT_VIEW` |
-| `lookupMerchandise` | [RetailService](../backend/RetailService.md#lookupmerchandise) | onLoad | Price and stock check by barcode | `PRODUCT_VIEW` |
+| `lookupMerchandise` | [RetailService](../backend/RetailService.md#lookupmerchandise) | onAction | Price and stock check by barcode | `PRODUCT_VIEW` |
 | `addCartLine` | [OrderService](../backend/OrderService.md#addcartline) | onAction | Add something | `None` |
 | `createRetailSale` | [RetailService](../backend/RetailService.md#createretailsale) | onAction | Sell merchandise | `ORDER_CREATE` |
 | `evaluatePromotions` | [CatalogueService](../backend/CatalogueService.md#evaluatepromotions) | onAction | Evaluate promotions against a cart | `PRICE_VIEW` |
@@ -1210,7 +1220,7 @@
 | To | Trigger | Carries | Guard |
 |---|---|---|---|
 | POS-005 | Charge | cart, guest, discount, taxTotals | payment.take |
-| POS-002 | Sell — Ticket Catalogue | cardCode, cartId, orderId, productId, promotionId, workstationId |  |
+| POS-002 | Sell — Ticket Catalogue | orderId, promotionId |  |
 
 ## POS-024 Outlet Setup
 
@@ -1258,8 +1268,8 @@
 
 | To | Trigger | Carries | Guard |
 |---|---|---|---|
-| POS-005 | Payment | paymentId, saleId |  |
-| POS-002 | Sell — Ticket Catalogue | cardCode, cartId, orderId, productId, promotionId, workstationId |  |
+| POS-005 | Payment |  |  |
+| POS-002 | Sell — Ticket Catalogue |  |  |
 
 ## POS-025 Till Home
 
@@ -1359,8 +1369,8 @@
 
 | To | Trigger | Carries | Guard |
 |---|---|---|---|
-| POS-025 | Till Home | workstationId |  |
-| POS-011 | Returns, Refunds & Exchanges | boxId, orderId, outletId, workstationId |  |
+| POS-025 | Till Home |  |  |
+| POS-011 | Returns, Refunds & Exchanges | orderId |  |
 
 ## POS-027 Guest Lookup
 
@@ -1402,8 +1412,8 @@
 
 | To | Trigger | Carries | Guard |
 |---|---|---|---|
-| POS-025 | Till Home | workstationId |  |
-| POS-002 | Sell — Ticket Catalogue | cardCode, cartId, orderId, productId, promotionId, workstationId |  |
+| POS-025 | Till Home |  |  |
+| POS-002 | Sell — Ticket Catalogue |  |  |
 
 ## POS-028 Table Service
 
@@ -1455,9 +1465,9 @@
 
 | To | Trigger | Carries | Guard |
 |---|---|---|---|
-| POS-025 | Till Home | workstationId |  |
-| POS-005 | Payment | paymentId, saleId |  |
-| POS-021 | Sell — Food & Drink | cartId, itemId, outletId, workstationId |  |
+| POS-025 | Till Home |  |  |
+| POS-005 | Payment |  |  |
+| POS-021 | Sell — Food & Drink |  |  |
 
 ## POS-029 Order Queue
 
@@ -1486,9 +1496,9 @@
 | Operation | Service | When | Purpose | Permission |
 |---|---|---|---|---|
 | `listFnbOrders` | [FnbService](../backend/FnbService.md#listfnborders) | onLoad | Every order this outlet is working | `ORDER_VIEW` |
-| `listQueueEntries` | [VenueOpsService](../backend/VenueOpsService.md#listqueueentries) | onLoad | Who is waiting and for how long | `QUEUE_VIEW` |
-| `getQueue` | [VenueOpsService](../backend/VenueOpsService.md#getqueue) | onLoad | The queue this workstation serves | `QUEUE_VIEW` |
-| `getQueueFeedHealth` | [VenueOpsService](../backend/VenueOpsService.md#getqueuefeedhealth) | onLoad | Whether the feed is current | `QUEUE_MANAGE` |
+| `listQueueEntries` | [VenueOpsService](../backend/VenueOpsService.md#listqueueentries) | onAction | Who is waiting and for how long | `QUEUE_VIEW` |
+| `getQueue` | [VenueOpsService](../backend/VenueOpsService.md#getqueue) | onAction | The queue this workstation serves | `QUEUE_VIEW` |
+| `getQueueFeedHealth` | [VenueOpsService](../backend/VenueOpsService.md#getqueuefeedhealth) | onAction | Whether the feed is current | `QUEUE_MANAGE` |
 
 **States**
 
@@ -1504,8 +1514,8 @@
 
 | To | Trigger | Carries | Guard |
 |---|---|---|---|
-| POS-025 | Till Home | workstationId |  |
-| POS-022 | Send to Kitchen | orderId, outletId, ticketId, workstationId |  |
+| POS-025 | Till Home |  |  |
+| POS-022 | Send to Kitchen |  |  |
 
 ## KIT-001 Kitchen Operations Command Center
 
@@ -1543,7 +1553,7 @@
 | error | Could not reach the platform. The rail is still live from cache and every bump is queued. |
 | emptyFirstRun | No tickets. The kitchen is clear, and that is worth saying plainly rather than showing a blank rail — a screen that looks broken and a screen that means nothing to do are the same picture otherwise. |
 | emptyNoResults | Nothing matches this station or course filter. The rail is not empty — the filter is narrow, and on a kitchen screen that distinction is the difference between calm and panic. |
-| emptyNoAccess | This display is not assigned to a station. Assignment is a back-office act — a kitchen screen does not choose what it shows. |
+| emptyNoAccess | This display is not assigned to a station. Assignment is a back-office act — a kitchen screen does not choose what it shows. A principal without `ORDER_VIEW` gets this state naming `ORDER_VIEW`, the screen's `permission` and the one its read enforces; a button whose own `permission` the principal lacks is hidden, and a 403 from an action names that operation's permission. |
 | offline | Amber, and it keeps working. The kitchen still has to send food out — a display that blanks mid-service is worse than one that says it is behind, and every bump journals locally and syncs when the network returns. |
 
 **Goes to**
@@ -1552,10 +1562,10 @@
 |---|---|---|---|
 | KIT-002 | Kitchen Display System (KDS) |  |  |
 | KIT-003 | Order Firing & Course Management |  |  |
-| KIT-004 | Active Order Management & Fulfilment Journey |  |  |
+| KIT-004 | Active Order Management & Fulfilment Journey | orderId |  |
 | KIT-005 | Kitchen Station Workload & Dynamic Routing |  |  |
 | KIT-006 | Expeditor & Order Assembly |  |  |
-| KIT-007 | Guest Collection, Buzzer & Digital Notification |  |  |
+| KIT-007 | Guest Collection, Buzzer & Digital Notification | orderId |  |
 | KIT-008 | Exceptions, Re-Fire & Unavailable Items |  |  |
 | KIT-009 | SLA, Priority & Service Rules |  |  |
 | KIT-010 | Kitchen Performance, AI & Operational Optimization |  |  |
@@ -1602,18 +1612,18 @@
 | error | Could not reach the platform. The rail is still live from cache and every bump is queued. |
 | emptyFirstRun | No tickets. The kitchen is clear, and that is worth saying plainly rather than showing a blank rail — a screen that looks broken and a screen that means nothing to do are the same picture otherwise. |
 | emptyNoResults | Nothing matches this station or course filter. The rail is not empty — the filter is narrow, and on a kitchen screen that distinction is the difference between calm and panic. |
-| emptyNoAccess | This display is not assigned to a station. Assignment is a back-office act — a kitchen screen does not choose what it shows. |
+| emptyNoAccess | This display is not assigned to a station. Assignment is a back-office act — a kitchen screen does not choose what it shows. A principal without `ORDER_VIEW` gets this state naming `ORDER_VIEW`, the screen's `permission` and the one its read enforces; a button whose own `permission` the principal lacks is hidden, and a 403 from an action names that operation's permission. |
 | offline | Amber, and it keeps working. The kitchen still has to send food out — a display that blanks mid-service is worse than one that says it is behind, and every bump journals locally and syncs when the network returns. |
 
 **Goes to**
 
 | To | Trigger | Carries | Guard |
 |---|---|---|---|
-| KIT-003 | Order Firing & Course Management |  |  |
-| KIT-001 | Kitchen Operations Command Center | stationId, venueId |  |
-| EMP-058 | Starters cleared |  |  |
-| EMP-059 | The server comps the delayed dish |  |  |
-| POS-022 | The guest is called and takes it |  |  |
+| KIT-001 | Kitchen Operations Command Center |  |  |
+| KIT-003 | Order Firing & Course Management | ticketId |  |
+| EMP-058 | Starters cleared | ticketId, visitId |  |
+| EMP-059 | The server comps the delayed dish | visitId |  |
+| POS-022 | The guest is called and takes it | orderId, ticketId |  |
 
 ## KIT-003 Order Firing & Course Management
 
@@ -1654,15 +1664,15 @@
 | loading | The rail, oldest ticket first. The count renders before the tickets — a kitchen wants to know how deep it is before it reads anything. |
 | error | Could not reach the platform. The rail is still live from cache and every bump is queued. |
 | emptyFirstRun | No tickets. The kitchen is clear, and that is worth saying plainly rather than showing a blank rail — a screen that looks broken and a screen that means nothing to do are the same picture otherwise. |
-| emptyNoAccess | This display is not assigned to a station. Assignment is a back-office act — a kitchen screen does not choose what it shows. |
+| emptyNoAccess | This display is not assigned to a station. Assignment is a back-office act — a kitchen screen does not choose what it shows. A principal without `ORDER_MODIFY` gets this state naming `ORDER_MODIFY`, the screen's `permission` and the one its fire, hold, status and prioritise actions need (the screen has no read); a button whose own `permission` the principal lacks is hidden, and a 403 from an action names that operation's permission. |
 | offline | Amber, and it keeps working. The kitchen still has to send food out — a display that blanks mid-service is worse than one that says it is behind, and every bump journals locally and syncs when the network returns. |
 
 **Goes to**
 
 | To | Trigger | Carries | Guard |
 |---|---|---|---|
-| KIT-004 | Active Order Management & Fulfilment Journey |  |  |
-| KIT-001 | Kitchen Operations Command Center | stationId, venueId |  |
+| KIT-001 | Kitchen Operations Command Center |  |  |
+| KIT-004 | Active Order Management & Fulfilment Journey | orderId |  |
 
 ## KIT-004 Active Order Management & Fulfilment Journey
 
@@ -1700,7 +1710,7 @@
 | error | Could not reach the platform. The rail is still live from cache and every bump is queued. |
 | emptyFirstRun | No tickets. The kitchen is clear, and that is worth saying plainly rather than showing a blank rail — a screen that looks broken and a screen that means nothing to do are the same picture otherwise. |
 | emptyNoResults | Nothing matches this station or course filter. The rail is not empty — the filter is narrow, and on a kitchen screen that distinction is the difference between calm and panic. |
-| emptyNoAccess | This display is not assigned to a station. Assignment is a back-office act — a kitchen screen does not choose what it shows. |
+| emptyNoAccess | This display is not assigned to a station. Assignment is a back-office act — a kitchen screen does not choose what it shows. A principal without `ORDER_VIEW` gets this state naming `ORDER_VIEW`, the screen's `permission` and the one its read enforces; a button whose own `permission` the principal lacks is hidden, and a 403 from an action names that operation's permission. |
 | offline | Amber, and it keeps working. The kitchen still has to send food out — a display that blanks mid-service is worse than one that says it is behind, and every bump journals locally and syncs when the network returns. |
 
 **Goes to**
@@ -1745,14 +1755,14 @@
 | error | Could not reach the platform. The rail is still live from cache and every bump is queued. |
 | emptyFirstRun | No tickets. The kitchen is clear, and that is worth saying plainly rather than showing a blank rail — a screen that looks broken and a screen that means nothing to do are the same picture otherwise. |
 | emptyNoResults | Nothing matches this station or course filter. The rail is not empty — the filter is narrow, and on a kitchen screen that distinction is the difference between calm and panic. |
-| emptyNoAccess | This display is not assigned to a station. Assignment is a back-office act — a kitchen screen does not choose what it shows. |
+| emptyNoAccess | This display is not assigned to a station. Assignment is a back-office act — a kitchen screen does not choose what it shows. A principal without `PRODUCT_VIEW` gets this state naming `PRODUCT_VIEW`, the screen's `permission` and the one its read enforces; a button whose own `permission` the principal lacks is hidden, and a 403 from an action names that operation's permission. |
 | offline | Amber, and it keeps working. The kitchen still has to send food out — a display that blanks mid-service is worse than one that says it is behind, and every bump journals locally and syncs when the network returns. |
 
 **Goes to**
 
 | To | Trigger | Carries | Guard |
 |---|---|---|---|
-| KIT-001 | Kitchen Operations Command Center | stationId, venueId |  |
+| KIT-001 | Kitchen Operations Command Center |  |  |
 
 ## KIT-006 Expeditor & Order Assembly
 
@@ -1794,15 +1804,15 @@
 | error | Could not reach the platform. The rail is still live from cache and every bump is queued. |
 | emptyFirstRun | No tickets. The kitchen is clear, and that is worth saying plainly rather than showing a blank rail — a screen that looks broken and a screen that means nothing to do are the same picture otherwise. |
 | emptyNoResults | Nothing matches this station or course filter. The rail is not empty — the filter is narrow, and on a kitchen screen that distinction is the difference between calm and panic. |
-| emptyNoAccess | This display is not assigned to a station. Assignment is a back-office act — a kitchen screen does not choose what it shows. |
+| emptyNoAccess | This display is not assigned to a station. Assignment is a back-office act — a kitchen screen does not choose what it shows. A principal without `ORDER_VIEW` gets this state naming `ORDER_VIEW`, the screen's `permission` and the one its read enforces; a button whose own `permission` the principal lacks is hidden, and a 403 from an action names that operation's permission. |
 | offline | Amber, and it keeps working. The kitchen still has to send food out — a display that blanks mid-service is worse than one that says it is behind, and every bump journals locally and syncs when the network returns. |
 
 **Goes to**
 
 | To | Trigger | Carries | Guard |
 |---|---|---|---|
-| KIT-002 | Kitchen Display System (KDS) |  |  |
-| KIT-001 | Kitchen Operations Command Center | stationId, venueId |  |
+| KIT-001 | Kitchen Operations Command Center |  |  |
+| KIT-002 | Kitchen Display System (KDS) | ticketId |  |
 
 ## KIT-007 Guest Collection, Buzzer & Digital Notification
 
@@ -1840,14 +1850,14 @@
 | error | Could not reach the platform. The rail is still live from cache and every bump is queued. |
 | emptyFirstRun | No tickets. The kitchen is clear, and that is worth saying plainly rather than showing a blank rail — a screen that looks broken and a screen that means nothing to do are the same picture otherwise. |
 | emptyNoResults | Nothing matches this station or course filter. The rail is not empty — the filter is narrow, and on a kitchen screen that distinction is the difference between calm and panic. |
-| emptyNoAccess | This display is not assigned to a station. Assignment is a back-office act — a kitchen screen does not choose what it shows. |
+| emptyNoAccess | This display is not assigned to a station. Assignment is a back-office act — a kitchen screen does not choose what it shows. A principal without `ORDER_VIEW` gets this state naming `ORDER_VIEW`, the screen's `permission` and the one its read enforces; a button whose own `permission` the principal lacks is hidden, and a 403 from an action names that operation's permission. |
 | offline | Amber, and it keeps working. The kitchen still has to send food out — a display that blanks mid-service is worse than one that says it is behind, and every bump journals locally and syncs when the network returns. |
 
 **Goes to**
 
 | To | Trigger | Carries | Guard |
 |---|---|---|---|
-| KIT-001 | Kitchen Operations Command Center | stationId, venueId |  |
+| KIT-001 | Kitchen Operations Command Center |  |  |
 
 ## KIT-008 Exceptions, Re-Fire & Unavailable Items
 
@@ -1890,14 +1900,14 @@
 | error | Could not reach the platform. The rail is still live from cache and every bump is queued. |
 | emptyFirstRun | No tickets. The kitchen is clear, and that is worth saying plainly rather than showing a blank rail — a screen that looks broken and a screen that means nothing to do are the same picture otherwise. |
 | emptyNoResults | Nothing matches this station or course filter. The rail is not empty — the filter is narrow, and on a kitchen screen that distinction is the difference between calm and panic. |
-| emptyNoAccess | This display is not assigned to a station. Assignment is a back-office act — a kitchen screen does not choose what it shows. |
+| emptyNoAccess | This display is not assigned to a station. Assignment is a back-office act — a kitchen screen does not choose what it shows. A principal without `PRODUCT_VIEW` gets this state naming `PRODUCT_VIEW`, the screen's `permission` and the one `list86Events`, the population it reads, enforces (`getHaccpStatus` needs `INCIDENT_VIEW` and reaches no component yet, see `gaps`); a button whose own `permission` the principal lacks is hidden, and a 403 from an action names that operation's permission. |
 | offline | Amber, and it keeps working. The kitchen still has to send food out — a display that blanks mid-service is worse than one that says it is behind, and every bump journals locally and syncs when the network returns. |
 
 **Goes to**
 
 | To | Trigger | Carries | Guard |
 |---|---|---|---|
-| KIT-001 | Kitchen Operations Command Center | stationId, venueId |  |
+| KIT-001 | Kitchen Operations Command Center |  |  |
 
 ## KIT-009 SLA, Priority & Service Rules
 
@@ -1934,14 +1944,14 @@
 | loading | The rail, oldest ticket first. The count renders before the tickets — a kitchen wants to know how deep it is before it reads anything. |
 | error | Could not reach the platform. The rail is still live from cache and every bump is queued. |
 | emptyFirstRun | No tickets. The kitchen is clear, and that is worth saying plainly rather than showing a blank rail — a screen that looks broken and a screen that means nothing to do are the same picture otherwise. |
-| emptyNoAccess | This display is not assigned to a station. Assignment is a back-office act — a kitchen screen does not choose what it shows. |
+| emptyNoAccess | This display is not assigned to a station. Assignment is a back-office act — a kitchen screen does not choose what it shows. A principal without `ORDER_MODIFY` gets this state naming `ORDER_MODIFY`, the screen's `permission` and the one prioritising needs (the screen has no read); a button whose own `permission` the principal lacks is hidden, and a 403 from an action names that operation's permission. |
 | offline | Amber, and it keeps working. The kitchen still has to send food out — a display that blanks mid-service is worse than one that says it is behind, and every bump journals locally and syncs when the network returns. |
 
 **Goes to**
 
 | To | Trigger | Carries | Guard |
 |---|---|---|---|
-| KIT-001 | Kitchen Operations Command Center | stationId, venueId |  |
+| KIT-001 | Kitchen Operations Command Center |  |  |
 
 ## KIT-010 Kitchen Performance, AI & Operational Optimization
 
@@ -1979,14 +1989,14 @@
 | error | Could not reach the platform. The rail is still live from cache and every bump is queued. |
 | emptyFirstRun | No tickets. The kitchen is clear, and that is worth saying plainly rather than showing a blank rail — a screen that looks broken and a screen that means nothing to do are the same picture otherwise. |
 | emptyNoResults | Nothing matches this station or course filter. The rail is not empty — the filter is narrow, and on a kitchen screen that distinction is the difference between calm and panic. |
-| emptyNoAccess | This display is not assigned to a station. Assignment is a back-office act — a kitchen screen does not choose what it shows. |
+| emptyNoAccess | This display is not assigned to a station. Assignment is a back-office act — a kitchen screen does not choose what it shows. A principal without `REPORT_VIEW_VENUE` gets this state naming `REPORT_VIEW_VENUE`, the screen's `permission` and the one its read enforces; a button whose own `permission` the principal lacks is hidden, and a 403 from an action names that operation's permission. |
 | offline | Not available offline. `getDashboard` is an analytical read (ADR-0016) and there is nothing local to serve. The rail on KIT-001 is what survives a network loss. Corrected 24 August: the earlier wording described the kitchen rather than this screen, and a checker cannot tell those apart from prose. |
 
 **Goes to**
 
 | To | Trigger | Carries | Guard |
 |---|---|---|---|
-| KIT-001 | Kitchen Operations Command Center | stationId, venueId |  |
+| KIT-001 | Kitchen Operations Command Center |  |  |
 
 ## POS-004 Sell — Seat Map
 
@@ -2028,11 +2038,10 @@
 
 | State | Behaviour |
 |---|---|
-| loading | The sell seat map list. |
+| loading | The sell seat map, read by `getSeatAvailability`. |
 | error | Could not load. Names which read failed and leaves the sell seat map untouched. |
-| emptyFirstRun | No sell seat map yet. Carries the create action; distinct from a filter that matched nothing. |
-| emptyNoResults | The filter narrowed it and the sell seat map are still there. Names the active filter and offers to clear it. |
-| emptyNoAccess | Names the missing permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| emptyFirstRun | No sell seat map yet. Offers Create seat hold (`createSeatHold`). |
+| emptyNoAccess | Shown when the caller lacks `PRODUCT_VIEW`, which `getSeatAvailability` requires, and names that permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | offline | Not available offline. Seat holds require the primary; two terminals selling the same seat is unrecoverable |
 | denied | Seats can be viewed but not held without `payment.take` — an unchargeable hold takes capacity off sale for eight minutes and returns it unsold. |
 | zoneUnavailable | The zone sold out while the cashier was choosing. The board refuses the zone rather than the sale — the seat map reloads with that zone struck out and the cart intact. |
@@ -2041,10 +2050,10 @@
 
 | To | Trigger | Carries | Guard |
 |---|---|---|---|
-| POS-002 | Back |  |  |
+| POS-002 | Back | orderId |  |
 | POS-005 | Add seats to sale, then charge | cart, seatPicks, holdExpiresAt, guest, discount | payment.take |
-| POS-001 | Begin Shift | boxId, shiftId, workstationId |  |
-| POS-003 | Sell — Timed Entry | inventoryHoldId, productId |  |
+| POS-001 | Begin Shift |  |  |
+| POS-003 | Sell — Timed Entry |  |  |
 | POS-006 | Held Orders | orderId |  |
 
 ## POS-008 Reports
@@ -2071,11 +2080,11 @@
 
 | Operation | Service | When | Purpose | Permission |
 |---|---|---|---|---|
-| `runReport` | [ReportingService](../backend/ReportingService.md#runreport) | onLoad | Terminal day view | `REPORT_VIEW_VENUE` |
+| `runReport` | [ReportingService](../backend/ReportingService.md#runreport) | onAction | Terminal day view | `REPORT_VIEW_VENUE` |
 | `askReportingQuestion` | [ReportingService](../backend/ReportingService.md#askreportingquestion) | onAction | Natural-language reporting query | `REPORT_VIEW_VENUE` |
 | `deleteReport` | [ReportingService](../backend/ReportingService.md#deletereport) | onAction | Retire a report definition | `REPORT_MANAGE` |
 | `getFinancialReport` | [LedgerService](../backend/LedgerService.md#getfinancialreport) | onLoad | P&L, balance sheet or cash flow | `REPORT_VIEW_VENUE` |
-| `getReport` | [ReportingService](../backend/ReportingService.md#getreport) | onLoad | Read a report definition | `REPORT_VIEW_VENUE` |
+| `getReport` | [ReportingService](../backend/ReportingService.md#getreport) | onAction | Read a report definition | `REPORT_VIEW_VENUE` |
 | `listReports` | [ReportingService](../backend/ReportingService.md#listreports) | onLoad | List available report definitions | `REPORT_VIEW_VENUE` |
 | `saveNaturalLanguageQuery` | [ReportingService](../backend/ReportingService.md#savenaturallanguagequery) | onAction | Save a natural-language answer as a report definition | `REPORT_MANAGE` |
 
@@ -2085,9 +2094,9 @@
 |---|---|
 | loading | The reports list. |
 | error | Could not load. Names which read failed and leaves the reports untouched. |
-| emptyFirstRun | No reports yet. Carries the create action; distinct from a filter that matched nothing. |
-| emptyNoResults | The filter narrowed it and the reports are still there. Names the active filter and offers to clear it. |
-| emptyNoAccess | Names the missing permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| emptyFirstRun | No reports yet. Offers no create action — this screen declares no operation that makes one — and says so rather than showing an empty table. |
+| emptyNoResults | Nothing matches the filter on category, search and the reports are still there. Names the active filter and offers to clear it. |
+| emptyNoAccess | Shown when the caller lacks `REPORT_VIEW_VENUE`, which `getFinancialReport` requires, and names that permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | offline | Not available. Reporting reads the analytical replica (ADR-0016) and a terminal-local figure would disagree with the back office |
 
 **Goes to**
@@ -2095,8 +2104,8 @@
 | To | Trigger | Carries | Guard |
 |---|---|---|---|
 | POS-009 | Staffing against takings is read |  |  |
-| POS-001 | Begin Shift | boxId, shiftId, workstationId |  |
-| POS-002 | Sell — Ticket Catalogue | cardCode, cartId, orderId, productId, promotionId, workstationId |  |
+| POS-001 | Begin Shift |  |  |
+| POS-002 | Sell — Ticket Catalogue |  |  |
 
 ## POS-009 Staff Roster
 
@@ -2129,7 +2138,7 @@
 | `getShift` | [OrderService](../backend/OrderService.md#getshift) | onLoad | Read a shift | `REPORT_VIEW_WORKSTATION` |
 | `listCashMovements` | [OrderService](../backend/OrderService.md#listcashmovements) | onLoad | Lifts, adds and the opening float | `REPORT_VIEW_WORKSTATION` |
 | `openShift` | [OrderService](../backend/OrderService.md#openshift) | onAction | Open a shift | `SHIFT_OPEN` |
-| `recordNoSale` | [OrderService](../backend/OrderService.md#recordnosale) | onAction | Open the drawer without a sale | `SHIFT_SUSPEND` |
+| `recordNoSale` | [OrderService](../backend/OrderService.md#recordnosale) | onAction | Open the drawer without a sale | `CASH_NO_SALE` |
 | `reopenShift` | [OrderService](../backend/OrderService.md#reopenshift) | onAction | Reopen a shift closed in error | `SHIFT_REOPEN` |
 | `resumeShift` | [OrderService](../backend/OrderService.md#resumeshift) | onAction | Resume a suspended shift | `SHIFT_OPEN` |
 | `suspendShift` | [OrderService](../backend/OrderService.md#suspendshift) | onAction | Suspend a shift so another user can log in | `SHIFT_SUSPEND` |
@@ -2145,14 +2154,14 @@
 | loading | The staff roster list. |
 | error | Could not load. Names which read failed and leaves the staff roster untouched. |
 | emptyFirstRun | Nothing is waiting, which is the good outcome. An empty queue means every item has been decided; it offers no create action, because creating work is not what it needs. |
-| emptyNoResults | The filter narrowed it and the staff roster are still there. Names the active filter and offers to clear it. |
-| emptyNoAccess | Names the missing permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| emptyNoResults | Nothing matches the filter on workstationId, status, openedFrom, openedTo and the staff roster are still there. Names the active filter and offers to clear it. |
+| emptyNoAccess | Shown when the caller lacks `REPORT_VIEW_WORKSTATION`, which `listShifts` requires, and names that permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | offline | Last known roster, with its age shown |
 
 **Goes to**
 
 | To | Trigger | Carries | Guard |
 |---|---|---|---|
-| POS-001 | Begin Shift | boxId, shiftId, workstationId |  |
-| POS-002 | Sell — Ticket Catalogue | cardCode, cartId, orderId, productId, promotionId, workstationId |  |
-| POS-007 | Close Shift | boxId, saleId, shiftId |  |
+| POS-001 | Begin Shift | shiftId |  |
+| POS-002 | Sell — Ticket Catalogue |  |  |
+| POS-007 | Close Shift |  |  |

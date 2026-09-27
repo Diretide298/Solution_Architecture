@@ -13,7 +13,6 @@ initial:
 - queued
 terminal:
 - completed
-- failed
 - rolledBack
 transitions:
 - from: queued

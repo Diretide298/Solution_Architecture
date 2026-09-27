@@ -77,7 +77,7 @@ White Labelling is a module, not an app. Its screens live in the CMS (P13) and t
 | Operation | Service | When | Purpose | Permission |
 |---|---|---|---|---|
 | `createPreview` | [WhiteLabelService](../backend/WhiteLabelService.md#createpreview) | onAction | Generate a preview link | `TENANT_CONFIGURE` |
-| `diffConfigVersion` | [WhiteLabelService](../backend/WhiteLabelService.md#diffconfigversion) | onLoad | Compare a version against the working draft | `TENANT_CONFIGURE` |
+| `diffConfigVersion` | [WhiteLabelService](../backend/WhiteLabelService.md#diffconfigversion) | onAction | Compare a version against the working draft | `TENANT_CONFIGURE` |
 | `getAppIcons` | [WhiteLabelService](../backend/WhiteLabelService.md#getappicons) | onLoad | Read app icon set | `TENANT_CONFIGURE` |
 | `getBrandIdentity` | [WhiteLabelService](../backend/WhiteLabelService.md#getbrandidentity) | onLoad | Read brand identity | `TENANT_CONFIGURE` |
 | `getTheme` | [WhiteLabelService](../backend/WhiteLabelService.md#gettheme) | onLoad | Read colour theme | `TENANT_CONFIGURE` |
@@ -94,17 +94,17 @@ White Labelling is a module, not an app. Its screens live in the CMS (P13) and t
 |---|---|
 | loading | The white-label branding list. |
 | error | Could not load. Names which read failed and leaves the white-label branding untouched. |
-| emptyFirstRun | No white-label branding yet. Carries the create action; distinct from a filter that matched nothing. |
-| emptyNoResults | The filter narrowed it and the white-label branding are still there. Names the active filter and offers to clear it. |
-| emptyNoAccess | Names the missing permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| emptyFirstRun | No white-label branding yet. Offers Create preview (`createPreview`). |
+| emptyNoResults | Never shown: `listConfigVersions` takes no filter, so an empty list is always the first-run state above. |
+| emptyNoAccess | Shown when the caller lacks `TENANT_CONFIGURE`, which `getAppIcons` requires, and names that permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
 
 **Goes to**
 
 | To | Trigger | Carries | Guard |
 |---|---|---|---|
-| ADM-001 | Platform Login / MFA | sessionId |  |
-| ADM-002 | Platform Dashboard | tenantId |  |
-| ADM-003 | Cross-Tenant Health Dashboard | cellId, rightId |  |
+| ADM-001 | Platform Login / MFA |  |  |
+| ADM-002 | Platform Dashboard |  |  |
+| ADM-003 | Cross-Tenant Health Dashboard |  |  |
 
 ## ADM-017 Domain & Certificate Management
 
@@ -144,18 +144,18 @@ White Labelling is a module, not an app. Its screens live in the CMS (P13) and t
 |---|---|
 | loading | The domain certificate list. |
 | error | Could not load. Names which read failed and leaves the domain certificate untouched. |
-| emptyFirstRun | No domain certificate yet. Carries the create action; distinct from a filter that matched nothing. |
-| emptyNoResults | The filter narrowed it and the domain certificate are still there. Names the active filter and offers to clear it. |
-| emptyNoAccess | Names the missing permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| emptyFirstRun | No domain certificate yet. Offers no create action — this screen declares no operation that makes one — and says so rather than showing an empty table. |
+| emptyNoResults | Never shown: `listCustomDomains` takes no filter, so an empty list is always the first-run state above. |
+| emptyNoAccess | Shown when the caller lacks `TENANT_CONFIGURE`, which `listCustomDomains` requires, and names that permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
 
 **Goes to**
 
 | To | Trigger | Carries | Guard |
 |---|---|---|---|
-| ADM-016 | White-Label Branding Management |  |  |
-| ADM-001 | Platform Login / MFA | sessionId |  |
-| ADM-002 | Platform Dashboard | tenantId |  |
-| ADM-003 | Cross-Tenant Health Dashboard | cellId, rightId |  |
+| ADM-001 | Platform Login / MFA |  |  |
+| ADM-002 | Platform Dashboard |  |  |
+| ADM-003 | Cross-Tenant Health Dashboard |  |  |
+| ADM-016 | White-Label Branding Management | bannerId, pageId, policyKind, version |  |
 
 ## ADM-018 Localisation & Language Pack
 
@@ -183,7 +183,7 @@ White Labelling is a module, not an app. Its screens live in the CMS (P13) and t
 
 | Operation | Service | When | Purpose | Permission |
 |---|---|---|---|---|
-| `setLanguages` | [WhiteLabelService](../backend/WhiteLabelService.md#setlanguages) | onLoad | from page inventory | `TENANT_CONFIGURE` |
+| `setLanguages` | [WhiteLabelService](../backend/WhiteLabelService.md#setlanguages) | onAction | from page inventory | `TENANT_CONFIGURE` |
 | `listFaqs` | [WhiteLabelService](../backend/WhiteLabelService.md#listfaqs) | onLoad | List FAQs | `TENANT_CONFIGURE` |
 | `listPolicies` | [WhiteLabelService](../backend/WhiteLabelService.md#listpolicies) | onLoad | List legal policies | `TENANT_CONFIGURE` |
 | `setFaqs` | [WhiteLabelService](../backend/WhiteLabelService.md#setfaqs) | onAction | Set FAQ categories and entries | `TENANT_CONFIGURE` |
@@ -195,17 +195,17 @@ White Labelling is a module, not an app. Its screens live in the CMS (P13) and t
 |---|---|
 | loading | The localisation language pack list. |
 | error | Could not load. Names which read failed and leaves the localisation language pack untouched. |
-| emptyFirstRun | No localisation language pack yet. Carries the create action; distinct from a filter that matched nothing. |
-| emptyNoResults | The filter narrowed it and the localisation language pack are still there. Names the active filter and offers to clear it. |
-| emptyNoAccess | Names the missing permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| emptyFirstRun | No localisation language pack yet. Offers no create action — this screen declares no operation that makes one — and says so rather than showing an empty table. |
+| emptyNoResults | Never shown: `listFaqs` takes no filter, so an empty list is always the first-run state above. |
+| emptyNoAccess | Shown when the caller lacks `TENANT_CONFIGURE`, which `listFaqs` requires, and names that permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
 
 **Goes to**
 
 | To | Trigger | Carries | Guard |
 |---|---|---|---|
-| ADM-001 | Platform Login / MFA | sessionId |  |
-| ADM-002 | Platform Dashboard | tenantId |  |
-| ADM-003 | Cross-Tenant Health Dashboard | cellId, rightId |  |
+| ADM-001 | Platform Login / MFA |  |  |
+| ADM-002 | Platform Dashboard |  |  |
+| ADM-003 | Cross-Tenant Health Dashboard |  |  |
 
 ## CMS-001 Tenant Workspace
 
@@ -236,23 +236,33 @@ White Labelling is a module, not an app. Its screens live in the CMS (P13) and t
 
 | State | Behaviour |
 |---|---|
-| loading | The tenant list. |
+| loading | The tenant, read by `getTenantAppStatus`. |
 | error | Could not load. Names which read failed and leaves the tenant untouched. |
-| emptyFirstRun | No tenant yet. Carries the create action; distinct from a filter that matched nothing. |
-| emptyNoResults | The filter narrowed it and the tenant are still there. Names the active filter and offers to clear it. |
-| emptyNoAccess | Names the missing permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| emptyFirstRun | No tenant yet. Offers no create action — this screen declares no operation that makes one — and says so rather than showing an empty table. |
+| emptyNoAccess | Shown when the caller lacks `TENANT_CONFIGURE`, which `getTenantConfig` requires, and names that permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
 
 **Goes to**
 
 | To | Trigger | Carries | Guard |
 |---|---|---|---|
-| CMS-003 | Typography |  |  |
 | CMS-002 | Brand Kit |  |  |
 | CMS-004 | Logo & Assets |  |  |
 | CMS-061 | Digital Asset Management Command Center |  |  |
 | CMS-071 | AI Asset Intelligence Command Center |  |  |
 | CMS-081 | DAM Governance & Rights Command Center |  |  |
 | CMS-091 | Asset Distribution & Delivery Command Center |  |  |
+| CMS-008 | Content Blocks |  |  |
+| CMS-009 | Navigation & Menus |  |  |
+| CMS-010 | Media Library |  |  |
+| CMS-011 | Translations |  |  |
+| CMS-016 | Site Settings |  |  |
+| CMS-019 | User Access |  |  |
+| CMS-020 | Change Log |  |  |
+| CMS-021 | Privacy & Consent Configuration Command Center |  |  |
+| CMS-031 | Privacy Operations Command Center |  |  |
+| CMS-041 | Waiver & Consent Command Center |  |  |
+| CMS-051 | Waiver Operations Command Center |  |  |
+| CMS-003 | Typography | version |  |
 
 ## CMS-002 Brand Kit
 
@@ -286,20 +296,19 @@ White Labelling is a module, not an app. Its screens live in the CMS (P13) and t
 
 | State | Behaviour |
 |---|---|
-| loading | The brand kit list. |
+| loading | The brand kit, read by `getBrandIdentity`. |
 | error | Could not load. Names which read failed and leaves the brand kit untouched. |
-| emptyFirstRun | No brand kit yet. Carries the create action; distinct from a filter that matched nothing. |
-| emptyNoResults | The filter narrowed it and the brand kit are still there. Names the active filter and offers to clear it. |
-| emptyNoAccess | Names the missing permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| emptyFirstRun | No brand kit yet. Offers Create upload (`createUpload`). |
+| emptyNoAccess | Shown when the caller lacks `TENANT_CONFIGURE`, which `getBrandIdentity` requires, and names that permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
 
 **Goes to**
 
 | To | Trigger | Carries | Guard |
 |---|---|---|---|
 | CMS-005 | Sets the colour theme |  |  |
-| CMS-001 | Tenant Workspace | tenantId |  |
-| CMS-003 | Typography | bannerId, pageId, policyKind, version |  |
-| CMS-004 | Logo & Assets | assetId |  |
+| CMS-001 | Tenant Workspace |  |  |
+| CMS-003 | Typography |  |  |
+| CMS-004 | Logo & Assets |  |  |
 
 ## CMS-003 Typography
 
@@ -336,20 +345,19 @@ White Labelling is a module, not an app. Its screens live in the CMS (P13) and t
 
 | State | Behaviour |
 |---|---|
-| loading | The typography list. |
+| loading | The typography, read by `getFonts`. |
 | error | Could not load. Names which read failed and leaves the typography untouched. |
-| emptyFirstRun | No typography yet. Carries the create action; distinct from a filter that matched nothing. |
-| emptyNoResults | The filter narrowed it and the typography are still there. Names the active filter and offers to clear it. |
-| emptyNoAccess | Names the missing permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| emptyFirstRun | No typography yet. Offers no create action — this screen declares no operation that makes one — and says so rather than showing an empty table. |
+| emptyNoAccess | Shown when the caller lacks `TENANT_CONFIGURE`, which `getFonts` requires, and names that permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
 
 **Goes to**
 
 | To | Trigger | Carries | Guard |
 |---|---|---|---|
-| CMS-006 | Component Preview |  |  |
-| CMS-001 | Tenant Workspace | tenantId |  |
-| CMS-002 | Brand Kit | uploadId |  |
-| CMS-004 | Logo & Assets | assetId |  |
+| CMS-001 | Tenant Workspace |  |  |
+| CMS-002 | Brand Kit |  |  |
+| CMS-004 | Logo & Assets |  |  |
+| CMS-006 | Component Preview | bannerId, pageId, policyKind, version |  |
 
 ## CMS-004 Logo & Assets
 
@@ -377,19 +385,18 @@ White Labelling is a module, not an app. Its screens live in the CMS (P13) and t
 
 | State | Behaviour |
 |---|---|
-| loading | The logo assets list. |
+| loading | The logo assets, read by `getBrandIdentity`. |
 | error | Could not load. Names which read failed and leaves the logo assets untouched. |
-| emptyFirstRun | No logo assets yet. Carries the create action; distinct from a filter that matched nothing. |
-| emptyNoResults | The filter narrowed it and the logo assets are still there. Names the active filter and offers to clear it. |
-| emptyNoAccess | Names the missing permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| emptyFirstRun | No logo assets yet. Offers no create action — this screen declares no operation that makes one — and says so rather than showing an empty table. |
+| emptyNoAccess | Shown when the caller lacks `TENANT_CONFIGURE`, which `getBrandIdentity` requires, and names that permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
 
 **Goes to**
 
 | To | Trigger | Carries | Guard |
 |---|---|---|---|
-| CMS-001 | Tenant Workspace | tenantId |  |
-| CMS-002 | Brand Kit | uploadId |  |
-| CMS-003 | Typography | bannerId, pageId, policyKind, version |  |
+| CMS-001 | Tenant Workspace |  |  |
+| CMS-002 | Brand Kit |  |  |
+| CMS-003 | Typography |  |  |
 
 ## CMS-005 Theme Editor
 
@@ -415,20 +422,20 @@ White Labelling is a module, not an app. Its screens live in the CMS (P13) and t
 
 | State | Behaviour |
 |---|---|
-| loading | The theme editor list. |
+| loading | The theme editor, read by `getTheme`. |
 | error | Could not load. Names which read failed and leaves the theme editor untouched. |
-| emptyFirstRun | No theme editor yet. Carries the create action; distinct from a filter that matched nothing. |
-| emptyNoResults | The filter narrowed it and the theme editor are still there. Names the active filter and offers to clear it. |
-| emptyNoAccess | Names the missing permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| emptyFirstRun | No theme editor yet. Offers no create action — this screen declares no operation that makes one — and says so rather than showing an empty table. |
+| emptyNoAccess | Shown when the caller lacks `TENANT_CONFIGURE`, which `getTheme` requires, and names that permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
 
 **Goes to**
 
 | To | Trigger | Carries | Guard |
 |---|---|---|---|
 | CMS-007 | Rearranges the homepage |  |  |
-| CMS-001 | Tenant Workspace | tenantId |  |
-| CMS-002 | Brand Kit | uploadId |  |
-| CMS-003 | Typography | bannerId, pageId, policyKind, version |  |
+| CMS-001 | Tenant Workspace |  |  |
+| CMS-002 | Brand Kit |  |  |
+| CMS-003 | Typography |  |  |
+| CMS-006 | Component Preview |  |  |
 
 ## CMS-006 Component Preview
 
@@ -457,7 +464,7 @@ White Labelling is a module, not an app. Its screens live in the CMS (P13) and t
 | Operation | Service | When | Purpose | Permission |
 |---|---|---|---|---|
 | `createPreview` | [WhiteLabelService](../backend/WhiteLabelService.md#createpreview) | onAction | Generate a preview link | `TENANT_CONFIGURE` |
-| `diffConfigVersion` | [WhiteLabelService](../backend/WhiteLabelService.md#diffconfigversion) | onLoad | Compare a version against the working draft | `TENANT_CONFIGURE` |
+| `diffConfigVersion` | [WhiteLabelService](../backend/WhiteLabelService.md#diffconfigversion) | onAction | Compare a version against the working draft | `TENANT_CONFIGURE` |
 | `listConfigVersions` | [WhiteLabelService](../backend/WhiteLabelService.md#listconfigversions) | onLoad | Version history | `TENANT_CONFIGURE` |
 | `publishTenantConfig` | [WhiteLabelService](../backend/WhiteLabelService.md#publishtenantconfig) | onAction | Publish the working draft | `TENANT_PUBLISH` |
 | `restoreConfigVersion` | [WhiteLabelService](../backend/WhiteLabelService.md#restoreconfigversion) | onAction | Restore a previous version | `TENANT_PUBLISH` |
@@ -468,18 +475,18 @@ White Labelling is a module, not an app. Its screens live in the CMS (P13) and t
 |---|---|
 | loading | The component preview list. |
 | error | Could not load. Names which read failed and leaves the component preview untouched. |
-| emptyFirstRun | No component preview yet. Carries the create action; distinct from a filter that matched nothing. |
-| emptyNoResults | The filter narrowed it and the component preview are still there. Names the active filter and offers to clear it. |
-| emptyNoAccess | Names the missing permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| emptyFirstRun | No component preview yet. Offers Create preview (`createPreview`). |
+| emptyNoResults | Never shown: `listConfigVersions` takes no filter, so an empty list is always the first-run state above. |
+| emptyNoAccess | Shown when the caller lacks `TENANT_CONFIGURE`, which `listConfigVersions` requires, and names that permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
 
 **Goes to**
 
 | To | Trigger | Carries | Guard |
 |---|---|---|---|
-| CMS-001 | Tenant Workspace | tenantId |  |
-| CMS-002 | Brand Kit | uploadId |  |
+| CMS-001 | Tenant Workspace |  |  |
+| CMS-002 | Brand Kit |  |  |
 | CMS-003 | Typography | bannerId, pageId, policyKind, version |  |
-| ADM-016 | White-Label Branding Management |  |  |
+| ADM-016 | White-Label Branding Management | bannerId, pageId, policyKind, version |  |
 
 ## CMS-007 Page Builder
 
@@ -515,20 +522,19 @@ White Labelling is a module, not an app. Its screens live in the CMS (P13) and t
 
 | State | Behaviour |
 |---|---|
-| loading | The record list. |
+| loading | The record, read by `getHomepageLayout`. |
 | error | Could not load. Names which read failed and leaves the record untouched. |
-| emptyFirstRun | No record yet. Carries the create action; distinct from a filter that matched nothing. |
-| emptyNoResults | The filter narrowed it and the record are still there. Names the active filter and offers to clear it. |
-| emptyNoAccess | Names the missing permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| emptyFirstRun | No record yet. Offers Create content page (`createContentPage`). |
+| emptyNoAccess | Shown when the caller lacks `TENANT_CONFIGURE`, which `listContentPages` requires, and names that permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
 
 **Goes to**
 
 | To | Trigger | Carries | Guard |
 |---|---|---|---|
 | CMS-012 | Previews in both directions |  |  |
-| CMS-001 | Tenant Workspace | tenantId |  |
-| CMS-002 | Brand Kit | uploadId |  |
-| CMS-003 | Typography | bannerId, pageId, policyKind, version |  |
+| CMS-001 | Tenant Workspace |  |  |
+| CMS-002 | Brand Kit |  |  |
+| CMS-003 | Typography | pageId |  |
 
 ## CMS-008 Content Blocks
 
@@ -568,17 +574,17 @@ White Labelling is a module, not an app. Its screens live in the CMS (P13) and t
 |---|---|
 | loading | The content blocks list. |
 | error | Could not load. Names which read failed and leaves the content blocks untouched. |
-| emptyFirstRun | No content blocks yet. Carries the create action; distinct from a filter that matched nothing. |
-| emptyNoResults | The filter narrowed it and the content blocks are still there. Names the active filter and offers to clear it. |
-| emptyNoAccess | Names the missing permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| emptyFirstRun | No content blocks yet. Offers Create banner (`createBanner`). |
+| emptyNoResults | Never shown: `listPromoBlocks` takes no filter, so an empty list is always the first-run state above. |
+| emptyNoAccess | Shown when the caller lacks `TENANT_CONFIGURE`, which `listPromoBlocks` requires, and names that permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
 
 **Goes to**
 
 | To | Trigger | Carries | Guard |
 |---|---|---|---|
-| CMS-001 | Tenant Workspace | tenantId |  |
-| CMS-002 | Brand Kit | uploadId |  |
-| CMS-003 | Typography | bannerId, pageId, policyKind, version |  |
+| CMS-001 | Tenant Workspace |  |  |
+| CMS-002 | Brand Kit |  |  |
+| CMS-003 | Typography | bannerId |  |
 
 ## CMS-009 Navigation & Menus
 
@@ -604,7 +610,7 @@ White Labelling is a module, not an app. Its screens live in the CMS (P13) and t
 | Operation | Service | When | Purpose | Permission |
 |---|---|---|---|---|
 | `listMenus` | [FnbService](../backend/FnbService.md#listmenus) | onLoad | List menus | `PRODUCT_VIEW` |
-| `getMenu` | [FnbService](../backend/FnbService.md#getmenu) | onLoad | Read a menu with sections and items | `PRODUCT_VIEW` |
+| `getMenu` | [FnbService](../backend/FnbService.md#getmenu) | onAction | Read a menu with sections and items | `PRODUCT_VIEW` |
 | `createMenu` | [FnbService](../backend/FnbService.md#createmenu) | onAction | Create a menu | `PRODUCT_CONFIGURE` |
 | `setMenuSections` | [FnbService](../backend/FnbService.md#setmenusections) | onAction | Set menu sections and their item ordering | `PRODUCT_CONFIGURE` |
 | `updateMenu` | [FnbService](../backend/FnbService.md#updatemenu) | onAction | Amend a menu | `PRODUCT_CONFIGURE` |
@@ -615,17 +621,17 @@ White Labelling is a module, not an app. Its screens live in the CMS (P13) and t
 |---|---|
 | loading | The navigation menus list. |
 | error | Could not load. Names which read failed and leaves the navigation menus untouched. |
-| emptyFirstRun | No navigation menus yet. Carries the create action; distinct from a filter that matched nothing. |
-| emptyNoResults | The filter narrowed it and the navigation menus are still there. Names the active filter and offers to clear it. |
-| emptyNoAccess | Names the missing permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| emptyFirstRun | No navigation menus yet. Offers Create menu (`createMenu`); distinct from a filter that matched nothing. |
+| emptyNoResults | Nothing matches the filter on outletId, activeAt and the navigation menus are still there. Names the active filter and offers to clear it. |
+| emptyNoAccess | Shown when the caller lacks `PRODUCT_VIEW`, which `listMenus` requires, and names that permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
 
 **Goes to**
 
 | To | Trigger | Carries | Guard |
 |---|---|---|---|
-| CMS-001 | Tenant Workspace | tenantId |  |
-| CMS-002 | Brand Kit | uploadId |  |
-| CMS-003 | Typography | bannerId, pageId, policyKind, version |  |
+| CMS-001 | Tenant Workspace |  |  |
+| CMS-002 | Brand Kit |  |  |
+| CMS-003 | Typography |  |  |
 
 ## CMS-010 Media Library
 
@@ -652,7 +658,7 @@ White Labelling is a module, not an app. Its screens live in the CMS (P13) and t
 
 | Operation | Service | When | Purpose | Permission |
 |---|---|---|---|---|
-| `getMediaEntitlements` | [OrderService](../backend/OrderService.md#getmediaentitlements) | onLoad | What is already on this media | `ORDER_VIEW` |
+| `getMediaEntitlements` | [OrderService](../backend/OrderService.md#getmediaentitlements) | onAction | What is already on this media | `ORDER_VIEW` |
 | `searchMedia` | [VenueOpsService](../backend/VenueOpsService.md#searchmedia) | onLoad | Search the asset library | `ASSET_LIBRARY_VIEW` |
 | `appendEntitlementToMedia` | [OrderService](../backend/OrderService.md#appendentitlementtomedia) | onAction | Add something to a ticket the guest already holds | `ORDER_CREATE` |
 | `completeUpload` | [VenueOpsService](../backend/VenueOpsService.md#completeupload) | onAction | Confirm an upload and create the asset | `ASSET_LIBRARY_MANAGE` |
@@ -660,7 +666,7 @@ White Labelling is a module, not an app. Its screens live in the CMS (P13) and t
 | `createUpload` | [VenueOpsService](../backend/VenueOpsService.md#createupload) | onAction | Request a signed upload URL | `ASSET_LIBRARY_MANAGE` |
 | `deleteMediaAsset` | [VenueOpsService](../backend/VenueOpsService.md#deletemediaasset) | onAction | Delete an asset | `ASSET_LIBRARY_MANAGE` |
 | `getExpiringRights` | [VenueOpsService](../backend/VenueOpsService.md#getexpiringrights) | onLoad | Assets whose licence is expiring or expired | `ASSET_LIBRARY_VIEW` |
-| `getMediaAsset` | [VenueOpsService](../backend/VenueOpsService.md#getmediaasset) | onLoad | Read an asset with derivatives and usage | `ASSET_LIBRARY_VIEW` |
+| `getMediaAsset` | [VenueOpsService](../backend/VenueOpsService.md#getmediaasset) | onAction | Read an asset with derivatives and usage | `ASSET_LIBRARY_VIEW` |
 | `listCollections` | [VenueOpsService](../backend/VenueOpsService.md#listcollections) | onLoad | List collections | `ASSET_LIBRARY_VIEW` |
 | `replaceMediaAsset` | [VenueOpsService](../backend/VenueOpsService.md#replacemediaasset) | onAction | Replace the file behind an asset | `ASSET_LIBRARY_MANAGE` |
 | `updateMediaAsset` | [VenueOpsService](../backend/VenueOpsService.md#updatemediaasset) | onAction | Amend metadata, tags or rights | `ASSET_LIBRARY_MANAGE` |
@@ -671,17 +677,17 @@ White Labelling is a module, not an app. Its screens live in the CMS (P13) and t
 |---|---|
 | loading | The media list. |
 | error | Could not load. Names which read failed and leaves the media untouched. |
-| emptyFirstRun | No media yet. Carries the create action; distinct from a filter that matched nothing. |
-| emptyNoResults | The filter narrowed it and the media are still there. Names the active filter and offers to clear it. |
-| emptyNoAccess | Names the missing permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| emptyFirstRun | No media yet. Offers Create collection (`createCollection`); distinct from a filter that matched nothing. |
+| emptyNoResults | Nothing matches the filter on kind, tag, collectionId, venueId, search, unusedOnly and the media are still there. Names the active filter and offers to clear it. |
+| emptyNoAccess | Shown when the caller lacks `ORDER_VIEW`, which `getMediaEntitlements` requires, and names that permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
 
 **Goes to**
 
 | To | Trigger | Carries | Guard |
 |---|---|---|---|
-| CMS-001 | Tenant Workspace | tenantId |  |
+| CMS-001 | Tenant Workspace |  |  |
 | CMS-002 | Brand Kit | uploadId |  |
-| CMS-003 | Typography | bannerId, pageId, policyKind, version |  |
+| CMS-003 | Typography |  |  |
 
 ## CMS-011 Translations
 
@@ -708,16 +714,16 @@ White Labelling is a module, not an app. Its screens live in the CMS (P13) and t
 |---|---|
 | loading | The saved translations. |
 | error | Could not load. Names which read failed and leaves the translations untouched. |
-| emptyFirstRun | No translations configured. Carries the create action and says what the platform does in the meantime. |
-| emptyNoAccess | Names the missing permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| emptyFirstRun | No translations configured. The form opens empty and `setLanguages` saves the first one; it says what the platform does in the meantime. |
+| emptyNoAccess | Shown when the caller lacks `TENANT_CONFIGURE`, which `setLanguages` requires, and names that permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
 
 **Goes to**
 
 | To | Trigger | Carries | Guard |
 |---|---|---|---|
-| CMS-001 | Tenant Workspace | tenantId |  |
-| CMS-002 | Brand Kit | uploadId |  |
-| CMS-003 | Typography | bannerId, pageId, policyKind, version |  |
+| CMS-001 | Tenant Workspace |  |  |
+| CMS-002 | Brand Kit |  |  |
+| CMS-003 | Typography |  |  |
 
 ## CMS-012 RTL Preview
 
@@ -743,20 +749,19 @@ White Labelling is a module, not an app. Its screens live in the CMS (P13) and t
 
 | State | Behaviour |
 |---|---|
-| loading | The rtl preview list. |
+| loading | The rtl preview, read by `getTenantConfig`. |
 | error | Could not load. Names which read failed and leaves the rtl preview untouched. |
-| emptyFirstRun | No rtl preview yet. Carries the create action; distinct from a filter that matched nothing. |
-| emptyNoResults | The filter narrowed it and the rtl preview are still there. Names the active filter and offers to clear it. |
-| emptyNoAccess | Names the missing permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| emptyFirstRun | No rtl preview yet. Offers no create action — this screen declares no operation that makes one — and says so rather than showing an empty table. |
+| emptyNoAccess | Shown when the caller lacks `TENANT_CONFIGURE`, which `getTenantConfig` requires, and names that permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
 
 **Goes to**
 
 | To | Trigger | Carries | Guard |
 |---|---|---|---|
 | CMS-014 | Publishes |  |  |
-| CMS-001 | Tenant Workspace | tenantId |  |
-| CMS-002 | Brand Kit | uploadId |  |
-| CMS-003 | Typography | bannerId, pageId, policyKind, version |  |
+| CMS-001 | Tenant Workspace |  |  |
+| CMS-002 | Brand Kit |  |  |
+| CMS-003 | Typography | version |  |
 
 ## CMS-013 SEO & Metadata
 
@@ -784,15 +789,15 @@ White Labelling is a module, not an app. Its screens live in the CMS (P13) and t
 | loading | Detail loads |
 | error | Could not load |
 | emptyFirstRun | Not found — it may have been deleted or moved out of scope |
-| emptyNoAccess | Names the missing permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| emptyNoAccess | Shown when the caller lacks `MARKETING_MANAGE`, which `setSeoMetadata` requires, and names that permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
 
 **Goes to**
 
 | To | Trigger | Carries | Guard |
 |---|---|---|---|
-| CMS-001 | Tenant Workspace | tenantId |  |
-| CMS-002 | Brand Kit | uploadId |  |
-| CMS-003 | Typography | bannerId, pageId, policyKind, version |  |
+| CMS-001 | Tenant Workspace |  |  |
+| CMS-002 | Brand Kit |  |  |
+| CMS-003 | Typography |  |  |
 
 ## CMS-014 Publishing Workflow
 
@@ -819,20 +824,19 @@ White Labelling is a module, not an app. Its screens live in the CMS (P13) and t
 
 | State | Behaviour |
 |---|---|
-| loading | The publishing workflow list. |
+| loading | The publishing workflow, read by `getTenantAppStatus`. |
 | error | Could not load. Names which read failed and leaves the publishing workflow untouched. |
-| emptyFirstRun | No publishing workflow yet. Carries the create action; distinct from a filter that matched nothing. |
-| emptyNoResults | The filter narrowed it and the publishing workflow are still there. Names the active filter and offers to clear it. |
-| emptyNoAccess | Names the missing permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| emptyFirstRun | No publishing workflow yet. Offers no create action — this screen declares no operation that makes one — and says so rather than showing an empty table. |
+| emptyNoAccess | Shown when the caller lacks `TENANT_PUBLISH`, which `publishTenantConfig` requires, and names that permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
 
 **Goes to**
 
 | To | Trigger | Carries | Guard |
 |---|---|---|---|
-| CMS-015 | Rolls back when something is wrong |  |  |
-| CMS-001 | Tenant Workspace | tenantId |  |
-| CMS-002 | Brand Kit | uploadId |  |
-| CMS-003 | Typography | bannerId, pageId, policyKind, version |  |
+| CMS-001 | Tenant Workspace |  |  |
+| CMS-002 | Brand Kit |  |  |
+| CMS-003 | Typography | version |  |
+| CMS-015 | Rolls back when something is wrong | version |  |
 
 ## CMS-015 Version History
 
@@ -858,7 +862,7 @@ White Labelling is a module, not an app. Its screens live in the CMS (P13) and t
 | Operation | Service | When | Purpose | Permission |
 |---|---|---|---|---|
 | `listConfigVersions` | [WhiteLabelService](../backend/WhiteLabelService.md#listconfigversions) | onLoad | Version history | `TENANT_CONFIGURE` |
-| `diffConfigVersion` | [WhiteLabelService](../backend/WhiteLabelService.md#diffconfigversion) | onLoad | Compare a version against the working draft | `TENANT_CONFIGURE` |
+| `diffConfigVersion` | [WhiteLabelService](../backend/WhiteLabelService.md#diffconfigversion) | onAction | Compare a version against the working draft | `TENANT_CONFIGURE` |
 | `restoreConfigVersion` | [WhiteLabelService](../backend/WhiteLabelService.md#restoreconfigversion) | onAction | Restore a previous version | `TENANT_PUBLISH` |
 
 **States**
@@ -867,17 +871,17 @@ White Labelling is a module, not an app. Its screens live in the CMS (P13) and t
 |---|---|
 | loading | The version history list. |
 | error | Could not load. Names which read failed and leaves the version history untouched. |
-| emptyFirstRun | No version history yet. Carries the create action; distinct from a filter that matched nothing. |
-| emptyNoResults | The filter narrowed it and the version history are still there. Names the active filter and offers to clear it. |
-| emptyNoAccess | Names the missing permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| emptyFirstRun | No version history yet. Offers no create action — this screen declares no operation that makes one — and says so rather than showing an empty table. |
+| emptyNoResults | Never shown: `listConfigVersions` takes no filter, so an empty list is always the first-run state above. |
+| emptyNoAccess | Shown when the caller lacks `TENANT_CONFIGURE`, which `listConfigVersions` requires, and names that permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
 
 **Goes to**
 
 | To | Trigger | Carries | Guard |
 |---|---|---|---|
-| CMS-001 | Tenant Workspace | tenantId |  |
-| CMS-002 | Brand Kit | uploadId |  |
-| CMS-003 | Typography | bannerId, pageId, policyKind, version |  |
+| CMS-001 | Tenant Workspace |  |  |
+| CMS-002 | Brand Kit |  |  |
+| CMS-003 | Typography | version |  |
 
 ## CMS-016 Site Settings
 
@@ -904,19 +908,20 @@ White Labelling is a module, not an app. Its screens live in the CMS (P13) and t
 
 | State | Behaviour |
 |---|---|
-| loading | The site settings list. |
+| loading | The site settings, read by `getTenantConfig`. |
 | error | Could not load. Names which read failed and leaves the site settings untouched. |
-| emptyFirstRun | No site settings yet. Carries the create action; distinct from a filter that matched nothing. |
-| emptyNoResults | The filter narrowed it and the site settings are still there. Names the active filter and offers to clear it. |
-| emptyNoAccess | Names the missing permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| emptyFirstRun | No site settings yet. Offers no create action — this screen declares no operation that makes one — and says so rather than showing an empty table. |
+| emptyNoAccess | Shown when the caller lacks `TENANT_CONFIGURE`, which `getBookingFlowConfig` requires, and names that permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
 
 **Goes to**
 
 | To | Trigger | Carries | Guard |
 |---|---|---|---|
-| CMS-001 | Tenant Workspace | tenantId |  |
-| CMS-002 | Brand Kit | uploadId |  |
-| CMS-003 | Typography | bannerId, pageId, policyKind, version |  |
+| CMS-001 | Tenant Workspace |  |  |
+| CMS-002 | Brand Kit |  |  |
+| CMS-003 | Typography | version |  |
+| CMS-017 | Domain & Certificate |  |  |
+| CMS-018 | Consent & Legal |  |  |
 
 ## CMS-017 Domain & Certificate
 
@@ -953,16 +958,16 @@ White Labelling is a module, not an app. Its screens live in the CMS (P13) and t
 | loading | Detail loads |
 | error | Could not load |
 | emptyFirstRun | Not found — it may have been deleted or moved out of scope |
-| emptyNoResults | The filter narrowed it and the domain certificate are still there. Names the active filter and offers to clear it. |
-| emptyNoAccess | Names the missing permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| emptyNoResults | Never shown: `listCustomDomains` takes no filter, so an empty list is always the first-run state above. |
+| emptyNoAccess | Shown when the caller lacks `TENANT_CONFIGURE`, which `listCustomDomains` requires, and names that permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
 
 **Goes to**
 
 | To | Trigger | Carries | Guard |
 |---|---|---|---|
-| CMS-001 | Tenant Workspace | tenantId |  |
-| CMS-002 | Brand Kit | uploadId |  |
-| CMS-003 | Typography | bannerId, pageId, policyKind, version |  |
+| CMS-001 | Tenant Workspace |  |  |
+| CMS-002 | Brand Kit |  |  |
+| CMS-003 | Typography |  |  |
 
 ## CMS-018 Consent & Legal
 
@@ -998,17 +1003,17 @@ White Labelling is a module, not an app. Its screens live in the CMS (P13) and t
 |---|---|
 | loading | The consent legal list. |
 | error | Could not load. Names which read failed and leaves the consent legal untouched. |
-| emptyFirstRun | No consent legal yet. Carries the create action; distinct from a filter that matched nothing. |
-| emptyNoResults | The filter narrowed it and the consent legal are still there. Names the active filter and offers to clear it. |
-| emptyNoAccess | Names the missing permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| emptyFirstRun | No consent legal yet. Offers no create action — this screen declares no operation that makes one — and says so rather than showing an empty table. |
+| emptyNoResults | Never shown: `listPolicies` takes no filter, so an empty list is always the first-run state above. |
+| emptyNoAccess | Shown when the caller lacks `TENANT_CONFIGURE`, which `listPolicies` requires, and names that permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
 
 **Goes to**
 
 | To | Trigger | Carries | Guard |
 |---|---|---|---|
-| CMS-001 | Tenant Workspace | tenantId |  |
-| CMS-002 | Brand Kit | uploadId |  |
-| CMS-003 | Typography | bannerId, pageId, policyKind, version |  |
+| CMS-001 | Tenant Workspace |  |  |
+| CMS-002 | Brand Kit |  |  |
+| CMS-003 | Typography | policyKind, version |  |
 
 ## CMS-019 User Access
 
@@ -1036,17 +1041,17 @@ White Labelling is a module, not an app. Its screens live in the CMS (P13) and t
 |---|---|
 | loading | The user access list. |
 | error | Could not load. Names which read failed and leaves the user access untouched. |
-| emptyFirstRun | No user access yet. Carries the create action; distinct from a filter that matched nothing. |
-| emptyNoResults | The filter narrowed it and the user access are still there. Names the active filter and offers to clear it. |
-| emptyNoAccess | Names the missing permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| emptyFirstRun | No user access yet. Offers no create action — this screen declares no operation that makes one — and says so rather than showing an empty table. |
+| emptyNoResults | Nothing matches the filter on scopePath, isActive and the user access are still there. Names the active filter and offers to clear it. |
+| emptyNoAccess | Shown when the caller lacks `USER_MANAGE`, which `listPrincipals` requires, and names that permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
 
 **Goes to**
 
 | To | Trigger | Carries | Guard |
 |---|---|---|---|
-| CMS-001 | Tenant Workspace | tenantId |  |
-| CMS-002 | Brand Kit | uploadId |  |
-| CMS-003 | Typography | bannerId, pageId, policyKind, version |  |
+| CMS-001 | Tenant Workspace |  |  |
+| CMS-002 | Brand Kit |  |  |
+| CMS-003 | Typography |  |  |
 
 ## CMS-020 Change Log
 
@@ -1073,14 +1078,14 @@ White Labelling is a module, not an app. Its screens live in the CMS (P13) and t
 |---|---|
 | loading | The change log list. |
 | error | Could not load. Names which read failed and leaves the change log untouched. |
-| emptyFirstRun | No change log yet. Carries the create action; distinct from a filter that matched nothing. |
-| emptyNoResults | The filter narrowed it and the change log are still there. Names the active filter and offers to clear it. |
-| emptyNoAccess | Names the missing permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| emptyFirstRun | No change log yet. Offers no create action — this screen declares no operation that makes one — and says so rather than showing an empty table. |
+| emptyNoResults | Never shown: `listConfigVersions` takes no filter, so an empty list is always the first-run state above. |
+| emptyNoAccess | Shown when the caller lacks `TENANT_CONFIGURE`, which `listConfigVersions` requires, and names that permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
 
 **Goes to**
 
 | To | Trigger | Carries | Guard |
 |---|---|---|---|
-| CMS-001 | Tenant Workspace | tenantId |  |
-| CMS-002 | Brand Kit | uploadId |  |
-| CMS-003 | Typography | bannerId, pageId, policyKind, version |  |
+| CMS-001 | Tenant Workspace |  |  |
+| CMS-002 | Brand Kit |  |  |
+| CMS-003 | Typography | version |  |

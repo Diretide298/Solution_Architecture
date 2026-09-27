@@ -1,28 +1,28 @@
 id: LLD-FnbService
-title: FnbService — 111 operations, 42 tables
+title: FnbService — 113 operations, 47 tables
 generatedBy: tools/derive-diagrams.py
 tier: operations
 index: diagrams/hld/02-services.yaml
-why: '**96 operations and 34 tables — the largest single domain after marketing.** Its own service because
-  a kitchen pass has a latency profile nothing else shares: a bump must land in under a second on a
-  display that may be offline.'
+why: '**113 operations and 47 tables — the largest single domain after marketing.** Its own service
+  because a kitchen pass has a latency profile nothing else shares: a bump must land in under a second
+  on a display that may be offline.'
 scale: Write-heavy during service, idle between. **Two peaks a day, sharply.**
 ifDown: Down means the kitchen falls back to paper. Offline-capable by design.
 coverage:
-  operations: 111
-  inAFlow: 70
-  percent: 73%
+  operations: 113
+  inAFlow: 71
+  percent: 63%
   note: '**Flow coverage is how much of this service a journey has walked.** A service under 40% is
     unwalked rather than under-documented.'
 schemas:
 - schema: fnb
-  tables: 42
+  tables: 47
   stores:
   - postgres
   largestTable: fnb.product_recommendation
 operationsByContract:
 - contract: fnb
-  count: 111
+  count: 113
   operations:
   - operation: acceptFnbOrder
     verb: POST
@@ -62,8 +62,8 @@ operationsByContract:
     scope: venue
     permission: PRODUCT_CONFIGURE
     offline: false
-    reads: 5
-    writes: 2
+    reads: 6
+    writes: 3
   - operation: cancelFnbOrder
     verb: POST
     path: /fnb-orders/{orderId}/cancel
@@ -151,7 +151,7 @@ operationsByContract:
     permission: ORDER_CREATE
     offline: true
     reads: 3
-    writes: 2
+    writes: 3
   - operation: createGuestFnbOrder
     verb: POST
     path: /guest-orders
@@ -408,6 +408,22 @@ operationsByContract:
     offline: true
     reads: 2
     writes: 0
+  - operation: listMenuSchedules
+    verb: GET
+    path: /menus/{menuId}/schedule
+    scope: venue
+    permission: PRODUCT_VIEW
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: listMenuVersions
+    verb: GET
+    path: /menus/{menuId}/versions
+    scope: venue
+    permission: PRODUCT_VIEW
+    offline: false
+    reads: 3
+    writes: 0
   - operation: listMenus
     verb: GET
     path: /menus
@@ -470,7 +486,7 @@ operationsByContract:
     scope: venue
     permission: INCIDENT_REPORT
     offline: true
-    reads: 2
+    reads: 3
     writes: 2
   - operation: logTemperature
     verb: POST
@@ -486,7 +502,7 @@ operationsByContract:
     scope: venue
     permission: ORDER_MODIFY
     offline: true
-    reads: 3
+    reads: 4
     writes: 3
   - operation: mergeTableVisits
     verb: POST
@@ -558,7 +574,7 @@ operationsByContract:
     scope: venue
     permission: PRODUCT_CONFIGURE
     offline: false
-    reads: 3
+    reads: 5
     writes: 4
   - operation: quoteWaitTime
     verb: POST
@@ -630,7 +646,7 @@ operationsByContract:
     scope: venue
     permission: PRODUCT_CONFIGURE
     offline: false
-    reads: 2
+    reads: 3
     writes: 3
   - operation: requestBill
     verb: POST
@@ -662,7 +678,7 @@ operationsByContract:
     scope: venue
     permission: PRODUCT_CONFIGURE
     offline: false
-    reads: 2
+    reads: 5
     writes: 3
   - operation: scheduleMenuPublish
     verb: POST
@@ -670,7 +686,7 @@ operationsByContract:
     scope: venue
     permission: PRODUCT_CONFIGURE
     offline: false
-    reads: 2
+    reads: 3
     writes: 3
   - operation: seatTableReservation
     verb: POST
@@ -710,8 +726,8 @@ operationsByContract:
     scope: venue
     permission: PRODUCT_CONFIGURE
     offline: false
-    reads: 1
-    writes: 2
+    reads: 2
+    writes: 3
   - operation: setFnbDeliveryPolicy
     verb: PUT
     path: /fnb-delivery-policy
@@ -822,8 +838,8 @@ operationsByContract:
     scope: venue
     permission: PRODUCT_CONFIGURE
     offline: false
-    reads: 2
-    writes: 3
+    reads: 3
+    writes: 4
   - operation: setTableLayout
     verb: PUT
     path: /outlets/{outletId}/tables
@@ -870,7 +886,7 @@ operationsByContract:
     scope: venue
     permission: FNB_SERVE
     offline: true
-    reads: 3
+    reads: 5
     writes: 2
   - operation: updateMenu
     verb: PATCH
@@ -918,15 +934,193 @@ tables:
   columns: 5
   backing: redis
   owned: false
-  why: '**Not a table and not owned by a service.** Derived from something already read, invalidated
-    by an event already consumed, losable without consequence — no migration, no backup, no owner.'
+  why: '**Not a table and not owned by a service.** Derived from something already read, losable without
+    consequence — no migration, no backup, no owner.'
+  key: The idempotency key the caller sent
+  eviction:
+  - 'expires_at: **Must exceed the longest offline window.** A scanner out for a weekend replays on
+    Monday'
+  writtenBy:
+  - acceptFnbOrder
+  - amendFnbOrder
+  - applyMenuActions
+  - attachModifierGroup
+  - buildProductionPlan
+  - cancelFnbOrder
+  - chaseStation
+  - claimLocationSession
+  - claimTableSession
+  - clearTable
+  - closeCorrectiveAction
+  - closeTableVisit
+  - compItem
+  - completeProductionRun
+  - createCombo
+  - createFnbOrder
+  - createGuestFnbOrder
+  - createMenu
+  - createModifierGroup
+  - createTable
+  - createTableReservation
+  - enterCountLine
+  - escalateCorrectiveAction
+  - fireCourse
+  - holdCourse
+  - joinRestaurantWaitlist
+  - logColdChain
+  - logKitchenException
+  - logTemperature
+  - markOrderCollected
+  - mergeTableVisits
+  - moveTableVisit
+  - notifyServer
+  - notifyWaitlistParty
+  - openTableVisit
+  - planProductionRun
+  - prioritiseKitchenTicket
+  - publishMenu
+  - quoteWaitTime
+  - reassignServer
+  - rebalanceStationLoad
+  - recallKitchenTicket
+  - recordCorrectiveAction
+  - recordOrderHandover
+  - recordWaste
+  - refireItem
+  - releaseProductionPlan
+  - requestBill
+  - requestRecount
+  - rollbackMenu
+  - scheduleMenuPublish
+  - seatTableReservation
+  - sendBookingConfirmation
+  - sendOrderNotification
+  - setComboSlots
+  - setCourseRules
+  - setItemAvailability
+  - setKitchenSla
+  - setKitchenStations
+  - setKitchenTicketStatus
+  - setMenuSections
+  - setRecipe
+  - setSectionLayout
+  - setServiceStage
+  - setSubstitutionRules
+  - setTableCombinations
+  - setTableLayout
+  - signCorrectiveAction
+  - splitBill
+  - transferOrderItems
+  - transferTableVisit
+  - updateMenu
+  - updateTable
+  - updateTableReservation
+  - updateTableVisit
+  readBy:
+  - acceptFnbOrder
+  - amendFnbOrder
+  - applyMenuActions
+  - attachModifierGroup
+  - buildProductionPlan
+  - cancelFnbOrder
+  - chaseStation
+  - claimLocationSession
+  - claimTableSession
+  - clearTable
+  - closeCorrectiveAction
+  - closeTableVisit
+  - compItem
+  - completeProductionRun
+  - createCombo
+  - createFnbOrder
+  - createGuestFnbOrder
+  - createMenu
+  - createModifierGroup
+  - createTable
+  - createTableReservation
+  - enterCountLine
+  - escalateCorrectiveAction
+  - fireCourse
+  - holdCourse
+  - joinRestaurantWaitlist
+  - logColdChain
+  - logKitchenException
+  - logTemperature
+  - markOrderCollected
+  - mergeTableVisits
+  - moveTableVisit
+  - notifyServer
+  - notifyWaitlistParty
+  - openTableVisit
+  - planProductionRun
+  - prioritiseKitchenTicket
+  - publishMenu
+  - quoteWaitTime
+  - reassignServer
+  - rebalanceStationLoad
+  - recallKitchenTicket
+  - recordCorrectiveAction
+  - recordOrderHandover
+  - recordWaste
+  - refireItem
+  - releaseProductionPlan
+  - requestBill
+  - requestRecount
+  - rollbackMenu
+  - scheduleMenuPublish
+  - seatTableReservation
+  - sendBookingConfirmation
+  - sendOrderNotification
+  - setComboSlots
+  - setCourseRules
+  - setItemAvailability
+  - setKitchenSla
+  - setKitchenStations
+  - setKitchenTicketStatus
+  - setMenuSections
+  - setRecipe
+  - setSectionLayout
+  - setServiceStage
+  - setSubstitutionRules
+  - setTableCombinations
+  - setTableLayout
+  - signCorrectiveAction
+  - splitBill
+  - transferOrderItems
+  - transferTableVisit
+  - updateMenu
+  - updateTable
+  - updateTableReservation
+  - updateTableVisit
 - store: cache:resolution
   kind: cache
   columns: 4
   backing: redis
   owned: false
-  why: '**Not a table and not owned by a service.** Derived from something already read, invalidated
-    by an event already consumed, losable without consequence — no migration, no backup, no owner.'
+  why: '**Not a table and not owned by a service.** Derived from something already read, losable without
+    consequence — no migration, no backup, no owner.'
+  key: scope_path + what is being resolved — permissions, configuration, a price list
+  eviction:
+  - 'version: Bumped by the write that evicts it. **A config change nobody evicts is a stale permission**'
+  writtenBy:
+  - applyMenuActions
+  - attachModifierGroup
+  - createTable
+  - publishMenu
+  - rebalanceStationLoad
+  - rollbackMenu
+  - scheduleMenuPublish
+  - setCourseRules
+  - setKitchenSla
+  - setSectionLayout
+  - setSubstitutionRules
+  - setTableCombinations
+  - updateTable
+  readBy: null
+  gap: '**The lineage names this store, not the key.** Which resolution entry each writer below evicts
+    or bumps — permissions, configuration, a price list, and whether child scopes under its `scope_path`
+    are affected — is not recorded for any operation, so a writer here cannot yet be implemented from
+    the package alone.'
 - table: fnb.bill_split
   columns: 3
   store: postgres
@@ -956,9 +1150,16 @@ tables:
   - fnb
   foreignWriters: null
 - table: fnb.corrective_action
-  columns: 12
+  columns: 13
   store: postgres
   parent: null
+  writtenBy:
+  - fnb
+  foreignWriters: null
+- table: fnb.course_rule
+  columns: 7
+  store: postgres
+  parent: platform.outlet
   writtenBy:
   - fnb
   foreignWriters: null
@@ -982,7 +1183,7 @@ tables:
   - fnb
   foreignWriters: null
 - table: fnb.dining_table
-  columns: 7
+  columns: 8
   store: postgres
   parent: null
   writtenBy:
@@ -1023,7 +1224,7 @@ tables:
   - fnb
   foreignWriters: null
 - table: fnb.kitchen_ticket_line
-  columns: 11
+  columns: 14
   store: postgres
   parent: fnb.kitchen_ticket
   writtenBy:
@@ -1037,14 +1238,14 @@ tables:
   - fnb
   foreignWriters: null
 - table: fnb.menu
-  columns: 6
+  columns: 8
   store: postgres
   parent: null
   writtenBy:
   - fnb
   foreignWriters: null
 - table: fnb.menu_item
-  columns: 13
+  columns: 15
   store: postgres
   parent: null
   writtenBy:
@@ -1053,7 +1254,13 @@ tables:
 - table: fnb.menu_item_modifier
   columns: 5
   store: postgres
-  parent: inventory.item
+  parent: fnb.menu_item
+  writtenBy: []
+  foreignWriters: null
+- table: fnb.menu_schedule
+  columns: 9
+  store: postgres
+  parent: fnb.menu
   writtenBy: []
   foreignWriters: null
 - table: fnb.menu_section
@@ -1063,6 +1270,12 @@ tables:
   writtenBy:
   - fnb
   foreignWriters: null
+- table: fnb.menu_version
+  columns: 12
+  store: postgres
+  parent: fnb.menu
+  writtenBy: []
+  foreignWriters: null
 - table: fnb.modifier_group
   columns: 6
   store: postgres
@@ -1071,14 +1284,14 @@ tables:
   - fnb
   foreignWriters: null
 - table: fnb.modifier_option
-  columns: 6
+  columns: 7
   store: postgres
   parent: fnb.modifier_group
   writtenBy:
   - fnb
   foreignWriters: null
 - table: fnb.order_fulfilment
-  columns: 9
+  columns: 10
   store: postgres
   parent: null
   writtenBy:
@@ -1097,8 +1310,15 @@ tables:
   writtenBy:
   - fnb
   foreignWriters: null
+- table: fnb.production_plan_line
+  columns: 7
+  store: postgres
+  parent: fnb.production_plan
+  writtenBy:
+  - fnb
+  foreignWriters: null
 - table: fnb.production_run
-  columns: 9
+  columns: 10
   store: postgres
   parent: null
   writtenBy:
@@ -1140,7 +1360,7 @@ tables:
   - fnb
   foreignWriters: null
 - table: fnb.service_order
-  columns: 16
+  columns: 15
   store: postgres
   parent: null
   writtenBy:
@@ -1150,7 +1370,8 @@ tables:
   columns: 11
   store: postgres
   parent: fnb.service_order
-  writtenBy: []
+  writtenBy:
+  - fnb
   foreignWriters: null
 - table: fnb.sold_out_item
   columns: 8
@@ -1171,6 +1392,13 @@ tables:
   writtenBy:
   - fnb
   foreignWriters: null
+- table: fnb.table_combination
+  columns: 6
+  store: postgres
+  parent: null
+  writtenBy:
+  - fnb
+  foreignWriters: null
 - table: fnb.table_reservation
   columns: 14
   store: postgres
@@ -1186,7 +1414,7 @@ tables:
   - fnb
   foreignWriters: null
 - table: fnb.table_visit
-  columns: 13
+  columns: 14
   store: postgres
   parent: null
   writtenBy:
@@ -1207,7 +1435,7 @@ tables:
   - fnb
   foreignWriters: null
 - table: fnb.waitlist_entry
-  columns: 9
+  columns: 11
   store: postgres
   parent: null
   writtenBy:
@@ -1229,19 +1457,80 @@ readsFrom:
 writesOutside:
 - service: MarketingService
   operations: 4
-  why: '**The owner defines the row; this service may only append to it.**'
+  rule: 'ADR-0028: the owner defines the row; a foreign writer may only append, through a path the owner
+    published.'
+  why: '**The lineage records these writes, not how they honour the rule.** It does not say whether
+    each inserts or updates, or which operation or event MarketingService published for it — check each
+    against ADR-0028.'
+  writes:
+  - operation: notifyServer
+    tables:
+    - marketing.message_dispatch
+  - operation: notifyWaitlistParty
+    tables:
+    - marketing.message_dispatch
+  - operation: sendBookingConfirmation
+    tables:
+    - marketing.message_dispatch
+  - operation: sendOrderNotification
+    tables:
+    - marketing.message_dispatch
 - service: InventoryService
   operations: 3
-  why: '**The owner defines the row; this service may only append to it.**'
+  rule: 'ADR-0028: the owner defines the row; a foreign writer may only append, through a path the owner
+    published.'
+  why: '**The lineage records these writes, not how they honour the rule.** It does not say whether
+    each inserts or updates, or which operation or event InventoryService published for it — check each
+    against ADR-0028.'
+  writes:
+  - operation: completeProductionRun
+    tables:
+    - inventory.movement
+  - operation: recordWaste
+    tables:
+    - inventory.movement
+  - operation: refireItem
+    tables:
+    - inventory.movement
 - service: CatalogueService
   operations: 2
-  why: '**The owner defines the row; this service may only append to it.**'
+  rule: 'ADR-0028: the owner defines the row; a foreign writer may only append, through a path the owner
+    published.'
+  why: '**The lineage records these writes, not how they honour the rule.** It does not say whether
+    each inserts or updates, or which operation or event CatalogueService published for it — check each
+    against ADR-0028.'
+  writes:
+  - operation: applyMenuActions
+    tables:
+    - catalogue.price
+  - operation: publishMenu
+    tables:
+    - catalogue.product_version
 - service: OrderService
   operations: 2
-  why: '**The owner defines the row; this service may only append to it.**'
+  rule: 'ADR-0028: the owner defines the row; a foreign writer may only append, through a path the owner
+    published.'
+  why: '**The lineage records these writes, not how they honour the rule.** It does not say whether
+    each inserts or updates, or which operation or event OrderService published for it — check each
+    against ADR-0028.'
+  writes:
+  - operation: compItem
+    tables:
+    - orders.order_line
+  - operation: transferOrderItems
+    tables:
+    - orders.order_line
 - service: TenancyService
   operations: 1
-  why: '**The owner defines the row; this service may only append to it.**'
+  rule: 'ADR-0028: the owner defines the row; a foreign writer may only append, through a path the owner
+    published.'
+  why: '**The lineage records these writes, not how they honour the rule.** It does not say whether
+    each inserts or updates, or which operation or event TenancyService published for it — check each
+    against ADR-0028.'
+  writes:
+  - operation: setKitchenTicketStatus
+    tables:
+    - platform.outbox
 screens:
 - P01:WEB-031 My Reservations
 - P01:WEB-036 F&B – Browse & Order

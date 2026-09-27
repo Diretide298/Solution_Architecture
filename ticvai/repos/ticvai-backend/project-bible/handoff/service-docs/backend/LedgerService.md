@@ -70,6 +70,10 @@ Accounts may be created natively or mapped to a chart maintained externally in t
 | parentId | string (uuid) |  |  |
 | legalEntityId | string (uuid) | yes |  |
 | isPostable | boolean |  | (default True) |
+| isSuspense | boolean |  | See Account.isSuspense. (default False) |
+| subType | string |  | See Account.subType. (nullable) |
+| tags | array of string |  | See Account.tags. |
+| notes | string |  | See Account.notes. (nullable) |
 
 **Response**: `Account`
 
@@ -106,7 +110,8 @@ Accounts may be created natively or mapped to a chart maintained externally in t
 
 **`PATCH /accounts/{accountId}`**: Rename, remap or deactivate an account
 
-The code is immutable once entries exist. Deactivation prevents new postings and leaves history intact.
+The code is immutable once entries exist; until then it can be corrected here. Remapping is `externalCode`, the code in the client's own ERP chart. Deactivation prevents new postings and leaves history intact.
+**Changed in place.** An account is configuration, not a posting, so this edits the row rather than adding one. The postings made to it are untouched.
 
 |  |  |
 |---|---|
@@ -131,9 +136,14 @@ The code is immutable once entries exist. Deactivation prevents new postings and
 
 | Field | Type | Required | Notes |
 |---|---|---|---|
+| code | string |  | Accepted only while the account has no entries. (max length 64; pattern ^[A-Za-z0-9._-]+$) |
 | name | string |  | (max length 200) |
 | externalCode | string |  | (max length 64) |
 | isActive | boolean |  |  |
+| isSuspense | boolean |  |  |
+| subType | string |  | (nullable) |
+| tags | array of string |  |  |
+| notes | string |  | (nullable) |
 
 **Response**: `Account`
 
@@ -163,7 +173,8 @@ The code is immutable once entries exist. Deactivation prevents new postings and
 | Code | Shape | Meaning |
 |---|---|---|
 | 200 |  | Updated |
-| 409 |  | Attempt to change an immutable field after entries exist |
+| 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
+| 409 |  | code sent for an account that already has entries, or a new code already in use within the legal entity. |
 
 
 ## Group: finance
@@ -215,25 +226,27 @@ The code is immutable once entries exist. Deactivation prevents new postings and
 | purpose | FxRatePurpose: enum (tender, interEntity, reporting, revaluation) |  | A venue does not accept dollars at the rate it books an intercompany balance at. |
 | ratesWritten | integer |  |  |
 | unchanged | integer |  |  |
-| largestMove | number |  | The number a person reads. (nullable) |
+| largestMove | string |  | The number a person reads. (pattern ^-?\d+(\.\d{1,6})?$; nullable) |
 | rates | array of FxRate |  |  |
 | rates[].id | string (uuid) |  | (read-only) |
 | rates[].fromCurrency | string | yes | (pattern ^[A-Z]{3}$) |
 | rates[].toCurrency | string | yes | (pattern ^[A-Z]{3}$) |
-| rates[].rate | number | yes | Units of toCurrency per one fromCurrency. |
+| rates[].rate | object | yes | Units of toCurrency per one fromCurrency. |
 | rates[].purpose | FxRatePurpose: enum (tender, interEntity, reporting, revaluation) | yes | A venue does not accept dollars at the rate it books an intercompany balance at. |
-| rates[].source | FxRateSource: enum (manual, uaeCentralBank, ecb, openExchangeRates, cardScheme, provider) |  | Where the rate came from, and which provider specifically. |
+| rates[].source | object |  | (read-only) |
 | rates[].effectiveFrom | string (date-time) | yes |  |
 | rates[].effectiveTo | string (date-time) |  | A rate change is a new row. (nullable) |
 | rates[].setByPrincipalId | string (uuid) |  | (read-only) |
-| rates[].providerReference | string |  | The provider's own identifier for this quote. (nullable) |
-| rates[].fetchedAt | string (date-time) |  | When the rate was pulled. (nullable) |
+| rates[].providerReference | string |  | The provider's own identifier for this quote. (read-only; nullable) |
+| rates[].fetchedAt | string (date-time) |  | When the rate was pulled. (read-only; nullable) |
 
 **Responses**
 
 | Code | Shape | Meaning |
 |---|---|---|
 | 200 |  | What was fetched |
+| 409 |  | No provider is assigned to this purpose in this region (setFxProvider). |
+| 503 |  | The provider is unreachable, and nothing was written. |
 
 ### setFxProvider
 
@@ -252,9 +265,9 @@ The code is immutable once entries exist. Deactivation prevents new postings and
 | Offline | no |
 | Config scope | region |
 | Conflict policy | serverWins |
-| Reads | `platform.region_settings` |
-| Writes | `cache:idempotency`, `platform.region_settings` |
-| Called by | no screen (setup through Back Office) |
+| Reads | `ledger.fx_provider_assignment`, `platform.region_settings` |
+| Writes | `cache:idempotency`, `ledger.fx_provider_assignment`, `platform.region_settings` |
+| Called by | **no screen**: no screen lists it in its apis, so it is reachable only by API or import until one does (README, Known gaps) |
 
 **Parameters**
 
@@ -266,17 +279,18 @@ The code is immutable once entries exist. Deactivation prevents new postings and
 
 | Field | Type | Required | Notes |
 |---|---|---|---|
-| assignments | array of object | yes |  |
+| assignments | array of FxProviderAssignment | yes | At most one per purpose. |
 | assignments[].purpose | FxRatePurpose: enum (tender, interEntity, reporting, revaluation) | yes | A venue does not accept dollars at the rate it books an intercompany balance at. |
 | assignments[].source | FxRateSource: enum (manual, uaeCentralBank, ecb, openExchangeRates, cardScheme, provider) | yes | Where the rate came from, and which provider specifically. |
 | assignments[].credentialRef | string |  | BYOK — the key lives in the secret store, never here. (nullable) |
 | assignments[].schedule | string |  | Cron in the region timezone. (nullable) |
+| assignments[].scopePath | string |  | The partition key (ADR-0005). (read-only) |
 
 **Responses**
 
 | Code | Shape | Meaning |
 |---|---|---|
-| 200 |  | The assignments now in force |
+| 200 |  | The assignments now in force, one per purpose that has one. |
 
 
 ## Group: ledger
@@ -309,7 +323,26 @@ The consequence is that most of the questions FX usually raises do not arise. Th
 | asAt | query |  | string (date-time) | Rates in force at this instant. |
 | purpose | query |  | FxRatePurpose: enum (tender, interEntity, reporting, revaluation) |  |
 | pageSize | query |  | integer |  |
-| cursor | query |  | string | Opaque cursor from a previous page. |
+| cursor | query |  | string | Opaque cursor: the nextCursor of the previous page. |
+
+**Response**: `object`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| items | array of FxRate | yes |  |
+| items[].id | string (uuid) |  | (read-only) |
+| items[].fromCurrency | string | yes | (pattern ^[A-Z]{3}$) |
+| items[].toCurrency | string | yes | (pattern ^[A-Z]{3}$) |
+| items[].rate | object | yes | Units of toCurrency per one fromCurrency. |
+| items[].purpose | FxRatePurpose: enum (tender, interEntity, reporting, revaluation) | yes | A venue does not accept dollars at the rate it books an intercompany balance at. |
+| items[].source | object |  | (read-only) |
+| items[].effectiveFrom | string (date-time) | yes |  |
+| items[].effectiveTo | string (date-time) |  | A rate change is a new row. (nullable) |
+| items[].setByPrincipalId | string (uuid) |  | (read-only) |
+| items[].providerReference | string |  | The provider's own identifier for this quote. (read-only; nullable) |
+| items[].fetchedAt | string (date-time) |  | When the rate was pulled. (read-only; nullable) |
+| nextCursor | string |  |  |
+| hasMore | boolean | yes |  |
 
 **Responses**
 
@@ -322,8 +355,10 @@ The consequence is that most of the questions FX usually raises do not arise. Th
 **`PUT /fx-rates`**: Set a rate
 
 Rates are **configured, not fetched live**. A published market rate moving mid-shift would mean two guests paying different dirham amounts for the same product minutes apart, and a cashier unable to explain either.
-A rate change is a new row with its own effective window; the old one is never edited. A transaction posted last Tuesday must still reconcile at last Tuesday's rate.
+A rate change is a new row with its own effective window; the old one's rate is never edited. A transaction posted last Tuesday must still reconcile at last Tuesday's rate.
 **Tender rates carry a spread.** The rate a venue accepts dollars at is not the interbank rate, and pretending otherwise makes every foreign-tender sale look like a small loss.
+**A new rate supersedes the one in force.** Where the rate in force for the same pair and purpose is open-ended (no `effectiveTo`) and started before the new `effectiveFrom`, that row is closed at the new `effectiveFrom`, which is the only change ever made to an existing row; its rate is not touched. A new window that overlaps a bounded window, or starts at or before the start of the rate in force, is refused. Without this an open-ended rate would block every later rate.
+The server sets `source` to `manual` and `setByPrincipalId` to the caller; `fetchedAt` and `providerReference` belong to `ingestFxRates` and are ignored here.
 
 |  |  |
 |---|---|
@@ -351,14 +386,14 @@ A rate change is a new row with its own effective window; the old one is never e
 | id | string (uuid) |  | (read-only) |
 | fromCurrency | string | yes | (pattern ^[A-Z]{3}$) |
 | toCurrency | string | yes | (pattern ^[A-Z]{3}$) |
-| rate | number | yes | Units of toCurrency per one fromCurrency. |
+| rate | object | yes | Units of toCurrency per one fromCurrency. |
 | purpose | FxRatePurpose: enum (tender, interEntity, reporting, revaluation) | yes | A venue does not accept dollars at the rate it books an intercompany balance at. |
-| source | FxRateSource: enum (manual, uaeCentralBank, ecb, openExchangeRates, cardScheme, provider) |  | Where the rate came from, and which provider specifically. |
+| source | object |  | (read-only) |
 | effectiveFrom | string (date-time) | yes |  |
 | effectiveTo | string (date-time) |  | A rate change is a new row. (nullable) |
 | setByPrincipalId | string (uuid) |  | (read-only) |
-| providerReference | string |  | The provider's own identifier for this quote. (nullable) |
-| fetchedAt | string (date-time) |  | When the rate was pulled. (nullable) |
+| providerReference | string |  | The provider's own identifier for this quote. (read-only; nullable) |
+| fetchedAt | string (date-time) |  | When the rate was pulled. (read-only; nullable) |
 
 **Response**: `FxRate`
 
@@ -367,30 +402,31 @@ A rate change is a new row with its own effective window; the old one is never e
 | id | string (uuid) |  | (read-only) |
 | fromCurrency | string | yes | (pattern ^[A-Z]{3}$) |
 | toCurrency | string | yes | (pattern ^[A-Z]{3}$) |
-| rate | number | yes | Units of toCurrency per one fromCurrency. |
+| rate | object | yes | Units of toCurrency per one fromCurrency. |
 | purpose | FxRatePurpose: enum (tender, interEntity, reporting, revaluation) | yes | A venue does not accept dollars at the rate it books an intercompany balance at. |
-| source | FxRateSource: enum (manual, uaeCentralBank, ecb, openExchangeRates, cardScheme, provider) |  | Where the rate came from, and which provider specifically. |
+| source | object |  | (read-only) |
 | effectiveFrom | string (date-time) | yes |  |
 | effectiveTo | string (date-time) |  | A rate change is a new row. (nullable) |
 | setByPrincipalId | string (uuid) |  | (read-only) |
-| providerReference | string |  | The provider's own identifier for this quote. (nullable) |
-| fetchedAt | string (date-time) |  | When the rate was pulled. (nullable) |
+| providerReference | string |  | The provider's own identifier for this quote. (read-only; nullable) |
+| fetchedAt | string (date-time) |  | When the rate was pulled. (read-only; nullable) |
 
 **Responses**
 
 | Code | Shape | Meaning |
 |---|---|---|
 | 201 |  | Set |
-| 409 |  | Effective window overlaps an existing rate for the same pair and purpose |
+| 409 |  | Effective window overlaps an existing bounded rate for the same pair and purpose, or does not start after the rate in force |
 
 
 ## Group: reporting
 
 ### getFinancialReport
 
-**`GET /reports/financial`**: P&L, balance sheet or cash flow
+**`GET /reports/financial`**: Financial statements, revenue and tax summaries
 
 Served from the reporting replica, never the primary. A month-end report running against the transactional database during a venue spike is the single most likely cause of an outage.
+Six reports, named by `report`: profit and loss, balance sheet, cash flow, revenue by venue, revenue by product, and the tax summary.
 
 |  |  |
 |---|---|
@@ -409,7 +445,7 @@ Served from the reporting replica, never the primary. A month-end report running
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
-| report | query | yes | enum (profitAndLoss, balanceSheet, cashFlow, revenueByVenue, revenueByProduct, taxSummary) |  |
+| report | query | yes | FinancialReportKind: enum (profitAndLoss, balanceSheet, cashFlow, revenueByVenue, revenueByProduct, taxSummary) |  |
 | fiscalPeriodId | query | yes | string (uuid) |  |
 | legalEntityId | query |  | string (uuid) |  |
 | venueId | query |  | string (uuid) |  |
@@ -419,7 +455,7 @@ Served from the reporting replica, never the primary. A month-end report running
 
 | Field | Type | Required | Notes |
 |---|---|---|---|
-| report | string | yes |  |
+| report | FinancialReportKind: enum (profitAndLoss, balanceSheet, cashFlow, revenueByVenue, revenueByProduct, taxSummary) | yes | The report getFinancialReport returns. |
 | fiscalPeriodId | string (uuid) | yes |  |
 | legalEntityId | string (uuid) |  | (nullable) |
 | currency | string | yes | (pattern ^[A-Z]{3}$) |
@@ -488,11 +524,22 @@ Every table this service owns that the slice reads or writes, with its columns a
 | id | uuid | yes |  |
 | legal_entity_id | uuid | yes |  |
 | name | text | yes |  |
-| start_date | date | yes |  |
-| end_date | date | yes |  |
+| start_date | date | yes | A day in the region's time zone, local midnight to local midnight. |
+| end_date | date | yes | A day in the region's time zone, local midnight to local midnight. |
 | status | text | yes |  |
 | closed_by_principal_id | uuid | no |  |
 | closed_at | timestamptz | no |  |
+
+### `ledger.fx_provider_assignment`
+
+| Column | Type | Required | Notes |
+|---|---|---|---|
+| purpose | text | yes |  |
+| source | text | yes |  |
+| credential_ref | text | no | BYOK — the key lives in the secret store, never here. |
+| schedule | text | no | Cron in the region timezone. |
+| scope_path | text | no | The partition key (ADR-0005). |
+| id | uuid | yes | Synthesised key. |
 
 ### `ledger.fx_rate`
 
@@ -501,7 +548,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 | id | uuid | no |  |
 | from_currency | text | yes |  |
 | to_currency | text | yes |  |
-| rate | numeric | yes | Units of toCurrency per one fromCurrency. |
+| rate | numeric(18,6) | yes | Units of toCurrency per one fromCurrency. |
 | purpose | text | yes |  |
 | source | text | no |  |
 | effective_from | timestamptz | yes |  |
@@ -524,7 +571,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 | venue_id | uuid | no |  |
 | cost_center_id | uuid | no |  |
 | source | text | no |  |
-| source_id | uuid | no |  |
+| source_id | text | no |  |
 | description | text | no |  |
 | posted_at | timestamptz | yes |  |
 

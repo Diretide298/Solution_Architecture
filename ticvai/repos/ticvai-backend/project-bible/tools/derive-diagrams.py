@@ -24,6 +24,7 @@ Every node carries a `ref` pointing at a real artefact, so a click goes somewher
 from __future__ import annotations
 
 import json
+import re
 from collections import Counter, defaultdict
 from pathlib import Path
 
@@ -42,6 +43,63 @@ TIER_NOTE = {
     "engagement": ("Guests and intelligence. **Nothing that takes money depends on these**, which "
                    "is a deliberate property and one that should be tested rather than assumed."),
     "platform": "Provisioning, publishing, reporting, and the one path that crosses a region.",
+}
+
+_WORDS = ["zero", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine", "ten",
+          "eleven", "twelve", "thirteen", "fourteen", "fifteen", "sixteen", "seventeen",
+          "eighteen", "nineteen", "twenty"]
+
+
+def _word(n: int) -> str:
+    return _WORDS[n] if 0 <= n < len(_WORDS) else f"{n:,}"
+
+
+# **A service's `why` is hand-written, and the counts in it went stale.** OrderService's said
+# "96 operations, 34 tables" beside a computed title of 249 and 61; the LLD printed both, so every
+# service record contradicted itself (audit R043). The reasoning stays authored; **a count of the
+# service's own size is restated from the source.** A number that is a share of something else —
+# "675 of 1,014 operations", "13 of retail's 37 operations", "304 of 379 tables" — is history or
+# another thing's size and is left alone.
+_NUM = r"(\d[\d,]*|" + "|".join(_WORDS[1:]) + r")"
+_SELF_COUNT = re.compile(r"\b" + _NUM + r"(\s+)(operations|tables|schemas?)\b", re.IGNORECASE)
+_NOT_SELF = re.compile(r"(\bof|['’]s)\s*$", re.IGNORECASE)
+
+
+def restate_counts(text: str, counts: dict) -> str:
+    """Replace the service's own operation/table/schema counts in `text` with live ones."""
+    if not text:
+        return text
+
+    def sub(m):
+        if _NOT_SELF.search(text[max(0, m.start() - 12):m.start()]):
+            return m.group(0)
+        noun = m.group(3).lower()
+        n = counts["schemas" if noun.startswith("schema") else noun]
+        num = m.group(1)
+        if num[0].isdigit():
+            new = f"{n:,}"
+        else:
+            new = _word(n)
+            if num[0].isupper():
+                new = new[:1].upper() + new[1:]
+        word = m.group(3)
+        if noun.startswith("schema"):
+            word = word[:6] + ("" if n == 1 else "s")
+        return f"{new}{m.group(2)}{word}"
+
+    return _SELF_COUNT.sub(sub, text)
+
+
+# **What each cache store is keyed on and what evicts it**, read from the schema reference rather
+# than a sentence written once for all of them (audit R141). The old line said every cache entry
+# was "invalidated by an event already consumed" — `cache:resolution` is not: its `version` is
+# bumped by the write that evicts it.
+CACHE_GAP = {
+    "cache:resolution": (
+        "**The lineage names this store, not the key.** Which resolution entry each writer below "
+        "evicts or bumps — permissions, configuration, a price list, and whether child scopes "
+        "under its `scope_path` are affected — is not recorded for any operation, so a writer "
+        "here cannot yet be implemented from the package alone."),
 }
 
 
@@ -683,11 +741,13 @@ def main() -> int:
         screens[k] = sorted(set(screens[k]))
 
     flows = defaultdict(list)
+    in_flow = set()
     for f in sorted((ROOT / "flows").glob("F*.yaml")):
         doc = yaml.safe_load(f.read_text(encoding="utf-8"))
         for st in (doc.get("steps") or []):
             for op in (st.get("operations") or []):
                 if op in lin:
+                    in_flow.add(op)
                     flows[lin[op]["service"]].append(f"{doc['id']} {doc['name']}")
     for k in flows:
         flows[k] = sorted(set(flows[k]))
@@ -719,6 +779,15 @@ def main() -> int:
         _ops = [o for o, x in lin.items() if x.get("service") == _n]
         _v["operations"] = len(_ops)
         _v["tables"] = len([t for t in real if t.split(".")[0] in _v["schemas"]])
+        # **Flow coverage is recounted for the same reason** (audit R043). The cached
+        # `flowCoverage` had no entry for WalletService, so it drew 0% beside a flow list that
+        # named F18 — and the cached operation totals behind every other percentage were stale.
+        _walked = len([o for o in _ops if o in in_flow])
+        _v["flowCoverage"] = {
+            "operations": len(_ops),
+            "inAFlow": _walked,
+            "percent": round(100 * _walked / len(_ops)) if _ops else 0,
+        }
 
     OUT.mkdir(exist_ok=True)
     for sub in ("hld", "lld/services", "lld/platforms", "lld/contracts", "lld/lifecycles"):
@@ -756,11 +825,13 @@ def main() -> int:
 
     hld = {
         "id": "HLD",
-        "title": "TICVAI — sixteen services in five tiers",
+        # **Counted, not typed** (audit R043): the title said sixteen services after WalletService
+        # made seventeen.
+        "title": f"TICVAI — {_word(len(services))} services in {_word(len(tiers))} tiers",
         "generatedBy": "tools/derive-diagrams.py",
         "about": (
-            "**What ships together.** 1,014 operations and 379 tables resolve into sixteen "
-            "deployable services, and **the data boundary decides where they split** — no service "
+            f"**What ships together.** {len(lin):,} operations and {len(real):,} tables resolve "
+            f"into {_word(len(services))} deployable services, and **the data boundary decides where they split** — no service "
             "spans a schema it does not own, and no schema is written by two services.\n\n"
             "**Arrows are cross-service writes.** The rule is that the owner defines the row and a "
             "foreign writer may only append to it: a till closing posts to `ledger.posting` because "
@@ -822,20 +893,38 @@ def main() -> int:
         # exist.**
         #
         # **They are listed and marked, not owned.** A cache entry is derived from something already
-        # read, invalidated by an event already consumed, and losable without consequence — giving
-        # it a service would imply a migration and a backup it does not need.
+        # read and losable without consequence — giving it a service would imply a migration and a
+        # backup it does not need.
+        #
+        # **What it is keyed on and what evicts it come from its own columns** (audit R141), and
+        # the operations here that read and write it are named, so a writer can be followed to the
+        # rule it must honour — or to the fact that the package does not record one.
         cited = sorted({t for o in ops for t in (lin[o].get("reads", []) + lin[o].get("writes", []))
                         if ":" in t})
-        tables = [{
-            "store": t,
-            "kind": "cache" if t.startswith("cache:") else "vector",
-            "columns": len((schema.get("cols") or {}).get(t) or []),
-            "backing": (schema.get("store") or {}).get(t, "redis"),
-            "owned": False,
-            "why": ("**Not a table and not owned by a service.** Derived from something already "
-                    "read, invalidated by an event already consumed, losable without consequence — "
-                    "no migration, no backup, no owner."),
-        } for t in cited]
+        tables = []
+        for t in cited:
+            ccols = {c.get("column"): (c.get("description") or "").strip()
+                     for c in ((schema.get("cols") or {}).get(t) or [])}
+            w_ops = [o for o in ops if t in lin[o].get("writes", [])]
+            r_ops = [o for o in ops if t in lin[o].get("reads", [])]
+            entry = {
+                "store": t,
+                "kind": "cache" if t.startswith("cache:") else "vector",
+                "columns": len(ccols),
+                "backing": (schema.get("store") or {}).get(t, "redis"),
+                "owned": False,
+                "why": ("**Not a table and not owned by a service.** Derived from something "
+                        "already read, losable without consequence — no migration, no backup, "
+                        "no owner."),
+                "key": ccols.get("key") or None,
+                "eviction": [f"{c}: {ccols[c]}" for c in ("version", "expires_at", "invalidated_by")
+                             if ccols.get(c)] or None,
+                "writtenBy": w_ops or None,
+                "readBy": r_ops or None,
+            }
+            if w_ops and t in CACHE_GAP:
+                entry["gap"] = CACHE_GAP[t]
+            tables.append(entry)
         for t in sorted(t for t in real if t.split(".")[0] in v["schemas"]):
             cols = (schema.get("cols") or {}).get(t) or []
             lineage = (schema.get("lineage") or {}).get(t) or {}
@@ -853,6 +942,15 @@ def main() -> int:
                 "foreignWriters": [c for c in wc if c not in v["contracts"]] or None,
             })
 
+        def foreign_writes(svc_ops, other):
+            out = []
+            for o in svc_ops:
+                ts = sorted({t for t in lin[o].get("writes", [])
+                             if t in real and owner.get(t.split(".")[0]) == other})
+                if ts:
+                    out.append({"operation": o, "tables": ts})
+            return out
+
         cov = v.get("flowCoverage") or {}
         doc = {
             "id": f"LLD-{name}",
@@ -860,7 +958,10 @@ def main() -> int:
             "generatedBy": "tools/derive-diagrams.py",
             "tier": v["tier"],
             "index": "diagrams/hld/02-services.yaml",
-            "why": v["why"],
+            # **The reasoning is authored; its counts of this service are not** (audit R043).
+            "why": restate_counts(v["why"], {"operations": v["operations"],
+                                             "tables": v["tables"],
+                                             "schemas": len(v["schemas"])}),
             "scale": v["scale"],
             "ifDown": v["risk"],
             "coverage": {
@@ -895,9 +996,20 @@ def main() -> int:
             "tables": tables,
             "readsFrom": [{"service": k, "operations": n} for k, n in
                           sorted((v.get("readsFrom") or {}).items(), key=lambda kv: -kv[1])],
-            "writesOutside": [{"service": k, "operations": n, "why": (
-                "**The owner defines the row; this service may only append to it.**")}
-                for k, n in sorted((v.get("writesOutside") or {}).items(), key=lambda kv: -kv[1])],
+            # **Each foreign write is named, not blessed** (audit R114). The old entry pasted
+            # "this service may only append to it" onto every edge — a claim about the writes the
+            # lineage cannot support: it records that an operation writes a table, not whether it
+            # inserts or updates, and names no owner-published operation or event behind it.
+            # **The rule is quoted and the writes are listed**, so each can be checked against it.
+            "writesOutside": [{
+                "service": k, "operations": n,
+                "rule": ("ADR-0028: the owner defines the row; a foreign writer may only append, "
+                         "through a path the owner published."),
+                "why": ("**The lineage records these writes, not how they honour the rule.** It "
+                        "does not say whether each inserts or updates, or which operation or event "
+                        f"{k} published for it — check each against ADR-0028."),
+                "writes": foreign_writes(ops, k) or None,
+            } for k, n in sorted((v.get("writesOutside") or {}).items(), key=lambda kv: -kv[1])],
             "screens": screens.get(name, []),
             "flows": flows.get(name, []),
         }

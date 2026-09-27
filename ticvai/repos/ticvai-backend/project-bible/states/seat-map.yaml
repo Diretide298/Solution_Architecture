@@ -10,8 +10,7 @@ enumSchema: SeatMapStatus
 owner: seating
 initial:
 - draft
-terminal:
-- archived
+terminal: []
 transitions:
 - from: draft
   to: validated

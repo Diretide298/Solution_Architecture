@@ -60,8 +60,9 @@ IMPLIES = [
      "A search that returns nothing must say so differently from a search not yet run."),
     (lambda o, v, p: v == "DELETE" or o.startswith(("delete", "revoke", "cancel", "void")),
      "destructiveButton", None,
-     "**Always confirms, never the default focus.** The consequence goes in the body — *cancel 3 "
-     "orders worth AED 480* is a confirmation, *are you sure* is not."),
+     # Built per operation by destructive_note(): a fixed example about orders pasted onto a
+     # button that voids a coupon code reads as that screen's copy (audit R260).
+     None),
     (lambda o, v, p: v in ("POST", "PUT", "PATCH"),
      "primaryButton", None,
      "The act the screen exists for."),
@@ -80,6 +81,35 @@ VERB_LABEL = {
 }
 
 
+# **Acronyms keep their capitals.** `setAiPolicy` split and lower-cased is *Save ai policy*, which
+# is not a sentence-case label; the package writes AI, API, F&B, SLA, SEO and VSI everywhere else.
+ACRONYMS = {
+    "ai": "AI", "api": "API", "fnb": "F&B", "sla": "SLA", "seo": "SEO", "vsi": "VSI",
+    "sms": "SMS", "pos": "POS", "kds": "KDS", "qr": "QR", "nfc": "NFC", "pdf": "PDF",
+    "csv": "CSV", "url": "URL", "otp": "OTP", "kyc": "KYC", "vat": "VAT", "id": "ID",
+    "fx": "FX", "rfid": "RFID", "sso": "SSO", "mfa": "MFA", "crm": "CRM", "cms": "CMS",
+}
+
+
+def noun_for(rest: str) -> str:
+    """`FnbOrder` -> `F&B order`: split the camel case, lower-case it, restore acronyms."""
+    words = re.sub(r"(?<!^)(?=[A-Z])", " ", rest).strip().lower().split()
+    return " ".join(ACRONYMS.get(w, w) for w in words)
+
+
+def destructive_note(op: str) -> str:
+    """The confirmation guidance for a destructive button, about what *this* operation removes.
+
+    It says what the body must name and never supplies example copy: a made-up count and amount
+    reads as the screen's wording, and the real consequence is the screen's to state.
+    """
+    m = re.match(r"^([a-z]+)([A-Z].*)$", op)
+    what = noun_for(m.group(2)) if m else "record"
+    return ("**Always confirms, never the default focus.** The consequence goes in the body — "
+            f"which {what} is affected and what goes with it, in the screen's own words; "
+            "*are you sure* is not a confirmation.")
+
+
 def label_for(op: str) -> str | None:
     """A button label from the operation name, or nothing.
 
@@ -93,7 +123,7 @@ def label_for(op: str) -> str | None:
     verb, rest = m.group(1), m.group(2)
     if verb not in VERB_LABEL:
         return None
-    noun = re.sub(r"(?<!^)(?=[A-Z])", " ", rest).strip().lower()
+    noun = noun_for(rest)
     return f"{VERB_LABEL[verb]} {noun}" if len(noun) < 22 else VERB_LABEL[verb]
 
 
@@ -123,7 +153,7 @@ def propose(screen: dict, lin: dict, density: str) -> list[dict]:
             lbl = label or (label_for(op) if kind.endswith("Button") else None)
             if lbl:
                 c["label"] = lbl
-            c["notes"] = why
+            c["notes"] = why if why is not None else destructive_note(op)
             out.append(c)
             seen.add(kind)
             break

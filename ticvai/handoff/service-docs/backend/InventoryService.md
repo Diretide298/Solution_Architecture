@@ -75,7 +75,10 @@ Board 2C. **Retire a season, reprice a category, change a tax class across two h
 | matched | integer |  |  |
 | succeeded | integer |  |  |
 | failed | integer |  |  |
-| failures | array of object |  |  |
+| failures | array of object |  | One entry per product the change was refused for. |
+| failures[].productId | string (uuid) | yes |  |
+| failures[].code | string | yes | The validation rule the product failed, as in Problem.errors[].code. |
+| failures[].message | string |  |  |
 
 **Responses**
 
@@ -107,10 +110,27 @@ Retail Board 4. **A lot number answers which delivery; a serial answers which on
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
-| serial | query |  | string |  |
+| serial | query |  | string | Exact match. |
 | status | query |  | string |  |
 | pageSize | query |  | integer |  |
-| cursor | query |  | string | Opaque cursor from a previous page. |
+| cursor | query |  | string | Opaque cursor: the nextCursor of the previous page. |
+
+**Response**: `object`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| items | array of SerialisedItem | yes |  |
+| items[].id | string (uuid) | yes |  |
+| items[].itemId | string (uuid) | yes |  |
+| items[].batchId | string (uuid) |  | The batch it arrived in, where the item is both lotted and serialised. (nullable) |
+| items[].serial | string | yes | Unique within the item, not globally. |
+| items[].locationId | string (uuid) |  |  |
+| items[].status | enum (inStock, reserved, sold, returned, damaged, lost, inTransit, warranty) | yes |  |
+| items[].soldOnOrderLineId | string (uuid) |  | The link that makes serialisation worth having. (nullable) |
+| items[].warrantyUntil | string (date) |  | (nullable) |
+| items[].receivedAt | string (date-time) |  |  |
+| nextCursor | string |  |  |
+| hasMore | boolean | yes |  |
 
 **Responses**
 
@@ -245,6 +265,8 @@ Retail Board 4. **A lot number answers which delivery; a serial answers which on
 | parLevel | number |  | (min 0) |
 | preferredSupplierId | string (uuid) |  |  |
 | isActive | boolean |  |  |
+| costingMethod | CostingMethod: enum (weightedAverage, fifo, standardCost, lastPurchasePrice) |  | Fixed at item creation. |
+| baseUnit | string |  | Changeable only while hasMovements is false; the 409 below is the refusal once it is true. |
 
 **Response**: `InventoryItem`
 
@@ -309,8 +331,9 @@ Receipt increments stock and creates the accrual the invoice will later match ag
 | Offline | yes |
 | Conflict policy | append |
 | Reads | `cache:idempotency`, `inventory.goods_receipt`, `inventory.goods_receipt_line` |
-| Writes | `cache:idempotency`, `inventory.goods_receipt`, `platform.outbox` |
+| Writes | `cache:idempotency`, `inventory.goods_receipt`, `inventory.goods_receipt_line`, `platform.outbox` |
 | Called by | BO-052, BO-080, EMP-065 |
+| State model | Purchase order ([states/purchase-order.yaml](../../../states/purchase-order.yaml)): moves `acknowledged` -> `partiallyReceived`, `sent` -> `partiallyReceived`, `partiallyReceived` -> `received`, `acknowledged` -> `received` |
 
 **Parameters**
 
@@ -323,7 +346,7 @@ Receipt increments stock and creates the accrual the invoice will later match ag
 | Field | Type | Required | Notes |
 |---|---|---|---|
 | id | string | yes | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
-| purchaseOrderId | string | yes |  |
+| purchaseOrderId | string | yes | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
 | locationId | string (uuid) | yes |  |
 | deliveryNoteReference | string |  | (max length 128) |
 | lines | array of object | yes | (min items 1) |
@@ -339,9 +362,9 @@ Receipt increments stock and creates the accrual the invoice will later match ag
 
 | Field | Type | Required | Notes |
 |---|---|---|---|
-| id | string | yes |  |
+| id | string | yes | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
 | receiptNumber | string | yes |  |
-| purchaseOrderId | string | yes |  |
+| purchaseOrderId | string | yes | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
 | locationId | string (uuid) | yes |  |
 | deliveryNoteReference | string |  | (nullable) |
 | lines | array of object | yes |  |
@@ -388,7 +411,7 @@ Quality failure, damage, wrong item, expiry too near. Reverses the stock increme
 | Offline | no |
 | Conflict policy | serverWins |
 | Reads | `cache:idempotency`, `inventory.goods_receipt`, `inventory.goods_receipt_line` |
-| Writes | `cache:idempotency`, `inventory.goods_receipt` |
+| Writes | `cache:idempotency`, `inventory.goods_receipt`, `inventory.goods_receipt_line` |
 | Called by | BO-052, EMP-065 |
 
 **Parameters**
@@ -412,9 +435,9 @@ Quality failure, damage, wrong item, expiry too near. Reverses the stock increme
 
 | Field | Type | Required | Notes |
 |---|---|---|---|
-| id | string | yes |  |
+| id | string | yes | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
 | receiptNumber | string | yes |  |
-| purchaseOrderId | string | yes |  |
+| purchaseOrderId | string | yes | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
 | locationId | string (uuid) | yes |  |
 | deliveryNoteReference | string |  | (nullable) |
 | lines | array of object | yes |  |
@@ -444,6 +467,7 @@ Quality failure, damage, wrong item, expiry too near. Reverses the stock increme
 | Code | Shape | Meaning |
 |---|---|---|
 | 200 |  | Rejected; stock reversed and a return raised |
+| 409 |  | A line rejects more than was received and not already rejected on this receipt, or names an item the receipt does not hold |
 
 ## Tables
 
@@ -484,15 +508,15 @@ Every table this service owns that the slice reads or writes, with its columns a
 
 | Column | Type | Required | Notes |
 |---|---|---|---|
-| sku | text | no |  |
+| sku | text | yes |  |
 | barcode | text | no |  |
-| name | text | no |  |
-| venue_id | uuid | no |  |
+| name | text | yes |  |
+| venue_id | uuid | yes |  |
 | category_id | uuid | no |  |
-| base_unit | text | no | The unit stock is held in. |
+| base_unit | text | yes | The unit stock is held in. |
 | purchase_unit | text | no | How the supplier sells it — a case of 24 against a base unit of one. |
 | purchase_unit_factor | numeric | no |  |
-| costing_method | text | no |  |
+| costing_method | text | yes |  |
 | reorder_point | numeric | no |  |
 | reorder_quantity | numeric | no |  |
 | par_level | numeric | no |  |
@@ -500,8 +524,8 @@ Every table this service owns that the slice reads or writes, with its columns a
 | allow_negative_stock | boolean | no | True permits issue beyond on-hand. |
 | is_perishable | boolean | no |  |
 | shelf_life_days | integer | no |  |
-| id | uuid | no |  |
-| on_hand | numeric | no | Derived from movements. |
+| id | uuid | yes |  |
+| on_hand | numeric | yes | Derived from movements. |
 | on_order | numeric | no |  |
 | in_transit | numeric | no |  |
 | available | numeric | no |  |
@@ -509,7 +533,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 | last_purchase_price | numeric(18,4) | no |  |
 | is_below_reorder_point | boolean | no |  |
 | has_movements | boolean | no | True locks costing method and base unit. |
-| is_active | boolean | no |  |
+| is_active | boolean | yes |  |
 
 ### `inventory.serialised_item`
 

@@ -1,5 +1,5 @@
 id: LLD-orders
-title: orders — 188 operations
+title: orders — 191 operations
 generatedBy: tools/derive-diagrams.py
 index: diagrams/hld/03-contracts.yaml
 tier: spine
@@ -68,6 +68,7 @@ operations:
   - access.entitlement
   - cache:idempotency
   - orders.order_line
+  - orders.order_line_eligibility
   - orders.payment
   - orders.sales_order
   writes:
@@ -88,6 +89,7 @@ operations:
   reads:
   - cache:idempotency
   - orders.order_line
+  - orders.order_line_eligibility
   - orders.payment
   - orders.sales_order
   writes:
@@ -218,6 +220,7 @@ operations:
   - orders.cart
   - orders.cart_line
   - orders.order_line
+  - orders.order_line_eligibility
   - orders.payment
   - orders.sales_order
   writes:
@@ -269,6 +272,7 @@ operations:
   reads:
   - cache:idempotency
   - orders.order_line
+  - orders.order_line_eligibility
   - orders.payment
   - orders.sales_order
   writes:
@@ -287,6 +291,9 @@ operations:
   reads:
   - cache:idempotency
   - catalogue.product
+  - orders.order_line
+  - orders.order_line_eligibility
+  - orders.payment
   - orders.sales_order
   writes:
   - cache:idempotency
@@ -302,6 +309,7 @@ operations:
   reads:
   - cache:idempotency
   - orders.refund
+  - orders.refund_batch
   writes:
   - cache:idempotency
   - orders.refund
@@ -361,6 +369,7 @@ operations:
   reads:
   - cache:idempotency
   - orders.order_line
+  - orders.order_line_eligibility
   - orders.payment
   - orders.sales_order
   writes:
@@ -409,6 +418,7 @@ operations:
   offline: false
   reads:
   - cache:idempotency
+  - orders.payment_link
   - orders.sales_order
   - payments.provider
   writes:
@@ -479,9 +489,11 @@ operations:
   reads:
   - cache:idempotency
   - orders.reservation
+  - orders.reservation_line
   writes:
   - cache:idempotency
   - orders.reservation
+  - orders.reservation_line
 - operation: createTicketTemplate
   verb: POST
   path: /ticket-templates
@@ -493,6 +505,7 @@ operations:
   reads:
   - cache:idempotency
   - orders.ticket_template
+  - orders.ticket_template_channel
   writes:
   - cache:idempotency
   - orders.ticket_template
@@ -549,6 +562,7 @@ operations:
   reads:
   - cache:idempotency
   - orders.reservation
+  - orders.reservation_line
   writes:
   - cache:idempotency
   - orders.reservation
@@ -647,6 +661,7 @@ operations:
   offline: true
   reads:
   - orders.order_line
+  - orders.order_line_eligibility
   - orders.payment
   - orders.sales_order
   writes: []
@@ -690,6 +705,7 @@ operations:
   offline: false
   reads:
   - orders.order_line
+  - orders.order_line_eligibility
   - orders.payment_link
   - orders.reservation
   - orders.sales_order
@@ -706,6 +722,7 @@ operations:
   reads:
   - cache:resolution
   - orders.refund_policy
+  - orders.refund_policy_time_band
   writes:
   - cache:resolution
 - operation: getResaleFeePolicy
@@ -730,6 +747,7 @@ operations:
   offline: false
   reads:
   - orders.reservation
+  - orders.reservation_line
   writes: []
 - operation: getVisitReminder
   verb: GET
@@ -754,6 +772,7 @@ operations:
   reads:
   - cache:idempotency
   - orders.order_line
+  - orders.order_line_eligibility
   - orders.payment
   - orders.sales_order
   writes:
@@ -1168,6 +1187,7 @@ operations:
   offline: false
   reads:
   - orders.order_line
+  - orders.order_line_eligibility
   - orders.payment
   - orders.sales_order
   - pii.subject
@@ -1545,6 +1565,7 @@ operations:
   offline: false
   reads:
   - orders.reservation
+  - orders.reservation_line
   writes: []
 - operation: listSellerSettlementPayout
   verb: GET
@@ -1607,6 +1628,18 @@ operations:
   offline: false
   reads:
   - orders.ticket_template
+  - orders.ticket_template_channel
+  writes: []
+- operation: listTicketTransfers
+  verb: GET
+  path: /ticket-transfers
+  scope: tenant
+  permission: null
+  audience:
+  - guest
+  offline: false
+  reads:
+  - orders.ticket_transfer
   writes: []
 - operation: listUpgradeConversion
   verb: GET
@@ -1701,6 +1734,7 @@ operations:
   reads:
   - cache:idempotency
   - orders.order_line
+  - orders.order_line_eligibility
   - orders.payment
   - orders.sales_order
   writes:
@@ -1925,6 +1959,17 @@ operations:
   - cache:idempotency
   - marketing.message_dispatch
   - orders.payment_link
+- operation: resolveSyncRejection
+  verb: POST
+  path: /sync/rejections/{rejectionId}/resolve
+  scope: venue
+  permission: ORDER_MODIFY
+  audience:
+  - staff
+  offline: false
+  reads:
+  - sync.rejection
+  writes: []
 - operation: respondToChargeback
   verb: POST
   path: /chargebacks/{chargebackId}/respond
@@ -1955,6 +2000,7 @@ operations:
   reads:
   - cache:idempotency
   - orders.order_line
+  - orders.order_line_eligibility
   - orders.payment
   - orders.sales_order
   writes:
@@ -1962,6 +2008,17 @@ operations:
   - orders.order_line
   - orders.payment
   - orders.sales_order
+- operation: revokeEntitlementShare
+  verb: POST
+  path: /entitlements/{entitlementId}/share/{shareId}/revoke
+  scope: venue
+  permission: ORDER_MODIFY
+  audience:
+  - staff
+  - guest
+  offline: false
+  reads: []
+  writes: []
 - operation: setAfterSaleFinancial
   verb: PUT
   path: /after-sale-financial
@@ -2161,10 +2218,12 @@ operations:
   reads:
   - cache:idempotency
   - orders.refund_policy
+  - orders.refund_policy_time_band
   writes:
   - cache:idempotency
   - cache:resolution
   - orders.refund_policy
+  - orders.refund_policy_time_band
 - operation: setResaleEligibilityRule
   verb: PUT
   path: /resale-eligibility-rule
@@ -2354,6 +2413,7 @@ operations:
   reads:
   - cache:idempotency
   - orders.ticket_template
+  - orders.ticket_template_channel
   writes:
   - cache:idempotency
   - orders.ticket_template
@@ -2369,6 +2429,7 @@ operations:
   reads:
   - cache:idempotency
   - orders.order_line
+  - orders.order_line_eligibility
   - orders.payment
   - orders.sales_order
   writes:

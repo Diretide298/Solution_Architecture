@@ -38,8 +38,8 @@ info:
     Format: <DOMAIN>_<ACTION>[_<QUALIFIER>]
 
     Resolution semantics are normative and defined in
-    architecture/specs/permission-resolution.md: deny-overrides-allow, downward inheritance
-    only, default deny, resolved once at login.
+    [docs/architecture/specs/permission-resolution.md](../../docs/architecture/specs/permission-resolution.md):
+    deny-overrides-allow, downward inheritance only, default deny, resolved once at login.
 
 components:
   schemas:
@@ -133,13 +133,19 @@ components:
         # --- Shift and cash ---------------------------------------------------
         - SHIFT_OPEN
         - SHIFT_CLOSE
-        - SHIFT_SUSPEND
+        - SHIFT_SUSPEND               # suspend a shift for a break; float intact, workstation released
         - SHIFT_CLOSE_OTHER           # close a shift opened by another principal
         - SHIFT_APPROVE_OPEN          # where supervisor approval on open is configured
-        - SHIFT_APPROVE_CLOSE
+        - SHIFT_APPROVE_CLOSE         # release a shift held in pendingClosure, where configured
         - SHIFT_REOPEN                # after final close
         - CASH_LIFT                   # traced mid-shift removal from an open float
         - CASH_ADD
+        - CASH_NO_SALE                # open the drawer without a sale. Reason required, counted per shift
+        # **`CASH_NO_SALE` is not `SHIFT_SUSPEND`.** A no-sale opens the drawer on a live float
+        # and is the classic cover for theft; suspending a shift hands the workstation over for
+        # a break. One permission for both meant a role could not be allowed breaks without also
+        # being allowed to open the drawer, and a review of who may open it read as a review of
+        # who may take a break.
         - DEPOSIT_BOX_MODIFY_OWN
         - DEPOSIT_BOX_MODIFY_OTHER
         - OVERSHORT_ACCEPT            # accept a variance beyond the configured threshold
@@ -274,7 +280,12 @@ components:
         - AI_USE
         - AI_CONFIGURE
         - AI_APPROVE
-        - AI_AUDIT_VIEW
+        - AI_AUDIT_VIEW               # the AI activity and decision log only
+        - AUDIT_VIEW                  # the platform audit log: who did what, where and when
+        # **`AUDIT_VIEW` is separate from `AI_AUDIT_VIEW`.** The platform audit log records every
+        # principal's actions across the estate; the AI log records what an assistant did. A
+        # permission filed among the AI keys reads, on a role checklist, as an AI permission, and
+        # the general audit trail was gated by it.
         - APPROVAL_VIEW
         - APPROVAL_REQUEST
         - APPROVAL_DECIDE
@@ -317,6 +328,8 @@ components:
 #   (a) grants carry an optional decimal constraint, evaluated during resolution
 #   (b) thresholds are separate role configuration, and the permission is binary
 #
-# (b) is recommended — a grant that carries a value stops being a boolean and every
-# resolution path has to reason about amounts. Unresolved: see the refund contract, which
-# is deferred pending this decision.
+# (b) was taken — a grant that carries a value stops being a boolean and every resolution
+# path has to reason about amounts. CF-36 settled the refund threshold as venue policy
+# (docs/adr/0018-configuration-scope.md), and the refund policy in contracts/spine/orders.yaml
+# carries it as `requiresSecondUserAbove` and `requiresApprovalAbove`. ORDER_REFUND_APPROVE
+# stays binary.

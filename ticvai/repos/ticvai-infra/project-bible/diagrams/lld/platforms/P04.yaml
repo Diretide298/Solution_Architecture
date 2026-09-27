@@ -135,6 +135,16 @@ screens:
   - POS-002
   - POS-007
   - POS-009
+  - POS-011
+  - POS-012
+  - POS-013
+  - POS-014
+  - POS-015
+  - POS-016
+  - POS-017
+  - POS-018
+  - POS-019
+  - POS-020
   - POS-021
   - POS-022
   - POS-023
@@ -219,6 +229,8 @@ screens:
   - POS-005
   - POS-006
   - POS-007
+  - POS-008
+  - POS-009
   - POS-010
   - POS-011
   - POS-013
@@ -299,7 +311,6 @@ screens:
   - denied
   - emptyFirstRun
   - emptyNoAccess
-  - emptyNoResults
   - error
   - loading
   - offline
@@ -548,7 +559,6 @@ screens:
   states:
   - emptyFirstRun
   - emptyNoAccess
-  - emptyNoResults
   - error
   - loading
   - offline

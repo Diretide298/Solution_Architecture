@@ -36,7 +36,6 @@ notes: '**A guest inside a journey, at a step.**
 transitions:
 - from: active
   to: active
-  operation: getJourneyPerformance
   trigger: system
   guard: '**The step advance, and it is a self-transition because the status does not change.** `stepEnteredAt`
     moves and `nextActionAt` is recomputed — a delay step counts from the former.

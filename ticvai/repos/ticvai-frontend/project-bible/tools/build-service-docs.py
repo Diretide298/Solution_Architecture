@@ -250,7 +250,7 @@ def read_operations() -> dict[str, dict]:
                 else:
                     body_type = ""
                 responses, success = [], []
-                success_type = ""
+                success_type, success_schema = "", None
                 for code, r in (op.get("responses") or {}).items():
                     rr, rbase, rname = resolve(r, f)
                     responses.append((str(code), rname or "", first_sentence(rr.get("description"))))
@@ -260,6 +260,7 @@ def read_operations() -> dict[str, dict]:
                         if sch:
                             success = field_rows(sch, rbase)
                             success_type = resolve(sch, rbase)[2] or type_of(sch, rbase)
+                            success_schema = (sch, rbase)
                 tag = (op.get("tags") or ["general"])[0]
                 ops[op["operationId"]] = {
                     "contract": f.stem, "file": f.relative_to(ROOT).as_posix(),
@@ -280,8 +281,96 @@ def read_operations() -> dict[str, dict]:
                     "provisional": bool(op.get("x-ticvai-provisional")),
                     "params": params, "body": body, "bodyType": body_type,
                     "responses": responses, "success": success, "successType": success_type,
+                    "successSchema": success_schema,
+                    "creates": any(c == "201" for c, _, _ in responses),
                 }
     return ops
+
+
+# ---- state models -------------------------------------------------------------------------------
+# Audit R181: the status a create starts in lives in states/*.yaml, and nothing a developer reads from
+# the slice showed it, so "what status does a new asset start in" went unanswered even where the
+# package answers it. Each operation's page now says which state model it touches, the state a create
+# starts in and the moves it makes, and a create that the model also lists as a move out of its initial
+# state is logged as a gap, because the status it returns is then not settled.
+
+def read_state_models() -> dict[tuple[str, str], dict]:
+    """Every states/*.yaml, keyed by (contract, enum): enum is a schema name for a named enum and
+    Schema.property for one declared inline, as tools/check-states.py keys them."""
+    models = {}
+    for f in sorted((ROOT / "states").glob("*.yaml")):
+        if f.name.startswith("_"):
+            continue
+        d = load_yaml(f) or {}
+        if d.get("contract") and d.get("enum"):
+            d["_file"] = f.relative_to(ROOT).as_posix()
+            models[(d["contract"], str(d["enum"]))] = d
+    return models
+
+
+def enum_named(node, base: Path):
+    """(contract, schema name) of the named enum a property points at, through $ref or a one-ref allOf."""
+    if not isinstance(node, dict):
+        return None
+    if "$ref" in node:
+        r, rb, name = resolve(node, base)
+        if isinstance(r, dict) and "enum" in r and name:
+            return rb.stem, name
+        return None
+    for part in node.get("allOf") or []:
+        hit = enum_named(part, base)
+        if hit:
+            return hit
+    return None
+
+
+def entity_models(x: dict, models: dict) -> list[dict]:
+    """State models whose status field sits at the top level of the operation's success response,
+    that is, the models of the entity the operation returns."""
+    if not x.get("successSchema"):
+        return []
+    sch, base = x["successSchema"]
+    _, sbase, sname = resolve(sch, base)
+    props, _, _ = merged(sch, base, frozenset())
+    out = []
+    for pname, (v, b) in props.items():
+        hit = enum_named(v, b)
+        if hit and hit in models:
+            out.append(models[hit])
+            continue
+        vr, _, _ = resolve(v, b)
+        if sname and isinstance(vr, dict) and "enum" in vr and (sbase.stem, f"{sname}.{pname}") in models:
+            out.append(models[(sbase.stem, f"{sname}.{pname}")])
+    return out
+
+
+def state_facts(o: str, x: dict, models: dict, by_op: dict) -> tuple[list[str], list[str]]:
+    """What the operation's page says about state (one line per model), and the state-model gaps it shows."""
+    lines, gaps = [], []
+    touched = {m["_file"]: m for m in by_op.get(o, [])}
+    created = {m["_file"]: m for m in entity_models(x, models)} if x.get("creates") else {}
+    for f in sorted(set(touched) | set(created)):
+        m = touched.get(f) or created[f]
+        initial = [str(v) for v in m.get("initial") or []]
+        moves = [t for t in m.get("transitions") or [] if t.get("operation") == o]
+        bits = []
+        ambiguous = False
+        if f in created:
+            bits.append("created as " + " or ".join(f"`{v}`" for v in initial) if initial else
+                        "created, but the model names no initial state")
+            # A move into another initial state is a record created already advanced (the model allows
+            # several initial states for that); a move out to a non-initial state leaves the result open.
+            out_of_initial = [t for t in moves if t.get("from") in initial and t.get("to") not in initial]
+            if out_of_initial:
+                ambiguous = True
+                gaps.append(f"creates {m.get('entity')} in {', '.join(initial)}, but {f} also makes it the "
+                            + ", ".join(f"{t['from']} -> {t['to']}" for t in out_of_initial)
+                            + " transition, so the status it returns is not settled")
+        if moves:
+            bits.append("moves " + ", ".join(f"`{t.get('from')}` -> `{t.get('to')}`" for t in moves))
+        lines.append(f"{m.get('entity')} ([{f}](../../../{f})): " + "; ".join(bits)
+                     + (" **(not settled: see the Gaps sheet)**" if ambiguous else ""))
+    return lines, gaps
 
 
 # ---- DDL to migrations --------------------------------------------------------------------------
@@ -386,6 +475,12 @@ def main() -> int:
     tiers = decomp["tiers"]
     ops = read_operations()
     screens = all_screens()
+    state_models = read_state_models()
+    models_by_op: dict[str, list[dict]] = defaultdict(list)
+    for m in state_models.values():
+        for o in sorted({t.get("operation") for t in m.get("transitions") or [] if t.get("operation")}):
+            models_by_op[o].append(m)
+    state_gaps: list[tuple[str, str]] = []
     slice_ops = sl["operations"]
     plat = sl["platforms"]
 
@@ -498,6 +593,17 @@ def main() -> int:
           "written inside their parent's operation and missing from the lineage. Four are real contract "
           "gaps, logged as L1-L4 in `docs/active/action-register-22-september.md`.", "",
           ", ".join(f"`{t}`" for t in sl["noWriter"]), ""]
+    # Audit R174: setup operations no screen lists in its apis. The backend pages used to say "setup
+    # through Back Office" for operations no Back Office screen calls.
+    screenless = sorted(o for o, d in slice_ops.items() if d["part"] == "setup" and not d["screens"])
+    if screenless:
+        L += [f"**Setup operations no screen calls ({len(screenless)}).** No screen lists them in its apis and "
+              "no contract marks them consumed, so they are reachable only by API or import. Each needs a screen "
+              "that binds it, or its contract to say it is API-only.", ""]
+        L += table(["Operation", "Service", "Makes non-empty"],
+                   [[f"[`{o}`](backend/{slice_ops[o]['service']}.md#{o.lower()})", slice_ops[o]["service"],
+                     ", ".join(f"`{t}`" for t in slice_ops[o]["enables"])] for o in screenless])
+        L += [""]
     (OUT / "README.md").write_text("\n".join(L), encoding="utf-8")
 
     # ---------------------------------------------------------------- frontend
@@ -610,7 +716,15 @@ def main() -> int:
                     facts.append(["Status", "**Provisional**: not yet agreed; do not build"])
                 facts.append(["Reads", ", ".join(f"`{t}`" for t in lin.get("reads") or []) or "-"])
                 facts.append(["Writes", ", ".join(f"`{t}`" for t in lin.get("writes") or []) or "-"])
-                facts.append(["Called by", ", ".join(so["screens"]) or "no screen (setup through Back Office)"])
+                # Audit R174: an operation no screen lists in its apis has no Back Office screen to set it up
+                # through either, so the page says what is true until a screen binds it.
+                facts.append(["Called by", ", ".join(so["screens"]) or
+                              "**no screen**: no screen lists it in its apis, so it is reachable only by API or "
+                              "import until one does (README, Known gaps)"])
+                st_lines, st_gaps = state_facts(o, x, state_models, models_by_op)
+                if st_lines:
+                    facts.append(["State model", "<br/>".join(st_lines)])
+                state_gaps += [(o, g) for g in st_gaps]
                 L += table(["", ""], facts)
                 if x["params"]:
                     L += ["", "**Parameters**", ""]
@@ -1297,6 +1411,7 @@ def main() -> int:
     gaps += [["no writer", t, ""] for t in sl["noWriter"]]
     gaps += [["setup operation, no screen", o, f"{slice_ops[o]['service']}: makes "
               + ", ".join(slice_ops[o]["enables"]) + " non-empty; reachable only by API or import"] for o in no_screen]
+    gaps += [["state model", o, g] for o, g in state_gaps]
     sheet("Gaps", ["Kind", "Table", "Written by"], gaps, [16, 34, 80])
     wb.save(OUT / "TICVAI_First_Release.xlsx")
 

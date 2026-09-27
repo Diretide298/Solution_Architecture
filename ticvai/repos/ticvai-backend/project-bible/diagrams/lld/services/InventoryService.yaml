@@ -4,14 +4,14 @@ generatedBy: tools/derive-diagrams.py
 tier: operations
 index: diagrams/hld/02-services.yaml
 why: '**Stock, counting and procurement.** Its own service because `inventory.stock_level` is derived
-  from movements — a rule four operations broke on 20 August — and that derivation is expensive enough
+  from movements — a rule 51 operations broke on 20 August — and that derivation is expensive enough
   to want its own read path.'
 scale: Mixed. Counting is bursty; procurement is not.
 ifDown: Down blocks receiving and counting; selling continues from the till's cache.
 coverage:
   operations: 51
   inAFlow: 48
-  percent: 96%
+  percent: 94%
   note: '**Flow coverage is how much of this service a journey has walked.** A service under 40% is
     unwalked rather than under-documented.'
 schemas:
@@ -20,7 +20,7 @@ schemas:
   stores:
   - derived
   - postgres
-  largestTable: inventory.item
+  largestTable: inventory.purchase_order
 operationsByContract:
 - contract: inventory
   count: 51
@@ -31,7 +31,7 @@ operationsByContract:
     scope: venue
     permission: PRODUCT_CONFIGURE
     offline: false
-    reads: 2
+    reads: 3
     writes: 2
   - operation: approveRequisition
     verb: POST
@@ -63,7 +63,7 @@ operationsByContract:
     scope: venue
     permission: PRODUCT_CONFIGURE
     offline: false
-    reads: 2
+    reads: 3
     writes: 2
   - operation: cancelStockCount
     verb: POST
@@ -71,7 +71,7 @@ operationsByContract:
     scope: venue
     permission: PRODUCT_CONFIGURE
     offline: false
-    reads: 2
+    reads: 3
     writes: 2
   - operation: closePurchaseOrderShort
     verb: POST
@@ -79,7 +79,7 @@ operationsByContract:
     scope: venue
     permission: LEDGER_APPROVE
     offline: false
-    reads: 2
+    reads: 3
     writes: 2
   - operation: closeTransferShort
     verb: POST
@@ -87,7 +87,7 @@ operationsByContract:
     scope: venue
     permission: LEDGER_APPROVE
     offline: false
-    reads: 2
+    reads: 3
     writes: 2
   - operation: compareQuotations
     verb: GET
@@ -104,7 +104,7 @@ operationsByContract:
     permission: PRODUCT_CONFIGURE
     offline: true
     reads: 3
-    writes: 3
+    writes: 4
   - operation: createInventoryItem
     verb: POST
     path: /inventory-items
@@ -120,7 +120,7 @@ operationsByContract:
     permission: ORDER_CREATE
     offline: false
     reads: 3
-    writes: 2
+    writes: 3
   - operation: createRequisition
     verb: POST
     path: /requisitions
@@ -128,7 +128,7 @@ operationsByContract:
     permission: ORDER_CREATE
     offline: true
     reads: 3
-    writes: 2
+    writes: 3
   - operation: createStockLocation
     verb: POST
     path: /stock-locations
@@ -152,7 +152,7 @@ operationsByContract:
     permission: PRODUCT_CONFIGURE
     offline: false
     reads: 3
-    writes: 2
+    writes: 3
   - operation: createSupplier
     verb: POST
     path: /suppliers
@@ -199,7 +199,7 @@ operationsByContract:
     scope: venue
     permission: PRODUCT_VIEW
     offline: true
-    reads: 2
+    reads: 4
     writes: 0
   - operation: getStockValuation
     verb: GET
@@ -336,7 +336,7 @@ operationsByContract:
     permission: PRODUCT_CONFIGURE
     offline: false
     reads: 3
-    writes: 2
+    writes: 3
   - operation: recordQuotation
     verb: POST
     path: /suppliers/{supplierId}/quotations
@@ -344,14 +344,14 @@ operationsByContract:
     permission: PRODUCT_CONFIGURE
     offline: false
     reads: 3
-    writes: 2
+    writes: 3
   - operation: recountStockCount
     verb: POST
     path: /stock-counts/{countId}/recount
     scope: venue
     permission: LEDGER_APPROVE
     offline: false
-    reads: 2
+    reads: 3
     writes: 2
   - operation: rejectReceivedGoods
     verb: POST
@@ -360,14 +360,14 @@ operationsByContract:
     permission: PRODUCT_CONFIGURE
     offline: false
     reads: 3
-    writes: 2
+    writes: 3
   - operation: rejectRequisition
     verb: POST
     path: /requisitions/{requisitionId}/reject
     scope: venue
     permission: LEDGER_APPROVE
     offline: false
-    reads: 2
+    reads: 3
     writes: 2
   - operation: returnRequisition
     verb: POST
@@ -375,7 +375,7 @@ operationsByContract:
     scope: venue
     permission: LEDGER_APPROVE
     offline: false
-    reads: 2
+    reads: 3
     writes: 2
   - operation: sendPurchaseOrder
     verb: POST
@@ -383,7 +383,7 @@ operationsByContract:
     scope: venue
     permission: PRODUCT_CONFIGURE
     offline: false
-    reads: 2
+    reads: 3
     writes: 2
   - operation: setDailyCount
     verb: PUT
@@ -408,7 +408,7 @@ operationsByContract:
     permission: PRODUCT_CONFIGURE
     offline: true
     reads: 2
-    writes: 2
+    writes: 3
   - operation: updateInventoryItem
     verb: PATCH
     path: /inventory-items/{itemId}
@@ -423,8 +423,8 @@ operationsByContract:
     scope: venue
     permission: PRODUCT_CONFIGURE
     offline: true
-    reads: 3
-    writes: 2
+    reads: 4
+    writes: 3
   - operation: updateSupplier
     verb: PUT
     path: /suppliers/{supplierId}
@@ -439,17 +439,95 @@ tables:
   columns: 5
   backing: redis
   owned: false
-  why: '**Not a table and not owned by a service.** Derived from something already read, invalidated
-    by an event already consumed, losable without consequence — no migration, no backup, no owner.'
+  why: '**Not a table and not owned by a service.** Derived from something already read, losable without
+    consequence — no migration, no backup, no owner.'
+  key: The idempotency key the caller sent
+  eviction:
+  - 'expires_at: **Must exceed the longest offline window.** A scanner out for a weekend replays on
+    Monday'
+  writtenBy:
+  - acknowledgePurchaseOrder
+  - approveRequisition
+  - bulkUpdateProducts
+  - cancelPurchaseOrder
+  - cancelRequisition
+  - cancelStockCount
+  - closePurchaseOrderShort
+  - closeTransferShort
+  - createGoodsReceipt
+  - createInventoryItem
+  - createPurchaseOrder
+  - createRequisition
+  - createStockLocation
+  - createStockMovement
+  - createStockTransfer
+  - createSupplier
+  - postStockCount
+  - receiveStockTransfer
+  - recordQuotation
+  - recountStockCount
+  - rejectReceivedGoods
+  - rejectRequisition
+  - returnRequisition
+  - sendPurchaseOrder
+  - setDailyCount
+  - startStockCount
+  - submitCountLines
+  - updateInventoryItem
+  - updateRequisitionLines
+  - updateSupplier
+  readBy:
+  - acknowledgePurchaseOrder
+  - approveRequisition
+  - bulkUpdateProducts
+  - cancelPurchaseOrder
+  - cancelRequisition
+  - cancelStockCount
+  - closePurchaseOrderShort
+  - closeTransferShort
+  - createGoodsReceipt
+  - createInventoryItem
+  - createPurchaseOrder
+  - createRequisition
+  - createStockLocation
+  - createStockMovement
+  - createStockTransfer
+  - createSupplier
+  - postStockCount
+  - receiveStockTransfer
+  - recordQuotation
+  - recountStockCount
+  - rejectReceivedGoods
+  - rejectRequisition
+  - returnRequisition
+  - sendPurchaseOrder
+  - setDailyCount
+  - startStockCount
+  - submitCountLines
+  - updateInventoryItem
+  - updateRequisitionLines
+  - updateSupplier
 - store: cache:resolution
   kind: cache
   columns: 4
   backing: redis
   owned: false
-  why: '**Not a table and not owned by a service.** Derived from something already read, invalidated
-    by an event already consumed, losable without consequence — no migration, no backup, no owner.'
+  why: '**Not a table and not owned by a service.** Derived from something already read, losable without
+    consequence — no migration, no backup, no owner.'
+  key: scope_path + what is being resolved — permissions, configuration, a price list
+  eviction:
+  - 'version: Bumped by the write that evicts it. **A config change nobody evicts is a stale permission**'
+  writtenBy:
+  - bulkUpdateProducts
+  - setDailyCount
+  - updateSupplier
+  readBy: null
+  gap: '**The lineage names this store, not the key.** Which resolution entry each writer below evicts
+    or bumps — permissions, configuration, a price list, and whether child scopes under its `scope_path`
+    are affected — is not recorded for any operation, so a writer here cannot yet be implemented from
+    the package alone.'
 - table: inventory.count
-  columns: 16
+  columns: 18
   store: postgres
   parent: null
   writtenBy:
@@ -459,7 +537,8 @@ tables:
   columns: 14
   store: postgres
   parent: inventory.count
-  writtenBy: []
+  writtenBy:
+  - inventory
   foreignWriters: null
 - table: inventory.goods_receipt
   columns: 11
@@ -472,7 +551,8 @@ tables:
   columns: 10
   store: postgres
   parent: inventory.goods_receipt
-  writtenBy: []
+  writtenBy:
+  - inventory
   foreignWriters: null
 - table: inventory.item
   columns: 26
@@ -500,7 +580,7 @@ tables:
   - fnb
   - retail
 - table: inventory.purchase_order
-  columns: 22
+  columns: 28
   store: postgres
   parent: null
   writtenBy:
@@ -510,7 +590,8 @@ tables:
   columns: 10
   store: postgres
   parent: inventory.purchase_order
-  writtenBy: []
+  writtenBy:
+  - inventory
   foreignWriters: null
 - table: inventory.quotation
   columns: 12
@@ -523,10 +604,11 @@ tables:
   columns: 6
   store: postgres
   parent: inventory.quotation
-  writtenBy: []
+  writtenBy:
+  - inventory
   foreignWriters: null
 - table: inventory.requisition
-  columns: 12
+  columns: 20
   store: postgres
   parent: null
   writtenBy:
@@ -535,10 +617,11 @@ tables:
   foreignWriters:
   - maintenance
 - table: inventory.requisition_line
-  columns: 10
+  columns: 13
   store: postgres
   parent: inventory.requisition
-  writtenBy: []
+  writtenBy:
+  - inventory
   foreignWriters: null
 - table: inventory.serialised_item
   columns: 9
@@ -565,7 +648,7 @@ tables:
   writtenBy: []
   foreignWriters: null
 - table: inventory.supplier
-  columns: 13
+  columns: 16
   store: postgres
   parent: null
   writtenBy:
@@ -578,7 +661,7 @@ tables:
   writtenBy: []
   foreignWriters: null
 - table: inventory.transfer
-  columns: 10
+  columns: 11
   store: postgres
   parent: null
   writtenBy:
@@ -588,7 +671,8 @@ tables:
   columns: 8
   store: postgres
   parent: inventory.transfer
-  writtenBy: []
+  writtenBy:
+  - inventory
   foreignWriters: null
 readsFrom:
 - service: CatalogueService
@@ -600,10 +684,33 @@ readsFrom:
 writesOutside:
 - service: TenancyService
   operations: 3
-  why: '**The owner defines the row; this service may only append to it.**'
+  rule: 'ADR-0028: the owner defines the row; a foreign writer may only append, through a path the owner
+    published.'
+  why: '**The lineage records these writes, not how they honour the rule.** It does not say whether
+    each inserts or updates, or which operation or event TenancyService published for it — check each
+    against ADR-0028.'
+  writes:
+  - operation: createGoodsReceipt
+    tables:
+    - platform.outbox
+  - operation: postStockCount
+    tables:
+    - platform.outbox
+  - operation: updateSupplier
+    tables:
+    - platform.audit_record
 - service: CatalogueService
   operations: 1
-  why: '**The owner defines the row; this service may only append to it.**'
+  rule: 'ADR-0028: the owner defines the row; a foreign writer may only append, through a path the owner
+    published.'
+  why: '**The lineage records these writes, not how they honour the rule.** It does not say whether
+    each inserts or updates, or which operation or event CatalogueService published for it — check each
+    against ADR-0028.'
+  writes:
+  - operation: bulkUpdateProducts
+    tables:
+    - catalogue.price
+    - catalogue.product
 screens:
 - P04:POS-011 Returns, Refunds & Exchanges
 - P06:EMP-061 Retail Inventory Command Center

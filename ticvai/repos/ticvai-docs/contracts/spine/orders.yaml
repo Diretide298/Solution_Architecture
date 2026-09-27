@@ -58,7 +58,23 @@ info:
     \ is a different mechanism from\n  escalating to a higher permission.\n- **Orders never span cells**\
     \ (ADR-0010). The selling cell owns the order; redemption\n  rights propagate.\n- Payment recovery\
     \ matters more than the happy path. A terminal that charged a card and\n  never received a response\
-    \ is the normal failure, not the exotic one.\n"
+    \ is the normal failure, not the exotic one.\n\n## Conventions this file keeps\n- **Ids.** An order,\
+    \ its lines, a payment, a refund, a reservation, a ticket transfer, a sync rejection\n  and an entitlement\
+    \ are edge-created and are ULIDs (`^[0-9A-HJKMNP-TV-Z]{26}$`) everywhere\n  they appear: as the row's\
+    \ own `id`, as a path parameter and as a reference from another\n  schema (naming-and-style §4). Server-created\
+    \ configuration (a cart, a payment link, a\n  template, a policy) is a uuid. A ticket is an entitlement:\
+    \ `ticketIds` are `Entitlement.id`\n  values.\n- **A client ULID in a body is the idempotency key.** Where\
+    \ a write body carries a\n  client-generated `id`, it must equal the `Idempotency-Key` header; the\
+    \ replay and\n  mismatch rules are `IdempotencyKey` in `shared/common.yaml`.\n- **Server-owned fields\
+    \ in a request body are ignored.** A property marked `readOnly` is\n  never taken from a request, even\
+    \ where a request reuses the resource schema. A property\n  marked `writeOnly` is accepted and stored\
+    \ and never returned.\n- **Every listed refusal says which.** An operation-specific error answers\
+    \ with a `Problem`\n  extension carrying `refusedReason`, one value per cause, so a client switches\
+    \ on a value\n  rather than parsing `detail`. The shared errors (400/401/403/404/429/5xx and the shared\n\
+    \  idempotency `409`) stay implicit.\n- **Lists state their order.** Each list says its sort key; the\
+    \ item `id` is always the\n  tiebreak, and the cursor is keyset on that pair. An unknown or out-of-scope\
+    \ parent in\n  the path is the shared `404`; a parent that exists with nothing under it is an empty\n\
+    \  page.\n"
 servers:
 - url: https://{cellHost}/api/v1
   variables:
@@ -125,6 +141,9 @@ paths:
                   type: string
       responses:
         '201':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Started
           content:
             application/json:
@@ -159,6 +178,8 @@ paths:
       - name: since
         in: query
         required: false
+        description: Only orders whose `createdAt` falls on or after this date. Omit for the whole
+          history.
         schema:
           type: string
           format: date
@@ -166,13 +187,18 @@ paths:
       - $ref: ../shared/common.yaml#/components/parameters/PageCursor
       responses:
         '200':
-          description: Orders, newest first
+          description: Orders, newest first — `createdAt` descending, `id` as the tiebreak.
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/Order'
+                allOf:
+                  - $ref: '../shared/common.yaml#/components/schemas/Page'
+                  - type: object
+                    properties:
+                      items:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/Order'
   /fraud-rules:
     get:
       operationId: listFraudRules
@@ -201,14 +227,19 @@ paths:
       x-ticvai-conflict-policy: serverWins
       responses:
         '200':
-          description: Rules, in evaluation order
+          description: Rules, in evaluation order — the order `setFraudRules` saved them in, `id` as
+            the tiebreak.
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  type: object
-                  additionalProperties: true
+                allOf:
+                  - $ref: '../shared/common.yaml#/components/schemas/Page'
+                  - type: object
+                    properties:
+                      items:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/FraudRule'
     put:
       operationId: setFraudRules
       summary: Change what holds a transaction
@@ -236,16 +267,17 @@ paths:
         content:
           application/json:
             schema:
-              type: object
-              additionalProperties: true
+              $ref: '#/components/schemas/FraudRuleSet'
       responses:
         '200':
-          description: Set
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: Set. The whole set as it now stands, deactivated rules included.
           content:
             application/json:
               schema:
-                type: object
-                additionalProperties: true
+                $ref: '#/components/schemas/FraudRuleSet'
   /group-bookings:
     post:
       operationId: createGroupBooking
@@ -280,6 +312,9 @@ paths:
               $ref: '#/components/schemas/CreateGroupBookingRequest'
       responses:
         '201':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Created
           content:
             application/json:
@@ -290,11 +325,12 @@ paths:
         '403':
           $ref: ../shared/common.yaml#/components/responses/Forbidden
         '409':
-          description: The order already has a group booking, or is voided.
+          description: The order already has a group booking (`orderAlreadyGrouped`), or is voided
+            (`orderVoided`).
           content:
             application/problem+json:
               schema:
-                $ref: ../shared/common.yaml#/components/schemas/Problem
+                $ref: '#/components/schemas/GroupBookingProblem'
   /group-booking-requests:
     post:
       operationId: requestGroupBooking
@@ -326,23 +362,27 @@ paths:
       - guestAuth: []
       responses:
         '201':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: The held booking
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/GroupBooking'
         '409':
-          description: The date or package is no longer available.
+          description: The date is no longer available (`dateUnavailable`), or the package is not
+            (`packageUnavailable`).
           content:
             application/problem+json:
               schema:
-                $ref: ../shared/common.yaml#/components/schemas/Problem
+                $ref: '#/components/schemas/GroupBookingProblem'
         '422':
-          description: More participants than the package allows.
+          description: More participants than the package allows (`aboveParticipantLimit`).
           content:
             application/problem+json:
               schema:
-                $ref: ../shared/common.yaml#/components/schemas/Problem
+                $ref: '#/components/schemas/GroupBookingProblem'
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       requestBody:
@@ -404,6 +444,9 @@ paths:
               $ref: '#/components/schemas/DepositPolicy'
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Saved
           content:
             application/json:
@@ -427,7 +470,7 @@ paths:
         - "P01 WEB-031 My Reservations"
         - "P02 GST-072 Share & Group Booking"
         - "P08 BO-026 Group Bookings"
-      summary: A group, its leader and its manifest
+      summary: A group, its leader and its name-capture duty
       description: 'BL-028. **`orders.group_booking` had ten columns and nothing read it** — a table built
         and never surfaced.
 
@@ -488,6 +531,9 @@ paths:
               $ref: '#/components/schemas/UpdateGroupBookingRequest'
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Updated
           content:
             application/json:
@@ -498,11 +544,12 @@ paths:
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
         '409':
-          description: The status change goes backwards, or the group is already cancelled or complete.
+          description: The status change goes backwards (`statusBackwards`), or the group is already
+            cancelled or complete (`groupClosed`).
           content:
             application/problem+json:
               schema:
-                $ref: ../shared/common.yaml#/components/schemas/Problem
+                $ref: '#/components/schemas/GroupBookingProblem'
   /payment-links/{token}:
     parameters:
     - name: token
@@ -548,7 +595,13 @@ paths:
                 type: object
                 properties:
                   link:
-                    $ref: '#/components/schemas/PaymentLink'
+                    allOf:
+                    - $ref: '#/components/schemas/PaymentLinkView'
+                    description: '**The link as its holder may see it**, not the staff record. The
+                      token, the address it went to and who issued it are not repeated to somebody
+                      holding nothing but the token.
+
+                      '
                   lines:
                     type: array
                     items:
@@ -560,9 +613,11 @@ paths:
                   expiresInSeconds:
                     type: integer
         '410':
-          description: '**Expired, paid or superseded — and it says which.** A guest opening an email
-            three days late is the ordinary case, not an edge: *expired, the hold is released, book again*
-            is a different message from *already paid* and from *we sent you a newer link*.
+          description: '**Expired, paid, superseded or cancelled — and it says which**
+            (`linkExpired`, `linkPaid`, `linkSuperseded`, `linkCancelled`, the four terminal states of
+            `PaymentLink.status`). A guest opening an email three days late is the ordinary case, not
+            an edge: *expired, the hold is released, book again* is a different message from *already
+            paid*, from *we sent you a newer link* and from *the venue withdrew this link*.
 
             **404 is never returned for a real token.** Telling somebody their booking does not exist
             when it expired is how a support call starts.
@@ -571,7 +626,7 @@ paths:
           content:
             application/problem+json:
               schema:
-                $ref: ../shared/common.yaml#/components/schemas/Problem
+                $ref: '#/components/schemas/PaymentLinkProblem'
   /payment-links/{token}/pay:
     parameters:
     - name: token
@@ -630,6 +685,9 @@ paths:
                     '
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Paid, and the reservation converted
           content:
             application/json:
@@ -638,21 +696,23 @@ paths:
                 properties:
                   orderId:
                     type: string
-                    format: uuid
+                    pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
                   entitlementIds:
                     type: array
                     items:
                       type: string
+                      pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
         '409':
-          description: '**The hold went while they were paying.** Rare and real — a link near its expiry
-            and a guest reading slowly. The response names what is no longer available rather than failing
-            the whole basket, because **part of a booking is usually still worth having.**
+          description: '**The hold went while they were paying** (`linesUnavailable`). Rare and real
+            — a link near its expiry and a guest reading slowly. Nothing is charged. The response names
+            what is no longer available in `unavailableLines` rather than failing the whole basket
+            silently, because **part of a booking is usually still worth having.**
 
             '
           content:
             application/problem+json:
               schema:
-                $ref: ../shared/common.yaml#/components/schemas/Problem
+                $ref: '#/components/schemas/PaymentLinkProblem'
   /payment-links/{linkId}/resend:
     parameters:
     - name: linkId
@@ -701,6 +761,9 @@ paths:
                   nullable: true
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Resent
           content:
             application/json:
@@ -713,7 +776,7 @@ paths:
       required: true
       schema:
         type: string
-        format: uuid
+        pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
     post:
       operationId: convertToTermProduct
       summary: Turn a visit into a membership or season pass
@@ -761,12 +824,14 @@ paths:
                   nullable: true
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Converted
           content:
             application/json:
               schema:
-                type: object
-                additionalProperties: true
+                $ref: '#/components/schemas/ConvertToTermResult'
   /guest-credit-accounts:
     post:
       operationId: openGuestCreditAccount
@@ -821,8 +886,7 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                additionalProperties: true
+                $ref: '#/components/schemas/GuestCreditAccount'
   /orders/{orderId}/split:
     parameters:
     - name: orderId
@@ -830,7 +894,7 @@ paths:
       required: true
       schema:
         type: string
-        format: uuid
+        pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
     post:
       operationId: splitOrder
       x-ticvai-consumed-by:
@@ -873,21 +937,34 @@ paths:
                         type: array
                         items:
                           type: string
-                          format: uuid
+                          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
                       subjectId:
                         type: string
                         format: uuid
                         nullable: true
       responses:
         '200':
-          description: Split
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: Split. The ids of the resulting orders, one per group, in the order the groups
+            were sent.
           content:
             application/json:
               schema:
                 type: array
                 items:
                   type: string
-                  format: uuid
+                  pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+        '409':
+          description: 'The order is partly paid and the payment is not yet allocated to lines
+            (`paymentNotAllocated`), which the description makes a precondition of splitting.
+
+            '
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/OrderRefusedProblem'
   /entitlements/{entitlementId}/reissue:
     parameters:
     - name: entitlementId
@@ -895,7 +972,7 @@ paths:
       required: true
       schema:
         type: string
-        format: uuid
+        pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
     post:
       operationId: reissueEntitlement
       x-ticvai-consumed-by:
@@ -945,12 +1022,25 @@ paths:
                   nullable: true
       responses:
         '201':
-          description: Reissued
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: Reissued. The old entitlement voided, the new one issued, and the link between
+            them.
           content:
             application/json:
               schema:
-                type: object
-                additionalProperties: true
+                $ref: '#/components/schemas/ReissuedEntitlement'
+        '409':
+          description: 'The entitlement is not expired (`entitlementNotExpired`) — this is the reissue
+            of an expired entitlement, and a live one is exchanged or rescheduled instead — or it has
+            already been replaced by an earlier reissue (`entitlementAlreadyReplaced`).
+
+            '
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/EntitlementRefusedProblem'
   /entitlements/{entitlementId}/share:
     parameters:
     - name: entitlementId
@@ -958,7 +1048,7 @@ paths:
       required: true
       schema:
         type: string
-        format: uuid
+        pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
     post:
       operationId: shareEntitlement
       x-ticvai-consumed-by:
@@ -1005,11 +1095,75 @@ paths:
                   nullable: true
       responses:
         '200':
-          description: Shared
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: Shared. The share record, whose `id` is what `revokeEntitlementShare` takes.
           content:
             application/json:
               schema:
-                $ref: ../shared/common.yaml#/components/schemas/Problem
+                $ref: '#/components/schemas/EntitlementShare'
+        '409':
+          description: 'Not shareable, and the reason says which: the entitlement''s template does not
+            allow sharing (`sharingNotAllowed`, `EntitlementTemplate.canShareMedia` false), the caller
+            holds it only through a share and cannot pass it on (`recipientCannotShareOn`), or it is
+            no longer live — consumed, expired, cancelled or surrendered (`entitlementNotActive`).
+
+            '
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/EntitlementRefusedProblem'
+  /entitlements/{entitlementId}/share/{shareId}/revoke:
+    parameters:
+    - name: entitlementId
+      in: path
+      required: true
+      schema:
+        type: string
+        pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+    - name: shareId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    post:
+      operationId: revokeEntitlementShare
+      summary: Take back a share
+      description: '**The other half of `shareEntitlement`.** Its description promised *"the owner can
+        revoke"* and no operation did, so a share could only end by expiring.
+
+        **The owner revokes; the recipient cannot.** Revoking ends the second person''s right to present
+        the entitlement at once. It moves nothing — the owner held the entitlement throughout — and an
+        admission the recipient already used stays used.
+
+        '
+      tags:
+      - orders
+      x-ticvai-permission: ORDER_MODIFY
+      x-ticvai-guest-callable: true
+      x-ticvai-audience:
+      - staff
+      - guest
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      responses:
+        '200':
+          description: Revoked. The share, with `revokedAt` set.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EntitlementShare'
+        '409':
+          description: The share is already revoked or has expired (`shareNotActive`).
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/EntitlementRefusedProblem'
   /wallet-passes:
     post:
       operationId: issueWalletPass
@@ -1047,7 +1201,7 @@ paths:
               properties:
                 entitlementId:
                   type: string
-                  format: uuid
+                  pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
                 platform:
                   type: string
                   enum:
@@ -1055,6 +1209,9 @@ paths:
                   - google
       responses:
         '201':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Issued
           content:
             application/json:
@@ -1104,6 +1261,9 @@ paths:
                   - brandingUpdate
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Pushed
           content:
             application/json:
@@ -1171,6 +1331,9 @@ paths:
               $ref: '#/components/schemas/ResaleFeePolicy'
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Set
           content:
             application/json:
@@ -1207,23 +1370,27 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/ResaleListing'
+              $ref: '#/components/schemas/CreateResaleListingRequest'
       responses:
         '201':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Listed
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ResaleListing'
         '409':
-          description: 'Not resellable, and the reason says which — **partly consumed, name-bound, or
-            outside the resale window** are three different conversations with the seller.
+          description: 'Not resellable, and the reason says which — **partly consumed
+            (`partlyConsumed`), name-bound (`nameBound`), or outside the resale window
+            (`outsideResaleWindow`)** are three different conversations with the seller.
 
             '
           content:
             application/problem+json:
               schema:
-                $ref: ../shared/common.yaml#/components/schemas/Problem
+                $ref: '#/components/schemas/ResaleRefusedProblem'
   /orders/{orderId}/upgrade-quote:
     parameters:
     - name: orderId
@@ -1231,7 +1398,7 @@ paths:
       required: true
       schema:
         type: string
-        format: uuid
+        pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
     post:
       operationId: quoteUpgrade
       x-ticvai-consumed-by:
@@ -1273,10 +1440,12 @@ paths:
               properties:
                 entitlementId:
                   type: string
-                  format: uuid
+                  pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
                 targetProductId:
                   type: string
                   format: uuid
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       responses:
         '200':
           description: Quote
@@ -1332,8 +1501,17 @@ paths:
       - name: mediaType
         in: query
         required: false
+        description: Exact match on `TicketTemplate.mediaType`. Omit for every media type.
         schema:
           type: string
+          enum:
+          - thermalTicket
+          - a4Pdf
+          - wristband
+          - rfidCard
+          - walletPass
+          - qrOnly
+          - sms
       - name: includeInactive
         in: query
         required: false
@@ -1344,13 +1522,19 @@ paths:
       - $ref: ../shared/common.yaml#/components/parameters/PageCursor
       responses:
         '200':
-          description: Templates, by selection priority
+          description: Templates, by selection priority — the template a sale would try first at the
+            top, `id` as the tiebreak.
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/TicketTemplate'
+                allOf:
+                  - $ref: '../shared/common.yaml#/components/schemas/Page'
+                  - type: object
+                    properties:
+                      items:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/TicketTemplate'
     post:
       operationId: createTicketTemplate
       x-ticvai-consumed-by:
@@ -1383,6 +1567,9 @@ paths:
               $ref: '#/components/schemas/TicketTemplateRequest'
       responses:
         '201':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Created
           content:
             application/json:
@@ -1394,11 +1581,11 @@ paths:
           $ref: ../shared/common.yaml#/components/responses/Forbidden
         '409':
           description: Another active template has the same priority for the same product kind, channel
-            and media type.
+            and media type (`duplicateSelectionPriority`).
           content:
             application/problem+json:
               schema:
-                $ref: ../shared/common.yaml#/components/schemas/Problem
+                $ref: '#/components/schemas/TicketTemplateConflictProblem'
   /ticket-templates/{templateId}:
     parameters:
     - name: templateId
@@ -1436,6 +1623,9 @@ paths:
               $ref: '#/components/schemas/TicketTemplateRequest'
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Updated
           content:
             application/json:
@@ -1447,11 +1637,11 @@ paths:
           $ref: ../shared/common.yaml#/components/responses/NotFound
         '409':
           description: Another active template has the same priority for the same product kind, channel
-            and media type.
+            and media type (`duplicateSelectionPriority`).
           content:
             application/problem+json:
               schema:
-                $ref: ../shared/common.yaml#/components/schemas/Problem
+                $ref: '#/components/schemas/TicketTemplateConflictProblem'
   /ticket-templates/{templateId}/proof:
     parameters:
     - name: templateId
@@ -1502,8 +1692,7 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                additionalProperties: true
+                $ref: '#/components/schemas/TicketProof'
   /chargebacks:
     get:
       operationId: listChargebacks
@@ -1529,13 +1718,18 @@ paths:
       x-ticvai-conflict-policy: serverWins
       responses:
         '200':
-          description: Chargebacks
+          description: Chargebacks, soonest `evidenceDueBy` first, `id` as the tiebreak.
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/Chargeback'
+                allOf:
+                  - $ref: '../shared/common.yaml#/components/schemas/Page'
+                  - type: object
+                    properties:
+                      items:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/Chargeback'
   /chargebacks/{chargebackId}/respond:
     parameters:
     - name: chargebackId
@@ -1595,11 +1789,23 @@ paths:
                   nullable: true
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Responded
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Chargeback'
+        '409':
+          description: 'The case is already decided or past its deadline — `won`, `lost`, `accepted` or
+            `expired` (`chargebackClosed`).
+
+            '
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/PaymentProblem'
   /payment-providers:
     get:
       operationId: listPaymentProviders
@@ -1618,13 +1824,18 @@ paths:
       x-ticvai-conflict-policy: serverWins
       responses:
         '200':
-          description: Providers
+          description: Providers, by `name`, `id` as the tiebreak.
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/PaymentProvider'
+                allOf:
+                  - $ref: '../shared/common.yaml#/components/schemas/Page'
+                  - type: object
+                    properties:
+                      items:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/PaymentProvider'
     put:
       operationId: setPaymentProvider
       x-ticvai-consumed-by:
@@ -1637,6 +1848,10 @@ paths:
         **The credential goes to the vault and never to the database.** `credentialRef` is what is stored,
         following the rule ADR-0020 set for AI providers and applied here: **no surface ever holds a provider
         key.**
+
+        **The routing travels with the provider.** `routing` carries the `PaymentRouting` rules that send
+        payments to this provider, which is the *"and its routing"* in the summary and what lands in
+        `payments.routing_rule`.
 
         '
       tags:
@@ -1655,9 +1870,12 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/PaymentProvider'
+              $ref: '#/components/schemas/SetPaymentProviderRequest'
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Configured
           content:
             application/json:
@@ -1690,13 +1908,18 @@ paths:
       x-ticvai-conflict-policy: serverWins
       responses:
         '200':
-          description: Tokens
+          description: Tokens, the default first, then by `id`.
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/PaymentToken'
+                allOf:
+                  - $ref: '../shared/common.yaml#/components/schemas/Page'
+                  - type: object
+                    properties:
+                      items:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/PaymentToken'
     post:
       operationId: storePaymentToken
       x-ticvai-consumed-by:
@@ -1750,11 +1973,26 @@ paths:
                   default: false
       responses:
         '201':
-          description: Stored
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: Stored. `method`, `maskedIdentifier` and `expiresAt` are what the provider
+            reported when it tokenised the card; the token itself is never returned.
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/PaymentToken'
+        '409':
+          description: 'The provider cannot hold a stored credential (`tokenisationNotSupported`,
+            `PaymentProvider.supportsTokenisation` false), or the guest has not consented to the purpose
+            named in `consentPurposeId` (`consentNotGiven`) — a token taken without it is a card kept on
+            their behalf that they never agreed to.
+
+            '
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/PaymentProblem'
   /payment-links:
     post:
       operationId: createPaymentLink
@@ -1790,7 +2028,7 @@ paths:
               properties:
                 orderId:
                   type: string
-                  format: uuid
+                  pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
                 expiresAt:
                   type: string
                   format: date-time
@@ -1805,12 +2043,15 @@ paths:
                   default: true
       responses:
         '201':
-          description: Link created and sent
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: Link created and sent. The token goes to the guest in the message and is not
+            returned here.
           content:
             application/json:
               schema:
-                type: object
-                additionalProperties: true
+                $ref: '#/components/schemas/PaymentLink'
   /invitations:
     post:
       operationId: issueInvitation
@@ -1900,21 +2141,24 @@ paths:
                   description: Which budget carries it. Comps are a cost, not an absence of revenue.
       responses:
         '201':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Issued
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Invitation'
         '403':
-          description: '8.1.5. **The issuer''s profile does not permit this**, or their allowance is spent.
-            The reason says which, because *"not permitted"* on a host who has an allowance is a support
-            call.
+          description: '8.1.5. **The issuer''s profile does not permit this** (`profileNotPermitted`),
+            or their allowance is spent (`allowanceSpent`). The reason says which, because *"not
+            permitted"* on a host who has an allowance is a support call.
 
             '
           content:
             application/problem+json:
               schema:
-                $ref: ../shared/common.yaml#/components/schemas/Problem
+                $ref: '#/components/schemas/InvitationRefusedProblem'
   /invitations/allowances:
     get:
       operationId: listInvitationAllowances
@@ -1937,13 +2181,18 @@ paths:
       x-ticvai-conflict-policy: serverWins
       responses:
         '200':
-          description: Allowances
+          description: Allowances, by `principalId`, `id` as the tiebreak.
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/InvitationAllowance'
+                allOf:
+                  - $ref: '../shared/common.yaml#/components/schemas/Page'
+                  - type: object
+                    properties:
+                      items:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/InvitationAllowance'
   /stored-value/authorisations:
     post:
       operationId: authoriseStoredValue
@@ -2003,20 +2252,25 @@ paths:
                     '
       responses:
         '201':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Held
           content:
             application/json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/StoredValueAuthorisation
         '409':
-          description: 'Insufficient balance after existing holds. **The reason says which**, because
-            *"insufficient funds"* on a card the guest just topped up is a support call.
+          description: 'Insufficient balance after existing holds. **The reason says which** — the
+            balance itself is too low (`insufficientBalance`), or enough is there but other holds have
+            it (`heldByOtherAuthorisations`) — because *"insufficient funds"* on a card the guest just
+            topped up is a support call. `availableAmount` is what could be held now.
 
             '
           content:
             application/problem+json:
               schema:
-                $ref: ../shared/common.yaml#/components/schemas/Problem
+                $ref: '#/components/schemas/StoredValueProblem'
   /stored-value/authorisations/{authorisationId}/capture:
     parameters:
     - name: authorisationId
@@ -2073,11 +2327,24 @@ paths:
                   $ref: ../shared/common.yaml#/components/schemas/Money
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Captured
           content:
             application/json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/StoredValueAuthorisation
+        '409':
+          description: 'The hold is no longer live — `captured`, `released` or `expired`
+            (`authorisationNotHeld`) — or the amount is more than what remains held
+            (`aboveHeldAmount`). Only a `held` or `partiallyCaptured` hold is captured against.
+
+            '
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/StoredValueProblem'
   /stored-value/authorisations/{authorisationId}/release:
     parameters:
     - name: authorisationId
@@ -2114,6 +2381,15 @@ paths:
             application/json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/StoredValueAuthorisation
+        '409':
+          description: 'Nothing is held to release — the hold is already `captured`, `released` or
+            `expired` (`authorisationNotHeld`).
+
+            '
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/StoredValueProblem'
   /carts/{cartId}:
     parameters:
     - name: cartId
@@ -2159,14 +2435,14 @@ paths:
               schema:
                 $ref: '#/components/schemas/Cart'
         '410':
-          description: 'Expired. **Distinct from not found** — a guest returning to a link needs to know
-            their cart existed and lapsed, not that it never was.
+          description: 'Expired (`cartExpired`). **Distinct from not found** — a guest returning to a
+            link needs to know their cart existed and lapsed, not that it never was.
 
             '
           content:
             application/problem+json:
               schema:
-                $ref: ../shared/common.yaml#/components/schemas/Problem
+                $ref: '#/components/schemas/CartProblem'
     delete:
       operationId: abandonCart
       x-ticvai-consumed-by:
@@ -2192,7 +2468,20 @@ paths:
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       responses:
         '204':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Abandoned and leases released
+        '409':
+          description: 'The cart is not `active` or `expiring` (`cartNotOpen`) — an expired cart has
+            nothing left to release, and a checked-out cart''s leases already belong to its order, so
+            releasing them here would release the order''s capacity (states/cart.yaml).
+
+            '
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/CartProblem'
   /carts/{cartId}/lines:
     parameters:
     - name: cartId
@@ -2204,9 +2493,11 @@ paths:
     post:
       operationId: addCartLine
       x-ticvai-consumed-by:
+        - "P01 WEB-006 Date & Session Selection"
         - "P01 WEB-008 Add-ons & Upsell"
         - "P01 WEB-010 Shopping Cart"
         - "P01 WEB-033 Shop"
+        - "P02 GST-009 Review & Payment"
         - "P02 GST-032 AI Concierge – Chat"
         - "P02 GST-048 Upsell / Cross-Sell"
         - "P02 GST-050 Resource Booking – Cabana"
@@ -2215,6 +2506,7 @@ paths:
         - "P04 POS-002 Sell — Ticket Catalogue"
         - "P04 POS-021 Sell — Food & Drink"
         - "P04 POS-023 Sell — Merchandise"
+        - "P05 KSK-005 Choose a session"
         - "P05 KSK-006 Review"
         - "P05 KSK-017 Shop"
         - "P10 PTR-010 Cart & Quote"
@@ -2250,20 +2542,24 @@ paths:
               $ref: '#/components/schemas/AddCartLineRequest'
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Added, and the cart re-priced
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Cart'
         '409':
-          description: 'No capacity, or the product is not sellable on this channel. **The reason is specific**
-            — sold out for this session reads differently from sold out for the day.
+          description: 'No capacity, or the product is not sellable on this channel (`notSellableOnChannel`).
+            **The reason is specific** — sold out for this session (`soldOutForSession`) reads differently
+            from sold out for the day (`soldOutForDay`).
 
             '
           content:
             application/problem+json:
               schema:
-                $ref: ../shared/common.yaml#/components/schemas/Problem
+                $ref: '#/components/schemas/CartProblem'
   /carts/{cartId}/lines/{lineId}:
     parameters:
     - name: cartId
@@ -2315,17 +2611,20 @@ paths:
                   minimum: 0
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Updated
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Cart'
         '409':
-          description: Not enough capacity to increase
+          description: Not enough capacity to increase (`noCapacity`).
           content:
             application/problem+json:
               schema:
-                $ref: ../shared/common.yaml#/components/schemas/Problem
+                $ref: '#/components/schemas/CartProblem'
     delete:
       operationId: removeCartLine
       x-ticvai-consumed-by:
@@ -2347,6 +2646,9 @@ paths:
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Removed, and the cart re-priced
           content:
             application/json:
@@ -2385,18 +2687,21 @@ paths:
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Extended
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Cart'
         '409':
-          description: Extension cap reached, or a lease could not be extended because the capacity has
-            gone
+          description: Extension cap reached (`extensionCapReached`), or a lease could not be extended
+            because the capacity has gone (`noCapacity`, naming the lines in `lineIds`).
           content:
             application/problem+json:
               schema:
-                $ref: ../shared/common.yaml#/components/schemas/Problem
+                $ref: '#/components/schemas/CartProblem'
   /carts/{cartId}/claim:
     parameters:
     - name: cartId
@@ -2432,6 +2737,9 @@ paths:
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Claimed, and merged where the guest already had one
           content:
             application/json:
@@ -2498,37 +2806,55 @@ paths:
                 subjectId:
                   type: string
                   format: uuid
+                  description: The guest the order is for. A guest caller may name only themselves
+                    (`guestAuth` never widens to another subject); omitted, the cart's own `subjectId`
+                    is used.
                 attendees:
                   type: array
+                  description: The named holder for each cart line that needs one. Becomes
+                    `CreateOrderLine.holderName` on the order's matching line.
                   items:
                     type: object
-                    additionalProperties: true
+                    required:
+                    - lineId
+                    - holderName
+                    properties:
+                      lineId:
+                        type: string
+                        format: uuid
+                        description: A `CartLine.id` in this cart.
+                      holderName:
+                        type: string
       responses:
         '201':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: An order, pending payment
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Order'
         '403':
-          description: 'The contact the tickets would go to is not proven — an unverified session, or a
-            guest checkout with no confirmed one-time code. **The client sends the guest to sign-in or to
-            the code step and keeps the cart**; nothing is released.
+          description: 'The contact the tickets would go to is not proven — an unverified session
+            (`sessionNotVerified`), or a guest checkout with no confirmed one-time code
+            (`contactNotConfirmed`). **The client sends the guest to sign-in or to the code step and
+            keeps the cart**; nothing is released.
 
             '
           content:
             application/problem+json:
               schema:
-                $ref: ../shared/common.yaml#/components/schemas/Problem
+                $ref: '#/components/schemas/CartProblem'
         '409':
-          description: 'A lease expired between the last read and checkout. **Names which line**, so the
-            guest loses one thing rather than the cart.
+          description: 'A lease expired between the last read and checkout (`leaseExpired`). **Names which
+            line** in `lineIds`, so the guest loses one thing rather than the cart.
 
             '
           content:
             application/problem+json:
               schema:
-                $ref: ../shared/common.yaml#/components/schemas/Problem
+                $ref: '#/components/schemas/CartProblem'
   /carts/abandoned:
     get:
       operationId: listAbandonedCarts
@@ -2553,25 +2879,37 @@ paths:
       parameters:
       - name: since
         in: query
+        description: Only carts whose `abandonedAt` is at or after this instant.
         schema:
           type: string
           format: date-time
       - name: minValue
         in: query
-        description: Recovery is worth more on a large cart than a small one.
+        description: 'Recovery is worth more on a large cart than a small one. Only carts whose `value`
+          is at least this amount, in the venue''s currency. **A decimal string, never a float**, as
+          `Money.amount` is.
+
+          '
         schema:
-          type: number
+          type: string
+          pattern: ^\d+(\.\d{1,4})?$
       - $ref: ../shared/common.yaml#/components/parameters/PageSize
       - $ref: ../shared/common.yaml#/components/parameters/PageCursor
       responses:
         '200':
-          description: Abandoned carts
+          description: Abandoned carts, most recently abandoned first — `abandonedAt` descending, `cartId`
+            as the tiebreak.
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/AbandonedCart'
+                allOf:
+                  - $ref: '../shared/common.yaml#/components/schemas/Page'
+                  - type: object
+                    properties:
+                      items:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/AbandonedCart'
   /payments/{paymentId}/void:
     parameters:
     - name: paymentId
@@ -2579,7 +2917,7 @@ paths:
       required: true
       schema:
         type: string
-        format: uuid
+        pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
     post:
       operationId: voidPayment
       x-ticvai-consumed-by:
@@ -2625,20 +2963,24 @@ paths:
                   maxLength: 300
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Voided
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Payment'
         '409':
-          description: 'Already captured. **The response says so rather than failing generically**, because
-            the correct next action is a refund and the cashier needs to know that.
+          description: 'Already captured (`alreadyCaptured`). **The response says so rather than failing
+            generically**, because the correct next action is a refund and the cashier needs to know
+            that. Any other state that is not `authorised` is `notAuthorised`.
 
             '
           content:
             application/problem+json:
               schema:
-                $ref: ../shared/common.yaml#/components/schemas/Problem
+                $ref: '#/components/schemas/PaymentProblem'
   /billing-statements:
     get:
       operationId: listBillingStatements
@@ -2668,17 +3010,21 @@ paths:
       x-ticvai-self-scoped: subject
       x-ticvai-scope-level: tenant
       x-ticvai-read-routing: replica
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
       security:
       - guestAuth: []
       - bearerAuth: []
       parameters:
       - name: from
         in: query
+        description: Only statements whose `periodEnd` is on or after this date.
         schema:
           type: string
           format: date
       - name: to
         in: query
+        description: Only statements whose `periodStart` is on or before this date.
         schema:
           type: string
           format: date
@@ -2686,13 +3032,19 @@ paths:
       - $ref: ../shared/common.yaml#/components/parameters/PageCursor
       responses:
         '200':
-          description: Statements
+          description: Statements, most recent period first — `periodStart` descending, `id` as the
+            tiebreak.
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/BillingStatement'
+                allOf:
+                  - $ref: '../shared/common.yaml#/components/schemas/Page'
+                  - type: object
+                    properties:
+                      items:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/BillingStatement'
   /billing-statements/{statementId}:
     get:
       operationId: getBillingStatement
@@ -2716,6 +3068,8 @@ paths:
       x-ticvai-self-scoped: subject
       x-ticvai-scope-level: tenant
       x-ticvai-read-routing: replica
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
       security:
       - guestAuth: []
       - bearerAuth: []
@@ -2768,6 +3122,11 @@ paths:
       - partner
       x-ticvai-read-routing: replica
       summary: List orders
+      description: '**The staff list: venue-scoped, filtered by venue, cashier and shift.** A guest''s
+        own history is `listMyOrders`, which is scoped to the caller rather than filtered by a parameter
+        (raised 24 August for `WEB-019` and `GST-019`). A guest surface does not load its list from here.
+
+        '
       tags:
       - order
       x-ticvai-permission: ORDER_VIEW
@@ -2778,30 +3137,35 @@ paths:
       parameters:
       - name: venueId
         in: query
+        description: Exact match. Omit for every venue the caller's grants reach.
         schema:
           type: string
           format: uuid
       - name: principalId
         in: query
-        description: Requires ORDER_VIEW_OTHER when not the caller.
+        description: The cashier who raised the order. Requires ORDER_VIEW_OTHER when not the caller.
         schema:
           type: string
           format: uuid
       - name: shiftId
         in: query
+        description: Exact match on the shift the order was taken in.
         schema:
           type: string
+          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
       - name: status
         in: query
         schema:
           $ref: '#/components/schemas/OrderStatus'
       - name: createdFrom
         in: query
+        description: Only orders whose `createdAt` is at or after this instant.
         schema:
           type: string
           format: date-time
       - name: createdTo
         in: query
+        description: Only orders whose `createdAt` is before this instant.
         schema:
           type: string
           format: date-time
@@ -2809,7 +3173,7 @@ paths:
       - $ref: ../shared/common.yaml#/components/parameters/PageCursor
       responses:
         '200':
-          description: Orders
+          description: Orders, newest first — `createdAt` descending, `id` as the tiebreak.
           content:
             application/json:
               schema:
@@ -2892,14 +3256,15 @@ paths:
         '403':
           $ref: ../shared/common.yaml#/components/responses/Forbidden
         '409':
-          description: 'A lease covering a line has expired, capacity is exhausted, or the catalogue bundle
-            the client priced from is beyond its staleness bound.
+          description: 'A lease covering a line has expired (`leaseExpired`), capacity is exhausted
+            (`capacityExhausted`), or the catalogue bundle the client priced from is beyond its staleness
+            bound (`bundleStale`). `lineIds` names the lines a lease or capacity refusal is about.
 
             '
           content:
             application/problem+json:
               schema:
-                $ref: ../shared/common.yaml#/components/schemas/Problem
+                $ref: '#/components/schemas/OrderRefusedProblem'
   /orders/{orderId}:
     parameters:
     - name: orderId
@@ -2998,11 +3363,12 @@ paths:
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
         '409':
-          description: The order has no dated line, so there is nothing to put in a calendar.
+          description: The order has no dated line, so there is nothing to put in a calendar
+            (`noDatedLine`).
           content:
             application/problem+json:
               schema:
-                $ref: ../shared/common.yaml#/components/schemas/Problem
+                $ref: '#/components/schemas/OrderRefusedProblem'
   /orders/{orderId}/reminder:
     parameters:
     - name: orderId
@@ -3069,6 +3435,9 @@ paths:
               $ref: '#/components/schemas/VisitReminder'
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Saved
           content:
             application/json:
@@ -3111,12 +3480,16 @@ paths:
       description: 'The guest has gone to fetch a wallet, or wants to add something after checking with
         someone. The cashier parks the sale and serves the next person.
 
-        **Not a reservation.** Nothing is held against inventory — a parked sale that reserved capacity
-        would let a queue of parked sales exhaust a session. Prices are re-evaluated on resume, and a
-        price that moved is surfaced rather than silently applied.
+        **Not a reservation.** Parking holds nothing against inventory: it takes no lease and extends
+        none — a parked sale that reserved capacity would let a queue of parked sales exhaust a session.
+        **A seated line that already carries a lease keeps that lease only until the lease''s own
+        expiry**, and parking does not stop the clock; a lease that lapses while the sale is parked comes
+        back from `resumeOrder` as `seatHoldExpired`. Prices are re-evaluated on resume, and a price that
+        moved is surfaced rather than silently applied.
 
         Held orders expire. A till that accumulates parked sales across a shift cannot be closed, and
-        the cashier who parked them has gone home.
+        the cashier who parked them has gone home. `label` and `holdUntil` are kept on the order
+        (`Order.holdLabel`, `Order.heldUntil`) so the held-orders list can show and sort them.
 
         '
       tags:
@@ -3151,17 +3524,25 @@ paths:
                   format: date-time
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Held
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Order'
         '409':
-          description: Order is already paid, voided, or contains a seat hold about to expire
+          description: 'Order is already paid (`alreadyPaid`) or voided (`orderVoided`) — only a
+            `pending` order is parked — or a seated line''s lease ends before `holdUntil`
+            (`seatLeaseExpiring`, naming the lines in `lineIds`), because parking cannot extend it and
+            the seats would go back on sale while the guest is away.
+
+            '
           content:
             application/problem+json:
               schema:
-                $ref: ../shared/common.yaml#/components/schemas/Problem
+                $ref: '#/components/schemas/OrderRefusedProblem'
   /orders/{orderId}/resume:
     parameters:
     - name: orderId
@@ -3209,17 +3590,21 @@ paths:
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Resumed, with any change since the hold reported
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/OrderResumeResult'
         '409':
-          description: Held order expired, or already resumed at another till
+          description: Held order expired (`holdExpired`), or already resumed at another till
+            (`alreadyResumed`).
           content:
             application/problem+json:
               schema:
-                $ref: ../shared/common.yaml#/components/schemas/Problem
+                $ref: '#/components/schemas/OrderRefusedProblem'
   /orders/{orderId}/discounts:
     parameters:
     - name: orderId
@@ -3278,19 +3663,23 @@ paths:
               $ref: '#/components/schemas/ManualDiscountRequest'
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Applied
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Order'
         '403':
-          description: 'Above the cashier''s limit and no approver supplied, or the approver is the requester.
+          description: 'Above the cashier''s limit and no approver supplied (`approverRequired`), or the
+            approver is the requester (`approverIsRequester`).
 
             '
           content:
             application/problem+json:
               schema:
-                $ref: ../shared/common.yaml#/components/schemas/Problem
+                $ref: '#/components/schemas/OrderRefusedProblem'
   /orders/{orderId}/voids:
     parameters:
     - name: orderId
@@ -3348,6 +3737,8 @@ paths:
                 id:
                   type: string
                   pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+                  description: Client-generated ULID of this void, and its idempotency key — it must
+                    equal the `Idempotency-Key` header.
                 reason:
                   type: string
                   minLength: 3
@@ -3357,17 +3748,23 @@ paths:
                   format: date-time
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Voided
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Order'
         '409':
-          description: Settled, or from a closed shift. Use a refund.
+          description: 'Settled — a payment on the order has been `captured`, so the money has moved
+            (`alreadySettled`) — or taken in a shift that is now closed (`shiftClosed`). Use a refund.
+
+            '
           content:
             application/problem+json:
               schema:
-                $ref: ../shared/common.yaml#/components/schemas/Problem
+                $ref: '#/components/schemas/OrderRefusedProblem'
   /orders/{orderId}/refunds:
     parameters:
     - name: orderId
@@ -3400,6 +3797,8 @@ paths:
       - partner
       x-ticvai-read-routing: replica
       summary: List refunds against an order
+      description: An unknown order, or one outside the caller's scope, is the shared 404; an order with
+        no refunds is an empty list.
       tags:
       - refund
       parameters:
@@ -3411,13 +3810,20 @@ paths:
       x-ticvai-conflict-policy: serverWins
       responses:
         '200':
-          description: Refunds
+          description: Refunds, newest first — `createdAt` descending, `id` as the tiebreak.
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/Refund'
+                allOf:
+                  - $ref: '../shared/common.yaml#/components/schemas/Page'
+                  - type: object
+                    properties:
+                      items:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/Refund'
+        '404':
+          $ref: ../shared/common.yaml#/components/responses/NotFound
     post:
       operationId: createRefund
       x-ticvai-consumed-by:
@@ -3465,6 +3871,9 @@ paths:
               $ref: '#/components/schemas/CreateRefundRequest'
       responses:
         '202':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: 'Accepted. May be `pendingApproval` where policy requires an approver, or `pendingGateway`
             while the provider is called.
 
@@ -3478,9 +3887,9 @@ paths:
         '403':
           $ref: ../shared/common.yaml#/components/responses/Forbidden
         '409':
-          description: 'Second authorisation required and absent, refund window closed, or the amount
-            exceeds what remains refundable. The problem detail names the threshold and the policy that
-            set it.
+          description: 'Second authorisation required and absent (`secondAuthorisationRequired`), refund
+            window closed (`refundWindowClosed`), or the amount exceeds what remains refundable
+            (`exceedsRefundable`). The problem names the threshold and the policy that set it.
 
             '
           content:
@@ -3531,6 +3940,9 @@ paths:
                     '
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Approved; gateway call proceeds
           content:
             application/json:
@@ -3538,6 +3950,16 @@ paths:
                 $ref: '#/components/schemas/Refund'
         '403':
           $ref: ../shared/common.yaml#/components/responses/Forbidden
+        '409':
+          description: 'The refund is not waiting for approval (`notPendingApproval`) — it was already
+            approved, declined, completed or failed. Only a `pendingApproval` refund is approved
+            (states/refund.yaml).
+
+            '
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/RefundPolicyProblem'
       x-ticvai-step-up: mfa
       x-ticvai-step-up-reason: Money leaves. The one approval a compromised session is most obviously
         worth taking.
@@ -3600,30 +4022,18 @@ paths:
                   maxLength: 500
       responses:
         '202':
-          description: Queued for approval
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: 'Queued for approval. **The batch is a row** (`RefundBatch`), and each refund it
+            raises carries its `batchId`, so the aggregate that needed approving is what a reader sees
+            afterwards.
+
+            '
           content:
             application/json:
               schema:
-                type: object
-                required:
-                - batchId
-                - affectedOrders
-                - estimatedTotal
-                - status
-                properties:
-                  batchId:
-                    type: string
-                  affectedOrders:
-                    type: integer
-                  estimatedTotal:
-                    $ref: ../shared/common.yaml#/components/schemas/Money
-                  status:
-                    type: string
-                    enum:
-                    - pendingApproval
-                    - processing
-                    - completed
-                    - failed
+                $ref: '#/components/schemas/RefundBatch'
   /refund-requests:
     post:
       operationId: createRefundRequest
@@ -3665,22 +4075,23 @@ paths:
               properties:
                 orderId:
                   type: string
+                  pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
                 lineIds:
                   type: array
                   items:
                     type: string
+                    pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
                 reason:
                   type: string
                   minLength: 3
                   maxLength: 1000
       responses:
         '403':
-          description: Order does not belong to the authenticated subject
-          content:
-            application/problem+json:
-              schema:
-                $ref: ../shared/common.yaml#/components/schemas/Problem
+          $ref: ../shared/common.yaml#/components/responses/Forbidden
         '202':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Submitted to the approval queue
           content:
             application/json:
@@ -3762,6 +4173,9 @@ paths:
               $ref: '#/components/schemas/RefundPolicy'
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Set
           content:
             application/json:
@@ -3808,23 +4222,27 @@ paths:
               $ref: '#/components/schemas/CreatePaymentRequest'
       responses:
         '201':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Recorded
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Payment'
         '402':
-          description: Declined by the provider
+          description: Declined by the provider (`providerDeclined`).
           content:
             application/problem+json:
               schema:
-                $ref: ../shared/common.yaml#/components/schemas/Problem
+                $ref: '#/components/schemas/PaymentProblem'
         '409':
-          description: Tender unavailable offline, or amount exceeds the balance due
+          description: Tender unavailable offline (`tenderUnavailableOffline`), or amount exceeds the
+            balance due (`exceedsBalanceDue`).
           content:
             application/problem+json:
               schema:
-                $ref: ../shared/common.yaml#/components/schemas/Problem
+                $ref: '#/components/schemas/PaymentProblem'
   /payments/{paymentId}/inquiry:
     parameters:
     - name: paymentId
@@ -3868,6 +4286,9 @@ paths:
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Reconciled against the provider
           content:
             application/json:
@@ -3876,11 +4297,11 @@ paths:
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
         '503':
-          description: Provider unreachable. Retry; do not assume an outcome.
+          description: Provider unreachable (`providerUnreachable`). Retry; do not assume an outcome.
           content:
             application/problem+json:
               schema:
-                $ref: ../shared/common.yaml#/components/schemas/Problem
+                $ref: '#/components/schemas/PaymentProblem'
   /payments/{paymentId}/tip:
     parameters:
     - name: paymentId
@@ -3949,17 +4370,21 @@ paths:
                   format: date-time
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Recorded
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Payment'
         '409':
-          description: Payment not settled, or a tip is already recorded against it
+          description: Payment not settled — not yet `captured` (`notCaptured`) — or a tip is already
+            recorded against it (`tipAlreadyRecorded`).
           content:
             application/problem+json:
               schema:
-                $ref: ../shared/common.yaml#/components/schemas/Problem
+                $ref: '#/components/schemas/PaymentProblem'
   /payments/{paymentId}/capture:
     parameters:
     - name: paymentId
@@ -4000,11 +4425,32 @@ paths:
                   $ref: ../shared/common.yaml#/components/schemas/Money
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Captured
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Payment'
+        '402':
+          description: Capture refused by the issuer (`providerDeclined`); the payment moves to
+            `declined` (states/payment.yaml).
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/PaymentProblem'
+        '409':
+          description: 'Only an `authorised` payment is captured (`notAuthorised`). The amount may not
+            exceed what was authorised (`aboveAuthorisedAmount`), and less than that is refused where
+            the provider does not support partial capture (`partialCaptureNotSupported`,
+            `PaymentProvider.supportsPartialCapture` false).
+
+            '
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/PaymentProblem'
   /reservations/{reservationId}/convert:
     parameters:
     - name: reservationId
@@ -4028,17 +4474,20 @@ paths:
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       responses:
         '201':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Converted
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Order'
         '409':
-          description: Expired or already converted
+          description: Expired (`reservationExpired`) or already converted (`alreadyConverted`).
           content:
             application/problem+json:
               schema:
-                $ref: ../shared/common.yaml#/components/schemas/Problem
+                $ref: '#/components/schemas/ReservationProblem'
   /sync/orders:
     post:
       operationId: syncOrders
@@ -4085,8 +4534,13 @@ paths:
                   maxItems: 200
                   items:
                     $ref: '#/components/schemas/OfflineOrder'
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Batch processed, wholly or up to the first rejection
           content:
             application/json:
@@ -4109,6 +4563,9 @@ paths:
       description: 'Needs operator attention. These will not retry — surfacing them is the difference
         between a reconciliation task and silent data loss behind an "all synced" indicator.
 
+        A rejection leaves this list''s unresolved view when `resolveSyncRejection` records what was
+        done about it.
+
         '
       tags:
       - sync
@@ -4119,14 +4576,36 @@ paths:
       parameters:
       - name: workstationId
         in: query
+        description: Exact match on the till that journalled the entry. A filter, not a resource — an
+          unknown workstation returns an empty page, not a 404.
         schema:
           type: string
           format: uuid
+      - name: kind
+        in: query
+        description: Exact match on `SyncRejection.kind`. Omit for every kind.
+        schema:
+          type: string
+          enum:
+          - order
+          - payment
+          - refund
+          - void
+          - scan
+      - name: resolved
+        in: query
+        description: '`false` returns only rejections still waiting for a decision (`resolvedAt` null),
+          `true` only those resolved. Omit for both.
+
+          '
+        schema:
+          type: boolean
       - $ref: ../shared/common.yaml#/components/parameters/PageSize
       - $ref: ../shared/common.yaml#/components/parameters/PageCursor
       responses:
         '200':
-          description: Rejections
+          description: Rejections, oldest first — `rejectedAt` ascending, `id` as the tiebreak — so the
+            entry that has waited longest is at the top.
           content:
             application/json:
               schema:
@@ -4138,6 +4617,62 @@ paths:
                       type: array
                       items:
                         $ref: '#/components/schemas/SyncRejection'
+  /sync/rejections/{rejectionId}/resolve:
+    parameters:
+    - name: rejectionId
+      in: path
+      required: true
+      schema:
+        type: string
+        pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+    post:
+      operationId: resolveSyncRejection
+      x-ticvai-audience:
+      - staff
+      summary: Record what was done about a refused entry
+      description: '**A rejection is a reconciliation task, and a task needs a way to be finished.**
+        `SyncRejection` carried `resolvedAt` and `resolvedByPrincipalId` and no operation wrote them, so
+        a rejection the supervisor had dealt with stayed on the list for ever, and posting it a second
+        time was guarded by nothing but the new order''s own id.
+
+        **Resolving records the act; it does not perform it.** The supervisor posts the sale with
+        `createOrder`, voids it with `voidOrder` or refunds it with `createRefund` (F33 step 8), then
+        calls this with what they did and the id it produced. The rejection then leaves the unresolved
+        view of `listSyncRejections`.
+
+        **Resolved once.** A second call with the same resolution and record is the same answer; a
+        different one on an already-resolved rejection is refused, because two resolutions of one
+        entry is the double post this operation exists to stop.
+
+        '
+      tags:
+      - sync
+      x-ticvai-permission: ORDER_MODIFY
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ResolveSyncRejectionRequest'
+      responses:
+        '200':
+          description: Resolved. The rejection, with `resolvedAt`, `resolvedByPrincipalId`, `resolution`
+            and `resolvedRecordId` set.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SyncRejection'
+        '409':
+          description: Already resolved, differently (`alreadyResolved`).
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/OrderRefusedProblem'
   /orders/{orderId}/modify:
     parameters:
     - name: orderId
@@ -4191,19 +4726,23 @@ paths:
               $ref: '#/components/schemas/ModifyOrderRequest'
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Modified, with the balance to settle
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/OrderModificationResult'
         '409':
-          description: 'A targeted line''s entitlement has been redeemed, or the order is voided.
+          description: 'A targeted line''s entitlement has been redeemed (`lineRedeemed`, naming it in
+            `lineIds`), or the order is voided (`orderVoided`).
 
             '
           content:
             application/problem+json:
               schema:
-                $ref: ../shared/common.yaml#/components/schemas/Problem
+                $ref: '#/components/schemas/OrderRefusedProblem'
   /media/{mediaCode}/entitlements:
     parameters:
     - name: mediaCode
@@ -4224,6 +4763,9 @@ paths:
       summary: What is already on this media
       description: 'Scanned at a counter before adding something. Shows what the guest holds so a cashier
         does not sell a locker to someone who already has one.
+
+        **Media here is the glossary''s Media: the QR, wristband or card that carries a ticket.** It is
+        not a digital-library asset (`assets.yaml`), which shares the `/media` prefix and nothing else.
 
         '
       tags:
@@ -4287,6 +4829,9 @@ paths:
               $ref: '#/components/schemas/AppendEntitlementRequest'
       responses:
         '201':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: 'Appended. Returns the new order and the media''s full entitlement set, so the
             cashier can tell the guest what their QR now does.
 
@@ -4296,9 +4841,11 @@ paths:
               schema:
                 $ref: '#/components/schemas/AppendEntitlementResult'
         '409':
-          description: 'Media expired, blocked, already surrendered at exit, or the entitlement cannot
-            share media — a single-entry ticket surrendered at the gate is not a claim token for anything
-            bought afterwards.
+          description: 'Media expired (`mediaExpired`), blocked (`mediaBlocked`), already surrendered at
+            exit (`mediaSurrendered`), or the entitlement cannot share media
+            (`entitlementCannotShareMedia`) — a single-entry ticket surrendered at the gate is not a claim
+            token for anything bought afterwards. Also refused where the media was issued for another
+            venue (`venueMismatch`), or its holder has already left for the day (`guestAlreadyDeparted`).
 
             '
           content:
@@ -4306,11 +4853,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/AppendRefusedProblem'
         '404':
-          description: Media not recognised at this venue
-          content:
-            application/problem+json:
-              schema:
-                $ref: ../shared/common.yaml#/components/schemas/Problem
+          $ref: ../shared/common.yaml#/components/responses/NotFound
   /orders/{orderId}/exchanges:
     parameters:
     - name: orderId
@@ -4366,19 +4909,24 @@ paths:
               $ref: '#/components/schemas/ExchangeOrderRequest'
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Exchanged
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/OrderExchangeResult'
         '409':
-          description: 'Replacement unavailable, outside the exchange window, or the original is redeemed.
+          description: 'Replacement unavailable (`replacementUnavailable`), outside the exchange window
+            (`outsideExchangeWindow`), or the original is redeemed (`lineRedeemed`). `lineIds` names the
+            lines concerned.
 
             '
           content:
             application/problem+json:
               schema:
-                $ref: ../shared/common.yaml#/components/schemas/Problem
+                $ref: '#/components/schemas/OrderRefusedProblem'
   /orders/{orderId}/reschedule:
     parameters:
     - name: orderId
@@ -4442,6 +4990,7 @@ paths:
                   description: Omit to move the whole order.
                   items:
                     type: string
+                    pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
                 waiveFee:
                   type: boolean
                   default: false
@@ -4453,17 +5002,21 @@ paths:
                   format: date-time
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Rescheduled
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/OrderExchangeResult'
         '409':
-          description: Target performance is unavailable or outside the reschedule window
+          description: Target performance is unavailable (`targetUnavailable`) or outside the
+            reschedule window (`outsideRescheduleWindow`).
           content:
             application/problem+json:
               schema:
-                $ref: ../shared/common.yaml#/components/schemas/Problem
+                $ref: '#/components/schemas/OrderRefusedProblem'
   /orders/{orderId}/reprints:
     parameters:
     - name: orderId
@@ -4498,8 +5051,11 @@ paths:
       - guest
       - partner
       summary: Reprint or resend tickets
-      description: 'Reprint count is recorded per line. Repeated reprints on one order is a signal worth
-        surfacing — usually a printer fault, occasionally something else.
+      description: 'Reprint count is recorded per line (`OrderLine.reprintCount`). Repeated reprints on
+        one order is a signal worth surfacing — usually a printer fault, occasionally something else.
+
+        Offline-capable, so it carries `recordedAt`: the moment the till reprinted, kept apart from when
+        the server heard about it.
 
         '
       tags:
@@ -4518,6 +5074,7 @@ paths:
               type: object
               required:
               - delivery
+              - recordedAt
               properties:
                 delivery:
                   type: string
@@ -4531,8 +5088,10 @@ paths:
                   type: string
                 lineIds:
                   type: array
+                  description: Omit to reprint every line.
                   items:
                     type: string
+                    pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
                 reason:
                   type: string
                   enum:
@@ -4541,8 +5100,15 @@ paths:
                   - lostTicket
                   - notReceived
                   - other
+                recordedAt:
+                  type: string
+                  format: date-time
+                  description: When the till reprinted — device time, as for every offline-capable write.
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Reissued
           content:
             application/json:
@@ -4551,10 +5117,28 @@ paths:
                 properties:
                   reprintCount:
                     type: integer
+                    description: The order's total, the sum of `lines[].reprintCount`.
+                  lines:
+                    type: array
+                    description: The count per reprinted line, as recorded on `OrderLine.reprintCount`.
+                    items:
+                      type: object
+                      required:
+                      - lineId
+                      - reprintCount
+                      properties:
+                        lineId:
+                          type: string
+                          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+                        reprintCount:
+                          type: integer
                   reissuedTicketIds:
                     type: array
+                    description: The entitlements reprinted. A ticket is an entitlement, so these are
+                      `Entitlement.id` values.
                     items:
                       type: string
+                      pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
         '400':
           $ref: ../shared/common.yaml#/components/responses/BadRequest
   /orders/{orderId}/transfer:
@@ -4621,8 +5205,14 @@ paths:
                 ticketIds:
                   type: array
                   minItems: 1
+                  description: '**The entitlements to hand over.** A ticket is an entitlement, so each
+                    value is an `Entitlement.id` on this order — the ids in `OrderLine.entitlementIds`.
+                    Stored as `orders.ticket_transfer.ticket_ids`, each pointing at `access.entitlement`.
+
+                    '
                   items:
                     type: string
+                    pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
                 recipient:
                   type: object
                   required:
@@ -4642,19 +5232,24 @@ paths:
                   maxLength: 500
       responses:
         '202':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Transfer offered, pending claim
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/TicketTransfer'
         '409':
-          description: 'Ticket already redeemed, already offered, or the product forbids transfer.
+          description: 'Ticket already redeemed (`alreadyRedeemed`), already offered (`alreadyOffered`),
+            or the product forbids transfer (`transferNotAllowed`). `ticketIds` names the tickets refused,
+            so the guest can send the rest.
 
             '
           content:
             application/problem+json:
               schema:
-                $ref: ../shared/common.yaml#/components/schemas/Problem
+                $ref: '#/components/schemas/TicketTransferProblem'
   /ticket-transfers/{transferId}/claim:
     parameters:
     - name: transferId
@@ -4693,19 +5288,89 @@ paths:
               properties:
                 claimToken:
                   type: string
+                  description: The token carried in the claim link, checked against
+                    `TicketTransfer.claimToken`.
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Claimed. Ownership moves now, not at offer
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/TicketTransfer'
         '410':
-          description: Offer expired or already claimed
+          description: Offer expired (`offerExpired`), already claimed (`alreadyClaimed`), or withdrawn by
+            the sender (`offerCancelled`).
           content:
             application/problem+json:
               schema:
-                $ref: ../shared/common.yaml#/components/schemas/Problem
+                $ref: '#/components/schemas/TicketTransferProblem'
+  /ticket-transfers:
+    get:
+      operationId: listTicketTransfers
+      x-ticvai-audience:
+      - guest
+      summary: The ticket transfers this guest sent or received
+      description: '**`TicketTransfer` was only ever the answer to a POST.** A guest who sent tickets had
+        no way to see them again — whether the recipient claimed, whether the offer lapsed and the tickets
+        came back — and `WEB-030` and `GST-014` bound their *every ticket transfer* table to the order
+        list, which carries no transfer at all.
+
+        **Scoped to the caller, not filtered by them** — the same shape as `listMyOrders`. A transfer
+        appears where the caller is its sender (`fromSubjectId`) or, once claimed, its recipient
+        (`toSubjectId`).
+
+        '
+      tags:
+      - order
+      x-ticvai-permission: null
+      x-ticvai-self-scoped: subject
+      x-ticvai-scope-level: tenant
+      x-ticvai-read-routing: replica
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      security:
+      - guestAuth: []
+      parameters:
+      - name: direction
+        in: query
+        description: '`sent` for transfers the caller offered, `received` for those they claimed. Omit
+          for both.
+
+          '
+        schema:
+          type: string
+          enum:
+          - sent
+          - received
+      - name: status
+        in: query
+        description: Exact match on `TicketTransfer.status`. Omit for every status.
+        schema:
+          type: string
+          enum:
+          - offered
+          - claimed
+          - expired
+          - cancelled
+      - $ref: ../shared/common.yaml#/components/parameters/PageSize
+      - $ref: ../shared/common.yaml#/components/parameters/PageCursor
+      responses:
+        '200':
+          description: Transfers, newest offer first — `offeredAt` descending, `id` as the tiebreak.
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: ../shared/common.yaml#/components/schemas/Page
+                - type: object
+                  properties:
+                    items:
+                      type: array
+                      items:
+                        $ref: '#/components/schemas/TicketTransfer'
   /orders/{orderId}/statement:
     parameters:
     - name: orderId
@@ -4767,15 +5432,25 @@ paths:
       - guest
       x-ticvai-read-routing: replica
       summary: List reservations
+      description: '**Who sees what.** Staff see the reservations of every venue their grants reach. **A
+        guest sees only reservations held for them** (`Reservation.subjectId` equal to the caller): a
+        guest token never widens to another subject (`guestAuth`), so the venue scope narrows further to
+        the caller for a guest session, and no parameter can widen it.
+
+        '
       tags:
       - reservation
       x-ticvai-permission: ORDER_VIEW
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
+      security:
+      - bearerAuth: []
+      - guestAuth: []
       parameters:
       - name: status
         in: query
+        description: Exact match. Omit for every status.
         schema:
           type: string
           enum:
@@ -4785,13 +5460,19 @@ paths:
           - cancelled
       - name: expiringWithinMinutes
         in: query
+        description: '**Only `held` reservations whose `expiresAt` falls within this many minutes of
+          now** — the ones about to release capacity. Implies `status=held`; combined with another
+          status it returns nothing.
+
+          '
         schema:
           type: integer
+          minimum: 1
       - $ref: ../shared/common.yaml#/components/parameters/PageSize
       - $ref: ../shared/common.yaml#/components/parameters/PageCursor
       responses:
         '200':
-          description: Reservations
+          description: Reservations, soonest `expiresAt` first, `id` as the tiebreak.
           content:
             application/json:
               schema:
@@ -4828,17 +5509,20 @@ paths:
               $ref: '#/components/schemas/CreateReservationRequest'
       responses:
         '201':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Held
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Reservation'
         '409':
-          description: Capacity unavailable
+          description: Capacity unavailable (`capacityUnavailable`).
           content:
             application/problem+json:
               schema:
-                $ref: ../shared/common.yaml#/components/schemas/Problem
+                $ref: '#/components/schemas/ReservationProblem'
   /reservations/{reservationId}:
     parameters:
     - name: reservationId
@@ -4858,12 +5542,16 @@ paths:
       - guest
       x-ticvai-read-routing: primary
       summary: Read a reservation
+      description: A guest reads only a reservation held for them; another guest's is the shared 404.
       tags:
       - reservation
       x-ticvai-permission: ORDER_VIEW
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
+      security:
+      - bearerAuth: []
+      - guestAuth: []
       responses:
         '200':
           description: Reservation
@@ -4883,24 +5571,32 @@ paths:
       - staff
       - guest
       summary: Cancel a reservation
-      description: Releases held capacity immediately rather than waiting for expiry.
+      description: Releases held capacity immediately rather than waiting for expiry. A guest cancels
+        only a reservation held for them.
       tags:
       - reservation
       x-ticvai-permission: ORDER_CANCEL
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
+      security:
+      - bearerAuth: []
+      - guestAuth: []
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       responses:
         '204':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Cancelled
         '409':
-          description: Already converted
+          description: Already converted (`alreadyConverted`), or no longer held — expired or already
+            cancelled (`reservationNotHeld`).
           content:
             application/problem+json:
               schema:
-                $ref: ../shared/common.yaml#/components/schemas/Problem
+                $ref: '#/components/schemas/ReservationProblem'
   /reservations/{reservationId}/extend:
     parameters:
     - name: reservationId
@@ -4928,17 +5624,21 @@ paths:
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Extended
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Reservation'
         '409':
-          description: Expired, or the extension limit is reached
+          description: Expired (`reservationExpired`), or the extension limit is reached
+            (`extensionLimitReached`).
           content:
             application/problem+json:
               schema:
-                $ref: ../shared/common.yaml#/components/schemas/Problem
+                $ref: '#/components/schemas/ReservationProblem'
   /b2b-accounts/{accountId}/credit:
     parameters:
     - name: accountId
@@ -5023,6 +5723,9 @@ paths:
                   maxLength: 500
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Updated
           content:
             application/json:
@@ -5071,6 +5774,7 @@ paths:
               properties:
                 orderId:
                   type: string
+                  pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
                 amount:
                   $ref: ../shared/common.yaml#/components/schemas/Money
                 reason:
@@ -5082,6 +5786,9 @@ paths:
                   format: date-time
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Override recorded
           content:
             application/json:
@@ -5192,6 +5899,8 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/UpgradeConversionPathBuilderInput'
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       responses:
         '200':
           description: Upgrade & Conversion Path Builder
@@ -5350,6 +6059,8 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/ProRataResidualValueEntitlementCreditConfigurationInput'
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       responses:
         '200':
           description: Pro-Rata, Residual Value & Entitlement Credit Configuration
@@ -5468,6 +6179,8 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/UpgradeExecutionCredentialRegenerationChannelControlInput'
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       responses:
         '200':
           description: Upgrade Execution, Credential Regeneration & Channel Controls
@@ -5732,6 +6445,8 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/GroupPackageExperienceBuilderInput'
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       responses:
         '200':
           description: Group Package & Experience Builder
@@ -5775,6 +6490,8 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/GroupQuotationBuilderProposalGenerationInput'
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       responses:
         '200':
           description: Group Quotation Builder & Proposal Generation
@@ -5855,6 +6572,8 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/GroupDiscountExceptionApprovalWorkflowInput'
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       responses:
         '200':
           description: Group Discount, Exception & Approval Workflow
@@ -5936,6 +6655,8 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/GroupBooking360HandoverWorkspaceInput'
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       responses:
         '200':
           description: Group Booking 360° & Handover Workspace
@@ -6016,6 +6737,8 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/GroupOperationalPlanningTaskWorkspaceInput'
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       responses:
         '200':
           description: Group Operational Planning & Task Workspace
@@ -6501,6 +7224,8 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/OrderDetailTransactionWorkspaceInput'
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       responses:
         '200':
           description: Order Detail & Transaction Workspace
@@ -6544,6 +7269,8 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/ReservationHoldPolicyConfigurationInput'
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       responses:
         '200':
           description: Reservation & Hold Policy Configuration
@@ -6587,6 +7314,8 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/OrderReservationStatusLifecycleConfigurationInput'
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       responses:
         '200':
           description: Order & Reservation Status Lifecycle Configuration
@@ -6629,6 +7358,8 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/OrderCreationSourceChannelConfigurationInput'
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       responses:
         '200':
           description: Order Creation & Source/Channel Configuration
@@ -6671,6 +7402,8 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/CustomerGuestAccountAssignmentInput'
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       responses:
         '200':
           description: Customer, Guest & Account Assignment
@@ -6949,6 +7682,8 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/OrderAmendmentWorkspaceInput'
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       responses:
         '200':
           description: Order Amendment Workspace
@@ -6992,6 +7727,8 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/AmendmentEligibilityPolicyRuleBuilderInput'
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       responses:
         '200':
           description: Amendment Eligibility & Policy Rule Builder
@@ -7035,6 +7772,8 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/CancellationPartialCancellationPolicyConfigurationInput'
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       responses:
         '200':
           description: Cancellation & Partial Cancellation Policy Configuration
@@ -7154,6 +7893,8 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/AfterSalesFinancialSettlementAdjustmentWorkspaceInput'
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       responses:
         '200':
           description: After-Sales Financial Settlement & Adjustment Workspace
@@ -7196,6 +7937,8 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/ApprovalExceptionServiceRecoveryManagementInput'
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       responses:
         '200':
           description: Approval, Exception & Service Recovery Management
@@ -7399,6 +8142,8 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/MultiPaymentSplitTenderPaymentAllocationConfiguratioInput'
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       responses:
         '200':
           description: Multi-Payment, Split Tender & Payment Allocation Configuration
@@ -7877,6 +8622,8 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/ResaleEligibilityRuleConfigurationInput'
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       responses:
         '200':
           description: Resale Eligibility Rule Configuration
@@ -7958,6 +8705,8 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/ListingCreationSellerConfigurationInput'
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       responses:
         '200':
           description: Listing Creation & Seller Configuration
@@ -8076,6 +8825,8 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/ListingApprovalModerationInput'
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       responses:
         '200':
           description: Listing Approval & Moderation
@@ -8194,6 +8945,8 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/AiResaleConfigurationMarketplaceRecommendationsInput'
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       responses:
         '200':
           description: AI Resale Configuration & Marketplace Recommendations
@@ -9028,6 +9781,8 @@ paths:
         there was nowhere to read one. `failureReason` is on the row precisely so the answer does not
         require reading a payment provider''s logs.
 
+        An unknown membership is the shared 404; one never renewed is an empty list.
+
         '
       tags:
       - orders
@@ -9036,6 +9791,8 @@ paths:
       - staff
       x-ticvai-scope-level: venue
       x-ticvai-read-routing: replica
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
       parameters:
       - name: membershipId
         in: path
@@ -9047,13 +9804,21 @@ paths:
       - $ref: ../shared/common.yaml#/components/parameters/PageCursor
       responses:
         '200':
-          description: Renewals
+          description: Renewals, most recent attempt first — `attemptedAt` descending, `id` as the
+            tiebreak.
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/OrdersMembershipRenewal'
+                allOf:
+                  - $ref: '../shared/common.yaml#/components/schemas/Page'
+                  - type: object
+                    properties:
+                      items:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/OrdersMembershipRenewal'
+        '404':
+          $ref: ../shared/common.yaml#/components/responses/NotFound
     post:
       operationId: renewMembership
       summary: Renew a membership
@@ -9072,6 +9837,8 @@ paths:
       - staff
       - service
       x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
       parameters:
       - name: membershipId
         in: path
@@ -9088,17 +9855,21 @@ paths:
               $ref: '#/components/schemas/OrdersMembershipRenewal'
       responses:
         '201':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Renewed
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/OrdersMembershipRenewal'
         '409':
-          description: Outside the grace period, or already renewed for this term
+          description: Outside the grace period (`outsideGracePeriod`), or already renewed for this term
+            (`alreadyRenewedForTerm`).
           content:
             application/problem+json:
               schema:
-                $ref: ../shared/common.yaml#/components/schemas/Problem
+                $ref: '#/components/schemas/MembershipRenewalProblem'
   /deposits:
     get:
       operationId: listDeposits
@@ -9115,12 +9886,15 @@ paths:
       - staff
       x-ticvai-scope-level: venue
       x-ticvai-read-routing: replica
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/PageSize
       - $ref: ../shared/common.yaml#/components/parameters/PageCursor
       responses:
         '200':
-          description: Deposits and their authorisation state
+          description: Deposits and their authorisation state, newest first — `createdAt` descending,
+            `id` as the tiebreak.
           content:
             application/json:
               schema:
@@ -9147,12 +9921,15 @@ paths:
       - staff
       x-ticvai-scope-level: venue
       x-ticvai-read-routing: replica
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/PageSize
       - $ref: ../shared/common.yaml#/components/parameters/PageCursor
       responses:
         '200':
-          description: Discounts applied to orders
+          description: Discounts applied to orders, newest first — `createdAt` descending, `id` as the
+            tiebreak.
           content:
             application/json:
               schema:
@@ -9172,6 +9949,8 @@ paths:
         **A booking fee is not a line and not a tax**, and putting it in either makes one of the two
         wrong. A guest disputing a total is usually disputing a fee, and until now there was nowhere
         to read them.
+
+        An unknown order is the shared 404; an order with no fees is an empty list.
       tags:
       - orders
       x-ticvai-permission: ORDER_VIEW
@@ -9179,24 +9958,34 @@ paths:
       - staff
       x-ticvai-scope-level: venue
       x-ticvai-read-routing: replica
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
       parameters:
       - name: orderId
         in: path
         required: true
         schema:
           type: string
-          format: uuid
+          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
       - $ref: ../shared/common.yaml#/components/parameters/PageSize
       - $ref: ../shared/common.yaml#/components/parameters/PageCursor
       responses:
         '200':
-          description: Fees charged on an order
+          description: Fees charged on an order, in the order they were applied — `createdAt`
+            ascending, `id` as the tiebreak.
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/OrdersOrderFee'
+                allOf:
+                  - $ref: '../shared/common.yaml#/components/schemas/Page'
+                  - type: object
+                    properties:
+                      items:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/OrdersOrderFee'
+        '404':
+          $ref: ../shared/common.yaml#/components/responses/NotFound
   /upgrades:
     get:
       operationId: listUpgrades
@@ -9212,12 +10001,15 @@ paths:
       - staff
       x-ticvai-scope-level: venue
       x-ticvai-read-routing: replica
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/PageSize
       - $ref: ../shared/common.yaml#/components/parameters/PageCursor
       responses:
         '200':
-          description: Upgrade requests and their outcome
+          description: Upgrade requests and their outcome, newest first — `createdAt` descending, `id`
+            as the tiebreak.
           content:
             application/json:
               schema:
@@ -9248,9 +10040,10 @@ components:
         id:
           type: string
           format: uuid
+          readOnly: true
         orderId:
           type: string
-          format: uuid
+          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
         customerId:
           type: string
           format: uuid
@@ -9263,15 +10056,15 @@ components:
           type: string
           maxLength: 10
         requiredAmount:
-          type: number
+          $ref: ../shared/common.yaml#/components/schemas/Money
         authorizedAmount:
-          type: number
+          $ref: ../shared/common.yaml#/components/schemas/Money
         capturedAmount:
-          type: number
+          $ref: ../shared/common.yaml#/components/schemas/Money
         releasedAmount:
-          type: number
+          $ref: ../shared/common.yaml#/components/schemas/Money
         forfeitedAmount:
-          type: number
+          $ref: ../shared/common.yaml#/components/schemas/Money
         status:
           type: string
           maxLength: 30
@@ -9299,9 +10092,10 @@ components:
         id:
           type: string
           format: uuid
+          readOnly: true
         orderId:
           type: string
-          format: uuid
+          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
         promotionId:
           type: string
           format: uuid
@@ -9317,7 +10111,7 @@ components:
           type: number
           nullable: true
         appliedAmount:
-          type: number
+          $ref: ../shared/common.yaml#/components/schemas/Money
         reason:
           type: string
           maxLength: 500
@@ -9339,41 +10133,52 @@ components:
         id:
           type: string
           format: uuid
+          readOnly: true
         customerMembershipId:
           type: string
           format: uuid
+          description: The membership in the path. Taken from the path on `renewMembership`.
         entitlementTemplateId:
           type: string
           format: uuid
         orderId:
           type: string
-          format: uuid
+          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
           nullable: true
+          readOnly: true
+          description: The order the renewal charged through. Set by the server.
         type:
           type: string
           maxLength: 30
         status:
           type: string
           maxLength: 30
+          readOnly: true
         previousExpiryAt:
           type: string
           format: date-time
           nullable: true
+          readOnly: true
         newExpiryAt:
           type: string
           format: date-time
           nullable: true
+          readOnly: true
+          description: Computed from the entitlement template's term and grace period.
         attemptedAt:
           type: string
           format: date-time
+          readOnly: true
         completedAt:
           type: string
           format: date-time
           nullable: true
+          readOnly: true
         failureReason:
           type: string
           maxLength: 500
           nullable: true
+          readOnly: true
     OrdersOrderFee:
       type: object
       x-ticvai-persistence: orders.order_fee
@@ -9391,7 +10196,7 @@ components:
           format: uuid
         orderId:
           type: string
-          format: uuid
+          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
         ruleId:
           type: string
           format: uuid
@@ -9414,9 +10219,9 @@ components:
           type: number
           nullable: true
         amount:
-          type: number
+          $ref: ../shared/common.yaml#/components/schemas/Money
         taxAmount:
-          type: number
+          $ref: ../shared/common.yaml#/components/schemas/Money
         createdAt:
           type: string
           format: date-time
@@ -9442,24 +10247,24 @@ components:
           maxLength: 50
         orderId:
           type: string
-          format: uuid
+          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
         originalOrderLineId:
           type: string
-          format: uuid
+          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
         newOrderLineId:
           type: string
-          format: uuid
+          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
           nullable: true
         ruleId:
           type: string
           format: uuid
           nullable: true
         originalAmount:
-          type: number
+          $ref: ../shared/common.yaml#/components/schemas/Money
         newAmount:
-          type: number
+          $ref: ../shared/common.yaml#/components/schemas/Money
         amount:
-          type: number
+          $ref: ../shared/common.yaml#/components/schemas/Money
         status:
           type: string
           maxLength: 30
@@ -9511,6 +10316,11 @@ components:
         id:
           type: string
           pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+          description: 'Client-generated ULID **of this modification, not of the order** — the order is
+            the path''s `orderId`. It is the modification''s idempotency key and must equal the
+            `Idempotency-Key` header.
+
+            '
         addLines:
           type: array
           items:
@@ -9519,6 +10329,7 @@ components:
           type: array
           items:
             type: string
+            pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
         reason:
           type: string
           maxLength: 500
@@ -9550,12 +10361,13 @@ components:
         id:
           type: string
           format: uuid
+          readOnly: true
         orderId:
           type: string
-          format: uuid
+          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
         reservationId:
           type: string
-          format: uuid
+          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
           nullable: true
           description: 'Where the link was issued against a reservation rather than an order. **A reservation
             holds inventory and carries no money**, which is the whole reason a link is needed.
@@ -9564,6 +10376,7 @@ components:
         token:
           type: string
           format: password
+          writeOnly: true
           description: '**Write-only, single purpose, and it is the only thing the guest presents.** Long
             enough not to be guessed and scoped to one order — **a token that can read a second order
             is a token that read somebody else''s booking.**
@@ -9715,7 +10528,7 @@ components:
           nullable: true
         orderId:
           type: string
-          format: uuid
+          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
         leaderSubjectId:
           type: string
           format: uuid
@@ -9818,6 +10631,7 @@ components:
           readOnly: true
         orderId:
           type: string
+          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
           readOnly: true
         subjectId:
           type: string
@@ -9848,7 +10662,8 @@ components:
           description: '**The partition key** (ADR-0005). Operations write it at `venue` scope.'
     GroupBookingRequest:
       type: object
-      description: Request only. The caller is the leader.
+      description: Request only. The caller is the leader. `kind` is the same vocabulary as
+        `GroupBooking.kind`, so a request the guest makes can be any group the venue books.
       required:
       - kind
       - packageProductId
@@ -9858,9 +10673,10 @@ components:
         kind:
           type: string
           enum:
-          - school
-          - party
           - general
+          - school
+          - corporate
+          - party
         packageProductId:
           type: string
         preferredDate:
@@ -10023,9 +10839,15 @@ components:
           format: date-time
           nullable: true
           readOnly: true
+        preferredDate:
+          type: string
+          format: date
+          nullable: true
+          description: The date the guest asked for on `requestGroupBooking` — what its `409
+            dateUnavailable` is checked against. Null for a group a member of staff built from an order.
         orderId:
           type: string
-          format: uuid
+          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
         leaderSubjectId:
           type: string
           format: uuid
@@ -10088,7 +10910,7 @@ components:
           format: uuid
         entitlementId:
           type: string
-          format: uuid
+          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
         platform:
           type: string
           enum:
@@ -10099,6 +10921,7 @@ components:
         authenticationToken:
           type: string
           format: password
+          writeOnly: true
           description: '**Write-only.** How the device proves it may fetch an update, and the reason a
             leaked serial alone is not enough to read somebody''s ticket.
 
@@ -10148,6 +10971,7 @@ components:
         id:
           type: string
           format: uuid
+          readOnly: true
         eventId:
           type: string
           format: uuid
@@ -10194,6 +11018,8 @@ components:
           type: boolean
         scopePath:
           type: string
+          readOnly: true
+          description: '**The partition key** (ADR-0005). Operations write it at `venue` scope.'
     ResaleListing:
       type: object
       x-ticvai-persistence: orders.resale_listing
@@ -10216,9 +11042,10 @@ components:
         id:
           type: string
           format: uuid
+          readOnly: true
         entitlementId:
           type: string
-          format: uuid
+          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
         sellerSubjectId:
           type: string
           format: uuid
@@ -10227,17 +11054,23 @@ components:
         priceCapPercent:
           type: number
           nullable: true
+          readOnly: true
           description: '**A ceiling as a percentage of face value**, because uncapped resale is a venue
             watching its own tickets sold at four times the price with its name on them. Null means uncapped,
-            which is a venue decision rather than a default.
+            which is a venue decision rather than a default. Snapshotted from `ResaleFeePolicy` at listing.
 
             '
         sellerFeePercent:
           type: number
+          readOnly: true
+          description: Snapshotted from `ResaleFeePolicy` at listing.
         buyerFeePercent:
           type: number
+          readOnly: true
+          description: Snapshotted from `ResaleFeePolicy` at listing.
         status:
           type: string
+          readOnly: true
           enum:
           - listed
           - reserved
@@ -10247,12 +11080,15 @@ components:
         listedAt:
           type: string
           format: date-time
+          readOnly: true
         soldToSubjectId:
           type: string
           format: uuid
           nullable: true
+          readOnly: true
         payoutStatus:
           type: string
+          readOnly: true
           enum:
           - pending
           - held
@@ -10265,6 +11101,7 @@ components:
             '
         scopePath:
           type: string
+          readOnly: true
           description: '**The partition key** (ADR-0005). Added 31 August: the operations that write this
             table declare a scope and the table carried no column for it — **49 tables were in that state**,
             so a row could be written at venue scope and then read by anything that could reach the table.
@@ -10275,6 +11112,29 @@ components:
 
 
             **Operations write it at `venue` scope.**'
+    CreateResaleListingRequest:
+      type: object
+      x-ticvai-persistence: none — request only
+      description: 'Request only; persisted as `ResaleListing`. **What a seller decides**: which
+        entitlement, and at what price. The id, the status, the fee snapshot and the partition key are the
+        server''s, which is why `createResaleListing` no longer takes the whole listing.
+
+        '
+      required:
+      - entitlementId
+      - askPrice
+      properties:
+        entitlementId:
+          type: string
+          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+        askPrice:
+          $ref: ../shared/common.yaml#/components/schemas/Money
+        sellerSubjectId:
+          type: string
+          format: uuid
+          nullable: true
+          description: The holder listing it. A guest caller is always the seller and may name only
+            themselves; a member of staff listing on a guest's behalf names the guest.
     TicketTemplateRequest:
       type: object
       description: Request only; persisted as `TicketTemplate`. On update every field is optional and
@@ -10320,7 +11180,10 @@ components:
           type: boolean
     TicketTemplate:
       type: object
-      x-ticvai-persistence: orders.ticket_template
+      # `appliesToChannels` is an array of the shared `SalesChannel` enum, so it is a value list with
+      # rows of its own: one per template and channel. Named here so the uniqueness rule the create and
+      # update 409s enforce (priority per product kind, channel and media type) has a column to read.
+      x-ticvai-persistence: orders.ticket_template + orders.ticket_template_channel
       description: 'BL-102. **A venue changing its ticket artwork had no path that was not a code change.**
 
         2.16.6 asks to print a proof without processing a sale — the equivalent of `white-label.createPreview`,
@@ -10418,7 +11281,7 @@ components:
           format: uuid
         paymentId:
           type: string
-          format: uuid
+          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
         providerId:
           type: string
           format: uuid
@@ -10653,6 +11516,7 @@ components:
               default: false
         credentialRef:
           type: string
+          writeOnly: true
           description: 'A vault reference. **Never the credential**, never returned, and rotated without
             a contract change.
 
@@ -10667,6 +11531,24 @@ components:
           type: string
         isActive:
           type: boolean
+    SetPaymentProviderRequest:
+      x-ticvai-persistence: none — request only; the provider lands in payments.provider and its rules
+        in payments.routing_rule
+      description: 'Request only. **A provider and the rules that route to it**, because
+        `setPaymentProvider` is *"configure a gateway and its routing"* and writes both tables — and the
+        provider schema alone carried no routing field, so the routing half had nothing to arrive in.
+
+        '
+      allOf:
+      - $ref: '#/components/schemas/PaymentProvider'
+      - type: object
+        properties:
+          routing:
+            type: array
+            description: The ordered rules that send payments to this provider. `providerId` on each is
+              this provider's `id`.
+            items:
+              $ref: '#/components/schemas/PaymentRouting'
     PaymentRouting:
       type: object
       x-ticvai-persistence: payments.routing_rule
@@ -10773,7 +11655,9 @@ components:
         token:
           type: string
           format: password
+          writeOnly: true
           description: '**Write-only, never returned.** The provider''s reference to a credential it holds.
+            Required on the stored row; absent from every response.
 
             '
         method:
@@ -10860,7 +11744,7 @@ components:
           type: array
           items:
             type: string
-            format: uuid
+            pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
         issuedAt:
           type: string
           format: date-time
@@ -10948,15 +11832,18 @@ components:
           description: Positive means the guest pays; negative means a refund is due.
         refundId:
           type: string
+          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
           nullable: true
         revokedEntitlementIds:
           type: array
           items:
             type: string
+            pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
         issuedEntitlementIds:
           type: array
           items:
             type: string
+            pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
     ExchangeOrderRequest:
       type: object
       required:
@@ -10968,11 +11855,14 @@ components:
         id:
           type: string
           pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+          description: Client-generated ULID of this exchange, and its idempotency key — it must equal the
+            `Idempotency-Key` header.
         outgoingLineIds:
           type: array
           minItems: 1
           items:
             type: string
+            pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
         incomingLines:
           type: array
           minItems: 1
@@ -10998,6 +11888,7 @@ components:
       properties:
         orderId:
           type: string
+          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
         outgoingValue:
           $ref: ../shared/common.yaml#/components/schemas/Money
         incomingValue:
@@ -11015,14 +11906,17 @@ components:
           type: array
           items:
             type: string
+            pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
         revokedEntitlementIds:
           type: array
           items:
             type: string
+            pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
         issuedEntitlementIds:
           type: array
           items:
             type: string
+            pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
     TicketTransfer:
       x-ticvai-persistence: orders.ticket_transfer
       type: object
@@ -11036,12 +11930,17 @@ components:
       properties:
         id:
           type: string
+          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
         orderId:
           type: string
+          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
         ticketIds:
           type: array
+          description: The entitlements offered — `Entitlement.id` values, since a ticket is an
+            entitlement. Each points at `access.entitlement`.
           items:
             type: string
+            pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
         fromSubjectId:
           type: string
           format: uuid
@@ -11062,6 +11961,15 @@ components:
         claimUrl:
           type: string
           nullable: true
+        claimToken:
+          type: string
+          format: password
+          writeOnly: true
+          description: '**What `claimTicketTransfer` checks the presented `claimToken` against.** Carried
+            to the recipient inside `claimUrl` and never returned — the sender reading their transfer must
+            not be able to claim it on the recipient''s behalf.
+
+            '
         offeredAt:
           type: string
           format: date-time
@@ -11088,6 +11996,7 @@ components:
       properties:
         orderId:
           type: string
+          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
         orderNumber:
           type: string
         currency:
@@ -11208,6 +12117,7 @@ components:
             properties:
               orderId:
                 type: string
+                pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
               amount:
                 $ref: ../shared/common.yaml#/components/schemas/Money
               authorisedByPrincipalId:
@@ -11261,7 +12171,7 @@ components:
       properties:
         entitlementId:
           type: string
-          format: uuid
+          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
         productName:
           type: string
         status:
@@ -11329,6 +12239,7 @@ components:
             properties:
               entitlementId:
                 type: string
+                pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
               name:
                 type: string
               kind:
@@ -11344,6 +12255,7 @@ components:
                 - membership
               orderId:
                 type: string
+                pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
               addedAt:
                 type: string
                 format: date-time
@@ -11383,6 +12295,8 @@ components:
         id:
           type: string
           pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+          description: Client-generated ULID of the new order this creates, and its idempotency key — it
+            must equal the `Idempotency-Key` header.
         lines:
           type: array
           minItems: 1
@@ -11438,11 +12352,14 @@ components:
           type: array
           items:
             type: string
+            pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
     AppendRefusedProblem:
       allOf:
       - $ref: ../shared/common.yaml#/components/schemas/Problem
       - type: object
         x-ticvai-persistence: none — error shape
+        required:
+        - refusedReason
         properties:
           refusedReason:
             type: string
@@ -11488,6 +12405,7 @@ components:
                 - productWithdrawn
               lineId:
                 type: string
+                pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
               detail:
                 type: string
               wasAmount:
@@ -11505,8 +12423,11 @@ components:
         id:
           type: string
           pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+          description: Client-generated ULID of this discount, and its idempotency key — it must equal the
+            `Idempotency-Key` header.
         lineId:
           type: string
+          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
           nullable: true
           description: Omit to discount the order rather than a line.
         amount:
@@ -11681,7 +12602,12 @@ components:
         id:
           type: string
           pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
-          description: Client-generated ULID. Also the idempotency key.
+          description: 'Client-generated ULID. Also the idempotency key: it must equal the
+            `Idempotency-Key` header, and a replay or a mismatch follows `IdempotencyKey` in
+            `shared/common.yaml`. Offline replay through `syncOrders` carries no header, and this id
+            alone deduplicates there.
+
+            '
         venueId:
           type: string
           format: uuid
@@ -11689,6 +12615,7 @@ components:
           $ref: '#/components/schemas/Channel'
         shiftId:
           type: string
+          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
         subjectId:
           type: string
           format: uuid
@@ -11724,6 +12651,7 @@ components:
         id:
           type: string
           pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+          description: Client-generated ULID of the line. `lineIds` everywhere in this contract are these.
         variantId:
           type: string
           format: uuid
@@ -11733,18 +12661,24 @@ components:
         inventoryHoldId:
           type: string
           nullable: true
-          description: Lease the units were drawn from. Absent for uncontended products.
+          description: Lease the units were drawn from — a `catalogue.InventoryHold.id`. Absent for
+            uncontended products.
         seatIds:
           type: array
           items:
             type: string
-          description: Seated products only. Not available offline.
+            pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+          description: Seated products only, as `seating.Seat.id`. Not available offline.
         quantity:
           type: integer
           minimum: 1
         eligibilityDeclaration:
           type: array
           nullable: true
+          x-ticvai-note: 'One row per declared guest in `orders.order_line_eligibility` (named on
+            `OrderLine`), because an array of objects is a child table''s rows, not a column.
+
+            '
           items:
             type: object
             properties:
@@ -11779,8 +12713,15 @@ components:
         dataMaskValues:
           type: object
           additionalProperties: true
+          description: '**Deliberately open.** Custom fields keyed by the venue''s data mask: the field
+            definitions travel in the catalogue bundle (`catalogue.CatalogueBundle.payload`), so the keys
+            are the venue''s to define, as on `catalogue`''s own `dataMaskValues`.
+
+            '
     OrderLine:
-      x-ticvai-persistence: orders.order_line
+      # `eligibilityDeclaration` (from CreateOrderLine) is an array of objects — one per declared guest
+      # — so it is the rows of its own child table rather than a column of order_line.
+      x-ticvai-persistence: orders.order_line + orders.order_line_eligibility
       allOf:
       - $ref: '#/components/schemas/CreateOrderLine'
       - type: object
@@ -11809,13 +12750,23 @@ components:
             $ref: ../shared/common.yaml#/components/schemas/Money
           entitlementIds:
             type: array
+            description: The entitlements this line issued. **These are the ticket ids** —
+              `transferOrderTickets.ticketIds` and `reprintOrder.reissuedTicketIds` take and return them.
             items:
               type: string
+              pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
           crossRegionRightIds:
             type: array
             items:
               type: string
             description: Redemption rights propagated to other cells for this line.
+          reprintCount:
+            type: integer
+            minimum: 0
+            default: 0
+            readOnly: true
+            description: How many times this line's tickets were reprinted or resent. `reprintOrder`
+              increments it; repeated reprints are the signal worth surfacing.
     CartStatus:
       type: string
       enum:
@@ -11852,7 +12803,16 @@ components:
           type: array
           items:
             type: string
-            format: uuid
+            pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+        parentLineId:
+          type: string
+          format: uuid
+          nullable: true
+          description: 'The line this add-on is attached to, from `AddCartLineRequest.parentLineId`. Kept on
+            the line because **removing the parent removes the child**, and `removeCartLine` has to be able
+            to find the children.
+
+            '
         overridePrice:
           $ref: ../shared/common.yaml#/components/schemas/Money
         overrideReason:
@@ -11897,10 +12857,9 @@ components:
           $ref: ../shared/common.yaml#/components/schemas/Money
         inventoryHoldId:
           type: string
-          format: uuid
           nullable: true
-          description: 'The capacity held for this line. **Null for a product with no capacity** — a t-shirt
-            needs stock, not a lease.
+          description: 'The capacity held for this line — a `catalogue.InventoryHold.id`, typed as that id
+            is. **Null for a product with no capacity** — a t-shirt needs stock, not a lease.
 
             '
         leaseExpiresAt:
@@ -12044,7 +13003,7 @@ components:
           type: array
           items:
             type: string
-            format: uuid
+            pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
         parentLineId:
           type: string
           format: uuid
@@ -12137,6 +13096,8 @@ components:
       properties:
         id:
           type: string
+          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+          description: The client ULID from `CreateOrderRequest.id`.
         orderNumber:
           type: string
         channel:
@@ -12204,11 +13165,26 @@ components:
           format: uuid
         shiftId:
           type: string
+          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
           nullable: true
         subjectId:
           type: string
           format: uuid
           nullable: true
+        holdLabel:
+          type: string
+          maxLength: 60
+          nullable: true
+          readOnly: true
+          description: The `label` a cashier gave when parking it with `holdOrder` — how they find it
+            again. Null on an order never held.
+        heldUntil:
+          type: string
+          format: date-time
+          nullable: true
+          readOnly: true
+          description: When a held order expires and is voided (states/order.yaml), from `holdOrder`'s
+            `holdUntil`. Null on an order not currently held.
         createdAt:
           type: string
           format: date-time
@@ -12231,6 +13207,7 @@ components:
       properties:
         id:
           type: string
+          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
         orderNumber:
           type: string
         status:
@@ -12240,14 +13217,31 @@ components:
         refundedAmount:
           $ref: ../shared/common.yaml#/components/schemas/Money
         channel:
-          $ref: '#/components/schemas/Channel'
+          allOf:
+          - $ref: '#/components/schemas/OrderChannel'
+          description: The same vocabulary as `Order.channel`, which this projects.
         lineCount:
           type: integer
+        principalId:
+          type: string
+          format: uuid
+          description: The cashier who raised it — what the held-orders list shows.
+        holdLabel:
+          type: string
+          nullable: true
+          description: As `Order.holdLabel`.
+        heldUntil:
+          type: string
+          format: date-time
+          nullable: true
+          description: As `Order.heldUntil`, so a held-orders list can warn about the ones about to lapse.
         createdAt:
           type: string
           format: date-time
     RefundPolicy:
-      x-ticvai-persistence: orders.refund_policy
+      # `timeBands` is an array of objects, so its rows live in a child table rather than a column the
+      # derived DDL would silently drop — until 26 September a PUT that sent bands had nowhere to keep them.
+      x-ticvai-persistence: orders.refund_policy + orders.refund_policy_time_band
       type: object
       description: 'Venue-configured. Thresholds are policy, not permission scope — venues run different
         policies and the permission model should not encode commercial rules.
@@ -12271,6 +13265,8 @@ components:
         venueId:
           type: string
           format: uuid
+          readOnly: true
+          description: The venue in the path. Not taken from a `setRefundPolicy` body.
         selfAuthoriseLimit:
           allOf:
           - $ref: ../shared/common.yaml#/components/schemas/Money
@@ -12325,7 +13321,17 @@ components:
       allOf:
       - $ref: ../shared/common.yaml#/components/schemas/Problem
       - type: object
+        x-ticvai-persistence: none — error shape
+        required:
+        - refusedReason
         properties:
+          refusedReason:
+            type: string
+            enum:
+            - secondAuthorisationRequired   # createRefund: above requiresSecondUserAbove, none named
+            - refundWindowClosed            # createRefund: past refundWindowDays
+            - exceedsRefundable             # createRefund: more than the order has left to refund
+            - notPendingApproval            # approveRefund: the refund is not waiting for approval
           requiredAuthorisation:
             type: string
             enum:
@@ -12347,10 +13353,13 @@ components:
         id:
           type: string
           pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+          description: Client-generated ULID of the refund, and its idempotency key — it must equal the
+            `Idempotency-Key` header.
         lineIds:
           type: array
           items:
             type: string
+            pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
           description: Omit to refund the whole order.
         amount:
           $ref: ../shared/common.yaml#/components/schemas/Money
@@ -12394,10 +13403,20 @@ components:
       properties:
         id:
           type: string
+          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
         orderId:
           type: string
+          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+        batchId:
+          type: string
+          format: uuid
+          nullable: true
+          readOnly: true
+          description: The `RefundBatch` that raised this refund, where `createBulkRefund` did. Null for a
+            refund raised on its own.
         fxRate:
-          type: number
+          allOf:
+          - $ref: '#/components/schemas/ExchangeRateDecimal'
           nullable: true
           readOnly: true
           description: '**The rate on the original payment, not today''s** (BL-087, CF-118).
@@ -12501,16 +13520,29 @@ components:
         id:
           type: string
           pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+          description: Client-generated ULID of the payment, and its idempotency key — it must equal the
+            `Idempotency-Key` header.
         orderId:
           type: string
+          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
         tender:
           $ref: '#/components/schemas/TenderKind'
         amount:
           $ref: ../shared/common.yaml#/components/schemas/Money
-        tenderedAmount:
+        tenderCurrency:
+          type: string
+          pattern: ^[A-Z]{3}$
+          nullable: true
+          description: The currency the guest handed over, where it is not the venue's — becomes
+            `Payment.tenderCurrency`. Omit for a payment in the venue's own currency.
+        tenderAmount:
           allOf:
           - $ref: ../shared/common.yaml#/components/schemas/Money
-          description: Cash only. Change is the difference.
+          description: '**What the guest handed over**, in `tenderCurrency` — becomes
+            `Payment.tenderAmount`, one name for one concept (renamed from `tenderedAmount` on 26
+            September). For cash, change is the difference.
+
+            '
         walletAuthorisationId:
           type: string
           nullable: true
@@ -12535,8 +13567,10 @@ components:
       properties:
         id:
           type: string
+          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
         orderId:
           type: string
+          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
         tender:
           $ref: '#/components/schemas/TenderKind'
         tenderCurrency:
@@ -12556,7 +13590,8 @@ components:
           - $ref: ../shared/common.yaml#/components/schemas/Money
           description: The amount in `tenderCurrency`, at that currency's own scale.
         fxRate:
-          type: number
+          allOf:
+          - $ref: '#/components/schemas/ExchangeRateDecimal'
           nullable: true
           description: 'The rate applied, **stored on the payment rather than looked up later** (CF-37).
             A payment reconciled next month is reconciled at the rate of the day it was taken.
@@ -12624,12 +13659,16 @@ components:
         id:
           type: string
           pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+          description: Client-generated ULID of the reservation, and its idempotency key — it must equal
+            the `Idempotency-Key` header.
         venueId:
           type: string
           format: uuid
         subjectId:
           type: string
           format: uuid
+          description: The guest the reservation is held for. Becomes `Reservation.subjectId`, which is
+            what lets that guest list and read it.
         lines:
           type: array
           minItems: 1
@@ -12639,8 +13678,14 @@ components:
           type: string
           format: date-time
     Reservation:
-      x-ticvai-persistence: orders.reservation
+      # `lines` is an array of objects, so its rows live in `orders.reservation_line`: the reservation
+      # returned lines it had no table for, and `convertReservation` needs them to build the order.
+      x-ticvai-persistence: orders.reservation + orders.reservation_line
       type: object
+      description: '**An unpaid hold, not a booking.** It holds capacity, expires, issues no entitlement and
+        carries no media — a paid booking is an order (naming-and-style §3.1).
+
+        '
       required:
       - id
       - venueId
@@ -12650,9 +13695,16 @@ components:
       properties:
         id:
           type: string
+          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
         venueId:
           type: string
           format: uuid
+        subjectId:
+          type: string
+          format: uuid
+          nullable: true
+          description: The guest it is held for, from `CreateReservationRequest.subjectId`. A guest caller
+            sees only reservations carrying their own.
         status:
           type: string
           enum:
@@ -12672,6 +13724,7 @@ components:
           format: date-time
         convertedOrderId:
           type: string
+          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
           nullable: true
     OfflineOrder:
       x-ticvai-persistence: none — client-side journal, not server storage
@@ -12717,6 +13770,8 @@ components:
             properties:
               id:
                 type: string
+                pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+                description: The `OfflineOrder.id` this result is about.
               sequence:
                 type: integer
               status:
@@ -12749,6 +13804,7 @@ components:
       properties:
         id:
           type: string
+          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
         workstationId:
           type: string
           format: uuid
@@ -12771,14 +13827,617 @@ components:
         payload:
           type: object
           additionalProperties: true
+          description: '**Deliberately open: the journal entry exactly as the till sent it.** Its shape is
+            the request schema for `kind` — an `OfflineOrder` for `order`, a `CreatePaymentRequest` for
+            `payment` — kept verbatim so the supervisor resolves what was actually recorded, not a
+            re-typed copy.
+
+            '
         resolvedAt:
           type: string
           format: date-time
           nullable: true
+          readOnly: true
         resolvedByPrincipalId:
           type: string
           format: uuid
           nullable: true
+          readOnly: true
+        resolution:
+          type: string
+          nullable: true
+          readOnly: true
+          enum:
+          - posted
+          - voided
+          - refunded
+          description: What `resolveSyncRejection` recorded. Null while the rejection waits.
+        resolvedRecordId:
+          type: string
+          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+          nullable: true
+          readOnly: true
+          description: The order, void or refund the resolution produced — what stops the entry being
+            posted twice.
+    ResolveSyncRejectionRequest:
+      type: object
+      x-ticvai-persistence: none — request only; lands on sync.rejection
+      required:
+      - resolution
+      - resolvedRecordId
+      properties:
+        resolution:
+          type: string
+          enum:
+          - posted
+          - voided
+          - refunded
+          description: '`posted` — the sale was entered with `createOrder` (F33 step 8); `voided` — with
+            `voidOrder`; `refunded` — with `createRefund`.
+
+            '
+        resolvedRecordId:
+          type: string
+          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+          description: The id of the order, void or refund that resolution produced.
+        note:
+          type: string
+          maxLength: 500
+          nullable: true
+    FraudRuleSet:
+      type: object
+      x-ticvai-persistence: none — the whole set of orders.fraud_rule rows, in evaluation order
+      description: '**The whole set in one body**, as `setFraudRules` requires: a rule set edited one rule
+        at a time spends time in states nobody intended. A rule left out of the set is deactivated, never
+        deleted.
+
+        '
+      required:
+      - rules
+      properties:
+        rules:
+          type: array
+          description: In evaluation order.
+          items:
+            $ref: '#/components/schemas/FraudRule'
+    ExchangeRateDecimal:
+      type: string
+      x-ticvai-persistence-kind: valueObject
+      x-ticvai-persistence-column: numeric(18,6)
+      description: '**An exchange rate: a decimal string, never a float**, for the reason `Money.amount` is
+        one — a JavaScript client must not round a rate in transit. **Six decimal places**, the precision
+        `finance.FxRate.rate` asks for, and stored at that precision.
+
+        '
+      pattern: ^\d+(\.\d{1,6})?$
+    GroupBookingProblem:
+      x-ticvai-persistence: none — error shape
+      allOf:
+      - $ref: ../shared/common.yaml#/components/schemas/Problem
+      - type: object
+        required:
+        - refusedReason
+        properties:
+          refusedReason:
+            type: string
+            enum:
+            - orderAlreadyGrouped     # createGroupBooking: one order carries at most one group booking
+            - orderVoided             # createGroupBooking
+            - dateUnavailable         # requestGroupBooking
+            - packageUnavailable      # requestGroupBooking
+            - aboveParticipantLimit   # requestGroupBooking (422)
+            - statusBackwards         # updateGroupBooking: status moves forward only
+            - groupClosed             # updateGroupBooking: already cancelled or complete
+    PaymentLinkView:
+      type: object
+      x-ticvai-persistence: none — projection of orders.payment_link for its holder
+      description: What an anonymous holder of a payment link is shown about the link itself.
+      required:
+      - status
+      - expiresAt
+      properties:
+        status:
+          type: string
+          enum:
+          - issued
+          - viewed
+          - paid
+          - expired
+          - cancelled
+          - superseded
+        expiresAt:
+          type: string
+          format: date-time
+        releaseHoldOnExpiry:
+          type: boolean
+    PaymentLinkProblem:
+      x-ticvai-persistence: none — error shape
+      allOf:
+      - $ref: ../shared/common.yaml#/components/schemas/Problem
+      - type: object
+        required:
+        - refusedReason
+        properties:
+          refusedReason:
+            type: string
+            enum:
+            - linkExpired        # getPaymentLink 410
+            - linkPaid           # getPaymentLink 410
+            - linkSuperseded     # getPaymentLink 410: resendPaymentLink retired it
+            - linkCancelled      # getPaymentLink 410
+            - linesUnavailable   # payByLink 409: the hold went while the guest was paying
+          unavailableLines:
+            type: array
+            description: With `linesUnavailable`, the lines no longer available.
+            items:
+              type: object
+              required:
+              - lineId
+              properties:
+                lineId:
+                  type: string
+                  pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+                productName:
+                  type: string
+    ConvertToTermResult:
+      type: object
+      x-ticvai-persistence: none — computed; the sale lands in orders.sales_order
+      description: What `convertToTermProduct` did — the term product sold, the credit taken off it, and
+        what the guest still owes.
+      required:
+      - order
+      - creditApplied
+      - amountDue
+      properties:
+        order:
+          allOf:
+          - $ref: '#/components/schemas/Order'
+          description: The order the term product was sold on.
+        creditApplied:
+          allOf:
+          - $ref: ../shared/common.yaml#/components/schemas/Money
+          description: What the guest paid today, credited against the term product.
+        amountDue:
+          allOf:
+          - $ref: ../shared/common.yaml#/components/schemas/Money
+          description: The term product's price less the credit.
+        validFrom:
+          type: string
+          format: date
+          description: When the new validity period starts — `startFrom`, or today where it was omitted.
+    GuestCreditAccount:
+      type: object
+      x-ticvai-persistence: 'none — where a guest credit account is stored is not yet decided: the
+        lineage for openGuestCreditAccount writes no table'
+      description: A credit limit opened for an individual guest (BL-051). The request's terms, as opened.
+      required:
+      - id
+      - subjectId
+      - creditLimit
+      - requiresApproval
+      - status
+      properties:
+        id:
+          type: string
+          format: uuid
+        subjectId:
+          type: string
+          format: uuid
+        creditLimit:
+          $ref: ../shared/common.yaml#/components/schemas/Money
+        settlementDaysBeforeVisit:
+          type: integer
+        requiresApproval:
+          type: boolean
+        status:
+          type: string
+          enum:
+          - pendingApproval
+          - active
+          description: '`pendingApproval` while `requiresApproval` is true and nobody has approved it.'
+    ReissuedEntitlement:
+      type: object
+      x-ticvai-persistence: none — computed; both entitlements live in access.entitlement
+      description: The zero-value reissue — the old entitlement voided, the new one issued, and the reason
+        that links them.
+      required:
+      - entitlementId
+      - replacesEntitlementId
+      - reason
+      properties:
+        entitlementId:
+          type: string
+          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+          description: The new entitlement.
+        replacesEntitlementId:
+          type: string
+          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+          description: The expired one, now voided. **The original is traceable** from the new one.
+        reason:
+          type: string
+          enum:
+          - venueClosure
+          - weather
+          - goodwill
+          - systemError
+          - medicalIssue
+          - bereavement
+        validFrom:
+          type: string
+          format: date
+          nullable: true
+        note:
+          type: string
+          nullable: true
+    EntitlementShare:
+      type: object
+      x-ticvai-persistence: none — a view of the identity.delegated_access row shareEntitlement writes
+      description: '**A second person''s right to present an entitlement the owner still holds.** Returned
+        by `shareEntitlement` and `revokeEntitlementShare`; its `id` is the delegated-access row the share
+        is.
+
+        '
+      required:
+      - id
+      - entitlementId
+      - toSubjectId
+      - status
+      properties:
+        id:
+          type: string
+          format: uuid
+        entitlementId:
+          type: string
+          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+        toSubjectId:
+          type: string
+          format: uuid
+          description: The guest it is shared with. They may present it; they may not share or transfer it
+            on.
+        validFrom:
+          type: string
+          format: date-time
+        validUntil:
+          type: string
+          format: date-time
+          nullable: true
+          description: Null means until revoked or until the entitlement itself ends.
+        revokedAt:
+          type: string
+          format: date-time
+          nullable: true
+        status:
+          type: string
+          enum:
+          - active
+          - revoked
+          - expired
+    EntitlementRefusedProblem:
+      x-ticvai-persistence: none — error shape
+      allOf:
+      - $ref: ../shared/common.yaml#/components/schemas/Problem
+      - type: object
+        required:
+        - refusedReason
+        properties:
+          refusedReason:
+            type: string
+            enum:
+            - entitlementNotExpired        # reissueEntitlement
+            - entitlementAlreadyReplaced   # reissueEntitlement
+            - sharingNotAllowed            # shareEntitlement: EntitlementTemplate.canShareMedia is false
+            - recipientCannotShareOn       # shareEntitlement: the caller holds it through a share
+            - entitlementNotActive         # shareEntitlement
+            - shareNotActive               # revokeEntitlementShare: already revoked or expired
+          entitlementId:
+            type: string
+            pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+    ResaleRefusedProblem:
+      x-ticvai-persistence: none — error shape
+      allOf:
+      - $ref: ../shared/common.yaml#/components/schemas/Problem
+      - type: object
+        required:
+        - refusedReason
+        properties:
+          refusedReason:
+            type: string
+            enum:
+            - partlyConsumed
+            - nameBound
+            - outsideResaleWindow
+    TicketTemplateConflictProblem:
+      x-ticvai-persistence: none — error shape
+      allOf:
+      - $ref: ../shared/common.yaml#/components/schemas/Problem
+      - type: object
+        required:
+        - refusedReason
+        properties:
+          refusedReason:
+            type: string
+            enum:
+            - duplicateSelectionPriority
+          conflictingTemplateId:
+            type: string
+            format: uuid
+            description: The active template already holding that priority.
+    TicketProof:
+      type: object
+      x-ticvai-persistence: none — rendered on request, nothing is stored
+      description: A sample ticket from a template, **marked as a proof on the artefact itself** so it
+        cannot be presented at a gate.
+      required:
+      - templateId
+      - mediaType
+      - contentRef
+      properties:
+        templateId:
+          type: string
+          format: uuid
+        mediaType:
+          type: string
+          enum:
+          - thermalTicket
+          - a4Pdf
+          - wristband
+          - rfidCard
+          - walletPass
+          - qrOnly
+          - sms
+        locale:
+          type: string
+          nullable: true
+        contentRef:
+          type: string
+          format: uri
+          description: Where the rendered proof can be fetched or sent to the printer from.
+    PaymentProblem:
+      x-ticvai-persistence: none — error shape
+      allOf:
+      - $ref: ../shared/common.yaml#/components/schemas/Problem
+      - type: object
+        required:
+        - refusedReason
+        properties:
+          refusedReason:
+            type: string
+            enum:
+            - providerDeclined             # createPayment 402, capturePayment 402
+            - tenderUnavailableOffline     # createPayment
+            - exceedsBalanceDue            # createPayment
+            - providerUnreachable          # inquirePaymentStatus 503
+            - notAuthorised                # capturePayment, voidPayment: not in `authorised`
+            - alreadyCaptured              # voidPayment: refund it instead
+            - aboveAuthorisedAmount        # capturePayment
+            - partialCaptureNotSupported   # capturePayment
+            - notCaptured                  # addTip: the payment is not settled
+            - tipAlreadyRecorded           # addTip
+            - tokenisationNotSupported     # storePaymentToken
+            - consentNotGiven              # storePaymentToken
+            - chargebackClosed             # respondToChargeback
+          balanceDue:
+            allOf:
+            - $ref: ../shared/common.yaml#/components/schemas/Money
+            description: With `exceedsBalanceDue`, what the order still owes.
+    InvitationRefusedProblem:
+      x-ticvai-persistence: none — error shape
+      allOf:
+      - $ref: ../shared/common.yaml#/components/schemas/Problem
+      - type: object
+        required:
+        - refusedReason
+        properties:
+          refusedReason:
+            type: string
+            enum:
+            - profileNotPermitted
+            - allowanceSpent
+          remaining:
+            type: integer
+            description: With `allowanceSpent`, what is left of the offerer's allowance — fewer than asked.
+    StoredValueProblem:
+      x-ticvai-persistence: none — error shape
+      allOf:
+      - $ref: ../shared/common.yaml#/components/schemas/Problem
+      - type: object
+        required:
+        - refusedReason
+        properties:
+          refusedReason:
+            type: string
+            enum:
+            - insufficientBalance         # authoriseStoredValue: the balance itself is too low
+            - heldByOtherAuthorisations   # authoriseStoredValue: enough, but other holds have it
+            - authorisationNotHeld        # capture/release: captured, released or expired
+            - aboveHeldAmount             # captureStoredValue
+          availableAmount:
+            allOf:
+            - $ref: ../shared/common.yaml#/components/schemas/Money
+            description: What could be held (or captured) now.
+    CartProblem:
+      x-ticvai-persistence: none — error shape
+      allOf:
+      - $ref: ../shared/common.yaml#/components/schemas/Problem
+      - type: object
+        required:
+        - refusedReason
+        properties:
+          refusedReason:
+            type: string
+            enum:
+            - cartExpired            # getCart 410
+            - cartNotOpen            # abandonCart: not active or expiring
+            - soldOutForSession      # addCartLine
+            - soldOutForDay          # addCartLine
+            - notSellableOnChannel   # addCartLine
+            - noCapacity             # updateCartLine, extendCart
+            - extensionCapReached    # extendCart
+            - leaseExpired           # checkoutCart 409
+            - sessionNotVerified     # checkoutCart 403 (ADR-0045)
+            - contactNotConfirmed    # checkoutCart 403 (ADR-0045)
+          lineIds:
+            type: array
+            description: The cart lines the refusal is about, where it is about lines.
+            items:
+              type: string
+              format: uuid
+    OrderRefusedProblem:
+      x-ticvai-persistence: none — error shape
+      allOf:
+      - $ref: ../shared/common.yaml#/components/schemas/Problem
+      - type: object
+        required:
+        - refusedReason
+        properties:
+          refusedReason:
+            type: string
+            enum:
+            - leaseExpired              # createOrder
+            - capacityExhausted         # createOrder
+            - bundleStale               # createOrder: the priced-from bundle is past its staleness bound
+            - noDatedLine               # getOrderCalendarEvent
+            - alreadyPaid               # holdOrder
+            - orderVoided               # holdOrder, modifyOrder
+            - seatLeaseExpiring         # holdOrder: a seated line's lease ends before holdUntil
+            - holdExpired               # resumeOrder
+            - alreadyResumed            # resumeOrder
+            - approverRequired          # applyManualDiscount 403
+            - approverIsRequester       # applyManualDiscount 403
+            - alreadySettled            # voidOrder: a payment is captured; refund instead
+            - shiftClosed               # voidOrder
+            - paymentNotAllocated       # splitOrder
+            - lineRedeemed              # modifyOrder, exchangeOrderLines
+            - replacementUnavailable    # exchangeOrderLines
+            - outsideExchangeWindow     # exchangeOrderLines
+            - targetUnavailable         # rescheduleOrder
+            - outsideRescheduleWindow   # rescheduleOrder
+            - alreadyResolved           # resolveSyncRejection
+          lineIds:
+            type: array
+            description: The order lines the refusal is about, where it is about lines.
+            items:
+              type: string
+              pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+    RefundBatch:
+      type: object
+      x-ticvai-persistence: orders.refund_batch
+      description: '**One `createBulkRefund`, as a row.** It returned a `batchId` that nothing stored, so
+        the aggregate that *"always requires approval"* had nowhere to be approved from and no refund
+        could say which batch raised it. Each refund the batch raises carries `Refund.batchId`.
+
+        '
+      required:
+      - batchId
+      - reason
+      - affectedOrders
+      - estimatedTotal
+      - status
+      properties:
+        batchId:
+          type: string
+          format: uuid
+          x-ticvai-column: id
+          description: The batch's id. Kept under the name the `createBulkRefund` 202 always used.
+        performanceId:
+          type: string
+          format: uuid
+          nullable: true
+        eventId:
+          type: string
+          format: uuid
+          nullable: true
+        venueId:
+          type: string
+          format: uuid
+          nullable: true
+        dateFrom:
+          type: string
+          format: date
+          nullable: true
+        dateTo:
+          type: string
+          format: date
+          nullable: true
+        percentage:
+          type: number
+          minimum: 0
+          maximum: 100
+        reason:
+          type: string
+        affectedOrders:
+          type: integer
+        estimatedTotal:
+          $ref: ../shared/common.yaml#/components/schemas/Money
+        status:
+          type: string
+          enum:
+          - pendingApproval
+          - processing
+          - completed
+          - failed
+        requestedByPrincipalId:
+          type: string
+          format: uuid
+        createdAt:
+          type: string
+          format: date-time
+        scopePath:
+          type: string
+          readOnly: true
+          description: '**The partition key** (ADR-0005). Operations write it at `venue` scope.'
+    ReservationProblem:
+      x-ticvai-persistence: none — error shape
+      allOf:
+      - $ref: ../shared/common.yaml#/components/schemas/Problem
+      - type: object
+        required:
+        - refusedReason
+        properties:
+          refusedReason:
+            type: string
+            enum:
+            - capacityUnavailable     # createReservation
+            - reservationExpired      # convertReservation, extendReservation
+            - alreadyConverted        # convertReservation, cancelReservation
+            - reservationNotHeld      # cancelReservation: expired or already cancelled
+            - extensionLimitReached   # extendReservation
+    TicketTransferProblem:
+      x-ticvai-persistence: none — error shape
+      allOf:
+      - $ref: ../shared/common.yaml#/components/schemas/Problem
+      - type: object
+        required:
+        - refusedReason
+        properties:
+          refusedReason:
+            type: string
+            enum:
+            - alreadyRedeemed      # transferOrderTickets
+            - alreadyOffered       # transferOrderTickets
+            - transferNotAllowed   # transferOrderTickets: the product forbids transfer
+            - offerExpired         # claimTicketTransfer 410
+            - alreadyClaimed       # claimTicketTransfer 410
+            - offerCancelled       # claimTicketTransfer 410: withdrawn by the sender
+          ticketIds:
+            type: array
+            description: With a transfer refusal, the tickets refused — `Entitlement.id` values.
+            items:
+              type: string
+              pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+    MembershipRenewalProblem:
+      x-ticvai-persistence: none — error shape
+      allOf:
+      - $ref: ../shared/common.yaml#/components/schemas/Problem
+      - type: object
+        required:
+        - refusedReason
+        properties:
+          refusedReason:
+            type: string
+            enum:
+            - outsideGracePeriod
+            - alreadyRenewedForTerm
     UpgradeConversionCommandCenterView:
       type: object
       x-ticvai-drafted-shape: true

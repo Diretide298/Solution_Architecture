@@ -85,6 +85,9 @@ paths:
             schema: { $ref: '#/components/schemas/DeveloperAccount' }
       responses:
         '201':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Registered, pending verification
           content:
             application/json:
@@ -129,6 +132,9 @@ paths:
                       role: { type: string, enum: [owner, admin, developer, readOnly] }
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Set
           content:
             application/json:
@@ -199,6 +205,9 @@ paths:
             schema: { $ref: '#/components/schemas/ApiClient' }
       responses:
         '201':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: >
             Created. **The secret is returned once and never again** — a system that can show you a
             secret later is a system that stores one.
@@ -244,6 +253,9 @@ paths:
                 overlapHours: { type: integer, default: 72 }
       responses:
         '201':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Rotated
           content:
             application/json:
@@ -270,8 +282,13 @@ paths:
       x-ticvai-scope-level: tenant
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       responses:
         '204':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Revoked
 
   /oauth/token:
@@ -303,6 +320,8 @@ paths:
                 clientId: { type: string }
                 clientSecret: { type: string, format: password }
                 scope: { type: string }
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       responses:
         '200':
           description: Token
@@ -373,6 +392,9 @@ paths:
                 expiresAfterDays: { type: integer, default: 90 }
       responses:
         '202':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Provisioning
           content:
             application/json:
@@ -405,6 +427,9 @@ paths:
         - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       responses:
         '202':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Resetting
           content:
             application/json:
@@ -467,6 +492,9 @@ paths:
             schema: { $ref: '#/components/schemas/WebhookSubscription' }
       responses:
         '201':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Created, pending endpoint verification
           content:
             application/json:
@@ -545,6 +573,9 @@ paths:
                 eventTypes: { type: array, items: { type: string } }
       responses:
         '202':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Replay queued
           content:
             application/json:
@@ -585,6 +616,9 @@ paths:
             schema: { $ref: '#/components/schemas/ApiQuota' }
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Set
           content:
             application/json:
@@ -692,6 +726,9 @@ paths:
                 migrationGuideUrl: { type: string, nullable: true }
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Deprecated
           content:
             application/json:
@@ -750,6 +787,9 @@ paths:
             schema: { $ref: '#/components/schemas/IntegrationListing' }
       responses:
         '201':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Submitted for review
           content:
             application/json:
@@ -791,6 +831,9 @@ paths:
                 notes: { type: string, nullable: true }
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Decided
           content:
             application/json:
@@ -828,12 +871,20 @@ paths:
             schema: { $ref: '#/components/schemas/ApiLicence' }
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Set
           content:
             application/json:
               schema: { $ref: '#/components/schemas/ApiLicence' }
 
 components:
+  # **Server-owned fields are `readOnly`, secrets are `writeOnly`.** The create operations here
+  # take the resource schema as their body, so without the marks a client had to invent the id
+  # and the status. OpenAPI 3.1: a `readOnly` property listed in `required` is required in
+  # responses only, and a client that sends one has it ignored. Status moves through the
+  # operations that own it (verification, revocation, certification, endpoint verification).
   schemas:
     DeveloperAccount:
       type: object
@@ -846,7 +897,7 @@ components:
         and one organisation may be both.
       required: [id, organisationName, contactEmail, status]
       properties:
-        id: { type: string, format: uuid }
+        id: { type: string, format: uuid, readOnly: true }
         organisationName: { type: string }
         contactEmail: { type: string, format: email }
         websiteUrl: { type: string, nullable: true }
@@ -858,8 +909,8 @@ components:
           description: >
             Where this developer is also a commercial partner. **The link exists and the two are not
             the same record**, which is what CF-135a was about.
-        status: { type: string, enum: [pending, verified, suspended, closed] }
-        verifiedAt: { type: string, format: date-time, nullable: true }
+        status: { type: string, enum: [pending, verified, suspended, closed], readOnly: true }
+        verifiedAt: { type: string, format: date-time, nullable: true, readOnly: true }
 
     ApiClient:
       type: object
@@ -870,7 +921,7 @@ components:
         unrelated things with three lifecycles.
       required: [id, developerId, name, environment, scopes, status]
       properties:
-        id: { type: string, format: uuid }
+        id: { type: string, format: uuid, readOnly: true }
         developerId: { type: string, format: uuid }
         name: { type: string }
         clientId: { type: string, readOnly: true }
@@ -897,11 +948,12 @@ components:
           type: array
           description: 13.1.38. Optional, and the strongest control available where an integrator has fixed egress.
           items: { type: string }
-        status: { type: string, enum: [active, suspended, revoked] }
+        status: { type: string, enum: [active, suspended, revoked], readOnly: true }
         lastUsedAt:
           type: string
           format: date-time
           nullable: true
+          readOnly: true
           description: >
             **A credential unused for a year is a credential nobody will notice being stolen.**
 
@@ -912,10 +964,10 @@ components:
         D2 and D3. **One shared TICVAI sandbox, synthetic data only.**
       required: [id, name, status, dataProfile]
       properties:
-        id: { type: string, format: uuid }
+        id: { type: string, format: uuid, readOnly: true }
         name: { type: string }
         developerId: { type: string, format: uuid }
-        status: { type: string, enum: [provisioning, active, resetting, expired, deleted] }
+        status: { type: string, enum: [provisioning, active, resetting, expired, deleted], readOnly: true }
         dataProfile: { $ref: '#/components/schemas/SyntheticDataProfile' }
         containsProductionData:
           type: boolean
@@ -925,8 +977,8 @@ components:
             **Always false, and stated rather than assumed** (D2). No cloning, no masking. It is a
             field so that a future reversal is a visible change rather than a silent one — and
             because **the whole PDPL and DESC argument for this contract rests on it.**
-        expiresAt: { type: string, format: date-time }
-        lastResetAt: { type: string, format: date-time, nullable: true }
+        expiresAt: { type: string, format: date-time, readOnly: true }
+        lastResetAt: { type: string, format: date-time, nullable: true, readOnly: true }
 
     SyntheticDataProfile:
       type: object
@@ -957,7 +1009,7 @@ components:
         receive one.**
       required: [id, clientId, endpointUrl, eventTypes, status]
       properties:
-        id: { type: string, format: uuid }
+        id: { type: string, format: uuid, readOnly: true }
         clientId: { type: string, format: uuid }
         endpointUrl: { type: string }
         eventTypes:
@@ -974,14 +1026,20 @@ components:
         signingSecret:
           type: string
           format: password
+          writeOnly: true
           description: >
             **How the receiver knows it was TICVAI.** Without a signature an endpoint accepts a
             ticket-sale event from anybody who learns the URL.
-        status: { type: string, enum: [pendingVerification, active, paused, failing, disabled] }
+
+            **Write-only: accepted on create, never returned.** The same rule as `clientSecret` — a
+            system that can show you a secret later is a system that hands it to whoever reads
+            the subscription.
+        status: { type: string, enum: [pendingVerification, active, paused, failing, disabled], readOnly: true }
         consecutiveFailures: { type: integer, readOnly: true }
         disabledReason:
           type: string
           nullable: true
+          readOnly: true
           description: >
             13.1.29. **An endpoint failing for days is disabled rather than retried forever**, and
             the developer is told — a queue growing against a dead endpoint is a cost the platform
@@ -1103,22 +1161,23 @@ components:
         that is a different product with a different threat model.
       required: [id, developerId, name, category, status]
       properties:
-        id: { type: string, format: uuid }
+        id: { type: string, format: uuid, readOnly: true }
         developerId: { type: string, format: uuid }
         name: { type: string }
         category: { type: string, enum: [crm, marketing, accounting, hotel, transport, analytics, accessibility, other] }
         description: { type: string }
         integrationUrl: { type: string }
         requiredScopes: { type: array, items: { type: string } }
-        status: { type: string, enum: [draft, submitted, inReview, certified, rejected, revoked, delisted] }
+        status: { type: string, enum: [draft, submitted, inReview, certified, rejected, revoked, delisted], readOnly: true }
         certifiedUntil:
           type: string
           format: date
           nullable: true
+          readOnly: true
           description: >
             **Certification expires.** An integration certified against v1 and still listed after v3
             is TICVAI vouching for something it has not looked at in two years.
-        certifiedAgainstVersion: { type: string, nullable: true }
+        certifiedAgainstVersion: { type: string, nullable: true, readOnly: true }
         listingFeeModel: { type: string, enum: [none, flat, revenueShare], nullable: true }
 
     ApiLicence:

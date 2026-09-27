@@ -12,7 +12,6 @@ initial:
 - pendingApproval
 - open
 terminal:
-- closed
 - autoClosed
 transitions:
 - from: pendingApproval

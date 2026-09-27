@@ -50,7 +50,7 @@ Bonus credits from a promotion are tracked separately because they are typically
 | Offline | no |
 | Conflict policy | serverWins |
 | Guest callable | True |
-| Reads | `cache:idempotency`, `games.card`, `wallet.wallet` |
+| Reads | `cache:idempotency`, `games.card`, `wallet.credit_lot`, `wallet.wallet` |
 | Writes | `cache:idempotency`, `games.card` |
 | Called by | POS-002 |
 
@@ -109,6 +109,7 @@ Bonus credits from a promotion are tracked separately because they are typically
 | Code | Shape | Meaning |
 |---|---|---|
 | 200 |  | Loaded |
+| 409 |  | The card is not active. |
 
 
 ## Group: giftCard
@@ -161,7 +162,7 @@ Bonus credits from a promotion are tracked separately because they are typically
 | Code | Shape | Meaning |
 |---|---|---|
 | 200 |  | Card |
-| 404 | NotFound | The resource does not exist, or is outside the caller's scope |
+| 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
 
 
 ## Group: retail
@@ -172,7 +173,8 @@ Bonus credits from a promotion are tracked separately because they are typically
 
 BL-121. **Peer-to-peer transfer was declared on the wallet and unreachable** — a field with no operation behind it.
 **Only `cash` credit transfers.** Bonus, redemption and goodwill credit stay put, because a promotion that can be moved between guests is a promotion that can be sold — **and a venue that gave 50 dirhams of bonus credit has just funded a secondary market.**
-Both wallets must belong to the same tenant. **A transfer across tenants is a payment**, and it belongs on the payment path with everything that implies.
+Both wallets must belong to the same tenant. **A transfer across tenants is a payment**, and it belongs on the payment path with everything that implies. A recipient outside the tenant is therefore the shared 404, exactly as an unknown one is.
+**The recipient is named one way or the other, never both.** `toWalletId` names the receiving wallet outright — the only way to reach a shared wallet (BO-1121), because a subject can hold their own wallet and sit in a family or corporate one. `toSubjectId` is the guest-to-guest form and resolves to the same wallet `getWallet` returns for that subject: their own, never a shared wallet they belong to.
 
 |  |  |
 |---|---|
@@ -183,7 +185,7 @@ Both wallets must belong to the same tenant. **A transfer across tenants is a pa
 | Offline | no |
 | Conflict policy | serverWins |
 | Guest callable | True |
-| Reads | `cache:idempotency`, `pii.subject`, `wallet.wallet` |
+| Reads | `cache:idempotency`, `pii.subject`, `wallet.wallet`, `wallet.wallet_transaction` |
 | Writes | `cache:idempotency`, `wallet.wallet`, `wallet.wallet_transaction` |
 | Called by | BO-1116, BO-1121, GST-071, WEB-021 |
 
@@ -198,18 +200,39 @@ Both wallets must belong to the same tenant. **A transfer across tenants is a pa
 
 | Field | Type | Required | Notes |
 |---|---|---|---|
-| toSubjectId | string (uuid) | yes |  |
+| toSubjectId | string (uuid) |  | The recipient guest. |
+| toWalletId | string (uuid) |  | The receiving wallet, named outright. |
 | amount | Money | yes | On the wire this is three fields; in the database it is one column. |
 | amount.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
 | amount.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
 | amount.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
 | message | string |  | (max length 140; nullable) |
 
+**Response**: `WalletTransaction`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| id | string | yes |  |
+| kind | WalletTransactionKind: enum (topUp, spend, refund, adjustment, bonus, expiry, transfer) | yes |  |
+| amount | Money | yes | On the wire this is three fields; in the database it is one column. |
+| amount.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
+| amount.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
+| amount.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| balanceAfter | Money | yes | On the wire this is three fields; in the database it is one column. |
+| balanceAfter.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
+| balanceAfter.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
+| balanceAfter.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| orderId | string |  | (nullable) |
+| venueId | string (uuid) |  | (nullable) |
+| reason | string |  | (nullable) |
+| principalId | string (uuid) |  | (nullable) |
+| recordedAt | string (date-time) | yes |  |
+
 **Responses**
 
 | Code | Shape | Meaning |
 |---|---|---|
-| 200 |  | Transferred |
+| 200 |  | Transferred. |
 | 409 |  | Insufficient cash credit, distinct from insufficient balance — a guest with 200 of bonus credit and 10 of cash can transfer 10, and telling them they have 200 would be wrong. |
 
 
@@ -230,7 +253,7 @@ Stored value belonging to a guest, distinct from a bearer gift card. Where the g
 | Offline | no |
 | Conflict policy | serverWins |
 | Read routing | primary |
-| Reads | `wallet.wallet` |
+| Reads | `wallet.credit_lot`, `wallet.wallet` |
 | Writes | - |
 | Called by | BO-1086, BO-414, BO-416, BO-448, BO-487, GST-011, WEB-021 |
 
@@ -274,11 +297,14 @@ Stored value belonging to a guest, distinct from a bearer gift card. Where the g
 | Code | Shape | Meaning |
 |---|---|---|
 | 200 |  | Wallet |
-| 404 | NotFound | The resource does not exist, or is outside the caller's scope |
+| 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
 
 ### listWalletTransactions
 
 **`GET /wallets/{subjectId}/transactions`**: Wallet transaction history
+
+**Newest first: `recordedAt` descending, `id` descending as the tiebreak.** The cursor is keyset on that pair, so a transaction recorded while somebody pages cannot shift or repeat a row the way an offset would.
+**An unknown subject is 404; a wallet with no movements is an empty page.** A subject with no wallet in the caller's scope is the shared 404 — the same answer `getWallet` gives — so an empty page always means a wallet that exists and has not moved yet.
 
 |  |  |
 |---|---|
@@ -299,7 +325,7 @@ Stored value belonging to a guest, distinct from a bearer gift card. Where the g
 |---|---|---|---|---|
 | subjectId | path | yes | string (uuid) |  |
 | pageSize | query |  | integer |  |
-| cursor | query |  | string | Opaque cursor from a previous page. |
+| cursor | query |  | string | Opaque cursor: the nextCursor of the previous page. |
 
 **Response**: `object`
 
@@ -329,10 +355,28 @@ Stored value belonging to a guest, distinct from a bearer gift card. Where the g
 | Code | Shape | Meaning |
 |---|---|---|
 | 200 |  | Transactions |
+| 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
 
 ## Tables
 
 Every table this service owns that the slice reads or writes, with its columns as derived into `backend/tenant/*.sql`.
+
+### `wallet.credit_lot`
+
+| Column | Type | Required | Notes |
+|---|---|---|---|
+| id | uuid | yes |  |
+| wallet_id | uuid | yes |  |
+| credit_type_id | uuid | yes |  |
+| issued_amount | numeric(18,4) | no |  |
+| remaining_amount | numeric(18,4) | no |  |
+| issued_at | timestamptz | no |  |
+| expires_at | timestamptz | no |  |
+| source_kind | text | no |  |
+| source_reference | text | no |  |
+| terms_snapshot | jsonb | no | The credit type's terms as they stood at issue. |
+| status | text | no |  |
+| scope_path | text | no |  |
 
 ### `wallet.gift_card`
 

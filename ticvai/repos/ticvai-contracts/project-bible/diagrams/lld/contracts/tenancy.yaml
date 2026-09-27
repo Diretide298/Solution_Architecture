@@ -1,5 +1,5 @@
 id: LLD-tenancy
-title: tenancy — 39 operations
+title: tenancy — 46 operations
 generatedBy: tools/derive-diagrams.py
 index: diagrams/hld/03-contracts.yaml
 tier: spine
@@ -93,6 +93,39 @@ operations:
   - platform.device
   writes:
   - platform.device
+- operation: getConfigurationProfile
+  verb: GET
+  path: /configuration-profiles/{profileId}
+  scope: tenant
+  permission: TENANT_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - platform.configuration_profile
+  writes: []
+- operation: getConnectivityPolicy
+  verb: GET
+  path: /connectivity-policy
+  scope: venue
+  permission: TENANT_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - platform.connectivity_policy
+  writes: []
+- operation: getDevice
+  verb: GET
+  path: /devices/{deviceId}
+  scope: venue
+  permission: DEVICE_VIEW
+  audience:
+  - staff
+  offline: false
+  reads:
+  - platform.device
+  writes: []
 - operation: getDeviceTelemetry
   verb: GET
   path: /devices/{deviceId}/telemetry
@@ -103,6 +136,17 @@ operations:
   offline: false
   reads:
   - tenancy.device_telemetry
+  writes: []
+- operation: getOfflinePolicy
+  verb: GET
+  path: /offline-policy
+  scope: venue
+  permission: TENANT_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - platform.offline_policy
   writes: []
 - operation: getOrgUnit
   verb: GET
@@ -117,6 +161,17 @@ operations:
   - platform.scope
   writes:
   - cache:resolution
+- operation: getOutlet
+  verb: GET
+  path: /outlets/{outletId}
+  scope: venue
+  permission: SCOPE_VIEW
+  audience:
+  - staff
+  offline: true
+  reads:
+  - platform.outlet
+  writes: []
 - operation: getRegionSettings
   verb: GET
   path: /regions/{regionId}/settings
@@ -204,6 +259,17 @@ operations:
   reads:
   - platform.cell_endpoint
   writes: []
+- operation: listConfigurationProfiles
+  verb: GET
+  path: /configuration-profiles
+  scope: tenant
+  permission: TENANT_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - platform.configuration_profile
+  writes: []
 - operation: listDeviceAuditRecords
   verb: GET
   path: /devices/{deviceId}/audit
@@ -271,6 +337,17 @@ operations:
   offline: true
   reads:
   - platform.outlet
+  writes: []
+- operation: listProfileDeployments
+  verb: GET
+  path: /profile-deployments
+  scope: tenant
+  permission: TENANT_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - platform.profile_deployment
   writes: []
 - operation: listSaleBoards
   verb: GET

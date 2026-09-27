@@ -12,7 +12,7 @@ ifDown: Down degrades suggestions and the concierge. **Nothing that takes money 
 coverage:
   operations: 31
   inAFlow: 17
-  percent: 57%
+  percent: 55%
   note: '**Flow coverage is how much of this service a journey has walked.** A service under 40% is
     unwalked rather than under-documented.'
 schemas:
@@ -284,38 +284,137 @@ tables:
   columns: 5
   backing: redis
   owned: false
-  why: '**Not a table and not owned by a service.** Derived from something already read, invalidated
-    by an event already consumed, losable without consequence — no migration, no backup, no owner.'
+  why: '**Not a table and not owned by a service.** Derived from something already read, losable without
+    consequence — no migration, no backup, no owner.'
+  key: '**question hash + scope_path + locale.** Scope is part of the key — a cache keyed on the question
+    alone is a cross-venue leak'
+  eviction:
+  - 'expires_at: `AiPolicy.cacheTtlMinutes`. An upper bound on top of event invalidation, not instead
+    of it'
+  - 'invalidated_by: Which event dropped it, kept for a period so a stale answer can be traced'
+  writtenBy:
+  - semanticSearch
+  - sendAiMessage
+  readBy:
+  - semanticSearch
+  - sendAiMessage
 - store: cache:embedding
   kind: cache
   columns: 4
   backing: redis
   owned: false
-  why: '**Not a table and not owned by a service.** Derived from something already read, invalidated
-    by an event already consumed, losable without consequence — no migration, no backup, no owner.'
+  why: '**Not a table and not owned by a service.** Derived from something already read, losable without
+    consequence — no migration, no backup, no owner.'
+  key: '**content hash + model.** The key changes when the content does, which is why invalidation is
+    trivial'
+  eviction: null
+  writtenBy:
+  - ingestKnowledgeDocument
+  - reindexSource
+  - removeIndexEntry
+  readBy:
+  - ingestKnowledgeDocument
+  - reindexSource
+  - removeIndexEntry
 - store: cache:idempotency
   kind: cache
   columns: 5
   backing: redis
   owned: false
-  why: '**Not a table and not owned by a service.** Derived from something already read, invalidated
-    by an event already consumed, losable without consequence — no migration, no backup, no owner.'
+  why: '**Not a table and not owned by a service.** Derived from something already read, losable without
+    consequence — no migration, no backup, no owner.'
+  key: The idempotency key the caller sent
+  eviction:
+  - 'expires_at: **Must exceed the longest offline window.** A scanner out for a weekend replays on
+    Monday'
+  writtenBy:
+  - createAiConversation
+  - createKnowledgeCollection
+  - decideProposedAction
+  - generateConfiguration
+  - generateVenueLayout
+  - ingestKnowledgeDocument
+  - proposeTranslations
+  - proposeVenueLabels
+  - proposeWalkways
+  - recordSuggestionOutcome
+  - reindexSource
+  - removeIndexEntry
+  - requestSuggestion
+  - semanticSearch
+  - sendAiMessage
+  - setAiCredential
+  - setAiPolicy
+  - setAiProvider
+  - setIndexSource
+  - setSuggestionProvider
+  - testAiProvider
+  readBy:
+  - createAiConversation
+  - createKnowledgeCollection
+  - decideProposedAction
+  - generateConfiguration
+  - generateVenueLayout
+  - ingestKnowledgeDocument
+  - proposeTranslations
+  - proposeVenueLabels
+  - proposeWalkways
+  - recordSuggestionOutcome
+  - reindexSource
+  - removeIndexEntry
+  - requestSuggestion
+  - semanticSearch
+  - sendAiMessage
+  - setAiCredential
+  - setAiPolicy
+  - setAiProvider
+  - setIndexSource
+  - setSuggestionProvider
+  - testAiProvider
 - store: cache:resolution
   kind: cache
   columns: 4
   backing: redis
   owned: false
-  why: '**Not a table and not owned by a service.** Derived from something already read, invalidated
-    by an event already consumed, losable without consequence — no migration, no backup, no owner.'
+  why: '**Not a table and not owned by a service.** Derived from something already read, losable without
+    consequence — no migration, no backup, no owner.'
+  key: scope_path + what is being resolved — permissions, configuration, a price list
+  eviction:
+  - 'version: Bumped by the write that evicts it. **A config change nobody evicts is a stale permission**'
+  writtenBy:
+  - setSuggestionProvider
+  readBy: null
+  gap: '**The lineage names this store, not the key.** Which resolution entry each writer below evicts
+    or bumps — permissions, configuration, a price list, and whether child scopes under its `scope_path`
+    are affected — is not recorded for any operation, so a writer here cannot yet be implemented from
+    the package alone.'
 - store: qdrant:knowledge
   kind: vector
   columns: 9
   backing: qdrant
   owned: false
-  why: '**Not a table and not owned by a service.** Derived from something already read, invalidated
-    by an event already consumed, losable without consequence — no migration, no backup, no owner.'
+  why: '**Not a table and not owned by a service.** Derived from something already read, losable without
+    consequence — no migration, no backup, no owner.'
+  key: null
+  eviction: null
+  writtenBy:
+  - createKnowledgeCollection
+  - generateConfiguration
+  - ingestKnowledgeDocument
+  - reindexSource
+  - removeIndexEntry
+  - semanticSearch
+  - sendAiMessage
+  readBy:
+  - createKnowledgeCollection
+  - generateConfiguration
+  - ingestKnowledgeDocument
+  - listKnowledgeCollections
+  - proposeVenueLabels
+  - semanticSearch
+  - sendAiMessage
 - table: ai.activity
-  columns: 21
+  columns: 22
   store: postgres-analytical
   parent: null
   writtenBy:
@@ -371,7 +470,7 @@ tables:
   - ai
   foreignWriters: null
 - table: ai.knowledge_document
-  columns: 9
+  columns: 10
   store: postgres
   parent: null
   writtenBy:
@@ -385,14 +484,14 @@ tables:
   - ai
   foreignWriters: null
 - table: ai.message
-  columns: 14
+  columns: 15
   store: postgres-analytical
   parent: null
   writtenBy:
   - ai
   foreignWriters: null
 - table: ai.policy
-  columns: 26
+  columns: 28
   store: postgres
   parent: null
   writtenBy:

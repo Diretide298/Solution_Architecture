@@ -66,6 +66,23 @@ def block_lines(lines, i):
     return out, i + len(out)
 
 
+def split_items(body):
+    """The list items of a block body, each as its own lines: a `  - ` line and its continuations."""
+    items = []
+    for ln in body:
+        if ln.startswith("  - ") or not items:
+            items.append([ln])
+        else:
+            items[-1].append(ln)
+    return items
+
+
+def item_text(chunk):
+    """One list item's scalar, parsed -- so folding and quoting are YAML's business, not ours."""
+    val = yaml.safe_load("\n".join(chunk))
+    return val[0] if isinstance(val, list) and val and isinstance(val[0], str) else " ".join(chunk)
+
+
 def main():
     apply = "--apply" in sys.argv
     tally = {"deleted": 0, "resolved": 0, "kept": 0, "renamed": 0}
@@ -78,21 +95,32 @@ def main():
             ln = lines[i]
             if ln == "  openQuestions:":
                 blk, nxt = block_lines(lines, i)
-                # **The raw block is line-wrapped and the sentence is not.** YAML folds a long
-                # scalar across lines, so `Written before the contracts existed` appears intact in
-                # 32 items and split across a newline in 9 more. Matching the raw text found 32 of
-                # 41 and would have left nine pieces of residue behind reporting success.
-                body = " ".join(" ".join(blk[1:]).split())
-                n = sum(1 for b in blk[1:] if b.startswith("  - "))
-                if STALE in body:
-                    tally["deleted"] += n
-                elif ANSWERED.search(body.strip().lstrip("- ").lstrip("'")):
+                # **Sort item by item, not block by block.** Deciding on the whole block deleted
+                # every question in any block that held one stale line, and moved every question
+                # in any block whose first item was an answer. Today every stale block holds one
+                # item, so the block rule happened to be right; the first mixed block would have
+                # lost a live question and reported success.
+                keep, answered = [], []
+                for chunk in split_items(blk[1:]):
+                    # **The raw block is line-wrapped and the sentence is not.** YAML folds a long
+                    # scalar across lines, so `Written before the contracts existed` appears intact
+                    # in 32 items and split across a newline in 9 more. Matching the raw text found
+                    # 32 of 41 and would have left nine pieces of residue behind reporting success.
+                    text = item_text(chunk)
+                    if STALE in " ".join(text.split()):
+                        tally["deleted"] += 1
+                    elif ANSWERED.search(text):
+                        answered.extend(chunk)
+                        tally["resolved"] += 1
+                    else:
+                        keep.extend(chunk)
+                        tally["kept"] += 1
+                if keep:
+                    out.append("  openQuestions:")
+                    out.extend(keep)
+                if answered:
                     out.append("  resolvedQuestions:")
-                    out.extend(blk[1:])
-                    tally["resolved"] += 1
-                else:
-                    out.extend(blk)
-                    tally["kept"] += n
+                    out.extend(answered)
                 i = nxt
                 continue
             if ln.startswith("  provenance: "):
@@ -120,16 +148,28 @@ def main():
             kb = {k: v for k, v in sb.items() if k not in touch}
             assert ka == kb, f"{f.name}: {sa['id']} changed outside the permitted keys"
             assert sb.get("sourceNote") == sa.get("provenance"), f"{f.name}: {sa['id']} sourceNote"
-            moved = sa.get("openQuestions") or []
-            if sb.get("resolvedQuestions"):
-                assert sb["resolvedQuestions"] == moved, f"{f.name}: {sa['id']} resolved text"
+            # Every question is accounted for: still open, newly resolved, or stale and deleted
+            # -- and nothing that was already resolved is lost to a duplicate key.
+            was_open = sa.get("openQuestions") or []
+            was_res = sa.get("resolvedQuestions") or []
+            now_open = sb.get("openQuestions") or []
+            now_res = sb.get("resolvedQuestions") or []
+            # A screen that already has `resolvedQuestions` and gains more would get the key twice,
+            # and YAML keeps only the last -- so the earlier answers must survive intact.
+            assert not was_res or now_res == was_res, \
+                f"{f.name}: {sa['id']} already had resolvedQuestions; merge by hand"
+            stale = [q for q in was_open if STALE in " ".join(str(q).split())]
+            new_res = [q for q in now_res if q not in was_res]
+            assert sorted(map(str, now_open + new_res + stale)) == sorted(map(str, was_open)), \
+                f"{f.name}: {sa['id']} questions not accounted for"
+            assert all(ANSWERED.search(str(q)) for q in new_res), f"{f.name}: {sa['id']} resolved text"
 
         if apply:
             f.write_text(after, encoding="utf-8")
         print("  %-38s %s" % (f.name, "written" if apply else "would change"))
 
     print("\n  stale questions deleted   : %d" % tally["deleted"])
-    print("  screens moved to resolved : %d" % tally["resolved"])
+    print("  questions moved to resolved: %d" % tally["resolved"])
     print("  questions left open       : %d" % tally["kept"])
     print("  provenance -> sourceNote  : %d" % tally["renamed"])
     if not apply:

@@ -1,5 +1,5 @@
 id: LLD-shift
-title: shift — 20 operations
+title: shift — 21 operations
 generatedBy: tools/derive-diagrams.py
 index: diagrams/hld/03-contracts.yaml
 tier: spine
@@ -16,6 +16,8 @@ operations:
   reads:
   - cache:idempotency
   - orders.pos_shift
+  - orders.pos_shift_approval
+  - orders.pos_shift_incident
   writes:
   - cache:idempotency
   - orders.pos_shift
@@ -31,6 +33,8 @@ operations:
   reads:
   - cache:idempotency
   - orders.deposit_box
+  - orders.deposit_box_foreign_holding
+  - orders.deposit_box_opening_denomination
   writes:
   - cache:idempotency
   - orders.cash_movement
@@ -47,11 +51,28 @@ operations:
   - cache:idempotency
   - identity.principal
   - orders.deposit_box
+  - orders.deposit_box_foreign_holding
+  - orders.deposit_box_opening_denomination
   - platform.workstation
   writes:
   - cache:idempotency
   - orders.cash_movement
   - orders.deposit_box
+  - orders.deposit_box_foreign_holding
+  - orders.deposit_box_opening_denomination
+- operation: approveShiftClose
+  verb: POST
+  path: /shifts/{shiftId}/approve-close
+  scope: venue
+  permission: SHIFT_APPROVE_CLOSE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - orders.pos_shift
+  - orders.pos_shift_approval
+  - orders.pos_shift_incident
+  writes: []
 - operation: approveShiftOpen
   verb: POST
   path: /shifts/{shiftId}/approve-open
@@ -63,6 +84,8 @@ operations:
   reads:
   - cache:idempotency
   - orders.pos_shift
+  - orders.pos_shift_approval
+  - orders.pos_shift_incident
   writes:
   - cache:idempotency
   - orders.pos_shift
@@ -79,6 +102,8 @@ operations:
   - ledger.fx_rate
   - orders.cash_count_line
   - orders.deposit_box
+  - orders.deposit_box_foreign_holding
+  - orders.deposit_box_opening_denomination
   writes:
   - cache:idempotency
   - ledger.posting
@@ -98,6 +123,8 @@ operations:
   - orders.cash_movement
   - orders.payment
   - orders.pos_shift
+  - orders.pos_shift_approval
+  - orders.pos_shift_incident
   - platform.venue_settings
   writes:
   - cache:idempotency
@@ -130,6 +157,8 @@ operations:
   offline: true
   reads:
   - orders.pos_shift
+  - orders.pos_shift_approval
+  - orders.pos_shift_incident
   writes: []
 - operation: getShift
   verb: GET
@@ -141,6 +170,8 @@ operations:
   offline: true
   reads:
   - orders.pos_shift
+  - orders.pos_shift_approval
+  - orders.pos_shift_incident
   writes: []
 - operation: listCashMovements
   verb: GET
@@ -177,6 +208,8 @@ operations:
   reads:
   - identity.principal
   - orders.deposit_box
+  - orders.deposit_box_foreign_holding
+  - orders.deposit_box_opening_denomination
   writes: []
 - operation: listShifts
   verb: GET
@@ -188,6 +221,8 @@ operations:
   offline: false
   reads:
   - orders.pos_shift
+  - orders.pos_shift_approval
+  - orders.pos_shift_incident
   writes: []
 - operation: openShift
   verb: POST
@@ -202,6 +237,8 @@ operations:
   - identity.principal
   - orders.cash_count_line
   - orders.pos_shift
+  - orders.pos_shift_approval
+  - orders.pos_shift_incident
   - platform.venue_settings
   - platform.workstation
   writes:
@@ -233,6 +270,8 @@ operations:
   reads:
   - cache:idempotency
   - orders.pos_shift
+  - orders.pos_shift_approval
+  - orders.pos_shift_incident
   writes:
   - cache:idempotency
   - orders.pos_shift
@@ -247,6 +286,8 @@ operations:
   reads:
   - cache:idempotency
   - orders.pos_shift
+  - orders.pos_shift_approval
+  - orders.pos_shift_incident
   writes:
   - cache:idempotency
   - orders.pos_shift
@@ -275,6 +316,8 @@ operations:
   reads:
   - cache:idempotency
   - orders.pos_shift
+  - orders.pos_shift_approval
+  - orders.pos_shift_incident
   writes:
   - cache:idempotency
   - orders.pos_shift
@@ -289,6 +332,8 @@ operations:
   reads:
   - cache:idempotency
   - orders.deposit_box
+  - orders.deposit_box_foreign_holding
+  - orders.deposit_box_opening_denomination
   writes:
   - cache:idempotency
   - orders.cash_movement

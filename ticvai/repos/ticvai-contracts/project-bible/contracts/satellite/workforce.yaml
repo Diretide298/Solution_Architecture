@@ -38,10 +38,19 @@ info:
     the entire operational value** — a venue with only the rota believes it is fully staffed
     every day.
 
+    ## Dates are local
+
+    **Every `format: date` parameter here is a calendar day in the Region's time zone**
+    (`RegionSettings.timeZone`, which every venue inherits and cannot override), running from
+    local midnight to local midnight. Not UTC: in the Gulf a UTC day starts at four in the
+    morning, and a rota read by UTC days moves the night shift onto the wrong date. Instants
+    (`startsAt`, `occurredAt`) stay `date-time` in UTC, as everywhere else.
+
     ## Deliberately not here
 
     **Payroll.** Attendance produces hours; what they are worth is a finance system's problem
-    and almost certainly an existing one. This contract exports; it does not calculate pay.
+    and almost certainly an existing one. This contract records the hours; it does not calculate
+    pay, and it has **no export operation** — neither of hours nor of the rota.
 
     **Leave and absence approval.** Requests route through `approvals`, which already has
     delegation, escalation and segregation of duties. A second approval mechanism here would be
@@ -90,9 +99,11 @@ paths:
       parameters:
         - name: from
           in: query
+          description: First calendar day, in the Region's time zone, not UTC.
           schema: { type: string, format: date }
         - name: to
           in: query
+          description: Last calendar day, in the Region's time zone, not UTC.
           schema: { type: string, format: date }
         - name: principalId
           in: query
@@ -108,8 +119,13 @@ paths:
           content:
             application/json:
               schema:
-                type: array
-                items: { $ref: '#/components/schemas/RotaAssignment' }
+                allOf:
+                  - $ref: '../shared/common.yaml#/components/schemas/Page'
+                  - type: object
+                    properties:
+                      items:
+                        type: array
+                        items: { $ref: '#/components/schemas/RotaAssignment' }
 
     post:
       operationId: createRotaAssignment
@@ -143,6 +159,9 @@ paths:
             schema: { $ref: '#/components/schemas/RotaAssignment' }
       responses:
         '201':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Assigned
           content:
             application/json:
@@ -204,6 +223,9 @@ paths:
                 secondPrincipalId: { type: string, format: uuid, nullable: true }
       responses:
         '202':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Broadcasting
           content:
             application/json:
@@ -237,6 +259,9 @@ paths:
             schema: { $ref: '#/components/schemas/RotaAssignment' }
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Updated
           content:
             application/json:
@@ -284,6 +309,9 @@ paths:
                 reason: { type: string, maxLength: 300 }
       responses:
         '202':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Awaiting the other party, then approval
           content:
             application/json:
@@ -312,6 +340,7 @@ paths:
       parameters:
         - name: date
           in: query
+          description: A calendar day, in the Region's time zone, not UTC.
           schema: { type: string, format: date }
         - name: principalId
           in: query
@@ -377,6 +406,9 @@ paths:
                 longitude: { type: number, nullable: true }
       responses:
         '201':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Recorded
           content:
             application/json:
@@ -426,6 +458,9 @@ paths:
                 reason: { type: string, maxLength: 300 }
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Amended, with the original retained
           content:
             application/json:
@@ -501,6 +536,9 @@ paths:
             schema: { $ref: '#/components/schemas/Announcement' }
       responses:
         '201':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Published
           content:
             application/json:
@@ -535,6 +573,9 @@ paths:
         - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       responses:
         '204':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Acknowledged
 
   /announcements/{announcementId}/reach:
@@ -676,6 +717,9 @@ paths:
               $ref: '#/components/schemas/ShiftTemplate'
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Set
           content:
             application/json:
@@ -713,6 +757,9 @@ paths:
               $ref: '#/components/schemas/StaffingRules'
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Set
           content:
             application/json:
@@ -746,12 +793,14 @@ paths:
       - name: from
         in: query
         required: true
+        description: First calendar day, in the Region's time zone, not UTC.
         schema:
           type: string
           format: date
       - name: to
         in: query
         required: true
+        description: Last calendar day, in the Region's time zone, not UTC.
         schema:
           type: string
           format: date
@@ -824,6 +873,9 @@ paths:
               $ref: '#/components/schemas/LeaveRequest'
       responses:
         '201':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Requested, with the coverage impact
           content:
             application/json:
@@ -854,12 +906,14 @@ paths:
       - name: from
         in: query
         required: true
+        description: First calendar day, in the Region's time zone, not UTC.
         schema:
           type: string
           format: date
       - name: to
         in: query
         required: true
+        description: Last calendar day, in the Region's time zone, not UTC.
         schema:
           type: string
           format: date
@@ -907,11 +961,13 @@ paths:
       parameters:
       - name: from
         in: query
+        description: First calendar day, in the Region's time zone, not UTC.
         schema:
           type: string
           format: date
       - name: to
         in: query
+        description: Last calendar day, in the Region's time zone, not UTC.
         schema:
           type: string
           format: date
@@ -1128,6 +1184,9 @@ paths:
               $ref: '#/components/schemas/WorkforceJobTitle'
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Set
           content:
             application/json:
@@ -1177,6 +1236,9 @@ paths:
               $ref: '#/components/schemas/WorkforceLeaveType'
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Set
           content:
             application/json:
@@ -1263,6 +1325,9 @@ paths:
               $ref: '#/components/schemas/WorkforceShift'
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Set
           content:
             application/json:
@@ -1298,7 +1363,7 @@ paths:
           format: uuid
       - name: activeOn
         in: query
-        description: Postings in force on this date. Omit for current.
+        description: Postings in force on this calendar day, in the Region's time zone. Omit for current.
         schema:
           type: string
           format: date
@@ -1334,6 +1399,9 @@ paths:
               $ref: '#/components/schemas/WorkforceWorkAssignment'
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Posted
           content:
             application/json:
@@ -1389,6 +1457,9 @@ paths:
               $ref: '#/components/schemas/WorkforceIntegrationSource'
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Set
           content:
             application/json:
@@ -1461,6 +1532,9 @@ paths:
                 $ref: '#/components/schemas/WorkforceFieldOwnership'
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Set
           content:
             application/json:
@@ -2688,6 +2762,12 @@ components:
           description: >
             What they are rostered to do — gate steward, cashier, lifeguard, technician. **Most
             positions never touch a till**, which is why a rota assignment is not a shift.
+
+            **A position code, not a label.** It is the same value as
+            `StaffingRules.minimumCover[].positionCode`, `OpenShift.positionCode` and
+            `StaffingCoverage.positionCode`: coverage counts rostered people per position, so an
+            assignment spelled differently from the rule it fills is counted against nothing and
+            the gap stays open. Tenant-defined, which is why it is not an enum here.
         requiredRoleId:
           type: string
           format: uuid

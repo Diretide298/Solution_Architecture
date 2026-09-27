@@ -20,7 +20,8 @@ it before anyone writes the rebuild this file eventually needs.
 What is derived, and from where:
 
   `reads`   tables behind the schemas an operation RETURNS
-  `writes`  tables behind the schema it ACCEPTS in a request body
+  `writes`  tables behind the schema it ACCEPTS in a request body, plus the line table its
+            body's non-persisted `lines`-style arrays land in (`child_writes`)
   the rest  read straight off `x-ticvai-*` on the operation
 
 Run: `python3 tools/derive-lineage.py [--apply] [--audit]`
@@ -89,6 +90,96 @@ def persistence_map() -> dict:
             if parts:
                 out[n] = parts
     return out
+
+
+def _snake(name: str) -> str:
+    return re.sub(r"(?<!^)(?=[A-Z])", "_", name).lower()
+
+
+def _local_ref(node) -> str | None:
+    r = (node or {}).get("$ref") if isinstance(node, dict) else None
+    m = re.match(r"^#/components/schemas/([A-Za-z0-9_]+)$", r or "")
+    return m.group(1) if m else None
+
+
+def body_arrays(node, persist: dict, defs: dict, depth: int = 4) -> set:
+    """Names of the array-of-object properties a request body carries.
+
+    Walks inline objects, `allOf`/`oneOf`/`anyOf`, and `$ref`s to schemas that persist to
+    nothing themselves (a `Create…Request`, a `JournalLine` item). A persisted schema is not
+    walked: its tables are already reported by `tables_in`.
+    """
+    out = set()
+    if depth <= 0 or not isinstance(node, dict):
+        return out
+    if "content" in node:           # the requestBody object itself
+        for media in (node.get("content") or {}).values():
+            out |= body_arrays((media or {}).get("schema"), persist, defs, depth)
+        return out
+    n = _local_ref(node)
+    if n:
+        if n in persist or n not in defs:
+            return out
+        return body_arrays(defs[n], persist, defs, depth - 1)
+    for k in ("allOf", "oneOf", "anyOf"):
+        for sub in node.get(k) or []:
+            out |= body_arrays(sub, persist, defs, depth - 1)
+    for pname, p in (node.get("properties") or {}).items():
+        if not isinstance(p, dict):
+            continue
+        if p.get("type") == "array" and isinstance(p.get("items"), dict):
+            it = p["items"]
+            iname = _local_ref(it)
+            if iname in persist:
+                continue            # a persisted item schema is already a write via tables_in
+            if iname or it.get("type") == "object" or it.get("properties"):
+                out.add(pname)
+        elif p.get("type") == "object" or p.get("properties") or p.get("allOf"):
+            out |= body_arrays(p, persist, defs, depth - 1)
+    return out
+
+
+def child_writes(op: dict, path: str, persist: dict, defs: dict, known: set) -> list:
+    """The line table a request body writes when the lines are not a persisted `$ref`.
+
+    **`tables_in` only sees persisted `$ref`s, and a body's lines are usually neither.**
+    `createJournalEntry` accepts `CreateJournalEntryRequest`, which persists nothing, with
+    `lines: JournalLine[]`, which persists nothing either — the lines are stored as part of
+    `JournalEntry` (`ledger.journal_entry + ledger.journal_line`). `submitCountLines` has an
+    inline body of `lines` against `/stock-counts/{countId}`. Both derived no line-table write,
+    and the pull audit of 26 September then read "nothing writes `journal_line`" as a missing
+    operation when the operation was there all along.
+
+    The line table is found from facts the contract states, never guessed into existence:
+    the parent is a table the operation is about — the head table of a persisted schema it
+    returns or accepts, or the table a `{xId}` path parameter names — and the child is
+    `<parent prefix>_<singular array name>` **only if some schema already persists to it**.
+    """
+    arrays = body_arrays(op.get("requestBody"), persist, defs)
+    if not arrays:
+        return []
+    parents = set()
+    refs = set(re.findall(r"#/components/schemas/([A-Za-z0-9_]+)",
+                          json.dumps([op.get("responses") or {}, op.get("requestBody") or {}])))
+    for r in refs:
+        if r in persist:
+            parents.add(persist[r][0])
+    for pm in re.findall(r"\{([A-Za-z0-9_]+?)Id\}", path):
+        short = _snake(pm)
+        parents |= {t for t in known if t.split(".", 1)[1] == short}
+    out = set()
+    for arr in arrays:
+        sing = _snake(arr)
+        sing = sing[:-3] + "y" if sing.endswith("ies") else (sing[:-1] if sing.endswith("s") else sing)
+        for parent in parents:
+            schema, name = parent.split(".", 1)
+            toks = name.split("_")
+            for k in range(len(toks), 0, -1):
+                cand = "%s.%s_%s" % (schema, "_".join(toks[:k]), sing)
+                if cand in known:
+                    out.add(cand)
+                    break
+    return sorted(out)
 
 
 def tables_in(node, persist: dict, defs: dict = None, depth: int = 6) -> list:
@@ -214,6 +305,7 @@ def derive(stored: dict) -> dict:
     defs = schema_defs()
     svc = service_by_contract(stored)
     sto = stores_by_contract(stored)
+    known = {t for ts in persist.values() for t in ts}
     out = {}
     for c in sorted((ROOT / "contracts").rglob("*.yaml")):
         try:
@@ -231,7 +323,8 @@ def derive(stored: dict) -> dict:
                     "verb": verb.upper(),
                     "path": path,
                     "reads": tables_in(op.get("responses"), persist, defs),
-                    "writes": tables_in(op.get("requestBody"), persist, defs),
+                    "writes": sorted(set(tables_in(op.get("requestBody"), persist, defs))
+                                     | set(child_writes(op, path, persist, defs, known))),
                     # Kept only long enough for the repair below to tell which tables are new
                     # *because refs are now followed*, and stripped before anything is written.
                     "_direct_reads": tables_in(op.get("responses"), persist),

@@ -6,9 +6,9 @@
   "services": 17,
   "deployed": 3,
   "operations": 34,
-  "ofTotalOperations": 2113,
-  "tables": 44,
-  "ofTotalTables": 639
+  "ofTotalOperations": 2135,
+  "tables": 45,
+  "ofTotalTables": 678
  },
  "routing": {
   "note": "**Normal traffic and sale traffic are separate systems running concurrently.** The burst environment carries the on-sale and nothing else; everything a venue does that day continues in the shared cell. **They meet once, afterwards, at reconciliation.**",
@@ -17,8 +17,8 @@
     "name": "normal",
     "target": "shared cell",
     "services": 17,
-    "operations": 2079,
-    "tables": 639,
+    "operations": 2101,
+    "tables": 678,
     "exampleLoad": "stadium, routine Saturday: 60,000 guests x 14 requests = 48.5 RPS",
     "description": "**Everything except the sale.** Admission, food, retail, stock, staff back-office, reporting. Runs whether or not a sale is happening."
    },
@@ -27,7 +27,7 @@
     "target": "burst environment",
     "services": 3,
     "operations": 34,
-    "tables": 44,
+    "tables": 45,
     "exampleLoad": "same stadium on-sale: 1.25M requests in 2h = 1,045 RPS at a 6x burst; compressed to 20 minutes, 6,270",
     "description": "**The on-sale only.** Provisioned before it opens, torn down after, and **its orders reconcile back into the shared cell** (ADR-0035) — which is the single point the two paths touch."
    }
@@ -227,7 +227,7 @@
   {
    "table": "orders.sales_order",
    "schema": "orders",
-   "columns": 18,
+   "columns": 20,
    "burstOperations": 6,
    "written": true,
    "contention": null,
@@ -238,7 +238,7 @@
   {
    "table": "catalogue.inventory_hold",
    "schema": "catalogue",
-   "columns": 15,
+   "columns": 14,
    "burstOperations": 5,
    "written": true,
    "contention": {
@@ -288,7 +288,7 @@
   {
    "table": "catalogue.performance",
    "schema": "catalogue",
-   "columns": 10,
+   "columns": 9,
    "burstOperations": 4,
    "written": false,
    "contention": null,
@@ -299,7 +299,7 @@
   {
    "table": "catalogue.product",
    "schema": "catalogue",
-   "columns": 23,
+   "columns": 24,
    "burstOperations": 4,
    "written": false,
    "contention": null,
@@ -349,6 +349,17 @@
    "note": "**One thing bought on one order**, priced at the moment of sale. A price list changing afterwards does not change what somebody paid"
   },
   {
+   "table": "orders.order_line_eligibility",
+   "schema": "orders",
+   "columns": 7,
+   "burstOperations": 3,
+   "written": false,
+   "contention": null,
+   "contended": false,
+   "contentionIndeterminate": false,
+   "note": "Holds 7 columns. **No description has been written for this table** — the name is the only thing saying what it is"
+  },
+  {
    "table": "promotions.promotion",
    "schema": "promotions",
    "columns": 20,
@@ -362,7 +373,7 @@
   {
    "table": "approvals.delegation",
    "schema": "approvals",
-   "columns": 9,
+   "columns": 10,
    "burstOperations": 2,
    "written": false,
    "contention": null,
@@ -395,7 +406,7 @@
   {
    "table": "catalogue.entitlement_template",
    "schema": "catalogue",
-   "columns": 39,
+   "columns": 30,
    "burstOperations": 2,
    "written": false,
    "contention": null,
@@ -428,7 +439,7 @@
   {
    "table": "ledger.journal_entry",
    "schema": "ledger",
-   "columns": 16,
+   "columns": 20,
    "burstOperations": 2,
    "written": true,
    "contention": null,
@@ -544,12 +555,12 @@
    "contention": null,
    "contended": false,
    "contentionIndeterminate": false,
-   "note": "One request per action needing authorisation. The subject is a reference, never a copy **Hangs off**: **a root** — nothing above it in its schema; references `identity.principal`, `pii.subject`. **Reached by**: 7 operati"
+   "note": "One request per action needing authorisation. The subject is a reference, never a copy **Hangs off**: **a root** — nothing above it in its schema; references `identity.principal`. **Reached by**: 7 operations read it and"
   },
   {
    "table": "catalogue.price_list",
    "schema": "catalogue",
-   "columns": 7,
+   "columns": 8,
    "burstOperations": 1,
    "written": false,
    "contention": null,
@@ -593,7 +604,7 @@
   {
    "table": "marketing.guest_profile",
    "schema": "marketing",
-   "columns": 22,
+   "columns": 23,
    "burstOperations": 1,
    "written": false,
    "contention": null,
@@ -626,7 +637,7 @@
   {
    "table": "orders.refund",
    "schema": "orders",
-   "columns": 17,
+   "columns": 18,
    "burstOperations": 1,
    "written": true,
    "contention": null,
@@ -648,7 +659,7 @@
   {
    "table": "platform.workstation",
    "schema": "platform",
-   "columns": 18,
+   "columns": 17,
    "burstOperations": 1,
    "written": false,
    "contention": null,
@@ -659,7 +670,7 @@
   {
    "table": "retail.return_policy",
    "schema": "retail",
-   "columns": 9,
+   "columns": 10,
    "burstOperations": 1,
    "written": false,
    "contention": null,
@@ -912,6 +923,7 @@
    "reads": [
     "access.entitlement",
     "orders.order_line",
+    "orders.order_line_eligibility",
     "orders.payment",
     "orders.sales_order"
    ],
@@ -932,6 +944,7 @@
    "callsPerBuyer": 1,
    "reads": [
     "orders.order_line",
+    "orders.order_line_eligibility",
     "orders.payment",
     "orders.sales_order"
    ],
@@ -971,6 +984,7 @@
    "callsPerBuyer": 1,
    "reads": [
     "orders.order_line",
+    "orders.order_line_eligibility",
     "orders.payment",
     "orders.sales_order"
    ],

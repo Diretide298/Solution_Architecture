@@ -15,9 +15,14 @@ columns is not an error to any checker that only asks whether the table exists.
 
 Names convert camelCase to snake_case, which is the convention the existing 211 already follow.
 Types map from OpenAPI to Postgres. A `$ref` to another persisted schema becomes a `_id` column;
-a `$ref` to an enum becomes text; an array of objects is a child table's business and is skipped
-rather than flattened into jsonb, because a nested array silently becoming a column is how a
-child table goes missing.
+a `$ref` to an enum becomes text; an array of enum values becomes text[]; an array of objects is a
+child table's business and is skipped rather than flattened into jsonb, because a nested array
+silently becoming a column is how a child table goes missing. A `$ref` to a shape tagged
+"none — computed/projection" is worked out on read and gets no column.
+
+A field that is `nullable` is not NOT NULL even when it is `required`. Descriptions are carried
+whole. Column names follow the mechanical parts of naming-and-style.md (see `conventional_name`).
+`--strict` fails while any table holds only keys.
 """
 
 from __future__ import annotations
@@ -80,8 +85,104 @@ def _is_alias(body) -> bool:
     return isinstance(body, dict) and "$ref" in body and set(body) <= {"$ref", "description"}
 
 
+def describe(spec) -> str:
+    """A column's description: the contract's words, whole.
+
+    **It used to be cut at 220 characters with no marker** (audit R019, 26 September). 266 of
+    6,729 column rows stopped mid-sentence — `ledger.recognition_schedule.priority` ended on
+    "Lowest priority wins, and **", and the rule it was about to state (two schedules at the same
+    priority claiming the same kind are refused) reached no reader of the table. **A cut rule
+    reads as a complete one**, because nothing says it was cut. Any shortening belongs to whoever
+    renders the text, where it can be marked.
+    """
+    if not isinstance(spec, dict):
+        return ""
+    return " ".join((spec.get("description") or "").split())
+
+
+def is_nullable(spec) -> bool:
+    """Whether a property may legitimately hold null, in any of the forms OpenAPI allows.
+
+    **`required` says the key is present; `nullable` says its value may be null.** Reading only the
+    first made `Entitlement.subjectId` — required, `nullable: true`, "Null is legitimate" — a
+    `subject_id uuid NOT NULL` (audit R089). A column is NOT NULL only when the field is required
+    *and* cannot be null.
+    """
+    if not isinstance(spec, dict):
+        return False
+    if spec.get("nullable") is True:
+        return True
+    t = spec.get("type")
+    if isinstance(t, list) and "null" in t:
+        return True
+    for key in ("oneOf", "anyOf", "allOf"):
+        for part in spec.get(key) or []:
+            if isinstance(part, dict) and (part.get("type") == "null" or part.get("nullable") is True):
+                return True
+    return False
+
+
+# **A `$ref` to a shape nobody stores is not a column.** `x-ticvai-persistence: "none — computed"`
+# (or a projection, a union, an aggregate) says the value is worked out on read. Landing it as
+# `jsonb` gave `queue.queue.feed`, `marketing.guest_profile.consents` and `control.tenant.licences`
+# — a second, unreconciled copy of data that has a real home (audit R111). **Embedded shapes are
+# different**: "none — embedded in tenant_config" and "none — jsonb column" say the jsonb IS the
+# store, so they keep their column.
+_NOT_STORED = re.compile(r"^none\b.*\b(computed|projection|union|aggregated|composed|derived|"
+                         r"response shape|transient)\b", re.I | re.S)
+
+
+def _target_of(ref: str, schemas: dict):
+    """The schema a `$ref` names, following bare aliases (bounded, because two aliases naming
+    each other would otherwise loop)."""
+    target = schemas.get(ref.rsplit("/", 1)[-1])
+    for _ in range(4):
+        if not _is_alias(target):
+            break
+        target = schemas.get(target["$ref"].rsplit("/", 1)[-1])
+    return target
+
+
+def _array_type(items, schemas: dict, persisted: dict) -> str:
+    """The column type of an array property, or '' where the array is a child table's rows.
+
+    **An array of enum values is a value list, and a value list is `text[]`.** This returned ''
+    for any array whose items were a `$ref`, which is right for objects and wrong for enums:
+    `ApprovalDelegation.kinds` (`[ApprovalKind]`) and `RegisteredDevice.capabilities`
+    (`[DeviceCapability]`) produced no column and no child table, so the delegation stored no
+    kinds and the device no capabilities (audit R179).
+
+    **An array of `allOf` items is objects too.** It fell through to `text[]`, which is how
+    `fnb.service_order.lines` became a `text[] NOT NULL` beside the `service_order_line` table
+    that actually holds the lines (audit R111).
+    """
+    if not isinstance(items, dict):
+        return "text[]"
+    ref = items.get("$ref")
+    if not ref:
+        for part in items.get("allOf") or []:
+            if isinstance(part, dict) and part.get("$ref"):
+                ref = part["$ref"]
+                break
+        else:
+            if items.get("allOf"):
+                return ""
+    if ref:
+        if ref.rsplit("/", 1)[-1] in persisted:
+            return ""                # rows of another table: a join or child table, not a column
+        target = _target_of(ref, schemas)
+        if isinstance(target, dict) and ("enum" in target or target.get("type") in
+                                         ("string", "integer", "number", "boolean")):
+            return "text[]"
+        return ""                    # an array of objects: a child table, not a column
+    if items.get("type") == "object" or items.get("properties") or items.get("oneOf") \
+            or items.get("anyOf"):
+        return ""
+    return "text[]"
+
+
 def resolve_type(spec: dict, schemas: dict, persisted: dict) -> tuple[str, str | None]:
-    """Return (postgres type, referenced table or None)."""
+    """Return (postgres type, referenced table or None). An empty type means no column."""
     if not isinstance(spec, dict):
         return "text", None
 
@@ -95,14 +196,11 @@ def resolve_type(spec: dict, schemas: dict, persisted: dict) -> tuple[str, str |
         name = ref.rsplit("/", 1)[-1]
         if name in persisted:
             return "uuid", persisted[name]
-        target = schemas.get(name)
-        # Follow an alias to what it points at. Bounded, because two aliases naming each other
-        # would otherwise loop — the registry above makes that unlikely, not impossible.
-        for _ in range(4):
-            if not _is_alias(target):
-                break
-            target = schemas.get(target["$ref"].rsplit("/", 1)[-1])
+        target = _target_of(ref, schemas)
         if isinstance(target, dict):
+            tag = persistence_of(target)
+            if isinstance(tag, str) and _NOT_STORED.search(tag.strip()):
+                return "", None      # computed on read: no stored copy
             if "enum" in target:
                 return "text", None
             # **A value object may declare the column it becomes.** 24 August: every column typed
@@ -136,15 +234,67 @@ def resolve_type(spec: dict, schemas: dict, persisted: dict) -> tuple[str, str |
         return "jsonb", None
 
     t = spec.get("type")
+    if isinstance(t, list):          # OpenAPI 3.1: ["string", "null"] — nullability is separate
+        t = next((x for x in t if x != "null"), None)
     if t == "array":
-        items = spec.get("items") or {}
-        if isinstance(items, dict) and (items.get("type") == "object" or items.get("$ref")):
-            return "", None          # a child table, not a column
-        return "text[]", None
+        return _array_type(spec.get("items") or {}, schemas, persisted), None
     if "enum" in spec:
         return "text", None
     return TYPE_MAP.get((t, spec.get("format")), TYPE_MAP.get((t, None), "text")), None
 
+
+
+# **Column names follow `naming-and-style.md` §6.1 and §5.2, mechanically, where the rule is
+# mechanical** (audit R093, 26 September). The wire keeps its field names; only the column moves,
+# exactly as `x-ticvai-column` already does for the 24 September money renames. A field that
+# carries `x-ticvai-column` is never renamed here — somebody chose that name.
+#
+# Covered: a foreign key names its target and ends `_id` (`<referenced_table>_id`; an actor
+# `*_by` is `*_by_principal_id`, the form `collected_by_principal_id` already uses); a boolean
+# reads as an assertion (`is_active`, never `active`); a reserved word is not a column name
+# (`from`/`to` are the validity window §5.2 names `valid_from`/`valid_to`).
+#
+# **Not covered, because the standard does not settle them:** bare money names (`unit_price`,
+# `line_total`, `balance` …) need a gross/net decision per column; `*_at` columns typed `date`
+# need a decision on whether the field is a day or an instant; index and policy names are
+# `derive-ddl.py`'s.
+_RESERVED_RENAME = {"from": "valid_from", "to": "valid_to", "order": "sort_order",
+                    "table": "table_name"}
+_ASSERTING = {"is", "has", "have", "can", "requires", "require", "should", "allows", "allow",
+              "was", "were", "will", "does", "needs", "must", "supports", "accepts", "carries",
+              "contains", "counts", "crosses", "touches", "takes", "participates", "overrides",
+              "breaches", "holds", "includes", "include", "may", "uses", "enforce", "enforces",
+              "show", "shows", "notify", "exclude", "explain", "respect", "prevent", "restore",
+              "retain", "release", "refund", "reroute", "revalidate", "skip", "extend", "degrade",
+              "cache", "cascade", "failover", "alert", "offer", "force", "capture", "no"}
+
+
+def conventional_name(column: str, ctype: str, references: str | None) -> str:
+    """The column name the naming standard asks for; the input unchanged where it already fits."""
+    if column in ("from", "to"):
+        # Only an instant or a day is a validity window; a time-of-day `from` is left for a person.
+        return _RESERVED_RENAME[column] if ctype in ("timestamptz", "date") else column
+    if column in _RESERVED_RENAME:
+        return _RESERVED_RENAME[column]
+    if references and ctype in ("uuid", "text") and column != "id" and not column.endswith("_id"):
+        stem = references.split(".", 1)[-1]
+        if column.endswith("_by") and references == "identity.principal":
+            return column + "_principal_id"
+        base = column[:-4] if column.endswith("_ref") else column
+        if stem == base or stem.startswith(base + "_"):
+            return stem + "_id"
+        return base + "_id"
+    if ctype == "boolean":
+        tokens = column.split("_")
+        if tokens[0] in _ASSERTING:
+            return column
+        if len(tokens) == 1 and not column.endswith("s"):
+            return "is_" + column            # enabled -> is_enabled, active -> is_active
+        if tokens[0] == "auto":
+            return "is_" + column            # auto_switch -> is_auto_switch
+        if len(tokens) > 1 and re.search(r"(ed|able|ible)$", tokens[-1]):
+            return "is_" + column            # attendee_capture_required -> is_attendee_capture_required
+    return column
 
 
 def retired_of(body) -> list[str]:
@@ -230,9 +380,35 @@ def properties_of(body, schemas: dict | None = None, _seen=None) -> dict:
     return out
 
 
+def required_of(body, schemas: dict | None = None, _seen=None) -> set:
+    """Required property names, flattened across `allOf` exactly as `properties_of` flattens.
+
+    **Reading only the top level made every composed schema optional.** `SeatMap` is
+    `SeatMapSummary` plus an object, so its `id`, `name` and `venueId` lost NOT NULL the moment the
+    summary stopped lending its own required list to the table (audit R109).
+    """
+    if not isinstance(body, dict):
+        return set()
+    _seen = _seen or set()
+    out = set(body.get("required") or [])
+    for branch in (body.get("allOf") or []):
+        if not isinstance(branch, dict):
+            continue
+        ref = branch.get("$ref")
+        if ref and schemas is not None:
+            name = ref.split("/")[-1]
+            if name not in _seen:
+                out |= required_of(schemas.get(name), schemas, _seen | {name})
+            continue
+        out |= required_of(branch, schemas, _seen)
+    return out
+
+
 def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__.split("\n")[0])
     ap.add_argument("--dry-run", action="store_true")
+    ap.add_argument("--strict", action="store_true",
+                    help="exit non-zero while any table holds only keys (audit R087)")
     args = ap.parse_args()
 
     contracts = load_contracts()
@@ -240,6 +416,7 @@ def main() -> int:
     persisted: dict[str, str] = {}          # schema name -> table
     owner: dict[str, str] = {}              # table -> contract
     retired: dict[str, set[str]] = {}       # table -> columns the contract has withdrawn
+    schema_contract: dict[str, str] = {}    # schema name -> contract it was registered from
     for name, (_, doc) in contracts.items():
         for sname, body in ((doc.get("components") or {}).get("schemas") or {}).items():
             # **An alias does not claim a name over a definition.** `subscription.ModuleKey` became a
@@ -261,9 +438,31 @@ def main() -> int:
                     # string as a table name created 25 tables that do not exist.
                     table = table.split("+")[0].strip()
                     persisted[sname] = table
-                    owner[table] = name
+                    schema_contract[sname] = name
                     for rc in retired_of(body):
                         retired.setdefault(table, set()).add(rc)
+
+    # **A summary is a projection of a row, not a second source of its columns** (audit R109).
+    # `orders.EntitlementSummary` — one entitlement a guest holds — carried
+    # `x-ticvai-persistence: catalogue.entitlement_template`, and merging it with
+    # `EntitlementTemplate` gave the pre-sale template `entitlement_id NOT NULL`, `status NOT NULL`,
+    # `entries_used` and `last_used_at`: an instance's fields on a definition, a template ->
+    # entitlement -> template cycle, and a create operation that cannot supply its own NOT NULLs.
+    #
+    # Where a table is persisted by a full schema and by a `*Summary`, the full schema alone
+    # names the columns. The summary still resolves as a reference to the table (a `$ref` to it
+    # is still a key), and a table persisted *only* by a summary keeps it.
+    by_table: dict[str, list[str]] = {}
+    for sname, table in persisted.items():
+        by_table.setdefault(table, []).append(sname)
+    projection_only: set[str] = set()
+    for table, snames in by_table.items():
+        if len(snames) > 1 and any(not s.endswith("Summary") for s in snames):
+            projection_only |= {s for s in snames if s.endswith("Summary")}
+    # The owner is the contract of a schema that contributes columns — last wins, as before.
+    for sname, table in persisted.items():
+        if sname not in projection_only:
+            owner[table] = schema_contract[sname]
 
     # The relationship graph knows where a column points; the column did not say so. On 18 August
     # **all 514 relationships were invisible at column level** — `facility_id` on
@@ -296,6 +495,7 @@ def main() -> int:
     # The child's columns come from the array property whose items are objects — that array *is* the
     # child rows, which is why it was skipped as a column in the first place.
     child_of: dict[str, tuple[str, str]] = {}
+    declared_children: set[str] = set()     # children a `+` persistence tag names outright
     for name, (_, doc) in contracts.items():
         for sname, body in ((doc.get("components") or {}).get("schemas") or {}).items():
             raw = persistence_of(body)
@@ -306,6 +506,7 @@ def main() -> int:
                 if "." in child:
                     child_of[child] = (sname, parts[0])
                     owner[child] = name
+                    declared_children.add(child)
 
     # A child table may also be implied rather than declared. `identity.role_permission` is named
     # by the lineage, described in prose and used by an operation, and **no schema declares it** —
@@ -345,6 +546,7 @@ def main() -> int:
     derived: dict[str, list[dict]] = {}
     standalone_wins: set = set()
     parent_key: dict = {}
+    child_rows: set[tuple[str, str]] = set()     # (parent schema, array property) held as rows
     for child, (parent_schema, parent_table) in sorted(child_of.items()):
         body = all_schemas.get(parent_schema) or {}
         # the array of objects on the parent — the rows of the child
@@ -402,16 +604,18 @@ def main() -> int:
         }]
         cols = list(parent_cols)
         for prop, pspec in (items.get("properties") or {}).items():
+            if isinstance(pspec, dict) and pspec.get("x-ticvai-persisted") is False:
+                continue
             ptype, fk = resolve_type(pspec, all_schemas, persisted)
             if not ptype:
                 continue
+            chosen = pspec.get("x-ticvai-column") if isinstance(pspec, dict) else None
             cols.append({
-                "column": (pspec.get("x-ticvai-column") if isinstance(pspec, dict) else None) or snake(prop),
+                "column": chosen or conventional_name(snake(prop), ptype, fk),
                 "type": ptype,
-                "required": "yes" if prop in req else "no",
+                "required": "yes" if prop in req and not is_nullable(pspec) else "no",
                 "source": f"{owner.get(child, '')}.{parent_schema}.{key}[].{prop}",
-                "description": (pspec.get("description") or "").strip().replace("\n", " ")[:220]
-                if isinstance(pspec, dict) else "",
+                "description": describe(pspec),
                 "table": child,
                 **({"references": fk} if fk else {}),
             })
@@ -440,12 +644,33 @@ def main() -> int:
             # floating.** Found on 20 August by a reviewer looking at the picture.
             standalone_wins.discard(child)
             parent_key[child] = cols[0]
+            # **The array that became this child's rows is not also a column on the parent.**
+            # `Role.permissions` is `identity.role_permission`; a `permissions text[]` on the role
+            # beside it would be the same data in two places with no source of truth (audit R111).
+            child_rows.add((parent_schema, key))
 
+    def _held_as_rows(sname: str, table: str, prop: str) -> bool:
+        """An array property whose values live in a child table rather than on this row."""
+        if (sname, prop) in child_rows:
+            return True
+        tail = snake(prop).rstrip("s")
+        short = table.split(".")[-1]
+        schema_part = table.split(".")[0]
+        return any(t.startswith(f"{schema_part}.{short}_")
+                   and t[len(schema_part) + len(short) + 2:].rstrip("s") == tail
+                   for t in known_tables)
+
+    homeless: list[str] = []
     for sname, table in sorted(persisted.items()):
+        if sname in projection_only:
+            continue
         body = all_schemas.get(sname) or {}
-        required = set(body.get("required") or [])
+        required = required_of(body, all_schemas)
         cols = []
         for prop, spec in properties_of(body, all_schemas).items():
+            if isinstance(spec, dict) and spec.get("type") == "array" \
+                    and _held_as_rows(sname, table, prop):
+                continue
             # **`x-ticvai-persisted: false` is a field that travels and is not stored.** 24 August:
             # `currency` and `currencyScale` sat on `orders.pos_shift`, `orders.sales_order`,
             # `platform.workstation` and `catalogue.price_list` — four tables whose value can only
@@ -462,17 +687,25 @@ def main() -> int:
                 continue
             ptype, fk = resolve_type(spec, all_schemas, persisted)
             if not ptype:
+                # **An array of objects with no child table is data with nowhere to go** (audit
+                # R179): `Outlet.openingHours` produced no column and no table, so an outlet
+                # stores no hours. Listed so the contract can declare the child (`A + B`) or mark
+                # the field `x-ticvai-persisted: false`; a table is not invented here.
+                if isinstance(spec, dict) and spec.get("type") == "array" \
+                        and not _held_as_rows(sname, table, prop):
+                    homeless.append(f"{table} <- {sname}.{prop}")
                 continue
+            chosen = spec.get("x-ticvai-column") if isinstance(spec, dict) else None
             cols.append({
                 # **`x-ticvai-column` names the column when the field's name would break the standard**
                 # (24 September): naming-and-style 5.1 bans `total`, `price` and `value` alone, so
                 # `PurchaseOrder.total` lands as `gross_amount` while the wire keeps `total`.
-                "column": (spec.get("x-ticvai-column") if isinstance(spec, dict) else None) or snake(prop),
+                # Without one, the mechanical parts of the standard apply (`conventional_name`).
+                "column": chosen or conventional_name(snake(prop), ptype, fk),
                 "type": ptype,
-                "required": "yes" if prop in required else "no",
+                "required": "yes" if prop in required and not is_nullable(spec) else "no",
                 "source": f"{owner.get(table, '')}.{sname}.{prop}",
-                "description": (spec.get("description") or "").strip().replace("\n", " ")[:220]
-                if isinstance(spec, dict) else "",
+                "description": describe(spec),
                 "table": table,
                 **({"references": fk} if fk else {}),
             })
@@ -501,6 +734,20 @@ def main() -> int:
                 cols = [c for c in prior if c["column"] not in have] + cols
             derived[table] = cols
 
+    # **What a summary used to contribute is withdrawn, not merely no longer derived.** The graph
+    # was built from those columns, so without this `entitlement_template.entitlement_id` comes
+    # straight back as a relationship-graph column on the same run — the loop `retired_of`
+    # describes.
+    for sname in sorted(projection_only):
+        table = persisted[sname]
+        have = {c["column"] for c in derived.get(table, [])}
+        for prop, spec in properties_of(all_schemas.get(sname) or {}, all_schemas).items():
+            ptype, fk = resolve_type(spec, all_schemas, persisted)
+            chosen = spec.get("x-ticvai-column") if isinstance(spec, dict) else None
+            for name in {chosen or snake(prop), chosen or conventional_name(snake(prop), ptype, fk)}:
+                if name not in have:
+                    retired.setdefault(table, set()).add(name)
+
     filled = [t for t in derived if not existing.get(t)]
     changed = [t for t in derived if existing.get(t) and len(existing[t]) != len(derived[t])]
     untouched = [t for t in existing if t not in derived]
@@ -510,6 +757,9 @@ def main() -> int:
     if filled:
         print("   ", ", ".join(sorted(filled)[:8]) + (" …" if len(filled) > 8 else ""))
     print(f"  tables whose column count changes: {len(changed)}")
+    print(f"  arrays stored nowhere (no column, no child table): {len(homeless)}")
+    for h in homeless:
+        print(f"     {h}")
     print(f"  tables the contracts do not describe (kept as-is): {len(untouched)}")
 
     if args.dry_run:
@@ -576,10 +826,20 @@ def main() -> int:
             found["referenceHow"] = e.get("how", "convention")
             found["enforced"] = "yes" if e.get("how") == "declared" else "no"
             continue
+        # **The graph's `required` is not evidence that a column cannot be null.** An actor
+        # column paired with a nullable instant is nullable with it: `revoked_by` is empty for
+        # exactly as long as `revoked_at` is, and `identity.delegated_access.revoked_by NOT NULL`
+        # made every live delegation unwritable (audit R089).
+        _req = e.get("required") or "no"
+        _m = re.match(r"^(.*)_by(?:_principal_id)?$", col)
+        if _req == "yes" and _m:
+            _at = next((c for c in row if c["column"] == _m.group(1) + "_at"), None)
+            if _at is not None and _at.get("required") != "yes":
+                _req = "no"
         row.append({
             "column": col,
             "type": "uuid",
-            "required": e.get("required") or "no",
+            "required": _req,
             "source": "relationship-graph.json",
             "description": (f"Points at {e['to']}. **Not exposed by the contract** — an API returns "
                             "what a caller needs and a table carries what RLS and the joins need."),
@@ -597,6 +857,137 @@ def main() -> int:
             # nowhere. The other 594 are declared and should be enforced by the database.
             "enforced": "yes" if e.get("how") == "declared" else "no",
         })
+
+    def _from_contract(c) -> bool:
+        return str(c.get("source", "")).count(".") >= 2 and not str(c.get("source", "")).startswith(
+            "derive-schema.py")
+
+    def _from_graph(c) -> bool:
+        return c.get("source") == "relationship-graph.json"
+
+    # **One parent, one key** (audit R102). The graph was built from a hand-patched schema
+    # reference, and wherever it named a column differently from the contract the loop above
+    # appended a second one: `catalogue.performance` had `admission_rules_id` (the contract's, a
+    # convention index) *and* `admission_profile_id NOT NULL` (the graph's, the real foreign key);
+    # `orders.cart_line` had `inventory_hold_id` and `lease_id`; `reporting.report_column` had
+    # `report_definition_id` and `definition_id`. Two keys to one row that nothing keeps equal.
+    #
+    # **The contract's column is the one kept, and it takes the edge's enforcement.** A graph-only
+    # key is dropped where the table already has exactly one contract column pointing at the same
+    # table *and* that column is named for it. Actor and scope targets (`identity.principal`,
+    # `platform.scope`) are left alone: `created_by`, `revoked_by` and `approved_by` are three
+    # different people, not one key under three names. A same-role pair (`collected_by` and
+    # `collected_by_principal_id`) is caught by the naming pass below instead.
+    _MANY_ROLES = {"identity.principal", "platform.scope"}
+    _deduped = []
+    for table, row in existing.items():
+        drop = []
+        for g in row:
+            tgt = g.get("references")
+            if not (_from_graph(g) and tgt) or tgt in _MANY_ROLES or not g["column"].endswith("_id"):
+                continue
+            same = [c for c in row if c is not g and _from_contract(c) and c.get("references") == tgt]
+            if len(same) != 1:
+                continue
+            keep = same[0]
+            stem, kstem = tgt.split(".", 1)[-1], keep["column"][:-3] if keep["column"].endswith("_id") else ""
+            if not kstem or not (kstem == stem or stem.endswith("_" + kstem) or kstem.endswith(stem)):
+                continue
+            if g.get("enforced") == "yes" and keep.get("enforced") != "yes":
+                keep["referenceHow"] = "declared"
+                keep["enforced"] = "yes"
+                keep.setdefault("referenceKind", g.get("referenceKind", "reference"))
+            drop.append(g["column"])
+            _deduped.append(f"{table}.{g['column']} -> {keep['column']}")
+        if drop:
+            existing[table] = [c for c in row if not (_from_graph(c) and c["column"] in drop)]
+    print(f"  duplicate graph keys folded into the contract's column: {len(_deduped)}")
+    for d in _deduped:
+        print(f"     {d}")
+
+    # **A `+` persistence tag declares a parent** (audit R200). `StockCount` persists to
+    # `inventory.count + inventory.count_line`: the contract says outright that a count line
+    # belongs to a count. Its `count_id` was still a convention — indexed, never constrained —
+    # while `cart_line`, `order_line` and `purchase_order_line` were real foreign keys, and because
+    # only enforced references are retyped below, `count_line.count_id uuid` never matched
+    # `count.id text`. The parent key of a declared child is a declared reference.
+    _promoted = 0
+    for child in sorted(declared_children):
+        # The key the child pass derived, or — where the parent schema carries no nested array,
+        # as `StockCount` does not — the `<parent>_id` the child's own schema already has.
+        parent_table = child_of[child][1]
+        pk = parent_key.get(child) or {
+            "column": snake(parent_table.split(".")[-1]) + "_id", "references": parent_table}
+        if pk["references"] == child:
+            continue
+        for c in existing.get(child, []):
+            if c["column"] == pk["column"] and c.get("enforced") != "yes":
+                c["references"] = pk["references"]
+                c["referenceKind"] = c.get("referenceKind") or "reference"
+                c["referenceHow"] = "declared"
+                c["enforced"] = "yes"
+                _promoted += 1
+    print(f"  declared-child parent keys made foreign keys: {_promoted}")
+
+    # **Names, once every source has contributed a column** (audit R093). Contract columns were
+    # named at derivation; this catches the graph's and any hand-kept ones, whose edges still
+    # carry last run's names until `derive-relationships` re-reads this file. Where the
+    # conventional name is already taken, a graph-sourced duplicate goes; two contract columns
+    # colliding are left for a person, and printed.
+    _renamed, _clash = [], []
+    for table, row in existing.items():
+        if "." not in table or ":" in table:
+            continue
+        for c in list(row):
+            new = conventional_name(c["column"], c.get("type", ""), c.get("references"))
+            if new == c["column"] or not _from_graph(c) and _from_contract(c):
+                continue
+            other = next((x for x in row if x is not c and x["column"] == new), None)
+            if other is None:
+                _renamed.append(f"{table}.{c['column']} -> {new}")
+                c["column"] = new
+            elif _from_graph(c):
+                if c.get("enforced") == "yes" and other.get("references") == c.get("references"):
+                    other["referenceHow"], other["enforced"] = "declared", "yes"
+                row.remove(c)
+            else:
+                _clash.append(f"{table}.{c['column']} (wants {new}, taken)")
+        # A contract column renamed at derivation leaves last run's graph copy under the new name
+        # beside it: keep the contract's.
+        seen: dict[str, dict] = {}
+        for c in list(row):
+            prev = seen.get(c["column"])
+            if prev is None:
+                seen[c["column"]] = c
+                continue
+            loser = c if _from_graph(c) or not _from_graph(prev) else prev
+            winner = prev if loser is c else c
+            if loser.get("enforced") == "yes" and winner.get("references") == loser.get("references"):
+                winner["referenceHow"], winner["enforced"] = "declared", "yes"
+            row.remove(loser)
+            seen[c["column"]] = winner
+    print(f"  columns renamed to the naming standard after the merge: {len(_renamed)}")
+    for d in _renamed:
+        print(f"     {d}")
+    if _clash:
+        print(f"  columns that break the naming standard and cannot be renamed here: {len(_clash)}")
+        for d in _clash:
+            print(f"     {d}")
+
+    # **An actor column is nullable with its instant**, whichever source added it (audit R089).
+    # The append above handles a new column; this handles one a previous run already kept.
+    _relaxed = 0
+    for table, row in existing.items():
+        names = {c["column"]: c for c in row}
+        for c in row:
+            m = re.match(r"^(.*)_by(?:_principal_id)?$", c["column"])
+            if not (m and _from_graph(c) and c.get("required") == "yes"):
+                continue
+            at = names.get(m.group(1) + "_at")
+            if at is not None and at.get("required") != "yes":
+                c["required"] = "no"
+                _relaxed += 1
+    print(f"  actor columns made nullable with their instant: {_relaxed}")
 
     # **Withdrawn columns come out last, after every source has had its say.** The merge above
     # keeps a column whose source is not the contract, and the loop above re-creates one the graph
@@ -707,6 +1098,31 @@ def main() -> int:
                 _retyped += 1
     print(f"  reference columns retyped to their target's key: {_retyped}")
 
+    # **A table holding nothing but keys is a stub, whatever its comment promises** (audit R087).
+    # `identity.principal_credential` is (id, principal_id) under a comment about a credential
+    # hash; `games.credit_ledger` is (id, card_id) under "credits bought, played and won". Every
+    # structural check passed them: they have columns, a key and a relationship. **What none asked
+    # is whether any column holds the thing the table is for.**
+    #
+    # This cannot be fixed here — the missing columns are contract content (a hash, an amount, an
+    # expiry) that nobody has written. It is printed on every run so the list stays visible, and
+    # `--strict` fails on it once the contracts are expected to be complete.
+    _stubs = []
+    for _t in sorted(_real):
+        _row = existing.get(_t) or []
+        _k = _own_key(_t, [c["column"] for c in _row])
+        if _row and not [c for c in _row if c["column"] != _k and not c.get("references")]:
+            # A join table is keys by design (`<a>_<b>`, naming-and-style §6.1): every target it
+            # points at is named in its own name.
+            _fks = [c["references"] for c in _row if c.get("references")]
+            _stem = _t.split(".", 1)[1]
+            if len(_fks) >= 2 and all(f.split(".", 1)[1].split("_")[-1] in _stem for f in _fks):
+                continue
+            _stubs.append(f"{_t} ({', '.join(c['column'] for c in _row)})")
+    print(f"  tables holding only keys — contract content missing: {len(_stubs)}")
+    for _s in _stubs:
+        print(f"     {_s}")
+
     S["cols"] = existing
     ref_path.write_text(json.dumps(S), encoding="utf-8")
 
@@ -715,6 +1131,9 @@ def main() -> int:
     if empty:
         print("   ", ", ".join(sorted(empty)[:10]) + (" …" if len(empty) > 10 else ""))
     print(f"  → {ref_path.relative_to(ROOT)}")
+    if args.strict and _stubs:
+        print(f"  --strict: {len(_stubs)} table(s) hold only keys", file=sys.stderr)
+        return 1
     return 0
 
 

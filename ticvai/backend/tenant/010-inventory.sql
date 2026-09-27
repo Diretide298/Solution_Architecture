@@ -8,7 +8,7 @@ CREATE TABLE IF NOT EXISTS inventory.count (
     location_id                       uuid NOT NULL,
     location_name                     text,
     kind                              text NOT NULL,
-    status                            text NOT NULL,
+    status                            text NOT NULL CONSTRAINT count_status_chk CHECK (status IN ('open', 'counting', 'closed', 'variancePending', 'posted', 'cancelled')),
     is_blind                          boolean NOT NULL,
     line_count                        integer NOT NULL,
     counted_count                     integer NOT NULL,
@@ -19,7 +19,9 @@ CREATE TABLE IF NOT EXISTS inventory.count (
     journal_entry_id                  text,
     started_at                        timestamptz NOT NULL,
     closed_at                         timestamptz,
-    posted_at                         timestamptz
+    posted_at                         timestamptz,
+    recount_reason                    text,
+    cancel_reason                     text
 );
 
 -- What was actually on the shelf (client board 5, 24 August). A count could be opened and posted
@@ -28,7 +30,7 @@ CREATE TABLE IF NOT EXISTS inventory.count (
 -- different number from the one the counter was looking at
 CREATE TABLE IF NOT EXISTS inventory.count_line (
     id                                uuid PRIMARY KEY NOT NULL,
-    count_id                          uuid NOT NULL,
+    count_id                          text NOT NULL,
     item_id                           uuid NOT NULL,
     location_id                       uuid,
     batch_id                          uuid,
@@ -37,7 +39,7 @@ CREATE TABLE IF NOT EXISTS inventory.count_line (
     uom                               text,
     variance                          numeric(18,4),
     variance_percent                  numeric(18,4),
-    status                            text,
+    status                            text CONSTRAINT count_line_status_chk CHECK (status IN ('entered', 'recountRequested', 'recounted', 'accepted', 'rejected')),
     counted_by_principal_id           uuid,
     counted_at                        timestamptz,
     note                              text
@@ -75,24 +77,24 @@ CREATE TABLE IF NOT EXISTS inventory.goods_receipt_line (
 -- Something a venue stocks, distinct from something it sells. A bottle of syrup is an item and
 -- never a product; a t-shirt is both, joined through retail.merchandise
 CREATE TABLE IF NOT EXISTS inventory.item (
-    sku                               text,
-    barcode                           text,
-    name                              text,
-    venue_id                          uuid,
+    sku                               text NOT NULL CONSTRAINT item_sku_chk CHECK (char_length(sku) <= 64),
+    barcode                           text CONSTRAINT item_barcode_chk CHECK (char_length(barcode) <= 128),
+    name                              text NOT NULL CONSTRAINT item_name_chk CHECK (char_length(name) <= 200),
+    venue_id                          uuid NOT NULL,
     category_id                       uuid,
-    base_unit                         text,
+    base_unit                         text NOT NULL,
     purchase_unit                     text,
-    purchase_unit_factor              numeric(18,4),
-    costing_method                    text,
+    purchase_unit_factor              numeric(18,4) DEFAULT 1,
+    costing_method                    text NOT NULL CONSTRAINT item_costing_method_chk CHECK (costing_method IN ('weightedAverage', 'fifo', 'standardCost', 'lastPurchasePrice')),
     reorder_point                     numeric(18,4),
     reorder_quantity                  numeric(18,4),
     par_level                         numeric(18,4),
     preferred_supplier_id             uuid,
-    allow_negative_stock              boolean,
-    is_perishable                     boolean,
+    allow_negative_stock              boolean DEFAULT false,
+    is_perishable                     boolean DEFAULT false,
     shelf_life_days                   integer,
-    id                                uuid PRIMARY KEY,
-    on_hand                           numeric(18,4),
+    id                                uuid PRIMARY KEY NOT NULL,
+    on_hand                           numeric(18,4) NOT NULL,
     on_order                          numeric(18,4),
     in_transit                        numeric(18,4),
     available                         numeric(18,4),
@@ -100,7 +102,7 @@ CREATE TABLE IF NOT EXISTS inventory.item (
     last_purchase_price               numeric(18,4),
     is_below_reorder_point            boolean,
     has_movements                     boolean,
-    is_active                         boolean
+    is_active                         boolean NOT NULL
 );
 
 -- Where stock physically is — a stockroom, a bar, a cellar
@@ -109,7 +111,7 @@ CREATE TABLE IF NOT EXISTS inventory.location (
     code                              text NOT NULL,
     name                              text NOT NULL,
     venue_id                          uuid NOT NULL,
-    kind                              text NOT NULL,
+    kind                              text NOT NULL CONSTRAINT location_kind_chk CHECK (kind IN ('mainStore', 'subStore', 'kitchen', 'bar', 'retailFloor', 'cellar', 'transit')),
     parent_location_id                uuid,
     is_active                         boolean
 );
@@ -117,23 +119,23 @@ CREATE TABLE IF NOT EXISTS inventory.location (
 -- Every change in stock, and the only truth about a level — stock_level is computed from these and
 -- never stored
 CREATE TABLE IF NOT EXISTS inventory.movement (
-    id                                text PRIMARY KEY,
-    item_id                           uuid,
-    location_id                       uuid,
-    kind                              text,
-    quantity                          numeric(18,4),
+    id                                text PRIMARY KEY NOT NULL,
+    item_id                           uuid NOT NULL,
+    location_id                       uuid NOT NULL,
+    kind                              text NOT NULL CONSTRAINT movement_kind_chk CHECK (kind IN ('receipt', 'issue', 'saleDepletion', 'waste', 'adjustment', 'transferOut', 'transferIn', 'countAdjustment', 'supplierReturn', 'production')),
+    quantity                          numeric(18,4) NOT NULL,
     unit                              text,
-    reason                            text,
+    reason                            text CONSTRAINT movement_reason_chk CHECK (char_length(reason) <= 500),
     cost_center_id                    uuid,
-    recorded_at                       timestamptz,
-    balance_after                     numeric(18,4),
+    recorded_at                       timestamptz NOT NULL,
+    balance_after                     numeric(18,4) NOT NULL,
     unit_cost                         numeric(18,4),
     net_cost_amount                   numeric(18,4),
-    principal_id                      uuid,
+    principal_id                      uuid NOT NULL,
     source_type                       text,
-    source_id                         uuid,
+    source_id                         text,
     journal_entry_id                  text,
-    created_at                        timestamptz
+    created_at                        timestamptz NOT NULL
 );
 
 -- A commitment to buy, priced in the supplier’s currency
@@ -141,15 +143,16 @@ CREATE TABLE IF NOT EXISTS inventory.purchase_order (
     id                                text PRIMARY KEY NOT NULL,
     purchase_order_number             text NOT NULL,
     requisition_id                    text,
+    quotation_id                      uuid,
     supplier_id                       uuid NOT NULL,
     supplier_name                     text,
-    kind                              text,
-    blanket_parent_id                 uuid,
+    kind                              text DEFAULT 'standard' CONSTRAINT purchase_order_kind_chk CHECK (kind IN ('standard', 'blanket', 'release', 'rfqAward')),
+    blanket_parent_id                 text,
     contract_price_valid_until        date,
     rfq_id                            uuid,
     supplier_invoice_ref              text,
-    match_status                      text,
-    status                            text NOT NULL,
+    match_status                      text CONSTRAINT purchase_order_match_status_chk CHECK (match_status IN ('unmatched', 'matched', 'priceVariance', 'quantityVariance', 'bothVariance')),
+    status                            text NOT NULL CONSTRAINT purchase_order_status_chk CHECK (status IN ('raised', 'sent', 'acknowledged', 'partiallyReceived', 'received', 'closedShort', 'cancelled')),
     deliver_to_location_id            uuid,
     net_amount                        numeric(18,4),
     tax_amount                        numeric(18,4),
@@ -158,8 +161,13 @@ CREATE TABLE IF NOT EXISTS inventory.purchase_order (
     raised_by_principal_id            uuid,
     created_at                        timestamptz NOT NULL,
     closed_at                         timestamptz,
+    supplier_reference                text,
+    acknowledged_at                   timestamptz,
+    close_short_reason                text,
+    cancel_reason                     text,
+    cancelled_at                      timestamptz,
     venue_id                          uuid,
-    scope_path                        ltree
+    scope_path                        ltree NOT NULL
 );
 
 -- One item ordered, at a unit price
@@ -178,22 +186,22 @@ CREATE TABLE IF NOT EXISTS inventory.purchase_order_line (
 
 -- A supplier’s price, comparable against others
 CREATE TABLE IF NOT EXISTS inventory.quotation (
-    requisition_id                    text,
-    reference                         text,
+    requisition_id                    text NOT NULL,
+    reference                         text CONSTRAINT quotation_reference_chk CHECK (char_length(reference) <= 128),
     lead_time_days                    integer,
-    valid_until                       date,
-    note                              text,
-    id                                uuid PRIMARY KEY,
-    supplier_id                       uuid,
+    valid_until                       date NOT NULL,
+    note                              text CONSTRAINT quotation_note_chk CHECK (char_length(note) <= 1000),
+    id                                uuid PRIMARY KEY NOT NULL,
+    supplier_id                       uuid NOT NULL,
     supplier_name                     text,
-    gross_amount                      numeric(18,4),
+    gross_amount                      numeric(18,4) NOT NULL,
     is_selected                       boolean,
-    received_at                       timestamptz,
-    scope_path                        ltree
+    received_at                       timestamptz NOT NULL,
+    scope_path                        ltree NOT NULL
 );
 
 -- One item quoted. Hangs off: a child of inventory.quotation; reaches inventory.item through its
--- keys; references inventory.item, inventory.quotation. Reached by: 2 operations read it and 0
+-- keys; references inventory.item, inventory.quotation. Reached by: 2 operations read it and 1
 -- write it.
 CREATE TABLE IF NOT EXISTS inventory.quotation_line (
     quotation_id                      uuid NOT NULL,
@@ -211,28 +219,39 @@ CREATE TABLE IF NOT EXISTS inventory.requisition (
     requisition_number                text NOT NULL,
     venue_id                          uuid NOT NULL,
     department_id                     uuid,
-    status                            text NOT NULL,
+    cost_center_id                    uuid,
+    justification                     text,
+    status                            text NOT NULL CONSTRAINT requisition_status_chk CHECK (status IN ('draft', 'pendingApproval', 'approved', 'rejected', 'returnedForInfo', 'ordered', 'closed', 'cancelled')),
     estimated_total                   numeric(18,4),
     raised_by_principal_id            uuid NOT NULL,
     approved_by_principal_id          uuid,
     approval_note                     text,
     required_by                       date,
     created_at                        timestamptz NOT NULL,
-    approved_at                       timestamptz
+    approved_at                       timestamptz,
+    rejection_reason                  text,
+    rejected_at                       timestamptz,
+    return_question                   text,
+    returned_at                       timestamptz,
+    cancel_reason                     text,
+    cancelled_at                      timestamptz
 );
 
 -- One item asked for. Hangs off: a child of inventory.requisition; reaches inventory.item through
--- its keys; references inventory.item, inventory.requisition. Reached by: 3 operations read it and
--- 0 write it.
+-- its keys; references inventory.item, inventory.requisition. Reached by: 7 operations read it and
+-- 2 write it.
 CREATE TABLE IF NOT EXISTS inventory.requisition_line (
     requisition_id                    text NOT NULL,
     line_id                           text,
     item_id                           uuid,
     item_name                         text,
     requested_quantity                numeric(18,4),
+    suggested_quantity                numeric(18,4),
     approved_quantity                 numeric(18,4),
     ordered_quantity                  numeric(18,4),
     unit                              text,
+    reason                            text,
+    note                              text,
     estimated_cost                    numeric(18,4),
     id                                uuid PRIMARY KEY NOT NULL
 );
@@ -245,7 +264,7 @@ CREATE TABLE IF NOT EXISTS inventory.serialised_item (
     batch_id                          uuid,
     serial                            text NOT NULL,
     location_id                       uuid,
-    status                            text NOT NULL,
+    status                            text NOT NULL CONSTRAINT serialised_item_status_chk CHECK (status IN ('inStock', 'reserved', 'sold', 'returned', 'damaged', 'lost', 'inTransit', 'warranty')),
     sold_on_order_line_id             uuid,
     warranty_until                    date,
     received_at                       timestamptz
@@ -264,7 +283,7 @@ CREATE TABLE IF NOT EXISTS inventory.stock_batch (
     received_at                       timestamptz NOT NULL,
     expires_at                        date,
     supplier_id                       uuid,
-    status                            text
+    status                            text CONSTRAINT stock_batch_status_chk CHECK (status IN ('available', 'quarantined', 'expired', 'recalled', 'consumed', 'written-off'))
 );
 
 -- Holds 10 columns. No description has been written for this table — the name is the only thing
@@ -274,9 +293,9 @@ CREATE TABLE IF NOT EXISTS inventory.stock_reservation (
     item_id                           uuid NOT NULL,
     location_id                       uuid NOT NULL,
     quantity                          numeric(18,4) NOT NULL,
-    source_type                       text NOT NULL,
+    source_type                       text NOT NULL CONSTRAINT stock_reservation_source_type_chk CHECK (char_length(source_type) <= 50),
     source_id                         uuid NOT NULL,
-    status                            text NOT NULL,
+    status                            text NOT NULL CONSTRAINT stock_reservation_status_chk CHECK (char_length(status) <= 30),
     expires_at                        timestamptz,
     created_at                        timestamptz NOT NULL,
     released_at                       timestamptz
@@ -285,8 +304,8 @@ CREATE TABLE IF NOT EXISTS inventory.stock_reservation (
 -- Who a venue buys from, invoicing in their own currency
 CREATE TABLE IF NOT EXISTS inventory.supplier (
     id                                uuid PRIMARY KEY NOT NULL,
-    code                              text NOT NULL,
-    name                              text NOT NULL,
+    code                              text NOT NULL CONSTRAINT supplier_code_chk CHECK (char_length(code) <= 64),
+    name                              text NOT NULL CONSTRAINT supplier_name_chk CHECK (char_length(name) <= 200),
     contact_name                      text,
     contact_email                     text,
     contact_phone                     text,
@@ -296,7 +315,10 @@ CREATE TABLE IF NOT EXISTS inventory.supplier (
     currency                          text,
     account_id                        uuid,
     is_active                         boolean,
-    scope_path                        ltree
+    status                            text CONSTRAINT supplier_status_chk CHECK (status IN ('active', 'onHold', 'suspended', 'terminated')),
+    status_reason                     text,
+    minimum_order_value               numeric(18,4),
+    scope_path                        ltree NOT NULL
 );
 
 -- Holds 12 columns. No description has been written for this table — the name is the only thing
@@ -304,14 +326,14 @@ CREATE TABLE IF NOT EXISTS inventory.supplier (
 CREATE TABLE IF NOT EXISTS inventory.supplier_contract (
     id                                uuid PRIMARY KEY,
     supplier_id                       uuid NOT NULL,
-    number                            text NOT NULL,
-    name                              text NOT NULL,
+    number                            text NOT NULL CONSTRAINT supplier_contract_number_chk CHECK (char_length(number) <= 100),
+    name                              text NOT NULL CONSTRAINT supplier_contract_name_chk CHECK (char_length(name) <= 200),
     valid_from                        date NOT NULL,
     valid_to                          date,
-    currency_code                     text,
+    currency_code                     text CONSTRAINT supplier_contract_currency_code_chk CHECK (char_length(currency_code) <= 10),
     payment_terms_days                integer,
-    document_reference                text,
-    status                            text NOT NULL,
+    document_reference                text CONSTRAINT supplier_contract_document_reference_chk CHECK (char_length(document_reference) <= 500),
+    status                            text NOT NULL CONSTRAINT supplier_contract_status_chk CHECK (char_length(status) <= 30),
     created_by_principal_id           uuid,
     created_at                        timestamptz NOT NULL
 );
@@ -322,12 +344,13 @@ CREATE TABLE IF NOT EXISTS inventory.transfer (
     transfer_number                   text,
     from_location_id                  uuid NOT NULL,
     to_location_id                    uuid NOT NULL,
-    status                            text NOT NULL,
+    status                            text NOT NULL CONSTRAINT transfer_status_chk CHECK (status IN ('dispatched', 'inTransit', 'received', 'partiallyReceived', 'cancelled')),
     dispatched_by_principal_id        uuid,
     received_by_principal_id          uuid,
     dispatched_at                     timestamptz NOT NULL,
     received_at                       timestamptz,
-    scope_path                        ltree
+    close_short_reason                text,
+    scope_path                        ltree NOT NULL
 );
 
 -- One item moving, which is in neither location until it arrives

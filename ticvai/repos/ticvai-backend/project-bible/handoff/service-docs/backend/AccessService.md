@@ -71,6 +71,7 @@ Where the push fails the entitlement is still valid. **The guest paid**, and a b
 | Reads | `access.parking_entitlement`, `access.parking_facility`, `cache:idempotency`, `orders.sales_order` |
 | Writes | `access.parking_entitlement`, `cache:idempotency` |
 | Called by | GST-027, GST-028, WEB-041 |
+| State model | Parking entitlement ([states/parking-entitlement.yaml](../../../states/parking-entitlement.yaml)): created as `pending`; moves `pending` -> `pushed`, `pending` -> `active` **(not settled: see the Gaps sheet)** |
 
 **Parameters**
 
@@ -84,14 +85,14 @@ Where the push fails the entitlement is still valid. **The guest paid**, and a b
 |---|---|---|---|
 | id | string (uuid) |  | (read-only) |
 | facilityId | string (uuid) | yes |  |
-| orderId | string (uuid) | yes |  |
+| orderId | string | yes | The order's id, a ULID as in /orders/{orderId} (orders.sales_order.id). (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
 | subjectId | string (uuid) |  | (nullable) |
 | plateNumber | string |  | Required in plateWhitelist mode, meaningless in the others. (nullable) |
 | plateCountry | string |  | (nullable) |
 | mediaCode | string |  | The code presented in none and qrHandoff modes. (nullable) |
-| status | ParkingEntitlementStatus: enum (pending, pushed, pushFailed, active, used, expired, revoked) |  |  |
-| pushedAt | string (date-time) |  | (nullable) |
-| pushFailureReason | string |  | (nullable) |
+| status | object |  | Server-owned. (read-only) |
+| pushedAt | string (date-time) |  | (read-only; nullable) |
+| pushFailureReason | string |  | (read-only; nullable) |
 | validFrom | string (date-time) | yes |  |
 | validTo | string (date-time) | yes |  |
 
@@ -101,14 +102,14 @@ Where the push fails the entitlement is still valid. **The guest paid**, and a b
 |---|---|---|---|
 | id | string (uuid) |  | (read-only) |
 | facilityId | string (uuid) | yes |  |
-| orderId | string (uuid) | yes |  |
+| orderId | string | yes | The order's id, a ULID as in /orders/{orderId} (orders.sales_order.id). (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
 | subjectId | string (uuid) |  | (nullable) |
 | plateNumber | string |  | Required in plateWhitelist mode, meaningless in the others. (nullable) |
 | plateCountry | string |  | (nullable) |
 | mediaCode | string |  | The code presented in none and qrHandoff modes. (nullable) |
-| status | ParkingEntitlementStatus: enum (pending, pushed, pushFailed, active, used, expired, revoked) |  |  |
-| pushedAt | string (date-time) |  | (nullable) |
-| pushFailureReason | string |  | (nullable) |
+| status | object |  | Server-owned. (read-only) |
+| pushedAt | string (date-time) |  | (read-only; nullable) |
+| pushFailureReason | string |  | (read-only; nullable) |
 | validFrom | string (date-time) | yes |  |
 | validTo | string (date-time) | yes |  |
 
@@ -152,7 +153,7 @@ No image is stored — a template is. **The template cannot reconstruct the face
 | Field | Type | Required | Notes |
 |---|---|---|---|
 | subjectId | string (uuid) | yes |  |
-| entitlementId | string (uuid) | yes |  |
+| entitlementId | string | yes | An Entitlement.id, which is a ULID. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
 | template | string (password) | yes | Write-only, never returned. |
 | capturedAt | string (date-time) | yes |  |
 | source | enum (guestApp, ticketCounter, annualPassCounter) | yes | The three surfaces 3.2.43 allows. |
@@ -166,9 +167,9 @@ No image is stored — a template is. **The template cannot reconstruct the face
 
 | Field | Type | Required | Notes |
 |---|---|---|---|
-| id | string (uuid) | yes |  |
+| id | string (uuid) | yes | (read-only) |
 | subjectId | string (uuid) | yes |  |
-| entitlementId | string (uuid) | yes |  |
+| entitlementId | string | yes | The Entitlement.id, a ULID (pii.subject_biometric.entitlement_id). (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
 | kind | BiometricKind: enum (facePass, faceTag) | yes | BL-106, CF-35. |
 | retentionAnchor | object |  | BL-106. |
 | source | enum (guestApp, ticketCounter, annualPassCounter, entryGate) | yes | entryGate is valid for faceTag only, and 3.2.43's omission of it from Face Pass is deliberate: an enduring enrolment is a considered act with consent attached, not something done in a queue. |
@@ -221,7 +222,7 @@ No image is stored — a template is. **The template cannot reconstruct the face
 | id | string | yes | A ULID, matching TicketStatus.ticketId — stable for the life of the ticket and independent of the media carrying it. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
 | templateId | string (uuid) | yes | The definition it was issued against. |
 | productId | string (uuid) | yes |  |
-| orderId | string (uuid) | yes |  |
+| orderId | string | yes | The order's id, a ULID as in /orders/{orderId} (orders.sales_order.id). (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
 | orderLineId | string (uuid) |  |  |
 | subjectId | string (uuid) | yes | Who holds it. (nullable) |
 | venueId | string (uuid) |  |  |
@@ -231,17 +232,18 @@ No image is stored — a template is. **The template cannot reconstruct the face
 | statusNote | string |  | Not TicketStatus — that is a validation result with a misleading name, computed at scan time and carrying isValid and isInsideVenue. (nullable) |
 | validFrom | string (date-time) | yes |  |
 | validTo | string (date-time) | yes | Resolved at issue from the template, then owned here. |
-| entriesUsed | integer |  | The number validateAccess decrements and nothing was decrementing. (default 0) |
+| entriesUsed | integer |  | The number validateAccess decrements and nothing was decrementing. (default 0; read-only) |
 | entriesAllowed | integer |  | (nullable) |
-| lastEntryAt | string (date-time) |  | (nullable) |
-| frozenDays | integer |  | Days added by a freeze. (default 0) |
+| lastEntryAt | string (date-time) |  | recordedAt of the latest admission counted in entriesUsed, written by the same writes. (read-only; nullable) |
+| frozenDays | integer |  | Days added by a freeze. (default 0; read-only) |
 | suspendedReason | string |  | (nullable) |
 | isNameBound | boolean |  | (default False) |
 | holderName | string |  | (nullable) |
 | sharedWithSubjectIds | array of string (uuid) |  | shareEntitlement. |
 | issuedVia | enum (sale, invitation, reissue, transfer, resale, membership, groupBooking) |  | How it came to exist, and it matters to finance. |
-| supersedesEntitlementId | string (uuid) |  | For a reissue or a resale. (nullable) |
+| supersedesEntitlementId | string |  | For a reissue or a resale. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$; nullable) |
 | walletValueId | string (uuid) |  | Where the template carries stored value. (nullable) |
+| facePassEnrolmentId | string (uuid) |  | The active facePass enrolment on this entitlement (FacePassEnrolment.id), or null when none is. (read-only; nullable) |
 
 **Responses**
 
@@ -329,6 +331,7 @@ The QR payload, wallet pass reference or wristband serial. **Separated from `get
 **`GET /face-pass/enrolments/{enrolmentId}`**: Whether a pass has a face registered, and when
 
 **Returns metadata and never the template.** Whether one exists, when it was captured, which surface enrolled it, and the consent behind it.
+**Where the id comes from.** A screen opening on a guest's pass has the entitlement, not the enrolment: `Entitlement.facePassEnrolmentId` carries the id of the active `facePass` enrolment on that entitlement, or null when there is none — which is itself the answer to *is a face registered on this pass*. The id is also returned by `enrolFacePass`.
 
 |  |  |
 |---|---|
@@ -353,9 +356,9 @@ The QR payload, wallet pass reference or wristband serial. **Separated from `get
 
 | Field | Type | Required | Notes |
 |---|---|---|---|
-| id | string (uuid) | yes |  |
+| id | string (uuid) | yes | (read-only) |
 | subjectId | string (uuid) | yes |  |
-| entitlementId | string (uuid) | yes |  |
+| entitlementId | string | yes | The Entitlement.id, a ULID (pii.subject_biometric.entitlement_id). (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
 | kind | BiometricKind: enum (facePass, faceTag) | yes | BL-106, CF-35. |
 | retentionAnchor | object |  | BL-106. |
 | source | enum (guestApp, ticketCounter, annualPassCounter, entryGate) | yes | entryGate is valid for faceTag only, and 3.2.43's omission of it from Face Pass is deliberate: an enduring enrolment is a considered act with consent attached, not something done in a queue. |
@@ -399,13 +402,46 @@ The QR payload, wallet pass reference or wristband serial. **Separated from `get
 |---|---|---|---|---|
 | includeExpired | query |  | boolean |  |
 | pageSize | query |  | integer |  |
-| cursor | query |  | string | Opaque cursor from a previous page. |
+| cursor | query |  | string | Opaque cursor: the nextCursor of the previous page. |
+
+**Response**: `object`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| items | array of Entitlement | yes |  |
+| items[].id | string | yes | A ULID, matching TicketStatus.ticketId — stable for the life of the ticket and independent of the media carrying it. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
+| items[].templateId | string (uuid) | yes | The definition it was issued against. |
+| items[].productId | string (uuid) | yes |  |
+| items[].orderId | string | yes | The order's id, a ULID as in /orders/{orderId} (orders.sales_order.id). (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
+| items[].orderLineId | string (uuid) |  |  |
+| items[].subjectId | string (uuid) | yes | Who holds it. (nullable) |
+| items[].venueId | string (uuid) |  |  |
+| items[].scopePath | string |  |  |
+| items[].mediaCode | string |  | What is scanned — a QR payload, a wristband serial, a card number. |
+| items[].status | EntitlementStatus: enum (issued, partiallyConsumed, fullyConsumed, expired, cancelled, surrendered) | yes | What the storage layer holds, and what a guest is shown. |
+| items[].statusNote | string |  | Not TicketStatus — that is a validation result with a misleading name, computed at scan time and carrying isValid and isInsideVenue. (nullable) |
+| items[].validFrom | string (date-time) | yes |  |
+| items[].validTo | string (date-time) | yes | Resolved at issue from the template, then owned here. |
+| items[].entriesUsed | integer |  | The number validateAccess decrements and nothing was decrementing. (default 0; read-only) |
+| items[].entriesAllowed | integer |  | (nullable) |
+| items[].lastEntryAt | string (date-time) |  | recordedAt of the latest admission counted in entriesUsed, written by the same writes. (read-only; nullable) |
+| items[].frozenDays | integer |  | Days added by a freeze. (default 0; read-only) |
+| items[].suspendedReason | string |  | (nullable) |
+| items[].isNameBound | boolean |  | (default False) |
+| items[].holderName | string |  | (nullable) |
+| items[].sharedWithSubjectIds | array of string (uuid) |  | shareEntitlement. |
+| items[].issuedVia | enum (sale, invitation, reissue, transfer, resale, membership, groupBooking) |  | How it came to exist, and it matters to finance. |
+| items[].supersedesEntitlementId | string |  | For a reissue or a resale. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$; nullable) |
+| items[].walletValueId | string (uuid) |  | Where the template carries stored value. (nullable) |
+| items[].facePassEnrolmentId | string (uuid) |  | The active facePass enrolment on this entitlement (FacePassEnrolment.id), or null when none is. (read-only; nullable) |
+| nextCursor | string |  |  |
+| hasMore | boolean | yes |  |
 
 **Responses**
 
 | Code | Shape | Meaning |
 |---|---|---|
-| 200 |  | Entitlements, newest first |
+| 200 |  | Newest first: id descending. |
 
 ### listMyEntitlements
 
@@ -436,7 +472,40 @@ The QR payload, wallet pass reference or wristband serial. **Separated from `get
 | state | query |  | enum (usableNow, upcoming, expired, all) |  |
 | includeShared | query |  | boolean | Entitlements shared with this guest by somebody else (shareEntitlement). |
 | pageSize | query |  | integer |  |
-| cursor | query |  | string | Opaque cursor from a previous page. |
+| cursor | query |  | string | Opaque cursor: the nextCursor of the previous page. |
+
+**Response**: `object`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| items | array of Entitlement | yes |  |
+| items[].id | string | yes | A ULID, matching TicketStatus.ticketId — stable for the life of the ticket and independent of the media carrying it. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
+| items[].templateId | string (uuid) | yes | The definition it was issued against. |
+| items[].productId | string (uuid) | yes |  |
+| items[].orderId | string | yes | The order's id, a ULID as in /orders/{orderId} (orders.sales_order.id). (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
+| items[].orderLineId | string (uuid) |  |  |
+| items[].subjectId | string (uuid) | yes | Who holds it. (nullable) |
+| items[].venueId | string (uuid) |  |  |
+| items[].scopePath | string |  |  |
+| items[].mediaCode | string |  | What is scanned — a QR payload, a wristband serial, a card number. |
+| items[].status | EntitlementStatus: enum (issued, partiallyConsumed, fullyConsumed, expired, cancelled, surrendered) | yes | What the storage layer holds, and what a guest is shown. |
+| items[].statusNote | string |  | Not TicketStatus — that is a validation result with a misleading name, computed at scan time and carrying isValid and isInsideVenue. (nullable) |
+| items[].validFrom | string (date-time) | yes |  |
+| items[].validTo | string (date-time) | yes | Resolved at issue from the template, then owned here. |
+| items[].entriesUsed | integer |  | The number validateAccess decrements and nothing was decrementing. (default 0; read-only) |
+| items[].entriesAllowed | integer |  | (nullable) |
+| items[].lastEntryAt | string (date-time) |  | recordedAt of the latest admission counted in entriesUsed, written by the same writes. (read-only; nullable) |
+| items[].frozenDays | integer |  | Days added by a freeze. (default 0; read-only) |
+| items[].suspendedReason | string |  | (nullable) |
+| items[].isNameBound | boolean |  | (default False) |
+| items[].holderName | string |  | (nullable) |
+| items[].sharedWithSubjectIds | array of string (uuid) |  | shareEntitlement. |
+| items[].issuedVia | enum (sale, invitation, reissue, transfer, resale, membership, groupBooking) |  | How it came to exist, and it matters to finance. |
+| items[].supersedesEntitlementId | string |  | For a reissue or a resale. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$; nullable) |
+| items[].walletValueId | string (uuid) |  | Where the template carries stored value. (nullable) |
+| items[].facePassEnrolmentId | string (uuid) |  | The active facePass enrolment on this entitlement (FacePassEnrolment.id), or null when none is. (read-only; nullable) |
+| nextCursor | string |  |  |
+| hasMore | boolean | yes |  |
 
 **Responses**
 
@@ -449,10 +518,13 @@ The QR payload, wallet pass reference or wristband serial. **Separated from `get
 **`GET /parking-facilities`**: Car parks at a venue, and how each integrates
 
 3.2.30 and CF-52, settled 14 August. **Three integration modes**, and the mode decides what the platform must do at sale.
+**Which venue.** A staff caller sees the car parks of every venue their grants reach, and `venueId` narrows that to one. **A guest caller must send `venueId`** — a guest session carries no venue (`guestAuth`), so without it there is no venue to answer for, and the request is a `400`.
+**What a guest gets back.** The permission is the staff case (ADR-0025: audience and permission are orthogonal); a guest needs none, because car parks are what a guest chooses between when buying parking. **A guest is never shown the integration** — `vendorName`, `endpoint`, `credentialRef`, `pushLeadMinutes` and `vendorSwapTargetDays` are omitted from a guest response. They are how the platform talks to a vendor, not anything a guest decides on.
+**The staff permission is `PARKING_CONFIGURE`**, the same one `setParkingFacility` writes with. It was `ACCESS_POINT_CONFIGURE`, which let somebody who could configure a car park fail to read the one they had just configured.
 
 |  |  |
 |---|---|
-| Permission | `ACCESS_POINT_CONFIGURE` |
+| Permission | `PARKING_CONFIGURE` |
 | Scope level | venue |
 | Part of slice | core |
 | Wave | 2 |
@@ -467,14 +539,37 @@ The QR payload, wallet pass reference or wristband serial. **Separated from `get
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
+| venueId | query |  | string (uuid) | Required for a guest caller; optional for staff, where it narrows the list. |
 | pageSize | query |  | integer |  |
-| cursor | query |  | string | Opaque cursor from a previous page. |
+| cursor | query |  | string | Opaque cursor: the nextCursor of the previous page. |
+
+**Response**: `object`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| items | array of ParkingFacility | yes |  |
+| items[].id | string (uuid) |  | Server-assigned, and the upsert key of setParkingFacility. |
+| items[].name | string | yes |  |
+| items[].venueId | string (uuid) | yes |  |
+| items[].mode | ParkingIntegrationMode: enum (none, plateWhitelist, qrHandoff) | yes | CF-52, settled 14 August. |
+| items[].capacity | integer |  | (nullable) |
+| items[].takesPayment | boolean |  | Always false, and stated rather than assumed (19.2.78, CF-124). (default False; read-only) |
+| items[].vendorSwapTargetDays | integer |  | A new parking vendor should take days, not weeks — Qossai, 14 August. (default 5; read-only) |
+| items[].vendorName | string |  | Staff only — omitted from a guest's listParkingFacilities response. (nullable) |
+| items[].endpoint | string |  | Staff only — omitted from a guest's listParkingFacilities response. (nullable) |
+| items[].credentialRef | string |  | A vault reference, never the credential. (nullable) |
+| items[].pushLeadMinutes | integer |  | Staff only — omitted from a guest's listParkingFacilities response. (nullable) |
+| items[].accessPointIds | array of string (uuid) |  | Where the platform validates its own code, in none and qrHandoff modes. |
+| items[].isActive | boolean |  |  |
+| nextCursor | string |  |  |
+| hasMore | boolean | yes |  |
 
 **Responses**
 
 | Code | Shape | Meaning |
 |---|---|---|
 | 200 |  | Facilities |
+| 400 | BadRequest | Validation failed |
 
 ### revokeFacePass
 
@@ -518,6 +613,7 @@ Withdrawn by the guest, ended with the pass, or erased under a DSAR.
 `plateWhitelist` — the guest gives a plate at checkout and the platform pushes it to the parking system's whitelist. **The barrier opens without anything being presented**, which is the best experience and the only mode that needs a plate captured at sale.
 `qrHandoff` — TICVAI sends a code the barrier validates. No plate needed, and it fails the way any code fails: a dead phone at a barrier with a queue behind it.
 A fourth case is out of scope: pay-per-hour parking unrelated to a ticket runs on the parking system's own POS (14 August).
+**PUT semantics — an upsert of one facility, keyed on the body's `id`.** The collection path carries no id, so the body names the target. **No `id`** creates a facility: the server assigns the id and answers `201`. **An `id` that exists** replaces that facility whole and answers `200`: a field left out takes its default or null, it does not keep its stored value. **An `id` that does not exist** is a `404`, never a create with a client-chosen id. `takesPayment` and `vendorSwapTargetDays` are read-only and ignored in a body.
 
 |  |  |
 |---|---|
@@ -542,17 +638,17 @@ A fourth case is out of scope: pay-per-hour parking unrelated to a ticket runs o
 
 | Field | Type | Required | Notes |
 |---|---|---|---|
-| id | string (uuid) |  | (read-only) |
+| id | string (uuid) |  | Server-assigned, and the upsert key of setParkingFacility. |
 | name | string | yes |  |
 | venueId | string (uuid) | yes |  |
 | mode | ParkingIntegrationMode: enum (none, plateWhitelist, qrHandoff) | yes | CF-52, settled 14 August. |
 | capacity | integer |  | (nullable) |
 | takesPayment | boolean |  | Always false, and stated rather than assumed (19.2.78, CF-124). (default False; read-only) |
 | vendorSwapTargetDays | integer |  | A new parking vendor should take days, not weeks — Qossai, 14 August. (default 5; read-only) |
-| vendorName | string |  | (nullable) |
-| endpoint | string |  | (nullable) |
+| vendorName | string |  | Staff only — omitted from a guest's listParkingFacilities response. (nullable) |
+| endpoint | string |  | Staff only — omitted from a guest's listParkingFacilities response. (nullable) |
 | credentialRef | string |  | A vault reference, never the credential. (nullable) |
-| pushLeadMinutes | integer |  | How far ahead of the visit a plate is pushed. (nullable) |
+| pushLeadMinutes | integer |  | Staff only — omitted from a guest's listParkingFacilities response. (nullable) |
 | accessPointIds | array of string (uuid) |  | Where the platform validates its own code, in none and qrHandoff modes. |
 | isActive | boolean |  |  |
 
@@ -560,17 +656,17 @@ A fourth case is out of scope: pay-per-hour parking unrelated to a ticket runs o
 
 | Field | Type | Required | Notes |
 |---|---|---|---|
-| id | string (uuid) |  | (read-only) |
+| id | string (uuid) |  | Server-assigned, and the upsert key of setParkingFacility. |
 | name | string | yes |  |
 | venueId | string (uuid) | yes |  |
 | mode | ParkingIntegrationMode: enum (none, plateWhitelist, qrHandoff) | yes | CF-52, settled 14 August. |
 | capacity | integer |  | (nullable) |
 | takesPayment | boolean |  | Always false, and stated rather than assumed (19.2.78, CF-124). (default False; read-only) |
 | vendorSwapTargetDays | integer |  | A new parking vendor should take days, not weeks — Qossai, 14 August. (default 5; read-only) |
-| vendorName | string |  | (nullable) |
-| endpoint | string |  | (nullable) |
+| vendorName | string |  | Staff only — omitted from a guest's listParkingFacilities response. (nullable) |
+| endpoint | string |  | Staff only — omitted from a guest's listParkingFacilities response. (nullable) |
 | credentialRef | string |  | A vault reference, never the credential. (nullable) |
-| pushLeadMinutes | integer |  | How far ahead of the visit a plate is pushed. (nullable) |
+| pushLeadMinutes | integer |  | Staff only — omitted from a guest's listParkingFacilities response. (nullable) |
 | accessPointIds | array of string (uuid) |  | Where the platform validates its own code, in none and qrHandoff modes. |
 | isActive | boolean |  |  |
 
@@ -578,7 +674,10 @@ A fourth case is out of scope: pay-per-hour parking unrelated to a ticket runs o
 
 | Code | Shape | Meaning |
 |---|---|---|
-| 200 |  | Configured |
+| 200 |  | An existing facility, replaced |
+| 201 |  | A new facility, created |
+| 400 | BadRequest | Validation failed |
+| 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
 
 ### updateParkingEntitlement
 
@@ -586,6 +685,7 @@ A fourth case is out of scope: pay-per-hour parking unrelated to a ticket runs o
 
 **A guest changing car is the common case** and it must work after purchase — someone who books parking a month ahead does not know which car they will bring.
 Revocation removes the plate from the whitelist. A refunded parking entitlement whose plate still opens the barrier is a car park giving away spaces.
+**The body is the change, not the entitlement.** A PATCH carries only what moves — a new plate, or `status: revoked` — through `UpdateParkingEntitlementRequest`. Facility, order and validity window are fixed at purchase and are not resent.
 
 |  |  |
 |---|---|
@@ -598,30 +698,22 @@ Revocation removes the plate from the whitelist. A refunded parking entitlement 
 | Reads | `access.parking_entitlement`, `cache:idempotency` |
 | Writes | `access.parking_entitlement`, `cache:idempotency` |
 | Called by | GST-027, WEB-041 |
+| State model | Parking entitlement ([states/parking-entitlement.yaml](../../../states/parking-entitlement.yaml)): moves `pushFailed` -> `pushed`, `active` -> `revoked`, `pushed` -> `revoked`, `active` -> `pending` |
 
 **Parameters**
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
-| entitlementId | path | yes | string (uuid) |  |
+| entitlementId | path | yes | string |  |
 | Idempotency-Key | header | yes | string | Client-generated ULID. |
 
-**Request body**: `ParkingEntitlement`
+**Request body**: `UpdateParkingEntitlementRequest`
 
 | Field | Type | Required | Notes |
 |---|---|---|---|
-| id | string (uuid) |  | (read-only) |
-| facilityId | string (uuid) | yes |  |
-| orderId | string (uuid) | yes |  |
-| subjectId | string (uuid) |  | (nullable) |
-| plateNumber | string |  | Required in plateWhitelist mode, meaningless in the others. (nullable) |
+| plateNumber | string |  | Personal data, under the same rules as ParkingEntitlement.plateNumber. |
 | plateCountry | string |  | (nullable) |
-| mediaCode | string |  | The code presented in none and qrHandoff modes. (nullable) |
-| status | ParkingEntitlementStatus: enum (pending, pushed, pushFailed, active, used, expired, revoked) |  |  |
-| pushedAt | string (date-time) |  | (nullable) |
-| pushFailureReason | string |  | (nullable) |
-| validFrom | string (date-time) | yes |  |
-| validTo | string (date-time) | yes |  |
+| status | enum (revoked) |  | The only status a caller may set. |
 
 **Response**: `ParkingEntitlement`
 
@@ -629,14 +721,14 @@ Revocation removes the plate from the whitelist. A refunded parking entitlement 
 |---|---|---|---|
 | id | string (uuid) |  | (read-only) |
 | facilityId | string (uuid) | yes |  |
-| orderId | string (uuid) | yes |  |
+| orderId | string | yes | The order's id, a ULID as in /orders/{orderId} (orders.sales_order.id). (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
 | subjectId | string (uuid) |  | (nullable) |
 | plateNumber | string |  | Required in plateWhitelist mode, meaningless in the others. (nullable) |
 | plateCountry | string |  | (nullable) |
 | mediaCode | string |  | The code presented in none and qrHandoff modes. (nullable) |
-| status | ParkingEntitlementStatus: enum (pending, pushed, pushFailed, active, used, expired, revoked) |  |  |
-| pushedAt | string (date-time) |  | (nullable) |
-| pushFailureReason | string |  | (nullable) |
+| status | object |  | Server-owned. (read-only) |
+| pushedAt | string (date-time) |  | (read-only; nullable) |
+| pushFailureReason | string |  | (read-only; nullable) |
 | validFrom | string (date-time) | yes |  |
 | validTo | string (date-time) | yes |  |
 
@@ -645,6 +737,7 @@ Revocation removes the plate from the whitelist. A refunded parking entitlement 
 | Code | Shape | Meaning |
 |---|---|---|
 | 200 |  | Updated, and re-pushed |
+| 400 | BadRequest | Validation failed |
 
 
 ## Group: accessPoint
@@ -741,21 +834,21 @@ Denies outright regardless of entitlement state. Included in the offline package
 | name | string | yes |  |
 | venueId | string (uuid) | yes |  |
 | scopePath | string |  |  |
-| externalCredentialSources | array of object |  | BL-108. |
-| externalCredentialSources[].kind | enum (hotelRoomCard, corporateBadge, cityPass, transitCard, partnerToken) |  |  |
-| externalCredentialSources[].providerName | string |  |  |
-| externalCredentialSources[].endpoint | string |  |  |
-| externalCredentialSources[].credentialRef | string |  |  |
-| externalCredentialSources[].grantsProductId | string (uuid) |  |  |
-| scanAnomalyRules | array of object |  | BL-104. |
-| scanAnomalyRules[].rule | enum (simultaneousEntry, impossibleTravelTime, rapidReentry, sharedDevice, velocityBreach) |  |  |
-| scanAnomalyRules[].action | enum (log, flag, requireSupervisor, deny) |  |  |
-| scanAnomalyRules[].thresholdSeconds | integer |  | (nullable) |
+| externalCredentialSources | object |  | BL-108. |
+| scanAnomalyRules | object |  | BL-104. |
 | operatingMode | enum (normal, freeFlow, dropArm, closed, podium, maintenance) |  | BL-107 and BL-109. (default normal) |
 | vehicleLocationCapture | boolean |  | BL-023. (default False) |
 | mode | TurnstileMode: enum (entry, reentry, crossover, exit, freeRotation, closed) | yes |  |
 | direction | Direction: enum (entry, exit, reentry, crossover) |  |  |
 | antiPassbackEnabled | boolean |  |  |
+| requiresExitBeforeReentry | boolean |  | Written by createAccessPoint and updateAccessPoint, and returned so the edit form reads back what it wrote. (default False) |
+| driver | string |  | Driver identifier for the controller behind this access point, as written by createAccessPoint and updateAccessPoint. (nullable) |
+| geofence | object |  | Written by setAccessPointGeofence; null until one is set. (nullable) |
+| geofence.latitude | number |  |  |
+| geofence.longitude | number |  |  |
+| geofence.radiusMetres | integer |  | (min 5; max 5000) |
+| geofence.enforcement | enum (off, warn, deny) | yes | off keeps the fence on record and checks nothing; warn lets a validation from outside the fence through with a warning; deny refuses it. |
+| geofence.allowProximityBeacon | boolean |  | Accept a BLE proximity assertion in place of GPS. |
 | isActive | boolean | yes |  |
 | lastHeartbeatAt | string (date-time) |  | (nullable) |
 
@@ -793,15 +886,9 @@ Denies outright regardless of entitlement state. Included in the offline package
 
 | Field | Type | Required | Notes |
 |---|---|---|---|
-| id | string (uuid) | yes |  |
+| id | string (uuid) | yes | Server-assigned. (read-only) |
 | code | string | yes | (max length 64) |
-| perProductRules | array of object |  | BL-059. |
-| perProductRules[].productId | string (uuid) |  |  |
-| perProductRules[].entriesPerDay | integer |  | (nullable) |
-| perProductRules[].minimumGapMinutes | integer |  | Anti-passback in minutes rather than a boolean. (nullable) |
-| perProductRules[].allowedAccessPointIds | array of string (uuid) |  |  |
-| perProductRules[].biometricPolicy | object |  | BL-105, 3.2.9. |
-| perProductRules[].maxPassesPerBiometricIdentity | integer |  | BL-096, 2.14.7. (min 1; nullable) |
+| perProductRules | object |  | BL-059. |
 | name | string | yes | (max length 200) |
 | openMinutesBefore | integer | yes | How long before a performance validation opens. |
 | closeMinutesAfter | integer | yes |  |
@@ -815,15 +902,9 @@ Denies outright regardless of entitlement state. Included in the offline package
 
 | Field | Type | Required | Notes |
 |---|---|---|---|
-| id | string (uuid) | yes |  |
+| id | string (uuid) | yes | Server-assigned. (read-only) |
 | code | string | yes | (max length 64) |
-| perProductRules | array of object |  | BL-059. |
-| perProductRules[].productId | string (uuid) |  |  |
-| perProductRules[].entriesPerDay | integer |  | (nullable) |
-| perProductRules[].minimumGapMinutes | integer |  | Anti-passback in minutes rather than a boolean. (nullable) |
-| perProductRules[].allowedAccessPointIds | array of string (uuid) |  |  |
-| perProductRules[].biometricPolicy | object |  | BL-105, 3.2.9. |
-| perProductRules[].maxPassesPerBiometricIdentity | integer |  | BL-096, 2.14.7. (min 1; nullable) |
+| perProductRules | object |  | BL-059. |
 | name | string | yes | (max length 200) |
 | openMinutesBefore | integer | yes | How long before a performance validation opens. |
 | closeMinutesAfter | integer | yes |  |
@@ -844,7 +925,8 @@ Denies outright regardless of entitlement state. Included in the offline package
 **`PUT /access-points/{accessPointId}/geofence`**: Set a geofence for handheld validation
 
 Constrains where a handheld may validate for this access point. A roaming scanner used two hundred metres from the gate it claims to be at is either an error or something worse.
-Enforcement is configurable — warn, or deny — because GPS accuracy indoors is not a thing to build a hard block on without thought.
+Enforcement is configurable — `off`, `warn` or `deny` — because GPS accuracy indoors is not a thing to build a hard block on without thought. `off` keeps the fence on record and checks nothing.
+**PUT semantics — replaces this access point's geofence whole.** A field left out is null, not kept. The result is returned as `AccessPoint.geofence` and stored on the access point's row.
 
 |  |  |
 |---|---|
@@ -865,14 +947,14 @@ Enforcement is configurable — warn, or deny — because GPS accuracy indoors i
 | accessPointId | path | yes | string (uuid) |  |
 | Idempotency-Key | header | yes | string | Client-generated ULID. |
 
-**Request body**
+**Request body**: `AccessPointGeofence`
 
 | Field | Type | Required | Notes |
 |---|---|---|---|
 | latitude | number |  |  |
 | longitude | number |  |  |
 | radiusMetres | integer |  | (min 5; max 5000) |
-| enforcement | enum (False, warn, deny) | yes |  |
+| enforcement | enum (off, warn, deny) | yes | off keeps the fence on record and checks nothing; warn lets a validation from outside the fence through with a warning; deny refuses it. |
 | allowProximityBeacon | boolean |  | Accept a BLE proximity assertion in place of GPS. |
 
 **Response**: `AccessPoint`
@@ -884,21 +966,21 @@ Enforcement is configurable — warn, or deny — because GPS accuracy indoors i
 | name | string | yes |  |
 | venueId | string (uuid) | yes |  |
 | scopePath | string |  |  |
-| externalCredentialSources | array of object |  | BL-108. |
-| externalCredentialSources[].kind | enum (hotelRoomCard, corporateBadge, cityPass, transitCard, partnerToken) |  |  |
-| externalCredentialSources[].providerName | string |  |  |
-| externalCredentialSources[].endpoint | string |  |  |
-| externalCredentialSources[].credentialRef | string |  |  |
-| externalCredentialSources[].grantsProductId | string (uuid) |  |  |
-| scanAnomalyRules | array of object |  | BL-104. |
-| scanAnomalyRules[].rule | enum (simultaneousEntry, impossibleTravelTime, rapidReentry, sharedDevice, velocityBreach) |  |  |
-| scanAnomalyRules[].action | enum (log, flag, requireSupervisor, deny) |  |  |
-| scanAnomalyRules[].thresholdSeconds | integer |  | (nullable) |
+| externalCredentialSources | object |  | BL-108. |
+| scanAnomalyRules | object |  | BL-104. |
 | operatingMode | enum (normal, freeFlow, dropArm, closed, podium, maintenance) |  | BL-107 and BL-109. (default normal) |
 | vehicleLocationCapture | boolean |  | BL-023. (default False) |
 | mode | TurnstileMode: enum (entry, reentry, crossover, exit, freeRotation, closed) | yes |  |
 | direction | Direction: enum (entry, exit, reentry, crossover) |  |  |
 | antiPassbackEnabled | boolean |  |  |
+| requiresExitBeforeReentry | boolean |  | Written by createAccessPoint and updateAccessPoint, and returned so the edit form reads back what it wrote. (default False) |
+| driver | string |  | Driver identifier for the controller behind this access point, as written by createAccessPoint and updateAccessPoint. (nullable) |
+| geofence | object |  | Written by setAccessPointGeofence; null until one is set. (nullable) |
+| geofence.latitude | number |  |  |
+| geofence.longitude | number |  |  |
+| geofence.radiusMetres | integer |  | (min 5; max 5000) |
+| geofence.enforcement | enum (off, warn, deny) | yes | off keeps the fence on record and checks nothing; warn lets a validation from outside the fence through with a warning; deny refuses it. |
+| geofence.allowProximityBeacon | boolean |  | Accept a BLE proximity assertion in place of GPS. |
 | isActive | boolean | yes |  |
 | lastHeartbeatAt | string (date-time) |  | (nullable) |
 
@@ -907,6 +989,8 @@ Enforcement is configurable — warn, or deny — because GPS accuracy indoors i
 | Code | Shape | Meaning |
 |---|---|---|
 | 200 |  | Set |
+| 400 | BadRequest | Validation failed |
+| 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
 
 ### setTurnstileMode
 
@@ -949,21 +1033,21 @@ Podium operation. Changes what the gate does, not who may pass it.
 | name | string | yes |  |
 | venueId | string (uuid) | yes |  |
 | scopePath | string |  |  |
-| externalCredentialSources | array of object |  | BL-108. |
-| externalCredentialSources[].kind | enum (hotelRoomCard, corporateBadge, cityPass, transitCard, partnerToken) |  |  |
-| externalCredentialSources[].providerName | string |  |  |
-| externalCredentialSources[].endpoint | string |  |  |
-| externalCredentialSources[].credentialRef | string |  |  |
-| externalCredentialSources[].grantsProductId | string (uuid) |  |  |
-| scanAnomalyRules | array of object |  | BL-104. |
-| scanAnomalyRules[].rule | enum (simultaneousEntry, impossibleTravelTime, rapidReentry, sharedDevice, velocityBreach) |  |  |
-| scanAnomalyRules[].action | enum (log, flag, requireSupervisor, deny) |  |  |
-| scanAnomalyRules[].thresholdSeconds | integer |  | (nullable) |
+| externalCredentialSources | object |  | BL-108. |
+| scanAnomalyRules | object |  | BL-104. |
 | operatingMode | enum (normal, freeFlow, dropArm, closed, podium, maintenance) |  | BL-107 and BL-109. (default normal) |
 | vehicleLocationCapture | boolean |  | BL-023. (default False) |
 | mode | TurnstileMode: enum (entry, reentry, crossover, exit, freeRotation, closed) | yes |  |
 | direction | Direction: enum (entry, exit, reentry, crossover) |  |  |
 | antiPassbackEnabled | boolean |  |  |
+| requiresExitBeforeReentry | boolean |  | Written by createAccessPoint and updateAccessPoint, and returned so the edit form reads back what it wrote. (default False) |
+| driver | string |  | Driver identifier for the controller behind this access point, as written by createAccessPoint and updateAccessPoint. (nullable) |
+| geofence | object |  | Written by setAccessPointGeofence; null until one is set. (nullable) |
+| geofence.latitude | number |  |  |
+| geofence.longitude | number |  |  |
+| geofence.radiusMetres | integer |  | (min 5; max 5000) |
+| geofence.enforcement | enum (off, warn, deny) | yes | off keeps the fence on record and checks nothing; warn lets a validation from outside the fence through with a warning; deny refuses it. |
+| geofence.allowProximityBeacon | boolean |  | Accept a BLE proximity assertion in place of GPS. |
 | isActive | boolean | yes |  |
 | lastHeartbeatAt | string (date-time) |  | (nullable) |
 
@@ -973,7 +1057,7 @@ Podium operation. Changes what the gate does, not who may pass it.
 |---|---|---|
 | 200 |  | Mode set |
 | 403 | Forbidden | Authenticated but not permitted at the requested scope |
-| 404 | NotFound | The resource does not exist, or is outside the caller's scope |
+| 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
 
 ### updateAccessPoint
 
@@ -1018,21 +1102,21 @@ Podium operation. Changes what the gate does, not who may pass it.
 | name | string | yes |  |
 | venueId | string (uuid) | yes |  |
 | scopePath | string |  |  |
-| externalCredentialSources | array of object |  | BL-108. |
-| externalCredentialSources[].kind | enum (hotelRoomCard, corporateBadge, cityPass, transitCard, partnerToken) |  |  |
-| externalCredentialSources[].providerName | string |  |  |
-| externalCredentialSources[].endpoint | string |  |  |
-| externalCredentialSources[].credentialRef | string |  |  |
-| externalCredentialSources[].grantsProductId | string (uuid) |  |  |
-| scanAnomalyRules | array of object |  | BL-104. |
-| scanAnomalyRules[].rule | enum (simultaneousEntry, impossibleTravelTime, rapidReentry, sharedDevice, velocityBreach) |  |  |
-| scanAnomalyRules[].action | enum (log, flag, requireSupervisor, deny) |  |  |
-| scanAnomalyRules[].thresholdSeconds | integer |  | (nullable) |
+| externalCredentialSources | object |  | BL-108. |
+| scanAnomalyRules | object |  | BL-104. |
 | operatingMode | enum (normal, freeFlow, dropArm, closed, podium, maintenance) |  | BL-107 and BL-109. (default normal) |
 | vehicleLocationCapture | boolean |  | BL-023. (default False) |
 | mode | TurnstileMode: enum (entry, reentry, crossover, exit, freeRotation, closed) | yes |  |
 | direction | Direction: enum (entry, exit, reentry, crossover) |  |  |
 | antiPassbackEnabled | boolean |  |  |
+| requiresExitBeforeReentry | boolean |  | Written by createAccessPoint and updateAccessPoint, and returned so the edit form reads back what it wrote. (default False) |
+| driver | string |  | Driver identifier for the controller behind this access point, as written by createAccessPoint and updateAccessPoint. (nullable) |
+| geofence | object |  | Written by setAccessPointGeofence; null until one is set. (nullable) |
+| geofence.latitude | number |  |  |
+| geofence.longitude | number |  |  |
+| geofence.radiusMetres | integer |  | (min 5; max 5000) |
+| geofence.enforcement | enum (off, warn, deny) | yes | off keeps the fence on record and checks nothing; warn lets a validation from outside the fence through with a warning; deny refuses it. |
+| geofence.allowProximityBeacon | boolean |  | Accept a BLE proximity assertion in place of GPS. |
 | isActive | boolean | yes |  |
 | lastHeartbeatAt | string (date-time) |  | (nullable) |
 
@@ -1041,13 +1125,14 @@ Podium operation. Changes what the gate does, not who may pass it.
 | Code | Shape | Meaning |
 |---|---|---|
 | 200 |  | Updated |
-| 404 | NotFound | The resource does not exist, or is outside the caller's scope |
+| 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
 
 ### updateAdmissionRules
 
 **`PUT /admission-rules/{profileId}`**: Update an admission profile
 
 Changes take effect at terminals after the next offline package refresh, not immediately. A profile change during trading is not retroactive.
+**PUT semantics — replaces the profile the path names, whole.** A field left out takes its default or null; it does not keep its stored value. `perProductRules` is replaced as one list, never merged product by product. The body's `id` is read-only and ignored — the path decides which profile is written — and an unknown `profileId` is a `404`, never a create.
 
 |  |  |
 |---|---|
@@ -1073,15 +1158,9 @@ Changes take effect at terminals after the next offline package refresh, not imm
 
 | Field | Type | Required | Notes |
 |---|---|---|---|
-| id | string (uuid) | yes |  |
+| id | string (uuid) | yes | Server-assigned. (read-only) |
 | code | string | yes | (max length 64) |
-| perProductRules | array of object |  | BL-059. |
-| perProductRules[].productId | string (uuid) |  |  |
-| perProductRules[].entriesPerDay | integer |  | (nullable) |
-| perProductRules[].minimumGapMinutes | integer |  | Anti-passback in minutes rather than a boolean. (nullable) |
-| perProductRules[].allowedAccessPointIds | array of string (uuid) |  |  |
-| perProductRules[].biometricPolicy | object |  | BL-105, 3.2.9. |
-| perProductRules[].maxPassesPerBiometricIdentity | integer |  | BL-096, 2.14.7. (min 1; nullable) |
+| perProductRules | object |  | BL-059. |
 | name | string | yes | (max length 200) |
 | openMinutesBefore | integer | yes | How long before a performance validation opens. |
 | closeMinutesAfter | integer | yes |  |
@@ -1095,15 +1174,9 @@ Changes take effect at terminals after the next offline package refresh, not imm
 
 | Field | Type | Required | Notes |
 |---|---|---|---|
-| id | string (uuid) | yes |  |
+| id | string (uuid) | yes | Server-assigned. (read-only) |
 | code | string | yes | (max length 64) |
-| perProductRules | array of object |  | BL-059. |
-| perProductRules[].productId | string (uuid) |  |  |
-| perProductRules[].entriesPerDay | integer |  | (nullable) |
-| perProductRules[].minimumGapMinutes | integer |  | Anti-passback in minutes rather than a boolean. (nullable) |
-| perProductRules[].allowedAccessPointIds | array of string (uuid) |  |  |
-| perProductRules[].biometricPolicy | object |  | BL-105, 3.2.9. |
-| perProductRules[].maxPassesPerBiometricIdentity | integer |  | BL-096, 2.14.7. (min 1; nullable) |
+| perProductRules | object |  | BL-059. |
 | name | string | yes | (max length 200) |
 | openMinutesBefore | integer | yes | How long before a performance validation opens. |
 | closeMinutesAfter | integer | yes |  |
@@ -1118,7 +1191,7 @@ Changes take effect at terminals after the next offline package refresh, not imm
 | Code | Shape | Meaning |
 |---|---|---|
 | 200 |  | Updated |
-| 404 | NotFound | The resource does not exist, or is outside the caller's scope |
+| 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
 
 
 ## Group: drafted
@@ -1146,6 +1219,12 @@ Changes take effect at terminals after the next offline package refresh, not imm
 | Reads | - |
 | Writes | - |
 | Called by | BO-199, POS-016 |
+
+**Parameters**
+
+| Name | In | Required | Type | Notes |
+|---|---|---|---|---|
+| Idempotency-Key | header | yes | string | Client-generated ULID. |
 
 **Request body**: `ReaderScannerPeripheralConfigurationInput`
 
@@ -1176,6 +1255,7 @@ Changes take effect at terminals after the next offline package refresh, not imm
 
 Pulled by scanners and venue edge nodes so validation continues through a WAN outage. Returns entitlements valid within the requested window for the session's access point, plus the deny rules needed to evaluate them.
 `etag` supports conditional refresh — a device on a slow link should not re-download an unchanged package.
+**Workstation-scoped: the access point is the session's.** A caller whose session has no workstation — a back-office browser, a partner, a guest — is refused `403`, because there is no access point to build a package for.
 
 |  |  |
 |---|---|
@@ -1208,7 +1288,7 @@ Pulled by scanners and venue edge nodes so validation continues through a WAN ou
 | validTo | string (date-time) | yes |  |
 | accessPointId | string (uuid) | yes |  |
 | entitlements | array of object | yes |  |
-| entitlements[].ticketId | string | yes |  |
+| entitlements[].ticketId | string | yes | The Entitlement.id. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
 | entitlements[].mediaCodes | array of string | yes | A ticket may carry several media over its life. |
 | entitlements[].validFrom | string (date-time) | yes |  |
 | entitlements[].validTo | string (date-time) | yes |  |
@@ -1219,7 +1299,7 @@ Pulled by scanners and venue edge nodes so validation continues through a WAN ou
 | entitlements[].admissionRulesId | string (uuid) |  |  |
 | delegatedRights | array of object |  | Redemption rights issued by other cells and valid at this access point. |
 | delegatedRights[].rightId | string | yes |  |
-| delegatedRights[].ticketId | string | yes |  |
+| delegatedRights[].ticketId | string | yes | The Entitlement.id in the issuing cell. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
 | delegatedRights[].issuingCellId | string | yes |  |
 | delegatedRights[].guestLinkId | string |  | (nullable) |
 | delegatedRights[].mediaCodes | array of string |  |  |
@@ -1257,11 +1337,16 @@ Every table this service owns that the slice reads or writes, with its columns a
 | name | text | yes |  |
 | venue_id | uuid | yes |  |
 | scope_path | text | no |  |
+| external_credential_sources | jsonb | no | BL-108. |
+| scan_anomaly_rules | jsonb | no | BL-104. |
 | operating_mode | text | no | BL-107 and BL-109. |
 | vehicle_location_capture | boolean | no | BL-023. |
 | mode | text | yes |  |
 | direction | text | no |  |
-| anti_passback_enabled | boolean | no |  |
+| is_anti_passback_enabled | boolean | no |  |
+| requires_exit_before_reentry | boolean | no | Written by createAccessPoint and updateAccessPoint, and returned so the edit form reads back what it wrote. |
+| driver | text | no | Driver identifier for the controller behind this access point, as written by createAccessPoint and updateAccessPoint. |
+| geofence | jsonb | no | Written by setAccessPointGeofence; null until one is set. |
 | is_active | boolean | yes |  |
 | last_heartbeat_at | timestamptz | no |  |
 
@@ -1269,8 +1354,9 @@ Every table this service owns that the slice reads or writes, with its columns a
 
 | Column | Type | Required | Notes |
 |---|---|---|---|
-| id | uuid | yes |  |
+| id | uuid | yes | Server-assigned. |
 | code | text | yes |  |
+| per_product_rules | jsonb | no | BL-059. |
 | name | text | yes |  |
 | open_minutes_before | integer | yes | How long before a performance validation opens. |
 | close_minutes_after | integer | yes |  |
@@ -1299,9 +1385,9 @@ Every table this service owns that the slice reads or writes, with its columns a
 | id | text | yes | A ULID, matching TicketStatus.ticketId — stable for the life of the ticket and independent of the media carrying it. |
 | template_id | uuid | yes | The definition it was issued against. |
 | product_id | uuid | yes |  |
-| order_id | text | yes |  |
+| order_id | text | yes | The order's id, a ULID as in /orders/{orderId} (orders.sales_order.id). |
 | order_line_id | uuid | no |  |
-| subject_id | uuid | yes | Who holds it. |
+| subject_id | uuid | no | Who holds it. |
 | venue_id | uuid | no |  |
 | scope_path | text | no |  |
 | media_code | text | no | What is scanned — a QR payload, a wristband serial, a card number. |
@@ -1311,14 +1397,14 @@ Every table this service owns that the slice reads or writes, with its columns a
 | valid_to | timestamptz | yes | Resolved at issue from the template, then owned here. |
 | entries_used | integer | no | The number validateAccess decrements and nothing was decrementing. |
 | entries_allowed | integer | no |  |
-| last_entry_at | timestamptz | no |  |
+| last_entry_at | timestamptz | no | recordedAt of the latest admission counted in entriesUsed, written by the same writes. |
 | frozen_days | integer | no | Days added by a freeze. |
 | suspended_reason | text | no |  |
 | is_name_bound | boolean | no |  |
 | holder_name | text | no |  |
 | shared_with_subject_ids | text[] | no | shareEntitlement. |
 | issued_via | text | no | How it came to exist, and it matters to finance. |
-| supersedes_entitlement_id | uuid | no | For a reissue or a resale. |
+| supersedes_entitlement_id | text | no | For a reissue or a resale. |
 | wallet_value_id | uuid | no | Where the template carries stored value. |
 
 ### `access.parking_entitlement`
@@ -1327,12 +1413,12 @@ Every table this service owns that the slice reads or writes, with its columns a
 |---|---|---|---|
 | id | uuid | no |  |
 | facility_id | uuid | yes |  |
-| order_id | text | yes |  |
+| order_id | text | yes | The order's id, a ULID as in /orders/{orderId} (orders.sales_order.id). |
 | subject_id | uuid | no |  |
 | plate_number | text | no | Required in plateWhitelist mode, meaningless in the others. |
 | plate_country | text | no |  |
 | media_code | text | no | The code presented in none and qrHandoff modes. |
-| status | text | no |  |
+| status | text | no | Server-owned. |
 | pushed_at | timestamptz | no |  |
 | push_failure_reason | text | no |  |
 | valid_from | timestamptz | yes |  |
@@ -1342,17 +1428,17 @@ Every table this service owns that the slice reads or writes, with its columns a
 
 | Column | Type | Required | Notes |
 |---|---|---|---|
-| id | uuid | no |  |
+| id | uuid | no | Server-assigned, and the upsert key of setParkingFacility. |
 | name | text | yes |  |
 | venue_id | uuid | yes |  |
 | mode | text | yes |  |
 | capacity | integer | no |  |
 | takes_payment | boolean | no | Always false, and stated rather than assumed (19.2.78, CF-124). |
 | vendor_swap_target_days | integer | no | A new parking vendor should take days, not weeks — Qossai, 14 August. |
-| vendor_name | text | no |  |
-| endpoint | text | no |  |
+| vendor_name | text | no | Staff only — omitted from a guest's listParkingFacilities response. |
+| endpoint | text | no | Staff only — omitted from a guest's listParkingFacilities response. |
 | credential_ref | text | no | A vault reference, never the credential. |
-| push_lead_minutes | integer | no | How far ahead of the visit a plate is pushed. |
+| push_lead_minutes | integer | no | Staff only — omitted from a guest's listParkingFacilities response. |
 | access_point_ids | text[] | no | Where the platform validates its own code, in none and qrHandoff modes. |
 | is_active | boolean | no |  |
 
@@ -1360,11 +1446,11 @@ Every table this service owns that the slice reads or writes, with its columns a
 
 | Column | Type | Required | Notes |
 |---|---|---|---|
-| id | text | yes |  |
+| id | text | yes | The scan's client-generated ULID, the key offline replay deduplicates on. |
 | access_point_id | uuid | yes |  |
 | venue_id | uuid | yes |  |
 | scope_path | text | no |  |
-| ticket_id | text | no |  |
+| ticket_id | text | no | The Entitlement.id scanned; null where the media resolved to nothing. |
 | media_code | text | no |  |
 | outcome | text | yes |  |
 | deny_reason | text | no |  |

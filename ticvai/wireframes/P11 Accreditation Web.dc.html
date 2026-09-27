@@ -161,7 +161,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           <div><b>OPERATIONS</b> &middot; none declared</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyNoResults · emptyFirstRun</span></div>
           
-          <div><b>GOES TO</b> &middot; entry point · <a href="#acc-002">ACC-002</a>  &mdash; <i>Registration Form</i><br><a href="#acc-004">ACC-004</a>  &mdash; <i>Application Status Tracking</i></div>
+          <div><b>GOES TO</b> &middot; entry point · <a href="#acc-002">ACC-002</a>  &mdash; <i>Registration Form</i><br><a href="#acc-004">ACC-004</a>  &mdash; <i>Application Status Tracking</i><br><a href="#acc-006">ACC-006</a>  &mdash; <i>Reviewer Queue</i></div>
           
           
         </div>
@@ -318,7 +318,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           <div><b>OPERATIONS</b> &middot; listApprovalRequests</div>
           <div><b>STATES</b> &middot; <span class="">loading · emptyFirstRun · emptyNoResults · emptyNoAccess · error</span></div>
           <div><b>ARRIVES WITH</b> &middot; programmeId&larr;session</div>
-          <div><b>GOES TO</b> &middot; <a href="#acc-007">ACC-007</a>  &mdash; <i>Reviewer Application Detail</i> <span class="car">requestId</span><br><a href="#acc-008">ACC-008</a>  &mdash; <i>Credential Register</i> <span class="car">programmeId</span></div>
+          <div><b>GOES TO</b> &middot; <a href="#acc-007">ACC-007</a>  &mdash; <i>Reviewer Application Detail</i><br><a href="#acc-008">ACC-008</a>  &mdash; <i>Credential Register</i></div>
           
           
         </div>
@@ -350,7 +350,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           <div><b>OPERATIONS</b> &middot; listApprovalRequests · decideApprovalRequest</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyNoAccess · emptyNoResults · emptyFirstRun</span></div>
           <div><b>ARRIVES WITH</b> &middot; requestId&larr;ACC-006</div>
-          <div><b>GOES TO</b> &middot; <a href="#acc-005">ACC-005</a>  &mdash; <i>The badge is issued</i><br><a href="#acc-006">ACC-006</a>  &mdash; <i>Reviewer Queue</i> <span class="car">programmeId</span><br><a href="#acc-008">ACC-008</a>  &mdash; <i>Credential Register</i> <span class="car">programmeId</span></div>
+          <div><b>GOES TO</b> &middot; <a href="#acc-005">ACC-005</a>  &mdash; <i>The badge is issued</i><br><a href="#acc-006">ACC-006</a>  &mdash; <i>Reviewer Queue</i><br><a href="#acc-008">ACC-008</a>  &mdash; <i>Credential Register</i></div>
           
           <div><b>OVERLAYS</b><div class="ov"><b>confirmDialog</b> refuse &middot; <i>Refuse</i></div><div class="ov"><b>drawer</b> approveWithConditions &middot; <i>Approve</i></div></div>
         </div>
@@ -381,7 +381,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           <div><b>OPERATIONS</b> &middot; listAccreditationBadges</div>
           <div><b>STATES</b> &middot; <span class="">loading · emptyFirstRun · emptyNoResults · emptyNoAccess · error</span></div>
           <div><b>ARRIVES WITH</b> &middot; programmeId&larr;session</div>
-          <div><b>GOES TO</b> &middot; <a href="#acc-006">ACC-006</a>  &mdash; <i>Reviewer Queue</i> <span class="car">programmeId</span><br><a href="#acc-007">ACC-007</a>  &mdash; <i>Reviewer Application Detail</i> <span class="car">requestId</span></div>
+          <div><b>GOES TO</b> &middot; <a href="#acc-006">ACC-006</a>  &mdash; <i>Reviewer Queue</i><br><a href="#acc-007">ACC-007</a>  &mdash; <i>Reviewer Application Detail</i></div>
           
           <div><b>OVERLAYS</b><div class="ov"><b>confirmDialog</b> confirmRevoke &middot; <i>Revoke</i></div></div>
         </div>

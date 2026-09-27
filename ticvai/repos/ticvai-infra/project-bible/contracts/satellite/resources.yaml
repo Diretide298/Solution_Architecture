@@ -35,7 +35,7 @@ info:
 
     ## What it deliberately does not own
 
-    **Not staff scheduling.** `workforce` owns rotas. A resource of kind `person` points at a principal
+    **Not staff scheduling.** `workforce` owns rotas. A resource of kind `instructor` or `staff` points at a principal
     and the rota still says when they work — **this says whether they are qualified and whether they are
     already committed.**
 
@@ -70,8 +70,9 @@ paths:
       parameters:
       - name: kind
         in: query
+        description: Only resources of this kind.
         schema:
-          type: string
+          $ref: '#/components/schemas/ResourceKind'
       - name: availableFrom
         in: query
         schema:
@@ -116,6 +117,9 @@ paths:
               $ref: '#/components/schemas/Resource'
       responses:
         '201':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Created
           content:
             application/json:
@@ -191,6 +195,8 @@ paths:
       - staff
       x-ticvai-scope-level: venue
       x-ticvai-read-routing: replica
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
       parameters:
       - name: resourceId
         in: query
@@ -209,8 +215,9 @@ paths:
           format: date-time
       - name: status
         in: query
+        description: Only bookings in this state.
         schema:
-          type: string
+          $ref: '#/components/schemas/ResourceBookingStatus'
       responses:
         '200':
           description: Bookings
@@ -280,8 +287,9 @@ paths:
                   format: uuid
                   nullable: true
                 resourceKind:
-                  type: string
-                  nullable: true
+                  $ref: '#/components/schemas/ResourceKind'
+                  description: Supplied instead of `resourceId` when the caller does not care which
+                    one; the platform picks and the response names it.
                 from:
                   type: string
                   format: date-time
@@ -320,6 +328,9 @@ paths:
                       format: date
       responses:
         '201':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Booked
           content:
             application/json:
@@ -333,7 +344,7 @@ paths:
           content:
             application/problem+json:
               schema:
-                $ref: ../shared/common.yaml#/components/schemas/Problem
+                $ref: '#/components/schemas/ResourceConflictProblem'
   /resource-bookings/{bookingId}/check-out:
     parameters:
     - name: bookingId
@@ -379,6 +390,7 @@ paths:
               type: object
               required:
               - subjectId
+              - recordedAt
               properties:
                 subjectId:
                   type: string
@@ -387,6 +399,25 @@ paths:
                   $ref: ../shared/common.yaml#/components/schemas/Money
                 depositInstrument:
                   $ref: ../shared/common.yaml#/components/schemas/StoredValueKind
+                depositInstrumentId:
+                  type: string
+                  format: uuid
+                  nullable: true
+                  description: '**Which wallet, card, voucher or position the deposit is held against.**
+                    `depositInstrument` says what kind it is and this says which one — the pair is
+                    `kind` and `instrumentId` on `orders.authoriseStoredValue`, which cannot place a
+                    hold without both. Required whenever `depositAmount` is supplied.
+
+                    '
+                recordedAt:
+                  type: string
+                  format: date-time
+                  description: '**When the device handed it over**, not when the write reached the
+                    server. This operation is offline-capable, and a check-out replayed from the outbox
+                    an hour later still went out at the counter time. Stored as the booking''s
+                    `checkedOutAt`; the server records `syncedAt` on arrival (naming-and-style 5.2).
+
+                    '
                 conditionNote:
                   type: string
                   nullable: true
@@ -400,6 +431,9 @@ paths:
                   nullable: true
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Checked out
           content:
             application/json:
@@ -445,6 +479,7 @@ paths:
               type: object
               required:
               - condition
+              - recordedAt
               properties:
                 condition:
                   type: string
@@ -453,6 +488,15 @@ paths:
                   - minorDamage
                   - majorDamage
                   - notReturned
+                recordedAt:
+                  type: string
+                  format: date-time
+                  description: '**When the device took it back**, not when the write reached the server.
+                    Stored as the booking''s `returnedAt`, so an overdue charge is judged against the
+                    counter time rather than the sync time; the server records `syncedAt` on arrival
+                    (naming-and-style 5.2).
+
+                    '
                 captureAmount:
                   $ref: ../shared/common.yaml#/components/schemas/Money
                 note:
@@ -463,6 +507,9 @@ paths:
                   default: false
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Returned
           content:
             application/json:
@@ -476,6 +523,32 @@ paths:
       schema:
         type: string
         format: uuid
+    get:
+      operationId: getResourceQualifications
+      summary: What an instructor or staff resource is certified to do, and until when — as saved
+      description: '**The read the qualifications screen loads before it edits.** `setResourceQualifications`
+        replaces the whole set, so a screen that cannot load the current set can only overwrite it
+        blind — and the expiry on each row is the thing an operator opens the screen to check.
+
+        '
+      tags:
+      - resources
+      x-ticvai-permission: RESOURCE_VIEW
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      x-ticvai-read-routing: replica
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      responses:
+        '200':
+          description: The resource's qualifications, with their expiry
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Qualification'
     put:
       operationId: setResourceQualifications
       x-ticvai-consumed-by:
@@ -518,6 +591,9 @@ paths:
                     $ref: '#/components/schemas/Qualification'
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Set
           content:
             application/json:
@@ -586,14 +662,29 @@ paths:
               type: object
               required:
               - order
+              - recordedAt
               properties:
                 order:
                   type: array
                   items:
                     type: string
                     format: uuid
+                recordedAt:
+                  type: string
+                  format: date-time
+                  description: '**When the device made the change**, not when it reached the server.
+                    This is a `lastWriterWins` write that can arrive from an offline outbox, and without
+                    the device time "last" could only mean last to sync — an instructor''s reorder at the
+                    water''s edge would lose to an older one replayed after it. Stored on each
+                    participant as `recordedAt`; the server records `syncedAt` on arrival
+                    (naming-and-style 5.2).
+
+                    '
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Reordered
           content:
             application/json:
@@ -627,6 +718,8 @@ paths:
       - staff
       x-ticvai-scope-level: venue
       x-ticvai-read-routing: replica
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
       responses:
         '200':
           description: Resource types
@@ -654,6 +747,8 @@ paths:
       - staff
       x-ticvai-scope-level: tenant
       x-ticvai-config-scope: tenant
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       requestBody:
@@ -664,6 +759,9 @@ paths:
               $ref: '#/components/schemas/ResourceType'
       responses:
         '201':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Created
           content:
             application/json:
@@ -694,6 +792,8 @@ paths:
       - staff
       x-ticvai-scope-level: tenant
       x-ticvai-config-scope: tenant
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       requestBody:
@@ -704,6 +804,9 @@ paths:
               $ref: '#/components/schemas/ResourceType'
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Updated
           content:
             application/json:
@@ -714,7 +817,7 @@ paths:
           content:
             application/problem+json:
               schema:
-                $ref: ../shared/common.yaml#/components/schemas/Problem
+                $ref: '#/components/schemas/ResourceInUseProblem'
   /resource-categories:
     get:
       operationId: listResourceCategories
@@ -733,6 +836,8 @@ paths:
       - staff
       x-ticvai-scope-level: venue
       x-ticvai-read-routing: replica
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
       responses:
         '200':
           description: Categories
@@ -753,6 +858,8 @@ paths:
       x-ticvai-audience:
       - staff
       x-ticvai-scope-level: tenant
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       requestBody:
@@ -763,6 +870,9 @@ paths:
               $ref: '#/components/schemas/ResourceCategory'
       responses:
         '201':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Created
           content:
             application/json:
@@ -791,6 +901,8 @@ paths:
       x-ticvai-audience:
       - staff
       x-ticvai-scope-level: tenant
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       requestBody:
@@ -801,11 +913,23 @@ paths:
               $ref: '#/components/schemas/ResourceCategory'
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Updated
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ResourceCategory'
+        '409':
+          description: '**The category is in use**, and the refusal carries how many resources sit
+            beneath it so the warning can say so.
+
+            '
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ResourceInUseProblem'
   /resource-attributes:
     get:
       operationId: listResourceAttributes
@@ -825,6 +949,8 @@ paths:
       - staff
       x-ticvai-scope-level: venue
       x-ticvai-read-routing: replica
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
       responses:
         '200':
           description: Attribute definitions
@@ -845,6 +971,8 @@ paths:
       x-ticvai-audience:
       - staff
       x-ticvai-scope-level: tenant
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       requestBody:
@@ -855,6 +983,9 @@ paths:
               $ref: '#/components/schemas/ResourceAttributeDefinition'
       responses:
         '201':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Created
           content:
             application/json:
@@ -887,6 +1018,8 @@ paths:
       - staff
       x-ticvai-scope-level: venue
       x-ticvai-read-routing: replica
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
       responses:
         '200':
           description: The resource
@@ -905,6 +1038,8 @@ paths:
       x-ticvai-audience:
       - staff
       x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       requestBody:
@@ -915,6 +1050,9 @@ paths:
               $ref: '#/components/schemas/Resource'
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Updated
           content:
             application/json:
@@ -952,6 +1090,8 @@ paths:
       x-ticvai-audience:
       - staff
       x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       requestBody:
@@ -964,17 +1104,7 @@ paths:
               - state
               properties:
                 state:
-                  type: string
-                  enum:
-                  - draft
-                  - pendingApproval
-                  - approved
-                  - active
-                  - temporarilyUnavailable
-                  - underMaintenance
-                  - suspended
-                  - retired
-                  - archived
+                  $ref: '#/components/schemas/ResourceLifecycleState'
                 reason:
                   type: string
                   nullable: true
@@ -1005,7 +1135,7 @@ paths:
           content:
             application/problem+json:
               schema:
-                $ref: ../shared/common.yaml#/components/schemas/Problem
+                $ref: '#/components/schemas/ResourceTransitionProblem'
   /resources/{resourceId}/clone:
     parameters:
     - name: resourceId
@@ -1032,6 +1162,8 @@ paths:
       x-ticvai-audience:
       - staff
       x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       requestBody:
@@ -1085,6 +1217,8 @@ paths:
       - staff
       x-ticvai-scope-level: venue
       x-ticvai-read-routing: replica
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
       responses:
         '200':
           description: The subtree and the ancestors
@@ -1108,6 +1242,8 @@ paths:
       x-ticvai-audience:
       - staff
       x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       requestBody:
@@ -1118,6 +1254,9 @@ paths:
               $ref: '#/components/schemas/ResourceHierarchy'
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Set
           content:
             application/json:
@@ -1128,7 +1267,7 @@ paths:
           content:
             application/problem+json:
               schema:
-                $ref: ../shared/common.yaml#/components/schemas/Problem
+                $ref: '#/components/schemas/ResourceHierarchyProblem'
   /resources/{resourceId}/dependencies:
     parameters:
     - name: resourceId
@@ -1149,6 +1288,8 @@ paths:
       - staff
       x-ticvai-scope-level: venue
       x-ticvai-read-routing: replica
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
       responses:
         '200':
           description: Dependencies
@@ -1177,6 +1318,8 @@ paths:
       x-ticvai-audience:
       - staff
       x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       requestBody:
@@ -1194,6 +1337,9 @@ paths:
                     $ref: '#/components/schemas/ResourceDependency'
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Set
           content:
             application/json:
@@ -1224,6 +1370,8 @@ paths:
       - staff
       x-ticvai-scope-level: venue
       x-ticvai-read-routing: replica
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
       responses:
         '200':
           description: Packages
@@ -1246,6 +1394,8 @@ paths:
       x-ticvai-audience:
       - staff
       x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       requestBody:
@@ -1256,6 +1406,9 @@ paths:
               $ref: '#/components/schemas/ResourcePackage'
       responses:
         '201':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Created
           content:
             application/json:
@@ -1280,6 +1433,8 @@ paths:
       x-ticvai-audience:
       - staff
       x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       requestBody:
@@ -1290,6 +1445,9 @@ paths:
               $ref: '#/components/schemas/ResourcePackage'
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Updated
           content:
             application/json:
@@ -1320,6 +1478,8 @@ paths:
       x-ticvai-audience:
       - staff
       x-ticvai-scope-level: tenant
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       requestBody:
@@ -1330,6 +1490,9 @@ paths:
               $ref: '#/components/schemas/ResourceVenueAssignment'
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Assigned
           content:
             application/json:
@@ -1340,7 +1503,7 @@ paths:
           content:
             application/problem+json:
               schema:
-                $ref: ../shared/common.yaml#/components/schemas/Problem
+                $ref: '#/components/schemas/ResourceConflictProblem'
   /resources/{resourceId}/audit:
     parameters:
     - name: resourceId
@@ -1371,6 +1534,8 @@ paths:
       - staff
       x-ticvai-scope-level: venue
       x-ticvai-read-routing: replica
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
       responses:
         '200':
           description: The timeline
@@ -1410,6 +1575,8 @@ paths:
       - staff
       x-ticvai-scope-level: venue
       x-ticvai-read-routing: replica
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
       parameters:
       - name: from
         in: query
@@ -1473,6 +1640,8 @@ paths:
       - staff
       x-ticvai-scope-level: venue
       x-ticvai-read-routing: replica
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
       responses:
         '200':
           description: The schedule
@@ -1502,6 +1671,8 @@ paths:
       x-ticvai-audience:
       - staff
       x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       requestBody:
@@ -1512,6 +1683,9 @@ paths:
               $ref: '#/components/schemas/ResourceSchedule'
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Set
           content:
             application/json:
@@ -1546,6 +1720,8 @@ paths:
       x-ticvai-audience:
       - staff
       x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       requestBody:
@@ -1582,7 +1758,7 @@ paths:
           content:
             application/problem+json:
               schema:
-                $ref: ../shared/common.yaml#/components/schemas/Problem
+                $ref: '#/components/schemas/ResourceConflictProblem'
     delete:
       operationId: cancelResourceBooking
       x-ticvai-consumed-by:
@@ -1600,7 +1776,10 @@ paths:
       x-ticvai-audience:
       - staff
       x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
       parameters:
+      - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       - name: scope
         in: query
         required: true
@@ -1635,6 +1814,8 @@ paths:
       - staff
       x-ticvai-scope-level: venue
       x-ticvai-read-routing: replica
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
       parameters:
       - name: resourceId
         in: query
@@ -1679,6 +1860,8 @@ paths:
       x-ticvai-audience:
       - staff
       x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       requestBody:
@@ -1689,6 +1872,9 @@ paths:
               $ref: '#/components/schemas/ResourceBlock'
       responses:
         '201':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Blocked
           content:
             application/json:
@@ -1702,7 +1888,7 @@ paths:
           content:
             application/problem+json:
               schema:
-                $ref: ../shared/common.yaml#/components/schemas/Problem
+                $ref: '#/components/schemas/ResourceConflictProblem'
   /resource-blocks/{blockId}:
     parameters:
     - name: blockId
@@ -1722,6 +1908,10 @@ paths:
       x-ticvai-audience:
       - staff
       x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       responses:
         '204':
           description: Released
@@ -1754,6 +1944,8 @@ paths:
       x-ticvai-audience:
       - staff
       x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       requestBody:
@@ -1800,6 +1992,9 @@ paths:
                     '
       responses:
         '201':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Allocated, and which ones
           content:
             application/json:
@@ -1816,7 +2011,7 @@ paths:
           content:
             application/problem+json:
               schema:
-                $ref: ../shared/common.yaml#/components/schemas/Problem
+                $ref: '#/components/schemas/ResourceAllocationProblem'
   /resource-allocations/{bookingId}/replace:
     parameters:
     - name: bookingId
@@ -1842,6 +2037,8 @@ paths:
       x-ticvai-audience:
       - staff
       x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       requestBody:
@@ -1882,6 +2079,8 @@ paths:
       - staff
       x-ticvai-scope-level: venue
       x-ticvai-read-routing: replica
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
       responses:
         '200':
           description: The policy
@@ -1908,6 +2107,8 @@ paths:
       - staff
       x-ticvai-scope-level: venue
       x-ticvai-config-scope: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       requestBody:
@@ -1918,6 +2119,9 @@ paths:
               $ref: '#/components/schemas/ResourceAllocationPolicy'
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Set
           content:
             application/json:
@@ -1954,6 +2158,8 @@ paths:
       - staff
       x-ticvai-scope-level: venue
       x-ticvai-config-scope: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       requestBody:
@@ -2010,6 +2216,8 @@ paths:
       - staff
       x-ticvai-scope-level: venue
       x-ticvai-read-routing: replica
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
       parameters:
       - name: resourceTypeId
         in: query
@@ -2060,6 +2268,8 @@ paths:
       - staff
       x-ticvai-scope-level: venue
       x-ticvai-read-routing: replica
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
       responses:
         '200':
           description: Requirements
@@ -2089,6 +2299,8 @@ paths:
       x-ticvai-audience:
       - staff
       x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       requestBody:
@@ -2106,6 +2318,9 @@ paths:
                     $ref: '#/components/schemas/ResourceRequirement'
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Set
           content:
             application/json:
@@ -2139,6 +2354,8 @@ paths:
       - staff
       x-ticvai-scope-level: venue
       x-ticvai-read-routing: replica
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
       parameters:
       - name: from
         in: query
@@ -2654,8 +2871,12 @@ components:
                   type: string
               from:
                 type: string
+                pattern: ^([01]\d|2[0-3]):[0-5]\d$
+                description: Local time of day, HH:MM.
               to:
                 type: string
+                pattern: ^([01]\d|2[0-3]):[0-5]\d$
+                description: Local time of day, HH:MM.
               effectiveFrom:
                 type: string
                 format: date
@@ -2693,9 +2914,13 @@ components:
               from:
                 type: string
                 nullable: true
+                pattern: ^([01]\d|2[0-3]):[0-5]\d$
+                description: Local time of day, HH:MM.
               to:
                 type: string
                 nullable: true
+                pattern: ^([01]\d|2[0-3]):[0-5]\d$
+                description: Local time of day, HH:MM.
         scopePath:
           type: string
     ResourceBlock:
@@ -2916,33 +3141,7 @@ components:
         name:
           type: string
         kind:
-          type: string
-          enum:
-          - cabana
-          - locker
-          - wheelchair
-          - stroller
-          - equipment
-          - room
-          - auditorium
-          - vehicle
-          - instructor
-          - staff
-          - table
-          - pitch
-          - studio
-          - mealPlan
-          - other
-          description: 'BL-135. **`locker` was an entitlement kind in `orders` and nothing issued, assigned
-            or released one.** A locker is a specific object checked out to a named guest and returned
-            — which is this context exactly, and modelling it as an entitlement would have needed a second
-            check-out mechanism.
-
-            **`mealPlan` is the exception and is listed here to be refused**: 5.5.8b groups it with lockers
-            and parking, and a meal plan is a balance rather than an object. It resolves to `retail.Wallet`
-            with a `mealPlan` credit kind (CF-126), not to a resource.
-
-            '
+          $ref: '#/components/schemas/ResourceKind'
         venueId:
           type: string
           format: uuid
@@ -2961,7 +3160,7 @@ components:
           type: string
           format: uuid
           nullable: true
-          description: 'For a person resource. **`workforce` still owns their rota** — this says whether
+          description: 'For a resource of kind `instructor` or `staff`. **`workforce` still owns their rota** — this says whether
             they are qualified and whether they are already committed.
 
             '
@@ -3074,14 +3273,7 @@ components:
           type: string
           format: date-time
         status:
-          type: string
-          enum:
-          - reserved
-          - checkedOut
-          - returned
-          - overdue
-          - cancelled
-          - noShow
+          $ref: '#/components/schemas/ResourceBookingStatus'
         recurrenceGroupId:
           type: string
           format: uuid
@@ -3116,6 +3308,16 @@ components:
         conditionIn:
           type: string
           nullable: true
+        syncedAt:
+          type: string
+          format: date-time
+          nullable: true
+          readOnly: true
+          description: 'When the latest offline check-out or check-in write reached the server. **The
+            device times are `checkedOutAt` and `returnedAt`**, taken from each write''s `recordedAt`;
+            this is the server''s half of the pair naming-and-style 5.2 requires. Null while pending.
+
+            '
     Qualification:
       type: object
       x-ticvai-persistence: resources.qualification
@@ -3127,6 +3329,15 @@ components:
       - code
       - name
       properties:
+        resourceId:
+          type: string
+          format: uuid
+          readOnly: true
+          description: '**The resource that holds this qualification.** Set from the path of
+            `setResourceQualifications`; without it a stored qualification belongs to nobody and the
+            check before assignment has nothing to check against. One row per resource and `code`.
+
+            '
         code:
           type: string
         name:
@@ -3201,6 +3412,21 @@ components:
         notes:
           type: string
           nullable: true
+        recordedAt:
+          type: string
+          format: date-time
+          nullable: true
+          readOnly: true
+          description: 'When the device made the running-order change that set `position` — the
+            `recordedAt` of the last `reorderSessionManifest`. Null until the order is first changed.
+
+            '
+        syncedAt:
+          type: string
+          format: date-time
+          nullable: true
+          readOnly: true
+          description: When that change reached the server (naming-and-style 5.2).
         hasSignedWaiver:
           type: boolean
           readOnly: true
@@ -3208,3 +3434,215 @@ components:
             about to start does not want to discover an unsigned waiver at the water''s edge.
 
             '
+    ResourceKind:
+      type: string
+      description: 'BL-135. **`locker` was an entitlement kind in `orders` and nothing issued, assigned
+        or released one.** A locker is a specific object checked out to a named guest and returned
+        — which is this context exactly, and modelling it as an entitlement would have needed a second
+        check-out mechanism.
+
+        A seed for `ResourceType` rather than the law (board 1.02): a customer adding a class does it
+        with `createResourceType`, not by waiting for this list to grow.
+
+        '
+      enum:
+      - cabana
+      - locker
+      - wheelchair
+      - stroller
+      - equipment
+      - room
+      - auditorium
+      - vehicle
+      - instructor
+      - staff
+      - table
+      - pitch
+      - studio
+      - other
+      x-ticvai-refuses:
+        mealPlan: '**Listed by 5.5.8b and deliberately not a kind.** 5.5.8b groups meal plans with
+          lockers and parking, but a meal plan is a balance rather than an object. It resolves to
+          `retail.Wallet` with a `mealPlan` credit kind (CF-126), not to a resource — so it is not
+          offered here, and a form built from this enum cannot offer it either.'
+    ResourceBookingStatus:
+      type: string
+      enum:
+      - reserved
+      - checkedOut
+      - returned
+      - overdue
+      - cancelled
+      - noShow
+    ResourceLifecycleState:
+      type: string
+      description: 'Board 1.10. **States of one machine**, whose allowed transitions are configuration.'
+      enum:
+      - draft
+      - pendingApproval
+      - approved
+      - active
+      - temporarilyUnavailable
+      - underMaintenance
+      - suspended
+      - retired
+      - archived
+    ResourceConflictProblem:
+      x-ticvai-persistence: none — error shape
+      description: '**Names every clash with its times.** *"Not available"* on a resource somebody can
+        see in front of them is not an answer. Returned by `bookResource`, `updateResourceBooking`,
+        `createResourceBlock` and `setResourceVenueAssignment`.
+
+        '
+      allOf:
+      - $ref: ../shared/common.yaml#/components/schemas/Problem
+      - type: object
+        required:
+        - conflicts
+        properties:
+          conflicts:
+            type: array
+            items:
+              type: object
+              required:
+              - resourceId
+              - from
+              - to
+              - reason
+              properties:
+                resourceId:
+                  type: string
+                  format: uuid
+                from:
+                  type: string
+                  format: date-time
+                to:
+                  type: string
+                  format: date-time
+                reason:
+                  type: string
+                  enum:
+                  - booked
+                  - setup
+                  - teardown
+                  - maintenance
+                  - blackout
+                  - closed
+                  - operational
+                  - training
+                  - travelBuffer
+                  - overlappingAssignment
+                bookingId:
+                  type: string
+                  format: uuid
+                  nullable: true
+                  description: The booking in the way, where the clash is a booking.
+                blockId:
+                  type: string
+                  format: uuid
+                  nullable: true
+                  description: The block in the way, where the clash is a block.
+                occurrenceFrom:
+                  type: string
+                  format: date-time
+                  nullable: true
+                  description: For a recurring request, the start of the occurrence that clashes.
+    ResourceAllocationProblem:
+      x-ticvai-persistence: none — error shape
+      description: '**"No instructor free" and "the stage has no sound system" need different actions**,
+        so each unmet requirement says which it is. Returned by `allocateResources`.
+
+        '
+      allOf:
+      - $ref: ../shared/common.yaml#/components/schemas/Problem
+      - type: object
+        required:
+        - unmet
+        properties:
+          unmet:
+            type: array
+            items:
+              type: object
+              required:
+              - reason
+              properties:
+                reason:
+                  type: string
+                  enum:
+                  - nothingAvailable
+                  - dependencyMissing
+                requirement:
+                  $ref: '#/components/schemas/ResourceRequirement'
+                availableQuantity:
+                  type: integer
+                  description: How many matching resources were free in the window.
+                missingDependency:
+                  $ref: '#/components/schemas/ResourceDependency'
+    ResourceTransitionProblem:
+      x-ticvai-persistence: none — error shape
+      description: 'Returned by `setResourceLifecycleState`. **Names which refusal it is** — a transition
+        the configuration does not allow, or an approval it requires that has not been given.'
+      allOf:
+      - $ref: ../shared/common.yaml#/components/schemas/Problem
+      - type: object
+        required:
+        - refusedReason
+        properties:
+          refusedReason:
+            type: string
+            enum:
+            - transitionNotAllowed
+            - approvalRequired
+          currentState:
+            $ref: '#/components/schemas/ResourceLifecycleState'
+          requestedState:
+            $ref: '#/components/schemas/ResourceLifecycleState'
+          allowedStates:
+            type: array
+            items:
+              $ref: '#/components/schemas/ResourceLifecycleState'
+    ResourceHierarchyProblem:
+      x-ticvai-persistence: none — error shape
+      description: 'Returned by `setResourceHierarchy` (board 1.06).'
+      allOf:
+      - $ref: ../shared/common.yaml#/components/schemas/Problem
+      - type: object
+        required:
+        - refusedReason
+        properties:
+          refusedReason:
+            type: string
+            enum:
+            - circular
+            - invalidParent
+            - crossTenantUnauthorised
+          cycle:
+            type: array
+            description: For `circular`, the resource ids that would form the loop, in order.
+            items:
+              type: string
+              format: uuid
+    ResourceInUseProblem:
+      x-ticvai-persistence: none — error shape
+      description: 'Returned by `updateResourceType` and `updateResourceCategory`. **Carries the count and
+        the resources**, so the warning can say how many and which.'
+      allOf:
+      - $ref: ../shared/common.yaml#/components/schemas/Problem
+      - type: object
+        required:
+        - refusedReason
+        - resourceCount
+        properties:
+          refusedReason:
+            type: string
+            enum:
+            - resourcesCheckedOut
+            - resourcesInvalidated
+            - categoryInUse
+          resourceCount:
+            type: integer
+          resourceIds:
+            type: array
+            items:
+              type: string
+              format: uuid

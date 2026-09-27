@@ -118,6 +118,10 @@ paths:
         A venue may have several — **a park map and a floor plan per building are different maps,
         not layers of one**, because a guest on the second floor should not be shown the ground
         floor's toilets.
+
+        **The server owns the id, the status and the scope path.** The map is created as a
+        `draft` with a server-assigned id, and `scopePath` comes from `venueId`. Those fields are
+        `readOnly` on `VenueMap`; a client that sends them has them ignored.
       tags: [venueMap]
       x-ticvai-permission: VENUE_MAP_MANAGE
       x-ticvai-audience: [staff]
@@ -134,6 +138,9 @@ paths:
             schema: { $ref: '#/components/schemas/VenueMap' }
       responses:
         '201':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Created as a draft
           content:
             application/json:
@@ -157,6 +164,12 @@ paths:
         19.2.55. **The whole map in one call.** A guest app opening the map should not make one
         request per category — it caches the map and filters locally, which is also what makes it
         work with no signal in the middle of a park.
+
+        **Three things it can return, and the caller says which.** With no parameters, the
+        published version guests see. With `version`, that published version, read from its
+        `VenueMapVersion` snapshot. With `draft=true`, the working draft the editor changes, which
+        is what BO-094 loads. `VenueMapDetail.version` says which published version came back,
+        and is null for the draft.
       tags: [venueMap]
       x-ticvai-permission: VENUE_MAP_VIEW
       x-ticvai-guest-callable: true
@@ -171,10 +184,19 @@ paths:
           schema: { type: integer }
           description: >
             Absent means the published version. **A guest mid-route on version 3 finishes on
-            version 3**, so the client sends the version it cached.
+            version 3**, so the client sends the version it cached. Ignored when `draft` is true.
+        - name: draft
+          in: query
+          schema: { type: boolean, default: false }
+          description: >
+            **Read the working draft instead of a published version.** Staff only, and it needs
+            `VENUE_MAP_MANAGE`, because the draft is unfinished work that must never reach a guest.
+            A guest session, or a caller with only `VENUE_MAP_VIEW`, gets 403.
       responses:
         '200':
-          description: Map
+          description: >
+            The published version asked for, or the draft. **A map that has never been published
+            has no published version**, so without `draft=true` it returns 404.
           content:
             application/json:
               schema: { $ref: '#/components/schemas/VenueMapDetail' }
@@ -204,6 +226,16 @@ paths:
         read as mojibake taken as bytes.
 
         **A file that yields no shapes reports `nothingFound`, not success.**
+
+        **The file is uploaded first, through `assets`.** The drawing does not travel in this
+        request: the client calls `assets.createUpload`, sends the file to the signed URL, calls
+        `assets.completeUpload`, and passes the `MediaAsset.id` that returns as `sourceRef` (and the
+        manifest's as `manifestRef`). Uploading needs `ASSET_LIBRARY_MANAGE` as well as this
+        operation's permission.
+
+        **Returns `202` with the job, which is still `parsing`.** Poll `getVenueMapImportJob` until
+        it is `previewReady` or `failed`. The shapes it extracts go into the working draft, never
+        into the published map.
       tags: [venueMap]
       x-ticvai-permission: VENUE_MAP_MANAGE
       x-ticvai-audience: [staff]
@@ -221,7 +253,13 @@ paths:
               required: [format, sourceRef]
               properties:
                 format: { type: string, enum: [pdfPlan, svgPlan, dwgPlan, dxfPlan, rasterPlan] }
-                sourceRef: { type: string }
+                sourceRef:
+                  type: string
+                  format: uuid
+                  description: >
+                    **The drawing, as the `MediaAsset.id` from `assets.completeUpload`.** Not a URL
+                    and not a storage path; the file itself is never posted through this API.
+                  x-ticvai-references: assets.MediaAsset
                 layerMapping:
                   type: object
                   description: >
@@ -315,9 +353,12 @@ paths:
                           lng: { type: number }
                 manifestRef:
                   type: string
+                  format: uuid
                   nullable: true
+                  x-ticvai-references: assets.MediaAsset
                   description: >
-                    The seating manifest, where this map has seats. **One sheet per section, header
+                    The seating manifest, where this map has seats, as the `MediaAsset.id` from
+                    `assets.completeUpload`, uploaded the same way as `sourceRef`. **One sheet per section, header
                     on row 3, four columns: Description, Section, Row, Seat** — the shape the sample
                     file already uses.
 
@@ -325,7 +366,43 @@ paths:
                     of the spec is about.
       responses:
         '202':
-          description: Extracted to a draft
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: >
+            Accepted and parsing. The job's `id` is what `getVenueMapImportJob` polls.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/VenueMapImportJob' }
+
+  /venue-maps/{mapId}/import/{jobId}:
+    parameters:
+      - name: mapId
+        in: path
+        required: true
+        schema: { type: string, format: uuid }
+      - name: jobId
+        in: path
+        required: true
+        schema: { type: string, format: uuid }
+    get:
+      operationId: getVenueMapImportJob
+      summary: Import progress and findings
+      description: >
+        **The read the `202` from `importVenueGeometry` points at**, following
+        `seating.getImportJob`. The screen polls it until `status` leaves `parsing`, then shows
+        `outcome`, `layersFound`, `unmappedLayers` and `findings`, so an operator can tell a
+        misread file from an empty one before any proposal is reviewed.
+      tags: [venueMap]
+      x-ticvai-permission: VENUE_MAP_VIEW
+      x-ticvai-audience: [staff]
+      x-ticvai-scope-level: venue
+      x-ticvai-read-routing: replica
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      responses:
+        '200':
+          description: Job
           content:
             application/json:
               schema: { $ref: '#/components/schemas/VenueMapImportJob' }
@@ -349,9 +426,13 @@ paths:
         only the AI contract writes AI tables — and the boundary caught this contract trying to
         write `ai.proposed_action` on the day it was drafted.
 
-        **Accepting writes a point and does not touch the proposal.** 
+        **Accepting writes a point and does not touch the proposal.** `ai.decideProposedAction`
         closes it, because ADR-0020 holds in both directions — this contract may read an AI table and
         may not write one, and the isolation check caught that on the second attempt as well.
+
+        **Accepted points go into the working draft**, not the published map. Guests see them
+        after `publishVenueMap`. On an `edit`, the `point` sent is the operator's corrected point;
+        its `id` and `mapId` are `readOnly` and the server assigns them.
 
         Accepting is per proposal, not per map. **An operator who must take all four hundred or
         none will take all four hundred**, and a map with a mislabelled fire exit is worse than one
@@ -383,6 +464,9 @@ paths:
                       point: { $ref: '#/components/schemas/VenuePoint' }
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Applied
           content:
             application/json:
@@ -412,6 +496,14 @@ paths:
         that only works if the map knows which outlet it is.**
 
         Unlinked points are fine and expected — a toilet is a toilet.
+
+        **Writes the working draft, never the published map.** A point placed or moved here reaches
+        guests at the next `publishVenueMap`; until then the published version keeps serving.
+
+        **Place or amend is decided by `pointId`.** Absent, a new point is placed on this map and
+        the server assigns its id. Present, that point is amended; a `pointId` that is not a point
+        on this map returns 404. `VenuePoint.id` and `mapId` are `readOnly`, so a client never
+        makes up an id.
       tags: [venueMap]
       x-ticvai-permission: VENUE_MAP_MANAGE
       x-ticvai-audience: [staff]
@@ -424,9 +516,12 @@ paths:
         required: true
         content:
           application/json:
-            schema: { $ref: '#/components/schemas/VenuePoint' }
+            schema: { $ref: '#/components/schemas/SetVenuePointRequest' }
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Placed
           content:
             application/json:
@@ -449,6 +544,10 @@ paths:
 
         **Accepted segments become paths and run through graph validation immediately**, so a
         network that leaves something unreachable is caught here rather than at publish.
+
+        **Accepted paths go into the working draft**, and the validation is of the draft's graph.
+        On an `edit`, the `path` sent is the corrected segment; its `id`, `mapId` and the other
+        `readOnly` fields are assigned by the server.
       tags: [venueMap]
       x-ticvai-permission: VENUE_MAP_MANAGE
       x-ticvai-audience: [staff]
@@ -476,6 +575,9 @@ paths:
                       path: { $ref: '#/components/schemas/VenuePath' }
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Applied, with graph validation
           content:
             application/json:
@@ -507,6 +609,10 @@ paths:
         is the guest who most needs directions, so the graph is small, versioned and cached — and
         a route computed offline must not silently use a path that closed this morning, which is
         what `version` is for.
+
+        **The published graph by default**: the current published version's paths, with today's
+        closures applied, and `version` set to the map's `graphVersion`. With `draft=true`, the
+        working draft's graph, which is what the editor on BO-094 checks while it works.
       tags: [venueMap]
       x-ticvai-permission: VENUE_MAP_VIEW
       x-ticvai-guest-callable: true
@@ -516,6 +622,12 @@ paths:
       x-ticvai-offline-capable: true
       x-ticvai-conflict-policy: serverWins
       parameters:
+        - name: draft
+          in: query
+          schema: { type: boolean, default: false }
+          description: >
+            **The working draft's graph instead of the published one.** Staff only, and it needs
+            `VENUE_MAP_MANAGE`, as on `getVenueMap`. A guest session gets 403.
         - name: stepFreeOnly
           in: query
           schema: { type: boolean, default: false }
@@ -556,12 +668,16 @@ paths:
 
         **Orphan components** — two parts of the venue with no route between them. Legitimate for a
         map covering two buildings, and an error for one covering a park.
+
+        **Validates the working draft**, because that is what the next publish would make live.
       tags: [venueMap]
       x-ticvai-permission: VENUE_MAP_MANAGE
       x-ticvai-audience: [staff]
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       responses:
         '200':
           description: Findings
@@ -589,13 +705,18 @@ paths:
         **A closure is an operational act, not a map edit.** Closing a walkway for maintenance must
         not require republishing the map, and it must take effect in seconds.
 
-        **Bumps the graph version**, which is how a cached client learns its route is stale. A
-        guest holding an offline route across a path that closed this morning is the case this
-        exists for.
+        **Bumps the graph version** (`VenueMap.graphVersion`, which is separate from
+        `publishedVersion`), and that is how a cached client learns its route is stale. A guest
+        holding an offline route across a path that closed this morning is the case this exists
+        for.
 
-        Refuses a closure that would strand a point, unless forced — **and a forced closure that
-        strands a first-aid point warns by name.** Sometimes an incident makes stranding
-        unavoidable, and the operator should know what they just cut off.
+        **The closure is held on the path, by path id**, so it applies to the published graph at
+        once and to the draft as well. It does not create a map version.
+
+        Refuses a closure that would strand a point, unless forced. **A forced closure that
+        strands a first-aid point warns by name**: the `200` carries `strandedPoints`, with first
+        aid, emergency exits and assembly points flagged `isCritical`. Sometimes an incident makes
+        stranding unavoidable, and the operator should know what they just cut off.
       tags: [venueMap]
       x-ticvai-permission: VENUE_MAP_MANAGE
       x-ticvai-audience: [staff]
@@ -621,17 +742,20 @@ paths:
                 expectedReopenAt: { type: string, format: date-time, nullable: true }
       responses:
         '200':
-          description: Closed or reopened
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: Closed or reopened, with what a forced closure cut off
           content:
             application/json:
-              schema: { $ref: '#/components/schemas/VenuePath' }
+              schema: { $ref: '#/components/schemas/PathClosureResult' }
         '409':
           description: >
-            **Closing this strands a point, and the response names which.** *"Cannot close"* on a
-            park with two hundred paths is not actionable.
+            **Closing this strands a point, and the response names which** in `strandedPoints`.
+            *"Cannot close"* on a park with two hundred paths is not actionable.
           content:
             application/problem+json:
-              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+              schema: { $ref: '#/components/schemas/PathClosureProblem' }
 
   /venue-maps/{mapId}/publish:
     parameters:
@@ -650,6 +774,11 @@ paths:
 
         Publishing creates a version. **The previous version stays readable** so a guest mid-route
         finishes on the version they started with.
+
+        **What publishing stores.** The working draft's points and paths are copied into a new
+        `VenueMapVersion` snapshot, `publishedVersion` moves to it and `graphVersion` is bumped.
+        The draft stays as the working copy for the next round of edits. Earlier snapshots are kept,
+        which is what `getVenueMap?version=` reads.
 
         Refuses a draft with unresolved proposals or a point linked to something that no longer
         exists — **a restaurant point pointing at a closed outlet is worse than no point**, because
@@ -672,17 +801,21 @@ paths:
                 note: { type: string, maxLength: 300 }
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Published
           content:
             application/json:
               schema: { $ref: '#/components/schemas/VenueMap' }
         '409':
           description: >
-            Unresolved proposals, or a broken link. **The reason names which point**, because
-            *"cannot publish"* on a map with four hundred points is not actionable.
+            Unresolved proposals, or a broken link. **The reason names which point**, in
+            `blockers`, because *"cannot publish"* on a map with four hundred points is not
+            actionable.
           content:
             application/problem+json:
-              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+              schema: { $ref: '#/components/schemas/VenueMapPublishProblem' }
 
   /venue-maps/{mapId}/live:
     parameters:
@@ -719,6 +852,15 @@ paths:
                 additionalProperties: true
 
 components:
+  # **Server-owned fields are `readOnly`.** createVenueMap, setVenuePoint and the two accept
+  # operations take these schemas as their body, and without the marks a client had to invent the
+  # id, the status and the scope path. OpenAPI 3.1: a `readOnly` property listed in `required` is
+  # required in responses only, and a client that sends one has it ignored. Status and versions
+  # move through the operations that own them (publish, closure).
+  #
+  # **Draft and published are stored apart.** `venuemap.point` and `venuemap.path` hold the
+  # working draft; each publish copies them into a `VenueMapVersion` snapshot, and a guest reads a
+  # snapshot. Closures sit on the path row and apply to both.
   schemas:
     VenueMap:
       type: object
@@ -728,14 +870,35 @@ components:
         be shown the ground floor's toilets.
       required: [id, name, venueId, status]
       properties:
-        id: { type: string, format: uuid }
+        id: { type: string, format: uuid, readOnly: true }
         name: { type: string }
         venueId: { type: string, format: uuid }
-        scopePath: { type: string }
+        scopePath:
+          type: string
+          readOnly: true
+          description: Derived from `venueId`. Not sent by a client.
         kind: { type: string, enum: [park, floor, zone, parking] }
         floorLevel: { type: integer, nullable: true }
-        status: { type: string, enum: [draft, published, archived] }
-        publishedVersion: { type: integer, nullable: true }
+        status:
+          type: string
+          enum: [draft, published, archived]
+          readOnly: true
+          description: >
+            `draft` on create. Moves through `publishVenueMap` (`states/venue-map.yaml`), never by
+            sending a value.
+        publishedVersion:
+          type: integer
+          nullable: true
+          readOnly: true
+          description: >
+            The `VenueMapVersion.version` guests are served. Null until the first publish.
+        graphVersion:
+          type: integer
+          readOnly: true
+          description: >
+            **Bumped by a publish or a closure**, and returned as `VenueMapGraph.version`. Separate
+            from `publishedVersion` because a closure changes the routes without creating a map
+            version, and a closure that looked like a publish would lie about what changed.
         isGeoreferenced:
           type: boolean
           readOnly: true
@@ -785,6 +948,7 @@ components:
         tileSetRef:
           type: string
           nullable: true
+          readOnly: true
           description: >
             Where a base image is large enough to need zoom levels. **A 12,000-pixel park map is
             not something a phone downloads on arrival**, and a guest opening the map on venue wifi
@@ -808,6 +972,14 @@ components:
       type: object
       description: 19.2.55. **The whole map in one call**, so a client caches it and filters locally.
       properties:
+        version:
+          type: integer
+          nullable: true
+          readOnly: true
+          description: >
+            **The published version these points and paths belong to**, which is the number a
+            client caches and sends back as `version`. It can differ from `map.publishedVersion`
+            when an older version was asked for. Null when the draft was read.
         map: { $ref: '#/components/schemas/VenueMap' }
         points:
           type: array
@@ -823,8 +995,12 @@ components:
         19.2.57 to 19.2.60. **What a venue places on the map**, and what a guest taps.
       required: [id, mapId, kind, name, position]
       properties:
-        id: { type: string, format: uuid }
-        mapId: { type: string, format: uuid }
+        id: { type: string, format: uuid, readOnly: true }
+        mapId:
+          type: string
+          format: uuid
+          readOnly: true
+          description: From the path of the operation that writes the point.
         kind:
           type: string
           enum: [ride, attraction, show, restaurant, cafe, shop, kiosk, toilet, babyCare,
@@ -876,12 +1052,14 @@ components:
           description: >
             For an entrance or exit. **This is what makes 3.2.64 work** — live admission statistics
             drawn on the point they came from.
-        isAccessible:
+        isStepFree:
           type: boolean
           default: true
           description: >
-            Step-free. **Placed on the point rather than inferred from the path**, because a
-            step-free route to a building with steps at the door is not a step-free route.
+            Whether the point itself can be reached without steps. **The same name as
+            `VenuePath.isStepFree`, because it is the same concept** (it was `isAccessible` until the
+            26 September audit). **Placed on the point rather than inferred from the path**, because
+            a step-free route to a building with steps at the door is not a step-free route.
         openingHours: { type: string, nullable: true }
         iconRef: { type: string, nullable: true }
         isActive: { type: boolean, default: true }
@@ -902,6 +1080,21 @@ components:
             destination, and a fenced landmark is a destination you can be shown but not walked
             into.
 
+    SetVenuePointRequest:
+      description: >
+        What `setVenuePoint` takes: a `VenuePoint` without its server-owned fields, plus the point
+        to amend. **`pointId` absent places a new point; present amends that one**, and it must be a
+        point on the map in the path.
+      allOf:
+        - $ref: '#/components/schemas/VenuePoint'
+        - type: object
+          properties:
+            pointId:
+              type: string
+              format: uuid
+              nullable: true
+              description: The point to amend. Absent or null places a new point.
+
     VenuePath:
       type: object
       x-ticvai-persistence: "venuemap.path"
@@ -911,8 +1104,12 @@ components:
         not.
       required: [id, mapId, fromPointId, toPointId]
       properties:
-        id: { type: string, format: uuid }
-        mapId: { type: string, format: uuid }
+        id: { type: string, format: uuid, readOnly: true }
+        mapId:
+          type: string
+          format: uuid
+          readOnly: true
+          description: From the path of the operation that writes the path.
         fromPointId: { type: string, format: uuid }
         toPointId: { type: string, format: uuid }
         geometry:
@@ -928,8 +1125,10 @@ components:
         distanceMetres:
           type: number
           nullable: true
+          readOnly: true
           description: >
-            **Along the centreline, not point to point.** A path that curves round a lake is longer
+            Computed by the server from `geometry` and the georeference. **Along the centreline,
+            not point to point.** A path that curves round a lake is longer
             than the distance between its ends, and a guest told 80 metres who walks 200 stops
             trusting the map.
 
@@ -961,8 +1160,9 @@ components:
         closedReason:
           type: string
           nullable: true
+          readOnly: true
           description: >
-            Set during works or an incident. **A closed path removes routes rather than hiding the
+            Set by `setPathClosure` during works or an incident, never by sending it here. **A closed path removes routes rather than hiding the
             path**, so a guest sees why rather than wondering where it went.
 
     PointProposal:
@@ -998,9 +1198,9 @@ components:
         version:
           type: integer
           description: >
-            **Bumped by a publish or a closure.** A client holding an older version knows its route
-            may cross something that closed, and asking for the graph is cheaper than asking whether
-            the graph changed.
+            **Bumped by a publish or a closure**, and stored as `VenueMap.graphVersion`. A client
+            holding an older version knows its route may cross something that closed, and asking
+            for the graph is cheaper than asking whether the graph changed.
         generatedAt: { type: string, format: date-time }
         nodes:
           type: array
@@ -1011,7 +1211,7 @@ components:
               x: { type: number }
               y: { type: number }
               kind: { type: string }
-              isAccessible: { type: boolean }
+              isStepFree: { type: boolean }
         edges:
           type: array
           items:
@@ -1144,3 +1344,122 @@ components:
                 type: array
                 description: The layers, sections or rows involved. **Named, not counted.**
                 items: { type: string }
+
+    VenueMapVersion:
+      type: object
+      x-ticvai-persistence: "venuemap.map_version"
+      description: >
+        21.2.16. **One published version of a map, kept whole.** `publishVenueMap` writes one per
+        publish by copying the working draft's points and paths into `snapshot`, and
+        `getVenueMap?version=` reads it back. That is how the previous version stays readable while
+        the draft is edited: the draft rows change, the snapshot does not.
+      required: [id, mapId, version, publishedAt, publishedByPrincipalId, snapshot]
+      properties:
+        id: { type: string, format: uuid, readOnly: true }
+        mapId: { type: string, format: uuid }
+        version:
+          type: integer
+          description: One more than the version before it. `VenueMap.publishedVersion` names the current one.
+        publishedAt: { type: string, format: date-time }
+        publishedByPrincipalId: { type: string, format: uuid }
+        note:
+          type: string
+          nullable: true
+          maxLength: 300
+          description: The `note` sent to `publishVenueMap`.
+        snapshot:
+          type: object
+          description: >
+            **The points and paths as they were published**, stored as one document. Closures are
+            not in it: they sit on the path row and are applied when the graph is served.
+          properties:
+            points:
+              type: array
+              items: { $ref: '#/components/schemas/VenuePoint' }
+            paths:
+              type: array
+              items: { $ref: '#/components/schemas/VenuePath' }
+
+    PathClosureResult:
+      description: >
+        What `setPathClosure` returns: the path, and **what a forced closure cut off**, named.
+      allOf:
+        - $ref: '#/components/schemas/VenuePath'
+        - type: object
+          properties:
+            strandedPoints:
+              type: array
+              readOnly: true
+              description: >
+                Points no longer reachable because of this closure. Empty unless `force` was used.
+              items: { $ref: '#/components/schemas/StrandedPoint' }
+
+    StrandedPoint:
+      type: object
+      x-ticvai-persistence: none — computed from the graph
+      required: [pointId, name, kind, isCritical]
+      properties:
+        pointId: { type: string, format: uuid }
+        name: { type: string }
+        kind: { type: string }
+        isCritical:
+          type: boolean
+          description: >
+            First aid, an emergency exit or an assembly point, the same set as
+            `GraphValidation.criticalUnreachable`. **The one the operator must read first.**
+
+    PathClosureProblem:
+      x-ticvai-persistence: none — error shape
+      description: >
+        The `409` from `setPathClosure`. Names every point the closure would strand, so the operator
+        can decide whether to force it.
+      allOf:
+        - $ref: '../shared/common.yaml#/components/schemas/Problem'
+        - type: object
+          required: [refusedReason, strandedPoints]
+          properties:
+            refusedReason:
+              type: string
+              enum: [wouldStrandPoints]
+            strandedPoints:
+              type: array
+              items: { $ref: '#/components/schemas/StrandedPoint' }
+
+    VenueMapPublishProblem:
+      x-ticvai-persistence: none — error shape
+      description: >
+        The `409` from `publishVenueMap`. **One entry per blocker**, each naming the point or the
+        proposal, because *"cannot publish"* on four hundred points is not actionable.
+      allOf:
+        - $ref: '../shared/common.yaml#/components/schemas/Problem'
+        - type: object
+          required: [blockers]
+          properties:
+            blockers:
+              type: array
+              items:
+                type: object
+                required: [reason]
+                properties:
+                  reason:
+                    type: string
+                    enum: [unresolvedProposal, brokenLink]
+                  proposalId:
+                    type: string
+                    format: uuid
+                    nullable: true
+                    description: For `unresolvedProposal`, the `ai.proposed_action` still open.
+                  pointId:
+                    type: string
+                    format: uuid
+                    nullable: true
+                    description: For `brokenLink`, the point whose link no longer resolves.
+                  name:
+                    type: string
+                    nullable: true
+                    description: The point's name, or the proposed name, as the operator saw it.
+                  linkField:
+                    type: string
+                    nullable: true
+                    enum: [outletId, productId, accessPointId]
+                    description: For `brokenLink`, which link on the point is broken.

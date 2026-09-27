@@ -19,7 +19,6 @@ description: 'One physically identifiable item — a serial number, an RFID tag 
 initial:
 - inStock
 terminal:
-- sold
 - lost
 states:
 - name: inStock
@@ -48,13 +47,11 @@ states:
 transitions:
 - from: inStock
   to: reserved
-  trigger: reserve
-  operation: listSerialisedItems
+  trigger: job
   guard: Committed to a specific order.
 - from: reserved
   to: inStock
-  trigger: release
-  operation: listSerialisedItems
+  trigger: job
   guard: '**The cart expired or the order was cancelled.** Reservation is not a sale.'
 - from: reserved
   to: sold
@@ -74,18 +71,15 @@ transitions:
     where a terminal state is left, because the alternative is a second row for the same physical object.'
 - from: returned
   to: inStock
-  trigger: restock
-  operation: listSerialisedItems
+  trigger: job
   guard: '**Inspected and sellable again.** The inspection is the guard.'
 - from: returned
   to: damaged
-  trigger: writeOff
-  operation: listSerialisedItems
+  trigger: job
   guard: Came back unsellable.
 - from: inStock
   to: damaged
-  trigger: writeOff
-  operation: listSerialisedItems
+  trigger: job
   guard: Found damaged in stock.
 - from: inStock
   to: inTransit
@@ -99,29 +93,24 @@ transitions:
   guard: Arrived.
 - from: inTransit
   to: lost
-  trigger: lose
-  operation: listSerialisedItems
+  trigger: job
   guard: '**Never arrived.** The most common way an item becomes lost, and the reason `inTransit` earns
     a state.'
 - from: inStock
   to: lost
-  trigger: lose
-  operation: listSerialisedItems
+  trigger: job
   guard: Missing at a count.
 - from: damaged
   to: warranty
-  trigger: claim
-  operation: listSerialisedItems
+  trigger: job
   guard: Sent to the supplier.
 - from: warranty
   to: inStock
-  trigger: returnFromWarranty
-  operation: listSerialisedItems
+  trigger: job
   guard: Repaired and back.
 - from: warranty
   to: lost
-  trigger: lose
-  operation: listSerialisedItems
+  trigger: job
   guard: '**The supplier did not return it and the claim closed.** Rare and real.'
 openQuestions: '**`sold -> returned` leaves a terminal state.** It is the only such transition in 113
   models and it is correct — the alternative is a second row for one physical object — but `terminal`

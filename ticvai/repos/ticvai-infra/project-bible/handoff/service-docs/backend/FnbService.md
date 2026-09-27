@@ -7,7 +7,7 @@
 | Tier | operations: What a venue does with what it sold. Licensed per module. |
 | Contracts | `fnb` |
 | Schemas owned | `fnb` |
-| Operations in the slice | 57 of 111 |
+| Operations in the slice | 57 of 113 |
 | Scale | Write-heavy during service, idle between. Two peaks a day, sharply. |
 | If it is down | Down means the kitchen falls back to paper. Offline-capable by design. |
 
@@ -105,6 +105,7 @@ Converts the visit into one or more sales orders and posts to the ledger. The ta
 | Reads | `cache:idempotency`, `fnb.service_order`, `fnb.service_order_line`, `fnb.table_visit` |
 | Writes | `cache:idempotency`, `fnb.service_order`, `fnb.table_visit` |
 | Called by | EMP-059, POS-028 |
+| State model | Table visit ([states/table-visit.yaml](../../../states/table-visit.yaml)): moves `billRequested` -> `settled`, `open` -> `settled` |
 
 **Parameters**
 
@@ -134,7 +135,7 @@ Converts the visit into one or more sales orders and posts to the ledger. The ta
 | Field | Type | Required | Notes |
 |---|---|---|---|
 | visit | TableVisit | yes |  |
-| visit.id | string | yes |  |
+| visit.id | string | yes | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
 | visit.tableId | string (uuid) | yes |  |
 | visit.tableLabel | string |  |  |
 | visit.outletId | string (uuid) | yes |  |
@@ -143,28 +144,32 @@ Converts the visit into one or more sales orders and posts to the ledger. The ta
 | visit.serverPrincipalId | string (uuid) |  | (nullable) |
 | visit.subjectId | string (uuid) |  | (nullable) |
 | visit.orders | array of FnbOrder | yes |  |
-| visit.orders[].id | string | yes |  |
+| visit.orders[].id | string | yes | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
 | visit.orders[].orderNumber | string | yes |  |
 | visit.orders[].outletId | string (uuid) | yes |  |
 | visit.orders[].serviceMode | ServiceMode: enum (quickService, tableService, roomService, collection, delivery) | yes |  |
-| visit.orders[].tableVisitId | string |  | (nullable) |
+| visit.orders[].tableVisitId | string |  | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$; nullable) |
 | visit.orders[].status | FnbOrderStatus: enum (ordered, accepted, inPreparation, ready, served, collected, delivered, cancelled, …) | yes | The full lifecycle from 4.6.35. |
 | visit.orders[].lines | array of object | yes |  |
 | visit.orders[].salesOrderId | string (uuid) |  | Taken from their fnb.order, 20 September. (nullable) |
 | visit.orders[].updatedAt | string (date-time) |  | Taken from their fnb.order. (nullable) |
 | visit.orders[].grossAmount | Money | yes | On the wire this is three fields; in the database it is one column. |
 | visit.orders[].taxAmount | Money |  | On the wire this is three fields; in the database it is one column. |
-| visit.orders[].kitchenTicketId | string |  | (nullable) |
+| visit.orders[].kitchenTicketId | string |  | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$; nullable) |
 | visit.orders[].estimatedReadyAt | string (date-time) |  | (nullable) |
 | visit.orders[].createdAt | string (date-time) | yes |  |
 | visit.orders[].recordedAt | string (date-time) |  |  |
 | visit.orders[].syncedAt | string (date-time) |  | (nullable) |
-| visit.mergedIntoVisitId | string |  | (nullable) |
+| visit.mergedIntoVisitId | string |  | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$; nullable) |
 | visit.mergedFromVisitIds | array of string |  |  |
 | visit.runningTotal | Money |  | On the wire this is three fields; in the database it is one column. |
 | visit.runningTotal.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
 | visit.runningTotal.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
 | visit.runningTotal.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| visit.gratuity | object |  | The gratuity taken at closeTableVisit. (read-only; nullable) |
+| visit.gratuity.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
+| visit.gratuity.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
+| visit.gratuity.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
 | visit.openedAt | string (date-time) | yes |  |
 | visit.closedAt | string (date-time) |  | (nullable) |
 | orderIds | array of string | yes |  |
@@ -174,7 +179,7 @@ Converts the visit into one or more sales orders and posts to the ledger. The ta
 | Code | Shape | Meaning |
 |---|---|---|
 | 200 |  | Settled |
-| 409 |  | Payments do not cover the bill, or lines remain unserved |
+| 409 |  | Payments do not cover the bill, or lines remain unserved (named in lineIds). |
 
 
 ## Group: fnb
@@ -184,7 +189,7 @@ Converts the visit into one or more sales orders and posts to the ledger. The ta
 **`POST /kitchen-stations/{stationId}/chase`**: The pass asks a station where an item is
 
 Board 3. **A ticket waiting on one station while the rest of the table is plated** — the expeditor chases, and until now that happened by shouting.
-**Recorded, because a chased station is a signal.** One station chased six times a service is understaffed or badly laid out, and the venue only finds that out if the chase leaves a trace.
+**Recorded, because a chased station is a signal.** One station chased six times a service is understaffed or badly laid out, and the venue only finds that out if the chase leaves a trace. The trace is a `KitchenException` of kind `chased`.
 
 |  |  |
 |---|---|
@@ -209,8 +214,9 @@ Board 3. **A ticket waiting on one station while the rest of the table is plated
 
 | Field | Type | Required | Notes |
 |---|---|---|---|
-| ticketId | string (uuid) | yes |  |
-| lineId | string (uuid) |  | (nullable) |
+| ticketId | string | yes | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
+| lineId | string |  | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$; nullable) |
+| recordedAt | string (date-time) | yes | Device time of the chase. |
 
 **Responses**
 
@@ -236,6 +242,7 @@ Board 3. **A ticket waiting on one station while the rest of the table is plated
 | Reads | `cache:idempotency`, `fnb.dining_table`, `fnb.reservation_table`, `fnb.table_reservation` |
 | Writes | `cache:idempotency`, `fnb.reservation_table`, `fnb.table_reservation` |
 | Called by | EMP-055, GST-070, WEB-036 |
+| State model | Table reservation ([states/table-reservation.yaml](../../../states/table-reservation.yaml)): created as `booked` |
 
 **Parameters**
 
@@ -263,7 +270,7 @@ Board 3. **A ticket waiting on one station while the rest of the table is plated
 | groupId | string (uuid) |  | 5.1.2. (nullable) |
 | notes | string |  | Allergies |
 | actualPartySize | integer |  | (read-only; nullable) |
-| tableVisitId | string (uuid) |  | (read-only; nullable) |
+| tableVisitId | string |  | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$; read-only; nullable) |
 | createdAt | string (date-time) |  | (read-only) |
 
 **Response**: `TableReservation`
@@ -286,7 +293,7 @@ Board 3. **A ticket waiting on one station while the rest of the table is plated
 | groupId | string (uuid) |  | 5.1.2. (nullable) |
 | notes | string |  | Allergies |
 | actualPartySize | integer |  | (read-only; nullable) |
-| tableVisitId | string (uuid) |  | (read-only; nullable) |
+| tableVisitId | string |  | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$; read-only; nullable) |
 | createdAt | string (date-time) |  | (read-only) |
 
 **Responses**
@@ -312,7 +319,8 @@ Raised above the person who found it — a critical reading, or one nobody actio
 | Conflict policy | serverWins |
 | Reads | `cache:idempotency`, `fnb.corrective_action`, `identity.principal` |
 | Writes | `cache:idempotency`, `fnb.corrective_action` |
-| Called by | no screen (setup through Back Office) |
+| Called by | **no screen**: no screen lists it in its apis, so it is reachable only by API or import until one does (README, Known gaps) |
+| State model | CorrectiveAction ([states/corrective-action.yaml](../../../states/corrective-action.yaml)): moves `open` -> `escalated`, `actioned` -> `escalated` |
 
 **Parameters**
 
@@ -327,6 +335,7 @@ Raised above the person who found it — a critical reading, or one nobody actio
 |---|---|---|---|
 | id | string (uuid) | yes |  |
 | raisedAt | string (date-time) | yes |  |
+| raisedByPrincipalId | string (uuid) |  | Who raised it, which is who may not sign it when it is critical (signCorrectiveAction). (read-only; nullable) |
 | source | enum (temperatureExcursion, coldChainBreach, expiredStock, contamination, pestSighting, equipmentFailure, manual) | yes |  |
 | sourceRef | string (uuid) |  | (nullable) |
 | severity | enum (observation, minor, major, critical) |  |  |
@@ -368,13 +377,14 @@ Board 3 of the client F&B pack. **`KitchenTicket.coursing` carried the policy �
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
-| ticketId | path | yes | string (uuid) |  |
+| ticketId | path | yes | string |  |
 | Idempotency-Key | header | yes | string | Client-generated ULID. |
 
 **Request body**
 
 | Field | Type | Required | Notes |
 |---|---|---|---|
+| recordedAt | string (date-time) | yes | Device time of the act (offline-capable; replayed in this order). |
 | course | integer | yes | (min 1) |
 | fireAt | string (date-time) |  | For timed coursing. (nullable) |
 
@@ -382,25 +392,28 @@ Board 3 of the client F&B pack. **`KitchenTicket.coursing` carried the policy �
 
 | Field | Type | Required | Notes |
 |---|---|---|---|
-| id | string | yes |  |
-| orderId | string | yes |  |
+| id | string | yes | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
+| orderId | string | yes | The F&B order the ticket was created from on acceptance (FnbOrder.id). (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
 | orderNumber | string |  |  |
 | outletId | string (uuid) | yes |  |
 | tableLabel | string |  | (nullable) |
 | serviceMode | ServiceMode: enum (quickService, tableService, roomService, collection, delivery) |  |  |
-| coursing | enum (fireAndForget, holdAndFire, phased, timed, delayed) |  | BL-131. (nullable) |
+| coursing | object |  | BL-131. (nullable) |
 | buzzerCode | string |  | BL-128. (nullable) |
 | status | KitchenTicketStatus: enum (received, preparing, ready, served, recalled, cancelled) | yes |  |
 | priority | integer |  | Higher fires sooner. |
 | prioritisedByPrincipalId | string (uuid) |  | (nullable) |
 | prioritiseReason | string |  | (nullable) |
 | lines | array of object | yes |  |
-| lines[].lineId | string | yes |  |
+| lines[].lineId | string | yes | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
 | lines[].name | string | yes |  |
 | lines[].quantity | integer | yes |  |
 | lines[].modifiers | array of string |  |  |
 | lines[].note | string |  | (nullable) |
-| lines[].allergens | array of string |  |  |
+| lines[].allergens | array of AllergenCode: enum (gluten, crustaceans, eggs, fish, peanuts, soybeans, milk, nuts, …) |  |  |
+| lines[].refireOfLineId | string |  | Set on a refire. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$; read-only; nullable) |
+| lines[].refireReason | object |  | (read-only; nullable) |
+| lines[].isChargeable | boolean |  | A refire's chargeable flag. (read-only; nullable) |
 | lines[].course | integer |  | (nullable) |
 | lines[].stationId | string (uuid) |  | (nullable) |
 | lines[].status | KitchenTicketStatus: enum (received, preparing, ready, served, recalled, cancelled) | yes |  |
@@ -474,13 +487,14 @@ Board 3. **The other half of firing, and the one that gets forgotten.** A table 
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
-| ticketId | path | yes | string (uuid) |  |
+| ticketId | path | yes | string |  |
 | Idempotency-Key | header | yes | string | Client-generated ULID. |
 
 **Request body**
 
 | Field | Type | Required | Notes |
 |---|---|---|---|
+| recordedAt | string (date-time) | yes | Device time of the act (offline-capable; replayed in this order). |
 | course | integer | yes | (min 1) |
 | reason | enum (tableNotReady, guestRequest, kitchenBackedUp, awaitingPrevious, other) |  |  |
 
@@ -488,25 +502,28 @@ Board 3. **The other half of firing, and the one that gets forgotten.** A table 
 
 | Field | Type | Required | Notes |
 |---|---|---|---|
-| id | string | yes |  |
-| orderId | string | yes |  |
+| id | string | yes | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
+| orderId | string | yes | The F&B order the ticket was created from on acceptance (FnbOrder.id). (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
 | orderNumber | string |  |  |
 | outletId | string (uuid) | yes |  |
 | tableLabel | string |  | (nullable) |
 | serviceMode | ServiceMode: enum (quickService, tableService, roomService, collection, delivery) |  |  |
-| coursing | enum (fireAndForget, holdAndFire, phased, timed, delayed) |  | BL-131. (nullable) |
+| coursing | object |  | BL-131. (nullable) |
 | buzzerCode | string |  | BL-128. (nullable) |
 | status | KitchenTicketStatus: enum (received, preparing, ready, served, recalled, cancelled) | yes |  |
 | priority | integer |  | Higher fires sooner. |
 | prioritisedByPrincipalId | string (uuid) |  | (nullable) |
 | prioritiseReason | string |  | (nullable) |
 | lines | array of object | yes |  |
-| lines[].lineId | string | yes |  |
+| lines[].lineId | string | yes | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
 | lines[].name | string | yes |  |
 | lines[].quantity | integer | yes |  |
 | lines[].modifiers | array of string |  |  |
 | lines[].note | string |  | (nullable) |
-| lines[].allergens | array of string |  |  |
+| lines[].allergens | array of AllergenCode: enum (gluten, crustaceans, eggs, fish, peanuts, soybeans, milk, nuts, …) |  |  |
+| lines[].refireOfLineId | string |  | Set on a refire. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$; read-only; nullable) |
+| lines[].refireReason | object |  | (read-only; nullable) |
+| lines[].isChargeable | boolean |  | A refire's chargeable flag. (read-only; nullable) |
 | lines[].course | integer |  | (nullable) |
 | lines[].stationId | string (uuid) |  | (nullable) |
 | lines[].status | KitchenTicketStatus: enum (received, preparing, ready, served, recalled, cancelled) | yes |  |
@@ -539,6 +556,7 @@ BL-130. **Distinct from `queue`, which is for rides.** A restaurant waitlist has
 | Reads | `cache:idempotency`, `fnb.dining_table`, `fnb.waitlist_entry`, `platform.outlet` |
 | Writes | `cache:idempotency`, `fnb.waitlist_entry` |
 | Called by | EMP-056, EMP-058, GST-070, WEB-036 |
+| State model | Restaurant waitlist entry ([states/restaurant-waitlist.yaml](../../../states/restaurant-waitlist.yaml)): created as `waiting`; moves `waiting` -> `notified`, `notified` -> `seated`, `waiting` -> `walkedAway`, `waiting` -> `cancelled` **(not settled: see the Gaps sheet)** |
 
 **Parameters**
 
@@ -558,6 +576,8 @@ BL-130. **Distinct from `queue`, which is for rides.** A restaurant waitlist has
 | seatingPreference | enum (any, indoor, outdoor, bar, booth, highChair) |  | (nullable) |
 | status | enum (waiting, notified, seated, walkedAway, noShow, cancelled) | yes |  |
 | notifiedAt | string (date-time) |  | (nullable) |
+| recordedAt | string (date-time) | yes | When the party joined, on the device. |
+| syncedAt | string (date-time) |  | (read-only; nullable) |
 | holdExpiresAt | string (date-time) |  | How long a table waits for somebody who was called. (nullable) |
 
 **Response**: `RestaurantWaitlist`
@@ -572,6 +592,8 @@ BL-130. **Distinct from `queue`, which is for rides.** A restaurant waitlist has
 | seatingPreference | enum (any, indoor, outdoor, bar, booth, highChair) |  | (nullable) |
 | status | enum (waiting, notified, seated, walkedAway, noShow, cancelled) | yes |  |
 | notifiedAt | string (date-time) |  | (nullable) |
+| recordedAt | string (date-time) | yes | When the party joined, on the device. |
+| syncedAt | string (date-time) |  | (read-only; nullable) |
 | holdExpiresAt | string (date-time) |  | How long a table waits for somebody who was called. (nullable) |
 
 **Responses**
@@ -605,9 +627,25 @@ Board 5J. **`setItemAvailability` records the current state and not the history.
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
 | outletId | path | yes | string (uuid) |  |
-| from | query |  | string (date) |  |
+| from | query |  | string (date) | First calendar day, in the Region's time zone, not UTC. |
 | pageSize | query |  | integer |  |
-| cursor | query |  | string | Opaque cursor from a previous page. |
+| cursor | query |  | string | Opaque cursor: the nextCursor of the previous page. |
+
+**Response**: `object`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| items | array of EightySixEvent | yes |  |
+| items[].id | string (uuid) | yes |  |
+| items[].outletId | string (uuid) |  |  |
+| items[].menuItemId | string (uuid) | yes |  |
+| items[].offAt | string (date-time) | yes |  |
+| items[].backAt | string (date-time) |  | (nullable) |
+| items[].reason | enum (ranOut, qualityIssue, equipmentDown, supplierFailure, seasonal, other) |  |  |
+| items[].calledByPrincipalId | string (uuid) |  |  |
+| items[].refusedOrderCount | integer |  | (default 0; read-only) |
+| nextCursor | string |  |  |
+| hasMore | boolean | yes |  |
 
 **Responses**
 
@@ -619,7 +657,7 @@ Board 5J. **`setItemAvailability` records the current state and not the history.
 
 **`GET /table-reservations`**: Bookings for a service period
 
-5.1.1. **Live table state alongside the bookings**, because a host needs to know what is booked and what is actually free, and those differ all evening.
+5.1.1. **The bookings for a service period.** A host needs to know what is booked and what is actually free, and those differ all evening — the live table state is `getTableMap` on the same outlet, read alongside this. A reservation carries its tables and, once seated, its `tableVisitId`; it does not carry the table's state.
 
 |  |  |
 |---|---|
@@ -639,9 +677,35 @@ Board 5J. **`setItemAvailability` records the current state and not the history.
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
 | outletId | query |  | string (uuid) |  |
-| date | query |  | string (date) |  |
+| date | query |  | string (date) | A calendar day, in the Region's time zone, not UTC. |
 | pageSize | query |  | integer |  |
-| cursor | query |  | string | Opaque cursor from a previous page. |
+| cursor | query |  | string | Opaque cursor: the nextCursor of the previous page. |
+
+**Response**: `object`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| items | array of TableReservation | yes |  |
+| items[].id | string (uuid) |  | (read-only) |
+| items[].outletId | string (uuid) | yes |  |
+| items[].subjectId | string (uuid) |  | (nullable) |
+| items[].guestName | string |  |  |
+| items[].contactPoint | string |  |  |
+| items[].partySize | integer | yes | (min 1) |
+| items[].startsAt | string (date-time) | yes |  |
+| items[].durationMinutes | integer |  | How long the cover is held. |
+| items[].tables | array of FnbReservationTable |  | The dining tables assigned to this reservation, one row each. |
+| items[].tables[].reservationId | string (uuid) | yes |  |
+| items[].tables[].tableId | string (uuid) | yes |  |
+| items[].tables[].createdAt | string (date-time) | yes |  |
+| items[].status | TableReservationStatus: enum (booked, confirmed, seated, completed, cancelled, noShow) |  |  |
+| items[].groupId | string (uuid) |  | 5.1.2. (nullable) |
+| items[].notes | string |  | Allergies |
+| items[].actualPartySize | integer |  | (read-only; nullable) |
+| items[].tableVisitId | string |  | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$; read-only; nullable) |
+| items[].createdAt | string (date-time) |  | (read-only) |
+| nextCursor | string |  |  |
+| hasMore | boolean | yes |  |
 
 **Responses**
 
@@ -723,7 +787,7 @@ Board 3. **Equipment down, an item run out mid-ticket, a delivery late, a statio
 | Wave | 2 |
 | Offline | yes |
 | Conflict policy | lastWriterWins |
-| Reads | `cache:idempotency`, `fnb.kitchen_station` |
+| Reads | `cache:idempotency`, `fnb.kitchen_exception`, `fnb.kitchen_station` |
 | Writes | `cache:idempotency`, `fnb.kitchen_exception` |
 | Called by | KIT-008 |
 
@@ -737,9 +801,26 @@ Board 3. **Equipment down, an item run out mid-ticket, a delivery late, a statio
 
 | Field | Type | Required | Notes |
 |---|---|---|---|
-| kind | enum (equipmentDown, itemRanOut, lateDelivery, staffShort, powerLoss, spillage, other) | yes |  |
+| kind | enum (equipmentDown, itemRanOut, lateDelivery, staffShort, powerLoss, spillage, other) | yes | chased is not offered here — chaseStation records it. |
+| outletId | string (uuid) | yes | The outlet whose kitchen it happened in. |
 | stationId | string (uuid) |  | (nullable) |
+| ticketId | string |  | The ticket it happened on, where there was one. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$; nullable) |
 | durationMinutes | integer |  | (nullable) |
+| note | string |  | (nullable) |
+| recordedAt | string (date-time) | yes | Device time, not arrival time. |
+
+**Response**: `KitchenException`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| id | string (uuid) | yes |  |
+| outletId | string (uuid) |  |  |
+| stationId | string (uuid) |  | (nullable) |
+| ticketId | string |  | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$; nullable) |
+| kind | enum (equipmentDown, itemRanOut, lateDelivery, staffShort, powerLoss, spillage, chased, other) | yes |  |
+| durationMinutes | integer |  | (nullable) |
+| raisedAt | string (date-time) | yes |  |
+| raisedByPrincipalId | string (uuid) |  |  |
 | note | string |  | (nullable) |
 
 **Responses**
@@ -809,6 +890,7 @@ Board 5J. **HACCP records are a UAE regulatory obligation and nothing in the pac
 | correctiveAction | CorrectiveAction |  | What was done about a finding, and who signed it. |
 | correctiveAction.id | string (uuid) | yes |  |
 | correctiveAction.raisedAt | string (date-time) | yes |  |
+| correctiveAction.raisedByPrincipalId | string (uuid) |  | Who raised it, which is who may not sign it when it is critical (signCorrectiveAction). (read-only; nullable) |
 | correctiveAction.source | enum (temperatureExcursion, coldChainBreach, expiredStock, contamination, pestSighting, equipmentFailure, manual) | yes |  |
 | correctiveAction.sourceRef | string (uuid) |  | (nullable) |
 | correctiveAction.severity | enum (observation, minor, major, critical) |  |  |
@@ -841,7 +923,7 @@ Board 3. **`recordOrderHandover` exists for a staff handover; a collection count
 | Wave | 1 |
 | Offline | yes |
 | Conflict policy | lastWriterWins |
-| Reads | `cache:idempotency`, `fnb.service_order`, `fnb.kitchen_ticket` |
+| Reads | `cache:idempotency`, `fnb.kitchen_ticket`, `fnb.service_order`, `fnb.service_order_line` |
 | Writes | `cache:idempotency`, `fnb.service_order`, `fnb.kitchen_ticket` |
 | Called by | KIT-006, POS-022 |
 
@@ -849,7 +931,7 @@ Board 3. **`recordOrderHandover` exists for a staff handover; a collection count
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
-| orderId | path | yes | string (uuid) |  |
+| orderId | path | yes | string | The F&B order (FnbOrder.id), which is what this closes — not a sales order. |
 | Idempotency-Key | header | yes | string | Client-generated ULID. |
 
 **Request body**
@@ -857,12 +939,56 @@ Board 3. **`recordOrderHandover` exists for a staff handover; a collection count
 | Field | Type | Required | Notes |
 |---|---|---|---|
 | verifiedBy | enum (buzzer, orderNumber, name, qr, none) |  |  |
+| recordedAt | string (date-time) | yes | Device time of the collection. |
+
+**Response**: `FnbOrder`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| id | string | yes | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
+| orderNumber | string | yes |  |
+| outletId | string (uuid) | yes |  |
+| serviceMode | ServiceMode: enum (quickService, tableService, roomService, collection, delivery) | yes |  |
+| tableVisitId | string |  | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$; nullable) |
+| status | FnbOrderStatus: enum (ordered, accepted, inPreparation, ready, served, collected, delivered, cancelled, …) | yes | The full lifecycle from 4.6.35. |
+| lines | array of object | yes |  |
+| lines[].id | string | yes | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
+| lines[].menuItemId | string (uuid) | yes |  |
+| lines[].quantity | integer | yes | (min 1) |
+| lines[].modifierOptionIds | array of string (uuid) |  |  |
+| lines[].note | string |  | Free text to the kitchen. (max length 200) |
+| lines[].seatNumber | integer |  | Which cover ordered it. (nullable) |
+| lines[].course | integer |  | Course grouping, so the kitchen fires in sequence. (nullable) |
+| lines[].status | FnbOrderStatus: enum (ordered, accepted, inPreparation, ready, served, collected, delivered, cancelled, …) |  | The full lifecycle from 4.6.35. |
+| lines[].unitPrice | Money |  | On the wire this is three fields; in the database it is one column. |
+| lines[].unitPrice.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
+| lines[].unitPrice.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
+| lines[].unitPrice.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| lines[].lineTotal | Money |  | On the wire this is three fields; in the database it is one column. |
+| lines[].lineTotal.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
+| lines[].lineTotal.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
+| lines[].lineTotal.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| salesOrderId | string (uuid) |  | Taken from their fnb.order, 20 September. (nullable) |
+| updatedAt | string (date-time) |  | Taken from their fnb.order. (nullable) |
+| grossAmount | Money | yes | On the wire this is three fields; in the database it is one column. |
+| grossAmount.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
+| grossAmount.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
+| grossAmount.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| taxAmount | Money |  | On the wire this is three fields; in the database it is one column. |
+| taxAmount.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
+| taxAmount.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
+| taxAmount.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| kitchenTicketId | string |  | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$; nullable) |
+| estimatedReadyAt | string (date-time) |  | (nullable) |
+| createdAt | string (date-time) | yes |  |
+| recordedAt | string (date-time) |  |  |
+| syncedAt | string (date-time) |  | (nullable) |
 
 **Responses**
 
 | Code | Shape | Meaning |
 |---|---|---|
-| 200 |  | Collected |
+| 200 |  | Collected. |
 
 ### moveTableVisit
 
@@ -870,7 +996,7 @@ Board 3. **`recordOrderHandover` exists for a staff handover; a collection count
 
 Board 4 of the client F&B pack. **`mergeTableVisits` and `transferTableVisit` existed and moving a seated party did not** — a merge combines two bills and a transfer hands a visit to another server. Neither moves people.
 **The bill, the kitchen tickets and the server assignment all follow.** A move that leaves food going to the old table is worse than no move at all — which is why this is one operation rather than an update to `tableId`.
-**Refused if the target is occupied**, unless the caller is merging.
+**Refused if the target is occupied**, and the refusal names the visit there. Seating a party at an occupied table is a merge, which is `mergeTableVisits` — this operation has no merge option.
 
 |  |  |
 |---|---|
@@ -888,7 +1014,7 @@ Board 4 of the client F&B pack. **`mergeTableVisits` and `transferTableVisit` ex
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
-| visitId | path | yes | string (uuid) |  |
+| visitId | path | yes | string |  |
 | Idempotency-Key | header | yes | string | Client-generated ULID. |
 
 **Request body**
@@ -897,12 +1023,13 @@ Board 4 of the client F&B pack. **`mergeTableVisits` and `transferTableVisit` ex
 |---|---|---|---|
 | toTableId | string (uuid) | yes |  |
 | reason | enum (guestRequest, tableFault, partySizeChange, serviceRecovery, other) |  |  |
+| recordedAt | string (date-time) | yes | Device time of the act (offline-capable; replayed in this order). |
 
 **Response**: `TableVisit`
 
 | Field | Type | Required | Notes |
 |---|---|---|---|
-| id | string | yes |  |
+| id | string | yes | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
 | tableId | string (uuid) | yes |  |
 | tableLabel | string |  |  |
 | outletId | string (uuid) | yes |  |
@@ -911,11 +1038,11 @@ Board 4 of the client F&B pack. **`mergeTableVisits` and `transferTableVisit` ex
 | serverPrincipalId | string (uuid) |  | (nullable) |
 | subjectId | string (uuid) |  | (nullable) |
 | orders | array of FnbOrder | yes |  |
-| orders[].id | string | yes |  |
+| orders[].id | string | yes | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
 | orders[].orderNumber | string | yes |  |
 | orders[].outletId | string (uuid) | yes |  |
 | orders[].serviceMode | ServiceMode: enum (quickService, tableService, roomService, collection, delivery) | yes |  |
-| orders[].tableVisitId | string |  | (nullable) |
+| orders[].tableVisitId | string |  | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$; nullable) |
 | orders[].status | FnbOrderStatus: enum (ordered, accepted, inPreparation, ready, served, collected, delivered, cancelled, …) | yes | The full lifecycle from 4.6.35. |
 | orders[].lines | array of object | yes |  |
 | orders[].lines[].id | string | yes | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
@@ -938,17 +1065,21 @@ Board 4 of the client F&B pack. **`mergeTableVisits` and `transferTableVisit` ex
 | orders[].taxAmount.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
 | orders[].taxAmount.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
 | orders[].taxAmount.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
-| orders[].kitchenTicketId | string |  | (nullable) |
+| orders[].kitchenTicketId | string |  | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$; nullable) |
 | orders[].estimatedReadyAt | string (date-time) |  | (nullable) |
 | orders[].createdAt | string (date-time) | yes |  |
 | orders[].recordedAt | string (date-time) |  |  |
 | orders[].syncedAt | string (date-time) |  | (nullable) |
-| mergedIntoVisitId | string |  | (nullable) |
+| mergedIntoVisitId | string |  | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$; nullable) |
 | mergedFromVisitIds | array of string |  |  |
 | runningTotal | Money |  | On the wire this is three fields; in the database it is one column. |
 | runningTotal.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
 | runningTotal.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
 | runningTotal.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| gratuity | object |  | The gratuity taken at closeTableVisit. (read-only; nullable) |
+| gratuity.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
+| gratuity.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
+| gratuity.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
 | openedAt | string (date-time) | yes |  |
 | closedAt | string (date-time) |  | (nullable) |
 
@@ -982,7 +1113,7 @@ Board 3 and Board 4. **Food ready and nobody collecting it is the commonest reas
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
-| visitId | path | yes | string (uuid) |  |
+| visitId | path | yes | string |  |
 | Idempotency-Key | header | yes | string | Client-generated ULID. |
 
 **Request body**
@@ -1020,8 +1151,25 @@ A label that omits an allergen on a sealed bag is the failure mode this exists t
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
-| ticketId | path | yes | string (uuid) |  |
+| ticketId | path | yes | string |  |
 | Idempotency-Key | header | yes | string | Client-generated ULID. |
+
+**Response**: `OrderLabel`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| ticketId | string | yes | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
+| orderNumber | string | yes |  |
+| guestName | string |  | (nullable) |
+| serviceMode | ServiceMode: enum (quickService, tableService, roomService, collection, delivery) |  |  |
+| deliveryLabel | string |  | Where it is going, as a runner would read it. (nullable) |
+| buzzerCode | string |  | (nullable) |
+| lines | array of object | yes |  |
+| lines[].name | string | yes |  |
+| lines[].quantity | integer | yes |  |
+| lines[].modifiers | array of string |  |  |
+| lines[].allergens | array of AllergenCode: enum (gluten, crustaceans, eggs, fish, peanuts, soybeans, milk, nuts, …) |  |  |
+| allergens | array of AllergenCode: enum (gluten, crustaceans, eggs, fish, peanuts, soybeans, milk, nuts, …) | yes | Every allergen on the order, together. |
 
 **Responses**
 
@@ -1053,32 +1201,41 @@ Board 3. **A bumped ticket disappears from the rail**, and a bump is a single ta
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
-| ticketId | path | yes | string (uuid) |  |
+| ticketId | path | yes | string |  |
 | Idempotency-Key | header | yes | string | Client-generated ULID. |
+
+**Request body**
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| recordedAt | string (date-time) | yes | Device time of the act (offline-capable; replayed in this order). |
 
 **Response**: `KitchenTicket`
 
 | Field | Type | Required | Notes |
 |---|---|---|---|
-| id | string | yes |  |
-| orderId | string | yes |  |
+| id | string | yes | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
+| orderId | string | yes | The F&B order the ticket was created from on acceptance (FnbOrder.id). (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
 | orderNumber | string |  |  |
 | outletId | string (uuid) | yes |  |
 | tableLabel | string |  | (nullable) |
 | serviceMode | ServiceMode: enum (quickService, tableService, roomService, collection, delivery) |  |  |
-| coursing | enum (fireAndForget, holdAndFire, phased, timed, delayed) |  | BL-131. (nullable) |
+| coursing | object |  | BL-131. (nullable) |
 | buzzerCode | string |  | BL-128. (nullable) |
 | status | KitchenTicketStatus: enum (received, preparing, ready, served, recalled, cancelled) | yes |  |
 | priority | integer |  | Higher fires sooner. |
 | prioritisedByPrincipalId | string (uuid) |  | (nullable) |
 | prioritiseReason | string |  | (nullable) |
 | lines | array of object | yes |  |
-| lines[].lineId | string | yes |  |
+| lines[].lineId | string | yes | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
 | lines[].name | string | yes |  |
 | lines[].quantity | integer | yes |  |
 | lines[].modifiers | array of string |  |  |
 | lines[].note | string |  | (nullable) |
-| lines[].allergens | array of string |  |  |
+| lines[].allergens | array of AllergenCode: enum (gluten, crustaceans, eggs, fish, peanuts, soybeans, milk, nuts, …) |  |  |
+| lines[].refireOfLineId | string |  | Set on a refire. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$; read-only; nullable) |
+| lines[].refireReason | object |  | (read-only; nullable) |
+| lines[].isChargeable | boolean |  | A refire's chargeable flag. (read-only; nullable) |
 | lines[].course | integer |  | (nullable) |
 | lines[].stationId | string (uuid) |  | (nullable) |
 | lines[].status | KitchenTicketStatus: enum (received, preparing, ready, served, recalled, cancelled) | yes |  |
@@ -1117,40 +1274,44 @@ Board 3. **A refire is not a new order and it must not be.** It is the same line
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
-| ticketId | path | yes | string (uuid) |  |
+| ticketId | path | yes | string |  |
 | Idempotency-Key | header | yes | string | Client-generated ULID. |
 
 **Request body**
 
 | Field | Type | Required | Notes |
 |---|---|---|---|
-| lineId | string (uuid) | yes |  |
-| reason | enum (overcooked, undercooked, wrongItem, dropped, cold, allergyRisk, guestChangedMind, lateAdd) | yes |  |
+| lineId | string | yes | KitchenTicket.lines[].lineId. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
+| reason | RefireReason: enum (overcooked, undercooked, wrongItem, dropped, cold, allergyRisk, guestChangedMind, lateAdd) | yes | Why a line was made again (refireItem). |
+| recordedAt | string (date-time) | yes | Device time of the act (offline-capable; replayed in this order). |
 | chargeable | boolean |  | False by default, and that default is the point. (default False) |
 
 **Response**: `KitchenTicket`
 
 | Field | Type | Required | Notes |
 |---|---|---|---|
-| id | string | yes |  |
-| orderId | string | yes |  |
+| id | string | yes | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
+| orderId | string | yes | The F&B order the ticket was created from on acceptance (FnbOrder.id). (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
 | orderNumber | string |  |  |
 | outletId | string (uuid) | yes |  |
 | tableLabel | string |  | (nullable) |
 | serviceMode | ServiceMode: enum (quickService, tableService, roomService, collection, delivery) |  |  |
-| coursing | enum (fireAndForget, holdAndFire, phased, timed, delayed) |  | BL-131. (nullable) |
+| coursing | object |  | BL-131. (nullable) |
 | buzzerCode | string |  | BL-128. (nullable) |
 | status | KitchenTicketStatus: enum (received, preparing, ready, served, recalled, cancelled) | yes |  |
 | priority | integer |  | Higher fires sooner. |
 | prioritisedByPrincipalId | string (uuid) |  | (nullable) |
 | prioritiseReason | string |  | (nullable) |
 | lines | array of object | yes |  |
-| lines[].lineId | string | yes |  |
+| lines[].lineId | string | yes | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
 | lines[].name | string | yes |  |
 | lines[].quantity | integer | yes |  |
 | lines[].modifiers | array of string |  |  |
 | lines[].note | string |  | (nullable) |
-| lines[].allergens | array of string |  |  |
+| lines[].allergens | array of AllergenCode: enum (gluten, crustaceans, eggs, fish, peanuts, soybeans, milk, nuts, …) |  |  |
+| lines[].refireOfLineId | string |  | Set on a refire. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$; read-only; nullable) |
+| lines[].refireReason | object |  | (read-only; nullable) |
+| lines[].isChargeable | boolean |  | A refire's chargeable flag. (read-only; nullable) |
 | lines[].course | integer |  | (nullable) |
 | lines[].stationId | string (uuid) |  | (nullable) |
 | lines[].status | KitchenTicketStatus: enum (received, preparing, ready, served, recalled, cancelled) | yes |  |
@@ -1168,7 +1329,8 @@ Board 3. **A refire is not a new order and it must not be.** It is the same line
 
 **`POST /table-reservations/{reservationId}/seat`**: The party arrived and has been sat down
 
-**Where the booking becomes a visit.** The host names the actual table now, and a table session opens against it — which is the moment `claimTableSession` and this contract meet.
+**Where the booking becomes a visit.** The host names the actual table now, and a table session opens against it — which is where a guest claiming the table (`claimLocationSession`) joins this visit rather than starting a second.
+**Seats from `booked`, `confirmed` or `noShow` only** (states/table-reservation.yaml). A seated, completed or cancelled booking is refused with its current status.
 A party seated at a different size from the booking is recorded as such. A booking for six that arrives as four is a cover a restaurant could have sold.
 
 |  |  |
@@ -1182,6 +1344,7 @@ A party seated at a different size from the booking is recorded as such. A booki
 | Reads | `cache:idempotency`, `fnb.dining_table`, `fnb.reservation_table`, `fnb.table_reservation` |
 | Writes | `cache:idempotency`, `fnb.table_reservation`, `fnb.table_session`, `fnb.table_visit` |
 | Called by | EMP-058, POS-028 |
+| State model | Table reservation ([states/table-reservation.yaml](../../../states/table-reservation.yaml)): moves `booked` -> `seated`, `confirmed` -> `seated`, `noShow` -> `seated` |
 
 **Parameters**
 
@@ -1196,6 +1359,7 @@ A party seated at a different size from the booking is recorded as such. A booki
 |---|---|---|---|
 | tableIds | array of string (uuid) | yes | (min items 1) |
 | actualPartySize | integer |  |  |
+| recordedAt | string (date-time) | yes | Device time of the act (offline-capable; replayed in this order). |
 
 **Response**: `TableReservation`
 
@@ -1217,7 +1381,7 @@ A party seated at a different size from the booking is recorded as such. A booki
 | groupId | string (uuid) |  | 5.1.2. (nullable) |
 | notes | string |  | Allergies |
 | actualPartySize | integer |  | (read-only; nullable) |
-| tableVisitId | string (uuid) |  | (read-only; nullable) |
+| tableVisitId | string |  | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$; read-only; nullable) |
 | createdAt | string (date-time) |  | (read-only) |
 
 **Responses**
@@ -1225,6 +1389,7 @@ A party seated at a different size from the booking is recorded as such. A booki
 | Code | Shape | Meaning |
 |---|---|---|
 | 200 |  | Seated, and a table visit opened |
+| 409 |  | The booking is not in a seatable state. |
 
 ### setCourseRules
 
@@ -1242,8 +1407,8 @@ Board 3. **Coursing was a per-ticket field with no default**, so every table was
 | Offline | no |
 | Config scope | outlet |
 | Conflict policy | serverWins |
-| Reads | `cache:idempotency` |
-| Writes | `cache:idempotency`, `cache:resolution` |
+| Reads | `cache:idempotency`, `fnb.course_rule` |
+| Writes | `cache:idempotency`, `cache:resolution`, `fnb.course_rule` |
 | Called by | KIT-003 |
 
 **Parameters**
@@ -1253,14 +1418,27 @@ Board 3. **Coursing was a per-ticket field with no default**, so every table was
 | outletId | path | yes | string (uuid) |  |
 | Idempotency-Key | header | yes | string | Client-generated ULID. |
 
-**Request body**
+**Request body**: `CourseRules`
 
 | Field | Type | Required | Notes |
 |---|---|---|---|
-| defaultCoursing | enum (none, holdAndFire, phased, timed) |  |  |
+| outletId | string (uuid) |  | The outlet in the path. (read-only) |
+| defaultCoursing | CoursingPolicy: enum (fireAndForget, holdAndFire, phased, timed, delayed) |  | How a ticket's courses are fired. |
 | courseNames | array of string |  |  |
 | autoFireMinutes | integer |  | (nullable) |
-| serviceModeOverrides | object |  |  |
+| serviceModeOverrides | object |  | A different default per service mode. |
+| scopePath | string |  | The partition key (ADR-0005). (read-only) |
+
+**Response**: `CourseRules`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| outletId | string (uuid) |  | The outlet in the path. (read-only) |
+| defaultCoursing | CoursingPolicy: enum (fireAndForget, holdAndFire, phased, timed, delayed) |  | How a ticket's courses are fired. |
+| courseNames | array of string |  |  |
+| autoFireMinutes | integer |  | (nullable) |
+| serviceModeOverrides | object |  | A different default per service mode. |
+| scopePath | string |  | The partition key (ADR-0005). (read-only) |
 
 **Responses**
 
@@ -1285,8 +1463,8 @@ Without it, `getTableMap` reports a full room while the venue turns away a booki
 | Offline | no |
 | Config scope | outlet |
 | Conflict policy | serverWins |
-| Reads | `cache:idempotency`, `fnb.dining_table` |
-| Writes | `cache:idempotency`, `cache:resolution`, `fnb.dining_table` |
+| Reads | `cache:idempotency`, `fnb.dining_table`, `fnb.table_combination` |
+| Writes | `cache:idempotency`, `cache:resolution`, `fnb.dining_table`, `fnb.table_combination` |
 | Called by | EMP-058, POS-024 |
 
 **Parameters**
@@ -1300,16 +1478,31 @@ Without it, `getTableMap` reports a full room while the venue turns away a booki
 
 | Field | Type | Required | Notes |
 |---|---|---|---|
-| combinations | array of object | yes |  |
-| combinations[].tableIds | array of string (uuid) | yes |  |
-| combinations[].combinedCovers | integer | yes |  |
+| combinations | array of TableCombination | yes |  |
+| combinations[].id | string (uuid) |  | (read-only) |
+| combinations[].outletId | string (uuid) |  | The outlet in the path. (read-only) |
+| combinations[].tableIds | array of string (uuid) | yes | (min items 2) |
+| combinations[].combinedCovers | integer | yes | (min 1) |
 | combinations[].setupMinutes | integer |  | (default 5) |
+| combinations[].scopePath | string |  | The partition key (ADR-0005). (read-only) |
+
+**Response**: `object`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| combinations | array of TableCombination | yes |  |
+| combinations[].id | string (uuid) |  | (read-only) |
+| combinations[].outletId | string (uuid) |  | The outlet in the path. (read-only) |
+| combinations[].tableIds | array of string (uuid) | yes | (min items 2) |
+| combinations[].combinedCovers | integer | yes | (min 1) |
+| combinations[].setupMinutes | integer |  | (default 5) |
+| combinations[].scopePath | string |  | The partition key (ADR-0005). (read-only) |
 
 **Responses**
 
 | Code | Shape | Meaning |
 |---|---|---|
-| 200 |  | Set |
+| 200 |  | Set. |
 
 ### signCorrectiveAction
 
@@ -1329,6 +1522,7 @@ Board 5J. **The signature is the record.** *Discarded and reset* with nobody aga
 | Reads | `cache:idempotency`, `fnb.corrective_action`, `identity.principal` |
 | Writes | `cache:idempotency`, `fnb.corrective_action` |
 | Called by | BO-044, EMP-067 |
+| State model | CorrectiveAction ([states/corrective-action.yaml](../../../states/corrective-action.yaml)): moves `actioned` -> `signed`, `escalated` -> `signed` |
 
 **Parameters**
 
@@ -1350,6 +1544,7 @@ Board 5J. **The signature is the record.** *Discarded and reset* with nobody aga
 |---|---|---|---|
 | id | string (uuid) | yes |  |
 | raisedAt | string (date-time) | yes |  |
+| raisedByPrincipalId | string (uuid) |  | Who raised it, which is who may not sign it when it is critical (signCorrectiveAction). (read-only; nullable) |
 | source | enum (temperatureExcursion, coldChainBreach, expiredStock, contamination, pestSighting, equipmentFailure, manual) | yes |  |
 | sourceRef | string (uuid) |  | (nullable) |
 | severity | enum (observation, minor, major, critical) |  |  |
@@ -1366,7 +1561,7 @@ Board 5J. **The signature is the record.** *Discarded and reset* with nobody aga
 | Code | Shape | Meaning |
 |---|---|---|
 | 200 |  | Signed |
-| 409 |  | A critical finding signed by the principal who raised it. |
+| 409 |  | A critical finding signed by the principal who raised it (CorrectiveAction.raisedByPrincipalId). |
 
 ### updateTableReservation
 
@@ -1385,6 +1580,7 @@ Party size, time, or cancelled. **A reduced party size releases cover immediatel
 | Reads | `cache:idempotency`, `fnb.reservation_table`, `fnb.table_reservation` |
 | Writes | `cache:idempotency`, `fnb.reservation_table`, `fnb.table_reservation` |
 | Called by | GST-070, WEB-031 |
+| State model | Table reservation ([states/table-reservation.yaml](../../../states/table-reservation.yaml)): moves `booked` -> `confirmed`, `booked` -> `cancelled`, `confirmed` -> `cancelled` |
 
 **Parameters**
 
@@ -1413,7 +1609,7 @@ Party size, time, or cancelled. **A reduced party size releases cover immediatel
 | groupId | string (uuid) |  | 5.1.2. (nullable) |
 | notes | string |  | Allergies |
 | actualPartySize | integer |  | (read-only; nullable) |
-| tableVisitId | string (uuid) |  | (read-only; nullable) |
+| tableVisitId | string |  | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$; read-only; nullable) |
 | createdAt | string (date-time) |  | (read-only) |
 
 **Response**: `TableReservation`
@@ -1436,7 +1632,7 @@ Party size, time, or cancelled. **A reduced party size releases cover immediatel
 | groupId | string (uuid) |  | 5.1.2. (nullable) |
 | notes | string |  | Allergies |
 | actualPartySize | integer |  | (read-only; nullable) |
-| tableVisitId | string (uuid) |  | (read-only; nullable) |
+| tableVisitId | string |  | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$; read-only; nullable) |
 | createdAt | string (date-time) |  | (read-only) |
 
 **Responses**
@@ -1488,12 +1684,12 @@ Codes rotate. A static code photographed once lets someone order to a cabana the
 
 | Field | Type | Required | Notes |
 |---|---|---|---|
-| id | string | yes |  |
+| id | string | yes | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
 | locationId | string (uuid) | yes |  |
 | kind | DeliveryLocationKind: enum (table, seat, cabana, sunbed, poolside, box, suite, lawn, …) | yes | 4.6.26. |
 | label | string | yes |  |
 | outletId | string (uuid) |  | The outlet serving this location. (nullable) |
-| visitId | string |  | The table visit this session orders onto, where the location is a table. (nullable) |
+| visitId | string |  | The table visit this session orders onto, where the location is a table. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$; nullable) |
 | joinedExistingVisit | boolean |  |  |
 | subjectId | string (uuid) |  |  |
 | expiresAt | string (date-time) | yes | Sessions expire so a guest who leaves cannot order to a lounger now occupied by someone else. |
@@ -1510,6 +1706,7 @@ Codes rotate. A static code photographed once lets someone order to a cabana the
 
 **`POST /table-sessions`**: Identify which table a guest is sitting at
 
+**Superseded by `claimLocationSession`, 26 September.** That operation is *one operation for all of them* — a table is a `DeliveryLocation` of kind `table` with its `tableId` — and it is the one `CreateGuestOrderRequest.locationSessionId`, flow F11 and flow F48 use. A `TableSession` id has nowhere to go on a guest order. Kept, with its path and id, for callers already built on it; new screens claim with `claimLocationSession`.
 Scanning the QR code on a table. This is the step that makes ordering to a table possible without a server — the guest tells the platform where they are.
 **A claim is not a booking.** It attaches the guest to a table so an order can be routed there. Where a visit is already open — a server seated them — the guest joins it rather than starting a second one, and both order onto the same bill.
 The code is short-lived and rotates. A static table code photographed once lets someone order to a table they are not at, from outside the venue.
@@ -1525,6 +1722,7 @@ The code is short-lived and rotates. A static table code photographed once lets 
 | Reads | `cache:idempotency`, `fnb.table_session` |
 | Writes | `cache:idempotency`, `fnb.table_session` |
 | Called by | GST-024, GST-025, WEB-036, WEB-038 |
+| State model | Table ([states/table.yaml](../../../states/table.yaml)): moves `free` -> `seated`, `reserved` -> `seated` |
 
 **Parameters**
 
@@ -1543,12 +1741,12 @@ The code is short-lived and rotates. A static table code photographed once lets 
 
 | Field | Type | Required | Notes |
 |---|---|---|---|
-| id | string | yes |  |
+| id | string | yes | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
 | outletId | string (uuid) | yes |  |
 | outletName | string |  |  |
 | tableId | string (uuid) | yes |  |
 | tableLabel | string | yes |  |
-| visitId | string | yes | The table visit this session orders onto. |
+| visitId | string | yes | The table visit this session orders onto. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
 | joinedExistingVisit | boolean |  |  |
 | subjectId | string (uuid) |  |  |
 | expiresAt | string (date-time) | yes | Sessions expire so a guest who leaves cannot order to a table now occupied by someone else. |
@@ -1565,7 +1763,8 @@ The code is short-lived and rotates. A static table code photographed once lets 
 **`POST /guest-orders`**: A guest orders food
 
 Order to a table, or for collection from a counter.
-**Distinct from `createFnbOrder`, which is staff-operated.** A server placing an order is trusted with an outlet, a table and a price. A guest is trusted with none of those: the outlet comes from the table session, the price is recomputed server-side and the quoted total is checked against it.
+**Distinct from `createFnbOrder`, which is staff-operated.** A server placing an order is trusted with an outlet, a table and a price. A guest is trusted with none of those: the outlet comes from the location session (`claimLocationSession`), the price is recomputed server-side and the quoted total is checked against it.
+**An order that breaks the outlet's `FnbDeliveryPolicy` is refused with 422**, naming the rule it broke; a 409 is a state that changed under the guest.
 Payment is required before the kitchen sees it, unless the outlet runs a tab — a kitchen that cooks on an unpaid guest order is a kitchen giving food away.
 
 |  |  |
@@ -1579,6 +1778,7 @@ Payment is required before the kitchen sees it, unless the outlet runs a tab —
 | Reads | `cache:idempotency`, `fnb.location_session`, `fnb.menu_item`, `inventory.stock_level`, `fnb.delivery_policy` |
 | Writes | `cache:idempotency`, `fnb.kitchen_ticket`, `fnb.order_fulfilment`, `fnb.service_order` |
 | Called by | GST-024, GST-032, KSK-016, WEB-036 |
+| State model | F&B order ([states/fnb-order.yaml](../../../states/fnb-order.yaml)): created as `ordered` |
 
 **Parameters**
 
@@ -1591,11 +1791,12 @@ Payment is required before the kitchen sees it, unless the outlet runs a tab —
 | Field | Type | Required | Notes |
 |---|---|---|---|
 | id | string | yes | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
-| locationSessionId | string |  | Where the order is going. (nullable) |
+| locationSessionId | string |  | From claimLocationSession. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$; nullable) |
 | outletId | string (uuid) |  | Required for collection. (nullable) |
 | fulfilment | object |  | Required for takeaway and address delivery; refused with 422 when it breaks the outlet's FnbDeliveryPolicy. (nullable) |
 | fulfilment.id | string (uuid) |  | (read-only) |
-| fulfilment.mode | enum (collection, delivery, inVenue) | yes |  |
+| fulfilment.orderId | string |  | The guest order this fulfils (FnbOrder.id). (pattern ^[0-9A-HJKMNP-TV-Z]{26}$; read-only) |
+| fulfilment.mode | enum (collection, delivery, inVenue) | yes | collection from a counter, delivery to an address outside the venue, inVenue to a table, seat, cabana or named location (the location session). |
 | fulfilment.collectionAt | string (date-time) |  | (nullable) |
 | fulfilment.windowStart | string (date-time) |  | (nullable) |
 | fulfilment.windowEnd | string (date-time) |  | (nullable) |
@@ -1629,7 +1830,7 @@ Payment is required before the kitchen sees it, unless the outlet runs a tab —
 |---|---|---|---|
 | orderId | string | yes |  |
 | orderNumber | string | yes | Short and readable. |
-| fulfilment | enum (collect, deliverToLocation, tableService) |  |  |
+| fulfilment | enum (collect, deliverToLocation, tableService, deliverToAddress) |  | How the order reaches the guest, in the request's terms: collect is GuestOrderFulfilment.mode collection; deliverToAddress is delivery; inVenue is tableService where the location session is a table a… |
 | deliveryLabel | string |  | Where it is going, as a runner would read it. (nullable) |
 | status | FnbOrderStatus: enum (ordered, accepted, inPreparation, ready, served, collected, delivered, cancelled, …) | yes | The full lifecycle from 4.6.35. |
 | total | Money | yes | On the wire this is three fields; in the database it is one column. |
@@ -1645,12 +1846,15 @@ Payment is required before the kitchen sees it, unless the outlet runs a tab —
 | Code | Shape | Meaning |
 |---|---|---|
 | 201 |  | Placed |
-| 409 |  | An item became unavailable, the quoted total no longer matches, the table session expired, or the outlet stopped taking orders. |
+| 409 |  | An item became unavailable, the quoted total no longer matches, the location session expired, or the outlet stopped taking orders. |
+| 422 |  | The order breaks the outlet's FnbDeliveryPolicy. |
 | 402 |  | Payment required or declined |
 
 ### getFnbDeliveryPolicy
 
 **`GET /fnb-delivery-policy`**: How an outlet does takeaway and delivery
+
+**One policy per outlet**, so the outlet is named. Without it the operation could not say which of a venue's outlets it was answering for.
 
 |  |  |
 |---|---|
@@ -1665,6 +1869,12 @@ Payment is required before the kitchen sees it, unless the outlet runs a tab —
 | Reads | `fnb.delivery_policy` |
 | Writes | - |
 | Called by | BO-044, GST-024, WEB-036 |
+
+**Parameters**
+
+| Name | In | Required | Type | Notes |
+|---|---|---|---|---|
+| outletId | query | yes | string (uuid) |  |
 
 **Response**: `FnbDeliveryPolicy`
 
@@ -1775,7 +1985,7 @@ Everything ordered at the table this sitting, whether ordered through the app or
 | Code | Shape | Meaning |
 |---|---|---|
 | 200 |  | Bill |
-| 404 | NotFound | The resource does not exist, or is outside the caller's scope |
+| 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
 
 ### getGuestMenu
 
@@ -1827,7 +2037,7 @@ Allergens are always present. Omitting them is not an option a tenant gets to ch
 | sections[].items[].imageAssetRef | string |  | (nullable) |
 | sections[].items[].isAvailable | boolean | yes | Marked, not removed. |
 | sections[].items[].unavailableReason | string |  | (nullable) |
-| sections[].items[].allergens | array of string | yes | Always present. |
+| sections[].items[].allergens | array of AllergenCode: enum (gluten, crustaceans, eggs, fish, peanuts, soybeans, milk, nuts, …) | yes | Always present. |
 | sections[].items[].preparationMinutes | integer |  | (nullable) |
 | sections[].items[].modifierGroups | array of ModifierGroup |  |  |
 
@@ -1842,7 +2052,7 @@ Allergens are always present. Omitting them is not an option a tenant gets to ch
 
 **`GET /guest-orders/{orderId}`**: Track an order
 
-Received, preparing, ready, served. Fed by the kitchen ticket status the KDS already reports, so the guest sees what the kitchen sees rather than a timer counting down against nothing.
+The order's `FnbOrderStatus` — ordered, accepted, inPreparation, ready, then served, collected or delivered (or cancelled, refunded) — with each line's `KitchenTicketStatus`. Fed by the kitchen ticket status the kitchen display reports, so the guest sees what the kitchen sees rather than a timer counting down against nothing.
 **Read from the primary.** A guest refreshing to see whether their food is ready is the wrong place for replica lag.
 
 |  |  |
@@ -1883,7 +2093,7 @@ Received, preparing, ready, served. Fed by the kitchen ticket status the KDS alr
 | Code | Shape | Meaning |
 |---|---|---|
 | 200 |  | Status |
-| 404 | NotFound | The resource does not exist, or is outside the caller's scope |
+| 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
 
 ### listDeliveryLocations
 
@@ -1913,7 +2123,26 @@ They are one concept because a runner needs one instruction, and a guest needs o
 | kind | query |  | DeliveryLocationKind: enum (table, seat, cabana, sunbed, poolside, box, suite, lawn, …) |  |
 | servingOutletId | query |  | string (uuid) | Only locations this outlet delivers to. |
 | pageSize | query |  | integer |  |
-| cursor | query |  | string | Opaque cursor from a previous page. |
+| cursor | query |  | string | Opaque cursor: the nextCursor of the previous page. |
+
+**Response**: `object`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| items | array of DeliveryLocation | yes |  |
+| items[].id | string (uuid) | yes |  |
+| items[].venueId | string (uuid) | yes |  |
+| items[].kind | DeliveryLocationKind: enum (table, seat, cabana, sunbed, poolside, box, suite, lawn, …) | yes | 4.6.26. |
+| items[].label | string | yes | What a runner is told. |
+| items[].zone | string |  | (nullable) |
+| items[].tableId | string (uuid) |  | Set where the location is a restaurant table, so it shares table state. (nullable) |
+| items[].seatId | string |  | Set where the seat is the address. (nullable) |
+| items[].servingOutletIds | array of string (uuid) |  | Which outlets deliver here. |
+| items[].isServiceable | boolean | yes | False where the location exists but is not currently taking delivery — closed section, weather, no runner on shift. |
+| items[].unserviceableReason | string |  | (nullable) |
+| items[].walkTimeMinutes | integer |  | From the serving outlet. (nullable) |
+| nextCursor | string |  |  |
+| hasMore | boolean | yes |  |
 
 **Responses**
 
@@ -1949,14 +2178,34 @@ Ordering method is stated per outlet, because it varies within one venue: a tabl
 | openNow | query |  | boolean |  |
 | orderingMethod | query |  | GuestOrderingMethod: enum (tableService, appToTable, appToCollect, counterOnly, notAvailable) |  |
 | pageSize | query |  | integer |  |
-| cursor | query |  | string | Opaque cursor from a previous page. |
+| cursor | query |  | string | Opaque cursor: the nextCursor of the previous page. |
+
+**Response**: `object`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| items | array of DiningOutlet | yes |  |
+| items[].outletId | string (uuid) | yes |  |
+| items[].name | string | yes |  |
+| items[].kind | string | yes |  |
+| items[].zone | string |  | (nullable) |
+| items[].cuisine | array of string |  |  |
+| items[].isOpenNow | boolean | yes |  |
+| items[].opensAt | string (date-time) |  | (nullable) |
+| items[].closesAt | string (date-time) |  | (nullable) |
+| items[].orderingMethod | GuestOrderingMethod: enum (tableService, appToTable, appToCollect, counterOnly, notAvailable) | yes | How a guest may order at this outlet. |
+| items[].estimatedWaitMinutes | integer |  | From current kitchen ticket volume, not a fixed figure. (nullable) |
+| items[].imageAssetRef | string |  | (nullable) |
+| items[].menuId | string (uuid) |  | (nullable) |
+| nextCursor | string |  |  |
+| hasMore | boolean | yes |  |
 
 **Responses**
 
 | Code | Shape | Meaning |
 |---|---|---|
 | 200 |  | Dining outlets |
-| 404 | NotFound | The resource does not exist, or is outside the caller's scope |
+| 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
 
 ### listFulfilmentSlots
 
@@ -1983,18 +2232,21 @@ Computed from the outlet's `FnbDeliveryPolicy` and its current load: ASAP plus f
 |---|---|---|---|---|
 | outletId | path | yes | string (uuid) |  |
 | mode | query | yes | enum (collection, delivery) |  |
-| date | query |  | string (date) |  |
+| date | query |  | string (date) | A calendar day, in the Region's time zone, not UTC. |
 | pageSize | query |  | integer |  |
-| cursor | query |  | string | Opaque cursor from a previous page. |
+| cursor | query |  | string | Opaque cursor: the nextCursor of the previous page. |
 
-**Response**: `FulfilmentSlots`
+**Response**: `object`
 
 | Field | Type | Required | Notes |
 |---|---|---|---|
-| slots | array of object |  |  |
-| slots[].start | string (date-time) |  |  |
-| slots[].end | string (date-time) |  | (nullable) |
-| slots[].isAsap | boolean |  |  |
+| items | FulfilmentSlots | yes |  |
+| items.slots | array of object |  |  |
+| items.slots[].start | string (date-time) |  |  |
+| items.slots[].end | string (date-time) |  | (nullable) |
+| items.slots[].isAsap | boolean |  |  |
+| nextCursor | string |  |  |
+| hasMore | boolean | yes |  |
 
 **Responses**
 
@@ -2020,6 +2272,7 @@ Offline-capable. A runner crossing a venue loses signal, and an order that canno
 | Reads | `cache:idempotency`, `fnb.delivery_location`, `fnb.service_order` |
 | Writes | `cache:idempotency`, `fnb.service_order` |
 | Called by | BO-021, KIT-007, POS-012 |
+| State model | F&B order ([states/fnb-order.yaml](../../../states/fnb-order.yaml)): moves `ready` -> `served`, `ready` -> `collected`, `ready` -> `delivered`<br/>Kitchen ticket ([states/kitchen-ticket.yaml](../../../states/kitchen-ticket.yaml)): moves `ready` -> `served` |
 
 **Parameters**
 
@@ -2032,7 +2285,7 @@ Offline-capable. A runner crossing a venue loses signal, and an order that canno
 
 | Field | Type | Required | Notes |
 |---|---|---|---|
-| outcome | enum (served, collected, delivered, guestNotFound, refused) | yes |  |
+| outcome | enum (served, collected, delivered, guestNotFound, refused) | yes | served, collected and delivered move the order to the FnbOrderStatus of the same name. |
 | deliveredToLocationId | string (uuid) |  |  |
 | runnerPrincipalId | string (uuid) |  |  |
 | note | string |  | Required for guestNotFound and refused. (max length 500) |
@@ -2064,6 +2317,7 @@ Offline-capable. A runner crossing a venue loses signal, and an order that canno
 **`PUT /fnb-delivery-policy`**: Set takeaway and delivery rules
 
 **Design gap, 23 September.** The dining design offers takeaway with a collection time and delivery to an address with a delivery window, a minimum order, a fee, free delivery above a threshold and a radius. **The design only displays those rules; this makes them enforceable**, and `createGuestFnbOrder` refuses an order that breaks them. Delivery before this was to places inside the venue only (`listDeliveryLocations`).
+**Keyed on `outletId`, one policy per outlet.** The body replaces that outlet's policy, and creates it where the outlet has none — there is no separate create.
 
 |  |  |
 |---|---|
@@ -2176,8 +2430,24 @@ Offline-capable. A runner crossing a venue loses signal, and an order that canno
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
+| outletId | query |  | string (uuid) | One outlet's stations. |
 | pageSize | query |  | integer |  |
-| cursor | query |  | string | Opaque cursor from a previous page. |
+| cursor | query |  | string | Opaque cursor: the nextCursor of the previous page. |
+
+**Response**: `object`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| items | array of KitchenStation | yes |  |
+| items[].id | string (uuid) | yes |  |
+| items[].code | string | yes |  |
+| items[].name | string | yes |  |
+| items[].outletId | string (uuid) |  |  |
+| items[].menuItemIds | array of string (uuid) |  | Items routed to this station. |
+| items[].displayEndpoint | string |  | The P15 Kitchen Display device this station's tickets go to (19 Sep: the display is TICVAI software on commodity hardware, per station, with a fallback device where the primary is down — 18 Aug minut… (nullable) |
+| items[].isActive | boolean |  |  |
+| nextCursor | string |  |  |
+| hasMore | boolean | yes |  |
 
 **Responses**
 
@@ -2189,7 +2459,8 @@ Offline-capable. A runner crossing a venue loses signal, and an order that canno
 
 **`GET /kitchen/tickets`**: Kitchen ticket queue
 
-Read by the venue's KDS, or by a fallback screen where none is configured. TICVAI does not implement a kitchen display — this is the integration surface.
+The rail. Read by P15 Kitchen Display — TICVAI's own kitchen display on commodity hardware (19 Sep; the 31 Jul *KDS integration only* position is superseded) — and by the back-office and till views of the same queue.
+**Rail order is the server's.** Tickets come back ordered by `priority` and the outlet's priority weights (`setKitchenSla`: age, promise time — `targetReadyAt` —, table stage, VIP), and a display renders them in the order returned rather than re-sorting by arrival or by promise time.
 
 |  |  |
 |---|---|
@@ -2211,13 +2482,49 @@ Read by the venue's KDS, or by a fallback screen where none is configured. TICVA
 | stationId | query |  | string (uuid) | Route to a preparation station — grill, cold, bar. |
 | status | query |  | KitchenTicketStatus: enum (received, preparing, ready, served, recalled, cancelled) |  |
 | pageSize | query |  | integer |  |
-| cursor | query |  | string | Opaque cursor from a previous page. |
+| cursor | query |  | string | Opaque cursor: the nextCursor of the previous page. |
+
+**Response**: `object`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| items | array of KitchenTicket | yes |  |
+| items[].id | string | yes | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
+| items[].orderId | string | yes | The F&B order the ticket was created from on acceptance (FnbOrder.id). (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
+| items[].orderNumber | string |  |  |
+| items[].outletId | string (uuid) | yes |  |
+| items[].tableLabel | string |  | (nullable) |
+| items[].serviceMode | ServiceMode: enum (quickService, tableService, roomService, collection, delivery) |  |  |
+| items[].coursing | object |  | BL-131. (nullable) |
+| items[].buzzerCode | string |  | BL-128. (nullable) |
+| items[].status | KitchenTicketStatus: enum (received, preparing, ready, served, recalled, cancelled) | yes |  |
+| items[].priority | integer |  | Higher fires sooner. |
+| items[].prioritisedByPrincipalId | string (uuid) |  | (nullable) |
+| items[].prioritiseReason | string |  | (nullable) |
+| items[].lines | array of object | yes |  |
+| items[].lines[].lineId | string | yes | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
+| items[].lines[].name | string | yes |  |
+| items[].lines[].quantity | integer | yes |  |
+| items[].lines[].modifiers | array of string |  |  |
+| items[].lines[].note | string |  | (nullable) |
+| items[].lines[].allergens | array of AllergenCode: enum (gluten, crustaceans, eggs, fish, peanuts, soybeans, milk, nuts, …) |  |  |
+| items[].lines[].refireOfLineId | string |  | Set on a refire. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$; read-only; nullable) |
+| items[].lines[].refireReason | object |  | (read-only; nullable) |
+| items[].lines[].isChargeable | boolean |  | A refire's chargeable flag. (read-only; nullable) |
+| items[].lines[].course | integer |  | (nullable) |
+| items[].lines[].stationId | string (uuid) |  | (nullable) |
+| items[].lines[].status | KitchenTicketStatus: enum (received, preparing, ready, served, recalled, cancelled) | yes |  |
+| items[].createdAt | string (date-time) | yes |  |
+| items[].targetReadyAt | string (date-time) |  | (nullable) |
+| items[].elapsedSeconds | integer |  |  |
+| nextCursor | string |  |  |
+| hasMore | boolean | yes |  |
 
 **Responses**
 
 | Code | Shape | Meaning |
 |---|---|---|
-| 200 |  | Tickets, priority order |
+| 200 |  | Tickets, in rail order (priority first) |
 
 ### prioritiseKitchenTicket
 
@@ -2255,25 +2562,28 @@ Supervisor override, and the mechanism behind Fast Pass order prioritisation (4.
 
 | Field | Type | Required | Notes |
 |---|---|---|---|
-| id | string | yes |  |
-| orderId | string | yes |  |
+| id | string | yes | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
+| orderId | string | yes | The F&B order the ticket was created from on acceptance (FnbOrder.id). (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
 | orderNumber | string |  |  |
 | outletId | string (uuid) | yes |  |
 | tableLabel | string |  | (nullable) |
 | serviceMode | ServiceMode: enum (quickService, tableService, roomService, collection, delivery) |  |  |
-| coursing | enum (fireAndForget, holdAndFire, phased, timed, delayed) |  | BL-131. (nullable) |
+| coursing | object |  | BL-131. (nullable) |
 | buzzerCode | string |  | BL-128. (nullable) |
 | status | KitchenTicketStatus: enum (received, preparing, ready, served, recalled, cancelled) | yes |  |
 | priority | integer |  | Higher fires sooner. |
 | prioritisedByPrincipalId | string (uuid) |  | (nullable) |
 | prioritiseReason | string |  | (nullable) |
 | lines | array of object | yes |  |
-| lines[].lineId | string | yes |  |
+| lines[].lineId | string | yes | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
 | lines[].name | string | yes |  |
 | lines[].quantity | integer | yes |  |
 | lines[].modifiers | array of string |  |  |
 | lines[].note | string |  | (nullable) |
-| lines[].allergens | array of string |  |  |
+| lines[].allergens | array of AllergenCode: enum (gluten, crustaceans, eggs, fish, peanuts, soybeans, milk, nuts, …) |  |  |
+| lines[].refireOfLineId | string |  | Set on a refire. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$; read-only; nullable) |
+| lines[].refireReason | object |  | (read-only; nullable) |
+| lines[].isChargeable | boolean |  | A refire's chargeable flag. (read-only; nullable) |
 | lines[].course | integer |  | (nullable) |
 | lines[].stationId | string (uuid) |  | (nullable) |
 | lines[].status | KitchenTicketStatus: enum (received, preparing, ready, served, recalled, cancelled) | yes |  |
@@ -2291,6 +2601,8 @@ Supervisor override, and the mechanism behind Fast Pass order prioritisation (4.
 
 **`PUT /kitchen/stations`**: Configure stations and item routing
 
+**One outlet's stations, named in `outletId`.** A venue runs several kitchens, and a station set with no outlet named could be written to any of them. Each station is matched on `KitchenStation.id`, and every station in the body carries the same `outletId`. A temporary move of work between stations is `rebalanceStationLoad`, not this.
+
 |  |  |
 |---|---|
 | Permission | `PRODUCT_CONFIGURE` |
@@ -2307,6 +2619,7 @@ Supervisor override, and the mechanism behind Fast Pass order prioritisation (4.
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
+| outletId | query | yes | string (uuid) | The outlet whose stations these are. |
 | Idempotency-Key | header | yes | string | Client-generated ULID. |
 
 **Request body**
@@ -2319,7 +2632,7 @@ Supervisor override, and the mechanism behind Fast Pass order prioritisation (4.
 | stations[].name | string | yes |  |
 | stations[].outletId | string (uuid) |  |  |
 | stations[].menuItemIds | array of string (uuid) |  | Items routed to this station. |
-| stations[].displayEndpoint | string |  | Where the venue's KDS listens. (nullable) |
+| stations[].displayEndpoint | string |  | The P15 Kitchen Display device this station's tickets go to (19 Sep: the display is TICVAI software on commodity hardware, per station, with a fallback device where the primary is down — 18 Aug minut… (nullable) |
 | stations[].isActive | boolean |  |  |
 
 **Responses**
@@ -2332,7 +2645,8 @@ Supervisor override, and the mechanism behind Fast Pass order prioritisation (4.
 
 **`PUT /kitchen/tickets/{ticketId}/status`**: Advance a kitchen ticket
 
-Called by the KDS or a fallback screen. Status flows back to the guest app order tracker — received, preparing, ready, completed.
+Called by P15 Kitchen Display, or the back-office and till views of the rail. Status flows back to the guest app order tracker.
+**Four moves only** (states/kitchen-ticket.yaml): `received` to `preparing`, `preparing` to `ready`, `ready` to `recalled`, `recalled` to `preparing`. `served` is reached through `recordOrderHandover` and `cancelled` through `cancelFnbOrder`; any other move is refused with the current status named.
 
 |  |  |
 |---|---|
@@ -2345,6 +2659,7 @@ Called by the KDS or a fallback screen. Status flows back to the guest app order
 | Reads | `cache:idempotency`, `fnb.kitchen_ticket`, `fnb.kitchen_ticket_line` |
 | Writes | `cache:idempotency`, `fnb.kitchen_ticket`, `platform.outbox` |
 | Called by | BO-020, BO-046, KIT-002, KIT-003, KIT-006, KIT-008, POS-022 |
+| State model | F&B order ([states/fnb-order.yaml](../../../states/fnb-order.yaml)): moves `accepted` -> `inPreparation`, `inPreparation` -> `ready`<br/>Kitchen ticket ([states/kitchen-ticket.yaml](../../../states/kitchen-ticket.yaml)): moves `received` -> `preparing`, `preparing` -> `ready`, `ready` -> `recalled`, `recalled` -> `preparing` |
 
 **Parameters**
 
@@ -2366,25 +2681,28 @@ Called by the KDS or a fallback screen. Status flows back to the guest app order
 
 | Field | Type | Required | Notes |
 |---|---|---|---|
-| id | string | yes |  |
-| orderId | string | yes |  |
+| id | string | yes | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
+| orderId | string | yes | The F&B order the ticket was created from on acceptance (FnbOrder.id). (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
 | orderNumber | string |  |  |
 | outletId | string (uuid) | yes |  |
 | tableLabel | string |  | (nullable) |
 | serviceMode | ServiceMode: enum (quickService, tableService, roomService, collection, delivery) |  |  |
-| coursing | enum (fireAndForget, holdAndFire, phased, timed, delayed) |  | BL-131. (nullable) |
+| coursing | object |  | BL-131. (nullable) |
 | buzzerCode | string |  | BL-128. (nullable) |
 | status | KitchenTicketStatus: enum (received, preparing, ready, served, recalled, cancelled) | yes |  |
 | priority | integer |  | Higher fires sooner. |
 | prioritisedByPrincipalId | string (uuid) |  | (nullable) |
 | prioritiseReason | string |  | (nullable) |
 | lines | array of object | yes |  |
-| lines[].lineId | string | yes |  |
+| lines[].lineId | string | yes | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
 | lines[].name | string | yes |  |
 | lines[].quantity | integer | yes |  |
 | lines[].modifiers | array of string |  |  |
 | lines[].note | string |  | (nullable) |
-| lines[].allergens | array of string |  |  |
+| lines[].allergens | array of AllergenCode: enum (gluten, crustaceans, eggs, fish, peanuts, soybeans, milk, nuts, …) |  |  |
+| lines[].refireOfLineId | string |  | Set on a refire. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$; read-only; nullable) |
+| lines[].refireReason | object |  | (read-only; nullable) |
+| lines[].isChargeable | boolean |  | A refire's chargeable flag. (read-only; nullable) |
 | lines[].course | integer |  | (nullable) |
 | lines[].stationId | string (uuid) |  | (nullable) |
 | lines[].status | KitchenTicketStatus: enum (received, preparing, ready, served, recalled, cancelled) | yes |  |
@@ -2397,6 +2715,7 @@ Called by the KDS or a fallback screen. Status flows back to the guest app order
 | Code | Shape | Meaning |
 |---|---|---|
 | 200 |  | Updated |
+| 409 |  | The move is not one of the four above. |
 
 
 ## Group: menu
@@ -2433,10 +2752,10 @@ Called by the KDS or a fallback screen. Status flows back to the guest app order
 | outletId | string (uuid) | yes |  |
 | availability | MenuAvailability |  | When this menu is in force. |
 | availability.daysOfWeek | array of integer |  |  |
-| availability.startTime | string |  | (pattern ^([01]\d\|2[0-3]):[0-5]\d$) |
-| availability.endTime | string |  | (pattern ^([01]\d\|2[0-3]):[0-5]\d$) |
-| availability.validFrom | string (date) |  | (nullable) |
-| availability.validTo | string (date) |  | (nullable) |
+| availability.startTime | string |  | Wall-clock time, in the Region's time zone. (pattern ^([01]\d\|2[0-3]):[0-5]\d$) |
+| availability.endTime | string |  | Wall-clock time, in the Region's time zone. (pattern ^([01]\d\|2[0-3]):[0-5]\d$) |
+| availability.validFrom | string (date) |  | Calendar day, in the Region's time zone, not UTC. (nullable) |
+| availability.validTo | string (date) |  | Calendar day, in the Region's time zone, not UTC. (nullable) |
 
 **Response**: `Menu`
 
@@ -2448,15 +2767,16 @@ Called by the KDS or a fallback screen. Status flows back to the guest app order
 | outletId | string (uuid) | yes |  |
 | availability | MenuAvailability |  | When this menu is in force. |
 | availability.daysOfWeek | array of integer |  |  |
-| availability.startTime | string |  | (pattern ^([01]\d\|2[0-3]):[0-5]\d$) |
-| availability.endTime | string |  | (pattern ^([01]\d\|2[0-3]):[0-5]\d$) |
-| availability.validFrom | string (date) |  | (nullable) |
-| availability.validTo | string (date) |  | (nullable) |
+| availability.startTime | string |  | Wall-clock time, in the Region's time zone. (pattern ^([01]\d\|2[0-3]):[0-5]\d$) |
+| availability.endTime | string |  | Wall-clock time, in the Region's time zone. (pattern ^([01]\d\|2[0-3]):[0-5]\d$) |
+| availability.validFrom | string (date) |  | Calendar day, in the Region's time zone, not UTC. (nullable) |
+| availability.validTo | string (date) |  | Calendar day, in the Region's time zone, not UTC. (nullable) |
 | sections | array of MenuSection |  |  |
+| sections[].id | string (uuid) |  | (read-only) |
 | sections[].code | string | yes |  |
 | sections[].name | string | yes |  |
 | sections[].sortOrder | integer | yes |  |
-| sections[].items | array of MenuItem |  |  |
+| sections[].items | array of MenuItem |  | The section's items, in sale-board order. |
 | sections[].items[].id | string (uuid) | yes |  |
 | sections[].items[].productVariantId | string (uuid) | yes | The catalogue variant this item sells. |
 | sections[].items[].name | string | yes |  |
@@ -2465,12 +2785,16 @@ Called by the KDS or a fallback screen. Status flows back to the guest app order
 | sections[].items[].sortOrder | integer |  |  |
 | sections[].items[].modifierGroupIds | array of string (uuid) |  |  |
 | sections[].items[].stationId | string (uuid) |  | (nullable) |
+| sections[].items[].menuSectionId | string (uuid) |  | The section the item sits in, set by setMenuSections and applyMenuActions (moveSection). (read-only; nullable) |
 | sections[].items[].isStockTracked | boolean |  | True where a recipe exists. |
 | sections[].items[].isAvailable | boolean | yes |  |
 | sections[].items[].unavailableReason | string |  | (nullable) |
+| sections[].items[].restoreAt | string (date-time) |  | When an unavailable item comes back on its own (setItemAvailability). (nullable) |
 | sections[].items[].preparationMinutes | integer |  | (nullable) |
-| sections[].items[].allergens | array of string |  |  |
+| sections[].items[].allergens | array of AllergenCode: enum (gluten, crustaceans, eggs, fish, peanuts, soybeans, milk, nuts, …) |  |  |
 | isActive | boolean | yes |  |
+| publishedVersion | integer |  | The MenuVersion.version live now. (read-only; nullable) |
+| publishedAt | string (date-time) |  | (read-only; nullable) |
 
 **Responses**
 
@@ -2512,15 +2836,16 @@ Called by the KDS or a fallback screen. Status flows back to the guest app order
 | outletId | string (uuid) | yes |  |
 | availability | MenuAvailability |  | When this menu is in force. |
 | availability.daysOfWeek | array of integer |  |  |
-| availability.startTime | string |  | (pattern ^([01]\d\|2[0-3]):[0-5]\d$) |
-| availability.endTime | string |  | (pattern ^([01]\d\|2[0-3]):[0-5]\d$) |
-| availability.validFrom | string (date) |  | (nullable) |
-| availability.validTo | string (date) |  | (nullable) |
+| availability.startTime | string |  | Wall-clock time, in the Region's time zone. (pattern ^([01]\d\|2[0-3]):[0-5]\d$) |
+| availability.endTime | string |  | Wall-clock time, in the Region's time zone. (pattern ^([01]\d\|2[0-3]):[0-5]\d$) |
+| availability.validFrom | string (date) |  | Calendar day, in the Region's time zone, not UTC. (nullable) |
+| availability.validTo | string (date) |  | Calendar day, in the Region's time zone, not UTC. (nullable) |
 | sections | array of MenuSection |  |  |
+| sections[].id | string (uuid) |  | (read-only) |
 | sections[].code | string | yes |  |
 | sections[].name | string | yes |  |
 | sections[].sortOrder | integer | yes |  |
-| sections[].items | array of MenuItem |  |  |
+| sections[].items | array of MenuItem |  | The section's items, in sale-board order. |
 | sections[].items[].id | string (uuid) | yes |  |
 | sections[].items[].productVariantId | string (uuid) | yes | The catalogue variant this item sells. |
 | sections[].items[].name | string | yes |  |
@@ -2529,19 +2854,23 @@ Called by the KDS or a fallback screen. Status flows back to the guest app order
 | sections[].items[].sortOrder | integer |  |  |
 | sections[].items[].modifierGroupIds | array of string (uuid) |  |  |
 | sections[].items[].stationId | string (uuid) |  | (nullable) |
+| sections[].items[].menuSectionId | string (uuid) |  | The section the item sits in, set by setMenuSections and applyMenuActions (moveSection). (read-only; nullable) |
 | sections[].items[].isStockTracked | boolean |  | True where a recipe exists. |
 | sections[].items[].isAvailable | boolean | yes |  |
 | sections[].items[].unavailableReason | string |  | (nullable) |
+| sections[].items[].restoreAt | string (date-time) |  | When an unavailable item comes back on its own (setItemAvailability). (nullable) |
 | sections[].items[].preparationMinutes | integer |  | (nullable) |
-| sections[].items[].allergens | array of string |  |  |
+| sections[].items[].allergens | array of AllergenCode: enum (gluten, crustaceans, eggs, fish, peanuts, soybeans, milk, nuts, …) |  |  |
 | isActive | boolean | yes |  |
+| publishedVersion | integer |  | The MenuVersion.version live now. (read-only; nullable) |
+| publishedAt | string (date-time) |  | (read-only; nullable) |
 
 **Responses**
 
 | Code | Shape | Meaning |
 |---|---|---|
 | 200 |  | Menu |
-| 404 | NotFound | The resource does not exist, or is outside the caller's scope |
+| 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
 
 ### listMenus
 
@@ -2569,7 +2898,7 @@ Back-office use. A terminal reads its menu from the catalogue bundle.
 | outletId | query |  | string (uuid) |  |
 | activeAt | query |  | string (date-time) | Return menus in force at this time — breakfast, lunch, happy hour. |
 | pageSize | query |  | integer |  |
-| cursor | query |  | string | Opaque cursor from a previous page. |
+| cursor | query |  | string | Opaque cursor: the nextCursor of the previous page. |
 
 **Response**: `object`
 
@@ -2582,16 +2911,19 @@ Back-office use. A terminal reads its menu from the catalogue bundle.
 | items[].outletId | string (uuid) | yes |  |
 | items[].availability | MenuAvailability |  | When this menu is in force. |
 | items[].availability.daysOfWeek | array of integer |  |  |
-| items[].availability.startTime | string |  | (pattern ^([01]\d\|2[0-3]):[0-5]\d$) |
-| items[].availability.endTime | string |  | (pattern ^([01]\d\|2[0-3]):[0-5]\d$) |
-| items[].availability.validFrom | string (date) |  | (nullable) |
-| items[].availability.validTo | string (date) |  | (nullable) |
+| items[].availability.startTime | string |  | Wall-clock time, in the Region's time zone. (pattern ^([01]\d\|2[0-3]):[0-5]\d$) |
+| items[].availability.endTime | string |  | Wall-clock time, in the Region's time zone. (pattern ^([01]\d\|2[0-3]):[0-5]\d$) |
+| items[].availability.validFrom | string (date) |  | Calendar day, in the Region's time zone, not UTC. (nullable) |
+| items[].availability.validTo | string (date) |  | Calendar day, in the Region's time zone, not UTC. (nullable) |
 | items[].sections | array of MenuSection |  |  |
+| items[].sections[].id | string (uuid) |  | (read-only) |
 | items[].sections[].code | string | yes |  |
 | items[].sections[].name | string | yes |  |
 | items[].sections[].sortOrder | integer | yes |  |
-| items[].sections[].items | array of MenuItem |  |  |
+| items[].sections[].items | array of MenuItem |  | The section's items, in sale-board order. |
 | items[].isActive | boolean | yes |  |
+| items[].publishedVersion | integer |  | The MenuVersion.version live now. (read-only; nullable) |
+| items[].publishedAt | string (date-time) |  | (read-only; nullable) |
 | nextCursor | string |  |  |
 | hasMore | boolean | yes |  |
 
@@ -2634,6 +2966,7 @@ The most-used endpoint in a live kitchen. A sold-out item must disappear from ev
 | isAvailable | boolean | yes |  |
 | reason | enum (soldOut, ingredientUnavailable, equipmentDown, seasonal, other) |  |  |
 | restoreAt | string (date-time) |  | Automatic restore, typically at next service. |
+| recordedAt | string (date-time) | yes | Device time of the act (offline-capable; replayed in this order). |
 
 **Response**: `MenuItem`
 
@@ -2650,11 +2983,13 @@ The most-used endpoint in a live kitchen. A sold-out item must disappear from ev
 | sortOrder | integer |  |  |
 | modifierGroupIds | array of string (uuid) |  |  |
 | stationId | string (uuid) |  | (nullable) |
+| menuSectionId | string (uuid) |  | The section the item sits in, set by setMenuSections and applyMenuActions (moveSection). (read-only; nullable) |
 | isStockTracked | boolean |  | True where a recipe exists. |
 | isAvailable | boolean | yes |  |
 | unavailableReason | string |  | (nullable) |
+| restoreAt | string (date-time) |  | When an unavailable item comes back on its own (setItemAvailability). (nullable) |
 | preparationMinutes | integer |  | (nullable) |
-| allergens | array of string |  |  |
+| allergens | array of AllergenCode: enum (gluten, crustaceans, eggs, fish, peanuts, soybeans, milk, nuts, …) |  |  |
 
 **Responses**
 
@@ -2693,10 +3028,11 @@ Ordering matters at a counter. The sequence here is the sequence on the sale boa
 | Field | Type | Required | Notes |
 |---|---|---|---|
 | sections | array of MenuSection | yes |  |
+| sections[].id | string (uuid) |  | (read-only) |
 | sections[].code | string | yes |  |
 | sections[].name | string | yes |  |
 | sections[].sortOrder | integer | yes |  |
-| sections[].items | array of MenuItem |  |  |
+| sections[].items | array of MenuItem |  | The section's items, in sale-board order. |
 | sections[].items[].id | string (uuid) | yes |  |
 | sections[].items[].productVariantId | string (uuid) | yes | The catalogue variant this item sells. |
 | sections[].items[].name | string | yes |  |
@@ -2705,11 +3041,13 @@ Ordering matters at a counter. The sequence here is the sequence on the sale boa
 | sections[].items[].sortOrder | integer |  |  |
 | sections[].items[].modifierGroupIds | array of string (uuid) |  |  |
 | sections[].items[].stationId | string (uuid) |  | (nullable) |
+| sections[].items[].menuSectionId | string (uuid) |  | The section the item sits in, set by setMenuSections and applyMenuActions (moveSection). (read-only; nullable) |
 | sections[].items[].isStockTracked | boolean |  | True where a recipe exists. |
 | sections[].items[].isAvailable | boolean | yes |  |
 | sections[].items[].unavailableReason | string |  | (nullable) |
+| sections[].items[].restoreAt | string (date-time) |  | When an unavailable item comes back on its own (setItemAvailability). (nullable) |
 | sections[].items[].preparationMinutes | integer |  | (nullable) |
-| sections[].items[].allergens | array of string |  |  |
+| sections[].items[].allergens | array of AllergenCode: enum (gluten, crustaceans, eggs, fish, peanuts, soybeans, milk, nuts, …) |  |  |
 
 **Response**: `Menu`
 
@@ -2721,15 +3059,16 @@ Ordering matters at a counter. The sequence here is the sequence on the sale boa
 | outletId | string (uuid) | yes |  |
 | availability | MenuAvailability |  | When this menu is in force. |
 | availability.daysOfWeek | array of integer |  |  |
-| availability.startTime | string |  | (pattern ^([01]\d\|2[0-3]):[0-5]\d$) |
-| availability.endTime | string |  | (pattern ^([01]\d\|2[0-3]):[0-5]\d$) |
-| availability.validFrom | string (date) |  | (nullable) |
-| availability.validTo | string (date) |  | (nullable) |
+| availability.startTime | string |  | Wall-clock time, in the Region's time zone. (pattern ^([01]\d\|2[0-3]):[0-5]\d$) |
+| availability.endTime | string |  | Wall-clock time, in the Region's time zone. (pattern ^([01]\d\|2[0-3]):[0-5]\d$) |
+| availability.validFrom | string (date) |  | Calendar day, in the Region's time zone, not UTC. (nullable) |
+| availability.validTo | string (date) |  | Calendar day, in the Region's time zone, not UTC. (nullable) |
 | sections | array of MenuSection |  |  |
+| sections[].id | string (uuid) |  | (read-only) |
 | sections[].code | string | yes |  |
 | sections[].name | string | yes |  |
 | sections[].sortOrder | integer | yes |  |
-| sections[].items | array of MenuItem |  |  |
+| sections[].items | array of MenuItem |  | The section's items, in sale-board order. |
 | sections[].items[].id | string (uuid) | yes |  |
 | sections[].items[].productVariantId | string (uuid) | yes | The catalogue variant this item sells. |
 | sections[].items[].name | string | yes |  |
@@ -2738,12 +3077,16 @@ Ordering matters at a counter. The sequence here is the sequence on the sale boa
 | sections[].items[].sortOrder | integer |  |  |
 | sections[].items[].modifierGroupIds | array of string (uuid) |  |  |
 | sections[].items[].stationId | string (uuid) |  | (nullable) |
+| sections[].items[].menuSectionId | string (uuid) |  | The section the item sits in, set by setMenuSections and applyMenuActions (moveSection). (read-only; nullable) |
 | sections[].items[].isStockTracked | boolean |  | True where a recipe exists. |
 | sections[].items[].isAvailable | boolean | yes |  |
 | sections[].items[].unavailableReason | string |  | (nullable) |
+| sections[].items[].restoreAt | string (date-time) |  | When an unavailable item comes back on its own (setItemAvailability). (nullable) |
 | sections[].items[].preparationMinutes | integer |  | (nullable) |
-| sections[].items[].allergens | array of string |  |  |
+| sections[].items[].allergens | array of AllergenCode: enum (gluten, crustaceans, eggs, fish, peanuts, soybeans, milk, nuts, …) |  |  |
 | isActive | boolean | yes |  |
+| publishedVersion | integer |  | The MenuVersion.version live now. (read-only; nullable) |
+| publishedAt | string (date-time) |  | (read-only; nullable) |
 
 **Responses**
 
@@ -2782,10 +3125,10 @@ Ordering matters at a counter. The sequence here is the sequence on the sale boa
 | name | string |  | (max length 200) |
 | availability | MenuAvailability |  | When this menu is in force. |
 | availability.daysOfWeek | array of integer |  |  |
-| availability.startTime | string |  | (pattern ^([01]\d\|2[0-3]):[0-5]\d$) |
-| availability.endTime | string |  | (pattern ^([01]\d\|2[0-3]):[0-5]\d$) |
-| availability.validFrom | string (date) |  | (nullable) |
-| availability.validTo | string (date) |  | (nullable) |
+| availability.startTime | string |  | Wall-clock time, in the Region's time zone. (pattern ^([01]\d\|2[0-3]):[0-5]\d$) |
+| availability.endTime | string |  | Wall-clock time, in the Region's time zone. (pattern ^([01]\d\|2[0-3]):[0-5]\d$) |
+| availability.validFrom | string (date) |  | Calendar day, in the Region's time zone, not UTC. (nullable) |
+| availability.validTo | string (date) |  | Calendar day, in the Region's time zone, not UTC. (nullable) |
 | isActive | boolean |  |  |
 
 **Response**: `Menu`
@@ -2798,15 +3141,16 @@ Ordering matters at a counter. The sequence here is the sequence on the sale boa
 | outletId | string (uuid) | yes |  |
 | availability | MenuAvailability |  | When this menu is in force. |
 | availability.daysOfWeek | array of integer |  |  |
-| availability.startTime | string |  | (pattern ^([01]\d\|2[0-3]):[0-5]\d$) |
-| availability.endTime | string |  | (pattern ^([01]\d\|2[0-3]):[0-5]\d$) |
-| availability.validFrom | string (date) |  | (nullable) |
-| availability.validTo | string (date) |  | (nullable) |
+| availability.startTime | string |  | Wall-clock time, in the Region's time zone. (pattern ^([01]\d\|2[0-3]):[0-5]\d$) |
+| availability.endTime | string |  | Wall-clock time, in the Region's time zone. (pattern ^([01]\d\|2[0-3]):[0-5]\d$) |
+| availability.validFrom | string (date) |  | Calendar day, in the Region's time zone, not UTC. (nullable) |
+| availability.validTo | string (date) |  | Calendar day, in the Region's time zone, not UTC. (nullable) |
 | sections | array of MenuSection |  |  |
+| sections[].id | string (uuid) |  | (read-only) |
 | sections[].code | string | yes |  |
 | sections[].name | string | yes |  |
 | sections[].sortOrder | integer | yes |  |
-| sections[].items | array of MenuItem |  |  |
+| sections[].items | array of MenuItem |  | The section's items, in sale-board order. |
 | sections[].items[].id | string (uuid) | yes |  |
 | sections[].items[].productVariantId | string (uuid) | yes | The catalogue variant this item sells. |
 | sections[].items[].name | string | yes |  |
@@ -2815,12 +3159,16 @@ Ordering matters at a counter. The sequence here is the sequence on the sale boa
 | sections[].items[].sortOrder | integer |  |  |
 | sections[].items[].modifierGroupIds | array of string (uuid) |  |  |
 | sections[].items[].stationId | string (uuid) |  | (nullable) |
+| sections[].items[].menuSectionId | string (uuid) |  | The section the item sits in, set by setMenuSections and applyMenuActions (moveSection). (read-only; nullable) |
 | sections[].items[].isStockTracked | boolean |  | True where a recipe exists. |
 | sections[].items[].isAvailable | boolean | yes |  |
 | sections[].items[].unavailableReason | string |  | (nullable) |
+| sections[].items[].restoreAt | string (date-time) |  | When an unavailable item comes back on its own (setItemAvailability). (nullable) |
 | sections[].items[].preparationMinutes | integer |  | (nullable) |
-| sections[].items[].allergens | array of string |  |  |
+| sections[].items[].allergens | array of AllergenCode: enum (gluten, crustaceans, eggs, fish, peanuts, soybeans, milk, nuts, …) |  |  |
 | isActive | boolean | yes |  |
+| publishedVersion | integer |  | The MenuVersion.version live now. (read-only; nullable) |
+| publishedAt | string (date-time) |  | (read-only; nullable) |
 
 **Responses**
 
@@ -2847,7 +3195,7 @@ Groups carry selection constraints — minimum, maximum, required. A burger that
 | Conflict policy | serverWins |
 | Reads | `cache:idempotency`, `fnb.modifier_group`, `fnb.modifier_option` |
 | Writes | `cache:idempotency`, `fnb.modifier_group`, `fnb.modifier_option` |
-| Called by | no screen (setup through Back Office) |
+| Called by | **no screen**: no screen lists it in its apis, so it is reachable only by API or import until one does (README, Known gaps) |
 
 **Parameters**
 
@@ -2873,6 +3221,7 @@ Groups carry selection constraints — minimum, maximum, required. A burger that
 | options[].priceDelta.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
 | options[].isDefault | boolean |  |  |
 | options[].isAvailable | boolean |  |  |
+| options[].allergens | array of AllergenCode: enum (gluten, crustaceans, eggs, fish, peanuts, soybeans, milk, nuts, …) |  | What choosing this option adds to the dish. |
 | scopePath | string |  | The partition key (ADR-0005). |
 
 **Response**: `ModifierGroup`
@@ -2893,6 +3242,7 @@ Groups carry selection constraints — minimum, maximum, required. A burger that
 | options[].priceDelta.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
 | options[].isDefault | boolean |  |  |
 | options[].isAvailable | boolean |  |  |
+| options[].allergens | array of AllergenCode: enum (gluten, crustaceans, eggs, fish, peanuts, soybeans, milk, nuts, …) |  | What choosing this option adds to the dish. |
 | scopePath | string |  | The partition key (ADR-0005). |
 
 **Responses**
@@ -2900,7 +3250,7 @@ Groups carry selection constraints — minimum, maximum, required. A burger that
 | Code | Shape | Meaning |
 |---|---|---|
 | 201 |  | Created |
-| 400 |  | Constraints are unsatisfiable — minimum exceeds available options |
+| 400 |  | Constraints are unsatisfiable — minimum exceeds available options. |
 
 ### listModifierGroups
 
@@ -2924,7 +3274,28 @@ Groups carry selection constraints — minimum, maximum, required. A burger that
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
 | pageSize | query |  | integer |  |
-| cursor | query |  | string | Opaque cursor from a previous page. |
+| cursor | query |  | string | Opaque cursor: the nextCursor of the previous page. |
+
+**Response**: `object`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| items | array of ModifierGroup | yes |  |
+| items[].id | string (uuid) | yes |  |
+| items[].code | string | yes |  |
+| items[].name | string | yes |  |
+| items[].minSelections | integer | yes | Greater than zero makes the group required. (min 0) |
+| items[].maxSelections | integer | yes | (min 1) |
+| items[].options | array of object | yes | (min items 1) |
+| items[].options[].id | string (uuid) | yes |  |
+| items[].options[].name | string | yes |  |
+| items[].options[].priceDelta | Money | yes | On the wire this is three fields; in the database it is one column. |
+| items[].options[].isDefault | boolean |  |  |
+| items[].options[].isAvailable | boolean |  |  |
+| items[].options[].allergens | array of AllergenCode: enum (gluten, crustaceans, eggs, fish, peanuts, soybeans, milk, nuts, …) |  | What choosing this option adds to the dish. |
+| items[].scopePath | string |  | The partition key (ADR-0005). |
+| nextCursor | string |  |  |
+| hasMore | boolean | yes |  |
 
 **Responses**
 
@@ -2951,8 +3322,9 @@ Offline behaviour depends on the items: an order containing only untracked items
 | Offline | yes |
 | Conflict policy | append |
 | Reads | `cache:idempotency`, `fnb.service_order`, `fnb.service_order_line` |
-| Writes | `cache:idempotency`, `fnb.service_order` |
+| Writes | `cache:idempotency`, `fnb.service_order`, `fnb.service_order_line` |
 | Called by | BO-020, EMP-058, EMP-059, POS-022 |
+| State model | F&B order ([states/fnb-order.yaml](../../../states/fnb-order.yaml)): created as `ordered`<br/>Table ([states/table.yaml](../../../states/table.yaml)): moves `seated` -> `ordered` |
 
 **Parameters**
 
@@ -2967,7 +3339,7 @@ Offline behaviour depends on the items: an order containing only untracked items
 | id | string | yes | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
 | outletId | string (uuid) | yes |  |
 | serviceMode | ServiceMode: enum (quickService, tableService, roomService, collection, delivery) | yes |  |
-| tableVisitId | string |  | Required for table service. (nullable) |
+| tableVisitId | string |  | Required for table service. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$; nullable) |
 | lines | array of CreateFnbOrderLine | yes | (min items 1) |
 | lines[].id | string | yes | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
 | lines[].menuItemId | string (uuid) | yes |  |
@@ -2982,11 +3354,11 @@ Offline behaviour depends on the items: an order containing only untracked items
 
 | Field | Type | Required | Notes |
 |---|---|---|---|
-| id | string | yes |  |
+| id | string | yes | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
 | orderNumber | string | yes |  |
 | outletId | string (uuid) | yes |  |
 | serviceMode | ServiceMode: enum (quickService, tableService, roomService, collection, delivery) | yes |  |
-| tableVisitId | string |  | (nullable) |
+| tableVisitId | string |  | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$; nullable) |
 | status | FnbOrderStatus: enum (ordered, accepted, inPreparation, ready, served, collected, delivered, cancelled, …) | yes | The full lifecycle from 4.6.35. |
 | lines | array of object | yes |  |
 | lines[].id | string | yes | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
@@ -3015,7 +3387,7 @@ Offline behaviour depends on the items: an order containing only untracked items
 | taxAmount.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
 | taxAmount.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
 | taxAmount.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
-| kitchenTicketId | string |  | (nullable) |
+| kitchenTicketId | string |  | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$; nullable) |
 | estimatedReadyAt | string (date-time) |  | (nullable) |
 | createdAt | string (date-time) | yes |  |
 | recordedAt | string (date-time) |  |  |
@@ -3025,7 +3397,7 @@ Offline behaviour depends on the items: an order containing only untracked items
 
 | Code | Shape | Meaning |
 |---|---|---|
-| 201 |  | Created and sent to the kitchen where a KDS is configured |
+| 201 |  | Created. |
 | 400 | BadRequest | Validation failed |
 | 409 |  | An item is unavailable, modifier constraints are unmet, or a tracked item was ordered offline. |
 
@@ -3056,11 +3428,11 @@ Offline behaviour depends on the items: an order containing only untracked items
 
 | Field | Type | Required | Notes |
 |---|---|---|---|
-| id | string | yes |  |
+| id | string | yes | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
 | orderNumber | string | yes |  |
 | outletId | string (uuid) | yes |  |
 | serviceMode | ServiceMode: enum (quickService, tableService, roomService, collection, delivery) | yes |  |
-| tableVisitId | string |  | (nullable) |
+| tableVisitId | string |  | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$; nullable) |
 | status | FnbOrderStatus: enum (ordered, accepted, inPreparation, ready, served, collected, delivered, cancelled, …) | yes | The full lifecycle from 4.6.35. |
 | lines | array of object | yes |  |
 | lines[].id | string | yes | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
@@ -3089,7 +3461,7 @@ Offline behaviour depends on the items: an order containing only untracked items
 | taxAmount.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
 | taxAmount.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
 | taxAmount.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
-| kitchenTicketId | string |  | (nullable) |
+| kitchenTicketId | string |  | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$; nullable) |
 | estimatedReadyAt | string (date-time) |  | (nullable) |
 | createdAt | string (date-time) | yes |  |
 | recordedAt | string (date-time) |  |  |
@@ -3100,7 +3472,7 @@ Offline behaviour depends on the items: an order containing only untracked items
 | Code | Shape | Meaning |
 |---|---|---|
 | 200 |  | Order |
-| 404 | NotFound | The resource does not exist, or is outside the caller's scope |
+| 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
 
 ### listFnbOrders
 
@@ -3127,18 +3499,18 @@ Offline behaviour depends on the items: an order containing only untracked items
 | tableVisitId | query |  | string |  |
 | status | query |  | FnbOrderStatus: enum (ordered, accepted, inPreparation, ready, served, collected, delivered, cancelled, …) |  |
 | pageSize | query |  | integer |  |
-| cursor | query |  | string | Opaque cursor from a previous page. |
+| cursor | query |  | string | Opaque cursor: the nextCursor of the previous page. |
 
 **Response**: `object`
 
 | Field | Type | Required | Notes |
 |---|---|---|---|
 | items | array of FnbOrder | yes |  |
-| items[].id | string | yes |  |
+| items[].id | string | yes | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
 | items[].orderNumber | string | yes |  |
 | items[].outletId | string (uuid) | yes |  |
 | items[].serviceMode | ServiceMode: enum (quickService, tableService, roomService, collection, delivery) | yes |  |
-| items[].tableVisitId | string |  | (nullable) |
+| items[].tableVisitId | string |  | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$; nullable) |
 | items[].status | FnbOrderStatus: enum (ordered, accepted, inPreparation, ready, served, collected, delivered, cancelled, …) | yes | The full lifecycle from 4.6.35. |
 | items[].lines | array of object | yes |  |
 | items[].lines[].id | string | yes | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
@@ -3161,7 +3533,7 @@ Offline behaviour depends on the items: an order containing only untracked items
 | items[].taxAmount.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
 | items[].taxAmount.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
 | items[].taxAmount.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
-| items[].kitchenTicketId | string |  | (nullable) |
+| items[].kitchenTicketId | string |  | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$; nullable) |
 | items[].estimatedReadyAt | string (date-time) |  | (nullable) |
 | items[].createdAt | string (date-time) | yes |  |
 | items[].recordedAt | string (date-time) |  |  |
@@ -3193,6 +3565,7 @@ Offline behaviour depends on the items: an order containing only untracked items
 | Reads | `cache:idempotency`, `fnb.dining_table` |
 | Writes | `cache:idempotency`, `fnb.dining_table` |
 | Called by | POS-028 |
+| State model | Table visit ([states/table-visit.yaml](../../../states/table-visit.yaml)): moves `open` -> `cancelled`<br/>Table ([states/table.yaml](../../../states/table.yaml)): moves `needsClearing` -> `free`, `free` -> `outOfService`, `outOfService` -> `free`, `seated` -> `free` |
 
 **Parameters**
 
@@ -3200,6 +3573,12 @@ Offline behaviour depends on the items: an order containing only untracked items
 |---|---|---|---|---|
 | tableId | path | yes | string (uuid) |  |
 | Idempotency-Key | header | yes | string | Client-generated ULID. |
+
+**Request body**
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| recordedAt | string (date-time) | yes | Device time of the act (offline-capable; replayed in this order). |
 
 **Response**: `TableState`
 
@@ -3213,8 +3592,9 @@ Offline behaviour depends on the items: an order containing only untracked items
 | position.x | number |  |  |
 | position.y | number |  |  |
 | shape | enum (round, square, rectangle, booth, bar) |  |  |
+| isOutOfService | boolean |  | Damaged, or its section closed. (default False) |
 | status | TableStatus: enum (free, seated, ordered, billRequested, needsClearing, reserved, outOfService) | yes |  |
-| visitId | string |  | (nullable) |
+| visitId | string |  | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$; nullable) |
 | covers | integer |  | (nullable) |
 | seatedAt | string (date-time) |  | (nullable) |
 | serverPrincipalId | string (uuid) |  | (nullable) |
@@ -3269,8 +3649,9 @@ The floor as the server sees it — free, seated, ordered, bill requested, needs
 | tables[].position.x | number |  |  |
 | tables[].position.y | number |  |  |
 | tables[].shape | enum (round, square, rectangle, booth, bar) |  |  |
+| tables[].isOutOfService | boolean |  | Damaged, or its section closed. (default False) |
 | tables[].status | TableStatus: enum (free, seated, ordered, billRequested, needsClearing, reserved, outOfService) | yes |  |
-| tables[].visitId | string |  | (nullable) |
+| tables[].visitId | string |  | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$; nullable) |
 | tables[].covers | integer |  | (nullable) |
 | tables[].seatedAt | string (date-time) |  | (nullable) |
 | tables[].serverPrincipalId | string (uuid) |  | (nullable) |
@@ -3284,7 +3665,7 @@ The floor as the server sees it — free, seated, ordered, bill requested, needs
 | Code | Shape | Meaning |
 |---|---|---|
 | 200 |  | Table map |
-| 404 | NotFound | The resource does not exist, or is outside the caller's scope |
+| 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
 
 ### mergeTableVisits
 
@@ -3303,6 +3684,7 @@ Two tables pushed together. Orders and covers combine; the absorbed visit closes
 | Reads | `cache:idempotency`, `fnb.service_order`, `fnb.service_order_line`, `fnb.table_visit` |
 | Writes | `cache:idempotency`, `fnb.service_order`, `fnb.table_visit` |
 | Called by | EMP-058, POS-028 |
+| State model | Table visit ([states/table-visit.yaml](../../../states/table-visit.yaml)): moves `open` -> `merged` |
 
 **Parameters**
 
@@ -3315,13 +3697,13 @@ Two tables pushed together. Orders and covers combine; the absorbed visit closes
 
 | Field | Type | Required | Notes |
 |---|---|---|---|
-| sourceVisitId | string | yes |  |
+| sourceVisitId | string | yes | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
 
 **Response**: `TableVisit`
 
 | Field | Type | Required | Notes |
 |---|---|---|---|
-| id | string | yes |  |
+| id | string | yes | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
 | tableId | string (uuid) | yes |  |
 | tableLabel | string |  |  |
 | outletId | string (uuid) | yes |  |
@@ -3330,11 +3712,11 @@ Two tables pushed together. Orders and covers combine; the absorbed visit closes
 | serverPrincipalId | string (uuid) |  | (nullable) |
 | subjectId | string (uuid) |  | (nullable) |
 | orders | array of FnbOrder | yes |  |
-| orders[].id | string | yes |  |
+| orders[].id | string | yes | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
 | orders[].orderNumber | string | yes |  |
 | orders[].outletId | string (uuid) | yes |  |
 | orders[].serviceMode | ServiceMode: enum (quickService, tableService, roomService, collection, delivery) | yes |  |
-| orders[].tableVisitId | string |  | (nullable) |
+| orders[].tableVisitId | string |  | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$; nullable) |
 | orders[].status | FnbOrderStatus: enum (ordered, accepted, inPreparation, ready, served, collected, delivered, cancelled, …) | yes | The full lifecycle from 4.6.35. |
 | orders[].lines | array of object | yes |  |
 | orders[].lines[].id | string | yes | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
@@ -3357,17 +3739,21 @@ Two tables pushed together. Orders and covers combine; the absorbed visit closes
 | orders[].taxAmount.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
 | orders[].taxAmount.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
 | orders[].taxAmount.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
-| orders[].kitchenTicketId | string |  | (nullable) |
+| orders[].kitchenTicketId | string |  | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$; nullable) |
 | orders[].estimatedReadyAt | string (date-time) |  | (nullable) |
 | orders[].createdAt | string (date-time) | yes |  |
 | orders[].recordedAt | string (date-time) |  |  |
 | orders[].syncedAt | string (date-time) |  | (nullable) |
-| mergedIntoVisitId | string |  | (nullable) |
+| mergedIntoVisitId | string |  | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$; nullable) |
 | mergedFromVisitIds | array of string |  |  |
 | runningTotal | Money |  | On the wire this is three fields; in the database it is one column. |
 | runningTotal.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
 | runningTotal.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
 | runningTotal.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| gratuity | object |  | The gratuity taken at closeTableVisit. (read-only; nullable) |
+| gratuity.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
+| gratuity.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
+| gratuity.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
 | openedAt | string (date-time) | yes |  |
 | closedAt | string (date-time) |  | (nullable) |
 
@@ -3396,6 +3782,7 @@ Covers is captured at seating because it drives split-by-covers at close.
 | Reads | `cache:idempotency`, `fnb.service_order`, `fnb.service_order_line`, `fnb.table_visit` |
 | Writes | `cache:idempotency`, `fnb.service_order`, `fnb.table_visit` |
 | Called by | EMP-058, POS-028 |
+| State model | Table visit ([states/table-visit.yaml](../../../states/table-visit.yaml)): created as `open`; moves `billRequested` -> `open` |
 
 **Parameters**
 
@@ -3418,7 +3805,7 @@ Covers is captured at seating because it drives split-by-covers at close.
 
 | Field | Type | Required | Notes |
 |---|---|---|---|
-| id | string | yes |  |
+| id | string | yes | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
 | tableId | string (uuid) | yes |  |
 | tableLabel | string |  |  |
 | outletId | string (uuid) | yes |  |
@@ -3427,11 +3814,11 @@ Covers is captured at seating because it drives split-by-covers at close.
 | serverPrincipalId | string (uuid) |  | (nullable) |
 | subjectId | string (uuid) |  | (nullable) |
 | orders | array of FnbOrder | yes |  |
-| orders[].id | string | yes |  |
+| orders[].id | string | yes | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
 | orders[].orderNumber | string | yes |  |
 | orders[].outletId | string (uuid) | yes |  |
 | orders[].serviceMode | ServiceMode: enum (quickService, tableService, roomService, collection, delivery) | yes |  |
-| orders[].tableVisitId | string |  | (nullable) |
+| orders[].tableVisitId | string |  | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$; nullable) |
 | orders[].status | FnbOrderStatus: enum (ordered, accepted, inPreparation, ready, served, collected, delivered, cancelled, …) | yes | The full lifecycle from 4.6.35. |
 | orders[].lines | array of object | yes |  |
 | orders[].lines[].id | string | yes | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
@@ -3454,17 +3841,21 @@ Covers is captured at seating because it drives split-by-covers at close.
 | orders[].taxAmount.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
 | orders[].taxAmount.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
 | orders[].taxAmount.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
-| orders[].kitchenTicketId | string |  | (nullable) |
+| orders[].kitchenTicketId | string |  | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$; nullable) |
 | orders[].estimatedReadyAt | string (date-time) |  | (nullable) |
 | orders[].createdAt | string (date-time) | yes |  |
 | orders[].recordedAt | string (date-time) |  |  |
 | orders[].syncedAt | string (date-time) |  | (nullable) |
-| mergedIntoVisitId | string |  | (nullable) |
+| mergedIntoVisitId | string |  | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$; nullable) |
 | mergedFromVisitIds | array of string |  |  |
 | runningTotal | Money |  | On the wire this is three fields; in the database it is one column. |
 | runningTotal.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
 | runningTotal.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
 | runningTotal.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| gratuity | object |  | The gratuity taken at closeTableVisit. (read-only; nullable) |
+| gratuity.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
+| gratuity.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
+| gratuity.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
 | openedAt | string (date-time) | yes |  |
 | closedAt | string (date-time) |  | (nullable) |
 
@@ -3473,11 +3864,13 @@ Covers is captured at seating because it drives split-by-covers at close.
 | Code | Shape | Meaning |
 |---|---|---|
 | 201 |  | Visit opened |
-| 409 |  | Table already occupied |
+| 409 |  | Table already occupied. |
 
 ### setTableLayout
 
 **`PUT /outlets/{outletId}/tables`**: Configure the table layout
+
+The outlet's whole layout in one call — the outlet is the one in the path. Each table is matched on `TableDefinition.id`: an id already on the outlet updates that table, a new id adds one. A table whose capacity changes is refused while a visit is open on it, as `updateTable` is.
 
 |  |  |
 |---|---|
@@ -3512,6 +3905,7 @@ Covers is captured at seating because it drives split-by-covers at close.
 | tables[].position.x | number |  |  |
 | tables[].position.y | number |  |  |
 | tables[].shape | enum (round, square, rectangle, booth, bar) |  |  |
+| tables[].isOutOfService | boolean |  | Damaged, or its section closed. (default False) |
 
 **Response**: `TableMap`
 
@@ -3528,8 +3922,9 @@ Covers is captured at seating because it drives split-by-covers at close.
 | tables[].position.x | number |  |  |
 | tables[].position.y | number |  |  |
 | tables[].shape | enum (round, square, rectangle, booth, bar) |  |  |
+| tables[].isOutOfService | boolean |  | Damaged, or its section closed. (default False) |
 | tables[].status | TableStatus: enum (free, seated, ordered, billRequested, needsClearing, reserved, outOfService) | yes |  |
-| tables[].visitId | string |  | (nullable) |
+| tables[].visitId | string |  | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$; nullable) |
 | tables[].covers | integer |  | (nullable) |
 | tables[].seatedAt | string (date-time) |  | (nullable) |
 | tables[].serverPrincipalId | string (uuid) |  | (nullable) |
@@ -3560,7 +3955,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 | threshold_celsius | numeric | no |  |
 | decision | text | yes |  |
 | corrective_action_id | uuid | no |  |
-| supplier_claim_raised | boolean | no |  |
+| is_supplier_claim_raised | boolean | no |  |
 
 ### `fnb.corrective_action`
 
@@ -3568,6 +3963,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 |---|---|---|---|
 | id | uuid | yes |  |
 | raised_at | timestamptz | yes |  |
+| raised_by_principal_id | uuid | no | Who raised it, which is who may not sign it when it is critical (signCorrectiveAction). |
 | source | text | yes |  |
 | source_ref | uuid | no |  |
 | severity | text | no |  |
@@ -3578,6 +3974,18 @@ Every table this service owns that the slice reads or writes, with its columns a
 | signed_at | timestamptz | no |  |
 | escalated_to_principal_id | uuid | no | A critical finding a shift cannot close. |
 | scope_path | text | no | The partition key (ADR-0005). |
+
+### `fnb.course_rule`
+
+| Column | Type | Required | Notes |
+|---|---|---|---|
+| outlet_id | uuid | no | The outlet in the path. |
+| default_coursing | text | no |  |
+| course_names | text[] | no |  |
+| auto_fire_minutes | integer | no |  |
+| service_mode_overrides | jsonb | no | A different default per service mode. |
+| scope_path | text | no | The partition key (ADR-0005). |
+| id | uuid | yes | Synthesised key. |
 
 ### `fnb.delivery_location`
 
@@ -3601,8 +4009,8 @@ Every table this service owns that the slice reads or writes, with its columns a
 |---|---|---|---|
 | id | uuid | no |  |
 | outlet_id | uuid | yes |  |
-| collection_enabled | boolean | no |  |
-| delivery_enabled | boolean | no |  |
+| is_collection_enabled | boolean | no |  |
+| is_delivery_enabled | boolean | no |  |
 | collection_point | text | no |  |
 | collection_hold_minutes | integer | no |  |
 | asap_collection_minutes | integer | no |  |
@@ -3626,6 +4034,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 | zone | text | no |  |
 | position | jsonb | no |  |
 | shape | text | no |  |
+| is_out_of_service | boolean | no | Damaged, or its section closed. |
 | outlet_id | uuid | no | Points at platform.outlet. |
 
 ### `fnb.kitchen_exception`
@@ -3651,7 +4060,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 | name | text | yes |  |
 | outlet_id | uuid | no |  |
 | menu_item_ids | text[] | no | Items routed to this station. |
-| display_endpoint | text | no | Where the venue's KDS listens. |
+| display_endpoint | text | no | The P15 Kitchen Display device this station's tickets go to (19 Sep: the display is TICVAI software on commodity hardware, per station, with a fallback device where the primary is down — 18 Aug minut… |
 | is_active | boolean | no |  |
 
 ### `fnb.kitchen_ticket`
@@ -3659,7 +4068,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 | Column | Type | Required | Notes |
 |---|---|---|---|
 | id | text | yes |  |
-| order_id | text | yes |  |
+| order_id | text | yes | The F&B order the ticket was created from on acceptance (FnbOrder.id). |
 | order_number | text | no |  |
 | outlet_id | uuid | yes |  |
 | table_label | text | no |  |
@@ -3685,6 +4094,9 @@ Every table this service owns that the slice reads or writes, with its columns a
 | modifiers | text[] | no |  |
 | note | text | no |  |
 | allergens | text[] | no |  |
+| refire_of_line_id | text | no | Set on a refire. |
+| refire_reason | text | no |  |
+| is_chargeable | boolean | no | A refire's chargeable flag. |
 | course | integer | no |  |
 | station_id | uuid | no |  |
 | status | text | yes |  |
@@ -3715,6 +4127,8 @@ Every table this service owns that the slice reads or writes, with its columns a
 | outlet_id | uuid | yes |  |
 | availability | jsonb | no |  |
 | is_active | boolean | yes |  |
+| published_version | integer | no | The MenuVersion.version live now. |
+| published_at | timestamptz | no |  |
 
 ### `fnb.menu_item`
 
@@ -3728,9 +4142,11 @@ Every table this service owns that the slice reads or writes, with its columns a
 | sort_order | integer | no |  |
 | modifier_group_ids | text[] | no |  |
 | station_id | uuid | no |  |
+| menu_section_id | uuid | no | The section the item sits in, set by setMenuSections and applyMenuActions (moveSection). |
 | is_stock_tracked | boolean | no | True where a recipe exists. |
 | is_available | boolean | yes |  |
 | unavailable_reason | text | no |  |
+| restore_at | timestamptz | no | When an unavailable item comes back on its own (setItemAvailability). |
 | preparation_minutes | integer | no |  |
 | allergens | text[] | no |  |
 
@@ -3738,10 +4154,10 @@ Every table this service owns that the slice reads or writes, with its columns a
 
 | Column | Type | Required | Notes |
 |---|---|---|---|
+| id | uuid | no |  |
 | code | text | yes |  |
 | name | text | yes |  |
 | sort_order | integer | yes |  |
-| id | uuid | yes | Synthesised key. |
 | menu_id | uuid | yes | Points at fnb.menu. |
 
 ### `fnb.modifier_group`
@@ -3765,19 +4181,21 @@ Every table this service owns that the slice reads or writes, with its columns a
 | price_delta | numeric(18,4) | yes |  |
 | is_default | boolean | no |  |
 | is_available | boolean | no |  |
+| allergens | text[] | no | What choosing this option adds to the dish. |
 
 ### `fnb.order_fulfilment`
 
 | Column | Type | Required | Notes |
 |---|---|---|---|
 | id | uuid | no |  |
-| mode | text | yes |  |
+| service_order_id | text | no | The guest order this fulfils (FnbOrder.id). |
+| mode | text | yes | collection from a counter, delivery to an address outside the venue, inVenue to a table, seat, cabana or named location (the location session). |
 | collection_at | timestamptz | no |  |
 | window_start | timestamptz | no |  |
 | window_end | timestamptz | no |  |
 | delivery_address | jsonb | no |  |
 | delivery_fee | numeric(18,4) | no |  |
-| cutlery | boolean | no |  |
+| is_cutlery | boolean | no |  |
 | scope_path | text | no | The partition key (ADR-0005). |
 
 ### `fnb.reservation_table`
@@ -3799,7 +4217,6 @@ Every table this service owns that the slice reads or writes, with its columns a
 | service_mode | text | yes |  |
 | table_visit_id | text | no |  |
 | status | text | yes |  |
-| lines | text[] | yes |  |
 | sales_order_id | uuid | no | Taken from their fnb.order, 20 September. |
 | updated_at | timestamptz | no | Taken from their fnb.order. |
 | gross_amount | numeric(18,4) | yes |  |
@@ -3838,6 +4255,17 @@ Every table this service owns that the slice reads or writes, with its columns a
 | reason | text | no |  |
 | called_by_principal_id | uuid | no |  |
 | refused_order_count | integer | no |  |
+
+### `fnb.table_combination`
+
+| Column | Type | Required | Notes |
+|---|---|---|---|
+| id | uuid | no |  |
+| outlet_id | uuid | no | The outlet in the path. |
+| table_ids | text[] | yes |  |
+| combined_covers | integer | yes |  |
+| setup_minutes | integer | no |  |
+| scope_path | text | no | The partition key (ADR-0005). |
 
 ### `fnb.table_reservation`
 
@@ -3887,6 +4315,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 | merged_into_visit_id | text | no |  |
 | merged_from_visit_ids | text[] | no |  |
 | running_total | numeric(18,4) | no |  |
+| gratuity | numeric(18,4) | no | The gratuity taken at closeTableVisit. |
 | opened_at | timestamptz | yes |  |
 | closed_at | timestamptz | no |  |
 
@@ -3903,7 +4332,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 | min_celsius | numeric | no |  |
 | max_celsius | numeric | no |  |
 | outcome | text | yes | notTaken is a record, not an absence. |
-| device_reported | boolean | no | A probe reading and a person's reading are different evidence. |
+| is_device_reported | boolean | no | A probe reading and a person's reading are different evidence. |
 | corrective_action_id | uuid | no |  |
 
 ### `fnb.waitlist_entry`
@@ -3918,16 +4347,19 @@ Every table this service owns that the slice reads or writes, with its columns a
 | seating_preference | text | no |  |
 | status | text | yes |  |
 | notified_at | timestamptz | no |  |
+| recorded_at | timestamptz | yes | When the party joined, on the device. |
+| synced_at | timestamptz | no |  |
 | hold_expires_at | timestamptz | no | How long a table waits for somebody who was called. |
 
 ## Not in the first release
 
-54 operations, added to this service in later releases without changing any of the above.
+56 operations, added to this service in later releases without changing any of the above.
 
 | Group | Operations |
 |---|---|
 | bill | `getBill`, `splitBill` |
 | fnb | `applyMenuActions`, `attachModifierGroup`, `buildProductionPlan`, `closeCorrectiveAction`, `compItem`, `completeProductionRun`, `createCombo`, `createTable`, `enterCountLine`, `getFnbReservationPolicy`, `getFnbServiceChargePolicy`, `getProductionRun`, `listFnbRecommendations`, `listIngredientSubstitutes`, `listProductionRuns`, `listTemperatureCheckpoints`, `notifyWaitlistParty`, `planProductionRun`, `publishMenu`, `quoteWaitTime`, `reassignServer`, `rebalanceStationLoad`, `recordCorrectiveAction`, `releaseProductionPlan`, `requestBill`, `requestRecount`, `resolveBookingConflict`, `rollbackMenu`, `scheduleMenuPublish`, `sendBookingConfirmation`, `sendOrderNotification`, `setComboSlots`, `setFnbReservationPolicy`, `setFnbServiceChargePolicy`, `setIngredientSubstitutes`, `setKitchenSla`, `setSectionLayout`, `setServiceStage`, `setSubstitutionRules`, `setTemperatureCheckpoint`, `transferOrderItems`, `transferTableVisit`, `updateTable`, `verifyAllergens` |
+| menu | `listMenuSchedules`, `listMenuVersions` |
 | order | `amendFnbOrder` |
 | production | `listRecipes`, `recordWaste`, `setRecipe` |
 | service | `acceptFnbOrder`, `cancelFnbOrder` |

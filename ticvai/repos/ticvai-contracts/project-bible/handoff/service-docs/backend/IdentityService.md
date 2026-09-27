@@ -196,10 +196,10 @@
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
-| scopePath | query |  | string |  |
-| isActive | query |  | boolean |  |
+| scopePath | query |  | string | Principals whose home scope (identity.principal.home_scope_id) is this node or any node beneath it — a prefix match on the materialised path, the way scope_path is compared everywhere (shared/common.… |
+| isActive | query |  | boolean | Exact match on Principal.isActive. |
 | pageSize | query |  | integer |  |
-| cursor | query |  | string | Opaque cursor from a previous page. |
+| cursor | query |  | string | Opaque cursor: the nextCursor of the previous page. |
 
 **Response**: `object`
 
@@ -233,7 +233,7 @@
 
 **`GET /roles`**: List roles
 
-A role is a grouping for permission management — code, name, description. Nothing is predefined; privileges attach through grants.
+A role is a grouping for permission management — code, name, description and the permissions it carries (`Role.permissions`). **Seeded system roles ship with the tenant** (`Role.isSystem`: editable, not deletable); every other role is created with `createRole`. Grants (`createDelegatedAccess`) attach a role or a single permission to a principal at a scope.
 
 |  |  |
 |---|---|
@@ -254,7 +254,7 @@ A role is a grouping for permission management — code, name, description. Noth
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
 | pageSize | query |  | integer |  |
-| cursor | query |  | string | Opaque cursor from a previous page. |
+| cursor | query |  | string | Opaque cursor: the nextCursor of the previous page. |
 
 **Response**: `object`
 
@@ -442,6 +442,7 @@ Ends this device's session. `allDevices` revokes every session for the subject, 
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
+| Idempotency-Key | header | yes | string | Client-generated ULID. |
 | allDevices | query |  | boolean |  |
 
 **Responses**
@@ -568,7 +569,7 @@ Government onboarding has lead time and should be started before it becomes the 
 
 **`POST /auth/guest/link-checkout`**: Attach a guest checkout to an account
 
-A guest who bought without an account, then registered. Orders matching the verified contact detail are attached.
+A guest who bought without an account, then registered. **The guest names one booking** (`orderReference`, with `verificationCode` from its confirmation); it is attached only when its contact detail matches the caller's verified identifier, and 403 otherwise. Other guest-checkout orders carrying the same verified contact detail are attached in the same call, and `attachedOrderCount` counts every order attached.
 **Only orders whose contact detail matches the now-verified identifier.** Attaching on an unverified claim would hand someone else's booking history to whoever asked for it.
 
 |  |  |
@@ -600,7 +601,7 @@ A guest who bought without an account, then registered. Orders matching the veri
 
 | Field | Type | Required | Notes |
 |---|---|---|---|
-| attachedOrderCount | integer |  |  |
+| attachedOrderCount | integer |  | The named booking plus any other orders with the same verified contact detail. |
 
 **Responses**
 
@@ -613,7 +614,7 @@ A guest who bought without an account, then registered. Orders matching the veri
 
 **`POST /auth/guest/register`**: Create a guest account
 
-Email or mobile. Verification follows via OTP; the account exists but is unverified until then, and an unverified account may browse but not transact — on the guest web and app it is sent to sign-in before the cart. The full rule, including per-site guest checkout, is on `verifyGuestEmail` (decided 17 September 2026).
+Email or mobile. Verification follows via OTP; the account exists but is unverified until then, and an unverified account may browse and fill a cart but not transact — the gate is the checkout page (`WEB-011`, `GST-041`), not the cart, and `checkoutCart` refuses until the guest is verified or has proved the contact by code. The full rule, including per-site guest checkout, is on `verifyGuestEmail` (decided 17 September 2026; gate moved to checkout by ADR-0045, 18 September 2026).
 
 |  |  |
 |---|---|
@@ -852,11 +853,19 @@ Includes what is held and where it came from. **Excludes another guest's data ev
 |---|---|---|---|
 | format | enum (json, csv, pdf) |  | (default json) |
 
+**Response**: `object`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| requestId | string | yes | The data-subject request raised for this export. |
+| format | enum (json, csv, pdf) | yes | The format asked for, or json when the request named none. |
+| estimatedCompletionAt | string (date-time) |  | (nullable) |
+
 **Responses**
 
 | Code | Shape | Meaning |
 |---|---|---|
-| 202 |  | Export started |
+| 202 |  | Export started, as a data-subject request (platform.dsar_request). |
 
 ### forceLogout
 
@@ -875,6 +884,7 @@ Requires SESSION_FORCE_LOGOUT. Exists because §3.1.3 rejects rather than displa
 | Reads | `cache:idempotency`, `identity.session` |
 | Writes | `cache:idempotency`, `identity.session` |
 | Called by | ADM-001, POS-000, PTR-001, SUP-001 |
+| State model | Operator session ([states/operator-session.yaml](../../../states/operator-session.yaml)): moves `active` -> `terminated` |
 
 **Parameters**
 
@@ -923,7 +933,7 @@ Requires SESSION_FORCE_LOGOUT. Exists because §3.1.3 rejects rather than displa
 | displayName | string |  |  |
 | scope | array of ScopeRef | yes | Scope nodes this session may act within, resolved once at login from the ltree hierarchy with deny-overrides-allow. |
 | scope[].id | string (uuid) | yes |  |
-| scope[].level | ScopeLevel: enum (tenant, brand, region, venue, department, subDepartment, workstation, outlet, …) | yes | The eight organisational levels, and the shared copy of them. |
+| scope[].level | ScopeLevel: enum (tenant, brand, region, venue, department, subDepartment, workstation, outlet, …) | yes | The eight organisational levels, plus subject. |
 | scope[].path | string | yes | Materialised ltree path. |
 | scope[].code | string |  | (nullable) |
 | scope[].name | string |  | (nullable) |
@@ -1054,50 +1064,53 @@ CF-132. **Both directions, because a guest is usually in both.** A parent holds 
 |---|---|---|---|---|
 | subjectId | path | yes | string (uuid) |  |
 | pageSize | query |  | integer |  |
-| cursor | query |  | string | Opaque cursor from a previous page. |
+| cursor | query |  | string | Opaque cursor: the nextCursor of the previous page. |
 
 **Response**: `object`
 
 | Field | Type | Required | Notes |
 |---|---|---|---|
-| heldByThisGuest | array of DelegatedAccess |  |  |
-| heldByThisGuest[].id | string (uuid) | yes |  |
-| heldByThisGuest[].principalId | string (uuid) |  | (nullable) |
-| heldByThisGuest[].roleId | string (uuid) |  | (nullable) |
-| heldByThisGuest[].permission | string | yes | From the permission enum. |
-| heldByThisGuest[].subjectId | string (uuid) |  | CF-132, CL-05. (nullable) |
-| heldByThisGuest[].overSubjectId | string (uuid) |  | Whose behalf. (nullable) |
-| heldByThisGuest[].overObjectRef | string |  | Where the authority is over a thing rather than a scope — a wallet, an entitlement, a booking. (nullable) |
-| heldByThisGuest[].delegationKind | enum (primaryHolder, familyMember, groupLeader, attendee, corporateAdmin, corporateMember, carer) |  | What kind of relationship this expresses, for display and for reporting. (nullable) |
-| heldByThisGuest[].quota | integer |  | 2.14.15 and 4.3.11. (nullable) |
-| heldByThisGuest[].isRevocableBySubject | boolean |  | Whether the person it is over can end it. (default True) |
-| heldByThisGuest[].scopePath | string | yes |  |
-| heldByThisGuest[].effect | enum (ALLOW, DENY) | yes |  |
-| heldByThisGuest[].permissionId | string (uuid) |  | Taken from identity.user_access, 20 September, when that table was collapsed into this one. (nullable) |
-| heldByThisGuest[].revokedAt | string (date-time) |  | Taken from identity.user_access. (read-only; nullable) |
-| heldByThisGuest[].validFrom | string (date-time) |  | (nullable) |
-| heldByThisGuest[].validTo | string (date-time) |  | (nullable) |
-| heldByThisGuest[].createdByPrincipalId | string (uuid) |  |  |
-| heldByThisGuest[].createdAt | string (date-time) |  |  |
-| heldOverThisGuest | array of DelegatedAccess |  |  |
-| heldOverThisGuest[].id | string (uuid) | yes |  |
-| heldOverThisGuest[].principalId | string (uuid) |  | (nullable) |
-| heldOverThisGuest[].roleId | string (uuid) |  | (nullable) |
-| heldOverThisGuest[].permission | string | yes | From the permission enum. |
-| heldOverThisGuest[].subjectId | string (uuid) |  | CF-132, CL-05. (nullable) |
-| heldOverThisGuest[].overSubjectId | string (uuid) |  | Whose behalf. (nullable) |
-| heldOverThisGuest[].overObjectRef | string |  | Where the authority is over a thing rather than a scope — a wallet, an entitlement, a booking. (nullable) |
-| heldOverThisGuest[].delegationKind | enum (primaryHolder, familyMember, groupLeader, attendee, corporateAdmin, corporateMember, carer) |  | What kind of relationship this expresses, for display and for reporting. (nullable) |
-| heldOverThisGuest[].quota | integer |  | 2.14.15 and 4.3.11. (nullable) |
-| heldOverThisGuest[].isRevocableBySubject | boolean |  | Whether the person it is over can end it. (default True) |
-| heldOverThisGuest[].scopePath | string | yes |  |
-| heldOverThisGuest[].effect | enum (ALLOW, DENY) | yes |  |
-| heldOverThisGuest[].permissionId | string (uuid) |  | Taken from identity.user_access, 20 September, when that table was collapsed into this one. (nullable) |
-| heldOverThisGuest[].revokedAt | string (date-time) |  | Taken from identity.user_access. (read-only; nullable) |
-| heldOverThisGuest[].validFrom | string (date-time) |  | (nullable) |
-| heldOverThisGuest[].validTo | string (date-time) |  | (nullable) |
-| heldOverThisGuest[].createdByPrincipalId | string (uuid) |  |  |
-| heldOverThisGuest[].createdAt | string (date-time) |  |  |
+| items | object | yes |  |
+| items.heldByThisGuest | array of DelegatedAccess |  |  |
+| items.heldByThisGuest[].id | string (uuid) | yes |  |
+| items.heldByThisGuest[].principalId | string (uuid) |  | (nullable) |
+| items.heldByThisGuest[].roleId | string (uuid) |  | (nullable) |
+| items.heldByThisGuest[].permission | string | yes | From the permission enum. |
+| items.heldByThisGuest[].subjectId | string (uuid) |  | CF-132, CL-05. (nullable) |
+| items.heldByThisGuest[].overSubjectId | string (uuid) |  | Whose behalf. (nullable) |
+| items.heldByThisGuest[].overObjectRef | string |  | Where the authority is over a thing rather than a scope — a wallet, an entitlement, a booking. (nullable) |
+| items.heldByThisGuest[].delegationKind | enum (primaryHolder, familyMember, groupLeader, attendee, corporateAdmin, corporateMember, carer) |  | What kind of relationship this expresses, for display and for reporting. (nullable) |
+| items.heldByThisGuest[].quota | integer |  | 2.14.15 and 4.3.11. (nullable) |
+| items.heldByThisGuest[].isRevocableBySubject | boolean |  | Whether the person it is over can end it. (default True) |
+| items.heldByThisGuest[].scopePath | string | yes |  |
+| items.heldByThisGuest[].effect | enum (ALLOW, DENY) | yes |  |
+| items.heldByThisGuest[].permissionId | string (uuid) |  | Taken from identity.user_access, 20 September, when that table was collapsed into this one. (nullable) |
+| items.heldByThisGuest[].revokedAt | string (date-time) |  | Taken from identity.user_access. (read-only; nullable) |
+| items.heldByThisGuest[].validFrom | string (date-time) |  | (nullable) |
+| items.heldByThisGuest[].validTo | string (date-time) |  | (nullable) |
+| items.heldByThisGuest[].createdByPrincipalId | string (uuid) |  |  |
+| items.heldByThisGuest[].createdAt | string (date-time) |  |  |
+| items.heldOverThisGuest | array of DelegatedAccess |  |  |
+| items.heldOverThisGuest[].id | string (uuid) | yes |  |
+| items.heldOverThisGuest[].principalId | string (uuid) |  | (nullable) |
+| items.heldOverThisGuest[].roleId | string (uuid) |  | (nullable) |
+| items.heldOverThisGuest[].permission | string | yes | From the permission enum. |
+| items.heldOverThisGuest[].subjectId | string (uuid) |  | CF-132, CL-05. (nullable) |
+| items.heldOverThisGuest[].overSubjectId | string (uuid) |  | Whose behalf. (nullable) |
+| items.heldOverThisGuest[].overObjectRef | string |  | Where the authority is over a thing rather than a scope — a wallet, an entitlement, a booking. (nullable) |
+| items.heldOverThisGuest[].delegationKind | enum (primaryHolder, familyMember, groupLeader, attendee, corporateAdmin, corporateMember, carer) |  | What kind of relationship this expresses, for display and for reporting. (nullable) |
+| items.heldOverThisGuest[].quota | integer |  | 2.14.15 and 4.3.11. (nullable) |
+| items.heldOverThisGuest[].isRevocableBySubject | boolean |  | Whether the person it is over can end it. (default True) |
+| items.heldOverThisGuest[].scopePath | string | yes |  |
+| items.heldOverThisGuest[].effect | enum (ALLOW, DENY) | yes |  |
+| items.heldOverThisGuest[].permissionId | string (uuid) |  | Taken from identity.user_access, 20 September, when that table was collapsed into this one. (nullable) |
+| items.heldOverThisGuest[].revokedAt | string (date-time) |  | Taken from identity.user_access. (read-only; nullable) |
+| items.heldOverThisGuest[].validFrom | string (date-time) |  | (nullable) |
+| items.heldOverThisGuest[].validTo | string (date-time) |  | (nullable) |
+| items.heldOverThisGuest[].createdByPrincipalId | string (uuid) |  |  |
+| items.heldOverThisGuest[].createdAt | string (date-time) |  |  |
+| nextCursor | string |  |  |
+| hasMore | boolean | yes |  |
 
 **Responses**
 
@@ -1157,7 +1170,7 @@ CF-132. **Both directions, because a guest is usually in both.** A parent holds 
 | session.displayName | string |  |  |
 | session.scope | array of ScopeRef | yes | Scope nodes this session may act within, resolved once at login from the ltree hierarchy with deny-overrides-allow. |
 | session.scope[].id | string (uuid) | yes |  |
-| session.scope[].level | ScopeLevel: enum (tenant, brand, region, venue, department, subDepartment, workstation, outlet, …) | yes | The eight organisational levels, and the shared copy of them. |
+| session.scope[].level | ScopeLevel: enum (tenant, brand, region, venue, department, subDepartment, workstation, outlet, …) | yes | The eight organisational levels, plus subject. |
 | session.scope[].path | string | yes | Materialised ltree path. |
 | session.scope[].code | string |  | (nullable) |
 | session.scope[].name | string |  | (nullable) |
@@ -1274,7 +1287,7 @@ Per 12 Aug 2026 §4 — a user with one role logs in directly; a user with sever
 | displayName | string |  |  |
 | scope | array of ScopeRef | yes | Scope nodes this session may act within, resolved once at login from the ltree hierarchy with deny-overrides-allow. |
 | scope[].id | string (uuid) | yes |  |
-| scope[].level | ScopeLevel: enum (tenant, brand, region, venue, department, subDepartment, workstation, outlet, …) | yes | The eight organisational levels, and the shared copy of them. |
+| scope[].level | ScopeLevel: enum (tenant, brand, region, venue, department, subDepartment, workstation, outlet, …) | yes | The eight organisational levels, plus subject. |
 | scope[].path | string | yes | Materialised ltree path. |
 | scope[].code | string |  | (nullable) |
 | scope[].name | string |  | (nullable) |
@@ -1338,8 +1351,8 @@ BL-144. **Modelled on NIST SP 800-63B rather than on habit.** Length beats compo
 
 | Field | Type | Required | Notes |
 |---|---|---|---|
-| id | string (uuid) | yes |  |
-| scopePath | string | yes |  |
+| id | string (uuid) | yes | Assigned by the server. (read-only) |
+| scopePath | string | yes | The partition key (ADR-0005), written by the server from the caller's tenant (x-ticvai-config-scope: tenant). (read-only) |
 | minLength | integer | yes | (default 12) |
 | requireBreachCheck | boolean |  | The single most effective rule. (default True) |
 | maxAgeDays | integer |  | Null is the recommended value. (nullable) |
@@ -1360,8 +1373,8 @@ BL-144. **Modelled on NIST SP 800-63B rather than on habit.** Length beats compo
 
 | Field | Type | Required | Notes |
 |---|---|---|---|
-| id | string (uuid) | yes |  |
-| scopePath | string | yes |  |
+| id | string (uuid) | yes | Assigned by the server. (read-only) |
+| scopePath | string | yes | The partition key (ADR-0005), written by the server from the caller's tenant (x-ticvai-config-scope: tenant). (read-only) |
 | minLength | integer | yes | (default 12) |
 | requireBreachCheck | boolean |  | The single most effective rule. (default True) |
 | maxAgeDays | integer |  | Null is the recommended value. (nullable) |
@@ -1527,7 +1540,7 @@ Returns a secret or challenge to complete enrolment. **The method is not active 
 | kind | MfaKind: enum (totp, smsOtp, emailOtp, biometric, hardwareToken) | yes |  |
 | secret | string |  | TOTP shared secret. (nullable) |
 | qrCodeUri | string |  | (nullable) |
-| recoveryCodes | array of string |  | Returned once on successful verification. |
+| recoveryCodes | array of string |  | Returned once, in this enrolment response (enrolMfaMethod writes them, hashed, to identity.mfa_recovery_code). |
 | expiresAt | string (date-time) |  |  |
 
 **Responses**
@@ -1709,10 +1722,11 @@ Who is logged in, on which workstation, since when. There was previously no way 
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
-| venueId | query |  | string (uuid) |  |
-| principalId | query |  | string (uuid) |  |
+| venueId | query |  | string (uuid) | Exact match on ActiveSession.venueId. |
+| principalId | query |  | string (uuid) | Exact match on ActiveSession.principalId. |
+| workstationId | query |  | string (uuid) | Exact match on ActiveSession.workstationId — who holds this till, which POS-000 Sign In asks before offering a force-logout, without paging through every session in the venue. |
 | pageSize | query |  | integer |  |
-| cursor | query |  | string | Opaque cursor from a previous page. |
+| cursor | query |  | string | Opaque cursor: the nextCursor of the previous page. |
 
 **Response**: `object`
 
@@ -1799,7 +1813,7 @@ Group-to-role mapping is applied here. **A group with no mapping grants nothing*
 | session.displayName | string |  |  |
 | session.scope | array of ScopeRef | yes | Scope nodes this session may act within, resolved once at login from the ltree hierarchy with deny-overrides-allow. |
 | session.scope[].id | string (uuid) | yes |  |
-| session.scope[].level | ScopeLevel: enum (tenant, brand, region, venue, department, subDepartment, workstation, outlet, …) | yes | The eight organisational levels, and the shared copy of them. |
+| session.scope[].level | ScopeLevel: enum (tenant, brand, region, venue, department, subDepartment, workstation, outlet, …) | yes | The eight organisational levels, plus subject. |
 | session.scope[].path | string | yes | Materialised ltree path. |
 | session.scope[].code | string |  | (nullable) |
 | session.scope[].name | string |  | (nullable) |
@@ -1992,8 +2006,8 @@ Every table this service owns that the slice reads or writes, with its columns a
 | valid_to | timestamptz | no |  |
 | created_by_principal_id | uuid | no |  |
 | created_at | timestamptz | no |  |
-| granted_by | uuid | yes | Points at identity.principal. |
-| revoked_by | uuid | yes | Points at identity.principal. |
+| granted_by_principal_id | uuid | yes | Points at identity.principal. |
+| revoked_by_principal_id | uuid | no | Points at identity.principal. |
 | scope_id | uuid | yes | Points at platform.org_unit. |
 
 ### `identity.guest_session`
@@ -2042,8 +2056,8 @@ Every table this service owns that the slice reads or writes, with its columns a
 
 | Column | Type | Required | Notes |
 |---|---|---|---|
-| id | uuid | yes |  |
-| scope_path | text | yes |  |
+| id | uuid | yes | Assigned by the server. |
+| scope_path | text | yes | The partition key (ADR-0005), written by the server from the caller's tenant (x-ticvai-config-scope: tenant). |
 | min_length | integer | yes |  |
 | require_breach_check | boolean | no | The single most effective rule. |
 | max_age_days | integer | no | Null is the recommended value. |
@@ -2121,7 +2135,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 | issuer | text | no |  |
 | client_id | text | no |  |
 | client_secret_ref | text | no | Key vault reference. |
-| auto_provision_principals | boolean | no | Create a principal on first successful sign-in. |
+| is_auto_provision_principals | boolean | no | Create a principal on first successful sign-in. |
 | is_enforced | boolean | no |  |
 | is_active | boolean | no |  |
 

@@ -6,9 +6,9 @@
 -- **ADR-0038 left that decomposition untouched** — what changed is that this set now
 -- exists once per tenant rather than once for everybody.
 --
--- 586 tables. Applied to every tenant database by provision-tenant.sh.
+-- 622 tables. Applied to every tenant database by provision-tenant.sh.
 --
--- **`control` is not here.** It left the template in ADR-0039 and the count went 26 to 25.
+-- **`control` is not here.** It left the template in ADR-0039 and is a database of its own.
 
 CREATE SCHEMA IF NOT EXISTS access;
 CREATE SCHEMA IF NOT EXISTS accreditation;

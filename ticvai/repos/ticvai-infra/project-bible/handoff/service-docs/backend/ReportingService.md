@@ -44,7 +44,8 @@
 
 **`DELETE /reports/{reportId}`**: Retire a report definition
 
-Retired rather than deleted where executions or schedules reference it. History must continue to resolve.
+Retired rather than deleted where executions or paused schedules reference it — `isRetired` becomes true and the definition and its versions stay, because history must continue to resolve. Removed only where nothing references it.
+**Refused with `409` while an active (unpaused) schedule references it** — pause or delete the schedule first. Both the retire and the removal answer `204`.
 
 |  |  |
 |---|---|
@@ -69,7 +70,7 @@ Retired rather than deleted where executions or schedules reference it. History 
 
 | Code | Shape | Meaning |
 |---|---|---|
-| 204 |  | Retired |
+| 204 |  | Retired, or removed where nothing referenced it |
 | 409 |  | Active schedules reference this report |
 
 ### getReport
@@ -115,8 +116,8 @@ Retired rather than deleted where executions or schedules reference it. History 
 | filters[].id | string (uuid) |  | Added 20 August. (read-only) |
 | filters[].field | string | yes |  |
 | filters[].operator | enum (equals, notEquals, greaterThan, lessThan, between, in, notIn, contains, …) | yes |  |
-| filters[].value | object |  |  |
-| filters[].values | array of object |  |  |
+| filters[].value | object |  | Open on purpose; its type is the field's. |
+| filters[].values | array of object |  | The values for in and notIn, or exactly two (from, to) for between. |
 | filters[].isParameter | boolean |  | Prompted at run time rather than fixed. (default False) |
 | groupBy | array of string |  |  |
 | parameters | array of ReportParameter |  |  |
@@ -124,12 +125,12 @@ Retired rather than deleted where executions or schedules reference it. History 
 | parameters[].label | string | yes |  |
 | parameters[].type | FieldType: enum (string, integer, decimal, money, boolean, date, dateTime, uuid, …) | yes |  |
 | parameters[].isRequired | boolean | yes |  |
-| parameters[].defaultValue | object |  |  |
-| requiredPermission | string | yes | Permission needed to run this report. |
+| parameters[].defaultValue | object |  | Open on purpose. |
+| requiredPermission | Permission: enum (SESSION_FORCE_LOGOUT, USER_MANAGE, ROLE_MANAGE, PERMISSION_GRANT, PERMISSION_VIEW, PERMISSION_MANAGE, PLATFORM_TENANT_VIEW, PLATFORM_TENANT_MANAGE, …) | yes | Permission needed to run this report, from the shared Permission vocabulary. |
 | maxDateRangeDays | integer |  | Guards against a query spanning years of scan events. (nullable) |
 | id | string (uuid) | yes |  |
-| version | string | yes |  |
-| isSystem | boolean | yes | Shipped with the platform. |
+| version | string | yes | The current version. |
+| isSystem | boolean | yes | Shipped with the platform — seeded at provisioning (BL-053, SeededReport). |
 | isRetired | boolean | yes |  |
 | estimatedCost | enum (low, medium, high) |  | Informs whether it may run inline or must be queued. |
 | createdByPrincipalId | string (uuid) |  | (nullable) |
@@ -142,7 +143,7 @@ Retired rather than deleted where executions or schedules reference it. History 
 | Code | Shape | Meaning |
 |---|---|---|
 | 200 |  | Definition |
-| 404 | NotFound | The resource does not exist, or is outside the caller's scope |
+| 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
 
 ### listReports
 
@@ -170,7 +171,7 @@ Only definitions the caller may run. A report requiring `REPORT_VIEW_TENANT` doe
 | category | query |  | ReportCategory: enum (sales, admission, financial, inventory, guest, operations, marketing, workforce, …) |  |
 | search | query |  | string |  |
 | pageSize | query |  | integer |  |
-| cursor | query |  | string | Opaque cursor from a previous page. |
+| cursor | query |  | string | Opaque cursor: the nextCursor of the previous page. |
 
 **Response**: `object`
 
@@ -193,8 +194,8 @@ Only definitions the caller may run. A report requiring `REPORT_VIEW_TENANT` doe
 | items[].filters[].id | string (uuid) |  | Added 20 August. (read-only) |
 | items[].filters[].field | string | yes |  |
 | items[].filters[].operator | enum (equals, notEquals, greaterThan, lessThan, between, in, notIn, contains, …) | yes |  |
-| items[].filters[].value | object |  |  |
-| items[].filters[].values | array of object |  |  |
+| items[].filters[].value | object |  | Open on purpose; its type is the field's. |
+| items[].filters[].values | array of object |  | The values for in and notIn, or exactly two (from, to) for between. |
 | items[].filters[].isParameter | boolean |  | Prompted at run time rather than fixed. (default False) |
 | items[].groupBy | array of string |  |  |
 | items[].parameters | array of ReportParameter |  |  |
@@ -202,12 +203,12 @@ Only definitions the caller may run. A report requiring `REPORT_VIEW_TENANT` doe
 | items[].parameters[].label | string | yes |  |
 | items[].parameters[].type | FieldType: enum (string, integer, decimal, money, boolean, date, dateTime, uuid, …) | yes |  |
 | items[].parameters[].isRequired | boolean | yes |  |
-| items[].parameters[].defaultValue | object |  |  |
-| items[].requiredPermission | string | yes | Permission needed to run this report. |
+| items[].parameters[].defaultValue | object |  | Open on purpose. |
+| items[].requiredPermission | Permission: enum (SESSION_FORCE_LOGOUT, USER_MANAGE, ROLE_MANAGE, PERMISSION_GRANT, PERMISSION_VIEW, PERMISSION_MANAGE, PLATFORM_TENANT_VIEW, PLATFORM_TENANT_MANAGE, …) | yes | Permission needed to run this report, from the shared Permission vocabulary. |
 | items[].maxDateRangeDays | integer |  | Guards against a query spanning years of scan events. (nullable) |
 | items[].id | string (uuid) | yes |  |
-| items[].version | string | yes |  |
-| items[].isSystem | boolean | yes | Shipped with the platform. |
+| items[].version | string | yes | The current version. |
+| items[].isSystem | boolean | yes | Shipped with the platform — seeded at provisioning (BL-053, SeededReport). |
 | items[].isRetired | boolean | yes |  |
 | items[].estimatedCost | enum (low, medium, high) |  | Informs whether it may run inline or must be queued. |
 | items[].createdByPrincipalId | string (uuid) |  | (nullable) |
@@ -259,14 +260,14 @@ Tiles reference report definitions. Each tile carries its own refresh interval, 
 | name | string | yes | (max length 200) |
 | module | ModuleKey: enum (core, ticketing, access, fnb, retail, inventory, seating, membership, …) | yes | What a tenant buys, and what a screen belongs to. |
 | description | string |  | (max length 1000) |
-| venueId | string (uuid) |  |  |
+| venueId | string (uuid) |  | Narrows every tile to one venue. |
 | isShared | boolean |  | (default False) |
 | tiles | array of DashboardTile | yes | (min items 1; max items 24) |
 | tiles[].id | string (uuid) | yes |  |
 | tiles[].title | string |  |  |
 | tiles[].reportId | string (uuid) | yes |  |
 | tiles[].visualisation | enum (number, line, area, bar, stackedBar, stackedBar100, combo, pie, …) | yes | Extended 22 September from eight marks to twenty against Ticketing_Platform_Native_Dashboard_Visualization_Requirements.pdf, which names eighteen components and marks every one MVP. |
-| tiles[].parameters | object |  |  |
+| tiles[].parameters | object |  | Open on purpose, and not yet specified. |
 | tiles[].refreshSeconds | integer |  | Minimum thirty seconds. (min 30) |
 | tiles[].position | object | yes |  |
 | tiles[].position.row | integer | yes |  |
@@ -281,14 +282,14 @@ Tiles reference report definitions. Each tile carries its own refresh interval, 
 | name | string | yes | (max length 200) |
 | module | ModuleKey: enum (core, ticketing, access, fnb, retail, inventory, seating, membership, …) | yes | What a tenant buys, and what a screen belongs to. |
 | description | string |  | (max length 1000) |
-| venueId | string (uuid) |  |  |
+| venueId | string (uuid) |  | Narrows every tile to one venue. |
 | isShared | boolean |  | (default False) |
 | tiles | array of DashboardTile | yes | (min items 1; max items 24) |
 | tiles[].id | string (uuid) | yes |  |
 | tiles[].title | string |  |  |
 | tiles[].reportId | string (uuid) | yes |  |
 | tiles[].visualisation | enum (number, line, area, bar, stackedBar, stackedBar100, combo, pie, …) | yes | Extended 22 September from eight marks to twenty against Ticketing_Platform_Native_Dashboard_Visualization_Requirements.pdf, which names eighteen components and marks every one MVP. |
-| tiles[].parameters | object |  |  |
+| tiles[].parameters | object |  | Open on purpose, and not yet specified. |
 | tiles[].refreshSeconds | integer |  | Minimum thirty seconds. (min 30) |
 | tiles[].position | object | yes |  |
 | tiles[].position.row | integer | yes |  |
@@ -340,14 +341,14 @@ Tiles reference report definitions. Each tile carries its own refresh interval, 
 | name | string | yes | (max length 200) |
 | module | ModuleKey: enum (core, ticketing, access, fnb, retail, inventory, seating, membership, …) | yes | What a tenant buys, and what a screen belongs to. |
 | description | string |  | (max length 1000) |
-| venueId | string (uuid) |  |  |
+| venueId | string (uuid) |  | Narrows every tile to one venue. |
 | isShared | boolean |  | (default False) |
 | tiles | array of DashboardTile | yes | (min items 1; max items 24) |
 | tiles[].id | string (uuid) | yes |  |
 | tiles[].title | string |  |  |
 | tiles[].reportId | string (uuid) | yes |  |
 | tiles[].visualisation | enum (number, line, area, bar, stackedBar, stackedBar100, combo, pie, …) | yes | Extended 22 September from eight marks to twenty against Ticketing_Platform_Native_Dashboard_Visualization_Requirements.pdf, which names eighteen components and marks every one MVP. |
-| tiles[].parameters | object |  |  |
+| tiles[].parameters | object |  | Open on purpose, and not yet specified. |
 | tiles[].refreshSeconds | integer |  | Minimum thirty seconds. (min 30) |
 | tiles[].position | object | yes |  |
 | tiles[].position.row | integer | yes |  |
@@ -364,8 +365,8 @@ Tiles reference report definitions. Each tile carries its own refresh interval, 
 | tileData[].result | ReportResult |  |  |
 | tileData[].result.executionId | string | yes |  |
 | tileData[].result.columns | array of object | yes |  |
-| tileData[].result.rows | array of object | yes |  |
-| tileData[].result.totals | object |  |  |
+| tileData[].result.rows | array of object | yes | Open on purpose; the shape is columns. |
+| tileData[].result.totals | object |  | Aggregated columns only, keyed and typed as a row is. |
 | tileData[].result.rowCount | integer |  |  |
 | tileData[].result.nextCursor | string |  | (nullable) |
 | tileData[].result.generatedAt | string (date-time) |  |  |
@@ -378,11 +379,13 @@ Tiles reference report definitions. Each tile carries its own refresh interval, 
 | Code | Shape | Meaning |
 |---|---|---|
 | 200 |  | Dashboard with data |
-| 404 | NotFound | The resource does not exist, or is outside the caller's scope |
+| 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
 
 ### updateDashboard
 
 **`PUT /dashboards/{dashboardId}`**: Update a dashboard
+
+**PUT semantics — a full replace of the dashboard, never a create.** The body is the whole dashboard, tiles included. **Tiles are matched on `id` within this dashboard**: a tile whose id is already on it is replaced whole, a new id adds a tile, and a stored tile the body leaves out is removed. A tile id that belongs to another dashboard is `400`. An unknown `dashboardId` is `404` — `createDashboard` makes dashboards.
 
 |  |  |
 |---|---|
@@ -411,14 +414,14 @@ Tiles reference report definitions. Each tile carries its own refresh interval, 
 | name | string | yes | (max length 200) |
 | module | ModuleKey: enum (core, ticketing, access, fnb, retail, inventory, seating, membership, …) | yes | What a tenant buys, and what a screen belongs to. |
 | description | string |  | (max length 1000) |
-| venueId | string (uuid) |  |  |
+| venueId | string (uuid) |  | Narrows every tile to one venue. |
 | isShared | boolean |  | (default False) |
 | tiles | array of DashboardTile | yes | (min items 1; max items 24) |
 | tiles[].id | string (uuid) | yes |  |
 | tiles[].title | string |  |  |
 | tiles[].reportId | string (uuid) | yes |  |
 | tiles[].visualisation | enum (number, line, area, bar, stackedBar, stackedBar100, combo, pie, …) | yes | Extended 22 September from eight marks to twenty against Ticketing_Platform_Native_Dashboard_Visualization_Requirements.pdf, which names eighteen components and marks every one MVP. |
-| tiles[].parameters | object |  |  |
+| tiles[].parameters | object |  | Open on purpose, and not yet specified. |
 | tiles[].refreshSeconds | integer |  | Minimum thirty seconds. (min 30) |
 | tiles[].position | object | yes |  |
 | tiles[].position.row | integer | yes |  |
@@ -433,14 +436,14 @@ Tiles reference report definitions. Each tile carries its own refresh interval, 
 | name | string | yes | (max length 200) |
 | module | ModuleKey: enum (core, ticketing, access, fnb, retail, inventory, seating, membership, …) | yes | What a tenant buys, and what a screen belongs to. |
 | description | string |  | (max length 1000) |
-| venueId | string (uuid) |  |  |
+| venueId | string (uuid) |  | Narrows every tile to one venue. |
 | isShared | boolean |  | (default False) |
 | tiles | array of DashboardTile | yes | (min items 1; max items 24) |
 | tiles[].id | string (uuid) | yes |  |
 | tiles[].title | string |  |  |
 | tiles[].reportId | string (uuid) | yes |  |
 | tiles[].visualisation | enum (number, line, area, bar, stackedBar, stackedBar100, combo, pie, …) | yes | Extended 22 September from eight marks to twenty against Ticketing_Platform_Native_Dashboard_Visualization_Requirements.pdf, which names eighteen components and marks every one MVP. |
-| tiles[].parameters | object |  |  |
+| tiles[].parameters | object |  | Open on purpose, and not yet specified. |
 | tiles[].refreshSeconds | integer |  | Minimum thirty seconds. (min 30) |
 | tiles[].position | object | yes |  |
 | tiles[].position.row | integer | yes |  |
@@ -494,7 +497,7 @@ Scope is applied from the caller's resolved permissions. Parameters narrow; they
 
 | Field | Type | Required | Notes |
 |---|---|---|---|
-| parameters | object |  |  |
+| parameters | object |  | Open on purpose; its shape is the report's. |
 | venueId | string (uuid) |  | Narrows to one venue. |
 | dateFrom | string (date) |  |  |
 | dateTo | string (date) |  |  |
@@ -509,8 +512,8 @@ Scope is applied from the caller's resolved permissions. Parameters narrow; they
 | columns[].key | string |  |  |
 | columns[].label | string |  |  |
 | columns[].type | FieldType: enum (string, integer, decimal, money, boolean, date, dateTime, uuid, …) |  |  |
-| rows | array of object | yes |  |
-| totals | object |  |  |
+| rows | array of object | yes | Open on purpose; the shape is columns. |
+| totals | object |  | Aggregated columns only, keyed and typed as a row is. |
 | rowCount | integer |  |  |
 | nextCursor | string |  | (nullable) |
 | generatedAt | string (date-time) |  |  |
@@ -532,11 +535,12 @@ Scope is applied from the caller's resolved permissions. Parameters narrow; they
 
 **`POST /reports/ask`**: Natural-language reporting query
 
-**This is an AI capability and is governed as one.** It resolves its provider through `ai.provider`, respects `ai.policy` including the masking list, and writes an `ai.interaction` with its prompt, response, model, tokens and cost — the same audit trail as the assistant (8.3.55–8.3.57).
+**This is an AI capability and is governed as one.** It resolves its provider through `ai.provider`, respects `ai.policy` including the masking list, and writes an `ai.activity` row with its prompt, response, model, tokens and cost — the same audit trail as the assistant (8.3.55–8.3.57).
 Distinct from `sendAiMessage`, which retrieves from documents. **This generates a query against the analytical replica and returns it**, so a finance user can check the number rather than trust it.
 AI-57, Phase 1. Queries data that already exists, so it works from day one — unlike forecasting, which needs history.
 **Returns the generated query alongside the answer.** An answer nobody can check is worse than no answer, and a finance user asked to trust an unexplained number will rightly refuse.
 Runs under the caller's resolved permissions. The generated query cannot widen scope, because scope is applied after generation, not by it.
+**The generated query is kept, not just returned.** Each answer writes a `reporting.natural_language_query` row (`NaturalLanguageQuery`) against its `conversationId`, because `saveNaturalLanguageQuery` turns it into a definition in a later call and `ai.activity` holds only free-text prompt and response.
 
 |  |  |
 |---|---|
@@ -562,7 +566,7 @@ Runs under the caller's resolved permissions. The generated query cannot widen s
 |---|---|---|---|
 | question | string | yes | (min length 3; max length 1000) |
 | conversationId | string |  | Continue a prior exchange for follow-up questions. |
-| venueId | string (uuid) |  |  |
+| venueId | string (uuid) |  | Narrows the answer to one venue. |
 
 **Response**: `NaturalLanguageAnswer`
 
@@ -571,7 +575,7 @@ Runs under the caller's resolved permissions. The generated query cannot widen s
 | conversationId | string | yes |  |
 | question | string | yes |  |
 | interpretation | string | yes | What the question was understood to mean, in plain language. |
-| generatedQuery | object |  | The structured query produced — data source, columns, filters, grouping. |
+| generatedQuery | GeneratedQuery |  | The structured query a natural-language question produced — data source, columns, filters, grouping. |
 | generatedQuery.dataSource | DataSource: enum (orders, orderLines, payments, refunds, shifts, scanEvents, entitlements, products, …) |  | What a report may be built over. |
 | generatedQuery.columns | array of ReportColumn |  |  |
 | generatedQuery.columns[].id | string (uuid) |  | Added 20 August. (read-only) |
@@ -585,8 +589,8 @@ Runs under the caller's resolved permissions. The generated query cannot widen s
 | generatedQuery.filters[].id | string (uuid) |  | Added 20 August. (read-only) |
 | generatedQuery.filters[].field | string | yes |  |
 | generatedQuery.filters[].operator | enum (equals, notEquals, greaterThan, lessThan, between, in, notIn, contains, …) | yes |  |
-| generatedQuery.filters[].value | object |  |  |
-| generatedQuery.filters[].values | array of object |  |  |
+| generatedQuery.filters[].value | object |  | Open on purpose; its type is the field's. |
+| generatedQuery.filters[].values | array of object |  | The values for in and notIn, or exactly two (from, to) for between. |
 | generatedQuery.filters[].isParameter | boolean |  | Prompted at run time rather than fixed. (default False) |
 | generatedQuery.groupBy | array of string |  |  |
 | result | ReportResult | yes |  |
@@ -595,8 +599,8 @@ Runs under the caller's resolved permissions. The generated query cannot widen s
 | result.columns[].key | string |  |  |
 | result.columns[].label | string |  |  |
 | result.columns[].type | FieldType: enum (string, integer, decimal, money, boolean, date, dateTime, uuid, …) |  |  |
-| result.rows | array of object | yes |  |
-| result.totals | object |  |  |
+| result.rows | array of object | yes | Open on purpose; the shape is columns. |
+| result.totals | object |  | Aggregated columns only, keyed and typed as a row is. |
 | result.rowCount | integer |  |  |
 | result.nextCursor | string |  | (nullable) |
 | result.generatedAt | string (date-time) |  |  |
@@ -619,6 +623,7 @@ Runs under the caller's resolved permissions. The generated query cannot widen s
 **`POST /reports/ask/{conversationId}/save`**: Save a natural-language answer as a report definition
 
 Turns a one-off question into something schedulable. The generated query becomes the definition, reviewable and versioned like any other.
+**Reads the latest `NaturalLanguageQuery` kept for `{conversationId}`** — the query behind the most recent answer in that conversation. A conversation with no kept query, or one outside the caller's scope, is `404`.
 
 |  |  |
 |---|---|
@@ -666,8 +671,8 @@ Turns a one-off question into something schedulable. The generated query becomes
 | filters[].id | string (uuid) |  | Added 20 August. (read-only) |
 | filters[].field | string | yes |  |
 | filters[].operator | enum (equals, notEquals, greaterThan, lessThan, between, in, notIn, contains, …) | yes |  |
-| filters[].value | object |  |  |
-| filters[].values | array of object |  |  |
+| filters[].value | object |  | Open on purpose; its type is the field's. |
+| filters[].values | array of object |  | The values for in and notIn, or exactly two (from, to) for between. |
 | filters[].isParameter | boolean |  | Prompted at run time rather than fixed. (default False) |
 | groupBy | array of string |  |  |
 | parameters | array of ReportParameter |  |  |
@@ -675,12 +680,12 @@ Turns a one-off question into something schedulable. The generated query becomes
 | parameters[].label | string | yes |  |
 | parameters[].type | FieldType: enum (string, integer, decimal, money, boolean, date, dateTime, uuid, …) | yes |  |
 | parameters[].isRequired | boolean | yes |  |
-| parameters[].defaultValue | object |  |  |
-| requiredPermission | string | yes | Permission needed to run this report. |
+| parameters[].defaultValue | object |  | Open on purpose. |
+| requiredPermission | Permission: enum (SESSION_FORCE_LOGOUT, USER_MANAGE, ROLE_MANAGE, PERMISSION_GRANT, PERMISSION_VIEW, PERMISSION_MANAGE, PLATFORM_TENANT_VIEW, PLATFORM_TENANT_MANAGE, …) | yes | Permission needed to run this report, from the shared Permission vocabulary. |
 | maxDateRangeDays | integer |  | Guards against a query spanning years of scan events. (nullable) |
 | id | string (uuid) | yes |  |
-| version | string | yes |  |
-| isSystem | boolean | yes | Shipped with the platform. |
+| version | string | yes | The current version. |
+| isSystem | boolean | yes | Shipped with the platform — seeded at provisioning (BL-053, SeededReport). |
 | isRetired | boolean | yes |  |
 | estimatedCost | enum (low, medium, high) |  | Informs whether it may run inline or must be queued. |
 | createdByPrincipalId | string (uuid) |  | (nullable) |
@@ -702,6 +707,7 @@ Turns a one-off question into something schedulable. The generated query becomes
 **`GET /alerts`**: What is currently wrong
 
 **The dashboard panel reads this.** Critical first, then unacknowledged, then by age — an alert list sorted by time puts a resolved info notice above an unacknowledged critical.
+**Venue scope is the rule; the filters below narrow inside it.** A till screen asks for its own workstation or shift, a replenishment screen for one item. Each alert carries its rule's name and metric, so a list can be read without a second call to `listAlertRules`.
 
 |  |  |
 |---|---|
@@ -720,7 +726,11 @@ Turns a one-off question into something schedulable. The generated query becomes
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
-| status | query |  | string |  |
+| status | query |  | AlertStatus: enum (raised, acknowledged, resolved, expired) |  |
+| severity | query |  | AlertSeverity: enum (info, warning, critical) |  |
+| workstationId | query |  | string (uuid) | Only alerts raised for this workstation. |
+| shiftId | query |  | string (uuid) | Only alerts raised during this till shift. |
+| itemId | query |  | string (uuid) | Only alerts raised about this inventory item. |
 
 **Responses**
 
@@ -733,6 +743,8 @@ Turns a one-off question into something schedulable. The generated query becomes
 **`PUT /alert-rules`**: Watch a metric and tell somebody
 
 BL-152. **The metric comes from the closed set**, so a rule cannot watch something nothing produces.
+**PUT semantics — an upsert of one rule, keyed on the body's `id`.** The collection path carries no id, so the body names the rule: a client-generated `id` that does not exist creates the rule (`201`); an `id` that exists replaces that rule whole (`200`). **Replace means every field** — an optional field left out of the body returns to its default, it does not keep its stored value. Other rules are never touched; removing a rule is `isActive: false`.
+**The target is the body's `scopePath`**, which names the venue the rule watches and must lie inside the caller's scope (`403` otherwise). An `id` that exists at a scope the caller cannot reach is also `403`, never a silent second rule with the same id.
 
 |  |  |
 |---|---|
@@ -761,15 +773,15 @@ BL-152. **The metric comes from the closed set**, so a rule cannot watch somethi
 | name | string | yes |  |
 | metric | object | yes | From the closed set, so a rule cannot watch something nothing produces — the same discipline MetricSource exists for. |
 | comparator | enum (above, below, outsideRange, changesBy, equals) | yes |  |
-| threshold | number | yes |  |
-| thresholdUpper | number |  | (nullable) |
+| threshold | number or Money | yes | A reading of a metric or KPI, or a threshold on one. |
+| thresholdUpper | object |  | (nullable) |
 | windowMinutes | integer |  | The window is what stops an alert firing on noise. (default 15) |
-| severity | enum (info, warning, critical) | yes |  |
+| severity | AlertSeverity: enum (info, warning, critical) | yes | How urgent an alert rule's breach is. |
 | deliverTo | array of enum (dashboardPanel, email, whatsapp, sms) |  | CF-134. |
 | recipientRoleIds | array of string (uuid) |  |  |
 | cooldownMinutes | integer |  | How long before the same rule may fire again. (default 30) |
 | isActive | boolean | yes |  |
-| scopePath | string |  | The partition key (ADR-0005). |
+| scopePath | string | yes | The partition key (ADR-0005). |
 
 **Response**: `AlertRule`
 
@@ -779,21 +791,22 @@ BL-152. **The metric comes from the closed set**, so a rule cannot watch somethi
 | name | string | yes |  |
 | metric | object | yes | From the closed set, so a rule cannot watch something nothing produces — the same discipline MetricSource exists for. |
 | comparator | enum (above, below, outsideRange, changesBy, equals) | yes |  |
-| threshold | number | yes |  |
-| thresholdUpper | number |  | (nullable) |
+| threshold | number or Money | yes | A reading of a metric or KPI, or a threshold on one. |
+| thresholdUpper | object |  | (nullable) |
 | windowMinutes | integer |  | The window is what stops an alert firing on noise. (default 15) |
-| severity | enum (info, warning, critical) | yes |  |
+| severity | AlertSeverity: enum (info, warning, critical) | yes | How urgent an alert rule's breach is. |
 | deliverTo | array of enum (dashboardPanel, email, whatsapp, sms) |  | CF-134. |
 | recipientRoleIds | array of string (uuid) |  |  |
 | cooldownMinutes | integer |  | How long before the same rule may fire again. (default 30) |
 | isActive | boolean | yes |  |
-| scopePath | string |  | The partition key (ADR-0005). |
+| scopePath | string | yes | The partition key (ADR-0005). |
 
 **Responses**
 
 | Code | Shape | Meaning |
 |---|---|---|
-| 200 |  | Set |
+| 200 |  | Replaced — a rule with this id already existed |
+| 201 |  | Created — no rule with this id existed |
 
 ## Tables
 
@@ -805,14 +818,20 @@ Every table this service owns that the slice reads or writes, with its columns a
 |---|---|---|---|
 | id | uuid | yes |  |
 | rule_id | uuid | yes |  |
+| rule_name | text | no | AlertRule.name as it stood when the alert was raised. |
+| metric | text | no | The rule's metric, carried so the alert says what went out of range. |
 | raised_at | timestamptz | yes |  |
 | severity | text | yes |  |
 | status | text | yes |  |
-| observed_value | numeric | no |  |
-| threshold | numeric | no |  |
+| observed_value | numeric(18,4) | no |  |
+| threshold | numeric(18,4) | no |  |
 | scope_path | text | no |  |
+| workstation_id | uuid | no | The workstation the reading was taken for, where the metric is measured per workstation (salesByWorkstation). |
+| shift_id | uuid | no | The till shift (orders.pos_shift) the reading belongs to, where it was taken for a workstation with a shift open. |
+| item_id | uuid | no | The inventory item the reading is about, where the metric is measured per item (stockAgeing, stockTurnover, wastageRate, inventoryValuation). |
 | acknowledged_by_principal_id | uuid | no |  |
 | acknowledged_at | timestamptz | no |  |
+| acknowledgement_note | text | no | The note given to acknowledgeAlert. |
 | resolved_at | timestamptz | no | Set when the metric returns to range, automatically. |
 | escalated_at | timestamptz | no | Where VenueSettings.alerting.escalateAfterMinutes passed with no acknowledgement. |
 
@@ -824,30 +843,30 @@ Every table this service owns that the slice reads or writes, with its columns a
 | name | text | yes |  |
 | metric | text | yes | From the closed set, so a rule cannot watch something nothing produces — the same discipline MetricSource exists for. |
 | comparator | text | yes |  |
-| threshold | numeric | yes |  |
-| threshold_upper | numeric | no |  |
+| threshold | numeric(18,4) | yes |  |
+| threshold_upper | numeric(18,4) | no |  |
 | window_minutes | integer | no | The window is what stops an alert firing on noise. |
 | severity | text | yes |  |
 | deliver_to | text[] | no | CF-134. |
 | recipient_role_ids | text[] | no |  |
 | cooldown_minutes | integer | no | How long before the same rule may fire again. |
 | is_active | boolean | yes |  |
-| scope_path | text | no | The partition key (ADR-0005). |
+| scope_path | text | yes | The partition key (ADR-0005). |
 
 ### `reporting.dashboard`
 
 | Column | Type | Required | Notes |
 |---|---|---|---|
-| name | text | no |  |
-| module | text | no | Which module this dashboard belongs to, and therefore who may see it. |
+| name | text | yes |  |
+| module | text | yes | Which module this dashboard belongs to, and therefore who may see it. |
 | description | text | no |  |
-| venue_id | uuid | no |  |
+| venue_id | uuid | no | Narrows every tile to one venue. |
 | is_shared | boolean | no |  |
-| id | uuid | no |  |
-| owner_principal_id | uuid | no |  |
-| aggregate_cost | text | no | Combined refresh load of every tile. |
+| id | uuid | yes |  |
+| owner_principal_id | uuid | yes |  |
+| aggregate_cost | text | yes | Combined refresh load of every tile. |
 | archived_at | timestamptz | no | Set by deleteDashboard, which archives rather than removes. |
-| created_at | timestamptz | no |  |
+| created_at | timestamptz | yes |  |
 
 ### `reporting.dashboard_tile`
 
@@ -858,7 +877,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 | title | text | no |  |
 | report_id | uuid | yes |  |
 | visualisation | text | yes | Extended 22 September from eight marks to twenty against Ticketing_Platform_Native_Dashboard_Visualization_Requirements.pdf, which names eighteen components and marks every one MVP. |
-| parameters | jsonb | no |  |
+| parameters | jsonb | no | Open on purpose, and not yet specified. |
 | refresh_seconds | integer | no | Minimum thirty seconds. |
 | position | jsonb | yes |  |
 
@@ -871,7 +890,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 | report_name | text | no |  |
 | definition_version | text | yes | The version this ran against. |
 | status | text | yes |  |
-| parameters | jsonb | no |  |
+| parameters | jsonb | no | The parameters it ran with, keyed by ReportParameter.key of definitionVersion — defaults filled in, so the record is complete. |
 | scope_applied | text[] | no | Scope paths the caller held. |
 | row_count | integer | no |  |
 | duration_ms | integer | no |  |
@@ -894,26 +913,25 @@ Every table this service owns that the slice reads or writes, with its columns a
 | sort_order | integer | no |  |
 | sort_direction | text | no |  |
 | format | text | no |  |
-| definition_id | uuid | yes | Points at reporting.report_definition. |
 
 ### `reporting.report_definition`
 
 | Column | Type | Required | Notes |
 |---|---|---|---|
-| name | text | no |  |
+| name | text | yes |  |
 | description | text | no |  |
-| category | text | no |  |
-| data_source | text | no |  |
+| category | text | yes |  |
+| data_source | text | yes |  |
 | group_by | text[] | no |  |
-| required_permission | text | no | Permission needed to run this report. |
+| required_permission | text | yes | Permission needed to run this report, from the shared Permission vocabulary. |
 | max_date_range_days | integer | no | Guards against a query spanning years of scan events. |
-| id | uuid | no |  |
-| version | text | no |  |
-| is_system | boolean | no | Shipped with the platform. |
-| is_retired | boolean | no |  |
+| id | uuid | yes |  |
+| version | text | yes | The current version. |
+| is_system | boolean | yes | Shipped with the platform — seeded at provisioning (BL-053, SeededReport). |
+| is_retired | boolean | yes |  |
 | estimated_cost | text | no | Informs whether it may run inline or must be queued. |
 | created_by_principal_id | uuid | no |  |
-| created_at | timestamptz | no |  |
+| created_at | timestamptz | yes |  |
 | last_run_at | timestamptz | no |  |
 | scope_path | text | no | The partition key (ADR-0005). |
 
@@ -925,10 +943,9 @@ Every table this service owns that the slice reads or writes, with its columns a
 | id | uuid | no | Added 20 August. |
 | field | text | yes |  |
 | operator | text | yes |  |
-| value | text | no |  |
-| values | text[] | no |  |
+| value | text | no | Open on purpose; its type is the field's. |
+| values | text[] | no | The values for in and notIn, or exactly two (from, to) for between. |
 | is_parameter | boolean | no | Prompted at run time rather than fixed. |
-| definition_id | uuid | yes | Points at reporting.report_definition. |
 
 ### `reporting.report_parameter`
 
@@ -938,7 +955,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 | label | text | yes |  |
 | type | text | yes |  |
 | is_required | boolean | yes |  |
-| default_value | text | no |  |
+| default_value | text | no | Open on purpose. |
 | id | uuid | yes | Synthesised key. |
 | definition_id | uuid | yes | Points at reporting.report_definition. |
 

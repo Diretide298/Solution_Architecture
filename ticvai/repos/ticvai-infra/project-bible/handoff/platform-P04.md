@@ -9,12 +9,12 @@
 | Contracts | 20 |
 | Modules | 4 |
 | Undrawn | 0 |
-| Operations with no screen | 194 |
+| Operations with no screen | 211 |
 | Waves | wave1 27 · wave2 3 |
 
 ## Gaps
 
-### 194 operations with no screen here
+### 211 operations with no screen here
 
 **In a contract this platform uses, callable by its audience, and reaching no screen on any platform serving that audience.** Either a screen is missing or the endpoint should not exist — and the second is worth considering first.
 
@@ -31,6 +31,7 @@
 | `commitCatalogueImport` | catalogue | POST | Apply a parsed catalogue import |
 | `createDonationCampaign` | catalogue | POST | Create a campaign |
 | `freezeEntitlement` | catalogue | POST | Pause a membership at the guest's request |
+| `getCatalogueImportJob` | catalogue | GET | Progress and findings of a catalogue import |
 | `getDynamicPriceRule` | catalogue | GET | One rule with its conditions and actions |
 | `getPlanBenefits` | catalogue | GET | Which benefits a plan grants, and how much of each |
 | `listDonationCampaigns` | catalogue | GET | Campaigns a guest can give to |
@@ -59,8 +60,7 @@
 | `closeCorrectiveAction` | fnb | POST | Close a signed finding |
 | `createCombo` | fnb | POST | A meal deal, priced as one thing |
 | `createModifierGroup` | fnb | POST | Create a modifier group |
-| `createTable` | fnb | POST | A table as a thing, not an inference |
-| … | | | 154 more |
+| … | | | 171 more |
 
 ### 2 modules split across waves
 

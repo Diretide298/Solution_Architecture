@@ -31,7 +31,6 @@ stateModels:
   - queued
   terminal:
   - complete
-  - failed
   operations:
   - reindexSource
   guarded: 8
@@ -45,7 +44,6 @@ stateModels:
   initial:
   - processing
   terminal:
-  - failed
   - superseded
   operations:
   - ingestKnowledgeDocument
@@ -134,7 +132,6 @@ stateModels:
   - pending
   terminal:
   - approved
-  - rejected
   - withdrawn
   - expired
   - cancelled
@@ -208,7 +205,6 @@ stateModels:
   initial:
   - active
   terminal:
-  - expired
   - abandoned
   - checkedOut
   operations:
@@ -275,7 +271,6 @@ stateModels:
   - queued
   terminal:
   - completed
-  - failed
   - rolledBack
   operations: []
   guarded: 5
@@ -338,7 +333,6 @@ stateModels:
   - accepted
   - expired
   operations:
-  - listChargebacks
   - respondToChargeback
   guarded: 7
   ref: diagrams/lld/lifecycles/chargeback.yaml
@@ -379,8 +373,7 @@ stateModels:
   transitions: 5
   initial:
   - draft
-  terminal:
-  - archived
+  terminal: []
   operations:
   - publishTenantConfig
   - restoreConfigVersion
@@ -452,7 +445,6 @@ stateModels:
   initial:
   - issued
   terminal:
-  - redeemed
   - expired
   - voided
   operations:
@@ -471,7 +463,6 @@ stateModels:
   initial:
   - active
   terminal:
-  - exhausted
   - revoked
   - expired
   operations:
@@ -492,7 +483,6 @@ stateModels:
   - revoked
   operations:
   - claimCustomDomain
-  - listCustomDomains
   - relinquishCustomDomain
   - verifyCustomDomain
   guarded: 12
@@ -556,7 +546,6 @@ stateModels:
   - pending
   terminal:
   - completed
-  - partiallyFailed
   operations:
   - createDsarRequest
   guarded: 4
@@ -591,9 +580,6 @@ stateModels:
   initial:
   - ordered
   terminal:
-  - served
-  - collected
-  - delivered
   - cancelled
   - refunded
   operations:
@@ -660,7 +646,6 @@ stateModels:
   terminal:
   - redeemed
   - expired
-  - blocked
   operations:
   - activateGiftCard
   - blockGiftCard
@@ -691,7 +676,6 @@ stateModels:
   - active
   terminal:
   - revoked
-  - failed
   operations:
   - registerGuestDevice
   - revokeGuestDevice
@@ -829,7 +813,6 @@ stateModels:
   initial:
   - draft
   terminal:
-  - posted
   - reversed
   operations:
   - approveJournalEntry
@@ -852,7 +835,6 @@ stateModels:
   - suppressed
   operations:
   - activateJourney
-  - getJourneyPerformance
   - recordConsent
   guarded: 8
   ref: diagrams/lld/lifecycles/journey-entrant.yaml
@@ -979,7 +961,6 @@ stateModels:
   - queued
   terminal:
   - complete
-  - failed
   - rolledBack
   operations:
   - applyMigration
@@ -1030,7 +1011,6 @@ stateModels:
   initial:
   - pending
   terminal:
-  - completed
   - voided
   - refunded
   - failed
@@ -1090,7 +1070,6 @@ stateModels:
   - superseded
   operations:
   - createPayment
-  - getPaymentLink
   - resendPaymentLink
   guarded: 9
   ref: diagrams/lld/lifecycles/payment-link.yaml
@@ -1104,7 +1083,6 @@ stateModels:
   - authorised
   - pendingConfirmation
   terminal:
-  - captured
   - declined
   - failed
   - voided
@@ -1140,8 +1118,7 @@ stateModels:
   transitions: 4
   initial:
   - open
-  terminal:
-  - closed
+  terminal: []
   operations:
   - abandonPeriodClose
   - closeFiscalPeriod
@@ -1216,7 +1193,6 @@ stateModels:
   initial:
   - queued
   terminal:
-  - completed
   - rolledBack
   operations:
   - deployConfigurationProfile
@@ -1323,7 +1299,6 @@ stateModels:
   terminal:
   - completed
   - declined
-  - failed
   operations:
   - createRefund
   - decideApprovalRequest
@@ -1368,7 +1343,6 @@ stateModels:
   initial:
   - queued
   terminal:
-  - completed
   - failed
   - cancelled
   - expired
@@ -1385,8 +1359,6 @@ stateModels:
   initial:
   - queued
   terminal:
-  - ready
-  - failed
   - expired
   operations:
   - exportReportResult
@@ -1506,8 +1478,6 @@ stateModels:
   initial:
   - pending
   terminal:
-  - complete
-  - failed
   - skipped
   - rolledBack
   operations:
@@ -1611,7 +1581,6 @@ stateModels:
   - rejected
   - failed
   operations:
-  - getSeatMapImport
   - importSeatMap
   guarded: 5
   ref: diagrams/lld/lifecycles/seat-map-import-job.yaml
@@ -1623,8 +1592,7 @@ stateModels:
   transitions: 6
   initial:
   - draft
-  terminal:
-  - archived
+  terminal: []
   operations:
   - publishSeatMap
   - updateSeatMap
@@ -1661,13 +1629,11 @@ stateModels:
   initial:
   - inStock
   terminal:
-  - sold
   - lost
   operations:
   - createRetailReturn
   - createRetailSale
   - createStockTransfer
-  - listSerialisedItems
   - receiveStockTransfer
   guarded: 15
   ref: diagrams/lld/lifecycles/serialised-item.yaml
@@ -1713,7 +1679,6 @@ stateModels:
   - pendingApproval
   - open
   terminal:
-  - closed
   - autoClosed
   operations:
   - acceptShiftVariance
@@ -1734,7 +1699,6 @@ stateModels:
   - awaitingCollection
   terminal:
   - collected
-  - uncollected
   - disposed
   operations:
   - collectShopAndDrop
@@ -1817,7 +1781,6 @@ stateModels:
   terminal:
   - completed
   - cancelled
-  - noShow
   operations:
   - seatTableReservation
   - updateTableReservation
@@ -1851,15 +1814,13 @@ stateModels:
   transitions: 11
   initial:
   - free
-  terminal:
-  - outOfService
+  terminal: []
   operations:
   - claimTableSession
   - clearTable
   - createFnbOrder
   - createPayment
   - createReservation
-  - getGuestBill
   guarded: 11
   ref: diagrams/lld/lifecycles/table.yaml
 - entity: Tenant migration
@@ -2095,7 +2056,6 @@ stateModels:
   terminal:
   - cancelled
   - closed
-  - verified
   operations:
   - acceptWorkOrder
   - cancelWorkOrder

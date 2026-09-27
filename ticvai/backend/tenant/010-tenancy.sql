@@ -14,7 +14,7 @@ CREATE TABLE IF NOT EXISTS tenancy.device_assignment (
     acquired_at                       date,
     warranty_expires_at               date,
     assigned_at                       timestamptz,
-    scope_path                        ltree,
+    scope_path                        ltree NOT NULL,
     id                                uuid PRIMARY KEY NOT NULL
 );
 
@@ -24,14 +24,14 @@ CREATE TABLE IF NOT EXISTS tenancy.device_audit (
     id                                uuid PRIMARY KEY,
     device_id                         uuid,
     at                                timestamptz,
-    kind                              text,
+    kind                              text CONSTRAINT device_audit_kind_chk CHECK (kind IN ('administration', 'access', 'security')),
     action                            text,
     actor_principal_id                uuid,
     previous_value                    text,
     new_value                         text,
     source_ip                         text,
     correlation_id                    text,
-    scope_path                        ltree
+    scope_path                        ltree NOT NULL
 );
 
 -- Holds 9 columns. No description has been written for this table — the name is the only thing
@@ -39,13 +39,13 @@ CREATE TABLE IF NOT EXISTS tenancy.device_audit (
 CREATE TABLE IF NOT EXISTS tenancy.device_credential (
     id                                uuid PRIMARY KEY,
     device_id                         uuid,
-    kind                              text,
+    kind                              text CONSTRAINT device_credential_kind_chk CHECK (kind IN ('clientCertificate', 'deviceToken', 'mutualTls')),
     fingerprint                       text,
     issued_at                         timestamptz,
     expires_at                        timestamptz,
     revoked_at                        timestamptz,
     revocation_reason                 text,
-    scope_path                        ltree
+    scope_path                        ltree NOT NULL
 );
 
 -- Holds 10 columns. No description has been written for this table — the name is the only thing
@@ -60,7 +60,7 @@ CREATE TABLE IF NOT EXISTS tenancy.device_firmware (
     minimum_previous_version          text,
     released_at                       timestamptz,
     installed_count                   integer,
-    status                            text
+    status                            text CONSTRAINT device_firmware_status_chk CHECK (status IN ('draft', 'released', 'deprecated', 'withdrawn'))
 );
 
 -- Holds 10 columns. No description has been written for this table — the name is the only thing
@@ -71,11 +71,11 @@ CREATE TABLE IF NOT EXISTS tenancy.device_rollout (
     target_scope_path                 ltree,
     target_device_ids                 text[],
     maintenance_window                jsonb,
-    previous_version_retained         boolean,
-    status                            text,
+    is_previous_version_retained      boolean DEFAULT true,
+    status                            text CONSTRAINT device_rollout_status_chk CHECK (status IN ('scheduled', 'running', 'paused', 'completed', 'halted', 'rolledBack')),
     succeeded_count                   integer,
     failed_count                      integer,
-    scope_path                        ltree
+    scope_path                        ltree NOT NULL
 );
 
 -- Holds 10 columns. No description has been written for this table — the name is the only thing
@@ -83,14 +83,14 @@ CREATE TABLE IF NOT EXISTS tenancy.device_rollout (
 CREATE TABLE IF NOT EXISTS tenancy.device_tamper_event (
     id                                uuid PRIMARY KEY,
     device_id                         uuid NOT NULL,
-    kind                              text NOT NULL,
+    kind                              text NOT NULL CONSTRAINT device_tamper_event_kind_chk CHECK (kind IN ('enclosureOpened', 'locationAnomaly', 'credentialMismatch', 'firmwareUnsigned', 'clockSkew', 'physicalRemoval')),
     detected_at                       timestamptz,
     detail                            text,
-    device_trusted                    boolean,
+    is_device_trusted                 boolean DEFAULT false,
     resolved_at                       timestamptz,
     resolved_by                       uuid,
     resolution                        text,
-    scope_path                        ltree
+    scope_path                        ltree NOT NULL
 );
 
 -- Holds 13 columns. No description has been written for this table — the name is the only thing
@@ -100,14 +100,14 @@ CREATE TABLE IF NOT EXISTS tenancy.device_telemetry (
     at                                timestamptz,
     battery_percent                   integer,
     battery_health_percent            integer,
-    charging                          boolean,
+    is_charging                       boolean,
     signal_strength                   integer,
     cpu_percent                       numeric(18,4),
     memory_percent                    numeric(18,4),
     storage_free_mb                   integer,
     consumables                       jsonb,
     uptime_seconds                    integer,
-    scope_path                        ltree,
+    scope_path                        ltree NOT NULL,
     id                                uuid PRIMARY KEY NOT NULL
 );
 

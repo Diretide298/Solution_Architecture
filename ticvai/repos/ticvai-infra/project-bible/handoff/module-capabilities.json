@@ -22,14 +22,14 @@
      "key": "ACCESS_POINT_CONFIGURE",
      "label": null,
      "group": "Access control",
-     "operationCount": 49,
+     "operationCount": 48,
      "operations": [
       "addBlacklistEntry",
       "approveManualOverrideSupervisor",
       "approveMultiMediaPreview",
       "createAccessPoint",
       "createAdmissionRules",
-      "listParkingFacilities"
+      "publishMediaCompatibilityTesting"
      ],
      "elevated": true,
      "segregationConstrained": false
@@ -92,8 +92,9 @@
      "key": "PARKING_CONFIGURE",
      "label": null,
      "group": "Operations",
-     "operationCount": 1,
+     "operationCount": 2,
      "operations": [
+      "listParkingFacilities",
       "setParkingFacility"
      ],
      "elevated": false,
@@ -261,7 +262,7 @@
     },
     {
      "key": "AI_AUDIT_VIEW",
-     "label": null,
+     "label": "the AI activity and decision log only",
      "group": "Operations",
      "operationCount": 2,
      "operations": [
@@ -609,14 +610,14 @@
      "key": "PRODUCT_VIEW",
      "label": null,
      "group": "Catalogue",
-     "operationCount": 108,
+     "operationCount": 109,
      "operations": [
       "checkBookingEligibility",
       "getAvailability",
+      "getCatalogueImportJob",
       "getChannelAllocations",
       "getEvent",
-      "getGroupPackageDefinition",
-      "getLatestBundle"
+      "getGroupPackageDefinition"
      ],
      "elevated": false,
      "segregationConstrained": false
@@ -917,7 +918,7 @@
      "key": "PRODUCT_VIEW",
      "label": null,
      "group": "Catalogue",
-     "operationCount": 15,
+     "operationCount": 17,
      "operations": [
       "getFnbDeliveryPolicy",
       "getFnbReservationPolicy",
@@ -1542,14 +1543,14 @@
      "key": "GUEST_VIEW",
      "label": "profiles, behavioural attributes, consent state",
      "group": "Guest engagement",
-     "operationCount": 21,
+     "operationCount": 23,
      "operations": [
       "getConsentHistory",
+      "getForm",
       "getGuestAttributeModel",
       "getGuestConsents",
       "getGuestExtraValues",
-      "getGuestIntelligence",
-      "getGuestLoyalty"
+      "getGuestIntelligence"
      ],
      "elevated": false,
      "segregationConstrained": false
@@ -1636,7 +1637,7 @@
      "key": "MARKETING_VIEW",
      "label": "segments, campaigns, loyalty, reviews",
      "group": "Guest engagement",
-     "operationCount": 74,
+     "operationCount": 76,
      "operations": [
       "getAudienceOverlap",
       "getCampaign",
@@ -1653,7 +1654,7 @@
   "orders": {
    "title": "2 — Ticketing Sales",
    "capabilityCount": 20,
-   "unguardedOperations": 16,
+   "unguardedOperations": 17,
    "capabilities": [
     {
      "key": "CREDIT_MANAGE",
@@ -1742,7 +1743,7 @@
      "key": "ORDER_MODIFY",
      "label": null,
      "group": "Selling",
-     "operationCount": 13,
+     "operationCount": 15,
      "operations": [
       "addTip",
       "convertToTermProduct",
@@ -2130,14 +2131,14 @@
      "key": "PRICE_VIEW",
      "label": null,
      "group": "Catalogue",
-     "operationCount": 89,
+     "operationCount": 90,
      "operations": [
       "analysePromotionConflicts",
       "evaluatePromotions",
       "getCouponCode",
+      "getCouponCodeBatch",
       "getPromotion",
-      "getPromotionUsage",
-      "listAdvancedOffer"
+      "getPromotionUsage"
      ],
      "elevated": false,
      "segregationConstrained": false
@@ -2232,7 +2233,7 @@
   "queue": {
    "title": "5 — F&B & Guest Management (Virtual Queue)",
    "capabilityCount": 4,
-   "unguardedOperations": 7,
+   "unguardedOperations": 8,
    "capabilities": [
     {
      "key": "QUEUE_MANAGE",
@@ -2542,7 +2543,7 @@
      "key": "RESOURCE_VIEW",
      "label": null,
      "group": "Guest engagement",
-     "operationCount": 19,
+     "operationCount": 20,
      "operations": [
       "getExperienceResourceRequirements",
       "getResource",
@@ -2759,7 +2760,7 @@
   },
   "shift": {
    "title": "2 — Ticketing Sales (cash handling)",
-   "capabilityCount": 10,
+   "capabilityCount": 12,
    "unguardedOperations": 0,
    "capabilities": [
     {
@@ -2781,6 +2782,17 @@
      "operations": [
       "createCashMovement",
       "withdrawFromDepositBox"
+     ],
+     "elevated": false,
+     "segregationConstrained": false
+    },
+    {
+     "key": "CASH_NO_SALE",
+     "label": "open the drawer without a sale. Reason required, counted per shift",
+     "group": "Shift and cash",
+     "operationCount": 1,
+     "operations": [
+      "recordNoSale"
      ],
      "elevated": false,
      "segregationConstrained": false
@@ -2816,6 +2828,17 @@
       "getShift",
       "listCashMovements",
       "listShifts"
+     ],
+     "elevated": false,
+     "segregationConstrained": false
+    },
+    {
+     "key": "SHIFT_APPROVE_CLOSE",
+     "label": "release a shift held in pendingClosure, where configured",
+     "group": "Shift and cash",
+     "operationCount": 1,
+     "operations": [
+      "approveShiftClose"
      ],
      "elevated": false,
      "segregationConstrained": false
@@ -2872,11 +2895,10 @@
     },
     {
      "key": "SHIFT_SUSPEND",
-     "label": null,
+     "label": "suspend a shift for a break; float intact, workstation released",
      "group": "Shift and cash",
-     "operationCount": 2,
+     "operationCount": 1,
      "operations": [
-      "recordNoSale",
       "suspendShift"
      ],
      "elevated": false,
@@ -3070,8 +3092,8 @@
    "unguardedOperations": 1,
    "capabilities": [
     {
-     "key": "AI_AUDIT_VIEW",
-     "label": null,
+     "key": "AUDIT_VIEW",
+     "label": "the platform audit log: who did what, where and when",
      "group": "Operations",
      "operationCount": 1,
      "operations": [
@@ -3111,14 +3133,14 @@
      "key": "DEVICE_VIEW",
      "label": null,
      "group": "Operations",
-     "operationCount": 7,
+     "operationCount": 8,
      "operations": [
+      "getDevice",
       "getDeviceTelemetry",
       "getWorkstationHealth",
       "listDeviceAuditRecords",
       "listDeviceFirmware",
-      "listDeviceTamperEvents",
-      "listDevices"
+      "listDeviceTamperEvents"
      ],
      "elevated": false,
      "segregationConstrained": false
@@ -3163,14 +3185,14 @@
      "key": "SCOPE_VIEW",
      "label": "read the hierarchy",
      "group": "Organisation",
-     "operationCount": 8,
+     "operationCount": 9,
      "operations": [
       "getOrgUnit",
+      "getOutlet",
       "getRegionSettings",
       "getWorkstation",
       "listCellEndpoints",
-      "listOrgUnits",
-      "listOutlets"
+      "listOrgUnits"
      ],
      "elevated": false,
      "segregationConstrained": false
@@ -3179,14 +3201,14 @@
      "key": "TENANT_CONFIGURE",
      "label": "edit branding, content, navigation, modules",
      "group": "Tenant experience",
-     "operationCount": 6,
+     "operationCount": 11,
      "operations": [
       "deployConfigurationProfile",
+      "getConfigurationProfile",
+      "getConnectivityPolicy",
+      "getOfflinePolicy",
       "getVenueSettings",
-      "setConfigurationProfile",
-      "setConnectivityThresholds",
-      "setOfflinePolicy",
-      "setVenueSettings"
+      "listConfigurationProfiles"
      ],
      "elevated": false,
      "segregationConstrained": false
@@ -3242,10 +3264,11 @@
      "key": "VENUE_MAP_VIEW",
      "label": null,
      "group": "Guest engagement",
-     "operationCount": 4,
+     "operationCount": 5,
      "operations": [
       "getVenueMap",
       "getVenueMapGraph",
+      "getVenueMapImportJob",
       "getVenueMapLive",
       "listVenueMaps"
      ],
@@ -3410,7 +3433,7 @@
  },
  "unlabelled": {
   "note": "Permission keys used by a contract with no description in contracts/shared/permissions.yaml. **A checklist item nobody can read gets ticked anyway**, so these are the blocker for shipping the grant screen -- not the contract, which is done. One line each, written next to the key in permissions.yaml.",
-  "count": 72,
+  "count": 70,
   "keys": {
    "ACCESS_POINT_CONFIGURE": [
     "addBlacklistEntry",
@@ -3427,11 +3450,6 @@
    "AI_APPROVE": [
     "decideProposedAction",
     "listProposedActions"
-   ],
-   "AI_AUDIT_VIEW": [
-    "getAiUsage",
-    "listAiInteractions",
-    "listAuditRecords"
    ],
    "AI_CONFIGURE": [
     "createKnowledgeCollection",
@@ -3516,10 +3534,10 @@
     "testReader"
    ],
    "DEVICE_VIEW": [
+    "getDevice",
     "getDeviceTelemetry",
     "getWorkstationHealth",
-    "listDeviceAuditRecords",
-    "listDeviceFirmware"
+    "listDeviceAuditRecords"
    ],
    "EVENT_CONFIGURE": [
     "assignSessionMedia",
@@ -3599,6 +3617,7 @@
     "voidOrder"
    ],
    "PARKING_CONFIGURE": [
+    "listParkingFacilities",
     "setParkingFacility"
    ],
    "PARTNER_MANAGE": [
@@ -3685,7 +3704,7 @@
     "analysePromotionConflicts",
     "evaluatePromotions",
     "getCouponCode",
-    "getDynamicPriceRule"
+    "getCouponCodeBatch"
    ],
    "PRODUCT_CONFIGURE": [
     "acknowledgePurchaseOrder",
@@ -3756,10 +3775,6 @@
     "listDenominations",
     "listDepositBoxes"
    ],
-   "SHIFT_SUSPEND": [
-    "recordNoSale",
-    "suspendShift"
-   ],
    "TAX_CONFIGURE": [
     "createTaxCode",
     "createTaxExemption",
@@ -3768,8 +3783,8 @@
    "VENUE_MAP_VIEW": [
     "getVenueMap",
     "getVenueMapGraph",
-    "getVenueMapLive",
-    "listVenueMaps"
+    "getVenueMapImportJob",
+    "getVenueMapLive"
    ],
    "WORKFORCE_MANAGE": [
     "amendAttendance",

@@ -117,15 +117,21 @@ def main() -> int:
         # `\n` meant the first block's match consumed the newline the second one needed to start,
         # so a pair was only ever half-removed — which is how the duplicates survived the first
         # attempt at this fix.
-        text = _re.sub(r"^ +x-ticvai-consumed-by:\n(?:[ ]+- [^\n]*\n)+", "", text, flags=_re.M)
+        # CRLF as well: on a CRLF contract the old blocks were never stripped, and a block written in
+        # the wrong place stayed there on every later run.
+        text = _re.sub(r"^ +x-ticvai-consumed-by:\r?\n(?:[ ]+- [^\n]*\n)+", "", text, flags=_re.M)
         n = 0
         for oid, screens in sorted(op_screens.items()):
-            marker = f"      operationId: {oid}\n"
-            if marker not in text:
+            # A whole line at the operation's own indent. A substring match also hit an OpenAPI
+            # response `links:` entry (`operationId: X` at a deeper indent) and wrote the block
+            # inside the link, which no longer parsed.
+            marker = _re.compile(rf"^      operationId: {_re.escape(oid)}\r?\n", _re.M)
+            hit = marker.search(text)
+            if not hit:
                 continue
             block = "      x-ticvai-consumed-by:\n" + "".join(
                 f"        - \"{s}\"\n" for s in sorted(set(screens)))
-            text = text.replace(marker, marker + block, 1)
+            text = text[:hit.end()] + block + text[hit.end():]
             n += 1
         total_ops = len(_re.findall(r"^      operationId: ", text, _re.M))
         consumed += n

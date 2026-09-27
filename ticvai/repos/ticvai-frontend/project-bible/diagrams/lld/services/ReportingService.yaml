@@ -1,5 +1,5 @@
 id: LLD-ReportingService
-title: ReportingService — 44 operations, 20 tables
+title: ReportingService — 44 operations, 22 tables
 generatedBy: tools/derive-diagrams.py
 tier: platform
 index: diagrams/hld/02-services.yaml
@@ -11,16 +11,16 @@ ifDown: Down stops dashboards. **Nothing operational depends on it.**
 coverage:
   operations: 44
   inAFlow: 18
-  percent: 62%
+  percent: 41%
   note: '**Flow coverage is how much of this service a journey has walked.** A service under 40% is
     unwalked rather than under-documented.'
 schemas:
 - schema: reporting
-  tables: 20
+  tables: 22
   stores:
   - derived
   - postgres
-  largestTable: reporting.report_definition
+  largestTable: reporting.alert
 operationsByContract:
 - contract: reporting
   count: 44
@@ -383,10 +383,46 @@ tables:
   columns: 5
   backing: redis
   owned: false
-  why: '**Not a table and not owned by a service.** Derived from something already read, invalidated
-    by an event already consumed, losable without consequence — no migration, no backup, no owner.'
+  why: '**Not a table and not owned by a service.** Derived from something already read, losable without
+    consequence — no migration, no backup, no owner.'
+  key: The idempotency key the caller sent
+  eviction:
+  - 'expires_at: **Must exceed the longest offline window.** A scanner out for a weekend replays on
+    Monday'
+  writtenBy:
+  - acknowledgeAlert
+  - askReportingQuestion
+  - cancelReportExecution
+  - createDashboard
+  - createReport
+  - createReportSchedule
+  - deleteReport
+  - deleteReportSchedule
+  - exportReportResult
+  - runReport
+  - saveNaturalLanguageQuery
+  - setAlertRule
+  - updateDashboard
+  - updateReport
+  - updateReportSchedule
+  readBy:
+  - acknowledgeAlert
+  - askReportingQuestion
+  - cancelReportExecution
+  - createDashboard
+  - createReport
+  - createReportSchedule
+  - deleteReport
+  - deleteReportSchedule
+  - exportReportResult
+  - runReport
+  - saveNaturalLanguageQuery
+  - setAlertRule
+  - updateDashboard
+  - updateReport
+  - updateReportSchedule
 - table: reporting.alert
-  columns: 12
+  columns: 18
   store: postgres
   parent: null
   writtenBy:
@@ -453,6 +489,12 @@ tables:
   writtenBy:
   - reporting
   foreignWriters: null
+- table: reporting.natural_language_query
+  columns: 8
+  store: postgres
+  parent: null
+  writtenBy: []
+  foreignWriters: null
 - table: reporting.pipeline
   columns: 13
   store: postgres
@@ -460,7 +502,7 @@ tables:
   writtenBy: []
   foreignWriters: null
 - table: reporting.report_column
-  columns: 9
+  columns: 8
   store: postgres
   parent: reporting.report_definition
   writtenBy:
@@ -473,6 +515,12 @@ tables:
   writtenBy:
   - reporting
   foreignWriters: null
+- table: reporting.report_definition_version
+  columns: 7
+  store: postgres
+  parent: null
+  writtenBy: []
+  foreignWriters: null
 - table: reporting.report_field
   columns: 2
   store: derived
@@ -480,7 +528,7 @@ tables:
   writtenBy: []
   foreignWriters: null
 - table: reporting.report_filter
-  columns: 8
+  columns: 7
   store: postgres
   parent: reporting.report_definition
   writtenBy:
@@ -501,9 +549,9 @@ tables:
   - reporting
   foreignWriters: null
 - table: reporting.schedule_recipient
-  columns: 4
+  columns: 5
   store: postgres
-  parent: null
+  parent: reporting.schedule
   writtenBy:
   - reporting
   foreignWriters: null
@@ -531,7 +579,18 @@ readsFrom:
 writesOutside:
 - service: AiService
   operations: 2
-  why: '**The owner defines the row; this service may only append to it.**'
+  rule: 'ADR-0028: the owner defines the row; a foreign writer may only append, through a path the owner
+    published.'
+  why: '**The lineage records these writes, not how they honour the rule.** It does not say whether
+    each inserts or updates, or which operation or event AiService published for it — check each against
+    ADR-0028.'
+  writes:
+  - operation: askReportingQuestion
+    tables:
+    - ai.activity
+  - operation: saveNaturalLanguageQuery
+    tables:
+    - ai.activity
 screens:
 - P04:POS-008 Reports
 - P04:POS-009 Staff Roster

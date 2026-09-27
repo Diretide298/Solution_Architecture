@@ -1604,6 +1604,7 @@
   "reads": [
    "cache:idempotency",
    "orders.order_line",
+   "orders.order_line_eligibility",
    "orders.payment",
    "orders.sales_order"
   ],
@@ -1636,6 +1637,7 @@
   "path": "/orders/{orderId}",
   "reads": [
    "orders.order_line",
+   "orders.order_line_eligibility",
    "orders.payment",
    "orders.sales_order"
   ],
@@ -1663,6 +1665,7 @@
   "reads": [
    "cache:idempotency",
    "orders.order_line",
+   "orders.order_line_eligibility",
    "orders.payment",
    "orders.sales_order"
   ],
@@ -1695,6 +1698,7 @@
   "reads": [
    "cache:idempotency",
    "orders.order_line",
+   "orders.order_line_eligibility",
    "orders.payment",
    "orders.sales_order"
   ],
@@ -1727,6 +1731,7 @@
   "reads": [
    "cache:idempotency",
    "orders.order_line",
+   "orders.order_line_eligibility",
    "orders.payment",
    "orders.sales_order"
   ],
@@ -1759,6 +1764,7 @@
   "reads": [
    "cache:idempotency",
    "orders.order_line",
+   "orders.order_line_eligibility",
    "orders.payment",
    "orders.sales_order"
   ],
@@ -1874,7 +1880,8 @@
   "path": "/refunds/bulk",
   "reads": [
    "cache:idempotency",
-   "orders.refund"
+   "orders.refund",
+   "orders.refund_batch"
   ],
   "writes": [
    "cache:idempotency",
@@ -1929,7 +1936,8 @@
   "path": "/venues/{venueId}/refund-policy",
   "reads": [
    "cache:resolution",
-   "orders.refund_policy"
+   "orders.refund_policy",
+   "orders.refund_policy_time_band"
   ],
   "writes": [
    "cache:resolution"
@@ -1955,12 +1963,14 @@
   "path": "/venues/{venueId}/refund-policy",
   "reads": [
    "cache:idempotency",
-   "orders.refund_policy"
+   "orders.refund_policy",
+   "orders.refund_policy_time_band"
   ],
   "writes": [
    "cache:idempotency",
    "cache:resolution",
-   "orders.refund_policy"
+   "orders.refund_policy",
+   "orders.refund_policy_time_band"
   ],
   "routing": "",
   "scope": "venue",
@@ -2107,6 +2117,7 @@
   "reads": [
    "cache:idempotency",
    "orders.order_line",
+   "orders.order_line_eligibility",
    "orders.payment",
    "orders.sales_order"
   ],
@@ -2184,6 +2195,7 @@
   "reads": [
    "cache:idempotency",
    "orders.order_line",
+   "orders.order_line_eligibility",
    "orders.payment",
    "orders.sales_order"
   ],
@@ -2243,6 +2255,7 @@
    "access.entitlement",
    "cache:idempotency",
    "orders.order_line",
+   "orders.order_line_eligibility",
    "orders.payment",
    "orders.sales_order"
   ],
@@ -2442,7 +2455,8 @@
   "verb": "GET",
   "path": "/reservations",
   "reads": [
-   "orders.reservation"
+   "orders.reservation",
+   "orders.reservation_line"
   ],
   "writes": [],
   "routing": "replica",
@@ -2466,11 +2480,13 @@
   "path": "/reservations",
   "reads": [
    "cache:idempotency",
-   "orders.reservation"
+   "orders.reservation",
+   "orders.reservation_line"
   ],
   "writes": [
    "cache:idempotency",
-   "orders.reservation"
+   "orders.reservation",
+   "orders.reservation_line"
   ],
   "routing": "",
   "scope": "venue",
@@ -2492,7 +2508,8 @@
   "verb": "GET",
   "path": "/reservations/{reservationId}",
   "reads": [
-   "orders.reservation"
+   "orders.reservation",
+   "orders.reservation_line"
   ],
   "writes": [],
   "routing": "primary",
@@ -2544,7 +2561,8 @@
   "path": "/reservations/{reservationId}/extend",
   "reads": [
    "cache:idempotency",
-   "orders.reservation"
+   "orders.reservation",
+   "orders.reservation_line"
   ],
   "writes": [
    "cache:idempotency",
@@ -3154,7 +3172,9 @@
   "verb": "GET",
   "path": "/shifts",
   "reads": [
-   "orders.pos_shift"
+   "orders.pos_shift",
+   "orders.pos_shift_approval",
+   "orders.pos_shift_incident"
   ],
   "writes": [],
   "routing": "primary",
@@ -3180,6 +3200,8 @@
    "identity.principal",
    "orders.cash_count_line",
    "orders.pos_shift",
+   "orders.pos_shift_approval",
+   "orders.pos_shift_incident",
    "platform.venue_settings",
    "platform.workstation"
   ],
@@ -3208,7 +3230,9 @@
   "verb": "GET",
   "path": "/shifts/current",
   "reads": [
-   "orders.pos_shift"
+   "orders.pos_shift",
+   "orders.pos_shift_approval",
+   "orders.pos_shift_incident"
   ],
   "writes": [],
   "routing": "primary",
@@ -3230,7 +3254,9 @@
   "verb": "GET",
   "path": "/shifts/{shiftId}",
   "reads": [
-   "orders.pos_shift"
+   "orders.pos_shift",
+   "orders.pos_shift_approval",
+   "orders.pos_shift_incident"
   ],
   "writes": [],
   "routing": "primary",
@@ -3253,7 +3279,9 @@
   "path": "/shifts/{shiftId}/approve-open",
   "reads": [
    "cache:idempotency",
-   "orders.pos_shift"
+   "orders.pos_shift",
+   "orders.pos_shift_approval",
+   "orders.pos_shift_incident"
   ],
   "writes": [
    "cache:idempotency",
@@ -3280,7 +3308,9 @@
   "path": "/shifts/{shiftId}/reopen",
   "reads": [
    "cache:idempotency",
-   "orders.pos_shift"
+   "orders.pos_shift",
+   "orders.pos_shift_approval",
+   "orders.pos_shift_incident"
   ],
   "writes": [
    "cache:idempotency",
@@ -3307,7 +3337,9 @@
   "path": "/shifts/{shiftId}/suspend",
   "reads": [
    "cache:idempotency",
-   "orders.pos_shift"
+   "orders.pos_shift",
+   "orders.pos_shift_approval",
+   "orders.pos_shift_incident"
   ],
   "writes": [
    "cache:idempotency",
@@ -3334,7 +3366,9 @@
   "path": "/shifts/{shiftId}/resume",
   "reads": [
    "cache:idempotency",
-   "orders.pos_shift"
+   "orders.pos_shift",
+   "orders.pos_shift_approval",
+   "orders.pos_shift_incident"
   ],
   "writes": [
    "cache:idempotency",
@@ -3366,6 +3400,8 @@
    "orders.cash_movement",
    "orders.payment",
    "orders.pos_shift",
+   "orders.pos_shift_approval",
+   "orders.pos_shift_incident",
    "platform.venue_settings"
   ],
   "writes": [
@@ -3396,7 +3432,9 @@
   "path": "/shifts/{shiftId}/accept-variance",
   "reads": [
    "cache:idempotency",
-   "orders.pos_shift"
+   "orders.pos_shift",
+   "orders.pos_shift_approval",
+   "orders.pos_shift_incident"
   ],
   "writes": [
    "cache:idempotency",
@@ -5401,7 +5439,8 @@
   ],
   "writes": [
    "cache:idempotency",
-   "ledger.journal_entry"
+   "ledger.journal_entry",
+   "ledger.journal_line"
   ],
   "routing": "",
   "scope": "region",
@@ -5476,7 +5515,8 @@
   "path": "/journal-entries/{entryId}/reject",
   "reads": [
    "cache:idempotency",
-   "ledger.journal_entry"
+   "ledger.journal_entry",
+   "ledger.journal_line"
   ],
   "writes": [
    "cache:idempotency",
@@ -5928,7 +5968,8 @@
   "verb": "GET",
   "path": "/fiscal-periods",
   "reads": [
-   "ledger.fiscal_period"
+   "ledger.fiscal_period",
+   "ledger.fiscal_period_event"
   ],
   "writes": [],
   "routing": "replica",
@@ -5951,7 +5992,8 @@
   "path": "/fiscal-periods/{periodId}/begin-close",
   "reads": [
    "cache:idempotency",
-   "ledger.fiscal_period"
+   "ledger.fiscal_period",
+   "ledger.fiscal_period_event"
   ],
   "writes": [
    "cache:idempotency",
@@ -5978,7 +6020,8 @@
   "path": "/fiscal-periods/{periodId}/abandon-close",
   "reads": [
    "cache:idempotency",
-   "ledger.fiscal_period"
+   "ledger.fiscal_period",
+   "ledger.fiscal_period_event"
   ],
   "writes": [
    "cache:idempotency",
@@ -6005,7 +6048,8 @@
   "path": "/fiscal-periods/{periodId}/reopen",
   "reads": [
    "cache:idempotency",
-   "ledger.fiscal_period"
+   "ledger.fiscal_period",
+   "ledger.fiscal_period_event"
   ],
   "writes": [
    "cache:idempotency",
@@ -6242,7 +6286,8 @@
   "verb": "GET",
   "path": "/guests/{subjectId}/consents/history",
   "reads": [
-   "marketing.consent_record"
+   "marketing.consent_record",
+   "marketing.consent_record_channel"
   ],
   "writes": [],
   "routing": "analytical",
@@ -6265,7 +6310,8 @@
   "path": "/consent-purposes",
   "reads": [
    "cache:resolution",
-   "marketing.consent_purpose"
+   "marketing.consent_purpose",
+   "marketing.consent_purpose_channel"
   ],
   "writes": [
    "cache:resolution"
@@ -6292,12 +6338,14 @@
   "path": "/consent-purposes",
   "reads": [
    "cache:idempotency",
-   "marketing.consent_purpose"
+   "marketing.consent_purpose",
+   "marketing.consent_purpose_channel"
   ],
   "writes": [
    "cache:idempotency",
    "cache:resolution",
-   "marketing.consent_purpose"
+   "marketing.consent_purpose",
+   "marketing.consent_purpose_channel"
   ],
   "routing": "",
   "scope": "tenant",
@@ -6780,7 +6828,8 @@
   "path": "/campaigns/{campaignId}/pause",
   "reads": [
    "cache:idempotency",
-   "marketing.campaign"
+   "marketing.campaign",
+   "marketing.segment_criterion"
   ],
   "writes": [
    "cache:idempotency",
@@ -6807,7 +6856,8 @@
   "path": "/campaigns/{campaignId}/unschedule",
   "reads": [
    "cache:idempotency",
-   "marketing.campaign"
+   "marketing.campaign",
+   "marketing.segment_criterion"
   ],
   "writes": [
    "cache:idempotency",
@@ -7176,7 +7226,8 @@
   "path": "/loyalty/programmes",
   "reads": [
    "marketing.loyalty_programme",
-   "marketing.points_earning_rule"
+   "marketing.points_earning_rule",
+   "marketing.programme_tier"
   ],
   "writes": [],
   "routing": "replica",
@@ -7201,12 +7252,14 @@
   "reads": [
    "cache:idempotency",
    "marketing.loyalty_programme",
-   "marketing.points_earning_rule"
+   "marketing.points_earning_rule",
+   "marketing.programme_tier"
   ],
   "writes": [
    "cache:idempotency",
    "marketing.loyalty_programme",
-   "marketing.points_earning_rule"
+   "marketing.points_earning_rule",
+   "marketing.programme_tier"
   ],
   "routing": "",
   "scope": "tenant",
@@ -7539,7 +7592,9 @@
   "verb": "GET",
   "path": "/plans",
   "reads": [
-   "subscription.plan"
+   "subscription.plan",
+   "subscription.plan_limit",
+   "subscription.plan_module"
   ],
   "writes": [],
   "routing": "replica",
@@ -7562,11 +7617,14 @@
   "path": "/plans",
   "reads": [
    "cache:idempotency",
-   "subscription.plan"
+   "subscription.plan",
+   "subscription.plan_limit",
+   "subscription.plan_module"
   ],
   "writes": [
    "cache:idempotency",
-   "subscription.plan"
+   "subscription.plan",
+   "subscription.plan_limit"
   ],
   "routing": "",
   "scope": "tenant",
@@ -7588,7 +7646,9 @@
   "verb": "GET",
   "path": "/plans/{planId}",
   "reads": [
-   "subscription.plan"
+   "subscription.plan",
+   "subscription.plan_limit",
+   "subscription.plan_module"
   ],
   "writes": [],
   "routing": "replica",
@@ -7611,11 +7671,14 @@
   "path": "/plans/{planId}",
   "reads": [
    "cache:idempotency",
-   "subscription.plan"
+   "subscription.plan",
+   "subscription.plan_limit",
+   "subscription.plan_module"
   ],
   "writes": [
    "cache:idempotency",
-   "subscription.plan"
+   "subscription.plan",
+   "subscription.plan_limit"
   ],
   "routing": "",
   "scope": "tenant",
@@ -7744,7 +7807,8 @@
   ],
   "writes": [
    "cache:idempotency",
-   "control.licence_add_on"
+   "control.licence_add_on",
+   "control.licence_add_on_limit"
   ],
   "routing": "",
   "scope": "tenant",
@@ -8883,7 +8947,8 @@
   ],
   "writes": [
    "cache:idempotency",
-   "fnb.service_order"
+   "fnb.service_order",
+   "fnb.service_order_line"
   ],
   "routing": "",
   "scope": "workstation",
@@ -10510,7 +10575,8 @@
   ],
   "writes": [
    "cache:idempotency",
-   "inventory.count"
+   "inventory.count",
+   "inventory.count_line"
   ],
   "routing": "",
   "scope": "venue",
@@ -10555,7 +10621,8 @@
   "path": "/stock-counts/{countId}/cancel",
   "reads": [
    "cache:idempotency",
-   "inventory.count"
+   "inventory.count",
+   "inventory.count_line"
   ],
   "writes": [
    "cache:idempotency",
@@ -10582,7 +10649,8 @@
   "path": "/stock-counts/{countId}/recount",
   "reads": [
    "cache:idempotency",
-   "inventory.count"
+   "inventory.count",
+   "inventory.count_line"
   ],
   "writes": [
    "cache:idempotency",
@@ -10667,7 +10735,8 @@
   ],
   "writes": [
    "cache:idempotency",
-   "inventory.transfer"
+   "inventory.transfer",
+   "inventory.transfer_line"
   ],
   "routing": "",
   "scope": "venue",
@@ -10690,7 +10759,8 @@
   "path": "/stock-transfers/{transferId}/close-short",
   "reads": [
    "cache:idempotency",
-   "inventory.transfer"
+   "inventory.transfer",
+   "inventory.transfer_line"
   ],
   "writes": [
    "cache:idempotency",
@@ -10722,7 +10792,8 @@
   ],
   "writes": [
    "cache:idempotency",
-   "inventory.transfer"
+   "inventory.transfer",
+   "inventory.transfer_line"
   ],
   "routing": "",
   "scope": "venue",
@@ -10773,7 +10844,8 @@
   ],
   "writes": [
    "cache:idempotency",
-   "inventory.requisition"
+   "inventory.requisition",
+   "inventory.requisition_line"
   ],
   "routing": "",
   "scope": "venue",
@@ -10818,7 +10890,8 @@
   "path": "/requisitions/{requisitionId}/reject",
   "reads": [
    "cache:idempotency",
-   "inventory.requisition"
+   "inventory.requisition",
+   "inventory.requisition_line"
   ],
   "writes": [
    "cache:idempotency",
@@ -10845,7 +10918,8 @@
   "path": "/requisitions/{requisitionId}/return",
   "reads": [
    "cache:idempotency",
-   "inventory.requisition"
+   "inventory.requisition",
+   "inventory.requisition_line"
   ],
   "writes": [
    "cache:idempotency",
@@ -10872,7 +10946,8 @@
   "path": "/requisitions/{requisitionId}/cancel",
   "reads": [
    "cache:idempotency",
-   "inventory.requisition"
+   "inventory.requisition",
+   "inventory.requisition_line"
   ],
   "writes": [
    "cache:idempotency",
@@ -10981,7 +11056,8 @@
   ],
   "writes": [
    "cache:idempotency",
-   "inventory.quotation"
+   "inventory.quotation",
+   "inventory.quotation_line"
   ],
   "routing": "",
   "scope": "venue",
@@ -11056,7 +11132,8 @@
   ],
   "writes": [
    "cache:idempotency",
-   "inventory.purchase_order"
+   "inventory.purchase_order",
+   "inventory.purchase_order_line"
   ],
   "routing": "",
   "scope": "venue",
@@ -11102,7 +11179,8 @@
   "path": "/purchase-orders/{purchaseOrderId}/send",
   "reads": [
    "cache:idempotency",
-   "inventory.purchase_order"
+   "inventory.purchase_order",
+   "inventory.purchase_order_line"
   ],
   "writes": [
    "cache:idempotency",
@@ -11129,7 +11207,8 @@
   "path": "/purchase-orders/{purchaseOrderId}/acknowledge",
   "reads": [
    "cache:idempotency",
-   "inventory.purchase_order"
+   "inventory.purchase_order",
+   "inventory.purchase_order_line"
   ],
   "writes": [
    "cache:idempotency",
@@ -11156,7 +11235,8 @@
   "path": "/purchase-orders/{purchaseOrderId}/close-short",
   "reads": [
    "cache:idempotency",
-   "inventory.purchase_order"
+   "inventory.purchase_order",
+   "inventory.purchase_order_line"
   ],
   "writes": [
    "cache:idempotency",
@@ -11240,6 +11320,7 @@
   "writes": [
    "cache:idempotency",
    "inventory.goods_receipt",
+   "inventory.goods_receipt_line",
    "platform.outbox"
   ],
   "routing": "",
@@ -11268,7 +11349,8 @@
   ],
   "writes": [
    "cache:idempotency",
-   "inventory.goods_receipt"
+   "inventory.goods_receipt",
+   "inventory.goods_receipt_line"
   ],
   "routing": "",
   "scope": "venue",
@@ -11419,7 +11501,8 @@
   ],
   "writes": [
    "cache:idempotency",
-   "retail.sale"
+   "retail.sale",
+   "retail.sale_line"
   ],
   "routing": "",
   "scope": "workstation",
@@ -11543,7 +11626,8 @@
   ],
   "writes": [
    "cache:idempotency",
-   "retail.return"
+   "retail.return",
+   "retail.return_line"
   ],
   "routing": "",
   "scope": "venue",
@@ -11646,6 +11730,7 @@
   "verb": "GET",
   "path": "/wallets/{subjectId}",
   "reads": [
+   "wallet.credit_lot",
    "wallet.wallet"
   ],
   "writes": [],
@@ -11670,6 +11755,7 @@
   "path": "/wallets/{subjectId}/top-ups",
   "reads": [
    "cache:idempotency",
+   "wallet.credit_lot",
    "wallet.wallet"
   ],
   "writes": [
@@ -11720,6 +11806,7 @@
   "path": "/wallets/{subjectId}/adjust",
   "reads": [
    "cache:idempotency",
+   "wallet.credit_lot",
    "wallet.wallet"
   ],
   "writes": [
@@ -11931,7 +12018,8 @@
   ],
   "writes": [
    "cache:idempotency",
-   "retail.reservation"
+   "retail.reservation",
+   "retail.reservation_line"
   ],
   "routing": "",
   "scope": "venue",
@@ -11981,7 +12069,8 @@
   ],
   "writes": [
    "cache:idempotency",
-   "maintenance.asset"
+   "maintenance.asset",
+   "maintenance.asset_document"
   ],
   "routing": "",
   "scope": "venue",
@@ -12004,6 +12093,7 @@
   "path": "/assets/{assetId}",
   "reads": [
    "maintenance.asset",
+   "maintenance.asset_document",
    "maintenance.preventive_plan",
    "maintenance.work_order"
   ],
@@ -12032,7 +12122,8 @@
   ],
   "writes": [
    "cache:idempotency",
-   "maintenance.asset"
+   "maintenance.asset",
+   "maintenance.asset_document"
   ],
   "routing": "",
   "scope": "venue",
@@ -12055,6 +12146,7 @@
   "path": "/assets/lookup",
   "reads": [
    "maintenance.asset",
+   "maintenance.asset_document",
    "maintenance.preventive_plan",
    "maintenance.work_order"
   ],
@@ -12613,7 +12705,9 @@
   "verb": "GET",
   "path": "/incidents/{incidentId}",
   "reads": [
-   "maintenance.incident"
+   "maintenance.incident",
+   "maintenance.incident_authority_notification",
+   "maintenance.incident_involved_party"
   ],
   "writes": [],
   "routing": "replica",
@@ -12735,6 +12829,7 @@
   "path": "/media/{mediaId}",
   "reads": [
    "assets.media_asset",
+   "assets.media_usage",
    "cache:idempotency"
   ],
   "writes": [
@@ -14695,6 +14790,7 @@
    "promotions.allocation_component",
    "promotions.bundle",
    "promotions.bundle_choice_group",
+   "promotions.bundle_choice_option",
    "promotions.bundle_component"
   ],
   "writes": [],
@@ -14721,6 +14817,7 @@
    "promotions.allocation_component",
    "promotions.bundle",
    "promotions.bundle_choice_group",
+   "promotions.bundle_choice_option",
    "promotions.bundle_component"
   ],
   "writes": [
@@ -14728,6 +14825,7 @@
    "promotions.allocation_component",
    "promotions.bundle",
    "promotions.bundle_choice_group",
+   "promotions.bundle_choice_option",
    "promotions.bundle_component"
   ],
   "routing": "",
@@ -14753,6 +14851,7 @@
    "promotions.allocation_component",
    "promotions.bundle",
    "promotions.bundle_choice_group",
+   "promotions.bundle_choice_option",
    "promotions.bundle_component"
   ],
   "writes": [],
@@ -14780,6 +14879,7 @@
    "promotions.allocation_component",
    "promotions.bundle",
    "promotions.bundle_choice_group",
+   "promotions.bundle_choice_option",
    "promotions.bundle_component"
   ],
   "writes": [
@@ -15488,7 +15588,8 @@
   "verb": "GET",
   "path": "/queues",
   "reads": [
-   "queue.queue"
+   "queue.queue",
+   "queue.queue_operating_window"
   ],
   "writes": [],
   "routing": "replica",
@@ -15512,11 +15613,13 @@
   "path": "/queues",
   "reads": [
    "cache:idempotency",
-   "queue.queue"
+   "queue.queue",
+   "queue.queue_operating_window"
   ],
   "writes": [
    "cache:idempotency",
-   "queue.queue"
+   "queue.queue",
+   "queue.queue_operating_window"
   ],
   "routing": "",
   "scope": "venue",
@@ -15538,7 +15641,8 @@
   "verb": "GET",
   "path": "/queues/{queueId}",
   "reads": [
-   "queue.queue"
+   "queue.queue",
+   "queue.queue_operating_window"
   ],
   "writes": [],
   "routing": "replica",
@@ -15561,7 +15665,8 @@
   "path": "/queues/{queueId}",
   "reads": [
    "cache:idempotency",
-   "queue.queue"
+   "queue.queue",
+   "queue.queue_operating_window"
   ],
   "writes": [
    "cache:idempotency",
@@ -15588,7 +15693,8 @@
   "path": "/queues/{queueId}/status",
   "reads": [
    "cache:idempotency",
-   "queue.queue"
+   "queue.queue",
+   "queue.queue_operating_window"
   ],
   "writes": [
    "cache:idempotency",
@@ -16067,6 +16173,7 @@
   "reads": [
    "cache:idempotency",
    "games.card",
+   "wallet.credit_lot",
    "wallet.wallet"
   ],
   "writes": [
@@ -16306,7 +16413,8 @@
   ],
   "writes": [
    "cache:idempotency",
-   "games.redemption"
+   "games.redemption",
+   "games.redemption_line"
   ],
   "routing": "",
   "scope": "workstation",
@@ -16330,6 +16438,7 @@
   "reads": [
    "cache:idempotency",
    "games.card",
+   "wallet.credit_lot",
    "wallet.wallet"
   ],
   "writes": [
@@ -16358,6 +16467,8 @@
   "reads": [
    "cache:resolution",
    "control.footer_config",
+   "control.footer_config_column",
+   "control.footer_config_social_link",
    "whitelabel.feature_toggle",
    "whitelabel.homepage_section",
    "whitelabel.module_enablement",
@@ -17430,6 +17541,8 @@
   "reads": [
    "cache:idempotency",
    "control.footer_config",
+   "control.footer_config_column",
+   "control.footer_config_social_link",
    "whitelabel.feature_toggle",
    "whitelabel.homepage_section",
    "whitelabel.module_enablement",
@@ -18729,6 +18842,7 @@
    "orders.cart",
    "orders.cart_line",
    "orders.order_line",
+   "orders.order_line_eligibility",
    "orders.payment",
    "orders.sales_order"
   ],
@@ -19596,6 +19710,7 @@
   "path": "/wallets/{walletId}/suspend",
   "reads": [
    "cache:idempotency",
+   "wallet.credit_lot",
    "wallet.wallet"
   ],
   "writes": [
@@ -19623,6 +19738,7 @@
   "path": "/wallets/{walletId}/reinstate",
   "reads": [
    "cache:idempotency",
+   "wallet.credit_lot",
    "wallet.wallet"
   ],
   "writes": [
@@ -19650,6 +19766,7 @@
   "path": "/wallets/{walletId}/close",
   "reads": [
    "cache:idempotency",
+   "wallet.credit_lot",
    "wallet.wallet",
    "wallet.wallet_transaction"
   ],
@@ -19813,7 +19930,9 @@
   "path": "/deposit-boxes",
   "reads": [
    "identity.principal",
-   "orders.deposit_box"
+   "orders.deposit_box",
+   "orders.deposit_box_foreign_holding",
+   "orders.deposit_box_opening_denomination"
   ],
   "writes": [],
   "routing": "primary",
@@ -19838,12 +19957,16 @@
    "cache:idempotency",
    "identity.principal",
    "orders.deposit_box",
+   "orders.deposit_box_foreign_holding",
+   "orders.deposit_box_opening_denomination",
    "platform.workstation"
   ],
   "writes": [
    "cache:idempotency",
    "orders.cash_movement",
-   "orders.deposit_box"
+   "orders.deposit_box",
+   "orders.deposit_box_foreign_holding",
+   "orders.deposit_box_opening_denomination"
   ],
   "routing": "",
   "scope": "venue",
@@ -19866,7 +19989,9 @@
   "path": "/deposit-boxes/{boxId}/adjust-float",
   "reads": [
    "cache:idempotency",
-   "orders.deposit_box"
+   "orders.deposit_box",
+   "orders.deposit_box_foreign_holding",
+   "orders.deposit_box_opening_denomination"
   ],
   "writes": [
    "cache:idempotency",
@@ -19894,7 +20019,9 @@
   "path": "/deposit-boxes/{boxId}/withdraw",
   "reads": [
    "cache:idempotency",
-   "orders.deposit_box"
+   "orders.deposit_box",
+   "orders.deposit_box_foreign_holding",
+   "orders.deposit_box_opening_denomination"
   ],
   "writes": [
    "cache:idempotency",
@@ -19924,7 +20051,9 @@
    "cache:idempotency",
    "ledger.fx_rate",
    "orders.cash_count_line",
-   "orders.deposit_box"
+   "orders.deposit_box",
+   "orders.deposit_box_foreign_holding",
+   "orders.deposit_box_opening_denomination"
   ],
   "writes": [
    "cache:idempotency",
@@ -20040,7 +20169,8 @@
   "reads": [
    "identity.principal",
    "marketing.conversation",
-   "marketing.conversation_message"
+   "marketing.conversation_message",
+   "marketing.conversation_message_attachment"
   ],
   "writes": [],
   "routing": "primary",
@@ -20064,6 +20194,7 @@
   "reads": [
    "marketing.conversation",
    "marketing.conversation_message",
+   "marketing.conversation_message_attachment",
    "pii.subject"
   ],
   "writes": [],
@@ -20088,12 +20219,14 @@
   "reads": [
    "cache:idempotency",
    "marketing.conversation",
-   "marketing.conversation_message"
+   "marketing.conversation_message",
+   "marketing.conversation_message_attachment"
   ],
   "writes": [
    "cache:idempotency",
    "marketing.conversation",
-   "marketing.conversation_message"
+   "marketing.conversation_message",
+   "marketing.conversation_message_attachment"
   ],
   "routing": "",
   "scope": "tenant",
@@ -20119,7 +20252,8 @@
    "cache:idempotency",
    "marketing.agent_availability",
    "marketing.conversation",
-   "marketing.conversation_message"
+   "marketing.conversation_message",
+   "marketing.conversation_message_attachment"
   ],
   "writes": [
    "cache:idempotency",
@@ -20149,7 +20283,8 @@
    "cache:idempotency",
    "marketing.agent_availability",
    "marketing.conversation",
-   "marketing.conversation_message"
+   "marketing.conversation_message",
+   "marketing.conversation_message_attachment"
   ],
   "writes": [
    "cache:idempotency",
@@ -20178,7 +20313,8 @@
    "cache:idempotency",
    "identity.principal",
    "marketing.conversation",
-   "marketing.conversation_message"
+   "marketing.conversation_message",
+   "marketing.conversation_message_attachment"
   ],
   "writes": [
    "cache:idempotency",
@@ -20206,7 +20342,8 @@
   "reads": [
    "cache:idempotency",
    "marketing.conversation",
-   "marketing.conversation_message"
+   "marketing.conversation_message",
+   "marketing.conversation_message_attachment"
   ],
   "writes": [
    "cache:idempotency",
@@ -20234,7 +20371,8 @@
   "path": "/agent-availability",
   "reads": [
    "cache:idempotency",
-   "identity.principal"
+   "identity.principal",
+   "marketing.agent_availability"
   ],
   "writes": [
    "cache:idempotency",
@@ -21005,7 +21143,8 @@
   "verb": "GET",
   "path": "/journeys",
   "reads": [
-   "marketing.journey"
+   "marketing.journey",
+   "marketing.journey_step"
   ],
   "writes": [],
   "routing": "replica",
@@ -21029,11 +21168,13 @@
   "reads": [
    "cache:idempotency",
    "marketing.journey",
+   "marketing.journey_step",
    "marketing.message_template"
   ],
   "writes": [
    "cache:idempotency",
-   "marketing.journey"
+   "marketing.journey",
+   "marketing.journey_step"
   ],
   "routing": "",
   "scope": "venue",
@@ -21056,7 +21197,8 @@
   "path": "/journeys/{journeyId}/activate",
   "reads": [
    "cache:idempotency",
-   "marketing.journey"
+   "marketing.journey",
+   "marketing.journey_step"
   ],
   "writes": [
    "cache:idempotency",
@@ -22007,8 +22149,9 @@
   "path": "/payment-links",
   "reads": [
    "cache:idempotency",
-   "payments.provider",
-   "orders.sales_order"
+   "orders.payment_link",
+   "orders.sales_order",
+   "payments.provider"
   ],
   "writes": [
    "cache:idempotency",
@@ -22583,6 +22726,8 @@
   "path": "/table-visits/{visitId}/transfer",
   "reads": [
    "cache:idempotency",
+   "fnb.service_order",
+   "fnb.service_order_line",
    "fnb.table_visit",
    "identity.principal"
   ],
@@ -22643,7 +22788,9 @@
   "reads": [
    "cache:idempotency",
    "control.partner_agreement",
-   "ledger.account"
+   "ledger.account",
+   "ledger.journal_entry",
+   "ledger.journal_line"
   ],
   "writes": [
    "cache:idempotency",
@@ -23174,11 +23321,13 @@
   "reads": [
    "cache:idempotency",
    "catalogue.product",
-   "marketing.form_definition"
+   "marketing.form_definition",
+   "marketing.form_definition_field"
   ],
   "writes": [
    "cache:idempotency",
-   "marketing.form_definition"
+   "marketing.form_definition",
+   "marketing.form_definition_field"
   ],
   "routing": "",
   "scope": "venue",
@@ -23463,11 +23612,13 @@
   "path": "/promotions/{promotionId}/variants",
   "reads": [
    "cache:idempotency",
-   "promotions.promotion"
+   "promotions.promotion",
+   "promotions.promotion_variant"
   ],
   "writes": [
    "cache:idempotency",
-   "promotions.promotion"
+   "promotions.promotion",
+   "promotions.promotion_variant"
   ],
   "routing": "",
   "scope": "venue",
@@ -24193,12 +24344,16 @@
   "path": "/footer",
   "reads": [
    "cache:idempotency",
-   "control.footer_config"
+   "control.footer_config",
+   "control.footer_config_column",
+   "control.footer_config_social_link"
   ],
   "writes": [
    "cache:idempotency",
    "cache:resolution",
-   "control.footer_config"
+   "control.footer_config",
+   "control.footer_config_column",
+   "control.footer_config_social_link"
   ],
   "routing": "",
   "scope": "tenant",
@@ -24222,7 +24377,8 @@
   "reads": [
    "cache:idempotency",
    "pii.subject",
-   "wallet.wallet"
+   "wallet.wallet",
+   "wallet.wallet_transaction"
   ],
   "writes": [
    "cache:idempotency",
@@ -24253,6 +24409,9 @@
   "reads": [
    "cache:idempotency",
    "catalogue.product",
+   "orders.order_line",
+   "orders.order_line_eligibility",
+   "orders.payment",
    "orders.sales_order"
   ],
   "writes": [
@@ -24641,6 +24800,7 @@
   "path": "/payment-links/{token}",
   "reads": [
    "orders.order_line",
+   "orders.order_line_eligibility",
    "orders.payment_link",
    "orders.reservation",
    "orders.sales_order",
@@ -25363,11 +25523,13 @@
   "verb": "PUT",
   "path": "/outlets/{outletId}/course-rules",
   "reads": [
-   "cache:idempotency"
+   "cache:idempotency",
+   "fnb.course_rule"
   ],
   "writes": [
    "cache:idempotency",
-   "cache:resolution"
+   "cache:resolution",
+   "fnb.course_rule"
   ],
   "routing": "",
   "scope": "venue",
@@ -25496,7 +25658,9 @@
   "reads": [
    "cache:idempotency",
    "fnb.menu",
-   "fnb.menu_section"
+   "fnb.menu_item",
+   "fnb.menu_section",
+   "fnb.menu_version"
   ],
   "writes": [
    "cache:idempotency",
@@ -25525,7 +25689,10 @@
   "path": "/menus/{menuId}/rollback",
   "reads": [
    "cache:idempotency",
-   "fnb.menu"
+   "fnb.menu",
+   "fnb.menu_item",
+   "fnb.menu_section",
+   "fnb.menu_version"
   ],
   "writes": [
    "cache:idempotency",
@@ -25581,12 +25748,14 @@
   "path": "/outlets/{outletId}/table-combinations",
   "reads": [
    "cache:idempotency",
-   "fnb.dining_table"
+   "fnb.dining_table",
+   "fnb.table_combination"
   ],
   "writes": [
    "cache:idempotency",
    "cache:resolution",
-   "fnb.dining_table"
+   "fnb.dining_table",
+   "fnb.table_combination"
   ],
   "routing": "",
   "scope": "venue",
@@ -25753,6 +25922,7 @@
   "path": "/kitchen-exceptions",
   "reads": [
    "cache:idempotency",
+   "fnb.kitchen_exception",
    "fnb.kitchen_station"
   ],
   "writes": [
@@ -25828,8 +25998,9 @@
   "path": "/orders/{orderId}/collected",
   "reads": [
    "cache:idempotency",
+   "fnb.kitchen_ticket",
    "fnb.service_order",
-   "fnb.kitchen_ticket"
+   "fnb.service_order_line"
   ],
   "writes": [
    "cache:idempotency",
@@ -26089,6 +26260,7 @@
   "path": "/guests/{subjectId}/notes",
   "reads": [
    "cache:idempotency",
+   "marketing.guest_note",
    "marketing.guest_profile"
   ],
   "writes": [
@@ -26115,10 +26287,12 @@
   "path": "/guests/{subjectId}/preferences",
   "reads": [
    "cache:idempotency",
+   "marketing.guest_preference",
    "marketing.guest_profile"
   ],
   "writes": [
    "cache:idempotency",
+   "marketing.guest_preference",
    "marketing.guest_profile"
   ],
   "routing": "",
@@ -26201,7 +26375,8 @@
   "path": "/menus/{menuId}/schedule",
   "reads": [
    "cache:idempotency",
-   "fnb.menu"
+   "fnb.menu",
+   "fnb.menu_schedule"
   ],
   "writes": [
    "cache:idempotency",
@@ -26311,11 +26486,13 @@
   "reads": [
    "cache:idempotency",
    "inventory.item",
-   "inventory.requisition"
+   "inventory.requisition",
+   "inventory.requisition_line"
   ],
   "writes": [
    "cache:idempotency",
-   "inventory.requisition"
+   "inventory.requisition",
+   "inventory.requisition_line"
   ],
   "routing": "",
   "scope": "venue",
@@ -26554,11 +26731,13 @@
    "cache:idempotency",
    "fnb.menu_item",
    "fnb.production_plan",
+   "fnb.production_plan_line",
    "fnb.recipe"
   ],
   "writes": [
    "cache:idempotency",
-   "fnb.production_plan"
+   "fnb.production_plan",
+   "fnb.production_plan_line"
   ],
   "routing": "",
   "scope": "venue",
@@ -26582,7 +26761,8 @@
   "path": "/production-plans/{planId}/release",
   "reads": [
    "cache:idempotency",
-   "fnb.production_plan"
+   "fnb.production_plan",
+   "fnb.production_plan_line"
   ],
   "writes": [
    "cache:idempotency",
@@ -26698,7 +26878,9 @@
   "path": "/stock-transfers/{transferId}",
   "reads": [
    "fnb.cold_chain_event",
-   "inventory.item"
+   "inventory.item",
+   "inventory.transfer",
+   "inventory.transfer_line"
   ],
   "writes": [],
   "routing": "replica",
@@ -26773,7 +26955,8 @@
   "path": "/my/cases/{caseId}/messages",
   "reads": [
    "cache:idempotency",
-   "marketing.case"
+   "marketing.case",
+   "marketing.case_message"
   ],
   "writes": [
    "cache:idempotency",
@@ -26878,6 +27061,7 @@
   "path": "/my/orders",
   "reads": [
    "orders.order_line",
+   "orders.order_line_eligibility",
    "orders.payment",
    "orders.sales_order",
    "pii.subject"
@@ -27137,10 +27321,12 @@
   "verb": "PUT",
   "path": "/fx-rates/providers",
   "reads": [
+   "ledger.fx_provider_assignment",
    "platform.region_settings"
   ],
   "writes": [
    "cache:idempotency",
+   "ledger.fx_provider_assignment",
    "platform.region_settings"
   ],
   "routing": "",
@@ -40195,7 +40381,9 @@
   "verb": "POST",
   "path": "/resource-allocations",
   "reads": [
-   "resources.booking"
+   "resources.booking",
+   "resources.resource_dependency",
+   "resources.resource_requirement"
   ],
   "writes": [
    "resources.resource_requirement"
@@ -50873,7 +51061,8 @@
   "path": "/ticket-templates",
   "reads": [
    "cache:idempotency",
-   "orders.ticket_template"
+   "orders.ticket_template",
+   "orders.ticket_template_channel"
   ],
   "writes": [
    "cache:idempotency",
@@ -50899,7 +51088,8 @@
   "verb": "GET",
   "path": "/ticket-templates",
   "reads": [
-   "orders.ticket_template"
+   "orders.ticket_template",
+   "orders.ticket_template_channel"
   ],
   "writes": [],
   "routing": "replica",
@@ -51007,7 +51197,8 @@
   "path": "/ticket-templates/{templateId}",
   "reads": [
    "cache:idempotency",
-   "orders.ticket_template"
+   "orders.ticket_template",
+   "orders.ticket_template_channel"
   ],
   "writes": [
    "cache:idempotency",
@@ -51603,6 +51794,523 @@
    "staff"
   ],
   "service": "CatalogueService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "approveShiftClose": {
+  "contract": "shift",
+  "verb": "POST",
+  "path": "/shifts/{shiftId}/approve-close",
+  "reads": [
+   "orders.pos_shift",
+   "orders.pos_shift_approval",
+   "orders.pos_shift_incident"
+  ],
+  "writes": [],
+  "routing": null,
+  "scope": "venue",
+  "perm": "SHIFT_APPROVE_CLOSE",
+  "offline": false,
+  "summary": "Release a shift held for close approval",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "OrderService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "getCatalogueImportJob": {
+  "contract": "catalogue",
+  "verb": "GET",
+  "path": "/products/import/{jobId}",
+  "reads": [
+   "catalogue.import_job"
+  ],
+  "writes": [],
+  "routing": "primary",
+  "scope": "venue",
+  "perm": "PRODUCT_VIEW",
+  "offline": false,
+  "summary": "Progress and findings of a catalogue import",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "CatalogueService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "getConfigurationProfile": {
+  "contract": "tenancy",
+  "verb": "GET",
+  "path": "/configuration-profiles/{profileId}",
+  "reads": [
+   "platform.configuration_profile"
+  ],
+  "writes": [],
+  "routing": "replica",
+  "scope": "tenant",
+  "perm": "TENANT_CONFIGURE",
+  "offline": false,
+  "summary": "One profile, at its latest version or at a named one",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "TenancyService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "getConnectivityPolicy": {
+  "contract": "tenancy",
+  "verb": "GET",
+  "path": "/connectivity-policy",
+  "reads": [
+   "platform.connectivity_policy"
+  ],
+  "writes": [],
+  "routing": "replica",
+  "scope": "venue",
+  "perm": "TENANT_CONFIGURE",
+  "offline": false,
+  "summary": "The connectivity thresholds saved at one scope node",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "TenancyService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "getCouponCodeBatch": {
+  "contract": "promotions",
+  "verb": "GET",
+  "path": "/coupon-campaigns/{campaignId}/code-batches/{batchId}",
+  "reads": [
+   "promotions.coupon_code_batch"
+  ],
+  "writes": [],
+  "routing": "primary",
+  "scope": "venue",
+  "perm": "PRICE_VIEW",
+  "offline": false,
+  "summary": "Progress and export of a code batch",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "CatalogueService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "getDevice": {
+  "contract": "tenancy",
+  "verb": "GET",
+  "path": "/devices/{deviceId}",
+  "reads": [
+   "platform.device"
+  ],
+  "writes": [],
+  "routing": "replica",
+  "scope": "venue",
+  "perm": "DEVICE_VIEW",
+  "offline": false,
+  "summary": "Read one registered device",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "TenancyService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "getForm": {
+  "contract": "marketing-crm",
+  "verb": "GET",
+  "path": "/forms/{formId}",
+  "reads": [
+   "marketing.form_definition",
+   "marketing.form_definition_field"
+  ],
+  "writes": [],
+  "routing": "replica",
+  "scope": "venue",
+  "perm": "GUEST_VIEW",
+  "offline": false,
+  "summary": "One form, to fill in or to edit",
+  "source": "derived",
+  "audience": [
+   "staff",
+   "guest"
+  ],
+  "service": "MarketingService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "getMyProfile": {
+  "contract": "marketing-crm",
+  "verb": "GET",
+  "path": "/guests/me/profile",
+  "reads": [
+   "marketing.guest_preference",
+   "marketing.guest_profile"
+  ],
+  "writes": [],
+  "routing": "replica",
+  "scope": "subject",
+  "perm": "GUEST_VIEW",
+  "offline": false,
+  "summary": "A guest reading their own details",
+  "source": "derived",
+  "audience": [
+   "guest"
+  ],
+  "service": "MarketingService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "getOfflinePolicy": {
+  "contract": "tenancy",
+  "verb": "GET",
+  "path": "/offline-policy",
+  "reads": [
+   "platform.offline_policy"
+  ],
+  "writes": [],
+  "routing": "replica",
+  "scope": "venue",
+  "perm": "TENANT_CONFIGURE",
+  "offline": false,
+  "summary": "The offline policy saved at one scope node",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "TenancyService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "getOutlet": {
+  "contract": "tenancy",
+  "verb": "GET",
+  "path": "/outlets/{outletId}",
+  "reads": [
+   "platform.outlet"
+  ],
+  "writes": [],
+  "routing": "replica",
+  "scope": "venue",
+  "perm": "SCOPE_VIEW",
+  "offline": true,
+  "summary": "Read an outlet",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "TenancyService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "getResourceQualifications": {
+  "contract": "resources",
+  "verb": "GET",
+  "path": "/resources/{resourceId}/qualifications",
+  "reads": [
+   "resources.qualification"
+  ],
+  "writes": [],
+  "routing": "replica",
+  "scope": "venue",
+  "perm": "RESOURCE_VIEW",
+  "offline": false,
+  "summary": "What an instructor or staff resource is certified to do, and until when — as saved",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "VenueOpsService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "getSeoMetadata": {
+  "contract": "marketing-crm",
+  "verb": "GET",
+  "path": "/seo-metadata",
+  "reads": [
+   "control.seo_metadata"
+  ],
+  "writes": [],
+  "routing": "replica",
+  "scope": "tenant",
+  "perm": "MARKETING_VIEW",
+  "offline": false,
+  "summary": "The metadata in force for one page",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "MarketingService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "getVenueMapImportJob": {
+  "contract": "venue-map",
+  "verb": "GET",
+  "path": "/venue-maps/{mapId}/import/{jobId}",
+  "reads": [
+   "venuemap.import_job"
+  ],
+  "writes": [],
+  "routing": "replica",
+  "scope": "venue",
+  "perm": "VENUE_MAP_VIEW",
+  "offline": false,
+  "summary": "Import progress and findings",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "VenueOpsService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "listConfigurationProfiles": {
+  "contract": "tenancy",
+  "verb": "GET",
+  "path": "/configuration-profiles",
+  "reads": [
+   "platform.configuration_profile"
+  ],
+  "writes": [],
+  "routing": "replica",
+  "scope": "tenant",
+  "perm": "TENANT_CONFIGURE",
+  "offline": false,
+  "summary": "Every configuration profile, at its current version",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "TenancyService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "listForms": {
+  "contract": "marketing-crm",
+  "verb": "GET",
+  "path": "/forms",
+  "reads": [
+   "marketing.form_definition",
+   "marketing.form_definition_field"
+  ],
+  "writes": [],
+  "routing": "replica",
+  "scope": "venue",
+  "perm": "MARKETING_VIEW",
+  "offline": false,
+  "summary": "Waivers, surveys and capture forms",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "MarketingService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "listMenuSchedules": {
+  "contract": "fnb",
+  "verb": "GET",
+  "path": "/menus/{menuId}/schedule",
+  "reads": [
+   "fnb.menu_schedule"
+  ],
+  "writes": [],
+  "routing": "replica",
+  "scope": "venue",
+  "perm": "PRODUCT_VIEW",
+  "offline": false,
+  "summary": "What is scheduled to go live, and when",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "FnbService",
+  "stores": [
+   "derived",
+   "postgres",
+   "postgres-analytical",
+   "redis"
+  ]
+ },
+ "listMenuVersions": {
+  "contract": "fnb",
+  "verb": "GET",
+  "path": "/menus/{menuId}/versions",
+  "reads": [
+   "fnb.menu_item",
+   "fnb.menu_section",
+   "fnb.menu_version"
+  ],
+  "writes": [],
+  "routing": "replica",
+  "scope": "venue",
+  "perm": "PRODUCT_VIEW",
+  "offline": false,
+  "summary": "Every published version of a menu",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "FnbService",
+  "stores": [
+   "derived",
+   "postgres",
+   "postgres-analytical",
+   "redis"
+  ]
+ },
+ "listMyWaitingGuests": {
+  "contract": "queue",
+  "verb": "GET",
+  "path": "/waiting-guests",
+  "reads": [
+   "queue.entry"
+  ],
+  "writes": [],
+  "routing": "primary",
+  "scope": "venue",
+  "perm": null,
+  "offline": false,
+  "summary": "The caller's own queue entries",
+  "source": "derived",
+  "audience": [
+   "guest"
+  ],
+  "service": "VenueOpsService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "listProfileDeployments": {
+  "contract": "tenancy",
+  "verb": "GET",
+  "path": "/profile-deployments",
+  "reads": [
+   "platform.profile_deployment"
+  ],
+  "writes": [],
+  "routing": "replica",
+  "scope": "tenant",
+  "perm": "TENANT_CONFIGURE",
+  "offline": false,
+  "summary": "Recent deployments, with a date, a target and an outcome",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "TenancyService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "listTicketTransfers": {
+  "contract": "orders",
+  "verb": "GET",
+  "path": "/ticket-transfers",
+  "reads": [
+   "orders.ticket_transfer"
+  ],
+  "writes": [],
+  "routing": "replica",
+  "scope": "tenant",
+  "perm": null,
+  "offline": false,
+  "summary": "The ticket transfers this guest sent or received",
+  "source": "derived",
+  "audience": [
+   "guest"
+  ],
+  "service": "OrderService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "resolveSyncRejection": {
+  "contract": "orders",
+  "verb": "POST",
+  "path": "/sync/rejections/{rejectionId}/resolve",
+  "reads": [
+   "sync.rejection"
+  ],
+  "writes": [],
+  "routing": null,
+  "scope": "venue",
+  "perm": "ORDER_MODIFY",
+  "offline": false,
+  "summary": "Record what was done about a refused entry",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "OrderService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "revokeEntitlementShare": {
+  "contract": "orders",
+  "verb": "POST",
+  "path": "/entitlements/{entitlementId}/share/{shareId}/revoke",
+  "reads": [],
+  "writes": [],
+  "routing": null,
+  "scope": "venue",
+  "perm": "ORDER_MODIFY",
+  "offline": false,
+  "summary": "Take back a share",
+  "source": "derived",
+  "audience": [
+   "staff",
+   "guest"
+  ],
+  "service": "OrderService",
   "stores": [
    "postgres",
    "redis"

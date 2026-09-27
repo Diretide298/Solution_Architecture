@@ -149,6 +149,9 @@ paths:
                   default: 600
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Assigned and held
           content:
             application/json:
@@ -226,6 +229,9 @@ paths:
                     $ref: '#/components/schemas/MapZone'
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Set
           content:
             application/json:
@@ -307,6 +313,9 @@ paths:
               $ref: '#/components/schemas/CreateSeatMapRequest'
       responses:
         '201':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Created in draft
           content:
             application/json:
@@ -388,6 +397,9 @@ paths:
                   type: boolean
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Updated
           content:
             application/json:
@@ -433,6 +445,9 @@ paths:
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Published
           content:
             application/json:
@@ -495,6 +510,9 @@ paths:
                   default: true
       responses:
         '201':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Cloned into draft
           content:
             application/json:
@@ -588,6 +606,9 @@ paths:
               $ref: '#/components/schemas/BulkUpdateSeatsRequest'
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Applied
           content:
             application/json:
@@ -637,6 +658,9 @@ paths:
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Findings
           content:
             application/json:
@@ -680,6 +704,9 @@ paths:
               $ref: '#/components/schemas/ImportManifestRequest'
       responses:
         '202':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Accepted; parsing proceeds asynchronously
           content:
             application/json:
@@ -727,6 +754,9 @@ paths:
               $ref: '#/components/schemas/ImportGeometryRequest'
       responses:
         '202':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Accepted
           content:
             application/json:
@@ -804,6 +834,9 @@ paths:
                   default: false
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Applied
           content:
             application/json:
@@ -879,6 +912,9 @@ paths:
                   maxLength: 1000
       responses:
         '201':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Created
           content:
             application/json:
@@ -964,6 +1000,9 @@ paths:
                   description: Ordering for best-seat assignment. Lower is better.
       responses:
         '201':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Created
           content:
             application/json:
@@ -1097,6 +1136,9 @@ paths:
               $ref: '#/components/schemas/CreateSeatHoldRequest'
       responses:
         '201':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Held
           content:
             application/json:
@@ -1164,6 +1206,9 @@ paths:
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       responses:
         '204':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Released
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
@@ -1197,17 +1242,20 @@ paths:
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Extended
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/SeatHold'
         '409':
-          description: Already expired, or the extension limit is reached
+          description: Already expired, or the extension limit is reached. `refusedReason` says which.
           content:
             application/problem+json:
               schema:
-                $ref: ../shared/common.yaml#/components/schemas/Problem
+                $ref: '#/components/schemas/SeatHoldExtendProblem'
   /seat-blocks:
     get:
       operationId: listSeatBlocks
@@ -1280,6 +1328,9 @@ paths:
               $ref: '#/components/schemas/CreateSeatBlockRequest'
       responses:
         '201':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Blocked
           content:
             application/json:
@@ -1383,6 +1434,9 @@ paths:
                   maxLength: 500
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Allocated; returns a hold to convert into an order
           content:
             application/json:
@@ -1447,6 +1501,9 @@ paths:
               $ref: '#/components/schemas/SeatingRules'
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Set
           content:
             application/json:
@@ -1496,6 +1553,8 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/SeatRecommendationRequest'
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       responses:
         '200':
           description: Recommendations, best first
@@ -1547,6 +1606,9 @@ paths:
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Copy one section into another map
           content:
             application/json:
@@ -1646,6 +1708,9 @@ paths:
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Import a seat map from a plan or a manifest
           content:
             application/json:
@@ -1773,6 +1838,9 @@ paths:
               $ref: '#/components/schemas/SeatHoldType'
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Set
           content:
             application/json:
@@ -1838,6 +1906,9 @@ paths:
               $ref: '#/components/schemas/SeatHoldPool'
       responses:
         '201':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Created
           content:
             application/json:
@@ -1977,6 +2048,9 @@ paths:
               $ref: '#/components/schemas/SeatRules'
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Set
           content:
             application/json:
@@ -2044,6 +2118,9 @@ paths:
               $ref: '#/components/schemas/AccessibleSeating'
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Set
           content:
             application/json:
@@ -2142,6 +2219,9 @@ paths:
               $ref: '#/components/schemas/GroupSeatRequest'
       responses:
         '201':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Recorded
           content:
             application/json:
@@ -2202,13 +2282,13 @@ paths:
                 $ref: '#/components/schemas/GroupSeatAllocation'
         '409':
           description: '**Cannot be seated within the stated constraints.** The best available shape is
-            returned so the desk can offer it rather than guess.
+            returned in `bestAvailable` so the desk can offer it rather than guess.
 
             '
           content:
             application/problem+json:
               schema:
-                $ref: ../shared/common.yaml#/components/schemas/Problem
+                $ref: '#/components/schemas/GroupSeatingProblem'
   /group-seat-requests/{requestId}/roster:
     parameters:
     - name: requestId
@@ -2320,6 +2400,9 @@ paths:
               $ref: '#/components/schemas/SeatRecommendationRules'
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Set
           content:
             application/json:
@@ -3796,12 +3879,46 @@ components:
                   $ref: '#/components/schemas/SeatStatus'
                 reason:
                   type: string
+    SeatHoldExtendProblem:
+      x-ticvai-persistence: none — error shape
+      allOf:
+      - $ref: ../shared/common.yaml#/components/schemas/Problem
+      - type: object
+        required:
+        - refusedReason
+        properties:
+          refusedReason:
+            type: string
+            enum:
+            - holdExpired
+            - extensionLimitReached
+          extensionCount:
+            type: integer
+            description: Extensions already made on this hold, as on `SeatHold`.
+          expiresAt:
+            type: string
+            format: date-time
+            description: When the hold expired or will expire.
+    GroupSeatingProblem:
+      x-ticvai-persistence: none — error shape
+      allOf:
+      - $ref: ../shared/common.yaml#/components/schemas/Problem
+      - type: object
+        required:
+        - bestAvailable
+        properties:
+          bestAvailable:
+            allOf:
+            - $ref: '#/components/schemas/GroupSeatAllocation'
+            description: The best shape the performance can offer the group. Not held; allocating it
+              is a separate call.
     SeatAvailability:
       x-ticvai-persistence: none — computed from seat, hold and block
       type: object
       required:
       - performanceId
       - seatMapId
+      - renderMode
       - totals
       - seats
       properties:
@@ -3811,6 +3928,17 @@ components:
         seatMapId:
           type: string
           format: uuid
+        renderMode:
+          type: string
+          enum:
+          - graphical
+          - list
+          description: 'The mode the server actually used. With `mode=auto` this is how a client knows
+            what it got: `list` means the map has no geometry (the seat map''s `noGeometry` state), so
+            the client sells from categories and best-available groups and does not draw a plan.
+            `graphical` means every seat carries `position`.
+
+            '
         totals:
           type: object
           properties:
@@ -3856,6 +3984,15 @@ components:
                 type: string
                 format: uuid
                 nullable: true
+              displayLabel:
+                type: string
+                description: What the guest sees, e.g. `A2-7-11`, as on `Seat`.
+              position:
+                allOf:
+                - $ref: '#/components/schemas/Point'
+                nullable: true
+                description: The seat's coordinates on the map, as on `Seat`. Present when `renderMode`
+                  is `graphical`; null when it is `list`.
     CreateSeatHoldRequest:
       x-ticvai-persistence: none — request only
       type: object
@@ -4109,8 +4246,6 @@ components:
           maximum: 10
     SeatRecommendation:
       x-ticvai-persistence: none — computed
-      parameters:
-      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       type: object
       required:
       - seatIds

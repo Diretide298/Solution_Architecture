@@ -7,7 +7,7 @@
  "audience": "staff",
  "formFactor": "web",
  "offlineCapable": false,
- "generated": "2026-09-24",
+ "generated": "2026-09-28",
  "note": "Derived by tools/derive-platform.py. **The gaps section is the point** \u2014 a page listing what exists is a directory; one listing what is missing is a worklist.",
  "counts": {
   "screens": 69,
@@ -15,7 +15,7 @@
   "contracts": 11,
   "modules": 1,
   "undrawn": 0,
-  "operationsWithNoScreen": 135
+  "operationsWithNoScreen": 149
  },
  "waves": {
   "wave3": 69
@@ -39,11 +39,11 @@
    "operations": 4
   },
   {
-   "contract": "marketing-crm",
+   "contract": "inventory",
    "operations": 3
   },
   {
-   "contract": "inventory",
+   "contract": "marketing-crm",
    "operations": 3
   },
   {
@@ -51,7 +51,7 @@
    "operations": 2
   },
   {
-   "contract": "access",
+   "contract": "tenancy",
    "operations": 1
   },
   {
@@ -63,15 +63,15 @@
    "operations": 1
   },
   {
-   "contract": "tenancy",
-   "operations": 1
-  },
-  {
    "contract": "approvals",
    "operations": 1
   },
   {
    "contract": "catalogue",
+   "operations": 1
+  },
+  {
+   "contract": "access",
    "operations": 1
   }
  ],
@@ -827,6 +827,12 @@
     "summary": "Pause a membership at the guest's request"
    },
    {
+    "operation": "getCatalogueImportJob",
+    "contract": "catalogue",
+    "verb": "GET",
+    "summary": "Progress and findings of a catalogue import"
+   },
+   {
     "operation": "getDynamicPriceRule",
     "contract": "catalogue",
     "verb": "GET",
@@ -1085,6 +1091,12 @@
     "summary": "A quota-bounded, addressed invitation"
    },
    {
+    "operation": "getForm",
+    "contract": "marketing-crm",
+    "verb": "GET",
+    "summary": "One form, to fill in or to edit"
+   },
+   {
     "operation": "getGuestExtraValues",
     "contract": "marketing-crm",
     "verb": "GET",
@@ -1101,6 +1113,12 @@
     "contract": "marketing-crm",
     "verb": "GET",
     "summary": "Every rule a loyalty programme runs on"
+   },
+   {
+    "operation": "getSeoMetadata",
+    "contract": "marketing-crm",
+    "verb": "GET",
+    "summary": "The metadata in force for one page"
    },
    {
     "operation": "getSuppressionList",
@@ -1125,6 +1143,12 @@
     "contract": "marketing-crm",
     "verb": "GET",
     "summary": "Badges a guest holds"
+   },
+   {
+    "operation": "listForms",
+    "contract": "marketing-crm",
+    "verb": "GET",
+    "summary": "Waivers, surveys and capture forms"
    },
    {
     "operation": "listGuestExtraFields",
@@ -1343,6 +1367,18 @@
     "summary": "Renew a membership"
    },
    {
+    "operation": "resolveSyncRejection",
+    "contract": "orders",
+    "verb": "POST",
+    "summary": "Record what was done about a refused entry"
+   },
+   {
+    "operation": "revokeEntitlementShare",
+    "contract": "orders",
+    "verb": "POST",
+    "summary": "Take back a share"
+   },
+   {
     "operation": "setFraudRules",
     "contract": "orders",
     "verb": "PUT",
@@ -1377,6 +1413,12 @@
     "contract": "promotions",
     "verb": "DELETE",
     "summary": "Remove an upsell rule"
+   },
+   {
+    "operation": "getCouponCodeBatch",
+    "contract": "promotions",
+    "verb": "GET",
+    "summary": "Progress and export of a code batch"
    },
    {
     "operation": "listAllocationSplits",
@@ -1457,6 +1499,36 @@
     "summary": "Amend, pause or resume a schedule"
    },
    {
+    "operation": "getConfigurationProfile",
+    "contract": "tenancy",
+    "verb": "GET",
+    "summary": "One profile, at its latest version or at a named one"
+   },
+   {
+    "operation": "getConnectivityPolicy",
+    "contract": "tenancy",
+    "verb": "GET",
+    "summary": "The connectivity thresholds saved at one scope node"
+   },
+   {
+    "operation": "getDevice",
+    "contract": "tenancy",
+    "verb": "GET",
+    "summary": "Read one registered device"
+   },
+   {
+    "operation": "getOfflinePolicy",
+    "contract": "tenancy",
+    "verb": "GET",
+    "summary": "The offline policy saved at one scope node"
+   },
+   {
+    "operation": "getOutlet",
+    "contract": "tenancy",
+    "verb": "GET",
+    "summary": "Read an outlet"
+   },
+   {
     "operation": "issueDeviceCredential",
     "contract": "tenancy",
     "verb": "POST",
@@ -1467,6 +1539,12 @@
     "contract": "tenancy",
     "verb": "GET",
     "summary": "Where each service answers inside a cell"
+   },
+   {
+    "operation": "listConfigurationProfiles",
+    "contract": "tenancy",
+    "verb": "GET",
+    "summary": "Every configuration profile, at its current version"
    },
    {
     "operation": "listDeviceAuditRecords",
@@ -1485,6 +1563,12 @@
     "contract": "tenancy",
     "verb": "GET",
     "summary": "Devices that report having been interfered with"
+   },
+   {
+    "operation": "listProfileDeployments",
+    "contract": "tenancy",
+    "verb": "GET",
+    "summary": "Recent deployments, with a date, a target and an outcome"
    },
    {
     "operation": "recordDeviceTamperEvent",

@@ -14,7 +14,6 @@ initial:
 - authorised
 - pendingConfirmation
 terminal:
-- captured
 - declined
 - failed
 - voided

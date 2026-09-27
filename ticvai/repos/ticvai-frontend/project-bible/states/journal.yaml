@@ -11,7 +11,6 @@ owner: ledger
 initial:
 - draft
 terminal:
-- posted
 - reversed
 transitions:
 - from: draft
@@ -46,5 +45,5 @@ transitions:
   guard: '**A posted entry is never edited.** Reversal posts an opposite entry; the original stands'
   isReversal: true
   requiresApproval: true
-notes: No transition out of `posted` except reversal, and no transition back to `draft`. That is what
+notes: No transition out of `posted` except reversal, and nothing posted goes back to `draft` (a rejected entry that was only pending approval does). That is what
   append-only means, and it is the reason a correction is two entries rather than one edit.

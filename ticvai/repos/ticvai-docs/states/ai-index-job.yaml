@@ -13,7 +13,6 @@ initial:
 - queued
 terminal:
 - complete
-- failed
 transitions:
 - from: queued
   to: building

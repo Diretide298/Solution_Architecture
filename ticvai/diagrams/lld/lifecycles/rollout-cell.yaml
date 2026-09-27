@@ -13,8 +13,6 @@ owner: platform-ops
 initial:
 - pending
 terminal:
-- complete
-- failed
 - skipped
 - rolledBack
 transitions:

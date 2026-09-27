@@ -9,12 +9,12 @@
 | Contracts | 7 |
 | Modules | 5 |
 | Undrawn | 0 |
-| Operations with no screen | 81 |
+| Operations with no screen | 84 |
 | Waves | wave2 2 · wave3 26 |
 
 ## Gaps
 
-### 81 operations with no screen here
+### 84 operations with no screen here
 
 **In a contract this platform uses, callable by its audience, and reaching no screen on any platform serving that audience.** Either a screen is missing or the endpoint should not exist — and the second is worth considering first.
 
@@ -60,7 +60,7 @@
 | `setPrincipalModuleAccess` | identity | PUT | Tick what they may do |
 | `updateAccessPolicy` | identity | PUT | Change a policy, as a new version |
 | `addGuestNote` | marketing-crm | POST | What the floor needs to know about this table |
-| … | | | 41 more |
+| … | | | 44 more |
 
 ## Modules
 

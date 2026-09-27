@@ -121,6 +121,9 @@ paths:
               $ref: '#/components/schemas/WalletType'
       responses:
         '201':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Created
           content:
             application/json:
@@ -161,6 +164,9 @@ paths:
               $ref: '#/components/schemas/WalletType'
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Updated
           content:
             application/json:
@@ -231,6 +237,9 @@ paths:
               $ref: '#/components/schemas/CreditType'
       responses:
         '201':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Created
           content:
             application/json:
@@ -275,6 +284,9 @@ paths:
               $ref: '#/components/schemas/CreditType'
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Updated
           content:
             application/json:
@@ -319,6 +331,9 @@ paths:
               $ref: '#/components/schemas/CreditEligibility'
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Set
           content:
             application/json:
@@ -382,6 +397,9 @@ paths:
               $ref: '#/components/schemas/CreditConsumptionPolicy'
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Set
           content:
             application/json:
@@ -543,6 +561,8 @@ paths:
                   type: string
                   format: uuid
                   nullable: true
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       responses:
         '200':
           description: The allocation
@@ -613,6 +633,9 @@ paths:
               $ref: '#/components/schemas/WalletFundingRules'
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Set
           content:
             application/json:
@@ -735,6 +758,9 @@ paths:
               $ref: '#/components/schemas/SharedWallet'
       responses:
         '201':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Created
           content:
             application/json:
@@ -791,6 +817,9 @@ paths:
                     $ref: '#/components/schemas/SharedWalletMember'
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Set
           content:
             application/json:
@@ -850,6 +879,9 @@ paths:
               $ref: '#/components/schemas/VoucherType'
       responses:
         '201':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Created
           content:
             application/json:
@@ -886,6 +918,9 @@ paths:
               $ref: '#/components/schemas/GiftCardProduct'
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Set
           content:
             application/json:
@@ -931,6 +966,9 @@ paths:
               $ref: '#/components/schemas/WalletChannelRules'
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Set
           content:
             application/json:
@@ -969,6 +1007,9 @@ paths:
               $ref: '#/components/schemas/WalletCredential'
       responses:
         '201':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Linked
           content:
             application/json:
@@ -1012,6 +1053,9 @@ paths:
               $ref: '#/components/schemas/WalletTransferRules'
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Set
           content:
             application/json:
@@ -1050,6 +1094,9 @@ paths:
               $ref: '#/components/schemas/WalletRefundPolicy'
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Set
           content:
             application/json:
@@ -1086,6 +1133,9 @@ paths:
               $ref: '#/components/schemas/WalletRestriction'
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Applied
           content:
             application/json:
@@ -1149,6 +1199,9 @@ paths:
               $ref: '#/components/schemas/WalletDispute'
       responses:
         '201':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Raised
           content:
             application/json:
@@ -1192,6 +1245,9 @@ paths:
               $ref: '#/components/schemas/WalletRiskRules'
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Set
           content:
             application/json:
@@ -1231,6 +1287,9 @@ paths:
               $ref: '#/components/schemas/WalletAccountingMapping'
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Set
           content:
             application/json:
@@ -1409,7 +1468,14 @@ paths:
         that gave 50 dirhams of bonus credit has just funded a secondary market.**
 
         Both wallets must belong to the same tenant. **A transfer across tenants is a payment**, and
-        it belongs on the payment path with everything that implies.
+        it belongs on the payment path with everything that implies. A recipient outside the
+        tenant is therefore the shared 404, exactly as an unknown one is.
+
+        **The recipient is named one way or the other, never both.** `toWalletId` names the
+        receiving wallet outright — the only way to reach a shared wallet (BO-1121), because a
+        subject can hold their own wallet and sit in a family or corporate one. `toSubjectId` is
+        the guest-to-guest form and resolves to the same wallet `getWallet` returns for that
+        subject: their own, never a shared wallet they belong to.
       tags: [retail]
       x-ticvai-permission: WALLET_OPERATE
       x-ticvai-guest-callable: true
@@ -1425,27 +1491,42 @@ paths:
           application/json:
             schema:
               type: object
-              required: [toSubjectId, amount]
+              required: [amount]
+              oneOf:
+                - required: [toSubjectId]
+                - required: [toWalletId]
               properties:
-                toSubjectId: { type: string, format: uuid }
+                toSubjectId:
+                  type: string
+                  format: uuid
+                  description: The recipient guest. Resolves to their own wallet, as `getWallet` does.
+                toWalletId:
+                  type: string
+                  format: uuid
+                  description: The receiving wallet, named outright. Required to reach a shared wallet.
                 amount: { $ref: '../shared/common.yaml#/components/schemas/Money' }
                 message: { type: string, maxLength: 140, nullable: true }
       responses:
         '200':
-          description: Transferred
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: >
+            Transferred. **The sender's side of the movement** — the `transfer` transaction on
+            the wallet in the path, with its `balanceAfter`. The recipient's balance is theirs and
+            is not returned to the sender.
           content:
             application/json:
-              schema:
-                type: object
-                additionalProperties: true
+              schema: { $ref: '#/components/schemas/WalletTransaction' }
         '409':
           description: >
             **Insufficient cash credit**, distinct from insufficient balance — a guest with 200 of
             bonus credit and 10 of cash can transfer 10, and telling them they have 200 would be
-            wrong.
+            wrong. Also refused where either wallet is suspended or closed, or where the transfer
+            rules forbid it. `refusedReason` says which.
           content:
             application/problem+json:
-              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+              schema: { $ref: '#/components/schemas/WalletTransferProblem' }
   /wallets/{walletId}/suspend:
     parameters:
       - name: walletId
@@ -1468,12 +1549,18 @@ paths:
         - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       responses:
         '200':
-          description: Done
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: Suspended. The wallet, with its balance unchanged.
           content:
             application/json:
-              schema:
-                type: object
-                additionalProperties: true
+              schema: { $ref: '#/components/schemas/Wallet' }
+        '409':
+          description: The wallet is closed, and a closed wallet cannot be suspended.
+          content:
+            application/problem+json:
+              schema: { $ref: '#/components/schemas/WalletStateProblem' }
   /wallets/{walletId}/reinstate:
     parameters:
       - name: walletId
@@ -1495,12 +1582,20 @@ paths:
         - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       responses:
         '200':
-          description: Done
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: Reinstated. The wallet, active again.
           content:
             application/json:
-              schema:
-                type: object
-                additionalProperties: true
+              schema: { $ref: '#/components/schemas/Wallet' }
+        '409':
+          description: >
+            The wallet is not suspended. Reinstating is the way out of `suspended` only — a
+            closed wallet is not reopened by it.
+          content:
+            application/problem+json:
+              schema: { $ref: '#/components/schemas/WalletStateProblem' }
   /wallets/{walletId}/close:
     parameters:
       - name: walletId
@@ -1535,12 +1630,20 @@ paths:
                 targetWalletId: { type: string, format: uuid }
       responses:
         '200':
-          description: Done
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: Closed. The wallet, its remaining balance settled as the request said.
           content:
             application/json:
-              schema:
-                type: object
-                additionalProperties: true
+              schema: { $ref: '#/components/schemas/Wallet' }
+        '409':
+          description: >
+            **A balance remains and no settlement was given**, or the wallet is already closed.
+            `refusedReason` says which, and `balance` carries what is still owed to the guest.
+          content:
+            application/problem+json:
+              schema: { $ref: '#/components/schemas/WalletStateProblem' }
   /wallets/{subjectId}:
     parameters:
       - name: subjectId
@@ -1618,6 +1721,9 @@ paths:
                 recordedAt: { type: string, format: date-time }
       responses:
         '201':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Topped up
           content:
             application/json:
@@ -1648,6 +1754,14 @@ paths:
       x-ticvai-audience: [staff, guest]
       x-ticvai-read-routing: primary   # reconciling a disputed balance needs the current one
       summary: Wallet transaction history
+      description: >
+        **Newest first: `recordedAt` descending, `id` descending as the tiebreak.** The cursor is
+        keyset on that pair, so a transaction recorded while somebody pages cannot shift or
+        repeat a row the way an offset would.
+
+        **An unknown subject is 404; a wallet with no movements is an empty page.** A subject
+        with no wallet in the caller's scope is the shared 404 — the same answer `getWallet`
+        gives — so an empty page always means a wallet that exists and has not moved yet.
       tags: [wallet]
       x-ticvai-permission: WALLET_VIEW
       x-ticvai-scope-level: venue
@@ -1669,6 +1783,7 @@ paths:
                       items:
                         type: array
                         items: { $ref: '#/components/schemas/WalletTransaction' }
+        '404': { $ref: '../shared/common.yaml#/components/responses/NotFound' }
   /wallets/{subjectId}/adjust:
     parameters:
       - name: subjectId
@@ -1709,6 +1824,9 @@ paths:
                 reason: { type: string, minLength: 3, maxLength: 500 }
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Adjusted
           content:
             application/json:
@@ -1741,6 +1859,9 @@ paths:
             schema: { $ref: '#/components/schemas/IssueGiftCardRequest' }
       responses:
         '201':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Issued
           content:
             application/json:
@@ -1808,6 +1929,9 @@ paths:
                 note: { type: string, maxLength: 500 }
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Blocked
           content:
             application/json:
@@ -1839,12 +1963,21 @@ paths:
         - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       responses:
         '200':
-          description: Done
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: Activated. The card, now spendable.
           content:
             application/json:
-              schema:
-                type: object
-                additionalProperties: true
+              schema: { $ref: '#/components/schemas/GiftCard' }
+        '409':
+          description: >
+            The card is fully redeemed or expired. Activation moves an `issued` card, or a
+            `blocked` one that was found, to `active`; it does not revive a card whose value is
+            gone.
+          content:
+            application/problem+json:
+              schema: { $ref: '#/components/schemas/GiftCardProblem' }
   /gift-cards/{giftCardId}/redeem:
     parameters:
       - name: giftCardId
@@ -1882,12 +2015,22 @@ paths:
                 orderId: { type: string, format: uuid }
       responses:
         '200':
-          description: Done
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: Redeemed. The card, with the balance that stays on it.
           content:
             application/json:
-              schema:
-                type: object
-                additionalProperties: true
+              schema: { $ref: '#/components/schemas/GiftCard' }
+        '409':
+          description: >
+            **The card cannot be spent, or cannot cover the amount.** Only an `active` or
+            `partiallyRedeemed` card is spent against; a card not yet activated, blocked, expired
+            or fully redeemed is refused. An amount above the balance is refused with `balance`,
+            so the till can redeem what is there and take the rest in another tender.
+          content:
+            application/problem+json:
+              schema: { $ref: '#/components/schemas/GiftCardProblem' }
   /game-cards/{cardCode}/load:
     parameters:
     - name: cardCode
@@ -1949,11 +2092,25 @@ paths:
                   format: date-time
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Loaded
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Wallet'
+        '409':
+          description: 'The card is not `active`. A `blocked` card is a lost credential, a `transferred`
+            card stopped working when its balances moved (`transferredToCardCode` names where), and
+            an `expired` card has had its balance taken as breakage; loading any of them creates a
+            liability on a card that cannot spend it.
+
+            '
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/GameCardLoadProblem'
   /game-cards/{cardCode}/adjust:
     parameters:
     - name: cardCode
@@ -1998,6 +2155,9 @@ paths:
                   maxLength: 500
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Adjusted
           content:
             application/json:
@@ -2481,6 +2641,10 @@ components:
           additionalProperties: true
           description: '**The credit type''s terms as they stood at issue.** Changing a credit type must
             not retro-expire credit already given, so the lot carries its own terms.
+
+            **Open on purpose, and its shape lives in `CreditType`**: the snapshot is that credit
+            type''s properties copied at issue, so it follows `CreditType` as it stood then rather
+            than as it stands now.
 
             '
         status:
@@ -3326,7 +3490,10 @@ components:
         scopePath:
           type: string
     Wallet:
-      x-ticvai-persistence: "wallet.wallet"
+      # `credits[]` is not a column of `wallet.wallet`: each entry is a live lot in
+      # `wallet.credit_lot`, so the lot table is named here as the child and a read of the wallet
+      # reads both.
+      x-ticvai-persistence: "wallet.wallet + wallet.credit_lot"
       type: object
       required: [subjectId, balance, currency, status]
       properties:
@@ -3351,6 +3518,11 @@ components:
 
             **Consumed first-expiry-first-out across all three** (4.3.19), which is also the order
             that is fairest to the guest — spend what is about to die before what is not.
+
+            **One entry per `active` lot in `wallet.credit_lot`** for this wallet: `amount` is the
+            lot's `remaining_amount`, `expiresAt` its `expires_at`, `sourceRef` its
+            `source_reference`. `kind` and `isRefundable` are not stored on the lot; they come from
+            the lot's credit type (`listCreditLots` returns the lots themselves).
           items:
             type: object
             required: [kind, amount]
@@ -3361,12 +3533,19 @@ components:
                 description: >
                   **`cash` is money the guest paid and the others are not.** That distinction
                   decides what is refundable, what expires, and what shows as a liability.
-              amount: { $ref: '../shared/common.yaml#/components/schemas/Money' }
+                x-ticvai-persisted: false   # from the lot's credit type, not a lot column
+              amount:
+                x-ticvai-column: remaining_amount
+                $ref: '../shared/common.yaml#/components/schemas/Money'
               expiresAt: { type: string, format: date-time, nullable: true }
-              sourceRef: { type: string, nullable: true }
+              sourceRef:
+                type: string
+                nullable: true
+                x-ticvai-column: source_reference
               isRefundable:
                 type: boolean
                 default: false
+                x-ticvai-persisted: false   # the credit type's `refundable`
                 description: >
                   **True only for `cash`.** A guest cannot cash out a promotional credit, and a
                   wallet that lets them has given away the promotion twice.
@@ -3436,3 +3615,90 @@ components:
         recipientPhone: { type: string, nullable: true }
         message: { type: string, maxLength: 500 }
         validMonths: { type: integer, minimum: 1 }
+    # **Refusals carry their reason.** Each 409 below names the state or rule that refused it in
+    # `refusedReason`, so a till or an app switches on a value instead of parsing `detail`.
+    WalletTransferProblem:
+      x-ticvai-persistence: "none — error shape"
+      allOf:
+        - $ref: '../shared/common.yaml#/components/schemas/Problem'
+        - type: object
+          required: [refusedReason]
+          properties:
+            refusedReason:
+              type: string
+              enum:
+                - insufficientCashCredit   # only `cash` credit moves
+                - senderWalletNotActive    # the wallet in the path is suspended or closed
+                - recipientWalletNotActive
+                - peerToPeerNotAllowed     # WalletTransferRules.peerToPeerAllowed is false
+                - outsideSharedWallet      # WalletTransferRules.withinSharedWalletOnly
+                - aboveTransferLimit       # maximumPerTransfer
+                - aboveDailyLimit          # maximumPerDay
+            transferableAmount:
+              allOf:
+                - $ref: '../shared/common.yaml#/components/schemas/Money'
+              description: >
+                The cash credit the sender could move now. Present with
+                `insufficientCashCredit`, so the guest is told 10, not 200.
+    WalletStateProblem:
+      x-ticvai-persistence: "none — error shape"
+      allOf:
+        - $ref: '../shared/common.yaml#/components/schemas/Problem'
+        - type: object
+          required: [refusedReason, walletStatus]
+          properties:
+            refusedReason:
+              type: string
+              enum:
+                - walletClosed
+                - walletNotSuspended
+                - balanceRemaining          # close with a balance and no settlement
+            walletStatus:
+              type: string
+              enum: [active, suspended, closed]
+              description: The wallet's status when the request was refused, as on `Wallet`.
+            balance:
+              allOf:
+                - $ref: '../shared/common.yaml#/components/schemas/Money'
+              description: What is still owed to the guest. Present with `balanceRemaining`.
+    GiftCardProblem:
+      x-ticvai-persistence: "none — error shape"
+      allOf:
+        - $ref: '../shared/common.yaml#/components/schemas/Problem'
+        - type: object
+          required: [refusedReason, cardStatus]
+          properties:
+            refusedReason:
+              type: string
+              enum:
+                - cardNotActivated
+                - cardBlocked
+                - cardExpired
+                - cardRedeemed
+                - insufficientBalance
+            cardStatus:
+              type: string
+              enum: [issued, active, partiallyRedeemed, redeemed, expired, blocked]
+              description: The card's status when the request was refused, as on `GiftCard`.
+            balance:
+              allOf:
+                - $ref: '../shared/common.yaml#/components/schemas/Money'
+              description: What is left on the card. Present with `insufficientBalance`.
+    GameCardLoadProblem:
+      x-ticvai-persistence: "none — error shape"
+      allOf:
+        - $ref: '../shared/common.yaml#/components/schemas/Problem'
+        - type: object
+          required: [refusedReason]
+          properties:
+            refusedReason:
+              type: string
+              enum:
+                - cardBlocked
+                - cardExpired
+                - cardTransferred
+              description: The card's `status` in `games`, which is not `active`.
+            transferredToCardCode:
+              type: string
+              nullable: true
+              description: Where the balances went. Present with `cardTransferred`.

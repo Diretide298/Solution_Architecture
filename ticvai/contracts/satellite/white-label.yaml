@@ -34,9 +34,12 @@ info:
     \ are API schemas — the shape of data on the wire.** They are not database tables. One API schema\
     \ may become three columns (`Money`) or five tables (`Order`); some have no table at all (`ValidationResult`,\
     \ `TrialBalance`). Roughly 70% of the DDL derives from these, and the rest — partitioning, RLS, the\
-    \ PII split — is storage design that lives in the migration scripts.\n**`security` arrays hold OAuth\
-    \ scopes.** Empty means \"this scheme, no scopes\" — for bearer tokens there is nothing to list. Empty\
-    \ is not the same as absent: absent means unauthenticated.\n\n## This context\nHow a tenant configures\
+    \ PII split — is storage design that lives in the migration scripts.\n**`security` says who may call.**\
+    \ An operation with no `security` of its own inherits the file-level `bearerAuth`, a staff session.\
+    \ `security: []` on an operation removes that: the call is public and needs no token. A list naming\
+    \ several schemes accepts any one of them, and an empty object `{}` in the list makes the token optional.\
+    \ Inside a scheme the array holds OAuth scopes; TICVAI uses none, so it is always empty.\n\n## This\
+    \ context\nHow a tenant configures\
     \ their branded guest app — identity, theme, navigation, homepage, content, module enablement, and\
     \ publishing. Capabilities C57, C105 and C106.\nTwenty screens in the client UI/UX reference. This\
     \ is not a settings page; it is a CMS plus an app builder, and no tenant goes live without it.\nPositions\
@@ -50,7 +53,23 @@ info:
     \ surfaced.** A module the tenant has not\n  licensed cannot be enabled here, and a disabled module\
     \ is hidden from the guest app\n  entirely rather than shown and refused.\n- **Arabic is a first-class\
     \ layout, not a translation layer.** Fonts pair Arabic with\n  Latin, preview toggles direction, and\
-    \ content carries per-language versions.\n"
+    \ content carries per-language versions.\n\n## Draft, published and live\n**One working draft per\
+    \ tenant.** It is the tenant's `whitelabel.tenant_config` row (`isDraft` true) and the rows that hang\
+    \ off it: brand, app icons, booking flow, theme, fonts, header, footer, navigation, homepage, module\
+    \ enablement, feature toggles and languages. Every `set*` operation on those parts writes the draft,\
+    \ and nothing a guest sees changes. The first `set*` call creates the draft row; until a part has\
+    \ been saved once, its read returns 404 `not-configured`, which a screen shows as its first-run state.\n\
+    **Published versions are snapshots.** `publishTenantConfig` copies the draft into a new `ConfigVersion`\
+    \ (its `snapshot`) and makes that version current. Guests read the current version, never the draft.\
+    \ `restoreConfigVersion` copies a snapshot back into the draft and does not publish.\n**Outside the\
+    \ draft:** `setMaintenanceMode` (live at once, and neither published nor restored), `setPolicy` (each\
+    \ call publishes a policy version), content blocks and banners (each has its own schedule), and custom\
+    \ domains.\n\n## Fields the server owns\nA `readOnly` field (an id, a `status` or `state` that an operation\
+    \ or a timer moves, `scopePath`, a computed field) is returned and never taken: a request that carries\
+    \ one has it ignored. `x-ticvai-derived` says how a computed field is kept current: `onWrite` (in the\
+    \ same transaction as the write that changes it), `onRead` (computed when read, never stored) or `sweeper`\
+    \ (a timer).\n\n## Asset references\nA field named `*AssetRef` or `*AssetRefs` holds the `id` of a `MediaAsset`\
+    \ in the `assets` library, produced there by `createUpload` then `completeUpload`.\n"
 servers:
 - url: https://{cellHost}/api/v1
   variables:
@@ -75,8 +94,11 @@ paths:
         - "P09 ADM-017 Domain & Certificate Management"
         - "P13 CMS-017 Domain & Certificate"
       summary: The domains this tenant has claimed
-      description: '**Status per domain, not just the hostname.** Pending, verifying, active, expiring
-        — a tenant looking at this screen is almost always looking because something is wrong.
+      description: '**Status per domain, not just the hostname.** `pending`, `verifying`, `verified`,
+        `issuing`, `active`, `failed`, `expired` or `revoked` (`states/custom-domain.yaml`) — a tenant
+        looking at this screen is almost always looking because something is wrong. A certificate close
+        to lapsing is an `active` domain with an early `certificateExpiresAt`; there is no separate status
+        for it.
 
         '
       tags:
@@ -104,8 +126,8 @@ paths:
         - "P09 ADM-017 Domain & Certificate Management"
         - "P13 CMS-017 Domain & Certificate"
       summary: Claim a domain and get a verification token
-      description: '**Claiming is not owning.** The response carries the DNS record the tenant must publish,
-        and nothing happens until it resolves.
+      description: '**Claiming is not owning.** The response carries the record the tenant must publish
+        (`verificationRecord`), and nothing happens until it resolves.
 
         **Refused where another tenant already holds it** — with no detail about who, because telling
         one tenant that another owns a hostname is telling them something about a customer.
@@ -150,6 +172,9 @@ paths:
                   default: dnsTxt
       responses:
         '201':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Claimed, with the record to publish
           content:
             application/json:
@@ -196,6 +221,9 @@ paths:
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Verified, or the reason it is not yet
           content:
             application/json:
@@ -229,8 +257,13 @@ paths:
       x-ticvai-scope-level: tenant
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       responses:
         '204':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Released
         '409':
           description: '**The only active domain for a live app.** Refused, naming what would break.
@@ -272,6 +305,9 @@ paths:
               $ref: '#/components/schemas/FooterConfig'
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Set
           content:
             application/json:
@@ -308,6 +344,9 @@ paths:
               $ref: '#/components/schemas/ContentBlock'
       responses:
         '201':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Created as a draft
           content:
             application/json:
@@ -358,6 +397,9 @@ paths:
                   nullable: true
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Published or scheduled
           content:
             application/json:
@@ -380,8 +422,11 @@ paths:
       - guest
       x-ticvai-read-routing: replica
       summary: Full working configuration
-      description: 'Everything the builder edits, in its current draft state. The dashboard reads this
-        for its status view — app published state, active modules, active pages, recent changes.
+      description: 'Everything the builder edits. **A staff caller gets the working draft**, or with
+        `version` the snapshot of that published version. **A guest caller always gets the current published
+        version**: `version` is ignored and `TENANT_CONFIGURE` is not needed, because reading the published
+        app is not configuring it. The dashboard''s status view (published state, module and page counts,
+        recent changes) is `getTenantAppStatus`, not this.
 
         '
       tags:
@@ -390,10 +435,13 @@ paths:
       x-ticvai-scope-level: tenant
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
+      security:
+      - guestAuth: []
+      - bearerAuth: []
       parameters:
       - name: version
         in: query
-        description: Read a published version instead of the working draft.
+        description: Read a published version's snapshot instead of the working draft. Staff only.
         schema:
           type: string
       responses:
@@ -406,7 +454,17 @@ paths:
         '403':
           $ref: ../shared/common.yaml#/components/responses/Forbidden
         '404':
-          $ref: ../shared/common.yaml#/components/responses/NotFound
+          description: '`version` names no published version (`not-found`), or the tenant has no working
+            draft yet — for a guest, nothing has been published yet (`not-configured`).
+
+            '
+          x-ticvai-problem-types:
+          - not-found
+          - not-configured
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
   /tenant-config/status:
     get:
       operationId: getTenantAppStatus
@@ -429,6 +487,12 @@ paths:
       description: 'Also the endpoint the guest app calls to discover a maintenance window, which is why
         it is unauthenticated and cacheable.
 
+        **Two views of one schema.** Called without a staff session, the response carries only `tenantId`,
+        `isPublished`, `publishedVersion`, `publishedAt`, `isInMaintenance`, `maintenanceMessage` and
+        `expectedBackAt`. The draft and CMS fields (`draftVersion`, `hasUnpublishedChanges`, the module
+        and page counts, `recentChanges`) are returned only to a staff session holding `TENANT_CONFIGURE`
+        — a public, cacheable response must not carry who changed what.
+
         '
       tags:
       - overview
@@ -436,6 +500,10 @@ paths:
       x-ticvai-scope-level: tenant
       x-ticvai-offline-capable: true
       x-ticvai-conflict-policy: serverWins
+      # Public, with an optional staff token: `{}` makes authentication optional (header, "security").
+      security:
+      - {}
+      - bearerAuth: []
       responses:
         '200':
           description: Status
@@ -452,6 +520,11 @@ paths:
       summary: Enable or clear maintenance mode
       description: 'Renders the branded maintenance screen with an expected-back time. Tenant-branded,
         because an unbranded error page in a tenant''s app looks like the tenant''s failure.
+
+        **Live at once, not through `publishTenantConfig`.** Written to the maintenance fields of the
+        tenant''s `tenant_config` row (`TenantConfig.isInMaintenance`, `maintenanceMessage`, `expectedBackAt`),
+        which a publish does not snapshot and a restore does not overwrite. `getTenantAppStatus` reads
+        them from there.
 
         '
       tags:
@@ -480,6 +553,9 @@ paths:
                   format: date-time
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Updated
           content:
             application/json:
@@ -509,6 +585,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/BrandIdentity'
+        '404':
+          $ref: '#/components/responses/NotConfigured'
     put:
       operationId: setBrandIdentity
       x-ticvai-consumed-by:
@@ -540,6 +618,9 @@ paths:
               $ref: '#/components/schemas/BrandIdentity'
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Updated
           content:
             application/json:
@@ -574,6 +655,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/AppIcons'
+        '404':
+          $ref: '#/components/responses/NotConfigured'
     put:
       operationId: setAppIcons
       x-ticvai-consumed-by:
@@ -583,8 +666,9 @@ paths:
       - staff
       summary: Set app icons
       description: '**Build-time.** Icons are baked into the binary, so a change here does not reach guests
-        until the next store release. The response states which platforms need a rebuild and what is currently
-        live, so nobody expects an icon change to appear tomorrow.
+        until the next store release. The response says whether a rebuild is needed (`requiresRebuild`)
+        and which icon is currently live (`liveVersion`), so nobody expects an icon change to appear tomorrow.
+        The sizes generated for each platform are listed in `derived`.
 
         Source is a single 1024×1024 PNG without transparency; derived sizes are generated.
 
@@ -608,8 +692,14 @@ paths:
               properties:
                 sourceAssetRef:
                   type: string
+                  format: uuid
+                  description: The `MediaAsset` id of the 1024×1024 source, from `assets` `createUpload`
+                    then `completeUpload`.
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Set. Requires a rebuild to reach guests
           content:
             application/json:
@@ -638,7 +728,8 @@ paths:
       x-ticvai-conflict-policy: serverWins
       responses:
         '200':
-          description: The current setting
+          description: The working draft's setting. Before it has ever been saved, every field comes back
+            at its default, or null where it declares none — there is no `not-configured` for this part.
           content:
             application/json:
               schema:
@@ -675,6 +766,9 @@ paths:
               $ref: '#/components/schemas/BookingFlowConfig'
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Saved
           content:
             application/json:
@@ -708,6 +802,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Theme'
+        '404':
+          $ref: '#/components/responses/NotConfigured'
     put:
       operationId: setTheme
       x-ticvai-consumed-by:
@@ -717,7 +813,8 @@ paths:
       x-ticvai-audience:
       - staff
       summary: Set colour theme
-      description: 'Runtime. Contrast is checked against WCAG 2.2 AA and a failing pair is refused — accessibility
+      description: 'Runtime (reaches guests on publish, not on a store release) and written to the working
+        draft. Contrast is checked against WCAG 2.2 AA and a failing pair is refused — accessibility
         is a stated target for the guest app, and a tenant picking two similar colours should be told
         at configuration time rather than at audit.
 
@@ -738,6 +835,9 @@ paths:
               $ref: '#/components/schemas/Theme'
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Updated
           content:
             application/json:
@@ -771,6 +871,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/FontConfig'
+        '404':
+          $ref: '#/components/responses/NotConfigured'
     put:
       operationId: setFonts
       x-ticvai-consumed-by:
@@ -799,6 +901,9 @@ paths:
               $ref: '#/components/schemas/FontConfig'
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Updated
           content:
             application/json:
@@ -832,6 +937,9 @@ paths:
               $ref: '#/components/schemas/HeaderConfig'
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Updated
           content:
             application/json:
@@ -857,6 +965,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/NavigationConfig'
+        '404':
+          $ref: '#/components/responses/NotConfigured'
     put:
       operationId: setNavigation
       x-ticvai-audience:
@@ -884,6 +994,9 @@ paths:
               $ref: '#/components/schemas/NavigationConfig'
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Updated
           content:
             application/json:
@@ -917,6 +1030,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/HomepageLayout'
+        '404':
+          $ref: '#/components/responses/NotConfigured'
     put:
       operationId: setHomepageLayout
       x-ticvai-consumed-by:
@@ -946,6 +1061,9 @@ paths:
               $ref: '#/components/schemas/HomepageLayout'
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Updated
           content:
             application/json:
@@ -1020,6 +1138,9 @@ paths:
               $ref: '#/components/schemas/Banner'
       responses:
         '201':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Created
           content:
             application/json:
@@ -1055,11 +1176,23 @@ paths:
             schema:
               type: object
               minProperties: 1
+              description: A partial update. Only the fields sent change; `state` is not taken and moves
+                as `states/schedule.yaml` says.
               properties:
                 title:
                   $ref: '#/components/schemas/LocalisedText'
+                subtitle:
+                  $ref: '#/components/schemas/LocalisedText'
                 imageAssetRef:
                   type: string
+                  format: uuid
+                placement:
+                  type: string
+                  enum:
+                  - homepageHero
+                  - homepageBlock
+                  - explore
+                  - checkout
                 linkTarget:
                   $ref: '#/components/schemas/LinkTarget'
                 startsAt:
@@ -1068,10 +1201,17 @@ paths:
                 endsAt:
                   type: string
                   format: date-time
+                  nullable: true
+                  description: Null runs the banner with no end.
+                sortOrder:
+                  type: integer
                 isActive:
                   type: boolean
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Updated
           content:
             application/json:
@@ -1092,6 +1232,9 @@ paths:
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       responses:
         '204':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Deleted
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
@@ -1138,6 +1281,7 @@ paths:
                   $ref: '#/components/schemas/LocalisedText'
                 iconAssetRef:
                   type: string
+                  format: uuid
                 promotionId:
                   type: string
                   format: uuid
@@ -1153,6 +1297,9 @@ paths:
                   type: integer
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Updated
           content:
             application/json:
@@ -1177,6 +1324,9 @@ paths:
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       responses:
         '204':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Deleted
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
@@ -1231,6 +1381,9 @@ paths:
               $ref: '#/components/schemas/PromoBlock'
       responses:
         '201':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Created
           content:
             application/json:
@@ -1250,23 +1403,43 @@ paths:
       - guest
       x-ticvai-read-routing: replica
       summary: List custom content pages
+      description: '**A guest caller sees only what is live**: pages whose `status` is `published` and
+        `isEnabled` is true. For a guest `status` is ignored and `TENANT_CONFIGURE` is not needed — reading
+        a published page is not configuring it. A staff caller sees every page, and with no `status` gets
+        all three states.
+
+        '
       tags:
       - content
       x-ticvai-permission: TENANT_CONFIGURE
       x-ticvai-scope-level: tenant
       x-ticvai-offline-capable: true
       x-ticvai-offline-note: '24 August: **servable from a local cache.** The device holds enough to answer
-        without the  network and the answer may be stale — which is correct for a catalogue and wrong
-        for conte nded state. `getSeatAvailability`, `getSeatHold` and `getPromotionUsage` are deliberately  excluded
-        - **a stale seat is a seat sold twice.**
+        without the network, and the answer may be stale — which is correct for published content, which
+        changes only on a publish.
 
         '
       x-ticvai-conflict-policy: serverWins
+      security:
+      - guestAuth: []
+      - bearerAuth: []
       parameters:
       - name: status
         in: query
+        description: Staff only. Ignored for a guest caller.
         schema:
           $ref: '#/components/schemas/ContentStatus'
+      - name: categoryCode
+        in: query
+        description: Only pages with this `categoryCode`.
+        schema:
+          type: string
+      - name: slug
+        in: query
+        description: Only the page with this slug — how a screen fetches one known page.
+        schema:
+          type: string
+          pattern: ^[a-z0-9-]+$
       - $ref: ../shared/common.yaml#/components/parameters/PageSize
       - $ref: ../shared/common.yaml#/components/parameters/PageCursor
       responses:
@@ -1291,6 +1464,10 @@ paths:
       x-ticvai-audience:
       - staff
       summary: Create a content page
+      description: 'Always created as a `draft`; `id`, `status`, `isReferenced` and `scopePath` are the
+        server''s and are ignored if sent.
+
+        '
       tags:
       - content
       x-ticvai-permission: TENANT_CONFIGURE
@@ -1307,6 +1484,9 @@ paths:
               $ref: '#/components/schemas/ContentPage'
       responses:
         '201':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Created in draft
           content:
             application/json:
@@ -1333,6 +1513,10 @@ paths:
       x-ticvai-audience:
       - staff
       summary: Amend a content page
+      description: 'Replaces the page''s editable fields. `status` is taken only to archive the page
+        (`states/content.yaml`: withdrawn or abandoned); publishing is `publishTenantConfig`.
+
+        '
       tags:
       - content
       x-ticvai-permission: TENANT_CONFIGURE
@@ -1346,9 +1530,12 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/ContentPage'
+              $ref: '#/components/schemas/UpdateContentPageRequest'
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Updated
           content:
             application/json:
@@ -1373,6 +1560,9 @@ paths:
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       responses:
         '204':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Deleted
         '409':
           description: Page is referenced by navigation or the homepage
@@ -1393,18 +1583,24 @@ paths:
       - guest
       x-ticvai-read-routing: replica
       summary: List FAQs
+      description: 'A guest caller sees only entries whose `isPublished` is true, and needs no `TENANT_CONFIGURE`
+        — reading the help content is not configuring it.
+
+        '
       tags:
       - content
       x-ticvai-permission: TENANT_CONFIGURE
       x-ticvai-scope-level: tenant
       x-ticvai-offline-capable: true
       x-ticvai-offline-note: '24 August: **servable from a local cache.** The device holds enough to answer
-        without the  network and the answer may be stale — which is correct for a catalogue and wrong
-        for conte nded state. `getSeatAvailability`, `getSeatHold` and `getPromotionUsage` are deliberately  excluded
-        - **a stale seat is a seat sold twice.**
+        without the network, and the answer may be stale — which is correct for FAQ content, which changes
+        only when a tenant edits it.
 
         '
       x-ticvai-conflict-policy: serverWins
+      security:
+      - guestAuth: []
+      - bearerAuth: []
       responses:
         '200':
           description: FAQ categories with entries
@@ -1448,6 +1644,9 @@ paths:
                     $ref: '#/components/schemas/FaqCategory'
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Updated
           content:
             application/json:
@@ -1533,6 +1732,9 @@ paths:
                   format: date
       responses:
         '201':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: New version published
           content:
             application/json:
@@ -1616,6 +1818,9 @@ paths:
                         type: boolean
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Updated
           content:
             application/json:
@@ -1694,11 +1899,14 @@ paths:
                     - isEnabled
                     properties:
                       featureKey:
-                        type: string
+                        $ref: '#/components/schemas/FeatureKey'
                       isEnabled:
                         type: boolean
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Updated
           content:
             application/json:
@@ -1749,6 +1957,9 @@ paths:
                   pattern: ^[a-z]{2}$
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Updated, with translation gaps reported
           content:
             application/json:
@@ -1809,6 +2020,9 @@ paths:
                   default: 24
       responses:
         '201':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Preview created
           content:
             application/json:
@@ -1837,6 +2051,9 @@ paths:
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Findings
           content:
             application/json:
@@ -1854,7 +2071,8 @@ paths:
       - staff
       x-ticvai-config-scope: tenant
       summary: Publish the working draft
-      description: 'Validates, snapshots, versions and activates atomically. Guests receive the new configuration
+      description: 'Validates, snapshots, versions and activates atomically: the draft is copied into
+        the new version''s `snapshot`, and that version becomes the one guests read. Guests receive the new configuration
         on next launch — no store release, because runtime configuration is deliberately separated from
         build-time.
 
@@ -1890,6 +2108,9 @@ paths:
                   description: Publish at a future time. Useful for a campaign launch.
       responses:
         '201':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Published
           content:
             application/json:
@@ -1952,7 +2173,7 @@ paths:
       x-ticvai-audience:
       - staff
       summary: Restore a previous version
-      description: 'Copies the chosen version into the working draft. **It does not publish** — restore
+      description: 'Copies the chosen version''s `snapshot` into the working draft. **It does not publish** — restore
         then review then publish, so a rollback is as deliberate as the change that caused it.
 
         '
@@ -1966,6 +2187,9 @@ paths:
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Restored into the working draft
           content:
             application/json:
@@ -2076,6 +2300,32 @@ components:
         verificationToken:
           type: string
           readOnly: true
+        verificationRecord:
+          type: object
+          readOnly: true
+          description: '**The record the tenant must publish**, which `claimCustomDomain` promises and
+            the claim had nowhere to hold. Set when the claim is made, from `hostname`, `verificationMethod`
+            and `verificationToken`: a TXT record for `dnsTxt`, a CNAME for `cname`, and for `httpFile`
+            the URL path to serve and the file''s content.
+
+            '
+          required:
+          - type
+          - name
+          - value
+          properties:
+            type:
+              type: string
+              enum:
+              - TXT
+              - CNAME
+              - httpFile
+            name:
+              type: string
+              description: The DNS name to create, or for `httpFile` the URL path on `hostname`.
+            value:
+              type: string
+              description: The record's value, CNAME target or file content.
         certificateExpiresAt:
           type: string
           format: date-time
@@ -2093,13 +2343,17 @@ components:
           nullable: true
     FooterConfig:
       type: object
-      x-ticvai-persistence: control.footer_config
+      x-ticvai-persistence: control.footer_config + control.footer_config_column + control.footer_config_social_link
       description: 'BL-002. **`setHeader` and `HeaderConfig` exist and the footer does not**, which looked
         like symmetry until you notice it is not: **a header is chrome and a footer is a link surface.**
 
         A footer carries the legal links — terms, privacy, accessibility statement, cookie preferences
         — and **those are the ones a regulator checks.** Treating it as a mirror of the header would have
         given it a logo and no way to reach a privacy notice.
+
+        **Where it is stored.** `legalLinks` and `copyrightText` are columns of `control.footer_config`;
+        each entry of `columns` is a `control.footer_config_column` row and each entry of `socialLinks`
+        a `control.footer_config_social_link` row. Part of the working draft (see the header).
 
         '
       required:
@@ -2109,8 +2363,11 @@ components:
         id:
           type: string
           format: uuid
+          readOnly: true
         scopePath:
           type: string
+          readOnly: true
+          description: The partition key (ADR-0005), written at `tenant` scope by the server.
         columns:
           type: array
           items:
@@ -2215,6 +2472,7 @@ components:
         id:
           type: string
           format: uuid
+          readOnly: true
         pageId:
           type: string
           format: uuid
@@ -2249,6 +2507,9 @@ components:
             '
         status:
           type: string
+          readOnly: true
+          description: Created as `draft`; moved by `publishContentBlock` and the `publishAt`/`expireAt`
+            timer (`states/content-block.yaml`), never by the body of a create.
           enum:
           - draft
           - scheduled
@@ -2279,8 +2540,10 @@ components:
           type: string
           format: uuid
           nullable: true
+          readOnly: true
         scopePath:
           type: string
+          readOnly: true
           description: '**The partition key** (ADR-0005). Added 31 August: the operations that write this
             table declare a scope and the table carried no column for it — **49 tables were in that state**,
             so a row could be written at venue scope and then read by anything that could reach the table.
@@ -2321,6 +2584,12 @@ components:
     TenantAppStatus:
       x-ticvai-persistence: none — computed
       type: object
+      description: 'Computed on read. The published fields come from the current `ConfigVersion`, the
+        maintenance fields from the tenant''s `tenant_config` row (`setMaintenanceMode`), and the draft
+        fields from the working draft. **Fields marked staff only are left out of a response to a caller
+        without a staff session** (`getTenantAppStatus`).
+
+        '
       required:
       - tenantId
       - isPublished
@@ -2331,6 +2600,8 @@ components:
           format: uuid
         isPublished:
           type: boolean
+          x-ticvai-derived: onRead
+          description: True once any version has been published.
         publishedVersion:
           type: string
           nullable: true
@@ -2340,14 +2611,23 @@ components:
           nullable: true
         draftVersion:
           type: string
+          description: Staff only.
         hasUnpublishedChanges:
           type: boolean
+          x-ticvai-derived: onRead
+          description: Staff only. The working draft differs from the current version's `snapshot`.
         activeModuleCount:
           type: integer
+          x-ticvai-derived: onRead
+          description: Staff only. `ModuleEnablement` rows with `isEnabled` true.
         licensedModuleCount:
           type: integer
+          x-ticvai-derived: onRead
+          description: Staff only. `ModuleEnablement` rows with `isLicensed` true.
         activePageCount:
           type: integer
+          x-ticvai-derived: onRead
+          description: Staff only. Content pages that are `published` and enabled.
         isInMaintenance:
           type: boolean
         maintenanceMessage:
@@ -2358,6 +2638,8 @@ components:
           nullable: true
         recentChanges:
           type: array
+          description: Staff only. Names the principal behind each change, so it never reaches a public
+            response.
           items:
             type: object
             properties:
@@ -2374,22 +2656,33 @@ components:
     BrandIdentity:
       x-ticvai-persistence: none — embedded in tenant_config
       type: object
+      description: 'Every `*AssetRef` here is a `MediaAsset` id from the `assets` library (`createUpload`
+        then `completeUpload`), PNG or SVG.
+
+        '
       required:
       - logoAssetRef
       properties:
         logoAssetRef:
           type: string
+          format: uuid
+          description: The primary logo.
         logoDarkAssetRef:
           type: string
+          format: uuid
           nullable: true
           description: Used on dark backgrounds. Falls back to the primary logo.
         faviconAssetRef:
           type: string
+          format: uuid
           nullable: true
+          description: The browser tab icon for the guest web app.
         splashImageAssetRefs:
           type: array
+          description: Splash images for the native apps, shown in order. Build-time (`splashChangeScope`).
           items:
             type: string
+            format: uuid
         splashDurationSeconds:
           type: integer
           minimum: 0
@@ -2415,29 +2708,42 @@ components:
       properties:
         sourceAssetRef:
           type: string
+          format: uuid
+          description: The `MediaAsset` id of the 1024×1024 source.
         derived:
           type: array
           readOnly: true
+          x-ticvai-derived: onWrite
+          description: Generated by `setAppIcons` from the source, one entry per platform and size.
           items:
             type: object
             properties:
               platform:
                 type: string
+                enum:
+                - ios
+                - android
+                - web
               size:
                 type: string
               assetRef:
                 type: string
+                format: uuid
         changeScope:
           allOf:
           - $ref: '#/components/schemas/ChangeScope'
           readOnly: true
+          description: Always `buildTime` — icons are baked into the binary.
         liveVersion:
           type: string
           nullable: true
+          readOnly: true
           description: Icon currently shipped. Differs from the draft until the next release.
         requiresRebuild:
           type: boolean
           readOnly: true
+          x-ticvai-derived: onRead
+          description: True while the draft's source differs from the icon in `liveVersion`.
     BookingFlowConfig:
       type: object
       x-ticvai-persistence: none — embedded in tenant_config
@@ -2565,10 +2871,13 @@ components:
           properties:
             primaryColour:
               type: string
+              pattern: ^#[0-9A-Fa-f]{6}$
             backgroundColour:
               type: string
+              pattern: ^#[0-9A-Fa-f]{6}$
             textColour:
               type: string
+              pattern: ^#[0-9A-Fa-f]{6}$
         cornerRadius:
           type: integer
           minimum: 0
@@ -2617,12 +2926,15 @@ components:
           nullable: true
         customFontAssetRefs:
           type: array
+          description: Uploaded font files, as `MediaAsset` ids.
           items:
             type: string
+            format: uuid
         changeScope:
           allOf:
           - $ref: '#/components/schemas/ChangeScope'
           readOnly: true
+          x-ticvai-derived: onRead
           description: Custom font files are `buildTime`; selecting a bundled face is `runtime`.
     HeaderConfig:
       x-ticvai-persistence: none — embedded in tenant_config
@@ -2808,12 +3120,14 @@ components:
         id:
           type: string
           format: uuid
+          readOnly: true
         title:
           $ref: '#/components/schemas/LocalisedText'
         subtitle:
           $ref: '#/components/schemas/LocalisedText'
         imageAssetRef:
           type: string
+          format: uuid
         placement:
           type: string
           enum:
@@ -2834,6 +3148,10 @@ components:
           allOf:
           - $ref: '#/components/schemas/ScheduleState'
           readOnly: true
+          x-ticvai-derived: sweeper
+          description: Moved by `updateBanner` between `draft` and `scheduled`, and by the schedule timer
+            from `scheduled` to `active` and `active` to `expired` at `startsAt` and `endsAt`, in the tenant's
+            timezone (`states/schedule.yaml`).
         sortOrder:
           type: integer
         isActive:
@@ -2848,12 +3166,14 @@ components:
         id:
           type: string
           format: uuid
+          readOnly: true
         title:
           $ref: '#/components/schemas/LocalisedText'
         description:
           $ref: '#/components/schemas/LocalisedText'
         iconAssetRef:
           type: string
+          format: uuid
           nullable: true
         promotionId:
           type: string
@@ -2877,10 +3197,14 @@ components:
           allOf:
           - $ref: '#/components/schemas/ScheduleState'
           readOnly: true
+          x-ticvai-derived: sweeper
+          description: Moved by the schedule timer at `startsAt` and `endsAt`, in the tenant's timezone,
+            as for `Banner.state`.
         sortOrder:
           type: integer
         scopePath:
           type: string
+          readOnly: true
           description: '**The partition key** (ADR-0005). Added 31 August: the operations that write this
             table declare a scope and the table carried no column for it — **49 tables were in that state**,
             so a row could be written at venue scope and then read by anything that could reach the table.
@@ -2904,6 +3228,7 @@ components:
         id:
           type: string
           format: uuid
+          readOnly: true
         slug:
           type: string
           pattern: ^[a-z0-9-]+$
@@ -2923,9 +3248,14 @@ components:
 
             '
         status:
-          $ref: '#/components/schemas/ContentStatus'
+          allOf:
+          - $ref: '#/components/schemas/ContentStatus'
+          readOnly: true
+          description: Created as `draft`, published by `publishTenantConfig`, archived through `updateContentPage`
+            (`states/content.yaml`).
         iconAssetRef:
           type: string
+          format: uuid
           nullable: true
         categoryCode:
           type: string
@@ -2935,9 +3265,12 @@ components:
         isReferenced:
           type: boolean
           readOnly: true
-          description: True when navigation or the homepage links to this page. Blocks deletion.
+          x-ticvai-derived: onWrite
+          description: True when navigation or the homepage links to this page. Blocks deletion. Maintained
+            by `setNavigation` and `setHomepageLayout` in the same transaction as the links they write.
         scopePath:
           type: string
+          readOnly: true
           description: '**The partition key** (ADR-0005). Added 31 August: the operations that write this
             table declare a scope and the table carried no column for it — **49 tables were in that state**,
             so a row could be written at venue scope and then read by anything that could reach the table.
@@ -2948,6 +3281,44 @@ components:
 
 
             **Operations write it at `tenant` scope.**'
+    UpdateContentPageRequest:
+      x-ticvai-persistence: none — request only; the fields land on whitelabel.content_page
+      type: object
+      description: 'The body of `updateContentPage`: the fields a tenant edits. `id`, `isReferenced` and
+        `scopePath` are the server''s, and `status` moves only to `archived` here — publishing is `publishTenantConfig`
+        (`states/content.yaml`).
+
+        '
+      required:
+      - slug
+      - title
+      - body
+      properties:
+        slug:
+          type: string
+          pattern: ^[a-z0-9-]+$
+        title:
+          $ref: '#/components/schemas/LocalisedText'
+        body:
+          $ref: '#/components/schemas/LocalisedRichText'
+        isEnabled:
+          type: boolean
+          default: true
+        iconAssetRef:
+          type: string
+          format: uuid
+          nullable: true
+        categoryCode:
+          type: string
+          nullable: true
+        sortOrder:
+          type: integer
+        status:
+          allOf:
+          - $ref: '#/components/schemas/ContentStatus'
+          description: Only `archived` is taken — send it to withdraw a published page or abandon a draft
+            (`states/content.yaml`). Any other value is a 400 `validation`. Omit to leave the status as it
+            is.
     FaqCategory:
       x-ticvai-persistence: whitelabel.faq_category + whitelabel.faq_entry
       type: object
@@ -2984,6 +3355,7 @@ components:
                 type: boolean
         scopePath:
           type: string
+          readOnly: true
           description: '**The partition key** (ADR-0005). Added 31 August: the operations that write this
             table declare a scope and the table carried no column for it — **49 tables were in that state**,
             so a row could be written at venue scope and then read by anything that could reach the table.
@@ -3040,6 +3412,7 @@ components:
           format: date-time
         scopePath:
           type: string
+          readOnly: true
           description: '**The partition key** (ADR-0005). Added 31 August: the operations that write this
             table declare a scope and the table carried no column for it — **49 tables were in that state**,
             so a row could be written at venue scope and then read by anything that could reach the table.
@@ -3087,7 +3460,9 @@ components:
         referencedBy:
           type: array
           readOnly: true
-          description: Navigation items and homepage sections pointing at this module.
+          x-ticvai-derived: onWrite
+          description: Navigation items and homepage sections pointing at this module. Maintained by `setNavigation`
+            and `setHomepageLayout` in the same transaction as the links they write.
           items:
             type: string
     ModuleReferenceProblem:
@@ -3097,13 +3472,32 @@ components:
       - type: object
         properties:
           moduleKey:
-            type: string
+            $ref: '#/components/schemas/ModuleKey'
           referencedBy:
             type: array
             items:
               type: string
           isLicensed:
             type: boolean
+    FeatureKey:
+      type: string
+      description: 'The feature toggles a tenant can set — one list for `FeatureToggle` and the `setFeatureToggles`
+        body, which took a free string where the response had this enum.
+
+        '
+      enum:
+      - digitalCompanionMode
+      - aiConciergeChat
+      - lostAndFound
+      - pushNotifications
+      - socialSharing
+      - multiLanguage
+      - appleWallet
+      - googlePay
+      - applePay
+      - cashOnDelivery
+      - guestCheckout
+      - uaePassLogin
     FeatureToggle:
       x-ticvai-persistence: whitelabel.feature_toggle
       type: object
@@ -3113,7 +3507,8 @@ components:
       - changeScope
       properties:
         featureKey:
-          type: string
+          allOf:
+          - $ref: '#/components/schemas/FeatureKey'
           description: '`guestCheckout` is **off by default** (decided 17 September 2026, matrix 2.6.28,
             placement settled by [ADR-0045](../../docs/adr/0045-every-order-carries-a-proven-contact.md)
             18 September): **the venue sets this from the configuration menu**, and it decides which routes
@@ -3123,19 +3518,6 @@ components:
             `verifyGuestEmail`.
 
             '
-          enum:
-          - digitalCompanionMode
-          - aiConciergeChat
-          - lostAndFound
-          - pushNotifications
-          - socialSharing
-          - multiLanguage
-          - appleWallet
-          - googlePay
-          - applePay
-          - cashOnDelivery
-          - guestCheckout
-          - uaePassLogin
         displayName:
           type: string
         isEnabled:
@@ -3162,13 +3544,19 @@ components:
           type: array
           items:
             type: string
+            pattern: ^[a-z]{2}$
         defaultLanguage:
           type: string
+          pattern: ^[a-z]{2}$
         rtlLanguages:
           type: array
           readOnly: true
+          x-ticvai-derived: onRead
+          description: The enabled languages written right to left — those whose Unicode CLDR character
+            order is `right-to-left` (Arabic, `ar`, among them). Not configured; it follows from `languages`.
           items:
             type: string
+            pattern: ^[a-z]{2}$
         translationGaps:
           type: array
           readOnly: true
@@ -3199,10 +3587,18 @@ components:
           type: string
         platform:
           type: string
+          enum:
+          - ios
+          - android
+          - web
         theme:
           type: string
+          enum:
+          - light
+          - dark
         language:
           type: string
+          pattern: ^[a-z]{2}$
         expiresAt:
           type: string
           format: date-time
@@ -3267,7 +3663,7 @@ components:
               type: object
               properties:
                 kind:
-                  type: string
+                  $ref: '#/components/schemas/ConfigFindingKind'
                 message:
                   type: string
                 area:
@@ -3319,8 +3715,25 @@ components:
                 type: array
                 items:
                   type: string
+                  enum:
+                  - ios
+                  - android
+                  - web
+        snapshot:
+          type: object
+          additionalProperties: true
+          readOnly: true
+          description: '**What this version contained.** The working draft exactly as published, in the
+            shape `getTenantConfig` returns (`TenantConfig`) — so `restoreConfigVersion` has something to
+            copy back and `diffConfigVersion` something to compare. Deliberately an open object here: its
+            shape is `TenantConfig`, and a `$ref` would make it a key to a `tenant_config` row rather than
+            a copy. Written once by `publishTenantConfig` and never changed. Left out of `listConfigVersions`
+            items; a version''s content is read with `getTenantConfig?version=`.
+
+            '
         scopePath:
           type: string
+          readOnly: true
           description: '**The partition key** (ADR-0005). Added 31 August: the operations that write this
             table declare a scope and the table carried no column for it — **49 tables were in that state**,
             so a row could be written at venue scope and then read by anything that could reach the table.
@@ -3373,23 +3786,29 @@ components:
     TenantConfig:
       x-ticvai-persistence: whitelabel.tenant_config
       type: object
+      description: '**The tenant''s working draft**, one row per tenant (see the header). Published versions
+        are `ConfigVersion.snapshot`, not further rows here.
+
+        **Only `tenantId` and `version` are required**, because the draft is built one part at a time:
+        the first `set*` call creates the row with that part alone. A part that is still unset is what
+        `validateTenantConfig` reports (`missingRequiredAsset` and the like) and what blocks `publishTenantConfig`
+        — a storage rule that every part exist would stop the first save.
+
+        '
       required:
       - tenantId
       - version
-      - brand
-      - theme
-      - fonts
-      - navigation
-      - homepage
-      - languages
       properties:
         tenantId:
           type: string
           format: uuid
         version:
           type: string
+          description: The draft's working version label; the published one is `ConfigVersion.version`.
         isDraft:
           type: boolean
+          readOnly: true
+          description: True for the working draft, which is the only row.
         brand:
           $ref: '#/components/schemas/BrandIdentity'
         appIcons:
@@ -3461,8 +3880,40 @@ components:
         updatedAt:
           type: string
           format: date-time
+        # The three below are live state, not draft: `setMaintenanceMode` writes them directly, a
+        # publish does not snapshot them and a restore does not overwrite them.
+        isInMaintenance:
+          type: boolean
+          default: false
+          description: Written by `setMaintenanceMode`; read by `getTenantAppStatus`.
+        maintenanceMessage:
+          allOf:
+          - $ref: '#/components/schemas/LocalisedText'
+          nullable: true
+          description: The message on the branded maintenance screen.
+        expectedBackAt:
+          type: string
+          format: date-time
+          nullable: true
+  responses:
+    NotConfigured:
+      description: 'This part of the working draft has never been saved. **Not the same as a missing
+        resource**: it is the first-run state, and a screen shows its empty state and create action rather
+        than an error. The first `set*` call for the part ends it. Problem type `https://api.ticvai.com/problems/not-configured`.
+
+        '
+      x-ticvai-problem-types:
+      - not-configured
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../shared/common.yaml#/components/schemas/Problem
   securitySchemes:
     bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+    guestAuth:
       type: http
       scheme: bearer
       bearerFormat: JWT

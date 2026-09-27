@@ -12,7 +12,6 @@ owner: promotions
 initial:
 - issued
 terminal:
-- redeemed
 - expired
 - voided
 transitions:

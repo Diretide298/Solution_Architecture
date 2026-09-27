@@ -5,10 +5,9 @@ index: diagrams/hld/04-lifecycles.yaml
 source: states/resource-booking.yaml
 entity: Resource booking
 contract: resources
-enum: ResourceBooking.status
-enumKind: inline
-enumSchema: ResourceBooking
-enumProperty: status
+enum: ResourceBookingStatus
+enumKind: named
+enumSchema: ResourceBookingStatus
 owner: resources
 initial:
 - reserved

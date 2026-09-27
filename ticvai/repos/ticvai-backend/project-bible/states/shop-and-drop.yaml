@@ -13,7 +13,6 @@ initial:
 - awaitingCollection
 terminal:
 - collected
-- uncollected
 - disposed
 transitions:
 - from: awaitingCollection

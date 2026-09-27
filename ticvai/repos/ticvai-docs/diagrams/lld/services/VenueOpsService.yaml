@@ -1,28 +1,28 @@
 id: LLD-VenueOpsService
-title: VenueOpsService — 221 operations, 90 tables
+title: VenueOpsService — 224 operations, 97 tables
 generatedBy: tools/derive-diagrams.py
 tier: operations
 index: diagrams/hld/02-services.yaml
-why: '**Six small domains, 102 operations, one team.** Queue, maintenance, bookable resources, venue
+why: '**Six small domains, 224 operations, one team.** Queue, maintenance, bookable resources, venue
   mapping, media assets and arcade. None is large enough to deploy alone, all are venue-scoped, none
   is on the critical sale path, and **all six are licensed as optional modules** — a venue that buys
   none of them should not be running six idle services.'
 scale: Low and steady. Queue readings are the only frequent write.
 ifDown: Down degrades venue operations. Selling and admitting continue.
 coverage:
-  operations: 221
-  inAFlow: 48
-  percent: 47%
+  operations: 224
+  inAFlow: 47
+  percent: 21%
   note: '**Flow coverage is how much of this service a journey has walked.** A service under 40% is
     unwalked rather than under-documented.'
 schemas:
 - schema: queue
-  tables: 4
+  tables: 5
   stores:
   - postgres
   largestTable: queue.queue
 - schema: maintenance
-  tables: 10
+  tables: 14
   stores:
   - postgres
   largestTable: maintenance.work_order
@@ -32,12 +32,12 @@ schemas:
   - postgres
   largestTable: resources.resource_type
 - schema: venuemap
-  tables: 4
+  tables: 5
   stores:
   - postgres
   largestTable: venuemap.point
 - schema: assets
-  tables: 12
+  tables: 13
   stores:
   - postgres
   largestTable: assets.media_asset
@@ -53,7 +53,7 @@ schemas:
   largestTable: rental.pricing_profile
 operationsByContract:
 - contract: resources
-  count: 48
+  count: 49
   operations:
   - operation: allocateResources
     verb: POST
@@ -61,7 +61,7 @@ operationsByContract:
     scope: venue
     permission: RESOURCE_BOOK
     offline: false
-    reads: 1
+    reads: 3
     writes: 1
   - operation: bookResource
     verb: POST
@@ -210,6 +210,14 @@ operationsByContract:
   - operation: getResourceHierarchy
     verb: GET
     path: /resources/{resourceId}/hierarchy
+    scope: venue
+    permission: RESOURCE_VIEW
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: getResourceQualifications
+    verb: GET
+    path: /resources/{resourceId}/qualifications
     scope: venue
     permission: RESOURCE_VIEW
     offline: false
@@ -836,7 +844,7 @@ operationsByContract:
     permission: ASSET_MANAGE
     offline: false
     reads: 2
-    writes: 2
+    writes: 3
   - operation: createInspectionTemplate
     verb: POST
     path: /inspection-templates
@@ -867,7 +875,7 @@ operationsByContract:
     scope: venue
     permission: ASSET_VIEW
     offline: true
-    reads: 3
+    reads: 4
     writes: 0
   - operation: getAssetHistory
     verb: GET
@@ -891,7 +899,7 @@ operationsByContract:
     scope: venue
     permission: INCIDENT_VIEW
     offline: false
-    reads: 1
+    reads: 3
     writes: 0
   - operation: getWorkOrder
     verb: GET
@@ -955,7 +963,7 @@ operationsByContract:
     scope: venue
     permission: ASSET_VIEW
     offline: true
-    reads: 3
+    reads: 4
     writes: 0
   - operation: pauseWorkOrder
     verb: POST
@@ -1044,7 +1052,7 @@ operationsByContract:
     permission: ASSET_MANAGE
     offline: false
     reads: 2
-    writes: 2
+    writes: 3
   - operation: updateIncident
     verb: PATCH
     path: /incidents/{incidentId}
@@ -1231,7 +1239,7 @@ operationsByContract:
     permission: ORDER_CREATE
     offline: false
     reads: 3
-    writes: 2
+    writes: 3
   - operation: setAttractionType
     verb: PUT
     path: /attraction-types
@@ -1569,10 +1577,10 @@ operationsByContract:
     scope: venue
     permission: ASSET_LIBRARY_MANAGE
     offline: false
-    reads: 2
+    reads: 3
     writes: 2
 - contract: queue
-  count: 21
+  count: 22
   operations:
   - operation: callNextParties
     verb: POST
@@ -1596,15 +1604,15 @@ operationsByContract:
     scope: venue
     permission: QUEUE_MANAGE
     offline: false
-    reads: 2
-    writes: 2
+    reads: 3
+    writes: 3
   - operation: getQueue
     verb: GET
     path: /queues/{queueId}
     scope: venue
     permission: QUEUE_VIEW
     offline: true
-    reads: 1
+    reads: 2
     writes: 0
   - operation: getQueueFeedHealth
     verb: GET
@@ -1662,6 +1670,14 @@ operationsByContract:
     offline: false
     reads: 2
     writes: 2
+  - operation: listMyWaitingGuests
+    verb: GET
+    path: /waiting-guests
+    scope: venue
+    permission: null
+    offline: false
+    reads: 1
+    writes: 0
   - operation: listQueueEntries
     verb: GET
     path: /queues/{queueId}/entries
@@ -1684,7 +1700,7 @@ operationsByContract:
     scope: venue
     permission: QUEUE_VIEW
     offline: true
-    reads: 1
+    reads: 2
     writes: 0
   - operation: overrideWaitingGuest
     verb: POST
@@ -1708,7 +1724,7 @@ operationsByContract:
     scope: venue
     permission: QUEUE_MANAGE
     offline: true
-    reads: 2
+    reads: 3
     writes: 2
   - operation: setWaitTime
     verb: PUT
@@ -1740,10 +1756,10 @@ operationsByContract:
     scope: venue
     permission: QUEUE_MANAGE
     offline: false
-    reads: 2
+    reads: 3
     writes: 2
 - contract: venue-map
-  count: 12
+  count: 13
   operations:
   - operation: acceptVenueLabelProposals
     verb: POST
@@ -1785,6 +1801,14 @@ operationsByContract:
     offline: true
     reads: 4
     writes: 1
+  - operation: getVenueMapImportJob
+    verb: GET
+    path: /venue-maps/{mapId}/import/{jobId}
+    scope: venue
+    permission: VENUE_MAP_VIEW
+    offline: false
+    reads: 1
+    writes: 0
   - operation: getVenueMapLive
     verb: GET
     path: /venue-maps/{mapId}/live
@@ -1847,25 +1871,170 @@ tables:
   columns: 5
   backing: redis
   owned: false
-  why: '**Not a table and not owned by a service.** Derived from something already read, invalidated
-    by an event already consumed, losable without consequence — no migration, no backup, no owner.'
+  why: '**Not a table and not owned by a service.** Derived from something already read, losable without
+    consequence — no migration, no backup, no owner.'
+  key: The idempotency key the caller sent
+  eviction:
+  - 'expires_at: **Must exceed the longest offline window.** A scanner out for a weekend replays on
+    Monday'
+  writtenBy:
+  - acceptVenueLabelProposals
+  - acceptWalkwayProposals
+  - acceptWorkOrder
+  - attachWorkOrderEvidence
+  - bookResource
+  - callNextParties
+  - cancelWorkOrder
+  - checkInResource
+  - checkOutResource
+  - closeWorkOrder
+  - completeUpload
+  - completeWorkOrder
+  - configureQueueFeed
+  - createAsset
+  - createCollection
+  - createGame
+  - createInspectionTemplate
+  - createMaintenancePlan
+  - createPrize
+  - createQueue
+  - createResource
+  - createUpload
+  - createVenueMap
+  - createWorkOrder
+  - deleteMediaAsset
+  - importVenueGeometry
+  - issueGameCard
+  - joinQueue
+  - leaveQueue
+  - overrideWaitingGuest
+  - pauseWorkOrder
+  - publishVenueMap
+  - recordAuthorityNotification
+  - recordGamePlay
+  - recordWorkOrderParts
+  - recordWorkOrderTime
+  - redeemPrize
+  - redeemWaitingGuest
+  - rejectWorkOrder
+  - reorderSessionManifest
+  - replaceMediaAsset
+  - reportIncident
+  - resumeWorkOrder
+  - setAssetStatus
+  - setPathClosure
+  - setQueueStatus
+  - setReaderProfile
+  - setResourceQualifications
+  - setVenuePoint
+  - setWaitTime
+  - startWorkOrder
+  - submitInspection
+  - submitQueueReading
+  - testQueueFeed
+  - transferGameCard
+  - updateAsset
+  - updateGame
+  - updateIncident
+  - updateMaintenancePlan
+  - updateMediaAsset
+  - updateQueue
+  - updateWorkOrder
+  - verifyWorkOrder
+  readBy:
+  - acceptVenueLabelProposals
+  - acceptWalkwayProposals
+  - acceptWorkOrder
+  - attachWorkOrderEvidence
+  - bookResource
+  - callNextParties
+  - cancelWorkOrder
+  - checkInResource
+  - checkOutResource
+  - closeWorkOrder
+  - completeUpload
+  - completeWorkOrder
+  - configureQueueFeed
+  - createAsset
+  - createCollection
+  - createGame
+  - createInspectionTemplate
+  - createMaintenancePlan
+  - createPrize
+  - createQueue
+  - createResource
+  - createUpload
+  - createVenueMap
+  - createWorkOrder
+  - deleteMediaAsset
+  - importVenueGeometry
+  - issueGameCard
+  - joinQueue
+  - leaveQueue
+  - overrideWaitingGuest
+  - pauseWorkOrder
+  - publishVenueMap
+  - recordAuthorityNotification
+  - recordGamePlay
+  - recordWorkOrderParts
+  - recordWorkOrderTime
+  - redeemPrize
+  - redeemWaitingGuest
+  - rejectWorkOrder
+  - reorderSessionManifest
+  - replaceMediaAsset
+  - reportIncident
+  - resumeWorkOrder
+  - setAssetStatus
+  - setPathClosure
+  - setQueueStatus
+  - setReaderProfile
+  - setResourceQualifications
+  - setVenuePoint
+  - setWaitTime
+  - startWorkOrder
+  - submitInspection
+  - submitQueueReading
+  - testQueueFeed
+  - transferGameCard
+  - updateAsset
+  - updateGame
+  - updateIncident
+  - updateMaintenancePlan
+  - updateMediaAsset
+  - updateQueue
+  - updateWorkOrder
+  - verifyWorkOrder
 - store: cache:resolution
   kind: cache
   columns: 4
   backing: redis
   owned: false
-  why: '**Not a table and not owned by a service.** Derived from something already read, invalidated
-    by an event already consumed, losable without consequence — no migration, no backup, no owner.'
+  why: '**Not a table and not owned by a service.** Derived from something already read, losable without
+    consequence — no migration, no backup, no owner.'
+  key: scope_path + what is being resolved — permissions, configuration, a price list
+  eviction:
+  - 'version: Bumped by the write that evicts it. **A config change nobody evicts is a stale permission**'
+  writtenBy:
+  - getVenueMapGraph
+  - publishVenueMap
+  - setPathClosure
+  readBy:
+  - getVenueMapGraph
+  gap: '**The lineage names this store, not the key.** Which resolution entry each writer below evicts
+    or bumps — permissions, configuration, a price list, and whether child scopes under its `scope_path`
+    are affected — is not recorded for any operation, so a writer here cannot yet be implemented from
+    the package alone.'
 - table: assets.approval
   columns: 7
   store: postgres
-  parent: maintenance.asset
+  parent: null
   writtenBy: []
   foreignWriters: null
 - table: assets.asset_version
   columns: 11
   store: postgres
-  parent: maintenance.asset
+  parent: null
   writtenBy: []
   foreignWriters: null
 - table: assets.audit
@@ -1882,7 +2051,7 @@ tables:
   - assets
   foreignWriters: null
 - table: assets.media_asset
-  columns: 23
+  columns: 24
   store: postgres
   parent: null
   writtenBy:
@@ -1895,8 +2064,14 @@ tables:
   writtenBy:
   - assets
   foreignWriters: null
+- table: assets.media_collection_member
+  columns: 5
+  store: postgres
+  parent: assets.media_collection
+  writtenBy: []
+  foreignWriters: null
 - table: assets.media_upload
-  columns: 7
+  columns: 12
   store: postgres
   parent: null
   writtenBy:
@@ -2001,7 +2176,7 @@ tables:
   - games
   foreignWriters: null
 - table: games.operational_config
-  columns: 13
+  columns: 12
   store: postgres
   parent: games.game
   writtenBy:
@@ -2066,7 +2241,8 @@ tables:
   columns: 6
   store: postgres
   parent: games.redemption
-  writtenBy: []
+  writtenBy:
+  - games
   foreignWriters: null
 - table: games.redemption_rules
   columns: 8
@@ -2083,7 +2259,7 @@ tables:
   - games
   foreignWriters: null
 - table: maintenance.asset
-  columns: 31
+  columns: 29
   store: postgres
   parent: null
   writtenBy:
@@ -2096,12 +2272,37 @@ tables:
   writtenBy:
   - rental
   foreignWriters: null
+- table: maintenance.asset_document
+  columns: 5
+  store: postgres
+  parent: maintenance.asset
+  writtenBy:
+  - maintenance
+  foreignWriters: null
+- table: maintenance.asset_status_change
+  columns: 10
+  store: postgres
+  parent: maintenance.asset
+  writtenBy: []
+  foreignWriters: null
 - table: maintenance.incident
   columns: 26
   store: postgres
   parent: null
   writtenBy:
   - maintenance
+  foreignWriters: null
+- table: maintenance.incident_authority_notification
+  columns: 8
+  store: postgres
+  parent: maintenance.incident
+  writtenBy: []
+  foreignWriters: null
+- table: maintenance.incident_involved_party
+  columns: 5
+  store: postgres
+  parent: maintenance.incident
+  writtenBy: []
   foreignWriters: null
 - table: maintenance.inspection
   columns: 14
@@ -2139,7 +2340,7 @@ tables:
   - maintenance
   foreignWriters: null
 - table: maintenance.work_order
-  columns: 36
+  columns: 52
   store: postgres
   parent: null
   writtenBy:
@@ -2167,14 +2368,21 @@ tables:
   - queue
   foreignWriters: null
 - table: queue.queue
-  columns: 31
+  columns: 33
   store: postgres
   parent: null
   writtenBy:
   - queue
   foreignWriters: null
-- table: queue.reading
+- table: queue.queue_operating_window
   columns: 6
+  store: postgres
+  parent: queue.queue
+  writtenBy:
+  - queue
+  foreignWriters: null
+- table: queue.reading
+  columns: 8
   store: postgres
   parent: null
   writtenBy:
@@ -2353,16 +2561,16 @@ tables:
   - resources
   foreignWriters: null
 - table: resources.booking
-  columns: 14
+  columns: 15
   store: postgres
   parent: null
   writtenBy:
   - resources
   foreignWriters: null
 - table: resources.qualification
-  columns: 8
+  columns: 9
   store: postgres
-  parent: null
+  parent: resources.resource
   writtenBy:
   - resources
   foreignWriters: null
@@ -2436,7 +2644,7 @@ tables:
   - resources
   foreignWriters: null
 - table: resources.session_participant
-  columns: 8
+  columns: 10
   store: postgres
   parent: null
   writtenBy:
@@ -2457,11 +2665,17 @@ tables:
   - venue-map
   foreignWriters: null
 - table: venuemap.map
-  columns: 14
+  columns: 15
   store: postgres
   parent: null
   writtenBy:
   - venue-map
+  foreignWriters: null
+- table: venuemap.map_version
+  columns: 7
+  store: postgres
+  parent: venuemap.map
+  writtenBy: []
   foreignWriters: null
 - table: venuemap.path
   columns: 10
@@ -2493,16 +2707,54 @@ readsFrom:
 writesOutside:
 - service: TenancyService
   operations: 2
-  why: '**The owner defines the row; this service may only append to it.**'
+  rule: 'ADR-0028: the owner defines the row; a foreign writer may only append, through a path the owner
+    published.'
+  why: '**The lineage records these writes, not how they honour the rule.** It does not say whether
+    each inserts or updates, or which operation or event TenancyService published for it — check each
+    against ADR-0028.'
+  writes:
+  - operation: completeWorkOrder
+    tables:
+    - platform.outbox
+  - operation: verifyWorkOrder
+    tables:
+    - platform.outbox
 - service: OrderService
   operations: 2
-  why: '**The owner defines the row; this service may only append to it.**'
+  rule: 'ADR-0028: the owner defines the row; a foreign writer may only append, through a path the owner
+    published.'
+  why: '**The lineage records these writes, not how they honour the rule.** It does not say whether
+    each inserts or updates, or which operation or event OrderService published for it — check each
+    against ADR-0028.'
+  writes:
+  - operation: checkInResource
+    tables:
+    - orders.stored_value_authorisation
+  - operation: checkOutResource
+    tables:
+    - orders.stored_value_authorisation
 - service: CrossRegionService
   operations: 1
-  why: '**The owner defines the row; this service may only append to it.**'
+  rule: 'ADR-0028: the owner defines the row; a foreign writer may only append, through a path the owner
+    published.'
+  why: '**The lineage records these writes, not how they honour the rule.** It does not say whether
+    each inserts or updates, or which operation or event CrossRegionService published for it — check
+    each against ADR-0028.'
+  writes:
+  - operation: syncGamePlays
+    tables:
+    - sync.rejection
 - service: InventoryService
   operations: 1
-  why: '**The owner defines the row; this service may only append to it.**'
+  rule: 'ADR-0028: the owner defines the row; a foreign writer may only append, through a path the owner
+    published.'
+  why: '**The lineage records these writes, not how they honour the rule.** It does not say whether
+    each inserts or updates, or which operation or event InventoryService published for it — check each
+    against ADR-0028.'
+  writes:
+  - operation: pauseWorkOrder
+    tables:
+    - inventory.requisition
 screens:
 - P01:WEB-002 Event & Attraction Listing
 - P01:WEB-004 Attraction Details

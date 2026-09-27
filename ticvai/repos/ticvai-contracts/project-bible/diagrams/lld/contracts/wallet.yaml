@@ -30,6 +30,7 @@ operations:
   reads:
   - cache:idempotency
   - games.card
+  - wallet.credit_lot
   - wallet.wallet
   writes:
   - cache:idempotency
@@ -44,6 +45,7 @@ operations:
   offline: false
   reads:
   - cache:idempotency
+  - wallet.credit_lot
   - wallet.wallet
   writes:
   - cache:idempotency
@@ -72,6 +74,7 @@ operations:
   offline: false
   reads:
   - cache:idempotency
+  - wallet.credit_lot
   - wallet.wallet
   - wallet.wallet_transaction
   writes:
@@ -170,6 +173,7 @@ operations:
   - guest
   offline: false
   reads:
+  - wallet.credit_lot
   - wallet.wallet
   writes: []
 - operation: getWalletBalance
@@ -341,6 +345,7 @@ operations:
   reads:
   - cache:idempotency
   - games.card
+  - wallet.credit_lot
   - wallet.wallet
   writes:
   - cache:idempotency
@@ -393,6 +398,7 @@ operations:
   offline: false
   reads:
   - cache:idempotency
+  - wallet.credit_lot
   - wallet.wallet
   writes:
   - cache:idempotency
@@ -561,6 +567,7 @@ operations:
   offline: false
   reads:
   - cache:idempotency
+  - wallet.credit_lot
   - wallet.wallet
   writes:
   - cache:idempotency
@@ -575,6 +582,7 @@ operations:
   offline: false
   reads:
   - cache:idempotency
+  - wallet.credit_lot
   - wallet.wallet
   writes:
   - cache:idempotency
@@ -592,6 +600,7 @@ operations:
   - cache:idempotency
   - pii.subject
   - wallet.wallet
+  - wallet.wallet_transaction
   writes:
   - cache:idempotency
   - wallet.wallet

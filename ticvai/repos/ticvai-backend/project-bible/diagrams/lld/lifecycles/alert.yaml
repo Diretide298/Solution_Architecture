@@ -5,10 +5,9 @@ index: diagrams/hld/04-lifecycles.yaml
 source: states/alert.yaml
 entity: Operational alert
 contract: reporting
-enum: Alert.status
-enumKind: inline
-enumSchema: Alert
-enumProperty: status
+enum: AlertStatus
+enumKind: named
+enumSchema: AlertStatus
 owner: reporting
 initial:
 - raised

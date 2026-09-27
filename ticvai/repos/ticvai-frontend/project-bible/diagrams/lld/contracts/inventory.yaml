@@ -16,6 +16,7 @@ operations:
   reads:
   - cache:idempotency
   - inventory.purchase_order
+  - inventory.purchase_order_line
   writes:
   - cache:idempotency
   - inventory.purchase_order
@@ -79,6 +80,7 @@ operations:
   reads:
   - cache:idempotency
   - inventory.requisition
+  - inventory.requisition_line
   writes:
   - cache:idempotency
   - inventory.requisition
@@ -93,6 +95,7 @@ operations:
   reads:
   - cache:idempotency
   - inventory.count
+  - inventory.count_line
   writes:
   - cache:idempotency
   - inventory.count
@@ -107,6 +110,7 @@ operations:
   reads:
   - cache:idempotency
   - inventory.purchase_order
+  - inventory.purchase_order_line
   writes:
   - cache:idempotency
   - inventory.purchase_order
@@ -121,6 +125,7 @@ operations:
   reads:
   - cache:idempotency
   - inventory.transfer
+  - inventory.transfer_line
   writes:
   - cache:idempotency
   - inventory.transfer
@@ -151,6 +156,7 @@ operations:
   writes:
   - cache:idempotency
   - inventory.goods_receipt
+  - inventory.goods_receipt_line
   - platform.outbox
 - operation: createInventoryItem
   verb: POST
@@ -181,6 +187,7 @@ operations:
   writes:
   - cache:idempotency
   - inventory.purchase_order
+  - inventory.purchase_order_line
 - operation: createRequisition
   verb: POST
   path: /requisitions
@@ -196,6 +203,7 @@ operations:
   writes:
   - cache:idempotency
   - inventory.requisition
+  - inventory.requisition_line
 - operation: createStockLocation
   verb: POST
   path: /stock-locations
@@ -239,6 +247,7 @@ operations:
   writes:
   - cache:idempotency
   - inventory.transfer
+  - inventory.transfer_line
 - operation: createSupplier
   verb: POST
   path: /suppliers
@@ -311,6 +320,8 @@ operations:
   reads:
   - fnb.cold_chain_event
   - inventory.item
+  - inventory.transfer
+  - inventory.transfer_line
   writes: []
 - operation: getStockValuation
   verb: GET
@@ -518,6 +529,7 @@ operations:
   writes:
   - cache:idempotency
   - inventory.transfer
+  - inventory.transfer_line
 - operation: recordQuotation
   verb: POST
   path: /suppliers/{supplierId}/quotations
@@ -533,6 +545,7 @@ operations:
   writes:
   - cache:idempotency
   - inventory.quotation
+  - inventory.quotation_line
 - operation: recountStockCount
   verb: POST
   path: /stock-counts/{countId}/recount
@@ -544,6 +557,7 @@ operations:
   reads:
   - cache:idempotency
   - inventory.count
+  - inventory.count_line
   writes:
   - cache:idempotency
   - inventory.count
@@ -562,6 +576,7 @@ operations:
   writes:
   - cache:idempotency
   - inventory.goods_receipt
+  - inventory.goods_receipt_line
 - operation: rejectRequisition
   verb: POST
   path: /requisitions/{requisitionId}/reject
@@ -573,6 +588,7 @@ operations:
   reads:
   - cache:idempotency
   - inventory.requisition
+  - inventory.requisition_line
   writes:
   - cache:idempotency
   - inventory.requisition
@@ -587,6 +603,7 @@ operations:
   reads:
   - cache:idempotency
   - inventory.requisition
+  - inventory.requisition_line
   writes:
   - cache:idempotency
   - inventory.requisition
@@ -601,6 +618,7 @@ operations:
   reads:
   - cache:idempotency
   - inventory.purchase_order
+  - inventory.purchase_order_line
   writes:
   - cache:idempotency
   - inventory.purchase_order
@@ -647,6 +665,7 @@ operations:
   writes:
   - cache:idempotency
   - inventory.count
+  - inventory.count_line
 - operation: updateInventoryItem
   verb: PATCH
   path: /inventory-items/{itemId}
@@ -673,9 +692,11 @@ operations:
   - cache:idempotency
   - inventory.item
   - inventory.requisition
+  - inventory.requisition_line
   writes:
   - cache:idempotency
   - inventory.requisition
+  - inventory.requisition_line
 - operation: updateSupplier
   verb: PUT
   path: /suppliers/{supplierId}

@@ -61,8 +61,8 @@
 | [GST-032](#gst-032-ai-concierge-chat) | AI Concierge – Chat | Engagement & Support | 2 | 8 |
 | [GST-033](#gst-033-ai-concierge-contextual-help) | AI Concierge – Contextual Help | Engagement & Support | 2 | 1 |
 | [GST-034](#gst-034-lost-found) | Lost & Found | Support | 2 | 3 |
-| [GST-036](#gst-036-loyalty-rewards) | Loyalty & Rewards | Membership, Loyalty & Value | 2 | 4 |
-| [GST-037](#gst-037-offers-promotions) | Offers & Promotions | Promotions | 2 | 4 |
+| [GST-036](#gst-036-loyalty-rewards) | Loyalty & Rewards | Membership, Loyalty & Value | 2 | 3 |
+| [GST-037](#gst-037-offers-promotions) | Offers & Promotions | Promotions | 2 | 3 |
 | [GST-040](#gst-040-help-support) | Help & Support | Engagement & Support | 2 | 5 |
 | [GST-044](#gst-044-multi-currency-pricing) | Multi-Currency & Pricing | Ticketing | 2 | 2 |
 | [GST-045](#gst-045-ticket-delivery-sharing) | Ticket Delivery & Sharing | Account & Self-Service | 2 | 1 |
@@ -122,7 +122,7 @@
 | `getTenantAppStatus` | [WhiteLabelService](../backend/WhiteLabelService.md#gettenantappstatus) | onLoad | App status and recent changes | `None` |
 | `getGuestProfile` | [MarketingService](../backend/MarketingService.md#getguestprofile) | onLoad | Read a guest profile | `GUEST_VIEW` |
 | `listMyEntitlements` | [AccessService](../backend/AccessService.md#listmyentitlements) | onLoad | Every ticket, pass and membership this guest holds | `ORDER_VIEW` |
-| `searchCatalogue` | [CatalogueService](../backend/CatalogueService.md#searchcatalogue) | onLoad | Find something by name | `None` |
+| `searchCatalogue` | [CatalogueService](../backend/CatalogueService.md#searchcatalogue) | onAction | Find something by name | `None` |
 | `getTenantConfig` | [WhiteLabelService](../backend/WhiteLabelService.md#gettenantconfig) | onLoad | Branding, currency and what this venue enables | `TENANT_CONFIGURE` |
 
 **States**
@@ -131,9 +131,9 @@
 |---|---|
 | loading | The home default list. |
 | error | Could not load. Names which read failed and leaves the home default untouched. |
-| emptyFirstRun | No home default yet. Carries the create action; distinct from a filter that matched nothing. |
-| emptyNoResults | The filter narrowed it and the home default are still there. Names the active filter and offers to clear it. |
-| emptyNoAccess | Names the missing permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| emptyFirstRun | No home default yet. Offers no create action — this screen declares no operation that makes one — and says so rather than showing an empty table. |
+| emptyNoResults | Nothing matches the filter on state, includeShared and the home default are still there. Names the active filter and offers to clear it. |
+| emptyNoAccess | Shown when the caller lacks `GUEST_VIEW`, which `getGuestProfile` requires, and names that permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | offline | The offline banner shows. What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing. |
 
 **Goes to**
@@ -142,7 +142,67 @@
 |---|---|---|---|
 | GST-002 | Explore Categories |  |  |
 | GST-003 | Event & Attraction Listing |  |  |
-| GST-004 | Attraction Details |  |  |
+| GST-004 | Attraction Details | productId |  |
+| GST-005 | What's On |  |  |
+| GST-006 | Event / Exhibition Details | productId |  |
+| GST-007 | Select Date & Time |  |  |
+| GST-008 | Tickets & Add-ons | orderId |  |
+| GST-009 | Review & Payment | orderId |  |
+| GST-010 | Booking Confirmation | orderId |  |
+| GST-011 | Wallet Overview | subjectId |  |
+| GST-012 | My Tickets | entitlementId, orderId |  |
+| GST-013 | Ticket Details | entitlementId, orderId |  |
+| GST-014 | Ticket Transfer | orderId |  |
+| GST-015 | Memberships | subjectId |  |
+| GST-016 | My Reservations |  |  |
+| GST-017 | Reservation Details |  |  |
+| GST-018 | Add to Calendar / Reminders | orderId |  |
+| GST-019 | Order History | orderId |  |
+| GST-020 | Saved Items / Wishlist | subjectId |  |
+| GST-021 | Interactive Map |  |  |
+| GST-023 | Virtual Queue |  |  |
+| GST-024 | F&B – Browse & Order | orderId |  |
+| GST-025 | F&B – Order Tracking | orderId |  |
+| GST-026 | Retail / Merchandise |  |  |
+| GST-027 | Parking – Reserve & Pay | entitlementId |  |
+| GST-031 | AI Concierge – Home |  |  |
+| GST-032 | AI Concierge – Chat | orderId |  |
+| GST-033 | AI Concierge – Contextual Help |  |  |
+| GST-034 | Lost & Found | orderId |  |
+| GST-037 | Offers & Promotions |  |  |
+| GST-039 | Profile | subjectId |  |
+| GST-040 | Help & Support |  |  |
+| GST-041 | Checkout Entry | productId |  |
+| GST-042 | Simple Registration & OTP |  |  |
+| GST-045 | Ticket Delivery & Sharing | orderId |  |
+| GST-046 | Branded Queue / Waiting Room |  |  |
+| GST-049 | Interactive Seat Selection |  |  |
+| GST-052 | Suggested Itineraries |  |  |
+| GST-054 | AI Optimized Itinerary |  |  |
+| GST-055 | Dynamic QR Ticket | entitlementId, orderId |  |
+| GST-056 | Bundle Package |  |  |
+| GST-059 | Plan My Day – In Progress |  |  |
+| GST-061 | Menu Item Detail |  |  |
+| GST-070 | Reserve a Table or Cabana |  |  |
+| GST-022 | Attraction Wait Times |  |  |
+| GST-028 | Parking – Reservation Confirmed |  |  |
+| GST-029 | Venue Info & Services |  |  |
+| GST-030 | In-Venue Notifications |  |  |
+| GST-035 | Feedback & Ratings |  |  |
+| GST-036 | Loyalty & Rewards |  |  |
+| GST-038 | Digital Companion Mode |  |  |
+| GST-043 | Arabic / RTL Experience |  |  |
+| GST-044 | Multi-Currency & Pricing |  |  |
+| GST-047 | Maintenance / Upgrade Page |  |  |
+| GST-048 | Upsell / Cross-Sell |  |  |
+| GST-050 | Resource Booking – Cabana |  |  |
+| GST-051 | Plan Your Adventure – Start |  |  |
+| GST-053 | Build Your Own Itinerary |  |  |
+| GST-057 | Accessibility Information |  |  |
+| GST-058 | Resource Availability (Cabana) |  |  |
+| GST-062 | Shop & Drop Collection |  |  |
+| GST-063 | Search |  |  |
+| GST-068 | Help & My Cases |  |  |
 
 ## GST-002 Explore Categories
 
@@ -169,18 +229,18 @@
 |---|---|
 | loading | The explore categories list. |
 | error | Could not load. Names which read failed and leaves the explore categories untouched. |
-| emptyFirstRun | No explore categories yet. Carries the create action; distinct from a filter that matched nothing. |
-| emptyNoResults | The filter narrowed it and the explore categories are still there. Names the active filter and offers to clear it. |
-| emptyNoAccess | Names the missing permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| emptyFirstRun | No explore categories yet. Offers no create action — this screen declares no operation that makes one — and says so rather than showing an empty table. |
+| emptyNoResults | Nothing matches the filter on venueId, kind, isSellable and the explore categories are still there. Names the active filter and offers to clear it. |
+| emptyNoAccess | Shown when the caller lacks `PRODUCT_VIEW`, which `listProducts` requires, and names that permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | offline | The offline banner shows. What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing. |
 
 **Goes to**
 
 | To | Trigger | Carries | Guard |
 |---|---|---|---|
-| GST-001 | Home – Default | subjectId |  |
-| GST-003 | Event & Attraction Listing | eventId |  |
-| GST-004 | Attraction Details | eventId, productId |  |
+| GST-001 | Home – Default |  |  |
+| GST-003 | Event & Attraction Listing |  |  |
+| GST-004 | Attraction Details | productId |  |
 
 ## GST-003 Event & Attraction Listing
 
@@ -208,7 +268,7 @@
 | `listProducts` | [CatalogueService](../backend/CatalogueService.md#listproducts) | onLoad | List products | `PRODUCT_VIEW` |
 | `getWaitTimes` | [VenueOpsService](../backend/VenueOpsService.md#getwaittimes) | onLoad | Wait times across a venue | `None` |
 | `listPerformances` | [CatalogueService](../backend/CatalogueService.md#listperformances) | onLoad | List performances of an event | `PRODUCT_VIEW` |
-| `searchCatalogue` | [CatalogueService](../backend/CatalogueService.md#searchcatalogue) | onLoad | Find something by name | `None` |
+| `searchCatalogue` | [CatalogueService](../backend/CatalogueService.md#searchcatalogue) | onAction | Find something by name | `None` |
 
 **States**
 
@@ -216,18 +276,18 @@
 |---|---|
 | loading | The event attraction listing list. |
 | error | Could not load. Names which read failed and leaves the event attraction listing untouched. |
-| emptyFirstRun | No event attraction listing yet. Carries the create action; distinct from a filter that matched nothing. |
-| emptyNoResults | The filter narrowed it and the event attraction listing are still there. Names the active filter and offers to clear it. |
-| emptyNoAccess | Names the missing permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| emptyFirstRun | No event attraction listing yet. Offers no create action — this screen declares no operation that makes one — and says so rather than showing an empty table. |
+| emptyNoResults | Nothing matches the filter on venueId, kind, isSellable and the event attraction listing are still there. Names the active filter and offers to clear it. |
+| emptyNoAccess | Shown when the caller lacks `PRODUCT_VIEW`, which `listProducts` requires, and names that permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | offline | The offline banner shows. What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing. |
 
 **Goes to**
 
 | To | Trigger | Carries | Guard |
 |---|---|---|---|
-| GST-001 | Home – Default | subjectId |  |
+| GST-001 | Home – Default |  |  |
 | GST-004 | Attraction Details | eventId, productId |  |
-| BO-005 | A supervisor sees the queue building |  |  |
+| BO-005 | A supervisor sees the queue building | queueId |  |
 
 ## GST-004 Attraction Details
 
@@ -265,16 +325,16 @@
 |---|---|
 | loading | The attraction list. |
 | error | Could not load. Names which read failed and leaves the attraction untouched. |
-| emptyFirstRun | No attraction yet. Carries the create action; distinct from a filter that matched nothing. |
-| emptyNoResults | The filter narrowed it and the attraction are still there. Names the active filter and offers to clear it. |
-| emptyNoAccess | Names the missing permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| emptyFirstRun | No attraction yet. Offers no create action — this screen declares no operation that makes one — and says so rather than showing an empty table. |
+| emptyNoResults | Nothing matches the filter on from, to and the attraction are still there. Names the active filter and offers to clear it. |
+| emptyNoAccess | Shown when the caller lacks `PRODUCT_VIEW`, which `getProductEligibilityRule` requires, and names that permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | offline | The offline banner shows. What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing. |
 
 **Goes to**
 
 | To | Trigger | Carries | Guard |
 |---|---|---|---|
-| GST-001 | Home – Default | subjectId |  |
+| GST-001 | Home – Default |  |  |
 | GST-003 | Event & Attraction Listing | eventId |  |
 
 ## GST-005 What's On
@@ -309,16 +369,16 @@
 |---|---|
 | loading | The what's list. |
 | error | Could not load. Names which read failed and leaves the what's untouched. |
-| emptyFirstRun | No what's yet. Carries the create action; distinct from a filter that matched nothing. |
-| emptyNoResults | The filter narrowed it and the what's are still there. Names the active filter and offers to clear it. |
-| emptyNoAccess | Names the missing permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| emptyFirstRun | No what's yet. Offers no create action — this screen declares no operation that makes one — and says so rather than showing an empty table. |
+| emptyNoResults | Nothing matches the filter on from, to and the what's are still there. Names the active filter and offers to clear it. |
+| emptyNoAccess | Shown when the caller lacks `PRODUCT_VIEW`, which `listPerformances` requires, and names that permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | offline | The offline banner shows. What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing. |
 
 **Goes to**
 
 | To | Trigger | Carries | Guard |
 |---|---|---|---|
-| GST-001 | Home – Default | subjectId |  |
+| GST-001 | Home – Default |  |  |
 | GST-003 | Event & Attraction Listing | eventId |  |
 
 ## GST-006 Event / Exhibition Details
@@ -352,18 +412,17 @@
 
 | State | Behaviour |
 |---|---|
-| loading | The event exhibition list. |
+| loading | The event exhibition, read by `getPerformance`. |
 | error | Could not load. Names which read failed and leaves the event exhibition untouched. |
-| emptyFirstRun | No event exhibition yet. Carries the create action; distinct from a filter that matched nothing. |
-| emptyNoResults | The filter narrowed it and the event exhibition are still there. Names the active filter and offers to clear it. |
-| emptyNoAccess | Names the missing permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| emptyFirstRun | No event exhibition yet. Offers no create action — this screen declares no operation that makes one — and says so rather than showing an empty table. |
+| emptyNoAccess | Shown when the caller lacks `PRODUCT_VIEW`, which `getPerformance` requires, and names that permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | offline | The offline banner shows. What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing. |
 
 **Goes to**
 
 | To | Trigger | Carries | Guard |
 |---|---|---|---|
-| GST-001 | Home – Default | subjectId |  |
+| GST-001 | Home – Default |  |  |
 | GST-003 | Event & Attraction Listing | eventId |  |
 
 ## GST-007 Select Date & Time
@@ -399,16 +458,16 @@
 |---|---|
 | loading | The select date time list. |
 | error | Could not load. Names which read failed and leaves the select date time untouched. |
-| emptyFirstRun | No select date time yet. Carries the create action; distinct from a filter that matched nothing. |
-| emptyNoResults | The filter narrowed it and the select date time are still there. Names the active filter and offers to clear it. |
-| emptyNoAccess | Names the missing permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| emptyFirstRun | No select date time yet. Offers no create action — this screen declares no operation that makes one — and says so rather than showing an empty table. |
+| emptyNoResults | Nothing matches the filter on from, to and the select date time are still there. Names the active filter and offers to clear it. |
+| emptyNoAccess | Shown when the caller lacks `PRODUCT_VIEW`, which `listPerformances` requires, and names that permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | offline | The offline banner shows. What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing. |
 
 **Goes to**
 
 | To | Trigger | Carries | Guard |
 |---|---|---|---|
-| GST-001 | Home – Default | subjectId |  |
+| GST-001 | Home – Default |  |  |
 | GST-003 | Event & Attraction Listing | eventId |  |
 
 ## GST-008 Tickets & Add-ons
@@ -442,16 +501,16 @@
 |---|---|
 | loading | The saved tickets add-ons. |
 | error | Could not load. Names which read failed and leaves the tickets add-ons untouched. |
-| emptyFirstRun | No tickets add-ons configured. Carries the create action and says what the platform does in the meantime. |
-| emptyNoAccess | Names the missing permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| emptyFirstRun | No tickets add-ons configured. The form opens empty and `transferOrderTickets` saves the first one; it says what the platform does in the meantime. |
 | offline | The offline banner shows. What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing. |
 
 **Goes to**
 
 | To | Trigger | Carries | Guard |
 |---|---|---|---|
-| GST-001 | Home – Default | subjectId |  |
-| GST-003 | Event & Attraction Listing | eventId |  |
+| GST-001 | Home – Default |  |  |
+| GST-003 | Event & Attraction Listing |  |  |
+| GST-072 | Share & Group Booking |  |  |
 
 ## GST-009 Review & Payment
 
@@ -486,7 +545,7 @@
 | `inquirePaymentStatus` | [OrderService](../backend/OrderService.md#inquirepaymentstatus) | onAction | Ask the provider what actually happened | `ORDER_CREATE` |
 | `checkoutCart` | [OrderService](../backend/OrderService.md#checkoutcart) | onAction | Turn the cart into an order | `None` |
 | `getCart` | [OrderService](../backend/OrderService.md#getcart) | onLoad | The cart, priced and checked, right now | `None` |
-| `acquireInventoryHold` | [CatalogueService](../backend/CatalogueService.md#acquireinventoryhold) | onAction | Hold the stock while payment is taken | `ORDER_CREATE` |
+| `addCartLine` | [OrderService](../backend/OrderService.md#addcartline) | onAction | Hold the stock while payment is taken | `None` |
 | `createOrder` | [OrderService](../backend/OrderService.md#createorder) | onAction | Turn the checked-out cart into an order | `ORDER_CREATE` |
 | `getPaymentLink` | [OrderService](../backend/OrderService.md#getpaymentlink) | onLoad | Open a payment link sent to this guest | `ORDER_VIEW` |
 | `payByLink` | [OrderService](../backend/OrderService.md#paybylink) | onAction | Pay a booking somebody else made | `ORDER_CREATE` |
@@ -495,20 +554,19 @@
 
 | State | Behaviour |
 |---|---|
-| loading | The review payment list. |
+| loading | The review payment, read by `getCart`. |
 | error | Could not load. Names which read failed and leaves the review payment untouched. |
-| emptyFirstRun | No review payment yet. Carries the create action; distinct from a filter that matched nothing. |
-| emptyNoResults | The filter narrowed it and the review payment are still there. Names the active filter and offers to clear it. |
-| emptyNoAccess | Names the missing permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| emptyFirstRun | No review payment yet. Offers Create payment (`createPayment`). |
+| emptyNoAccess | Shown when the caller lacks `ORDER_VIEW`, which `getPaymentLink` requires, and names that permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | offline | Not available, and the offline banner says why. A payment needs the gateway, and pretending otherwise takes money nobody can confirm. What was typed stays on screen so nothing is entered twice. |
 
 **Goes to**
 
 | To | Trigger | Carries | Guard |
 |---|---|---|---|
-| GST-001 | Home – Default | subjectId |  |
-| GST-003 | Event & Attraction Listing | eventId |  |
-| BO-020 | Kitchen accepts and prepares |  |  |
+| GST-001 | Home – Default |  |  |
+| GST-003 | Event & Attraction Listing |  |  |
+| BO-020 | Kitchen accepts and prepares | orderId |  |
 
 ## GST-010 Booking Confirmation
 
@@ -541,19 +599,18 @@
 
 | State | Behaviour |
 |---|---|
-| loading | The booking confirmation list. |
+| loading | The booking confirmation, read by `getOrder`. |
 | error | Could not load. Names which read failed and leaves the booking confirmation untouched. |
-| emptyFirstRun | No booking confirmation yet. Carries the create action; distinct from a filter that matched nothing. |
-| emptyNoResults | The filter narrowed it and the booking confirmation are still there. Names the active filter and offers to clear it. |
-| emptyNoAccess | Names the missing permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| emptyFirstRun | No booking confirmation yet. Offers no create action — this screen declares no operation that makes one — and says so rather than showing an empty table. |
+| emptyNoAccess | Shown when the caller lacks `ORDER_VIEW`, which `getOrder` requires, and names that permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | offline | The offline banner shows. What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing. |
 
 **Goes to**
 
 | To | Trigger | Carries | Guard |
 |---|---|---|---|
-| GST-001 | Home – Default | subjectId |  |
-| GST-003 | Event & Attraction Listing | eventId |  |
+| GST-001 | Home – Default |  |  |
+| GST-003 | Event & Attraction Listing |  |  |
 
 ## GST-012 My Tickets
 
@@ -592,18 +649,18 @@
 |---|---|
 | loading | The tickets list. |
 | error | Could not load. Names which read failed and leaves the tickets untouched. |
-| emptyFirstRun | No tickets yet. Carries the create action; distinct from a filter that matched nothing. |
-| emptyNoResults | The filter narrowed it and the tickets are still there. Names the active filter and offers to clear it. |
-| emptyNoAccess | Names the missing permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| emptyFirstRun | No tickets yet. Offers no create action — this screen declares no operation that makes one — and says so rather than showing an empty table. |
+| emptyNoResults | Nothing matches the filter on state, includeShared and the tickets are still there. Names the active filter and offers to clear it. |
+| emptyNoAccess | Shown when the caller lacks `ORDER_VIEW`, which `listMyEntitlements` requires, and names that permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | offline | The offline banner shows. Tickets already loaded stay visible with their age. Sharing, transferring and adding to a phone wallet need the connection. |
 
 **Goes to**
 
 | To | Trigger | Carries | Guard |
 |---|---|---|---|
-| GST-013 | They open the one for now |  |  |
-| GST-001 | Home – Default | subjectId |  |
-| GST-003 | Event & Attraction Listing | eventId |  |
+| GST-001 | Home – Default |  |  |
+| GST-003 | Event & Attraction Listing |  |  |
+| GST-013 | They open the one for now | entitlementId, orderId |  |
 
 ## GST-013 Ticket Details
 
@@ -641,17 +698,16 @@
 | loading | Availability is live, never cached |
 | error | Availability unavailable. Selection is blocked — overselling is worse than waiting |
 | emptyFirstRun | Sold out is a real answer. Offers the next available rather than a dead end |
-| emptyNoResults | The filter narrowed it and the ticket are still there. Names the active filter and offers to clear it. |
-| emptyNoAccess | Names the missing permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| emptyNoAccess | Shown when the caller lacks `ORDER_VIEW`, which `getEntitlement` requires, and names that permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | offline | The offline banner shows. Tickets already loaded stay visible with their age. Sharing, transferring and adding to a phone wallet need the connection. |
 
 **Goes to**
 
 | To | Trigger | Carries | Guard |
 |---|---|---|---|
-| GST-055 | The QR rotates as they walk to the gate |  |  |
-| GST-001 | Home – Default | subjectId |  |
-| GST-003 | Event & Attraction Listing | eventId |  |
+| GST-001 | Home – Default |  |  |
+| GST-003 | Event & Attraction Listing |  |  |
+| GST-055 | The QR rotates as they walk to the gate | entitlementId, orderId |  |
 
 ## GST-039 Profile
 
@@ -685,8 +741,8 @@
 |---|---|
 | loading | The saved profile. |
 | error | Could not load. Names which read failed and leaves the profile untouched. |
-| emptyFirstRun | No profile configured. Carries the create action and says what the platform does in the meantime. |
-| emptyNoAccess | Names the missing permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| emptyFirstRun | No profile configured. The form opens empty and `recordConsent` saves the first one; it says what the platform does in the meantime. |
+| emptyNoAccess | Shown when the caller lacks `GUEST_VIEW`, which `updateMyProfile` requires, and names that permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | offline | The offline banner shows. What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing. |
 
 **Goes to**
@@ -694,8 +750,10 @@
 | To | Trigger | Carries | Guard |
 |---|---|---|---|
 | GST-065 | And their marketing preferences |  |  |
-| GST-001 | Home – Default | subjectId |  |
-| GST-003 | Event & Attraction Listing | eventId |  |
+| GST-001 | Home – Default |  |  |
+| GST-003 | Event & Attraction Listing |  |  |
+| GST-069 | Face Pass |  |  |
+| GST-071 | Payment Methods |  |  |
 
 ## GST-041 Checkout Entry
 
@@ -727,7 +785,7 @@
 | `abandonCart` | [OrderService](../backend/OrderService.md#abandoncart) | onAction | Give the inventory back | `None` |
 | `claimCart` | [OrderService](../backend/OrderService.md#claimcart) | onAction | Pick up a basket started on another device | `None` |
 | `extendCart` | [OrderService](../backend/OrderService.md#extendcart) | onAction | Keep the hold alive while the guest decides | `None` |
-| `listProductVariants` | [CatalogueService](../backend/CatalogueService.md#listproductvariants) | onLoad | Which variant each line is | `PRODUCT_VIEW` |
+| `listProductVariants` | [CatalogueService](../backend/CatalogueService.md#listproductvariants) | onAction | Which variant each line is | `PRODUCT_VIEW` |
 | `removeCartLine` | [OrderService](../backend/OrderService.md#removecartline) | onAction | Take a line out of the basket | `None` |
 | `updateCartLine` | [OrderService](../backend/OrderService.md#updatecartline) | onAction | Change a quantity before paying | `None` |
 
@@ -738,7 +796,7 @@
 | loading | Terminal or gateway state, shown plainly |
 | error | Declined reads differently from unresolved. An unresolved payment inquires rather than retries, and nothing is issued until it resolves |
 | emptyFirstRun | — |
-| emptyNoResults | The filter narrowed it and the checkout entry are still there. Names the active filter and offers to clear it. |
+| emptyNoResults | Never shown: `listProductVariants` takes no filter, so an empty list is always the first-run state above. |
 | emptyNoAccess | This is the checkout page, and it is where identity is settled (ADR-0045, 18 September 2026). An unverified or anonymous guest is not turned away — they are offered sign-in or, where the site's `guestCheckout` is on, the one-time code. The cart stays intact either way; `checkoutCart` is what refuses. |
 | offline | The offline banner shows. What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing. |
 
@@ -747,8 +805,8 @@
 | To | Trigger | Carries | Guard |
 |---|---|---|---|
 | GST-042 | Signs in, or proves the contact the tickets go to | cartId | no verified guest session. This screen is the checkout page, so the fork sits here rather than in front of the cart (matrix 2.6.1 §2.4) |
-| GST-001 | Home – Default | subjectId |  |
-| GST-003 | Event & Attraction Listing | eventId |  |
+| GST-001 | Home – Default |  |  |
+| GST-003 | Event & Attraction Listing |  |  |
 
 ## GST-042 Simple Registration & OTP
 
@@ -775,7 +833,7 @@
 
 | Operation | Service | When | Purpose | Permission |
 |---|---|---|---|---|
-| `requestGuestOtp` | [IdentityService](../backend/IdentityService.md#requestguestotp) | onLoad | from page inventory | `None` |
+| `requestGuestOtp` | [IdentityService](../backend/IdentityService.md#requestguestotp) | onAction | from page inventory | `None` |
 | `completeSsoAuthorization` | [IdentityService](../backend/IdentityService.md#completessoauthorization) | onAction | Exchange an SSO code for a session | `None` |
 | `enrolMfaMethod` | [IdentityService](../backend/IdentityService.md#enrolmfamethod) | onAction | Enrol an MFA method | `None` |
 | `getGuestSession` | [IdentityService](../backend/IdentityService.md#getguestsession) | onLoad | Read the current guest session | `None` |
@@ -789,7 +847,7 @@
 | `refreshToken` | [IdentityService](../backend/IdentityService.md#refreshtoken) | onAction | Rotate the access token | `None` |
 | `registerGuest` | [IdentityService](../backend/IdentityService.md#registerguest) | onAction | Create a guest account | `None` |
 | `removeMfaMethod` | [IdentityService](../backend/IdentityService.md#removemfamethod) | onAction | Remove an MFA method | `None` |
-| `startSsoAuthorization` | [IdentityService](../backend/IdentityService.md#startssoauthorization) | onLoad | Begin an SSO flow | `None` |
+| `startSsoAuthorization` | [IdentityService](../backend/IdentityService.md#startssoauthorization) | onAction | Begin an SSO flow | `None` |
 | `verifyGuestOtp` | [IdentityService](../backend/IdentityService.md#verifyguestotp) | onAction | Verify a one-time code and issue a session | `None` |
 | `verifyMfaChallenge` | [IdentityService](../backend/IdentityService.md#verifymfachallenge) | onAction | Complete a step-up challenge | `None` |
 | `verifyMfaEnrolment` | [IdentityService](../backend/IdentityService.md#verifymfaenrolment) | onAction | Complete enrolment | `None` |
@@ -800,19 +858,18 @@
 |---|---|
 | loading | The simple registration otp list. |
 | error | Could not load. Names which read failed and leaves the simple registration otp untouched. |
-| emptyFirstRun | No simple registration otp yet. Carries the create action; distinct from a filter that matched nothing. |
-| emptyNoResults | The filter narrowed it and the simple registration otp are still there. Names the active filter and offers to clear it. |
-| emptyNoAccess | Names the missing permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| emptyFirstRun | No simple registration otp yet. Offers Request guest OTP (`requestGuestOtp`). |
+| emptyNoResults | Never shown: `listMfaMethods` takes no filter, so an empty list is always the first-run state above. |
 | offline | Not available, and the offline banner says why. Signing in, registering and verifying a code need the server. |
 
 **Goes to**
 
 | To | Trigger | Carries | Guard |
 |---|---|---|---|
-| GST-001 | Home – Default | subjectId |  |
-| GST-003 | Event & Attraction Listing | eventId |  |
-| WEB-016 | A guest who checked out anonymously links their order |  |  |
+| GST-001 | Home – Default |  |  |
+| GST-003 | Event & Attraction Listing |  |  |
 | GST-041 | Signed in and verified — back to the cart | cartId | arrived from the cart |
+| WEB-016 | A guest who checked out anonymously links their order | challengeId, methodId, providerId |  |
 
 ## GST-043 Arabic / RTL Experience
 
@@ -833,17 +890,15 @@
 |---|---|
 | loading | The arabic rtl experience list. |
 | error | Could not load. Names which read failed and leaves the arabic rtl experience untouched. |
-| emptyFirstRun | No arabic rtl experience yet. Carries the create action; distinct from a filter that matched nothing. |
-| emptyNoResults | The filter narrowed it and the arabic rtl experience are still there. Names the active filter and offers to clear it. |
-| emptyNoAccess | Names the missing permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| emptyFirstRun | No arabic rtl experience yet. Offers no create action — this screen declares no operation that makes one — and says so rather than showing an empty table. |
 | offline | The offline banner shows. What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing. |
 
 **Goes to**
 
 | To | Trigger | Carries | Guard |
 |---|---|---|---|
-| GST-001 | Home – Default | subjectId |  |
-| GST-003 | Event & Attraction Listing | eventId |  |
+| GST-001 | Home – Default |  |  |
+| GST-003 | Event & Attraction Listing |  |  |
 
 ## GST-046 Branded Queue / Waiting Room
 
@@ -876,19 +931,17 @@
 
 | State | Behaviour |
 |---|---|
-| loading | The branded queue waiting list. |
+| loading | The branded queue waiting, read by `getWaitTimes`. |
 | error | Could not load. Names which read failed and leaves the branded queue waiting untouched. |
-| emptyFirstRun | No branded queue waiting yet. Carries the create action; distinct from a filter that matched nothing. |
-| emptyNoResults | The filter narrowed it and the branded queue waiting are still there. Names the active filter and offers to clear it. |
-| emptyNoAccess | Names the missing permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| emptyFirstRun | No branded queue waiting yet. Offers no create action — this screen declares no operation that makes one — and says so rather than showing an empty table. |
 | offline | The offline banner shows. The last known position stays on screen with its age. Joining, leaving and being admitted all need the connection. |
 
 **Goes to**
 
 | To | Trigger | Carries | Guard |
 |---|---|---|---|
-| GST-001 | Home – Default | subjectId |  |
-| GST-003 | Event & Attraction Listing | eventId |  |
+| GST-001 | Home – Default |  |  |
+| GST-003 | Event & Attraction Listing |  |  |
 
 ## GST-047 Maintenance / Upgrade Page
 
@@ -913,19 +966,17 @@
 
 | State | Behaviour |
 |---|---|
-| loading | The maintenance upgrade list. |
+| loading | The maintenance upgrade, read by `getTenantAppStatus`. |
 | error | Could not load. Names which read failed and leaves the maintenance upgrade untouched. |
-| emptyFirstRun | No maintenance upgrade yet. Carries the create action; distinct from a filter that matched nothing. |
-| emptyNoResults | The filter narrowed it and the maintenance upgrade are still there. Names the active filter and offers to clear it. |
-| emptyNoAccess | Names the missing permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| emptyFirstRun | No maintenance upgrade yet. Offers no create action — this screen declares no operation that makes one — and says so rather than showing an empty table. |
 | offline | The offline banner shows instead of this page. Being offline is the guest's connection, not the venue's — an error or maintenance page shown for a dropped signal tells a guest the venue is down. |
 
 **Goes to**
 
 | To | Trigger | Carries | Guard |
 |---|---|---|---|
-| GST-001 | Home – Default | subjectId |  |
-| GST-003 | Event & Attraction Listing | eventId |  |
+| GST-001 | Home – Default |  |  |
+| GST-003 | Event & Attraction Listing |  |  |
 
 ## GST-055 Dynamic QR Ticket
 
@@ -952,8 +1003,8 @@
 | Operation | Service | When | Purpose | Permission |
 |---|---|---|---|---|
 | `listMyEntitlements` | [AccessService](../backend/AccessService.md#listmyentitlements) | onLoad | The guest's tickets and passes | `ORDER_VIEW` |
-| `getEntitlement` | [AccessService](../backend/AccessService.md#getentitlement) | onLoad | The selected ticket | `ORDER_VIEW` |
-| `getEntitlementCredential` | [AccessService](../backend/AccessService.md#getentitlementcredential) | onLoad | The QR code that gets scanned, refreshed | `ORDER_VIEW` |
+| `getEntitlement` | [AccessService](../backend/AccessService.md#getentitlement) | onAction | The selected ticket | `ORDER_VIEW` |
+| `getEntitlementCredential` | [AccessService](../backend/AccessService.md#getentitlementcredential) | onAction | The QR code that gets scanned, refreshed | `ORDER_VIEW` |
 | `transferOrderTickets` | [OrderService](../backend/OrderService.md#transferordertickets) | onAction | Transfer tickets to another guest | `None` |
 
 **States**
@@ -963,15 +1014,15 @@
 | loading | Availability is live, never cached |
 | error | Availability unavailable. Selection is blocked — overselling is worse than waiting |
 | emptyFirstRun | Sold out is a real answer. Offers the next available rather than a dead end |
-| emptyNoAccess | Names the missing permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| emptyNoAccess | Shown when the caller lacks `ORDER_VIEW`, which `listMyEntitlements` requires, and names that permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | offline | The offline banner shows. What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing. |
 
 **Goes to**
 
 | To | Trigger | Carries | Guard |
 |---|---|---|---|
-| GST-001 | Home – Default | subjectId |  |
-| GST-003 | Event & Attraction Listing | eventId |  |
+| GST-001 | Home – Default |  |  |
+| GST-003 | Event & Attraction Listing |  |  |
 
 ## GST-063 Search
 
@@ -990,7 +1041,7 @@
 
 | Operation | Service | When | Purpose | Permission |
 |---|---|---|---|---|
-| `searchCatalogue` | [CatalogueService](../backend/CatalogueService.md#searchcatalogue) | onLoad | Find something by name | `None` |
+| `searchCatalogue` | [CatalogueService](../backend/CatalogueService.md#searchcatalogue) | onAction | Find something by name | `None` |
 
 **States**
 
@@ -998,16 +1049,15 @@
 |---|---|
 | loading | The search list. |
 | error | Could not load. Names which read failed and leaves the search untouched. |
-| emptyFirstRun | No search yet. Carries the create action; distinct from a filter that matched nothing. |
-| emptyNoResults | The filter narrowed it and the search are still there. Names the active filter and offers to clear it. |
-| emptyNoAccess | Names the missing permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| emptyFirstRun | No search yet. Offers no create action — this screen declares no operation that makes one — and says so rather than showing an empty table. |
+| emptyNoResults | Nothing matches the filter on q, venueId, kind and the search are still there. Names the active filter and offers to clear it. |
 | offline | The offline banner shows. Results come only from what was already loaded, with a note that newer items may exist. |
 
 **Goes to**
 
 | To | Trigger | Carries | Guard |
 |---|---|---|---|
-| GST-001 | Home – Default | subjectId |  |
+| GST-001 | Home – Default |  |  |
 
 ## GST-011 Wallet Overview
 
@@ -1041,18 +1091,18 @@
 |---|---|
 | loading | The wallet overview list. |
 | error | Could not load. Names which read failed and leaves the wallet overview untouched. |
-| emptyFirstRun | No wallet overview yet. Carries the create action; distinct from a filter that matched nothing. |
-| emptyNoResults | The filter narrowed it and the wallet overview are still there. Names the active filter and offers to clear it. |
-| emptyNoAccess | Names the missing permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| emptyFirstRun | No wallet overview yet. Offers no create action — this screen declares no operation that makes one — and says so rather than showing an empty table. |
+| emptyNoResults | Never shown: `listWalletTransactions` takes no filter, so an empty list is always the first-run state above. |
+| emptyNoAccess | Shown when the caller lacks `WALLET_VIEW`, which `getWallet` requires, and names that permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | offline | The offline banner shows. Balances and stored cards already loaded stay visible with their age, cards masked. Storing a card and transferring value need the server. |
 
 **Goes to**
 
 | To | Trigger | Carries | Guard |
 |---|---|---|---|
-| GST-020 | Saved items carry across sessions |  |  |
-| GST-001 | Home – Default | subjectId |  |
-| GST-003 | Event & Attraction Listing | eventId |  |
+| GST-001 | Home – Default |  |  |
+| GST-003 | Event & Attraction Listing |  |  |
+| GST-020 | Saved items carry across sessions | subjectId |  |
 
 ## GST-014 Ticket Transfer
 
@@ -1089,16 +1139,16 @@
 | loading | Availability is live, never cached |
 | error | Availability unavailable. Selection is blocked — overselling is worse than waiting |
 | emptyFirstRun | Sold out is a real answer. Offers the next available rather than a dead end |
-| emptyNoResults | The filter narrowed it and the ticket transfer are still there. Names the active filter and offers to clear it. |
-| emptyNoAccess | Names the missing permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| emptyNoResults | Nothing matches the filter on venueId, principalId, shiftId, status, createdFrom, createdTo and the ticket transfer are still there. Names the active filter and offers to clear it. |
+| emptyNoAccess | Shown when the caller lacks `ORDER_VIEW`, which `listOrders` requires, and names that permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | offline | The offline banner shows. Sending, claiming and listing for resale need the connection — a transfer nobody received is a ticket nobody holds. Tickets already loaded stay visible. |
 
 **Goes to**
 
 | To | Trigger | Carries | Guard |
 |---|---|---|---|
-| GST-001 | Home – Default | subjectId |  |
-| GST-003 | Event & Attraction Listing | eventId |  |
+| GST-001 | Home – Default |  |  |
+| GST-003 | Event & Attraction Listing |  |  |
 
 ## GST-015 Memberships
 
@@ -1127,7 +1177,7 @@
 | Operation | Service | When | Purpose | Permission |
 |---|---|---|---|---|
 | `listBillingStatements` | [OrderService](../backend/OrderService.md#listbillingstatements) | onLoad | Membership billing statements | `None` |
-| `getBillingStatement` | [OrderService](../backend/OrderService.md#getbillingstatement) | onLoad | One statement, line by line | `None` |
+| `getBillingStatement` | [OrderService](../backend/OrderService.md#getbillingstatement) | onAction | One statement, line by line | `None` |
 | `listMyPaymentIssues` | [OrderService](../backend/OrderService.md#listmypaymentissues) | onLoad | Declined renewals waiting on the guest | `None` |
 | `retryMyDunningPayment` | [OrderService](../backend/OrderService.md#retrymydunningpayment) | onAction | Retry a declined payment, on another card if needed | `None` |
 | `getMyMemberships` | [CatalogueService](../backend/CatalogueService.md#getmymemberships) | onLoad | A guest's own memberships, benefits and history | `PRODUCT_VIEW` |
@@ -1142,17 +1192,17 @@
 |---|---|
 | loading | The memberships list. |
 | error | Could not load. Names which read failed and leaves the memberships untouched. |
-| emptyFirstRun | No memberships yet. Carries the create action; distinct from a filter that matched nothing. |
-| emptyNoResults | The filter narrowed it and the memberships are still there. Names the active filter and offers to clear it. |
-| emptyNoAccess | Names the missing permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| emptyFirstRun | No memberships yet. Offers no create action — this screen declares no operation that makes one — and says so rather than showing an empty table. |
+| emptyNoResults | Nothing matches the filter on from, to and the memberships are still there. Names the active filter and offers to clear it. |
+| emptyNoAccess | Shown when the caller lacks `PRODUCT_VIEW`, which `getMyMemberships` requires, and names that permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | offline | The offline banner shows. What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing. |
 
 **Goes to**
 
 | To | Trigger | Carries | Guard |
 |---|---|---|---|
-| GST-001 | Home – Default | subjectId |  |
-| GST-003 | Event & Attraction Listing | eventId |  |
+| GST-001 | Home – Default |  |  |
+| GST-003 | Event & Attraction Listing |  |  |
 | ADM-003 | The right is propagated to the other cell |  |  |
 
 ## GST-016 My Reservations
@@ -1179,7 +1229,7 @@
 | Operation | Service | When | Purpose | Permission |
 |---|---|---|---|---|
 | `listReservations` | [OrderService](../backend/OrderService.md#listreservations) | onLoad | List reservations | `ORDER_VIEW` |
-| `getReservation` | [OrderService](../backend/OrderService.md#getreservation) | onLoad | Read a reservation | `ORDER_VIEW` |
+| `getReservation` | [OrderService](../backend/OrderService.md#getreservation) | onAction | Read a reservation | `ORDER_VIEW` |
 | `cancelReservation` | [OrderService](../backend/OrderService.md#cancelreservation) | onAction | Cancel a reservation | `ORDER_CANCEL` |
 
 **States**
@@ -1188,18 +1238,18 @@
 |---|---|
 | loading | The reservations list. |
 | error | Could not load. Names which read failed and leaves the reservations untouched. |
-| emptyFirstRun | No reservations yet. Carries the create action; distinct from a filter that matched nothing. |
-| emptyNoResults | The filter narrowed it and the reservations are still there. Names the active filter and offers to clear it. |
-| emptyNoAccess | Names the missing permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| emptyFirstRun | No reservations yet. Offers no create action — this screen declares no operation that makes one — and says so rather than showing an empty table. |
+| emptyNoResults | Nothing matches the filter on status, expiringWithinMinutes and the reservations are still there. Names the active filter and offers to clear it. |
+| emptyNoAccess | Shown when the caller lacks `ORDER_VIEW`, which `listReservations` requires, and names that permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | offline | The offline banner shows. Reservations already loaded stay visible with their age. Booking, changing and cancelling need the connection — a table held offline is a table two people think they have. |
 
 **Goes to**
 
 | To | Trigger | Carries | Guard |
 |---|---|---|---|
-| GST-017 | On the day, they arrive |  |  |
-| GST-001 | Home – Default | subjectId |  |
-| GST-003 | Event & Attraction Listing | eventId |  |
+| GST-001 | Home – Default |  |  |
+| GST-003 | Event & Attraction Listing |  |  |
+| GST-017 | On the day, they arrive | reservationId |  |
 
 ## GST-017 Reservation Details
 
@@ -1231,19 +1281,18 @@
 
 | State | Behaviour |
 |---|---|
-| loading | The reservation list. |
+| loading | The reservation, read by `getReservation`. |
 | error | Could not load. Names which read failed and leaves the reservation untouched. |
-| emptyFirstRun | No reservation yet. Carries the create action; distinct from a filter that matched nothing. |
-| emptyNoResults | The filter narrowed it and the reservation are still there. Names the active filter and offers to clear it. |
-| emptyNoAccess | Names the missing permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| emptyFirstRun | No reservation yet. Offers no create action — this screen declares no operation that makes one — and says so rather than showing an empty table. |
+| emptyNoAccess | Shown when the caller lacks `ORDER_VIEW`, which `getReservation` requires, and names that permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | offline | The offline banner shows. Reservations already loaded stay visible with their age. Booking, changing and cancelling need the connection — a table held offline is a table two people think they have. |
 
 **Goes to**
 
 | To | Trigger | Carries | Guard |
 |---|---|---|---|
-| GST-001 | Home – Default | subjectId |  |
-| GST-003 | Event & Attraction Listing | eventId |  |
+| GST-001 | Home – Default |  |  |
+| GST-003 | Event & Attraction Listing |  |  |
 
 ## GST-019 Order History
 
@@ -1269,7 +1318,7 @@
 | Operation | Service | When | Purpose | Permission |
 |---|---|---|---|---|
 | `listOrders` | [OrderService](../backend/OrderService.md#listorders) | onLoad | List orders | `ORDER_VIEW` |
-| `getOrder` | [OrderService](../backend/OrderService.md#getorder) | onLoad | Read an order | `ORDER_VIEW` |
+| `getOrder` | [OrderService](../backend/OrderService.md#getorder) | onAction | Read an order | `ORDER_VIEW` |
 | `listMyOrders` | [OrderService](../backend/OrderService.md#listmyorders) | onLoad | The orders this guest placed | `None` |
 | `transferOrderTickets` | [OrderService](../backend/OrderService.md#transferordertickets) | onAction | Transfer tickets to another guest | `None` |
 
@@ -1279,17 +1328,17 @@
 |---|---|
 | loading | The order history list. |
 | error | Could not load. Names which read failed and leaves the order history untouched. |
-| emptyFirstRun | No order history yet. Carries the create action; distinct from a filter that matched nothing. |
-| emptyNoResults | The filter narrowed it and the order history are still there. Names the active filter and offers to clear it. |
-| emptyNoAccess | Names the missing permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| emptyFirstRun | No order history yet. Offers no create action — this screen declares no operation that makes one — and says so rather than showing an empty table. |
+| emptyNoResults | Nothing matches the filter on venueId, principalId, shiftId, status, createdFrom, createdTo and the order history are still there. Names the active filter and offers to clear it. |
+| emptyNoAccess | Shown when the caller lacks `ORDER_VIEW`, which `listOrders` requires, and names that permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | offline | The offline banner shows. What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing. |
 
 **Goes to**
 
 | To | Trigger | Carries | Guard |
 |---|---|---|---|
-| GST-001 | Home – Default | subjectId |  |
-| GST-003 | Event & Attraction Listing | eventId |  |
+| GST-001 | Home – Default |  |  |
+| GST-003 | Event & Attraction Listing |  |  |
 
 ## GST-021 Interactive Map
 
@@ -1325,9 +1374,9 @@
 |---|---|
 | loading | The interactive map list. |
 | error | Could not load. Names which read failed and leaves the interactive map untouched. |
-| emptyFirstRun | No interactive map yet. Carries the create action; distinct from a filter that matched nothing. |
-| emptyNoResults | The filter narrowed it and the interactive map are still there. Names the active filter and offers to clear it. |
-| emptyNoAccess | Names the missing permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| emptyFirstRun | No interactive map yet. Offers no create action — this screen declares no operation that makes one — and says so rather than showing an empty table. |
+| emptyNoResults | Nothing matches the filter on venueId, kind, isSellable and the interactive map are still there. Names the active filter and offers to clear it. |
+| emptyNoAccess | Shown when the caller lacks `PRODUCT_VIEW`, which `listProducts` requires, and names that permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | offline | The offline banner shows. A map and route graph already loaded stay usable, so directions do not need a signal. Wait times show their last reading marked out of date, never as live — a queue length from an hour ago sends a guest to the wrong ride. With no map loaded yet, the screen asks the guest to reconnect. |
 
 **Goes to**
@@ -1335,8 +1384,8 @@
 | To | Trigger | Carries | Guard |
 |---|---|---|---|
 | GST-022 | They compare waits across attractions |  |  |
-| GST-001 | Home – Default | subjectId |  |
-| GST-003 | Event & Attraction Listing | eventId |  |
+| GST-001 | Home – Default |  |  |
+| GST-003 | Event & Attraction Listing |  |  |
 | BO-096 | The attendant checks what is free for the requested window |  |  |
 
 ## GST-022 Attraction Wait Times
@@ -1362,11 +1411,9 @@
 
 | State | Behaviour |
 |---|---|
-| loading | The attraction wait times list. |
+| loading | The attraction wait times, read by `getWaitTimes`. |
 | error | Could not load. Names which read failed and leaves the attraction wait times untouched. |
-| emptyFirstRun | No attraction wait times yet. Carries the create action; distinct from a filter that matched nothing. |
-| emptyNoResults | The filter narrowed it and the attraction wait times are still there. Names the active filter and offers to clear it. |
-| emptyNoAccess | Names the missing permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| emptyFirstRun | No attraction wait times yet. Offers no create action — this screen declares no operation that makes one — and says so rather than showing an empty table. |
 | offline | The offline banner shows. A map and route graph already loaded stay usable, so directions do not need a signal. Wait times show their last reading marked out of date, never as live — a queue length from an hour ago sends a guest to the wrong ride. With no map loaded yet, the screen asks the guest to reconnect. |
 
 **Goes to**
@@ -1375,8 +1422,8 @@
 |---|---|---|---|
 | GST-003 | Picks something shorter from the attractions list |  |  |
 | GST-023 | They join a virtual queue rather than stand in it |  |  |
-| GST-001 | Home – Default | subjectId |  |
-| GST-059 | Plan My Day – In Progress | suggestionId |  |
+| GST-001 | Home – Default |  |  |
+| GST-059 | Plan My Day – In Progress |  |  |
 
 ## GST-024 F&B – Browse & Order
 
@@ -1407,8 +1454,8 @@
 | `listFulfilmentSlots` | [FnbService](../backend/FnbService.md#listfulfilmentslots) | onLoad | Collection times or delivery windows still open | `None` |
 | `listDiningOutlets` | [FnbService](../backend/FnbService.md#listdiningoutlets) | onLoad | Outlets open now, with ordering method | `None` |
 | `getGuestMenu` | [FnbService](../backend/FnbService.md#getguestmenu) | onLoad | The menu in force at this moment | `None` |
-| `claimLocationSession` | [FnbService](../backend/FnbService.md#claimlocationsession) | onLoad | Scan the table, cabana or sunbed code | `None` |
-| `createGuestFnbOrder` | [FnbService](../backend/FnbService.md#createguestfnborder) | onLoad | Place the order | `None` |
+| `claimLocationSession` | [FnbService](../backend/FnbService.md#claimlocationsession) | onAction | Scan the table, cabana or sunbed code | `None` |
+| `createGuestFnbOrder` | [FnbService](../backend/FnbService.md#createguestfnborder) | onAction | Place the order | `None` |
 | `getGuestOrderStatus` | [FnbService](../backend/FnbService.md#getguestorderstatus) | onLoad | Track an order | `None` |
 | `listDeliveryLocations` | [FnbService](../backend/FnbService.md#listdeliverylocations) | onLoad | Where an order can be delivered | `None` |
 | `claimTableSession` | [FnbService](../backend/FnbService.md#claimtablesession) | onAction | Identify which table a guest is sitting at | `None` |
@@ -1420,19 +1467,19 @@
 |---|---|
 | loading | The browse order list. |
 | error | Could not load. Names which read failed and leaves the browse order untouched. |
-| emptyFirstRun | No browse order yet. Carries the create action; distinct from a filter that matched nothing. |
-| emptyNoResults | The filter narrowed it and the browse order are still there. Names the active filter and offers to clear it. |
-| emptyNoAccess | Names the missing permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| emptyFirstRun | No browse order yet. Offers Create guest F&B order (`createGuestFnbOrder`); distinct from a filter that matched nothing. |
+| emptyNoResults | Nothing matches the filter on mode, date and the browse order are still there. Names the active filter and offers to clear it. |
+| emptyNoAccess | Shown when the caller lacks `PRODUCT_VIEW`, which `getFnbDeliveryPolicy` requires, and names that permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | offline | The offline banner shows. The menu already loaded stays with its age. Ordering, claiming a table and booking wait for the connection — an order placed offline is food nobody is making. |
 
 **Goes to**
 
 | To | Trigger | Carries | Guard |
 |---|---|---|---|
-| GST-009 | Pays |  |  |
-| GST-025 | They watch the order progress |  |  |
-| GST-001 | Home – Default | subjectId |  |
-| GST-003 | Event & Attraction Listing | eventId |  |
+| GST-001 | Home – Default |  |  |
+| GST-003 | Event & Attraction Listing |  |  |
+| GST-009 | Pays | orderId |  |
+| GST-025 | They watch the order progress | orderId |  |
 
 ## GST-025 F&B – Order Tracking
 
@@ -1469,8 +1516,6 @@
 | loading | Availability is live, never cached |
 | error | Availability unavailable. Selection is blocked — overselling is worse than waiting |
 | emptyFirstRun | Sold out is a real answer. Offers the next available rather than a dead end |
-| emptyNoResults | The filter narrowed it and the order tracking are still there. Names the active filter and offers to clear it. |
-| emptyNoAccess | Names the missing permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | offline | The offline banner shows. The last status stays on screen with its age and is never presented as current. Settling the bill waits for the connection. |
 
 **Goes to**
@@ -1478,9 +1523,9 @@
 | To | Trigger | Carries | Guard |
 |---|---|---|---|
 | GST-030 | Their queue place comes up and they are told |  |  |
-| GST-001 | Home – Default | subjectId |  |
-| GST-003 | Event & Attraction Listing | eventId |  |
-| BO-021 | Runner delivers to the lounger |  |  |
+| GST-001 | Home – Default |  |  |
+| GST-003 | Event & Attraction Listing |  |  |
+| BO-021 | Runner delivers to the lounger | orderId |  |
 
 ## GST-026 Retail / Merchandise
 
@@ -1506,9 +1551,9 @@
 
 | Operation | Service | When | Purpose | Permission |
 |---|---|---|---|---|
-| `getGameCard` | [VenueOpsService](../backend/VenueOpsService.md#getgamecard) | onLoad | Read a card's balances | `None` |
+| `getGameCard` | [VenueOpsService](../backend/VenueOpsService.md#getgamecard) | onAction | Read a card's balances | `None` |
 | `listMerchandise` | [RetailService](../backend/RetailService.md#listmerchandise) | onLoad | List merchandise | `PRODUCT_VIEW` |
-| `lookupMerchandise` | [RetailService](../backend/RetailService.md#lookupmerchandise) | onLoad | Find an item by code or scan | `PRODUCT_VIEW` |
+| `lookupMerchandise` | [RetailService](../backend/RetailService.md#lookupmerchandise) | onAction | Find an item by code or scan | `PRODUCT_VIEW` |
 | `reserveMerchandise` | [RetailService](../backend/RetailService.md#reservemerchandise) | onAction | Hold it for collection | `ORDER_CREATE` |
 
 **States**
@@ -1517,19 +1562,19 @@
 |---|---|
 | loading | The retail merchandise list. |
 | error | Could not load. Names which read failed and leaves the retail merchandise untouched. |
-| emptyFirstRun | No retail merchandise yet. Carries the create action; distinct from a filter that matched nothing. |
-| emptyNoResults | The filter narrowed it and the retail merchandise are still there. Names the active filter and offers to clear it. |
-| emptyNoAccess | Names the missing permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| emptyFirstRun | No retail merchandise yet. Offers no create action — this screen declares no operation that makes one — and says so rather than showing an empty table. |
+| emptyNoResults | Nothing matches the filter on outletId, categoryId, inStockOnly, search and the retail merchandise are still there. Names the active filter and offers to clear it. |
+| emptyNoAccess | Shown when the caller lacks `PRODUCT_VIEW`, which `listMerchandise` requires, and names that permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | offline | The offline banner shows. What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing. |
 
 **Goes to**
 
 | To | Trigger | Carries | Guard |
 |---|---|---|---|
-| GST-001 | Home – Default | subjectId |  |
-| GST-003 | Event & Attraction Listing | eventId |  |
-| BO-048 | Collected on the way out |  |  |
+| GST-001 | Home – Default |  |  |
+| GST-003 | Event & Attraction Listing |  |  |
 | BO-069 | Machine records the play |  |  |
+| BO-048 | Collected on the way out | merchandiseId |  |
 
 ## GST-029 Venue Info & Services
 
@@ -1563,17 +1608,16 @@
 |---|---|
 | loading | The venue info services list. |
 | error | Could not load. Names which read failed and leaves the venue info services untouched. |
-| emptyFirstRun | No venue info services yet. Carries the create action; distinct from a filter that matched nothing. |
-| emptyNoResults | The filter narrowed it and the venue info services are still there. Names the active filter and offers to clear it. |
-| emptyNoAccess | Names the missing permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| emptyFirstRun | No venue info services yet. Offers no create action — this screen declares no operation that makes one — and says so rather than showing an empty table. |
+| emptyNoResults | Nothing matches the filter on openNow, orderingMethod and the venue info services are still there. Names the active filter and offers to clear it. |
 | offline | The offline banner shows. What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing. |
 
 **Goes to**
 
 | To | Trigger | Carries | Guard |
 |---|---|---|---|
-| GST-001 | Home – Default | subjectId |  |
-| GST-003 | Event & Attraction Listing | eventId |  |
+| GST-001 | Home – Default |  |  |
+| GST-003 | Event & Attraction Listing |  |  |
 
 ## GST-030 In-Venue Notifications
 
@@ -1592,7 +1636,7 @@
 
 | Operation | Service | When | Purpose | Permission |
 |---|---|---|---|---|
-| `claimLocationSession` | [FnbService](../backend/FnbService.md#claimlocationsession) | onLoad | From the flow it appears in | `None` |
+| `claimLocationSession` | [FnbService](../backend/FnbService.md#claimlocationsession) | onAction | From the flow it appears in | `None` |
 
 **States**
 
@@ -1600,17 +1644,16 @@
 |---|---|
 | loading | The saved in-venue notifications. |
 | error | Could not load. Names which read failed and leaves the in-venue notifications untouched. |
-| emptyFirstRun | No in-venue notifications configured. Carries the create action and says what the platform does in the meantime. |
-| emptyNoAccess | Names the missing permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| emptyFirstRun | No in-venue notifications configured. The form opens empty and `claimLocationSession` saves the first one; it says what the platform does in the meantime. |
 | offline | The offline banner shows. Notices already received stay listed. New queue calls and order updates arrive once the connection is back, and the banner is the warning that they may be late. |
 
 **Goes to**
 
 | To | Trigger | Carries | Guard |
 |---|---|---|---|
-| GST-001 | Home – Default | subjectId |  |
-| GST-003 | Event & Attraction Listing | eventId |  |
-| GST-031 | AI Concierge – Home | conversationId, outletId |  |
+| GST-001 | Home – Default |  |  |
+| GST-003 | Event & Attraction Listing |  |  |
+| GST-031 | AI Concierge – Home | outletId |  |
 
 ## GST-031 AI Concierge – Home
 
@@ -1646,20 +1689,19 @@
 
 | State | Behaviour |
 |---|---|
-| loading | The concierge home list. |
+| loading | The concierge home, read by `getGuestMenu`. |
 | error | Could not load. Names which read failed and leaves the concierge home untouched. |
-| emptyFirstRun | No concierge home yet. Carries the create action; distinct from a filter that matched nothing. |
-| emptyNoResults | The filter narrowed it and the concierge home are still there. Names the active filter and offers to clear it. |
-| emptyNoAccess | Names the missing permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| emptyFirstRun | No concierge home yet. Offers Create AI conversation (`createAiConversation`). |
+| emptyNoAccess | Shown when the caller lacks `AI_USE`, which `sendAiMessage` requires, and names that permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | offline | Not available, and the offline banner says why. The assistant needs the connection; conversations already loaded stay readable. |
 
 **Goes to**
 
 | To | Trigger | Carries | Guard |
 |---|---|---|---|
-| GST-001 | Home – Default | subjectId |  |
-| GST-003 | Event & Attraction Listing | eventId |  |
-| GST-032 | AI Concierge – Chat | cartId, conversationId, orderId |  |
+| GST-001 | Home – Default |  |  |
+| GST-003 | Event & Attraction Listing |  |  |
+| GST-032 | AI Concierge – Chat | conversationId |  |
 
 ## GST-032 AI Concierge – Chat
 
@@ -1686,7 +1728,7 @@
 
 | Operation | Service | When | Purpose | Permission |
 |---|---|---|---|---|
-| `createGuestFnbOrder` | [FnbService](../backend/FnbService.md#createguestfnborder) | onLoad | From the flow it appears in | `None` |
+| `createGuestFnbOrder` | [FnbService](../backend/FnbService.md#createguestfnborder) | onAction | From the flow it appears in | `None` |
 | `getGuestOrderStatus` | [FnbService](../backend/FnbService.md#getguestorderstatus) | onLoad | Track an order | `None` |
 | `getCart` | [OrderService](../backend/OrderService.md#getcart) | onLoad | The cart, priced and checked, right now | `None` |
 | `addCartLine` | [OrderService](../backend/OrderService.md#addcartline) | onAction | Add something | `None` |
@@ -1699,19 +1741,18 @@
 
 | State | Behaviour |
 |---|---|
-| loading | The concierge chat list. |
+| loading | The concierge chat, read by `getGuestOrderStatus`. |
 | error | Could not load. Names which read failed and leaves the concierge chat untouched. |
-| emptyFirstRun | No concierge chat yet. Carries the create action; distinct from a filter that matched nothing. |
-| emptyNoResults | The filter narrowed it and the concierge chat are still there. Names the active filter and offers to clear it. |
-| emptyNoAccess | Names the missing permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| emptyFirstRun | No concierge chat yet. Offers Create guest F&B order (`createGuestFnbOrder`). |
+| emptyNoAccess | Shown when the caller lacks `AI_USE`, which `sendAiMessage` requires, and names that permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | offline | Not available, and the offline banner says why. The assistant needs the connection; conversations already loaded stay readable. |
 
 **Goes to**
 
 | To | Trigger | Carries | Guard |
 |---|---|---|---|
-| GST-001 | Home – Default | subjectId |  |
-| GST-003 | Event & Attraction Listing | eventId |  |
+| GST-001 | Home – Default |  |  |
+| GST-003 | Event & Attraction Listing |  |  |
 | GST-033 | AI Concierge – Contextual Help | conversationId |  |
 
 ## GST-033 AI Concierge – Contextual Help
@@ -1745,16 +1786,16 @@
 |---|---|
 | loading | The saved concierge contextual help. |
 | error | Could not load. Names which read failed and leaves the concierge contextual help untouched. |
-| emptyFirstRun | No concierge contextual help configured. Carries the create action and says what the platform does in the meantime. |
-| emptyNoAccess | Names the missing permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| emptyFirstRun | No concierge contextual help configured. The form opens empty and `sendAiMessage` saves the first one; it says what the platform does in the meantime. |
+| emptyNoAccess | Shown when the caller lacks `AI_USE`, which `sendAiMessage` requires, and names that permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | offline | Not available, and the offline banner says why. The assistant needs the connection; conversations already loaded stay readable. |
 
 **Goes to**
 
 | To | Trigger | Carries | Guard |
 |---|---|---|---|
-| GST-001 | Home – Default | subjectId |  |
-| GST-003 | Event & Attraction Listing | eventId |  |
+| GST-001 | Home – Default |  |  |
+| GST-003 | Event & Attraction Listing |  |  |
 
 ## GST-034 Lost & Found
 
@@ -1790,17 +1831,16 @@
 |---|---|
 | loading | The lost found list. |
 | error | Could not load. Names which read failed and leaves the lost found untouched. |
-| emptyFirstRun | No lost found yet. Carries the create action; distinct from a filter that matched nothing. |
-| emptyNoResults | The filter narrowed it and the lost found are still there. Names the active filter and offers to clear it. |
-| emptyNoAccess | Names the missing permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| emptyFirstRun | No lost found yet. Offers Raise my case (`raiseMyCase`). |
+| emptyNoResults | Never shown: `listMyCases` takes no filter, so an empty list is always the first-run state above. |
 | offline | The offline banner shows. Reports already loaded stay read-only with their age. Reporting and replying need the connection. |
 
 **Goes to**
 
 | To | Trigger | Carries | Guard |
 |---|---|---|---|
-| GST-001 | Home – Default | subjectId |  |
-| GST-003 | Event & Attraction Listing | eventId |  |
+| GST-001 | Home – Default |  |  |
+| GST-003 | Event & Attraction Listing |  |  |
 
 ## GST-036 Loyalty & Rewards
 
@@ -1821,7 +1861,6 @@
 |---|---|---|---|---|
 | `getLoyaltyPosition` | [MarketingService](../backend/MarketingService.md#getloyaltyposition) | onLoad | A guest's points, tier and what is within reach | `None` |
 | `listLoyaltyProgrammes` | [MarketingService](../backend/MarketingService.md#listloyaltyprogrammes) | onLoad | List loyalty programmes | `MARKETING_VIEW` |
-| `evaluatePromotions` | [CatalogueService](../backend/CatalogueService.md#evaluatepromotions) | onAction | Evaluate promotions against a cart | `PRICE_VIEW` |
 | `listPromotions` | [CatalogueService](../backend/CatalogueService.md#listpromotions) | onLoad | List promotions | `PRICE_VIEW` |
 
 **States**
@@ -1830,17 +1869,17 @@
 |---|---|
 | loading | The loyalty rewards list. |
 | error | Could not load. Names which read failed and leaves the loyalty rewards untouched. |
-| emptyFirstRun | No loyalty rewards yet. Carries the create action; distinct from a filter that matched nothing. |
-| emptyNoResults | The filter narrowed it and the loyalty rewards are still there. Names the active filter and offers to clear it. |
-| emptyNoAccess | Names the missing permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| emptyFirstRun | No loyalty rewards yet. Offers no create action — this screen declares no operation that makes one — and says so rather than showing an empty table. |
+| emptyNoResults | Never shown: `listLoyaltyProgrammes` takes no filter, so an empty list is always the first-run state above. |
+| emptyNoAccess | Shown when the caller lacks `MARKETING_VIEW`, which `listLoyaltyProgrammes` requires, and names that permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | offline | The offline banner shows. The last known balance stays with its age, and points earned since are not shown — and that is said. Redeeming and referring need the connection. |
 
 **Goes to**
 
 | To | Trigger | Carries | Guard |
 |---|---|---|---|
-| GST-001 | Home – Default | subjectId |  |
-| GST-003 | Event & Attraction Listing | eventId |  |
+| GST-001 | Home – Default |  |  |
+| GST-003 | Event & Attraction Listing |  |  |
 | WEB-024 | They see rewards and manage their devices |  |  |
 
 ## GST-037 Offers & Promotions
@@ -1868,9 +1907,8 @@
 | Operation | Service | When | Purpose | Permission |
 |---|---|---|---|---|
 | `listPromotions` | [CatalogueService](../backend/CatalogueService.md#listpromotions) | onLoad | List promotions | `PRICE_VIEW` |
-| `getPromotion` | [CatalogueService](../backend/CatalogueService.md#getpromotion) | onLoad | Read a promotion | `PRICE_VIEW` |
-| `evaluatePromotions` | [CatalogueService](../backend/CatalogueService.md#evaluatepromotions) | onAction | Evaluate promotions against a cart | `PRICE_VIEW` |
-| `getCouponCode` | [CatalogueService](../backend/CatalogueService.md#getcouponcode) | onLoad | Resolve a code the guest typed | `PRICE_VIEW` |
+| `getPromotion` | [CatalogueService](../backend/CatalogueService.md#getpromotion) | onAction | Read a promotion | `PRICE_VIEW` |
+| `getCouponCode` | [CatalogueService](../backend/CatalogueService.md#getcouponcode) | onAction | Resolve a code the guest typed | `PRICE_VIEW` |
 
 **States**
 
@@ -1878,18 +1916,18 @@
 |---|---|
 | loading | The offers promotions list. |
 | error | Could not load. Names which read failed and leaves the offers promotions untouched. |
-| emptyFirstRun | No offers promotions yet. Carries the create action; distinct from a filter that matched nothing. |
-| emptyNoResults | The filter narrowed it and the offers promotions are still there. Names the active filter and offers to clear it. |
-| emptyNoAccess | Names the missing permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| emptyFirstRun | No offers promotions yet. Offers no create action — this screen declares no operation that makes one — and says so rather than showing an empty table. |
+| emptyNoResults | Nothing matches the filter on venueId, status, activeAt and the offers promotions are still there. Names the active filter and offers to clear it. |
+| emptyNoAccess | Shown when the caller lacks `PRICE_VIEW`, which `listPromotions` requires, and names that permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | offline | The offline banner shows. What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing. |
 
 **Goes to**
 
 | To | Trigger | Carries | Guard |
 |---|---|---|---|
+| GST-001 | Home – Default |  |  |
+| GST-003 | Event & Attraction Listing |  |  |
 | GST-011 | Their wallet shows stored value |  |  |
-| GST-001 | Home – Default | subjectId |  |
-| GST-003 | Event & Attraction Listing | eventId |  |
 
 ## GST-040 Help & Support
 
@@ -1924,20 +1962,20 @@
 
 | State | Behaviour |
 |---|---|
-| loading | The help support list. |
+| loading | The help support figures; each tile loads on its own. |
 | error | Could not load. Names which read failed and leaves the help support untouched. |
-| emptyFirstRun | No help support yet. Carries the create action; distinct from a filter that matched nothing. |
-| emptyNoResults | The filter narrowed it and the help support are still there. Names the active filter and offers to clear it. |
-| emptyNoAccess | Names the missing permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| emptyFirstRun | No help support yet. Offers Raise my case (`raiseMyCase`). |
+| emptyNoResults | Never shown: `listFaqs` takes no filter, so an empty list is always the first-run state above. |
+| emptyNoAccess | Shown when the caller lacks `TENANT_CONFIGURE`, which `listFaqs` requires, and names that permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | offline | The offline banner shows. What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing. |
 
 **Goes to**
 
 | To | Trigger | Carries | Guard |
 |---|---|---|---|
-| GST-001 | Home – Default | subjectId |  |
-| GST-003 | Event & Attraction Listing | eventId |  |
-| WEB-034 | They report something lost |  |  |
+| GST-001 | Home – Default |  |  |
+| GST-003 | Event & Attraction Listing |  |  |
+| WEB-034 | They report something lost | caseId |  |
 
 ## GST-044 Multi-Currency & Pricing
 
@@ -1965,17 +2003,17 @@
 |---|---|
 | loading | The multi-currency pricing list. |
 | error | Could not load. Names which read failed and leaves the multi-currency pricing untouched. |
-| emptyFirstRun | No multi-currency pricing yet. Carries the create action; distinct from a filter that matched nothing. |
-| emptyNoResults | The filter narrowed it and the multi-currency pricing are still there. Names the active filter and offers to clear it. |
-| emptyNoAccess | Names the missing permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| emptyFirstRun | No multi-currency pricing yet. Offers no create action — this screen declares no operation that makes one — and says so rather than showing an empty table. |
+| emptyNoResults | Nothing matches the filter on asAt, purpose and the multi-currency pricing are still there. Names the active filter and offers to clear it. |
+| emptyNoAccess | Shown when the caller lacks `LEDGER_VIEW`, which `listFxRates` requires, and names that permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | offline | The offline banner shows. Last known rates stay, with their age. A rate is a number a guest may act on, and an undated one they cannot judge. |
 
 **Goes to**
 
 | To | Trigger | Carries | Guard |
 |---|---|---|---|
-| GST-001 | Home – Default | subjectId |  |
-| GST-003 | Event & Attraction Listing | eventId |  |
+| GST-001 | Home – Default |  |  |
+| GST-003 | Event & Attraction Listing |  |  |
 
 ## GST-045 Ticket Delivery & Sharing
 
@@ -2009,15 +2047,14 @@
 | loading | Availability is live, never cached |
 | error | Availability unavailable. Selection is blocked — overselling is worse than waiting |
 | emptyFirstRun | Sold out is a real answer. Offers the next available rather than a dead end |
-| emptyNoAccess | Names the missing permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | offline | The offline banner shows. Sending, claiming and listing for resale need the connection — a transfer nobody received is a ticket nobody holds. Tickets already loaded stay visible. |
 
 **Goes to**
 
 | To | Trigger | Carries | Guard |
 |---|---|---|---|
-| GST-001 | Home – Default | subjectId |  |
-| GST-003 | Event & Attraction Listing | eventId |  |
+| GST-001 | Home – Default |  |  |
+| GST-003 | Event & Attraction Listing |  |  |
 
 ## GST-048 Upsell / Cross-Sell
 
@@ -2049,19 +2086,18 @@
 
 | State | Behaviour |
 |---|---|
-| loading | The upsell cross-sell list. |
+| loading | The upsell cross-sell, read by `getUpsellSuggestions`. |
 | error | Could not load. Names which read failed and leaves the upsell cross-sell untouched. |
-| emptyFirstRun | No upsell cross-sell yet. Carries the create action; distinct from a filter that matched nothing. |
-| emptyNoResults | The filter narrowed it and the upsell cross-sell are still there. Names the active filter and offers to clear it. |
-| emptyNoAccess | Names the missing permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| emptyFirstRun | No upsell cross-sell yet. Offers Add cart line (`addCartLine`). |
+| emptyNoAccess | Shown when the caller lacks `PRODUCT_VIEW`, which `getUpsellSuggestions` requires, and names that permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | offline | The offline banner shows. What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing. |
 
 **Goes to**
 
 | To | Trigger | Carries | Guard |
 |---|---|---|---|
-| GST-001 | Home – Default | subjectId |  |
-| GST-003 | Event & Attraction Listing | eventId |  |
+| GST-001 | Home – Default |  |  |
+| GST-003 | Event & Attraction Listing |  |  |
 
 ## GST-049 Interactive Seat Selection
 
@@ -2094,19 +2130,18 @@
 
 | State | Behaviour |
 |---|---|
-| loading | The interactive seat selection list. |
+| loading | The interactive seat selection, read by `getSeatAvailability`. |
 | error | Could not load. Names which read failed and leaves the interactive seat selection untouched. |
-| emptyFirstRun | No interactive seat selection yet. Carries the create action; distinct from a filter that matched nothing. |
-| emptyNoResults | The filter narrowed it and the interactive seat selection are still there. Names the active filter and offers to clear it. |
-| emptyNoAccess | Names the missing permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| emptyFirstRun | No interactive seat selection yet. Offers Create seat hold (`createSeatHold`). |
+| emptyNoAccess | Shown when the caller lacks `PRODUCT_VIEW`, which `getSeatAvailability` requires, and names that permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | offline | The offline banner shows. What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing. |
 
 **Goes to**
 
 | To | Trigger | Carries | Guard |
 |---|---|---|---|
-| GST-001 | Home – Default | subjectId |  |
-| GST-003 | Event & Attraction Listing | eventId |  |
+| GST-001 | Home – Default |  |  |
+| GST-003 | Event & Attraction Listing |  |  |
 
 ## GST-056 Bundle Package
 
@@ -2142,17 +2177,17 @@
 |---|---|
 | loading | The bundle package list. |
 | error | Could not load. Names which read failed and leaves the bundle package untouched. |
-| emptyFirstRun | No bundle package yet. Carries the create action; distinct from a filter that matched nothing. |
-| emptyNoResults | The filter narrowed it and the bundle package are still there. Names the active filter and offers to clear it. |
-| emptyNoAccess | Names the missing permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| emptyFirstRun | No bundle package yet. Offers Add cart line (`addCartLine`). |
+| emptyNoResults | Never shown: `listCatalogueBundles` takes no filter, so an empty list is always the first-run state above. |
+| emptyNoAccess | Shown when the caller lacks `PRODUCT_VIEW`, which `listCatalogueBundles` requires, and names that permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | offline | The offline banner shows. What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing. |
 
 **Goes to**
 
 | To | Trigger | Carries | Guard |
 |---|---|---|---|
-| GST-001 | Home – Default | subjectId |  |
-| GST-003 | Event & Attraction Listing | eventId |  |
+| GST-001 | Home – Default |  |  |
+| GST-003 | Event & Attraction Listing |  |  |
 
 ## GST-057 Accessibility Information
 
@@ -2179,17 +2214,17 @@
 |---|---|
 | loading | The accessibility information list. |
 | error | Could not load. Names which read failed and leaves the accessibility information untouched. |
-| emptyFirstRun | No accessibility information yet. Carries the create action; distinct from a filter that matched nothing. |
-| emptyNoResults | The filter narrowed it and the accessibility information are still there. Names the active filter and offers to clear it. |
-| emptyNoAccess | Names the missing permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| emptyFirstRun | No accessibility information yet. Offers no create action — this screen declares no operation that makes one — and says so rather than showing an empty table. |
+| emptyNoResults | Nothing matches the filter on status, categoryCode, slug and the accessibility information are still there. Names the active filter and offers to clear it. |
+| emptyNoAccess | Shown when the caller lacks `TENANT_CONFIGURE`, which `listContentPages` requires, and names that permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | offline | The offline banner shows. What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing. |
 
 **Goes to**
 
 | To | Trigger | Carries | Guard |
 |---|---|---|---|
-| GST-001 | Home – Default | subjectId |  |
-| GST-003 | Event & Attraction Listing | eventId |  |
+| GST-001 | Home – Default |  |  |
+| GST-003 | Event & Attraction Listing |  |  |
 
 ## GST-061 Menu Item Detail
 
@@ -2224,15 +2259,15 @@
 | loading | Item skeleton |
 | error | Item unavailable, with a route back to the menu |
 | emptyFirstRun | Not applicable |
-| emptyNoResults | The filter narrowed it and the menu item are still there. Names the active filter and offers to clear it. |
-| emptyNoAccess | Names the missing permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| emptyNoResults | Never shown: `listModifierGroups` takes no filter, so an empty list is always the first-run state above. |
+| emptyNoAccess | Shown when the caller lacks `PRODUCT_VIEW`, which `listModifierGroups` requires, and names that permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | offline | The offline banner shows. The dish already loaded stays, with a note that it may be out of date and its allergens in full. Ordering is refused — availability changes by the minute. |
 
 **Goes to**
 
 | To | Trigger | Carries | Guard |
 |---|---|---|---|
-| GST-001 | Home – Default | subjectId |  |
+| GST-001 | Home – Default |  |  |
 
 ## GST-066 Privacy & My Data
 
@@ -2271,7 +2306,7 @@
 | error | Could not load. Says what failed and offers one way onward, never a bare failure. |
 | emptyFirstRun | Nothing requested yet. No export, no erasure, no document — and that is the ordinary state. The screen explains what each request means before offering it, because an erasure a guest did not understand is one they will phone about. |
 | emptyNoResults | Nothing here yet. The scope is what narrowed it — naming the scope is what stops somebody concluding the record does not exist. |
-| emptyNoAccess | Names the missing permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| emptyNoAccess | Shown when the caller lacks `GUEST_VIEW_PII`, which `exportSubjectData` requires, and names that permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | offline | Nothing here is offered offline, and the banner says so. An erasure request or a device change queued and never sent is worse than one that could not be made — the legal clock starts when the platform receives it, and a second factor set up offline is not a second factor. |
 
 **Goes to**
@@ -2315,7 +2350,7 @@
 | error | Could not load. Says what failed and offers one way onward, never a bare failure. |
 | emptyFirstRun | No refunds or listings yet. The venue's policy is shown regardless, so a guest knows the answer before they need it. |
 | emptyNoResults | Nothing here yet. The scope is what narrowed it — naming the scope is what stops somebody concluding the record does not exist. |
-| emptyNoAccess | Names the missing permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| emptyNoAccess | Shown when the caller lacks `GUEST_VIEW`, which `getWaiverStatus` requires, and names that permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | offline | Not available, and the offline banner says why. Refunds and resale listings need the server — a queued refund request is a promise nobody made. |
 
 **Goes to**
@@ -2359,7 +2394,7 @@
 | error | Could not load. Says what failed and offers one way onward, never a bare failure. |
 | emptyFirstRun | No cases open. The concierge sits here too — most questions never become a case, and that is the intent. |
 | emptyNoResults | Nothing here yet. The scope is what narrowed it — naming the scope is what stops somebody concluding the record does not exist. |
-| emptyNoAccess | Names the missing permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| emptyNoAccess | Shown when the caller lacks `CASE_VIEW`, which `listCases` requires, and names that permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | offline | The offline banner shows. Cases already loaded stay read-only with their age, so a guest can see what they raised without believing a reply arrived. Raising and replying need the connection. |
 
 **Goes to**
@@ -2404,7 +2439,7 @@
 | error | Could not load. Says what failed and offers one way onward, never a bare failure. |
 | emptyFirstRun | Not enrolled. What a face pass is for, where it works, and what withdrawing it does — before the camera opens. |
 | emptyNoResults | Nothing here yet. The scope is what narrowed it — naming the scope is what stops somebody concluding the record does not exist. |
-| emptyNoAccess | Names the missing permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| emptyNoAccess | Shown when the caller lacks `GUEST_VIEW`, which `getFacePassEnrolment` requires, and names that permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | offline | Not available, and the offline banner says why. Biometric enrolment never happens offline — a face captured and queued is a face the guest cannot withdraw until it uploads. |
 
 **Goes to**
@@ -2454,7 +2489,7 @@
 | error | Could not load. Says what failed and offers one way onward, never a bare failure. |
 | emptyFirstRun | Nothing reserved. Availability shows regardless; a guest looking at an empty list should still see what is bookable. |
 | emptyNoResults | Nothing here yet. The scope is what narrowed it — naming the scope is what stops somebody concluding the record does not exist. |
-| emptyNoAccess | Names the missing permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| emptyNoAccess | Shown when the caller lacks `RESOURCE_VIEW`, which `getResourceAvailability` requires, and names that permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | offline | The offline banner shows. Availability already loaded stays with its age. Booking is not offered — a table held offline is a table two people think they have. |
 
 **Goes to**
@@ -2492,7 +2527,7 @@
 | `storePaymentToken` | [OrderService](../backend/OrderService.md#storepaymenttoken) | onAction | Save a payment method for future use | `ORDER_CREATE` |
 | `transferWalletBalance` | [WalletService](../backend/WalletService.md#transferwalletbalance) | onAction | Send balance to another guest | `WALLET_OPERATE` |
 | `redeemLoyaltyPoints` | [MarketingService](../backend/MarketingService.md#redeemloyaltypoints) | onAction | Spend points | `LOYALTY_REDEEM` |
-| `getGiftCard` | [WalletService](../backend/WalletService.md#getgiftcard) | onLoad | Balance on a gift card | `WALLET_VIEW` |
+| `getGiftCard` | [WalletService](../backend/WalletService.md#getgiftcard) | onAction | Balance on a gift card | `WALLET_VIEW` |
 
 **States**
 
@@ -2502,7 +2537,7 @@
 | error | Could not load. Says what failed and offers one way onward, never a bare failure. |
 | emptyFirstRun | No stored cards. A guest arrives here after a first purchase, so the empty state is the common one. |
 | emptyNoResults | Nothing here yet. The scope is what narrowed it — naming the scope is what stops somebody concluding the record does not exist. |
-| emptyNoAccess | Names the missing permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| emptyNoAccess | Shown when the caller lacks `ORDER_VIEW`, which `listPaymentTokens` requires, and names that permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | offline | The offline banner shows. Balances and stored cards already loaded stay visible with their age, cards masked. Storing a card and transferring value need the server. |
 
 **Goes to**
@@ -2539,7 +2574,7 @@
 | Operation | Service | When | Purpose | Permission |
 |---|---|---|---|---|
 | `listGroupPackages` | [CatalogueService](../backend/CatalogueService.md#listgrouppackages) | onLoad | School-trip formats and party packages | `PRODUCT_VIEW` |
-| `getGroupPackageDefinition` | [CatalogueService](../backend/CatalogueService.md#getgrouppackagedefinition) | onLoad | What a package includes | `PRODUCT_VIEW` |
+| `getGroupPackageDefinition` | [CatalogueService](../backend/CatalogueService.md#getgrouppackagedefinition) | onAction | What a package includes | `PRODUCT_VIEW` |
 | `requestGroupBooking` | [OrderService](../backend/OrderService.md#requestgroupbooking) | onAction | Ask for a school trip or a birthday party | `None` |
 | `shareEntitlement` | [OrderService](../backend/OrderService.md#shareentitlement) | onAction | Let somebody else use this, without giving it away | `ORDER_MODIFY` |
 | `getGroupBooking` | [OrderService](../backend/OrderService.md#getgroupbooking) | onLoad | getGroupBooking | `ORDER_VIEW` |
@@ -2555,7 +2590,7 @@
 | error | Could not load. Says what failed and offers one way onward, never a bare failure. |
 | emptyFirstRun | Nothing shared. A guest holding eight tickets sees the option here rather than discovering it at the gate. |
 | emptyNoResults | Nothing here yet. The scope is what narrowed it — naming the scope is what stops somebody concluding the record does not exist. |
-| emptyNoAccess | Names the missing permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| emptyNoAccess | Shown when the caller lacks `PRODUCT_VIEW`, which `listGroupPackages` requires, and names that permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | offline | The offline banner shows. Tickets already shared stay visible. Sharing, invitations and referrals need the connection — a transfer nobody received is a ticket nobody holds. |
 
 **Goes to**
@@ -2601,7 +2636,7 @@
 | loading | Content loads. |
 | error | Could not load. Says what failed and offers one way onward, never a bare failure. |
 | emptyFirstRun | No second factor enrolled. Explains what one protects before asking for a phone number. |
-| emptyNoAccess | Names the missing permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| emptyNoAccess | Shown when the caller lacks `GUEST_VIEW`, which `verifyGuestEmail` requires, and names that permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | offline | Nothing here is offered offline, and the banner says so. An erasure request or a device change queued and never sent is worse than one that could not be made — the legal clock starts when the platform receives it, and a second factor set up offline is not a second factor. |
 
 **Goes to**
@@ -2634,9 +2669,9 @@
 | Operation | Service | When | Purpose | Permission |
 |---|---|---|---|---|
 | `getOrderCalendarEvent` | [OrderService](../backend/OrderService.md#getordercalendarevent) | onAction | Add the visit to the phone's calendar | `ORDER_VIEW` |
-| `getVisitReminder` | [OrderService](../backend/OrderService.md#getvisitreminder) | onLoad | The reminder set for this booking | `ORDER_VIEW` |
+| `getVisitReminder` | [OrderService](../backend/OrderService.md#getvisitreminder) | onAction | The reminder set for this booking | `ORDER_VIEW` |
 | `setVisitReminder` | [OrderService](../backend/OrderService.md#setvisitreminder) | onAction | Turn a visit reminder on or off | `ORDER_VIEW` |
-| `getOrder` | [OrderService](../backend/OrderService.md#getorder) | onLoad | Read an order | `ORDER_VIEW` |
+| `getOrder` | [OrderService](../backend/OrderService.md#getorder) | onAction | Read an order | `ORDER_VIEW` |
 | `listOrders` | [OrderService](../backend/OrderService.md#listorders) | onLoad | List orders | `ORDER_VIEW` |
 | `issueWalletPass` | [OrderService](../backend/OrderService.md#issuewalletpass) | onAction | Generate an Apple or Google wallet pass | `ORDER_VIEW` |
 
@@ -2646,17 +2681,17 @@
 |---|---|
 | loading | The add calendar reminders list. |
 | error | Could not load. Names which read failed and leaves the add calendar reminders untouched. |
-| emptyFirstRun | No add calendar reminders yet. Carries the create action; distinct from a filter that matched nothing. |
-| emptyNoResults | The filter narrowed it and the add calendar reminders are still there. Names the active filter and offers to clear it. |
-| emptyNoAccess | Names the missing permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| emptyFirstRun | No add calendar reminders yet. Offers Issue wallet pass (`issueWalletPass`); distinct from a filter that matched nothing. |
+| emptyNoResults | Nothing matches the filter on venueId, principalId, shiftId, status, createdFrom, createdTo and the add calendar reminders are still there. Names the active filter and offers to clear it. |
+| emptyNoAccess | Shown when the caller lacks `ORDER_VIEW`, which `getOrderCalendarEvent` requires, and names that permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | offline | The offline banner shows. What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing. |
 
 **Goes to**
 
 | To | Trigger | Carries | Guard |
 |---|---|---|---|
-| GST-001 | Home – Default | subjectId |  |
-| GST-003 | Event & Attraction Listing | eventId |  |
+| GST-001 | Home – Default |  |  |
+| GST-003 | Event & Attraction Listing |  |  |
 
 ## GST-020 Saved Items / Wishlist
 
@@ -2690,19 +2725,17 @@
 
 | State | Behaviour |
 |---|---|
-| loading | The saved items wishlist list. |
+| loading | The saved items wishlist, read by `getWishlist`. |
 | error | Could not load. Names which read failed and leaves the saved items wishlist untouched. |
-| emptyFirstRun | No saved items wishlist yet. Carries the create action; distinct from a filter that matched nothing. |
-| emptyNoResults | The filter narrowed it and the saved items wishlist are still there. Names the active filter and offers to clear it. |
-| emptyNoAccess | Names the missing permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| emptyFirstRun | No saved items wishlist yet. Offers Add to wishlist (`addToWishlist`). |
 | offline | The offline banner shows. What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing. |
 
 **Goes to**
 
 | To | Trigger | Carries | Guard |
 |---|---|---|---|
-| GST-001 | Home – Default | subjectId |  |
-| GST-003 | Event & Attraction Listing | eventId |  |
+| GST-001 | Home – Default |  |  |
+| GST-003 | Event & Attraction Listing |  |  |
 
 ## GST-023 Virtual Queue
 
@@ -2727,7 +2760,7 @@
 
 | Operation | Service | When | Purpose | Permission |
 |---|---|---|---|---|
-| `joinQueue` | [VenueOpsService](../backend/VenueOpsService.md#joinqueue) | onLoad | from page inventory | `None` |
+| `joinQueue` | [VenueOpsService](../backend/VenueOpsService.md#joinqueue) | onAction | from page inventory | `None` |
 | `getWaitingGuest` | [VenueOpsService](../backend/VenueOpsService.md#getwaitingguest) | onLoad | Read a queue entry | `None` |
 | `leaveQueue` | [VenueOpsService](../backend/VenueOpsService.md#leavequeue) | onAction | Leave a queue | `None` |
 | `getWaitTimes` | [VenueOpsService](../backend/VenueOpsService.md#getwaittimes) | onLoad | Wait times across a venue | `None` |
@@ -2737,11 +2770,10 @@
 
 | State | Behaviour |
 |---|---|
-| loading | The virtual queue list. |
+| loading | The virtual queue, read by `getWaitingGuest`. |
 | error | Could not load. Names which read failed and leaves the virtual queue untouched. |
-| emptyFirstRun | No virtual queue yet. Carries the create action; distinct from a filter that matched nothing. |
-| emptyNoResults | The filter narrowed it and the virtual queue are still there. Names the active filter and offers to clear it. |
-| emptyNoAccess | Names the missing permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| emptyFirstRun | No virtual queue yet. Offers no create action — this screen declares no operation that makes one — and says so rather than showing an empty table. |
+| emptyNoAccess | Shown when the caller lacks `QUEUE_VIEW`, which `listQueues` requires, and names that permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | offline | The offline banner shows. The guest's place stays on screen with its age, so they can see they hold it. Joining and leaving need the connection — a place taken offline is a place nobody else can see. |
 
 **Goes to**
@@ -2749,8 +2781,8 @@
 | To | Trigger | Carries | Guard |
 |---|---|---|---|
 | GST-024 | While waiting, they order food to where they are sitting |  |  |
-| GST-001 | Home – Default | subjectId |  |
-| GST-003 | Event & Attraction Listing | eventId |  |
+| GST-001 | Home – Default |  |  |
+| GST-003 | Event & Attraction Listing |  |  |
 
 ## GST-027 Parking – Reserve & Pay
 
@@ -2777,7 +2809,7 @@
 |---|---|---|---|---|
 | `createParkingEntitlement` | [AccessService](../backend/AccessService.md#createparkingentitlement) | onAction | A guest bought parking | `None` |
 | `updateParkingEntitlement` | [AccessService](../backend/AccessService.md#updateparkingentitlement) | onAction | Change the plate, or revoke | `None` |
-| `listParkingFacilities` | [AccessService](../backend/AccessService.md#listparkingfacilities) | onLoad | Car parks at a venue, and how each integrates | `ACCESS_POINT_CONFIGURE` |
+| `listParkingFacilities` | [AccessService](../backend/AccessService.md#listparkingfacilities) | onLoad | Car parks at a venue, and how each integrates | `PARKING_CONFIGURE` |
 
 **States**
 
@@ -2786,8 +2818,8 @@
 | loading | Terminal or gateway state, shown plainly |
 | error | Declined reads differently from unresolved. An unresolved payment inquires rather than retries, and nothing is issued until it resolves |
 | emptyFirstRun | — |
-| emptyNoResults | The filter narrowed it and the parking reserve pay are still there. Names the active filter and offers to clear it. |
-| emptyNoAccess | Names the missing permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| emptyNoResults | Nothing matches the filter on venueId and the parking reserve pay are still there. Names the active filter and offers to clear it. |
+| emptyNoAccess | Shown when the caller lacks `PARKING_CONFIGURE`, which `listParkingFacilities` requires, and names that permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | offline | The offline banner shows. A reservation already confirmed stays on screen with its plate and car park. Reserving, paying and changing the plate need the connection. |
 
 **Goes to**
@@ -2795,8 +2827,8 @@
 | To | Trigger | Carries | Guard |
 |---|---|---|---|
 | GST-028 | It is confirmed with a facility and a bay type |  |  |
-| GST-001 | Home – Default | subjectId |  |
-| GST-003 | Event & Attraction Listing | eventId |  |
+| GST-001 | Home – Default |  |  |
+| GST-003 | Event & Attraction Listing |  |  |
 
 ## GST-028 Parking – Reservation Confirmed
 
@@ -2816,7 +2848,7 @@
 | Operation | Service | When | Purpose | Permission |
 |---|---|---|---|---|
 | `createParkingEntitlement` | [AccessService](../backend/AccessService.md#createparkingentitlement) | onAction | A guest bought parking | `None` |
-| `listParkingFacilities` | [AccessService](../backend/AccessService.md#listparkingfacilities) | onLoad | Car parks at a venue, and how each integrates | `ACCESS_POINT_CONFIGURE` |
+| `listParkingFacilities` | [AccessService](../backend/AccessService.md#listparkingfacilities) | onLoad | Car parks at a venue, and how each integrates | `PARKING_CONFIGURE` |
 
 **States**
 
@@ -2824,18 +2856,18 @@
 |---|---|
 | loading | The parking reservation confirmed list. |
 | error | Could not load. Names which read failed and leaves the parking reservation confirmed untouched. |
-| emptyFirstRun | No parking reservation confirmed yet. Carries the create action; distinct from a filter that matched nothing. |
-| emptyNoResults | The filter narrowed it and the parking reservation confirmed are still there. Names the active filter and offers to clear it. |
-| emptyNoAccess | Names the missing permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| emptyFirstRun | No parking reservation confirmed yet. Offers Create parking entitlement (`createParkingEntitlement`); distinct from a filter that matched nothing. |
+| emptyNoResults | Nothing matches the filter on venueId and the parking reservation confirmed are still there. Names the active filter and offers to clear it. |
+| emptyNoAccess | Shown when the caller lacks `PARKING_CONFIGURE`, which `listParkingFacilities` requires, and names that permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | offline | The offline banner shows. A reservation already confirmed stays on screen with its plate and car park. Reserving, paying and changing the plate need the connection. |
 
 **Goes to**
 
 | To | Trigger | Carries | Guard |
 |---|---|---|---|
-| GST-012 | They open their tickets |  |  |
-| GST-001 | Home – Default | subjectId |  |
-| GST-003 | Event & Attraction Listing | eventId |  |
+| GST-001 | Home – Default |  |  |
+| GST-003 | Event & Attraction Listing |  |  |
+| GST-012 | They open their tickets | orderId |  |
 
 ## GST-035 Feedback & Ratings
 
@@ -2854,7 +2886,7 @@
 
 | Operation | Service | When | Purpose | Permission |
 |---|---|---|---|---|
-| `submitReview` | [MarketingService](../backend/MarketingService.md#submitreview) | onLoad | from page inventory | `None` |
+| `submitReview` | [MarketingService](../backend/MarketingService.md#submitreview) | onAction | from page inventory | `None` |
 | `raiseMyCase` | [MarketingService](../backend/MarketingService.md#raisemycase) | onAction | Report something — lost property, a complaint, a question | `None` |
 
 **States**
@@ -2863,16 +2895,15 @@
 |---|---|
 | loading | The saved feedback ratings. |
 | error | Could not load. Names which read failed and leaves the feedback ratings untouched. |
-| emptyFirstRun | No feedback ratings configured. Carries the create action and says what the platform does in the meantime. |
-| emptyNoAccess | Names the missing permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| emptyFirstRun | No feedback ratings configured. The form opens empty and `submitReview` saves the first one; it says what the platform does in the meantime. |
 | offline | The offline banner shows. What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing. |
 
 **Goes to**
 
 | To | Trigger | Carries | Guard |
 |---|---|---|---|
-| GST-001 | Home – Default | subjectId |  |
-| GST-003 | Event & Attraction Listing | eventId |  |
+| GST-001 | Home – Default |  |  |
+| GST-003 | Event & Attraction Listing |  |  |
 
 ## GST-038 Digital Companion Mode
 
@@ -2901,17 +2932,17 @@
 |---|---|
 | loading | The digital companion mode list. |
 | error | Could not load. Names which read failed and leaves the digital companion mode untouched. |
-| emptyFirstRun | No digital companion mode yet. Carries the create action; distinct from a filter that matched nothing. |
-| emptyNoResults | The filter narrowed it and the digital companion mode are still there. Names the active filter and offers to clear it. |
-| emptyNoAccess | Names the missing permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| emptyFirstRun | No digital companion mode yet. Offers no create action — this screen declares no operation that makes one — and says so rather than showing an empty table. |
+| emptyNoResults | Nothing matches the filter on venueId, kind, isSellable and the digital companion mode are still there. Names the active filter and offers to clear it. |
+| emptyNoAccess | Shown when the caller lacks `PRODUCT_VIEW`, which `listProducts` requires, and names that permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | offline | The offline banner shows. What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing. |
 
 **Goes to**
 
 | To | Trigger | Carries | Guard |
 |---|---|---|---|
-| GST-001 | Home – Default | subjectId |  |
-| GST-003 | Event & Attraction Listing | eventId |  |
+| GST-001 | Home – Default |  |  |
+| GST-003 | Event & Attraction Listing |  |  |
 
 ## GST-050 Resource Booking – Cabana
 
@@ -2946,9 +2977,9 @@
 |---|---|
 | loading | The resource booking cabana list. |
 | error | Could not load. Names which read failed and leaves the resource booking cabana untouched. |
-| emptyFirstRun | No resource booking cabana yet. Carries the create action; distinct from a filter that matched nothing. |
-| emptyNoResults | The filter narrowed it and the resource booking cabana are still there. Names the active filter and offers to clear it. |
-| emptyNoAccess | Names the missing permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| emptyFirstRun | No resource booking cabana yet. Offers Add cart line (`addCartLine`); distinct from a filter that matched nothing. |
+| emptyNoResults | Nothing matches the filter on venueId, kind, isSellable and the resource booking cabana are still there. Names the active filter and offers to clear it. |
+| emptyNoAccess | Shown when the caller lacks `PRODUCT_VIEW`, which `listProducts` requires, and names that permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | offline | The offline banner shows. What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing. |
 
 **Goes to**
@@ -2956,8 +2987,8 @@
 | To | Trigger | Carries | Guard |
 |---|---|---|---|
 | GST-016 | They see it in their reservations |  |  |
-| GST-001 | Home – Default | subjectId |  |
-| GST-003 | Event & Attraction Listing | eventId |  |
+| GST-001 | Home – Default |  |  |
+| GST-003 | Event & Attraction Listing |  |  |
 
 ## GST-051 Plan Your Adventure – Start
 
@@ -2985,9 +3016,9 @@
 |---|---|
 | loading | The plan your adventure list. |
 | error | Could not load. Names which read failed and leaves the plan your adventure untouched. |
-| emptyFirstRun | No plan your adventure yet. Carries the create action; distinct from a filter that matched nothing. |
-| emptyNoResults | The filter narrowed it and the plan your adventure are still there. Names the active filter and offers to clear it. |
-| emptyNoAccess | Names the missing permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| emptyFirstRun | No plan your adventure yet. Offers no create action — this screen declares no operation that makes one — and says so rather than showing an empty table. |
+| emptyNoResults | Nothing matches the filter on venueId, kind, isSellable and the plan your adventure are still there. Names the active filter and offers to clear it. |
+| emptyNoAccess | Shown when the caller lacks `PRODUCT_VIEW`, which `listProducts` requires, and names that permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | offline | The offline banner shows. What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing. |
 
 **Goes to**
@@ -2995,8 +3026,8 @@
 | To | Trigger | Carries | Guard |
 |---|---|---|---|
 | GST-052 | Suggested itineraries are offered |  |  |
-| GST-001 | Home – Default | subjectId |  |
-| GST-003 | Event & Attraction Listing | eventId |  |
+| GST-001 | Home – Default |  |  |
+| GST-003 | Event & Attraction Listing |  |  |
 
 ## GST-052 Suggested Itineraries
 
@@ -3031,9 +3062,9 @@
 |---|---|
 | loading | The suggested itineraries list. |
 | error | Could not load. Names which read failed and leaves the suggested itineraries untouched. |
-| emptyFirstRun | No suggested itineraries yet. Carries the create action; distinct from a filter that matched nothing. |
-| emptyNoResults | The filter narrowed it and the suggested itineraries are still there. Names the active filter and offers to clear it. |
-| emptyNoAccess | Names the missing permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| emptyFirstRun | No suggested itineraries yet. Offers Request suggestion (`requestSuggestion`); distinct from a filter that matched nothing. |
+| emptyNoResults | Nothing matches the filter on venueId, kind, isSellable and the suggested itineraries are still there. Names the active filter and offers to clear it. |
+| emptyNoAccess | Shown when the caller lacks `PRODUCT_VIEW`, which `listProducts` requires, and names that permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | offline | The offline banner shows. What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing. |
 
 **Goes to**
@@ -3041,8 +3072,8 @@
 | To | Trigger | Carries | Guard |
 |---|---|---|---|
 | GST-053 | They build their own instead |  |  |
-| GST-001 | Home – Default | subjectId |  |
-| GST-003 | Event & Attraction Listing | eventId |  |
+| GST-001 | Home – Default |  |  |
+| GST-003 | Event & Attraction Listing |  |  |
 
 ## GST-053 Build Your Own Itinerary
 
@@ -3078,9 +3109,9 @@
 |---|---|
 | loading | The build your own list. |
 | error | Could not load. Names which read failed and leaves the build your own untouched. |
-| emptyFirstRun | No build your own yet. Carries the create action; distinct from a filter that matched nothing. |
-| emptyNoResults | The filter narrowed it and the build your own are still there. Names the active filter and offers to clear it. |
-| emptyNoAccess | Names the missing permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| emptyFirstRun | No build your own yet. Offers Add cart line (`addCartLine`); distinct from a filter that matched nothing. |
+| emptyNoResults | Nothing matches the filter on venueId, kind, isSellable and the build your own are still there. Names the active filter and offers to clear it. |
+| emptyNoAccess | Shown when the caller lacks `PRODUCT_VIEW`, which `listProducts` requires, and names that permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | offline | The offline banner shows. What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing. |
 
 **Goes to**
@@ -3088,8 +3119,8 @@
 | To | Trigger | Carries | Guard |
 |---|---|---|---|
 | GST-054 | An optimised order is proposed |  |  |
-| GST-001 | Home – Default | subjectId |  |
-| GST-003 | Event & Attraction Listing | eventId |  |
+| GST-001 | Home – Default |  |  |
+| GST-003 | Event & Attraction Listing |  |  |
 
 ## GST-054 AI Optimized Itinerary
 
@@ -3126,18 +3157,18 @@
 |---|---|
 | loading | The optimized itinerary list. |
 | error | Could not load. Names which read failed and leaves the optimized itinerary untouched. |
-| emptyFirstRun | No optimized itinerary yet. Carries the create action; distinct from a filter that matched nothing. |
-| emptyNoResults | The filter narrowed it and the optimized itinerary are still there. Names the active filter and offers to clear it. |
-| emptyNoAccess | Names the missing permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| emptyFirstRun | No optimized itinerary yet. Offers Request suggestion (`requestSuggestion`); distinct from a filter that matched nothing. |
+| emptyNoResults | Nothing matches the filter on venueId, kind, isSellable and the optimized itinerary are still there. Names the active filter and offers to clear it. |
+| emptyNoAccess | Shown when the caller lacks `PRODUCT_VIEW`, which `listProducts` requires, and names that permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | offline | The offline banner shows. What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing. |
 
 **Goes to**
 
 | To | Trigger | Carries | Guard |
 |---|---|---|---|
-| GST-059 | They follow it through the day |  |  |
-| GST-001 | Home – Default | subjectId |  |
-| GST-003 | Event & Attraction Listing | eventId |  |
+| GST-001 | Home – Default |  |  |
+| GST-003 | Event & Attraction Listing |  |  |
+| GST-059 | They follow it through the day | suggestionId |  |
 
 ## GST-058 Resource Availability (Cabana)
 
@@ -3165,9 +3196,9 @@
 |---|---|
 | loading | The resource availability (cabana) list. |
 | error | Could not load. Names which read failed and leaves the resource availability (cabana) untouched. |
-| emptyFirstRun | No resource availability (cabana) yet. Carries the create action; distinct from a filter that matched nothing. |
-| emptyNoResults | The filter narrowed it and the resource availability (cabana) are still there. Names the active filter and offers to clear it. |
-| emptyNoAccess | Names the missing permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| emptyFirstRun | No resource availability (cabana) yet. Offers no create action — this screen declares no operation that makes one — and says so rather than showing an empty table. |
+| emptyNoResults | Nothing matches the filter on venueId, kind, isSellable and the resource availability (cabana) are still there. Names the active filter and offers to clear it. |
+| emptyNoAccess | Shown when the caller lacks `PRODUCT_VIEW`, which `getAvailability` requires, and names that permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | offline | The offline banner shows. What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing. |
 
 **Goes to**
@@ -3175,8 +3206,8 @@
 | To | Trigger | Carries | Guard |
 |---|---|---|---|
 | GST-050 | They book and pay |  |  |
-| GST-001 | Home – Default | subjectId |  |
-| GST-003 | Event & Attraction Listing | eventId |  |
+| GST-001 | Home – Default |  |  |
+| GST-003 | Event & Attraction Listing |  |  |
 
 ## GST-059 Plan My Day – In Progress
 
@@ -3211,17 +3242,17 @@
 |---|---|
 | loading | The plan day progress list. |
 | error | Could not load. Names which read failed and leaves the plan day progress untouched. |
-| emptyFirstRun | No plan day progress yet. Carries the create action; distinct from a filter that matched nothing. |
-| emptyNoResults | The filter narrowed it and the plan day progress are still there. Names the active filter and offers to clear it. |
-| emptyNoAccess | Names the missing permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| emptyFirstRun | No plan day progress yet. Offers Request suggestion (`requestSuggestion`); distinct from a filter that matched nothing. |
+| emptyNoResults | Nothing matches the filter on venueId, kind, isSellable and the plan day progress are still there. Names the active filter and offers to clear it. |
+| emptyNoAccess | Shown when the caller lacks `PRODUCT_VIEW`, which `listProducts` requires, and names that permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | offline | The offline banner shows. What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing. |
 
 **Goes to**
 
 | To | Trigger | Carries | Guard |
 |---|---|---|---|
-| GST-001 | Home – Default | subjectId |  |
-| GST-003 | Event & Attraction Listing | eventId |  |
+| GST-001 | Home – Default |  |  |
+| GST-003 | Event & Attraction Listing |  |  |
 
 ## GST-062 Shop & Drop Collection
 
@@ -3240,7 +3271,7 @@
 
 | Operation | Service | When | Purpose | Permission |
 |---|---|---|---|---|
-| `lookupShopAndDrop` | [RetailService](../backend/RetailService.md#lookupshopanddrop) | onLoad | Find a guest's dropped goods | `ORDER_VIEW` |
+| `lookupShopAndDrop` | [RetailService](../backend/RetailService.md#lookupshopanddrop) | onAction | Find a guest's dropped goods | `ORDER_VIEW` |
 
 **States**
 
@@ -3248,16 +3279,16 @@
 |---|---|
 | loading | The saved shop drop collection. |
 | error | Could not load. Names which read failed and leaves the shop drop collection untouched. |
-| emptyFirstRun | No shop drop collection configured. Carries the create action and says what the platform does in the meantime. |
-| emptyNoAccess | Names the missing permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| emptyFirstRun | No shop drop collection configured. The form opens empty and `lookupShopAndDrop` saves the first one; it says what the platform does in the meantime. |
+| emptyNoAccess | Shown when the caller lacks `ORDER_VIEW`, which `lookupShopAndDrop` requires, and names that permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | offline | The offline banner shows, and lookup cannot run. A drop reference already on screen stays visible so the guest can quote it at the collection point. Reserving merchandise needs the connection. |
 
 **Goes to**
 
 | To | Trigger | Carries | Guard |
 |---|---|---|---|
-| GST-001 | Home – Default | subjectId |  |
-| GST-061 | Menu Item Detail | outletId |  |
+| GST-001 | Home – Default |  |  |
+| GST-061 | Menu Item Detail |  |  |
 | KSK-017 | Or they collect from a kiosk |  |  |
 
 ## GST-065 Newsletter & Preferences
@@ -3294,13 +3325,13 @@
 |---|---|
 | loading | The newsletter preferences list. |
 | error | Could not load. Names which read failed and leaves the newsletter preferences untouched. |
-| emptyFirstRun | No newsletter preferences yet. Carries the create action; distinct from a filter that matched nothing. |
-| emptyNoResults | The filter narrowed it and the newsletter preferences are still there. Names the active filter and offers to clear it. |
-| emptyNoAccess | Names the missing permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| emptyFirstRun | No newsletter preferences yet. Offers Record consent (`recordConsent`). |
+| emptyNoResults | Never shown: `listConsentPurposes` takes no filter, so an empty list is always the first-run state above. |
+| emptyNoAccess | Shown when the caller lacks `GUEST_VIEW`, which `listConsentPurposes` requires, and names that permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | offline | Not available, and the offline banner says why. A consent change must reach the server to mean anything. |
 
 **Goes to**
 
 | To | Trigger | Carries | Guard |
 |---|---|---|---|
-| GST-001 | Home – Default | subjectId |  |
+| GST-001 | Home – Default |  |  |

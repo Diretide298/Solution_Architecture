@@ -13,8 +13,6 @@ owner: reporting
 initial:
 - queued
 terminal:
-- ready
-- failed
 - expired
 transitions:
 - from: queued

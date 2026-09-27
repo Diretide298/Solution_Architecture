@@ -1,5 +1,5 @@
 id: LLD-fnb
-title: fnb — 111 operations
+title: fnb — 113 operations
 generatedBy: tools/derive-diagrams.py
 index: diagrams/hld/03-contracts.yaml
 tier: satellite
@@ -82,10 +82,12 @@ operations:
   - cache:idempotency
   - fnb.menu_item
   - fnb.production_plan
+  - fnb.production_plan_line
   - fnb.recipe
   writes:
   - cache:idempotency
   - fnb.production_plan
+  - fnb.production_plan_line
 - operation: cancelFnbOrder
   verb: POST
   path: /fnb-orders/{orderId}/cancel
@@ -256,6 +258,7 @@ operations:
   writes:
   - cache:idempotency
   - fnb.service_order
+  - fnb.service_order_line
 - operation: createGuestFnbOrder
   verb: POST
   path: /guest-orders
@@ -682,6 +685,30 @@ operations:
   - fnb.kitchen_ticket
   - fnb.kitchen_ticket_line
   writes: []
+- operation: listMenuSchedules
+  verb: GET
+  path: /menus/{menuId}/schedule
+  scope: venue
+  permission: PRODUCT_VIEW
+  audience:
+  - staff
+  offline: false
+  reads:
+  - fnb.menu_schedule
+  writes: []
+- operation: listMenuVersions
+  verb: GET
+  path: /menus/{menuId}/versions
+  scope: venue
+  permission: PRODUCT_VIEW
+  audience:
+  - staff
+  offline: false
+  reads:
+  - fnb.menu_item
+  - fnb.menu_section
+  - fnb.menu_version
+  writes: []
 - operation: listMenus
   verb: GET
   path: /menus
@@ -783,6 +810,7 @@ operations:
   offline: true
   reads:
   - cache:idempotency
+  - fnb.kitchen_exception
   - fnb.kitchen_station
   writes:
   - cache:idempotency
@@ -816,6 +844,7 @@ operations:
   - cache:idempotency
   - fnb.kitchen_ticket
   - fnb.service_order
+  - fnb.service_order_line
   writes:
   - cache:idempotency
   - fnb.kitchen_ticket
@@ -957,7 +986,9 @@ operations:
   reads:
   - cache:idempotency
   - fnb.menu
+  - fnb.menu_item
   - fnb.menu_section
+  - fnb.menu_version
   writes:
   - cache:idempotency
   - cache:resolution
@@ -1096,6 +1127,7 @@ operations:
   reads:
   - cache:idempotency
   - fnb.production_plan
+  - fnb.production_plan_line
   writes:
   - cache:idempotency
   - fnb.production_plan
@@ -1152,6 +1184,9 @@ operations:
   reads:
   - cache:idempotency
   - fnb.menu
+  - fnb.menu_item
+  - fnb.menu_section
+  - fnb.menu_version
   writes:
   - cache:idempotency
   - cache:resolution
@@ -1167,6 +1202,7 @@ operations:
   reads:
   - cache:idempotency
   - fnb.menu
+  - fnb.menu_schedule
   writes:
   - cache:idempotency
   - cache:resolution
@@ -1246,9 +1282,11 @@ operations:
   offline: false
   reads:
   - cache:idempotency
+  - fnb.course_rule
   writes:
   - cache:idempotency
   - cache:resolution
+  - fnb.course_rule
 - operation: setFnbDeliveryPolicy
   verb: PUT
   path: /fnb-delivery-policy
@@ -1445,10 +1483,12 @@ operations:
   reads:
   - cache:idempotency
   - fnb.dining_table
+  - fnb.table_combination
   writes:
   - cache:idempotency
   - cache:resolution
   - fnb.dining_table
+  - fnb.table_combination
 - operation: setTableLayout
   verb: PUT
   path: /outlets/{outletId}/tables
@@ -1533,6 +1573,8 @@ operations:
   offline: true
   reads:
   - cache:idempotency
+  - fnb.service_order
+  - fnb.service_order_line
   - fnb.table_visit
   - identity.principal
   writes:

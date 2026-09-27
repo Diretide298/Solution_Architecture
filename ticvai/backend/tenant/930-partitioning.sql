@@ -12,9 +12,13 @@
 -- **One thing from the old baseline is deliberately not carried: the `platform.scope_level` enum.**
 -- It existed so a `venue_id` column could not resolve to a workstation, paired with a composite
 -- foreign key in a `V0003a__scope-typing.sql` that is not part of this generation. Every
--- `scope_level` column here is `text`, derived from contracts that declare it as a string.
--- **Emitting an unused type would imply a constraint nothing enforces**, so the gap is named here
--- instead: scope levels are validated by the application, not by the database.
+-- `scope_level` column here is `text`; where its contract declares the enum, the column carries a
+-- `<table>_<column>_chk` CHECK with the contract's values, like every other contract enum. That a
+-- `venue_id` resolves to a venue and not a workstation is still the application's to check.
+--
+-- **Partitions are named `<table>_<venue uuid hex>`, not naming-and-style 6.1's
+-- `<table>_v<venue_number>`.** Nothing in the package defines or allocates a venue number, so
+-- there is nothing to derive the 6.1 name from; that is a decision to make, not a rename.
 CREATE OR REPLACE FUNCTION platform.ensure_venue_partition(target regclass, venue_id uuid)
     RETURNS void
     LANGUAGE plpgsql
@@ -34,7 +38,7 @@ END
 $$;
 
 
--- **34 tables qualify today** — a NOT NULL `venue_id` in the schema reference.
+-- **44 tables qualify today** — a NOT NULL `venue_id` in the schema reference.
 -- Listed rather than counted, because ADR-0044's rule is checkable and the list is how.
 
 --   access.access_point
@@ -49,11 +53,16 @@ $$;
 --   games.card
 --   games.game
 --   games.prize
+--   inventory.item
 --   inventory.location
 --   inventory.requisition
 --   ledger.price_variance
+--   maintenance.asset
+--   maintenance.incident
 --   maintenance.inspection
+--   maintenance.work_order
 --   marketing.lost_item
+--   marketing.review
 --   orders.cart
 --   orders.deposit_box
 --   orders.pos_shift
@@ -63,6 +72,11 @@ $$;
 --   platform.outlet
 --   platform.sale_board
 --   platform.workstation
+--   promotions.bundle
+--   promotions.coupon_campaign
+--   promotions.promotion
+--   promotions.voucher_batch
+--   queue.queue
 --   rental.agreement
 --   rental.product
 --   resources.resource

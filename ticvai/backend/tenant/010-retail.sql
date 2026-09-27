@@ -26,9 +26,9 @@ CREATE TABLE IF NOT EXISTS retail.merchandise (
     inventory_item_id                 uuid,
     list_price                        numeric(18,4) NOT NULL,
     on_hand                           numeric(18,4) NOT NULL,
-    is_returnable                     boolean,
+    is_returnable                     boolean DEFAULT true,
     return_window_days                integer,
-    requires_serial_number            boolean,
+    requires_serial_number            boolean DEFAULT false,
     image_asset_ref                   text,
     is_active                         boolean NOT NULL
 );
@@ -37,14 +37,14 @@ CREATE TABLE IF NOT EXISTS retail.merchandise (
 -- saying what it is
 CREATE TABLE IF NOT EXISTS retail.product_recommendation (
     id                                uuid PRIMARY KEY,
-    scope_path                        ltree,
+    scope_path                        ltree NOT NULL,
     source_product_id                 uuid NOT NULL,
     source_variant_id                 uuid,
-    type                              text NOT NULL,
-    target_service                    text NOT NULL,
+    type                              text NOT NULL CONSTRAINT product_recommendation_type_chk CHECK (char_length(type) <= 30),
+    target_service                    text NOT NULL CONSTRAINT product_recommendation_target_service_chk CHECK (char_length(target_service) <= 30),
     target_product_id                 uuid NOT NULL,
     target_variant_id                 uuid,
-    display_message                   text,
+    display_message                   text CONSTRAINT product_recommendation_display_message_chk CHECK (char_length(display_message) <= 300),
     default_quantity                  numeric(18,4) NOT NULL,
     max_quantity                      numeric(18,4),
     priority                          integer NOT NULL,
@@ -63,14 +63,14 @@ CREATE TABLE IF NOT EXISTS retail.reservation (
     reservation_number                text,
     outlet_id                         uuid NOT NULL,
     subject_id                        uuid,
-    status                            text NOT NULL,
+    status                            text NOT NULL CONSTRAINT reservation_status_chk CHECK (status IN ('reserved', 'collected', 'expired', 'cancelled')),
     collection_note                   text,
     expires_at                        timestamptz NOT NULL,
     collected_at                      timestamptz
 );
 
 -- One item reserved. Hangs off: a child of retail.reservation; reaches retail.sale through its
--- keys; references retail.merchandise, retail.reservation. Reached by: 1 operations read it and 0
+-- keys; references retail.merchandise, retail.reservation. Reached by: 1 operations read it and 1
 -- write it.
 CREATE TABLE IF NOT EXISTS retail.reservation_line (
     reservation_id                    text NOT NULL,
@@ -86,11 +86,13 @@ CREATE TABLE IF NOT EXISTS retail."return" (
     return_number                     text,
     sale_id                           text NOT NULL,
     refund_id                         text,
-    reason                            text,
+    reason                            text CONSTRAINT return_reason_chk CHECK (reason IN ('changedMind', 'wrongSize', 'wrongItem', 'faulty', 'damagedInTransit', 'duplicatePurchase', 'giftReturn', 'other')),
     refund_amount                     numeric(18,4) NOT NULL,
     refund_tender                     text,
     restocked_quantity                integer NOT NULL,
     written_off_quantity              integer NOT NULL,
+    status                            text NOT NULL,
+    refused_reason                    text,
     accepted_by_principal_id          uuid,
     secondary_principal_id            uuid,
     created_at                        timestamptz NOT NULL
@@ -114,11 +116,12 @@ CREATE TABLE IF NOT EXISTS retail.return_policy (
     id                                uuid PRIMARY KEY,
     outlet_id                         uuid NOT NULL,
     default_window_days               integer NOT NULL,
-    requires_receipt                  boolean NOT NULL,
-    allow_cash_refund_on_card_sale    boolean,
+    requires_receipt                  boolean NOT NULL DEFAULT true,
+    allow_cash_refund_on_card_sale    boolean DEFAULT false,
     self_authorise_limit              numeric(18,4),
     requires_second_user_above        numeric(18,4),
     requires_approval_above           numeric(18,4),
+    restockable_conditions            text[],
     non_returnable_category_ids       text[]
 );
 
@@ -165,13 +168,12 @@ CREATE TABLE IF NOT EXISTS retail.shop_and_drop (
     subject_id                        uuid,
     collection_point_id               uuid NOT NULL,
     collection_point_name             text,
-    status                            text NOT NULL,
+    status                            text NOT NULL CONSTRAINT shop_and_drop_status_chk CHECK (status IN ('awaitingCollection', 'partiallyCollected', 'collected', 'uncollected', 'disposed')),
     dropped_at                        timestamptz,
     collect_by                        timestamptz NOT NULL,
     collected_at                      timestamptz,
     collected_by_principal_id         uuid,
     verified_by                       text,
-    collected_by                      uuid,
     venue_id                          uuid
 );
 
@@ -185,8 +187,7 @@ CREATE TABLE IF NOT EXISTS retail.shop_and_drop_line (
     name                              text,
     quantity                          integer,
     collected_quantity                integer,
-    id                                uuid PRIMARY KEY NOT NULL,
-    drop_id                           text
+    id                                uuid PRIMARY KEY NOT NULL
 );
 
 -- Holds 8 columns. No description has been written for this table — the name is the only thing
@@ -195,10 +196,12 @@ CREATE TABLE IF NOT EXISTS retail.store_rule (
     id                                uuid PRIMARY KEY NOT NULL,
     venue_id                          uuid,
     outlet_id                         uuid,
-    kind                              text,
-    threshold_minor                   integer,
+    kind                              text CONSTRAINT store_rule_kind_chk CHECK (kind IN ('discountLimit', 'refundThreshold', 'ageCheck', 'managerOverride', 'priceOverride')),
+    threshold_amount                  numeric(18,4),
+    minimum_age_years                 integer,
     requires_permission               text,
-    enabled                           boolean,
-    updated_at                        timestamptz
+    is_enabled                        boolean,
+    updated_at                        timestamptz,
+    updated_by_principal_id           uuid
 );
 

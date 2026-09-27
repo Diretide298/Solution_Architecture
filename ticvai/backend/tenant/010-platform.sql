@@ -12,12 +12,16 @@ CREATE TABLE IF NOT EXISTS platform.audit_read (
 
 -- Written by the platform on every write, not by any one operation (ADR-0022 sits above this).
 -- Naming it on 431 lineage rows would say nothing Hangs off: reaches platform.scope through its
--- keys; references identity.principal, platform.scope. Reached by: 1 operations read it and 2
--- write it; written by 2 contracts — inventory, tenancy.
+-- keys; references identity.principal, platform.scope, platform.workstation. Reached by: 1
+-- operations read it and 2 write it; written by 2 contracts — inventory, tenancy.
 CREATE TABLE IF NOT EXISTS platform.audit_record (
     id                                uuid PRIMARY KEY NOT NULL,
-    principal_id                      uuid NOT NULL,
-    org_unit_id                       uuid NOT NULL
+    principal_id                      uuid,
+    org_unit_id                       uuid,
+    workstation_id                    uuid,
+    action                            text NOT NULL,
+    subject_ref                       text,
+    occurred_at                       timestamptz NOT NULL
 );
 
 -- Holds 11 columns. No description has been written for this table — the name is the only thing
@@ -25,12 +29,12 @@ CREATE TABLE IF NOT EXISTS platform.audit_record (
 CREATE TABLE IF NOT EXISTS platform.cell_endpoint (
     id                                uuid PRIMARY KEY,
     cell_id                           uuid NOT NULL,
-    service_name                      text NOT NULL,
-    url                               text NOT NULL,
-    contract_version                  text,
-    authentication_type               text,
-    credential_reference              text,
-    status                            text NOT NULL,
+    service_name                      text NOT NULL CONSTRAINT cell_endpoint_service_name_chk CHECK (char_length(service_name) <= 100),
+    url                               text NOT NULL CONSTRAINT cell_endpoint_url_chk CHECK (char_length(url) <= 1000),
+    contract_version                  text CONSTRAINT cell_endpoint_contract_version_chk CHECK (char_length(contract_version) <= 50),
+    authentication_type               text CONSTRAINT cell_endpoint_authentication_type_chk CHECK (char_length(authentication_type) <= 50),
+    credential_reference              text CONSTRAINT cell_endpoint_credential_reference_chk CHECK (char_length(credential_reference) <= 500),
+    status                            text NOT NULL CONSTRAINT cell_endpoint_status_chk CHECK (char_length(status) <= 30),
     last_health_check_at              timestamptz,
     created_at                        timestamptz NOT NULL,
     updated_at                        timestamptz
@@ -42,11 +46,11 @@ CREATE TABLE IF NOT EXISTS platform.cell_endpoint (
 CREATE TABLE IF NOT EXISTS platform.configuration_profile (
     id                                uuid PRIMARY KEY NOT NULL,
     name                              text NOT NULL,
-    scope_path                        ltree,
+    scope_path                        ltree NOT NULL,
     venue_kind_scope                  text[] NOT NULL,
     version                           integer NOT NULL,
     settings                          jsonb,
-    status                            text NOT NULL,
+    status                            text NOT NULL CONSTRAINT configuration_profile_status_chk CHECK (status IN ('draft', 'published', 'deploying', 'deployed', 'superseded', 'rolledBack')),
     deployed_count                    integer,
     published_at                      timestamptz
 );
@@ -54,14 +58,14 @@ CREATE TABLE IF NOT EXISTS platform.configuration_profile (
 -- When a workstation decides it is offline, and when it is back (Board 5). Asymmetric thresholds,
 -- because symmetric ones make it flap across a marginal connection
 CREATE TABLE IF NOT EXISTS platform.connectivity_policy (
-    id                                uuid PRIMARY KEY NOT NULL,
+    id                                uuid PRIMARY KEY,
     scope_path                        ltree NOT NULL,
-    failures_before_offline           integer,
-    probe_interval_seconds            integer,
-    probe_timeout_ms                  integer,
-    successes_before_online           integer,
-    minimum_stable_seconds            integer,
-    auto_switch                       boolean
+    failures_before_offline           integer DEFAULT 3,
+    probe_interval_seconds            integer DEFAULT 15,
+    probe_timeout_ms                  integer DEFAULT 2000,
+    successes_before_online           integer DEFAULT 5,
+    minimum_stable_seconds            integer DEFAULT 30,
+    is_auto_switch                    boolean DEFAULT true
 );
 
 -- Something bought in one jurisdiction and honoured in another. ADR-0010: the guest does not move,
@@ -80,12 +84,11 @@ CREATE TABLE IF NOT EXISTS platform.cross_region_entitlement (
     valid_to                          timestamptz NOT NULL,
     admission_rules_id                uuid,
     venue_id                          uuid,
-    entries_allowed                   integer NOT NULL,
+    entries_allowed                   integer,
     entries_consumed                  integer NOT NULL,
-    status                            text NOT NULL,
+    status                            text NOT NULL CONSTRAINT cross_region_entitlement_status_chk CHECK (status IN ('active', 'exhausted', 'revoked', 'expired')),
     last_consumed_at                  timestamptz,
-    last_reconciled_at                timestamptz,
-    admission_profile_id              uuid NOT NULL
+    last_reconciled_at                timestamptz
 );
 
 -- An outbox row whose delivery failed after its retry budget (ADR-0033). Carries the payload
@@ -100,8 +103,8 @@ CREATE TABLE IF NOT EXISTS platform.dead_letter (
     attempts                          integer,
     last_error                        text,
     last_attempt_at                   timestamptz,
-    replay_count                      integer,
-    scope_path                        ltree,
+    replay_count                      integer DEFAULT 0,
+    scope_path                        ltree NOT NULL,
     created_at                        timestamptz
 );
 
@@ -112,35 +115,36 @@ CREATE TABLE IF NOT EXISTS platform.denomination (
     id                                uuid PRIMARY KEY,
     currency_code                     text NOT NULL,
     display_name                      text,
-    kind                              text NOT NULL,
+    kind                              text NOT NULL CONSTRAINT denomination_kind_chk CHECK (kind IN ('note', 'coin')),
     sort_order                        integer,
-    is_active                         boolean,
+    is_active                         boolean DEFAULT true,
     face_value_amount                 numeric(18,4) NOT NULL
 );
 
 -- A physical thing that authenticates and does not authorise — a scanner, a printer, a kitchen
 -- display. It proves which device; the person proves what they may do
 CREATE TABLE IF NOT EXISTS platform.device (
-    state                             text NOT NULL,
+    state                             text NOT NULL CONSTRAINT device_state_chk CHECK (state IN ('enrolled', 'provisioned', 'active', 'deactivated', 'retired')),
     reason                            text,
     id                                uuid PRIMARY KEY NOT NULL,
-    kind                              text NOT NULL,
+    kind                              text NOT NULL CONSTRAINT device_kind_chk CHECK (kind IN ('receiptPrinter', 'ticketPrinter', 'labelPrinter', 'cashDrawer', 'barcodeScanner', 'rfidReader', 'nfcReader', 'cardReader', 'idReader', 'biometricReader', 'accessReader', 'paymentTerminal', 'customerDisplay', 'signageDisplay', 'kitchenDisplay', 'turnstileController', 'wristbandEncoder', 'signaturePad', 'scale', 'camera')),
     driver                            text NOT NULL,
     identifier                        text,
     workstation_id                    uuid NOT NULL,
     model                             text,
     push_token                        text,
-    push_platform                     text,
-    push_failure_count                integer,
-    offline_scope                     text,
+    push_platform                     text CONSTRAINT device_push_platform_chk CHECK (push_platform IN ('ios', 'android', 'web', 'windows')),
+    push_failure_count                integer DEFAULT 0,
+    offline_scope                     text CONSTRAINT device_offline_scope_chk CHECK (offline_scope IN ('none', 'readOnly', 'sellAndScan', 'fullVenue')),
     firmware_version                  text,
     is_required                       boolean,
-    status                            text,
+    status                            text CONSTRAINT device_status_chk CHECK (status IN ('online', 'offline', 'error', 'consumableLow', 'needsAttention', 'unknown')),
     battery_percent                   integer,
     last_checked_at                   timestamptz,
-    health                            text,
+    health                            text DEFAULT 'unknown' CONSTRAINT device_health_chk CHECK (health IN ('healthy', 'warning', 'degraded', 'offline', 'unknown')),
     last_heartbeat_at                 timestamptz,
-    enrolment_state                   text,
+    capabilities                      text[],
+    enrolment_state                   text DEFAULT 'registered' CONSTRAINT device_enrolment_state_chk CHECK (enrolment_state IN ('registered', 'enrolled', 'provisioned', 'active', 'deactivated', 'retired')),
     retired_at                        timestamptz,
     configuration_profile_id          uuid
 );
@@ -158,8 +162,8 @@ CREATE TABLE IF NOT EXISTS platform.dsar_request (
     id                                uuid PRIMARY KEY,
     request_id                        text NOT NULL,
     guest_link_id                     text NOT NULL,
-    kind                              text NOT NULL,
-    status                            text NOT NULL,
+    kind                              text NOT NULL CONSTRAINT dsar_request_kind_chk CHECK (kind IN ('access', 'rectification', 'erasure', 'portability', 'restriction')),
+    status                            text NOT NULL CONSTRAINT dsar_request_status_chk CHECK (status IN ('pending', 'inProgress', 'completed', 'partiallyFailed')),
     created_at                        timestamptz NOT NULL,
     completed_at                      timestamptz
 );
@@ -175,16 +179,16 @@ CREATE TABLE IF NOT EXISTS platform.guest_link (
 
 -- What a workstation may do with no network, and for how long (Board 5). A till three days offline
 -- holding 900 unsynced sales is a reconciliation nobody can do. Hangs off: reaches platform.scope
--- through its keys. Reached by: 1 operations read it and 1 write it.
+-- through its keys. Reached by: 2 operations read it and 1 write it.
 CREATE TABLE IF NOT EXISTS platform.offline_policy (
-    id                                uuid PRIMARY KEY NOT NULL,
+    id                                uuid PRIMARY KEY,
     scope_path                        ltree NOT NULL,
-    max_offline_hours                 integer,
+    max_offline_hours                 integer DEFAULT 24,
     allowed_offline                   text[],
     offline_value_ceiling             numeric(18,4),
     offline_transaction_ceiling       integer,
-    on_ceiling_breach                 text,
-    requires_manager_to_extend        boolean
+    on_ceiling_breach                 text DEFAULT 'blockNewSales' CONSTRAINT offline_policy_on_ceiling_breach_chk CHECK (on_ceiling_breach IN ('warn', 'blockNewSales', 'blockAll')),
+    requires_manager_to_extend        boolean DEFAULT true
 );
 
 -- Written in the same transaction as the state change, by the platform, not by an operation. That
@@ -197,10 +201,10 @@ CREATE TABLE IF NOT EXISTS platform.outbox (
     aggregate_type                    text,
     aggregate_id                      uuid,
     payload                           jsonb NOT NULL,
-    scope_path                        ltree,
+    scope_path                        ltree NOT NULL,
     sequence                          integer,
     published_at                      timestamptz,
-    attempts                          integer,
+    attempts                          integer DEFAULT 0,
     last_error                        text,
     created_at                        timestamptz NOT NULL
 );
@@ -210,10 +214,10 @@ CREATE TABLE IF NOT EXISTS platform.outbox (
 -- modelling a restaurant as a department puts it in the staffing tree
 CREATE TABLE IF NOT EXISTS platform.outlet (
     id                                uuid PRIMARY KEY NOT NULL,
-    code                              text NOT NULL,
-    name                              text NOT NULL,
+    code                              text NOT NULL CONSTRAINT outlet_code_chk CHECK (char_length(code) <= 64),
+    name                              text NOT NULL CONSTRAINT outlet_name_chk CHECK (char_length(name) <= 200),
     venue_id                          uuid NOT NULL,
-    kind                              text NOT NULL,
+    kind                              text NOT NULL CONSTRAINT outlet_kind_chk CHECK (kind IN ('shop', 'restaurant', 'bar', 'cafe', 'kiosk', 'gameFloor', 'ticketOffice', 'mobile')),
     zone                              text,
     stock_location_id                 uuid,
     cost_center_id                    uuid,
@@ -228,8 +232,8 @@ CREATE TABLE IF NOT EXISTS platform.profile_deployment (
     version                           integer NOT NULL,
     target_workstation_ids            text[],
     target_filter                     jsonb,
-    strategy                          text,
-    status                            text NOT NULL,
+    strategy                          text DEFAULT 'onNextIdle' CONSTRAINT profile_deployment_strategy_chk CHECK (strategy IN ('immediate', 'staged', 'onNextIdle')),
+    status                            text NOT NULL CONSTRAINT profile_deployment_status_chk CHECK (status IN ('queued', 'inProgress', 'completed', 'partiallyFailed', 'rolledBack')),
     succeeded_count                   integer,
     failed_count                      integer,
     failure_reasons                   jsonb,
@@ -243,8 +247,8 @@ CREATE TABLE IF NOT EXISTS platform.region_settings (
     currency_code                     text NOT NULL,
     currency_scale                    integer NOT NULL,
     time_zone                         text NOT NULL,
-    date_format                       text,
-    number_format                     text,
+    date_format                       text DEFAULT 'dd/MM/yyyy',
+    number_format                     text DEFAULT '#,##0.00',
     fiscal_year_start_month           integer NOT NULL,
     placement                         jsonb,
     cell_name                         text,
@@ -255,10 +259,10 @@ CREATE TABLE IF NOT EXISTS platform.region_settings (
 -- What a till shows and in what order. Configured by the venue, not by code
 CREATE TABLE IF NOT EXISTS platform.sale_board (
     id                                uuid PRIMARY KEY NOT NULL,
-    code                              text NOT NULL,
-    name                              text NOT NULL,
+    code                              text NOT NULL CONSTRAINT sale_board_code_chk CHECK (char_length(code) <= 64),
+    name                              text NOT NULL CONSTRAINT sale_board_name_chk CHECK (char_length(name) <= 200),
     venue_id                          uuid NOT NULL,
-    kind                              text NOT NULL,
+    kind                              text NOT NULL CONSTRAINT sale_board_kind_chk CHECK (kind IN ('ticketing', 'fnb', 'retail', 'mixed')),
     is_active                         boolean
 );
 
@@ -284,17 +288,17 @@ CREATE TABLE IF NOT EXISTS platform.sale_board_tile (
 -- org unit; a scope_path is a
 CREATE TABLE IF NOT EXISTS platform.scope (
     id                                uuid PRIMARY KEY NOT NULL,
-    level                             text NOT NULL,
+    level                             text NOT NULL CONSTRAINT scope_level_chk CHECK (level IN ('tenant', 'brand', 'region', 'venue', 'department', 'subDepartment', 'workstation', 'outlet')),
     parent_id                         uuid,
-    path                              text NOT NULL,
-    code                              text NOT NULL,
-    name                              text NOT NULL,
+    path                              ltree NOT NULL,
+    code                              text NOT NULL CONSTRAINT scope_code_chk CHECK (char_length(code) <= 64),
+    name                              text NOT NULL CONSTRAINT scope_name_chk CHECK (char_length(name) <= 200),
     is_active                         boolean NOT NULL,
     child_count                       integer
 );
 
 -- read-only projection of control.tenant, outside every cell Hangs off: reaches platform.scope
--- through its keys; references platform.scope. Reached by: 2 operations read it and 0 write it; 8
+-- through its keys; references platform.scope. Reached by: 2 operations read it and 0 write it; 17
 -- tables reference it.
 CREATE TABLE IF NOT EXISTS platform.tenant (
     id                                uuid PRIMARY KEY NOT NULL,
@@ -319,7 +323,7 @@ CREATE TABLE IF NOT EXISTS platform.venue_settings (
 -- A hold on a balance held in another jurisdiction, with the rate it converted at fixed on
 -- authorisation rather than capture
 CREATE TABLE IF NOT EXISTS platform.wallet_authorisation (
-    mode                              text NOT NULL,
+    mode                              text NOT NULL CONSTRAINT wallet_authorisation_mode_chk CHECK (mode IN ('none', 'fixed', 'percentageOfBalance')),
     allocated_amount                  numeric(18,4),
     drawn_amount                      numeric(18,4),
     available_amount                  numeric(18,4) NOT NULL,
@@ -330,7 +334,7 @@ CREATE TABLE IF NOT EXISTS platform.wallet_authorisation (
     guest_link_id                     text NOT NULL,
     amount                            numeric(18,4) NOT NULL,
     captured_amount                   numeric(18,4),
-    status                            text NOT NULL,
+    status                            text NOT NULL CONSTRAINT wallet_authorisation_status_chk CHECK (status IN ('held', 'captured', 'partiallyCaptured', 'released', 'expired')),
     home_cell_name                    text,
     consuming_cell_name               text,
     order_id                          text,
@@ -349,8 +353,8 @@ CREATE TABLE IF NOT EXISTS platform.wallet_authorisation (
 -- the person’s, not the workstation’s (ADR-0002), which is what makes a shared handheld safe
 CREATE TABLE IF NOT EXISTS platform.workstation (
     id                                uuid PRIMARY KEY NOT NULL,
-    code                              text NOT NULL,
-    name                              text NOT NULL,
+    code                              text NOT NULL CONSTRAINT workstation_code_chk CHECK (char_length(code) <= 64),
+    name                              text NOT NULL CONSTRAINT workstation_name_chk CHECK (char_length(name) <= 200),
     venue_id                          uuid NOT NULL,
     region_id                         uuid NOT NULL,
     department_id                     uuid,
@@ -358,12 +362,11 @@ CREATE TABLE IF NOT EXISTS platform.workstation (
     sale_board                        jsonb NOT NULL,
     access_point_id                   uuid,
     time_zone                         text NOT NULL,
-    deployment_profile                text,
+    deployment_profile                text CONSTRAINT workstation_deployment_profile_chk CHECK (deployment_profile IN ('terminalLocal', 'venueEdge', 'thin')),
     edge_node_id                      uuid,
     health_score                      integer,
     configuration_profile_id          uuid,
-    catalogue_state                   jsonb,
-    offline_capable                   boolean,
+    is_offline_capable                boolean,
     is_active                         boolean,
     org_unit_id                       uuid NOT NULL
 );

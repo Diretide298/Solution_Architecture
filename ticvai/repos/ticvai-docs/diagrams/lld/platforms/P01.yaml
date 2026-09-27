@@ -41,9 +41,9 @@ servicesCalled:
 - service: MarketingService
   operationCalls: 60
 - service: OrderService
-  operationCalls: 45
+  operationCalls: 46
 - service: CatalogueService
-  operationCalls: 40
+  operationCalls: 37
 - service: IdentityService
   operationCalls: 24
 - service: FnbService
@@ -92,7 +92,26 @@ screens:
   - WEB-002
   - WEB-003
   - WEB-004
+  - WEB-008
+  - WEB-009
+  - WEB-015
   - WEB-016
+  - WEB-017
+  - WEB-018
+  - WEB-019
+  - WEB-020
+  - WEB-021
+  - WEB-022
+  - WEB-023
+  - WEB-024
+  - WEB-025
+  - WEB-026
+  - WEB-027
+  - WEB-028
+  - WEB-029
+  - WEB-032
+  - WEB-033
+  - WEB-034
   - WEB-036
   - WEB-037
   - WEB-038
@@ -229,20 +248,20 @@ screens:
   wave: 1
   density: compact
   operations:
-  - acquireInventoryHold
+  - addCartLine
   - checkBookingEligibility
   - getAvailability
   - getPerformance
   states:
   - emptyFirstRun
   - emptyNoAccess
-  - emptyNoResults
   - error
   - loading
   - offline
   offlineState: true
   entryParams:
   - performanceId<-navigation
+  - cartId<-navigation
   goesTo:
   - WEB-001
   - WEB-005
@@ -267,7 +286,6 @@ screens:
   states:
   - emptyFirstRun
   - emptyNoAccess
-  - emptyNoResults
   - error
   - loading
   - offline
@@ -312,6 +330,7 @@ screens:
   - WEB-005
   - WEB-006
   - WEB-007
+  - WEB-010
   boardFrames: null
   wireframe: wireframes/P01 Guest Web.dc.html#web-008
   inFlows: null
@@ -328,7 +347,6 @@ screens:
   states:
   - emptyFirstRun
   - emptyNoAccess
-  - emptyNoResults
   - error
   - loading
   - offline
@@ -364,7 +382,6 @@ screens:
   states:
   - emptyFirstRun
   - emptyNoAccess
-  - emptyNoResults
   - error
   - loading
   - offline
@@ -445,7 +462,6 @@ screens:
   states:
   - emptyFirstRun
   - emptyNoAccess
-  - emptyNoResults
   - error
   - loading
   - offline
@@ -476,7 +492,6 @@ screens:
   states:
   - emptyFirstRun
   - emptyNoAccess
-  - emptyNoResults
   - error
   - loading
   - offline
@@ -488,6 +503,7 @@ screens:
   - WEB-010
   - WEB-011
   - WEB-012
+  - WEB-014
   - WEB-018
   boardFrames: null
   wireframe: wireframes/P01 Guest Web.dc.html#web-013
@@ -505,7 +521,6 @@ screens:
   states:
   - emptyFirstRun
   - emptyNoAccess
-  - emptyNoResults
   - error
   - loading
   - offline
@@ -530,7 +545,6 @@ screens:
   states:
   - emptyFirstRun
   - emptyNoAccess
-  - emptyNoResults
   - error
   - loading
   - offline
@@ -585,6 +599,7 @@ screens:
   goesTo:
   - WEB-001
   - WEB-010
+  - WEB-011
   - WEB-017
   - WEB-018
   - WEB-019
@@ -879,7 +894,6 @@ screens:
   states:
   - emptyFirstRun
   - emptyNoAccess
-  - emptyNoResults
   - error
   - loading
   - offline
@@ -964,7 +978,6 @@ screens:
   states:
   - emptyFirstRun
   - emptyNoAccess
-  - emptyNoResults
   - error
   - loading
   - offline
@@ -989,7 +1002,6 @@ screens:
   states:
   - emptyFirstRun
   - emptyNoAccess
-  - emptyNoResults
   - error
   - loading
   - offline
@@ -1073,7 +1085,6 @@ screens:
   wave: 2
   density: compact
   operations:
-  - evaluatePromotions
   - getPromotion
   - listPromotions
   states:
@@ -1373,7 +1384,6 @@ screens:
   density: compact
   operations:
   - createReferral
-  - evaluatePromotions
   - getLoyaltyPosition
   - listLoyaltyProgrammes
   - listPromotions

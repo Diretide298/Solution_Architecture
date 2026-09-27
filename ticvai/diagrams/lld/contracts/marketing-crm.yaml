@@ -1,5 +1,5 @@
 id: LLD-marketing-crm
-title: marketing-crm — 209 operations
+title: marketing-crm — 213 operations
 generatedBy: tools/derive-diagrams.py
 index: diagrams/hld/03-contracts.yaml
 tier: satellite
@@ -44,6 +44,7 @@ operations:
   reads:
   - cache:idempotency
   - marketing.journey
+  - marketing.journey_step
   writes:
   - cache:idempotency
   - marketing.journey
@@ -72,6 +73,7 @@ operations:
   offline: true
   reads:
   - cache:idempotency
+  - marketing.guest_note
   - marketing.guest_profile
   writes:
   - cache:idempotency
@@ -178,6 +180,7 @@ operations:
   - marketing.agent_availability
   - marketing.conversation
   - marketing.conversation_message
+  - marketing.conversation_message_attachment
   writes:
   - cache:idempotency
   - marketing.conversation
@@ -193,6 +196,7 @@ operations:
   - cache:idempotency
   - marketing.conversation
   - marketing.conversation_message
+  - marketing.conversation_message_attachment
   writes:
   - cache:idempotency
   - marketing.case
@@ -267,9 +271,11 @@ operations:
   - cache:idempotency
   - catalogue.product
   - marketing.form_definition
+  - marketing.form_definition_field
   writes:
   - cache:idempotency
   - marketing.form_definition
+  - marketing.form_definition_field
 - operation: createInvitationCampaign
   verb: POST
   path: /invitation-campaigns
@@ -297,10 +303,12 @@ operations:
   reads:
   - cache:idempotency
   - marketing.journey
+  - marketing.journey_step
   - marketing.message_template
   writes:
   - cache:idempotency
   - marketing.journey
+  - marketing.journey_step
 - operation: createLoyaltyProgramme
   verb: POST
   path: /loyalty/programmes
@@ -313,10 +321,12 @@ operations:
   - cache:idempotency
   - marketing.loyalty_programme
   - marketing.points_earning_rule
+  - marketing.programme_tier
   writes:
   - cache:idempotency
   - marketing.loyalty_programme
   - marketing.points_earning_rule
+  - marketing.programme_tier
 - operation: createMessageTemplate
   verb: POST
   path: /message-templates
@@ -494,6 +504,7 @@ operations:
   offline: false
   reads:
   - marketing.consent_record
+  - marketing.consent_record_channel
   writes: []
 - operation: getConversation
   verb: GET
@@ -506,7 +517,21 @@ operations:
   reads:
   - marketing.conversation
   - marketing.conversation_message
+  - marketing.conversation_message_attachment
   - pii.subject
+  writes: []
+- operation: getForm
+  verb: GET
+  path: /forms/{formId}
+  scope: venue
+  permission: GUEST_VIEW
+  audience:
+  - staff
+  - guest
+  offline: false
+  reads:
+  - marketing.form_definition
+  - marketing.form_definition_field
   writes: []
 - operation: getGuestAttributeModel
   verb: GET
@@ -709,6 +734,29 @@ operations:
   - marketing.challenge
   - marketing.challenge_progress
   writes: []
+- operation: getMyProfile
+  verb: GET
+  path: /guests/me/profile
+  scope: subject
+  permission: GUEST_VIEW
+  audience:
+  - guest
+  offline: false
+  reads:
+  - marketing.guest_preference
+  - marketing.guest_profile
+  writes: []
+- operation: getSeoMetadata
+  verb: GET
+  path: /seo-metadata
+  scope: tenant
+  permission: MARKETING_VIEW
+  audience:
+  - staff
+  offline: false
+  reads:
+  - control.seo_metadata
+  writes: []
 - operation: getSuppressionList
   verb: GET
   path: /consent/suppression-list
@@ -760,6 +808,7 @@ operations:
   - marketing.agent_availability
   - marketing.conversation
   - marketing.conversation_message
+  - marketing.conversation_message_attachment
   writes:
   - cache:idempotency
   - marketing.conversation
@@ -959,6 +1008,7 @@ operations:
   reads:
   - cache:resolution
   - marketing.consent_purpose
+  - marketing.consent_purpose_channel
   writes:
   - cache:resolution
 - operation: listContact
@@ -993,6 +1043,7 @@ operations:
   - identity.principal
   - marketing.conversation
   - marketing.conversation_message
+  - marketing.conversation_message_attachment
   writes: []
 - operation: listCookieBannerPreference
   verb: GET
@@ -1177,6 +1228,18 @@ operations:
   offline: false
   reads: []
   writes: []
+- operation: listForms
+  verb: GET
+  path: /forms
+  scope: venue
+  permission: MARKETING_VIEW
+  audience:
+  - staff
+  offline: false
+  reads:
+  - marketing.form_definition
+  - marketing.form_definition_field
+  writes: []
 - operation: listGuestDevices
   verb: GET
   path: /guests/{subjectId}/devices
@@ -1210,6 +1273,7 @@ operations:
   offline: false
   reads:
   - marketing.journey
+  - marketing.journey_step
   writes: []
 - operation: listLeaderboard
   verb: GET
@@ -1267,6 +1331,7 @@ operations:
   reads:
   - marketing.loyalty_programme
   - marketing.points_earning_rule
+  - marketing.programme_tier
   writes: []
 - operation: listMessageTemplates
   verb: GET
@@ -1690,6 +1755,7 @@ operations:
   reads:
   - cache:idempotency
   - marketing.campaign
+  - marketing.segment_criterion
   writes:
   - cache:idempotency
   - marketing.campaign
@@ -1853,6 +1919,7 @@ operations:
   reads:
   - cache:idempotency
   - marketing.case
+  - marketing.case_message
   writes:
   - cache:idempotency
   - marketing.case_message
@@ -1952,10 +2019,12 @@ operations:
   - cache:idempotency
   - marketing.conversation
   - marketing.conversation_message
+  - marketing.conversation_message_attachment
   writes:
   - cache:idempotency
   - marketing.conversation
   - marketing.conversation_message
+  - marketing.conversation_message_attachment
 - operation: sendTransactionalMessage
   verb: POST
   path: /messages
@@ -1982,6 +2051,7 @@ operations:
   reads:
   - cache:idempotency
   - identity.principal
+  - marketing.agent_availability
   writes:
   - cache:idempotency
   - marketing.agent_availability
@@ -2064,10 +2134,12 @@ operations:
   reads:
   - cache:idempotency
   - marketing.consent_purpose
+  - marketing.consent_purpose_channel
   writes:
   - cache:idempotency
   - cache:resolution
   - marketing.consent_purpose
+  - marketing.consent_purpose_channel
 - operation: setCustomerServiceCopilot
   verb: PUT
   path: /customer-service-copilot
@@ -2471,6 +2543,7 @@ operations:
   - identity.principal
   - marketing.conversation
   - marketing.conversation_message
+  - marketing.conversation_message_attachment
   writes:
   - cache:idempotency
   - marketing.conversation
@@ -2485,6 +2558,7 @@ operations:
   reads:
   - cache:idempotency
   - marketing.campaign
+  - marketing.segment_criterion
   writes:
   - cache:idempotency
   - marketing.campaign
@@ -2530,9 +2604,11 @@ operations:
   offline: false
   reads:
   - cache:idempotency
+  - marketing.guest_preference
   - marketing.guest_profile
   writes:
   - cache:idempotency
+  - marketing.guest_preference
   - marketing.guest_profile
 - operation: updateGuestProfile
   verb: PATCH

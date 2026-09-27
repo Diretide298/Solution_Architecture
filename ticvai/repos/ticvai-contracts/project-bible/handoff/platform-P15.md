@@ -9,12 +9,12 @@
 | Contracts | 3 |
 | Modules | 1 |
 | Undrawn | 0 |
-| Operations with no screen | 37 |
+| Operations with no screen | 46 |
 | Waves | wave2 10 |
 
 ## Gaps
 
-### 37 operations with no screen here
+### 46 operations with no screen here
 
 **In a contract this platform uses, callable by its audience, and reaching no screen on any platform serving that audience.** Either a screen is missing or the endpoint should not exist — and the second is worth considering first.
 
@@ -30,6 +30,8 @@
 | `getFnbServiceChargePolicy` | fnb | GET | The service charge a venue applies, and on what |
 | `listFnbRecommendations` | fnb | GET | Upsell and pairing suggestions for F&B |
 | `listIngredientSubstitutes` | fnb | GET | Approved substitutions for a recipe's ingredients |
+| `listMenuSchedules` | fnb | GET | What is scheduled to go live, and when |
+| `listMenuVersions` | fnb | GET | Every published version of a menu |
 | `listTemperatureCheckpoints` | fnb | GET | The units that get read, and the range each must hold |
 | `rebalanceStationLoad` | fnb | POST | Move work between stations mid-service |
 | `recordCorrectiveAction` | fnb | POST | Record what was done about a finding |
@@ -48,15 +50,17 @@
 | `deleteReportSchedule` | reporting | DELETE | Delete a schedule |
 | `listAlertRules` | reporting | GET | What raises an alert, and when |
 | `updateReportSchedule` | reporting | PATCH | Amend, pause or resume a schedule |
+| `getConfigurationProfile` | tenancy | GET | One profile, at its latest version or at a named one |
+| `getConnectivityPolicy` | tenancy | GET | The connectivity thresholds saved at one scope node |
+| `getDevice` | tenancy | GET | Read one registered device |
+| `getOfflinePolicy` | tenancy | GET | The offline policy saved at one scope node |
+| `getOutlet` | tenancy | GET | Read an outlet |
 | `issueDeviceCredential` | tenancy | POST | Give the device an identity it can prove |
 | `listCellEndpoints` | tenancy | GET | Where each service answers inside a cell |
+| `listConfigurationProfiles` | tenancy | GET | Every configuration profile, at its current version |
 | `listDeviceAuditRecords` | tenancy | GET | What was done to this device, and what it did |
 | `listDeviceFirmware` | tenancy | GET | Firmware and software versions, and what is running where |
-| `listDeviceTamperEvents` | tenancy | GET | Devices that report having been interfered with |
-| `recordDeviceTamperEvent` | tenancy | POST | A device reports interference |
-| `revokeDeviceCredential` | tenancy | DELETE | Cut a device off now |
-| `rollbackDeviceFirmware` | tenancy | POST | Put the fleet back on the previous version |
-| `startDeviceFirmwareRollout` | tenancy | POST | Push an update to a fleet, in waves |
+| … | | | 6 more |
 
 ## Modules
 
