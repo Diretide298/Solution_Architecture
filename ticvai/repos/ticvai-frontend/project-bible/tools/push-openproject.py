@@ -79,9 +79,12 @@ def main() -> int:
                     help="also send links another chain already implies (A>C when A>B>C); same effect, more calls")
     ap.add_argument("--idle-seconds", type=float, default=3.0, help="a read slower than this means the server is busy")
     ap.add_argument("--idle-wait", type=int, default=60, help="seconds to wait before checking again")
+    ap.add_argument("--export", metavar="JSON",
+                    help="write the work packages still to make to this file instead of making them; "
+                         "tools/op-create.rb makes them on the server, without Cloudflare's 100-second limit")
     a = ap.parse_args()
     token = os.environ.get("TICVAI_OP_TOKEN", "")
-    if not token and not a.dry_run:
+    if not token and not a.dry_run and not a.export:
         print("TICVAI_OP_TOKEN is not set")
         return 2
     auth = "Basic " + base64.b64encode(f"apikey:{token}".encode()).decode()
@@ -92,7 +95,7 @@ def main() -> int:
                                          {"Content-Type": "application/json", "Authorization": auth,
                                           "User-Agent": "curl/8.0"}, method=method)
             try:
-                with urllib.request.urlopen(req, timeout=60) as r:
+                with urllib.request.urlopen(req, timeout=180) as r:
                     txt = r.read().decode("utf-8") or "{}"
                     return json.loads(txt)
             except urllib.error.HTTPError as e:
@@ -102,6 +105,11 @@ def main() -> int:
                     continue
                 raise RuntimeError(f"{method} {path} -> {e.code}: {msg[:400]}")
             except (urllib.error.URLError, ConnectionError, TimeoutError):
+                # A create that timed out may still have been made on the server: retrying it made four copies
+                # of one sub-task on 28 September. Stop instead, and check the project before running again.
+                if method == "POST":
+                    raise RuntimeError(f"{method} {path} timed out; it may have been created. Check the project "
+                                       "for the newest work packages (tools/op-recent.py) before running again")
                 if i < tries - 1:
                     time.sleep(2 * (i + 1))
                     continue
@@ -120,7 +128,7 @@ def main() -> int:
         MAP.write_text(json.dumps(mp, indent=1), encoding="utf-8")
 
     users = {}
-    if not a.dry_run:
+    if not a.dry_run and not a.export:
         for u in call("GET", f"/projects/{PROJECT}/available_assignees?pageSize=200")["_embedded"]["elements"]:
             users[u["name"]] = u["id"]
 
@@ -128,7 +136,7 @@ def main() -> int:
         return {"href": f"/api/v3/users/{users[name]}"} if name in users else None
 
     # ---- 1. the old test tickets
-    if a.delete_test:
+    if a.delete_test and not a.export:
         old = [] if a.dry_run else call("GET", f'/projects/{PROJECT}/work_packages?pageSize=200&filters='
                                         + urllib.request.quote(json.dumps([{"status": {"operator": "*", "values": []}}])))["_embedded"]["elements"]
         old = [w for w in old if w["subject"].startswith("test:")]
@@ -139,7 +147,7 @@ def main() -> int:
     # ---- 2. versions: one per Block A week
     for n in range(1, 8):
         k = f"VERSION-W{n}"
-        if k in mp or a.dry_run:
+        if k in mp or a.dry_run or a.export:
             continue
         v = call("POST", "/versions", {"name": f"Block A · Week {n}",
                                        "_links": {"definingProject": {"href": f"/api/v3/projects/{PROJECT}"}}})
@@ -159,8 +167,18 @@ def main() -> int:
         area = "VM" if r["area"] == "VM" else r["area"]
         return LEAD.get(area) or r["assignee"]
 
+    exported = []
+
     def create(key, typ, subject, desc, parent_key, assignee, acct, prio, version_week, seq):
         if key in mp:
+            return
+        if a.export:
+            exported.append({"key": key, "type_id": TYPES[typ], "subject": subject[:255],
+                             "description": full.get(key, desc), "parent_key": parent_key,
+                             "parent_id": mp.get(parent_key) if parent_key else None,
+                             "assignee": assignee, "responsible": acct, "priority_id": prio,
+                             "version_id": mp.get(f"VERSION-W{version_week}") if version_week else None,
+                             "sequence": int(seq) if seq else None, "priority_no_field": PRIORITY_NO})
             return
         links = {"type": {"href": f"/api/v3/types/{TYPES[typ]}"},
                  "priority": {"href": f"/api/v3/priorities/{prio}"}}
@@ -175,10 +193,31 @@ def main() -> int:
                 "_links": links}
         if seq:
             body[PRIORITY_NO] = int(seq)
-        wp = call("POST", f"/projects/{PROJECT}/work_packages", body)
-        mp[key] = wp["id"]
-        if len(mp) % 20 == 0:
-            save()
+        try:
+            wp_id = call("POST", f"/projects/{PROJECT}/work_packages", body)["id"]
+        except RuntimeError as e:
+            # Cloudflare gives up after 100 s (524) while OpenProject goes on and makes the work package: a new
+            # sub-task under a big migration task took longer than that on 28 September. Find it, don't remake it.
+            if "-> 524" not in str(e) and "timed out" not in str(e):
+                raise
+            wp_id = made_late(subject[:255], mp[parent_key] if parent_key else None)
+            print(f"  {key}: the server answered late; found it as #{wp_id}", flush=True)
+        mp[key] = wp_id
+        save()      # every one: a run stopped part-way must not leave made tickets unrecorded
+
+    def made_late(subject, parent_id, wait=600):
+        known = {v for v in mp.values() if isinstance(v, int)}
+        query = ("/projects/%d/work_packages?pageSize=40&sortBy=%s&filters=%s" % (
+            PROJECT, urllib.request.quote('[["id","desc"]]'),
+            urllib.request.quote(json.dumps([{"status": {"operator": "*", "values": []}}]))))
+        until = time.time() + wait
+        while time.time() < until:
+            for w in call("GET", query)["_embedded"]["elements"]:
+                parent = ((w["_links"].get("parent") or {}).get("href") or "").rsplit("/", 1)[-1]
+                if w["id"] not in known and w["subject"] == subject and parent == (str(parent_id) if parent_id else ""):
+                    return w["id"]
+            time.sleep(20)
+        raise RuntimeError(f"'{subject}' was not made within {wait}s; check the project before running again")
 
     def small(r, assignee, wk):
         """The sub-tasks under a task: one per operation, one per table, three per screen."""
@@ -231,7 +270,8 @@ def main() -> int:
     if a.dry_run:
         print(dict(counts), "relations:", sum(1 for r in rows if r["type"] == "Task" and r["dependsOn"]))
         return 0
-    save()
+    if not a.export:
+        save()
     print("work packages:", {k: v for k, v in counts.items()}, flush=True)
     for i, (key, parent, subject, desc, assignee, r, wk) in enumerate(subs, 1):
         create(key, "Sub Task", subject, desc, parent, assignee, accountable(r), PRIORITY.get(r["wave"] or "2", 8),
@@ -239,6 +279,10 @@ def main() -> int:
         if i % 100 == 0:
             save()
             print(f"  sub-tasks {i}/{len(subs)}", flush=True)
+    if a.export:
+        Path(a.export).write_text(json.dumps(exported, indent=1, ensure_ascii=False), encoding="utf-8")
+        print(f"exported {len(exported)} work packages to make -> {a.export}")
+        return 0
     save()
 
     # ---- 4. relations: a task follows each task it depends on. Several at once: each one makes OpenProject
