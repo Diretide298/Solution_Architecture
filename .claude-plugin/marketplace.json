@@ -1,0 +1,17 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-marketplace.json",
+  "name": "adam",
+  "description": "ADAM — the delivery package, in Claude Code.",
+  "owner": {
+    "name": "Softlabs Group",
+    "url": "https://adam.ainfinite.ai"
+  },
+  "plugins": [
+    {
+      "name": "adam",
+      "source": "./viewer/mcp",
+      "category": "delivery",
+      "tags": ["adam", "delivery", "openproject", "specification"]
+    }
+  ]
+}

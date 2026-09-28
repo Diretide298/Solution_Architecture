@@ -56,8 +56,36 @@ async function ask(route) {
  *  not being in the list rather than by being caught. */
 const ALLOWED = new Set(FILES);
 
+/**
+ * Whether these files are a plugin's copy rather than a zip install.
+ *
+ * **Checked on disk, not from the environment.** `CLAUDE_PLUGIN_ROOT` reaches
+ * the MCP server process, but this script is run by hand from a shell, where
+ * that variable is not set — so asking the environment would answer "not a
+ * plugin" every time and the guard would never fire. A zip install is a copy of
+ * the six files in `FILES` and carries no manifest, so the manifest sitting
+ * beside them is the honest signal.
+ */
+async function installedAsPlugin() {
+  return readFile(path.join(HERE, '.claude-plugin', 'plugin.json'), 'utf8')
+    .then(() => true, () => false);
+}
+
 async function main() {
   const mine = await buildOf(HERE);
+
+  // **A plugin updates through the marketplace and must not be written here.**
+  // Claude Code replaces the whole plugin directory when the plugin updates, so
+  // anything this wrote would work until the next `/plugin update` silently
+  // reverted it — and the developer would be on a build ADAM thinks they are
+  // not. `--check` still reports, because answering "which build am I on" is
+  // useful in both installs and writes nothing.
+  if (await installedAsPlugin() && !CHECK_ONLY) {
+    say(`this is the ADAM plugin (build ${mine}), which updates through the marketplace.`);
+    say('Run:  /plugin update adam@adam');
+    say('Then restart Claude Code. Use --check here if you only want the build.');
+    process.exit(2);
+  }
 
   let theirs;
   try {

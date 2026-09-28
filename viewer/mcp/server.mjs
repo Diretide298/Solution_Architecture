@@ -226,9 +226,21 @@ log(`ready — ${TOOLS.length} tools, viewer at ${client.base}`
     // Fire and forget, and deliberately not awaited before the version check:
     // reporting is a courtesy to whoever is reading the fleet list, and no part
     // of it may delay or break the connector the developer is waiting on.
+    // **Which of the two installs this is.** Claude Code exports
+    // CLAUDE_PLUGIN_ROOT to a plugin's MCP servers and to nothing else, so its
+    // presence is the one reliable signal — and the two installs need different
+    // advice below, not just a different label. Reported so the fleet list can
+    // show how far the migration off the zip has actually got, which is the
+    // question somebody retiring `setup.cmd` has to answer.
+    const asPlugin = Boolean(process.env.CLAUDE_PLUGIN_ROOT);
+
     client.service('/api/connector/seen', {
       method: 'POST',
-      body: { build: mine, host: hostname(), agent: 'claude-code' },
+      body: {
+        build: mine,
+        host: hostname(),
+        agent: asPlugin ? 'claude-code-plugin' : 'claude-code',
+      },
     }).catch(() => { /* older ADAM, or offline: nothing to say */ });
 
     const res = await fetch(`${client.base}/connector/version`, {
@@ -238,6 +250,17 @@ log(`ready — ${TOOLS.length} tools, viewer at ${client.base}`
     if (!res.ok) return;
     const { build } = await res.json();
     if (!build || build === mine) return;
+
+    // **A plugin install is updated by the marketplace, never by update.mjs.**
+    // Telling a plugin user to run the updater would have them write into
+    // ${CLAUDE_PLUGIN_ROOT}, which Claude Code replaces wholesale on the next
+    // plugin update — so the edit survives until it silently doesn't, which is
+    // the worst of both. `update.mjs` refuses that case outright; this makes
+    // sure nobody is sent there in the first place.
+    if (asPlugin) {
+      log(`an update is available (${mine} → ${build}). Run: /plugin update adam@adam`);
+      return;
+    }
     // path.join, so the command can be pasted on Windows: string concatenation
     // produces `C:\Users\...\connector/update.mjs`, which works and looks
     // like a typo, and a command somebody doubts is a command they do not run.

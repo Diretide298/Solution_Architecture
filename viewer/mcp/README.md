@@ -9,7 +9,45 @@ wrong, contradictory or short of something. Phases 1 to 3 of
 
 ## What a developer runs
 
-**The easy way is the setup zip.** Build it once, hand it out:
+**The easy way is now the plugin.** Two lines in Claude Code, and nothing to download or unzip:
+
+```
+/plugin marketplace add softlabsgroup/adam
+/plugin install adam@adam
+```
+
+Claude Code prompts for the four values in `userConfig` — the ADAM address, the developer's e-mail
+and password, and optionally a package — and substitutes them into the server's `env`. The password
+is declared `sensitive`, so it goes to the OS credential store rather than `settings.json`; the
+`claude mcp add` registration the zip writes keeps it in plain text, where `claude mcp get` prints
+it.
+
+The manifests are `.claude-plugin/plugin.json` here and `.claude-plugin/marketplace.json` at the
+repository root, whose entry's relative source (`./viewer/mcp`) is this directory — so the plugin is
+the connector, not a copy of it, and there is no second place for the tools to drift.
+
+The plugin also ships `hooks/hooks.json`, which wires the usage hooks that fill the Agents page.
+Those were previously a block of JSON in `hooks/README.md` for somebody to paste into their
+settings by hand, which meant they were mostly not installed.
+
+**A plugin install updates through the marketplace** (`/plugin update adam@adam`), never through
+`update.mjs`: Claude Code replaces the whole plugin directory on update, so anything the updater
+wrote there would work until it was silently reverted. `update.mjs` refuses outright when it finds
+a manifest beside it, and `server.mjs` prints the marketplace command instead of the updater's.
+Both are guarded by `plugin-check.mjs`:
+
+```
+node viewer/mcp/plugin-check.mjs
+```
+
+which also checks what `claude plugin validate` cannot — that the file the manifest launches
+exists, that every `${user_config.*}` the server reads was declared, and that the marketplace entry
+resolves to this directory.
+
+### The zip, still
+
+**The zip remains the first install for anyone not on the plugin**, and nothing has to move today.
+Build it once, hand it out:
 
 ```powershell
 powershell -ExecutionPolicy Bypass -File viewer\mcp\setup\build-zip.ps1

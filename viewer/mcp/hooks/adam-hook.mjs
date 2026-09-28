@@ -39,6 +39,27 @@ const HOME = path.join(os.homedir(), '.adam', 'agent');
 
 const stamp = (d = new Date()) => d.toISOString().replace(/\.\d+Z$/, 'Z');
 
+/**
+ * Who to sign in as, from whichever install put us here.
+ *
+ * A zip install sets `ADAM_*` in the MCP server's registration and in the hook
+ * commands the README has people paste into `settings.json`. The plugin sets
+ * neither: it collects the same four values as `userConfig` and exports them to
+ * hook processes as `CLAUDE_PLUGIN_OPTION_<KEY>`, with the password coming out
+ * of the OS credential store rather than out of a settings file.
+ *
+ * `ADAM_*` is preferred so that somebody debugging can still override by hand.
+ */
+function credentials() {
+  const pick = (name, option) => process.env[name] || process.env[`CLAUDE_PLUGIN_OPTION_${option}`] || '';
+  return {
+    base: pick('ADAM_VIEWER_URL', 'VIEWER_URL'),
+    project: pick('ADAM_PROJECT', 'PROJECT') || null,
+    email: pick('ADAM_EMAIL', 'EMAIL'),
+    password: pick('ADAM_PASSWORD', 'PASSWORD'),
+  };
+}
+
 async function readStdin() {
   const parts = [];
   for await (const chunk of process.stdin) parts.push(chunk);
@@ -159,19 +180,14 @@ async function flush(hook) {
   }
   if (!events.length) return;
 
-  // The same client the connector uses, signing in as the same developer with
-  // the same ADAM_EMAIL / ADAM_PASSWORD. That is what makes the session land
-  // against the right person: there is no way to file somebody else's time.
+  // The same client the connector uses, signing in as the same developer. That
+  // is what makes the session land against the right person: there is no way to
+  // file somebody else's time.
   const { ViewerClient } = await import('../client.mjs').catch(() => ({}));
   if (!ViewerClient) return;
 
   const cwd = hook.cwd || process.cwd();
-  const client = new ViewerClient({
-    base: process.env.ADAM_VIEWER_URL,
-    project: process.env.ADAM_PROJECT || null,
-    email: process.env.ADAM_EMAIL,
-    password: process.env.ADAM_PASSWORD,
-  });
+  const client = new ViewerClient({ ...credentials() });
   const answer = await client.service('/api/agent/flush', {
     method: 'POST',
     body: {

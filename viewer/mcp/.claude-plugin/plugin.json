@@ -1,0 +1,59 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-plugin.json",
+  "name": "adam",
+  "displayName": "ADAM",
+  "description": "Read the delivery package from Claude Code: screens, tables, services, journeys, contracts, boards and the change log, straight out of ADAM.",
+  "version": "1.0.0",
+  "author": {
+    "name": "Softlabs Group",
+    "url": "https://adam.ainfinite.ai"
+  },
+  "homepage": "https://adam.ainfinite.ai",
+  "repository": "https://github.com/softlabsgroup/adam",
+  "license": "UNLICENSED",
+  "keywords": ["adam", "delivery", "openproject", "specification", "ticvai"],
+
+  "userConfig": {
+    "viewer_url": {
+      "type": "string",
+      "title": "ADAM address",
+      "description": "Where ADAM is served. Leave the default unless you were given another address.",
+      "default": "https://adam.ainfinite.ai",
+      "required": true
+    },
+    "email": {
+      "type": "string",
+      "title": "Your ADAM e-mail",
+      "description": "The address you sign in to ADAM with. Everything the connector reads is filtered to what this account may see.",
+      "required": true
+    },
+    "password": {
+      "type": "string",
+      "title": "Your ADAM password",
+      "description": "Kept in your operating system's credential store, not in settings.json.",
+      "required": true,
+      "sensitive": true
+    },
+    "project": {
+      "type": "string",
+      "title": "Package",
+      "description": "Leave empty for the default package. Only set this if you were told to — it names one package on an ADAM serving several.",
+      "default": ""
+    }
+  },
+
+  "mcpServers": {
+    "adam": {
+      "command": "node",
+      "args": ["${CLAUDE_PLUGIN_ROOT}/server.mjs"],
+      "env": {
+        "ADAM_VIEWER_URL": "${user_config.viewer_url}",
+        "ADAM_EMAIL": "${user_config.email}",
+        "ADAM_PASSWORD": "${user_config.password}",
+        "ADAM_PROJECT": "${user_config.project}"
+      }
+    }
+  },
+
+  "hooks": "./hooks/hooks.json"
+}

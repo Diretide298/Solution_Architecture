@@ -1,0 +1,29 @@
+{
+  "hooks": {
+    "PreToolUse": [
+      { "hooks": [ { "type": "command", "command": "node",
+        "args": ["${CLAUDE_PLUGIN_ROOT}/hooks/adam-hook.mjs", "record"],
+        "timeout": 10, "async": true } ] }
+    ],
+    "PostToolUse": [
+      { "hooks": [ { "type": "command", "command": "node",
+        "args": ["${CLAUDE_PLUGIN_ROOT}/hooks/adam-hook.mjs", "record"],
+        "timeout": 10, "async": true } ] }
+    ],
+    "UserPromptSubmit": [
+      { "hooks": [ { "type": "command", "command": "node",
+        "args": ["${CLAUDE_PLUGIN_ROOT}/hooks/adam-hook.mjs", "record"],
+        "timeout": 10, "async": true } ] }
+    ],
+    "Stop": [
+      { "hooks": [ { "type": "command", "command": "node",
+        "args": ["${CLAUDE_PLUGIN_ROOT}/hooks/adam-hook.mjs", "record"],
+        "timeout": 10, "async": true } ] }
+    ],
+    "SessionEnd": [
+      { "hooks": [ { "type": "command", "command": "node",
+        "args": ["${CLAUDE_PLUGIN_ROOT}/hooks/adam-hook.mjs", "flush"],
+        "timeout": 30 } ] }
+    ]
+  }
+}
