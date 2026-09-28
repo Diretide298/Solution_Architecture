@@ -1,0 +1,643 @@
+{
+ "prototype": "TICVAI Guest Booking Mobile v2.dc.html (same app packed as \"TICVAI Guest Booking Mobile v2 (single file).html\")",
+ "rev": "Client rev 3 (feedback 25 Sep; flow review and updates 28 Sep; handoff exported 27–28 Sep)",
+ "howToOpen": "Open \"TICVAI Guest Booking Mobile v2 (single file).html\" in a browser, tap the Account tab, then \"All screens\" (Wave 1/2/3 and \"Rev 3 feedback · 25 screens\"). Booking flows open the embedded web engine from Discover → a venue.",
+ "screens": [
+  {
+   "id": "GST-001",
+   "name": "Home – Default",
+   "match": "exact",
+   "view": "Discover tab (Home)",
+   "evidence": "isHome template: \"Evening, Layla\", \"Where to\" venue cards (Summit Peaks, Union Arena, Coastal Aqua, Grand Playhouse, Saffron Table), \"Tonight\"; dir row \"Home\" → #home",
+   "differences": "Home carries an \"At venue mode is live\" banner and the EN/العربية language button; no search box on home (search is reached from the listing). YAML reads listMyEntitlements but the prototype home shows no ticket strip."
+  },
+  {
+   "id": "GST-002",
+   "name": "Explore Categories",
+   "match": "exact",
+   "view": "Account → All screens → Wave 1 → Explore categories",
+   "evidence": "scrDefs.explore \"Explore\": grid Rides, Shows, Water, Food & drink, Kids, Shop, Parking, Memberships",
+   "differences": "Tiles also jump to F&B, Retail, Parking and Memberships, not only to listing/details as the YAML navigation says."
+  },
+  {
+   "id": "GST-003",
+   "name": "Event & Attraction Listing",
+   "match": "exact",
+   "view": "Account → All screens → Wave 1 → Event & attraction listing",
+   "evidence": "scrDefs.listing \"Events & attractions\": search input, chips All/Rides/Shows/Kids/Food, \"Open now\" rows with queue + height",
+   "differences": "Rev 3 adds \"Ticket categories\" (category → subcategory) and \"Experiences, product first\" listings which the YAML does not describe."
+  },
+  {
+   "id": "GST-004",
+   "name": "Attraction Details",
+   "match": "exact",
+   "view": "Account → All screens → Wave 1 → Attraction details",
+   "evidence": "scrDefs.attraction \"Desert Coaster\": queue 25 min, minimum height 1.30 m, Fast Track, \"Join the virtual queue\"",
+   "differences": "Shows nearby show times and a Join virtual queue action (GST-023) not in the YAML navigation."
+  },
+  {
+   "id": "GST-005",
+   "name": "What's On",
+   "match": "exact",
+   "view": "Account → All screens → Wave 1 → What’s on",
+   "evidence": "scrDefs.whatson: chips Today/This week/This month, \"Night of Nine\", \"Stunt show\"",
+   "differences": ""
+  },
+  {
+   "id": "GST-006",
+   "name": "Event / Exhibition Details",
+   "match": "exact",
+   "view": "Account → All screens → Wave 1 → Event / exhibition details",
+   "evidence": "scrDefs.event \"Dinosaurs of Arabia\": dates and times list, \"Choose a date\"",
+   "differences": ""
+  },
+  {
+   "id": "GST-007",
+   "name": "Select Date & Time",
+   "match": "partial",
+   "view": "Account → All screens → Wave 1 → Select date & time; Rev 3 feedback → Performance times; live flow: Discover → venue → Booking (embedded web engine)",
+   "evidence": "scrDefs.datetime \"Select date & time\" (15:00 \"Sold out\" → \"Waitlist\"); r3perf \"Step 1 · Date / Step 2 · Time of day\", \"Morning · page 1 of 3\"; #book → iframe \"TICVAI Guest Booking v2.dc.html?embed=mobile\"",
+   "differences": "Rev 3 adds date → time → ticket reveal, a morning/afternoon/evening filter with counts, paging of long time lists, a waitlist on sold-out times, and per-flow variants (guided tour by language, surf session filters, swim consent pop-up, location switcher, quick tour). None of these (paging, part-of-day filter, waitlist, language filter) are in the YAML."
+  },
+  {
+   "id": "GST-008",
+   "name": "Tickets & Add-ons",
+   "match": "partial",
+   "view": "Account → All screens → Wave 1 → Tickets & add-ons; ticket selection itself is Rev 3 feedback → Tickets after a time",
+   "evidence": "scrDefs.addons \"On booking TCV-UA-7741\" rows with \"Transfer\"; r3tickets \"Step 3 · Tickets\" Adult/Child/Senior",
+   "differences": "The YAML (transferOrderTickets only) and the Wave 1 prototype screen both treat this as tickets-with-transfer after purchase, but the name and the Rev 3 flow mean choosing ticket types and add-ons during booking. Rev 3 also moves all add-ons to one Add-ons step. The YAML needs a definition for selection and add-ons (listProducts/addCartLine)."
+  },
+  {
+   "id": "GST-009",
+   "name": "Review & Payment",
+   "match": "exact",
+   "view": "Account → All screens → Wave 1 → Review & payment; also the \"Confirm and pay\" sheet in the booking flow",
+   "evidence": "scrDefs.review: \"Your basket · held for 9 minutes\", Pay with Apple Pay/Visa/Tabby/Wallet credit, \"Paste a payment link\", \"If the connection drops\"; payOpen sheet \"Confirm and pay\"",
+   "differences": "Prototype offers Tabby and wallet credit as payment methods; the YAML does not name them."
+  },
+  {
+   "id": "GST-010",
+   "name": "Booking Confirmation",
+   "match": "exact",
+   "view": "Account → All screens → Wave 1 → Booking confirmation (#confirm)",
+   "evidence": "isConfirm template: \"You’re going\", \"Booking UA-7741\", \"Set a password\", \"Open my tickets\"",
+   "differences": "Prototype offers \"Set a password\" to turn a guest-checkout profile into an account (linkGuestCheckout, GST-042); not declared on this screen in YAML."
+  },
+  {
+   "id": "GST-011",
+   "name": "Wallet Overview",
+   "match": "exact",
+   "view": "Account → All screens → Wave 2 → Wallet overview",
+   "evidence": "scrDefs.wallet \"Wallet\": \"AED 120.00\", Recent transactions",
+   "differences": ""
+  },
+  {
+   "id": "GST-012",
+   "name": "My Tickets",
+   "match": "exact",
+   "view": "Tickets tab (#tickets)",
+   "evidence": "isTickets template: \"Upcoming 3\", \"Next up · in 4 hours\", \"Show at gate\", \"Add to wallet\"",
+   "differences": "Add to wallet (issueWalletPass) is on this screen in the prototype; the YAML puts the wallet pass on GST-018."
+  },
+  {
+   "id": "GST-013",
+   "name": "Ticket Details",
+   "match": "exact",
+   "view": "Account → All screens → Wave 1 → Ticket details",
+   "evidence": "scrDefs.ticketdetail: QR TCV-UA-7741, \"What is left\", \"Scan and sharing history\", \"Add to Apple Wallet\"",
+   "differences": "The YAML states come from an availability template (\"Sold out is a real answer\") and do not fit a ticket-detail screen."
+  },
+  {
+   "id": "GST-014",
+   "name": "Ticket Transfer",
+   "match": "exact",
+   "view": "Account → All screens → Wave 2 → Ticket transfer (also Account → Ticket transfer)",
+   "evidence": "scrDefs.transfer: \"Send to\", \"Choose tickets\", \"Sent\", \"Claim a ticket sent to you\"",
+   "differences": ""
+  },
+  {
+   "id": "GST-015",
+   "name": "Memberships",
+   "match": "exact",
+   "view": "Account → All screens → Wave 2 → Memberships; billing in \"Also built, not in the plan\" → Membership billing (#billing)",
+   "evidence": "scrDefs.memberships \"Gold · renews 4 Feb\", \"People who can act for you\"; isBilling \"GST-015 · Gold\", \"A payment failed on 4 September\", \"Renew automatically\"",
+   "differences": "Prototype splits the screen in two (benefits and delegation vs billing statement and dunning retries)."
+  },
+  {
+   "id": "GST-016",
+   "name": "My Reservations",
+   "match": "exact",
+   "view": "Account → All screens → Wave 2 → My reservations (also Account → Reservations)",
+   "evidence": "scrDefs.reservations: \"Saffron Table · table for 4\", \"Riverside cabana\"",
+   "differences": "Prototype lists cabana reservations and \"Book a table or cabana\"; YAML GST-070 says cabanas are booked by staff."
+  },
+  {
+   "id": "GST-017",
+   "name": "Reservation Details",
+   "match": "exact",
+   "view": "Account → All screens → Wave 2 → Reservation details",
+   "evidence": "scrDefs.resdetail \"Saffron Table\": Deposit \"AED 100 paid\", \"Cancel reservation\"",
+   "differences": "Prototype shows a deposit that is kept on late cancellation; the YAML (audit R077a) says no deposit and no no-show fee."
+  },
+  {
+   "id": "GST-018",
+   "name": "Add to Calendar / Reminders",
+   "match": "exact",
+   "view": "Account → All screens → Wave 3 → Add to calendar / reminders",
+   "evidence": "scrDefs.calendar \"Calendar & reminders\": Add to calendar, Save tickets to wallet, Remind me, push/SMS/email",
+   "differences": ""
+  },
+  {
+   "id": "GST-019",
+   "name": "Order History",
+   "match": "exact",
+   "view": "Account → All screens → Wave 2 → Order history",
+   "evidence": "scrDefs.orders: \"8 Aug · Summit Peaks … paid\", \"refunded\", \"Transfer tickets from an order\"",
+   "differences": ""
+  },
+  {
+   "id": "GST-020",
+   "name": "Saved Items / Wishlist",
+   "match": "exact",
+   "view": "Account → All screens → Wave 3 → Saved items / wishlist",
+   "evidence": "scrDefs.wishlist \"Saved items\": Remove, \"Save something new\"",
+   "differences": ""
+  },
+  {
+   "id": "GST-021",
+   "name": "Interactive Map",
+   "match": "exact",
+   "view": "Account → All screens → Wave 2 → Interactive map; also At-venue tab → Map",
+   "evidence": "scrDefs.map: \"Works without a signal\", chips Rides/Food/Toilets/Step-free, Route; isVenue \"You → Desert Coaster · 6 min walk\"",
+   "differences": "Prototype promises an offline map; not in the YAML states."
+  },
+  {
+   "id": "GST-022",
+   "name": "Attraction Wait Times",
+   "match": "exact",
+   "view": "Account → All screens → Wave 2 → Attraction wait times",
+   "evidence": "scrDefs.waits \"Wait times\": chips Under 15 min/Thrill/Family, \"Open my day plan\"",
+   "differences": "Links to Plan my day (GST-059, deferred)."
+  },
+  {
+   "id": "GST-023",
+   "name": "Virtual Queue",
+   "match": "exact",
+   "view": "Account → All screens → Wave 3 → Virtual queue; also At-venue card \"Desert Coaster · queued\"",
+   "evidence": "scrDefs.vqueue: \"Your place: 38th\", \"You can hold two queues at once\", \"Order food while you wait\"",
+   "differences": "Prototype allows two queues at once; the YAML states no limit."
+  },
+  {
+   "id": "GST-024",
+   "name": "F&B – Browse & Order",
+   "match": "exact",
+   "view": "Account → All screens → Wave 2 → F&B – browse & order",
+   "evidence": "scrDefs.fnb \"Food & drink\": outlets, \"Where are you? Table, cabana or sunbed code\", \"Bring it to me / I’ll collect\"",
+   "differences": ""
+  },
+  {
+   "id": "GST-025",
+   "name": "F&B – Order Tracking",
+   "match": "exact",
+   "view": "Account → All screens → Wave 2 → F&B – order tracking",
+   "evidence": "scrDefs.fnbtrack \"Order 4471\": Received/Being prepared/On its way, \"Table 14 bill\"",
+   "differences": "The YAML states come from an availability template (\"Selection is blocked\") and do not fit order tracking."
+  },
+  {
+   "id": "GST-026",
+   "name": "Retail / Merchandise",
+   "match": "partial",
+   "view": "Account → All screens → Wave 2 → Retail / merchandise",
+   "evidence": "scrDefs.retail \"Shop\": scan tag, \"Reserved. Collect at the exit shop\", balances",
+   "differences": "Prototype only reserves for collection (reserveMerchandise). The YAML also declares addCartLine/checkoutCart/createPayment and getGameCard, and the prototype shows neither a buy-now path nor a game card."
+  },
+  {
+   "id": "GST-027",
+   "name": "Parking – Reserve & Pay",
+   "match": "exact",
+   "view": "Account → All screens → Wave 3 → Parking – reserve & pay",
+   "evidence": "scrDefs.parking: car parks Premium/East/Accessible, \"Number plate\", \"Reserve and pay AED 60\"",
+   "differences": ""
+  },
+  {
+   "id": "GST-028",
+   "name": "Parking – Reservation Confirmed",
+   "match": "exact",
+   "view": "Account → All screens → Wave 3 → Parking – reservation confirmed",
+   "evidence": "scrDefs.parkok: \"East car park\", \"Bay D14\", \"Plate is read at the barrier\"",
+   "differences": ""
+  },
+  {
+   "id": "GST-029",
+   "name": "Venue Info & Services",
+   "match": "exact",
+   "view": "Account → All screens → Wave 2 → Venue info & services",
+   "evidence": "scrDefs.venueinfo: \"Where you can eat now\", \"We deliver to\"",
+   "differences": "Prototype shows only dining and delivery points, no other venue services."
+  },
+  {
+   "id": "GST-030",
+   "name": "In-Venue Notifications",
+   "match": "exact",
+   "view": "DEFERRED (R242), still in the prototype: Account → All screens → Wave 2 → In-venue notifications; At-venue tab → Alerts",
+   "evidence": "scrDefs.notifs \"Notifications\": \"Desert Coaster: your turn\", \"Order 4471 ready soon\"; venueTabs \"Alerts\"",
+   "differences": "The YAML defers this (no in-app notification feed in the first release), but the prototype still shows a feed and an Alerts tab, so the client will expect it."
+  },
+  {
+   "id": "GST-031",
+   "name": "AI Concierge – Home",
+   "match": "exact",
+   "view": "Account → All screens → Wave 2 → AI concierge – home",
+   "evidence": "scrDefs.concierge \"Sahli, your concierge\": \"Earlier conversations\", \"Talk to a person\"",
+   "differences": ""
+  },
+  {
+   "id": "GST-032",
+   "name": "AI Concierge – Chat",
+   "match": "exact",
+   "view": "Account → All screens → Wave 2 → AI concierge – chat",
+   "evidence": "scrDefs.chat \"Chat with Sahli\": \"Kids’ meal × 2 … Add\", \"Check out from the chat\"",
+   "differences": ""
+  },
+  {
+   "id": "GST-033",
+   "name": "AI Concierge – Contextual Help",
+   "match": "exact",
+   "view": "Account → All screens → Wave 2 → AI concierge – contextual help",
+   "evidence": "scrDefs.ctxhelp \"Help with this screen\": \"You are on: seat selection\"",
+   "differences": ""
+  },
+  {
+   "id": "GST-034",
+   "name": "Lost & Found",
+   "match": "exact",
+   "view": "Account → All screens → Wave 2 → Lost & found (also Account → Lost & found)",
+   "evidence": "scrDefs.lost: \"Report something\", \"Your reports\"",
+   "differences": ""
+  },
+  {
+   "id": "GST-035",
+   "name": "Feedback & Ratings",
+   "match": "exact",
+   "view": "Account → All screens → Wave 3 → Feedback & ratings",
+   "evidence": "scrDefs.feedback \"Rate your visit\": 1–5, \"Link to an order\", \"Raise a complaint instead\"",
+   "differences": ""
+  },
+  {
+   "id": "GST-036",
+   "name": "Loyalty & Rewards",
+   "match": "exact",
+   "view": "Account → All screens → Wave 2 → Loyalty & rewards",
+   "evidence": "scrDefs.loyalty: \"Gold member\", \"4,340 points\", \"660 to Platinum\", \"Close to you\"",
+   "differences": ""
+  },
+  {
+   "id": "GST-037",
+   "name": "Offers & Promotions",
+   "match": "exact",
+   "view": "Account → All screens → Wave 2 → Offers & promotions",
+   "evidence": "scrDefs.offers \"Offers\": codes TWOPARK/MIDWEEK, \"Have a code? … Apply\"",
+   "differences": "Promo code entry is here in the prototype; the YAML puts applyCartPromoCode on GST-041."
+  },
+  {
+   "id": "GST-038",
+   "name": "Digital Companion Mode",
+   "match": "exact",
+   "view": "At-venue tab (\"Your park, live\"); Account → All screens → Wave 3 → Digital companion mode",
+   "evidence": "isVenue \"Inside Summit Peaks\", tabs Map/Queue/Order/Alerts, venueCards (queued, Order 4471, Parking East); scrDefs.companion \"At Summit Peaks today\"",
+   "differences": "Prototype has two versions of this screen: the tab and the directory screen."
+  },
+  {
+   "id": "GST-039",
+   "name": "Profile",
+   "match": "exact",
+   "view": "Account → All screens → Wave 1 → Profile (also Account → Profile)",
+   "evidence": "scrDefs.profile: name, email verified, mobile, \"Emirates ID … Replace\", Consent and Marketing toggles",
+   "differences": "Emirates ID upload is on Profile in the prototype; the YAML has uploadGuestDocument on GST-066. Account also has a \"Saved guests (heights on file)\" row that no screen defines."
+  },
+  {
+   "id": "GST-040",
+   "name": "Help & Support",
+   "match": "exact",
+   "view": "Account → All screens → Wave 2 → Help & support",
+   "evidence": "scrDefs.helpsupport: \"Search help\", \"Common questions\", \"Raise a question\", \"Lost something?\"",
+   "differences": ""
+  },
+  {
+   "id": "GST-041",
+   "name": "Checkout Entry",
+   "match": "partial",
+   "view": "Account → All screens → Wave 1 → Checkout entry (#ident); Rev 3 feedback → Sign in after add-ons",
+   "evidence": "isIdent \"Step 3 of 4 · Checkout entry\", aria-label \"GST-041 Checkout Entry\": \"Sign in\", \"Guest checkout\", \"Email me a code\", \"We found a profile that matches\"",
+   "differences": "In the prototype, Checkout entry is the choice between signing in and guest checkout, with contact proof and profile matching. The YAML defines a cart screen instead (promo code, extend/abandon/claim cart, edit lines), which the prototype does not show here. Rev 3 moves sign-in to after Add-ons (configurable)."
+  },
+  {
+   "id": "GST-042",
+   "name": "Simple Registration & OTP",
+   "match": "partial",
+   "view": "Account → All screens → Wave 1 → Simple registration & OTP (same #ident screen) + \"Log in or register\" sheet from home",
+   "evidence": "authSheet \"Sign in to book faster\", \"Continue with email\", \"Enter your code … Six digits\", Apple / Google buttons",
+   "differences": "Prototype has email code, Apple and Google only; the YAML also has password login, UAE Pass and explicit registration."
+  },
+  {
+   "id": "GST-043",
+   "name": "Arabic / RTL Experience",
+   "match": "exact",
+   "view": "Account → All screens → Wave 1 → Arabic / RTL experience; language button on home",
+   "evidence": "scrDefs.rtl \"Arabic / RTL experience\", \"Switch language\" (!rtl); ticvai-ar.js / ticvai-ar-rev3.js",
+   "differences": "Rev 3 decision: the basket stays on the right in Arabic by default (configurable)."
+  },
+  {
+   "id": "GST-044",
+   "name": "Multi-Currency & Pricing",
+   "match": "exact",
+   "view": "Account → All screens → Wave 2 → Multi-currency & pricing",
+   "evidence": "scrDefs.fx \"Prices in your currency\": AED/SAR/USD/INR/GBP, \"Rates in use · 09:00 today\"",
+   "differences": ""
+  },
+  {
+   "id": "GST-045",
+   "name": "Ticket Delivery & Sharing",
+   "match": "partial",
+   "view": "Account → All screens → Wave 2 → Ticket delivery & sharing (opens Ticket transfer)",
+   "evidence": "dir row \"Ticket delivery & sharing\" sub \"Same screen as Ticket transfer (interim)\" → @transfer",
+   "differences": "No screen of its own; it shares GST-014’s screen until the client confirms."
+  },
+  {
+   "id": "GST-046",
+   "name": "Branded Queue / Waiting Room",
+   "match": "exact",
+   "view": "Account → All screens → Wave 1 → Branded queue / waiting room",
+   "evidence": "scrDefs.queue \"Waiting room\": \"1,284 People ahead of you\", \"Leaving the app for more than 10 minutes puts you at the back\"",
+   "differences": ""
+  },
+  {
+   "id": "GST-047",
+   "name": "Maintenance / Upgrade Page",
+   "match": "exact",
+   "view": "Account → All screens → Wave 1 → Maintenance / upgrade",
+   "evidence": "scrDefs.maint: \"Back at 04:00 GST\", \"Your tickets still work\", \"App update available\"",
+   "differences": ""
+  },
+  {
+   "id": "GST-048",
+   "name": "Upsell / Cross-Sell",
+   "match": "exact",
+   "view": "Account → All screens → Wave 2 → Upsell / cross-sell",
+   "evidence": "scrDefs.upsell \"Goes well with your visit\": Fast Track 5, Locker, Prepaid parking",
+   "differences": ""
+  },
+  {
+   "id": "GST-049",
+   "name": "Interactive Seat Selection",
+   "match": "partial",
+   "view": "Account → All screens → Wave 2 → Interactive seat selection (#seats → embedded web engine: Union Arena / Grand Playhouse seat maps); Rev 3 feedback → Seat map · date & time pop-up, Time bar above the seat map",
+   "evidence": "dir row \"Interactive seat selection\" → #seats; go() maps seats → engine iframe; r3seatpop \"Flow 2 · Option 1 · Desert Nights\"; r3seatbar \"Changing the show releases any seats you are holding\"",
+   "differences": "Rev 3 adds Flow 1 (fixed date, straight to the map) and Flow 2 (date and time, then the map, as an inline step or a pop-up). It also adds a time bar whose show switch releases held seats, a movable seat-view box, a theatre auditorium plan and up to ten seats. The YAML has no date/time step on the map and no rule for switching show and releasing seats."
+  },
+  {
+   "id": "GST-050",
+   "name": "Resource Booking – Cabana",
+   "match": "partial",
+   "view": "Account → All screens → Wave 3 → Resource booking – cabana; Rev 3 feedback → Cabana map",
+   "evidence": "scrDefs.cabana \"Book a cabana\"; r3cabmap \"Select cabana\": images/cabana-map.jpg, areas Beach/Tower/Riverside/Splash zone, \"B09 · 15 guests · AED 1,855\", \"Remaining time · 9:45\"",
+   "differences": "Rev 3 books from a map, with a hold countdown and sold-out cabanas; the YAML is a list with addCartLine and no hold. YAML GST-070 also says cabanas are booked by staff (R073c), which contradicts both this screen and the prototype."
+  },
+  {
+   "id": "GST-051",
+   "name": "Plan Your Adventure – Start",
+   "match": "exact",
+   "view": "DEFERRED (R187), still in the prototype: Account → All screens → Wave 3 → Plan your adventure – start",
+   "evidence": "scrDefs.adventure \"Plan your adventure\"",
+   "differences": "Deferred in the YAML but present in the prototype."
+  },
+  {
+   "id": "GST-052",
+   "name": "Suggested Itineraries",
+   "match": "exact",
+   "view": "DEFERRED (R187), still in the prototype: Account → All screens → Wave 3 → Suggested itineraries",
+   "evidence": "scrDefs.suggested \"Suggested plans\"",
+   "differences": "Deferred in the YAML but present in the prototype."
+  },
+  {
+   "id": "GST-053",
+   "name": "Build Your Own Itinerary",
+   "match": "exact",
+   "view": "DEFERRED (R187), still in the prototype: Account → All screens → Wave 3 → Build your own itinerary",
+   "evidence": "scrDefs.buildplan \"Build your own plan\"",
+   "differences": "Deferred in the YAML but present in the prototype."
+  },
+  {
+   "id": "GST-054",
+   "name": "AI Optimized Itinerary",
+   "match": "exact",
+   "view": "DEFERRED (R187), still in the prototype: Account → All screens → Wave 3 → AI optimised itinerary",
+   "evidence": "scrDefs.aiplan \"Plan my day with Sahli\"",
+   "differences": "Deferred in the YAML but present in the prototype."
+  },
+  {
+   "id": "GST-055",
+   "name": "Dynamic QR Ticket",
+   "match": "exact",
+   "view": "Account → All screens → Wave 1 → Dynamic QR ticket; also the Scan tab overlay",
+   "evidence": "scrDefs.qr \"Your QR ticket\": \"The code refreshes every 30 seconds\"; scanOpen overlay \"Gate pass · UA-7741\"",
+   "differences": "The Scan overlay also scans table codes and lockers (\"Scan a table code or locker with the same button\"), which the YAML does not cover."
+  },
+  {
+   "id": "GST-056",
+   "name": "Bundle Package",
+   "match": "exact",
+   "view": "Account → All screens → Wave 2 → Bundle package",
+   "evidence": "scrDefs.bundle \"Packages\": Family day, Thrill pack, Two parks; \"You save AED 180\"",
+   "differences": ""
+  },
+  {
+   "id": "GST-057",
+   "name": "Accessibility Information",
+   "match": "exact",
+   "view": "Account → All screens → Wave 2 → Accessibility information",
+   "evidence": "scrDefs.access \"Accessibility\": Step-free route, Quiet room, Companion ticket",
+   "differences": ""
+  },
+  {
+   "id": "GST-058",
+   "name": "Resource Availability (Cabana)",
+   "match": "exact",
+   "view": "Account → All screens → Wave 3 → Resource availability (cabana); Rev 3 feedback → Cabana map",
+   "evidence": "scrDefs.cabanaavail \"Cabana availability\": Area Riverside/Wave view/Private deck, Date chips",
+   "differences": "The Rev 3 cabana map puts availability and booking on one screen."
+  },
+  {
+   "id": "GST-059",
+   "name": "Plan My Day – In Progress",
+   "match": "exact",
+   "view": "DEFERRED (R187), still in the prototype: Account → All screens → Wave 3 → Plan my day – in progress",
+   "evidence": "scrDefs.planday \"Plan my day\": \"Queue changed … Swap it with the stunt show?\"",
+   "differences": "Deferred in the YAML but present in the prototype, and linked from Wait times."
+  },
+  {
+   "id": "GST-061",
+   "name": "Menu Item Detail",
+   "match": "exact",
+   "view": "Account → All screens → Wave 2 → Menu item detail; Rev 3 feedback → Menu item add-ons & modifiers",
+   "evidence": "scrDefs.menuitem \"Spiced lamb flatbread\": Allergens, Options; r3mods \"Lamb ouzi\": \"Spice level · choose 1\", \"Add a side · up to 2\", \"Leave out\"",
+   "differences": "Rev 3 adds min/max selection rules for each modifier group, priced add-ons, leave-outs and a live total."
+  },
+  {
+   "id": "GST-062",
+   "name": "Shop & Drop Collection",
+   "match": "exact",
+   "view": "Account → All screens → Wave 3 → Shop & drop collection",
+   "evidence": "scrDefs.shopdrop: QR \"SD-4417\", \"No receipt needed\"",
+   "differences": "Prototype uses a separate SD code; the YAML says the guest collects with the ticket."
+  },
+  {
+   "id": "GST-063",
+   "name": "Search",
+   "match": "exact",
+   "view": "Account → All screens → Wave 1 → Search",
+   "evidence": "scrDefs.search: \"Rides, shows, food, shops\", Recent, Popular",
+   "differences": ""
+  },
+  {
+   "id": "GST-065",
+   "name": "Newsletter & Preferences",
+   "match": "exact",
+   "view": "Account → All screens → Wave 3 → Newsletter & preferences",
+   "evidence": "scrDefs.newsletter \"Newsletters & preferences\": Topics, Channel Email/Push/SMS/WhatsApp",
+   "differences": ""
+  },
+  {
+   "id": "GST-066",
+   "name": "Privacy & My Data",
+   "match": "exact",
+   "view": "Account → All screens → Wave 2 → Privacy & my data (#privacy; also Account → Data & privacy)",
+   "evidence": "isPrivacy \"Data & privacy\": \"Request my export\", \"Delete my account\", consent toggles",
+   "differences": "The prototype labels this screen \"GST-070 · Your data\" (aria-label \"GST-070 Data and privacy\"), but GST-070 is Reserve a Table in the YAML, so the label is wrong. Document upload is on Profile instead."
+  },
+  {
+   "id": "GST-067",
+   "name": "Refunds & Resale",
+   "match": "exact",
+   "view": "Account → All screens → Wave 2 → Refunds & resale",
+   "evidence": "scrDefs.refunds: \"Refund\", \"Resell … Listed at face value\", \"Waiver check\"",
+   "differences": ""
+  },
+  {
+   "id": "GST-068",
+   "name": "Help & My Cases",
+   "match": "exact",
+   "view": "Account → All screens → Wave 2 → Help & my cases",
+   "evidence": "scrDefs.cases \"My cases\": Open/Closed, \"Raise a new case\"",
+   "differences": "The YAML lists AI conversations here (listAiConversations); the prototype shows them on the concierge home instead."
+  },
+  {
+   "id": "GST-069",
+   "name": "Face Pass",
+   "match": "exact",
+   "view": "Account → All screens → Wave 2 → Face Pass (also Account → Face Pass)",
+   "evidence": "scrDefs.facepass: \"Your choice, always\", \"the template is deleted within 24 hours\", Register/Remove per pass",
+   "differences": ""
+  },
+  {
+   "id": "GST-070",
+   "name": "Reserve a Table",
+   "match": "partial",
+   "view": "Account → All screens → Wave 2 → Reserve a table or cabana; Rev 3 feedback → Book a table (fixed)",
+   "evidence": "scrDefs.reserve \"Reserve a table or cabana\": Waiting lists \"Oasis Kitchen … Join\"; r3table \"Book a table\": date/time/guests, \"Card needed: No\"",
+   "differences": "The YAML covers tables only (cabanas are staff-booked, R073c) and has no deposit (R077a). The prototype also reserves cabanas and shows a deposit on the reservation, and the Rev 3 web flow has a deposit-hold variant at AED 100 per guest."
+  },
+  {
+   "id": "GST-071",
+   "name": "Payment Methods",
+   "match": "exact",
+   "view": "Account → All screens → Wave 2 → Payment methods",
+   "evidence": "scrDefs.paymethods: Saved cards, Balances (gift card, wallet credit, points), \"Send balance to someone\"",
+   "differences": "The Account → \"Payment methods\" row opens Engine settings instead of this screen."
+  },
+  {
+   "id": "GST-072",
+   "name": "Share & Group Booking",
+   "match": "exact",
+   "view": "Account → All screens → Wave 2 → Share & group booking",
+   "evidence": "scrDefs.group: Invitations, \"Your group · Night of Nine\", Referral code, \"Challenge: three venues\"",
+   "differences": ""
+  },
+  {
+   "id": "GST-073",
+   "name": "Security & Sign-in",
+   "match": "partial",
+   "view": "Account → All screens → Wave 2 → Security & sign-in",
+   "evidence": "scrDefs.security: devices, \"Trust this device\", \"Two-step verification · An authenticator code as well\", Recovery, \"Lost a phone? Sign it out\"",
+   "differences": "Prototype offers two-step verification and a trusted-device skip, but the YAML says guests have no second factor (R167). Either remove the toggle from the prototype or reopen the decision."
+  }
+ ],
+ "unmappedViews": [
+  {
+   "view": "Account → All screens → Rev 3 feedback → Choose a location / Change location while booking (r3loc, r3locbook)",
+   "what": "Kids Club with four locations: pick a location first, then a \"Booking at\" bar switches location and keeps selections; times and prices refresh",
+   "suggest": "part of GST-007, plus a location picker before it; no YAML screen or state covers tenants with several locations"
+  },
+  {
+   "view": "Account → All screens → Rev 3 feedback → Ticket categories / Subcategory tickets & info-only (r3cats, r3sub)",
+   "what": "Category tiles lead to the tickets in that category; info-only products (\"Not bookable online\") open their details instead of adding to the basket",
+   "suggest": "part of GST-003 / GST-008 (info-only is a product flag the YAML does not mention)"
+  },
+  {
+   "view": "Account → All screens → Rev 3 feedback → Guided tour by language (r3guided)",
+   "what": "Tour-language chips filter the tour times",
+   "suggest": "part of GST-007"
+  },
+  {
+   "view": "Account → All screens → Rev 3 feedback → Surf sessions with filters (r3surf)",
+   "what": "Experience and surf-level filters with descriptions, a 4-day calendar, price and places left per session, Reset filters",
+   "suggest": "part of GST-007"
+  },
+  {
+   "view": "Account → All screens → Rev 3 feedback → Swim consent pop-up (r3swim)",
+   "what": "\"Are you able to swim?\" asked once per water-park booking; Yes clears the swimmer check",
+   "suggest": "part of GST-007 (eligibility, checkBookingEligibility)"
+  },
+  {
+   "view": "Account → All screens → Rev 3 feedback → Help me choose banner / Help me choose (r3hmc, r3quiz)",
+   "what": "A banner under the products opens a 1–2 question quiz that routes to the matching flow",
+   "suggest": "new screen (or an overlay on GST-003)"
+  },
+  {
+   "view": "Account → All screens → Rev 3 feedback → Meeting room by the hour (r3room)",
+   "what": "House of Pages: start time, length (1 hour to full day), room by capacity, add-ons; the price multiplies by the length",
+   "suggest": "new screen (hourly resource booking; GST-050 covers cabanas only)"
+  },
+  {
+   "view": "Account → All screens → Rev 3 feedback → Experiences, product first (r3exp)",
+   "what": "Each experience is listed as the product with its own date and time; there is no category step",
+   "suggest": "part of GST-003 / GST-005"
+  },
+  {
+   "view": "Account → All screens → Rev 3 feedback → Intercity bus · one-way, Bus route & passengers, Bus multi-trip cards, Bus favourite routes (r3bus, r3route, r3busmulti, r3busfav)",
+   "what": "Emirates Link transport: From/To stations, date, time period, departures, route stop list, passenger types (child/student half fare, person of determination free), 5- and 10-trip and weekly/monthly passes, saved routes",
+   "suggest": "new screen(s): transport is a new venue type with no P02 screen. Confirm the scope with the client, who still owes the real station list and fares."
+  },
+  {
+   "view": "Account → All screens → Rev 3 feedback → Quick tour (r3tour)",
+   "what": "Four-step coach marks on first visit over date, time, tickets and basket, with a replay button",
+   "suggest": "part of GST-007 (overlay)"
+  },
+  {
+   "view": "Account → All screens → Rev 3 feedback → Basket display (r3cart)",
+   "what": "Basket position options for the website; on mobile the basket stays a bottom bar with the running total",
+   "suggest": "part of GST-041 (mostly web/config)"
+  },
+  {
+   "view": "Account → All screens → Also built, not in the plan → Engine settings (#settings); Account → Engine settings / Saved guests",
+   "what": "Prototype configuration drawer (theme, palette, flow, currency) and a \"Saved guests — heights on file\" row",
+   "suggest": "out of scope (prototype controls). If Saved guests with heights is kept, it belongs to GST-039."
+  },
+  {
+   "view": "Discover → venue → Booking (#book): embedded web prototype \"TICVAI Guest Booking v2.dc.html?embed=mobile\"",
+   "what": "Every live venue flow (Summit Peaks, Union Arena, Coastal Aqua, Grand Playhouse, Saffron Table, Tidewater Museum, House of Pages, Emirates Link) runs inside the web engine in mobile mode, including the Add-ons step and the deposit and waitlist dining flows",
+   "suggest": "part of GST-007 / GST-008 / GST-049 / GST-009; use the web map for detail at the flow level"
+  }
+ ],
+ "summary": "71 screens: 61 exact, 10 partial, 0 none. The six deferred screens (GST-030, 051-054, 059) are all still drawn in the prototype. 13 unmapped views, mostly Rev 3 flows (multi-location, categories and info-only products, help me choose, meeting room, intercity transport). Top differences: (1) Booking steps. Rev 3 reveals date, then time, then ticket, pages long time lists with part-of-day filters, puts a date/time pop-up and a time bar on the seat map, and moves every add-on to one step. GST-007, GST-008 and GST-049 have none of this, and GST-008 is defined as ticket transfer rather than choosing tickets and add-ons. (2) The prototype contradicts settled decisions: guests book cabanas from a map (GST-050/058/070, against R073c staff-only), tables take deposits (GST-017/070, against R077a), Security offers two-step verification (GST-073, against R167), and it shows the in-venue notifications feed that R242 defers (GST-030). (3) Sign-in and checkout. In the prototype, Checkout entry is a choice between signing in and guest checkout (email code, Apple, Google), asked after Add-ons. The YAML GST-041 is a cart screen, and GST-042 also has password and UAE Pass, which the prototype does not show. The prototype also labels the privacy screen GST-070."
+}

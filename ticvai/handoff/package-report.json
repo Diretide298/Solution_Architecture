@@ -1,5 +1,5 @@
 {
- "generated": "2026-09-28",
+ "generated": "2026-09-29",
  "note": "The package measured in one pass. Derived by tools/build-package-report.py from the files the refresh writes -- never from prose.",
  "counts": {
   "operations": 2147,
@@ -52,7 +52,7 @@
   },
   {
    "link": "Operations with resolved lineage",
-   "done": 1505,
+   "done": 1506,
    "total": 2147,
    "percent": 70,
    "note": "names the tables it reads and writes -- the join the DDL cannot make itself"
@@ -577,7 +577,7 @@
    "contract": "reporting",
    "operations": 44,
    "onAScreen": 42,
-   "withLineage": 40,
+   "withLineage": 41,
    "withPermission": 44,
    "percentOnAScreen": 95
   },
@@ -848,7 +848,7 @@
   "requirementsPartial": 44,
   "operationsNoScreen": 288,
   "screensNoOperation": 108,
-  "operationsNoLineage": 642,
+  "operationsNoLineage": 641,
   "tablesNotReached": 24,
   "permissionsWithoutLabel": 69,
   "capabilityPairs": 242,

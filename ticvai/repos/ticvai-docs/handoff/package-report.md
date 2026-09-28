@@ -1,6 +1,6 @@
 # Package report
 
-**Generated 2026-09-28 by `tools/build-package-report.py`.** Every figure is read from a file another tool wrote in the same refresh.
+**Generated 2026-09-29 by `tools/build-package-report.py`.** Every figure is read from a file another tool wrote in the same refresh.
 
 ## Scale
 
@@ -31,7 +31,7 @@
 | Requirements contracted | 2650 / 2788 | 95% | an operation or schema field demonstrably serves it |
 | Operations declaring a service | 2147 / 2147 | 100% | the operation is owned by one of the seventeen deployables |
 | Operations declaring a permission | 2042 / 2147 | 95% | the checklist a grant screen renders is built from these |
-| Operations with resolved lineage | 1505 / 2147 | 70% | names the tables it reads and writes -- the join the DDL cannot make itself |
+| Operations with resolved lineage | 1506 / 2147 | 70% | names the tables it reads and writes -- the join the DDL cannot make itself |
 | Operations reaching a screen | 1859 / 2147 | 87% | sync, webhook and job operations legitimately have none |
 | Screens naming an operation | 2314 / 2422 | 96% | the rest are static, navigation shells or workshop-blocked |
 | Tables reached by an operation | 659 / 683 | 96% | a table nothing reaches is a missing operation or a table that should not exist |
@@ -118,7 +118,7 @@
 | public-api | 22 | 21 | 22 | 22 |
 | queue | 22 | 16 | 22 | 14 |
 | rental | 43 | 39 | 37 | 43 |
-| reporting | 44 | 42 | 40 | 44 |
+| reporting | 44 | 42 | 41 | 44 |
 | resources | 49 | 48 | 45 | 49 |
 | retail | 25 | 17 | 25 | 25 |
 | seating | 55 | 54 | 49 | 55 |
@@ -162,7 +162,7 @@
 | Requirements Partial | 44 |
 | Operations No Screen | 288 |
 | Screens No Operation | 108 |
-| Operations No Lineage | 642 |
+| Operations No Lineage | 641 |
 | Tables Not Reached | 24 |
 | Permissions Without Label | 69 |
 | Capability Pairs | 242 |

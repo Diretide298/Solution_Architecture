@@ -236,7 +236,9 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
+  reads:
+  - reporting.kpi_definition
+  - reporting.kpi_target
   writes: []
 - operation: getReport
   verb: GET

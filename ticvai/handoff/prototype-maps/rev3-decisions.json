@@ -1,0 +1,1037 @@
+{
+ "items": [
+  {
+   "ref": "REV3-1",
+   "source": "CLIENT-RESPONSE-REV3-25SEP.md#1 Many performances should resize and page; morning/afternoon/evening filter",
+   "what": "More than 8 times show as compact tiles, paged 24 at a time with Earlier/Later, plus day-part chips with counts. Config: Times per page (8/12/24/all, default 24), Morning/afternoon/evening filter (on/off).",
+   "kind": "config",
+   "package": "listPerformances (catalogue.yaml ~l.2150) pages by from/to with PageSize/PageCursor, so paging works. Missing: no day-part concept; BookingFlowConfig has no timesPerPage or dayPartFilter. getAvailability (catalogue.yaml ~l.3031) takes one performanceId (or channelCapacityId) and has no eventId/date filter, so 64 tiles with remaining counts means 64 calls; its response is also inline (already a WEB-006 gap).",
+   "screens": [
+    "WEB-006",
+    "GST-007"
+   ],
+   "proposal": "Add BookingFlowConfig.timesPerPage enum [8,12,24,all] default 24 and dayPartFilter bool default true. Fix the day-part boundaries in the venue time zone on WEB-006/GST-007 (morning before 12:00, afternoon 12:00-17:00, evening from 17:00). Add eventId + from/to query params to getAvailability and name its response schema.",
+   "needsClient": "Confirm the day-part boundaries (proposed: before 12:00, 12:00-17:00, from 17:00)."
+  },
+  {
+   "ref": "REV3-2",
+   "source": "CLIENT-RESPONSE-REV3-25SEP.md#2 Step 1 date, step 2 time only after date, step 3 ticket only after date and time",
+   "what": "Time sits right after the date and stays hidden until a date is picked; tickets stay hidden until a time is picked; Continue stays off until both are chosen. Config: Performance reveal = Date->time->ticket (default) or All at once.",
+   "kind": "screen",
+   "package": "Package navigation runs the other way: WEB-006 Date & Performance Selection has entryFrom WEB-005 Ticket Type Selection (flow F01: ticket type, then date). GST-007 Select Date & Time comes before GST-008 on mobile. BookingFlowConfig has no reveal setting.",
+   "screens": [
+    "WEB-005",
+    "WEB-006",
+    "GST-007",
+    "GST-008"
+   ],
+   "proposal": "Reorder the dated flow to WEB-006 (date, then time) before WEB-005 (tickets), or fold both into one staged step, and state the reveal rule on the screens. Add BookingFlowConfig.performanceReveal enum [dateTimeTicket, allAtOnce] default dateTimeTicket.",
+   "needsClient": ""
+  },
+  {
+   "ref": "REV3-3",
+   "source": "CLIENT-RESPONSE-REV3-25SEP.md#3 Sign-in screen after Add-ons",
+   "what": "Sign-in (or guest code when guest checkout is on) is asked when the guest leaves Add-ons; basket kept. Config: Ask to sign in = After add-ons (default) or At payment.",
+   "kind": "config",
+   "package": "Compatible with the package rule: FeatureToggle guestCheckout (white-label.yaml ~l.3712) 'gates checkout, never the cart', and identity.yaml ~l.144 routes at checkout. Checkout entry is GST-041 on mobile; on web the gate sits at WEB-012. No setting chooses where the gate appears.",
+   "screens": [
+    "WEB-008",
+    "WEB-011",
+    "WEB-012",
+    "WEB-016",
+    "GST-041",
+    "GST-042"
+   ],
+   "proposal": "Add BookingFlowConfig.signInAt enum [afterAddOns, atPayment] default afterAddOns. On web, move the gate from WEB-012 to the WEB-008 exit when afterAddOns.",
+   "needsClient": ""
+  },
+  {
+   "ref": "REV3-4",
+   "source": "CLIENT-RESPONSE-REV3-25SEP.md#4 Flow 1 (fixed date and time) and Flow 2 (date, then time, then seat map); pop-up or inline option",
+   "what": "Seated events either go straight to the seat map (single performance) or ask date and time first, inline or as a pop-up over the seat map. Config: Date & time on seat events = Inline step or Pop-up on the seat map.",
+   "kind": "config",
+   "package": "Both flows exist: WEB-006 -> WEB-007 carries performanceId (flow F02), and a single-performance event can skip WEB-006. GST-007 -> GST-049 on mobile. No setting chooses inline vs pop-up.",
+   "screens": [
+    "WEB-006",
+    "WEB-007",
+    "GST-007",
+    "GST-049"
+   ],
+   "proposal": "Add BookingFlowConfig.seatEventDateMode enum [inlineStep, popupOnSeatMap] default inlineStep. Add a date/time overlay to WEB-007 and GST-049 for the pop-up mode. Skip WEB-006 when the event has exactly one on-sale performance.",
+   "needsClient": ""
+  },
+  {
+   "ref": "REV3-5",
+   "source": "CLIENT-RESPONSE-REV3-25SEP.md#5 CMS option: seat view box right, left, top or bottom",
+   "what": "Position of the 'view from your seat' box around the seat map; drops below on narrow screens. Config: Seat view box = Bottom/Right/Left/Top.",
+   "kind": "config",
+   "package": "BookingFlowConfig has no field for it. The view itself has no data source (see 23SEP-14).",
+   "screens": [
+    "WEB-007",
+    "GST-049"
+   ],
+   "proposal": "Add BookingFlowConfig.seatViewPosition enum [bottom, right, left, top] default bottom (web only; mobile always below).",
+   "needsClient": ""
+  },
+  {
+   "ref": "REV3-6",
+   "source": "CLIENT-RESPONSE-REV3-25SEP.md#6 Time selection on top, configurable (time bar above the seat map)",
+   "what": "Time sits under the date on the selection step. On the seat map a time bar shows the chosen performance, lets the guest switch show and has Change date; changing the show releases held seats. Config: Time bar above seat map (on/off).",
+   "kind": "screen",
+   "package": "relinquishSeatHold and createSeatHold exist (seating.yaml ~l.1260, ~l.1161). WEB-007/GST-049 declare no performance switcher, and BookingFlowConfig has no toggle.",
+   "screens": [
+    "WEB-007",
+    "GST-049"
+   ],
+   "proposal": "Add a performance switcher region to WEB-007/GST-049: listPerformances for the event; on a change, relinquishSeatHold and then a new hold. Add BookingFlowConfig.seatTimeBar bool default true.",
+   "needsClient": ""
+  },
+  {
+   "ref": "REV3-7",
+   "source": "CLIENT-RESPONSE-REV3-25SEP.md#7 Theatre flow like the stadium, with its own auditorium seat map; show and seats on one step; up to ten seats",
+   "what": "Grand Playhouse has a stage/screen, Stalls/Circle/Balcony with curved rows, aisles and 3 price bands. Date, time, show (plus language & format for cinema) and the seat map sit on one page. Max 10 seats per booking; basket lists each seat.",
+   "kind": "screen",
+   "package": "Seat maps are layout-agnostic: createSeatMap/importSeatGeometry, seat categories and non-sellable zones such as a stage (seating.yaml ~l.3258). The package splits the step over two screens (WEB-006, WEB-007). CreateSeatHoldRequest allows up to 50 seats. R080(c) set 10 per sale for POS only; no guest seat limit exists. Language/format has no field (see REV3-17).",
+   "screens": [
+    "WEB-006",
+    "WEB-007",
+    "GST-007",
+    "GST-049"
+   ],
+   "proposal": "Allow WEB-006+WEB-007 (and GST-007+GST-049) to render as one step for seated events. Add VenueSettings.seating.maxSeatsPerGuestOrder (default 10, bounds 1-50) to the configured-limits sheet, applied by createSeatHold on guest channels.",
+   "needsClient": "Confirm 10 seats as the guest-channel maximum per booking."
+  },
+  {
+   "ref": "REV3-8",
+   "source": "CLIENT-RESPONSE-REV3-25SEP.md#8 Unable to complete the table booking flow",
+   "what": "Prototype bug: a table reservation had nothing priced in the basket. Now adds 'Table for 4 . 19:30 . no card needed' to the basket and completes. Waitlist is fixed the same way.",
+   "kind": "screen",
+   "package": "In the package a table reservation never enters the cart: WEB-036/GST-070 call createTableReservation directly (fnb.yaml ~l.3545), which takes no payment (R077(a)). Waitlist is joinRestaurantWaitlist/leaveRestaurantWaitlist (R073(d)). A zero-price 'table' cart line has no cart-line kind.",
+   "screens": [
+    "WEB-036",
+    "GST-070"
+   ],
+   "proposal": "No contract change. Keep the table reservation and waitlist out of the cart: confirm straight after createTableReservation with a 'no card needed' confirmation. Tell the client the basket line is prototype-only.",
+   "needsClient": ""
+  },
+  {
+   "ref": "REV3-8b",
+   "source": "CLIENT-RESPONSE-REV3-25SEP.md#8 deposit hold flow ('the deposit hold adds AED 100 per guest')",
+   "what": "A dining 'deposit hold' flow charges AED 100 per guest.",
+   "kind": "conflict",
+   "package": "Contradicts audit R077(a), 'No deposit and no no-show fee in the first release', applied in fnb.yaml createTableReservation (~l.3560) and the GST-070 notes. DepositPolicy (orders.yaml ~l.10896) lists 'dining' in appliesTo for later.",
+   "screens": [
+    "WEB-036",
+    "GST-070"
+   ],
+   "proposal": "Hide the deposit-hold flow for the first release. If the client wants it, a CR reopens R077(a) and uses DepositPolicy (basis fixedPerGuest, appliesTo dining).",
+   "needsClient": "The deposit hold contradicts the 28 Sep default (R077(a), no table deposit in the first release). Remove it from the prototype, or raise a CR?"
+  },
+  {
+   "ref": "REV3-9",
+   "source": "CLIENT-RESPONSE-REV3-25SEP.md#9 Add-ons and modifiers for F&B menu items",
+   "what": "In the takeaway, delivery and café menus, Add opens a side panel with choose-one options, priced optional add-ons and quantity; the basket line lists the choices. Config: F&B add-ons & modifiers (on/off).",
+   "kind": "screen",
+   "package": "Exists: ModifierGroup, listModifierGroups (guest-readable), attachModifierGroup (fnb.yaml ~l.1128, ~l.4872). WEB-036, WEB-037 and GST-024 already declare listModifierGroups. A per-tenant on/off is redundant: an item shows modifiers when groups are attached.",
+   "screens": [
+    "WEB-036",
+    "WEB-037",
+    "GST-024",
+    "GST-061"
+   ],
+   "proposal": "Draw the modifier side panel on WEB-037/GST-061 (no api change). Drop the Config toggle: modifiers show when the item has attached groups.",
+   "needsClient": ""
+  },
+  {
+   "ref": "REV3-10",
+   "source": "CLIENT-RESPONSE-REV3-25SEP.md#10 Cart display: fixed right, left, slide-in, slide-up, floating icon, single column; right for Arabic (+ Update 28 Sep: stays right in Arabic)",
+   "what": "Config Cart & summary adds 'Floating cart icon' (round basket button with count). New Cart side in Arabic = Keep on right (default) or Mirror to left. The client confirmed the basket stays on the right in Arabic.",
+   "kind": "config",
+   "package": "BookingFlowConfig.cartLayout enum = sidebarRight, sidebarLeft, slideInRight, slideUpBottom, singleColumn. It lacks floatingIcon, and no field controls the cart side under RTL.",
+   "screens": [
+    "WEB-005",
+    "WEB-006",
+    "WEB-008",
+    "WEB-010",
+    "GST-041"
+   ],
+   "proposal": "Add 'floatingIcon' to BookingFlowConfig.cartLayout. Add cartSideInRtl enum [keepRight, mirror] default keepRight.",
+   "needsClient": ""
+  },
+  {
+   "ref": "REV3-11",
+   "source": "CLIENT-RESPONSE-REV3-25SEP.md#11 Help me choose; CLIENT-RESPONSE-FEEDBACK-23SEP.md#20 Build your experience in the CMS; BUILD-YOUR-EXPERIENCE.md; also 28 Sep 'Help me choose banner'",
+   "what": "A 1-2 question quiz (3 answers each, with title, one-liner, icon and optional badge) maps the last answer to a booking flow/product with a result card. Shown as a button, a pop-up on arrival, or off, and now as a dark banner under the products. Runs on Kids Club, Coastal Aqua and Tidewater Museum.",
+   "kind": "new-capability",
+   "package": "Nothing in the contracts: no quiz, question, answer or 'guided choice' entity, and no BookingFlowConfig field. White-label LinkTarget (kind product/event, white-label.yaml ~l.3165) can already express 'answer -> product'. Not found in sources/ (no match for quiz, questionnaire, help me choose or guided selling).",
+   "screens": [
+    "WEB-004",
+    "WEB-005",
+    "GST-004",
+    "GST-008"
+   ],
+   "proposal": "Add a venue-scoped GuidedChoice config to white-label (part of the published tenant config): mode enum [button, popupOnArrival, banner, off]; questions[<=2] {text: LocalisedText, answers[3] {title, description, iconKey, badge, target: LinkTarget}}; resultCards keyed by target {title, description, imageAssetId}. Guests read it through the public tenant config. Add get/setGuidedChoice (TENANT_CONFIGURE).",
+   "needsClient": "Help me choose is not in the RFP sources. Accept it as in scope (CR), or keep it as a later option?"
+  },
+  {
+   "ref": "REV3-12",
+   "source": "CLIENT-RESPONSE-REV3-25SEP.md#12 Experience flow: product first, no ticket-category step",
+   "what": "House of Pages lists each experience (author talk, workshop, story hour, rooftop night) with its own date, time and tickets. No category step.",
+   "kind": "presentation-only",
+   "package": "The package already lists products (WEB-002/GST-003 via searchCatalogue/listProducts), each with an Event and Performances. A category step is optional.",
+   "screens": [
+    "WEB-002",
+    "WEB-004",
+    "GST-003",
+    "GST-004"
+   ],
+   "proposal": "No package change.",
+   "needsClient": ""
+  },
+  {
+   "ref": "REV3-13",
+   "source": "CLIENT-RESPONSE-REV3-25SEP.md#13 House of Wisdom: meeting room by the hour",
+   "what": "Date -> start time -> length (1h, 2h, half day, full day) -> room type (focus pod, majlis, boardroom, auditorium) -> attendees -> add-ons (coffee break, lunch, AV technician). Price = room rate x length.",
+   "kind": "new-capability",
+   "package": "Partly grounded. The 26 Aug minute says a guest books 'a meeting room product', never a raw room (resources.yaml bookResource, ~l.230). ResourceKind has room/auditorium; ResourcePackage 'Conference Package' (~l.1385); setExperienceResourceRequirements + allocateResources; getResourceAvailability is guest-callable. Missing: AddCartLineRequest (orders.yaml ~l.13196) carries performanceId but no free start/end window, so a guest cannot buy 'room type X, 14:00, 2 hours'. No length-based pricing and no guest screen. Sources: Meeting Room appears only as a group-package component (workshop pack Group Sales 9.1.5) and in the 26 Aug minute.",
+   "screens": [],
+   "proposal": "Model each room type as a product with VariantDimension 'length' (1h, 2h, half, full), priced per variant. Add AddCartLineRequest.window {startsAt, endsAt} for resource-backed products; getResourceAvailability supplies start times; allocateResources picks the room at checkout. Add a staged 'Book a space' flow to WEB-005/WEB-006 (or a new WEB/GST screen).",
+   "needsClient": "Is online self-booking of meeting rooms by the hour in scope for the first release? It is not a guest screen in the plan."
+  },
+  {
+   "ref": "REV3-14",
+   "source": "CLIENT-RESPONSE-REV3-25SEP.md#14 Ticket category shown with details but booking off (info-only products)",
+   "what": "A product can be marked information only: it keeps details and photo, shows an 'Info only / Not bookable online' label and opens details instead of adding to the basket. Config: Show info-only products (on/off).",
+   "kind": "contract",
+   "package": "Product (catalogue.yaml ~l.11565) has channels[] and derived isSellable but no 'visible but not bookable' flag. searchCatalogue is explicitly 'scoped to what is on sale ... so a guest never finds a product they cannot buy' (~l.921), so today an info-only product would simply be hidden.",
+   "screens": [
+    "WEB-002",
+    "WEB-003",
+    "WEB-004",
+    "WEB-005",
+    "GST-003",
+    "GST-004",
+    "GST-063"
+   ],
+   "proposal": "Add Product.guestListing enum [bookable, infoOnly, hidden] default bookable, plus an optional notBookableLabel (LocalisedText). listProducts/searchCatalogue return infoOnly products flagged, and addCartLine refuses them (409). Amend the searchCatalogue description. Add BookingFlowConfig.showInfoOnly bool default true.",
+   "needsClient": ""
+  },
+  {
+   "ref": "REV3-15",
+   "source": "CLIENT-RESPONSE-REV3-25SEP.md#15 Book the product from the map (cabana); 28 Sep 'Book a cabana from the map'; EMAIL-TO-CLIENT.md ask 2",
+   "what": "The Coastal Aqua cabana map on the first screen: 34 numbered cabanas (R01-R10, T01-T08, S01-S06, B01-B10) with seat counts, sold-out greyed. Tapping one adds e.g. 'Cabana B09 . Large cabana . Beach, AED 1,855' and starts a remaining-time counter. Prices: Family 6 = 995, Medium 10 = 1,295, Large 15 = 1,855, XL 20 = 2,295.",
+   "kind": "conflict",
+   "package": "Contradicts audit R073(c): 'Cabanas stay staff-booked and GST-070 becomes table-only' (GST-070 notes). Also contradicts resources.yaml bookResource (~l.230): staff-only since 19 Sep per the 26 Aug minute, 'never a specific room/vehicle/instructor'. The package sells cabanas as a capacity product on GST-050/GST-058 (wave 3, addCartLine + getAvailability), with no web screen. A route exists if the client wants choice: ResourceType.customerSelectable (~l.2485) + setResourceSelectionPolicy mode guestMayChoose (~l.2159) + allocateResources preferredResourceIds (~l.2010). The countdown matches the cart lease (R169, 15 min).",
+   "screens": [
+    "GST-050",
+    "GST-058",
+    "GST-070"
+   ],
+   "proposal": "First release: sell cabanas by size (Family/Medium/Large/XL) as capacity products on GST-050/GST-058, allocated by the platform. If the client wants map picking: a CR reopens R073(c); set guestMayChoose on the cabana ticket types; add a guest read of per-cabana availability with venue-map positions; add AddCartLine attributes.preferredResourceId passed to allocateResources; add a WEB cabana screen.",
+   "needsClient": "Picking a numbered cabana contradicts the 28 Sep default (R073(c)) and the 26 Aug minute. Should guests choose a specific cabana (reopen R073(c)), or book by cabana size? Also confirm the cabana numbering and prices."
+  },
+  {
+   "ref": "REV3-16",
+   "source": "CLIENT-RESPONSE-REV3-25SEP.md#16 Category then subcategory, configurable in the CMS",
+   "what": "Category tiles (Permanent exhibition, Temporary exhibitions, Guided tours, Courses) then that category's tickets, each with Adult/Child/Student counters. Config: Ticket categories = Category->subcategory or Flat list.",
+   "kind": "config",
+   "package": "ProductCategory is a tree (parentId, displayOrder, imageAssetId; catalogue.yaml ~l.10483), and Product.categoryId exists. listProducts filters only venueId and kind (no categoryId), and BookingFlowConfig has no display field.",
+   "screens": [
+    "WEB-002",
+    "WEB-005",
+    "GST-002",
+    "GST-003"
+   ],
+   "proposal": "Add a categoryId query param to listProducts (guest). Add BookingFlowConfig.ticketCategories enum [categoryThenSubcategory, flatList] default categoryThenSubcategory.",
+   "needsClient": ""
+  },
+  {
+   "ref": "REV3-17",
+   "source": "CLIENT-RESPONSE-REV3-25SEP.md#17 Guided tour times by tour language (also #7 cinema 'language & format')",
+   "what": "Pick a language (EN, AR, FR, DE, ZH, RU) and only tours in that language are listed. Cinema shows pick language and format.",
+   "kind": "contract",
+   "package": "Performance (catalogue.yaml ~l.12039) has no language or format field, and listPerformances filters only from/to. Not found in sources/ as a stated requirement (only 'Guided Tour' as a product/package item).",
+   "screens": [
+    "WEB-006",
+    "GST-007"
+   ],
+   "proposal": "Add Performance.language (BCP 47, nullable) and Performance.format (string, nullable, e.g. 2D/3D/subtitled). Add a language query param to listPerformances.",
+   "needsClient": ""
+  },
+  {
+   "ref": "REV3-18",
+   "source": "CLIENT-RESPONSE-REV3-25SEP.md#18 One tenant, attraction in several locations; change location on the booking screen",
+   "what": "The guest picks a location first; a 'Booking at' bar on the booking screen has Change location; selections are kept and times and prices refresh. Config: Location switcher (on/off).",
+   "kind": "screen",
+   "package": "R267 is applied: a venue picker on WEB-001 (P01 ~l.243-442), remembered and changeable, fed by the public venue list (white-label.yaml ~l.512). Missing: a switcher on the booking screens. 'Selections kept' has no key: products are per venue (Product.venueId), and codes are unique per tenant (R108), so the same ticket at two venues shares no identifier.",
+   "screens": [
+    "WEB-001",
+    "WEB-005",
+    "WEB-006",
+    "GST-001",
+    "GST-007",
+    "GST-008"
+   ],
+   "proposal": "Add a 'Booking at' venue switcher to WEB-005/WEB-006/GST-007/GST-008 that reuses the R267 venue choice. On a switch, clear the selection unless products share a new optional Product.familyKey (tenant-unique family, per-venue product). Add BookingFlowConfig.locationSwitcher bool.",
+   "needsClient": "Must selections carry across locations (which needs a product family key), or is restarting the selection acceptable?"
+  },
+  {
+   "ref": "REV3-19",
+   "source": "CLIENT-RESPONSE-REV3-25SEP.md#19 Surf sessions with filters (as on The Wave); 28 Sep four-day calendar with option descriptions",
+   "what": "Dropdowns Choose your experience (surf, lessons, swim, sauna) and Select surf level (beginner-expert), each option with a short description, plus Reset, day-part chips and paging. A 4-day calendar shows performances by time with places left and price per surfer; sold-out greyed.",
+   "kind": "contract",
+   "package": "Experience maps to ProductCategory/Product. There is no 'level' attribute: Product.segmentTags is free text and Performance has no attributes. Places left per performance needs a batched getAvailability (see REV3-1). listProducts has no category or tag filter.",
+   "screens": [
+    "WEB-005",
+    "WEB-006",
+    "GST-007"
+   ],
+   "proposal": "Model level as Product.segmentTags 'level/<code>' (or a VariantDimension). Add categoryId and segmentTag filters to listProducts. Take option descriptions from ProductCategory (add description LocalisedText). Reuse the getAvailability eventId+date-range change from REV3-1. The 4-day calendar layout needs no package change.",
+   "needsClient": ""
+  },
+  {
+   "ref": "REV3-20",
+   "source": "CLIENT-RESPONSE-REV3-25SEP.md#20 Enable or disable a Quick Tour of the customer journey",
+   "what": "A 4-step first-visit coach-mark tour (date, time, tickets, basket) with Back/Next/End, replayable from a Quick tour button. Config: Quick tour (on/off).",
+   "kind": "config",
+   "package": "No field. Not in sources/.",
+   "screens": [
+    "WEB-005",
+    "WEB-006",
+    "GST-007"
+   ],
+   "proposal": "Add BookingFlowConfig.quickTour bool default false. The first-visit flag is kept on the device only.",
+   "needsClient": ""
+  },
+  {
+   "ref": "REV3-21",
+   "source": "CLIENT-RESPONSE-REV3-25SEP.md#21 Transport tickets (Emirates Link); 28 Sep RTA layout; EMAIL-TO-CLIENT.md ask 1",
+   "what": "Intercity coach: From/To stations with swap, date, time period with departure counts, departure cards (arrival, duration, seats left, fare), passenger types (adult; child and student half fare; person of determination free). Multi-trip 5/10-trip carnets and weekly/monthly unlimited; favourite routes; route stop list and a street map (needs internet); Search Trips and Next Available Trip.",
+   "kind": "new-capability",
+   "package": "The contracts have no station, route, timetable, trip, fare-table or favourite-route entity (grep transport/station/route/trip finds none). The closest pieces: Event+Performance could model a departure; ProductKind openDated with entitlement entries_allowed could model carnets and unlimited passes; ResourceKind 'vehicle'. Sources: 'Transportation' appears only as a component of a group package (workshop pack Group Sales 9.1.4/9.1.5), never as scheduled public-transport ticketing, so it looks out of RFP scope. The street map adds a third-party tile provider, which needs approval under R038.",
+   "screens": [],
+   "proposal": "Do not add it to the package until the client confirms scope with a CR. If accepted: a TransportService (or a catalogue extension) with Station, Route (ordered stops), Departure (a Performance per leg), a fare matrix by passenger type, carnet and period passes as openDated products, and guest favourite routes. Add a map-tile dependency to the R038 list. New WEB/GST screens.",
+   "needsClient": "Scheduled transport ticketing is not in the RFP sources. Is it in scope (CR), and whose network is it? If yes, we need the real station list, fares and timetable."
+  },
+  {
+   "ref": "REV3-22",
+   "source": "CLIENT-RESPONSE-REV3-25SEP.md#Flow review (28 Sep): add-ons asked twice; cabana/table zone chosen twice; dinner deals on 3 screens",
+   "what": "All add-ons sit on the Add-ons step only. The cabana zone and dinner-table zone steps are gone (picked on the map). Dinner deals take 2 screens.",
+   "kind": "presentation-only",
+   "package": "Matches the package: WEB-008/GST-048 is the only add-on surface (23SEP-11). Dinner-event tables on a map use a seat map of tables (seating.yaml). The cabana part depends on REV3-15.",
+   "screens": [
+    "WEB-008",
+    "GST-048",
+    "WEB-007"
+   ],
+   "proposal": "No package change.",
+   "needsClient": ""
+  },
+  {
+   "ref": "REV3-23",
+   "source": "CLIENT-RESPONSE-REV3-25SEP.md#Flow review: height asked twice (Summit Peaks, water park)",
+   "what": "One eligibility declaration: the height bands are the check, and the tallest-guest question is gone.",
+   "kind": "presentation-only",
+   "package": "Matches the package: ProductEligibilityRule.heightBandsCm with EligibilityDeclaration.heightBandIndex per person, checked once by checkBookingEligibility (catalogue.yaml ~l.11366-11476) from the WEB-006 overlay.",
+   "screens": [
+    "WEB-006",
+    "GST-007"
+   ],
+   "proposal": "No package change.",
+   "needsClient": ""
+  },
+  {
+   "ref": "REV3-24",
+   "source": "CLIENT-RESPONSE-REV3-25SEP.md#Flow review: party/school details typed twice; steps with nothing to decide merged (one-decision-per-screen layout)",
+   "what": "The party/school summary pre-fills from the form. Information blocks stay on the previous screen, and up to 3 quick choices share one screen (table reservation 2->1, deposit 2->1, waitlist/takeaway/delivery/private dining 3->2).",
+   "kind": "presentation-only",
+   "package": "requestGroupBooking (orders.yaml ~l.334) already carries the headcount and child details. Screen grouping is layout.",
+   "screens": [
+    "WEB-031",
+    "WEB-036",
+    "GST-070",
+    "GST-072"
+   ],
+   "proposal": "No package change (the deposit flow is still covered by REV3-8b).",
+   "needsClient": ""
+  },
+  {
+   "ref": "REV3-25",
+   "source": "CLIENT-RESPONSE-REV3-25SEP.md#Update 28 Sep: Arabic copy for Rev 3 strings in ticvai-ar-rev3.js",
+   "what": "The interface text added in Rev 3 now has Arabic, held in a separate string file.",
+   "kind": "presentation-only",
+   "package": "Matches R096(3) (English and Arabic) and R163(6) (Arabic in tenant languages). UI string catalogues are frontend resources, not contract fields.",
+   "screens": [
+    "GST-043"
+   ],
+   "proposal": "No package change. Guest-facing product text uses the existing LocalisedText/nameLocalised fields.",
+   "needsClient": ""
+  },
+  {
+   "ref": "REV3-26",
+   "source": "CLIENT-RESPONSE-REV3-25SEP.md#Built to match your examples: Swim question (water park)",
+   "what": "A themed pop-up 'Are you able to swim?' (Yes/No, Next) appears once after the session/date on any water-park flow; 'Yes' clears the swimmer check for the whole booking. Config: Swim consent pop-up (on/off).",
+   "kind": "conflict",
+   "package": "The package declares swim ability per person: ProductEligibilityRule.swimAbility [notRequired, confident] and EligibilityDeclaration.confidentSwimmer per party member (catalogue.yaml ~l.11420, ~l.11470), checked by checkBookingEligibility. One booking-level yes that clears everyone contradicts that per-person contract shape. A tenant toggle is redundant with the per-product rule.",
+   "screens": [
+    "WEB-006",
+    "GST-007"
+   ],
+   "proposal": "Keep the pop-up UI but record the answer per declared person (one 'everyone in my party can swim' tick that sets confidentSwimmer for each person is fine). Show it when any cart product has swimAbility=confident, not from a tenant toggle.",
+   "needsClient": "Can one person declare swim ability for the whole party, or must each guest (or guardian) confirm per person?"
+  },
+  {
+   "ref": "REV3-27",
+   "source": "CLIENT-RESPONSE-REV3-25SEP.md#Mobile: Rev 3 feedback group (22-25 clickable screens); EMAIL-TO-CLIENT.md mobile runs the live engine",
+   "what": "Mobile shows every Rev 3 flow as clickable screens under Account -> All screens.",
+   "kind": "presentation-only",
+   "package": "Prototype navigation only. The package screen IDs for these flows are the GST ids named in the items above.",
+   "screens": [],
+   "proposal": "No package change.",
+   "needsClient": ""
+  },
+  {
+   "ref": "23SEP-1",
+   "source": "CLIENT-RESPONSE-FEEDBACK-23SEP.md#1 One profile icon that opens Log in / Register",
+   "what": "Sign in and Create account merged into one profile icon; one screen with Log in and Register tabs.",
+   "kind": "presentation-only",
+   "package": "WEB-016 Login / Register already covers both (guest password sign-in added by R073(a); OTP, social and UAE Pass per R167).",
+   "screens": [
+    "WEB-016",
+    "GST-042"
+   ],
+   "proposal": "No package change.",
+   "needsClient": ""
+  },
+  {
+   "ref": "23SEP-2",
+   "source": "CLIENT-RESPONSE-FEEDBACK-23SEP.md#2 Language icon in the header (EN / Arabic, full RTL)",
+   "what": "EN/Arabic switch that flips to RTL and translates the interface. Venue and dish names stay as written; long descriptions stay English until Arabic copy is supplied.",
+   "kind": "presentation-only",
+   "package": "Tenant languages (white-label /tenant-config/languages ~l.2034), FeatureKey multiLanguage, R163(6), GST-043 Arabic/RTL. P01 directions ltr+rtl.",
+   "screens": [
+    "WEB-001",
+    "GST-043"
+   ],
+   "proposal": "No package change. Arabic product copy is content in the existing LocalisedText fields.",
+   "needsClient": "Supply the final Arabic copy for venue and product descriptions."
+  },
+  {
+   "ref": "23SEP-3",
+   "source": "CLIENT-RESPONSE-FEEDBACK-23SEP.md#3 Read more carries per-ticket-type tags; BUILD-YOUR-EXPERIENCE.md#Ticket tags",
+   "what": "Tags such as '2 Hours', 'Min 1.10 m', 'Free adult entry', 'Valid 90 days', 'Emirates ID'. They come from the ticket's own tags list of {type: clock|height|free|cal|id, label}, else are derived from duration, validity and the height rule. Config: Tags on tickets (on/off).",
+   "kind": "contract",
+   "package": "Product/ProductVariant have no display-tag field (Product.segmentTags is for reporting and segmentation). The derivation sources exist: ProductEligibilityRule.minHeightCm and entitlement validity.",
+   "screens": [
+    "WEB-004",
+    "WEB-005",
+    "GST-004",
+    "GST-008",
+    "GST-013"
+   ],
+   "proposal": "Add Product.displayTags[] {kind enum [clock, height, free, calendar, id], label: LocalisedText}, max 6. The derivation fallback happens on read. Add BookingFlowConfig.ticketTags bool default true.",
+   "needsClient": ""
+  },
+  {
+   "ref": "23SEP-4",
+   "source": "CLIENT-RESPONSE-FEEDBACK-23SEP.md#4 Video or image should show (each ticket has its own photo)",
+   "what": "Read more opens with the ticket's video or photo, and each ticket in a listing has its own photo.",
+   "kind": "contract",
+   "package": "Product has no media field; only ProductCategory.imageAssetId exists (catalogue.yaml ~l.10550). The asset library (assets.yaml) tracks usage but nothing links an asset to a product.",
+   "screens": [
+    "WEB-002",
+    "WEB-004",
+    "WEB-005",
+    "GST-003",
+    "GST-004"
+   ],
+   "proposal": "Add Product.media[] {assetId, kind [image, video], isPrimary} referencing assets.yaml assets, and register the reference in asset usage.",
+   "needsClient": ""
+  },
+  {
+   "ref": "23SEP-5",
+   "source": "CLIENT-RESPONSE-FEEDBACK-23SEP.md#5 Clicking a Dated Day Pass shows counters on the same screen (no extra Select Tickets step)",
+   "what": "Counters open in a side panel on the listing/details screen; Book goes straight into the booking.",
+   "kind": "screen",
+   "package": "The package has separate WEB-004 Attraction Details -> WEB-005 Ticket Type Selection screens.",
+   "screens": [
+    "WEB-004",
+    "WEB-005",
+    "GST-004",
+    "GST-008"
+   ],
+   "proposal": "Allow WEB-005 to render as a side panel on WEB-002/WEB-004 (a navigation change; no contract change).",
+   "needsClient": ""
+  },
+  {
+   "ref": "23SEP-6",
+   "source": "CLIENT-RESPONSE-FEEDBACK-23SEP.md#6 Extra information (i) for each Adult/Child/Senior/Infant row",
+   "what": "Each ticket-type row explains who it is for and what it includes. Config: Extra info on cards (cardInfo).",
+   "kind": "contract",
+   "package": "ProductVariant (catalogue.yaml ~l.11794) has sku, axisValues, name, barcode, isDefault and isActive, with no description. BookingFlowConfig has no cardInfo.",
+   "screens": [
+    "WEB-005",
+    "GST-008"
+   ],
+   "proposal": "Add ProductVariant.description (LocalisedText, <=300 chars). Add BookingFlowConfig.cardInfo bool default true.",
+   "needsClient": ""
+  },
+  {
+   "ref": "23SEP-7",
+   "source": "CLIENT-RESPONSE-FEEDBACK-23SEP.md#7 Show the ticket category directly (no Dated Pass -> Single Day Pass step)",
+   "what": "The categories (Single day, Two-day flexible, UAE resident) are shown directly.",
+   "kind": "presentation-only",
+   "package": "Listing is by product; no intermediate step in the package.",
+   "screens": [
+    "WEB-002",
+    "WEB-005"
+   ],
+   "proposal": "No package change.",
+   "needsClient": ""
+  },
+  {
+   "ref": "23SEP-8",
+   "source": "CLIENT-RESPONSE-FEEDBACK-23SEP.md#8 Show the single-day ticket category on the B2C home page",
+   "what": "The home page lists ticket categories; clicking one opens its counters in place.",
+   "kind": "presentation-only",
+   "package": "White-label homepage sections include a productGrid (white-label.yaml ~l.2615) with LinkTarget product.",
+   "screens": [
+    "WEB-001",
+    "GST-001"
+   ],
+   "proposal": "No package change.",
+   "needsClient": ""
+  },
+  {
+   "ref": "23SEP-9",
+   "source": "CLIENT-RESPONSE-FEEDBACK-23SEP.md#9 Show the date of visit in the cart",
+   "what": "The cart shows the visit date (match date; reservation date for dining).",
+   "kind": "screen",
+   "package": "A cart line has performanceId (AddCartLineRequest), so the date is readable via getPerformance. Dining reservations are not cart lines in the package (REV3-8).",
+   "screens": [
+    "WEB-010",
+    "GST-041"
+   ],
+   "proposal": "Show Performance.startsAt per cart line on WEB-010/GST-041. No contract change.",
+   "needsClient": ""
+  },
+  {
+   "ref": "23SEP-10",
+   "source": "CLIENT-RESPONSE-FEEDBACK-23SEP.md#10 Upgrades only after the main ticket is in the cart",
+   "what": "'Upgrade your day' stays hidden until a main ticket is in the cart.",
+   "kind": "presentation-only",
+   "package": "getRecommendations (promotions.yaml ~l.219) is cart-driven.",
+   "screens": [
+    "WEB-010",
+    "GST-048"
+   ],
+   "proposal": "No package change.",
+   "needsClient": ""
+  },
+  {
+   "ref": "23SEP-11",
+   "source": "CLIENT-RESPONSE-FEEDBACK-23SEP.md#11 Add-ons only on the Add-ons / Extras page",
+   "what": "Add-ons are removed from the ticket panels.",
+   "kind": "presentation-only",
+   "package": "WEB-008/GST-048 are the add-on surfaces; BookingFlowConfig.extrasStep exists.",
+   "screens": [
+    "WEB-008",
+    "GST-048"
+   ],
+   "proposal": "No package change.",
+   "needsClient": ""
+  },
+  {
+   "ref": "23SEP-12",
+   "source": "CLIENT-RESPONSE-FEEDBACK-23SEP.md#12 Quantity stepper for season and membership packages",
+   "what": "Season and membership packages get a quantity stepper once selected.",
+   "kind": "presentation-only",
+   "package": "addCartLine quantity exists.",
+   "screens": [
+    "WEB-005",
+    "WEB-022"
+   ],
+   "proposal": "No package change.",
+   "needsClient": ""
+  },
+  {
+   "ref": "23SEP-13",
+   "source": "CLIENT-RESPONSE-FEEDBACK-23SEP.md#13 'Slide in right' cart showed at the bottom",
+   "what": "Prototype bug fixed.",
+   "kind": "presentation-only",
+   "package": "BookingFlowConfig.cartLayout slideInRight exists.",
+   "screens": [
+    "WEB-010"
+   ],
+   "proposal": "No package change.",
+   "needsClient": ""
+  },
+  {
+   "ref": "23SEP-14",
+   "source": "CLIENT-RESPONSE-FEEDBACK-23SEP.md#14 View to the stage from the selected section",
+   "what": "Picking a section shows the view from that section (larger stage and fewer rows ahead for closer sections; concert mode shows the stage).",
+   "kind": "contract",
+   "package": "seating.yaml has no per-section view image or viewpoint data (it mentions sightlines only for kills and seat recommendation). importSeatGeometry holds geometry, from which a view could be rendered.",
+   "screens": [
+    "WEB-007",
+    "GST-049"
+   ],
+   "proposal": "Add an optional SeatMap section field viewAssetId (a photo per section). When it is null, the client renders a view from the imported geometry.",
+   "needsClient": "Will the venue supply a photo per section, or do we render the view from the 3D geometry?"
+  },
+  {
+   "ref": "23SEP-15",
+   "source": "CLIENT-RESPONSE-FEEDBACK-23SEP.md#15 Selected seats go into the cart with section, row, seat and price",
+   "what": "Each seat is a cart line, e.g. 'Section 101 . Row A, Seat 4 . AED 165'; tapping again removes it.",
+   "kind": "presentation-only",
+   "package": "createSeatHold + addCartLine seatIds exist.",
+   "screens": [
+    "WEB-007",
+    "WEB-010",
+    "GST-049"
+   ],
+   "proposal": "No package change.",
+   "needsClient": ""
+  },
+  {
+   "ref": "23SEP-16",
+   "source": "CLIENT-RESPONSE-FEEDBACK-23SEP.md#16 2D full map with price colours; click a section to zoom in place; 3D stand -> 2D; the stadium 'Your fixture' page removed",
+   "what": "Section zoom happens on the same map. The fixture becomes a strip at the top of the seat step, so booking opens on the map.",
+   "kind": "screen",
+   "package": "BookingFlowConfig.seatPicker/mapView exist. The separate fixture step removed here maps to the event detail before WEB-006/WEB-007.",
+   "screens": [
+    "WEB-004",
+    "WEB-006",
+    "WEB-007",
+    "GST-049"
+   ],
+   "proposal": "Add a fixture strip region to WEB-007/GST-049 and allow a direct WEB-004 -> WEB-007 path for single-performance fixtures. No contract change.",
+   "needsClient": ""
+  },
+  {
+   "ref": "23SEP-17",
+   "source": "CLIENT-RESPONSE-FEEDBACK-23SEP.md#17 When zoomed in, show available seats across the map",
+   "what": "Dots per seat: available in price colour, taken grey, picked highlighted; zoom controls.",
+   "kind": "presentation-only",
+   "package": "getSeatAvailability exists.",
+   "screens": [
+    "WEB-007",
+    "GST-049"
+   ],
+   "proposal": "No package change.",
+   "needsClient": ""
+  },
+  {
+   "ref": "23SEP-18",
+   "source": "CLIENT-RESPONSE-FEEDBACK-23SEP.md#18 Category display (Grid / Row strip) made no difference",
+   "what": "The fixed Config Category display now changes the product cards.",
+   "kind": "config",
+   "package": "BookingFlowConfig has no category-display field.",
+   "screens": [
+    "WEB-001",
+    "WEB-002",
+    "GST-002"
+   ],
+   "proposal": "Add BookingFlowConfig.categoryDisplay enum [grid, rowStrip] default grid.",
+   "needsClient": ""
+  },
+  {
+   "ref": "23SEP-19",
+   "source": "CLIENT-RESPONSE-FEEDBACK-23SEP.md#19 Why is there a date selection in the header? (Dates in event banner)",
+   "what": "The event-banner date list is now off by default (Config: Dates in event banner); the date picker always sits at the top of the booking step.",
+   "kind": "config",
+   "package": "BookingFlowConfig has heroBanner/searchInBanner/singleEventPage but no banner-dates field.",
+   "screens": [
+    "WEB-001",
+    "WEB-004"
+   ],
+   "proposal": "Add BookingFlowConfig.eventBannerDates bool default false.",
+   "needsClient": ""
+  },
+  {
+   "ref": "DG-1",
+   "source": "DESIGN-GAP-RESPONSE-23SEP.md#1 Guest checkout, code proof, profile matching",
+   "what": "Guest checkout off by default, then sign-in required with the basket kept. On: email/mobile + 6-digit code, then a match prompt (past orders, first order, profile type), 'Use this profile' / 'Not me', and an expired state. Config: Guest checkout (code proof); Match returning guests by.",
+   "kind": "config",
+   "package": "Exists: FeatureToggle guestCheckout, off by default (white-label.yaml ~l.3712); GuestMatchPolicy.matchBy [email, mobile, emailOrMobile] and offerAtCheckout (marketing-crm.yaml ~l.13966); checkGuestCheckoutMatch/decideGuestCheckoutMatch with an opaque matchToken; linkGuestCheckout (identity.yaml ~l.2147); VenueSettings.identity.guestOtpMaxAttempts (limits sheet #15).",
+   "screens": [
+    "WEB-012",
+    "WEB-016",
+    "GST-041",
+    "GST-042"
+   ],
+   "proposal": "No change. Map the Config toggles to FeatureToggle guestCheckout and GuestMatchPolicy.matchBy.",
+   "needsClient": ""
+  },
+  {
+   "ref": "DG-2",
+   "source": "DESIGN-GAP-RESPONSE-23SEP.md#2 Billing statement and payment retry",
+   "what": "Membership billing statement; soft decline = Retry now + Use another card; hard decline = another card only; declined again shows the next retry date; paid.",
+   "kind": "screen",
+   "package": "Exists: decline classes soft/hard/unknown and guest retry (payments.yaml ~l.86-145, ~l.1621), subscription declined state.",
+   "screens": [
+    "WEB-023",
+    "GST-015"
+   ],
+   "proposal": "No contract change; the states belong on WEB-023/GST-015.",
+   "needsClient": ""
+  },
+  {
+   "ref": "DG-3",
+   "source": "DESIGN-GAP-RESPONSE-23SEP.md#3 Height and age check",
+   "what": "Per-person age and height band, a swimmer toggle, guardian signature for 12-15, 'Remove this guest' / 'Choose another activity', and Continue locked. The kids club reads the age range from the pass; under-8s need an adult.",
+   "kind": "screen",
+   "package": "Exists: ProductEligibilityRule (min/max age and height, heightBandsCm, accompaniedBelowAge, guardianSignatureAgeFrom/To, swimAbility, waiverRequired) and checkBookingEligibility (catalogue.yaml ~l.11366-11560).",
+   "screens": [
+    "WEB-006",
+    "GST-007"
+   ],
+   "proposal": "No contract change.",
+   "needsClient": ""
+  },
+  {
+   "ref": "DG-4",
+   "source": "DESIGN-GAP-RESPONSE-23SEP.md#4 School trips and parties",
+   "what": "School: pupil stepper, 1 free teacher per 10 pupils, invoice estimate, quote in 2 working days, headcount due 5 days before. Party: child name/age, deposit AED 100 per AED 400, refundable to 24 h. Both: over-cap and date-gone states.",
+   "kind": "screen",
+   "package": "Exists: requestGroupBooking (orders.yaml ~l.334; school by invoice, finalHeadcountDueBy; party deposit under DepositPolicy), DepositPolicy basis perBand with bandSize (~l.10896), freeLeaderRatio (catalogue.yaml ~l.11544). R077(a) covers table reservations only, so the party deposit is fine.",
+   "screens": [
+    "WEB-031",
+    "GST-072"
+   ],
+   "proposal": "No contract change.",
+   "needsClient": ""
+  },
+  {
+   "ref": "DG-5",
+   "source": "DESIGN-GAP-RESPONSE-23SEP.md#5 Takeaway and delivery",
+   "what": "Delivery fee AED 15, free from AED 200, refused below AED 90, Dubai only ('We don't deliver to this address'), and slots can close ('That time just filled').",
+   "kind": "screen",
+   "package": "Exists: FnbDeliveryPolicy minimumOrder, deliveryFee, freeDeliveryAbove, radiusKm, emiratesServed, slotMinutes (fnb.yaml ~l.8366); get/setFnbDeliveryPolicy; listFulfilmentSlots; createGuestFnbOrder refuses breaches.",
+   "screens": [
+    "WEB-036",
+    "GST-024"
+   ],
+   "proposal": "No contract change.",
+   "needsClient": ""
+  },
+  {
+   "ref": "DG-6",
+   "source": "DESIGN-GAP-RESPONSE-23SEP.md#6 Booking-flow configuration (CMS-016): card layout options; TICVAI Engine Controls Manual.dc.html + Guest Booking v2.dc.html twSpec() Card layout/Card size/Density",
+   "what": "The design says card layout need not be free text: Stacked rows, Split rows, Cards across, Poster cards. Card size: Compact, Standard, Large, Extra large (default Compact). Density: Compact, Standard, Roomy (default Compact).",
+   "kind": "contract",
+   "package": "BookingFlowConfig.cardLayout is a free string (maxLength 40, nullable). cardSize enum is [compact, regular, large] with no extra large. density enum is [compact, comfortable, airy] with default comfortable, where the design default is Compact.",
+   "screens": [
+    "WEB-005",
+    "WEB-002",
+    "GST-003"
+   ],
+   "proposal": "cardLayout becomes enum [stackedRows, splitRows, cardsAcross, posterCards] default stackedRows. cardSize becomes [compact, standard, large, extraLarge] default compact. density becomes [compact, standard, roomy] default compact (or keep the names and document the label mapping).",
+   "needsClient": ""
+  },
+  {
+   "ref": "GAP-A",
+   "source": "CLAUDE-CODE-GAP-FIX.md#A Web missing screens (Profile, Order History, Reservations, Wallet, Membership, Transfer, Newsletter, Contact, Error/Sold out, Lost & Found, Survey, Devices & Consent, Help & Accessibility)",
+   "what": "A prompt to build the web screens the plan lists and the prototype lacks.",
+   "kind": "presentation-only",
+   "package": "All exist in P01: WEB-019, 020, 021, 023, 024, 025, 026, 027, 028, 029, 030, 031, 034, 045. The prototype is catching up with the package.",
+   "screens": [
+    "WEB-019",
+    "WEB-020",
+    "WEB-021",
+    "WEB-023",
+    "WEB-024",
+    "WEB-025",
+    "WEB-026",
+    "WEB-027",
+    "WEB-028",
+    "WEB-029",
+    "WEB-030",
+    "WEB-031",
+    "WEB-034",
+    "WEB-045"
+   ],
+   "proposal": "No package change.",
+   "needsClient": ""
+  },
+  {
+   "ref": "GAP-B1",
+   "source": "CLAUDE-CODE-GAP-FIX.md#B Login: set up two-step verification; #C Security & Sign-in (step-up auth)",
+   "what": "The prompt asks the prototype to add guest 2FA setup on web and step-up auth on mobile Security & Sign-in.",
+   "kind": "conflict",
+   "package": "Contradicts audit R167 ('No SSO for guests and no guest MFA at sign-in') and R073(a). The GST-073 notes say createMfaChallenge was removed and a guest cannot enrol a method.",
+   "screens": [
+    "WEB-016",
+    "GST-073"
+   ],
+   "proposal": "Drop 2FA setup and step-up from the prototype. Guests keep OTP, social and UAE Pass sign-in.",
+   "needsClient": ""
+  },
+  {
+   "ref": "GAP-B2",
+   "source": "CLAUDE-CODE-GAP-FIX.md#B Help: app status + recent changes",
+   "what": "The guest Help screen shows app status and recent changes.",
+   "kind": "conflict",
+   "package": "TenantAppStatus.recentChanges is staff only (white-label.yaml ~l.504, ~l.2774: it names the principal behind each change). Guests get isInMaintenance, contact, availability and minimumAppVersion (R073(b)/(f)).",
+   "screens": [
+    "WEB-025",
+    "WEB-045",
+    "GST-040"
+   ],
+   "proposal": "Show status, maintenance and contact only. If a guest-facing 'what's new' is wanted, add a separate public releaseNotes (LocalisedText) field.",
+   "needsClient": ""
+  },
+  {
+   "ref": "GAP-B3",
+   "source": "CLAUDE-CODE-GAP-FIX.md#B other web functions (promo code, empty basket, interrupted payment, reprint/resend, UAE Pass, link guest checkout, support cases, Sahli handoff, FX rates + timestamp, remaining entitlements)",
+   "what": "Functions the prompt adds to existing web screens.",
+   "kind": "screen",
+   "package": "Exist: applyCartPromoCode (R073(e)), abandonCart, payment unknown/decline handling (payments.yaml), reprintOrder/reissueEntitlement (orders.yaml ~l.5126/~l.976), UAE Pass (FeatureKey uaePassLogin, R167), linkGuestCheckout, the live agent queue (R149(6)), FX rates with fetchedAt (finance.yaml ~l.4576).",
+   "screens": [
+    "WEB-010",
+    "WEB-012",
+    "WEB-013",
+    "WEB-016",
+    "WEB-018",
+    "WEB-025",
+    "WEB-035"
+   ],
+   "proposal": "No contract change. Check each screen's apis list declares these operations.",
+   "needsClient": ""
+  },
+  {
+   "ref": "GAP-C1",
+   "source": "CLAUDE-CODE-GAP-FIX.md#C Wave 2: In-Venue Notifications",
+   "what": "The prompt builds the notifications feed in mobile wave 2.",
+   "kind": "conflict",
+   "package": "Contradicts audit R242: not in the first release, and GST-030/WEB-046 are out of Block A (both are wave 4 in the package).",
+   "screens": [
+    "GST-030",
+    "WEB-046"
+   ],
+   "proposal": "Leave it out of the prototype's first-release build. Queue calls and order status stay on the queue and order screens.",
+   "needsClient": ""
+  },
+  {
+   "ref": "GAP-C2",
+   "source": "CLAUDE-CODE-GAP-FIX.md#C Wave 2: Reserve a Table or Cabana (waitlist, notify)",
+   "what": "The prompt keeps the combined table-or-cabana screen.",
+   "kind": "conflict",
+   "package": "Contradicts audit R073(c): GST-070 was renamed 'Reserve a Table' and is table-only (cabanas staff-booked).",
+   "screens": [
+    "GST-070",
+    "GST-050",
+    "GST-058"
+   ],
+   "proposal": "Build GST-070 as table-only with leave-waitlist. Cabanas follow REV3-15.",
+   "needsClient": ""
+  },
+  {
+   "ref": "GAP-C3",
+   "source": "CLAUDE-CODE-GAP-FIX.md#C Wave 3: AI Optimized Itinerary, Build Your Own Itinerary, Plan My Day, Plan Your Adventure, Suggested Itineraries",
+   "what": "The prompt builds the itinerary screens in wave 3.",
+   "kind": "conflict",
+   "package": "The package has GST-051/052/053/054/059 in wave 4, and R209 makes the itinerary suggestion conditional on the planner shipping (R187).",
+   "screens": [
+    "GST-051",
+    "GST-052",
+    "GST-053",
+    "GST-054",
+    "GST-059"
+   ],
+   "proposal": "Align the prototype to wave 4, and show the itinerary suggestion only if the planner ships.",
+   "needsClient": ""
+  },
+  {
+   "ref": "GAP-D1",
+   "source": "CLAUDE-CODE-GAP-FIX.md#D Mobile-only features get web equivalents: Face Pass and Security & Sign-in on web Account",
+   "what": "Adds Face Pass (register/status/withdraw) and security (devices, trust device, sign out a lost device, recovery) to the web account.",
+   "kind": "screen",
+   "package": "P01 has no Face Pass or security screen: the functions live on GST-069/GST-073, and WEB-024 covers devices and consent. Face capture depends on the client's facial-reader vendor SDK (R077(b), still open), which may not run in a browser.",
+   "screens": [
+    "WEB-017",
+    "WEB-024",
+    "GST-069",
+    "GST-073"
+   ],
+   "proposal": "Add the device and sign-out-lost-device functions to WEB-024. Keep Face Pass mobile-only until the vendor SDK is named and supports web capture.",
+   "needsClient": "Do you want Face Pass enrolment on the web? That depends on your facial-reader vendor (R077(b))."
+  },
+  {
+   "ref": "GAP-D2",
+   "source": "CLAUDE-CODE-GAP-FIX.md#D Wave mismatches (Parking, Virtual Queue, Multi-Currency) - build on both now",
+   "what": "The prompt builds these on web and mobile regardless of wave.",
+   "kind": "screen",
+   "package": "Package waves differ between shells: WEB-041 wave 2 vs GST-027/028 wave 3; WEB-040 wave 2 vs GST-023 wave 3; WEB-035 wave 1 vs GST-044 wave 2. Parking scope is set by R166 (cart-sold, no live availability).",
+   "screens": [
+    "WEB-035",
+    "WEB-040",
+    "WEB-041",
+    "GST-023",
+    "GST-027",
+    "GST-028",
+    "GST-044"
+   ],
+   "proposal": "Align each pair to one wave in P01/P02 once the client picks it.",
+   "needsClient": "Which wave should parking, virtual queue and multi-currency ship in on both web and mobile?"
+  },
+  {
+   "ref": "GAP-D3",
+   "source": "CLAUDE-CODE-GAP-FIX.md#D Duplicate screens merged (mobile Transfer + Delivery & Sharing + Tickets & Add-ons; web Wishlist + Devices/Consent; Help Centre + Help & Accessibility); group booking on web",
+   "what": "Merge duplicates into one screen labelled with every plan ID; add a web Group Booking view.",
+   "kind": "screen",
+   "package": "P02 keeps GST-014, GST-045 and GST-008 separate (GST-008's only api is transferOrderTickets, which supports the duplicate reading). P01 keeps WEB-009/WEB-024 and WEB-025/WEB-045. Group booking on web is already WEB-031 (requestGroupBooking); GST-072 on mobile.",
+   "screens": [
+    "GST-008",
+    "GST-014",
+    "GST-045",
+    "WEB-009",
+    "WEB-024",
+    "WEB-025",
+    "WEB-045",
+    "WEB-031",
+    "GST-072"
+   ],
+   "proposal": "Record each merge as one implementation with several screen IDs; keep the IDs. Move the ticket-selection functions GST-008's name promises onto GST-008.",
+   "needsClient": "Confirm the screen merges (the plan counts 46 web and 71 mobile screens)."
+  },
+  {
+   "ref": "ASSET-1",
+   "source": "ASSETS-NEEDED.md (70 photos/clips; stadium-football.jpg)",
+   "what": "Photos, clips, shop squares and event posters still to supply.",
+   "kind": "presentation-only",
+   "package": "Content for the DAM (assets.yaml). In production it is tenant content, not a package change. Product-level media depends on 23SEP-4.",
+   "screens": [],
+   "proposal": "No package change.",
+   "needsClient": "Supply the assets, at least section 1 (Kids Club, 12 photos + 3 clips)."
+  },
+  {
+   "ref": "CFG-1",
+   "source": "TICVAI Engine Controls Manual.dc.html + Guest Booking v2.dc.html twSpec() Preset (UI preset L1-L6, Custom)",
+   "what": "The UI preset picks a bundle of drawer values per venue type.",
+   "kind": "config",
+   "package": "Exists: BookingFlowConfig.preset [auto, ticketBox, playCentre, venueSite, marketplace, singleEvent, season, custom].",
+   "screens": [
+    "WEB-001"
+   ],
+   "proposal": "No change.",
+   "needsClient": ""
+  },
+  {
+   "ref": "CFG-2",
+   "source": "TICVAI Engine Controls Manual.dc.html + Guest Booking v2.dc.html twSpec() Brand: Palette, Typeface; Shape: Background, Corner radius",
+   "what": "Named palettes, font pairs, background tones and a 0-22px corner radius.",
+   "kind": "config",
+   "package": "Exists: Theme primary/secondary/accent/background/text colours, darkMode, cornerRadius 0-32 (white-label.yaml Theme ~l.3040), and typography (CMS-003). Named palettes and tones are presets over these values.",
+   "screens": [],
+   "proposal": "No change.",
+   "needsClient": ""
+  },
+  {
+   "ref": "CFG-3",
+   "source": "TICVAI Engine Controls Manual.dc.html + Guest Booking v2.dc.html twSpec() Surfaces (Glass/Solid) and Buttons (Solid/Outline/Pill)",
+   "what": "Glass or opaque cards; button shape.",
+   "kind": "config",
+   "package": "Missing on Theme and BookingFlowConfig.",
+   "screens": [],
+   "proposal": "Add Theme.surfaceStyle enum [glass, solid] default glass and Theme.buttonStyle enum [solid, outline, pill] default solid.",
+   "needsClient": ""
+  },
+  {
+   "ref": "CFG-4",
+   "source": "TICVAI Engine Controls Manual.dc.html + Guest Booking v2.dc.html twSpec() Brand logo + Logo palette (Light/Dark/Duotone)",
+   "what": "Which lockup sits in the nav bar and which colour reading of it drives the theme.",
+   "kind": "config",
+   "package": "Logo upload exists in white-label. The partner-logo list is demo-only. There is no logo palette/variant field.",
+   "screens": [],
+   "proposal": "Add a logo variant enum [light, dark, duotone] to the tenant logo config.",
+   "needsClient": ""
+  },
+  {
+   "ref": "CFG-5",
+   "source": "TICVAI Engine Controls Manual.dc.html + Guest Booking v2.dc.html twSpec() Sahli mascot (on/off)",
+   "what": "Show the concierge as mascot art or as a plain button.",
+   "kind": "config",
+   "package": "No 'mascot' anywhere in contracts. FeatureKey aiConciergeChat exists (white-label.yaml ~l.3700).",
+   "screens": [
+    "WEB-044",
+    "GST-031"
+   ],
+   "proposal": "Add BookingFlowConfig.conciergeMascot bool default true (or a FeatureKey conciergeMascot).",
+   "needsClient": ""
+  },
+  {
+   "ref": "CFG-6",
+   "source": "TICVAI Engine Controls Manual.dc.html + Guest Booking v2.dc.html twSpec() Step indicator; Extras step; Seat picker; Map view; Quantities on add-ons; Embed mode; Hero banner; Search in banner; Single-event page",
+   "what": "Existing drawer settings from earlier rounds.",
+   "kind": "config",
+   "package": "All exist in BookingFlowConfig (stepIndicator 8 values, extrasStep, seatPicker, mapView, quantitiesOnAddOns, embedMode, heroBanner, searchInBanner, singleEventPage). Two defaults differ: searchInBanner is true in the contract but off in the prototype; seatPicker is nullable with no default, but the prototype defaults to bowl.",
+   "screens": [
+    "WEB-001",
+    "WEB-007",
+    "WEB-008"
+   ],
+   "proposal": "Set searchInBanner default false and seatPicker default bowl, or tell the client the prototype defaults differ.",
+   "needsClient": ""
+  },
+  {
+   "ref": "CFG-7",
+   "source": "TICVAI Engine Controls Manual.dc.html + Guest Booking v2.dc.html twSpec() Currency (AED/SAR/USD/INR/GBP)",
+   "what": "Converts every price at a fixed demo rate.",
+   "kind": "config",
+   "package": "Exists: VenueSettings.displayCurrencies (tenancy.yaml ~l.3551, R120(a)), FX rates with fetchedAt (finance.yaml), WEB-035/GST-044. Fixed demo rates are prototype-only.",
+   "screens": [
+    "WEB-035",
+    "GST-044"
+   ],
+   "proposal": "No change.",
+   "needsClient": ""
+  },
+  {
+   "ref": "CFG-8",
+   "source": "TICVAI Engine Controls Manual.dc.html + Guest Booking v2.dc.html twSpec() Right to left (toggle)",
+   "what": "Mirrors the engine for a layout check.",
+   "kind": "presentation-only",
+   "package": "Direction follows the guest's language (tenant languages incl. Arabic, R163(6)); it is not a tenant setting. The manual's 'copy stays in English' is out of date after 23SEP-2.",
+   "screens": [
+    "GST-043"
+   ],
+   "proposal": "No package change.",
+   "needsClient": ""
+  },
+  {
+   "ref": "CFG-9",
+   "source": "TICVAI Engine Controls Manual.dc.html + Guest Booking v2.dc.html twSpec() Use fetched photo set; Payment outcome (demo); Venue type / Booking flow selector (34 flows)",
+   "what": "Demo harness controls.",
+   "kind": "presentation-only",
+   "package": "Demo only. In the package a flow follows from ProductKind and product configuration, and payment outcomes are real provider results.",
+   "screens": [],
+   "proposal": "No package change.",
+   "needsClient": ""
+  },
+  {
+   "ref": "CFG-10",
+   "source": "EMAIL-TO-CLIENT.md 'Sessions can be added, edited or closed from Config -> Sessions'; guest copy 'Surf sessions', 'Timed access 10-minute slots'",
+   "what": "A drawer editor to add, edit or close sessions per flow, and 'session' used in guest-facing copy.",
+   "kind": "conflict",
+   "package": "The function exists as Performance management (createPerformances, Performance.status suspended/cancelled; BO-015). Audit R165 renamed Session to Performance, and the glossary bans 'Session'. R145 made a recorded exception only for 'Booking'.",
+   "screens": [
+    "WEB-006",
+    "GST-007"
+   ],
+   "proposal": "Keep Performance in code and contracts. Record 'session' as an allowed guest-facing label, like R145, or change the copy.",
+   "needsClient": "May guest-facing copy say 'session' (surf sessions, timed sessions), as a recorded glossary exception like 'Booking'?"
+  },
+  {
+   "ref": "CFG-11",
+   "source": "CLIENT-RESPONSE-REV3-25SEP.md#Where the settings live: all Rev 3 options 'set per tenant' as engine properties",
+   "what": "Every Rev 3 option sits in Config -> Booking rules (Rev 3) and is exposed as a per-tenant property.",
+   "kind": "config",
+   "package": "BookingFlowConfig is tenant-scoped (x-ticvai-config-scope: tenant) and embedded in tenant_config, so one tenant with several venues (Kids Club x4, Coastal Aqua vs Union Arena) cannot differ per venue.",
+   "screens": [],
+   "proposal": "Put the Rev 3 fields (REV3-1..20, 23SEP-3/6/18/19) in BookingFlowConfig with an optional venue override map, venueOverrides{venueId: partial BookingFlowConfig}, following the VenueSettings tenant-default pattern.",
+   "needsClient": "Do any booking-flow settings need to differ between venues of one tenant?"
+  }
+ ],
+ "summary": "75 items from the rev 3 handoff (25 Sep + 28 Sep updates, 23 Sep feedback, design-gap reply, the Claude Code gap prompt, assets, email and the Config/Tweaks drawer), checked against contracts, P01/P02, audit decisions and the configured-limits sheet. Most new drawer settings belong in white-label BookingFlowConfig. It lacks about 20 fields (timesPerPage, dayPartFilter, performanceReveal, signInAt, seatEventDateMode, seatViewPosition, seatTimeBar, ticketCategories, showInfoOnly, locationSwitcher, quickTour, cartSideInRtl, a floatingIcon cart option, categoryDisplay, eventBannerDates, ticketTags, cardInfo, conciergeMascot). Its cardLayout/cardSize/density enums do not match the design, and it is tenant-only (no per-venue override). Contract gaps: getAvailability cannot batch by event and date range; Product has no display tags, no media and no info-only flag; ProductVariant has no description; Performance has no language/format; listProducts has no category filter; no per-section seat view; no guest seat limit. Conflicts: the cabana map (R073(c) and the 26 Aug minute), the dining deposit hold (R077(a)), the one-answer swim consent against per-person declarations, and guest 2FA/step-up (R167). The gap prompt also conflicts on the notifications feed (R242), table-or-cabana GST-070 (R073(c)), itinerary waves (wave 4, R209), guest-visible recentChanges (staff only) and 'session' copy (R165). New capabilities: transport ticketing (not in RFP sources; Transportation appears only as a group-package component), hourly meeting-room booking (a meeting-room product is minuted 26 Aug, but there is no cart time-window or screen), and Help me choose (nothing in the contracts or sources). The location switcher builds on R267 but cannot keep selections across venues without a product family key. Counts by kind: config 18, conflict 9, contract 8, new-capability 3, presentation-only 20, screen 17"
+}

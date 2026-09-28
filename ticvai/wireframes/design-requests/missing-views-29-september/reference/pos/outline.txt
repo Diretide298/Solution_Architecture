@@ -1,0 +1,1424 @@
+1: <x-dc>
+2: <helmet>
+3: <link rel="preconnect" href="https://fonts.googleapis.com">
+4: <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+6: <script src="31e907a7-9774-44b9-a568-f42ffe646c5d"></script>
+8: </helmet>
+16: TERMINAL POS-014 · AQUA PARK GATE A
+18: TICVAI OS 4.2.1
+22: <sc-if value="{{ onLogin }}" hint-placeholder-val="{{ true }}">
+25: <sc-if value="{{ loginBg }}" hint-placeholder-val="{{ false }}"><img src="{{ loginBg }}" alt=""></sc-if>
+28: <img src="973684be-8e8d-4c78-9540-fd2fac92e425" alt="Ticvai">
+30: Point of Sale
+31: ENTERPRISE TERMINAL
+35: Marina Bay<br>Entertainment District
+36: Aqua Park Gate A · 64 terminals across 11 outlets. This lane is configured for ticketing, F&amp;B and retail with offline continuity.
+39: Sync healthy · 42 ms
+41: Offline-ready
+42: PCI-DSS 4.0
+46: Build 2026.08.14 · b7f31c
+47: 20 Aug 2026 · 09:42 GST
+54: Sign in to shift
+55: Select your profile, then enter your 4-digit PIN.
+57: Shift not started · Float pending
+61: <sc-for list="{{ operators }}" as="op" hint-placeholder-count="4">
+62: <div sc-camel-on-click="{{ op.pick }}" style-hover="border-color:#C9CED4; box-shadow:0 10px 24px -14px rgba(14,17,22,.35); transform:translateY(-2px)">
+63: {{ op.initials }}
+64: {{ op.name }}
+65: {{ op.role }}
+68: </sc-for>
+73: OPERATOR PIN
+75: <sc-for list="{{ pinCells }}" as="cell" hint-placeholder-count="4">
+76: {{ cell.mark }}
+77: </sc-for>
+79: {{ hint }}
+81: <div sc-camel-on-click="{{ submit }}" style-hover="background:#0A5C64" style-active="transform:translateY(1px)">
+82: Continue to float count
+86: <div sc-camel-on-click="{{ submit }}" style-hover="background:#F4F5F7">Badge / RFID
+87: <div sc-camel-on-click="{{ submit }}" style-hover="background:#F4F5F7">Corporate SSO
+92: <sc-for list="{{ keys }}" as="k" hint-placeholder-count="12">
+93: <div sc-camel-on-click="{{ k.press }}" style-hover="background:#F4F5F7" style-active="transform:translateY(2px); background:#EDEFF1">{{ k.label }}
+94: </sc-for>
+99: Forgot PIN? Contact your duty manager.
+100: Terminal locks after 90 s idle
+104: </sc-if>
+106: <sc-if value="{{ onFloat }}" hint-placeholder-val="{{ false }}">
+110: STEP 2 OF 2 · SHIFT OPENING
+111: Count the opening float
+112: Drawer POS-014 · counted by {{ opName }} · blind-verified by duty manager.
+115: Expected float
+116: AED 1,000.00
+122: Denomination count
+124: <sc-for list="{{ denoms }}" as="d" hint-placeholder-count="6">
+126: {{ d.label }}
+127: {{ d.kind }}
+128: <div sc-camel-on-click="{{ d.minus }}" style-hover="background:#EDEFF1">−
+129: {{ d.qty }}
+130: <div sc-camel-on-click="{{ d.plus }}" style-hover="background:#E4F1F2">+
+131: {{ d.total }}
+133: </sc-for>
+140: COUNTED TOTAL
+141: {{ floatTotal }}
+142: {{ varianceText }}
+145: Supervisor verification
+146: Blind count recorded by A. Mansouri at 09:41 — cashier count is not shown to the verifier.
+147: PIN approved · session may open
+150: <div sc-camel-on-click="{{ openShift }}" style-hover="background:#0A5C64">
+151: Open shift &amp; start selling
+157: </sc-if>
+159: <sc-if value="{{ onApp }}" hint-placeholder-val="{{ false }}">
+162: <img src="75f5ec69-c636-45e2-a447-cd186e9b9da8" alt="Ticvai">
+163: <sc-for list="{{ nav }}" as="n" hint-placeholder-count="8">
+164: <div sc-camel-on-click="{{ n.pick }}">
+166: {{ n.label }}
+168: </sc-for>
+169: <div sc-camel-on-click="{{ goClose }}" style-hover="color:#F2F4F6">
+171: Close
+177: Aqua Park Gate A·{{ opName }}·POS-014
+178: Shift open · 09:42
+179: Float AED 1,000.00
+181: <img src="75f5ec69-c636-45e2-a447-cd186e9b9da8" alt="">Powered by Ticvai
+187: {{ title }}
+188: {{ subtitle }}
+190: <div sc-camel-on-click="{{ openPalette }}" style-hover="border-color:#C9CED4">
+192: {{ searchHint }}
+193: ⌘K
+196: <div sc-camel-on-click="{{ goSync }}">
+197: {{ netLabel }}
+199: <div sc-camel-on-click="{{ openHw }}" style-hover="background:#EDEFF1">
+201: <sc-if value="{{ hwBadge }}" hint-placeholder-val="{{ true }}">
+203: </sc-if>
+205: <div sc-camel-on-click="{{ toggleNotif }}" style-hover="background:#EDEFF1">
+207: <sc-if value="{{ showBadge }}" hint-placeholder-val="{{ true }}">
+209: </sc-if>
+212: {{ opInitials }}
+214: {{ opName }}
+215: {{ opRole }}
+222: <sc-if value="{{ drawerOpen }}" hint-placeholder-val="{{ false }}">
+224: <div sc-camel-on-click="{{ closeDrawer }}">
+228: {{ drawerKicker }}
+229: {{ drawerTitle }}
+230: {{ drawerMeta }}
+232: <div sc-camel-on-click="{{ closeDrawer }}" style-hover="background:#EDEFF1">
+236: <sc-if value="{{ showHero }}" hint-placeholder-val="{{ true }}">
+238: <img src="{{ drawerSrc }}" alt="">
+240: </sc-if>
+241: <sc-if value="{{ showVisitDate }}" hint-placeholder-val="{{ true }}">
+242: <div sc-camel-on-click="{{ openVisitCal }}" style-hover="border-color:#0E7C86; background:#F1F6F6">
+247: VISIT DATE
+248: {{ visitDateLabel }}
+250: Change
+252: </sc-if>
+254: <sc-if value="{{ stepDetail }}" hint-placeholder-val="{{ false }}">
+259: {{ showRating }}
+260: {{ showReviews }}
+262: {{ showPrice }}
+267: CAPACITY
+268: {{ capLabel }}
+276: <div sc-camel-on-click="{{ toggleDetails }}">
+278: DETAILS, INCLUDES &amp; RULES
+281: <sc-if value="{{ detailsOpen }}" hint-placeholder-val="{{ false }}">
+283: · Doors open 15 minutes before the showing; latecomers are seated at the next break.
+284: · Ticket includes 3D glasses and one cloakroom item per guest.
+285: · Under-8s must be accompanied; no food from outside the venue.
+286: · Seats are held for 8 minutes once selected, then released back to the house.
+288: </sc-if>
+294: DATE &amp; TIME
+296: <div sc-camel-on-click="{{ openDT }}" style-hover="border-color:#0E7C86; background:#F1F6F6">
+301: {{ dtLabel }}
+302: {{ dtSub }}
+304: ✓
+308: <div sc-camel-on-click="{{ openSeats }}" style-hover="border-color:#0E7C86; background:#F1F6F6">
+313: {{ seatsRowLabel }}
+314: Interactive seat map
+318: <sc-if value="{{ seatsLockedNote }}" hint-placeholder-val="{{ false }}">
+321: {{ seatsLockedNote }}
+323: </sc-if>
+326: </sc-if>
+328: <sc-if value="{{ evStepDetail }}" hint-placeholder-val="{{ false }}">
+331: EVENT DATE
+333: <sc-for list="{{ evDates }}" as="d" hint-placeholder-count="7">
+334: <div sc-camel-on-click="{{ d.press }}">
+335: {{ d.dow }}
+336: {{ d.day }}
+337: {{ d.mon }}
+338: {{ d.note }}
+340: </sc-for>
+345: SHOW TIME
+347: <sc-for list="{{ evTimes }}" as="t" hint-placeholder-count="2">
+348: <div sc-camel-on-click="{{ t.press }}">{{ t.label }}
+349: </sc-for>
+354: RUNNING ORDER
+356: <sc-for list="{{ evLineup }}" as="l" hint-placeholder-count="3">
+359: {{ l.t }}
+361: {{ l.d }}
+363: </sc-for>
+369: SELECTED
+370: {{ evSummary }}
+372: <div sc-camel-on-click="{{ evOpenZone }}" style-hover="background:#0A5C64">
+373: Choose zone
+377: </sc-if>
+379: <sc-if value="{{ evStepZone }}" hint-placeholder-val="{{ false }}">
+381: <div sc-camel-on-click="{{ evBackDetail }}" style-hover="background:#F4F5F7">
+383: Back
+387: {{ evDateLabel }}
+388: · {{ evVenue }}
+392: {{ evStageLabel }}
+394: <sc-for list="{{ evZones }}" as="z" hint-placeholder-count="5">
+395: <div sc-camel-on-click="{{ z.press }}" style-hover="transform:translateY(-1px)">
+396: {{ z.name }}
+397: {{ z.price }}
+399: </sc-for>
+404: <sc-for list="{{ evZones }}" as="z" hint-placeholder-count="5">
+405: <div sc-camel-on-click="{{ z.press }}">
+408: {{ z.name }}
+409: {{ z.sub }}
+411: {{ z.leftLabel }}
+412: {{ z.price }}
+415: </sc-for>
+418: </sc-if>
+420: <sc-if value="{{ evStepQty }}" hint-placeholder-val="{{ false }}">
+422: <div sc-camel-on-click="{{ evBackZone }}" style-hover="background:#F4F5F7">
+424: Zones
+430: {{ evZoneName }}
+431: {{ evZoneSub }}
+433: {{ evSummary }}
+436: ADMISSIONS
+438: <sc-for list="{{ evTiers }}" as="t" hint-placeholder-count="4">
+441: {{ t.label }}
+442: {{ t.sub }}
+444: {{ t.unit }}
+446: <div sc-camel-on-click="{{ t.minus }}" style-hover="background:#EDEFF1">−
+447: {{ t.qty }}
+448: <div sc-camel-on-click="{{ t.plus }}" style-hover="background:#D3E9EA">+
+451: </sc-for>
+454: <div sc-camel-on-click="{{ evToggleTogether }}">
+456: Keep the party together
+457: Off assigns best available anywhere in the zone.
+466: {{ evPax }}
+467: {{ evTotal }}
+469: <div sc-camel-on-click="{{ evAdd }}">
+471: Add to sale
+474: </sc-if>
+476: <sc-if value="{{ stepDT }}" hint-placeholder-val="{{ false }}">
+478: <div sc-camel-on-click="{{ backToDetail }}" style-hover="background:#F4F5F7">
+480: Back
+483: <div sc-camel-on-click="{{ calPrev }}" style-hover="background:#F4F5F7">
+486: {{ calTitle }}
+487: <div sc-camel-on-click="{{ calNext }}" style-hover="background:#F4F5F7">
+492: SUN
+493: MON
+494: TUE
+495: WED
+496: THU
+497: FRI
+498: SAT
+499: <sc-for list="{{ dtCells }}" as="d" hint-placeholder-count="35">
+500: <div sc-camel-on-click="{{ d.press }}" style-hover="background:#F1F6F6">
+501: {{ d.label }}
+504: </sc-for>
+507: Available
+508: Low stock
+509: Full
+515: AVAILABLE TIMES
+517: {{ dtHeadDate }}
+520: <sc-for list="{{ dtTimes }}" as="tm" hint-placeholder-count="5">
+521: <div sc-camel-on-click="{{ tm.press }}">
+522: {{ tm.label }}
+526: {{ tm.note }}
+528: </sc-for>
+533: SELECTED
+534: {{ dtConfirmNote }}
+536: <div sc-camel-on-click="{{ dtConfirm }}">
+538: Confirm
+542: </sc-if>
+544: <sc-if value="{{ stepSeats }}" hint-placeholder-val="{{ false }}">
+546: <div sc-camel-on-click="{{ backToDetail }}" style-hover="background:#F4F5F7">
+548: Back
+550: {{ dtLabel }}
+552: </sc-if>
+554: <sc-if value="{{ gridSeatMode }}" hint-placeholder-val="{{ false }}">
+556: {{ seatScreen }}
+558: <sc-for list="{{ seatRows }}" as="r" hint-placeholder-count="8">
+560: {{ r.name }}
+561: <sc-for list="{{ r.seats }}" as="st" hint-placeholder-count="12">
+562: <div sc-camel-on-click="{{ st.press }}" style-hover="transform:translateY(-2px)">{{ st.id }}
+563: </sc-for>
+565: </sc-for>
+568: <sc-for list="{{ seatLegend }}" as="lg" hint-placeholder-count="3">
+570: {{ lg.label }}
+572: </sc-for>
+573: Sold
+576: </sc-if>
+578: <sc-if value="{{ arenaSeatMode }}" hint-placeholder-val="{{ false }}">
+583: {{ seatScreen }}
+588: FANPIT
+589: General admission
+593: <sc-for list="{{ arenaSections }}" as="sec" hint-placeholder-count="26">
+594: <div sc-camel-on-click="{{ sec.press }}" style-hover="transform:translate(-50%,-50%) translateY(-2px)">{{ sec.id }}
+595: </sc-for>
+599: <sc-for list="{{ seatLegend }}" as="lg" hint-placeholder-count="3">
+601: {{ lg.label }}
+603: </sc-for>
+604: Sold
+607: </sc-if>
+609: <sc-if value="{{ variantMode }}" hint-placeholder-val="{{ false }}">
+611: GUESTS BY TICKET TYPE
+613: <sc-for list="{{ variantRows }}" as="v" hint-placeholder-count="4">
+616: {{ v.label }}
+617: {{ v.sub }}
+619: {{ v.price }}
+620: <div sc-camel-on-click="{{ v.minus }}" style-hover="background:#EDEFF1">−
+621: {{ v.qty }}
+622: <div sc-camel-on-click="{{ v.plus }}" style-hover="background:#E4F1F2">+
+624: </sc-for>
+626: GROUP &amp; FAMILY BUNDLES · ONE PRICE
+628: <sc-for list="{{ groupPresets }}" as="gp" hint-placeholder-count="4">
+629: <div sc-camel-on-click="{{ gp.pick }}">
+631: {{ gp.label }}
+632: {{ gp.price }}
+634: {{ gp.sub }}
+636: </sc-for>
+639: </sc-if>
+641: <sc-if value="{{ voucherMode }}" hint-placeholder-val="{{ false }}">
+643: VOUCHER FACE VALUE
+645: <sc-for list="{{ voucherChips }}" as="v" hint-placeholder-count="5">
+646: <div sc-camel-on-click="{{ v.pick }}">{{ v.label }}
+647: </sc-for>
+651: TICVAI GIFT VOUCHER
+652: VALID 12 MONTHS
+654: {{ voucherFace }}
+655: Redeemable at every outlet · code printed and emailed on payment
+657: Vouchers can also be taken as a tender at checkout — pick <strong>Voucher</strong> on the payment screen to redeem a code against the amount due.
+659: </sc-if>
+661: <sc-if value="{{ waitlistMode }}" hint-placeholder-val="{{ false }}">
+665: Capacity reached
+666: No tickets available — new guests join the waitlist and convert when a spot opens.
+669: {{ wlWaiting }}
+670: waiting
+673: ADD GUEST TO WAITLIST
+675: <input value="{{ wlName }}" sc-camel-on-change="{{ onWlName }}" placeholder="Guest name">
+677: <input value="{{ wlPhone }}" sc-camel-on-change="{{ onWlPhone }}" placeholder="Mobile number">
+679: <div sc-camel-on-click="{{ wlPartyMinus }}">−
+680: {{ wlParty }}
+681: <div sc-camel-on-click="{{ wlPartyPlus }}">+
+684: <div sc-camel-on-click="{{ wlAdd }}" style-hover="background:#22272C">Add to waitlist
+686: CURRENTLY WAITING
+688: <sc-for list="{{ wlRows }}" as="w" hint-placeholder-count="4">
+691: {{ w.name }}
+692: {{ w.meta }}
+694: {{ w.status }}
+695: <div sc-camel-on-click="{{ w.notify }}" style-hover="background:#EDEFF1">{{ w.notifyLabel }}
+696: <div sc-camel-on-click="{{ w.convert }}">Convert
+698: </sc-for>
+701: </sc-if>
+704: <sc-for list="{{ drawerGroups }}" as="g" hint-placeholder-count="3">
+707: {{ g.label }}
+708: {{ g.req }}
+711: <sc-for list="{{ g.options }}" as="o" hint-placeholder-count="4">
+712: <div sc-camel-on-click="{{ o.pick }}">{{ o.label }}
+713: </sc-for>
+716: </sc-for>
+719: <sc-if value="{{ showSeatFooter }}" hint-placeholder-val="{{ false }}">
+722: {{ seatCount }} seats selected
+723: {{ seatList }}
+725: {{ seatTotal }}
+727: </sc-if>
+728: <sc-if value="{{ variantMode }}" hint-placeholder-val="{{ false }}">
+730: {{ paxLine }}
+731: {{ variantTotal }}
+733: </sc-if>
+734: <sc-if value="{{ voucherMode }}" hint-placeholder-val="{{ false }}">
+737: Vouchers
+739: <div sc-camel-on-click="{{ qtyMinus }}" style-hover="background:#EDEFF1">−
+740: {{ drawerQty }}
+741: <div sc-camel-on-click="{{ qtyPlus }}" style-hover="background:#E4F1F2">+
+745: Line total
+746: {{ voucherLineTotal }}
+749: </sc-if>
+750: <sc-if value="{{ simpleMode }}" hint-placeholder-val="{{ true }}">
+753: Quantity
+755: <div sc-camel-on-click="{{ qtyMinus }}" style-hover="background:#EDEFF1">−
+756: {{ drawerQty }}
+757: <div sc-camel-on-click="{{ qtyPlus }}" style-hover="background:#E4F1F2">+
+761: Line total
+762: {{ drawerTotal }}
+765: </sc-if>
+766: <sc-if value="{{ showAddToSale }}" hint-placeholder-val="{{ true }}">
+767: <div sc-camel-on-click="{{ drawerAdd }}" style-hover="background:#0A5C64">Add to sale
+768: </sc-if>
+769: <sc-if value="{{ waitlistMode }}" hint-placeholder-val="{{ false }}">
+770: <div sc-camel-on-click="{{ closeDrawer }}" style-hover="background:#F4F5F7">Close
+771: </sc-if>
+775: </sc-if>
+778: <sc-if value="{{ onHome }}" hint-placeholder-val="{{ false }}">
+782: <sc-for list="{{ shiftKpis }}" as="k" hint-placeholder-count="4">
+783: <div style-hover="box-shadow:0 18px 32px -24px rgba(14,17,22,.45); transform:translateY(-2px); border-color:#D6DBE0">
+789: <sc-if value="{{ k.up }}" hint-placeholder-val="{{ true }}">
+791: {{ k.delta }}
+793: </sc-if>
+794: <sc-if value="{{ k.down }}" hint-placeholder-val="{{ false }}">
+796: {{ k.delta }}
+798: </sc-if>
+800: {{ k.value }}
+802: {{ k.label }}
+804: {{ k.sub }}
+805: <svg sc-camel-view-box="0 0 100 28" sc-camel-preserve-aspect-ratio="none" width="100%" height="24">
+806: <polyline points="{{ k.points }}" fill="none" stroke="#0E7C86" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="260"></polyline>
+807: </svg>
+809: </sc-for>
+813: HOT KEYS
+818: <sc-for list="{{ hotKeys }}" as="h" hint-placeholder-count="5">
+819: <div sc-camel-on-click="{{ h.press }}" style-hover="background:#FBFCFD; border-color:#C9CED4; box-shadow:0 10px 20px -16px rgba(14,17,22,.5)">
+820: {{ h.kbd }}
+822: {{ h.label }}
+824: </sc-for>
+831: <sc-for list="{{ launchers }}" as="l" hint-placeholder-count="6">
+832: <div sc-camel-on-click="{{ l.press }}" style-hover="box-shadow:0 20px 36px -24px rgba(14,17,22,.5); transform:translateY(-3px); border-color:#C9CED4">
+839: {{ l.label }}
+840: {{ l.sub }}
+842: {{ l.meta }}
+845: </sc-for>
+849: <sc-if value="{{ highlight.bg }}" hint-placeholder-val="{{ false }}"><img src="{{ highlight.bg }}" alt=""></sc-if>
+852: <sc-for list="{{ highlight.thumbs }}" as="t" hint-placeholder-count="3">
+853: <img src="{{ t }}" alt="" loading="lazy">
+854: </sc-for>
+858: TODAY AT THE DISTRICT
+860: {{ highlight.title }}
+861: {{ highlight.sub }}
+868: Recent transactions
+869: LIVE
+872: <sc-for list="{{ recent }}" as="r" hint-placeholder-count="6">
+873: <div sc-camel-on-click="{{ r.press }}" style-hover="background:#EAEDF0; transform:translateX(2px)">
+874: <img src="{{ r.photo }}" alt="" loading="lazy">
+876: {{ r.ref }}
+877: {{ r.meta }}
+880: {{ r.amount }}
+881: {{ r.method }}
+884: </sc-for>
+886: <div sc-camel-on-click="{{ openSales }}" style-hover="background:#1B2129; transform:translateY(-1px)">
+887: Open sales journal
+893: RFID sync healthy
+894: 312 wristbands paired today · 42 ms
+901: </sc-if>
+903: <sc-if value="{{ onGrid }}" hint-placeholder-val="{{ false }}">
+905: <sc-if value="{{ showFeature }}" hint-placeholder-val="{{ false }}">
+908: On now at Marina Bay
+909: Featured for upsell at the gate
+912: <sc-for list="{{ featured }}" as="f" hint-placeholder-count="3">
+913: <div sc-camel-on-click="{{ f.press }}" style-hover="box-shadow:0 18px 34px -22px rgba(14,17,22,.45); transform:translateY(-2px)">
+914: <img src="{{ f.src }}" alt="">
+916: {{ f.tag }}
+919: {{ f.title }}
+920: {{ f.meta }}
+922: {{ f.price }}
+925: </sc-for>
+928: </sc-if>
+930: <sc-for list="{{ cats }}" as="c" hint-placeholder-count="5">
+931: <div sc-camel-on-click="{{ c.pick }}">
+932: {{ c.label }}
+933: {{ c.count }}
+935: </sc-for>
+936: <div sc-camel-on-click="{{ scanItem }}" style-hover="background:#F4F5F7">
+938: Scan barcode / QR
+941: <sc-if value="{{ showFilters }}" hint-placeholder-val="{{ true }}">
+943: FILTER
+944: <sc-for list="{{ filterPills }}" as="fp" hint-placeholder-count="5">
+945: <div sc-camel-on-click="{{ fp.toggle }}">
+947: {{ fp.label }}
+949: </sc-for>
+950: <sc-if value="{{ hasFilters }}" hint-placeholder-val="{{ false }}">
+951: <div sc-camel-on-click="{{ clearFilters }}" style-hover="background:#EFF1F3; color:#0E1116">
+952: {{ filterNote }} · clear
+954: </sc-if>
+956: </sc-if>
+959: <sc-for list="{{ products }}" as="p" hint-placeholder-count="12">
+960: <div sc-camel-on-click="{{ p.press }}" style-hover="box-shadow:0 18px 34px -22px rgba(14,17,22,.45); transform:translateY(-2px); border-color:#C9CED4">
+962: <img src="{{ p.src }}" alt="">
+963: {{ p.code }}
+964: {{ p.badge }}
+965: <sc-if value="{{ p.hasSale }}" hint-placeholder-val="{{ false }}">
+966: {{ p.saleTag }}
+967: </sc-if>
+970: {{ p.name }}
+971: {{ p.meta }}
+974: {{ p.rating }}
+975: {{ p.reviews }}
+977: <sc-if value="{{ p.hasStockTag }}" hint-placeholder-val="{{ false }}">
+978: {{ p.stockTag }}
+979: </sc-if>
+982: {{ p.price }}
+983: <sc-if value="{{ p.hasSale }}" hint-placeholder-val="{{ false }}">
+984: {{ p.wasPrice }}
+985: </sc-if>
+993: </sc-for>
+997: </sc-if>
+999: <sc-if value="{{ onTables }}" hint-placeholder-val="{{ false }}">
+1003: <img src="9ac6ee4a-8381-46ef-8dd2-da826ac19b91" alt="">
+1006: Oasis Bistro · dinner service
+1007: 18 tables · terrace open · last seating 22:30
+1010: <div sc-camel-on-click="{{ setService }}">
+1012: Table service
+1014: <div sc-camel-on-click="{{ setBooking }}">
+1016: Reservations
+1021: <sc-if value="{{ onService }}" hint-placeholder-val="{{ true }}">
+1024: Vacant
+1025: Occupied
+1026: Bill requested
+1027: Reserved
+1028: Tap a table to open its check · reserved tables seat the booking
+1031: <sc-for list="{{ tables }}" as="t" hint-placeholder-count="12">
+1032: <div sc-camel-on-click="{{ t.press }}" style-hover="box-shadow:0 16px 30px -22px rgba(14,17,22,.4); transform:translateY(-2px)">
+1034: {{ t.name }}
+1037: {{ t.seats }}
+1038: {{ t.status }}
+1039: {{ t.meta }}
+1041: {{ t.cta }}
+1045: </sc-for>
+1048: </sc-if>
+1050: <sc-if value="{{ onBooking }}" hint-placeholder-val="{{ false }}">
+1054: New reservation
+1055: Seats only — no items are added to a sale. The check opens when the guest is seated.
+1057: DATE
+1058: <div sc-camel-on-click="{{ openResCal }}" style-hover="border-color:#0E7C86; background:#F1F6F6">
+1060: {{ resDateLabel }}
+1061: Change
+1064: SITTING TIME
+1066: <sc-for list="{{ resSlots }}" as="sl" hint-placeholder-count="10">
+1067: <div sc-camel-on-click="{{ sl.press }}">
+1068: {{ sl.label }}
+1069: {{ sl.meta }}
+1071: </sc-for>
+1076: PARTY SIZE
+1078: <div sc-camel-on-click="{{ partyMinus }}" style-hover="background:#EEF1F3">−
+1079: {{ resParty }}
+1080: <div sc-camel-on-click="{{ partyPlus }}" style-hover="background:#EEF1F3">+
+1084: TABLE HELD FOR
+1086: <sc-for list="{{ resDurs }}" as="d" hint-placeholder-count="3">
+1087: <div sc-camel-on-click="{{ d.press }}">{{ d.label }}
+1088: </sc-for>
+1093: TABLES THAT FIT
+1095: <sc-for list="{{ resTables }}" as="rt" hint-placeholder-count="5">
+1096: <div sc-camel-on-click="{{ rt.press }}">
+1097: {{ rt.name }}
+1098: {{ rt.seats }}
+1099: {{ rt.note }}
+1101: </sc-for>
+1104: GUEST
+1106: <input value="{{ resName }}" sc-camel-on-change="{{ onResName }}" placeholder="Guest or company name">
+1108: <input value="{{ resPhone }}" sc-camel-on-change="{{ onResPhone }}" placeholder="Mobile number">
+1109: <input value="{{ resNote }}" sc-camel-on-change="{{ onResNote }}" placeholder="Note — occasion, allergies, seating">
+1113: <div sc-camel-on-click="{{ toggleDep }}">
+1118: Take a holding deposit
+1119: AED 50 per cover · redeemed against the final bill
+1121: {{ depAmt }}
+1125: {{ resSummary }}
+1126: <div sc-camel-on-click="{{ confirmBooking }}" style-hover="background:#0B666F; transform:translateY(-1px)">
+1127: Confirm booking
+1135: Tonight's book
+1136: {{ resCount }} · {{ resCovers }}
+1139: <sc-for list="{{ resRows }}" as="r" hint-placeholder-count="4">
+1140: <div style-hover="border-color:#C9CED4">
+1142: {{ r.initials }}
+1144: {{ r.name }}
+1145: {{ r.meta }}
+1148: {{ r.slot }}
+1149: {{ r.status }}
+1152: <sc-if value="{{ r.hasNote }}" hint-placeholder-val="{{ false }}">
+1153: {{ r.note }}
+1154: </sc-if>
+1156: {{ r.dep }}
+1157: <sc-if value="{{ r.canSeat }}" hint-placeholder-val="{{ true }}">
+1158: <div sc-camel-on-click="{{ r.press }}" style-hover="background:#1B2129">Seat now
+1159: </sc-if>
+1162: </sc-for>
+1166: Held tables release 15 minutes after the sitting time unless the guest is seated.
+1171: </sc-if>
+1173: </sc-if>
+1175: <sc-if value="{{ onGuests }}" hint-placeholder-val="{{ false }}">
+1180: +971 50 …
+1181: Phone · name · email · membership no.
+1183: <div sc-camel-on-click="{{ scanBand }}" style-hover="background:#F4F5F7">Scan wristband
+1184: <div sc-camel-on-click="{{ enrol }}" style-hover="background:#F4F5F7">Enrol new guest
+1187: <sc-for list="{{ guests }}" as="g" hint-placeholder-count="3">
+1190: {{ g.initials }}
+1192: {{ g.name }}
+1193: {{ g.phone }}
+1195: {{ g.tier }}
+1199: POINTS
+1200: {{ g.points }}
+1203: WALLET
+1204: {{ g.wallet }}
+1207: VISITS
+1208: {{ g.visits }}
+1211: {{ g.benefit }}
+1213: <div sc-camel-on-click="{{ g.link }}">{{ g.btn }}
+1214: <div sc-camel-on-click="{{ g.topup }}" style-hover="background:#F4F5F7">
+1216: Top up
+1220: </sc-for>
+1223: </sc-if>
+1225: <sc-if value="{{ onReports }}" hint-placeholder-val="{{ false }}">
+1228: <sc-for list="{{ kpis }}" as="k" hint-placeholder-count="4">
+1229: <div style-hover="box-shadow:0 16px 32px -22px rgba(14,17,22,.4); transform:translateY(-2px)">
+1231: {{ k.label }}
+1232: {{ k.delta }}
+1234: {{ k.value }}
+1236: {{ k.sub }}
+1237: <svg sc-camel-view-box="0 0 108 34" width="108" height="30" fill="none">
+1238: <polyline points="{{ k.spark }}" stroke="{{ k.sparkColor }}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></polyline>
+1239: </svg>
+1242: </sc-for>
+1248: Revenue by hour
+1249: Trading day 10:00 – 23:00 · AED thousands
+1252: <sc-for list="{{ tabs }}" as="t" hint-placeholder-count="4">
+1253: <div sc-camel-on-click="{{ t.pick }}">{{ t.label }}
+1254: </sc-for>
+1258: Ticketing &amp; attractions
+1259: Food &amp; beverage
+1260: Retail
+1262: <svg sc-camel-view-box="0 0 560 268" sc-camel-preserve-aspect-ratio="none">
+1263: <g stroke="#EEF0F2" stroke-width="1">
+1264: <line x1="0" y1="232" x2="560" y2="232"></line><line x1="0" y1="174" x2="560" y2="174"></line><line x1="0" y1="116" x2="560" y2="116"></line><line x1="0" y1="58" x2="560" y2="58"></line>
+1265: </g>
+1266: <g font-family="Inter" font-size="9" fill="#A6AEB6"><text x="0" y="54">180</text><text x="0" y="112">120</text><text x="0" y="170">60</text></g>
+1267: <g>
+1268: <g fill="#0E7C86" opacity="{{ opTickets }}">
+1269: <rect x="30" y="184" width="22" height="48" rx="4"></rect><rect x="68" y="170" width="22" height="62" rx="4"></rect><rect x="106" y="152" width="22" height="80" rx="4"></rect><rect x="144" y="144" width="22" height="88" 
+1270: </g>
+1271: <g fill="#6BC2C0" opacity="{{ opFnb }}">
+1272: <rect x="30" y="166" width="22" height="17" rx="3"></rect><rect x="68" y="144" width="22" height="25" rx="3"></rect><rect x="106" y="108" width="22" height="43" rx="3"></rect><rect x="144" y="82" width="22" height="61" r
+1273: </g>
+1274: <g fill="#CFE3E4" opacity="{{ opRetail }}">
+1275: <rect x="30" y="156" width="22" height="9" rx="3"></rect><rect x="68" y="132" width="22" height="11" rx="3"></rect><rect x="106" y="92" width="22" height="15" rx="3"></rect><rect x="144" y="62" width="22" height="19" rx=
+1276: </g>
+1277: </g>
+1278: <g font-family="Inter" font-size="9.5" fill="#8A939C" text-anchor="middle">
+1279: <text x="41" y="250">10</text><text x="79" y="250">11</text><text x="117" y="250">12</text><text x="155" y="250">13</text><text x="193" y="250">14</text><text x="231" y="250">15</text><text x="269" y="250">16</text><text
+1280: </g>
+1281: </svg>
+1286: Terminal health
+1287: 62 / 64 online
+1290: <sc-for list="{{ terminals }}" as="t" hint-placeholder-count="3">
+1291: <div style-hover="background:rgba(255,255,255,.09)">
+1294: {{ t.id }}
+1295: {{ t.where }}
+1297: {{ t.status }}
+1299: </sc-for>
+1303: Attraction utilisation
+1305: <sc-for list="{{ utilisation }}" as="u" hint-placeholder-count="4">
+1308: {{ u.name }}
+1309: {{ u.meta }}
+1315: </sc-for>
+1323: Outlet performance
+1324: All 11 outlets
+1326: <sc-raw-table>
+1327: <sc-raw-thead>
+1328: <sc-raw-tr>
+1329: <sc-raw-th>OUTLET</sc-raw-th>
+1330: <sc-raw-th>SALES (AED)</sc-raw-th>
+1331: <sc-raw-th>TXNS</sc-raw-th>
+1332: <sc-raw-th>AVG</sc-raw-th>
+1333: <sc-raw-th>STATUS</sc-raw-th>
+1334: </sc-raw-tr>
+1335: </sc-raw-thead>
+1336: <sc-raw-tbody>
+1337: <sc-for list="{{ outlets }}" as="o" hint-placeholder-count="5">
+1338: <sc-raw-tr style-hover="background:#FAFBFB">
+1339: <sc-raw-td>
+1341: {{ o.code }}
+1343: {{ o.name }}
+1344: {{ o.type }}
+1347: </sc-raw-td>
+1348: <sc-raw-td>{{ o.sales }}</sc-raw-td>
+1349: <sc-raw-td>{{ o.txns }}</sc-raw-td>
+1350: <sc-raw-td>{{ o.avg }}</sc-raw-td>
+1351: <sc-raw-td>
+1352: {{ o.status }}
+1353: </sc-raw-td>
+1354: </sc-raw-tr>
+1355: </sc-for>
+1356: </sc-raw-tbody>
+1357: </sc-raw-table>
+1361: Needs attention
+1362: 3 open
+1365: <sc-for list="{{ alerts }}" as="a" hint-placeholder-count="3">
+1366: <div style-hover="transform:translateX(2px)">
+1371: {{ a.title }}
+1372: {{ a.body }}
+1374: {{ a.action }}
+1376: </sc-for>
+1381: </sc-if>
+1383: <sc-if value="{{ onCloseout }}" hint-placeholder-val="{{ false }}">
+1386: {{ closeStepLabel }}
+1387: {{ varWord }} · {{ varAmount }}
+1390: <sc-if value="{{ closeCount }}" hint-placeholder-val="{{ true }}">
+1393: Count the drawer
+1394: Enter a quantity per denomination — the counted total updates live.
+1396: <sc-for list="{{ closeRows }}" as="d" hint-placeholder-count="11">
+1398: {{ d.label }}
+1399: <div sc-camel-on-click="{{ d.minus }}" style-hover="background:#EDEFF1">−
+1400: {{ d.qty }}
+1401: <div sc-camel-on-click="{{ d.plus }}" style-hover="background:#E4F1F2">+
+1402: {{ d.total }}
+1404: </sc-for>
+1412: COUNTED
+1413: {{ countedTotal }}
+1416: EXPECTED
+1417: {{ expectedTotal }}
+1420: Expected = opening float AED 1,000.00 plus every cash transaction logged this shift.
+1423: Expected by tender
+1424: <sc-raw-table>
+1425: <sc-raw-tbody>
+1426: <sc-for list="{{ zRows }}" as="z" hint-placeholder-count="6">
+1427: <sc-raw-tr>
+1428: <sc-raw-td>{{ z.label }}</sc-raw-td>
+1429: <sc-raw-td>{{ z.txns }}</sc-raw-td>
+1430: <sc-raw-td>{{ z.amount }}</sc-raw-td>
+1431: </sc-raw-tr>
+1432: </sc-for>
+1433: </sc-raw-tbody>
+1434: </sc-raw-table>
+1436: {{ varNote }}
+1438: <div sc-camel-on-click="{{ countNext }}">{{ countNextLabel }}
+1441: </sc-if>
+1443: <sc-if value="{{ closeVariance }}" hint-placeholder-val="{{ false }}">
+1447: DRAWER {{ varWord }}
+1448: {{ varAmount }}
+1449: Counted {{ countedTotal }} against expected {{ expectedTotal }}
+1451: REASON CODE · REQUIRED
+1453: <sc-for list="{{ closeReasons }}" as="r" hint-placeholder-count="4">
+1454: <div sc-camel-on-click="{{ r.pick }}">{{ r.label }}
+1455: </sc-for>
+1457: CASHIER COMMENT
+1458: <textarea value="{{ closeNote }}" sc-camel-on-change="{{ onCloseNote }}"></textarea>
+1460: <div sc-camel-on-click="{{ backToCount }}" style-hover="background:#F4F5F7">Recount
+1461: <div sc-camel-on-click="{{ sendApproval }}" style-hover="background:#22272C">Send for supervisor approval
+1465: Shift transaction log
+1466: Shown to the supervisor beside the count.
+1468: <sc-for list="{{ recent }}" as="r" hint-placeholder-count="5">
+1471: {{ r.ref }}
+1472: {{ r.meta }}
+1475: {{ r.amount }}
+1476: {{ r.method }}
+1479: </sc-for>
+1483: </sc-if>
+1485: <sc-if value="{{ closeSummary }}" hint-placeholder-val="{{ false }}">
+1488: Shift summary · 09:42 – 17:58
+1489: {{ opName }} · POS-014 · 132 transactions
+1490: SALES BY CATEGORY
+1491: <sc-raw-table>
+1492: <sc-raw-tbody>
+1493: <sc-for list="{{ closeSummaryRows }}" as="r" hint-placeholder-count="5">
+1494: <sc-raw-tr>
+1495: <sc-raw-td>{{ r.label }}</sc-raw-td>
+1496: <sc-raw-td>{{ r.b }}</sc-raw-td>
+1497: <sc-raw-td>{{ r.a }}</sc-raw-td>
+1498: </sc-raw-tr>
+1499: </sc-for>
+1500: </sc-raw-tbody>
+1501: </sc-raw-table>
+1502: TENDER BREAKDOWN
+1503: <sc-raw-table>
+1504: <sc-raw-tbody>
+1505: <sc-for list="{{ zRows }}" as="z" hint-placeholder-count="6">
+1506: <sc-raw-tr>
+1507: <sc-raw-td>{{ z.label }}</sc-raw-td>
+1508: <sc-raw-td>{{ z.txns }}</sc-raw-td>
+1509: <sc-raw-td>{{ z.amount }}</sc-raw-td>
+1510: </sc-raw-tr>
+1511: </sc-for>
+1512: </sc-raw-tbody>
+1513: </sc-raw-table>
+1517: VARIANCE OUTCOME
+1518: {{ varAmount }} · {{ varOutcome }}
+1519: {{ closeVarianceLine }}
+1522: Approval record
+1524: Counted by{{ opName }}
+1525: Supervisor{{ supName }}
+1526: Timestamp{{ supAt }}
+1530: Handover checklist
+1532: <sc-for list="{{ checklist }}" as="c" hint-placeholder-count="4">
+1534: {{ c.mark }}
+1535: {{ c.label }}
+1537: </sc-for>
+1541: <div sc-camel-on-click="{{ printZ }}" style-hover="background:#F4F5F7">Print Z-report
+1542: <div sc-camel-on-click="{{ emailZ }}" style-hover="background:#F4F5F7">Email finance
+1544: <div sc-camel-on-click="{{ lockShift }}" style-hover="background:#22272C">Sign, close &amp; lock shift
+1547: </sc-if>
+1549: </sc-if>
+1551: <sc-if value="{{ onQueue }}" hint-placeholder-val="{{ false }}">
+1554: <sc-for list="{{ queueCounts }}" as="q" hint-placeholder-count="5">
+1557: {{ q.label }}
+1558: {{ q.n }}
+1560: </sc-for>
+1563: <sc-for list="{{ queueOrders }}" as="o" hint-placeholder-count="6">
+1566: {{ o.ref }}
+1567: {{ o.type }}
+1568: {{ o.stage }}
+1570: {{ o.who }}
+1571: {{ o.items }}
+1572: {{ o.pay }}
+1574: {{ o.eta }}
+1575: <div sc-camel-on-click="{{ o.cancel }}" style-hover="background:#FBECEC">Cancel
+1576: <div sc-camel-on-click="{{ o.press }}" style-hover="background:#0A5C64">{{ o.action }}
+1579: </sc-for>
+1582: </sc-if>
+1584: <sc-if value="{{ onRefunds }}" hint-placeholder-val="{{ false }}">
+1587: Find the original sale
+1590: <input value="{{ rfQuery }}" sc-camel-on-change="{{ onRfQuery }}" placeholder="Receipt no · card last-4 · date · shift">
+1593: <sc-for list="{{ refundTxns }}" as="x" hint-placeholder-count="5">
+1594: <div sc-camel-on-click="{{ x.press }}">
+1596: {{ x.ref }}
+1597: {{ x.meta }}
+1598: {{ x.mode }}
+1601: {{ x.amount }}
+1602: {{ x.done }}
+1605: </sc-for>
+1608: AUDIT TRAIL
+1610: <sc-for list="{{ auditRows }}" as="a" hint-placeholder-count="0">
+1612: {{ a.line }}
+1613: {{ a.detail }}
+1615: </sc-for>
+1616: <sc-if value="{{ auditEmpty }}" hint-placeholder-val="{{ true }}">
+1617: No voids or refunds on this shift yet.
+1618: </sc-if>
+1623: <sc-if value="{{ refundPicked }}" hint-placeholder-val="{{ true }}">
+1627: {{ refundRef }}
+1628: {{ refundMeta }}
+1630: {{ rfMode }}
+1633: <sc-for list="{{ rfScopes }}" as="sc" hint-placeholder-count="2">
+1634: <div sc-camel-on-click="{{ sc.pick }}">{{ sc.label }}
+1635: </sc-for>
+1637: <sc-if value="{{ scopeIsSale }}" hint-placeholder-val="{{ false }}">
+1638: Whole sale selected — every line on this receipt will be reversed.
+1639: </sc-if>
+1641: <sc-for list="{{ refundLines }}" as="l" hint-placeholder-count="2">
+1642: <div sc-camel-on-click="{{ l.toggle }}">
+1643: {{ l.mark }}
+1645: {{ l.name }}
+1646: {{ l.qty }}
+1648: {{ l.total }}
+1650: </sc-for>
+1654: REFUND METHOD
+1656: <sc-for list="{{ rfMethods }}" as="m" hint-placeholder-count="3">
+1657: <div sc-camel-on-click="{{ m.pick }}">{{ m.label }}
+1658: </sc-for>
+1662: REASON CODE
+1664: <sc-for list="{{ refundReasons }}" as="r" hint-placeholder-count="5">
+1665: <div sc-camel-on-click="{{ r.pick }}">{{ r.label }}
+1666: </sc-for>
+1672: ORIGINAL{{ rfOriginalAmt }}
+1673: ORIGINAL VAT{{ rfOriginalVat }}
+1674: REFUND{{ rfRefundAmt }}
+1675: REFUND VAT{{ rfRefundVat }}
+1679: Refund amount · editable for a partial
+1680: {{ rfGate }}
+1683: <div sc-camel-on-click="{{ rfMinus }}" style-hover="background:#EDEFF1">−
+1684: {{ rfAmount }}
+1685: <div sc-camel-on-click="{{ rfPlus }}" style-hover="background:#E4F1F2">+
+1686: <div sc-camel-on-click="{{ rfFull }}" style-hover="background:#EDEFF1">{{ rfFullLabel }}
+1690: <sc-if value="{{ canVoid }}" hint-placeholder-val="{{ true }}">
+1691: <div sc-camel-on-click="{{ doVoid }}" style-hover="background:#FBECEC">Void · no funds move
+1692: </sc-if>
+1693: <sc-if value="{{ canReverse }}" hint-placeholder-val="{{ false }}">
+1694: <div sc-camel-on-click="{{ startReversal }}" style-hover="background:var(--paper)">
+1696: Reverse payment
+1698: </sc-if>
+1699: <div sc-camel-on-click="{{ doRefund }}">{{ refundBtnLabel }}
+1703: </sc-if>
+1706: </sc-if>
+1708: <sc-if value="{{ onSetup }}" hint-placeholder-val="{{ false }}">
+1712: Terminal behaviour
+1714: <sc-for list="{{ setupToggles }}" as="t" hint-placeholder-count="6">
+1715: <div sc-camel-on-click="{{ t.press }}" style-hover="background:#EDEFF1">
+1717: {{ t.label }}
+1718: {{ t.sub }}
+1724: </sc-for>
+1729: Peripherals
+1731: <sc-for list="{{ setupDevices }}" as="d" hint-placeholder-count="5">
+1735: {{ d.name }}
+1736: {{ d.meta }}
+1738: {{ d.status }}
+1739: <div sc-camel-on-click="{{ d.press }}" style-hover="background:#EDEFF1">{{ d.action }}
+1741: </sc-for>
+1745: Deployment
+1748: TERMINAL
+1749: {{ deployTerminal }}
+1752: BUILD
+1753: TICVAI OS 4.2.1 · b7f31c
+1756: SYNC
+1757: 42 ms · 0 queued
+1760: COMPLIANCE
+1761: PCI-DSS 4.0 · FTA e-invoice
+1771: Access &amp; roles
+1772: Permissions come from platform configuration, not this screen — Role → Permissions → User → Terminal → Outlet → Venue.
+1775: {{ meName }}
+1776: {{ meRole }} · {{ mePermCount }} permissions
+1781: <sc-for list="{{ tenantChain }}" as="tc" hint-placeholder-count="6">
+1782: <strong>{{ tc.label }}</strong> {{ tc.value }}
+1783: </sc-for>
+1787: <sc-for list="{{ accessRoles }}" as="r" hint-placeholder-count="6">
+1789: <div sc-camel-on-click="{{ r.toggle }}" style-hover="background:#EDEFF1">
+1791: {{ r.label }}{{ r.youTag }}
+1792: {{ r.count }} permissions
+1796: <sc-if value="{{ r.open }}" hint-placeholder-val="{{ false }}">
+1798: <sc-for list="{{ r.perms }}" as="p" hint-placeholder-count="4">
+1799: {{ p }}
+1800: </sc-for>
+1802: </sc-if>
+1804: </sc-for>
+1808: </sc-if>
+1810: <sc-if value="{{ onSync }}" hint-placeholder-val="{{ false }}">
+1814: CONNECTION
+1817: {{ syncConnLabel }}
+1819: <div sc-camel-on-click="{{ toggleNetBtn }}">{{ toggleNetLabel }}
+1822: LAST SUCCESSFUL SYNC
+1823: {{ lastSyncLabel }}
+1826: PENDING TRANSACTIONS
+1827: {{ syncPendingCount }}
+1830: FAILED / NEEDS ATTENTION
+1831: {{ syncFailedCount }}
+1836: <div sc-camel-on-click="{{ syncNowBtn }}" style-hover="background:#0A5C64">
+1838: {{ syncNowLabel }}
+1840: <div sc-camel-on-click="{{ viewPending }}" style-hover="background:#F4F5F7">View pending
+1841: <div sc-camel-on-click="{{ viewFailed }}" style-hover="background:#F4F5F7">View failed
+1842: <div sc-camel-on-click="{{ retryFailedBtn }}" style-hover="background:#F4F5F7">Retry failed
+1843: <div sc-camel-on-click="{{ openLedger }}" style-hover="background:#F4F5F7">Inventory ledger
+1845: <sc-for list="{{ syncFilters }}" as="f" hint-placeholder-count="3">
+1846: <div sc-camel-on-click="{{ f.pick }}">{{ f.label }}
+1847: </sc-for>
+1852: Local transaction queue · POS-014
+1854: <sc-for list="{{ syncRows }}" as="r" hint-placeholder-count="6">
+1857: {{ r.id }}
+1858: {{ r.type }} · {{ r.method }} · {{ r.created }}
+1860: {{ r.amount }}
+1861: {{ r.statusLabel }}
+1862: {{ r.error }}
+1863: {{ r.retries }}
+1864: <sc-if value="{{ r.resolvable }}" hint-placeholder-val="{{ false }}">
+1865: <div sc-camel-on-click="{{ r.resolve }}">Resolve
+1866: </sc-if>
+1868: </sc-for>
+1869: <sc-if value="{{ syncEmpty }}" hint-placeholder-val="{{ false }}">
+1870: Nothing queued.
+1871: </sc-if>
+1875: </sc-if>
+1877: <sc-if value="{{ conflictOpen }}" hint-placeholder-val="{{ false }}">
+1879: <div sc-camel-on-click="{{ closeConflict }}">
+1881: SYNC CONFLICT · SUPERVISOR RESOLUTION
+1882: {{ conflictId }} · {{ conflictAmount }}
+1883: {{ conflictDetail }}
+1884: Stock was never silently overwritten — this sale stayed queued as CONFLICT until a supervisor chose how to resolve it. Keep it and correct stock, or void it and release the item back to inventory.
+1886: <div sc-camel-on-click="{{ resolveVoid }}" style-hover="background:#FBECEC">Void this sale
+1887: <div sc-camel-on-click="{{ resolveKeep }}">Keep this sale · fix stock
+1891: </sc-if>
+1893: <sc-if value="{{ ledgerOpenState }}" hint-placeholder-val="{{ false }}">
+1895: <div sc-camel-on-click="{{ closeLedger }}">
+1899: OPERATIONAL INVENTORY
+1900: Inventory ledger
+1901: Every stock movement from this POS — full inventory administration stays in TICVAI Back Office.
+1903: <div sc-camel-on-click="{{ closeLedger }}" style-hover="background:#EDEFF1">
+1908: <sc-for list="{{ ledgerRows }}" as="lg" hint-placeholder-count="6">
+1911: {{ lg.product }}
+1912: {{ lg.qtyLabel }}
+1914: {{ lg.sku }} · {{ lg.type }} · {{ lg.stockLine }}
+1915: {{ lg.txnId }} · {{ lg.venue }} / {{ lg.outlet }} / {{ lg.terminal }} · {{ lg.operator }} · {{ lg.source }} · {{ lg.at }}
+1917: </sc-for>
+1921: </sc-if>
+1926: <sc-if value="{{ showCart }}" hint-placeholder-val="{{ false }}">
+1930: <sc-for list="{{ saleTabs }}" as="t" hint-placeholder-count="1">
+1931: <div sc-camel-on-click="{{ t.pick }}">
+1932: {{ t.label }}
+1933: {{ t.count }}
+1934: <sc-if value="{{ t.closable }}" hint-placeholder-val="{{ false }}">
+1935: <span sc-camel-on-click="{{ t.close }}" style-hover="opacity:1; background:rgba(0,0,0,.08)">✕
+1936: </sc-if>
+1938: </sc-for>
+1940: <div sc-camel-on-click="{{ addSaleTab }}" style-hover="background:#F4F5F7; color:#0E7C86">
+1947: {{ cartTitle }}
+1948: {{ cartMeta }}
+1951: <div sc-camel-on-click="{{ openHistory }}" style-hover="background:#F4F5F7; color:#0E7C86">
+1953: History
+1955: <div sc-camel-on-click="{{ clearCart }}" style-hover="background:#F4F5F7">Clear
+1958: <sc-if value="{{ holdShow }}" hint-placeholder-val="{{ false }}">
+1960: <div sc-camel-on-animation-iteration="{{ holdBeat }}">
+1963: {{ holdLabel }}
+1964: {{ holdClock }}
+1965: <div sc-camel-on-click="{{ holdExtend }}" style-hover="background:#fff">{{ holdNote }}
+1971: </sc-if>
+1972: <sc-if value="{{ showOrderType }}" hint-placeholder-val="{{ false }}">
+1974: <sc-for list="{{ orderTypes }}" as="ot" hint-placeholder-count="3">
+1975: <div sc-camel-on-click="{{ ot.pick }}">{{ ot.label }}
+1976: </sc-for>
+1978: <sc-if value="{{ isTakeaway }}" hint-placeholder-val="{{ false }}">
+1980: PICKUP DETAILS
+1981: <input value="{{ tkName }}" sc-camel-on-change="{{ onTkName }}" placeholder="Guest name">
+1983: <input value="{{ tkPhone }}" sc-camel-on-change="{{ onTkPhone }}" placeholder="Mobile">
+1984: <input value="{{ tkTime }}" sc-camel-on-change="{{ onTkTime }}" placeholder="Pickup">
+1987: </sc-if>
+1988: <sc-if value="{{ isDelivery }}" hint-placeholder-val="{{ false }}">
+1990: FULFILMENT SOURCE
+1992: <sc-for list="{{ delSources }}" as="ds" hint-placeholder-count="2">
+1993: <div sc-camel-on-click="{{ ds.pick }}">{{ ds.label }}
+1994: </sc-for>
+1996: <sc-if value="{{ isOwnDel }}" hint-placeholder-val="{{ false }}">
+1998: <input value="{{ delAddr }}" sc-camel-on-change="{{ onDelAddr }}" placeholder="Delivery address">
+2000: <sc-for list="{{ drivers }}" as="dv" hint-placeholder-count="4">
+2001: <div sc-camel-on-click="{{ dv.pick }}">{{ dv.label }}
+2002: </sc-for>
+2004: {{ delFeeLine }}
+2006: </sc-if>
+2007: <sc-if value="{{ isPartnerDel }}" hint-placeholder-val="{{ false }}">
+2010: <sc-for list="{{ partners }}" as="pt" hint-placeholder-count="5">
+2011: <div sc-camel-on-click="{{ pt.pick }}">{{ pt.label }}
+2012: </sc-for>
+2014: <input value="{{ delRef }}" sc-camel-on-change="{{ onDelRef }}" placeholder="Partner order reference">
+2015: Prepaid via partner — tender step skipped
+2017: </sc-if>
+2019: </sc-if>
+2020: </sc-if>
+2021: <sc-if value="{{ guestLinked }}" hint-placeholder-val="{{ false }}">
+2023: {{ guestInitials }}
+2025: {{ guestName }}
+2026: {{ guestBenefit }}
+2029: </sc-if>
+2033: <sc-if value="{{ cartEmpty }}" hint-placeholder-val="{{ true }}">
+2038: No items yet
+2039: Tap a product, scan a barcode, or recall a held sale to begin.
+2041: </sc-if>
+2042: <sc-for list="{{ cart }}" as="l" hint-placeholder-count="0">
+2046: {{ l.name }}
+2047: {{ l.meta }}
+2049: <sc-for list="{{ l.tags }}" as="tg" hint-placeholder-count="0">
+2050: {{ tg.label }}
+2051: </sc-for>
+2053: <sc-if value="{{ l.editable }}" hint-placeholder-val="{{ false }}">
+2054: <div sc-camel-on-click="{{ l.edit }}">
+2056: {{ l.editLabel }}
+2058: </sc-if>
+2060: {{ l.total }}
+2063: <div sc-camel-on-click="{{ l.minus }}" style-hover="background:#EDEFF1">−
+2064: {{ l.qty }}
+2065: <div sc-camel-on-click="{{ l.plus }}" style-hover="background:#E4F1F2">+
+2066: {{ l.unit }} ea
+2067: <div sc-camel-on-click="{{ l.remove }}" style-hover="background:#FBECEC">
+2072: </sc-for>
+2077: <sc-for list="{{ totals }}" as="t" hint-placeholder-count="3">
+2079: {{ t.label }}{{ t.value }}
+2081: </sc-for>
+2083: <sc-if value="{{ hasDiscount }}" hint-placeholder-val="{{ false }}">
+2086: {{ discountLine }}
+2087: {{ discountReason }}
+2088: {{ strikeSub }} → {{ newSub }}
+2090: {{ discountAmt }}
+2091: <div sc-camel-on-click="{{ removeDiscount }}" style-hover="background:#D6EFDF">
+2095: </sc-if>
+2097: Total
+2098: {{ grandTotal }}
+2101: <div sc-camel-on-click="{{ goGuests }}" style-hover="background:#F4F5F7">{{ guestBtn }}
+2102: <div sc-camel-on-click="{{ holdSale }}" style-hover="background:#F4F5F7">Hold sale
+2103: <div sc-camel-on-click="{{ openDiscount }}" style-hover="background:#F4F5F7">Discount
+2105: <div sc-camel-on-click="{{ goCheckout }}" style-hover="background:#0A5C64">
+2106: Charge
+2107: {{ grandTotal }}
+2111: </sc-if>
+2115: </sc-if>
+2117: <sc-if value="{{ onCheckout }}" hint-placeholder-val="{{ false }}">
+2121: <div sc-camel-on-click="{{ backToSale }}" style-hover="color:#F2F4F6">
+2123: Back to sale
+2125: {{ orderRef }}
+2127: Payment
+2128: {{ cartMeta }} · {{ opName }} · POS-014
+2131: <sc-for list="{{ cart }}" as="l" hint-placeholder-count="3">
+2133: {{ l.qty }}
+2135: {{ l.name }}
+2136: {{ l.meta }}
+2138: {{ l.total }}
+2140: </sc-for>
+2144: <sc-for list="{{ totals }}" as="t" hint-placeholder-count="4">
+2146: {{ t.label }}{{ t.value }}
+2148: </sc-for>
+2149: <div sc-camel-on-click="{{ toggleTaxDetails }}">
+2150: {{ taxDetailsCaret }}Tax details
+2152: <sc-if value="{{ taxDetailsOpen }}" hint-placeholder-val="{{ false }}">
+2154: {{ trnLine }} · configurable rates, never hardcoded per screen
+2155: <sc-for list="{{ taxBreakdown }}" as="b" hint-placeholder-count="2">
+2157: {{ b.label }} · on AED {{ b.taxable }}AED {{ b.vat }}
+2159: </sc-for>
+2161: </sc-if>
+2163: Amount due
+2164: {{ grandTotal }}
+2171: Select payment method
+2173: Terminal ready
+2176: <sc-if value="{{ printerDown }}" hint-placeholder-val="{{ false }}">
+2180: Receipt printer offline
+2181: Gate A thermal stopped responding 9 minutes ago. The sale can still complete.
+2183: <div sc-camel-on-click="{{ fallbackPrinter }}">Email receipt instead
+2185: </sc-if>
+2187: <sc-if value="{{ paySelecting }}" hint-placeholder-val="{{ true }}">
+2190: <sc-for list="{{ tenders }}" as="m" hint-placeholder-count="11">
+2191: <div sc-camel-on-click="{{ m.pick }}">
+2193: {{ m.label }}
+2195: </sc-for>
+2198: <sc-if value="{{ isCompTender }}" hint-placeholder-val="{{ false }}">
+2200: REASON · REQUIRED FOR COMPLIMENTARY
+2202: <sc-for list="{{ compReasons }}" as="cr" hint-placeholder-count="4">
+2203: <div sc-camel-on-click="{{ cr.pick }}">{{ cr.label }}
+2204: </sc-for>
+2207: </sc-if>
+2209: <sc-if value="{{ singleMode }}" hint-placeholder-val="{{ true }}">
+2213: {{ tenderLabel }}
+2214: {{ tenderedText }}
+2215: Keys fill from the left — 5 · 4 · . · 3 · 0 gives 54.30
+2218: CHANGE DUE
+2219: {{ changeText }}
+2223: <sc-for list="{{ quickCash }}" as="q" hint-placeholder-count="4">
+2224: <div sc-camel-on-click="{{ q.press }}" style-hover="background:rgba(255,255,255,.13)">{{ q.label }}
+2225: </sc-for>
+2228: <sc-for list="{{ payKeys }}" as="k" hint-placeholder-count="12">
+2229: <div sc-camel-on-click="{{ k.press }}" style-hover="background:rgba(255,255,255,.13)" style-active="transform:translateY(2px)">{{ k.label }}
+2230: </sc-for>
+2233: </sc-if>
+2235: <sc-if value="{{ splitMode }}" hint-placeholder-val="{{ false }}">
+2238: TOTAL{{ grandTotal }}
+2239: PAID{{ splitPaid }}
+2240: REMAINING{{ splitRemaining }}
+2243: <sc-for list="{{ splitRows }}" as="p" hint-placeholder-count="0">
+2245: {{ p.label }}
+2247: {{ p.amt }}
+2248: <span sc-camel-on-click="{{ p.remove }}">✕
+2251: </sc-for>
+2254: <sc-for list="{{ splitMethods }}" as="m" hint-placeholder-count="4">
+2255: <div sc-camel-on-click="{{ m.pick }}">{{ m.label }}
+2256: </sc-for>
+2259: {{ splitAmtText }}
+2260: <div sc-camel-on-click="{{ splitAddPart }}">Add to split
+2263: <sc-for list="{{ splitKeys }}" as="k" hint-placeholder-count="12">
+2264: <div sc-camel-on-click="{{ k.press }}">{{ k.label }}
+2265: </sc-for>
+2268: </sc-if>
+2271: <div sc-camel-on-click="{{ complete }}">
+2272: {{ completeLabel }}
+2273: {{ grandTotal }}
+2277: </sc-if>
+2279: <sc-if value="{{ payProcessing }}" hint-placeholder-val="{{ false }}">
+2282: {{ processingLabel }}
+2283: {{ processingSub }}
+2285: </sc-if>
+2287: <sc-if value="{{ payChecking }}" hint-placeholder-val="{{ false }}">
+2290: Checking payment status…
+2291: Confirming the true outcome with the gateway before any retry — a timeout is never assumed to be a failure.
+2293: </sc-if>
+2295: <sc-if value="{{ payUnknown }}" hint-placeholder-val="{{ false }}">
+2300: Payment status unknown
+2301: {{ unknownReason }}. The connection dropped after the request was sent — we don't yet know the outcome. Check status before retrying; never assume a timeout means the payment failed.
+2303: <div sc-camel-on-click="{{ cancelUnknown }}">Cancel transaction
+2304: <div sc-camel-on-click="{{ checkStatus }}">Check payment status
+2307: </sc-if>
+2309: <sc-if value="{{ payFailedOpen }}" hint-placeholder-val="{{ false }}">
+2315: Payment failed
+2316: Reason: <strong>{{ failReason }}</strong>
+2317: No charge was made. Retrying reuses the same transaction and idempotency key — it will never create a duplicate payment.
+2319: <div sc-camel-on-click="{{ retryPayment }}">Retry payment
+2320: <div sc-camel-on-click="{{ changeMethod }}">Change payment method
+2321: <div sc-camel-on-click="{{ cancelTxn }}">Cancel transaction
+2325: </sc-if>
+2328: </sc-if>
+2330: <sc-if value="{{ onReceipt }}" hint-placeholder-val="{{ false }}">
+2337: Payment complete
+2338: {{ receiptLine }}
+2341: PAID
+2342: {{ paidText }}
+2345: CHANGE
+2346: {{ changeText }}
+2349: TENDER
+2350: {{ tenderName }}
+2355: {{ rcLeft }}
+2358: {{ rcTitle }}
+2359: {{ rcSub }}
+2361: <div sc-camel-on-click="{{ rcToggle }}" style-hover="background:#F4F5F7">{{ rcToggleLabel }}
+2362: <div sc-camel-on-click="{{ newSale }}" style-hover="background:#1B2129">Skip
+2365: <div sc-camel-on-click="{{ newSale }}" style-hover="background:#0A5C64">New sale
+2368: <div sc-camel-on-click="{{ printReceipt }}" style-hover="background:#F4F5F7">
+2370: Print
+2372: <div sc-camel-on-click="{{ emailReceipt }}" style-hover="background:#F4F5F7">
+2374: Email
+2376: <div sc-camel-on-click="{{ saveReceipt }}" style-hover="background:#F4F5F7">
+2378: Save
+2385: {{ merchantName }}
+2386: {{ invoiceType }}
+2388: {{ venueLine }}
+2389: {{ receiptTrn }} · {{ cashierLine }}
+2393: {{ orderRef }}
+2394: 20 Aug 2026 · {{ receiptTxnId }}
+2396: {{ queueNo }}
+2399: <sc-for list="{{ receiptLines }}" as="l" hint-placeholder-count="3">
+2401: {{ l.name }}
+2402: {{ l.total }}
+2404: </sc-for>
+2407: <sc-for list="{{ receiptTaxRows }}" as="r" hint-placeholder-count="4">
+2409: {{ r.label }}{{ r.value }}
+2411: </sc-for>
+2414: Grand total
+2415: {{ grandTotal }}
+2418: Paid via <strong>{{ tenderName }}</strong>
+2419: <div sc-camel-on-click="{{ toggleReceiptDetails }}">{{ receiptDetailsCaret }} Payment details
+2421: <sc-if value="{{ receiptDetailsOpen }}" hint-placeholder-val="{{ false }}">
+2423: Transaction ID{{ receiptTxnId }}
+2424: Payment ID{{ receiptPaymentId }}
+2425: Authorisation ref{{ receiptAuthRef }}
+2426: Gateway ref{{ receiptGwRef }}
+2427: Idempotency key{{ receiptIdem }}
+2428: Retries{{ receiptRetries }}
+2429: StatusCompleted
+2430: <sc-if value="{{ receiptSplitOpen }}" hint-placeholder-val="{{ false }}">
+2432: <sc-for list="{{ receiptSplitRows }}" as="p" hint-placeholder-count="2">
+2433: {{ p.label }}{{ p.amt }}
+2434: </sc-for>
+2436: </sc-if>
+2438: </sc-if>
+2440: <svg sc-camel-view-box="0 0 66 66" width="66" height="66">
+2441: <rect width="66" height="66" fill="#fff" rx="6"></rect>
+2442: <g fill="#0E1116">
+2443: <rect x="6" y="6" width="16" height="16" rx="2"></rect><rect x="10" y="10" width="8" height="8" fill="#fff"></rect>
+2444: <rect x="44" y="6" width="16" height="16" rx="2"></rect><rect x="48" y="10" width="8" height="8" fill="#fff"></rect>
+2445: <rect x="6" y="44" width="16" height="16" rx="2"></rect><rect x="10" y="48" width="8" height="8" fill="#fff"></rect>
+2446: <rect x="28" y="8" width="4" height="4"></rect><rect x="34" y="14" width="4" height="4"></rect><rect x="28" y="20" width="4" height="4"></rect><rect x="36" y="24" width="4" height="4"></rect>
+2447: <rect x="8" y="28" width="4" height="4"></rect><rect x="16" y="34" width="4" height="4"></rect><rect x="24" y="28" width="4" height="4"></rect><rect x="30" y="32" width="4" height="4"></rect><rect x="38" y="30" width="4"
+2448: <rect x="28" y="42" width="4" height="4"></rect><rect x="34" y="48" width="4" height="4"></rect><rect x="44" y="44" width="4" height="4"></rect><rect x="52" y="50" width="4" height="4"></rect><rect x="42" y="54" width="4
+2449: </g>
+2450: </svg>
+2452: One QR for the whole sale
+2453: Scans at gate, F&amp;B collection and locker release.
+2457: <img src="75f5ec69-c636-45e2-a447-cd186e9b9da8" alt="">
+2458: POWERED BY TICVAI
+2463: </sc-if>
+2465: <sc-if value="{{ calOpen }}" hint-placeholder-val="{{ false }}">
+2467: <div sc-camel-on-click="{{ calClose }}">
+2471: SELECT A DATE
+2472: {{ calHeading }}
+2474: <div sc-camel-on-click="{{ calClose }}" style-hover="background:#E4E7EA">✕
+2477: <div sc-camel-on-click="{{ calPrev }}" style-hover="background:#F4F5F7">
+2480: {{ calTitle }}
+2481: <div sc-camel-on-click="{{ calNext }}" style-hover="background:#F4F5F7">
+2486: S
+2487: M
+2488: T
+2489: W
+2490: T
+2491: F
+2492: S
+2493: <sc-for list="{{ calCells }}" as="d" hint-placeholder-count="35">
+2494: <div sc-camel-on-click="{{ d.press }}" style-hover="background:#F1F6F6">
+2495: {{ d.label }}
+2498: </sc-for>
+2501: {{ calSelectedLabel }}
+2502: <div sc-camel-on-click="{{ calToday }}" style-hover="background:#F4F5F7">Today
+2503: <div sc-camel-on-click="{{ calClose }}" style-hover="background:#0A5C64">Done
+2507: </sc-if>
+2509: <sc-if value="{{ upsellOpen }}" hint-placeholder-val="{{ false }}">
+2511: <div sc-camel-on-click="{{ closeUpsell }}">
+2513: <div sc-camel-on-click="{{ closeUpsell }}" style-hover="background:#E4E7EA; color:#0E1116">✕
+2514: COMPLETE THE EXPERIENCE
+2515: Add-ons for this ticket
+2516: Optional — one tap adds it to the same sale.
+2518: <sc-for list="{{ upsellItems }}" as="a" hint-placeholder-count="6">
+2524: {{ a.name }}
+2525: {{ a.desc }}
+2526: {{ a.price }}
+2528: <div sc-camel-on-click="{{ a.toggle }}">{{ a.btn }}
+2530: </sc-for>
+2533: {{ upsellCount }} add-on(s) added to this sale · {{ upsellTotal }}
+2534: <div sc-camel-on-click="{{ closeUpsell }}" style-hover="background:#1B2129">
+2535: Continue to cart
+2540: </sc-if>
+2542: <sc-if value="{{ paletteOpen }}" hint-placeholder-val="{{ false }}">
+2544: <div sc-camel-on-click="{{ closePalette }}">
+2548: <input value="{{ query }}" sc-camel-on-change="{{ onQuery }}" placeholder="Jump to a screen, product or function…">
+2549: <span sc-camel-on-click="{{ closePalette }}">ESC
+2552: <sc-for list="{{ results }}" as="r" hint-placeholder-count="6">
+2553: <div sc-camel-on-click="{{ r.press }}" style-hover="background:#F4F5F7">
+2554: {{ r.label }}
+2555: {{ r.meta }}
+2557: </sc-for>
+2561: </sc-if>
+2563: <sc-if value="{{ notifOpen }}" hint-placeholder-val="{{ false }}">
+2565: <div sc-camel-on-click="{{ closeNotif }}">
+2568: Notifications
+2569: <div sc-camel-on-click="{{ clearNotifs }}">Mark all read
+2572: <sc-for list="{{ notifItems }}" as="n" hint-placeholder-count="3">
+2574: {{ n.title }}
+2575: {{ n.body }}
+2577: </sc-for>
+2578: <sc-if value="{{ notifEmpty }}" hint-placeholder-val="{{ false }}">
+2579: All clear — nothing needs attention.
+2580: </sc-if>
+2584: </sc-if>
+2586: <sc-if value="{{ histOpen }}" hint-placeholder-val="{{ false }}">
+2588: <div sc-camel-on-click="{{ closeModal }}">
+2592: THIS SHIFT · POS-014
+2593: Cart history
+2594: {{ histCount }} completed sales · {{ histTotal }} taken. Reload a sale to rebuild the same cart.
+2596: <div sc-camel-on-click="{{ closeModal }}" style-hover="background:#E4E7EA">✕
+2599: <sc-for list="{{ histItems }}" as="h" hint-placeholder-count="3">
+2602: {{ h.ref }}
+2603: {{ h.meta }}
+2604: {{ h.summary }}
+2606: {{ h.amount }}
+2607: <div sc-camel-on-click="{{ h.reprint }}" style-hover="background:#F1F3F5">Reprint
+2608: <div sc-camel-on-click="{{ h.reorder }}" style-hover="background:#0A5C64">Reload cart
+2610: </sc-for>
+2611: <sc-if value="{{ histEmpty }}" hint-placeholder-val="{{ false }}">
+2612: No sales completed on this terminal yet.
+2613: </sc-if>
+2617: </sc-if>
+2619: <sc-if value="{{ heldModalOpen }}" hint-placeholder-val="{{ false }}">
+2621: <div sc-camel-on-click="{{ closeModal }}">
+2625: Held sales
+2626: Recall a parked sale into this terminal, or discard it.
+2628: <div sc-camel-on-click="{{ closeModal }}">
+2633: <sc-for list="{{ heldItems }}" as="h" hint-placeholder-count="1">
+2636: {{ h.ref }}
+2637: {{ h.meta }}
+2639: {{ h.amount }}
+2640: <div sc-camel-on-click="{{ h.discard }}" style-hover="background:#FBECEC">Discard
+2641: <div sc-camel-on-click="{{ h.recall }}" style-hover="background:#0A5C64">Recall
+2643: </sc-for>
+2644: <sc-if value="{{ heldEmpty }}" hint-placeholder-val="{{ false }}">
+2645: No held sales on this terminal.
+2646: </sc-if>
+2650: </sc-if>
+2652: <sc-if value="{{ enrolModalOpen }}" hint-placeholder-val="{{ false }}">
+2654: <div sc-camel-on-click="{{ closeModal }}">
+2656: Enrol a new guest
+2657: Silver tier starts immediately; the wristband links on first scan.
+2660: FULL NAME
+2661: Noor Khalid
+2664: MOBILE
+2665: +971 56 330 2244
+2668: EMAIL
+2669: noor.k@example.ae
+2672: CONSENT
+2673: Marketing opted in
+2677: <div sc-camel-on-click="{{ closeModal }}" style-hover="background:#F4F5F7">Cancel
+2678: <div sc-camel-on-click="{{ createGuest }}" style-hover="background:#0A5C64">Create &amp; link to sale
+2682: </sc-if>
+2684: <sc-if value="{{ topupOpen }}" hint-placeholder-val="{{ false }}">
+2686: <div sc-camel-on-click="{{ closeModal }}">
+2688: MONEY CARD · TOP UP
+2689: {{ topupName }}
+2690: Current balance {{ topupBalance }} · loads the moment payment completes.
+2692: <sc-for list="{{ topupChips }}" as="c" hint-placeholder-count="5">
+2693: <div sc-camel-on-click="{{ c.pick }}">{{ c.label }}
+2694: </sc-for>
+2697: Balance after top-up
+2698: {{ topupAfter }}
+2701: <div sc-camel-on-click="{{ closeModal }}" style-hover="background:#F4F5F7">Cancel
+2702: <div sc-camel-on-click="{{ confirmTopup }}" style-hover="background:#0A5C64">Add top-up to sale
+2706: </sc-if>
+2708: <sc-if value="{{ discOpen }}" hint-placeholder-val="{{ false }}">
+2710: <div sc-camel-on-click="{{ closeModal }}">
+2712: APPLY DISCOUNT
+2713: Discount this sale
+2715: <sc-for list="{{ discTypes }}" as="dt" hint-placeholder-count="4">
+2716: <div sc-camel-on-click="{{ dt.pick }}">{{ dt.label }}
+2717: </sc-for>
+2719: <sc-if value="{{ discIsPct }}" hint-placeholder-val="{{ true }}">
+2721: <sc-for list="{{ discPresets }}" as="dp" hint-placeholder-count="4">
+2722: <div sc-camel-on-click="{{ dp.pick }}">{{ dp.label }}
+2723: </sc-for>
+2725: </sc-if>
+2726: <sc-if value="{{ discIsPromo }}" hint-placeholder-val="{{ false }}">
+2728: <sc-for list="{{ promoChips }}" as="pc" hint-placeholder-count="3">
+2729: <div sc-camel-on-click="{{ pc.pick }}">{{ pc.label }}
+2730: </sc-for>
+2732: </sc-if>
+2733: REASON CODE · REQUIRED
+2735: <sc-for list="{{ discReasons }}" as="dr" hint-placeholder-count="4">
+2736: <div sc-camel-on-click="{{ dr.pick }}">{{ dr.label }}
+2737: </sc-for>
+2741: Discount value
+2742: {{ discGate }}
+2744: {{ discPreview }}
+2747: <div sc-camel-on-click="{{ closeModal }}" style-hover="background:#F4F5F7">Cancel
+2748: <div sc-camel-on-click="{{ applyDiscount }}" style-hover="background:#0A5C64">{{ discBtnLabel }}
+2752: </sc-if>
+2754: <sc-if value="{{ pinAskOpen }}" hint-placeholder-val="{{ false }}">
+2757: AUTHORISATION REQUIRED
+2758: {{ pinTitle }}
+2759: {{ pinDetail }}
+2760: {{ pinRoleNote }}
+2763: SUPERVISOR PIN OR BADGE
+2765: <sc-for list="{{ pinCellsMod }}" as="pc" hint-placeholder-count="4">
+2766: {{ pc.mark }}
+2767: </sc-for>
+2770: <div sc-camel-on-click="{{ pinApprove }}" style-hover="background:#0A5C64">Approve
+2771: <div sc-camel-on-click="{{ pinReject }}" style-hover="background:#FBECEC">Reject &amp; send back
+2772: <div sc-camel-on-click="{{ closePin }}" style-hover="background:#F4F5F7">Cancel
+2776: <sc-for list="{{ pinKeys }}" as="k" hint-placeholder-count="12">
+2777: <div sc-camel-on-click="{{ k.press }}" style-hover="background:#EDEFF1">{{ k.label }}
+2778: </sc-for>
+2783: </sc-if>
+2785: <sc-if value="{{ hwOpen }}" hint-placeholder-val="{{ false }}">
+2787: <div sc-camel-on-click="{{ closeHw }}">
+2789: <sc-if value="{{ hwDetailOpen }}" hint-placeholder-val="{{ false }}">
+2791: <div sc-camel-on-click="{{ hwBack }}">
+2793: All devices
+2795: {{ hwDetailName }}
+2796: {{ hwDetailModel }}
+2797: {{ hwDetailState }}
+2799: <sc-for list="{{ hwActions }}" as="ha" hint-placeholder-count="2">
+2800: <div sc-camel-on-click="{{ ha.press }}" style-hover="background:#EDEFF1">{{ ha.label }}
+2801: </sc-for>
+2804: </sc-if>
+2805: <sc-if value="{{ hwListOnly }}" hint-placeholder-val="{{ true }}">
+2808: Hardware status
+2809: POS-014
+2812: <sc-for list="{{ hwList }}" as="h" hint-placeholder-count="5">
+2813: <div sc-camel-on-click="{{ h.press }}" style-hover="background:#EDEFF1">
+2816: {{ h.name }}
+2817: {{ h.last }}
+2819: {{ h.state }}
+2822: </sc-for>
+2825: </sc-if>
+2828: </sc-if>
+2830: <sc-if value="{{ cancelOpen }}" hint-placeholder-val="{{ false }}">
+2832: <div sc-camel-on-click="{{ closeCancel }}">
+2834: CANCEL ORDER
+2835: {{ cancelRef }}
+2836: <sc-if value="{{ cancelPrepaid }}" hint-placeholder-val="{{ false }}">
+2837: Prepaid via partner — a refund is raised automatically on cancellation.
+2838: </sc-if>
+2839: REASON · REQUIRED
+2841: <sc-for list="{{ cancelReasons }}" as="cr" hint-placeholder-count="5">
+2842: <div sc-camel-on-click="{{ cr.pick }}">{{ cr.label }}
+2843: </sc-for>
+2846: <div sc-camel-on-click="{{ closeCancel }}" style-hover="background:#F4F5F7">Keep order
+2847: <div sc-camel-on-click="{{ confirmCancel }}">Cancel order
+2851: </sc-if>
+2853: <sc-if value="{{ reversalOpen }}" hint-placeholder-val="{{ false }}">
+2856: PAYMENT REVERSAL
+2857: {{ reversalRef }} · {{ reversalAmt }}
+2858: {{ reversalMeta }}
+2860: <sc-if value="{{ reversalRequested }}" hint-placeholder-val="{{ true }}">
+2861: This will move the completed payment through Reversal requested → Reversal processing → Reversed, and reverse funds back to the original payment method. The action is written to the audit trail.
+2863: <div sc-camel-on-click="{{ closeReversal }}" style-hover="background:#F4F5F7">Keep payment
+2864: <div sc-camel-on-click="{{ confirmReversal }}">Confirm reversal
+2866: </sc-if>
+2867: <sc-if value="{{ reversalProcessing }}" hint-placeholder-val="{{ false }}">
+2870: Reversal processing…
+2872: </sc-if>
+2873: <sc-if value="{{ reversalDone }}" hint-placeholder-val="{{ false }}">
+2877: Reversed
+2878: Approved by A. Mansouri · {{ reversalAuditAt }} · logged to audit trail
+2881: <div sc-camel-on-click="{{ closeReversal }}">Done
+2882: </sc-if>
+2885: </sc-if>
+2887: <sc-if value="{{ toastOn }}" hint-placeholder-val="{{ false }}">
+2891: {{ toastMsg }}
+2894: </sc-if>
+2904: <img src="973684be-8e8d-4c78-9540-fd2fac92e425" alt="Ticvai">
+2905: ·
+2906: Powered by Ticvai · Enterprise terminal · 21.5″ capacitive touch
+2911: </x-dc>
+2915: </body></html>

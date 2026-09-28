@@ -300,6 +300,33 @@ def main() -> int:
                     "is a client pack")
 
 
+    # **`client-verified` means the client signed off a prototype that shows this screen** (added 29
+    # September, when the POS terminal and the guest web and mobile rev 3 prototypes were mapped). The
+    # claim is only worth something if a developer can open the view: so the prototype file must exist,
+    # the match must say how close it is, and a verified date and a way to reach the view must be there.
+    # A screen the prototype does not show keeps its board, carries `match: none`, and is built from its
+    # definition; it must not claim client-verified.
+    for _f in sorted(SCREENS.glob("P*.yaml")):
+        _d = yaml.safe_load(_f.read_text(encoding="utf-8"))
+        for _s in _d.get("screens") or []:
+            _w = _s.get("wireframe") or {}
+            _p = _w.get("prototype")
+            _cv = _w.get("provenance") == "client-verified"
+            if not _p:
+                if _cv:
+                    ERRORS.append(f"{_s['id']}: provenance client-verified with no wireframe.prototype block")
+                continue
+            if not (ROOT / str(_p.get("file", ""))).exists():
+                ERRORS.append(f"{_s['id']}: wireframe.prototype.file {_p.get('file')!r} is not on disk")
+            _pm = _p.get("match")
+            if _pm not in ("exact", "partial", "none"):
+                ERRORS.append(f"{_s['id']}: wireframe.prototype.match is {_pm!r}; exact, partial or none")
+            elif _pm == "none" and _cv:
+                ERRORS.append(f"{_s['id']}: client-verified, but its prototype has no view for it (match: none)")
+            elif _pm != "none" and not (_p.get("verified") and _p.get("view") and _p.get("rev")):
+                ERRORS.append(f"{_s['id']}: wireframe.prototype needs rev, verified and view when it matches")
+
+
     # **A screen drawn by a client pack is still drawn by the generator, and that is correct.**
     # 20 screens moved onto Seat and Dashboards boards on 26 August; `derive-wireframes.py` keeps
     # writing their frames because it draws every screen on its platform. **`generatedFallback`

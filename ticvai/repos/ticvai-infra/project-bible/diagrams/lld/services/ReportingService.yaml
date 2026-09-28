@@ -159,7 +159,7 @@ operationsByContract:
     scope: venue
     permission: REPORT_VIEW_VENUE
     offline: false
-    reads: 0
+    reads: 2
     writes: 0
   - operation: getReport
     verb: GET

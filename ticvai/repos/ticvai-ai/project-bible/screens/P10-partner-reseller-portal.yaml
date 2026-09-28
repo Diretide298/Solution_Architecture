@@ -186,6 +186,12 @@ screens:
     - to: PTR-042
       trigger: Partner Operations Command Center
       provenance: structural — PTR-001 is P10's home screen and its exits are its launcher
+    - to: PTR-005
+      trigger: Books against the allocation
+      provenance: flow F10 step 1→2
+      operation: getB2bCredit
+      carries:
+      - orderId
     - to: SUP-001
       trigger: A back-office user signs in through the same door
       provenance: flow F104 step 4→5
@@ -193,12 +199,6 @@ screens:
       back: false
       carries:
       - challengeId
-    - to: PTR-005
-      trigger: Books against the allocation
-      provenance: flow F10 step 1→2
-      operation: getB2bCredit
-      carries:
-      - orderId
   notes: States derived from the screen pattern on 17 August, not individually considered — sound for
     a list, a form or a money screen, and worth revisiting where this screen is unusual. Purpose derived
     from the screen name and its operations on 17 August, not from a requirement.

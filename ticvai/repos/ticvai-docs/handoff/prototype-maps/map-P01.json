@@ -1,0 +1,464 @@
+{
+ "prototype": "TICVAI Guest Booking v2.dc.html (same app as 'TICVAI Guest Booking v2 (single file).html')",
+ "rev": "Client rev 3 (feedback 25 Sep 2026; handoff exported 27 Sep; updates and flow review 28 Sep)",
+ "howToOpen": "Open 'TICVAI Guest Booking v2 (single file).html' in a browser (or the .dc.html with support.js, venueplan.js, stadium3d.js, venuemap3d.js, images/, logos/ beside it). Use the header nav (Discover, What's on, Book, At the venue, My tickets, Help), and the corner engine-controls button (Config drawer) to switch venue type and booking flow.",
+ "screens": [
+  {
+   "id": "WEB-001",
+   "name": "Home / Landing",
+   "match": "partial",
+   "view": "Header 'Discover' (default view on load)",
+   "evidence": "<main data-screen-label=\"WEB-001 Home\">; hero carousel with 'Search venues, shows, attractions', 'Pick up where you left off' (home.resume), 'Browse by venue', 'Popular right now' rail, discoverLinks",
+   "differences": "No first-open venue picker remembered on the device and no 'Change venue' in the header (YAML R267); the prototype shows 'Browse by venue' tiles instead and switches venue from the Config drawer. Prototype adds a resume-booking card, a video 'Tonight in the city' panel, live queue times on cards and footer links to Contact / Accessibility / Service status. YAML emptyNoAccess/offline states are not drawn on Home (offline exists only as a demo tweak)."
+  },
+  {
+   "id": "WEB-002",
+   "name": "Event & Attraction Listing",
+   "match": "exact",
+   "view": "Header 'What's on'",
+   "evidence": "<main data-screen-label=\"WEB-002 Listing\">; 'What's on', category chips (list.cats), date calendar filter (list.cal), empty state 'Nothing matched ...', row/stack/poster card layouts, 'Book' button",
+   "differences": "Prototype adds a right-hand quick-book preview ('list.pick' aside with ticket counters and Continue) that YAML leaves to WEB-004/WEB-005, and shows each card's booking-flow label and live queue time (getWaitTimes is in the YAML). Empty-results copy 'Everything is still on sale — the filter is what narrowed it.'"
+  },
+  {
+   "id": "WEB-003",
+   "name": "Search Results",
+   "match": "partial",
+   "view": "Discover → search box in the hero (opens the search panel) → Enter lands on What's on filtered by the query",
+   "evidence": "home.panel overlay: 'Recent searches', 'Popular searches', 'Featured categories', 'Popular right now', 'No matches for “…” — try a venue name or show.'; comment '<!-- WEB-002 / WEB-003 LISTING & SEARCH RESULTS -->'",
+   "differences": "No separate results page: results render as a type-ahead overlay and then in the WEB-002 listing with the query applied. Recent and popular searches are prototype additions not in the YAML."
+  },
+  {
+   "id": "WEB-004",
+   "name": "Attraction Details",
+   "match": "partial",
+   "view": "Config → Marketing layer → 'Single-event page' on, then Book; or any product card → 'Read more' dialog; or a listing card's preview aside",
+   "evidence": "data-screen-label=\"WEB-003b Single event\" (evt.show: title, facts, blurb, video, date strip evt.days with status/price); readMore dialog with tags (height, time, ID) and 'Select this'",
+   "differences": "No standing attraction-detail page in the default flow: details are a banner above the booking step (behind a Config toggle), a pop-up per product, or the listing preview. Eligibility rule display (getProductEligibilityRule) appears only as tags. Prototype labels it WEB-003b, not WEB-004."
+  },
+  {
+   "id": "WEB-005",
+   "name": "Ticket Type Selection",
+   "match": "partial",
+   "view": "Header 'Book' (or any card's Book) → step 1 'Tickets' of the booking stepper; e.g. Tidewater Museum → 'Category → subcategory tickets'",
+   "evidence": "data-screen-label=\"WEB-004…013 Booking\", isSelect step: counters (m.isCounters), product cards (m.isCards), 'Show info-only products', category tiles, Rev 3 'Help me choose' (kidsQuiz)",
+   "differences": "Ticket choice is on the same step as date and time and comes last: 'Date → time → ticket' (Config 'Performance reveal', Rev 3 item 2), whereas YAML goes WEB-005 → WEB-006. Prototype adds category → subcategory browsing, info-only (not bookable) products, 'Help me choose' questions, location switcher ('Booking at' bar), quick tour. Promo codes are entered in the cart, not on this step (YAML keeps evaluatePromotions here)."
+  },
+  {
+   "id": "WEB-006",
+   "name": "Date & Performance Selection",
+   "match": "partial",
+   "view": "Book → step 1; e.g. Summit Peaks → 'Timed access — 10-minute slots', Coastal Aqua → 'Surf sessions with filters'",
+   "evidence": "date chips + calendar (dateCal), sessions module (m.isSessions) with day-part chips, paging 'Earlier / Later', surf filters, 4-day calendar; eligibility dialog o.label='WEB-006 Eligibility check'; swim consent pop-up (swimQ)",
+   "differences": "Merged into the ticket step (date first, time revealed after the date, tickets after the time). Prototype adds morning/afternoon/evening filters, times-per-page paging, sold-out greying, per-guest age/height eligibility dialog with 'Remove this guest', and the water-park 'Are you able to swim?' pop-up. YAML's separate hold call (addCartLine / inventory hold) is implicit."
+  },
+  {
+   "id": "WEB-007",
+   "name": "Interactive Seat Selection",
+   "match": "exact",
+   "view": "Union Arena → 'Flow 1 · Fixed date → zone → seat map' or 'Flow 2 · Choose date & time → seat map'; Grand Playhouse → Flow 1 / Flow 2",
+   "evidence": "isSeats step: bowlView (stadium-3d x-import, 2D sections, 'Choose your section', zone pricing, sight-line POV box), theatre auditorium plan, seatTime bar ('Performance', 'Change date'), seatTime.pop date/time dialog, holdText 'Seats are held for six minutes... Up to ten per booking'",
+   "differences": "Prototype adds a 3D/2D bowl, seat-view box position (Config 'Seat view box'), time bar to switch performance (releases held seats), date & time pop-up on the map, standing zones sold by quantity, up to 10 seats. Best-available is a separate flow ('Best available (no map)') rather than recommendSeats on this screen. Also reused as a cabana map (Coastal Aqua) and dinner-event table map."
+  },
+  {
+   "id": "WEB-008",
+   "name": "Add-ons & Upsell",
+   "match": "exact",
+   "view": "Book → 'Extras' step (e.g. Summit Peaks → Dated day pass → Continue)",
+   "evidence": "isExtras step: extras list with check, image, price and qty stepper (i.qtyMode); combo offer on payment (comboTitle/addCombo); post-purchase upsells on confirmation",
+   "differences": "Sign-in is asked when leaving Add-ons (Config 'Ask to sign in: After add-ons', Rev 3 item 3), so WEB-008 → WEB-016 is a transition YAML does not have. Add-ons also appear on the payment step (combo) and confirmation (upsells). 28 Sep flow review: all add-ons live here only."
+  },
+  {
+   "id": "WEB-009",
+   "name": "Wishlist",
+   "match": "exact",
+   "view": "Discover → 'Wishlist' link (discoverLinks)",
+   "evidence": "<main data-screen-label=\"WEB-009 Wishlist\">; 'prices and queue times update every time you open this', Book, remove (×), 'Restore removed', empty text 'Anything you tap the heart on…'",
+   "differences": "No 'withdrawn product stays marked unavailable' state (YAML note). Prototype adds 'Restore removed' and live queue times."
+  },
+  {
+   "id": "WEB-010",
+   "name": "Shopping Cart",
+   "match": "partial",
+   "view": "Visible on every booking step as the cart sidebar (Config → Layout & locale → 'Cart & summary' changes it to slide-in, bottom sheet, floating icon or single column)",
+   "evidence": "<aside data-tour=\"cart\">: cartLines with remove, 'Promo code' + Apply (TICVAI10 / WELCOME15 / expired SUMMER25), 'Empty basket' confirm 'Remove everything and release held places?', Subtotal / VAT 5% / total, visit date",
+   "differences": "Not a separate screen: a persistent sidebar/drawer through the stepper, with a Rev 3 option to mirror it in Arabic. No 'extend hold' action (extendCart) — only hold timers on the seat step. Exit-intent dialog (exit.open) is a prototype addition."
+  },
+  {
+   "id": "WEB-011",
+   "name": "Guest Details & Attendee Forms",
+   "match": "exact",
+   "view": "Book → 'Your details' step (after Extras)",
+   "evidence": "isInfo step: infoSections 'Lead booker', 'Guest names & ages', 'Identity' (document upload), 'Declaration' (health check + signature), 'Certification', 'Vehicle' (plate), 'Consent' (terms + marketing)",
+   "differences": "Sections are driven by the flow's requires list; prototype adds a signature, diving certification and vehicle plate fields. Wishlist/device operations listed in the YAML apis have no counterpart here. Saved guests prefill is described in Account but not shown on this step."
+  },
+  {
+   "id": "WEB-012",
+   "name": "Checkout — Payment",
+   "match": "partial",
+   "view": "Book → 'Payment' step; Config → Layout & locale → 'Payment outcome (demo)' = Interrupted / Declined for the failure states; Config → Steps & cards → 'Guest checkout (code proof)' for the guest route",
+   "evidence": "isPay step: payMethods Card / Apple Pay / 'Split in 4' (Tabby) / 'Pay on arrival', invoice or purchase order for group flows; data-screen-label=\"WEB Payment outcome\" (checking, unknown, declined); gx 'WEB-012 Guest checkout' (contact → code → 'We found a profile that matches' → 'Use this profile' / 'Not me – keep separate' / expired)",
+   "differences": "Contradicts 28 Sep decisions: YAML allows card or wallet only (R080) — prototype offers Apple Pay, Tabby split-in-4, pay on arrival and invoice/PO; YAML removed the 'is this you?' match at checkout (R120 b) — prototype still asks the guest to link or keep separate. The unknown-outcome inquiry state matches the YAML ('We couldn't confirm this payment yet… you won't be charged twice')."
+  },
+  {
+   "id": "WEB-013",
+   "name": "Booking Confirmation",
+   "match": "exact",
+   "view": "Book → final step 'Confirmed' after paying",
+   "evidence": "isTicket step: 'You’re all set!', QR 'SCAN AT ENTRY', ticketRows, 'Add to Apple Wallet', 'Download PDF', 'Email again', 'Reissue QR', 'Transfer tickets', 'Change your details' (swap), upsells",
+   "differences": "Prototype adds editing attendee details after purchase ('Change your details', signed-in only) and Reissue QR. No 'unpaid — pay now' route to WEB-014."
+  },
+  {
+   "id": "WEB-014",
+   "name": "Pay for a Booking",
+   "match": "none",
+   "view": "Not in the prototype",
+   "evidence": "No pay-by-link view; the only 'payment link' string is the invoice note 'We will send a quote and a payment link.'",
+   "differences": "The prototype has no screen for a third party paying an existing booking without an account."
+  },
+  {
+   "id": "WEB-015",
+   "name": "Branded Queue / Waiting Room",
+   "match": "partial",
+   "view": "Only when the host tweak 'waitingRoom' is on; it is not in the Config drawer lists, so a reviewer cannot switch it on from the page",
+   "evidence": "data-screen-label=\"WEB-015 Waiting room\": 'You are in the queue', position '1,284', 'People ahead of you', progress bar, 'About 6 minutes', 'Do not refresh. Your place is held on this page.', 'Skip the wait (demo)'",
+   "differences": "Drawn but unreachable from the Config drawer. The prototype holds the place by keeping the page open ('refreshing puts you at the back'); YAML getWaitingGuest implies a resumable place."
+  },
+  {
+   "id": "WEB-016",
+   "name": "Login / Register",
+   "match": "partial",
+   "view": "Header profile icon (signed out), or automatically when leaving Add-ons / at payment",
+   "evidence": "data-screen-label=\"WEB-016 Login\" modal: tabs 'Log in' / 'Register', Email → 'Six-digit code', 'Continue with Apple', 'Continue with Google', 'Continue with UAE Pass', 'Continue as guest — we send a code first'",
+   "differences": "No password sign-in and no mobile-number OTP (YAML has guestPasswordLogin and 'Email or mobile number'); it is a modal, not a page. Account → Security still shows 'Two-step verification' and passkeys, which the YAML ruled out for guests (R167). Guest checkout route belongs to WEB-012 in the prototype."
+  },
+  {
+   "id": "WEB-017",
+   "name": "My Account Dashboard",
+   "match": "exact",
+   "view": "Sign in → avatar menu → 'Account overview'",
+   "evidence": "<main data-screen-label=\"WEB-017 Account\">: 'Hello, {name}', tier and points, left nav of 18 sections (Overview, Personal details, Payment methods, Saved guests, Membership, Wallet & gift cards, Order history, Notifications, Accessibility, Security, Reservations, Transfer & resale, Groups & invitations, Newsletters, Face Pass, Data & privacy, Lost & found, Reviews & feedback)",
+   "differences": "Prototype makes the account a single page with section panes; most YAML account screens (019–024, 026, 027, 030, 031, 034) are panes of it. Groups & invitations (respondToInvitation, getMyChallenges, referral code) sits here. Signed-out state 'Sign in to see your account' is drawn."
+  },
+  {
+   "id": "WEB-018",
+   "name": "My Tickets",
+   "match": "partial",
+   "view": "Header 'My tickets' → a ticket → 'Manage' (ticket sheet)",
+   "evidence": "data-screen-label=\"WEB-018 My tickets\": Upcoming / Past tabs, month groups, QR, 'Add to wallet', 'Save PDF', 'Directions'; '<!-- WEB-018b TICKET DETAIL & MANAGE -->' sheet: 'What is left on this ticket', 'Scan and sharing history', Reschedule, Add guests, Transfer ticket, Request a refund, List for resale, Reissue QR, Cancel booking",
+   "differences": "QR is static — no rotating code with a visible countdown (YAML R230). Prototype adds reschedule, add guests, refund, resale and cancel on the ticket sheet (YAML routes refunds to WEB-019 and transfers to WEB-030)."
+  },
+  {
+   "id": "WEB-019",
+   "name": "Order History",
+   "match": "partial",
+   "view": "Account → 'Order history'",
+   "evidence": "settings pane orders: 'Eleven orders since March. Invoices download as PDF.', 'AED 6,415 Spent this year', rows with 'Invoice', 'Request a refund' → Start, 'Transfer from an order'",
+   "differences": "A list pane with toast-only actions; no order detail view. Refund request and transfer are rows, not flows."
+  },
+  {
+   "id": "WEB-020",
+   "name": "Profile & Preferences",
+   "match": "partial",
+   "view": "Account → 'Personal details', 'Notifications', 'Accessibility'",
+   "evidence": "panes profile (Full name, Email 'Verified', Mobile, Date of birth, Emirates ID, 'Email verification — Resend link', 'ID document — Replace', marketing toggles), notify (entry reminders, WhatsApp…), access (step-free, quiet hours, companion ticket)",
+   "differences": "Split over three panes; fields are read-only with a 'Save changes' toast. No 'which level the current value came from' (YAML purpose). Consent purposes appear as two marketing toggles rather than the configured purpose list."
+  },
+  {
+   "id": "WEB-021",
+   "name": "Wallet & Gift Cards",
+   "match": "partial",
+   "view": "Account → 'Wallet & gift cards' (and 'Payment methods')",
+   "evidence": "pane wallet: 'AED 120.00 Available credit', gift card TCV-GIFT-2290, refund credit, 'Game card GC-5510-43 · 42 credits', 'Move balance', 'Transactions', 'Auto top-up' toggle, 'Add a gift card'; pane payment: saved cards",
+   "differences": "Rows with toast actions; no transaction list, no gift-card balance lookup. Auto top-up is a prototype addition with no YAML operation. Saved payment tokens are a separate pane."
+  },
+  {
+   "id": "WEB-022",
+   "name": "Membership Plans",
+   "match": "partial",
+   "view": "Summit Peaks → 'Annual pass / membership' flow; Kids Club → 'Membership pass'; Account → Membership → 'Other plans — Compare'",
+   "evidence": "flows id 'annual' benefits('prod','Membership tiers') and Kids Club 'member'; account row 'Other plans · Silver, Gold, Platinum and family plans · Compare'",
+   "differences": "Plans are sold as a booking flow, not a plans page; the account 'Compare' action is a toast."
+  },
+  {
+   "id": "WEB-023",
+   "name": "Membership Management",
+   "match": "partial",
+   "view": "Account → 'Membership' → 'Billing statement — View'",
+   "evidence": "membership pane (Gold, renews 4 Feb, guest passes 4 of 6, 'Transfer membership', 'Change tier'); gx o.label='WEB-023 Billing statement' with Soft decline / Hard decline / Declined again / Paid, 'Retry now', 'Use another card'",
+   "differences": "Billing and dunning retry are well covered. Prototype adds membership transfer to a family member and guest passes; YAML's transferOrderTickets on this screen has no visible use."
+  },
+  {
+   "id": "WEB-024",
+   "name": "Devices, Wishlist & Consent",
+   "match": "partial",
+   "view": "Account → 'Security' (devices), 'Face Pass', 'Data & privacy', 'Newsletters' (devices that get notifications)",
+   "evidence": "panes security ('iPhone 15 · Dubai — Sign out', passkey), facepass ('Register a face', 'Use Face Pass at the gate'), privacy ('Consent history', 'Waivers', 'People who can manage your bookings', 'Download your data', 'Delete your account')",
+   "differences": "Spread across four panes rather than one screen; wishlist is its own view (WEB-009). Security pane includes passkeys and two-step verification, which the YAML does not have for guests. YAML purpose text still says 'See loyalty & rewards' (stale)."
+  },
+  {
+   "id": "WEB-025",
+   "name": "Help Centre / FAQ",
+   "match": "exact",
+   "view": "Header 'Help'",
+   "evidence": "<main data-screen-label=\"WEB-025 Help centre\">: 'Help centre', service status line, 'Search help articles', six FAQs, 'Your cases' with 'Raise a case' form (topics Booking, Refund, Lost property, Complaint, Accessibility, Other) and 'Reply', 'Policies and accessibility', 'Still stuck' contacts, 'Ask Sahli instead', 'Talk to a person instead'",
+   "differences": "Also carries policies and the accessibility statement (YAML WEB-045) and the case list (YAML WEB-034's listMyCases) on the same page."
+  },
+  {
+   "id": "WEB-026",
+   "name": "Survey & Feedback",
+   "match": "partial",
+   "view": "Account → 'Reviews & feedback'",
+   "evidence": "pane feedback: 'Summit Peaks · 8 Aug — Rate it', 'You gave it 4 out of 5 — Edit', 'The Crater Grill · order 4471 — Rate your food order', 'Leave feedback'",
+   "differences": "List of visits to rate with toast actions; no rating form or survey questions are drawn."
+  },
+  {
+   "id": "WEB-027",
+   "name": "Newsletter Subscription",
+   "match": "partial",
+   "view": "Account → 'Newsletters'; Contact page → 'Choose newsletters'",
+   "evidence": "pane newsletter: per-venue toggles (Summit Peaks, Coastal Aqua, Union Arena, Grand Playhouse), 'By push notification', 'Devices that get notifications', 'Save choices'; contact 'Get the newsletter'",
+   "differences": "Per-venue and channel toggles only for signed-in guests; no signed-out email sign-up form."
+  },
+  {
+   "id": "WEB-028",
+   "name": "Contact & Venue Information",
+   "match": "exact",
+   "view": "Footer 'Contact', or Discover → 'Contact & venue info'",
+   "evidence": "<main data-screen-label=\"WEB Contact and venue information\">: address, cards (Directions, Parking, Accessibility…), 'Opening hours', 'Get the newsletter'",
+   "differences": "Links to parking and accessibility from the contact cards; otherwise matches."
+  },
+  {
+   "id": "WEB-029",
+   "name": "Error / Sold Out / Maintenance",
+   "match": "exact",
+   "view": "Footer 'Service status', or Discover → 'Service status'",
+   "evidence": "<main data-screen-label=\"WEB Error / Sold out / Maintenance\">: tabs Error / Sold out / Maintenance, advice 'Wait a minute' / 'Waitlist open' / 'Come back after 04:00', reference code",
+   "differences": "Prototype has 'Maintenance' where YAML has 'closed'; sold-out offers 'Join the waitlist' (holds a returned place for 15 minutes), which the YAML screen (getTenantAppStatus only) cannot call."
+  },
+  {
+   "id": "WEB-030",
+   "name": "Ticket Transfer",
+   "match": "partial",
+   "view": "Account → 'Transfer & resale'; My tickets → Manage → 'Transfer ticket'; Confirmation → 'Transfer tickets'",
+   "evidence": "pane transfers: 'A transferred ticket gets a new QR and the old one stops working. Resale is at face value only.', sent/claimed rows, 'Cancel transfer', 'Claim a ticket', 'Listed for resale · AED 180 — Withdraw', 'Transfer a ticket'",
+   "differences": "List pane with toast actions; no recipient form. Prototype adds cancel transfer and withdraw resale listing."
+  },
+  {
+   "id": "WEB-031",
+   "name": "My Reservations",
+   "match": "partial",
+   "view": "Account → 'Reservations'",
+   "evidence": "pane reservations: 'Booked but not yet paid, and group holds', 'Saffron Table · Table for 4 — Change', 'Riverside cabana · hold ends in 2 days — Pay now', 'School group, 32 pupils — View', 'Check another date', 'Cancel a reservation'; gx labelled 'WEB-031 Birthday party' / 'WEB-031 School trip' in the booking flow",
+   "differences": "The prototype uses the WEB-031 label for the group booking request dialog (deposit / invoice quote) inside Kids Club → 'Birthday party / group' and 'School trip', which the YAML covers only through requestGroupBooking. 'Pay now' on a held reservation has no YAML route (WEB-014 is pay-by-link)."
+  },
+  {
+   "id": "WEB-032",
+   "name": "Offers & Promotions",
+   "match": "exact",
+   "view": "Discover → 'Offers & promotions'",
+   "evidence": "<main data-screen-label=\"WEB-032 Offers\">: 'What is on, and what applies to you.', offers with tag, ends date, code, 'Use this offer'",
+   "differences": "'Use this offer' returns to the listing; no personalised 'applies to you' filter."
+  },
+  {
+   "id": "WEB-033",
+   "name": "Shop",
+   "match": "partial",
+   "view": "No pre-arrival shop page; retail items appear as add-ons in the Extras step (images/shop product squares) and in At the venue → 'Shop & drop'",
+   "evidence": "extras list with images/shop/*; venue.isShop 'In the shop today'",
+   "differences": "No browsable merchandise catalogue before arrival; the nearest is in-venue Shop & drop (WEB-042)."
+  },
+  {
+   "id": "WEB-034",
+   "name": "Lost & Found",
+   "match": "partial",
+   "view": "Account → 'Lost & found, reports'; Help → 'Your cases' → Raise a case → topic 'Lost property'",
+   "evidence": "pane cases: 'Lost: black backpack · found, at guest services — Reply', 'Report something'; help topics list includes 'Lost property'",
+   "differences": "No lost-item report form (item, where, when, photo); reported via the generic case form."
+  },
+  {
+   "id": "WEB-035",
+   "name": "Multi-Currency & Pricing",
+   "match": "exact",
+   "view": "Discover → 'Prices in your currency'",
+   "evidence": "<main data-screen-label=\"WEB-035 Multi-currency\">: 'Compare before you travel. You are always charged in AED.', AED/SAR/USD/INR/GBP, 'Exchange rates in use', 'your bank sets the rate on the day'",
+   "differences": "Matches the YAML's charged-vs-shown rule. Separately, Config → Currency switches the whole storefront currency, which contradicts 'always charged in AED'."
+  },
+  {
+   "id": "WEB-036",
+   "name": "F&B – Browse & Order",
+   "match": "exact",
+   "view": "Header 'At the venue' → 'Order food'; also Saffron Table → 'Takeaway — collect' / 'Delivery' flows",
+   "evidence": "venue.isOrder: 'You scanned the code on your table. Nothing to install', menu sections, qty, 'Your order', 'Send to the kitchen'; gx 'WEB-036 Delivery check' / 'Takeaway check' (outside area, time just filled); dining flows 'Table reservation', 'Waitlist / join queue'",
+   "differences": "Prototype splits in-venue table ordering (At the venue) from takeaway/delivery ordering (a booking flow with a delivery-area and slot check). Table reservation and waitlist (in YAML apis) are booking flows at Saffron Table."
+  },
+  {
+   "id": "WEB-037",
+   "name": "Menu Item Detail",
+   "match": "exact",
+   "view": "At the venue → Order food → tap a dish; Takeaway/Delivery → 'Add' opens the modifier side panel",
+   "evidence": "data-screen-label=\"WEB-037 Menu item detail\": kcal, diet, 'Allergens', 'Make it yours' modifiers, 'Add to the order'; fm.open side panel with choose-one options and priced add-ons (Rev 3 item 9, Config 'F&B add-ons & modifiers')",
+   "differences": "Two renderings of the same thing (dialog in-venue, side panel in takeaway/delivery)."
+  },
+  {
+   "id": "WEB-038",
+   "name": "F&B – Order Tracking",
+   "match": "exact",
+   "view": "At the venue → Order food → 'Send to the kitchen'",
+   "evidence": "data-screen-label=\"WEB-038 Order tracking\": 'Your order is in the kitchen', stages 'Sent to the kitchen', 'Being made', 'Ready to collect', 'Collected', 'Advance the demo', 'Start another order'",
+   "differences": "No bill or settle-the-bill view (YAML getGuestBill, 'settle the bill')."
+  },
+  {
+   "id": "WEB-039",
+   "name": "Venue Map & Wait Times",
+   "match": "exact",
+   "view": "At the venue → 'Map & waits'",
+   "evidence": "comment '<!-- WEB-039 VENUE MAP & WAIT TIMES -->': 2D plan / 3D map (venue-map-3d), pins, 'Directions' From/To, 'Start navigation', step list, step-free note, 'Where things are, and how long they take', wait summary",
+   "differences": "Prototype adds turn-by-turn walking directions and navigation mode."
+  },
+  {
+   "id": "WEB-040",
+   "name": "Virtual Queue",
+   "match": "exact",
+   "view": "At the venue → 'Virtual queue'",
+   "evidence": "data-screen-label=\"WEB-040 Virtual queue\": 'Open for virtual queueing', 'You are in the queue', position, ETA, 'Leave the queue', 'One virtual queue at a time, per guest.'",
+   "differences": ""
+  },
+  {
+   "id": "WEB-041",
+   "name": "Parking – Reserve & Pay",
+   "match": "partial",
+   "view": "At the venue → 'Parking'",
+   "evidence": "data-screen-label=\"WEB-041 Parking\": 'Choose a car park', bays with '… bays free' and price, 'Number plate', 'Reserve and pay'",
+   "differences": "Shows live free-bay counts, which the YAML says it does not have (no live availability; full = soldOutForDay). Pays directly with 'Reserve and pay' rather than through cart and checkout (R166). Also a plate field in the cabana/party flows."
+  },
+  {
+   "id": "WEB-042",
+   "name": "Retail & Shop and Drop",
+   "match": "exact",
+   "view": "At the venue → 'Shop & drop'",
+   "evidence": "data-screen-label=\"WEB-042 Shop and drop\": 'In the shop today', collection points (sdPoints), 'Buy and collect on the way out'",
+   "differences": "Pays in one tap on the page, not through the cart and checkout (YAML R236)."
+  },
+  {
+   "id": "WEB-043",
+   "name": "Loyalty & Rewards",
+   "match": "exact",
+   "view": "At the venue → 'Loyalty'",
+   "evidence": "data-screen-label=\"WEB-043 Loyalty\": tier, points, next tier, 'Earned today', 'Spend them here' → 'Redeem'",
+   "differences": "Placed inside the in-venue section; referral code appears under Account → Groups & invitations (YAML createReferral is here)."
+  },
+  {
+   "id": "WEB-044",
+   "name": "AI Concierge – Home",
+   "match": "exact",
+   "view": "Floating 'Ask Sahli' button on every page",
+   "evidence": "ai.shut 'Ask {{ ai.name }}' launcher; ai.open chat with quick replies, 'Ask about tickets, timings, refunds…', 'Talk to a person'",
+   "differences": "A floating chat panel rather than a home screen; no conversation history list (listAiConversations)."
+  },
+  {
+   "id": "WEB-045",
+   "name": "Help Centre & Accessibility",
+   "match": "partial",
+   "view": "Header 'Help' → 'Policies and accessibility'; footer 'Accessibility'",
+   "evidence": "gp.help.policies: 'Terms of sale', 'Privacy notice', 'Cookie notice', 'Refund policy', 'Accessibility statement' ('aims to meet WCAG 2.2 AA'); footAccess sets helpPol 'access'",
+   "differences": "Not a separate screen: part of the WEB-025 Help centre page."
+  },
+  {
+   "id": "WEB-046",
+   "name": "In-Venue Notifications",
+   "match": "exact",
+   "view": "At the venue → 'Alerts'",
+   "evidence": "data-screen-label=\"WEB-046 In-venue notifications\": Queue 'Summit Coaster is calling your party', Order 'FNB-4471 is being made', Venue notices, 'Your locker was opened'",
+   "differences": "Deferred in the YAML (release later, R242: no in-app feed in the first release), but the prototype draws it as a live section, so the client will expect it.",
+   "deferred": true
+  }
+ ],
+ "unmappedViews": [
+  {
+   "view": "Config drawer (engine controls: venue type, booking flow, brand, steps & cards, marketing layer, Booking rules (Rev 3), layout & locale)",
+   "what": "Demo controls; 'Demo controls only — guests never see this panel.'",
+   "suggest": "out of scope (maps to tenant/CMS configuration, not a guest screen)"
+  },
+  {
+   "view": "Emirates Link → 'Route & schedule · one-way, multi-trip, favourites'",
+   "what": "Transport ticketing: From/To stations with swap, date and time period, departures, multi-trip passes, favourite routes, route stop list and street map (Leaflet), 'Next Available Trip'",
+   "suggest": "new screen (if transport is in scope; no P01 screen or operation covers routes or stations)"
+  },
+  {
+   "view": "House of Pages → 'Meeting room by the hour'",
+   "what": "Date → start time → length → room → attendees → add-ons; price multiplies by length",
+   "suggest": "part of WEB-006 (resource booking) / WEB-031 getResourceAvailability"
+  },
+  {
+   "view": "Coastal Aqua → 'Cabana & locker rentals' cabana map",
+   "what": "34 numbered cabanas on the water-park map, greyed when taken, tap to add, 'Remaining time' counter",
+   "suggest": "part of WEB-007 (map-based selection of a resource)"
+  },
+  {
+   "view": "Help me choose (kidsQuiz) and 'Help me choose' banner",
+   "what": "1–2 questions that open the matching flow (Kids Club, Coastal Aqua, Tidewater Museum)",
+   "suggest": "part of WEB-005"
+  },
+  {
+   "view": "Quick tour",
+   "what": "Four-step highlight of date, time, tickets and basket on first booking visit",
+   "suggest": "part of WEB-006"
+  },
+  {
+   "view": "Location switcher ('Booking at' bar)",
+   "what": "Kids Club at Al Barsha, Mirdif, Yas Island, Sharjah; change location keeps selections",
+   "suggest": "part of WEB-006 (and WEB-001 venue picker)"
+  },
+  {
+   "view": "Swim consent pop-up",
+   "what": "'Are you able to swim?' Yes/No after picking a water-park session",
+   "suggest": "part of WEB-006 (eligibility)"
+  },
+  {
+   "view": "Group request dialog labelled 'WEB-031 Birthday party' / 'WEB-031 School trip'",
+   "what": "Children/pupils stepper with package cap, deposit now and balance on the day, or invoice quote request; states Ready / Date gone / Requested",
+   "suggest": "part of WEB-031 (requestGroupBooking) or a new group-booking step in the booking flow"
+  },
+  {
+   "view": "Account → Saved guests",
+   "what": "Saved party profiles with age and height band that prefill checkout",
+   "suggest": "part of WEB-020 or WEB-011"
+  },
+  {
+   "view": "Account → Groups & invitations",
+   "what": "Invitations to accept, group organiser view, referral code, challenge progress",
+   "suggest": "part of WEB-017 (respondToInvitation, getMyChallenges already wired)"
+  },
+  {
+   "view": "Account → Security (passkey, two-step verification, devices, 'Guest checkouts under this email — Link to account')",
+   "what": "Sign-in hardening and linking guest checkouts",
+   "suggest": "part of WEB-024 (devices) and WEB-016 (linkGuestCheckout); drop two-step per R167"
+  },
+  {
+   "view": "Confirmation → 'Change your details'",
+   "what": "Edit attendee names after purchase, signed-in only",
+   "suggest": "part of WEB-013"
+  },
+  {
+   "view": "Exit-intent dialog",
+   "what": "Asks before leaving a booking in progress",
+   "suggest": "part of WEB-010 (abandonCart)"
+  },
+  {
+   "view": "Turnstile loader and offline banner",
+   "what": "Branded loading overlay; offline message pausing book/pay/order/queue",
+   "suggest": "part of every screen's loading and offline states"
+  },
+  {
+   "view": "Arabic / right-to-left switch (header language button)",
+   "what": "Arabic interface layer (ticvai-ar.js, ticvai-ar-rev3.js), basket side option",
+   "suggest": "out of scope as a screen (cross-cutting locale)"
+  },
+  {
+   "view": "Dining flows at Saffron Table (Table reservation, Prepaid set menu, Deposit-only hold, Deals & offer redemption, Waitlist, Private dining enquiry)",
+   "what": "Restaurant booking as booking flows",
+   "suggest": "part of WEB-005/WEB-006 with WEB-036 createTableReservation / joinRestaurantWaitlist"
+  }
+ ],
+ "summary": "46 screens: 21 exact, 24 partial, 1 none (WEB-014 Pay for a Booking). WEB-046 is deferred in the YAML but fully drawn. 17 prototype views have no screen of their own (transport and meeting rooms are the largest). Three most important differences: (1) Booking order and structure. The prototype asks date → time → ticket on one step (Rev 3 item 2) and sign-in after Add-ons (item 3), and the cart is a persistent sidebar. The YAML chains WEB-005 → WEB-006 → WEB-010 and reaches WEB-016 only from home and cart. (2) Checkout and sign-in contradict the 28 Sep decisions. The prototype offers Apple Pay, Tabby split-in-4, pay on arrival and invoice/PO (YAML: card or wallet, R080). Guest checkout still asks 'We found a profile that matches — Use this profile / Not me' (removed, R120 b). Account shows two-step verification and passkeys (R167). Sign-in has no password or mobile route. (3) Missing or conflicting coverage. There is no pay-by-link (WEB-014) and no pre-arrival shop (WEB-033). There is no venue picker on first open (WEB-001, R267) and the QR is static, not rotating (WEB-018, R230). Parking shows live free bays and shop and parking pay outside the cart (R166, R236). Account screens 019–024, 026, 027, 030, 031 and 034 are only list panes with toast actions. The waiting room (WEB-015) cannot be switched on from the Config drawer."
+}

@@ -33633,7 +33633,9 @@
    "queue.entry",
    "queue.queue",
    "queue.queue_operating_window",
-   "queue.reading"
+   "queue.reading",
+   "reporting.kpi_definition",
+   "reporting.kpi_target"
   ],
   "writes": [
    "cache:idempotency",
@@ -48187,7 +48189,9 @@
    "orders.pos_shift",
    "orders.pos_shift_approval",
    "orders.pos_shift_incident",
-   "platform.venue_settings"
+   "platform.venue_settings",
+   "reporting.kpi_definition",
+   "reporting.kpi_target"
   ],
   "writes": [],
   "storedProcedures": [],
@@ -49440,7 +49444,9 @@
    "access.access_point",
    "access.scan_event",
    "cache:resolution",
-   "platform.venue_settings"
+   "platform.venue_settings",
+   "reporting.kpi_definition",
+   "reporting.kpi_target"
   ],
   "writes": [],
   "storedProcedures": [],
@@ -49625,7 +49631,9 @@
    "fnb.menu",
    "fnb.menu_item",
    "fnb.menu_section",
-   "platform.venue_settings"
+   "platform.venue_settings",
+   "reporting.kpi_definition",
+   "reporting.kpi_target"
   ],
   "writes": [
    "cache:idempotency",
@@ -49754,7 +49762,9 @@
    "inventory.item",
    "inventory.purchase_order",
    "inventory.purchase_order_line",
-   "platform.venue_settings"
+   "platform.venue_settings",
+   "reporting.kpi_definition",
+   "reporting.kpi_target"
   ],
   "writes": [
    "cache:idempotency",
@@ -49934,7 +49944,9 @@
   "reads": [
    "cache:resolution",
    "identity.role",
-   "platform.venue_settings"
+   "platform.venue_settings",
+   "reporting.kpi_definition",
+   "reporting.kpi_target"
   ],
   "writes": [],
   "storedProcedures": [],
@@ -50034,7 +50046,9 @@
    "cache:resolution",
    "marketing.campaign",
    "marketing.segment_criterion",
-   "platform.venue_settings"
+   "platform.venue_settings",
+   "reporting.kpi_definition",
+   "reporting.kpi_target"
   ],
   "writes": [
    "cache:idempotency",
@@ -50129,7 +50143,9 @@
    "maintenance.asset",
    "maintenance.incident",
    "maintenance.work_order",
-   "platform.venue_settings"
+   "platform.venue_settings",
+   "reporting.kpi_definition",
+   "reporting.kpi_target"
   ],
   "writes": [],
   "storedProcedures": [],
@@ -78521,7 +78537,10 @@
    "postgres-analytical",
    "redis"
   ],
-  "reads": [],
+  "reads": [
+   "reporting.kpi_definition",
+   "reporting.kpi_target"
+  ],
   "writes": [],
   "storedProcedures": [],
   "wave": 3,
@@ -84300,7 +84319,10 @@
    "postgres-analytical",
    "redis"
   ],
-  "reads": [],
+  "reads": [
+   "reporting.kpi_definition",
+   "reporting.kpi_target"
+  ],
   "writes": [],
   "storedProcedures": [],
   "wave": 3,
@@ -86877,7 +86899,10 @@
    "postgres-analytical",
    "redis"
   ],
-  "reads": [],
+  "reads": [
+   "reporting.kpi_definition",
+   "reporting.kpi_target"
+  ],
   "writes": [],
   "storedProcedures": [],
   "wave": 3,
@@ -105624,7 +105649,10 @@
    "postgres-analytical",
    "redis"
   ],
-  "reads": [],
+  "reads": [
+   "reporting.kpi_definition",
+   "reporting.kpi_target"
+  ],
   "writes": [],
   "storedProcedures": [],
   "wave": 3,
@@ -105674,7 +105702,10 @@
    "postgres-analytical",
    "redis"
   ],
-  "reads": [],
+  "reads": [
+   "reporting.kpi_definition",
+   "reporting.kpi_target"
+  ],
   "writes": [],
   "storedProcedures": [],
   "wave": 3,
@@ -105724,7 +105755,10 @@
    "postgres-analytical",
    "redis"
   ],
-  "reads": [],
+  "reads": [
+   "reporting.kpi_definition",
+   "reporting.kpi_target"
+  ],
   "writes": [],
   "storedProcedures": [],
   "wave": 3,
@@ -105824,7 +105858,10 @@
    "postgres-analytical",
    "redis"
   ],
-  "reads": [],
+  "reads": [
+   "reporting.kpi_definition",
+   "reporting.kpi_target"
+  ],
   "writes": [],
   "storedProcedures": [],
   "wave": 3,
@@ -107307,6 +107344,8 @@
    "ledger.posting",
    "ledger.settlement",
    "orders.payment",
+   "reporting.kpi_definition",
+   "reporting.kpi_target",
    "wallet.wallet_transaction"
   ],
   "writes": [],
@@ -107362,6 +107401,8 @@
   "reads": [
    "cache:idempotency",
    "reporting.execution",
+   "reporting.kpi_definition",
+   "reporting.kpi_target",
    "reporting.report_definition",
    "reporting.report_parameter"
   ],
@@ -153799,6 +153840,15 @@
     "provenance": "structural \u2014 PTR-001 is P10's home screen and its exits are its launcher"
    },
    {
+    "to": "PTR-005",
+    "trigger": "Books against the allocation",
+    "provenance": "flow F10 step 1\u21922",
+    "operation": "getB2bCredit",
+    "carries": [
+     "orderId"
+    ]
+   },
+   {
     "to": "SUP-001",
     "trigger": "A back-office user signs in through the same door",
     "provenance": "flow F104 step 4\u21925",
@@ -153806,15 +153856,6 @@
     "back": false,
     "carries": [
      "challengeId"
-    ]
-   },
-   {
-    "to": "PTR-005",
-    "trigger": "Books against the allocation",
-    "provenance": "flow F10 step 1\u21922",
-    "operation": "getB2bCredit",
-    "carries": [
-     "orderId"
     ]
    }
   ],
@@ -171618,7 +171659,9 @@
   ],
   "reads": [
    "reporting.alert",
-   "reporting.alert_rule"
+   "reporting.alert_rule",
+   "reporting.kpi_definition",
+   "reporting.kpi_target"
   ],
   "writes": [],
   "storedProcedures": [],
@@ -171676,7 +171719,10 @@
    "postgres-analytical",
    "redis"
   ],
-  "reads": [],
+  "reads": [
+   "reporting.kpi_definition",
+   "reporting.kpi_target"
+  ],
   "writes": [],
   "storedProcedures": [],
   "wave": 3,
@@ -171733,7 +171779,10 @@
    "postgres-analytical",
    "redis"
   ],
-  "reads": [],
+  "reads": [
+   "reporting.kpi_definition",
+   "reporting.kpi_target"
+  ],
   "writes": [],
   "storedProcedures": [],
   "wave": 3,
@@ -171790,7 +171839,10 @@
    "postgres-analytical",
    "redis"
   ],
-  "reads": [],
+  "reads": [
+   "reporting.kpi_definition",
+   "reporting.kpi_target"
+  ],
   "writes": [],
   "storedProcedures": [],
   "wave": 3,
@@ -171847,7 +171899,10 @@
    "postgres-analytical",
    "redis"
   ],
-  "reads": [],
+  "reads": [
+   "reporting.kpi_definition",
+   "reporting.kpi_target"
+  ],
   "writes": [],
   "storedProcedures": [],
   "wave": 3,
@@ -171904,7 +171959,10 @@
    "postgres-analytical",
    "redis"
   ],
-  "reads": [],
+  "reads": [
+   "reporting.kpi_definition",
+   "reporting.kpi_target"
+  ],
   "writes": [],
   "storedProcedures": [],
   "wave": 3,
@@ -174455,7 +174513,10 @@
    "postgres-analytical",
    "redis"
   ],
-  "reads": [],
+  "reads": [
+   "reporting.kpi_definition",
+   "reporting.kpi_target"
+  ],
   "writes": [],
   "storedProcedures": [],
   "wave": 3,
@@ -174812,6 +174873,7 @@
    "redis"
   ],
   "reads": [
+   "reporting.kpi_definition",
    "reporting.kpi_target"
   ],
   "writes": [

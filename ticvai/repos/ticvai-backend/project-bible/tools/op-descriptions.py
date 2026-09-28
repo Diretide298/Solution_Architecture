@@ -460,6 +460,10 @@ def build(schedule, keys):
     out = {}
     for key in keys:
         base, _, part = key.partition("#")
+        if base not in rows:
+            # Out of the plan since it was pushed (a decision deferred, merged or regrouped it). op-retire.py
+            # moves those tickets; rewriting them here would describe work nobody is going to do.
+            continue
         r = rows[base]
         text = []
         if r["track"] == "Backend" and r["type"] == "Task":

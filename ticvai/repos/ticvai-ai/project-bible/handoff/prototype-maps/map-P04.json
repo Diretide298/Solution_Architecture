@@ -1,0 +1,320 @@
+{
+ "prototype": "D:/Chinmay/adam/TICVAI POS Terminal.html",
+ "rev": "TICVAI OS 4.2.1 · Build 2026.08.14 · b7f31c",
+ "howToOpen": "Open the HTML file in Chrome (the bundle unpacks itself). Tap any operator, key any 4 digits, then 'Continue to float count' -> 'Open shift & start selling'. The left rail reaches every view (Home, Tickets, F&B, Tables, Retail, Queue, Guests, Refunds, Sync, Reports, Setup, Close); the startScreen prop can jump straight to login/home/reports/checkout.",
+ "screens": [
+  {
+   "id": "POS-000",
+   "name": "Sign In",
+   "match": "exact",
+   "view": "Opens here (startScreen 'login'): pick an operator tile, enter any 4-digit PIN",
+   "evidence": "sc-if onLogin; 'Sign in to shift', 'Select your profile, then enter your 4-digit PIN.', OPS (6 operators with roleKey), buttons 'Badge / RFID', 'Corporate SSO'; submit -> go('float')",
+   "differences": "Prototype adds Badge/RFID and Corporate SSO sign-in (both just submit), a 'Terminal locks after 90 s idle' rule, and a 'Shift not started · Float pending' pill. No MFA challenge, no active-session / force-logout, no role selection, no denied/offline state (YAML has mfaRequired, denied, offline, emptyNoAccess). The operator's role is fixed by the tile, not chosen."
+  },
+  {
+   "id": "POS-001",
+   "name": "Begin Shift",
+   "match": "exact",
+   "view": "Login -> 'Continue to float count' -> 'STEP 2 OF 2 · SHIFT OPENING'",
+   "evidence": "sc-if onFloat; 'Count the opening float', DENOMS (6 rows, +/-), 'Expected float AED 1,000.00', 'Supervisor verification ... blind-verified by duty manager', button 'Open shift & start selling' (openShift -> go('home'))",
+   "differences": "The expected float (AED 1,000.00) and a live variance are shown to the cashier while counting, and supervisor approval is a static 'PIN approved' note rather than a step. No suspend/resume/reopen shift, no cash movement, no no-sale, no deposit-box float or role selection here, although the YAML hangs all of those overlays on this screen."
+  },
+  {
+   "id": "POS-002",
+   "name": "Sell — Ticket Catalogue",
+   "match": "exact",
+   "view": "Left rail 'Tickets' (or Home launcher 'Ticketing' / F1 'Scan ticket')",
+   "evidence": "screen 'tickets'; title 'Ticketing & attractions'; CATALOG.tickets cats All/Attractions/Cinema/Events/Passes/Vouchers; 'On now at Marina Bay' featured strip; filter pills; 'Scan barcode / QR'; product drawer (drawerOpen); cart panel with Hold sale / Discount / Charge",
+   "differences": "Prototype adds several things the YAML does not declare: a cart-hold countdown (props cartHold / cartHoldSeconds, 300 s, 'extend' capped at two extensions); up to 4 parked cart tabs ('Four parked carts is the limit on this terminal'); a gift-voucher face-value sale (voucherMode); a waitlist for sold-out events (waitlistMode, 'Starlight Rooftop Party'); group/family bundles; an add-on upsell modal ('Add-ons for this ticket'); live stock status (IN/LOW/OUT/OFFLINE_STOCK); and a cart History modal with Reload cart. The YAML declares game-card issue/transfer/load, exchange, reschedule and promotion evaluation, and none of these appear (promo codes exist only inside the Discount modal)."
+  },
+  {
+   "id": "POS-003",
+   "name": "Sell — Timed Entry",
+   "match": "partial",
+   "view": "Tickets -> 'Aqua Park · Day Pass' -> drawer -> DATE & TIME row -> calendar + AVAILABLE TIMES; per-guest variants in the same drawer",
+   "evidence": "drawer steps stepDetail -> stepDT (dtCells calendar, legend Available/Low stock/Full, dtTimes); VARIANTS.park Adult/Child/Senior/Infant; GROUPS family bundles; item meta 'Timed entry · per-guest variants'",
+   "differences": "This is a drawer step, not a page, which matches the YAML gap (the 3 Aug workshop decision) and not the screen as it is modelled. The prototype has no inventory-hold acquire/renew/relinquish UI; the only hold is the cart timer. It adds group bundles priced at one amount."
+  },
+  {
+   "id": "POS-004",
+   "name": "Sell — Seat Map",
+   "match": "partial",
+   "view": "Tickets -> Cinema item (e.g. 'Skyline Cinema · Standard') -> drawer -> 'Interactive seat map'; Events -> 'Desert Beats Concert' -> date/time -> 'Choose zone' -> admissions",
+   "evidence": "stepSeats with gridSeatMode (SEATMAPS.cinema rows) and arenaSeatMode (ARENA_SECTIONS, 'FANPIT General admission'); event flow evStepDetail -> evStepZone (EVENTPLANS.arena zones Golden Circle/Floor A/B) -> evStepQty ('Keep the party together')",
+   "differences": "Seats are picked inside the POS-002 drawer, not on a full-screen map (YAML gap). The prototype adds a zone-priced general-admission flow (zones -> tiers -> 'Keep the party together' / best available) that has no screen. It also shows a running order and says 'Seats are held for 8 minutes', but there is no seat-hold extend/recommend UI and no separate booking-fee line."
+  },
+  {
+   "id": "POS-005",
+   "name": "Payment",
+   "match": "exact",
+   "view": "Cart 'Charge' -> checkout (startScreen 'checkout')",
+   "evidence": "sc-if onCheckout; 'Select payment method'; tenders (11: Cash, Card, Contactless, Apple Pay, Google Pay, Guest wallet, Gift voucher, Complimentary, Corporate voucher, Prepaid / online, Split payment); cash keypad + quickCash + 'CHANGE DUE'; splitMode; states payProcessing / payChecking / payUnknown ('Payment status unknown') / payFailedOpen; 'Tax details' breakdown; printerDown banner",
+   "differences": "Prototype goes further than the YAML: it has an explicit unknown-outcome state with 'Check payment status' (inquirePaymentStatus), idempotent retry, a Complimentary tender with a required reason, Split, Corporate voucher and Prepaid tenders, a printer-offline fallback to email, and training mode ('Sales are simulated and not posted'). The Tip step is missing: Setup has a 'Tip prompt' toggle but flags.tips is never read, so no tip is taken. There is no foreign-currency tender, and no buyer name/address/TRN is captured above the AED 10,000 invoice threshold, although the receipt does relabel to 'Tax Invoice' (the YAML gap is still open)."
+  },
+  {
+   "id": "POS-006",
+   "name": "Held Orders",
+   "match": "partial",
+   "view": "Cart 'Hold sale' or Home hot key F2 'Recall held (n)' -> 'Held sales' modal",
+   "evidence": "sc-if heldModalOpen; 'Held sales — Recall a parked sale into this terminal, or discard it.'; h.recall / h.discard; also saleTabs (parked cart tabs)",
+   "differences": "Held orders are a modal limited to this terminal, and there are also up to 4 parked cart tabs that act as a second hold mechanism. There is no search, and no modify/refund/exchange/reschedule/void of held orders, although the YAML attaches 9 overlays."
+  },
+  {
+   "id": "POS-007",
+   "name": "Close Shift",
+   "match": "exact",
+   "view": "Left rail 'Close' (goClose) or palette 'Shift close & Z-report'",
+   "evidence": "screen 'closeout'; steps closeCount ('Count the drawer', CLOSE_DENOMS 11 rows) -> closeVariance ('REASON CODE · REQUIRED', CLOSE_REASONS, 'Send for supervisor approval', cash.variance.approve / askPin('shift')) -> closeSummary (Z-report, 'Print Z-report', 'Email finance', 'Sign, close & lock shift')",
+   "differences": "It is not a blind count. COUNTED and EXPECTED totals ('Expected = opening float ... plus every cash transaction') are shown live side by side, which contradicts the YAML note 'The blind count is the whole control'. It adds an expected-by-tender table, a handover checklist and an approval record. There is no per-currency count, no deposit-box close and no suspend/reopen."
+  },
+  {
+   "id": "POS-008",
+   "name": "Reports",
+   "match": "partial",
+   "view": "Left rail 'Reports' or Home launcher 'Venue command'",
+   "evidence": "screen 'reports'; title 'Venue command'; kpis, 'Revenue by hour' (Ticketing/F&B/Retail tabs), 'Terminal health 62 / 64 online', 'Attraction utilisation', 'Outlet performance · All 11 outlets', 'Needs attention 3 open'",
+   "differences": "The prototype is a fixed cross-venue command dashboard. There is no report list, run-report action, natural-language question or saved query (all declared in the YAML). It also shows terminal health and cross-outlet data, which is broader than 'from the terminal'."
+  },
+  {
+   "id": "POS-009",
+   "name": "Staff Roster",
+   "match": "none",
+   "view": "—",
+   "evidence": "No staff/rota view in the new prototype. Nearest: Setup 'Access & roles' (role permission lists) and Reports 'Terminal health'",
+   "differences": "The older Park_POS_v1 had this ('Staff & shifts', 'On duty today 6 of 8 scheduled', roster table). The new prototype dropped it. There is no rota assignment, no on-duty list and no workstation assignment."
+  },
+  {
+   "id": "POS-010",
+   "name": "Add to Existing Ticket",
+   "match": "none",
+   "view": "—",
+   "evidence": "Nearest: Retail lockers 'Links to ticket QR' and the upsell modal 'Add-ons for this ticket'; both add lines to the current sale",
+   "differences": "Nothing appends an entitlement to media the guest already carries (appendEntitlementToMedia). Lockers and add-ons are sold as new cart lines, and the receipt issues 'One QR for the whole sale'. The Guests 'Top up' money-card modal loads wallet value, not entitlements."
+  },
+  {
+   "id": "POS-011",
+   "name": "Returns, Refunds & Exchanges",
+   "match": "partial",
+   "view": "Left rail 'Refunds' (or tap a Recent transaction on Home)",
+   "evidence": "screen 'refunds'; title 'Refund & void'; 'Find the original sale' (Receipt no · card last-4 · date · shift); rfScopes Whole sale / Line items; REFUND_METHODS Original tender / Cash / Store credit / voucher; REASONS; editable partial amount; 'Void · no funds move'; 'Reverse payment' modal (Reversal requested -> processing -> Reversed); AUDIT TRAIL; manager PIN via askPin('refund'/'void'/'reversal')",
+   "differences": "There is no exchange flow and no retail return/restock or return-policy check, all of which the YAML declares (exchangeOrderLines, createRetailReturn, getReturnPolicy). The prototype adds void and payment reversal on this screen, shows original and refund VAT, and gates approval by role permission."
+  },
+  {
+   "id": "POS-012",
+   "name": "Omnichannel Order & Fulfilment Center",
+   "match": "partial",
+   "view": "Cart order-type selector (Dine-in / Takeaway / Delivery, shown on F&B) + left rail 'Queue'",
+   "evidence": "orderTypes; isTakeaway 'PICKUP DETAILS'; isDelivery 'FULFILMENT SOURCE' own driver (DRIVERS) or partner (PARTNERS Talabat/Deliveroo/Careem Now/Noon Food, 'Prepaid via partner — tender step skipped'); queue title 'Delivery & takeaway queue — Kiosk, aggregator and runner orders in one lane'",
+   "differences": "Omnichannel here means F&B takeaway, delivery and aggregator orders. There is no click-and-collect of merchandise (reserveMerchandise) and no handover record beyond the queue stage action. Delivery-partner capture (partner, reference, driver, fee) is not in the YAML."
+  },
+  {
+   "id": "POS-013",
+   "name": "Mobile POS, Event Sales & Offline Operations",
+   "match": "partial",
+   "view": "Left rail 'Sync' (or the network pill in the top bar)",
+   "evidence": "screen 'sync'; title 'Offline & sync'; toggleNet online/offline; 'LAST SUCCESSFUL SYNC', 'PENDING TRANSACTIONS', 'FAILED / NEEDS ATTENTION'; 'Local transaction queue · POS-014'; conflict modal 'SYNC CONFLICT · SUPERVISOR RESOLUTION' (Void / Keep & fix stock); 'Inventory ledger' drawer; Setup toggle 'Offline continuity'",
+   "differences": "The prototype covers offline operation and sync thoroughly (queue, retry, conflict resolution with supervisor PIN, OFFLINE_STOCK). It has no mobile/handheld form factor, no event-sales mode, no offline package download and no deposit-box withdraw/float. Conflict resolution and the inventory ledger are not in the YAML."
+  },
+  {
+   "id": "POS-014",
+   "name": "Sales Exceptions, Controls & Operational Actions",
+   "match": "partial",
+   "view": "Spread across: cart 'Discount' modal; Refunds 'Void'; Home hot key F3 'Open drawer'; 'AUTHORISATION REQUIRED' PIN modal",
+   "evidence": "discOpen ('APPLY DISCOUNT', discTypes, PROMOS, DISC_REASONS 'REASON CODE · REQUIRED', threshold -> askPin('discount')); pinAskOpen ('SUPERVISOR PIN OR BADGE', Approve / 'Reject & send back'); hotKeys 'Open drawer' -> flash only",
+   "differences": "There is no single exceptions screen: the controls are overlays on the sale. 'Open drawer' (the no-sale) takes no reason, checks no permission and writes no audit entry; it only shows a toast. This is the POS-020 gap C-4/C-5, still present. The approval modal has a reject path that the YAML does not model."
+  },
+  {
+   "id": "POS-015",
+   "name": "Cash Operations Dashboard",
+   "match": "none",
+   "view": "—",
+   "evidence": "No cash-movement or deposit-box view",
+   "differences": "Nothing lists cash movements or deposit boxes. The closest is the Close 'Expected by tender' table."
+  },
+  {
+   "id": "POS-016",
+   "name": "Till Configuration",
+   "match": "exact",
+   "view": "Left rail 'Setup'; hardware status also from the top-bar device icon (openHw)",
+   "evidence": "screen 'setup'; title 'Terminal setup — POS-014 · peripherals, modes and continuity'; 'Terminal behaviour' setupToggles (printer, offline, tips, display, sound, training); 'Peripherals' setupDevices; 'Deployment' (terminal, build, sync, compliance); 'Access & roles' (tenantChain, role permission lists); hwOpen 'Hardware status' with per-device actions (DEVICES: Reconnect / Test print / Test kick guarded by hardware.drawer.manual ...)",
+   "differences": "Prototype adds a read-only 'Access & roles' panel ('Permissions come from platform configuration, not this screen'), training mode, and device test actions. There is no deposit-box allocation (allocateDepositBox) and no workstation-configuration form."
+  },
+  {
+   "id": "POS-017",
+   "name": "Cash In / Cash Out Operations",
+   "match": "none",
+   "view": "—",
+   "evidence": "No paid-in / paid-out form; 'Open drawer' hot key only toasts",
+   "differences": "The prototype has no cash-in/cash-out view."
+  },
+  {
+   "id": "POS-018",
+   "name": "Safe Drop & Cash Transfer Management",
+   "match": "none",
+   "view": "—",
+   "evidence": "No safe drop / transfer view",
+   "differences": "The prototype has no safe-drop or transfer view."
+  },
+  {
+   "id": "POS-019",
+   "name": "Shift Templates & Policies",
+   "match": "none",
+   "view": "—",
+   "evidence": "No shift templates/policies view",
+   "differences": "Not represented. The variance tolerance (inTol) is hard-coded in the close flow."
+  },
+  {
+   "id": "POS-020",
+   "name": "Shift Exceptions & Alerts",
+   "match": "partial",
+   "view": "Top-bar bell -> 'Notifications' panel; Reports -> 'Needs attention'",
+   "evidence": "notifOpen ('Notifications', 'Mark all read', items 'Float variance — POS-047', 'Low stock — character plush', 'Printer offline — Cinema 4'); reports alerts with actions Review / Reorder / Dispatch",
+   "differences": "Alerts are a notification list with no screen of their own. There are no approval-request decisions (the PIN modal is inline and synchronous) and no no-sale reason log."
+  },
+  {
+   "id": "POS-021",
+   "name": "Sell — Food & Drink",
+   "match": "exact",
+   "view": "Left rail 'F&B' or Home launcher 'Food & beverage'",
+   "evidence": "screen 'fnb'; title 'Food & beverage — Bite & Go quick service · kitchen fires on payment'; CATALOG.fnb cats Popular/Mains/Sides/Drinks/Desserts; modifier drawer MODS burger/pizza/drink (SIZE Required, EXTRAS '2 free, then +6 each', MAKE IT A MEAL); order type Dine-in / Takeaway / Delivery in cart",
+   "differences": "Takeaway and delivery capture sit in the cart (see POS-012). There is no item-availability (86) toggle, although the YAML attaches setItemAvailability."
+  },
+  {
+   "id": "POS-022",
+   "name": "Send to Kitchen",
+   "match": "partial",
+   "view": "Implicit: F&B sale fires on payment; then Queue -> stage 'Received' action 'Send to kitchen' / 'Mark ready' / 'Dispatch / hand over'",
+   "evidence": "fnb subtitle 'kitchen fires on payment'; STAGES actions; receipt queueNo ('One QR for the whole sale ... F&B collection'); DEVICES 'Kitchen printer / KDS' 'Test ticket'",
+   "differences": "There is no explicit send-to-kitchen step at the counter; the order fires on payment. Kitchen ticket status and 'collected' are worked from the Queue board (POS-029), not from a screen of their own."
+  },
+  {
+   "id": "POS-023",
+   "name": "Sell — Merchandise",
+   "match": "exact",
+   "view": "Left rail 'Retail' or Home launcher 'Retail'",
+   "evidence": "screen 'retail'; title 'Retail — Inventory-aware · add-ons link to a ticket QR'; CATALOG.retail cats Apparel/Souvenirs/Essentials/Lockers; stock tags ('Low stock', 'n in stock'); reserveStock/releaseStock + INVENTORY_LEDGER; 'Scan barcode / QR'",
+   "differences": "Adds lockers sold as retail lines linked to the ticket QR, and an operational inventory ledger (Sync -> 'Inventory ledger'). No size/variant picker for apparel ('S–XXL' is meta text only); the stockConflict state appears only via sync conflicts."
+  },
+  {
+   "id": "POS-024",
+   "name": "Outlet Setup",
+   "match": "none",
+   "view": "—",
+   "evidence": "Tables screen has a fixed floor (TABLES, 12 tables); Setup is terminal-only",
+   "differences": "No table-layout, table-combination or item-availability editing anywhere."
+  },
+  {
+   "id": "POS-025",
+   "name": "Till Home",
+   "match": "exact",
+   "view": "After 'Open shift & start selling', or left rail 'Home' (startScreen 'home')",
+   "evidence": "screen 'home'; title 'Sales board'; shiftKpis (SHIFT SALES, AVG BASKET, OPEN CHECKS, QUEUE NOW); HOT KEYS F1 Scan ticket / F2 Recall held / F3 Open drawer / F4 Reprint receipt / F8 Hold sale; launchers (Ticketing, F&B, Tables, Retail, Guests & loyalty, Venue command); 'TODAY AT THE DISTRICT'; 'Recent transactions LIVE'; 'Open sales journal'; 'RFID sync healthy'",
+   "differences": "Adds hot keys, a venue highlight card and a recent-transactions feed that jumps to Refunds. The alerts and device health that the YAML binds to (listAlerts, listDevices) sit in the top-bar bell and device icon rather than on the home surface."
+  },
+  {
+   "id": "POS-026",
+   "name": "Receipt & Reprint",
+   "match": "partial",
+   "view": "After a successful payment (receipt screen); reprint via Home F4 or cart 'History' -> 'Reprint'",
+   "evidence": "screen 'receipt'; 'Payment complete', PAID / CHANGE / TENDER, auto-continue countdown (rcLeft, Skip / New sale), Print / Email / Save, invoiceType 'Tax Invoice'|'Simplified Tax Invoice', receiptTrn, 'Payment details' (Transaction ID, Payment ID, Auth ref, Gateway ref, Idempotency key, Retries), 'One QR for the whole sale'; histOpen h.reprint",
+   "differences": "The post-payment receipt is drawn and answers the POS-005 exitTo gap. Reprint is only a toast from the hot key or History, and there is no entitlement reissue (reissueEntitlement)."
+  },
+  {
+   "id": "POS-027",
+   "name": "Guest Lookup",
+   "match": "exact",
+   "view": "Left rail 'Guests', or cart guest button (goGuests)",
+   "evidence": "screen 'guests'; title 'Guests, loyalty & wallet — One identification component across every flow'; search 'Phone · name · email · membership no.'; 'Scan wristband'; 'Enrol new guest' modal; guest cards POINTS / WALLET / VISITS / benefit; link to sale; 'Top up' money-card modal",
+   "differences": "Adds guest enrolment ('Create & link to sale') and wallet top-up (TOPUPS 50–1000), neither declared on this screen. Open reservations are not shown on the guest card."
+  },
+  {
+   "id": "POS-028",
+   "name": "Table Service",
+   "match": "partial",
+   "view": "Left rail 'Tables' -> 'Table service' | 'Reservations' toggle",
+   "evidence": "screen 'tables'; 'Oasis Bistro floor plan'; tables with Vacant/Occupied/Bill requested/Reserved and CTA 'Seat & order' / 'Recall check' / 'Settle bill' / 'Seat booking' (press -> go('fnb') with table); onBooking 'New reservation' (date, SITTING TIME, PARTY SIZE, TABLE HELD FOR, 'TABLES THAT FIT', holding deposit 'AED 50 per cover'), \"Tonight's book\", 'Seat now'",
+   "differences": "There is no move, merge or close/clear of a table visit; tapping a table only drops into the F&B catalogue. The prototype adds reservation creation with a deposit, which goes beyond listTableReservations / seatTableReservation."
+  },
+  {
+   "id": "POS-029",
+   "name": "Order Queue",
+   "match": "exact",
+   "view": "Left rail 'Queue'",
+   "evidence": "screen 'queue'; QUEUE (6 orders TKW/DLV/DIN), STAGES Received -> Preparing -> Ready -> Out for delivery -> Completed with actions 'Send to kitchen' / 'Mark ready' / 'Dispatch / hand over' / 'Mark delivered' / 'Reopen'; cancel modal 'CANCEL ORDER' with CANCEL_REASONS and prepaid-partner auto-refund",
+   "differences": "Adds order cancellation with a reason, and auto-refund for partner-prepaid orders. The YAML has no cancel operation on this screen and no queue feed-health display."
+  }
+ ],
+ "unmappedViews": [
+  {
+   "view": "Command palette (⌘K / top-bar search)",
+   "what": "Jump-to-screen search listing the main screens and functions",
+   "suggest": "part of POS-025"
+  },
+  {
+   "view": "Hardware status panel (top-bar device icon)",
+   "what": "Per-device state for printer, drawer, card reader, scanner, CFD and KDS, with Reconnect/Test actions (drawer test-kick needs a permission)",
+   "suggest": "part of POS-016"
+  },
+  {
+   "view": "Cart history modal ('Cart history — THIS SHIFT · POS-014')",
+   "what": "Completed sales this shift, with Reprint and 'Reload cart'",
+   "suggest": "part of POS-026"
+  },
+  {
+   "view": "Parked cart tabs + cart hold timer",
+   "what": "Up to 4 concurrent carts; a hold countdown (default 300 s, 60–900) with two extensions, after which stock is released",
+   "suggest": "part of POS-002 / POS-006"
+  },
+  {
+   "view": "Event waitlist (drawer waitlistMode on a sold-out event)",
+   "what": "Capture name, phone and party, notify, then convert to a sale when a spot opens",
+   "suggest": "new screen"
+  },
+  {
+   "view": "Gift voucher sale (drawer voucherMode)",
+   "what": "Sell a gift voucher by face value (12-month validity); vouchers are also a tender",
+   "suggest": "part of POS-002"
+  },
+  {
+   "view": "Add-on upsell modal ('COMPLETE THE EXPERIENCE')",
+   "what": "Optional add-ons for a ticket, added to the same sale",
+   "suggest": "part of POS-002"
+  },
+  {
+   "view": "Guest enrol modal + money-card top-up modal",
+   "what": "Create a guest and link to the sale; top up the wallet by preset amounts",
+   "suggest": "part of POS-027"
+  },
+  {
+   "view": "Discount modal + supervisor PIN approval modal",
+   "what": "Percentage/amount/promo discount with a required reason and threshold approval; generic Approve / 'Reject & send back' PIN modal used for discount, void, refund, reversal, variance and conflict",
+   "suggest": "part of POS-014"
+  },
+  {
+   "view": "Payment reversal modal",
+   "what": "Reverse a settled payment (Reversal requested -> processing -> Reversed) with an audit entry",
+   "suggest": "part of POS-011"
+  },
+  {
+   "view": "Sync conflict modal + Inventory ledger drawer",
+   "what": "Supervisor resolves a queued offline sale that conflicts on stock (void or keep and fix stock); ledger of every stock movement from this POS",
+   "suggest": "part of POS-013"
+  },
+  {
+   "view": "Dining reservations (Tables -> Reservations)",
+   "what": "Create a table reservation with slot, party, hold duration, table fit and deposit; tonight's book with 'Seat now'",
+   "suggest": "part of POS-028"
+  },
+  {
+   "view": "Delivery / partner order capture in cart",
+   "what": "Order type Dine-in/Takeaway/Delivery; own driver or aggregator partner with reference; prepaid skips tender",
+   "suggest": "part of POS-012"
+  },
+  {
+   "view": "Training mode (Setup toggle)",
+   "what": "Sales are simulated and not posted",
+   "suggest": "part of POS-016"
+  }
+ ],
+ "summary": "30 P04 screens (none deferred): 11 exact, 12 partial, 7 none (POS-009, 010, 015, 017, 018, 019, 024). The prototype has 16 views: login, float, home, tickets, fnb, tables, retail, queue, guests, refunds, sync, reports, setup, closeout, checkout and receipt. It also has about 14 overlays; 14 unmapped views are listed, mostly parts of existing screens, and one suggested new screen (event waitlist). The three most important differences: (1) Cash control is weaker than the model. The close-out count is not blind (expected and counted totals are shown side by side). 'Open drawer' is a no-sale with no reason, permission or audit record. There are no cash-in/out, safe-drop, deposit-box or cash dashboard views, so POS-015/017/018 have nothing to map to. (2) The prototype goes further than the YAML on payment and offline. It has an unknown-outcome state with status inquiry and idempotent retry, 11 tenders including comp/split/corporate/prepaid, payment reversal, sync conflict resolution and an inventory ledger, but the tip step is missing (the toggle exists and does nothing) and no buyer TRN is captured above AED 10,000. (3) Timed entry and seat selection live as steps in the POS-002 drawer, which confirms the gaps recorded on POS-003/004. The prototype also adds flows with no screen: zone-priced events, waitlist, parked cart tabs with a hold timer, and reservations with deposits. Versus Park_POS_v1 (VERDANT, 4 views: catalogue, full-page timed-entry detail, cash payment, Staff & shifts with Begin shift float): the new build replaces the single ticket catalogue with a multi-module till (F&B, tables, retail, queue, guests, refunds, sync, setup, reports, close) and moves timed entry into a drawer. It drops the staff roster, which is why POS-009 now maps to nothing."
+}

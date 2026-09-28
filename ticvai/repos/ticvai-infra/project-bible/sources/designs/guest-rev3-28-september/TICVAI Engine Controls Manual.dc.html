@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin=""/>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<style>
+  doc-page:not(:defined) { visibility: hidden }
+  body { margin: 0 }
+  a { color: #7a4bd6; text-decoration: none }
+  a:hover { color: #5b32ab; text-decoration: underline }
+  figure { break-inside: avoid }
+  h2, h3 { break-after: avoid }
+  .spec { break-inside: avoid; orphans: 3; widows: 3 }
+</style>
+<script src="./doc-page.js"></script>
+</helmet>
+
+<doc-page margin="0.7in">
+
+  <h1 style="font-family:'Archivo',sans-serif; font-weight:700; font-size:30px; line-height:1.15; letter-spacing:-.01em; margin:0 0 10px; color:#141317">TICVAI engine controls</h1>
+  <p style="font-family:'IBM Plex Sans',sans-serif; font-size:13px; letter-spacing:.13em; text-transform:uppercase; color:var(--mAccent,#7a4bd6); font-weight:600; margin:0 0 22px">Operator manual · guest booking web app</p>
+
+  <p style="font-family:'IBM Plex Sans',sans-serif; font-size:15px; line-height:1.62; color:#2a2825; margin:0 0 14px">The engine controls panel re-skins and re-wires the guest booking app while it is running. Every screenshot in this manual was taken from the live build, one control at a time, so each pair shows the same screen before and after a single change.</p>
+
+  <p style="font-family:'IBM Plex Sans',sans-serif; font-size:15px; line-height:1.62; color:#2a2825; margin:0 0 26px">The panel is a demo and configuration surface. Guests never see it, and nothing in it is saved to a guest's booking — it is there so you can show any venue, any brand and any flow from one URL.</p>
+
+  <h2 style="font-family:'Archivo',sans-serif; font-weight:600; font-size:20px; margin:30px 0 10px; color:#141317; border-top:2px solid #141317; padding-top:12px">Opening the panel</h2>
+  <div style="display:grid; grid-template-columns:0.62fr 1fr; gap:24px; align-items:start; margin:0 0 10px">
+    <figure style="margin:0">
+      <img src="manual/img/panel-top.png" alt="Engine controls drawer, top section" style="width:100%; display:block; border:var(--mFrame,1px solid #d8d5cf); border-radius:4px; box-shadow:var(--mShadow,none)"/>
+      <figcaption style="display:var(--mCap,block); font-family:'IBM Plex Sans',sans-serif; font-size:11.5px; line-height:1.45; color:#6b6660; padding-top:6px">The drawer, scrolled to the top: venue type and booking flow.</figcaption>
+    </figure>
+    <div>
+      <p style="font-family:'IBM Plex Sans',sans-serif; font-size:15px; line-height:1.62; color:#2a2825; margin:0 0 12px">Open it from the dark square button at the left end of the navigation bar — the single bar that carries the venue lockup, the guest navigation, the account controls and the venue's own call to action. The page behind it dims; the drawer itself scrolls independently. Close it with the &times; in its top corner or by clicking the dimmed page.</p>
+      <p style="font-family:'IBM Plex Sans',sans-serif; font-size:15px; line-height:1.62; color:#2a2825; margin:0 0 12px">Controls are grouped in five blocks, in this order: <strong>Venue type</strong>, <strong>Booking flow</strong>, <strong>Brand</strong>, <strong>Flow</strong>, <strong>Shape &amp; background</strong>, <strong>Layout &amp; locale</strong>.</p>
+      <p style="font-family:'IBM Plex Sans',sans-serif; font-size:15px; line-height:1.62; color:#2a2825; margin:0">Every change applies immediately, with no reload and without losing the guest's place in the flow. <strong>Reset to defaults</strong> sits at the bottom of the drawer.</p>
+    </div>
+  </div>
+
+  <h2 style="font-family:'Archivo',sans-serif; font-weight:600; font-size:20px; margin:34px 0 10px; color:#141317; border-top:2px solid #141317; padding-top:12px">1 · Venue type</h2>
+  <div class="spec" style="font-family:'IBM Plex Mono',monospace; font-size:12px; line-height:1.6; color:#3d3a35; background:#f4f2ee; border-left:3px solid var(--mAccent,#7a4bd6); padding:10px 14px; margin:0 0 16px">Options: Theme park · Water park · Stadium · Theatre · Dining<br/>Default: Theme park</div>
+  <p style="font-family:'IBM Plex Sans',sans-serif; font-size:15px; line-height:1.62; color:#2a2825; margin:0 0 18px">The venue buttons switch the whole tenant. Each one carries its own logo and lockup, colour palette, typeface, photography, section copy, ticket tiers, add-ons and step names — a water park shows sessions and wristbands, a stadium shows fixtures and stands, a restaurant shows tables and covers. The booking flow list below also re-scopes to the flows that venue offers.</p>
+
+  <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px 18px; margin:0 0 6px">
+    <figure style="margin:0">
+      <img src="manual/img/venue-park.jpg" alt="Theme park ticket selection" style="width:100%; display:block; border:var(--mFrame,1px solid #d8d5cf); border-radius:4px; box-shadow:var(--mShadow,none)"/>
+      <figcaption style="display:var(--mCap,block); font-family:'IBM Plex Sans',sans-serif; font-size:11.5px; line-height:1.45; color:#6b6660; padding-top:6px">Theme park — Summit Peaks: purple, Outfit, coaster imagery.</figcaption>
+    </figure>
+    <figure style="margin:0">
+      <img src="manual/img/venue-water.jpg" alt="Water park session selection" style="width:100%; display:block; border:var(--mFrame,1px solid #d8d5cf); border-radius:4px; box-shadow:var(--mShadow,none)"/>
+      <figcaption style="display:var(--mCap,block); font-family:'IBM Plex Sans',sans-serif; font-size:11.5px; line-height:1.45; color:#6b6660; padding-top:6px">Water park — Coastal Aqua: its own mark, palette and photography.</figcaption>
+    </figure>
+    <figure style="margin:0">
+      <img src="manual/img/venue-stadium.jpg" alt="Stadium fixture selection" style="width:100%; display:block; border:var(--mFrame,1px solid #d8d5cf); border-radius:4px; box-shadow:var(--mShadow,none)"/>
+      <figcaption style="display:var(--mCap,block); font-family:'IBM Plex Sans',sans-serif; font-size:11.5px; line-height:1.45; color:#6b6660; padding-top:6px">Stadium — Union Arena: dark charcoal-navy, condensed type.</figcaption>
+    </figure>
+    <figure style="margin:0">
+      <img src="manual/img/venue-theatre.jpg" alt="Theatre screening selection" style="width:100%; display:block; border:var(--mFrame,1px solid #d8d5cf); border-radius:4px; box-shadow:var(--mShadow,none)"/>
+      <figcaption style="display:var(--mCap,block); font-family:'IBM Plex Sans',sans-serif; font-size:11.5px; line-height:1.45; color:#6b6660; padding-top:6px">Theatre — plum, Playfair display, performance imagery.</figcaption>
+    </figure>
+    <figure style="margin:0">
+      <img src="manual/img/venue-dining.jpg" alt="Dining service selection" style="width:100%; display:block; border:var(--mFrame,1px solid #d8d5cf); border-radius:4px; box-shadow:var(--mShadow,none)"/>
+      <figcaption style="display:var(--mCap,block); font-family:'IBM Plex Sans',sans-serif; font-size:11.5px; line-height:1.45; color:#6b6660; padding-top:6px">Dining — Saffron Table: serif lockup, warm palette.</figcaption>
+    </figure>
+  </div>
+
+  <h2 style="font-family:'Archivo',sans-serif; font-weight:600; font-size:20px; margin:34px 0 10px; color:#141317; border-top:2px solid #141317; padding-top:12px">2 · Booking flow</h2>
+  <div class="spec" style="font-family:'IBM Plex Mono',monospace; font-size:12px; line-height:1.6; color:#3d3a35; background:#f4f2ee; border-left:3px solid var(--mAccent,#7a4bd6); padding:10px 14px; margin:0 0 16px">Options: 34 flows in total, listed per venue<br/>Theme park: Dated day pass · Timed entry / capacity slots · Multi-park combo · Annual pass / membership · Fast-track upgrade · Height &amp; age eligibility gate · Group / school booking</div>
+  <p style="font-family:'IBM Plex Sans',sans-serif; font-size:15px; line-height:1.62; color:#2a2825; margin:0 0 18px">The flow decides which steps exist and what each one asks for. A day pass runs Tickets → Extras → Details → Payment → Confirmed; an eligibility gate adds rider requirements and a guardian waiver; a group booking replaces card payment with an invoice and drops the extras step; a waitlist or offer flow ends in a hold rather than a sale. Changing the flow restarts the guest at step one, because the steps themselves are different.</p>
+
+  <h2 style="font-family:'Archivo',sans-serif; font-weight:600; font-size:20px; margin:34px 0 10px; color:#141317; border-top:2px solid #141317; padding-top:12px">3 · Brand</h2>
+  <div style="display:grid; grid-template-columns:0.62fr 1fr; gap:24px; align-items:start; margin:0 0 20px">
+    <figure style="margin:0">
+      <img src="manual/img/panel-brand.png" alt="Brand group in the controls drawer" style="width:100%; display:block; border:var(--mFrame,1px solid #d8d5cf); border-radius:4px; box-shadow:var(--mShadow,none)"/>
+      <figcaption style="display:var(--mCap,block); font-family:'IBM Plex Sans',sans-serif; font-size:11.5px; line-height:1.45; color:#6b6660; padding-top:6px">The Brand group: six controls.</figcaption>
+    </figure>
+    <p style="font-family:'IBM Plex Sans',sans-serif; font-size:15px; line-height:1.62; color:#2a2825; margin:0">Brand controls change the skin only. Prices, availability, steps and copy stay exactly where they were, so you can hand the same booking to a different tenant mid-demo.</p>
+  </div>
+
+  <h3 style="font-family:'Archivo',sans-serif; font-weight:600; font-size:16px; margin:22px 0 8px; color:#141317">Palette</h3>
+  <div class="spec" style="font-family:'IBM Plex Mono',monospace; font-size:12px; line-height:1.6; color:#3d3a35; background:#f4f2ee; border-left:3px solid var(--mAccent,#7a4bd6); padding:10px 14px; margin:0 0 14px">Options: Auto (per venue) + 18 named palettes — Sunset amber, Deep teal, Stadium red, Playhouse plum, Saffron cream, Midnight ink, Paper mono, Racing red, Dive cyan, Kids playground, Arena violet, Cinema crimson, Desert gold, Ticvai blue, Ticvai night, Souk terracotta, Slate lime, Mobile app · Nocturne dark / light<br/>Default: Auto (per venue)</div>
+  <p style="font-family:'IBM Plex Sans',sans-serif; font-size:15px; line-height:1.62; color:#2a2825; margin:0 0 16px">Sets brand, accent, ink and surface colours together, and decides whether the app runs light or dark. On Auto, each venue uses its own palette. A named palette overrides all five venues, which is how you check a tenant's colours against an unfamiliar flow.</p>
+  <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px 18px; margin:0 0 6px">
+    <figure style="margin:0">
+      <img src="manual/img/palette-midnight.png" alt="Midnight ink palette" style="width:100%; display:block; border:var(--mFrame,1px solid #d8d5cf); border-radius:4px; box-shadow:var(--mShadow,none)"/>
+      <figcaption style="display:var(--mCap,block); font-family:'IBM Plex Sans',sans-serif; font-size:11.5px; line-height:1.45; color:#6b6660; padding-top:6px">Midnight ink — a dark palette on the theme park flow.</figcaption>
+    </figure>
+    <figure style="margin:0">
+      <img src="manual/img/palette-gold.png" alt="Desert gold palette" style="width:100%; display:block; border:var(--mFrame,1px solid #d8d5cf); border-radius:4px; box-shadow:var(--mShadow,none)"/>
+      <figcaption style="display:var(--mCap,block); font-family:'IBM Plex Sans',sans-serif; font-size:11.5px; line-height:1.45; color:#6b6660; padding-top:6px">Desert gold — the same screen, warm light palette.</figcaption>
+    </figure>
+  </div>
+
+  <h3 style="font-family:'Archivo',sans-serif; font-weight:600; font-size:16px; margin:22px 0 8px; color:#141317">Typeface</h3>
+  <div class="spec" style="font-family:'IBM Plex Mono',monospace; font-size:12px; line-height:1.6; color:#3d3a35; background:#f4f2ee; border-left:3px solid var(--mAccent,#7a4bd6); padding:10px 14px; margin:0 0 14px">Options: Auto (venue brand) · Archivo / IBM Plex Sans · Instrument Serif / Public Sans · Manrope only · Inter Tight (mobile app)<br/>Default: Auto (venue brand)</div>
+  <p style="font-family:'IBM Plex Sans',sans-serif; font-size:15px; line-height:1.62; color:#2a2825; margin:0 0 14px">Swaps the display and body pairing across every screen. Auto keeps each venue's own fonts. The pairings are sized to hold the same layout, so switching never reflows a card out of its frame.</p>
+  <figure style="margin:0 0 6px; max-width:62%">
+    <img src="manual/img/type-serif.png" alt="Instrument Serif and Public Sans pairing" style="width:100%; display:block; border:var(--mFrame,1px solid #d8d5cf); border-radius:4px; box-shadow:var(--mShadow,none)"/>
+    <figcaption style="display:var(--mCap,block); font-family:'IBM Plex Sans',sans-serif; font-size:11.5px; line-height:1.45; color:#6b6660; padding-top:6px">Instrument Serif / Public Sans on the ticket step.</figcaption>
+  </figure>
+
+  <h3 style="font-family:'Archivo',sans-serif; font-weight:600; font-size:16px; margin:22px 0 8px; color:#141317">Surfaces</h3>
+  <div class="spec" style="font-family:'IBM Plex Mono',monospace; font-size:12px; line-height:1.6; color:#3d3a35; background:#f4f2ee; border-left:3px solid var(--mAccent,#7a4bd6); padding:10px 14px; margin:0 0 14px">Options: Glass · Solid &nbsp;|&nbsp; Default: Glass</div>
+  <p style="font-family:'IBM Plex Sans',sans-serif; font-size:15px; line-height:1.62; color:#2a2825; margin:0 0 14px">Glass gives cards, the cart and overlays a translucent fill with a 20px backdrop blur. Solid replaces that with an opaque fill. Use Solid for embeds over busy host pages, for low-powered kiosk hardware, and whenever a screenshot needs flat colour.</p>
+  <figure style="margin:0 0 6px; max-width:62%">
+    <img src="manual/img/surface-solid.png" alt="Solid surfaces" style="width:100%; display:block; border:var(--mFrame,1px solid #d8d5cf); border-radius:4px; box-shadow:var(--mShadow,none)"/>
+    <figcaption style="display:var(--mCap,block); font-family:'IBM Plex Sans',sans-serif; font-size:11.5px; line-height:1.45; color:#6b6660; padding-top:6px">Solid surfaces — opaque cards, no blur.</figcaption>
+  </figure>
+
+  <h3 style="font-family:'Archivo',sans-serif; font-weight:600; font-size:16px; margin:22px 0 8px; color:#141317">Brand logo &amp; Logo palette</h3>
+  <div class="spec" style="font-family:'IBM Plex Mono',monospace; font-size:12px; line-height:1.6; color:#3d3a35; background:#f4f2ee; border-left:3px solid var(--mAccent,#7a4bd6); padding:10px 14px; margin:0 0 14px">Brand logo: Venue palette · Ticvai · Ferrari World · Explorers · Majid Al Futtaim · Deep Dive Dubai<br/>Logo palette: Light · Dark · Duotone &nbsp;|&nbsp; Defaults: Venue palette, Light</div>
+  <p style="font-family:'IBM Plex Sans',sans-serif; font-size:15px; line-height:1.62; color:#2a2825; margin:0 0 12px">Brand logo sets which lockup sits in the navigation bar and on the powered-by strip. Venue palette uses the venue's own mark; the other five drop a real partner lockup in its place, which is how you check a mark against a bar it was not drawn for.</p>
+  <p style="font-family:'IBM Plex Sans',sans-serif; font-size:15px; line-height:1.62; color:#2a2825; margin:0 0 16px">Logo palette decides which reading of that lockup's colours is pulled into the theme — light, dark or duotone. It re-reads the artwork rather than recolouring it, so a mark with fixed brand colours looks the same in all three while the page tone behind it changes.</p>
+  <div style="display:flex; flex-direction:column; gap:14px; margin:0 0 6px">
+    <figure style="margin:0">
+      <img src="manual/img/logo-venue.jpg" alt="Venue lockup in the bar" style="width:100%; display:block; border:var(--mFrame,1px solid #d8d5cf); border-radius:4px; box-shadow:var(--mShadow,none)"/>
+      <figcaption style="display:var(--mCap,block); font-family:'IBM Plex Sans',sans-serif; font-size:11.5px; line-height:1.45; color:#6b6660; padding-top:6px">Venue palette — Summit Peaks' own mark, purple accents.</figcaption>
+    </figure>
+    <figure style="margin:0">
+      <img src="manual/img/logo-ticvai.jpg" alt="Ticvai lockup in the bar" style="width:100%; display:block; border:var(--mFrame,1px solid #d8d5cf); border-radius:4px; box-shadow:var(--mShadow,none)"/>
+      <figcaption style="display:var(--mCap,block); font-family:'IBM Plex Sans',sans-serif; font-size:11.5px; line-height:1.45; color:#6b6660; padding-top:6px">Ticvai — the platform lockup, and the accents follow it to blue.</figcaption>
+    </figure>
+    <figure style="margin:0">
+      <img src="manual/img/logo-partner.jpg" alt="Partner lockup in the bar" style="width:100%; display:block; border:var(--mFrame,1px solid #d8d5cf); border-radius:4px; box-shadow:var(--mShadow,none)"/>
+      <figcaption style="display:var(--mCap,block); font-family:'IBM Plex Sans',sans-serif; font-size:11.5px; line-height:1.45; color:#6b6660; padding-top:6px">Deep Dive Dubai — a partner mark in the same bar.</figcaption>
+    </figure>
+  </div>
+
+  <h3 style="font-family:'Archivo',sans-serif; font-weight:600; font-size:16px; margin:22px 0 8px; color:#141317">Sahli mascot</h3>
+  <div class="spec" style="font-family:'IBM Plex Mono',monospace; font-size:12px; line-height:1.6; color:#3d3a35; background:#f4f2ee; border-left:3px solid var(--mAccent,#7a4bd6); padding:10px 14px; margin:0 0 14px">Toggle &nbsp;|&nbsp; Default: on</div>
+  <p style="font-family:'IBM Plex Sans',sans-serif; font-size:15px; line-height:1.62; color:#2a2825; margin:0 0 16px">Shows or hides Sahli, the AI concierge. On, the mascot sits in a rounded frame in the corner, reacts to what the guest is doing, and opens the concierge panel. Off, the concierge is still available but appears as a plain button with no character art — the setting to use for tenants who bring their own mascot.</p>
+  <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px 18px; margin:0 0 6px">
+    <figure style="margin:0">
+      <img src="manual/img/mascot-on.jpg" alt="Sahli mascot visible" style="width:100%; display:block; border:var(--mFrame,1px solid #d8d5cf); border-radius:4px; box-shadow:var(--mShadow,none)"/>
+      <figcaption style="display:var(--mCap,block); font-family:'IBM Plex Sans',sans-serif; font-size:11.5px; line-height:1.45; color:#6b6660; padding-top:6px">Mascot on — Ask Sahli, bottom right.</figcaption>
+    </figure>
+    <figure style="margin:0">
+      <img src="manual/img/mascot-off.jpg" alt="Sahli mascot hidden" style="width:100%; display:block; border:var(--mFrame,1px solid #d8d5cf); border-radius:4px; box-shadow:var(--mShadow,none)"/>
+      <figcaption style="display:var(--mCap,block); font-family:'IBM Plex Sans',sans-serif; font-size:11.5px; line-height:1.45; color:#6b6660; padding-top:6px">Mascot off — same concierge, no character art.</figcaption>
+    </figure>
+  </div>
+
+  <h2 style="font-family:'Archivo',sans-serif; font-weight:600; font-size:20px; margin:34px 0 10px; color:#141317; border-top:2px solid #141317; padding-top:12px">4 · Flow</h2>
+  <div style="display:grid; grid-template-columns:0.62fr 1fr; gap:24px; align-items:start; margin:0 0 20px">
+    <figure style="margin:0">
+      <img src="manual/img/panel-flow.png" alt="Flow group in the controls drawer" style="width:100%; display:block; border:var(--mFrame,1px solid #d8d5cf); border-radius:4px; box-shadow:var(--mShadow,none)"/>
+      <figcaption style="display:var(--mCap,block); font-family:'IBM Plex Sans',sans-serif; font-size:11.5px; line-height:1.45; color:#6b6660; padding-top:6px">The Flow group: six controls.</figcaption>
+    </figure>
+    <p style="font-family:'IBM Plex Sans',sans-serif; font-size:15px; line-height:1.62; color:#2a2825; margin:0">Flow controls change how the guest chooses: how choices are presented, how many steps there are, and how seats are picked.</p>
+  </div>
+
+  <h3 style="font-family:'Archivo',sans-serif; font-weight:600; font-size:16px; margin:22px 0 8px; color:#141317">Card layout</h3>
+  <div class="spec" style="font-family:'IBM Plex Mono',monospace; font-size:12px; line-height:1.6; color:#3d3a35; background:#f4f2ee; border-left:3px solid var(--mAccent,#7a4bd6); padding:10px 14px; margin:0 0 14px">Options: Stacked rows · Split rows · Cards across · Poster cards &nbsp;|&nbsp; Default: Stacked rows</div>
+  <p style="font-family:'IBM Plex Sans',sans-serif; font-size:15px; line-height:1.62; color:#2a2825; margin:0 0 12px">Sets how the choice cards on the first step are built. Stacked rows put a thumbnail, name and price on one line and expand for guest numbers. Split rows give the image more room. Cards across lays them out as a grid. Poster cards lead with full-width imagery, for titles and shows that sell on the artwork.</p>
+  <p style="font-family:'IBM Plex Sans',sans-serif; font-size:15px; line-height:1.62; color:#2a2825; margin:0 0 16px">The same setting drives the browse pages: the <strong>What's on</strong> results list and the rail on <strong>Discover</strong>. In the two grid modes the results wrap into a grid and every card in it is the same height, whatever the length of its title; in the two row modes they stay a single column and the Discover rail scrolls sideways.</p>
+  <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px 18px; margin:0 0 6px">
+    <figure style="margin:0">
+      <img src="manual/img/base.png" alt="Stacked rows card layout" style="width:100%; display:block; border:var(--mFrame,1px solid #d8d5cf); border-radius:4px; box-shadow:var(--mShadow,none)"/>
+      <figcaption style="display:var(--mCap,block); font-family:'IBM Plex Sans',sans-serif; font-size:11.5px; line-height:1.45; color:#6b6660; padding-top:6px">Stacked rows.</figcaption>
+    </figure>
+    <figure style="margin:0">
+      <img src="manual/img/cards-split.png" alt="Split rows card layout" style="width:100%; display:block; border:var(--mFrame,1px solid #d8d5cf); border-radius:4px; box-shadow:var(--mShadow,none)"/>
+      <figcaption style="display:var(--mCap,block); font-family:'IBM Plex Sans',sans-serif; font-size:11.5px; line-height:1.45; color:#6b6660; padding-top:6px">Split rows.</figcaption>
+    </figure>
+    <figure style="margin:0">
+      <img src="manual/img/cards-grid.png" alt="Cards across layout" style="width:100%; display:block; border:var(--mFrame,1px solid #d8d5cf); border-radius:4px; box-shadow:var(--mShadow,none)"/>
+      <figcaption style="display:var(--mCap,block); font-family:'IBM Plex Sans',sans-serif; font-size:11.5px; line-height:1.45; color:#6b6660; padding-top:6px">Cards across.</figcaption>
+    </figure>
+    <figure style="margin:0">
+      <img src="manual/img/cards-poster.png" alt="Poster cards layout" style="width:100%; display:block; border:var(--mFrame,1px solid #d8d5cf); border-radius:4px; box-shadow:var(--mShadow,none)"/>
+      <figcaption style="display:var(--mCap,block); font-family:'IBM Plex Sans',sans-serif; font-size:11.5px; line-height:1.45; color:#6b6660; padding-top:6px">Poster cards.</figcaption>
+    </figure>
+  </div>
+
+  <p style="font-family:'IBM Plex Sans',sans-serif; font-size:13px; letter-spacing:.1em; text-transform:uppercase; color:#6b6660; font-weight:600; margin:22px 0 10px">The same four settings on What's on</p>
+  <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px 18px; margin:0 0 6px">
+    <figure style="margin:0">
+      <img src="manual/img/wo-stacked.jpg" alt="What's on, stacked rows" style="width:100%; display:block; border:var(--mFrame,1px solid #d8d5cf); border-radius:4px; box-shadow:var(--mShadow,none)"/>
+      <figcaption style="display:var(--mCap,block); font-family:'IBM Plex Sans',sans-serif; font-size:11.5px; line-height:1.45; color:#6b6660; padding-top:6px">Stacked rows — one result per line.</figcaption>
+    </figure>
+    <figure style="margin:0">
+      <img src="manual/img/wo-split.jpg" alt="What's on, split rows" style="width:100%; display:block; border:var(--mFrame,1px solid #d8d5cf); border-radius:4px; box-shadow:var(--mShadow,none)"/>
+      <figcaption style="display:var(--mCap,block); font-family:'IBM Plex Sans',sans-serif; font-size:11.5px; line-height:1.45; color:#6b6660; padding-top:6px">Split rows — a larger thumbnail.</figcaption>
+    </figure>
+    <figure style="margin:0">
+      <img src="manual/img/wo-grid.jpg" alt="What's on, cards across" style="width:100%; display:block; border:var(--mFrame,1px solid #d8d5cf); border-radius:4px; box-shadow:var(--mShadow,none)"/>
+      <figcaption style="display:var(--mCap,block); font-family:'IBM Plex Sans',sans-serif; font-size:11.5px; line-height:1.45; color:#6b6660; padding-top:6px">Cards across — results wrap into a grid.</figcaption>
+    </figure>
+    <figure style="margin:0">
+      <img src="manual/img/wo-poster.jpg" alt="What's on, poster cards" style="width:100%; display:block; border:var(--mFrame,1px solid #d8d5cf); border-radius:4px; box-shadow:var(--mShadow,none)"/>
+      <figcaption style="display:var(--mCap,block); font-family:'IBM Plex Sans',sans-serif; font-size:11.5px; line-height:1.45; color:#6b6660; padding-top:6px">Poster cards — price on the image.</figcaption>
+    </figure>
+  </div>
+  <p style="font-family:'IBM Plex Sans',sans-serif; font-size:15px; line-height:1.62; color:#2a2825; margin:12px 0 0">In both grid modes every card is forced to the same height, so a two-line title never leaves one card taller than the ones beside it, and the Book button sits on the same line across the row.</p>
+
+  <h3 style="font-family:'Archivo',sans-serif; font-weight:600; font-size:16px; margin:22px 0 8px; color:#141317">Card size</h3>
+  <div class="spec" style="font-family:'IBM Plex Mono',monospace; font-size:12px; line-height:1.6; color:#3d3a35; background:#f4f2ee; border-left:3px solid var(--mAccent,#7a4bd6); padding:10px 14px; margin:0 0 14px">Options: Compact · Standard · Large · Extra large &nbsp;|&nbsp; Default: Compact</div>
+  <p style="font-family:'IBM Plex Sans',sans-serif; font-size:15px; line-height:1.62; color:#2a2825; margin:0 0 16px">Scales the choice cards without changing their layout: thumbnail size, padding, title and the weight of the price all move together, on the booking steps and on the browse pages alike. Compact fits more above the fold; Extra large suits kiosks and walk-up counters where the screen is further away.</p>
+  <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px 18px; margin:0 0 6px">
+    <figure style="margin:0">
+      <img src="manual/img/size-compact.png" alt="Compact card size" style="width:100%; display:block; border:var(--mFrame,1px solid #d8d5cf); border-radius:4px; box-shadow:var(--mShadow,none)"/>
+      <figcaption style="display:var(--mCap,block); font-family:'IBM Plex Sans',sans-serif; font-size:11.5px; line-height:1.45; color:#6b6660; padding-top:6px">Compact.</figcaption>
+    </figure>
+    <figure style="margin:0">
+      <img src="manual/img/size-xl.png" alt="Extra large card size" style="width:100%; display:block; border:var(--mFrame,1px solid #d8d5cf); border-radius:4px; box-shadow:var(--mShadow,none)"/>
+      <figcaption style="display:var(--mCap,block); font-family:'IBM Plex Sans',sans-serif; font-size:11.5px; line-height:1.45; color:#6b6660; padding-top:6px">Extra large.</figcaption>
+    </figure>
+  </div>
+
+  <h3 style="font-family:'Archivo',sans-serif; font-weight:600; font-size:16px; margin:22px 0 8px; color:#141317">Quantities on add-ons</h3>
+  <div class="spec" style="font-family:'IBM Plex Mono',monospace; font-size:12px; line-height:1.6; color:#3d3a35; background:#f4f2ee; border-left:3px solid var(--mAccent,#7a4bd6); padding:10px 14px; margin:0 0 14px">Toggle &nbsp;|&nbsp; Default: on</div>
+  <p style="font-family:'IBM Plex Sans',sans-serif; font-size:15px; line-height:1.62; color:#2a2825; margin:0 0 16px">On, every add-on carries a stepper, so a guest can take four parking spaces or two photo packs. Off, add-ons become single checkboxes — one per booking. Turn it off for venues whose extras are per-booking rather than per-guest.</p>
+  <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px 18px; margin:0 0 6px">
+    <figure style="margin:0">
+      <img src="manual/img/qty-on.png" alt="Add-ons with quantity steppers" style="width:100%; display:block; border:var(--mFrame,1px solid #d8d5cf); border-radius:4px; box-shadow:var(--mShadow,none)"/>
+      <figcaption style="display:var(--mCap,block); font-family:'IBM Plex Sans',sans-serif; font-size:11.5px; line-height:1.45; color:#6b6660; padding-top:6px">Quantities on — steppers on each add-on.</figcaption>
+    </figure>
+    <figure style="margin:0">
+      <img src="manual/img/qty-off.png" alt="Add-ons as checkboxes" style="width:100%; display:block; border:var(--mFrame,1px solid #d8d5cf); border-radius:4px; box-shadow:var(--mShadow,none)"/>
+      <figcaption style="display:var(--mCap,block); font-family:'IBM Plex Sans',sans-serif; font-size:11.5px; line-height:1.45; color:#6b6660; padding-top:6px">Quantities off — one checkbox per add-on.</figcaption>
+    </figure>
+  </div>
+
+  <h3 style="font-family:'Archivo',sans-serif; font-weight:600; font-size:16px; margin:22px 0 8px; color:#141317">Seat picker</h3>
+  <div class="spec" style="font-family:'IBM Plex Mono',monospace; font-size:12px; line-height:1.6; color:#3d3a35; background:#f4f2ee; border-left:3px solid var(--mAccent,#7a4bd6); padding:10px 14px; margin:0 0 14px">Options: Stadium bowl (zones → seats) · Zones, then seats · Zones only (capacity) · Seats only<br/>Default: Stadium bowl. Applies to venues with a seated step — stadium and theatre.</div>
+  <p style="font-family:'IBM Plex Sans',sans-serif; font-size:15px; line-height:1.62; color:#2a2825; margin:0 0 16px">Stadium bowl draws the real bowl: pick a stand, then zoom into its seats. Zones, then seats keeps the two-stage choice but lists the zones instead of drawing them. Zones only sells by zone capacity with steppers and no seat numbers — right for general admission and standing. Seats only drops straight to a single seat grid, which suits small rooms.</p>
+  <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px 18px; margin:0 0 6px">
+    <figure style="margin:0">
+      <img src="manual/img/seats-2d.png" alt="Stadium bowl, 2D" style="width:100%; display:block; border:var(--mFrame,1px solid #d8d5cf); border-radius:4px; box-shadow:var(--mShadow,none)"/>
+      <figcaption style="display:var(--mCap,block); font-family:'IBM Plex Sans',sans-serif; font-size:11.5px; line-height:1.45; color:#6b6660; padding-top:6px">Stadium bowl — stands around the pitch.</figcaption>
+    </figure>
+    <figure style="margin:0">
+      <img src="manual/img/seats-zones-then.png" alt="Zones, then seats" style="width:100%; display:block; border:var(--mFrame,1px solid #d8d5cf); border-radius:4px; box-shadow:var(--mShadow,none)"/>
+      <figcaption style="display:var(--mCap,block); font-family:'IBM Plex Sans',sans-serif; font-size:11.5px; line-height:1.45; color:#6b6660; padding-top:6px">Zones, then seats — priced zone list above the grid.</figcaption>
+    </figure>
+    <figure style="margin:0">
+      <img src="manual/img/seats-zones-only.png" alt="Zones only, capacity" style="width:100%; display:block; border:var(--mFrame,1px solid #d8d5cf); border-radius:4px; box-shadow:var(--mShadow,none)"/>
+      <figcaption style="display:var(--mCap,block); font-family:'IBM Plex Sans',sans-serif; font-size:11.5px; line-height:1.45; color:#6b6660; padding-top:6px">Zones only — capacity steppers, no seat numbers.</figcaption>
+    </figure>
+    <figure style="margin:0">
+      <img src="manual/img/seats-only.png" alt="Seats only" style="width:100%; display:block; border:var(--mFrame,1px solid #d8d5cf); border-radius:4px; box-shadow:var(--mShadow,none)"/>
+      <figcaption style="display:var(--mCap,block); font-family:'IBM Plex Sans',sans-serif; font-size:11.5px; line-height:1.45; color:#6b6660; padding-top:6px">Seats only — one grid, no zone step.</figcaption>
+    </figure>
+  </div>
+
+  <h3 style="font-family:'Archivo',sans-serif; font-weight:600; font-size:16px; margin:22px 0 8px; color:#141317">Map view</h3>
+  <div class="spec" style="font-family:'IBM Plex Mono',monospace; font-size:12px; line-height:1.6; color:#3d3a35; background:#f4f2ee; border-left:3px solid var(--mAccent,#7a4bd6); padding:10px 14px; margin:0 0 14px">Options: 2D · 3D &nbsp;|&nbsp; Default: 3D</div>
+  <p style="font-family:'IBM Plex Sans',sans-serif; font-size:15px; line-height:1.62; color:#2a2825; margin:0 0 16px">2D is the flat plan: fast, legible, and the safer choice on weak hardware. 3D is an isometric bowl the guest can orbit and zoom, with clickable stands and a crowd; the page keeps scrolling normally around it. Guests can also switch between them from the toggle on the seating step, along with the sport and concert configurations.</p>
+  <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px 18px; margin:0 0 6px">
+    <figure style="margin:0">
+      <img src="manual/img/seats-3d.png" alt="3D stadium bowl" style="width:100%; display:block; border:var(--mFrame,1px solid #d8d5cf); border-radius:4px; box-shadow:var(--mShadow,none)"/>
+      <figcaption style="display:var(--mCap,block); font-family:'IBM Plex Sans',sans-serif; font-size:11.5px; line-height:1.45; color:#6b6660; padding-top:6px">3D — isometric bowl, orbit and zoom.</figcaption>
+    </figure>
+    <figure style="margin:0">
+      <img src="manual/img/seats-theatre.png" alt="Theatre seat map" style="width:100%; display:block; border:var(--mFrame,1px solid #d8d5cf); border-radius:4px; box-shadow:var(--mShadow,none)"/>
+      <figcaption style="display:var(--mCap,block); font-family:'IBM Plex Sans',sans-serif; font-size:11.5px; line-height:1.45; color:#6b6660; padding-top:6px">The same controls on the theatre, around a stage.</figcaption>
+    </figure>
+  </div>
+
+  <h3 style="font-family:'Archivo',sans-serif; font-weight:600; font-size:16px; margin:22px 0 8px; color:#141317">Extras step</h3>
+  <div class="spec" style="font-family:'IBM Plex Mono',monospace; font-size:12px; line-height:1.6; color:#3d3a35; background:#f4f2ee; border-left:3px solid var(--mAccent,#7a4bd6); padding:10px 14px; margin:0 0 14px">Options: Auto (per flow) · Always · Never &nbsp;|&nbsp; Default: Auto (per flow)</div>
+  <p style="font-family:'IBM Plex Sans',sans-serif; font-size:15px; line-height:1.62; color:#2a2825; margin:0 0 14px">Auto follows the flow: invoiced group bookings, waitlists and offer holds skip extras, everything else shows them. Always forces the step in; Never removes it, and the add-ons are still reachable from the cart's often-added panel. The step count in the progress bar follows.</p>
+  <figure style="margin:0 0 6px">
+    <img src="manual/img/strip-extras-never.png" alt="Step list without the extras step" style="width:100%; display:block; border:var(--mFrame,1px solid #d8d5cf); border-radius:4px; box-shadow:var(--mShadow,none)"/>
+    <figcaption style="display:var(--mCap,block); font-family:'IBM Plex Sans',sans-serif; font-size:11.5px; line-height:1.45; color:#6b6660; padding-top:6px">Extras set to Never — four steps instead of five, extras gone from the list.</figcaption>
+  </figure>
+
+  <h2 style="font-family:'Archivo',sans-serif; font-weight:600; font-size:20px; margin:34px 0 10px; color:#141317; border-top:2px solid #141317; padding-top:12px">5 · Shape &amp; background</h2>
+  <div style="display:grid; grid-template-columns:0.62fr 1fr; gap:24px; align-items:start; margin:0 0 20px">
+    <figure style="margin:0">
+      <img src="manual/img/panel-shape.png" alt="Shape and background group in the controls drawer" style="width:100%; display:block; border:var(--mFrame,1px solid #d8d5cf); border-radius:4px; box-shadow:var(--mShadow,none)"/>
+      <figcaption style="display:var(--mCap,block); font-family:'IBM Plex Sans',sans-serif; font-size:11.5px; line-height:1.45; color:#6b6660; padding-top:6px">Shape &amp; background: four controls.</figcaption>
+    </figure>
+    <p style="font-family:'IBM Plex Sans',sans-serif; font-size:15px; line-height:1.62; color:#2a2825; margin:0">These four are the fastest way to make the engine sit inside a host site it was not designed for: page tone, corner radius, button shape and spacing.</p>
+  </div>
+
+  <h3 style="font-family:'Archivo',sans-serif; font-weight:600; font-size:16px; margin:22px 0 8px; color:#141317">Background</h3>
+  <div class="spec" style="font-family:'IBM Plex Mono',monospace; font-size:12px; line-height:1.6; color:#3d3a35; background:#f4f2ee; border-left:3px solid var(--mAccent,#7a4bd6); padding:10px 14px; margin:0 0 14px">Options: Auto, plus 28 tones — brand tints and washes, neutral papers (Paper white, Warm sand, Cool grey, Greige, Bone), accent tints, and darks (Near black, Charcoal, Deep navy, Forest night, Plum night, Espresso)<br/>Default: Auto</div>
+  <p style="font-family:'IBM Plex Sans',sans-serif; font-size:15px; line-height:1.62; color:#2a2825; margin:0 0 16px">Sets the page behind the cards. Auto follows the palette. Brand tints and washes pull the tenant colour into the page; the neutrals keep it out of the way; the darks flip the app without changing the palette's accents. Text and card contrast are recalculated with the tone, so ink stays readable on every option.</p>
+  <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px 18px; margin:0 0 6px">
+    <figure style="margin:0">
+      <img src="manual/img/bg-wash.png" alt="Brand wash background" style="width:100%; display:block; border:var(--mFrame,1px solid #d8d5cf); border-radius:4px; box-shadow:var(--mShadow,none)"/>
+      <figcaption style="display:var(--mCap,block); font-family:'IBM Plex Sans',sans-serif; font-size:11.5px; line-height:1.45; color:#6b6660; padding-top:6px">Brand wash.</figcaption>
+    </figure>
+    <figure style="margin:0">
+      <img src="manual/img/bg-ink.png" alt="Brand ink background" style="width:100%; display:block; border:var(--mFrame,1px solid #d8d5cf); border-radius:4px; box-shadow:var(--mShadow,none)"/>
+      <figcaption style="display:var(--mCap,block); font-family:'IBM Plex Sans',sans-serif; font-size:11.5px; line-height:1.45; color:#6b6660; padding-top:6px">Brand ink — same palette, dark page.</figcaption>
+    </figure>
+  </div>
+
+  <h3 style="font-family:'Archivo',sans-serif; font-weight:600; font-size:16px; margin:22px 0 8px; color:#141317">Corner radius</h3>
+  <div class="spec" style="font-family:'IBM Plex Mono',monospace; font-size:12px; line-height:1.6; color:#3d3a35; background:#f4f2ee; border-left:3px solid var(--mAccent,#7a4bd6); padding:10px 14px; margin:0 0 14px">Range: 0–22px &nbsp;|&nbsp; Default: 10px</div>
+  <p style="font-family:'IBM Plex Sans',sans-serif; font-size:15px; line-height:1.62; color:#2a2825; margin:0 0 16px">One slider drives the radius of cards, inputs, chips, images and the cart. Buttons keep their own shape, set by the next control.</p>
+  <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px 18px; margin:0 0 6px">
+    <figure style="margin:0">
+      <img src="manual/img/radius-0.png" alt="Corner radius zero" style="width:100%; display:block; border:var(--mFrame,1px solid #d8d5cf); border-radius:4px; box-shadow:var(--mShadow,none)"/>
+      <figcaption style="display:var(--mCap,block); font-family:'IBM Plex Sans',sans-serif; font-size:11.5px; line-height:1.45; color:#6b6660; padding-top:6px">0px — square.</figcaption>
+    </figure>
+    <figure style="margin:0">
+      <img src="manual/img/radius-22.png" alt="Corner radius 22px" style="width:100%; display:block; border:var(--mFrame,1px solid #d8d5cf); border-radius:4px; box-shadow:var(--mShadow,none)"/>
+      <figcaption style="display:var(--mCap,block); font-family:'IBM Plex Sans',sans-serif; font-size:11.5px; line-height:1.45; color:#6b6660; padding-top:6px">22px — fully rounded.</figcaption>
+    </figure>
+  </div>
+
+  <h3 style="font-family:'Archivo',sans-serif; font-weight:600; font-size:16px; margin:22px 0 8px; color:#141317">Buttons</h3>
+  <div class="spec" style="font-family:'IBM Plex Mono',monospace; font-size:12px; line-height:1.6; color:#3d3a35; background:#f4f2ee; border-left:3px solid var(--mAccent,#7a4bd6); padding:10px 14px; margin:0 0 14px">Options: Solid · Outline · Pill &nbsp;|&nbsp; Default: Solid</div>
+  <p style="font-family:'IBM Plex Sans',sans-serif; font-size:15px; line-height:1.62; color:#2a2825; margin:0 0 16px">Applies to every primary and secondary button, including the cart's continue button and the payment actions. Outline keeps the brand colour but drops the fill; Pill rounds fully regardless of the corner radius.</p>
+  <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px 18px; margin:0 0 6px">
+    <figure style="margin:0">
+      <img src="manual/img/btn-outline.png" alt="Outline buttons" style="width:100%; display:block; border:var(--mFrame,1px solid #d8d5cf); border-radius:4px; box-shadow:var(--mShadow,none)"/>
+      <figcaption style="display:var(--mCap,block); font-family:'IBM Plex Sans',sans-serif; font-size:11.5px; line-height:1.45; color:#6b6660; padding-top:6px">Outline.</figcaption>
+    </figure>
+    <figure style="margin:0">
+      <img src="manual/img/btn-pill.png" alt="Pill buttons" style="width:100%; display:block; border:var(--mFrame,1px solid #d8d5cf); border-radius:4px; box-shadow:var(--mShadow,none)"/>
+      <figcaption style="display:var(--mCap,block); font-family:'IBM Plex Sans',sans-serif; font-size:11.5px; line-height:1.45; color:#6b6660; padding-top:6px">Pill.</figcaption>
+    </figure>
+  </div>
+
+  <h3 style="font-family:'Archivo',sans-serif; font-weight:600; font-size:16px; margin:22px 0 8px; color:#141317">Density</h3>
+  <div class="spec" style="font-family:'IBM Plex Mono',monospace; font-size:12px; line-height:1.6; color:#3d3a35; background:#f4f2ee; border-left:3px solid var(--mAccent,#7a4bd6); padding:10px 14px; margin:0 0 14px">Options: Compact · Standard · Roomy &nbsp;|&nbsp; Default: Compact</div>
+  <p style="font-family:'IBM Plex Sans',sans-serif; font-size:15px; line-height:1.62; color:#2a2825; margin:0 0 16px">Scales padding and the gaps between blocks across every step. It does not change type size or hit targets, so touch targets stay at least 44px on Compact.</p>
+  <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px 18px; margin:0 0 6px">
+    <figure style="margin:0">
+      <img src="manual/img/density-compact.png" alt="Compact density" style="width:100%; display:block; border:var(--mFrame,1px solid #d8d5cf); border-radius:4px; box-shadow:var(--mShadow,none)"/>
+      <figcaption style="display:var(--mCap,block); font-family:'IBM Plex Sans',sans-serif; font-size:11.5px; line-height:1.45; color:#6b6660; padding-top:6px">Compact.</figcaption>
+    </figure>
+    <figure style="margin:0">
+      <img src="manual/img/density-roomy.png" alt="Roomy density" style="width:100%; display:block; border:var(--mFrame,1px solid #d8d5cf); border-radius:4px; box-shadow:var(--mShadow,none)"/>
+      <figcaption style="display:var(--mCap,block); font-family:'IBM Plex Sans',sans-serif; font-size:11.5px; line-height:1.45; color:#6b6660; padding-top:6px">Roomy.</figcaption>
+    </figure>
+  </div>
+
+  <h2 style="font-family:'Archivo',sans-serif; font-weight:600; font-size:20px; margin:34px 0 10px; color:#141317; border-top:2px solid #141317; padding-top:12px">6 · Layout &amp; locale</h2>
+  <div style="display:grid; grid-template-columns:0.62fr 1fr; gap:24px; align-items:start; margin:0 0 20px">
+    <figure style="margin:0">
+      <img src="manual/img/panel-layout.png" alt="Layout and locale group in the controls drawer" style="width:100%; display:block; border:var(--mFrame,1px solid #d8d5cf); border-radius:4px; box-shadow:var(--mShadow,none)"/>
+      <figcaption style="display:var(--mCap,block); font-family:'IBM Plex Sans',sans-serif; font-size:11.5px; line-height:1.45; color:#6b6660; padding-top:6px">Layout &amp; locale: five controls.</figcaption>
+    </figure>
+    <p style="font-family:'IBM Plex Sans',sans-serif; font-size:15px; line-height:1.62; color:#2a2825; margin:0">Where the engine runs and who it runs for: page or embed, cart position, progress style, currency and reading direction.</p>
+  </div>
+
+  <h3 style="font-family:'Archivo',sans-serif; font-weight:600; font-size:16px; margin:22px 0 8px; color:#141317">Embed mode</h3>
+  <div class="spec" style="font-family:'IBM Plex Mono',monospace; font-size:12px; line-height:1.6; color:#3d3a35; background:#f4f2ee; border-left:3px solid var(--mAccent,#7a4bd6); padding:10px 14px; margin:0 0 14px">Options: Full page · Embedded &nbsp;|&nbsp; Default: Full page</div>
+  <p style="font-family:'IBM Plex Sans',sans-serif; font-size:15px; line-height:1.62; color:#2a2825; margin:0 0 14px">Full page is the standalone booking site: venue header, hero and footer. Embedded drops all of it and renders only the engine, for dropping into a tenant's own page. The powered-by strip, progress and secure-checkout note stay in both.</p>
+  <figure style="margin:0 0 6px; max-width:72%">
+    <img src="manual/img/embed.png" alt="Embedded mode" style="width:100%; display:block; border:var(--mFrame,1px solid #d8d5cf); border-radius:4px; box-shadow:var(--mShadow,none)"/>
+    <figcaption style="display:var(--mCap,block); font-family:'IBM Plex Sans',sans-serif; font-size:11.5px; line-height:1.45; color:#6b6660; padding-top:6px">Embedded — no venue header or hero.</figcaption>
+  </figure>
+
+  <h3 style="font-family:'Archivo',sans-serif; font-weight:600; font-size:16px; margin:22px 0 8px; color:#141317">Checkout layout</h3>
+  <div class="spec" style="font-family:'IBM Plex Mono',monospace; font-size:12px; line-height:1.6; color:#3d3a35; background:#f4f2ee; border-left:3px solid var(--mAccent,#7a4bd6); padding:10px 14px; margin:0 0 14px">Options: Cart sidebar · Single column &nbsp;|&nbsp; Default: Cart sidebar</div>
+  <p style="font-family:'IBM Plex Sans',sans-serif; font-size:15px; line-height:1.62; color:#2a2825; margin:0 0 14px">Cart sidebar keeps the running total, VAT and continue button beside the step. Single column moves the cart below the content, full width — the layout to use for narrow embeds and for mobile-first demos.</p>
+  <figure style="margin:0 0 6px; max-width:72%">
+    <img src="manual/img/single-col.png" alt="Single column checkout" style="width:100%; display:block; border:var(--mFrame,1px solid #d8d5cf); border-radius:4px; box-shadow:var(--mShadow,none)"/>
+    <figcaption style="display:var(--mCap,block); font-family:'IBM Plex Sans',sans-serif; font-size:11.5px; line-height:1.45; color:#6b6660; padding-top:6px">Single column — content full width, cart below.</figcaption>
+  </figure>
+
+  <h3 style="font-family:'Archivo',sans-serif; font-weight:600; font-size:16px; margin:22px 0 8px; color:#141317">Progress</h3>
+  <div class="spec" style="font-family:'IBM Plex Mono',monospace; font-size:12px; line-height:1.6; color:#3d3a35; background:#f4f2ee; border-left:3px solid var(--mAccent,#7a4bd6); padding:10px 14px; margin:0 0 14px">Options: Bar · Numbered steps · Dots &nbsp;|&nbsp; Default: Bar</div>
+  <p style="font-family:'IBM Plex Sans',sans-serif; font-size:15px; line-height:1.62; color:#2a2825; margin:0 0 16px">Sets the step indicator under the powered-by strip. Numbered steps name every step and let a guest jump back to a completed one. Bar and Dots are quieter, for short flows and for embeds where the host page already shows its own progress.</p>
+  <div style="display:flex; flex-direction:column; gap:14px; margin:0 0 6px">
+    <figure style="margin:0">
+      <img src="manual/img/strip-progress-num.png" alt="Numbered steps progress" style="width:100%; display:block; border:var(--mFrame,1px solid #d8d5cf); border-radius:4px; box-shadow:var(--mShadow,none)"/>
+      <figcaption style="display:var(--mCap,block); font-family:'IBM Plex Sans',sans-serif; font-size:11.5px; line-height:1.45; color:#6b6660; padding-top:6px">Numbered steps — every step named, completed ones clickable.</figcaption>
+    </figure>
+    <figure style="margin:0">
+      <img src="manual/img/strip-progress-bar.png" alt="Bar progress" style="width:100%; display:block; border:var(--mFrame,1px solid #d8d5cf); border-radius:4px; box-shadow:var(--mShadow,none)"/>
+      <figcaption style="display:var(--mCap,block); font-family:'IBM Plex Sans',sans-serif; font-size:11.5px; line-height:1.45; color:#6b6660; padding-top:6px">Bar — current step named, progress shown as a rule.</figcaption>
+    </figure>
+    <figure style="margin:0">
+      <img src="manual/img/strip-progress-dots.png" alt="Dots progress" style="width:100%; display:block; border:var(--mFrame,1px solid #d8d5cf); border-radius:4px; box-shadow:var(--mShadow,none)"/>
+      <figcaption style="display:var(--mCap,block); font-family:'IBM Plex Sans',sans-serif; font-size:11.5px; line-height:1.45; color:#6b6660; padding-top:6px">Dots — one dot per step, current step named.</figcaption>
+    </figure>
+  </div>
+
+  <h3 style="font-family:'Archivo',sans-serif; font-weight:600; font-size:16px; margin:22px 0 8px; color:#141317">Currency</h3>
+  <div class="spec" style="font-family:'IBM Plex Mono',monospace; font-size:12px; line-height:1.6; color:#3d3a35; background:#f4f2ee; border-left:3px solid var(--mAccent,#7a4bd6); padding:10px 14px; margin:0 0 14px">Options: AED · SAR · USD · INR · GBP &nbsp;|&nbsp; Default: AED</div>
+  <p style="font-family:'IBM Plex Sans',sans-serif; font-size:15px; line-height:1.62; color:#2a2825; margin:0 0 16px">Converts every price, add-on, subtotal, VAT line and total at a fixed demo rate and relabels them. Amounts are rounded to whole units, so a converted total will not always match the sum of its converted parts to the last unit.</p>
+  <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px 18px; margin:0 0 6px">
+    <figure style="margin:0">
+      <img src="manual/img/cur-usd.png" alt="Prices in USD" style="width:100%; display:block; border:var(--mFrame,1px solid #d8d5cf); border-radius:4px; box-shadow:var(--mShadow,none)"/>
+      <figcaption style="display:var(--mCap,block); font-family:'IBM Plex Sans',sans-serif; font-size:11.5px; line-height:1.45; color:#6b6660; padding-top:6px">USD.</figcaption>
+    </figure>
+    <figure style="margin:0">
+      <img src="manual/img/cur-inr.png" alt="Prices in INR" style="width:100%; display:block; border:var(--mFrame,1px solid #d8d5cf); border-radius:4px; box-shadow:var(--mShadow,none)"/>
+      <figcaption style="display:var(--mCap,block); font-family:'IBM Plex Sans',sans-serif; font-size:11.5px; line-height:1.45; color:#6b6660; padding-top:6px">INR.</figcaption>
+    </figure>
+  </div>
+
+  <h3 style="font-family:'Archivo',sans-serif; font-weight:600; font-size:16px; margin:22px 0 8px; color:#141317">Right to left</h3>
+  <div class="spec" style="font-family:'IBM Plex Mono',monospace; font-size:12px; line-height:1.6; color:#3d3a35; background:#f4f2ee; border-left:3px solid var(--mAccent,#7a4bd6); padding:10px 14px; margin:0 0 14px">Toggle &nbsp;|&nbsp; Default: off</div>
+  <p style="font-family:'IBM Plex Sans',sans-serif; font-size:15px; line-height:1.62; color:#2a2825; margin:0 0 14px">Mirrors the whole engine: reading order, cart side, date strips, steppers, progress and the concierge. Copy stays in English, so this is a layout check rather than a translation.</p>
+  <figure style="margin:0 0 6px; max-width:72%">
+    <img src="manual/img/rtl.png" alt="Right to left layout" style="width:100%; display:block; border:var(--mFrame,1px solid #d8d5cf); border-radius:4px; box-shadow:var(--mShadow,none)"/>
+    <figcaption style="display:var(--mCap,block); font-family:'IBM Plex Sans',sans-serif; font-size:11.5px; line-height:1.45; color:#6b6660; padding-top:6px">Right to left — cart and dates mirrored.</figcaption>
+  </figure>
+
+  <h2 style="font-family:'Archivo',sans-serif; font-weight:600; font-size:20px; margin:34px 0 10px; color:#141317; border-top:2px solid #141317; padding-top:12px">Reset, and what carries over</h2>
+  <p style="font-family:'IBM Plex Sans',sans-serif; font-size:15px; line-height:1.62; color:#2a2825; margin:0 0 12px"><strong>Reset to defaults</strong>, at the bottom of the drawer, returns every control in all four groups to the values listed in this manual. It leaves the venue and the flow as they are.</p>
+  <p style="font-family:'IBM Plex Sans',sans-serif; font-size:15px; line-height:1.62; color:#2a2825; margin:0 0 12px">Brand, shape and locale controls never touch the guest's progress: a cart built on the theme park survives a switch to Desert gold, Solid surfaces or right-to-left. Venue type, booking flow and seat picker do change what the steps are, so they restart the guest at step one.</p>
+  <p style="font-family:'IBM Plex Sans',sans-serif; font-size:15px; line-height:1.62; color:#2a2825; margin:0">Settings live in the session only. A reload returns the engine to its defaults, which makes the panel safe to hand to someone else mid-demo.</p>
+
+</doc-page>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;accent&quot;:{&quot;editor&quot;:&quot;color&quot;,&quot;default&quot;:&quot;#7a4bd6&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;options&quot;:[&quot;#7a4bd6&quot;,&quot;#0f766e&quot;,&quot;#c0392b&quot;,&quot;#141317&quot;],&quot;section&quot;:&quot;Manual style&quot;},&quot;imageFrame&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;default&quot;:&quot;Hairline&quot;,&quot;options&quot;:[&quot;Hairline&quot;,&quot;Shadow&quot;,&quot;None&quot;],&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Manual style&quot;},&quot;captions&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Manual style&quot;}}">
+class Component extends DCLogic {
+  apply() {
+    const p = this.props || {};
+    const el = document.documentElement;
+    el.style.setProperty('--mAccent', p.accent || '#7a4bd6');
+    const frame = p.imageFrame || 'Hairline';
+    el.style.setProperty('--mFrame', frame === 'None' ? '0' : '1px solid ' + (frame === 'Shadow' ? '#e4e1db' : '#d8d5cf'));
+    el.style.setProperty('--mShadow', frame === 'Shadow' ? '0 2px 10px rgba(20,19,23,.13)' : 'none');
+    el.style.setProperty('--mCap', p.captions === false ? 'none' : 'block');
+  }
+  componentDidMount() { this.apply(); }
+  componentDidUpdate() { this.apply(); }
+  renderVals() { return {}; }
+}
+
+</script>
+</body>
+</html>

@@ -450,8 +450,15 @@ screens:
     - Product.kind
   wireframe:
     status: review
-    provenance: designed
+    provenance: client-verified
     board: wireframes/P01 Guest Web.dc.html#web-001
+    prototype:
+      file: 'sources/designs/guest-rev3-28-september/TICVAI Guest Booking v2.dc.html'
+      rev: 'rev 3'
+      verified: 2026-09-28
+      match: partial
+      view: 'Header ''Discover'' (default view on load)'
+      differences: 'No first-open venue picker remembered on the device and no ''Change venue'' in the header (YAML R267); the prototype shows ''Browse by venue'' tiles instead and switches venue from the Config drawer. Prototype adds a resume-booking card, a video ''Tonight in the city'' panel, live queue times on cards and footer links to Contact / Accessibility / Service status. YAML emptyNoAccess/offline states are not drawn on Home (offline exists only as a demo tweak).'
   apisNote: Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop pack
     — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
     to the ones that matter is work a person still owes this screen.
@@ -658,8 +665,15 @@ screens:
     - WaitTime.waitMinutes
   wireframe:
     status: review
-    provenance: designed
+    provenance: client-verified
     board: wireframes/P01 Guest Web.dc.html#web-002
+    prototype:
+      file: 'sources/designs/guest-rev3-28-september/TICVAI Guest Booking v2.dc.html'
+      rev: 'rev 3'
+      verified: 2026-09-28
+      match: exact
+      view: 'Header ''What''s on'''
+      differences: 'Prototype adds a right-hand quick-book preview (''list.pick'' aside with ticket counters and Continue) that YAML leaves to WEB-004/WEB-005, and shows each card''s booking-flow label and live queue time (getWaitTimes is in the YAML). Empty-results copy ''Everything is still on sale — the filter is what narrowed it.'''
   apisNote: Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack
     — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
     to the ones that matter is work a person still owes this screen.
@@ -790,8 +804,15 @@ screens:
     - Money.scale
   wireframe:
     status: review
-    provenance: designed
+    provenance: client-verified
     board: wireframes/P01 Guest Web.dc.html#web-003
+    prototype:
+      file: 'sources/designs/guest-rev3-28-september/TICVAI Guest Booking v2.dc.html'
+      rev: 'rev 3'
+      verified: 2026-09-28
+      match: partial
+      view: 'Discover → search box in the hero (opens the search panel) → Enter lands on What''s on filtered by the query'
+      differences: 'No separate results page: results render as a type-ahead overlay and then in the WEB-002 listing with the query applied. Recent and popular searches are prototype additions not in the YAML.'
   apisNote: Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack
     — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
     to the ones that matter is work a person still owes this screen.
@@ -1022,8 +1043,15 @@ screens:
     - Performance.approvalRequestId
   wireframe:
     status: review
-    provenance: designed
+    provenance: client-verified
     board: wireframes/P01 Guest Web.dc.html#web-004
+    prototype:
+      file: 'sources/designs/guest-rev3-28-september/TICVAI Guest Booking v2.dc.html'
+      rev: 'rev 3'
+      verified: 2026-09-28
+      match: partial
+      view: 'Config → Marketing layer → ''Single-event page'' on, then Book; or any product card → ''Read more'' dialog; or a listing card''s preview aside'
+      differences: 'No standing attraction-detail page in the default flow: details are a banner above the booking step (behind a Config toggle), a pop-up per product, or the listing preview. Eligibility rule display (getProductEligibilityRule) appears only as tags. Prototype labels it WEB-003b, not WEB-004.'
   apisNote: Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack
     — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
     to the ones that matter is work a person still owes this screen.
@@ -1160,8 +1188,15 @@ screens:
     - ProductVariant.isActive
   wireframe:
     status: review
-    provenance: designed
+    provenance: client-verified
     board: wireframes/P01 Guest Web.dc.html#web-005
+    prototype:
+      file: 'sources/designs/guest-rev3-28-september/TICVAI Guest Booking v2.dc.html'
+      rev: 'rev 3'
+      verified: 2026-09-28
+      match: partial
+      view: 'Header ''Book'' (or any card''s Book) → step 1 ''Tickets'' of the booking stepper; e.g. Tidewater Museum → ''Category → subcategory tickets'''
+      differences: 'Ticket choice is on the same step as date and time and comes last: ''Date → time → ticket'' (Config ''Performance reveal'', Rev 3 item 2), whereas YAML goes WEB-005 → WEB-006. Prototype adds category → subcategory browsing, info-only (not bookable) products, ''Help me choose'' questions, location switcher (''Booking at'' bar), quick tour. Promo codes are entered in the cart, not on this step (YAML keeps evaluatePromotions here).'
   apisNote: Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack
     — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
     to the ones that matter is work a person still owes this screen.
@@ -1186,7 +1221,7 @@ screens:
       - membershipTierId
       - couponCodes
       - evaluateAt
-    provenance: contract promotions.yaml POST /promotions/evaluate
+    provenance: client-verified
 - id: WEB-006
   name: Date & Performance Selection
   module: Booking & Selection
@@ -1326,8 +1361,15 @@ screens:
     trigger: onAction
   wireframe:
     status: review
-    provenance: designed
+    provenance: client-verified
     board: wireframes/P01 Guest Web.dc.html#web-006
+    prototype:
+      file: 'sources/designs/guest-rev3-28-september/TICVAI Guest Booking v2.dc.html'
+      rev: 'rev 3'
+      verified: 2026-09-28
+      match: partial
+      view: 'Book → step 1; e.g. Summit Peaks → ''Timed access — 10-minute slots'', Coastal Aqua → ''Surf sessions with filters'''
+      differences: 'Merged into the ticket step (date first, time revealed after the date, tickets after the time). Prototype adds morning/afternoon/evening filters, times-per-page paging, sold-out greying, per-guest age/height eligibility dialog with ''Remove this guest'', and the water-park ''Are you able to swim?'' pop-up. YAML''s separate hold call (addCartLine / inventory hold) is implicit.'
   apisNote: Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack
     — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
     to the ones that matter is work a person still owes this screen.
@@ -1352,7 +1394,7 @@ screens:
       discards:
       - productIds
       - party
-    provenance: contract catalogue.yaml POST /eligibility-checks
+    provenance: client-verified
   - id: formAcquireInventoryHold
     component: modal
     trigger: Add to cart
@@ -1371,7 +1413,7 @@ screens:
       - requestedUnits
       - ttlSeconds
       - channel
-    provenance: contract catalogue.yaml POST /inventory-holds
+    provenance: client-verified
 - id: WEB-007
   name: Interactive Seat Selection
   module: Booking & Selection
@@ -1502,8 +1544,15 @@ screens:
       event.'
   wireframe:
     status: review
-    provenance: designed
+    provenance: client-verified
     board: wireframes/P01 Guest Web.dc.html#web-007
+    prototype:
+      file: 'sources/designs/guest-rev3-28-september/TICVAI Guest Booking v2.dc.html'
+      rev: 'rev 3'
+      verified: 2026-09-28
+      match: exact
+      view: 'Union Arena → ''Flow 1 · Fixed date → zone → seat map'' or ''Flow 2 · Choose date & time → seat map''; Grand Playhouse → Flow 1 / Flow 2'
+      differences: 'Prototype adds a 3D/2D bowl, seat-view box position (Config ''Seat view box''), time bar to switch performance (releases held seats), date & time pop-up on the map, standing zones sold by quantity, up to 10 seats. Best-available is a separate flow (''Best available (no map)'') rather than recommendSeats on this screen. Also reused as a cabana map (Coastal Aqua) and dinner-event table map.'
     derivedFrom: wireframes/reference/Seat Board 3.dc.html
     note: '**Drawn by Claude Design on `Seat Board 3.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.**
       The frame it points at now is the generated one. This screen has been designed once and is not starting
@@ -1529,7 +1578,7 @@ screens:
       - seatIds
       - ttlSeconds
       - subjectId
-    provenance: contract seating.yaml POST /seat-holds
+    provenance: client-verified
   - id: formRecommendSeats
     component: modal
     trigger: Recommend seats
@@ -1549,7 +1598,7 @@ screens:
       - maxPrice
       - accessibleCount
       - maxOptions
-    provenance: contract seating.yaml POST /performances/{performanceId}/seat-recommendations
+    provenance: client-verified
 - id: WEB-008
   name: Add-ons & Upsell
   module: Booking & Selection
@@ -1708,8 +1757,15 @@ screens:
     coldEntry: Resolves from the session; a cold arrival is the ordinary case.
   wireframe:
     status: review
-    provenance: designed
+    provenance: client-verified
     board: wireframes/P01 Guest Web.dc.html#web-008
+    prototype:
+      file: 'sources/designs/guest-rev3-28-september/TICVAI Guest Booking v2.dc.html'
+      rev: 'rev 3'
+      verified: 2026-09-28
+      match: exact
+      view: 'Book → ''Extras'' step (e.g. Summit Peaks → Dated day pass → Continue)'
+      differences: 'Sign-in is asked when leaving Add-ons (Config ''Ask to sign in: After add-ons'', Rev 3 item 3), so WEB-008 → WEB-016 is a transition YAML does not have. Add-ons also appear on the payment step (combo) and confirmation (upsells). 28 Sep flow review: all add-ons live here only.'
   apisNote: Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack
     — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
     to the ones that matter is work a person still owes this screen.
@@ -1733,7 +1789,7 @@ screens:
       - seatIds
       - parentLineId
       - attributes
-    provenance: contract orders.yaml POST /carts/{cartId}/lines
+    provenance: client-verified
 - id: WEB-009
   name: Wishlist
   module: Booking & Selection
@@ -1819,7 +1875,7 @@ screens:
     trigger: Remove from wishlist
     body: '**Names what `removeFromWishlist` changes and what it leaves alone**, in the consequence rather
       than the verb. A wishlist this affects should be identified in the dialog, not just counted.'
-    provenance: contract marketing-crm.yaml DELETE /guests/{subjectId}/wishlist/{itemId}
+    provenance: client-verified
   - id: formAddToWishlist
     component: modal
     trigger: Add to wishlist
@@ -1834,7 +1890,7 @@ screens:
       - variantId
       - performanceId
       - note
-    provenance: contract marketing-crm.yaml POST /guests/{subjectId}/wishlist
+    provenance: client-verified
   states:
     loading: Saved items load
     error: Could not load
@@ -1874,8 +1930,15 @@ screens:
       Arrives with `itemId`.'
   wireframe:
     status: review
-    provenance: designed
+    provenance: client-verified
     board: wireframes/P01 Guest Web.dc.html#web-009
+    prototype:
+      file: 'sources/designs/guest-rev3-28-september/TICVAI Guest Booking v2.dc.html'
+      rev: 'rev 3'
+      verified: 2026-09-28
+      match: exact
+      view: 'Discover → ''Wishlist'' link (discoverLinks)'
+      differences: 'No ''withdrawn product stays marked unavailable'' state (YAML note). Prototype adds ''Restore removed'' and live queue times.'
   apisNote: Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop pack
     — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
     to the ones that matter is work a person still owes this screen.
@@ -2049,13 +2112,13 @@ screens:
     trigger: Remove cart line
     body: '**Names what `removeCartLine` changes and what it leaves alone**, in the consequence rather
       than the verb. A shopping cart this affects should be identified in the dialog, not just counted.'
-    provenance: contract orders.yaml DELETE /carts/{cartId}/lines/{lineId}
+    provenance: client-verified
   - id: confirmAbandonCart
     component: confirmDialog
     trigger: Abandon cart
     body: '**Names what `abandonCart` changes and what it leaves alone**, in the consequence rather than
       the verb. A shopping cart this affects should be identified in the dialog, not just counted.'
-    provenance: contract orders.yaml DELETE /carts/{cartId}
+    provenance: client-verified
   - id: formCreateCart
     component: modal
     trigger: Create cart
@@ -2071,7 +2134,7 @@ screens:
       - channel
       - subjectId
       - locale
-    provenance: contract orders.yaml POST /carts
+    provenance: client-verified
   - id: formAddCartLine
     component: modal
     trigger: Add cart line
@@ -2091,7 +2154,7 @@ screens:
       - seatIds
       - parentLineId
       - attributes
-    provenance: contract orders.yaml POST /carts/{cartId}/lines
+    provenance: client-verified
   - id: formUpdateCartLine
     component: modal
     trigger: Save cart line
@@ -2104,7 +2167,7 @@ screens:
       label: Cancel
       discards:
       - quantity
-    provenance: contract orders.yaml PATCH /carts/{cartId}/lines/{lineId}
+    provenance: client-verified
   - id: formCheckoutCart
     component: modal
     trigger: Checkout cart
@@ -2118,7 +2181,7 @@ screens:
       discards:
       - subjectId
       - attendees
-    provenance: contract orders.yaml POST /carts/{cartId}/checkout
+    provenance: client-verified
   - id: formEvaluatePromotions
     component: modal
     trigger: Evaluate promotions
@@ -2139,7 +2202,7 @@ screens:
       - membershipTierId
       - couponCodes
       - evaluateAt
-    provenance: contract promotions.yaml POST /promotions/evaluate
+    provenance: client-verified
   states:
     loading: The shopping cart, read by `getCart`.
     error: Could not load. Names which read failed and leaves the shopping cart untouched.
@@ -2198,7 +2261,7 @@ screens:
     contract: orders
     purpose: Start a cart
     trigger: onAction
-    provenance: wiring gap, 19 September 2026 — the screen showed the noun and could not act on it
+    provenance: client-verified
   entryState:
     params:
     - name: cartId
@@ -2215,8 +2278,15 @@ screens:
       fork waits until checkout (ADR-0045).'
   wireframe:
     status: review
-    provenance: designed
+    provenance: client-verified
     board: wireframes/P01 Guest Web.dc.html#web-010
+    prototype:
+      file: 'sources/designs/guest-rev3-28-september/TICVAI Guest Booking v2.dc.html'
+      rev: 'rev 3'
+      verified: 2026-09-28
+      match: partial
+      view: 'Visible on every booking step as the cart sidebar (Config → Layout & locale → ''Cart & summary'' changes it to slide-in, bottom sheet, floating icon or single column)'
+      differences: 'Not a separate screen: a persistent sidebar/drawer through the stepper, with a Rev 3 option to mirror it in Arabic. No ''extend hold'' action (extendCart) — only hold timers on the seat step. Exit-intent dialog (exit.open) is a prototype addition.'
   apisNote: Rebuilt 9 September 2026 from the 9 operations this screen declares, not from a workshop pack
     — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
     to the ones that matter is work a person still owes this screen.
@@ -2419,14 +2489,14 @@ screens:
     body: '**Names what `removeFromWishlist` changes and what it leaves alone**, in the consequence rather
       than the verb. A guest attendee forms this affects should be identified in the dialog, not just
       counted.'
-    provenance: contract marketing-crm.yaml DELETE /guests/{subjectId}/wishlist/{itemId}
+    provenance: client-verified
   - id: confirmRevokeGuestDevice
     component: confirmDialog
     trigger: Revoke guest device
     body: '**Names what `revokeGuestDevice` changes and what it leaves alone**, in the consequence rather
       than the verb. A guest attendee forms this affects should be identified in the dialog, not just
       counted.'
-    provenance: contract marketing-crm.yaml DELETE /guests/{subjectId}/devices/{deviceId}
+    provenance: client-verified
   - id: formUploadGuestDocument
     component: modal
     trigger: Upload guest document
@@ -2449,7 +2519,7 @@ screens:
       - consentPurposeId
       - uploadedAt
       - uploadedByPrincipalId
-    provenance: contract marketing-crm.yaml POST /guest-documents
+    provenance: client-verified
   - id: formAddToWishlist
     component: modal
     trigger: Add to wishlist
@@ -2464,7 +2534,7 @@ screens:
       - variantId
       - performanceId
       - note
-    provenance: contract marketing-crm.yaml POST /guests/{subjectId}/wishlist
+    provenance: client-verified
   - id: formRecordConsent
     component: modal
     trigger: Record consent
@@ -2484,7 +2554,7 @@ screens:
       - source
       - recordedAt
       - channels
-    provenance: contract marketing-crm.yaml POST /guests/{subjectId}/consents
+    provenance: client-verified
   - id: formRegisterGuestDevice
     component: modal
     trigger: Register guest device
@@ -2503,7 +2573,7 @@ screens:
       - osVersion
       - deviceModel
       - locale
-    provenance: contract marketing-crm.yaml POST /guests/{subjectId}/devices
+    provenance: client-verified
   - id: formUpdateMyProfile
     component: modal
     trigger: Save my profile
@@ -2523,7 +2593,7 @@ screens:
       - preferredChannel
       - dietary
       - accessibility
-    provenance: contract marketing-crm.yaml PATCH /guests/me/profile
+    provenance: client-verified
   states:
     loading: The guest attendee forms list.
     error: Could not load. Names which read failed and leaves the guest attendee forms untouched.
@@ -2616,8 +2686,15 @@ screens:
     - GuestDevice.tokenRef
   wireframe:
     status: review
-    provenance: designed
+    provenance: client-verified
     board: wireframes/P01 Guest Web.dc.html#web-011
+    prototype:
+      file: 'sources/designs/guest-rev3-28-september/TICVAI Guest Booking v2.dc.html'
+      rev: 'rev 3'
+      verified: 2026-09-28
+      match: exact
+      view: 'Book → ''Your details'' step (after Extras)'
+      differences: 'Sections are driven by the flow''s requires list; prototype adds a signature, diving certification and vehicle plate fields. Wishlist/device operations listed in the YAML apis have no counterpart here. Saved guests prefill is described in Account but not shown on this step.'
   apisNote: Rebuilt 9 September 2026 from the 10 operations this screen declares, not from a workshop
     pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing
     them to the ones that matter is work a person still owes this screen.
@@ -2770,8 +2847,15 @@ screens:
       it was refunded or the performance passed, says which and offers the order list rather than an error.'
   wireframe:
     status: review
-    provenance: designed
+    provenance: client-verified
     board: wireframes/P01 Guest Web.dc.html#web-012
+    prototype:
+      file: 'sources/designs/guest-rev3-28-september/TICVAI Guest Booking v2.dc.html'
+      rev: 'rev 3'
+      verified: 2026-09-28
+      match: partial
+      view: 'Book → ''Payment'' step; Config → Layout & locale → ''Payment outcome (demo)'' = Interrupted / Declined for the failure states; Config → Steps & cards → ''Guest checkout (code proof)'' for the guest route'
+      differences: 'Contradicts 28 Sep decisions: YAML allows card or wallet only (R080) — prototype offers Apple Pay, Tabby split-in-4, pay on arrival and invoice/PO; YAML removed the ''is this you?'' match at checkout (R120 b) — prototype still asks the guest to link or keep separate. The unknown-outcome inquiry state matches the YAML (''We couldn''t confirm this payment yet… you won''t be charged twice'').'
   apisNote: Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack
     — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
     to the ones that matter is work a person still owes this screen.
@@ -2790,7 +2874,7 @@ screens:
       - ticketIds
       - recipient
       - message
-    provenance: contract orders.yaml POST /orders/{orderId}/transfer
+    provenance: client-verified
   - id: formCreateOrder
     component: modal
     trigger: Create order
@@ -2813,7 +2897,7 @@ screens:
       - subjectId
       - guestLinkId
       - catalogueBundleVersion
-    provenance: contract orders.yaml POST /orders
+    provenance: client-verified
   - id: formCreatePayment
     component: modal
     trigger: Create payment
@@ -2836,7 +2920,7 @@ screens:
       - tenderAmount
       - walletAuthorisationId
       - deviceId
-    provenance: contract orders.yaml POST /payments
+    provenance: client-verified
 - id: WEB-013
   name: Booking Confirmation
   module: Cart & Checkout
@@ -2975,8 +3059,15 @@ screens:
     coldEntry: Resolves from the session; a cold arrival is the ordinary case.
   wireframe:
     status: review
-    provenance: designed
+    provenance: client-verified
     board: wireframes/P01 Guest Web.dc.html#web-013
+    prototype:
+      file: 'sources/designs/guest-rev3-28-september/TICVAI Guest Booking v2.dc.html'
+      rev: 'rev 3'
+      verified: 2026-09-28
+      match: exact
+      view: 'Book → final step ''Confirmed'' after paying'
+      differences: 'Prototype adds editing attendee details after purchase (''Change your details'', signed-in only) and Reissue QR. No ''unpaid — pay now'' route to WEB-014.'
   apisNote: Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop pack
     — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
     to the ones that matter is work a person still owes this screen.
@@ -2995,7 +3086,7 @@ screens:
       - ticketIds
       - recipient
       - message
-    provenance: contract orders.yaml POST /orders/{orderId}/transfer
+    provenance: client-verified
   - id: formReprintOrder
     component: modal
     trigger: Reprint order
@@ -3012,7 +3103,7 @@ screens:
       - destination
       - lineIds
       - reason
-    provenance: contract orders.yaml POST /orders/{orderId}/reprints
+    provenance: client-verified
 - id: WEB-014
   name: Pay for a Booking
   module: Cart & Checkout
@@ -3131,6 +3222,11 @@ screens:
     status: review
     provenance: designed
     board: wireframes/P01 Guest Web.dc.html#web-014
+    prototype:
+      file: 'sources/designs/guest-rev3-28-september/TICVAI Guest Booking v2.dc.html'
+      rev: 'rev 3'
+      match: none
+      note: 'The prototype has no view for this screen. Build it from this definition with the generated layout (decided 29 September).'
   apisNote: Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack
     — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
     to the ones that matter is work a person still owes this screen.
@@ -3268,8 +3364,15 @@ screens:
       Arrives with `entryId`.'
   wireframe:
     status: review
-    provenance: designed
+    provenance: client-verified
     board: wireframes/P01 Guest Web.dc.html#web-015
+    prototype:
+      file: 'sources/designs/guest-rev3-28-september/TICVAI Guest Booking v2.dc.html'
+      rev: 'rev 3'
+      verified: 2026-09-28
+      match: partial
+      view: 'Only when the host tweak ''waitingRoom'' is on; it is not in the Config drawer lists, so a reviewer cannot switch it on from the page'
+      differences: 'Drawn but unreachable from the Config drawer. The prototype holds the place by keeping the page open (''refreshing puts you at the back''); YAML getWaitingGuest implies a resumable place.'
   apisNote: Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop pack
     — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
     to the ones that matter is work a person still owes this screen.
@@ -3293,7 +3396,7 @@ screens:
       - recordedAt
       - entitlementId
       - partyHeightsCm
-    provenance: contract queue.yaml POST /waiting-guests
+    provenance: client-verified
 - id: WEB-016
   name: Login / Register
   module: Account & Self-Service
@@ -3470,7 +3573,7 @@ screens:
       - password
       - preferredLanguage
       - consents
-    provenance: contract identity.yaml POST /auth/guest/register
+    provenance: client-verified
   - id: formGuestPasswordLogin
     component: modal
     trigger: Sign in with password
@@ -3487,7 +3590,7 @@ screens:
       - identifier
       - password
       - deviceId
-    provenance: contract identity.yaml POST /auth/guest/password
+    provenance: client-verified
   - id: formGuestSocialLogin
     component: modal
     trigger: Continue with Apple or Google
@@ -3502,7 +3605,7 @@ screens:
       - provider
       - idToken
       - deviceId
-    provenance: contract identity.yaml POST /auth/guest/social
+    provenance: client-verified
   - id: formGuestUaePassLogin
     component: modal
     trigger: Continue with UAE Pass
@@ -3518,7 +3621,7 @@ screens:
       - redirectUri
       - state
       - deviceId
-    provenance: contract identity.yaml POST /auth/guest/uae-pass
+    provenance: client-verified
   - id: formLinkGuestCheckout
     component: modal
     trigger: Link an order I placed as a guest
@@ -3532,7 +3635,7 @@ screens:
       discards:
       - orderReference
       - verificationCode
-    provenance: contract identity.yaml POST /auth/guest/link-checkout
+    provenance: client-verified
   - id: formRefreshToken
     component: modal
     trigger: Refresh token
@@ -3545,7 +3648,7 @@ screens:
       label: Cancel
       discards:
       - refreshToken
-    provenance: contract identity.yaml POST /auth/refresh
+    provenance: client-verified
   - id: formRequestGuestOtp
     component: modal
     trigger: Send me a code
@@ -3560,7 +3663,7 @@ screens:
       - identifier
       - channel
       - purpose
-    provenance: contract identity.yaml POST /auth/guest/otp
+    provenance: client-verified
   - id: formVerifyGuestOtp
     component: modal
     trigger: Sign in with the code
@@ -3575,7 +3678,7 @@ screens:
       - identifier
       - code
       - deviceId
-    provenance: contract identity.yaml POST /auth/guest/otp/verify
+    provenance: client-verified
   states:
     loading: Checking whether this device already holds a guest session. The sign-in form stays visible.
     error: Identity could not be reached. **Says so rather than saying the password or code is wrong**,
@@ -3660,8 +3763,15 @@ screens:
       `methodId`, `providerId`) went with the operations that used them (audit R167).'
   wireframe:
     status: review
-    provenance: designed
+    provenance: client-verified
     board: wireframes/P01 Guest Web.dc.html#web-016
+    prototype:
+      file: 'sources/designs/guest-rev3-28-september/TICVAI Guest Booking v2.dc.html'
+      rev: 'rev 3'
+      verified: 2026-09-28
+      match: partial
+      view: 'Header profile icon (signed out), or automatically when leaving Add-ons / at payment'
+      differences: 'No password sign-in and no mobile-number OTP (YAML has guestPasswordLogin and ''Email or mobile number''); it is a modal, not a page. Account → Security still shows ''Two-step verification'' and passkeys, which the YAML ruled out for guests (R167). Guest checkout route belongs to WEB-012 in the prototype.'
   apisNote: Rebuilt 9 September 2026 from the 19 operations this screen declares, not from a workshop
     pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing
     them to the ones that matter is work a person still owes this screen.
@@ -3817,13 +3927,13 @@ screens:
     trigger: Remove from wishlist
     body: '**Names what `removeFromWishlist` changes and what it leaves alone**, in the consequence rather
       than the verb. A account this affects should be identified in the dialog, not just counted.'
-    provenance: contract marketing-crm.yaml DELETE /guests/{subjectId}/wishlist/{itemId}
+    provenance: client-verified
   - id: confirmRevokeGuestDevice
     component: confirmDialog
     trigger: Revoke guest device
     body: '**Names what `revokeGuestDevice` changes and what it leaves alone**, in the consequence rather
       than the verb. A account this affects should be identified in the dialog, not just counted.'
-    provenance: contract marketing-crm.yaml DELETE /guests/{subjectId}/devices/{deviceId}
+    provenance: client-verified
   - id: formRespondToInvitation
     component: modal
     trigger: Respond to invitation
@@ -3837,7 +3947,7 @@ screens:
       discards:
       - response
       - plusOnes
-    provenance: contract marketing-crm.yaml POST /invitations/{token}/respond
+    provenance: client-verified
   - id: formAddToWishlist
     component: modal
     trigger: Add to wishlist
@@ -3852,7 +3962,7 @@ screens:
       - variantId
       - performanceId
       - note
-    provenance: contract marketing-crm.yaml POST /guests/{subjectId}/wishlist
+    provenance: client-verified
   - id: formRecordConsent
     component: modal
     trigger: Record consent
@@ -3872,7 +3982,7 @@ screens:
       - source
       - recordedAt
       - channels
-    provenance: contract marketing-crm.yaml POST /guests/{subjectId}/consents
+    provenance: client-verified
   - id: formRegisterGuestDevice
     component: modal
     trigger: Register guest device
@@ -3891,7 +4001,7 @@ screens:
       - osVersion
       - deviceModel
       - locale
-    provenance: contract marketing-crm.yaml POST /guests/{subjectId}/devices
+    provenance: client-verified
   states:
     loading: Tiles skeleton
     error: Partial. Each tile fails independently
@@ -3977,8 +4087,15 @@ screens:
     - GuestDevice.tokenRef
   wireframe:
     status: review
-    provenance: designed
+    provenance: client-verified
     board: wireframes/P01 Guest Web.dc.html#web-017
+    prototype:
+      file: 'sources/designs/guest-rev3-28-september/TICVAI Guest Booking v2.dc.html'
+      rev: 'rev 3'
+      verified: 2026-09-28
+      match: exact
+      view: 'Sign in → avatar menu → ''Account overview'''
+      differences: 'Prototype makes the account a single page with section panes; most YAML account screens (019–024, 026, 027, 030, 031, 034) are panes of it. Groups & invitations (respondToInvitation, getMyChallenges, referral code) sits here. Signed-out state ''Sign in to see your account'' is drawn.'
     derivedFrom: wireframes/reference/Dashboards Board.dc.html
     note: '**Drawn by Claude Design on `Dashboards Board.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.**
       The frame it points at now is the generated one. This screen has been designed once and is not starting
@@ -4226,8 +4343,15 @@ screens:
     - Entitlement.orderLineId
   wireframe:
     status: review
-    provenance: designed
+    provenance: client-verified
     board: wireframes/P01 Guest Web.dc.html#web-018
+    prototype:
+      file: 'sources/designs/guest-rev3-28-september/TICVAI Guest Booking v2.dc.html'
+      rev: 'rev 3'
+      verified: 2026-09-28
+      match: partial
+      view: 'Header ''My tickets'' → a ticket → ''Manage'' (ticket sheet)'
+      differences: 'QR is static — no rotating code with a visible countdown (YAML R230). Prototype adds reschedule, add guests, refund, resale and cancel on the ticket sheet (YAML routes refunds to WEB-019 and transfers to WEB-030).'
   apisNote: Rebuilt 9 September 2026 from the 6 operations this screen declares, not from a workshop pack
     — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
     to the ones that matter is work a person still owes this screen.
@@ -4245,7 +4369,7 @@ screens:
       discards:
       - entitlementId
       - platform
-    provenance: contract orders.yaml POST /wallet-passes
+    provenance: client-verified
   - id: formShareEntitlement
     component: modal
     trigger: Share entitlement
@@ -4259,7 +4383,7 @@ screens:
       discards:
       - toSubjectId
       - validUntil
-    provenance: contract orders.yaml POST /entitlements/{entitlementId}/share
+    provenance: client-verified
   - id: formTransferOrderTickets
     component: modal
     trigger: Transfer order tickets
@@ -4274,7 +4398,7 @@ screens:
       - ticketIds
       - recipient
       - message
-    provenance: contract orders.yaml POST /orders/{orderId}/transfer
+    provenance: client-verified
 - id: WEB-019
   name: Order History
   module: Account & Self-Service
@@ -4455,8 +4579,15 @@ screens:
     - Order.scopePath
   wireframe:
     status: review
-    provenance: designed
+    provenance: client-verified
     board: wireframes/P01 Guest Web.dc.html#web-019
+    prototype:
+      file: 'sources/designs/guest-rev3-28-september/TICVAI Guest Booking v2.dc.html'
+      rev: 'rev 3'
+      verified: 2026-09-28
+      match: partial
+      view: 'Account → ''Order history'''
+      differences: 'A list pane with toast-only actions; no order detail view. Refund request and transfer are rows, not flows.'
   apisNote: Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack
     — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
     to the ones that matter is work a person still owes this screen.
@@ -4475,7 +4606,7 @@ screens:
       - orderId
       - reason
       - lineIds
-    provenance: contract orders.yaml POST /refund-requests
+    provenance: client-verified
   - id: formTransferOrderTickets
     component: modal
     trigger: Transfer order tickets
@@ -4490,7 +4621,7 @@ screens:
       - ticketIds
       - recipient
       - message
-    provenance: contract orders.yaml POST /orders/{orderId}/transfer
+    provenance: client-verified
 - id: WEB-020
   name: Profile & Preferences
   module: Account & Self-Service
@@ -4671,8 +4802,15 @@ screens:
     - ConsentPurposeConfig.noticeVersion
   wireframe:
     status: review
-    provenance: designed
+    provenance: client-verified
     board: wireframes/P01 Guest Web.dc.html#web-020
+    prototype:
+      file: 'sources/designs/guest-rev3-28-september/TICVAI Guest Booking v2.dc.html'
+      rev: 'rev 3'
+      verified: 2026-09-28
+      match: partial
+      view: 'Account → ''Personal details'', ''Notifications'', ''Accessibility'''
+      differences: 'Split over three panes; fields are read-only with a ''Save changes'' toast. No ''which level the current value came from'' (YAML purpose). Consent purposes appear as two marketing toggles rather than the configured purpose list.'
   apisNote: Rebuilt 9 September 2026 from the 5 operations this screen declares, not from a workshop pack
     — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
     to the ones that matter is work a person still owes this screen.
@@ -4697,7 +4835,7 @@ screens:
       - dietary
       - accessibility
       - preferredChannel
-    provenance: contract marketing-crm.yaml PUT /guests/{subjectId}/preferences
+    provenance: client-verified
   - id: formUpdateMyProfile
     component: modal
     trigger: Save my profile
@@ -4717,7 +4855,7 @@ screens:
       - preferredChannel
       - dietary
       - accessibility
-    provenance: contract marketing-crm.yaml PATCH /guests/me/profile
+    provenance: client-verified
   - id: formRecordConsent
     component: modal
     trigger: Record consent
@@ -4737,7 +4875,7 @@ screens:
       - source
       - recordedAt
       - channels
-    provenance: contract marketing-crm.yaml POST /guests/{subjectId}/consents
+    provenance: client-verified
   - id: formVerifyGuestEmail
     component: modal
     trigger: Verify guest email
@@ -4751,7 +4889,7 @@ screens:
       discards:
       - mode
       - token
-    provenance: contract identity.yaml POST /auth/guest/verify-email
+    provenance: client-verified
 - id: WEB-021
   name: Wallet & Gift Cards
   module: Membership, Loyalty & Value
@@ -4973,8 +5111,15 @@ screens:
     - WalletTransaction.orderId
   wireframe:
     status: review
-    provenance: designed
+    provenance: client-verified
     board: wireframes/P01 Guest Web.dc.html#web-021
+    prototype:
+      file: 'sources/designs/guest-rev3-28-september/TICVAI Guest Booking v2.dc.html'
+      rev: 'rev 3'
+      verified: 2026-09-28
+      match: partial
+      view: 'Account → ''Wallet & gift cards'' (and ''Payment methods'')'
+      differences: 'Rows with toast actions; no transaction list, no gift-card balance lookup. Auto top-up is a prototype addition with no YAML operation. Saved payment tokens are a separate pane.'
   apisNote: Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop pack
     — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
     to the ones that matter is work a person still owes this screen.
@@ -4994,7 +5139,7 @@ screens:
       - providerToken
       - consentPurposeId
       - setDefault
-    provenance: contract orders.yaml POST /payment-tokens
+    provenance: client-verified
   - id: formTransferWalletBalance
     component: modal
     trigger: Transfer wallet balance
@@ -5010,7 +5155,7 @@ screens:
       - toSubjectId
       - toWalletId
       - message
-    provenance: contract wallet.yaml POST /wallets/{walletId}/transfer
+    provenance: client-verified
 - id: WEB-022
   name: Membership Plans
   module: Membership, Loyalty & Value
@@ -5197,8 +5342,15 @@ screens:
     - Product.kind
   wireframe:
     status: review
-    provenance: designed
+    provenance: client-verified
     board: wireframes/P01 Guest Web.dc.html#web-022
+    prototype:
+      file: 'sources/designs/guest-rev3-28-september/TICVAI Guest Booking v2.dc.html'
+      rev: 'rev 3'
+      verified: 2026-09-28
+      match: partial
+      view: 'Summit Peaks → ''Annual pass / membership'' flow; Kids Club → ''Membership pass''; Account → Membership → ''Other plans — Compare'''
+      differences: 'Plans are sold as a booking flow, not a plans page; the account ''Compare'' action is a toast.'
   apisNote: Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack
     — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
     to the ones that matter is work a person still owes this screen.
@@ -5418,8 +5570,15 @@ screens:
     - BillingStatement.lines
   wireframe:
     status: review
-    provenance: designed
+    provenance: client-verified
     board: wireframes/P01 Guest Web.dc.html#web-023
+    prototype:
+      file: 'sources/designs/guest-rev3-28-september/TICVAI Guest Booking v2.dc.html'
+      rev: 'rev 3'
+      verified: 2026-09-28
+      match: partial
+      view: 'Account → ''Membership'' → ''Billing statement — View'''
+      differences: 'Billing and dunning retry are well covered. Prototype adds membership transfer to a family member and guest passes; YAML''s transferOrderTickets on this screen has no visible use.'
   apisNote: Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop pack
     — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
     to the ones that matter is work a person still owes this screen.
@@ -5437,7 +5596,7 @@ screens:
       label: Cancel
       discards:
       - paymentTokenId
-    provenance: contract payments.yaml POST /dunning-cases/{caseId}/retry
+    provenance: client-verified
   - id: formTransferOrderTickets
     component: modal
     trigger: Transfer order tickets
@@ -5452,7 +5611,7 @@ screens:
       - ticketIds
       - recipient
       - message
-    provenance: contract orders.yaml POST /orders/{orderId}/transfer
+    provenance: client-verified
 - id: WEB-024
   name: Devices, Wishlist & Consent
   module: Membership, Loyalty & Value
@@ -5677,21 +5836,21 @@ screens:
     body: '**Names what `removeFromWishlist` changes and what it leaves alone**, in the consequence rather
       than the verb. A devices wishlist consent this affects should be identified in the dialog, not just
       counted.'
-    provenance: contract marketing-crm.yaml DELETE /guests/{subjectId}/wishlist/{itemId}
+    provenance: client-verified
   - id: confirmRevokeGuestDevice
     component: confirmDialog
     trigger: Revoke guest device
     body: '**Names what `revokeGuestDevice` changes and what it leaves alone**, in the consequence rather
       than the verb. A devices wishlist consent this affects should be identified in the dialog, not just
       counted.'
-    provenance: contract marketing-crm.yaml DELETE /guests/{subjectId}/devices/{deviceId}
+    provenance: client-verified
   - id: confirmDeleteGuestAccount
     component: confirmDialog
     trigger: Delete guest account
     body: '**Names what `deleteGuestAccount` changes and what it leaves alone**, in the consequence rather
       than the verb. A devices wishlist consent this affects should be identified in the dialog, not just
       counted.'
-    provenance: contract identity.yaml DELETE /auth/guest/account
+    provenance: client-verified
   - id: formGrantDelegation
     component: modal
     trigger: Grant delegation
@@ -5711,14 +5870,14 @@ screens:
       - quota
       - validTo
       - isRevocableBySubject
-    provenance: contract identity.yaml POST /guests/{subjectId}/delegations
+    provenance: client-verified
   - id: confirmRevokeFacePass
     component: confirmDialog
     trigger: Revoke face pass
     body: '**Names what `revokeFacePass` changes and what it leaves alone**, in the consequence rather
       than the verb. A devices wishlist consent this affects should be identified in the dialog, not just
       counted.'
-    provenance: contract access.yaml DELETE /face-pass/enrolments/{enrolmentId}
+    provenance: client-verified
   - id: formAddToWishlist
     component: modal
     trigger: Add to wishlist
@@ -5733,7 +5892,7 @@ screens:
       - variantId
       - performanceId
       - note
-    provenance: contract marketing-crm.yaml POST /guests/{subjectId}/wishlist
+    provenance: client-verified
   - id: formRecordConsent
     component: modal
     trigger: Record consent
@@ -5753,7 +5912,7 @@ screens:
       - source
       - recordedAt
       - channels
-    provenance: contract marketing-crm.yaml POST /guests/{subjectId}/consents
+    provenance: client-verified
   - id: formRegisterGuestDevice
     component: modal
     trigger: Register guest device
@@ -5772,7 +5931,7 @@ screens:
       - osVersion
       - deviceModel
       - locale
-    provenance: contract marketing-crm.yaml POST /guests/{subjectId}/devices
+    provenance: client-verified
   states:
     loading: Points and rewards
     error: Could not load
@@ -5884,8 +6043,15 @@ screens:
     - GuestDevice.tokenRef
   wireframe:
     status: review
-    provenance: designed
+    provenance: client-verified
     board: wireframes/P01 Guest Web.dc.html#web-024
+    prototype:
+      file: 'sources/designs/guest-rev3-28-september/TICVAI Guest Booking v2.dc.html'
+      rev: 'rev 3'
+      verified: 2026-09-28
+      match: partial
+      view: 'Account → ''Security'' (devices), ''Face Pass'', ''Data & privacy'', ''Newsletters'' (devices that get notifications)'
+      differences: 'Spread across four panes rather than one screen; wishlist is its own view (WEB-009). Security pane includes passkeys and two-step verification, which the YAML does not have for guests. YAML purpose text still says ''See loyalty & rewards'' (stale).'
   apisNote: Rebuilt 9 September 2026 from the 7 operations this screen declares, not from a workshop pack
     — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
     to the ones that matter is work a person still owes this screen.
@@ -6004,8 +6170,15 @@ screens:
     trigger: onLoad
   wireframe:
     status: review
-    provenance: designed
+    provenance: client-verified
     board: wireframes/P01 Guest Web.dc.html#web-025
+    prototype:
+      file: 'sources/designs/guest-rev3-28-september/TICVAI Guest Booking v2.dc.html'
+      rev: 'rev 3'
+      verified: 2026-09-28
+      match: exact
+      view: 'Header ''Help'''
+      differences: 'Also carries policies and the accessibility statement (YAML WEB-045) and the case list (YAML WEB-034''s listMyCases) on the same page.'
   apisNote: Rebuilt 9 September 2026 from the 1 operation this screen declares, not from a workshop pack
     — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
     to the ones that matter is work a person still owes this screen.
@@ -6035,7 +6208,7 @@ screens:
       - venueId
       - relatedOrderId
       - attachmentRefs
-    provenance: contract marketing-crm.yaml POST /cases
+    provenance: client-verified
 - id: WEB-026
   name: Survey & Feedback
   module: Engagement & Support
@@ -6136,8 +6309,15 @@ screens:
     trigger: onAction
   wireframe:
     status: review
-    provenance: designed
+    provenance: client-verified
     board: wireframes/P01 Guest Web.dc.html#web-026
+    prototype:
+      file: 'sources/designs/guest-rev3-28-september/TICVAI Guest Booking v2.dc.html'
+      rev: 'rev 3'
+      verified: 2026-09-28
+      match: partial
+      view: 'Account → ''Reviews & feedback'''
+      differences: 'List of visits to rate with toast actions; no rating form or survey questions are drawn.'
   apisNote: Rebuilt 9 September 2026 from the 1 operation this screen declares, not from a workshop pack
     — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
     to the ones that matter is work a person still owes this screen.
@@ -6281,14 +6461,14 @@ screens:
     body: '**Names what `removeFromWishlist` changes and what it leaves alone**, in the consequence rather
       than the verb. A newsletter subscription this affects should be identified in the dialog, not just
       counted.'
-    provenance: contract marketing-crm.yaml DELETE /guests/{subjectId}/wishlist/{itemId}
+    provenance: client-verified
   - id: confirmRevokeGuestDevice
     component: confirmDialog
     trigger: Revoke guest device
     body: '**Names what `revokeGuestDevice` changes and what it leaves alone**, in the consequence rather
       than the verb. A newsletter subscription this affects should be identified in the dialog, not just
       counted.'
-    provenance: contract marketing-crm.yaml DELETE /guests/{subjectId}/devices/{deviceId}
+    provenance: client-verified
   - id: formRecordConsent
     component: modal
     trigger: Record consent
@@ -6308,7 +6488,7 @@ screens:
       - source
       - recordedAt
       - channels
-    provenance: contract marketing-crm.yaml POST /guests/{subjectId}/consents
+    provenance: client-verified
   - id: formAddToWishlist
     component: modal
     trigger: Add to wishlist
@@ -6323,7 +6503,7 @@ screens:
       - variantId
       - performanceId
       - note
-    provenance: contract marketing-crm.yaml POST /guests/{subjectId}/wishlist
+    provenance: client-verified
   - id: formRegisterGuestDevice
     component: modal
     trigger: Register guest device
@@ -6342,7 +6522,7 @@ screens:
       - osVersion
       - deviceModel
       - locale
-    provenance: contract marketing-crm.yaml POST /guests/{subjectId}/devices
+    provenance: client-verified
   - id: formSetMarketingSubscription
     component: modal
     trigger: Save marketing subscription
@@ -6363,7 +6543,7 @@ screens:
       - isSubscribed
       - source
       - unsubscribeToken
-    provenance: contract marketing-crm.yaml PUT /marketing-subscriptions
+    provenance: client-verified
   states:
     loading: —
     error: Could not subscribe. **Consent is not recorded on a failed request**, because a subscription
@@ -6449,8 +6629,15 @@ screens:
     - GuestDevice.tokenRef
   wireframe:
     status: review
-    provenance: designed
+    provenance: client-verified
     board: wireframes/P01 Guest Web.dc.html#web-027
+    prototype:
+      file: 'sources/designs/guest-rev3-28-september/TICVAI Guest Booking v2.dc.html'
+      rev: 'rev 3'
+      verified: 2026-09-28
+      match: partial
+      view: 'Account → ''Newsletters''; Contact page → ''Choose newsletters'''
+      differences: 'Per-venue and channel toggles only for signed-in guests; no signed-out email sign-up form.'
   apisNote: Rebuilt 9 September 2026 from the 9 operations this screen declares, not from a workshop pack
     — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
     to the ones that matter is work a person still owes this screen.
@@ -6544,8 +6731,15 @@ screens:
     trigger: onLoad
   wireframe:
     status: review
-    provenance: designed
+    provenance: client-verified
     board: wireframes/P01 Guest Web.dc.html#web-028
+    prototype:
+      file: 'sources/designs/guest-rev3-28-september/TICVAI Guest Booking v2.dc.html'
+      rev: 'rev 3'
+      verified: 2026-09-28
+      match: exact
+      view: 'Footer ''Contact'', or Discover → ''Contact & venue info'''
+      differences: 'Links to parking and accessibility from the contact cards; otherwise matches.'
   apisNote: Rebuilt 9 September 2026 from the 1 operation this screen declares, not from a workshop pack
     — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
     to the ones that matter is work a person still owes this screen.
@@ -6638,8 +6832,15 @@ screens:
     trigger: onLoad
   wireframe:
     status: review
-    provenance: designed
+    provenance: client-verified
     board: wireframes/P01 Guest Web.dc.html#web-029
+    prototype:
+      file: 'sources/designs/guest-rev3-28-september/TICVAI Guest Booking v2.dc.html'
+      rev: 'rev 3'
+      verified: 2026-09-28
+      match: exact
+      view: 'Footer ''Service status'', or Discover → ''Service status'''
+      differences: 'Prototype has ''Maintenance'' where YAML has ''closed''; sold-out offers ''Join the waitlist'' (holds a returned place for 15 minutes), which the YAML screen (getTenantAppStatus only) cannot call.'
   apisNote: Rebuilt 9 September 2026 from the 1 operation this screen declares, not from a workshop pack
     — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
     to the ones that matter is work a person still owes this screen.
@@ -6813,8 +7014,15 @@ screens:
     - OrderSummary.refundedAmount
   wireframe:
     status: review
-    provenance: designed
+    provenance: client-verified
     board: wireframes/P01 Guest Web.dc.html#web-030
+    prototype:
+      file: 'sources/designs/guest-rev3-28-september/TICVAI Guest Booking v2.dc.html'
+      rev: 'rev 3'
+      verified: 2026-09-28
+      match: partial
+      view: 'Account → ''Transfer & resale''; My tickets → Manage → ''Transfer ticket''; Confirmation → ''Transfer tickets'''
+      differences: 'List pane with toast actions; no recipient form. Prototype adds cancel transfer and withdraw resale listing.'
   apisNote: Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop pack
     — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
     to the ones that matter is work a person still owes this screen.
@@ -6834,7 +7042,7 @@ screens:
       - entitlementId
       - askPrice
       - sellerSubjectId
-    provenance: contract orders.yaml POST /resale-listings
+    provenance: client-verified
   - id: formTransferOrderTickets
     component: modal
     trigger: Transfer order tickets
@@ -6849,7 +7057,7 @@ screens:
       - ticketIds
       - recipient
       - message
-    provenance: contract orders.yaml POST /orders/{orderId}/transfer
+    provenance: client-verified
   - id: formClaimTicketTransfer
     component: modal
     trigger: Claim ticket transfer
@@ -6862,7 +7070,7 @@ screens:
       label: Cancel
       discards:
       - claimToken
-    provenance: contract orders.yaml POST /ticket-transfers/{transferId}/claim
+    provenance: client-verified
 - id: WEB-031
   name: My Reservations
   module: Ticketing
@@ -7030,7 +7238,7 @@ screens:
     trigger: Cancel reservation
     body: '**Names what `cancelReservation` changes and what it leaves alone**, in the consequence rather
       than the verb. A reservations this affects should be identified in the dialog, not just counted.'
-    provenance: contract orders.yaml DELETE /reservations/{reservationId}
+    provenance: client-verified
   - id: formRequestGroupBooking
     component: modal
     trigger: Request group booking
@@ -7055,7 +7263,7 @@ screens:
       - celebrantName
       - celebrantTurningAge
       - allergiesAndRequests
-    provenance: contract orders.yaml POST /group-booking-requests
+    provenance: client-verified
   - id: formUpdateTableReservation
     component: modal
     trigger: Save table reservation
@@ -7084,7 +7292,7 @@ screens:
       - notes
       - actualPartySize
       - tableVisitId
-    provenance: contract fnb.yaml PATCH /table-reservations/{reservationId}
+    provenance: client-verified
   states:
     loading: The reservations list.
     error: Could not load. Names which read failed and leaves the reservations untouched.
@@ -7163,8 +7371,15 @@ screens:
     - Reservation.expiresAt
   wireframe:
     status: review
-    provenance: designed
+    provenance: client-verified
     board: wireframes/P01 Guest Web.dc.html#web-031
+    prototype:
+      file: 'sources/designs/guest-rev3-28-september/TICVAI Guest Booking v2.dc.html'
+      rev: 'rev 3'
+      verified: 2026-09-28
+      match: partial
+      view: 'Account → ''Reservations'''
+      differences: 'The prototype uses the WEB-031 label for the group booking request dialog (deposit / invoice quote) inside Kids Club → ''Birthday party / group'' and ''School trip'', which the YAML covers only through requestGroupBooking. ''Pay now'' on a held reservation has no YAML route (WEB-014 is pay-by-link).'
   apisNote: Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop pack
     — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
     to the ones that matter is work a person still owes this screen.
@@ -7303,8 +7518,15 @@ screens:
     - Promotion.discount
   wireframe:
     status: review
-    provenance: designed
+    provenance: client-verified
     board: wireframes/P01 Guest Web.dc.html#web-032
+    prototype:
+      file: 'sources/designs/guest-rev3-28-september/TICVAI Guest Booking v2.dc.html'
+      rev: 'rev 3'
+      verified: 2026-09-28
+      match: exact
+      view: 'Discover → ''Offers & promotions'''
+      differences: '''Use this offer'' returns to the listing; no personalised ''applies to you'' filter.'
   apisNote: Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop pack
     — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
     to the ones that matter is work a person still owes this screen.
@@ -7502,8 +7724,15 @@ screens:
     - MerchandiseItem.outletId
   wireframe:
     status: review
-    provenance: designed
+    provenance: client-verified
     board: wireframes/P01 Guest Web.dc.html#web-033
+    prototype:
+      file: 'sources/designs/guest-rev3-28-september/TICVAI Guest Booking v2.dc.html'
+      rev: 'rev 3'
+      verified: 2026-09-28
+      match: partial
+      view: 'No pre-arrival shop page; retail items appear as add-ons in the Extras step (images/shop product squares) and in At the venue → ''Shop & drop'''
+      differences: 'No browsable merchandise catalogue before arrival; the nearest is in-venue Shop & drop (WEB-042).'
   apisNote: Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack
     — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
     to the ones that matter is work a person still owes this screen.
@@ -7527,7 +7756,7 @@ screens:
       - seatIds
       - parentLineId
       - attributes
-    provenance: contract orders.yaml POST /carts/{cartId}/lines
+    provenance: client-verified
 - id: WEB-034
   name: Lost & Found
   module: Support
@@ -7673,8 +7902,15 @@ screens:
     - Case.subject
   wireframe:
     status: review
-    provenance: designed
+    provenance: client-verified
     board: wireframes/P01 Guest Web.dc.html#web-034
+    prototype:
+      file: 'sources/designs/guest-rev3-28-september/TICVAI Guest Booking v2.dc.html'
+      rev: 'rev 3'
+      verified: 2026-09-28
+      match: partial
+      view: 'Account → ''Lost & found, reports''; Help → ''Your cases'' → Raise a case → topic ''Lost property'''
+      differences: 'No lost-item report form (item, where, when, photo); reported via the generic case form.'
   apisNote: Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop pack
     — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
     to the ones that matter is work a person still owes this screen.
@@ -7698,7 +7934,7 @@ screens:
       - detail
       - venueId
       - orderRef
-    provenance: contract marketing-crm.yaml POST /my/cases
+    provenance: client-verified
   - id: formReplyToMyCase
     component: modal
     trigger: Reply to my case
@@ -7711,7 +7947,7 @@ screens:
       label: Cancel
       discards:
       - message
-    provenance: contract marketing-crm.yaml POST /my/cases/{caseId}/messages
+    provenance: client-verified
 - id: WEB-035
   name: Multi-Currency & Pricing
   module: Ticketing
@@ -7865,8 +8101,15 @@ screens:
     - FxRate.purpose
   wireframe:
     status: review
-    provenance: designed
+    provenance: client-verified
     board: wireframes/P01 Guest Web.dc.html#web-035
+    prototype:
+      file: 'sources/designs/guest-rev3-28-september/TICVAI Guest Booking v2.dc.html'
+      rev: 'rev 3'
+      verified: 2026-09-28
+      match: exact
+      view: 'Discover → ''Prices in your currency'''
+      differences: 'Matches the YAML''s charged-vs-shown rule. Separately, Config → Currency switches the whole storefront currency, which contradicts ''always charged in AED''.'
   apisNote: Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack
     — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
     to the ones that matter is work a person still owes this screen.
@@ -8150,8 +8393,15 @@ screens:
     - FulfilmentSlots.slots
   wireframe:
     status: review
-    provenance: designed
+    provenance: client-verified
     board: wireframes/P01 Guest Web.dc.html#web-036
+    prototype:
+      file: 'sources/designs/guest-rev3-28-september/TICVAI Guest Booking v2.dc.html'
+      rev: 'rev 3'
+      verified: 2026-09-28
+      match: exact
+      view: 'Header ''At the venue'' → ''Order food''; also Saffron Table → ''Takeaway — collect'' / ''Delivery'' flows'
+      differences: 'Prototype splits in-venue table ordering (At the venue) from takeaway/delivery ordering (a booking flow with a delivery-area and slot check). Table reservation and waitlist (in YAML apis) are booking flows at Saffron Table.'
   apisNote: Rebuilt 9 September 2026 from the 8 operations this screen declares, not from a workshop pack
     — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
     to the ones that matter is work a person still owes this screen.
@@ -8184,7 +8434,7 @@ screens:
       - notes
       - actualPartySize
       - tableVisitId
-    provenance: contract fnb.yaml POST /table-reservations
+    provenance: client-verified
   - id: formJoinRestaurantWaitlist
     component: modal
     trigger: Join restaurant waitlist
@@ -8209,7 +8459,7 @@ screens:
       - notifiedAt
       - syncedAt
       - holdExpiresAt
-    provenance: contract fnb.yaml POST /waitlist
+    provenance: client-verified
   - id: formClaimLocationSession
     component: modal
     trigger: Claim location session
@@ -8225,7 +8475,7 @@ screens:
       - locationCode
       - seatReference
       - partySize
-    provenance: contract fnb.yaml POST /location-sessions
+    provenance: client-verified
   - id: formClaimTableSession
     component: modal
     trigger: Claim table session
@@ -8239,7 +8489,7 @@ screens:
       discards:
       - tableCode
       - partySize
-    provenance: contract fnb.yaml POST /table-sessions
+    provenance: client-verified
   - id: formCreateGuestFnbOrder
     component: modal
     trigger: Create guest F&B order
@@ -8261,7 +8511,7 @@ screens:
       - outletId
       - fulfilment
       - paymentMethod
-    provenance: contract fnb.yaml POST /guest-orders
+    provenance: client-verified
 - id: WEB-037
   name: Menu Item Detail
   module: In-venue Services
@@ -8371,8 +8621,15 @@ screens:
     - ModifierGroup.maxSelections
   wireframe:
     status: review
-    provenance: designed
+    provenance: client-verified
     board: wireframes/P01 Guest Web.dc.html#web-037
+    prototype:
+      file: 'sources/designs/guest-rev3-28-september/TICVAI Guest Booking v2.dc.html'
+      rev: 'rev 3'
+      verified: 2026-09-28
+      match: exact
+      view: 'At the venue → Order food → tap a dish; Takeaway/Delivery → ''Add'' opens the modifier side panel'
+      differences: 'Two renderings of the same thing (dialog in-venue, side panel in takeaway/delivery).'
   apisNote: Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack
     — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
     to the ones that matter is work a person still owes this screen.
@@ -8485,8 +8742,15 @@ screens:
       R267).'
   wireframe:
     status: review
-    provenance: designed
+    provenance: client-verified
     board: wireframes/P01 Guest Web.dc.html#web-038
+    prototype:
+      file: 'sources/designs/guest-rev3-28-september/TICVAI Guest Booking v2.dc.html'
+      rev: 'rev 3'
+      verified: 2026-09-28
+      match: exact
+      view: 'At the venue → Order food → ''Send to the kitchen'''
+      differences: 'No bill or settle-the-bill view (YAML getGuestBill, ''settle the bill'').'
   apisNote: Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop pack
     — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
     to the ones that matter is work a person still owes this screen.
@@ -8504,7 +8768,7 @@ screens:
       discards:
       - tableCode
       - partySize
-    provenance: contract fnb.yaml POST /table-sessions
+    provenance: client-verified
 - id: WEB-039
   name: Venue Map & Wait Times
   module: In-venue Services
@@ -8684,8 +8948,15 @@ screens:
     - Queue.assetId
   wireframe:
     status: review
-    provenance: designed
+    provenance: client-verified
     board: wireframes/P01 Guest Web.dc.html#web-039
+    prototype:
+      file: 'sources/designs/guest-rev3-28-september/TICVAI Guest Booking v2.dc.html'
+      rev: 'rev 3'
+      verified: 2026-09-28
+      match: exact
+      view: 'At the venue → ''Map & waits'''
+      differences: 'Prototype adds turn-by-turn walking directions and navigation mode.'
     derivedFrom: wireframes/reference/Seat Board 3.dc.html
     note: '**Drawn by Claude Design on `Seat Board 3.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.**
       The frame it points at now is the generated one. This screen has been designed once and is not starting
@@ -8830,8 +9101,14 @@ screens:
       here, and the person holding it did nothing wrong. Arrives with `entryId`.'
   wireframe:
     status: review
-    provenance: designed
+    provenance: client-verified
     board: wireframes/P01 Guest Web.dc.html#web-040
+    prototype:
+      file: 'sources/designs/guest-rev3-28-september/TICVAI Guest Booking v2.dc.html'
+      rev: 'rev 3'
+      verified: 2026-09-28
+      match: exact
+      view: 'At the venue → ''Virtual queue'''
   apisNote: Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack
     — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
     to the ones that matter is work a person still owes this screen.
@@ -8860,7 +9137,7 @@ screens:
       - offeredAt
       - offerExpiresAt
       - joinedAt
-    provenance: contract catalogue.yaml POST /waitlist-entries
+    provenance: client-verified
   - id: formJoinQueue
     component: modal
     trigger: Join queue
@@ -8880,7 +9157,7 @@ screens:
       - recordedAt
       - entitlementId
       - partyHeightsCm
-    provenance: contract queue.yaml POST /waiting-guests
+    provenance: client-verified
 - id: WEB-041
   name: Parking – Reserve & Pay
   module: In-venue Services
@@ -9048,8 +9325,15 @@ screens:
     - ParkingFacility.capacity
   wireframe:
     status: review
-    provenance: designed
+    provenance: client-verified
     board: wireframes/P01 Guest Web.dc.html#web-041
+    prototype:
+      file: 'sources/designs/guest-rev3-28-september/TICVAI Guest Booking v2.dc.html'
+      rev: 'rev 3'
+      verified: 2026-09-28
+      match: partial
+      view: 'At the venue → ''Parking'''
+      differences: 'Shows live free-bay counts, which the YAML says it does not have (no live availability; full = soldOutForDay). Pays directly with ''Reserve and pay'' rather than through cart and checkout (R166). Also a plate field in the cabana/party flows.'
   apisNote: Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop pack
     — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
     to the ones that matter is work a person still owes this screen.
@@ -9071,7 +9355,7 @@ screens:
       - quantity
       - performanceId
       - attributes
-    provenance: contract orders.yaml POST /carts/{cartId}/lines
+    provenance: client-verified
   - id: formUpdateParkingEntitlement
     component: modal
     trigger: Save parking entitlement
@@ -9088,7 +9372,7 @@ screens:
       - plateNumber
       - plateCountry
       - status
-    provenance: contract access.yaml PATCH /parking-entitlements/{entitlementId}
+    provenance: client-verified
 - id: WEB-042
   name: Retail & Shop and Drop
   module: Retail
@@ -9273,8 +9557,15 @@ screens:
     - MerchandiseItem.outletId
   wireframe:
     status: review
-    provenance: designed
+    provenance: client-verified
     board: wireframes/P01 Guest Web.dc.html#web-042
+    prototype:
+      file: 'sources/designs/guest-rev3-28-september/TICVAI Guest Booking v2.dc.html'
+      rev: 'rev 3'
+      verified: 2026-09-28
+      match: exact
+      view: 'At the venue → ''Shop & drop'''
+      differences: 'Pays in one tap on the page, not through the cart and checkout (YAML R236).'
   apisNote: Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack
     — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
     to the ones that matter is work a person still owes this screen.
@@ -9298,7 +9589,7 @@ screens:
       - seatIds
       - parentLineId
       - attributes
-    provenance: contract orders.yaml POST /carts/{cartId}/lines
+    provenance: client-verified
 - id: WEB-043
   name: Loyalty & Rewards
   module: Membership, Loyalty & Value
@@ -9435,8 +9726,15 @@ screens:
       the site.'
   wireframe:
     status: review
-    provenance: designed
+    provenance: client-verified
     board: wireframes/P01 Guest Web.dc.html#web-043
+    prototype:
+      file: 'sources/designs/guest-rev3-28-september/TICVAI Guest Booking v2.dc.html'
+      rev: 'rev 3'
+      verified: 2026-09-28
+      match: exact
+      view: 'At the venue → ''Loyalty'''
+      differences: 'Placed inside the in-venue section; referral code appears under Account → Groups & invitations (YAML createReferral is here).'
   apisNote: Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack
     — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
     to the ones that matter is work a person still owes this screen.
@@ -9464,7 +9762,7 @@ screens:
       - refereeRewardId
       - expiresAt
       - scopePath
-    provenance: contract marketing-crm.yaml POST /referrals
+    provenance: client-verified
   - id: formRedeemLoyaltyPoints
     component: modal
     trigger: Redeem loyalty points
@@ -9481,7 +9779,7 @@ screens:
       - points
       - rewardId
       - orderId
-    provenance: contract marketing-crm.yaml POST /loyalty/redemptions
+    provenance: client-verified
 - id: WEB-044
   name: AI Concierge – Home
   module: Engagement & Support
@@ -9619,8 +9917,15 @@ screens:
       here, and the person holding it did nothing wrong. Arrives with `conversationId`.'
   wireframe:
     status: review
-    provenance: designed
+    provenance: client-verified
     board: wireframes/P01 Guest Web.dc.html#web-044
+    prototype:
+      file: 'sources/designs/guest-rev3-28-september/TICVAI Guest Booking v2.dc.html'
+      rev: 'rev 3'
+      verified: 2026-09-28
+      match: exact
+      view: 'Floating ''Ask Sahli'' button on every page'
+      differences: 'A floating chat panel rather than a home screen; no conversation history list (listAiConversations).'
   apisNote: Rebuilt 9 September 2026 from the 5 operations this screen declares, not from a workshop pack
     — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
     to the ones that matter is work a person still owes this screen.
@@ -9638,7 +9943,7 @@ screens:
       discards:
       - body
       - attachments
-    provenance: contract marketing-crm.yaml POST /conversations/{conversationId}/messages
+    provenance: client-verified
   - id: formCreateAiConversation
     component: modal
     trigger: Create AI conversation
@@ -9652,7 +9957,7 @@ screens:
       discards:
       - module
       - locale
-    provenance: contract ai.yaml POST /conversations
+    provenance: client-verified
   - id: formSendAiMessage
     component: modal
     trigger: Send AI message
@@ -9666,7 +9971,7 @@ screens:
       discards:
       - content
       - collectionIds
-    provenance: contract ai.yaml POST /conversations/{conversationId}/messages
+    provenance: client-verified
   - id: formHandoverToAgent
     component: modal
     trigger: Handover to agent
@@ -9681,7 +9986,7 @@ screens:
       - reason
       - summary
       - preferredQueueId
-    provenance: contract marketing-crm.yaml POST /conversations/{conversationId}/handover
+    provenance: client-verified
   - id: formRequestSuggestion
     component: modal
     trigger: Request suggestion
@@ -9697,7 +10002,7 @@ screens:
       - subjectRef
       - horizon
       - context
-    provenance: contract ai.yaml POST /ai/suggestions
+    provenance: client-verified
 - id: WEB-045
   name: Help Centre & Accessibility
   module: Support
@@ -9808,8 +10113,15 @@ screens:
     - FaqCategory.scopePath
   wireframe:
     status: review
-    provenance: designed
+    provenance: client-verified
     board: wireframes/P01 Guest Web.dc.html#web-045
+    prototype:
+      file: 'sources/designs/guest-rev3-28-september/TICVAI Guest Booking v2.dc.html'
+      rev: 'rev 3'
+      verified: 2026-09-28
+      match: partial
+      view: 'Header ''Help'' → ''Policies and accessibility''; footer ''Accessibility'''
+      differences: 'Not a separate screen: part of the WEB-025 Help centre page.'
   apisNote: Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack
     — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
     to the ones that matter is work a person still owes this screen.
@@ -9896,8 +10208,15 @@ screens:
       the site.'
   wireframe:
     status: review
-    provenance: designed
+    provenance: client-verified
     board: wireframes/P01 Guest Web.dc.html#web-046
+    prototype:
+      file: 'sources/designs/guest-rev3-28-september/TICVAI Guest Booking v2.dc.html'
+      rev: 'rev 3'
+      verified: 2026-09-28
+      match: exact
+      view: 'At the venue → ''Alerts'''
+      differences: 'Deferred in the YAML (release later, R242: no in-app feed in the first release), but the prototype draws it as a live section, so the client will expect it.'
   apisNote: Rebuilt 9 September 2026 from the 1 operation this screen declares, not from a workshop pack
     — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
     to the ones that matter is work a person still owes this screen.

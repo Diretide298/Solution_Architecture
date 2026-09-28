@@ -42175,14 +42175,17 @@
   "contract": "reporting",
   "verb": "GET",
   "path": "/kpi-values",
-  "reads": [],
+  "reads": [
+   "reporting.kpi_definition",
+   "reporting.kpi_target"
+  ],
   "writes": [],
   "routing": "replica",
   "scope": "venue",
   "perm": "REPORT_VIEW_VENUE",
   "offline": false,
   "summary": "Current values, against target, with movement",
-  "source": "derived",
+  "source": "hand-mapped 28 September (audit R283)",
   "audience": [
    "staff"
   ],
