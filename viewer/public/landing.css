@@ -83,7 +83,6 @@ html:has(body.landing) { scroll-behavior: smooth; }
 .lp-hero .lp-eyebrow { letter-spacing: .2em; }
 /* The lockup at hero size. Transparent PNG, drawn at most at half its height. */
 .lp-hero-logo { display: block; height: clamp(56px, 7vw, 96px); width: auto; margin: 0 0 0 -6px; }
-.lp-lockup-row { display: flex; align-items: center; gap: clamp(8px, 1.4vw, 20px); margin-bottom: clamp(18px, 2.4vw, 28px); }
 .lp-hero-grid {
   display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 420px), 1fr));
   gap: clamp(24px, 4vw, 64px); align-items: center;
@@ -279,19 +278,40 @@ html:has(body.landing) { scroll-behavior: smooth; }
 /* ── the mascot ───────────────────────────────────────────────────────
  * ADAM, through the page.
  *
- * `.lp-adam` stands at the right end of the hero's button row, in the space
- * beside the headline (moved from beside the lockup, 28 September). It was in
- * the right-hand gutter once, positioned, which put it on the lede the moment
- * the hero reflowed -- being in the flow is what stops that happening again.
+ * **Every pose gets the same box, and that is the whole trick.** The poses are
+ * cut to their own content, so their aspect ratios differ -- 184x223 against
+ * 165x250 against 198x244. Sizing them by height alone gave each one a
+ * different width (59px, 48px, 37px...), so four figures that should have read
+ * as one motif sat at four different distances from four different headings.
+ * A fixed box with `object-fit: contain` makes them occupy identical space
+ * whatever shape the artwork is, and `object-position: bottom` stands them all
+ * on the same floor rather than centring each one in its own empty air.
  *
- * `.lp-pose` is a small figure beside a section's eyebrow. It rides in the
- * eyebrow's own line box, so it moves with the heading instead of being
- * positioned against a layout that reflows underneath it.
+ * Setting both `width` and `height` also reserves the box before the image
+ * arrives. Height alone collapsed an unloaded pose to zero width, so every
+ * heading below the fold shifted sideways as its figure loaded.
+ *
+ * `.lp-adam` stands beside the hero lockup, sized off the lockup rather than
+ * off the window so the pair reads as one lockup at every width. It was in the
+ * right-hand gutter first, which put it on the lede the moment the hero
+ * reflowed; being in the flow is what stops that recurring.
  *
  * Both are decorative: `aria-hidden`, and nothing depends on them loading.
  */
+.lp-lockup-row {
+  display: flex;
+  align-items: center;
+  /* Wide enough that the figure reads as standing beside the wordmark rather
+     than touching it: the lockup's M and the figure's outer node were meeting
+     at a 20px gap. */
+  gap: clamp(20px, 2.6vw, 44px);
+  margin-bottom: clamp(18px, 2.4vw, 28px);
+}
+
 .lp-adam {
-  height: clamp(74px, 9.4vw, 128px);
+  /* Tied to the lockup's own clamp, one notch larger, so the two scale
+     together instead of drifting apart at the ends of the range. */
+  height: clamp(62px, 7.8vw, 106px);
   width: auto;
   user-select: none;
   animation: lp-adam-float 7s ease-in-out infinite;
@@ -303,23 +323,30 @@ html:has(body.landing) { scroll-behavior: smooth; }
 }
 
 .lp-pose {
-  height: 72px;
-  width: auto;
-  vertical-align: -26px;
-  margin-right: 12px;
+  display: inline-block;
+  width: 62px;
+  height: 74px;
+  object-fit: contain;
+  object-position: bottom center;
+  vertical-align: middle;
+  margin: 0 12px 0 0;
   opacity: .92;
 }
 
+/* On the closing panel it is the only figure, so it leads the block rather
+   than sitting in a line of type. */
 .lp-pose.is-cta {
   display: block;
-  height: 110px;
-  margin: 0 0 14px;
+  width: 96px;
+  height: 116px;
+  object-position: bottom left;
+  margin: 0 0 16px;
   vertical-align: baseline;
 }
 
 @media (max-width: 720px) {
-  .lp-pose { height: 48px; vertical-align: -17px; margin-right: 9px; }
-  .lp-pose.is-cta { height: 76px; }
+  .lp-pose { width: 44px; height: 52px; margin-right: 9px; }
+  .lp-pose.is-cta { width: 72px; height: 86px; }
 }
 
 @media (prefers-reduced-motion: reduce) {
