@@ -12,7 +12,7 @@ wrong, contradictory or short of something. Phases 1 to 3 of
 **The easy way is now the plugin.** Two lines in Claude Code, and nothing to download or unzip:
 
 ```
-/plugin marketplace add softlabsgroup/adam
+/plugin marketplace add Diretide298/Solution_Architecture
 /plugin install adam@adam
 ```
 

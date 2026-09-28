@@ -11,7 +11,7 @@ changes when you run `/update-adam` in Claude Code and restart it.
 Two lines in Claude Code instead of a zip, a `setup.cmd` and a walkthrough:
 
 ```
-/plugin marketplace add softlabsgroup/adam
+/plugin marketplace add Diretide298/Solution_Architecture
 /plugin install adam@adam
 ```
 
