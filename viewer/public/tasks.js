@@ -558,7 +558,28 @@ function drawParents(items) {
   $('tk-parents-count').textContent = plural(rows.filter((r) => r.key).length, 'epic', 'epics');
 }
 
-const WEEKS = 8;
+const WEEKS = 12;
+
+/**
+ * A "nice" ceiling for the axis: 1, 2, 5 or 10 times a power of ten.
+ *
+ * The old chart scaled every bar against the tallest week, which makes a good
+ * week and a bad week look identical whenever both are the tallest thing on
+ * screen — the shape changed but the reading never did. A rounded ceiling with
+ * labelled gridlines means the bars keep their meaning between refreshes.
+ */
+function niceMax(value) {
+  // Small counts get an even ceiling so the midpoint gridline is a whole
+  // ticket. Above ten the usual 1/2/5 steps, which are already even or are
+  // drawn without a midpoint.
+  if (value <= 10) return Math.max(2, value + (value % 2));
+  const power = 10 ** Math.floor(Math.log10(value));
+  for (const step of [1, 2, 5, 10]) {
+    const candidate = step * power;
+    if (candidate >= value) return candidate;
+  }
+  return 10 * power;
+}
 
 function drawThroughput(items) {
   const done = items.filter(isDone);
@@ -572,21 +593,98 @@ function drawThroughput(items) {
     const index = Math.min(WEEKS - 1, Math.floor(days(start, when) / 7));
     buckets[index].count += 1;
   }
-  const biggest = Math.max(1, ...buckets.map((b) => b.count));
+
+  const counts = buckets.map((b) => b.count);
+  const closed = counts.reduce((sum, n) => sum + n, 0);
+  const top = niceMax(Math.max(1, ...counts));
+  const mean = closed / WEEKS;
+  const peak = Math.max(...counts);
+
   const box = $('tk-weeks');
-  box.replaceChildren(...buckets.map((b) => {
-    const column = el('div', 'tk-week');
+  box.replaceChildren();
+
+  // The plot: gridlines behind, bars in front, one baseline under both. The bars
+  // used to each sit in their own filled track, so the empty part of every week
+  // was drawn as heavily as the data and eight boxes read louder than the eight
+  // numbers they carried.
+  const plot = el('div', 'tk-thr-plot');
+  const grid = el('div', 'tk-thr-grid');
+  // Only ever two or three lines. A gridline per unit on a chart that counts to
+  // five is a ruler with the data hidden behind it — and the midpoint is drawn
+  // only when it lands on a whole ticket, because "2.5 tickets closed" is a
+  // quantity nobody has ever had.
+  const ticks = top % 2 === 0 ? [top, top / 2, 0] : [top, 0];
+  for (const at of ticks) {
+    const line = el('div', 'tk-thr-line');
+    line.style.bottom = `${(at / top) * 100}%`;
+    line.append(el('span', 'tk-thr-tick', String(Math.round(at * 10) / 10)));
+    grid.append(line);
+  }
+  plot.append(grid);
+
+  // The average, as the one annotation worth a line of its own: the question a
+  // throughput chart is actually asked is "is this week normal".
+  if (closed) {
+    const avg = el('div', 'tk-thr-mean');
+    avg.style.bottom = `${(mean / top) * 100}%`;
+    avg.append(el('span', 'tk-thr-mean-label', `avg ${Math.round(mean * 10) / 10}`));
+    plot.append(avg);
+  }
+
+  const bars = el('div', 'tk-thr-bars');
+  buckets.forEach((b, i) => {
+    const column = el('div', 'tk-thr-col');
+    column.tabIndex = 0;
+    const label = `${plural(b.count, 'ticket', 'tickets')} closed in the week of ${fmtDay(b.from.toISOString())}`;
+    column.setAttribute('aria-label', label);
     // A week where nothing closed draws nothing. A minimum-height bar on a zero
     // is a week that looks like it delivered a little, which is the one thing
     // the column must not say.
-    const bar = el('div', `tk-week-bar${b.count ? '' : ' tk-week-none'}`);
-    bar.style.height = b.count ? `${Math.round((b.count / biggest) * 100)}%` : '0';
-    bar.title = `${plural(b.count, 'ticket', 'tickets')} closed in the week of ${fmtDay(b.from.toISOString())}`;
-    column.append(el('div', 'tk-week-count', String(b.count)), el('div', 'tk-week-track', bar),
-      el('div', 'tk-week-label', b.from.toLocaleDateString(undefined, { day: 'numeric', month: 'short' })));
-    return column;
-  }));
-  const closed = buckets.reduce((sum, b) => sum + b.count, 0);
+    const bar = el('div', 'tk-thr-bar');
+    bar.style.height = b.count ? `${(b.count / top) * 100}%` : '0';
+    if (!b.count) bar.classList.add('is-zero');
+    if (i === WEEKS - 1) bar.classList.add('is-latest');
+    // Labelled selectively — the peak and the week just gone. A number over
+    // every bar is the axis written out twice.
+    if (b.count && (b.count === peak || i === WEEKS - 1)) {
+      column.append(Object.assign(el('span', 'tk-thr-value', String(b.count)),
+        { style: `bottom:calc(${(b.count / top) * 100}% + 4px)` }));
+    }
+    column.append(bar, el('span', 'tk-thr-tip', label));
+    bars.append(column);
+  });
+  plot.append(bars);
+
+  // Every fourth week is named. Twelve dates along the foot of a 600px panel
+  // overlap, and the ones between are readable from the two either side.
+  const axis = el('div', 'tk-thr-axis');
+  buckets.forEach((b, i) => {
+    const cell = el('div', 'tk-thr-when');
+    if (i % 4 === 0 || i === WEEKS - 1) {
+      cell.textContent = b.from.toLocaleDateString(undefined, { day: 'numeric', month: 'short' });
+    }
+    axis.append(cell);
+  });
+
+  // The table twin. Two bars are labelled and the other ten live in a tooltip,
+  // and a value only a mouse can reach is a value some readers do not have at
+  // all. This carries every week, in order, for anything that is not looking at
+  // the picture — and it is what a screen reader reads instead of twelve
+  // unlabelled columns.
+  const table = el('table', 'tk-thr-table');
+  const caption = el('caption', null, `Tickets closed each week for the last ${WEEKS} weeks`);
+  const head = el('tr');
+  head.append(el('th', null, 'Week beginning'), el('th', null, 'Tickets closed'));
+  const body = el('tbody');
+  for (const b of buckets) {
+    const row = el('tr');
+    row.append(el('th', null, fmtDay(b.from.toISOString())), el('td', null, String(b.count)));
+    body.append(row);
+  }
+  table.append(caption, el('thead', null, '') , body);
+  table.querySelector('thead').append(head);
+  box.append(plot, axis, table);
+
   const median = medianDaysToClose(done);
   $('tk-throughput-lede').textContent =
     `${plural(closed, 'ticket', 'tickets')} closed in the last ${WEEKS} weeks`
