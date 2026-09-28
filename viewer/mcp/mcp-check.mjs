@@ -206,7 +206,16 @@ else fail('adam_pull refuses a missing folder', JSON.stringify(nowhere).slice(0,
 // network.
 
 console.log('\nthe connector manifest');
-{
+// Only in the ADAM repo: an installed connector has setup.ps1 in its root and no
+// build-zip.ps1, and reading them there crashed the full test on every machine
+// that said yes to it (28 September, on Linux).
+const inRepo = await readFile(path.join(here, 'setup', 'build-zip.ps1'), 'utf8').then(() => true, () => false);
+if (!inRepo) {
+  const { buildOf, HERE } = await import('./version.mjs');
+  const build = await buildOf(HERE);
+  if (/^[0-9a-f]{12}$/.test(build)) pass(`this connector is build ${build}`);
+  else fail('the build id is twelve hex characters', String(build));
+} else {
   const { FILES } = await import('./version.mjs');
   const listed = [...FILES].sort();
   const namesIn = (text, after) => {
