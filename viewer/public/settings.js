@@ -27,6 +27,7 @@ import {
   changePassword, signOut, logoutAll, project, isAdmin, isOwner,
   connectorFleet, servedBuild,
 } from '/validation.js';
+import { mountPanels } from '/panels.js';
 
 const $ = (id) => document.getElementById(id);
 
@@ -284,32 +285,9 @@ async function load() {
  * between tabs replaces the hash rather than pushing it, so Back leaves the
  * settings page instead of walking you through every tab you looked at.
  */
-function tabs(start) {
-  const strip = $('set-tabs');
-  const buttons = [...strip.querySelectorAll('button')];
-  const names = buttons.map((b) => b.dataset.tab);
-
-  const show = (name, push) => {
-    const pick = names.includes(name) && !buttons[names.indexOf(name)].hidden ? name : 'account';
-    for (const b of buttons) {
-      const on = b.dataset.tab === pick;
-      b.setAttribute('aria-current', on ? 'true' : 'false');
-    }
-    for (const n of names) {
-      const section = $(n);
-      if (section) section.hidden = n !== pick;
-    }
-    if (push) history.replaceState(null, '', `#${pick}`);
-    // Back to the top of the section, not to wherever the last one was scrolled.
-    window.scrollTo({ top: 0 });
-  };
-
-  for (const b of buttons) b.onclick = () => show(b.dataset.tab, true);
-  addEventListener('hashchange', () => show(location.hash.slice(1), false));
-  show(start, false);
-}
-
-const followScroll = () => tabs(location.hash.slice(1) || 'account');
+// Which section is showing. The mechanism is shared with the tasks page — see
+// panels.js for why it is not written twice.
+const followScroll = () => mountPanels({ nav: $('set-tabs'), fallback: 'account' });
 
 function wirePassword() {
   $('pw-submit').addEventListener('click', async () => {

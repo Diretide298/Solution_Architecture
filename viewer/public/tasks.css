@@ -296,3 +296,57 @@ a.tk-badge:hover { background: var(--bg-hover); }
   .tk-gantt-label { grid-column: 1 / -1; }
   .tk-gantt-track { grid-column: 1 / 2; }
 }
+
+/* ── the dashboard ───────────────────────────────────────────────────
+ * The overview's two charts, side by side under the counts.
+ *
+ * They were two more full-width panels in a column of nine, on a page that
+ * measured 26,000 pixels against a real board — so the one screen somebody
+ * opens this page for was spread over four of them. Throughput and the state
+ * pipeline answer "is it moving" and "where is it stuck", which are the two
+ * questions asked together and never apart.
+ *
+ * `auto-fit` with a 420px floor rather than a media query: the two cards sit
+ * side by side wherever there is room for both and stack where there is not,
+ * and the rail is 210px of that width on this layout.
+ */
+.tk-dash {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(420px, 1fr));
+  gap: 14px;
+  margin-top: 4px;
+  /* Each card is as tall as its own content. Stretching both to the taller one
+     left the throughput card with a third of itself empty. */
+  align-items: start;
+}
+
+.tk-dash-card {
+  border: 1px solid var(--border);
+  border-radius: 9px;
+  background: var(--bg-panel);
+  padding: 16px 18px 18px;
+  min-width: 0;   /* a grid child holding a chart must be allowed to shrink */
+}
+
+.tk-dash-heading {
+  margin: 0 0 6px;
+  font-size: 13.5px; font-weight: 700; color: var(--text);
+}
+
+.tk-dash-note {
+  margin: 0;
+  font-size: 12px; line-height: 1.5; color: var(--text-dim);
+}
+
+/* Inside a card the state rows have less room than they had across a whole
+   panel, so the bar gives width back to the label, the count and the note.
+   The note is not decoration: `--ok` is deliberately an alias of `--accent`
+   in this palette — the tokens file says a separate green would be the only
+   green on the page — so a finished state and an open one are the same colour
+   by design, and the word "finished" is the whole distinction. Hiding it left
+   the row saying nothing. */
+.tk-dash-card .tk-bar-row {
+  grid-template-columns: minmax(88px, 1.2fr) minmax(40px, 1.8fr) 32px minmax(0, 52px);
+  gap: 9px;
+}
+.tk-dash-card .tk-bar-extra { font-size: 11px; }

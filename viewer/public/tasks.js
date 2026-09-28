@@ -26,7 +26,7 @@
 import '/page-chrome.js';
 import * as auth from '/validation.js';
 import { hideLoader, loaderSays } from '/loader.js';
-import { followSections } from '/sections.js';
+import { mountPanels } from '/panels.js';
 
 const $ = (id) => document.getElementById(id);
 const el = (tag, className, text) => {
@@ -810,6 +810,10 @@ function exportCsv() {
 
   loaderSays('Reading the delivery board…');
   await load();
-  followSections('overview');
+  // One section at a time, driven by the rail. The page was nine full-width
+  // panels in a single column — 26,000 pixels of it on a real board — so the
+  // rail marked where you were in a scroll nobody could hold in their head.
+  // Same mechanism as the settings page; see panels.js.
+  mountPanels({ nav: document.querySelector('#tasks .set-nav'), fallback: 'overview' });
   hideLoader();
 })();

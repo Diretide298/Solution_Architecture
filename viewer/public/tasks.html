@@ -104,15 +104,12 @@
         <div class="set-nav-list">
           <a href="#overview">Overview</a>
           <div class="set-nav-group">Where the work is</div>
-          <a href="#states">States</a>
           <a href="#people">People</a>
           <a href="#dates">Overdue and due</a>
           <div class="set-nav-group">What is being delivered</div>
           <a href="#timeline">Timeline</a>
           <a href="#deliverables">Deliverables</a>
           <a href="#parents">Epics</a>
-          <div class="set-nav-group">Over time</div>
-          <a href="#throughput">Throughput</a>
           <div class="set-nav-group">Everything</div>
           <a href="#tickets">All tickets</a>
         </div>
@@ -133,19 +130,34 @@
             <p class="set-state" id="tk-asof" role="status"></p>
           </div>
           <section class="stat-strip" id="tk-stats"></section>
+
+          <!-- The dashboard proper. Throughput and the state pipeline were two
+               more full-width panels further down a page that was already nine
+               of them; here they are side by side with the counts, which is the
+               one screen somebody opens this page to see. Their ids are kept so
+               an existing #states or #throughput link still lands on them. -->
+          <div class="tk-dash">
+            <div class="tk-dash-card" id="throughput">
+              <h3 class="tk-dash-heading">Throughput</h3>
+              <p class="auth-note tk-dash-note" id="tk-throughput-lede"></p>
+              <div id="tk-weeks" class="tk-weeks"></div>
+            </div>
+
+            <div class="tk-dash-card" id="states">
+              <h3 class="tk-dash-heading">
+                States <span class="admin-count" id="tk-states-count"></span>
+              </h3>
+              <p class="auth-note tk-dash-note">
+                Every status OpenProject has for this project's tickets, in its
+                own order. ADAM keeps no list of its own — a team that renames a
+                column keeps its numbers.
+              </p>
+              <div class="admin-table" id="tk-states"></div>
+            </div>
+          </div>
         </section>
 
         <!-- ── states ────────────────────────────────────────────────── -->
-        <section class="admin-panel set-section" id="states">
-          <h2 class="admin-heading">States <span class="admin-count" id="tk-states-count"></span></h2>
-          <p class="auth-note set-lede">
-            Every status OpenProject has for this project's tickets, in its own
-            order. ADAM does not keep a list of its own — a team that renames a
-            column keeps its numbers.
-          </p>
-          <div class="admin-table" id="tk-states"></div>
-        </section>
-
         <!-- ── people ────────────────────────────────────────────────── -->
         <section class="admin-panel set-section" id="people">
           <h2 class="admin-heading">People <span class="admin-count" id="tk-people-count"></span></h2>
@@ -217,13 +229,6 @@
             typed on them.
           </p>
           <div class="admin-table" id="tk-parents"></div>
-        </section>
-
-        <!-- ── throughput ────────────────────────────────────────────── -->
-        <section class="admin-panel set-section" id="throughput">
-          <h2 class="admin-heading">Throughput</h2>
-          <p class="auth-note set-lede" id="tk-throughput-lede"></p>
-          <div id="tk-weeks" class="tk-weeks"></div>
         </section>
 
         <!-- ── every ticket ──────────────────────────────────────────── -->
