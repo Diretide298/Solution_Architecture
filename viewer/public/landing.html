@@ -49,15 +49,11 @@
       <section class="lp-hero">
         <div class="lp-hero-grid">
           <div class="lp-hero-title">
-            <!-- ADAM standing beside its own lockup. In the flow rather than
-                 positioned over it: the hero reflows at several widths, and a
-                 figure placed against that layout is a figure that lands on the
-                 copy at one of them. -->
-            <div class="lp-lockup-row">
-              <img class="lp-hero-logo" src="/brand/adam-lockup-day.png" alt="" width="706" height="200" />
-              <img class="lp-adam" src="/brand/mascot/hero.webp" alt="" aria-hidden="true"
-                   width="355" height="560" decoding="async" />
-            </div>
+            <!-- No mascot here. The lockup already carries the ADAM mark, so a
+                 figure beside it is the same mark twice and reads as decoration
+                 looking for a home. It stands in the closing panel instead,
+                 which is the one dark ground on this page. -->
+            <img class="lp-hero-logo" src="/brand/adam-lockup-day.png" alt="" width="706" height="200" />
             <p class="lp-eyebrow">The context layer for AI-assisted development</p>
             <h1 class="lp-h1">Every layer,<br />one reference graph.</h1>
           </div>
@@ -186,9 +182,12 @@
 
       <section id="demo" class="lp-section">
         <div class="lp-cta">
+          <!-- ADAM, at the end, on the only dark ground on the page — which is
+               what the artwork was drawn against. It fills the empty bottom
+               right of the panel and is the last thing before the footer. -->
+          <img class="lp-adam" src="/brand/mascot/hero.webp" alt="" aria-hidden="true"
+               width="355" height="560" loading="lazy" decoding="async" />
           <div>
-            <img class="lp-pose is-cta" src="/brand/mascot/poses/welcome.webp" alt=""
-                 aria-hidden="true" loading="lazy" decoding="async" />
             <h2>See it against your own delivery package.</h2>
             <p class="lp-cta-body">Adam reads the package straight from the repository. Nothing is uploaded, and nothing leaves the machine it runs on.</p>
           </div>

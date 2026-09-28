@@ -82,7 +82,7 @@ html:has(body.landing) { scroll-behavior: smooth; }
 .lp-hero { padding-top: clamp(48px, 7vw, 86px); }
 .lp-hero .lp-eyebrow { letter-spacing: .2em; }
 /* The lockup at hero size. Transparent PNG, drawn at most at half its height. */
-.lp-hero-logo { display: block; height: clamp(56px, 7vw, 96px); width: auto; margin: 0 0 0 -6px; }
+.lp-hero-logo { display: block; height: clamp(56px, 7vw, 96px); width: auto; margin: 0 0 clamp(18px, 2.4vw, 28px) -6px; }
 .lp-hero-grid {
   display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 420px), 1fr));
   gap: clamp(24px, 4vw, 64px); align-items: center;
@@ -218,6 +218,7 @@ html:has(body.landing) { scroll-behavior: smooth; }
 
 /* ── CTA ────────────────────────────────────────────────────────────── */
 .lp-cta {
+  position: relative; overflow: hidden;
   background: var(--cta-ink); border-radius: 16px; padding: clamp(32px, 5vw, 64px); display: grid;
   grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr)); gap: clamp(24px, 4vw, 56px); align-items: center;
 }
@@ -270,47 +271,38 @@ html:has(body.landing) { scroll-behavior: smooth; }
 /* ── the mascot ───────────────────────────────────────────────────────
  * ADAM, through the page.
  *
+ * **Not in the hero.** The lockup already carries the ADAM mark, so a figure
+ * beside it is the same mark twice, and it showed: wherever it was put in that
+ * row it read as decoration looking for somewhere to be. It stands in the
+ * closing panel instead, which is the one dark ground on this page and what the
+ * artwork was drawn against — and the panel's bottom right is genuinely empty,
+ * because the fine print is short and the grid is centred.
+ *
+ * Absolute inside the panel, which is safe in a way the hero was not: the panel
+ * is one box with its own padding rather than a grid that reflows around the
+ * copy, so `right` and `bottom` mean the same thing at every width. Below the
+ * width where the panel stacks into one column it is not scaled down, it is
+ * dropped — overlapping the call to action to keep a decoration is the wrong
+ * trade. `overflow: hidden` keeps it inside the panel's rounded corner.
+ *
  * **Every pose gets the same box, and that is the whole trick.** The poses are
- * cut to their own content, so their aspect ratios differ -- 184x223 against
+ * cut to their own content, so their aspect ratios differ — 184x223 against
  * 165x250 against 198x244. Sizing them by height alone gave each one a
- * different width (59px, 48px, 37px...), so four figures that should have read
- * as one motif sat at four different distances from four different headings.
- * A fixed box with `object-fit: contain` makes them occupy identical space
- * whatever shape the artwork is, and `object-position: bottom` stands them all
- * on the same floor rather than centring each one in its own empty air.
- *
- * Setting both `width` and `height` also reserves the box before the image
- * arrives. Height alone collapsed an unloaded pose to zero width, so every
- * heading below the fold shifted sideways as its figure loaded.
- *
- * `.lp-adam` stands beside the hero lockup, sized off the lockup rather than
- * off the window so the pair reads as one lockup at every width. It was in the
- * right-hand gutter first, which put it on the lede the moment the hero
- * reflowed; being in the flow is what stops that recurring.
- *
- * Both are decorative: `aria-hidden`, and nothing depends on them loading.
+ * different width, so four figures that should have read as one motif sat at
+ * four different distances from four different headings. A fixed box with
+ * `object-fit: contain` makes them occupy identical space whatever shape the
+ * artwork is, and `object-position: bottom` stands them all on the same floor.
+ * Setting both dimensions also reserves the box before the image arrives;
+ * height alone collapsed an unloaded pose to zero width, and every heading
+ * below the fold shifted sideways as its figure loaded.
  */
-.lp-lockup-row {
-  display: flex;
-  align-items: center;
-  /* Wide enough that the figure reads as standing beside the wordmark rather
-     than touching it: the lockup's M and the figure's outer node were meeting
-     at a 20px gap. */
-  gap: clamp(20px, 2.6vw, 44px);
-  margin-bottom: clamp(18px, 2.4vw, 28px);
-}
-
-.lp-adam {
-  /* Pushed to the far end of the row, and sized to the space that is actually
-     there. The headline's second line is set to fill its column exactly -- its
-     ink ends within 3px of the column edge at every width from 1080 to 1920 --
-     so the only free area in this half of the hero is the block between the
-     lockup and the headline, right of the wordmark. The figure fills it in both
-     directions: across, by sitting at the column's right edge, and down, by
-     making the row tall enough to close the gap above the headline. */
-  margin-left: auto;
-  height: clamp(84px, 10.4vw, 152px);
+.lp-cta .lp-adam {
+  position: absolute;
+  right: clamp(16px, 3vw, 52px);
+  bottom: 0;
+  height: clamp(150px, 19vw, 250px);
   width: auto;
+  pointer-events: none;
   user-select: none;
   animation: lp-adam-float 7s ease-in-out infinite;
 }
@@ -331,22 +323,16 @@ html:has(body.landing) { scroll-behavior: smooth; }
   opacity: .92;
 }
 
-/* On the closing panel it is the only figure, so it leads the block rather
-   than sitting in a line of type. */
-.lp-pose.is-cta {
-  display: block;
-  width: 96px;
-  height: 116px;
-  object-position: bottom left;
-  margin: 0 0 16px;
-  vertical-align: baseline;
+/* Under this the panel stacks into one column and the figure would stand on
+   the buttons. */
+@media (max-width: 900px) {
+  .lp-cta .lp-adam { display: none; }
 }
 
 @media (max-width: 720px) {
   .lp-pose { width: 44px; height: 52px; margin-right: 9px; }
-  .lp-pose.is-cta { width: 72px; height: 86px; }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .lp-adam { animation: none; }
+  .lp-cta .lp-adam { animation: none; }
 }
