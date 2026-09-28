@@ -49,16 +49,27 @@
       <section class="lp-hero">
         <div class="lp-hero-grid">
           <div class="lp-hero-title">
-            <img class="lp-hero-logo" src="/brand/adam-lockup-day.png" alt="" width="706" height="200" />
+            <!-- ADAM standing beside its own lockup. In the flow rather than
+                 positioned over it: the hero reflows at several widths, and a
+                 figure placed against that layout is a figure that lands on the
+                 copy at one of them. -->
+            <div class="lp-lockup-row">
+              <img class="lp-hero-logo" src="/brand/adam-lockup-day.png" alt="" width="706" height="200" />
+            </div>
             <p class="lp-eyebrow">The context layer for AI-assisted development</p>
             <h1 class="lp-h1">Every layer,<br />one reference graph.</h1>
           </div>
           <div class="lp-hero-copy">
             <p class="lp-lede">Every screen, contract, state model, table and decision in the delivery package — indexed, cross-referenced, and checked against each other. The requirements a workshop produced, the decisions taken about them, and every artefact derived from those decisions, in one place that refuses to contradict itself.</p>
             <p class="lp-pipeline">Requirements → decisions → contracts → data model → screens → handoff</p>
+            <!-- ADAM stands at the right end of the button row, in the space
+                 beside the headline. In the flow, not positioned: a figure placed
+                 against a hero that reflows lands on the copy at some width. -->
             <div class="lp-hero-cta">
               <a class="lp-btn lp-btn-fill" href="/home.html" data-workspace>Open workspace</a>
               <a class="lp-btn" href="#journey">See how it works</a>
+              <img class="lp-adam" src="/brand/mascot/hero.webp" alt="" aria-hidden="true"
+                   width="355" height="560" decoding="async" />
             </div>
           </div>
         </div>
@@ -101,7 +112,7 @@
       <p class="lp-figures-note">Counted from the package this instance serves, at design 87% and build 33%.</p>
 
       <section id="what" class="lp-section">
-        <p class="lp-eyebrow">01 / What Adam is</p>
+        <p class="lp-eyebrow"><img class="lp-pose" src="/brand/mascot/poses/explaining.webp" alt="" aria-hidden="true" loading="lazy" decoding="async" />01 / What Adam is</p>
         <h2 class="lp-h2 lp-what-h2">A contract-first package that refuses to contradict itself.</h2>
         <div class="lp-cards3">
           <div class="lp-card">
@@ -123,7 +134,7 @@
       </section>
 
       <section id="journey" class="lp-section">
-        <p class="lp-eyebrow">02 / The journey — before the derivation</p>
+        <p class="lp-eyebrow"><img class="lp-pose" src="/brand/mascot/poses/greeting.webp" alt="" aria-hidden="true" loading="lazy" decoding="async" />02 / The journey — before the derivation</p>
         <div class="lp-lead-grid">
           <h2 class="lp-h2">From a room full of requirements to a decision the package can hold.</h2>
           <p class="lp-intro">Seven steps happen with people in the room. Each one leaves something behind that Adam can read — a parsed pack, a minute, an ADR, a signed verdict — so the next step starts from the record rather than from memory.</p>
@@ -137,7 +148,7 @@
       </section>
 
       <section id="chain" class="lp-section">
-        <p class="lp-eyebrow">03 / The derivation chain</p>
+        <p class="lp-eyebrow"><img class="lp-pose" src="/brand/mascot/poses/processing.webp" alt="" aria-hidden="true" loading="lazy" decoding="async" />03 / The derivation chain</p>
         <div class="lp-lead-grid">
           <h2 class="lp-h2">One command, in dependency order.</h2>
           <p class="lp-intro">After any change to the contracts, screens, flows, states or events, everything downstream is rebuilt. The order matters — the domain closure reads the lineage, and the status reads the closure. Pick a step to see what it writes and why it exists.</p>
@@ -160,7 +171,7 @@
       </section>
 
       <section id="read" class="lp-section">
-        <p class="lp-eyebrow">04 / Reading it back</p>
+        <p class="lp-eyebrow"><img class="lp-pose" src="/brand/mascot/poses/reading.webp" alt="" aria-hidden="true" loading="lazy" decoding="async" />04 / Reading it back</p>
         <div class="lp-read-grid">
           <div class="lp-read-card">
             <h3>Four layers, one switch</h3>
@@ -179,6 +190,8 @@
       <section id="demo" class="lp-section">
         <div class="lp-cta">
           <div>
+            <img class="lp-pose is-cta" src="/brand/mascot/poses/welcome.webp" alt=""
+                 aria-hidden="true" loading="lazy" decoding="async" />
             <h2>See it against your own delivery package.</h2>
             <p class="lp-cta-body">Adam reads the package straight from the repository. Nothing is uploaded, and nothing leaves the machine it runs on.</p>
           </div>

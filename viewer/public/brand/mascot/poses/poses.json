@@ -1,0 +1,107 @@
+{
+  "note": "ADAM's mascot, 20 poses plus hero.webp beside this folder. Sliced from the delivered sheet: the index sheet's faint alpha-1-8 wash is cleared (it read as a pale rectangle on dark panels) and fragments of a neighbouring cell removed.",
+  "rule": "The mascot reacts to the system's state, never to a person. Never put it on a per-person row.",
+  "hero": "../hero.webp",
+  "poses": {
+    "alert": {
+      "file": "alert.webp",
+      "w": 176,
+      "h": 227
+    },
+    "confused": {
+      "file": "confused.webp",
+      "w": 172,
+      "h": 231
+    },
+    "determined": {
+      "file": "determined.webp",
+      "w": 172,
+      "h": 227
+    },
+    "error": {
+      "file": "error.webp",
+      "w": 161,
+      "h": 224
+    },
+    "excited": {
+      "file": "excited.webp",
+      "w": 213,
+      "h": 254
+    },
+    "explaining": {
+      "file": "explaining.webp",
+      "w": 184,
+      "h": 223
+    },
+    "greeting": {
+      "file": "greeting.webp",
+      "w": 165,
+      "h": 250
+    },
+    "idea": {
+      "file": "idea.webp",
+      "w": 162,
+      "h": 229
+    },
+    "idle": {
+      "file": "idle.webp",
+      "w": 167,
+      "h": 221
+    },
+    "listening": {
+      "file": "listening.webp",
+      "w": 216,
+      "h": 244
+    },
+    "love": {
+      "file": "love.webp",
+      "w": 184,
+      "h": 219
+    },
+    "neutral": {
+      "file": "neutral.webp",
+      "w": 170,
+      "h": 254
+    },
+    "processing": {
+      "file": "processing.webp",
+      "w": 198,
+      "h": 244
+    },
+    "reading": {
+      "file": "reading.webp",
+      "w": 173,
+      "h": 241
+    },
+    "sleepy": {
+      "file": "sleepy.webp",
+      "w": 172,
+      "h": 211
+    },
+    "speaking": {
+      "file": "speaking.webp",
+      "w": 202,
+      "h": 242
+    },
+    "success": {
+      "file": "success.webp",
+      "w": 200,
+      "h": 219
+    },
+    "thinking": {
+      "file": "thinking.webp",
+      "w": 185,
+      "h": 251
+    },
+    "typing": {
+      "file": "typing.webp",
+      "w": 177,
+      "h": 243
+    },
+    "welcome": {
+      "file": "welcome.webp",
+      "w": 173,
+      "h": 247
+    }
+  }
+}

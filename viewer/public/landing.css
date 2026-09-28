@@ -82,7 +82,8 @@ html:has(body.landing) { scroll-behavior: smooth; }
 .lp-hero { padding-top: clamp(48px, 7vw, 86px); }
 .lp-hero .lp-eyebrow { letter-spacing: .2em; }
 /* The lockup at hero size. Transparent PNG, drawn at most at half its height. */
-.lp-hero-logo { display: block; height: clamp(56px, 7vw, 96px); width: auto; margin: 0 0 clamp(18px, 2.4vw, 28px) -6px; }
+.lp-hero-logo { display: block; height: clamp(56px, 7vw, 96px); width: auto; margin: 0 0 0 -6px; }
+.lp-lockup-row { display: flex; align-items: center; gap: clamp(8px, 1.4vw, 20px); margin-bottom: clamp(18px, 2.4vw, 28px); }
 .lp-hero-grid {
   display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 420px), 1fr));
   gap: clamp(24px, 4vw, 64px); align-items: center;
@@ -98,7 +99,15 @@ html:has(body.landing) { scroll-behavior: smooth; }
 .lp-hero-copy { display: flex; flex-direction: column; gap: 18px; padding-bottom: 8px; }
 .lp-lede { font-size: 17.5px; line-height: 1.58; color: var(--body); text-wrap: pretty; max-width: 52ch; }
 .lp-pipeline { font-family: var(--mono); font-size: 12px; line-height: 1.9; letter-spacing: .04em; color: var(--muted); }
-.lp-hero-cta { display: flex; gap: 10px; flex-wrap: wrap; }
+.lp-hero-cta { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+/* ADAM at the row's right end, in the empty space beside the headline. */
+/* Negative margins take it out of the row's height, so the buttons keep their
+   place under the pipeline line and the figure hangs into the space below. */
+.lp-hero-cta .lp-adam {
+  --adam-h: clamp(110px, 12vw, 170px);
+  height: var(--adam-h); margin-left: auto;
+  margin-top: calc(var(--adam-h) * -.12); margin-bottom: calc(var(--adam-h) * -.78);
+}
 
 /* ── hero animation ─────────────────────────────────────────────────── */
 .lp-scene-section { margin-top: clamp(28px, 4vw, 52px); }
@@ -265,4 +274,54 @@ html:has(body.landing) { scroll-behavior: smooth; }
 }
 @media (prefers-reduced-motion: reduce) {
   html:has(body.landing) { scroll-behavior: auto; }
+}
+
+/* ── the mascot ───────────────────────────────────────────────────────
+ * ADAM, through the page.
+ *
+ * `.lp-adam` stands at the right end of the hero's button row, in the space
+ * beside the headline (moved from beside the lockup, 28 September). It was in
+ * the right-hand gutter once, positioned, which put it on the lede the moment
+ * the hero reflowed -- being in the flow is what stops that happening again.
+ *
+ * `.lp-pose` is a small figure beside a section's eyebrow. It rides in the
+ * eyebrow's own line box, so it moves with the heading instead of being
+ * positioned against a layout that reflows underneath it.
+ *
+ * Both are decorative: `aria-hidden`, and nothing depends on them loading.
+ */
+.lp-adam {
+  height: clamp(74px, 9.4vw, 128px);
+  width: auto;
+  user-select: none;
+  animation: lp-adam-float 7s ease-in-out infinite;
+}
+
+@keyframes lp-adam-float {
+  0%, 100% { transform: translateY(0); }
+  50%      { transform: translateY(-7px); }
+}
+
+.lp-pose {
+  height: 72px;
+  width: auto;
+  vertical-align: -26px;
+  margin-right: 12px;
+  opacity: .92;
+}
+
+.lp-pose.is-cta {
+  display: block;
+  height: 110px;
+  margin: 0 0 14px;
+  vertical-align: baseline;
+}
+
+@media (max-width: 720px) {
+  .lp-pose { height: 48px; vertical-align: -17px; margin-right: 9px; }
+  .lp-pose.is-cta { height: 76px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .lp-adam { animation: none; }
 }

@@ -622,6 +622,16 @@ async function main() {
   window.addEventListener('hashchange', fromHash);
   fromHash();
 
+  // The mascot becomes video where that is wanted and affordable; the still in
+  // the markup is what the page shows otherwise, and is already correct. Loaded
+  // on demand so a reader who turned video off never fetches the keyer either,
+  // and failing to load it is not a reason to fail the page.
+  import('/mascot-figure.js').then(({ mountFigure }) => {
+    mountFigure(document.getElementById('home-mascot'), {
+      clip: '/brand/mascot/mascot-idle.mp4',
+    });
+  }).catch(() => { /* the still stays, which is the whole fallback */ });
+
   hideLoader();
 }
 

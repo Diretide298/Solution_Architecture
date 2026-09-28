@@ -99,6 +99,16 @@
       <p class="home-account" id="home-account" hidden></p>
     </footer>
 
+    <!-- ADAM itself, standing in its own scene.
+         Decorative and inert: `aria-hidden` and `pointer-events: none`, because
+         the canvas behind it is the page's only control and a figure that ate
+         clicks would break the graph wherever it happened to stand. It appears
+         only on windows wide enough to have empty space to the right of the
+         graph and left of the rail -- see home.css. -->
+    <div class="home-mascot" id="home-mascot" aria-hidden="true">
+      <img src="/brand/mascot/hero.webp" alt="" width="355" height="560" decoding="async" />
+    </div>
+
     <!-- The way out, on the canvas's own layer. Escape does the same thing and
          always has; a page whose main control is a canvas cannot rely on a
          reader knowing that. Hidden until there is something to come back

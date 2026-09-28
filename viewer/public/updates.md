@@ -4,6 +4,46 @@ Most changes need nothing from you: the pages are served from one place, so a re
 upgrade. The exception is the **connector** — the part that runs on your own machine — which only
 changes when you run `/update-adam` in Claude Code and restart it.
 
+## 28 September 2026
+
+### The connector installs as a Claude Code plugin
+
+Two lines in Claude Code instead of a zip, a `setup.cmd` and a walkthrough:
+
+```
+/plugin marketplace add softlabsgroup/adam
+/plugin install adam@adam
+```
+
+Claude Code then **asks you** for the ADAM address, your e-mail and your password, and puts the
+password in your operating system's credential store rather than in a settings file. The old
+registration kept it in plain text where `claude mcp get` would print it.
+
+The plugin carries the connector, and also the **usage hooks** — the ones that fill the Agents page
+under Tasks. Those were a block of JSON in a README that people were asked to paste into
+`settings.json` by hand, which is to say they were mostly not installed at all. Installing the
+plugin installs them.
+
+**Updates come from the marketplace**, so `/update-adam` is not the command for a plugin install —
+`/plugin update adam@adam` is, and the connector says so on startup rather than sending you to an
+updater that would write files the marketplace owns on its next update. **Settings → Claude
+connector → Builds** now shows which of the two installs each machine is on, so retiring the zip is
+something you can watch happen rather than guess at.
+
+**The zip still works and still needs `setup.cmd` for a first install.** Nothing has to move today.
+
+### Adam is on the landing and home pages
+
+The mascot now stands beside the lockup on the landing page, next to each section heading, and in
+the corner of the home page's graph. Twenty poses came out of the delivered sheet — reading,
+thinking, sleepy, error, and the rest — cleaned the same way the first set was: the sheet arrives
+with a faint wash over the background that shows up as a pale rectangle on any dark panel.
+
+On the home page it becomes **video** where that is wanted: the same clip the corner dock plays,
+with the same switch turning it off, and never fetched at all if you have asked for reduced motion,
+are on a metered connection, or have scrolled past without it ever being on screen. The still is
+what the page draws first and what it keeps if any of that says no.
+
 ## 24 September 2026
 
 ### ADAM says when there is something new here
