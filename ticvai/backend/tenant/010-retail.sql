@@ -163,7 +163,8 @@ CREATE TABLE IF NOT EXISTS retail.sale_line (
 CREATE TABLE IF NOT EXISTS retail.shop_and_drop (
     id                                text PRIMARY KEY NOT NULL,
     drop_reference                    text NOT NULL,
-    sale_id                           text NOT NULL,
+    sale_id                           text,
+    order_id                          text,
     entitlement_id                    text,
     subject_id                        uuid,
     collection_point_id               uuid NOT NULL,

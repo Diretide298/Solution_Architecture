@@ -74,6 +74,28 @@ BEGIN
 END
 $$;
 
+-- **A row shared by two scopes** (audit R183): visible, and writable, from either path. A stock
+-- transfer is owned at the source venue's `scope_path` and admits the destination through its
+-- second path, so the receiving venue can read and receive it. Its lines follow through the
+-- parent policy like any other child.
+CREATE OR REPLACE FUNCTION platform.apply_shared_scope_rls(target regclass, second_path text)
+    RETURNS void
+    LANGUAGE plpgsql
+AS $$
+DECLARE
+    policy_name text := platform.rls_policy_name(target);
+    predicate text := format('(platform.in_scope(scope_path) OR platform.in_scope(%I))',
+                             second_path);
+BEGIN
+    EXECUTE format('ALTER TABLE %s ENABLE ROW LEVEL SECURITY', target);
+    EXECUTE format('ALTER TABLE %s FORCE ROW LEVEL SECURITY', target);
+    EXECUTE format('DROP POLICY IF EXISTS scope_isolation ON %s', target);
+    EXECUTE format('DROP POLICY IF EXISTS %I ON %s', policy_name, target);
+    EXECUTE format('CREATE POLICY %I ON %s USING %s WITH CHECK %s',
+                   policy_name, target, predicate, predicate);
+END
+$$;
+
 -- **59 tables carry `venue_id` and no `scope_path`, and a policy set built on `scope_path`
 -- alone leaves every one of them open.** `check-migrations` has said so since it was written --
 -- checking only scope_path missed the tables that carry venue_id instead, and they would have
@@ -150,7 +172,7 @@ BEGIN
 END
 $$;
 
--- **622 tables: 265 scoped by `scope_path`, 59 by `venue_id`, 127 through the parent that owns them, 170 with no policy.**
+-- **630 tables: 267 scoped by `scope_path`, 59 by `venue_id`, 129 through the parent that owns them, 174 with no policy.**
 -- A table with no policy is listed at the end of this file with the reason. It is not
 -- claimed to be reference data: for most of them that is a scoping decision nobody has
 -- made yet, and they stay readable by every connection to this database until it is.
@@ -219,11 +241,11 @@ SELECT platform.apply_scope_rls('catalogue.event_schedule'::regclass);
 SELECT platform.apply_scope_rls('catalogue.event_type'::regclass);
 SELECT platform.apply_scope_rls('catalogue.group_package'::regclass);
 SELECT platform.apply_scope_rls('catalogue.import_job'::regclass);
+SELECT platform.apply_scope_rls('catalogue.performance_template'::regclass);
 SELECT platform.apply_scope_rls('catalogue.prepaid_minutes'::regclass);
 SELECT platform.apply_scope_rls('catalogue.product'::regclass);
 SELECT platform.apply_scope_rls('catalogue.product_category'::regclass);
 SELECT platform.apply_scope_rls('catalogue.product_eligibility_rule'::regclass);
-SELECT platform.apply_scope_rls('catalogue.session_template'::regclass);
 SELECT platform.apply_scope_rls('catalogue.space'::regclass);
 SELECT platform.apply_scope_rls('fnb.corrective_action'::regclass);
 SELECT platform.apply_scope_rls('fnb.course_rule'::regclass);
@@ -258,13 +280,13 @@ SELECT platform.apply_scope_rls('identity.capability_template'::regclass);
 SELECT platform.apply_scope_rls('identity.delegated_access'::regclass);
 SELECT platform.apply_scope_rls('identity.module_access'::regclass);
 SELECT platform.apply_scope_rls('identity.password_policy'::regclass);
+SELECT platform.apply_scope_rls('identity.platform_staff_grant'::regclass);
 SELECT platform.apply_scope_rls('identity.segregation_rule'::regclass);
 SELECT platform.apply_scope_rls('identity.sso_group_mapping'::regclass);
 SELECT platform.apply_scope_rls('identity.sso_provider'::regclass);
 SELECT platform.apply_scope_rls('inventory.purchase_order'::regclass);
 SELECT platform.apply_scope_rls('inventory.quotation'::regclass);
 SELECT platform.apply_scope_rls('inventory.supplier'::regclass);
-SELECT platform.apply_scope_rls('inventory.transfer'::regclass);
 SELECT platform.apply_scope_rls('ledger.fx_provider_assignment'::regclass);
 SELECT platform.apply_scope_rls('ledger.legal_entity'::regclass);
 SELECT platform.apply_scope_rls('ledger.settlement'::regclass);
@@ -420,6 +442,7 @@ SELECT platform.apply_scope_rls('wallet.wallet_type'::regclass);
 SELECT platform.apply_scope_rls('whitelabel.config_version'::regclass);
 SELECT platform.apply_scope_rls('whitelabel.content_page'::regclass);
 SELECT platform.apply_scope_rls('whitelabel.faq_category'::regclass);
+SELECT platform.apply_scope_rls('whitelabel.footer_config'::regclass);
 SELECT platform.apply_scope_rls('whitelabel.policy'::regclass);
 SELECT platform.apply_scope_rls('whitelabel.promo_block'::regclass);
 SELECT platform.apply_scope_rls('workforce.field_ownership'::regclass);
@@ -431,6 +454,9 @@ SELECT platform.apply_scope_rls('workforce.staffing_rules'::regclass);
 SELECT platform.apply_scope_rls('workforce.sync_conflict'::regclass);
 SELECT platform.apply_scope_rls('workforce.sync_run'::regclass);
 SELECT platform.apply_scope_rls('workforce.work_assignment'::regclass);
+
+-- Scoped by either of two paths: owned at scope_path, shared with a second scope (audit R183).
+SELECT platform.apply_shared_scope_rls('inventory.transfer'::regclass, 'to_scope_path');
 
 -- Scoped by venue, resolved through the scope tree.
 SELECT platform.apply_venue_rls('access.parking_facility'::regclass);
@@ -593,6 +619,8 @@ SELECT platform.apply_parent_rls('sync.rejection'::regclass, 'workstation_id', '
 SELECT platform.apply_parent_rls('venuemap.path'::regclass, 'map_id', 'venuemap.map'::regclass, 'id');
 SELECT platform.apply_parent_rls('venuemap.point'::regclass, 'map_id', 'venuemap.map'::regclass, 'id');
 SELECT platform.apply_parent_rls('whitelabel.faq_entry'::regclass, 'faq_category_id', 'whitelabel.faq_category'::regclass, 'id');
+SELECT platform.apply_parent_rls('whitelabel.footer_config_column'::regclass, 'footer_config_id', 'whitelabel.footer_config'::regclass, 'id');
+SELECT platform.apply_parent_rls('whitelabel.footer_config_social_link'::regclass, 'footer_config_id', 'whitelabel.footer_config'::regclass, 'id');
 SELECT platform.apply_parent_rls('workforce.announcement_receipt'::regclass, 'announcement_id', 'workforce.announcement'::regclass, 'id');
 SELECT platform.apply_parent_rls('workforce.shift_swap'::regclass, 'assignment_id', 'workforce.rota_assignment'::regclass, 'id');
 SELECT platform.apply_parent_rls('ai.index_entry'::regclass, 'source_id', 'ai.index_source'::regclass, 'id');
@@ -639,6 +667,7 @@ SELECT platform.apply_parent_rls('fnb.production_run'::regclass, 'recipe_id', 'f
 --   catalogue.membership_programme  -- no scope column and no declared owner
 --   catalogue.plan_benefit  -- no scope column and no declared owner
 --   catalogue.product_version  -- only nullable references (product_id -> catalogue.product)
+--   fnb.allergen_verdict  -- no scope column and no declared owner
 --   fnb.cold_chain_event  -- no scope column and no declared owner
 --   fnb.combo  -- no scope column and no declared owner
 --   fnb.combo_slot  -- no scope column and no declared owner
@@ -686,6 +715,7 @@ SELECT platform.apply_parent_rls('fnb.production_run'::regclass, 'recipe_id', 'f
 --   maintenance.asset_document  -- no scope column and no declared owner
 --   maintenance.asset_status_change  -- no scope column and no declared owner
 --   maintenance.incident_authority_notification  -- no scope column and no declared owner
+--   maintenance.incident_investigation_note  -- no scope column and no declared owner
 --   maintenance.incident_involved_party  -- no scope column and no declared owner
 --   marketing.agent_availability  -- its owner identity.principal has no policy either
 --   marketing.badge  -- no scope column and no declared owner
@@ -746,7 +776,7 @@ SELECT platform.apply_parent_rls('fnb.production_run'::regclass, 'recipe_id', 'f
 --   rental.inspection_item  -- no scope column and no declared owner
 --   rental.participant  -- no scope column and no declared owner
 --   reporting.dashboard_tile  -- several protected owners (dashboard_id -> reporting.dashboard, report_id -> reporting.report_definition); which one owns the row is not decided
---   resources.session_participant  -- its owner pii.subject has no policy either
+--   resources.performance_participant  -- no scope column and no declared owner
 --   retail.exchange  -- its owners retail.return, retail.sale have no policy either
 --   retail."return"  -- its owner retail.sale has no policy either
 --   retail.return_line  -- its owner retail.return has no policy either
@@ -755,6 +785,7 @@ SELECT platform.apply_parent_rls('fnb.production_run'::regclass, 'recipe_id', 'f
 --   seating.seat  -- only nullable references (seat_map_id -> seating.seat_map)
 --   seating.seat_block_item  -- no scope column and no declared owner
 --   seating.seat_hold_item  -- no scope column and no declared owner
+--   seating.seat_price_band  -- no scope column and no declared owner
 --   subscription.capacity_pack  -- no scope column and no declared owner
 --   subscription.contract  -- its owners platform.tenant, subscription.plan have no policy either
 --   subscription.enforcement_policy  -- no scope column and no declared owner
@@ -787,6 +818,7 @@ SELECT platform.apply_parent_rls('fnb.production_run'::regclass, 'recipe_id', 'f
 --   whitelabel.module_enablement  -- its owner whitelabel.tenant_config has no policy either
 --   whitelabel.navigation_item  -- no scope column and no declared owner
 --   whitelabel.tenant_config  -- its owner platform.tenant has no policy either
+--   workforce.attendance_amendment  -- no scope column and no declared owner
 --   workforce.employee  -- no scope column and no declared owner
 --   workforce.employment  -- no scope column and no declared owner
 --   workforce.job_title  -- no scope column and no declared owner

@@ -9,12 +9,12 @@
 | Contracts | 8 |
 | Modules | 2 |
 | Undrawn | 0 |
-| Operations with no screen | 13 |
+| Operations with no screen | 15 |
 | Waves | wave2 17 |
 
 ## Gaps
 
-### 13 operations with no screen here
+### 15 operations with no screen here
 
 **In a contract this platform uses, callable by its audience, and reaching no screen on any platform serving that audience.** Either a screen is missing or the endpoint should not exist — and the second is worth considering first.
 
@@ -23,6 +23,8 @@
 | `getPlanBenefits` | catalogue | GET | Which benefits a plan grants, and how much of each |
 | `listMembershipBenefits` | catalogue | GET | Benefits a plan can grant |
 | `listMembershipProgrammes` | catalogue | GET | Membership schemes, the level above a plan |
+| `checkGuestCheckoutMatch` | marketing-crm | POST | Does this contact already have a profile here |
+| `decideGuestCheckoutMatch` | marketing-crm | POST | Use the existing profile or keep this booking separate |
 | `getForm` | marketing-crm | GET | One form, to fill in or to edit |
 | `getMyProfile` | marketing-crm | GET | A guest reading their own details |
 | `listBadges` | marketing-crm | GET | Badges a guest can be awarded |
@@ -49,7 +51,7 @@
 | `KSK-002` | Language Select | Sell | 2 | 2 | yes |
 | `KSK-003` | What are you buying | Sell | 2 | 1 | yes |
 | `KSK-004` | Choose tickets | Sell | 2 | 2 | yes |
-| `KSK-005` | Choose a session | Sell | 2 | 2 | yes |
+| `KSK-005` | Choose a performance | Sell | 2 | 2 | yes |
 | `KSK-006` | Review | Sell | 2 | 4 | yes |
 | `KSK-007` | Payment | Sell | 2 | 1 | yes |
 | `KSK-008` | Payment unresolved | Sell | 2 | 1 | yes |

@@ -767,9 +767,17 @@ paths:
         - "P09 ADM-011 Licence & Seat Management"
         - "P09 ADM-012 Tenant Isolation & Resource Pool"
         - "P09 ADM-015 API Rate Limit & Quota Management"
+        - "P09 ADM-016 White-Label Branding Management"
+        - "P09 ADM-017 Domain & Certificate Management"
+        - "P09 ADM-018 Localisation & Language Pack"
+        - "P09 ADM-019 Global Configuration & Defaults"
+        - "P09 ADM-031 Security & Compliance Dashboard"
+        - "P09 ADM-037 AI Provider & Credentials"
         - "P09 ADM-369 Commercial Command Center"
         - "P09 ADM-370 Customer Subscription & Commercial Portfolio"
         - "P09 ADM-374 Trial & Conversion Monitor"
+        - "P09 ADM-412 Payment Method & Settlement Setup"
+        - "P09 ADM-421 Venue & Operational Structure Creation"
       x-ticvai-audience:
       - staff
       x-ticvai-read-routing: replica
@@ -898,6 +906,11 @@ paths:
       x-ticvai-audience:
       - staff
       summary: Amend tenant details
+      description: '**A suspended tenant may be amended; a terminated one may not** (decided 28 September,
+        audit R214 (3)). Suspension is reversible and the details may need correcting to lift it;
+        termination is not, and its record stays as it was when it ended.
+
+        '
       tags:
       - tenant
       x-ticvai-permission: PLATFORM_TENANT_MANAGE
@@ -935,6 +948,14 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Tenant'
+        '409':
+          description: The tenant is terminated (`tenant-terminated`, audit R214 (3)).
+          x-ticvai-problem-types:
+          - tenant-terminated
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
   /tenants/{tenantId}/suspend:
     parameters:
     - name: tenantId
@@ -1301,6 +1322,21 @@ paths:
         Silently switching off a module a venue is trading on is not an acceptable consequence of a billing
         change.
 
+        **When a change takes effect, and what is prorated** (decided 28 September, audit R214 (1)). **An
+        upgrade takes effect immediately and is always prorated**: the tenant pays the difference for the
+        rest of the current term. **A downgrade takes effect at the next renewal** (`renewsAt`), is not
+        prorated, and until then is held on `Subscription.scheduledChange`. `effectiveFrom` is therefore
+        set by the server, today for an upgrade and `renewsAt` for a downgrade; a request that sends any
+        other date is refused with 422 `effective-date-not-allowed`.
+
+        **A tenant''s first plan starts `active`**, not in `trial`, with `startsAt` today and `renewsAt`
+        one term (`billingPeriod`) after it (decided 28 September, audit R214 (2)). A trial is a separate,
+        explicit choice.
+
+        **A cancelled subscription is reactivated here, on the same record, only within its paid period**
+        (decided 28 September, audit STATE-SUBSCRIPTION). After the period ends it is `expired` and this
+        call refuses with 409 `subscription-expired`; the tenant needs a new subscription.
+
         '
       tags:
       - subscription
@@ -1328,13 +1364,25 @@ paths:
                 $ref: '#/components/schemas/Subscription'
         '409':
           description: 'Downgrade conflicts with current usage. The response names every module and limit
-            that would be violated.
+            that would be violated. Or the subscription is `expired` and cannot be reactivated
+            (`subscription-expired`, audit STATE-SUBSCRIPTION); start a new one.
 
             '
           content:
             application/problem+json:
               schema:
                 $ref: '#/components/schemas/DowngradeConflictProblem'
+        '422':
+          description: '`effectiveFrom` was sent and is not the date the change must take effect: today for an
+            upgrade, the next renewal for a downgrade (`effective-date-not-allowed`, audit R214 (1)).
+
+            '
+          x-ticvai-problem-types:
+          - effective-date-not-allowed
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
   /tenants/{tenantId}/subscription/preview:
     parameters:
     - name: tenantId
@@ -7508,6 +7556,17 @@ components:
           type: integer
         venueCount:
           type: integer
+        regionId:
+          type: string
+          format: uuid
+          nullable: true
+          readOnly: true
+          description: 'The tenant''s home region: the `tenancy` region node whose `RegionSettings` govern
+            tenant-wide gates, today `allowedAiResidencies` (decided 28 September, audit R203). Written by
+            the server when the tenant''s first region is created; null until then. ADM-037 reads it to
+            show the region''s residency restriction, and `ai.setAiProvider` checks against the same region.
+
+            '
         billingEmail:
           type: string
         billingAddress:
@@ -7693,9 +7752,14 @@ components:
         effectiveFrom:
           type: string
           format: date
+          description: Optional, and set by the server if omitted. Today for an upgrade, `renewsAt` for a
+            downgrade; any other date is refused (audit R214 (1)).
         prorate:
           type: boolean
           default: true
+          description: An upgrade is always prorated and a downgrade, which starts at renewal, never is
+            (audit R214 (1)). Kept so a preview can show the unprorated figure; `setSubscription` applies
+            the rule whatever is sent.
         note:
           type: string
           maxLength: 500
@@ -7738,6 +7802,22 @@ components:
           type: string
           format: date
           nullable: true
+        scheduledChange:
+          type: object
+          nullable: true
+          readOnly: true
+          description: A downgrade waiting for the next renewal (decided 28 September, audit R214 (1)).
+            Null when none is scheduled.
+          properties:
+            planId:
+              type: string
+              format: uuid
+            planVersion:
+              type: string
+            effectiveFrom:
+              type: string
+              format: date
+              description: Always the `renewsAt` it was scheduled against.
         currentPrice:
           $ref: ../shared/common.yaml#/components/schemas/Money
         billingPeriod:
@@ -8807,6 +8887,12 @@ components:
           format: uuid
         invoiceNumber:
           type: string
+          readOnly: true
+          description: 'A tax invoice number, so **gapless, per legal entity** (decided 28 September, audit
+            R152): one unbroken sequence for the TICVAI legal entity that issues it, assigned when the
+            invoice is issued, never reused. A cancelled invoice keeps its number.
+
+            '
         tenantId:
           type: string
           format: uuid

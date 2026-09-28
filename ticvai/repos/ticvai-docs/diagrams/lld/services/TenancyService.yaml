@@ -1,5 +1,5 @@
 id: LLD-TenancyService
-title: TenancyService — 163 operations, 82 tables
+title: TenancyService — 166 operations, 83 tables
 generatedBy: tools/derive-diagrams.py
 tier: foundation
 index: diagrams/hld/02-services.yaml
@@ -20,9 +20,9 @@ why: '**`platform.org_unit` is reached by 304 of 379 tables** — the tenancy sp
 scale: Read-heavy and highly cacheable. Config changes are rare.
 ifDown: Same as identity — nothing runs without a scope.
 coverage:
-  operations: 163
-  inAFlow: 53
-  percent: 33%
+  operations: 166
+  inAFlow: 52
+  percent: 31%
   note: '**Flow coverage is how much of this service a journey has walked.** A service under 40% is
     unwalked rather than under-documented.'
 schemas:
@@ -30,9 +30,9 @@ schemas:
   tables: 26
   stores:
   - postgres
-  largestTable: platform.wallet_authorisation
+  largestTable: platform.venue_settings
 - schema: workforce
-  tables: 21
+  tables: 22
   stores:
   - postgres
   largestTable: workforce.rota_assignment
@@ -53,7 +53,7 @@ schemas:
   largestTable: tenancy.device_telemetry
 operationsByContract:
 - contract: tenancy
-  count: 46
+  count: 48
   operations:
   - operation: configureWorkstation
     verb: PUT
@@ -174,6 +174,14 @@ operationsByContract:
     permission: TENANT_VIEW
     offline: true
     reads: 2
+    writes: 0
+  - operation: getVenueSettingsDefaults
+    verb: GET
+    path: /venue-settings-defaults
+    scope: tenant
+    permission: TENANT_VIEW
+    offline: false
+    reads: 1
     writes: 0
   - operation: getWorkstation
     verb: GET
@@ -383,6 +391,14 @@ operationsByContract:
     offline: false
     reads: 3
     writes: 3
+  - operation: setVenueSettingsDefaults
+    verb: PUT
+    path: /venue-settings-defaults
+    scope: tenant
+    permission: TENANT_CONFIGURE
+    offline: false
+    reads: 1
+    writes: 1
   - operation: startDeviceFirmwareRollout
     verb: POST
     path: /device-firmware/rollouts
@@ -424,7 +440,7 @@ operationsByContract:
     reads: 2
     writes: 2
 - contract: approvals
-  count: 45
+  count: 46
   operations:
   - operation: approveMatrixMultiLevel
     verb: PUT
@@ -778,6 +794,14 @@ operationsByContract:
     offline: false
     reads: 0
     writes: 0
+  - operation: submitApprovalRequest
+    verb: POST
+    path: /approval-requests/{requestId}/submit
+    scope: venue
+    permission: APPROVAL_REQUEST
+    offline: false
+    reads: 2
+    writes: 0
   - operation: withdrawApprovalRequest
     verb: POST
     path: /approval-requests/{requestId}/withdraw
@@ -803,7 +827,7 @@ operationsByContract:
     scope: venue
     permission: WORKFORCE_MANAGE
     offline: false
-    reads: 2
+    reads: 3
     writes: 2
   - operation: broadcastToGuests
     verb: POST
@@ -883,7 +907,7 @@ operationsByContract:
     scope: venue
     permission: WORKFORCE_VIEW
     offline: false
-    reads: 2
+    reads: 3
     writes: 0
   - operation: listEmployees
     verb: GET
@@ -1019,7 +1043,7 @@ operationsByContract:
     scope: venue
     permission: ATTENDANCE_RECORD
     offline: true
-    reads: 4
+    reads: 5
     writes: 2
   - operation: requestLeave
     verb: POST
@@ -1681,7 +1705,7 @@ tables:
   - tenancy
   foreignWriters: null
 - table: platform.audit_record
-  columns: 7
+  columns: 8
   store: postgres
   parent: null
   writtenBy:
@@ -1817,7 +1841,7 @@ tables:
   - tenancy
   foreignWriters: null
 - table: platform.region_settings
-  columns: 11
+  columns: 12
   store: postgres
   parent: null
   writtenBy:
@@ -1864,7 +1888,7 @@ tables:
   writtenBy: []
   foreignWriters: null
 - table: platform.venue_settings
-  columns: 10
+  columns: 28
   store: postgres
   parent: null
   writtenBy:
@@ -1950,6 +1974,12 @@ tables:
   parent: null
   writtenBy:
   - workforce
+  foreignWriters: null
+- table: workforce.attendance_amendment
+  columns: 7
+  store: postgres
+  parent: null
+  writtenBy: []
   foreignWriters: null
 - table: workforce.employee
   columns: 14
@@ -2174,7 +2204,6 @@ screens:
 - P08:BO-124 Layout & Journey Builder
 - P08:BO-125 Product & Category Button Configuration
 - P08:BO-126 Deployment, Preview & Audit
-- P08:BO-127 Hardware & Peripherals Management
 - P08:BO-128 Live Workstation Health Monitor
 - P08:BO-129 Software, Configuration & Version Management
 - P08:BO-130 Offline Policy & Rules Configuration
@@ -2315,7 +2344,9 @@ screens:
 - P08:BO-940 Manager Mobile Approval Center
 - P08:BO-941 Operational Notifications & Live Alerts
 - P09:ADM-006 Tenant Hierarchy Explorer
+- P09:ADM-019 Global Configuration & Defaults
 - P09:ADM-036 Platform Notification Broadcast
+- P09:ADM-037 AI Provider & Credentials
 - P09:ADM-145 Promotion Approval Inbox
 - P09:ADM-238 Rules & Workflow Command Center
 - P09:ADM-239 Visual Business Rule Builder

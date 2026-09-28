@@ -158,9 +158,9 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; login · getCurrentShift · getCurrentSession · listMfaMethods +3</div>
-          <div><b>STATES</b> &middot; <span class="warn">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess · offline</span></div>
-          <div><b>ARRIVES WITH</b> &middot; shiftId&larr;session</div>
+          <div><b>OPERATIONS</b> &middot; login · getCurrentShift · getCurrentSession · listMfaMethods +5</div>
+          <div><b>STATES</b> &middot; <span class="warn">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess · mfaRequired · offline</span></div>
+          <div><b>ARRIVES WITH</b> &middot; shiftId&larr;session, challengeId&larr;navigation</div>
           <div><b>GOES TO</b> &middot; entry point · <a href="#scn-002">SCN-002</a>  &mdash; <i>Confirms access point and direction</i><br><a href="#scn-003">SCN-003</a>  &mdash; <i>Ready to scan</i></div>
           
           <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formLogin &middot; <i>Login</i> &middot; <b>Login</b> &middot; Cancel <span class="dis">discards username · credential · workstationId · method · deviceFingerprint</span></div><div class="ov"><b>modal</b> formSelectRole &middot; <i>Select role</i> &middot; <b>Select role</b> &middot; Cancel <span class="dis">discards roleId</span></div><div class="ov"><b>modal</b> formResolvePermissions &middot; <i>Resolve permissions</i> &middot; <b>Resolve permissions</b> &middot; Cancel <span class="dis">discards principalId · roleId · atScopePath</span></div></div>
@@ -193,7 +193,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           <div><b>ARRIVES WITH</b> &middot; accessPointId&larr;deepLink</div>
           <div><b>GOES TO</b> &middot; <a href="#scn-001">SCN-001</a>  &mdash; <i>Sign in</i><br><a href="#scn-003">SCN-003</a>  &mdash; <i>Ready to scan</i><br><a href="#scn-013">SCN-013</a> <br><a href="#scn-015">SCN-015</a>  &mdash; <i>Loads the offline package</i><br><a href="#scn-016">SCN-016</a>  &mdash; <i>Gate mode</i> <span class="car">accessPointId</span></div>
           
-          <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formSetTurnstileMode &middot; <i>Save turnstile mode</i> &middot; <b>Save turnstile mode</b> &middot; Cancel <span class="dis">discards mode · reason</span></div></div>
+          <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formSetTurnstileMode &middot; <i>Save gate mode</i> &middot; <b>Save gate mode</b> &middot; Cancel <span class="dis">discards operatingMode · mode · reason</span></div></div>
         </div>
       </div>
       <div id="scn-003" class="scr">
@@ -463,7 +463,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           <div><b>ARRIVES WITH</b> &middot; accessPointId&larr;deepLink</div>
           <div><b>GOES TO</b> &middot; <a href="#scn-001">SCN-001</a>  &mdash; <i>Sign in</i><br><a href="#scn-002">SCN-002</a>  &mdash; <i>Access point &amp; direction</i> <span class="car">accessPointId</span><br><a href="#scn-003">SCN-003</a>  &mdash; <i>Ready to scan</i></div>
           
-          <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formSetTurnstileMode &middot; <i>Save turnstile mode</i> &middot; <b>Save turnstile mode</b> &middot; Cancel <span class="dis">discards mode · reason</span></div></div>
+          <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formSetTurnstileMode &middot; <i>Save gate mode</i> &middot; <b>Save gate mode</b> &middot; Cancel <span class="dis">discards operatingMode · mode · reason</span></div></div>
         </div>
       </div></div>
   <div class="bottom">

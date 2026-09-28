@@ -2,7 +2,7 @@ openapi: 3.1.0
 info:
   title: TICVAI Tenancy & Organisation
   version: 1.0.0
-  x-ticvai-screen-count: 30
+  x-ticvai-screen-count: 32
   x-ticvai-tier: spine
   x-ticvai-module: "Cross-cutting — organisation hierarchy"
   x-ticvai-capabilities: [C95, C20]
@@ -237,6 +237,12 @@ paths:
             **The thing acted on.** A profile, a shift, an order — one filter rather than a
             different endpoint per subject, which is what four board frames were asking for.
           schema: { type: string }
+        - name: platformStaffGrantId
+          in: query
+          description: >
+            Exact match on `AuditRecord.platformStaffGrantId`: what a platform operator did under
+            one grant (audit R098).
+          schema: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
         - name: from
           in: query
           schema: { type: string, format: date-time }
@@ -286,9 +292,14 @@ paths:
 
         **Refused where it breaches a `SegregationRule`.** The refusal names the rule and the two
         permissions in conflict — a venue told only *not allowed* will grant it another way.
+
+        **No escalated permission** (decided 28 September, audit R197): a role's permission set has
+        no value to set a threshold on, and an escalation that repeated `ROLE_MANAGE` gated nothing.
+        The control is `ROLE_MANAGE` itself, which requires MFA (audit R135). **Removing a
+        permission ends the live sessions of every principal holding the role at once** (audit
+        R126); an addition takes effect at their next sign-in.
       tags: [identity]
       x-ticvai-permission: ROLE_MANAGE
-      x-ticvai-permission-escalated: ROLE_MANAGE
       x-ticvai-audience: [staff]
       x-ticvai-scope-level: tenant
       x-ticvai-offline-capable: false
@@ -640,8 +651,11 @@ paths:
         **`scopePath` names the node**, the same key `setOfflinePolicy` upserts on. Where nothing
         has been saved there the answer is still `200`: the schema defaults, with no `id`. A
         policy that has never been set is the default policy, not a missing resource.
+
+        **Gated by `TENANT_VIEW`, not `TENANT_CONFIGURE`** (decided 28 September, audit R091):
+        seeing a policy is not the right to change it.
       tags: [tenancy]
-      x-ticvai-permission: TENANT_CONFIGURE
+      x-ticvai-permission: TENANT_VIEW
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
@@ -728,9 +742,9 @@ paths:
         26 September, pull audit R280. **BO-131 loads the saved thresholds and nothing returned
         them.** `scopePath` names the node, the same key `setConnectivityThresholds` upserts on.
         Where nothing has been saved there the answer is `200` with the schema defaults and no
-        `id`.
+        `id`. **Gated by `TENANT_VIEW`** (decided 28 September, audit R091).
       tags: [tenancy]
-      x-ticvai-permission: TENANT_CONFIGURE
+      x-ticvai-permission: TENANT_VIEW
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
@@ -830,10 +844,15 @@ paths:
       description: >
         **What this returns, and what it does not.** `VenueSettings` holds the venue's trading
         currency, support hours, quiet hours, biometrics, segregated access and alerting — the
-        things `setVenueSettings` writes. It carries **no module enablement and no F&B or retail
-        setting**, so a section landing that wants *what is enabled here*, or a store or kitchen
-        settings screen, does not get it from this read (pull audit R279). It is gated by
-        `TENANT_CONFIGURE`; a caller holding only a section's view permission is refused `403`.
+        things `setVenueSettings` writes. It carries **no module enablement and no retail setting**,
+        so a section landing that wants *what is enabled here*, or a store settings screen, does not
+        get it from this read (pull audit R279). **Since 28 September it does carry the configured
+        limits** (audit R094), the F&B ones among them (`fnb.recallWindowMinutes`,
+        `fnb.compEscalationAmount`, `fnb.foodSafetyLeadPrincipalId`). A limit the venue has not set
+        is null and resolves to the tenant default, which `getVenueSettingsDefaults` returns. It is gated by
+        `TENANT_VIEW` (decided 28 September, audit R091): reading a venue's settings no longer
+        needs the right to change them. A caller holding only a section's view permission is
+        refused `403`.
 
         **A venue with nothing saved still has settings** (pull audit R175). Where
         `platform.venue_settings` has no row for this venue the answer is `200` with the schema
@@ -841,7 +860,7 @@ paths:
         *resolve from the region*. `404` means the venue does not exist or is outside the
         caller's scope.
       tags: [tenancy]
-      x-ticvai-permission: TENANT_CONFIGURE
+      x-ticvai-permission: TENANT_VIEW
       x-ticvai-audience: [staff]
       x-ticvai-scope-level: venue
       x-ticvai-read-routing: replica
@@ -882,6 +901,10 @@ paths:
         `segregatedAccess.entitlementGated` and `biometrics.acknowledgedByPrincipalId` are
         `readOnly` and ignored on input.
 
+        **The configured limits** (audit R094) are set here as venue overrides. A null limit
+        inherits the tenant default (`setVenueSettingsDefaults`); a value outside the field's
+        `minimum` and `maximum` is refused `400` with `errors[]` naming the field.
+
         **Refused with `422`** (pull audit R078) where the body asks for something the venue
         cannot evidence: `biometrics.isEnabled` true without both `dpiaReference` and
         `consentNoticeAcknowledgedAt`, or `segregatedAccess.genderVerification: deviceAssisted`
@@ -920,6 +943,72 @@ paths:
           content:
             application/problem+json:
               schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+
+  /venue-settings-defaults:
+    get:
+      operationId: getVenueSettingsDefaults
+      x-ticvai-consumed-by:
+        - "P08 BO-1062 Tenant & Brand Context"
+        - "P09 ADM-019 Global Configuration & Defaults"
+      x-ticvai-audience: [staff]
+      x-ticvai-read-routing: replica
+      summary: The tenant's default for every venue setting
+      description: >
+        **The tenant-level default each venue inherits** (decided 28 September, audit R094). The
+        same shape as `VenueSettings`; a venue whose own field is null uses the value here. Where
+        the tenant has saved nothing the answer is `200` with the schema defaults, which are the
+        proposed values, client to correct. Only the configured limits are read from this row; the
+        venue facts on the schema (support hours, biometrics, segregated access) are ignored here.
+      tags: [tenancy]
+      x-ticvai-permission: TENANT_VIEW
+      x-ticvai-scope-level: tenant
+      x-ticvai-config-scope: tenant
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      responses:
+        '200':
+          description: The tenant defaults, or the proposed defaults where none are saved
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/VenueSettings' }
+        '403': { $ref: '../shared/common.yaml#/components/responses/Forbidden' }
+    put:
+      operationId: setVenueSettingsDefaults
+      x-ticvai-consumed-by:
+        - "P08 BO-1062 Tenant & Brand Context"
+        - "P09 ADM-019 Global Configuration & Defaults"
+      x-ticvai-audience: [staff]
+      summary: Set the tenant's default for every venue setting
+      description: >
+        **Sets the tenant-level defaults** (decided 28 September, audit R094), stored as the
+        tenant's own row of `platform.venue_settings` (no `venueId`). **PUT semantics**: the body
+        replaces the row whole, and an omitted limit returns to its proposed default. Each value
+        must sit within the field's `minimum` and `maximum`, or the request is refused `400` with
+        `errors[]` naming the field. A venue's own values are untouched; a venue that has none
+        follows the new default at once.
+      tags: [tenancy]
+      x-ticvai-permission: TENANT_CONFIGURE
+      x-ticvai-scope-level: tenant
+      x-ticvai-config-scope: tenant
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/VenueSettings' }
+      responses:
+        '200':
+          description: Set
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/VenueSettings' }
+          headers:
+            X-Consistency-Token: { $ref: '../shared/common.yaml#/components/headers/ConsistencyToken' }
+        '400': { $ref: '../shared/common.yaml#/components/responses/BadRequest' }
+        '403': { $ref: '../shared/common.yaml#/components/responses/Forbidden' }
 
   /org-units/{orgUnitId}:
     parameters:
@@ -1001,6 +1090,7 @@ paths:
       operationId: getRegionSettings
       x-ticvai-consumed-by:
         - "P08 BO-1064 Naming, Numbering & Localization"
+        - "P09 ADM-037 AI Provider & Credentials"
       x-ticvai-audience: [staff]
       x-ticvai-read-routing: replica
       summary: Read region settings
@@ -1488,7 +1578,6 @@ paths:
         - "P06 EMP-043 Device settings"
         - "P08 BO-036 Device Registry"
         - "P08 BO-124 Layout & Journey Builder"
-        - "P08 BO-127 Hardware & Peripherals Management"
         - "P09 ADM-580 Payment Terminal & Device Inventory\t49"
         - "P16 ANL-003 Operational Performance"
       x-ticvai-audience: [staff]
@@ -1533,7 +1622,6 @@ paths:
       x-ticvai-consumed-by:
         - "P06 EMP-043 Device settings"
         - "P08 BO-036 Device Registry"
-        - "P08 BO-127 Hardware & Peripherals Management"
       x-ticvai-audience: [staff]
       summary: Register a device
       description: >
@@ -1616,7 +1704,6 @@ paths:
         - "P08 BO-036 Device Registry"
         - "P08 BO-124 Layout & Journey Builder"
         - "P08 BO-125 Product & Category Button Configuration"
-        - "P08 BO-127 Hardware & Peripherals Management"
       x-ticvai-audience: [device]
       summary: Device heartbeat and status
       description: >
@@ -2244,6 +2331,15 @@ components:
           type: string
           format: date-time
           description: When. The list is ordered by this, most recent first.
+        platformStaffGrantId:
+          type: string
+          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+          nullable: true
+          description: >
+            **Set when a TICVAI platform operator acted, naming the grant they acted under**
+            (`identity.openPlatformStaffGrant`; decided 28 September, audit R098). Null for the
+            tenant's own staff. Every platform action in a tenant carries one, so the tenant can
+            see all of them.
 
     OpeningHoursWindow:
       type: object
@@ -2770,6 +2866,9 @@ components:
 
         **One per scope node, keyed on `scopePath`** (pull audit R162). `id` is server-owned and
         absent where `getOfflinePolicy` returns the defaults for a node with nothing saved.
+
+        **The `minimum` and `maximum` on each field are proposed, client to correct (decided 28
+        September, audit R129).** A value outside them is refused `400`, `errors[]` naming the field.
       required: [scopePath]
       properties:
         id: { type: string, format: uuid, readOnly: true }
@@ -2782,10 +2881,12 @@ components:
         maxOfflineHours:
           type: integer
           default: 24
+          minimum: 1
+          maximum: 72
           description: >
             **After which the workstation refuses to sell rather than keep journalling.** A till
             three days offline holding 900 unsynced sales is a reconciliation nobody can do and a
-            fraud nobody can detect.
+            fraud nobody can detect. Bounds 1 to 72 hours: proposed, client to correct (audit R129).
         allowedOffline:
           type: array
           description: >
@@ -2796,13 +2897,20 @@ components:
             enum: [sale, refund, exchange, entitlementIssue, entitlementValidate, loyaltyAccrual,
                    loyaltyRedemption, walletSpend, priceOverride, discount, voidLine, noSale]
         offlineValueCeiling:
-          $ref: '../shared/common.yaml#/components/schemas/Money'
+          allOf:
+            - $ref: '../shared/common.yaml#/components/schemas/Money'
+          description: >
+            Above zero, and in the currency of the venue the policy resolves to; a ceiling in another
+            currency is refused `400` (decided 28 September, audit R129).
         offlineTransactionCeiling:
           type: integer
           nullable: true
+          minimum: 1
+          maximum: 5000
           description: >
             **A ceiling on count as well as value.** Nine hundred small sales and one large one are
-            different risks, and a value ceiling alone catches only the second.
+            different risks, and a value ceiling alone catches only the second. Bounds 1 to 5,000:
+            proposed, client to correct (audit R129).
         onCeilingBreach: { type: string, enum: [warn, blockNewSales, blockAll], default: blockNewSales }
         requiresManagerToExtend: { type: boolean, default: true }
 
@@ -2820,6 +2928,10 @@ components:
 
         **One per scope node, keyed on `scopePath`.** `id` is server-owned and absent where
         `getConnectivityPolicy` returns the defaults for a node with nothing saved.
+
+        **The `minimum` and `maximum` on each field are proposed, client to correct (decided 28
+        September, audit R129).** A value outside them, or a broken cross-field rule, is refused
+        `400` with `errors[]` naming the field.
       required: [scopePath]
       properties:
         id: { type: string, format: uuid, readOnly: true }
@@ -2832,20 +2944,32 @@ components:
         failuresBeforeOffline:
           type: integer
           default: 3
+          minimum: 1
+          maximum: 10
           description: >
             **Consecutive, not cumulative.** One dropped request on a busy till is normal; three in a
             row is a network.
-        probeIntervalSeconds: { type: integer, default: 15 }
-        probeTimeoutMs: { type: integer, default: 2000 }
+        probeIntervalSeconds: { type: integer, default: 15, minimum: 5, maximum: 300 }
+        probeTimeoutMs:
+          type: integer
+          default: 2000
+          minimum: 500
+          maximum: 30000
+          description: Shorter than `probeIntervalSeconds`, or the body is refused `400` (audit R129).
         successesBeforeOnline:
           type: integer
           default: 5
+          minimum: 1
+          maximum: 20
           description: >
             **Higher than the offline threshold, deliberately.** Coming back is where the cost is —
             a workstation that returns online and immediately fails has resynced for nothing.
+            **Never below `failuresBeforeOffline`**, or the body is refused `400` (audit R129).
         minimumStableSeconds:
           type: integer
           default: 30
+          minimum: 10
+          maximum: 600
           description: >
             How long the connection must hold before the workstation trusts it. **This is what stops
             the flapping**, and it is the field a venue with poor wifi will actually tune.
@@ -3188,6 +3312,15 @@ components:
         Region owns currency, tax regime and fiscal year (ADR-0011). Venue owns the things that
         vary between two venues in one region — **opening hours, support hours, and what the local
         law requires of the gate.**
+
+        **And the configured limits** (decided 28 September, audit R094): every limit the contracts
+        call *configured* is a field here, from `displayCurrencies` and `cartLeaseSeconds` down to
+        the grouped `catalogue`, `inventory`, `seating`, `promotions`, `fnb`, `queue`, `reporting`,
+        `marketing` and `identity` settings. **Each has a tenant-level default**: the tenant sets it
+        once with `setVenueSettingsDefaults`, a venue overrides it within the field's bounds, and a
+        null field here inherits it. Each field's `default` is the proposed tenant default, marked
+        proposed, client to correct (audit R094); `docs/active/configured-limits-proposal.md` is the
+        sheet the client corrects, and where the two differ this contract is what runs.
       properties:
         id:
           type: string
@@ -3411,6 +3544,252 @@ components:
             acknowledgementRequired: { type: boolean, default: true }
             escalateAfterMinutes: { type: integer, nullable: true }
 
+        # ---- Configured limits (decided 28 September, audit R094). Each is a venue setting with a
+        # tenant-level default: null here inherits the tenant default (`getVenueSettingsDefaults`),
+        # and each `default` below is the proposed tenant default, client to correct. The client
+        # sheet is docs/active/configured-limits-proposal.md; where the two differ this contract runs.
+        displayCurrencies:
+          type: array
+          nullable: true
+          description: >
+            **Which currencies this venue shows guests** (decided 28 September, audit R120 (a)).
+            ISO 4217 codes, each one its region holds an `FxRate` for; the rate itself stays per
+            region and is never set here. `finance.listFxRates` with `venueId` narrows the region's
+            rates to these. Null or empty shows the trading currency only. A code the region has no
+            rate for is refused `400`.
+          items: { type: string, pattern: '^[A-Z]{3}$' }
+        cartLeaseSeconds:
+          type: integer
+          nullable: true
+          minimum: 30
+          maximum: 3600
+          default: 900
+          description: >
+            **How long a cart holds capacity** (decided 28 September, audit R169): 15 minutes,
+            the default `catalogue.acquireInventoryHold` takes for `ttlSeconds`. Proposed, client to correct (audit R094).
+        cartHoldExtensionMinutes:
+          type: integer
+          nullable: true
+          minimum: 1
+          maximum: 30
+          default: 5
+          description: How long one `orders.extendCart` extension adds. Proposed, client to correct (audit R094).
+        cartMaxExtensions:
+          type: integer
+          nullable: true
+          minimum: 0
+          maximum: 5
+          default: 1
+          description: How many extensions a cart may take before `extensionCapReached` (`Cart.maxExtensions`). Proposed, client to correct (audit R094).
+        resaleCutoffHours:
+          type: integer
+          nullable: true
+          minimum: 0
+          maximum: 168
+          default: 24
+          description: Hours before the performance after which a ticket can no longer be listed for resale (`orders.createResaleListing`). Proposed, client to correct (audit R094).
+        exchangeCutoffHours:
+          type: integer
+          nullable: true
+          minimum: 0
+          maximum: 720
+          default: 24
+          description: Hours before the original performance after which lines can no longer be exchanged (`orders.exchangeOrderLines`, `outsideExchangeWindow`). Proposed, client to correct (audit R094).
+        rescheduleCutoffHours:
+          type: integer
+          nullable: true
+          minimum: 0
+          maximum: 720
+          default: 24
+          description: Hours before the original performance after which an order can no longer be rescheduled (`orders.rescheduleOrder`, `outsideRescheduleWindow`). Proposed, client to correct (audit R094).
+        reservationMaxExtensions:
+          type: integer
+          nullable: true
+          minimum: 0
+          maximum: 5
+          default: 1
+          description: How many times `orders.extendReservation` may extend one reservation. Proposed, client to correct (audit R094).
+        shiftVarianceThreshold:
+          allOf:
+            - $ref: '../shared/common.yaml#/components/schemas/Money'
+          nullable: true
+          description: >
+            Over or short at shift close beyond which the shift waits in `pendingVariance` for
+            `shift.acceptShiftVariance`. **Proposed tenant default AED 20.00, bounds 0 to 1,000 in
+            the venue currency; client finance to correct (audit R094).**
+        catalogue:
+          type: object
+          nullable: true
+          properties:
+            maxVariantsPerProduct:
+              type: integer
+              nullable: true
+              minimum: 1
+              maximum: 2000
+              default: 200
+              description: Variants one product may generate from its attributes (`setProductAttributes` refuses above it). Proposed, client to correct (audit R094).
+            waitlistOfferHoldMinutes:
+              type: integer
+              nullable: true
+              minimum: 1
+              maximum: 1440
+              default: 30
+              description: How long a waitlist offer holds the released capacity for the guest it was offered to. Proposed, client to correct (audit R094).
+            bulkPriceChangeEscalationPercent:
+              type: number
+              nullable: true
+              minimum: 0
+              maximum: 100
+              default: 10
+              description: A `bulkChangePrices` run changing any price by more than this percentage needs `PRICE_CONFIGURE` (audit R197). Proposed, client to correct (audit R094).
+            bulkPriceChangeEscalationCount:
+              type: integer
+              nullable: true
+              minimum: 1
+              default: 50
+              description: A `bulkChangePrices` run touching more prices than this needs `PRICE_CONFIGURE` (audit R197). Proposed, client to correct (audit R094).
+        inventory:
+          type: object
+          nullable: true
+          properties:
+            overReceiptTolerancePercent:
+              type: number
+              nullable: true
+              minimum: 0
+              maximum: 25
+              default: 5
+              description: Percent above the outstanding ordered quantity a goods receipt line may record (`createGoodsReceipt`). Proposed, client to correct (audit R094).
+            countVarianceTolerancePercent:
+              type: number
+              nullable: true
+              minimum: 0
+              maximum: 25
+              default: 2
+              description: Percent difference between counted and expected quantity before a count line is an exception (`getCountVariance`). Proposed, client to correct (audit R094).
+            countVarianceApprovalAmount:
+              allOf:
+                - $ref: '../shared/common.yaml#/components/schemas/Money'
+              nullable: true
+              description: >
+                Total variance value of a count above which posting it needs approval
+                (`postStockCount`). **Proposed tenant default 1,000.00 in the venue currency, client
+                finance to correct (audit R094).**
+        seating:
+          type: object
+          nullable: true
+          properties:
+            seatHoldExtensionSeconds:
+              type: integer
+              nullable: true
+              minimum: 60
+              maximum: 1800
+              default: 300
+              description: What one `extendSeatHold` adds. No hold outlives 30 minutes in all (audit R169). Proposed, client to correct (audit R094).
+            seatHoldMaxExtensions:
+              type: integer
+              nullable: true
+              minimum: 0
+              maximum: 5
+              default: 2
+              description: How many times a seat hold may be extended. Proposed, client to correct (audit R094).
+        promotions:
+          type: object
+          nullable: true
+          properties:
+            maxDiscountPercent:
+              type: number
+              nullable: true
+              minimum: 0
+              maximum: 100
+              default: 30
+              description: The largest discount one promotion may give (`createPromotion` refuses above it). Proposed, client to correct (audit R094).
+            nearZeroLinePrice:
+              allOf:
+                - $ref: '../shared/common.yaml#/components/schemas/Money'
+              nullable: true
+              description: >
+                Net line price below which a stacked combination is flagged near-zero in
+                `analysePromotionConflicts` (audit R096 (5)); a warning, not a refusal. **Proposed
+                tenant default AED 1.00, client to correct (audit R094).**
+        fnb:
+          type: object
+          nullable: true
+          properties:
+            recallWindowMinutes:
+              type: integer
+              nullable: true
+              minimum: 0
+              maximum: 60
+              default: 10
+              description: Minutes after a bump during which `recallKitchenTicket` still recalls; after it the act is a refire. Proposed, client to correct (audit R094).
+            compEscalationAmount:
+              allOf:
+                - $ref: '../shared/common.yaml#/components/schemas/Money'
+              nullable: true
+              description: >
+                Line value above which `compItem` needs `ORDER_DISCOUNT` (audit R197). **Proposed
+                tenant default AED 100.00, client to correct (audit R094).**
+            foodSafetyLeadPrincipalId:
+              type: string
+              format: uuid
+              nullable: true
+              description: >
+                **The venue's food-safety lead**, to whom `escalateCorrectiveAction` sends every
+                escalation (decided 28 September, audit R096 (9)). A venue fact, so it has no tenant
+                default; while it is null an escalation is refused `409 no-food-safety-lead`.
+        queue:
+          type: object
+          nullable: true
+          properties:
+            crossQueueLimit:
+              type: integer
+              nullable: true
+              minimum: 1
+              maximum: 10
+              default: 2
+              description: Virtual queues one guest party may wait in at once (`joinQueue`, `crossQueueLimitReached`). Proposed, client to correct (audit R094).
+        reporting:
+          type: object
+          nullable: true
+          properties:
+            inlineRunRowLimit:
+              type: integer
+              nullable: true
+              minimum: 1000
+              maximum: 100000
+              default: 5000
+              description: Estimated rows above which `runReport` answers `202` and runs in the background. Proposed, client to correct (audit R094).
+            dashboardRefreshBudgetPerMinute:
+              type: integer
+              nullable: true
+              minimum: 1
+              default: 24
+              description: Tile refreshes per minute, summed over a dashboard's tiles, that `createDashboard` allows. Proposed, client to correct (audit R094).
+        marketing:
+          type: object
+          nullable: true
+          properties:
+            attributionWindowDays:
+              type: integer
+              nullable: true
+              minimum: 1
+              maximum: 30
+              default: 7
+              description: Days after a campaign touch within which a booking is attributed to it (`getCampaignPerformance`). Proposed, client to correct (audit R094).
+        identity:
+          type: object
+          nullable: true
+          properties:
+            guestOtpMaxAttempts:
+              type: integer
+              nullable: true
+              minimum: 3
+              maximum: 10
+              default: 5
+              description: >
+                Wrong entries allowed per guest one-time code before `verifyGuestOtp` invalidates it.
+                A guest code is tenant-scoped, so the tenant default is the value used. Proposed, client to correct (audit R094).
+
     RegionSettings:
       x-ticvai-persistence: "platform.region_settings"
       type: object
@@ -3441,6 +3820,16 @@ components:
           minimum: 1
           maximum: 12
           description: Varies by country.
+        allowedAiResidencies:
+          type: array
+          description: >
+            **The region's compliance gate on AI providers** (decided 28 September, audit R203;
+            ADR-0009). The `AiProvider.residency` values a tenant in this region may use; empty
+            means no restriction. `ai.setAiProvider` refuses any other residency with
+            `409 residency-refused`. A prompt carrying guest data that reaches a provider hosted
+            elsewhere is a cross-border transfer, and this is where a region says which it allows.
+          default: []
+          items: { type: string }
         placement:
           $ref: '#/components/schemas/Placement'
         cellName:
@@ -3628,6 +4017,13 @@ components:
 
             **Derived from its devices, its heartbeat age, its firmware currency and its error
             rate.** Read-only, because a workstation that could set its own score would.
+
+            **The formula, proposed, client to correct (audit R096 (2)):** score = 40% device online
+            share (the share of its devices reporting online) + 25% heartbeat freshness (100 at one
+            minute old or less, 0 at 15 minutes or more, linear between) + 20% firmware and profile
+            currency (100 on the latest, 50 one version behind, 0 older) + 15% error rate (100 at 0
+            errors an hour, 0 at 10 or more, linear between), rounded to a whole number. **Below 80
+            is a warning and below 60 a failure.**
         configurationProfileId:
           type: string
           format: uuid

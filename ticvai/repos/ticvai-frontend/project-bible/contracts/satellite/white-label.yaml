@@ -247,11 +247,14 @@ paths:
         a tenant''s guests are using takes their storefront down, and the confirmation should say so rather
         than the request succeeding.
 
+        **A live app is an app with a published configuration (decided 28 September, audit R096)**: the
+        tenant has a current `ConfigVersion` (`TenantAppStatus.isPublished` true) for the app the domain
+        serves. Maintenance mode does not make an app less live.
+
         '
       tags:
       - white-label
       x-ticvai-permission: TENANT_CONFIGURE
-      x-ticvai-permission-escalated: TENANT_CONFIGURE
       x-ticvai-audience:
       - staff
       x-ticvai-scope-level: tenant
@@ -284,6 +287,10 @@ paths:
 
         **Legal links are held separately from the free-form columns**, so a tenant reorganising their
         footer cannot remove the privacy notice by accident.
+
+        **Set per tenant in the tenant''s own configuration, not in the control plane (decided 28
+        September, audit R163).** The footer is part of the working draft and reaches guests through
+        `publishTenantConfig`, like the header and the theme.
 
         '
       tags:
@@ -368,6 +375,9 @@ paths:
 
         Approval is separate from authoring where the tenant requires it — **the approver may not be the
         author**, following the rule already enforced on products.
+
+        **`expireAt` must follow `publishAt`** when both are sent (decided 28 September, audit R163), or
+        400. A scheduled job makes the publish and the expiry at those times (audit R163).
 
         '
       tags:
@@ -474,6 +484,7 @@ paths:
         - "P01 WEB-028 Contact & Venue Information"
         - "P01 WEB-029 Error / Sold Out / Maintenance"
         - "P02 GST-001 Home – Default"
+        - "P02 GST-029 Venue Info & Services"
         - "P02 GST-038 Digital Companion Mode"
         - "P02 GST-047 Maintenance / Upgrade Page"
         - "P05 KSK-002 Language Select"
@@ -488,10 +499,20 @@ paths:
         it is unauthenticated and cacheable.
 
         **Two views of one schema.** Called without a staff session, the response carries only `tenantId`,
-        `isPublished`, `publishedVersion`, `publishedAt`, `isInMaintenance`, `maintenanceMessage` and
-        `expectedBackAt`. The draft and CMS fields (`draftVersion`, `hasUnpublishedChanges`, the module
+        `isPublished`, `publishedVersion`, `publishedAt`, `isInMaintenance`, `maintenanceMessage`,
+        `expectedBackAt`, `minimumAppVersion`, `contact`, `availability`, `availabilityMessage` and `venues`. The draft and CMS fields (`draftVersion`, `hasUnpublishedChanges`, the module
         and page counts, `recentChanges`) are returned only to a staff session holding `TENANT_CONFIGURE`
         — a public, cacheable response must not carry who changed what.
+
+        **It also carries what the guest screens promise (decided 28 September, audit R073)**: the
+        minimum supported app version, so GST-047 can force an upgrade (`minimumAppVersion`); and the
+        venue''s contact details with a sold-out or closed signal, for WEB-028 and WEB-029 (`contact`,
+        `availability`). All of them are set with `setMaintenanceMode`.
+
+        **And the tenant''s venues, for the guest''s venue picker (decided 28 September, audit R267)**: the
+        guest picks a venue on first open of WEB-001 or GST-001, the choice is remembered on the device
+        and changeable, and on a visit day the app suggests the venue on the guest''s ticket. `venues` lists
+        the tenant''s active venues so that picker has a source without a session.
 
         '
       tags:
@@ -517,9 +538,14 @@ paths:
         - "P13 CMS-001 Tenant Workspace"
       x-ticvai-audience:
       - staff
-      summary: Enable or clear maintenance mode
+      summary: Enable or clear maintenance mode, and set the live app status
       description: 'Renders the branded maintenance screen with an expected-back time. Tenant-branded,
         because an unbranded error page in a tenant''s app looks like the tenant''s failure.
+
+        **Also sets the rest of the live app status (decided 28 September, audit R073)**: the minimum
+        supported app version, the contact details and the sold-out or closed signal. Each is optional
+        in the body and a field not sent is left as it is, so clearing maintenance does not clear the
+        contact details.
 
         **Live at once, not through `publishTenantConfig`.** Written to the maintenance fields of the
         tenant''s `tenant_config` row (`TenantConfig.isInMaintenance`, `maintenanceMessage`, `expectedBackAt`),
@@ -551,6 +577,14 @@ paths:
                 expectedBackAt:
                   type: string
                   format: date-time
+                minimumAppVersion:
+                  $ref: '#/components/schemas/MinimumAppVersion'
+                contact:
+                  $ref: '#/components/schemas/VenueContact'
+                availability:
+                  $ref: '#/components/schemas/AppAvailability'
+                availabilityMessage:
+                  $ref: '#/components/schemas/LocalisedText'
       responses:
         '200':
           headers:
@@ -599,7 +633,11 @@ paths:
       summary: Set logo, favicon and splash
       description: 'Logo and favicon are runtime — they change with a publish. **Splash images are build-time
         on native apps** and are marked as such in the response, because changing them requires a rebuild
-        and a store submission.
+        and a store submission. **On the guest web app a splash change is immediate (decided 28 September,
+        audit R163)**: it reaches web guests with the publish, with no build.
+
+        **Each asset is PNG or SVG, up to 2 MB (decided 28 September, audit R270).** Anything else is
+        refused with 400 before it is stored against the brand.
 
         '
       tags:
@@ -627,7 +665,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/BrandIdentity'
         '400':
-          description: Asset exceeds size limits, or is not PNG or SVG
+          description: An asset is larger than 2 MB, or is not PNG or SVG (audit R270)
           content:
             application/problem+json:
               schema:
@@ -671,6 +709,12 @@ paths:
         The sizes generated for each platform are listed in `derived`.
 
         Source is a single 1024×1024 PNG without transparency; derived sizes are generated.
+
+        **Generated: the iOS and Android store sets, plus web favicons (decided 28 September, audit
+        R163).** iOS: 1024 (App Store), 180, 167, 152, 120, 87, 80, 76, 60, 58, 40, 29 and 20 px. Android:
+        512 (Play Store), 432 adaptive foreground, 192, 144, 96, 72 and 48 px. Web: 16, 32 and 48 px
+        favicons, the 180 px Apple touch icon, and 192 and 512 px manifest icons. The web icons are
+        runtime and reach guests with the publish; the store sets need a release.
 
         '
       tags:
@@ -816,7 +860,8 @@ paths:
       description: 'Runtime (reaches guests on publish, not on a store release) and written to the working
         draft. Contrast is checked against WCAG 2.2 AA and a failing pair is refused — accessibility
         is a stated target for the guest app, and a tenant picking two similar colours should be told
-        at configuration time rather than at audit.
+        at configuration time rather than at audit. **Refused, not warned (confirmed 28 September,
+        audit R139)**: flow F22 is corrected to match.
 
         '
       tags:
@@ -884,6 +929,10 @@ paths:
         Arabic text rendering in a system fallback that will not match, so an Arabic face is required
         whenever Arabic is an enabled language.
 
+        **"Arabic enabled" means `ar` is in the tenant''s languages (`setLanguages`) (decided 28 September,
+        audit R163).** Then `primaryArabic` is required, and **`secondaryArabic` is required whenever
+        `secondaryLatin` is set**; either missing is a 400.
+
         '
       tags:
       - theme
@@ -910,7 +959,8 @@ paths:
               schema:
                 $ref: '#/components/schemas/FontConfig'
         '400':
-          description: Arabic is enabled but no Arabic face is set
+          description: '`ar` is among the tenant''s languages and `primaryArabic` is not set, or `secondaryLatin`
+            is set without `secondaryArabic` (audit R163)'
           content:
             application/problem+json:
               schema:
@@ -1043,6 +1093,9 @@ paths:
       summary: Set homepage section order
       description: 'The drag-and-drop builder. Sections are an ordered list; the order here is the order
         on the guest''s home screen.
+
+        **A section whose module is disabled is refused (400)**, by the mapping on `HomepageSectionKind`,
+        which is proposed, client to correct (audit R163).
 
         '
       tags:
@@ -1202,7 +1255,8 @@ paths:
                   type: string
                   format: date-time
                   nullable: true
-                  description: Null runs the banner with no end.
+                  description: Null runs the banner with no end. When set, must follow `startsAt` (audit
+                    R163), or 400.
                 sortOrder:
                   type: integer
                 isActive:
@@ -1258,6 +1312,10 @@ paths:
         a block and never change or withdraw it. `Banner` is the same shape one path up and has always
         had both.
 
+        **Once a block is `active` or `expired` it may only be withdrawn (decided 28 September, audit
+        R163)**, with `deletePromoBlock`; an amendment is refused with 409 `published-block-locked`. A
+        block in `draft` or `scheduled` may change freely. **`endsAt` must follow `startsAt`**, or 400.
+
         '
       tags:
       - content
@@ -1305,8 +1363,24 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/PromoBlock'
+        '400':
+          description: '`endsAt` is not after `startsAt` (audit R163)'
+          x-ticvai-problem-types:
+          - validation
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
+        '409':
+          description: The block is `active` or `expired`, and may only be withdrawn (audit R163).
+          x-ticvai-problem-types:
+          - published-block-locked
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
     delete:
       operationId: deletePromoBlock
       x-ticvai-consumed-by:
@@ -1362,7 +1436,7 @@ paths:
       - staff
       summary: Create a promotional block
       description: 'Presentation only. A block may point at a promotion, but it does not create or price
-        one — that lives in the promotions module.
+        one — that lives in the promotions module. **`endsAt` must follow `startsAt`** (audit R163), or 400.
 
         '
       tags:
@@ -1389,6 +1463,14 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/PromoBlock'
+        '400':
+          description: '`endsAt` is not after `startsAt` (audit R163)'
+          x-ticvai-problem-types:
+          - validation
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
   /tenant-config/pages:
     get:
       operationId: listContentPages
@@ -1516,6 +1598,10 @@ paths:
       description: 'Replaces the page''s editable fields. `status` is taken only to archive the page
         (`states/content.yaml`: withdrawn or abandoned); publishing is `publishTenantConfig`.
 
+        **A published page may only be archived (decided 28 September, audit R163).** On a `published`
+        page the only change taken is `status: archived`; anything else is refused with 409
+        `published-page-locked`. To change what guests read, archive it and author a new page.
+
         '
       tags:
       - content
@@ -1541,6 +1627,15 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ContentPage'
+        '409':
+          description: The page is `published` and the body changes more than its status to `archived`
+            (audit R163).
+          x-ticvai-problem-types:
+          - published-page-locked
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
     delete:
       operationId: deleteContentPage
       x-ticvai-audience:
@@ -1665,12 +1760,29 @@ paths:
       - staff
       x-ticvai-read-routing: replica
       summary: List legal policies
+      description: '**The current version of each policy only, with history on request (decided 28
+        September, audit R163).** Without `includeHistory` the list holds one entry per `PolicyKind`,
+        its current version; with it, every version, newest first within each kind.
+
+        '
       tags:
       - content
       x-ticvai-permission: TENANT_CONFIGURE
       x-ticvai-scope-level: tenant
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
+      parameters:
+      - name: includeHistory
+        in: query
+        description: Every version rather than the current one per kind (audit R163).
+        schema:
+          type: boolean
+          default: false
+      - name: kind
+        in: query
+        description: Only this policy kind. With `includeHistory`, how a screen reads one policy's history.
+        schema:
+          $ref: '#/components/schemas/PolicyKind'
       responses:
         '200':
           description: Policies
@@ -1699,6 +1811,10 @@ paths:
       description: '**Policies are versioned and never overwritten.** A guest who consented to version
         3 consented to version 3, and a privacy notice that changes silently under a recorded consent
         is a compliance failure. Publishing creates a new version; prior versions remain readable.
+
+        **English and Arabic are both required before a policy can be published (decided 28 September,
+        audit R096)**: `body` must carry non-empty `en` and `ar` entries, or 400. Other enabled languages
+        are optional.
 
         '
       tags:
@@ -1741,7 +1857,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/Policy'
         '400':
-          description: A required language version is missing
+          description: The English (`en`) or Arabic (`ar`) version is missing (audit R096)
           content:
             application/problem+json:
               schema:
@@ -1751,6 +1867,7 @@ paths:
       operationId: getModuleEnablement
       x-ticvai-consumed-by:
         - "P13 CMS-001 Tenant Workspace"
+        - "P13 CMS-007 Page Builder"
       x-ticvai-audience:
       - staff
       x-ticvai-read-routing: replica
@@ -2105,7 +2222,12 @@ paths:
                 scheduledFor:
                   type: string
                   format: date-time
-                  description: Publish at a future time. Useful for a campaign launch.
+                  description: >-
+                    Publish at a future time. Useful for a campaign launch. **A scheduled job
+                    activates it (decided 28 September, audit R163)**: the version is validated and
+                    snapshotted now, recorded with `isCurrent` false, and the job makes it current at
+                    `scheduledFor`. It is validated again then; a failure leaves the current version
+                    live and is reported on the version.
       responses:
         '201':
           headers:
@@ -2129,7 +2251,6 @@ paths:
         - "P09 ADM-016 White-Label Branding Management"
         - "P13 CMS-006 Component Preview"
         - "P13 CMS-015 Version History"
-        - "P13 CMS-020 Change Log"
       x-ticvai-audience:
       - staff
       x-ticvai-read-routing: replica
@@ -2174,7 +2295,8 @@ paths:
       - staff
       summary: Restore a previous version
       description: 'Copies the chosen version''s `snapshot` into the working draft. **It does not publish** — restore
-        then review then publish, so a rollback is as deliberate as the change that caused it.
+        then review then publish, so a rollback is as deliberate as the change that caused it. **Not a
+        one-click rollback (confirmed 28 September, audit R139)**: flow F22 is corrected to match.
 
         '
       tags:
@@ -2343,7 +2465,7 @@ components:
           nullable: true
     FooterConfig:
       type: object
-      x-ticvai-persistence: control.footer_config + control.footer_config_column + control.footer_config_social_link
+      x-ticvai-persistence: whitelabel.footer_config + whitelabel.footer_config_column + whitelabel.footer_config_social_link
       description: 'BL-002. **`setHeader` and `HeaderConfig` exist and the footer does not**, which looked
         like symmetry until you notice it is not: **a header is chrome and a footer is a link surface.**
 
@@ -2351,9 +2473,11 @@ components:
         — and **those are the ones a regulator checks.** Treating it as a mirror of the header would have
         given it a logo and no way to reach a privacy notice.
 
-        **Where it is stored.** `legalLinks` and `copyrightText` are columns of `control.footer_config`;
-        each entry of `columns` is a `control.footer_config_column` row and each entry of `socialLinks`
-        a `control.footer_config_social_link` row. Part of the working draft (see the header).
+        **Where it is stored.** `legalLinks` and `copyrightText` are columns of `whitelabel.footer_config`;
+        each entry of `columns` is a `whitelabel.footer_config_column` row and each entry of `socialLinks`
+        a `whitelabel.footer_config_social_link` row. Part of the working draft (see the header). **In
+        the tenant''s own database, not the control plane (decided 28 September, audit R163)**: it moved
+        from `control.footer_config` and its two child tables.
 
         '
       required:
@@ -2636,6 +2760,17 @@ components:
           type: string
           format: date-time
           nullable: true
+        minimumAppVersion:
+          $ref: '#/components/schemas/MinimumAppVersion'
+        contact:
+          $ref: '#/components/schemas/VenueContact'
+        availability:
+          $ref: '#/components/schemas/AppAvailability'
+        availabilityMessage:
+          allOf:
+          - $ref: '#/components/schemas/LocalisedText'
+          nullable: true
+          description: What the sold-out or closed screen says (WEB-029). Null shows the default wording.
         recentChanges:
           type: array
           description: Staff only. Names the principal behind each change, so it never reaches a public
@@ -2653,11 +2788,73 @@ components:
               at:
                 type: string
                 format: date-time
+    MinimumAppVersion:
+      x-ticvai-persistence: none — embedded in tenant_config
+      type: object
+      nullable: true
+      description: '**The oldest guest app build still allowed to run (decided 28 September, audit R073).**
+        A guest app whose own version is below the one for its platform shows the forced-upgrade screen
+        (GST-047) and nothing else. Null, or a platform left null, forces nothing. Live at once through
+        `setMaintenanceMode`, because an upgrade that must wait for a publish is not forced.
+
+        '
+      properties:
+        ios:
+          type: string
+          nullable: true
+          pattern: ^\d+\.\d+\.\d+$
+        android:
+          type: string
+          nullable: true
+          pattern: ^\d+\.\d+\.\d+$
+    VenueContact:
+      x-ticvai-persistence: none — embedded in tenant_config
+      type: object
+      nullable: true
+      description: 'How a guest reaches the venue: WEB-028 Contact & Venue Information, and the screen
+        shown on an error or when the app cannot help (decided 28 September, audit R073). Public, because
+        nothing here is personal.
+
+        '
+      properties:
+        phone:
+          type: string
+          nullable: true
+        email:
+          type: string
+          format: email
+          nullable: true
+        whatsapp:
+          type: string
+          nullable: true
+        address:
+          allOf:
+          - $ref: '#/components/schemas/LocalisedText'
+          nullable: true
+        openingHours:
+          allOf:
+          - $ref: '#/components/schemas/LocalisedText'
+          nullable: true
+          description: Prose, as the guest reads it. The bookable hours are the catalogue's.
+    AppAvailability:
+      type: string
+      description: '**The sold-out or closed signal (decided 28 September, audit R073).** `open` is the
+        normal state. `soldOut` shows WEB-029''s sold-out state across the app while browsing still
+        works; `closed` shows the closed state (a weather closure, a private event). Neither refuses a
+        request on its own: it is what the guest is told, and a sale is still refused by availability
+        where it applies. Set with `setMaintenanceMode`.
+
+        '
+      enum:
+      - open
+      - soldOut
+      - closed
+      default: open
     BrandIdentity:
       x-ticvai-persistence: none — embedded in tenant_config
       type: object
       description: 'Every `*AssetRef` here is a `MediaAsset` id from the `assets` library (`createUpload`
-        then `completeUpload`), PNG or SVG.
+        then `completeUpload`), PNG or SVG and at most 2 MB (decided 28 September, audit R270).
 
         '
       required:
@@ -2679,7 +2876,8 @@ components:
           description: The browser tab icon for the guest web app.
         splashImageAssetRefs:
           type: array
-          description: Splash images for the native apps, shown in order. Build-time (`splashChangeScope`).
+          description: Splash images, shown in order. Build-time on the native apps (`splashChangeScope`);
+            immediate on web, reaching guests with the publish (audit R163).
           items:
             type: string
             format: uuid
@@ -2698,7 +2896,8 @@ components:
           allOf:
           - $ref: '#/components/schemas/ChangeScope'
           readOnly: true
-          description: Always `buildTime` for native apps.
+          description: Always `buildTime` for native apps. The guest web app takes a splash change at
+            the publish, with no build (audit R163).
     AppIcons:
       x-ticvai-persistence: none — embedded in tenant_config
       type: object
@@ -2714,7 +2913,8 @@ components:
           type: array
           readOnly: true
           x-ticvai-derived: onWrite
-          description: Generated by `setAppIcons` from the source, one entry per platform and size.
+          description: Generated by `setAppIcons` from the source, one entry per platform and size — the
+            iOS and Android store sets and the web favicons listed on `setAppIcons` (audit R163).
           items:
             type: object
             properties:
@@ -2914,8 +3114,8 @@ components:
         primaryArabic:
           type: string
           nullable: true
-          description: 'Required when Arabic is enabled. A Latin face alone leaves Arabic in a system
-            fallback that will not match.
+          description: 'Required when `ar` is among the tenant''s languages (audit R163). A Latin face alone
+            leaves Arabic in a system fallback that will not match.
 
             '
         secondaryLatin:
@@ -2924,6 +3124,8 @@ components:
         secondaryArabic:
           type: string
           nullable: true
+          description: Required whenever `secondaryLatin` is set and `ar` is among the tenant's languages
+            (decided 28 September, audit R163).
         customFontAssetRefs:
           type: array
           description: Uploaded font files, as `MediaAsset` ids.
@@ -3045,6 +3247,14 @@ components:
                 type: integer
     HomepageSectionKind:
       type: string
+      description: '**Which module each section needs, proposed, client to correct (decided 28 September,
+        audit R163).** `tickets` needs `ticketsAndBooking`; `whatsOn` needs `events`; `attractions`
+        needs `attractions`; `membership` needs `membership`; `dining` needs `diningAndFnb`; `shop`
+        needs `shop`; `map` needs `map`. `heroBanner`, `quickActions`, `promotions`, `customContent` and
+        `spacer` need no module. `setHomepageLayout` refuses a visible section whose module is not
+        enabled, and `setModuleEnablement` refuses to disable a module a section still needs.
+
+        '
       enum:
       - heroBanner
       - quickActions
@@ -3144,6 +3354,8 @@ components:
           type: string
           format: date-time
           nullable: true
+          description: Must follow `startsAt` when set (decided 28 September, audit R163). Null runs the
+            banner with no end.
         state:
           allOf:
           - $ref: '#/components/schemas/ScheduleState'
@@ -3193,13 +3405,14 @@ components:
           type: string
           format: date-time
           nullable: true
+          description: Must follow `startsAt` when both are set (decided 28 September, audit R163).
         state:
           allOf:
           - $ref: '#/components/schemas/ScheduleState'
           readOnly: true
           x-ticvai-derived: sweeper
           description: Moved by the schedule timer at `startsAt` and `endsAt`, in the tenant's timezone,
-            as for `Banner.state`.
+            as for `Banner.state`. Once `active` or `expired` the block may only be withdrawn (audit R163).
         sortOrder:
           type: integer
         scopePath:
@@ -3880,7 +4093,7 @@ components:
         updatedAt:
           type: string
           format: date-time
-        # The three below are live state, not draft: `setMaintenanceMode` writes them directly, a
+        # The fields below are live state, not draft: `setMaintenanceMode` writes them directly, a
         # publish does not snapshot them and a restore does not overwrite them.
         isInMaintenance:
           type: boolean
@@ -3895,6 +4108,50 @@ components:
           type: string
           format: date-time
           nullable: true
+        minimumAppVersion:
+          allOf:
+          - $ref: '#/components/schemas/MinimumAppVersion'
+          description: Live state, written by `setMaintenanceMode` (audit R073).
+        contact:
+          allOf:
+          - $ref: '#/components/schemas/VenueContact'
+          description: Live state, written by `setMaintenanceMode` (audit R073).
+        availability:
+          allOf:
+          - $ref: '#/components/schemas/AppAvailability'
+          description: Live state, written by `setMaintenanceMode` (audit R073).
+        availabilityMessage:
+          allOf:
+          - $ref: '#/components/schemas/LocalisedText'
+          nullable: true
+          description: Live state, written by `setMaintenanceMode` (audit R073).
+        venues:
+          type: array
+          x-ticvai-derived: onRead
+          description: 'The tenant''s active venues, for the guest venue picker on WEB-001 and GST-001 (decided
+            28 September, audit R267). Public: returned without a session and cached with the rest of the
+            response. Read from `tenancy` venues; a closed or archived venue is left out.
+
+            '
+          items:
+            type: object
+            required:
+            - venueId
+            - name
+            properties:
+              venueId:
+                type: string
+                format: uuid
+              name:
+                $ref: '#/components/schemas/LocalisedText'
+              city:
+                type: string
+                nullable: true
+              openingHours:
+                allOf:
+                - $ref: '#/components/schemas/LocalisedText'
+                nullable: true
+                description: Today's hours as shown to a guest, e.g. "10:00 to 22:00".
   responses:
     NotConfigured:
       description: 'This part of the working draft has never been saved. **Not the same as a missing

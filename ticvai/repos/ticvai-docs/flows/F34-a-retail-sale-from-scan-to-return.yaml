@@ -136,9 +136,10 @@ branches:
   resolvedBy: setOfflinePolicy
 - at: 6
   condition: The guest has no receipt.
-  behaviour: '`lookupRetailSale` by card token, by member, or by item and date. **A no-receipt return
-    is a policy question rather than a lookup failure** — `getReturnPolicy` says whether the venue allows
-    it and at what value.
+  behaviour: '**Looked up by order number instead, and by nothing else in the first release** (decided
+    28 September, audit R139 (c)): `lookupRetailSale` takes a receipt or an order number, not a card,
+    a membership or an item and a date. A guest with neither is a no-receipt return, which is a policy
+    question rather than a lookup — `getReturnPolicy` says whether the venue allows it and at what value.
 
     '
   severity: medium

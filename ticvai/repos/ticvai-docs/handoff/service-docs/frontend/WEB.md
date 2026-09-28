@@ -24,18 +24,18 @@
 
 | ID | Screen | Module | Wave | Operations |
 |---|---|---|---|---|
-| [WEB-001](#web-001-home-landing) | Home / Landing | Discovery & Browse | 1 | 3 |
+| [WEB-001](#web-001-home-landing) | Home / Landing | Discovery & Browse | 1 | 4 |
 | [WEB-002](#web-002-event-attraction-listing) | Event & Attraction Listing | Discovery & Browse | 1 | 4 |
 | [WEB-003](#web-003-search-results) | Search Results | Discovery & Browse | 1 | 2 |
 | [WEB-004](#web-004-attraction-details) | Attraction Details | Discovery & Browse | 1 | 5 |
 | [WEB-005](#web-005-ticket-type-selection) | Ticket Type Selection | Booking & Selection | 1 | 2 |
-| [WEB-006](#web-006-date-session-selection) | Date & Session Selection | Booking & Selection | 1 | 4 |
-| [WEB-010](#web-010-shopping-cart) | Shopping Cart | Cart & Checkout | 1 | 10 |
+| [WEB-006](#web-006-date-performance-selection) | Date & Performance Selection | Booking & Selection | 1 | 4 |
+| [WEB-010](#web-010-shopping-cart) | Shopping Cart | Cart & Checkout | 1 | 11 |
 | [WEB-011](#web-011-guest-details-attendee-forms) | Guest Details & Attendee Forms | Cart & Checkout | 1 | 11 |
-| [WEB-012](#web-012-checkout-payment) | Checkout — Payment | Cart & Checkout | 1 | 7 |
+| [WEB-012](#web-012-checkout-payment) | Checkout — Payment | Cart & Checkout | 1 | 5 |
 | [WEB-013](#web-013-booking-confirmation) | Booking Confirmation | Cart & Checkout | 1 | 3 |
 | [WEB-014](#web-014-pay-for-a-booking) | Pay for a Booking | Cart & Checkout | 1 | 2 |
-| [WEB-016](#web-016-login-register) | Login / Register | Account & Self-Service | 1 | 20 |
+| [WEB-016](#web-016-login-register) | Login / Register | Account & Self-Service | 1 | 11 |
 | [WEB-017](#web-017-my-account-dashboard) | My Account Dashboard | Account & Self-Service | 1 | 9 |
 | [WEB-018](#web-018-my-tickets) | My Tickets | Account & Self-Service | 1 | 8 |
 | [WEB-019](#web-019-order-history) | Order History | Account & Self-Service | 1 | 5 |
@@ -54,18 +54,17 @@
 | [WEB-027](#web-027-newsletter-subscription) | Newsletter Subscription | Engagement & Support | 2 | 9 |
 | [WEB-031](#web-031-my-reservations) | My Reservations | Ticketing | 2 | 9 |
 | [WEB-032](#web-032-offers-promotions) | Offers & Promotions | Promotions | 2 | 2 |
-| [WEB-033](#web-033-shop) | Shop | Retail | 2 | 4 |
-| [WEB-036](#web-036-f-b-browse-order) | F&B – Browse & Order | In-venue Services | 2 | 12 |
+| [WEB-033](#web-033-shop) | Shop | Retail | 2 | 5 |
+| [WEB-036](#web-036-f-b-browse-order) | F&B – Browse & Order | In-venue Services | 2 | 13 |
 | [WEB-037](#web-037-menu-item-detail) | Menu Item Detail | In-venue Services | 2 | 2 |
 | [WEB-038](#web-038-f-b-order-tracking) | F&B – Order Tracking | In-venue Services | 2 | 3 |
 | [WEB-039](#web-039-venue-map-wait-times) | Venue Map & Wait Times | In-venue Services | 2 | 4 |
 | [WEB-040](#web-040-virtual-queue) | Virtual Queue | In-venue Services | 2 | 6 |
-| [WEB-041](#web-041-parking-reserve-pay) | Parking – Reserve & Pay | In-venue Services | 2 | 3 |
-| [WEB-042](#web-042-retail-shop-and-drop) | Retail & Shop and Drop | Retail | 2 | 4 |
+| [WEB-041](#web-041-parking-reserve-pay) | Parking – Reserve & Pay | In-venue Services | 2 | 5 |
+| [WEB-042](#web-042-retail-shop-and-drop) | Retail & Shop and Drop | Retail | 2 | 6 |
 | [WEB-043](#web-043-loyalty-rewards) | Loyalty & Rewards | Membership, Loyalty & Value | 2 | 5 |
 | [WEB-044](#web-044-ai-concierge-home) | AI Concierge – Home | Engagement & Support | 2 | 7 |
 | [WEB-045](#web-045-help-centre-accessibility) | Help Centre & Accessibility | Support | 2 | 2 |
-| [WEB-046](#web-046-in-venue-notifications) | In-Venue Notifications | Engagement & Support | 2 | 1 |
 | [WEB-009](#web-009-wishlist) | Wishlist | Booking & Selection | 3 | 3 |
 | [WEB-024](#web-024-devices-wishlist-consent) | Devices, Wishlist & Consent | Membership, Loyalty & Value | 3 | 15 |
 | [WEB-026](#web-026-survey-feedback) | Survey & Feedback | Engagement & Support | 3 | 1 |
@@ -91,6 +90,7 @@
 | `getTenantAppStatus` | [WhiteLabelService](../backend/WhiteLabelService.md#gettenantappstatus) | onLoad | Maintenance check before rendering anything | `None` |
 | `getTenantConfig` | [WhiteLabelService](../backend/WhiteLabelService.md#gettenantconfig) | onLoad | Full working configuration | `TENANT_CONFIGURE` |
 | `listProducts` | [CatalogueService](../backend/CatalogueService.md#listproducts) | onLoad | List products | `PRODUCT_VIEW` |
+| `listMyEntitlements` | [AccessService](../backend/AccessService.md#listmyentitlements) | onLoad | The guest's upcoming tickets, so a visit day can suggest the ticket's venue (decided 28 September, audit R267); only when signed in | `ORDER_VIEW` |
 
 **States**
 
@@ -115,17 +115,17 @@
 | WEB-038 | F&B – Order Tracking |  |  |
 | WEB-039 | Venue Map & Wait Times |  |  |
 | WEB-040 | Virtual Queue |  |  |
-| WEB-041 | Parking – Reserve & Pay |  |  |
+| WEB-041 | Parking – Reserve & Pay | entitlementId |  |
 | WEB-042 | Retail & Shop and Drop |  |  |
 | WEB-043 | Loyalty & Rewards |  |  |
 | WEB-044 | AI Concierge – Home |  |  |
 | WEB-045 | Help Centre & Accessibility |  |  |
-| WEB-046 | In-Venue Notifications |  |  |
+| WEB-046 | In-Venue Notifications |  | a later release: the in-venue notification feed is deferred and not shown in the first release; queue calls and order updates show on the queue and order screens, which poll (decided 28 September, audit R242) |
 | WEB-008 | Add-ons & Upsell |  |  |
 | WEB-009 | Wishlist |  |  |
 | WEB-015 | Branded Queue / Waiting Room |  |  |
 | WEB-017 | My Account Dashboard |  |  |
-| WEB-018 | My Tickets |  |  |
+| WEB-018 | My Tickets | entitlementId, orderId |  |
 | WEB-019 | Order History |  |  |
 | WEB-021 | Wallet & Gift Cards |  |  |
 | WEB-022 | Membership Plans | productId |  |
@@ -319,7 +319,7 @@
 | WEB-008 | Add-ons & Upsell |  |  |
 | WEB-010 | Shopping Cart | lineId |  |
 
-## WEB-006 Date & Session Selection
+## WEB-006 Date & Performance Selection
 
 **Pick a date and time that has capacity.**
 
@@ -392,6 +392,7 @@
 
 | Operation | Service | When | Purpose | Permission |
 |---|---|---|---|---|
+| `applyCartPromoCode` | [OrderService](../backend/OrderService.md#applycartpromocode) | onAction | Apply a promo code to the cart; refused 422 promoCodeInvalid or promoCodeNotApplicable, shown as different messages (decided 28 September, audit R073 (e)) | `None` |
 | `getCart` | [OrderService](../backend/OrderService.md#getcart) | onLoad | The cart, priced and checked, right now | `None` |
 | `addCartLine` | [OrderService](../backend/OrderService.md#addcartline) | onAction | Add something | `None` |
 | `updateCartLine` | [OrderService](../backend/OrderService.md#updatecartline) | onAction | Change a quantity | `None` |
@@ -504,8 +505,6 @@
 
 | Operation | Service | When | Purpose | Permission |
 |---|---|---|---|---|
-| `checkGuestCheckoutMatch` | [MarketingService](../backend/MarketingService.md#checkguestcheckoutmatch) | onAction | Does this contact already have a profile here | `None` |
-| `decideGuestCheckoutMatch` | [MarketingService](../backend/MarketingService.md#decideguestcheckoutmatch) | onAction | Use the existing profile or keep separate | `None` |
 | `transferOrderTickets` | [OrderService](../backend/OrderService.md#transferordertickets) | onAction | Transfer tickets to another guest | `None` |
 | `createOrder` | [OrderService](../backend/OrderService.md#createorder) | onAction | Create an order | `ORDER_CREATE` |
 | `createPayment` | [OrderService](../backend/OrderService.md#createpayment) | onAction | Take a payment against an order | `ORDER_CREATE` |
@@ -621,7 +620,7 @@
 
 ## WEB-016 Login / Register
 
-**Get a guest into the app, fast, on a device that may be shared.**
+**Get a guest into the site, fast, on a device that may be shared: a one-time code to the email or mobile, a password, Apple or Google, or UAE Pass, or register a new account. **No enterprise SSO and no second factor at sign-in for guests** (decided 28 September, audit R167).**
 
 |  |  |
 |---|---|
@@ -630,51 +629,39 @@
 | Licensed module | ticketing |
 | Route | `/account-and-self-service/login-register` |
 | Component | `apps/guest-web/src/routes/account-and-self-service/LoginRegisterList.tsx` |
-| Pattern | listDetail |
+| Pattern | form |
 
 **Entry parameters**
 
 | Parameter | From |
 |---|---|
 | cartId | session |
-| challengeId | deepLink |
-| methodId | deepLink |
-| providerId | deepLink |
 
 **Operations**
 
 | Operation | Service | When | Purpose | Permission |
 |---|---|---|---|---|
-| `registerGuest` | [IdentityService](../backend/IdentityService.md#registerguest) | onAction | from page inventory | `None` |
-| `completeSsoAuthorization` | [IdentityService](../backend/IdentityService.md#completessoauthorization) | onAction | Exchange an SSO code for a session | `None` |
-| `enrolMfaMethod` | [IdentityService](../backend/IdentityService.md#enrolmfamethod) | onAction | Enrol an MFA method | `None` |
+| `registerGuest` | [IdentityService](../backend/IdentityService.md#registerguest) | onAction | Create a guest account | `None` |
 | `getGuestSession` | [IdentityService](../backend/IdentityService.md#getguestsession) | onLoad | Read the current guest session | `None` |
 | `guestLogout` | [IdentityService](../backend/IdentityService.md#guestlogout) | onAction | End a guest session | `None` |
+| `guestPasswordLogin` | [IdentityService](../backend/IdentityService.md#guestpasswordlogin) | onAction | Sign in with the email or mobile and the password set at registration (identifier, password, deviceId -> GuestSession); one indistinguishable 401, lockout, 429 (decided 28 September, audit R073 (a)) | `None` |
 | `guestSocialLogin` | [IdentityService](../backend/IdentityService.md#guestsociallogin) | onAction | Sign in with Apple or Google | `None` |
 | `guestUaePassLogin` | [IdentityService](../backend/IdentityService.md#guestuaepasslogin) | onAction | Sign in with a national identity provider | `None` |
 | `linkGuestCheckout` | [IdentityService](../backend/IdentityService.md#linkguestcheckout) | onAction | Attach a guest checkout to an account | `None` |
-| `listMfaMethods` | [IdentityService](../backend/IdentityService.md#listmfamethods) | onLoad | Enrolled MFA methods | `None` |
-| `listSsoProviders` | [IdentityService](../backend/IdentityService.md#listssoproviders) | onLoad | Identity providers configured for this tenant | `None` |
-| `login` | [IdentityService](../backend/IdentityService.md#login) | onAction | Authenticate and open a session | `None` |
 | `refreshToken` | [IdentityService](../backend/IdentityService.md#refreshtoken) | onAction | Rotate the access token | `None` |
-| `removeMfaMethod` | [IdentityService](../backend/IdentityService.md#removemfamethod) | onAction | Remove an MFA method | `None` |
 | `requestGuestOtp` | [IdentityService](../backend/IdentityService.md#requestguestotp) | onAction | Request a one-time code | `None` |
-| `startSsoAuthorization` | [IdentityService](../backend/IdentityService.md#startssoauthorization) | onAction | Begin an SSO flow | `None` |
 | `verifyGuestOtp` | [IdentityService](../backend/IdentityService.md#verifyguestotp) | onAction | Verify a one-time code and issue a session | `None` |
-| `verifyMfaChallenge` | [IdentityService](../backend/IdentityService.md#verifymfachallenge) | onAction | Complete a step-up challenge | `None` |
-| `verifyMfaEnrolment` | [IdentityService](../backend/IdentityService.md#verifymfaenrolment) | onAction | Complete enrolment | `None` |
 | `claimCart` | [OrderService](../backend/OrderService.md#claimcart) | onAction | Attach an anonymous cart to a guest | `None` |
-| `createMfaChallenge` | [IdentityService](../backend/IdentityService.md#createmfachallenge) | onAction | Second factor at sign-in | `None` |
 
 **States**
 
 | State | Behaviour |
 |---|---|
-| loading | The login register list. |
-| error | Could not load. Names which read failed and leaves the login register untouched. |
-| emptyFirstRun | No login register yet. Offers Register guest (`registerGuest`). |
-| emptyNoResults | Never shown: `listMfaMethods` takes no filter, so an empty list is always the first-run state above. |
+| loading | Checking whether this device already holds a guest session. The sign-in form stays visible. |
+| error | Identity could not be reached. Says so rather than saying the password or code is wrong, and keeps what was typed. |
+| emptyFirstRun | Nobody signed in on this device — the normal state. The form offers a code, a password, Apple or Google and UAE Pass, and Create an account (`registerGuest`). |
 | emptyNoAccess | There is no permission to name — a guest holds none (ADR-0025), and this is the screen a guest who is not signed in is sent to, so it has no no-access case of its own. A session that has expired lands here with the screen it came from kept, and returns to it after sign-in. |
+| signInRefused | One message for every refusal of a password sign-in: `guestPasswordLogin` answers 401 alike for a wrong password, an unknown identifier, an account with no password and a locked account, and the screen never says which. Too many attempts (429, or the lockout after `PasswordPolicy.lockoutAfterAttempts`) says to try again later and offers Send me a code instead (decided 28 September, audit R073 (a)). |
 | offline | Not available, and the offline banner says why. Signing in, registering and verifying a code need the server. |
 
 **Goes to**
@@ -769,7 +756,7 @@
 |---|---|---|---|---|
 | `listMyEntitlements` | [AccessService](../backend/AccessService.md#listmyentitlements) | onLoad | Every ticket, pass and membership this guest holds | `ORDER_VIEW` |
 | `getEntitlement` | [AccessService](../backend/AccessService.md#getentitlement) | onLoad | One entitlement, with what remains on it | `ORDER_VIEW` |
-| `getEntitlementCredential` | [AccessService](../backend/AccessService.md#getentitlementcredential) | onLoad | The thing that gets scanned | `ORDER_VIEW` |
+| `getEntitlementCredential` | [AccessService](../backend/AccessService.md#getentitlementcredential) | onLoad | The thing that gets scanned — with the `rotation` seed the device derives the rotating code from (audit R230) | `ORDER_VIEW` |
 | `getEntitlementHistory` | [AccessService](../backend/AccessService.md#getentitlementhistory) | onLoad | Every scan, freeze, share and reissue against it | `ORDER_VIEW` |
 | `listEntitlements` | [AccessService](../backend/AccessService.md#listentitlements) | onLoad | Every entitlement this guest holds, including expired | `None` |
 | `transferOrderTickets` | [OrderService](../backend/OrderService.md#transferordertickets) | onAction | Transfer tickets to another guest | `None` |
@@ -785,7 +772,7 @@
 | emptyFirstRun | No tickets — distinguishes never bought from all past |
 | emptyNoResults | Nothing matches the current filters. The filters are named and clearable from here — an empty list with the filter state hidden elsewhere is a person who thinks the data is gone. Added 25 August with the derived list component: a screen that lists has to say what it shows when the list is empty, and this screen gained the list before it gained the sentence. |
 | emptyNoAccess | There is no permission to name — a guest holds none (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
-| offline | The offline banner shows. Tickets already loaded stay visible with their age. Sharing, transferring and adding to a phone wallet need the connection. |
+| offline | The offline banner shows. Tickets already loaded stay visible with their age, and a ticket's rotating code is derived on the device from its seed, so it changes with no signal (decided 28 September, audit R230). Sharing, transferring and adding to a phone wallet need the connection. |
 
 **Goes to**
 
@@ -921,7 +908,7 @@
 | error | Could not load |
 | emptyFirstRun | No articles — offers contact instead of an empty help centre |
 | emptyNoAccess | There is no permission to name — a guest holds none (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
-| offline | The offline banner shows. Cases already loaded stay read-only with their age, so a guest can see what they raised without believing a reply arrived. Raising and replying need the connection. |
+| offline | The offline banner shows. Cases already loaded stay read-only with their age, so a guest can see what they raised without believing a reply arrived. Raising a case and replying are disabled offline — both need the connection (decided 28 September, audit R148) — and the screen says how to reach staff in person instead: the guest services desk, or any member of staff. |
 
 **Goes to**
 
@@ -992,6 +979,8 @@
 | emptyFirstRun | — |
 | emptyNoAccess | There is no permission to name — a guest holds none (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | offline | The offline banner shows instead of this page. Being offline is the guest's connection, not the venue's — an error or maintenance page shown for a dropped signal tells a guest the venue is down. |
+| soldOut | Sold out today. `getTenantAppStatus.availability` is `soldOut`: the page says so with the tenant's `availabilityMessage` and offers another day, never a generic error (decided 28 September, audit R073 (f)). |
+| closed | Closed. `getTenantAppStatus.availability` is `closed`: the page says the venue is not open, with the tenant's `availabilityMessage` and the opening hours from `contact` (decided 28 September, audit R073 (f)). |
 
 ## WEB-030 Ticket Transfer
 
@@ -1057,7 +1046,7 @@
 
 | Operation | Service | When | Purpose | Permission |
 |---|---|---|---|---|
-| `listFxRates` | [LedgerService](../backend/LedgerService.md#listfxrates) | onLoad | The rates in force | `LEDGER_VIEW` |
+| `listFxRates` | [LedgerService](../backend/LedgerService.md#listfxrates) | onLoad | The rates in force for the venue's shown currencies — always called with `venueId` (decided 28 September, audit R120 (a)) | `LEDGER_VIEW` |
 | `listProducts` | [CatalogueService](../backend/CatalogueService.md#listproducts) | onLoad | List products | `PRODUCT_VIEW` |
 
 **States**
@@ -1122,7 +1111,7 @@
 | WEB-010 | Reviews the cart |  |  |
 | WEB-005 | Ticket Type Selection |  |  |
 | WEB-008 | Add-ons & Upsell |  |  |
-| WEB-006 | Date & Session Selection | performanceId |  |
+| WEB-006 | Date & Performance Selection | performanceId |  |
 
 ## WEB-008 Add-ons & Upsell
 
@@ -1170,7 +1159,7 @@
 |---|---|---|---|
 | WEB-005 | Ticket Type Selection |  |  |
 | WEB-007 | Interactive Seat Selection |  |  |
-| WEB-006 | Date & Session Selection | cartId, performanceId |  |
+| WEB-006 | Date & Performance Selection | cartId, performanceId |  |
 | WEB-010 | Shopping Cart | cartId, code |  |
 
 ## WEB-015 Branded Queue / Waiting Room
@@ -1197,7 +1186,7 @@
 | Operation | Service | When | Purpose | Permission |
 |---|---|---|---|---|
 | `joinQueue` | [VenueOpsService](../backend/VenueOpsService.md#joinqueue) | onAction | Join a virtual queue | `None` |
-| `getWaitingGuest` | [VenueOpsService](../backend/VenueOpsService.md#getwaitingguest) | onLoad | Read a queue entry | `None` |
+| `getWaitingGuest` | [VenueOpsService](../backend/VenueOpsService.md#getwaitingguest) | onInterval | The guest's place and the call to come forward, read on entry and polled while the screen is open; the queue call shows here, not in a notification feed (decided 28 September, audit R242) | `None` |
 | `getWaitTimes` | [VenueOpsService](../backend/VenueOpsService.md#getwaittimes) | onLoad | Wait times across a venue | `None` |
 
 **States**
@@ -1522,8 +1511,9 @@
 | Operation | Service | When | Purpose | Permission |
 |---|---|---|---|---|
 | `listMerchandise` | [RetailService](../backend/RetailService.md#listmerchandise) | onLoad | List merchandise | `PRODUCT_VIEW` |
-| `lookupMerchandise` | [RetailService](../backend/RetailService.md#lookupmerchandise) | onAction | Price and stock check by barcode | `PRODUCT_VIEW` |
-| `reserveMerchandise` | [RetailService](../backend/RetailService.md#reservemerchandise) | onAction | Reserve an item for collection | `ORDER_CREATE` |
+| `lookupMerchandise` | [RetailService](../backend/RetailService.md#lookupmerchandise) | onAction | Price and stock check by barcode, at the outlet named by `outletId` (audit R215 (1)) | `PRODUCT_VIEW` |
+| `checkoutCart` | [OrderService](../backend/OrderService.md#checkoutcart) | onAction | Turn the cart into an order; merchandise for collection is paid online (audit R236) | `None` |
+| `createPayment` | [OrderService](../backend/OrderService.md#createpayment) | onAction | Pay for it; payment creates the shop-and-drop for collection (decided 28 September, audit R236) | `ORDER_CREATE` |
 | `addCartLine` | [OrderService](../backend/OrderService.md#addcartline) | onAction | Add something | `None` |
 
 **States**
@@ -1563,6 +1553,7 @@
 | outletId | deepLink |
 | venueId | session |
 | orderId | deepLink |
+| entryId | deepLink |
 
 **Operations**
 
@@ -1580,6 +1571,7 @@
 | `getGuestOrderStatus` | [FnbService](../backend/FnbService.md#getguestorderstatus) | onLoad | Track an order | `None` |
 | `createTableReservation` | [FnbService](../backend/FnbService.md#createtablereservation) | onAction | Reserve a table | `None` |
 | `joinRestaurantWaitlist` | [FnbService](../backend/FnbService.md#joinrestaurantwaitlist) | onAction | Join the waitlist when nothing is free | `ORDER_MODIFY` |
+| `leaveRestaurantWaitlist` | [FnbService](../backend/FnbService.md#leaverestaurantwaitlist) | onAction | Leave the restaurant waitlist; the entry returns cancelled (decided 28 September, audit R073 (d)) | `ORDER_MODIFY` |
 
 **States**
 
@@ -1654,7 +1646,7 @@
 
 | Operation | Service | When | Purpose | Permission |
 |---|---|---|---|---|
-| `getGuestOrderStatus` | [FnbService](../backend/FnbService.md#getguestorderstatus) | onLoad | Track an order | `None` |
+| `getGuestOrderStatus` | [FnbService](../backend/FnbService.md#getguestorderstatus) | onInterval | The order's status (ordered, accepted, in preparation, ready, served, collected or delivered), read on entry and polled while the screen is open; order updates show here, not in a notification feed (decided 28 September, audit R242) | `None` |
 | `getGuestBill` | [FnbService](../backend/FnbService.md#getguestbill) | onLoad | The bill for the guest's table | `None` |
 | `claimTableSession` | [FnbService](../backend/FnbService.md#claimtablesession) | onAction | Identify which table a guest is sitting at | `None` |
 
@@ -1733,7 +1725,7 @@
 | Operation | Service | When | Purpose | Permission |
 |---|---|---|---|---|
 | `joinQueue` | [VenueOpsService](../backend/VenueOpsService.md#joinqueue) | onAction | Join a virtual queue | `None` |
-| `getWaitingGuest` | [VenueOpsService](../backend/VenueOpsService.md#getwaitingguest) | onLoad | Read a queue entry | `None` |
+| `getWaitingGuest` | [VenueOpsService](../backend/VenueOpsService.md#getwaitingguest) | onInterval | The guest's place and the call to come forward, read on entry and polled while the screen is open; the queue call shows here, not in a notification feed (decided 28 September, audit R242) | `None` |
 | `leaveQueue` | [VenueOpsService](../backend/VenueOpsService.md#leavequeue) | onAction | Leave a queue | `None` |
 | `getWaitTimes` | [VenueOpsService](../backend/VenueOpsService.md#getwaittimes) | onLoad | Wait times across a venue | `None` |
 | `joinWaitlist` | [CatalogueService](../backend/CatalogueService.md#joinwaitlist) | onAction | Join a virtual queue | `None` |
@@ -1769,13 +1761,16 @@
 |---|---|
 | entitlementId | deepLink |
 | venueId | session |
+| cartId | session |
 
 **Operations**
 
 | Operation | Service | When | Purpose | Permission |
 |---|---|---|---|---|
 | `listParkingFacilities` | [AccessService](../backend/AccessService.md#listparkingfacilities) | onLoad | Car parks at a venue, and how each integrates | `PARKING_CONFIGURE` |
-| `createParkingEntitlement` | [AccessService](../backend/AccessService.md#createparkingentitlement) | onAction | A guest bought parking | `None` |
+| `addCartLine` | [OrderService](../backend/OrderService.md#addcartline) | onAction | Put the car park's parking product in the cart; refused `soldOutForDay` when the car park is at capacity (decided 28 September, audit R166) | `None` |
+| `checkoutCart` | [OrderService](../backend/OrderService.md#checkoutcart) | onAction | Turn the cart into an order | `None` |
+| `createPayment` | [OrderService](../backend/OrderService.md#createpayment) | onAction | Pay for it; the parking entitlement is issued at payment with the order's id (audit R166) | `ORDER_CREATE` |
 | `updateParkingEntitlement` | [AccessService](../backend/AccessService.md#updateparkingentitlement) | onAction | Change the plate, or revoke | `None` |
 
 **States**
@@ -1788,6 +1783,7 @@
 | emptyNoResults | Nothing matches. |
 | emptyNoAccess | Sign in to see this. A guest who is not signed in is offered the door, not refused. |
 | offline | The offline banner shows. A reservation already confirmed stays on screen with its plate and car park. Reserving, paying and changing the plate need the connection. |
+| soldOutForDay | The car park is full. `addCartLine` refused the parking line with `soldOutForDay`: issued entitlements have reached the facility's capacity for that day. Shown only then — there is no live space count in the first release, so the screen never promises spaces before the guest tries (decided 28 September, audit R166). |
 
 ## WEB-042 Retail & Shop and Drop
 
@@ -1807,14 +1803,17 @@
 | Parameter | From |
 |---|---|
 | outletId | deepLink |
+| cartId | session |
 
 **Operations**
 
 | Operation | Service | When | Purpose | Permission |
 |---|---|---|---|---|
 | `listMerchandise` | [RetailService](../backend/RetailService.md#listmerchandise) | onLoad | List merchandise | `PRODUCT_VIEW` |
-| `lookupMerchandise` | [RetailService](../backend/RetailService.md#lookupmerchandise) | onAction | Price and stock check by barcode | `PRODUCT_VIEW` |
-| `reserveMerchandise` | [RetailService](../backend/RetailService.md#reservemerchandise) | onAction | Reserve an item for collection | `ORDER_CREATE` |
+| `lookupMerchandise` | [RetailService](../backend/RetailService.md#lookupmerchandise) | onAction | Price and stock check by barcode, at the outlet named by `outletId` (audit R215 (1)) | `PRODUCT_VIEW` |
+| `addCartLine` | [OrderService](../backend/OrderService.md#addcartline) | onAction | Put the item in the cart, marked for collection on the way out (audit R236) | `None` |
+| `checkoutCart` | [OrderService](../backend/OrderService.md#checkoutcart) | onAction | Turn the cart into an order; merchandise for collection is paid online (audit R236) | `None` |
+| `createPayment` | [OrderService](../backend/OrderService.md#createpayment) | onAction | Pay for it; payment creates the shop-and-drop for collection (decided 28 September, audit R236) | `ORDER_CREATE` |
 | `lookupShopAndDrop` | [RetailService](../backend/RetailService.md#lookupshopanddrop) | onAction | Find a guest's dropped goods | `ORDER_VIEW` |
 
 **States**
@@ -1934,36 +1933,7 @@
 | emptyFirstRun | Nothing here yet for this venue. Names what turns it on rather than showing an empty panel. |
 | emptyNoResults | Nothing matches. |
 | emptyNoAccess | Sign in to see this. A guest who is not signed in is offered the door, not refused. |
-| offline | The offline banner shows. What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing. |
-
-## WEB-046 In-Venue Notifications
-
-**Queue calls, order updates, venue notices.**
-
-|  |  |
-|---|---|
-| Module | Engagement & Support |
-| Wave | 2 |
-| Licensed module | marketing |
-| Route | `/in-venue-notifications` |
-| Component | `apps/guest-web/src/routes/InVenueNotifications.tsx` |
-| Pattern | configEditor |
-
-**Operations**
-
-| Operation | Service | When | Purpose | Permission |
-|---|---|---|---|---|
-| `claimLocationSession` | [FnbService](../backend/FnbService.md#claimlocationsession) | onAction | Tell the platform where the guest is | `None` |
-
-**States**
-
-| State | Behaviour |
-|---|---|
-| loading | Content resolves in place. |
-| error | Could not load. The rest of the site is unaffected. |
-| emptyFirstRun | Nothing here yet for this venue. Names what turns it on rather than showing an empty panel. |
-| emptyNoAccess | Sign in to see this. A guest who is not signed in is offered the door, not refused. |
-| offline | The offline banner shows. Notices already received stay listed. New queue calls and order updates arrive once the connection is back, and the banner is the warning that they may be late. |
+| offline | The offline banner shows. Help already loaded stays readable, marked with its age. Raising a case is disabled offline — it needs the connection (decided 28 September, audit R148) — and the screen says how to reach staff in person instead: the guest services desk, or any member of staff. |
 
 ## WEB-009 Wishlist
 
@@ -2009,7 +1979,7 @@
 |---|---|---|---|
 | WEB-005 | Ticket Type Selection |  |  |
 | WEB-007 | Interactive Seat Selection |  |  |
-| WEB-006 | Date & Session Selection |  |  |
+| WEB-006 | Date & Performance Selection |  |  |
 
 ## WEB-024 Devices, Wishlist & Consent
 
@@ -2062,7 +2032,7 @@
 | emptyFirstRun | No points yet — explains how they accrue |
 | emptyNoResults | Nothing matches the current filters. The filters are named and clearable from here — an empty list with the filter state hidden elsewhere is a person who thinks the data is gone. Added 25 August with the derived list component: a screen that lists has to say what it shows when the list is empty, and this screen gained the list before it gained the sentence. |
 | emptyNoAccess | There is no permission to name — a guest holds none (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
-| offline | Nothing here is offered offline, and the banner says so. An erasure request or a device change queued and never sent is worse than one that could not be made — the legal clock starts when the platform receives it, and a second factor set up offline is not a second factor. |
+| offline | Nothing here is offered offline, and the banner says so. An erasure request or a device change queued and never sent is worse than one that could not be made — the legal clock starts when the platform receives it, and a device signed out offline is still signed in. |
 
 **Goes to**
 
@@ -2144,7 +2114,7 @@
 | emptyFirstRun | No lost found yet. Offers Raise my case (`raiseMyCase`). |
 | emptyNoResults | Never shown: `listMyCases` takes no filter, so an empty list is always the first-run state above. |
 | emptyNoAccess | There is no permission to name — a guest holds none (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
-| offline | The offline banner shows. Reports already loaded stay read-only with their age. Reporting and replying need the connection. |
+| offline | The offline banner shows. Reports already loaded stay read-only with their age. Reporting a loss and replying are disabled offline — both need the connection (decided 28 September, audit R148) — and the screen says how to reach staff in person instead: the guest services desk or lost-property point, or any member of staff. |
 
 **Goes to**
 

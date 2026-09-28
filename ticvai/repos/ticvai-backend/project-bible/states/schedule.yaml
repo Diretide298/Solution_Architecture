@@ -40,4 +40,8 @@ transitions:
   trigger: operation
   guard: Pulled early
   isReversal: true
-notes: Timezone is a region setting. Every scheduling bug in a platform like this is the same bug.
+notes: 'Timezone is a region setting. Every scheduling bug in a platform like this is the same bug.
+
+  **A promo block is not pulled back to `draft` (decided 28 September, audit R163).** Once `active` or
+  `expired` it may only be withdrawn with `deletePromoBlock`; the `active` to `draft` pull above is the
+  banner''s. For both, an end must follow the start.'

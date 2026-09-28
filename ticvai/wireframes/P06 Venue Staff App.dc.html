@@ -158,9 +158,9 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; login · getCurrentSession · listMfaMethods · listSsoProviders</div>
-          <div><b>STATES</b> &middot; <span class="warn">loading · error · emptyFirstRun · emptyNoResults · offline</span></div>
-          
+          <div><b>OPERATIONS</b> &middot; login · getCurrentSession · listMfaMethods · listSsoProviders +2</div>
+          <div><b>STATES</b> &middot; <span class="warn">loading · error · emptyFirstRun · emptyNoResults · mfaRequired · offline</span></div>
+          <div><b>ARRIVES WITH</b> &middot; challengeId&larr;navigation</div>
           <div><b>GOES TO</b> &middot; entry point · <a href="#emp-002">EMP-002</a>  &mdash; <i>Selects venue and role</i><br><a href="#emp-003">EMP-003</a>  &mdash; <i>Home — on duty</i><br><a href="#emp-048">EMP-048</a>  &mdash; <i>Opening checklist</i></div>
           
           <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formLogin &middot; <i>Login</i> &middot; <b>Login</b> &middot; Cancel <span class="dis">discards username · credential · workstationId · method · deviceFingerprint</span></div></div>
@@ -221,9 +221,9 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           <div><b>OPERATIONS</b> &middot; getCurrentShift · listIncidents · acceptShiftVariance · approveShiftOpen +13</div>
           <div><b>STATES</b> &middot; <span class="warn">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess · offline</span></div>
           <div><b>ARRIVES WITH</b> &middot; incidentId&larr;deepLink, shiftId&larr;session</div>
-          <div><b>GOES TO</b> &middot; <a href="#emp-001">EMP-001</a>  &mdash; <i>Sign in</i><br><a href="#emp-002">EMP-002</a>  &mdash; <i>Select venue &amp; role</i><br><a href="#emp-004">EMP-004</a>  &mdash; <i>Works the task list</i><br><a href="#emp-006">EMP-006</a>  &mdash; <i>Raise a task</i><br><a href="#emp-008">EMP-008</a> <br><a href="#emp-010">EMP-010</a> <br><a href="#emp-014">EMP-014</a>  &mdash; <i>Ticket lookup</i><br><a href="#emp-017">EMP-017</a> <br><a href="#emp-019">EMP-019</a>  &mdash; <i>AI assistant — home</i><br><a href="#emp-021">EMP-021</a>  &mdash; <i>Roster</i><br><a href="#emp-022">EMP-022</a>  &mdash; <i>My rota</i><br><a href="#emp-024">EMP-024</a>  &mdash; <i>Clock in / out</i><br><a href="#emp-025">EMP-025</a>  &mdash; <i>Break management</i><br><a href="#emp-026">EMP-026</a>  &mdash; <i>Incident report</i> <span class="car">incidentId</span><br><a href="#emp-028">EMP-028</a>  &mdash; <i>Lost &amp; found</i><br><a href="#emp-029">EMP-029</a>  &mdash; <i>Guest assistance</i> <span class="car">incidentId</span><br><a href="#emp-030">EMP-030</a>  &mdash; <i>Venue map</i><br><a href="#emp-031">EMP-031</a>  &mdash; <i>Queue monitor</i><br><a href="#emp-033">EMP-033</a>  &mdash; <i>Capacity view</i><br><a href="#emp-034">EMP-034</a>  &mdash; <i>Walk-up sale</i><br><a href="#emp-037">EMP-037</a>  &mdash; <i>Notifications</i><br><a href="#emp-038">EMP-038</a>  &mdash; <i>Broadcast to team</i><br><a href="#emp-039">EMP-039</a>  &mdash; <i>Announcements</i><br><a href="#emp-040">EMP-040</a> <br><a href="#emp-042">EMP-042</a> <br><a href="#emp-043">EMP-043</a> <br><a href="#emp-046">EMP-046</a> <br><a href="#emp-047">EMP-047</a>  &mdash; <i>Emergency mode</i><br><a href="#emp-048">EMP-048</a> <br><a href="#emp-051">EMP-051</a>  &mdash; <i>Restaurant Service Command Center</i><br><a href="#emp-052">EMP-052</a>  &mdash; <i>Floor Plan &amp; Table Map</i><br><a href="#emp-053">EMP-053</a>  &mdash; <i>Table &amp; Seating Configuration</i><br><a href="#emp-054">EMP-054</a>  &mdash; <i>Reservation Calendar &amp; Timeline</i><br><a href="#emp-055">EMP-055</a>  &mdash; <i>Create / Edit Reservation</i><br><a href="#emp-056">EMP-056</a>  &mdash; <i>Walk-In &amp; Waitlist Management</i><br><a href="#emp-057">EMP-057</a>  &mdash; <i>Guest Profile &amp; Dining History</i><br><a href="#emp-058">EMP-058</a>  &mdash; <i>Live Table &amp; Service Management</i><br><a href="#emp-059">EMP-059</a>  &mdash; <i>Table Order, Bill &amp; Payment Management</i><br><a href="#emp-060">EMP-060</a>  &mdash; <i>Reservation &amp; Table Performance</i><br><a href="#emp-061">EMP-061</a>  &mdash; <i>Retail Inventory Command Center</i><br><a href="#emp-062">EMP-062</a>  &mdash; <i>Store Stock &amp; SKU Availability</i><br><a href="#emp-063">EMP-063</a>  &mdash; <i>Requisition &amp; Smart Store Replenishment</i><br><a href="#emp-064">EMP-064</a>  &mdash; <i>Store-to-Store &amp; Warehouse Transfers</i><br><a href="#emp-065">EMP-065</a>  &mdash; <i>Receiving &amp; Store Put-Away</i><br><a href="#emp-066">EMP-066</a>  &mdash; <i>Stock Count &amp; Cycle Count Management</i><br><a href="#emp-067">EMP-067</a>  &mdash; <i>Damage, Loss, Shrinkage &amp; Stock Adjustment</i><br><a href="#emp-068">EMP-068</a>  &mdash; <i>Reservation, Allocation &amp; Omnichannel Invent</i><br><a href="#emp-069">EMP-069</a>  &mdash; <i>Barcode, RFID, Serialized Stock &amp; Traceabili</i><br><a href="#emp-070">EMP-070</a>  &mdash; <i>Inventory Exceptions, AI Replenishment &amp; Act</i><br><a href="#emp-071">EMP-071</a>  &mdash; <i>Rental Checkout Command Center</i><br><a href="#emp-081">EMP-081</a>  &mdash; <i>Active Rental Operations Command Center</i><br><a href="#emp-091">EMP-091</a>  &mdash; <i>Rental Return Command Center</i></div>
+          <div><b>GOES TO</b> &middot; <a href="#emp-001">EMP-001</a>  &mdash; <i>Sign in</i><br><a href="#emp-002">EMP-002</a>  &mdash; <i>Select venue &amp; role</i><br><a href="#emp-004">EMP-004</a>  &mdash; <i>Works the task list</i><br><a href="#emp-006">EMP-006</a>  &mdash; <i>Raise a task</i><br><a href="#emp-008">EMP-008</a> <br><a href="#emp-010">EMP-010</a> <br><a href="#emp-014">EMP-014</a>  &mdash; <i>Ticket lookup</i><br><a href="#emp-017">EMP-017</a> <br><a href="#emp-019">EMP-019</a>  &mdash; <i>AI assistant — home</i><br><a href="#emp-021">EMP-021</a>  &mdash; <i>Roster</i><br><a href="#emp-022">EMP-022</a>  &mdash; <i>My rota</i><br><a href="#emp-024">EMP-024</a>  &mdash; <i>Clock in / out</i><br><a href="#emp-025">EMP-025</a>  &mdash; <i>Break management</i><br><a href="#emp-026">EMP-026</a>  &mdash; <i>Incident report</i> <span class="car">incidentId</span><br><a href="#emp-028">EMP-028</a>  &mdash; <i>Lost &amp; found</i><br><a href="#emp-029">EMP-029</a>  &mdash; <i>Guest assistance</i> <span class="car">incidentId</span><br><a href="#emp-030">EMP-030</a>  &mdash; <i>Venue map</i><br><a href="#emp-031">EMP-031</a>  &mdash; <i>Queue monitor</i><br><a href="#emp-033">EMP-033</a>  &mdash; <i>Capacity view</i><br><a href="#emp-034">EMP-034</a>  &mdash; <i>Walk-up sale</i><br><a href="#emp-037">EMP-037</a>  &mdash; <i>Notifications</i><br><a href="#emp-038">EMP-038</a>  &mdash; <i>Broadcast to team</i><br><a href="#emp-039">EMP-039</a>  &mdash; <i>Announcements</i><br><a href="#emp-040">EMP-040</a> <br><a href="#emp-042">EMP-042</a>  &mdash; <i>Profile</i><br><a href="#emp-043">EMP-043</a> <br><a href="#emp-046">EMP-046</a> <br><a href="#emp-047">EMP-047</a>  &mdash; <i>Emergency mode</i><br><a href="#emp-048">EMP-048</a> <br><a href="#emp-051">EMP-051</a>  &mdash; <i>Restaurant Service Command Center</i><br><a href="#emp-052">EMP-052</a>  &mdash; <i>Floor Plan &amp; Table Map</i><br><a href="#emp-053">EMP-053</a>  &mdash; <i>Table &amp; Seating Configuration</i><br><a href="#emp-054">EMP-054</a>  &mdash; <i>Reservation Calendar &amp; Timeline</i><br><a href="#emp-055">EMP-055</a>  &mdash; <i>Create / Edit Reservation</i><br><a href="#emp-056">EMP-056</a>  &mdash; <i>Walk-In &amp; Waitlist Management</i><br><a href="#emp-057">EMP-057</a>  &mdash; <i>Guest Profile &amp; Dining History</i><br><a href="#emp-058">EMP-058</a>  &mdash; <i>Live Table &amp; Service Management</i><br><a href="#emp-059">EMP-059</a>  &mdash; <i>Table Order, Bill &amp; Payment Management</i><br><a href="#emp-060">EMP-060</a>  &mdash; <i>Reservation &amp; Table Performance</i><br><a href="#emp-061">EMP-061</a>  &mdash; <i>Retail Inventory Command Center</i><br><a href="#emp-062">EMP-062</a>  &mdash; <i>Store Stock &amp; SKU Availability</i><br><a href="#emp-063">EMP-063</a>  &mdash; <i>Requisition &amp; Smart Store Replenishment</i><br><a href="#emp-064">EMP-064</a>  &mdash; <i>Store-to-Store &amp; Warehouse Transfers</i><br><a href="#emp-065">EMP-065</a>  &mdash; <i>Receiving &amp; Store Put-Away</i><br><a href="#emp-066">EMP-066</a>  &mdash; <i>Stock Count &amp; Cycle Count Management</i><br><a href="#emp-067">EMP-067</a>  &mdash; <i>Damage, Loss, Shrinkage &amp; Stock Adjustment</i><br><a href="#emp-068">EMP-068</a>  &mdash; <i>Reservation, Allocation &amp; Omnichannel Invent</i><br><a href="#emp-069">EMP-069</a>  &mdash; <i>Barcode, RFID, Serialized Stock &amp; Traceabili</i><br><a href="#emp-070">EMP-070</a>  &mdash; <i>Inventory Exceptions, AI Replenishment &amp; Act</i><br><a href="#emp-071">EMP-071</a>  &mdash; <i>Rental Checkout Command Center</i><br><a href="#emp-081">EMP-081</a>  &mdash; <i>Active Rental Operations Command Center</i><br><a href="#emp-091">EMP-091</a>  &mdash; <i>Rental Return Command Center</i></div>
           
-          <div><b>OVERLAYS</b><div class="ov"><b>confirmDialog</b> confirmCloseShift &middot; <i>Close shift</i></div><div class="ov"><b>confirmDialog</b> confirmSuspendShift &middot; <i>Suspend shift</i></div><div class="ov"><b>modal</b> formAcceptShiftVariance &middot; <i>Accept shift variance</i> &middot; <b>Accept shift variance</b> &middot; Cancel <span class="dis">discards reason</span></div><div class="ov"><b>modal</b> formApproveShiftOpen &middot; <i>Approve shift open</i> &middot; <b>Approve shift open</b> &middot; Cancel <span class="dis">discards reason</span></div><div class="ov"><b>modal</b> formOpenShift &middot; <i>Open shift</i> &middot; <b>Open shift</b> &middot; Cancel <span class="dis">discards workstationId · openingFloat · depositBoxCode · bagNumber · recordedAt</span></div><div class="ov"><b>modal</b> formRecordAuthorityNotification &middot; <i>Record authority notification</i> &middot; <b>Record authority notification</b> &middot; Cancel <span class="dis">discards authority · notifiedAt · reference · notifiedByPrincipalId · attachmentRefs</span></div><div class="ov"><b>modal</b> formRecordNoSale &middot; <i>Record no sale</i> &middot; <b>Record no sale</b> &middot; Cancel <span class="dis">discards id · reason · recordedAt · note</span></div><div class="ov"><b>modal</b> formReopenShift &middot; <i>Reopen shift</i> &middot; <b>Reopen shift</b> &middot; Cancel <span class="dis">discards reason · approverPrincipalId</span></div><div class="ov"><b>modal</b> formReportIncident &middot; <i>Report incident</i> &middot; <b>Report incident</b> &middot; Cancel <span class="dis">discards id · kind · severity · venueId · description · occurredAt · recordedAt · assetId · locationDescription · involvedSubjectIds · involvedStaffPrincipalIds · witnessCount · firstAidGiven · emergencyServicesCalled · attachmentRefs</span></div><div class="ov"><b>modal</b> formResumeShift &middot; <i>Resume shift</i> &middot; <b>Resume shift</b> &middot; Cancel <span class="dis">discards recordedAt</span></div><div class="ov"><b>modal</b> formUpdateIncident &middot; <i>Save incident</i> &middot; <b>Save incident</b> &middot; Cancel <span class="dis">discards status · severity · assignedToPrincipalId · investigationNote · rootCause · correctiveActions · correctiveWorkOrderId · attachmentRefs</span></div></div>
+          <div><b>OVERLAYS</b><div class="ov"><b>confirmDialog</b> confirmCloseShift &middot; <i>Close shift</i></div><div class="ov"><b>confirmDialog</b> confirmSuspendShift &middot; <i>Suspend shift</i></div><div class="ov"><b>modal</b> formAcceptShiftVariance &middot; <i>Accept shift variance</i> &middot; <b>Accept shift variance</b> &middot; Cancel <span class="dis">discards reason</span></div><div class="ov"><b>modal</b> formApproveShiftOpen &middot; <i>Approve shift open</i> &middot; <b>Approve shift open</b> &middot; Cancel <span class="dis">discards reason</span></div><div class="ov"><b>modal</b> formOpenShift &middot; <i>Open shift</i> &middot; <b>Open shift</b> &middot; Cancel <span class="dis">discards workstationId · openingFloat · depositBoxCode · bagNumber · recordedAt</span></div><div class="ov"><b>modal</b> formRecordAuthorityNotification &middot; <i>Record authority notification</i> &middot; <b>Record authority notification</b> &middot; Cancel <span class="dis">discards authority · notifiedAt · reference · notifiedByPrincipalId · attachmentRefs</span></div><div class="ov"><b>modal</b> formRecordNoSale &middot; <i>Record no sale</i> &middot; <b>Record no sale</b> &middot; Cancel <span class="dis">discards id · reason · recordedAt · note</span></div><div class="ov"><b>modal</b> formReopenShift &middot; <i>Reopen shift</i> &middot; <b>Reopen shift</b> &middot; Cancel <span class="dis">discards reason · supervisorStepUp</span></div><div class="ov"><b>modal</b> formReportIncident &middot; <i>Report incident</i> &middot; <b>Report incident</b> &middot; Cancel <span class="dis">discards id · kind · severity · venueId · description · occurredAt · recordedAt · assetId · locationDescription · involvedSubjectIds · involvedStaffPrincipalIds · witnessCount · firstAidGiven · emergencyServicesCalled · attachmentRefs</span></div><div class="ov"><b>modal</b> formResumeShift &middot; <i>Resume shift</i> &middot; <b>Resume shift</b> &middot; Cancel <span class="dis">discards recordedAt</span></div><div class="ov"><b>modal</b> formUpdateIncident &middot; <i>Save incident</i> &middot; <b>Save incident</b> &middot; Cancel <span class="dis">discards status · severity · assignedToPrincipalId · investigationNote · rootCause · correctiveActions · correctiveWorkOrderId · attachmentRefs</span></div></div>
         </div>
       </div>
       <div id="emp-048" class="scr">
@@ -283,7 +283,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           <div><b>ARRIVES WITH</b> &middot; shiftId&larr;session</div>
           <div><b>GOES TO</b> &middot; <a href="#emp-001">EMP-001</a>  &mdash; <i>Sign in</i><br><a href="#emp-002">EMP-002</a>  &mdash; <i>Select venue &amp; role</i><br><a href="#emp-003">EMP-003</a>  &mdash; <i>Home — on duty</i><br><a href="#emp-049">EMP-049</a> </div>
           
-          <div><b>OVERLAYS</b><div class="ov"><b>confirmDialog</b> confirmCloseShift &middot; <i>Close shift</i></div><div class="ov"><b>confirmDialog</b> confirmSuspendShift &middot; <i>Suspend shift</i></div><div class="ov"><b>modal</b> formAcceptShiftVariance &middot; <i>Accept shift variance</i> &middot; <b>Accept shift variance</b> &middot; Cancel <span class="dis">discards reason</span></div><div class="ov"><b>modal</b> formApproveShiftOpen &middot; <i>Approve shift open</i> &middot; <b>Approve shift open</b> &middot; Cancel <span class="dis">discards reason</span></div><div class="ov"><b>modal</b> formCreateCashMovement &middot; <i>Create cash movement</i> &middot; <b>Create cash movement</b> &middot; Cancel <span class="dis">discards id · kind · amount · recordedAt · denominations · reference · reason</span></div><div class="ov"><b>modal</b> formOpenShift &middot; <i>Open shift</i> &middot; <b>Open shift</b> &middot; Cancel <span class="dis">discards workstationId · openingFloat · depositBoxCode · bagNumber · recordedAt</span></div><div class="ov"><b>modal</b> formRecordNoSale &middot; <i>Record no sale</i> &middot; <b>Record no sale</b> &middot; Cancel <span class="dis">discards id · reason · recordedAt · note</span></div><div class="ov"><b>modal</b> formReopenShift &middot; <i>Reopen shift</i> &middot; <b>Reopen shift</b> &middot; Cancel <span class="dis">discards reason · approverPrincipalId</span></div><div class="ov"><b>modal</b> formResumeShift &middot; <i>Resume shift</i> &middot; <b>Resume shift</b> &middot; Cancel <span class="dis">discards recordedAt</span></div></div>
+          <div><b>OVERLAYS</b><div class="ov"><b>confirmDialog</b> confirmCloseShift &middot; <i>Close shift</i></div><div class="ov"><b>confirmDialog</b> confirmSuspendShift &middot; <i>Suspend shift</i></div><div class="ov"><b>modal</b> formAcceptShiftVariance &middot; <i>Accept shift variance</i> &middot; <b>Accept shift variance</b> &middot; Cancel <span class="dis">discards reason</span></div><div class="ov"><b>modal</b> formApproveShiftOpen &middot; <i>Approve shift open</i> &middot; <b>Approve shift open</b> &middot; Cancel <span class="dis">discards reason</span></div><div class="ov"><b>modal</b> formCreateCashMovement &middot; <i>Create cash movement</i> &middot; <b>Create cash movement</b> &middot; Cancel <span class="dis">discards id · kind · amount · recordedAt · denominations · reference · reason</span></div><div class="ov"><b>modal</b> formOpenShift &middot; <i>Open shift</i> &middot; <b>Open shift</b> &middot; Cancel <span class="dis">discards workstationId · openingFloat · depositBoxCode · bagNumber · recordedAt</span></div><div class="ov"><b>modal</b> formRecordNoSale &middot; <i>Record no sale</i> &middot; <b>Record no sale</b> &middot; Cancel <span class="dis">discards id · reason · recordedAt · note</span></div><div class="ov"><b>modal</b> formReopenShift &middot; <i>Reopen shift</i> &middot; <b>Reopen shift</b> &middot; Cancel <span class="dis">discards reason · supervisorStepUp</span></div><div class="ov"><b>modal</b> formResumeShift &middot; <i>Resume shift</i> &middot; <b>Resume shift</b> &middot; Cancel <span class="dis">discards recordedAt</span></div></div>
         </div>
       </div>
       <div id="emp-010" class="scr">
@@ -1363,12 +1363,12 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; getCurrentSession · listMfaMethods · listSsoProviders</div>
+          <div><b>OPERATIONS</b> &middot; getCurrentSession · listMfaMethods · enrolMfaMethod · verifyMfaEnrolment +2</div>
           <div><b>STATES</b> &middot; <span class="warn">loading · error · emptyFirstRun · emptyNoResults · offline</span></div>
-          <div><b>ARRIVES WITH</b> &middot; sessionId&larr;session</div>
+          <div><b>ARRIVES WITH</b> &middot; sessionId&larr;session, methodId&larr;navigation</div>
           <div><b>GOES TO</b> &middot; <a href="#emp-001">EMP-001</a>  &mdash; <i>Sign in</i><br><a href="#emp-002">EMP-002</a>  &mdash; <i>Select venue &amp; role</i><br><a href="#emp-003">EMP-003</a>  &mdash; <i>Home — on duty</i></div>
           
-          
+          <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formEnrolMfaMethod &middot; <i>Add a sign-in method</i> &middot; <b>Add method</b> &middot; Cancel <span class="dis">discards kind · target</span></div><div class="ov"><b>modal</b> formVerifyMfaEnrolment &middot; <i>Verify the new method</i> &middot; <b>Verify</b> &middot; Cancel <span class="dis">discards code</span></div><div class="ov"><b>confirmDialog</b> confirmRemoveMfaMethod &middot; <i>Remove this method</i> &middot; <b>Remove method</b> &middot; Keep it</div></div>
         </div>
       </div>
       <div id="emp-043" class="scr">
@@ -1546,7 +1546,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           <div><b>OPERATIONS</b> &middot; getTableMap · listTableReservations · listFnbOrders</div>
           <div><b>STATES</b> &middot; <span class="warn">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess · offline</span></div>
           <div><b>ARRIVES WITH</b> &middot; venueId&larr;session, outletId&larr;EMP-003</div>
-          <div><b>GOES TO</b> &middot; <a href="#emp-003">EMP-003</a>  &mdash; <i>Home — on duty</i></div>
+          <div><b>GOES TO</b> &middot; nothing declared</div>
           
           
         </div>
@@ -1576,7 +1576,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           <div><b>OPERATIONS</b> &middot; getTableMap · setTableLayout</div>
           <div><b>STATES</b> &middot; <span class="warn">loading · error · emptyFirstRun · emptyNoAccess · offline</span></div>
           <div><b>ARRIVES WITH</b> &middot; venueId&larr;session, outletId&larr;EMP-003</div>
-          <div><b>GOES TO</b> &middot; <a href="#emp-003">EMP-003</a>  &mdash; <i>Home — on duty</i></div>
+          <div><b>GOES TO</b> &middot; nothing declared</div>
           
           <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formSetTableLayout &middot; <i>Save table layout</i> &middot; <b>Save table layout</b> &middot; Cancel <span class="dis">discards tables</span></div></div>
         </div>
@@ -1606,7 +1606,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           <div><b>OPERATIONS</b> &middot; setTableLayout</div>
           <div><b>STATES</b> &middot; <span class="warn">loading · error · emptyFirstRun · emptyNoAccess · offline</span></div>
           <div><b>ARRIVES WITH</b> &middot; venueId&larr;session, outletId&larr;EMP-003</div>
-          <div><b>GOES TO</b> &middot; <a href="#emp-003">EMP-003</a>  &mdash; <i>Home — on duty</i></div>
+          <div><b>GOES TO</b> &middot; nothing declared</div>
           
           
         </div>
@@ -1636,7 +1636,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           <div><b>OPERATIONS</b> &middot; listTableReservations</div>
           <div><b>STATES</b> &middot; <span class="warn">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess · offline</span></div>
           <div><b>ARRIVES WITH</b> &middot; venueId&larr;session</div>
-          <div><b>GOES TO</b> &middot; <a href="#emp-003">EMP-003</a>  &mdash; <i>Home — on duty</i></div>
+          <div><b>GOES TO</b> &middot; nothing declared</div>
           
           
         </div>
@@ -1666,7 +1666,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           <div><b>OPERATIONS</b> &middot; createTableReservation · matchGuest</div>
           <div><b>STATES</b> &middot; <span class="warn">loading · error · emptyFirstRun · emptyNoAccess · offline</span></div>
           <div><b>ARRIVES WITH</b> &middot; venueId&larr;session</div>
-          <div><b>GOES TO</b> &middot; <a href="#emp-003">EMP-003</a>  &mdash; <i>Home — on duty</i></div>
+          <div><b>GOES TO</b> &middot; nothing declared</div>
           
           <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formMatchGuest &middot; <i>Find matches for guest</i> &middot; <b>Find matches for guest</b> &middot; Cancel <span class="dis">discards name · phone · email</span></div></div>
         </div>
@@ -1693,12 +1693,12 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; joinRestaurantWaitlist</div>
+          <div><b>OPERATIONS</b> &middot; joinRestaurantWaitlist · leaveRestaurantWaitlist</div>
           <div><b>STATES</b> &middot; <span class="warn">loading · error · emptyFirstRun · emptyNoAccess · offline</span></div>
-          <div><b>ARRIVES WITH</b> &middot; venueId&larr;session</div>
-          <div><b>GOES TO</b> &middot; <a href="#emp-003">EMP-003</a>  &mdash; <i>Home — on duty</i></div>
+          <div><b>ARRIVES WITH</b> &middot; venueId&larr;session, entryId&larr;navigation</div>
+          <div><b>GOES TO</b> &middot; nothing declared</div>
           
-          
+          <div><b>OVERLAYS</b><div class="ov"><b>confirmDialog</b> confirmLeaveRestaurantWaitlist &middot; <i>Leave waitlist</i> &middot; <b>Take them off the list</b> <span class="car">entryId</span> &middot; Keep them <span class="dis">discards note</span></div></div>
         </div>
       </div>
       <div id="emp-057" class="scr">
@@ -1726,7 +1726,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           <div><b>OPERATIONS</b> &middot; getGuestProfile · listOrders · matchGuest · mergeGuests</div>
           <div><b>STATES</b> &middot; <span class="warn">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess · offline</span></div>
           <div><b>ARRIVES WITH</b> &middot; venueId&larr;session, subjectId&larr;EMP-003</div>
-          <div><b>GOES TO</b> &middot; <a href="#emp-003">EMP-003</a>  &mdash; <i>Home — on duty</i></div>
+          <div><b>GOES TO</b> &middot; nothing declared</div>
           
           <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formMatchGuest &middot; <i>Find matches for guest</i> &middot; <b>Find matches for guest</b> &middot; Cancel <span class="dis">discards name · phone · email</span></div><div class="ov"><b>confirmDialog</b> confirmMergeGuests &middot; <i>Merge guests</i></div></div>
         </div>
@@ -1758,7 +1758,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           <div><b>ARRIVES WITH</b> &middot; venueId&larr;session, visitId&larr;EMP-003, reservationId&larr;deepLink</div>
           <div><b>GOES TO</b> &middot; <a href="#emp-059">EMP-059</a>  &mdash; <i>Food is ordered with courses</i> <span class="car">visitId</span><br><a href="#emp-060">EMP-060</a>  &mdash; <i>Reservation &amp; Table Performance</i> <span class="car">outletId</span></div>
           
-          <div><b>OVERLAYS</b><div class="ov"><b>confirmDialog</b> confirmMergeTableVisits &middot; <i>Merge table visits</i></div><div class="ov"><b>modal</b> formUpdateTableVisit &middot; <i>Save table visit</i> &middot; <b>Save table visit</b> &middot; Cancel <span class="dis">discards recordedAt · covers · tableId · serverPrincipalId · note</span></div><div class="ov"><b>modal</b> formTransferTableVisit &middot; <i>Transfer table visit</i> &middot; <b>Transfer table visit</b> &middot; Cancel <span class="dis">discards toPrincipalId · reason · recordedAt</span></div><div class="ov"><b>modal</b> formSeatTableReservation &middot; <i>Seat table reservation</i> &middot; <b>Seat table reservation</b> &middot; Cancel <span class="dis">discards tableIds · recordedAt · actualPartySize</span></div><div class="ov"><b>modal</b> formSetServiceStage &middot; <i>Save service stage</i> &middot; <b>Save service stage</b> &middot; Cancel <span class="dis">discards recordedAt · stage</span></div><div class="ov"><b>modal</b> formMoveTableVisit &middot; <i>Move table visit</i> &middot; <b>Move table visit</b> &middot; Cancel <span class="dis">discards toTableId · recordedAt · reason</span></div><div class="ov"><b>modal</b> formReassignServer &middot; <i>Reassign server</i> &middot; <b>Reassign server</b> &middot; Cancel <span class="dis">discards recordedAt · serverPrincipalId · splitGratuity</span></div><div class="ov"><b>modal</b> formNotifyServer &middot; <i>Notify server</i> &middot; <b>Notify server</b> &middot; Cancel <span class="dis">discards reason</span></div><div class="ov"><b>modal</b> formCreateFnbOrder &middot; <i>Create F&amp;B order</i> &middot; <b>Create F&amp;B order</b> &middot; Cancel <span class="dis">discards id · outletId · serviceMode · lines · recordedAt · tableVisitId</span></div><div class="ov"><b>modal</b> formFireCourse &middot; <i>Fire course</i> &middot; <b>Fire course</b> &middot; Cancel <span class="dis">discards recordedAt · course · fireAt</span></div><div class="ov"><b>modal</b> formHoldCourse &middot; <i>Hold course</i> &middot; <b>Hold course</b> &middot; Cancel <span class="dis">discards recordedAt · course · reason</span></div><div class="ov"><b>modal</b> formSetTableCombinations &middot; <i>Save table combinations</i> &middot; <b>Save table combinations</b> &middot; Cancel <span class="dis">discards combinations</span></div><div class="ov"><b>modal</b> formJoinRestaurantWaitlist &middot; <i>Join restaurant waitlist</i> &middot; <b>Join restaurant waitlist</b> &middot; Cancel <span class="dis">discards id · outletId · partySize · status · recordedAt · subjectId · quotedWaitMinutes · seatingPreference · notifiedAt · syncedAt · holdExpiresAt</span></div><div class="ov"><b>modal</b> formNotifyWaitlistParty &middot; <i>Notify waitlist party</i> &middot; <b>Notify waitlist party</b> &middot; Cancel <span class="dis">discards channel · holdMinutes</span></div></div>
+          <div><b>OVERLAYS</b><div class="ov"><b>confirmDialog</b> confirmMergeTableVisits &middot; <i>Merge table visits</i></div><div class="ov"><b>modal</b> formUpdateTableVisit &middot; <i>Save table visit</i> &middot; <b>Save table visit</b> &middot; Cancel <span class="dis">discards recordedAt · covers · tableId · serverPrincipalId · note</span></div><div class="ov"><b>modal</b> formTransferTableVisit &middot; <i>Transfer table visit</i> &middot; <b>Transfer table visit</b> &middot; Cancel <span class="dis">discards toPrincipalId · reason · recordedAt · note</span></div><div class="ov"><b>modal</b> formSeatTableReservation &middot; <i>Seat table reservation</i> &middot; <b>Seat table reservation</b> &middot; Cancel <span class="dis">discards tableIds · recordedAt · actualPartySize</span></div><div class="ov"><b>modal</b> formSetServiceStage &middot; <i>Save service stage</i> &middot; <b>Save service stage</b> &middot; Cancel <span class="dis">discards recordedAt · stage</span></div><div class="ov"><b>modal</b> formMoveTableVisit &middot; <i>Move table visit</i> &middot; <b>Move table visit</b> &middot; Cancel <span class="dis">discards toTableId · recordedAt · reason · note</span></div><div class="ov"><b>modal</b> formReassignServer &middot; <i>Reassign server</i> &middot; <b>Reassign server</b> &middot; Cancel <span class="dis">discards recordedAt · serverPrincipalId · splitGratuity</span></div><div class="ov"><b>modal</b> formNotifyServer &middot; <i>Notify server</i> &middot; <b>Notify server</b> &middot; Cancel <span class="dis">discards reason</span></div><div class="ov"><b>modal</b> formCreateFnbOrder &middot; <i>Create F&amp;B order</i> &middot; <b>Create F&amp;B order</b> &middot; Cancel <span class="dis">discards id · outletId · serviceMode · lines · recordedAt · tableVisitId</span></div><div class="ov"><b>modal</b> formFireCourse &middot; <i>Fire course</i> &middot; <b>Fire course</b> &middot; Cancel <span class="dis">discards recordedAt · course · fireAt</span></div><div class="ov"><b>modal</b> formHoldCourse &middot; <i>Hold course</i> &middot; <b>Hold course</b> &middot; Cancel <span class="dis">discards recordedAt · course · reason · note</span></div><div class="ov"><b>modal</b> formSetTableCombinations &middot; <i>Save table combinations</i> &middot; <b>Save table combinations</b> &middot; Cancel <span class="dis">discards combinations</span></div><div class="ov"><b>modal</b> formJoinRestaurantWaitlist &middot; <i>Join restaurant waitlist</i> &middot; <b>Join restaurant waitlist</b> &middot; Cancel <span class="dis">discards id · outletId · partySize · status · recordedAt · subjectId · quotedWaitMinutes · seatingPreference · notifiedAt · syncedAt · holdExpiresAt</span></div><div class="ov"><b>modal</b> formNotifyWaitlistParty &middot; <i>Notify waitlist party</i> &middot; <b>Notify waitlist party</b> &middot; Cancel <span class="dis">discards channel · holdMinutes</span></div></div>
         </div>
       </div>
       <div id="emp-059" class="scr">
@@ -1816,7 +1816,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           <div><b>OPERATIONS</b> &middot; listTableReservations · getTableMap</div>
           <div><b>STATES</b> &middot; <span class="warn">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess · offline</span></div>
           <div><b>ARRIVES WITH</b> &middot; venueId&larr;session, outletId&larr;EMP-003</div>
-          <div><b>GOES TO</b> &middot; <a href="#emp-003">EMP-003</a>  &mdash; <i>Home — on duty</i><br><a href="#emp-061">EMP-061</a>  &mdash; <i>Retail Inventory Command Center</i></div>
+          <div><b>GOES TO</b> &middot; <a href="#emp-061">EMP-061</a>  &mdash; <i>Retail Inventory Command Center</i></div>
           
           
         </div>
@@ -1846,7 +1846,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           <div><b>OPERATIONS</b> &middot; getStockPositions · listStockMovements</div>
           <div><b>STATES</b> &middot; <span class="warn">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess · offline</span></div>
           <div><b>ARRIVES WITH</b> &middot; venueId&larr;session</div>
-          <div><b>GOES TO</b> &middot; <a href="#emp-003">EMP-003</a>  &mdash; <i>Home — on duty</i></div>
+          <div><b>GOES TO</b> &middot; nothing declared</div>
           
           
         </div>
@@ -1878,7 +1878,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           <div><b>ARRIVES WITH</b> &middot; venueId&larr;session, itemId&larr;EMP-003</div>
           <div><b>GOES TO</b> &middot; <a href="#emp-067">EMP-067</a>  &mdash; <i>They read the unit and record the temperatur</i></div>
           
-          <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formSetItemAvailability &middot; <i>Save item availability</i> &middot; <b>Save item availability</b> &middot; Cancel <span class="dis">discards isAvailable · recordedAt · reason · restoreAt</span></div><div class="ov"><b>modal</b> formLogTemperature &middot; <i>Log temperature</i> &middot; <b>Log temperature</b> &middot; Cancel <span class="dis">discards id · checkPointId · recordedAt · valueCelsius · outcome · checkPointKind · recordedByPrincipalId · minCelsius · maxCelsius · deviceReported · correctiveActionId</span></div></div>
+          <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formSetItemAvailability &middot; <i>Save item availability</i> &middot; <b>Save item availability</b> &middot; Cancel <span class="dis">discards isAvailable · recordedAt · reason · restoreAt · note</span></div><div class="ov"><b>modal</b> formLogTemperature &middot; <i>Log temperature</i> &middot; <b>Log temperature</b> &middot; Cancel <span class="dis">discards id · checkPointId · recordedAt · valueCelsius · outcome · checkPointKind · recordedByPrincipalId · minCelsius · maxCelsius · deviceReported · correctiveActionId</span></div></div>
         </div>
       </div>
       <div id="emp-063" class="scr">
@@ -1906,7 +1906,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           <div><b>OPERATIONS</b> &middot; createRequisition · listRequisitions</div>
           <div><b>STATES</b> &middot; <span class="warn">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess · offline</span></div>
           <div><b>ARRIVES WITH</b> &middot; venueId&larr;session</div>
-          <div><b>GOES TO</b> &middot; <a href="#emp-003">EMP-003</a>  &mdash; <i>Home — on duty</i></div>
+          <div><b>GOES TO</b> &middot; nothing declared</div>
           
           <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formCreateRequisition &middot; <i>Create requisition</i> &middot; <b>Create requisition</b> &middot; Cancel <span class="dis">discards id · venueId · lines · requiredBy · departmentId · costCenterId · justification</span></div></div>
         </div>
@@ -1936,7 +1936,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           <div><b>OPERATIONS</b> &middot; createStockTransfer · listStockLocations</div>
           <div><b>STATES</b> &middot; <span class="warn">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess · offline</span></div>
           <div><b>ARRIVES WITH</b> &middot; venueId&larr;session</div>
-          <div><b>GOES TO</b> &middot; <a href="#emp-003">EMP-003</a>  &mdash; <i>Home — on duty</i></div>
+          <div><b>GOES TO</b> &middot; nothing declared</div>
           
           <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formCreateStockTransfer &middot; <i>Create stock transfer</i> &middot; <b>Create stock transfer</b> &middot; Cancel <span class="dis">discards id · fromLocationId · toLocationId · lines · recordedAt · note</span></div></div>
         </div>
@@ -1966,7 +1966,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           <div><b>OPERATIONS</b> &middot; createGoodsReceipt · rejectReceivedGoods · logColdChain · getStockTransfer</div>
           <div><b>STATES</b> &middot; <span class="warn">loading · error · emptyFirstRun · emptyNoAccess · offline</span></div>
           <div><b>ARRIVES WITH</b> &middot; venueId&larr;session, receiptId&larr;EMP-003, transferId&larr;deepLink</div>
-          <div><b>GOES TO</b> &middot; <a href="#emp-003">EMP-003</a>  &mdash; <i>Home — on duty</i></div>
+          <div><b>GOES TO</b> &middot; nothing declared</div>
           
           <div><b>OVERLAYS</b><div class="ov"><b>confirmDialog</b> confirmRejectReceivedGoods &middot; <i>Reject received goods</i></div><div class="ov"><b>modal</b> formCreateGoodsReceipt &middot; <i>Create goods receipt</i> &middot; <b>Create goods receipt</b> &middot; Cancel <span class="dis">discards id · purchaseOrderId · locationId · lines · recordedAt · deliveryNoteReference</span></div><div class="ov"><b>modal</b> formLogColdChain &middot; <i>Log cold chain</i> &middot; <b>Log cold chain</b> &middot; Cancel <span class="dis">discards id · recordedAt · valueCelsius · decision · goodsReceiptId · transferId · thresholdCelsius · correctiveActionId · supplierClaimRaised</span></div></div>
         </div>
@@ -1988,7 +1988,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
             <div class="strip">offline capable · works from the local journal</div>
             <div class="canvas">
               <div class="kpis"><div class="kpi"><b>Total</b><span>1,248</span></div><div class="kpi"><b>Active</b><span>978</span></div><div class="kpi"><b>Attention</b><span>142</span></div><div class="kpi"><b>Offline</b><span>12</span></div></div>
-              <div class="two"><div class="grow"><div class="panel"><b>The count variance</b><div class="rows"><div class="bar"><i style="width:64%"></i></div></div></div><div class="panel"><b>Search stock count</b><div class="chip">Search stock count</div></div><div class="panel"><span class="kind">cardList</span><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div><span class="why">**Cards rather than a table.** One thumb, arm’s length, and a person who is walking.</span></div></div><div class="side"><div class="panel"><b>Confirm</b><div class="chip cta">Confirm</div></div></div></div>
+              <div class="two"><div class="grow"><div class="panel"><b>The count variance</b><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">**Shown only after the count is submitted.** While the count is `open` or `counting` the screen shows no expected quantity and no variance, and `getCountVariance` answers</span></div><div class="panel"><b>Search stock count</b><div class="chip">Search stock count</div></div><div class="panel"><span class="kind">cardList</span><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div><span class="why">**Cards rather than a table.** One thumb, arm’s length, and a person who is walking. **The lines arrive pre-filled from on-hand stock** — one card per item at the locatio</span></div></div><div class="side"><div class="panel"><b>Confirm</b><div class="chip cta">Confirm</div></div></div></div>
             </div>
           </div>
         </div>
@@ -1996,7 +1996,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           <div><b>OPERATIONS</b> &middot; startStockCount · postStockCount · getCountVariance · enterCountLine +2</div>
           <div><b>STATES</b> &middot; <span class="warn">loading · error · emptyFirstRun · emptyNoAccess · offline</span></div>
           <div><b>ARRIVES WITH</b> &middot; venueId&larr;session, countId&larr;EMP-003</div>
-          <div><b>GOES TO</b> &middot; <a href="#emp-003">EMP-003</a>  &mdash; <i>Home — on duty</i></div>
+          <div><b>GOES TO</b> &middot; nothing declared</div>
           
           <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formStartStockCount &middot; <i>Start stock count</i> &middot; <b>Start stock count</b> &middot; Cancel <span class="dis">discards id · locationId · kind · categoryIds · isBlind</span></div><div class="ov"><b>modal</b> formPostStockCount &middot; <i>Post stock count</i> &middot; <b>Post stock count</b> &middot; Cancel <span class="dis">discards note</span></div><div class="ov"><b>modal</b> formEnterCountLine &middot; <i>Enter count line</i> &middot; <b>Enter count line</b> &middot; Cancel <span class="dis">discards recordedAt · itemId · countedQuantity · locationId · uom · batchId · note</span></div><div class="ov"><b>modal</b> formRequestRecount &middot; <i>Request recount</i> &middot; <b>Request recount</b> &middot; Cancel <span class="dis">discards lineIds · reason</span></div><div class="ov"><b>modal</b> formSetDailyCount &middot; <i>Save daily count</i> &middot; <b>Save daily count</b> &middot; Cancel <span class="dis">discards itemIds · locationId · dueBy · postsAdjustment</span></div></div>
         </div>
@@ -2026,7 +2026,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           <div><b>OPERATIONS</b> &middot; recordWaste · createStockMovement · logTemperature · signCorrectiveAction</div>
           <div><b>STATES</b> &middot; <span class="warn">loading · error · emptyFirstRun · emptyNoAccess · offline</span></div>
           <div><b>ARRIVES WITH</b> &middot; venueId&larr;session, outletId&larr;EMP-003, actionId&larr;deepLink</div>
-          <div><b>GOES TO</b> &middot; <a href="#emp-003">EMP-003</a>  &mdash; <i>Home — on duty</i></div>
+          <div><b>GOES TO</b> &middot; nothing declared</div>
           
           <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formCreateStockMovement &middot; <i>Create stock movement</i> &middot; <b>Create stock movement</b> &middot; Cancel <span class="dis">discards id · itemId · locationId · kind · quantity · recordedAt · unit · reason · costCenterId</span></div><div class="ov"><b>modal</b> formLogTemperature &middot; <i>Log temperature</i> &middot; <b>Log temperature</b> &middot; Cancel <span class="dis">discards id · checkPointId · recordedAt · valueCelsius · outcome · checkPointKind · recordedByPrincipalId · minCelsius · maxCelsius · deviceReported · correctiveActionId</span></div><div class="ov"><b>modal</b> formSignCorrectiveAction &middot; <i>Sign corrective action</i> &middot; <b>Sign corrective action</b> &middot; Cancel <span class="dis">discards actionTaken · disposal</span></div></div>
         </div>
@@ -2056,7 +2056,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           <div><b>OPERATIONS</b> &middot; getStockPositions · reserveMerchandise</div>
           <div><b>STATES</b> &middot; <span class="warn">loading · error · emptyFirstRun · emptyNoAccess · offline</span></div>
           <div><b>ARRIVES WITH</b> &middot; venueId&larr;session, outletId&larr;EMP-003</div>
-          <div><b>GOES TO</b> &middot; <a href="#emp-003">EMP-003</a>  &mdash; <i>Home — on duty</i></div>
+          <div><b>GOES TO</b> &middot; nothing declared</div>
           
           <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formReserveMerchandise &middot; <i>Reserve merchandise</i> &middot; <b>Reserve merchandise</b> &middot; Cancel <span class="dis">discards id · lines · expiresAt · subjectId · collectionNote</span></div></div>
         </div>
@@ -2086,7 +2086,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           <div><b>OPERATIONS</b> &middot; listSerialisedItems · lookupMerchandise</div>
           <div><b>STATES</b> &middot; <span class="warn">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess · offline</span></div>
           <div><b>ARRIVES WITH</b> &middot; venueId&larr;session</div>
-          <div><b>GOES TO</b> &middot; <a href="#emp-003">EMP-003</a>  &mdash; <i>Home — on duty</i></div>
+          <div><b>GOES TO</b> &middot; nothing declared</div>
           
           
         </div>
@@ -2116,7 +2116,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           <div><b>OPERATIONS</b> &middot; listAlerts · acknowledgeAlert · createRequisition</div>
           <div><b>STATES</b> &middot; <span class="warn">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess · offline</span></div>
           <div><b>ARRIVES WITH</b> &middot; venueId&larr;session, alertId&larr;EMP-003</div>
-          <div><b>GOES TO</b> &middot; <a href="#emp-003">EMP-003</a>  &mdash; <i>Home — on duty</i></div>
+          <div><b>GOES TO</b> &middot; nothing declared</div>
           
           <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formAcknowledgeAlert &middot; <i>Acknowledge alert</i> &middot; <b>Acknowledge alert</b> &middot; Cancel <span class="dis">discards note</span></div><div class="ov"><b>modal</b> formCreateRequisition &middot; <i>Create requisition</i> &middot; <b>Create requisition</b> &middot; Cancel <span class="dis">discards id · venueId · lines · requiredBy · departmentId · costCenterId · justification</span></div></div>
         </div>

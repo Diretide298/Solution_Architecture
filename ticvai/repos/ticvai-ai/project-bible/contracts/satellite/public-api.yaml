@@ -444,7 +444,11 @@ paths:
         - "P08 BO-1077 Mapping & Transformation"
         - "P08 BO-692 Accreditation Webhook Management"
         - "P14 DEV-005 Webhooks"
-      summary: What this client is subscribed to
+      summary: The tenant's webhook subscriptions, filterable by API client
+      description: >
+        **Per tenant, filterable by API client** (decided 28 September, audit R214 (4)). Returns every
+        webhook subscription in the tenant; `clientId` narrows it to what one API client is subscribed
+        to. A partner caller sees only its own client's subscriptions whatever it sends.
       tags: [publicApi]
       x-ticvai-permission: DEVELOPER_VIEW
       x-ticvai-audience: [staff, partner]
@@ -452,6 +456,12 @@ paths:
       x-ticvai-read-routing: replica
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
+      parameters:
+        - name: clientId
+          in: query
+          required: false
+          description: Only this API client's subscriptions (audit R214 (4)).
+          schema: { type: string, format: uuid }
       responses:
         '200':
           description: Subscriptions

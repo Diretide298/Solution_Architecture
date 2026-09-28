@@ -42,10 +42,10 @@ servicesCalled:
   operationCalls: 22
 - service: RetailService
   operationCalls: 18
+- service: IdentityService
+  operationCalls: 10
 - service: ReportingService
   operationCalls: 10
-- service: IdentityService
-  operationCalls: 8
 - service: VenueOpsService
   operationCalls: 6
 - service: MarketingService
@@ -73,22 +73,25 @@ screens:
   density: touchLarge
   operations:
   - changeOwnCredential
+  - createMfaChallenge
   - forceLogout
   - getCurrentSession
   - listActiveSessions
   - login
   - selectRole
+  - verifyMfaChallenge
   states:
   - denied
   - emptyFirstRun
   - emptyNoAccess
   - error
   - loading
+  - mfaRequired
   - offline
   offlineState: true
-  entryParams: []
+  entryParams:
+  - challengeId<-navigation
   goesTo:
-  - KIT-002
   - POS-001
   - POS-025
   boardFrames: null
@@ -223,7 +226,6 @@ screens:
   - promotionId<-deepLink
   goesTo:
   - BO-045
-  - POS-001
   - POS-003
   - POS-004
   - POS-005
@@ -280,7 +282,6 @@ screens:
   - inventoryHoldId<-deepLink
   - productId<-POS-002
   goesTo:
-  - POS-001
   - POS-002
   - POS-004
   - POS-005
@@ -320,7 +321,6 @@ screens:
   - holdId<-deepLink
   - performanceId<-deepLink
   goesTo:
-  - POS-001
   - POS-002
   - POS-003
   - POS-005
@@ -363,7 +363,6 @@ screens:
   - POS-001
   - POS-002
   - POS-010
-  - POS-021
   - POS-022
   - POS-023
   boardFrames:
@@ -410,7 +409,6 @@ screens:
   entryParams:
   - orderId<-POS-002
   goesTo:
-  - POS-001
   - POS-002
   - POS-003
   - POS-004
@@ -443,7 +441,6 @@ screens:
   - resumeShift
   - suspendShift
   states:
-  - awaitingApproval
   - denied
   - emptyFirstRun
   - emptyNoAccess
@@ -451,6 +448,7 @@ screens:
   - error
   - loading
   - offline
+  - pendingVariance
   offlineState: true
   entryParams:
   - shiftId<-session
@@ -458,7 +456,6 @@ screens:
   - saleId<-deepLink
   goesTo:
   - POS-001
-  - POS-002
   - POS-008
   - POS-009
   boardFrames:
@@ -495,8 +492,6 @@ screens:
   - conversationId<-deepLink
   - reportId<-deepLink
   goesTo:
-  - POS-001
-  - POS-002
   - POS-009
   boardFrames: null
   wireframe: wireframes/P04 Venue POS.dc.html#pos-008
@@ -537,7 +532,6 @@ screens:
   - shiftId<-session
   goesTo:
   - POS-001
-  - POS-002
   - POS-007
   boardFrames:
   - POS Board 3.dc.html#pos-3a
@@ -569,7 +563,6 @@ screens:
   - cartId<-session
   - orderId<-deepLink
   goesTo:
-  - POS-001
   - POS-002
   - POS-003
   - POS-004
@@ -925,6 +918,7 @@ screens:
   goesTo:
   - POS-002
   - POS-005
+  - POS-022
   boardFrames: null
   wireframe: wireframes/P04 Venue POS.dc.html#pos-021
   inFlows:
@@ -1019,7 +1013,6 @@ screens:
   - itemId<-deepLink
   goesTo:
   - POS-002
-  - POS-005
   boardFrames: null
   wireframe: wireframes/P04 Venue POS.dc.html#pos-024
   inFlows: null

@@ -164,7 +164,7 @@ screens:
   inFlows:
   - F07 Guest buys at a kiosk
 - screen: KSK-005
-  name: Choose a session
+  name: Choose a performance
   module: Sell
   requiresModule: ticketing
   wave: 2

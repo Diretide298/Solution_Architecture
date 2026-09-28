@@ -76,6 +76,7 @@ operations:
   reads:
   - cache:idempotency
   - ledger.fiscal_period
+  - ledger.fiscal_period_event
   writes:
   - cache:idempotency
   - ledger.fiscal_period

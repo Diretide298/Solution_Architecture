@@ -139,6 +139,8 @@ screens:
     - to: WEB-041
       trigger: Parking – Reserve & Pay
       provenance: structural — WEB-001 is P01's home screen and its exits are its launcher
+      carries:
+      - entitlementId
     - to: WEB-042
       trigger: Retail & Shop and Drop
       provenance: structural — WEB-001 is P01's home screen and its exits are its launcher
@@ -153,6 +155,9 @@ screens:
       provenance: structural — WEB-001 is P01's home screen and its exits are its launcher
     - to: WEB-046
       trigger: In-Venue Notifications
+      precondition: 'a later release: the in-venue notification feed is deferred and not shown in the
+        first release; queue calls and order updates show on the queue and order screens, which poll (decided
+        28 September, audit R242)'
       provenance: structural — WEB-001 is P01's home screen and its exits are its launcher
     - to: WEB-008
       trigger: Add-ons & Upsell
@@ -172,8 +177,11 @@ screens:
         none of them, so the edge carries nothing and WEB-017 opens cold
     - to: WEB-018
       trigger: My Tickets
+      carries:
+      - entitlementId
+      - orderId
       provenance: derived — WEB-018 declares entryState.params entitlementId, orderId and WEB-001 holds
-        none of them, so the edge carries nothing and WEB-018 opens cold
+        entitlementId, orderId, so an edge into it carries them
     - to: WEB-019
       trigger: Order History
       provenance: derived — WEB-019 declares entryState.params orderId and WEB-001 holds none of them,
@@ -232,6 +240,10 @@ screens:
       provenance: flow F01 step 1→2
       carries:
       - productId
+  notes: '**Venue selection added 28 September** (decided 28 September, audit R267): a venue picker on
+    first open, remembered on the device, **Change venue** in the header, and a visit-day suggestion from
+    the guest''s ticket. The options come from `getTenantAppStatus.venues`, the tenant''s active venues,
+    public and cacheable.'
   density: compact
   pattern: listDetail
   patternReason: '`listProducts` reads the population and `getTenantAppStatus` reads one of them — list,
@@ -243,11 +255,37 @@ screens:
     - name: contentBody
       slot: collection
       components:
-      - kind: textField
-        label: Venue id
-        operation: listProducts
-        notes: Sends `?venueId=` to `listProducts`.
-        provenance: contract catalogue.yaml GET /products
+      - kind: selectField
+        label: Your venue
+        bindsTo: TenantAppStatus.venues
+        operation: getTenantAppStatus
+        notes: '**The guest picks a venue on first open** (decided 28 September, audit R267): shown before
+          anything else when the device has no venue remembered, and remembered on the device after that.
+          The chosen `venueId` is what every screen that declares `venueId` `from: session` reads, and
+          it is sent as `?venueId=` to `listProducts`. The options are `getTenantAppStatus.venues` (venue
+          id, name, city, today''s opening hours), the tenant''s active venues, returned without a session.'
+        provenance: contract white-label.yaml GET /tenant-config/status (TenantAppStatus.venues, audit
+          R267)
+      - kind: banner
+        label: Visiting today?
+        bindsTo: Entitlement
+        columns:
+        - Entitlement.venueId
+        - Entitlement.validFrom
+        - Entitlement.validTo
+        operation: listMyEntitlements
+        notes: '**On a visit day the app suggests the ticket''s venue** (decided 28 September, audit R267):
+          for a signed-in guest, an entitlement from `listMyEntitlements` (`state=upcoming`) valid today
+          at a venue other than the chosen one offers **Switch to that venue**; the guest decides, the
+          app never switches by itself.'
+        provenance: contract access.yaml GET /guests/me/entitlements
+      - kind: banner
+        label: Sold out or closed today
+        bindsTo: TenantAppStatus.availabilityMessage
+        operation: getTenantAppStatus
+        notes: From `getTenantAppStatus.availability` (`open`, `soldOut`, `closed`) and `availabilityMessage`
+          (decided 28 September, audit R073 (f)); nothing shows while it is `open`.
+        provenance: contract white-label.yaml GET /tenant-config/status
       - kind: textField
         label: Kind
         operation: listProducts
@@ -360,6 +398,11 @@ screens:
         label: Sign in
         notes: Becomes an account menu once authenticated
         provenance: carried from the previous definition
+      - kind: secondaryButton
+        label: Change venue
+        notes: Reopens the venue picker; the new choice replaces the remembered one on this device and
+          every venue-scoped screen reloads for it (decided 28 September, audit R267).
+        provenance: decided 28 September 2026, audit R267
   states:
     loading: The home landing list.
     error: Could not load. Names which read failed and leaves the home landing untouched.
@@ -389,7 +432,16 @@ screens:
     contract: catalogue
     purpose: List products
     trigger: onLoad
+  - operationId: listMyEntitlements
+    contract: access
+    purpose: The guest's upcoming tickets, so a visit day can suggest the ticket's venue (decided 28 September,
+      audit R267); only when signed in
+    trigger: onLoad
   entryState:
+    coldEntry: '**A cold arrival is the ordinary case.** **The venue comes from the device** (decided
+      28 September, audit R267): on first open the guest picks one, it is remembered on the device and
+      changeable from the header, and on a visit day the ticket''s venue is suggested. Every guest screen
+      that declares `venueId` `from: session` reads that remembered choice.'
     preloaded:
     - Product.id
     - Product.code
@@ -1136,7 +1188,7 @@ screens:
       - evaluateAt
     provenance: contract promotions.yaml POST /promotions/evaluate
 - id: WEB-006
-  name: Date & Session Selection
+  name: Date & Performance Selection
   module: Booking & Selection
   requiresModule: ticketing
   wave: 1
@@ -1353,7 +1405,7 @@ screens:
       provenance: derived — WEB-008 declares entryState.params bundleId and WEB-007 holds none of them,
         so the edge carries nothing and WEB-008 opens cold
     - to: WEB-006
-      trigger: Date & Session Selection
+      trigger: Date & Performance Selection
       carries:
       - performanceId
       provenance: derived — WEB-006 declares entryState.params cartId, performanceId and WEB-007 holds
@@ -1529,7 +1581,7 @@ screens:
       provenance: derived — WEB-007 declares entryState.params performanceId and WEB-008 holds none of
         them, so the edge carries nothing and WEB-007 opens cold
     - to: WEB-006
-      trigger: Date & Session Selection
+      trigger: Date & Performance Selection
       carries:
       - cartId
       - performanceId
@@ -1712,7 +1764,7 @@ screens:
       provenance: derived — WEB-007 declares entryState.params performanceId and WEB-009 holds none of
         them, so the edge carries nothing and WEB-007 opens cold
     - to: WEB-006
-      trigger: Date & Session Selection
+      trigger: Date & Performance Selection
       provenance: derived — WEB-006 declares entryState.params cartId, performanceId and WEB-009 holds
         none of them, so the edge carries nothing and WEB-006 opens cold
   notes: Withdrawn products stay in the list marked unavailable. A guest who saved something and finds
@@ -1871,8 +1923,8 @@ screens:
       provenance: flow F01 step 5→6, F02 step 3→4, F55 step 1→2
     - to: WEB-016
       trigger: Login / Register
-      provenance: derived — WEB-016 declares entryState.params challengeId, methodId, providerId and WEB-010
-        holds none of them, so the edge carries nothing and WEB-016 opens cold
+      provenance: derived — WEB-016 declares entryState.params  and WEB-010 holds none of them, so the
+        edge carries nothing and WEB-016 opens cold
     - to: WEB-030
       trigger: They transfer three tickets
       provenance: flow F55 step 3→4
@@ -1907,6 +1959,7 @@ screens:
         - Cart.taxTotal
         - Cart.total
         - Cart.appliedPromotionIds
+        - Cart.couponCodes
         - Cart.expiresAt
         - Cart.extensionsUsed
         - Cart.maxExtensions
@@ -1934,7 +1987,19 @@ screens:
         provenance: contract promotions.yaml GET /coupon-codes/{code}
       - kind: textField
         label: Promo code
-        provenance: carried from the previous definition
+        bindsTo: ApplyCartPromoCodeRequest.code
+        operation: applyCartPromoCode
+        notes: '**Applied to the cart at once** with `applyCartPromoCode` (POST /carts/{cartId}/promo-codes,
+          body `{code}`; decided 28 September, audit R073 (e)). The two refusals read differently: 422
+          `promoCodeInvalid` says the code does not exist, was voided or is used up; 422 `promoCodeNotApplicable`
+          says the code is real but nothing in this cart qualifies. A 410 `cartExpired` sends the guest
+          back to rebuild the cart. Accepted codes are listed from `Cart.couponCodes` and re-priced on
+          every read.'
+        provenance: contract orders.yaml POST /carts/{cartId}/promo-codes
+      - kind: secondaryButton
+        label: Apply code
+        operation: applyCartPromoCode
+        provenance: contract orders.yaml POST /carts/{cartId}/promo-codes
       - kind: banner
         bindsTo: PromotionEvaluation.rejected
         notes: When a code does not apply, say which condition failed. "Expired" and "already used" are
@@ -2086,6 +2151,13 @@ screens:
       Anything that spends money, holds capacity or changes the account waits for the connection, and
       its button says so rather than failing.'
   apis:
+  - operationId: applyCartPromoCode
+    contract: orders
+    purpose: Apply a promo code to the cart; refused 422 promoCodeInvalid or promoCodeNotApplicable, shown
+      as different messages (decided 28 September, audit R073 (e))
+    trigger: onAction
+    invalidates:
+    - getCart
   - operationId: getCart
     contract: orders
     purpose: The cart, priced and checked, right now
@@ -2583,13 +2655,17 @@ screens:
       carries:
       - orderId
   notes: 'The unknown outcome is the one to build for. A payment taken but never confirmed must offer
-    inquiry, not a retry — a retry double-charges and the guest finds out. **Card only, so tender currency
+    inquiry, not a retry — a retry double-charges and the guest finds out. **Card or wallet** (TenderKind
+    `card`, `wallet`; decided 28 September, audit R080 (a)), **both in base currency, so tender currency
     equals base currency.** A guest paying with a foreign card is converted by their own issuer at their
     own rate — that is not our conversion and is not recorded as one. The displayed comparison price (`WEB-035`)
     and the charged amount are different numbers and the screen says so before the guest commits. **Wired
     24 August from review**: getOrder. **The operations existed and this screen could not call them**
     — reviewers reported them as missing APIs, which is what an unreachable operation looks like from
-    a wireframe.'
+    a wireframe. **No ''is this you?'' at checkout** (decided 28 September, audit R120 (b)): a verified
+    contact that matches an existing profile attaches the order automatically inside `checkoutCart` (ADR-0045),
+    so `checkGuestCheckoutMatch` and `decideGuestCheckoutMatch` were removed from this screen; only unverified
+    matches go to staff review.'
   openQuestions:
   - Sandbox credentials for Stripe and Network International are outstanding. The recovery paths cannot
     be tested without them.
@@ -2645,14 +2721,6 @@ screens:
         operation: createPayment
         provenance: contract orders.yaml POST /payments
       - kind: secondaryButton
-        label: Check guest checkout match
-        operation: checkGuestCheckoutMatch
-        provenance: contract marketing-crm.yaml POST /guest-checkout/profile-match
-      - kind: secondaryButton
-        label: Decide guest checkout match
-        operation: decideGuestCheckoutMatch
-        provenance: contract marketing-crm.yaml POST /guest-checkout/profile-match/decision
-      - kind: secondaryButton
         label: Inquire payment status
         operation: inquirePaymentStatus
         provenance: contract orders.yaml POST /payments/{paymentId}/inquiry
@@ -2672,14 +2740,6 @@ screens:
     offline: '**Not available, and the offline banner says why.** A payment needs the gateway, and pretending
       otherwise takes money nobody can confirm. What was typed stays on screen so nothing is entered twice.'
   apis:
-  - operationId: checkGuestCheckoutMatch
-    contract: marketing-crm
-    purpose: Does this contact already have a profile here
-    trigger: onAction
-  - operationId: decideGuestCheckoutMatch
-    contract: marketing-crm
-    purpose: Use the existing profile or keep separate
-    trigger: onAction
   - operationId: transferOrderTickets
     contract: orders
     purpose: Transfer tickets to another guest
@@ -2716,37 +2776,6 @@ screens:
     — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
     to the ones that matter is work a person still owes this screen.
   overlays:
-  - id: formCheckGuestCheckoutMatch
-    component: modal
-    trigger: Check guest checkout match
-    body: '**Collects what `checkGuestCheckoutMatch` sends before it is called.** Required: `cartId`.
-      Optional: `email`, `mobile`. Dismissing sends nothing; the screen behind is unchanged.'
-    bindsTo: GuestCheckoutMatchRequest
-    confirm:
-      label: Check guest checkout match
-      operation: checkGuestCheckoutMatch
-    dismiss:
-      label: Cancel
-      discards:
-      - cartId
-      - email
-      - mobile
-    provenance: contract marketing-crm.yaml POST /guest-checkout/profile-match
-  - id: formDecideGuestCheckoutMatch
-    component: modal
-    trigger: Decide guest checkout match
-    body: '**Collects what `decideGuestCheckoutMatch` sends before it is called.** Required: `matchToken`,
-      `decision`. Dismissing sends nothing; the screen behind is unchanged.'
-    bindsTo: GuestMatchDecisionRequest
-    confirm:
-      label: Decide guest checkout match
-      operation: decideGuestCheckoutMatch
-    dismiss:
-      label: Cancel
-      discards:
-      - matchToken
-      - decision
-    provenance: contract marketing-crm.yaml POST /guest-checkout/profile-match/decision
   - id: formTransferOrderTickets
     component: modal
     trigger: Transfer order tickets
@@ -3221,8 +3250,9 @@ screens:
     trigger: onAction
   - operationId: getWaitingGuest
     contract: queue
-    purpose: Read a queue entry
-    trigger: onLoad
+    purpose: The guest's place and the call to come forward, read on entry and polled while the screen
+      is open; the queue call shows here, not in a notification feed (decided 28 September, audit R242)
+    trigger: onInterval
   - operationId: getWaitTimes
     contract: queue
     purpose: Wait times across a venue
@@ -3321,171 +3351,109 @@ screens:
     to select and its own logout** — `selectRole` is ADR-0002 staff authorisation and `getCurrentSession`
     is the staff session. `guestLogout` and `getGuestSession` are the equivalents and both already existed.
     **The screen was calling the staff identity surface because nothing checked that a guest platform
-    only calls guest operations.**'
+    only calls guest operations.** **Rebuilt 28 September as a guest sign-in form** (decided 28 September,
+    audit R167, R073 (a)): removed `login`, `startSsoAuthorization`, `completeSsoAuthorization`, `listSsoProviders`
+    and the six MFA operations (`createMfaChallenge`, `enrolMfaMethod`, `listMfaMethods`, `removeMfaMethod`,
+    `verifyMfaChallenge`, `verifyMfaEnrolment`) — guests have no enterprise SSO and no second factor at
+    sign-in. Password sign-in is `guestPasswordLogin`.'
   density: compact
-  pattern: listDetail
-  patternReason: '`listMfaMethods` reads the population and `getGuestSession` reads one of them — list,
-    select, act'
-  purpose: Get a guest into the app, fast, on a device that may be shared.
+  pattern: form
+  patternReason: '**A sign-in form, not a list.** Four ways in (a one-time code, a password, Apple or
+    Google, UAE Pass) and a way to register; `getGuestSession` is the one piece of context. Rebuilt 28
+    September: the screen had been generated as a list of MFA methods and SSO providers, neither of which
+    a guest has (decided 28 September, audit R167, R073 (a)).'
+  purpose: 'Get a guest into the site, fast, on a device that may be shared: a one-time code to the email
+    or mobile, a password, Apple or Google, or UAE Pass, or register a new account. **No enterprise SSO
+    and no second factor at sign-in for guests** (decided 28 September, audit R167).'
   layout:
-    template: split
+    template: form
     regions:
-    - name: contentBody
-      slot: collection
+    - name: signIn
+      slot: fields
       components:
-      - kind: dataTable
-        label: Every MFA method
-        bindsTo: MfaMethod
-        columns:
-        - MfaMethod.id
-        - MfaMethod.kind
-        - MfaMethod.label
-        - MfaMethod.maskedTarget
-        - MfaMethod.isActive
-        - MfaMethod.isPrimary
-        - MfaMethod.enrolledAt
-        - MfaMethod.lastUsedAt
-        operation: listMfaMethods
-        provenance: contract identity.yaml GET /auth/mfa/methods
-      - kind: dataTable
-        label: Every SSO provider
-        bindsTo: SsoProvider
-        columns:
-        - SsoProvider.id
-        - SsoProvider.displayName
-        - SsoProvider.protocol
-        - SsoProvider.iconAssetRef
-        - SsoProvider.isEnforced
-        - SsoProvider.scopePath
-        operation: listSsoProviders
-        provenance: contract identity.yaml GET /auth/sso/providers
-    - name: contextPanel
-      slot: selection
+      - kind: textField
+        label: Email or mobile number
+        operation: requestGuestOtp
+        notes: One field for both routes below; the same identifier goes to `requestGuestOtp` and to `guestPasswordLogin`.
+        provenance: contract identity.yaml POST /auth/guest/otp
+      - kind: primaryButton
+        label: Send me a code
+        operation: requestGuestOtp
+        provenance: contract identity.yaml POST /auth/guest/otp
+      - kind: textField
+        label: Code
+        operation: verifyGuestOtp
+        notes: Shown once a code has been sent; `verifyGuestOtp` returns the `GuestSession`.
+        provenance: contract identity.yaml POST /auth/guest/otp/verify
+      - kind: primaryButton
+        label: Sign in with the code
+        operation: verifyGuestOtp
+        provenance: contract identity.yaml POST /auth/guest/otp/verify
+      - kind: textField
+        label: Password
+        operation: guestPasswordLogin
+        notes: '**Password sign-in** (decided 28 September, audit R073 (a)): sends `identifier`, `password`
+          and the device''s `deviceId` to `guestPasswordLogin`, which returns the same `GuestSession`.
+          A wrong password, an unknown identifier and an account with no password are one answer (401)
+          and the screen shows one message for all of them, never which it was. Signing in here ends this
+          device''s previous guest session.'
+        provenance: contract identity.yaml POST /auth/guest/password
+      - kind: secondaryButton
+        label: Sign in with password
+        operation: guestPasswordLogin
+        provenance: contract identity.yaml POST /auth/guest/password
+      - kind: secondaryButton
+        label: Continue with Apple or Google
+        operation: guestSocialLogin
+        provenance: contract identity.yaml POST /auth/guest/social
+      - kind: secondaryButton
+        label: Continue with UAE Pass
+        operation: guestUaePassLogin
+        provenance: contract identity.yaml POST /auth/guest/uae-pass
+      - kind: secondaryButton
+        label: Create an account
+        operation: registerGuest
+        provenance: contract identity.yaml POST /auth/guest/register
+    - name: session
+      slot: context
       components:
       - kind: detailPanel
-        label: The selected MFA method
-        bindsTo: MfaMethod
-        columns:
-        - MfaMethod.id
-        - MfaMethod.kind
-        - MfaMethod.label
-        - MfaMethod.maskedTarget
-        - MfaMethod.isActive
-        - MfaMethod.isPrimary
-        - MfaMethod.enrolledAt
-        - MfaMethod.lastUsedAt
-        operation: listMfaMethods
-        provenance: contract identity.yaml GET /auth/mfa/methods
-      - kind: detailPanel
-        label: The guest session
+        label: Who is signed in on this device
         bindsTo: GuestSession
         columns:
         - GuestSession.subjectId
         - GuestSession.displayName
-        - GuestSession.tokens
         - GuestSession.isVerified
         - GuestSession.identityProviders
-        - GuestSession.guestLinkId
-        - GuestSession.homeCellName
         - GuestSession.preferredLanguage
         - GuestSession.expiresAt
         operation: getGuestSession
+        notes: Shown only when a guest session already exists on this device, with a way to sign out so
+          a shared device is handed over clean.
         provenance: contract identity.yaml GET /auth/guest/session
-    - name: actionBar
-      slot: rowActions
-      components:
-      - kind: primaryButton
-        label: Register guest
-        operation: registerGuest
-        provenance: contract identity.yaml POST /auth/guest/register
       - kind: secondaryButton
-        label: Complete SSO authorization
-        operation: completeSsoAuthorization
-        provenance: contract identity.yaml POST /auth/sso/{providerId}/callback
-      - kind: secondaryButton
-        label: Enrol MFA method
-        operation: enrolMfaMethod
-        provenance: contract identity.yaml POST /auth/mfa/methods
-      - kind: secondaryButton
-        label: Guest logout
+        label: Sign out
         operation: guestLogout
         provenance: contract identity.yaml DELETE /auth/guest/session
       - kind: secondaryButton
-        label: Guest social login
-        operation: guestSocialLogin
-        provenance: contract identity.yaml POST /auth/guest/social
-      - kind: secondaryButton
-        label: Guest uae pass login
-        operation: guestUaePassLogin
-        provenance: contract identity.yaml POST /auth/guest/uae-pass
-      - kind: secondaryButton
-        label: Link guest checkout
+        label: Link an order I placed as a guest
         operation: linkGuestCheckout
         provenance: contract identity.yaml POST /auth/guest/link-checkout
       - kind: secondaryButton
-        label: Login
-        operation: login
-        provenance: contract identity.yaml POST /auth/login
+        label: Keep my cart
+        operation: claimCart
+        notes: Called after sign-in when the guest arrived from the cart, so the anonymous cart becomes
+          theirs.
+        provenance: contract orders.yaml POST /carts/{cartId}/claim
       - kind: secondaryButton
         label: Refresh token
         operation: refreshToken
+        notes: Not a button the guest sees; the client rotates the access token before it expires.
         provenance: contract identity.yaml POST /auth/refresh
-      - kind: destructiveButton
-        label: Remove MFA method
-        operation: removeMfaMethod
-        provenance: contract identity.yaml DELETE /auth/mfa/methods/{methodId}
-      - kind: secondaryButton
-        label: Request guest OTP
-        operation: requestGuestOtp
-        provenance: contract identity.yaml POST /auth/guest/otp
-      - kind: secondaryButton
-        label: Start SSO authorization
-        operation: startSsoAuthorization
-        provenance: contract identity.yaml GET /auth/sso/{providerId}/authorize
-      - kind: secondaryButton
-        label: Verify guest OTP
-        operation: verifyGuestOtp
-        provenance: contract identity.yaml POST /auth/guest/otp/verify
-      - kind: secondaryButton
-        label: Verify MFA challenge
-        operation: verifyMfaChallenge
-        provenance: contract identity.yaml POST /auth/mfa/challenge/{challengeId}/verify
-      - kind: secondaryButton
-        label: Verify MFA enrolment
-        operation: verifyMfaEnrolment
-        provenance: contract identity.yaml POST /auth/mfa/methods/{methodId}
-      - kind: secondaryButton
-        label: Claim cart
-        operation: claimCart
-        provenance: contract orders.yaml POST /carts/{cartId}/claim
-      - kind: secondaryButton
-        label: Create MFA challenge
-        operation: createMfaChallenge
-        provenance: contract identity.yaml POST /auth/mfa/challenge
   overlays:
-  - id: confirmRemoveMfaMethod
-    component: confirmDialog
-    trigger: Remove MFA method
-    body: '**Names what `removeMfaMethod` changes and what it leaves alone**, in the consequence rather
-      than the verb. A login register this affects should be identified in the dialog, not just counted.'
-    provenance: contract identity.yaml DELETE /auth/mfa/methods/{methodId}
-  - id: formCreateMfaChallenge
-    component: modal
-    trigger: Create MFA challenge
-    body: '**Collects what `createMfaChallenge` sends before it is called.** Required: `action`. Optional:
-      `methodId`. Dismissing sends nothing; the screen behind is unchanged.'
-    confirm:
-      label: Create MFA challenge
-      operation: createMfaChallenge
-    dismiss:
-      label: Cancel
-      discards:
-      - action
-      - methodId
-    provenance: contract identity.yaml POST /auth/mfa/challenge
   - id: formRegisterGuest
     component: modal
-    trigger: Register guest
+    trigger: Create an account
     body: '**Collects what `registerGuest` sends before it is called.** Required: `identifier`, `channel`.
       Optional: `displayName`, `password`, `preferredLanguage`, `consents`. Dismissing sends nothing;
       the screen behind is unchanged.'
@@ -3503,38 +3471,26 @@ screens:
       - preferredLanguage
       - consents
     provenance: contract identity.yaml POST /auth/guest/register
-  - id: formCompleteSsoAuthorization
+  - id: formGuestPasswordLogin
     component: modal
-    trigger: Complete SSO authorization
-    body: '**Collects what `completeSsoAuthorization` sends before it is called.** Required: `code`, `state`.
-      Optional: `workstationId`. Dismissing sends nothing; the screen behind is unchanged.'
+    trigger: Sign in with password
+    body: '**Collects what `guestPasswordLogin` sends before it is called.** Required: `identifier`, `password`.
+      Optional: `deviceId` (sent by the client, not typed). A 401 is one message whatever the cause; a
+      429 or a locked account says to try again later or use a one-time code instead (decided 28 September,
+      audit R073 (a)). Dismissing sends nothing; the screen behind is unchanged.'
     confirm:
-      label: Complete SSO authorization
-      operation: completeSsoAuthorization
+      label: Sign in
+      operation: guestPasswordLogin
     dismiss:
       label: Cancel
       discards:
-      - code
-      - state
-      - workstationId
-    provenance: contract identity.yaml POST /auth/sso/{providerId}/callback
-  - id: formEnrolMfaMethod
-    component: modal
-    trigger: Enrol MFA method
-    body: '**Collects what `enrolMfaMethod` sends before it is called.** Required: `kind`. Optional: `target`.
-      Dismissing sends nothing; the screen behind is unchanged.'
-    confirm:
-      label: Enrol MFA method
-      operation: enrolMfaMethod
-    dismiss:
-      label: Cancel
-      discards:
-      - kind
-      - target
-    provenance: contract identity.yaml POST /auth/mfa/methods
+      - identifier
+      - password
+      - deviceId
+    provenance: contract identity.yaml POST /auth/guest/password
   - id: formGuestSocialLogin
     component: modal
-    trigger: Guest social login
+    trigger: Continue with Apple or Google
     body: '**Collects what `guestSocialLogin` sends before it is called.** Required: `provider`, `idToken`.
       Optional: `deviceId`. Dismissing sends nothing; the screen behind is unchanged.'
     confirm:
@@ -3549,7 +3505,7 @@ screens:
     provenance: contract identity.yaml POST /auth/guest/social
   - id: formGuestUaePassLogin
     component: modal
-    trigger: Guest uae pass login
+    trigger: Continue with UAE Pass
     body: '**Collects what `guestUaePassLogin` sends before it is called.** Required: `code`, `redirectUri`.
       Optional: `state`, `deviceId`. Dismissing sends nothing; the screen behind is unchanged.'
     confirm:
@@ -3565,7 +3521,7 @@ screens:
     provenance: contract identity.yaml POST /auth/guest/uae-pass
   - id: formLinkGuestCheckout
     component: modal
-    trigger: Link guest checkout
+    trigger: Link an order I placed as a guest
     body: '**Collects what `linkGuestCheckout` sends before it is called.** Required: `orderReference`.
       Optional: `verificationCode`. Dismissing sends nothing; the screen behind is unchanged.'
     confirm:
@@ -3577,24 +3533,6 @@ screens:
       - orderReference
       - verificationCode
     provenance: contract identity.yaml POST /auth/guest/link-checkout
-  - id: formLogin
-    component: modal
-    trigger: Login
-    body: '**Collects what `login` sends before it is called.** Required: `username`, `credential`, `workstationId`.
-      Optional: `method`, `deviceFingerprint`. Dismissing sends nothing; the screen behind is unchanged.'
-    bindsTo: LoginRequest
-    confirm:
-      label: Login
-      operation: login
-    dismiss:
-      label: Cancel
-      discards:
-      - username
-      - credential
-      - workstationId
-      - method
-      - deviceFingerprint
-    provenance: contract identity.yaml POST /auth/login
   - id: formRefreshToken
     component: modal
     trigger: Refresh token
@@ -3610,7 +3548,7 @@ screens:
     provenance: contract identity.yaml POST /auth/refresh
   - id: formRequestGuestOtp
     component: modal
-    trigger: Request guest OTP
+    trigger: Send me a code
     body: '**Collects what `requestGuestOtp` sends before it is called.** Required: `identifier`, `channel`.
       Optional: `purpose`. Dismissing sends nothing; the screen behind is unchanged.'
     confirm:
@@ -3625,7 +3563,7 @@ screens:
     provenance: contract identity.yaml POST /auth/guest/otp
   - id: formVerifyGuestOtp
     component: modal
-    trigger: Verify guest OTP
+    trigger: Sign in with the code
     body: '**Collects what `verifyGuestOtp` sends before it is called.** Required: `identifier`, `code`.
       Optional: `deviceId`. Dismissing sends nothing; the screen behind is unchanged.'
     confirm:
@@ -3638,60 +3576,29 @@ screens:
       - code
       - deviceId
     provenance: contract identity.yaml POST /auth/guest/otp/verify
-  - id: formVerifyMfaChallenge
-    component: modal
-    trigger: Verify MFA challenge
-    body: '**Collects what `verifyMfaChallenge` sends before it is called.** Required: `code`. Dismissing
-      sends nothing; the screen behind is unchanged.'
-    confirm:
-      label: Verify MFA challenge
-      operation: verifyMfaChallenge
-    dismiss:
-      label: Cancel
-      discards:
-      - code
-    provenance: contract identity.yaml POST /auth/mfa/challenge/{challengeId}/verify
-  - id: formVerifyMfaEnrolment
-    component: modal
-    trigger: Verify MFA enrolment
-    body: '**Collects what `verifyMfaEnrolment` sends before it is called.** Required: `code`. Dismissing
-      sends nothing; the screen behind is unchanged.'
-    confirm:
-      label: Verify MFA enrolment
-      operation: verifyMfaEnrolment
-    dismiss:
-      label: Cancel
-      discards:
-      - code
-    provenance: contract identity.yaml POST /auth/mfa/methods/{methodId}
   states:
-    loading: The login register list.
-    error: Could not load. Names which read failed and leaves the login register untouched.
-    emptyFirstRun: No login register yet. Offers Register guest (`registerGuest`).
-    emptyNoResults: 'Never shown: `listMfaMethods` takes no filter, so an empty list is always the first-run
-      state above.'
+    loading: Checking whether this device already holds a guest session. The sign-in form stays visible.
+    error: Identity could not be reached. **Says so rather than saying the password or code is wrong**,
+      and keeps what was typed.
+    emptyFirstRun: '**Nobody signed in on this device** — the normal state. The form offers a code, a
+      password, Apple or Google and UAE Pass, and Create an account (`registerGuest`).'
     emptyNoAccess: '**There is no permission to name — a guest holds none** (ADR-0025), and this is the
       screen a guest who is not signed in is sent to, so it has no no-access case of its own. A session
       that has expired lands here with the screen it came from kept, and returns to it after sign-in.'
+    signInRefused: '**One message for every refusal of a password sign-in**: `guestPasswordLogin` answers
+      401 alike for a wrong password, an unknown identifier, an account with no password and a locked
+      account, and the screen never says which. Too many attempts (429, or the lockout after `PasswordPolicy.lockoutAfterAttempts`)
+      says to try again later and offers **Send me a code** instead (decided 28 September, audit R073
+      (a)).'
     offline: '**Not available, and the offline banner says why.** Signing in, registering and verifying
       a code need the server.'
   apis:
   - operationId: registerGuest
     contract: identity
-    purpose: from page inventory
-    trigger: onAction
-  - operationId: completeSsoAuthorization
-    contract: identity
-    purpose: Exchange an SSO code for a session
+    purpose: Create a guest account
     trigger: onAction
     invalidates:
-    - listMfaMethods
-  - operationId: enrolMfaMethod
-    contract: identity
-    purpose: Enrol an MFA method
-    trigger: onAction
-    invalidates:
-    - listMfaMethods
+    - getGuestSession
   - operationId: getGuestSession
     contract: identity
     purpose: Read the current guest session
@@ -3701,110 +3608,56 @@ screens:
     purpose: End a guest session
     trigger: onAction
     invalidates:
-    - listMfaMethods
+    - getGuestSession
+  - operationId: guestPasswordLogin
+    contract: identity
+    purpose: Sign in with the email or mobile and the password set at registration (identifier, password,
+      deviceId -> GuestSession); one indistinguishable 401, lockout, 429 (decided 28 September, audit
+      R073 (a))
+    trigger: onAction
+    invalidates:
+    - getGuestSession
   - operationId: guestSocialLogin
     contract: identity
     purpose: Sign in with Apple or Google
     trigger: onAction
     invalidates:
-    - listMfaMethods
+    - getGuestSession
   - operationId: guestUaePassLogin
     contract: identity
     purpose: Sign in with a national identity provider
     trigger: onAction
     invalidates:
-    - listMfaMethods
+    - getGuestSession
   - operationId: linkGuestCheckout
     contract: identity
     purpose: Attach a guest checkout to an account
     trigger: onAction
-    invalidates:
-    - listMfaMethods
-  - operationId: listMfaMethods
-    contract: identity
-    purpose: Enrolled MFA methods
-    trigger: onLoad
-  - operationId: listSsoProviders
-    contract: identity
-    purpose: Identity providers configured for this tenant
-    trigger: onLoad
-  - operationId: login
-    contract: identity
-    purpose: Authenticate and open a session
-    trigger: onAction
-    invalidates:
-    - listMfaMethods
   - operationId: refreshToken
     contract: identity
     purpose: Rotate the access token
     trigger: onAction
-    invalidates:
-    - listMfaMethods
-  - operationId: removeMfaMethod
-    contract: identity
-    purpose: Remove an MFA method
-    trigger: onAction
-    invalidates:
-    - listMfaMethods
   - operationId: requestGuestOtp
     contract: identity
     purpose: Request a one-time code
-    trigger: onAction
-    invalidates:
-    - listMfaMethods
-  - operationId: startSsoAuthorization
-    contract: identity
-    purpose: Begin an SSO flow
     trigger: onAction
   - operationId: verifyGuestOtp
     contract: identity
     purpose: Verify a one-time code and issue a session
     trigger: onAction
     invalidates:
-    - listMfaMethods
-  - operationId: verifyMfaChallenge
-    contract: identity
-    purpose: Complete a step-up challenge
-    trigger: onAction
-    invalidates:
-    - listMfaMethods
-  - operationId: verifyMfaEnrolment
-    contract: identity
-    purpose: Complete enrolment
-    trigger: onAction
-    invalidates:
-    - listMfaMethods
+    - getGuestSession
   - operationId: claimCart
     contract: orders
     purpose: Attach an anonymous cart to a guest
-    trigger: onAction
-    invalidates:
-    - listMfaMethods
-  - operationId: createMfaChallenge
-    contract: identity
-    purpose: Second factor at sign-in
     trigger: onAction
   entryState:
     params:
     - name: cartId
       from: session
-    - name: challengeId
-      from: deepLink
-    - name: methodId
-      from: deepLink
-    - name: providerId
-      from: deepLink
-    coldEntry: '**A guest arriving cold on a link that no longer resolves is shown what happened and one
-      way onward — never a 404.** A shared ticket, a forwarded confirmation and a push notification opened
-      three weeks late all land here, and the person holding the link did nothing wrong. **The screen
-      names the thing, says it is expired, cancelled or withdrawn, and offers the list it came from.**
-      Arrives with `challengeId`, `methodId`, `providerId`.'
-    preloaded:
-    - MfaMethod.id
-    - MfaMethod.kind
-    - MfaMethod.label
-    - MfaMethod.maskedTarget
-    - MfaMethod.isActive
+    coldEntry: '**Needs nothing.** A guest arriving cold signs in and goes to My Account; one sent from
+      the cart carries `cartId` and goes back to it. The MFA and SSO deep-link parameters (`challengeId`,
+      `methodId`, `providerId`) went with the operations that used them (audit R167).'
   wireframe:
     status: review
     provenance: designed
@@ -3835,8 +3688,8 @@ screens:
     transitions:
     - to: WEB-016
       trigger: Login / Register
-      provenance: derived — WEB-016 declares entryState.params challengeId, methodId, providerId and WEB-017
-        holds none of them, so the edge carries nothing and WEB-016 opens cold
+      provenance: derived — WEB-016 declares entryState.params  and WEB-017 holds none of them, so the
+        edge carries nothing and WEB-016 opens cold
     - to: WEB-018
       trigger: My Tickets
       provenance: derived — WEB-018 declares entryState.params entitlementId, orderId and WEB-017 holds
@@ -4156,8 +4009,8 @@ screens:
     transitions:
     - to: WEB-016
       trigger: Login / Register
-      provenance: derived — WEB-016 declares entryState.params challengeId, methodId, providerId and WEB-018
-        holds none of them, so the edge carries nothing and WEB-016 opens cold
+      provenance: derived — WEB-016 declares entryState.params  and WEB-018 holds none of them, so the
+        edge carries nothing and WEB-016 opens cold
     - to: WEB-017
       trigger: My Account Dashboard
       provenance: derived — WEB-017 declares entryState.params deviceId, itemId, token and WEB-018 holds
@@ -4168,14 +4021,17 @@ screens:
       - orderId
       provenance: derived — WEB-019 declares entryState.params orderId and WEB-018 holds orderId, so an
         edge into it carries them
-  notes: 'Dynamic QR with a visible countdown. Anti-screenshot, per the guest boards. Purpose derived
-    from the screen name and its operations on 17 August, not from a requirement. The read surface Deep
-    asked for. **All four were missing and the table itself did not exist until 18 August.** **Rewired
-    on the 20 August review.** **`listEntitlements` wired 24 August, raised in review.** The staff-scoped
-    list was on this guest screen — **a guest-facing list must be scoped to the caller, not filtered by
-    a subject parameter**, or a guest is one parameter away from somebody else’s. **Cross-surface parity,
-    31 August**: added transferOrderTickets. **The same screen on web and app was calling different operations**
-    — one side could do something the other could not, and nothing recorded the difference as deliberate.'
+  notes: 'Dynamic QR with a visible countdown: a rotating code derived in the page from the `rotation`
+    seed that `getEntitlementCredential` returns, with the seconds to the next step shown (audit R230).
+    **No screenshot blocking on the web** — a browser cannot enforce it, so the page promises none (decided
+    28 September, audit R077 (c)). Purpose derived from the screen name and its operations on 17 August,
+    not from a requirement. The read surface Deep asked for. **All four were missing and the table itself
+    did not exist until 18 August.** **Rewired on the 20 August review.** **`listEntitlements` wired 24
+    August, raised in review.** The staff-scoped list was on this guest screen — **a guest-facing list
+    must be scoped to the caller, not filtered by a subject parameter**, or a guest is one parameter away
+    from somebody else’s. **Cross-surface parity, 31 August**: added transferOrderTickets. **The same
+    screen on web and app was calling different operations** — one side could do something the other could
+    not, and nothing recorded the difference as deliberate.'
   density: compact
   pattern: listDetail
   patternReason: '`listMyEntitlements` reads the population and `getEntitlement` reads one of them — list,
@@ -4277,8 +4133,14 @@ screens:
       - kind: detailPanel
         label: Entitlement credential
         operation: getEntitlementCredential
-        notes: Shows `mediaCode`, `payload`, `expiresAt` from `getEntitlementCredential`'s inline response.
-          **The response has no named schema**, so this cannot bind until the contract names one.
+        notes: 'Shows `mediaCode`, `payload`, `expiresAt` from `getEntitlementCredential`''s inline response.
+          **The response has no named schema**, so this cannot bind until the contract names one. **A
+          rotating code derived on the device** (decided 28 September, audit R230): while online the screen
+          fetches `rotation` (secret, `timeStepSeconds`, `digits`, `algorithm`, valid `validFrom` to `validTo`)
+          and computes the current code from the seed and the clock, with a visible countdown to the next
+          step; it keeps rotating with no signal. A null `rotation` (wristband, wallet pass) shows the
+          static code. **No screenshot blocking on the web** — a browser cannot enforce it and the page
+          promises none (audit R077 (c)).'
         provenance: contract access.yaml GET /entitlements/{entitlementId}/credential
     - name: actionBar
       slot: rowActions
@@ -4309,8 +4171,9 @@ screens:
       and brought back to this screen, or a record that is not theirs, which says so without saying whose
       it is. **Never an empty table** — that reads as *there is no data* and sends somebody to support
       with the wrong question.'
-    offline: '**The offline banner shows.** Tickets already loaded stay visible with their age. Sharing,
-      transferring and adding to a phone wallet need the connection.'
+    offline: '**The offline banner shows.** Tickets already loaded stay visible with their age, and a
+      ticket''s rotating code is derived on the device from its seed, so it changes with no signal (decided
+      28 September, audit R230). Sharing, transferring and adding to a phone wallet need the connection.'
   apis:
   - operationId: listMyEntitlements
     contract: access
@@ -4322,7 +4185,8 @@ screens:
     trigger: onLoad
   - operationId: getEntitlementCredential
     contract: access
-    purpose: The thing that gets scanned
+    purpose: The thing that gets scanned — with the `rotation` seed the device derives the rotating code
+      from (audit R230)
     trigger: onLoad
   - operationId: getEntitlementHistory
     contract: access
@@ -4434,8 +4298,8 @@ screens:
     transitions:
     - to: WEB-016
       trigger: Login / Register
-      provenance: derived — WEB-016 declares entryState.params challengeId, methodId, providerId and WEB-019
-        holds none of them, so the edge carries nothing and WEB-016 opens cold
+      provenance: derived — WEB-016 declares entryState.params  and WEB-019 holds none of them, so the
+        edge carries nothing and WEB-016 opens cold
     - to: WEB-017
       trigger: My Account Dashboard
       provenance: derived — WEB-017 declares entryState.params deviceId, itemId, token and WEB-019 holds
@@ -4650,8 +4514,8 @@ screens:
     transitions:
     - to: WEB-016
       trigger: Login / Register
-      provenance: derived — WEB-016 declares entryState.params challengeId, methodId, providerId and WEB-020
-        holds none of them, so the edge carries nothing and WEB-016 opens cold
+      provenance: derived — WEB-016 declares entryState.params  and WEB-020 holds none of them, so the
+        edge carries nothing and WEB-016 opens cold
     - to: WEB-017
       trigger: My Account Dashboard
       provenance: derived — WEB-017 declares entryState.params deviceId, itemId, token and WEB-020 holds
@@ -5712,6 +5576,20 @@ screens:
         - GuestDevice.revokedAt
         operation: listGuestDevices
         provenance: contract marketing-crm.yaml GET /guests/{subjectId}/devices
+      - kind: selectField
+        label: Whose Face Pass
+        bindsTo: DelegatedAccess
+        columns:
+        - DelegatedAccess.overSubjectId
+        - DelegatedAccess.delegationKind
+        operation: listDelegations
+        notes: '**Who is this for** (decided 28 September, audit R205): the signed-in guest and each child
+          linked to them (`heldByThisGuest` with `delegationKind` `familyMember` or `primaryHolder`),
+          so a parent sees and can revoke a child''s enrolment here. Enrolling is app-only (GST-069),
+          where the same pick sets the `subjectId` `enrolFacePass` sends; no guardian field is collected
+          — the server records the caller as guardian. A 403 `subject-not-linked` says the person is no
+          longer linked.'
+        provenance: contract identity.yaml GET /guests/{subjectId}/delegations
       - kind: detailPanel
         label: The face pass enrolment
         bindsTo: FacePassEnrolment
@@ -5911,7 +5789,7 @@ screens:
       with the wrong question.'
     offline: '**Nothing here is offered offline, and the banner says so.** An erasure request or a device
       change queued and never sent is worse than one that could not be made — the legal clock starts when
-      the platform receives it, and a second factor set up offline is not a second factor.'
+      the platform receives it, and a device signed out offline is still signed in.'
   apis:
   - operationId: addToWishlist
     contract: marketing-crm
@@ -6108,7 +5986,9 @@ screens:
       it is. **Never an empty table** — that reads as *there is no data* and sends somebody to support
       with the wrong question.'
     offline: '**The offline banner shows.** Cases already loaded stay read-only with their age, so a guest
-      can see what they raised without believing a reply arrived. Raising and replying need the connection.'
+      can see what they raised without believing a reply arrived. **Raising a case and replying are disabled
+      offline** — both need the connection (decided 28 September, audit R148) — and the screen says how
+      to reach staff in person instead: the guest services desk, or any member of staff.'
   apis:
   - operationId: getTenantAppStatus
     contract: white-label
@@ -6600,6 +6480,7 @@ screens:
       provenance: derived — WEB-027 declares entryState.params deviceId, itemId and WEB-028 holds none
         of them, so the edge carries nothing and WEB-027 opens cold
   notes: Purpose derived from the screen name and its operations on 17 August, not from a requirement.
+    **Contact bound 28 September** to `getTenantAppStatus.contact` (decided 28 September, audit R073 (f)).
   density: compact
   pattern: statusTracker
   patternReason: '`getTenantAppStatus` reads one record and nothing reads a population — the screen is
@@ -6628,6 +6509,20 @@ screens:
         - TenantAppStatus.expectedBackAt
         - TenantAppStatus.recentChanges
         operation: getTenantAppStatus
+        provenance: contract white-label.yaml GET /tenant-config/status
+      - kind: detailPanel
+        label: How to reach the venue
+        bindsTo: VenueContact
+        columns:
+        - VenueContact.phone
+        - VenueContact.email
+        - VenueContact.whatsapp
+        - VenueContact.address
+        - VenueContact.openingHours
+        operation: getTenantAppStatus
+        notes: '**From `getTenantAppStatus.contact`** (decided 28 September, audit R073 (f)): phone, email,
+          WhatsApp, address and opening hours, set from CMS-001 through `setMaintenanceMode`. Each is
+          optional and a missing one is left out rather than shown blank.'
         provenance: contract white-label.yaml GET /tenant-config/status
   states:
     loading: Venue details
@@ -6673,6 +6568,9 @@ screens:
     - WEB-001
   notes: Tenant-branded. An unbranded error page inside a tenant's storefront reads as the tenant's failure,
     not ours. Purpose derived from the screen name and its operations on 17 August, not from a requirement.
+    **Bound 28 September** — sold out and closed come from `getTenantAppStatus.availability` (`open`,
+    `soldOut`, `closed`) and `availabilityMessage` (decided 28 September, audit R073 (f)). The forced
+    upgrade (`minimumAppVersion`) is the app's alone, since a website is always the current version.
   density: compact
   pattern: statusTracker
   patternReason: '`getTenantAppStatus` reads one record and nothing reads a population — the screen is
@@ -6699,8 +6597,19 @@ screens:
         - TenantAppStatus.isInMaintenance
         - TenantAppStatus.maintenanceMessage
         - TenantAppStatus.expectedBackAt
+        - TenantAppStatus.availability
+        - TenantAppStatus.availabilityMessage
         - TenantAppStatus.recentChanges
         operation: getTenantAppStatus
+        provenance: contract white-label.yaml GET /tenant-config/status
+      - kind: banner
+        label: Sold out or closed today
+        bindsTo: TenantAppStatus.availabilityMessage
+        operation: getTenantAppStatus
+        notes: '**From `getTenantAppStatus.availability`** (`open`, `soldOut`, `closed`) and its `availabilityMessage`,
+          set live from CMS-001 through `setMaintenanceMode` (decided 28 September, audit R073 (f)). `soldOut`
+          and `closed` read differently: sold out means come another day, closed means the venue is not
+          open. Nothing shows while it is `open`.'
         provenance: contract white-label.yaml GET /tenant-config/status
   states:
     loading: —
@@ -6716,6 +6625,12 @@ screens:
     offline: '**The offline banner shows instead of this page.** Being offline is the guest''s connection,
       not the venue''s — an error or maintenance page shown for a dropped signal tells a guest the venue
       is down.'
+    soldOut: '**Sold out today.** `getTenantAppStatus.availability` is `soldOut`: the page says so with
+      the tenant''s `availabilityMessage` and offers another day, never a generic error (decided 28 September,
+      audit R073 (f)).'
+    closed: '**Closed.** `getTenantAppStatus.availability` is `closed`: the page says the venue is not
+      open, with the tenant''s `availabilityMessage` and the opening hours from `contact` (decided 28
+      September, audit R073 (f)).'
   apis:
   - operationId: getTenantAppStatus
     contract: white-label
@@ -7416,10 +7331,13 @@ screens:
     - to: GST-062
       trigger: On the way out they find their collection point
       provenance: flow F51 step 2→3
-      operation: reserveMerchandise
       crossesDevice: true
       back: false
-  notes: Added 17 August for parity with GST-026. **Not on the wireframe board** — needs drawing. CF-93.
+  notes: 'Added 17 August for parity with GST-026. **Not on the wireframe board** — needs drawing. CF-93.
+    **Buy-and-collect is paid online** (decided 28 September, audit R236): the cart is checked out and
+    paid here (`checkoutCart`, `createPayment`) and payment creates the shop-and-drop; `reserveMerchandise`
+    was removed from the web. The app''s GST-026 still reserves in the venue, where the reservation expiry
+    runs 15 minutes ahead to the close of the operating day (audit R215 (2)).'
   density: compact
   pattern: listDetail
   patternReason: '`listMerchandise` reads a population and nothing reads one of them; the detail is the
@@ -7505,11 +7423,22 @@ screens:
       - kind: primaryButton
         label: Lookup merchandise
         operation: lookupMerchandise
+        notes: Sends `?outletId=` — the outlet the guest is browsing — because a web caller has no workstation;
+          price and stock are that outlet's, and an inactive item is not found (decided 28 September,
+          audit R215 (1)).
         provenance: contract retail.yaml GET /merchandise/lookup
       - kind: secondaryButton
-        label: Reserve merchandise
-        operation: reserveMerchandise
-        provenance: contract retail.yaml POST /outlets/{outletId}/reserve
+        label: Check out to collect on the way out
+        operation: checkoutCart
+        notes: '**Paid online at checkout** (decided 28 September, audit R236): merchandise marked for
+          collection goes in the cart with `addCartLine`, the cart is checked out and paid here, and **payment
+          creates the shop-and-drop** for collection on the way out. Nothing is reserved unpaid on the
+          web; `reserveMerchandise` is not the web path.'
+        provenance: contract orders.yaml POST /carts/{cartId}/checkout
+      - kind: primaryButton
+        label: Pay
+        operation: createPayment
+        provenance: contract orders.yaml POST /payments
       - kind: secondaryButton
         label: Add cart line
         operation: addCartLine
@@ -7537,14 +7466,17 @@ screens:
     trigger: onLoad
   - operationId: lookupMerchandise
     contract: retail
-    purpose: Price and stock check by barcode
+    purpose: Price and stock check by barcode, at the outlet named by `outletId` (audit R215 (1))
     trigger: onAction
-  - operationId: reserveMerchandise
-    contract: retail
-    purpose: Reserve an item for collection
+  - operationId: checkoutCart
+    contract: orders
+    purpose: Turn the cart into an order; merchandise for collection is paid online (audit R236)
     trigger: onAction
-    invalidates:
-    - listMerchandise
+  - operationId: createPayment
+    contract: orders
+    purpose: Pay for it; payment creates the shop-and-drop for collection (decided 28 September, audit
+      R236)
+    trigger: onAction
   - operationId: addCartLine
     contract: orders
     purpose: Add something
@@ -7576,24 +7508,6 @@ screens:
     — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
     to the ones that matter is work a person still owes this screen.
   overlays:
-  - id: formReserveMerchandise
-    component: modal
-    trigger: Reserve merchandise
-    body: '**Collects what `reserveMerchandise` sends before it is called.** Required: `id`, `lines`,
-      `expiresAt`. Optional: `subjectId`, `collectionNote`. Dismissing sends nothing; the screen behind
-      is unchanged.'
-    confirm:
-      label: Reserve merchandise
-      operation: reserveMerchandise
-    dismiss:
-      label: Cancel
-      discards:
-      - id
-      - lines
-      - expiresAt
-      - subjectId
-      - collectionNote
-    provenance: contract retail.yaml POST /outlets/{outletId}/reserve
   - id: formAddCartLine
     component: modal
     trigger: Add cart line
@@ -7723,8 +7637,10 @@ screens:
       and brought back to this screen, or a record that is not theirs, which says so without saying whose
       it is. **Never an empty table** — that reads as *there is no data* and sends somebody to support
       with the wrong question.'
-    offline: '**The offline banner shows.** Reports already loaded stay read-only with their age. Reporting
-      and replying need the connection.'
+    offline: '**The offline banner shows.** Reports already loaded stay read-only with their age. **Reporting
+      a loss and replying are disabled offline** — both need the connection (decided 28 September, audit
+      R148) — and the screen says how to reach staff in person instead: the guest services desk or lost-property
+      point, or any member of staff.'
   apis:
   - operationId: listMyCases
     contract: marketing-crm
@@ -7842,6 +7758,14 @@ screens:
     - name: contentBody
       slot: collection
       components:
+      - kind: selectField
+        label: Venue
+        operation: listFxRates
+        notes: Sends `?venueId=` to `listFxRates`, from the venue the guest picked (see the home screen),
+          so the list is the region's rates narrowed to the currencies this venue shows. Rates are set
+          per region and each venue picks which currencies it shows (decided 28 September, audit R120
+          (a)).
+        provenance: contract finance.yaml GET /fx-rates
       - kind: datePicker
         label: As at
         operation: listFxRates
@@ -7925,7 +7849,8 @@ screens:
   apis:
   - operationId: listFxRates
     contract: finance
-    purpose: The rates in force
+    purpose: The rates in force for the venue's shown currencies — always called with `venueId` (decided
+      28 September, audit R120 (a))
     trigger: onLoad
   - operationId: listProducts
     contract: catalogue
@@ -8130,6 +8055,12 @@ screens:
         label: Join restaurant waitlist
         operation: joinRestaurantWaitlist
         provenance: contract fnb.yaml POST /waitlist
+      - kind: destructiveButton
+        label: Leave restaurant waitlist
+        operation: leaveRestaurantWaitlist
+        notes: Leaves the guest's own entry — the one just joined, or one opened from its link — and the
+          entry returns `cancelled` (decided 28 September, audit R073 (d)); the same act as GST-070.
+        provenance: contract fnb.yaml POST /waitlist/{entryId}/leave
   states:
     loading: Content resolves in place.
     error: Could not load. **The rest of the site is unaffected.**
@@ -8194,6 +8125,11 @@ screens:
     contract: fnb
     purpose: Join the waitlist when nothing is free
     trigger: onAction
+  - operationId: leaveRestaurantWaitlist
+    contract: fnb
+    purpose: Leave the restaurant waitlist; the entry returns cancelled (decided 28 September, audit R073
+      (d))
+    trigger: onAction
   entryState:
     params:
     - name: outletId
@@ -8202,9 +8138,14 @@ screens:
       from: session
     - name: orderId
       from: deepLink
+    - name: entryId
+      from: deepLink
+      optional: true
     coldEntry: '**A guest arriving cold on a link that no longer resolves is shown what happened and one
       way onward — never a 404.** A shared link, a scanned code and a forwarded confirmation all land
-      here, and the person holding it did nothing wrong. Arrives with `outletId`.'
+      here, and the person holding it did nothing wrong. Arrives with `outletId`. **`venueId` is the venue
+      the guest picked on the home screen** (WEB-001 on the web, GST-001 in the app), remembered on the
+      device and changeable there; it is not read from the sign-in (decided 28 September, audit R267).'
     preloaded:
     - FulfilmentSlots.slots
   wireframe:
@@ -8516,8 +8457,10 @@ screens:
   apis:
   - operationId: getGuestOrderStatus
     contract: fnb
-    purpose: Track an order
-    trigger: onLoad
+    purpose: The order's status (ordered, accepted, in preparation, ready, served, collected or delivered),
+      read on entry and polled while the screen is open; order updates show here, not in a notification
+      feed (decided 28 September, audit R242)
+    trigger: onInterval
   - operationId: getGuestBill
     contract: fnb
     purpose: The bill for the guest's table
@@ -8536,7 +8479,10 @@ screens:
       from: session
     coldEntry: '**A guest arriving cold on a link that no longer resolves is shown what happened and one
       way onward — never a 404.** A shared link, a scanned code and a forwarded confirmation all land
-      here, and the person holding it did nothing wrong. Arrives with `orderId`, `sessionId`.'
+      here, and the person holding it did nothing wrong. Arrives with `orderId`, `sessionId`. **`venueId`
+      is the venue the guest picked on the home screen** (WEB-001 on the web, GST-001 in the app), remembered
+      on the device and changeable there; it is not read from the sign-in (decided 28 September, audit
+      R267).'
   wireframe:
     status: review
     provenance: designed
@@ -8678,6 +8624,9 @@ screens:
         - WaitTime.zone
         - WaitTime.asOf
         operation: getWaitTimes
+        notes: '**A stale wait time is shown with a caveat, never hidden** (decided 28 September, audit
+          R080 (b)): where `WaitTime.isStale` is true the minutes stay on screen marked out of date with
+          their `asOf` time, as queue.yaml says.'
         provenance: contract queue.yaml GET /queues/wait-times
       - kind: detailPanel
         label: The venue map
@@ -8724,7 +8673,9 @@ screens:
       from: session
     coldEntry: '**A guest arriving cold on a link that no longer resolves is shown what happened and one
       way onward — never a 404.** A shared link, a scanned code and a forwarded confirmation all land
-      here, and the person holding it did nothing wrong. Arrives with `mapId`.'
+      here, and the person holding it did nothing wrong. Arrives with `mapId`. **`venueId` is the venue
+      the guest picked on the home screen** (WEB-001 on the web, GST-001 in the app), remembered on the
+      device and changeable there; it is not read from the sign-in (decided 28 September, audit R267).'
     preloaded:
     - Queue.code
     - Queue.name
@@ -8851,8 +8802,9 @@ screens:
     trigger: onAction
   - operationId: getWaitingGuest
     contract: queue
-    purpose: Read a queue entry
-    trigger: onLoad
+    purpose: The guest's place and the call to come forward, read on entry and polled while the screen
+      is open; the queue call shows here, not in a notification feed (decided 28 September, audit R242)
+    trigger: onInterval
   - operationId: leaveQueue
     contract: queue
     purpose: Leave a queue
@@ -8947,7 +8899,11 @@ screens:
   notes: '**A guest reserves parking on the drive, from whatever is open on their phone.** Requiring an
     install for a car park is requiring an install to arrive. **Renamed 31 August** from *Parking — Reserve
     & Pay*. **A guest surface is one product with two renderings** — a screen named differently on web
-    and app is two screens to a developer and one journey to a guest.'
+    and app is two screens to a developer and one journey to a guest. **Rebound 28 September** (decided
+    28 September, audit R166): parking is sold through the normal cart and checkout (`addCartLine`, `checkoutCart`,
+    `createPayment`), so the entitlement gets its `orderId`; the guest no longer calls `createParkingEntitlement`,
+    which the order service issues at payment. No live availability; a full car park is the `soldOutForDay`
+    refusal.'
   density: compact
   pattern: listDetail
   patternReason: '`listParkingFacilities` reads a population and nothing reads one of them; the detail
@@ -9014,9 +8970,21 @@ screens:
       slot: rowActions
       components:
       - kind: primaryButton
-        label: Create parking entitlement
-        operation: createParkingEntitlement
-        provenance: contract access.yaml POST /parking-entitlements
+        label: Add parking to my cart
+        operation: addCartLine
+        notes: '**Parking is sold through the normal cart** (decided 28 September, audit R166): the car
+          park''s parking product goes in as a cart line, then checkout and payment as for a ticket, and
+          the parking entitlement is issued at payment carrying the order''s id — the guest never creates
+          it. No live space count: a car park at capacity refuses the line with `soldOutForDay`.'
+        provenance: contract orders.yaml POST /carts/{cartId}/lines
+      - kind: secondaryButton
+        label: Check out
+        operation: checkoutCart
+        provenance: contract orders.yaml POST /carts/{cartId}/checkout
+      - kind: primaryButton
+        label: Pay
+        operation: createPayment
+        provenance: contract orders.yaml POST /payments
       - kind: secondaryButton
         label: Save parking entitlement
         operation: updateParkingEntitlement
@@ -9030,17 +8998,28 @@ screens:
     emptyNoAccess: '**Sign in to see this.** A guest who is not signed in is offered the door, not refused.'
     offline: '**The offline banner shows.** A reservation already confirmed stays on screen with its plate
       and car park. Reserving, paying and changing the plate need the connection.'
+    soldOutForDay: '**The car park is full.** `addCartLine` refused the parking line with `soldOutForDay`:
+      issued entitlements have reached the facility''s capacity for that day. Shown only then — there
+      is no live space count in the first release, so the screen never promises spaces before the guest
+      tries (decided 28 September, audit R166).'
   apis:
   - operationId: listParkingFacilities
     contract: access
     purpose: Car parks at a venue, and how each integrates
     trigger: onLoad
-  - operationId: createParkingEntitlement
-    contract: access
-    purpose: A guest bought parking
+  - operationId: addCartLine
+    contract: orders
+    purpose: Put the car park's parking product in the cart; refused `soldOutForDay` when the car park
+      is at capacity (decided 28 September, audit R166)
     trigger: onAction
-    invalidates:
-    - listParkingFacilities
+  - operationId: checkoutCart
+    contract: orders
+    purpose: Turn the cart into an order
+    trigger: onAction
+  - operationId: createPayment
+    contract: orders
+    purpose: Pay for it; the parking entitlement is issued at payment with the order's id (audit R166)
+    trigger: onAction
   - operationId: updateParkingEntitlement
     contract: access
     purpose: Change the plate, or revoke
@@ -9053,9 +9032,14 @@ screens:
       from: deepLink
     - name: venueId
       from: session
+    - name: cartId
+      from: session
     coldEntry: '**A guest arriving cold on a link that no longer resolves is shown what happened and one
       way onward — never a 404.** A shared link, a scanned code and a forwarded confirmation all land
-      here, and the person holding it did nothing wrong. Arrives with `entitlementId`.'
+      here, and the person holding it did nothing wrong. Arrives with `entitlementId`. **`venueId` is
+      the venue the guest picked on the home screen** (WEB-001 on the web, GST-001 in the app), remembered
+      on the device and changeable there; it is not read from the sign-in (decided 28 September, audit
+      R267).'
     preloaded:
     - ParkingFacility.id
     - ParkingFacility.name
@@ -9070,32 +9054,24 @@ screens:
     — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
     to the ones that matter is work a person still owes this screen.
   overlays:
-  - id: formCreateParkingEntitlement
+  - id: formAddCartLine
     component: modal
-    trigger: Create parking entitlement
-    body: '**Collects what `createParkingEntitlement` sends before it is called.** Required: `facilityId`,
-      `orderId`, `validFrom`, `validTo`. Optional: `id`, `subjectId`, `plateNumber`, `plateCountry`, `mediaCode`,
-      `status`, `pushedAt`, `pushFailureReason`. Dismissing sends nothing; the screen behind is unchanged.'
-    bindsTo: ParkingEntitlement
+    trigger: Add parking to my cart
+    body: '**Collects what `addCartLine` sends before it is called.** Required: `variantId` (the car park''s
+      parking product), `quantity`. Optional: `performanceId`, `attributes` (the plate). A 409 `soldOutForDay`
+      is shown as **the car park is full** for that day — capacity reached, not a live count (decided
+      28 September, audit R166). Dismissing sends nothing; the screen behind is unchanged.'
     confirm:
-      label: Create parking entitlement
-      operation: createParkingEntitlement
+      label: Add to cart
+      operation: addCartLine
     dismiss:
       label: Cancel
       discards:
-      - facilityId
-      - orderId
-      - validFrom
-      - validTo
-      - id
-      - subjectId
-      - plateNumber
-      - plateCountry
-      - mediaCode
-      - status
-      - pushedAt
-      - pushFailureReason
-    provenance: contract access.yaml POST /parking-entitlements
+      - variantId
+      - quantity
+      - performanceId
+      - attributes
+    provenance: contract orders.yaml POST /carts/{cartId}/lines
   - id: formUpdateParkingEntitlement
     component: modal
     trigger: Save parking entitlement
@@ -9129,7 +9105,10 @@ screens:
     exitTo:
     - WEB-001
   notes: '**The web could sell merchandise and could not arrange collection.** `lookupShopAndDrop` was
-    app-only, which made the service half-available on the surface most guests use.'
+    app-only, which made the service half-available on the surface most guests use. **Paid online at checkout**
+    (decided 28 September, audit R236): the guest adds the item to the cart for collection, checks out
+    and pays (`addCartLine`, `checkoutCart`, `createPayment`), and payment creates the shop-and-drop that
+    `lookupShopAndDrop` then finds; `reserveMerchandise` ("reserved at purchase") is no longer wired here.'
   density: compact
   pattern: listDetail
   patternReason: '`listMerchandise` reads a population and nothing reads one of them; the detail is the
@@ -9215,11 +9194,26 @@ screens:
       - kind: primaryButton
         label: Lookup merchandise
         operation: lookupMerchandise
+        notes: Sends `?outletId=` — the outlet the guest is browsing — because a web caller has no workstation;
+          price and stock are that outlet's, and an inactive item is not found (decided 28 September,
+          audit R215 (1)).
         provenance: contract retail.yaml GET /merchandise/lookup
       - kind: secondaryButton
-        label: Reserve merchandise
-        operation: reserveMerchandise
-        provenance: contract retail.yaml POST /outlets/{outletId}/reserve
+        label: Add to cart for collection
+        operation: addCartLine
+        provenance: contract orders.yaml POST /carts/{cartId}/lines
+      - kind: secondaryButton
+        label: Check out to collect on the way out
+        operation: checkoutCart
+        notes: '**Paid online at checkout** (decided 28 September, audit R236): merchandise marked for
+          collection goes in the cart with `addCartLine`, the cart is checked out and paid here, and **payment
+          creates the shop-and-drop** for collection on the way out. Nothing is reserved unpaid on the
+          web; `reserveMerchandise` is not the web path.'
+        provenance: contract orders.yaml POST /carts/{cartId}/checkout
+      - kind: primaryButton
+        label: Pay
+        operation: createPayment
+        provenance: contract orders.yaml POST /payments
       - kind: secondaryButton
         label: Lookup shop and drop
         operation: lookupShopAndDrop
@@ -9241,14 +9235,23 @@ screens:
     trigger: onLoad
   - operationId: lookupMerchandise
     contract: retail
-    purpose: Price and stock check by barcode
+    purpose: Price and stock check by barcode, at the outlet named by `outletId` (audit R215 (1))
     trigger: onAction
-  - operationId: reserveMerchandise
-    contract: retail
-    purpose: Reserve an item for collection
+  - operationId: addCartLine
+    contract: orders
+    purpose: Put the item in the cart, marked for collection on the way out (audit R236)
     trigger: onAction
     invalidates:
     - listMerchandise
+  - operationId: checkoutCart
+    contract: orders
+    purpose: Turn the cart into an order; merchandise for collection is paid online (audit R236)
+    trigger: onAction
+  - operationId: createPayment
+    contract: orders
+    purpose: Pay for it; payment creates the shop-and-drop for collection (decided 28 September, audit
+      R236)
+    trigger: onAction
   - operationId: lookupShopAndDrop
     contract: retail
     purpose: Find a guest's dropped goods
@@ -9257,6 +9260,8 @@ screens:
     params:
     - name: outletId
       from: deepLink
+    - name: cartId
+      from: session
     coldEntry: '**A guest arriving cold on a link that no longer resolves is shown what happened and one
       way onward — never a 404.** A shared link, a scanned code and a forwarded confirmation all land
       here, and the person holding it did nothing wrong. Arrives with `outletId`.'
@@ -9274,24 +9279,26 @@ screens:
     — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
     to the ones that matter is work a person still owes this screen.
   overlays:
-  - id: formReserveMerchandise
+  - id: formAddCartLine
     component: modal
-    trigger: Reserve merchandise
-    body: '**Collects what `reserveMerchandise` sends before it is called.** Required: `id`, `lines`,
-      `expiresAt`. Optional: `subjectId`, `collectionNote`. Dismissing sends nothing; the screen behind
-      is unchanged.'
+    trigger: Add to cart for collection
+    body: '**Collects what `addCartLine` sends before it is called.** Required: `variantId`, `quantity`.
+      Optional: `performanceId`, `seatIds`, `parentLineId`, `attributes`. Dismissing sends nothing; the
+      screen behind is unchanged.'
+    bindsTo: AddCartLineRequest
     confirm:
-      label: Reserve merchandise
-      operation: reserveMerchandise
+      label: Add cart line
+      operation: addCartLine
     dismiss:
       label: Cancel
       discards:
-      - id
-      - lines
-      - expiresAt
-      - subjectId
-      - collectionNote
-    provenance: contract retail.yaml POST /outlets/{outletId}/reserve
+      - variantId
+      - quantity
+      - performanceId
+      - seatIds
+      - parentLineId
+      - attributes
+    provenance: contract orders.yaml POST /carts/{cartId}/lines
 - id: WEB-043
   name: Loyalty & Rewards
   module: Membership, Loyalty & Value
@@ -9774,9 +9781,10 @@ screens:
       empty panel.'
     emptyNoResults: Nothing matches.
     emptyNoAccess: '**Sign in to see this.** A guest who is not signed in is offered the door, not refused.'
-    offline: '**The offline banner shows.** What was already loaded stays on screen, marked with its age.
-      Anything that spends money, holds capacity or changes the account waits for the connection, and
-      its button says so rather than failing.'
+    offline: '**The offline banner shows.** Help already loaded stays readable, marked with its age. **Raising
+      a case is disabled offline** — it needs the connection (decided 28 September, audit R148) — and
+      the screen says how to reach staff in person instead: the guest services desk, or any member of
+      staff.'
   apis:
   - operationId: listFaqs
     contract: white-label
@@ -9809,7 +9817,13 @@ screens:
   name: In-Venue Notifications
   module: Engagement & Support
   requiresModule: marketing
-  wave: 2
+  wave: 4
+  deferred:
+    release: later
+    decided: '2026-09-28'
+    decision: R242
+    reason: No in-app feed of in-venue notifications in the first release; queue calls and order status
+      show on the queue and order screens, which poll for them (decided 28 September, audit R242).
   implementation:
     app: guest-web
     route: /in-venue-notifications
@@ -9821,7 +9835,9 @@ screens:
     exitTo:
     - WEB-001
   notes: '**Web push is weaker than native and it is not absent.** A guest with a tab open gets their
-    queue call; the app does it better and the web does it.'
+    queue call; the app does it better and the web does it. **Out of the first release** (decided 28 September,
+    audit R242): no in-app notification feed; queue calls and order status show on the queue and order
+    screens, which poll. This screen is `wave: 4` with a `deferred` block, kept for a later release.'
   density: compact
   pattern: configEditor
   patternReason: the screen declares only writes (`claimLocationSession`) and no read of a population

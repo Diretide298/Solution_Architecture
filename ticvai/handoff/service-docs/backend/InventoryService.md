@@ -210,7 +210,7 @@ Retail Board 4. **A lot number answers which delivery; a serial answers which on
 | onHand | number | yes | Derived from movements. |
 | onOrder | number |  |  |
 | inTransit | number |  |  |
-| available | number |  |  |
+| available | number |  | On-hand minus allocated, where allocated is stock reserved for orders (decided 28 September, audit R171). |
 | averageCost | Money |  | On the wire this is three fields; in the database it is one column. |
 | averageCost.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
 | averageCost.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
@@ -259,11 +259,11 @@ Retail Board 4. **A lot number answers which delivery; a serial answers which on
 | Field | Type | Required | Notes |
 |---|---|---|---|
 | name | string |  | (max length 200) |
-| categoryId | string (uuid) |  |  |
+| categoryId | string (uuid) |  | Null clears the category (decided 28 September, audit R171). (nullable) |
 | reorderPoint | number |  | (min 0) |
 | reorderQuantity | number |  | (min 0) |
 | parLevel | number |  | (min 0) |
-| preferredSupplierId | string (uuid) |  |  |
+| preferredSupplierId | string (uuid) |  | Null clears the preferred supplier (decided 28 September, audit R171). (nullable) |
 | isActive | boolean |  |  |
 | costingMethod | CostingMethod: enum (weightedAverage, fifo, standardCost, lastPurchasePrice) |  | Fixed at item creation. |
 | baseUnit | string |  | Changeable only while hasMovements is false; the 409 below is the refusal once it is true. |
@@ -292,7 +292,7 @@ Retail Board 4. **A lot number answers which delivery; a serial answers which on
 | onHand | number | yes | Derived from movements. |
 | onOrder | number |  |  |
 | inTransit | number |  |  |
-| available | number |  |  |
+| available | number |  | On-hand minus allocated, where allocated is stock reserved for orders (decided 28 September, audit R171). |
 | averageCost | Money |  | On the wire this is three fields; in the database it is one column. |
 | averageCost.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
 | averageCost.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
@@ -320,11 +320,12 @@ Retail Board 4. **A lot number answers which delivery; a serial answers which on
 **`POST /goods-receipts`**: Receive goods against a purchase order
 
 Partial receipts are normal and expected. Over-receipt beyond the configured tolerance is refused — a delivery larger than the order is a supplier error, not a windfall.
+**The tolerance is `VenueSettings.inventory.overReceiptTolerancePercent`**, a venue setting with a tenant default (decided 28 September, audit R094): a line may receive up to that percentage above its outstanding ordered quantity. **Proposed default 5 per cent, client to correct (audit R094).**
 Receipt increments stock and creates the accrual the invoice will later match against.
 
 |  |  |
 |---|---|
-| Permission | `PRODUCT_CONFIGURE` |
+| Permission | `PROCUREMENT_RECEIVE` |
 | Scope level | venue |
 | Part of slice | setup, makes `inventory.goods_receipt` non-empty |
 | Wave | 2 |
@@ -363,11 +364,12 @@ Receipt increments stock and creates the accrual the invoice will later match ag
 | Field | Type | Required | Notes |
 |---|---|---|---|
 | id | string | yes | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
-| receiptNumber | string | yes |  |
+| receiptNumber | string | yes | Server-assigned: the venue prefix plus a sequence per venue (decided 28 September, audit R152), e.g. (read-only) |
 | purchaseOrderId | string | yes | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
 | locationId | string (uuid) | yes |  |
 | deliveryNoteReference | string |  | (nullable) |
 | lines | array of object | yes |  |
+| lines[].lineId | string |  | One batch or expiry line of the receipt. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$; read-only) |
 | lines[].itemId | string (uuid) |  |  |
 | lines[].itemName | string |  |  |
 | lines[].orderedQuantity | number |  |  |
@@ -394,17 +396,19 @@ Receipt increments stock and creates the accrual the invoice will later match ag
 | Code | Shape | Meaning |
 |---|---|---|
 | 201 |  | Received; stock incremented |
-| 409 |  | Over-receipt beyond tolerance, or the purchase order is closed |
+| 409 |  | Over-receipt beyond VenueSettings.inventory.overReceiptTolerancePercent (proposed default 5, audit R094), or the purchase order is closed |
 
 ### rejectReceivedGoods
 
 **`POST /goods-receipts/{receiptId}/reject`**: Reject received goods
 
 Quality failure, damage, wrong item, expiry too near. Reverses the stock increment and creates a supplier return.
+**Rejected by receipt line, not by item** (decided 28 September, audit R171): a receipt can hold one item on several batch or expiry lines, and each line names the one it rejects by `lineId`.
+**`other` needs a `note`** (decided 28 September, audit R222); the notes are reviewed quarterly to add the real reasons they reveal.
 
 |  |  |
 |---|---|
-| Permission | `PRODUCT_CONFIGURE` |
+| Permission | `PROCUREMENT_RECEIVE` |
 | Scope level | venue |
 | Part of slice | setup, makes `inventory.goods_receipt` non-empty |
 | Wave | 2 |
@@ -426,21 +430,22 @@ Quality failure, damage, wrong item, expiry too near. Reverses the stock increme
 | Field | Type | Required | Notes |
 |---|---|---|---|
 | lines | array of object | yes | (min items 1) |
-| lines[].itemId | string (uuid) | yes |  |
+| lines[].lineId | string | yes | GoodsReceipt.lines[].lineId, the batch or expiry line rejected (audit R171). (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
 | lines[].quantity | number | yes | (min 0) |
-| reason | enum (damaged, wrongItem, qualityFailure, shortDated, overDelivery, other) | yes |  |
-| note | string |  | (max length 1000) |
+| reason | enum (damaged, wrongItem, qualityFailure, shortDated, overDelivery, other) | yes | other requires note (decided 28 September, audit R222). |
+| note | string |  | Required, at least 3 characters, when reason is other (audit R222). (max length 1000) |
 
 **Response**: `GoodsReceipt`
 
 | Field | Type | Required | Notes |
 |---|---|---|---|
 | id | string | yes | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
-| receiptNumber | string | yes |  |
+| receiptNumber | string | yes | Server-assigned: the venue prefix plus a sequence per venue (decided 28 September, audit R152), e.g. (read-only) |
 | purchaseOrderId | string | yes | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
 | locationId | string (uuid) | yes |  |
 | deliveryNoteReference | string |  | (nullable) |
 | lines | array of object | yes |  |
+| lines[].lineId | string |  | One batch or expiry line of the receipt. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$; read-only) |
 | lines[].itemId | string (uuid) |  |  |
 | lines[].itemName | string |  |  |
 | lines[].orderedQuantity | number |  |  |
@@ -467,7 +472,8 @@ Quality failure, damage, wrong item, expiry too near. Reverses the stock increme
 | Code | Shape | Meaning |
 |---|---|---|
 | 200 |  | Rejected; stock reversed and a return raised |
-| 409 |  | A line rejects more than was received and not already rejected on this receipt, or names an item the receipt does not hold |
+| 400 |  | reason is other with no note (audit R222). |
+| 409 |  | A line rejects more than was received and not already rejected on it, or names a lineId the receipt does not hold (audit R171) |
 
 ## Tables
 
@@ -478,7 +484,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 | Column | Type | Required | Notes |
 |---|---|---|---|
 | id | text | yes |  |
-| receipt_number | text | yes |  |
+| receipt_number | text | yes | Server-assigned: the venue prefix plus a sequence per venue (decided 28 September, audit R152), e.g. |
 | purchase_order_id | text | yes |  |
 | location_id | uuid | yes |  |
 | delivery_note_reference | text | no |  |
@@ -494,6 +500,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 | Column | Type | Required | Notes |
 |---|---|---|---|
 | goods_receipt_id | text | yes | The parent row. |
+| line_id | text | no | One batch or expiry line of the receipt. |
 | item_id | uuid | no |  |
 | item_name | text | no |  |
 | ordered_quantity | numeric | no |  |
@@ -528,7 +535,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 | on_hand | numeric | yes | Derived from movements. |
 | on_order | numeric | no |  |
 | in_transit | numeric | no |  |
-| available | numeric | no |  |
+| available | numeric | no | On-hand minus allocated, where allocated is stock reserved for orders (decided 28 September, audit R171). |
 | average_cost | numeric(18,4) | no |  |
 | last_purchase_price | numeric(18,4) | no |  |
 | is_below_reorder_point | boolean | no |  |

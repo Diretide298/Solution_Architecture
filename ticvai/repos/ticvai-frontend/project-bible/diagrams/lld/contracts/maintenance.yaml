@@ -186,6 +186,7 @@ operations:
   reads:
   - maintenance.incident
   - maintenance.incident_authority_notification
+  - maintenance.incident_investigation_note
   - maintenance.incident_involved_party
   writes: []
 - operation: getWorkOrder

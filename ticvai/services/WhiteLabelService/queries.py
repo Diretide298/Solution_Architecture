@@ -122,7 +122,7 @@ READS = {
   "SELECT * FROM whitelabel.tenant_config LIMIT 50"
  ],
  "setFooter": [
-  "SELECT * FROM control.footer_config WHERE scope_path LIKE $1 LIMIT 50"
+  "SELECT * FROM whitelabel.footer_config WHERE scope_path LIKE $1 LIMIT 50"
  ],
  "setHeader": [
   "SELECT * FROM whitelabel.tenant_config LIMIT 50"
@@ -223,7 +223,7 @@ WRITES = {
   "SELECT id FROM whitelabel.tenant_config ORDER BY id LIMIT 1 FOR UPDATE"
  ],
  "setFooter": [
-  "SELECT id FROM control.footer_config WHERE scope_path LIKE $1 ORDER BY id LIMIT 1 FOR UPDATE"
+  "SELECT id FROM whitelabel.footer_config WHERE scope_path LIKE $1 ORDER BY id LIMIT 1 FOR UPDATE"
  ],
  "setHeader": [
   "SELECT id FROM whitelabel.tenant_config ORDER BY id LIMIT 1 FOR UPDATE"

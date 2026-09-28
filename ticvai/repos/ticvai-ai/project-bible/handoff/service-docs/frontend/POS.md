@@ -24,7 +24,7 @@
 
 | ID | Screen | Module | Wave | Operations |
 |---|---|---|---|---|
-| [POS-000](#pos-000-sign-in) | Sign In | Shift | 1 | 6 |
+| [POS-000](#pos-000-sign-in) | Sign In | Shift | 1 | 8 |
 | [POS-001](#pos-001-begin-shift) | Begin Shift | Shift | 1 | 17 |
 | [POS-002](#pos-002-sell-ticket-catalogue) | Sell — Ticket Catalogue | Sell | 1 | 42 |
 | [POS-003](#pos-003-sell-timed-entry) | Sell — Timed Entry | Sell | 1 | 10 |
@@ -53,12 +53,12 @@
 | [POS-029](#pos-029-order-queue) | Order Queue | Sell | 1 | 4 |
 | [KIT-001](#kit-001-kitchen-operations-command-center) | Kitchen Operations Command Center | Kitchen | 2 | 3 |
 | [KIT-002](#kit-002-kitchen-display-system-kds) | Kitchen Display System (KDS) | Kitchen | 2 | 7 |
-| [KIT-003](#kit-003-order-firing-course-management) | Order Firing & Course Management | Kitchen | 2 | 5 |
+| [KIT-003](#kit-003-order-firing-course-management) | Order Firing & Course Management | Kitchen | 2 | 6 |
 | [KIT-004](#kit-004-active-order-management-fulfilment-journey) | Active Order Management & Fulfilment Journey | Kitchen | 2 | 2 |
-| [KIT-005](#kit-005-kitchen-station-workload-dynamic-routing) | Kitchen Station Workload & Dynamic Routing | Kitchen | 2 | 2 |
+| [KIT-005](#kit-005-kitchen-station-workload-dynamic-routing) | Kitchen Station Workload & Dynamic Routing | Kitchen | 2 | 3 |
 | [KIT-006](#kit-006-expeditor-order-assembly) | Expeditor & Order Assembly | Kitchen | 2 | 5 |
 | [KIT-007](#kit-007-guest-collection-buzzer-digital-notification) | Guest Collection, Buzzer & Digital Notification | Kitchen | 2 | 2 |
-| [KIT-008](#kit-008-exceptions-re-fire-unavailable-items) | Exceptions, Re-Fire & Unavailable Items | Kitchen | 2 | 5 |
+| [KIT-008](#kit-008-exceptions-re-fire-unavailable-items) | Exceptions, Re-Fire & Unavailable Items | Kitchen | 2 | 6 |
 | [KIT-009](#kit-009-sla-priority-service-rules) | SLA, Priority & Service Rules | Kitchen | 2 | 2 |
 | [KIT-010](#kit-010-kitchen-performance-ai-operational-optimization) | Kitchen Performance, AI & Operational Optimization | Kitchen | 2 | 2 |
 | [POS-004](#pos-004-sell-seat-map) | Sell — Seat Map | Sell | 2 | 11 |
@@ -78,6 +78,12 @@
 | Component | `apps/venue-pos/src/routes/SignInTerminal.tsx` |
 | Pattern | form |
 
+**Entry parameters**
+
+| Parameter | From |
+|---|---|
+| challengeId | navigation |
+
 **Operations**
 
 | Operation | Service | When | Purpose | Permission |
@@ -85,9 +91,11 @@
 | `changeOwnCredential` | [IdentityService](../backend/IdentityService.md#changeowncredential) | onAction | Replace a temporary PIN or password at first sign-in | `None` |
 | `login` | [IdentityService](../backend/IdentityService.md#login) | onAction | Authenticate the operator at this terminal | `None` |
 | `listActiveSessions` | [IdentityService](../backend/IdentityService.md#listactivesessions) | onLoad | Who holds this till now | `SESSION_FORCE_LOGOUT` |
-| `forceLogout` | [IdentityService](../backend/IdentityService.md#forcelogout) | onAction | Take the till over from the operator holding it | `SESSION_FORCE_LOGOUT` |
+| `forceLogout` | [IdentityService](../backend/IdentityService.md#forcelogout) | onAction | A supervisor ends the session of the operator holding the till, after login was refused 409 (audit R184) | `SESSION_FORCE_LOGOUT` |
 | `selectRole` | [IdentityService](../backend/IdentityService.md#selectrole) | onAction | Choose which role to work as when login returns more than one | `None` |
 | `getCurrentSession` | [IdentityService](../backend/IdentityService.md#getcurrentsession) | onAction | Read the session the login just created | `None` |
+| `createMfaChallenge` | [IdentityService](../backend/IdentityService.md#createmfachallenge) | onAction | Second factor after login when the principal holds a permission in mfaRequiredForPermissions; action `signIn`, the primary method (authenticator app), or the email method as the fallback (decided 28 September, audit R135, R126 (5)) | `None` |
+| `verifyMfaChallenge` | [IdentityService](../backend/IdentityService.md#verifymfachallenge) | onAction | Completes sign-in with the code; the session is usable only after it. Five wrong codes lock step-up (audit R126 (6)) | `None` |
 
 **States**
 
@@ -98,6 +106,7 @@
 | error | Identity could not be reached. Says so rather than saying the PIN is wrong -- telling an operator their PIN failed when the network did sends them to a supervisor with the wrong question. |
 | denied | The employee number and PIN do not match, or the account is locked. Names which, and how many attempts remain before the lock. |
 | emptyNoAccess | Authentication succeeded and the operator holds no role on this workstation. A real outcome on a shared till -- a steward badged for the gate is not a cashier -- and it is the session that succeeded and the authorisation that did not. |
+| mfaRequired | Signed in, not yet through. The principal holds a permission that requires MFA (ROLE_MANAGE, LEDGER_APPROVE, any platform-staff permission, or one the tenant added), so after `login` the screen calls `createMfaChallenge` and asks for the authenticator code; `verifyMfaChallenge` completes the sign-in. Email me a code instead is the fallback. Five wrong codes lock step-up for the policy's lockout minutes and the screen says so. A principal with no enrolled method is sent to enrol first (decided 28 September, audit R135, R126). A cashier never reaches this state. |
 | offline | Signs in against the cached operator list and syncs when the link returns. A till that cannot open because the network is down is a till that does not sell, which is the same reasoning POS-001 applies to the float. |
 
 **Goes to**
@@ -106,7 +115,6 @@
 |---|---|---|---|
 | POS-001 | Begin Shift |  |  |
 | POS-025 | Till Home |  |  |
-| KIT-002 | Kitchen Display System (KDS) |  |  |
 
 ## POS-001 Begin Shift
 
@@ -273,7 +281,7 @@
 
 | To | Trigger | Carries | Guard |
 |---|---|---|---|
-| POS-003 | Choose a date and session for a timed product | productId, visitDate, sessionTime, quantityByVariant | product.timed |
+| POS-003 | Choose a date and performance for a timed product (a session is a Performance, audit R165) | productId, visitDate, sessionTime, quantityByVariant | product.timed |
 | POS-004 | Select seats on the plan | productId, performanceId, seatPicks, zoneId, holdExpiresAt | product.seats or product.evt |
 | POS-005 | Charge, or swipe the pay control | cart, guest, discount, orderType, table, taxTotals | payment.take |
 | POS-006 | Recall held | orderId | sale.resume |
@@ -282,7 +290,6 @@
 | BO-084 | The manager sees it in their inbox |  |  |
 | BO-130 | Four transactions are rejected — a product retired while the till was offline |  |  |
 | BO-133 | The venue's offline exposure crosses a ceiling |  |  |
-| POS-001 | Begin Shift |  |  |
 | POS-007 | Close Shift | saleId |  |
 | POS-010 | Add to Existing Ticket | orderId |  |
 | POS-020 | Shift Exceptions & Alerts |  |  |
@@ -343,7 +350,6 @@
 |---|---|---|---|
 | POS-002 | Back | productId |  |
 | POS-005 | Add to sale, then charge | cart, guest, discount, visitDate, sessionTime | payment.take |
-| POS-001 | Begin Shift |  |  |
 | POS-004 | Sell — Seat Map | performanceId |  |
 | POS-006 | Held Orders |  |  |
 
@@ -379,7 +385,7 @@
 | `createRetailSale` | [RetailService](../backend/RetailService.md#createretailsale) | onAction | Sell merchandise | `ORDER_CREATE` |
 | `getRetailSale` | [RetailService](../backend/RetailService.md#getretailsale) | onAction | Read a retail sale | `ORDER_VIEW` |
 | `listRetailSales` | [RetailService](../backend/RetailService.md#listretailsales) | onLoad | List retail sales | `ORDER_VIEW` |
-| `lookupRetailSale` | [RetailService](../backend/RetailService.md#lookupretailsale) | onAction | Find a sale from a receipt | `ORDER_VIEW` |
+| `lookupRetailSale` | [RetailService](../backend/RetailService.md#lookupretailsale) | onAction | Find a sale from a receipt; returns a list with matchedBy, a pick list when several match (audit R215) | `ORDER_VIEW` |
 | `createOrder` | [OrderService](../backend/OrderService.md#createorder) | onAction | Create an order | `ORDER_CREATE` |
 | `redeemLoyaltyPoints` | [MarketingService](../backend/MarketingService.md#redeemloyaltypoints) | onAction | Spend points | `LOYALTY_REDEEM` |
 
@@ -400,10 +406,10 @@
 |---|---|---|---|
 | POS-002 | Back to sale | cart, guest, discount, orderType |  |
 | POS-001 | Begin Shift | shiftId |  |
-| POS-021 | Sell — Food & Drink |  |  |
 | POS-023 | Sell — Merchandise |  |  |
+| POS-022 | Charged — back to the pass, where the order already sent to the kitchen is handed over (send to kitchen, then charge; audit R261) | orderId |  |
+| KIT-002 | The kitchen makes it and bumps it |  |  |
 | POS-010 | The guest asks to add a locker to the ticket they just bought | orderId |  |
-| POS-022 | The order goes to the pass | orderId |  |
 | BO-048 | Bag is dropped and tagged | merchandiseId |  |
 
 ## POS-006 Held Orders
@@ -461,7 +467,6 @@
 | To | Trigger | Carries | Guard |
 |---|---|---|---|
 | POS-002 | Recall this held sale | cart, cartHoldExpiresAt, guest, discount, table, orderType | sale.resume |
-| POS-001 | Begin Shift |  |  |
 | POS-003 | Sell — Timed Entry |  |  |
 | POS-004 | Sell — Seat Map | performanceId |  |
 
@@ -490,8 +495,8 @@
 
 | Operation | Service | When | Purpose | Permission |
 |---|---|---|---|---|
-| `closeShift` | [OrderService](../backend/OrderService.md#closeshift) | onAction | Submit the blind count | `SHIFT_CLOSE` |
-| `acceptShiftVariance` | [OrderService](../backend/OrderService.md#acceptshiftvariance) | onAction | Supervisor accepts a variance above threshold | `OVERSHORT_ACCEPT` |
+| `closeShift` | [OrderService](../backend/OrderService.md#closeshift) | onAction | Submit the blind count; ShiftCloseResult.requiresAcceptance says whether a supervisor must accept the variance | `SHIFT_CLOSE` |
+| `acceptShiftVariance` | [OrderService](../backend/OrderService.md#acceptshiftvariance) | onAction | Supervisor accepts a variance above threshold on the till, after closeShift left the shift pendingVariance (OVERSHORT_ACCEPT, PIN step-up; audit R080 (e)) | `OVERSHORT_ACCEPT` |
 | `recordNoSale` | [OrderService](../backend/OrderService.md#recordnosale) | onAction | Drawer opened without a sale | `CASH_NO_SALE` |
 | `approveShiftOpen` | [OrderService](../backend/OrderService.md#approveshiftopen) | onAction | Approve a shift opening outside tolerance | `SHIFT_APPROVE_OPEN` |
 | `createCashMovement` | [OrderService](../backend/OrderService.md#createcashmovement) | onAction | Record a cash lift or add | `CASH_LIFT` |
@@ -518,17 +523,16 @@
 | emptyNoResults | Never shown: `listCashMovements` takes no filter, so an empty list is always the first-run state above. |
 | emptyNoAccess | Shown when the caller lacks `SHIFT_OPEN`, which `getCurrentShift` requires, and names that permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | offline | Cannot close. Closing requires the server total, and a locally computed variance is not a variance |
-| denied | The count is accepted and the close is held. A variance beyond tolerance needs `cash.variance.approve` — a supervisor PIN is captured in place and the shift closes against the same count, rather than the cashier counting twice. |
-| awaitingApproval | The close is waiting on a supervisor who is not at the till. The count is held; the drawer stays shut. |
+| denied | `acceptShiftVariance` was refused: the caller lacks OVERSHORT_ACCEPT at this venue, or is the cashier whose shift it is. The shift stays `pendingVariance` against the same count, and a supervisor accepts it on this till (audit R080 (e)). |
+| pendingVariance | Closed as counted, over/short waiting for a supervisor. `closeShift` returned `requiresAcceptance`; a supervisor holding OVERSHORT_ACCEPT accepts the variance on this till with a PIN step-up. There is no pre-close PIN hold and no approval request (decided 28 September, audit R080 (e)). |
 
 **Goes to**
 
 | To | Trigger | Carries | Guard |
 |---|---|---|---|
-| POS-001 | Close and sign out | shiftId, countedCash, variance, approverPrincipalId | cash.variance.approve |
+| POS-001 | Close and sign out | shiftId, countedCash, variance | closeStep == 'summary' |
 | POS-008 | The day is reported |  |  |
 | BO-024 | The supervisor reviews the shift and the deposit reconciles |  |  |
-| POS-002 | Sell — Ticket Catalogue |  |  |
 | POS-009 | Staff Roster |  |  |
 
 ## POS-010 Add to Existing Ticket
@@ -577,8 +581,7 @@
 
 | To | Trigger | Carries | Guard |
 |---|---|---|---|
-| POS-001 | Begin Shift |  |  |
-| POS-002 | Sell — Ticket Catalogue | orderId |  |
+| POS-002 | Sell — Ticket Catalogue | orderId, promotionId |  |
 | POS-003 | Sell — Timed Entry |  |  |
 | POS-004 | Sell — Seat Map | performanceId |  |
 | POS-005 | Payment | paymentId |  |
@@ -616,7 +619,7 @@
 | `adjustDepositBoxFloat` | [OrderService](../backend/OrderService.md#adjustdepositboxfloat) | onAction | Change the initial fund | `CASH_ADD` |
 | `listDenominations` | [OrderService](../backend/OrderService.md#listdenominations) | onLoad | listDenominations | `SHIFT_OPEN` |
 | `listOutlets` | [TenancyService](../backend/TenancyService.md#listoutlets) | onLoad | List outlets | `SCOPE_VIEW` |
-| `lookupRetailSale` | [RetailService](../backend/RetailService.md#lookupretailsale) | onAction | Find a sale from a receipt | `ORDER_VIEW` |
+| `lookupRetailSale` | [RetailService](../backend/RetailService.md#lookupretailsale) | onAction | Find a sale from a receipt; returns a list with matchedBy, a pick list when several match (audit R215) | `ORDER_VIEW` |
 | `createRetailReturn` | [RetailService](../backend/RetailService.md#createretailreturn) | onAction | Accept a return | `ORDER_REFUND` |
 | `listSerialisedItems` | [InventoryService](../backend/InventoryService.md#listserialiseditems) | onLoad | listSerialisedItems | `PRODUCT_VIEW` |
 
@@ -998,7 +1001,7 @@
 |---|---|---|---|---|
 | `listShifts` | [OrderService](../backend/OrderService.md#listshifts) | onLoad | List shifts | `REPORT_VIEW_WORKSTATION` |
 | `setVenueSettings` | [TenancyService](../backend/TenancyService.md#setvenuesettings) | onAction | Set support hours, quiet hours, segregated access and alerti | `TENANT_CONFIGURE` |
-| `getVenueSettings` | [TenancyService](../backend/TenancyService.md#getvenuesettings) | onLoad | Operational settings for this venue | `TENANT_CONFIGURE` |
+| `getVenueSettings` | [TenancyService](../backend/TenancyService.md#getvenuesettings) | onLoad | Operational settings for this venue | `TENANT_VIEW` |
 
 **States**
 
@@ -1048,7 +1051,7 @@
 | `listAlerts` | [ReportingService](../backend/ReportingService.md#listalerts) | onLoad | What is currently raised | `REPORT_VIEW_VENUE` |
 | `createApprovalRequest` | [TenancyService](../backend/TenancyService.md#createapprovalrequest) | onAction | Raise a request | `APPROVAL_REQUEST` |
 | `decideApprovalRequest` | [TenancyService](../backend/TenancyService.md#decideapprovalrequest) | onAction | Approve or reject | `APPROVAL_DECIDE` |
-| `runReport` | [ReportingService](../backend/ReportingService.md#runreport) | onAction | Run a report | `REPORT_VIEW_VENUE` |
+| `runReport` | [ReportingService](../backend/ReportingService.md#runreport) | onAction | Shift summary -- runs the seeded report shiftSummary (audit R282) | `REPORT_VIEW_VENUE` |
 
 **States**
 
@@ -1119,6 +1122,7 @@
 |---|---|---|---|
 | POS-005 | Charge | cart, guest, discount, orderType, table, taxTotals | payment.take |
 | POS-002 | Sell — Ticket Catalogue | promotionId |  |
+| POS-022 | The order goes to the pass before the guest pays |  |  |
 
 ## POS-022 Send to Kitchen
 
@@ -1268,7 +1272,6 @@
 
 | To | Trigger | Carries | Guard |
 |---|---|---|---|
-| POS-005 | Payment |  |  |
 | POS-002 | Sell — Ticket Catalogue |  |  |
 
 ## POS-025 Till Home
@@ -1651,6 +1654,7 @@
 
 | Operation | Service | When | Purpose | Permission |
 |---|---|---|---|---|
+| `listKitchenTickets` | [FnbService](../backend/FnbService.md#listkitchentickets) | onLoad | Kitchen ticket queue, filtered by course (audit R277) | `ORDER_VIEW` |
 | `setKitchenTicketStatus` | [FnbService](../backend/FnbService.md#setkitchenticketstatus) | onAction | Advance a kitchen ticket | `ORDER_MODIFY` |
 | `prioritiseKitchenTicket` | [FnbService](../backend/FnbService.md#prioritisekitchenticket) | onAction | Move a ticket up the queue | `ORDER_MODIFY` |
 | `fireCourse` | [FnbService](../backend/FnbService.md#firecourse) | onAction | Send a held course to the pass | `ORDER_MODIFY` |
@@ -1664,6 +1668,7 @@
 | loading | The rail, oldest ticket first. The count renders before the tickets — a kitchen wants to know how deep it is before it reads anything. |
 | error | Could not reach the platform. The rail is still live from cache and every bump is queued. |
 | emptyFirstRun | No tickets. The kitchen is clear, and that is worth saying plainly rather than showing a blank rail — a screen that looks broken and a screen that means nothing to do are the same picture otherwise. |
+| emptyNoResults | Nothing matches this course filter. The rail is not empty — the filter is narrow, and on a kitchen screen that distinction is the difference between calm and panic (audit R277). |
 | emptyNoAccess | This display is not assigned to a station. Assignment is a back-office act — a kitchen screen does not choose what it shows. A principal without `ORDER_MODIFY` gets this state naming `ORDER_MODIFY`, the screen's `permission` and the one its fire, hold, status and prioritise actions need (the screen has no read); a button whose own `permission` the principal lacks is hidden, and a 403 from an action names that operation's permission. |
 | offline | Amber, and it keeps working. The kitchen still has to send food out — a display that blanks mid-service is worse than one that says it is behind, and every bump journals locally and syncs when the network returns. |
 
@@ -1744,6 +1749,7 @@
 
 | Operation | Service | When | Purpose | Permission |
 |---|---|---|---|---|
+| `listKitchenTickets` | [FnbService](../backend/FnbService.md#listkitchentickets) | onLoad | Kitchen ticket queue, filtered by course (audit R277) | `ORDER_VIEW` |
 | `listKitchenStations` | [FnbService](../backend/FnbService.md#listkitchenstations) | onLoad | List preparation stations and their routing | `PRODUCT_VIEW` |
 | `setKitchenStations` | [FnbService](../backend/FnbService.md#setkitchenstations) | onAction | Configure stations and item routing | `PRODUCT_CONFIGURE` |
 
@@ -1886,6 +1892,7 @@
 
 | Operation | Service | When | Purpose | Permission |
 |---|---|---|---|---|
+| `listKitchenTickets` | [FnbService](../backend/FnbService.md#listkitchentickets) | onLoad | Kitchen ticket queue, filtered by course (audit R277) | `ORDER_VIEW` |
 | `setItemAvailability` | [FnbService](../backend/FnbService.md#setitemavailability) | onAction | Mark an item available or eighty-sixed | `PRODUCT_CONFIGURE` |
 | `setKitchenTicketStatus` | [FnbService](../backend/FnbService.md#setkitchenticketstatus) | onAction | Advance a kitchen ticket | `ORDER_MODIFY` |
 | `getHaccpStatus` | [FnbService](../backend/FnbService.md#gethaccpstatus) | onLoad | getHaccpStatus | `INCIDENT_VIEW` |
@@ -2052,7 +2059,6 @@
 |---|---|---|---|
 | POS-002 | Back | orderId |  |
 | POS-005 | Add seats to sale, then charge | cart, seatPicks, holdExpiresAt, guest, discount | payment.take |
-| POS-001 | Begin Shift |  |  |
 | POS-003 | Sell — Timed Entry |  |  |
 | POS-006 | Held Orders | orderId |  |
 
@@ -2080,7 +2086,7 @@
 
 | Operation | Service | When | Purpose | Permission |
 |---|---|---|---|---|
-| `runReport` | [ReportingService](../backend/ReportingService.md#runreport) | onAction | Terminal day view | `REPORT_VIEW_VENUE` |
+| `runReport` | [ReportingService](../backend/ReportingService.md#runreport) | onAction | Terminal day view -- runs the seeded report terminalDayView (audit R282) | `REPORT_VIEW_VENUE` |
 | `askReportingQuestion` | [ReportingService](../backend/ReportingService.md#askreportingquestion) | onAction | Natural-language reporting query | `REPORT_VIEW_VENUE` |
 | `deleteReport` | [ReportingService](../backend/ReportingService.md#deletereport) | onAction | Retire a report definition | `REPORT_MANAGE` |
 | `getFinancialReport` | [LedgerService](../backend/LedgerService.md#getfinancialreport) | onLoad | P&L, balance sheet or cash flow | `REPORT_VIEW_VENUE` |
@@ -2104,8 +2110,6 @@
 | To | Trigger | Carries | Guard |
 |---|---|---|---|
 | POS-009 | Staffing against takings is read |  |  |
-| POS-001 | Begin Shift |  |  |
-| POS-002 | Sell — Ticket Catalogue |  |  |
 
 ## POS-009 Staff Roster
 
@@ -2163,5 +2167,4 @@
 | To | Trigger | Carries | Guard |
 |---|---|---|---|
 | POS-001 | Begin Shift | shiftId |  |
-| POS-002 | Sell — Ticket Catalogue |  |  |
 | POS-007 | Close Shift |  |  |

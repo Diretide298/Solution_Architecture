@@ -100,8 +100,9 @@ steps:
   operations: []
   outcome: Ready for the next screen on this board
 - step: 16
-  screen: BO-472
-  action: Works in Operational Alerts & Exception Center
+  screen: BO-141
+  action: Works in Operational Alerts, AI Replenishment & Action Center (Operational Alerts & Exception
+    Center, merged into it on 28 September, audit R276)
   operations: []
   outcome: Provide one central queue for operational problems requiring attention.
 - step: 17

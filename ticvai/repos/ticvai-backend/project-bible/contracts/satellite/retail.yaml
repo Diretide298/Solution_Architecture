@@ -427,6 +427,13 @@ paths:
         The most-used operation on a shop floor. Returns price after any live promotion,
         stock at this outlet, and stock at sibling outlets — so a colleague can be sent to
         fetch a size rather than losing the sale.
+
+
+        **"This outlet" is the outlet of the workstation asking** (decided 28 September, audit
+        R215): price and `onHand` are that outlet's row. A caller with no workstation (a guest
+        on the web shop or app) names the outlet with `outletId`; a workstation caller's own
+        outlet always wins. **An inactive item is not found**: it answers `404`, exactly as
+        an unknown barcode does.
       tags: [floor]
       x-ticvai-permission: PRODUCT_VIEW
       x-ticvai-scope-level: venue
@@ -445,6 +452,13 @@ paths:
           in: query
           description: False leaves `siblingOutlets` empty.
           schema: { type: boolean, default: true }
+        - name: outletId
+          in: query
+          description: >
+            The outlet to price and count at, for a caller with no workstation (audit R215).
+            Ignored for a workstation caller, whose own outlet is used. Required when the
+            caller has no workstation; absent then, the request is a `400`.
+          schema: { type: string, format: uuid }
       responses:
         '200':
           description: Price and stock
@@ -452,11 +466,16 @@ paths:
             application/json:
               schema: { $ref: '#/components/schemas/PriceCheck' }
         '400':
-          description: Neither barcode nor SKU supplied
+          description: Neither barcode nor SKU supplied, or a caller with no workstation sent no `outletId` (audit R215)
           content:
             application/problem+json:
               schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
-        '404': { $ref: '../shared/common.yaml#/components/responses/NotFound' }
+        '404':
+          description: No active item with that barcode or SKU at the outlet. An inactive item is not found (audit R215).
+          x-ticvai-problem-types: [not-found]
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
 
   # ---------------------------------------------------------------- sales
   /retail-sales:
@@ -593,6 +612,12 @@ paths:
       description: >
         By receipt number, order number or the barcode printed on the receipt. A guest at a
         returns desk has a piece of paper, not an order ID.
+
+
+        **Where several identifiers are sent, the receipt barcode wins, then the receipt
+        number, then the order number** (decided 28 September, audit R215); the others are
+        ignored and `matchedBy` says which was used. **Several matching sales return a list**,
+        newest first, for the cashier to choose from; one match is a list of one.
       tags: [return]
       x-ticvai-permission: ORDER_VIEW
       x-ticvai-scope-level: venue
@@ -609,14 +634,33 @@ paths:
           schema: { type: string }
         - name: receiptBarcode
           in: query
-          description: Exact match on the barcode printed on the receipt.
+          description: Exact match on the barcode printed on the receipt. Wins over the other two (audit R215).
           schema: { type: string }
+        - $ref: '../shared/common.yaml#/components/parameters/PageSize'
+        - $ref: '../shared/common.yaml#/components/parameters/PageCursor'
       responses:
         '200':
-          description: Sale
+          description: The matching sales, newest first. Several matches return several (audit R215).
           content:
             application/json:
-              schema: { $ref: '#/components/schemas/RetailSale' }
+              schema:
+                allOf:
+                  - $ref: '../shared/common.yaml#/components/schemas/Page'
+                  - type: object
+                    required: [matchedBy]
+                    properties:
+                      matchedBy:
+                        type: string
+                        enum: [receiptBarcode, receiptNumber, orderNumber]
+                        description: The identifier used, by the precedence above (audit R215).
+                      items:
+                        type: array
+                        items: { $ref: '#/components/schemas/RetailSale' }
+        '400':
+          description: None of the three identifiers was sent
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
         '404': { $ref: '../shared/common.yaml#/components/responses/NotFound' }
 
   /retail-sales/{saleId}/reprint:
@@ -733,9 +777,19 @@ paths:
         `refusedReason`, nothing refunded, restocked or written off, and a new id that the
         server assigns and returns as `refusalId`. The request's own `id` stays unused, so the
         same return can be sent again, under a new `Idempotency-Key`, once the second
-        authoriser or the approval is in hand.
+        authoriser is in hand.
+
+
+        **Above the outlet's self-authorise limit, a supervisor's step-up on the same device**
+        (decided 28 September, audit R144), never an approval request. `secondaryAuthorisation`
+        carries the supervisor's principal and staff PIN (a PIN, never a password, audit R123
+        (7)). The rule is `SupervisorStepUp` in `common.yaml`: the PIN is verified against the
+        principal, who must hold `ORDER_REFUND_APPROVE` at this venue and must not be the caller;
+        a failure is a `403` (`supervisor-step-up-refused`) and nothing is written. Missing when
+        the amount needs it, the return is refused with the `409` below.
       tags: [return]
       x-ticvai-permission: ORDER_REFUND
+      x-ticvai-permission-escalated: ORDER_REFUND_APPROVE
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
@@ -758,12 +812,23 @@ paths:
         '409':
           description: >
             Refused by the return policy: outside the return window, item is non-returnable,
-            already returned, a second authoriser or an approval is required, no receipt, or a
-            serial number that does not match. `refusedReason` says which, and `refusalId`
-            names the recorded refusal.
+            already returned, a supervisor step-up is required, no receipt, or a serial number
+            that does not match. `refusedReason` says which, and `refusalId` names the recorded
+            refusal.
           content:
             application/problem+json:
               schema: { $ref: '#/components/schemas/ReturnPolicyProblem' }
+        '403':
+          description: >
+            The caller lacks `ORDER_REFUND`, or the supervisor step-up failed: the PIN did not
+            verify, the principal does not hold `ORDER_REFUND_APPROVE` at this venue, or is the
+            caller (`supervisor-step-up-refused`, audit R144).
+          x-ticvai-problem-types:
+            - forbidden
+            - supervisor-step-up-refused
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
 
   /retail-exchanges:
     post:
@@ -921,7 +986,10 @@ paths:
   /shop-and-drop:
     post:
       operationId: createShopAndDrop
-      x-ticvai-audience: [staff]
+      x-ticvai-audience: [staff, service]
+      security:
+        - bearerAuth: []
+        - serviceAuth: []
       summary: Buy now, collect on the way out
       description: >
         4.4.7 — a guest buys in store and leaves the goods behind rather than carrying them
@@ -935,6 +1003,13 @@ paths:
         Not a reservation. `reserveMerchandise` holds unsold stock for someone who has not
         paid; this is paid goods awaiting handover, and conflating the two produces a stock
         figure nobody can explain.
+
+
+        **Also called by the order service when an online order is paid** (decided 28
+        September, audit R236): a guest on the web buys merchandise to collect on the way
+        out, pays at checkout, and on payment the order service calls this with `orderId`
+        (and no `saleId`), once per order, naming the retail lines marked for collection in
+        `lineIds`. A staff caller at a till sends `saleId`. Exactly one of the two is sent.
       tags: [floor]
       x-ticvai-permission: ORDER_CREATE
       x-ticvai-scope-level: workstation
@@ -948,10 +1023,19 @@ paths:
           application/json:
             schema:
               type: object
-              required: [id, saleId, collectionPointId, recordedAt]
+              required: [id, collectionPointId, recordedAt]
               properties:
                 id: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
-                saleId: { type: string }
+                saleId:
+                  type: string
+                  nullable: true
+                  description: The retail sale, from a till. Send this or `orderId`, not both.
+                orderId:
+                  type: string
+                  nullable: true
+                  description: >
+                    The paid online order, when the order service calls on payment (audit R236).
+                    `lineIds` then names the order's retail lines marked for collection.
                 entitlementId:
                   type: string
                   nullable: true
@@ -1095,8 +1179,6 @@ paths:
     post:
       operationId: reserveMerchandise
       x-ticvai-consumed-by:
-        - "P01 WEB-033 Shop"
-        - "P01 WEB-042 Retail & Shop and Drop"
         - "P02 GST-026 Retail / Merchandise"
         - "P04 POS-012 Omnichannel Order & Fulfilment Center"
         - "P05 KSK-017 Shop"
@@ -1107,6 +1189,21 @@ paths:
       description: >
         A guest who cannot carry a purchase around a venue collects it on the way out. The
         item is allocated but not sold, and the reservation expires.
+
+
+        **`expiresAt` is at least 15 minutes ahead and no later than the end of the visit
+        day** (decided 28 September, audit R215): the close of the venue's operating day on
+        which the reservation is made. Outside that window the request is a `400`. **Left
+        out, the reservation holds until the end of the visit day** (decided 28 September,
+        audit R169).
+
+
+        **Not the guest path for buying to collect, on the web or in the app** (decided
+        28 September, audit R236). A guest buying to collect pays online at checkout
+        (`addCartLine`, `checkoutCart`, `createPayment`), and the order service creates the
+        collection with `createShopAndDrop`. This holds unpaid stock only: in the guest app
+        (GST-026) it is offered as a hold the guest pays for at the shop, and staff use it
+        at a till or an outlet. A held item is never collected unpaid.
       tags: [floor]
       x-ticvai-permission: ORDER_CREATE
       x-ticvai-scope-level: venue
@@ -1120,7 +1217,7 @@ paths:
           application/json:
             schema:
               type: object
-              required: [id, lines, expiresAt]
+              required: [id, lines]
               properties:
                 id: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
                 subjectId: { type: string, format: uuid }
@@ -1133,9 +1230,23 @@ paths:
                     properties:
                       merchandiseId: { type: string, format: uuid }
                       quantity: { type: integer, minimum: 1 }
-                expiresAt: { type: string, format: date-time }
+                expiresAt:
+                  type: string
+                  format: date-time
+                  description: >
+                    At least 15 minutes from now and no later than the close of the venue's
+                    operating day (audit R215). Defaults to the close of the venue's operating
+                    day, the end of the visit day (audit R169).
                 collectionNote: { type: string, maxLength: 200 }
       responses:
+        '400':
+          description: >
+            `expiresAt` is less than 15 minutes ahead, or later than the end of the visit day
+            (audit R215).
+          x-ticvai-problem-types: [validation]
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
         '201':
           headers:
             X-Consistency-Token:
@@ -1489,6 +1600,12 @@ components:
       required: [merchandiseId, name, listPrice, effectivePrice, onHand]
       properties:
         merchandiseId: { type: string, format: uuid }
+        outletId:
+          type: string
+          format: uuid
+          description: >
+            The outlet whose price and stock this is: the asking workstation's outlet, or
+            `outletId` for a caller with none (decided 28 September, audit R215).
         sku: { type: string }
         name: { type: string }
         listPrice: { $ref: '../shared/common.yaml#/components/schemas/Money' }
@@ -1551,7 +1668,15 @@ components:
       required: [id, receiptNumber, orderId, outletId, lines, grossAmount, createdAt]
       properties:
         id: { type: string }
-        receiptNumber: { type: string }
+        receiptNumber:
+          type: string
+          readOnly: true
+          description: >
+            **Server-assigned: the venue prefix plus a sequence per venue** (decided 28
+            September, audit R152). Each till holds a reserved range of the venue's sequence,
+            so a sale made offline prints its number at once and the server accepts it on
+            sync. **Not gapless**: an unused reserved number is skipped, not reissued. Only
+            tax invoices are gapless, per legal entity.
         orderId:
           type: string
           description: The order in the Order & Payment context. Retail does not keep its own ledger.
@@ -1658,11 +1783,14 @@ components:
             Defaults to the original tender. Cash refunds against a card sale usually need
             approval, per the outlet's return policy.
         secondaryAuthorisation:
-          type: object
-          description: Required above the outlet's self-authorise limit.
-          properties:
-            principalId: { type: string, format: uuid }
-            credential: { type: string }
+          allOf:
+            - $ref: '../shared/common.yaml#/components/schemas/SupervisorStepUp'
+          description: >
+            Required above the outlet's self-authorise limit. **A supervisor's step-up on the
+            same device** (decided 28 September, audit R144): `credential` is the supervisor's
+            staff PIN, never a password (audit R123 (7)), as on orders `CreateRefundRequest`.
+            The principal must hold `ORDER_REFUND_APPROVE` at this venue and must not be the
+            caller.
         recordedAt: { type: string, format: date-time }
 
     RetailReturn:
@@ -1857,13 +1985,20 @@ components:
     ShopAndDrop:
       type: object
       x-ticvai-persistence: "retail.shop_and_drop + retail.shop_and_drop_line"
-      required: [id, dropReference, saleId, collectionPointId, status, collectBy]
+      required: [id, dropReference, collectionPointId, status, collectBy]
       properties:
         id: { type: string }
         dropReference:
           type: string
           description: Short and readable. Printed on the slip a guest may or may not keep.
-        saleId: { type: string }
+        saleId:
+          type: string
+          nullable: true
+          description: The till sale. Null for an online order, which sets `orderId` (audit R236).
+        orderId:
+          type: string
+          nullable: true
+          description: The paid online order that created this collection (audit R236).
         entitlementId:
           type: string
           nullable: true
@@ -1944,3 +2079,9 @@ components:
       type: http
       scheme: bearer
       bearerFormat: JWT
+    serviceAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: Cell-to-cell, as `common.yaml` `serviceAuth`. Used by the order service calling
+        `createShopAndDrop` when an online order is paid (audit R236).

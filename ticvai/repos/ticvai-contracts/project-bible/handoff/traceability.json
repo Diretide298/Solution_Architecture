@@ -4238,7 +4238,7 @@
    "domain": "Ticketing Catalogue",
    "verdict": "CONTRACTED",
    "contract": "resources",
-   "evidence": "SessionParticipant",
+   "evidence": "PerformanceParticipant",
    "note": "Arrival is recorded. The process around it — waiver signed, class sheet, which session — is not. **Contracted 18 August by the resources contract (CF-125), BL-045.**",
    "backlog": "BL-045"
   },
@@ -4262,7 +4262,7 @@
    "domain": "Ticketing Catalogue",
    "verdict": "CONTRACTED",
    "contract": "resources",
-   "evidence": "SessionParticipant",
+   "evidence": "PerformanceParticipant",
    "note": "A first-time uplift is a variant with its own price. Which mix of flyers a session may hold is not modelled. **Contracted 18 August by the resources contract (CF-125), BL-045.**",
    "backlog": "BL-045"
   },
@@ -4274,7 +4274,7 @@
    "domain": "Ticketing Catalogue",
    "verdict": "CONTRACTED",
    "contract": "resources",
-   "evidence": "SessionParticipant",
+   "evidence": "PerformanceParticipant",
    "note": "A first-time uplift is a variant with its own price. Which mix of flyers a session may hold is not modelled. **Contracted 18 August by the resources contract (CF-125), BL-045.**",
    "backlog": "BL-045"
   },
@@ -4288,7 +4288,7 @@
    "contract": "resources",
    "note": "No session manifest, no running order within a session, no option added to a participant mid-session. **Contracted 18 August by the resources contract (CF-125), BL-045.**",
    "backlog": "BL-045",
-   "evidence": "SessionParticipant"
+   "evidence": "PerformanceParticipant"
   },
   {
    "packageRef": "1.3.46",
@@ -4300,7 +4300,7 @@
    "contract": "resources",
    "note": "No session manifest, no running order within a session, no option added to a participant mid-session. **Contracted 18 August by the resources contract (CF-125), BL-045.**",
    "backlog": "BL-045",
-   "evidence": "SessionParticipant"
+   "evidence": "PerformanceParticipant"
   },
   {
    "packageRef": "1.3.47",
@@ -4312,7 +4312,7 @@
    "contract": "resources",
    "note": "No session manifest, no running order within a session, no option added to a participant mid-session. **Contracted 18 August by the resources contract (CF-125), BL-045.**",
    "backlog": "BL-045",
-   "evidence": "SessionParticipant"
+   "evidence": "PerformanceParticipant"
   },
   {
    "packageRef": "1.3.48",
@@ -4322,7 +4322,7 @@
    "domain": "Ticketing Catalogue",
    "verdict": "CONTRACTED",
    "contract": "resources",
-   "evidence": "SessionParticipant",
+   "evidence": "PerformanceParticipant",
    "note": "MediaUsage.surface has no participant or session value. **Contracted 18 August by the resources contract (CF-125), BL-045.**",
    "backlog": "BL-045"
   },

@@ -10,8 +10,8 @@ scale: Read-heavy, extreme latency sensitivity, edge-cached. **`frozenDays` is h
 ifDown: Down means the gates stop. Runs at the edge with a local decision cache.
 coverage:
   operations: 182
-  inAFlow: 163
-  percent: 90%
+  inAFlow: 161
+  percent: 88%
   note: '**Flow coverage is how much of this service a journey has walked.** A service under 40% is
     unwalked rather than under-documented.'
 schemas:
@@ -1572,7 +1572,7 @@ tables:
   - access
   foreignWriters: null
 - table: access.entitlement
-  columns: 24
+  columns: 26
   store: postgres
   parent: null
   writtenBy:
@@ -1604,7 +1604,7 @@ tables:
   - access
   foreignWriters: null
 - table: access.scan_event
-  columns: 15
+  columns: 16
   store: postgres
   parent: null
   writtenBy:
@@ -1676,6 +1676,7 @@ writesOutside:
     tables:
     - marketing.consent_record
 screens:
+- P01:WEB-001 Home / Landing
 - P01:WEB-018 My Tickets
 - P01:WEB-024 Devices, Wishlist & Consent
 - P01:WEB-041 Parking – Reserve & Pay
@@ -1703,6 +1704,7 @@ screens:
 - P07:SCN-015 Offline package
 - P07:SCN-016 Gate mode
 - P08:BO-006 Parking Configuration
+- P08:BO-027 Reissue & Media Replacement
 - P08:BO-032 Admission Profiles
 - P08:BO-033 Blacklist Management
 - P08:BO-034 Scan Activity
@@ -1859,7 +1861,6 @@ screens:
 - P08:BO-362 Credential Security, Audit & Operational Evidence
 - P08:BO-363 Ticket Media Analytics & AI Operations Intelligence
 - P08:BO-644 Credential Issuance Command Center
-- P08:BO-652 Credential Replacement & Reissue
 - P08:BO-653 Credential Registry & Credential History
 - P08:BO-780 Guest Engagement Journeys
 - P08:BO-981 Conflict & Impact Simulation
@@ -1867,7 +1868,6 @@ screens:
 flows:
 - F06 Guest enters the venue
 - F10 Partner books, uses and settles
-- F107 A report is defined, scheduled and delivered
 - 'F111 Access Control board 1: Access Control Command Center'
 - 'F112 Access Control board 2: Access Rule Command Center'
 - 'F113 Access Control board 3: Digital Credential Security Command Center'
@@ -1893,3 +1893,4 @@ flows:
 - F71 A device is prepared, used and handed over
 - F72 A shift ends and the summary is read
 - F87 A till handles a return, a collection and a safe drop
+- F89 Offline policy is set, cached, monitored and reconciled

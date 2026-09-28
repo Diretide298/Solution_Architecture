@@ -1,4 +1,4 @@
--- workforce — 21 tables
+-- workforce — 22 tables
 -- **Derived. Do not hand-edit.**
 
 -- Targeted by venue, department or role. emergency is not a louder operational Hangs off: reaches
@@ -49,6 +49,18 @@ CREATE TABLE IF NOT EXISTS workforce.attendance (
     amendment_reason                  text,
     original_occurred_at              timestamptz,
     exception                         text CONSTRAINT attendance_exception_chk CHECK (exception IN ('late', 'earlyLeave', 'missingClockOut', 'noShow', 'outOfGeofence', 'unscheduled'))
+);
+
+-- Holds 7 columns. No description has been written for this table — the name is the only thing
+-- saying what it is
+CREATE TABLE IF NOT EXISTS workforce.attendance_amendment (
+    id                                uuid PRIMARY KEY NOT NULL,
+    attendance_record_id              uuid NOT NULL,
+    amended_by_principal_id           uuid NOT NULL,
+    amended_at                        timestamptz NOT NULL,
+    occurred_at_before                timestamptz NOT NULL,
+    occurred_at_after                 timestamptz NOT NULL,
+    reason                            text NOT NULL CONSTRAINT attendance_amendment_reason_chk CHECK (char_length(reason) <= 300)
 );
 
 -- Holds 14 columns. No description has been written for this table — the name is the only thing

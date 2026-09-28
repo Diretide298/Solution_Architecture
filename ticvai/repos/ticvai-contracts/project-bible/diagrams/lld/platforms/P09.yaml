@@ -35,13 +35,13 @@ servicesCalled:
 - service: CatalogueService
   operationCalls: 311
 - service: PlatformService
-  operationCalls: 288
+  operationCalls: 296
 - service: OrderService
   operationCalls: 145
 - service: TenancyService
-  operationCalls: 85
+  operationCalls: 88
 - service: IdentityService
-  operationCalls: 29
+  operationCalls: 45
 - service: WhiteLabelService
   operationCalls: 20
 - service: MarketingService
@@ -72,24 +72,32 @@ screens:
   wave: 1
   density: compact
   operations:
+  - createMfaChallenge
+  - enrolMfaMethod
   - forceLogout
   - getCurrentSession
   - listActiveSessions
   - listMfaMethods
   - listSsoProviders
   - login
+  - removeMfaMethod
   - revokeAllSessions
+  - verifyMfaChallenge
+  - verifyMfaEnrolment
   states:
   - emptyFirstRun
   - emptyNoAccess
   - emptyNoResults
   - error
   - loading
+  - mfaEnrolmentRequired
+  - mfaRequired
   offlineState: false
-  entryParams: []
+  entryParams:
+  - challengeId<-navigation
+  - methodId<-navigation
   goesTo:
   - ADM-002
-  - ADM-003
   - ADM-004
   boardFrames: null
   wireframe: wireframes/P09 TICVAI Web.dc.html#adm-001
@@ -301,6 +309,7 @@ screens:
   - getTenantLicences
   - listTenantCells
   - listTenants
+  - openPlatformStaffGrant
   - provisionCell
   - reactivateTenant
   - removeLicenceAddOn
@@ -313,6 +322,7 @@ screens:
   - emptyNoAccess
   - emptyNoResults
   - error
+  - grantRequired
   - loading
   offlineState: false
   entryParams:
@@ -690,6 +700,8 @@ screens:
   - getBrandIdentity
   - getTheme
   - listConfigVersions
+  - listTenants
+  - openPlatformStaffGrant
   - publishTenantConfig
   - restoreConfigVersion
   - setAppIcons
@@ -700,6 +712,7 @@ screens:
   - emptyNoAccess
   - emptyNoResults
   - error
+  - grantRequired
   - loading
   offlineState: false
   entryParams:
@@ -710,7 +723,6 @@ screens:
   goesTo:
   - ADM-001
   - ADM-002
-  - ADM-003
   boardFrames: null
   wireframe: wireframes/P09 TICVAI Web.dc.html#adm-016
   inFlows:
@@ -725,6 +737,8 @@ screens:
   operations:
   - claimCustomDomain
   - listCustomDomains
+  - listTenants
+  - openPlatformStaffGrant
   - relinquishCustomDomain
   - verifyCustomDomain
   states:
@@ -732,6 +746,7 @@ screens:
   - emptyNoAccess
   - emptyNoResults
   - error
+  - grantRequired
   - loading
   offlineState: false
   entryParams:
@@ -743,7 +758,6 @@ screens:
   goesTo:
   - ADM-001
   - ADM-002
-  - ADM-003
   - ADM-016
   boardFrames: null
   wireframe: wireframes/P09 TICVAI Web.dc.html#adm-017
@@ -758,6 +772,8 @@ screens:
   operations:
   - listFaqs
   - listPolicies
+  - listTenants
+  - openPlatformStaffGrant
   - setFaqs
   - setLanguages
   - setPolicy
@@ -766,6 +782,7 @@ screens:
   - emptyNoAccess
   - emptyNoResults
   - error
+  - grantRequired
   - loading
   offlineState: false
   entryParams:
@@ -776,7 +793,6 @@ screens:
   goesTo:
   - ADM-001
   - ADM-002
-  - ADM-003
   boardFrames: null
   wireframe: wireframes/P09 TICVAI Web.dc.html#adm-018
   inFlows: null
@@ -790,12 +806,17 @@ screens:
   - createPlan
   - createPlanVersion
   - getPlan
+  - getVenueSettingsDefaults
   - listPlans
+  - listTenants
+  - openPlatformStaffGrant
+  - setVenueSettingsDefaults
   states:
   - emptyFirstRun
   - emptyNoAccess
   - emptyNoResults
   - error
+  - grantRequired
   - loading
   offlineState: false
   entryParams:
@@ -803,7 +824,6 @@ screens:
   goesTo:
   - ADM-001
   - ADM-002
-  - ADM-003
   boardFrames: null
   wireframe: wireframes/P09 TICVAI Web.dc.html#adm-019
   inFlows: null
@@ -830,7 +850,6 @@ screens:
   goesTo:
   - ADM-001
   - ADM-002
-  - ADM-003
   boardFrames: null
   wireframe: wireframes/P09 TICVAI Web.dc.html#adm-020
   inFlows:
@@ -856,7 +875,6 @@ screens:
   goesTo:
   - ADM-001
   - ADM-002
-  - ADM-003
   boardFrames: null
   wireframe: wireframes/P09 TICVAI Web.dc.html#adm-021
   inFlows:
@@ -887,7 +905,6 @@ screens:
   goesTo:
   - ADM-001
   - ADM-002
-  - ADM-003
   - ADM-027
   boardFrames: null
   wireframe: wireframes/P09 TICVAI Web.dc.html#adm-022
@@ -919,7 +936,6 @@ screens:
   goesTo:
   - ADM-001
   - ADM-002
-  - ADM-003
   - ADM-029
   boardFrames: null
   wireframe: wireframes/P09 TICVAI Web.dc.html#adm-023
@@ -946,7 +962,6 @@ screens:
   goesTo:
   - ADM-001
   - ADM-002
-  - ADM-003
   boardFrames: null
   wireframe: wireframes/P09 TICVAI Web.dc.html#adm-024
   inFlows: null
@@ -970,7 +985,6 @@ screens:
   goesTo:
   - ADM-001
   - ADM-002
-  - ADM-003
   boardFrames: null
   wireframe: wireframes/P09 TICVAI Web.dc.html#adm-025
   inFlows: null
@@ -996,7 +1010,6 @@ screens:
   goesTo:
   - ADM-001
   - ADM-002
-  - ADM-003
   boardFrames: null
   wireframe: wireframes/P09 TICVAI Web.dc.html#adm-026
   inFlows: null
@@ -1025,7 +1038,6 @@ screens:
   goesTo:
   - ADM-001
   - ADM-002
-  - ADM-003
   - ADM-023
   boardFrames: null
   wireframe: wireframes/P09 TICVAI Web.dc.html#adm-027
@@ -1051,7 +1063,6 @@ screens:
   goesTo:
   - ADM-001
   - ADM-002
-  - ADM-003
   boardFrames: null
   wireframe: wireframes/P09 TICVAI Web.dc.html#adm-028
   inFlows: null
@@ -1080,6 +1091,7 @@ screens:
   - emptyNoResults
   - error
   - loading
+  - rolloutPendingApproval
   offlineState: false
   entryParams:
   - cellId<-deepLink
@@ -1134,12 +1146,15 @@ screens:
   - createDashboard
   - getDashboard
   - listDashboards
+  - listTenants
+  - openPlatformStaffGrant
   - updateDashboard
   states:
   - emptyFirstRun
   - emptyNoAccess
   - emptyNoResults
   - error
+  - grantRequired
   - loading
   offlineState: false
   entryParams:
@@ -1147,7 +1162,6 @@ screens:
   goesTo:
   - ADM-001
   - ADM-002
-  - ADM-003
   - ADM-004
   boardFrames: null
   wireframe: wireframes/P09 TICVAI Web.dc.html#adm-031
@@ -1267,7 +1281,6 @@ screens:
   goesTo:
   - ADM-001
   - ADM-002
-  - ADM-003
   boardFrames: null
   wireframe: wireframes/P09 TICVAI Web.dc.html#adm-035
   inFlows: null
@@ -1293,7 +1306,6 @@ screens:
   goesTo:
   - ADM-001
   - ADM-002
-  - ADM-003
   boardFrames: null
   wireframe: wireframes/P09 TICVAI Web.dc.html#adm-036
   inFlows: null
@@ -1304,7 +1316,11 @@ screens:
   wave: 1
   density: compact
   operations:
+  - getRegionSettings
   - listAiProviders
+  - listOwnPlatformStaffGrants
+  - listTenants
+  - openPlatformStaffGrant
   - setAiCredential
   - setAiProvider
   - testAiProvider
@@ -1313,10 +1329,12 @@ screens:
   - emptyNoAccess
   - emptyNoResults
   - error
+  - grantRequired
   - loading
   offlineState: false
   entryParams:
   - providerId<-deepLink
+  - regionId<-navigation
   goesTo:
   - ADM-001
   boardFrames: null
@@ -8227,6 +8245,7 @@ screens:
   operations:
   - listMfaMethods
   - listStepUpPolicies
+  - setPasswordPolicy
   - setStepUpPolicy
   states:
   - emptyFirstRun
@@ -9842,12 +9861,15 @@ screens:
   wave: 3
   density: compact
   operations:
+  - listTenants
+  - openPlatformStaffGrant
   - setPaymentProvider
   states:
   - emptyFirstRun
   - emptyNoAccess
   - emptyNoResults
   - error
+  - grantRequired
   - loading
   offlineState: false
   entryParams: []
@@ -10052,12 +10074,15 @@ screens:
   density: compact
   operations:
   - createPrincipal
+  - listTenants
+  - openPlatformStaffGrant
   - setPasswordPolicy
   states:
   - emptyFirstRun
   - emptyNoAccess
   - emptyNoResults
   - error
+  - grantRequired
   - loading
   offlineState: false
   entryParams: []

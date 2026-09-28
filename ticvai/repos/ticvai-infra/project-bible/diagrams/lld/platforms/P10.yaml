@@ -31,7 +31,7 @@ servicesCalled:
 - service: CatalogueService
   operationCalls: 33
 - service: IdentityService
-  operationCalls: 14
+  operationCalls: 16
 - service: MarketingService
   operationCalls: 9
 - service: ReportingService
@@ -52,6 +52,7 @@ screens:
   wave: 2
   density: compact
   operations:
+  - createMfaChallenge
   - forceLogout
   - getB2bCredit
   - getCurrentSession
@@ -63,15 +64,18 @@ screens:
   - overrideCreditLimit
   - revokeAllSessions
   - setB2bCreditLimit
+  - verifyMfaChallenge
   states:
   - emptyFirstRun
   - emptyNoAccess
   - emptyNoResults
   - error
   - loading
+  - mfaRequired
   offlineState: false
   entryParams:
   - accountId<-deepLink
+  - challengeId<-navigation
   goesTo:
   - PTR-002
   - PTR-003
@@ -138,7 +142,6 @@ screens:
   goesTo:
   - PTR-001
   - PTR-003
-  - PTR-004
   - PTR-007
   boardFrames:
   - Dashboards Board.dc.html#ptr-002
@@ -167,7 +170,6 @@ screens:
   - principalId<-session
   goesTo:
   - PTR-001
-  - PTR-002
   - PTR-004
   boardFrames: null
   wireframe: wireframes/P10 Partner Web.dc.html#ptr-003
@@ -191,7 +193,6 @@ screens:
   - messageId<-deepLink
   goesTo:
   - PTR-001
-  - PTR-002
   - PTR-003
   boardFrames: null
   wireframe: wireframes/P10 Partner Web.dc.html#ptr-004
@@ -233,7 +234,6 @@ screens:
   - channelCapacityId<-deepLink
   - orderId<-deepLink
   goesTo:
-  - PTR-001
   - PTR-002
   - PTR-003
   - PTR-008
@@ -276,8 +276,6 @@ screens:
   - priceListId<-deepLink
   - productId<-deepLink
   goesTo:
-  - PTR-001
-  - PTR-002
   - PTR-003
   boardFrames: null
   wireframe: wireframes/P10 Partner Web.dc.html#ptr-006
@@ -298,8 +296,6 @@ screens:
   offlineState: false
   entryParams: []
   goesTo:
-  - PTR-001
-  - PTR-002
   - PTR-003
   - PTR-008
   boardFrames: null
@@ -337,7 +333,6 @@ screens:
   entryParams:
   - orderId<-deepLink
   goesTo:
-  - PTR-001
   - PTR-002
   - PTR-003
   - PTR-016
@@ -367,8 +362,6 @@ screens:
   entryParams:
   - blockId<-deepLink
   goesTo:
-  - PTR-001
-  - PTR-002
   - PTR-003
   boardFrames:
   - Seat Board 3.dc.html#seat-3d
@@ -403,7 +396,6 @@ screens:
   - lineId<-deepLink
   - promotionId<-deepLink
   goesTo:
-  - PTR-001
   - PTR-002
   - PTR-003
   boardFrames: null
@@ -430,8 +422,6 @@ screens:
   entryParams:
   - agreementId<-deepLink
   goesTo:
-  - PTR-001
-  - PTR-002
   - PTR-003
   boardFrames: null
   wireframe: wireframes/P10 Partner Web.dc.html#ptr-011
@@ -456,7 +446,6 @@ screens:
   entryParams:
   - paymentId<-deepLink
   goesTo:
-  - PTR-001
   - PTR-002
   - PTR-003
   boardFrames: null
@@ -509,8 +498,6 @@ screens:
   entryParams:
   - settlementId<-deepLink
   goesTo:
-  - PTR-001
-  - PTR-002
   - PTR-003
   boardFrames: null
   wireframe: wireframes/P10 Partner Web.dc.html#ptr-014
@@ -547,7 +534,6 @@ screens:
   entryParams:
   - orderId<-deepLink
   goesTo:
-  - PTR-001
   - PTR-002
   - PTR-003
   boardFrames: null
@@ -584,7 +570,6 @@ screens:
   entryParams:
   - orderId<-PTR-008
   goesTo:
-  - PTR-001
   - PTR-002
   - PTR-003
   boardFrames: null
@@ -610,8 +595,6 @@ screens:
   entryParams:
   - agreementId<-deepLink
   goesTo:
-  - PTR-001
-  - PTR-002
   - PTR-003
   boardFrames: null
   wireframe: wireframes/P10 Partner Web.dc.html#ptr-017
@@ -643,8 +626,6 @@ screens:
   - conversationId<-deepLink
   - reportId<-deepLink
   goesTo:
-  - PTR-001
-  - PTR-002
   - PTR-003
   boardFrames: null
   wireframe: wireframes/P10 Partner Web.dc.html#ptr-018
@@ -671,7 +652,6 @@ screens:
   - clientId<-navigation
   goesTo:
   - PTR-001
-  - PTR-002
   - PTR-003
   boardFrames: null
   wireframe: wireframes/P10 Partner Web.dc.html#ptr-019
@@ -697,7 +677,6 @@ screens:
   - delegatedAccessId<-deepLink
   goesTo:
   - PTR-001
-  - PTR-002
   - PTR-003
   boardFrames: null
   wireframe: wireframes/P10 Partner Web.dc.html#ptr-020
@@ -727,8 +706,6 @@ screens:
   entryParams:
   - caseId<-deepLink
   goesTo:
-  - PTR-001
-  - PTR-002
   - PTR-003
   boardFrames: null
   wireframe: wireframes/P10 Partner Web.dc.html#ptr-021
@@ -751,7 +728,6 @@ screens:
   offlineState: false
   entryParams: []
   goesTo:
-  - PTR-001
   - PTR-023
   - PTR-024
   - PTR-025
@@ -972,7 +948,6 @@ screens:
   offlineState: false
   entryParams: []
   goesTo:
-  - PTR-001
   - PTR-033
   - PTR-034
   - PTR-035
@@ -1198,7 +1173,6 @@ screens:
   offlineState: false
   entryParams: []
   goesTo:
-  - PTR-001
   - PTR-043
   - PTR-044
   - PTR-045

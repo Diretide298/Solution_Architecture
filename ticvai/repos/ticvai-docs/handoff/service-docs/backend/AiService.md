@@ -23,12 +23,12 @@ Nothing outside itself.
 
 | Group | Operation | Method | Path | Part | Wave | Called by |
 |---|---|---|---|---|---|---|
-| ai | [`requestSuggestion`](#requestsuggestion) | POST | `/ai/suggestions` | core | 2 | ANL-001, ANL-010, BO-115, BO-117, GST-031, GST-052 … |
+| ai | [`requestSuggestion`](#requestsuggestion) | POST | `/ai/suggestions` | core | 2 | ANL-001, ANL-010, BO-115, BO-117, GST-031, WEB-044 |
 | ai | [`setAiCredential`](#setaicredential) | PUT | `/ai-providers/{providerId}/credential` | setup | 2 | ADM-037 |
 | ai | [`setSuggestionProvider`](#setsuggestionprovider) | PUT | `/ai/suggestion-providers` | setup | 2 |  |
 | assist | [`createAiConversation`](#createaiconversation) | POST | `/conversations` | core | 2 | EMP-019, EMP-020, GST-031, WEB-044 |
 | assist | [`listAiConversations`](#listaiconversations) | GET | `/conversations` | core | 2 | EMP-019, EMP-020, GST-068, WEB-044 |
-| assist | [`sendAiMessage`](#sendaimessage) | POST | `/conversations/{conversationId}/messages` | core | 2 | EMP-019, EMP-020, GST-031, GST-032, GST-033, GST-054 … |
+| assist | [`sendAiMessage`](#sendaimessage) | POST | `/conversations/{conversationId}/messages` | core | 2 | EMP-019, EMP-020, GST-031, GST-032, GST-033, KSK-015 … |
 | config | [`setAiPolicy`](#setaipolicy) | PUT | `/policy` | setup | 2 | BO-091 |
 | config | [`setAiProvider`](#setaiprovider) | PUT | `/providers` | setup | 2 | ADM-037 |
 | retrieval | [`ingestKnowledgeDocument`](#ingestknowledgedocument) | POST | `/collections/{collectionId}/documents` | setup | 2 |  |
@@ -55,7 +55,7 @@ Nothing outside itself.
 | Guest callable | True |
 | Reads | `ai.policy`, `ai.provider`, `ai.suggestion`, `cache:idempotency` |
 | Writes | `ai.activity`, `ai.suggestion`, `cache:idempotency` |
-| Called by | ANL-001, ANL-010, BO-115, BO-117, GST-031, GST-052, GST-054, GST-059, WEB-044 |
+| Called by | ANL-001, ANL-010, BO-115, BO-117, GST-031, WEB-044 |
 
 **Parameters**
 
@@ -102,7 +102,7 @@ Nothing outside itself.
 
 **The key goes to the vault and never to the database.** The request carries the secret once; what is stored is a `credentialRef`, and every read of this provider thereafter returns the reference rather than the value.
 **No surface ever holds a provider key.** A kiosk, an app and a browser all call TICVAI, and TICVAI calls the provider — because a token that reaches a client is a token that bills the tenant from somebody else's machine.
-Rotation is the same operation. The previous key is revoked at the vault after a grace window, so an in-flight request does not fail mid-answer.
+Rotation is the same operation. The previous key is revoked at the vault after a grace window, so an in-flight request does not fail mid-answer. **The window is 24 hours (decided 28 September, audit R096)**: a replaced key keeps working for `graceMinutes`, 1,440 unless a shorter window is sent — a compromised key is rotated with `graceMinutes: 0`.
 
 |  |  |
 |---|---|
@@ -129,7 +129,7 @@ Rotation is the same operation. The previous key is revoked at the vault after a
 |---|---|---|---|
 | secret | string (password) | yes | Write-only, never returned, never logged, never in an ai.interaction. |
 | expiresAt | string (date-time) |  | (nullable) |
-| graceMinutes | integer |  | How long the previous key stays valid, so in-flight requests survive. (default 15) |
+| graceMinutes | integer |  | How long the previous key stays valid, so in-flight requests survive. (min 0; max 1440; default 1440) |
 
 **Response**: `AiProvider`
 
@@ -340,7 +340,7 @@ Every response carries a trace id, the model and provider that produced it, toke
 | Conflict policy | append |
 | Reads | `ai.chunk_ref`, `ai.conversation`, `ai.knowledge_document`, `ai.message`, `ai.policy`, `ai.proposed_action`, `ai.provider`, `cache:answer`, `cache:idempotency`, `qdrant:knowledge` |
 | Writes | `ai.activity`, `ai.message`, `ai.proposed_action`, `cache:answer`, `cache:idempotency`, `qdrant:knowledge` |
-| Called by | EMP-019, EMP-020, GST-031, GST-032, GST-033, GST-054, KSK-015, WEB-044 |
+| Called by | EMP-019, EMP-020, GST-031, GST-032, GST-033, KSK-015, WEB-044 |
 
 **Parameters**
 
@@ -381,8 +381,9 @@ Every response carries a trace id, the model and provider that produced it, toke
 | proposedAction.targetOperation | string | yes |  |
 | proposedAction.payload | object | yes | The request body a person would submit, ready to review. |
 | proposedAction.summary | string |  |  |
-| proposedAction.status | enum (proposed, approved, rejected, applied, expired) | yes |  |
-| proposedAction.approvalLevel | integer |  | 8.3.65. |
+| proposedAction.status | enum (proposed, approved, rejected, applied, expired) | yes | Expiry (decided 28 September, audit R213): a proposed action expires 7 days after proposedAt; an approved action not applied expires 24 hours after decidedAt. |
+| proposedAction.expiresAt | string (date-time) |  | When the expiry timer moves this action to expired — proposedAt plus 7 days while proposed, decidedAt plus 24 hours once approved, null once rejected, applied or expired (audit R213). (read-only; nullable) |
+| proposedAction.approvalLevel | integer |  | 8.3.65. (min 1; max 2) |
 | proposedAction.decidedByPrincipalId | string (uuid) |  | (nullable) |
 | proposedAction.decisionReason | string |  | Required on rejection. (nullable) |
 | proposedAction.proposedAt | string (date-time) |  |  |
@@ -529,18 +530,19 @@ Masking is the part to get right. `maskedFields` names what is redacted before a
 
 **`PUT /providers`**: Configure a provider
 
-**Region-scoped, because inference is a data transfer.** ADR-0009: a prompt containing guest data leaves the jurisdiction the moment it reaches a provider hosted elsewhere, and which providers a region may use is a residency decision rather than a preference.
+**Per tenant, with a compliance gate (decided 28 September, audit R203), as ADR-0009 says.** Inference is a data transfer: a prompt containing guest data leaves the jurisdiction the moment it reaches a provider hosted elsewhere. So **platform staff set a tenant's provider on ADM-037**, and **a region may restrict the choice**: a provider whose `residency` is not in the allowed residencies of the tenant's home region (`subscription.Tenant.regionId`, read through `tenancy.getRegionSettings` as `RegionSettings.allowedAiResidencies`; empty means no restriction) is refused with 409 `residency-refused`, which is the gate.
+**How the permission is honoured in the tenant's cell** (decided 28 September, audit R203). `PLATFORM_TENANT_MANAGE` is a platform permission: it is read from the operator's platform token, never from a platform-staff grant, which refuses `PLATFORM_*` values. The cell additionally requires the operator to have a grant into this tenant open (`openPlatformStaffGrant`, audit R098), so the change is audited against that grant (`AuditRecord.platformStaffGrantId`); without one it refuses `403 platform-grant-required`. A tenant's own staff cannot set a provider, whatever they hold.
 Credentials are a key-vault reference, never the key.
 **What the PUT does.** The body is one whole provider configuration, matched on `id`. With an `id`, it replaces that provider's configuration in full — a field left out takes its default or null, not its old value — and returns 200; an `id` that names no provider at the caller's scope is a 404. Without an `id`, it creates a provider and returns 201 with the new id. The other providers are never touched: this is not a replace-the-list call.
 
 |  |  |
 |---|---|
-| Permission | `AI_CONFIGURE` |
-| Scope level | region |
+| Permission | `PLATFORM_TENANT_MANAGE` |
+| Scope level | tenant |
 | Part of slice | setup, makes `ai.provider` non-empty |
 | Wave | 2 |
 | Offline | no |
-| Config scope | region |
+| Config scope | tenant |
 | Conflict policy | serverWins |
 | Reads | `ai.provider`, `cache:idempotency` |
 | Writes | `ai.provider`, `cache:idempotency` |
@@ -604,7 +606,9 @@ Credentials are a key-vault reference, never the key.
 |---|---|---|
 | 200 |  | Configured — an existing provider, named by id, replaced |
 | 201 |  | Created — the body carried no id |
+| 403 |  | The caller lacks PLATFORM_TENANT_MANAGE on their platform token, or has no platform-staff grant into this tenant open (platform-grant-required, audit R203). |
 | 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
+| 409 |  | The provider's residency is not in the tenant's region's allowedAiResidencies (audit R203). |
 
 
 ## Group: retrieval
@@ -810,7 +814,8 @@ Every table this service owns that the slice reads or writes, with its columns a
 | target_operation | text | yes |  |
 | payload | jsonb | yes | The request body a person would submit, ready to review. |
 | summary | text | no |  |
-| status | text | yes |  |
+| status | text | yes | Expiry (decided 28 September, audit R213): a proposed action expires 7 days after proposedAt; an approved action not applied expires 24 hours after decidedAt. |
+| expires_at | timestamptz | no | When the expiry timer moves this action to expired — proposedAt plus 7 days while proposed, decidedAt plus 24 hours once approved, null once rejected, applied or expired (audit R213). |
 | approval_level | integer | no | 8.3.65. |
 | decided_by_principal_id | uuid | no |  |
 | decision_reason | text | no | Required on rejection. |

@@ -51,7 +51,7 @@ CREATE TABLE IF NOT EXISTS approvals.control_policy (
 
 -- Every decision at every level. Immutable once the request completes — an approval is evidence
 -- Hangs off: reaches approvals.request through its keys; references approvals.request,
--- identity.principal. Reached by: 7 operations read it and 1 write it.
+-- identity.principal. Reached by: 8 operations read it and 1 write it.
 CREATE TABLE IF NOT EXISTS approvals.decision (
     id                                uuid PRIMARY KEY,
     level                             integer NOT NULL,
@@ -130,7 +130,7 @@ CREATE TABLE IF NOT EXISTS approvals.evidence_package (
 -- read it and 1 write it; 1 tables reference it.
 CREATE TABLE IF NOT EXISTS approvals.matrix (
     id                                uuid PRIMARY KEY,
-    kind                              text NOT NULL CONSTRAINT matrix_kind_chk CHECK (kind IN ('refund', 'priceOverride', 'discountOverride', 'complimentaryTicket', 'membershipCancellation', 'accessPermissionChange', 'configurationChange', 'aiRecommendation', 'shiftVariance', 'releasePromotion', 'requisition', 'stockWriteOff', 'journalEntry', 'periodReopen', 'tenantMigration')),
+    kind                              text NOT NULL CONSTRAINT matrix_kind_chk CHECK (kind IN ('refund', 'priceOverride', 'discountOverride', 'complimentaryTicket', 'membershipCancellation', 'accessPermissionChange', 'configurationChange', 'aiRecommendation', 'releasePromotion', 'requisition', 'stockWriteOff', 'journalEntry', 'periodClose', 'periodReopen', 'purchaseOrderCancel', 'purchaseOrderShortClose', 'tenantMigration')),
     scope_level                       text NOT NULL CONSTRAINT matrix_scope_level_chk CHECK (scope_level IN ('tenant', 'region', 'venue')),
     scope_path                        ltree NOT NULL,
     version                           integer,
@@ -138,12 +138,12 @@ CREATE TABLE IF NOT EXISTS approvals.matrix (
 );
 
 -- One request per action needing authorisation. The subject is a reference, never a copy Hangs
--- off: a root — nothing above it in its schema; references identity.principal. Reached by: 7
--- operations read it and 8 write it; 16 tables reference it; written by 3 contracts — approvals,
+-- off: a root — nothing above it in its schema; references identity.principal. Reached by: 8
+-- operations read it and 8 write it; 18 tables reference it; written by 3 contracts — approvals,
 -- subscription, workforce.
 CREATE TABLE IF NOT EXISTS approvals.request (
     id                                text PRIMARY KEY NOT NULL,
-    kind                              text NOT NULL CONSTRAINT request_kind_chk CHECK (kind IN ('refund', 'priceOverride', 'discountOverride', 'complimentaryTicket', 'membershipCancellation', 'accessPermissionChange', 'configurationChange', 'aiRecommendation', 'shiftVariance', 'releasePromotion', 'requisition', 'stockWriteOff', 'journalEntry', 'periodReopen', 'tenantMigration')),
+    kind                              text NOT NULL CONSTRAINT request_kind_chk CHECK (kind IN ('refund', 'priceOverride', 'discountOverride', 'complimentaryTicket', 'membershipCancellation', 'accessPermissionChange', 'configurationChange', 'aiRecommendation', 'releasePromotion', 'requisition', 'stockWriteOff', 'journalEntry', 'periodClose', 'periodReopen', 'purchaseOrderCancel', 'purchaseOrderShortClose', 'tenantMigration')),
     reroute_on_no_approver            boolean DEFAULT true,
     out_of_office_delegate_id         uuid,
     allow_email_approval              boolean DEFAULT false,

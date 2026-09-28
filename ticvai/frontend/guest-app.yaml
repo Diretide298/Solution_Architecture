@@ -33,7 +33,6 @@ contracts:
 - payments
 - promotions
 - queue
-- resources
 - retail
 - seating
 - venue-map

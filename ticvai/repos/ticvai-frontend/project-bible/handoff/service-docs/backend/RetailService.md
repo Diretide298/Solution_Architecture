@@ -25,7 +25,7 @@ Nothing outside itself.
 |---|---|---|---|---|---|---|
 | floor | [`lookupMerchandise`](#lookupmerchandise) | GET | `/merchandise/lookup` | core | 1 | BO-048, BO-114, EMP-069, GST-026, KSK-017, POS-002 … |
 | floor | [`lookupShopAndDrop`](#lookupshopanddrop) | GET | `/shop-and-drop/lookup` | core | 2 | GST-062, KSK-011, WEB-042 |
-| floor | [`reserveMerchandise`](#reservemerchandise) | POST | `/outlets/{outletId}/reserve` | core | 1 | BO-044, EMP-068, GST-026, KSK-017, POS-012, WEB-033 … |
+| floor | [`reserveMerchandise`](#reservemerchandise) | POST | `/outlets/{outletId}/reserve` | core | 1 | BO-044, EMP-068, GST-026, KSK-017, POS-012 |
 | merchandise | [`createMerchandise`](#createmerchandise) | POST | `/merchandise` | setup | 1 | BO-007, BO-048 |
 | merchandise | [`listMerchandise`](#listmerchandise) | GET | `/merchandise` | core | 1 | BO-007, BO-044, BO-048, BO-116, GST-026, KSK-017 … |
 | merchandise | [`updateMerchandise`](#updatemerchandise) | PATCH | `/merchandise/{merchandiseId}` | setup | 1 | BO-048, BO-116 |
@@ -45,6 +45,8 @@ Nothing outside itself.
 **`GET /merchandise/lookup`**: Price and stock check by barcode
 
 The most-used operation on a shop floor. Returns price after any live promotion, stock at this outlet, and stock at sibling outlets — so a colleague can be sent to fetch a size rather than losing the sale.
+
+**"This outlet" is the outlet of the workstation asking** (decided 28 September, audit R215): price and `onHand` are that outlet's row. A caller with no workstation (a guest on the web shop or app) names the outlet with `outletId`; a workstation caller's own outlet always wins. **An inactive item is not found**: it answers `404`, exactly as an unknown barcode does.
 
 |  |  |
 |---|---|
@@ -66,12 +68,14 @@ The most-used operation on a shop floor. Returns price after any live promotion,
 | barcode | query |  | string | Exact match on barcode, within the venue. |
 | sku | query |  | string | Exact match on sku, within the venue. |
 | includeSiblingOutlets | query |  | boolean | False leaves siblingOutlets empty. |
+| outletId | query |  | string (uuid) | The outlet to price and count at, for a caller with no workstation (audit R215). |
 
 **Response**: `PriceCheck`
 
 | Field | Type | Required | Notes |
 |---|---|---|---|
 | merchandiseId | string (uuid) | yes |  |
+| outletId | string (uuid) |  | The outlet whose price and stock this is: the asking workstation's outlet, or outletId for a caller with none (decided 28 September, audit R215). |
 | sku | string |  |  |
 | name | string | yes |  |
 | listPrice | Money | yes | On the wire this is three fields; in the database it is one column. |
@@ -95,8 +99,8 @@ The most-used operation on a shop floor. Returns price after any live promotion,
 | Code | Shape | Meaning |
 |---|---|---|
 | 200 |  | Price and stock |
-| 400 |  | Neither barcode nor SKU supplied |
-| 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
+| 400 |  | Neither barcode nor SKU supplied, or a caller with no workstation sent no outletId (audit R215) |
+| 404 |  | No active item with that barcode or SKU at the outlet. |
 
 ### lookupShopAndDrop
 
@@ -138,6 +142,10 @@ Scanned at the collection point. Accepts the entitlement, the drop reference, or
 
 A guest who cannot carry a purchase around a venue collects it on the way out. The item is allocated but not sold, and the reservation expires.
 
+**`expiresAt` is at least 15 minutes ahead and no later than the end of the visit day** (decided 28 September, audit R215): the close of the venue's operating day on which the reservation is made. Outside that window the request is a `400`. **Left out, the reservation holds until the end of the visit day** (decided 28 September, audit R169).
+
+**Not the guest path for buying to collect, on the web or in the app** (decided 28 September, audit R236). A guest buying to collect pays online at checkout (`addCartLine`, `checkoutCart`, `createPayment`), and the order service creates the collection with `createShopAndDrop`. This holds unpaid stock only: in the guest app (GST-026) it is offered as a hold the guest pays for at the shop, and staff use it at a till or an outlet. A held item is never collected unpaid.
+
 |  |  |
 |---|---|
 | Permission | `ORDER_CREATE` |
@@ -148,7 +156,7 @@ A guest who cannot carry a purchase around a venue collects it on the way out. T
 | Conflict policy | serverWins |
 | Reads | `cache:idempotency`, `retail.reservation`, `retail.reservation_line` |
 | Writes | `cache:idempotency`, `retail.reservation`, `retail.reservation_line` |
-| Called by | BO-044, EMP-068, GST-026, KSK-017, POS-012, WEB-033, WEB-042 |
+| Called by | BO-044, EMP-068, GST-026, KSK-017, POS-012 |
 | State model | Merchandise reservation ([states/merchandise-reservation.yaml](../../../states/merchandise-reservation.yaml)): created as `reserved` |
 
 **Parameters**
@@ -167,7 +175,7 @@ A guest who cannot carry a purchase around a venue collects it on the way out. T
 | lines | array of object | yes | (min items 1) |
 | lines[].merchandiseId | string (uuid) | yes |  |
 | lines[].quantity | integer | yes | (min 1) |
-| expiresAt | string (date-time) | yes |  |
+| expiresAt | string (date-time) |  | At least 15 minutes from now and no later than the close of the venue's operating day (audit R215). |
 | collectionNote | string |  | (max length 200) |
 
 **Response**: `MerchandiseReservation`
@@ -191,6 +199,7 @@ A guest who cannot carry a purchase around a venue collects it on the way out. T
 
 | Code | Shape | Meaning |
 |---|---|---|
+| 400 |  | expiresAt is less than 15 minutes ahead, or later than the end of the visit day (audit R215). |
 | 201 |  | Reserved |
 | 409 |  | Insufficient stock. |
 
@@ -397,7 +406,9 @@ Two callers. **The back office** lists and manages the range. **The guest shop s
 **A return is not a negative sale.** It records the condition of the goods, restores stock only where condition permits, and refunds through the venue's retail return policy — which is separate from the ticket refund policy.
 Goods returned damaged or opened are written off rather than restocked, and that write-off is a movement with a reason rather than a silent absence.
 
-**A refused return is recorded** (F34 `refusedReturn`: a refused return is a guest who may complain). The 409 writes a `RetailReturn` with `status: refused`, the `refusedReason`, nothing refunded, restocked or written off, and a new id that the server assigns and returns as `refusalId`. The request's own `id` stays unused, so the same return can be sent again, under a new `Idempotency-Key`, once the second authoriser or the approval is in hand.
+**A refused return is recorded** (F34 `refusedReturn`: a refused return is a guest who may complain). The 409 writes a `RetailReturn` with `status: refused`, the `refusedReason`, nothing refunded, restocked or written off, and a new id that the server assigns and returns as `refusalId`. The request's own `id` stays unused, so the same return can be sent again, under a new `Idempotency-Key`, once the second authoriser is in hand.
+
+**Above the outlet's self-authorise limit, a supervisor's step-up on the same device** (decided 28 September, audit R144), never an approval request. `secondaryAuthorisation` carries the supervisor's principal and staff PIN (a PIN, never a password, audit R123 (7)). The rule is `SupervisorStepUp` in `common.yaml`: the PIN is verified against the principal, who must hold `ORDER_REFUND_APPROVE` at this venue and must not be the caller; a failure is a `403` (`supervisor-step-up-refused`) and nothing is written. Missing when the amount needs it, the return is refused with the `409` below.
 
 |  |  |
 |---|---|
@@ -433,8 +444,8 @@ Goods returned damaged or opened are written off rather than restocked, and that
 | reason | ReturnReason: enum (changedMind, wrongSize, wrongItem, faulty, damagedInTransit, duplicatePurchase, giftReturn, other) | yes |  |
 | refundTender | string |  | Defaults to the original tender. |
 | secondaryAuthorisation | object |  | Required above the outlet's self-authorise limit. |
-| secondaryAuthorisation.principalId | string (uuid) |  |  |
-| secondaryAuthorisation.credential | string |  |  |
+| secondaryAuthorisation.principalId | string (uuid) | yes | The supervisor signing. |
+| secondaryAuthorisation.credential | string | yes | The supervisor's staff PIN, as they sign in at a till with it. (max length 512) |
 | recordedAt | string (date-time) | yes |  |
 
 **Response**: `RetailReturn`
@@ -475,7 +486,8 @@ Goods returned damaged or opened are written off rather than restocked, and that
 | Code | Shape | Meaning |
 |---|---|---|
 | 201 |  | Accepted |
-| 409 |  | Refused by the return policy: outside the return window, item is non-returnable, already returned, a second authoriser or an approval is required, no receipt, or a serial number that does not match. |
+| 409 |  | Refused by the return policy: outside the return window, item is non-returnable, already returned, a supervisor step-up is required, no receipt, or a serial number that does not match. |
+| 403 |  | The caller lacks ORDER_REFUND, or the supervisor step-up failed: the PIN did not verify, the principal does not hold ORDER_REFUND_APPROVE at this venue, or is the caller (supervisor-step-up-refused,… |
 
 ### getReturnPolicy
 
@@ -539,6 +551,8 @@ Separate from the ticket refund policy. A t-shirt and a timed admission have not
 
 By receipt number, order number or the barcode printed on the receipt. A guest at a returns desk has a piece of paper, not an order ID.
 
+**Where several identifiers are sent, the receipt barcode wins, then the receipt number, then the order number** (decided 28 September, audit R215); the others are ignored and `matchedBy` says which was used. **Several matching sales return a list**, newest first, for the cashier to choose from; one match is a list of one.
+
 |  |  |
 |---|---|
 | Permission | `ORDER_VIEW` |
@@ -559,63 +573,61 @@ By receipt number, order number or the barcode printed on the receipt. A guest a
 | receiptNumber | query |  | string | Exact match on receiptNumber. |
 | orderNumber | query |  | string | Exact match on the order number of the order in the Order & Payment context. |
 | receiptBarcode | query |  | string | Exact match on the barcode printed on the receipt. |
+| pageSize | query |  | integer |  |
+| cursor | query |  | string | Opaque cursor: the nextCursor of the previous page. |
 
-**Response**: `RetailSale`
+**Response**: `object`
 
 | Field | Type | Required | Notes |
 |---|---|---|---|
-| id | string | yes |  |
-| receiptNumber | string | yes |  |
-| orderId | string | yes | The order in the Order & Payment context. |
-| outletId | string (uuid) | yes |  |
-| shiftId | string |  | (nullable) |
-| subjectId | string (uuid) |  | (nullable) |
-| lines | array of object | yes |  |
-| lines[].lineId | string |  |  |
-| lines[].merchandiseId | string (uuid) |  |  |
-| lines[].name | string |  |  |
-| lines[].quantity | integer |  |  |
-| lines[].unitPrice | Money |  | On the wire this is three fields; in the database it is one column. |
-| lines[].unitPrice.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
-| lines[].unitPrice.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
-| lines[].unitPrice.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
-| lines[].discount | Money |  | On the wire this is three fields; in the database it is one column. |
-| lines[].discount.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
-| lines[].discount.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
-| lines[].discount.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
-| lines[].lineTotal | Money |  | On the wire this is three fields; in the database it is one column. |
-| lines[].lineTotal.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
-| lines[].lineTotal.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
-| lines[].lineTotal.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
-| lines[].serialNumbers | array of string |  |  |
-| lines[].returnedQuantity | integer |  |  |
-| lines[].isReturnable | boolean |  | False once the window has passed or the line is fully returned. |
-| lines[].notReturnableReason | string |  | (nullable) |
-| subtotal | Money |  | On the wire this is three fields; in the database it is one column. |
-| subtotal.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
-| subtotal.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
-| subtotal.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
-| discountAmount | Money |  | On the wire this is three fields; in the database it is one column. |
-| discountAmount.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
-| discountAmount.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
-| discountAmount.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
-| taxAmount | Money |  | On the wire this is three fields; in the database it is one column. |
-| taxAmount.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
-| taxAmount.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
-| taxAmount.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
-| grossAmount | Money | yes | On the wire this is three fields; in the database it is one column. |
-| grossAmount.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
-| grossAmount.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
-| grossAmount.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
-| reprintCount | integer |  |  |
-| createdAt | string (date-time) | yes |  |
-| recordedAt | string (date-time) |  |  |
+| items | array of RetailSale | yes |  |
+| items[].id | string | yes |  |
+| items[].receiptNumber | string | yes | Server-assigned: the venue prefix plus a sequence per venue (decided 28 September, audit R152). (read-only) |
+| items[].orderId | string | yes | The order in the Order & Payment context. |
+| items[].outletId | string (uuid) | yes |  |
+| items[].shiftId | string |  | (nullable) |
+| items[].subjectId | string (uuid) |  | (nullable) |
+| items[].lines | array of object | yes |  |
+| items[].lines[].lineId | string |  |  |
+| items[].lines[].merchandiseId | string (uuid) |  |  |
+| items[].lines[].name | string |  |  |
+| items[].lines[].quantity | integer |  |  |
+| items[].lines[].unitPrice | Money |  | On the wire this is three fields; in the database it is one column. |
+| items[].lines[].discount | Money |  | On the wire this is three fields; in the database it is one column. |
+| items[].lines[].lineTotal | Money |  | On the wire this is three fields; in the database it is one column. |
+| items[].lines[].serialNumbers | array of string |  |  |
+| items[].lines[].returnedQuantity | integer |  |  |
+| items[].lines[].isReturnable | boolean |  | False once the window has passed or the line is fully returned. |
+| items[].lines[].notReturnableReason | string |  | (nullable) |
+| items[].subtotal | Money |  | On the wire this is three fields; in the database it is one column. |
+| items[].subtotal.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
+| items[].subtotal.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
+| items[].subtotal.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| items[].discountAmount | Money |  | On the wire this is three fields; in the database it is one column. |
+| items[].discountAmount.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
+| items[].discountAmount.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
+| items[].discountAmount.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| items[].taxAmount | Money |  | On the wire this is three fields; in the database it is one column. |
+| items[].taxAmount.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
+| items[].taxAmount.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
+| items[].taxAmount.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| items[].grossAmount | Money | yes | On the wire this is three fields; in the database it is one column. |
+| items[].grossAmount.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
+| items[].grossAmount.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
+| items[].grossAmount.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| items[].reprintCount | integer |  |  |
+| items[].createdAt | string (date-time) | yes |  |
+| items[].recordedAt | string (date-time) |  |  |
+| nextCursor | string |  |  |
+| hasMore | boolean | yes |  |
+| matchedBy | enum (receiptBarcode, receiptNumber, orderNumber) | yes | The identifier used, by the precedence above (audit R215). |
 
 **Responses**
 
 | Code | Shape | Meaning |
 |---|---|---|
-| 200 |  | Sale |
+| 200 |  | The matching sales, newest first. |
+| 400 |  | None of the three identifiers was sent |
 | 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
 
 ### setReturnPolicy
@@ -751,7 +763,7 @@ Creates an order in the Order & Payment context and a `saleDepletion` movement i
 | Field | Type | Required | Notes |
 |---|---|---|---|
 | id | string | yes |  |
-| receiptNumber | string | yes |  |
+| receiptNumber | string | yes | Server-assigned: the venue prefix plus a sequence per venue (decided 28 September, audit R152). (read-only) |
 | orderId | string | yes | The order in the Order & Payment context. |
 | outletId | string (uuid) | yes |  |
 | shiftId | string |  | (nullable) |
@@ -835,7 +847,7 @@ Also the receipt lookup a returns desk starts from. Returns whether each line is
 | Field | Type | Required | Notes |
 |---|---|---|---|
 | id | string | yes |  |
-| receiptNumber | string | yes |  |
+| receiptNumber | string | yes | Server-assigned: the venue prefix plus a sequence per venue (decided 28 September, audit R152). (read-only) |
 | orderId | string | yes | The order in the Order & Payment context. |
 | outletId | string (uuid) | yes |  |
 | shiftId | string |  | (nullable) |
@@ -922,7 +934,7 @@ Also the receipt lookup a returns desk starts from. Returns whether each line is
 |---|---|---|---|
 | items | array of RetailSale | yes |  |
 | items[].id | string | yes |  |
-| items[].receiptNumber | string | yes |  |
+| items[].receiptNumber | string | yes | Server-assigned: the venue prefix plus a sequence per venue (decided 28 September, audit R152). (read-only) |
 | items[].orderId | string | yes | The order in the Order & Payment context. |
 | items[].outletId | string (uuid) | yes |  |
 | items[].shiftId | string |  | (nullable) |
@@ -1111,7 +1123,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 | Column | Type | Required | Notes |
 |---|---|---|---|
 | id | text | yes |  |
-| receipt_number | text | yes |  |
+| receipt_number | text | yes | Server-assigned: the venue prefix plus a sequence per venue (decided 28 September, audit R152). |
 | order_id | text | yes | The order in the Order & Payment context. |
 | outlet_id | uuid | yes |  |
 | shift_id | text | no |  |
@@ -1148,7 +1160,8 @@ Every table this service owns that the slice reads or writes, with its columns a
 |---|---|---|---|
 | id | text | yes |  |
 | drop_reference | text | yes | Short and readable. |
-| sale_id | text | yes |  |
+| sale_id | text | no | The till sale. |
+| order_id | text | no | The paid online order that created this collection (audit R236). |
 | entitlement_id | text | no | The ticket that claims these goods. |
 | subject_id | uuid | no |  |
 | collection_point_id | uuid | yes |  |

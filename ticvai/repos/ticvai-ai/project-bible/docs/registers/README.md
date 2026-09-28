@@ -13,4 +13,5 @@ Reference data, not narrative. These change as decisions land.
 | [ai-applications](ai-applications.md) | 67 AI applications across 19 domains |
 | [external-dependencies](external-dependencies.md) | Hardware, third-party software, on-location |
 | [conflicts](conflicts.md) | Open and closed decisions — feeds [adr](../adr/) |
+| [audit-decisions](audit-decisions.md) | The 77 Block A audit questions, adopted on our recommendation 28 September, awaiting client confirmation |
 | [deviations](deviations.md) | Knowingly-unimplemented requirements, surfaced at UAT |

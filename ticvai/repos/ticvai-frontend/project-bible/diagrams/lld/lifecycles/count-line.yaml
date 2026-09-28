@@ -43,7 +43,9 @@ transitions:
   trigger: accept
   operation: submitCountLines
   guard: '**Variance within tolerance.** The threshold is venue configuration, not a constant — a warehouse
-    and a bar have different ideas of a large discrepancy.'
+    and a bar have different ideas of a large discrepancy. It is `VenueSettings.inventory.countVarianceTolerancePercent`,
+    a venue setting with a tenant default, proposed at 2 per cent of the expected quantity (decided
+    28 September, audit R094).'
 - from: entered
   to: recountRequested
   trigger: requestRecount

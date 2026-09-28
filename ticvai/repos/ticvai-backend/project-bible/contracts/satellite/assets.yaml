@@ -203,6 +203,7 @@ paths:
       operationId: updateMediaAsset
       x-ticvai-consumed-by:
         - "P13 CMS-010 Media Library"
+        - "P13 CMS-075 Duplicate & Near-Duplicate Management"
         - "P13 CMS-082 Asset Ownership & Responsibility Management"
       x-ticvai-audience: [staff]
       summary: Amend metadata, tags or rights
@@ -215,6 +216,10 @@ paths:
         `quarantined` to `ready` (the reversal of a scan flag, which the state model marks as
         requiring approval). **Archiving is refused while the asset is referenced**, for the
         same reason deletion is: an archived image on a live homepage is a broken image.
+
+        **None of these states is final (decided 28 September, audit STATE-MEDIA).** An archived
+        asset may be restored to `ready`, and a quarantined one released to `ready` after review;
+        the only end of an asset's life is `deleteMediaAsset`.
       tags: [asset]
       x-ticvai-permission: ASSET_LIBRARY_MANAGE
       x-ticvai-scope-level: venue
@@ -283,6 +288,10 @@ paths:
         **Refused while the asset is referenced.** The response names every reference so the
         holder can be cleared first — deleting the image on a live homepage should not be one
         keystroke away.
+
+        **Deletion is the only end of an asset's life (decided 28 September, audit
+        STATE-MEDIA).** It removes the row rather than moving the asset to a state; `archived`
+        and `quarantined` are both reversible through `updateMediaAsset`.
       tags: [asset]
       x-ticvai-permission: ASSET_LIBRARY_MANAGE
       x-ticvai-scope-level: venue
@@ -536,6 +545,8 @@ paths:
           content:
             application/json:
               schema: { $ref: '#/components/schemas/Collection' }
+        '409':
+          $ref: '../shared/common.yaml#/components/responses/DuplicateCode'
 
   /media/rights-expiring:
     get:
@@ -551,6 +562,11 @@ paths:
       description: >
         A stock photograph licensed for one season and still on a website two years later is
         a legal problem. Expired assets in active use sort first.
+
+        **"In use" means referenced by live content** (decided 28 September, audit R106 (10)):
+        an asset counts as in use only while a published page, block, menu or other content that
+        is live references it. A reference from a draft, an archived item or a collection does
+        not count, so an expired asset only a draft uses sorts with the unused ones.
       tags: [rights]
       x-ticvai-permission: ASSET_LIBRARY_VIEW
       x-ticvai-scope-level: venue
@@ -2058,7 +2074,12 @@ components:
       required: [id, name, assetCount]
       properties:
         id: { type: string, format: uuid }
-        name: { type: string }
+        name:
+          type: string
+          x-ticvai-unique: tenant
+          description: >
+            **Unique per tenant** (decided 28 September, audit R108). A name already used by any
+            collection in the tenant, at any venue or level, is refused with `409 duplicate-code`.
         description: { type: string, nullable: true }
         venueId: { type: string, format: uuid, nullable: true }
         parentCollectionId: { type: string, format: uuid, nullable: true }
@@ -2077,10 +2098,14 @@ components:
         validTo: { type: string, format: date }
         daysRemaining: { type: integer }
         isExpired: { type: boolean }
-        isInUse: { type: boolean }
+        isInUse:
+          type: boolean
+          description: True while `liveUsageCount` is above zero, that is, while live (published)
+            content references the asset (audit R106 (10)). Drafts and collections do not count.
         liveUsageCount:
           type: integer
-          description: Expired and live is the combination that matters.
+          description: References from live (published) content only (audit R106 (10)). Expired and
+            live is the combination that matters.
 
   securitySchemes:
     bearerAuth:

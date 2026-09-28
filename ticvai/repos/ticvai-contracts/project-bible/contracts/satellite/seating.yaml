@@ -998,6 +998,11 @@ paths:
                 rank:
                   type: integer
                   description: Ordering for best-seat assignment. Lower is better.
+                priceBands:
+                  type: array
+                  description: The category's price bands (decided 28 September, audit R275 (d)).
+                  items:
+                    $ref: '#/components/schemas/SeatPriceBand'
       responses:
         '201':
           headers:
@@ -1008,6 +1013,72 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/SeatCategory'
+  /seat-categories/{seatCategoryId}:
+    parameters:
+    - name: seatCategoryId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    patch:
+      operationId: updateSeatCategory
+      x-ticvai-audience:
+      - staff
+      summary: Rename, re-rank or re-price a seat category
+      description: 'Added with `SeatCategory.priceBands` (decided 28 September, audit R275 (d)), so BO-1045
+        can change a category''s bands after it is created. `priceBands`, when sent, replaces the whole
+        list; a band left out is removed. A band change applies to sales from its `effectiveFrom`, never
+        to seats already sold.
+
+        '
+      tags:
+      - category
+      x-ticvai-permission: CAPACITY_CONFIGURE
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              minProperties: 1
+              properties:
+                name:
+                  type: string
+                  maxLength: 200
+                displayColour:
+                  type: string
+                  pattern: ^#[0-9A-Fa-f]{6}$
+                rank:
+                  type: integer
+                priceBands:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/SeatPriceBand'
+      responses:
+        '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: Updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SeatCategory'
+        '404':
+          $ref: ../shared/common.yaml#/components/responses/NotFound
+        '422':
+          description: Two bands with the same `code`, or a band whose `effectiveTo` is not after its
+            `effectiveFrom` (audit R275 (d)).
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
   /performances/{performanceId}/seat-availability:
     parameters:
     - name: performanceId
@@ -1023,8 +1094,7 @@ paths:
         - "P02 GST-049 Interactive Seat Selection"
         - "P04 POS-004 Sell — Seat Map"
         - "P08 BO-002 Queue Configuration"
-        - "P08 BO-015 Session Calendar"
-        - "P08 BO-016 Session Template"
+        - "P08 BO-015 Performance Calendar"
         - "P08 BO-019 Closures & Blackouts"
         - "P08 BO-063 Opening Hours & Calendar"
         - "P08 BO-1000 Mobile & Accessible Selection"
@@ -1231,6 +1301,11 @@ paths:
       description: 'For a guest still completing payment. Bounded by the venue''s maximum, so a hold cannot
         be renewed indefinitely against a busy performance.
 
+        **The bounds are venue settings with a tenant default** (decided 28 September, audit R094): each
+        extension adds `VenueSettings.seating.seatHoldExtensionSeconds` and a hold may be extended at most
+        `VenueSettings.seating.seatHoldMaxExtensions` times. **Proposed defaults 300 seconds and 2
+        extensions, client to correct (audit R094).**
+
         '
       tags:
       - hold
@@ -1251,7 +1326,8 @@ paths:
               schema:
                 $ref: '#/components/schemas/SeatHold'
         '409':
-          description: Already expired, or the extension limit is reached. `refusedReason` says which.
+          description: Already expired, or `VenueSettings.seating.seatHoldMaxExtensions` is reached (proposed
+            default 2, audit R094). `refusedReason` says which.
           content:
             application/problem+json:
               schema:
@@ -1524,8 +1600,7 @@ paths:
         - "P02 GST-049 Interactive Seat Selection"
         - "P04 POS-004 Sell — Seat Map"
         - "P08 BO-002 Queue Configuration"
-        - "P08 BO-015 Session Calendar"
-        - "P08 BO-016 Session Template"
+        - "P08 BO-015 Performance Calendar"
         - "P08 BO-019 Closures & Blackouts"
         - "P08 BO-063 Opening Hours & Calendar"
         - "P08 BO-1001 View Preview, Compare & Heat Map"
@@ -3530,6 +3605,69 @@ components:
           description: Ordering for best-seat assignment. Lower is better.
         seatCount:
           type: integer
+        priceBands:
+          type: array
+          description: 'What a seat in this category costs, by band (decided 28 September, audit R275 (d),
+            from the BO-1045 pack). Written by `createSeatCategory` and `updateSeatCategory`. A band may
+            be narrowed to a sales channel or a customer segment and to a window; where several match a
+            sale, the narrowest wins.
+
+            '
+          items:
+            $ref: '#/components/schemas/SeatPriceBand'
+    SeatPriceBand:
+      x-ticvai-persistence: seating.seat_price_band
+      type: object
+      description: 'One price band on a seat category (decided 28 September, audit R275 (d)). The currency
+        is `amount.currency`, resolved from the region like every `Money` (ADR-0018), so the band carries
+        no currency of its own.
+
+        '
+      required:
+      - code
+      - displayLabel
+      - amount
+      - effectiveFrom
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        seatCategoryId:
+          type: string
+          format: uuid
+          readOnly: true
+        code:
+          type: string
+          maxLength: 64
+          description: Unique within the category.
+        displayLabel:
+          type: string
+          maxLength: 200
+        displayColour:
+          type: string
+          nullable: true
+          pattern: ^#[0-9A-Fa-f]{6}$
+        amount:
+          $ref: ../shared/common.yaml#/components/schemas/Money
+        channel:
+          nullable: true
+          description: Null means every channel.
+          allOf:
+          - $ref: ../shared/common.yaml#/components/schemas/SalesChannel
+        customerSegmentId:
+          type: string
+          format: uuid
+          nullable: true
+          description: A `marketing-crm` customer segment; null means everyone.
+        effectiveFrom:
+          type: string
+          format: date-time
+        effectiveTo:
+          type: string
+          format: date-time
+          nullable: true
+          description: Null means open-ended.
     SeatMapTemplate:
       x-ticvai-persistence: seating.seat_map_template
       type: object
@@ -4000,7 +4138,6 @@ components:
       - id
       - performanceId
       - seatIds
-      - ttlSeconds
       properties:
         id:
           type: string
@@ -4011,13 +4148,21 @@ components:
         seatIds:
           type: array
           minItems: 1
-          maxItems: 50
+          maxItems: 10
+          description: At most 10 seats per sale (decided 28 September, audit R080 (c)), as orders
+            `CreateOrderLine.seatIds` and `AddCartLineRequest.seatIds` allow and POS-002 shows.
           items:
             type: string
         ttlSeconds:
           type: integer
           minimum: 60
           maximum: 1800
+          default: 480
+          description: '**8 minutes by default, extendable to 30 in all** (decided 28 September, audit
+            R169). Left out, the hold lasts 480 seconds. No hold, first grant or extended, outlives
+            1800 seconds from its creation.
+
+            '
         subjectId:
           type: string
           format: uuid
@@ -4074,6 +4219,11 @@ components:
           format: date-time
     BlockReason:
       type: string
+      description: '`other` is allowed only with a note (decided 28 September, audit R222). Every block
+        already requires `note`, so an `other` block always says why; the notes are reviewed quarterly
+        to add the real reasons they reveal.
+
+        '
       enum:
       - productionHold
       - houseSeats

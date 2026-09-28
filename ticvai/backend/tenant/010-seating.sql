@@ -1,4 +1,4 @@
--- seating — 20 tables
+-- seating — 21 tables
 -- **Derived. Do not hand-edit.**
 
 -- Holds 5 columns. No description has been written for this table — the name is the only thing
@@ -209,6 +209,21 @@ CREATE TABLE IF NOT EXISTS seating.seat_map_template (
     has_geometry                      boolean,
     created_at                        timestamptz,
     region_id                         uuid NOT NULL
+);
+
+-- Holds 10 columns. No description has been written for this table — the name is the only thing
+-- saying what it is
+CREATE TABLE IF NOT EXISTS seating.seat_price_band (
+    id                                uuid PRIMARY KEY,
+    seat_category_id                  uuid,
+    code                              text NOT NULL CONSTRAINT seat_price_band_code_chk CHECK (char_length(code) <= 64),
+    display_label                     text NOT NULL CONSTRAINT seat_price_band_display_label_chk CHECK (char_length(display_label) <= 200),
+    display_colour                    text,
+    amount                            numeric(18,4) NOT NULL,
+    channel                           text,
+    customer_segment_id               uuid,
+    effective_from                    timestamptz NOT NULL,
+    effective_to                      timestamptz
 );
 
 -- Holds 8 columns. No description has been written for this table — the name is the only thing

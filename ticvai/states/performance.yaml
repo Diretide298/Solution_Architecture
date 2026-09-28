@@ -46,20 +46,26 @@ transitions:
   to: cancelled
   operation: cancelPerformance
   trigger: operation
-  guard: '**Cancelled before selling** — nobody to refund, and the simple case'
+  guard: '**Cancelled before selling** — nobody to refund, and the simple case. A supervisor''s PIN
+    step-up on the same device (proposed by the coordinator, client to confirm, audit R144)'
+  requiresApproval: true
 - from: onSale
   to: cancelled
   operation: cancelPerformance
   trigger: operation
   guard: '**Cancelled with tickets sold.** Triggers F09: every holder refunded, every entitlement void,
-    and the guests told'
+    and the guests told. A supervisor''s PIN step-up on the same device (proposed by the coordinator,
+    client to confirm, audit R144)'
+  requiresApproval: true
   emits:
   - performance.cancelled
 - from: suspended
   to: cancelled
   operation: cancelPerformance
   trigger: operation
-  guard: Suspended and then abandoned
+  guard: Suspended and then abandoned. A supervisor's PIN step-up on the same device (proposed by the
+    coordinator, client to confirm, audit R144)
+  requiresApproval: true
   emits:
   - performance.cancelled
 - from: onSale

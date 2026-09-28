@@ -50,16 +50,16 @@ contracts:
   ref: diagrams/lld/contracts/catalogue.yaml
 - contract: orders
   tier: spine
-  operations: 191
+  operations: 192
   holds: null
   service: OrderService
   verbs:
     GET: 99
-    POST: 59
+    POST: 60
     PUT: 27
     DELETE: 3
     PATCH: 3
-  guestCallable: 37
+  guestCallable: 38
   offlineCapable: 13
   events:
   - cart-abandoned
@@ -116,15 +116,15 @@ contracts:
   ref: diagrams/lld/contracts/subscription.yaml
 - contract: fnb
   tier: satellite
-  operations: 113
+  operations: 115
   holds: null
   service: FnbService
   verbs:
-    POST: 57
-    GET: 31
+    POST: 58
+    GET: 32
     PUT: 21
     PATCH: 4
-  guestCallable: 14
+  guestCallable: 15
   offlineCapable: 50
   events:
   - fnb-menuPublished
@@ -132,12 +132,12 @@ contracts:
   ref: diagrams/lld/contracts/fnb.yaml
 - contract: identity
   tier: spine
-  operations: 70
+  operations: 75
   holds: null
   service: IdentityService
   verbs:
-    POST: 32
-    GET: 27
+    POST: 34
+    GET: 30
     PUT: 6
     DELETE: 4
     PATCH: 1
@@ -161,14 +161,14 @@ contracts:
   ref: diagrams/lld/contracts/finance.yaml
 - contract: seating
   tier: satellite
-  operations: 54
+  operations: 55
   holds: null
   service: CatalogueService
   verbs:
     POST: 22
     GET: 21
     PUT: 7
-    PATCH: 2
+    PATCH: 3
     DELETE: 2
   guestCallable: 3
   offlineCapable: 2
@@ -236,13 +236,13 @@ contracts:
   ref: diagrams/lld/contracts/resources.yaml
 - contract: tenancy
   tier: spine
-  operations: 46
+  operations: 48
   holds: null
   service: TenancyService
   verbs:
-    GET: 23
+    GET: 24
     POST: 11
-    PUT: 9
+    PUT: 10
     PATCH: 2
     DELETE: 1
   guestCallable: 0
@@ -251,13 +251,13 @@ contracts:
   ref: diagrams/lld/contracts/tenancy.yaml
 - contract: approvals
   tier: spine
-  operations: 45
+  operations: 46
   holds: null
   service: TenancyService
   verbs:
     GET: 19
     PUT: 14
-    POST: 11
+    POST: 12
     DELETE: 1
   guestCallable: 0
   offlineCapable: 0

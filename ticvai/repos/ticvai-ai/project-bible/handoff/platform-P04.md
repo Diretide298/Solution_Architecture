@@ -5,16 +5,16 @@
 | | |
 |---|---|
 | Screens | 30 |
-| Operations | 141 |
+| Operations | 143 |
 | Contracts | 20 |
 | Modules | 4 |
 | Undrawn | 0 |
-| Operations with no screen | 211 |
+| Operations with no screen | 212 |
 | Waves | wave1 27 · wave2 3 |
 
 ## Gaps
 
-### 211 operations with no screen here
+### 212 operations with no screen here
 
 **In a contract this platform uses, callable by its audience, and reaching no screen on any platform serving that audience.** Either a screen is missing or the endpoint should not exist — and the second is worth considering first.
 
@@ -25,6 +25,7 @@
 | `listEntryRulePoints` | access | GET | Which access points an admission rule covers |
 | `setEntryRulePoints` | access | PUT | Set the access points an admission rule covers |
 | `verifyIdentity` | access | POST | Check the person presenting against the person entitled |
+| `submitApprovalRequest` | approvals | POST | Send a saved draft for approval |
 | `assessProductChange` | catalogue | POST | What a change would touch, before making it |
 | `bulkChangePrices` | catalogue | POST | Reprice a category or a whole catalogue |
 | `cloneProduct` | catalogue | POST | Copy a product as a new draft |
@@ -59,8 +60,7 @@
 | `attachModifierGroup` | fnb | PUT | Give an item its choices |
 | `closeCorrectiveAction` | fnb | POST | Close a signed finding |
 | `createCombo` | fnb | POST | A meal deal, priced as one thing |
-| `createModifierGroup` | fnb | POST | Create a modifier group |
-| … | | | 171 more |
+| … | | | 172 more |
 
 ### 2 modules split across waves
 
@@ -82,7 +82,7 @@
 
 | | Name | Module | Wave | Ops | Drawn |
 |---|---|---|---|---|---|
-| `POS-000` | Sign In | Shift | 1 | 6 | yes |
+| `POS-000` | Sign In | Shift | 1 | 8 | yes |
 | `POS-001` | Begin Shift | Shift | 1 | 17 | yes |
 | `POS-002` | Sell — Ticket Catalogue | Sell | 1 | 42 | yes |
 | `POS-003` | Sell — Timed Entry | Sell | 1 | 10 | yes |

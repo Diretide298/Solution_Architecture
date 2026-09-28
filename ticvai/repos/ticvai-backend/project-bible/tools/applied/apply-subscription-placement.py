@@ -84,6 +84,14 @@ P17_NO_ACCESS = (
     "on the P09 twin does not apply. The book offers *Continue Saved Setup* and *Sign In* on 2.1, "
     "which is where somebody without access to a saved setup would be sent; no minute has decided it.")
 
+# **P17 screens that no longer twin their P09 screen** (28 September 2026, audit R098). ADM-412 gained
+# the platform-staff tenant picker and grant step, which a prospect with no account and no tenant
+# cannot use, so SGN-021 dropped `source.sameAs` and is edited by hand. The tool must neither re-add
+# `sameAs`, nor re-copy ADM-412's fields into it, nor mint a new SGN twin because none carries
+# `sameAs: ADM-412` any more. Keyed twin id -> the detached P17 id; the screen still takes its place
+# in the book's journey.
+DETACHED = {"ADM-412": "SGN-021"}
+
 
 def slug(text: str) -> str:
     return re.sub(r"-+", "-", re.sub(r"[^a-z0-9]+", "-", text.lower())).strip("-")
@@ -244,10 +252,17 @@ def main() -> int:
         ta["note"] = CONTROL_NOTE
 
     by_twin = {(s.get("source") or {}).get("sameAs"): s for s in p17["screens"]}
+    for twin_id, sid in DETACHED.items():
+        detached = next((s for s in p17["screens"] if s.get("id") == sid), None)
+        if detached is not None:
+            (detached.get("source") or {}).pop("sameAs", None)
+            by_twin[twin_id] = detached
     new17, synced = [], 0
     for k in SIGNUP:
         twin = on09[k]
         mine = by_twin.get(twin["id"])
+        if twin["id"] in DETACHED and mine is not None:
+            continue  # detached on 28 September (audit R098): kept in the journey, never re-copied
         if mine is None:
             sid = next_id("SGN", p17)
             section = SIGNUP_SECTION[k[0]]

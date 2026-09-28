@@ -83,7 +83,17 @@ properties:
         isReversal:
           type: boolean
           default: false
-        requiresApproval: { type: boolean, default: false }
+        requiresApproval:
+          type: boolean
+          default: false
+          description: >
+            **True means a second person must sign the move, and says which way** (decided 28
+            September, audit R144). Either the transition goes through the approvals engine (the
+            operation asks `evaluateApprovalRequirement` and raises a request of a matching
+            `ApprovalKind`, answering `202` until it is decided), or, where the decision says so, a
+            supervisor gives a PIN step-up on the same device (`SupervisorStepUp` in `common.yaml`,
+            `x-ticvai-step-up: pin` on the operation) and no request is raised. The guard names
+            which. A transition that needs neither is false.
         emits:
           type: array
           description: Domain events this transition publishes. Cross-checked against events/.

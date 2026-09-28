@@ -101,10 +101,12 @@ screens:
     status: notStarted
   density: touchLarge
   pattern: form
-  patternReason: Two fields and a keypad. `listActiveSessions` reads who holds the till so the operator
-    can take it over -- a form with one piece of context, not a list to browse
+  patternReason: Two fields and a keypad. `listActiveSessions` reads who holds the till so a supervisor
+    can end that session -- a form with one piece of context, not a list to browse
   entryState:
-    params: []
+    params:
+    - name: challengeId
+      from: navigation
     coldEntry: '**The only screen in venue-pos that needs nothing.** That is what makes it the door. `workstationId`
       travels in the login request and comes from the terminal itself, not from a session -- the contract
       says it identifies the device and is *NOT a permission source*.'
@@ -121,6 +123,12 @@ screens:
     emptyNoAccess: Authentication succeeded and the operator holds no role on this workstation. **A real
       outcome on a shared till** -- a steward badged for the gate is not a cashier -- and it is the session
       that succeeded and the authorisation that did not.
+    mfaRequired: '**Signed in, not yet through.** The principal holds a permission that requires MFA (ROLE_MANAGE,
+      LEDGER_APPROVE, any platform-staff permission, or one the tenant added), so after `login` the screen
+      calls `createMfaChallenge` and asks for the authenticator code; `verifyMfaChallenge` completes the
+      sign-in. **Email me a code instead** is the fallback. Five wrong codes lock step-up for the policy''s
+      lockout minutes and the screen says so. A principal with no enrolled method is sent to enrol first
+      (decided 28 September, audit R135, R126). A cashier never reaches this state.'
     offline: Signs in against the cached operator list and syncs when the link returns. **A till that
       cannot open because the network is down is a till that does not sell**, which is the same reasoning
       POS-001 applies to the float.
@@ -129,7 +137,6 @@ screens:
     exitTo:
     - POS-001
     - POS-025
-    - KIT-002
     transitions:
     - to: POS-001
       trigger: Begin Shift
@@ -139,10 +146,6 @@ screens:
       trigger: Till Home
       provenance: derived — POS-025 declares entryState.params  and POS-000 holds none of them, so the
         edge carries nothing and POS-025 opens cold
-    - to: KIT-002
-      trigger: Kitchen Display System (KDS)
-      provenance: derived — KIT-002 declares entryState.params ticketId, visitId and POS-000 holds none
-        of them, so the edge carries nothing and KIT-002 opens cold
   layout:
     template: form
     regions:
@@ -159,6 +162,22 @@ screens:
         label: Sign in
         operation: login
         provenance: contract identity.yaml POST /auth/login
+      - kind: textField
+        label: Authentication code
+        operation: verifyMfaChallenge
+        provenance: contract identity.yaml POST /auth/mfa/challenge/{challengeId}/verify
+        notes: Shown only in the mfaRequired state -- a supervisor or manager whose permissions require
+          a second factor (audit R135).
+      - kind: primaryButton
+        label: Verify
+        operation: verifyMfaChallenge
+        provenance: contract identity.yaml POST /auth/mfa/challenge/{challengeId}/verify
+      - kind: secondaryButton
+        label: Email me a code instead
+        operation: createMfaChallenge
+        provenance: contract identity.yaml POST /auth/mfa/challenge
+        notes: The fallback -- issues the challenge against the principal's email (`emailOtp`) method
+          (audit R126 (5)).
       - kind: cardList
         label: Recent operators on this till
         notes: '**Device-local and deliberately backed by no operation.** The terminal remembers who used
@@ -176,9 +195,11 @@ screens:
         label: Take the till over
         operation: forceLogout
         provenance: contract identity.yaml POST /auth/sessions/{sessionId}/force-logout
-        notes: '**One principal, one active session per workstation** -- signing in while somebody else
-          holds the till ends their session as `terminated`, not `signedOut`, so the registry can answer
-          *what happened to till 4*. The `sessionId` is theirs, picked off the list above.'
+        notes: '**One principal, one active session per workstation.** Signing in while somebody else
+          holds the till is refused (`login` answers 409); signing in never ends the other session. A
+          supervisor holding SESSION_FORCE_LOGOUT ends it with `forceLogout`, and only then can the next
+          operator sign in (decided 28 September, audit R184). The `sessionId` is theirs, picked off the
+          list above.'
       - kind: confirmDialog
         label: End the other operator's session?
         notes: Names who is being signed out and whether their shift is still open. **Their float does
@@ -207,7 +228,8 @@ screens:
     trigger: onLoad
   - operationId: forceLogout
     contract: identity
-    purpose: Take the till over from the operator holding it
+    purpose: A supervisor ends the session of the operator holding the till, after login was refused 409
+      (audit R184)
     trigger: onAction
     invalidates:
     - listActiveSessions
@@ -219,9 +241,23 @@ screens:
     contract: identity
     purpose: Read the session the login just created
     trigger: onAction
-  apisNote: '**No `listMfaMethods`, and that is deliberate.** ADM-001, PTR-001 and SUP-001 all carry it;
-    a till does not. The bound on a PIN is the device - `workstationId` is required on every login and
-    the terminal sits on a venue network in a staff area - not a second factor typed between guests.'
+  - operationId: createMfaChallenge
+    contract: identity
+    purpose: Second factor after login when the principal holds a permission in mfaRequiredForPermissions;
+      action `signIn`, the primary method (authenticator app), or the email method as the fallback (decided
+      28 September, audit R135, R126 (5))
+    trigger: onAction
+  - operationId: verifyMfaChallenge
+    contract: identity
+    purpose: Completes sign-in with the code; the session is usable only after it. Five wrong codes lock
+      step-up (audit R126 (6))
+    trigger: onAction
+  apisNote: '**MFA by permission, not by device** (decided 28 September, audit R135). A cashier never
+    holds a permission in `PasswordPolicy.mfaRequiredForPermissions`, so a cashier signs in with number
+    and PIN and never sees the second-factor step; the till''s `workstationId` remains the bound on a
+    PIN. A manager or supervisor who holds LEDGER_APPROVE or ROLE_MANAGE (or a permission the tenant added)
+    is asked for the authenticator code after `login` via `createMfaChallenge` / `verifyMfaChallenge`.
+    Enrolment happens on EMP-042, not at the till, so there is no `listMfaMethods` here.'
   wireframe:
     status: notStarted
     provenance: generated
@@ -692,8 +728,10 @@ screens:
   - id: formReopenShift
     component: modal
     trigger: Reopen shift
-    body: '**Collects what `reopenShift` sends before it is called.** Required: `reason`, `approverPrincipalId`.
-      Dismissing sends nothing; the screen behind is unchanged.'
+    body: '**Collects what `reopenShift` sends before it is called.** Required: `reason`, `supervisorStepUp`
+      {`principalId`, `credential`}: the supervisor enters their staff PIN on this device, and may not
+      be the principal who closed the shift. Refused 403 `approver-is-closer` or `supervisor-step-up-refused`
+      (decided 28 September, audit R144). Dismissing sends nothing; the screen behind is unchanged.'
     confirm:
       label: Reopen shift
       operation: reopenShift
@@ -701,7 +739,7 @@ screens:
       label: Cancel
       discards:
       - reason
-      - approverPrincipalId
+      - supervisorStepUp
     provenance: contract shift.yaml POST /shifts/{shiftId}/reopen
   - id: formResumeShift
     component: modal
@@ -896,7 +934,6 @@ screens:
     - POS-027
     exitTo:
     - BO-045
-    - POS-001
     - POS-003
     - POS-004
     - POS-005
@@ -914,7 +951,7 @@ screens:
       non-inferred is what turned the disagreement from a warning into a failure.'
     transitions:
     - to: POS-003
-      trigger: Choose a date and session for a timed product
+      trigger: Choose a date and performance for a timed product (a session is a Performance, audit R165)
       control: drawer#drawerDateAndSession
       precondition: product.timed
       carries:
@@ -1006,10 +1043,6 @@ screens:
       provenance: flow F33 step 3→4
       crossesDevice: true
       back: false
-    - to: POS-001
-      trigger: Begin Shift
-      provenance: derived — POS-001 declares entryState.params shiftId and POS-002 holds none of them,
-        so the edge carries nothing and POS-001 opens cold
     - to: POS-007
       trigger: Close Shift
       carries:
@@ -1078,8 +1111,8 @@ screens:
         note: The ticket is chosen and its detail is open. Which step comes next is decided by the product,
           not by the cashier.
       datetime:
-        note: Date, and for a timed product a session. **Dated products stop at the date**; timed ones
-          carry on to the time.
+        note: Date, and for a timed product a performance (audit R165). **Dated products stop at the date**;
+          timed ones carry on to the time.
       zone:
         note: Which part of the house, before any individual seat.
       seats:
@@ -1099,7 +1132,7 @@ screens:
       'on': product is seated
       to: zone
     - from: datetime
-      'on': date and session chosen
+      'on': date and performance chosen
       to: qty
     - from: zone
       'on': zone chosen
@@ -1580,7 +1613,10 @@ screens:
     trigger: Void order
     body: '**Names what `voidOrder` changes and what it leaves alone**, in the consequence rather than
       the verb. A sell ticket catalogue this affects should be identified in the dialog, not just counted.
-      **Collects what `voidOrder` sends before it is called.** Required: `id`, `reason`, `recordedAt`.'
+      **Collects what `voidOrder` sends before it is called.** Required: `id`, `reason`, `recordedAt`.
+      `reason` is picked from the void reason list (guestChangedMind, enteredInError, itemUnavailable,
+      qualityIssue, duplicate, other); **`note` is required when the reason is other**, refused 400 without
+      it (decided 28 September, audit R125 (4), R222).'
     provenance: contract orders.yaml POST /orders/{orderId}/voids
     confirm:
       label: Void
@@ -1615,10 +1651,10 @@ screens:
     component: drawer
     trigger: Continue from ticket detail
     bindsTo: Availability
-    body: '**Date, then session, for the flows that need them.** An admission ticket skips this and goes
-      to quantity; a dated ticket asks the date; a timed ticket asks the date and then the time. Which
-      of the three is not a property of this drawer — it is the product type, and the drawer shows the
-      steps that type requires.'
+    body: '**Date, then performance, for the flows that need them** (a session is a Performance, audit
+      R165). An admission ticket skips this and goes to quantity; a dated ticket asks the date; a timed
+      ticket asks the date and then the time. Which of the three is not a property of this drawer — it
+      is the product type, and the drawer shows the steps that type requires.'
     provenance: minute 2026-08-03 §Ticket Flow Variations by Product Type
     confirm:
       label: Continue
@@ -1637,7 +1673,7 @@ screens:
       - sessionTime
   - id: drawerSeatSelection
     component: drawer
-    trigger: Continue from date and session
+    trigger: Continue from date and performance
     bindsTo: SeatAvailability
     body: '**Seats, for a seated product only.** Carries the seating rules the venue configured — a group
       whose seats must stay together cannot be split here, and the map says so at the point of selection
@@ -1981,8 +2017,10 @@ screens:
     component: modal
     trigger: Create retail return
     body: '**Collects what `createRetailReturn` sends before it is called.** Required: `id`, `saleId`,
-      `lines`, `reason`, `recordedAt`. Optional: `refundTender`, `secondaryAuthorisation`. Dismissing
-      sends nothing; the screen behind is unchanged.'
+      `lines`, `reason`, `recordedAt`. Optional: `refundTender`, `secondaryAuthorisation`. **Above the
+      outlet''s self-authorise limit a supervisor enters their staff PIN on this till** (`secondaryAuthorisation`
+      {`principalId`, `credential`}); refused 403 `supervisor-step-up-refused`. There is no approval-request
+      path (decided 28 September, audit R144). Dismissing sends nothing; the screen behind is unchanged.'
     bindsTo: CreateRetailReturnRequest
     confirm:
       label: Create retail return
@@ -2340,7 +2378,6 @@ screens:
     entryFrom:
     - POS-002
     exitTo:
-    - POS-001
     - POS-002
     - POS-004
     - POS-005
@@ -2367,10 +2404,6 @@ screens:
       - visitDate
       - sessionTime
       provenance: board TICVAI POS Terminal · drawerConfirm (4118) then goCheckout (5157)
-    - to: POS-001
-      trigger: Begin Shift
-      provenance: derived — POS-001 declares entryState.params shiftId and POS-003 holds none of them,
-        so the edge carries nothing and POS-001 opens cold
     - to: POS-004
       trigger: Sell — Seat Map
       carries:
@@ -2675,7 +2708,6 @@ screens:
     entryFrom:
     - POS-002
     exitTo:
-    - POS-001
     - POS-002
     - POS-003
     - POS-005
@@ -2701,10 +2733,6 @@ screens:
       - guest
       - discount
       provenance: board TICVAI POS Terminal · drawerConfirm (4118) then goCheckout (5157)
-    - to: POS-001
-      trigger: Begin Shift
-      provenance: derived — POS-001 declares entryState.params shiftId and POS-004 holds none of them,
-        so the edge carries nothing and POS-001 opens cold
     - to: POS-003
       trigger: Sell — Timed Entry
       provenance: derived — POS-003 declares entryState.params inventoryHoldId, productId and POS-004
@@ -3057,7 +3085,6 @@ screens:
     - POS-001
     - POS-002
     - POS-010
-    - POS-021
     - POS-022
     - POS-023
     fromFlows: true
@@ -3083,22 +3110,25 @@ screens:
       - shiftId
       provenance: derived — POS-001 declares entryState.params shiftId and POS-005 holds shiftId, so an
         edge into it carries them
-    - to: POS-021
-      trigger: Sell — Food & Drink
-      provenance: derived — POS-021 declares entryState.params itemId and POS-005 holds none of them,
-        so the edge carries nothing and POS-021 opens cold
     - to: POS-023
       trigger: Sell — Merchandise
       provenance: derived — POS-023 declares entryState.params  and POS-005 holds none of them, so the
         edge carries nothing and POS-023 opens cold
+    - to: POS-022
+      trigger: Charged — back to the pass, where the order already sent to the kitchen is handed over
+        (send to kitchen, then charge; audit R261)
+      provenance: flow F108 step 4→6 — paid at step 4, collected at the pass at step 6 once the kitchen
+        (step 5, another device) has bumped it; the send itself is POS-022 → POS-005, step 3→4
+      carries:
+      - orderId
+    - to: KIT-002
+      trigger: The kitchen makes it and bumps it
+      provenance: flow F108 step 4→5
+      crossesDevice: true
+      back: false
     - to: POS-010
       trigger: The guest asks to add a locker to the ticket they just bought
       provenance: flow F58 step 6→7
-      carries:
-      - orderId
-    - to: POS-022
-      trigger: The order goes to the pass
-      provenance: flow F108 step 3→4
       carries:
       - orderId
     - to: BO-048
@@ -3319,6 +3349,23 @@ screens:
         label: Lookup retail sale
         operation: lookupRetailSale
         provenance: contract retail.yaml GET /retail-sales/lookup
+        notes: '**Scan the receipt barcode, or type the receipt or order number.** The barcode wins, then
+          the receipt number, then the order number; `matchedBy` says which was used. The answer is a
+          list: one match opens it, several show a pick list, newest first, for the cashier to choose
+          the sale whose receipt is reprinted (decided 28 September, audit R215).'
+      - kind: dataTable
+        label: Matching sales
+        bindsTo: RetailSale
+        columns:
+        - RetailSale.receiptNumber
+        - RetailSale.orderId
+        - RetailSale.outletId
+        - RetailSale.grossAmount
+        - RetailSale.createdAt
+        operation: lookupRetailSale
+        provenance: contract retail.yaml GET /retail-sales/lookup
+        notes: Shown only when `lookupRetailSale` returns more than one sale; picking a row opens it.
+          Headed by the identifier in `matchedBy` (audit R215).
       - kind: secondaryButton
         label: Create order
         operation: createOrder
@@ -3401,7 +3448,8 @@ screens:
     trigger: onLoad
   - operationId: lookupRetailSale
     contract: retail
-    purpose: Find a sale from a receipt
+    purpose: Find a sale from a receipt; returns a list with matchedBy, a pick list when several match
+      (audit R215)
     trigger: onAction
   - operationId: createOrder
     contract: orders
@@ -3588,7 +3636,6 @@ screens:
     - POS-002
     - POS-025
     exitTo:
-    - POS-001
     - POS-002
     - POS-003
     - POS-004
@@ -3608,10 +3655,6 @@ screens:
       provenance: board TICVAI POS Terminal · recall (4000). **The hold clock travels with the cart**
         — a destination that re-fetches the lines has lost the lease, and the guest's seats go back on
         sale while they are standing at the till.
-    - to: POS-001
-      trigger: Begin Shift
-      provenance: derived — POS-001 declares entryState.params shiftId and POS-006 holds none of them,
-        so the edge carries nothing and POS-001 opens cold
     - to: POS-003
       trigger: Sell — Timed Entry
       provenance: derived — POS-003 declares entryState.params inventoryHoldId, productId and POS-006
@@ -3812,7 +3855,10 @@ screens:
     trigger: Void order
     body: '**Names what `voidOrder` changes and what it leaves alone**, in the consequence rather than
       the verb. A held orders this affects should be identified in the dialog, not just counted. **Collects
-      what `voidOrder` sends before it is called.** Required: `id`, `reason`, `recordedAt`.'
+      what `voidOrder` sends before it is called.** Required: `id`, `reason`, `recordedAt`. `reason` is
+      picked from the void reason list (guestChangedMind, enteredInError, itemUnavailable, qualityIssue,
+      duplicate, other); **`note` is required when the reason is other**, refused 400 without it (decided
+      28 September, audit R125 (4), R222).'
     provenance: contract orders.yaml POST /orders/{orderId}/voids
     confirm:
       label: Void
@@ -4108,7 +4154,6 @@ screens:
     - POS-025
     exitTo:
     - POS-001
-    - POS-002
     - POS-008
     - POS-009
     inferred: true
@@ -4117,23 +4162,23 @@ screens:
       trigger: Close and sign out
       control: primaryButton#lockShift
       precondition: closeStep == 'summary'
-      guard: cash.variance.approve
-      escalatable: true
+      operation: closeShift
       carries:
       - shiftId
       - countedCash
       - variance
-      - approverPrincipalId
       discards:
       - cart
       - guest
       - table
       - discount
       onFailure:
-      - when: varianceOutOfTolerance
-        to: POS-007#awaitingApproval
-        note: Variance beyond tolerance holds the close until a Duty Manager PIN is captured — `pinConfirm`
-          case 'shift' (4348). The expected figure is never shown before the count (blindCount).
+      - when: requiresAcceptance
+        to: POS-007#pendingVariance
+        note: '**No pre-close PIN hold** (decided 28 September, audit R080 (e)). `closeShift` is submitted
+          with the blind count; when `ShiftCloseResult.requiresAcceptance` is true the shift is `pendingVariance`
+          and a supervisor accepts it on this till with `acceptShiftVariance` (OVERSHORT_ACCEPT, PIN step-up),
+          the only path for a variance. The expected figure is never shown before the count (blindCount).'
       provenance: board TICVAI POS Terminal · signOut (5641) + lockShift (5687); flow F32 step 6
     - to: POS-008
       trigger: The day is reported
@@ -4143,10 +4188,6 @@ screens:
       provenance: flow F32 step 7→8
       crossesDevice: true
       back: false
-    - to: POS-002
-      trigger: Sell — Ticket Catalogue
-      provenance: derived — POS-002 declares entryState.params cardCode, orderId, productId, promotionId
-        and POS-007 holds none of them, so the edge carries nothing and POS-002 opens cold
     - to: POS-009
       trigger: Staff Roster
       provenance: derived — POS-009 declares entryState.params  and POS-007 holds none of them, so the
@@ -4170,26 +4211,28 @@ screens:
     states:
       count:
         note: Counting the drawer down, denomination by denomination, against the float declared at open.
-      variance:
-        note: '**The count is outside tolerance.** A supervisor PIN is required before the shift can close,
-          and the approval is recorded against their name.'
       summary:
         operation: closeShift
-        note: The count is accepted. What is left is the close itself.
+        note: The count is entered. `closeShift` submits it; nothing holds the close for a PIN first (audit
+          R080 (e)).
+      pendingVariance:
+        operation: acceptShiftVariance
+        note: '**The shift is closed as counted and the over/short is beyond the threshold** (`ShiftCloseResult.requiresAcceptance`).
+          A supervisor holding OVERSHORT_ACCEPT accepts it here on the till with a PIN step-up; the acceptance
+          is recorded against their name. Not the cashier whose shift it is (decided 28 September, audit
+          R080 (e)).'
     transitions:
     - from: count
-      'on': Next, within tolerance
+      'on': Submit count
       to: summary
-    - from: count
-      'on': Next, outside tolerance
-      to: variance
-    - from: variance
-      'on': Supervisor PIN accepted
-      to: summary
-      note: Recorded as a cash variance in the audit trail, against the approver.
     - from: summary
       'on': Back to count
       to: count
+    - from: summary
+      'on': closeShift returns requiresAcceptance
+      to: pendingVariance
+      note: Within the threshold the shift closes and the screen leaves for POS-001; beyond it the shift
+        is `pendingVariance` (audit R080 (e)).
   pattern: approvalInbox
   patternReason: '`approveShiftOpen` decides items that `listCashMovements` queues — every row is waiting
     for a person, so the empty state is success'
@@ -4255,7 +4298,8 @@ screens:
         provenance: carried from the previous definition
       - kind: banner
         bindsTo: ShiftCloseResult.variance
-        notes: Revealed only after submission. Above the venue threshold it needs approval
+        notes: Revealed only after submission. Above the venue threshold the shift is `pendingVariance`
+          and a supervisor accepts it with `acceptShiftVariance` (audit R080 (e))
         provenance: carried from the previous definition
       - kind: timeline
         notes: No-sale count, manual discounts, voids — the numbers a supervisor reviews
@@ -4431,8 +4475,9 @@ screens:
   - id: formAcceptShiftVariance
     component: modal
     trigger: Accept shift variance
-    body: '**Collects what `acceptShiftVariance` sends before it is called.** Required: `reason`. Dismissing
-      sends nothing; the screen behind is unchanged.'
+    body: '**Collects what `acceptShiftVariance` sends before it is called.** Required: `reason`. Shown
+      in the pendingVariance state; the supervisor confirms with their PIN (step-up) on this till (audit
+      R080 (e)). Dismissing sends nothing; the screen behind is unchanged.'
     confirm:
       label: Accept shift variance
       operation: acceptShiftVariance
@@ -4513,8 +4558,10 @@ screens:
   - id: formReopenShift
     component: modal
     trigger: Reopen shift
-    body: '**Collects what `reopenShift` sends before it is called.** Required: `reason`, `approverPrincipalId`.
-      Dismissing sends nothing; the screen behind is unchanged.'
+    body: '**Collects what `reopenShift` sends before it is called.** Required: `reason`, `supervisorStepUp`
+      {`principalId`, `credential`}: the supervisor enters their staff PIN on this device, and may not
+      be the principal who closed the shift. Refused 403 `approver-is-closer` or `supervisor-step-up-refused`
+      (decided 28 September, audit R144). Dismissing sends nothing; the screen behind is unchanged.'
     confirm:
       label: Reopen shift
       operation: reopenShift
@@ -4522,7 +4569,7 @@ screens:
       label: Cancel
       discards:
       - reason
-      - approverPrincipalId
+      - supervisorStepUp
     provenance: contract shift.yaml POST /shifts/{shiftId}/reopen
   - id: formResumeShift
     component: modal
@@ -4577,21 +4624,25 @@ screens:
       to support with the wrong question.
     offline: Cannot close. Closing requires the server total, and a locally computed variance is not a
       variance
-    denied: The count is accepted and the close is held. A variance beyond tolerance needs `cash.variance.approve`
-      — a supervisor PIN is captured in place and the shift closes against the same count, rather than
-      the cashier counting twice.
-    awaitingApproval: The close is waiting on a supervisor who is not at the till. The count is held;
-      the drawer stays shut.
+    denied: '`acceptShiftVariance` was refused: the caller lacks OVERSHORT_ACCEPT at this venue, or is
+      the cashier whose shift it is. The shift stays `pendingVariance` against the same count, and a supervisor
+      accepts it on this till (audit R080 (e)).'
+    pendingVariance: '**Closed as counted, over/short waiting for a supervisor.** `closeShift` returned
+      `requiresAcceptance`; a supervisor holding OVERSHORT_ACCEPT accepts the variance on this till with
+      a PIN step-up. There is no pre-close PIN hold and no approval request (decided 28 September, audit
+      R080 (e)).'
   apis:
   - operationId: closeShift
     contract: shift
-    purpose: Submit the blind count
+    purpose: Submit the blind count; ShiftCloseResult.requiresAcceptance says whether a supervisor must
+      accept the variance
     trigger: onAction
     invalidates:
     - listCashMovements
   - operationId: acceptShiftVariance
     contract: shift
-    purpose: Supervisor accepts a variance above threshold
+    purpose: Supervisor accepts a variance above threshold on the till, after closeShift left the shift
+      pendingVariance (OVERSHORT_ACCEPT, PIN step-up; audit R080 (e))
     trigger: onAction
     invalidates:
     - listCashMovements
@@ -4719,8 +4770,6 @@ screens:
     - POS-002
     - POS-007
     exitTo:
-    - POS-001
-    - POS-002
     - POS-009
     uses:
     - posPrimaryRail
@@ -4729,14 +4778,6 @@ screens:
       trigger: Staffing against takings is read
       provenance: flow F74 step 2→3
       operation: runReport
-    - to: POS-001
-      trigger: Begin Shift
-      provenance: derived — POS-001 declares entryState.params shiftId and POS-008 holds none of them,
-        so the edge carries nothing and POS-001 opens cold
-    - to: POS-002
-      trigger: Sell — Ticket Catalogue
-      provenance: derived — POS-002 declares entryState.params cardCode, orderId, productId, promotionId
-        and POS-008 holds none of them, so the edge carries nothing and POS-002 opens cold
   notes: 'Design: Park_POS_dc.html reports view. Read routing is analytical — never the primary, under
     any load. **Authoring operations removed 24 August**: createReport, updateReport. **A till sells the
     catalogue; it does not author it.** These arrived in the 18 August bulk attach — the same defect that
@@ -4837,6 +4878,9 @@ screens:
         label: Run report
         operation: runReport
         provenance: contract reporting.yaml POST /reports/{reportId}/run
+        notes: Runs the seeded report `terminalDayView` (sales, tenders, voids and refunds for this terminal
+          today), its `reportId` taken from `listSeededReports` (proposed, client to correct; decided
+          28 September, audit R282).
       - kind: secondaryButton
         label: Ask reporting question
         operation: askReportingQuestion
@@ -4930,7 +4974,7 @@ screens:
   apis:
   - operationId: runReport
     contract: reporting
-    purpose: Terminal day view
+    purpose: Terminal day view -- runs the seeded report terminalDayView (audit R282)
     trigger: onAction
   - operationId: askReportingQuestion
     contract: reporting
@@ -5000,7 +5044,6 @@ screens:
     - POS-008
     exitTo:
     - POS-001
-    - POS-002
     - POS-007
     uses:
     - posPrimaryRail
@@ -5011,10 +5054,6 @@ screens:
       - shiftId
       provenance: derived — POS-001 declares entryState.params shiftId and POS-009 holds shiftId, so an
         edge into it carries them
-    - to: POS-002
-      trigger: Sell — Ticket Catalogue
-      provenance: derived — POS-002 declares entryState.params cardCode, orderId, productId, promotionId
-        and POS-009 holds none of them, so the edge carries nothing and POS-002 opens cold
     - to: POS-007
       trigger: Close Shift
       provenance: derived — POS-007 declares entryState.params saleId and POS-009 holds none of them,
@@ -5337,8 +5376,10 @@ screens:
   - id: formReopenShift
     component: modal
     trigger: Reopen shift
-    body: '**Collects what `reopenShift` sends before it is called.** Required: `reason`, `approverPrincipalId`.
-      Dismissing sends nothing; the screen behind is unchanged.'
+    body: '**Collects what `reopenShift` sends before it is called.** Required: `reason`, `supervisorStepUp`
+      {`principalId`, `credential`}: the supervisor enters their staff PIN on this device, and may not
+      be the principal who closed the shift. Refused 403 `approver-is-closer` or `supervisor-step-up-refused`
+      (decided 28 September, audit R144). Dismissing sends nothing; the screen behind is unchanged.'
     confirm:
       label: Reopen shift
       operation: reopenShift
@@ -5346,7 +5387,7 @@ screens:
       label: Cancel
       discards:
       - reason
-      - approverPrincipalId
+      - supervisorStepUp
     provenance: contract shift.yaml POST /shifts/{shiftId}/reopen
   - id: formResumeShift
     component: modal
@@ -5525,7 +5566,6 @@ screens:
     entryFrom:
     - POS-002
     exitTo:
-    - POS-001
     - POS-002
     - POS-003
     - POS-004
@@ -5534,16 +5574,13 @@ screens:
     uses:
     - posSaleToPayment
     transitions:
-    - to: POS-001
-      trigger: Begin Shift
-      provenance: derived — POS-001 declares entryState.params shiftId and POS-010 holds none of them,
-        so the edge carries nothing and POS-001 opens cold
     - to: POS-002
       trigger: Sell — Ticket Catalogue
       carries:
       - orderId
+      - promotionId
       provenance: derived — POS-002 declares entryState.params cardCode, orderId, productId, promotionId
-        and POS-010 holds orderId, so an edge into it carries them
+        and POS-010 holds orderId, promotionId, so an edge into it carries them
     - to: POS-003
       trigger: Sell — Timed Entry
       provenance: derived — POS-003 declares entryState.params inventoryHoldId, productId and POS-010
@@ -5942,6 +5979,23 @@ screens:
         label: Lookup retail sale
         operation: lookupRetailSale
         provenance: contract retail.yaml GET /retail-sales/lookup
+        notes: '**Scan the receipt barcode, or type the receipt or order number.** The barcode wins, then
+          the receipt number, then the order number; `matchedBy` says which was used. The answer is a
+          list: one match opens it, several show a pick list, newest first, for the cashier to choose
+          the sale being returned (decided 28 September, audit R215).'
+      - kind: dataTable
+        label: Matching sales
+        bindsTo: RetailSale
+        columns:
+        - RetailSale.receiptNumber
+        - RetailSale.orderId
+        - RetailSale.outletId
+        - RetailSale.grossAmount
+        - RetailSale.createdAt
+        operation: lookupRetailSale
+        provenance: contract retail.yaml GET /retail-sales/lookup
+        notes: Shown only when `lookupRetailSale` returns more than one sale; picking a row opens it.
+          Headed by the identifier in `matchedBy` (audit R215).
       - kind: secondaryButton
         label: Create retail return
         operation: createRetailReturn
@@ -5990,7 +6044,8 @@ screens:
     trigger: onLoad
   - operationId: lookupRetailSale
     contract: retail
-    purpose: Find a sale from a receipt
+    purpose: Find a sale from a receipt; returns a list with matchedBy, a pick list when several match
+      (audit R215)
     trigger: onAction
   - operationId: createRetailReturn
     contract: retail
@@ -6093,8 +6148,10 @@ screens:
     component: modal
     trigger: Create retail return
     body: '**Collects what `createRetailReturn` sends before it is called.** Required: `id`, `saleId`,
-      `lines`, `reason`, `recordedAt`. Optional: `refundTender`, `secondaryAuthorisation`. Dismissing
-      sends nothing; the screen behind is unchanged.'
+      `lines`, `reason`, `recordedAt`. Optional: `refundTender`, `secondaryAuthorisation`. **Above the
+      outlet''s self-authorise limit a supervisor enters their staff PIN on this till** (`secondaryAuthorisation`
+      {`principalId`, `credential`}); refused 403 `supervisor-step-up-refused`. There is no approval-request
+      path (decided 28 September, audit R144). Dismissing sends nothing; the screen behind is unchanged.'
     bindsTo: CreateRetailReturnRequest
     confirm:
       label: Create retail return
@@ -6365,8 +6422,11 @@ screens:
     component: modal
     trigger: Record order handover
     body: '**Collects what `recordOrderHandover` sends before it is called.** Required: `outcome`, `recordedAt`.
-      Optional: `deliveredToLocationId`, `runnerPrincipalId`, `note`. Dismissing sends nothing; the screen
-      behind is unchanged.'
+      Optional: `deliveredToLocationId`, `runnerPrincipalId`, `note`. **Only the outcome that fits the
+      order''s service mode is offered**: tableService `served`; quickService or collection `collected`;
+      delivery or roomService `delivered`, with `deliveredToLocationId` required. `guestNotFound` and
+      `refused` are offered for every mode. Any other pairing is refused 422 `outcomeNotForServiceMode`
+      (decided 28 September, audit R125 (1)). Dismissing sends nothing; the screen behind is unchanged.'
     confirm:
       label: Record order handover
       operation: recordOrderHandover
@@ -6383,8 +6443,9 @@ screens:
     component: modal
     trigger: Reserve merchandise
     body: '**Collects what `reserveMerchandise` sends before it is called.** Required: `id`, `lines`,
-      `expiresAt`. Optional: `subjectId`, `collectionNote`. Dismissing sends nothing; the screen behind
-      is unchanged.'
+      `expiresAt`. Optional: `subjectId`, `collectionNote`. **The expiry picker offers 15 minutes ahead
+      at the earliest and the close of the venue''s operating day at the latest**; anything outside is
+      refused 400 (decided 28 September, audit R215). Dismissing sends nothing; the screen behind is unchanged.'
     confirm:
       label: Reserve merchandise
       operation: reserveMerchandise
@@ -6860,7 +6921,10 @@ screens:
     trigger: Void order
     body: '**Names what `voidOrder` changes and what it leaves alone**, in the consequence rather than
       the verb. A sales exceptions controls this affects should be identified in the dialog, not just
-      counted. **Collects what `voidOrder` sends before it is called.** Required: `id`, `reason`, `recordedAt`.'
+      counted. **Collects what `voidOrder` sends before it is called.** Required: `id`, `reason`, `recordedAt`.
+      `reason` is picked from the void reason list (guestChangedMind, enteredInError, itemUnavailable,
+      qualityIssue, duplicate, other); **`note` is required when the reason is other**, refused 400 without
+      it (decided 28 September, audit R125 (4), R222).'
     provenance: contract orders.yaml POST /orders/{orderId}/voids
     confirm:
       label: Void
@@ -8072,6 +8136,9 @@ screens:
         label: Run report
         operation: runReport
         provenance: contract reporting.yaml POST /reports/{reportId}/run
+        notes: Runs the seeded report `shiftSummary` (each till shift's takings, expected against counted
+          cash, and variance), its `reportId` taken from `listSeededReports` (proposed, client to correct;
+          decided 28 September, audit R282).
   states:
     loading: The shift exceptions alerts list.
     error: Could not load. Names which read failed and leaves the shift exceptions alerts untouched.
@@ -8111,7 +8178,7 @@ screens:
     - listAlerts
   - operationId: runReport
     contract: reporting
-    purpose: Run a report
+    purpose: Shift summary -- runs the seeded report shiftSummary (audit R282)
     trigger: onAction
     invalidates:
     - listAlerts
@@ -8242,6 +8309,7 @@ screens:
     exitTo:
     - POS-005
     - POS-002
+    - POS-022
     transitions:
     - to: POS-005
       trigger: Charge
@@ -8263,6 +8331,9 @@ screens:
       - promotionId
       provenance: derived — POS-002 declares entryState.params cardCode, orderId, productId, promotionId
         and POS-021 holds promotionId, so an edge into it carries them
+    - to: POS-022
+      trigger: The order goes to the pass before the guest pays
+      provenance: flow F108 step 2→3
     uses:
     - posPrimaryRail
     - posSaleToPayment
@@ -8539,8 +8610,9 @@ screens:
       - tableLabel
       - courses
       - cart
-      provenance: board TICVAI POS Terminal · queue STAGES (3483) — **the kitchen fires on payment** for
-        quick service and on send for dine-in.
+      provenance: board TICVAI POS Terminal · queue STAGES (3483). **Send to kitchen, then charge, for
+        every POS F&B order** — the ticket fires on send and the till charges after (decided 28 September,
+        audit R261); the board's "fires on payment for quick service" is superseded. Flow F108 step 3→4.
     - to: POS-002
       trigger: Sell — Ticket Catalogue
       carries:
@@ -8549,7 +8621,8 @@ screens:
         and POS-022 holds orderId, so an edge into it carries them
     - to: KIT-002
       trigger: The kitchen makes it and bumps it
-      provenance: flow F108 step 4→5
+      provenance: flow F108 step 3→5 — the ticket sent here is made on the kitchen display while the guest
+        pays at POS-005 (step 4)
       crossesDevice: true
       back: false
       carries:
@@ -8898,6 +8971,9 @@ screens:
         label: Lookup merchandise
         operation: lookupMerchandise
         provenance: contract retail.yaml GET /merchandise/lookup
+        notes: Price and stock are this till's outlet, resolved from the workstation; the till sends no
+          `outletId` (only a caller with no workstation does), and an inactive item answers 404 like an
+          unknown barcode (decided 28 September, audit R215).
       - kind: secondaryButton
         label: Add cart line
         operation: addCartLine
@@ -9051,13 +9127,8 @@ screens:
     entryFrom:
     - POS-001
     exitTo:
-    - POS-005
     - POS-002
     transitions:
-    - to: POS-005
-      trigger: Payment
-      provenance: derived — POS-005 declares entryState.params paymentId, saleId and POS-024 holds none
-        of them, so the edge carries nothing and POS-005 opens cold
     - to: POS-002
       trigger: Sell — Ticket Catalogue
       provenance: derived — POS-002 declares entryState.params cardCode, orderId, productId, promotionId

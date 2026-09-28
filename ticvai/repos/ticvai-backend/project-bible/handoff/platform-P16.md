@@ -9,12 +9,12 @@
 | Contracts | 11 |
 | Modules | 1 |
 | Undrawn | 0 |
-| Operations with no screen | 149 |
+| Operations with no screen | 148 |
 | Waves | wave3 69 |
 
 ## Gaps
 
-### 149 operations with no screen here
+### 148 operations with no screen here
 
 **In a contract this platform uses, callable by its audience, and reaching no screen on any platform serving that audience.** Either a screen is missing or the endpoint should not exist — and the second is worth considering first.
 
@@ -35,6 +35,7 @@
 | `removeIndexEntry` | ai | DELETE | Remove one record from the index |
 | `setIndexSource` | ai | PUT | Declare a source indexed |
 | `setSuggestionProvider` | ai | PUT |  |
+| `submitApprovalRequest` | approvals | POST | Send a saved draft for approval |
 | `assessProductChange` | catalogue | POST | What a change would touch, before making it |
 | `bulkChangePrices` | catalogue | POST | Reprice a category or a whole catalogue |
 | `cloneProduct` | catalogue | POST | Copy a product as a new draft |
@@ -59,8 +60,7 @@
 | `suspendEntitlement` | catalogue | POST | Suspend or reinstate an entitlement |
 | `updateDonationCampaign` | catalogue | PATCH | Amend or close a campaign |
 | `createEmergencyAccessOverride` | identity | POST | Bypass the policy, loudly |
-| `evaluateAccess` | identity | POST | Decide, now, and say why |
-| … | | | 109 more |
+| … | | | 108 more |
 
 ## Modules
 

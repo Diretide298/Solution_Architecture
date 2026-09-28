@@ -234,6 +234,7 @@ CREATE TABLE IF NOT EXISTS ai.proposed_action (
     payload                           jsonb NOT NULL,
     summary                           text,
     status                            text NOT NULL CONSTRAINT proposed_action_status_chk CHECK (status IN ('proposed', 'approved', 'rejected', 'applied', 'expired')),
+    expires_at                        timestamptz,
     approval_level                    integer,
     decided_by_principal_id           uuid,
     decision_reason                   text,

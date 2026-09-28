@@ -51,6 +51,21 @@ CREATE TABLE IF NOT EXISTS resources.booking (
     synced_at                         timestamptz
 );
 
+-- Who is in a session, in what order (BL-045). The running order is operational — an instructor
+-- takes beginners first
+CREATE TABLE IF NOT EXISTS resources.performance_participant (
+    id                                uuid PRIMARY KEY NOT NULL,
+    performance_id                    uuid NOT NULL,
+    subject_id                        uuid NOT NULL,
+    position                          integer NOT NULL,
+    experience_level                  text CONSTRAINT performance_participant_experience_level_chk CHECK (experience_level IN ('firstTime', 'beginner', 'intermediate', 'advanced')),
+    package_name                      text,
+    notes                             text,
+    recorded_at                       timestamptz,
+    synced_at                         timestamptz,
+    has_signed_waiver                 boolean
+);
+
 -- What a person resource is certified to do, and until when (BL-042). A lapsed lifeguard
 -- certificate is a safety failure, not a data-quality one. Hangs off: a child of
 -- resources.resource; reaches resources.resource through its keys; references assets.media_asset,
@@ -233,21 +248,6 @@ CREATE TABLE IF NOT EXISTS resources.resource_type (
     is_customer_selectable            boolean DEFAULT false,
     scope_path                        ltree NOT NULL,
     is_active                         boolean DEFAULT true
-);
-
--- Who is in a session, in what order (BL-045). The running order is operational — an instructor
--- takes beginners first
-CREATE TABLE IF NOT EXISTS resources.session_participant (
-    id                                uuid PRIMARY KEY NOT NULL,
-    session_id                        uuid NOT NULL,
-    subject_id                        uuid NOT NULL,
-    position                          integer NOT NULL,
-    experience_level                  text CONSTRAINT session_participant_experience_level_chk CHECK (experience_level IN ('firstTime', 'beginner', 'intermediate', 'advanced')),
-    package_name                      text,
-    notes                             text,
-    recorded_at                       timestamptz,
-    synced_at                         timestamptz,
-    has_signed_waiver                 boolean
 );
 
 -- Holds 10 columns. No description has been written for this table — the name is the only thing

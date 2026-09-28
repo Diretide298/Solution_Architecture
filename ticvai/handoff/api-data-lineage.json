@@ -3923,6 +3923,7 @@
   "reads": [
    "cache:idempotency",
    "identity.delegated_access",
+   "identity.mfa_method",
    "identity.principal",
    "identity.principal_credential",
    "identity.role"
@@ -4653,6 +4654,7 @@
   "path": "/auth/sso/{providerId}/callback",
   "reads": [
    "cache:idempotency",
+   "identity.mfa_method",
    "identity.principal",
    "identity.sso_provider"
   ],
@@ -6076,7 +6078,8 @@
   "path": "/fiscal-periods/{periodId}/close",
   "reads": [
    "cache:idempotency",
-   "ledger.fiscal_period"
+   "ledger.fiscal_period",
+   "ledger.fiscal_period_event"
   ],
   "writes": [
    "cache:idempotency",
@@ -9947,7 +9950,8 @@
   "verb": "GET",
   "path": "/seat-categories",
   "reads": [
-   "seating.seat_category"
+   "seating.seat_category",
+   "seating.seat_price_band"
   ],
   "writes": [],
   "routing": "replica",
@@ -9970,11 +9974,13 @@
   "path": "/seat-categories",
   "reads": [
    "cache:idempotency",
-   "seating.seat_category"
+   "seating.seat_category",
+   "seating.seat_price_band"
   ],
   "writes": [
    "cache:idempotency",
-   "seating.seat_category"
+   "seating.seat_category",
+   "seating.seat_price_band"
   ],
   "routing": "",
   "scope": "venue",
@@ -12707,6 +12713,7 @@
   "reads": [
    "maintenance.incident",
    "maintenance.incident_authority_notification",
+   "maintenance.incident_investigation_note",
    "maintenance.incident_involved_party"
   ],
   "writes": [],
@@ -16466,10 +16473,10 @@
   "path": "/tenant-config",
   "reads": [
    "cache:resolution",
-   "control.footer_config",
-   "control.footer_config_column",
-   "control.footer_config_social_link",
    "whitelabel.feature_toggle",
+   "whitelabel.footer_config",
+   "whitelabel.footer_config_column",
+   "whitelabel.footer_config_social_link",
    "whitelabel.homepage_section",
    "whitelabel.module_enablement",
    "whitelabel.navigation_item",
@@ -17540,10 +17547,10 @@
   "path": "/tenant-config/versions/{version}/restore",
   "reads": [
    "cache:idempotency",
-   "control.footer_config",
-   "control.footer_config_column",
-   "control.footer_config_social_link",
    "whitelabel.feature_toggle",
+   "whitelabel.footer_config",
+   "whitelabel.footer_config_column",
+   "whitelabel.footer_config_social_link",
    "whitelabel.homepage_section",
    "whitelabel.module_enablement",
    "whitelabel.navigation_item",
@@ -18414,6 +18421,7 @@
   "path": "/attendance",
   "reads": [
    "workforce.attendance",
+   "workforce.attendance_amendment",
    "workforce.rota_assignment"
   ],
   "writes": [],
@@ -18439,6 +18447,7 @@
    "access.access_point",
    "cache:idempotency",
    "workforce.attendance",
+   "workforce.attendance_amendment",
    "workforce.rota_assignment"
   ],
   "writes": [
@@ -18466,7 +18475,8 @@
   "path": "/attendance/{recordId}/amend",
   "reads": [
    "cache:idempotency",
-   "workforce.attendance"
+   "workforce.attendance",
+   "workforce.attendance_amendment"
   ],
   "writes": [
    "cache:idempotency",
@@ -20058,6 +20068,7 @@
   "writes": [
    "cache:idempotency",
    "ledger.posting",
+   "orders.cash_count_line",
    "orders.deposit_box"
   ],
   "routing": "",
@@ -21899,21 +21910,21 @@
    "staff"
   ]
  },
- "getSessionManifest": {
+ "getPerformanceManifest": {
   "contract": "resources",
   "verb": "GET",
-  "path": "/sessions/{sessionId}/manifest",
+  "path": "/performances/{performanceId}/manifest",
   "reads": [
    "marketing.consent_record",
    "pii.subject",
-   "resources.session_participant"
+   "resources.performance_participant"
   ],
   "writes": [],
   "routing": "replica",
   "scope": "venue",
   "perm": "RESOURCE_VIEW",
   "offline": true,
-  "summary": "Who is in a session, in what order",
+  "summary": "Who is in a performance, in what order",
   "source": "hand-mapped",
   "service": "VenueOpsService",
   "stores": [
@@ -21923,17 +21934,17 @@
    "staff"
   ]
  },
- "reorderSessionManifest": {
+ "reorderPerformanceManifest": {
   "contract": "resources",
   "verb": "PUT",
-  "path": "/sessions/{sessionId}/manifest",
+  "path": "/performances/{performanceId}/manifest",
   "reads": [
    "cache:idempotency",
-   "resources.session_participant"
+   "resources.performance_participant"
   ],
   "writes": [
    "cache:idempotency",
-   "resources.session_participant"
+   "resources.performance_participant"
   ],
   "routing": "",
   "scope": "venue",
@@ -24344,16 +24355,16 @@
   "path": "/footer",
   "reads": [
    "cache:idempotency",
-   "control.footer_config",
-   "control.footer_config_column",
-   "control.footer_config_social_link"
+   "whitelabel.footer_config",
+   "whitelabel.footer_config_column",
+   "whitelabel.footer_config_social_link"
   ],
   "writes": [
    "cache:idempotency",
    "cache:resolution",
-   "control.footer_config",
-   "control.footer_config_column",
-   "control.footer_config_social_link"
+   "whitelabel.footer_config",
+   "whitelabel.footer_config_column",
+   "whitelabel.footer_config_social_link"
   ],
   "routing": "",
   "scope": "tenant",
@@ -26702,6 +26713,7 @@
   "verb": "POST",
   "path": "/menu-items/{menuItemId}/verify-allergens",
   "reads": [
+   "fnb.allergen_verdict",
    "fnb.menu_item",
    "fnb.modifier_group",
    "fnb.recipe",
@@ -40474,27 +40486,6 @@
    "postgres"
   ]
  },
- "assignSessionMedia": {
-  "contract": "catalogue",
-  "verb": "POST",
-  "path": "/sessions/{sessionId}/media",
-  "reads": [],
-  "writes": [],
-  "routing": null,
-  "scope": "venue",
-  "perm": "EVENT_CONFIGURE",
-  "offline": false,
-  "summary": "Attach photos and video to the participants in a session",
-  "source": "derived",
-  "audience": [
-   "staff"
-  ],
-  "service": "CatalogueService",
-  "stores": [
-   "postgres",
-   "redis"
-  ]
- },
  "authoriseGameplay": {
   "contract": "games",
   "verb": "POST",
@@ -44498,29 +44489,6 @@
    "redis"
   ]
  },
- "listSessionTemplates": {
-  "contract": "catalogue",
-  "verb": "GET",
-  "path": "/session-templates",
-  "reads": [
-   "catalogue.session_template"
-  ],
-  "writes": [],
-  "routing": "replica",
-  "scope": "venue",
-  "perm": "PERFORMANCE_CONFIGURE",
-  "offline": false,
-  "summary": "Slot templates, peak bands and walk-in rules",
-  "source": "derived",
-  "audience": [
-   "staff"
-  ],
-  "service": "CatalogueService",
-  "stores": [
-   "postgres",
-   "redis"
-  ]
- },
  "listSharedWallets": {
   "contract": "wallet",
   "verb": "GET",
@@ -47232,31 +47200,6 @@
    "derived",
    "postgres",
    "postgres-analytical",
-   "redis"
-  ]
- },
- "setSessionTemplate": {
-  "contract": "catalogue",
-  "verb": "PUT",
-  "path": "/session-templates",
-  "reads": [
-   "catalogue.session_template"
-  ],
-  "writes": [
-   "catalogue.session_template"
-  ],
-  "routing": null,
-  "scope": "venue",
-  "perm": "PERFORMANCE_CONFIGURE",
-  "offline": false,
-  "summary": "Define slot length, capacity, bands and walk-in policy",
-  "source": "derived",
-  "audience": [
-   "staff"
-  ],
-  "service": "CatalogueService",
-  "stores": [
-   "postgres",
    "redis"
   ]
  },
@@ -52311,6 +52254,362 @@
    "guest"
   ],
   "service": "OrderService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "applyCartPromoCode": {
+  "contract": "orders",
+  "verb": "POST",
+  "path": "/carts/{cartId}/promo-codes",
+  "reads": [
+   "orders.cart",
+   "orders.cart_line"
+  ],
+  "writes": [],
+  "routing": null,
+  "scope": "venue",
+  "perm": null,
+  "offline": false,
+  "summary": "Apply a promo code to the cart",
+  "source": "derived",
+  "audience": [
+   "guest",
+   "partner"
+  ],
+  "service": "OrderService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "assignPerformanceMedia": {
+  "contract": "catalogue",
+  "verb": "POST",
+  "path": "/performances/{performanceId}/media",
+  "reads": [],
+  "writes": [],
+  "routing": null,
+  "scope": "venue",
+  "perm": "EVENT_CONFIGURE",
+  "offline": false,
+  "summary": "Attach photos and video to the participants in a performance",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "CatalogueService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "getAllergenVerification": {
+  "contract": "fnb",
+  "verb": "GET",
+  "path": "/menu-items/{menuItemId}/allergen-verification",
+  "reads": [
+   "fnb.allergen_verdict"
+  ],
+  "writes": [],
+  "routing": "replica",
+  "scope": "venue",
+  "perm": "PRODUCT_VIEW",
+  "offline": false,
+  "summary": "The last allergen verdict recorded for a dish",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "FnbService",
+  "stores": [
+   "derived",
+   "postgres",
+   "postgres-analytical",
+   "redis"
+  ]
+ },
+ "getPasswordPolicy": {
+  "contract": "identity",
+  "verb": "GET",
+  "path": "/password-policy",
+  "reads": [
+   "identity.password_policy"
+  ],
+  "writes": [],
+  "routing": "replica",
+  "scope": "tenant",
+  "perm": "TENANT_CONFIGURE",
+  "offline": false,
+  "summary": "Read the password and MFA policy in force",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "IdentityService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "getVenueSettingsDefaults": {
+  "contract": "tenancy",
+  "verb": "GET",
+  "path": "/venue-settings-defaults",
+  "reads": [
+   "platform.venue_settings"
+  ],
+  "writes": [],
+  "routing": "replica",
+  "scope": "tenant",
+  "perm": "TENANT_VIEW",
+  "offline": false,
+  "summary": "The tenant's default for every venue setting",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "TenancyService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "guestPasswordLogin": {
+  "contract": "identity",
+  "verb": "POST",
+  "path": "/auth/guest/password",
+  "reads": [],
+  "writes": [],
+  "routing": null,
+  "scope": "tenant",
+  "perm": null,
+  "offline": false,
+  "summary": "Sign in with an email or mobile and a password",
+  "source": "derived",
+  "audience": [
+   "anonymous"
+  ],
+  "service": "IdentityService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "leaveRestaurantWaitlist": {
+  "contract": "fnb",
+  "verb": "POST",
+  "path": "/waitlist/{entryId}/leave",
+  "reads": [
+   "fnb.waitlist_entry"
+  ],
+  "writes": [],
+  "routing": null,
+  "scope": "venue",
+  "perm": "ORDER_MODIFY",
+  "offline": false,
+  "summary": "Take a party off an outlet's waitlist",
+  "source": "derived",
+  "audience": [
+   "staff",
+   "guest"
+  ],
+  "service": "FnbService",
+  "stores": [
+   "derived",
+   "postgres",
+   "postgres-analytical",
+   "redis"
+  ]
+ },
+ "listOwnPlatformStaffGrants": {
+  "contract": "identity",
+  "verb": "GET",
+  "path": "/platform-staff-grants/mine",
+  "reads": [
+   "identity.platform_staff_grant"
+  ],
+  "writes": [],
+  "routing": "replica",
+  "scope": "tenant",
+  "perm": "PLATFORM_TENANT_ACCESS",
+  "offline": false,
+  "summary": "The calling platform operator's own grants into this tenant",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "IdentityService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "listPerformanceTemplates": {
+  "contract": "catalogue",
+  "verb": "GET",
+  "path": "/performance-templates",
+  "reads": [
+   "catalogue.performance_template"
+  ],
+  "writes": [],
+  "routing": "replica",
+  "scope": "venue",
+  "perm": "PERFORMANCE_CONFIGURE",
+  "offline": false,
+  "summary": "Slot templates, peak bands and walk-in rules",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "CatalogueService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "listPlatformStaffGrants": {
+  "contract": "identity",
+  "verb": "GET",
+  "path": "/platform-staff-grants",
+  "reads": [
+   "identity.platform_staff_grant"
+  ],
+  "writes": [],
+  "routing": "replica",
+  "scope": "tenant",
+  "perm": "AUDIT_VIEW",
+  "offline": false,
+  "summary": "Which platform staff have acted in this tenant, and under what grant",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "IdentityService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "openPlatformStaffGrant": {
+  "contract": "identity",
+  "verb": "POST",
+  "path": "/platform-staff-grants",
+  "reads": [
+   "identity.platform_staff_grant"
+  ],
+  "writes": [],
+  "routing": null,
+  "scope": "tenant",
+  "perm": "PLATFORM_TENANT_ACCESS",
+  "offline": false,
+  "summary": "A platform operator opens a time-boxed grant into this tenant",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "IdentityService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "setPerformanceTemplate": {
+  "contract": "catalogue",
+  "verb": "PUT",
+  "path": "/performance-templates",
+  "reads": [
+   "catalogue.performance_template"
+  ],
+  "writes": [
+   "catalogue.performance_template"
+  ],
+  "routing": null,
+  "scope": "venue",
+  "perm": "PERFORMANCE_CONFIGURE",
+  "offline": false,
+  "summary": "Define slot length, capacity, bands and walk-in policy",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "CatalogueService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "setVenueSettingsDefaults": {
+  "contract": "tenancy",
+  "verb": "PUT",
+  "path": "/venue-settings-defaults",
+  "reads": [
+   "platform.venue_settings"
+  ],
+  "writes": [
+   "platform.venue_settings"
+  ],
+  "routing": null,
+  "scope": "tenant",
+  "perm": "TENANT_CONFIGURE",
+  "offline": false,
+  "summary": "Set the tenant's default for every venue setting",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "TenancyService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "submitApprovalRequest": {
+  "contract": "approvals",
+  "verb": "POST",
+  "path": "/approval-requests/{requestId}/submit",
+  "reads": [
+   "approvals.decision",
+   "approvals.request"
+  ],
+  "writes": [],
+  "routing": null,
+  "scope": "venue",
+  "perm": "APPROVAL_REQUEST",
+  "offline": false,
+  "summary": "Send a saved draft for approval",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "TenancyService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "updateSeatCategory": {
+  "contract": "seating",
+  "verb": "PATCH",
+  "path": "/seat-categories/{seatCategoryId}",
+  "reads": [
+   "seating.seat_category",
+   "seating.seat_price_band"
+  ],
+  "writes": [
+   "seating.seat_price_band"
+  ],
+  "routing": null,
+  "scope": "venue",
+  "perm": "CAPACITY_CONFIGURE",
+  "offline": false,
+  "summary": "Rename, re-rank or re-price a seat category",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "CatalogueService",
   "stores": [
    "postgres",
    "redis"

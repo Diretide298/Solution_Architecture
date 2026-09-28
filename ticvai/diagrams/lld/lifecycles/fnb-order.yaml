@@ -42,22 +42,24 @@ transitions:
   to: served
   operation: recordOrderHandover
   trigger: operation
-  guard: A server put it on a table
+  guard: A server put it on a table. `tableService` only (decided 28 September, audit R125 (1))
 - from: ready
   to: collected
   operation: recordOrderHandover
   trigger: operation
-  guard: The guest took it from a counter
+  guard: The guest took it from a counter. `quickService` and `collection` only (audit R125 (1))
 - from: ready
   to: delivered
   operation: recordOrderHandover
   trigger: operation
-  guard: A runner took it to a seat, cabana or named location
+  guard: A runner took it to a seat, cabana or named location. `delivery` and `roomService` only, and
+    `deliveredToLocationId` is required (audit R125 (1))
 - from: accepted
   to: cancelled
   operation: cancelFnbOrder
   trigger: operation
-  guard: Cancelled after acceptance. Waste is recorded separately
+  guard: Cancelled after acceptance. Waste is recorded separately. **The last status cancel reaches**
+    (decided 28 September, audit R125 (3)); from `inPreparation` on, the act is a void
   requiresApproval: true
 - from: served
   to: refunded

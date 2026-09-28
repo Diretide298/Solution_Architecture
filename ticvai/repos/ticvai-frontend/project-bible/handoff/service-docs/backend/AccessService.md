@@ -7,7 +7,7 @@
 | Tier | commerce: The sale path. Highest availability, highest write rate. |
 | Contracts | `access` |
 | Schemas owned | `access` |
-| Operations in the slice | 21 of 182 |
+| Operations in the slice | 20 of 182 |
 | Scale | Read-heavy, extreme latency sensitivity, edge-cached. `frozenDays` is held rather than replayed precisely because the gate cannot afford the arithmetic. |
 | If it is down | Down means the gates stop. Runs at the edge with a local decision cache. |
 
@@ -22,21 +22,19 @@
 | [CatalogueService](CatalogueService.md) | `catalogue.entitlement_template`, `catalogue.product` |
 | [IdentityService](IdentityService.md) | `identity.delegated_access`, `identity.principal`, `pii.subject`, `pii.subject_biometric` |
 | [MarketingService](MarketingService.md) | `marketing.consent_record` |
-| [OrderService](OrderService.md) | `orders.sales_order` |
 | [VenueOpsService](VenueOpsService.md) | `venuemap.map`, `venuemap.path`, `venuemap.point` |
 
 ## Operations in the first release
 
 | Group | Operation | Method | Path | Part | Wave | Called by |
 |---|---|---|---|---|---|---|
-| access | [`createParkingEntitlement`](#createparkingentitlement) | POST | `/parking-entitlements` | core | 2 | GST-027, GST-028, WEB-041 |
 | access | [`enrolFacePass`](#enrolfacepass) | POST | `/face-pass/enrolments` | core | 2 | GST-069 |
 | access | [`getEntitlement`](#getentitlement) | GET | `/entitlements/{entitlementId}` | core | 1 | GST-012, GST-013, GST-055, WEB-018 |
 | access | [`getEntitlementCredential`](#getentitlementcredential) | GET | `/entitlements/{entitlementId}/credential` | core | 1 | GST-012, GST-013, GST-055, WEB-018 |
 | access | [`getEntitlementHistory`](#getentitlementhistory) | GET | `/entitlements/{entitlementId}/history` | core | 1 | GST-012, GST-013, WEB-018 |
 | access | [`getFacePassEnrolment`](#getfacepassenrolment) | GET | `/face-pass/enrolments/{enrolmentId}` | core | 2 | GST-069, WEB-024 |
 | access | [`listEntitlements`](#listentitlements) | GET | `/my/entitlements/all` | core | 1 | GST-012, WEB-018 |
-| access | [`listMyEntitlements`](#listmyentitlements) | GET | `/guests/me/entitlements` | core | 1 | GST-001, GST-012, GST-055, POS-002, WEB-018 |
+| access | [`listMyEntitlements`](#listmyentitlements) | GET | `/guests/me/entitlements` | core | 1 | GST-001, GST-012, GST-055, POS-002, WEB-001, WEB-018 |
 | access | [`listParkingFacilities`](#listparkingfacilities) | GET | `/parking-facilities` | core | 2 | BO-006, GST-027, GST-028, WEB-041 |
 | access | [`revokeFacePass`](#revokefacepass) | DELETE | `/face-pass/enrolments/{enrolmentId}` | core | 2 | GST-069, WEB-024 |
 | access | [`setParkingFacility`](#setparkingfacility) | PUT | `/parking-facilities` | setup | 2 | BO-006 |
@@ -53,73 +51,6 @@
 
 ## Group: access
 
-### createParkingEntitlement
-
-**`POST /parking-entitlements`**: A guest bought parking
-
-**Pushes the plate to the parking system where the mode is `plateWhitelist`**, and that push is the operation that was missing — CF-52 settled the direction on 14 August and nothing implemented it.
-Where the push fails the entitlement is still valid. **The guest paid**, and a barrier that will not open is a staffed problem rather than a refund.
-
-|  |  |
-|---|---|
-| Permission | `None` |
-| Scope level | venue |
-| Part of slice | core |
-| Wave | 2 |
-| Offline | no |
-| Conflict policy | serverWins |
-| Reads | `access.parking_entitlement`, `access.parking_facility`, `cache:idempotency`, `orders.sales_order` |
-| Writes | `access.parking_entitlement`, `cache:idempotency` |
-| Called by | GST-027, GST-028, WEB-041 |
-| State model | Parking entitlement ([states/parking-entitlement.yaml](../../../states/parking-entitlement.yaml)): created as `pending`; moves `pending` -> `pushed`, `pending` -> `active` **(not settled: see the Gaps sheet)** |
-
-**Parameters**
-
-| Name | In | Required | Type | Notes |
-|---|---|---|---|---|
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
-
-**Request body**: `ParkingEntitlement`
-
-| Field | Type | Required | Notes |
-|---|---|---|---|
-| id | string (uuid) |  | (read-only) |
-| facilityId | string (uuid) | yes |  |
-| orderId | string | yes | The order's id, a ULID as in /orders/{orderId} (orders.sales_order.id). (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
-| subjectId | string (uuid) |  | (nullable) |
-| plateNumber | string |  | Required in plateWhitelist mode, meaningless in the others. (nullable) |
-| plateCountry | string |  | (nullable) |
-| mediaCode | string |  | The code presented in none and qrHandoff modes. (nullable) |
-| status | object |  | Server-owned. (read-only) |
-| pushedAt | string (date-time) |  | (read-only; nullable) |
-| pushFailureReason | string |  | (read-only; nullable) |
-| validFrom | string (date-time) | yes |  |
-| validTo | string (date-time) | yes |  |
-
-**Response**: `ParkingEntitlement`
-
-| Field | Type | Required | Notes |
-|---|---|---|---|
-| id | string (uuid) |  | (read-only) |
-| facilityId | string (uuid) | yes |  |
-| orderId | string | yes | The order's id, a ULID as in /orders/{orderId} (orders.sales_order.id). (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
-| subjectId | string (uuid) |  | (nullable) |
-| plateNumber | string |  | Required in plateWhitelist mode, meaningless in the others. (nullable) |
-| plateCountry | string |  | (nullable) |
-| mediaCode | string |  | The code presented in none and qrHandoff modes. (nullable) |
-| status | object |  | Server-owned. (read-only) |
-| pushedAt | string (date-time) |  | (read-only; nullable) |
-| pushFailureReason | string |  | (read-only; nullable) |
-| validFrom | string (date-time) | yes |  |
-| validTo | string (date-time) | yes |  |
-
-**Responses**
-
-| Code | Shape | Meaning |
-|---|---|---|
-| 201 |  | Created, and pushed where the mode requires it |
-| 502 |  | The parking system rejected the push. |
-
 ### enrolFacePass
 
 **`POST /face-pass/enrolments`**: Register a facial profile against an entitlement
@@ -128,7 +59,9 @@ Where the push fails the entitlement is still valid. **The guest paid**, and a b
 **One facial profile may not be associated with more than one annual pass.** The refusal is explicit rather than a unique constraint, because the reason matters to the person at the counter — a duplicate means either a mistake or a pass being shared.
 **Consent is captured in the same transaction and is not implied by enrolment.** Under PDPL a biometric is a special category, and a consent record written afterwards is a consent record for something that already happened.
 **A minor's consent is given by a guardian**, and the guardian is recorded. The child-protection journey (3.2.12) sits above this.
+**How a guardian consents in the app — decided 28 September, audit R205.** The signed-in adult enrols a linked child: on the guest surfaces `subjectId` may be the caller or a subject the caller holds a `familyMember` or `primaryHolder` delegation over (`identity.listDelegations`), and **the caller is recorded as guardian** — the server sets `consent.guardianSubjectId` to the caller and ignores any other value sent. A guest may not enrol anybody else. **The age below which a subject is a minor is an open value that client counsel sets**; a subject with no date of birth is treated as a minor (audit R126).
 No image is stored — a template is. **The template cannot reconstruct the face**, and that is the property that makes retention defensible at all (CF-35, CF-64).
+**The face-capture SDK and the template format are an open value** (decided 28 September, audit R077 (b)): they are those of the facial-reader vendor the client has contracted, and the client names that vendor. Until then the template is carried as the vendor's opaque format and nothing here depends on which one it is.
 
 |  |  |
 |---|---|
@@ -186,6 +119,7 @@ No image is stored — a template is. **The template cannot reconstruct the face
 |---|---|---|
 | 201 |  | Enrolled |
 | 409 |  | This face is already on another annual pass. |
+| 403 |  | A guest enrolling a subject who is neither themselves nor a child linked to them by a familyMember or primaryHolder delegation (audit R205). |
 | 422 |  | Capture quality too low to enrol. |
 
 ### getEntitlement
@@ -237,6 +171,8 @@ No image is stored — a template is. **The template cannot reconstruct the face
 | lastEntryAt | string (date-time) |  | recordedAt of the latest admission counted in entriesUsed, written by the same writes. (read-only; nullable) |
 | frozenDays | integer |  | Days added by a freeze. (default 0; read-only) |
 | suspendedReason | string |  | (nullable) |
+| freezeReason | enum (travelling, injury, personal, seasonal, other) |  | The reason of the latest freezeEntitlement (audit R222). (nullable) |
+| freezeNote | string |  | The note the latest freezeEntitlement took, required there when reason is other (decided 28 September, audit R222). (max length 500; nullable) |
 | isNameBound | boolean |  | (default False) |
 | holderName | string |  | (nullable) |
 | sharedWithSubjectIds | array of string (uuid) |  | shareEntitlement. |
@@ -258,6 +194,7 @@ No image is stored — a template is. **The template cannot reconstruct the face
 
 The QR payload, wallet pass reference or wristband serial. **Separated from `getEntitlement` because it is the sensitive half** — a list of a guest's tickets is a convenience, and the credential admits somebody.
 **Rotates without reissuing.** A guest whose phone was stolen gets a new payload against the same entitlement, and the old one stops scanning.
+**The code rotates offline too** (decided 28 September, audit R230). While online the app fetches `rotation`, a time-based seed: the secret, the time step, the digits and the algorithm, valid from `validFrom` to `validTo`. The app derives the current rotating code on the device from the seed and the clock, with no signal, and shows it with a countdown to the next step (GST-013, GST-055, WEB-018; no screenshot blocking on web, audit R077 (c)). **Gates verify the code offline against the same seed**, which they hold in their offline package, accepting the current step and one step either side for clock drift. `rotate=true` replaces the seed, so a stolen phone's codes stop verifying once gates have the new one.
 
 |  |  |
 |---|---|
@@ -286,6 +223,13 @@ The QR payload, wallet pass reference or wristband serial. **Separated from `get
 | mediaCode | string |  |  |
 | payload | string |  |  |
 | expiresAt | string (date-time) |  | (nullable) |
+| rotation | object |  | The time-based seed the rotating code is derived from (audit R230). (nullable) |
+| rotation.secret | string | yes | Base32 shared secret. |
+| rotation.timeStepSeconds | integer | yes | (min 10; max 60; default 30) |
+| rotation.digits | integer | yes | (min 6; max 10; default 8) |
+| rotation.algorithm | enum (SHA1, SHA256, SHA512) | yes | (default SHA256) |
+| rotation.validFrom | string (date-time) | yes |  |
+| rotation.validTo | string (date-time) | yes | The seed stops verifying after this. |
 
 **Responses**
 
@@ -332,6 +276,7 @@ The QR payload, wallet pass reference or wristband serial. **Separated from `get
 
 **Returns metadata and never the template.** Whether one exists, when it was captured, which surface enrolled it, and the consent behind it.
 **Where the id comes from.** A screen opening on a guest's pass has the entitlement, not the enrolment: `Entitlement.facePassEnrolmentId` carries the id of the active `facePass` enrolment on that entitlement, or null when there is none — which is itself the answer to *is a face registered on this pass*. The id is also returned by `enrolFacePass`.
+**Face Pass enrolments only — decided 28 September, audit R228.** A Face Tag lives in the same table, but it is never returned here: an id that names a `faceTag` enrolment answers `404`, exactly as an unknown id does, so `kind` in the response is always `facePass`.
 
 |  |  |
 |---|---|
@@ -374,6 +319,7 @@ The QR payload, wallet pass reference or wristband serial. **Separated from `get
 | Code | Shape | Meaning |
 |---|---|---|
 | 200 |  | Enrolment |
+| 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
 
 ### listEntitlements
 
@@ -427,6 +373,8 @@ The QR payload, wallet pass reference or wristband serial. **Separated from `get
 | items[].lastEntryAt | string (date-time) |  | recordedAt of the latest admission counted in entriesUsed, written by the same writes. (read-only; nullable) |
 | items[].frozenDays | integer |  | Days added by a freeze. (default 0; read-only) |
 | items[].suspendedReason | string |  | (nullable) |
+| items[].freezeReason | enum (travelling, injury, personal, seasonal, other) |  | The reason of the latest freezeEntitlement (audit R222). (nullable) |
+| items[].freezeNote | string |  | The note the latest freezeEntitlement took, required there when reason is other (decided 28 September, audit R222). (max length 500; nullable) |
 | items[].isNameBound | boolean |  | (default False) |
 | items[].holderName | string |  | (nullable) |
 | items[].sharedWithSubjectIds | array of string (uuid) |  | shareEntitlement. |
@@ -463,7 +411,7 @@ The QR payload, wallet pass reference or wristband serial. **Separated from `get
 | Guest callable | True |
 | Reads | `access.entitlement`, `catalogue.entitlement_template`, `catalogue.product`, `identity.delegated_access` |
 | Writes | - |
-| Called by | GST-001, GST-012, GST-055, POS-002, WEB-018 |
+| Called by | GST-001, GST-012, GST-055, POS-002, WEB-001, WEB-018 |
 
 **Parameters**
 
@@ -497,6 +445,8 @@ The QR payload, wallet pass reference or wristband serial. **Separated from `get
 | items[].lastEntryAt | string (date-time) |  | recordedAt of the latest admission counted in entriesUsed, written by the same writes. (read-only; nullable) |
 | items[].frozenDays | integer |  | Days added by a freeze. (default 0; read-only) |
 | items[].suspendedReason | string |  | (nullable) |
+| items[].freezeReason | enum (travelling, injury, personal, seasonal, other) |  | The reason of the latest freezeEntitlement (audit R222). (nullable) |
+| items[].freezeNote | string |  | The note the latest freezeEntitlement took, required there when reason is other (decided 28 September, audit R222). (max length 500; nullable) |
 | items[].isNameBound | boolean |  | (default False) |
 | items[].holderName | string |  | (nullable) |
 | items[].sharedWithSubjectIds | array of string (uuid) |  | shareEntitlement. |
@@ -552,7 +502,7 @@ The QR payload, wallet pass reference or wristband serial. **Separated from `get
 | items[].name | string | yes |  |
 | items[].venueId | string (uuid) | yes |  |
 | items[].mode | ParkingIntegrationMode: enum (none, plateWhitelist, qrHandoff) | yes | CF-52, settled 14 August. |
-| items[].capacity | integer |  | (nullable) |
+| items[].capacity | integer |  | What "full" means in the first release (decided 28 September, audit R166): the facility is full when the issued ParkingEntitlements valid for a time reach this number. (nullable) |
 | items[].takesPayment | boolean |  | Always false, and stated rather than assumed (19.2.78, CF-124). (default False; read-only) |
 | items[].vendorSwapTargetDays | integer |  | A new parking vendor should take days, not weeks — Qossai, 14 August. (default 5; read-only) |
 | items[].vendorName | string |  | Staff only — omitted from a guest's listParkingFacilities response. (nullable) |
@@ -642,7 +592,7 @@ A fourth case is out of scope: pay-per-hour parking unrelated to a ticket runs o
 | name | string | yes |  |
 | venueId | string (uuid) | yes |  |
 | mode | ParkingIntegrationMode: enum (none, plateWhitelist, qrHandoff) | yes | CF-52, settled 14 August. |
-| capacity | integer |  | (nullable) |
+| capacity | integer |  | What "full" means in the first release (decided 28 September, audit R166): the facility is full when the issued ParkingEntitlements valid for a time reach this number. (nullable) |
 | takesPayment | boolean |  | Always false, and stated rather than assumed (19.2.78, CF-124). (default False; read-only) |
 | vendorSwapTargetDays | integer |  | A new parking vendor should take days, not weeks — Qossai, 14 August. (default 5; read-only) |
 | vendorName | string |  | Staff only — omitted from a guest's listParkingFacilities response. (nullable) |
@@ -660,7 +610,7 @@ A fourth case is out of scope: pay-per-hour parking unrelated to a ticket runs o
 | name | string | yes |  |
 | venueId | string (uuid) | yes |  |
 | mode | ParkingIntegrationMode: enum (none, plateWhitelist, qrHandoff) | yes | CF-52, settled 14 August. |
-| capacity | integer |  | (nullable) |
+| capacity | integer |  | What "full" means in the first release (decided 28 September, audit R166): the facility is full when the issued ParkingEntitlements valid for a time reach this number. (nullable) |
 | takesPayment | boolean |  | Always false, and stated rather than assumed (19.2.78, CF-124). (default False; read-only) |
 | vendorSwapTargetDays | integer |  | A new parking vendor should take days, not weeks — Qossai, 14 August. (default 5; read-only) |
 | vendorName | string |  | Staff only — omitted from a guest's listParkingFacilities response. (nullable) |
@@ -747,6 +697,7 @@ Revocation removes the plate from the whitelist. A refunded parking entitlement 
 **`POST /blacklist`**: Blacklist a media code
 
 Denies outright regardless of entitlement state. Included in the offline package so it holds during an outage — a blacklist that only works online is not a blacklist.
+**One entry per media code in the tenant** (decided 28 September, audit R108). A media code is honoured at every venue of the tenant, so a second entry for the same code is refused `409` rather than stored beside the first; change the existing entry by removing and re-adding it.
 
 |  |  |
 |---|---|
@@ -778,7 +729,7 @@ Denies outright regardless of entitlement state. Included in the offline package
 
 | Field | Type | Required | Notes |
 |---|---|---|---|
-| mediaCode | string | yes |  |
+| mediaCode | string | yes | Unique within the tenant (decided 28 September, audit R108): one entry per code. |
 | reason | string | yes |  |
 | addedAt | string (date-time) | yes |  |
 | addedByPrincipalId | string (uuid) | yes |  |
@@ -790,6 +741,7 @@ Denies outright regardless of entitlement state. Included in the offline package
 | Code | Shape | Meaning |
 |---|---|---|
 | 201 |  | Added |
+| 409 | DuplicateCode | A business code the request names is already used within its uniqueness scope (the scope the property's x-ticvai-unique names; decided 28 September, audit R108). |
 
 ### createAccessPoint
 
@@ -836,10 +788,10 @@ Denies outright regardless of entitlement state. Included in the offline package
 | scopePath | string |  |  |
 | externalCredentialSources | object |  | BL-108. |
 | scanAnomalyRules | object |  | BL-104. |
-| operatingMode | enum (normal, freeFlow, dropArm, closed, podium, maintenance) |  | BL-107 and BL-109. (default normal) |
+| operatingMode | object | yes | Set by the podium with setTurnstileMode, and it wins (audit R221). (default normal) |
 | vehicleLocationCapture | boolean |  | BL-023. (default False) |
-| mode | TurnstileMode: enum (entry, reentry, crossover, exit, freeRotation, closed) | yes |  |
-| direction | Direction: enum (entry, exit, reentry, crossover) |  |  |
+| mode | object |  | Narrows operatingMode only: freeRotation or closed within normal or podium, null otherwise and whenever the turnstile validates in its fixed direction (audit R221). (nullable) |
+| direction | object |  | Fixed per access point (audit R221): set in the back office by createAccessPoint and updateAccessPoint, never by the podium. |
 | antiPassbackEnabled | boolean |  |  |
 | requiresExitBeforeReentry | boolean |  | Written by createAccessPoint and updateAccessPoint, and returned so the edit form reads back what it wrote. (default False) |
 | driver | string |  | Driver identifier for the controller behind this access point, as written by createAccessPoint and updateAccessPoint. (nullable) |
@@ -968,10 +920,10 @@ Enforcement is configurable — `off`, `warn` or `deny` — because GPS accuracy
 | scopePath | string |  |  |
 | externalCredentialSources | object |  | BL-108. |
 | scanAnomalyRules | object |  | BL-104. |
-| operatingMode | enum (normal, freeFlow, dropArm, closed, podium, maintenance) |  | BL-107 and BL-109. (default normal) |
+| operatingMode | object | yes | Set by the podium with setTurnstileMode, and it wins (audit R221). (default normal) |
 | vehicleLocationCapture | boolean |  | BL-023. (default False) |
-| mode | TurnstileMode: enum (entry, reentry, crossover, exit, freeRotation, closed) | yes |  |
-| direction | Direction: enum (entry, exit, reentry, crossover) |  |  |
+| mode | object |  | Narrows operatingMode only: freeRotation or closed within normal or podium, null otherwise and whenever the turnstile validates in its fixed direction (audit R221). (nullable) |
+| direction | object |  | Fixed per access point (audit R221): set in the back office by createAccessPoint and updateAccessPoint, never by the podium. |
 | antiPassbackEnabled | boolean |  |  |
 | requiresExitBeforeReentry | boolean |  | Written by createAccessPoint and updateAccessPoint, and returned so the edit form reads back what it wrote. (default False) |
 | driver | string |  | Driver identifier for the controller behind this access point, as written by createAccessPoint and updateAccessPoint. (nullable) |
@@ -997,6 +949,7 @@ Enforcement is configurable — `off`, `warn` or `deny` — because GPS accuracy
 **`PUT /access-points/{accessPointId}/mode`**: Set the operating mode of an access point
 
 Podium operation. Changes what the gate does, not who may pass it.
+**The podium sets the operating mode — decided 28 September, audit R221.** `operatingMode` is what this writes and what the gate obeys: `normal`, `freeFlow`, `dropArm`, `closed`, `podium` or `maintenance`. **Direction is fixed per access point**: it is set in the back office with `createAccessPoint` or `updateAccessPoint` and never here. **The turnstile mode only narrows the operating mode**: `freeRotation` or `closed` within it, or null for the turnstile to validate in its fixed direction. Nothing here can contradict the operating mode: a turnstile mode sent with an operating mode other than `normal` or `podium` is refused `400`, because the other four already decide the arm.
 
 |  |  |
 |---|---|
@@ -1021,7 +974,8 @@ Podium operation. Changes what the gate does, not who may pass it.
 
 | Field | Type | Required | Notes |
 |---|---|---|---|
-| mode | TurnstileMode: enum (entry, reentry, crossover, exit, freeRotation, closed) | yes |  |
+| operatingMode | AccessPointOperatingMode: enum (normal, freeFlow, dropArm, closed, podium, maintenance) | yes | BL-107 and BL-109. |
+| mode | object |  | Optional narrowing within normal or podium: freeRotation or closed. (nullable) |
 | reason | string |  | (max length 200) |
 
 **Response**: `AccessPoint`
@@ -1035,10 +989,10 @@ Podium operation. Changes what the gate does, not who may pass it.
 | scopePath | string |  |  |
 | externalCredentialSources | object |  | BL-108. |
 | scanAnomalyRules | object |  | BL-104. |
-| operatingMode | enum (normal, freeFlow, dropArm, closed, podium, maintenance) |  | BL-107 and BL-109. (default normal) |
+| operatingMode | object | yes | Set by the podium with setTurnstileMode, and it wins (audit R221). (default normal) |
 | vehicleLocationCapture | boolean |  | BL-023. (default False) |
-| mode | TurnstileMode: enum (entry, reentry, crossover, exit, freeRotation, closed) | yes |  |
-| direction | Direction: enum (entry, exit, reentry, crossover) |  |  |
+| mode | object |  | Narrows operatingMode only: freeRotation or closed within normal or podium, null otherwise and whenever the turnstile validates in its fixed direction (audit R221). (nullable) |
+| direction | object |  | Fixed per access point (audit R221): set in the back office by createAccessPoint and updateAccessPoint, never by the podium. |
 | antiPassbackEnabled | boolean |  |  |
 | requiresExitBeforeReentry | boolean |  | Written by createAccessPoint and updateAccessPoint, and returned so the edit form reads back what it wrote. (default False) |
 | driver | string |  | Driver identifier for the controller behind this access point, as written by createAccessPoint and updateAccessPoint. (nullable) |
@@ -1056,6 +1010,7 @@ Podium operation. Changes what the gate does, not who may pass it.
 | Code | Shape | Meaning |
 |---|---|---|
 | 200 |  | Mode set |
+| 400 | BadRequest | Validation failed |
 | 403 | Forbidden | Authenticated but not permitted at the requested scope |
 | 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
 
@@ -1104,10 +1059,10 @@ Podium operation. Changes what the gate does, not who may pass it.
 | scopePath | string |  |  |
 | externalCredentialSources | object |  | BL-108. |
 | scanAnomalyRules | object |  | BL-104. |
-| operatingMode | enum (normal, freeFlow, dropArm, closed, podium, maintenance) |  | BL-107 and BL-109. (default normal) |
+| operatingMode | object | yes | Set by the podium with setTurnstileMode, and it wins (audit R221). (default normal) |
 | vehicleLocationCapture | boolean |  | BL-023. (default False) |
-| mode | TurnstileMode: enum (entry, reentry, crossover, exit, freeRotation, closed) | yes |  |
-| direction | Direction: enum (entry, exit, reentry, crossover) |  |  |
+| mode | object |  | Narrows operatingMode only: freeRotation or closed within normal or podium, null otherwise and whenever the turnstile validates in its fixed direction (audit R221). (nullable) |
+| direction | object |  | Fixed per access point (audit R221): set in the back office by createAccessPoint and updateAccessPoint, never by the podium. |
 | antiPassbackEnabled | boolean |  |  |
 | requiresExitBeforeReentry | boolean |  | Written by createAccessPoint and updateAccessPoint, and returned so the edit form reads back what it wrote. (default False) |
 | driver | string |  | Driver identifier for the controller behind this access point, as written by createAccessPoint and updateAccessPoint. (nullable) |
@@ -1339,10 +1294,10 @@ Every table this service owns that the slice reads or writes, with its columns a
 | scope_path | text | no |  |
 | external_credential_sources | jsonb | no | BL-108. |
 | scan_anomaly_rules | jsonb | no | BL-104. |
-| operating_mode | text | no | BL-107 and BL-109. |
+| operating_mode | text | yes | Set by the podium with setTurnstileMode, and it wins (audit R221). |
 | vehicle_location_capture | boolean | no | BL-023. |
-| mode | text | yes |  |
-| direction | text | no |  |
+| mode | text | no | Narrows operatingMode only: freeRotation or closed within normal or podium, null otherwise and whenever the turnstile validates in its fixed direction (audit R221). |
+| direction | text | no | Fixed per access point (audit R221): set in the back office by createAccessPoint and updateAccessPoint, never by the podium. |
 | is_anti_passback_enabled | boolean | no |  |
 | requires_exit_before_reentry | boolean | no | Written by createAccessPoint and updateAccessPoint, and returned so the edit form reads back what it wrote. |
 | driver | text | no | Driver identifier for the controller behind this access point, as written by createAccessPoint and updateAccessPoint. |
@@ -1370,7 +1325,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 
 | Column | Type | Required | Notes |
 |---|---|---|---|
-| media_code | text | yes |  |
+| media_code | text | yes | Unique within the tenant (decided 28 September, audit R108): one entry per code. |
 | reason | text | yes |  |
 | added_at | timestamptz | yes |  |
 | added_by_principal_id | uuid | yes |  |
@@ -1400,6 +1355,8 @@ Every table this service owns that the slice reads or writes, with its columns a
 | last_entry_at | timestamptz | no | recordedAt of the latest admission counted in entriesUsed, written by the same writes. |
 | frozen_days | integer | no | Days added by a freeze. |
 | suspended_reason | text | no |  |
+| freeze_reason | text | no | The reason of the latest freezeEntitlement (audit R222). |
+| freeze_note | text | no | The note the latest freezeEntitlement took, required there when reason is other (decided 28 September, audit R222). |
 | is_name_bound | boolean | no |  |
 | holder_name | text | no |  |
 | shared_with_subject_ids | text[] | no | shareEntitlement. |
@@ -1432,7 +1389,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 | name | text | yes |  |
 | venue_id | uuid | yes |  |
 | mode | text | yes |  |
-| capacity | integer | no |  |
+| capacity | integer | no | What "full" means in the first release (decided 28 September, audit R166): the facility is full when the issued ParkingEntitlements valid for a time reach this number. |
 | takes_payment | boolean | no | Always false, and stated rather than assumed (19.2.78, CF-124). |
 | vendor_swap_target_days | integer | no | A new parking vendor should take days, not weeks — Qossai, 14 August. |
 | vendor_name | text | no | Staff only — omitted from a guest's listParkingFacilities response. |
@@ -1457,18 +1414,19 @@ Every table this service owns that the slice reads or writes, with its columns a
 | direction | text | yes |  |
 | operator_principal_id | uuid | no |  |
 | device_id | uuid | no |  |
-| overridden_by_principal_id | uuid | no |  |
-| override_reason | text | no |  |
+| overrides_scan_id | text | no | Set only on an override row, naming the denied scan it admits against (decided 28 September, audit R228). |
+| override_reason | text | no | The supervisor's justification, on the override row only. |
 | recorded_at | timestamptz | yes |  |
 | synced_at | timestamptz | no | Null while pending. |
+| overridden_by_principal_id | uuid | no | Points at identity.principal. |
 
 ## Not in the first release
 
-161 operations, added to this service in later releases without changing any of the above.
+162 operations, added to this service in later releases without changing any of the above.
 
 | Group | Operations |
 |---|---|
-| access | `enrolFaceTag`, `listAccessChanges`, `listEntryRulePoints`, `setEntryRulePoints`, `verifyIdentity` |
+| access | `createParkingEntitlement`, `enrolFaceTag`, `listAccessChanges`, `listEntryRulePoints`, `setEntryRulePoints`, `verifyIdentity` |
 | accessPoint | `getAccessPoint`, `listAccessPoints`, `listAdmissionRules`, `listBlacklist`, `removeBlacklistEntry` |
 | drafted | `approveManualOverrideSupervisor`, `approveMultiMediaPreview`, `listAccess`, `listAccessAttributeCatalog`, `listAccessExecutiveInsight`, `listAccessLocationGrouping`, `listAccessMonitoring`, `listAccessReportScheduled`, `listAccessRiskScoring`, `listAccessRule`, `listAccessSecurityFraud`, `listAccessValidityTime`, `listAntiPassbackJourney`, `listAttendanceAdmission`, `listAuthorizationGovernanceTemporary`, `listBiometric`, `listBiometricAccess`, `listBiometricConsentGuardian`, `listBiometricIdentityIntegrity`, `listBiometricLifecycleRetention`, `listBiometricValidationGate`, `listBrandingLocalizationTemplate`, `listConnectivityFailureDegraded`, `listCredential`, `listCredentialActivationDisplay`, `listCredentialDeliveryDistribution`, `listCredentialDisableBlacklist`, `listCredentialGenerationIssuance`, `listCredentialIdentityToken`, `listCredentialReplacementReissue`, `listCredentialRevocationLifecycle`, `listCredentialSecurity`, `listCredentialSecurityOperational`, `listCredentialSharingConcurrent`, `listCredentialTransferRebinding`, `listCredentialUsageCross`, `listDeviceBindingSession`, `listDeviceGate`, `listDeviceTypeHardware`, `listDigitalCredentialSecurity`, `listDynamicAccessPolicy`, `listEdgePackageData`, `listEdgeSecurityDeployment`, `listEntitlementConsumption`, `listEntitlementCrossMedia`, `listEntryExitCrossover`, `listEntryExitRule`, `listEntryTemporaryExit`, `listExternalPartnerCredential`, `listFaceChangeEnrollment`, `listFaceMatchingVerification`, `listFaceTagTemporary`, `listFailedGenerationDelivery`, `listFamilyChildPod`, `listFastPassAttraction`, `listFraudDetectionRule`, `listGateModeFree`, `listGraphicalAccessMap`, `listGroupAdmissionQuantity`, `listGroupAttendancePartial`, `listGroupLeaderFast`, `listGuestCompanionEligibility`, `listGuestDwellTime`, `listGuestJourney`, `listHardwareCompatibilityHealth`, `listHotelWalletExternal`, `listIdentityMembershipAccreditation`, `listLiveAccess`, `listLiveGateMode`, `listLiveVenueOccupancy`, `listMediaActivationPriority`, `listMediaCredential`, `listMediaDesign`, `listMediaIssuanceEncoding`, `listMediaReplacementRevocation`, `listMediaSwapReplacement`, `listMediaTypeCredential`, `listMediaTypeTechnology`, `listMultiMediaBinding`, `listMultiParkCrossover`, `listMultiParkCrossover2`, `listOfflineCredentialRevocation`, `listOfflineCryptographicValidation`, `listOfflineEdge`, `listOfflineEntitlementUsage`, `listOperatingCalendarSpecial`, `listPhysicalDeviceRegistration`, `listPodiumConsole`, `listPolicyEvaluationArchitecture`, `listPolicyScopeHierarchy`, `listQueueThroughputLane`, `listReconnectionSynchronizationConflict`, `listRelationshipCompanionFraud`, `listSecurityDetectionGovernance`, `listShiftHandoverSummary`, `listSpecialEventFree`, `listThroughputQueueValidation`, `listTicketCredentialInvestigation`, `listTicketMedia`, `listUnifiedIdentityCredential`, `listValidationExceptionReason`, `listValidationOutcomeRejection`, `listVenueParkAccess`, `listVerificationMethodSelection`, `listVirtualCredentialMedia`, `listVirtualTicket`, `listVirtualTicketArchitecture`, `listVirtualTicketStatus`, `publishMediaCompatibilityTesting`, `publishRuleConflictCheck`, `publishTopologyValidation`, `setAccessAreaZone`, `setAccessGraphicalMap`, `setAppleWalletPass`, `setAttractionAccess`, `setBiometricVerificationProfile`, `setBleBeaconGeofence`, `setContextTimeEvent`, `setDeviceSoftwareContent`, `setDigitalBarcodeTicket`, `setDigitalCardMembership`, `setDynamicFieldData`, `setDynamicSecurityProfile`, `setEdgeNodeLocal`, `setEmbeddedEntitlementPayload`, `setFacePassEnrollment`, `setGateLane`, `setGoogleWalletPass`, `setGroupAdmissionProfile`, `setHandheldMobileAccess`, `setMediaBindingActivation`, `setOperationalIncidentException`, `setPdfPrintablePos`, `setRealTimeSecurity`, `setRfidNfc`, `setRfidNfcCard`, `setSecurityInvestigationEvidence`, `setTurnstileLaneBehavior`, `setValidationOutcomeGuest`, `setVirtualTicketCredential`, `setVirtualTicketIdentity`, `setVisualAccessRule`, `setVisualDynamicPolicy`, `simulateOfflineResilienceTesting`, `simulatePolicyConflictImpact` |
 | sync | `listScans`, `syncScans` |

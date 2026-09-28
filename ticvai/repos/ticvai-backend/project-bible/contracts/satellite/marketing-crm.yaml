@@ -2,7 +2,7 @@ openapi: 3.1.0
 info:
   title: TICVAI Marketing & CRM
   version: 0.1.0
-  x-ticvai-screen-count: 175
+  x-ticvai-screen-count: 173
   x-ticvai-tier: satellite
   x-ticvai-module: 22 — Marketing & CRM
   x-ticvai-requirements: 319
@@ -141,7 +141,11 @@ paths:
         queue serve all three, and it is why `GST-034` and `GST-040` are the same mechanism at two entry
         points.
 
-        **Works offline and queues.** A guest with a problem and no signal still has a problem.
+        **Needs the connection (decided 28 September, audit R148).** Raising a case is not queued
+        offline, as flow F54 and the screens GST-034, GST-068, WEB-025 and WEB-034 say: a case sent
+        hours later is a promise of help nobody could give at the time. Offline, the screen shows how
+        to reach staff in person instead of a form. The id is still minted on the device, so a retry
+        after a dropped connection is the same case, not a second one.
 
         '
       tags:
@@ -151,7 +155,7 @@ paths:
       x-ticvai-audience:
       - guest
       x-ticvai-scope-level: tenant
-      x-ticvai-offline-capable: true
+      x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: append
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
@@ -170,9 +174,9 @@ paths:
                 id:
                   type: string
                   pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
-                  description: '**Created on the device**, because the case exists from the moment the guest
-                    raises it offline. A ULID, like every id created at the edge; a replay carrying the same
-                    id is the same case.
+                  description: '**Created on the device**, so a retry after a dropped connection carries
+                    the same id and is the same case. A ULID, like every id created at the edge. Raising
+                    needs the connection (audit R148).
 
                     '
                 kind:
@@ -192,6 +196,8 @@ paths:
                 detail:
                   type: string
                   nullable: true
+                  description: Required, and not empty, when `kind` is `other` (decided 28 September,
+                    audit R222); a 400 otherwise.
                 venueId:
                   type: string
                   format: uuid
@@ -209,6 +215,15 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Case'
+        '400':
+          description: '`kind` is `other` and `detail` is missing or empty (audit R222), or another field
+            breaks the schema'
+          x-ticvai-problem-types:
+          - validation
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
   /my/cases/{caseId}/messages:
     parameters:
     - name: caseId
@@ -303,9 +318,14 @@ paths:
         `matchGuest` existed for staff and nothing decided the key or offered the guest the choice.
 
 
-        **The guest decides, never the system.** A match is an offer, because two people share a family
-        email far more often than one person uses two. Declined matches stay separate and staff can merge
-        them later (`mergeGuests`).
+        **A verified match attaches automatically, as ADR-0045 accepted** (decided 28 September, audit
+        R120 (b); this reverses the 23 September text, *the guest decides, never the system*). When the
+        contact a guest proves at checkout with a one-time code matches an existing profile on the
+        venue''s `matchBy` key, the order attaches to that profile with no question asked; the checkout
+        session gets no access to the profile. **Any unverified or inferred match is only a suggestion
+        for staff review** and is merged, if at all, with `mergeGuests`. The policy still chooses the
+        match key (email, mobile or either), and `offerAtCheckout` off skips the check entirely (audit
+        R149).
 
         '
       tags:
@@ -342,15 +362,23 @@ paths:
   /guest-checkout/profile-match:
     post:
       operationId: checkGuestCheckoutMatch
-      x-ticvai-consumed-by:
-        - "P01 WEB-012 Checkout — Payment"
-        - "P02 GST-009 Review & Payment"
       summary: Does this contact already have a profile here
-      description: 'Called at the payment step of a guest checkout, **after the contact has been proven
+      deprecated: true
+      description: '**Retired from checkout, 28 September (decided 28 September, audit R120 (b)).** A verified
+        contact that matches an existing profile now attaches the order automatically inside
+        `orders.checkoutCart` (ADR-0045 section 4); the guest is not asked, and any other candidate match
+        goes to staff review (BO-746). No screen calls this any more; it is kept, with its path and id, for
+        callers already built on it, and new screens must not bind it.
+
+        Was called at the payment step of a guest checkout, **after the contact has been proven
         with a one-time code** (ADR-0045); an unproven contact is refused, because answering would tell
         anyone who types an email whether that person has been to the venue. Uses the venue''s `GuestMatchPolicy`.
         Returns what the design shows: what it matched on, how many past orders, and the profile type, never
         the other profile''s details.
+
+        **When the venue''s `offerAtCheckout` is off, the check is skipped entirely (decided 28 September,
+        audit R149).** No lookup runs and the response is `matched: false` with every other field null, so
+        a switched-off venue leaks nothing and the screen shows no match step.
 
         '
       tags:
@@ -388,11 +416,14 @@ paths:
   /guest-checkout/profile-match/decision:
     post:
       operationId: decideGuestCheckoutMatch
-      x-ticvai-consumed-by:
-        - "P01 WEB-012 Checkout — Payment"
-        - "P02 GST-009 Review & Payment"
       summary: Use the existing profile or keep this booking separate
-      description: '`useExisting` puts this booking under the matched customer record, so past orders and
+      deprecated: true
+      description: '**Retired from checkout, 28 September (decided 28 September, audit R120 (b)).** The guest
+        no longer chooses: a verified match attaches automatically inside `orders.checkoutCart`, and an
+        unverified candidate goes to staff review (BO-746). No screen calls this any more; it is kept, with
+        its path and id, for callers already built on it, and new screens must not bind it.
+
+        `useExisting` puts this booking under the matched customer record, so past orders and
         this one sit together. `keepSeparate` creates a new guest profile; staff can merge it later. **The
         decision is recorded either way**, so a merge done later can see that the guest once said no.
 
@@ -514,11 +545,15 @@ paths:
         produce the narrower of the two — **inheriting the more permissive consent is how a merge becomes
         a regulatory finding.**
 
+        **Loyalty merges per programme (decided 28 September, audit R149).** For each programme either
+        record belongs to, the points balances are added and the higher of the two tiers is kept; a
+        programme only one record holds moves across unchanged. The outcome is in
+        `MergeResult.loyaltyProgrammes`, one entry per programme.
+
         '
       tags:
       - marketing
       x-ticvai-permission: GUEST_MANAGE
-      x-ticvai-permission-escalated: GUEST_MANAGE
       x-ticvai-audience:
       - staff
       x-ticvai-scope-level: tenant
@@ -1087,6 +1122,8 @@ paths:
         exist, and **one careless query against a shared store returns both.**
 
         `retainUntil` is required. **A guest document with no deletion date is a guest document kept forever.**
+        It is the end of the document''s purpose plus the retention period client counsel sets, which is
+        still open (audit R149).
 
         '
       tags:
@@ -2144,6 +2181,10 @@ paths:
         Fired by order completion rather than called by a screen. **Idempotent on the order**, because
         an order that completes twice through a retry must not pay twice.
 
+        **Posts to the ledger** (decided 28 September, audit R191): each accrual raises a `pointsAccrued`
+        posting event (`finance.PostingEventType`) for the points'' value, to the liability account the
+        programme is mapped to, in the fiscal period open for the accrual date.
+
         '
       tags:
       - marketing
@@ -2465,6 +2506,11 @@ paths:
 
         **Where no agent is available it says so** and offers a case instead. Queuing a guest for a person
         who is not there is the failure this operation exists to avoid.
+
+        **The position and wait estimate come from the live agent queue (decided 28 September, audit
+        R149)**: `queuePosition` is the conversation''s place among the unclaimed conversations in its
+        queue, and `estimatedWaitSeconds` is computed on read from that queue''s agents online now, not
+        from a stored figure or a daily average.
 
         '
       tags:
@@ -3031,7 +3077,6 @@ paths:
       operationId: searchGuests
       x-ticvai-consumed-by:
         - "P04 POS-027 Guest Lookup"
-        - "P08 BO-036 Device Registry"
         - "P08 BO-734 CRM Command Center"
         - "P08 BO-735 Guest Directory"
       x-ticvai-audience:
@@ -3106,7 +3151,6 @@ paths:
         - "P01 WEB-020 Profile & Preferences"
         - "P02 GST-001 Home – Default"
         - "P06 EMP-057 Guest Profile & Dining History"
-        - "P08 BO-036 Device Registry"
         - "P08 BO-735 Guest Directory"
         - "P08 BO-738 Activity Timeline"
         - "P08 BO-740 Family & Guardians"
@@ -3139,7 +3183,7 @@ paths:
     patch:
       operationId: updateGuestProfile
       x-ticvai-consumed-by:
-        - "P08 BO-036 Device Registry"
+        - "P08 BO-735 Guest Directory"
       x-ticvai-audience:
       - staff
       summary: Amend a guest profile
@@ -3195,13 +3239,16 @@ paths:
     post:
       operationId: mergeGuestProfiles
       x-ticvai-consumed-by:
-        - "P08 BO-036 Device Registry"
+        - "P08 BO-735 Guest Directory"
       x-ticvai-audience:
       - staff
       summary: Merge a duplicate profile into this one
       description: 'Orders, cases, loyalty and consent transfer to the surviving profile. **Consent does
         not combine permissively** — where the two profiles disagree, the more restrictive position wins,
         because merging must never widen what a guest agreed to.
+
+        **Loyalty merges per programme (decided 28 September, audit R149)**: points added, the higher tier
+        kept, reported in `MergeResult.loyaltyProgrammes` — the same rule as `mergeGuests`.
 
         The absorbed profile is retained as a redirect rather than deleted; historic references must continue
         to resolve.
@@ -3261,7 +3308,6 @@ paths:
       x-ticvai-consumed-by:
         - "P01 WEB-024 Devices, Wishlist & Consent"
         - "P02 GST-066 Privacy & My Data"
-        - "P08 BO-036 Device Registry"
         - "P08 BO-749 Guest Preference Center"
       x-ticvai-audience:
       - staff
@@ -3365,7 +3411,7 @@ paths:
     get:
       operationId: getConsentHistory
       x-ticvai-consumed-by:
-        - "P08 BO-036 Device Registry"
+        - "P08 BO-735 Guest Directory"
       x-ticvai-audience:
       - staff
       x-ticvai-read-routing: analytical
@@ -3590,7 +3636,6 @@ paths:
         - "P01 WEB-024 Devices, Wishlist & Consent"
         - "P01 WEB-027 Newsletter Subscription"
         - "P02 GST-020 Saved Items / Wishlist"
-        - "P08 BO-036 Device Registry"
       x-ticvai-audience:
       - guest
       x-ticvai-read-routing: replica
@@ -3641,8 +3686,12 @@ paths:
       x-ticvai-audience:
       - guest
       summary: Save an item
-      description: 'Idempotent on the variant — saving twice is one entry, not two. The count matters
-        to the guest and to demand signals, so a double tap must not inflate it.
+      description: 'Idempotent on the variant and performance — saving twice is one entry, not two.
+        The count matters to the guest and to demand signals, so a double tap must not inflate it.
+
+        **The same product for two different performances is two entries (decided 28 September,
+        audit R149).** The entry key is `variantId` plus `performanceId`; a save with no
+        `performanceId` is a third, date-less entry for the product generally.
 
         '
       tags:
@@ -3767,7 +3816,6 @@ paths:
         - "P01 WEB-024 Devices, Wishlist & Consent"
         - "P01 WEB-027 Newsletter Subscription"
         - "P02 GST-073 Security & Sign-in"
-        - "P08 BO-036 Device Registry"
       x-ticvai-audience:
       - guest
       summary: A guest's registered devices
@@ -4596,6 +4644,11 @@ paths:
       description: 'Sent, delivered, opened, clicked, bounced, complained, unsubscribed — and attributed
         revenue where a booking followed within the attribution window.
 
+        **The window is `VenueSettings.marketing.attributionWindowDays`**, a venue setting with a tenant
+        default (decided 28 September, audit R094): a booking counts when it follows the guest''s last
+        touch from the campaign within that many days. **Proposed default 7 days, client to correct
+        (audit R094).** The window applied is returned as `attributionWindowDays`.
+
         '
       tags:
       - campaign
@@ -5275,6 +5328,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/LoyaltyProgramme'
+        '409':
+          $ref: ../shared/common.yaml#/components/responses/DuplicateCode
   /guests/{subjectId}/loyalty:
     parameters:
     - name: subjectId
@@ -5286,7 +5341,7 @@ paths:
     get:
       operationId: getGuestLoyalty
       x-ticvai-consumed-by:
-        - "P08 BO-036 Device Registry"
+        - "P08 BO-735 Guest Directory"
       x-ticvai-audience:
       - staff
       x-ticvai-read-routing: replica
@@ -5328,12 +5383,18 @@ paths:
     post:
       operationId: adjustLoyaltyPoints
       x-ticvai-consumed-by:
-        - "P08 BO-036 Device Registry"
+        - "P08 BO-735 Guest Directory"
       x-ticvai-audience:
       - staff
       summary: Manually adjust points
       description: 'Goodwill, correction, or reversal. Requires a reason and is reported separately —
         manual point adjustments are the loyalty equivalent of a wallet adjustment and get the same scrutiny.
+
+        **Three adjustment types, and they move the balance only (decided 28 September, audit R149).**
+        `reason` is `goodwill`, `correction` or `expiryReversal`. An adjustment changes the spendable
+        balance and **never the tier or `lifetimePoints`**, so a goodwill grant cannot lift a guest into a
+        higher tier. Adjustments are shown in the loyalty ledger report, `listLoyaltyPointEntries` with
+        `reason` set.
 
         '
       tags:
@@ -9672,6 +9733,16 @@ paths:
         in: query
         schema:
           type: string
+      - name: reason
+        in: query
+        description: Only manual adjustments of this type. **The loyalty ledger report of manual
+          adjustments** is this list filtered by `reason` (audit R149).
+        schema:
+          type: string
+          enum:
+          - goodwill
+          - correction
+          - expiryReversal
       - $ref: ../shared/common.yaml#/components/parameters/PageSize
       - $ref: ../shared/common.yaml#/components/parameters/PageCursor
       responses:
@@ -10397,13 +10468,16 @@ components:
           description: Signed. Negative removes points, and the balance may not go below zero.
         reason:
           type: string
+          description: '**Goodwill, correction or expiry reversal, and nothing else (decided 28 September,
+            audit R149).** A service-recovery grant is `goodwill`, a fraud or migration fix is `correction`,
+            and returning points that expired in error is `expiryReversal`. None of them moves the tier or
+            `lifetimePoints`.
+
+            '
           enum:
-          - correction
           - goodwill
-          - serviceRecovery
-          - fraudReversal
-          - expiryAdjustment
-          - migration
+          - correction
+          - expiryReversal
         reversedLoyaltyPointsId:
           type: string
           format: uuid
@@ -10767,14 +10841,12 @@ components:
           type: string
           nullable: true
           description: For a manual movement, `AdjustLoyaltyPointsRequest.reason`. Null for an accrual, a
-            redemption or an expiry, whose `transactionType` and source already say why.
+            redemption or an expiry, whose `transactionType` and source already say why. The three
+            manual types are the only ones (audit R149).
           enum:
-          - correction
           - goodwill
-          - serviceRecovery
-          - fraudReversal
-          - expiryAdjustment
-          - migration
+          - correction
+          - expiryReversal
         authorPrincipalId:
           type: string
           format: uuid
@@ -12471,6 +12543,11 @@ components:
           description: '**Required, not optional.** A guest document with no deletion date is a guest
             document kept forever, and the retention question is the one CF-64 is open on.
 
+            **Kept until its purpose ends, then for the period client counsel sets (decided 28 September,
+            audit R149).** The caller sets `retainUntil` to the end of the purpose (the visit, the waiver''s
+            validity, the visa''s expiry) plus that period. **The period per `kind` is an open value**: until
+            counsel names it, it is zero, so the document is deleted when the purpose ends.
+
             '
         uploadedAt:
           readOnly: true
@@ -12507,6 +12584,13 @@ components:
           type: string
         kind:
           type: string
+          description: 'What an entrant does to progress. `scan`, `activity` and `purchase` were added from
+            the BO-825 pack (decided 28 September, audit R275 (c)): `scan` counts scans of a named code or
+            point (a trail marker, a stand), `activity` counts completions of a named attraction or activity
+            that is not a ride, and `purchase` counts purchases of named products or categories. **`purchase`
+            is not `spend`**: `spend` counts money, whatever was bought; `purchase` counts items bought.
+
+            '
           enum:
           - visit
           - spend
@@ -12517,6 +12601,9 @@ components:
           - survey
           - social
           - milestone
+          - scan
+          - activity
+          - purchase
         scope:
           type: string
           enum:
@@ -13709,10 +13796,16 @@ components:
           type: integer
           nullable: true
           readOnly: true
+          x-ticvai-derived: onRead
+          description: Place among the unclaimed conversations in `queueId`, from the live agent queue
+            (audit R149). Null once claimed.
         estimatedWaitSeconds:
           type: integer
           nullable: true
           readOnly: true
+          x-ticvai-derived: onRead
+          description: From the live agent queue — the conversations ahead divided across that queue's
+            agents online now (audit R149). Null once claimed.
         handoverReason:
           type: string
           nullable: true
@@ -13892,8 +13985,9 @@ components:
         offerAtCheckout:
           type: boolean
           default: true
-          description: Whether the guest is offered the match at the payment step. Off means staff merge later
-            only.
+          description: Whether a verified contact is matched at the payment step. On, a verified match
+            attaches the order automatically (audit R120 (b)). Off means staff merge later only, and
+            `checkGuestCheckoutMatch` skips the lookup entirely (audit R149).
         scopePath:
           type: string
           readOnly: true
@@ -14149,6 +14243,34 @@ components:
               type: integer
             loyaltyPoints:
               type: integer
+              description: The total points moved across every programme. The per-programme outcome is
+                `loyaltyProgrammes`.
+        loyaltyProgrammes:
+          type: array
+          description: '**One entry per loyalty programme either record belonged to (decided 28 September,
+            audit R149).** Points are added and the higher tier is kept, per programme — a single points
+            number cannot say which programme it belongs to.
+
+            '
+          items:
+            type: object
+            required:
+            - programmeId
+            - pointsAdded
+            - resultingPoints
+            properties:
+              programmeId:
+                type: string
+                format: uuid
+              pointsAdded:
+                type: integer
+                description: The absorbed record's balance in this programme, added to the survivor's.
+              resultingPoints:
+                type: integer
+              tierKept:
+                type: string
+                nullable: true
+                description: The higher of the two records' tiers in this programme.
         consentOutcome:
           type: array
           description: 'Per purpose, the resulting position. Where the two profiles disagreed, the more
@@ -15203,6 +15325,9 @@ components:
           $ref: ../shared/common.yaml#/components/schemas/Money
         attributionWindowDays:
           type: integer
+          minimum: 1
+          description: The window these figures were attributed over, from `VenueSettings.marketing.attributionWindowDays`
+            (proposed default 7, audit R094).
     MessageTemplate:
       x-ticvai-persistence: marketing.message_template
       type: object
@@ -15344,6 +15469,10 @@ components:
         the case, because a lost-property report that forgets it was one cannot be routed to the lost
         and found desk.
 
+        **`other` only with a note (decided 28 September, audit R222).** A case raised as `other` must
+        carry a non-empty `detail` (`raiseMyCase`), or it is refused with 400; the notes are reviewed
+        quarterly to add the real kinds they reveal.
+
         '
       enum:
       - lostProperty
@@ -15421,6 +15550,11 @@ components:
         caseNumber:
           type: string
           readOnly: true
+          description: '**Server-assigned: the venue prefix plus a sequence per venue** (decided 28
+            September, audit R152). Not gapless; only tax invoices are gapless, per legal entity.
+            Assigned when the case reaches the server, so a retry with the same `id` keeps its number.
+
+            '
         subjectId:
           type: string
           format: uuid
@@ -15598,6 +15732,11 @@ components:
           format: uuid
         code:
           type: string
+          x-ticvai-unique: tenant
+          description: '**Unique per tenant** (decided 28 September, audit R108). A code already used by
+            any loyalty programme in the tenant, at any venue, is refused with `409 duplicate-code`.
+
+            '
         name:
           type: string
         venueId:

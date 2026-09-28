@@ -9,9 +9,9 @@ about: '**A multi-tenant venue platform.** One tenant operates several venues; a
   contracts persist to 26 schemas, and every artefact in the package is drawn by resolving against that
   join rather than by being written twice.'
 scale:
-  operations: 2135
+  operations: 2147
   contracts: 32
-  tables: 682
+  tables: 687
   tablesNote: '**Postgres tables only.** `status.json` reports 379 because it counts five non-table
     stores. **They own no service and should not**: a cache entry is derived from something already
     read, invalidated by an event already consumed, and losable without consequence. **Both numbers
@@ -27,7 +27,7 @@ scale:
   services: 17
   platforms: 16
   apps: 13
-  screens: 2427
+  screens: 2422
   flows: 288
   stateModels: 125
   events: 29
@@ -40,7 +40,7 @@ actors:
   - P01
   - P02
   - P05
-  operations: 188
+  operations: 190
   note: Buys, arrives, is admitted, spends. **Never sees a staff surface** — `check-screens` refuses
     a guest screen declaring a staff permission.
 - actor: venue staff
@@ -51,13 +51,13 @@ actors:
   - P08
   - P15
   - P16
-  operations: 2000
+  operations: 2010
   note: Sells, admits, cooks, counts, configures. **Authority is carried by the person, not the device**
     (ADR-0002) — which is what makes a shared handheld safe.
 - actor: partner
   reaches:
   - P10
-  operations: 163
+  operations: 164
   note: Resellers and agents, with their own credit and settlement.
 - actor: platform operator
   reaches:
@@ -259,7 +259,7 @@ surfaces:
   app: venue-management-web
   formFactor: web
   offlineCapable: false
-  screens: 1182
+  screens: 1178
   modules:
   - access
   - accreditation
@@ -386,7 +386,7 @@ surfaces:
   app: venue-management-web
   formFactor: web
   offlineCapable: false
-  screens: 100
+  screens: 99
   modules:
   - core
   - fnb
@@ -495,12 +495,12 @@ services:
     - WhiteLabelService
 stores:
 - store: postgres
-  operations: 2121
+  operations: 2133
   usedBy:
   - service: CatalogueService
-    operations: 406
+    operations: 407
   - service: OrderService
-    operations: 253
+    operations: 254
   - service: VenueOpsService
     operations: 224
   - service: MarketingService
@@ -510,11 +510,11 @@ stores:
   - service: AccessService
     operations: 182
   - service: TenancyService
-    operations: 163
+    operations: 166
   - service: FnbService
-    operations: 110
+    operations: 112
   - service: IdentityService
-    operations: 65
+    operations: 70
   - service: LedgerService
     operations: 56
   - service: WhiteLabelService
@@ -534,12 +534,12 @@ stores:
   note: '**One Postgres per cell**, 26 schemas inside it. Not one database per tenant (ADR-0005) — tenancy
     is a partition key, not a deployment boundary.'
 - store: redis
-  operations: 1631
+  operations: 1643
   usedBy:
   - service: CatalogueService
-    operations: 351
+    operations: 352
   - service: OrderService
-    operations: 185
+    operations: 186
   - service: MarketingService
     operations: 181
   - service: AccessService
@@ -549,11 +549,11 @@ stores:
   - service: PlatformService
     operations: 137
   - service: TenancyService
-    operations: 119
+    operations: 122
   - service: FnbService
-    operations: 89
+    operations: 91
   - service: IdentityService
-    operations: 61
+    operations: 66
   - service: WhiteLabelService
     operations: 39
   - service: InventoryService
@@ -573,15 +573,15 @@ stores:
   note: Sessions, resolution caches, idempotency. **Losable without consequence** — nothing treats a
     cache entry as a source of truth.
 - store: postgres-analytical
-  operations: 118
+  operations: 120
   usedBy:
   - service: PlatformService
     operations: 71
   - service: ReportingService
     operations: 17
-  - service: AiService
-    operations: 15
   - service: FnbService
+    operations: 17
+  - service: AiService
     operations: 15
   note: Reporting and AI interactions. **Never the transactional primary** (ADR-0016).
 - store: qdrant
@@ -591,10 +591,10 @@ stores:
     operations: 9
   note: Vector search for the concierge and semantic lookup.
 - store: derived
-  operations: 35
+  operations: 37
   usedBy:
   - service: FnbService
-    operations: 16
+    operations: 18
   - service: ReportingService
     operations: 16
   - service: InventoryService
@@ -661,9 +661,9 @@ layers:
 - layer: frontend
   holds: 477 screens, 93 flows, 15 platforms, 12 apps
 - layer: contracts
-  holds: 2135 operations across 28 contracts — the join
+  holds: 2147 operations across 28 contracts — the join
 - layer: backend
-  holds: 682 tables in 26 schemas, 910 relationships
+  holds: 687 tables in 26 schemas, 910 relationships
 - layer: domain
   holds: 113 state models, 29 events
 - layer: decisions

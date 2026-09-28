@@ -20,9 +20,11 @@ terminal:
 transitions:
 - from: draft
   to: pending
-  operation: createApprovalRequest
+  operation: submitApprovalRequest
   trigger: operation
-  guard: Submitted. A draft is for a person gathering detail; a contract raising one submits immediately
+  guard: Submitted by the requester who saved the draft, and no other request for the subject is open.
+    Routing, the matrix version and the SLA start here, not when the draft was saved (decided 28 September,
+    audit R129). A contract raising a request creates it at pending and never drafts
 - from: pending
   to: escalated
   operation: escalateApprovalRequest

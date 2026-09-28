@@ -2025,7 +2025,6 @@ screens:
   requiresModule: core
   wave: 3
   source:
-    sameAs: ADM-412
     book: Subscription_Licensing_AI_Self_Service.pdf
     board: '5'
     number: '4'
@@ -2036,9 +2035,14 @@ screens:
     component: apps/signup-web/src/routes/purchase-activation/PaymentMethodSettlementSetup.tsx
     status: notStarted
   density: compact
-  notes: The self-service form of `ADM-412`, for a prospect with no account. Decided 11 September 2026;
-    P09 keeps its screen for the operator-led path (BL-165). `tools/applied/apply-subscription-placement.py`
-    keeps the two in step.
+  notes: 'The self-service form of `ADM-412`, for a prospect with no account. Decided 11 September 2026;
+    P09 keeps its screen for the operator-led path (BL-165).
+
+
+    **Diverged from ADM-412 on 28 September; no longer `sameAs`.** ADM-412 gained the platform-staff tenant
+    picker and grant step (audit R098), which does not apply to a prospect with no account and no tenant
+    yet, so `tools/applied/apply-subscription-placement.py` no longer keeps the two in step. The payment-methods
+    change of audit R275 (a) is applied here by hand.'
   wireframe:
     status: notStarted
     board: wireframes/P17 TICVAI Sign-up.dc.html#sgn-021
@@ -2053,15 +2057,21 @@ screens:
     - name: actionBar
       slot: rowActions
       components:
+      - kind: multiSelect
+        label: Payment methods
+        bindsTo: PaymentProvider
+        columns:
+        - PaymentProvider.supportedMethods
+        operation: setPaymentProvider
+        notes: '**The methods follow the contract (decided 28 September, audit R275 (a))**: the options are
+          the `PaymentProvider.supportedMethods` enum that `setPaymentProvider` accepts. The pack''s Credit
+          / Debit Card is `card` and its Bank Transfer is `bankTransfer`; its Other Approved Method is not
+          in the contract and is dropped.'
+        provenance: contract orders.yaml PUT /payment-providers
       - kind: primaryButton
-        label: Credit / Debit Card
-        provenance: pack Subscription_Licensing_AI_Self_Service.pdf, page 61 §Support
-      - kind: secondaryButton
-        label: Bank Transfer
-        provenance: pack Subscription_Licensing_AI_Self_Service.pdf, page 61 §Support
-      - kind: secondaryButton
-        label: Other Approved Method
-        provenance: pack Subscription_Licensing_AI_Self_Service.pdf, page 61 §Support
+        label: Save payment provider
+        operation: setPaymentProvider
+        provenance: contract orders.yaml PUT /payment-providers
     - name: contentBody
       components: []
   states:
@@ -2076,12 +2086,6 @@ screens:
       2.1, which is where somebody without access to a saved setup would be sent; no minute has decided
       it.
   gaps:
-  - operation: null
-    why: '**The pack names 3 actions on this screen and the screen declares 0 operations.** Unserved:
-      Credit / Debit Card, Bank Transfer, Other Approved Method. Each needs an operation, or needs removing
-      from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract
-      side.'
-    source: pack Subscription_Licensing_AI_Self_Service.pdf, page 61 §Support
   - operation: null
     why: '**Payment Method & Settlement Setup declares no operation that writes anything** — its only
       declared call is `none`, a read. The name promises authoring and the contract offers none, so either

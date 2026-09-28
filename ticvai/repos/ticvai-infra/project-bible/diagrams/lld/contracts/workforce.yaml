@@ -30,6 +30,7 @@ operations:
   reads:
   - cache:idempotency
   - workforce.attendance
+  - workforce.attendance_amendment
   writes:
   - cache:idempotency
   - workforce.attendance
@@ -160,6 +161,7 @@ operations:
   offline: false
   reads:
   - workforce.attendance
+  - workforce.attendance_amendment
   - workforce.rota_assignment
   writes: []
 - operation: listEmployees
@@ -357,6 +359,7 @@ operations:
   - access.access_point
   - cache:idempotency
   - workforce.attendance
+  - workforce.attendance_amendment
   - workforce.rota_assignment
   writes:
   - cache:idempotency

@@ -254,12 +254,14 @@ permanent platform afterwards.**
 
 ## CF-64 — the cloud provider
 
-**AWS or Azure, pending DESC.** Owned by Dinesh and Qossai.
+**Decided 28 September (audit R057): Azure in a UAE region, GitHub Actions for CI. CF-64 closed.**
+Owned by Dinesh and Qossai.
 
-**Everything above is provider-neutral. Nothing below it can be** — managed Postgres, the Redis
-tier, Qdrant hosting, the CDN, the secret store.
+**Everything above is provider-neutral. What sits below it is now Azure's** — managed Postgres,
+the Redis tier, Qdrant hosting, the CDN, and Azure Key Vault as the secret store, one per cell.
 
-**CF-64 also carries RPO and RTO, which are stated nowhere else.**
+**RPO and RTO were settled on 21 September** (asynchronous by default, synchronous selectable;
+`docs/registers/conflicts.md` CF-64).
 
 ---
 

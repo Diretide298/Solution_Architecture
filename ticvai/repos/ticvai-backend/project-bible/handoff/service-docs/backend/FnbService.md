@@ -7,7 +7,7 @@
 | Tier | operations: What a venue does with what it sold. Licensed per module. |
 | Contracts | `fnb` |
 | Schemas owned | `fnb` |
-| Operations in the slice | 57 of 113 |
+| Operations in the slice | 58 of 115 |
 | Scale | Write-heavy during service, idle between. Two peaks a day, sharply. |
 | If it is down | Down means the kitchen falls back to paper. Offline-capable by design. |
 
@@ -36,6 +36,7 @@
 | fnb | [`getHaccpStatus`](#gethaccpstatus) | GET | `/food-safety/status` | core | 2 | BO-044, EMP-062, KIT-008 |
 | fnb | [`holdCourse`](#holdcourse) | POST | `/kitchen-tickets/{ticketId}/hold` | core | 2 | EMP-058, KIT-002, KIT-003 |
 | fnb | [`joinRestaurantWaitlist`](#joinrestaurantwaitlist) | POST | `/waitlist` | core | 2 | EMP-056, EMP-058, GST-070, WEB-036 |
+| fnb | [`leaveRestaurantWaitlist`](#leaverestaurantwaitlist) | POST | `/waitlist/{entryId}/leave` | core | 2 | EMP-056, GST-070, WEB-036 |
 | fnb | [`list86Events`](#list86events) | GET | `/outlets/{outletId}/86-events` | core | 2 | KIT-008 |
 | fnb | [`listTableReservations`](#listtablereservations) | GET | `/table-reservations` | core | 1 | EMP-051, EMP-054, EMP-060, POS-028 |
 | fnb | [`logColdChain`](#logcoldchain) | POST | `/food-safety/cold-chain` | setup | 2 | EMP-065 |
@@ -52,7 +53,7 @@
 | fnb | [`setTableCombinations`](#settablecombinations) | PUT | `/outlets/{outletId}/table-combinations` | core | 1 | EMP-058, POS-024 |
 | fnb | [`signCorrectiveAction`](#signcorrectiveaction) | POST | `/food-safety/corrective-actions/{actionId}/sign` | setup | 2 | BO-044, EMP-067 |
 | fnb | [`updateTableReservation`](#updatetablereservation) | PATCH | `/table-reservations/{reservationId}` | core | 2 | GST-070, WEB-031 |
-| guestOrdering | [`claimLocationSession`](#claimlocationsession) | POST | `/location-sessions` | core | 2 | GST-024, GST-030, WEB-036, WEB-046 |
+| guestOrdering | [`claimLocationSession`](#claimlocationsession) | POST | `/location-sessions` | core | 2 | GST-024, WEB-036 |
 | guestOrdering | [`claimTableSession`](#claimtablesession) | POST | `/table-sessions` | core | 2 | GST-024, GST-025, WEB-036, WEB-038 |
 | guestOrdering | [`createGuestFnbOrder`](#createguestfnborder) | POST | `/guest-orders` | core | 2 | GST-024, GST-032, KSK-016, WEB-036 |
 | guestOrdering | [`getFnbDeliveryPolicy`](#getfnbdeliverypolicy) | GET | `/fnb-delivery-policy` | core | 2 | BO-044, GST-024, WEB-036 |
@@ -65,7 +66,7 @@
 | guestOrdering | [`recordOrderHandover`](#recordorderhandover) | POST | `/guest-orders/{orderId}/delivery` | core | 1 | BO-021, KIT-007, POS-012 |
 | guestOrdering | [`setFnbDeliveryPolicy`](#setfnbdeliverypolicy) | PUT | `/fnb-delivery-policy` | setup | 2 | BO-044 |
 | kitchen | [`listKitchenStations`](#listkitchenstations) | GET | `/kitchen/stations` | core | 2 | BO-020, BO-046, BO-134, KIT-001, KIT-005 |
-| kitchen | [`listKitchenTickets`](#listkitchentickets) | GET | `/kitchen/tickets` | core | 1 | BO-020, BO-046, BO-731, KIT-001, KIT-002, KIT-004 … |
+| kitchen | [`listKitchenTickets`](#listkitchentickets) | GET | `/kitchen/tickets` | core | 1 | BO-020, BO-046, BO-731, KIT-001, KIT-002, KIT-003 … |
 | kitchen | [`prioritiseKitchenTicket`](#prioritisekitchenticket) | POST | `/kitchen/tickets/{ticketId}/prioritise` | core | 2 | BO-020, BO-046, KIT-003, KIT-009 |
 | kitchen | [`setKitchenStations`](#setkitchenstations) | PUT | `/kitchen/stations` | core | 2 | BO-020, BO-046, BO-134, BO-135, KIT-005 |
 | kitchen | [`setKitchenTicketStatus`](#setkitchenticketstatus) | PUT | `/kitchen/tickets/{ticketId}/status` | core | 1 | BO-020, BO-046, KIT-002, KIT-003, KIT-006, KIT-008 … |
@@ -230,6 +231,7 @@ Board 3. **A ticket waiting on one station while the rest of the table is plated
 
 4.9.13. **Distinct from `claimTableSession`**, which identifies a table a guest is already sitting at. This is a booking with a time, a party size and nobody present.
 **Does not name a specific table by default.** A host seats a party on the night, and committing table 7 at booking time means every later booking is refused against a constraint that did not need to exist. A table may be named where a guest asked for one.
+**No deposit and no no-show fee in the first release** (decided 28 September, audit R077 (a)). Booking takes no payment, and cancelling or not arriving costs the guest nothing; GST-070 says so at booking and at cancel.
 
 |  |  |
 |---|---|
@@ -309,6 +311,8 @@ Board 3. **A ticket waiting on one station while the rest of the table is plated
 
 Raised above the person who found it — a critical reading, or one nobody actioned in time. **Escalation is not a failure state**: it is how a finding reaches somebody with the authority to sign it.
 
+**An escalation goes to the venue's food-safety lead** (decided 28 September, audit R096 (9)): the principal named in the venue setting `fnb.foodSafetyLeadPrincipalId`. The action's `escalatedToPrincipalId` is set to that person and they are notified. A venue with no lead named refuses the escalation with a `409` (`no-food-safety-lead`), because an escalation to nobody is the finding going quiet.
+
 |  |  |
 |---|---|
 | Permission | `INCIDENT_MANAGE` |
@@ -336,9 +340,9 @@ Raised above the person who found it — a critical reading, or one nobody actio
 | id | string (uuid) | yes |  |
 | raisedAt | string (date-time) | yes |  |
 | raisedByPrincipalId | string (uuid) |  | Who raised it, which is who may not sign it when it is critical (signCorrectiveAction). (read-only; nullable) |
-| source | enum (temperatureExcursion, coldChainBreach, expiredStock, contamination, pestSighting, equipmentFailure, manual) | yes |  |
+| source | enum (temperatureExcursion, coldChainBreach, expiredStock, contamination, pestSighting, equipmentFailure, missedCheck, manual) | yes | missedCheck is raised by the server when a checkpoint goes past its checkFrequencyMinutes with no reading (audit R125 (5)). |
 | sourceRef | string (uuid) |  | (nullable) |
-| severity | enum (observation, minor, major, critical) |  |  |
+| severity | enum (observation, minor, major, critical) |  | Set by the source when the platform opens it (decided 28 September, audit R125 (5)): an out-of-range reading or a cold-chain breach opens at major, a missed check at minor. |
 | actionTaken | string |  | (nullable) |
 | disposal | enum (none, discarded, reworked, quarantined, returned) |  | (nullable) |
 | status | enum (open, actioned, signed, escalated, closed) | yes |  |
@@ -352,6 +356,7 @@ Raised above the person who found it — a critical reading, or one nobody actio
 | Code | Shape | Meaning |
 |---|---|---|
 | 200 |  | Escalate a finding |
+| 409 |  | The venue has no food-safety lead named in fnb.foodSafetyLeadPrincipalId (audit R096 (9)). |
 
 ### fireCourse
 
@@ -432,7 +437,7 @@ Board 3 of the client F&B pack. **`KitchenTicket.coursing` carried the policy �
 **`GET /food-safety/status`**: Where this venue stands, right now
 
 Board 5J. **What an inspector asks for and what a manager checks before service.**
-Checks due, checks missed, open corrective actions and unsigned findings. **A missed check counts against the venue the same as a failed one** — a log with a gap cannot be told apart from a log nobody kept.
+Checks due, checks missed, open corrective actions and unsigned findings. **A missed check counts against the venue the same as a failed one** — a log with a gap cannot be told apart from a log nobody kept. Each missed check has opened a `minor` corrective action (`source: missedCheck`, audit R125 (5)), so it is in `openActions` too.
 
 |  |  |
 |---|---|
@@ -496,7 +501,8 @@ Board 3. **The other half of firing, and the one that gets forgotten.** A table 
 |---|---|---|---|
 | recordedAt | string (date-time) | yes | Device time of the act (offline-capable; replayed in this order). |
 | course | integer | yes | (min 1) |
-| reason | enum (tableNotReady, guestRequest, kitchenBackedUp, awaitingPrevious, other) |  |  |
+| reason | enum (tableNotReady, guestRequest, kitchenBackedUp, awaitingPrevious, other) |  | other is allowed only with a note, which it then requires (decided 28 September, audit R222). |
+| note | string |  | Free text. (max length 500; nullable) |
 
 **Response**: `KitchenTicket`
 
@@ -535,6 +541,7 @@ Board 3. **The other half of firing, and the one that gets forgotten.** A table 
 
 | Code | Shape | Meaning |
 |---|---|---|
+| 400 | BadRequest | Validation failed |
 | 200 |  | Held |
 
 ### joinRestaurantWaitlist
@@ -556,7 +563,7 @@ BL-130. **Distinct from `queue`, which is for rides.** A restaurant waitlist has
 | Reads | `cache:idempotency`, `fnb.dining_table`, `fnb.waitlist_entry`, `platform.outlet` |
 | Writes | `cache:idempotency`, `fnb.waitlist_entry` |
 | Called by | EMP-056, EMP-058, GST-070, WEB-036 |
-| State model | Restaurant waitlist entry ([states/restaurant-waitlist.yaml](../../../states/restaurant-waitlist.yaml)): created as `waiting`; moves `waiting` -> `notified`, `notified` -> `seated`, `waiting` -> `walkedAway`, `waiting` -> `cancelled` **(not settled: see the Gaps sheet)** |
+| State model | Restaurant waitlist entry ([states/restaurant-waitlist.yaml](../../../states/restaurant-waitlist.yaml)): created as `waiting`; moves `waiting` -> `notified`, `notified` -> `seated`, `waiting` -> `walkedAway` **(not settled: see the Gaps sheet)** |
 
 **Parameters**
 
@@ -602,6 +609,65 @@ BL-130. **Distinct from `queue`, which is for rides.** A restaurant waitlist has
 |---|---|---|
 | 201 |  | Added |
 
+### leaveRestaurantWaitlist
+
+**`POST /waitlist/{entryId}/leave`**: Take a party off an outlet's waitlist
+
+**A guest could join a restaurant waitlist and not leave it** (decided 28 September, audit R073 (d)). A party that has gone elsewhere and cannot say so is a table held for nobody, and a `noShow` recorded against a guest who told us.
+**The entry ends `cancelled`, from `waiting` or `notified`** (states/restaurant-waitlist.yaml). Leaving after being called releases the held table at once rather than at `holdExpiresAt`. `walkedAway` is not this: that is a host recording a party that left without saying so.
+**A guest leaves only their own entry** (`subjectId` is the caller); a host may take any party off the list with `ORDER_MODIFY`. Idempotent: leaving an entry that is already `cancelled` returns it unchanged.
+
+|  |  |
+|---|---|
+| Permission | `ORDER_MODIFY` |
+| Scope level | venue |
+| Part of slice | core |
+| Wave | 2 |
+| Offline | no |
+| Conflict policy | serverWins |
+| Guest callable | True |
+| Reads | `fnb.waitlist_entry` |
+| Writes | - |
+| Called by | EMP-056, GST-070, WEB-036 |
+| State model | Restaurant waitlist entry ([states/restaurant-waitlist.yaml](../../../states/restaurant-waitlist.yaml)): moves `waiting` -> `cancelled`, `notified` -> `cancelled` |
+
+**Parameters**
+
+| Name | In | Required | Type | Notes |
+|---|---|---|---|---|
+| entryId | path | yes | string (uuid) |  |
+| Idempotency-Key | header | yes | string | Client-generated ULID. |
+
+**Request body**
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| note | string |  | Why, where the guest or host gave a reason. (max length 300; nullable) |
+
+**Response**: `RestaurantWaitlist`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| id | string (uuid) | yes |  |
+| outletId | string (uuid) | yes |  |
+| subjectId | string (uuid) |  | (nullable) |
+| partySize | integer | yes |  |
+| quotedWaitMinutes | integer |  | (nullable) |
+| seatingPreference | enum (any, indoor, outdoor, bar, booth, highChair) |  | (nullable) |
+| status | enum (waiting, notified, seated, walkedAway, noShow, cancelled) | yes |  |
+| notifiedAt | string (date-time) |  | (nullable) |
+| recordedAt | string (date-time) | yes | When the party joined, on the device. |
+| syncedAt | string (date-time) |  | (read-only; nullable) |
+| holdExpiresAt | string (date-time) |  | How long a table waits for somebody who was called. (nullable) |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 200 |  | Left. |
+| 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
+| 409 |  | The party is already seated, walkedAway or noShow. |
+
 ### list86Events
 
 **`GET /outlets/{outletId}/86-events`**: What came off the menu today, when, and for how long
@@ -641,7 +707,8 @@ Board 5J. **`setItemAvailability` records the current state and not the history.
 | items[].menuItemId | string (uuid) | yes |  |
 | items[].offAt | string (date-time) | yes |  |
 | items[].backAt | string (date-time) |  | (nullable) |
-| items[].reason | enum (ranOut, qualityIssue, equipmentDown, supplierFailure, seasonal, other) |  |  |
+| items[].reason | enum (ranOut, qualityIssue, equipmentDown, supplierFailure, seasonal, other) |  | other always carries a note (audit R222). |
+| items[].note | string |  | The note given with the 86. (max length 500; nullable) |
 | items[].calledByPrincipalId | string (uuid) |  |  |
 | items[].refusedOrderCount | integer |  | (default 0; read-only) |
 | nextCursor | string |  |  |
@@ -719,6 +786,7 @@ Board 5J. **`setItemAvailability` records the current state and not the history.
 
 Board 5G. **A delivery arriving warm is a rejection decision made at the door**, and `createGoodsReceipt` had nowhere to record the temperature.
 **Taken before the receipt is posted.** Once stock is received it has entered the kitchen, and **a claim against a supplier needs the reading that refused it** rather than one taken afterwards.
+**A breach opens a corrective action at `major`** (high), the same as an out-of-range reading (decided 28 September, audit R125 (5)).
 
 |  |  |
 |---|---|
@@ -817,7 +885,7 @@ Board 3. **Equipment down, an item run out mid-ticket, a delivery late, a statio
 | outletId | string (uuid) |  |  |
 | stationId | string (uuid) |  | (nullable) |
 | ticketId | string |  | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$; nullable) |
-| kind | enum (equipmentDown, itemRanOut, lateDelivery, staffShort, powerLoss, spillage, chased, other) | yes |  |
+| kind | enum (equipmentDown, itemRanOut, lateDelivery, staffShort, powerLoss, spillage, chased, other) | yes | other always carries a note (audit R222). |
 | durationMinutes | integer |  | (nullable) |
 | raisedAt | string (date-time) | yes |  |
 | raisedByPrincipalId | string (uuid) |  |  |
@@ -828,6 +896,7 @@ Board 3. **Equipment down, an item run out mid-ticket, a delivery late, a statio
 | Code | Shape | Meaning |
 |---|---|---|
 | 201 |  | Logged |
+| 400 | BadRequest | Validation failed |
 
 ### logTemperature
 
@@ -835,6 +904,7 @@ Board 3. **Equipment down, an item run out mid-ticket, a delivery late, a statio
 
 Board 5J. **HACCP records are a UAE regulatory obligation and nothing in the package touched them.**
 **An out-of-range reading is recorded, not refused.** It opens a corrective action and keeps the value — **deleting a bad reading is the one thing an inspector looks for**, and an operation that rejects the reading teaches a kitchen to stop taking it.
+**Severity is set by what happened** (decided 28 September, audit R125 (5)). An out-of-range reading opens the corrective action at `major` (high). A reading not taken opens one at `minor` (medium), with `source: missedCheck`: the server raises it when a checkpoint's `checkFrequencyMinutes` passes with no log.
 **Offline-capable, deliberately.** A walk-in freezer is where the signal is worst and the readings matter most, and a check nobody can record is a check nobody takes.
 
 |  |  |
@@ -891,9 +961,9 @@ Board 5J. **HACCP records are a UAE regulatory obligation and nothing in the pac
 | correctiveAction.id | string (uuid) | yes |  |
 | correctiveAction.raisedAt | string (date-time) | yes |  |
 | correctiveAction.raisedByPrincipalId | string (uuid) |  | Who raised it, which is who may not sign it when it is critical (signCorrectiveAction). (read-only; nullable) |
-| correctiveAction.source | enum (temperatureExcursion, coldChainBreach, expiredStock, contamination, pestSighting, equipmentFailure, manual) | yes |  |
+| correctiveAction.source | enum (temperatureExcursion, coldChainBreach, expiredStock, contamination, pestSighting, equipmentFailure, missedCheck, manual) | yes | missedCheck is raised by the server when a checkpoint goes past its checkFrequencyMinutes with no reading (audit R125 (5)). |
 | correctiveAction.sourceRef | string (uuid) |  | (nullable) |
-| correctiveAction.severity | enum (observation, minor, major, critical) |  |  |
+| correctiveAction.severity | enum (observation, minor, major, critical) |  | Set by the source when the platform opens it (decided 28 September, audit R125 (5)): an out-of-range reading or a cold-chain breach opens at major, a missed check at minor. |
 | correctiveAction.actionTaken | string |  | (nullable) |
 | correctiveAction.disposal | enum (none, discarded, reworked, quarantined, returned) |  | (nullable) |
 | correctiveAction.status | enum (open, actioned, signed, escalated, closed) | yes |  |
@@ -1022,7 +1092,8 @@ Board 4 of the client F&B pack. **`mergeTableVisits` and `transferTableVisit` ex
 | Field | Type | Required | Notes |
 |---|---|---|---|
 | toTableId | string (uuid) | yes |  |
-| reason | enum (guestRequest, tableFault, partySizeChange, serviceRecovery, other) |  |  |
+| reason | enum (guestRequest, tableFault, partySizeChange, serviceRecovery, other) |  | other is allowed only with a note, which it then requires (decided 28 September, audit R222). |
+| note | string |  | Free text. (max length 500; nullable) |
 | recordedAt | string (date-time) | yes | Device time of the act (offline-capable; replayed in this order). |
 
 **Response**: `TableVisit`
@@ -1088,6 +1159,7 @@ Board 4 of the client F&B pack. **`mergeTableVisits` and `transferTableVisit` ex
 | Code | Shape | Meaning |
 |---|---|---|
 | 200 |  | Moved |
+| 400 | BadRequest | Validation failed |
 | 409 |  | The target table is occupied. |
 
 ### notifyServer
@@ -1096,6 +1168,7 @@ Board 4 of the client F&B pack. **`mergeTableVisits` and `transferTableVisit` ex
 
 Board 3 and Board 4. **Food ready and nobody collecting it is the commonest reason a plate goes out cold**, and the pass had no way to say so.
 **Reaches the server assigned to the table, not the room.** A broadcast to every handheld is one everybody ignores by the second service.
+**Where no server is assigned, it goes to the outlet's supervisor on duty** (decided 28 September, audit R125 (6)), never to the room and never to nobody.
 
 |  |  |
 |---|---|
@@ -1184,6 +1257,7 @@ A label that omits an allergen on a sealed bag is the failure mode this exists t
 Board 3. **A bumped ticket disappears from the rail**, and a bump is a single tap on a screen operated by somebody with their hands full.
 **The most-used undo in a kitchen**, and the package had none — the only recovery was to re-key the order, which changes its number and loses its age.
 **Bounded to the current service.** A recall is for the last few minutes; a ticket from yesterday is not a mis-bump.
+**The window is `VenueSettings.fnb.recallWindowMinutes`, counted from the bump**, a venue setting with a tenant default (decided 28 September, audit R094), and never past the end of the current service. **Proposed default 10 minutes, client to correct (audit R094).**
 
 |  |  |
 |---|---|
@@ -1248,7 +1322,7 @@ Board 3. **A bumped ticket disappears from the rail**, and a bump is a single ta
 | Code | Shape | Meaning |
 |---|---|---|
 | 200 |  | Back on the rail, with its original age |
-| 409 |  | Past the recall window. |
+| 409 |  | Past the recall window (VenueSettings.fnb.recallWindowMinutes, proposed default 10, audit R094). |
 
 ### refireItem
 
@@ -1545,9 +1619,9 @@ Board 5J. **The signature is the record.** *Discarded and reset* with nobody aga
 | id | string (uuid) | yes |  |
 | raisedAt | string (date-time) | yes |  |
 | raisedByPrincipalId | string (uuid) |  | Who raised it, which is who may not sign it when it is critical (signCorrectiveAction). (read-only; nullable) |
-| source | enum (temperatureExcursion, coldChainBreach, expiredStock, contamination, pestSighting, equipmentFailure, manual) | yes |  |
+| source | enum (temperatureExcursion, coldChainBreach, expiredStock, contamination, pestSighting, equipmentFailure, missedCheck, manual) | yes | missedCheck is raised by the server when a checkpoint goes past its checkFrequencyMinutes with no reading (audit R125 (5)). |
 | sourceRef | string (uuid) |  | (nullable) |
-| severity | enum (observation, minor, major, critical) |  |  |
+| severity | enum (observation, minor, major, critical) |  | Set by the source when the platform opens it (decided 28 September, audit R125 (5)): an out-of-range reading or a cold-chain breach opens at major, a missed check at minor. |
 | actionTaken | string |  | (nullable) |
 | disposal | enum (none, discarded, reworked, quarantined, returned) |  | (nullable) |
 | status | enum (open, actioned, signed, escalated, closed) | yes |  |
@@ -1568,6 +1642,7 @@ Board 5J. **The signature is the record.** *Discarded and reset* with nobody aga
 **`PATCH /table-reservations/{reservationId}`**: Change or cancel a booking
 
 Party size, time, or cancelled. **A reduced party size releases cover immediately** — four seats returned at 18:00 can be sold for the same evening.
+**Cancelling is free** (decided 28 September, audit R077 (a)): no deposit is held and no no-show or late-cancel fee is charged in the first release.
 
 |  |  |
 |---|---|
@@ -1662,7 +1737,7 @@ Codes rotate. A static code photographed once lets someone order to a cabana the
 | Conflict policy | serverWins |
 | Reads | `cache:idempotency`, `fnb.location_session` |
 | Writes | `cache:idempotency`, `fnb.location_session` |
-| Called by | GST-024, GST-030, WEB-036, WEB-046 |
+| Called by | GST-024, WEB-036 |
 
 **Parameters**
 
@@ -2260,6 +2335,7 @@ Computed from the outlet's `FnbDeliveryPolicy` and its current load: ASAP plus f
 
 The closing state, and it differs by fulfilment: a server marks `served`, a counter marks `collected`, a runner marks `delivered`. 4.6.35 distinguishes all three, and so does this — "the guest has it" is not one event when the dispute is about which.
 Offline-capable. A runner crossing a venue loses signal, and an order that cannot be closed until they return is an order that reads as undelivered for ten minutes.
+**Which outcome closes which service mode** (decided 28 September, audit R125 (1)): `tableService` closes `served`; `quickService` and `collection` close `collected`; `delivery` and `roomService` close `delivered`, and a `delivered` outcome needs `deliveredToLocationId`. Any other pairing is refused `422` with `outcomeNotForServiceMode`, and a delivery with no location with `locationNotSupplied`. `guestNotFound` and `refused` are recorded for every mode.
 
 |  |  |
 |---|---|
@@ -2286,7 +2362,7 @@ Offline-capable. A runner crossing a venue loses signal, and an order that canno
 | Field | Type | Required | Notes |
 |---|---|---|---|
 | outcome | enum (served, collected, delivered, guestNotFound, refused) | yes | served, collected and delivered move the order to the FnbOrderStatus of the same name. |
-| deliveredToLocationId | string (uuid) |  |  |
+| deliveredToLocationId | string (uuid) |  | Required where outcome is delivered (audit R125 (1)). |
 | runnerPrincipalId | string (uuid) |  |  |
 | note | string |  | Required for guestNotFound and refused. (max length 500) |
 | recordedAt | string (date-time) | yes |  |
@@ -2311,6 +2387,7 @@ Offline-capable. A runner crossing a venue loses signal, and an order that canno
 |---|---|---|
 | 200 |  | Recorded |
 | 409 |  | Order is not ready, or already closed |
+| 422 |  | The outcome does not close this order's service mode, or a delivery names no location (audit R125 (1)). |
 
 ### setFnbDeliveryPolicy
 
@@ -2444,6 +2521,7 @@ Offline-capable. A runner crossing a venue loses signal, and an order that canno
 | items[].name | string | yes |  |
 | items[].outletId | string (uuid) |  |  |
 | items[].menuItemIds | array of string (uuid) |  | Items routed to this station. |
+| items[].displayWorkstationIds | array of string (uuid) |  | The kitchen displays assigned to this station (decided 28 September, audit R277), as tenancy Workstation ids, primary first and fallbacks after it. |
 | items[].displayEndpoint | string |  | The P15 Kitchen Display device this station's tickets go to (19 Sep: the display is TICVAI software on commodity hardware, per station, with a fallback device where the primary is down — 18 Aug minut… (nullable) |
 | items[].isActive | boolean |  |  |
 | nextCursor | string |  |  |
@@ -2461,6 +2539,7 @@ Offline-capable. A runner crossing a venue loses signal, and an order that canno
 
 The rail. Read by P15 Kitchen Display — TICVAI's own kitchen display on commodity hardware (19 Sep; the 31 Jul *KDS integration only* position is superseded) — and by the back-office and till views of the same queue.
 **Rail order is the server's.** Tickets come back ordered by `priority` and the outlet's priority weights (`setKitchenSla`: age, promise time — `targetReadyAt` —, table stage, VIP), and a display renders them in the order returned rather than re-sorting by arrival or by promise time.
+**A kitchen display does not choose its station** (decided 28 September, audit R277). Where the caller is a workstation named in a station's `displayWorkstationIds` and sends no `stationId`, the station resolves from that assignment; a `stationId` sent by an assigned display is ignored. The station-load tile is not in the first release.
 
 |  |  |
 |---|---|
@@ -2473,7 +2552,7 @@ The rail. Read by P15 Kitchen Display — TICVAI's own kitchen display on commod
 | Read routing | replica |
 | Reads | `fnb.kitchen_ticket`, `fnb.kitchen_ticket_line` |
 | Writes | - |
-| Called by | BO-020, BO-046, BO-731, KIT-001, KIT-002, KIT-004, KIT-006, KIT-007, POS-022 |
+| Called by | BO-020, BO-046, BO-731, KIT-001, KIT-002, KIT-003, KIT-004, KIT-005, KIT-006, KIT-007, KIT-008, POS-022 |
 
 **Parameters**
 
@@ -2481,6 +2560,7 @@ The rail. Read by P15 Kitchen Display — TICVAI's own kitchen display on commod
 |---|---|---|---|---|
 | stationId | query |  | string (uuid) | Route to a preparation station — grill, cold, bar. |
 | status | query |  | KitchenTicketStatus: enum (received, preparing, ready, served, recalled, cancelled) |  |
+| course | query |  | integer | The course filter (decided 28 September, audit R277). |
 | pageSize | query |  | integer |  |
 | cursor | query |  | string | Opaque cursor: the nextCursor of the previous page. |
 
@@ -2556,7 +2636,7 @@ Supervisor override, and the mechanism behind Fast Pass order prioritisation (4.
 | Field | Type | Required | Notes |
 |---|---|---|---|
 | reason | string | yes | (min length 3; max length 500) |
-| priority | integer |  | (min 0; max 100) |
+| priority | integer |  | Absent means the top of the queue (decided 28 September, audit R125 (2)): the ticket takes the highest priority on the rail. (min 0; max 100; default 100) |
 
 **Response**: `KitchenTicket`
 
@@ -2632,6 +2712,7 @@ Supervisor override, and the mechanism behind Fast Pass order prioritisation (4.
 | stations[].name | string | yes |  |
 | stations[].outletId | string (uuid) |  |  |
 | stations[].menuItemIds | array of string (uuid) |  | Items routed to this station. |
+| stations[].displayWorkstationIds | array of string (uuid) |  | The kitchen displays assigned to this station (decided 28 September, audit R277), as tenancy Workstation ids, primary first and fallbacks after it. |
 | stations[].displayEndpoint | string |  | The P15 Kitchen Display device this station's tickets go to (19 Sep: the display is TICVAI software on commodity hardware, per station, with a fallback device where the primary is down — 18 Aug minut… (nullable) |
 | stations[].isActive | boolean |  |  |
 
@@ -2639,6 +2720,7 @@ Supervisor override, and the mechanism behind Fast Pass order prioritisation (4.
 
 | Code | Shape | Meaning |
 |---|---|---|
+| 400 |  | A workstation is assigned to more than one station (displayWorkstationIds, audit R277), or the body fails validation. |
 | 200 |  | Configured |
 
 ### setKitchenTicketStatus
@@ -2939,6 +3021,7 @@ Back-office use. A terminal reads its menu from the catalogue bundle.
 **`PUT /menu-items/{itemId}/availability`**: Mark an item available or eighty-sixed
 
 The most-used endpoint in a live kitchen. A sold-out item must disappear from every terminal in the outlet immediately — this does not wait for a bundle publish.
+**Immediate, not on save** (decided 28 September, audit R110 (c)). The change is live on every terminal and guest menu of the outlet when this returns; there is no pending state behind a *Save changes* button.
 
 |  |  |
 |---|---|
@@ -2964,7 +3047,8 @@ The most-used endpoint in a live kitchen. A sold-out item must disappear from ev
 | Field | Type | Required | Notes |
 |---|---|---|---|
 | isAvailable | boolean | yes |  |
-| reason | enum (soldOut, ingredientUnavailable, equipmentDown, seasonal, other) |  |  |
+| reason | enum (soldOut, ingredientUnavailable, equipmentDown, seasonal, other) |  | other is allowed only with a note, which it then requires (decided 28 September, audit R222). |
+| note | string |  | Free text. (max length 500; nullable) |
 | restoreAt | string (date-time) |  | Automatic restore, typically at next service. |
 | recordedAt | string (date-time) | yes | Device time of the act (offline-capable; replayed in this order). |
 
@@ -2995,6 +3079,7 @@ The most-used endpoint in a live kitchen. A sold-out item must disappear from ev
 
 | Code | Shape | Meaning |
 |---|---|---|
+| 400 | BadRequest | Validation failed |
 | 200 |  | Updated |
 
 ### setMenuSections
@@ -3585,7 +3670,7 @@ Offline behaviour depends on the items: an order containing only untracked items
 | Field | Type | Required | Notes |
 |---|---|---|---|
 | id | string (uuid) | yes |  |
-| label | string | yes | (max length 32) |
+| label | string | yes | The table code, unique per venue (decided 28 September, audit R108). (max length 32) |
 | capacity | integer | yes | (min 1) |
 | zone | string |  | (nullable) |
 | position | object |  |  |
@@ -3642,7 +3727,7 @@ The floor as the server sees it — free, seated, ordered, bill requested, needs
 | zones | array of string |  |  |
 | tables | array of TableState | yes |  |
 | tables[].id | string (uuid) | yes |  |
-| tables[].label | string | yes | (max length 32) |
+| tables[].label | string | yes | The table code, unique per venue (decided 28 September, audit R108). (max length 32) |
 | tables[].capacity | integer | yes | (min 1) |
 | tables[].zone | string |  | (nullable) |
 | tables[].position | object |  |  |
@@ -3898,7 +3983,7 @@ The outlet's whole layout in one call — the outlet is the one in the path. Eac
 |---|---|---|---|
 | tables | array of TableDefinition | yes |  |
 | tables[].id | string (uuid) | yes |  |
-| tables[].label | string | yes | (max length 32) |
+| tables[].label | string | yes | The table code, unique per venue (decided 28 September, audit R108). (max length 32) |
 | tables[].capacity | integer | yes | (min 1) |
 | tables[].zone | string |  | (nullable) |
 | tables[].position | object |  |  |
@@ -3915,7 +4000,7 @@ The outlet's whole layout in one call — the outlet is the one in the path. Eac
 | zones | array of string |  |  |
 | tables | array of TableState | yes |  |
 | tables[].id | string (uuid) | yes |  |
-| tables[].label | string | yes | (max length 32) |
+| tables[].label | string | yes | The table code, unique per venue (decided 28 September, audit R108). (max length 32) |
 | tables[].capacity | integer | yes | (min 1) |
 | tables[].zone | string |  | (nullable) |
 | tables[].position | object |  |  |
@@ -3964,9 +4049,9 @@ Every table this service owns that the slice reads or writes, with its columns a
 | id | uuid | yes |  |
 | raised_at | timestamptz | yes |  |
 | raised_by_principal_id | uuid | no | Who raised it, which is who may not sign it when it is critical (signCorrectiveAction). |
-| source | text | yes |  |
+| source | text | yes | missedCheck is raised by the server when a checkpoint goes past its checkFrequencyMinutes with no reading (audit R125 (5)). |
 | source_ref | uuid | no |  |
-| severity | text | no |  |
+| severity | text | no | Set by the source when the platform opens it (decided 28 September, audit R125 (5)): an out-of-range reading or a cold-chain breach opens at major, a missed check at minor. |
 | action_taken | text | no |  |
 | disposal | text | no |  |
 | status | text | yes |  |
@@ -4029,7 +4114,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 | Column | Type | Required | Notes |
 |---|---|---|---|
 | id | uuid | yes |  |
-| label | text | yes |  |
+| label | text | yes | The table code, unique per venue (decided 28 September, audit R108). |
 | capacity | integer | yes |  |
 | zone | text | no |  |
 | position | jsonb | no |  |
@@ -4045,7 +4130,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 | outlet_id | uuid | no |  |
 | station_id | uuid | no |  |
 | ticket_id | text | no |  |
-| kind | text | yes |  |
+| kind | text | yes | other always carries a note (audit R222). |
 | duration_minutes | integer | no |  |
 | raised_at | timestamptz | yes |  |
 | raised_by_principal_id | uuid | no |  |
@@ -4060,6 +4145,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 | name | text | yes |  |
 | outlet_id | uuid | no |  |
 | menu_item_ids | text[] | no | Items routed to this station. |
+| display_workstation_ids | text[] | no | The kitchen displays assigned to this station (decided 28 September, audit R277), as tenancy Workstation ids, primary first and fallbacks after it. |
 | display_endpoint | text | no | The P15 Kitchen Display device this station's tickets go to (19 Sep: the display is TICVAI software on commodity hardware, per station, with a fallback device where the primary is down — 18 Aug minut… |
 | is_active | boolean | no |  |
 
@@ -4252,7 +4338,8 @@ Every table this service owns that the slice reads or writes, with its columns a
 | menu_item_id | uuid | yes |  |
 | off_at | timestamptz | yes |  |
 | back_at | timestamptz | no |  |
-| reason | text | no |  |
+| reason | text | no | other always carries a note (audit R222). |
+| note | text | no | The note given with the 86. |
 | called_by_principal_id | uuid | no |  |
 | refused_order_count | integer | no |  |
 
@@ -4353,12 +4440,12 @@ Every table this service owns that the slice reads or writes, with its columns a
 
 ## Not in the first release
 
-56 operations, added to this service in later releases without changing any of the above.
+57 operations, added to this service in later releases without changing any of the above.
 
 | Group | Operations |
 |---|---|
 | bill | `getBill`, `splitBill` |
-| fnb | `applyMenuActions`, `attachModifierGroup`, `buildProductionPlan`, `closeCorrectiveAction`, `compItem`, `completeProductionRun`, `createCombo`, `createTable`, `enterCountLine`, `getFnbReservationPolicy`, `getFnbServiceChargePolicy`, `getProductionRun`, `listFnbRecommendations`, `listIngredientSubstitutes`, `listProductionRuns`, `listTemperatureCheckpoints`, `notifyWaitlistParty`, `planProductionRun`, `publishMenu`, `quoteWaitTime`, `reassignServer`, `rebalanceStationLoad`, `recordCorrectiveAction`, `releaseProductionPlan`, `requestBill`, `requestRecount`, `resolveBookingConflict`, `rollbackMenu`, `scheduleMenuPublish`, `sendBookingConfirmation`, `sendOrderNotification`, `setComboSlots`, `setFnbReservationPolicy`, `setFnbServiceChargePolicy`, `setIngredientSubstitutes`, `setKitchenSla`, `setSectionLayout`, `setServiceStage`, `setSubstitutionRules`, `setTemperatureCheckpoint`, `transferOrderItems`, `transferTableVisit`, `updateTable`, `verifyAllergens` |
+| fnb | `applyMenuActions`, `attachModifierGroup`, `buildProductionPlan`, `closeCorrectiveAction`, `compItem`, `completeProductionRun`, `createCombo`, `createTable`, `enterCountLine`, `getAllergenVerification`, `getFnbReservationPolicy`, `getFnbServiceChargePolicy`, `getProductionRun`, `listFnbRecommendations`, `listIngredientSubstitutes`, `listProductionRuns`, `listTemperatureCheckpoints`, `notifyWaitlistParty`, `planProductionRun`, `publishMenu`, `quoteWaitTime`, `reassignServer`, `rebalanceStationLoad`, `recordCorrectiveAction`, `releaseProductionPlan`, `requestBill`, `requestRecount`, `resolveBookingConflict`, `rollbackMenu`, `scheduleMenuPublish`, `sendBookingConfirmation`, `sendOrderNotification`, `setComboSlots`, `setFnbReservationPolicy`, `setFnbServiceChargePolicy`, `setIngredientSubstitutes`, `setKitchenSla`, `setSectionLayout`, `setServiceStage`, `setSubstitutionRules`, `setTemperatureCheckpoint`, `transferOrderItems`, `transferTableVisit`, `updateTable`, `verifyAllergens` |
 | menu | `listMenuSchedules`, `listMenuVersions` |
 | order | `amendFnbOrder` |
 | production | `listRecipes`, `recordWaste`, `setRecipe` |

@@ -3,7 +3,7 @@
  "generated": "2026-09-28",
  "basedOn": {
   "boardIndex": "2026-09-28",
-  "packageScreens": 2427
+  "packageScreens": 2422
  },
  "note": "Screens with no `clientPack` or `claudeDesign` frame. **Wave is the schedule** \u2014 the Wave 1 and 2 rows are the tranche worth starting; Wave 3 is most of the total and none of the urgency.",
  "counts": {
@@ -88,8 +88,8 @@
    "surface": "staffFacing",
    "runtime": "reactWeb",
    "offlineCapable": false,
-   "screens": 1182,
-   "drawn": 1182,
+   "screens": 1178,
+   "drawn": 1178,
    "undrawn": 0,
    "undrawnByWave": {}
   },
@@ -143,8 +143,8 @@
    "surface": "staffFacing",
    "runtime": "reactWeb",
    "offlineCapable": false,
-   "screens": 100,
-   "drawn": 100,
+   "screens": 99,
+   "drawn": 99,
    "undrawn": 0,
    "undrawnByWave": {}
   },

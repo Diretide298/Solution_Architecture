@@ -1,5 +1,5 @@
 id: LLD-Tenant subscription
-title: Tenant subscription — 7 transitions
+title: Tenant subscription — 8 transitions
 generatedBy: tools/derive-diagrams.py
 index: diagrams/hld/04-lifecycles.yaml
 source: states/subscription.yaml
@@ -14,7 +14,6 @@ initial:
 - trial
 - active
 terminal:
-- cancelled
 - expired
 transitions:
 - from: trial
@@ -52,10 +51,21 @@ transitions:
   to: active
   operation: setSubscription
   trigger: operation
-  guard: Reinstated within the retention window
+  guard: '**Reactivated on the same record, within the paid period** (decided 28 September, audit STATE-SUBSCRIPTION).
+    History and entitlements stay on the one subscription'
   isReversal: true
+- from: cancelled
+  to: expired
+  trigger: timer
+  guard: '**The paid period ended.** From here the subscription cannot be reactivated; the tenant starts
+    a new one (decided 28 September, audit STATE-SUBSCRIPTION)'
 notes: '**`pastDue` never stops service.** An unpaid invoice is a commercial problem and a closed gate
   is an operational one, and the second is worse for both parties.
 
 
-  Termination is always a decision, never a timer.'
+  Termination is always a decision, never a timer.
+
+
+  **`cancelled` is not terminal** (decided 28 September, audit STATE-SUBSCRIPTION). A cancelled subscription
+  can be reactivated on the same record until its paid period ends; the timer then moves it to `expired`,
+  and a returning tenant needs a new subscription.'

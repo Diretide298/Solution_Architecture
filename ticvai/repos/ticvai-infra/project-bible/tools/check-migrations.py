@@ -156,7 +156,11 @@ def collect_alters(files: list[Path]) -> None:
         # `scope_path`; `apply_venue_rls` protects one that carries `venue_id` instead, resolving
         # it through the scope tree. A checker that knew only the first reported 59 unprotected
         # tables that were protected — which is the same false negative in the other direction.
-        for m in re.finditer(r"apply_(?:scope|venue)_rls\('([\w.\"]+)'", text):
+        # **And a third, since 28 September** (audit R183): `apply_shared_scope_rls` protects a row
+        # owned at its `scope_path` and shared with a second path -- a stock transfer, readable at
+        # the destination. It is still a `scope_path` policy; the checker that knew only two
+        # families called the table unprotected when derive-ddl had protected it more carefully.
+        for m in re.finditer(r"apply_(?:scope|venue|shared_scope)_rls\('([\w.\"]+)'", text):
             RLS_APPLIED.add(m.group(1))
             RLS_APPLIED.add(m.group(1).replace('"', ""))
         for m in re.finditer(r"ALTER TABLE ([\w.]+) ENABLE ROW LEVEL SECURITY", text):

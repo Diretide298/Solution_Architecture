@@ -117,6 +117,18 @@ roles:
           a permission and a reason code, not a button.
       - key: txn.view.outlet
         label: View outlet transactions
+      - key: procurement.view
+        label: See requisitions, suppliers, purchase orders and receipts
+        permission: PROCUREMENT_VIEW
+        note: Proposed, client to correct (decided 28 September, audit R091).
+      - key: procurement.request
+        label: Raise, amend and cancel a requisition
+        permission: PROCUREMENT_REQUEST
+        note: Proposed, client to correct (decided 28 September, audit R091).
+      - key: procurement.receive
+        label: Record and reject received goods
+        permission: PROCUREMENT_RECEIVE
+        note: Proposed, client to correct (decided 28 September, audit R091). The person at the dock receives; they do not raise the order.
 
   dutyManager:
     label: Duty Manager
@@ -136,6 +148,18 @@ roles:
         label: Manual adjustment
       - key: inventory.conflict.resolve
         label: Resolve an inventory conflict raised on sync
+      - key: product.publish
+        label: Make an approved product live
+        permission: PRODUCT_PUBLISH
+        note: Proposed, client to correct (decided 28 September, audit R091). An operator publishes; approving is the Venue Manager's.
+      - key: announcement.emergency
+        label: Declare an emergency announcement or evacuation broadcast
+        permission: ANNOUNCEMENT_EMERGENCY
+        note: Proposed, client to correct (decided 28 September, audit R091). The person on shift must be able to declare it without waiting for anyone.
+      - key: tenant.view
+        label: Read venue settings
+        permission: TENANT_VIEW
+        note: Proposed, client to correct (decided 28 September, audit R091).
 
   venueManager:
     label: Venue Manager
@@ -149,6 +173,17 @@ roles:
         label: Pricing override
       - key: staff.manage
         label: Manage staff
+      - key: procurement.manage
+        label: Suppliers and quotations; raise, send, cancel and short-close a purchase order
+        permission: PROCUREMENT_MANAGE
+        note: Proposed, client to correct (decided 28 September, audit R091).
+      - key: product.approve
+        label: Approve a product in review
+        permission: PRODUCT_APPROVE
+        note: >
+          Proposed, client to correct (decided 28 September, audit R091). **Roles are cumulative, so a Venue Manager also holds `product.publish`.** That one
+          person does not both approve and publish the same product is a segregation rule
+          (`setSegregationRules`, PRODUCT_APPROVE with PRODUCT_PUBLISH), not a role split.
 
   sysAdmin:
     label: System Administrator

@@ -7,7 +7,7 @@
 | Tier | engagement: Guests and intelligence. Nothing that takes money depends on these. |
 | Contracts | `marketing-crm` |
 | Schemas owned | `marketing` |
-| Operations in the slice | 43 of 213 |
+| Operations in the slice | 40 of 213 |
 | Scale | Bursty on send, read-heavy otherwise. The one to watch for a split. |
 | If it is down | Down stops campaigns and guest lookup. Neither stops trading. |
 
@@ -24,7 +24,7 @@
 | [AccessService](AccessService.md) | `access.blacklist`, `access.entitlement` |
 | [CatalogueService](CatalogueService.md) | `catalogue.event`, `catalogue.product`, `promotions.promotion` |
 | [IdentityService](IdentityService.md) | `identity.principal`, `pii.subject`, `pii.subject_contact` |
-| [OrderService](OrderService.md) | `orders.cart`, `orders.invitation` |
+| [OrderService](OrderService.md) | `orders.invitation` |
 | [PlatformService](PlatformService.md) | `control.seo_metadata` |
 
 ## Operations in the first release
@@ -33,22 +33,19 @@
 |---|---|---|---|---|---|---|
 | case | [`createCase`](#createcase) | POST | `/cases` | core | 1 | BO-806, EMP-028, EMP-029, GST-068, PTR-021, SUP-002 … |
 | case | [`listCases`](#listcases) | GET | `/cases` | core | 1 | BO-804, BO-805, BO-813, EMP-028, EMP-029, GST-068 … |
-| consent | [`getGuestConsents`](#getguestconsents) | GET | `/guests/{subjectId}/consents` | core | 2 | BO-036, BO-749, GST-066, WEB-024 |
+| consent | [`getGuestConsents`](#getguestconsents) | GET | `/guests/{subjectId}/consents` | core | 2 | BO-749, GST-066, WEB-024 |
 | consent | [`listConsentPurposes`](#listconsentpurposes) | GET | `/consent-purposes` | core | 1 | BO-747, CMS-018, GST-065, WEB-011, WEB-020 |
 | consent | [`recordConsent`](#recordconsent) | POST | `/guests/{subjectId}/consents` | core | 1 | BO-748, GST-039, GST-065, WEB-011, WEB-017, WEB-020 … |
 | consent | [`setConsentPurposes`](#setconsentpurposes) | PUT | `/consent-purposes` | core | 2 | BO-747, CMS-018, CMS-023 |
 | feedback | [`submitReview`](#submitreview) | POST | `/reviews` | core | 3 | GST-035, WEB-026 |
 | guest | [`addToWishlist`](#addtowishlist) | POST | `/guests/{subjectId}/wishlist` | core | 1 | GST-020, WEB-009, WEB-011, WEB-017, WEB-024, WEB-027 |
-| guest | [`getGuestProfile`](#getguestprofile) | GET | `/guests/{subjectId}` | core | 1 | ADM-680, BO-036, BO-735, BO-738, BO-740, EMP-057 … |
-| guest | [`getWishlist`](#getwishlist) | GET | `/guests/{subjectId}/wishlist` | core | 1 | BO-036, GST-020, WEB-009, WEB-011, WEB-017, WEB-024 … |
-| guest | [`listGuestDevices`](#listguestdevices) | GET | `/guests/{subjectId}/devices` | core | 1 | BO-036, GST-073, WEB-011, WEB-017, WEB-024, WEB-027 |
+| guest | [`getGuestProfile`](#getguestprofile) | GET | `/guests/{subjectId}` | core | 1 | ADM-680, BO-735, BO-738, BO-740, EMP-057, GST-001 … |
+| guest | [`getWishlist`](#getwishlist) | GET | `/guests/{subjectId}/wishlist` | core | 1 | GST-020, WEB-009, WEB-011, WEB-017, WEB-024, WEB-027 |
+| guest | [`listGuestDevices`](#listguestdevices) | GET | `/guests/{subjectId}/devices` | core | 1 | GST-073, WEB-011, WEB-017, WEB-024, WEB-027 |
 | guest | [`registerGuestDevice`](#registerguestdevice) | POST | `/guests/{subjectId}/devices` | core | 1 | GST-073, WEB-011, WEB-017, WEB-024, WEB-027 |
 | guest | [`removeFromWishlist`](#removefromwishlist) | DELETE | `/guests/{subjectId}/wishlist/{itemId}` | core | 1 | GST-020, WEB-009, WEB-011, WEB-017, WEB-024, WEB-027 |
 | guest | [`revokeGuestDevice`](#revokeguestdevice) | DELETE | `/guests/{subjectId}/devices/{deviceId}` | core | 1 | GST-073, WEB-011, WEB-017, WEB-024, WEB-027 |
-| guest | [`searchGuests`](#searchguests) | GET | `/guests` | core | 1 | BO-036, BO-734, BO-735, POS-027 |
-| guests | [`checkGuestCheckoutMatch`](#checkguestcheckoutmatch) | POST | `/guest-checkout/profile-match` | core | 1 | GST-009, WEB-012 |
-| guests | [`decideGuestCheckoutMatch`](#decideguestcheckoutmatch) | POST | `/guest-checkout/profile-match/decision` | core | 1 | GST-009, WEB-012 |
-| guests | [`setGuestMatchPolicy`](#setguestmatchpolicy) | PUT | `/guest-match-policy` | setup | 1 | BO-746 |
+| guest | [`searchGuests`](#searchguests) | GET | `/guests` | core | 1 | BO-734, BO-735, POS-027 |
 | loyalty | [`createLoyaltyProgramme`](#createloyaltyprogramme) | POST | `/loyalty/programmes` | setup | 1 | BO-827, BO-828 |
 | loyalty | [`listLoyaltyProgrammes`](#listloyaltyprogrammes) | GET | `/loyalty/programmes` | core | 2 | BO-833, GST-036, WEB-043 |
 | loyalty | [`setLoyaltyRules`](#setloyaltyrules) | PUT | `/loyalty/programmes/{programmeId}/rules` | setup | 1 |  |
@@ -125,7 +122,7 @@ Staff, partner or guest raise it; `channel` records how the guest reached the ve
 | Field | Type | Required | Notes |
 |---|---|---|---|
 | id | string | yes | Created on the device (CreateCaseRequest.id, raiseMyCase), so a ULID. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
-| caseNumber | string | yes | (read-only) |
+| caseNumber | string | yes | Server-assigned: the venue prefix plus a sequence per venue (decided 28 September, audit R152). (read-only) |
 | subjectId | string (uuid) |  | (nullable) |
 | guestName | string |  | Resolved from pii.subject when the case is read, never stored on the case. (read-only; nullable) |
 | subject | string | yes | The case's one-line title, not a person. |
@@ -186,7 +183,7 @@ Staff, partner or guest raise it; `channel` records how the guest reached the ve
 |---|---|---|---|
 | items | array of Case | yes |  |
 | items[].id | string | yes | Created on the device (CreateCaseRequest.id, raiseMyCase), so a ULID. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
-| items[].caseNumber | string | yes | (read-only) |
+| items[].caseNumber | string | yes | Server-assigned: the venue prefix plus a sequence per venue (decided 28 September, audit R152). (read-only) |
 | items[].subjectId | string (uuid) |  | (nullable) |
 | items[].guestName | string |  | Resolved from pii.subject when the case is read, never stored on the case. (read-only; nullable) |
 | items[].subject | string | yes | The case's one-line title, not a person. |
@@ -235,7 +232,7 @@ Current position per purpose and channel, with the version of the notice consent
 | Read routing | primary |
 | Reads | `marketing.consent_purpose`, `marketing.consent_record`, `pii.subject` |
 | Writes | - |
-| Called by | BO-036, BO-749, GST-066, WEB-024 |
+| Called by | BO-749, GST-066, WEB-024 |
 
 **Parameters**
 
@@ -483,7 +480,8 @@ Guest-facing. A low rating may open a service case automatically where the venue
 
 **`POST /guests/{subjectId}/wishlist`**: Save an item
 
-Idempotent on the variant — saving twice is one entry, not two. The count matters to the guest and to demand signals, so a double tap must not inflate it.
+Idempotent on the variant and performance — saving twice is one entry, not two. The count matters to the guest and to demand signals, so a double tap must not inflate it.
+**The same product for two different performances is two entries (decided 28 September, audit R149).** The entry key is `variantId` plus `performanceId`; a save with no `performanceId` is a third, date-less entry for the product generally.
 
 |  |  |
 |---|---|
@@ -558,7 +556,7 @@ The single-guest view a service agent works from — profile, consent state, rec
 | Read routing | replica |
 | Reads | `marketing.consent_record`, `marketing.guest_profile`, `marketing.loyalty_position`, `pii.subject`, `pii.subject_contact` |
 | Writes | - |
-| Called by | ADM-680, BO-036, BO-735, BO-738, BO-740, EMP-057, GST-001, WEB-011, WEB-020 |
+| Called by | ADM-680, BO-735, BO-738, BO-740, EMP-057, GST-001, WEB-011, WEB-020 |
 
 **Parameters**
 
@@ -642,7 +640,7 @@ Items whose product has been withdrawn are returned with `isAvailable: false` ra
 | Read routing | replica |
 | Reads | `marketing.wishlist_item` |
 | Writes | - |
-| Called by | BO-036, GST-020, WEB-009, WEB-011, WEB-017, WEB-024, WEB-027 |
+| Called by | GST-020, WEB-009, WEB-011, WEB-017, WEB-024, WEB-027 |
 
 **Parameters**
 
@@ -696,7 +694,7 @@ Here rather than in tenancy. `platform.device` is staff hardware bound to a work
 | Read routing | replica |
 | Reads | `marketing.guest_device` |
 | Writes | - |
-| Called by | BO-036, GST-073, WEB-011, WEB-017, WEB-024, WEB-027 |
+| Called by | GST-073, WEB-011, WEB-017, WEB-024, WEB-027 |
 
 **Parameters**
 
@@ -882,7 +880,7 @@ Returns profiles the caller's scope permits. Personal fields are returned only t
 | Read routing | replica |
 | Reads | `marketing.guest_profile` |
 | Writes | - |
-| Called by | BO-036, BO-734, BO-735, POS-027 |
+| Called by | BO-734, BO-735, POS-027 |
 
 **Parameters**
 
@@ -930,162 +928,6 @@ Returns profiles the caller's scope permits. Personal fields are returned only t
 | 403 |  | Not permitted at the requested scope, or search passed without GUEST_VIEW_PII. |
 
 
-## Group: guests
-
-### checkGuestCheckoutMatch
-
-**`POST /guest-checkout/profile-match`**: Does this contact already have a profile here
-
-Called at the payment step of a guest checkout, **after the contact has been proven with a one-time code** (ADR-0045); an unproven contact is refused, because answering would tell anyone who types an email whether that person has been to the venue. Uses the venue's `GuestMatchPolicy`. Returns what the design shows: what it matched on, how many past orders, and the profile type, never the other profile's details.
-
-|  |  |
-|---|---|
-| Permission | `None` |
-| Scope level | venue |
-| Part of slice | core |
-| Wave | 1 |
-| Offline | no |
-| Conflict policy | serverWins |
-| Reads | `marketing.guest_match_policy`, `marketing.guest_profile`, `orders.cart` |
-| Writes | - |
-| Called by | GST-009, WEB-012 |
-
-**Parameters**
-
-| Name | In | Required | Type | Notes |
-|---|---|---|---|---|
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
-
-**Request body**: `GuestCheckoutMatchRequest`
-
-| Field | Type | Required | Notes |
-|---|---|---|---|
-| cartId | string | yes |  |
-| email | string (email) |  | (nullable) |
-| mobile | string |  | (nullable) |
-
-**Response**: `GuestCheckoutMatch`
-
-| Field | Type | Required | Notes |
-|---|---|---|---|
-| matched | boolean | yes |  |
-| matchedOn | enum (email, mobile) |  | (nullable) |
-| pastOrderCount | integer |  | (nullable) |
-| firstOrderAt | string (date-time) |  | (nullable) |
-| profileType | enum (guestNoLogin, account) |  | (nullable) |
-| matchToken | string |  | Opaque, short-lived. (nullable) |
-
-**Responses**
-
-| Code | Shape | Meaning |
-|---|---|---|
-| 200 |  | Whether a profile exists |
-| 403 |  | The contact has not been proven with a one-time code. |
-
-### decideGuestCheckoutMatch
-
-**`POST /guest-checkout/profile-match/decision`**: Use the existing profile or keep this booking separate
-
-`useExisting` puts this booking under the matched customer record, so past orders and this one sit together. `keepSeparate` creates a new guest profile; staff can merge it later. **The decision is recorded either way**, so a merge done later can see that the guest once said no.
-
-|  |  |
-|---|---|
-| Permission | `None` |
-| Scope level | venue |
-| Part of slice | core |
-| Wave | 1 |
-| Offline | no |
-| Conflict policy | serverWins |
-| Reads | `cache:idempotency`, `marketing.guest_match_decision`, `marketing.guest_profile`, `orders.cart` |
-| Writes | `cache:idempotency`, `marketing.guest_match_decision`, `orders.cart` |
-| Called by | GST-009, WEB-012 |
-
-**Parameters**
-
-| Name | In | Required | Type | Notes |
-|---|---|---|---|---|
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
-
-**Request body**: `GuestMatchDecisionRequest`
-
-| Field | Type | Required | Notes |
-|---|---|---|---|
-| matchToken | string | yes |  |
-| decision | enum (useExisting, keepSeparate) | yes |  |
-
-**Response**: `GuestMatchDecision`
-
-| Field | Type | Required | Notes |
-|---|---|---|---|
-| id | string (uuid) |  | (read-only) |
-| cartId | string |  |  |
-| matchedProfileId | string (uuid) |  | (read-only) |
-| matchedOn | enum (email, mobile) |  |  |
-| decision | enum (useExisting, keepSeparate) | yes |  |
-| decidedAt | string (date-time) |  | (read-only) |
-| scopePath | string |  | The partition key (ADR-0005). (read-only) |
-
-**Responses**
-
-| Code | Shape | Meaning |
-|---|---|---|
-| 200 |  | Recorded |
-| 409 |  | The match has expired or was already decided. |
-
-### setGuestMatchPolicy
-
-**`PUT /guest-match-policy`**: Set how returning guests are recognised
-
-**Design gap, 23 September.** The booking design matches a guest checking out without an account to an existing profile, by email, mobile or either, and asks them whether it is them. `matchGuest` existed for staff and nothing decided the key or offered the guest the choice.
-
-**The guest decides, never the system.** A match is an offer, because two people share a family email far more often than one person uses two. Declined matches stay separate and staff can merge them later (`mergeGuests`).
-
-|  |  |
-|---|---|
-| Permission | `MARKETING_MANAGE` |
-| Scope level | venue |
-| Part of slice | setup, makes `marketing.guest_match_policy` non-empty |
-| Wave | 1 |
-| Offline | no |
-| Config scope | venue |
-| Conflict policy | serverWins |
-| Reads | `marketing.guest_match_policy` |
-| Writes | `marketing.guest_match_policy` |
-| Called by | BO-746 |
-
-**Parameters**
-
-| Name | In | Required | Type | Notes |
-|---|---|---|---|---|
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
-
-**Request body**: `GuestMatchPolicy`
-
-| Field | Type | Required | Notes |
-|---|---|---|---|
-| id | string (uuid) |  | (read-only) |
-| matchBy | enum (email, mobile, emailOrMobile) | yes | The key a returning guest is matched on. (default email) |
-| offerAtCheckout | boolean |  | Whether the guest is offered the match at the payment step. (default True) |
-| scopePath | string |  | The partition key (ADR-0005). (read-only) |
-
-**Response**: `GuestMatchPolicy`
-
-| Field | Type | Required | Notes |
-|---|---|---|---|
-| id | string (uuid) |  | (read-only) |
-| matchBy | enum (email, mobile, emailOrMobile) | yes | The key a returning guest is matched on. (default email) |
-| offerAtCheckout | boolean |  | Whether the guest is offered the match at the payment step. (default True) |
-| scopePath | string |  | The partition key (ADR-0005). (read-only) |
-
-**Responses**
-
-| Code | Shape | Meaning |
-|---|---|---|
-| 200 |  | Saved |
-| 400 | BadRequest | Validation failed |
-| 403 | Forbidden | Authenticated but not permitted at the requested scope |
-
-
 ## Group: loyalty
 
 ### createLoyaltyProgramme
@@ -1130,7 +972,7 @@ Earn rules and tiers. **What points redeem for is the rewards catalogue** (`setR
 | tiers[].earnMultiplier | number |  | Applied to every earn rule while the guest holds this tier. (nullable) |
 | tiers[].isActive | boolean |  | (default True) |
 | id | string (uuid) | yes | (read-only) |
-| code | string | yes |  |
+| code | string | yes | Unique per tenant (decided 28 September, audit R108). |
 | name | string | yes |  |
 | venueId | string (uuid) |  | (nullable) |
 | pointsLiabilityAccountId | string (uuid) |  | Points post here on accrual. |
@@ -1159,7 +1001,7 @@ Earn rules and tiers. **What points redeem for is the rewards catalogue** (`setR
 | tiers[].earnMultiplier | number |  | Applied to every earn rule while the guest holds this tier. (nullable) |
 | tiers[].isActive | boolean |  | (default True) |
 | id | string (uuid) | yes | (read-only) |
-| code | string | yes |  |
+| code | string | yes | Unique per tenant (decided 28 September, audit R108). |
 | name | string | yes |  |
 | venueId | string (uuid) |  | (nullable) |
 | pointsLiabilityAccountId | string (uuid) |  | Points post here on accrual. |
@@ -1176,6 +1018,7 @@ Earn rules and tiers. **What points redeem for is the rewards catalogue** (`setR
 | Code | Shape | Meaning |
 |---|---|---|
 | 201 |  | Created |
+| 409 | DuplicateCode | A business code the request names is already used within its uniqueness scope (the scope the property's x-ticvai-unique names; decided 28 September, audit R108). |
 
 ### listLoyaltyProgrammes
 
@@ -1219,7 +1062,7 @@ Earn rules and tiers. **What points redeem for is the rewards catalogue** (`setR
 | items[].tiers[].earnMultiplier | number |  | Applied to every earn rule while the guest holds this tier. (nullable) |
 | items[].tiers[].isActive | boolean |  | (default True) |
 | items[].id | string (uuid) | yes | (read-only) |
-| items[].code | string | yes |  |
+| items[].code | string | yes | Unique per tenant (decided 28 September, audit R108). |
 | items[].name | string | yes |  |
 | items[].venueId | string (uuid) |  | (nullable) |
 | items[].pointsLiabilityAccountId | string (uuid) |  | Points post here on accrual. |
@@ -1391,7 +1234,7 @@ Earn rules and tiers. **What points redeem for is the rewards catalogue** (`setR
 |---|---|---|---|
 | id | string (uuid) | yes | (read-only) |
 | name | string | yes |  |
-| kind | enum (visit, spend, ride, collection, streak, referral, survey, social, …) | yes |  |
+| kind | enum (visit, spend, ride, collection, streak, referral, survey, social, …) | yes | What an entrant does to progress. |
 | scope | enum (individual, family, group, team) |  | 22.6.7 and 22.6.8. (default individual) |
 | goal | object | yes | What completes it. |
 | goal.metric | string |  |  |
@@ -1416,7 +1259,7 @@ Earn rules and tiers. **What points redeem for is the rewards catalogue** (`setR
 |---|---|---|---|
 | id | string (uuid) | yes | (read-only) |
 | name | string | yes |  |
-| kind | enum (visit, spend, ride, collection, streak, referral, survey, social, …) | yes |  |
+| kind | enum (visit, spend, ride, collection, streak, referral, survey, social, …) | yes | What an entrant does to progress. |
 | scope | enum (individual, family, group, team) |  | 22.6.7 and 22.6.8. (default individual) |
 | goal | object | yes | What completes it. |
 | goal.metric | string |  |  |
@@ -1811,6 +1654,7 @@ Returns the points, the tier, and **how far from the next one** — the last is 
 **The whole thread goes with it, and the guest does not repeat themselves.** A handover that loses context is worse than no assistant at all, because the guest has already spent the effort once.
 Triggered by the guest asking, by the assistant refusing or failing, by sentiment (22.8.16), or by a capability outside `guestCapabilityScope` — **an assistant bounded to ticket selection and checkout will meet questions it may not answer, and this is where those go.**
 **Where no agent is available it says so** and offers a case instead. Queuing a guest for a person who is not there is the failure this operation exists to avoid.
+**The position and wait estimate come from the live agent queue (decided 28 September, audit R149)**: `queuePosition` is the conversation's place among the unclaimed conversations in its queue, and `estimatedWaitSeconds` is computed on read from that queue's agents online now, not from a stored figure or a daily average.
 
 |  |  |
 |---|---|
@@ -1858,8 +1702,8 @@ Triggered by the guest asking, by the assistant refusing or failing, by sentimen
 | venueId | string (uuid) |  | (nullable) |
 | assignedPrincipalId | string (uuid) |  | (nullable) |
 | queueId | string (uuid) |  | (nullable) |
-| queuePosition | integer |  | (read-only; nullable) |
-| estimatedWaitSeconds | integer |  | (read-only; nullable) |
+| queuePosition | integer |  | Place among the unclaimed conversations in queueId, from the live agent queue (audit R149). (read-only; nullable) |
+| estimatedWaitSeconds | integer |  | From the live agent queue — the conversations ahead divided across that queue's agents online now (audit R149). (read-only; nullable) |
 | handoverReason | enum (guestRequested, assistantRefused, assistantFailed, outOfScope, negativeSentiment, complexIntent, paymentIssue) |  | (nullable) |
 | handoverSummary | string |  | The assistant's own account of what the guest wants, so an agent opens with context rather than reading a transcript while somebody waits. (nullable) |
 | sentiment | enum (positive, neutral, negative, escalating) |  | 22.8.16. (nullable) |
@@ -1991,7 +1835,7 @@ Found writing F54: `GST-034 Lost & Found` declared exactly one operation and it 
 |---|---|---|---|
 | items | array of Case | yes |  |
 | items[].id | string | yes | Created on the device (CreateCaseRequest.id, raiseMyCase), so a ULID. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
-| items[].caseNumber | string | yes | (read-only) |
+| items[].caseNumber | string | yes | Server-assigned: the venue prefix plus a sequence per venue (decided 28 September, audit R152). (read-only) |
 | items[].subjectId | string (uuid) |  | (nullable) |
 | items[].guestName | string |  | Resolved from pii.subject when the case is read, never stored on the case. (read-only; nullable) |
 | items[].subject | string | yes | The case's one-line title, not a person. |
@@ -2025,7 +1869,7 @@ Found writing F54: `GST-034 Lost & Found` declared exactly one operation and it 
 **`POST /my/cases`**: Report something — lost property, a complaint, a question
 
 **Lost and found, a complaint and a query are one object.** That is what lets a single queue serve all three, and it is why `GST-034` and `GST-040` are the same mechanism at two entry points.
-**Works offline and queues.** A guest with a problem and no signal still has a problem.
+**Needs the connection (decided 28 September, audit R148).** Raising a case is not queued offline, as flow F54 and the screens GST-034, GST-068, WEB-025 and WEB-034 say: a case sent hours later is a promise of help nobody could give at the time. Offline, the screen shows how to reach staff in person instead of a form. The id is still minted on the device, so a retry after a dropped connection is the same case, not a second one.
 
 |  |  |
 |---|---|
@@ -2033,7 +1877,7 @@ Found writing F54: `GST-034 Lost & Found` declared exactly one operation and it 
 | Scope level | tenant |
 | Part of slice | core |
 | Wave | 2 |
-| Offline | yes |
+| Offline | no |
 | Conflict policy | append |
 | Guest callable | True |
 | Reads | `cache:idempotency`, `marketing.case` |
@@ -2051,11 +1895,11 @@ Found writing F54: `GST-034 Lost & Found` declared exactly one operation and it 
 
 | Field | Type | Required | Notes |
 |---|---|---|---|
-| id | string | yes | Created on the device, because the case exists from the moment the guest raises it offline. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
+| id | string | yes | Created on the device, so a retry after a dropped connection carries the same id and is the same case. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
 | kind | CaseKind: enum (lostProperty, complaint, question, accessibility, refundRequest, other) | yes | What the guest says the case is about, in their words rather than the venue's taxonomy — raiseMyCase asks for it and categoryId is what staff file it under. |
 | summary | string | yes | Lands in Case.subject — the case's one-line title. (max length 200) |
 | recordedAt | string (date-time) | yes | Device time when the guest raised it. |
-| detail | string |  | (nullable) |
+| detail | string |  | Required, and not empty, when kind is other (decided 28 September, audit R222); a 400 otherwise. (nullable) |
 | venueId | string (uuid) |  | (nullable) |
 | orderRef | string |  | (nullable) |
 
@@ -2064,7 +1908,7 @@ Found writing F54: `GST-034 Lost & Found` declared exactly one operation and it 
 | Field | Type | Required | Notes |
 |---|---|---|---|
 | id | string | yes | Created on the device (CreateCaseRequest.id, raiseMyCase), so a ULID. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
-| caseNumber | string | yes | (read-only) |
+| caseNumber | string | yes | Server-assigned: the venue prefix plus a sequence per venue (decided 28 September, audit R152). (read-only) |
 | subjectId | string (uuid) |  | (nullable) |
 | guestName | string |  | Resolved from pii.subject when the case is read, never stored on the case. (read-only; nullable) |
 | subject | string | yes | The case's one-line title, not a person. |
@@ -2090,6 +1934,7 @@ Found writing F54: `GST-034 Lost & Found` declared exactly one operation and it 
 | Code | Shape | Meaning |
 |---|---|---|
 | 201 |  | Raised |
+| 400 |  | kind is other and detail is missing or empty (audit R222), or another field breaks the schema |
 
 ### redeemLoyaltyPoints
 
@@ -2190,7 +2035,7 @@ The reply is written as a `CaseMessage` with `authorKind: guest` and `isInternal
 | Field | Type | Required | Notes |
 |---|---|---|---|
 | id | string | yes | Created on the device (CreateCaseRequest.id, raiseMyCase), so a ULID. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
-| caseNumber | string | yes | (read-only) |
+| caseNumber | string | yes | Server-assigned: the venue prefix plus a sequence per venue (decided 28 September, audit R152). (read-only) |
 | subjectId | string (uuid) |  | (nullable) |
 | guestName | string |  | Resolved from pii.subject when the case is read, never stored on the case. (read-only; nullable) |
 | subject | string | yes | The case's one-line title, not a person. |
@@ -2658,7 +2503,7 @@ CF-96 fixed this class for 28 guest screens and the underlying pattern was never
 **`POST /guest-documents`**: Store a guest photo, ID or signed document
 
 BL-133. **Deliberately not `assets`.** A guest's passport scan is not a marketing asset — it has a different retention clock, a different access rule and a different reason to exist, and **one careless query against a shared store returns both.**
-`retainUntil` is required. **A guest document with no deletion date is a guest document kept forever.**
+`retainUntil` is required. **A guest document with no deletion date is a guest document kept forever.** It is the end of the document's purpose plus the retention period client counsel sets, which is still open (audit R149).
 
 |  |  |
 |---|---|
@@ -2734,7 +2579,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 | Column | Type | Required | Notes |
 |---|---|---|---|
 | id | text | yes | Created on the device (CreateCaseRequest.id, raiseMyCase), so a ULID. |
-| case_number | text | yes |  |
+| case_number | text | yes | Server-assigned: the venue prefix plus a sequence per venue (decided 28 September, audit R152). |
 | subject_id | uuid | no |  |
 | title | text | yes | The case's one-line title, not a person. |
 | kind | text | no | What the guest said it was about, where the guest raised it. |
@@ -2777,7 +2622,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 |---|---|---|---|
 | id | uuid | yes |  |
 | name | text | yes |  |
-| kind | text | yes |  |
+| kind | text | yes | What an entrant does to progress. |
 | scope | text | no | 22.6.7 and 22.6.8. |
 | goal | jsonb | yes | What completes it. |
 | event_id | uuid | no |  |
@@ -2852,8 +2697,8 @@ Every table this service owns that the slice reads or writes, with its columns a
 | venue_id | uuid | no |  |
 | assigned_principal_id | uuid | no |  |
 | queue_id | uuid | no |  |
-| queue_position | integer | no |  |
-| estimated_wait_seconds | integer | no |  |
+| queue_position | integer | no | Place among the unclaimed conversations in queueId, from the live agent queue (audit R149). |
+| estimated_wait_seconds | integer | no | From the live agent queue — the conversations ahead divided across that queue's agents online now (audit R149). |
 | handover_reason | text | no |  |
 | handover_summary | text | no | The assistant's own account of what the guest wants, so an agent opens with context rather than reading a transcript while somebody waits. |
 | sentiment | text | no | 22.8.16. |
@@ -2973,27 +2818,6 @@ Every table this service owns that the slice reads or writes, with its columns a
 | uploaded_at | timestamptz | no |  |
 | uploaded_by_principal_id | uuid | no |  |
 
-### `marketing.guest_match_decision`
-
-| Column | Type | Required | Notes |
-|---|---|---|---|
-| id | uuid | no |  |
-| cart_id | text | no |  |
-| matched_profile_id | uuid | no |  |
-| matched_on | text | no |  |
-| decision | text | yes |  |
-| decided_at | timestamptz | no |  |
-| scope_path | text | no | The partition key (ADR-0005). |
-
-### `marketing.guest_match_policy`
-
-| Column | Type | Required | Notes |
-|---|---|---|---|
-| id | uuid | no |  |
-| match_by | text | yes | The key a returning guest is matched on. |
-| offer_at_checkout | boolean | no | Whether the guest is offered the match at the payment step. |
-| scope_path | text | no | The partition key (ADR-0005). |
-
 ### `marketing.guest_preference`
 
 | Column | Type | Required | Notes |
@@ -3090,7 +2914,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 | Column | Type | Required | Notes |
 |---|---|---|---|
 | id | uuid | yes |  |
-| code | text | yes |  |
+| code | text | yes | Unique per tenant (decided 28 September, audit R108). |
 | name | text | yes |  |
 | venue_id | uuid | no |  |
 | points_liability_account_id | uuid | no | Points post here on accrual. |
@@ -3221,7 +3045,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 
 ## Not in the first release
 
-170 operations, added to this service in later releases without changing any of the above.
+173 operations, added to this service in later releases without changing any of the above.
 
 | Group | Operations |
 |---|---|
@@ -3231,7 +3055,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 | drafted | `approvePrivacyTesting`, `approveWaiverTesting`, `createCaseClassificationIntelligent`, `listAgentWorkloadAvailability`, `listBusinessEventNotification`, `listCaseResolutionClosure`, `listCommunicationService`, `listComplianceEvidenceWaiver`, `listConsentEvidenceWithdrawal`, `listConsentPreferenceCommunication`, `listContact`, `listContactAutomation`, `listCookieBannerPreference`, `listCookieTrackingDigital`, `listCustomerPrivacyConsent`, `listCustomerSatisfactionFeedback`, `listCustomerService`, `listCustomerServiceProfile`, `listDataProcessingPurpose`, `listDataRetentionExpiry`, `listDataSubjectCustomer`, `listDeletionAnonymizationRestriction`, `listDeliveryCommunicationPlatform`, `listDeliveryQueueFailure`, `listDigitalSigningCollection`, `listDynamicFieldQuestion`, `listEscalationCollaborationInternal`, `listEscalationCriticalCase`, `listMinorGuardianGroup`, `listMissingExpiredInvalid`, `listParticipantWaiverStatus`, `listPrivacy`, `listPrivacyCompliance`, `listPrivacyConsent`, `listPrivacyEvidenceCompliance`, `listPrivacyNoticePolicy`, `listProductEventExperience`, `listProviderHealthUsage`, `listQualityAgentEvaluation`, `listRoutingPriorityThrottling`, `listServiceRootCause`, `listSiteWaiverException`, `listSlaPolicyService`, `listSystemTransactionalTemplate`, `listUnifiedInteractionCommunication`, `listVersioningEffectiveDate`, `listWaiver`, `listWaiverComplianceOperational`, `listWaiverComplianceRisk`, `listWaiverConsent`, `listWaiverTemplateMaster`, `listWaiverTriggerEligibility`, `setCaseInvestigationResolution`, `setChannelProvider`, `setCommunicationPreferenceMarketing`, `setConsentCapturePoint`, `setCustomerServiceCopilot`, `setDataDiscoveryAccess`, `setDigitalWaiverForm`, `setIntelligentRoutingSkill`, `setLocalizationBrandingCustomer`, `setMinorGuardianAge`, `setOrderBookingTicket`, `setPrivacyComplianceException`, `setRefundCompensationService`, `setSenderIdentityDomain`, `setSignatorySignatureGuardian`, `setWaiverVerificationValidation` |
 | feedback | `listReviews`, `respondToReview` |
 | guest | `mergeGuestProfiles`, `updateGuestProfile` |
-| guests | `activateAudience`, `decideDuplicateCandidate`, `getAudienceOverlap`, `getGuestAttributeModel`, `getGuestIntelligence`, `getGuestMatchPolicy`, `getGuestRelationships`, `getGuestTimeline`, `getIdentityResolutionRules`, `importAudienceList`, `listAudienceActivations`, `listAudienceLists`, `listDuplicateCandidates`, `runDataRetention`, `setDataRetentionPolicy`, `setGuestAttributeModel`, `setGuestRelationships`, `setIdentityResolutionRules` |
+| guests | `activateAudience`, `checkGuestCheckoutMatch`, `decideDuplicateCandidate`, `decideGuestCheckoutMatch`, `getAudienceOverlap`, `getGuestAttributeModel`, `getGuestIntelligence`, `getGuestMatchPolicy`, `getGuestRelationships`, `getGuestTimeline`, `getIdentityResolutionRules`, `importAudienceList`, `listAudienceActivations`, `listAudienceLists`, `listDuplicateCandidates`, `runDataRetention`, `setDataRetentionPolicy`, `setGuestAttributeModel`, `setGuestMatchPolicy`, `setGuestRelationships`, `setIdentityResolutionRules` |
 | loyalty | `adjustLoyaltyPoints`, `awardBadge`, `getGuestLoyalty`, `getLoyaltyRules`, `issueReward`, `listBadges`, `listCustomerBadges`, `listLeaderboard`, `listLoyaltyCampaigns`, `listLoyaltyPointEntries`, `listRewardAssignments`, `listRewards`, `setBadge`, `setLeaderboardNickname`, `setLoyaltyCampaign`, `setReward` |
 | marketing | `accrueLoyaltyPoints`, `activateJourney`, `addGuestNote`, `claimConversation`, `closeConversation`, `createJourney`, `createUrlRedirect`, `endKioskAssist`, `getConversation`, `getForm`, `getGuestExtraValues`, `getJourneyPerformance`, `getLostItemMatches`, `getMyProfile`, `getSeoMetadata`, `listConversations`, `listForms`, `listGuestExtraFields`, `listJourneys`, `listLostItems`, `listMessageTriggers`, `listSlaPolicies`, `listWaiverSignatures`, `matchGuest`, `matchLostItem`, `mergeGuests`, `recordLostItem`, `recordPrivacyIncident`, `recordTouchPoint`, `retryMessageDispatch`, `setCallDisposition`, `setGuestExtraFields`, `setGuestExtraValues`, `setMessageTrigger`, `setSlaPolicy`, `startKioskAssist`, `submitForm`, `transferConversation` |
 | message | `createMessageTemplate`, `getMessageStatus`, `listMessageTemplates`, `sendTransactionalMessage` |

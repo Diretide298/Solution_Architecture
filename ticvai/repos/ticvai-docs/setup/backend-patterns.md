@@ -110,6 +110,7 @@ public sealed class RefundAuthoriser(
 
 | Rule | Detail |
 |---|---|
+| Provider: `azurerm`, Azure in a UAE region | Decided 28 September, audit R057. The region per cell is a tfvar |
 | Modules parameterised, never copy-pasted per cell | One `cell` module, N tfvars |
 | `prevent_destroy` on databases and key vaults | — |
 | No inline secrets | Key vault references |

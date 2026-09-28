@@ -63,7 +63,7 @@ operationsByContract:
     scope: region
     permission: LEDGER_APPROVE
     offline: false
-    reads: 2
+    reads: 3
     writes: 3
   - operation: createAccount
     verb: POST
@@ -584,7 +584,7 @@ tables:
   writtenBy: []
   foreignWriters: null
 - table: ledger.fiscal_period
-  columns: 8
+  columns: 9
   store: postgres
   parent: null
   writtenBy:
@@ -604,7 +604,7 @@ tables:
   - finance
   foreignWriters: null
 - table: ledger.fx_rate
-  columns: 12
+  columns: 13
   store: postgres
   parent: null
   writtenBy:
@@ -668,7 +668,7 @@ tables:
   - finance
   foreignWriters: null
 - table: ledger.settlement
-  columns: 19
+  columns: 20
   store: postgres
   parent: null
   writtenBy:
@@ -735,7 +735,6 @@ screens:
 - P08:BO-058 Reporting Home
 - P08:BO-059 Sales Reports
 - P08:BO-060 Attendance & Footfall
-- P08:BO-061 Scheduled Reports
 - P08:BO-074 Chart of Accounts
 - P08:BO-075 Account Mapping
 - P08:BO-076 Revenue Recognition

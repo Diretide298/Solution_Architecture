@@ -3,9 +3,9 @@
 **10 September 2026. Fifteen of seventeen checks pass; the two that do not are named below.**
 
 ```
-2135 operations · 32 contracts · 678 tables · 1467 relationships
+2147 operations · 32 contracts · 683 tables · 1490 relationships
 125 state models · 29 events · 96 flows · 48 ADRs
-2427 screens · 16 platforms · 13 frontends · 5 apps · 218 boards
+2422 screens · 16 platforms · 13 frontends · 5 apps · 218 boards
 ```
 
 **`96 flows` counts authored journeys.** 106 more are derived from the client boards and carry
@@ -76,7 +76,7 @@ decision somebody has to make, and the register says which.
 
 ```
 contracts/      28 OpenAPI files — the source of truth. Everything else derives from here.
-screens/        2427 screens across 16 platforms
+screens/        2422 screens across 16 platforms
 flows/          203 journey files · 106 derived from the client boards, one per board but B2B board 1
 states/         125 state models
 events/         29 declared events
@@ -84,7 +84,7 @@ docs/adr/       44 architecture decisions
 docs/active/    the working documents — audits, briefs, handoffs
 docs/registers/ conflicts (CF-*), backlog, decisions
 
-backend/        DDL, generated — 678 tables, 615 foreign keys, 1468 indexes
+backend/        DDL, generated — 683 tables, 615 foreign keys, 1491 indexes
 services/       16 FastAPI skeletons for topology benchmarking
 deploy/         four deployment configurations plus three burst variants
 tools/          the generators and the checks
@@ -102,7 +102,7 @@ sources/        every client file — MoMs, RFP, board PDFs, requirements
 
 ## Where the screen design stands
 
-**46 of 2427 screens are drawn.** 13 batches of P01 Guest Web came back on 10 September,
+**46 of 2422 screens are drawn.** 13 batches of P01 Guest Web came back on 10 September,
 passed the import with nothing refused, and 45 of the 46 carry seeded values rather than
 blank rows. Those frames are now the house style: a later batch that re-derives the look
 instead of matching them produces a second product, not more of this one.
@@ -156,7 +156,7 @@ selected gate mode" and nothing else. **These are placeholders to be replaced, a
 sets them in type has published a generator's shrug.** The 83% that remain were written by a
 person and should be kept.
 
-**719 of the 2427 screens cannot be drawn faithfully from what they declare.** They carry fewer
+**719 of the 2422 screens cannot be drawn faithfully from what they declare.** They carry fewer
 than four components, 224 carry none, and `purpose` runs to a median of 84 characters (measured
 11 September). The bundle says
 so where a designer will see it. Drawing over that gap invents requirements; the gap is a
@@ -169,7 +169,7 @@ specification problem and belongs in the log, not in a picture.
 **`handoff/api-data-lineage.json`** — every operation with its verb, path, scope, permission,
 audience, service, reads and writes. **The join everything else resolves through.**
 
-**`handoff/schema-reference.json`** — 678 tables, every column, every reference, and a description
+**`handoff/schema-reference.json`** — 683 tables, every column, every reference, and a description
 for all of them.
 
 **`handoff/burst-scope.json`** — what a flash-sale environment runs, and what it does not. **Thirteen
@@ -192,13 +192,19 @@ a disagreement means a parser is reading something the generator did not write.
 contradicting what the client was told on 24 August.** ADR-0036 carves out the burst cell and
 settles nothing about the permanent platform.
 
-**CF-64** — AWS or Azure, pending DESC. Carries RPO and RTO, **which are stated nowhere in 37
-ADRs.**
-
 **CF-162** — three deployment scenarios. Answered in `docs/active/`, not yet with the client.
 
 **CF-165** — retention and archival absent. Three failure tables now exist and none has a retention
 rule.
+
+---
+
+## Settled since
+
+**CF-64** — closed. **Decided 28 September (audit R057): Azure in a UAE region, GitHub Actions for
+CI. CF-64 closed.** The RPO half closed on 21 September (asynchronous by default, synchronous
+selectable) and retention on 20 September (ADR-0047); the provider half closed on 28 September.
+See `docs/registers/conflicts.md` CF-64.
 
 ---
 

@@ -158,9 +158,9 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; login · forceLogout · getCurrentSession · listActiveSessions +3</div>
-          <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess</span></div>
-          
+          <div><b>OPERATIONS</b> &middot; createMfaChallenge · verifyMfaChallenge · login · forceLogout +5</div>
+          <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess · mfaRequired</span></div>
+          <div><b>ARRIVES WITH</b> &middot; challengeId&larr;navigation</div>
           <div><b>GOES TO</b> &middot; entry point · <a href="P16%20Venue%20Analytics.dc.html#anl-001">ANL-001</a> <span class="away">other board</span>  &mdash; <i>Executive Command Center</i><br><a href="P08%20Venue%20Management.dc.html#bo-001">BO-001</a> <span class="away">other board</span>  &mdash; <i>Queue Directory</i><br><a href="P13%20Venue%20CMS.dc.html#cms-001">CMS-001</a> <span class="away">other board</span>  &mdash; <i>Tenant Workspace</i><br><a href="#sup-002">SUP-002</a>  &mdash; <i>Agent Dashboard</i><br><a href="#sup-003">SUP-003</a>  &mdash; <i>Availability &amp; Routing Settings</i><br><a href="#sup-004">SUP-004</a>  &mdash; <i>Conversation Queue</i><br><a href="#sup-005">SUP-005</a>  &mdash; <i>Live Chat Workspace</i><br><a href="#sup-006">SUP-006</a>  &mdash; <i>Knowledge Base Search</i><br><a href="#sup-007">SUP-007</a>  &mdash; <i>Canned Response Management</i><br><a href="#sup-008">SUP-008</a>  &mdash; <i>Agent Performance &amp; SLA View</i><br><a href="#sup-009">SUP-009</a>  &mdash; <i>Customer Service Command Center</i><br><a href="#sup-019">SUP-019</a>  &mdash; <i>Contact Center Operations Command Center</i></div>
           
           <div><b>OVERLAYS</b><div class="ov"><b>confirmDialog</b> confirmForceLogout &middot; <i>Force logout</i></div><div class="ov"><b>confirmDialog</b> confirmRevokeAllSessions &middot; <i>Revoke all sessions</i></div><div class="ov"><b>modal</b> formLogin &middot; <i>Login</i> &middot; <b>Login</b> &middot; Cancel <span class="dis">discards username · credential · workstationId · method · deviceFingerprint</span></div></div>
@@ -191,7 +191,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           <div><b>OPERATIONS</b> &middot; setAgentAvailability</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoAccess</span></div>
           
-          <div><b>GOES TO</b> &middot; <a href="#sup-001">SUP-001</a>  &mdash; <i>Agent Login</i><br><a href="#sup-002">SUP-002</a>  &mdash; <i>Agent Dashboard</i><br><a href="#sup-004">SUP-004</a>  &mdash; <i>Conversation Queue</i></div>
+          <div><b>GOES TO</b> &middot; <a href="#sup-001">SUP-001</a>  &mdash; <i>Agent Login</i></div>
           
           
         </div>
@@ -341,7 +341,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           <div><b>OPERATIONS</b> &middot; listKnowledgeCollections · listFaqs</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess</span></div>
           <div><b>ARRIVES WITH</b> &middot; bannerId&larr;deepLink, pageId&larr;deepLink, policyKind&larr;deepLink</div>
-          <div><b>GOES TO</b> &middot; <a href="#sup-001">SUP-001</a>  &mdash; <i>Agent Login</i><br><a href="#sup-002">SUP-002</a>  &mdash; <i>Agent Dashboard</i><br><a href="#sup-003">SUP-003</a> <br><a href="#sup-005">SUP-005</a>  &mdash; <i>Live Chat Workspace</i></div>
+          <div><b>GOES TO</b> &middot; <a href="#sup-001">SUP-001</a>  &mdash; <i>Agent Login</i><br><a href="#sup-003">SUP-003</a> </div>
           
           
         </div>
@@ -371,7 +371,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           <div><b>OPERATIONS</b> &middot; listMessageTemplates · createMessageTemplate</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess</span></div>
           
-          <div><b>GOES TO</b> &middot; <a href="#sup-001">SUP-001</a>  &mdash; <i>Agent Login</i><br><a href="#sup-002">SUP-002</a>  &mdash; <i>Agent Dashboard</i><br><a href="#sup-003">SUP-003</a> </div>
+          <div><b>GOES TO</b> &middot; <a href="#sup-001">SUP-001</a>  &mdash; <i>Agent Login</i><br><a href="#sup-003">SUP-003</a> </div>
           
           <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formCreateMessageTemplate &middot; <i>Create message template</i> &middot; <b>Create message template</b> &middot; Cancel <span class="dis">discards id · code · name · channel · bodies · subjects · mergeFields · missingLanguages · providerTemplateId</span></div></div>
         </div>

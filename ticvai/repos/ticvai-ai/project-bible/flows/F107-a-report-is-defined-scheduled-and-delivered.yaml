@@ -17,25 +17,25 @@ offlineBehaviour: Analytical.
 steps:
 - step: 1
   screen: BO-058
-  action: Reporting Home.
+  action: The report is defined.
   operations:
-  - updateReport
-  outcome: 1 operations, 1 of them previously unwalked.
+  - createReport
+  - runReport
+  outcome: Built once and run to check it shows the right numbers.
 - step: 2
   screen: BO-061
-  action: Scheduled Reports.
+  action: It is scheduled to the people who need it.
   operations:
-  - updateReport
-  outcome: 1 operations, 1 of them previously unwalked.
+  - createReportSchedule
+  - listReportSchedules
+  outcome: '**Every Monday, to these people**, without anybody remembering to run it.'
   crossesDevice: true
 - step: 3
-  screen: BO-060
-  action: Attendance & Footfall.
+  screen: BO-061
+  action: Each delivery is checked.
   operations:
-  - overrideAccess
-  - updateReport
-  outcome: 2 operations, 2 of them previously unwalked.
-  crossesDevice: true
+  - listReportExecutions
+  outcome: '**Delivered, or failed and said so.** A schedule that silently stops is worse than none.'
 branches:
 - at: 1
   condition: The acting principal lacks the permission at this scope.
@@ -48,6 +48,6 @@ exitStates:
   description: The journey ran end to end.
 - state: refused
   description: '**Stopped at a permission or a licence boundary**, with the reason named.'
-notes: '**ReportingService at 48% and scheduling uncovered.** A report nobody has to remember to run
+notes: '**Re-authored 28 September to follow the purpose of each screen it visits** (decided 28 September, audit R261): the step on Attendance & Footfall (overrideAccess, updateReport) left the journey; defining, scheduling and delivering now run on Reporting Home and Scheduled Reports. **ReportingService at 48% and scheduling uncovered.** A report nobody has to remember to run
   is the difference between a dashboard and a habit.'
 openQuestions: null

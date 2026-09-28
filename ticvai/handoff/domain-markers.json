@@ -104,10 +104,16 @@
  "conflict:CF-96": [
   "ai:closed"
  ],
+ "document:docs\\active\\README.md": [
+  "ai:names it"
+ ],
  "document:docs\\active\\action-register-22-september.md": [
   "ai:names it"
  ],
  "document:docs\\active\\ai-scope-for-confirmation.md": [
+  "ai:names it"
+ ],
+ "document:docs\\active\\ai-suggestion-rules-proposal.md": [
   "ai:names it"
  ],
  "document:docs\\active\\bl-073-cookie-consent-20-september.md": [
@@ -117,6 +123,9 @@
   "ai:names it"
  ],
  "document:docs\\active\\change-log-validation-18-september.md": [
+  "ai:names it"
+ ],
+ "document:docs\\active\\configured-limits-proposal.md": [
   "ai:names it"
  ],
  "document:docs\\active\\contract-audit-19-september.md": [
@@ -218,6 +227,9 @@
  "document:docs\\architecture\\ai-credentials.md": [
   "ai:names it"
  ],
+ "document:docs\\architecture\\ai-system-design.md": [
+  "ai:names it"
+ ],
  "event:ai.ceilingApproaching": [
   "ai:publishes"
  ],
@@ -267,9 +279,6 @@
   "ai:steps through"
  ],
  "flow:F26": [
-  "ai:steps through"
- ],
- "flow:F49": [
   "ai:steps through"
  ],
  "flow:F77": [
@@ -422,9 +431,6 @@
  "screen:BO-060": [
   "ai:calls 2"
  ],
- "screen:BO-061": [
-  "ai:calls 2"
- ],
  "screen:BO-088": [
   "ai:calls 1"
  ],
@@ -470,13 +476,7 @@
  "screen:GST-033": [
   "ai:calls 1"
  ],
- "screen:GST-052": [
-  "ai:calls 1"
- ],
  "screen:GST-054": [
-  "ai:calls 2"
- ],
- "screen:GST-059": [
   "ai:calls 1"
  ],
  "screen:GST-068": [

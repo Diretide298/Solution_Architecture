@@ -628,6 +628,7 @@ separates the four most sharply.
 shared-schema**, and per-service databases turn (d′)'s 601 databases into several thousand. **ADR-0028
 still reads Accepted while contradicting a client-facing recommendation.**
 
-**CF-64** — AWS or Azure, pending DESC. **This document prices AWS and GCP because those were
-asked for; Azure is not costed and should be if it is still a candidate.** CF-64 also carries RPO
-and RTO, which are stated nowhere in the package.
+**CF-64** — **Decided 28 September (audit R057): Azure in a UAE region, GitHub Actions for CI.
+CF-64 closed.** **This document prices AWS and GCP because those were asked for; they are now
+comparisons, not candidates, and Azure in the UAE region is not yet costed here.** RPO and RTO
+were settled on 21 September (`docs/registers/conflicts.md` CF-64).

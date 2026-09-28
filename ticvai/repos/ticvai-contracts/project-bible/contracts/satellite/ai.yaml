@@ -145,9 +145,6 @@ paths:
       x-ticvai-consumed-by:
         - "P01 WEB-044 AI Concierge – Home"
         - "P02 GST-031 AI Concierge – Home"
-        - "P02 GST-052 Suggested Itineraries"
-        - "P02 GST-054 AI Optimized Itinerary"
-        - "P02 GST-059 Plan My Day – In Progress"
         - "P08 BO-115 Category, Brand & Merchandise Hierarchy"
         - "P08 BO-117 Product Import, Governance & AI Configuration Assistant"
         - "P16 ANL-001 Executive Command Center"
@@ -201,6 +198,11 @@ paths:
                     on the operation rather than in a note, because **an audience widened without narrowing
                     its inputs is an audience given everything.**
 
+                    **No guest day plan in the first release (decided 28 September, audits R187 and
+                    R209).** The itinerary planner is deferred, so there is no guest itinerary kind and
+                    `scenario` stays staff-only; a guest request for it is refused like any other. When
+                    the planner ships it gets its own guest-allowed kind, not `scenario`.
+
                     '
                 subjectRef:
                   type: string
@@ -235,7 +237,13 @@ paths:
             **refusing is better than a confident number built on nothing** — the response names what
             is missing and when there will be enough.
 
+            **The threshold is that kind''s minimum history**, listed per value on `SuggestionKind`
+            (proposed, client to correct (audit R213)). `need` carries that minimum and `have` what the
+            scope holds, counted at the scope the question is asked at.
+
             '
+          x-ticvai-problem-types:
+          - insufficient-data
           content:
             application/problem+json:
               schema:
@@ -319,7 +327,6 @@ paths:
       tags:
       - ai
       x-ticvai-permission: AI_CONFIGURE
-      x-ticvai-permission-escalated: AI_CONFIGURE
       x-ticvai-audience:
       - staff
       x-ticvai-scope-level: tenant
@@ -497,7 +504,9 @@ paths:
         somebody else''s machine.
 
         Rotation is the same operation. The previous key is revoked at the vault after a grace window,
-        so an in-flight request does not fail mid-answer.
+        so an in-flight request does not fail mid-answer. **The window is 24 hours (decided 28 September,
+        audit R096)**: a replaced key keeps working for `graceMinutes`, 1,440 unless a shorter window is
+        sent — a compromised key is rotated with `graceMinutes: 0`.
 
         '
       tags:
@@ -530,8 +539,11 @@ paths:
                   nullable: true
                 graceMinutes:
                   type: integer
-                  default: 15
-                  description: How long the previous key stays valid, so in-flight requests survive.
+                  minimum: 0
+                  maximum: 1440
+                  default: 1440
+                  description: How long the previous key stays valid, so in-flight requests survive. 24
+                    hours by default (decided 28 September, audit R096); 0 revokes it at once.
       responses:
         '200':
           headers:
@@ -1228,10 +1240,15 @@ paths:
         for approval, and multi-level approval is supported because a pricing change and a discount rule
         do not carry the same authority.
 
+        **What a caller sees follows who may decide** (audit R213 (3)): a caller holding `AI_APPROVE` sees
+        every open proposal at the scope; a caller with `AI_USE` only sees the proposals they prompted,
+        because those are the level 1 proposals they may approve themselves.
+
         '
       tags:
       - governance
-      x-ticvai-permission: AI_APPROVE
+      x-ticvai-permission: AI_USE
+      x-ticvai-permission-escalated: AI_APPROVE
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
@@ -1269,10 +1286,22 @@ paths:
         A rejection carries a reason. It is the only signal that the assistant is proposing badly, and
         without it a bad model degrades silently.
 
+        **Who may approve (decided 28 September, audit R213 (3)).** An action at `approvalLevel` 2, anything
+        touching prices or permissions, needs a manager: a principal holding `AI_APPROVE` who is not the
+        one who prompted it. An action at level 1 is approved by the requester themselves. A proposal
+        past its `expiresAt` is refused with 409.
+
+        **The permission model says the same thing.** The operation''s permission is `AI_USE`, the one the
+        requester already holds to prompt the assistant, and it lets them decide **only their own level 1
+        proposals**. Deciding a level 2 proposal requires `AI_APPROVE` (`x-ticvai-permission-escalated`)
+        and a caller other than the requester. Deciding somebody else''s level 1 proposal is refused
+        unless the caller holds `AI_APPROVE`. Each refusal is a `403` naming which rule failed.
+
         '
       tags:
       - governance
-      x-ticvai-permission: AI_APPROVE
+      x-ticvai-permission: AI_USE
+      x-ticvai-permission-escalated: AI_APPROVE
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
@@ -1306,10 +1335,26 @@ paths:
               schema:
                 $ref: '#/components/schemas/ProposedAction'
         '403':
-          description: 'The approver may not authorise this kind of action, or is the principal who prompted
-            it.
+          description: 'The caller may not decide this proposal (audit R213 (3)): a level 2 proposal and
+            the caller lacks `AI_APPROVE` (`approval-level-requires-manager`), a level 2 proposal the
+            caller prompted themselves (`approver-is-requester`), or a level 1 proposal somebody else
+            prompted and the caller lacks `AI_APPROVE` (`not-own-proposal`). One `403` only: the older
+            second `403` key, which YAML let silently replace this one, is merged in here.
 
             '
+          x-ticvai-problem-types:
+          - approval-level-requires-manager
+          - approver-is-requester
+          - not-own-proposal
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
+        '409':
+          description: The action is no longer `proposed` — already decided, or expired (7 days after it
+            was proposed, audit R213).
+          x-ticvai-problem-types:
+          - proposal-not-open
           content:
             application/problem+json:
               schema:
@@ -1374,12 +1419,18 @@ paths:
         a model that embeds — and the platform resolves which provider serves it. That is what makes "no
         provider SDK in capability code" enforceable rather than aspirational.
 
+        **Per tenant** (decided 28 September, audit R203; ADR-0009). Platform staff read and set a
+        tenant''s providers on ADM-037, acting inside the tenant under a platform-staff grant (audit
+        R098); the tenant''s own staff read them with `AI_CONFIGURE`. Each row carries `residency`, which
+        the tenant''s region may restrict (`tenancy.RegionSettings.allowedAiResidencies`). ADM-037 finds
+        that region from `subscription.Tenant.regionId` and reads it with `tenancy.getRegionSettings`.
+
         '
       tags:
       - config
       x-ticvai-permission: AI_CONFIGURE
-      x-ticvai-scope-level: region
-      x-ticvai-config-scope: region
+      x-ticvai-scope-level: tenant
+      x-ticvai-config-scope: tenant
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
       x-ticvai-read-routing: replica
@@ -1399,9 +1450,21 @@ paths:
       x-ticvai-audience:
       - staff
       summary: Configure a provider
-      description: '**Region-scoped, because inference is a data transfer.** ADR-0009: a prompt containing
-        guest data leaves the jurisdiction the moment it reaches a provider hosted elsewhere, and which
-        providers a region may use is a residency decision rather than a preference.
+      description: '**Per tenant, with a compliance gate (decided 28 September, audit R203), as ADR-0009
+        says.** Inference is a data transfer: a prompt containing guest data leaves the jurisdiction the
+        moment it reaches a provider hosted elsewhere. So **platform staff set a tenant''s provider on
+        ADM-037**, and **a region may restrict the choice**: a provider whose `residency` is not in the
+        allowed residencies of the tenant''s home region (`subscription.Tenant.regionId`, read through
+        `tenancy.getRegionSettings` as `RegionSettings.allowedAiResidencies`; empty means no restriction)
+        is refused with 409 `residency-refused`, which is the gate.
+
+        **How the permission is honoured in the tenant''s cell** (decided 28 September, audit R203).
+        `PLATFORM_TENANT_MANAGE` is a platform permission: it is read from the operator''s platform token,
+        never from a platform-staff grant, which refuses `PLATFORM_*` values. The cell additionally
+        requires the operator to have a grant into this tenant open (`openPlatformStaffGrant`, audit R098),
+        so the change is audited against that grant (`AuditRecord.platformStaffGrantId`); without one it
+        refuses `403 platform-grant-required`. A tenant''s own staff cannot set a provider, whatever they
+        hold.
 
         Credentials are a key-vault reference, never the key.
 
@@ -1414,9 +1477,9 @@ paths:
         '
       tags:
       - config
-      x-ticvai-permission: AI_CONFIGURE
-      x-ticvai-scope-level: region
-      x-ticvai-config-scope: region
+      x-ticvai-permission: PLATFORM_TENANT_MANAGE
+      x-ticvai-scope-level: tenant
+      x-ticvai-config-scope: tenant
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
       parameters:
@@ -1443,8 +1506,26 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/AiProvider'
+        '403':
+          description: The caller lacks `PLATFORM_TENANT_MANAGE` on their platform token, or has no
+            platform-staff grant into this tenant open (`platform-grant-required`, audit R203).
+          x-ticvai-problem-types:
+          - platform-grant-required
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
+        '409':
+          description: The provider's `residency` is not in the tenant's region's `allowedAiResidencies`
+            (audit R203).
+          x-ticvai-problem-types:
+          - residency-refused
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
   /policy:
     get:
       operationId: getAiPolicy
@@ -1860,6 +1941,47 @@ components:
         **Building six endpoints means six places to change when a model changes**, and the model will
         change more often than the venue''s question does.
 
+        **What each kind is based on, and how much history is enough. Proposed, client to correct
+        (decided 28 September, audit R213).** With less than the minimum, `requestSuggestion` answers
+        422 with `InsufficientDataProblem` naming the input, what there is and this minimum.
+
+        - `price`: unit cost plus the category''s target margin, held inside the price band. Minimum:
+        a current cost, no history.
+
+        - `replenishment`: par level minus on-hand plus expected use over the supplier lead time.
+        Minimum: 14 days of stock movements.
+
+        - `requisition`: the next service''s prep-plan ingredient needs minus kitchen stock. Minimum: 14
+        days of sales.
+
+        - `demandForecast`: the average of the same weekday over the last 8 weeks, adjusted by admissions
+        already booked. Minimum: 8 weeks of sales.
+
+        - `prepPlan`: forecast covers for the service times each item''s share of the last 4 same
+        weekdays. Minimum: 4 weeks of sales.
+
+        - `menuEngineering`: each item placed by popularity against margin, over 90 days. Minimum: 90
+        days of sales.
+
+        - `staffing`: forecast demand divided by the role''s standard covers per staff hour. Minimum: 8
+        weeks of sales (the forecast it rests on).
+
+        - `slaTarget`: the 80th percentile of actual times over the last 30 days. Minimum: 30 days of
+        timed events.
+
+        - `waitTime`: people ahead divided by the throughput of the last 30 minutes. Minimum: 30 minutes
+        of throughput today.
+
+        - `upsell`: the item most often bought with the basket''s items over 90 days. Minimum: 90 days of
+        orders.
+
+        - `segmentation`: recency, frequency and spend scores over 12 months. Minimum: 90 days of orders.
+
+        - `anomaly`: a value outside three standard deviations of the same weekday over 8 weeks. Minimum:
+        8 weeks of the measure.
+
+        - `scenario`: the demand forecast re-run with the stated changes. Minimum: as `demandForecast`.
+
         '
       enum:
       - price
@@ -2105,6 +2227,12 @@ components:
 
             `venue` exists for the case where one venue''s volume justifies its own key, or where a venue
             is billed separately from the rest of its tenant.
+
+            **`tenant` is the decided level** (audit R203, ADR-0009): a tenant''s provider is set per
+            tenant, by platform staff on ADM-037. `venue` narrows inside a tenant; `platform` is only
+            the platform''s fallback. **No provider is configured per region**: a region restricts the
+            choice through `tenancy.RegionSettings.allowedAiResidencies` and nothing else, and the table''s
+            `region_id` is the tenant''s home region, recorded so that gate can be re-checked.
 
             '
         scopePath:
@@ -2589,15 +2717,37 @@ components:
           type: string
         status:
           type: string
+          description: '**Expiry (decided 28 September, audit R213)**: a `proposed` action expires 7 days
+            after `proposedAt`; an `approved` action not applied expires 24 hours after `decidedAt`. Both
+            are proposed values, client to correct, and `expiresAt` carries the one that applies.
+
+            '
           enum:
           - proposed
           - approved
           - rejected
           - applied
           - expired
+        expiresAt:
+          type: string
+          format: date-time
+          nullable: true
+          readOnly: true
+          x-ticvai-derived: onWrite
+          description: When the expiry timer moves this action to `expired` — `proposedAt` plus 7 days
+            while `proposed`, `decidedAt` plus 24 hours once `approved`, null once `rejected`, `applied`
+            or `expired` (audit R213).
         approvalLevel:
           type: integer
-          description: 8.3.65. Multi-level, because a discount and a pricing change differ in authority.
+          minimum: 1
+          maximum: 2
+          description: '8.3.65. Multi-level, because a discount and a pricing change differ in authority.
+            **Two levels (decided 28 September, audit R213)**: `2` for anything touching prices or
+            permissions (every `pricing` and `promotion` action, and any other whose payload sets a price,
+            a discount, a role or a permission grant), which needs a manager other than the requester;
+            `1` for everything else, which the requester approves themselves.
+
+            '
         decidedByPrincipalId:
           type: string
           format: uuid
@@ -3439,7 +3589,8 @@ components:
                 need:
                   type: string
                   nullable: true
-                  description: How much the producer needs — *one full year*.
+                  description: How much the producer needs — *one full year*. The minimum per kind is on
+                    `SuggestionKind` (proposed, audit R213).
           enoughBy:
             type: string
             format: date-time

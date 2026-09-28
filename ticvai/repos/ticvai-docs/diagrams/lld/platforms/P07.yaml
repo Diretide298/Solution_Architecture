@@ -27,7 +27,7 @@ servicesCalled:
 - service: AccessService
   operationCalls: 56
 - service: IdentityService
-  operationCalls: 6
+  operationCalls: 8
 - service: OrderService
   operationCalls: 3
 - service: CrossRegionService
@@ -46,6 +46,7 @@ screens:
   wave: 1
   density: comfortable
   operations:
+  - createMfaChallenge
   - getCurrentSession
   - getCurrentShift
   - listMfaMethods
@@ -53,16 +54,19 @@ screens:
   - login
   - resolvePermissions
   - selectRole
+  - verifyMfaChallenge
   states:
   - emptyFirstRun
   - emptyNoAccess
   - emptyNoResults
   - error
   - loading
+  - mfaRequired
   - offline
   offlineState: true
   entryParams:
   - shiftId<-session
+  - challengeId<-navigation
   goesTo:
   - SCN-002
   - SCN-003

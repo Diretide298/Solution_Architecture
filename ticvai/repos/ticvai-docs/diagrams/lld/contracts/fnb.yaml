@@ -1,5 +1,5 @@
 id: LLD-fnb
-title: fnb — 113 operations
+title: fnb — 115 operations
 generatedBy: tools/derive-diagrams.py
 index: diagrams/hld/03-contracts.yaml
 tier: satellite
@@ -388,6 +388,17 @@ operations:
   writes:
   - cache:idempotency
   - fnb.kitchen_ticket
+- operation: getAllergenVerification
+  verb: GET
+  path: /menu-items/{menuItemId}/allergen-verification
+  scope: venue
+  permission: PRODUCT_VIEW
+  audience:
+  - staff
+  offline: false
+  reads:
+  - fnb.allergen_verdict
+  writes: []
 - operation: getBill
   verb: GET
   path: /table-visits/{visitId}/bill
@@ -580,6 +591,18 @@ operations:
   writes:
   - cache:idempotency
   - fnb.waitlist_entry
+- operation: leaveRestaurantWaitlist
+  verb: POST
+  path: /waitlist/{entryId}/leave
+  scope: venue
+  permission: ORDER_MODIFY
+  audience:
+  - staff
+  - guest
+  offline: false
+  reads:
+  - fnb.waitlist_entry
+  writes: []
 - operation: list86Events
   verb: GET
   path: /outlets/{outletId}/86-events
@@ -1656,6 +1679,7 @@ operations:
   - staff
   offline: false
   reads:
+  - fnb.allergen_verdict
   - fnb.menu_item
   - fnb.modifier_group
   - fnb.recipe

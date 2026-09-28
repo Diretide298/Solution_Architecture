@@ -7,11 +7,11 @@ description: '**Derived from what each app''s screens call, not decided here.** 
   and the approval hierarchy are deliberately absent: who at a venue may configure pricing is the client''s
   decision and a plausible answer written here would be read as one they made.'
 theTwoVocabularies:
-  onOperations: 157
-  inRolesYaml: 35
+  onOperations: 162
+  inRolesYaml: 43
   shared: 0
-  note: '**Zero shared keys.** The contracts carry 157 permission keys across 2032 operations; `roles.yaml`
-    grants 35, all of them POS. `check-screens` validates a screen''s `guard` against `roles.yaml`, so
+  note: '**Zero shared keys.** The contracts carry 162 permission keys across 2042 operations; `roles.yaml`
+    grants 43, all of them POS. `check-screens` validates a screen''s `guard` against `roles.yaml`, so
     the only guards anyone could write were POS ones — and that is what the package shows: venue-pos declares
     every guard in it and the other four apps declare none. **Joining these two is the work; this file
     is the evidence for what the join has to cover.**'
@@ -30,7 +30,7 @@ apps:
     - P02
     - P05
     screens: 134
-    operations: 171
+    operations: 161
     permissions: 24
     tiers:
       read:
@@ -64,23 +64,18 @@ apps:
     - abandonCart
     - addCartLine
     - addToWishlist
-    - checkGuestCheckoutMatch
+    - applyCartPromoCode
     - checkoutCart
     - claimCart
     - claimLocationSession
     - claimTableSession
     - claimTicketTransfer
-    - completeSsoAuthorization
     - createCart
     - createGuestFnbOrder
-    - createMfaChallenge
-    - createParkingEntitlement
     - createRefundRequest
     - createTableReservation
-    - decideGuestCheckoutMatch
     - deleteGuestAccount
     - endKioskAssist
-    - enrolMfaMethod
     - extendCart
     - getBillingStatement
     - getCart
@@ -95,13 +90,18 @@ apps:
     - getWaitingGuest
     - getWishlist
     - guestLogout
+    - guestPasswordLogin
     - guestSocialLogin
     - guestUaePassLogin
     - handoverToAgent
     - joinQueue
     - joinWaitlist
     - leaveQueue
-    operationsWithNoPermissionCount: 77
+    - leaveWaitlist
+    - linkGuestCheckout
+    - listBillingStatements
+    - listDeliveryLocations
+    operationsWithNoPermissionCount: 66
   ticvai-control:
     name: TICVAI Control
     platforms:
@@ -111,8 +111,8 @@ apps:
     - P14
     - P17
     screens: 767
-    operations: 652
-    permissions: 77
+    operations: 662
+    permissions: 79
     tiers:
       read:
       - AI_AUDIT_VIEW
@@ -136,6 +136,7 @@ apps:
       - PRODUCT_VIEW
       - SCOPE_VIEW
       - SETTLEMENT_VIEW
+      - TENANT_VIEW
       - WALLET_VIEW
       - WORKFORCE_VIEW
       operate:
@@ -157,6 +158,7 @@ apps:
       - PAYMENT_VOID
       - PLATFORM_MIGRATION_APPLY
       - PLATFORM_RELEASE_PROMOTE
+      - PLATFORM_TENANT_ACCESS
       - PLATFORM_TENANT_TERMINATE
       - REPORT_VIEW_VENUE
       - SESSION_FORCE_LOGOUT
@@ -197,7 +199,9 @@ apps:
     operationsWithNoPermission:
     - addCartLine
     - checkoutCart
+    - createMfaChallenge
     - createRefundRequest
+    - enrolMfaMethod
     - getCart
     - getCurrentSession
     - listMfaMethods
@@ -206,9 +210,12 @@ apps:
     - propagateCrossRegionEntitlement
     - reconcileRedemptions
     - removeCartLine
+    - removeMfaMethod
     - sendTransactionalMessage
     - updateCartLine
-    operationsWithNoPermissionCount: 13
+    - verifyMfaChallenge
+    - verifyMfaEnrolment
+    operationsWithNoPermissionCount: 18
   venue-management:
     name: TICVAI Venue Management
     platforms:
@@ -216,9 +223,9 @@ apps:
     - P12
     - P13
     - P16
-    screens: 1379
-    operations: 1228
-    permissions: 135
+    screens: 1374
+    operations: 1238
+    permissions: 138
     tiers:
       read:
       - ACCREDITATION_VIEW
@@ -241,6 +248,7 @@ apps:
       - PERMISSION_VIEW
       - PLATFORM_TENANT_VIEW
       - PRICE_VIEW
+      - PROCUREMENT_VIEW
       - PRODUCT_VIEW
       - QUEUE_VIEW
       - RENTAL_VIEW
@@ -248,6 +256,7 @@ apps:
       - RESOURCE_VIEW
       - SCOPE_VIEW
       - SETTLEMENT_VIEW
+      - TENANT_VIEW
       - VENUE_MAP_VIEW
       - WALLET_VIEW
       - WORKFORCE_VIEW
@@ -258,7 +267,6 @@ apps:
       - ACCREDITATION_APPLY
       - ACCREDITATION_APPROVE
       - ACCREDITATION_ISSUE
-      - AI_APPROVE
       - AI_USE
       - APPROVAL_ACT
       - APPROVAL_DECIDE
@@ -276,7 +284,6 @@ apps:
       - MAINTENANCE_APPROVE
       - MAINTENANCE_EXECUTE
       - MARKETING_SEND
-      - ORDER_CANCEL
       - ORDER_CREATE
       - ORDER_DISCOUNT
       - ORDER_EXCHANGE
@@ -289,6 +296,8 @@ apps:
       - ORDER_VOID
       - OVERSHORT_ACCEPT
       - PLATFORM_RELEASE_PROMOTE
+      - PROCUREMENT_RECEIVE
+      - PROCUREMENT_REQUEST
       - RENTAL_APPROVE
       - RENTAL_BOOK
       - RENTAL_OPERATE
@@ -338,6 +347,7 @@ apps:
       - PLATFORM_CELL_MANAGE
       - PLATFORM_TENANT_MANAGE
       - PRICE_CONFIGURE
+      - PROCUREMENT_MANAGE
       - PRODUCT_CONFIGURE
       - QUEUE_MANAGE
       - REGION_CONFIGURE
@@ -359,6 +369,7 @@ apps:
       - WORKSTATION_CONFIGURE
       - WORK_ORDER_MANAGE
     operationsWithNoPermission:
+    - createMfaChallenge
     - createRefundRequest
     - getCurrentSession
     - getGameCard
@@ -367,11 +378,9 @@ apps:
     - getLoyaltyPosition
     - getTenantAppStatus
     - getWaitTimes
-    - getWishlist
     - handoverToAgent
     - listDeliveryLocations
     - listDiningOutlets
-    - listGuestDevices
     - listMfaMethods
     - listMyCases
     - listSsoProviders
@@ -382,6 +391,7 @@ apps:
     - recordGamePlay
     - sendTransactionalMessage
     - syncGamePlays
+    - verifyMfaChallenge
     operationsWithNoPermissionCount: 23
   venue-pos:
     name: TICVAI POS
@@ -389,8 +399,8 @@ apps:
     - P04
     - P15
     screens: 40
-    operations: 157
-    permissions: 46
+    operations: 159
+    permissions: 47
     tiers:
       read:
       - APPROVAL_VIEW
@@ -403,6 +413,7 @@ apps:
       - PRODUCT_VIEW
       - QUEUE_VIEW
       - SCOPE_VIEW
+      - TENANT_VIEW
       - WORKFORCE_VIEW
       operate:
       - ACCESS_VALIDATE
@@ -444,6 +455,7 @@ apps:
     operationsWithNoPermission:
     - addCartLine
     - changeOwnCredential
+    - createMfaChallenge
     - getCart
     - getCurrentSession
     - getGuestMenu
@@ -451,15 +463,16 @@ apps:
     - login
     - recordDeviceHeartbeat
     - selectRole
-    operationsWithNoPermissionCount: 9
+    - verifyMfaChallenge
+    operationsWithNoPermissionCount: 11
   venue-staff-mobile:
     name: TICVAI Venue Staff
     platforms:
     - P06
     - P07
     screens: 107
-    operations: 209
-    permissions: 60
+    operations: 215
+    permissions: 63
     tiers:
       read:
       - ASSET_LIBRARY_VIEW
@@ -471,6 +484,7 @@ apps:
       - INSPECTION_VIEW
       - ORDER_VIEW
       - PERMISSION_VIEW
+      - PROCUREMENT_VIEW
       - PRODUCT_VIEW
       - QUEUE_VIEW
       - RENTAL_VIEW
@@ -499,6 +513,8 @@ apps:
       - ORDER_RESCHEDULE
       - ORDER_VOID
       - OVERSHORT_ACCEPT
+      - PROCUREMENT_RECEIVE
+      - PROCUREMENT_REQUEST
       - RENTAL_OPERATE
       - REPORT_VIEW_VENUE
       - REPORT_VIEW_WORKSTATION
@@ -525,7 +541,9 @@ apps:
       - WORKFORCE_MANAGE
       - WORK_ORDER_MANAGE
     operationsWithNoPermission:
+    - createMfaChallenge
     - createTableReservation
+    - enrolMfaMethod
     - getCurrentSession
     - getWaitTimes
     - listDeliveryLocations
@@ -534,6 +552,9 @@ apps:
     - listSsoProviders
     - login
     - logout
+    - removeMfaMethod
     - selectRole
     - sendTransactionalMessage
-    operationsWithNoPermissionCount: 11
+    - verifyMfaChallenge
+    - verifyMfaEnrolment
+    operationsWithNoPermissionCount: 16

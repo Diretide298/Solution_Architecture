@@ -303,6 +303,9 @@ paths:
         kept as income, above zero and below the deposit, in the deposit''s currency; the other outcomes
         settle the whole deposit and ignore it.
 
+        **A partial forfeit returns the remainder to the guest** (decided 28 September, audit R127 (2)):
+        the deposit less `amount` is paid back as `return` would pay it, and only `amount` is income.
+
         '
       tags:
       - finance
@@ -752,6 +755,10 @@ paths:
         is `externalCode`, the code in the client''s own ERP chart. Deactivation prevents new postings and
         leaves history intact.
 
+        **Once an account has been posted to, a remap changes `externalCode` only** (decided 28 September,
+        audit R127 (5)). The account `type` is fixed from its first posting, and is not accepted by this
+        call at all.
+
         **Changed in place.** An account is configuration, not a posting, so this edits the row rather
         than adding one. The postings made to it are untouched.
 
@@ -869,6 +876,12 @@ paths:
         postings: a posting already made keeps the accounts it was booked to, and the new set applies
         to postings from now on.
 
+        **Four event types are required before a venue can trade** (decided 28 September, audit R127 (1)):
+        `cardReceived`, `cashReceived`, `refundIssued` and `priceVariance`. A set missing any of them, for
+        the region or for a venue that trades, is refused with 400 `posting-event-unmapped` naming the
+        event type. Every other event type may be left unmapped, and a posting for one goes to the
+        suspense account.
+
         '
       tags:
       - accounts
@@ -904,7 +917,8 @@ paths:
                 items:
                   $ref: '#/components/schemas/AccountMapping'
         '400':
-          description: A required event type has no mapping, or maps to a non-postable account
+          description: A required event type (`cardReceived`, `cashReceived`, `refundIssued`, `priceVariance`;
+            audit R127 (1)) has no mapping, or maps to a non-postable account
           x-ticvai-problem-types:
           - posting-event-unmapped
           - account-not-postable
@@ -1814,6 +1828,11 @@ paths:
         or down. They are purchasing a product equivalent to that currency… at the end they are paying
         that base currency value, and they get a refund for the base currency value."*
 
+        **Rates are set per region; each venue picks which currencies it shows** (decided 28 September,
+        audit R120 (a)). A guest screen passes `venueId` and gets the region''s rates narrowed to the
+        currencies that venue has chosen to display (`tenancy.VenueSettings.displayCurrencies`); the
+        rate itself is never set per venue.
+
         '
       tags:
       - ledger
@@ -1833,6 +1852,13 @@ paths:
         in: query
         schema:
           $ref: '#/components/schemas/FxRatePurpose'
+      - name: venueId
+        in: query
+        description: Narrows the region's rates to the currencies this venue shows. The venue picks the
+          currencies and the region sets the rates (audit R120 (a)).
+        schema:
+          type: string
+          format: uuid
       - $ref: ../shared/common.yaml#/components/parameters/PageSize
       - $ref: ../shared/common.yaml#/components/parameters/PageCursor
       responses:
@@ -1876,6 +1902,9 @@ paths:
         The server sets `source` to `manual` and `setByPrincipalId` to the caller; `fetchedAt` and
         `providerReference` belong to `ingestFxRates` and are ignored here.
 
+        **A rate set by hand is `manual` and carries a note** (decided 28 September, audit R127 (4)).
+        No other source may be recorded through this call, and a rate without `note` is refused with 400.
+
         '
       tags:
       - ledger
@@ -1901,6 +1930,14 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/FxRate'
+        '400':
+          description: No `note` was given. A manual rate says where the figure came from (audit R127 (4)).
+          x-ticvai-problem-types:
+          - validation
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
         '409':
           description: Effective window overlaps an existing bounded rate for the same pair and purpose, or
             does not start after the rate in force
@@ -2205,6 +2242,9 @@ paths:
         Variances above the venue''s threshold are flagged as exceptions requiring review. Everything
         else is a routine posting nobody needs to look at.
 
+        The threshold is `orders.RefundPolicy.varianceThreshold`, a venue setting with a tenant default
+        (decided 28 September, audit R094; proposed default AED 5.00 per order line, client to correct).
+
         '
       tags:
       - variance
@@ -2347,6 +2387,12 @@ paths:
         in: query
         schema:
           type: string
+      - name: venueId
+        in: query
+        description: One venue's settlements. Settlement is reconciled daily per venue (audit R110 (b)).
+        schema:
+          type: string
+          format: uuid
       - name: status
         in: query
         schema:
@@ -2378,8 +2424,14 @@ paths:
       - staff
       - partner
       summary: Ingest a provider settlement file
-      description: 'Step one of five: ingest, parse, match, classify, auto-resolve. Monthly and file-based,
-        not per-transaction API comparison (12 Aug §17).
+      description: 'Step one of five: ingest, parse, match, classify, auto-resolve. File-based, not
+        per-transaction API comparison (12 Aug §17).
+
+        **Daily, per venue** (decided 28 September, audit R110 (b); BO-043 Daily Reconciliation). One
+        settlement is one provider, one venue and one trading day: `periodStart` and `periodEnd` are the
+        same day and `venueId` names the venue. A request whose period is longer than a day is refused
+        with 400 `settlement-period-not-a-day`. Until this date the description said monthly, which
+        contradicted the screen that runs it.
 
         '
       tags:
@@ -2398,12 +2450,17 @@ paths:
               type: object
               required:
               - providerName
+              - venueId
               - periodStart
               - periodEnd
               - fileReference
               properties:
                 providerName:
                   type: string
+                venueId:
+                  type: string
+                  format: uuid
+                  description: The venue this day of settlement is for (audit R110 (b)).
                 periodStart:
                   type: string
                   format: date
@@ -2439,12 +2496,13 @@ paths:
               schema:
                 $ref: '#/components/schemas/Settlement'
         '400':
-          description: '`fileReference` names no completed upload in the caller''s scope. `errors[]` names
-            the field.
+          description: '`fileReference` names no completed upload in the caller''s scope, or the period is
+            not a single day (`settlement-period-not-a-day`, audit R110 (b)). `errors[]` names the field.
 
             '
           x-ticvai-problem-types:
           - validation
+          - settlement-period-not-a-day
           content:
             application/problem+json:
               schema:
@@ -2860,6 +2918,14 @@ paths:
       description: '**Rare and heavily controlled.** Reopening restates figures somebody has already reported,
         so it requires an approver who is not the requester and records why.
 
+        **Goes through the approvals engine to a finance approver** (decided 28 September, audit R144).
+        The call first asks `approvals.evaluateApprovalRequirement` with kind `periodReopen`; where an
+        approval is required (the tenant default matrix always requires one) it raises
+        `approvals.createApprovalRequest` (kind `periodReopen`), routed to a holder of `LEDGER_APPROVE`
+        for the period''s region who is not the caller, and answers 202 with the period still `closed`
+        and `approvalRequestId` set (the request is `pending`). The move below happens when that request is
+        approved. The caller no longer names the approver; the engine routes it.
+
         Moves a `closed` period to `closing` (the period state model): postings stay stopped while the
         restatement is worked, and the period closes again through `closeFiscalPeriod` or opens through
         `abandonPeriodClose`. The `reason`, the requester, the approver and when are kept in the period''s
@@ -2882,30 +2948,23 @@ paths:
               type: object
               required:
               - reason
-              - approverPrincipalId
               properties:
                 reason:
                   type: string
-                approverPrincipalId:
-                  type: string
-                  format: uuid
-                  description: The approver. Must hold `LEDGER_APPROVE` for the period's region and must not
-                    be the caller.
       responses:
-        '200':
+        '202':
           headers:
             X-Consistency-Token:
               $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
-          description: Reopened. The period, now `closing`.
+          description: Waiting for a finance approver. The period is still `closed`; `approvalRequestId` names
+            the request. On approval it moves to `closing` (audit R144).
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/FiscalPeriod'
         '403':
-          description: The approver is the requester, or does not hold `LEDGER_APPROVE` there; or the caller
-            lacks it.
+          description: The caller lacks `LEDGER_APPROVE` there.
           x-ticvai-problem-types:
-          - approver-is-requester
           - forbidden
           content:
             application/problem+json:
@@ -2939,6 +2998,14 @@ paths:
       description: 'Runs the close checks and, if they pass, locks the period. Nothing may post to a closed
         period; corrections go to the current open one as reversals.
 
+        **Goes through the approvals engine to a finance approver** (decided 28 September, audit R144).
+        When the checks pass, the call asks `approvals.evaluateApprovalRequirement` with kind
+        `periodClose`; where an approval is required (the tenant default matrix always requires one) it
+        raises `approvals.createApprovalRequest` (kind `periodClose`), routed to a holder of
+        `LEDGER_APPROVE` for the period''s region who is not the caller, and answers 202 with the period
+        still `closing` and `approvalRequestId` set (the request is `pending`). The period locks when that request is
+        approved. A dry run raises nothing.
+
         **FX revaluation of open cross-currency balances is part of close and is not yet implemented**
         — it depends on CF-37.
 
@@ -2967,11 +3034,21 @@ paths:
           headers:
             X-Consistency-Token:
               $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
-          description: Closed, or checks reported when dry run
+          description: Checks reported, when dry run
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/PeriodCloseResult'
+        '202':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: Checks passed and the close is waiting for a finance approver. The period is still
+            `closing`; `approvalRequestId` names the request (audit R144).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FiscalPeriod'
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
         '409':
@@ -2996,7 +3073,6 @@ paths:
         - "P08 BO-058 Reporting Home"
         - "P08 BO-059 Sales Reports"
         - "P08 BO-060 Attendance & Footfall"
-        - "P08 BO-061 Scheduled Reports"
         - "P10 PTR-018 Reports & Sales Performance"
         - "P12 SUP-008 Agent Performance & SLA View"
       x-ticvai-audience:
@@ -3540,7 +3616,19 @@ components:
           description: See `Account.notes`.
     PostingEventType:
       type: string
-      description: Every event that generates a ledger posting.
+      description: 'Every event that generates a ledger posting.
+
+        **How each money event posts** (decided 28 September, audit R191). Card payment `cardReceived`,
+        cash payment `cashReceived`, refund `refundIssued`, a POS offline sync the same events as the
+        payments it replays, dated by when the till recorded them. **Two added on that date**:
+        `gameCreditLoaded`, the liability `wallet.loadGameCredits` creates, and `pointsAccrued`, the
+        liability for loyalty points earned. Every posting goes to the fiscal period open for the event
+        date, through the mapping for its event type, or to suspense where none is mapped.
+
+        **Required before a venue trades**: `cardReceived`, `cashReceived`, `refundIssued` and
+        `priceVariance` (audit R127 (1)).
+
+        '
       enum:
       - ticketRevenue
       - fnbRevenue
@@ -3559,6 +3647,8 @@ components:
       - cashOverShort
       - settlementFee
       - settlementClearing
+      - gameCreditLoaded
+      - pointsAccrued
     AccountMapping:
       x-ticvai-persistence: ledger.account_mapping
       type: object
@@ -4160,6 +4250,12 @@ components:
           pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
         entryNumber:
           type: string
+          readOnly: true
+          description: 'Server-assigned, **in sequence per legal entity per fiscal year** (decided 28 September,
+            audit R191), for example `JE-2026-000123`. Gapless within the legal entity and year: a number is
+            taken when the entry reaches the ledger, not when a draft is saved.
+
+            '
         fiscalPeriodId:
           type: string
           format: uuid
@@ -4464,6 +4560,12 @@ components:
           type: string
           format: uuid
           readOnly: true
+        note:
+          type: string
+          maxLength: 500
+          nullable: true
+          description: Why this rate, and from where. **Required when `source` is `manual`** (decided 28
+            September, audit R127 (4)); null on a rate `ingestFxRates` fetched.
         providerReference:
           type: string
           nullable: true
@@ -4694,6 +4796,11 @@ components:
             became able to trade outside its region's currency.
         providerName:
           type: string
+        venueId:
+          type: string
+          format: uuid
+          description: The venue this settlement is for. **Reconciled daily per venue** (decided 28 September,
+            audit R110 (b)), so `periodStart` and `periodEnd` are the same day.
         periodStart:
           type: string
           format: date
@@ -4929,6 +5036,13 @@ components:
           type: string
           format: date-time
           nullable: true
+        approvalRequestId:
+          type: string
+          format: uuid
+          nullable: true
+          readOnly: true
+          description: The approval request a close or reopen is waiting on (`approvals`), routed to a finance
+            approver (decided 28 September, audit R144). Null when nothing is waiting.
         events:
           type: array
           description: '**Every step of the period''s close, oldest first**: begin, abandon, close and reopen,
@@ -5096,7 +5210,10 @@ components:
                     amount:
                       $ref: ../shared/common.yaml#/components/schemas/Money
                     priorPeriodAmount:
-                      $ref: ../shared/common.yaml#/components/schemas/Money
+                      allOf:
+                      - $ref: ../shared/common.yaml#/components/schemas/Money
+                      description: The same line for **the same period last year** (decided 28 September,
+                        audit R127 (3)). Absent where that period did not exist.
               total:
                 $ref: ../shared/common.yaml#/components/schemas/Money
     FinancialReportKind:

@@ -262,9 +262,10 @@ shared-schema; per-service databases change the connection arithmetic entirely.
 **CF-162** — the three scenarios. **This document is a partial answer to it** and should be attached
 when it is closed.
 
-**CF-64** — AWS or Azure, pending DESC. **Everything here is provider-neutral. Nothing below it can
-be**: managed Postgres sizing, the Redis tier, autoscale semantics and cost are all provider
-choices, and **CF-64 also carries the RPO and RTO targets, which are stated nowhere.**
+**CF-64** — **Decided 28 September (audit R057): Azure in a UAE region, GitHub Actions for CI.
+CF-64 closed.** Everything here is provider-neutral; managed Postgres sizing, the Redis tier,
+autoscale semantics and cost are now Azure's to state. The RPO and RTO targets were settled on
+21 September (`docs/registers/conflicts.md` CF-64).
 
 ---
 

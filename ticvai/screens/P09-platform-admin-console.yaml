@@ -72,22 +72,19 @@ screens:
     inferred: true
     exitTo:
     - ADM-002
-    - ADM-003
     - ADM-004
     transitions:
     - to: ADM-002
       trigger: Platform Dashboard
       provenance: derived — ADM-002 declares entryState.params  and ADM-001 holds none of them, so the
         edge carries nothing and ADM-002 opens cold
-    - to: ADM-003
-      trigger: Cross-Tenant Health Dashboard
-      provenance: derived — ADM-003 declares entryState.params cellId, rightId and ADM-001 holds none
-        of them, so the edge carries nothing and ADM-003 opens cold
     - to: PTR-001
-      trigger: Partner Login / MFA
-      provenance: flow F104 step 1→2
+      trigger: A partner user signs in through the same door
+      provenance: flow F104 step 3→4
       crossesDevice: true
       back: false
+      carries:
+      - challengeId
   notes: Purpose derived from the screen name and its operations on 17 August, not from a requirement.
   density: compact
   pattern: listDetail
@@ -207,6 +204,45 @@ screens:
         label: Login
         operation: login
         provenance: contract identity.yaml POST /auth/login
+      - kind: textField
+        label: Authentication code
+        operation: verifyMfaChallenge
+        notes: Shown only in the mfaRequired state, after `login`, for the authenticator-app code or the
+          emailed code (decided 28 September, audit R135, R126 (5)).
+        provenance: contract identity.yaml POST /auth/mfa/challenge/{challengeId}/verify
+      - kind: primaryButton
+        label: Verify
+        operation: verifyMfaChallenge
+        notes: Completes sign-in; the session is usable only after it. Five wrong codes lock step-up (429
+          step-up-locked, audit R126 (6)).
+        provenance: contract identity.yaml POST /auth/mfa/challenge/{challengeId}/verify
+      - kind: secondaryButton
+        label: Email me a code instead
+        operation: createMfaChallenge
+        notes: 'The fallback: a new challenge with the email method (`emailOtp`) instead of the authenticator
+          app (decided 28 September, audit R126 (5)).'
+        provenance: contract identity.yaml POST /auth/mfa/challenge
+      - kind: secondaryButton
+        label: Enrol MFA method
+        operation: enrolMfaMethod
+        notes: '**A platform operator must hold a method to sign in** — every platform-staff permission
+          is in the MFA floor (decided 28 September, audit R135). On a first sign-in with no method enrolled,
+          the screen goes to enrolment before anything else. The kind picker offers only the authenticator
+          app (`totp`) and email (`emailOtp`); any other kind is refused 422 mfa-kind-not-allowed (audit
+          R126 (5)).'
+        provenance: contract identity.yaml POST /auth/mfa/methods
+      - kind: secondaryButton
+        label: Confirm enrolment
+        operation: verifyMfaEnrolment
+        notes: The method is not active until the first code is verified. Recovery codes are shown once,
+          from the enrolment response, and never again.
+        provenance: contract identity.yaml POST /auth/mfa/methods/{methodId}
+      - kind: destructiveButton
+        label: Remove MFA method
+        operation: removeMfaMethod
+        notes: Removing the last active method is refused 409 while the principal holds a permission that
+          requires MFA — for platform staff, always (decided 28 September, audit R135).
+        provenance: contract identity.yaml DELETE /auth/mfa/methods/{methodId}
       - kind: destructiveButton
         label: Force logout
         operation: forceLogout
@@ -216,6 +252,46 @@ screens:
         operation: revokeAllSessions
         provenance: contract identity.yaml POST /auth/sessions/revoke-all
   overlays:
+  - id: formEnrolMfaMethod
+    component: modal
+    trigger: Enrol MFA method
+    body: '**Collects what `enrolMfaMethod` sends before it is called.** Required: `kind` — the authenticator
+      app (`totp`) or email (`emailOtp`) only (decided 28 September, audit R126 (5)). Optional: `target`
+      (the email address for `emailOtp`). The response carries the secret or QR for the app and the recovery
+      codes, shown once. Dismissing sends nothing; the screen behind is unchanged.'
+    confirm:
+      label: Enrol
+      operation: enrolMfaMethod
+    dismiss:
+      label: Cancel
+      discards:
+      - kind
+      - target
+    provenance: contract identity.yaml POST /auth/mfa/methods
+  - id: formVerifyMfaEnrolment
+    component: modal
+    trigger: Confirm enrolment
+    body: '**Collects what `verifyMfaEnrolment` sends before it is called.** Required: `code`, the first
+      code from the new method. The method is active only after this. Dismissing sends nothing; the method
+      stays pending.'
+    confirm:
+      label: Confirm enrolment
+      operation: verifyMfaEnrolment
+    dismiss:
+      label: Cancel
+      discards:
+      - code
+    provenance: contract identity.yaml POST /auth/mfa/methods/{methodId}
+  - id: confirmRemoveMfaMethod
+    component: confirmDialog
+    trigger: Remove MFA method
+    body: '**Names the method being removed and what remains.** Removing the last active method is refused
+      409 while the principal holds a permission that requires MFA (decided 28 September, audit R135);
+      the dialog says so before it is sent rather than after.'
+    confirm:
+      label: Remove
+      operation: removeMfaMethod
+    provenance: contract identity.yaml DELETE /auth/mfa/methods/{methodId}
   - id: confirmForceLogout
     component: confirmDialog
     trigger: Force logout
@@ -259,7 +335,48 @@ screens:
     emptyNoAccess: Shown when the caller lacks `SESSION_FORCE_LOGOUT`, which `listActiveSessions` requires,
       and names that permission. **Never an empty table** — that reads as *there is no data* and sends
       somebody to support with the wrong question.
+    mfaRequired: '**Signed in, not yet through.** The principal holds a permission that requires MFA (ROLE_MANAGE,
+      LEDGER_APPROVE, any platform-staff permission, or one the tenant added), so after `login` the screen
+      calls `createMfaChallenge` and asks for the authenticator code; `verifyMfaChallenge` completes the
+      sign-in. **Email me a code instead** is the fallback. Five wrong codes lock step-up for the policy''s
+      lockout minutes and the screen says so. A principal with no enrolled method is sent to enrol first
+      (decided 28 September, audit R135, R126).'
+    mfaEnrolmentRequired: '**First sign-in, no method yet.** A platform operator always requires MFA (every
+      `PLATFORM_*` permission is in the floor), so one with no enrolled method cannot finish signing in:
+      the screen enrols the authenticator app (`enrolMfaMethod`, email as the fallback), confirms it with
+      the first code (`verifyMfaEnrolment`), then continues to the mfaRequired step (decided 28 September,
+      audit R135, R126 (5)).'
   apis:
+  - operationId: createMfaChallenge
+    contract: identity
+    purpose: Second factor after login when the principal holds a permission in mfaRequiredForPermissions;
+      action `signIn`, the primary method (authenticator app), or the email method as the fallback (decided
+      28 September, audit R135, R126 (5))
+    trigger: onAction
+  - operationId: verifyMfaChallenge
+    contract: identity
+    purpose: Completes sign-in with the code; the session is usable only after it. Five wrong codes lock
+      step-up (audit R126 (6))
+    trigger: onAction
+  - operationId: enrolMfaMethod
+    contract: identity
+    purpose: A platform operator's first method, at first sign-in — authenticator app, or email as the
+      fallback (decided 28 September, audit R135, R126 (5))
+    trigger: onAction
+    invalidates:
+    - listMfaMethods
+  - operationId: verifyMfaEnrolment
+    contract: identity
+    purpose: Activates the enrolled method with its first code
+    trigger: onAction
+    invalidates:
+    - listMfaMethods
+  - operationId: removeMfaMethod
+    contract: identity
+    purpose: Remove a method; the last one is refused 409 while a listed permission is held (audit R135)
+    trigger: onAction
+    invalidates:
+    - listMfaMethods
   - operationId: login
     contract: identity
     purpose: from page inventory
@@ -293,7 +410,11 @@ screens:
     invalidates:
     - listActiveSessions
   entryState:
-    params: []
+    params:
+    - name: challengeId
+      from: navigation
+    - name: methodId
+      from: navigation
     coldEntry: Resolves from the session; a cold arrival is the ordinary case.
     preloaded:
     - ActiveSession.status
@@ -684,8 +805,10 @@ screens:
         edge into it carries them
     - to: ADM-037
       trigger: AI Provider & Credentials
-      provenance: derived — ADM-037 declares entryState.params providerId and ADM-002 holds none of them,
-        so the edge carries nothing and ADM-037 opens cold
+      carries:
+      - regionId
+      provenance: derived — ADM-037 declares entryState.params providerId, regionId and ADM-002 holds
+        regionId, so an edge into it carries them
     - to: ADM-138
       trigger: Promotion Command Center Dashboard
       provenance: derived — ADM-138 declares entryState.params promotionId and ADM-002 holds none of them,
@@ -1023,8 +1146,8 @@ screens:
     transitions:
     - to: ADM-001
       trigger: Platform Login / MFA
-      provenance: derived — ADM-001 declares entryState.params  and ADM-003 holds none of them, so the
-        edge carries nothing and ADM-001 opens cold
+      provenance: derived — ADM-001 declares entryState.params challengeId, methodId and ADM-003 holds
+        none of them, so the edge carries nothing and ADM-001 opens cold
     - to: ADM-002
       trigger: Platform Dashboard
       provenance: derived — ADM-002 declares entryState.params  and ADM-003 holds none of them, so the
@@ -1364,8 +1487,8 @@ screens:
     transitions:
     - to: ADM-001
       trigger: Platform Login / MFA
-      provenance: derived — ADM-001 declares entryState.params  and ADM-004 holds none of them, so the
-        edge carries nothing and ADM-001 opens cold
+      provenance: derived — ADM-001 declares entryState.params challengeId, methodId and ADM-004 holds
+        none of them, so the edge carries nothing and ADM-001 opens cold
     - to: ADM-002
       trigger: Platform Dashboard
       provenance: derived — ADM-002 declares entryState.params  and ADM-004 holds none of them, so the
@@ -1506,8 +1629,8 @@ screens:
     transitions:
     - to: ADM-001
       trigger: Platform Login / MFA
-      provenance: derived — ADM-001 declares entryState.params  and ADM-005 holds none of them, so the
-        edge carries nothing and ADM-001 opens cold
+      provenance: derived — ADM-001 declares entryState.params challengeId, methodId and ADM-005 holds
+        none of them, so the edge carries nothing and ADM-001 opens cold
     - to: ADM-002
       trigger: Platform Dashboard
       provenance: derived — ADM-002 declares entryState.params  and ADM-005 holds none of them, so the
@@ -1547,6 +1670,29 @@ screens:
     - name: contentBody
       slot: collection
       components:
+      - kind: detailPanel
+        label: Open grant into this tenant
+        bindsTo: PlatformStaffGrant
+        columns:
+        - PlatformStaffGrant.id
+        - PlatformStaffGrant.operatorDisplayName
+        - PlatformStaffGrant.permissions
+        - PlatformStaffGrant.reason
+        - PlatformStaffGrant.ticketRef
+        - PlatformStaffGrant.openedAt
+        - PlatformStaffGrant.expiresAt
+        operation: openPlatformStaffGrant
+        notes: '**Always visible while the screen acts on a tenant** (decided 28 September, audit R098):
+          which tenant, which permissions, why, and the time left to `expiresAt`. At expiry every tenant
+          action is disabled and the screen returns to its grantRequired state; a new need is a new grant.
+          The tenant sees the grant in its own audit log.'
+        provenance: contract identity.yaml POST /platform-staff-grants
+      - kind: primaryButton
+        label: Open access grant
+        operation: openPlatformStaffGrant
+        notes: Shown until a grant into the picked tenant is open; asks for the second factor first (step-up,
+          audit R135).
+        provenance: contract identity.yaml POST /platform-staff-grants
       - kind: textField
         label: Status
         operation: listTenants
@@ -1714,6 +1860,25 @@ screens:
         operation: updateTenant
         provenance: contract subscription.yaml PATCH /tenants/{tenantId}
   overlays:
+  - id: formOpenPlatformStaffGrant
+    component: modal
+    trigger: Open access grant
+    body: '**Collects what `openPlatformStaffGrant` sends before it is called** (decided 28 September,
+      audit R098). Required: `id` (a client ULID), `permissions` (tenant permissions only — the ones this
+      screen''s operations need, preselected), `reason`, `expiresAt` (at most 8 hours ahead, proposed).
+      Optional: `ticketRef`. Requires step-up: the operator presents a second factor first. The tenant
+      sees the grant and everything done under it. Dismissing sends nothing; the screen behind is unchanged.'
+    confirm:
+      label: Open access grant
+      operation: openPlatformStaffGrant
+    dismiss:
+      label: Cancel
+      discards:
+      - permissions
+      - reason
+      - ticketRef
+      - expiresAt
+    provenance: contract identity.yaml POST /platform-staff-grants
   - id: confirmRemoveLicenceAddOn
     component: confirmDialog
     trigger: Remove licence add on
@@ -1848,7 +2013,16 @@ screens:
     emptyNoAccess: Shown when the caller lacks `PLATFORM_TENANT_VIEW`, which `listTenants` requires, and
       names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody
       to support with the wrong question.
+    grantRequired: '**No access into this tenant yet.** A tenant is picked and no platform-staff grant
+      into it is open, so every tenant action is disabled and the screen offers **Open access grant**
+      (`openPlatformStaffGrant`: reason, permissions, expiry). The same state returns when the grant reaches
+      `expiresAt` (decided 28 September, audit R098).'
   apis:
+  - operationId: openPlatformStaffGrant
+    contract: identity
+    purpose: Open a time-boxed, audited platform-staff grant into the picked tenant before any tenant-scoped
+      operation here; the tenant sees it (decided 28 September, audit R098)
+    trigger: onAction
   - operationId: listTenants
     contract: subscription
     purpose: from page inventory
@@ -1969,8 +2143,8 @@ screens:
     transitions:
     - to: ADM-001
       trigger: Platform Login / MFA
-      provenance: derived — ADM-001 declares entryState.params  and ADM-006 holds none of them, so the
-        edge carries nothing and ADM-001 opens cold
+      provenance: derived — ADM-001 declares entryState.params challengeId, methodId and ADM-006 holds
+        none of them, so the edge carries nothing and ADM-001 opens cold
     - to: ADM-002
       trigger: Platform Dashboard
       provenance: derived — ADM-002 declares entryState.params  and ADM-006 holds none of them, so the
@@ -2287,8 +2461,8 @@ screens:
     transitions:
     - to: ADM-001
       trigger: Platform Login / MFA
-      provenance: derived — ADM-001 declares entryState.params  and ADM-007 holds none of them, so the
-        edge carries nothing and ADM-001 opens cold
+      provenance: derived — ADM-001 declares entryState.params challengeId, methodId and ADM-007 holds
+        none of them, so the edge carries nothing and ADM-001 opens cold
     - to: ADM-002
       trigger: Platform Dashboard
       provenance: derived — ADM-002 declares entryState.params  and ADM-007 holds none of them, so the
@@ -2609,8 +2783,8 @@ screens:
     transitions:
     - to: ADM-001
       trigger: Platform Login / MFA
-      provenance: derived — ADM-001 declares entryState.params  and ADM-008 holds none of them, so the
-        edge carries nothing and ADM-001 opens cold
+      provenance: derived — ADM-001 declares entryState.params challengeId, methodId and ADM-008 holds
+        none of them, so the edge carries nothing and ADM-001 opens cold
     - to: ADM-002
       trigger: Platform Dashboard
       provenance: derived — ADM-002 declares entryState.params  and ADM-008 holds none of them, so the
@@ -3179,8 +3353,8 @@ screens:
     transitions:
     - to: ADM-001
       trigger: Platform Login / MFA
-      provenance: derived — ADM-001 declares entryState.params  and ADM-009 holds none of them, so the
-        edge carries nothing and ADM-001 opens cold
+      provenance: derived — ADM-001 declares entryState.params challengeId, methodId and ADM-009 holds
+        none of them, so the edge carries nothing and ADM-001 opens cold
     - to: ADM-002
       trigger: Platform Dashboard
       provenance: derived — ADM-002 declares entryState.params  and ADM-009 holds none of them, so the
@@ -3475,8 +3649,8 @@ screens:
     transitions:
     - to: ADM-001
       trigger: Platform Login / MFA
-      provenance: derived — ADM-001 declares entryState.params  and ADM-010 holds none of them, so the
-        edge carries nothing and ADM-001 opens cold
+      provenance: derived — ADM-001 declares entryState.params challengeId, methodId and ADM-010 holds
+        none of them, so the edge carries nothing and ADM-001 opens cold
     - to: ADM-002
       trigger: Platform Dashboard
       provenance: derived — ADM-002 declares entryState.params  and ADM-010 holds none of them, so the
@@ -3715,8 +3889,8 @@ screens:
     transitions:
     - to: ADM-001
       trigger: Platform Login / MFA
-      provenance: derived — ADM-001 declares entryState.params  and ADM-011 holds none of them, so the
-        edge carries nothing and ADM-001 opens cold
+      provenance: derived — ADM-001 declares entryState.params challengeId, methodId and ADM-011 holds
+        none of them, so the edge carries nothing and ADM-001 opens cold
     - to: ADM-002
       trigger: Platform Dashboard
       provenance: derived — ADM-002 declares entryState.params  and ADM-011 holds none of them, so the
@@ -4079,8 +4253,8 @@ screens:
     transitions:
     - to: ADM-001
       trigger: Platform Login / MFA
-      provenance: derived — ADM-001 declares entryState.params  and ADM-012 holds none of them, so the
-        edge carries nothing and ADM-001 opens cold
+      provenance: derived — ADM-001 declares entryState.params challengeId, methodId and ADM-012 holds
+        none of them, so the edge carries nothing and ADM-001 opens cold
     - to: ADM-002
       trigger: Platform Dashboard
       provenance: derived — ADM-002 declares entryState.params  and ADM-012 holds none of them, so the
@@ -4369,8 +4543,8 @@ screens:
     transitions:
     - to: ADM-001
       trigger: Platform Login / MFA
-      provenance: derived — ADM-001 declares entryState.params  and ADM-013 holds none of them, so the
-        edge carries nothing and ADM-001 opens cold
+      provenance: derived — ADM-001 declares entryState.params challengeId, methodId and ADM-013 holds
+        none of them, so the edge carries nothing and ADM-001 opens cold
     - to: ADM-002
       trigger: Platform Dashboard
       provenance: derived — ADM-002 declares entryState.params  and ADM-013 holds none of them, so the
@@ -4616,8 +4790,8 @@ screens:
     transitions:
     - to: ADM-001
       trigger: Platform Login / MFA
-      provenance: derived — ADM-001 declares entryState.params  and ADM-014 holds none of them, so the
-        edge carries nothing and ADM-001 opens cold
+      provenance: derived — ADM-001 declares entryState.params challengeId, methodId and ADM-014 holds
+        none of them, so the edge carries nothing and ADM-001 opens cold
     - to: ADM-002
       trigger: Platform Dashboard
       provenance: derived — ADM-002 declares entryState.params  and ADM-014 holds none of them, so the
@@ -4875,8 +5049,8 @@ screens:
     transitions:
     - to: ADM-001
       trigger: Platform Login / MFA
-      provenance: derived — ADM-001 declares entryState.params  and ADM-015 holds none of them, so the
-        edge carries nothing and ADM-001 opens cold
+      provenance: derived — ADM-001 declares entryState.params challengeId, methodId and ADM-015 holds
+        none of them, so the edge carries nothing and ADM-001 opens cold
     - to: ADM-002
       trigger: Platform Dashboard
       provenance: derived — ADM-002 declares entryState.params  and ADM-015 holds none of them, so the
@@ -5181,20 +5355,15 @@ screens:
     exitTo:
     - ADM-001
     - ADM-002
-    - ADM-003
     transitions:
     - to: ADM-001
       trigger: Platform Login / MFA
-      provenance: derived — ADM-001 declares entryState.params  and ADM-016 holds none of them, so the
-        edge carries nothing and ADM-001 opens cold
+      provenance: derived — ADM-001 declares entryState.params challengeId, methodId and ADM-016 holds
+        none of them, so the edge carries nothing and ADM-001 opens cold
     - to: ADM-002
       trigger: Platform Dashboard
       provenance: derived — ADM-002 declares entryState.params  and ADM-016 holds none of them, so the
         edge carries nothing and ADM-002 opens cold
-    - to: ADM-003
-      trigger: Cross-Tenant Health Dashboard
-      provenance: derived — ADM-003 declares entryState.params cellId, rightId and ADM-016 holds none
-        of them, so the edge carries nothing and ADM-003 opens cold
   notes: Purpose derived from the screen name and its operations on 17 August, not from a requirement.
     **30 operations removed 24 August.** Every white-label screen across P09, P12 and P13 declared the
     **identical 41 operations** — a Typography screen that could create banners and a Component Preview
@@ -5211,6 +5380,42 @@ screens:
     - name: contentBody
       slot: collection
       components:
+      - kind: selectField
+        label: Tenant
+        bindsTo: Tenant
+        columns:
+        - Tenant.id
+        - Tenant.code
+        - Tenant.name
+        - Tenant.status
+        operation: listTenants
+        notes: '**Pick a tenant first** (decided 28 September, audit R098). This screen''s operations
+          run in that tenant''s cell, and a platform token carries no tenant permission there until a
+          platform-staff grant into it is open.'
+        provenance: contract subscription.yaml GET /tenants
+      - kind: detailPanel
+        label: Open grant into this tenant
+        bindsTo: PlatformStaffGrant
+        columns:
+        - PlatformStaffGrant.id
+        - PlatformStaffGrant.operatorDisplayName
+        - PlatformStaffGrant.permissions
+        - PlatformStaffGrant.reason
+        - PlatformStaffGrant.ticketRef
+        - PlatformStaffGrant.openedAt
+        - PlatformStaffGrant.expiresAt
+        operation: openPlatformStaffGrant
+        notes: '**Always visible while the screen acts on a tenant** (decided 28 September, audit R098):
+          which tenant, which permissions, why, and the time left to `expiresAt`. At expiry every tenant
+          action is disabled and the screen returns to its grantRequired state; a new need is a new grant.
+          The tenant sees the grant in its own audit log.'
+        provenance: contract identity.yaml POST /platform-staff-grants
+      - kind: primaryButton
+        label: Open access grant
+        operation: openPlatformStaffGrant
+        notes: Shown until a grant into the picked tenant is open; asks for the second factor first (step-up,
+          audit R135).
+        provenance: contract identity.yaml POST /platform-staff-grants
       - kind: dataTable
         label: Every config version
         bindsTo: ConfigVersion
@@ -5335,7 +5540,20 @@ screens:
     emptyNoAccess: Shown when the caller lacks `TENANT_CONFIGURE`, which `getAppIcons` requires, and names
       that permission. **Never an empty table** — that reads as *there is no data* and sends somebody
       to support with the wrong question.
+    grantRequired: '**No access into this tenant yet.** A tenant is picked and no platform-staff grant
+      into it is open, so every tenant action is disabled and the screen offers **Open access grant**
+      (`openPlatformStaffGrant`: reason, permissions, expiry). The same state returns when the grant reaches
+      `expiresAt` (decided 28 September, audit R098).'
   apis:
+  - operationId: openPlatformStaffGrant
+    contract: identity
+    purpose: Open a time-boxed, audited platform-staff grant into the picked tenant before any tenant-scoped
+      operation here; the tenant sees it (decided 28 September, audit R098)
+    trigger: onAction
+  - operationId: listTenants
+    contract: subscription
+    purpose: The tenant picker — the operator picks a tenant before acting in its cell (audit R098)
+    trigger: onLoad
   - operationId: createPreview
     contract: white-label
     purpose: Generate a preview link
@@ -5420,6 +5638,25 @@ screens:
     pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing
     them to the ones that matter is work a person still owes this screen.
   overlays:
+  - id: formOpenPlatformStaffGrant
+    component: modal
+    trigger: Open access grant
+    body: '**Collects what `openPlatformStaffGrant` sends before it is called** (decided 28 September,
+      audit R098). Required: `id` (a client ULID), `permissions` (tenant permissions only — the ones this
+      screen''s operations need, preselected), `reason`, `expiresAt` (at most 8 hours ahead, proposed).
+      Optional: `ticketRef`. Requires step-up: the operator presents a second factor first. The tenant
+      sees the grant and everything done under it. Dismissing sends nothing; the screen behind is unchanged.'
+    confirm:
+      label: Open access grant
+      operation: openPlatformStaffGrant
+    dismiss:
+      label: Cancel
+      discards:
+      - permissions
+      - reason
+      - ticketRef
+      - expiresAt
+    provenance: contract identity.yaml POST /platform-staff-grants
   - id: formCreatePreview
     component: modal
     trigger: Create preview
@@ -5525,21 +5762,16 @@ screens:
     exitTo:
     - ADM-001
     - ADM-002
-    - ADM-003
     - ADM-016
     transitions:
     - to: ADM-001
       trigger: Platform Login / MFA
-      provenance: derived — ADM-001 declares entryState.params  and ADM-017 holds none of them, so the
-        edge carries nothing and ADM-001 opens cold
+      provenance: derived — ADM-001 declares entryState.params challengeId, methodId and ADM-017 holds
+        none of them, so the edge carries nothing and ADM-001 opens cold
     - to: ADM-002
       trigger: Platform Dashboard
       provenance: derived — ADM-002 declares entryState.params  and ADM-017 holds none of them, so the
         edge carries nothing and ADM-002 opens cold
-    - to: ADM-003
-      trigger: Cross-Tenant Health Dashboard
-      provenance: derived — ADM-003 declares entryState.params cellId, rightId and ADM-017 holds none
-        of them, so the edge carries nothing and ADM-003 opens cold
     - to: ADM-016
       trigger: White-Label Branding Management
       provenance: flow F103 step 1→2
@@ -5569,6 +5801,42 @@ screens:
     - name: contentBody
       slot: collection
       components:
+      - kind: selectField
+        label: Tenant
+        bindsTo: Tenant
+        columns:
+        - Tenant.id
+        - Tenant.code
+        - Tenant.name
+        - Tenant.status
+        operation: listTenants
+        notes: '**Pick a tenant first** (decided 28 September, audit R098). This screen''s operations
+          run in that tenant''s cell, and a platform token carries no tenant permission there until a
+          platform-staff grant into it is open.'
+        provenance: contract subscription.yaml GET /tenants
+      - kind: detailPanel
+        label: Open grant into this tenant
+        bindsTo: PlatformStaffGrant
+        columns:
+        - PlatformStaffGrant.id
+        - PlatformStaffGrant.operatorDisplayName
+        - PlatformStaffGrant.permissions
+        - PlatformStaffGrant.reason
+        - PlatformStaffGrant.ticketRef
+        - PlatformStaffGrant.openedAt
+        - PlatformStaffGrant.expiresAt
+        operation: openPlatformStaffGrant
+        notes: '**Always visible while the screen acts on a tenant** (decided 28 September, audit R098):
+          which tenant, which permissions, why, and the time left to `expiresAt`. At expiry every tenant
+          action is disabled and the screen returns to its grantRequired state; a new need is a new grant.
+          The tenant sees the grant in its own audit log.'
+        provenance: contract identity.yaml POST /platform-staff-grants
+      - kind: primaryButton
+        label: Open access grant
+        operation: openPlatformStaffGrant
+        notes: Shown until a grant into the picked tenant is open; asks for the second factor first (step-up,
+          audit R135).
+        provenance: contract identity.yaml POST /platform-staff-grants
       - kind: dataTable
         label: Every custom domain
         bindsTo: CustomDomain
@@ -5627,7 +5895,20 @@ screens:
     emptyNoAccess: Shown when the caller lacks `TENANT_CONFIGURE`, which `listCustomDomains` requires,
       and names that permission. **Never an empty table** — that reads as *there is no data* and sends
       somebody to support with the wrong question.
+    grantRequired: '**No access into this tenant yet.** A tenant is picked and no platform-staff grant
+      into it is open, so every tenant action is disabled and the screen offers **Open access grant**
+      (`openPlatformStaffGrant`: reason, permissions, expiry). The same state returns when the grant reaches
+      `expiresAt` (decided 28 September, audit R098).'
   apis:
+  - operationId: openPlatformStaffGrant
+    contract: identity
+    purpose: Open a time-boxed, audited platform-staff grant into the picked tenant before any tenant-scoped
+      operation here; the tenant sees it (decided 28 September, audit R098)
+    trigger: onAction
+  - operationId: listTenants
+    contract: subscription
+    purpose: The tenant picker — the operator picks a tenant before acting in its cell (audit R098)
+    trigger: onLoad
   - operationId: listCustomDomains
     contract: white-label
     purpose: The domains this tenant has claimed
@@ -5681,6 +5962,25 @@ screens:
     — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
     to the ones that matter is work a person still owes this screen.
   overlays:
+  - id: formOpenPlatformStaffGrant
+    component: modal
+    trigger: Open access grant
+    body: '**Collects what `openPlatformStaffGrant` sends before it is called** (decided 28 September,
+      audit R098). Required: `id` (a client ULID), `permissions` (tenant permissions only — the ones this
+      screen''s operations need, preselected), `reason`, `expiresAt` (at most 8 hours ahead, proposed).
+      Optional: `ticketRef`. Requires step-up: the operator presents a second factor first. The tenant
+      sees the grant and everything done under it. Dismissing sends nothing; the screen behind is unchanged.'
+    confirm:
+      label: Open access grant
+      operation: openPlatformStaffGrant
+    dismiss:
+      label: Cancel
+      discards:
+      - permissions
+      - reason
+      - ticketRef
+      - expiresAt
+    provenance: contract identity.yaml POST /platform-staff-grants
   - id: formClaimCustomDomain
     component: modal
     trigger: Claim custom domain
@@ -5714,20 +6014,15 @@ screens:
     exitTo:
     - ADM-001
     - ADM-002
-    - ADM-003
     transitions:
     - to: ADM-001
       trigger: Platform Login / MFA
-      provenance: derived — ADM-001 declares entryState.params  and ADM-018 holds none of them, so the
-        edge carries nothing and ADM-001 opens cold
+      provenance: derived — ADM-001 declares entryState.params challengeId, methodId and ADM-018 holds
+        none of them, so the edge carries nothing and ADM-001 opens cold
     - to: ADM-002
       trigger: Platform Dashboard
       provenance: derived — ADM-002 declares entryState.params  and ADM-018 holds none of them, so the
         edge carries nothing and ADM-002 opens cold
-    - to: ADM-003
-      trigger: Cross-Tenant Health Dashboard
-      provenance: derived — ADM-003 declares entryState.params cellId, rightId and ADM-018 holds none
-        of them, so the edge carries nothing and ADM-003 opens cold
   notes: Purpose derived from the screen name and its operations on 17 August, not from a requirement.
     **36 operations removed 24 August.** Every white-label screen across P09, P12 and P13 declared the
     **identical 41 operations** — a Typography screen that could create banners and a Component Preview
@@ -5744,6 +6039,42 @@ screens:
     - name: contentBody
       slot: collection
       components:
+      - kind: selectField
+        label: Tenant
+        bindsTo: Tenant
+        columns:
+        - Tenant.id
+        - Tenant.code
+        - Tenant.name
+        - Tenant.status
+        operation: listTenants
+        notes: '**Pick a tenant first** (decided 28 September, audit R098). This screen''s operations
+          run in that tenant''s cell, and a platform token carries no tenant permission there until a
+          platform-staff grant into it is open.'
+        provenance: contract subscription.yaml GET /tenants
+      - kind: detailPanel
+        label: Open grant into this tenant
+        bindsTo: PlatformStaffGrant
+        columns:
+        - PlatformStaffGrant.id
+        - PlatformStaffGrant.operatorDisplayName
+        - PlatformStaffGrant.permissions
+        - PlatformStaffGrant.reason
+        - PlatformStaffGrant.ticketRef
+        - PlatformStaffGrant.openedAt
+        - PlatformStaffGrant.expiresAt
+        operation: openPlatformStaffGrant
+        notes: '**Always visible while the screen acts on a tenant** (decided 28 September, audit R098):
+          which tenant, which permissions, why, and the time left to `expiresAt`. At expiry every tenant
+          action is disabled and the screen returns to its grantRequired state; a new need is a new grant.
+          The tenant sees the grant in its own audit log.'
+        provenance: contract identity.yaml POST /platform-staff-grants
+      - kind: primaryButton
+        label: Open access grant
+        operation: openPlatformStaffGrant
+        notes: Shown until a grant into the picked tenant is open; asks for the second factor first (step-up,
+          audit R135).
+        provenance: contract identity.yaml POST /platform-staff-grants
       - kind: dataTable
         label: Every faq category
         bindsTo: FaqCategory
@@ -5808,7 +6139,20 @@ screens:
     emptyNoAccess: Shown when the caller lacks `TENANT_CONFIGURE`, which `listFaqs` requires, and names
       that permission. **Never an empty table** — that reads as *there is no data* and sends somebody
       to support with the wrong question.
+    grantRequired: '**No access into this tenant yet.** A tenant is picked and no platform-staff grant
+      into it is open, so every tenant action is disabled and the screen offers **Open access grant**
+      (`openPlatformStaffGrant`: reason, permissions, expiry). The same state returns when the grant reaches
+      `expiresAt` (decided 28 September, audit R098).'
   apis:
+  - operationId: openPlatformStaffGrant
+    contract: identity
+    purpose: Open a time-boxed, audited platform-staff grant into the picked tenant before any tenant-scoped
+      operation here; the tenant sees it (decided 28 September, audit R098)
+    trigger: onAction
+  - operationId: listTenants
+    contract: subscription
+    purpose: The tenant picker — the operator picks a tenant before acting in its cell (audit R098)
+    trigger: onLoad
   - operationId: setLanguages
     contract: white-label
     purpose: from page inventory
@@ -5861,6 +6205,25 @@ screens:
     — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
     to the ones that matter is work a person still owes this screen.
   overlays:
+  - id: formOpenPlatformStaffGrant
+    component: modal
+    trigger: Open access grant
+    body: '**Collects what `openPlatformStaffGrant` sends before it is called** (decided 28 September,
+      audit R098). Required: `id` (a client ULID), `permissions` (tenant permissions only — the ones this
+      screen''s operations need, preselected), `reason`, `expiresAt` (at most 8 hours ahead, proposed).
+      Optional: `ticketRef`. Requires step-up: the operator presents a second factor first. The tenant
+      sees the grant and everything done under it. Dismissing sends nothing; the screen behind is unchanged.'
+    confirm:
+      label: Open access grant
+      operation: openPlatformStaffGrant
+    dismiss:
+      label: Cancel
+      discards:
+      - permissions
+      - reason
+      - ticketRef
+      - expiresAt
+    provenance: contract identity.yaml POST /platform-staff-grants
   - id: formSetLanguages
     component: modal
     trigger: Save languages
@@ -5921,21 +6284,22 @@ screens:
     exitTo:
     - ADM-001
     - ADM-002
-    - ADM-003
     transitions:
     - to: ADM-001
       trigger: Platform Login / MFA
-      provenance: derived — ADM-001 declares entryState.params  and ADM-019 holds none of them, so the
-        edge carries nothing and ADM-001 opens cold
+      provenance: derived — ADM-001 declares entryState.params challengeId, methodId and ADM-019 holds
+        none of them, so the edge carries nothing and ADM-001 opens cold
     - to: ADM-002
       trigger: Platform Dashboard
       provenance: derived — ADM-002 declares entryState.params  and ADM-019 holds none of them, so the
         edge carries nothing and ADM-002 opens cold
-    - to: ADM-003
-      trigger: Cross-Tenant Health Dashboard
-      provenance: derived — ADM-003 declares entryState.params cellId, rightId and ADM-019 holds none
-        of them, so the edge carries nothing and ADM-003 opens cold
-  notes: Purpose derived from the screen name and its operations on 17 August, not from a requirement.
+  notes: 'Purpose derived from the screen name and its operations on 17 August, not from a requirement.
+
+
+    **Holds the tenant-level venue defaults (decided 28 September, audit R094).** `getVenueSettingsDefaults`
+    and `setVenueSettingsDefaults` are the tenant row every venue inherits where its own value is null;
+    a venue''s own values are set on its venue settings screen. They run in the tenant''s cell, so the
+    operator picks a tenant and opens a platform-staff grant first (audit R098).'
   openQuestions:
   - No contract — platform defaults not specified
   density: compact
@@ -5948,6 +6312,42 @@ screens:
     - name: contentBody
       slot: collection
       components:
+      - kind: selectField
+        label: Tenant
+        bindsTo: Tenant
+        columns:
+        - Tenant.id
+        - Tenant.code
+        - Tenant.name
+        - Tenant.status
+        operation: listTenants
+        notes: '**Pick a tenant first** (decided 28 September, audit R098). This screen''s operations
+          run in that tenant''s cell, and a platform token carries no tenant permission there until a
+          platform-staff grant into it is open.'
+        provenance: contract subscription.yaml GET /tenants
+      - kind: detailPanel
+        label: Open grant into this tenant
+        bindsTo: PlatformStaffGrant
+        columns:
+        - PlatformStaffGrant.id
+        - PlatformStaffGrant.operatorDisplayName
+        - PlatformStaffGrant.permissions
+        - PlatformStaffGrant.reason
+        - PlatformStaffGrant.ticketRef
+        - PlatformStaffGrant.openedAt
+        - PlatformStaffGrant.expiresAt
+        operation: openPlatformStaffGrant
+        notes: '**Always visible while the screen acts on a tenant** (decided 28 September, audit R098):
+          which tenant, which permissions, why, and the time left to `expiresAt`. At expiry every tenant
+          action is disabled and the screen returns to its grantRequired state; a new need is a new grant.
+          The tenant sees the grant in its own audit log.'
+        provenance: contract identity.yaml POST /platform-staff-grants
+      - kind: primaryButton
+        label: Open access grant
+        operation: openPlatformStaffGrant
+        notes: Shown until a grant into the picked tenant is open; asks for the second factor first (step-up,
+          audit R135).
+        provenance: contract identity.yaml POST /platform-staff-grants
       - kind: dataTable
         label: Every plan
         bindsTo: Plan
@@ -5969,6 +6369,26 @@ screens:
     - name: contextPanel
       slot: selection
       components:
+      - kind: detailPanel
+        label: Tenant defaults for every venue
+        bindsTo: VenueSettings
+        columns:
+        - VenueSettings.cartLeaseSeconds
+        - VenueSettings.cartHoldExtensionMinutes
+        - VenueSettings.cartMaxExtensions
+        - VenueSettings.resaleCutoffHours
+        - VenueSettings.exchangeCutoffHours
+        - VenueSettings.rescheduleCutoffHours
+        - VenueSettings.reservationMaxExtensions
+        - VenueSettings.shiftVarianceThreshold
+        - VenueSettings.quietHours
+        - VenueSettings.displayCurrencies
+        operation: getVenueSettingsDefaults
+        notes: '**The tenant-level default each venue inherits** (decided 28 September, audit R094). A
+          venue whose own value is null uses the value here; where the tenant has saved nothing these
+          are the proposed defaults, client to correct. The venue facts on the schema (support hours,
+          biometrics, segregated access) are not defaulted here.'
+        provenance: contract tenancy.yaml GET /venue-settings-defaults
       - kind: detailPanel
         label: The selected plan
         bindsTo: Plan
@@ -5992,6 +6412,10 @@ screens:
     - name: actionBar
       slot: rowActions
       components:
+      - kind: secondaryButton
+        label: Save venue defaults
+        operation: setVenueSettingsDefaults
+        provenance: contract tenancy.yaml PUT /venue-settings-defaults
       - kind: primaryButton
         label: Create plan
         operation: createPlan
@@ -6009,7 +6433,30 @@ screens:
     emptyNoAccess: Shown when the caller lacks `PLATFORM_TENANT_VIEW`, which `listPlans` requires, and
       names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody
       to support with the wrong question.
+    grantRequired: '**No access into this tenant yet.** A tenant is picked and no platform-staff grant
+      into it is open, so every tenant action is disabled and the screen offers **Open access grant**
+      (`openPlatformStaffGrant`: reason, permissions, expiry). The same state returns when the grant reaches
+      `expiresAt` (decided 28 September, audit R098).'
   apis:
+  - operationId: getVenueSettingsDefaults
+    contract: tenancy
+    purpose: The tenant-level default each venue inherits (decided 28 September, audit R094)
+    trigger: onLoad
+  - operationId: setVenueSettingsDefaults
+    contract: tenancy
+    purpose: Set the tenant-level venue defaults; venues with their own values are untouched (audit R094)
+    trigger: onAction
+    invalidates:
+    - getVenueSettingsDefaults
+  - operationId: openPlatformStaffGrant
+    contract: identity
+    purpose: Open a time-boxed, audited platform-staff grant into the picked tenant before any tenant-scoped
+      operation here; the tenant sees it (decided 28 September, audit R098)
+    trigger: onAction
+  - operationId: listTenants
+    contract: subscription
+    purpose: The tenant picker — the operator picks a tenant before acting in its cell (audit R098)
+    trigger: onLoad
   - operationId: listPlans
     contract: subscription
     purpose: List subscription plans
@@ -6052,6 +6499,51 @@ screens:
     — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
     to the ones that matter is work a person still owes this screen.
   overlays:
+  - id: formOpenPlatformStaffGrant
+    component: modal
+    trigger: Open access grant
+    body: '**Collects what `openPlatformStaffGrant` sends before it is called** (decided 28 September,
+      audit R098). Required: `id` (a client ULID), `permissions` (tenant permissions only — the ones this
+      screen''s operations need, preselected), `reason`, `expiresAt` (at most 8 hours ahead, proposed).
+      Optional: `ticketRef`. Requires step-up: the operator presents a second factor first. The tenant
+      sees the grant and everything done under it. Dismissing sends nothing; the screen behind is unchanged.'
+    confirm:
+      label: Open access grant
+      operation: openPlatformStaffGrant
+    dismiss:
+      label: Cancel
+      discards:
+      - permissions
+      - reason
+      - ticketRef
+      - expiresAt
+    provenance: contract identity.yaml POST /platform-staff-grants
+  - id: formSetVenueSettingsDefaults
+    component: modal
+    trigger: Save venue defaults
+    body: '**Collects what `setVenueSettingsDefaults` sends before it is called** (decided 28 September,
+      audit R094). The whole row is replaced: an omitted limit returns to its proposed default. Each value
+      must sit within its field''s minimum and maximum, or the request is refused 400 naming the field.
+      A venue''s own values are untouched; a venue with none follows the new default at once. Dismissing
+      sends nothing; the screen behind is unchanged.'
+    bindsTo: VenueSettings
+    confirm:
+      label: Save venue defaults
+      operation: setVenueSettingsDefaults
+    dismiss:
+      label: Cancel
+      discards:
+      - cartLeaseSeconds
+      - cartHoldExtensionMinutes
+      - cartMaxExtensions
+      - resaleCutoffHours
+      - exchangeCutoffHours
+      - rescheduleCutoffHours
+      - reservationMaxExtensions
+      - shiftVarianceThreshold
+      - quietHours
+      - displayCurrencies
+    provenance: contract tenancy.yaml PUT /venue-settings-defaults
   - id: formCreatePlan
     component: modal
     trigger: Create plan
@@ -6118,20 +6610,15 @@ screens:
     exitTo:
     - ADM-001
     - ADM-002
-    - ADM-003
     transitions:
     - to: ADM-001
       trigger: Platform Login / MFA
-      provenance: derived — ADM-001 declares entryState.params  and ADM-020 holds none of them, so the
-        edge carries nothing and ADM-001 opens cold
+      provenance: derived — ADM-001 declares entryState.params challengeId, methodId and ADM-020 holds
+        none of them, so the edge carries nothing and ADM-001 opens cold
     - to: ADM-002
       trigger: Platform Dashboard
       provenance: derived — ADM-002 declares entryState.params  and ADM-020 holds none of them, so the
         edge carries nothing and ADM-002 opens cold
-    - to: ADM-003
-      trigger: Cross-Tenant Health Dashboard
-      provenance: derived — ADM-003 declares entryState.params cellId, rightId and ADM-020 holds none
-        of them, so the edge carries nothing and ADM-003 opens cold
   notes: Purpose derived from the screen name and its operations on 17 August, not from a requirement.
   density: compact
   pattern: listDetail
@@ -6303,20 +6790,15 @@ screens:
     exitTo:
     - ADM-001
     - ADM-002
-    - ADM-003
     transitions:
     - to: ADM-001
       trigger: Platform Login / MFA
-      provenance: derived — ADM-001 declares entryState.params  and ADM-021 holds none of them, so the
-        edge carries nothing and ADM-001 opens cold
+      provenance: derived — ADM-001 declares entryState.params challengeId, methodId and ADM-021 holds
+        none of them, so the edge carries nothing and ADM-001 opens cold
     - to: ADM-002
       trigger: Platform Dashboard
       provenance: derived — ADM-002 declares entryState.params  and ADM-021 holds none of them, so the
         edge carries nothing and ADM-002 opens cold
-    - to: ADM-003
-      trigger: Cross-Tenant Health Dashboard
-      provenance: derived — ADM-003 declares entryState.params cellId, rightId and ADM-021 holds none
-        of them, so the edge carries nothing and ADM-003 opens cold
   notes: Purpose derived from the screen name and its operations on 17 August, not from a requirement.
   density: compact
   pattern: listDetail
@@ -6435,7 +6917,6 @@ screens:
     exitTo:
     - ADM-001
     - ADM-002
-    - ADM-003
     - ADM-027
     flowDerived: true
     transitions:
@@ -6444,16 +6925,12 @@ screens:
       provenance: flow F04 step 1→2
     - to: ADM-001
       trigger: Platform Login / MFA
-      provenance: derived — ADM-001 declares entryState.params  and ADM-022 holds none of them, so the
-        edge carries nothing and ADM-001 opens cold
+      provenance: derived — ADM-001 declares entryState.params challengeId, methodId and ADM-022 holds
+        none of them, so the edge carries nothing and ADM-001 opens cold
     - to: ADM-002
       trigger: Platform Dashboard
       provenance: derived — ADM-002 declares entryState.params  and ADM-022 holds none of them, so the
         edge carries nothing and ADM-002 opens cold
-    - to: ADM-003
-      trigger: Cross-Tenant Health Dashboard
-      provenance: derived — ADM-003 declares entryState.params cellId, rightId and ADM-022 holds none
-        of them, so the edge carries nothing and ADM-003 opens cold
   notes: Purpose derived from the screen name and its operations on 17 August, not from a requirement.
   openQuestions:
   - No contract — new scope, 30 Jul
@@ -6698,22 +7175,17 @@ screens:
     exitTo:
     - ADM-001
     - ADM-002
-    - ADM-003
     - ADM-029
     flowDerived: true
     transitions:
     - to: ADM-001
       trigger: Platform Login / MFA
-      provenance: derived — ADM-001 declares entryState.params  and ADM-023 holds none of them, so the
-        edge carries nothing and ADM-001 opens cold
+      provenance: derived — ADM-001 declares entryState.params challengeId, methodId and ADM-023 holds
+        none of them, so the edge carries nothing and ADM-001 opens cold
     - to: ADM-002
       trigger: Platform Dashboard
       provenance: derived — ADM-002 declares entryState.params  and ADM-023 holds none of them, so the
         edge carries nothing and ADM-002 opens cold
-    - to: ADM-003
-      trigger: Cross-Tenant Health Dashboard
-      provenance: derived — ADM-003 declares entryState.params cellId, rightId and ADM-023 holds none
-        of them, so the edge carries nothing and ADM-003 opens cold
     - to: ADM-029
       trigger: Watches the rollout per cell
       provenance: flow F04 step 3→4
@@ -6961,20 +7433,15 @@ screens:
     exitTo:
     - ADM-001
     - ADM-002
-    - ADM-003
     transitions:
     - to: ADM-001
       trigger: Platform Login / MFA
-      provenance: derived — ADM-001 declares entryState.params  and ADM-024 holds none of them, so the
-        edge carries nothing and ADM-001 opens cold
+      provenance: derived — ADM-001 declares entryState.params challengeId, methodId and ADM-024 holds
+        none of them, so the edge carries nothing and ADM-001 opens cold
     - to: ADM-002
       trigger: Platform Dashboard
       provenance: derived — ADM-002 declares entryState.params  and ADM-024 holds none of them, so the
         edge carries nothing and ADM-002 opens cold
-    - to: ADM-003
-      trigger: Cross-Tenant Health Dashboard
-      provenance: derived — ADM-003 declares entryState.params cellId, rightId and ADM-024 holds none
-        of them, so the edge carries nothing and ADM-003 opens cold
   notes: Purpose derived from the screen name and its operations on 17 August, not from a requirement.
   openQuestions:
   - No contract — new scope, 30 Jul
@@ -7129,20 +7596,15 @@ screens:
     exitTo:
     - ADM-001
     - ADM-002
-    - ADM-003
     transitions:
     - to: ADM-001
       trigger: Platform Login / MFA
-      provenance: derived — ADM-001 declares entryState.params  and ADM-025 holds none of them, so the
-        edge carries nothing and ADM-001 opens cold
+      provenance: derived — ADM-001 declares entryState.params challengeId, methodId and ADM-025 holds
+        none of them, so the edge carries nothing and ADM-001 opens cold
     - to: ADM-002
       trigger: Platform Dashboard
       provenance: derived — ADM-002 declares entryState.params  and ADM-025 holds none of them, so the
         edge carries nothing and ADM-002 opens cold
-    - to: ADM-003
-      trigger: Cross-Tenant Health Dashboard
-      provenance: derived — ADM-003 declares entryState.params cellId, rightId and ADM-025 holds none
-        of them, so the edge carries nothing and ADM-003 opens cold
   notes: Purpose derived from the screen name and its operations on 17 August, not from a requirement.
   openQuestions:
   - No contract — new scope, 30 Jul
@@ -7266,20 +7728,15 @@ screens:
     exitTo:
     - ADM-001
     - ADM-002
-    - ADM-003
     transitions:
     - to: ADM-001
       trigger: Platform Login / MFA
-      provenance: derived — ADM-001 declares entryState.params  and ADM-026 holds none of them, so the
-        edge carries nothing and ADM-001 opens cold
+      provenance: derived — ADM-001 declares entryState.params challengeId, methodId and ADM-026 holds
+        none of them, so the edge carries nothing and ADM-001 opens cold
     - to: ADM-002
       trigger: Platform Dashboard
       provenance: derived — ADM-002 declares entryState.params  and ADM-026 holds none of them, so the
         edge carries nothing and ADM-002 opens cold
-    - to: ADM-003
-      trigger: Cross-Tenant Health Dashboard
-      provenance: derived — ADM-003 declares entryState.params cellId, rightId and ADM-026 holds none
-        of them, so the edge carries nothing and ADM-003 opens cold
   notes: Purpose derived from the screen name and its operations on 17 August, not from a requirement.
   openQuestions:
   - No contract — new scope, 30 Jul
@@ -7449,7 +7906,6 @@ screens:
     exitTo:
     - ADM-001
     - ADM-002
-    - ADM-003
     - ADM-023
     flowDerived: true
     transitions:
@@ -7459,16 +7915,12 @@ screens:
       operation: planMigration
     - to: ADM-001
       trigger: Platform Login / MFA
-      provenance: derived — ADM-001 declares entryState.params  and ADM-027 holds none of them, so the
-        edge carries nothing and ADM-001 opens cold
+      provenance: derived — ADM-001 declares entryState.params challengeId, methodId and ADM-027 holds
+        none of them, so the edge carries nothing and ADM-001 opens cold
     - to: ADM-002
       trigger: Platform Dashboard
       provenance: derived — ADM-002 declares entryState.params  and ADM-027 holds none of them, so the
         edge carries nothing and ADM-002 opens cold
-    - to: ADM-003
-      trigger: Cross-Tenant Health Dashboard
-      provenance: derived — ADM-003 declares entryState.params cellId, rightId and ADM-027 holds none
-        of them, so the edge carries nothing and ADM-003 opens cold
   notes: Purpose derived from the screen name and its operations on 17 August, not from a requirement.
   openQuestions:
   - No contract — the unowned orchestrator
@@ -7696,20 +8148,15 @@ screens:
     exitTo:
     - ADM-001
     - ADM-002
-    - ADM-003
     transitions:
     - to: ADM-001
       trigger: Platform Login / MFA
-      provenance: derived — ADM-001 declares entryState.params  and ADM-028 holds none of them, so the
-        edge carries nothing and ADM-001 opens cold
+      provenance: derived — ADM-001 declares entryState.params challengeId, methodId and ADM-028 holds
+        none of them, so the edge carries nothing and ADM-001 opens cold
     - to: ADM-002
       trigger: Platform Dashboard
       provenance: derived — ADM-002 declares entryState.params  and ADM-028 holds none of them, so the
         edge carries nothing and ADM-002 opens cold
-    - to: ADM-003
-      trigger: Cross-Tenant Health Dashboard
-      provenance: derived — ADM-003 declares entryState.params cellId, rightId and ADM-028 holds none
-        of them, so the edge carries nothing and ADM-003 opens cold
   notes: Purpose derived from the screen name and its operations on 17 August, not from a requirement.
   openQuestions:
   - No contract — not specified
@@ -7840,8 +8287,8 @@ screens:
     transitions:
     - to: ADM-001
       trigger: Platform Login / MFA
-      provenance: derived — ADM-001 declares entryState.params  and ADM-029 holds none of them, so the
-        edge carries nothing and ADM-001 opens cold
+      provenance: derived — ADM-001 declares entryState.params challengeId, methodId and ADM-029 holds
+        none of them, so the edge carries nothing and ADM-001 opens cold
     - to: ADM-002
       trigger: Platform Dashboard
       provenance: derived — ADM-002 declares entryState.params  and ADM-029 holds none of them, so the
@@ -8002,6 +8449,9 @@ screens:
       - kind: secondaryButton
         label: Start rollout
         operation: startRollout
+        notes: Requests the stage; it does not move it. `startRollout` answers 202 with `approvalRequestId`
+          and the rollout unchanged until the platform release manager approves (decided 28 September,
+          audit R144).
         provenance: contract platform-ops.yaml POST /rollouts/{rolloutId}/start
       - kind: secondaryButton
         label: Save cell tier
@@ -8059,8 +8509,11 @@ screens:
   - id: formStartRollout
     component: modal
     trigger: Start rollout
-    body: '**Collects what `startRollout` sends before it is called.** Required: `stage`. Dismissing sends
-      nothing; the screen behind is unchanged.'
+    body: '**Collects what `startRollout` sends before it is called.** Required: `stage`. **Sending it
+      asks for approval, it does not promote** (decided 28 September, audit R144): the answer is 202 with
+      a pending `releasePromotion` request, routed to a holder of `PLATFORM_RELEASE_PROMOTE` other than
+      the requester — nobody approves their own promotion. The rollout moves to the stage when that request
+      is approved. Dismissing sends nothing; the screen behind is unchanged.'
     confirm:
       label: Start rollout
       operation: startRollout
@@ -8093,6 +8546,10 @@ screens:
     emptyNoAccess: Shown when the caller lacks `PLATFORM_CELL_VIEW`, which `listCellJobs` requires, and
       names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody
       to support with the wrong question.
+    rolloutPendingApproval: '**Requested, not moved.** `startRollout` answered 202: the rollout shows
+      the stage it has reached, the stage requested and that a `releasePromotion` approval is pending
+      with the platform release manager. The requester sees no approve action for their own request (decided
+      28 September, audit R144).'
   apis:
   - operationId: listCellJobs
     contract: subscription
@@ -8140,7 +8597,8 @@ screens:
     trigger: onLoad
   - operationId: startRollout
     contract: platform-ops
-    purpose: Start or continue a rollout
+    purpose: Request the next rollout stage; 202 pending the platform release manager's releasePromotion
+      approval, never the requester's own (audit R144)
     trigger: onAction
     invalidates:
     - listCellJobs
@@ -8195,8 +8653,8 @@ screens:
     transitions:
     - to: ADM-001
       trigger: Platform Login / MFA
-      provenance: derived — ADM-001 declares entryState.params  and ADM-030 holds none of them, so the
-        edge carries nothing and ADM-001 opens cold
+      provenance: derived — ADM-001 declares entryState.params challengeId, methodId and ADM-030 holds
+        none of them, so the edge carries nothing and ADM-001 opens cold
     - to: ADM-002
       trigger: Platform Dashboard
       provenance: derived — ADM-002 declares entryState.params  and ADM-030 holds none of them, so the
@@ -8480,7 +8938,6 @@ screens:
     exitTo:
     - ADM-001
     - ADM-002
-    - ADM-003
     - ADM-004
     transitions:
     - to: ADM-004
@@ -8488,16 +8945,12 @@ screens:
       provenance: flow F106 step 1→2
     - to: ADM-001
       trigger: Platform Login / MFA
-      provenance: derived — ADM-001 declares entryState.params  and ADM-031 holds none of them, so the
-        edge carries nothing and ADM-001 opens cold
+      provenance: derived — ADM-001 declares entryState.params challengeId, methodId and ADM-031 holds
+        none of them, so the edge carries nothing and ADM-001 opens cold
     - to: ADM-002
       trigger: Platform Dashboard
       provenance: derived — ADM-002 declares entryState.params  and ADM-031 holds none of them, so the
         edge carries nothing and ADM-002 opens cold
-    - to: ADM-003
-      trigger: Cross-Tenant Health Dashboard
-      provenance: derived — ADM-003 declares entryState.params cellId, rightId and ADM-031 holds none
-        of them, so the edge carries nothing and ADM-003 opens cold
   notes: Purpose derived from the screen name and its operations on 17 August, not from a requirement.
   openQuestions:
   - No contract — not specified
@@ -8512,6 +8965,42 @@ screens:
     - name: contentBody
       slot: collection
       components:
+      - kind: selectField
+        label: Tenant
+        bindsTo: Tenant
+        columns:
+        - Tenant.id
+        - Tenant.code
+        - Tenant.name
+        - Tenant.status
+        operation: listTenants
+        notes: '**Pick a tenant first** (decided 28 September, audit R098). This screen''s operations
+          run in that tenant''s cell, and a platform token carries no tenant permission there until a
+          platform-staff grant into it is open.'
+        provenance: contract subscription.yaml GET /tenants
+      - kind: detailPanel
+        label: Open grant into this tenant
+        bindsTo: PlatformStaffGrant
+        columns:
+        - PlatformStaffGrant.id
+        - PlatformStaffGrant.operatorDisplayName
+        - PlatformStaffGrant.permissions
+        - PlatformStaffGrant.reason
+        - PlatformStaffGrant.ticketRef
+        - PlatformStaffGrant.openedAt
+        - PlatformStaffGrant.expiresAt
+        operation: openPlatformStaffGrant
+        notes: '**Always visible while the screen acts on a tenant** (decided 28 September, audit R098):
+          which tenant, which permissions, why, and the time left to `expiresAt`. At expiry every tenant
+          action is disabled and the screen returns to its grantRequired state; a new need is a new grant.
+          The tenant sees the grant in its own audit log.'
+        provenance: contract identity.yaml POST /platform-staff-grants
+      - kind: primaryButton
+        label: Open access grant
+        operation: openPlatformStaffGrant
+        notes: Shown until a grant into the picked tenant is open; asks for the second factor first (step-up,
+          audit R135).
+        provenance: contract identity.yaml POST /platform-staff-grants
       - kind: textField
         label: Module
         operation: listDashboards
@@ -8583,7 +9072,20 @@ screens:
     emptyNoAccess: Shown when the caller lacks `REPORT_VIEW_VENUE`, which `listDashboards` requires, and
       names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody
       to support with the wrong question.
+    grantRequired: '**No access into this tenant yet.** A tenant is picked and no platform-staff grant
+      into it is open, so every tenant action is disabled and the screen offers **Open access grant**
+      (`openPlatformStaffGrant`: reason, permissions, expiry). The same state returns when the grant reaches
+      `expiresAt` (decided 28 September, audit R098).'
   apis:
+  - operationId: openPlatformStaffGrant
+    contract: identity
+    purpose: Open a time-boxed, audited platform-staff grant into the picked tenant before any tenant-scoped
+      operation here; the tenant sees it (decided 28 September, audit R098)
+    trigger: onAction
+  - operationId: listTenants
+    contract: subscription
+    purpose: The tenant picker — the operator picks a tenant before acting in its cell (audit R098)
+    trigger: onLoad
   - operationId: listDashboards
     contract: reporting
     purpose: List dashboards
@@ -8626,6 +9128,25 @@ screens:
     — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
     to the ones that matter is work a person still owes this screen.
   overlays:
+  - id: formOpenPlatformStaffGrant
+    component: modal
+    trigger: Open access grant
+    body: '**Collects what `openPlatformStaffGrant` sends before it is called** (decided 28 September,
+      audit R098). Required: `id` (a client ULID), `permissions` (tenant permissions only — the ones this
+      screen''s operations need, preselected), `reason`, `expiresAt` (at most 8 hours ahead, proposed).
+      Optional: `ticketRef`. Requires step-up: the operator presents a second factor first. The tenant
+      sees the grant and everything done under it. Dismissing sends nothing; the screen behind is unchanged.'
+    confirm:
+      label: Open access grant
+      operation: openPlatformStaffGrant
+    dismiss:
+      label: Cancel
+      discards:
+      - permissions
+      - reason
+      - ticketRef
+      - expiresAt
+    provenance: contract identity.yaml POST /platform-staff-grants
   - id: formCreateDashboard
     component: modal
     trigger: Create dashboard
@@ -8688,8 +9209,8 @@ screens:
     transitions:
     - to: ADM-001
       trigger: Platform Login / MFA
-      provenance: derived — ADM-001 declares entryState.params  and ADM-032 holds none of them, so the
-        edge carries nothing and ADM-001 opens cold
+      provenance: derived — ADM-001 declares entryState.params challengeId, methodId and ADM-032 holds
+        none of them, so the edge carries nothing and ADM-001 opens cold
     - to: ADM-002
       trigger: Platform Dashboard
       provenance: derived — ADM-002 declares entryState.params  and ADM-032 holds none of them, so the
@@ -8979,8 +9500,8 @@ screens:
     transitions:
     - to: ADM-001
       trigger: Platform Login / MFA
-      provenance: derived — ADM-001 declares entryState.params  and ADM-033 holds none of them, so the
-        edge carries nothing and ADM-001 opens cold
+      provenance: derived — ADM-001 declares entryState.params challengeId, methodId and ADM-033 holds
+        none of them, so the edge carries nothing and ADM-001 opens cold
     - to: ADM-002
       trigger: Platform Dashboard
       provenance: derived — ADM-002 declares entryState.params  and ADM-033 holds none of them, so the
@@ -9238,8 +9759,8 @@ screens:
     transitions:
     - to: ADM-001
       trigger: Platform Login / MFA
-      provenance: derived — ADM-001 declares entryState.params  and ADM-034 holds none of them, so the
-        edge carries nothing and ADM-001 opens cold
+      provenance: derived — ADM-001 declares entryState.params challengeId, methodId and ADM-034 holds
+        none of them, so the edge carries nothing and ADM-001 opens cold
     - to: ADM-002
       trigger: Platform Dashboard
       provenance: derived — ADM-002 declares entryState.params  and ADM-034 holds none of them, so the
@@ -9494,20 +10015,15 @@ screens:
     exitTo:
     - ADM-001
     - ADM-002
-    - ADM-003
     transitions:
     - to: ADM-001
       trigger: Platform Login / MFA
-      provenance: derived — ADM-001 declares entryState.params  and ADM-035 holds none of them, so the
-        edge carries nothing and ADM-001 opens cold
+      provenance: derived — ADM-001 declares entryState.params challengeId, methodId and ADM-035 holds
+        none of them, so the edge carries nothing and ADM-001 opens cold
     - to: ADM-002
       trigger: Platform Dashboard
       provenance: derived — ADM-002 declares entryState.params  and ADM-035 holds none of them, so the
         edge carries nothing and ADM-002 opens cold
-    - to: ADM-003
-      trigger: Cross-Tenant Health Dashboard
-      provenance: derived — ADM-003 declares entryState.params cellId, rightId and ADM-035 holds none
-        of them, so the edge carries nothing and ADM-003 opens cold
   notes: Purpose derived from the screen name and its operations on 17 August, not from a requirement.
   openQuestions:
   - No contract — overlaps P12
@@ -9645,20 +10161,15 @@ screens:
     exitTo:
     - ADM-001
     - ADM-002
-    - ADM-003
     transitions:
     - to: ADM-001
       trigger: Platform Login / MFA
-      provenance: derived — ADM-001 declares entryState.params  and ADM-036 holds none of them, so the
-        edge carries nothing and ADM-001 opens cold
+      provenance: derived — ADM-001 declares entryState.params challengeId, methodId and ADM-036 holds
+        none of them, so the edge carries nothing and ADM-001 opens cold
     - to: ADM-002
       trigger: Platform Dashboard
       provenance: derived — ADM-002 declares entryState.params  and ADM-036 holds none of them, so the
         edge carries nothing and ADM-002 opens cold
-    - to: ADM-003
-      trigger: Cross-Tenant Health Dashboard
-      provenance: derived — ADM-003 declares entryState.params cellId, rightId and ADM-036 holds none
-        of them, so the edge carries nothing and ADM-003 opens cold
   notes: Purpose derived from the screen name and its operations on 17 August, not from a requirement.
   openQuestions:
   - No contract — not specified
@@ -9859,28 +10370,79 @@ screens:
     transitions:
     - to: ADM-001
       trigger: Platform Login / MFA
-      provenance: derived — ADM-001 declares entryState.params  and ADM-037 holds none of them, so the
-        edge carries nothing and ADM-001 opens cold
+      provenance: derived — ADM-001 declares entryState.params challengeId, methodId and ADM-037 holds
+        none of them, so the edge carries nothing and ADM-001 opens cold
     - to: BO-091
       trigger: AI Policy & Spend
       provenance: flow F100 step 1→2
       crossesDevice: true
       back: false
-  notes: Added 17 August. **The key is entered once and never returned** — the screen shows a reference,
+  notes: 'Added 17 August. **The key is entered once and never returned** — the screen shows a reference,
     a rotation date and a last-verified date, never a secret. Test before activate. **Not on the wireframe
     board.**
+
+
+    **Per tenant, not per region (decided 28 September, audit R203).** Platform staff pick a tenant, open
+    a platform-staff grant into it (audit R098), and set that tenant''s provider with `setAiProvider`
+    (`PLATFORM_TENANT_MANAGE`, read from the operator''s own token; the open grant ties the change to
+    the tenant''s audit); the region only restricts the choice. The screen shows the tenant''s region''s
+    residency restriction before the form, and a provider whose `residency` is outside it is refused `409
+    residency-refused`, which the form shows against the residency field.'
   density: compact
   pattern: listDetail
   patternReason: '`listAiProviders` reads a population and nothing reads one of them; the detail is the
     row until a `get` exists'
-  purpose: Configure which model a tenant uses, hold the key, and prove it works before anyone relies
-    on it.
+  purpose: Configure which model a tenant uses, within what its region allows, hold the key, and prove
+    it works before anyone relies on it.
   layout:
     template: split
     regions:
     - name: contentBody
       slot: collection
       components:
+      - kind: selectField
+        label: Tenant
+        bindsTo: Tenant
+        columns:
+        - Tenant.id
+        - Tenant.code
+        - Tenant.name
+        - Tenant.status
+        - Tenant.regionId
+        operation: listTenants
+        notes: The provider is set per tenant (decided 28 September, audit R203); the list below is the
+          picked tenant's providers.
+        provenance: contract subscription.yaml GET /tenants
+      - kind: detailPanel
+        label: Open grant into this tenant
+        bindsTo: PlatformStaffGrant
+        columns:
+        - PlatformStaffGrant.id
+        - PlatformStaffGrant.permissions
+        - PlatformStaffGrant.reason
+        - PlatformStaffGrant.expiresAt
+        operation: listOwnPlatformStaffGrants
+        notes: '**Always visible while the screen acts on a tenant** (decided 28 September, audit R098,
+          R203). `setAiProvider` is checked against the operator''s own `PLATFORM_TENANT_MANAGE`, and
+          in addition needs a grant into the tenant open, so the change is audited against it; reading
+          the providers and the region needs the grant to carry `AI_CONFIGURE` and `SCOPE_VIEW`. Found
+          after a reload with `listOwnPlatformStaffGrants`.'
+        provenance: contract identity.yaml GET /platform-staff-grants/mine
+      - kind: primaryButton
+        label: Open access grant
+        operation: openPlatformStaffGrant
+        notes: Shown until a grant into the picked tenant is open; asks for the second factor first (step-up,
+          audit R135).
+        provenance: contract identity.yaml POST /platform-staff-grants
+      - kind: banner
+        label: Region residency restriction
+        bindsTo: RegionSettings.allowedAiResidencies
+        operation: getRegionSettings
+        notes: Names the residencies the picked tenant's home region allows for AI processing (`RegionSettings.allowedAiResidencies`;
+          empty means no restriction), and says that `setAiProvider` refuses any other residency with
+          409 `residency-refused` (decided 28 September, audit R203). The region is `Tenant.regionId`,
+          read with `getRegionSettings`; a tenant with no region yet shows the 409 rule only.
+        provenance: contract tenancy.yaml GET /regions/{regionId}/settings
       - kind: dataTable
         label: Every AI provider
         bindsTo: AiProvider
@@ -9949,14 +10511,38 @@ screens:
     emptyNoAccess: Shown when the caller lacks `AI_CONFIGURE`, which `listAiProviders` requires, and names
       that permission. **Never an empty table** — that reads as *there is no data* and sends somebody
       to support with the wrong question.
+    grantRequired: '**No access into this tenant yet.** A tenant is picked and no platform-staff grant
+      into it is open, so the provider list and every action are disabled and the screen offers **Open
+      access grant** (`openPlatformStaffGrant`: reason, permissions, expiry). The same state returns when
+      the grant reaches `expiresAt` (decided 28 September, audit R098, R203).'
   apis:
   - operationId: listAiProviders
     contract: ai
     purpose: Configured providers and their order
     trigger: onLoad
+  - operationId: listTenants
+    contract: subscription
+    purpose: The tenant picker — the provider is a per-tenant setting (audit R203)
+    trigger: onLoad
+  - operationId: getRegionSettings
+    contract: tenancy
+    purpose: The picked tenant's region's allowed AI residencies, for the restriction banner (audit R203)
+    trigger: onAction
+  - operationId: listOwnPlatformStaffGrants
+    contract: identity
+    purpose: Find a grant into the picked tenant already open, after a reload (audit R098)
+    trigger: onAction
+  - operationId: openPlatformStaffGrant
+    contract: identity
+    purpose: Open a time-boxed, audited platform-staff grant into the picked tenant before setting its
+      provider; the tenant sees it (decided 28 September, audit R098, R203)
+    trigger: onAction
+    invalidates:
+    - listOwnPlatformStaffGrants
   - operationId: setAiProvider
     contract: ai
-    purpose: Configure a provider
+    purpose: Configure the picked tenant's provider, per tenant with the region's compliance gate — 409
+      residency-refused (decided 28 September, audit R203)
     trigger: onAction
     invalidates:
     - listAiProviders
@@ -9976,10 +10562,15 @@ screens:
     params:
     - name: providerId
       from: deepLink
+    - name: regionId
+      from: navigation
+      optional: true
     coldEntry: '**A platform-admin link resolves against the tenant in the link and refuses if the operator
       does not hold that tenant.** A link is not authorisation. If the target is gone the screen says
       so and returns to the directory — **an admin console that silently shows the wrong tenant is worse
-      than one that shows nothing.** Arrives with `providerId`.'
+      than one that shows nothing.** Arrives with `providerId`. `regionId` is not carried in: it is the
+      picked tenant''s `Tenant.regionId`, read from `listTenants` once a tenant is chosen, and feeds `getRegionSettings`
+      for the residency banner (audit R203).'
     preloaded:
     - AiProvider.id
     - AiProvider.kind
@@ -9994,13 +10585,34 @@ screens:
     — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
     to the ones that matter is work a person still owes this screen.
   overlays:
+  - id: formOpenPlatformStaffGrant
+    component: modal
+    trigger: Open access grant
+    body: '**Collects what `openPlatformStaffGrant` sends before it is called** (decided 28 September,
+      audit R098). Required: `id` (a client ULID), `permissions` (tenant permissions only; `AI_CONFIGURE`
+      and `SCOPE_VIEW` preselected for this screen), `reason`, `expiresAt` (at most 8 hours ahead, proposed).
+      Optional: `ticketRef`. Requires step-up: the operator presents a second factor first. The tenant
+      sees the grant and everything done under it. Dismissing sends nothing; the screen behind is unchanged.'
+    confirm:
+      label: Open access grant
+      operation: openPlatformStaffGrant
+    dismiss:
+      label: Cancel
+      discards:
+      - permissions
+      - reason
+      - ticketRef
+      - expiresAt
+    provenance: contract identity.yaml POST /platform-staff-grants
   - id: formSetAiProvider
     component: modal
     trigger: Save AI provider
     body: '**Collects what `setAiProvider` sends before it is called.** Required: `kind`, `capability`,
       `priority`, `isActive`. Optional: `id`, `model`, `failoverProviderId`, `degradeGracefully`, `scopeLevel`,
       `scopePath`, `credentialRef`, `credentialRotatedAt`, `credentialExpiresAt`, `lastVerifiedAt`, `endpoint`,
-      `residency` and 1 more. Dismissing sends nothing; the screen behind is unchanged.'
+      `residency` and 1 more. **Set for the picked tenant**; a `residency` outside what the tenant''s
+      region allows is refused `409 residency-refused` and shown against that field (decided 28 September,
+      audit R203). Dismissing sends nothing; the screen behind is unchanged.'
     bindsTo: AiProvider
     confirm:
       label: Save AI provider
@@ -42632,8 +43244,8 @@ screens:
     transitions:
     - to: ADM-001
       trigger: Platform Login / MFA
-      provenance: derived — ADM-001 declares entryState.params  and ADM-318 holds none of them, so the
-        edge carries nothing and ADM-001 opens cold
+      provenance: derived — ADM-001 declares entryState.params challengeId, methodId and ADM-318 holds
+        none of them, so the edge carries nothing and ADM-001 opens cold
   notes: 'Added 4 September. **47 consumers declare `retryThenDeadLetter` and all 47 are marked `isCritical`,
     and until this screen existed nothing in the package read the table they land in.** Deliberately not
     DEV-005 Webhooks: `replayEvents` is partner-facing redelivery of a customer''s own integration, and
@@ -44749,6 +45361,11 @@ screens:
     decisions. The source requires authentication before approval actions and supports MFA for sensitive
     approvals.
   gaps:
+  - operation: setPasswordPolicy
+    why: '**`setPasswordPolicy` replaces the whole policy and nothing reads it.** identity has no `getPasswordPolicy`,
+      so this screen cannot show the tenant''s current `mfaRequiredForPermissions` (or the rest of the
+      policy it must send back unchanged). Handed to the contracts group (audit R135).'
+    source: contract identity.yaml PUT /password-policy
   - operation: null
     why: '**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose,
       acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere
@@ -44780,6 +45397,22 @@ screens:
         notes: '**A screen that can submit must be leaveable without submitting.**'
         derived: true
         impliedBy: setStepUpPolicy
+      - kind: multiSelect
+        label: Permissions that require MFA
+        bindsTo: PasswordPolicy
+        columns:
+        - PasswordPolicy.mfaRequiredForPermissions
+        operation: setPasswordPolicy
+        notes: '**MFA is required by permission (decided 28 September, audit R135).** A principal holding
+          any permission listed here must present a second factor at sign-in and keep an active method.
+          The floor — `ROLE_MANAGE`, `LEDGER_APPROVE` and every `PLATFORM_*` permission — is shown locked:
+          the tenant may add permissions and never drop a floor entry (`setPasswordPolicy` refuses such
+          a body with 400).'
+        provenance: contract identity.yaml PUT /password-policy
+      - kind: primaryButton
+        label: Save MFA requirement
+        operation: setPasswordPolicy
+        provenance: contract identity.yaml PUT /password-policy
   states:
     loading: The authentication mfa policy list.
     error: Could not load. Names which read failed and leaves the authentication mfa policy untouched.
@@ -44800,6 +45433,11 @@ screens:
     trigger: onAction
     invalidates:
     - listStepUpPolicies
+  - operationId: setPasswordPolicy
+    contract: identity
+    purpose: Which permissions require MFA (`mfaRequiredForPermissions`) — add above the floor, never
+      drop (decided 28 September, audit R135)
+    trigger: onAction
   - operationId: listMfaMethods
     contract: identity
     purpose: Which methods approvers have enrolled, because a policy demanding a factor nobody holds locks
@@ -51466,12 +52104,6 @@ screens:
   purpose: Configure how TICVAI collects its fees.
   gaps:
   - operation: null
-    why: '**The pack names 3 actions on this screen and the screen declares 0 operations.** Unserved:
-      Credit / Debit Card, Bank Transfer, Other Approved Method. Each needs an operation, or needs removing
-      from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract
-      side.'
-    source: pack Subscription_Licensing_AI_Self_Service.pdf, page 61 §Support
-  - operation: null
     why: '**Payment Method & Settlement Setup declares no operation that writes anything** — its only
       declared call is `none`, a read. The name promises authoring and the contract offers none, so either
       the write operations are missing or this screen is a view of something another screen builds.'
@@ -51492,17 +52124,79 @@ screens:
     - name: actionBar
       slot: rowActions
       components:
+      - kind: multiSelect
+        label: Payment methods
+        bindsTo: PaymentProvider
+        columns:
+        - PaymentProvider.supportedMethods
+        operation: setPaymentProvider
+        notes: '**The methods follow the contract (decided 28 September, audit R275 (a))**: the options
+          are the `PaymentProvider.supportedMethods` enum that `setPaymentProvider` accepts. The pack''s
+          Credit / Debit Card is `card` and its Bank Transfer is `bankTransfer`; its Other Approved Method
+          is not in the contract and is dropped.'
+        provenance: contract orders.yaml PUT /payment-providers
       - kind: primaryButton
-        label: Credit / Debit Card
-        provenance: pack Subscription_Licensing_AI_Self_Service.pdf, page 61 §Support
-      - kind: secondaryButton
-        label: Bank Transfer
-        provenance: pack Subscription_Licensing_AI_Self_Service.pdf, page 61 §Support
-      - kind: secondaryButton
-        label: Other Approved Method
-        provenance: pack Subscription_Licensing_AI_Self_Service.pdf, page 61 §Support
+        label: Save payment provider
+        operation: setPaymentProvider
+        provenance: contract orders.yaml PUT /payment-providers
     - name: contentBody
-      components: []
+      components:
+      - kind: selectField
+        label: Tenant
+        bindsTo: Tenant
+        columns:
+        - Tenant.id
+        - Tenant.code
+        - Tenant.name
+        - Tenant.status
+        operation: listTenants
+        notes: '**Pick a tenant first** (decided 28 September, audit R098). This screen''s operations
+          run in that tenant''s cell, and a platform token carries no tenant permission there until a
+          platform-staff grant into it is open.'
+        provenance: contract subscription.yaml GET /tenants
+      - kind: detailPanel
+        label: Open grant into this tenant
+        bindsTo: PlatformStaffGrant
+        columns:
+        - PlatformStaffGrant.id
+        - PlatformStaffGrant.operatorDisplayName
+        - PlatformStaffGrant.permissions
+        - PlatformStaffGrant.reason
+        - PlatformStaffGrant.ticketRef
+        - PlatformStaffGrant.openedAt
+        - PlatformStaffGrant.expiresAt
+        operation: openPlatformStaffGrant
+        notes: '**Always visible while the screen acts on a tenant** (decided 28 September, audit R098):
+          which tenant, which permissions, why, and the time left to `expiresAt`. At expiry every tenant
+          action is disabled and the screen returns to its grantRequired state; a new need is a new grant.
+          The tenant sees the grant in its own audit log.'
+        provenance: contract identity.yaml POST /platform-staff-grants
+      - kind: primaryButton
+        label: Open access grant
+        operation: openPlatformStaffGrant
+        notes: Shown until a grant into the picked tenant is open; asks for the second factor first (step-up,
+          audit R135).
+        provenance: contract identity.yaml POST /platform-staff-grants
+  overlays:
+  - id: formOpenPlatformStaffGrant
+    component: modal
+    trigger: Open access grant
+    body: '**Collects what `openPlatformStaffGrant` sends before it is called** (decided 28 September,
+      audit R098). Required: `id` (a client ULID), `permissions` (tenant permissions only — the ones this
+      screen''s operations need, preselected), `reason`, `expiresAt` (at most 8 hours ahead, proposed).
+      Optional: `ticketRef`. Requires step-up: the operator presents a second factor first. The tenant
+      sees the grant and everything done under it. Dismissing sends nothing; the screen behind is unchanged.'
+    confirm:
+      label: Open access grant
+      operation: openPlatformStaffGrant
+    dismiss:
+      label: Cancel
+      discards:
+      - permissions
+      - reason
+      - ticketRef
+      - expiresAt
+    provenance: contract identity.yaml POST /platform-staff-grants
   states:
     loading: The payment method settlement list.
     error: Could not load. Names which read failed and leaves the payment method settlement untouched.
@@ -51512,7 +52206,20 @@ screens:
       active filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
+    grantRequired: '**No access into this tenant yet.** A tenant is picked and no platform-staff grant
+      into it is open, so every tenant action is disabled and the screen offers **Open access grant**
+      (`openPlatformStaffGrant`: reason, permissions, expiry). The same state returns when the grant reaches
+      `expiresAt` (decided 28 September, audit R098).'
   apis:
+  - operationId: openPlatformStaffGrant
+    contract: identity
+    purpose: Open a time-boxed, audited platform-staff grant into the picked tenant before any tenant-scoped
+      operation here; the tenant sees it (decided 28 September, audit R098)
+    trigger: onAction
+  - operationId: listTenants
+    contract: subscription
+    purpose: The tenant picker — the operator picks a tenant before acting in its cell (audit R098)
+    trigger: onLoad
   - operationId: setPaymentProvider
     contract: orders
     purpose: Payment and settlement setup
@@ -52379,6 +53086,42 @@ screens:
       slot: fields
       components:
       - kind: selectField
+        label: Tenant
+        bindsTo: Tenant
+        columns:
+        - Tenant.id
+        - Tenant.code
+        - Tenant.name
+        - Tenant.status
+        operation: listTenants
+        notes: '**Pick a tenant first** (decided 28 September, audit R098). This screen''s operations
+          run in that tenant''s cell, and a platform token carries no tenant permission there until a
+          platform-staff grant into it is open.'
+        provenance: contract subscription.yaml GET /tenants
+      - kind: detailPanel
+        label: Open grant into this tenant
+        bindsTo: PlatformStaffGrant
+        columns:
+        - PlatformStaffGrant.id
+        - PlatformStaffGrant.operatorDisplayName
+        - PlatformStaffGrant.permissions
+        - PlatformStaffGrant.reason
+        - PlatformStaffGrant.ticketRef
+        - PlatformStaffGrant.openedAt
+        - PlatformStaffGrant.expiresAt
+        operation: openPlatformStaffGrant
+        notes: '**Always visible while the screen acts on a tenant** (decided 28 September, audit R098):
+          which tenant, which permissions, why, and the time left to `expiresAt`. At expiry every tenant
+          action is disabled and the screen returns to its grantRequired state; a new need is a new grant.
+          The tenant sees the grant in its own audit log.'
+        provenance: contract identity.yaml POST /platform-staff-grants
+      - kind: primaryButton
+        label: Open access grant
+        operation: openPlatformStaffGrant
+        notes: Shown until a grant into the picked tenant is open; asks for the second factor first (step-up,
+          audit R135).
+        provenance: contract identity.yaml POST /platform-staff-grants
+      - kind: selectField
         label: Venue Name
         provenance: pack Subscription_Licensing_AI_Self_Service.pdf, page 74 §Venue Settings
       - kind: selectField
@@ -52402,6 +53145,26 @@ screens:
       - kind: selectField
         label: Operating Model
         provenance: pack Subscription_Licensing_AI_Self_Service.pdf, page 74 §Venue Settings
+  overlays:
+  - id: formOpenPlatformStaffGrant
+    component: modal
+    trigger: Open access grant
+    body: '**Collects what `openPlatformStaffGrant` sends before it is called** (decided 28 September,
+      audit R098). Required: `id` (a client ULID), `permissions` (tenant permissions only — the ones this
+      screen''s operations need, preselected), `reason`, `expiresAt` (at most 8 hours ahead, proposed).
+      Optional: `ticketRef`. Requires step-up: the operator presents a second factor first. The tenant
+      sees the grant and everything done under it. Dismissing sends nothing; the screen behind is unchanged.'
+    confirm:
+      label: Open access grant
+      operation: openPlatformStaffGrant
+    dismiss:
+      label: Cancel
+      discards:
+      - permissions
+      - reason
+      - ticketRef
+      - expiresAt
+    provenance: contract identity.yaml POST /platform-staff-grants
   states:
     loading: The venue operational structure configuration as saved.
     error: Could not load. Names which read failed and leaves the venue operational structure untouched.
@@ -52411,7 +53174,20 @@ screens:
       data* and sends somebody to support with the wrong question.
     emptyNoResults: '**Nothing matched.** The filter or the scope narrowed it — naming which is what stops
       somebody concluding the record does not exist'
+    grantRequired: '**No access into this tenant yet.** A tenant is picked and no platform-staff grant
+      into it is open, so every tenant action is disabled and the screen offers **Open access grant**
+      (`openPlatformStaffGrant`: reason, permissions, expiry). The same state returns when the grant reaches
+      `expiresAt` (decided 28 September, audit R098).'
   apis:
+  - operationId: openPlatformStaffGrant
+    contract: identity
+    purpose: Open a time-boxed, audited platform-staff grant into the picked tenant before any tenant-scoped
+      operation here; the tenant sees it (decided 28 September, audit R098)
+    trigger: onAction
+  - operationId: listTenants
+    contract: subscription
+    purpose: The tenant picker — the operator picks a tenant before acting in its cell (audit R098)
+    trigger: onLoad
   - operationId: createPrincipal
     contract: identity
     purpose: The first administrator

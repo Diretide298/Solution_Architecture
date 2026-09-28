@@ -41,7 +41,7 @@ modulesUsed:
   screens: 10
 servicesCalled:
 - service: FnbService
-  operationCalls: 32
+  operationCalls: 35
 - service: ReportingService
   operationCalls: 2
 - service: TenancyService
@@ -137,12 +137,14 @@ screens:
   operations:
   - fireCourse
   - holdCourse
+  - listKitchenTickets
   - prioritiseKitchenTicket
   - setCourseRules
   - setKitchenTicketStatus
   states:
   - emptyFirstRun
   - emptyNoAccess
+  - emptyNoResults
   - error
   - loading
   - offline
@@ -199,6 +201,7 @@ screens:
   density: touchLarge
   operations:
   - listKitchenStations
+  - listKitchenTickets
   - setKitchenStations
   states:
   - emptyFirstRun
@@ -286,6 +289,7 @@ screens:
   operations:
   - getHaccpStatus
   - list86Events
+  - listKitchenTickets
   - logKitchenException
   - setItemAvailability
   - setKitchenTicketStatus

@@ -265,10 +265,10 @@ operations:
   offline: false
   reads:
   - cache:resolution
-  - control.footer_config
-  - control.footer_config_column
-  - control.footer_config_social_link
   - whitelabel.feature_toggle
+  - whitelabel.footer_config
+  - whitelabel.footer_config_column
+  - whitelabel.footer_config_social_link
   - whitelabel.homepage_section
   - whitelabel.module_enablement
   - whitelabel.navigation_item
@@ -422,10 +422,10 @@ operations:
   offline: false
   reads:
   - cache:idempotency
-  - control.footer_config
-  - control.footer_config_column
-  - control.footer_config_social_link
   - whitelabel.feature_toggle
+  - whitelabel.footer_config
+  - whitelabel.footer_config_column
+  - whitelabel.footer_config_social_link
   - whitelabel.homepage_section
   - whitelabel.module_enablement
   - whitelabel.navigation_item
@@ -536,15 +536,15 @@ operations:
   offline: false
   reads:
   - cache:idempotency
-  - control.footer_config
-  - control.footer_config_column
-  - control.footer_config_social_link
+  - whitelabel.footer_config
+  - whitelabel.footer_config_column
+  - whitelabel.footer_config_social_link
   writes:
   - cache:idempotency
   - cache:resolution
-  - control.footer_config
-  - control.footer_config_column
-  - control.footer_config_social_link
+  - whitelabel.footer_config
+  - whitelabel.footer_config_column
+  - whitelabel.footer_config_social_link
 - operation: setHeader
   verb: PUT
   path: /tenant-config/header

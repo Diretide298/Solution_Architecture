@@ -74,6 +74,28 @@ BEGIN
 END
 $$;
 
+-- **A row shared by two scopes** (audit R183): visible, and writable, from either path. A stock
+-- transfer is owned at the source venue's `scope_path` and admits the destination through its
+-- second path, so the receiving venue can read and receive it. Its lines follow through the
+-- parent policy like any other child.
+CREATE OR REPLACE FUNCTION platform.apply_shared_scope_rls(target regclass, second_path text)
+    RETURNS void
+    LANGUAGE plpgsql
+AS $$
+DECLARE
+    policy_name text := platform.rls_policy_name(target);
+    predicate text := format('(platform.in_scope(scope_path) OR platform.in_scope(%I))',
+                             second_path);
+BEGIN
+    EXECUTE format('ALTER TABLE %s ENABLE ROW LEVEL SECURITY', target);
+    EXECUTE format('ALTER TABLE %s FORCE ROW LEVEL SECURITY', target);
+    EXECUTE format('DROP POLICY IF EXISTS scope_isolation ON %s', target);
+    EXECUTE format('DROP POLICY IF EXISTS %I ON %s', policy_name, target);
+    EXECUTE format('CREATE POLICY %I ON %s USING %s WITH CHECK %s',
+                   policy_name, target, predicate, predicate);
+END
+$$;
+
 
 
 -- A child table protected through the declared foreign key to the row that owns it. The row is
@@ -96,7 +118,7 @@ BEGIN
 END
 $$;
 
--- **52 tables: 7 scoped by `scope_path`, 0 by `venue_id`, 3 through the parent that owns them, 41 with no policy.**
+-- **49 tables: 6 scoped by `scope_path`, 0 by `venue_id`, 1 through the parent that owns them, 41 with no policy.**
 -- A table with no policy is listed at the end of this file with the reason. It is not
 -- claimed to be reference data: for most of them that is a scoping decision nobody has
 -- made yet, and they stay readable by every connection to this database until it is.
@@ -105,7 +127,6 @@ $$;
 -- Scoped by path.
 SELECT platform.apply_scope_rls('control.channel_listing'::regclass);
 SELECT platform.apply_scope_rls('control.content_block'::regclass);
-SELECT platform.apply_scope_rls('control.footer_config'::regclass);
 SELECT platform.apply_scope_rls('control.migration_plan'::regclass);
 SELECT platform.apply_scope_rls('control.seo_metadata'::regclass);
 SELECT platform.apply_scope_rls('control.support_notice'::regclass);
@@ -115,8 +136,6 @@ SELECT platform.apply_scope_rls('control.url_redirect'::regclass);
 --   control.usage_record
 
 -- Scoped through the parent that owns the row (a NOT NULL declared foreign key).
-SELECT platform.apply_parent_rls('control.footer_config_column'::regclass, 'footer_config_id', 'control.footer_config'::regclass, 'id');
-SELECT platform.apply_parent_rls('control.footer_config_social_link'::regclass, 'footer_config_id', 'control.footer_config'::regclass, 'id');
 SELECT platform.apply_parent_rls('control.migration_plan_cell'::regclass, 'migration_plan_id', 'control.migration_plan'::regclass, 'id');
 
 -- No policy. Each needs a scoping decision (carry scope_path or venue_id, or a

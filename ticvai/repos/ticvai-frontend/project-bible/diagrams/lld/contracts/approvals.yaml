@@ -1,5 +1,5 @@
 id: LLD-approvals
-title: approvals — 45 operations
+title: approvals — 46 operations
 generatedBy: tools/derive-diagrams.py
 index: diagrams/hld/03-contracts.yaml
 tier: spine
@@ -525,6 +525,18 @@ operations:
   - staff
   offline: false
   reads: []
+  writes: []
+- operation: submitApprovalRequest
+  verb: POST
+  path: /approval-requests/{requestId}/submit
+  scope: venue
+  permission: APPROVAL_REQUEST
+  audience:
+  - staff
+  offline: false
+  reads:
+  - approvals.decision
+  - approvals.request
   writes: []
 - operation: withdrawApprovalRequest
   verb: POST

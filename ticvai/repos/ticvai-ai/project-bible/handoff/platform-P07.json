@@ -11,11 +11,11 @@
  "note": "Derived by tools/derive-platform.py. **The gaps section is the point** \u2014 a page listing what exists is a directory; one listing what is missing is a worklist.",
  "counts": {
   "screens": 11,
-  "operations": 22,
+  "operations": 24,
   "contracts": 5,
   "modules": 1,
   "undrawn": 0,
-  "operationsWithNoScreen": 55
+  "operationsWithNoScreen": 56
  },
  "waves": {
   "wave1": 11
@@ -36,7 +36,7 @@
   },
   {
    "contract": "identity",
-   "operations": 6
+   "operations": 8
   },
   {
    "contract": "cross-region",
@@ -58,7 +58,7 @@
    "module": "Access",
    "wave": 1,
    "route": "/access/sign-in",
-   "operations": 7,
+   "operations": 9,
    "drawn": true
   },
   {
@@ -255,6 +255,12 @@
     "contract": "identity",
     "verb": "GET",
     "summary": "A membership with its history, usage and renewals"
+   },
+   {
+    "operation": "getPasswordPolicy",
+    "contract": "identity",
+    "verb": "GET",
+    "summary": "Read the password and MFA policy in force"
    },
    {
     "operation": "getPrincipalModuleAccess",

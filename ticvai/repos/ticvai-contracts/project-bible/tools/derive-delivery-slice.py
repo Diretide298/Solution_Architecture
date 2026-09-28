@@ -66,9 +66,17 @@ TRADING_NOUN = re.compile(r"WorkOrder|WaitTime|QueueStatus|PathClosure")
 TRADING_PERM = re.compile(r"_(EXECUTE|VALIDATE|BOOK|CREATE|MODIFY)$")
 
 
+def is_deferred(s: dict) -> bool:
+    """**A screen with a `deferred` block is out of the first release** (decided 28 September, audit
+    R187 and R242): the itinerary planner GST-051..054 and GST-059, and the in-venue notifications feed
+    GST-030 and WEB-046, all `wave: 4`. Kept in the package for the release that builds them, but
+    neither they nor the operations only they call may count toward Block A."""
+    return bool(s.get("deferred"))
+
+
 def screens(code: str) -> list[dict]:
     f = next((ROOT / "screens").glob(f"{code}-*.yaml"))
-    return yaml.safe_load(f.read_text(encoding="utf-8"))["screens"]
+    return [s for s in yaml.safe_load(f.read_text(encoding="utf-8"))["screens"] if not is_deferred(s)]
 
 
 def ops_of(s: dict) -> list[str]:
@@ -94,8 +102,12 @@ def main() -> int:
     lineage = json.loads((ROOT / "handoff" / "api-data-lineage.json").read_text(encoding="utf-8"))
 
     called_by: dict[str, set[str]] = defaultdict(set)
+    deferred_screens: list[str] = []
     for f in sorted((ROOT / "screens").glob("P*.yaml")):
         for s in yaml.safe_load(f.read_text(encoding="utf-8"))["screens"]:
+            if is_deferred(s):
+                deferred_screens.append(s["id"])
+                continue
             for o in ops_of(s):
                 called_by[o].add(s["id"])
 
@@ -167,6 +179,7 @@ def main() -> int:
     out = {
         "note": "Derived by tools/derive-delivery-slice.py. Do not hand-edit.",
         "platforms": {k: {"name": p["name"], "screens": plat_screens[k]} for k, p in PLATFORMS.items()},
+        "deferredScreens": sorted(deferred_screens),
         "counts": {"core": sum(1 for o in ops.values() if o["part"] == "core"),
                    "setup": sum(1 for o in ops.values() if o["part"] == "setup"),
                    "allOperations": len(lineage)},
@@ -183,6 +196,7 @@ def main() -> int:
     for s, v in out["services"].items():
         print(f"  {s:22} core {v['core']:4}  setup {v['setup']:4}  of {v['total']}")
     print(f"fed by other platforms: {len(fed_elsewhere)} tables; no writer at all: {len(no_writer)}")
+    print(f"left out as deferred to a later release: {len(deferred_screens)} screens {sorted(deferred_screens)}")
     if missing:
         print(f"ERROR: {len(missing)} called operations missing from lineage: {missing[:5]}")
         return 1

@@ -69,12 +69,14 @@ steps:
     changes is a guest walking to the counter.'
   crossesDevice: true
 - step: 6
-  screen: GST-030
-  action: Their queue place comes up and they are told.
+  screen: GST-023
+  action: Their queue place comes up and the queue screen shows it.
   operations:
-  - claimLocationSession
-  outcome: '**The notification is the payoff.** A virtual queue that does not tell you is a queue you
-    have to watch, which is the thing it was meant to replace.'
+  - getWaitingGuest
+  outcome: '**The queue screen tells them, by polling its own status**, and a push reaches a guest who
+    has the app closed. There is no in-app notifications feed in the first release (decided 28 September,
+    audit R242; GST-030 is a later release). A virtual queue that does not tell you is a queue you have
+    to watch, which is the thing it was meant to replace.'
   crossesDevice: true
 exitStates:
 - state: served

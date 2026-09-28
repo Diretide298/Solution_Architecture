@@ -128,10 +128,10 @@ READS = {
   "SELECT * FROM resources.booking LIMIT 50",
   "SELECT * FROM resources.resource WHERE scope_path LIKE $1 LIMIT 50"
  ],
- "getSessionManifest": [
+ "getPerformanceManifest": [
   "SELECT * FROM marketing.consent_record LIMIT 50",
   "SELECT * FROM pii.subject LIMIT 50",
-  "SELECT * FROM resources.session_participant LIMIT 50"
+  "SELECT * FROM resources.performance_participant LIMIT 50"
  ],
  "getSignageQueueBoard": [
   "SELECT * FROM queue.queue LIMIT 50",
@@ -264,8 +264,8 @@ READS = {
  "rejectWorkOrder": [
   "SELECT * FROM maintenance.work_order LIMIT 50"
  ],
- "reorderSessionManifest": [
-  "SELECT * FROM resources.session_participant LIMIT 50"
+ "reorderPerformanceManifest": [
+  "SELECT * FROM resources.performance_participant LIMIT 50"
  ],
  "replaceMediaAsset": [
   "SELECT * FROM assets.media_asset LIMIT 50"
@@ -486,8 +486,8 @@ WRITES = {
  "rejectWorkOrder": [
   "SELECT id FROM maintenance.work_order ORDER BY id LIMIT 1 FOR UPDATE"
  ],
- "reorderSessionManifest": [
-  "SELECT id FROM resources.session_participant ORDER BY id LIMIT 1 FOR UPDATE"
+ "reorderPerformanceManifest": [
+  "SELECT id FROM resources.performance_participant ORDER BY id LIMIT 1 FOR UPDATE"
  ],
  "replaceMediaAsset": [
   "SELECT id FROM assets.media_asset ORDER BY id LIMIT 1 FOR UPDATE"
@@ -694,7 +694,7 @@ CACHE = {
  "rejectWorkOrder": [
   "cache:idempotency:bench"
  ],
- "reorderSessionManifest": [
+ "reorderPerformanceManifest": [
   "cache:idempotency:bench"
  ],
  "replaceMediaAsset": [

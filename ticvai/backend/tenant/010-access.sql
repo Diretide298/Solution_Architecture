@@ -25,10 +25,10 @@ CREATE TABLE IF NOT EXISTS access.access_point (
     scope_path                        ltree NOT NULL,
     external_credential_sources       jsonb,
     scan_anomaly_rules                jsonb,
-    operating_mode                    text DEFAULT 'normal' CONSTRAINT access_point_operating_mode_chk CHECK (operating_mode IN ('normal', 'freeFlow', 'dropArm', 'closed', 'podium', 'maintenance')),
+    operating_mode                    text NOT NULL DEFAULT 'normal',
     vehicle_location_capture          boolean DEFAULT false,
-    mode                              text NOT NULL CONSTRAINT access_point_mode_chk CHECK (mode IN ('entry', 'reentry', 'crossover', 'exit', 'freeRotation', 'closed')),
-    direction                         text CONSTRAINT access_point_direction_chk CHECK (direction IN ('entry', 'exit', 'reentry', 'crossover')),
+    mode                              text,
+    direction                         text,
     is_anti_passback_enabled          boolean,
     requires_exit_before_reentry      boolean DEFAULT false,
     driver                            text,
@@ -88,6 +88,8 @@ CREATE TABLE IF NOT EXISTS access.entitlement (
     last_entry_at                     timestamptz,
     frozen_days                       integer DEFAULT 0,
     suspended_reason                  text,
+    freeze_reason                     text CONSTRAINT entitlement_freeze_reason_chk CHECK (freeze_reason IN ('travelling', 'injury', 'personal', 'seasonal', 'other')),
+    freeze_note                       text CONSTRAINT entitlement_freeze_note_chk CHECK (char_length(freeze_note) <= 500),
     is_name_bound                     boolean DEFAULT false,
     holder_name                       text,
     shared_with_subject_ids           text[],
@@ -157,9 +159,10 @@ CREATE TABLE IF NOT EXISTS access.scan_event (
     direction                         text NOT NULL CONSTRAINT scan_event_direction_chk CHECK (direction IN ('entry', 'exit', 'reentry', 'crossover')),
     operator_principal_id             uuid,
     device_id                         uuid,
-    overridden_by_principal_id        uuid,
+    overrides_scan_id                 text,
     override_reason                   text,
     recorded_at                       timestamptz NOT NULL,
-    synced_at                         timestamptz
+    synced_at                         timestamptz,
+    overridden_by_principal_id        uuid
 );
 

@@ -1,5 +1,7 @@
 # Git & Merge Requests
 
+**Platform: GitHub, with GitHub Actions for CI** (decided 28 September, audit R057). The repositories already ship `.github/workflows`. *Merge request* in this bible means a GitHub pull request.
+
 ## 9. Code Review
 
 Every change reviewed. Elevated-review areas per `AI_AUTHORSHIP.md` §5 need a second

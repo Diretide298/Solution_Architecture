@@ -40,7 +40,8 @@ transitions:
   to: cancelled
   operation: closeTransferShort
   trigger: operation
-  guard: Balance written off
+  guard: Balance written off. A supervisor's PIN step-up on the same device, no approval request (proposed
+    by the coordinator, client to confirm, audit R144)
   requiresApproval: true
 - from: dispatched
   to: cancelled

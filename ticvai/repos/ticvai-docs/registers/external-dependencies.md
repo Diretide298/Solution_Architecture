@@ -161,6 +161,52 @@ consuming all relevant APIs, not just the happy path** (12 Aug §12) — includi
 payment-status inquiry to recover orders where a success response never arrived, and a
 background reconciler for on-site terminal failures.
 
+### 4.4 Platform, vendors, sandboxes and sign-off — decided 28 September
+
+Chinmay adopted the recommended default for every question the Block A pull audit raised (`handoff/audit-decisions.json`). **Where the decision leaves a name or a date to the client, the row says `[client to name]` and it stays open until it is filled.**
+
+#### Hosting and CI (audit R057, closes the provider half of CF-64)
+
+| Choice | Decision | Why |
+|---|---|---|
+| Cloud provider and region | **Azure, in a UAE region** | The existing Terraform scaffold already targets `azurerm` |
+| CI | **GitHub Actions** | Every repository already ships `.github/workflows` |
+
+The setup bible carries it where developers read it: `setup/backend-patterns.md` (Terraform provider), `setup/config-and-secrets.md` (Azure Key Vault), `setup/git-and-mrs.md` (pull requests on GitHub), `setup/dependencies.md` (infra and CI list).
+
+#### Integration vendors (audit R117)
+
+We write each adapter spec against the vendor's own documentation. **Payments follow CF-131 and the FX feed is already in the contract; for every other integration the client names the vendor.**
+
+| Integration | Vendor | Status | API documentation and sandbox | Client owner |
+|---|---|---|---|---|
+| Payment gateways | **Stripe and Network International (N-Genius)** — CF-131 | Decided | See *Payment sandboxes* below | [client to name] |
+| Card tokenisation and checkout | **Each gateway's own hosted checkout, with tokenisation** — no card data touches TICVAI | Decided | With the gateway sandboxes | [client to name] |
+| FX rate feed | **UAE Central Bank** (`uaeCentralBank`, the default in `FxRateSource`, `finance.yaml`) | Decided | Public daily rate; no sandbox needed | — |
+| Face matching (Face Pass, `access.yaml` face-matching thresholds) | [client to name] | Open — vendor | [date to be set when named] | [client to name] |
+| Parking vendor | [client to name] | Open — vendor | [date to be set when named] | [client to name] |
+| Password breach check (`requireBreachCheck`, `identity.yaml`) | [client to name] | Open — vendor | [date to be set when named] | [client to name] |
+| Apple and Google wallet pass signing | Apple Wallet and Google Wallet (S-6); the signing account holder is [client to name] | Open — account holder | [date to be set when named] | [client to name] |
+| DNS and certificates for custom domains | [client to name] | Open — vendor | [date to be set when named] | [client to name] |
+
+#### Payment sandboxes (audit R065)
+
+| Item | Decision |
+|---|---|
+| Sandboxes | Stripe and Network International test accounts with API credentials, delivered together |
+| Owner | **[client to name]** — the client finance / payments owner. One named person |
+| Due date | **[client to set]** — a fixed date, added to the plan as a task |
+| Until then | WEB-012 and SVC-ORDER-PAYMENT-1 build and test the declined, unknown-outcome and reconcile branches against a conforming fake; they cannot be accepted without the sandboxes |
+| Reconciler threshold | **Proposed, client to confirm or correct:** the background reconciler behind `inquirePaymentStatus` polls each provider at **that provider's own recommended status-poll interval**, rather than a TICVAI-invented number |
+
+#### Wireframe sign-off (audit R252)
+
+| Item | Decision |
+|---|---|
+| Reviewer | **One named design reviewer on the client side: [client to name]** |
+| Turnaround | **Sign-off within 3 working days of each batch** of redrawn Block A wireframes |
+| What it gates | Frontend acceptance on every Block A screen ticket |
+
 ---
 
 ## 5. Queue Management — Three Distinct Systems
@@ -265,7 +311,9 @@ full matrix for duplicate IDs before it is used as the acceptance baseline.**
 | **Turnstile SDK outstanding** (05 Aug) | H | Blocks the largest single sub-domain (125 reqs) | **Escalate** |
 | Five device classes absent from Integrations sheet | H | Parking, sensors, game readers, lockers, signage may be unscoped and unbudgeted | Confirm in/out |
 | **CF-33 queue ownership unresolved** | H+S | Q1 and Q2 have different owners, timelines and dependency profiles | Resolve before design |
-| Payment gateway sandbox access | S-1 | End-to-end recovery flows untestable without it | Request sandbox credentials now |
+| Payment gateway sandbox access | S-1 | End-to-end recovery flows untestable without it | Named client owner and fixed date (§4.4, audit R065); fake adapter until then |
+| Vendors not named for face matching, parking, breach check, wallet signing, custom domains | S | Those adapters cannot be specified | Client names each vendor (§4.4, audit R117) |
+| No named design reviewer | — | Block A frontend tickets cannot be accepted | One reviewer, 3 working days per batch (§4.4, audit R252) |
 | UAE Pass integration approval | S-2 | Government onboarding has lead time | Start the process early |
 | OTA partner API access | S-3 | Each reseller has its own onboarding | Sequence by commercial priority |
 | No pilot venue identified | T | Vertical slice unprovable | Identify with TICVAI |
@@ -282,9 +330,12 @@ full matrix for duplicate IDs before it is used as the acceptance baseline.**
 | 3 | Resolve CF-33 — Q1 vs Q2 ownership and scope | Both | New |
 | 4 | Confirm scope: parking, sensors, game readers, lockers, signage | Qossai / Allam | New |
 | 5 | Identify pilot venue for on-location testing | Qossai / Allam | New |
-| 6 | Payment gateway sandbox credentials (Stripe, NI) | Allam | New |
+| 6 | Payment gateway sandbox credentials (Stripe, NI) — one named owner, one fixed date (audit R065) | **[client to name]** (client finance / payments) | Decided 28 Sep; owner and date open |
 | 7 | Define driver interface — access control and payment | Chinmay | High |
 | 8 | Define the standard third-party inbound API pattern (C101) | Chinmay | High |
 | 9 | Specify and procure Priority 1 lab | Dinesh | High |
 | 10 | Build device simulators for CI ahead of hardware | Backend | High |
 | 11 | Audit matrix for duplicate requirement IDs | Chinmay | New |
+| 12 | Name the vendor for face matching, parking, password breach check, wallet pass signing and custom-domain DNS/certificates (audit R117) | **[client to name]** (client IT / procurement) | Decided 28 Sep; vendors open |
+| 13 | Name the design reviewer for Block A wireframes; sign-off within 3 working days per batch (audit R252) | **[client to name]** (client design) | Decided 28 Sep; name open |
+| 14 | Name the approver for dependencies outside `setup/dependencies.md` (audit R038) | **[client to name]** (client IT / architecture) | Decided 28 Sep; name open |

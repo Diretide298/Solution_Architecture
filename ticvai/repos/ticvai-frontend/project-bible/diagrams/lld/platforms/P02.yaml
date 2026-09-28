@@ -41,22 +41,22 @@ modulesUsed:
   screens: 1
 servicesCalled:
 - service: OrderService
-  operationCalls: 61
+  operationCalls: 69
 - service: CatalogueService
   operationCalls: 48
 - service: MarketingService
-  operationCalls: 38
-- service: IdentityService
-  operationCalls: 24
+  operationCalls: 36
 - service: FnbService
-  operationCalls: 24
+  operationCalls: 25
 - service: VenueOpsService
-  operationCalls: 21
-- service: AccessService
   operationCalls: 20
-- service: AiService
-  operationCalls: 10
+- service: AccessService
+  operationCalls: 18
+- service: IdentityService
+  operationCalls: 18
 - service: WhiteLabelService
+  operationCalls: 8
+- service: AiService
   operationCalls: 7
 - service: WalletService
   operationCalls: 4
@@ -66,7 +66,7 @@ servicesCalled:
   operationCalls: 1
 coverage:
   screens: 71
-  inAFlow: 35
+  inAFlow: 34
   drawn: 71
   note: '**A screen in no flow has been specified and never walked.** Every flow written in this package
     has found a defect.'
@@ -342,7 +342,6 @@ screens:
   goesTo:
   - GST-001
   - GST-002
-  - GST-003
   - GST-067
   - GST-072
   boardFrames: null
@@ -356,11 +355,9 @@ screens:
   density: comfortable
   operations:
   - addCartLine
-  - checkGuestCheckoutMatch
   - checkoutCart
   - createOrder
   - createPayment
-  - decideGuestCheckoutMatch
   - getCart
   - getPaymentLink
   - inquirePaymentStatus
@@ -381,7 +378,6 @@ screens:
   goesTo:
   - GST-001
   - GST-002
-  - GST-003
   boardFrames: null
   wireframe: wireframes/P02 Guest App.dc.html#gst-009
   inFlows:
@@ -408,7 +404,6 @@ screens:
   goesTo:
   - GST-001
   - GST-002
-  - GST-003
   boardFrames: null
   wireframe: wireframes/P02 Guest App.dc.html#gst-010
   inFlows: null
@@ -434,7 +429,6 @@ screens:
   goesTo:
   - GST-001
   - GST-002
-  - GST-003
   - GST-020
   boardFrames: null
   wireframe: wireframes/P02 Guest App.dc.html#gst-011
@@ -467,7 +461,6 @@ screens:
   goesTo:
   - GST-001
   - GST-002
-  - GST-003
   - GST-013
   boardFrames: null
   wireframe: wireframes/P02 Guest App.dc.html#gst-012
@@ -497,7 +490,6 @@ screens:
   goesTo:
   - GST-001
   - GST-002
-  - GST-003
   - GST-055
   boardFrames: null
   wireframe: wireframes/P02 Guest App.dc.html#gst-013
@@ -527,7 +519,6 @@ screens:
   goesTo:
   - GST-001
   - GST-002
-  - GST-003
   boardFrames: null
   wireframe: wireframes/P02 Guest App.dc.html#gst-014
   inFlows:
@@ -564,7 +555,6 @@ screens:
   goesTo:
   - GST-001
   - GST-002
-  - GST-003
   boardFrames: null
   wireframe: wireframes/P02 Guest App.dc.html#gst-015
   inFlows:
@@ -592,7 +582,6 @@ screens:
   goesTo:
   - GST-001
   - GST-002
-  - GST-003
   - GST-017
   boardFrames: null
   wireframe: wireframes/P02 Guest App.dc.html#gst-016
@@ -619,7 +608,6 @@ screens:
   goesTo:
   - GST-001
   - GST-002
-  - GST-003
   boardFrames: null
   wireframe: wireframes/P02 Guest App.dc.html#gst-017
   inFlows:
@@ -650,7 +638,6 @@ screens:
   goesTo:
   - GST-001
   - GST-002
-  - GST-003
   boardFrames: null
   wireframe: wireframes/P02 Guest App.dc.html#gst-018
   inFlows: null
@@ -678,7 +665,6 @@ screens:
   goesTo:
   - GST-001
   - GST-002
-  - GST-003
   boardFrames: null
   wireframe: wireframes/P02 Guest App.dc.html#gst-019
   inFlows: null
@@ -704,7 +690,6 @@ screens:
   goesTo:
   - GST-001
   - GST-002
-  - GST-003
   boardFrames: null
   wireframe: wireframes/P02 Guest App.dc.html#gst-020
   inFlows:
@@ -733,7 +718,6 @@ screens:
   goesTo:
   - GST-001
   - GST-002
-  - GST-003
   - GST-022
   boardFrames:
   - Seat Board 4.dc.html#seat-4b
@@ -792,7 +776,6 @@ screens:
   goesTo:
   - GST-001
   - GST-002
-  - GST-003
   - GST-024
   boardFrames: null
   wireframe: wireframes/P02 Guest App.dc.html#gst-023
@@ -830,7 +813,6 @@ screens:
   goesTo:
   - GST-001
   - GST-002
-  - GST-003
   - GST-009
   - GST-025
   boardFrames: null
@@ -860,7 +842,7 @@ screens:
   goesTo:
   - GST-001
   - GST-002
-  - GST-003
+  - GST-023
   - GST-030
   boardFrames: null
   wireframe: wireframes/P02 Guest App.dc.html#gst-025
@@ -874,6 +856,9 @@ screens:
   wave: 2
   density: comfortable
   operations:
+  - addCartLine
+  - checkoutCart
+  - createPayment
   - getGameCard
   - listMerchandise
   - lookupMerchandise
@@ -887,12 +872,12 @@ screens:
   - offline
   offlineState: true
   entryParams:
+  - cartId<-session
   - cardCode<-deepLink
   - outletId<-session
   goesTo:
   - GST-001
   - GST-002
-  - GST-003
   boardFrames: null
   wireframe: wireframes/P02 Guest App.dc.html#gst-026
   inFlows:
@@ -905,7 +890,9 @@ screens:
   wave: 3
   density: comfortable
   operations:
-  - createParkingEntitlement
+  - addCartLine
+  - checkoutCart
+  - createPayment
   - listParkingFacilities
   - updateParkingEntitlement
   states:
@@ -915,13 +902,14 @@ screens:
   - error
   - loading
   - offline
+  - soldOutForDay
   offlineState: true
   entryParams:
   - entitlementId<-deepLink
+  - cartId<-session
   goesTo:
   - GST-001
   - GST-002
-  - GST-003
   - GST-028
   boardFrames: null
   wireframe: wireframes/P02 Guest App.dc.html#gst-027
@@ -934,7 +922,7 @@ screens:
   wave: 3
   density: comfortable
   operations:
-  - createParkingEntitlement
+  - getOrder
   - listParkingFacilities
   states:
   - emptyFirstRun
@@ -944,11 +932,11 @@ screens:
   - loading
   - offline
   offlineState: true
-  entryParams: []
+  entryParams:
+  - orderId<-previousScreen
   goesTo:
   - GST-001
   - GST-002
-  - GST-003
   - GST-012
   boardFrames: null
   wireframe: wireframes/P02 Guest App.dc.html#gst-028
@@ -961,6 +949,7 @@ screens:
   wave: 2
   density: comfortable
   operations:
+  - getTenantAppStatus
   - listDeliveryLocations
   - listDiningOutlets
   states:
@@ -975,7 +964,6 @@ screens:
   goesTo:
   - GST-001
   - GST-002
-  - GST-003
   boardFrames: null
   wireframe: wireframes/P02 Guest App.dc.html#gst-029
   inFlows: null
@@ -983,7 +971,7 @@ screens:
   name: In-Venue Notifications
   module: Engagement & Support
   requiresModule: fnb
-  wave: 2
+  wave: 4
   density: comfortable
   operations:
   - claimLocationSession
@@ -997,12 +985,10 @@ screens:
   goesTo:
   - GST-001
   - GST-002
-  - GST-003
   - GST-031
   boardFrames: null
   wireframe: wireframes/P02 Guest App.dc.html#gst-030
-  inFlows:
-  - F48 A guest finds it, queues for it, and eats
+  inFlows: null
 - screen: GST-031
   name: AI Concierge – Home
   module: Engagement & Support
@@ -1028,7 +1014,6 @@ screens:
   goesTo:
   - GST-001
   - GST-002
-  - GST-003
   - GST-032
   boardFrames: null
   wireframe: wireframes/P02 Guest App.dc.html#gst-031
@@ -1062,7 +1047,6 @@ screens:
   goesTo:
   - GST-001
   - GST-002
-  - GST-003
   - GST-033
   boardFrames: null
   wireframe: wireframes/P02 Guest App.dc.html#gst-032
@@ -1087,7 +1071,6 @@ screens:
   goesTo:
   - GST-001
   - GST-002
-  - GST-003
   boardFrames: null
   wireframe: wireframes/P02 Guest App.dc.html#gst-033
   inFlows: null
@@ -1114,7 +1097,6 @@ screens:
   goesTo:
   - GST-001
   - GST-002
-  - GST-003
   boardFrames: null
   wireframe: wireframes/P02 Guest App.dc.html#gst-034
   inFlows:
@@ -1138,7 +1120,6 @@ screens:
   goesTo:
   - GST-001
   - GST-002
-  - GST-003
   boardFrames: null
   wireframe: wireframes/P02 Guest App.dc.html#gst-035
   inFlows: null
@@ -1164,7 +1145,6 @@ screens:
   goesTo:
   - GST-001
   - GST-002
-  - GST-003
   boardFrames: null
   wireframe: wireframes/P02 Guest App.dc.html#gst-036
   inFlows:
@@ -1193,7 +1173,6 @@ screens:
   goesTo:
   - GST-001
   - GST-002
-  - GST-003
   - GST-011
   boardFrames: null
   wireframe: wireframes/P02 Guest App.dc.html#gst-037
@@ -1221,7 +1200,6 @@ screens:
   goesTo:
   - GST-001
   - GST-002
-  - GST-003
   boardFrames: null
   wireframe: wireframes/P02 Guest App.dc.html#gst-038
   inFlows: null
@@ -1246,7 +1224,6 @@ screens:
   goesTo:
   - GST-001
   - GST-002
-  - GST-003
   - GST-065
   - GST-066
   - GST-069
@@ -1281,7 +1258,6 @@ screens:
   goesTo:
   - GST-001
   - GST-002
-  - GST-003
   boardFrames: null
   wireframe: wireframes/P02 Guest App.dc.html#gst-040
   inFlows:
@@ -1294,6 +1270,7 @@ screens:
   density: comfortable
   operations:
   - abandonCart
+  - applyCartPromoCode
   - checkoutCart
   - claimCart
   - extendCart
@@ -1316,7 +1293,6 @@ screens:
   goesTo:
   - GST-001
   - GST-002
-  - GST-003
   - GST-042
   boardFrames: null
   wireframe: wireframes/P02 Guest App.dc.html#gst-041
@@ -1328,39 +1304,29 @@ screens:
   wave: 1
   density: comfortable
   operations:
-  - completeSsoAuthorization
-  - enrolMfaMethod
   - getGuestSession
   - guestLogout
+  - guestPasswordLogin
   - guestSocialLogin
   - guestUaePassLogin
   - linkGuestCheckout
-  - listMfaMethods
-  - listSsoProviders
-  - login
   - refreshToken
   - registerGuest
-  - removeMfaMethod
   - requestGuestOtp
-  - startSsoAuthorization
   - verifyGuestOtp
-  - verifyMfaChallenge
-  - verifyMfaEnrolment
   states:
   - emptyFirstRun
-  - emptyNoResults
+  - emptyNoAccess
   - error
   - loading
   - offline
+  - signInRefused
   offlineState: true
   entryParams:
-  - challengeId<-deepLink
-  - methodId<-deepLink
-  - providerId<-deepLink
+  - cartId<-session
   goesTo:
   - GST-001
   - GST-002
-  - GST-003
   - GST-041
   boardFrames: null
   wireframe: wireframes/P02 Guest App.dc.html#gst-042
@@ -1383,7 +1349,6 @@ screens:
   goesTo:
   - GST-001
   - GST-002
-  - GST-003
   boardFrames: null
   wireframe: wireframes/P02 Guest App.dc.html#gst-043
   inFlows: null
@@ -1408,7 +1373,6 @@ screens:
   goesTo:
   - GST-001
   - GST-002
-  - GST-003
   boardFrames: null
   wireframe: wireframes/P02 Guest App.dc.html#gst-044
   inFlows: null
@@ -1431,7 +1395,6 @@ screens:
   goesTo:
   - GST-001
   - GST-002
-  - GST-003
   boardFrames: null
   wireframe: wireframes/P02 Guest App.dc.html#gst-045
   inFlows: null
@@ -1456,7 +1419,6 @@ screens:
   goesTo:
   - GST-001
   - GST-002
-  - GST-003
   boardFrames: null
   wireframe: wireframes/P02 Guest App.dc.html#gst-046
   inFlows: null
@@ -1469,16 +1431,18 @@ screens:
   operations:
   - getTenantAppStatus
   states:
+  - closed
   - emptyFirstRun
   - error
+  - forcedUpgrade
   - loading
   - offline
+  - soldOut
   offlineState: true
   entryParams: []
   goesTo:
   - GST-001
   - GST-002
-  - GST-003
   boardFrames: null
   wireframe: wireframes/P02 Guest App.dc.html#gst-047
   inFlows: null
@@ -1503,7 +1467,6 @@ screens:
   goesTo:
   - GST-001
   - GST-002
-  - GST-003
   boardFrames: null
   wireframe: wireframes/P02 Guest App.dc.html#gst-048
   inFlows: null
@@ -1529,7 +1492,6 @@ screens:
   goesTo:
   - GST-001
   - GST-002
-  - GST-003
   boardFrames:
   - Seat Board 4.dc.html#seat-4a
   wireframe: wireframes/P02 Guest App.dc.html#gst-049
@@ -1557,7 +1519,6 @@ screens:
   goesTo:
   - GST-001
   - GST-002
-  - GST-003
   - GST-016
   boardFrames: null
   wireframe: wireframes/P02 Guest App.dc.html#gst-050
@@ -1567,7 +1528,7 @@ screens:
   name: Plan Your Adventure – Start
   module: Engagement & Support
   requiresModule: queue
-  wave: 3
+  wave: 4
   density: comfortable
   operations:
   - getWaitTimes
@@ -1584,7 +1545,6 @@ screens:
   goesTo:
   - GST-001
   - GST-002
-  - GST-003
   - GST-052
   boardFrames: null
   wireframe: wireframes/P02 Guest App.dc.html#gst-051
@@ -1594,12 +1554,11 @@ screens:
   name: Suggested Itineraries
   module: Engagement & Support
   requiresModule: ai
-  wave: 3
+  wave: 4
   density: comfortable
   operations:
   - listCatalogueBundles
   - listProducts
-  - requestSuggestion
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -1613,7 +1572,6 @@ screens:
   goesTo:
   - GST-001
   - GST-002
-  - GST-003
   - GST-053
   boardFrames: null
   wireframe: wireframes/P02 Guest App.dc.html#gst-052
@@ -1623,7 +1581,7 @@ screens:
   name: Build Your Own Itinerary
   module: Engagement & Support
   requiresModule: ticketing
-  wave: 3
+  wave: 4
   density: comfortable
   operations:
   - addCartLine
@@ -1643,7 +1601,6 @@ screens:
   goesTo:
   - GST-001
   - GST-002
-  - GST-003
   - GST-054
   boardFrames: null
   wireframe: wireframes/P02 Guest App.dc.html#gst-053
@@ -1653,12 +1610,11 @@ screens:
   name: AI Optimized Itinerary
   module: Engagement & Support
   requiresModule: ai
-  wave: 3
+  wave: 4
   density: comfortable
   operations:
   - getWaitTimes
   - listProducts
-  - requestSuggestion
   - sendAiMessage
   states:
   - emptyFirstRun
@@ -1674,7 +1630,6 @@ screens:
   goesTo:
   - GST-001
   - GST-002
-  - GST-003
   - GST-059
   boardFrames: null
   wireframe: wireframes/P02 Guest App.dc.html#gst-054
@@ -1704,7 +1659,6 @@ screens:
   goesTo:
   - GST-001
   - GST-002
-  - GST-003
   boardFrames: null
   wireframe: wireframes/P02 Guest App.dc.html#gst-055
   inFlows:
@@ -1733,7 +1687,6 @@ screens:
   goesTo:
   - GST-001
   - GST-002
-  - GST-003
   boardFrames: null
   wireframe: wireframes/P02 Guest App.dc.html#gst-056
   inFlows: null
@@ -1782,7 +1735,6 @@ screens:
   goesTo:
   - GST-001
   - GST-002
-  - GST-003
   - GST-050
   boardFrames: null
   wireframe: wireframes/P02 Guest App.dc.html#gst-058
@@ -1792,12 +1744,11 @@ screens:
   name: Plan My Day – In Progress
   module: Engagement & Support
   requiresModule: ai
-  wave: 3
+  wave: 4
   density: comfortable
   operations:
   - getWaitTimes
   - listProducts
-  - requestSuggestion
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -1811,7 +1762,6 @@ screens:
   goesTo:
   - GST-001
   - GST-002
-  - GST-003
   boardFrames: null
   wireframe: wireframes/P02 Guest App.dc.html#gst-059
   inFlows:
@@ -1998,6 +1948,7 @@ screens:
   operations:
   - enrolFacePass
   - getFacePassEnrolment
+  - listDelegations
   - revokeFacePass
   states:
   - emptyFirstRun
@@ -2006,6 +1957,7 @@ screens:
   - error
   - loading
   - offline
+  - subjectNotLinked
   offlineState: true
   entryParams:
   - enrolmentId<-deepLink
@@ -2016,16 +1968,16 @@ screens:
   wireframe: wireframes/P02 Guest App.dc.html#gst-069
   inFlows: null
 - screen: GST-070
-  name: Reserve a Table or Cabana
+  name: Reserve a Table
   module: In-venue Services
   requiresModule: core
   wave: 2
   density: comfortable
   operations:
   - createTableReservation
-  - getResourceAvailability
   - joinRestaurantWaitlist
   - joinWaitlist
+  - leaveRestaurantWaitlist
   - leaveWaitlist
   - updateTableReservation
   states:
@@ -2039,7 +1991,6 @@ screens:
   entryParams:
   - entryId<-deepLink
   - reservationId<-deepLink
-  - resourceId<-deepLink
   - subjectId<-session
   goesTo:
   - GST-039
@@ -2116,7 +2067,8 @@ screens:
   wave: 2
   density: comfortable
   operations:
-  - createMfaChallenge
+  - getGuestSession
+  - guestLogout
   - listGuestDevices
   - registerGuestDevice
   - revokeGuestDevice

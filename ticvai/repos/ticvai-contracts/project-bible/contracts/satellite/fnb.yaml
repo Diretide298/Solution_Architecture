@@ -2,7 +2,7 @@ openapi: 3.1.0
 info:
   title: TICVAI Food & Beverage
   version: 0.1.0
-  x-ticvai-screen-count: 87
+  x-ticvai-screen-count: 88
   x-ticvai-tier: satellite
   x-ticvai-module: 7 — F&B POS  ·  5 — F&B & Guest Management (service)
   x-ticvai-requirements: 151
@@ -233,6 +233,12 @@ paths:
         **`requiresApproval` defaults true wherever the swap changes an allergen.** A chef may substitute
         freely within a claim; changing the claim is somebody else''s decision.
 
+        **A rule belongs to a recipe** (decided 28 September, audit R125 (10)): each rule names its `recipeId`,
+        not a menu item and not the whole venue, because a swap that is safe in one dish is not safe in
+        another. A rule whose recipe does not exist is refused `400`.
+
+        **Saving re-runs `verifyAllergens`** for every menu item whose recipe the rules touch (audit R241).
+
         '
       tags:
       - fnb
@@ -259,6 +265,8 @@ paths:
                   items:
                     $ref: '#/components/schemas/SubstitutionRule'
       responses:
+        '400':
+          $ref: ../shared/common.yaml#/components/responses/BadRequest
         '200':
           headers:
             X-Consistency-Token:
@@ -295,8 +303,11 @@ paths:
         **A dish still labelled nut-free after a swap nobody checked is what this prevents**, and that
         is not a data-quality problem — it is somebody in an ambulance.
 
-        **Run on every recipe change, not on demand.** An operation a kitchen must remember to call is
-        an operation nobody calls on the day it matters.
+        **Run automatically after every change, and callable by hand as a re-check** (decided 28 September,
+        audit R241). The server runs this check for every menu item a change touches, after `setRecipe`,
+        `setSubstitutionRules`, `setIngredientSubstitutes` and `attachModifierGroup`, and records the verdict;
+        the Verify button on BO-045 and BO-111 calls this operation again as a manual re-check. An operation
+        a kitchen must remember to call is an operation nobody calls on the day it matters.
 
         '
       tags:
@@ -311,50 +322,47 @@ paths:
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       responses:
         '200':
-          description: The verdict, and where any discrepancy came from
+          description: The verdict, and where any discrepancy came from. Recorded as the item's latest
+            verdict (`trigger` is `manual`), readable with `getAllergenVerification`.
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  matches:
-                    type: boolean
-                  declared:
-                    type: array
-                    items:
-                      type: string
-                  actual:
-                    type: array
-                    items:
-                      type: string
-                  undeclared:
-                    type: array
-                    description: '**Present in the dish and absent from the label.** The dangerous direction,
-                      and the response leads with it.
+                $ref: '#/components/schemas/AllergenVerdict'
+  /menu-items/{menuItemId}/allergen-verification:
+    parameters:
+    - name: menuItemId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    get:
+      operationId: getAllergenVerification
+      summary: The last allergen verdict recorded for a dish
+      description: '**The read for the automatic check** (decided 28 September, audit R241). The server runs
+        `verifyAllergens` after every recipe, substitution or modifier change and records the verdict;
+        this returns the latest one, with when it was checked and what triggered it, so BO-045 and BO-111
+        show the "Last allergen verdict" without re-running the check. `404` where no check has run yet.
 
-                      '
-                    items:
-                      type: object
-                      properties:
-                        allergen:
-                          type: string
-                        via:
-                          type: string
-                          enum:
-                          - ingredient
-                          - substitution
-                          - modifier
-                          - sharedEquipment
-                        sourceRef:
-                          type: string
-                  overDeclared:
-                    type: array
-                    description: 'Labelled and no longer present. **Safe, and still worth fixing** — a
-                      menu that over-declares teaches guests the labels are guesses.
-
-                      '
-                    items:
-                      type: string
+        '
+      tags:
+      - fnb
+      x-ticvai-permission: PRODUCT_VIEW
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      x-ticvai-read-routing: replica
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      responses:
+        '200':
+          description: The latest verdict
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AllergenVerdict'
+        '404':
+          $ref: ../shared/common.yaml#/components/responses/NotFound
   /production-plans:
     post:
       operationId: buildProductionPlan
@@ -410,7 +418,10 @@ paths:
       x-ticvai-consumed-by:
         - "P08 BO-136 F&B Global Settings & Controls"
       summary: Make the plan real
-      description: 'Board 2M. **A plan becomes production runs**, one per line or grouped by station.
+      description: 'Board 2M. **A plan becomes production runs, grouped by station** (decided 28 September,
+        audit R125 (7)). Each line becomes a run of its recipe carrying the line''s `stationId`, and the
+        kitchen works from one prep list per station rather than one task per line; lines with no station
+        form one group of their own.
 
         **Separate from building it because a plan is edited before it is released.** A plan that creates
         runs as it is drafted creates runs nobody asked for, and a kitchen that finds yesterday''s abandoned
@@ -668,6 +679,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/TableDefinition'
+        '409':
+          $ref: ../shared/common.yaml#/components/responses/DuplicateCode
   /tables/{tableId}:
     parameters:
     - name: tableId
@@ -712,7 +725,12 @@ paths:
               schema:
                 $ref: '#/components/schemas/TableDefinition'
         '409':
-          description: A visit is open on the table. Names the visit.
+          description: 'A visit is open on the table (names the visit), or the new `label` is already used by
+            another table in this venue (`duplicate-code`, audit R108).
+
+            '
+          x-ticvai-problem-types:
+          - duplicate-code
           content:
             application/problem+json:
               schema:
@@ -867,7 +885,6 @@ paths:
       tags:
       - fnb
       x-ticvai-permission: PRODUCT_CONFIGURE
-      x-ticvai-permission-escalated: PRODUCT_CONFIGURE
       x-ticvai-audience:
       - staff
       x-ticvai-scope-level: venue
@@ -1307,7 +1324,9 @@ paths:
                   - powerLoss
                   - spillage
                   - other
-                  description: '`chased` is not offered here — `chaseStation` records it.'
+                  description: '`chased` is not offered here — `chaseStation` records it. `other` is allowed only
+                    with a `note`, which it then requires (decided 28 September, audit R222); refused `400` without
+                    one, and the notes are reviewed quarterly so the common ones become real kinds.'
                 outletId:
                   type: string
                   format: uuid
@@ -1342,6 +1361,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/KitchenException'
+        '400':
+          $ref: ../shared/common.yaml#/components/responses/BadRequest
   /outlets/{outletId}/kitchen-sla:
     parameters:
     - name: outletId
@@ -1705,6 +1726,9 @@ paths:
         **Reaches the server assigned to the table, not the room.** A broadcast to every handheld is one
         everybody ignores by the second service.
 
+        **Where no server is assigned, it goes to the outlet''s supervisor on duty** (decided 28 September,
+        audit R125 (6)), never to the room and never to nobody.
+
         '
       tags:
       - fnb
@@ -1937,6 +1961,11 @@ paths:
         is the normal case, and a model that refuses the second entry sends them to a supervisor to undo
         the first.
 
+        **The count is blind** (decided 28 September, audit R110 (a)): the response never carries the
+        expected quantity or the variance. Both are computed when the count is submitted
+        (`states/count-line.yaml`) and read with `getCountVariance` after that. A counter who can see
+        the expected figure counts towards it.
+
         '
       tags:
       - fnb
@@ -1983,7 +2012,8 @@ paths:
                   nullable: true
       responses:
         '201':
-          description: Recorded, with the variance against theoretical
+          description: Recorded. No expected quantity and no variance until the count is submitted (audit
+            R110 (a)).
           content:
             application/json:
               schema:
@@ -1992,12 +2022,9 @@ paths:
                   lineId:
                     type: string
                     format: uuid
-                  theoreticalQuantity:
+                  countedQuantity:
                     type: number
-                  variance:
-                    type: number
-                  variancePercent:
-                    type: number
+                    description: The quantity as recorded, echoed so the device can confirm it.
   /fnb-stock-counts/{countId}/recount:
     parameters:
     - name: countId
@@ -2082,7 +2109,6 @@ paths:
       tags:
       - fnb
       x-ticvai-permission: PRODUCT_CONFIGURE
-      x-ticvai-permission-escalated: PRODUCT_CONFIGURE
       x-ticvai-audience:
       - staff
       x-ticvai-scope-level: venue
@@ -2146,7 +2172,6 @@ paths:
       tags:
       - fnb
       x-ticvai-permission: PRODUCT_CONFIGURE
-      x-ticvai-permission-escalated: PRODUCT_CONFIGURE
       x-ticvai-audience:
       - staff
       x-ticvai-scope-level: venue
@@ -2351,7 +2376,17 @@ paths:
                   - kitchenBackedUp
                   - awaitingPrevious
                   - other
+                  description: '`other` is allowed only with a `note`, which it then requires (decided 28 September,
+                    audit R222). A reason of `other` with no note is refused `400`, and the notes are reviewed
+                    quarterly so the common ones become real reasons.'
+                note:
+                  type: string
+                  maxLength: 500
+                  nullable: true
+                  description: Free text. Required where the reason is `other` (audit R222).
       responses:
+        '400':
+          $ref: ../shared/common.yaml#/components/responses/BadRequest
         '200':
           headers:
             X-Consistency-Token:
@@ -2455,6 +2490,10 @@ paths:
         **Bounded to the current service.** A recall is for the last few minutes; a ticket from yesterday
         is not a mis-bump.
 
+        **The window is `VenueSettings.fnb.recallWindowMinutes`, counted from the bump**, a venue setting
+        with a tenant default (decided 28 September, audit R094), and never past the end of the current
+        service. **Proposed default 10 minutes, client to correct (audit R094).**
+
         '
       tags:
       - fnb
@@ -2490,7 +2529,8 @@ paths:
               schema:
                 $ref: '#/components/schemas/KitchenTicket'
         '409':
-          description: '**Past the recall window.** The ticket is closed and the correct act is a refire,
+          description: '**Past the recall window** (`VenueSettings.fnb.recallWindowMinutes`, proposed default
+            10, audit R094). The ticket is closed and the correct act is a refire,
             which the response names in `suggestedOperation` (`refireItem`).
 
             '
@@ -2608,6 +2648,14 @@ paths:
                   - partySizeChange
                   - serviceRecovery
                   - other
+                  description: '`other` is allowed only with a `note`, which it then requires (decided 28 September,
+                    audit R222). A reason of `other` with no note is refused `400`, and the notes are reviewed
+                    quarterly so the common ones become real reasons.'
+                note:
+                  type: string
+                  maxLength: 500
+                  nullable: true
+                  description: Free text. Required where the reason is `other` (audit R222).
                 recordedAt:
                   type: string
                   format: date-time
@@ -2622,6 +2670,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/TableVisit'
+        '400':
+          $ref: ../shared/common.yaml#/components/responses/BadRequest
         '409':
           description: '**The target table is occupied.** Names the visit occupying it in `occupyingVisitId`,
             because the next thing the server asks is *by whom*, and `suggestedOperation` is `mergeTableVisits`.
@@ -2718,11 +2768,17 @@ paths:
         the override-rate alert built on 18 August is what catches a manager comping every fourth table,
         and it needs the reason to be useful.
 
+        **Escalates to `ORDER_DISCOUNT` above the venue''s comp value** (decided 28 September, audit
+        R197): a comp whose line value is above the venue setting `fnb.compEscalationAmount` (tenant
+        default, proposed AED 100.00, client to correct under audit R094) needs `ORDER_DISCOUNT`; at or
+        below it, `ORDER_MODIFY` is enough. Above it without `ORDER_DISCOUNT` is a `403`
+        (`comp-escalation-required`).
+
         '
       tags:
       - fnb
       x-ticvai-permission: ORDER_MODIFY
-      x-ticvai-permission-escalated: ORDER_MODIFY
+      x-ticvai-permission-escalated: ORDER_DISCOUNT
       x-ticvai-audience:
       - staff
       x-ticvai-scope-level: venue
@@ -2760,10 +2816,16 @@ paths:
                   - staffMeal
                   - wastage
                   - other
+                  description: '`other` is allowed only with a `note`, which it then requires (decided 28 September,
+                    audit R222). A reason of `other` with no note is refused `400`, and the notes are reviewed
+                    quarterly so the common ones become real reasons.'
                 note:
                   type: string
                   nullable: true
+                  description: Free text. Required where the reason is `other` (audit R222).
       responses:
+        '400':
+          $ref: ../shared/common.yaml#/components/responses/BadRequest
         '200':
           headers:
             X-Consistency-Token:
@@ -2864,6 +2926,11 @@ paths:
         value — **deleting a bad reading is the one thing an inspector looks for**, and an operation that
         rejects the reading teaches a kitchen to stop taking it.
 
+        **Severity is set by what happened** (decided 28 September, audit R125 (5)). An out-of-range reading
+        opens the corrective action at `major` (high). A reading not taken opens one at `minor` (medium),
+        with `source: missedCheck`: the server raises it when a checkpoint''s `checkFrequencyMinutes` passes
+        with no log.
+
         **Offline-capable, deliberately.** A walk-in freezer is where the signal is worst and the readings
         matter most, and a check nobody can record is a check nobody takes.
 
@@ -2911,6 +2978,9 @@ paths:
         **Taken before the receipt is posted.** Once stock is received it has entered the kitchen, and
         **a claim against a supplier needs the reading that refused it** rather than one taken afterwards.
 
+        **A breach opens a corrective action at `major`** (high), the same as an out-of-range reading
+        (decided 28 September, audit R125 (5)).
+
         '
       tags:
       - fnb
@@ -2950,7 +3020,8 @@ paths:
 
         Checks due, checks missed, open corrective actions and unsigned findings. **A missed check counts
         against the venue the same as a failed one** — a log with a gap cannot be told apart from a log
-        nobody kept.
+        nobody kept. Each missed check has opened a `minor` corrective action (`source: missedCheck`, audit
+        R125 (5)), so it is in `openActions` too.
 
         '
       tags:
@@ -3010,7 +3081,6 @@ paths:
       tags:
       - fnb
       x-ticvai-permission: INCIDENT_MANAGE
-      x-ticvai-permission-escalated: INCIDENT_MANAGE
       x-ticvai-audience:
       - staff
       x-ticvai-scope-level: venue
@@ -3142,6 +3212,10 @@ paths:
         **Production is a stock movement in both directions at once** — ingredients out, sellable items
         in — and treating it as two unrelated adjustments loses the yield.
 
+        **Ingredients leave stock when the run starts** (`planned` to `inProgress`), not at completion
+        (decided 28 September, audit R125 (8), as states/production-run.yaml says). A run abandoned halfway
+        has still consumed them. `completeProductionRun` then moves the made quantity into stock.
+
         '
       tags:
       - fnb
@@ -3188,6 +3262,9 @@ paths:
 
         **The gap is waste, theft, or a recipe that is wrong** — and a kitchen that never compares them
         cannot tell which.
+
+        **Only the made quantity moves here.** The ingredients left stock when the run started (audit
+        R125 (8)); completion moves `actualQuantity` of the produced item into stock.
 
         '
       tags:
@@ -3292,6 +3369,14 @@ paths:
                   - sectionChange
                   - escalation
                   - other
+                  description: '`other` is allowed only with a `note`, which it then requires (decided 28 September,
+                    audit R222). A reason of `other` with no note is refused `400`, and the notes are reviewed
+                    quarterly so the common ones become real reasons.'
+                note:
+                  type: string
+                  maxLength: 500
+                  nullable: true
+                  description: Free text. Required where the reason is `other` (audit R222).
                 recordedAt:
                   type: string
                   format: date-time
@@ -3306,12 +3391,14 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/TableVisit'
+        '400':
+          $ref: ../shared/common.yaml#/components/responses/BadRequest
   /waitlist:
     post:
       operationId: joinRestaurantWaitlist
       x-ticvai-consumed-by:
         - "P01 WEB-036 F&B – Browse & Order"
-        - "P02 GST-070 Reserve a Table or Cabana"
+        - "P02 GST-070 Reserve a Table"
         - "P06 EMP-056 Walk-In & Waitlist Management"
         - "P06 EMP-058 Live Table & Service Management"
       summary: Add a party to an outlet's waitlist
@@ -3458,7 +3545,7 @@ paths:
       operationId: createTableReservation
       x-ticvai-consumed-by:
         - "P01 WEB-036 F&B – Browse & Order"
-        - "P02 GST-070 Reserve a Table or Cabana"
+        - "P02 GST-070 Reserve a Table"
         - "P06 EMP-055 Create / Edit Reservation"
       x-ticvai-audience:
       - guest
@@ -3469,6 +3556,10 @@ paths:
         **Does not name a specific table by default.** A host seats a party on the night, and committing
         table 7 at booking time means every later booking is refused against a constraint that did not
         need to exist. A table may be named where a guest asked for one.
+
+        **No deposit and no no-show fee in the first release** (decided 28 September, audit R077 (a)).
+        Booking takes no payment, and cancelling or not arriving costs the guest nothing; GST-070 says
+        so at booking and at cancel.
 
         '
       tags:
@@ -3524,12 +3615,15 @@ paths:
       operationId: updateTableReservation
       x-ticvai-consumed-by:
         - "P01 WEB-031 My Reservations"
-        - "P02 GST-070 Reserve a Table or Cabana"
+        - "P02 GST-070 Reserve a Table"
       x-ticvai-audience:
       - guest
       summary: Change or cancel a booking
       description: 'Party size, time, or cancelled. **A reduced party size releases cover immediately**
         — four seats returned at 18:00 can be sold for the same evening.
+
+        **Cancelling is free** (decided 28 September, audit R077 (a)): no deposit is held and no
+        no-show or late-cancel fee is charged in the first release.
 
         '
       tags:
@@ -3962,6 +4056,12 @@ paths:
         Offline-capable. A runner crossing a venue loses signal, and an order that cannot be closed until
         they return is an order that reads as undelivered for ten minutes.
 
+        **Which outcome closes which service mode** (decided 28 September, audit R125 (1)): `tableService`
+        closes `served`; `quickService` and `collection` close `collected`; `delivery` and `roomService` close
+        `delivered`, and a `delivered` outcome needs `deliveredToLocationId`. Any other pairing is refused
+        `422` with `outcomeNotForServiceMode`, and a delivery with no location with `locationNotSupplied`.
+        `guestNotFound` and `refused` are recorded for every mode.
+
         '
       tags:
       - guestOrdering
@@ -3996,6 +4096,7 @@ paths:
                 deliveredToLocationId:
                   type: string
                   format: uuid
+                  description: Required where `outcome` is `delivered` (audit R125 (1)).
                 runnerPrincipalId:
                   type: string
                   format: uuid
@@ -4029,6 +4130,20 @@ paths:
                       enum:
                       - orderNotReady
                       - orderAlreadyClosed
+        '422':
+          description: The outcome does not close this order's service mode, or a delivery names no location
+            (audit R125 (1)).
+          content:
+            application/problem+json:
+              schema:
+                allOf:
+                - $ref: '#/components/schemas/FnbProblem'
+                - type: object
+                  properties:
+                    refusedReason:
+                      enum:
+                      - outcomeNotForServiceMode
+                      - locationNotSupplied
   /table-sessions:
     post:
       operationId: claimTableSession
@@ -4691,6 +4806,10 @@ paths:
       description: 'The most-used endpoint in a live kitchen. A sold-out item must disappear from every
         terminal in the outlet immediately — this does not wait for a bundle publish.
 
+        **Immediate, not on save** (decided 28 September, audit R110 (c)). The change is live on every
+        terminal and guest menu of the outlet when this returns; there is no pending state behind a
+        *Save changes* button.
+
         '
       tags:
       - menu
@@ -4720,6 +4839,14 @@ paths:
                   - equipmentDown
                   - seasonal
                   - other
+                  description: '`other` is allowed only with a `note`, which it then requires (decided 28 September,
+                    audit R222). A reason of `other` with no note is refused `400`, and the notes are reviewed
+                    quarterly so the common ones become real reasons.'
+                note:
+                  type: string
+                  maxLength: 500
+                  nullable: true
+                  description: Free text. Required where the reason is `other` (audit R222).
                 restoreAt:
                   type: string
                   format: date-time
@@ -4729,6 +4856,8 @@ paths:
                   format: date-time
                   description: Device time of the act (offline-capable; replayed in this order).
       responses:
+        '400':
+          $ref: ../shared/common.yaml#/components/responses/BadRequest
         '200':
           headers:
             X-Consistency-Token:
@@ -4922,6 +5051,10 @@ paths:
           description: 'An item is unavailable, modifier constraints are unmet, or a tracked item was
             ordered offline. One reason per cause.
 
+            **`trackedItemOffline` is stock that ran out while the terminal was offline** (proposed, client
+            to correct (audit R125 (11))): an order queued offline with a recipe-linked item is replayed, and
+            the stock it needs was used up meanwhile.
+
             '
           content:
             application/problem+json:
@@ -5029,10 +5162,20 @@ paths:
         kitchen may have started**, so waste is recorded separately and the cancellation needs the same
         authority as a void.
 
+        **Only from `ordered` or `accepted`** (decided 28 September, audit R125 (3)). From `inPreparation`
+        onward the kitchen has the food and the act is a void, with a reason from the void reason list;
+        the refusal names `voidOrder` in `suggestedOperation`.
+
+        **An accepted order needs `ORDER_VOID`** (decided 28 September, audit R091 (5)): `ORDER_MODIFY`
+        cancels an order that is still `ordered`, and cancelling one that is `accepted` requires
+        `ORDER_VOID`, the same authority as a void. A caller without it gets a `403`
+        (`void-permission-required`).
+
         '
       tags:
       - service
       x-ticvai-permission: ORDER_MODIFY
+      x-ticvai-permission-escalated: ORDER_VOID
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: true
       x-ticvai-conflict-policy: lastWriterWins
@@ -5079,8 +5222,22 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/FnbOrder'
+        '403':
+          description: The caller lacks `ORDER_MODIFY`, or the order is `accepted` and the caller lacks
+            `ORDER_VOID` (`void-permission-required`, audit R091 (5)).
+          x-ticvai-problem-types:
+          - forbidden
+          - void-permission-required
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
         '409':
-          description: Already served, collected or delivered — cancel is no longer the operation
+          description: 'Past `accepted` (audit R125 (3)). `illegalStatusTransition` where the order is `inPreparation`
+            or `ready`, naming `currentStatus` and `suggestedOperation: voidOrder`; `orderAlreadyFulfilled`
+            where it is served, collected or delivered.
+
+            '
           content:
             application/problem+json:
               schema:
@@ -5090,6 +5247,7 @@ paths:
                   properties:
                     refusedReason:
                       enum:
+                      - illegalStatusTransition
                       - orderAlreadyFulfilled
   /fnb-orders/{orderId}:
     parameters:
@@ -5133,6 +5291,10 @@ paths:
       description: 'Once a line is `inPreparation` (or later), amendment is refused — the kitchen has
         started. Removing it becomes a void with a reason, which is a different and auditable action.
 
+        **The reasons a void may carry are the void reason list** (decided 28 September, audit R125 (4)),
+        the same list every void takes, ending in `other` with a required note (audit R222). No second list
+        is kept for F&B. The refusal names `voidOrder` in `suggestedOperation`.
+
         '
       tags:
       - order
@@ -5169,7 +5331,8 @@ paths:
               schema:
                 $ref: '#/components/schemas/FnbOrder'
         '409':
-          description: A targeted line is already `inPreparation` or served. Names the lines in `lineIds`.
+          description: A targeted line is already `inPreparation` or served. Names the lines in `lineIds`,
+            and `suggestedOperation` is `voidOrder` (audit R125 (4)).
           content:
             application/problem+json:
               schema:
@@ -5730,9 +5893,12 @@ paths:
         - "P08 BO-731 Operating Hours & Service Periods"
         - "P15 KIT-001 Kitchen Operations Command Center"
         - "P15 KIT-002 Kitchen Display System (KDS)"
+        - "P15 KIT-003 Order Firing & Course Management"
         - "P15 KIT-004 Active Order Management & Fulfilment Journey"
+        - "P15 KIT-005 Kitchen Station Workload & Dynamic Routing"
         - "P15 KIT-006 Expeditor & Order Assembly"
         - "P15 KIT-007 Guest Collection, Buzzer & Digital Notification"
+        - "P15 KIT-008 Exceptions, Re-Fire & Unavailable Items"
       x-ticvai-audience:
       - staff
       x-ticvai-read-routing: replica
@@ -5744,6 +5910,11 @@ paths:
         **Rail order is the server''s.** Tickets come back ordered by `priority` and the outlet''s priority
         weights (`setKitchenSla`: age, promise time — `targetReadyAt` —, table stage, VIP), and a display
         renders them in the order returned rather than re-sorting by arrival or by promise time.
+
+        **A kitchen display does not choose its station** (decided 28 September, audit R277). Where the
+        caller is a workstation named in a station''s `displayWorkstationIds` and sends no `stationId`, the
+        station resolves from that assignment; a `stationId` sent by an assigned display is ignored. The
+        station-load tile is not in the first release.
 
         '
       tags:
@@ -5759,6 +5930,15 @@ paths:
         in: query
         schema:
           $ref: '#/components/schemas/KitchenTicketStatus'
+      - name: course
+        in: query
+        description: '**The course filter** (decided 28 September, audit R277). Only tickets with a line in
+          this course (`lines[].course`), and on those tickets only that course''s lines are returned.
+
+          '
+        schema:
+          type: integer
+          minimum: 1
       - $ref: ../shared/common.yaml#/components/parameters/PageSize
       - $ref: ../shared/common.yaml#/components/parameters/PageCursor
       x-ticvai-permission: ORDER_VIEW
@@ -5909,6 +6089,11 @@ paths:
                   type: integer
                   minimum: 0
                   maximum: 100
+                  default: 100
+                  description: '**Absent means the top of the queue** (decided 28 September, audit R125 (2)): the
+                    ticket takes the highest priority on the rail. A value moves it to that place instead.
+
+                    '
       responses:
         '200':
           headers:
@@ -6007,6 +6192,13 @@ paths:
                   items:
                     $ref: '#/components/schemas/KitchenStation'
       responses:
+        '400':
+          description: A workstation is assigned to more than one station (`displayWorkstationIds`, audit
+            R277), or the body fails validation.
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
         '200':
           headers:
             X-Consistency-Token:
@@ -6075,6 +6267,11 @@ paths:
       x-ticvai-audience:
       - staff
       summary: Define a recipe for a menu item
+      description: '**Saving re-runs `verifyAllergens`** for the menu item (decided 28 September, audit R241),
+        and **recomputes `costPerPortion`** from the ingredients (audit R125 (9)). A cost sent in the body
+        is ignored.
+
+        '
       tags:
       - production
       x-ticvai-permission: PRODUCT_CONFIGURE
@@ -6242,7 +6439,14 @@ paths:
       summary: Escalate a finding
       description: 'Raised above the person who found it — a critical reading, or one nobody actioned
         in time. **Escalation is not a failure state**: it is how a finding reaches somebody with the
-        authority to sign it.'
+        authority to sign it.
+
+
+        **An escalation goes to the venue''s food-safety lead** (decided 28 September, audit R096 (9)):
+        the principal named in the venue setting `fnb.foodSafetyLeadPrincipalId`. The action''s
+        `escalatedToPrincipalId` is set to that person and they are notified. A venue with no lead named
+        refuses the escalation with a `409` (`no-food-safety-lead`), because an escalation to nobody is
+        the finding going quiet.'
       tags:
       - fnb
       x-ticvai-permission: INCIDENT_MANAGE
@@ -6263,6 +6467,15 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/CorrectiveAction'
+        '409':
+          description: The venue has no food-safety lead named in `fnb.foodSafetyLeadPrincipalId` (audit
+            R096 (9)).
+          x-ticvai-problem-types:
+          - no-food-safety-lead
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
   /food-safety/corrective-actions/{actionId}/close:
     parameters:
     - name: actionId
@@ -6345,6 +6558,8 @@ paths:
       description: >
         Set whole per recipe: a substitution list is reviewed as a list, usually against an allergen
         matrix.
+
+        **Saving re-runs `verifyAllergens`** for the recipe's menu item (decided 28 September, audit R241).
       tags:
       - fnb
       x-ticvai-permission: PRODUCT_CONFIGURE
@@ -6412,8 +6627,154 @@ paths:
                         type: array
                         items:
                           $ref: '#/components/schemas/FnbProductRecommendation'
+  /waitlist/{entryId}/leave:
+    parameters:
+    - name: entryId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    post:
+      operationId: leaveRestaurantWaitlist
+      x-ticvai-consumed-by:
+        - "P01 WEB-036 F&B – Browse & Order"
+        - "P02 GST-070 Reserve a Table"
+        - "P06 EMP-056 Walk-In & Waitlist Management"
+      summary: Take a party off an outlet's waitlist
+      description: '**A guest could join a restaurant waitlist and not leave it** (decided 28 September,
+        audit R073 (d)). A party that has gone elsewhere and cannot say so is a table held for nobody,
+        and a `noShow` recorded against a guest who told us.
+
+        **The entry ends `cancelled`, from `waiting` or `notified`** (states/restaurant-waitlist.yaml).
+        Leaving after being called releases the held table at once rather than at `holdExpiresAt`.
+        `walkedAway` is not this: that is a host recording a party that left without saying so.
+
+        **A guest leaves only their own entry** (`subjectId` is the caller); a host may take any party
+        off the list with `ORDER_MODIFY`. Idempotent: leaving an entry that is already `cancelled` returns
+        it unchanged.
+
+        '
+      tags:
+      - fnb
+      x-ticvai-permission: ORDER_MODIFY
+      x-ticvai-guest-callable: true
+      x-ticvai-audience:
+      - staff
+      - guest
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                note:
+                  type: string
+                  maxLength: 300
+                  nullable: true
+                  description: Why, where the guest or host gave a reason. Optional.
+      responses:
+        '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: Left. The entry, now `cancelled`
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RestaurantWaitlist'
+        '404':
+          $ref: ../shared/common.yaml#/components/responses/NotFound
+        '409':
+          description: The party is already `seated`, `walkedAway` or `noShow`. Names the entry's current
+            status.
+          content:
+            application/problem+json:
+              schema:
+                allOf:
+                - $ref: '#/components/schemas/FnbProblem'
+                - type: object
+                  properties:
+                    refusedReason:
+                      enum:
+                      - illegalStatusTransition
 components:
   schemas:
+    AllergenVerdict:
+      x-ticvai-persistence: fnb.allergen_verdict
+      type: object
+      description: 'One allergen check of one dish (decided 28 September, audit R241). Written by the server
+        on every automatic run and by `verifyAllergens` on a manual re-check; `getAllergenVerification`
+        reads the latest.
+
+        '
+      required:
+      - menuItemId
+      - matches
+      - checkedAt
+      - trigger
+      properties:
+        menuItemId:
+          type: string
+          format: uuid
+        matches:
+          type: boolean
+        declared:
+          type: array
+          items:
+            type: string
+        actual:
+          type: array
+          items:
+            type: string
+        undeclared:
+          type: array
+          description: '**Present in the dish and absent from the label.** The dangerous direction,
+            and the response leads with it.
+
+            '
+          items:
+            type: object
+            properties:
+              allergen:
+                type: string
+              via:
+                type: string
+                enum:
+                - ingredient
+                - substitution
+                - modifier
+                - sharedEquipment
+              sourceRef:
+                type: string
+        overDeclared:
+          type: array
+          description: 'Labelled and no longer present. **Safe, and still worth fixing** — a
+            menu that over-declares teaches guests the labels are guesses.
+
+            '
+          items:
+            type: string
+        checkedAt:
+          type: string
+          format: date-time
+          readOnly: true
+        trigger:
+          type: string
+          readOnly: true
+          description: What ran the check. `manual` is the Verify button; the others are the automatic run
+            after that change (audit R241).
+          enum:
+          - manual
+          - recipeChanged
+          - substitutionChanged
+          - modifierChanged
     FnbReservationPolicy:
       type: object
       x-ticvai-persistence: fnb.reservation_policy
@@ -6783,12 +7144,20 @@ components:
         '
       required:
       - id
+      - recipeId
       - fromIngredientId
       - toIngredientId
       properties:
         id:
           type: string
           format: uuid
+        recipeId:
+          type: string
+          format: uuid
+          description: '**The recipe the rule applies to** (decided 28 September, audit R125 (10)). Not a menu
+            item and not the whole venue: a swap that is safe in one dish is not safe in another.
+
+            '
         fromIngredientId:
           type: string
           format: uuid
@@ -7039,6 +7408,7 @@ components:
           - spillage
           - chased
           - other
+          description: '`other` always carries a `note` (audit R222).'
         durationMinutes:
           type: integer
           nullable: true
@@ -7092,6 +7462,12 @@ components:
           - supplierFailure
           - seasonal
           - other
+          description: '`other` always carries a `note` (audit R222).'
+        note:
+          type: string
+          maxLength: 500
+          nullable: true
+          description: The note given with the 86. Required where the reason is `other` (audit R222).
         calledByPrincipalId:
           type: string
           format: uuid
@@ -7255,7 +7631,10 @@ components:
           - contamination
           - pestSighting
           - equipmentFailure
+          - missedCheck
           - manual
+          description: '`missedCheck` is raised by the server when a checkpoint goes past its `checkFrequencyMinutes`
+            with no reading (audit R125 (5)).'
         sourceRef:
           type: string
           format: uuid
@@ -7267,6 +7646,9 @@ components:
           - minor
           - major
           - critical
+          description: '**Set by the source when the platform opens it** (decided 28 September, audit R125 (5)):
+            an out-of-range reading or a cold-chain breach opens at `major`, a missed check at `minor`.
+            `critical` is a person''s escalation, not a default.'
         actionTaken:
           type: string
           nullable: true
@@ -7300,7 +7682,8 @@ components:
           format: uuid
           nullable: true
           description: '**A critical finding a shift cannot close.** Escalation exists so a supervisor
-            signs what a cook should not.
+            signs what a cook should not. Always the venue''s food-safety lead at the time of escalation
+            (`fnb.foodSafetyLeadPrincipalId`, audit R096 (9)).
 
             '
         scopePath:
@@ -7444,6 +7827,14 @@ components:
           nullable: true
           readOnly: true
           description: The plan whose release created this run. Null for a run planned directly.
+        stationId:
+          type: string
+          format: uuid
+          nullable: true
+          description: '**The station whose prep list this run is on.** Copied from the plan line on release,
+            where runs are grouped by station (audit R125 (7)).
+
+            '
         producingOutletId:
           type: string
           format: uuid
@@ -8740,6 +9131,12 @@ components:
         label:
           type: string
           maxLength: 32
+          x-ticvai-unique: venue
+          description: '**The table code, unique per venue** (decided 28 September, audit R108). Two tables
+            in one venue never share a label, across all its outlets, so *T12* names one table wherever it
+            is read. `createTable` and `updateTable` refuse a duplicate with `409` `duplicate-code`.
+
+            '
         capacity:
           type: integer
           minimum: 1
@@ -9223,6 +9620,17 @@ components:
             type: string
             format: uuid
           description: Items routed to this station.
+        displayWorkstationIds:
+          type: array
+          items:
+            type: string
+            format: uuid
+          description: '**The kitchen displays assigned to this station** (decided 28 September, audit R277),
+            as tenancy `Workstation` ids, primary first and fallbacks after it. Set with `setKitchenStations`.
+            A display reads the rail for the station it is assigned to (`listKitchenTickets`). A workstation
+            is assigned to at most one station; a second assignment is refused `400`.
+
+            '
         displayEndpoint:
           type: string
           nullable: true
@@ -9269,7 +9677,14 @@ components:
                 type: boolean
                 default: false
         costPerPortion:
-          $ref: ../shared/common.yaml#/components/schemas/Money
+          allOf:
+          - $ref: ../shared/common.yaml#/components/schemas/Money
+          readOnly: true
+          description: '**Computed, never entered** (decided 28 September, audit R125 (9)): the sum of each
+            ingredient quantity at its current inventory cost, divided by `yield`. Recomputed when the recipe
+            or an ingredient cost changes.
+
+            '
     FnbProblem:
       x-ticvai-persistence: none — error shape
       description: '**Every operation-specific error in this contract except a guest order''s.** One
@@ -9331,6 +9746,7 @@ components:
             - paymentsShortOfBill
             - linesUnserved
             - illegalStatusTransition
+            - outcomeNotForServiceMode
           occupyingVisitId:
             type: string
             pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
@@ -9341,8 +9757,11 @@ components:
             - refireItem
             - escalateCorrectiveAction
             - mergeTableVisits
+            - voidOrder
             description: '**The act that is allowed instead.** `recallWindowPassed` names `refireItem`,
-              `criticalSelfSign` names `escalateCorrectiveAction`, `targetTableOccupied` names `mergeTableVisits`.'
+              `criticalSelfSign` names `escalateCorrectiveAction`, `targetTableOccupied` names `mergeTableVisits`,
+              and a cancel or amend refused because the kitchen has started names `voidOrder` (orders contract,
+              audit R125 (3) and (4)).'
           nextMenuStartsAt:
             type: string
             format: date-time

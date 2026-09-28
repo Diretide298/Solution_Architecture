@@ -24,7 +24,7 @@ CREATE TABLE IF NOT EXISTS ledger.account (
 
 -- Which account a kind of transaction posts to. Configuration, not a posting
 CREATE TABLE IF NOT EXISTS ledger.account_mapping (
-    event_type                        text NOT NULL CONSTRAINT account_mapping_event_type_chk CHECK (event_type IN ('ticketRevenue', 'fnbRevenue', 'retailRevenue', 'rentalRevenue', 'taxPayable', 'cashReceived', 'cardReceived', 'walletReceived', 'refundIssued', 'voidReversal', 'deferredRevenue', 'recognisedRevenue', 'breakageRevenue', 'priceVariance', 'cashOverShort', 'settlementFee', 'settlementClearing')),
+    event_type                        text NOT NULL CONSTRAINT account_mapping_event_type_chk CHECK (event_type IN ('ticketRevenue', 'fnbRevenue', 'retailRevenue', 'rentalRevenue', 'taxPayable', 'cashReceived', 'cardReceived', 'walletReceived', 'refundIssued', 'voidReversal', 'deferredRevenue', 'recognisedRevenue', 'breakageRevenue', 'priceVariance', 'cashOverShort', 'settlementFee', 'settlementClearing', 'gameCreditLoaded', 'pointsAccrued')),
     debit_account_id                  uuid NOT NULL,
     credit_account_id                 uuid NOT NULL,
     venue_id                          uuid,
@@ -79,7 +79,8 @@ CREATE TABLE IF NOT EXISTS ledger.fiscal_period (
     end_date                          date NOT NULL,
     status                            text NOT NULL CONSTRAINT fiscal_period_status_chk CHECK (status IN ('open', 'closing', 'closed')),
     closed_by_principal_id            uuid,
-    closed_at                         timestamptz
+    closed_at                         timestamptz,
+    approval_request_id               uuid
 );
 
 -- Holds 7 columns. No description has been written for this table — the name is the only thing
@@ -118,6 +119,7 @@ CREATE TABLE IF NOT EXISTS ledger.fx_rate (
     effective_from                    timestamptz NOT NULL,
     effective_to                      timestamptz,
     set_by_principal_id               uuid,
+    note                              text CONSTRAINT fx_rate_note_chk CHECK (char_length(note) <= 500),
     provider_reference                text,
     fetched_at                        timestamptz,
     region_id                         uuid NOT NULL
@@ -257,6 +259,7 @@ CREATE TABLE IF NOT EXISTS ledger.settlement (
     id                                uuid PRIMARY KEY NOT NULL,
     currency_code                     text,
     provider_name                     text NOT NULL,
+    venue_id                          uuid,
     period_start                      date NOT NULL,
     period_end                        date NOT NULL,
     file_reference                    uuid,

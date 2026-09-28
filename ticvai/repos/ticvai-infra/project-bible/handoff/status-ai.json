@@ -46,9 +46,9 @@
   "states": 11,
   "events": 11,
   "tables": 51,
-  "screens": 40,
-  "flows": 11,
-  "documents": 38,
+  "screens": 37,
+  "flows": 10,
+  "documents": 42,
   "openConflicts": 1
  },
  "metrics": {
@@ -98,8 +98,9 @@
  },
  "waves": {
   "wave2": 15,
-  "wave3": 19,
-  "wave1": 6
+  "wave4": 1,
+  "wave1": 6,
+  "wave3": 15
  },
  "reachedOutsideTheContract": [
   {
@@ -187,6 +188,11 @@
    "status": ""
   },
   {
+   "file": "docs\\active\\ai-suggestion-rules-proposal.md",
+   "title": "AI suggestion rules: one rule and a minimum history per kind",
+   "status": ""
+  },
+  {
    "file": "docs\\active\\bl-073-cookie-consent-20-september.md",
    "title": "BL-073 \u2014 cookie consent: what to buy, what to build, what is ours either way",
    "status": ""
@@ -199,6 +205,11 @@
   {
    "file": "docs\\active\\change-log-validation-18-september.md",
    "title": "Validating the developer team's Change Log",
+   "status": ""
+  },
+  {
+   "file": "docs\\active\\configured-limits-proposal.md",
+   "title": "Configured limits: proposed values",
    "status": ""
   },
   {
@@ -259,6 +270,11 @@
   {
    "file": "docs\\active\\phase0-identity-pass-all-clusters.md",
    "title": "Phase 0 \u2014 identity pass, all clusters",
+   "status": ""
+  },
+  {
+   "file": "docs\\active\\README.md",
+   "title": "Active",
    "status": ""
   },
   {
@@ -359,6 +375,11 @@
   {
    "file": "docs\\architecture\\ai-credentials.md",
    "title": "AI provider credentials \u2014 where the key lives and who can reach it",
+   "status": ""
+  },
+  {
+   "file": "docs\\architecture\\ai-system-design.md",
+   "title": "TICVAI AI subsystem: system design",
    "status": ""
   },
   {

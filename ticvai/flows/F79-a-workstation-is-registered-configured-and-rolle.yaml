@@ -18,38 +18,37 @@ offlineBehaviour: '**Deployment needs the network by definition.** A config push
   can reach is a config that has not been pushed.'
 steps:
 - step: 1
-  screen: BO-126
-  action: Deployment, Preview & Audit.
-  operations:
-  - deployConfigurationProfile
-  - listAuditRecords
-  - listSaleBoards
-  - listWorkstations
-  - startRollout
-  - updateSaleBoard
-  outcome: '**Drawn by the client as POS-1F.** 6 operations on this step.'
-- step: 2
   screen: BO-036
-  action: Device Registry.
+  action: The new device is registered and its workstation configured.
   operations:
-  - adjustLoyaltyPoints
-  - deployConfigurationProfile
-  - getConsentHistory
-  - getGuestConsents
-  - getGuestLoyalty
+  - registerDevice
+  - configureWorkstation
   - getWorkstation
-  outcome: '**Drawn by the client as POS-1A.** 13 operations on this step.'
+  outcome: '**Known before it is used.** A till nobody registered is a till whose sales belong to nobody.'
+- step: 2
+  screen: BO-129
+  action: A configuration profile is set for it.
+  operations:
+  - setConfigurationProfile
+  - setConnectivityThresholds
+  outcome: Software version, settings and when it counts as offline.
   crossesDevice: true
 - step: 3
   screen: BO-124
-  action: Layout & Journey Builder.
+  action: Its sale board layout is built.
   operations:
   - createSaleBoard
-  - deployConfigurationProfile
-  - listAuditRecords
-  - recordDeviceHeartbeat
   - updateSaleBoard
-  outcome: '**Drawn by the client as POS-1B.** 5 operations on this step.'
+  outcome: What the cashier sees and in what order.
+  crossesDevice: true
+- step: 4
+  screen: BO-126
+  action: The configuration is deployed and rolled out.
+  operations:
+  - deployConfigurationProfile
+  - startRollout
+  outcome: '**`startRollout` answers 202 until the release manager approves** (audit R144); a requester
+    cannot approve their own.'
   crossesDevice: true
 branches:
 - at: 1
@@ -64,7 +63,7 @@ exitStates:
   description: The chain ran as the client drew it.
 - state: stoppedAtModule
   description: '**A licence boundary, not a failure.**'
-notes: '**POS board 1, the fleet loop.** `getWorkstationHealth`, `setConfigurationProfile` and `deployConfigurationProfile`
+notes: '**Re-authored 28 September to follow the purpose of each screen it visits** (decided 28 September, audit R261): the guest-loyalty and consent operations bulk-attached to Device Registry left the journey (audit R254), and the chain now runs register, configure, lay out, roll out. **POS board 1, the fleet loop.** `getWorkstationHealth`, `setConfigurationProfile` and `deployConfigurationProfile`
   were built on 20 August from this same board and had never been walked together. **Derived from the
   client''s own `GOES TO` edges**, not from an inferred path — a pair of frames the client linked is
   evidence; a chain assembled from unrelated pairs is a guess.'

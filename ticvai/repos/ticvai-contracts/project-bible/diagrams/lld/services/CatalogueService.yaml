@@ -1,5 +1,5 @@
 id: LLD-CatalogueService
-title: CatalogueService — 406 operations, 74 tables
+title: CatalogueService — 407 operations, 75 tables
 generatedBy: tools/derive-diagrams.py
 tier: commerce
 index: diagrams/hld/02-services.yaml
@@ -15,9 +15,9 @@ why: '**What is sold, at what price, in which seat.** Promotions and seating are
 scale: Read-heavy, bundle-published to tills. **The catalogue bundle is this service's output** (ADR-0013).
 ifDown: A bad publish reaches every workstation. Versioned and rollback-able for that reason.
 coverage:
-  operations: 406
-  inAFlow: 263
-  percent: 65%
+  operations: 407
+  inAFlow: 257
+  percent: 63%
   note: '**Flow coverage is how much of this service a journey has walked.** A service under 40% is
     unwalked rather than under-documented.'
 schemas:
@@ -37,7 +37,7 @@ schemas:
   - postgres
   largestTable: promotions.promotion
 - schema: seating
-  tables: 20
+  tables: 21
   stores:
   - postgres
   largestTable: seating.group_request
@@ -85,9 +85,9 @@ operationsByContract:
     offline: false
     reads: 4
     writes: 0
-  - operation: assignSessionMedia
+  - operation: assignPerformanceMedia
     verb: POST
-    path: /sessions/{sessionId}/media
+    path: /performances/{performanceId}/media
     scope: venue
     permission: EVENT_CONFIGURE
     offline: false
@@ -821,6 +821,14 @@ operationsByContract:
     offline: false
     reads: 0
     writes: 0
+  - operation: listPerformanceTemplates
+    verb: GET
+    path: /performance-templates
+    scope: venue
+    permission: PERFORMANCE_CONFIGURE
+    offline: false
+    reads: 1
+    writes: 0
   - operation: listPerformances
     verb: GET
     path: /events/{eventId}/performances
@@ -1132,14 +1140,6 @@ operationsByContract:
     permission: PRODUCT_VIEW
     offline: false
     reads: 0
-    writes: 0
-  - operation: listSessionTemplates
-    verb: GET
-    path: /session-templates
-    scope: venue
-    permission: PERFORMANCE_CONFIGURE
-    offline: false
-    reads: 1
     writes: 0
   - operation: listSignalDataQuality
     verb: GET
@@ -1469,6 +1469,14 @@ operationsByContract:
     offline: false
     reads: 1
     writes: 1
+  - operation: setPerformanceTemplate
+    verb: PUT
+    path: /performance-templates
+    scope: venue
+    permission: PERFORMANCE_CONFIGURE
+    offline: false
+    reads: 1
+    writes: 1
   - operation: setPlanBenefits
     verb: PUT
     path: /entitlement-templates/{templateId}/benefits
@@ -1589,14 +1597,6 @@ operationsByContract:
     offline: false
     reads: 0
     writes: 0
-  - operation: setSessionTemplate
-    verb: PUT
-    path: /session-templates
-    scope: venue
-    permission: PERFORMANCE_CONFIGURE
-    offline: false
-    reads: 1
-    writes: 1
   - operation: setSpace
     verb: PUT
     path: /spaces
@@ -2865,7 +2865,7 @@ operationsByContract:
     reads: 2
     writes: 2
 - contract: seating
-  count: 54
+  count: 55
   operations:
   - operation: allocateBlockedSeats
     verb: POST
@@ -2937,8 +2937,8 @@ operationsByContract:
     scope: venue
     permission: CAPACITY_CONFIGURE
     offline: false
-    reads: 2
-    writes: 2
+    reads: 3
+    writes: 3
   - operation: createSeatHold
     verb: POST
     path: /seat-holds
@@ -3121,7 +3121,7 @@ operationsByContract:
     scope: venue
     permission: PRODUCT_VIEW
     offline: true
-    reads: 1
+    reads: 2
     writes: 0
   - operation: listSeatHoldPools
     verb: GET
@@ -3267,6 +3267,14 @@ operationsByContract:
     offline: false
     reads: 2
     writes: 2
+  - operation: updateSeatCategory
+    verb: PATCH
+    path: /seat-categories/{seatCategoryId}
+    scope: venue
+    permission: CAPACITY_CONFIGURE
+    offline: false
+    reads: 2
+    writes: 1
   - operation: updateSeatMap
     verb: PATCH
     path: /seat-maps/{seatMapId}
@@ -3612,6 +3620,13 @@ tables:
   writtenBy:
   - catalogue
   foreignWriters: null
+- table: catalogue.performance_template
+  columns: 9
+  store: postgres
+  parent: null
+  writtenBy:
+  - catalogue
+  foreignWriters: null
 - table: catalogue.plan_benefit
   columns: 8
   store: postgres
@@ -3677,13 +3692,6 @@ tables:
   - fnb
 - table: catalogue.published_bundle
   columns: 10
-  store: postgres
-  parent: null
-  writtenBy:
-  - catalogue
-  foreignWriters: null
-- table: catalogue.session_template
-  columns: 9
   store: postgres
   parent: null
   writtenBy:
@@ -3849,7 +3857,7 @@ tables:
   - promotions
   foreignWriters: null
 - table: promotions.upsell_rule
-  columns: 11
+  columns: 12
   store: postgres
   parent: null
   writtenBy:
@@ -3971,6 +3979,13 @@ tables:
   writtenBy:
   - seating
   foreignWriters: null
+- table: seating.seat_price_band
+  columns: 10
+  store: postgres
+  parent: null
+  writtenBy:
+  - seating
+  foreignWriters: null
 - table: seating.seat_rules
   columns: 8
   store: postgres
@@ -4056,7 +4071,7 @@ screens:
 - P01:WEB-003 Search Results
 - P01:WEB-004 Attraction Details
 - P01:WEB-005 Ticket Type Selection
-- P01:WEB-006 Date & Session Selection
+- P01:WEB-006 Date & Performance Selection
 - P01:WEB-007 Interactive Seat Selection
 - P01:WEB-008 Add-ons & Upsell
 - P01:WEB-010 Shopping Cart
@@ -4092,7 +4107,7 @@ screens:
 - P02:GST-058 Resource Availability (Cabana)
 - P02:GST-059 Plan My Day – In Progress
 - P02:GST-063 Search
-- P02:GST-070 Reserve a Table or Cabana
+- P02:GST-070 Reserve a Table
 - P02:GST-072 Share & Group Booking
 - P04:POS-002 Sell — Ticket Catalogue
 - P04:POS-003 Sell — Timed Entry
@@ -4101,7 +4116,7 @@ screens:
 - P04:POS-023 Sell — Merchandise
 - P05:KSK-003 What are you buying
 - P05:KSK-004 Choose tickets
-- P05:KSK-005 Choose a session
+- P05:KSK-005 Choose a performance
 - P05:KSK-006 Review
 - P05:KSK-015 Assistant
 - P06:EMP-018 Offline package
@@ -4117,8 +4132,8 @@ screens:
 - P08:BO-012 Membership Products
 - P08:BO-013 Channel & Distribution
 - P08:BO-014 Catalogue Publishing
-- P08:BO-015 Session Calendar
-- P08:BO-016 Session Template
+- P08:BO-015 Performance Calendar
+- P08:BO-016 Performance Template
 - P08:BO-017 Capacity Management
 - P08:BO-018 Allocation & Holds
 - P08:BO-019 Closures & Blackouts
@@ -4226,11 +4241,11 @@ screens:
 - P08:BO-717 Lifecycle Transition Configuration
 - P08:BO-719 Event Cancellation Workflow Configuration
 - P08:BO-720 Ticket, Reservation & Customer Treatment Configuration
-- P08:BO-721 Activity Session & Slot Template Configuration
+- P08:BO-721 Activity Performance & Slot Template Configuration
 - P08:BO-722 Prepaid Minute Package & Customer Balance Configuration
 - P08:BO-723 Peak, Off-Peak & Super Prime Time Configuration
 - P08:BO-724 Walk-In / There-and-Then Booking Configuration
-- P08:BO-725 Session Operations Command Center
+- P08:BO-725 Performance Operations Command Center
 - P08:BO-726 Participant Photo & Video Assignment
 - P08:BO-737 Customer 360 Profile
 - P08:BO-761 AI Audience Discovery
@@ -4620,6 +4635,6 @@ flows:
 - F82 A month is analysed from incrementality to a scheduled report
 - F85 Production is planned, costed and released
 - F86 A POS layout is designed, previewed and deployed
+- F89 Offline policy is set, cached, monitored and reconciled
 - F90 An audience is built, offered to, and the result is judged
 - F93 A recipe changes and its allergen claim is re-verified
-- F95 A fleet is watched, a fault is found, and a station is fixed

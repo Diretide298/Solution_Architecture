@@ -87,8 +87,9 @@ steps:
   - listAmendmentAfterSale
   outcome: Ready for the next screen on this board
 - step: 12
-  screen: BO-320
-  action: Works in Ticket Reissue & Fulfillment Regeneration
+  screen: BO-027
+  action: Works in Reissue & Media Replacement (Ticket Reissue & Fulfillment Regeneration, merged
+    into it on 28 September, audit R276)
   operations:
   - listTicketReissueFulfillment
   outcome: Manage ticket/media regeneration following an amendment, correction, loss, delivery failure,

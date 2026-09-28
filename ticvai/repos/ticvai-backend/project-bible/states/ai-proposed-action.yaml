@@ -20,7 +20,8 @@ transitions:
   to: approved
   operation: decideProposedAction
   trigger: operation
-  guard: '**Authorised, not performed.** The owning contract executes afterwards under the approver’s
+  guard: '**Authorised, not performed.** At `approvalLevel` 2 (prices or permissions) by a manager other
+    than the requester, at level 1 by the requester (audit R213). The owning contract executes afterwards under the approver’s
     own permission — an approval endpoint that also executed would let someone authorise what they could
     not do themselves'
   requiresApproval: true
@@ -39,13 +40,15 @@ transitions:
 - from: proposed
   to: expired
   trigger: timer
-  guard: Nobody decided. **A stale proposal is priced against a catalogue that has moved**, so applying
+  guard: Nobody decided within **7 days of `proposedAt`** (decided 28 September, audit R213; proposed,
+    client to correct). **A stale proposal is priced against a catalogue that has moved**, so applying
     it later is applying yesterday’s reasoning to today’s data
 - from: approved
   to: expired
   trigger: timer
-  guard: Approved and never applied. **The more dangerous expiry** — someone believes they authorised
-    a change that never happened
+  guard: Approved and not applied within **24 hours of `decidedAt`** (decided 28 September, audit R213;
+    proposed, client to correct). **The more dangerous expiry** — someone believes they authorised a
+    change that never happened
 notes: '`approved` is not terminal and must not be treated as done. `rejectionRate` in the usage report
   counts rejections against proposals, and it is the number that says whether the assistant is worth
   having.

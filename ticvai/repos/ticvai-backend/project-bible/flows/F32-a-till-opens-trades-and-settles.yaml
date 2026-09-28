@@ -117,10 +117,12 @@ branches:
   - at: 7
     condition: The variance is above the venue's threshold.
     behaviour: >
-      Routes through `createApprovalRequest` before the shift can close. **The same approval
-      mechanism as a stock write-off** — one path, different subjects.
+      `closeShift` is submitted and the shift waits in `pendingVariance`. **A supervisor accepts the
+      variance on the till with `acceptShiftVariance`** (OVERSHORT_ACCEPT, PIN step-up). That is the
+      only path: no approval request is raised and nothing holds the close for a Duty Manager PIN
+      beforehand (decided 28 September, audit R080 (e)).
     severity: high
-    resolvedBy: createApprovalRequest
+    resolvedBy: acceptShiftVariance
 
   - at: 6
     condition: The cashier's shift ends and the till stays open for the next one.
@@ -136,7 +138,7 @@ exitStates:
     description: Counted, variance accepted, deposit reconciled, ledger posted. **The ordinary night.**
   - state: settledWithVariance
     description: >
-      Above threshold and approved. **A separate exit because it is a different conversation** —
+      Above threshold and accepted on the till by a supervisor. **A separate exit because it is a different conversation** —
       the money reconciles either way and only one of the two gets looked at.
   - state: forceClosed
     description: >

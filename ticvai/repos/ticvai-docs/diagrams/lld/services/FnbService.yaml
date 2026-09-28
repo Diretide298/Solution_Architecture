@@ -1,28 +1,28 @@
 id: LLD-FnbService
-title: FnbService — 113 operations, 47 tables
+title: FnbService — 115 operations, 48 tables
 generatedBy: tools/derive-diagrams.py
 tier: operations
 index: diagrams/hld/02-services.yaml
-why: '**113 operations and 47 tables — the largest single domain after marketing.** Its own service
+why: '**115 operations and 48 tables — the largest single domain after marketing.** Its own service
   because a kitchen pass has a latency profile nothing else shares: a bump must land in under a second
   on a display that may be offline.'
 scale: Write-heavy during service, idle between. **Two peaks a day, sharply.**
 ifDown: Down means the kitchen falls back to paper. Offline-capable by design.
 coverage:
-  operations: 113
-  inAFlow: 71
-  percent: 63%
+  operations: 115
+  inAFlow: 70
+  percent: 61%
   note: '**Flow coverage is how much of this service a journey has walked.** A service under 40% is
     unwalked rather than under-documented.'
 schemas:
 - schema: fnb
-  tables: 47
+  tables: 48
   stores:
   - postgres
   largestTable: fnb.product_recommendation
 operationsByContract:
 - contract: fnb
-  count: 113
+  count: 115
   operations:
   - operation: acceptFnbOrder
     verb: POST
@@ -216,6 +216,14 @@ operationsByContract:
     offline: true
     reads: 3
     writes: 2
+  - operation: getAllergenVerification
+    verb: GET
+    path: /menu-items/{menuItemId}/allergen-verification
+    scope: venue
+    permission: PRODUCT_VIEW
+    offline: false
+    reads: 1
+    writes: 0
   - operation: getBill
     verb: GET
     path: /table-visits/{visitId}/bill
@@ -336,6 +344,14 @@ operationsByContract:
     offline: true
     reads: 4
     writes: 2
+  - operation: leaveRestaurantWaitlist
+    verb: POST
+    path: /waitlist/{entryId}/leave
+    scope: venue
+    permission: ORDER_MODIFY
+    offline: false
+    reads: 1
+    writes: 0
   - operation: list86Events
     verb: GET
     path: /outlets/{outletId}/86-events
@@ -926,7 +942,7 @@ operationsByContract:
     scope: venue
     permission: PRODUCT_VIEW
     offline: false
-    reads: 4
+    reads: 5
     writes: 0
 tables:
 - store: cache:idempotency
@@ -1121,6 +1137,12 @@ tables:
     or bumps — permissions, configuration, a price list, and whether child scopes under its `scope_path`
     are affected — is not recorded for any operation, so a writer here cannot yet be implemented from
     the package alone.'
+- table: fnb.allergen_verdict
+  columns: 8
+  store: postgres
+  parent: fnb.menu_item
+  writtenBy: []
+  foreignWriters: null
 - table: fnb.bill_split
   columns: 3
   store: postgres
@@ -1210,7 +1232,7 @@ tables:
   - fnb
   foreignWriters: null
 - table: fnb.kitchen_station
-  columns: 7
+  columns: 8
   store: postgres
   parent: null
   writtenBy:
@@ -1318,7 +1340,7 @@ tables:
   - fnb
   foreignWriters: null
 - table: fnb.production_run
-  columns: 10
+  columns: 11
   store: postgres
   parent: null
   writtenBy:
@@ -1374,7 +1396,7 @@ tables:
   - fnb
   foreignWriters: null
 - table: fnb.sold_out_item
-  columns: 8
+  columns: 9
   store: postgres
   parent: null
   writtenBy: []
@@ -1386,7 +1408,7 @@ tables:
   writtenBy: []
   foreignWriters: null
 - table: fnb.substitution_rule
-  columns: 9
+  columns: 10
   store: postgres
   parent: null
   writtenBy:
@@ -1545,7 +1567,7 @@ screens:
 - P02:GST-031 AI Concierge – Home
 - P02:GST-032 AI Concierge – Chat
 - P02:GST-061 Menu Item Detail
-- P02:GST-070 Reserve a Table or Cabana
+- P02:GST-070 Reserve a Table
 - P04:POS-012 Omnichannel Order & Fulfilment Center
 - P04:POS-021 Sell — Food & Drink
 - P04:POS-022 Send to Kitchen
@@ -1615,7 +1637,6 @@ flows:
 - F48 A guest finds it, queues for it, and eats
 - F60 An online order is collected at the counter
 - F70 A guest needs help and something is lost
-- F78 A supplier is set up and a catalogue is priced and published
 - F80 A table is configured, reserved, seated and billed
 - F81 A retail sale runs from overview to tender
 - F83 A kitchen works a service from the rail to the exception

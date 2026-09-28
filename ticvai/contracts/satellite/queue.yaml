@@ -402,6 +402,11 @@ paths:
         guest holding positions in every queue at once defeats the purpose of a virtual queue
         for everyone else.
 
+        **The cap is `VenueSettings.queue.crossQueueLimit`**, the number of queues a guest may
+        be waiting in at once in this venue: a venue setting with a tenant default (decided
+        28 September, audit R094). **Proposed default 2, client to correct (audit R094).** The
+        refusal carries the limit in `crossQueueLimit`.
+
         Where the party includes someone below the height requirement, the join is refused
         here rather than at the ride, which is a much better place to find out.
       tags: [entry]
@@ -758,6 +763,8 @@ paths:
             list to queues whose attraction product (`attractionProductId`) is filed under that
             category; each row carries it as `attractionCategoryId`, so a screen can name the
             active filter. Not free text — the category list is catalogue's, not this contract's.
+            The attraction category is what "category" means here (decided 28 September, audit
+            R106 (2)).
           schema: { type: string, format: uuid }
       responses:
         '200':
@@ -1036,6 +1043,9 @@ paths:
         Last reading, expected interval, and whether the feed has gone quiet. A silent feed
         falls back to throughput-derived estimates and the wait time is marked accordingly —
         it does not simply freeze at the last value.
+
+        **A feed is healthy when its last reading is within its expected interval** (decided
+        28 September, audit R106 (1)).
       tags: [feed]
       x-ticvai-permission: QUEUE_MANAGE
       x-ticvai-scope-level: venue
@@ -1356,7 +1366,11 @@ components:
                 - queueAtCapacity
                 - entitlementRequired
             activeQueueCount: { type: integer }
-            crossQueueLimit: { type: integer }
+            crossQueueLimit:
+              type: integer
+              description: >
+                `crossQueueLimitReached`: the venue's `VenueSettings.queue.crossQueueLimit`
+                (proposed default 2, audit R094).
             heightRequirementCm: { type: integer, nullable: true }
 
     WaitingGuest:
@@ -1444,7 +1458,9 @@ components:
           type: boolean
           description: >
             The underlying feed has gone quiet past its expected interval. The figure is
-            shown with a caveat rather than frozen and presented as current.
+            shown with a caveat rather than frozen and presented as current, and it is not
+            hidden (decided 28 September, audit R080 (b)): the screen shows `waitMinutes` with
+            its `asOf` and a stale marker.
         heightRequirementCm: { type: integer, nullable: true }
         zone: { type: string, nullable: true }
         asOf:
@@ -1564,7 +1580,13 @@ components:
       properties:
         feedId: { type: string, format: uuid }
         adaptor: { $ref: '#/components/schemas/QueueFeedAdaptor' }
-        isHealthy: { type: boolean }
+        isHealthy:
+          type: boolean
+          description: >
+            **Healthy means the last reading arrived within the feed's expected interval**
+            (decided 28 September, audit R106 (1)): `lastReadingAt` is no older than
+            `expectedIntervalSeconds`. It is the opposite of `isQuiet`, and nothing else (latency,
+            discards) makes a reporting feed unhealthy.
         isQuiet:
           type: boolean
           description: >

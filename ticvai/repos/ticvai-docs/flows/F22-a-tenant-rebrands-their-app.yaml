@@ -40,7 +40,9 @@ steps:
   operations:
   - getTheme
   - setTheme
-  outcome: Contrast checked, because a brand colour that fails 4.5:1 is inaccessible
+  outcome: '**Contrast checked and enforced**: a colour pair that fails 4.5:1 is refused by `setTheme`
+    (`400 ContrastProblem`), because a brand colour that fails it is inaccessible (decided 28 September,
+    audit R139 (a))'
 - step: 3
   screen: CMS-007
   action: Rearranges the homepage
@@ -68,14 +70,24 @@ steps:
   operations:
   - listConfigVersions
   - restoreConfigVersion
-  outcome: '**Versioned, so the previous brand is one click away**'
+  - diffConfigVersion
+  outcome: '**Restore, then review, then publish — not one click** (decided 28 September, audit R139 (b)).
+    `restoreConfigVersion` copies the earlier version into the draft without publishing it, and
+    `diffConfigVersion` shows what the restore changes against what is live.'
+- step: 7
+  screen: CMS-014
+  action: Publishes the restored draft
+  operations:
+  - publishTenantConfig
+  outcome: The previous brand is live again, through the same publish gate as any other change
 branches:
 - at: 2
   condition: The brand colour fails contrast
-  behaviour: '**Warned, not blocked.** It is the tenant’s brand and their decision, and the platform
-    records that they were told — refusing a client’s own colour is a fight the platform will lose.'
+  behaviour: '**Refused, not warned** (decided 28 September, audit R139 (a)). `setTheme` answers `400
+    ContrastProblem` naming the failing pair, and the tenant picks a shade that passes 4.5:1. Nothing
+    inaccessible reaches a guest surface.'
   severity: recoverable
-  resolvedBy: Tenant
+  resolvedBy: setTheme
 - at: 4
   condition: Arabic layout breaks with the new logo
   behaviour: A wide logo that fits left-aligned may not fit mirrored. **This is why the preview toggles
@@ -112,7 +124,7 @@ exitStates:
 - state: deferred
   description: Published to web, app awaits a store release
 - state: abandoned
-  description: Rolled back
+  description: Rolled back (restored into the draft, reviewed and published again)
 primaryContract: white-label
 contracts:
 - white-label

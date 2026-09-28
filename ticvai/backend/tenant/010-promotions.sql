@@ -242,6 +242,7 @@ CREATE TABLE IF NOT EXISTS promotions.recommendation_suppression (
 -- What to offer alongside what, and where it may appear
 CREATE TABLE IF NOT EXISTS promotions.upsell_rule (
     id                                uuid PRIMARY KEY NOT NULL,
+    region_id                         uuid,
     name                              text NOT NULL CONSTRAINT upsell_rule_name_chk CHECK (char_length(name) <= 200),
     placement                         text NOT NULL CONSTRAINT upsell_rule_placement_chk CHECK (placement IN ('productDetail', 'cart', 'checkout', 'postPurchase', 'atGate', 'inVenue')),
     trigger_variant_ids               text[] NOT NULL,

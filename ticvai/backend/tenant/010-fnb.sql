@@ -1,5 +1,18 @@
--- fnb — 46 tables
+-- fnb — 47 tables
 -- **Derived. Do not hand-edit.**
+
+-- Holds 8 columns. No description has been written for this table — the name is the only thing
+-- saying what it is
+CREATE TABLE IF NOT EXISTS fnb.allergen_verdict (
+    menu_item_id                      uuid NOT NULL,
+    matches                           boolean NOT NULL,
+    declared                          text[],
+    actual                            text[],
+    over_declared                     text[],
+    checked_at                        timestamptz NOT NULL,
+    trigger                           text NOT NULL CONSTRAINT allergen_verdict_trigger_chk CHECK (trigger IN ('manual', 'recipeChanged', 'substitutionChanged', 'modifierChanged')),
+    id                                uuid PRIMARY KEY NOT NULL
+);
 
 -- How one table’s bill was divided. A party of six paying separately is the ordinary case
 CREATE TABLE IF NOT EXISTS fnb.bill_split (
@@ -51,7 +64,7 @@ CREATE TABLE IF NOT EXISTS fnb.corrective_action (
     id                                uuid PRIMARY KEY NOT NULL,
     raised_at                         timestamptz NOT NULL,
     raised_by_principal_id            uuid,
-    source                            text NOT NULL CONSTRAINT corrective_action_source_chk CHECK (source IN ('temperatureExcursion', 'coldChainBreach', 'expiredStock', 'contamination', 'pestSighting', 'equipmentFailure', 'manual')),
+    source                            text NOT NULL CONSTRAINT corrective_action_source_chk CHECK (source IN ('temperatureExcursion', 'coldChainBreach', 'expiredStock', 'contamination', 'pestSighting', 'equipmentFailure', 'missedCheck', 'manual')),
     source_ref                        uuid,
     severity                          text CONSTRAINT corrective_action_severity_chk CHECK (severity IN ('observation', 'minor', 'major', 'critical')),
     action_taken                      text,
@@ -170,6 +183,7 @@ CREATE TABLE IF NOT EXISTS fnb.kitchen_station (
     name                              text NOT NULL,
     outlet_id                         uuid,
     menu_item_ids                     text[],
+    display_workstation_ids           text[],
     display_endpoint                  text,
     is_active                         boolean
 );
@@ -399,6 +413,7 @@ CREATE TABLE IF NOT EXISTS fnb.production_run (
     id                                uuid PRIMARY KEY NOT NULL,
     recipe_id                         uuid NOT NULL,
     production_plan_id                uuid,
+    station_id                        uuid,
     producing_outlet_id               uuid,
     for_outlet_ids                    text[],
     planned_quantity                  numeric(18,4) NOT NULL,
@@ -517,6 +532,7 @@ CREATE TABLE IF NOT EXISTS fnb.sold_out_item (
     off_at                            timestamptz NOT NULL,
     back_at                           timestamptz,
     reason                            text CONSTRAINT sold_out_item_reason_chk CHECK (reason IN ('ranOut', 'qualityIssue', 'equipmentDown', 'supplierFailure', 'seasonal', 'other')),
+    note                              text CONSTRAINT sold_out_item_note_chk CHECK (char_length(note) <= 500),
     called_by_principal_id            uuid,
     refused_order_count               integer DEFAULT 0
 );
@@ -543,6 +559,7 @@ CREATE TABLE IF NOT EXISTS fnb.sub_bill (
 -- may add soy
 CREATE TABLE IF NOT EXISTS fnb.substitution_rule (
     id                                uuid PRIMARY KEY NOT NULL,
+    recipe_id                         uuid NOT NULL,
     from_ingredient_id                uuid NOT NULL,
     to_ingredient_id                  uuid NOT NULL,
     ratio                             numeric(18,4) DEFAULT 1,

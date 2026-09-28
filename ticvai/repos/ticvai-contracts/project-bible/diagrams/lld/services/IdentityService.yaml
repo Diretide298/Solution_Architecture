@@ -1,5 +1,5 @@
 id: LLD-IdentityService
-title: IdentityService — 70 operations, 32 tables
+title: IdentityService — 75 operations, 33 tables
 generatedBy: tools/derive-diagrams.py
 tier: foundation
 index: diagrams/hld/02-services.yaml
@@ -9,14 +9,14 @@ why: '**Twelve contracts read it and it reads almost nothing.** The one service 
 scale: Read-heavy, latency-critical, cached hard. Every request resolves a principal.
 ifDown: '**A restart is an outage everywhere.** Deploys go out first and alone.'
 coverage:
-  operations: 70
-  inAFlow: 21
-  percent: 30%
+  operations: 75
+  inAFlow: 23
+  percent: 31%
   note: '**Flow coverage is how much of this service a journey has walked.** A service under 40% is
     unwalked rather than under-documented.'
 schemas:
 - schema: identity
-  tables: 28
+  tables: 29
   stores:
   - postgres
   - redis
@@ -28,7 +28,7 @@ schemas:
   largestTable: pii.subject
 operationsByContract:
 - contract: identity
-  count: 70
+  count: 75
   operations:
   - operation: changeOwnCredential
     verb: POST
@@ -44,7 +44,7 @@ operationsByContract:
     scope: tenant
     permission: null
     offline: false
-    reads: 3
+    reads: 4
     writes: 2
   - operation: createAccessPolicy
     verb: POST
@@ -182,6 +182,14 @@ operationsByContract:
     offline: false
     reads: 3
     writes: 0
+  - operation: getPasswordPolicy
+    verb: GET
+    path: /password-policy
+    scope: tenant
+    permission: TENANT_CONFIGURE
+    offline: false
+    reads: 1
+    writes: 0
   - operation: getPrincipal
     verb: GET
     path: /principals/{principalId}
@@ -222,6 +230,14 @@ operationsByContract:
     offline: false
     reads: 1
     writes: 1
+  - operation: guestPasswordLogin
+    verb: POST
+    path: /auth/guest/password
+    scope: tenant
+    permission: null
+    offline: false
+    reads: 0
+    writes: 0
   - operation: guestSocialLogin
     verb: POST
     path: /auth/guest/social
@@ -342,11 +358,27 @@ operationsByContract:
     offline: false
     reads: 1
     writes: 0
+  - operation: listOwnPlatformStaffGrants
+    verb: GET
+    path: /platform-staff-grants/mine
+    scope: tenant
+    permission: PLATFORM_TENANT_ACCESS
+    offline: false
+    reads: 1
+    writes: 0
   - operation: listPermissions
     verb: GET
     path: /permissions
     scope: tenant
     permission: PERMISSION_VIEW
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: listPlatformStaffGrants
+    verb: GET
+    path: /platform-staff-grants
+    scope: tenant
+    permission: AUDIT_VIEW
     offline: false
     reads: 1
     writes: 0
@@ -396,7 +428,7 @@ operationsByContract:
     scope: tenant
     permission: null
     offline: false
-    reads: 5
+    reads: 6
     writes: 2
   - operation: logout
     verb: POST
@@ -406,6 +438,14 @@ operationsByContract:
     offline: true
     reads: 2
     writes: 2
+  - operation: openPlatformStaffGrant
+    verb: POST
+    path: /platform-staff-grants
+    scope: tenant
+    permission: PLATFORM_TENANT_ACCESS
+    offline: false
+    reads: 1
+    writes: 0
   - operation: recordBenefitUsage
     verb: POST
     path: /memberships/{membershipId}/benefit-usage
@@ -822,6 +862,12 @@ tables:
   parent: null
   writtenBy: []
   foreignWriters: null
+- table: identity.platform_staff_grant
+  columns: 9
+  store: postgres
+  parent: null
+  writtenBy: []
+  foreignWriters: null
 - table: identity.principal
   columns: 9
   store: postgres
@@ -966,6 +1012,7 @@ screens:
 - P02:GST-015 Memberships
 - P02:GST-042 Simple Registration & OTP
 - P02:GST-066 Privacy & My Data
+- P02:GST-069 Face Pass
 - P02:GST-073 Security & Sign-in
 - P04:POS-000 Sign In
 - P04:POS-001 Begin Shift
@@ -997,11 +1044,18 @@ screens:
 - P09:ADM-011 Licence & Seat Management
 - P09:ADM-012 Tenant Isolation & Resource Pool
 - P09:ADM-015 API Rate Limit & Quota Management
+- P09:ADM-016 White-Label Branding Management
+- P09:ADM-017 Domain & Certificate Management
+- P09:ADM-018 Localisation & Language Pack
+- P09:ADM-019 Global Configuration & Defaults
 - P09:ADM-020 Platform User Directory
 - P09:ADM-021 Platform Role Management
+- P09:ADM-031 Security & Compliance Dashboard
+- P09:ADM-037 AI Provider & Credentials
 - P09:ADM-340 Segregation of Duties Policy Manager
 - P09:ADM-342 Authentication & MFA Policy Manager
 - P09:ADM-356 Integration Security & Access Control
+- P09:ADM-412 Payment Method & Settlement Setup
 - P09:ADM-421 Venue & Operational Structure Creation
 - P10:PTR-001 Partner Login / MFA
 - P10:PTR-003 Profile & Company Details

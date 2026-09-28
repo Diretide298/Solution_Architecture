@@ -1942,6 +1942,9 @@ screens:
         - ProposedAction.decisionReason
         - ProposedAction.proposedAt
         operation: listProposedActions
+        notes: '**What a caller sees follows who may decide** (decided 28 September, audit R213 (3)):
+          with `AI_APPROVE`, every open proposal at the scope; with `AI_USE` only, the caller''s own proposals,
+          which are the level 1 ones they may approve themselves.'
         provenance: contract ai.yaml GET /proposed-actions
       - kind: multiSelect
         label: Domain
@@ -1996,6 +1999,10 @@ screens:
       - kind: secondaryButton
         label: Decide proposed action
         operation: decideProposedAction
+        notes: 'Guarded as the contract is (decided 28 September, audit R213 (3)): offered on the caller''s
+          own level 1 proposals with `AI_USE`; on a level 2 proposal, or somebody else''s, only with `AI_APPROVE`,
+          and never on a level 2 proposal the caller prompted. Hidden rather than disabled where the rule
+          already says no.'
         provenance: contract ai.yaml POST /proposed-actions/{actionId}/decide
   states:
     loading: Tiles render in place; **each resolves on its own** so one slow source does not hold the
@@ -2042,11 +2049,13 @@ screens:
     - listAlerts
   - operationId: listProposedActions
     contract: ai
-    purpose: What the assistant has proposed and nobody has decided
+    purpose: What the assistant has proposed and nobody has decided — all of them with AI_APPROVE, the
+      caller's own with AI_USE (audit R213 (3))
     trigger: onLoad
   - operationId: decideProposedAction
     contract: ai
-    purpose: Approve or reject a proposal
+    purpose: Approve or reject a proposal — own level 1 with AI_USE, level 2 or another's with AI_APPROVE,
+      never one's own level 2 (audit R213 (3))
     trigger: onAction
     invalidates:
     - listAlerts
@@ -2164,7 +2173,11 @@ screens:
     component: modal
     trigger: Decide proposed action
     body: '**Collects what `decideProposedAction` sends before it is called.** Required: `decision`. Optional:
-      `reason`. Dismissing sends nothing; the screen behind is unchanged.'
+      `reason` (asked for on a rejection). A refusal is a 403 named by its rule and shown as such (decided
+      28 September, audit R213 (3)): `approval-level-requires-manager` (level 2 needs a manager holding
+      `AI_APPROVE`), `approver-is-requester` (a level 2 proposal cannot be approved by whoever prompted
+      it), `not-own-proposal` (somebody else''s level 1 proposal needs `AI_APPROVE`). An expired or already
+      decided proposal is a 409. Dismissing sends nothing; the screen behind is unchanged.'
     confirm:
       label: Decide proposed action
       operation: decideProposedAction

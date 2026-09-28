@@ -137,7 +137,6 @@ paths:
       operationId: getResourceAvailability
       x-ticvai-consumed-by:
         - "P01 WEB-031 My Reservations"
-        - "P02 GST-070 Reserve a Table or Cabana"
         - "P08 BO-096 Resource Calendar"
       summary: When it is free, with conflicts already resolved
       description: '**Returns free windows, not a list of bookings for the caller to subtract.** A client
@@ -338,9 +337,14 @@ paths:
                 $ref: '#/components/schemas/ResourceBooking'
         '409':
           description: '**Conflicts, and the response names them with times.** *"Not available"* on a
-            resource a guest can see in front of them is not an answer.
+            resource a guest can see in front of them is not an answer. Also refused while the resource
+            came back damaged and has not been inspected (`resource-awaiting-inspection`, decided 28
+            September, audit R106 (4)); the response names the booking it came back damaged from.
 
             '
+          x-ticvai-problem-types:
+          - resource-conflict
+          - resource-awaiting-inspection
           content:
             application/problem+json:
               schema:
@@ -460,6 +464,13 @@ paths:
         it. A returned item that goes straight back into the pool with a cracked wheel is how the second
         guest gets hurt.
 
+        **Damaged means unavailable until inspected** (decided 28 September, audit R106 (4)). A
+        `condition` of `minorDamage` or `majorDamage` moves the resource to `maintenance`
+        (`states/resource.yaml`) whatever `blockFurtherBookings` says, and `bookResource` refuses it
+        with `409 resource-awaiting-inspection` until an inspection clears it
+        (`setResourceLifecycleState` back to active, with the inspector''s reason). A `good` return
+        frees it at once.
+
         '
       tags:
       - resources
@@ -505,6 +516,8 @@ paths:
                 blockFurtherBookings:
                   type: boolean
                   default: false
+                  description: Blocks a `good` return from further booking too. **Ignored for a damaged
+                    return, which always blocks until inspected** (audit R106 (4)).
       responses:
         '200':
           headers:
@@ -601,24 +614,30 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/Qualification'
-  /sessions/{sessionId}/manifest:
+  /performances/{performanceId}/manifest:
     parameters:
-    - name: sessionId
+    - name: performanceId
       in: path
       required: true
+      description: The catalogue Performance the manifest belongs to (`catalogue.performance`).
       schema:
         type: string
         format: uuid
     get:
-      operationId: getSessionManifest
+      operationId: getPerformanceManifest
       x-ticvai-consumed-by:
-        - "P08 BO-099 Session Manifest"
-      summary: Who is in a session, in what order
+        - "P08 BO-099 Performance Manifest"
+      summary: Who is in a performance, in what order
       description: '1.3.44. **Distinct from duration, which variants already handle.**
 
-        A session holding a mix of first-time and experienced participants needs a running order, **because
+        A performance holding a mix of first-time and experienced participants needs a running order, **because
         the order is operational rather than administrative** — an instructor takes the beginners first,
         and a manifest sorted by booking time gives them a beginner between two advanced riders.
+
+        **The manifest hangs off a Performance** (decided 28 September, audit R165). What the design calls a
+        session is a Performance, so `performanceId` is a `catalogue.performance` id; the former
+        `sessionId` pointed at no entity. Formerly `getSessionManifest` on `/sessions/{sessionId}/manifest`.
+        An unknown or out-of-scope performance is a `404`.
 
         '
       tags:
@@ -638,12 +657,18 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/SessionParticipant'
+                  $ref: '#/components/schemas/PerformanceParticipant'
+        '404':
+          $ref: ../shared/common.yaml#/components/responses/NotFound
     put:
-      operationId: reorderSessionManifest
+      operationId: reorderPerformanceManifest
       x-ticvai-consumed-by:
-        - "P08 BO-099 Session Manifest"
+        - "P08 BO-099 Performance Manifest"
       summary: Change the running order
+      description: 'Formerly `reorderSessionManifest`. The manifest belongs to a Performance (decided 28
+        September, audit R165).
+
+        '
       tags:
       - resources
       x-ticvai-permission: RESOURCE_BOOK
@@ -691,7 +716,9 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/SessionParticipant'
+                  $ref: '#/components/schemas/PerformanceParticipant'
+        '404':
+          $ref: ../shared/common.yaml#/components/responses/NotFound
   /resource-types:
     get:
       operationId: listResourceTypes
@@ -1661,7 +1688,7 @@ paths:
         exceptions does not.
 
         **Slot length is here and not on the product**, because the same instructor may teach a
-        forty-minute private lesson and a ninety-minute group session, and the constraint being modelled
+        forty-minute private lesson and a ninety-minute group lesson, and the constraint being modelled
         is the resource''s — how finely its time can be cut.
 
         '
@@ -3374,25 +3401,29 @@ components:
 
 
             **Operations write it at `venue` scope.**'
-    SessionParticipant:
+    PerformanceParticipant:
       type: object
-      x-ticvai-persistence: resources.session_participant
+      x-ticvai-persistence: resources.performance_participant
       description: '1.3.44. **The running order is operational.** An instructor takes beginners first,
         and a manifest sorted by booking time puts one between two advanced riders.
+
+        Formerly `SessionParticipant` on `resources.session_participant`: a session is a Performance and
+        the manifest hangs off one (decided 28 September, audit R165).
 
         '
       required:
       - id
-      - sessionId
+      - performanceId
       - subjectId
       - position
       properties:
         id:
           type: string
           format: uuid
-        sessionId:
+        performanceId:
           type: string
           format: uuid
+          description: The `catalogue.performance` this participant is on (audit R165).
         subjectId:
           type: string
           format: uuid
@@ -3418,7 +3449,7 @@ components:
           nullable: true
           readOnly: true
           description: 'When the device made the running-order change that set `position` — the
-            `recordedAt` of the last `reorderSessionManifest`. Null until the order is first changed.
+            `recordedAt` of the last `reorderPerformanceManifest`. Null until the order is first changed.
 
             '
         syncedAt:

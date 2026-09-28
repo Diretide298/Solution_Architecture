@@ -15,7 +15,7 @@
   "contracts": 3,
   "modules": 1,
   "undrawn": 0,
-  "operationsWithNoScreen": 46
+  "operationsWithNoScreen": 45
  },
  "waves": {
   "wave2": 10
@@ -68,7 +68,7 @@
    "module": "Kitchen",
    "wave": 2,
    "route": "/kitchen/order-firing-course-management",
-   "operations": 5,
+   "operations": 6,
    "drawn": true
   },
   {
@@ -86,7 +86,7 @@
    "module": "Kitchen",
    "wave": 2,
    "route": "/kitchen/kitchen-station-workload-dynamic-routing",
-   "operations": 2,
+   "operations": 3,
    "drawn": true
   },
   {
@@ -113,7 +113,7 @@
    "module": "Kitchen",
    "wave": 2,
    "route": "/kitchen/exceptions-re-fire-unavailable-items",
-   "operations": 5,
+   "operations": 6,
    "drawn": true
   },
   {
@@ -172,6 +172,12 @@
     "contract": "fnb",
     "verb": "POST",
     "summary": "Escalate a finding"
+   },
+   {
+    "operation": "getAllergenVerification",
+    "contract": "fnb",
+    "verb": "GET",
+    "summary": "The last allergen verdict recorded for a dish"
    },
    {
     "operation": "getFnbReservationPolicy",
@@ -300,22 +306,10 @@
     "summary": "Archive a dashboard"
    },
    {
-    "operation": "deleteReportSchedule",
-    "contract": "reporting",
-    "verb": "DELETE",
-    "summary": "Delete a schedule"
-   },
-   {
     "operation": "listAlertRules",
     "contract": "reporting",
     "verb": "GET",
     "summary": "What raises an alert, and when"
-   },
-   {
-    "operation": "updateReportSchedule",
-    "contract": "reporting",
-    "verb": "PATCH",
-    "summary": "Amend, pause or resume a schedule"
    },
    {
     "operation": "getConfigurationProfile",

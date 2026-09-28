@@ -19,7 +19,7 @@ offlineBehaviour: 'The guest half needs a network — an order nobody received i
 trigger:
   description: A guest on a sunbed opens the app, scans the QR on their lounger, orders, and a runner
     brings it. Described in detail by the client on 14 August.
-  entryScreen: GST-030
+  entryScreen: GST-024
   entryPoints:
   - QR on the lounger
   - Dining tab in the app

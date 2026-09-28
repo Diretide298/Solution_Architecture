@@ -183,10 +183,7 @@ paths:
             application/json:
               schema: { $ref: '#/components/schemas/Asset' }
         '409':
-          description: Asset tag already in use
-          content:
-            application/problem+json:
-              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+          $ref: '../shared/common.yaml#/components/responses/DuplicateCode'
 
   /assets/{assetId}:
     parameters:
@@ -410,6 +407,7 @@ paths:
         - "P06 EMP-005 Task detail"
         - "P06 EMP-006 Raise a task"
         - "P08 BO-030 Work Order Verification"
+        - "P08 BO-070 Work Orders"
         - "P08 BO-108 Venue Operations"
         - "P08 BO-574 Maintenance Command Center"
         - "P08 BO-577 Maintenance Work Order"
@@ -460,6 +458,7 @@ paths:
       x-ticvai-consumed-by:
         - "P06 EMP-006 Raise a task"
         - "P08 BO-030 Work Order Verification"
+        - "P08 BO-070 Work Orders"
         - "P08 BO-576 Maintenance Calendar & Scheduling"
         - "P08 BO-577 Maintenance Work Order"
         - "P08 BO-910 Maintenance & Resource Blocking"
@@ -511,6 +510,7 @@ paths:
         - "P06 EMP-005 Task detail"
         - "P06 EMP-006 Raise a task"
         - "P08 BO-030 Work Order Verification"
+        - "P08 BO-070 Work Orders"
         - "P08 BO-577 Maintenance Work Order"
       x-ticvai-audience: [staff]
       x-ticvai-read-routing: replica
@@ -534,6 +534,7 @@ paths:
         - "P06 EMP-004 Task list"
         - "P06 EMP-005 Task detail"
         - "P06 EMP-006 Raise a task"
+        - "P08 BO-070 Work Orders"
         - "P08 BO-577 Maintenance Work Order"
       x-ticvai-audience: [staff]
       summary: Assign, reprioritise or amend
@@ -611,9 +612,16 @@ paths:
                 pauseReason:
                   type: string
                   enum: [awaitingParts, awaitingAccess, awaitingApproval, endOfShift, reassigned, other]
-                note: { type: string, maxLength: 500 }
+                note:
+                  type: string
+                  maxLength: 500
+                  description: >
+                    Required where the pause reason is `other` (decided 28 September, audit R222):
+                    `other` with no note is refused `400`, and the notes are reviewed quarterly
+                    so the common ones become real reasons.
                 recordedAt: { type: string, format: date-time }
       responses:
+        '400': { $ref: '../shared/common.yaml#/components/responses/BadRequest' }
         '200':
           headers:
             X-Consistency-Token:
@@ -702,6 +710,7 @@ paths:
         - "P06 EMP-005 Task detail"
         - "P06 EMP-006 Raise a task"
         - "P08 BO-030 Work Order Verification"
+        - "P08 BO-070 Work Orders"
       x-ticvai-audience: [staff]
       summary: Cancel a work order
       description: >
@@ -758,6 +767,7 @@ paths:
         - "P06 EMP-005 Task detail"
         - "P06 EMP-006 Raise a task"
         - "P08 BO-030 Work Order Verification"
+        - "P08 BO-070 Work Orders"
         - "P08 BO-578 Technician Repair Workspace"
       x-ticvai-audience: [staff]
       summary: Complete a work order
@@ -825,6 +835,10 @@ paths:
         Where the category requires it, a second person confirms the work. The verifier may
         not be the technician who did it — the point is a second pair of eyes, and enforcing
         that is cheaper than discovering it was skipped.
+
+        **A supervisor other than the technician moves `completed` to `verified`** (decided
+        28 September, audit R106 (9)): the caller holds `WORK_ORDER_VERIFY` and is not
+        `completedByPrincipalId`; the second is refused `403`.
       tags: [workOrder]
       x-ticvai-permission: WORK_ORDER_VERIFY
       x-ticvai-scope-level: venue
@@ -915,6 +929,7 @@ paths:
         - "P06 EMP-004 Task list"
         - "P06 EMP-005 Task detail"
         - "P06 EMP-006 Raise a task"
+        - "P08 BO-070 Work Orders"
       x-ticvai-audience: [staff]
       summary: The assignee declines, with a reason
       description: >
@@ -941,8 +956,15 @@ paths:
                 reason:
                   type: string
                   enum: [wrongSkill, notOnShift, wrongVenue, alreadyInHand, unsafe, other]
-                note: { type: string, maxLength: 300 }
+                note:
+                  type: string
+                  maxLength: 300
+                  description: >
+                    Required where the reason is `other` (decided 28 September, audit R222):
+                    `other` with no note is refused `400`, and the notes are reviewed quarterly
+                    so the common ones become real reasons.
       responses:
+        '400': { $ref: '../shared/common.yaml#/components/responses/BadRequest' }
         '200':
           headers:
             X-Consistency-Token:
@@ -1014,6 +1036,7 @@ paths:
         - "P06 EMP-004 Task list"
         - "P06 EMP-005 Task detail"
         - "P06 EMP-006 Raise a task"
+        - "P08 BO-070 Work Orders"
       x-ticvai-audience: [staff]
       summary: Stopped, and why
       description: >
@@ -1041,12 +1064,19 @@ paths:
                   type: string
                   enum: [awaitingParts, awaitingPermit, awaitingOutageWindow, awaitingSpecialist,
                          endOfShift, safetyConcern, other]
-                note: { type: string, maxLength: 300 }
+                note:
+                  type: string
+                  maxLength: 300
+                  description: >
+                    Required where the reason is `other` (decided 28 September, audit R222):
+                    `other` with no note is refused `400`, and the notes are reviewed quarterly
+                    so the common ones become real reasons.
                 requisitionId:
                   type: string
                   pattern: '^[0-9A-HJKMNP-TV-Z]{26}$'
                   description: Where a part was ordered, so the two are linked.
       responses:
+        '400': { $ref: '../shared/common.yaml#/components/responses/BadRequest' }
         '200':
           headers:
             X-Consistency-Token:
@@ -1101,6 +1131,7 @@ paths:
         - "P06 EMP-005 Task detail"
         - "P06 EMP-006 Raise a task"
         - "P08 BO-030 Work Order Verification"
+        - "P08 BO-070 Work Orders"
       x-ticvai-audience: [staff]
       summary: Administratively closed
       description: >
@@ -1631,6 +1662,10 @@ paths:
         work order. An incident closed without either is a lesson nobody learned.
 
         **The original report is never edited.** Investigation adds to the record.
+
+        **Investigation notes are a history, not a field** (decided 28 September, audit R106 (5)).
+        Each `investigationNote` sent appends one row to `IncidentDetail.investigationNotes`, with
+        who wrote it and when; nothing overwrites or deletes an earlier note.
       tags: [incident]
       x-ticvai-permission: INCIDENT_MANAGE
       x-ticvai-scope-level: venue
@@ -1649,7 +1684,12 @@ paths:
                 status: { $ref: '#/components/schemas/IncidentStatus' }
                 severity: { $ref: '#/components/schemas/IncidentSeverity' }
                 assignedToPrincipalId: { type: string, format: uuid }
-                investigationNote: { type: string, maxLength: 10000 }
+                investigationNote:
+                  type: string
+                  maxLength: 10000
+                  description: >
+                    Appended as a new entry of `IncidentDetail.investigationNotes`, never
+                    overwriting the last (audit R106 (5)).
                 rootCause: { type: string, maxLength: 2000 }
                 correctiveActions: { type: string, maxLength: 5000 }
                 correctiveWorkOrderId: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
@@ -1694,6 +1734,11 @@ paths:
 
         Appends a `maintenance.incident_authority_notification` row; a second notification
         adds a row rather than replacing the first.
+
+        **Refused for an incident that is not reportable; a repeat is recorded** (decided
+        28 September, audit R106 (6)). Where `isReportable` is false the call is refused `409`
+        and nothing is written. A second notification to the same authority is accepted and
+        kept as its own row, because each is evidence.
       tags: [incident]
       x-ticvai-permission: INCIDENT_MANAGE
       x-ticvai-scope-level: venue
@@ -1725,6 +1770,11 @@ paths:
           content:
             application/json:
               schema: { $ref: '#/components/schemas/Incident' }
+        '409':
+          description: The incident is not reportable (`isReportable` false, audit R106 (6)).
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
 
 components:
   schemas:
@@ -1803,7 +1853,14 @@ components:
       type: object
       required: [assetTag, name, venueId, criticality]
       properties:
-        assetTag: { type: string, maxLength: 64 }
+        assetTag:
+          type: string
+          maxLength: 64
+          x-ticvai-unique: venue
+          description: >
+            **Unique per venue** (decided 28 September, audit R108). Two assets in one venue never
+            share a tag; `createAsset` refuses a duplicate with `409` `duplicate-code`. Two venues
+            may each have an `A-001`.
         name: { type: string, maxLength: 200 }
         venueId: { type: string, format: uuid }
         categoryId: { type: string, format: uuid }
@@ -2215,7 +2272,12 @@ components:
             accepted after twenty minutes escalates itself, because the alternative is somebody
             noticing.
         id: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
-        workOrderNumber: { type: string }
+        workOrderNumber:
+          type: string
+          readOnly: true
+          description: >
+            **Server-assigned: the venue prefix plus a sequence per venue** (decided 28
+            September, audit R152). Not gapless; only tax invoices are gapless, per legal entity.
         title: { type: string }
         venueId: { type: string, format: uuid }
         assetId: { type: string, format: uuid, nullable: true }
@@ -2626,7 +2688,12 @@ components:
       required: [id, incidentNumber, kind, severity, status, venueId, occurredAt, reportedByPrincipalId]
       properties:
         id: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
-        incidentNumber: { type: string }
+        incidentNumber:
+          type: string
+          readOnly: true
+          description: >
+            **Server-assigned: the venue prefix plus a sequence per venue** (decided 28
+            September, audit R152). Not gapless; only tax invoices are gapless, per legal entity.
         kind: { $ref: '#/components/schemas/IncidentKind' }
         severity: { $ref: '#/components/schemas/IncidentSeverity' }
         status: { $ref: '#/components/schemas/IncidentStatus' }
@@ -2664,7 +2731,18 @@ components:
             description:
               type: string
               description: The original report. Never edited — investigation adds to the record.
-            investigationNote: { type: string, nullable: true }
+            investigationNote:
+              type: string
+              nullable: true
+              readOnly: true
+              description: The latest entry of `investigationNotes`, kept for readers that show one line.
+            investigationNotes:
+              type: array
+              readOnly: true
+              description: >
+                **Every investigation note, oldest first** (decided 28 September, audit R106 (5)).
+                Read from `maintenance.incident_investigation_note`; appended by `updateIncident`.
+              items: { $ref: '#/components/schemas/IncidentInvestigationNote' }
             rootCause: { type: string, nullable: true }
             correctiveActions: { type: string, nullable: true }
             firstAidGiven: { type: boolean }
@@ -2707,6 +2785,21 @@ components:
           format: uuid
           nullable: true
           description: The staff principal where `kind` is `staff`.
+
+    IncidentInvestigationNote:
+      x-ticvai-persistence: maintenance.incident_investigation_note
+      type: object
+      description: >
+        **One investigation note, appended by `updateIncident`** (decided 28 September, audit
+        R106 (5)). A history rather than a field, so what an investigator thought on Tuesday
+        survives what they found on Thursday.
+      required: [id, incidentId, note, recordedAt]
+      properties:
+        id: { type: string, format: uuid }
+        incidentId: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
+        note: { type: string, maxLength: 10000 }
+        writtenByPrincipalId: { type: string, format: uuid }
+        recordedAt: { type: string, format: date-time }
 
     IncidentAuthorityNotification:
       x-ticvai-persistence: maintenance.incident_authority_notification

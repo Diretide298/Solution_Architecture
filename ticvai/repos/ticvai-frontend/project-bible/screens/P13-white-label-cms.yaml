@@ -22,7 +22,7 @@ platform:
     deviceOwnership: tenant workstation
     networkAssumption: public internet
     releaseCadence: weekly
-  screenCount: 100
+  screenCount: 99
   designReferences:
   - path: sources/designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
     note: The CMS **is** the White Label Builder. These six boards are the design, not a reference for
@@ -83,8 +83,8 @@ screens:
     - CMS-010
     - CMS-011
     - CMS-016
+    - CMS-015
     - CMS-019
-    - CMS-020
     - CMS-021
     - CMS-031
     - CMS-041
@@ -135,9 +135,11 @@ screens:
     - to: CMS-019
       trigger: User Access
       provenance: structural — CMS-001 is P13's home screen and its exits are its launcher
-    - to: CMS-020
-      trigger: Change Log
+    - to: CMS-015
+      trigger: Version History
       provenance: structural — CMS-001 is P13's home screen and its exits are its launcher
+      carries:
+      - version
     - to: CMS-021
       trigger: Privacy & Consent Configuration Command Center
       provenance: structural — CMS-001 is P13's home screen and its exits are its launcher
@@ -208,7 +210,8 @@ screens:
     trigger: onAction
   - operationId: setMaintenanceMode
     contract: white-label
-    purpose: Put the guest web and app into maintenance
+    purpose: Put the guest web and app into maintenance, and set the rest of the live app status — minimum
+      app version, contact details, availability (decided 28 September, audit R073)
     trigger: onAction
   wireframe:
     status: notStarted
@@ -242,6 +245,10 @@ screens:
         - TenantAppStatus.isInMaintenance
         - TenantAppStatus.maintenanceMessage
         - TenantAppStatus.expectedBackAt
+        - TenantAppStatus.minimumAppVersion
+        - TenantAppStatus.contact
+        - TenantAppStatus.availability
+        - TenantAppStatus.availabilityMessage
         - TenantAppStatus.recentChanges
         operation: getTenantAppStatus
         provenance: contract white-label.yaml GET /tenant-config/status
@@ -335,7 +342,13 @@ screens:
     component: modal
     trigger: Save maintenance mode
     body: '**Collects what `setMaintenanceMode` sends before it is called.** Required: `isInMaintenance`.
-      Optional: `message`, `expectedBackAt`. Dismissing sends nothing; the screen behind is unchanged.'
+      Optional: `message`, `expectedBackAt`, `minimumAppVersion` (`ios`, `android`), `contact` (`phone`,
+      `email`, `whatsapp`, `address`, `openingHours`), `availability` (`open`, `soldOut`, `closed`) and
+      `availabilityMessage`. **The live app status is set here, not published** (decided 28 September,
+      audit R073 (b)(f)): a guest app below `minimumAppVersion` for its platform is sent to the forced
+      upgrade (GST-047), the contact details feed WEB-028 and the availability feeds WEB-029''s sold-out
+      and closed states. A field not sent is left as it is, so clearing maintenance does not clear the
+      contact details. Dismissing sends nothing; the screen behind is unchanged.'
     confirm:
       label: Save maintenance mode
       operation: setMaintenanceMode
@@ -345,6 +358,10 @@ screens:
       - isInMaintenance
       - message
       - expectedBackAt
+      - minimumAppVersion
+      - contact
+      - availability
+      - availabilityMessage
     provenance: contract white-label.yaml PUT /tenant-config/status
 - id: CMS-002
   name: Brand Kit
@@ -894,9 +911,15 @@ screens:
       trigger: Component Preview
       provenance: derived — CMS-006 declares entryState.params bannerId, pageId, policyKind, version and
         CMS-005 holds none of them, so the edge carries nothing and CMS-006 opens cold
-  notes: Definition derived from the wireframe board on 14 August. Components, states and operations still
-    to be written. States derived from the screen pattern on 17 August, not individually considered —
-    sound for a list, a form or a money screen, and worth revisiting where this screen is unusual.
+  notes: 'Definition derived from the wireframe board on 14 August. Components, states and operations
+    still to be written. States derived from the screen pattern on 17 August, not individually considered
+    — sound for a list, a form or a money screen, and worth revisiting where this screen is unusual.
+
+
+    **A failing colour contrast is refused, not warned (decided 28 September, audit R139 (a)).** `setTheme`
+    answers `400` with a `ContrastProblem` naming each failing pair (foreground, background, ratio, the
+    ratio required, where it is used); the theme is not saved, and the editor keeps the entered colours
+    and marks the failing pairs so they can be corrected. There is no save-anyway.'
   density: compact
   pattern: statusTracker
   patternReason: '`getTheme` reads one record and nothing reads a population — the screen is about that
@@ -928,6 +951,15 @@ screens:
         label: Save theme
         operation: setTheme
         provenance: contract white-label.yaml PUT /tenant-config/theme
+      - kind: banner
+        label: Contrast refused
+        bindsTo: ContrastProblem
+        columns:
+        - ContrastProblem.failures
+        operation: setTheme
+        notes: Shown when `setTheme` answers 400. Lists every failing pair; the theme was not saved (decided
+          28 September, audit R139 (a)).
+        provenance: contract white-label.yaml PUT /tenant-config/theme
   states:
     loading: The theme editor, read by `getTheme`.
     error: Could not load. Names which read failed and leaves the theme editor untouched.
@@ -957,8 +989,10 @@ screens:
     component: modal
     trigger: Save theme
     body: '**Collects what `setTheme` sends before it is called.** Required: `primaryColour`, `secondaryColour`,
-      `backgroundColour`, `textColour`. Optional: `accentColour`, `darkMode`, `cornerRadius`. Dismissing
-      sends nothing; the screen behind is unchanged.'
+      `backgroundColour`, `textColour`. Optional: `accentColour`, `darkMode`, `cornerRadius`. **A colour
+      pair that fails contrast is refused** (`400 ContrastProblem`, decided 28 September, audit R139 (a)):
+      the modal stays open with the failing pairs marked. Dismissing sends nothing; the screen behind
+      is unchanged.'
     bindsTo: Theme
     confirm:
       label: Save theme
@@ -1238,9 +1272,18 @@ screens:
       - pageId
       provenance: derived — CMS-003 declares entryState.params bannerId, pageId, policyKind, version and
         CMS-007 holds pageId, so an edge into it carries them
-  notes: Definition derived from the wireframe board on 14 August. Components, states and operations still
-    to be written. States derived from the screen pattern on 17 August, not individually considered —
-    sound for a list, a form or a money screen, and worth revisiting where this screen is unusual.
+  notes: 'Definition derived from the wireframe board on 14 August. Components, states and operations
+    still to be written. States derived from the screen pattern on 17 August, not individually considered
+    — sound for a list, a form or a money screen, and worth revisiting where this screen is unusual.
+
+
+    **A section whose module is off is disabled in the builder (decided 28 September, audit R163 (4)).**
+    The builder reads `getModuleEnablement` and applies the mapping on `HomepageSectionKind`: `tickets`
+    needs `ticketsAndBooking`, `whatsOn` needs `events`, `attractions` needs `attractions`, `membership`
+    needs `membership`, `dining` needs `diningAndFnb`, `shop` needs `shop`, `map` needs `map`; `heroBanner`,
+    `quickActions`, `promotions`, `customContent` and `spacer` need none. A section whose module is off
+    cannot be added or made visible, and says which module to switch on (on CMS-001). `setHomepageLayout`
+    refuses such a section with 400 in any case.'
   density: compact
   pattern: statusTracker
   patternReason: '`getHomepageLayout` reads one record and nothing reads a population — the screen is
@@ -1260,6 +1303,17 @@ screens:
         - HomepageLayout.sections
         operation: getHomepageLayout
         provenance: contract white-label.yaml GET /tenant-config/homepage
+      - kind: detailPanel
+        label: Modules the sections need
+        bindsTo: ModuleEnablement
+        columns:
+        - ModuleEnablement.moduleKey
+        - ModuleEnablement.displayName
+        - ModuleEnablement.isEnabled
+        operation: getModuleEnablement
+        notes: A section whose module is off (mapping on `HomepageSectionKind`) is shown disabled and
+          cannot be added or made visible (decided 28 September, audit R163 (4)).
+        provenance: contract white-label.yaml GET /tenant-config/modules
       - kind: dataTable
         label: Every content page
         bindsTo: ContentPage
@@ -1332,6 +1386,11 @@ screens:
     contract: white-label
     purpose: Set homepage section order
     trigger: onAction
+  - operationId: getModuleEnablement
+    contract: white-label
+    purpose: Which modules are on, so a section whose module is off is disabled in the builder (decided
+      28 September, audit R163 (4))
+    trigger: onLoad
   wireframe:
     status: notStarted
     provenance: generated
@@ -1415,7 +1474,8 @@ screens:
     component: modal
     trigger: Save homepage layout
     body: '**Collects what `setHomepageLayout` sends before it is called.** Required: `sections`. Optional:
-      `id`. Dismissing sends nothing; the screen behind is unchanged.'
+      `id`. A section whose module is off is disabled here and cannot be made visible (audit R163 (4)).
+      Dismissing sends nothing; the screen behind is unchanged.'
     bindsTo: HomepageLayout
     confirm:
       label: Save homepage layout
@@ -1962,9 +2022,16 @@ screens:
       trigger: Typography
       provenance: derived — CMS-003 declares entryState.params bannerId, pageId, policyKind, version and
         CMS-010 holds none of them, so the edge carries nothing and CMS-003 opens cold
-  notes: Definition derived from the wireframe board on 14 August. Components, states and operations still
-    to be written. States derived from the screen pattern on 17 August, not individually considered —
-    sound for a list, a form or a money screen, and worth revisiting where this screen is unusual.
+  notes: 'Definition derived from the wireframe board on 14 August. Components, states and operations
+    still to be written. States derived from the screen pattern on 17 August, not individually considered
+    — sound for a list, a form or a money screen, and worth revisiting where this screen is unusual.
+
+
+    **Archive and quarantine are reversible; deletion is the only end of an asset''s life (decided 28
+    September, audit STATE-MEDIA).** An archived asset offers **Restore** (`updateMediaAsset` with `status:
+    ready`); a quarantined one offers **Release**, which is the same call after a reviewer has cleared
+    the scan flag (the state model marks that move as needing approval). **Delete media asset** (`deleteMediaAsset`)
+    removes the asset for good and is refused while it is referenced.'
   density: compact
   pattern: listDetail
   patternReason: '`searchMedia` reads the population and `getMediaEntitlements` reads one of them — list,
@@ -2160,13 +2227,46 @@ screens:
         label: Save media asset
         operation: updateMediaAsset
         provenance: contract assets.yaml PATCH /media/{mediaId}
+      - kind: secondaryButton
+        label: Restore media asset
+        operation: updateMediaAsset
+        notes: 'Shown on an `archived` asset. Sends `status: ready` (decided 28 September, audit STATE-MEDIA).'
+        provenance: contract assets.yaml PATCH /media/{mediaId}
+      - kind: secondaryButton
+        label: Release from quarantine
+        operation: updateMediaAsset
+        notes: 'Shown on a `quarantined` asset, to a reviewer, after the scan flag has been reviewed and
+          cleared. Sends `status: ready` (decided 28 September, audit STATE-MEDIA).'
+        provenance: contract assets.yaml PATCH /media/{mediaId}
   overlays:
   - id: confirmDeleteMediaAsset
     component: confirmDialog
     trigger: Delete media asset
     body: '**Names what `deleteMediaAsset` changes and what it leaves alone**, in the consequence rather
-      than the verb. A media this affects should be identified in the dialog, not just counted.'
+      than the verb. A media this affects should be identified in the dialog, not just counted. **Deletion
+      is the only end of an asset''s life and cannot be undone** (decided 28 September, audit STATE-MEDIA);
+      the dialog offers archiving instead where the asset may be wanted again, and lists every reference
+      when it is refused as in use.'
     provenance: contract assets.yaml DELETE /media/{mediaId}
+  - id: confirmRestoreMediaAsset
+    component: confirmDialog
+    trigger: Restore media asset
+    body: '**Returns an archived asset to `ready`**, so it can be used again (decided 28 September, audit
+      STATE-MEDIA). Names the asset.'
+    confirm:
+      label: Restore
+      operation: updateMediaAsset
+    provenance: contract assets.yaml PATCH /media/{mediaId}
+  - id: confirmReleaseMediaAsset
+    component: confirmDialog
+    trigger: Release from quarantine
+    body: '**Releases a quarantined asset to `ready` after review** (decided 28 September, audit STATE-MEDIA).
+      Names the asset and the scan finding, and records the reviewer; the state model marks this reversal
+      as needing approval.'
+    confirm:
+      label: Release
+      operation: updateMediaAsset
+    provenance: contract assets.yaml PATCH /media/{mediaId}
   - id: formAppendEntitlementToMedia
     component: modal
     trigger: Append entitlement to media
@@ -2730,9 +2830,14 @@ screens:
       provenance: flow F22 step 5→6
       carries:
       - version
-  notes: Definition derived from the wireframe board on 14 August. Components, states and operations still
-    to be written. States derived from the screen pattern on 17 August, not individually considered —
-    sound for a list, a form or a money screen, and worth revisiting where this screen is unusual.
+  notes: 'Definition derived from the wireframe board on 14 August. Components, states and operations
+    still to be written. States derived from the screen pattern on 17 August, not individually considered
+    — sound for a list, a form or a money screen, and worth revisiting where this screen is unusual.
+
+
+    **A rollback arrives here as a draft (decided 28 September, audit R139 (b)).** Version History (CMS-015)
+    restores an old version into the working draft with `restoreConfigVersion` and reviews it with `diffConfigVersion`;
+    only this screen''s `publishTenantConfig` puts it live, with a note. A rollback is never one click.'
   density: compact
   pattern: statusTracker
   patternReason: '`getTenantAppStatus` reads one record and nothing reads a population — the screen is
@@ -2840,10 +2945,14 @@ screens:
     component: apps/venue-management-web/src/routes/white-label/VersionHistoryDetail.tsx
     status: notStarted
   navigation:
+    entryFrom:
+    - CMS-001
+    - CMS-014
     exitTo:
     - CMS-001
     - CMS-002
     - CMS-003
+    - CMS-014
     inferred: true
     transitions:
     - to: CMS-001
@@ -2860,14 +2969,32 @@ screens:
       - version
       provenance: derived — CMS-003 declares entryState.params bannerId, pageId, policyKind, version and
         CMS-015 holds version, so an edge into it carries them
-  notes: Definition derived from the wireframe board on 14 August. Components, states and operations still
-    to be written. States derived from the screen pattern on 17 August, not individually considered —
-    sound for a list, a form or a money screen, and worth revisiting where this screen is unusual.
+    - to: CMS-014
+      trigger: Review and publish the restored draft
+      provenance: decided 28 September, audit R139 (b) — a restore lands in the working draft, and the
+        publish is a separate, deliberate step
+  notes: 'Definition derived from the wireframe board on 14 August. Components, states and operations
+    still to be written. States derived from the screen pattern on 17 August, not individually considered
+    — sound for a list, a form or a money screen, and worth revisiting where this screen is unusual.
+
+
+    **Absorbed CMS-020 on 28 September (audit R276)**: the Change Log listed the same `listConfigVersions`
+    rows (who published what, when, with which note) and nothing else, so it brought no operation; its
+    entry from the Tenant Workspace (CMS-001) now lands here.
+
+
+    **Rollback is restore, then review, then publish — never one click (decided 28 September, audit R139
+    (b)).** **Restore config version** calls `restoreConfigVersion`, which copies the chosen version into
+    the working draft and publishes nothing. The screen then shows **Diff config version** of the live
+    version against the restored draft (`diffConfigVersion`) as the review, and **Review and publish the
+    restored draft** goes to the Publishing Workflow (CMS-014), where `publishTenantConfig` puts it live
+    with a note.'
   density: compact
   pattern: listDetail
   patternReason: '`listConfigVersions` reads a population and nothing reads one of them; the detail is
     the row until a `get` exists'
-  purpose: See what changed and go back if it was wrong.
+  purpose: See who changed what and go back if it was wrong — by restoring into the draft, reviewing,
+    then publishing.
   layout:
     template: split
     regions:
@@ -2913,10 +3040,14 @@ screens:
       - kind: primaryButton
         label: Diff config version
         operation: diffConfigVersion
+        notes: After a restore this is the review step — the live version against the restored draft —
+          before anything is published (decided 28 September, audit R139 (b)).
         provenance: contract white-label.yaml GET /tenant-config/versions/{version}/diff
       - kind: secondaryButton
         label: Restore config version
         operation: restoreConfigVersion
+        notes: Restores into the working draft only; nothing goes live until it is reviewed and published
+          on CMS-014 (decided 28 September, audit R139 (b)).
         provenance: contract white-label.yaml POST /tenant-config/versions/{version}/restore
   states:
     loading: The version history list.
@@ -2939,7 +3070,7 @@ screens:
     trigger: onAction
   - operationId: restoreConfigVersion
     contract: white-label
-    purpose: Restore a previous version
+    purpose: Restore a previous version into the working draft; it does not publish (audit R139 (b))
     trigger: onAction
     invalidates:
     - listConfigVersions
@@ -2963,6 +3094,20 @@ screens:
   apisNote: Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop pack
     — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
     to the ones that matter is work a person still owes this screen.
+  overlays:
+  - id: confirmRestoreConfigVersion
+    component: confirmDialog
+    trigger: Restore config version
+    body: '**Restores the chosen version into the working draft and publishes nothing** (decided 28 September,
+      audit R139 (b)). Names the version and says that any unpublished changes in the draft are replaced.
+      Guests keep seeing the live version until the restored draft is reviewed (`diffConfigVersion`) and
+      published on CMS-014.'
+    confirm:
+      label: Restore into draft
+      operation: restoreConfigVersion
+    dismiss:
+      label: Cancel
+    provenance: contract white-label.yaml POST /tenant-config/versions/{version}/restore
 - id: CMS-016
   name: Site Settings
   module: White Label
@@ -3617,118 +3762,6 @@ screens:
     provenance: generated
     board: wireframes/P13 Venue CMS.dc.html#cms-019
   apisNote: Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack
-    — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
-    to the ones that matter is work a person still owes this screen.
-- id: CMS-020
-  name: Change Log
-  module: White Label
-  requiresModule: core
-  wave: 2
-  capability: C00
-  implementation:
-    app: venue-management-web
-    route: /white-label/change-log
-    component: apps/venue-management-web/src/routes/white-label/ChangeLogDetail.tsx
-    status: notStarted
-  navigation:
-    exitTo:
-    - CMS-001
-    - CMS-002
-    - CMS-003
-    inferred: false
-    entryFrom:
-    - CMS-001
-    notes: '**Reached from CMS-001** — a top-level workspace section. Stated on 4 September: this screen
-      exited somewhere and nothing exited to it, so it was outside the navigation graph entirely.'
-    transitions:
-    - to: CMS-001
-      trigger: Tenant Workspace
-      provenance: derived — CMS-001 declares entryState.params  and CMS-020 holds none of them, so the
-        edge carries nothing and CMS-001 opens cold
-    - to: CMS-002
-      trigger: Brand Kit
-      provenance: derived — CMS-002 declares entryState.params uploadId and CMS-020 holds none of them,
-        so the edge carries nothing and CMS-002 opens cold
-    - to: CMS-003
-      trigger: Typography
-      carries:
-      - version
-      provenance: derived — CMS-003 declares entryState.params bannerId, pageId, policyKind, version and
-        CMS-020 holds version, so an edge into it carries them
-  notes: Definition derived from the wireframe board on 14 August. Components, states and operations still
-    to be written. States derived from the screen pattern on 17 August, not individually considered —
-    sound for a list, a form or a money screen, and worth revisiting where this screen is unusual.
-  density: compact
-  pattern: listDetail
-  patternReason: '`listConfigVersions` reads a population and nothing reads one of them; the detail is
-    the row until a `get` exists'
-  purpose: See who changed what, before the publish that carried it.
-  layout:
-    template: split
-    regions:
-    - name: contentBody
-      slot: collection
-      components:
-      - kind: dataTable
-        label: Every config version
-        bindsTo: ConfigVersion
-        columns:
-        - ConfigVersion.publishedAt
-        - ConfigVersion.publishedByPrincipalId
-        - ConfigVersion.publishedByName
-        - ConfigVersion.note
-        - ConfigVersion.isCurrent
-        - ConfigVersion.scheduledFor
-        - ConfigVersion.contentHash
-        - ConfigVersion.pendingBuildTimeChanges
-        - ConfigVersion.scopePath
-        operation: listConfigVersions
-        provenance: contract white-label.yaml GET /tenant-config/versions
-    - name: contextPanel
-      slot: selection
-      components:
-      - kind: detailPanel
-        label: The selected config version
-        bindsTo: ConfigVersion
-        columns:
-        - ConfigVersion.publishedAt
-        - ConfigVersion.publishedByPrincipalId
-        - ConfigVersion.publishedByName
-        - ConfigVersion.note
-        - ConfigVersion.isCurrent
-        - ConfigVersion.scheduledFor
-        - ConfigVersion.contentHash
-        - ConfigVersion.pendingBuildTimeChanges
-        - ConfigVersion.scopePath
-        operation: listConfigVersions
-        provenance: contract white-label.yaml GET /tenant-config/versions
-  states:
-    loading: The change log list.
-    error: Could not load. Names which read failed and leaves the change log untouched.
-    emptyFirstRun: No change log yet. **Offers no create action** — this screen declares no operation
-      that makes one — and says so rather than showing an empty table.
-    emptyNoResults: 'Never shown: `listConfigVersions` takes no filter, so an empty list is always the
-      first-run state above.'
-    emptyNoAccess: Shown when the caller lacks `TENANT_CONFIGURE`, which `listConfigVersions` requires,
-      and names that permission. **Never an empty table** — that reads as *there is no data* and sends
-      somebody to support with the wrong question.
-  apis:
-  - operationId: listConfigVersions
-    contract: white-label
-    purpose: Version history
-    trigger: onLoad
-  entryState:
-    preloaded:
-    - ConfigVersion.publishedAt
-    - ConfigVersion.publishedByPrincipalId
-    - ConfigVersion.publishedByName
-    - ConfigVersion.note
-    - ConfigVersion.isCurrent
-  wireframe:
-    status: notStarted
-    provenance: generated
-    board: wireframes/P13 Venue CMS.dc.html#cms-020
-  apisNote: Rebuilt 9 September 2026 from the 1 operation this screen declares, not from a workshop pack
     — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
     to the ones that matter is work a person still owes this screen.
 - id: CMS-021
@@ -10545,6 +10578,10 @@ screens:
       trigger: Back to AI Asset Intelligence Command Center
       provenance: structural — pack board 2 wiring, 11 September 2026
       back: true
+  notes: '**Archive and quarantine are reversible; deletion is the only end of an asset''s life (decided
+    28 September, audit STATE-MEDIA).** Archive Duplicate archives the copy (`updateMediaAsset`, `status:
+    archived`) and can be undone with Restore Archived Copy; Delete Duplicate (`deleteMediaAsset`) removes
+    it for good.'
   density: compact
   pattern: listDetail
   patternReason: '**nothing in the pack chooses a pattern for this screen** — no metric directory, no
@@ -10593,19 +10630,47 @@ screens:
       - kind: secondaryButton
         label: Replace Duplicate
         provenance: pack Digital Asset Management DAM.pdf, page 30 §Actions
-      - kind: destructiveButton
+      - kind: secondaryButton
         label: Archive Duplicate
+        operation: updateMediaAsset
+        notes: 'Sends `status: archived`; reversible — an archived copy can be restored (decided 28 September,
+          audit STATE-MEDIA).'
         provenance: pack Digital Asset Management DAM.pdf, page 30 §Actions
+      - kind: secondaryButton
+        label: Restore Archived Copy
+        operation: updateMediaAsset
+        notes: 'Shown on an archived copy. Sends `status: ready` (decided 28 September, audit STATE-MEDIA).'
+        provenance: contract assets.yaml PATCH /media/{mediaId}
+      - kind: destructiveButton
+        label: Delete Duplicate
+        operation: deleteMediaAsset
+        notes: The only end of a copy's life; refused while the copy is referenced (decided 28 September,
+          audit STATE-MEDIA).
+        provenance: contract assets.yaml DELETE /media/{mediaId}
     - name: contentBody
       components: []
   overlays:
   - id: confirmArchiveDuplicate
     component: confirmDialog
     trigger: Archive Duplicate
-    body: '**Archive Duplicate on a duplicate near-duplicate is not reversible from this screen.** Names
-      what it affects and what it leaves alone. The pack requires the decision to reach the audit trail,
-      so the dialog states that it is recorded.'
+    body: '**Archive Duplicate is reversible** (decided 28 September, audit STATE-MEDIA): the copy leaves
+      use and can be restored to `ready`; it is refused while the copy is referenced. Names what it affects
+      and what it leaves alone. The pack requires the decision to reach the audit trail, so the dialog
+      states that it is recorded.'
+    confirm:
+      label: Archive
+      operation: updateMediaAsset
     provenance: pack Digital Asset Management DAM.pdf, page 30 §Actions
+  - id: confirmDeleteDuplicate
+    component: confirmDialog
+    trigger: Delete Duplicate
+    body: '**Deletes the copy for good** — deletion is the only end of an asset''s life (decided 28 September,
+      audit STATE-MEDIA). Names the copy and the asset it duplicates, lists every reference when refused
+      as in use, and offers Archive instead where the copy may be wanted again.'
+    confirm:
+      label: Delete
+      operation: deleteMediaAsset
+    provenance: contract assets.yaml DELETE /media/{mediaId}
   states:
     loading: The duplicate near-duplicate list.
     error: Could not load. Names which read failed and leaves the duplicate near-duplicate untouched.
@@ -10623,11 +10688,17 @@ screens:
     provenance: board reading, 19 September 2026
   - operationId: deleteMediaAsset
     contract: assets
-    purpose: Retire the copy
+    purpose: Delete the copy — the only end of an asset's life (audit STATE-MEDIA)
     trigger: onAction
     provenance: board reading, 19 September 2026
     invalidates:
     - searchMedia
+  - operationId: updateMediaAsset
+    contract: assets
+    purpose: Archive a copy, or restore an archived one (decided 28 September, audit STATE-MEDIA)
+    trigger: onAction
+    invalidates:
+    - findSimilarMediaAssets
   wireframe:
     status: notStarted
     board: wireframes/P13 Venue CMS.dc.html#cms-075

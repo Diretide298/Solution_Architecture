@@ -10,15 +10,15 @@
  "generated": "2026-09-28",
  "note": "Derived by tools/derive-platform.py. **The gaps section is the point** \u2014 a page listing what exists is a directory; one listing what is missing is a worklist.",
  "counts": {
-  "screens": 100,
+  "screens": 99,
   "operations": 123,
   "contracts": 7,
   "modules": 3,
   "undrawn": 0,
-  "operationsWithNoScreen": 107
+  "operationsWithNoScreen": 109
  },
  "waves": {
-  "wave2": 20,
+  "wave2": 19,
   "wave3": 80
  },
  "modules": [
@@ -38,7 +38,7 @@
   },
   {
    "module": "White Label",
-   "screens": 20,
+   "screens": 19,
    "waves": [
     2
    ]
@@ -135,7 +135,7 @@
    "module": "White Label",
    "wave": 2,
    "route": "/white-label/page-builder",
-   "operations": 6,
+   "operations": 7,
    "drawn": true
   },
   {
@@ -244,15 +244,6 @@
    "wave": 2,
    "route": "/white-label/user-access",
    "operations": 2,
-   "drawn": true
-  },
-  {
-   "id": "CMS-020",
-   "name": "Change Log",
-   "module": "White Label",
-   "wave": 2,
-   "route": "/white-label/change-log",
-   "operations": 1,
    "drawn": true
   },
   {
@@ -747,7 +738,7 @@
    "module": "Media Library",
    "wave": 3,
    "route": "/media-library/duplicate-near-duplicate-management-cms-075",
-   "operations": 2,
+   "operations": 3,
    "drawn": true
   },
   {
@@ -1015,6 +1006,12 @@
     "summary": "Escalate a finding"
    },
    {
+    "operation": "getAllergenVerification",
+    "contract": "fnb",
+    "verb": "GET",
+    "summary": "The last allergen verdict recorded for a dish"
+   },
+   {
     "operation": "getFnbReservationPolicy",
     "contract": "fnb",
     "verb": "GET",
@@ -1163,6 +1160,12 @@
     "contract": "identity",
     "verb": "GET",
     "summary": "A membership with its history, usage and renewals"
+   },
+   {
+    "operation": "getPasswordPolicy",
+    "contract": "identity",
+    "verb": "GET",
+    "summary": "Read the password and MFA policy in force"
    },
    {
     "operation": "getPrincipalModuleAccess",

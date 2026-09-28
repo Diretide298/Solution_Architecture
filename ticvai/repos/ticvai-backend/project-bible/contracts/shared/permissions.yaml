@@ -41,6 +41,31 @@ info:
     [docs/architecture/specs/permission-resolution.md](../../docs/architecture/specs/permission-resolution.md):
     deny-overrides-allow, downward inheritance only, default deny, resolved once at login.
 
+    ## What `x-ticvai-permission-escalated` means
+
+    **Decided 28 September, audit R197.** An operation may declare a second, higher permission
+    beside its base one. **The escalated permission is required only above a configured value
+    threshold** — an amount, a count or a percentage that the operation's own description names,
+    and that the venue sets as policy (the way NOTE-1 below keeps the refund threshold out of the
+    grant). Below the threshold the base permission is enough; above it the caller must also hold
+    the escalated one at the same scope, or the call is refused `403`.
+
+    **The escalated permission must be a different, manager-level permission from the base.** An
+    escalation that repeats the base gates nothing. **Where no threshold makes sense, the operation
+    declares no escalation at all** rather than a copy of its base. A condition that is not a value
+    (the order is somebody else's, the box is not the caller's own) is written as a comment on the
+    declaration, as `closeShift` does.
+
+    **Who holds the escalated permission is role configuration**, not a contract fact: the seeded
+    role templates give it to the manager roles, and a tenant may move it.
+
+    ## Who must use MFA
+
+    **By permission, not by role — decided 28 September, audit R135.** A principal holding any
+    permission in `PasswordPolicy.mfaRequiredForPermissions` (contracts/spine/identity.yaml) must
+    have an active MFA method. The platform floor is `ROLE_MANAGE`, `LEDGER_APPROVE` and every
+    `PLATFORM_*` permission; a tenant may add to the list and never remove from the floor.
+
 components:
   schemas:
     Permission:
@@ -73,9 +98,19 @@ components:
         - PLATFORM_RELEASE_PROMOTE    # promote, pause, roll back. Separate from MANAGE
         - PLATFORM_MIGRATION_VIEW
         - PLATFORM_MIGRATION_APPLY    # apply a plan. Requires step-up
+        - PLATFORM_TENANT_ACCESS      # open a time-boxed platform-staff grant into one tenant
+        # **How a platform operator acts inside a tenant — decided 28 September, audit R098.** The
+        # operator picks a tenant and opens a platform-staff grant (`openPlatformStaffGrant`,
+        # contracts/spine/identity.yaml). The grant is time-boxed, names the permissions it carries,
+        # and every action under it is audited and listed to the tenant. Holding this permission
+        # grants nothing in a cell by itself.
 
         # --- Tenant experience ---
         - TENANT_CONFIGURE            # edit branding, content, navigation, modules
+        - TENANT_VIEW                 # read venue settings and policies without being able to change them
+        # **Decided 28 September, audit R091 (3).** `getVenueSettings`, `getOfflinePolicy` and
+        # `getConnectivityPolicy` were gated by `TENANT_CONFIGURE`, so anybody who needed to *see*
+        # a venue's settings had to be allowed to change them.
         - TENANT_PUBLISH              # publish a configuration version, restore a prior one
 
         # --- Organisation -----------------------------------------------------
@@ -87,6 +122,11 @@ components:
         # --- Catalogue --------------------------------------------------------
         - PRODUCT_VIEW
         - PRODUCT_CONFIGURE
+        - PRODUCT_APPROVE             # move a product from review to approved
+        - PRODUCT_PUBLISH             # make an approved product live
+        # **Approving and publishing are different acts — decided 28 September, audit R091 (2).**
+        # A product manager approves; an operator publishes. Both rode `PRODUCT_CONFIGURE`, so the
+        # person who wrote a product could also approve and publish it.
         - PRICE_VIEW
         - PRICE_CONFIGURE
         - EVENT_CONFIGURE
@@ -154,7 +194,7 @@ components:
         - ACCESS_VALIDATE             # scan and admit
         - ACCESS_OVERRIDE             # admit against a failed validation, logged
         - ACCESS_POINT_CONFIGURE
-        - TURNSTILE_MODE_SET          # entry, re-entry, crossover, exit, free, closed
+        - TURNSTILE_MODE_SET          # the podium: operating mode, and free rotation or closed within it (R221)
         - TICKET_LOOKUP               # read-only validity check, no admission
 
         # --- Accreditation ----------------------------------------------------
@@ -296,10 +336,23 @@ components:
         - WORKFORCE_MANAGE
         - ATTENDANCE_RECORD
         - ANNOUNCEMENT_PUBLISH
+        - ANNOUNCEMENT_EMERGENCY      # declare an emergency announcement or an evacuation broadcast
+        # **Decided 28 September, audit R091 (1).** Posting a staff notice must not carry the
+        # ability to declare an emergency, which overrides every home screen and bypasses quiet hours.
         - PARTNER_VIEW
         - PARTNER_MANAGE
         - PARKING_CONFIGURE
         - PAYMENT_VOID
+
+        # --- Procurement ---
+        # **Procurement gets its own permissions — decided 28 September, audit R091 (4).** It was
+        # borrowing `ORDER_*`, `PRODUCT_CONFIGURE` and `LEDGER_APPROVE`, so a role allowed to raise
+        # a purchase order could also void a guest's order, and one allowed to reject a requisition
+        # could approve journals. Deciding a requisition is `APPROVAL_ACT`, as every other approval.
+        - PROCUREMENT_VIEW            # requisitions, suppliers, quotations, purchase orders, receipts
+        - PROCUREMENT_REQUEST         # raise, amend and cancel a requisition
+        - PROCUREMENT_MANAGE          # suppliers, quotations; raise, send, cancel and short-close a PO
+        - PROCUREMENT_RECEIVE         # record and reject received goods
 
     PermissionSet:
       type: array

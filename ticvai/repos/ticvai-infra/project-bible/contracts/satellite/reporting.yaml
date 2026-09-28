@@ -2,7 +2,7 @@ openapi: 3.1.0
 info:
   title: TICVAI Reporting & Analytics
   version: 0.1.0
-  x-ticvai-screen-count: 40
+  x-ticvai-screen-count: 42
   x-ticvai-tier: satellite
   x-ticvai-module: 8 — Unified Operations Dashboard  ·  cross-cutting
   x-ticvai-requirements: 332
@@ -72,12 +72,33 @@ paths:
       description: 'BL-053. **A venue opening on Monday does not want a report builder — it wants the
         reports every venue runs.**
 
-        Seeded at provisioning and **editable**: a venue that cannot change a system report will rebuild
-        it from scratch and maintain two.
+        Seeded at provisioning and **clone-only (decided 28 September, audit R096)**: a system report
+        cannot be amended or retired; a venue that wants it different clones it with `createReport` and
+        changes the copy, so the seeded one stays the reference every venue shares.
 
-        Covers approval throughput and ageing (11.1), supplier performance and spend (15.3), slow-moving
-        and expiring stock (15.4), void checks (6.1.29) and the financial pack (5.7.80) — **every one
-        of them a report over data that already existed.**
+        **The eight, proposed from the screens that need them, client to correct (decided 28 September,
+        audit R282).** Code, what it shows, its data source, and the screen that runs it:
+
+        - `terminalDayView`: sales, tenders, voids and refunds for one terminal today (`orders`); POS-008.
+
+        - `salesByChannel`: net sales per sales channel for the period (`orders`); BO-059.
+
+        - `attendanceAndFootfall`: admissions per hour and per entry point, against capacity
+        (`scanEvents`); BO-060.
+
+        - `shiftSummary`: each till shift''s takings, expected against counted cash, and variance
+        (`shifts`); POS-020.
+
+        - `refunds`: refunds by reason, operator and tender (`refunds`).
+
+        - `voidsAndDiscounts`: voided lines and discounts by operator, reason and approver (`orderLines`);
+        BO-133.
+
+        - `stockValuation`: stock on hand at cost, by location and category (`stockBatches`).
+
+        - `fnbSales`: F&B sales by outlet, item and hour (`orderLines`, F&B outlets only).
+
+        Each is run with `runReport` naming its `reportId`; a screen that runs a report names which.
 
         '
       tags:
@@ -116,6 +137,12 @@ paths:
 
         **OTIF is the measure procurement actually uses**: on time *and* in full, because a delivery that
         is early and short is not a good delivery.
+
+        **The definitions (decided 28 September, audit R158).** A purchase order line is **on time** when
+        its goods receipt is recorded on or before the purchase order''s expected delivery date, and **in
+        full** when the received quantity is at least the ordered quantity. `onTimeInFullPercent` is the
+        share of lines that are both; `averageDaysLate` counts days from the expected date to the receipt
+        for the late ones.
 
         **Rejection reasons are separated from short deliveries.** One is a quality problem and the other
         is a supply problem, and a single fill-rate number hides which.
@@ -251,6 +278,15 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/AlertRule'
+        '400':
+          description: An `outsideRange` rule without both `threshold` and `thresholdUpper`, or with the
+            upper not above the lower (audit R158)
+          x-ticvai-problem-types:
+          - validation
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
   /alerts:
     get:
       operationId: listAlerts
@@ -263,7 +299,6 @@ paths:
         - "P08 BO-125 Product & Category Button Configuration"
         - "P08 BO-133 Offline Alerts, Limits & Audit"
         - "P08 BO-141 Operational Alerts, AI Replenishment & Action Center"
-        - "P08 BO-472 Operational Alerts & Exception Center"
         - "P16 ANL-001 Executive Command Center"
         - "P16 ANL-003 Operational Performance"
         - "P16 ANL-009 AI Assistant & Action Center"
@@ -289,6 +324,11 @@ paths:
       parameters:
       - name: status
         in: query
+        description: '**Defaults to open alerts (decided 28 September, audit R158)**: with no `status`
+          the list holds `raised` and `acknowledged` alerts, never `resolved` or `expired` ones. Send a
+          status to read exactly that one.
+
+          '
         schema:
           $ref: '#/components/schemas/AlertStatus'
       - name: severity
@@ -386,7 +426,6 @@ paths:
         - "P08 BO-058 Reporting Home"
         - "P08 BO-059 Sales Reports"
         - "P08 BO-060 Attendance & Footfall"
-        - "P08 BO-061 Scheduled Reports"
         - "P10 PTR-018 Reports & Sales Performance"
         - "P12 SUP-008 Agent Performance & SLA View"
         - "P16 ANL-031 Report Catalogue & Library"
@@ -439,7 +478,6 @@ paths:
         - "P08 BO-058 Reporting Home"
         - "P08 BO-059 Sales Reports"
         - "P08 BO-060 Attendance & Footfall"
-        - "P08 BO-061 Scheduled Reports"
         - "P08 BO-1060 Report Builder, Export & Audit"
         - "P10 PTR-018 Reports & Sales Performance"
         - "P12 SUP-008 Agent Performance & SLA View"
@@ -508,7 +546,6 @@ paths:
         - "P08 BO-058 Reporting Home"
         - "P08 BO-059 Sales Reports"
         - "P08 BO-060 Attendance & Footfall"
-        - "P08 BO-061 Scheduled Reports"
         - "P10 PTR-018 Reports & Sales Performance"
         - "P12 SUP-008 Agent Performance & SLA View"
       x-ticvai-audience:
@@ -538,7 +575,6 @@ paths:
         - "P08 BO-058 Reporting Home"
         - "P08 BO-059 Sales Reports"
         - "P08 BO-060 Attendance & Footfall"
-        - "P08 BO-061 Scheduled Reports"
         - "P10 PTR-018 Reports & Sales Performance"
         - "P12 SUP-008 Agent Performance & SLA View"
         - "P16 ANL-035 Filter & Parameter Builder"
@@ -562,6 +598,9 @@ paths:
         new definition: columns, filters, grouping and parameters left out of it are not in the new
         version. An unknown `reportId` is `404`; there is no create-on-PUT, `createReport` makes
         definitions. The server assigns the new `version`.
+
+        **A system report is refused (decided 28 September, audit R096)**: seeded reports are clone-only,
+        so an `isSystem` definition answers 409 `system-report`. Clone it with `createReport`.
 
         '
       tags:
@@ -588,6 +627,14 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ReportDefinition'
+        '409':
+          description: The report is a system report, which is clone-only (audit R096).
+          x-ticvai-problem-types:
+          - system-report
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
     delete:
       operationId: deleteReport
       x-ticvai-consumed-by:
@@ -596,7 +643,6 @@ paths:
         - "P08 BO-058 Reporting Home"
         - "P08 BO-059 Sales Reports"
         - "P08 BO-060 Attendance & Footfall"
-        - "P08 BO-061 Scheduled Reports"
         - "P10 PTR-018 Reports & Sales Performance"
         - "P12 SUP-008 Agent Performance & SLA View"
       x-ticvai-audience:
@@ -608,7 +654,8 @@ paths:
         continue to resolve. Removed only where nothing references it.
 
         **Refused with `409` while an active (unpaused) schedule references it** — pause or delete the
-        schedule first. Both the retire and the removal answer `204`.
+        schedule first. Both the retire and the removal answer `204`. **A system report is refused with
+        `409` too** (clone-only, audit R096).
 
         '
       tags:
@@ -626,7 +673,11 @@ paths:
               $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Retired, or removed where nothing referenced it
         '409':
-          description: Active schedules reference this report
+          description: Active schedules reference this report (`report-scheduled`), or it is a system
+            report, which is clone-only (`system-report`, audit R096)
+          x-ticvai-problem-types:
+          - report-scheduled
+          - system-report
           content:
             application/problem+json:
               schema:
@@ -684,7 +735,6 @@ paths:
         - "P08 BO-058 Reporting Home"
         - "P08 BO-059 Sales Reports"
         - "P08 BO-060 Attendance & Footfall"
-        - "P08 BO-061 Scheduled Reports"
         - "P08 BO-1059 Heat Maps & Drill-Down"
         - "P08 BO-1082 Admissions Revenue"
         - "P08 BO-115 Category, Brand & Merchandise Hierarchy"
@@ -711,6 +761,14 @@ paths:
 
         Small results return inline. Anything beyond the inline threshold returns `202` with an execution
         to poll — a synchronous response containing a year of scan events is a timeout waiting to happen.
+        **The threshold is `VenueSettings.reporting.inlineRunRowLimit`**, a venue setting with a tenant
+        default (decided 28 September, audit R094): a run whose estimated rows exceed it, or whose
+        definition''s `estimatedCost` is `high`, is queued. **Proposed default 5,000 rows, client to
+        correct (audit R094).**
+
+        **Dates (decided 28 September, audit R158).** With no `dateFrom` or `dateTo` the run covers today
+        in the venue''s time zone, and a range longer than the definition''s `maxDateRangeDays` (366 when
+        the definition sets none) is a 400.
 
         Scope is applied from the caller''s resolved permissions. Parameters narrow; they never widen.
 
@@ -758,7 +816,8 @@ paths:
                 executionId: $response.body#/id
               description: The rows, once the execution has completed.
         '400':
-          description: Required parameter missing, or the date range exceeds the limit
+          description: Required parameter missing, or the date range exceeds `maxDateRangeDays` (366 days
+            when the definition sets none, audit R158)
           content:
             application/problem+json:
               schema:
@@ -770,6 +829,7 @@ paths:
       operationId: listReportExecutions
       x-ticvai-consumed-by:
         - "P08 BO-058 Reporting Home"
+        - "P08 BO-061 Scheduled Reports"
       x-ticvai-audience:
       - staff
       x-ticvai-read-routing: analytical
@@ -792,6 +852,12 @@ paths:
           $ref: '#/components/schemas/ExecutionStatus'
       - name: mineOnly
         in: query
+        description: '**Who sees other people''s runs (decided 28 September, audit R158)**: venue managers
+          see their venue''s runs. With `mineOnly` false, runs by other principals are returned for the
+          venues where the caller holds `REPORT_MANAGE`, and nowhere else; a caller without it gets only
+          their own runs whatever this says.
+
+          '
         schema:
           type: boolean
           default: true
@@ -918,6 +984,7 @@ paths:
     get:
       operationId: listReportSchedules
       x-ticvai-consumed-by:
+        - "P08 BO-061 Scheduled Reports"
         - "P16 ANL-041 Reporting Governance Command Center"
         - "P16 ANL-042 Report Scheduler"
       x-ticvai-audience:
@@ -951,6 +1018,7 @@ paths:
       operationId: createReportSchedule
       x-ticvai-consumed-by:
         - "P08 BO-058 Reporting Home"
+        - "P08 BO-061 Scheduled Reports"
         - "P16 ANL-042 Report Scheduler"
       x-ticvai-audience:
       - staff
@@ -987,7 +1055,8 @@ paths:
               schema:
                 $ref: '#/components/schemas/ReportSchedule'
         '400':
-          description: Invalid cadence, or no recipients
+          description: Invalid cadence (a field its frequency needs is missing, or one it does not take is
+            sent, audit R158), or no recipients
           content:
             application/problem+json:
               schema:
@@ -1002,6 +1071,8 @@ paths:
         format: uuid
     patch:
       operationId: updateReportSchedule
+      x-ticvai-consumed-by:
+        - "P08 BO-061 Scheduled Reports"
       x-ticvai-audience:
       - staff
       summary: Amend, pause or resume a schedule
@@ -1043,6 +1114,8 @@ paths:
                 $ref: '#/components/schemas/ReportSchedule'
     delete:
       operationId: deleteReportSchedule
+      x-ticvai-consumed-by:
+        - "P08 BO-061 Scheduled Reports"
       x-ticvai-audience:
       - staff
       summary: Delete a schedule
@@ -1260,6 +1333,11 @@ paths:
         the response reports the aggregate query cost — a dashboard of twelve tiles refreshing every thirty
         seconds is a load problem disguised as a convenience.
 
+        **The budget is `VenueSettings.reporting.dashboardRefreshBudgetPerMinute`**, a venue setting with a
+        tenant default (decided 28 September, audit R094); a tenant-wide dashboard uses the tenant default.
+        The dashboard''s tile refreshes per minute, summed over its tiles, may not exceed it. **Proposed
+        default 24 refreshes per minute, client to correct (audit R094).**
+
         '
       tags:
       - dashboard
@@ -1286,7 +1364,8 @@ paths:
               schema:
                 $ref: '#/components/schemas/Dashboard'
         '400':
-          description: Aggregate refresh cost exceeds the configured budget
+          description: The tiles' refreshes per minute exceed `VenueSettings.reporting.dashboardRefreshBudgetPerMinute`
+            (proposed default 24, audit R094)
           content:
             application/problem+json:
               schema:
@@ -1446,7 +1525,6 @@ paths:
         - "P08 BO-058 Reporting Home"
         - "P08 BO-059 Sales Reports"
         - "P08 BO-060 Attendance & Footfall"
-        - "P08 BO-061 Scheduled Reports"
         - "P08 BO-593 AI Rental Management Copilot & Action Center"
         - "P10 PTR-018 Reports & Sales Performance"
         - "P12 SUP-008 Agent Performance & SLA View"
@@ -1550,7 +1628,6 @@ paths:
         - "P08 BO-058 Reporting Home"
         - "P08 BO-059 Sales Reports"
         - "P08 BO-060 Attendance & Footfall"
-        - "P08 BO-061 Scheduled Reports"
         - "P10 PTR-018 Reports & Sales Performance"
         - "P12 SUP-008 Agent Performance & SLA View"
         - "P16 ANL-052 Ask TICVAI — Natural Language Analytics"
@@ -1729,10 +1806,18 @@ paths:
     get:
       operationId: getKpiValues
       x-ticvai-consumed-by:
+        - "P08 BO-005 Queue Monitor"
+        - "P08 BO-100 Venue Home"
+        - "P08 BO-103 Access & Venue"
+        - "P08 BO-104 Food & Beverage"
+        - "P08 BO-105 Stock & Supply"
         - "P08 BO-1052 Occupancy Reporting"
         - "P08 BO-1053 Zone Performance Reporting"
         - "P08 BO-1054 Revenue by Section"
         - "P08 BO-1056 Seat Utilization Analytics"
+        - "P08 BO-106 People & Access Rights"
+        - "P08 BO-107 Guests & Marketing"
+        - "P08 BO-108 Venue Operations"
         - "P08 BO-1081 Finance Dashboard"
         - "P08 BO-1082 Admissions Revenue"
         - "P08 BO-585 Rental Revenue & Commercial Analytics"
@@ -1751,6 +1836,13 @@ paths:
         freshness in one call — a dashboard assembling those from four places will render three of them
         and spin on the fourth.
 
+        **Takings and admissions are always offered (decided 28 September, audit R283).** Two system KPIs
+        are seeded at provisioning for every tenant, so a hub can ask for them by code without knowing
+        an id: `takings`, the gross value of payments taken in the period (currency, from `orders`
+        payments less refunds), and `admissions`, admitted in-direction scans in the period (count, from
+        `access.scan_event`). With no `period`, the period is today in the venue''s time zone. The
+        back-office hubs and the Queue Monitor read their takings and admissions tiles here.
+
         '
       tags:
       - reporting
@@ -1762,6 +1854,12 @@ paths:
       parameters:
       - name: kpiIds
         in: query
+        schema:
+          type: string
+      - name: kpiCodes
+        in: query
+        description: Comma-separated KPI codes, as an alternative to `kpiIds` — `takings,admissions`
+          for the seeded pair (audit R283).
         schema:
           type: string
       - name: scopePath
@@ -2151,6 +2249,10 @@ components:
           format: uuid
         code:
           type: string
+          description: '`takings` and `admissions` are seeded for every tenant as system KPIs (decided 28
+            September, audit R283).
+
+            '
         name:
           type: string
         description:
@@ -2628,8 +2730,10 @@ components:
         **A venue opening on Monday does not want a report builder. It wants the eight reports every venue
         runs**, and the ability to change them.
 
-        Seeded at provisioning, `isSystem` true, **editable and forkable rather than locked**: a venue
-        that cannot change a system report will rebuild it from scratch and maintain two.
+        Seeded at provisioning, `isSystem` true, and **clone-only (decided 28 September, audit R096)**:
+        `updateReport` and `deleteReport` refuse a system report with 409, and a venue that wants one
+        different clones it with `createReport`. The eight codes are listed on `listSeededReports`
+        (proposed, audit R282).
 
         '
       required:
@@ -2711,6 +2815,11 @@ components:
           allOf:
           - $ref: '#/components/schemas/MetricValue'
           nullable: true
+          description: '**Required when `comparator` is `outsideRange`** (decided 28 September, audit R158):
+            the range is `threshold` to `thresholdUpper`, and a rule missing either, or with the upper not
+            above the lower, is refused by `setAlertRule` with 400. Ignored for every other comparator.
+
+            '
         windowMinutes:
           type: integer
           default: 15
@@ -3206,7 +3315,11 @@ components:
         maxDateRangeDays:
           type: integer
           nullable: true
-          description: Guards against a query spanning years of scan events.
+          minimum: 1
+          default: 366
+          description: Guards against a query spanning years of scan events. **When a report sets none,
+            366 days applies (decided 28 September, audit R158)**, so `runReport`'s date-range 400 always
+            has a limit.
     ReportDefinition:
       x-ticvai-persistence: reporting.report_definition + reporting.report_column + reporting.report_filter
       allOf:
@@ -3229,8 +3342,8 @@ components:
           isSystem:
             type: boolean
             description: 'Shipped with the platform — seeded at provisioning (BL-053, `SeededReport`).
-              **Editable and forkable, not locked**: a venue that cannot change a system report
-              rebuilds it and maintains two.
+              **Clone-only (decided 28 September, audit R096)**: `updateReport` and `deleteReport`
+              refuse it with 409 `system-report`; a venue changes a copy made with `createReport`.
 
               '
           isRetired:
@@ -3334,9 +3447,12 @@ components:
         dateFrom:
           type: string
           format: date
+          description: Defaults to today in the venue's time zone when not sent (decided 28 September,
+            audit R158).
         dateTo:
           type: string
           format: date
+          description: Defaults to today in the venue's time zone when not sent (audit R158).
         forceAsync:
           type: boolean
           default: false
@@ -3469,6 +3585,14 @@ components:
     Cadence:
       x-ticvai-persistence: none — embedded in schedule
       type: object
+      description: '**What each frequency needs (decided 28 September, audit R158).** `daily`: `timeOfDay`.
+        `weekly`: `dayOfWeek` and `timeOfDay`. `monthly`: `dayOfMonth` and `timeOfDay`, a day past the
+        month''s end running on its last day. `quarterly`: `dayOfMonth` and `timeOfDay`, in the first
+        month of each quarter. `onShiftClose` and `onPeriodClose`: nothing else, they run on the event.
+        A field a frequency needs and does not have, or one it does not take, is the 400 on
+        `createReportSchedule`. **Times are in the venue''s time zone.**
+
+        '
       required:
       - frequency
       properties:
@@ -3494,6 +3618,9 @@ components:
           pattern: ^([01]\d|2[0-3]):[0-5]\d$
         timeZone:
           type: string
+          readOnly: true
+          description: Always the venue's time zone (decided 28 September, audit R158), returned so a
+            reader knows which. Not taken on a write.
     Recipient:
       x-ticvai-persistence: reporting.schedule_recipient
       type: object

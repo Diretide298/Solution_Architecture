@@ -10,8 +10,8 @@ scale: Analytical. Runs against the replica and the analytical store.
 ifDown: Down stops dashboards. **Nothing operational depends on it.**
 coverage:
   operations: 44
-  inAFlow: 18
-  percent: 41%
+  inAFlow: 17
+  percent: 39%
   note: '**Flow coverage is how much of this service a journey has walked.** A service under 40% is
     unwalked rather than under-documented.'
 schemas:
@@ -597,6 +597,7 @@ screens:
 - P04:POS-020 Shift Exceptions & Alerts
 - P04:POS-025 Till Home
 - P06:EMP-070 Inventory Exceptions, AI Replenishment & Action Center
+- P08:BO-005 Queue Monitor
 - P08:BO-010 Promotions & Coupons
 - P08:BO-029 Report Builder
 - P08:BO-036 Device Registry
@@ -605,12 +606,19 @@ screens:
 - P08:BO-060 Attendance & Footfall
 - P08:BO-061 Scheduled Reports
 - P08:BO-083 Suppliers
+- P08:BO-100 Venue Home
+- P08:BO-103 Access & Venue
+- P08:BO-104 Food & Beverage
+- P08:BO-105 Stock & Supply
 - P08:BO-1052 Occupancy Reporting
 - P08:BO-1053 Zone Performance Reporting
 - P08:BO-1054 Revenue by Section
 - P08:BO-1056 Seat Utilization Analytics
 - P08:BO-1059 Heat Maps & Drill-Down
+- P08:BO-106 People & Access Rights
 - P08:BO-1060 Report Builder, Export & Audit
+- P08:BO-107 Guests & Marketing
+- P08:BO-108 Venue Operations
 - P08:BO-1081 Finance Dashboard
 - P08:BO-1082 Admissions Revenue
 - P08:BO-115 Category, Brand & Merchandise Hierarchy
@@ -619,7 +627,6 @@ screens:
 - P08:BO-126 Deployment, Preview & Audit
 - P08:BO-133 Offline Alerts, Limits & Audit
 - P08:BO-141 Operational Alerts, AI Replenishment & Action Center
-- P08:BO-472 Operational Alerts & Exception Center
 - P08:BO-585 Rental Revenue & Commercial Analytics
 - P08:BO-590 Location & Channel Performance
 - P08:BO-593 AI Rental Management Copilot & Action Center
@@ -700,7 +707,6 @@ flows:
 - F33 A till goes offline and comes back
 - F74 A shift closes and the day is reported
 - F77 A promotion is built, bundled, published and measured
-- F78 A supplier is set up and a catalogue is priced and published
 - F82 A month is analysed from incrementality to a scheduled report
 - F90 An audience is built, offered to, and the result is judged
 - F95 A fleet is watched, a fault is found, and a station is fixed

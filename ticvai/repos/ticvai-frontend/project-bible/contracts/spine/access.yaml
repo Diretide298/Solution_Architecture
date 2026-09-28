@@ -2,7 +2,7 @@ openapi: 3.1.0
 info:
   title: TICVAI Access Control
   version: 1.0.0
-  x-ticvai-screen-count: 177
+  x-ticvai-screen-count: 176
   x-ticvai-tier: spine
   x-ticvai-module: 3 — Admission and Access
   x-ticvai-requirements: 201
@@ -195,6 +195,7 @@ paths:
     get:
       operationId: listMyEntitlements
       x-ticvai-consumed-by:
+        - "P01 WEB-001 Home / Landing"
         - "P01 WEB-018 My Tickets"
         - "P02 GST-001 Home – Default"
         - "P02 GST-012 My Tickets"
@@ -336,6 +337,15 @@ paths:
         **Rotates without reissuing.** A guest whose phone was stolen gets a new payload against the same
         entitlement, and the old one stops scanning.
 
+        **The code rotates offline too** (decided 28 September, audit R230). While online the app fetches
+        `rotation`, a time-based seed: the secret, the time step, the digits and the algorithm, valid
+        from `validFrom` to `validTo`. The app derives the current rotating code on the device from the
+        seed and the clock, with no signal, and shows it with a countdown to the next step (GST-013,
+        GST-055, WEB-018; no screenshot blocking on web, audit R077 (c)). **Gates verify the code offline
+        against the same seed**, which they hold in their offline package, accepting the current step
+        and one step either side for clock drift. `rotate=true` replaces the seed, so a stolen phone''s
+        codes stop verifying once gates have the new one.
+
         '
       tags:
       - access
@@ -369,6 +379,51 @@ paths:
                     type: string
                     format: date-time
                     nullable: true
+                  rotation:
+                    type: object
+                    nullable: true
+                    description: '**The time-based seed the rotating code is derived from** (audit R230).
+                      Null for a credential that does not rotate (a wristband serial, a wallet pass).
+                      Only ever returned to the entitlement''s holder or a staff caller; never logged.
+
+                      '
+                    required:
+                    - secret
+                    - timeStepSeconds
+                    - digits
+                    - algorithm
+                    - validFrom
+                    - validTo
+                    properties:
+                      secret:
+                        type: string
+                        description: Base32 shared secret. Held on the device and in the gates' offline
+                          package; replaced by `rotate=true`.
+                      timeStepSeconds:
+                        type: integer
+                        minimum: 10
+                        maximum: 60
+                        default: 30
+                      digits:
+                        type: integer
+                        minimum: 6
+                        maximum: 10
+                        default: 8
+                      algorithm:
+                        type: string
+                        enum:
+                        - SHA1
+                        - SHA256
+                        - SHA512
+                        default: SHA256
+                      validFrom:
+                        type: string
+                        format: date-time
+                      validTo:
+                        type: string
+                        format: date-time
+                        description: The seed stops verifying after this. The app fetches a fresh one
+                          whenever it is online before then.
   /entitlements/{entitlementId}/history:
     parameters:
     - name: entitlementId
@@ -672,8 +727,21 @@ paths:
         **A minor''s consent is given by a guardian**, and the guardian is recorded. The child-protection
         journey (3.2.12) sits above this.
 
+        **How a guardian consents in the app — decided 28 September, audit R205.** The signed-in adult
+        enrols a linked child: on the guest surfaces `subjectId` may be the caller or a subject the caller
+        holds a `familyMember` or `primaryHolder` delegation over (`identity.listDelegations`), and **the
+        caller is recorded as guardian** — the server sets `consent.guardianSubjectId` to the caller and
+        ignores any other value sent. A guest may not enrol anybody else. **The age below which a subject
+        is a minor is an open value that client counsel sets**; a subject with no date of birth is treated
+        as a minor (audit R126).
+
         No image is stored — a template is. **The template cannot reconstruct the face**, and that is
         the property that makes retention defensible at all (CF-35, CF-64).
+
+        **The face-capture SDK and the template format are an open value** (decided 28 September, audit
+        R077 (b)): they are those of the facial-reader vendor the client has contracted, and the client
+        names that vendor. Until then the template is carried as the vendor''s opaque format and nothing
+        here depends on which one it is.
 
         '
       tags:
@@ -741,7 +809,8 @@ paths:
                       type: string
                       format: uuid
                       nullable: true
-                      description: Required where the subject is a minor.
+                      description: Required where the subject is a minor. **On a guest surface the server
+                        sets it to the signed-in adult** enrolling their linked child (audit R205).
                     guardianRelationship:
                       type: string
                       nullable: true
@@ -760,6 +829,17 @@ paths:
             without naming the other pass — a counter agent needs to know it is a duplicate, not whose.
 
             '
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
+        '403':
+          description: 'A guest enrolling a subject who is neither themselves nor a child linked to them by
+            a `familyMember` or `primaryHolder` delegation (audit R205).
+
+            '
+          x-ticvai-problem-types:
+          - subject-not-linked
           content:
             application/problem+json:
               schema:
@@ -796,6 +876,10 @@ paths:
         on that entitlement, or null when there is none — which is itself the answer to *is a face
         registered on this pass*. The id is also returned by `enrolFacePass`.
 
+        **Face Pass enrolments only — decided 28 September, audit R228.** A Face Tag lives in the same
+        table, but it is never returned here: an id that names a `faceTag` enrolment answers `404`,
+        exactly as an unknown id does, so `kind` in the response is always `facePass`.
+
         '
       tags:
       - access
@@ -811,6 +895,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/FacePassEnrolment'
+        '404':
+          $ref: ../shared/common.yaml#/components/responses/NotFound
     delete:
       operationId: revokeFacePass
       x-ticvai-consumed-by:
@@ -977,20 +1063,20 @@ paths:
   /parking-entitlements:
     post:
       operationId: createParkingEntitlement
-      x-ticvai-consumed-by:
-        - "P01 WEB-041 Parking – Reserve & Pay"
-        - "P02 GST-027 Parking – Reserve & Pay"
-        - "P02 GST-028 Parking – Reservation Confirmed"
       x-ticvai-audience:
       - service
-      - guest
-      x-ticvai-audience-note: '24 August: widened to include guest. **A guest reserves their own parking.**
-        Declared `service` only, on two guest screens — `updateParkingEntitlement` was already `guest`,
-        which made the asymmetry an omission rather than a design.
+      x-ticvai-audience-note: '28 September: `guest` removed (decided 28 September, audit R166). The 24
+        August widening let a guest reserve parking directly; parking is now bought like any other product,
+        through the cart, and the entitlement is issued by the order service when the order is paid.
 
         '
       summary: A guest bought parking
-      description: '**Pushes the plate to the parking system where the mode is `plateWhitelist`**, and
+      description: '**Issued by the order service, never by a guest** (decided 28 September, audit R166).
+        When a cart order containing a parking product is paid (`addCartLine`, `checkoutCart`,
+        `createPayment`), the order service calls this for each parking line. A guest reads the result
+        through the paid order (`getOrder`), and no guest screen calls this operation.
+
+        **Pushes the plate to the parking system where the mode is `plateWhitelist`**, and
         that push is the operation that was missing — CF-52 settled the direction on 14 August and nothing
         implemented it.
 
@@ -1106,6 +1192,12 @@ paths:
       summary: Admit against a failed validation
       description: 'Records the overriding principal, the original denial reason and a mandatory justification.
         Every override is auditable — this is the operation most likely to be examined after an incident.
+
+        **The denial is kept and the override is its own row — decided 28 September, audit R228.** The
+        denied scan is never updated. The override is written as a new `ScanEvent` with the body''s `id`,
+        `outcome: overridden`, `overridesScanId` naming the denied scan, the overriding principal as
+        `operatorPrincipalId` and the justification as `overrideReason`. A denied scan has at most one
+        override, which is what the `409` checks.
 
         '
       tags:
@@ -1462,6 +1554,15 @@ paths:
       summary: Set the operating mode of an access point
       description: 'Podium operation. Changes what the gate does, not who may pass it.
 
+        **The podium sets the operating mode — decided 28 September, audit R221.** `operatingMode` is
+        what this writes and what the gate obeys: `normal`, `freeFlow`, `dropArm`, `closed`, `podium` or
+        `maintenance`. **Direction is fixed per access point**: it is set in the back office with
+        `createAccessPoint` or `updateAccessPoint` and never here. **The turnstile mode only narrows
+        the operating mode**: `freeRotation` or `closed` within it, or null for the turnstile to validate
+        in its fixed direction. Nothing here can contradict the operating mode: a turnstile mode sent
+        with an operating mode other than `normal` or `podium` is refused `400`, because the other four
+        already decide the arm.
+
         '
       tags:
       - accessPoint
@@ -1478,10 +1579,18 @@ paths:
             schema:
               type: object
               required:
-              - mode
+              - operatingMode
               properties:
+                operatingMode:
+                  $ref: '#/components/schemas/AccessPointOperatingMode'
                 mode:
-                  $ref: '#/components/schemas/TurnstileMode'
+                  allOf:
+                  - $ref: '#/components/schemas/TurnstileMode'
+                  nullable: true
+                  description: 'Optional narrowing within `normal` or `podium`: `freeRotation` or `closed`.
+                    Null or absent, the turnstile validates in the access point''s fixed direction.
+
+                    '
                 reason:
                   type: string
                   maxLength: 200
@@ -1495,6 +1604,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/AccessPoint'
+        '400':
+          $ref: ../shared/common.yaml#/components/responses/BadRequest
         '403':
           $ref: ../shared/common.yaml#/components/responses/Forbidden
         '404':
@@ -1825,6 +1936,10 @@ paths:
       description: 'Denies outright regardless of entitlement state. Included in the offline package so
         it holds during an outage — a blacklist that only works online is not a blacklist.
 
+        **One entry per media code in the tenant** (decided 28 September, audit R108). A media code is
+        honoured at every venue of the tenant, so a second entry for the same code is refused `409`
+        rather than stored beside the first; change the existing entry by removing and re-adding it.
+
         '
       tags:
       - accessPoint
@@ -1864,6 +1979,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/BlacklistEntry'
+        '409':
+          $ref: ../shared/common.yaml#/components/responses/DuplicateCode
   /blacklist/{mediaCode}:
     parameters:
     - name: mediaCode
@@ -3174,8 +3291,8 @@ paths:
     get:
       operationId: listCredentialReplacementReissue
       x-ticvai-consumed-by:
+        - "P08 BO-027 Reissue & Media Replacement"
         - "P08 BO-359 Credential Replacement, Reissue, Revocation & Recovery"
-        - "P08 BO-652 Credential Replacement & Reissue"
       x-ticvai-audience:
       - staff
       x-ticvai-provisional: true
@@ -8676,6 +8793,23 @@ components:
         suspendedReason:
           type: string
           nullable: true
+        freezeReason:
+          type: string
+          nullable: true
+          enum:
+          - travelling
+          - injury
+          - personal
+          - seasonal
+          - other
+          description: The `reason` of the latest `freezeEntitlement` (audit R222). Null when never frozen.
+        freezeNote:
+          type: string
+          nullable: true
+          maxLength: 500
+          description: The `note` the latest `freezeEntitlement` took, required there when `reason` is
+            `other` (decided 28 September, audit R222). Kept so the quarterly review of `other` notes
+            has something to read.
         isNameBound:
           type: boolean
           default: false
@@ -8955,6 +9089,12 @@ components:
         capacity:
           type: integer
           nullable: true
+          description: '**What "full" means in the first release** (decided 28 September, audit R166):
+            the facility is full when the issued `ParkingEntitlement`s valid for a time reach this
+            number. There is no live space count from the car park; a guest sees *full* only when
+            capacity is reached, never an availability figure. Null means no limit is enforced.
+
+            '
         takesPayment:
           type: boolean
           readOnly: true
@@ -9027,6 +9167,15 @@ components:
     ParkingEntitlement:
       type: object
       x-ticvai-persistence: access.parking_entitlement
+      description: '**Issued at payment of an order that contains a parking product** (decided 28
+        September, audit R166). Parking is sold through the normal cart and checkout
+        (`orders.addCartLine`, `orders.checkoutCart`), so every entitlement carries that order''s
+        `orderId`. The guest pays for the parking right with their order; the facility''s own system
+        is never paid through the app (`ParkingFacility.takesPayment`). **No live availability in the
+        first release**: the sale is refused as full only when the facility''s issued entitlements
+        reach its `capacity`.
+
+        '
       required:
       - facilityId
       - orderId
@@ -9188,6 +9337,9 @@ components:
       properties:
         mediaCode:
           type: string
+          x-ticvai-unique: tenant
+          description: '**Unique within the tenant** (decided 28 September, audit R108): one entry per code.
+            `addBlacklistEntry` refuses a second entry with `409 duplicate-code`.'
         reason:
           type: string
         addedAt:
@@ -9232,13 +9384,30 @@ components:
       - crossover
     TurnstileMode:
       type: string
+      description: '**Reduced to two values — decided 28 September, audit R221.** Entry, exit, re-entry and
+        crossover were the access point''s `Direction` under another name, and two fields that could
+        disagree left the gate to guess. Direction is fixed per access point; within `normal` or `podium`
+        operation the turnstile may only be let spin free or held closed.
+
+        '
       enum:
-      - entry
-      - reentry
-      - crossover
-      - exit
       - freeRotation
       - closed
+    AccessPointOperatingMode:
+      type: string
+      description: 'BL-107 and BL-109. **What the gate does, and what the podium sets** (`setTurnstileMode`,
+        decided 28 September, audit R221). `closed` refuses everybody; `dropArm` lets everybody through and
+        exists for an evacuation; `podium` is supervised validation by eye; `freeFlow` counts without
+        validating; `maintenance` takes the lane out of use.
+
+        '
+      enum:
+      - normal
+      - freeFlow
+      - dropArm
+      - closed
+      - podium
+      - maintenance
     ScanOutcome:
       type: string
       enum:
@@ -9585,13 +9754,20 @@ components:
           type: string
           format: uuid
           nullable: true
-        overriddenByPrincipalId:
+        overridesScanId:
           type: string
-          format: uuid
+          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
           nullable: true
+          description: '**Set only on an override row**, naming the denied scan it admits against (decided
+            28 September, audit R228). The denied scan itself is never updated: the denial and the override
+            are two rows, and at most one override row names any scan. Null on every other scan.
+
+            '
         overrideReason:
           type: string
           nullable: true
+          description: The supervisor's justification, on the override row only. The overriding principal
+            is that row's `operatorPrincipalId`.
         recordedAt:
           type: string
           format: date-time
@@ -9608,7 +9784,7 @@ components:
       - code
       - name
       - venueId
-      - mode
+      - operatingMode
       - isActive
       properties:
         id:
@@ -9644,16 +9820,10 @@ components:
 
             '
         operatingMode:
-          type: string
-          enum:
-          - normal
-          - freeFlow
-          - dropArm
-          - closed
-          - podium
-          - maintenance
+          allOf:
+          - $ref: '#/components/schemas/AccessPointOperatingMode'
           default: normal
-          description: 'BL-107 and BL-109. **A closed turnstile and one in emergency drop-arm mode look
+          description: '**Set by the podium with `setTurnstileMode`, and it wins** (audit R221). BL-107 and BL-109. **A closed turnstile and one in emergency drop-arm mode look
             the same in the model and are opposite in meaning.** Closed refuses everybody; drop-arm lets
             everybody through, and it is the state that exists for an evacuation.
 
@@ -9674,9 +9844,20 @@ components:
 
             '
         mode:
-          $ref: '#/components/schemas/TurnstileMode'
+          allOf:
+          - $ref: '#/components/schemas/TurnstileMode'
+          nullable: true
+          description: 'Narrows `operatingMode` only: `freeRotation` or `closed` within `normal` or `podium`,
+            null otherwise and whenever the turnstile validates in its fixed `direction` (audit R221).
+
+            '
         direction:
-          $ref: '#/components/schemas/Direction'
+          allOf:
+          - $ref: '#/components/schemas/Direction'
+          description: '**Fixed per access point** (audit R221): set in the back office by `createAccessPoint`
+            and `updateAccessPoint`, never by the podium.
+
+            '
         antiPassbackEnabled:
           type: boolean
         requiresExitBeforeReentry:

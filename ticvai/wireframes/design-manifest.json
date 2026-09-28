@@ -9,7 +9,7 @@
  },
  "counts": {
   "batches": 298,
-  "screens": 2427,
+  "screens": 2422,
   "framesOnDisk": 46,
   "byStatus": {
    "pending": 279,
@@ -18,12 +18,12 @@
    "locked": 6
   },
   "screensByStatus": {
-   "pending": 2351,
+   "pending": 2346,
    "partial": 0,
    "drawn": 46,
    "locked": 30
   },
-  "fullyDrawableBatches": 57
+  "fullyDrawableBatches": 56
  },
  "batches": [
   {
@@ -331,7 +331,6 @@
    "platform": "P08",
    "screens": [
     "BO-065",
-    "BO-070",
     "BO-074",
     "BO-075",
     "BO-076",
@@ -340,29 +339,7 @@
     "BO-090",
     "BO-101"
    ],
-   "drawable": 9,
-   "thin": 0,
-   "frames": 0,
-   "status": "pending"
-  },
-  {
-   "id": "P08-sell-01",
-   "kind": "module",
-   "label": "P08 · Sell (1 of 4)",
-   "platform": "P08",
-   "screens": [
-    "BO-007",
-    "BO-009",
-    "BO-010",
-    "BO-011",
-    "BO-012",
-    "BO-013",
-    "BO-014",
-    "BO-015",
-    "BO-016",
-    "BO-017"
-   ],
-   "drawable": 10,
+   "drawable": 8,
    "thin": 0,
    "frames": 0,
    "status": "pending"
@@ -453,9 +430,9 @@
     "BO-060",
     "BO-064",
     "BO-067",
+    "BO-070",
     "BO-100",
     "BO-108",
-    "BO-127",
     "BO-128"
    ],
    "drawable": 10,
@@ -858,6 +835,22 @@
    "status": "pending"
   },
   {
+   "id": "P02-account-self-service-02",
+   "kind": "module",
+   "label": "P02 · Account & Self-Service (2 of 2)",
+   "platform": "P02",
+   "screens": [
+    "GST-067",
+    "GST-069",
+    "GST-071",
+    "GST-073"
+   ],
+   "drawable": 3,
+   "thin": 1,
+   "frames": 0,
+   "status": "pending"
+  },
+  {
    "id": "P02-booking-selection-01",
    "kind": "module",
    "label": "P02 · Booking & Selection",
@@ -1093,6 +1086,28 @@
    "status": "pending"
   },
   {
+   "id": "P08-sell-01",
+   "kind": "module",
+   "label": "P08 · Sell (1 of 4)",
+   "platform": "P08",
+   "screens": [
+    "BO-007",
+    "BO-009",
+    "BO-010",
+    "BO-011",
+    "BO-012",
+    "BO-013",
+    "BO-014",
+    "BO-015",
+    "BO-016",
+    "BO-017"
+   ],
+   "drawable": 9,
+   "thin": 1,
+   "frames": 0,
+   "status": "pending"
+  },
+  {
    "id": "P08-sell-04",
    "kind": "module",
    "label": "P08 · Sell (4 of 4)",
@@ -1240,12 +1255,11 @@
     "BO-317",
     "BO-318",
     "BO-319",
-    "BO-320",
     "BO-321",
     "BO-322",
     "BO-323"
    ],
-   "drawable": 9,
+   "drawable": 8,
    "thin": 1,
    "frames": 0,
    "status": "pending"
@@ -1449,22 +1463,6 @@
    ],
    "drawable": 9,
    "thin": 1,
-   "frames": 0,
-   "status": "pending"
-  },
-  {
-   "id": "P02-account-self-service-02",
-   "kind": "module",
-   "label": "P02 · Account & Self-Service (2 of 2)",
-   "platform": "P02",
-   "screens": [
-    "GST-067",
-    "GST-069",
-    "GST-071",
-    "GST-073"
-   ],
-   "drawable": 2,
-   "thin": 2,
    "frames": 0,
    "status": "pending"
   },
@@ -1913,6 +1911,27 @@
     "EMP-044"
    ],
    "drawable": 7,
+   "thin": 3,
+   "frames": 0,
+   "status": "pending"
+  },
+  {
+   "id": "P13-white-label-02",
+   "kind": "module",
+   "label": "P13 · White Label (2 of 2)",
+   "platform": "P13",
+   "screens": [
+    "CMS-011",
+    "CMS-012",
+    "CMS-013",
+    "CMS-014",
+    "CMS-015",
+    "CMS-016",
+    "CMS-017",
+    "CMS-018",
+    "CMS-019"
+   ],
+   "drawable": 6,
    "thin": 3,
    "frames": 0,
    "status": "pending"
@@ -2528,28 +2547,6 @@
    "status": "pending"
   },
   {
-   "id": "P13-white-label-02",
-   "kind": "module",
-   "label": "P13 · White Label (2 of 2)",
-   "platform": "P13",
-   "screens": [
-    "CMS-011",
-    "CMS-012",
-    "CMS-013",
-    "CMS-014",
-    "CMS-015",
-    "CMS-016",
-    "CMS-017",
-    "CMS-018",
-    "CMS-019",
-    "CMS-020"
-   ],
-   "drawable": 6,
-   "thin": 4,
-   "frames": 0,
-   "status": "pending"
-  },
-  {
    "id": "WS05",
    "kind": "workshop",
    "label": "Access Control board 5",
@@ -2587,6 +2584,28 @@
     "BO-201",
     "BO-202",
     "BO-203"
+   ],
+   "drawable": 6,
+   "thin": 4,
+   "frames": 0,
+   "status": "pending"
+  },
+  {
+   "id": "WS18",
+   "kind": "workshop",
+   "label": "Approval Workflows and Governance board 6",
+   "platform": "P09",
+   "screens": [
+    "ADM-339",
+    "ADM-340",
+    "ADM-341",
+    "ADM-342",
+    "ADM-343",
+    "ADM-344",
+    "ADM-345",
+    "ADM-346",
+    "ADM-347",
+    "ADM-348"
    ],
    "drawable": 6,
    "thin": 4,
@@ -3014,28 +3033,6 @@
     "BO-161",
     "BO-162",
     "BO-163"
-   ],
-   "drawable": 5,
-   "thin": 5,
-   "frames": 0,
-   "status": "pending"
-  },
-  {
-   "id": "WS18",
-   "kind": "workshop",
-   "label": "Approval Workflows and Governance board 6",
-   "platform": "P09",
-   "screens": [
-    "ADM-339",
-    "ADM-340",
-    "ADM-341",
-    "ADM-342",
-    "ADM-343",
-    "ADM-344",
-    "ADM-345",
-    "ADM-346",
-    "ADM-347",
-    "ADM-348"
    ],
    "drawable": 5,
    "thin": 5,
@@ -4189,6 +4186,27 @@
    "status": "pending"
   },
   {
+   "id": "WS85",
+   "kind": "workshop",
+   "label": "Game and Ride board 8",
+   "platform": "P08",
+   "screens": [
+    "BO-464",
+    "BO-465",
+    "BO-466",
+    "BO-467",
+    "BO-468",
+    "BO-469",
+    "BO-470",
+    "BO-471",
+    "BO-473"
+   ],
+   "drawable": 2,
+   "thin": 7,
+   "frames": 0,
+   "status": "pending"
+  },
+  {
    "id": "WS86",
    "kind": "workshop",
    "label": "Game and Ride board 9",
@@ -4248,6 +4266,28 @@
     "ADM-386",
     "ADM-387",
     "ADM-388"
+   ],
+   "drawable": 3,
+   "thin": 7,
+   "frames": 0,
+   "status": "pending"
+  },
+  {
+   "id": "WS102",
+   "kind": "workshop",
+   "label": "Subscription Licensing AI Self Service board 5",
+   "platform": "P09",
+   "screens": [
+    "ADM-409",
+    "ADM-410",
+    "ADM-411",
+    "ADM-412",
+    "ADM-413",
+    "ADM-414",
+    "ADM-415",
+    "ADM-416",
+    "ADM-417",
+    "ADM-418"
    ],
    "drawable": 3,
    "thin": 7,
@@ -4585,28 +4625,6 @@
    "status": "pending"
   },
   {
-   "id": "WS85",
-   "kind": "workshop",
-   "label": "Game and Ride board 8",
-   "platform": "P08",
-   "screens": [
-    "BO-464",
-    "BO-465",
-    "BO-466",
-    "BO-467",
-    "BO-468",
-    "BO-469",
-    "BO-470",
-    "BO-471",
-    "BO-472",
-    "BO-473"
-   ],
-   "drawable": 2,
-   "thin": 8,
-   "frames": 0,
-   "status": "pending"
-  },
-  {
    "id": "WS87",
    "kind": "workshop",
    "label": "Game and Ride board 10",
@@ -4622,28 +4640,6 @@
     "BO-491",
     "BO-492",
     "BO-493"
-   ],
-   "drawable": 2,
-   "thin": 8,
-   "frames": 0,
-   "status": "pending"
-  },
-  {
-   "id": "WS102",
-   "kind": "workshop",
-   "label": "Subscription Licensing AI Self Service board 5",
-   "platform": "P09",
-   "screens": [
-    "ADM-409",
-    "ADM-410",
-    "ADM-411",
-    "ADM-412",
-    "ADM-413",
-    "ADM-414",
-    "ADM-415",
-    "ADM-416",
-    "ADM-417",
-    "ADM-418"
    ],
    "drawable": 2,
    "thin": 8,
@@ -5110,6 +5106,49 @@
    "status": "pending"
   },
   {
+   "id": "WS111",
+   "kind": "workshop",
+   "label": "ACCREDITATION board 4",
+   "platform": "P08",
+   "screens": [
+    "BO-644",
+    "BO-645",
+    "BO-646",
+    "BO-647",
+    "BO-648",
+    "BO-649",
+    "BO-650",
+    "BO-651",
+    "BO-653"
+   ],
+   "drawable": 0,
+   "thin": 9,
+   "frames": 0,
+   "status": "pending"
+  },
+  {
+   "id": "WS135",
+   "kind": "workshop",
+   "label": "Marketing CRM Configuration Reference v1.0 board 1",
+   "platform": "P08",
+   "screens": [
+    "BO-734",
+    "BO-735",
+    "BO-736",
+    "BO-737",
+    "BO-738",
+    "BO-739",
+    "BO-740",
+    "BO-741",
+    "BO-742",
+    "BO-743"
+   ],
+   "drawable": 1,
+   "thin": 9,
+   "frames": 0,
+   "status": "pending"
+  },
+  {
    "id": "WS137",
    "kind": "workshop",
    "label": "Marketing CRM Configuration Reference v1.0 board 3",
@@ -5257,50 +5296,6 @@
     "BO-622",
     "BO-623",
     "BO-624"
-   ],
-   "drawable": 0,
-   "thin": 10,
-   "frames": 0,
-   "status": "pending"
-  },
-  {
-   "id": "WS111",
-   "kind": "workshop",
-   "label": "ACCREDITATION board 4",
-   "platform": "P08",
-   "screens": [
-    "BO-644",
-    "BO-645",
-    "BO-646",
-    "BO-647",
-    "BO-648",
-    "BO-649",
-    "BO-650",
-    "BO-651",
-    "BO-652",
-    "BO-653"
-   ],
-   "drawable": 0,
-   "thin": 10,
-   "frames": 0,
-   "status": "pending"
-  },
-  {
-   "id": "WS135",
-   "kind": "workshop",
-   "label": "Marketing CRM Configuration Reference v1.0 board 1",
-   "platform": "P08",
-   "screens": [
-    "BO-734",
-    "BO-735",
-    "BO-736",
-    "BO-737",
-    "BO-738",
-    "BO-739",
-    "BO-740",
-    "BO-741",
-    "BO-742",
-    "BO-743"
    ],
    "drawable": 0,
    "thin": 10,

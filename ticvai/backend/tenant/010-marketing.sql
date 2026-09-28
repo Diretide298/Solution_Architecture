@@ -168,7 +168,7 @@ CREATE TABLE IF NOT EXISTS marketing.case_message (
 CREATE TABLE IF NOT EXISTS marketing.challenge (
     id                                uuid PRIMARY KEY NOT NULL,
     name                              text NOT NULL,
-    kind                              text NOT NULL CONSTRAINT challenge_kind_chk CHECK (kind IN ('visit', 'spend', 'ride', 'collection', 'streak', 'referral', 'survey', 'social', 'milestone')),
+    kind                              text NOT NULL CONSTRAINT challenge_kind_chk CHECK (kind IN ('visit', 'spend', 'ride', 'collection', 'streak', 'referral', 'survey', 'social', 'milestone', 'scan', 'activity', 'purchase')),
     scope                             text DEFAULT 'individual' CONSTRAINT challenge_scope_chk CHECK (scope IN ('individual', 'family', 'group', 'team')),
     goal                              jsonb NOT NULL,
     event_id                          uuid,
@@ -710,7 +710,7 @@ CREATE TABLE IF NOT EXISTS marketing.loyalty_points (
     expires_at                        timestamptz,
     reversed_loyalty_points_id        uuid,
     notes                             text CONSTRAINT loyalty_points_notes_chk CHECK (char_length(notes) <= 500),
-    reason                            text CONSTRAINT loyalty_points_reason_chk CHECK (reason IN ('correction', 'goodwill', 'serviceRecovery', 'fraudReversal', 'expiryAdjustment', 'migration')),
+    reason                            text CONSTRAINT loyalty_points_reason_chk CHECK (reason IN ('goodwill', 'correction', 'expiryReversal')),
     author_principal_id               uuid,
     created_at                        timestamptz NOT NULL
 );

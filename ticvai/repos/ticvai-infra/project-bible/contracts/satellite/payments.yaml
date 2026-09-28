@@ -2878,6 +2878,10 @@ components:
         expectedSchedule:
           type: string
           nullable: true
+          default: daily
+          description: How often a file is expected. **Daily by default, one per venue per trading day**
+            (decided 28 September, audit R110 (b)), because settlement is reconciled daily per venue
+            (`finance.ingestSettlementFile`).
         expectedByTime:
           type: string
           nullable: true

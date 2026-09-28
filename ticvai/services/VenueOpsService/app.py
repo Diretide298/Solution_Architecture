@@ -511,13 +511,13 @@ async def get_resource_availability(request: Request) -> dict:
                      request.headers.get(TENANT_HEADER))
 
 
-@app.get("/sessions/{sessionId}/manifest")
-async def get_session_manifest(request: Request) -> dict:
-    """Who is in a session, in what order
+@app.get("/performances/{performanceId}/manifest")
+async def get_performance_manifest(request: Request) -> dict:
+    """Who is in a performance, in what order
 
     scope: venue · permission: RESOURCE_VIEW · offline: True
     """
-    return await run("getSessionManifest", request.headers.get("x-scope-path", "uae"),
+    return await run("getPerformanceManifest", request.headers.get("x-scope-path", "uae"),
                      request.headers.get(TENANT_HEADER))
 
 
@@ -901,13 +901,13 @@ async def reject_work_order(request: Request) -> dict:
                      request.headers.get(TENANT_HEADER))
 
 
-@app.put("/sessions/{sessionId}/manifest")
-async def reorder_session_manifest(request: Request) -> dict:
+@app.put("/performances/{performanceId}/manifest")
+async def reorder_performance_manifest(request: Request) -> dict:
     """Change the running order
 
     scope: venue · permission: RESOURCE_BOOK · offline: True
     """
-    return await run("reorderSessionManifest", request.headers.get("x-scope-path", "uae"),
+    return await run("reorderPerformanceManifest", request.headers.get("x-scope-path", "uae"),
                      request.headers.get(TENANT_HEADER))
 
 

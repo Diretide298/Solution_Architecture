@@ -753,6 +753,13 @@ screens:
     - name: contentBody
       slot: collection
       components:
+      - kind: textField
+        label: API client
+        operation: listWebhookSubscriptions
+        notes: 'Sends `?clientId=` to `listWebhookSubscriptions`. Empty lists every subscription in the tenant;
+          a client narrows it to that client''s subscriptions. A partner sees only its own client''s whatever
+          it sends (decided 28 September, audit R214 (4)).'
+        provenance: contract public-api.yaml GET /webhook-subscriptions
       - kind: dataTable
         label: Every webhook subscription
         bindsTo: WebhookSubscription
@@ -850,7 +857,7 @@ screens:
   apis:
   - operationId: listWebhookSubscriptions
     contract: public-api
-    purpose: Subscriptions
+    purpose: The tenant's webhook subscriptions, filterable by API client (`clientId`, audit R214 (4))
     trigger: onLoad
   - operationId: createWebhookSubscription
     contract: public-api

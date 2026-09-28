@@ -67,4 +67,9 @@ transitions:
   trigger: operation
   guard: Withdrawn by the requester
 notes: '`returnedForInfo` is the state that keeps requisitions moving. Without it every incomplete request
-  is a rejection and the requester starts over.'
+  is a rejection and the requester starts over.
+
+
+  **Lines are editable only in `draft`, `pendingApproval` and `returnedForInfo`.** `approved` and every
+  later status (`ordered`, `closed`) count as approved for `updateRequisitionLines` (decided 28 September,
+  audit R171).'

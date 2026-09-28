@@ -1,9 +1,9 @@
 id: LLD-OrderService
-title: OrderService — 253 operations, 70 tables
+title: OrderService — 254 operations, 70 tables
 generatedBy: tools/derive-diagrams.py
 tier: commerce
 index: diagrams/hld/02-services.yaml
-why: '**The transactional core.** 253 operations, 70 tables, and the highest write rate in the platform.
+why: '**The transactional core.** 254 operations, 70 tables, and the highest write rate in the platform.
   Separate because its scaling profile is unlike anything else — a Saturday evening is ten times a Tuesday
   morning.
 
@@ -27,9 +27,9 @@ why: '**The transactional core.** 253 operations, 70 tables, and the highest wri
 scale: Write-heavy, spiky, latency-critical. **The one that autoscales.**
 ifDown: '**Down means no sales.** Highest availability target in the platform.'
 coverage:
-  operations: 253
-  inAFlow: 143
-  percent: 57%
+  operations: 254
+  inAFlow: 142
+  percent: 56%
   note: '**Flow coverage is how much of this service a journey has walked.** A service under 40% is
     unwalked rather than under-documented.'
 schemas:
@@ -42,10 +42,10 @@ schemas:
   tables: 25
   stores:
   - postgres
-  largestTable: payments.method
+  largestTable: payments.fee_rule
 operationsByContract:
 - contract: orders
-  count: 191
+  count: 192
   operations:
   - operation: abandonCart
     verb: DELETE
@@ -79,6 +79,14 @@ operationsByContract:
     offline: false
     reads: 6
     writes: 5
+  - operation: applyCartPromoCode
+    verb: POST
+    path: /carts/{cartId}/promo-codes
+    scope: venue
+    permission: null
+    offline: false
+    reads: 2
+    writes: 0
   - operation: applyManualDiscount
     verb: POST
     path: /orders/{orderId}/discounts
@@ -1956,7 +1964,7 @@ operationsByContract:
     permission: SHIFT_CLOSE
     offline: false
     reads: 6
-    writes: 3
+    writes: 4
   - operation: closeShift
     verb: POST
     path: /shifts/{shiftId}/close
@@ -2267,7 +2275,7 @@ tables:
   - orders
   foreignWriters: null
 - table: orders.cart
-  columns: 17
+  columns: 18
   store: postgres
   parent: null
   writtenBy:
@@ -2399,9 +2407,9 @@ tables:
   writtenBy: []
   foreignWriters: null
 - table: orders.order_line
-  columns: 18
+  columns: 21
   store: postgres
-  parent: orders.sales_order
+  parent: promotions.promotion
   writtenBy:
   - fnb
   - orders
@@ -2914,7 +2922,7 @@ writesOutside:
     tables:
     - wallet.wallet_transaction
 screens:
-- P01:WEB-006 Date & Session Selection
+- P01:WEB-006 Date & Performance Selection
 - P01:WEB-008 Add-ons & Upsell
 - P01:WEB-010 Shopping Cart
 - P01:WEB-012 Checkout — Payment
@@ -2928,6 +2936,8 @@ screens:
 - P01:WEB-030 Ticket Transfer
 - P01:WEB-031 My Reservations
 - P01:WEB-033 Shop
+- P01:WEB-041 Parking – Reserve & Pay
+- P01:WEB-042 Retail & Shop and Drop
 - P02:GST-008 Tickets & Add-ons
 - P02:GST-009 Review & Payment
 - P02:GST-010 Booking Confirmation
@@ -2939,6 +2949,9 @@ screens:
 - P02:GST-017 Reservation Details
 - P02:GST-018 Add to Calendar / Reminders
 - P02:GST-019 Order History
+- P02:GST-026 Retail / Merchandise
+- P02:GST-027 Parking – Reserve & Pay
+- P02:GST-028 Parking – Reservation Confirmed
 - P02:GST-032 AI Concierge – Chat
 - P02:GST-041 Checkout Entry
 - P02:GST-045 Ticket Delivery & Sharing
@@ -2972,7 +2985,7 @@ screens:
 - P04:POS-023 Sell — Merchandise
 - P04:POS-025 Till Home
 - P04:POS-026 Receipt & Reprint
-- P05:KSK-005 Choose a session
+- P05:KSK-005 Choose a performance
 - P05:KSK-006 Review
 - P05:KSK-007 Payment
 - P05:KSK-008 Payment unresolved
@@ -3007,10 +3020,8 @@ screens:
 - P08:BO-041 Cash Movements
 - P08:BO-042 Banking & Safe
 - P08:BO-047 Order Corrections & Exceptions
-- P08:BO-051 Purchase Orders
 - P08:BO-062 Venue Profile
 - P08:BO-065 Venue Configuration
-- P08:BO-070 Work Orders
 - P08:BO-082 Stock Movements
 - P08:BO-097 Check Out & Check In
 - P08:BO-100 Venue Home
@@ -3058,7 +3069,6 @@ screens:
 - P08:BO-317 Cancellation & Partial Cancellation Policy Configuration
 - P08:BO-318 Refund Policy & Refund Calculation Configuration
 - P08:BO-319 Void, Reversal & Same-Day Correction Management
-- P08:BO-320 Ticket Reissue & Fulfillment Regeneration
 - P08:BO-321 After-Sales Financial Settlement & Adjustment Workspace
 - P08:BO-322 Approval, Exception & Service Recovery Management
 - P08:BO-323 Amendment History, Audit & After-Sales Analytics
@@ -3211,7 +3221,6 @@ flows:
 - F08 Steward works a shift on the employee app
 - F09 Event is cancelled and refunded
 - F10 Partner books, uses and settles
-- F104 A platform operator signs in under MFA
 - F108 A guest orders food at a counter and collects it
 - F11 Guest orders food to a lounger
 - F13 Month end closes
@@ -3249,4 +3258,5 @@ flows:
 - F75 A kiosk serves itself and calls for help
 - F81 A retail sale runs from overview to tender
 - F87 A till handles a return, a collection and a safe drop
+- F89 Offline policy is set, cached, monitored and reconciled
 - F99 A chargeback arrives and is defended

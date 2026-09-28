@@ -21,6 +21,7 @@ CREATE TABLE IF NOT EXISTS inventory.count (
     closed_at                         timestamptz,
     posted_at                         timestamptz,
     recount_reason                    text,
+    recount_signed_by_principal_id    uuid,
     cancel_reason                     text
 );
 
@@ -63,6 +64,7 @@ CREATE TABLE IF NOT EXISTS inventory.goods_receipt (
 -- One line received, which may differ from what was ordered
 CREATE TABLE IF NOT EXISTS inventory.goods_receipt_line (
     goods_receipt_id                  text NOT NULL,
+    line_id                           text,
     item_id                           uuid,
     item_name                         text,
     ordered_quantity                  numeric(18,4),
@@ -122,7 +124,7 @@ CREATE TABLE IF NOT EXISTS inventory.movement (
     id                                text PRIMARY KEY NOT NULL,
     item_id                           uuid NOT NULL,
     location_id                       uuid NOT NULL,
-    kind                              text NOT NULL CONSTRAINT movement_kind_chk CHECK (kind IN ('receipt', 'issue', 'saleDepletion', 'waste', 'adjustment', 'transferOut', 'transferIn', 'countAdjustment', 'supplierReturn', 'production')),
+    kind                              text NOT NULL CONSTRAINT movement_kind_chk CHECK (kind IN ('receipt', 'issue', 'saleDepletion', 'waste', 'adjustmentIn', 'adjustmentOut', 'transferOut', 'transferIn', 'countGain', 'countLoss', 'supplierReturn', 'production')),
     quantity                          numeric(18,4) NOT NULL,
     unit                              text,
     reason                            text CONSTRAINT movement_reason_chk CHECK (char_length(reason) <= 500),
@@ -165,6 +167,7 @@ CREATE TABLE IF NOT EXISTS inventory.purchase_order (
     acknowledged_at                   timestamptz,
     close_short_reason                text,
     cancel_reason                     text,
+    approval_request_id               uuid,
     cancelled_at                      timestamptz,
     venue_id                          uuid,
     scope_path                        ltree NOT NULL
@@ -180,6 +183,8 @@ CREATE TABLE IF NOT EXISTS inventory.purchase_order_line (
     received_quantity                 numeric(18,4),
     outstanding_quantity              numeric(18,4),
     unit_price                        numeric(18,4),
+    quoted_unit_price                 numeric(18,4),
+    price_override_reason             text,
     line_total                        numeric(18,4),
     id                                uuid PRIMARY KEY NOT NULL
 );
@@ -350,7 +355,11 @@ CREATE TABLE IF NOT EXISTS inventory.transfer (
     dispatched_at                     timestamptz NOT NULL,
     received_at                       timestamptz,
     close_short_reason                text,
-    scope_path                        ltree NOT NULL
+    close_short_signed_by_principal_id uuid,
+    from_venue_id                     uuid,
+    to_venue_id                       uuid,
+    scope_path                        ltree NOT NULL,
+    to_scope_path                     ltree
 );
 
 -- One item moving, which is in neither location until it arrives

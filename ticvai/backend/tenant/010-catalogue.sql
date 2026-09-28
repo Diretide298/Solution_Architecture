@@ -185,7 +185,7 @@ CREATE TABLE IF NOT EXISTS catalogue.event_type (
     code                              text NOT NULL,
     name                              text NOT NULL,
     has_performances                  boolean DEFAULT true,
-    capacity_basis                    text CONSTRAINT event_type_capacity_basis_chk CHECK (capacity_basis IN ('perPerformance', 'perDay', 'perSession', 'unlimited')),
+    capacity_basis                    text CONSTRAINT event_type_capacity_basis_chk CHECK (capacity_basis IN ('perPerformance', 'perDay', 'unlimited')),
     ticket_names_date                 boolean DEFAULT true,
     multi_day                         boolean DEFAULT false,
     requires_registration             boolean DEFAULT false,
@@ -284,6 +284,20 @@ CREATE TABLE IF NOT EXISTS catalogue.performance (
     status                            text NOT NULL CONSTRAINT performance_status_chk CHECK (status IN ('scheduled', 'onSale', 'soldOut', 'suspended', 'cancelled', 'completed')),
     admission_rules_id                uuid,
     seat_map_id                       uuid
+);
+
+-- Holds 9 columns. No description has been written for this table — the name is the only thing
+-- saying what it is
+CREATE TABLE IF NOT EXISTS catalogue.performance_template (
+    id                                uuid PRIMARY KEY,
+    code                              text NOT NULL,
+    name                              text,
+    space_id                          uuid,
+    slot_minutes                      integer,
+    turnaround_minutes                integer DEFAULT 0,
+    concurrent_capacity               integer,
+    walk_in                           jsonb,
+    scope_path                        ltree NOT NULL
 );
 
 -- Holds 8 columns. No description has been written for this table — the name is the only thing
@@ -430,20 +444,6 @@ CREATE TABLE IF NOT EXISTS catalogue.published_bundle (
     stale_after                       timestamptz NOT NULL,
     payload                           jsonb NOT NULL,
     id                                uuid PRIMARY KEY NOT NULL
-);
-
--- Holds 9 columns. No description has been written for this table — the name is the only thing
--- saying what it is
-CREATE TABLE IF NOT EXISTS catalogue.session_template (
-    id                                uuid PRIMARY KEY,
-    code                              text NOT NULL,
-    name                              text,
-    space_id                          uuid,
-    slot_minutes                      integer,
-    turnaround_minutes                integer DEFAULT 0,
-    concurrent_capacity               integer,
-    walk_in                           jsonb,
-    scope_path                        ltree NOT NULL
 );
 
 -- Holds 14 columns. No description has been written for this table — the name is the only thing

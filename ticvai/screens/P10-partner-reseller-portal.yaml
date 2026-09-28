@@ -106,11 +106,6 @@ screens:
     - to: PTR-004
       trigger: Notifications
       provenance: structural — PTR-001 is P10's home screen and its exits are its launcher
-    - to: SUP-001
-      trigger: Agent Login
-      provenance: flow F104 step 2→3
-      crossesDevice: true
-      back: false
     - to: PTR-022
       trigger: Opens the partner command centre
       provenance: flow F110 step 1→2
@@ -191,6 +186,13 @@ screens:
     - to: PTR-042
       trigger: Partner Operations Command Center
       provenance: structural — PTR-001 is P10's home screen and its exits are its launcher
+    - to: SUP-001
+      trigger: A back-office user signs in through the same door
+      provenance: flow F104 step 4→5
+      crossesDevice: true
+      back: false
+      carries:
+      - challengeId
     - to: PTR-005
       trigger: Books against the allocation
       provenance: flow F10 step 1→2
@@ -355,6 +357,24 @@ screens:
         label: Login
         operation: login
         provenance: contract identity.yaml POST /auth/login
+      - kind: textField
+        label: Authentication code
+        operation: verifyMfaChallenge
+        notes: Shown only in the mfaRequired state, after `login`, for the authenticator-app code or the
+          emailed code (decided 28 September, audit R135, R126 (5)).
+        provenance: contract identity.yaml POST /auth/mfa/challenge/{challengeId}/verify
+      - kind: primaryButton
+        label: Verify
+        operation: verifyMfaChallenge
+        notes: Completes sign-in; the session is usable only after it. Five wrong codes lock step-up (429
+          step-up-locked, audit R126 (6)).
+        provenance: contract identity.yaml POST /auth/mfa/challenge/{challengeId}/verify
+      - kind: secondaryButton
+        label: Email me a code instead
+        operation: createMfaChallenge
+        notes: 'The fallback: a new challenge with the email method (`emailOtp`) instead of the authenticator
+          app (decided 28 September, audit R126 (5)).'
+        provenance: contract identity.yaml POST /auth/mfa/challenge
       - kind: destructiveButton
         label: Force logout
         operation: forceLogout
@@ -439,7 +459,24 @@ screens:
     emptyNoAccess: Shown when the caller lacks `ORDER_VIEW`, which `getB2bCredit` requires, and names
       that permission. **Never an empty table** — that reads as *there is no data* and sends somebody
       to support with the wrong question.
+    mfaRequired: '**Signed in, not yet through.** The principal holds a permission that requires MFA (ROLE_MANAGE,
+      LEDGER_APPROVE, any platform-staff permission, or one the tenant added), so after `login` the screen
+      calls `createMfaChallenge` and asks for the authenticator code; `verifyMfaChallenge` completes the
+      sign-in. **Email me a code instead** is the fallback. Five wrong codes lock step-up for the policy''s
+      lockout minutes and the screen says so. A principal with no enrolled method is sent to enrol first
+      (decided 28 September, audit R135, R126).'
   apis:
+  - operationId: createMfaChallenge
+    contract: identity
+    purpose: Second factor after login when the principal holds a permission in mfaRequiredForPermissions;
+      action `signIn`, the primary method (authenticator app), or the email method as the fallback (decided
+      28 September, audit R135, R126 (5))
+    trigger: onAction
+  - operationId: verifyMfaChallenge
+    contract: identity
+    purpose: Completes sign-in with the code; the session is usable only after it. Five wrong codes lock
+      step-up (audit R126 (6))
+    trigger: onAction
   - operationId: login
     contract: identity
     purpose: from page inventory
@@ -496,6 +533,8 @@ screens:
     params:
     - name: accountId
       from: deepLink
+    - name: challengeId
+      from: navigation
     coldEntry: '**A partner link resolves within that partner''s own scope and refuses outside it.** A
       forwarded link between partners must not open another partner''s record. If the target is gone the
       screen says so and offers the partner''s own list. Arrives with `accountId`.'
@@ -530,7 +569,6 @@ screens:
     exitTo:
     - PTR-001
     - PTR-003
-    - PTR-004
     - PTR-007
     flowDerived: true
     transitions:
@@ -542,16 +580,12 @@ screens:
       trigger: Partner Login / MFA
       carries:
       - accountId
-      provenance: derived — PTR-001 declares entryState.params accountId and PTR-002 holds accountId,
-        so an edge into it carries them
+      provenance: derived — PTR-001 declares entryState.params accountId, challengeId and PTR-002 holds
+        accountId, so an edge into it carries them
     - to: PTR-003
       trigger: Profile & Company Details
       provenance: derived — PTR-003 declares entryState.params  and PTR-002 holds none of them, so the
         edge carries nothing and PTR-003 opens cold
-    - to: PTR-004
-      trigger: Notifications
-      provenance: derived — PTR-004 declares entryState.params messageId and PTR-002 holds none of them,
-        so the edge carries nothing and PTR-004 opens cold
   notes: States derived from the screen pattern on 17 August, not individually considered — sound for
     a list, a form or a money screen, and worth revisiting where this screen is unusual. Purpose derived
     from the screen name and its operations on 17 August, not from a requirement. **createRefund removed
@@ -1059,17 +1093,12 @@ screens:
     inferred: true
     exitTo:
     - PTR-001
-    - PTR-002
     - PTR-004
     transitions:
     - to: PTR-001
       trigger: Partner Login / MFA
-      provenance: derived — PTR-001 declares entryState.params accountId and PTR-003 holds none of them,
-        so the edge carries nothing and PTR-001 opens cold
-    - to: PTR-002
-      trigger: Partner Dashboard
-      provenance: derived — PTR-002 declares entryState.params accountId, orderId and PTR-003 holds none
-        of them, so the edge carries nothing and PTR-002 opens cold
+      provenance: derived — PTR-001 declares entryState.params accountId, challengeId and PTR-003 holds
+        none of them, so the edge carries nothing and PTR-001 opens cold
     - to: PTR-004
       trigger: Notifications
       provenance: derived — PTR-004 declares entryState.params messageId and PTR-003 holds none of them,
@@ -1246,17 +1275,12 @@ screens:
     inferred: true
     exitTo:
     - PTR-001
-    - PTR-002
     - PTR-003
     transitions:
     - to: PTR-001
       trigger: Partner Login / MFA
-      provenance: derived — PTR-001 declares entryState.params accountId and PTR-004 holds none of them,
-        so the edge carries nothing and PTR-001 opens cold
-    - to: PTR-002
-      trigger: Partner Dashboard
-      provenance: derived — PTR-002 declares entryState.params accountId, orderId and PTR-004 holds none
-        of them, so the edge carries nothing and PTR-002 opens cold
+      provenance: derived — PTR-001 declares entryState.params accountId, challengeId and PTR-004 holds
+        none of them, so the edge carries nothing and PTR-001 opens cold
     - to: PTR-003
       trigger: Profile & Company Details
       provenance: derived — PTR-003 declares entryState.params  and PTR-004 holds none of them, so the
@@ -1363,16 +1387,11 @@ screens:
     - PTR-001
     inferred: true
     exitTo:
-    - PTR-001
     - PTR-002
     - PTR-003
     - PTR-008
     fromFlows: true
     transitions:
-    - to: PTR-001
-      trigger: Partner Login / MFA
-      provenance: derived — PTR-001 declares entryState.params accountId and PTR-005 holds none of them,
-        so the edge carries nothing and PTR-001 opens cold
     - to: PTR-002
       trigger: Partner Dashboard
       carries:
@@ -1945,18 +1964,8 @@ screens:
     - PTR-001
     inferred: true
     exitTo:
-    - PTR-001
-    - PTR-002
     - PTR-003
     transitions:
-    - to: PTR-001
-      trigger: Partner Login / MFA
-      provenance: derived — PTR-001 declares entryState.params accountId and PTR-006 holds none of them,
-        so the edge carries nothing and PTR-001 opens cold
-    - to: PTR-002
-      trigger: Partner Dashboard
-      provenance: derived — PTR-002 declares entryState.params accountId, orderId and PTR-006 holds none
-        of them, so the edge carries nothing and PTR-002 opens cold
     - to: PTR-003
       trigger: Profile & Company Details
       provenance: derived — PTR-003 declares entryState.params  and PTR-006 holds none of them, so the
@@ -2432,8 +2441,6 @@ screens:
     - PTR-002
     inferred: true
     exitTo:
-    - PTR-001
-    - PTR-002
     - PTR-003
     - PTR-008
     flowDerived: true
@@ -2442,14 +2449,6 @@ screens:
       trigger: Creates the booking
       provenance: flow F03 step 2→3
       operation: getAvailability
-    - to: PTR-001
-      trigger: Partner Login / MFA
-      provenance: derived — PTR-001 declares entryState.params accountId and PTR-007 holds none of them,
-        so the edge carries nothing and PTR-001 opens cold
-    - to: PTR-002
-      trigger: Partner Dashboard
-      provenance: derived — PTR-002 declares entryState.params accountId, orderId and PTR-007 holds none
-        of them, so the edge carries nothing and PTR-002 opens cold
     - to: PTR-003
       trigger: Profile & Company Details
       provenance: derived — PTR-003 declares entryState.params  and PTR-007 holds none of them, so the
@@ -2516,17 +2515,12 @@ screens:
     - PTR-007
     inferred: true
     exitTo:
-    - PTR-001
     - PTR-002
     - PTR-003
     - PTR-016
     flowDerived: true
     fromFlows: true
     transitions:
-    - to: PTR-001
-      trigger: Partner Login / MFA
-      provenance: derived — PTR-001 declares entryState.params accountId and PTR-008 holds none of them,
-        so the edge carries nothing and PTR-001 opens cold
     - to: PTR-002
       trigger: Partner Dashboard
       carries:
@@ -3008,18 +3002,8 @@ screens:
     - PTR-001
     inferred: true
     exitTo:
-    - PTR-001
-    - PTR-002
     - PTR-003
     transitions:
-    - to: PTR-001
-      trigger: Partner Login / MFA
-      provenance: derived — PTR-001 declares entryState.params accountId and PTR-009 holds none of them,
-        so the edge carries nothing and PTR-001 opens cold
-    - to: PTR-002
-      trigger: Partner Dashboard
-      provenance: derived — PTR-002 declares entryState.params accountId, orderId and PTR-009 holds none
-        of them, so the edge carries nothing and PTR-002 opens cold
     - to: PTR-003
       trigger: Profile & Company Details
       provenance: derived — PTR-003 declares entryState.params  and PTR-009 holds none of them, so the
@@ -3232,14 +3216,9 @@ screens:
     - PTR-001
     inferred: true
     exitTo:
-    - PTR-001
     - PTR-002
     - PTR-003
     transitions:
-    - to: PTR-001
-      trigger: Partner Login / MFA
-      provenance: derived — PTR-001 declares entryState.params accountId and PTR-010 holds none of them,
-        so the edge carries nothing and PTR-001 opens cold
     - to: PTR-002
       trigger: Partner Dashboard
       carries:
@@ -3569,18 +3548,8 @@ screens:
     - PTR-001
     inferred: true
     exitTo:
-    - PTR-001
-    - PTR-002
     - PTR-003
     transitions:
-    - to: PTR-001
-      trigger: Partner Login / MFA
-      provenance: derived — PTR-001 declares entryState.params accountId and PTR-011 holds none of them,
-        so the edge carries nothing and PTR-001 opens cold
-    - to: PTR-002
-      trigger: Partner Dashboard
-      provenance: derived — PTR-002 declares entryState.params accountId, orderId and PTR-011 holds none
-        of them, so the edge carries nothing and PTR-002 opens cold
     - to: PTR-003
       trigger: Profile & Company Details
       provenance: derived — PTR-003 declares entryState.params  and PTR-011 holds none of them, so the
@@ -3778,14 +3747,9 @@ screens:
     - PTR-001
     inferred: true
     exitTo:
-    - PTR-001
     - PTR-002
     - PTR-003
     transitions:
-    - to: PTR-001
-      trigger: Partner Login / MFA
-      provenance: derived — PTR-001 declares entryState.params accountId and PTR-012 holds none of them,
-        so the edge carries nothing and PTR-001 opens cold
     - to: PTR-002
       trigger: Partner Dashboard
       carries:
@@ -3959,8 +3923,8 @@ screens:
       trigger: Partner Login / MFA
       carries:
       - accountId
-      provenance: derived — PTR-001 declares entryState.params accountId and PTR-013 holds accountId,
-        so an edge into it carries them
+      provenance: derived — PTR-001 declares entryState.params accountId, challengeId and PTR-013 holds
+        accountId, so an edge into it carries them
     - to: PTR-002
       trigger: Partner Dashboard
       carries:
@@ -4090,18 +4054,8 @@ screens:
     - PTR-001
     inferred: true
     exitTo:
-    - PTR-001
-    - PTR-002
     - PTR-003
     transitions:
-    - to: PTR-001
-      trigger: Partner Login / MFA
-      provenance: derived — PTR-001 declares entryState.params accountId and PTR-014 holds none of them,
-        so the edge carries nothing and PTR-001 opens cold
-    - to: PTR-002
-      trigger: Partner Dashboard
-      provenance: derived — PTR-002 declares entryState.params accountId, orderId and PTR-014 holds none
-        of them, so the edge carries nothing and PTR-002 opens cold
     - to: PTR-003
       trigger: Profile & Company Details
       provenance: derived — PTR-003 declares entryState.params  and PTR-014 holds none of them, so the
@@ -4308,15 +4262,10 @@ screens:
     - PTR-001
     inferred: true
     exitTo:
-    - PTR-001
     - PTR-002
     - PTR-003
     fromFlows: true
     transitions:
-    - to: PTR-001
-      trigger: Partner Login / MFA
-      provenance: derived — PTR-001 declares entryState.params accountId and PTR-015 holds none of them,
-        so the edge carries nothing and PTR-001 opens cold
     - to: PTR-002
       trigger: Partner Dashboard
       carries:
@@ -4795,14 +4744,9 @@ screens:
     - PTR-008
     inferred: true
     exitTo:
-    - PTR-001
     - PTR-002
     - PTR-003
     transitions:
-    - to: PTR-001
-      trigger: Partner Login / MFA
-      provenance: derived — PTR-001 declares entryState.params accountId and PTR-016 holds none of them,
-        so the edge carries nothing and PTR-001 opens cold
     - to: PTR-002
       trigger: Partner Dashboard
       carries:
@@ -5227,18 +5171,8 @@ screens:
     - PTR-001
     inferred: true
     exitTo:
-    - PTR-001
-    - PTR-002
     - PTR-003
     transitions:
-    - to: PTR-001
-      trigger: Partner Login / MFA
-      provenance: derived — PTR-001 declares entryState.params accountId and PTR-017 holds none of them,
-        so the edge carries nothing and PTR-001 opens cold
-    - to: PTR-002
-      trigger: Partner Dashboard
-      provenance: derived — PTR-002 declares entryState.params accountId, orderId and PTR-017 holds none
-        of them, so the edge carries nothing and PTR-002 opens cold
     - to: PTR-003
       trigger: Profile & Company Details
       provenance: derived — PTR-003 declares entryState.params  and PTR-017 holds none of them, so the
@@ -5384,18 +5318,8 @@ screens:
     - PTR-001
     inferred: true
     exitTo:
-    - PTR-001
-    - PTR-002
     - PTR-003
     transitions:
-    - to: PTR-001
-      trigger: Partner Login / MFA
-      provenance: derived — PTR-001 declares entryState.params accountId and PTR-018 holds none of them,
-        so the edge carries nothing and PTR-001 opens cold
-    - to: PTR-002
-      trigger: Partner Dashboard
-      provenance: derived — PTR-002 declares entryState.params accountId, orderId and PTR-018 holds none
-        of them, so the edge carries nothing and PTR-002 opens cold
     - to: PTR-003
       trigger: Profile & Company Details
       provenance: derived — PTR-003 declares entryState.params  and PTR-018 holds none of them, so the
@@ -5705,17 +5629,12 @@ screens:
     inferred: true
     exitTo:
     - PTR-001
-    - PTR-002
     - PTR-003
     transitions:
     - to: PTR-001
       trigger: Partner Login / MFA
-      provenance: derived — PTR-001 declares entryState.params accountId and PTR-019 holds none of them,
-        so the edge carries nothing and PTR-001 opens cold
-    - to: PTR-002
-      trigger: Partner Dashboard
-      provenance: derived — PTR-002 declares entryState.params accountId, orderId and PTR-019 holds none
-        of them, so the edge carries nothing and PTR-002 opens cold
+      provenance: derived — PTR-001 declares entryState.params accountId, challengeId and PTR-019 holds
+        none of them, so the edge carries nothing and PTR-001 opens cold
     - to: PTR-003
       trigger: Profile & Company Details
       provenance: derived — PTR-003 declares entryState.params  and PTR-019 holds none of them, so the
@@ -5904,17 +5823,12 @@ screens:
     inferred: true
     exitTo:
     - PTR-001
-    - PTR-002
     - PTR-003
     transitions:
     - to: PTR-001
       trigger: Partner Login / MFA
-      provenance: derived — PTR-001 declares entryState.params accountId and PTR-020 holds none of them,
-        so the edge carries nothing and PTR-001 opens cold
-    - to: PTR-002
-      trigger: Partner Dashboard
-      provenance: derived — PTR-002 declares entryState.params accountId, orderId and PTR-020 holds none
-        of them, so the edge carries nothing and PTR-002 opens cold
+      provenance: derived — PTR-001 declares entryState.params accountId, challengeId and PTR-020 holds
+        none of them, so the edge carries nothing and PTR-001 opens cold
     - to: PTR-003
       trigger: Profile & Company Details
       provenance: derived — PTR-003 declares entryState.params  and PTR-020 holds none of them, so the
@@ -6085,18 +5999,8 @@ screens:
     - PTR-001
     inferred: true
     exitTo:
-    - PTR-001
-    - PTR-002
     - PTR-003
     transitions:
-    - to: PTR-001
-      trigger: Partner Login / MFA
-      provenance: derived — PTR-001 declares entryState.params accountId and PTR-021 holds none of them,
-        so the edge carries nothing and PTR-001 opens cold
-    - to: PTR-002
-      trigger: Partner Dashboard
-      provenance: derived — PTR-002 declares entryState.params accountId, orderId and PTR-021 holds none
-        of them, so the edge carries nothing and PTR-002 opens cold
     - to: PTR-003
       trigger: Profile & Company Details
       provenance: derived — PTR-003 declares entryState.params  and PTR-021 holds none of them, so the
@@ -6400,7 +6304,6 @@ screens:
     entryFrom:
     - PTR-001
     exitTo:
-    - PTR-001
     - PTR-023
     - PTR-024
     - PTR-025
@@ -6415,10 +6318,6 @@ screens:
       with a command centre; the other nine screens are that board''s detail, so they are reached from
       here and return here.'
     transitions:
-    - to: PTR-001
-      trigger: Partner Login / MFA
-      provenance: derived — PTR-001 declares entryState.params accountId and PTR-022 holds none of them,
-        so the edge carries nothing and PTR-001 opens cold
     - to: PTR-023
       trigger: Sets up the organisation record
       provenance: flow F110 step 4→5
@@ -7652,7 +7551,6 @@ screens:
     entryFrom:
     - PTR-001
     exitTo:
-    - PTR-001
     - PTR-033
     - PTR-034
     - PTR-035
@@ -7667,10 +7565,6 @@ screens:
       with a command centre; the other nine screens are that board''s detail, so they are reached from
       here and return here.'
     transitions:
-    - to: PTR-001
-      trigger: Partner Login / MFA
-      provenance: derived — PTR-001 declares entryState.params accountId and PTR-032 holds none of them,
-        so the edge carries nothing and PTR-001 opens cold
     - to: PTR-033
       trigger: Works in Agreement & Contract Terms Builder
       provenance: flow F131 step 1→2
@@ -8966,7 +8860,6 @@ screens:
     entryFrom:
     - PTR-001
     exitTo:
-    - PTR-001
     - PTR-043
     - PTR-044
     - PTR-045
@@ -8981,10 +8874,6 @@ screens:
       with a command centre; the other nine screens are that board''s detail, so they are reached from
       here and return here.'
     transitions:
-    - to: PTR-001
-      trigger: Partner Login / MFA
-      provenance: derived — PTR-001 declares entryState.params accountId and PTR-042 holds none of them,
-        so the edge carries nothing and PTR-001 opens cold
     - to: PTR-043
       trigger: Works in Partner Orders & Booking Management
       provenance: flow F132 step 1→2

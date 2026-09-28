@@ -39,6 +39,7 @@
 **`POST /game-cards/{cardCode}/load`**: Load credits onto a card
 
 Creates a liability, not revenue. Recognition happens as credits are played, or as breakage when the card expires.
+**Posts a `gameCreditLoaded` ledger entry** (decided 28 September, audit R191): the amount paid to the liability account `finance.setAccountMappings` holds for that event type, in the fiscal period open for the load date. Until this date the load wrote no ledger row.
 Bonus credits from a promotion are tracked separately because they are typically non-refundable and are spent first.
 
 |  |  |

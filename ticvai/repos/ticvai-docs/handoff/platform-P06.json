@@ -11,11 +11,11 @@
  "note": "Derived by tools/derive-platform.py. **The gaps section is the point** \u2014 a page listing what exists is a directory; one listing what is missing is a worklist.",
  "counts": {
   "screens": 96,
-  "operations": 202,
+  "operations": 208,
   "contracts": 18,
   "modules": 4,
   "undrawn": 0,
-  "operationsWithNoScreen": 198
+  "operationsWithNoScreen": 197
  },
  "waves": {
   "wave1": 25,
@@ -57,7 +57,7 @@
  "contracts": [
   {
    "contract": "fnb",
-   "operations": 38
+   "operations": 39
   },
   {
    "contract": "maintenance",
@@ -76,31 +76,31 @@
    "operations": 15
   },
   {
-   "contract": "rental",
-   "operations": 13
-  },
-  {
    "contract": "shift",
    "operations": 13
   },
   {
-   "contract": "workforce",
-   "operations": 11
+   "contract": "rental",
+   "operations": 13
+  },
+  {
+   "contract": "identity",
+   "operations": 12
   },
   {
    "contract": "marketing-crm",
    "operations": 11
   },
   {
-   "contract": "identity",
+   "contract": "workforce",
+   "operations": 11
+  },
+  {
+   "contract": "queue",
    "operations": 7
   },
   {
    "contract": "access",
-   "operations": 7
-  },
-  {
-   "contract": "queue",
    "operations": 7
   },
   {
@@ -116,11 +116,11 @@
    "operations": 2
   },
   {
-   "contract": "venue-map",
+   "contract": "tenancy",
    "operations": 2
   },
   {
-   "contract": "tenancy",
+   "contract": "venue-map",
    "operations": 2
   },
   {
@@ -135,7 +135,7 @@
    "module": "Operations",
    "wave": 1,
    "route": "/operations/sign-in",
-   "operations": 4,
+   "operations": 6,
    "drawn": true
   },
   {
@@ -468,7 +468,7 @@
    "module": "Operations",
    "wave": 1,
    "route": "/operations/profile",
-   "operations": 3,
+   "operations": 6,
    "drawn": true
   },
   {
@@ -594,7 +594,7 @@
    "module": "Floor Service",
    "wave": 2,
    "route": "/operations/walk-in-waitlist-management",
-   "operations": 1,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -1261,6 +1261,12 @@
     "summary": "Escalate a finding"
    },
    {
+    "operation": "getAllergenVerification",
+    "contract": "fnb",
+    "verb": "GET",
+    "summary": "The last allergen verdict recorded for a dish"
+   },
+   {
     "operation": "getFnbReservationPolicy",
     "contract": "fnb",
     "verb": "GET",
@@ -1411,6 +1417,12 @@
     "summary": "A membership with its history, usage and renewals"
    },
    {
+    "operation": "getPasswordPolicy",
+    "contract": "identity",
+    "verb": "GET",
+    "summary": "Read the password and MFA policy in force"
+   },
+   {
     "operation": "getPrincipalModuleAccess",
     "contract": "identity",
     "verb": "GET",
@@ -1511,12 +1523,6 @@
     "contract": "inventory",
     "verb": "GET",
     "summary": "Soft holds on stock"
-   },
-   {
-    "operation": "submitCountLines",
-    "contract": "inventory",
-    "verb": "POST",
-    "summary": "Submit counted quantities"
    },
    {
     "operation": "addGuestNote",
@@ -1885,22 +1891,10 @@
     "summary": "Archive a dashboard"
    },
    {
-    "operation": "deleteReportSchedule",
-    "contract": "reporting",
-    "verb": "DELETE",
-    "summary": "Delete a schedule"
-   },
-   {
     "operation": "listAlertRules",
     "contract": "reporting",
     "verb": "GET",
     "summary": "What raises an alert, and when"
-   },
-   {
-    "operation": "updateReportSchedule",
-    "contract": "reporting",
-    "verb": "PATCH",
-    "summary": "Amend, pause or resume a schedule"
    },
    {
     "operation": "cancelMerchandiseReservation",

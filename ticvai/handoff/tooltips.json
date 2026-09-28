@@ -578,7 +578,7 @@
    "columns": 9,
    "tip": "**Dev, staging, production — and which cells are in each.** Promotion may require approval and a soak period"
   },
-  "control.footer_config": {
+  "whitelabel.footer_config": {
    "columns": 4,
    "tip": "Footer columns and legal links (BL-002). **A header is chrome and a footer is a link surface** — legal links are held separately so a tenant cannot remove the privacy notice by accident."
   },
@@ -1650,7 +1650,7 @@
    "columns": 15,
    "tip": "A specific bookable object (CF-125, BL-039). **Not a quantity of interchangeable ones** — forty identical strollers are forty resources, because guest twelve returned stroller twelve."
   },
-  "resources.session_participant": {
+  "resources.performance_participant": {
    "columns": 8,
    "tip": "Who is in a session, in what order (BL-045). **The running order is operational** — an instructor takes beginners first."
   },

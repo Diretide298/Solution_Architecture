@@ -39,23 +39,23 @@ modulesUsed:
   screens: 1
 servicesCalled:
 - service: MarketingService
-  operationCalls: 60
+  operationCalls: 58
 - service: OrderService
-  operationCalls: 46
+  operationCalls: 55
 - service: CatalogueService
   operationCalls: 37
-- service: IdentityService
-  operationCalls: 24
 - service: FnbService
-  operationCalls: 20
+  operationCalls: 21
 - service: VenueOpsService
+  operationCalls: 15
+- service: IdentityService
   operationCalls: 15
 - service: AccessService
   operationCalls: 10
 - service: WhiteLabelService
   operationCalls: 7
 - service: RetailService
-  operationCalls: 7
+  operationCalls: 5
 - service: WalletService
   operationCalls: 4
 - service: AiService
@@ -78,6 +78,7 @@ screens:
   operations:
   - getTenantAppStatus
   - getTenantConfig
+  - listMyEntitlements
   - listProducts
   states:
   - emptyFirstRun
@@ -242,7 +243,7 @@ screens:
   inFlows:
   - F01 Guest buys a ticket online
 - screen: WEB-006
-  name: Date & Session Selection
+  name: Date & Performance Selection
   module: Booking & Selection
   requiresModule: ticketing
   wave: 1
@@ -371,6 +372,7 @@ screens:
   operations:
   - abandonCart
   - addCartLine
+  - applyCartPromoCode
   - checkoutCart
   - createCart
   - evaluatePromotions
@@ -452,10 +454,8 @@ screens:
   wave: 1
   density: compact
   operations:
-  - checkGuestCheckoutMatch
   - createOrder
   - createPayment
-  - decideGuestCheckoutMatch
   - getOrder
   - inquirePaymentStatus
   - transferOrderTickets
@@ -564,38 +564,26 @@ screens:
   density: compact
   operations:
   - claimCart
-  - completeSsoAuthorization
-  - createMfaChallenge
-  - enrolMfaMethod
   - getGuestSession
   - guestLogout
+  - guestPasswordLogin
   - guestSocialLogin
   - guestUaePassLogin
   - linkGuestCheckout
-  - listMfaMethods
-  - listSsoProviders
-  - login
   - refreshToken
   - registerGuest
-  - removeMfaMethod
   - requestGuestOtp
-  - startSsoAuthorization
   - verifyGuestOtp
-  - verifyMfaChallenge
-  - verifyMfaEnrolment
   states:
   - emptyFirstRun
   - emptyNoAccess
-  - emptyNoResults
   - error
   - loading
   - offline
+  - signInRefused
   offlineState: true
   entryParams:
   - cartId<-session
-  - challengeId<-deepLink
-  - methodId<-deepLink
-  - providerId<-deepLink
   goesTo:
   - WEB-001
   - WEB-010
@@ -1000,11 +988,13 @@ screens:
   operations:
   - getTenantAppStatus
   states:
+  - closed
   - emptyFirstRun
   - emptyNoAccess
   - error
   - loading
   - offline
+  - soldOut
   offlineState: true
   entryParams: []
   goesTo:
@@ -1110,9 +1100,10 @@ screens:
   density: compact
   operations:
   - addCartLine
+  - checkoutCart
+  - createPayment
   - listMerchandise
   - lookupMerchandise
-  - reserveMerchandise
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -1196,6 +1187,7 @@ screens:
   - getGuestMenu
   - getGuestOrderStatus
   - joinRestaurantWaitlist
+  - leaveRestaurantWaitlist
   - listDeliveryLocations
   - listDiningOutlets
   - listFulfilmentSlots
@@ -1212,6 +1204,7 @@ screens:
   - outletId<-deepLink
   - venueId<-session
   - orderId<-deepLink
+  - entryId<-deepLink
   goesTo:
   - WEB-001
   boardFrames: null
@@ -1331,7 +1324,9 @@ screens:
   wave: 2
   density: compact
   operations:
-  - createParkingEntitlement
+  - addCartLine
+  - checkoutCart
+  - createPayment
   - listParkingFacilities
   - updateParkingEntitlement
   states:
@@ -1341,10 +1336,12 @@ screens:
   - error
   - loading
   - offline
+  - soldOutForDay
   offlineState: true
   entryParams:
   - entitlementId<-deepLink
   - venueId<-session
+  - cartId<-session
   goesTo:
   - WEB-001
   boardFrames: null
@@ -1357,10 +1354,12 @@ screens:
   wave: 2
   density: compact
   operations:
+  - addCartLine
+  - checkoutCart
+  - createPayment
   - listMerchandise
   - lookupMerchandise
   - lookupShopAndDrop
-  - reserveMerchandise
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -1371,6 +1370,7 @@ screens:
   offlineState: true
   entryParams:
   - outletId<-deepLink
+  - cartId<-session
   goesTo:
   - WEB-001
   boardFrames: null
@@ -1459,7 +1459,7 @@ screens:
   name: In-Venue Notifications
   module: Engagement & Support
   requiresModule: marketing
-  wave: 2
+  wave: 4
   density: compact
   operations:
   - claimLocationSession

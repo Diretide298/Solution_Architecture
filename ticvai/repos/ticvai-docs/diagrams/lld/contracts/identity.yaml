@@ -1,5 +1,5 @@
 id: LLD-identity
-title: identity — 70 operations
+title: identity — 75 operations
 generatedBy: tools/derive-diagrams.py
 index: diagrams/hld/03-contracts.yaml
 tier: spine
@@ -33,6 +33,7 @@ operations:
   offline: false
   reads:
   - cache:idempotency
+  - identity.mfa_method
   - identity.principal
   - identity.sso_provider
   writes:
@@ -284,6 +285,17 @@ operations:
   - identity.customer_membership
   - identity.membership_history
   writes: []
+- operation: getPasswordPolicy
+  verb: GET
+  path: /password-policy
+  scope: tenant
+  permission: TENANT_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - identity.password_policy
+  writes: []
 - operation: getPrincipal
   verb: GET
   path: /principals/{principalId}
@@ -347,6 +359,16 @@ operations:
   - identity.guest_session
   writes:
   - identity.guest_session
+- operation: guestPasswordLogin
+  verb: POST
+  path: /auth/guest/password
+  scope: tenant
+  permission: null
+  audience:
+  - anonymous
+  offline: false
+  reads: []
+  writes: []
 - operation: guestSocialLogin
   verb: POST
   path: /auth/guest/social
@@ -535,6 +557,17 @@ operations:
   reads:
   - identity.module
   writes: []
+- operation: listOwnPlatformStaffGrants
+  verb: GET
+  path: /platform-staff-grants/mine
+  scope: tenant
+  permission: PLATFORM_TENANT_ACCESS
+  audience:
+  - staff
+  offline: false
+  reads:
+  - identity.platform_staff_grant
+  writes: []
 - operation: listPermissions
   verb: GET
   path: /permissions
@@ -545,6 +578,17 @@ operations:
   offline: false
   reads:
   - identity.permission
+  writes: []
+- operation: listPlatformStaffGrants
+  verb: GET
+  path: /platform-staff-grants
+  scope: tenant
+  permission: AUDIT_VIEW
+  audience:
+  - staff
+  offline: false
+  reads:
+  - identity.platform_staff_grant
   writes: []
 - operation: listPrincipals
   verb: GET
@@ -614,6 +658,7 @@ operations:
   reads:
   - cache:idempotency
   - identity.delegated_access
+  - identity.mfa_method
   - identity.principal
   - identity.principal_credential
   - identity.role
@@ -634,6 +679,17 @@ operations:
   writes:
   - cache:idempotency
   - identity.session
+- operation: openPlatformStaffGrant
+  verb: POST
+  path: /platform-staff-grants
+  scope: tenant
+  permission: PLATFORM_TENANT_ACCESS
+  audience:
+  - staff
+  offline: false
+  reads:
+  - identity.platform_staff_grant
+  writes: []
 - operation: recordBenefitUsage
   verb: POST
   path: /memberships/{membershipId}/benefit-usage

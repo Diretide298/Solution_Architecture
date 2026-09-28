@@ -136,10 +136,10 @@ stateModels:
   - expired
   - cancelled
   operations:
-  - createApprovalRequest
   - decideApprovalRequest
   - escalateApprovalRequest
   - resubmitApprovalRequest
+  - submitApprovalRequest
   - withdrawApprovalRequest
   guarded: 13
   ref: diagrams/lld/lifecycles/approval-request.yaml
@@ -909,11 +909,7 @@ stateModels:
   transitions: 6
   initial:
   - processing
-  terminal:
-  - ready
-  - quarantined
-  - failed
-  - archived
+  terminal: []
   operations:
   - updateMediaAsset
   guarded: 6
@@ -1121,6 +1117,7 @@ stateModels:
   terminal: []
   operations:
   - abandonPeriodClose
+  - beginPeriodClose
   - closeFiscalPeriod
   - reopenPeriod
   guarded: 4
@@ -1450,6 +1447,7 @@ stateModels:
   - checkInResource
   - checkOutResource
   - createResource
+  - setResourceLifecycleState
   guarded: 9
   ref: diagrams/lld/lifecycles/resource.yaml
 - entity: Restaurant waitlist entry
@@ -1457,7 +1455,7 @@ stateModels:
   owner: fnb
   service: FnbService
   states: null
-  transitions: 5
+  transitions: 6
   initial:
   - waiting
   terminal:
@@ -1467,7 +1465,8 @@ stateModels:
   - cancelled
   operations:
   - joinRestaurantWaitlist
-  guarded: 5
+  - leaveRestaurantWaitlist
+  guarded: 6
   ref: diagrams/lld/lifecycles/restaurant-waitlist.yaml
 - entity: Rollout to a cell
   contract: platform-ops
@@ -1509,7 +1508,7 @@ stateModels:
   owner: workforce
   service: TenancyService
   states: null
-  transitions: 10
+  transitions: 11
   initial:
   - planned
   terminal:
@@ -1520,7 +1519,7 @@ stateModels:
   - createRotaAssignment
   - requestShiftSwap
   - updateRotaAssignment
-  guarded: 10
+  guarded: 11
   ref: diagrams/lld/lifecycles/rota-assignment.yaml
 - entity: Sandbox
   contract: public-api
@@ -1758,17 +1757,16 @@ stateModels:
   owner: subscription
   service: PlatformService
   states: null
-  transitions: 7
+  transitions: 8
   initial:
   - trial
   - active
   terminal:
-  - cancelled
   - expired
   operations:
   - cancelSubscription
   - setSubscription
-  guarded: 7
+  guarded: 8
   ref: diagrams/lld/lifecycles/subscription.yaml
 - entity: Table reservation
   contract: fnb

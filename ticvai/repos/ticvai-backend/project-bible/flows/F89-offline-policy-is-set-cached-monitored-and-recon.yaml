@@ -18,33 +18,42 @@ trigger:
 offlineBehaviour: Configuration is online. What it configures is entirely offline.
 steps:
 - step: 1
-  screen: BO-037
-  action: Offline Package Status.
+  screen: BO-130
+  action: The venue sets its offline policy.
   operations:
   - setOfflinePolicy
-  outcome: '**Drawn by the client as POS-5A.** 1 operations on this step.'
+  outcome: What a till may do with no network, and for how long.
 - step: 2
-  screen: BO-128
-  action: Live Workstation Health Monitor.
+  screen: BO-129
+  action: The connectivity thresholds are set.
   operations:
-  - setOfflinePolicy
-  outcome: '**Drawn by the client as POS-5B.** 1 operations on this step.'
+  - setConnectivityThresholds
+  outcome: When a device counts as offline rather than slow.
   crossesDevice: true
 - step: 3
-  screen: BO-129
-  action: Software, Configuration & Version Management.
+  screen: BO-037
+  action: Each device's cached package is checked.
   operations:
-  - setConfigurationProfile
-  - setConnectivityThresholds
-  outcome: '**Drawn by the client as POS-5C.** 2 operations on this step.'
+  - getOfflinePackage
+  - listCatalogueBundles
+  outcome: '**What each device is enforcing right now**, not what was configured.'
   crossesDevice: true
 - step: 4
-  screen: BO-130
-  action: Offline Policy & Rules Configuration.
+  screen: BO-128
+  action: The fleet is monitored.
   operations:
-  - setOfflinePolicy
-  outcome: '**Drawn by the client as POS-5D.** 1 operations on this step.'
+  - getWorkstationHealth
+  - listWorkstations
+  outcome: Which tills are offline, and since when.
   crossesDevice: true
+- step: 5
+  screen: BO-037
+  action: What the tills did offline is reconciled.
+  operations:
+  - listSyncRejections
+  - syncOrders
+  outcome: '**Every rejected offline sale is seen by a person.** A rejection nobody reads is money nobody
+    collects.'
 branches:
 - at: 1
   condition: A step in the chain is not licensed for this tenant.
@@ -58,7 +67,7 @@ exitStates:
   description: The chain ran as the client drew it.
 - state: stoppedAtModule
   description: '**A licence boundary, not a failure.**'
-notes: '**POS board 5.** F33 walks a till going offline; this walks the venue deciding the rules it
+notes: '**Re-authored 28 September to follow the purpose of each screen it visits** (decided 28 September, audit R261): set, cached, monitored and reconciled now each land on the screen whose purpose it is, instead of setOfflinePolicy repeated on four screens. **POS board 5.** F33 walks a till going offline; this walks the venue deciding the rules it
   obeys. **Derived from the client''s own `GOES TO` edges**, not from an inferred path — a pair of frames
   the client linked is evidence; a chain assembled from unrelated pairs is a guess.'
 openQuestions: null

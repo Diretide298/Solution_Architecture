@@ -267,6 +267,24 @@ screens:
         label: Login
         operation: login
         provenance: contract identity.yaml POST /auth/login
+      - kind: textField
+        label: Authentication code
+        operation: verifyMfaChallenge
+        notes: Shown only in the mfaRequired state, after `login`, for the authenticator-app code or the
+          emailed code (decided 28 September, audit R135, R126 (5)).
+        provenance: contract identity.yaml POST /auth/mfa/challenge/{challengeId}/verify
+      - kind: primaryButton
+        label: Verify
+        operation: verifyMfaChallenge
+        notes: Completes sign-in; the session is usable only after it. Five wrong codes lock step-up (429
+          step-up-locked, audit R126 (6)).
+        provenance: contract identity.yaml POST /auth/mfa/challenge/{challengeId}/verify
+      - kind: secondaryButton
+        label: Email me a code instead
+        operation: createMfaChallenge
+        notes: 'The fallback: a new challenge with the email method (`emailOtp`) instead of the authenticator
+          app (decided 28 September, audit R126 (5)).'
+        provenance: contract identity.yaml POST /auth/mfa/challenge
       - kind: destructiveButton
         label: Force logout
         operation: forceLogout
@@ -319,7 +337,24 @@ screens:
     emptyNoAccess: Shown when the caller lacks `SESSION_FORCE_LOGOUT`, which `listActiveSessions` requires,
       and names that permission. **Never an empty table** — that reads as *there is no data* and sends
       somebody to support with the wrong question.
+    mfaRequired: '**Signed in, not yet through.** The principal holds a permission that requires MFA (ROLE_MANAGE,
+      LEDGER_APPROVE, any platform-staff permission, or one the tenant added), so after `login` the screen
+      calls `createMfaChallenge` and asks for the authenticator code; `verifyMfaChallenge` completes the
+      sign-in. **Email me a code instead** is the fallback. Five wrong codes lock step-up for the policy''s
+      lockout minutes and the screen says so. A principal with no enrolled method is sent to enrol first
+      (decided 28 September, audit R135, R126).'
   apis:
+  - operationId: createMfaChallenge
+    contract: identity
+    purpose: Second factor after login when the principal holds a permission in mfaRequiredForPermissions;
+      action `signIn`, the primary method (authenticator app), or the email method as the fallback (decided
+      28 September, audit R135, R126 (5))
+    trigger: onAction
+  - operationId: verifyMfaChallenge
+    contract: identity
+    purpose: Completes sign-in with the code; the session is usable only after it. Five wrong codes lock
+      step-up (audit R126 (6))
+    trigger: onAction
   - operationId: login
     contract: identity
     purpose: from page inventory
@@ -353,7 +388,9 @@ screens:
     invalidates:
     - listActiveSessions
   entryState:
-    params: []
+    params:
+    - name: challengeId
+      from: navigation
     coldEntry: Resolves from the session; a cold arrival is the ordinary case.
     preloaded:
     - ActiveSession.status
@@ -390,8 +427,8 @@ screens:
     transitions:
     - to: SUP-001
       trigger: Agent Login
-      provenance: derived — SUP-001 declares entryState.params  and SUP-002 holds none of them, so the
-        edge carries nothing and SUP-001 opens cold
+      provenance: derived — SUP-001 declares entryState.params challengeId and SUP-002 holds none of them,
+        so the edge carries nothing and SUP-001 opens cold
     - to: SUP-004
       trigger: Conversation Queue
       carries:
@@ -755,21 +792,11 @@ screens:
     inferred: true
     exitTo:
     - SUP-001
-    - SUP-002
-    - SUP-004
     transitions:
     - to: SUP-001
       trigger: Agent Login
-      provenance: derived — SUP-001 declares entryState.params  and SUP-003 holds none of them, so the
-        edge carries nothing and SUP-001 opens cold
-    - to: SUP-002
-      trigger: Agent Dashboard
-      provenance: derived — SUP-002 declares entryState.params caseId and SUP-003 holds none of them,
-        so the edge carries nothing and SUP-002 opens cold
-    - to: SUP-004
-      trigger: Conversation Queue
-      provenance: derived — SUP-004 declares entryState.params caseId, conversationId and SUP-003 holds
-        none of them, so the edge carries nothing and SUP-004 opens cold
+      provenance: derived — SUP-001 declares entryState.params challengeId and SUP-003 holds none of them,
+        so the edge carries nothing and SUP-001 opens cold
   notes: States derived from the screen pattern on 17 August, not individually considered — sound for
     a list, a form or a money screen, and worth revisiting where this screen is unusual. Purpose derived
     from the screen name and its operations on 17 August, not from a requirement.
@@ -848,8 +875,8 @@ screens:
     transitions:
     - to: SUP-001
       trigger: Agent Login
-      provenance: derived — SUP-001 declares entryState.params  and SUP-004 holds none of them, so the
-        edge carries nothing and SUP-001 opens cold
+      provenance: derived — SUP-001 declares entryState.params challengeId and SUP-004 holds none of them,
+        so the edge carries nothing and SUP-001 opens cold
     - to: SUP-002
       trigger: Agent Dashboard
       carries:
@@ -1230,8 +1257,8 @@ screens:
     transitions:
     - to: SUP-001
       trigger: Agent Login
-      provenance: derived — SUP-001 declares entryState.params  and SUP-005 holds none of them, so the
-        edge carries nothing and SUP-001 opens cold
+      provenance: derived — SUP-001 declares entryState.params challengeId and SUP-005 holds none of them,
+        so the edge carries nothing and SUP-001 opens cold
     - to: SUP-002
       trigger: Agent Dashboard
       carries:
@@ -1625,23 +1652,13 @@ screens:
     - SUP-001
     exitTo:
     - SUP-001
-    - SUP-002
     - SUP-003
-    - SUP-005
     inferred: true
     transitions:
     - to: SUP-001
       trigger: Agent Login
-      provenance: derived — SUP-001 declares entryState.params  and SUP-006 holds none of them, so the
-        edge carries nothing and SUP-001 opens cold
-    - to: SUP-002
-      trigger: Agent Dashboard
-      provenance: derived — SUP-002 declares entryState.params caseId and SUP-006 holds none of them,
-        so the edge carries nothing and SUP-002 opens cold
-    - to: SUP-005
-      trigger: Live Chat Workspace
-      provenance: derived — SUP-005 declares entryState.params caseId, conversationId and SUP-006 holds
-        none of them, so the edge carries nothing and SUP-005 opens cold
+      provenance: derived — SUP-001 declares entryState.params challengeId and SUP-006 holds none of them,
+        so the edge carries nothing and SUP-001 opens cold
   notes: States derived from the screen pattern on 17 August, not individually considered — sound for
     a list, a form or a money screen, and worth revisiting where this screen is unusual. Purpose derived
     from the screen name and its operations on 17 August, not from a requirement. **41 operations removed
@@ -1773,17 +1790,12 @@ screens:
     inferred: true
     exitTo:
     - SUP-001
-    - SUP-002
     - SUP-003
     transitions:
     - to: SUP-001
       trigger: Agent Login
-      provenance: derived — SUP-001 declares entryState.params  and SUP-007 holds none of them, so the
-        edge carries nothing and SUP-001 opens cold
-    - to: SUP-002
-      trigger: Agent Dashboard
-      provenance: derived — SUP-002 declares entryState.params caseId and SUP-007 holds none of them,
-        so the edge carries nothing and SUP-002 opens cold
+      provenance: derived — SUP-001 declares entryState.params challengeId and SUP-007 holds none of them,
+        so the edge carries nothing and SUP-001 opens cold
   notes: States derived from the screen pattern on 17 August, not individually considered — sound for
     a list, a form or a money screen, and worth revisiting where this screen is unusual. Purpose derived
     from the screen name and its operations on 17 August, not from a requirement.
@@ -1924,8 +1936,8 @@ screens:
     transitions:
     - to: SUP-001
       trigger: Agent Login
-      provenance: derived — SUP-001 declares entryState.params  and SUP-008 holds none of them, so the
-        edge carries nothing and SUP-001 opens cold
+      provenance: derived — SUP-001 declares entryState.params challengeId and SUP-008 holds none of them,
+        so the edge carries nothing and SUP-001 opens cold
     - to: SUP-002
       trigger: Agent Dashboard
       carries:
@@ -2278,8 +2290,8 @@ screens:
     transitions:
     - to: SUP-001
       trigger: Agent Login
-      provenance: derived — SUP-001 declares entryState.params  and SUP-009 holds none of them, so the
-        edge carries nothing and SUP-001 opens cold
+      provenance: derived — SUP-001 declares entryState.params challengeId and SUP-009 holds none of them,
+        so the edge carries nothing and SUP-001 opens cold
     - to: SUP-010
       trigger: Works in Customer 360° Service Profile
       provenance: flow F134 step 1→2
@@ -3534,8 +3546,8 @@ screens:
     transitions:
     - to: SUP-001
       trigger: Agent Login
-      provenance: derived — SUP-001 declares entryState.params  and SUP-019 holds none of them, so the
-        edge carries nothing and SUP-001 opens cold
+      provenance: derived — SUP-001 declares entryState.params challengeId and SUP-019 holds none of them,
+        so the edge carries nothing and SUP-001 opens cold
     - to: SUP-020
       trigger: Works in Queue Configuration & Management
       provenance: flow F135 step 1→2

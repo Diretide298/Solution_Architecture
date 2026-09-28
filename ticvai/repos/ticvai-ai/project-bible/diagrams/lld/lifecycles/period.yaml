@@ -15,7 +15,7 @@ terminal: []
 transitions:
 - from: open
   to: closing
-  operation: closeFiscalPeriod
+  operation: beginPeriodClose
   trigger: operation
   guard: Close initiated. New postings to this period are refused from here
 - from: closing
@@ -29,7 +29,8 @@ transitions:
   to: closed
   operation: closeFiscalPeriod
   trigger: operation
-  guard: Reconciled, revalued, no open exceptions
+  guard: Reconciled, revalued, no open exceptions. **Approved through the approvals engine by a finance
+    approver** (subject `periodClose`; decided 28 September, audit R144)
   requiresApproval: true
   emits:
   - ledger.periodClosed
@@ -38,7 +39,8 @@ transitions:
   operation: reopenPeriod
   trigger: operation
   guard: '**Rare and heavily controlled.** Reopening a closed period restates figures somebody has already
-    reported'
+    reported. Approved through the approvals engine by a finance approver (subject `periodReopen`; decided
+    28 September, audit R144)'
   isReversal: true
   requiresApproval: true
 notes: '`closing` exists so postings stop before reconciliation starts. Without it the balance moves

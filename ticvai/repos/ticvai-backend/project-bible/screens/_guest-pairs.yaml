@@ -124,6 +124,9 @@ groups:
   kind: paired
   web: [WEB-016]
   app: [GST-042]
+  note: Both are one guest sign-in form since 28 September — one-time code, password (`guestPasswordLogin`),
+    Apple or Google, UAE Pass, register. No enterprise SSO and no second factor for guests (decided 28
+    September, audit R167, R073 (a)).
   offline: >-
     **Not available, and the offline banner says why.** Signing in, registering and verifying a code
     need the server.
@@ -138,8 +141,9 @@ groups:
   web: [WEB-018]
   app: [GST-012, GST-013]
   offline: >-
-    **The offline banner shows.** Tickets already loaded stay visible with their age. Sharing,
-    transferring and adding to a phone wallet need the connection.
+    **The offline banner shows.** Tickets already loaded stay visible with their age, and a ticket's
+    rotating code is derived on the device from its seed, so it changes with no signal (decided 28
+    September, audit R230). Sharing, transferring and adding to a phone wallet need the connection.
 - key: order-history
   kind: paired
   web: [WEB-019]
@@ -153,9 +157,9 @@ groups:
   web: [WEB-024]
   app: [GST-066, GST-073]
   offline: >-
-    **Nothing here is offered offline, and the banner says so.** An erasure request or a device
-    change queued and never sent is worse than one that could not be made — the legal clock starts
-    when the platform receives it, and a second factor set up offline is not a second factor.
+    **Nothing here is offered offline, and the banner says so.** An erasure request or a device change
+    queued and never sent is worse than one that could not be made — the legal clock starts when the
+    platform receives it, and a device signed out offline is still signed in.
 - key: ticket-transfer
   kind: paired
   web: [WEB-030]
@@ -198,7 +202,12 @@ groups:
   decision: deliberate
   note: The 2 September session decided a dynamic-QR ticket bought on the web is redirected into the
     app, because a credential that needs a network round trip at a gate fails at the gate
-    (_components.yaml, credentialPresenter).
+    (_components.yaml, credentialPresenter). Since 28 September the code is derived on the device from
+    the `rotation` seed (audit R230), and the web's My Tickets shows the same rotating code.
+  offline: >-
+    **The offline banner shows.** A ticket already loaded shows its rotating code, derived on the device
+    from its seed, so it changes with no signal (decided 28 September, audit R230). Transferring a
+    ticket needs the connection.
 - key: face-pass
   kind: appOnly
   app: [GST-069]
@@ -294,6 +303,9 @@ groups:
   kind: paired
   web: [WEB-033]
   app: [GST-026]
+  note: Buying to collect is paid online through the cart on both (decided 28 September, audit R236);
+    payment creates the shop-and-drop. The app keeps `reserveMerchandise` only as an unpaid hold to pay
+    at the shop, which the web does not offer.
 - key: shop-and-drop
   kind: paired
   web: [WEB-042]
@@ -306,6 +318,9 @@ groups:
   kind: paired
   web: [WEB-046]
   app: [GST-030]
+  note: '**Deferred to a later release** (decided 28 September, audit R242): both are `wave: 4` with a
+    `deferred` block. Queue calls and order status show on the queue and order screens, which poll
+    (WEB-015, WEB-040, GST-023, GST-046, WEB-038, GST-025).'
   offline: >-
     **The offline banner shows.** Notices already received stay listed. New queue calls and order
     updates arrive once the connection is back, and the banner is the warning that they may be late.
@@ -317,8 +332,11 @@ groups:
   kind: folded
   app: [GST-070]
   foldedInto: [WEB-031, WEB-036, WEB-040]
-  note: The web books a table and joins a restaurant waitlist on F&B, books a resource on My
-    Reservations, and joins a waitlist on Virtual Queue. Every operation is on both shells.
+  note: '**Table-only since 28 September** (decided 28 September, audit R073 (c)): GST-070 is *Reserve a
+    Table*; cabanas stay staff-booked, so neither shell books a resource. The web books a table and joins
+    and leaves a restaurant waitlist on F&B (WEB-036), and joins a waitlist on Virtual Queue. Leaving a
+    restaurant waitlist is `leaveRestaurantWaitlist` on both (audit R073 (d)). The key keeps its old name
+    so references to it hold.'
   offline: >-
     **The offline banner shows.** Availability already loaded stays with its age. **Booking is not
     offered** — a table held offline is a table two people think they have.
@@ -332,13 +350,16 @@ groups:
   kind: appOnly
   app: [GST-050, GST-058]
   decision: raise
-  note: Unsourced (guest-surface-parity.md). bookResource and getResourceAvailability are on the web's
-    My Reservations, so the web can book a cabana with no screen drawn for choosing one.
+  note: 'Unsourced (guest-surface-parity.md). **Cabanas stay staff-booked** (decided 28 September, audit
+    R073 (c)): `bookResource` is staff-only, so neither shell books a cabana and these screens can at most
+    show one; GST-070 is table-only.'
 - key: itinerary-planning
   kind: appOnly
   app: [GST-051, GST-052, GST-053, GST-054, GST-059]
   decision: raise
-  note: Five screens with no requirement (guest-surface-parity.md); GST-054 assumes parked AI.
+  note: 'Five screens with no requirement (guest-surface-parity.md); GST-054 assumes parked AI. **Deferred
+    to a later release** (decided 28 September, audit R187): all five are `wave: 4` with a `deferred`
+    block and out of Block A; the itinerary suggestion is removed from them (audit R209).'
 
 # ── engagement and support ──────────────────────────────────────────────────────────────────
 - key: help-and-cases
@@ -346,19 +367,27 @@ groups:
   web: [WEB-025]
   app: [GST-068]
   offline: >-
-    **The offline banner shows.** Cases already loaded stay read-only with their age, so a guest can
-    see what they raised without believing a reply arrived. Raising and replying need the connection.
+    **The offline banner shows.** Cases already loaded stay read-only with their age, so a guest can see
+    what they raised without believing a reply arrived. **Raising a case and replying are disabled
+    offline** — both need the connection (decided 28 September, audit R148) — and the screen says how to
+    reach staff in person instead: the guest services desk, or any member of staff.
 - key: help-content-and-accessibility
   kind: paired
   web: [WEB-045]
   app: [GST-040, GST-057]
+  offline: >-
+    **The offline banner shows.** Help already loaded stays readable, marked with its age. **Raising a
+    case is disabled offline** — it needs the connection (decided 28 September, audit R148) — and the
+    screen says how to reach staff in person instead: the guest services desk, or any member of staff.
 - key: lost-and-found
   kind: paired
   web: [WEB-034]
   app: [GST-034]
   offline: >-
-    **The offline banner shows.** Reports already loaded stay read-only with their age. Reporting and
-    replying need the connection.
+    **The offline banner shows.** Reports already loaded stay read-only with their age. **Reporting a
+    loss and replying are disabled offline** — both need the connection (decided 28 September, audit
+    R148) — and the screen says how to reach staff in person instead: the guest services desk or
+    lost-property point, or any member of staff.
 - key: feedback
   kind: paired
   web: [WEB-026]

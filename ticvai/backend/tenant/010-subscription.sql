@@ -26,6 +26,7 @@ CREATE TABLE IF NOT EXISTS subscription.contract (
     starts_at                         date NOT NULL,
     renews_at                         date,
     cancelled_at                      date,
+    scheduled_change                  jsonb,
     current_price                     numeric(18,4),
     billing_period                    text,
     id                                uuid PRIMARY KEY NOT NULL

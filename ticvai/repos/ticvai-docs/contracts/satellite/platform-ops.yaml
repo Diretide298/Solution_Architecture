@@ -541,6 +541,12 @@ paths:
         cell or the smallest shared one** — a canary that is itself a busy shared cell risks many tenants
         (ADR-0001 (retired — see ADR-0014 and ADR-0017)).
 
+        **Needs the platform release manager''s approval** (decided 28 September, audit R144). Each start
+        or continuation raises an approval request of kind `releasePromotion`, routed to a holder of
+        `PLATFORM_RELEASE_PROMOTE` other than the requester, and answers `202` with the rollout unchanged
+        and `approvalRequestId` set (the request is `pending`). The rollout moves to the requested stage
+        when the request is approved. A requester may never approve their own promotion.
+
         '
       tags:
       - rollout
@@ -561,12 +567,47 @@ paths:
               properties:
                 stage:
                   type: string
+                  enum:
+                  - canary
+                  - partial
+                  - full
+                  description: >-
+                    The stage to take the rollout to (decided 28 September, audit R096). `canary` is the
+                    first cell only; `partial` is a wave of the remaining cells, and may be sent again to
+                    continue with the next wave; `full` is every remaining cell. A stage behind the one the
+                    rollout has reached is a 409.
       responses:
         '200':
           headers:
             X-Consistency-Token:
               $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Done
+        '202':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: Waiting for the platform release manager (audit R144). Nothing has moved yet.
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - rolloutId
+                - approvalRequestId
+                properties:
+                  rolloutId:
+                    type: string
+                  stage:
+                    type: string
+                    enum:
+                    - canary
+                    - partial
+                    - full
+                    description: The stage requested, applied on approval.
+                  approvalRequestId:
+                    type: string
+                    format: uuid
+                    description: The pending `releasePromotion` request.
         '409':
           description: Not in a state that permits this
           content:

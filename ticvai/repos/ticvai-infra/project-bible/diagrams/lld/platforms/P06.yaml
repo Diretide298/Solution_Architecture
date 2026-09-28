@@ -47,19 +47,19 @@ servicesCalled:
 - service: OrderService
   operationCalls: 70
 - service: FnbService
-  operationCalls: 46
+  operationCalls: 47
 - service: TenancyService
   operationCalls: 35
 - service: AccessService
   operationCalls: 23
 - service: MarketingService
   operationCalls: 19
+- service: IdentityService
+  operationCalls: 18
 - service: InventoryService
   operationCalls: 18
 - service: CatalogueService
   operationCalls: 17
-- service: IdentityService
-  operationCalls: 13
 - service: AiService
   operationCalls: 8
 - service: RetailService
@@ -80,18 +80,22 @@ screens:
   wave: 1
   density: comfortable
   operations:
+  - createMfaChallenge
   - getCurrentSession
   - listMfaMethods
   - listSsoProviders
   - login
+  - verifyMfaChallenge
   states:
   - emptyFirstRun
   - emptyNoResults
   - error
   - loading
+  - mfaRequired
   - offline
   offlineState: true
-  entryParams: []
+  entryParams:
+  - challengeId<-navigation
   goesTo:
   - EMP-002
   - EMP-003
@@ -1419,9 +1423,12 @@ screens:
   wave: 1
   density: comfortable
   operations:
+  - enrolMfaMethod
   - getCurrentSession
   - listMfaMethods
   - listSsoProviders
+  - removeMfaMethod
+  - verifyMfaEnrolment
   states:
   - emptyFirstRun
   - emptyNoResults
@@ -1431,6 +1438,7 @@ screens:
   offlineState: true
   entryParams:
   - sessionId<-session
+  - methodId<-navigation
   goesTo:
   - EMP-001
   - EMP-002
@@ -1579,8 +1587,7 @@ screens:
   entryParams:
   - venueId<-session
   - outletId<-EMP-003
-  goesTo:
-  - EMP-003
+  goesTo: []
   boardFrames:
   - FnB Board 4.dc.html#fnb-4a
   wireframe: wireframes/P06 Venue Staff App.dc.html#emp-051
@@ -1604,8 +1611,7 @@ screens:
   entryParams:
   - venueId<-session
   - outletId<-EMP-003
-  goesTo:
-  - EMP-003
+  goesTo: []
   boardFrames:
   - FnB Board 4.dc.html#fnb-4b
   wireframe: wireframes/P06 Venue Staff App.dc.html#emp-052
@@ -1628,8 +1634,7 @@ screens:
   entryParams:
   - venueId<-session
   - outletId<-EMP-003
-  goesTo:
-  - EMP-003
+  goesTo: []
   boardFrames:
   - FnB Board 4.dc.html#fnb-4c
   wireframe: wireframes/P06 Venue Staff App.dc.html#emp-053
@@ -1652,8 +1657,7 @@ screens:
   offlineState: true
   entryParams:
   - venueId<-session
-  goesTo:
-  - EMP-003
+  goesTo: []
   boardFrames:
   - FnB Board 4.dc.html#fnb-4d
   wireframe: wireframes/P06 Venue Staff App.dc.html#emp-054
@@ -1676,8 +1680,7 @@ screens:
   offlineState: true
   entryParams:
   - venueId<-session
-  goesTo:
-  - EMP-003
+  goesTo: []
   boardFrames:
   - FnB Board 4.dc.html#fnb-4e
   wireframe: wireframes/P06 Venue Staff App.dc.html#emp-055
@@ -1690,6 +1693,7 @@ screens:
   density: comfortable
   operations:
   - joinRestaurantWaitlist
+  - leaveRestaurantWaitlist
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -1699,8 +1703,8 @@ screens:
   offlineState: true
   entryParams:
   - venueId<-session
-  goesTo:
-  - EMP-003
+  - entryId<-navigation
+  goesTo: []
   boardFrames:
   - FnB Board 4.dc.html#fnb-4f
   wireframe: wireframes/P06 Venue Staff App.dc.html#emp-056
@@ -1727,8 +1731,7 @@ screens:
   entryParams:
   - venueId<-session
   - subjectId<-EMP-003
-  goesTo:
-  - EMP-003
+  goesTo: []
   boardFrames:
   - FnB Board 4.dc.html#fnb-4g
   wireframe: wireframes/P06 Venue Staff App.dc.html#emp-057
@@ -1837,7 +1840,6 @@ screens:
   - venueId<-session
   - outletId<-EMP-003
   goesTo:
-  - EMP-003
   - EMP-061
   boardFrames:
   - FnB Board 4.dc.html#fnb-4c
@@ -1864,8 +1866,7 @@ screens:
   offlineState: true
   entryParams:
   - venueId<-session
-  goesTo:
-  - EMP-003
+  goesTo: []
   boardFrames:
   - FnB Board 4.dc.html#fnb-4d
   - FnB Board 4.dc.html#fnb-4e
@@ -1920,8 +1921,7 @@ screens:
   offlineState: true
   entryParams:
   - venueId<-session
-  goesTo:
-  - EMP-003
+  goesTo: []
   boardFrames:
   - FnB Board 4.dc.html#fnb-4f
   wireframe: wireframes/P06 Venue Staff App.dc.html#emp-063
@@ -1945,8 +1945,7 @@ screens:
   offlineState: true
   entryParams:
   - venueId<-session
-  goesTo:
-  - EMP-003
+  goesTo: []
   boardFrames:
   - FnB Board 4.dc.html#fnb-4g
   wireframe: wireframes/P06 Venue Staff App.dc.html#emp-064
@@ -1973,8 +1972,7 @@ screens:
   - venueId<-session
   - receiptId<-EMP-003
   - transferId<-deepLink
-  goesTo:
-  - EMP-003
+  goesTo: []
   boardFrames:
   - FnB Board 5.dc.html#fnb-5g
   wireframe: wireframes/P06 Venue Staff App.dc.html#emp-065
@@ -2003,8 +2001,7 @@ screens:
   entryParams:
   - venueId<-session
   - countId<-EMP-003
-  goesTo:
-  - EMP-003
+  goesTo: []
   boardFrames:
   - Retail Board 4.dc.html#ret-4f
   wireframe: wireframes/P06 Venue Staff App.dc.html#emp-066
@@ -2032,8 +2029,7 @@ screens:
   - venueId<-session
   - outletId<-EMP-003
   - actionId<-deepLink
-  goesTo:
-  - EMP-003
+  goesTo: []
   boardFrames:
   - FnB Board 5.dc.html#fnb-5e
   wireframe: wireframes/P06 Venue Staff App.dc.html#emp-067
@@ -2058,8 +2054,7 @@ screens:
   entryParams:
   - venueId<-session
   - outletId<-EMP-003
-  goesTo:
-  - EMP-003
+  goesTo: []
   boardFrames:
   - Retail Board 4.dc.html#ret-4h
   wireframe: wireframes/P06 Venue Staff App.dc.html#emp-068
@@ -2083,8 +2078,7 @@ screens:
   offlineState: true
   entryParams:
   - venueId<-session
-  goesTo:
-  - EMP-003
+  goesTo: []
   boardFrames:
   - Retail Board 4.dc.html#ret-4j
   wireframe: wireframes/P06 Venue Staff App.dc.html#emp-069
@@ -2110,8 +2104,7 @@ screens:
   entryParams:
   - venueId<-session
   - alertId<-EMP-003
-  goesTo:
-  - EMP-003
+  goesTo: []
   boardFrames:
   - Inventory Board 1.dc.html#inv-10
   wireframe: wireframes/P06 Venue Staff App.dc.html#emp-070

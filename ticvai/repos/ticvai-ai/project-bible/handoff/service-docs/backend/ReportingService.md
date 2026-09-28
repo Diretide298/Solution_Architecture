@@ -26,15 +26,15 @@
 
 | Group | Operation | Method | Path | Part | Wave | Called by |
 |---|---|---|---|---|---|---|
-| catalogue | [`deleteReport`](#deletereport) | DELETE | `/reports/{reportId}` | core | 2 | BO-029, BO-058, BO-059, BO-060, BO-061, POS-008 … |
-| catalogue | [`getReport`](#getreport) | GET | `/reports/{reportId}` | core | 2 | BO-029, BO-058, BO-059, BO-060, BO-061, POS-008 … |
-| catalogue | [`listReports`](#listreports) | GET | `/reports` | core | 2 | ANL-031, BO-029, BO-058, BO-059, BO-060, BO-061 … |
+| catalogue | [`deleteReport`](#deletereport) | DELETE | `/reports/{reportId}` | core | 2 | BO-029, BO-058, BO-059, BO-060, POS-008, PTR-018 … |
+| catalogue | [`getReport`](#getreport) | GET | `/reports/{reportId}` | core | 2 | BO-029, BO-058, BO-059, BO-060, POS-008, PTR-018 … |
+| catalogue | [`listReports`](#listreports) | GET | `/reports` | core | 2 | ANL-031, BO-029, BO-058, BO-059, BO-060, POS-008 … |
 | dashboard | [`createDashboard`](#createdashboard) | POST | `/dashboards` | setup | 2 | ADM-031, ANL-021, ANL-022, ANL-053 |
 | dashboard | [`getDashboard`](#getdashboard) | GET | `/dashboards/{dashboardId}` | core | 2 | ADM-031, ANL-001, ANL-002, ANL-003, ANL-004, ANL-005 … |
 | dashboard | [`updateDashboard`](#updatedashboard) | PUT | `/dashboards/{dashboardId}` | setup | 2 | ADM-031, ANL-023, ANL-027, ANL-028, ANL-029 |
 | execution | [`runReport`](#runreport) | POST | `/reports/{reportId}/run` | core | 1 | ANL-001, ANL-002, ANL-003, ANL-004, ANL-005, ANL-006 … |
 | naturalLanguage | [`askReportingQuestion`](#askreportingquestion) | POST | `/reports/ask` | core | 2 | ANL-008, ANL-009, ANL-019, ANL-052, ANL-056, BO-029 … |
-| naturalLanguage | [`saveNaturalLanguageQuery`](#savenaturallanguagequery) | POST | `/reports/ask/{conversationId}/save` | core | 2 | ANL-052, BO-029, BO-058, BO-059, BO-060, BO-061 … |
+| naturalLanguage | [`saveNaturalLanguageQuery`](#savenaturallanguagequery) | POST | `/reports/ask/{conversationId}/save` | core | 2 | ANL-052, BO-029, BO-058, BO-059, BO-060, POS-008 … |
 | reporting | [`listAlerts`](#listalerts) | GET | `/alerts` | core | 1 | ANL-001, ANL-003, ANL-009, ANL-012, BO-036, BO-125 … |
 | reporting | [`setAlertRule`](#setalertrule) | PUT | `/alert-rules` | setup | 1 | ANL-009, BO-133 |
 
@@ -45,7 +45,7 @@
 **`DELETE /reports/{reportId}`**: Retire a report definition
 
 Retired rather than deleted where executions or paused schedules reference it — `isRetired` becomes true and the definition and its versions stay, because history must continue to resolve. Removed only where nothing references it.
-**Refused with `409` while an active (unpaused) schedule references it** — pause or delete the schedule first. Both the retire and the removal answer `204`.
+**Refused with `409` while an active (unpaused) schedule references it** — pause or delete the schedule first. Both the retire and the removal answer `204`. **A system report is refused with `409` too** (clone-only, audit R096).
 
 |  |  |
 |---|---|
@@ -57,7 +57,7 @@ Retired rather than deleted where executions or paused schedules reference it �
 | Conflict policy | serverWins |
 | Reads | `cache:idempotency`, `reporting.report_definition` |
 | Writes | `cache:idempotency`, `reporting.report_definition` |
-| Called by | BO-029, BO-058, BO-059, BO-060, BO-061, POS-008, PTR-018, SUP-008 |
+| Called by | BO-029, BO-058, BO-059, BO-060, POS-008, PTR-018, SUP-008 |
 
 **Parameters**
 
@@ -71,7 +71,7 @@ Retired rather than deleted where executions or paused schedules reference it �
 | Code | Shape | Meaning |
 |---|---|---|
 | 204 |  | Retired, or removed where nothing referenced it |
-| 409 |  | Active schedules reference this report |
+| 409 |  | Active schedules reference this report (report-scheduled), or it is a system report, which is clone-only (system-report, audit R096) |
 
 ### getReport
 
@@ -88,7 +88,7 @@ Retired rather than deleted where executions or paused schedules reference it �
 | Read routing | analytical |
 | Reads | `reporting.report_column`, `reporting.report_definition`, `reporting.report_filter`, `reporting.report_parameter` |
 | Writes | - |
-| Called by | BO-029, BO-058, BO-059, BO-060, BO-061, POS-008, PTR-018, SUP-008 |
+| Called by | BO-029, BO-058, BO-059, BO-060, POS-008, PTR-018, SUP-008 |
 
 **Parameters**
 
@@ -127,7 +127,7 @@ Retired rather than deleted where executions or paused schedules reference it �
 | parameters[].isRequired | boolean | yes |  |
 | parameters[].defaultValue | object |  | Open on purpose. |
 | requiredPermission | Permission: enum (SESSION_FORCE_LOGOUT, USER_MANAGE, ROLE_MANAGE, PERMISSION_GRANT, PERMISSION_VIEW, PERMISSION_MANAGE, PLATFORM_TENANT_VIEW, PLATFORM_TENANT_MANAGE, …) | yes | Permission needed to run this report, from the shared Permission vocabulary. |
-| maxDateRangeDays | integer |  | Guards against a query spanning years of scan events. (nullable) |
+| maxDateRangeDays | integer |  | Guards against a query spanning years of scan events. (min 1; default 366; nullable) |
 | id | string (uuid) | yes |  |
 | version | string | yes | The current version. |
 | isSystem | boolean | yes | Shipped with the platform — seeded at provisioning (BL-053, SeededReport). |
@@ -162,7 +162,7 @@ Only definitions the caller may run. A report requiring `REPORT_VIEW_TENANT` doe
 | Read routing | analytical |
 | Reads | `reporting.report_column`, `reporting.report_definition`, `reporting.report_filter`, `reporting.report_parameter` |
 | Writes | - |
-| Called by | ANL-031, BO-029, BO-058, BO-059, BO-060, BO-061, POS-008, PTR-018, SUP-008 |
+| Called by | ANL-031, BO-029, BO-058, BO-059, BO-060, POS-008, PTR-018, SUP-008 |
 
 **Parameters**
 
@@ -205,7 +205,7 @@ Only definitions the caller may run. A report requiring `REPORT_VIEW_TENANT` doe
 | items[].parameters[].isRequired | boolean | yes |  |
 | items[].parameters[].defaultValue | object |  | Open on purpose. |
 | items[].requiredPermission | Permission: enum (SESSION_FORCE_LOGOUT, USER_MANAGE, ROLE_MANAGE, PERMISSION_GRANT, PERMISSION_VIEW, PERMISSION_MANAGE, PLATFORM_TENANT_VIEW, PLATFORM_TENANT_MANAGE, …) | yes | Permission needed to run this report, from the shared Permission vocabulary. |
-| items[].maxDateRangeDays | integer |  | Guards against a query spanning years of scan events. (nullable) |
+| items[].maxDateRangeDays | integer |  | Guards against a query spanning years of scan events. (min 1; default 366; nullable) |
 | items[].id | string (uuid) | yes |  |
 | items[].version | string | yes | The current version. |
 | items[].isSystem | boolean | yes | Shipped with the platform — seeded at provisioning (BL-053, SeededReport). |
@@ -233,6 +233,7 @@ Only definitions the caller may run. A report requiring `REPORT_VIEW_TENANT` doe
 **`POST /dashboards`**: Create a dashboard
 
 Tiles reference report definitions. Each tile carries its own refresh interval, and the response reports the aggregate query cost — a dashboard of twelve tiles refreshing every thirty seconds is a load problem disguised as a convenience.
+**The budget is `VenueSettings.reporting.dashboardRefreshBudgetPerMinute`**, a venue setting with a tenant default (decided 28 September, audit R094); a tenant-wide dashboard uses the tenant default. The dashboard's tile refreshes per minute, summed over its tiles, may not exceed it. **Proposed default 24 refreshes per minute, client to correct (audit R094).**
 
 |  |  |
 |---|---|
@@ -307,7 +308,7 @@ Tiles reference report definitions. Each tile carries its own refresh interval, 
 | Code | Shape | Meaning |
 |---|---|---|
 | 201 |  | Created |
-| 400 |  | Aggregate refresh cost exceeds the configured budget |
+| 400 |  | The tiles' refreshes per minute exceed VenueSettings.reporting.dashboardRefreshBudgetPerMinute (proposed default 24, audit R094) |
 | 409 |  | The caller is not entitled to the dashboard's module — the tenant has not licensed it, or the principal holds no permission in it. |
 
 ### getDashboard
@@ -471,7 +472,8 @@ Tiles reference report definitions. Each tile carries its own refresh interval, 
 **`POST /reports/{reportId}/run`**: Run a report
 
 Executes against the **reporting replica**, never the primary.
-Small results return inline. Anything beyond the inline threshold returns `202` with an execution to poll — a synchronous response containing a year of scan events is a timeout waiting to happen.
+Small results return inline. Anything beyond the inline threshold returns `202` with an execution to poll — a synchronous response containing a year of scan events is a timeout waiting to happen. **The threshold is `VenueSettings.reporting.inlineRunRowLimit`**, a venue setting with a tenant default (decided 28 September, audit R094): a run whose estimated rows exceed it, or whose definition's `estimatedCost` is `high`, is queued. **Proposed default 5,000 rows, client to correct (audit R094).**
+**Dates (decided 28 September, audit R158).** With no `dateFrom` or `dateTo` the run covers today in the venue's time zone, and a range longer than the definition's `maxDateRangeDays` (366 when the definition sets none) is a 400.
 Scope is applied from the caller's resolved permissions. Parameters narrow; they never widen.
 
 |  |  |
@@ -484,7 +486,7 @@ Scope is applied from the caller's resolved permissions. Parameters narrow; they
 | Conflict policy | serverWins |
 | Reads | `cache:idempotency`, `reporting.execution`, `reporting.report_definition`, `reporting.report_parameter` |
 | Writes | `cache:idempotency`, `reporting.execution` |
-| Called by | ANL-001, ANL-002, ANL-003, ANL-004, ANL-005, ANL-006, ANL-007, ANL-009, ANL-039, ANL-040, BO-010, BO-029, BO-058, BO-059, BO-060, BO-061, BO-1059, BO-1082, BO-115, BO-118, BO-126, BO-133, POS-008, POS-020, PTR-018, SUP-008 |
+| Called by | ANL-001, ANL-002, ANL-003, ANL-004, ANL-005, ANL-006, ANL-007, ANL-009, ANL-039, ANL-040, BO-010, BO-029, BO-058, BO-059, BO-060, BO-1059, BO-1082, BO-115, BO-118, BO-126, BO-133, POS-008, POS-020, PTR-018, SUP-008 |
 
 **Parameters**
 
@@ -499,8 +501,8 @@ Scope is applied from the caller's resolved permissions. Parameters narrow; they
 |---|---|---|---|
 | parameters | object |  | Open on purpose; its shape is the report's. |
 | venueId | string (uuid) |  | Narrows to one venue. |
-| dateFrom | string (date) |  |  |
-| dateTo | string (date) |  |  |
+| dateFrom | string (date) |  | Defaults to today in the venue's time zone when not sent (decided 28 September, audit R158). |
+| dateTo | string (date) |  | Defaults to today in the venue's time zone when not sent (audit R158). |
 | forceAsync | boolean |  | Queue regardless of size, for a result to be collected later. (default False) |
 
 **Response**: `ReportResult`
@@ -525,7 +527,7 @@ Scope is applied from the caller's resolved permissions. Parameters narrow; they
 |---|---|---|
 | 200 |  | Completed inline |
 | 202 |  | Queued. |
-| 400 |  | Required parameter missing, or the date range exceeds the limit |
+| 400 |  | Required parameter missing, or the date range exceeds maxDateRangeDays (366 days when the definition sets none, audit R158) |
 | 403 | Forbidden | Authenticated but not permitted at the requested scope |
 
 
@@ -552,7 +554,7 @@ Runs under the caller's resolved permissions. The generated query cannot widen s
 | Conflict policy | serverWins |
 | Reads | `ai.policy`, `ai.provider`, `cache:idempotency`, `reporting.report_column`, `reporting.report_filter` |
 | Writes | `ai.activity`, `cache:idempotency`, `reporting.report_column`, `reporting.report_filter` |
-| Called by | ANL-008, ANL-009, ANL-019, ANL-052, ANL-056, BO-029, BO-058, BO-059, BO-060, BO-061, BO-593, KIT-010, POS-008, PTR-018, SUP-008 |
+| Called by | ANL-008, ANL-009, ANL-019, ANL-052, ANL-056, BO-029, BO-058, BO-059, BO-060, BO-593, KIT-010, POS-008, PTR-018, SUP-008 |
 
 **Parameters**
 
@@ -635,7 +637,7 @@ Turns a one-off question into something schedulable. The generated query becomes
 | Conflict policy | serverWins |
 | Reads | `ai.policy`, `ai.provider`, `cache:idempotency`, `reporting.report_column`, `reporting.report_definition`, `reporting.report_filter`, `reporting.report_parameter` |
 | Writes | `ai.activity`, `cache:idempotency`, `reporting.report_column`, `reporting.report_definition`, `reporting.report_filter`, `reporting.report_parameter` |
-| Called by | ANL-052, BO-029, BO-058, BO-059, BO-060, BO-061, POS-008, PTR-018, SUP-008 |
+| Called by | ANL-052, BO-029, BO-058, BO-059, BO-060, POS-008, PTR-018, SUP-008 |
 
 **Parameters**
 
@@ -682,7 +684,7 @@ Turns a one-off question into something schedulable. The generated query becomes
 | parameters[].isRequired | boolean | yes |  |
 | parameters[].defaultValue | object |  | Open on purpose. |
 | requiredPermission | Permission: enum (SESSION_FORCE_LOGOUT, USER_MANAGE, ROLE_MANAGE, PERMISSION_GRANT, PERMISSION_VIEW, PERMISSION_MANAGE, PLATFORM_TENANT_VIEW, PLATFORM_TENANT_MANAGE, …) | yes | Permission needed to run this report, from the shared Permission vocabulary. |
-| maxDateRangeDays | integer |  | Guards against a query spanning years of scan events. (nullable) |
+| maxDateRangeDays | integer |  | Guards against a query spanning years of scan events. (min 1; default 366; nullable) |
 | id | string (uuid) | yes |  |
 | version | string | yes | The current version. |
 | isSystem | boolean | yes | Shipped with the platform — seeded at provisioning (BL-053, SeededReport). |
@@ -720,13 +722,13 @@ Turns a one-off question into something schedulable. The generated query becomes
 | Read routing | replica |
 | Reads | `reporting.alert`, `reporting.alert_rule` |
 | Writes | - |
-| Called by | ANL-001, ANL-003, ANL-009, ANL-012, BO-036, BO-125, BO-133, BO-141, BO-472, EMP-070, POS-009, POS-020, POS-025 |
+| Called by | ANL-001, ANL-003, ANL-009, ANL-012, BO-036, BO-125, BO-133, BO-141, EMP-070, POS-009, POS-020, POS-025 |
 
 **Parameters**
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
-| status | query |  | AlertStatus: enum (raised, acknowledged, resolved, expired) |  |
+| status | query |  | AlertStatus: enum (raised, acknowledged, resolved, expired) | Defaults to open alerts (decided 28 September, audit R158): with no status the list holds raised and acknowledged alerts, never resolved or expired ones. |
 | severity | query |  | AlertSeverity: enum (info, warning, critical) |  |
 | workstationId | query |  | string (uuid) | Only alerts raised for this workstation. |
 | shiftId | query |  | string (uuid) | Only alerts raised during this till shift. |
@@ -774,7 +776,7 @@ BL-152. **The metric comes from the closed set**, so a rule cannot watch somethi
 | metric | object | yes | From the closed set, so a rule cannot watch something nothing produces — the same discipline MetricSource exists for. |
 | comparator | enum (above, below, outsideRange, changesBy, equals) | yes |  |
 | threshold | number or Money | yes | A reading of a metric or KPI, or a threshold on one. |
-| thresholdUpper | object |  | (nullable) |
+| thresholdUpper | object |  | Required when comparator is outsideRange (decided 28 September, audit R158): the range is threshold to thresholdUpper, and a rule missing either, or with the upper not above the lower, is refused by… (nullable) |
 | windowMinutes | integer |  | The window is what stops an alert firing on noise. (default 15) |
 | severity | AlertSeverity: enum (info, warning, critical) | yes | How urgent an alert rule's breach is. |
 | deliverTo | array of enum (dashboardPanel, email, whatsapp, sms) |  | CF-134. |
@@ -792,7 +794,7 @@ BL-152. **The metric comes from the closed set**, so a rule cannot watch somethi
 | metric | object | yes | From the closed set, so a rule cannot watch something nothing produces — the same discipline MetricSource exists for. |
 | comparator | enum (above, below, outsideRange, changesBy, equals) | yes |  |
 | threshold | number or Money | yes | A reading of a metric or KPI, or a threshold on one. |
-| thresholdUpper | object |  | (nullable) |
+| thresholdUpper | object |  | Required when comparator is outsideRange (decided 28 September, audit R158): the range is threshold to thresholdUpper, and a rule missing either, or with the upper not above the lower, is refused by… (nullable) |
 | windowMinutes | integer |  | The window is what stops an alert firing on noise. (default 15) |
 | severity | AlertSeverity: enum (info, warning, critical) | yes | How urgent an alert rule's breach is. |
 | deliverTo | array of enum (dashboardPanel, email, whatsapp, sms) |  | CF-134. |
@@ -807,6 +809,7 @@ BL-152. **The metric comes from the closed set**, so a rule cannot watch somethi
 |---|---|---|
 | 200 |  | Replaced — a rule with this id already existed |
 | 201 |  | Created — no rule with this id existed |
+| 400 |  | An outsideRange rule without both threshold and thresholdUpper, or with the upper not above the lower (audit R158) |
 
 ## Tables
 
@@ -844,7 +847,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 | metric | text | yes | From the closed set, so a rule cannot watch something nothing produces — the same discipline MetricSource exists for. |
 | comparator | text | yes |  |
 | threshold | numeric(18,4) | yes |  |
-| threshold_upper | numeric(18,4) | no |  |
+| threshold_upper | numeric(18,4) | no | Required when comparator is outsideRange (decided 28 September, audit R158): the range is threshold to thresholdUpper, and a rule missing either, or with the upper not above the lower, is refused by… |
 | window_minutes | integer | no | The window is what stops an alert firing on noise. |
 | severity | text | yes |  |
 | deliver_to | text[] | no | CF-134. |

@@ -40,7 +40,8 @@ transitions:
   to: closed
   operation: closeDepositBoxes
   trigger: operation
-  guard: Counted, with a variance recorded
+  guard: Counted, with a variance recorded. **A count is required, and a mismatch still closes**, with the
+    difference kept as the box variance (decided 28 September, audit R123 (4))
 - from: closed
   to: reconciled
   operation: acceptShiftVariance

@@ -1221,7 +1221,6 @@ components:
       - id
       - guestLinkId
       - amount
-      - expiresInSeconds
       properties:
         id:
           type: string
@@ -1234,7 +1233,11 @@ components:
           type: integer
           minimum: 30
           maximum: 1800
+          default: 300
           description: 'A hold that outlives the sale strands the guest''s own funds. Keep it short.
+
+            **300 seconds when omitted** (decided 28 September, audit R169), the same default as
+            `orders.authoriseStoredValue`. The client no longer has to supply a figure nothing gave it.
 
             '
     WalletAuthorisation:

@@ -49,7 +49,9 @@ transitions:
   to: closed
   operation: acceptShiftVariance
   trigger: operation
-  guard: Supervisor accepted, with a reason
+  guard: Supervisor accepted, with a reason, on the till with a PIN step-up. **The only way past a variance
+    above the threshold** (decided 28 September, audit R080 (e)); no pre-close PIN hold and no approval
+    request
   requiresApproval: true
   emits:
   - shift.closed
@@ -66,7 +68,8 @@ transitions:
   to: open
   operation: reopenShift
   trigger: operation
-  guard: Correction of a wrongly closed shift
+  guard: Correction of a wrongly closed shift. Approved by a supervisor other than the closer, with a PIN
+    step-up on the same device (decided 28 September, audit R144)
   isReversal: true
   requiresApproval: true
 notes: '`autoClosed` is deliberately distinct from `closed`. A shift nobody counted must not appear

@@ -2,7 +2,7 @@ openapi: 3.1.0
 info:
   title: TICVAI Identity & Authorisation
   version: 1.0.0
-  x-ticvai-screen-count: 49
+  x-ticvai-screen-count: 51
   x-ticvai-tier: spine
   x-ticvai-module: 19 — Guest Mobile App & Branding (auth) + cross-cutting staff auth
   x-ticvai-requirements: 107
@@ -59,8 +59,6 @@ paths:
     post:
       operationId: login
       x-ticvai-consumed-by:
-        - "P01 WEB-016 Login / Register"
-        - "P02 GST-042 Simple Registration & OTP"
         - "P04 POS-000 Sign In"
         - "P06 EMP-001 Sign in"
         - "P07 SCN-001 Sign in"
@@ -95,6 +93,11 @@ paths:
             When the user holds several, `requiresRoleSelection` is true and `availableRoles` is populated
             — the caller must call /auth/select-role before the session becomes usable.
 
+            **When `requiresMfa` is true the session is not usable until the second factor is presented**
+            (decided 28 September, audit R135): the client calls `createMfaChallenge` with `action: signIn`,
+            then `verifyMfaChallenge`. A principal with `requiresMfa` and no active method
+            (`hasMfaMethod: false`) may only enrol one (`enrolMfaMethod`, `verifyMfaEnrolment`) before that.
+
             '
           content:
             application/json:
@@ -107,7 +110,9 @@ paths:
         '409':
           description: 'An active session already exists for this principal on another device. Per §3.1.3
             the new login is refused. A supervisor with the SESSION_FORCE_LOGOUT permission may terminate
-            the existing session.
+            the existing session. **The same holds on a till somebody else is signed in to**: the sign-in
+            is refused until a supervisor ends the other session with `forceLogout`; signing in never ends
+            it (confirmed 28 September, audit R184).
 
             '
           content:
@@ -200,7 +205,9 @@ paths:
                   type: string
                   nullable: true
                   description: 'For `confirm`. **Single use and short-lived** — a verification link that
-                    works forever is a verification link in an old inbox.
+                    works forever is a verification link in an old inbox. **Valid for 24 hours and sent by
+                    email only** (decided 28 September, audit R126); after that `confirm` answers `410`
+                    and `send` issues a new one.
 
                     '
       responses:
@@ -230,9 +237,38 @@ paths:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
   /password-policy:
+    get:
+      operationId: getPasswordPolicy
+      summary: Read the password and MFA policy in force
+      description: 'The read `setPasswordPolicy` never had (decided 28 September, audit R135). `setPasswordPolicy`
+        replaces the whole policy, so a screen that changes one field, such as `mfaRequiredForPermissions`,
+        must read the rest here and send it back unchanged. A tenant that never set one is answered with
+        the defaults.
+
+        '
+      tags:
+      - identity
+      x-ticvai-permission: TENANT_CONFIGURE
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: tenant
+      x-ticvai-config-scope: tenant
+      x-ticvai-read-routing: replica
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      responses:
+        '200':
+          description: The policy in force
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PasswordPolicy'
+        '403':
+          $ref: ../shared/common.yaml#/components/responses/Forbidden
     put:
       operationId: setPasswordPolicy
       x-ticvai-consumed-by:
+        - "P09 ADM-342 Authentication & MFA Policy Manager"
         - "P09 ADM-421 Venue & Operational Structure Creation"
       summary: Length, breach check, lockout and step-up
       description: 'BL-144. **Modelled on NIST SP 800-63B rather than on habit.** Length beats composition,
@@ -684,6 +720,7 @@ paths:
       x-ticvai-consumed-by:
         - "P01 WEB-024 Devices, Wishlist & Consent"
         - "P02 GST-015 Memberships"
+        - "P02 GST-069 Face Pass"
         - "P08 BO-385 Delegation Management"
       summary: Who may act for this guest, and for whom they may act
       description: 'CF-132. **Both directions, because a guest is usually in both.** A parent holds authority
@@ -743,6 +780,14 @@ paths:
         **This does not make the work smaller** — extending grants to guest-held, object-scoped authority
         is real work touching `orders`, `access` and `retail`. **It makes it one piece of work rather
         than four.**
+
+
+        **Who grants, and the minor rule — decided 28 September, audit R126 (3).** **The account holder
+        grants**: the guest whose account the authority is over (`overSubjectId`), or, where that guest is
+        a minor, the adult account holder the minor is linked to. A guest caller may not grant authority
+        over anybody else''s account; staff holding `GUEST_MANAGE` record a grant on the account holder''s
+        behalf. **A subject with no date of birth on file is treated as a minor.** The age below which a
+        subject is a minor is an open value that client counsel sets; it is not assumed here.
 
         '
       tags:
@@ -809,7 +854,8 @@ paths:
         '409':
           description: '**A cycle, or a minor granting authority over an adult.** Both are refused — a
             delegation graph with a loop is one nobody can reason about, and the second is a safeguarding
-            concern rather than a modelling one.
+            concern rather than a modelling one. A subject with no date of birth counts as a minor
+            (audit R126).
 
             '
           content:
@@ -968,7 +1014,12 @@ paths:
         '401':
           $ref: ../shared/common.yaml#/components/responses/Unauthorized
         '422':
-          description: The new credential fails the password policy, or is the same as the current one.
+          description: 'The new credential fails the password policy, or matches the current one or any of
+            the previous `PasswordPolicy.reusePreventionCount` credentials (5 unless the tenant sets
+            another; decided 28 September, audit R132). The server keeps a hash of each replaced
+            credential for that purpose and never the credential itself.
+
+            '
           content:
             application/problem+json:
               schema:
@@ -1284,8 +1335,10 @@ paths:
       - staff
       - partner
       summary: Update or deactivate a principal
-      description: 'Deactivation invalidates any live session immediately. Additive changes take effect
-        at next login; revocations take effect at once.
+      description: 'Deactivation invalidates any live session immediately. **A change to `validTo`, to
+        `primaryRoleId` or to the principal''s permissions ends every live session of the principal at
+        once** (decided 28 September, audit R126 (1)): the person signs in again and is resolved afresh.
+        A change to `displayName` alone ends nothing.
 
         '
       tags:
@@ -1343,6 +1396,9 @@ paths:
       description: 'A role is a grouping for permission management — code, name, description and the
         permissions it carries (`Role.permissions`). **Seeded system roles ship with the tenant**
         (`Role.isSystem`: editable, not deletable); every other role is created with `createRole`.
+        The seeded set is Cashier, Supervisor, Venue Manager, Finance and Tenant Admin, with the
+        permissions `docs/active/seed-data-proposal.md` section 2 drafts (proposed, client to correct;
+        audit R229).
         Grants (`createDelegatedAccess`) attach a role or a single permission to a principal at a scope.
 
         '
@@ -1405,6 +1461,8 @@ paths:
                   type: string
                   maxLength: 64
                   pattern: ^[A-Za-z0-9_-]+$
+                  description: Unique within the tenant, compared case-insensitively (decided 28 September,
+                    audit R108).
                 name:
                   type: string
                   maxLength: 200
@@ -1421,6 +1479,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Role'
+        '409':
+          $ref: ../shared/common.yaml#/components/responses/DuplicateCode
   /delegated-access:
     get:
       operationId: listDelegatedAccess
@@ -1500,7 +1560,12 @@ paths:
           headers:
             X-Consistency-Token:
               $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
-          description: Granted. Takes effect at next login unless it is a revocation.
+          description: 'Granted. **A grant to a principal ends that principal''s live sessions at once**, so
+            it applies from their next sign-in, which is immediate (audit R126). A grant to a role takes
+            effect for its holders at their next sign-in, unless it is a DENY, which ends their sessions at
+            once.
+
+            '
           content:
             application/json:
               schema:
@@ -1808,13 +1873,99 @@ paths:
                 $ref: '#/components/schemas/GuestSession'
         '401':
           description: 'Code invalid or expired. Attempts are counted; the code is invalidated after the
-            configured limit rather than allowing indefinite guessing.
+            configured limit rather than allowing indefinite guessing. **The limit is
+            `VenueSettings.identity.guestOtpMaxAttempts`, read from the tenant default** (a guest code
+            is tenant-scoped; decided 28 September, audit R094). **Proposed default 5 wrong entries,
+            bounds 3 to 10, client to correct (audit R094).**
 
             '
           content:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+  /auth/guest/password:
+    post:
+      operationId: guestPasswordLogin
+      x-ticvai-consumed-by:
+        - "P01 WEB-016 Login / Register"
+        - "P02 GST-042 Simple Registration & OTP"
+      x-ticvai-audience:
+      - anonymous
+      summary: Sign in with an email or mobile and a password
+      description: '**Decided 28 September, audit R073 (a).** `registerGuest` has always taken an optional
+        password and nothing let a guest sign in with it, so `WEB-016` promised a sign-in that did not
+        exist. This is that sign-in, beside the one-time code, social and UAE Pass routes; it returns the
+        same `GuestSession`.
+
+        **A wrong password, an unknown identifier and an account with no password are one answer**
+        (`401`, the same timing), because a sign-in that tells them apart is an account enumeration
+        tool. **Failed attempts count against `PasswordPolicy.lockoutAfterAttempts`** and lock the
+        account for `lockoutMinutes`, never permanently; the guest can still use a one-time code.
+
+        **No second factor at sign-in** (audit R167): a guest signs in with this, a code, a social
+        provider or UAE Pass, never with enterprise SSO and never with MFA. **One session per device**
+        (audit R126): signing in on a device ends that device''s previous guest session.
+
+        An unverified account signs in and may browse and fill a cart; the checkout gate on
+        `verifyGuestEmail` still applies.
+
+        '
+      tags:
+      - guestAuth
+      x-ticvai-permission: null
+      x-ticvai-scope-level: tenant
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - identifier
+              - password
+              properties:
+                identifier:
+                  type: string
+                  maxLength: 256
+                  description: The email address or E.164 mobile number the account was registered with.
+                password:
+                  type: string
+                  minLength: 8
+                  maxLength: 256
+                  writeOnly: true
+                deviceId:
+                  type: string
+                  description: Names the device; a new sign-in here ends the previous session on it.
+      responses:
+        '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: Signed in
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GuestSession'
+        '400':
+          $ref: ../shared/common.yaml#/components/responses/BadRequest
+        '401':
+          description: 'Identifier or password not accepted, or the account is locked. One answer for all
+            of them, deliberately.
+
+            '
+          x-ticvai-problem-types:
+          - unauthenticated
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: ../shared/common.yaml#/components/responses/TooManyRequests
   /auth/guest/social:
     post:
       operationId: guestSocialLogin
@@ -1933,6 +2084,7 @@ paths:
       x-ticvai-consumed-by:
         - "P01 WEB-016 Login / Register"
         - "P02 GST-042 Simple Registration & OTP"
+        - "P02 GST-073 Security & Sign-in"
       x-ticvai-audience:
       - guest
       x-ticvai-read-routing: primary
@@ -1960,6 +2112,7 @@ paths:
       x-ticvai-consumed-by:
         - "P01 WEB-016 Login / Register"
         - "P02 GST-042 Simple Registration & OTP"
+        - "P02 GST-073 Security & Sign-in"
       x-ticvai-audience:
       - guest
       summary: End a guest session
@@ -2108,8 +2261,6 @@ paths:
     get:
       operationId: listSsoProviders
       x-ticvai-consumed-by:
-        - "P01 WEB-016 Login / Register"
-        - "P02 GST-042 Simple Registration & OTP"
         - "P06 EMP-001 Sign in"
         - "P06 EMP-002 Select venue & role"
         - "P06 EMP-042 Profile"
@@ -2149,13 +2300,16 @@ paths:
         format: uuid
     get:
       operationId: startSsoAuthorization
-      x-ticvai-consumed-by:
-        - "P01 WEB-016 Login / Register"
-        - "P02 GST-042 Simple Registration & OTP"
       x-ticvai-audience:
       - anonymous
       x-ticvai-read-routing: replica
       summary: Begin an SSO flow
+      description: '**Staff and partner sign-in only — guests never use enterprise SSO** (decided 28
+        September, audit R167). A guest signs in with a one-time code, a password, Apple or Google, or
+        UAE Pass, each returning a `GuestSession`; this flow maps groups to roles and returns a staff
+        session, which a guest surface cannot use.
+
+        '
       tags:
       - sso
       x-ticvai-permission: null
@@ -2194,15 +2348,14 @@ paths:
         format: uuid
     post:
       operationId: completeSsoAuthorization
-      x-ticvai-consumed-by:
-        - "P01 WEB-016 Login / Register"
-        - "P02 GST-042 Simple Registration & OTP"
       x-ticvai-audience:
       - anonymous
       summary: Exchange an SSO code for a session
       description: 'Group-to-role mapping is applied here. **A group with no mapping grants nothing**
         — an unmapped group must never fall back to a default role, or the identity provider becomes a
         way to mint access nobody configured.
+
+        **Staff and partner sign-in only; guests never use SSO** (decided 28 September, audit R167).
 
         '
       tags:
@@ -2331,8 +2484,6 @@ paths:
     get:
       operationId: listMfaMethods
       x-ticvai-consumed-by:
-        - "P01 WEB-016 Login / Register"
-        - "P02 GST-042 Simple Registration & OTP"
         - "P06 EMP-001 Sign in"
         - "P06 EMP-002 Select venue & role"
         - "P06 EMP-042 Profile"
@@ -2345,12 +2496,10 @@ paths:
       x-ticvai-audience:
       - staff
       - partner
-      - guest
-      x-ticvai-audience-note: '24 August: widened to include `guest`. **MFA and token refresh act on the
-        caller''s own session, whoever the caller is** — a guest enrolling a second factor is the same
-        act as a cashier doing it, and `WEB-016 Login / Register` was calling six staff-only operations
-        because no guest equivalent existed. **Declaring them staff-only did not make them staff-only;
-        it made the guest surface look like a violation.**
+      x-ticvai-audience-note: '28 September: `guest` removed again (decided 28 September, audit R167).
+        Guests are never asked for a second factor and cannot enrol one; they sign in with a one-time
+        code, a password, Apple or Google, or UAE Pass. The 24 August widening was made for `WEB-016`,
+        which no longer calls any MFA operation.
 
         '
       x-ticvai-read-routing: replica
@@ -2374,23 +2523,25 @@ paths:
     post:
       operationId: enrolMfaMethod
       x-ticvai-consumed-by:
-        - "P01 WEB-016 Login / Register"
-        - "P02 GST-042 Simple Registration & OTP"
+        - "P06 EMP-042 Profile"
+        - "P09 ADM-001 Platform Login / MFA"
       x-ticvai-self-service: true
       x-ticvai-audience:
       - staff
       - partner
-      - guest
-      x-ticvai-audience-note: '24 August: widened to include `guest`. **MFA and token refresh act on the
-        caller''s own session, whoever the caller is** — a guest enrolling a second factor is the same
-        act as a cashier doing it, and `WEB-016 Login / Register` was calling six staff-only operations
-        because no guest equivalent existed. **Declaring them staff-only did not make them staff-only;
-        it made the guest surface look like a violation.**
+      x-ticvai-audience-note: '28 September: `guest` removed again (decided 28 September, audit R167).
+        Guests are never asked for a second factor and cannot enrol one; they sign in with a one-time
+        code, a password, Apple or Google, or UAE Pass. The 24 August widening was made for `WEB-016`,
+        which no longer calls any MFA operation.
 
         '
       summary: Enrol an MFA method
       description: 'Returns a secret or challenge to complete enrolment. **The method is not active until
         verified** — enrolling without verifying would lock the principal out of their own account.
+
+        **Staff enrol an authenticator app (`totp`), with email (`emailOtp`) as the fallback** (decided 28
+        September, audit R126 (5)). A staff or partner principal asking for `smsOtp`, `biometric` or
+        `hardwareToken` is refused `422`.
 
         '
       tags:
@@ -2426,6 +2577,15 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/MfaEnrolment'
+        '422':
+          description: A kind staff may not enrol. Staff use `totp`, with `emailOtp` as the fallback
+            (audit R126).
+          x-ticvai-problem-types:
+          - mfa-kind-not-allowed
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
   /auth/mfa/methods/{methodId}:
     parameters:
     - name: methodId
@@ -2437,18 +2597,16 @@ paths:
     post:
       operationId: verifyMfaEnrolment
       x-ticvai-consumed-by:
-        - "P01 WEB-016 Login / Register"
-        - "P02 GST-042 Simple Registration & OTP"
+        - "P06 EMP-042 Profile"
+        - "P09 ADM-001 Platform Login / MFA"
       x-ticvai-self-service: true
       x-ticvai-audience:
       - staff
       - partner
-      - guest
-      x-ticvai-audience-note: '24 August: widened to include `guest`. **MFA and token refresh act on the
-        caller''s own session, whoever the caller is** — a guest enrolling a second factor is the same
-        act as a cashier doing it, and `WEB-016 Login / Register` was calling six staff-only operations
-        because no guest equivalent existed. **Declaring them staff-only did not make them staff-only;
-        it made the guest surface look like a violation.**
+      x-ticvai-audience-note: '28 September: `guest` removed again (decided 28 September, audit R167).
+        Guests are never asked for a second factor and cannot enrol one; they sign in with a one-time
+        code, a password, Apple or Google, or UAE Pass. The 24 August widening was made for `WEB-016`,
+        which no longer calls any MFA operation.
 
         '
       summary: Complete enrolment
@@ -2495,24 +2653,23 @@ paths:
     delete:
       operationId: removeMfaMethod
       x-ticvai-consumed-by:
-        - "P01 WEB-016 Login / Register"
-        - "P02 GST-042 Simple Registration & OTP"
+        - "P06 EMP-042 Profile"
+        - "P09 ADM-001 Platform Login / MFA"
       x-ticvai-self-service: true
       x-ticvai-audience:
       - staff
       - partner
-      - guest
-      x-ticvai-audience-note: '24 August: widened to include `guest`. **MFA and token refresh act on the
-        caller''s own session, whoever the caller is** — a guest enrolling a second factor is the same
-        act as a cashier doing it, and `WEB-016 Login / Register` was calling six staff-only operations
-        because no guest equivalent existed. **Declaring them staff-only did not make them staff-only;
-        it made the guest surface look like a violation.**
+      x-ticvai-audience-note: '28 September: `guest` removed again (decided 28 September, audit R167).
+        Guests are never asked for a second factor and cannot enrol one; they sign in with a one-time
+        code, a password, Apple or Google, or UAE Pass. The 24 August widening was made for `WEB-016`,
+        which no longer calls any MFA operation.
 
         '
       summary: Remove an MFA method
-      description: 'Refused where it is the only active method and the principal''s role requires MFA.
-        Removing the last factor from an account that must have one is not a choice the account holder
-        gets to make.
+      description: 'Refused where it is the only active method and the principal holds a permission listed
+        in `PasswordPolicy.mfaRequiredForPermissions` (MFA is required by permission, not by role —
+        decided 28 September, audit R135). Removing the last factor from an account that must have one is
+        not a choice the account holder gets to make.
 
         '
       tags:
@@ -2531,7 +2688,8 @@ paths:
               $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Removed
         '409':
-          description: Last remaining method on a role that requires MFA
+          description: Last remaining method of a principal who holds a permission that requires MFA
+            (audit R135)
           content:
             application/problem+json:
               schema:
@@ -2540,23 +2698,33 @@ paths:
     post:
       operationId: createMfaChallenge
       x-ticvai-consumed-by:
-        - "P01 WEB-016 Login / Register"
-        - "P02 GST-073 Security & Sign-in"
+        - "P04 POS-000 Sign In"
+        - "P06 EMP-001 Sign in"
+        - "P07 SCN-001 Sign in"
+        - "P09 ADM-001 Platform Login / MFA"
+        - "P10 PTR-001 Partner Login / MFA"
+        - "P12 SUP-001 Venue Management Sign In"
       x-ticvai-self-service: true
       x-ticvai-audience:
       - staff
       - partner
-      - guest
-      x-ticvai-audience-note: '24 August: widened to include `guest`. **MFA and token refresh act on the
-        caller''s own session, whoever the caller is** — a guest enrolling a second factor is the same
-        act as a cashier doing it, and `WEB-016 Login / Register` was calling six staff-only operations
-        because no guest equivalent existed. **Declaring them staff-only did not make them staff-only;
-        it made the guest surface look like a violation.**
+      x-ticvai-audience-note: '28 September: `guest` removed again (decided 28 September, audit R167).
+        Guests are never asked for a second factor and cannot enrol one; they sign in with a one-time
+        code, a password, Apple or Google, or UAE Pass. The 24 August widening was made for `WEB-016`,
+        which no longer calls any MFA operation.
 
         '
-      summary: Step-up authentication for a sensitive action
+      summary: Second factor at staff sign-in, and step-up for a sensitive action
       description: 'Issues a short-lived token proving a factor was presented just now. Consumed by operations
         that require it — high-value refunds, ledger approval, permission grants, tenant termination.
+
+        **For a staff or partner principal it is also the second factor at sign-in** (decided 28 September,
+        audit R135, R126 (5)(6)). When `login` answers `requiresMfa: true`, the client calls this with
+        `action: signIn` on the pending session and then `verifyMfaChallenge`; until that succeeds the
+        session is not usable. POS-000, EMP-001, SCN-001, ADM-001, PTR-001 and SUP-001 do this.
+
+        **Never for guests** (decided 28 September, audit R167): a guest is not asked for a second factor
+        and cannot enrol one.
 
         A session that authenticated hours ago is not the same as a person present at the keyboard now,
         and for those actions the difference matters.
@@ -2582,7 +2750,9 @@ paths:
               properties:
                 action:
                   type: string
-                  description: What the step-up is for. Recorded in the audit trail.
+                  description: What the step-up is for. Recorded in the audit trail. `signIn` is the
+                    second factor after `login` answered `requiresMfa` (audit R135); it is the only
+                    action a pending, not yet usable, session may ask for.
                 methodId:
                   type: string
                   format: uuid
@@ -2612,21 +2782,29 @@ paths:
     post:
       operationId: verifyMfaChallenge
       x-ticvai-consumed-by:
-        - "P01 WEB-016 Login / Register"
-        - "P02 GST-042 Simple Registration & OTP"
+        - "P04 POS-000 Sign In"
+        - "P06 EMP-001 Sign in"
+        - "P07 SCN-001 Sign in"
+        - "P09 ADM-001 Platform Login / MFA"
+        - "P10 PTR-001 Partner Login / MFA"
+        - "P12 SUP-001 Venue Management Sign In"
       x-ticvai-self-service: true
       x-ticvai-audience:
       - staff
       - partner
-      - guest
-      x-ticvai-audience-note: '24 August: widened to include `guest`. **MFA and token refresh act on the
-        caller''s own session, whoever the caller is** — a guest enrolling a second factor is the same
-        act as a cashier doing it, and `WEB-016 Login / Register` was calling six staff-only operations
-        because no guest equivalent existed. **Declaring them staff-only did not make them staff-only;
-        it made the guest surface look like a violation.**
+      x-ticvai-audience-note: '28 September: `guest` removed again (decided 28 September, audit R167).
+        Guests are never asked for a second factor and cannot enrol one; they sign in with a one-time
+        code, a password, Apple or Google, or UAE Pass. The 24 August widening was made for `WEB-016`,
+        which no longer calls any MFA operation.
 
         '
-      summary: Complete a step-up challenge
+      summary: Complete a sign-in or step-up challenge
+      description: 'For a `signIn` challenge (decided 28 September, audit R135) a correct code completes the
+        sign-in: the pending session becomes usable and is returned in `session`, or, where `login`
+        also answered `requiresRoleSelection`, the client goes on to `selectRole`. For any other action
+        it returns a short-lived, single-purpose `stepUpToken`.
+
+        '
       tags:
       - mfa
       x-ticvai-permission: null
@@ -2652,7 +2830,8 @@ paths:
           headers:
             X-Consistency-Token:
               $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
-          description: Verified. The step-up token is short-lived and single-purpose
+          description: Verified. The step-up token is short-lived and single-purpose; a `signIn`
+            challenge returns the now usable `session` instead (audit R135)
           content:
             application/json:
               schema:
@@ -2660,11 +2839,31 @@ paths:
                 properties:
                   stepUpToken:
                     type: string
+                    nullable: true
+                    description: Null for a `signIn` challenge.
                   expiresAt:
                     type: string
                     format: date-time
+                  session:
+                    nullable: true
+                    description: Only for a `signIn` challenge, and only where no role selection is
+                      still owed.
+                    allOf:
+                    - $ref: '#/components/schemas/Session'
         '401':
           $ref: ../shared/common.yaml#/components/responses/Unauthorized
+        '429':
+          description: '**Five wrong codes and step-up is locked** (decided 28 September, audit R126 (6)).
+            The fifth failure voids the challenge, and no new challenge is issued to this principal for
+            `PasswordPolicy.lockoutMinutes`. The session itself is not ended.
+
+            '
+          x-ticvai-problem-types:
+          - step-up-locked
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
   /auth/sessions:
     get:
       operationId: listActiveSessions
@@ -3328,6 +3527,197 @@ paths:
               schema:
                 $ref: '#/components/schemas/EmergencyAccessOverride'
 
+  /platform-staff-grants:
+    get:
+      operationId: listPlatformStaffGrants
+      x-ticvai-consumed-by:
+        - "P08 BO-068 Audit Log"
+      summary: Which platform staff have acted in this tenant, and under what grant
+      description: '**Decided 28 September, audit R098: every platform-staff grant is visible to the
+        tenant.** Open, expired and ended grants, most recent first, each with the operator, the reason,
+        the permissions it carried and its window. What was done under a grant is in `listAuditRecords`,
+        filtered on the grant (`AuditRecord.platformStaffGrantId`).
+
+        '
+      tags:
+      - administration
+      x-ticvai-permission: AUDIT_VIEW
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: tenant
+      x-ticvai-read-routing: replica
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+      - name: activeOnly
+        in: query
+        description: True returns only grants whose window is open now.
+        schema:
+          type: boolean
+          default: false
+      - $ref: ../shared/common.yaml#/components/parameters/PageSize
+      - $ref: ../shared/common.yaml#/components/parameters/PageCursor
+      responses:
+        '200':
+          description: Grants
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: ../shared/common.yaml#/components/schemas/Page
+                - type: object
+                  properties:
+                    items:
+                      type: array
+                      items:
+                        $ref: '#/components/schemas/PlatformStaffGrant'
+        '403':
+          $ref: ../shared/common.yaml#/components/responses/Forbidden
+    post:
+      operationId: openPlatformStaffGrant
+      x-ticvai-consumed-by:
+        - "P09 ADM-005 Tenant Directory"
+        - "P09 ADM-016 White-Label Branding Management"
+        - "P09 ADM-017 Domain & Certificate Management"
+        - "P09 ADM-018 Localisation & Language Pack"
+        - "P09 ADM-019 Global Configuration & Defaults"
+        - "P09 ADM-031 Security & Compliance Dashboard"
+        - "P09 ADM-037 AI Provider & Credentials"
+        - "P09 ADM-412 Payment Method & Settlement Setup"
+        - "P09 ADM-421 Venue & Operational Structure Creation"
+      summary: A platform operator opens a time-boxed grant into this tenant
+      description: '**How a TICVAI operator acts inside a tenant — decided 28 September, audit R098.** The
+        Platform Console (P09) runs outside every cell, and its tenant screens call operations that live
+        in the tenant''s cell. The operator **picks a tenant, then opens a grant here**, in that tenant''s
+        cell: it names the permissions it carries, a reason and a window. Until it is open, a platform
+        token carries no tenant permission at all; while it is open, the cell resolves the operator''s
+        permissions from the grant, at tenant scope, and nothing else.
+
+        **`PLATFORM_*` permissions never ride in a grant; they are read from the platform token** (decided
+        28 September, audit R203). A cell honours one only on the few operations that name it: this one
+        (`PLATFORM_TENANT_ACCESS`), `listOwnPlatformStaffGrants`, and `ai.setAiProvider`
+        (`PLATFORM_TENANT_MANAGE`), which in addition requires a grant into the tenant to be open so
+        the change is audited against it.
+
+        **Time-boxed at opening and never open-ended**: `expiresAt` is at most 8 hours ahead (proposed,
+        client to correct). **Every action under the grant is audited** with the grant''s id
+        (`AuditRecord.platformStaffGrantId`) and **the grant itself is listed to the tenant**
+        (`listPlatformStaffGrants`). A tenant never has to grant a support role for this, and cannot
+        see a platform action that is not tied to a grant.
+
+        Requires step-up: the operator holds `PLATFORM_*` permissions, which require MFA (audit R135).
+
+        '
+      tags:
+      - administration
+      x-ticvai-permission: PLATFORM_TENANT_ACCESS
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: tenant
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      x-ticvai-step-up: mfa
+      x-ticvai-step-up-reason: Opens a platform operator's access into a tenant's data.
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - id
+              - permissions
+              - reason
+              - expiresAt
+              properties:
+                id:
+                  type: string
+                  pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+                  description: Client-generated ULID for the grant.
+                permissions:
+                  type: array
+                  minItems: 1
+                  uniqueItems: true
+                  description: What the operator may do in this tenant while the grant is open. Tenant
+                    permissions only; a `PLATFORM_*` value is refused `400`.
+                  items:
+                    $ref: ../shared/permissions.yaml#/components/schemas/Permission
+                reason:
+                  type: string
+                  minLength: 3
+                  maxLength: 500
+                ticketRef:
+                  type: string
+                  nullable: true
+                  maxLength: 100
+                  description: The support case this access serves, where there is one.
+                expiresAt:
+                  type: string
+                  format: date-time
+                  description: At most 8 hours after opening (proposed, client to correct).
+      responses:
+        '201':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: Open. The operator's calls into this tenant resolve against it until `expiresAt`.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PlatformStaffGrant'
+        '400':
+          $ref: ../shared/common.yaml#/components/responses/BadRequest
+        '403':
+          $ref: ../shared/common.yaml#/components/responses/Forbidden
+  /platform-staff-grants/mine:
+    get:
+      operationId: listOwnPlatformStaffGrants
+      x-ticvai-consumed-by:
+        - "P09 ADM-037 AI Provider & Credentials"
+      summary: The calling platform operator's own grants into this tenant
+      description: '**How a P09 screen finds a grant already open after a reload** (decided 28 September,
+        audit R098). Callable with `PLATFORM_TENANT_ACCESS`, the permission that opens a grant, so the
+        operator needs no tenant grant to read it; `listPlatformStaffGrants` needs `AUDIT_VIEW`, which
+        the operator only has if a grant carries it. Returns only grants whose `operatorPrincipalId` is
+        the caller, most recent first.
+
+        '
+      tags:
+      - administration
+      x-ticvai-permission: PLATFORM_TENANT_ACCESS
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: tenant
+      x-ticvai-read-routing: replica
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+      - name: activeOnly
+        in: query
+        description: True returns only grants whose window is open now.
+        schema:
+          type: boolean
+          default: true
+      - $ref: ../shared/common.yaml#/components/parameters/PageSize
+      - $ref: ../shared/common.yaml#/components/parameters/PageCursor
+      responses:
+        '200':
+          description: The caller's grants
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: ../shared/common.yaml#/components/schemas/Page
+                - type: object
+                  properties:
+                    items:
+                      type: array
+                      items:
+                        $ref: '#/components/schemas/PlatformStaffGrant'
+        '403':
+          $ref: ../shared/common.yaml#/components/responses/Forbidden
   /customers/{customerId}/memberships:
     get:
       operationId: listCustomerMemberships
@@ -4219,6 +4609,54 @@ components:
           items:
             type: string
             format: uuid
+    PlatformStaffGrant:
+      type: object
+      x-ticvai-persistence: identity.platform_staff_grant
+      description: '**One platform operator''s time-boxed access into this tenant** (decided 28 September,
+        audit R098). Written by `openPlatformStaffGrant`, read by the tenant through
+        `listPlatformStaffGrants`, and never edited: a grant ends at `expiresAt`, and a new need is a new
+        grant.
+
+        '
+      required:
+      - id
+      - operatorPrincipalId
+      - permissions
+      - reason
+      - openedAt
+      - expiresAt
+      properties:
+        id:
+          type: string
+          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+        operatorPrincipalId:
+          type: string
+          format: uuid
+          readOnly: true
+          description: The platform operator, from the Control Plane token. Set by the server.
+        operatorDisplayName:
+          type: string
+          readOnly: true
+        permissions:
+          type: array
+          items:
+            $ref: ../shared/permissions.yaml#/components/schemas/Permission
+        reason:
+          type: string
+        ticketRef:
+          type: string
+          nullable: true
+        openedAt:
+          type: string
+          format: date-time
+          readOnly: true
+        expiresAt:
+          type: string
+          format: date-time
+        scopePath:
+          type: string
+          readOnly: true
+          description: The tenant root. **Operations write it at `tenant` scope**; the server sets it.
     GuestSession:
       x-ticvai-persistence: none — Redis session registry
       type: object
@@ -4269,8 +4707,10 @@ components:
         expiresAt:
           type: string
           format: date-time
-          description: 'Longer lived than a staff session. No single-session rule — a guest may be signed
-            in on a phone and a laptop at once.
+          description: '**30 days, sliding** (decided 28 September, audit R126 (2)): each use of the session
+            moves this to 30 days from now, and 30 days unused ends it. **One session per device**: a guest
+            may be signed in on a phone and a laptop at once, and a new sign-in on the same `deviceId` ends
+            that device''s previous session.
 
             '
     ChangeCredentialRequest:
@@ -4350,6 +4790,9 @@ components:
         minLength:
           type: integer
           default: 12
+          minimum: 8
+          description: A tenant may raise the length and never set it below 8 (decided 28 September, audit
+            R126 (7)).
         requireBreachCheck:
           type: boolean
           default: true
@@ -4386,12 +4829,12 @@ components:
         maxConcurrentSessions:
           type: integer
           nullable: true
-          description: 'BL-145. **Null, and that is the decision.** ADR-0004 makes a session a token with
-            a validity window and no server-side registry, so counting concurrent sessions would mean
-            adding one — **a stateful check on a deliberately stateless design.**
+          description: 'BL-145. **Null, and that is the decision.** A staff principal has one live session,
+            full stop: ADR-0004 keeps a server-side session registry (the `sid` claim, `ActiveSession`), and
+            §3.1.3 refuses a second sign-in rather than counting towards a limit (confirmed 28 September,
+            audit R184). A number here would only ever mean 1.
 
-            The requirement asked for it configurable. **Configurable to null is still an answer**, and
-            the contradiction is recorded rather than resolved by quietly building a session table.
+            The requirement asked for it configurable. **Configurable to null is still an answer.**
 
             '
         deviceRestriction:
@@ -4440,14 +4883,44 @@ components:
         reusePreventionCount:
           type: integer
           default: 5
+          minimum: 0
+          maximum: 24
+          description: '**How many previous credentials a staff member may not reuse** — the last 5 unless
+            the tenant sets another (decided 28 September, audit R132). `changeOwnCredential` refuses a
+            match with `422`.
+
+            '
         mfaRequiredForPermissions:
           type: array
           description: '**Step-up rather than blanket MFA.** Requiring it for a refund approval and not
             for reading a rota is what stops people sharing devices to avoid it.
 
+            **MFA is required by permission, not by role** (decided 28 September, audit R135). A principal
+            holding any permission listed here must keep an active method (`removeMfaMethod` refuses to
+            remove the last one). **The default is the platform floor**: `ROLE_MANAGE`, `LEDGER_APPROVE`
+            and every `PLATFORM_*` permission. A tenant may add to the list and never remove a floor entry;
+            a body that drops one is refused `400`.
+
             '
           items:
-            type: string
+            $ref: ../shared/permissions.yaml#/components/schemas/Permission
+          default:
+          - ROLE_MANAGE
+          - LEDGER_APPROVE
+          - PLATFORM_TENANT_VIEW
+          - PLATFORM_TENANT_MANAGE
+          - PLATFORM_TENANT_TERMINATE
+          - PLATFORM_TENANT_ACCESS
+          - PLATFORM_PLAN_MANAGE
+          - PLATFORM_CELL_VIEW
+          - PLATFORM_CELL_MANAGE
+          - PLATFORM_BILLING_VIEW
+          - PLATFORM_BILLING_MANAGE
+          - PLATFORM_RELEASE_VIEW
+          - PLATFORM_RELEASE_MANAGE
+          - PLATFORM_RELEASE_PROMOTE
+          - PLATFORM_MIGRATION_VIEW
+          - PLATFORM_MIGRATION_APPLY
     SegregationViolation:
       type: object
       x-ticvai-persistence: none — computed from identity.grant against identity.segregation_rule
@@ -5135,6 +5608,12 @@ components:
           format: uuid
         code:
           type: string
+          x-ticvai-unique: tenant
+          description: '**Unique within the tenant** (decided 28 September, audit R108). A seeded role''s
+            code is reserved in every tenant. Unique per tenant, not per venue, because a grant names a
+            role anywhere in the tree; `createRole` refuses a duplicate with `409 duplicate-code`.
+
+            '
         name:
           type: string
         description:
@@ -5169,6 +5648,9 @@ components:
           default: false
           description: '**Seeded roles ship and are editable; deleting one is refused.** A venue that
             removes `cashier` and rebuilds it has two roles with one name in the audit log.
+
+            **The seeded system roles are Cashier, Supervisor, Venue Manager, Finance and Tenant Admin**
+            (proposed in `docs/active/seed-data-proposal.md` section 2, client to correct; audit R229).
 
             '
         principalCount:
@@ -5438,9 +5920,25 @@ components:
       - type: object
         required:
         - requiresRoleSelection
+        - requiresMfa
         properties:
           requiresRoleSelection:
             type: boolean
+          requiresMfa:
+            type: boolean
+            description: True when the principal holds any permission listed in
+              `PasswordPolicy.mfaRequiredForPermissions` (decided 28 September, audit R135). The session
+              is not usable until `verifyMfaChallenge` succeeds on a `signIn` challenge.
+          hasMfaMethod:
+            type: boolean
+            description: Whether the principal has an active MFA method. With `requiresMfa` true and this
+              false, the client must enrol one first (audit R135, R126 (5)).
+          mfaMethods:
+            type: array
+            description: The principal's active methods, so the client can offer the right one for the
+              `signIn` challenge. Empty when `requiresMfa` is false.
+            items:
+              $ref: '#/components/schemas/MfaMethod'
           availableRoles:
             type: array
             items:

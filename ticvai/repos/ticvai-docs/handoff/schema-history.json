@@ -715,7 +715,17 @@
   "reporting.report_definition_version": "2026-09-27",
   "subscription.plan_limit": "2026-09-27",
   "subscription.plan_module": "2026-09-27",
-  "venuemap.map_version": "2026-09-27"
+  "venuemap.map_version": "2026-09-27",
+  "catalogue.performance_template": "2026-09-28",
+  "fnb.allergen_verdict": "2026-09-28",
+  "identity.platform_staff_grant": "2026-09-28",
+  "maintenance.incident_investigation_note": "2026-09-28",
+  "resources.performance_participant": "2026-09-28",
+  "seating.seat_price_band": "2026-09-28",
+  "whitelabel.footer_config": "2026-09-28",
+  "whitelabel.footer_config_column": "2026-09-28",
+  "whitelabel.footer_config_social_link": "2026-09-28",
+  "workforce.attendance_amendment": "2026-09-28"
  },
  "renames": [
   {
@@ -831,6 +841,36 @@
    "to": "wallet.gift_card",
    "on": "2026-09-19",
    "why": "moved with wallet.wallet"
+  },
+  {
+   "from": "catalogue.session_template",
+   "to": "catalogue.performance_template",
+   "on": "2026-09-28",
+   "why": "a session in the design is a Performance (decided 28 September, audit R165)"
+  },
+  {
+   "from": "resources.session_participant",
+   "to": "resources.performance_participant",
+   "on": "2026-09-28",
+   "why": "audit R165: the manifest is per Performance; session_id becomes performance_id, a foreign key to catalogue.performance"
+  },
+  {
+   "from": "control.footer_config",
+   "to": "whitelabel.footer_config",
+   "on": "2026-09-28",
+   "why": "the footer is tenant configuration, not control plane (audit R163)"
+  },
+  {
+   "from": "control.footer_config_column",
+   "to": "whitelabel.footer_config_column",
+   "on": "2026-09-28",
+   "why": "moved with whitelabel.footer_config (audit R163)"
+  },
+  {
+   "from": "control.footer_config_social_link",
+   "to": "whitelabel.footer_config_social_link",
+   "on": "2026-09-28",
+   "why": "moved with whitelabel.footer_config (audit R163)"
   }
  ],
  "withdrawn": {

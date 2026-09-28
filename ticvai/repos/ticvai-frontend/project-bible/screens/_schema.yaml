@@ -142,7 +142,28 @@ properties:
           description: One sentence. What the user came here to do.
         capability: { type: string }
         requirements: { type: array, items: { type: string } }
-        wave: { type: integer, minimum: 1, maximum: 4 }
+        wave:
+          type: integer
+          minimum: 1
+          maximum: 4
+          description: >
+            **Waves 1 to 3 are the first release (Block A on the four platforms it covers). Wave 4 is
+            a later release**, used from 28 September 2026 together with `deferred`, which says why.
+        deferred:
+          type: object
+          required: [release, decided, decision, reason]
+          description: >
+            **A screen kept in the package but taken out of the first release** by a client decision.
+            Added 28 September 2026 for the audit decisions R187 (the itinerary planner, GST-051 to
+            GST-054 and GST-059) and R242 (the in-venue notifications feed, GST-030 and WEB-046).
+            **Kept, not deleted**: the screen is still what the later release builds, and deleting it
+            would reissue nothing and lose the design. A deferred screen carries `wave: 4`, and the
+            delivery slice and the Block A task sheet leave it out.
+          properties:
+            release: { type: string, enum: [later] }
+            decided: { type: string, description: The date of the decision, ISO. }
+            decision: { type: string, description: The audit decision or minute that deferred it. }
+            reason: { type: string }
         permission:
           type: string
           description: >

@@ -5,16 +5,16 @@
 | | |
 |---|---|
 | Screens | 11 |
-| Operations | 22 |
+| Operations | 24 |
 | Contracts | 5 |
 | Modules | 1 |
 | Undrawn | 0 |
-| Operations with no screen | 55 |
+| Operations with no screen | 56 |
 | Waves | wave1 11 |
 
 ## Gaps
 
-### 55 operations with no screen here
+### 56 operations with no screen here
 
 **In a contract this platform uses, callable by its audience, and reaching no screen on any platform serving that audience.** Either a screen is missing or the endpoint should not exist — and the second is worth considering first.
 
@@ -37,6 +37,7 @@
 | `getAccessPolicy` | identity | GET | One policy, at a version |
 | `getAccessPolicyBundle` | identity | GET | The policies a device needs to decide for itself |
 | `getMembership` | identity | GET | A membership with its history, usage and renewals |
+| `getPasswordPolicy` | identity | GET | Read the password and MFA policy in force |
 | `getPrincipalModuleAccess` | identity | GET | What this person may do, as ticks |
 | `listAccessDecisions` | identity | GET | What was decided, for whom, where and why |
 | `listAccessPolicyHistory` | identity | GET | Every version, who changed it and why |
@@ -59,8 +60,7 @@
 | `extendReservation` | orders | POST | Extend a reservation |
 | `getResaleFeePolicy` | orders | GET | The commission and price cap a resale listing is created under |
 | `issueInvitation` | orders | POST | Issue a complimentary entitlement, with no payment expected |
-| `listDeposits` | orders | GET | Deposits and their authorisation state |
-| … | | | 15 more |
+| … | | | 16 more |
 
 ## Modules
 
@@ -72,7 +72,7 @@
 
 | | Name | Module | Wave | Ops | Drawn |
 |---|---|---|---|---|---|
-| `SCN-001` | Sign in | Access | 1 | 7 | yes |
+| `SCN-001` | Sign in | Access | 1 | 9 | yes |
 | `SCN-002` | Access point & direction | Access | 1 | 3 | yes |
 | `SCN-003` | Ready to scan | Access | 1 | 9 | yes |
 | `SCN-007` | Group admission | Access | 1 | 7 | yes |

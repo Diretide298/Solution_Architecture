@@ -30,6 +30,12 @@ transitions:
   operation: requestShiftSwap
   trigger: operation
   guard: A swap was asked for. Both parties, then the supervisor
+- from: confirmed
+  to: swapPending
+  operation: requestShiftSwap
+  trigger: operation
+  guard: A swap was asked for after the person confirmed. Same role, same venue, and a supervisor
+    approves before it takes effect (audit R129 (6))
 - from: swapPending
   to: published
   operation: requestShiftSwap

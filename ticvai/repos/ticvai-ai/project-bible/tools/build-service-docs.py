@@ -798,7 +798,8 @@ def main() -> int:
     # **Frontend or backend is on every task, and in its OpenProject subject**, so a board, a filter or a
     # person scanning a list can tell them apart without opening the ticket.
     PREFIX = {"Frontend": "[FE]", "Backend": "[BE]", "Database": "[DB]", "DevOps": "[DevOps]",
-              "Onboarding": "[Onboarding]", "Full stack": "[FE+BE]", "Setup": "[Setup]"}
+              "Onboarding": "[Onboarding]", "Full stack": "[FE+BE]", "Setup": "[Setup]",
+              "Client": "[Client]"}
 
     def track_of(key, area):
         if key.startswith(("MIG", "VM-MIG", "VM-DB")):
@@ -809,7 +810,8 @@ def main() -> int:
             return "Full stack"
         if area == "VM":
             return "Frontend" if key.startswith(("VM-BO-", "VM-FE")) else "Backend"
-        return {"devops": "DevOps", "onboard": "Onboarding", "backend": "Backend"}.get(area, "Frontend")
+        return {"devops": "DevOps", "onboard": "Onboarding", "backend": "Backend",
+                "client": "Client"}.get(area, "Frontend")
 
     by_key: dict[str, dict] = {}
 
@@ -861,40 +863,51 @@ def main() -> int:
     # not do.
     devops = (areas.get("devops") or [""])[0]
     # Each setup task names the repository it lands in and what "done" means (audit R002, R059): a
-    # one-line description sent people to guess both. The seed is the reference fixture every test
+    # one-line description sent people to guess both. The provider is decided (28 September, audit
+    # R057): Azure in a UAE region, Terraform `azurerm`, CI on GitHub Actions, secrets in Azure Key
+    # Vault per cell, dependencies per setup/dependencies.md -- so the tasks name it rather than
+    # leave CF-64 open in the plan. The seed is the reference fixture every test
     # runs against (quality-gates 8), not a single demo venue (R034). The migration runner applies
     # the derived DDL forward and records each file; there is no ROLLBACK section to run (R046).
     SETUP = [
         ("SETUP-CI", "CI pipelines for the backend and frontend repositories", 3, [],
-         "In **ticvai-backend** and **ticvai-frontend** (the repositories the setup zip creates). Done when: every "
-         "merge request runs build, tests and lint in both, a red run blocks the merge, and a failing test on a "
-         "branch shows in the MR."),
+         "In **ticvai-backend** and **ticvai-frontend** (the repositories the setup zip creates). CI is GitHub "
+         "Actions (decided 28 September, audit R057). Done when: every merge request runs build, tests and lint "
+         "in both, a red run blocks the merge, and a failing test on a branch shows in the MR. Tool versions per "
+         "setup/dependencies.md."),
         ("SETUP-ENV", "Dev and staging environments (Terraform, ADR-0007 infra repository)", 5, [],
-         "In **ticvai-infra** (ADR-0007: one parameterised `cell` module, one tfvars per environment). Done when: "
-         "`terraform plan` and `apply` build dev and staging from nothing, state is remote and locked, and the "
-         "cell mapping and region are written in the infra README."),
+         "In **ticvai-infra** (ADR-0007: one parameterised `cell` module, one tfvars per environment). The "
+         "provider is Azure in a UAE region, Terraform `azurerm`, with each cell's secrets in its Azure Key Vault "
+         "(decided 28 September, audit R057). Done when: `terraform plan` and `apply` build dev and staging from "
+         "nothing, state is remote and locked, and the cell mapping and Azure region are written in the infra "
+         "README."),
         ("SETUP-DB", "PostgreSQL (tenant and control databases) and a forward-only migration runner that applies the MIG epic in order", 5, ["SETUP-ENV"],
          "In **ticvai-backend**: `SqlMigrationRunner` (in the starter) applies `db/tenant` and `db/control` - the "
          "package's derived DDL - in file order and records each file with its checksum in "
-         "`platform.schema_version`. Done when: both databases exist in dev, the runner applies every MIG file "
+         "`platform.schema_version`. The databases run on Azure in the UAE region, connection strings from the "
+         "cell's Key Vault (audit R057). Done when: both databases exist in dev, the runner applies every MIG file "
          "to an empty database, and a second run applies nothing."),
         ("SETUP-SEED", "Seed data: the reference fixture (two brands, three regions, AED and OMR) every test runs against", 5, ["SETUP-DB"],
          "In **ticvai-backend** `db/seed`: the reference fixture quality-gates 8 requires - two brands, three regions "
          "across two countries, AED and OMR - with products, prices, events, tills, staff, roles and "
-         "denominations, so apps can be built before the Back Office setup screens exist. Done when: it loads on a "
-         "migrated database, integration tests run against it, and the frontend mock server serves the same data."),
+         "denominations, so apps can be built before the Back Office setup screens exist. The denominations and "
+         "roles seed from docs/active/seed-data-proposal.md (proposed, client to correct - audit R229). Done when: "
+         "it loads on a migrated database, integration tests run against it, and the frontend mock server serves "
+         "the same data."),
         ("SETUP-CLIENTS", "Generate the typed API clients from contracts/ for the frontend workspace", 3, ["SETUP-CI"],
          "In **ticvai-frontend** `packages/api-client`: generated from the package's `contracts/`, re-generated by "
-         "one command. Done when: every in-release operation has a typed call, the build fails if the contracts "
-         "change without a re-generate, and screen tickets stop stubbing calls."),
+         "one command and checked in CI on GitHub Actions (audit R057). Done when: every in-release operation has "
+         "a typed call, the build fails if the contracts change without a re-generate, and screen tickets stop "
+         "stubbing calls."),
         ("SETUP-AUTH", "Sign-in working end to end against IdentityService", 5, ["SETUP-DB"],
          "In **ticvai-backend** and **ticvai-frontend**: the identity sign-in operations, `ICurrentPrincipal` and "
-         "`ITenantContext` filled from the session. Done when: a seeded staff member signs in from a web app and "
-         "an app, gets their effective permissions, and a request without a session gets 401."),
+         "`ITenantContext` filled from the session, signing keys from the cell's Azure Key Vault (audit R057). "
+         "Done when: a seeded staff member signs in from a web app and an app, gets their effective permissions, "
+         "and a request without a session gets 401."),
         ("SETUP-OBS", "Logging and monitoring basics", 2, ["SETUP-ENV"],
          "In **ticvai-backend** and **ticvai-infra**: structured logs and traces (OpenTelemetry, already referenced by "
-         "the starter) shipped from dev and staging. Done when: a request can be followed from the API log to "
-         "its trace, and an error raises an alert someone receives."),
+         "the starter) shipped from dev and staging in the Azure UAE region (audit R057). Done when: a request "
+         "can be followed from the API log to its trace, and an error raises an alert someone receives."),
     ]
     task("SETUP", "", "Epic", "Setup: environments, pipelines, database, seed data and sign-in",
          "Everything else depends on this epic.", 1, area="devops")
@@ -909,6 +922,25 @@ def main() -> int:
              "tickets; paste both into the Ready for QA comment.", 1, pts=1, area="onboard", assignee=who)
     for k, subj, p, dep, detail in SETUP:
         task(k, "SETUP", "Task", subj, subj + ". " + detail, 1, pts=p, area="devops", assignee=devops, depends=dep)
+
+    # --- client-side prerequisites (audit R065, R252). Assigned to nobody here on purpose: the
+    # owner is the client's to name, and each ticket says so in its own text.
+    task("CLIENT", "", "Epic", "Client-side prerequisites: sandbox credentials and design sign-off",
+         "Deliverables only the client can produce, each blocking acceptance elsewhere in this plan "
+         "(decided 28 September, audit R065 and R252).", 1, area="client")
+    task("CLIENT-PAY-SANDBOX", "CLIENT", "Task",
+         "Deliver Stripe and Network International sandbox credentials",
+         "A named client owner [client to name: client finance / payments owner] delivers Stripe and "
+         "Network International sandbox credentials by a fixed date [client to set] (decided 28 September, "
+         "audit R065). Blocks acceptance of WEB-012 and SVC-ORDER-PAYMENT-1: the declined, unknown and "
+         "reconcile paths cannot be tested without a sandbox to fail against.",
+         1, pts=1, area="client")
+    task("CLIENT-DESIGN-REVIEWER", "CLIENT", "Task",
+         "Name one design reviewer; each wireframe batch signed off within 3 working days",
+         "The client names one design reviewer [client to name] (decided 28 September, audit R252). Each "
+         "wireframe batch is signed off within 3 working days of delivery, and frontend acceptance on the "
+         "Block A screen tickets depends on that sign-off - an unreviewed screen is not accepted, it is "
+         "waiting.", 1, pts=1, area="client")
 
     # --- backend: one epic per service, a feature per tag, and tasks of at most four operations,
     # because a 30-operation feature cannot be estimated, started or finished as one thing.
@@ -1284,12 +1316,20 @@ def main() -> int:
             x["assignee"] = who
             load[who] += int(x["points"] or 0)
 
+    # **Acceptance that waits on the client** (audit R065): the payment-sandbox task blocks the
+    # tickets whose testing needs its credentials. Wired here, after every ticket exists, so the
+    # dependency survives however those keys are generated.
+    for k in ("APP-WEB-WEB-012", "SVC-ORDER-PAYMENT-1"):
+        if k in by_key:
+            by_key[k]["dependsOn"] = " ".join(sorted(set((by_key[k]["dependsOn"] or "").split())
+                                                     | {"CLIENT-PAY-SANDBOX"}))
+
     # **Chronology.** Every task gets its place in the order work can happen: the first release before
     # Venue Management, then wave, then how many tasks stand in front of it, then database before
     # backend before frontend. `queue` is the same order within one person's list, so each developer's
     # board reads top to bottom as the order to work in.
-    TRACK_ORDER = {"Setup": 0, "DevOps": 1, "Onboarding": 1, "Database": 2, "Backend": 3, "Full stack": 4,
-                   "Frontend": 5}
+    TRACK_ORDER = {"Setup": 0, "Client": 0, "DevOps": 1, "Onboarding": 1, "Database": 2, "Backend": 3,
+                   "Full stack": 4, "Frontend": 5}
     for t_ in tasks:
         step_of(t_["key"])
     ordered = sorted(tasks, key=lambda t_: (t_["phase"], int(t_["wave"] or 9), step[t_["key"]],

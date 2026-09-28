@@ -7,7 +7,7 @@
 | Tier | foundation: Read by everything, reads nothing above. Deploys first and alone. |
 | Contracts | `identity` |
 | Schemas owned | `identity`, `pii` |
-| Operations in the slice | 36 of 70 |
+| Operations in the slice | 32 of 75 |
 | Scale | Read-heavy, latency-critical, cached hard. Every request resolves a principal. |
 | If it is down | A restart is an outage everywhere. Deploys go out first and alone. |
 
@@ -31,10 +31,12 @@
 | administration | [`createRole`](#createrole) | POST | `/roles` | setup | 1 | ADM-021, BO-054 |
 | administration | [`listPrincipals`](#listprincipals) | GET | `/principals` | core | 1 | ADM-020, ANL-003, BO-053, BO-057, BO-873, CMS-019 … |
 | administration | [`listRoles`](#listroles) | GET | `/roles` | core | 2 | ADM-021, BO-054, BO-106, BO-142, CMS-019, EMP-002 |
+| administration | [`openPlatformStaffGrant`](#openplatformstaffgrant) | POST | `/platform-staff-grants` | core | 2 | ADM-005, ADM-016, ADM-017, ADM-018, ADM-019, ADM-031 … |
 | administration | [`updatePrincipal`](#updateprincipal) | PATCH | `/principals/{principalId}` | setup | 1 | ADM-020, BO-053, PTR-003 |
 | guestAuth | [`deleteGuestAccount`](#deleteguestaccount) | DELETE | `/auth/guest/account` | core | 2 | GST-066, WEB-024 |
-| guestAuth | [`getGuestSession`](#getguestsession) | GET | `/auth/guest/session` | core | 1 | GST-042, WEB-016 |
-| guestAuth | [`guestLogout`](#guestlogout) | DELETE | `/auth/guest/session` | core | 1 | GST-042, WEB-016 |
+| guestAuth | [`getGuestSession`](#getguestsession) | GET | `/auth/guest/session` | core | 1 | GST-042, GST-073, WEB-016 |
+| guestAuth | [`guestLogout`](#guestlogout) | DELETE | `/auth/guest/session` | core | 1 | GST-042, GST-073, WEB-016 |
+| guestAuth | [`guestPasswordLogin`](#guestpasswordlogin) | POST | `/auth/guest/password` | core | 1 | GST-042, WEB-016 |
 | guestAuth | [`guestSocialLogin`](#guestsociallogin) | POST | `/auth/guest/social` | core | 1 | GST-042, WEB-016 |
 | guestAuth | [`guestUaePassLogin`](#guestuaepasslogin) | POST | `/auth/guest/uae-pass` | core | 1 | GST-042, WEB-016 |
 | guestAuth | [`linkGuestCheckout`](#linkguestcheckout) | POST | `/auth/guest/link-checkout` | core | 1 | GST-042, WEB-016 |
@@ -46,23 +48,17 @@
 | identity | [`forceLogout`](#forcelogout) | POST | `/auth/sessions/{sessionId}/force-logout` | core | 1 | ADM-001, POS-000, PTR-001, SUP-001 |
 | identity | [`getCurrentSession`](#getcurrentsession) | GET | `/auth/session` | core | 1 | ADM-001, EMP-001, EMP-002, EMP-042, POS-000, PTR-001 … |
 | identity | [`grantDelegation`](#grantdelegation) | POST | `/guests/{subjectId}/delegations` | core | 2 | GST-015, WEB-024 |
-| identity | [`listDelegations`](#listdelegations) | GET | `/guests/{subjectId}/delegations` | core | 2 | BO-385, GST-015, WEB-024 |
-| identity | [`login`](#login) | POST | `/auth/login` | core | 1 | ADM-001, EMP-001, GST-042, POS-000, PTR-001, SCN-001 … |
+| identity | [`listDelegations`](#listdelegations) | GET | `/guests/{subjectId}/delegations` | core | 2 | BO-385, GST-015, GST-069, WEB-024 |
+| identity | [`login`](#login) | POST | `/auth/login` | core | 1 | ADM-001, EMP-001, POS-000, PTR-001, SCN-001, SUP-001 |
 | identity | [`refreshToken`](#refreshtoken) | POST | `/auth/refresh` | core | 1 | GST-042, WEB-016 |
 | identity | [`selectRole`](#selectrole) | POST | `/auth/select-role` | core | 1 | EMP-002, POS-000, POS-001, SCN-001 |
-| identity | [`setPasswordPolicy`](#setpasswordpolicy) | PUT | `/password-policy` | setup | 1 | ADM-421 |
+| identity | [`setPasswordPolicy`](#setpasswordpolicy) | PUT | `/password-policy` | setup | 1 | ADM-342, ADM-421 |
 | identity | [`verifyGuestEmail`](#verifyguestemail) | POST | `/auth/guest/verify-email` | core | 1 | GST-073, WEB-020 |
-| mfa | [`createMfaChallenge`](#createmfachallenge) | POST | `/auth/mfa/challenge` | core | 1 | GST-073, WEB-016 |
-| mfa | [`enrolMfaMethod`](#enrolmfamethod) | POST | `/auth/mfa/methods` | core | 1 | GST-042, WEB-016 |
-| mfa | [`listMfaMethods`](#listmfamethods) | GET | `/auth/mfa/methods` | core | 1 | ADM-001, ADM-342, EMP-001, EMP-002, EMP-042, GST-042 … |
-| mfa | [`removeMfaMethod`](#removemfamethod) | DELETE | `/auth/mfa/methods/{methodId}` | core | 1 | GST-042, WEB-016 |
-| mfa | [`verifyMfaChallenge`](#verifymfachallenge) | POST | `/auth/mfa/challenge/{challengeId}/verify` | core | 1 | GST-042, WEB-016 |
-| mfa | [`verifyMfaEnrolment`](#verifymfaenrolment) | POST | `/auth/mfa/methods/{methodId}` | core | 1 | GST-042, WEB-016 |
+| mfa | [`createMfaChallenge`](#createmfachallenge) | POST | `/auth/mfa/challenge` | core | 1 | ADM-001, EMP-001, POS-000, PTR-001, SCN-001, SUP-001 |
+| mfa | [`enrolMfaMethod`](#enrolmfamethod) | POST | `/auth/mfa/methods` | setup | 1 | ADM-001, EMP-042 |
+| mfa | [`verifyMfaChallenge`](#verifymfachallenge) | POST | `/auth/mfa/challenge/{challengeId}/verify` | core | 1 | ADM-001, EMP-001, POS-000, PTR-001, SCN-001, SUP-001 |
+| mfa | [`verifyMfaEnrolment`](#verifymfaenrolment) | POST | `/auth/mfa/methods/{methodId}` | setup | 1 | ADM-001, EMP-042 |
 | session | [`listActiveSessions`](#listactivesessions) | GET | `/auth/sessions` | core | 1 | ADM-001, POS-000, PTR-001, SUP-001 |
-| sso | [`completeSsoAuthorization`](#completessoauthorization) | POST | `/auth/sso/{providerId}/callback` | core | 1 | GST-042, WEB-016 |
-| sso | [`listSsoProviders`](#listssoproviders) | GET | `/auth/sso/providers` | core | 1 | ADM-001, EMP-001, EMP-002, EMP-042, GST-042, PTR-001 … |
-| sso | [`setSsoConfig`](#setssoconfig) | PUT | `/tenants/sso-config` | setup | 1 | ADM-005 |
-| sso | [`startSsoAuthorization`](#startssoauthorization) | GET | `/auth/sso/{providerId}/authorize` | core | 1 | GST-042, WEB-016 |
 
 ## Group: administration
 
@@ -151,7 +147,7 @@
 
 | Field | Type | Required | Notes |
 |---|---|---|---|
-| code | string | yes | (max length 64; pattern ^[A-Za-z0-9_-]+$) |
+| code | string | yes | Unique within the tenant, compared case-insensitively (decided 28 September, audit R108). (max length 64; pattern ^[A-Za-z0-9_-]+$) |
 | name | string | yes | (max length 200) |
 | description | string |  | (max length 500) |
 
@@ -160,7 +156,7 @@
 | Field | Type | Required | Notes |
 |---|---|---|---|
 | id | string (uuid) | yes |  |
-| code | string | yes |  |
+| code | string | yes | Unique within the tenant (decided 28 September, audit R108). |
 | name | string | yes |  |
 | description | string |  |  |
 | permissions | array of Permission: enum (SESSION_FORCE_LOGOUT, USER_MANAGE, ROLE_MANAGE, PERMISSION_GRANT, PERMISSION_VIEW, PERMISSION_MANAGE, PLATFORM_TENANT_VIEW, PLATFORM_TENANT_MANAGE, …) |  | A role that grants no permissions is not a role. |
@@ -174,6 +170,7 @@
 | Code | Shape | Meaning |
 |---|---|---|
 | 201 |  | Created |
+| 409 | DuplicateCode | A business code the request names is already used within its uniqueness scope (the scope the property's x-ticvai-unique names; decided 28 September, audit R108). |
 
 ### listPrincipals
 
@@ -233,7 +230,7 @@
 
 **`GET /roles`**: List roles
 
-A role is a grouping for permission management — code, name, description and the permissions it carries (`Role.permissions`). **Seeded system roles ship with the tenant** (`Role.isSystem`: editable, not deletable); every other role is created with `createRole`. Grants (`createDelegatedAccess`) attach a role or a single permission to a principal at a scope.
+A role is a grouping for permission management — code, name, description and the permissions it carries (`Role.permissions`). **Seeded system roles ship with the tenant** (`Role.isSystem`: editable, not deletable); every other role is created with `createRole`. The seeded set is Cashier, Supervisor, Venue Manager, Finance and Tenant Admin, with the permissions `docs/active/seed-data-proposal.md` section 2 drafts (proposed, client to correct; audit R229). Grants (`createDelegatedAccess`) attach a role or a single permission to a principal at a scope.
 
 |  |  |
 |---|---|
@@ -262,7 +259,7 @@ A role is a grouping for permission management — code, name, description and t
 |---|---|---|---|
 | items | array of Role | yes |  |
 | items[].id | string (uuid) | yes |  |
-| items[].code | string | yes |  |
+| items[].code | string | yes | Unique within the tenant (decided 28 September, audit R108). |
 | items[].name | string | yes |  |
 | items[].description | string |  |  |
 | items[].permissions | array of Permission: enum (SESSION_FORCE_LOGOUT, USER_MANAGE, ROLE_MANAGE, PERMISSION_GRANT, PERMISSION_VIEW, PERMISSION_MANAGE, PLATFORM_TENANT_VIEW, PLATFORM_TENANT_MANAGE, …) |  | A role that grants no permissions is not a role. |
@@ -279,11 +276,71 @@ A role is a grouping for permission management — code, name, description and t
 |---|---|---|
 | 200 |  | Roles |
 
+### openPlatformStaffGrant
+
+**`POST /platform-staff-grants`**: A platform operator opens a time-boxed grant into this tenant
+
+**How a TICVAI operator acts inside a tenant — decided 28 September, audit R098.** The Platform Console (P09) runs outside every cell, and its tenant screens call operations that live in the tenant's cell. The operator **picks a tenant, then opens a grant here**, in that tenant's cell: it names the permissions it carries, a reason and a window. Until it is open, a platform token carries no tenant permission at all; while it is open, the cell resolves the operator's permissions from the grant, at tenant scope, and nothing else.
+**`PLATFORM_*` permissions never ride in a grant; they are read from the platform token** (decided 28 September, audit R203). A cell honours one only on the few operations that name it: this one (`PLATFORM_TENANT_ACCESS`), `listOwnPlatformStaffGrants`, and `ai.setAiProvider` (`PLATFORM_TENANT_MANAGE`), which in addition requires a grant into the tenant to be open so the change is audited against it.
+**Time-boxed at opening and never open-ended**: `expiresAt` is at most 8 hours ahead (proposed, client to correct). **Every action under the grant is audited** with the grant's id (`AuditRecord.platformStaffGrantId`) and **the grant itself is listed to the tenant** (`listPlatformStaffGrants`). A tenant never has to grant a support role for this, and cannot see a platform action that is not tied to a grant.
+Requires step-up: the operator holds `PLATFORM_*` permissions, which require MFA (audit R135).
+
+|  |  |
+|---|---|
+| Permission | `PLATFORM_TENANT_ACCESS` |
+| Scope level | tenant |
+| Part of slice | core |
+| Wave | 2 |
+| Offline | no |
+| Conflict policy | serverWins |
+| Step-up auth | mfa |
+| Reads | `identity.platform_staff_grant` |
+| Writes | - |
+| Called by | ADM-005, ADM-016, ADM-017, ADM-018, ADM-019, ADM-031, ADM-037, ADM-412, ADM-421 |
+
+**Parameters**
+
+| Name | In | Required | Type | Notes |
+|---|---|---|---|---|
+| Idempotency-Key | header | yes | string | Client-generated ULID. |
+
+**Request body**
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| id | string | yes | Client-generated ULID for the grant. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
+| permissions | array of Permission: enum (SESSION_FORCE_LOGOUT, USER_MANAGE, ROLE_MANAGE, PERMISSION_GRANT, PERMISSION_VIEW, PERMISSION_MANAGE, PLATFORM_TENANT_VIEW, PLATFORM_TENANT_MANAGE, …) | yes | What the operator may do in this tenant while the grant is open. (min items 1) |
+| reason | string | yes | (min length 3; max length 500) |
+| ticketRef | string |  | The support case this access serves, where there is one. (max length 100; nullable) |
+| expiresAt | string (date-time) | yes | At most 8 hours after opening (proposed, client to correct). |
+
+**Response**: `PlatformStaffGrant`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| id | string | yes | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
+| operatorPrincipalId | string (uuid) | yes | The platform operator, from the Control Plane token. (read-only) |
+| operatorDisplayName | string |  | (read-only) |
+| permissions | array of Permission: enum (SESSION_FORCE_LOGOUT, USER_MANAGE, ROLE_MANAGE, PERMISSION_GRANT, PERMISSION_VIEW, PERMISSION_MANAGE, PLATFORM_TENANT_VIEW, PLATFORM_TENANT_MANAGE, …) | yes |  |
+| reason | string | yes |  |
+| ticketRef | string |  | (nullable) |
+| openedAt | string (date-time) | yes | (read-only) |
+| expiresAt | string (date-time) | yes |  |
+| scopePath | string |  | The tenant root. (read-only) |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 201 |  | Open. |
+| 400 | BadRequest | Validation failed |
+| 403 | Forbidden | Authenticated but not permitted at the requested scope |
+
 ### updatePrincipal
 
 **`PATCH /principals/{principalId}`**: Update or deactivate a principal
 
-Deactivation invalidates any live session immediately. Additive changes take effect at next login; revocations take effect at once.
+Deactivation invalidates any live session immediately. **A change to `validTo`, to `primaryRoleId` or to the principal's permissions ends every live session of the principal at once** (decided 28 September, audit R126 (1)): the person signs in again and is resolved afresh. A change to `displayName` alone ends nothing.
 
 |  |  |
 |---|---|
@@ -394,7 +451,7 @@ Where the guest is linked across cells, the request fans out (ADR-0010).
 | Read routing | primary |
 | Reads | `identity.guest_session`, `pii.subject` |
 | Writes | - |
-| Called by | GST-042, WEB-016 |
+| Called by | GST-042, GST-073, WEB-016 |
 
 **Response**: `GuestSession`
 
@@ -411,7 +468,7 @@ Where the guest is linked across cells, the request fans out (ADR-0010).
 | guestLinkId | string |  | Present where the guest is linked across cells (ADR-0010). (nullable) |
 | homeCellName | string |  | (nullable) |
 | preferredLanguage | string |  | (nullable) |
-| expiresAt | string (date-time) | yes | Longer lived than a staff session. |
+| expiresAt | string (date-time) | yes | 30 days, sliding (decided 28 September, audit R126 (2)): each use of the session moves this to 30 days from now, and 30 days unused ends it. |
 
 **Responses**
 
@@ -436,7 +493,7 @@ Ends this device's session. `allDevices` revokes every session for the subject, 
 | Conflict policy | serverWins |
 | Reads | `identity.guest_session` |
 | Writes | `identity.guest_session` |
-| Called by | GST-042, WEB-016 |
+| Called by | GST-042, GST-073, WEB-016 |
 
 **Parameters**
 
@@ -450,6 +507,67 @@ Ends this device's session. `allDevices` revokes every session for the subject, 
 | Code | Shape | Meaning |
 |---|---|---|
 | 204 |  | Ended |
+
+### guestPasswordLogin
+
+**`POST /auth/guest/password`**: Sign in with an email or mobile and a password
+
+**Decided 28 September, audit R073 (a).** `registerGuest` has always taken an optional password and nothing let a guest sign in with it, so `WEB-016` promised a sign-in that did not exist. This is that sign-in, beside the one-time code, social and UAE Pass routes; it returns the same `GuestSession`.
+**A wrong password, an unknown identifier and an account with no password are one answer** (`401`, the same timing), because a sign-in that tells them apart is an account enumeration tool. **Failed attempts count against `PasswordPolicy.lockoutAfterAttempts`** and lock the account for `lockoutMinutes`, never permanently; the guest can still use a one-time code.
+**No second factor at sign-in** (audit R167): a guest signs in with this, a code, a social provider or UAE Pass, never with enterprise SSO and never with MFA. **One session per device** (audit R126): signing in on a device ends that device's previous guest session.
+An unverified account signs in and may browse and fill a cart; the checkout gate on `verifyGuestEmail` still applies.
+
+|  |  |
+|---|---|
+| Permission | `None` |
+| Scope level | tenant |
+| Part of slice | core |
+| Wave | 1 |
+| Offline | no |
+| Conflict policy | serverWins |
+| Reads | - |
+| Writes | - |
+| Called by | GST-042, WEB-016 |
+
+**Parameters**
+
+| Name | In | Required | Type | Notes |
+|---|---|---|---|---|
+| Idempotency-Key | header | yes | string | Client-generated ULID. |
+
+**Request body**
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| identifier | string | yes | The email address or E.164 mobile number the account was registered with. (max length 256) |
+| password | string | yes | (min length 8; max length 256) |
+| deviceId | string |  | Names the device; a new sign-in here ends the previous session on it. |
+
+**Response**: `GuestSession`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| subjectId | string (uuid) | yes |  |
+| displayName | string |  | (nullable) |
+| tokens | TokenPair | yes |  |
+| tokens.accessToken | string | yes | JWT carrying sid, validated per request against the session registry. |
+| tokens.refreshToken | string | yes |  |
+| tokens.expiresIn | integer | yes | Seconds |
+| isVerified | boolean | yes | False until an OTP or a verified provider identity confirms ownership. |
+| identityProviders | array of enum (password, otp, apple, google, uaePass) |  | Linked providers. |
+| guestLinkId | string |  | Present where the guest is linked across cells (ADR-0010). (nullable) |
+| homeCellName | string |  | (nullable) |
+| preferredLanguage | string |  | (nullable) |
+| expiresAt | string (date-time) | yes | 30 days, sliding (decided 28 September, audit R126 (2)): each use of the session moves this to 30 days from now, and 30 days unused ends it. |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 200 |  | Signed in |
+| 400 | BadRequest | Validation failed |
+| 401 |  | Identifier or password not accepted, or the account is locked. |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal |
 
 ### guestSocialLogin
 
@@ -498,7 +616,7 @@ Where the provider's verified email matches an existing account, the identities 
 | guestLinkId | string |  | Present where the guest is linked across cells (ADR-0010). (nullable) |
 | homeCellName | string |  | (nullable) |
 | preferredLanguage | string |  | (nullable) |
-| expiresAt | string (date-time) | yes | Longer lived than a staff session. |
+| expiresAt | string (date-time) | yes | 30 days, sliding (decided 28 September, audit R126 (2)): each use of the session moves this to 30 days from now, and 30 days unused ends it. |
 
 **Responses**
 
@@ -556,7 +674,7 @@ Government onboarding has lead time and should be started before it becomes the 
 | guestLinkId | string |  | Present where the guest is linked across cells (ADR-0010). (nullable) |
 | homeCellName | string |  | (nullable) |
 | preferredLanguage | string |  | (nullable) |
-| expiresAt | string (date-time) | yes | Longer lived than a staff session. |
+| expiresAt | string (date-time) | yes | 30 days, sliding (decided 28 September, audit R126 (2)): each use of the session moves this to 30 days from now, and 30 days unused ends it. |
 
 **Responses**
 
@@ -663,7 +781,7 @@ Email or mobile. Verification follows via OTP; the account exists but is unverif
 | guestLinkId | string |  | Present where the guest is linked across cells (ADR-0010). (nullable) |
 | homeCellName | string |  | (nullable) |
 | preferredLanguage | string |  | (nullable) |
-| expiresAt | string (date-time) | yes | Longer lived than a staff session. |
+| expiresAt | string (date-time) | yes | 30 days, sliding (decided 28 September, audit R126 (2)): each use of the session moves this to 30 days from now, and 30 days unused ends it. |
 
 **Responses**
 
@@ -764,7 +882,7 @@ Delivered by WhatsApp, SMS or email. Rate-limited per identifier and per source 
 | guestLinkId | string |  | Present where the guest is linked across cells (ADR-0010). (nullable) |
 | homeCellName | string |  | (nullable) |
 | preferredLanguage | string |  | (nullable) |
-| expiresAt | string (date-time) | yes | Longer lived than a staff session. |
+| expiresAt | string (date-time) | yes | 30 days, sliding (decided 28 September, audit R126 (2)): each use of the session moves this to 30 days from now, and 30 days unused ends it. |
 
 **Responses**
 
@@ -817,7 +935,7 @@ Held to `setPasswordPolicy` (length, breach check); a PIN is held to the length 
 | 204 |  | Changed. |
 | 400 | BadRequest | Validation failed |
 | 401 | Unauthorized | Missing, expired or superseded session |
-| 422 |  | The new credential fails the password policy, or is the same as the current one. |
+| 422 |  | The new credential fails the password policy, or matches the current one or any of the previous PasswordPolicy.reusePreventionCount credentials (5 unless the tenant sets another; decided 28 September… |
 
 ### exportSubjectData
 
@@ -976,6 +1094,8 @@ Covers a primary holder assigning entitlements, a group leader holding tickets, 
 **It inherits the audit.** Who granted what to whom, when, and whether it has expired is already recorded for every grant, which a bespoke family structure would have needed built.
 **This does not make the work smaller** — extending grants to guest-held, object-scoped authority is real work touching `orders`, `access` and `retail`. **It makes it one piece of work rather than four.**
 
+**Who grants, and the minor rule — decided 28 September, audit R126 (3).** **The account holder grants**: the guest whose account the authority is over (`overSubjectId`), or, where that guest is a minor, the adult account holder the minor is linked to. A guest caller may not grant authority over anybody else's account; staff holding `GUEST_MANAGE` record a grant on the account holder's behalf. **A subject with no date of birth on file is treated as a minor.** The age below which a subject is a minor is an open value that client counsel sets; it is not assumed here.
+
 |  |  |
 |---|---|
 | Permission | `GUEST_MANAGE` |
@@ -1056,7 +1176,7 @@ CF-132. **Both directions, because a guest is usually in both.** A parent holds 
 | Guest callable | True |
 | Reads | `identity.delegated_access`, `marketing.guest_profile`, `pii.subject` |
 | Writes | - |
-| Called by | BO-385, GST-015, WEB-024 |
+| Called by | BO-385, GST-015, GST-069, WEB-024 |
 
 **Parameters**
 
@@ -1130,9 +1250,9 @@ CF-132. **Both directions, because a guest is usually in both.** A parent holds 
 | Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
-| Reads | `cache:idempotency`, `identity.delegated_access`, `identity.principal`, `identity.principal_credential`, `identity.role` |
+| Reads | `cache:idempotency`, `identity.delegated_access`, `identity.mfa_method`, `identity.principal`, `identity.principal_credential`, `identity.role` |
 | Writes | `cache:idempotency`, `identity.session` |
-| Called by | ADM-001, EMP-001, GST-042, POS-000, PTR-001, SCN-001, SUP-001, WEB-016 |
+| Called by | ADM-001, EMP-001, POS-000, PTR-001, SCN-001, SUP-001 |
 
 **Parameters**
 
@@ -1158,6 +1278,17 @@ CF-132. **Both directions, because a guest is usually in both.** A parent holds 
 | refreshToken | string | yes |  |
 | expiresIn | integer | yes | Seconds |
 | requiresRoleSelection | boolean | yes |  |
+| requiresMfa | boolean | yes | True when the principal holds any permission listed in PasswordPolicy.mfaRequiredForPermissions (decided 28 September, audit R135). |
+| hasMfaMethod | boolean |  | Whether the principal has an active MFA method. |
+| mfaMethods | array of MfaMethod |  | The principal's active methods, so the client can offer the right one for the signIn challenge. |
+| mfaMethods[].id | string (uuid) | yes |  |
+| mfaMethods[].kind | MfaKind: enum (totp, smsOtp, emailOtp, biometric, hardwareToken) | yes |  |
+| mfaMethods[].label | string |  | (nullable) |
+| mfaMethods[].maskedTarget | string |  | Partially masked destination, so a person can tell two methods apart. (nullable) |
+| mfaMethods[].isActive | boolean | yes |  |
+| mfaMethods[].isPrimary | boolean |  |  |
+| mfaMethods[].enrolledAt | string (date-time) | yes |  |
+| mfaMethods[].lastUsedAt | string (date-time) |  | (nullable) |
 | availableRoles | array of RoleSummary |  |  |
 | availableRoles[].id | string (uuid) | yes |  |
 | availableRoles[].code | string | yes |  |
@@ -1339,7 +1470,7 @@ BL-144. **Modelled on NIST SP 800-63B rather than on habit.** Length beats compo
 | Conflict policy | serverWins |
 | Reads | `cache:idempotency`, `identity.password_policy` |
 | Writes | `cache:idempotency`, `identity.password_policy` |
-| Called by | ADM-421 |
+| Called by | ADM-342, ADM-421 |
 
 **Parameters**
 
@@ -1353,7 +1484,7 @@ BL-144. **Modelled on NIST SP 800-63B rather than on habit.** Length beats compo
 |---|---|---|---|
 | id | string (uuid) | yes | Assigned by the server. (read-only) |
 | scopePath | string | yes | The partition key (ADR-0005), written by the server from the caller's tenant (x-ticvai-config-scope: tenant). (read-only) |
-| minLength | integer | yes | (default 12) |
+| minLength | integer | yes | A tenant may raise the length and never set it below 8 (decided 28 September, audit R126 (7)). (min 8; default 12) |
 | requireBreachCheck | boolean |  | The single most effective rule. (default True) |
 | maxAgeDays | integer |  | Null is the recommended value. (nullable) |
 | recoveryMethods | array of enum (email, sms, securityQuestions, inPersonVerification, supportAssisted) |  | BL-132. |
@@ -1366,8 +1497,8 @@ BL-144. **Modelled on NIST SP 800-63B rather than on habit.** Length beats compo
 | lockoutAfterAttempts | integer |  | (default 10) |
 | lockoutMinutes | integer |  | A temporary lockout, not a permanent one. (default 15) |
 | forceChangeOnFirstLogon | boolean |  | (default True) |
-| reusePreventionCount | integer |  | (default 5) |
-| mfaRequiredForPermissions | array of string |  | Step-up rather than blanket MFA. |
+| reusePreventionCount | integer |  | How many previous credentials a staff member may not reuse — the last 5 unless the tenant sets another (decided 28 September, audit R132). (min 0; max 24; default 5) |
+| mfaRequiredForPermissions | array of Permission: enum (SESSION_FORCE_LOGOUT, USER_MANAGE, ROLE_MANAGE, PERMISSION_GRANT, PERMISSION_VIEW, PERMISSION_MANAGE, PLATFORM_TENANT_VIEW, PLATFORM_TENANT_MANAGE, …) |  | Step-up rather than blanket MFA. (default ['ROLE_MANAGE', 'LEDGER_APPROVE', 'PLATFORM_TENANT_VIEW', 'PLATFORM_TENANT_MANAGE', 'PLATFORM_TENANT_TERMINATE', 'PLATFORM_TENANT_ACCESS', 'PLATFORM_PLAN_MANAGE', 'PLATFORM_CELL_VIEW', 'PLATFORM_CELL_MANAGE', 'PLATFORM_BILLING_VIEW', 'PLATFORM_BILLING_MANAGE', 'PLATFORM_RELEASE_VIEW', 'PLATFORM_RELEASE_MANAGE', 'PLATFORM_RELEASE_PROMOTE', 'PLATFORM_MIGRATION_VIEW', 'PLATFORM_MIGRATION_APPLY']) |
 
 **Response**: `PasswordPolicy`
 
@@ -1375,7 +1506,7 @@ BL-144. **Modelled on NIST SP 800-63B rather than on habit.** Length beats compo
 |---|---|---|---|
 | id | string (uuid) | yes | Assigned by the server. (read-only) |
 | scopePath | string | yes | The partition key (ADR-0005), written by the server from the caller's tenant (x-ticvai-config-scope: tenant). (read-only) |
-| minLength | integer | yes | (default 12) |
+| minLength | integer | yes | A tenant may raise the length and never set it below 8 (decided 28 September, audit R126 (7)). (min 8; default 12) |
 | requireBreachCheck | boolean |  | The single most effective rule. (default True) |
 | maxAgeDays | integer |  | Null is the recommended value. (nullable) |
 | recoveryMethods | array of enum (email, sms, securityQuestions, inPersonVerification, supportAssisted) |  | BL-132. |
@@ -1388,8 +1519,8 @@ BL-144. **Modelled on NIST SP 800-63B rather than on habit.** Length beats compo
 | lockoutAfterAttempts | integer |  | (default 10) |
 | lockoutMinutes | integer |  | A temporary lockout, not a permanent one. (default 15) |
 | forceChangeOnFirstLogon | boolean |  | (default True) |
-| reusePreventionCount | integer |  | (default 5) |
-| mfaRequiredForPermissions | array of string |  | Step-up rather than blanket MFA. |
+| reusePreventionCount | integer |  | How many previous credentials a staff member may not reuse — the last 5 unless the tenant sets another (decided 28 September, audit R132). (min 0; max 24; default 5) |
+| mfaRequiredForPermissions | array of Permission: enum (SESSION_FORCE_LOGOUT, USER_MANAGE, ROLE_MANAGE, PERMISSION_GRANT, PERMISSION_VIEW, PERMISSION_MANAGE, PLATFORM_TENANT_VIEW, PLATFORM_TENANT_MANAGE, …) |  | Step-up rather than blanket MFA. (default ['ROLE_MANAGE', 'LEDGER_APPROVE', 'PLATFORM_TENANT_VIEW', 'PLATFORM_TENANT_MANAGE', 'PLATFORM_TENANT_TERMINATE', 'PLATFORM_TENANT_ACCESS', 'PLATFORM_PLAN_MANAGE', 'PLATFORM_CELL_VIEW', 'PLATFORM_CELL_MANAGE', 'PLATFORM_BILLING_VIEW', 'PLATFORM_BILLING_MANAGE', 'PLATFORM_RELEASE_VIEW', 'PLATFORM_RELEASE_MANAGE', 'PLATFORM_RELEASE_PROMOTE', 'PLATFORM_MIGRATION_VIEW', 'PLATFORM_MIGRATION_APPLY']) |
 
 **Responses**
 
@@ -1457,9 +1588,11 @@ Two modes on one operation: **`send` issues a single-use token; `confirm` consum
 
 ### createMfaChallenge
 
-**`POST /auth/mfa/challenge`**: Step-up authentication for a sensitive action
+**`POST /auth/mfa/challenge`**: Second factor at staff sign-in, and step-up for a sensitive action
 
 Issues a short-lived token proving a factor was presented just now. Consumed by operations that require it — high-value refunds, ledger approval, permission grants, tenant termination.
+**For a staff or partner principal it is also the second factor at sign-in** (decided 28 September, audit R135, R126 (5)(6)). When `login` answers `requiresMfa: true`, the client calls this with `action: signIn` on the pending session and then `verifyMfaChallenge`; until that succeeds the session is not usable. POS-000, EMP-001, SCN-001, ADM-001, PTR-001 and SUP-001 do this.
+**Never for guests** (decided 28 September, audit R167): a guest is not asked for a second factor and cannot enrol one.
 A session that authenticated hours ago is not the same as a person present at the keyboard now, and for those actions the difference matters.
 
 |  |  |
@@ -1472,7 +1605,7 @@ A session that authenticated hours ago is not the same as a person present at th
 | Conflict policy | serverWins |
 | Reads | `cache:idempotency`, `identity.mfa_method` |
 | Writes | `cache:idempotency`, `identity.mfa_challenge` |
-| Called by | GST-073, WEB-016 |
+| Called by | ADM-001, EMP-001, POS-000, PTR-001, SCN-001, SUP-001 |
 
 **Parameters**
 
@@ -1505,18 +1638,19 @@ A session that authenticated hours ago is not the same as a person present at th
 **`POST /auth/mfa/methods`**: Enrol an MFA method
 
 Returns a secret or challenge to complete enrolment. **The method is not active until verified** — enrolling without verifying would lock the principal out of their own account.
+**Staff enrol an authenticator app (`totp`), with email (`emailOtp`) as the fallback** (decided 28 September, audit R126 (5)). A staff or partner principal asking for `smsOtp`, `biometric` or `hardwareToken` is refused `422`.
 
 |  |  |
 |---|---|
 | Permission | `None` |
 | Scope level | tenant |
-| Part of slice | core |
+| Part of slice | setup, makes `identity.mfa_method` non-empty |
 | Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
 | Reads | `cache:idempotency`, `identity.mfa_recovery_code`, `identity.principal` |
 | Writes | `cache:idempotency`, `identity.mfa_method`, `identity.mfa_recovery_code` |
-| Called by | GST-042, WEB-016 |
+| Called by | ADM-001, EMP-042 |
 
 **Parameters**
 
@@ -1548,65 +1682,13 @@ Returns a secret or challenge to complete enrolment. **The method is not active 
 | Code | Shape | Meaning |
 |---|---|---|
 | 201 |  | Enrolment started, pending verification |
-
-### listMfaMethods
-
-**`GET /auth/mfa/methods`**: Enrolled MFA methods
-
-|  |  |
-|---|---|
-| Permission | `None` |
-| Scope level | tenant |
-| Part of slice | core |
-| Wave | 1 |
-| Offline | no |
-| Conflict policy | serverWins |
-| Read routing | replica |
-| Reads | `identity.mfa_method` |
-| Writes | - |
-| Called by | ADM-001, ADM-342, EMP-001, EMP-002, EMP-042, GST-042, PTR-001, SCN-001, SUP-001, WEB-016 |
-
-**Responses**
-
-| Code | Shape | Meaning |
-|---|---|---|
-| 200 |  | Methods |
-
-### removeMfaMethod
-
-**`DELETE /auth/mfa/methods/{methodId}`**: Remove an MFA method
-
-Refused where it is the only active method and the principal's role requires MFA. Removing the last factor from an account that must have one is not a choice the account holder gets to make.
-
-|  |  |
-|---|---|
-| Permission | `None` |
-| Scope level | tenant |
-| Part of slice | core |
-| Wave | 1 |
-| Offline | no |
-| Conflict policy | serverWins |
-| Reads | `cache:idempotency`, `identity.mfa_method` |
-| Writes | `cache:idempotency`, `identity.mfa_method` |
-| Called by | GST-042, WEB-016 |
-
-**Parameters**
-
-| Name | In | Required | Type | Notes |
-|---|---|---|---|---|
-| methodId | path | yes | string (uuid) |  |
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
-
-**Responses**
-
-| Code | Shape | Meaning |
-|---|---|---|
-| 204 |  | Removed |
-| 409 |  | Last remaining method on a role that requires MFA |
+| 422 |  | A kind staff may not enrol. |
 
 ### verifyMfaChallenge
 
-**`POST /auth/mfa/challenge/{challengeId}/verify`**: Complete a step-up challenge
+**`POST /auth/mfa/challenge/{challengeId}/verify`**: Complete a sign-in or step-up challenge
+
+For a `signIn` challenge (decided 28 September, audit R135) a correct code completes the sign-in: the pending session becomes usable and is returned in `session`, or, where `login` also answered `requiresRoleSelection`, the client goes on to `selectRole`. For any other action it returns a short-lived, single-purpose `stepUpToken`.
 
 |  |  |
 |---|---|
@@ -1618,7 +1700,7 @@ Refused where it is the only active method and the principal's role requires MFA
 | Conflict policy | serverWins |
 | Reads | `cache:idempotency`, `identity.mfa_challenge`, `identity.mfa_recovery_code` |
 | Writes | `cache:idempotency`, `identity.mfa_challenge`, `identity.mfa_recovery_code`, `identity.session` |
-| Called by | GST-042, WEB-016 |
+| Called by | ADM-001, EMP-001, POS-000, PTR-001, SCN-001, SUP-001 |
 
 **Parameters**
 
@@ -1637,8 +1719,38 @@ Refused where it is the only active method and the principal's role requires MFA
 
 | Field | Type | Required | Notes |
 |---|---|---|---|
-| stepUpToken | string |  |  |
+| stepUpToken | string |  | Null for a signIn challenge. (nullable) |
 | expiresAt | string (date-time) |  |  |
+| session | object |  | Only for a signIn challenge, and only where no role selection is still owed. (nullable) |
+| session.sessionId | string (uuid) | yes |  |
+| session.principalId | string (uuid) | yes |  |
+| session.roleId | string (uuid) | yes |  |
+| session.displayName | string |  |  |
+| session.scope | array of ScopeRef | yes | Scope nodes this session may act within, resolved once at login from the ltree hierarchy with deny-overrides-allow. |
+| session.scope[].id | string (uuid) | yes |  |
+| session.scope[].level | ScopeLevel: enum (tenant, brand, region, venue, department, subDepartment, workstation, outlet, …) | yes | The eight organisational levels, plus subject. |
+| session.scope[].path | string | yes | Materialised ltree path. |
+| session.scope[].code | string |  | (nullable) |
+| session.scope[].name | string |  | (nullable) |
+| session.effectivePermissions | object | yes | Flattened set across all granted scopes, after deny resolution. |
+| session.permissionsByScope | array of ScopedPermissions |  | Permissions effective at each granted scope path. |
+| session.permissionsByScope[].scopePath | string | yes | (pattern ^[a-z0-9_]+(\.[a-z0-9_]+)*$) |
+| session.permissionsByScope[].permissions | array of Permission: enum (SESSION_FORCE_LOGOUT, USER_MANAGE, ROLE_MANAGE, PERMISSION_GRANT, PERMISSION_VIEW, PERMISSION_MANAGE, PLATFORM_TENANT_VIEW, PLATFORM_TENANT_MANAGE, …) | yes |  |
+| session.saleBoardId | string (uuid) | yes | Landing surface, derived from the WORKSTATION, not the role (12 Aug 2026 §3). |
+| session.workstation | WorkstationContext |  |  |
+| session.workstation.id | string (uuid) | yes |  |
+| session.workstation.code | string | yes |  |
+| session.workstation.venueId | string (uuid) | yes |  |
+| session.workstation.regionId | string (uuid) | yes |  |
+| session.workstation.accessPointId | string (uuid) |  | Inherited from the workstation, never selected by the operator. |
+| session.workstation.devices | array of object |  |  |
+| session.workstation.currency | string |  | (pattern ^[A-Z]{3}$) |
+| session.workstation.currencyScale | integer |  | (min 0; max 4) |
+| session.workstation.timezone | string |  |  |
+| session.workstation.cellName | string |  | The cell serving this workstation's region. |
+| session.workstation.deploymentProfile | enum (terminalLocal, venueEdge, thin) |  | Whether this surface reads catalogue locally (ADR-0013). |
+| session.openedAt | string (date-time) |  |  |
+| session.expiresAt | string (date-time) |  |  |
 
 **Responses**
 
@@ -1646,6 +1758,7 @@ Refused where it is the only active method and the principal's role requires MFA
 |---|---|---|
 | 200 |  | Verified. |
 | 401 | Unauthorized | Missing, expired or superseded session |
+| 429 |  | Five wrong codes and step-up is locked (decided 28 September, audit R126 (6)). |
 
 ### verifyMfaEnrolment
 
@@ -1655,13 +1768,13 @@ Refused where it is the only active method and the principal's role requires MFA
 |---|---|
 | Permission | `None` |
 | Scope level | tenant |
-| Part of slice | core |
+| Part of slice | setup, makes `identity.mfa_method` non-empty |
 | Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
 | Reads | `cache:idempotency`, `identity.mfa_method` |
 | Writes | `cache:idempotency`, `identity.mfa_method` |
-| Called by | GST-042, WEB-016 |
+| Called by | ADM-001, EMP-042 |
 
 **Parameters**
 
@@ -1757,229 +1870,6 @@ Who is logged in, on which workstation, since when. There was previously no way 
 |---|---|---|
 | 200 |  | Sessions |
 
-
-## Group: sso
-
-### completeSsoAuthorization
-
-**`POST /auth/sso/{providerId}/callback`**: Exchange an SSO code for a session
-
-Group-to-role mapping is applied here. **A group with no mapping grants nothing** — an unmapped group must never fall back to a default role, or the identity provider becomes a way to mint access nobody configured.
-
-|  |  |
-|---|---|
-| Permission | `None` |
-| Scope level | tenant |
-| Part of slice | core |
-| Wave | 1 |
-| Offline | no |
-| Conflict policy | serverWins |
-| Reads | `cache:idempotency`, `identity.principal`, `identity.sso_provider` |
-| Writes | `cache:idempotency`, `identity.session` |
-| Called by | GST-042, WEB-016 |
-
-**Parameters**
-
-| Name | In | Required | Type | Notes |
-|---|---|---|---|---|
-| providerId | path | yes | string (uuid) |  |
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
-
-**Request body**
-
-| Field | Type | Required | Notes |
-|---|---|---|---|
-| code | string | yes |  |
-| state | string | yes |  |
-| workstationId | string (uuid) |  |  |
-
-**Response**: `LoginResponse`
-
-| Field | Type | Required | Notes |
-|---|---|---|---|
-| accessToken | string | yes | JWT carrying sid, validated per request against the session registry. |
-| refreshToken | string | yes |  |
-| expiresIn | integer | yes | Seconds |
-| requiresRoleSelection | boolean | yes |  |
-| availableRoles | array of RoleSummary |  |  |
-| availableRoles[].id | string (uuid) | yes |  |
-| availableRoles[].code | string | yes |  |
-| availableRoles[].name | string | yes |  |
-| availableRoles[].isPrimary | boolean |  |  |
-| session | Session |  |  |
-| session.sessionId | string (uuid) | yes |  |
-| session.principalId | string (uuid) | yes |  |
-| session.roleId | string (uuid) | yes |  |
-| session.displayName | string |  |  |
-| session.scope | array of ScopeRef | yes | Scope nodes this session may act within, resolved once at login from the ltree hierarchy with deny-overrides-allow. |
-| session.scope[].id | string (uuid) | yes |  |
-| session.scope[].level | ScopeLevel: enum (tenant, brand, region, venue, department, subDepartment, workstation, outlet, …) | yes | The eight organisational levels, plus subject. |
-| session.scope[].path | string | yes | Materialised ltree path. |
-| session.scope[].code | string |  | (nullable) |
-| session.scope[].name | string |  | (nullable) |
-| session.effectivePermissions | object | yes | Flattened set across all granted scopes, after deny resolution. |
-| session.permissionsByScope | array of ScopedPermissions |  | Permissions effective at each granted scope path. |
-| session.permissionsByScope[].scopePath | string | yes | (pattern ^[a-z0-9_]+(\.[a-z0-9_]+)*$) |
-| session.permissionsByScope[].permissions | array of Permission: enum (SESSION_FORCE_LOGOUT, USER_MANAGE, ROLE_MANAGE, PERMISSION_GRANT, PERMISSION_VIEW, PERMISSION_MANAGE, PLATFORM_TENANT_VIEW, PLATFORM_TENANT_MANAGE, …) | yes |  |
-| session.saleBoardId | string (uuid) | yes | Landing surface, derived from the WORKSTATION, not the role (12 Aug 2026 §3). |
-| session.workstation | WorkstationContext |  |  |
-| session.workstation.id | string (uuid) | yes |  |
-| session.workstation.code | string | yes |  |
-| session.workstation.venueId | string (uuid) | yes |  |
-| session.workstation.regionId | string (uuid) | yes |  |
-| session.workstation.accessPointId | string (uuid) |  | Inherited from the workstation, never selected by the operator. |
-| session.workstation.devices | array of object |  |  |
-| session.workstation.currency | string |  | (pattern ^[A-Z]{3}$) |
-| session.workstation.currencyScale | integer |  | (min 0; max 4) |
-| session.workstation.timezone | string |  |  |
-| session.workstation.cellName | string |  | The cell serving this workstation's region. |
-| session.workstation.deploymentProfile | enum (terminalLocal, venueEdge, thin) |  | Whether this surface reads catalogue locally (ADR-0013). |
-| session.openedAt | string (date-time) |  |  |
-| session.expiresAt | string (date-time) |  |  |
-
-**Responses**
-
-| Code | Shape | Meaning |
-|---|---|---|
-| 200 |  | Signed in |
-| 401 | Unauthorized | Missing, expired or superseded session |
-| 403 |  | Authenticated, but no group maps to a role in this tenant. |
-
-### listSsoProviders
-
-**`GET /auth/sso/providers`**: Identity providers configured for this tenant
-
-Called before the login screen renders, so it is unauthenticated.
-
-|  |  |
-|---|---|
-| Permission | `None` |
-| Scope level | tenant |
-| Part of slice | core |
-| Wave | 1 |
-| Offline | no |
-| Conflict policy | serverWins |
-| Read routing | replica |
-| Reads | `identity.sso_provider` |
-| Writes | - |
-| Called by | ADM-001, EMP-001, EMP-002, EMP-042, GST-042, PTR-001, SCN-001, SUP-001, WEB-016 |
-
-**Responses**
-
-| Code | Shape | Meaning |
-|---|---|---|
-| 200 |  | Providers |
-
-### setSsoConfig
-
-**`PUT /tenants/sso-config`**: Configure an identity provider
-
-Per tenant. A tenant's Azure AD is theirs, not TICVAI's, and credentials are stored in the cell key vault rather than returned by this endpoint.
-
-|  |  |
-|---|---|
-| Permission | `USER_MANAGE` |
-| Scope level | tenant |
-| Part of slice | setup, makes `identity.sso_provider` non-empty |
-| Wave | 1 |
-| Offline | no |
-| Config scope | tenant |
-| Conflict policy | serverWins |
-| Reads | `cache:idempotency`, `identity.sso_group_mapping`, `identity.sso_provider` |
-| Writes | `cache:idempotency`, `identity.sso_group_mapping`, `identity.sso_provider` |
-| Called by | ADM-005 |
-
-**Parameters**
-
-| Name | In | Required | Type | Notes |
-|---|---|---|---|---|
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
-
-**Request body**: `SsoProviderConfig`
-
-| Field | Type | Required | Notes |
-|---|---|---|---|
-| id | string (uuid) | yes |  |
-| displayName | string | yes |  |
-| protocol | SsoProtocol: enum (oidc, saml2) | yes |  |
-| metadataUrl | string |  | (nullable) |
-| issuer | string |  | (nullable) |
-| clientId | string |  | (nullable) |
-| clientSecretRef | string |  | Key vault reference. (nullable) |
-| groupMappings | array of SsoGroupMapping | yes | A group with no mapping grants nothing. (min items 1) |
-| groupMappings[].id | string (uuid) |  | Added 20 August. (read-only) |
-| groupMappings[].externalGroup | string | yes |  |
-| groupMappings[].roleId | string (uuid) | yes |  |
-| groupMappings[].scopePath | string |  | Scope the mapped role is granted at. |
-| autoProvisionPrincipals | boolean |  | Create a principal on first successful sign-in. (default False) |
-| isEnforced | boolean |  | (default False) |
-| isActive | boolean |  |  |
-
-**Response**: `SsoProviderConfig`
-
-| Field | Type | Required | Notes |
-|---|---|---|---|
-| id | string (uuid) | yes |  |
-| displayName | string | yes |  |
-| protocol | SsoProtocol: enum (oidc, saml2) | yes |  |
-| metadataUrl | string |  | (nullable) |
-| issuer | string |  | (nullable) |
-| clientId | string |  | (nullable) |
-| clientSecretRef | string |  | Key vault reference. (nullable) |
-| groupMappings | array of SsoGroupMapping | yes | A group with no mapping grants nothing. (min items 1) |
-| groupMappings[].id | string (uuid) |  | Added 20 August. (read-only) |
-| groupMappings[].externalGroup | string | yes |  |
-| groupMappings[].roleId | string (uuid) | yes |  |
-| groupMappings[].scopePath | string |  | Scope the mapped role is granted at. |
-| autoProvisionPrincipals | boolean |  | Create a principal on first successful sign-in. (default False) |
-| isEnforced | boolean |  | (default False) |
-| isActive | boolean |  |  |
-
-**Responses**
-
-| Code | Shape | Meaning |
-|---|---|---|
-| 200 |  | Configured |
-| 400 |  | Metadata unreachable, or no group mappings supplied |
-
-### startSsoAuthorization
-
-**`GET /auth/sso/{providerId}/authorize`**: Begin an SSO flow
-
-|  |  |
-|---|---|
-| Permission | `None` |
-| Scope level | tenant |
-| Part of slice | core |
-| Wave | 1 |
-| Offline | no |
-| Conflict policy | serverWins |
-| Read routing | replica |
-| Reads | `identity.sso_provider` |
-| Writes | - |
-| Called by | GST-042, WEB-016 |
-
-**Parameters**
-
-| Name | In | Required | Type | Notes |
-|---|---|---|---|---|
-| providerId | path | yes | string (uuid) |  |
-| redirectUri | query | yes | string |  |
-
-**Response**: `object`
-
-| Field | Type | Required | Notes |
-|---|---|---|---|
-| authorizationUrl | string |  |  |
-| state | string |  |  |
-| expiresAt | string (date-time) |  |  |
-
-**Responses**
-
-| Code | Shape | Meaning |
-|---|---|---|
-| 200 |  | Authorization URL and state |
-
 ## Tables
 
 Every table this service owns that the slice reads or writes, with its columns as derived into `backend/tenant/*.sql`.
@@ -2058,7 +1948,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 |---|---|---|---|
 | id | uuid | yes | Assigned by the server. |
 | scope_path | text | yes | The partition key (ADR-0005), written by the server from the caller's tenant (x-ticvai-config-scope: tenant). |
-| min_length | integer | yes |  |
+| min_length | integer | yes | A tenant may raise the length and never set it below 8 (decided 28 September, audit R126 (7)). |
 | require_breach_check | boolean | no | The single most effective rule. |
 | max_age_days | integer | no | Null is the recommended value. |
 | recovery_methods | text[] | no | BL-132. |
@@ -2067,8 +1957,22 @@ Every table this service owns that the slice reads or writes, with its columns a
 | lockout_after_attempts | integer | no |  |
 | lockout_minutes | integer | no | A temporary lockout, not a permanent one. |
 | force_change_on_first_logon | boolean | no |  |
-| reuse_prevention_count | integer | no |  |
+| reuse_prevention_count | integer | no | How many previous credentials a staff member may not reuse — the last 5 unless the tenant sets another (decided 28 September, audit R132). |
 | mfa_required_for_permissions | text[] | no | Step-up rather than blanket MFA. |
+
+### `identity.platform_staff_grant`
+
+| Column | Type | Required | Notes |
+|---|---|---|---|
+| id | text | yes |  |
+| operator_principal_id | uuid | yes | The platform operator, from the Control Plane token. |
+| operator_display_name | text | no |  |
+| permissions | text[] | yes |  |
+| reason | text | yes |  |
+| ticket_ref | text | no |  |
+| opened_at | timestamptz | yes |  |
+| expires_at | timestamptz | yes |  |
+| scope_path | text | no | The tenant root. |
 
 ### `identity.principal`
 
@@ -2096,7 +2000,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 | Column | Type | Required | Notes |
 |---|---|---|---|
 | id | uuid | yes |  |
-| code | text | yes |  |
+| code | text | yes | Unique within the tenant (decided 28 September, audit R108). |
 | name | text | yes |  |
 | description | text | no |  |
 | inherits_from_role_id | uuid | no | Role composition, one level deep and no deeper. |
@@ -2110,34 +2014,6 @@ Every table this service owns that the slice reads or writes, with its columns a
 |---|---|---|---|
 | id | uuid | yes | Synthesised key. |
 | principal_id | uuid | yes | Points at identity.principal. |
-
-### `identity.sso_group_mapping`
-
-| Column | Type | Required | Notes |
-|---|---|---|---|
-| id | uuid | no | Added 20 August. |
-| external_group | text | yes |  |
-| role_id | uuid | yes |  |
-| scope_path | text | no | Scope the mapped role is granted at. |
-| provider_id | uuid | no | Points at identity.sso_provider. |
-| scope_id | uuid | no | Points at platform.org_unit. |
-
-### `identity.sso_provider`
-
-| Column | Type | Required | Notes |
-|---|---|---|---|
-| icon_asset_ref | text | no |  |
-| scope_path | text | no | The partition key (ADR-0005). |
-| id | uuid | yes |  |
-| display_name | text | yes |  |
-| protocol | text | yes |  |
-| metadata_url | text | no |  |
-| issuer | text | no |  |
-| client_id | text | no |  |
-| client_secret_ref | text | no | Key vault reference. |
-| is_auto_provision_principals | boolean | no | Create a principal on first successful sign-in. |
-| is_enforced | boolean | no |  |
-| is_active | boolean | no |  |
 
 ### `pii.subject`
 
@@ -2189,11 +2065,12 @@ Every table this service owns that the slice reads or writes, with its columns a
 
 ## Not in the first release
 
-34 operations, added to this service in later releases without changing any of the above.
+43 operations, added to this service in later releases without changing any of the above.
 
 | Group | Operations |
 |---|---|
-| administration | `createAccessPolicy`, `createDelegatedAccess`, `createEmergencyAccessOverride`, `deleteDelegatedAccess`, `evaluateAccess`, `getAccessPolicy`, `getAccessPolicyBundle`, `getPrincipal`, `getPrincipalModuleAccess`, `listAccessDecisions`, `listAccessPolicies`, `listAccessPolicyHistory`, `listAccessPolicyTemplates`, `listCapabilityTemplates`, `listDelegatedAccess`, `listModuleCapabilities`, `resetPrincipalCredential`, `resolvePermissions`, `setAccessPolicyState`, `setCapabilityTemplate`, `setPrincipalModuleAccess`, `simulateAccessPolicy`, `updateAccessPolicy` |
-| identity | `getMembership`, `listCustomerMemberships`, `listModules`, `listPermissions`, `listSegregationRules`, `listSegregationViolations`, `logout`, `recordBenefitUsage`, `setSegregationRules` |
+| administration | `createAccessPolicy`, `createDelegatedAccess`, `createEmergencyAccessOverride`, `deleteDelegatedAccess`, `evaluateAccess`, `getAccessPolicy`, `getAccessPolicyBundle`, `getPrincipal`, `getPrincipalModuleAccess`, `listAccessDecisions`, `listAccessPolicies`, `listAccessPolicyHistory`, `listAccessPolicyTemplates`, `listCapabilityTemplates`, `listDelegatedAccess`, `listModuleCapabilities`, `listOwnPlatformStaffGrants`, `listPlatformStaffGrants`, `resetPrincipalCredential`, `resolvePermissions`, `setAccessPolicyState`, `setCapabilityTemplate`, `setPrincipalModuleAccess`, `simulateAccessPolicy`, `updateAccessPolicy` |
+| identity | `getMembership`, `getPasswordPolicy`, `listCustomerMemberships`, `listModules`, `listPermissions`, `listSegregationRules`, `listSegregationViolations`, `logout`, `recordBenefitUsage`, `setSegregationRules` |
+| mfa | `listMfaMethods`, `removeMfaMethod` |
 | session | `revokeAllSessions` |
-| sso | `getSsoConfig` |
+| sso | `completeSsoAuthorization`, `getSsoConfig`, `listSsoProviders`, `setSsoConfig`, `startSsoAuthorization` |

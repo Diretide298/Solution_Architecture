@@ -52,8 +52,10 @@ partition's `<table>_v<venue_number>`: nothing in the package defines a venue nu
 
 **Contract enums, maxLength and defaults are carried** as a `<table>_<column>_chk` CHECK and a
 column DEFAULT (storage-design.md, "Enum agreement": the database holds the same values as the
-contract). Uniqueness and immutability rules the contracts state only in prose are not -- there
-is nothing machine-readable to derive them from.
+contract). **Uniqueness is carried where the contract marks it**: a property with
+`x-ticvai-unique: tenant` or `venue` becomes a `<table>_<columns>_uniq` unique index (audit R108,
+28 September). Uniqueness and immutability rules the contracts state only in prose are not --
+there is nothing machine-readable to derive them from.
 
 Run: `python3 tools/derive-ddl.py [--apply]`
 """
@@ -197,6 +199,16 @@ TYPE_MAP = {
 
 POSTGRES_STORES = {"postgres", "postgres-analytical"}
 
+# **A row that belongs to two scopes at once.** A stock transfer is owned at the source venue and
+# has to be read and received at the destination (decided 28 September, audit R183). It used to
+# sit at the tenant above both, where neither venue could see it. The second path is named here
+# rather than inferred from any `*_scope_path` column: `target_scope_path` and
+# `branch_scope_path` elsewhere name what a row is *about*, not who may see it, and widening
+# visibility is a decision, not a naming habit.
+SHARED_SCOPE = {
+    "inventory.transfer": "to_scope_path",
+}
+
 # --- the machinery layer, folded in from V0001__baseline.sql on 21 September -------------------
 
 EXTENSIONS = """-- Extensions, applied before any table.
@@ -287,6 +299,28 @@ BEGIN
     EXECUTE format(
         'CREATE POLICY %I ON %s USING (platform.in_scope(scope_path)) '
         'WITH CHECK (platform.in_scope(scope_path))', policy_name, target);
+END
+$$;
+
+-- **A row shared by two scopes** (audit R183): visible, and writable, from either path. A stock
+-- transfer is owned at the source venue's `scope_path` and admits the destination through its
+-- second path, so the receiving venue can read and receive it. Its lines follow through the
+-- parent policy like any other child.
+CREATE OR REPLACE FUNCTION platform.apply_shared_scope_rls(target regclass, second_path text)
+    RETURNS void
+    LANGUAGE plpgsql
+AS $$
+DECLARE
+    policy_name text := platform.rls_policy_name(target);
+    predicate text := format('(platform.in_scope(scope_path) OR platform.in_scope(%I))',
+                             second_path);
+BEGIN
+    EXECUTE format('ALTER TABLE %s ENABLE ROW LEVEL SECURITY', target);
+    EXECUTE format('ALTER TABLE %s FORCE ROW LEVEL SECURITY', target);
+    EXECUTE format('DROP POLICY IF EXISTS scope_isolation ON %s', target);
+    EXECUTE format('DROP POLICY IF EXISTS %I ON %s', policy_name, target);
+    EXECUTE format('CREATE POLICY %I ON %s USING %s WITH CHECK %s',
+                   policy_name, target, predicate, predicate);
 END
 $$;
 
@@ -467,11 +501,13 @@ CREATE TABLE IF NOT EXISTS platform.schema_version (
 
 
 def rls_file(db: str, scoped: list, by_venue: list, by_parent: list, unscoped: list,
-             total: int, has_scope_table: bool) -> str:
+             total: int, has_scope_table: bool, shared: dict | None = None) -> str:
     """The functions, then one call per table -- by `scope_path` where it has one, by `venue_id`
     where it does not, and through its owning parent where it has neither.
 
-    `by_parent` is `(table, fk_column, parent, parent_key)`; `unscoped` is `(table, why)`."""
+    `by_parent` is `(table, fk_column, parent, parent_key)`; `unscoped` is `(table, why)`;
+    `shared` maps a scoped table to the second path column that also admits a caller."""
+    shared = shared or {}
     head = RLS_HEAD.replace("{n_venue}", str(len(by_venue)))
     if db != "tenant":
         # **The control database has no scope tree** (ADR-0039 took `control` out of the tenant
@@ -509,7 +545,14 @@ def rls_file(db: str, scoped: list, by_venue: list, by_parent: list, unscoped: l
 
     if scoped:
         body.append("\n-- Scoped by path.")
-        body += [f"SELECT platform.apply_scope_rls('{qual(t)}'::regclass);" for t in scoped]
+        body += [f"SELECT platform.apply_scope_rls('{qual(t)}'::regclass);" for t in scoped
+                 if t not in shared]
+    mine_shared = sorted(t for t in scoped if t in shared)
+    if mine_shared:
+        body.append("\n-- Scoped by either of two paths: owned at scope_path, shared with a second "
+                    "scope (audit R183).")
+        body += [f"SELECT platform.apply_shared_scope_rls('{qual(t)}'::regclass, '{shared[t]}');"
+                 for t in mine_shared]
     if by_venue and db != "tenant":
         body.append("\n-- Carries venue_id but not scoped here: the control database has no scope tree to "
                     "resolve a venue against, and these are operator records read across tenants.")
@@ -756,10 +799,28 @@ def main() -> int:
     xdb_lines: list[str] = []
     n_tables = n_cols = n_fk = n_idx = n_xdb = n_chk = n_def = 0
     unkeyed: list = []
+    no_unique: list = []
+    n_uniq = 0
     # A table's NOT NULL declared references inside its own database: `(column, parent, key)`.
     # Row-level security uses them to protect a child through the row that owns it.
     owners: dict[str, list] = defaultdict(list)
     contract_props = load_contract_props()
+    # **A uniqueness marker on `Create<X>Request` or `Update<X>Request` speaks for `<X>`.**
+    # The contracts state a code's uniqueness where a developer writes one -- on the create
+    # request -- but a column's `source` names the persisted schema, so the marker would be
+    # invisible here unless the persisted schema happens to allOf-include its request (as
+    # maintenance.AssetDetail does). Only the marker is carried across, and never over one the
+    # persisted schema declares itself.
+    for key, spec in list(contract_props.items()):
+        lvl = (spec or {}).get("x-ticvai-unique")
+        if not lvl:
+            continue
+        mreq = re.match(r"^([\w-]+)\.(?:Create|Update)(\w+)Request\.(\w+)$", key)
+        if not mreq:
+            continue
+        tgt = f"{mreq.group(1)}.{mreq.group(2)}.{mreq.group(3)}"
+        if tgt in contract_props and "x-ticvai-unique" not in contract_props[tgt]:
+            contract_props[tgt] = {**contract_props[tgt], "x-ticvai-unique": lvl}
 
     # **One name per index per schema.** naming-and-style 6.1's `<table>_<columns>_idx` can make
     # the same string from two tables (`a_b` + `c`, `a` + `b_c`), and `CREATE INDEX IF NOT EXISTS`
@@ -923,6 +984,46 @@ def main() -> int:
                     f"CREATE INDEX IF NOT EXISTS {index_name(schema, short, 'path')} "
                     f"ON {q(schema)}.{q(short)} USING gist (path);"))
                 n_idx += 1
+            # **A second visibility path is indexed like the first** -- the shared policy tests it
+            # on every read.
+            second = SHARED_SCOPE.get(t)
+            if second and second in names:
+                idx_lines.append((schema,
+                    f"CREATE INDEX IF NOT EXISTS {index_name(schema, short, second)} "
+                    f"ON {q(schema)}.{q(short)} USING gist ({q(second)});"))
+                n_idx += 1
+
+            # **Uniqueness the contract marks, as a unique index** (audit R108, 28 September).
+            # `x-ticvai-unique: tenant` is unique within the tenant database -- one tenant per
+            # database (ADR-0038), so the column alone, or with `tenant_id` where a table carries
+            # one. `venue` is unique per venue: with `venue_id`, else with `scope_path` (a venue's
+            # rows sit at its path). A nullable column gets a partial index, so rows without a
+            # value never collide. Named `<table>_<columns>_uniq` (naming-and-style 6.1).
+            for c in cols[t]:
+                col = c["column"]
+                level = contract_props.get(str(c.get("source") or ""), {}).get("x-ticvai-unique")
+                if not level:
+                    continue
+                if level == "tenant":
+                    lead = ["tenant_id"] if "tenant_id" in names else []
+                elif level == "venue":
+                    lead = (["venue_id"] if "venue_id" in names
+                            else ["scope_path"] if "scope_path" in names else None)
+                else:
+                    lead = None
+                if lead is None:
+                    no_unique.append(f"{t}.{col} (x-ticvai-unique: {level}): "
+                                     + ("no venue_id or scope_path to key it by"
+                                        if level == "venue" else "not a recognised level"))
+                    continue
+                keycols = lead + [col]
+                where = "" if c.get("required") == "yes" else f" WHERE {q(col)} IS NOT NULL"
+                uname = obj_name(short, *keycols, suffix="uniq")
+                idx_lines.append((schema,
+                    f"-- unique per {level} (x-ticvai-unique): {t}.{col}\n"
+                    f"CREATE UNIQUE INDEX IF NOT EXISTS {uname} ON {q(schema)}.{q(short)} "
+                    f"({', '.join(q(k) for k in keycols)}){where};"))
+                n_uniq += 1
 
             out.append(",\n".join(body))
             out.append(");")
@@ -1011,6 +1112,14 @@ def main() -> int:
                                        "CREATE TABLE IF NOT EXISTS platform.schema_version"))
 
     scoped = sorted(t for t in real if any(c["column"] == "scope_path" for c in cols[t]))
+    # A shared-scope table is honoured only when both of its paths exist; a declared pair whose
+    # second column has not reached the schema reference yet is reported, not silently dropped.
+    shared_scope = {t: c for t, c in SHARED_SCOPE.items()
+                    if t in scoped and any(x["column"] == c for x in cols[t])}
+    for t, c in sorted(SHARED_SCOPE.items()):
+        if t not in shared_scope:
+            print(f"  shared scope declared but not applied: {t}.{c} is not in the schema "
+                  "reference; the table keeps its single-path policy")
     venue_only = sorted(t for t in real if t not in set(scoped)
                         and any(c["column"] == "venue_id" for c in cols[t]))
     # **The rest are protected through the row that owns them, where one does.** A table with
@@ -1074,7 +1183,8 @@ def main() -> int:
         total = len(by_schema.get(CONTROL) or []) if db == CONTROL else n_tenant_tables
         files[f"{db}/920-row-level-security.sql"] = rls_file(
             db, mine, vmine, pmine, umine, total,
-            has_scope_table=(SCOPE_TABLE in real and db == "tenant"))
+            has_scope_table=(SCOPE_TABLE in real and db == "tenant"),
+            shared={t: c for t, c in shared_scope.items() if t in mine})
 
     # **The venue partition mechanism** (ADR-0005, ADR-0044). The helper only; the tables that use
     # it declare their own partitioning where they are created.
@@ -1107,7 +1217,11 @@ def main() -> int:
                 dest.chmod(0o755)
 
     print(f"  {n_tables} tables · {n_cols} columns · {n_fk} foreign keys · {n_idx} indexes · "
-          f"{n_chk} checks · {n_def} defaults")
+          f"{n_chk} checks · {n_def} defaults · {n_uniq} unique indexes")
+    if no_unique:
+        print(f"  {len(no_unique)} uniqueness rule(s) the contract marks but the DDL cannot key:")
+        for u in no_unique:
+            print(f"     {u}")
     print(f"  row-level security: {len(scoped)} by scope_path · {len(venue_only)} carry venue_id · "
           f"{len(by_parent)} through their owner · {len(unscoped_all)} with no policy")
     print(f"  {len(by_schema.get(CONTROL) or [])} control tables · "

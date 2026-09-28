@@ -4,17 +4,17 @@
 
 | | |
 |---|---|
-| Screens | 100 |
+| Screens | 99 |
 | Operations | 123 |
 | Contracts | 7 |
 | Modules | 3 |
 | Undrawn | 0 |
-| Operations with no screen | 107 |
-| Waves | wave2 20 · wave3 80 |
+| Operations with no screen | 109 |
+| Waves | wave2 19 · wave3 80 |
 
 ## Gaps
 
-### 107 operations with no screen here
+### 109 operations with no screen here
 
 **In a contract this platform uses, callable by its audience, and reaching no screen on any platform serving that audience.** Either a screen is missing or the endpoint should not exist — and the second is worth considering first.
 
@@ -26,6 +26,7 @@
 | `createModifierGroup` | fnb | POST | Create a modifier group |
 | `createTable` | fnb | POST | A table as a thing, not an inference |
 | `escalateCorrectiveAction` | fnb | POST | Escalate a finding |
+| `getAllergenVerification` | fnb | GET | The last allergen verdict recorded for a dish |
 | `getFnbReservationPolicy` | fnb | GET | How long a table is held, by party size |
 | `getFnbServiceChargePolicy` | fnb | GET | The service charge a venue applies, and on what |
 | `listFnbRecommendations` | fnb | GET | Upsell and pairing suggestions for F&B |
@@ -51,6 +52,7 @@
 | `getAccessPolicy` | identity | GET | One policy, at a version |
 | `getAccessPolicyBundle` | identity | GET | The policies a device needs to decide for itself |
 | `getMembership` | identity | GET | A membership with its history, usage and renewals |
+| `getPasswordPolicy` | identity | GET | Read the password and MFA policy in force |
 | `getPrincipalModuleAccess` | identity | GET | What this person may do, as ticks |
 | `listAccessDecisions` | identity | GET | What was decided, for whom, where and why |
 | `listAccessPolicyHistory` | identity | GET | Every version, who changed it and why |
@@ -58,9 +60,7 @@
 | `listCapabilityTemplates` | identity | GET | Saved tick-sets |
 | `listCustomerMemberships` | identity | GET | Memberships a customer holds |
 | `listModuleCapabilities` | identity | GET | What a person can be allowed to do, per module |
-| `listModules` | identity | GET | The module tree permissions are grouped under |
-| `listPermissions` | identity | GET | Every permission key the contracts enforce |
-| … | | | 67 more |
+| … | | | 69 more |
 
 ## Modules
 
@@ -68,7 +68,7 @@
 |---|---|---|
 | Policy | 40 | 3 |
 | Media Library | 40 | 3 |
-| White Label | 20 | 2 |
+| White Label | 19 | 2 |
 
 ## Screens
 
@@ -80,7 +80,7 @@
 | `CMS-004` | Logo & Assets | White Label | 2 | 4 | yes |
 | `CMS-005` | Theme Editor | White Label | 2 | 2 | yes |
 | `CMS-006` | Component Preview | White Label | 2 | 5 | yes |
-| `CMS-007` | Page Builder | White Label | 2 | 6 | yes |
+| `CMS-007` | Page Builder | White Label | 2 | 7 | yes |
 | `CMS-008` | Content Blocks | White Label | 2 | 7 | yes |
 | `CMS-009` | Navigation & Menus | White Label | 2 | 5 | yes |
 | `CMS-010` | Media Library | White Label | 2 | 12 | yes |
@@ -93,7 +93,6 @@
 | `CMS-017` | Domain & Certificate | White Label | 2 | 4 | yes |
 | `CMS-018` | Consent & Legal | White Label | 2 | 4 | yes |
 | `CMS-019` | User Access | White Label | 2 | 2 | yes |
-| `CMS-020` | Change Log | White Label | 2 | 1 | yes |
 | `CMS-021` | Privacy & Consent Configuration Command Center | Policy | 3 | 2 | yes |
 | `CMS-022` | Data Processing Purpose & Lawful Basis Registry | Policy | 3 | 1 | yes |
 | `CMS-023` | Consent Purpose & Consent Type Builder | Policy | 3 | 1 | yes |
@@ -148,7 +147,7 @@
 | `CMS-072` | AI Auto-Tagging & Content Understanding | Media Library | 3 | 2 | yes |
 | `CMS-073` | Semantic & Natural-Language Asset Search | Media Library | 3 | 1 | yes |
 | `CMS-074` | Visual Similarity & Related Asset Discovery | Media Library | 3 | 1 | yes |
-| `CMS-075` | Duplicate & Near-Duplicate Management | Media Library | 3 | 2 | yes |
+| `CMS-075` | Duplicate & Near-Duplicate Management | Media Library | 3 | 3 | yes |
 | `CMS-076` | Asset Version Control & Revision History | Media Library | 3 | 2 | yes |
 | `CMS-077` | Version Comparison & Replacement Impact | Media Library | 3 | 1 | yes |
 | `CMS-078` | Transformation & Rendition Management | Media Library | 3 | 2 | yes |

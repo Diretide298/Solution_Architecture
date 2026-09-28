@@ -10,8 +10,8 @@ scale: Mixed. Counting is bursty; procurement is not.
 ifDown: Down blocks receiving and counting; selling continues from the till's cache.
 coverage:
   operations: 51
-  inAFlow: 48
-  percent: 94%
+  inAFlow: 47
+  percent: 92%
   note: '**Flow coverage is how much of this service a journey has walked.** A service under 40% is
     unwalked rather than under-documented.'
 schemas:
@@ -527,7 +527,7 @@ tables:
     are affected — is not recorded for any operation, so a writer here cannot yet be implemented from
     the package alone.'
 - table: inventory.count
-  columns: 18
+  columns: 19
   store: postgres
   parent: null
   writtenBy:
@@ -548,7 +548,7 @@ tables:
   - inventory
   foreignWriters: null
 - table: inventory.goods_receipt_line
-  columns: 10
+  columns: 11
   store: postgres
   parent: inventory.goods_receipt
   writtenBy:
@@ -580,14 +580,14 @@ tables:
   - fnb
   - retail
 - table: inventory.purchase_order
-  columns: 28
+  columns: 29
   store: postgres
   parent: null
   writtenBy:
   - inventory
   foreignWriters: null
 - table: inventory.purchase_order_line
-  columns: 10
+  columns: 12
   store: postgres
   parent: inventory.purchase_order
   writtenBy:
@@ -661,7 +661,7 @@ tables:
   writtenBy: []
   foreignWriters: null
 - table: inventory.transfer
-  columns: 11
+  columns: 15
   store: postgres
   parent: null
   writtenBy:
@@ -726,6 +726,7 @@ screens:
 - P08:BO-007 Product Directory
 - P08:BO-049 Stock Levels
 - P08:BO-050 Stock Position & Valuation
+- P08:BO-051 Purchase Orders
 - P08:BO-052 Goods Receipt
 - P08:BO-078 Requisitions
 - P08:BO-079 Stock Count

@@ -176,6 +176,7 @@ pattern that distinguishes the three scenarios most sharply.
 shared-schema.** Per-service databases change the pooling arithmetic entirely, and ADR-0028 still
 reads Accepted while contradicting a client-facing recommendation.
 
-**CF-64** — AWS or Azure. **Everything here is provider-neutral; the managed Postgres tier, the
-Redis offering, autoscale semantics and cost are not.** CF-64 also carries RPO and RTO, which are
-stated nowhere.
+**CF-64** — **Decided 28 September (audit R057): Azure in a UAE region, GitHub Actions for CI.
+CF-64 closed.** **Everything here is provider-neutral; the managed Postgres tier, the Redis
+offering, autoscale semantics and cost are Azure's.** RPO and RTO were settled on 21 September
+(`docs/registers/conflicts.md` CF-64).

@@ -1,6 +1,6 @@
 openapi: 3.1.0
 info:
-  title: TICVAI Shift & Till
+  title: TICVAI Shift & Deposit Box
   version: 1.0.0
   x-ticvai-screen-count: 20
   x-ticvai-tier: spine
@@ -177,8 +177,6 @@ paths:
         - "P06 EMP-009 End shift"
         - "P08 BO-039 Shift Directory"
         - "P08 BO-040 Variance Approval"
-        - "P08 BO-041 Cash Movements"
-        - "P08 BO-042 Banking & Safe"
       x-ticvai-audience: [staff]
       summary: Open a shift
       description: >
@@ -334,6 +332,7 @@ paths:
       operationId: listDepositBoxes
       x-ticvai-consumed-by:
         - "P04 POS-015 Cash Operations Dashboard"
+        - "P08 BO-042 Banking & Safe"
       x-ticvai-audience: [staff]
       summary: Cash boxes and who holds them
       description: >
@@ -379,6 +378,11 @@ paths:
         5.8.1 and 5.8.3. **The opening float may be a total or a denomination breakdown** — the
         14 August MoM found POS-001 offered only denominations, and a supervisor handing over a
         counted bag should not have to re-count it into fields.
+
+        **Either is accepted, and a denomination count takes precedence** (decided 28 September,
+        audit R123 (9)). Where `openingDenominations` is sent, `openingFloat` is computed from it
+        and any total sent alongside is ignored; where only `openingFloat` is sent, it is the
+        float.
       tags: [shift]
       x-ticvai-permission: SHIFT_OPEN
       x-ticvai-scope-level: venue
@@ -420,6 +424,11 @@ paths:
       description: >
         5.8.4. **Gated on a right the cashier does not have**, because a cashier who can raise
         their own opening float can cover a shortfall by declaring one.
+
+        **`amount` is a change, not the new total** (decided 28 September, audit R123 (3)):
+        positive raises the float, negative lowers it, and the new `openingFloat` is the old one
+        plus `amount`. A change that would take the float below zero is refused with 422
+        `float-below-zero`.
       tags: [shift]
       x-ticvai-permission: CASH_ADD
       x-ticvai-permission-escalated: DEPOSIT_BOX_MODIFY_OTHER   # where the box is not the caller's own
@@ -436,7 +445,12 @@ paths:
               type: object
               required: [amount, reason]
               properties:
-                amount: { $ref: '../shared/common.yaml#/components/schemas/Money' }
+                amount:
+                  allOf:
+                    - $ref: '../shared/common.yaml#/components/schemas/Money'
+                  description: >
+                    The change to the float, signed. Positive adds, negative removes. Never the new
+                    total (audit R123 (3)).
                 reason: { type: string, maxLength: 300 }
       responses:
         '200':
@@ -457,6 +471,13 @@ paths:
           content:
             application/problem+json:
               schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+        '422':
+          description: >
+            The change would leave the float below zero (problem type `float-below-zero`, audit
+            R123 (3)).
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
 
   /deposit-boxes/{boxId}/withdraw:
     parameters:
@@ -469,6 +490,7 @@ paths:
       x-ticvai-consumed-by:
         - "P04 POS-013 Mobile POS, Event Sales & Offline Operations"
         - "P04 POS-018 Safe Drop & Cash Transfer Management"
+        - "P08 BO-042 Banking & Safe"
       x-ticvai-audience: [staff]
       summary: A supervisor takes cash out mid-shift
       description: >
@@ -551,6 +573,13 @@ paths:
 
         A box closed without its holder present is flagged rather than blocked — **the cash is
         counted by somebody, and who counted it is the record that matters.**
+
+        **Counted figures are required, and a mismatch still closes** (decided 28 September, audit
+        R123 (4)). Every box being closed needs an entry in `counts`, as a total or a denomination
+        count (a denomination count takes precedence where both are sent). A box whose count differs
+        from its expected figure closes with that difference recorded as its `variance`; it is not
+        refused. A box still `allocated`, never traded, needs no count and closes at its opening
+        float.
       tags: [shift]
       x-ticvai-permission: SHIFT_CLOSE
       x-ticvai-permission-escalated: SHIFT_CLOSE_OTHER   # closing a box whose holder is not the caller
@@ -565,11 +594,24 @@ paths:
           application/json:
             schema:
               type: object
+              required: [counts]
               properties:
                 boxIds:
                   type: array
                   items: { type: string, format: uuid }
                 allOpenAtVenue: { type: boolean }
+                counts:
+                  type: array
+                  description: >
+                    One count per box being closed that has traded (audit R123 (4)). Omitting a
+                    box that needs one is refused with 422 `deposit-box-count-missing`.
+                  items:
+                    type: object
+                    required: [boxId]
+                    properties:
+                      boxId: { type: string, format: uuid }
+                      countedTotal: { $ref: '../shared/common.yaml#/components/schemas/Money' }
+                      countedDenominations: { $ref: '#/components/schemas/DenominationCount' }
       responses:
         '200':
           headers:
@@ -581,6 +623,13 @@ paths:
               schema:
                 type: array
                 items: { $ref: '#/components/schemas/DepositBox' }
+        '422':
+          description: >
+            A box being closed has no entry in `counts`, or its entry has neither a total nor a
+            denomination count (problem type `deposit-box-count-missing`, audit R123 (4)).
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
 
   /shifts/current:
     get:
@@ -598,8 +647,6 @@ paths:
         - "P07 SCN-001 Sign in"
         - "P08 BO-039 Shift Directory"
         - "P08 BO-040 Variance Approval"
-        - "P08 BO-041 Cash Movements"
-        - "P08 BO-042 Banking & Safe"
       x-ticvai-audience: [staff]
       x-ticvai-read-routing: primary   # cash position drives close-out
       summary: The open or suspended shift on the session's workstation
@@ -674,8 +721,6 @@ paths:
         - "P06 EMP-009 End shift"
         - "P08 BO-039 Shift Directory"
         - "P08 BO-040 Variance Approval"
-        - "P08 BO-041 Cash Movements"
-        - "P08 BO-042 Banking & Safe"
       x-ticvai-audience: [staff]
       summary: Approve a shift opening outside tolerance
       description: >
@@ -729,8 +774,6 @@ paths:
         - "P06 EMP-009 End shift"
         - "P08 BO-039 Shift Directory"
         - "P08 BO-040 Variance Approval"
-        - "P08 BO-041 Cash Movements"
-        - "P08 BO-042 Banking & Safe"
       x-ticvai-audience: [staff]
       summary: Reopen a shift closed in error
       description: >
@@ -740,8 +783,17 @@ paths:
         **A reversal, and treated as one.** Requires an approver who is not the person who
         closed it, and the original close is retained — reopening does not erase the first
         count, because the difference between the two counts is the thing worth looking at.
+
+        **The approver is a supervisor giving a step-up on the same device** (decided 28 September,
+        audit R144): `supervisorStepUp` carries the supervisor's principal and PIN, entered on the
+        till or browser making this call. The rule is `SupervisorStepUp` in `common.yaml`: the PIN is
+        verified against the principal, who must hold `SHIFT_REOPEN` at this venue and must not be
+        the principal who closed the shift; otherwise a `403` and nothing is written. It does not go
+        through the approvals engine.
       tags: [shift]
       x-ticvai-permission: SHIFT_REOPEN
+      x-ticvai-step-up: pin
+      x-ticvai-step-up-reason: Reopening a counted shift is a reversal; a supervisor signs it in place (audit R144).
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
@@ -753,13 +805,16 @@ paths:
           application/json:
             schema:
               type: object
-              required: [reason, approverPrincipalId]
+              required: [reason, supervisorStepUp]
               properties:
                 reason: { type: string, minLength: 3, maxLength: 500 }
-                approverPrincipalId:
-                  type: string
-                  format: uuid
-                  description: May not be the principal who closed it.
+                supervisorStepUp:
+                  allOf:
+                    - $ref: '../shared/common.yaml#/components/schemas/SupervisorStepUp'
+                  description: >
+                    The supervisor signing the reopen on this device (audit R144). Replaces the bare
+                    `approverPrincipalId`, which named an approver without proving they were there.
+                    May not be the principal who closed the shift.
       responses:
         '200':
           headers:
@@ -770,7 +825,13 @@ paths:
             application/json:
               schema: { $ref: '#/components/schemas/Shift' }
         '403':
-          description: Approver is the closing principal (problem type `approver-is-closer`)
+          description: >
+            The supervisor is the closing principal (problem type `approver-is-closer`), or the
+            step-up failed: the PIN did not verify, or the principal does not hold `SHIFT_REOPEN` at
+            this venue (`supervisor-step-up-refused`, audit R144).
+          x-ticvai-problem-types:
+            - approver-is-closer
+            - supervisor-step-up-refused
           content:
             application/problem+json:
               schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
@@ -799,8 +860,6 @@ paths:
         - "P06 EMP-009 End shift"
         - "P08 BO-039 Shift Directory"
         - "P08 BO-040 Variance Approval"
-        - "P08 BO-041 Cash Movements"
-        - "P08 BO-042 Banking & Safe"
       x-ticvai-audience: [staff]
       summary: Suspend a shift so another user can log in
       description: >
@@ -860,8 +919,6 @@ paths:
         - "P06 EMP-009 End shift"
         - "P08 BO-039 Shift Directory"
         - "P08 BO-040 Variance Approval"
-        - "P08 BO-041 Cash Movements"
-        - "P08 BO-042 Banking & Safe"
       x-ticvai-audience: [staff]
       summary: Resume a suspended shift
       description: >
@@ -924,8 +981,6 @@ paths:
         - "P06 EMP-009 End shift"
         - "P08 BO-039 Shift Directory"
         - "P08 BO-040 Variance Approval"
-        - "P08 BO-041 Cash Movements"
-        - "P08 BO-042 Banking & Safe"
       x-ticvai-audience: [staff]
       summary: Blind close-out
       description: >
@@ -934,6 +989,14 @@ paths:
 
         The response carries the variance. Where it exceeds the configured threshold, the
         shift moves to `pendingVariance` and requires OVERSHORT_ACCEPT to finalise.
+
+        **The threshold is the venue setting `shiftVarianceThreshold`, with a tenant default**, an
+        absolute amount either way, over or short (decided 28 September, audit R094). **Proposed
+        default, client to correct (audit R094): AED 20.00 per shift.**
+
+        **`acceptShiftVariance` is the one way past that threshold** (decided 28 September, audit
+        R080 (e)): a supervisor accepts the variance on the till. The close is not held for a PIN
+        before this call, and no approval request is raised for it.
 
         Closing a shift opened by another principal requires SHIFT_CLOSE_OTHER.
 
@@ -991,12 +1054,23 @@ paths:
         - "P06 EMP-009 End shift"
         - "P08 BO-039 Shift Directory"
         - "P08 BO-040 Variance Approval"
-        - "P08 BO-041 Cash Movements"
-        - "P08 BO-042 Banking & Safe"
       x-ticvai-audience: [staff]
       summary: Accept an over/short beyond the threshold
+      description: >
+        **The single mechanism for a shift variance above the threshold** (decided 28 September, audit
+        R080 (e)). A supervisor holding OVERSHORT_ACCEPT accepts it **on the till**, with a supervisor
+        PIN step-up on the same device, after `closeShift` has left the shift in `pendingVariance`.
+        The two other paths the package described are removed: no Duty Manager PIN holds the close
+        before it is submitted, and no approval request (`approvals.createApprovalRequest`) is raised
+        for a shift variance. BO-040 lists the shifts waiting here; it does not approve them by
+        another route.
+
+        Moves the shift to `closed` and each of its deposit boxes from `closed` to `reconciled`
+        (`states/shift.yaml`, `states/deposit-box.yaml`).
       tags: [shift]
       x-ticvai-permission: OVERSHORT_ACCEPT
+      x-ticvai-step-up: pin
+      x-ticvai-step-up-reason: A supervisor signs off a cashier's over/short at the till, in front of the drawer (audit R080 (e)).
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: append
@@ -1061,6 +1135,10 @@ paths:
         to `pendingVariance` when it is beyond it — **approving the close is not accepting the
         over/short**, which still needs `acceptShiftVariance` (OVERSHORT_ACCEPT). The approving
         principal is recorded in `Shift.approvals` as kind `close`.
+
+        **This never accepts a variance** (decided 28 September, audit R080 (e)): it releases a close
+        the venue chose to supervise, and a variance above the threshold still goes to
+        `acceptShiftVariance`, the only path for one.
       tags: [shift]
       x-ticvai-permission: SHIFT_APPROVE_CLOSE
       x-ticvai-scope-level: venue
@@ -1110,9 +1188,8 @@ paths:
         - "P08 BO-039 Shift Directory"
         - "P08 BO-040 Variance Approval"
         - "P08 BO-041 Cash Movements"
-        - "P08 BO-042 Banking & Safe"
       x-ticvai-audience: [staff]
-      summary: Open the drawer without a sale
+      summary: Open the Deposit Box without a sale
       description: >
         Change for a guest, a dropped coin, correcting a float. Legitimate and routine.
 
@@ -1215,7 +1292,6 @@ paths:
         - "P08 BO-039 Shift Directory"
         - "P08 BO-040 Variance Approval"
         - "P08 BO-041 Cash Movements"
-        - "P08 BO-042 Banking & Safe"
       x-ticvai-audience: [staff]
       summary: Record a cash lift or add
       description: >
@@ -1223,6 +1299,12 @@ paths:
         takes the excess to the safe and the cashier keeps trading. Both directions are
         traced, both record the authorising principal, and both adjust the expected figure
         used at close.
+
+        **What "exceeds the counted float" means** (decided 28 September, audit R123 (2)): the
+        cash available to lift is the float counted at the shift's last count (the opening float,
+        or the last `movement` count if one is later), less every lift recorded since, plus every
+        add. A lift larger than that is refused with `lift-exceeds-float`. Cash taken in sales since
+        the last count does not count towards it, because nobody has counted it.
       tags: [cash]
       x-ticvai-permission: CASH_LIFT
       x-ticvai-scope-level: venue
@@ -1248,8 +1330,8 @@ paths:
         '403': { $ref: '../shared/common.yaml#/components/responses/Forbidden' }
         '409':
           description: >
-            Shift is not open (problem type `shift-not-open`), or the lift exceeds the counted
-            float (`lift-exceeds-float`)
+            Shift is not open (problem type `shift-not-open`), or the lift exceeds the float
+            counted at the last count less lifts since (`lift-exceeds-float`, audit R123 (2))
           content:
             application/problem+json:
               schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
@@ -1384,9 +1466,11 @@ components:
         and the reason is stronger than storage tidiness — **`orders.cash_movement.denominations`
         was a jsonb blob, so a note that stops circulating has nothing to deactivate.**
 
-        The UAE set he supplied is the seed. **His list carries `Coin, 0, COIN`** — a zero-valued
-        coin, which is a transcription slip rather than a denomination, and it is the kind of row a
-        table refuses and a JSON blob accepts silently.
+        **The seed is `docs/active/seed-data-proposal.md` section 1** (audit R229, proposed, client to
+        correct): notes 5, 10, 20, 50, 100, 200, 500 and 1000 AED; coins 25 fils, 50 fils and 1 AED.
+        The zero-valued coin in the list first supplied (`Coin, 0, COIN`) is a transcription slip
+        rather than a denomination, is not seeded, and is the kind of row a table refuses and a
+        JSON blob accepts silently.
 
         **Ordered for counting, not by value.** A cashier counts notes highest first and coins in
         the order they sit in the drawer, and `sortOrder` is what makes the count screen match the
@@ -1578,7 +1662,10 @@ components:
           description: Counted minus expected. Negative is short.
         requiresAcceptance:
           type: boolean
-          description: True when the variance exceeds the configured threshold.
+          description: >
+            True when the variance exceeds the venue's `shiftVarianceThreshold` (audit R094). The
+            shift is then `pendingVariance` and only `acceptShiftVariance` finalises it (audit
+            R080 (e)).
         nonCashVariances:
           type: array
           items:

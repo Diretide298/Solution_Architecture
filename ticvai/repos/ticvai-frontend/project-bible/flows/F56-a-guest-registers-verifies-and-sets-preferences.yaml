@@ -21,21 +21,23 @@ offlineBehaviour: '**None of it works offline and none of it should.** A credent
 steps:
 - step: 1
   screen: GST-042
-  action: They register — social, UAE Pass, or an email.
+  action: They register — social, UAE Pass, or an email (with a password if they want one).
   operations:
   - guestSocialLogin
   - guestUaePassLogin
-  - completeSsoAuthorization
+  - registerGuest
   outcome: '**Three doors, one subject.** UAE Pass is the one that matters locally, and it arrives verified
     in a way an email never is.'
 - step: 2
   screen: GST-042
-  action: An OTP or MFA is enrolled where the venue needs it.
+  action: They prove the contact with a one-time code, and sign in with it or with their password later.
   operations:
-  - enrolMfaMethod
-  - listMfaMethods
-  outcome: '**Enrolled at registration, not at first sensitive act.** A guest asked for MFA halfway
-    through a purchase abandons the purchase.'
+  - requestGuestOtp
+  - verifyGuestOtp
+  - guestPasswordLogin
+  outcome: '**No enterprise SSO and no second factor for guests** (decided 28 September, audit R167):
+    a guest signs in with a one-time code, a password (audit R073 (a)), a social provider or UAE Pass.
+    A guest asked for a second factor halfway through a purchase abandons the purchase.'
 - step: 3
   screen: WEB-016
   action: A guest who checked out anonymously links their order.

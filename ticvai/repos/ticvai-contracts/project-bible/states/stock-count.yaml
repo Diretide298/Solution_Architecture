@@ -23,15 +23,18 @@ transitions:
   to: closed
   operation: postStockCount
   trigger: operation
-  guard: Blind count submitted. The expected figure was withheld until this point
+  guard: Blind count submitted. The expected figure and the variance were withheld until this point
+    (decided 28 September, audit R110)
 - from: closed
   to: variancePending
   trigger: job
-  guard: Variance above the threshold
+  guard: Variance above `VenueSettings.inventory.countVarianceApprovalAmount` (proposed default 1,000.00
+    in the venue currency, audit R094)
 - from: closed
   to: posted
   trigger: job
-  guard: Within tolerance. Adjustments posted
+  guard: Within `VenueSettings.inventory.countVarianceApprovalAmount` (audit R094). Adjustments posted
+    as `countGain` and `countLoss` movements (audit R171)
   emits:
   - stock.depleted
 - from: variancePending
@@ -46,7 +49,8 @@ transitions:
   to: counting
   operation: recountStockCount
   trigger: operation
-  guard: Sent back to be recounted rather than accepted
+  guard: Sent back to be recounted rather than accepted. A supervisor's PIN step-up on the same device,
+    no approval request (decided 28 September, audit R144)
   isReversal: true
   requiresApproval: true
 - from: open

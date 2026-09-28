@@ -7,7 +7,7 @@
 | Tier | commerce: The sale path. Highest availability, highest write rate. |
 | Contracts | `orders`, `shift`, `payments` |
 | Schemas owned | `orders`, `payments` |
-| Operations in the slice | 78 of 253 |
+| Operations in the slice | 79 of 254 |
 | Scale | Write-heavy, spiky, latency-critical. The one that autoscales. |
 | If it is down | Down means no sales. Highest availability target in the platform. |
 
@@ -37,37 +37,38 @@
 | Group | Operation | Method | Path | Part | Wave | Called by |
 |---|---|---|---|---|---|---|
 | cart | [`abandonCart`](#abandoncart) | DELETE | `/carts/{cartId}` | core | 1 | GST-041, WEB-010 |
-| cart | [`addCartLine`](#addcartline) | POST | `/carts/{cartId}/lines` | core | 1 | GST-009, GST-032, GST-048, GST-050, GST-053, GST-056 … |
-| cart | [`checkoutCart`](#checkoutcart) | POST | `/carts/{cartId}/checkout` | core | 1 | GST-009, GST-032, GST-041, KSK-006, PTR-010, WEB-010 |
+| cart | [`addCartLine`](#addcartline) | POST | `/carts/{cartId}/lines` | core | 1 | GST-009, GST-026, GST-027, GST-032, GST-048, GST-050 … |
+| cart | [`applyCartPromoCode`](#applycartpromocode) | POST | `/carts/{cartId}/promo-codes` | core | 1 | GST-041, WEB-010 |
+| cart | [`checkoutCart`](#checkoutcart) | POST | `/carts/{cartId}/checkout` | core | 1 | GST-009, GST-026, GST-027, GST-032, GST-041, KSK-006 … |
 | cart | [`claimCart`](#claimcart) | POST | `/carts/{cartId}/claim` | core | 1 | GST-041, WEB-016 |
 | cart | [`createCart`](#createcart) | POST | `/carts` | core | 1 | WEB-010 |
 | cart | [`extendCart`](#extendcart) | POST | `/carts/{cartId}/extend` | core | 1 | GST-041, WEB-010 |
-| cart | [`getCart`](#getcart) | GET | `/carts/{cartId}` | core | 1 | GST-009, GST-032, GST-041, GST-053, KSK-006, POS-010 … |
+| cart | [`getCart`](#getcart) | GET | `/carts/{cartId}` | core | 1 | GST-009, GST-032, GST-041, KSK-006, POS-010, PTR-010 … |
 | cart | [`removeCartLine`](#removecartline) | DELETE | `/carts/{cartId}/lines/{lineId}` | core | 1 | GST-041, PTR-010, WEB-010 |
 | cart | [`updateCartLine`](#updatecartline) | PATCH | `/carts/{cartId}/lines/{lineId}` | core | 1 | GST-041, PTR-010, WEB-010 |
-| cash | [`createCashMovement`](#createcashmovement) | POST | `/shifts/{shiftId}/cash-movements` | core | 1 | BO-039, BO-040, BO-041, BO-042, EMP-009, POS-001 … |
+| cash | [`createCashMovement`](#createcashmovement) | POST | `/shifts/{shiftId}/cash-movements` | core | 1 | BO-039, BO-040, BO-041, EMP-009, POS-001, POS-007 … |
 | cash | [`listCashMovements`](#listcashmovements) | GET | `/shifts/{shiftId}/cash-movements` | core | 1 | BO-039, BO-040, BO-041, BO-042, EMP-003, EMP-008 … |
 | dunning | [`listMyPaymentIssues`](#listmypaymentissues) | GET | `/guests/me/payment-issues` | core | 2 | GST-015, WEB-023 |
 | dunning | [`retryMyDunningPayment`](#retrymydunningpayment) | POST | `/dunning-cases/{caseId}/retry` | core | 2 | GST-015, WEB-023 |
 | order | [`appendEntitlementToMedia`](#appendentitlementtomedia) | POST | `/media/{mediaCode}/entitlements` | core | 1 | BO-027, CMS-010, EMP-036, POS-010 |
-| order | [`applyManualDiscount`](#applymanualdiscount) | POST | `/orders/{orderId}/discounts` | core | 1 | BO-022, BO-023, BO-026, BO-047, BO-051, BO-070 … |
+| order | [`applyManualDiscount`](#applymanualdiscount) | POST | `/orders/{orderId}/discounts` | core | 1 | BO-022, BO-023, BO-026, BO-047, EMP-014, EMP-034 … |
 | order | [`claimTicketTransfer`](#claimtickettransfer) | POST | `/ticket-transfers/{transferId}/claim` | core | 1 | GST-014, WEB-030 |
-| order | [`createOrder`](#createorder) | POST | `/orders` | core | 1 | BO-022, BO-023, BO-026, BO-047, BO-051, BO-070 … |
-| order | [`exchangeOrderLines`](#exchangeorderlines) | POST | `/orders/{orderId}/exchanges` | core | 1 | BO-022, BO-023, BO-026, BO-047, BO-051, BO-070 … |
+| order | [`createOrder`](#createorder) | POST | `/orders` | core | 1 | BO-022, BO-023, BO-026, BO-047, BO-130, EMP-014 … |
+| order | [`exchangeOrderLines`](#exchangeorderlines) | POST | `/orders/{orderId}/exchanges` | core | 1 | BO-022, BO-023, BO-026, BO-047, EMP-014, EMP-034 … |
 | order | [`getMediaEntitlements`](#getmediaentitlements) | GET | `/media/{mediaCode}/entitlements` | core | 1 | BO-027, CMS-010, EMP-036, POS-010 |
-| order | [`getOrder`](#getorder) | GET | `/orders/{orderId}` | core | 1 | BO-022, BO-023, BO-026, BO-047, BO-051, BO-070 … |
+| order | [`getOrder`](#getorder) | GET | `/orders/{orderId}` | core | 1 | BO-022, BO-023, BO-026, BO-047, EMP-014, EMP-034 … |
 | order | [`getOrderCalendarEvent`](#getordercalendarevent) | GET | `/orders/{orderId}/calendar-event` | core | 3 | GST-018 |
-| order | [`getOrderStatement`](#getorderstatement) | GET | `/orders/{orderId}/statement` | core | 1 | BO-022, BO-023, BO-026, BO-047, BO-051, BO-070 … |
+| order | [`getOrderStatement`](#getorderstatement) | GET | `/orders/{orderId}/statement` | core | 1 | BO-022, BO-023, BO-026, BO-047, EMP-014, EMP-034 … |
 | order | [`getVisitReminder`](#getvisitreminder) | GET | `/orders/{orderId}/reminder` | core | 3 | GST-018 |
-| order | [`holdOrder`](#holdorder) | POST | `/orders/{orderId}/hold` | core | 1 | BO-022, BO-023, BO-026, BO-047, BO-051, BO-070 … |
-| order | [`listOrders`](#listorders) | GET | `/orders` | core | 1 | ANL-009, BO-022, BO-023, BO-026, BO-047, BO-051 … |
-| order | [`modifyOrder`](#modifyorder) | POST | `/orders/{orderId}/modify` | core | 1 | BO-022, BO-023, BO-026, BO-047, BO-051, BO-070 … |
-| order | [`reprintOrder`](#reprintorder) | POST | `/orders/{orderId}/reprints` | core | 1 | BO-022, BO-023, BO-026, BO-047, BO-051, BO-070 … |
-| order | [`rescheduleOrder`](#rescheduleorder) | POST | `/orders/{orderId}/reschedule` | core | 1 | BO-022, BO-023, BO-026, BO-047, BO-051, BO-070 … |
-| order | [`resumeOrder`](#resumeorder) | POST | `/orders/{orderId}/resume` | core | 1 | BO-022, BO-023, BO-026, BO-047, BO-051, BO-070 … |
+| order | [`holdOrder`](#holdorder) | POST | `/orders/{orderId}/hold` | core | 1 | BO-022, BO-023, BO-026, BO-047, EMP-014, EMP-034 … |
+| order | [`listOrders`](#listorders) | GET | `/orders` | core | 1 | ANL-009, BO-022, BO-023, BO-026, BO-047, BO-082 … |
+| order | [`modifyOrder`](#modifyorder) | POST | `/orders/{orderId}/modify` | core | 1 | BO-022, BO-023, BO-026, BO-047, EMP-014, EMP-034 … |
+| order | [`reprintOrder`](#reprintorder) | POST | `/orders/{orderId}/reprints` | core | 1 | BO-022, BO-023, BO-026, BO-047, EMP-014, EMP-034 … |
+| order | [`rescheduleOrder`](#rescheduleorder) | POST | `/orders/{orderId}/reschedule` | core | 1 | BO-022, BO-023, BO-026, BO-047, EMP-014, EMP-034 … |
+| order | [`resumeOrder`](#resumeorder) | POST | `/orders/{orderId}/resume` | core | 1 | BO-022, BO-023, BO-026, BO-047, EMP-014, EMP-034 … |
 | order | [`setVisitReminder`](#setvisitreminder) | PUT | `/orders/{orderId}/reminder` | core | 3 | GST-018 |
 | order | [`transferOrderTickets`](#transferordertickets) | POST | `/orders/{orderId}/transfer` | core | 1 | GST-008, GST-009, GST-010, GST-012, GST-013, GST-014 … |
-| order | [`voidOrder`](#voidorder) | POST | `/orders/{orderId}/voids` | core | 1 | BO-022, BO-023, BO-026, BO-047, BO-051, BO-070 … |
+| order | [`voidOrder`](#voidorder) | POST | `/orders/{orderId}/voids` | core | 1 | BO-022, BO-023, BO-026, BO-047, EMP-014, EMP-034 … |
 | orders | [`createResaleListing`](#createresalelisting) | POST | `/resale-listings` | core | 1 | GST-067, WEB-030 |
 | orders | [`createTicketTemplate`](#createtickettemplate) | POST | `/ticket-templates` | setup | 1 | BO-346 |
 | orders | [`getBillingStatement`](#getbillingstatement) | GET | `/billing-statements/{statementId}` | core | 2 | GST-015, WEB-023 |
@@ -86,33 +87,33 @@
 | orders | [`updateTicketTemplate`](#updatetickettemplate) | PATCH | `/ticket-templates/{templateId}` | setup | 1 | BO-346 |
 | payment | [`addTip`](#addtip) | POST | `/payments/{paymentId}/tip` | core | 1 | BO-024, EMP-035, POS-005, PTR-012 |
 | payment | [`capturePayment`](#capturepayment) | POST | `/payments/{paymentId}/capture` | core | 1 | BO-024, EMP-035, POS-005, PTR-012 |
-| payment | [`createPayment`](#createpayment) | POST | `/payments` | core | 1 | BO-024, EMP-035, EMP-059, GST-009, KSK-007, POS-002 … |
+| payment | [`createPayment`](#createpayment) | POST | `/payments` | core | 1 | BO-024, EMP-035, EMP-059, GST-009, GST-026, GST-027 … |
 | payment | [`inquirePaymentStatus`](#inquirepaymentstatus) | POST | `/payments/{paymentId}/inquiry` | core | 1 | ADM-595, ADM-597, ADM-615, BO-024, EMP-035, GST-009 … |
 | policy | [`setRefundPolicy`](#setrefundpolicy) | PUT | `/venues/{venueId}/refund-policy` | setup | 1 | ADM-611, BO-062, BO-065, BO-1146, BO-318 |
 | refund | [`createRefund`](#createrefund) | POST | `/orders/{orderId}/refunds` | core | 1 | ADM-616, BO-022, BO-023, BO-026, BO-047, BO-1147 … |
 | refund | [`createRefundRequest`](#createrefundrequest) | POST | `/refund-requests` | core | 1 | ADM-610, BO-028, GST-067, WEB-019 |
-| refund | [`listOrderRefunds`](#listorderrefunds) | GET | `/orders/{orderId}/refunds` | core | 1 | ADM-609, BO-022, BO-023, BO-026, BO-047, BO-051 … |
+| refund | [`listOrderRefunds`](#listorderrefunds) | GET | `/orders/{orderId}/refunds` | core | 1 | ADM-609, BO-022, BO-023, BO-026, BO-047, EMP-014 … |
 | reservation | [`cancelReservation`](#cancelreservation) | DELETE | `/reservations/{reservationId}` | core | 2 | GST-016, GST-017, WEB-031 |
 | reservation | [`getReservation`](#getreservation) | GET | `/reservations/{reservationId}` | core | 2 | GST-016, GST-017, WEB-031 |
 | reservation | [`listReservations`](#listreservations) | GET | `/reservations` | core | 2 | GST-016, WEB-031 |
-| shift | [`acceptShiftVariance`](#acceptshiftvariance) | POST | `/shifts/{shiftId}/accept-variance` | core | 1 | BO-039, BO-040, BO-041, BO-042, EMP-003, EMP-009 … |
+| shift | [`acceptShiftVariance`](#acceptshiftvariance) | POST | `/shifts/{shiftId}/accept-variance` | core | 1 | BO-039, BO-040, EMP-003, EMP-009, POS-001, POS-007 … |
 | shift | [`adjustDepositBoxFloat`](#adjustdepositboxfloat) | POST | `/deposit-boxes/{boxId}/adjust-float` | core | 1 | POS-001, POS-007, POS-011, POS-012, POS-013 |
 | shift | [`allocateDepositBox`](#allocatedepositbox) | POST | `/deposit-boxes` | core | 1 | POS-016 |
-| shift | [`approveShiftOpen`](#approveshiftopen) | POST | `/shifts/{shiftId}/approve-open` | core | 1 | BO-039, BO-040, BO-041, BO-042, EMP-003, EMP-009 … |
+| shift | [`approveShiftOpen`](#approveshiftopen) | POST | `/shifts/{shiftId}/approve-open` | core | 1 | BO-039, BO-040, EMP-003, EMP-009, POS-001, POS-007 … |
 | shift | [`closeDepositBoxes`](#closedepositboxes) | POST | `/deposit-boxes/close` | core | 1 | BO-024, POS-007 |
-| shift | [`closeShift`](#closeshift) | POST | `/shifts/{shiftId}/close` | core | 1 | BO-039, BO-040, BO-041, BO-042, EMP-003, EMP-009 … |
-| shift | [`getCurrentShift`](#getcurrentshift) | GET | `/shifts/current` | core | 1 | BO-039, BO-040, BO-041, BO-042, EMP-003, EMP-008 … |
+| shift | [`closeShift`](#closeshift) | POST | `/shifts/{shiftId}/close` | core | 1 | BO-039, BO-040, EMP-003, EMP-009, POS-001, POS-007 … |
+| shift | [`getCurrentShift`](#getcurrentshift) | GET | `/shifts/current` | core | 1 | BO-039, BO-040, EMP-003, EMP-008, EMP-009, EMP-022 … |
 | shift | [`getShift`](#getshift) | GET | `/shifts/{shiftId}` | core | 1 | BO-039, BO-040, BO-041, BO-042, EMP-003, EMP-008 … |
 | shift | [`listDenominations`](#listdenominations) | GET | `/denominations` | core | 1 | BO-1065, POS-001, POS-007, POS-011, POS-012, POS-013 |
-| shift | [`listDepositBoxes`](#listdepositboxes) | GET | `/deposit-boxes` | core | 1 | POS-015 |
+| shift | [`listDepositBoxes`](#listdepositboxes) | GET | `/deposit-boxes` | core | 1 | BO-042, POS-015 |
 | shift | [`listShifts`](#listshifts) | GET | `/shifts` | core | 1 | BO-039, BO-040, BO-041, BO-042, BO-100, EMP-003 … |
-| shift | [`openShift`](#openshift) | POST | `/shifts` | core | 1 | BO-039, BO-040, BO-041, BO-042, EMP-003, EMP-009 … |
-| shift | [`recordNoSale`](#recordnosale) | POST | `/shifts/{shiftId}/no-sale` | core | 1 | BO-039, BO-040, BO-041, BO-042, EMP-003, EMP-009 … |
-| shift | [`reopenShift`](#reopenshift) | POST | `/shifts/{shiftId}/reopen` | core | 1 | BO-039, BO-040, BO-041, BO-042, EMP-003, EMP-009 … |
-| shift | [`resumeShift`](#resumeshift) | POST | `/shifts/{shiftId}/resume` | core | 1 | BO-039, BO-040, BO-041, BO-042, EMP-003, EMP-009 … |
+| shift | [`openShift`](#openshift) | POST | `/shifts` | core | 1 | BO-039, BO-040, EMP-003, EMP-009, POS-001, POS-007 … |
+| shift | [`recordNoSale`](#recordnosale) | POST | `/shifts/{shiftId}/no-sale` | core | 1 | BO-039, BO-040, BO-041, EMP-003, EMP-009, POS-001 … |
+| shift | [`reopenShift`](#reopenshift) | POST | `/shifts/{shiftId}/reopen` | core | 1 | BO-039, BO-040, EMP-003, EMP-009, POS-001, POS-007 … |
+| shift | [`resumeShift`](#resumeshift) | POST | `/shifts/{shiftId}/resume` | core | 1 | BO-039, BO-040, EMP-003, EMP-009, POS-001, POS-007 … |
 | shift | [`setDenominations`](#setdenominations) | PUT | `/denominations` | setup | 1 | BO-1065 |
-| shift | [`suspendShift`](#suspendshift) | POST | `/shifts/{shiftId}/suspend` | core | 1 | BO-039, BO-040, BO-041, BO-042, EMP-003, EMP-008 … |
-| shift | [`withdrawFromDepositBox`](#withdrawfromdepositbox) | POST | `/deposit-boxes/{boxId}/withdraw` | core | 1 | POS-013, POS-018 |
+| shift | [`suspendShift`](#suspendshift) | POST | `/shifts/{shiftId}/suspend` | core | 1 | BO-039, BO-040, EMP-003, EMP-008, EMP-009, POS-001 … |
+| shift | [`withdrawFromDepositBox`](#withdrawfromdepositbox) | POST | `/deposit-boxes/{boxId}/withdraw` | core | 1 | BO-042, POS-013, POS-018 |
 | sync | [`syncOrders`](#syncorders) | POST | `/sync/orders` | core | 1 | BO-037, BO-130, BO-132, EMP-017, POS-002, POS-013 … |
 
 ## Group: cart
@@ -156,6 +157,8 @@ Distinct from expiry: this is a decision, and the recovery campaign must not cha
 **`POST /carts/{cartId}/lines`**: Add something
 
 2.9.4. **Acquiring the lease is the whole reason this is a server operation.** A capacity-bound product added to a cart reserves capacity for a configured window, and a cart held in a browser cannot reserve anything.
+**The window is 15 minutes** (decided 28 September, audit R169): the cart lease is acquired for 900 seconds unless the venue sets otherwise, and `extendCart` adds to it.
+**Parking is sold here like any other line** (decided 28 September, audit R166). A parking product goes through the cart and `checkoutCart`, so the parking entitlement is issued at payment carrying this order's id. There is no live space count in the first release: a car park at its capacity refuses the line with `soldOutForDay`.
 **Refused rather than added where capacity has gone.** A line added optimistically and removed at checkout is a guest who thinks they bought something.
 Returns the cart with any conflicts the addition created (2.9.5) — golf at 13:00 already in the cart and karting at 13:00 being added is a prompt, not a refusal, because a party of four may legitimately split.
 
@@ -169,7 +172,7 @@ Returns the cart with any conflicts the addition created (2.9.5) — golf at 13:
 | Conflict policy | serverWins |
 | Reads | `cache:idempotency`, `catalogue.channel_capacity`, `catalogue.performance`, `catalogue.variant`, `orders.cart`, `orders.cart_line` |
 | Writes | `cache:idempotency`, `catalogue.inventory_hold`, `orders.cart`, `orders.cart_line` |
-| Called by | GST-009, GST-032, GST-048, GST-050, GST-053, GST-056, KSK-005, KSK-006, KSK-017, POS-002, POS-021, POS-023, PTR-010, WEB-006, WEB-008, WEB-010, WEB-033 |
+| Called by | GST-009, GST-026, GST-027, GST-032, GST-048, GST-050, GST-056, KSK-005, KSK-006, KSK-017, POS-002, POS-021, POS-023, PTR-010, WEB-006, WEB-008, WEB-010, WEB-033, WEB-041, WEB-042 |
 | State model | Cart ([states/cart.yaml](../../../states/cart.yaml)): moves `expiring` -> `active`, `expired` -> `active` |
 
 **Parameters**
@@ -186,7 +189,7 @@ Returns the cart with any conflicts the addition created (2.9.5) — golf at 13:
 | variantId | string (uuid) | yes |  |
 | quantity | integer | yes | (min 1) |
 | performanceId | string (uuid) |  |  |
-| seatIds | array of string |  |  |
+| seatIds | array of string |  | At most 10 seats per sale (decided 28 September, audit R080 (c)). (max items 10) |
 | parentLineId | string (uuid) |  | For an add-on attaching to a ticket already in the cart. (nullable) |
 | attributes | object |  |  |
 
@@ -247,6 +250,7 @@ Returns the cart with any conflicts the addition created (2.9.5) — golf at 13:
 | total.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
 | total.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
 | appliedPromotionIds | array of string (uuid) |  | Re-evaluated on every read. |
+| couponCodes | array of string |  | The promo codes the guest entered through applyCartPromoCode (decided 28 September, audit R073 (e)). (read-only) |
 | expiresAt | string (date-time) |  | The earliest lease expiry in the cart, or the cart's own window where it holds none. |
 | extensionsUsed | integer |  | (read-only) |
 | maxExtensions | integer |  | (read-only) |
@@ -261,6 +265,112 @@ Returns the cart with any conflicts the addition created (2.9.5) — golf at 13:
 | 200 |  | Added, and the cart re-priced |
 | 409 |  | No capacity, or the product is not sellable on this channel (notSellableOnChannel). |
 
+### applyCartPromoCode
+
+**`POST /carts/{cartId}/promo-codes`**: Apply a promo code to the cart
+
+**Decided 28 September, audit R073 (e): WEB-010 promised a promo code field and the cart had no way to take one.**
+The code is evaluated the way the cart already evaluates promotions: the cart's lines, venue, channel and subject are sent to `promotions.evaluatePromotions` with the cart's `couponCodes` plus this one. **A code that unlocks nothing is refused, not stored**, so the guest learns at once rather than at checkout. An accepted code is kept on `Cart.couponCodes` and re-evaluated on every read, like `appliedPromotionIds`.
+Applying a code the cart already holds returns the cart unchanged.
+
+|  |  |
+|---|---|
+| Permission | `None` |
+| Scope level | venue |
+| Part of slice | core |
+| Wave | 1 |
+| Offline | no |
+| Conflict policy | serverWins |
+| Reads | `orders.cart`, `orders.cart_line` |
+| Writes | - |
+| Called by | GST-041, WEB-010 |
+
+**Parameters**
+
+| Name | In | Required | Type | Notes |
+|---|---|---|---|---|
+| cartId | path | yes | string (uuid) |  |
+| Idempotency-Key | header | yes | string | Client-generated ULID. |
+
+**Request body**: `ApplyCartPromoCodeRequest`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| code | string | yes | The code as the guest typed it. (min length 1; max length 100) |
+
+**Response**: `Cart`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| id | string (uuid) | yes |  |
+| token | string |  | How an anonymous guest returns to their cart, including from a recovery email. (read-only) |
+| venueId | string (uuid) | yes |  |
+| channel | SalesChannel: enum (pos, kiosk, guestApp, guestWeb, callCentre, partner, api, backOffice, …) | yes | Where a sale came from. |
+| subjectId | string (uuid) |  | Null while anonymous. (nullable) |
+| status | CartStatus: enum (active, expiring, expired, abandoned, checkedOut) | yes |  |
+| lines | array of CartLine | yes |  |
+| lines[].id | string (uuid) | yes |  |
+| lines[].variantId | string (uuid) | yes |  |
+| lines[].productName | string |  | (read-only) |
+| lines[].quantity | integer | yes | (min 1) |
+| lines[].performanceId | string (uuid) |  | (nullable) |
+| lines[].seatIds | array of string |  |  |
+| lines[].parentLineId | string (uuid) |  | The line this add-on is attached to, from AddCartLineRequest.parentLineId. (nullable) |
+| lines[].overridePrice | Money |  | On the wire this is three fields; in the database it is one column. |
+| lines[].overridePrice.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
+| lines[].overridePrice.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
+| lines[].overridePrice.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| lines[].overrideReason | enum (priceMatch, serviceRecovery, negotiated, damagedGoods, staffSale, error) |  | BL-085. (nullable) |
+| lines[].feeKind | enum (booking, transaction, service, delivery, convenience, cancellation) |  | A fee is a line, not an adjustment. (nullable) |
+| lines[].unitPrice | Money |  | On the wire this is three fields; in the database it is one column. |
+| lines[].unitPrice.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
+| lines[].unitPrice.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
+| lines[].unitPrice.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| lines[].lineTotal | Money |  | On the wire this is three fields; in the database it is one column. |
+| lines[].lineTotal.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
+| lines[].lineTotal.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
+| lines[].lineTotal.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| lines[].inventoryHoldId | string |  | The capacity held for this line — a catalogue.InventoryHold.id, typed as that id is. (nullable) |
+| lines[].leaseExpiresAt | string (date-time) |  | Shown to the guest. (nullable) |
+| lines[].isAvailable | boolean |  | Re-checked on every read. (read-only) |
+| conflicts | array of CartConflict |  |  |
+| conflicts[].kind | enum (overlappingTime, sameSessionDifferentVenue, exceedsPartySize, requiresPrerequisite) |  |  |
+| conflicts[].lineIds | array of string (uuid) |  |  |
+| conflicts[].message | string |  |  |
+| conflicts[].isBlocking | boolean |  | Most are not. |
+| subtotal | Money |  | On the wire this is three fields; in the database it is one column. |
+| subtotal.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
+| subtotal.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
+| subtotal.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| discountTotal | Money |  | On the wire this is three fields; in the database it is one column. |
+| discountTotal.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
+| discountTotal.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
+| discountTotal.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| taxTotal | Money |  | On the wire this is three fields; in the database it is one column. |
+| taxTotal.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
+| taxTotal.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
+| taxTotal.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| total | Money |  | On the wire this is three fields; in the database it is one column. |
+| total.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
+| total.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
+| total.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| appliedPromotionIds | array of string (uuid) |  | Re-evaluated on every read. |
+| couponCodes | array of string |  | The promo codes the guest entered through applyCartPromoCode (decided 28 September, audit R073 (e)). (read-only) |
+| expiresAt | string (date-time) |  | The earliest lease expiry in the cart, or the cart's own window where it holds none. |
+| extensionsUsed | integer |  | (read-only) |
+| maxExtensions | integer |  | (read-only) |
+| locale | string |  |  |
+| createdAt | string (date-time) |  |  |
+| updatedAt | string (date-time) |  |  |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 200 |  | Applied, and the cart re-priced |
+| 410 |  | Expired (cartExpired), as for getCart. |
+| 422 |  | The code is not accepted: no such code, voided or used up (promoCodeInvalid), or a real code that nothing in this cart qualifies for (promoCodeNotApplicable). |
+
 ### checkoutCart
 
 **`POST /carts/{cartId}/checkout`**: Turn the cart into an order
@@ -270,6 +380,9 @@ The cart is retained, not deleted — a checkout that fails at payment must be r
 **One cart, one order, one receipt** across ticketing, F&B and retail (14 August).
 **No order against an unproven contact on the guest web or app** (decided 17 September 2026; the rule is on `identity` `verifyGuestEmail`). A signed-in session must be verified; where the site's `guestCheckout` feature is on, a guest without an account must have proved the email or mobile the tickets go to with a one-time code. **Kiosk walk-up orders are exempt** — the tickets are printed for the person standing there.
 **This operation is the gate, and the cart is not** ([ADR-0045](../../docs/adr/0045-every-order-carries-a-proven-contact.md), 18 September 2026, matrix 2.6.1 §2.4). Anyone may fill a cart. The fork between signing in and supplying guest details belongs to the checkout page — `WEB-011`, `GST-041` — and this call refuses until one of them has completed, keeping the cart so the guest resumes rather than restarts.
+**A verified contact that matches an existing profile attaches the order to it automatically** (ADR-0045 section 4; decided 28 September, audit R120 (b)). The guest is not asked, and gets no session on that profile: they see this order and nothing else of its history until they sign in as its owner. Only a verified contact attaches automatically; any other candidate match goes to staff review.
+**A promotion whose budget this order would exceed is not applied** (decided 28 September, audit R101 (8)). At checkout each promotion's remaining `budgetCap` is checked against the discount this order would take from it; where the discount would exceed it, the order is re-priced without that promotion, and the order names it in `droppedPromotions` so the guest sees why the price changed before paying. Budget is refused at checkout, not only reported.
+**Merchandise bought for collection is paid here, online, first** (decided 28 September, audit R236). When the order is paid, each retail line marked for collection becomes a shop-and-drop (`retail.createShopAndDrop`) for the guest to collect on the way out. Nothing is reserved unpaid from this channel.
 
 |  |  |
 |---|---|
@@ -281,7 +394,7 @@ The cart is retained, not deleted — a checkout that fails at payment must be r
 | Conflict policy | serverWins |
 | Reads | `cache:idempotency`, `catalogue.inventory_hold`, `orders.cart`, `orders.cart_line`, `orders.order_line`, `orders.order_line_eligibility`, `orders.payment`, `orders.sales_order` |
 | Writes | `cache:idempotency`, `orders.cart`, `orders.order_line`, `orders.sales_order` |
-| Called by | GST-009, GST-032, GST-041, KSK-006, PTR-010, WEB-010 |
+| Called by | GST-009, GST-026, GST-027, GST-032, GST-041, KSK-006, PTR-010, WEB-010, WEB-033, WEB-041, WEB-042 |
 | State model | Cart ([states/cart.yaml](../../../states/cart.yaml)): moves `active` -> `checkedOut`, `expiring` -> `checkedOut`<br/>Order ([states/order.yaml](../../../states/order.yaml)): created as `pending` |
 
 **Parameters**
@@ -305,7 +418,7 @@ The cart is retained, not deleted — a checkout that fails at payment must be r
 | Field | Type | Required | Notes |
 |---|---|---|---|
 | id | string | yes | The client ULID from CreateOrderRequest.id. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
-| orderNumber | string |  |  |
+| orderNumber | string |  | The number a guest reads and a cashier types. (read-only) |
 | channel | object | yes | Where it came from. |
 | venueId | string (uuid) | yes |  |
 | scopePath | string | yes |  |
@@ -328,6 +441,10 @@ The cart is retained, not deleted — a checkout that fails at payment must be r
 | refundedAmount.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
 | refundedAmount.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
 | refundedAmount.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| droppedPromotions | array of object |  | Promotions left off this order at checkout because their budget cap would have been exceeded (decided 28 September, audit R101 (8)). (read-only) |
+| droppedPromotions[].promotionId | string (uuid) | yes |  |
+| droppedPromotions[].name | string |  |  |
+| droppedPromotions[].reason | enum (budgetCapReached) |  |  |
 | totalPriceVariance | object |  | Sum across lines. |
 | totalPriceVariance.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
 | totalPriceVariance.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
@@ -337,7 +454,7 @@ The cart is retained, not deleted — a checkout that fails at payment must be r
 | lines[].variantId | string (uuid) | yes |  |
 | lines[].performanceId | string (uuid) |  |  |
 | lines[].inventoryHoldId | string |  | Lease the units were drawn from — a catalogue.InventoryHold.id. (nullable) |
-| lines[].seatIds | array of string |  | Seated products only, as seating.Seat.id. |
+| lines[].seatIds | array of string |  | Seated products only, as seating.Seat.id. (max items 10) |
 | lines[].quantity | integer | yes | (min 1) |
 | lines[].eligibilityDeclaration | array of object |  | What was declared for each guest on this line, kept as the record staff check at the gate. (nullable) |
 | lines[].eligibilityDeclaration[].ageBand | enum (infant, child, junior, adult, senior) |  | Infant under 3, child 3–12, junior 13–17, adult 18–59, senior 60+. |
@@ -377,7 +494,7 @@ The cart is retained, not deleted — a checkout that fails at payment must be r
 | payments | array of Payment |  |  |
 | payments[].id | string | yes | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
 | payments[].orderId | string | yes | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
-| payments[].tender | TenderKind: enum (cash, card, wallet, voucher, bankTransfer, hotelCharge, installment, giftCard, …) | yes |  |
+| payments[].tender | TenderKind: enum (cash, card, wallet, voucher, bankTransfer, hotelCharge, installment, giftCard, …) | yes | wallet is a digital wallet (Apple Pay, Google Pay and the like, taken through the gateway), the value the guest channels accept beside card (decided 28 September, audit R080 (a)). |
 | payments[].tenderCurrency | string |  | 4.6.11. (pattern ^[A-Z]{3}$) |
 | payments[].tenderAmount | object |  | The amount in tenderCurrency, at that currency's own scale. |
 | payments[].tenderAmount.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
@@ -493,6 +610,7 @@ Where the guest already has a cart, the two **merge rather than one replacing th
 | cart.total.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
 | cart.total.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
 | cart.appliedPromotionIds | array of string (uuid) |  | Re-evaluated on every read. |
+| cart.couponCodes | array of string |  | The promo codes the guest entered through applyCartPromoCode (decided 28 September, audit R073 (e)). (read-only) |
 | cart.expiresAt | string (date-time) |  | The earliest lease expiry in the cart, or the cart's own window where it holds none. |
 | cart.extensionsUsed | integer |  | (read-only) |
 | cart.maxExtensions | integer |  | (read-only) |
@@ -603,6 +721,7 @@ Created against a guest subject where one is known, or an anonymous token where 
 | total.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
 | total.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
 | appliedPromotionIds | array of string (uuid) |  | Re-evaluated on every read. |
+| couponCodes | array of string |  | The promo codes the guest entered through applyCartPromoCode (decided 28 September, audit R073 (e)). (read-only) |
 | expiresAt | string (date-time) |  | The earliest lease expiry in the cart, or the cart's own window where it holds none. |
 | extensionsUsed | integer |  | (read-only) |
 | maxExtensions | integer |  | (read-only) |
@@ -621,6 +740,7 @@ Created against a guest subject where one is known, or an anonymous token where 
 **`POST /carts/{cartId}/extend`**: Give the guest more time
 
 Extends every lease in the cart. **Capped, and the cap is configuration** — an indefinitely extendable hold is capacity permanently removed from sale by someone who left the tab open.
+**Two venue settings, each with a tenant default** (decided 28 September, audit R094): `cartHoldExtensionMinutes`, how long one extension adds, and `cartMaxExtensions`, how many a cart may take (`Cart.maxExtensions` reports it). **Proposed defaults, client to correct (audit R094): 5 minutes, and 1 extension.**
 Offered once, typically, and the interface should say it is the last extension rather than letting a guest discover the cap by hitting it.
 
 |  |  |
@@ -700,6 +820,7 @@ Offered once, typically, and the interface should say it is the last extension r
 | total.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
 | total.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
 | appliedPromotionIds | array of string (uuid) |  | Re-evaluated on every read. |
+| couponCodes | array of string |  | The promo codes the guest entered through applyCartPromoCode (decided 28 September, audit R073 (e)). (read-only) |
 | expiresAt | string (date-time) |  | The earliest lease expiry in the cart, or the cart's own window where it holds none. |
 | extensionsUsed | integer |  | (read-only) |
 | maxExtensions | integer |  | (read-only) |
@@ -732,7 +853,7 @@ Returns the conflicts (2.9.5) and the leases with their remaining time, so the i
 | Read routing | primary |
 | Reads | `catalogue.channel_capacity`, `catalogue.inventory_hold`, `orders.cart`, `orders.cart_line`, `promotions.promotion` |
 | Writes | - |
-| Called by | GST-009, GST-032, GST-041, GST-053, KSK-006, POS-010, PTR-010, WEB-010 |
+| Called by | GST-009, GST-032, GST-041, KSK-006, POS-010, PTR-010, WEB-010 |
 
 **Parameters**
 
@@ -797,6 +918,7 @@ Returns the conflicts (2.9.5) and the leases with their remaining time, so the i
 | total.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
 | total.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
 | appliedPromotionIds | array of string (uuid) |  | Re-evaluated on every read. |
+| couponCodes | array of string |  | The promo codes the guest entered through applyCartPromoCode (decided 28 September, audit R073 (e)). (read-only) |
 | expiresAt | string (date-time) |  | The earliest lease expiry in the cart, or the cart's own window where it holds none. |
 | extensionsUsed | integer |  | (read-only) |
 | maxExtensions | integer |  | (read-only) |
@@ -894,6 +1016,7 @@ Releases its lease immediately.
 | total.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
 | total.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
 | appliedPromotionIds | array of string (uuid) |  | Re-evaluated on every read. |
+| couponCodes | array of string |  | The promo codes the guest entered through applyCartPromoCode (decided 28 September, audit R073 (e)). (read-only) |
 | expiresAt | string (date-time) |  | The earliest lease expiry in the cart, or the cart's own window where it holds none. |
 | extensionsUsed | integer |  | (read-only) |
 | maxExtensions | integer |  | (read-only) |
@@ -912,6 +1035,7 @@ Releases its lease immediately.
 **`PATCH /carts/{cartId}/lines/{lineId}`**: Change a quantity
 
 Increasing extends the lease and may fail on capacity; decreasing releases part of it. **Releasing immediately matters** — a guest reducing from six to two should return four seats to sale now, not in twenty minutes.
+**A quantity of 0 removes the line**, exactly as `removeCartLine` does: its lease is released and the line is gone from the returned cart (decided 28 September, audit R123 (1)).
 
 |  |  |
 |---|---|
@@ -937,7 +1061,7 @@ Increasing extends the lease and may fail on capacity; decreasing releases part 
 
 | Field | Type | Required | Notes |
 |---|---|---|---|
-| quantity | integer | yes | (min 0) |
+| quantity | integer | yes | The new quantity. (min 0) |
 
 **Response**: `Cart`
 
@@ -996,6 +1120,7 @@ Increasing extends the lease and may fail on capacity; decreasing releases part 
 | total.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
 | total.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
 | appliedPromotionIds | array of string (uuid) |  | Re-evaluated on every read. |
+| couponCodes | array of string |  | The promo codes the guest entered through applyCartPromoCode (decided 28 September, audit R073 (e)). (read-only) |
 | expiresAt | string (date-time) |  | The earliest lease expiry in the cart, or the cart's own window where it holds none. |
 | extensionsUsed | integer |  | (read-only) |
 | maxExtensions | integer |  | (read-only) |
@@ -1018,6 +1143,7 @@ Increasing extends the lease and may fail on capacity; decreasing releases part 
 **`POST /shifts/{shiftId}/cash-movements`**: Record a cash lift or add
 
 A lift removes cash from an open float mid-shift without closing it — the supervisor takes the excess to the safe and the cashier keeps trading. Both directions are traced, both record the authorising principal, and both adjust the expected figure used at close.
+**What "exceeds the counted float" means** (decided 28 September, audit R123 (2)): the cash available to lift is the float counted at the shift's last count (the opening float, or the last `movement` count if one is later), less every lift recorded since, plus every add. A lift larger than that is refused with `lift-exceeds-float`. Cash taken in sales since the last count does not count towards it, because nobody has counted it.
 
 |  |  |
 |---|---|
@@ -1029,7 +1155,7 @@ A lift removes cash from an open float mid-shift without closing it — the supe
 | Conflict policy | append |
 | Reads | `cache:idempotency`, `orders.cash_count_line`, `orders.cash_movement` |
 | Writes | `cache:idempotency`, `orders.cash_count_line`, `orders.cash_movement` |
-| Called by | BO-039, BO-040, BO-041, BO-042, EMP-009, POS-001, POS-007, POS-013, POS-017, POS-018 |
+| Called by | BO-039, BO-040, BO-041, EMP-009, POS-001, POS-007, POS-013, POS-017, POS-018 |
 
 **Parameters**
 
@@ -1110,7 +1236,7 @@ A lift removes cash from an open float mid-shift without closing it — the supe
 | 201 |  | Recorded |
 | 400 | BadRequest | Validation failed |
 | 403 | Forbidden | Authenticated but not permitted at the requested scope |
-| 409 |  | Shift is not open (problem type shift-not-open), or the lift exceeds the counted float (lift-exceeds-float) |
+| 409 |  | Shift is not open (problem type shift-not-open), or the lift exceeds the float counted at the last count less lifts since (lift-exceeds-float, audit R123 (2)) |
 
 ### listCashMovements
 
@@ -1351,7 +1477,7 @@ The media is the join, not the order. That is why this operation is keyed on `me
 |---|---|---|---|
 | order | object | yes | A new order. |
 | order.id | string | yes | The client ULID from CreateOrderRequest.id. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
-| order.orderNumber | string |  |  |
+| order.orderNumber | string |  | The number a guest reads and a cashier types. (read-only) |
 | order.channel | object | yes | Where it came from. |
 | order.venueId | string (uuid) | yes |  |
 | order.scopePath | string | yes |  |
@@ -1374,6 +1500,10 @@ The media is the join, not the order. That is why this operation is keyed on `me
 | order.refundedAmount.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
 | order.refundedAmount.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
 | order.refundedAmount.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| order.droppedPromotions | array of object |  | Promotions left off this order at checkout because their budget cap would have been exceeded (decided 28 September, audit R101 (8)). (read-only) |
+| order.droppedPromotions[].promotionId | string (uuid) | yes |  |
+| order.droppedPromotions[].name | string |  |  |
+| order.droppedPromotions[].reason | enum (budgetCapReached) |  |  |
 | order.totalPriceVariance | object |  | Sum across lines. |
 | order.totalPriceVariance.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
 | order.totalPriceVariance.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
@@ -1383,7 +1513,7 @@ The media is the join, not the order. That is why this operation is keyed on `me
 | order.lines[].variantId | string (uuid) | yes |  |
 | order.lines[].performanceId | string (uuid) |  |  |
 | order.lines[].inventoryHoldId | string |  | Lease the units were drawn from — a catalogue.InventoryHold.id. (nullable) |
-| order.lines[].seatIds | array of string |  | Seated products only, as seating.Seat.id. |
+| order.lines[].seatIds | array of string |  | Seated products only, as seating.Seat.id. (max items 10) |
 | order.lines[].quantity | integer | yes | (min 1) |
 | order.lines[].eligibilityDeclaration | array of object |  | What was declared for each guest on this line, kept as the record staff check at the gate. (nullable) |
 | order.lines[].quotedUnitPrice | object | yes | What the client charged, from its local bundle. |
@@ -1400,7 +1530,7 @@ The media is the join, not the order. That is why this operation is keyed on `me
 | order.payments | array of Payment |  |  |
 | order.payments[].id | string | yes | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
 | order.payments[].orderId | string | yes | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
-| order.payments[].tender | TenderKind: enum (cash, card, wallet, voucher, bankTransfer, hotelCharge, installment, giftCard, …) | yes |  |
+| order.payments[].tender | TenderKind: enum (cash, card, wallet, voucher, bankTransfer, hotelCharge, installment, giftCard, …) | yes | wallet is a digital wallet (Apple Pay, Google Pay and the like, taken through the gateway), the value the guest channels accept beside card (decided 28 September, audit R080 (a)). |
 | order.payments[].tenderCurrency | string |  | 4.6.11. (pattern ^[A-Z]{3}$) |
 | order.payments[].tenderAmount | object |  | The amount in tenderCurrency, at that currency's own scale. |
 | order.payments[].fxRate | object |  | The rate applied, stored on the payment rather than looked up later (CF-37). (nullable) |
@@ -1470,7 +1600,7 @@ Posts to a discount account, never as a price change. A line sold at a reduced p
 | Conflict policy | append |
 | Reads | `cache:idempotency`, `orders.order_line`, `orders.order_line_eligibility`, `orders.payment`, `orders.sales_order` |
 | Writes | `cache:idempotency`, `orders.order_line`, `orders.payment`, `orders.sales_order` |
-| Called by | BO-022, BO-023, BO-026, BO-047, BO-051, BO-070, EMP-014, EMP-034, POS-002, POS-006, POS-014, PTR-002, PTR-005, PTR-008, PTR-015, PTR-016 |
+| Called by | BO-022, BO-023, BO-026, BO-047, EMP-014, EMP-034, POS-002, POS-006, POS-014, PTR-002, PTR-005, PTR-008, PTR-015, PTR-016 |
 
 **Parameters**
 
@@ -1500,7 +1630,7 @@ Posts to a discount account, never as a price change. A line sold at a reduced p
 | Field | Type | Required | Notes |
 |---|---|---|---|
 | id | string | yes | The client ULID from CreateOrderRequest.id. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
-| orderNumber | string |  |  |
+| orderNumber | string |  | The number a guest reads and a cashier types. (read-only) |
 | channel | object | yes | Where it came from. |
 | venueId | string (uuid) | yes |  |
 | scopePath | string | yes |  |
@@ -1523,6 +1653,10 @@ Posts to a discount account, never as a price change. A line sold at a reduced p
 | refundedAmount.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
 | refundedAmount.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
 | refundedAmount.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| droppedPromotions | array of object |  | Promotions left off this order at checkout because their budget cap would have been exceeded (decided 28 September, audit R101 (8)). (read-only) |
+| droppedPromotions[].promotionId | string (uuid) | yes |  |
+| droppedPromotions[].name | string |  |  |
+| droppedPromotions[].reason | enum (budgetCapReached) |  |  |
 | totalPriceVariance | object |  | Sum across lines. |
 | totalPriceVariance.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
 | totalPriceVariance.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
@@ -1532,7 +1666,7 @@ Posts to a discount account, never as a price change. A line sold at a reduced p
 | lines[].variantId | string (uuid) | yes |  |
 | lines[].performanceId | string (uuid) |  |  |
 | lines[].inventoryHoldId | string |  | Lease the units were drawn from — a catalogue.InventoryHold.id. (nullable) |
-| lines[].seatIds | array of string |  | Seated products only, as seating.Seat.id. |
+| lines[].seatIds | array of string |  | Seated products only, as seating.Seat.id. (max items 10) |
 | lines[].quantity | integer | yes | (min 1) |
 | lines[].eligibilityDeclaration | array of object |  | What was declared for each guest on this line, kept as the record staff check at the gate. (nullable) |
 | lines[].eligibilityDeclaration[].ageBand | enum (infant, child, junior, adult, senior) |  | Infant under 3, child 3–12, junior 13–17, adult 18–59, senior 60+. |
@@ -1572,7 +1706,7 @@ Posts to a discount account, never as a price change. A line sold at a reduced p
 | payments | array of Payment |  |  |
 | payments[].id | string | yes | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
 | payments[].orderId | string | yes | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
-| payments[].tender | TenderKind: enum (cash, card, wallet, voucher, bankTransfer, hotelCharge, installment, giftCard, …) | yes |  |
+| payments[].tender | TenderKind: enum (cash, card, wallet, voucher, bankTransfer, hotelCharge, installment, giftCard, …) | yes | wallet is a digital wallet (Apple Pay, Google Pay and the like, taken through the gateway), the value the guest channels accept beside card (decided 28 September, audit R080 (a)). |
 | payments[].tenderCurrency | string |  | 4.6.11. (pattern ^[A-Z]{3}$) |
 | payments[].tenderAmount | object |  | The amount in tenderCurrency, at that currency's own scale. |
 | payments[].tenderAmount.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
@@ -1672,6 +1806,7 @@ Posts to a discount account, never as a price change. A line sold at a reduced p
 
 The client submits lines with the prices it quoted from its local bundle. **The server re-prices every line** and returns both figures.
 Where they differ the order is still accepted at the quoted price and `priceVariance` is populated. The client shows nothing; the variance is a finance concern, not a cashier concern.
+**A promotion whose budget cap this order would exceed is not applied** (decided 28 September, audit R101 (8)), as at `checkoutCart`: an order created online is priced without it and names it in `droppedPromotions`. An order replayed from an offline till keeps the price the cashier quoted, as above, and the overrun is recorded against the promotion's budget as a variance.
 Offline-capable. The client writes to its local journal, acknowledges the cashier, and replays through `/sync/orders` on reconnect.
 
 |  |  |
@@ -1684,7 +1819,7 @@ Offline-capable. The client writes to its local journal, acknowledges the cashie
 | Conflict policy | append |
 | Reads | `cache:idempotency`, `orders.order_line`, `orders.order_line_eligibility`, `orders.payment`, `orders.sales_order` |
 | Writes | `cache:idempotency`, `orders.order_line`, `orders.payment`, `orders.sales_order` |
-| Called by | BO-022, BO-023, BO-026, BO-047, BO-051, BO-070, BO-130, EMP-014, EMP-034, GST-009, POS-002, POS-004, POS-005, POS-006, POS-013, PTR-002, PTR-005, PTR-008, PTR-015, PTR-016, WEB-012 |
+| Called by | BO-022, BO-023, BO-026, BO-047, BO-130, EMP-014, EMP-034, GST-009, POS-002, POS-004, POS-005, POS-006, POS-013, PTR-002, PTR-005, PTR-008, PTR-015, PTR-016, WEB-012 |
 | State model | Order ([states/order.yaml](../../../states/order.yaml)): created as `pending`<br/>Seat hold ([states/seat-hold.yaml](../../../states/seat-hold.yaml)): moves `held` -> `converted` |
 
 **Parameters**
@@ -1709,7 +1844,7 @@ Offline-capable. The client writes to its local journal, acknowledges the cashie
 | lines[].variantId | string (uuid) | yes |  |
 | lines[].performanceId | string (uuid) |  |  |
 | lines[].inventoryHoldId | string |  | Lease the units were drawn from — a catalogue.InventoryHold.id. (nullable) |
-| lines[].seatIds | array of string |  | Seated products only, as seating.Seat.id. |
+| lines[].seatIds | array of string |  | Seated products only, as seating.Seat.id. (max items 10) |
 | lines[].quantity | integer | yes | (min 1) |
 | lines[].eligibilityDeclaration | array of object |  | What was declared for each guest on this line, kept as the record staff check at the gate. (nullable) |
 | lines[].eligibilityDeclaration[].ageBand | enum (infant, child, junior, adult, senior) |  | Infant under 3, child 3–12, junior 13–17, adult 18–59, senior 60+. |
@@ -1730,7 +1865,7 @@ Offline-capable. The client writes to its local journal, acknowledges the cashie
 | Field | Type | Required | Notes |
 |---|---|---|---|
 | id | string | yes | The client ULID from CreateOrderRequest.id. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
-| orderNumber | string |  |  |
+| orderNumber | string |  | The number a guest reads and a cashier types. (read-only) |
 | channel | object | yes | Where it came from. |
 | venueId | string (uuid) | yes |  |
 | scopePath | string | yes |  |
@@ -1753,6 +1888,10 @@ Offline-capable. The client writes to its local journal, acknowledges the cashie
 | refundedAmount.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
 | refundedAmount.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
 | refundedAmount.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| droppedPromotions | array of object |  | Promotions left off this order at checkout because their budget cap would have been exceeded (decided 28 September, audit R101 (8)). (read-only) |
+| droppedPromotions[].promotionId | string (uuid) | yes |  |
+| droppedPromotions[].name | string |  |  |
+| droppedPromotions[].reason | enum (budgetCapReached) |  |  |
 | totalPriceVariance | object |  | Sum across lines. |
 | totalPriceVariance.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
 | totalPriceVariance.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
@@ -1762,7 +1901,7 @@ Offline-capable. The client writes to its local journal, acknowledges the cashie
 | lines[].variantId | string (uuid) | yes |  |
 | lines[].performanceId | string (uuid) |  |  |
 | lines[].inventoryHoldId | string |  | Lease the units were drawn from — a catalogue.InventoryHold.id. (nullable) |
-| lines[].seatIds | array of string |  | Seated products only, as seating.Seat.id. |
+| lines[].seatIds | array of string |  | Seated products only, as seating.Seat.id. (max items 10) |
 | lines[].quantity | integer | yes | (min 1) |
 | lines[].eligibilityDeclaration | array of object |  | What was declared for each guest on this line, kept as the record staff check at the gate. (nullable) |
 | lines[].eligibilityDeclaration[].ageBand | enum (infant, child, junior, adult, senior) |  | Infant under 3, child 3–12, junior 13–17, adult 18–59, senior 60+. |
@@ -1802,7 +1941,7 @@ Offline-capable. The client writes to its local journal, acknowledges the cashie
 | payments | array of Payment |  |  |
 | payments[].id | string | yes | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
 | payments[].orderId | string | yes | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
-| payments[].tender | TenderKind: enum (cash, card, wallet, voucher, bankTransfer, hotelCharge, installment, giftCard, …) | yes |  |
+| payments[].tender | TenderKind: enum (cash, card, wallet, voucher, bankTransfer, hotelCharge, installment, giftCard, …) | yes | wallet is a digital wallet (Apple Pay, Google Pay and the like, taken through the gateway), the value the guest channels accept beside card (decided 28 September, audit R080 (a)). |
 | payments[].tenderCurrency | string |  | 4.6.11. (pattern ^[A-Z]{3}$) |
 | payments[].tenderAmount | object |  | The amount in tenderCurrency, at that currency's own scale. |
 | payments[].tenderAmount.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
@@ -1850,6 +1989,7 @@ Offline-capable. The client writes to its local journal, acknowledges the cashie
 
 A date change, a tier upgrade, a different performance. **Settles only the difference** — modelled as separate refund and sale, a guest exchanging a date can end up refunded and then unable to rebook when the new date turns out to be full.
 The replacement is held before the original is released, never the other way round.
+**The exchange window is a venue setting with a tenant default**, `exchangeCutoffHours`: an exchange is refused with `outsideExchangeWindow` once the original performance is fewer than that many hours away (decided 28 September, audit R094). **Proposed default, client to correct (audit R094): 24 hours.**
 
 |  |  |
 |---|---|
@@ -1861,7 +2001,7 @@ The replacement is held before the original is released, never the other way rou
 | Conflict policy | serverWins |
 | Reads | `cache:idempotency`, `orders.sales_order` |
 | Writes | `cache:idempotency`, `orders.sales_order` |
-| Called by | BO-022, BO-023, BO-026, BO-047, BO-051, BO-070, EMP-014, EMP-034, POS-002, POS-006, POS-010, POS-011, PTR-002, PTR-005, PTR-008, PTR-015, PTR-016 |
+| Called by | BO-022, BO-023, BO-026, BO-047, EMP-014, EMP-034, POS-002, POS-006, POS-010, POS-011, PTR-002, PTR-005, PTR-008, PTR-015, PTR-016 |
 
 **Parameters**
 
@@ -1881,7 +2021,7 @@ The replacement is held before the original is released, never the other way rou
 | incomingLines[].variantId | string (uuid) | yes |  |
 | incomingLines[].performanceId | string (uuid) |  |  |
 | incomingLines[].inventoryHoldId | string |  | Lease the units were drawn from — a catalogue.InventoryHold.id. (nullable) |
-| incomingLines[].seatIds | array of string |  | Seated products only, as seating.Seat.id. |
+| incomingLines[].seatIds | array of string |  | Seated products only, as seating.Seat.id. (max items 10) |
 | incomingLines[].quantity | integer | yes | (min 1) |
 | incomingLines[].eligibilityDeclaration | array of object |  | What was declared for each guest on this line, kept as the record staff check at the gate. (nullable) |
 | incomingLines[].eligibilityDeclaration[].ageBand | enum (infant, child, junior, adult, senior) |  | Infant under 3, child 3–12, junior 13–17, adult 18–59, senior 60+. |
@@ -2003,7 +2143,7 @@ Scanned at a counter before adding something. Shows what the guest holds so a ca
 | Read routing | primary |
 | Reads | `orders.order_line`, `orders.order_line_eligibility`, `orders.payment`, `orders.sales_order` |
 | Writes | - |
-| Called by | BO-022, BO-023, BO-026, BO-047, BO-051, BO-070, EMP-014, EMP-034, GST-010, GST-018, GST-019, KSK-009, KSK-011, POS-002, POS-006, PTR-002, PTR-005, PTR-008, PTR-015, PTR-016, WEB-012, WEB-013, WEB-019 |
+| Called by | BO-022, BO-023, BO-026, BO-047, EMP-014, EMP-034, GST-010, GST-018, GST-019, GST-028, KSK-009, KSK-011, POS-002, POS-006, PTR-002, PTR-005, PTR-008, PTR-015, PTR-016, WEB-012, WEB-013, WEB-019 |
 
 **Parameters**
 
@@ -2016,7 +2156,7 @@ Scanned at a counter before adding something. Shows what the guest holds so a ca
 | Field | Type | Required | Notes |
 |---|---|---|---|
 | id | string | yes | The client ULID from CreateOrderRequest.id. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
-| orderNumber | string |  |  |
+| orderNumber | string |  | The number a guest reads and a cashier types. (read-only) |
 | channel | object | yes | Where it came from. |
 | venueId | string (uuid) | yes |  |
 | scopePath | string | yes |  |
@@ -2039,6 +2179,10 @@ Scanned at a counter before adding something. Shows what the guest holds so a ca
 | refundedAmount.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
 | refundedAmount.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
 | refundedAmount.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| droppedPromotions | array of object |  | Promotions left off this order at checkout because their budget cap would have been exceeded (decided 28 September, audit R101 (8)). (read-only) |
+| droppedPromotions[].promotionId | string (uuid) | yes |  |
+| droppedPromotions[].name | string |  |  |
+| droppedPromotions[].reason | enum (budgetCapReached) |  |  |
 | totalPriceVariance | object |  | Sum across lines. |
 | totalPriceVariance.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
 | totalPriceVariance.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
@@ -2048,7 +2192,7 @@ Scanned at a counter before adding something. Shows what the guest holds so a ca
 | lines[].variantId | string (uuid) | yes |  |
 | lines[].performanceId | string (uuid) |  |  |
 | lines[].inventoryHoldId | string |  | Lease the units were drawn from — a catalogue.InventoryHold.id. (nullable) |
-| lines[].seatIds | array of string |  | Seated products only, as seating.Seat.id. |
+| lines[].seatIds | array of string |  | Seated products only, as seating.Seat.id. (max items 10) |
 | lines[].quantity | integer | yes | (min 1) |
 | lines[].eligibilityDeclaration | array of object |  | What was declared for each guest on this line, kept as the record staff check at the gate. (nullable) |
 | lines[].eligibilityDeclaration[].ageBand | enum (infant, child, junior, adult, senior) |  | Infant under 3, child 3–12, junior 13–17, adult 18–59, senior 60+. |
@@ -2088,7 +2232,7 @@ Scanned at a counter before adding something. Shows what the guest holds so a ca
 | payments | array of Payment |  |  |
 | payments[].id | string | yes | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
 | payments[].orderId | string | yes | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
-| payments[].tender | TenderKind: enum (cash, card, wallet, voucher, bankTransfer, hotelCharge, installment, giftCard, …) | yes |  |
+| payments[].tender | TenderKind: enum (cash, card, wallet, voucher, bankTransfer, hotelCharge, installment, giftCard, …) | yes | wallet is a digital wallet (Apple Pay, Google Pay and the like, taken through the gateway), the value the guest channels accept beside card (decided 28 September, audit R080 (a)). |
 | payments[].tenderCurrency | string |  | 4.6.11. (pattern ^[A-Z]{3}$) |
 | payments[].tenderAmount | object |  | The amount in tenderCurrency, at that currency's own scale. |
 | payments[].tenderAmount.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
@@ -2180,7 +2324,7 @@ Every payment, refund, void, modification and exchange in sequence, with the run
 | Read routing | primary |
 | Reads | `ledger.posting`, `orders.payment`, `orders.refund`, `orders.sales_order` |
 | Writes | - |
-| Called by | BO-022, BO-023, BO-026, BO-047, BO-051, BO-070, EMP-014, EMP-034, POS-002, POS-006, PTR-002, PTR-005, PTR-008, PTR-015, PTR-016 |
+| Called by | BO-022, BO-023, BO-026, BO-047, EMP-014, EMP-034, POS-002, POS-006, PTR-002, PTR-005, PTR-008, PTR-015, PTR-016 |
 
 **Parameters**
 
@@ -2293,7 +2437,7 @@ Held orders expire. A till that accumulates parked sales across a shift cannot b
 | Conflict policy | lastWriterWins |
 | Reads | `cache:idempotency`, `orders.order_line`, `orders.order_line_eligibility`, `orders.payment`, `orders.sales_order` |
 | Writes | `cache:idempotency`, `orders.order_line`, `orders.payment`, `orders.sales_order` |
-| Called by | BO-022, BO-023, BO-026, BO-047, BO-051, BO-070, EMP-014, EMP-034, POS-002, POS-006, PTR-002, PTR-005, PTR-008, PTR-015, PTR-016 |
+| Called by | BO-022, BO-023, BO-026, BO-047, EMP-014, EMP-034, POS-002, POS-006, PTR-002, PTR-005, PTR-008, PTR-015, PTR-016 |
 | State model | Order ([states/order.yaml](../../../states/order.yaml)): moves `pending` -> `held` |
 
 **Parameters**
@@ -2316,7 +2460,7 @@ Held orders expire. A till that accumulates parked sales across a shift cannot b
 | Field | Type | Required | Notes |
 |---|---|---|---|
 | id | string | yes | The client ULID from CreateOrderRequest.id. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
-| orderNumber | string |  |  |
+| orderNumber | string |  | The number a guest reads and a cashier types. (read-only) |
 | channel | object | yes | Where it came from. |
 | venueId | string (uuid) | yes |  |
 | scopePath | string | yes |  |
@@ -2339,6 +2483,10 @@ Held orders expire. A till that accumulates parked sales across a shift cannot b
 | refundedAmount.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
 | refundedAmount.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
 | refundedAmount.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| droppedPromotions | array of object |  | Promotions left off this order at checkout because their budget cap would have been exceeded (decided 28 September, audit R101 (8)). (read-only) |
+| droppedPromotions[].promotionId | string (uuid) | yes |  |
+| droppedPromotions[].name | string |  |  |
+| droppedPromotions[].reason | enum (budgetCapReached) |  |  |
 | totalPriceVariance | object |  | Sum across lines. |
 | totalPriceVariance.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
 | totalPriceVariance.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
@@ -2348,7 +2496,7 @@ Held orders expire. A till that accumulates parked sales across a shift cannot b
 | lines[].variantId | string (uuid) | yes |  |
 | lines[].performanceId | string (uuid) |  |  |
 | lines[].inventoryHoldId | string |  | Lease the units were drawn from — a catalogue.InventoryHold.id. (nullable) |
-| lines[].seatIds | array of string |  | Seated products only, as seating.Seat.id. |
+| lines[].seatIds | array of string |  | Seated products only, as seating.Seat.id. (max items 10) |
 | lines[].quantity | integer | yes | (min 1) |
 | lines[].eligibilityDeclaration | array of object |  | What was declared for each guest on this line, kept as the record staff check at the gate. (nullable) |
 | lines[].eligibilityDeclaration[].ageBand | enum (infant, child, junior, adult, senior) |  | Infant under 3, child 3–12, junior 13–17, adult 18–59, senior 60+. |
@@ -2388,7 +2536,7 @@ Held orders expire. A till that accumulates parked sales across a shift cannot b
 | payments | array of Payment |  |  |
 | payments[].id | string | yes | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
 | payments[].orderId | string | yes | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
-| payments[].tender | TenderKind: enum (cash, card, wallet, voucher, bankTransfer, hotelCharge, installment, giftCard, …) | yes |  |
+| payments[].tender | TenderKind: enum (cash, card, wallet, voucher, bankTransfer, hotelCharge, installment, giftCard, …) | yes | wallet is a digital wallet (Apple Pay, Google Pay and the like, taken through the gateway), the value the guest channels accept beside card (decided 28 September, audit R080 (a)). |
 | payments[].tenderCurrency | string |  | 4.6.11. (pattern ^[A-Z]{3}$) |
 | payments[].tenderAmount | object |  | The amount in tenderCurrency, at that currency's own scale. |
 | payments[].tenderAmount.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
@@ -2445,7 +2593,7 @@ Held orders expire. A till that accumulates parked sales across a shift cannot b
 | Read routing | replica |
 | Reads | `orders.order_line`, `orders.sales_order` |
 | Writes | - |
-| Called by | ANL-009, BO-022, BO-023, BO-026, BO-047, BO-051, BO-070, BO-082, BO-101, EMP-014, EMP-034, EMP-057, GST-014, GST-018, GST-019, POS-002, POS-006, POS-012, PTR-002, PTR-005, PTR-008, PTR-015, PTR-016, WEB-019, WEB-030 |
+| Called by | ANL-009, BO-022, BO-023, BO-026, BO-047, BO-082, BO-101, EMP-014, EMP-034, EMP-057, GST-014, GST-018, GST-019, POS-002, POS-006, POS-012, PTR-002, PTR-005, PTR-008, PTR-015, PTR-016, WEB-019, WEB-030 |
 
 **Parameters**
 
@@ -2509,7 +2657,7 @@ Lines whose entitlement has been redeemed cannot be removed. The guest has used 
 | Conflict policy | serverWins |
 | Reads | `cache:idempotency`, `orders.order_line`, `orders.order_line_eligibility`, `orders.payment`, `orders.sales_order` |
 | Writes | `cache:idempotency`, `orders.order_line`, `orders.payment`, `orders.sales_order` |
-| Called by | BO-022, BO-023, BO-026, BO-047, BO-051, BO-070, EMP-014, EMP-034, POS-002, POS-006, PTR-002, PTR-005, PTR-008, PTR-015, PTR-016 |
+| Called by | BO-022, BO-023, BO-026, BO-047, EMP-014, EMP-034, POS-002, POS-006, PTR-002, PTR-005, PTR-008, PTR-015, PTR-016 |
 
 **Parameters**
 
@@ -2528,7 +2676,7 @@ Lines whose entitlement has been redeemed cannot be removed. The guest has used 
 | addLines[].variantId | string (uuid) | yes |  |
 | addLines[].performanceId | string (uuid) |  |  |
 | addLines[].inventoryHoldId | string |  | Lease the units were drawn from — a catalogue.InventoryHold.id. (nullable) |
-| addLines[].seatIds | array of string |  | Seated products only, as seating.Seat.id. |
+| addLines[].seatIds | array of string |  | Seated products only, as seating.Seat.id. (max items 10) |
 | addLines[].quantity | integer | yes | (min 1) |
 | addLines[].eligibilityDeclaration | array of object |  | What was declared for each guest on this line, kept as the record staff check at the gate. (nullable) |
 | addLines[].eligibilityDeclaration[].ageBand | enum (infant, child, junior, adult, senior) |  | Infant under 3, child 3–12, junior 13–17, adult 18–59, senior 60+. |
@@ -2552,7 +2700,7 @@ Lines whose entitlement has been redeemed cannot be removed. The guest has used 
 |---|---|---|---|
 | order | Order | yes |  |
 | order.id | string | yes | The client ULID from CreateOrderRequest.id. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
-| order.orderNumber | string |  |  |
+| order.orderNumber | string |  | The number a guest reads and a cashier types. (read-only) |
 | order.channel | object | yes | Where it came from. |
 | order.venueId | string (uuid) | yes |  |
 | order.scopePath | string | yes |  |
@@ -2575,6 +2723,10 @@ Lines whose entitlement has been redeemed cannot be removed. The guest has used 
 | order.refundedAmount.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
 | order.refundedAmount.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
 | order.refundedAmount.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| order.droppedPromotions | array of object |  | Promotions left off this order at checkout because their budget cap would have been exceeded (decided 28 September, audit R101 (8)). (read-only) |
+| order.droppedPromotions[].promotionId | string (uuid) | yes |  |
+| order.droppedPromotions[].name | string |  |  |
+| order.droppedPromotions[].reason | enum (budgetCapReached) |  |  |
 | order.totalPriceVariance | object |  | Sum across lines. |
 | order.totalPriceVariance.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
 | order.totalPriceVariance.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
@@ -2584,7 +2736,7 @@ Lines whose entitlement has been redeemed cannot be removed. The guest has used 
 | order.lines[].variantId | string (uuid) | yes |  |
 | order.lines[].performanceId | string (uuid) |  |  |
 | order.lines[].inventoryHoldId | string |  | Lease the units were drawn from — a catalogue.InventoryHold.id. (nullable) |
-| order.lines[].seatIds | array of string |  | Seated products only, as seating.Seat.id. |
+| order.lines[].seatIds | array of string |  | Seated products only, as seating.Seat.id. (max items 10) |
 | order.lines[].quantity | integer | yes | (min 1) |
 | order.lines[].eligibilityDeclaration | array of object |  | What was declared for each guest on this line, kept as the record staff check at the gate. (nullable) |
 | order.lines[].quotedUnitPrice | object | yes | What the client charged, from its local bundle. |
@@ -2601,7 +2753,7 @@ Lines whose entitlement has been redeemed cannot be removed. The guest has used 
 | order.payments | array of Payment |  |  |
 | order.payments[].id | string | yes | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
 | order.payments[].orderId | string | yes | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
-| order.payments[].tender | TenderKind: enum (cash, card, wallet, voucher, bankTransfer, hotelCharge, installment, giftCard, …) | yes |  |
+| order.payments[].tender | TenderKind: enum (cash, card, wallet, voucher, bankTransfer, hotelCharge, installment, giftCard, …) | yes | wallet is a digital wallet (Apple Pay, Google Pay and the like, taken through the gateway), the value the guest channels accept beside card (decided 28 September, audit R080 (a)). |
 | order.payments[].tenderCurrency | string |  | 4.6.11. (pattern ^[A-Z]{3}$) |
 | order.payments[].tenderAmount | object |  | The amount in tenderCurrency, at that currency's own scale. |
 | order.payments[].fxRate | object |  | The rate applied, stored on the payment rather than looked up later (CF-37). (nullable) |
@@ -2664,7 +2816,7 @@ Offline-capable, so it carries `recordedAt`: the moment the till reprinted, kept
 | Conflict policy | append |
 | Reads | `cache:idempotency`, `orders.sales_order` |
 | Writes | `cache:idempotency`, `orders.sales_order` |
-| Called by | BO-022, BO-023, BO-026, BO-047, BO-051, BO-070, EMP-014, EMP-034, GST-010, POS-002, POS-006, POS-026, PTR-002, PTR-005, PTR-008, PTR-015, PTR-016, WEB-013 |
+| Called by | BO-022, BO-023, BO-026, BO-047, EMP-014, EMP-034, GST-010, POS-002, POS-006, POS-026, PTR-002, PTR-005, PTR-008, PTR-015, PTR-016, WEB-013 |
 
 **Parameters**
 
@@ -2717,7 +2869,7 @@ Where the new performance is priced differently, the balance settles as for an e
 | Conflict policy | serverWins |
 | Reads | `cache:idempotency`, `orders.sales_order` |
 | Writes | `cache:idempotency`, `orders.sales_order` |
-| Called by | BO-022, BO-023, BO-026, BO-047, BO-051, BO-070, EMP-014, EMP-034, POS-002, POS-006, PTR-002, PTR-005, PTR-008, PTR-015, PTR-016 |
+| Called by | BO-022, BO-023, BO-026, BO-047, EMP-014, EMP-034, POS-002, POS-006, PTR-002, PTR-005, PTR-008, PTR-015, PTR-016 |
 
 **Parameters**
 
@@ -2774,6 +2926,7 @@ Where the new performance is priced differently, the balance settles as for an e
 
 Any till, not only the one that parked it — the cashier who took it may be on a break.
 Prices are re-evaluated. Where a price, a promotion or an availability has moved since the hold, the response says so and the cashier decides. Silently charging the old price loses money; silently charging the new one loses the guest.
+**The cashier has two choices, keep prices or discard** (decided 28 September, audit R123 (5)). Keeping continues the sale at the prices it was parked at; the re-evaluation is reported in `changes` and never applied. Discarding voids the sale (`voidOrder`). There is no reprice in place: a cashier who wants current prices discards and rings the sale again. A line that cannot be kept at all (`soldOut`, `seatHoldExpired`, `productWithdrawn`) is removed whichever is chosen.
 
 |  |  |
 |---|---|
@@ -2785,7 +2938,7 @@ Prices are re-evaluated. Where a price, a promotion or an availability has moved
 | Conflict policy | serverWins |
 | Reads | `cache:idempotency`, `orders.order_line`, `orders.order_line_eligibility`, `orders.payment`, `orders.sales_order` |
 | Writes | `cache:idempotency`, `orders.order_line`, `orders.payment`, `orders.sales_order` |
-| Called by | BO-022, BO-023, BO-026, BO-047, BO-051, BO-070, EMP-014, EMP-034, POS-002, POS-006, PTR-002, PTR-005, PTR-008, PTR-015, PTR-016 |
+| Called by | BO-022, BO-023, BO-026, BO-047, EMP-014, EMP-034, POS-002, POS-006, PTR-002, PTR-005, PTR-008, PTR-015, PTR-016 |
 | State model | Order ([states/order.yaml](../../../states/order.yaml)): moves `held` -> `pending` |
 
 **Parameters**
@@ -2801,7 +2954,7 @@ Prices are re-evaluated. Where a price, a promotion or an availability has moved
 |---|---|---|---|
 | order | Order | yes |  |
 | order.id | string | yes | The client ULID from CreateOrderRequest.id. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
-| order.orderNumber | string |  |  |
+| order.orderNumber | string |  | The number a guest reads and a cashier types. (read-only) |
 | order.channel | object | yes | Where it came from. |
 | order.venueId | string (uuid) | yes |  |
 | order.scopePath | string | yes |  |
@@ -2824,6 +2977,10 @@ Prices are re-evaluated. Where a price, a promotion or an availability has moved
 | order.refundedAmount.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
 | order.refundedAmount.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
 | order.refundedAmount.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| order.droppedPromotions | array of object |  | Promotions left off this order at checkout because their budget cap would have been exceeded (decided 28 September, audit R101 (8)). (read-only) |
+| order.droppedPromotions[].promotionId | string (uuid) | yes |  |
+| order.droppedPromotions[].name | string |  |  |
+| order.droppedPromotions[].reason | enum (budgetCapReached) |  |  |
 | order.totalPriceVariance | object |  | Sum across lines. |
 | order.totalPriceVariance.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
 | order.totalPriceVariance.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
@@ -2833,7 +2990,7 @@ Prices are re-evaluated. Where a price, a promotion or an availability has moved
 | order.lines[].variantId | string (uuid) | yes |  |
 | order.lines[].performanceId | string (uuid) |  |  |
 | order.lines[].inventoryHoldId | string |  | Lease the units were drawn from — a catalogue.InventoryHold.id. (nullable) |
-| order.lines[].seatIds | array of string |  | Seated products only, as seating.Seat.id. |
+| order.lines[].seatIds | array of string |  | Seated products only, as seating.Seat.id. (max items 10) |
 | order.lines[].quantity | integer | yes | (min 1) |
 | order.lines[].eligibilityDeclaration | array of object |  | What was declared for each guest on this line, kept as the record staff check at the gate. (nullable) |
 | order.lines[].quotedUnitPrice | object | yes | What the client charged, from its local bundle. |
@@ -2850,7 +3007,7 @@ Prices are re-evaluated. Where a price, a promotion or an availability has moved
 | order.payments | array of Payment |  |  |
 | order.payments[].id | string | yes | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
 | order.payments[].orderId | string | yes | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
-| order.payments[].tender | TenderKind: enum (cash, card, wallet, voucher, bankTransfer, hotelCharge, installment, giftCard, …) | yes |  |
+| order.payments[].tender | TenderKind: enum (cash, card, wallet, voucher, bankTransfer, hotelCharge, installment, giftCard, …) | yes | wallet is a digital wallet (Apple Pay, Google Pay and the like, taken through the gateway), the value the guest channels accept beside card (decided 28 September, audit R080 (a)). |
 | order.payments[].tenderCurrency | string |  | 4.6.11. (pattern ^[A-Z]{3}$) |
 | order.payments[].tenderAmount | object |  | The amount in tenderCurrency, at that currency's own scale. |
 | order.payments[].fxRate | object |  | The rate applied, stored on the payment rather than looked up later (CF-37). (nullable) |
@@ -3019,6 +3176,8 @@ The recipient receives a claim link. **Ownership moves only when they claim it**
 **`POST /orders/{orderId}/voids`**: Void an order
 
 Only before settlement and only within the same shift. After that it is a refund — the money has moved.
+**Voids the whole order**, never one line: a single F&B line removed after preparation is voided by voiding its order (`fnb.amendFnbOrder`, `fnb.cancelFnbOrder` point here).
+**The reason comes from the void reason list** (`VoidReason`; decided 28 September, audit R125 (4)), the one list every void takes, F&B included. `other` requires a `note` (audit R222); the notes are reviewed quarterly to add real reasons.
 
 |  |  |
 |---|---|
@@ -3030,7 +3189,7 @@ Only before settlement and only within the same shift. After that it is a refund
 | Conflict policy | append |
 | Reads | `cache:idempotency`, `orders.order_line`, `orders.order_line_eligibility`, `orders.payment`, `orders.sales_order` |
 | Writes | `cache:idempotency`, `orders.order_line`, `orders.payment`, `orders.sales_order` |
-| Called by | BO-022, BO-023, BO-026, BO-047, BO-051, BO-070, EMP-014, EMP-034, POS-002, POS-006, POS-014, PTR-002, PTR-005, PTR-008, PTR-015, PTR-016 |
+| Called by | BO-022, BO-023, BO-026, BO-047, EMP-014, EMP-034, POS-002, POS-006, POS-014, PTR-002, PTR-005, PTR-008, PTR-015, PTR-016 |
 | State model | Order ([states/order.yaml](../../../states/order.yaml)): moves `pending` -> `voided` |
 
 **Parameters**
@@ -3045,7 +3204,8 @@ Only before settlement and only within the same shift. After that it is a refund
 | Field | Type | Required | Notes |
 |---|---|---|---|
 | id | string | yes | Client-generated ULID of this void, and its idempotency key — it must equal the Idempotency-Key header. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
-| reason | string | yes | (min length 3; max length 500) |
+| reason | VoidReason: enum (guestChangedMind, enteredInError, itemUnavailable, qualityIssue, duplicate, other) | yes | The void reason list (decided 28 September, audit R125 (4)): the one list voidOrder takes, and the list fnb.amendFnbOrder and fnb.cancelFnbOrder point to. |
+| note | string |  | Required when reason is other (audit R222); optional otherwise. (min length 3; max length 500; nullable) |
 | recordedAt | string (date-time) | yes |  |
 
 **Response**: `Order`
@@ -3053,7 +3213,7 @@ Only before settlement and only within the same shift. After that it is a refund
 | Field | Type | Required | Notes |
 |---|---|---|---|
 | id | string | yes | The client ULID from CreateOrderRequest.id. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
-| orderNumber | string |  |  |
+| orderNumber | string |  | The number a guest reads and a cashier types. (read-only) |
 | channel | object | yes | Where it came from. |
 | venueId | string (uuid) | yes |  |
 | scopePath | string | yes |  |
@@ -3076,6 +3236,10 @@ Only before settlement and only within the same shift. After that it is a refund
 | refundedAmount.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
 | refundedAmount.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
 | refundedAmount.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| droppedPromotions | array of object |  | Promotions left off this order at checkout because their budget cap would have been exceeded (decided 28 September, audit R101 (8)). (read-only) |
+| droppedPromotions[].promotionId | string (uuid) | yes |  |
+| droppedPromotions[].name | string |  |  |
+| droppedPromotions[].reason | enum (budgetCapReached) |  |  |
 | totalPriceVariance | object |  | Sum across lines. |
 | totalPriceVariance.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
 | totalPriceVariance.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
@@ -3085,7 +3249,7 @@ Only before settlement and only within the same shift. After that it is a refund
 | lines[].variantId | string (uuid) | yes |  |
 | lines[].performanceId | string (uuid) |  |  |
 | lines[].inventoryHoldId | string |  | Lease the units were drawn from — a catalogue.InventoryHold.id. (nullable) |
-| lines[].seatIds | array of string |  | Seated products only, as seating.Seat.id. |
+| lines[].seatIds | array of string |  | Seated products only, as seating.Seat.id. (max items 10) |
 | lines[].quantity | integer | yes | (min 1) |
 | lines[].eligibilityDeclaration | array of object |  | What was declared for each guest on this line, kept as the record staff check at the gate. (nullable) |
 | lines[].eligibilityDeclaration[].ageBand | enum (infant, child, junior, adult, senior) |  | Infant under 3, child 3–12, junior 13–17, adult 18–59, senior 60+. |
@@ -3125,7 +3289,7 @@ Only before settlement and only within the same shift. After that it is a refund
 | payments | array of Payment |  |  |
 | payments[].id | string | yes | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
 | payments[].orderId | string | yes | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
-| payments[].tender | TenderKind: enum (cash, card, wallet, voucher, bankTransfer, hotelCharge, installment, giftCard, …) | yes |  |
+| payments[].tender | TenderKind: enum (cash, card, wallet, voucher, bankTransfer, hotelCharge, installment, giftCard, …) | yes | wallet is a digital wallet (Apple Pay, Google Pay and the like, taken through the gateway), the value the guest channels accept beside card (decided 28 September, audit R080 (a)). |
 | payments[].tenderCurrency | string |  | 4.6.11. (pattern ^[A-Z]{3}$) |
 | payments[].tenderAmount | object |  | The amount in tenderCurrency, at that currency's own scale. |
 | payments[].tenderAmount.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
@@ -3174,6 +3338,7 @@ Only before settlement and only within the same shift. After that it is a refund
 
 BL-060. **A resale is a transfer with money attached, and the venue stays in the middle** — the seller's entitlement is voided and a new one issued to the buyer, so **the ticket that admits is always one the venue issued.** That is what stops a screenshot at the gate.
 Refuses where the entitlement is partly consumed, name-bound, or past its resale window.
+**The resale window is a venue setting with a tenant default**, `resaleCutoffHours`: listing closes that many hours before the performance starts (decided 28 September, audit R094). **Proposed default, client to correct (audit R094): 24 hours.**
 
 |  |  |
 |---|---|
@@ -3455,7 +3620,7 @@ Returns the lines, the total and the deadline. **Never the guest's other orders*
 | lines[].variantId | string (uuid) | yes |  |
 | lines[].performanceId | string (uuid) |  |  |
 | lines[].inventoryHoldId | string |  | Lease the units were drawn from — a catalogue.InventoryHold.id. (nullable) |
-| lines[].seatIds | array of string |  | Seated products only, as seating.Seat.id. |
+| lines[].seatIds | array of string |  | Seated products only, as seating.Seat.id. (max items 10) |
 | lines[].quantity | integer | yes | (min 1) |
 | lines[].eligibilityDeclaration | array of object |  | What was declared for each guest on this line, kept as the record staff check at the gate. (nullable) |
 | lines[].eligibilityDeclaration[].ageBand | enum (infant, child, junior, adult, senior) |  | Infant under 3, child 3–12, junior 13–17, adult 18–59, senior 60+. |
@@ -3654,7 +3819,7 @@ BL-029. **A wallet pass is a live object, not a download.** Its value over a PDF
 |---|---|---|---|
 | items | array of Order | yes |  |
 | items[].id | string | yes | The client ULID from CreateOrderRequest.id. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
-| items[].orderNumber | string |  |  |
+| items[].orderNumber | string |  | The number a guest reads and a cashier types. (read-only) |
 | items[].channel | object | yes | Where it came from. |
 | items[].venueId | string (uuid) | yes |  |
 | items[].scopePath | string | yes |  |
@@ -3677,6 +3842,10 @@ BL-029. **A wallet pass is a live object, not a download.** Its value over a PDF
 | items[].refundedAmount.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
 | items[].refundedAmount.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
 | items[].refundedAmount.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| items[].droppedPromotions | array of object |  | Promotions left off this order at checkout because their budget cap would have been exceeded (decided 28 September, audit R101 (8)). (read-only) |
+| items[].droppedPromotions[].promotionId | string (uuid) | yes |  |
+| items[].droppedPromotions[].name | string |  |  |
+| items[].droppedPromotions[].reason | enum (budgetCapReached) |  |  |
 | items[].totalPriceVariance | object |  | Sum across lines. |
 | items[].totalPriceVariance.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
 | items[].totalPriceVariance.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
@@ -3686,7 +3855,7 @@ BL-029. **A wallet pass is a live object, not a download.** Its value over a PDF
 | items[].lines[].variantId | string (uuid) | yes |  |
 | items[].lines[].performanceId | string (uuid) |  |  |
 | items[].lines[].inventoryHoldId | string |  | Lease the units were drawn from — a catalogue.InventoryHold.id. (nullable) |
-| items[].lines[].seatIds | array of string |  | Seated products only, as seating.Seat.id. |
+| items[].lines[].seatIds | array of string |  | Seated products only, as seating.Seat.id. (max items 10) |
 | items[].lines[].quantity | integer | yes | (min 1) |
 | items[].lines[].eligibilityDeclaration | array of object |  | What was declared for each guest on this line, kept as the record staff check at the gate. (nullable) |
 | items[].lines[].quotedUnitPrice | object | yes | What the client charged, from its local bundle. |
@@ -3703,7 +3872,7 @@ BL-029. **A wallet pass is a live object, not a download.** Its value over a PDF
 | items[].payments | array of Payment |  |  |
 | items[].payments[].id | string | yes | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
 | items[].payments[].orderId | string | yes | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
-| items[].payments[].tender | TenderKind: enum (cash, card, wallet, voucher, bankTransfer, hotelCharge, installment, giftCard, …) | yes |  |
+| items[].payments[].tender | TenderKind: enum (cash, card, wallet, voucher, bankTransfer, hotelCharge, installment, giftCard, …) | yes | wallet is a digital wallet (Apple Pay, Google Pay and the like, taken through the gateway), the value the guest channels accept beside card (decided 28 September, audit R080 (a)). |
 | items[].payments[].tenderCurrency | string |  | 4.6.11. (pattern ^[A-Z]{3}$) |
 | items[].payments[].tenderAmount | object |  | The amount in tenderCurrency, at that currency's own scale. |
 | items[].payments[].fxRate | object |  | The rate applied, stored on the payment rather than looked up later (CF-37). (nullable) |
@@ -4288,7 +4457,7 @@ Where the terminal captured the tip, this records what it reported. Where the gu
 |---|---|---|---|
 | id | string | yes | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
 | orderId | string | yes | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
-| tender | TenderKind: enum (cash, card, wallet, voucher, bankTransfer, hotelCharge, installment, giftCard, …) | yes |  |
+| tender | TenderKind: enum (cash, card, wallet, voucher, bankTransfer, hotelCharge, installment, giftCard, …) | yes | wallet is a digital wallet (Apple Pay, Google Pay and the like, taken through the gateway), the value the guest channels accept beside card (decided 28 September, audit R080 (a)). |
 | tenderCurrency | string |  | 4.6.11. (pattern ^[A-Z]{3}$) |
 | tenderAmount | object |  | The amount in tenderCurrency, at that currency's own scale. |
 | tenderAmount.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
@@ -4358,7 +4527,7 @@ Where the terminal captured the tip, this records what it reported. Where the gu
 |---|---|---|---|
 | id | string | yes | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
 | orderId | string | yes | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
-| tender | TenderKind: enum (cash, card, wallet, voucher, bankTransfer, hotelCharge, installment, giftCard, …) | yes |  |
+| tender | TenderKind: enum (cash, card, wallet, voucher, bankTransfer, hotelCharge, installment, giftCard, …) | yes | wallet is a digital wallet (Apple Pay, Google Pay and the like, taken through the gateway), the value the guest channels accept beside card (decided 28 September, audit R080 (a)). |
 | tenderCurrency | string |  | 4.6.11. (pattern ^[A-Z]{3}$) |
 | tenderAmount | object |  | The amount in tenderCurrency, at that currency's own scale. |
 | tenderAmount.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
@@ -4396,6 +4565,8 @@ Where the terminal captured the tip, this records what it reported. Where the gu
 
 Cash is offline-capable. Card, wallet and voucher are not — they need the gateway.
 A card payment returns `pendingConfirmation` when the terminal has been instructed but no result has arrived. **Do not assume failure.** Poll `/payments/{id}/inquiry`.
+**Which tenders each channel takes** (decided 28 September, audit R080 (a) and (d)). **In the guest app and on the guest web, card or wallet** (`card`, `wallet`): any other `tender` from a guest caller is refused with 409 `tenderNotAllowedOnChannel`. **At the till, all five the payment screen offers**: card, cash, digital wallet (`wallet`), gift card or voucher (`giftCard`, `voucher`), and online payment, which is a payment link the guest pays on their own device (`createPaymentLink`) rather than a tender on this call.
+**Posts to the ledger through the account mappings** (decided 28 September, audit R191): a captured `cash` payment posts `cashReceived`, `card` posts `cardReceived` and `wallet` posts `walletReceived`, each to the accounts `finance.setAccountMappings` holds for the venue, and to the fiscal period that is open for the payment date. An offline cash payment replayed through `syncOrders` posts the same event, dated by its `recordedAt`.
 
 |  |  |
 |---|---|
@@ -4407,7 +4578,7 @@ A card payment returns `pendingConfirmation` when the terminal has been instruct
 | Conflict policy | append |
 | Reads | `cache:idempotency`, `ledger.fx_rate`, `orders.payment`, `orders.sales_order` |
 | Writes | `cache:idempotency`, `ledger.journal_entry`, `ledger.posting`, `orders.payment`, `platform.outbox` |
-| Called by | BO-024, EMP-035, EMP-059, GST-009, KSK-007, POS-002, POS-004, POS-005, PTR-012, WEB-012 |
+| Called by | BO-024, EMP-035, EMP-059, GST-009, GST-026, GST-027, KSK-007, POS-002, POS-004, POS-005, PTR-012, WEB-012, WEB-033, WEB-041, WEB-042 |
 | State model | Order ([states/order.yaml](../../../states/order.yaml)): moves `pending` -> `paid`, `pending` -> `partiallyPaid`, `partiallyPaid` -> `paid`, `pending` -> `failed`<br/>PaymentLink ([states/payment-link.yaml](../../../states/payment-link.yaml)): moves `issued` -> `paid`, `viewed` -> `paid`<br/>Payment ([states/payment.yaml](../../../states/payment.yaml)): created as `authorised` or `pendingConfirmation`<br/>Seat ([states/seat.yaml](../../../states/seat.yaml)): moves `held` -> `sold`<br/>SubBill ([states/sub-bill.yaml](../../../states/sub-bill.yaml)): moves `open` -> `paid`<br/>Table ([states/table.yaml](../../../states/table.yaml)): moves `billRequested` -> `needsClearing` |
 
 **Parameters**
@@ -4422,7 +4593,7 @@ A card payment returns `pendingConfirmation` when the terminal has been instruct
 |---|---|---|---|
 | id | string | yes | Client-generated ULID of the payment, and its idempotency key — it must equal the Idempotency-Key header. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
 | orderId | string | yes | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
-| tender | TenderKind: enum (cash, card, wallet, voucher, bankTransfer, hotelCharge, installment, giftCard, …) | yes |  |
+| tender | TenderKind: enum (cash, card, wallet, voucher, bankTransfer, hotelCharge, installment, giftCard, …) | yes | wallet is a digital wallet (Apple Pay, Google Pay and the like, taken through the gateway), the value the guest channels accept beside card (decided 28 September, audit R080 (a)). |
 | amount | Money | yes | On the wire this is three fields; in the database it is one column. |
 | amount.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
 | amount.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
@@ -4442,7 +4613,7 @@ A card payment returns `pendingConfirmation` when the terminal has been instruct
 |---|---|---|---|
 | id | string | yes | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
 | orderId | string | yes | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
-| tender | TenderKind: enum (cash, card, wallet, voucher, bankTransfer, hotelCharge, installment, giftCard, …) | yes |  |
+| tender | TenderKind: enum (cash, card, wallet, voucher, bankTransfer, hotelCharge, installment, giftCard, …) | yes | wallet is a digital wallet (Apple Pay, Google Pay and the like, taken through the gateway), the value the guest channels accept beside card (decided 28 September, audit R080 (a)). |
 | tenderCurrency | string |  | 4.6.11. (pattern ^[A-Z]{3}$) |
 | tenderAmount | object |  | The amount in tenderCurrency, at that currency's own scale. |
 | tenderAmount.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
@@ -4472,7 +4643,7 @@ A card payment returns `pendingConfirmation` when the terminal has been instruct
 |---|---|---|
 | 201 |  | Recorded |
 | 402 |  | Declined by the provider (providerDeclined). |
-| 409 |  | Tender unavailable offline (tenderUnavailableOffline), or amount exceeds the balance due (exceedsBalanceDue). |
+| 409 |  | Tender unavailable offline (tenderUnavailableOffline), amount exceeds the balance due (exceedsBalanceDue), or a guest channel sent a tender other than card or wallet (tenderNotAllowedOnChannel, audit… |
 
 ### inquirePaymentStatus
 
@@ -4480,6 +4651,7 @@ A card payment returns `pendingConfirmation` when the terminal has been instruct
 
 The recovery path (12 Aug §12). A terminal charged the card and the response never arrived — the guest has been charged and the order shows unpaid.
 This queries the provider directly and reconciles. A background reconciler runs the same operation for payments left unconfirmed past a threshold, so recovery does not depend on an operator noticing.
+**The reconciler threshold is the provider's own recommended status-poll interval** (Stripe and Network International each publish one), held per provider in the adapter configuration and never shorter than that interval. Proposed, client to correct (decided 28 September, audit R065).
 
 |  |  |
 |---|---|
@@ -4507,7 +4679,7 @@ This queries the provider directly and reconciles. A background reconciler runs 
 |---|---|---|---|
 | id | string | yes | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
 | orderId | string | yes | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
-| tender | TenderKind: enum (cash, card, wallet, voucher, bankTransfer, hotelCharge, installment, giftCard, …) | yes |  |
+| tender | TenderKind: enum (cash, card, wallet, voucher, bankTransfer, hotelCharge, installment, giftCard, …) | yes | wallet is a digital wallet (Apple Pay, Google Pay and the like, taken through the gateway), the value the guest channels accept beside card (decided 28 September, audit R080 (a)). |
 | tenderCurrency | string |  | 4.6.11. (pattern ^[A-Z]{3}$) |
 | tenderAmount | object |  | The amount in tenderCurrency, at that currency's own scale. |
 | tenderAmount.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
@@ -4588,7 +4760,7 @@ This queries the provider directly and reconciles. A background reconciler runs 
 | timeBands[].hoursBefore | integer | yes | (min 0) |
 | timeBands[].percentage | number | yes | (min 0; max 100) |
 | allowPartial | boolean |  | (default True) |
-| refundWindowDays | integer |  | (nullable) |
+| refundWindowDays | integer |  | Days after purchase within which a refund may be made. (min 0; nullable) |
 | varianceThreshold | object |  | Price variance above this is an exception requiring review rather than a routine posting (CF-38). |
 | varianceThreshold.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
 | varianceThreshold.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
@@ -4616,7 +4788,7 @@ This queries the provider directly and reconciles. A background reconciler runs 
 | timeBands[].hoursBefore | integer | yes | (min 0) |
 | timeBands[].percentage | number | yes | (min 0; max 100) |
 | allowPartial | boolean |  | (default True) |
-| refundWindowDays | integer |  | (nullable) |
+| refundWindowDays | integer |  | Days after purchase within which a refund may be made. (min 0; nullable) |
 | varianceThreshold | object |  | Price variance above this is an exception requiring review rather than a routine posting (CF-38). |
 | varianceThreshold.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
 | varianceThreshold.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
@@ -4627,6 +4799,7 @@ This queries the provider directly and reconciles. A background reconciler runs 
 | Code | Shape | Meaning |
 |---|---|---|
 | 200 |  | Set |
+| 422 |  | The thresholds do not ascend: selfAuthoriseLimit above requiresSecondUserAbove, or either above requiresApprovalAbove (refund-thresholds-not-ascending, audit R123 (6)). |
 
 
 ## Group: refund
@@ -4638,6 +4811,7 @@ This queries the provider directly and reconciles. A background reconciler runs 
 **Not offline-capable.** A refund touches the gateway and the ledger; both need the network.
 The venue's refund policy determines whether a second authoriser is required. Call `/venues/{venueId}/refund-policy` first, or submit without `secondaryAuthorisation` and handle the 409 that names the threshold.
 Sequencing is ledger-first: the ledger entry is written, then the gateway is called, then the outcome is reconciled. A gateway call that succeeds against an unwritten ledger entry is money that left with no record.
+**The ledger entry is a `refundIssued` posting** to the accounts `finance.setAccountMappings` holds for the venue, in the fiscal period open for the refund date (decided 28 September, audit R191).
 
 |  |  |
 |---|---|
@@ -4672,9 +4846,9 @@ Sequencing is ledger-first: the ledger entry is written, then the gateway is cal
 | reason | string | yes | (min length 3; max length 500) |
 | secondaryAuthorisation | object |  | Required above the venue's requiresSecondUserAbove. |
 | secondaryAuthorisation.principalId | string (uuid) | yes |  |
-| secondaryAuthorisation.credential | string | yes | (max length 512) |
+| secondaryAuthorisation.credential | string | yes | The second person's staff PIN, as they sign in at a till with it. (max length 512) |
 | refundToOriginalTender | boolean |  | (default True) |
-| alternateTender | TenderKind: enum (cash, card, wallet, voucher, bankTransfer, hotelCharge, installment, giftCard, …) |  |  |
+| alternateTender | TenderKind: enum (cash, card, wallet, voucher, bankTransfer, hotelCharge, installment, giftCard, …) |  | wallet is a digital wallet (Apple Pay, Google Pay and the like, taken through the gateway), the value the guest channels accept beside card (decided 28 September, audit R080 (a)). |
 | recordedAt | string (date-time) | yes |  |
 
 **Response**: `Refund`
@@ -4779,7 +4953,7 @@ An unknown order, or one outside the caller's scope, is the shared 404; an order
 | Read routing | replica |
 | Reads | `orders.refund` |
 | Writes | - |
-| Called by | ADM-609, BO-022, BO-023, BO-026, BO-047, BO-051, BO-070, EMP-014, EMP-034, POS-002, POS-006, PTR-002, PTR-005, PTR-008, PTR-015, PTR-016 |
+| Called by | ADM-609, BO-022, BO-023, BO-026, BO-047, EMP-014, EMP-034, POS-002, POS-006, PTR-002, PTR-005, PTR-008, PTR-015, PTR-016 |
 
 **Parameters**
 
@@ -4902,7 +5076,7 @@ A guest reads only a reservation held for them; another guest's is the shared 40
 | lines[].variantId | string (uuid) | yes |  |
 | lines[].performanceId | string (uuid) |  |  |
 | lines[].inventoryHoldId | string |  | Lease the units were drawn from — a catalogue.InventoryHold.id. (nullable) |
-| lines[].seatIds | array of string |  | Seated products only, as seating.Seat.id. |
+| lines[].seatIds | array of string |  | Seated products only, as seating.Seat.id. (max items 10) |
 | lines[].quantity | integer | yes | (min 1) |
 | lines[].eligibilityDeclaration | array of object |  | What was declared for each guest on this line, kept as the record staff check at the gate. (nullable) |
 | lines[].eligibilityDeclaration[].ageBand | enum (infant, child, junior, adult, senior) |  | Infant under 3, child 3–12, junior 13–17, adult 18–59, senior 60+. |
@@ -4969,7 +5143,7 @@ A guest reads only a reservation held for them; another guest's is the shared 40
 | items[].lines[].variantId | string (uuid) | yes |  |
 | items[].lines[].performanceId | string (uuid) |  |  |
 | items[].lines[].inventoryHoldId | string |  | Lease the units were drawn from — a catalogue.InventoryHold.id. (nullable) |
-| items[].lines[].seatIds | array of string |  | Seated products only, as seating.Seat.id. |
+| items[].lines[].seatIds | array of string |  | Seated products only, as seating.Seat.id. (max items 10) |
 | items[].lines[].quantity | integer | yes | (min 1) |
 | items[].lines[].eligibilityDeclaration | array of object |  | What was declared for each guest on this line, kept as the record staff check at the gate. (nullable) |
 | items[].lines[].quotedUnitPrice | object | yes | What the client charged, from its local bundle. |
@@ -4994,6 +5168,9 @@ A guest reads only a reservation held for them; another guest's is the shared 40
 
 **`POST /shifts/{shiftId}/accept-variance`**: Accept an over/short beyond the threshold
 
+**The single mechanism for a shift variance above the threshold** (decided 28 September, audit R080 (e)). A supervisor holding OVERSHORT_ACCEPT accepts it **on the till**, with a supervisor PIN step-up on the same device, after `closeShift` has left the shift in `pendingVariance`. The two other paths the package described are removed: no Duty Manager PIN holds the close before it is submitted, and no approval request (`approvals.createApprovalRequest`) is raised for a shift variance. BO-040 lists the shifts waiting here; it does not approve them by another route.
+Moves the shift to `closed` and each of its deposit boxes from `closed` to `reconciled` (`states/shift.yaml`, `states/deposit-box.yaml`).
+
 |  |  |
 |---|---|
 | Permission | `OVERSHORT_ACCEPT` |
@@ -5002,9 +5179,10 @@ A guest reads only a reservation held for them; another guest's is the shared 40
 | Wave | 1 |
 | Offline | no |
 | Conflict policy | append |
+| Step-up auth | pin |
 | Reads | `cache:idempotency`, `orders.pos_shift`, `orders.pos_shift_approval`, `orders.pos_shift_incident` |
 | Writes | `cache:idempotency`, `orders.pos_shift`, `platform.outbox` |
-| Called by | BO-039, BO-040, BO-041, BO-042, EMP-003, EMP-009, POS-001, POS-007, POS-009 |
+| Called by | BO-039, BO-040, EMP-003, EMP-009, POS-001, POS-007, POS-009 |
 | State model | Deposit box ([states/deposit-box.yaml](../../../states/deposit-box.yaml)): moves `closed` -> `reconciled`<br/>Shift ([states/shift.yaml](../../../states/shift.yaml)): moves `pendingVariance` -> `closed`<br/>Shift variance review ([states/variance-review.yaml](../../../states/variance-review.yaml)): moves `pendingReview` -> `reviewed` |
 
 **Parameters**
@@ -5095,6 +5273,7 @@ A guest reads only a reservation held for them; another guest's is the shared 40
 **`POST /deposit-boxes/{boxId}/adjust-float`**: Change the initial fund
 
 5.8.4. **Gated on a right the cashier does not have**, because a cashier who can raise their own opening float can cover a shortfall by declaring one.
+**`amount` is a change, not the new total** (decided 28 September, audit R123 (3)): positive raises the float, negative lowers it, and the new `openingFloat` is the old one plus `amount`. A change that would take the float below zero is refused with 422 `float-below-zero`.
 
 |  |  |
 |---|---|
@@ -5119,7 +5298,7 @@ A guest reads only a reservation held for them; another guest's is the shared 40
 
 | Field | Type | Required | Notes |
 |---|---|---|---|
-| amount | Money | yes | On the wire this is three fields; in the database it is one column. |
+| amount | object | yes | The change to the float, signed. |
 | amount.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
 | amount.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
 | amount.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
@@ -5188,12 +5367,14 @@ A guest reads only a reservation held for them; another guest's is the shared 40
 | 200 |  | Adjusted, and recorded against the person who authorised it |
 | 403 | Forbidden | Authenticated but not permitted at the requested scope |
 | 409 |  | The box is being counted or has been counted — closing, closed or reconciled (problem type deposit-box-not-open). |
+| 422 |  | The change would leave the float below zero (problem type float-below-zero, audit R123 (3)). |
 
 ### allocateDepositBox
 
 **`POST /deposit-boxes`**: Give a cashier a box and a float
 
 5.8.1 and 5.8.3. **The opening float may be a total or a denomination breakdown** — the 14 August MoM found POS-001 offered only denominations, and a supervisor handing over a counted bag should not have to re-count it into fields.
+**Either is accepted, and a denomination count takes precedence** (decided 28 September, audit R123 (9)). Where `openingDenominations` is sent, `openingFloat` is computed from it and any total sent alongside is ignored; where only `openingFloat` is sent, it is the float.
 
 |  |  |
 |---|---|
@@ -5348,7 +5529,7 @@ A float that does not match the venue's expected amount holds the shift in `pend
 | Conflict policy | serverWins |
 | Reads | `cache:idempotency`, `orders.pos_shift`, `orders.pos_shift_approval`, `orders.pos_shift_incident` |
 | Writes | `cache:idempotency`, `orders.pos_shift` |
-| Called by | BO-039, BO-040, BO-041, BO-042, EMP-003, EMP-009, POS-001, POS-007, POS-009 |
+| Called by | BO-039, BO-040, EMP-003, EMP-009, POS-001, POS-007, POS-009 |
 | State model | Shift ([states/shift.yaml](../../../states/shift.yaml)): moves `pendingApproval` -> `open` |
 
 **Parameters**
@@ -5439,6 +5620,7 @@ A float that does not match the venue's expected amount holds the shift in `pend
 
 5.8.6. **Automated close-out of one or more boxes.** A venue closing at 23:00 with forty tills does not close them one at a time, and a box whose holder has gone home still has to be reconciled.
 A box closed without its holder present is flagged rather than blocked — **the cash is counted by somebody, and who counted it is the record that matters.**
+**Counted figures are required, and a mismatch still closes** (decided 28 September, audit R123 (4)). Every box being closed needs an entry in `counts`, as a total or a denomination count (a denomination count takes precedence where both are sent). A box whose count differs from its expected figure closes with that difference recorded as its `variance`; it is not refused. A box still `allocated`, never traded, needs no count and closes at its opening float.
 
 |  |  |
 |---|---|
@@ -5449,7 +5631,7 @@ A box closed without its holder present is flagged rather than blocked — **the
 | Offline | no |
 | Conflict policy | serverWins |
 | Reads | `cache:idempotency`, `ledger.fx_rate`, `orders.cash_count_line`, `orders.deposit_box`, `orders.deposit_box_foreign_holding`, `orders.deposit_box_opening_denomination` |
-| Writes | `cache:idempotency`, `ledger.posting`, `orders.deposit_box` |
+| Writes | `cache:idempotency`, `ledger.posting`, `orders.cash_count_line`, `orders.deposit_box` |
 | Called by | BO-024, POS-007 |
 | State model | Deposit box ([states/deposit-box.yaml](../../../states/deposit-box.yaml)): moves `open` -> `closing`, `closing` -> `closed`, `allocated` -> `closed` |
 
@@ -5465,12 +5647,31 @@ A box closed without its holder present is flagged rather than blocked — **the
 |---|---|---|---|
 | boxIds | array of string (uuid) |  |  |
 | allOpenAtVenue | boolean |  |  |
+| counts | array of object | yes | One count per box being closed that has traded (audit R123 (4)). |
+| counts[].boxId | string (uuid) | yes |  |
+| counts[].countedTotal | Money |  | On the wire this is three fields; in the database it is one column. |
+| counts[].countedTotal.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
+| counts[].countedTotal.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
+| counts[].countedTotal.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| counts[].countedDenominations | array of CashCountLine |  | A count is a list of lines and the line is the row. (min items 1) |
+| counts[].countedDenominations[].id | string (uuid) |  |  |
+| counts[].countedDenominations[].shiftId | string | yes | A ULID, as Shift.id and orders.pos_shift.id are. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
+| counts[].countedDenominations[].depositBoxId | string (uuid) |  | (nullable) |
+| counts[].countedDenominations[].countKind | enum (openingFloat, close, movement) |  | Which count this line belongs to — the opening float (openShift), the close (closeShift) or a lift or add (createCashMovement). |
+| counts[].countedDenominations[].cashMovementId | string |  | The movement this line counts, where countKind is movement. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$; nullable) |
+| counts[].countedDenominations[].denominationId | string (uuid) | yes | References platform.denomination — face value, kind and sort order live there. |
+| counts[].countedDenominations[].countedQuantity | integer | yes | How many of this note or coin were in the drawer. (min 0) |
+| counts[].countedDenominations[].countedValue | Money |  | On the wire this is three fields; in the database it is one column. |
+| counts[].countedDenominations[].countedBy | string (uuid) |  | (nullable) |
+| counts[].countedDenominations[].countedAt | string (date-time) |  |  |
+| counts[].countedDenominations[].recountOf | string (uuid) |  | A recount points at what it replaces rather than overwriting it. (nullable) |
 
 **Responses**
 
 | Code | Shape | Meaning |
 |---|---|---|
 | 200 |  | Closed, with a variance per box |
+| 422 |  | A box being closed has no entry in counts, or its entry has neither a total nor a denomination count (problem type deposit-box-count-missing, audit R123 (4)). |
 
 ### closeShift
 
@@ -5478,6 +5679,8 @@ A box closed without its holder present is flagged rather than blocked — **the
 
 The operator submits a counted denomination breakdown. The expected figure is not returned before submission — that is what makes the count blind.
 The response carries the variance. Where it exceeds the configured threshold, the shift moves to `pendingVariance` and requires OVERSHORT_ACCEPT to finalise.
+**The threshold is the venue setting `shiftVarianceThreshold`, with a tenant default**, an absolute amount either way, over or short (decided 28 September, audit R094). **Proposed default, client to correct (audit R094): AED 20.00 per shift.**
+**`acceptShiftVariance` is the one way past that threshold** (decided 28 September, audit R080 (e)): a supervisor accepts the variance on the till. The close is not held for a PIN before this call, and no approval request is raised for it.
 Closing a shift opened by another principal requires SHIFT_CLOSE_OTHER.
 Where the venue requires approval on close, the shift waits in `pendingClosure` for `approveShiftClose` (SHIFT_APPROVE_CLOSE).
 **Online only** (F32, 26 September pull audit R257). Closing needs the server's total — a variance computed against a stale local journal is not a variance — and POS-007 and `states/shift.yaml` (`pendingClosure` is not offline-reachable) already said so.
@@ -5492,7 +5695,7 @@ Where the venue requires approval on close, the shift waits in `pendingClosure` 
 | Conflict policy | append |
 | Reads | `cache:idempotency`, `ledger.fx_rate`, `orders.cash_count_line`, `orders.cash_movement`, `orders.payment`, `orders.pos_shift`, `orders.pos_shift_approval`, `orders.pos_shift_incident`, `platform.venue_settings` |
 | Writes | `cache:idempotency`, `ledger.journal_entry`, `orders.cash_count_line`, `orders.pos_shift` |
-| Called by | BO-039, BO-040, BO-041, BO-042, EMP-003, EMP-009, POS-001, POS-007, POS-009 |
+| Called by | BO-039, BO-040, EMP-003, EMP-009, POS-001, POS-007, POS-009 |
 | State model | Shift ([states/shift.yaml](../../../states/shift.yaml)): moves `open` -> `pendingClosure` |
 
 **Parameters**
@@ -5605,7 +5808,7 @@ Where the venue requires approval on close, the shift waits in `pendingClosure` 
 | variance.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
 | variance.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
 | variance.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
-| requiresAcceptance | boolean | yes | True when the variance exceeds the configured threshold. |
+| requiresAcceptance | boolean | yes | True when the variance exceeds the venue's shiftVarianceThreshold (audit R094). |
 | nonCashVariances | array of object |  |  |
 | nonCashVariances[].tender | string | yes |  |
 | nonCashVariances[].declared | Money | yes | On the wire this is three fields; in the database it is one column. |
@@ -5645,7 +5848,7 @@ Where the venue requires approval on close, the shift waits in `pendingClosure` 
 | Read routing | primary |
 | Reads | `orders.pos_shift`, `orders.pos_shift_approval`, `orders.pos_shift_incident` |
 | Writes | - |
-| Called by | BO-039, BO-040, BO-041, BO-042, EMP-003, EMP-008, EMP-009, EMP-022, POS-001, POS-007, POS-009, POS-012, POS-025, SCN-001 |
+| Called by | BO-039, BO-040, EMP-003, EMP-008, EMP-009, EMP-022, POS-001, POS-007, POS-009, POS-012, POS-025, SCN-001 |
 
 **Response**: `Shift`
 
@@ -5860,7 +6063,7 @@ That separation is what makes a variance attributable to a person rather than to
 | Read routing | primary |
 | Reads | `identity.principal`, `orders.deposit_box`, `orders.deposit_box_foreign_holding`, `orders.deposit_box_opening_denomination` |
 | Writes | - |
-| Called by | POS-015 |
+| Called by | BO-042, POS-015 |
 
 **Parameters**
 
@@ -6040,7 +6243,7 @@ Fails if another shift is already open on this workstation. Where the venue is c
 | Conflict policy | append |
 | Reads | `cache:idempotency`, `identity.principal`, `orders.cash_count_line`, `orders.pos_shift`, `orders.pos_shift_approval`, `orders.pos_shift_incident`, `platform.venue_settings`, `platform.workstation` |
 | Writes | `cache:idempotency`, `orders.cash_count_line`, `orders.pos_shift` |
-| Called by | BO-039, BO-040, BO-041, BO-042, EMP-003, EMP-009, POS-001, POS-007, POS-009, POS-012 |
+| Called by | BO-039, BO-040, EMP-003, EMP-009, POS-001, POS-007, POS-009, POS-012 |
 | State model | Deposit box ([states/deposit-box.yaml](../../../states/deposit-box.yaml)): moves `allocated` -> `open`<br/>Shift ([states/shift.yaml](../../../states/shift.yaml)): created as `pendingApproval` or `open` |
 
 **Parameters**
@@ -6146,7 +6349,7 @@ Fails if another shift is already open on this workstation. Where the venue is c
 
 ### recordNoSale
 
-**`POST /shifts/{shiftId}/no-sale`**: Open the drawer without a sale
+**`POST /shifts/{shiftId}/no-sale`**: Open the Deposit Box without a sale
 
 Change for a guest, a dropped coin, correcting a float. Legitimate and routine.
 **Recorded because it is the classic cover for theft.** A drawer that opens forty times in a shift with four sales is a conversation, and it is only a conversation if someone can see the count. A reason is required for the same reason it is required on a manual discount — attributable, not forbidden.
@@ -6161,7 +6364,7 @@ Change for a guest, a dropped coin, correcting a float. Legitimate and routine.
 | Conflict policy | append |
 | Reads | `cache:idempotency`, `orders.no_sale_event` |
 | Writes | `cache:idempotency`, `orders.no_sale_event` |
-| Called by | BO-039, BO-040, BO-041, BO-042, EMP-003, EMP-009, POS-001, POS-007, POS-009, POS-014, POS-020 |
+| Called by | BO-039, BO-040, BO-041, EMP-003, EMP-009, POS-001, POS-007, POS-009, POS-014, POS-020 |
 
 **Parameters**
 
@@ -6205,6 +6408,7 @@ Change for a guest, a dropped coin, correcting a float. Legitimate and routine.
 
 A cashier who closed the wrong till, or a count submitted before the drawer was finished.
 **A reversal, and treated as one.** Requires an approver who is not the person who closed it, and the original close is retained — reopening does not erase the first count, because the difference between the two counts is the thing worth looking at.
+**The approver is a supervisor giving a step-up on the same device** (decided 28 September, audit R144): `supervisorStepUp` carries the supervisor's principal and PIN, entered on the till or browser making this call. The rule is `SupervisorStepUp` in `common.yaml`: the PIN is verified against the principal, who must hold `SHIFT_REOPEN` at this venue and must not be the principal who closed the shift; otherwise a `403` and nothing is written. It does not go through the approvals engine.
 
 |  |  |
 |---|---|
@@ -6214,9 +6418,10 @@ A cashier who closed the wrong till, or a count submitted before the drawer was 
 | Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
+| Step-up auth | pin |
 | Reads | `cache:idempotency`, `orders.pos_shift`, `orders.pos_shift_approval`, `orders.pos_shift_incident` |
 | Writes | `cache:idempotency`, `orders.pos_shift` |
-| Called by | BO-039, BO-040, BO-041, BO-042, EMP-003, EMP-009, POS-001, POS-007, POS-009 |
+| Called by | BO-039, BO-040, EMP-003, EMP-009, POS-001, POS-007, POS-009 |
 | State model | Shift ([states/shift.yaml](../../../states/shift.yaml)): moves `closed` -> `open` |
 
 **Parameters**
@@ -6231,7 +6436,9 @@ A cashier who closed the wrong till, or a count submitted before the drawer was 
 | Field | Type | Required | Notes |
 |---|---|---|---|
 | reason | string | yes | (min length 3; max length 500) |
-| approverPrincipalId | string (uuid) | yes | May not be the principal who closed it. |
+| supervisorStepUp | object | yes | The supervisor signing the reopen on this device (audit R144). |
+| supervisorStepUp.principalId | string (uuid) | yes | The supervisor signing. |
+| supervisorStepUp.credential | string | yes | The supervisor's staff PIN, as they sign in at a till with it. (max length 512) |
 
 **Response**: `Shift`
 
@@ -6300,7 +6507,7 @@ A cashier who closed the wrong till, or a count submitted before the drawer was 
 | Code | Shape | Meaning |
 |---|---|---|
 | 200 |  | Reopened |
-| 403 |  | Approver is the closing principal (problem type approver-is-closer) |
+| 403 |  | The supervisor is the closing principal (problem type approver-is-closer), or the step-up failed: the PIN did not verify, or the principal does not hold SHIFT_REOPEN at this venue (supervisor-step-up… |
 | 409 |  | Shift is not closed (problem type shift-not-closed), or the fiscal period has closed over it (fiscal-period-closed) |
 
 ### resumeShift
@@ -6319,7 +6526,7 @@ A cashier who closed the wrong till, or a count submitted before the drawer was 
 | Conflict policy | append |
 | Reads | `cache:idempotency`, `orders.pos_shift`, `orders.pos_shift_approval`, `orders.pos_shift_incident` |
 | Writes | `cache:idempotency`, `orders.pos_shift` |
-| Called by | BO-039, BO-040, BO-041, BO-042, EMP-003, EMP-009, POS-001, POS-007, POS-009 |
+| Called by | BO-039, BO-040, EMP-003, EMP-009, POS-001, POS-007, POS-009 |
 | State model | Deposit box ([states/deposit-box.yaml](../../../states/deposit-box.yaml)): moves `suspended` -> `open`<br/>Shift ([states/shift.yaml](../../../states/shift.yaml)): moves `suspended` -> `open` |
 
 **Parameters**
@@ -6476,7 +6683,7 @@ The break mechanism. The float and the shift stay intact; the workstation become
 | Conflict policy | append |
 | Reads | `cache:idempotency`, `orders.pos_shift`, `orders.pos_shift_approval`, `orders.pos_shift_incident` |
 | Writes | `cache:idempotency`, `orders.pos_shift` |
-| Called by | BO-039, BO-040, BO-041, BO-042, EMP-003, EMP-008, EMP-009, POS-001, POS-007, POS-009 |
+| Called by | BO-039, BO-040, EMP-003, EMP-008, EMP-009, POS-001, POS-007, POS-009 |
 | State model | Deposit box ([states/deposit-box.yaml](../../../states/deposit-box.yaml)): moves `open` -> `suspended`<br/>Shift ([states/shift.yaml](../../../states/shift.yaml)): moves `open` -> `suspended` |
 
 **Parameters**
@@ -6582,7 +6789,7 @@ Two people sign: the supervisor taking it and the cashier it came from.
 | Conflict policy | append |
 | Reads | `cache:idempotency`, `orders.deposit_box`, `orders.deposit_box_foreign_holding`, `orders.deposit_box_opening_denomination` |
 | Writes | `cache:idempotency`, `orders.cash_movement`, `orders.deposit_box` |
-| Called by | POS-013, POS-018 |
+| Called by | BO-042, POS-013, POS-018 |
 | State model | Deposit box ([states/deposit-box.yaml](../../../states/deposit-box.yaml)): created as `allocated` |
 
 **Parameters**
@@ -6717,7 +6924,7 @@ Every line is re-priced on ingest. Variances are returned per order and posted t
 | orders[].lines[].variantId | string (uuid) | yes |  |
 | orders[].lines[].performanceId | string (uuid) |  |  |
 | orders[].lines[].inventoryHoldId | string |  | Lease the units were drawn from — a catalogue.InventoryHold.id. (nullable) |
-| orders[].lines[].seatIds | array of string |  | Seated products only, as seating.Seat.id. |
+| orders[].lines[].seatIds | array of string |  | Seated products only, as seating.Seat.id. (max items 10) |
 | orders[].lines[].quantity | integer | yes | (min 1) |
 | orders[].lines[].eligibilityDeclaration | array of object |  | What was declared for each guest on this line, kept as the record staff check at the gate. (nullable) |
 | orders[].lines[].quotedUnitPrice | object | yes | What the client charged, from its local bundle. |
@@ -6728,7 +6935,7 @@ Every line is re-priced on ingest. Variances are returned per order and posted t
 | orders[].payments | array of CreatePaymentRequest | yes |  |
 | orders[].payments[].id | string | yes | Client-generated ULID of the payment, and its idempotency key — it must equal the Idempotency-Key header. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
 | orders[].payments[].orderId | string | yes | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
-| orders[].payments[].tender | TenderKind: enum (cash, card, wallet, voucher, bankTransfer, hotelCharge, installment, giftCard, …) | yes |  |
+| orders[].payments[].tender | TenderKind: enum (cash, card, wallet, voucher, bankTransfer, hotelCharge, installment, giftCard, …) | yes | wallet is a digital wallet (Apple Pay, Google Pay and the like, taken through the gateway), the value the guest channels accept beside card (decided 28 September, audit R080 (a)). |
 | orders[].payments[].amount | Money | yes | On the wire this is three fields; in the database it is one column. |
 | orders[].payments[].tenderCurrency | string |  | The currency the guest handed over, where it is not the venue's — becomes Payment.tenderCurrency. (pattern ^[A-Z]{3}$; nullable) |
 | orders[].payments[].tenderAmount | object |  | What the guest handed over, in tenderCurrency — becomes Payment.tenderAmount, one name for one concept (renamed from tenderedAmount on 26 September). |
@@ -6786,6 +6993,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 | tax_total | numeric(18,4) | no |  |
 | gross_amount | numeric(18,4) | no |  |
 | applied_promotion_ids | text[] | no | Re-evaluated on every read. |
+| coupon_codes | text[] | no | The promo codes the guest entered through applyCartPromoCode (decided 28 September, audit R073 (e)). |
 | expires_at | timestamptz | no | The earliest lease expiry in the cart, or the cart's own window where it holds none. |
 | extensions_used | integer | no |  |
 | max_extensions | integer | no |  |
@@ -6932,6 +7140,9 @@ Every table this service owns that the slice reads or writes, with its columns a
 
 | Column | Type | Required | Notes |
 |---|---|---|---|
+| promotion_id | uuid | yes |  |
+| name | text | no |  |
+| reason | text | no |  |
 | sales_order_id | text | yes | The parent row. |
 | id | text | yes | Client-generated ULID of the line. |
 | variant_id | uuid | yes |  |
@@ -7087,7 +7298,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 | requires_second_user_above | numeric(18,4) | no | Above this, a second user — cashier OR supervisor — names themselves as audit control. |
 | requires_approval_above | numeric(18,4) | yes | Above this, an ORDER_REFUND_APPROVE holder must approve. |
 | allow_partial | boolean | no |  |
-| refund_window_days | integer | no |  |
+| refund_window_days | integer | no | Days after purchase within which a refund may be made. |
 | variance_threshold | numeric(18,4) | no | Price variance above this is an exception requiring review rather than a routine posting (CF-38). |
 
 ### `orders.refund_policy_time_band`
@@ -7148,7 +7359,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 | Column | Type | Required | Notes |
 |---|---|---|---|
 | id | text | yes | The client ULID from CreateOrderRequest.id. |
-| order_number | text | no |  |
+| order_number | text | no | The number a guest reads and a cashier types. |
 | channel | text | yes | Where it came from. |
 | venue_id | uuid | yes |  |
 | scope_path | text | yes |  |

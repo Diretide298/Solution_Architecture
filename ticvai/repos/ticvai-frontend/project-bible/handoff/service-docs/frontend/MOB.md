@@ -32,13 +32,13 @@
 | [GST-006](#gst-006-event-exhibition-details) | Event / Exhibition Details | Discovery & Browse | 1 | 2 |
 | [GST-007](#gst-007-select-date-time) | Select Date & Time | Booking & Selection | 1 | 3 |
 | [GST-008](#gst-008-tickets-add-ons) | Tickets & Add-ons | Booking & Selection | 1 | 1 |
-| [GST-009](#gst-009-review-payment) | Review & Payment | Cart & Checkout | 1 | 11 |
+| [GST-009](#gst-009-review-payment) | Review & Payment | Cart & Checkout | 1 | 9 |
 | [GST-010](#gst-010-booking-confirmation) | Booking Confirmation | Cart & Checkout | 1 | 3 |
 | [GST-012](#gst-012-my-tickets) | My Tickets | Account & Self-Service | 1 | 6 |
 | [GST-013](#gst-013-ticket-details) | Ticket Details | Account & Self-Service | 1 | 4 |
 | [GST-039](#gst-039-profile) | Profile | Account & Self-Service | 1 | 2 |
-| [GST-041](#gst-041-checkout-entry) | Checkout Entry | Cart & Checkout | 1 | 8 |
-| [GST-042](#gst-042-simple-registration-otp) | Simple Registration & OTP | Account & Self-Service | 1 | 18 |
+| [GST-041](#gst-041-checkout-entry) | Checkout Entry | Cart & Checkout | 1 | 9 |
+| [GST-042](#gst-042-simple-registration-otp) | Simple Registration & OTP | Account & Self-Service | 1 | 10 |
 | [GST-043](#gst-043-arabic-rtl-experience) | Arabic / RTL Experience | System States | 1 | 0 |
 | [GST-046](#gst-046-branded-queue-waiting-room) | Branded Queue / Waiting Room | High-Demand Access | 1 | 3 |
 | [GST-047](#gst-047-maintenance-upgrade-page) | Maintenance / Upgrade Page | System States | 1 | 1 |
@@ -54,9 +54,8 @@
 | [GST-022](#gst-022-attraction-wait-times) | Attraction Wait Times | In-venue Services | 2 | 1 |
 | [GST-024](#gst-024-f-b-browse-order) | F&B – Browse & Order | In-venue Services | 2 | 10 |
 | [GST-025](#gst-025-f-b-order-tracking) | F&B – Order Tracking | In-venue Services | 2 | 3 |
-| [GST-026](#gst-026-retail-merchandise) | Retail / Merchandise | Retail | 2 | 4 |
-| [GST-029](#gst-029-venue-info-services) | Venue Info & Services | In-venue Services | 2 | 2 |
-| [GST-030](#gst-030-in-venue-notifications) | In-Venue Notifications | Engagement & Support | 2 | 1 |
+| [GST-026](#gst-026-retail-merchandise) | Retail / Merchandise | Retail | 2 | 7 |
+| [GST-029](#gst-029-venue-info-services) | Venue Info & Services | In-venue Services | 2 | 3 |
 | [GST-031](#gst-031-ai-concierge-home) | AI Concierge – Home | Engagement & Support | 2 | 5 |
 | [GST-032](#gst-032-ai-concierge-chat) | AI Concierge – Chat | Engagement & Support | 2 | 8 |
 | [GST-033](#gst-033-ai-concierge-contextual-help) | AI Concierge – Contextual Help | Engagement & Support | 2 | 1 |
@@ -74,25 +73,20 @@
 | [GST-066](#gst-066-privacy-my-data) | Privacy & My Data | Account & Self-Service | 2 | 5 |
 | [GST-067](#gst-067-refunds-resale) | Refunds & Resale | Account & Self-Service | 2 | 3 |
 | [GST-068](#gst-068-help-my-cases) | Help & My Cases | Engagement & Support | 2 | 3 |
-| [GST-069](#gst-069-face-pass) | Face Pass | Account & Self-Service | 2 | 3 |
-| [GST-070](#gst-070-reserve-a-table-or-cabana) | Reserve a Table or Cabana | In-venue Services | 2 | 6 |
+| [GST-069](#gst-069-face-pass) | Face Pass | Account & Self-Service | 2 | 4 |
+| [GST-070](#gst-070-reserve-a-table) | Reserve a Table | In-venue Services | 2 | 6 |
 | [GST-071](#gst-071-payment-methods) | Payment Methods | Account & Self-Service | 2 | 5 |
 | [GST-072](#gst-072-share-group-booking) | Share & Group Booking | Booking & Selection | 2 | 8 |
-| [GST-073](#gst-073-security-sign-in) | Security & Sign-in | Account & Self-Service | 2 | 5 |
+| [GST-073](#gst-073-security-sign-in) | Security & Sign-in | Account & Self-Service | 2 | 6 |
 | [GST-018](#gst-018-add-to-calendar-reminders) | Add to Calendar / Reminders | Account & Self-Service | 3 | 6 |
 | [GST-020](#gst-020-saved-items-wishlist) | Saved Items / Wishlist | Account & Self-Service | 3 | 3 |
 | [GST-023](#gst-023-virtual-queue) | Virtual Queue | In-venue Services | 3 | 5 |
-| [GST-027](#gst-027-parking-reserve-pay) | Parking – Reserve & Pay | In-venue Services | 3 | 3 |
+| [GST-027](#gst-027-parking-reserve-pay) | Parking – Reserve & Pay | In-venue Services | 3 | 5 |
 | [GST-028](#gst-028-parking-reservation-confirmed) | Parking – Reservation Confirmed | In-venue Services | 3 | 2 |
 | [GST-035](#gst-035-feedback-ratings) | Feedback & Ratings | Engagement & Support | 3 | 2 |
 | [GST-038](#gst-038-digital-companion-mode) | Digital Companion Mode | In-venue Services | 3 | 3 |
 | [GST-050](#gst-050-resource-booking-cabana) | Resource Booking – Cabana | Booking & Selection | 3 | 3 |
-| [GST-051](#gst-051-plan-your-adventure-start) | Plan Your Adventure – Start | Engagement & Support | 3 | 2 |
-| [GST-052](#gst-052-suggested-itineraries) | Suggested Itineraries | Engagement & Support | 3 | 3 |
-| [GST-053](#gst-053-build-your-own-itinerary) | Build Your Own Itinerary | Engagement & Support | 3 | 4 |
-| [GST-054](#gst-054-ai-optimized-itinerary) | AI Optimized Itinerary | Engagement & Support | 3 | 4 |
 | [GST-058](#gst-058-resource-availability-cabana) | Resource Availability (Cabana) | Booking & Selection | 3 | 2 |
-| [GST-059](#gst-059-plan-my-day-in-progress) | Plan My Day – In Progress | Engagement & Support | 3 | 3 |
 | [GST-062](#gst-062-shop-drop-collection) | Shop & Drop Collection | In-Venue Experience | 3 | 1 |
 | [GST-065](#gst-065-newsletter-preferences) | Newsletter & Preferences | Marketing | 3 | 4 |
 
@@ -121,7 +115,7 @@
 |---|---|---|---|---|
 | `getTenantAppStatus` | [WhiteLabelService](../backend/WhiteLabelService.md#gettenantappstatus) | onLoad | App status and recent changes | `None` |
 | `getGuestProfile` | [MarketingService](../backend/MarketingService.md#getguestprofile) | onLoad | Read a guest profile | `GUEST_VIEW` |
-| `listMyEntitlements` | [AccessService](../backend/AccessService.md#listmyentitlements) | onLoad | Every ticket, pass and membership this guest holds | `ORDER_VIEW` |
+| `listMyEntitlements` | [AccessService](../backend/AccessService.md#listmyentitlements) | onLoad | Every ticket, pass and membership this guest holds; on a visit day, the ticket's venue is suggested (decided 28 September, audit R267) | `ORDER_VIEW` |
 | `searchCatalogue` | [CatalogueService](../backend/CatalogueService.md#searchcatalogue) | onAction | Find something by name | `None` |
 | `getTenantConfig` | [WhiteLabelService](../backend/WhiteLabelService.md#gettenantconfig) | onLoad | Branding, currency and what this venue enables | `TENANT_CONFIGURE` |
 
@@ -177,17 +171,17 @@
 | GST-045 | Ticket Delivery & Sharing | orderId |  |
 | GST-046 | Branded Queue / Waiting Room |  |  |
 | GST-049 | Interactive Seat Selection |  |  |
-| GST-052 | Suggested Itineraries |  |  |
-| GST-054 | AI Optimized Itinerary |  |  |
+| GST-052 | Suggested Itineraries |  | a later release: the itinerary planner is deferred and this tile or link is not shown in the first release (decided 28 September, audit R187) |
+| GST-054 | AI Optimized Itinerary |  | a later release: the itinerary planner is deferred and this tile or link is not shown in the first release (decided 28 September, audit R187) |
 | GST-055 | Dynamic QR Ticket | entitlementId, orderId |  |
 | GST-056 | Bundle Package |  |  |
-| GST-059 | Plan My Day – In Progress |  |  |
+| GST-059 | Plan My Day – In Progress |  | a later release: the itinerary planner is deferred and this tile or link is not shown in the first release (decided 28 September, audit R187) |
 | GST-061 | Menu Item Detail |  |  |
-| GST-070 | Reserve a Table or Cabana |  |  |
+| GST-070 | Reserve a Table |  |  |
 | GST-022 | Attraction Wait Times |  |  |
-| GST-028 | Parking – Reservation Confirmed |  |  |
+| GST-028 | Parking – Reservation Confirmed | orderId |  |
 | GST-029 | Venue Info & Services |  |  |
-| GST-030 | In-Venue Notifications |  |  |
+| GST-030 | In-Venue Notifications |  | a later release: the in-venue notification feed is deferred and not shown in the first release; queue calls and order updates show on the queue and order screens, which poll (decided 28 September, audit R242) |
 | GST-035 | Feedback & Ratings |  |  |
 | GST-036 | Loyalty & Rewards |  |  |
 | GST-038 | Digital Companion Mode |  |  |
@@ -196,8 +190,8 @@
 | GST-047 | Maintenance / Upgrade Page |  |  |
 | GST-048 | Upsell / Cross-Sell |  |  |
 | GST-050 | Resource Booking – Cabana |  |  |
-| GST-051 | Plan Your Adventure – Start |  |  |
-| GST-053 | Build Your Own Itinerary |  |  |
+| GST-051 | Plan Your Adventure – Start |  | a later release: the itinerary planner is deferred and this tile or link is not shown in the first release (decided 28 September, audit R187) |
+| GST-053 | Build Your Own Itinerary |  | a later release: the itinerary planner is deferred and this tile or link is not shown in the first release (decided 28 September, audit R187) |
 | GST-057 | Accessibility Information |  |  |
 | GST-058 | Resource Availability (Cabana) |  |  |
 | GST-062 | Shop & Drop Collection |  |  |
@@ -509,7 +503,6 @@
 | To | Trigger | Carries | Guard |
 |---|---|---|---|
 | GST-001 | Home – Default |  |  |
-| GST-003 | Event & Attraction Listing |  |  |
 | GST-072 | Share & Group Booking |  |  |
 
 ## GST-009 Review & Payment
@@ -538,8 +531,6 @@
 
 | Operation | Service | When | Purpose | Permission |
 |---|---|---|---|---|
-| `checkGuestCheckoutMatch` | [MarketingService](../backend/MarketingService.md#checkguestcheckoutmatch) | onAction | Does this contact already have a profile here | `None` |
-| `decideGuestCheckoutMatch` | [MarketingService](../backend/MarketingService.md#decideguestcheckoutmatch) | onAction | Use the existing profile or keep separate | `None` |
 | `transferOrderTickets` | [OrderService](../backend/OrderService.md#transferordertickets) | onAction | Transfer tickets to another guest | `None` |
 | `createPayment` | [OrderService](../backend/OrderService.md#createpayment) | onAction | Take a payment against an order | `ORDER_CREATE` |
 | `inquirePaymentStatus` | [OrderService](../backend/OrderService.md#inquirepaymentstatus) | onAction | Ask the provider what actually happened | `ORDER_CREATE` |
@@ -565,7 +556,6 @@
 | To | Trigger | Carries | Guard |
 |---|---|---|---|
 | GST-001 | Home – Default |  |  |
-| GST-003 | Event & Attraction Listing |  |  |
 | BO-020 | Kitchen accepts and prepares | orderId |  |
 
 ## GST-010 Booking Confirmation
@@ -610,7 +600,6 @@
 | To | Trigger | Carries | Guard |
 |---|---|---|---|
 | GST-001 | Home – Default |  |  |
-| GST-003 | Event & Attraction Listing |  |  |
 
 ## GST-012 My Tickets
 
@@ -652,14 +641,13 @@
 | emptyFirstRun | No tickets yet. Offers no create action — this screen declares no operation that makes one — and says so rather than showing an empty table. |
 | emptyNoResults | Nothing matches the filter on state, includeShared and the tickets are still there. Names the active filter and offers to clear it. |
 | emptyNoAccess | Shown when the caller lacks `ORDER_VIEW`, which `listMyEntitlements` requires, and names that permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
-| offline | The offline banner shows. Tickets already loaded stay visible with their age. Sharing, transferring and adding to a phone wallet need the connection. |
+| offline | The offline banner shows. Tickets already loaded stay visible with their age, and a ticket's rotating code is derived on the device from its seed, so it changes with no signal (decided 28 September, audit R230). Sharing, transferring and adding to a phone wallet need the connection. |
 
 **Goes to**
 
 | To | Trigger | Carries | Guard |
 |---|---|---|---|
 | GST-001 | Home – Default |  |  |
-| GST-003 | Event & Attraction Listing |  |  |
 | GST-013 | They open the one for now | entitlementId, orderId |  |
 
 ## GST-013 Ticket Details
@@ -687,7 +675,7 @@
 | Operation | Service | When | Purpose | Permission |
 |---|---|---|---|---|
 | `getEntitlement` | [AccessService](../backend/AccessService.md#getentitlement) | onLoad | One entitlement, with what remains on it | `ORDER_VIEW` |
-| `getEntitlementCredential` | [AccessService](../backend/AccessService.md#getentitlementcredential) | onLoad | The thing that gets scanned | `ORDER_VIEW` |
+| `getEntitlementCredential` | [AccessService](../backend/AccessService.md#getentitlementcredential) | onLoad | The thing that gets scanned — with the `rotation` seed the device derives the rotating code from (audit R230) | `ORDER_VIEW` |
 | `getEntitlementHistory` | [AccessService](../backend/AccessService.md#getentitlementhistory) | onLoad | Every scan, freeze, share and reissue against it | `ORDER_VIEW` |
 | `transferOrderTickets` | [OrderService](../backend/OrderService.md#transferordertickets) | onAction | Transfer tickets to another guest | `None` |
 
@@ -699,14 +687,13 @@
 | error | Availability unavailable. Selection is blocked — overselling is worse than waiting |
 | emptyFirstRun | Sold out is a real answer. Offers the next available rather than a dead end |
 | emptyNoAccess | Shown when the caller lacks `ORDER_VIEW`, which `getEntitlement` requires, and names that permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
-| offline | The offline banner shows. Tickets already loaded stay visible with their age. Sharing, transferring and adding to a phone wallet need the connection. |
+| offline | The offline banner shows. Tickets already loaded stay visible with their age, and a ticket's rotating code is derived on the device from its seed, so it changes with no signal (decided 28 September, audit R230). Sharing, transferring and adding to a phone wallet need the connection. |
 
 **Goes to**
 
 | To | Trigger | Carries | Guard |
 |---|---|---|---|
 | GST-001 | Home – Default |  |  |
-| GST-003 | Event & Attraction Listing |  |  |
 | GST-055 | The QR rotates as they walk to the gate | entitlementId, orderId |  |
 
 ## GST-039 Profile
@@ -751,7 +738,6 @@
 |---|---|---|---|
 | GST-065 | And their marketing preferences |  |  |
 | GST-001 | Home – Default |  |  |
-| GST-003 | Event & Attraction Listing |  |  |
 | GST-069 | Face Pass |  |  |
 | GST-071 | Payment Methods |  |  |
 
@@ -780,6 +766,7 @@
 
 | Operation | Service | When | Purpose | Permission |
 |---|---|---|---|---|
+| `applyCartPromoCode` | [OrderService](../backend/OrderService.md#applycartpromocode) | onAction | Apply a promo code to the cart; refused 422 promoCodeInvalid or promoCodeNotApplicable, shown as different messages (decided 28 September, audit R073 (e)) | `None` |
 | `getCart` | [OrderService](../backend/OrderService.md#getcart) | onLoad | The cart, priced and checked, right now | `None` |
 | `checkoutCart` | [OrderService](../backend/OrderService.md#checkoutcart) | onAction | Turn the cart into an order | `None` |
 | `abandonCart` | [OrderService](../backend/OrderService.md#abandoncart) | onAction | Give the inventory back | `None` |
@@ -806,11 +793,10 @@
 |---|---|---|---|
 | GST-042 | Signs in, or proves the contact the tickets go to | cartId | no verified guest session. This screen is the checkout page, so the fork sits here rather than in front of the cart (matrix 2.6.1 §2.4) |
 | GST-001 | Home – Default |  |  |
-| GST-003 | Event & Attraction Listing |  |  |
 
 ## GST-042 Simple Registration & OTP
 
-**Work with simple registration & otp for this venue.**
+**Get a guest into the app, fast, on a device that may be shared: a one-time code to the email or mobile, a password, Apple or Google, or UAE Pass, or register a new account. **No enterprise SSO and no second factor at sign-in for guests** (decided 28 September, audit R167).**
 
 |  |  |
 |---|---|
@@ -819,47 +805,38 @@
 | Licensed module | core |
 | Route | `/general/simple-registration-and-otp` |
 | Component | `apps/guest-app/src/routes/general/SimpleRegistrationAndOtpDetail.tsx` |
-| Pattern | listDetail |
+| Pattern | form |
 
 **Entry parameters**
 
 | Parameter | From |
 |---|---|
-| challengeId | deepLink |
-| methodId | deepLink |
-| providerId | deepLink |
+| cartId | session |
 
 **Operations**
 
 | Operation | Service | When | Purpose | Permission |
 |---|---|---|---|---|
-| `requestGuestOtp` | [IdentityService](../backend/IdentityService.md#requestguestotp) | onAction | from page inventory | `None` |
-| `completeSsoAuthorization` | [IdentityService](../backend/IdentityService.md#completessoauthorization) | onAction | Exchange an SSO code for a session | `None` |
-| `enrolMfaMethod` | [IdentityService](../backend/IdentityService.md#enrolmfamethod) | onAction | Enrol an MFA method | `None` |
+| `registerGuest` | [IdentityService](../backend/IdentityService.md#registerguest) | onAction | Create a guest account | `None` |
 | `getGuestSession` | [IdentityService](../backend/IdentityService.md#getguestsession) | onLoad | Read the current guest session | `None` |
 | `guestLogout` | [IdentityService](../backend/IdentityService.md#guestlogout) | onAction | End a guest session | `None` |
+| `guestPasswordLogin` | [IdentityService](../backend/IdentityService.md#guestpasswordlogin) | onAction | Sign in with the email or mobile and the password set at registration (identifier, password, deviceId -> GuestSession); one indistinguishable 401, lockout, 429 (decided 28 September, audit R073 (a)) | `None` |
 | `guestSocialLogin` | [IdentityService](../backend/IdentityService.md#guestsociallogin) | onAction | Sign in with Apple or Google | `None` |
 | `guestUaePassLogin` | [IdentityService](../backend/IdentityService.md#guestuaepasslogin) | onAction | Sign in with a national identity provider | `None` |
 | `linkGuestCheckout` | [IdentityService](../backend/IdentityService.md#linkguestcheckout) | onAction | Attach a guest checkout to an account | `None` |
-| `listMfaMethods` | [IdentityService](../backend/IdentityService.md#listmfamethods) | onLoad | Enrolled MFA methods | `None` |
-| `listSsoProviders` | [IdentityService](../backend/IdentityService.md#listssoproviders) | onLoad | Identity providers configured for this tenant | `None` |
-| `login` | [IdentityService](../backend/IdentityService.md#login) | onAction | Authenticate and open a session | `None` |
 | `refreshToken` | [IdentityService](../backend/IdentityService.md#refreshtoken) | onAction | Rotate the access token | `None` |
-| `registerGuest` | [IdentityService](../backend/IdentityService.md#registerguest) | onAction | Create a guest account | `None` |
-| `removeMfaMethod` | [IdentityService](../backend/IdentityService.md#removemfamethod) | onAction | Remove an MFA method | `None` |
-| `startSsoAuthorization` | [IdentityService](../backend/IdentityService.md#startssoauthorization) | onAction | Begin an SSO flow | `None` |
+| `requestGuestOtp` | [IdentityService](../backend/IdentityService.md#requestguestotp) | onAction | Request a one-time code | `None` |
 | `verifyGuestOtp` | [IdentityService](../backend/IdentityService.md#verifyguestotp) | onAction | Verify a one-time code and issue a session | `None` |
-| `verifyMfaChallenge` | [IdentityService](../backend/IdentityService.md#verifymfachallenge) | onAction | Complete a step-up challenge | `None` |
-| `verifyMfaEnrolment` | [IdentityService](../backend/IdentityService.md#verifymfaenrolment) | onAction | Complete enrolment | `None` |
 
 **States**
 
 | State | Behaviour |
 |---|---|
-| loading | The simple registration otp list. |
-| error | Could not load. Names which read failed and leaves the simple registration otp untouched. |
-| emptyFirstRun | No simple registration otp yet. Offers Request guest OTP (`requestGuestOtp`). |
-| emptyNoResults | Never shown: `listMfaMethods` takes no filter, so an empty list is always the first-run state above. |
+| loading | Checking whether this device already holds a guest session. The sign-in form stays visible. |
+| error | Identity could not be reached. Says so rather than saying the password or code is wrong, and keeps what was typed. |
+| emptyFirstRun | Nobody signed in on this device — the normal state. The form offers a code, a password, Apple or Google and UAE Pass, and Create an account (`registerGuest`). |
+| emptyNoAccess | There is no permission to name — a guest holds none (ADR-0025), and this is the screen a guest who is not signed in is sent to, so it has no no-access case of its own. A session that has expired lands here with the screen it came from kept, and returns to it after sign-in. |
+| signInRefused | One message for every refusal of a password sign-in: `guestPasswordLogin` answers 401 alike for a wrong password, an unknown identifier, an account with no password and a locked account, and the screen never says which. Too many attempts (429, or the lockout after `PasswordPolicy.lockoutAfterAttempts`) says to try again later and offers Send me a code instead (decided 28 September, audit R073 (a)). |
 | offline | Not available, and the offline banner says why. Signing in, registering and verifying a code need the server. |
 
 **Goes to**
@@ -867,9 +844,8 @@
 | To | Trigger | Carries | Guard |
 |---|---|---|---|
 | GST-001 | Home – Default |  |  |
-| GST-003 | Event & Attraction Listing |  |  |
 | GST-041 | Signed in and verified — back to the cart | cartId | arrived from the cart |
-| WEB-016 | A guest who checked out anonymously links their order | challengeId, methodId, providerId |  |
+| WEB-016 | A guest who checked out anonymously links their order |  |  |
 
 ## GST-043 Arabic / RTL Experience
 
@@ -898,7 +874,6 @@
 | To | Trigger | Carries | Guard |
 |---|---|---|---|
 | GST-001 | Home – Default |  |  |
-| GST-003 | Event & Attraction Listing |  |  |
 
 ## GST-046 Branded Queue / Waiting Room
 
@@ -924,7 +899,7 @@
 | Operation | Service | When | Purpose | Permission |
 |---|---|---|---|---|
 | `getWaitTimes` | [VenueOpsService](../backend/VenueOpsService.md#getwaittimes) | onLoad | Wait times across a venue | `None` |
-| `getWaitingGuest` | [VenueOpsService](../backend/VenueOpsService.md#getwaitingguest) | onLoad | Read a queue entry | `None` |
+| `getWaitingGuest` | [VenueOpsService](../backend/VenueOpsService.md#getwaitingguest) | onInterval | The guest's place and the call to come forward, read on entry and polled while the screen is open; the queue call shows here, not in a notification feed (decided 28 September, audit R242) | `None` |
 | `joinQueue` | [VenueOpsService](../backend/VenueOpsService.md#joinqueue) | onAction | Join a virtual queue | `None` |
 
 **States**
@@ -941,7 +916,6 @@
 | To | Trigger | Carries | Guard |
 |---|---|---|---|
 | GST-001 | Home – Default |  |  |
-| GST-003 | Event & Attraction Listing |  |  |
 
 ## GST-047 Maintenance / Upgrade Page
 
@@ -970,13 +944,15 @@
 | error | Could not load. Names which read failed and leaves the maintenance upgrade untouched. |
 | emptyFirstRun | No maintenance upgrade yet. Offers no create action — this screen declares no operation that makes one — and says so rather than showing an empty table. |
 | offline | The offline banner shows instead of this page. Being offline is the guest's connection, not the venue's — an error or maintenance page shown for a dropped signal tells a guest the venue is down. |
+| forcedUpgrade | Update required. The app's version is below `getTenantAppStatus.minimumAppVersion` for its platform; the screen offers only the store link, because an app too old to talk to the server cannot be trusted to book or pay (decided 28 September, audit R073 (b)). |
+| soldOut | Sold out today. `getTenantAppStatus.availability` is `soldOut`: the page says so with the tenant's `availabilityMessage` and offers another day, never a generic error (decided 28 September, audit R073 (f)). |
+| closed | Closed. `getTenantAppStatus.availability` is `closed`: the page says the venue is not open, with the tenant's `availabilityMessage` and the opening hours from `contact` (decided 28 September, audit R073 (f)). |
 
 **Goes to**
 
 | To | Trigger | Carries | Guard |
 |---|---|---|---|
 | GST-001 | Home – Default |  |  |
-| GST-003 | Event & Attraction Listing |  |  |
 
 ## GST-055 Dynamic QR Ticket
 
@@ -1004,7 +980,7 @@
 |---|---|---|---|---|
 | `listMyEntitlements` | [AccessService](../backend/AccessService.md#listmyentitlements) | onLoad | The guest's tickets and passes | `ORDER_VIEW` |
 | `getEntitlement` | [AccessService](../backend/AccessService.md#getentitlement) | onAction | The selected ticket | `ORDER_VIEW` |
-| `getEntitlementCredential` | [AccessService](../backend/AccessService.md#getentitlementcredential) | onAction | The QR code that gets scanned, refreshed | `ORDER_VIEW` |
+| `getEntitlementCredential` | [AccessService](../backend/AccessService.md#getentitlementcredential) | onAction | The QR code that gets scanned, refreshed — with the `rotation` seed the device derives the rotating code from (audit R230) | `ORDER_VIEW` |
 | `transferOrderTickets` | [OrderService](../backend/OrderService.md#transferordertickets) | onAction | Transfer tickets to another guest | `None` |
 
 **States**
@@ -1015,14 +991,13 @@
 | error | Availability unavailable. Selection is blocked — overselling is worse than waiting |
 | emptyFirstRun | Sold out is a real answer. Offers the next available rather than a dead end |
 | emptyNoAccess | Shown when the caller lacks `ORDER_VIEW`, which `listMyEntitlements` requires, and names that permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
-| offline | The offline banner shows. What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing. |
+| offline | The offline banner shows. A ticket already loaded shows its rotating code, derived on the device from its seed, so it changes with no signal (decided 28 September, audit R230). Transferring a ticket needs the connection. |
 
 **Goes to**
 
 | To | Trigger | Carries | Guard |
 |---|---|---|---|
 | GST-001 | Home – Default |  |  |
-| GST-003 | Event & Attraction Listing |  |  |
 
 ## GST-063 Search
 
@@ -1101,7 +1076,6 @@
 | To | Trigger | Carries | Guard |
 |---|---|---|---|
 | GST-001 | Home – Default |  |  |
-| GST-003 | Event & Attraction Listing |  |  |
 | GST-020 | Saved items carry across sessions | subjectId |  |
 
 ## GST-014 Ticket Transfer
@@ -1148,7 +1122,6 @@
 | To | Trigger | Carries | Guard |
 |---|---|---|---|
 | GST-001 | Home – Default |  |  |
-| GST-003 | Event & Attraction Listing |  |  |
 
 ## GST-015 Memberships
 
@@ -1202,7 +1175,6 @@
 | To | Trigger | Carries | Guard |
 |---|---|---|---|
 | GST-001 | Home – Default |  |  |
-| GST-003 | Event & Attraction Listing |  |  |
 | ADM-003 | The right is propagated to the other cell |  |  |
 
 ## GST-016 My Reservations
@@ -1248,7 +1220,6 @@
 | To | Trigger | Carries | Guard |
 |---|---|---|---|
 | GST-001 | Home – Default |  |  |
-| GST-003 | Event & Attraction Listing |  |  |
 | GST-017 | On the day, they arrive | reservationId |  |
 
 ## GST-017 Reservation Details
@@ -1292,7 +1263,6 @@
 | To | Trigger | Carries | Guard |
 |---|---|---|---|
 | GST-001 | Home – Default |  |  |
-| GST-003 | Event & Attraction Listing |  |  |
 
 ## GST-019 Order History
 
@@ -1338,7 +1308,6 @@
 | To | Trigger | Carries | Guard |
 |---|---|---|---|
 | GST-001 | Home – Default |  |  |
-| GST-003 | Event & Attraction Listing |  |  |
 
 ## GST-021 Interactive Map
 
@@ -1385,7 +1354,6 @@
 |---|---|---|---|
 | GST-022 | They compare waits across attractions |  |  |
 | GST-001 | Home – Default |  |  |
-| GST-003 | Event & Attraction Listing |  |  |
 | BO-096 | The attendant checks what is free for the requested window |  |  |
 
 ## GST-022 Attraction Wait Times
@@ -1423,7 +1391,7 @@
 | GST-003 | Picks something shorter from the attractions list |  |  |
 | GST-023 | They join a virtual queue rather than stand in it |  |  |
 | GST-001 | Home – Default |  |  |
-| GST-059 | Plan My Day – In Progress |  |  |
+| GST-059 | Plan My Day – In Progress |  | a later release: the itinerary planner is deferred and this tile or link is not shown in the first release (decided 28 September, audit R187) |
 
 ## GST-024 F&B – Browse & Order
 
@@ -1477,7 +1445,6 @@
 | To | Trigger | Carries | Guard |
 |---|---|---|---|
 | GST-001 | Home – Default |  |  |
-| GST-003 | Event & Attraction Listing |  |  |
 | GST-009 | Pays | orderId |  |
 | GST-025 | They watch the order progress | orderId |  |
 
@@ -1505,7 +1472,7 @@
 
 | Operation | Service | When | Purpose | Permission |
 |---|---|---|---|---|
-| `getGuestOrderStatus` | [FnbService](../backend/FnbService.md#getguestorderstatus) | onLoad | Ordered → accepted → in preparation → ready → served, collected or delivered | `None` |
+| `getGuestOrderStatus` | [FnbService](../backend/FnbService.md#getguestorderstatus) | onInterval | The order's status (ordered, accepted, in preparation, ready, served, collected or delivered), read on entry and polled while the screen is open; order updates show here, not in a notification feed (decided 28 September, audit R242) | `None` |
 | `getGuestBill` | [FnbService](../backend/FnbService.md#getguestbill) | onLoad | Everything ordered at this location this sitting | `None` |
 | `claimTableSession` | [FnbService](../backend/FnbService.md#claimtablesession) | onAction | Identify which table a guest is sitting at | `None` |
 
@@ -1522,9 +1489,9 @@
 
 | To | Trigger | Carries | Guard |
 |---|---|---|---|
-| GST-030 | Their queue place comes up and they are told |  |  |
+| GST-030 | Their queue place comes up and they are told |  | a later release: the in-venue notification feed is deferred and not shown in the first release; queue calls and order updates show on the queue and order screens, which poll (decided 28 September, audit R242) |
 | GST-001 | Home – Default |  |  |
-| GST-003 | Event & Attraction Listing |  |  |
+| GST-023 | Their queue place comes up and the queue screen shows it |  |  |
 | BO-021 | Runner delivers to the lounger | orderId |  |
 
 ## GST-026 Retail / Merchandise
@@ -1544,6 +1511,7 @@
 
 | Parameter | From |
 |---|---|
+| cartId | session |
 | cardCode | deepLink |
 | outletId | session |
 
@@ -1554,6 +1522,9 @@
 | `getGameCard` | [VenueOpsService](../backend/VenueOpsService.md#getgamecard) | onAction | Read a card's balances | `None` |
 | `listMerchandise` | [RetailService](../backend/RetailService.md#listmerchandise) | onLoad | List merchandise | `PRODUCT_VIEW` |
 | `lookupMerchandise` | [RetailService](../backend/RetailService.md#lookupmerchandise) | onAction | Find an item by code or scan | `PRODUCT_VIEW` |
+| `addCartLine` | [OrderService](../backend/OrderService.md#addcartline) | onAction | Put the item in the cart, marked for collection on the way out (audit R236) | `None` |
+| `checkoutCart` | [OrderService](../backend/OrderService.md#checkoutcart) | onAction | Turn the cart into an order; merchandise for collection is paid online (audit R236) | `None` |
+| `createPayment` | [OrderService](../backend/OrderService.md#createpayment) | onAction | Pay for it; payment creates the shop-and-drop for collection (decided 28 September, audit R236) | `ORDER_CREATE` |
 | `reserveMerchandise` | [RetailService](../backend/RetailService.md#reservemerchandise) | onAction | Hold it for collection | `ORDER_CREATE` |
 
 **States**
@@ -1572,7 +1543,6 @@
 | To | Trigger | Carries | Guard |
 |---|---|---|---|
 | GST-001 | Home – Default |  |  |
-| GST-003 | Event & Attraction Listing |  |  |
 | BO-069 | Machine records the play |  |  |
 | BO-048 | Collected on the way out | merchandiseId |  |
 
@@ -1599,6 +1569,7 @@
 
 | Operation | Service | When | Purpose | Permission |
 |---|---|---|---|---|
+| `getTenantAppStatus` | [WhiteLabelService](../backend/WhiteLabelService.md#gettenantappstatus) | onLoad | How to reach the venue — phone, email, WhatsApp, address, opening hours (decided 28 September, audit R073 (f)) | `None` |
 | `listDiningOutlets` | [FnbService](../backend/FnbService.md#listdiningoutlets) | onLoad | Where a guest can eat, right now | `None` |
 | `listDeliveryLocations` | [FnbService](../backend/FnbService.md#listdeliverylocations) | onLoad | Where an order can be delivered | `None` |
 
@@ -1617,43 +1588,6 @@
 | To | Trigger | Carries | Guard |
 |---|---|---|---|
 | GST-001 | Home – Default |  |  |
-| GST-003 | Event & Attraction Listing |  |  |
-
-## GST-030 In-Venue Notifications
-
-**Work with in-venue notifications for this venue.**
-
-|  |  |
-|---|---|
-| Module | Engagement & Support |
-| Wave | 2 |
-| Licensed module | fnb |
-| Route | `/general/in-venue-notifications` |
-| Component | `apps/guest-app/src/routes/general/InVenueNotificationsDetail.tsx` |
-| Pattern | configEditor |
-
-**Operations**
-
-| Operation | Service | When | Purpose | Permission |
-|---|---|---|---|---|
-| `claimLocationSession` | [FnbService](../backend/FnbService.md#claimlocationsession) | onAction | From the flow it appears in | `None` |
-
-**States**
-
-| State | Behaviour |
-|---|---|
-| loading | The saved in-venue notifications. |
-| error | Could not load. Names which read failed and leaves the in-venue notifications untouched. |
-| emptyFirstRun | No in-venue notifications configured. The form opens empty and `claimLocationSession` saves the first one; it says what the platform does in the meantime. |
-| offline | The offline banner shows. Notices already received stay listed. New queue calls and order updates arrive once the connection is back, and the banner is the warning that they may be late. |
-
-**Goes to**
-
-| To | Trigger | Carries | Guard |
-|---|---|---|---|
-| GST-001 | Home – Default |  |  |
-| GST-003 | Event & Attraction Listing |  |  |
-| GST-031 | AI Concierge – Home | outletId |  |
 
 ## GST-031 AI Concierge – Home
 
@@ -1683,7 +1617,7 @@
 | `sendAiMessage` | [AiService](../backend/AiService.md#sendaimessage) | onAction | Ask | `AI_USE` |
 | `createAiConversation` | [AiService](../backend/AiService.md#createaiconversation) | onAction | Open a conversation | `AI_USE` |
 | `handoverToAgent` | [MarketingService](../backend/MarketingService.md#handovertoagent) | onAction | Pass an assistant conversation to a person | `None` |
-| `requestSuggestion` | [AiService](../backend/AiService.md#requestsuggestion) | onAction | requestSuggestion | `AI_USE` |
+| `requestSuggestion` | [AiService](../backend/AiService.md#requestsuggestion) | onAction | A suggestion of kind prepPlan, upsell or waitTime only — the kinds a guest may ask for; no itinerary or scenario (decided 28 September, audit R209) | `AI_USE` |
 
 **States**
 
@@ -1700,7 +1634,6 @@
 | To | Trigger | Carries | Guard |
 |---|---|---|---|
 | GST-001 | Home – Default |  |  |
-| GST-003 | Event & Attraction Listing |  |  |
 | GST-032 | AI Concierge – Chat | conversationId |  |
 
 ## GST-032 AI Concierge – Chat
@@ -1752,7 +1685,6 @@
 | To | Trigger | Carries | Guard |
 |---|---|---|---|
 | GST-001 | Home – Default |  |  |
-| GST-003 | Event & Attraction Listing |  |  |
 | GST-033 | AI Concierge – Contextual Help | conversationId |  |
 
 ## GST-033 AI Concierge – Contextual Help
@@ -1795,7 +1727,6 @@
 | To | Trigger | Carries | Guard |
 |---|---|---|---|
 | GST-001 | Home – Default |  |  |
-| GST-003 | Event & Attraction Listing |  |  |
 
 ## GST-034 Lost & Found
 
@@ -1833,14 +1764,13 @@
 | error | Could not load. Names which read failed and leaves the lost found untouched. |
 | emptyFirstRun | No lost found yet. Offers Raise my case (`raiseMyCase`). |
 | emptyNoResults | Never shown: `listMyCases` takes no filter, so an empty list is always the first-run state above. |
-| offline | The offline banner shows. Reports already loaded stay read-only with their age. Reporting and replying need the connection. |
+| offline | The offline banner shows. Reports already loaded stay read-only with their age. Reporting a loss and replying are disabled offline — both need the connection (decided 28 September, audit R148) — and the screen says how to reach staff in person instead: the guest services desk or lost-property point, or any member of staff. |
 
 **Goes to**
 
 | To | Trigger | Carries | Guard |
 |---|---|---|---|
 | GST-001 | Home – Default |  |  |
-| GST-003 | Event & Attraction Listing |  |  |
 
 ## GST-036 Loyalty & Rewards
 
@@ -1879,7 +1809,6 @@
 | To | Trigger | Carries | Guard |
 |---|---|---|---|
 | GST-001 | Home – Default |  |  |
-| GST-003 | Event & Attraction Listing |  |  |
 | WEB-024 | They see rewards and manage their devices |  |  |
 
 ## GST-037 Offers & Promotions
@@ -1926,7 +1855,6 @@
 | To | Trigger | Carries | Guard |
 |---|---|---|---|
 | GST-001 | Home – Default |  |  |
-| GST-003 | Event & Attraction Listing |  |  |
 | GST-011 | Their wallet shows stored value |  |  |
 
 ## GST-040 Help & Support
@@ -1967,14 +1895,13 @@
 | emptyFirstRun | No help support yet. Offers Raise my case (`raiseMyCase`). |
 | emptyNoResults | Never shown: `listFaqs` takes no filter, so an empty list is always the first-run state above. |
 | emptyNoAccess | Shown when the caller lacks `TENANT_CONFIGURE`, which `listFaqs` requires, and names that permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
-| offline | The offline banner shows. What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing. |
+| offline | The offline banner shows. Help already loaded stays readable, marked with its age. Raising a case is disabled offline — it needs the connection (decided 28 September, audit R148) — and the screen says how to reach staff in person instead: the guest services desk, or any member of staff. |
 
 **Goes to**
 
 | To | Trigger | Carries | Guard |
 |---|---|---|---|
 | GST-001 | Home – Default |  |  |
-| GST-003 | Event & Attraction Listing |  |  |
 | WEB-034 | They report something lost | caseId |  |
 
 ## GST-044 Multi-Currency & Pricing
@@ -1994,7 +1921,7 @@
 
 | Operation | Service | When | Purpose | Permission |
 |---|---|---|---|---|
-| `listFxRates` | [LedgerService](../backend/LedgerService.md#listfxrates) | onLoad | The rates in force | `LEDGER_VIEW` |
+| `listFxRates` | [LedgerService](../backend/LedgerService.md#listfxrates) | onLoad | The rates in force for the venue's shown currencies — always called with `venueId` (decided 28 September, audit R120 (a)) | `LEDGER_VIEW` |
 | `listProducts` | [CatalogueService](../backend/CatalogueService.md#listproducts) | onLoad | List products | `PRODUCT_VIEW` |
 
 **States**
@@ -2013,7 +1940,6 @@
 | To | Trigger | Carries | Guard |
 |---|---|---|---|
 | GST-001 | Home – Default |  |  |
-| GST-003 | Event & Attraction Listing |  |  |
 
 ## GST-045 Ticket Delivery & Sharing
 
@@ -2054,7 +1980,6 @@
 | To | Trigger | Carries | Guard |
 |---|---|---|---|
 | GST-001 | Home – Default |  |  |
-| GST-003 | Event & Attraction Listing |  |  |
 
 ## GST-048 Upsell / Cross-Sell
 
@@ -2097,7 +2022,6 @@
 | To | Trigger | Carries | Guard |
 |---|---|---|---|
 | GST-001 | Home – Default |  |  |
-| GST-003 | Event & Attraction Listing |  |  |
 
 ## GST-049 Interactive Seat Selection
 
@@ -2141,7 +2065,6 @@
 | To | Trigger | Carries | Guard |
 |---|---|---|---|
 | GST-001 | Home – Default |  |  |
-| GST-003 | Event & Attraction Listing |  |  |
 
 ## GST-056 Bundle Package
 
@@ -2187,7 +2110,6 @@
 | To | Trigger | Carries | Guard |
 |---|---|---|---|
 | GST-001 | Home – Default |  |  |
-| GST-003 | Event & Attraction Listing |  |  |
 
 ## GST-057 Accessibility Information
 
@@ -2217,7 +2139,7 @@
 | emptyFirstRun | No accessibility information yet. Offers no create action — this screen declares no operation that makes one — and says so rather than showing an empty table. |
 | emptyNoResults | Nothing matches the filter on status, categoryCode, slug and the accessibility information are still there. Names the active filter and offers to clear it. |
 | emptyNoAccess | Shown when the caller lacks `TENANT_CONFIGURE`, which `listContentPages` requires, and names that permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
-| offline | The offline banner shows. What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing. |
+| offline | The offline banner shows. Help already loaded stays readable, marked with its age. Raising a case is disabled offline — it needs the connection (decided 28 September, audit R148) — and the screen says how to reach staff in person instead: the guest services desk, or any member of staff. |
 
 **Goes to**
 
@@ -2307,7 +2229,7 @@
 | emptyFirstRun | Nothing requested yet. No export, no erasure, no document — and that is the ordinary state. The screen explains what each request means before offering it, because an erasure a guest did not understand is one they will phone about. |
 | emptyNoResults | Nothing here yet. The scope is what narrowed it — naming the scope is what stops somebody concluding the record does not exist. |
 | emptyNoAccess | Shown when the caller lacks `GUEST_VIEW_PII`, which `exportSubjectData` requires, and names that permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
-| offline | Nothing here is offered offline, and the banner says so. An erasure request or a device change queued and never sent is worse than one that could not be made — the legal clock starts when the platform receives it, and a second factor set up offline is not a second factor. |
+| offline | Nothing here is offered offline, and the banner says so. An erasure request or a device change queued and never sent is worse than one that could not be made — the legal clock starts when the platform receives it, and a device signed out offline is still signed in. |
 
 **Goes to**
 
@@ -2395,7 +2317,7 @@
 | emptyFirstRun | No cases open. The concierge sits here too — most questions never become a case, and that is the intent. |
 | emptyNoResults | Nothing here yet. The scope is what narrowed it — naming the scope is what stops somebody concluding the record does not exist. |
 | emptyNoAccess | Shown when the caller lacks `CASE_VIEW`, which `listCases` requires, and names that permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
-| offline | The offline banner shows. Cases already loaded stay read-only with their age, so a guest can see what they raised without believing a reply arrived. Raising and replying need the connection. |
+| offline | The offline banner shows. Cases already loaded stay read-only with their age, so a guest can see what they raised without believing a reply arrived. Raising a case and replying are disabled offline — both need the connection (decided 28 September, audit R148) — and the screen says how to reach staff in person instead: the guest services desk, or any member of staff. |
 
 **Goes to**
 
@@ -2427,6 +2349,7 @@
 
 | Operation | Service | When | Purpose | Permission |
 |---|---|---|---|---|
+| `listDelegations` | [IdentityService](../backend/IdentityService.md#listdelegations) | onLoad | Who this guest may enrol — themselves and the children linked to them (heldByThisGuest, familyMember or primaryHolder) (decided 28 September, audit R205) | `GUEST_VIEW` |
 | `enrolFacePass` | [AccessService](../backend/AccessService.md#enrolfacepass) | onAction | Register a facial profile against an entitlement | `GUEST_MANAGE` |
 | `getFacePassEnrolment` | [AccessService](../backend/AccessService.md#getfacepassenrolment) | onLoad | Whether a pass has a face registered, and when | `GUEST_VIEW` |
 | `revokeFacePass` | [AccessService](../backend/AccessService.md#revokefacepass) | onAction | Remove a facial profile | `GUEST_MANAGE` |
@@ -2441,6 +2364,7 @@
 | emptyNoResults | Nothing here yet. The scope is what narrowed it — naming the scope is what stops somebody concluding the record does not exist. |
 | emptyNoAccess | Shown when the caller lacks `GUEST_VIEW`, which `getFacePassEnrolment` requires, and names that permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | offline | Not available, and the offline banner says why. Biometric enrolment never happens offline — a face captured and queued is a face the guest cannot withdraw until it uploads. |
+| subjectNotLinked | Refused: that person is not linked to you (403 `subject-not-linked`). A guest may enrol only themselves or a child linked to them by a family-member or primary-holder delegation; the screen says so and returns to Who is this for, which is refreshed in case the link was just removed (decided 28 September, audit R205). |
 
 **Goes to**
 
@@ -2448,9 +2372,9 @@
 |---|---|---|---|
 | GST-039 | Profile | subjectId |  |
 
-## GST-070 Reserve a Table or Cabana
+## GST-070 Reserve a Table
 
-****Staff could book a table and a guest could not.** Seven guest-callable operations with no guest surface — reservations, cabanas, and both waitlists.**
+****Book a restaurant table, or wait for one.** A guest reserves a table ahead, changes or cancels it, or joins and leaves a restaurant's waitlist. Tables only: cabanas are booked by staff (decided 28 September, audit R073 (c)). No deposit and no no-show fee (audit R077 (a)).**
 
 |  |  |
 |---|---|
@@ -2459,7 +2383,7 @@
 | Licensed module | core |
 | Route | `/account/reserve-table-cabana` |
 | Component | `apps/guest-app/src/routes/account/ReserveTableCabana.tsx` |
-| Pattern | statusTracker |
+| Pattern | form |
 
 **Entry parameters**
 
@@ -2467,7 +2391,6 @@
 |---|---|
 | entryId | deepLink |
 | reservationId | deepLink |
-| resourceId | deepLink |
 | subjectId | session |
 
 **Operations**
@@ -2476,8 +2399,8 @@
 |---|---|---|---|---|
 | `createTableReservation` | [FnbService](../backend/FnbService.md#createtablereservation) | onAction | Book a table in advance | `None` |
 | `updateTableReservation` | [FnbService](../backend/FnbService.md#updatetablereservation) | onAction | Change or cancel a booking | `None` |
-| `getResourceAvailability` | [VenueOpsService](../backend/VenueOpsService.md#getresourceavailability) | onLoad | When it is free, with conflicts already resolved | `RESOURCE_VIEW` |
 | `joinRestaurantWaitlist` | [FnbService](../backend/FnbService.md#joinrestaurantwaitlist) | onAction | Add a party to an outlet's waitlist | `ORDER_MODIFY` |
+| `leaveRestaurantWaitlist` | [FnbService](../backend/FnbService.md#leaverestaurantwaitlist) | onAction | Leave the restaurant waitlist; the entry returns cancelled (decided 28 September, audit R073 (d)) | `ORDER_MODIFY` |
 | `joinWaitlist` | [CatalogueService](../backend/CatalogueService.md#joinwaitlist) | onAction | Ask to be told if capacity frees up | `None` |
 | `leaveWaitlist` | [CatalogueService](../backend/CatalogueService.md#leavewaitlist) | onAction | Stop waiting | `None` |
 
@@ -2487,9 +2410,9 @@
 |---|---|
 | loading | Content loads. |
 | error | Could not load. Says what failed and offers one way onward, never a bare failure. |
-| emptyFirstRun | Nothing reserved. Availability shows regardless; a guest looking at an empty list should still see what is bookable. |
+| emptyFirstRun | Nothing reserved. The booking form is the screen: pick the restaurant, party size and time, and `createTableReservation` says if that time is full. |
 | emptyNoResults | Nothing here yet. The scope is what narrowed it — naming the scope is what stops somebody concluding the record does not exist. |
-| emptyNoAccess | Shown when the caller lacks `RESOURCE_VIEW`, which `getResourceAvailability` requires, and names that permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| emptyNoAccess | There is no permission to name — a guest holds none (ADR-0025). A guest who is not signed in is offered sign-in and brought back here. |
 | offline | The offline banner shows. Availability already loaded stays with its age. Booking is not offered — a table held offline is a table two people think they have. |
 
 **Goes to**
@@ -2601,7 +2524,7 @@
 
 ## GST-073 Security & Sign-in
 
-****A guest could enrol a second factor and not manage it.** Small screen, and it is the one a guest reaches after losing a phone.**
+****How this guest signs in, and where.** The sign-in methods linked to the account, the email that recovers it, and the devices signed in, with a way to sign a lost phone out. Small screen, and it is the one a guest reaches after losing a phone. No second factor: guests have none (decided 28 September, audit R167).**
 
 |  |  |
 |---|---|
@@ -2623,7 +2546,8 @@
 
 | Operation | Service | When | Purpose | Permission |
 |---|---|---|---|---|
-| `createMfaChallenge` | [IdentityService](../backend/IdentityService.md#createmfachallenge) | onAction | Step-up authentication for a sensitive action | `None` |
+| `getGuestSession` | [IdentityService](../backend/IdentityService.md#getguestsession) | onLoad | The sign-in methods linked to the account and whether it is verified | `None` |
+| `guestLogout` | [IdentityService](../backend/IdentityService.md#guestlogout) | onAction | Sign out on this device | `None` |
 | `listGuestDevices` | [MarketingService](../backend/MarketingService.md#listguestdevices) | onLoad | Which devices hold this guest's credentials | `None` |
 | `registerGuestDevice` | [MarketingService](../backend/MarketingService.md#registerguestdevice) | onAction | Trust this device | `None` |
 | `revokeGuestDevice` | [MarketingService](../backend/MarketingService.md#revokeguestdevice) | onAction | Sign a lost device out | `None` |
@@ -2635,9 +2559,9 @@
 |---|---|
 | loading | Content loads. |
 | error | Could not load. Says what failed and offers one way onward, never a bare failure. |
-| emptyFirstRun | No second factor enrolled. Explains what one protects before asking for a phone number. |
+| emptyFirstRun | Only this device is signed in. The device list holds one row, this one, and the screen says that signing in elsewhere will add a row here. |
 | emptyNoAccess | Shown when the caller lacks `GUEST_VIEW`, which `verifyGuestEmail` requires, and names that permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
-| offline | Nothing here is offered offline, and the banner says so. An erasure request or a device change queued and never sent is worse than one that could not be made — the legal clock starts when the platform receives it, and a second factor set up offline is not a second factor. |
+| offline | Nothing here is offered offline, and the banner says so. An erasure request or a device change queued and never sent is worse than one that could not be made — the legal clock starts when the platform receives it, and a device signed out offline is still signed in. |
 
 **Goes to**
 
@@ -2691,7 +2615,6 @@
 | To | Trigger | Carries | Guard |
 |---|---|---|---|
 | GST-001 | Home – Default |  |  |
-| GST-003 | Event & Attraction Listing |  |  |
 
 ## GST-020 Saved Items / Wishlist
 
@@ -2735,7 +2658,6 @@
 | To | Trigger | Carries | Guard |
 |---|---|---|---|
 | GST-001 | Home – Default |  |  |
-| GST-003 | Event & Attraction Listing |  |  |
 
 ## GST-023 Virtual Queue
 
@@ -2761,7 +2683,7 @@
 | Operation | Service | When | Purpose | Permission |
 |---|---|---|---|---|
 | `joinQueue` | [VenueOpsService](../backend/VenueOpsService.md#joinqueue) | onAction | from page inventory | `None` |
-| `getWaitingGuest` | [VenueOpsService](../backend/VenueOpsService.md#getwaitingguest) | onLoad | Read a queue entry | `None` |
+| `getWaitingGuest` | [VenueOpsService](../backend/VenueOpsService.md#getwaitingguest) | onInterval | The guest's place and the call to come forward, read on entry and polled while the screen is open; the queue call shows here, not in a notification feed (decided 28 September, audit R242) | `None` |
 | `leaveQueue` | [VenueOpsService](../backend/VenueOpsService.md#leavequeue) | onAction | Leave a queue | `None` |
 | `getWaitTimes` | [VenueOpsService](../backend/VenueOpsService.md#getwaittimes) | onLoad | Wait times across a venue | `None` |
 | `listQueues` | [VenueOpsService](../backend/VenueOpsService.md#listqueues) | onLoad | Which virtual queues are running | `QUEUE_VIEW` |
@@ -2782,7 +2704,6 @@
 |---|---|---|---|
 | GST-024 | While waiting, they order food to where they are sitting |  |  |
 | GST-001 | Home – Default |  |  |
-| GST-003 | Event & Attraction Listing |  |  |
 
 ## GST-027 Parking – Reserve & Pay
 
@@ -2802,12 +2723,15 @@
 | Parameter | From |
 |---|---|
 | entitlementId | deepLink |
+| cartId | session |
 
 **Operations**
 
 | Operation | Service | When | Purpose | Permission |
 |---|---|---|---|---|
-| `createParkingEntitlement` | [AccessService](../backend/AccessService.md#createparkingentitlement) | onAction | A guest bought parking | `None` |
+| `addCartLine` | [OrderService](../backend/OrderService.md#addcartline) | onAction | Put the car park's parking product in the cart; refused `soldOutForDay` when the car park is at capacity (decided 28 September, audit R166) | `None` |
+| `checkoutCart` | [OrderService](../backend/OrderService.md#checkoutcart) | onAction | Turn the cart into an order | `None` |
+| `createPayment` | [OrderService](../backend/OrderService.md#createpayment) | onAction | Pay for it; the parking entitlement is issued at payment with the order's id (audit R166) | `ORDER_CREATE` |
 | `updateParkingEntitlement` | [AccessService](../backend/AccessService.md#updateparkingentitlement) | onAction | Change the plate, or revoke | `None` |
 | `listParkingFacilities` | [AccessService](../backend/AccessService.md#listparkingfacilities) | onLoad | Car parks at a venue, and how each integrates | `PARKING_CONFIGURE` |
 
@@ -2821,14 +2745,14 @@
 | emptyNoResults | Nothing matches the filter on venueId and the parking reserve pay are still there. Names the active filter and offers to clear it. |
 | emptyNoAccess | Shown when the caller lacks `PARKING_CONFIGURE`, which `listParkingFacilities` requires, and names that permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | offline | The offline banner shows. A reservation already confirmed stays on screen with its plate and car park. Reserving, paying and changing the plate need the connection. |
+| soldOutForDay | The car park is full. `addCartLine` refused the parking line with `soldOutForDay`: issued entitlements have reached the facility's capacity for that day. Shown only then — there is no live space count in the first release, so the screen never promises spaces before the guest tries (decided 28 September, audit R166). |
 
 **Goes to**
 
 | To | Trigger | Carries | Guard |
 |---|---|---|---|
-| GST-028 | It is confirmed with a facility and a bay type |  |  |
 | GST-001 | Home – Default |  |  |
-| GST-003 | Event & Attraction Listing |  |  |
+| GST-028 | It is confirmed with a facility | orderId |  |
 
 ## GST-028 Parking – Reservation Confirmed
 
@@ -2843,11 +2767,17 @@
 | Component | `apps/guest-app/src/routes/general/ParkingReservationConfirmedDetail.tsx` |
 | Pattern | listDetail |
 
+**Entry parameters**
+
+| Parameter | From |
+|---|---|
+| orderId | previousScreen |
+
 **Operations**
 
 | Operation | Service | When | Purpose | Permission |
 |---|---|---|---|---|
-| `createParkingEntitlement` | [AccessService](../backend/AccessService.md#createparkingentitlement) | onAction | A guest bought parking | `None` |
+| `getOrder` | [OrderService](../backend/OrderService.md#getorder) | onLoad | The paid order that carries the parking entitlement (audit R166) | `ORDER_VIEW` |
 | `listParkingFacilities` | [AccessService](../backend/AccessService.md#listparkingfacilities) | onLoad | Car parks at a venue, and how each integrates | `PARKING_CONFIGURE` |
 
 **States**
@@ -2856,7 +2786,7 @@
 |---|---|
 | loading | The parking reservation confirmed list. |
 | error | Could not load. Names which read failed and leaves the parking reservation confirmed untouched. |
-| emptyFirstRun | No parking reservation confirmed yet. Offers Create parking entitlement (`createParkingEntitlement`); distinct from a filter that matched nothing. |
+| emptyFirstRun | Paid, entitlement not yet shown. The order is paid and the entitlement is issued at payment; until it appears the screen shows the order and says the car park pass follows (audit R166). |
 | emptyNoResults | Nothing matches the filter on venueId and the parking reservation confirmed are still there. Names the active filter and offers to clear it. |
 | emptyNoAccess | Shown when the caller lacks `PARKING_CONFIGURE`, which `listParkingFacilities` requires, and names that permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | offline | The offline banner shows. A reservation already confirmed stays on screen with its plate and car park. Reserving, paying and changing the plate need the connection. |
@@ -2866,7 +2796,6 @@
 | To | Trigger | Carries | Guard |
 |---|---|---|---|
 | GST-001 | Home – Default |  |  |
-| GST-003 | Event & Attraction Listing |  |  |
 | GST-012 | They open their tickets | orderId |  |
 
 ## GST-035 Feedback & Ratings
@@ -2903,7 +2832,6 @@
 | To | Trigger | Carries | Guard |
 |---|---|---|---|
 | GST-001 | Home – Default |  |  |
-| GST-003 | Event & Attraction Listing |  |  |
 
 ## GST-038 Digital Companion Mode
 
@@ -2942,7 +2870,6 @@
 | To | Trigger | Carries | Guard |
 |---|---|---|---|
 | GST-001 | Home – Default |  |  |
-| GST-003 | Event & Attraction Listing |  |  |
 
 ## GST-050 Resource Booking – Cabana
 
@@ -2988,187 +2915,6 @@
 |---|---|---|---|
 | GST-016 | They see it in their reservations |  |  |
 | GST-001 | Home – Default |  |  |
-| GST-003 | Event & Attraction Listing |  |  |
-
-## GST-051 Plan Your Adventure – Start
-
-**Start a plan for the visit — which attractions, in what order — before arriving.**
-
-|  |  |
-|---|---|
-| Module | Engagement & Support |
-| Wave | 3 |
-| Licensed module | queue |
-| Route | `/general/plan-your-adventure-start` |
-| Component | `apps/guest-app/src/routes/general/PlanYourAdventureStartDetail.tsx` |
-| Pattern | listDetail |
-
-**Operations**
-
-| Operation | Service | When | Purpose | Permission |
-|---|---|---|---|---|
-| `getWaitTimes` | [VenueOpsService](../backend/VenueOpsService.md#getwaittimes) | onLoad | Wait times across a venue | `None` |
-| `listProducts` | [CatalogueService](../backend/CatalogueService.md#listproducts) | onLoad | List products | `PRODUCT_VIEW` |
-
-**States**
-
-| State | Behaviour |
-|---|---|
-| loading | The plan your adventure list. |
-| error | Could not load. Names which read failed and leaves the plan your adventure untouched. |
-| emptyFirstRun | No plan your adventure yet. Offers no create action — this screen declares no operation that makes one — and says so rather than showing an empty table. |
-| emptyNoResults | Nothing matches the filter on venueId, kind, isSellable and the plan your adventure are still there. Names the active filter and offers to clear it. |
-| emptyNoAccess | Shown when the caller lacks `PRODUCT_VIEW`, which `listProducts` requires, and names that permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
-| offline | The offline banner shows. What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing. |
-
-**Goes to**
-
-| To | Trigger | Carries | Guard |
-|---|---|---|---|
-| GST-052 | Suggested itineraries are offered |  |  |
-| GST-001 | Home – Default |  |  |
-| GST-003 | Event & Attraction Listing |  |  |
-
-## GST-052 Suggested Itineraries
-
-**Curated plans a guest can take rather than build.**
-
-|  |  |
-|---|---|
-| Module | Engagement & Support |
-| Wave | 3 |
-| Licensed module | ai |
-| Route | `/general/suggested-itineraries` |
-| Component | `apps/guest-app/src/routes/general/SuggestedItinerariesDetail.tsx` |
-| Pattern | listDetail |
-
-**Entry parameters**
-
-| Parameter | From |
-|---|---|
-| suggestionId | deepLink |
-
-**Operations**
-
-| Operation | Service | When | Purpose | Permission |
-|---|---|---|---|---|
-| `listProducts` | [CatalogueService](../backend/CatalogueService.md#listproducts) | onLoad | List products | `PRODUCT_VIEW` |
-| `listCatalogueBundles` | [CatalogueService](../backend/CatalogueService.md#listcataloguebundles) | onLoad | List published bundles | `PRODUCT_VIEW` |
-| `requestSuggestion` | [AiService](../backend/AiService.md#requestsuggestion) | onAction |  | `AI_USE` |
-
-**States**
-
-| State | Behaviour |
-|---|---|
-| loading | The suggested itineraries list. |
-| error | Could not load. Names which read failed and leaves the suggested itineraries untouched. |
-| emptyFirstRun | No suggested itineraries yet. Offers Request suggestion (`requestSuggestion`); distinct from a filter that matched nothing. |
-| emptyNoResults | Nothing matches the filter on venueId, kind, isSellable and the suggested itineraries are still there. Names the active filter and offers to clear it. |
-| emptyNoAccess | Shown when the caller lacks `PRODUCT_VIEW`, which `listProducts` requires, and names that permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
-| offline | The offline banner shows. What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing. |
-
-**Goes to**
-
-| To | Trigger | Carries | Guard |
-|---|---|---|---|
-| GST-053 | They build their own instead |  |  |
-| GST-001 | Home – Default |  |  |
-| GST-003 | Event & Attraction Listing |  |  |
-
-## GST-053 Build Your Own Itinerary
-
-**Choose the attractions and the order yourself.**
-
-|  |  |
-|---|---|
-| Module | Engagement & Support |
-| Wave | 3 |
-| Licensed module | ticketing |
-| Route | `/general/build-your-own-itinerary` |
-| Component | `apps/guest-app/src/routes/general/BuildYourOwnItineraryDetail.tsx` |
-| Pattern | listDetail |
-
-**Entry parameters**
-
-| Parameter | From |
-|---|---|
-| cartId | session |
-
-**Operations**
-
-| Operation | Service | When | Purpose | Permission |
-|---|---|---|---|---|
-| `addCartLine` | [OrderService](../backend/OrderService.md#addcartline) | onAction | Add something | `None` |
-| `getCart` | [OrderService](../backend/OrderService.md#getcart) | onLoad | The cart, priced and checked, right now | `None` |
-| `listProducts` | [CatalogueService](../backend/CatalogueService.md#listproducts) | onLoad | List products | `PRODUCT_VIEW` |
-| `getWaitTimes` | [VenueOpsService](../backend/VenueOpsService.md#getwaittimes) | onLoad | Wait times across a venue | `None` |
-
-**States**
-
-| State | Behaviour |
-|---|---|
-| loading | The build your own list. |
-| error | Could not load. Names which read failed and leaves the build your own untouched. |
-| emptyFirstRun | No build your own yet. Offers Add cart line (`addCartLine`); distinct from a filter that matched nothing. |
-| emptyNoResults | Nothing matches the filter on venueId, kind, isSellable and the build your own are still there. Names the active filter and offers to clear it. |
-| emptyNoAccess | Shown when the caller lacks `PRODUCT_VIEW`, which `listProducts` requires, and names that permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
-| offline | The offline banner shows. What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing. |
-
-**Goes to**
-
-| To | Trigger | Carries | Guard |
-|---|---|---|---|
-| GST-054 | An optimised order is proposed |  |  |
-| GST-001 | Home – Default |  |  |
-| GST-003 | Event & Attraction Listing |  |  |
-
-## GST-054 AI Optimized Itinerary
-
-**Let the assistant order the day around waits and opening times.**
-
-|  |  |
-|---|---|
-| Module | Engagement & Support |
-| Wave | 3 |
-| Licensed module | ai |
-| Route | `/general/ai-optimized-itinerary` |
-| Component | `apps/guest-app/src/routes/general/AiOptimizedItineraryDetail.tsx` |
-| Pattern | listDetail |
-
-**Entry parameters**
-
-| Parameter | From |
-|---|---|
-| conversationId | deepLink |
-| suggestionId | deepLink |
-
-**Operations**
-
-| Operation | Service | When | Purpose | Permission |
-|---|---|---|---|---|
-| `getWaitTimes` | [VenueOpsService](../backend/VenueOpsService.md#getwaittimes) | onLoad | Wait times across a venue | `None` |
-| `listProducts` | [CatalogueService](../backend/CatalogueService.md#listproducts) | onLoad | List products | `PRODUCT_VIEW` |
-| `sendAiMessage` | [AiService](../backend/AiService.md#sendaimessage) | onAction | Ask | `AI_USE` |
-| `requestSuggestion` | [AiService](../backend/AiService.md#requestsuggestion) | onAction |  | `AI_USE` |
-
-**States**
-
-| State | Behaviour |
-|---|---|
-| loading | The optimized itinerary list. |
-| error | Could not load. Names which read failed and leaves the optimized itinerary untouched. |
-| emptyFirstRun | No optimized itinerary yet. Offers Request suggestion (`requestSuggestion`); distinct from a filter that matched nothing. |
-| emptyNoResults | Nothing matches the filter on venueId, kind, isSellable and the optimized itinerary are still there. Names the active filter and offers to clear it. |
-| emptyNoAccess | Shown when the caller lacks `PRODUCT_VIEW`, which `listProducts` requires, and names that permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
-| offline | The offline banner shows. What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing. |
-
-**Goes to**
-
-| To | Trigger | Carries | Guard |
-|---|---|---|---|
-| GST-001 | Home – Default |  |  |
-| GST-003 | Event & Attraction Listing |  |  |
-| GST-059 | They follow it through the day | suggestionId |  |
 
 ## GST-058 Resource Availability (Cabana)
 
@@ -3207,52 +2953,6 @@
 |---|---|---|---|
 | GST-050 | They book and pay |  |  |
 | GST-001 | Home – Default |  |  |
-| GST-003 | Event & Attraction Listing |  |  |
-
-## GST-059 Plan My Day – In Progress
-
-**The plan while you are in the venue, against live waits.**
-
-|  |  |
-|---|---|
-| Module | Engagement & Support |
-| Wave | 3 |
-| Licensed module | ai |
-| Route | `/general/plan-my-day-in-progress` |
-| Component | `apps/guest-app/src/routes/general/PlanMyDayInProgressDetail.tsx` |
-| Pattern | listDetail |
-
-**Entry parameters**
-
-| Parameter | From |
-|---|---|
-| suggestionId | deepLink |
-
-**Operations**
-
-| Operation | Service | When | Purpose | Permission |
-|---|---|---|---|---|
-| `getWaitTimes` | [VenueOpsService](../backend/VenueOpsService.md#getwaittimes) | onLoad | Wait times across a venue | `None` |
-| `listProducts` | [CatalogueService](../backend/CatalogueService.md#listproducts) | onLoad | List products | `PRODUCT_VIEW` |
-| `requestSuggestion` | [AiService](../backend/AiService.md#requestsuggestion) | onAction |  | `AI_USE` |
-
-**States**
-
-| State | Behaviour |
-|---|---|
-| loading | The plan day progress list. |
-| error | Could not load. Names which read failed and leaves the plan day progress untouched. |
-| emptyFirstRun | No plan day progress yet. Offers Request suggestion (`requestSuggestion`); distinct from a filter that matched nothing. |
-| emptyNoResults | Nothing matches the filter on venueId, kind, isSellable and the plan day progress are still there. Names the active filter and offers to clear it. |
-| emptyNoAccess | Shown when the caller lacks `PRODUCT_VIEW`, which `listProducts` requires, and names that permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
-| offline | The offline banner shows. What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing. |
-
-**Goes to**
-
-| To | Trigger | Carries | Guard |
-|---|---|---|---|
-| GST-001 | Home – Default |  |  |
-| GST-003 | Event & Attraction Listing |  |  |
 
 ## GST-062 Shop & Drop Collection
 

@@ -10,6 +10,9 @@ Current wave, current context, open blockers, this week's gates.
 |---|---|
 | [sprint-1](sprint-1.md) | Current sprint board |
 | [needs-discussion](needs-discussion.md) | **Client agenda — 19 items** |
+| [seed-data-proposal](seed-data-proposal.md) | Client-facing draft, awaiting correction: UAE denominations and default staff roles SETUP-SEED loads (audit R229) |
+| [configured-limits-proposal](configured-limits-proposal.md) | Client-facing draft, awaiting correction: every "configured" limit with a proposed value |
+| [ai-suggestion-rules-proposal](ai-suggestion-rules-proposal.md) | Client-facing draft, awaiting correction: the rule and minimum history behind each AI suggestion kind |
 
 Kept short and current. If a page here is stale, delete it — a stale *active* page is worse
 than an empty one.

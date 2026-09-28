@@ -16,7 +16,7 @@ platforms:
 - P08 Venue Management
 - P06 Venue Staff App
 offlineBehaviour: '**Wait times are cached with their age on the guest app.** A wait time from twenty
-  minutes ago is worse than none, so the age is always shown.'
+  minutes ago presented as current is worse than none, so the age is always shown (audit R080 (b)).'
 trigger:
   description: A guest opens the app to decide what to do next, and the ride they wanted has an hour's
     wait.
@@ -39,8 +39,9 @@ steps:
   - getWaitTimes
   - listProducts
   outcome: Or joins a virtual queue for the long one. **Repointed from GST-059 Plan My Day on 17 August
-    (CF-101)** — the itinerary planner is Wave 3 and this flow is Wave 2, and choosing a shorter queue
-    does not need a saved plan.
+    (CF-101)** — the itinerary planner is deferred to a later release (wave 4, decided 28 September,
+    audit R187) and this flow is Wave 2, and choosing a shorter queue does not need a saved plan. No
+    step here reaches GST-059.
 - step: 3
   screen: BO-005
   action: A supervisor sees the queue building
@@ -68,8 +69,10 @@ branches:
   resolvedBy: Supervisor
 - at: 1
   condition: The reading is stale
-  behaviour: '**Age is shown and the reading is suppressed past a threshold.** A twenty-minute-old wait
-    presented as current sends guests to the wrong ride.'
+  behaviour: '**Shown with a caveat, never hidden** (decided 28 September, audit R080 (b)). A stale reading
+    comes back with `WaitTime.isStale` true and its `asOf`, and the screen shows the wait with its age
+    and a note that it may be out of date, as queue.yaml says. A twenty-minute-old wait presented as current
+    sends guests to the wrong ride; one presented as twenty minutes old is still worth reading.'
   severity: recoverable
   resolvedBy: Automatic
 - at: 4

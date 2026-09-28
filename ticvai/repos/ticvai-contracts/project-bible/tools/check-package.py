@@ -666,6 +666,15 @@ def main() -> int:
                             if perm and perm not in declared:
                                 ERRORS.append(f"{f.stem}.{op.get('operationId')}: {perm} is not in "
                                               "the Permission enum")
+                        # **An escalation that repeats its base gates nothing** (decided 28
+                        # September, audit R197; the rule is in permissions.yaml info). Where no
+                        # threshold makes sense the operation declares no escalation at all.
+                        esc = op.get("x-ticvai-permission-escalated")
+                        if esc and esc == op.get("x-ticvai-permission"):
+                            ERRORS.append(f"{f.stem}.{op.get('operationId')}: "
+                                          f"x-ticvai-permission-escalated {esc} is its base "
+                                          "permission — an escalation must be a different, "
+                                          "higher permission, or be left out (audit R197)")
 
     # 27. A platform code means one platform. `x-ticvai-platforms` is free text, and on
     # 18 August `P04` appeared as both "POS" in ten contracts and "Venue POS" in one — **the one

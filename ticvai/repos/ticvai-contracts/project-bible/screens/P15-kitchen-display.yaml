@@ -169,10 +169,12 @@ screens:
         operation: listFnbOrders
         permission: ORDER_VIEW
         provenance: contract fnb.yaml GET /fnb-orders
-      - kind: textField
-        label: Station id
+      - kind: numberField
+        label: Course
         operation: listKitchenTickets
-        notes: Sends `?stationId=` to `listKitchenTickets`.
+        notes: 'Sends `?course=` to `listKitchenTickets`; only that course''s lines come back. **No station
+          picker**: the display''s station comes from its assignment (`KitchenStation.displayWorkstationIds`,
+          set in station setup) and the display sends no `stationId` (decided 28 September, audit R277).'
         provenance: contract fnb.yaml GET /kitchen/tickets
       - kind: textField
         label: Status
@@ -204,8 +206,9 @@ screens:
           sits above one that arrived first, because a kitchen works to when food is wanted.'
         provenance: carried from the previous definition
       - kind: metricTile
-        notes: Depth, oldest ticket age, station load. **Three numbers, glanceable** — anything a chef
-          has to read is a number they will not read.
+        notes: Depth and oldest ticket age. **Two numbers, glanceable** — anything a chef has to read
+          is a number they will not read. The station-load tile is not in the first release (decided 28
+          September, audit R277).
         provenance: carried from the previous definition
       - kind: primaryButton
         label: Bump
@@ -347,10 +350,12 @@ screens:
     - name: contentBody
       slot: collection
       components:
-      - kind: textField
-        label: Station id
+      - kind: numberField
+        label: Course
         operation: listKitchenTickets
-        notes: Sends `?stationId=` to `listKitchenTickets`.
+        notes: 'Sends `?course=` to `listKitchenTickets`; only that course''s lines come back. **No station
+          picker**: the display''s station comes from its assignment (`KitchenStation.displayWorkstationIds`,
+          set in station setup) and the display sends no `stationId` (decided 28 September, audit R277).'
         provenance: contract fnb.yaml GET /kitchen/tickets
       - kind: textField
         label: Status
@@ -382,8 +387,9 @@ screens:
           sits above one that arrived first, because a kitchen works to when food is wanted.'
         provenance: carried from the previous definition
       - kind: metricTile
-        notes: Depth, oldest ticket age, station load. **Three numbers, glanceable** — anything a chef
-          has to read is a number they will not read.
+        notes: Depth and oldest ticket age. **Two numbers, glanceable** — anything a chef has to read
+          is a number they will not read. The station-load tile is not in the first release (decided 28
+          September, audit R277).
         provenance: carried from the previous definition
       - kind: primaryButton
         label: Bump
@@ -719,8 +725,15 @@ screens:
           sits above one that arrived first, because a kitchen works to when food is wanted.'
         provenance: carried from the previous definition
       - kind: metricTile
-        notes: Depth, oldest ticket age, station load. **Three numbers, glanceable** — anything a chef
-          has to read is a number they will not read.
+        notes: Depth and oldest ticket age. **Two numbers, glanceable** — anything a chef has to read
+          is a number they will not read. The station-load tile is not in the first release (decided 28
+          September, audit R277).
+      - kind: numberField
+        label: Course
+        operation: listKitchenTickets
+        notes: 'Sends `?course=` to `listKitchenTickets`; only that course''s lines come back. **No station
+          picker**: the display''s station comes from its assignment (`KitchenStation.displayWorkstationIds`,
+          set in station setup) and the display sends no `stationId` (decided 28 September, audit R277).'
         provenance: carried from the previous definition
       - kind: primaryButton
         label: Bump
@@ -743,6 +756,8 @@ screens:
         label: Station id
         operation: setKitchenTicketStatus
         provenance: contract fnb.yaml PUT /kitchen/tickets/{ticketId}/status
+        notes: Filled from this display's station assignment (`KitchenStation.displayWorkstationIds`),
+          not typed or picked (audit R277).
   states:
     loading: The rail, oldest ticket first. **The count renders before the tickets** — a kitchen wants
       to know how deep it is before it reads anything.
@@ -750,6 +765,8 @@ screens:
     emptyFirstRun: '**No tickets. The kitchen is clear**, and that is worth saying plainly rather than
       showing a blank rail — a screen that looks broken and a screen that means nothing to do are the
       same picture otherwise.'
+    emptyNoResults: Nothing matches this course filter. **The rail is not empty** — the filter is narrow,
+      and on a kitchen screen that distinction is the difference between calm and panic (audit R277).
     emptyNoAccess: This display is not assigned to a station. **Assignment is a back-office act** — a
       kitchen screen does not choose what it shows. **A principal without `ORDER_MODIFY` gets this state
       naming `ORDER_MODIFY`**, the screen's `permission` and the one its fire, hold, status and prioritise
@@ -759,6 +776,10 @@ screens:
       blanks mid-service is worse than one that says it is behind, and every bump journals locally and
       syncs when the network returns.'
   apis:
+  - operationId: listKitchenTickets
+    contract: fnb
+    purpose: Kitchen ticket queue, filtered by course (audit R277)
+    trigger: onLoad
   - operationId: setKitchenTicketStatus
     contract: fnb
     purpose: Advance a kitchen ticket
@@ -838,7 +859,9 @@ screens:
     component: modal
     trigger: Hold course
     body: '**Collects what `holdCourse` sends before it is called.** Required: `recordedAt`, `course`.
-      Optional: `reason`. Dismissing sends nothing; the screen behind is unchanged.'
+      Optional: `reason`, `note`. **When the reason is Other, the note is required** — the operation refuses
+      400 without it (decided 28 September, audit R222). Dismissing sends nothing; the screen behind is
+      unchanged.'
     confirm:
       label: Hold course
       operation: holdCourse
@@ -848,6 +871,7 @@ screens:
       - recordedAt
       - course
       - reason
+      - note
     provenance: contract fnb.yaml POST /kitchen-tickets/{ticketId}/hold
   - id: formSetCourseRules
     component: modal
@@ -919,10 +943,12 @@ screens:
     - name: contentBody
       slot: collection
       components:
-      - kind: textField
-        label: Station id
+      - kind: numberField
+        label: Course
         operation: listKitchenTickets
-        notes: Sends `?stationId=` to `listKitchenTickets`.
+        notes: 'Sends `?course=` to `listKitchenTickets`; only that course''s lines come back. **No station
+          picker**: the display''s station comes from its assignment (`KitchenStation.displayWorkstationIds`,
+          set in station setup) and the display sends no `stationId` (decided 28 September, audit R277).'
         provenance: contract fnb.yaml GET /kitchen/tickets
       - kind: textField
         label: Status
@@ -954,8 +980,9 @@ screens:
           sits above one that arrived first, because a kitchen works to when food is wanted.'
         provenance: carried from the previous definition
       - kind: metricTile
-        notes: Depth, oldest ticket age, station load. **Three numbers, glanceable** — anything a chef
-          has to read is a number they will not read.
+        notes: Depth and oldest ticket age. **Two numbers, glanceable** — anything a chef has to read
+          is a number they will not read. The station-load tile is not in the first release (decided 28
+          September, audit R277).
         provenance: carried from the previous definition
       - kind: primaryButton
         label: Bump
@@ -1123,6 +1150,7 @@ screens:
         - KitchenStation.outletId
         - KitchenStation.menuItemIds
         - KitchenStation.displayEndpoint
+        - KitchenStation.displayWorkstationIds
         - KitchenStation.isActive
         operation: listKitchenStations
         permission: PRODUCT_VIEW
@@ -1133,8 +1161,15 @@ screens:
           sits above one that arrived first, because a kitchen works to when food is wanted.'
         provenance: carried from the previous definition
       - kind: metricTile
-        notes: Depth, oldest ticket age, station load. **Three numbers, glanceable** — anything a chef
-          has to read is a number they will not read.
+        notes: Depth and oldest ticket age. **Two numbers, glanceable** — anything a chef has to read
+          is a number they will not read. The station-load tile is not in the first release (decided 28
+          September, audit R277).
+      - kind: numberField
+        label: Course
+        operation: listKitchenTickets
+        notes: 'Sends `?course=` to `listKitchenTickets`; only that course''s lines come back. **No station
+          picker**: the display''s station comes from its assignment (`KitchenStation.displayWorkstationIds`,
+          set in station setup) and the display sends no `stationId` (decided 28 September, audit R277).'
         provenance: carried from the previous definition
       - kind: primaryButton
         label: Bump
@@ -1152,6 +1187,7 @@ screens:
         - KitchenStation.outletId
         - KitchenStation.menuItemIds
         - KitchenStation.displayEndpoint
+        - KitchenStation.displayWorkstationIds
         - KitchenStation.isActive
         operation: listKitchenStations
         permission: PRODUCT_VIEW
@@ -1164,6 +1200,8 @@ screens:
         operation: setKitchenStations
         permission: PRODUCT_CONFIGURE
         provenance: contract fnb.yaml PUT /kitchen/stations
+        notes: Includes each station's display assignment (`displayWorkstationIds`); a workstation assigned
+          to two stations is refused 400 (decided 28 September, audit R277).
   states:
     loading: The rail, oldest ticket first. **The count renders before the tickets** — a kitchen wants
       to know how deep it is before it reads anything.
@@ -1182,6 +1220,10 @@ screens:
       blanks mid-service is worse than one that says it is behind, and every bump journals locally and
       syncs when the network returns.'
   apis:
+  - operationId: listKitchenTickets
+    contract: fnb
+    purpose: Kitchen ticket queue, filtered by course (audit R277)
+    trigger: onLoad
   - operationId: listKitchenStations
     contract: fnb
     purpose: List preparation stations and their routing
@@ -1292,10 +1334,12 @@ screens:
     - name: contentBody
       slot: collection
       components:
-      - kind: textField
-        label: Station id
+      - kind: numberField
+        label: Course
         operation: listKitchenTickets
-        notes: Sends `?stationId=` to `listKitchenTickets`.
+        notes: 'Sends `?course=` to `listKitchenTickets`; only that course''s lines come back. **No station
+          picker**: the display''s station comes from its assignment (`KitchenStation.displayWorkstationIds`,
+          set in station setup) and the display sends no `stationId` (decided 28 September, audit R277).'
         provenance: contract fnb.yaml GET /kitchen/tickets
       - kind: textField
         label: Status
@@ -1327,8 +1371,9 @@ screens:
           sits above one that arrived first, because a kitchen works to when food is wanted.'
         provenance: carried from the previous definition
       - kind: metricTile
-        notes: Depth, oldest ticket age, station load. **Three numbers, glanceable** — anything a chef
-          has to read is a number they will not read.
+        notes: Depth and oldest ticket age. **Two numbers, glanceable** — anything a chef has to read
+          is a number they will not read. The station-load tile is not in the first release (decided 28
+          September, audit R277).
         provenance: carried from the previous definition
       - kind: primaryButton
         label: Bump
@@ -1550,10 +1595,12 @@ screens:
     - name: contentBody
       slot: collection
       components:
-      - kind: textField
-        label: Station id
+      - kind: numberField
+        label: Course
         operation: listKitchenTickets
-        notes: Sends `?stationId=` to `listKitchenTickets`.
+        notes: 'Sends `?course=` to `listKitchenTickets`; only that course''s lines come back. **No station
+          picker**: the display''s station comes from its assignment (`KitchenStation.displayWorkstationIds`,
+          set in station setup) and the display sends no `stationId` (decided 28 September, audit R277).'
         provenance: contract fnb.yaml GET /kitchen/tickets
       - kind: textField
         label: Status
@@ -1585,8 +1632,9 @@ screens:
           sits above one that arrived first, because a kitchen works to when food is wanted.'
         provenance: carried from the previous definition
       - kind: metricTile
-        notes: Depth, oldest ticket age, station load. **Three numbers, glanceable** — anything a chef
-          has to read is a number they will not read.
+        notes: Depth and oldest ticket age. **Two numbers, glanceable** — anything a chef has to read
+          is a number they will not read. The station-load tile is not in the first release (decided 28
+          September, audit R277).
         provenance: carried from the previous definition
       - kind: primaryButton
         label: Bump
@@ -1684,8 +1732,11 @@ screens:
     component: modal
     trigger: Record order handover
     body: '**Collects what `recordOrderHandover` sends before it is called.** Required: `outcome`, `recordedAt`.
-      Optional: `deliveredToLocationId`, `runnerPrincipalId`, `note`. Dismissing sends nothing; the screen
-      behind is unchanged.'
+      Optional: `deliveredToLocationId`, `runnerPrincipalId`, `note`. **Only the outcome that fits the
+      order''s service mode is offered**: tableService `served`; quickService or collection `collected`;
+      delivery or roomService `delivered`, with `deliveredToLocationId` required. `guestNotFound` and
+      `refused` are offered for every mode. Any other pairing is refused 422 `outcomeNotForServiceMode`
+      (decided 28 September, audit R125 (1)). Dismissing sends nothing; the screen behind is unchanged.'
     confirm:
       label: Record order handover
       operation: recordOrderHandover
@@ -1783,8 +1834,15 @@ screens:
           sits above one that arrived first, because a kitchen works to when food is wanted.'
         provenance: carried from the previous definition
       - kind: metricTile
-        notes: Depth, oldest ticket age, station load. **Three numbers, glanceable** — anything a chef
-          has to read is a number they will not read.
+        notes: Depth and oldest ticket age. **Two numbers, glanceable** — anything a chef has to read
+          is a number they will not read. The station-load tile is not in the first release (decided 28
+          September, audit R277).
+      - kind: numberField
+        label: Course
+        operation: listKitchenTickets
+        notes: 'Sends `?course=` to `listKitchenTickets`; only that course''s lines come back. **No station
+          picker**: the display''s station comes from its assignment (`KitchenStation.displayWorkstationIds`,
+          set in station setup) and the display sends no `stationId` (decided 28 September, audit R277).'
         provenance: carried from the previous definition
       - kind: primaryButton
         label: Bump
@@ -1837,6 +1895,10 @@ screens:
       blanks mid-service is worse than one that says it is behind, and every bump journals locally and
       syncs when the network returns.'
   apis:
+  - operationId: listKitchenTickets
+    contract: fnb
+    purpose: Kitchen ticket queue, filtered by course (audit R277)
+    trigger: onLoad
   - operationId: setItemAvailability
     contract: fnb
     purpose: Mark an item available or eighty-sixed
@@ -1895,7 +1957,9 @@ screens:
     component: modal
     trigger: Save item availability
     body: '**Collects what `setItemAvailability` sends before it is called.** Required: `isAvailable`,
-      `recordedAt`. Optional: `reason`, `restoreAt`. Dismissing sends nothing; the screen behind is unchanged.'
+      `recordedAt`. Optional: `reason`, `note`, `restoreAt`. **When the reason is Other, the note is required**
+      — the operation refuses 400 without it (decided 28 September, audit R222). Dismissing sends nothing;
+      the screen behind is unchanged.'
     confirm:
       label: Save item availability
       operation: setItemAvailability
@@ -1905,6 +1969,7 @@ screens:
       - isAvailable
       - recordedAt
       - reason
+      - note
       - restoreAt
     provenance: contract fnb.yaml PUT /menu-items/{itemId}/availability
   - id: formSetKitchenTicketStatus
@@ -1927,8 +1992,9 @@ screens:
     component: modal
     trigger: Log kitchen exception
     body: '**Collects what `logKitchenException` sends before it is called.** Required: `kind`, `outletId`,
-      `recordedAt`. Optional: `stationId`, `ticketId`, `durationMinutes`, `note`. Dismissing sends nothing;
-      the screen behind is unchanged.'
+      `recordedAt`. Optional: `stationId`, `ticketId`, `durationMinutes`, `note`. **When the kind is Other,
+      the note is required** — the operation refuses 400 without it (decided 28 September, audit R222).
+      Dismissing sends nothing; the screen behind is unchanged.'
     confirm:
       label: Log kitchen exception
       operation: logKitchenException
@@ -2012,8 +2078,9 @@ screens:
           sits above one that arrived first, because a kitchen works to when food is wanted.'
         provenance: carried from the previous definition
       - kind: metricTile
-        notes: Depth, oldest ticket age, station load. **Three numbers, glanceable** — anything a chef
-          has to read is a number they will not read.
+        notes: Depth and oldest ticket age. **Two numbers, glanceable** — anything a chef has to read
+          is a number they will not read. The station-load tile is not in the first release (decided 28
+          September, audit R277).
         provenance: carried from the previous definition
       - kind: primaryButton
         label: Bump
@@ -2157,8 +2224,9 @@ screens:
           sits above one that arrived first, because a kitchen works to when food is wanted.'
         provenance: carried from the previous definition
       - kind: metricTile
-        notes: Depth, oldest ticket age, station load. **Three numbers, glanceable** — anything a chef
-          has to read is a number they will not read.
+        notes: Depth and oldest ticket age. **Two numbers, glanceable** — anything a chef has to read
+          is a number they will not read. The station-load tile is not in the first release (decided 28
+          September, audit R277).
         provenance: carried from the previous definition
       - kind: primaryButton
         label: Bump

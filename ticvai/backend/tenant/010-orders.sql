@@ -19,7 +19,7 @@ CREATE TABLE IF NOT EXISTS orders.b2b_credit (
 
 -- A cart holds leases; an order holds money. Retained after expiry so a recovery link lands on
 -- something Hangs off: reaches orders.sales_order through its keys; references pii.subject,
--- platform.scope. Reached by: 15 operations read it and 7 write it; 3 tables reference it; written
+-- platform.scope. Reached by: 16 operations read it and 7 write it; 3 tables reference it; written
 -- by 2 contracts — marketing-crm, orders.
 CREATE TABLE IF NOT EXISTS orders.cart (
     id                                uuid PRIMARY KEY NOT NULL,
@@ -33,6 +33,7 @@ CREATE TABLE IF NOT EXISTS orders.cart (
     tax_total                         numeric(18,4),
     gross_amount                      numeric(18,4),
     applied_promotion_ids             text[],
+    coupon_codes                      text[],
     expires_at                        timestamptz,
     extensions_used                   integer,
     max_extensions                    integer,
@@ -43,7 +44,7 @@ CREATE TABLE IF NOT EXISTS orders.cart (
 
 -- One line, with the lease that holds its capacity. Null lease for a product with no capacity
 -- Hangs off: a child of orders.cart; reaches orders.sales_order through its keys; references
--- catalogue.inventory_hold, catalogue.performance, catalogue.variant. Reached by: 9 operations
+-- catalogue.inventory_hold, catalogue.performance, catalogue.variant. Reached by: 10 operations
 -- read it and 4 write it; 1 tables reference it.
 CREATE TABLE IF NOT EXISTS orders.cart_line (
     id                                uuid PRIMARY KEY NOT NULL,
@@ -66,7 +67,7 @@ CREATE TABLE IF NOT EXISTS orders.cart_line (
 
 -- a denomination and a count from a blind till count Hangs off: reaches orders.sales_order through
 -- its keys; references orders.cash_movement, orders.deposit_box, orders.pos_shift. Reached by: 5
--- operations read it and 3 write it.
+-- operations read it and 4 write it.
 CREATE TABLE IF NOT EXISTS orders.cash_count_line (
     id                                uuid PRIMARY KEY,
     shift_id                          text NOT NULL,
@@ -341,6 +342,9 @@ CREATE TABLE IF NOT EXISTS orders.order_fee (
 -- One thing bought on one order, priced at the moment of sale. A price list changing afterwards
 -- does not change what somebody paid
 CREATE TABLE IF NOT EXISTS orders.order_line (
+    promotion_id                      uuid NOT NULL,
+    name                              text,
+    reason                            text,
     sales_order_id                    text NOT NULL,
     id                                text PRIMARY KEY NOT NULL,
     variant_id                        uuid NOT NULL,

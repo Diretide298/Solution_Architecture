@@ -75,6 +75,8 @@ CREATE INDEX IF NOT EXISTS rollout_tenant_tenant_id_idx ON control.rollout_tenan
 CREATE INDEX IF NOT EXISTS sandbox_developer_id_idx ON control.sandbox (developer_id);
 -- convention, not declared: control.scaling_policy.cell_id -> control.cell
 CREATE INDEX IF NOT EXISTS scaling_policy_cell_id_idx ON control.scaling_policy (cell_id);
+-- convention, not declared: control.tenant.region_id -> platform.scope
+CREATE INDEX IF NOT EXISTS tenant_region_id_idx ON control.tenant (region_id);
 -- convention, not declared: control.tenant.termination_requested_by_principal_id -> identity.principal
 CREATE INDEX IF NOT EXISTS tenant_termination_requested_by_principal_id_idx ON control.tenant (termination_requested_by_principal_id);
 -- convention, not declared: control.tenant_migration.from_cell_id -> control.cell
@@ -127,10 +129,6 @@ CREATE INDEX IF NOT EXISTS api_licence_tenant_id_idx ON control.api_licence (ten
 CREATE INDEX IF NOT EXISTS cell_job_cell_id_idx ON control.cell_job (cell_id);
 -- declared: control.environment.cell_id -> control.cell
 CREATE INDEX IF NOT EXISTS environment_cell_id_idx ON control.environment (cell_id);
--- declared: control.footer_config_column.footer_config_id -> control.footer_config
-CREATE INDEX IF NOT EXISTS footer_config_column_footer_config_id_idx ON control.footer_config_column (footer_config_id);
--- declared: control.footer_config_social_link.footer_config_id -> control.footer_config
-CREATE INDEX IF NOT EXISTS footer_config_social_link_footer_config_id_idx ON control.footer_config_social_link (footer_config_id);
 -- declared: control.invoice_line.invoice_id -> control.invoice
 CREATE INDEX IF NOT EXISTS invoice_line_invoice_id_idx ON control.invoice_line (invoice_id);
 -- declared: control.licence_add_on_limit.licence_add_on_id -> control.licence_add_on
@@ -163,7 +161,6 @@ CREATE INDEX IF NOT EXISTS tenant_migration_tenant_id_idx ON control.tenant_migr
 CREATE INDEX IF NOT EXISTS tenant_migration_plan_tenant_id_idx ON control.tenant_migration_plan (tenant_id);
 CREATE INDEX IF NOT EXISTS channel_listing_scope_path_idx ON control.channel_listing USING gist (scope_path);
 CREATE INDEX IF NOT EXISTS content_block_scope_path_idx ON control.content_block USING gist (scope_path);
-CREATE INDEX IF NOT EXISTS footer_config_scope_path_idx ON control.footer_config USING gist (scope_path);
 CREATE INDEX IF NOT EXISTS migration_plan_scope_path_idx ON control.migration_plan USING gist (scope_path);
 CREATE INDEX IF NOT EXISTS seo_metadata_scope_path_idx ON control.seo_metadata USING gist (scope_path);
 CREATE INDEX IF NOT EXISTS support_notice_scope_path_idx ON control.support_notice USING gist (scope_path);

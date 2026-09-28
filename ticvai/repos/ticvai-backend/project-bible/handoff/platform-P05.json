@@ -15,7 +15,7 @@
   "contracts": 8,
   "modules": 2,
   "undrawn": 0,
-  "operationsWithNoScreen": 13
+  "operationsWithNoScreen": 15
  },
  "waves": {
   "wave2": 17
@@ -50,7 +50,7 @@
    "operations": 3
   },
   {
-   "contract": "marketing-crm",
+   "contract": "white-label",
    "operations": 2
   },
   {
@@ -58,15 +58,15 @@
    "operations": 2
   },
   {
-   "contract": "white-label",
+   "contract": "marketing-crm",
    "operations": 2
   },
   {
-   "contract": "ai",
+   "contract": "promotions",
    "operations": 1
   },
   {
-   "contract": "promotions",
+   "contract": "ai",
    "operations": 1
   }
  ],
@@ -109,7 +109,7 @@
   },
   {
    "id": "KSK-005",
-   "name": "Choose a session",
+   "name": "Choose a performance",
    "module": "Sell",
    "wave": 2,
    "route": "/sell/choose-a-session",
@@ -244,6 +244,18 @@
     "contract": "catalogue",
     "verb": "GET",
     "summary": "Membership schemes, the level above a plan"
+   },
+   {
+    "operation": "checkGuestCheckoutMatch",
+    "contract": "marketing-crm",
+    "verb": "POST",
+    "summary": "Does this contact already have a profile here"
+   },
+   {
+    "operation": "decideGuestCheckoutMatch",
+    "contract": "marketing-crm",
+    "verb": "POST",
+    "summary": "Use the existing profile or keep this booking separate"
    },
    {
     "operation": "getForm",

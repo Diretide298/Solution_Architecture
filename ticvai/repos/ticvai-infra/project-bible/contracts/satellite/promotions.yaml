@@ -158,6 +158,9 @@ paths:
       description: 'BL-114. **Split by a stable hash of the subject, not at random per request** — a guest
         who sees 10% on Monday and 15% on Tuesday has learned to wait.
 
+        **The `trafficPercent` of all variants must sum to exactly 100; there is no minimum per variant**
+        (decided 28 September, audit R101). A variant at 0 is kept but receives no traffic.
+
         '
       tags:
       - promotions
@@ -205,6 +208,12 @@ paths:
                     type: array
                     items:
                       $ref: '#/components/schemas/PromotionVariant'
+        '400':
+          description: The variants' `trafficPercent` values do not sum to 100 (audit R101)
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
   /recommendations:
     post:
       operationId: getRecommendations
@@ -445,7 +454,22 @@ paths:
               schema:
                 $ref: '#/components/schemas/Promotion'
         '400':
-          description: Conditions are unsatisfiable, or the discount exceeds the configured cap
+          description: 'Conditions are unsatisfiable, or the discount exceeds the configured cap.
+
+            **The cap is `VenueSettings.promotions.maxDiscountPercent`**, a venue setting with a tenant
+            default (decided 28 September, audit R094). **Proposed default 30 per cent, the figure the
+            workshop pack shows, client to correct (audit R094).**
+
+            **Unsatisfiable combinations, proposed, client to correct (audit R101):** `validTo` at or before
+            `validFrom`; `validTo` already in the past; `variantIds` or `categoryIds` naming nothing that
+            is active at `venueId`; `productKinds` naming no kind that any listed variant or category carries;
+            `minQuantity` greater than `maxRedemptionsPerGuest` allows in one order; `minBasketValue` in a
+            currency the venue does not sell in; `channels` naming no channel the venue sells through; a
+            `paymentMethod` or `issuerBins` condition on channels that take no card payment; and
+            `componentRedemption` set where no targeted product is a bundle. Each refusal names the
+            condition that cannot hold.
+
+            '
           content:
             application/problem+json:
               schema:
@@ -710,6 +734,10 @@ paths:
         a negative or near-zero line price is refused — that combination is discovered at a till otherwise,
         usually by a guest.
 
+        **The floor is zero: a combined line price of zero or below is refused** (decided 28 September,
+        audit R101). A line that stays above zero, however small, publishes. One that falls below the
+        near-zero minimum (`ConflictAnalysis`, audit R096 (5)) publishes too, flagged rather than refused.
+
         '
       tags:
       - promotion
@@ -757,6 +785,12 @@ paths:
       description: 'Run before publishing. Reports promotions that overlap on product and period, and
         what the combined discount would be.
 
+        **"Near-zero" has a stated minimum** (decided 28 September, audit R096 (5)): a combination is
+        near-zero when the net line price it leaves falls below the venue setting
+        `promotions.nearZeroLinePrice` (a tenant default the venue may override; proposed AED 1.00,
+        client to correct under audit R094). It is flagged with `isNearZero` for a person to look at.
+        Only zero or below blocks publication (`isBlocking`, audit R101).
+
         '
       tags:
       - promotion
@@ -793,6 +827,10 @@ paths:
       summary: Redemption count and discount given
       description: 'Also the enforcement surface for budget caps — a promotion may be configured to stop
         automatically once a total discount value is reached.
+
+        **A budget cap is refused at checkout, not only reported** (decided 28 September, audit R101): once
+        `discountGiven` plus the discount on the order being checked out would exceed `budgetCap`, the
+        promotion no longer applies to that order and `isBudgetExhausted` is true.
 
         '
       tags:
@@ -938,6 +976,10 @@ paths:
         **Poll `getCouponCodeBatch` with the returned `batchId`** for progress, the failure reason and,
         once `complete`, the export''s download link. `listCouponCodes` filters by the same `batchId`.
 
+        **Codes are single-use by default** (the campaign''s `isSingleUse` defaults to true), and **the
+        number of assigned guests must not exceed `quantity`**. Fewer is allowed: the codes left over
+        are anonymous (decided 28 September, audit R101).
+
         '
       tags:
       - coupon
@@ -970,13 +1012,21 @@ paths:
                   default: 12
                 assignToSubjectIds:
                   type: array
-                  description: 'Personalised codes bound to named guests. Omit for anonymous codes.
+                  description: 'Personalised codes bound to named guests. Omit for anonymous codes. **No more
+                    entries than `quantity`**; any codes beyond the assigned guests are anonymous (audit R101).
 
                     '
+                  maxItems: 50000
                   items:
                     type: string
                     format: uuid
       responses:
+        '400':
+          description: More guests in `assignToSubjectIds` than `quantity` codes (audit R101)
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
         '202':
           headers:
             X-Consistency-Token:
@@ -1341,6 +1391,13 @@ paths:
         split is mandatory** — without it the ledger cannot divide the revenue, and each component may
         sit in a different venue, account, tax treatment or legal entity.
 
+        **Allocation rule (decided 28 September, audit R101):** the bundle price is allocated to components
+        in proportion to their list price, and **list price is the component variant''s current price**
+        when the bundle is created. Rounding is to the currency''s minor unit, and **the rounding remainder
+        goes to the first component**, so the allocated amounts always sum to the bundle price exactly.
+        `proRataListPrice` is the default method; `percentage` and `fixedAmount` remain for an explicit
+        split and follow the same remainder rule.
+
         '
       tags:
       - bundle
@@ -1576,6 +1633,10 @@ paths:
       - staff
       x-ticvai-read-routing: replica
       summary: List upsell and cross-sell rules
+      description: 'Read at venue: a venue sees the rules of the region above it. Rules are owned at region
+        (decided 28 September, audit R183).
+
+        '
       tags:
       - upsell
       x-ticvai-permission: PRODUCT_VIEW
@@ -1612,6 +1673,9 @@ paths:
       description: 'Rules apply across every channel by default — POS, kiosk, web, app, call centre, B2B
         and API (3.7.12). A rule that fires on the website but not at a counter is a guest experience
         inconsistency, so channel restriction is opt-in rather than the default.
+
+        **Owned at region, read at venue** (decided 28 September, audit R183). The rule records its owning
+        `regionId`, and every venue under that region evaluates it.
 
         '
       tags:
@@ -1650,11 +1714,16 @@ paths:
       operationId: deleteUpsellRule
       x-ticvai-audience:
       - staff
+      x-ticvai-config-scope: region
       summary: Remove an upsell rule
+      description: 'Upsell rules are owned at region and read at venue (decided 28 September, audit R183),
+        so a rule is removed at the region that owns it, never from one venue beneath it.
+
+        '
       tags:
       - upsell
       x-ticvai-permission: PRODUCT_CONFIGURE
-      x-ticvai-scope-level: venue
+      x-ticvai-scope-level: region
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
       parameters:
@@ -7213,7 +7282,9 @@ components:
         budgetCap:
           allOf:
           - $ref: ../shared/common.yaml#/components/schemas/Money
-          description: Total discount value after which the promotion stops automatically.
+          description: Total discount value after which the promotion stops automatically. **Enforced at
+            checkout**, where an order whose discount would take the total past the cap does not receive
+            the promotion (decided 28 September, audit R101).
     Promotion:
       x-ticvai-persistence: promotions.promotion
       allOf:
@@ -7263,6 +7334,10 @@ components:
           type: string
         trafficPercent:
           type: integer
+          minimum: 0
+          maximum: 100
+          description: Share of traffic. All variants of a promotion sum to 100, with no minimum per variant
+            (decided 28 September, audit R101).
         discountPercent:
           type: number
     GuestPromotion:
@@ -7345,7 +7420,13 @@ components:
                 description: Combined percentage where both apply to the same line.
               isBlocking:
                 type: boolean
-                description: True where the combination would produce a negative or near-zero price.
+                description: True where the combination would produce a line price of zero or below
+                  (decided 28 September, audit R101).
+              isNearZero:
+                type: boolean
+                description: True where the combination leaves a net line price above zero but below
+                  the venue setting `promotions.nearZeroLinePrice` (proposed AED 1.00; decided 28
+                  September, audit R096 (5)). A warning, not a refusal.
         worstCaseDiscount:
           type: number
           description: Largest combined discount any single line could receive.
@@ -7849,7 +7930,9 @@ components:
         listPrice:
           allOf:
           - $ref: ../shared/common.yaml#/components/schemas/Money
-          description: For `proRataListPrice` — weights derived from list prices.
+          description: For `proRataListPrice` — weights derived from list prices. **The variant's current
+            price when the bundle is created** (decided 28 September, audit R101), then frozen with the
+            allocation.
         revenueAccountId:
           type: string
           format: uuid
@@ -7979,7 +8062,13 @@ components:
           - components
           properties:
             method:
-              $ref: '#/components/schemas/AllocationMethod'
+              allOf:
+              - $ref: '#/components/schemas/AllocationMethod'
+              default: proRataListPrice
+              description: 'Proportional to list price by default. The rounding remainder in the currency''s
+                minor unit goes to the first component (decided 28 September, audit R101).
+
+                '
             components:
               type: array
               items:
@@ -8037,6 +8126,14 @@ components:
         id:
           type: string
           format: uuid
+        regionId:
+          type: string
+          format: uuid
+          readOnly: true
+          description: 'The region that owns the rule. Upsell rules are owned at region and read at venue
+            (decided 28 September, audit R183); set from the caller''s region scope on create.
+
+            '
         name:
           type: string
           maxLength: 200

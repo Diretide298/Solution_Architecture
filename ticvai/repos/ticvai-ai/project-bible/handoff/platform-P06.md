@@ -5,16 +5,16 @@
 | | |
 |---|---|
 | Screens | 96 |
-| Operations | 202 |
+| Operations | 208 |
 | Contracts | 18 |
 | Modules | 4 |
 | Undrawn | 0 |
-| Operations with no screen | 198 |
+| Operations with no screen | 197 |
 | Waves | wave1 25 · wave2 40 · wave3 31 |
 
 ## Gaps
 
-### 198 operations with no screen here
+### 197 operations with no screen here
 
 **In a contract this platform uses, callable by its audience, and reaching no screen on any platform serving that audience.** Either a screen is missing or the endpoint should not exist — and the second is worth considering first.
 
@@ -60,7 +60,7 @@
 | `updateDonationCampaign` | catalogue | PATCH | Amend or close a campaign |
 | `attachModifierGroup` | fnb | PUT | Give an item its choices |
 | `closeCorrectiveAction` | fnb | POST | Close a signed finding |
-| … | | | 158 more |
+| … | | | 157 more |
 
 ### 1 modules split across waves
 
@@ -81,7 +81,7 @@
 
 | | Name | Module | Wave | Ops | Drawn |
 |---|---|---|---|---|---|
-| `EMP-001` | Sign in | Operations | 1 | 4 | yes |
+| `EMP-001` | Sign in | Operations | 1 | 6 | yes |
 | `EMP-002` | Select venue & role | Operations | 1 | 5 | yes |
 | `EMP-003` | Home — on duty | Operations | 1 | 17 | yes |
 | `EMP-004` | Task list | Operations | 1 | 15 | yes |
@@ -118,7 +118,7 @@
 | `EMP-039` | Announcements | Operations | 2 | 4 | yes |
 | `EMP-040` | Knowledge base | Operations | 2 | 1 | yes |
 | `EMP-041` | Training | Operations | 3 | 2 | yes |
-| `EMP-042` | Profile | Operations | 1 | 3 | yes |
+| `EMP-042` | Profile | Operations | 1 | 6 | yes |
 | `EMP-043` | Device settings | Operations | 1 | 2 | yes |
 | `EMP-044` | Accessibility | Operations | 2 | 0 | yes |
 | `EMP-045` | Arabic / RTL | Operations | 1 | 0 | yes |
@@ -132,7 +132,7 @@
 | `EMP-053` | Table & Seating Configuration | Floor Service | 2 | 1 | yes |
 | `EMP-054` | Reservation Calendar & Timeline | Floor Service | 2 | 1 | yes |
 | `EMP-055` | Create / Edit Reservation | Floor Service | 2 | 2 | yes |
-| `EMP-056` | Walk-In & Waitlist Management | Floor Service | 2 | 1 | yes |
+| `EMP-056` | Walk-In & Waitlist Management | Floor Service | 2 | 2 | yes |
 | `EMP-057` | Guest Profile & Dining History | Floor Service | 2 | 4 | yes |
 | `EMP-058` | Live Table & Service Management | Floor Service | 2 | 17 | yes |
 | `EMP-059` | Table Order, Bill & Payment Management | Floor Service | 2 | 8 | yes |

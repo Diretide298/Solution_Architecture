@@ -317,8 +317,8 @@ screens:
         so an edge into it carries them
     - to: GST-042
       trigger: Simple Registration & OTP
-      provenance: derived — GST-042 declares entryState.params challengeId, methodId, providerId and GST-001
-        holds none of them, so the edge carries nothing and GST-042 opens cold
+      provenance: derived — GST-042 declares entryState.params  and GST-001 holds none of them, so the
+        edge carries nothing and GST-042 opens cold
     - to: GST-045
       trigger: Ticket Delivery & Sharing
       carries:
@@ -337,10 +337,14 @@ screens:
       trigger: Suggested Itineraries
       provenance: derived — GST-052 declares entryState.params suggestionId and GST-001 holds none of
         them, so the edge carries nothing and GST-052 opens cold
+      precondition: 'a later release: the itinerary planner is deferred and this tile or link is not shown
+        in the first release (decided 28 September, audit R187)'
     - to: GST-054
       trigger: AI Optimized Itinerary
       provenance: derived — GST-054 declares entryState.params conversationId, suggestionId and GST-001
         holds none of them, so the edge carries nothing and GST-054 opens cold
+      precondition: 'a later release: the itinerary planner is deferred and this tile or link is not shown
+        in the first release (decided 28 September, audit R187)'
     - to: GST-055
       trigger: Dynamic QR Ticket
       carries:
@@ -356,25 +360,32 @@ screens:
       trigger: Plan My Day – In Progress
       provenance: derived — GST-059 declares entryState.params suggestionId and GST-001 holds none of
         them, so the edge carries nothing and GST-059 opens cold
+      precondition: 'a later release: the itinerary planner is deferred and this tile or link is not shown
+        in the first release (decided 28 September, audit R187)'
     - to: GST-061
       trigger: Menu Item Detail
       provenance: derived — GST-061 declares entryState.params outletId and GST-001 holds none of them,
         so the edge carries nothing and GST-061 opens cold
     - to: GST-070
-      trigger: Reserve a Table or Cabana
-      provenance: derived — GST-070 declares entryState.params entryId, reservationId, resourceId and
-        GST-001 holds none of them, so the edge carries nothing and GST-070 opens cold
+      trigger: Reserve a Table
+      provenance: derived — GST-070 declares entryState.params entryId, reservationId and GST-001 holds
+        none of them, so the edge carries nothing and GST-070 opens cold
     - to: GST-022
       trigger: Attraction Wait Times
       provenance: structural — GST-001 is P02's home screen and its exits are its launcher
     - to: GST-028
       trigger: Parking – Reservation Confirmed
       provenance: structural — GST-001 is P02's home screen and its exits are its launcher
+      carries:
+      - orderId
     - to: GST-029
       trigger: Venue Info & Services
       provenance: structural — GST-001 is P02's home screen and its exits are its launcher
     - to: GST-030
       trigger: In-Venue Notifications
+      precondition: 'a later release: the in-venue notification feed is deferred and not shown in the
+        first release; queue calls and order updates show on the queue and order screens, which poll (decided
+        28 September, audit R242)'
       provenance: structural — GST-001 is P02's home screen and its exits are its launcher
     - to: GST-035
       trigger: Feedback & Ratings
@@ -402,9 +413,13 @@ screens:
       provenance: structural — GST-001 is P02's home screen and its exits are its launcher
     - to: GST-051
       trigger: Plan Your Adventure – Start
+      precondition: 'a later release: the itinerary planner is deferred and this tile or link is not shown
+        in the first release (decided 28 September, audit R187)'
       provenance: structural — GST-001 is P02's home screen and its exits are its launcher
     - to: GST-053
       trigger: Build Your Own Itinerary
+      precondition: 'a later release: the itinerary planner is deferred and this tile or link is not shown
+        in the first release (decided 28 September, audit R187)'
       provenance: structural — GST-001 is P02's home screen and its exits are its launcher
     - to: GST-057
       trigger: Accessibility Information
@@ -424,7 +439,10 @@ screens:
   notes: States derived from the screen pattern on 17 August, not individually considered. Purpose derived
     from the screen name and its operations on 17 August, not from a requirement. Landing. **Declared
     only a health check.** Pranay asked for guest details and tickets; Chitrangi asked for search. All
-    three existed and none were wired. **Rewired on the 20 August review.**
+    three existed and none were wired. **Rewired on the 20 August review.** **Venue selection added 28
+    September** (decided 28 September, audit R267) — a venue picker on first open, remembered on the device,
+    **Change venue**, and a visit-day suggestion from the guest's ticket (`listMyEntitlements`). Nothing
+    in `getTenantAppStatus.venues` supplies the options, the tenant's active venues, public and cacheable.
   density: comfortable
   pattern: listDetail
   patternReason: '`listMyEntitlements` reads the population and `getTenantAppStatus` reads one of them
@@ -436,6 +454,42 @@ screens:
     - name: contentBody
       slot: collection
       components:
+      - kind: selectField
+        label: Your venue
+        bindsTo: TenantAppStatus.venues
+        operation: getTenantAppStatus
+        notes: '**The guest picks a venue on first open** (decided 28 September, audit R267): shown before
+          anything else when the device has no venue remembered, and remembered on the device after that.
+          The chosen `venueId` is what every screen that declares `venueId` `from: session` reads. The
+          options are `getTenantAppStatus.venues` (venue id, name, city, today''s opening hours), the
+          tenant''s active venues, returned without a session.'
+        provenance: contract white-label.yaml GET /tenant-config/status (TenantAppStatus.venues, audit
+          R267)
+      - kind: secondaryButton
+        label: Change venue
+        notes: Reopens the venue picker; the new choice replaces the remembered one on this device and
+          every venue-scoped screen reloads for it (decided 28 September, audit R267).
+        provenance: decided 28 September 2026, audit R267
+      - kind: banner
+        label: Visiting today?
+        bindsTo: Entitlement
+        columns:
+        - Entitlement.venueId
+        - Entitlement.validFrom
+        - Entitlement.validTo
+        operation: listMyEntitlements
+        notes: '**On a visit day the app suggests the ticket''s venue** (decided 28 September, audit R267):
+          for a signed-in guest, an entitlement from `listMyEntitlements` (`state=upcoming`) valid today
+          at a venue other than the chosen one offers **Switch to that venue**; the guest decides, the
+          app never switches by itself.'
+        provenance: contract access.yaml GET /guests/me/entitlements
+      - kind: banner
+        label: Sold out or closed today
+        bindsTo: TenantAppStatus.availabilityMessage
+        operation: getTenantAppStatus
+        notes: From `getTenantAppStatus.availability` (`open`, `soldOut`, `closed`) and `availabilityMessage`
+          (decided 28 September, audit R073 (f)); nothing shows while it is `open`.
+        provenance: contract white-label.yaml GET /tenant-config/status
       - kind: selectField
         label: State
         operation: listMyEntitlements
@@ -584,7 +638,8 @@ screens:
     trigger: onLoad
   - operationId: listMyEntitlements
     contract: access
-    purpose: Every ticket, pass and membership this guest holds
+    purpose: Every ticket, pass and membership this guest holds; on a visit day, the ticket's venue is
+      suggested (decided 28 September, audit R267)
     trigger: onLoad
   - operationId: searchCatalogue
     contract: catalogue
@@ -598,7 +653,10 @@ screens:
     params:
     - name: subjectId
       from: session
-    coldEntry: Resolves from the session; a cold arrival is the ordinary case.
+    coldEntry: 'Resolves from the session; a cold arrival is the ordinary case. **The venue comes from
+      the device** (decided 28 September, audit R267): on first open the guest picks one, it is remembered
+      on the device and changeable from this screen, and on a visit day the ticket''s venue is suggested.
+      Every guest screen that declares `venueId` `from: session` reads that remembered choice.'
     preloaded:
     - Entitlement.id
     - Entitlement.templateId
@@ -1610,7 +1668,6 @@ screens:
     exitTo:
     - GST-001
     - GST-002
-    - GST-003
     - GST-067
     - GST-072
     transitions:
@@ -1618,10 +1675,6 @@ screens:
       trigger: Home – Default
       provenance: derived — GST-001 declares entryState.params  and GST-008 holds none of them, so the
         edge carries nothing and GST-001 opens cold
-    - to: GST-003
-      trigger: Event & Attraction Listing
-      provenance: derived — GST-003 declares entryState.params eventId and GST-008 holds none of them,
-        so the edge carries nothing and GST-003 opens cold
     - to: GST-072
       trigger: Share & Group Booking
       provenance: derived — GST-072 declares entryState.params entitlementId, groupBookingId, productId,
@@ -1703,17 +1756,12 @@ screens:
     exitTo:
     - GST-001
     - GST-002
-    - GST-003
     fromFlows: true
     transitions:
     - to: GST-001
       trigger: Home – Default
       provenance: derived — GST-001 declares entryState.params  and GST-009 holds none of them, so the
         edge carries nothing and GST-001 opens cold
-    - to: GST-003
-      trigger: Event & Attraction Listing
-      provenance: derived — GST-003 declares entryState.params eventId and GST-009 holds none of them,
-        so the edge carries nothing and GST-003 opens cold
     - to: BO-020
       trigger: Kitchen accepts and prepares
       provenance: flow F11 step 4→5
@@ -1725,13 +1773,18 @@ screens:
   notes: 'States derived from the screen pattern on 17 August, not individually considered. Purpose derived
     from the screen name and its operations on 17 August, not from a requirement. **`createPayment` added
     18 August** — the guest app''s payment screen did not declare the operation that takes a payment,
-    and F11 routed food payment through the AI concierge instead. **Card only, so tender currency equals
-    base currency**; a foreign card is converted by the guest''s own issuer at their rate, which is not
-    ours and is not recorded as ours. **Navigation repointed to P15 on 20 August** — the F&B screens it
-    linked to moved out of the back office when the client board was adopted. **Cross-platform navigation
-    removed 24 August**: BO-020. **A till does not navigate to a back office and a guest app does not
-    navigate to either** — those are device handovers, and a flow declares them with `crossesDevice` rather
-    than a screen pretending there is a link.'
+    and F11 routed food payment through the AI concierge instead. **Card or wallet** (TenderKind `card`,
+    `wallet`, as `createPayment` and flow F11 step 4 say; decided 28 September, audit R080 (a)), **both
+    in base currency, so tender currency equals base currency**; a foreign card is converted by the guest''s
+    own issuer at their rate, which is not ours and is not recorded as ours. **Navigation repointed to
+    P15 on 20 August** — the F&B screens it linked to moved out of the back office when the client board
+    was adopted. **Cross-platform navigation removed 24 August**: BO-020. **A till does not navigate to
+    a back office and a guest app does not navigate to either** — those are device handovers, and a flow
+    declares them with `crossesDevice` rather than a screen pretending there is a link. **No ''is this
+    you?'' at checkout** (decided 28 September, audit R120 (b)): a verified contact that matches an existing
+    profile attaches the order automatically inside `checkoutCart` (ADR-0045), so `checkGuestCheckoutMatch`
+    and `decideGuestCheckoutMatch` were removed from this screen; only unverified matches go to staff
+    review.'
   density: comfortable
   pattern: statusTracker
   patternReason: '`getCart` reads one record and nothing reads a population — the screen is about that
@@ -1794,14 +1847,6 @@ screens:
         operation: checkoutCart
         provenance: contract orders.yaml POST /carts/{cartId}/checkout
       - kind: secondaryButton
-        label: Check guest checkout match
-        operation: checkGuestCheckoutMatch
-        provenance: contract marketing-crm.yaml POST /guest-checkout/profile-match
-      - kind: secondaryButton
-        label: Decide guest checkout match
-        operation: decideGuestCheckoutMatch
-        provenance: contract marketing-crm.yaml POST /guest-checkout/profile-match/decision
-      - kind: secondaryButton
         label: Acquire inventory hold
         operation: addCartLine
         provenance: contract catalogue.yaml POST /inventory-holds
@@ -1823,14 +1868,6 @@ screens:
     offline: '**Not available, and the offline banner says why.** A payment needs the gateway, and pretending
       otherwise takes money nobody can confirm. What was typed stays on screen so nothing is entered twice.'
   apis:
-  - operationId: checkGuestCheckoutMatch
-    contract: marketing-crm
-    purpose: Does this contact already have a profile here
-    trigger: onAction
-  - operationId: decideGuestCheckoutMatch
-    contract: marketing-crm
-    purpose: Use the existing profile or keep separate
-    trigger: onAction
   - operationId: transferOrderTickets
     contract: orders
     purpose: Transfer tickets to another guest
@@ -1887,37 +1924,6 @@ screens:
     — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
     to the ones that matter is work a person still owes this screen.
   overlays:
-  - id: formCheckGuestCheckoutMatch
-    component: modal
-    trigger: Check guest checkout match
-    body: '**Collects what `checkGuestCheckoutMatch` sends before it is called.** Required: `cartId`.
-      Optional: `email`, `mobile`. Dismissing sends nothing; the screen behind is unchanged.'
-    bindsTo: GuestCheckoutMatchRequest
-    confirm:
-      label: Check guest checkout match
-      operation: checkGuestCheckoutMatch
-    dismiss:
-      label: Cancel
-      discards:
-      - cartId
-      - email
-      - mobile
-    provenance: contract marketing-crm.yaml POST /guest-checkout/profile-match
-  - id: formDecideGuestCheckoutMatch
-    component: modal
-    trigger: Decide guest checkout match
-    body: '**Collects what `decideGuestCheckoutMatch` sends before it is called.** Required: `matchToken`,
-      `decision`. Dismissing sends nothing; the screen behind is unchanged.'
-    bindsTo: GuestMatchDecisionRequest
-    confirm:
-      label: Decide guest checkout match
-      operation: decideGuestCheckoutMatch
-    dismiss:
-      label: Cancel
-      discards:
-      - matchToken
-      - decision
-    provenance: contract marketing-crm.yaml POST /guest-checkout/profile-match/decision
   - id: formAcquireInventoryHold
     component: modal
     trigger: Add to cart
@@ -2044,16 +2050,11 @@ screens:
     exitTo:
     - GST-001
     - GST-002
-    - GST-003
     transitions:
     - to: GST-001
       trigger: Home – Default
       provenance: derived — GST-001 declares entryState.params  and GST-010 holds none of them, so the
         edge carries nothing and GST-001 opens cold
-    - to: GST-003
-      trigger: Event & Attraction Listing
-      provenance: derived — GST-003 declares entryState.params eventId and GST-010 holds none of them,
-        so the edge carries nothing and GST-003 opens cold
   notes: 'States derived from the screen pattern on 17 August, not individually considered. Purpose derived
     from the screen name and its operations on 17 August, not from a requirement. **Wired 24 August from
     review**: getOrder. **The operations existed and this screen could not call them** — reviewers reported
@@ -2193,17 +2194,12 @@ screens:
     exitTo:
     - GST-001
     - GST-002
-    - GST-003
     - GST-020
     transitions:
     - to: GST-001
       trigger: Home – Default
       provenance: derived — GST-001 declares entryState.params  and GST-011 holds none of them, so the
         edge carries nothing and GST-001 opens cold
-    - to: GST-003
-      trigger: Event & Attraction Listing
-      provenance: derived — GST-003 declares entryState.params eventId and GST-011 holds none of them,
-        so the edge carries nothing and GST-003 opens cold
     - to: GST-020
       trigger: Saved items carry across sessions
       provenance: flow F53 step 4→5
@@ -2329,20 +2325,15 @@ screens:
     exitTo:
     - GST-001
     - GST-002
-    - GST-003
     - GST-013
     transitions:
     - to: GST-001
       trigger: Home – Default
       provenance: derived — GST-001 declares entryState.params  and GST-012 holds none of them, so the
         edge carries nothing and GST-001 opens cold
-    - to: GST-003
-      trigger: Event & Attraction Listing
-      provenance: derived — GST-003 declares entryState.params eventId and GST-012 holds none of them,
-        so the edge carries nothing and GST-003 opens cold
     - to: GST-013
       trigger: They open the one for now
-      provenance: flow F50 step 3→4
+      provenance: flow F50 step 4→5
       carries:
       - entitlementId
       - orderId
@@ -2474,8 +2465,9 @@ screens:
     emptyNoAccess: Shown when the caller lacks `ORDER_VIEW`, which `listMyEntitlements` requires, and
       names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody
       to support with the wrong question.
-    offline: '**The offline banner shows.** Tickets already loaded stay visible with their age. Sharing,
-      transferring and adding to a phone wallet need the connection.'
+    offline: '**The offline banner shows.** Tickets already loaded stay visible with their age, and a
+      ticket''s rotating code is derived on the device from its seed, so it changes with no signal (decided
+      28 September, audit R230). Sharing, transferring and adding to a phone wallet need the connection.'
   apis:
   - operationId: listMyEntitlements
     contract: access
@@ -2561,20 +2553,15 @@ screens:
     exitTo:
     - GST-001
     - GST-002
-    - GST-003
     - GST-055
     transitions:
     - to: GST-001
       trigger: Home – Default
       provenance: derived — GST-001 declares entryState.params  and GST-013 holds none of them, so the
         edge carries nothing and GST-001 opens cold
-    - to: GST-003
-      trigger: Event & Attraction Listing
-      provenance: derived — GST-003 declares entryState.params eventId and GST-013 holds none of them,
-        so the edge carries nothing and GST-003 opens cold
     - to: GST-055
       trigger: The QR rotates as they walk to the gate
-      provenance: flow F50 step 4→5
+      provenance: flow F50 step 5→6
       carries:
       - entitlementId
       - orderId
@@ -2627,8 +2614,13 @@ screens:
       - kind: detailPanel
         label: Entitlement credential
         operation: getEntitlementCredential
-        notes: Shows `mediaCode`, `payload`, `expiresAt` from `getEntitlementCredential`'s inline response.
-          **The response has no named schema**, so this cannot bind until the contract names one.
+        notes: 'Shows `mediaCode`, `payload`, `expiresAt` from `getEntitlementCredential`''s inline response.
+          **The response has no named schema**, so this cannot bind until the contract names one. **A
+          rotating code derived on the device** (decided 28 September, audit R230): while online the screen
+          fetches `rotation` (secret, `timeStepSeconds`, `digits`, `algorithm`, valid `validFrom` to `validTo`)
+          and computes the current code from the seed and the clock, with a visible countdown to the next
+          step; it keeps rotating with no signal. A null `rotation` (wristband, wallet pass) shows the
+          static code.'
         provenance: contract access.yaml GET /entitlements/{entitlementId}/credential
       - kind: dataTable
         label: Entitlement history
@@ -2651,8 +2643,9 @@ screens:
     emptyNoAccess: Shown when the caller lacks `ORDER_VIEW`, which `getEntitlement` requires, and names
       that permission. **Never an empty table** — that reads as *there is no data* and sends somebody
       to support with the wrong question.
-    offline: '**The offline banner shows.** Tickets already loaded stay visible with their age. Sharing,
-      transferring and adding to a phone wallet need the connection.'
+    offline: '**The offline banner shows.** Tickets already loaded stay visible with their age, and a
+      ticket''s rotating code is derived on the device from its seed, so it changes with no signal (decided
+      28 September, audit R230). Sharing, transferring and adding to a phone wallet need the connection.'
   apis:
   - operationId: getEntitlement
     contract: access
@@ -2660,7 +2653,8 @@ screens:
     trigger: onLoad
   - operationId: getEntitlementCredential
     contract: access
-    purpose: The thing that gets scanned
+    purpose: The thing that gets scanned — with the `rotation` seed the device derives the rotating code
+      from (audit R230)
     trigger: onLoad
   - operationId: getEntitlementHistory
     contract: access
@@ -2721,16 +2715,11 @@ screens:
     exitTo:
     - GST-001
     - GST-002
-    - GST-003
     transitions:
     - to: GST-001
       trigger: Home – Default
       provenance: derived — GST-001 declares entryState.params  and GST-014 holds none of them, so the
         edge carries nothing and GST-001 opens cold
-    - to: GST-003
-      trigger: Event & Attraction Listing
-      provenance: derived — GST-003 declares entryState.params eventId and GST-014 holds none of them,
-        so the edge carries nothing and GST-003 opens cold
   notes: 'States derived from the screen pattern on 17 August, not individually considered. Purpose derived
     from the screen name and its operations on 17 August, not from a requirement. **Cross-surface parity,
     31 August**: added listOrders. **The same screen on web and app was calling different operations**
@@ -2912,17 +2901,12 @@ screens:
     exitTo:
     - GST-001
     - GST-002
-    - GST-003
     fromFlows: true
     transitions:
     - to: GST-001
       trigger: Home – Default
       provenance: derived — GST-001 declares entryState.params  and GST-015 holds none of them, so the
         edge carries nothing and GST-001 opens cold
-    - to: GST-003
-      trigger: Event & Attraction Listing
-      provenance: derived — GST-003 declares entryState.params eventId and GST-015 holds none of them,
-        so the edge carries nothing and GST-003 opens cold
     - to: ADM-003
       trigger: The right is propagated to the other cell
       provenance: flow F19 step 1→2
@@ -3231,17 +3215,12 @@ screens:
     exitTo:
     - GST-001
     - GST-002
-    - GST-003
     - GST-017
     transitions:
     - to: GST-001
       trigger: Home – Default
       provenance: derived — GST-001 declares entryState.params  and GST-016 holds none of them, so the
         edge carries nothing and GST-001 opens cold
-    - to: GST-003
-      trigger: Event & Attraction Listing
-      provenance: derived — GST-003 declares entryState.params eventId and GST-016 holds none of them,
-        so the edge carries nothing and GST-003 opens cold
     - to: GST-017
       trigger: On the day, they arrive
       provenance: flow F52 step 3→4
@@ -3380,16 +3359,11 @@ screens:
     exitTo:
     - GST-001
     - GST-002
-    - GST-003
     transitions:
     - to: GST-001
       trigger: Home – Default
       provenance: derived — GST-001 declares entryState.params  and GST-017 holds none of them, so the
         edge carries nothing and GST-001 opens cold
-    - to: GST-003
-      trigger: Event & Attraction Listing
-      provenance: derived — GST-003 declares entryState.params eventId and GST-017 holds none of them,
-        so the edge carries nothing and GST-003 opens cold
   notes: States derived from the screen pattern on 17 August, not individually considered. Purpose derived
     from the screen name and its operations on 17 August, not from a requirement.
   density: comfortable
@@ -3483,16 +3457,11 @@ screens:
     exitTo:
     - GST-001
     - GST-002
-    - GST-003
     transitions:
     - to: GST-001
       trigger: Home – Default
       provenance: derived — GST-001 declares entryState.params  and GST-018 holds none of them, so the
         edge carries nothing and GST-001 opens cold
-    - to: GST-003
-      trigger: Event & Attraction Listing
-      provenance: derived — GST-003 declares entryState.params eventId and GST-018 holds none of them,
-        so the edge carries nothing and GST-003 opens cold
   notes: States derived from the screen pattern on 17 August, not individually considered. Purpose derived
     from the screen name and its operations on 17 August, not from a requirement. Add to Calendar and
     Reminders. **`issueWalletPass` is the operation this screen is for** — a wallet pass is the calendar
@@ -3734,16 +3703,11 @@ screens:
     exitTo:
     - GST-001
     - GST-002
-    - GST-003
     transitions:
     - to: GST-001
       trigger: Home – Default
       provenance: derived — GST-001 declares entryState.params  and GST-019 holds none of them, so the
         edge carries nothing and GST-001 opens cold
-    - to: GST-003
-      trigger: Event & Attraction Listing
-      provenance: derived — GST-003 declares entryState.params eventId and GST-019 holds none of them,
-        so the edge carries nothing and GST-003 opens cold
   notes: 'States derived from the screen pattern on 17 August, not individually considered. Purpose derived
     from the screen name and its operations on 17 August, not from a requirement. Order History. **`transferOrderTickets`
     was the only declared operation**, which is not history. Raised by Pranay. **Rewired on the 20 August
@@ -3959,16 +3923,11 @@ screens:
     exitTo:
     - GST-001
     - GST-002
-    - GST-003
     transitions:
     - to: GST-001
       trigger: Home – Default
       provenance: derived — GST-001 declares entryState.params  and GST-020 holds none of them, so the
         edge carries nothing and GST-001 opens cold
-    - to: GST-003
-      trigger: Event & Attraction Listing
-      provenance: derived — GST-003 declares entryState.params eventId and GST-020 holds none of them,
-        so the edge carries nothing and GST-003 opens cold
   notes: States derived from the screen pattern on 17 August, not individually considered. Purpose derived
     from the screen name and its operations on 17 August, not from a requirement. Wishlist. **Device and
     consent operations removed 20 August** — Pranay asked why they were here, and the answer is that seven
@@ -4082,7 +4041,6 @@ screens:
     exitTo:
     - GST-001
     - GST-002
-    - GST-003
     - GST-022
     transitions:
     - to: GST-022
@@ -4092,10 +4050,6 @@ screens:
       trigger: Home – Default
       provenance: derived — GST-001 declares entryState.params  and GST-021 holds none of them, so the
         edge carries nothing and GST-001 opens cold
-    - to: GST-003
-      trigger: Event & Attraction Listing
-      provenance: derived — GST-003 declares entryState.params eventId and GST-021 holds none of them,
-        so the edge carries nothing and GST-003 opens cold
     - to: BO-096
       trigger: The attendant checks what is free for the requested window
       provenance: flow F25 step 1→2
@@ -4316,6 +4270,8 @@ screens:
         edge carries nothing and GST-001 opens cold
     - to: GST-059
       trigger: Plan My Day – In Progress
+      precondition: 'a later release: the itinerary planner is deferred and this tile or link is not shown
+        in the first release (decided 28 September, audit R187)'
       provenance: derived — GST-059 declares entryState.params suggestionId and GST-022 holds none of
         them, so the edge carries nothing and GST-059 opens cold
   notes: States derived from the screen pattern on 17 August, not individually considered. Purpose derived
@@ -4347,6 +4303,9 @@ screens:
         - WaitTime.zone
         - WaitTime.asOf
         operation: getWaitTimes
+        notes: '**A stale wait time is shown with a caveat, never hidden** (decided 28 September, audit
+          R080 (b)): where `WaitTime.isStale` is true the minutes stay on screen marked out of date with
+          their `asOf` time, as queue.yaml says.'
         provenance: contract queue.yaml GET /queues/wait-times
   states:
     loading: The attraction wait times, read by `getWaitTimes`.
@@ -4384,11 +4343,11 @@ screens:
     entryFrom:
     - GST-001
     - GST-022
+    - GST-025
     inferred: true
     exitTo:
     - GST-001
     - GST-002
-    - GST-003
     - GST-024
     transitions:
     - to: GST-024
@@ -4398,10 +4357,6 @@ screens:
       trigger: Home – Default
       provenance: derived — GST-001 declares entryState.params  and GST-023 holds none of them, so the
         edge carries nothing and GST-001 opens cold
-    - to: GST-003
-      trigger: Event & Attraction Listing
-      provenance: derived — GST-003 declares entryState.params eventId and GST-023 holds none of them,
-        so the edge carries nothing and GST-003 opens cold
   notes: 'States derived from the screen pattern on 17 August, not individually considered. Purpose derived
     from the screen name and its operations on 17 August, not from a requirement. **Renamed 31 August**
     from *Virtual Queue / Join Queue*. **A guest surface is one product with two renderings** — a screen
@@ -4505,8 +4460,9 @@ screens:
     trigger: onAction
   - operationId: getWaitingGuest
     contract: queue
-    purpose: Read a queue entry
-    trigger: onLoad
+    purpose: The guest's place and the call to come forward, read on entry and polled while the screen
+      is open; the queue call shows here, not in a notification feed (decided 28 September, audit R242)
+    trigger: onInterval
   - operationId: leaveQueue
     contract: queue
     purpose: Leave a queue
@@ -4575,7 +4531,6 @@ screens:
     exitTo:
     - GST-001
     - GST-002
-    - GST-003
     - GST-009
     - GST-025
     fromFlows: true
@@ -4584,10 +4539,6 @@ screens:
       trigger: Home – Default
       provenance: derived — GST-001 declares entryState.params  and GST-024 holds none of them, so the
         edge carries nothing and GST-001 opens cold
-    - to: GST-003
-      trigger: Event & Attraction Listing
-      provenance: derived — GST-003 declares entryState.params eventId and GST-024 holds none of them,
-        so the edge carries nothing and GST-003 opens cold
     - to: GST-009
       trigger: Pays
       provenance: flow F11 step 3→4
@@ -4816,7 +4767,10 @@ screens:
     - name: venueId
       from: session
     coldEntry: '**A guest opening an order link weeks later.** Shows the order if it still resolves; if
-      it was refunded or the performance passed, says which and offers the order list rather than an error.'
+      it was refunded or the performance passed, says which and offers the order list rather than an error.
+      **`venueId` is the venue the guest picked on the home screen** (WEB-001 on the web, GST-001 in the
+      app), remembered on the device and changeable there; it is not read from the sign-in (decided 28
+      September, audit R267).'
     preloaded:
     - FulfilmentSlots.slots
   wireframe:
@@ -4898,21 +4852,23 @@ screens:
     exitTo:
     - GST-001
     - GST-002
-    - GST-003
+    - GST-023
     - GST-030
     fromFlows: true
     transitions:
     - to: GST-030
       trigger: Their queue place comes up and they are told
+      precondition: 'a later release: the in-venue notification feed is deferred and not shown in the
+        first release; queue calls and order updates show on the queue and order screens, which poll (decided
+        28 September, audit R242)'
       provenance: flow F48 step 5→6
     - to: GST-001
       trigger: Home – Default
       provenance: derived — GST-001 declares entryState.params  and GST-025 holds none of them, so the
         edge carries nothing and GST-001 opens cold
-    - to: GST-003
-      trigger: Event & Attraction Listing
-      provenance: derived — GST-003 declares entryState.params eventId and GST-025 holds none of them,
-        so the edge carries nothing and GST-003 opens cold
+    - to: GST-023
+      trigger: Their queue place comes up and the queue screen shows it
+      provenance: flow F48 step 5→6
     - to: BO-021
       trigger: Runner delivers to the lounger
       provenance: flow F11 step 6→7
@@ -4981,8 +4937,10 @@ screens:
   apis:
   - operationId: getGuestOrderStatus
     contract: fnb
-    purpose: Ordered → accepted → in preparation → ready → served, collected or delivered
-    trigger: onLoad
+    purpose: The order's status (ordered, accepted, in preparation, ready, served, collected or delivered),
+      read on entry and polled while the screen is open; order updates show here, not in a notification
+      feed (decided 28 September, audit R242)
+    trigger: onInterval
   - operationId: getGuestBill
     contract: fnb
     purpose: Everything ordered at this location this sitting
@@ -5039,17 +4997,12 @@ screens:
     exitTo:
     - GST-001
     - GST-002
-    - GST-003
     fromFlows: true
     transitions:
     - to: GST-001
       trigger: Home – Default
       provenance: derived — GST-001 declares entryState.params  and GST-026 holds none of them, so the
         edge carries nothing and GST-001 opens cold
-    - to: GST-003
-      trigger: Event & Attraction Listing
-      provenance: derived — GST-003 declares entryState.params eventId and GST-026 holds none of them,
-        so the edge carries nothing and GST-003 opens cold
     - to: BO-069
       trigger: Machine records the play
       provenance: flow F18 step 2→3
@@ -5066,9 +5019,12 @@ screens:
       - merchandiseId
   notes: 'States derived from the screen pattern on 17 August, not individually considered. Purpose derived
     from the screen name and its operations on 17 August, not from a requirement. **Cross-platform navigation
-    removed 24 August**: BO-048, BO-069. **A till does not navigate to a back office and a guest app does
-    not navigate to either** — those are device handovers, and a flow declares them with `crossesDevice`
-    rather than a screen pretending there is a link.'
+    removed 24 August**: BO-048, BO-069. **Buying to collect goes through the cart** (decided 28 September,
+    audit R236) — `addCartLine`, `checkoutCart`, `createPayment`, and payment creates the shop-and-drop,
+    as on the web''s WEB-033; `reserveMerchandise` stays only as an unpaid hold to pay at the shop. **A
+    till does not navigate to a back office and a guest app does not navigate to either** — those are
+    device handovers, and a flow declares them with `crossesDevice` rather than a screen pretending there
+    is a link.'
   density: comfortable
   pattern: listDetail
   patternReason: '`listMerchandise` reads the population and `getGameCard` reads one of them — list, select,
@@ -5168,10 +5124,31 @@ screens:
       - kind: primaryButton
         label: Lookup merchandise
         operation: lookupMerchandise
+        notes: Sends `?outletId=` — the outlet the guest is browsing — because the app has no workstation;
+          price and stock are that outlet's, and an inactive item is not found (decided 28 September,
+          audit R215 (1)).
         provenance: contract retail.yaml GET /merchandise/lookup
       - kind: secondaryButton
-        label: Reserve merchandise
+        label: Add to cart for collection
+        operation: addCartLine
+        provenance: contract orders.yaml POST /carts/{cartId}/lines
+      - kind: secondaryButton
+        label: Check out to collect on the way out
+        operation: checkoutCart
+        notes: '**Paid online at checkout** (decided 28 September, audit R236): merchandise marked for
+          collection goes in the cart with `addCartLine`, the cart is checked out and paid here, and **payment
+          creates the shop-and-drop** for collection on the way out. Nothing is reserved unpaid in the
+          app either; `reserveMerchandise` below only holds unpaid stock to pay for at the shop.'
+        provenance: contract orders.yaml POST /carts/{cartId}/checkout
+      - kind: primaryButton
+        label: Pay
+        operation: createPayment
+        provenance: contract orders.yaml POST /payments
+      - kind: secondaryButton
+        label: Hold to pay at the shop
         operation: reserveMerchandise
+        notes: An unpaid hold, not a purchase — the item is allocated and paid for at the outlet; buying
+          to collect is the cart above (decided 28 September, audit R236).
         provenance: contract retail.yaml POST /outlets/{outletId}/reserve
   states:
     loading: The retail merchandise list.
@@ -5199,12 +5176,29 @@ screens:
     contract: retail
     purpose: Find an item by code or scan
     trigger: onAction
+  - operationId: addCartLine
+    contract: orders
+    purpose: Put the item in the cart, marked for collection on the way out (audit R236)
+    trigger: onAction
+    invalidates:
+    - listMerchandise
+  - operationId: checkoutCart
+    contract: orders
+    purpose: Turn the cart into an order; merchandise for collection is paid online (audit R236)
+    trigger: onAction
+  - operationId: createPayment
+    contract: orders
+    purpose: Pay for it; payment creates the shop-and-drop for collection (decided 28 September, audit
+      R236)
+    trigger: onAction
   - operationId: reserveMerchandise
     contract: retail
     purpose: Hold it for collection
     trigger: onAction
   entryState:
     params:
+    - name: cartId
+      from: session
     - name: cardCode
       from: deepLink
     - name: outletId
@@ -5232,7 +5226,9 @@ screens:
     component: modal
     trigger: Reserve merchandise
     body: '**Collects what `reserveMerchandise` sends before it is called.** Required: `id`, `lines`,
-      `expiresAt`. Optional: `subjectId`, `collectionNote`. Dismissing sends nothing; the screen behind
+      `expiresAt`. Optional: `subjectId`, `collectionNote`. **Expiry** (`expiresAt`) is picked from 15
+      minutes ahead up to the close of the venue''s operating day, and the picker offers nothing outside
+      that window (decided 28 September, audit R215 (2)). Dismissing sends nothing; the screen behind
       is unchanged.'
     confirm:
       label: Reserve merchandise
@@ -5246,6 +5242,26 @@ screens:
       - subjectId
       - collectionNote
     provenance: contract retail.yaml POST /outlets/{outletId}/reserve
+  - id: formAddCartLine
+    component: modal
+    trigger: Add to cart for collection
+    body: '**Collects what `addCartLine` sends before it is called.** Required: `variantId`, `quantity`.
+      Optional: `performanceId`, `seatIds`, `parentLineId`, `attributes`. Dismissing sends nothing; the
+      screen behind is unchanged.'
+    bindsTo: AddCartLineRequest
+    confirm:
+      label: Add cart line
+      operation: addCartLine
+    dismiss:
+      label: Cancel
+      discards:
+      - variantId
+      - quantity
+      - performanceId
+      - seatIds
+      - parentLineId
+      - attributes
+    provenance: contract orders.yaml POST /carts/{cartId}/lines
 - id: GST-027
   name: Parking – Reserve & Pay
   module: In-venue Services
@@ -5264,21 +5280,17 @@ screens:
     exitTo:
     - GST-001
     - GST-002
-    - GST-003
     - GST-028
     transitions:
-    - to: GST-028
-      trigger: It is confirmed with a facility and a bay type
-      provenance: flow F50 step 1→2
-      operation: createParkingEntitlement
     - to: GST-001
       trigger: Home – Default
       provenance: derived — GST-001 declares entryState.params  and GST-027 holds none of them, so the
         edge carries nothing and GST-001 opens cold
-    - to: GST-003
-      trigger: Event & Attraction Listing
-      provenance: derived — GST-003 declares entryState.params eventId and GST-027 holds none of them,
-        so the edge carries nothing and GST-003 opens cold
+    - to: GST-028
+      trigger: It is confirmed with a facility
+      provenance: flow F50 step 2→3
+      carries:
+      - orderId
   notes: 'States derived from the screen pattern on 17 August, not individually considered. Purpose derived
     from the screen name and its operations on 17 August, not from a requirement. **`createParkingEntitlement`
     is declared `service` audience and this is a guest screen.** Either the guest calls it — in which
@@ -5286,7 +5298,11 @@ screens:
     it cannot perform. **Recorded 24 August rather than guessed**: `updateParkingEntitlement` is already
     `guest`, which makes the asymmetry look like an omission rather than a design. **Cross-surface parity,
     31 August**: added listParkingFacilities. **The same screen on web and app was calling different operations**
-    — one side could do something the other could not, and nothing recorded the difference as deliberate.'
+    — one side could do something the other could not, and nothing recorded the difference as deliberate.
+    **Rebound 28 September** (decided 28 September, audit R166): parking is sold through the normal cart
+    and checkout (`addCartLine`, `checkoutCart`, `createPayment`), so the entitlement gets its `orderId`;
+    the guest no longer calls `createParkingEntitlement`, which the order service issues at payment. No
+    live availability; a full car park is the `soldOutForDay` refusal.'
   density: comfortable
   pattern: listDetail
   patternReason: '`listParkingFacilities` reads a population and nothing reads one of them; the detail
@@ -5347,9 +5363,21 @@ screens:
       slot: rowActions
       components:
       - kind: primaryButton
-        label: Create parking entitlement
-        operation: createParkingEntitlement
-        provenance: contract access.yaml POST /parking-entitlements
+        label: Add parking to my cart
+        operation: addCartLine
+        notes: '**Parking is sold through the normal cart** (decided 28 September, audit R166): the car
+          park''s parking product goes in as a cart line, then checkout and payment as for a ticket, and
+          the parking entitlement is issued at payment carrying the order''s id — the guest never creates
+          it. No live space count: a car park at capacity refuses the line with `soldOutForDay`.'
+        provenance: contract orders.yaml POST /carts/{cartId}/lines
+      - kind: secondaryButton
+        label: Check out
+        operation: checkoutCart
+        provenance: contract orders.yaml POST /carts/{cartId}/checkout
+      - kind: primaryButton
+        label: Pay
+        operation: createPayment
+        provenance: contract orders.yaml POST /payments
       - kind: secondaryButton
         label: Save parking entitlement
         operation: updateParkingEntitlement
@@ -5366,13 +5394,24 @@ screens:
       somebody to support with the wrong question.
     offline: '**The offline banner shows.** A reservation already confirmed stays on screen with its plate
       and car park. Reserving, paying and changing the plate need the connection.'
+    soldOutForDay: '**The car park is full.** `addCartLine` refused the parking line with `soldOutForDay`:
+      issued entitlements have reached the facility''s capacity for that day. Shown only then — there
+      is no live space count in the first release, so the screen never promises spaces before the guest
+      tries (decided 28 September, audit R166).'
   apis:
-  - operationId: createParkingEntitlement
-    contract: access
-    purpose: A guest bought parking
+  - operationId: addCartLine
+    contract: orders
+    purpose: Put the car park's parking product in the cart; refused `soldOutForDay` when the car park
+      is at capacity (decided 28 September, audit R166)
     trigger: onAction
-    invalidates:
-    - listParkingFacilities
+  - operationId: checkoutCart
+    contract: orders
+    purpose: Turn the cart into an order
+    trigger: onAction
+  - operationId: createPayment
+    contract: orders
+    purpose: Pay for it; the parking entitlement is issued at payment with the order's id (audit R166)
+    trigger: onAction
   - operationId: updateParkingEntitlement
     contract: access
     purpose: Change the plate, or revoke
@@ -5387,6 +5426,8 @@ screens:
     params:
     - name: entitlementId
       from: deepLink
+    - name: cartId
+      from: session
     coldEntry: '**A ticket link opened after the event.** Shows the entitlement with its status — expired,
       used, transferred — because *not found* to somebody holding a ticket is the wrong answer.'
     preloaded:
@@ -5403,32 +5444,24 @@ screens:
     — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
     to the ones that matter is work a person still owes this screen.
   overlays:
-  - id: formCreateParkingEntitlement
+  - id: formAddCartLine
     component: modal
-    trigger: Create parking entitlement
-    body: '**Collects what `createParkingEntitlement` sends before it is called.** Required: `facilityId`,
-      `orderId`, `validFrom`, `validTo`. Optional: `id`, `subjectId`, `plateNumber`, `plateCountry`, `mediaCode`,
-      `status`, `pushedAt`, `pushFailureReason`. Dismissing sends nothing; the screen behind is unchanged.'
-    bindsTo: ParkingEntitlement
+    trigger: Add parking to my cart
+    body: '**Collects what `addCartLine` sends before it is called.** Required: `variantId` (the car park''s
+      parking product), `quantity`. Optional: `performanceId`, `attributes` (the plate). A 409 `soldOutForDay`
+      is shown as **the car park is full** for that day — capacity reached, not a live count (decided
+      28 September, audit R166). Dismissing sends nothing; the screen behind is unchanged.'
     confirm:
-      label: Create parking entitlement
-      operation: createParkingEntitlement
+      label: Add to cart
+      operation: addCartLine
     dismiss:
       label: Cancel
       discards:
-      - facilityId
-      - orderId
-      - validFrom
-      - validTo
-      - id
-      - subjectId
-      - plateNumber
-      - plateCountry
-      - mediaCode
-      - status
-      - pushedAt
-      - pushFailureReason
-    provenance: contract access.yaml POST /parking-entitlements
+      - variantId
+      - quantity
+      - performanceId
+      - attributes
+    provenance: contract orders.yaml POST /carts/{cartId}/lines
   - id: formUpdateParkingEntitlement
     component: modal
     trigger: Save parking entitlement
@@ -5465,20 +5498,15 @@ screens:
     exitTo:
     - GST-001
     - GST-002
-    - GST-003
     - GST-012
     transitions:
     - to: GST-001
       trigger: Home – Default
       provenance: derived — GST-001 declares entryState.params  and GST-028 holds none of them, so the
         edge carries nothing and GST-001 opens cold
-    - to: GST-003
-      trigger: Event & Attraction Listing
-      provenance: derived — GST-003 declares entryState.params eventId and GST-028 holds none of them,
-        so the edge carries nothing and GST-003 opens cold
     - to: GST-012
       trigger: They open their tickets
-      provenance: flow F50 step 2→3
+      provenance: flow F50 step 3→4
       carries:
       - orderId
   notes: 'States derived from the screen pattern on 17 August, not individually considered. Purpose derived
@@ -5486,7 +5514,9 @@ screens:
     is declared `service` audience and this is a guest screen.** Either the guest calls it — in which
     case the audience is wrong — or a guest-scoped operation is missing and the screen is drawing an act
     it cannot perform. **Recorded 24 August rather than guessed**: `updateParkingEntitlement` is already
-    `guest`, which makes the asymmetry look like an omission rather than a design.'
+    `guest`, which makes the asymmetry look like an omission rather than a design. **Rebound 28 September**
+    (decided 28 September, audit R166): the guest no longer creates the parking entitlement; it is issued
+    at payment of the cart order, and this screen reads that order (`getOrder`).'
   density: comfortable
   pattern: listDetail
   patternReason: '`listParkingFacilities` reads a population and nothing reads one of them; the detail
@@ -5546,15 +5576,23 @@ screens:
     - name: actionBar
       slot: rowActions
       components:
-      - kind: primaryButton
-        label: Create parking entitlement
-        operation: createParkingEntitlement
-        provenance: contract access.yaml POST /parking-entitlements
+      - kind: detailPanel
+        label: The order the parking was paid on
+        bindsTo: Order
+        columns:
+        - Order.id
+        - Order.status
+        operation: getOrder
+        notes: '**The parking entitlement is issued at payment, carrying this order''s id** (decided 28
+          September, audit R166); this screen confirms the order and shows the car park and plate from
+          it, and never creates the entitlement itself.'
+        provenance: contract orders.yaml GET /orders/{orderId}
   states:
     loading: The parking reservation confirmed list.
     error: Could not load. Names which read failed and leaves the parking reservation confirmed untouched.
-    emptyFirstRun: No parking reservation confirmed yet. Offers Create parking entitlement (`createParkingEntitlement`);
-      distinct from a filter that matched nothing.
+    emptyFirstRun: '**Paid, entitlement not yet shown.** The order is paid and the entitlement is issued
+      at payment; until it appears the screen shows the order and says the car park pass follows (audit
+      R166).'
     emptyNoResults: Nothing matches the filter on venueId and the parking reservation confirmed are still
       there. Names the active filter and offers to clear it.
     emptyNoAccess: Shown when the caller lacks `PARKING_CONFIGURE`, which `listParkingFacilities` requires,
@@ -5563,17 +5601,20 @@ screens:
     offline: '**The offline banner shows.** A reservation already confirmed stays on screen with its plate
       and car park. Reserving, paying and changing the plate need the connection.'
   apis:
-  - operationId: createParkingEntitlement
-    contract: access
-    purpose: A guest bought parking
-    trigger: onAction
-    invalidates:
-    - listParkingFacilities
+  - operationId: getOrder
+    contract: orders
+    purpose: The paid order that carries the parking entitlement (audit R166)
+    trigger: onLoad
   - operationId: listParkingFacilities
     contract: access
     purpose: Car parks at a venue, and how each integrates
     trigger: onLoad
   entryState:
+    params:
+    - name: orderId
+      from: previousScreen
+    coldEntry: '**Opened cold, it needs the order.** Without `orderId` it sends the guest to their orders
+      rather than showing an empty confirmation.'
     preloaded:
     - ParkingFacility.id
     - ParkingFacility.name
@@ -5587,33 +5628,6 @@ screens:
   apisNote: Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack
     — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
     to the ones that matter is work a person still owes this screen.
-  overlays:
-  - id: formCreateParkingEntitlement
-    component: modal
-    trigger: Create parking entitlement
-    body: '**Collects what `createParkingEntitlement` sends before it is called.** Required: `facilityId`,
-      `orderId`, `validFrom`, `validTo`. Optional: `id`, `subjectId`, `plateNumber`, `plateCountry`, `mediaCode`,
-      `status`, `pushedAt`, `pushFailureReason`. Dismissing sends nothing; the screen behind is unchanged.'
-    bindsTo: ParkingEntitlement
-    confirm:
-      label: Create parking entitlement
-      operation: createParkingEntitlement
-    dismiss:
-      label: Cancel
-      discards:
-      - facilityId
-      - orderId
-      - validFrom
-      - validTo
-      - id
-      - subjectId
-      - plateNumber
-      - plateCountry
-      - mediaCode
-      - status
-      - pushedAt
-      - pushFailureReason
-    provenance: contract access.yaml POST /parking-entitlements
 - id: GST-029
   name: Venue Info & Services
   module: In-venue Services
@@ -5632,18 +5646,14 @@ screens:
     exitTo:
     - GST-001
     - GST-002
-    - GST-003
     transitions:
     - to: GST-001
       trigger: Home – Default
       provenance: derived — GST-001 declares entryState.params  and GST-029 holds none of them, so the
         edge carries nothing and GST-001 opens cold
-    - to: GST-003
-      trigger: Event & Attraction Listing
-      provenance: derived — GST-003 declares entryState.params eventId and GST-029 holds none of them,
-        so the edge carries nothing and GST-003 opens cold
   notes: States derived from the screen pattern on 17 August, not individually considered. Purpose derived
-    from the screen name and its operations on 17 August, not from a requirement.
+    from the screen name and its operations on 17 August, not from a requirement. **Contact added 28 September**
+    from `getTenantAppStatus.contact`, as on the web's WEB-028 (decided 28 September, audit R073 (f)).
   density: comfortable
   pattern: listDetail
   patternReason: '`listDiningOutlets` reads a population and nothing reads one of them; the detail is
@@ -5655,6 +5665,20 @@ screens:
     - name: contentBody
       slot: collection
       components:
+      - kind: detailPanel
+        label: How to reach the venue
+        bindsTo: VenueContact
+        columns:
+        - VenueContact.phone
+        - VenueContact.email
+        - VenueContact.whatsapp
+        - VenueContact.address
+        - VenueContact.openingHours
+        operation: getTenantAppStatus
+        notes: '**From `getTenantAppStatus.contact`** (decided 28 September, audit R073 (f)): phone, email,
+          WhatsApp, address and opening hours, set from CMS-001 through `setMaintenanceMode`. Each is
+          optional and a missing one is left out rather than shown blank.'
+        provenance: contract white-label.yaml GET /tenant-config/status
       - kind: toggle
         label: Open now
         operation: listDiningOutlets
@@ -5732,6 +5756,11 @@ screens:
       Anything that spends money, holds capacity or changes the account waits for the connection, and
       its button says so rather than failing.'
   apis:
+  - operationId: getTenantAppStatus
+    contract: white-label
+    purpose: How to reach the venue — phone, email, WhatsApp, address, opening hours (decided 28 September,
+      audit R073 (f))
+    trigger: onLoad
   - operationId: listDiningOutlets
     contract: fnb
     purpose: Where a guest can eat, right now
@@ -5744,7 +5773,9 @@ screens:
     params:
     - name: venueId
       from: session
-    coldEntry: Resolves from the session; a cold arrival is the ordinary case.
+    coldEntry: Resolves from the session; a cold arrival is the ordinary case. **`venueId` is the venue
+      the guest picked on the home screen** (WEB-001 on the web, GST-001 in the app), remembered on the
+      device and changeable there; it is not read from the sign-in (decided 28 September, audit R267).
     preloaded:
     - DiningOutlet.outletId
     - DiningOutlet.name
@@ -5762,7 +5793,13 @@ screens:
   name: In-Venue Notifications
   module: Engagement & Support
   requiresModule: fnb
-  wave: 2
+  wave: 4
+  deferred:
+    release: later
+    decided: '2026-09-28'
+    decision: R242
+    reason: No in-app feed of in-venue notifications in the first release; queue calls and order status
+      show on the queue and order screens, which poll for them (decided 28 September, audit R242).
   capability: C61
   implementation:
     app: guest-app
@@ -5777,7 +5814,6 @@ screens:
     exitTo:
     - GST-001
     - GST-002
-    - GST-003
     - GST-031
     fromFlows: true
     transitions:
@@ -5785,18 +5821,17 @@ screens:
       trigger: Home – Default
       provenance: derived — GST-001 declares entryState.params  and GST-030 holds none of them, so the
         edge carries nothing and GST-001 opens cold
-    - to: GST-003
-      trigger: Event & Attraction Listing
-      provenance: derived — GST-003 declares entryState.params eventId and GST-030 holds none of them,
-        so the edge carries nothing and GST-003 opens cold
     - to: GST-031
       trigger: AI Concierge – Home
       carries:
       - outletId
       provenance: derived — GST-031 declares entryState.params conversationId, outletId and GST-030 holds
         outletId, so an edge into it carries them
-  notes: States derived from the screen pattern on 17 August, not individually considered. Purpose derived
-    from the screen name and its operations on 17 August, not from a requirement.
+  notes: 'States derived from the screen pattern on 17 August, not individually considered. Purpose derived
+    from the screen name and its operations on 17 August, not from a requirement. **Out of the first release**
+    (decided 28 September, audit R242): no in-app notification feed; queue calls and order status show
+    on the queue and order screens, which poll. This screen is `wave: 4` with a `deferred` block, kept
+    for a later release.'
   density: comfortable
   pattern: configEditor
   patternReason: the screen declares only writes (`claimLocationSession`) and no read of a population
@@ -5864,7 +5899,6 @@ screens:
     exitTo:
     - GST-001
     - GST-002
-    - GST-003
     - GST-032
     fromFlows: true
     transitions:
@@ -5872,10 +5906,6 @@ screens:
       trigger: Home – Default
       provenance: derived — GST-001 declares entryState.params  and GST-031 holds none of them, so the
         edge carries nothing and GST-001 opens cold
-    - to: GST-003
-      trigger: Event & Attraction Listing
-      provenance: derived — GST-003 declares entryState.params eventId and GST-031 holds none of them,
-        so the edge carries nothing and GST-003 opens cold
     - to: GST-032
       trigger: AI Concierge – Chat
       carries:
@@ -5959,7 +5989,8 @@ screens:
     trigger: onAction
   - operationId: requestSuggestion
     contract: ai
-    purpose: requestSuggestion
+    purpose: A suggestion of kind prepPlan, upsell or waitTime only — the kinds a guest may ask for; no
+      itinerary or scenario (decided 28 September, audit R209)
     trigger: onAction
   entryState:
     params:
@@ -6023,8 +6054,10 @@ screens:
   - id: formRequestSuggestion
     component: modal
     trigger: Request suggestion
-    body: '**Collects what `requestSuggestion` sends before it is called.** Required: `kind`. Optional:
-      `subjectRef`, `horizon`, `context`. Dismissing sends nothing; the screen behind is unchanged.'
+    body: '**Collects what `requestSuggestion` sends before it is called.** Required: `kind`, offered
+      as `prepPlan`, `upsell` or `waitTime` only — no itinerary or `scenario`, which the planner''s deferral
+      took out of the first release (decided 28 September, audit R209, R187). Optional: `subjectRef`,
+      `horizon`, `context`. Dismissing sends nothing; the screen behind is unchanged.'
     confirm:
       label: Request suggestion
       operation: requestSuggestion
@@ -6054,7 +6087,6 @@ screens:
     exitTo:
     - GST-001
     - GST-002
-    - GST-003
     - GST-033
     fromFlows: true
     transitions:
@@ -6062,10 +6094,6 @@ screens:
       trigger: Home – Default
       provenance: derived — GST-001 declares entryState.params  and GST-032 holds none of them, so the
         edge carries nothing and GST-001 opens cold
-    - to: GST-003
-      trigger: Event & Attraction Listing
-      provenance: derived — GST-003 declares entryState.params eventId and GST-032 holds none of them,
-        so the edge carries nothing and GST-003 opens cold
     - to: GST-033
       trigger: AI Concierge – Contextual Help
       carries:
@@ -6327,17 +6355,12 @@ screens:
     exitTo:
     - GST-001
     - GST-002
-    - GST-003
     fromFlows: true
     transitions:
     - to: GST-001
       trigger: Home – Default
       provenance: derived — GST-001 declares entryState.params  and GST-033 holds none of them, so the
         edge carries nothing and GST-001 opens cold
-    - to: GST-003
-      trigger: Event & Attraction Listing
-      provenance: derived — GST-003 declares entryState.params eventId and GST-033 holds none of them,
-        so the edge carries nothing and GST-003 opens cold
   notes: 'States derived from the screen pattern on 17 August, not individually considered. Purpose derived
     from the screen name and its operations on 17 August, not from a requirement. **Guest concierge confirmed
     in Phase 1 on 17 August (CF-14), charged per token and bounded by `AiPolicy.guestCapabilityScope`.**
@@ -6420,17 +6443,12 @@ screens:
     exitTo:
     - GST-001
     - GST-002
-    - GST-003
     fromFlows: true
     transitions:
     - to: GST-001
       trigger: Home – Default
       provenance: derived — GST-001 declares entryState.params  and GST-034 holds none of them, so the
         edge carries nothing and GST-001 opens cold
-    - to: GST-003
-      trigger: Event & Attraction Listing
-      provenance: derived — GST-003 declares entryState.params eventId and GST-034 holds none of them,
-        so the edge carries nothing and GST-003 opens cold
   notes: 'States derived from the screen pattern on 17 August, not individually considered. Purpose derived
     from the screen name and its operations on 17 August, not from a requirement. **Navigation repointed
     to P15 on 20 August** — the F&B screens it linked to moved out of the back office when the client
@@ -6515,8 +6533,10 @@ screens:
     emptyFirstRun: No lost found yet. Offers Raise my case (`raiseMyCase`).
     emptyNoResults: 'Never shown: `listMyCases` takes no filter, so an empty list is always the first-run
       state above.'
-    offline: '**The offline banner shows.** Reports already loaded stay read-only with their age. Reporting
-      and replying need the connection.'
+    offline: '**The offline banner shows.** Reports already loaded stay read-only with their age. **Reporting
+      a loss and replying are disabled offline** — both need the connection (decided 28 September, audit
+      R148) — and the screen says how to reach staff in person instead: the guest services desk or lost-property
+      point, or any member of staff.'
   apis:
   - operationId: listMyCases
     contract: marketing-crm
@@ -6610,16 +6630,11 @@ screens:
     exitTo:
     - GST-001
     - GST-002
-    - GST-003
     transitions:
     - to: GST-001
       trigger: Home – Default
       provenance: derived — GST-001 declares entryState.params  and GST-035 holds none of them, so the
         edge carries nothing and GST-001 opens cold
-    - to: GST-003
-      trigger: Event & Attraction Listing
-      provenance: derived — GST-003 declares entryState.params eventId and GST-035 holds none of them,
-        so the edge carries nothing and GST-003 opens cold
   notes: States derived from the screen pattern on 17 August, not individually considered. Purpose derived
     from the screen name and its operations on 17 August, not from a requirement. **Guest case operations
     wired 24 August.** **No case operation was guest-callable** — a guest could raise nothing and read
@@ -6742,16 +6757,11 @@ screens:
     exitTo:
     - GST-001
     - GST-002
-    - GST-003
     transitions:
     - to: GST-001
       trigger: Home – Default
       provenance: derived — GST-001 declares entryState.params  and GST-036 holds none of them, so the
         edge carries nothing and GST-001 opens cold
-    - to: GST-003
-      trigger: Event & Attraction Listing
-      provenance: derived — GST-003 declares entryState.params eventId and GST-036 holds none of them,
-        so the edge carries nothing and GST-003 opens cold
     - to: WEB-024
       trigger: They see rewards and manage their devices
       provenance: flow F53 step 1→2
@@ -6876,17 +6886,12 @@ screens:
     exitTo:
     - GST-001
     - GST-002
-    - GST-003
     - GST-011
     transitions:
     - to: GST-001
       trigger: Home – Default
       provenance: derived — GST-001 declares entryState.params  and GST-037 holds none of them, so the
         edge carries nothing and GST-001 opens cold
-    - to: GST-003
-      trigger: Event & Attraction Listing
-      provenance: derived — GST-003 declares entryState.params eventId and GST-037 holds none of them,
-        so the edge carries nothing and GST-003 opens cold
     - to: GST-011
       trigger: Their wallet shows stored value
       provenance: flow F53 step 3→4
@@ -7053,16 +7058,11 @@ screens:
     exitTo:
     - GST-001
     - GST-002
-    - GST-003
     transitions:
     - to: GST-001
       trigger: Home – Default
       provenance: derived — GST-001 declares entryState.params  and GST-038 holds none of them, so the
         edge carries nothing and GST-001 opens cold
-    - to: GST-003
-      trigger: Event & Attraction Listing
-      provenance: derived — GST-003 declares entryState.params eventId and GST-038 holds none of them,
-        so the edge carries nothing and GST-003 opens cold
   notes: '**Not minuted and not in the matrix.** The only unsourced screen of the eight audited on 17
     August — it reads as a framing for the in-venue capabilities rather than a capability of its own,
     and CF-92 asks whether it is a real screen or a name for a mode.'
@@ -7228,7 +7228,6 @@ screens:
     exitTo:
     - GST-001
     - GST-002
-    - GST-003
     - GST-065
     - GST-066
     - GST-069
@@ -7242,10 +7241,6 @@ screens:
       trigger: Home – Default
       provenance: derived — GST-001 declares entryState.params  and GST-039 holds none of them, so the
         edge carries nothing and GST-001 opens cold
-    - to: GST-003
-      trigger: Event & Attraction Listing
-      provenance: derived — GST-003 declares entryState.params eventId and GST-039 holds none of them,
-        so the edge carries nothing and GST-003 opens cold
     - to: GST-069
       trigger: Face Pass
       provenance: derived — GST-069 declares entryState.params enrolmentId and GST-039 holds none of them,
@@ -7373,16 +7368,11 @@ screens:
     exitTo:
     - GST-001
     - GST-002
-    - GST-003
     transitions:
     - to: GST-001
       trigger: Home – Default
       provenance: derived — GST-001 declares entryState.params  and GST-040 holds none of them, so the
         edge carries nothing and GST-001 opens cold
-    - to: GST-003
-      trigger: Event & Attraction Listing
-      provenance: derived — GST-003 declares entryState.params eventId and GST-040 holds none of them,
-        so the edge carries nothing and GST-003 opens cold
     - to: WEB-034
       trigger: They report something lost
       provenance: flow F54 step 2→3
@@ -7452,9 +7442,10 @@ screens:
     emptyNoAccess: Shown when the caller lacks `TENANT_CONFIGURE`, which `listFaqs` requires, and names
       that permission. **Never an empty table** — that reads as *there is no data* and sends somebody
       to support with the wrong question.
-    offline: '**The offline banner shows.** What was already loaded stays on screen, marked with its age.
-      Anything that spends money, holds capacity or changes the account waits for the connection, and
-      its button says so rather than failing.'
+    offline: '**The offline banner shows.** Help already loaded stays readable, marked with its age. **Raising
+      a case is disabled offline** — it needs the connection (decided 28 September, audit R148) — and
+      the screen says how to reach staff in person instead: the guest services desk, or any member of
+      staff.'
   apis:
   - operationId: listFaqs
     contract: white-label
@@ -7547,7 +7538,6 @@ screens:
     exitTo:
     - GST-001
     - GST-002
-    - GST-003
     - GST-042
     transitions:
     - to: GST-042
@@ -7563,12 +7553,10 @@ screens:
       trigger: Home – Default
       provenance: derived — GST-001 declares entryState.params  and GST-041 holds none of them, so the
         edge carries nothing and GST-001 opens cold
-    - to: GST-003
-      trigger: Event & Attraction Listing
-      provenance: derived — GST-003 declares entryState.params eventId and GST-041 holds none of them,
-        so the edge carries nothing and GST-003 opens cold
   notes: States derived from the screen pattern on 17 August, not individually considered. Purpose derived
-    from the screen name and its operations on 17 August, not from a requirement.
+    from the screen name and its operations on 17 August, not from a requirement. **Promo code added 28
+    September** (decided 28 September, audit R073 (e)) — the web cart WEB-010 has the field, and the two
+    shells are one product.
   density: comfortable
   pattern: statusTracker
   patternReason: '`getCart` reads one record and nothing reads a population — the screen is about that
@@ -7616,6 +7604,24 @@ screens:
         - ProductVariant.isActive
         operation: listProductVariants
         provenance: contract catalogue.yaml GET /products/{productId}/variants
+    - name: promoCode
+      slot: fields
+      components:
+      - kind: textField
+        label: Promo code
+        bindsTo: ApplyCartPromoCodeRequest.code
+        operation: applyCartPromoCode
+        notes: '**Applied to the cart at once** with `applyCartPromoCode` (POST /carts/{cartId}/promo-codes,
+          body `{code}`; decided 28 September, audit R073 (e)). The two refusals read differently: 422
+          `promoCodeInvalid` says the code does not exist, was voided or is used up; 422 `promoCodeNotApplicable`
+          says the code is real but nothing in this cart qualifies. A 410 `cartExpired` sends the guest
+          back to rebuild the cart. Accepted codes are listed from `Cart.couponCodes` and re-priced on
+          every read.'
+        provenance: contract orders.yaml POST /carts/{cartId}/promo-codes
+      - kind: secondaryButton
+        label: Apply code
+        operation: applyCartPromoCode
+        provenance: contract orders.yaml POST /carts/{cartId}/promo-codes
     - name: actionBar
       slot: rowActions
       components:
@@ -7658,6 +7664,13 @@ screens:
       Anything that spends money, holds capacity or changes the account waits for the connection, and
       its button says so rather than failing.'
   apis:
+  - operationId: applyCartPromoCode
+    contract: orders
+    purpose: Apply a promo code to the cart; refused 422 promoCodeInvalid or promoCodeNotApplicable, shown
+      as different messages (decided 28 September, audit R073 (e))
+    trigger: onAction
+    invalidates:
+    - getCart
   - operationId: getCart
     contract: orders
     purpose: The cart, priced and checked, right now
@@ -7767,17 +7780,12 @@ screens:
     exitTo:
     - GST-001
     - GST-002
-    - GST-003
     - GST-041
     transitions:
     - to: GST-001
       trigger: Home – Default
       provenance: derived — GST-001 declares entryState.params  and GST-042 holds none of them, so the
         edge carries nothing and GST-001 opens cold
-    - to: GST-003
-      trigger: Event & Attraction Listing
-      provenance: derived — GST-003 declares entryState.params eventId and GST-042 holds none of them,
-        so the edge carries nothing and GST-003 opens cold
     - to: GST-041
       trigger: Signed in and verified — back to the cart
       precondition: arrived from the cart
@@ -7790,279 +7798,108 @@ screens:
       provenance: flow F56 step 2→3
       crossesDevice: true
       back: false
-      carries:
-      - challengeId
-      - methodId
-      - providerId
   notes: 'States derived from the screen pattern on 17 August, not individually considered. Purpose derived
     from the screen name and its operations on 17 August, not from a requirement. **Corrected 24 August**:
     removed getCurrentSession, logout, selectRole. **A guest surface has no roles to select and its own
     logout.** `selectRole` is ADR-0002 staff authorisation; `getCurrentSession` is the staff session.
     `guestLogout` and `getGuestSession` already existed — the screen was reaching into the staff identity
-    surface because nothing checked that a guest platform only calls guest operations.'
+    surface because nothing checked that a guest platform only calls guest operations. **Rebuilt 28 September
+    as a guest sign-in form** (decided 28 September, audit R167, R073 (a)): removed `login`, `startSsoAuthorization`,
+    `completeSsoAuthorization`, `listSsoProviders` and the six MFA operations (`createMfaChallenge`, `enrolMfaMethod`,
+    `listMfaMethods`, `removeMfaMethod`, `verifyMfaChallenge`, `verifyMfaEnrolment`) — guests have no
+    enterprise SSO and no second factor at sign-in. Password sign-in is `guestPasswordLogin`.'
   density: comfortable
-  pattern: listDetail
-  patternReason: '`listMfaMethods` reads the population and `getGuestSession` reads one of them — list,
-    select, act'
-  purpose: Work with simple registration & otp for this venue.
+  pattern: form
+  patternReason: '**A sign-in form, not a list.** Four ways in (a one-time code, a password, Apple or
+    Google, UAE Pass) and a way to register; `getGuestSession` is the one piece of context. Rebuilt 28
+    September: the screen had been generated as a list of MFA methods and SSO providers, neither of which
+    a guest has (decided 28 September, audit R167, R073 (a)).'
+  purpose: 'Get a guest into the app, fast, on a device that may be shared: a one-time code to the email
+    or mobile, a password, Apple or Google, or UAE Pass, or register a new account. **No enterprise SSO
+    and no second factor at sign-in for guests** (decided 28 September, audit R167).'
   layout:
-    template: split
+    template: form
     regions:
-    - name: contentBody
-      slot: collection
+    - name: signIn
+      slot: fields
       components:
-      - kind: dataTable
-        label: Every MFA method
-        bindsTo: MfaMethod
-        columns:
-        - MfaMethod.id
-        - MfaMethod.kind
-        - MfaMethod.label
-        - MfaMethod.maskedTarget
-        - MfaMethod.isActive
-        - MfaMethod.isPrimary
-        - MfaMethod.enrolledAt
-        - MfaMethod.lastUsedAt
-        operation: listMfaMethods
-        provenance: contract identity.yaml GET /auth/mfa/methods
-      - kind: dataTable
-        label: Every SSO provider
-        bindsTo: SsoProvider
-        columns:
-        - SsoProvider.id
-        - SsoProvider.displayName
-        - SsoProvider.protocol
-        - SsoProvider.iconAssetRef
-        - SsoProvider.isEnforced
-        - SsoProvider.scopePath
-        operation: listSsoProviders
-        provenance: contract identity.yaml GET /auth/sso/providers
-    - name: contextPanel
-      slot: selection
+      - kind: textField
+        label: Email or mobile number
+        operation: requestGuestOtp
+        notes: One field for both routes below; the same identifier goes to `requestGuestOtp` and to `guestPasswordLogin`.
+        provenance: contract identity.yaml POST /auth/guest/otp
+      - kind: primaryButton
+        label: Send me a code
+        operation: requestGuestOtp
+        provenance: contract identity.yaml POST /auth/guest/otp
+      - kind: textField
+        label: Code
+        operation: verifyGuestOtp
+        notes: Shown once a code has been sent; `verifyGuestOtp` returns the `GuestSession`.
+        provenance: contract identity.yaml POST /auth/guest/otp/verify
+      - kind: primaryButton
+        label: Sign in with the code
+        operation: verifyGuestOtp
+        provenance: contract identity.yaml POST /auth/guest/otp/verify
+      - kind: textField
+        label: Password
+        operation: guestPasswordLogin
+        notes: '**Password sign-in** (decided 28 September, audit R073 (a)): sends `identifier`, `password`
+          and the device''s `deviceId` to `guestPasswordLogin`, which returns the same `GuestSession`.
+          A wrong password, an unknown identifier and an account with no password are one answer (401)
+          and the screen shows one message for all of them, never which it was. Signing in here ends this
+          device''s previous guest session.'
+        provenance: contract identity.yaml POST /auth/guest/password
+      - kind: secondaryButton
+        label: Sign in with password
+        operation: guestPasswordLogin
+        provenance: contract identity.yaml POST /auth/guest/password
+      - kind: secondaryButton
+        label: Continue with Apple or Google
+        operation: guestSocialLogin
+        provenance: contract identity.yaml POST /auth/guest/social
+      - kind: secondaryButton
+        label: Continue with UAE Pass
+        operation: guestUaePassLogin
+        provenance: contract identity.yaml POST /auth/guest/uae-pass
+      - kind: secondaryButton
+        label: Create an account
+        operation: registerGuest
+        provenance: contract identity.yaml POST /auth/guest/register
+    - name: session
+      slot: context
       components:
       - kind: detailPanel
-        label: The selected MFA method
-        bindsTo: MfaMethod
-        columns:
-        - MfaMethod.id
-        - MfaMethod.kind
-        - MfaMethod.label
-        - MfaMethod.maskedTarget
-        - MfaMethod.isActive
-        - MfaMethod.isPrimary
-        - MfaMethod.enrolledAt
-        - MfaMethod.lastUsedAt
-        operation: listMfaMethods
-        provenance: contract identity.yaml GET /auth/mfa/methods
-      - kind: detailPanel
-        label: The guest session
+        label: Who is signed in on this device
         bindsTo: GuestSession
         columns:
         - GuestSession.subjectId
         - GuestSession.displayName
-        - GuestSession.tokens
         - GuestSession.isVerified
         - GuestSession.identityProviders
-        - GuestSession.guestLinkId
-        - GuestSession.homeCellName
         - GuestSession.preferredLanguage
         - GuestSession.expiresAt
         operation: getGuestSession
+        notes: Shown only when a guest session already exists on this device, with a way to sign out so
+          a shared device is handed over clean.
         provenance: contract identity.yaml GET /auth/guest/session
-    - name: actionBar
-      slot: rowActions
-      components:
-      - kind: primaryButton
-        label: Request guest OTP
-        operation: requestGuestOtp
-        provenance: contract identity.yaml POST /auth/guest/otp
       - kind: secondaryButton
-        label: Complete SSO authorization
-        operation: completeSsoAuthorization
-        provenance: contract identity.yaml POST /auth/sso/{providerId}/callback
-      - kind: secondaryButton
-        label: Enrol MFA method
-        operation: enrolMfaMethod
-        provenance: contract identity.yaml POST /auth/mfa/methods
-      - kind: secondaryButton
-        label: Guest logout
+        label: Sign out
         operation: guestLogout
         provenance: contract identity.yaml DELETE /auth/guest/session
       - kind: secondaryButton
-        label: Guest social login
-        operation: guestSocialLogin
-        provenance: contract identity.yaml POST /auth/guest/social
-      - kind: secondaryButton
-        label: Guest uae pass login
-        operation: guestUaePassLogin
-        provenance: contract identity.yaml POST /auth/guest/uae-pass
-      - kind: secondaryButton
-        label: Link guest checkout
+        label: Link an order I placed as a guest
         operation: linkGuestCheckout
         provenance: contract identity.yaml POST /auth/guest/link-checkout
       - kind: secondaryButton
-        label: Login
-        operation: login
-        provenance: contract identity.yaml POST /auth/login
-      - kind: secondaryButton
         label: Refresh token
         operation: refreshToken
+        notes: Not a button the guest sees; the client rotates the access token before it expires.
         provenance: contract identity.yaml POST /auth/refresh
-      - kind: secondaryButton
-        label: Register guest
-        operation: registerGuest
-        provenance: contract identity.yaml POST /auth/guest/register
-      - kind: destructiveButton
-        label: Remove MFA method
-        operation: removeMfaMethod
-        provenance: contract identity.yaml DELETE /auth/mfa/methods/{methodId}
-      - kind: secondaryButton
-        label: Start SSO authorization
-        operation: startSsoAuthorization
-        provenance: contract identity.yaml GET /auth/sso/{providerId}/authorize
-      - kind: secondaryButton
-        label: Verify guest OTP
-        operation: verifyGuestOtp
-        provenance: contract identity.yaml POST /auth/guest/otp/verify
-      - kind: secondaryButton
-        label: Verify MFA challenge
-        operation: verifyMfaChallenge
-        provenance: contract identity.yaml POST /auth/mfa/challenge/{challengeId}/verify
-      - kind: secondaryButton
-        label: Verify MFA enrolment
-        operation: verifyMfaEnrolment
-        provenance: contract identity.yaml POST /auth/mfa/methods/{methodId}
   overlays:
-  - id: confirmRemoveMfaMethod
-    component: confirmDialog
-    trigger: Remove MFA method
-    body: '**Names what `removeMfaMethod` changes and what it leaves alone**, in the consequence rather
-      than the verb. A simple registration otp this affects should be identified in the dialog, not just
-      counted.'
-    provenance: contract identity.yaml DELETE /auth/mfa/methods/{methodId}
-  - id: formRequestGuestOtp
-    component: modal
-    trigger: Request guest OTP
-    body: '**Collects what `requestGuestOtp` sends before it is called.** Required: `identifier`, `channel`.
-      Optional: `purpose`. Dismissing sends nothing; the screen behind is unchanged.'
-    confirm:
-      label: Request guest OTP
-      operation: requestGuestOtp
-    dismiss:
-      label: Cancel
-      discards:
-      - identifier
-      - channel
-      - purpose
-    provenance: contract identity.yaml POST /auth/guest/otp
-  - id: formCompleteSsoAuthorization
-    component: modal
-    trigger: Complete SSO authorization
-    body: '**Collects what `completeSsoAuthorization` sends before it is called.** Required: `code`, `state`.
-      Optional: `workstationId`. Dismissing sends nothing; the screen behind is unchanged.'
-    confirm:
-      label: Complete SSO authorization
-      operation: completeSsoAuthorization
-    dismiss:
-      label: Cancel
-      discards:
-      - code
-      - state
-      - workstationId
-    provenance: contract identity.yaml POST /auth/sso/{providerId}/callback
-  - id: formEnrolMfaMethod
-    component: modal
-    trigger: Enrol MFA method
-    body: '**Collects what `enrolMfaMethod` sends before it is called.** Required: `kind`. Optional: `target`.
-      Dismissing sends nothing; the screen behind is unchanged.'
-    confirm:
-      label: Enrol MFA method
-      operation: enrolMfaMethod
-    dismiss:
-      label: Cancel
-      discards:
-      - kind
-      - target
-    provenance: contract identity.yaml POST /auth/mfa/methods
-  - id: formGuestSocialLogin
-    component: modal
-    trigger: Guest social login
-    body: '**Collects what `guestSocialLogin` sends before it is called.** Required: `provider`, `idToken`.
-      Optional: `deviceId`. Dismissing sends nothing; the screen behind is unchanged.'
-    confirm:
-      label: Guest social login
-      operation: guestSocialLogin
-    dismiss:
-      label: Cancel
-      discards:
-      - provider
-      - idToken
-      - deviceId
-    provenance: contract identity.yaml POST /auth/guest/social
-  - id: formGuestUaePassLogin
-    component: modal
-    trigger: Guest uae pass login
-    body: '**Collects what `guestUaePassLogin` sends before it is called.** Required: `code`, `redirectUri`.
-      Optional: `state`, `deviceId`. Dismissing sends nothing; the screen behind is unchanged.'
-    confirm:
-      label: Guest uae pass login
-      operation: guestUaePassLogin
-    dismiss:
-      label: Cancel
-      discards:
-      - code
-      - redirectUri
-      - state
-      - deviceId
-    provenance: contract identity.yaml POST /auth/guest/uae-pass
-  - id: formLinkGuestCheckout
-    component: modal
-    trigger: Link guest checkout
-    body: '**Collects what `linkGuestCheckout` sends before it is called.** Required: `orderReference`.
-      Optional: `verificationCode`. Dismissing sends nothing; the screen behind is unchanged.'
-    confirm:
-      label: Link guest checkout
-      operation: linkGuestCheckout
-    dismiss:
-      label: Cancel
-      discards:
-      - orderReference
-      - verificationCode
-    provenance: contract identity.yaml POST /auth/guest/link-checkout
-  - id: formLogin
-    component: modal
-    trigger: Login
-    body: '**Collects what `login` sends before it is called.** Required: `username`, `credential`, `workstationId`.
-      Optional: `method`, `deviceFingerprint`. Dismissing sends nothing; the screen behind is unchanged.'
-    bindsTo: LoginRequest
-    confirm:
-      label: Login
-      operation: login
-    dismiss:
-      label: Cancel
-      discards:
-      - username
-      - credential
-      - workstationId
-      - method
-      - deviceFingerprint
-    provenance: contract identity.yaml POST /auth/login
-  - id: formRefreshToken
-    component: modal
-    trigger: Refresh token
-    body: '**Collects what `refreshToken` sends before it is called.** Required: `refreshToken`. Dismissing
-      sends nothing; the screen behind is unchanged.'
-    confirm:
-      label: Refresh token
-      operation: refreshToken
-    dismiss:
-      label: Cancel
-      discards:
-      - refreshToken
-    provenance: contract identity.yaml POST /auth/refresh
   - id: formRegisterGuest
     component: modal
-    trigger: Register guest
+    trigger: Create an account
     body: '**Collects what `registerGuest` sends before it is called.** Required: `identifier`, `channel`.
       Optional: `displayName`, `password`, `preferredLanguage`, `consents`. Dismissing sends nothing;
       the screen behind is unchanged.'
@@ -8080,9 +7917,99 @@ screens:
       - preferredLanguage
       - consents
     provenance: contract identity.yaml POST /auth/guest/register
+  - id: formGuestPasswordLogin
+    component: modal
+    trigger: Sign in with password
+    body: '**Collects what `guestPasswordLogin` sends before it is called.** Required: `identifier`, `password`.
+      Optional: `deviceId` (sent by the client, not typed). A 401 is one message whatever the cause; a
+      429 or a locked account says to try again later or use a one-time code instead (decided 28 September,
+      audit R073 (a)). Dismissing sends nothing; the screen behind is unchanged.'
+    confirm:
+      label: Sign in
+      operation: guestPasswordLogin
+    dismiss:
+      label: Cancel
+      discards:
+      - identifier
+      - password
+      - deviceId
+    provenance: contract identity.yaml POST /auth/guest/password
+  - id: formGuestSocialLogin
+    component: modal
+    trigger: Continue with Apple or Google
+    body: '**Collects what `guestSocialLogin` sends before it is called.** Required: `provider`, `idToken`.
+      Optional: `deviceId`. Dismissing sends nothing; the screen behind is unchanged.'
+    confirm:
+      label: Guest social login
+      operation: guestSocialLogin
+    dismiss:
+      label: Cancel
+      discards:
+      - provider
+      - idToken
+      - deviceId
+    provenance: contract identity.yaml POST /auth/guest/social
+  - id: formGuestUaePassLogin
+    component: modal
+    trigger: Continue with UAE Pass
+    body: '**Collects what `guestUaePassLogin` sends before it is called.** Required: `code`, `redirectUri`.
+      Optional: `state`, `deviceId`. Dismissing sends nothing; the screen behind is unchanged.'
+    confirm:
+      label: Guest uae pass login
+      operation: guestUaePassLogin
+    dismiss:
+      label: Cancel
+      discards:
+      - code
+      - redirectUri
+      - state
+      - deviceId
+    provenance: contract identity.yaml POST /auth/guest/uae-pass
+  - id: formLinkGuestCheckout
+    component: modal
+    trigger: Link an order I placed as a guest
+    body: '**Collects what `linkGuestCheckout` sends before it is called.** Required: `orderReference`.
+      Optional: `verificationCode`. Dismissing sends nothing; the screen behind is unchanged.'
+    confirm:
+      label: Link guest checkout
+      operation: linkGuestCheckout
+    dismiss:
+      label: Cancel
+      discards:
+      - orderReference
+      - verificationCode
+    provenance: contract identity.yaml POST /auth/guest/link-checkout
+  - id: formRefreshToken
+    component: modal
+    trigger: Refresh token
+    body: '**Collects what `refreshToken` sends before it is called.** Required: `refreshToken`. Dismissing
+      sends nothing; the screen behind is unchanged.'
+    confirm:
+      label: Refresh token
+      operation: refreshToken
+    dismiss:
+      label: Cancel
+      discards:
+      - refreshToken
+    provenance: contract identity.yaml POST /auth/refresh
+  - id: formRequestGuestOtp
+    component: modal
+    trigger: Send me a code
+    body: '**Collects what `requestGuestOtp` sends before it is called.** Required: `identifier`, `channel`.
+      Optional: `purpose`. Dismissing sends nothing; the screen behind is unchanged.'
+    confirm:
+      label: Request guest OTP
+      operation: requestGuestOtp
+    dismiss:
+      label: Cancel
+      discards:
+      - identifier
+      - channel
+      - purpose
+    provenance: contract identity.yaml POST /auth/guest/otp
   - id: formVerifyGuestOtp
     component: modal
-    trigger: Verify guest OTP
+    trigger: Sign in with the code
     body: '**Collects what `verifyGuestOtp` sends before it is called.** Required: `identifier`, `code`.
       Optional: `deviceId`. Dismissing sends nothing; the screen behind is unchanged.'
     confirm:
@@ -8095,57 +8022,29 @@ screens:
       - code
       - deviceId
     provenance: contract identity.yaml POST /auth/guest/otp/verify
-  - id: formVerifyMfaChallenge
-    component: modal
-    trigger: Verify MFA challenge
-    body: '**Collects what `verifyMfaChallenge` sends before it is called.** Required: `code`. Dismissing
-      sends nothing; the screen behind is unchanged.'
-    confirm:
-      label: Verify MFA challenge
-      operation: verifyMfaChallenge
-    dismiss:
-      label: Cancel
-      discards:
-      - code
-    provenance: contract identity.yaml POST /auth/mfa/challenge/{challengeId}/verify
-  - id: formVerifyMfaEnrolment
-    component: modal
-    trigger: Verify MFA enrolment
-    body: '**Collects what `verifyMfaEnrolment` sends before it is called.** Required: `code`. Dismissing
-      sends nothing; the screen behind is unchanged.'
-    confirm:
-      label: Verify MFA enrolment
-      operation: verifyMfaEnrolment
-    dismiss:
-      label: Cancel
-      discards:
-      - code
-    provenance: contract identity.yaml POST /auth/mfa/methods/{methodId}
   states:
-    loading: The simple registration otp list.
-    error: Could not load. Names which read failed and leaves the simple registration otp untouched.
-    emptyFirstRun: No simple registration otp yet. Offers Request guest OTP (`requestGuestOtp`).
-    emptyNoResults: 'Never shown: `listMfaMethods` takes no filter, so an empty list is always the first-run
-      state above.'
+    loading: Checking whether this device already holds a guest session. The sign-in form stays visible.
+    error: Identity could not be reached. **Says so rather than saying the password or code is wrong**,
+      and keeps what was typed.
+    emptyFirstRun: '**Nobody signed in on this device** — the normal state. The form offers a code, a
+      password, Apple or Google and UAE Pass, and Create an account (`registerGuest`).'
+    emptyNoAccess: '**There is no permission to name — a guest holds none** (ADR-0025), and this is the
+      screen a guest who is not signed in is sent to, so it has no no-access case of its own. A session
+      that has expired lands here with the screen it came from kept, and returns to it after sign-in.'
+    signInRefused: '**One message for every refusal of a password sign-in**: `guestPasswordLogin` answers
+      401 alike for a wrong password, an unknown identifier, an account with no password and a locked
+      account, and the screen never says which. Too many attempts (429, or the lockout after `PasswordPolicy.lockoutAfterAttempts`)
+      says to try again later and offers **Send me a code** instead (decided 28 September, audit R073
+      (a)).'
     offline: '**Not available, and the offline banner says why.** Signing in, registering and verifying
       a code need the server.'
   apis:
-  - operationId: requestGuestOtp
+  - operationId: registerGuest
     contract: identity
-    purpose: from page inventory
-    trigger: onAction
-  - operationId: completeSsoAuthorization
-    contract: identity
-    purpose: Exchange an SSO code for a session
+    purpose: Create a guest account
     trigger: onAction
     invalidates:
-    - listMfaMethods
-  - operationId: enrolMfaMethod
-    contract: identity
-    purpose: Enrol an MFA method
-    trigger: onAction
-    invalidates:
-    - listMfaMethods
+    - getGuestSession
   - operationId: getGuestSession
     contract: identity
     purpose: Read the current guest session
@@ -8155,98 +8054,52 @@ screens:
     purpose: End a guest session
     trigger: onAction
     invalidates:
-    - listMfaMethods
+    - getGuestSession
+  - operationId: guestPasswordLogin
+    contract: identity
+    purpose: Sign in with the email or mobile and the password set at registration (identifier, password,
+      deviceId -> GuestSession); one indistinguishable 401, lockout, 429 (decided 28 September, audit
+      R073 (a))
+    trigger: onAction
+    invalidates:
+    - getGuestSession
   - operationId: guestSocialLogin
     contract: identity
     purpose: Sign in with Apple or Google
     trigger: onAction
     invalidates:
-    - listMfaMethods
+    - getGuestSession
   - operationId: guestUaePassLogin
     contract: identity
     purpose: Sign in with a national identity provider
     trigger: onAction
     invalidates:
-    - listMfaMethods
+    - getGuestSession
   - operationId: linkGuestCheckout
     contract: identity
     purpose: Attach a guest checkout to an account
     trigger: onAction
-    invalidates:
-    - listMfaMethods
-  - operationId: listMfaMethods
-    contract: identity
-    purpose: Enrolled MFA methods
-    trigger: onLoad
-  - operationId: listSsoProviders
-    contract: identity
-    purpose: Identity providers configured for this tenant
-    trigger: onLoad
-  - operationId: login
-    contract: identity
-    purpose: Authenticate and open a session
-    trigger: onAction
-    invalidates:
-    - listMfaMethods
   - operationId: refreshToken
     contract: identity
     purpose: Rotate the access token
     trigger: onAction
-    invalidates:
-    - listMfaMethods
-  - operationId: registerGuest
+  - operationId: requestGuestOtp
     contract: identity
-    purpose: Create a guest account
-    trigger: onAction
-    invalidates:
-    - listMfaMethods
-  - operationId: removeMfaMethod
-    contract: identity
-    purpose: Remove an MFA method
-    trigger: onAction
-    invalidates:
-    - listMfaMethods
-  - operationId: startSsoAuthorization
-    contract: identity
-    purpose: Begin an SSO flow
+    purpose: Request a one-time code
     trigger: onAction
   - operationId: verifyGuestOtp
     contract: identity
     purpose: Verify a one-time code and issue a session
     trigger: onAction
     invalidates:
-    - listMfaMethods
-  - operationId: verifyMfaChallenge
-    contract: identity
-    purpose: Complete a step-up challenge
-    trigger: onAction
-    invalidates:
-    - listMfaMethods
-  - operationId: verifyMfaEnrolment
-    contract: identity
-    purpose: Complete enrolment
-    trigger: onAction
-    invalidates:
-    - listMfaMethods
+    - getGuestSession
   entryState:
     params:
-    - name: challengeId
-      from: deepLink
-    - name: methodId
-      from: deepLink
-    - name: providerId
-      from: deepLink
-    coldEntry: '**A guest arriving cold on a link that no longer resolves is shown what happened and one
-      way onward — never a 404.** A shared ticket, a forwarded confirmation and a push notification opened
-      three weeks late all land here, and the person holding the link did nothing wrong. **The screen
-      names the thing, says it is expired, cancelled or withdrawn, and offers the list it came from.**
-      Arrives with `challengeId`, `methodId`, `providerId`.'
-    preloaded:
-    - MfaMethod.id
-    - MfaMethod.kind
-    - MfaMethod.label
-    - MfaMethod.maskedTarget
-    - MfaMethod.isActive
+    - name: cartId
+      from: session
+    coldEntry: '**Needs nothing.** A guest arriving cold signs in and goes Home; one sent from the cart
+      carries `cartId` and goes back to it. The MFA and SSO deep-link parameters (`challengeId`, `methodId`,
+      `providerId`) went with the operations that used them (audit R167).'
   wireframe:
     status: notStarted
     provenance: generated
@@ -8272,16 +8125,11 @@ screens:
     exitTo:
     - GST-001
     - GST-002
-    - GST-003
     transitions:
     - to: GST-001
       trigger: Home – Default
       provenance: derived — GST-001 declares entryState.params  and GST-043 holds none of them, so the
         edge carries nothing and GST-001 opens cold
-    - to: GST-003
-      trigger: Event & Attraction Listing
-      provenance: derived — GST-003 declares entryState.params eventId and GST-043 holds none of them,
-        so the edge carries nothing and GST-003 opens cold
   notes: States derived from the screen pattern on 17 August, not individually considered. Purpose derived
     from the screen name and its operations on 17 August, not from a requirement.
   density: comfortable
@@ -8332,16 +8180,11 @@ screens:
     exitTo:
     - GST-001
     - GST-002
-    - GST-003
     transitions:
     - to: GST-001
       trigger: Home – Default
       provenance: derived — GST-001 declares entryState.params  and GST-044 holds none of them, so the
         edge carries nothing and GST-001 opens cold
-    - to: GST-003
-      trigger: Event & Attraction Listing
-      provenance: derived — GST-003 declares entryState.params eventId and GST-044 holds none of them,
-        so the edge carries nothing and GST-003 opens cold
   notes: 'Drawn in guest storyboard board 7 panel 4 — a selector across AED, USD, EUR, GBP and SAR with
     *"payment will be processed in AED"* — and board 8 carries an AED selector in its header. **Confirmed
     for both surfaces on 18 August (CF-111).** The matrix names the website (2.6.33, 2.9.1) and the storyboard
@@ -8362,6 +8205,14 @@ screens:
     - name: contentBody
       slot: collection
       components:
+      - kind: selectField
+        label: Venue
+        operation: listFxRates
+        notes: Sends `?venueId=` to `listFxRates`, from the venue the guest picked (see the home screen),
+          so the list is the region's rates narrowed to the currencies this venue shows. Rates are set
+          per region and each venue picks which currencies it shows (decided 28 September, audit R120
+          (a)).
+        provenance: contract finance.yaml GET /fx-rates
       - kind: datePicker
         label: As at
         operation: listFxRates
@@ -8442,7 +8293,8 @@ screens:
   apis:
   - operationId: listFxRates
     contract: finance
-    purpose: The rates in force
+    purpose: The rates in force for the venue's shown currencies — always called with `venueId` (decided
+      28 September, audit R120 (a))
     trigger: onLoad
   - operationId: listProducts
     contract: catalogue
@@ -8480,16 +8332,11 @@ screens:
     exitTo:
     - GST-001
     - GST-002
-    - GST-003
     transitions:
     - to: GST-001
       trigger: Home – Default
       provenance: derived — GST-001 declares entryState.params  and GST-045 holds none of them, so the
         edge carries nothing and GST-001 opens cold
-    - to: GST-003
-      trigger: Event & Attraction Listing
-      provenance: derived — GST-003 declares entryState.params eventId and GST-045 holds none of them,
-        so the edge carries nothing and GST-003 opens cold
   notes: States derived from the screen pattern on 17 August, not individually considered. Purpose derived
     from the screen name and its operations on 17 August, not from a requirement.
   density: comfortable
@@ -8565,16 +8412,11 @@ screens:
     exitTo:
     - GST-001
     - GST-002
-    - GST-003
     transitions:
     - to: GST-001
       trigger: Home – Default
       provenance: derived — GST-001 declares entryState.params  and GST-046 holds none of them, so the
         edge carries nothing and GST-001 opens cold
-    - to: GST-003
-      trigger: Event & Attraction Listing
-      provenance: derived — GST-003 declares entryState.params eventId and GST-046 holds none of them,
-        so the edge carries nothing and GST-003 opens cold
   notes: 'States derived from the screen pattern on 17 August, not individually considered. Purpose derived
     from the screen name and its operations on 17 August, not from a requirement. **Cross-surface parity,
     31 August**: added getWaitingGuest, joinQueue. **A guest does not know which surface they are on**
@@ -8649,8 +8491,9 @@ screens:
     trigger: onLoad
   - operationId: getWaitingGuest
     contract: queue
-    purpose: Read a queue entry
-    trigger: onLoad
+    purpose: The guest's place and the call to come forward, read on entry and polled while the screen
+      is open; the queue call shows here, not in a notification feed (decided 28 September, audit R242)
+    trigger: onInterval
   - operationId: joinQueue
     contract: queue
     purpose: Join a virtual queue
@@ -8708,19 +8551,16 @@ screens:
     exitTo:
     - GST-001
     - GST-002
-    - GST-003
     transitions:
     - to: GST-001
       trigger: Home – Default
       provenance: derived — GST-001 declares entryState.params  and GST-047 holds none of them, so the
         edge carries nothing and GST-001 opens cold
-    - to: GST-003
-      trigger: Event & Attraction Listing
-      provenance: derived — GST-003 declares entryState.params eventId and GST-047 holds none of them,
-        so the edge carries nothing and GST-003 opens cold
   notes: Merged with GST-060 on 18 August. The client storyboard shows this on two boards — G7 panel 7
     and G8 panel 10 — which is a **board convention for a screen every journey can land on**, not two
-    screens. Both had the same single operation and the same purpose.
+    screens. Both had the same single operation and the same purpose. **Bound 28 September** to `getTenantAppStatus.minimumAppVersion`
+    for the forced upgrade and to `availability` and `availabilityMessage` for sold out and closed (decided
+    28 September, audit R073 (b)(f)).
   density: comfortable
   pattern: statusTracker
   patternReason: '`getTenantAppStatus` reads one record and nothing reads a population — the screen is
@@ -8747,8 +8587,29 @@ screens:
         - TenantAppStatus.isInMaintenance
         - TenantAppStatus.maintenanceMessage
         - TenantAppStatus.expectedBackAt
+        - TenantAppStatus.minimumAppVersion
+        - TenantAppStatus.availability
+        - TenantAppStatus.availabilityMessage
         - TenantAppStatus.recentChanges
         operation: getTenantAppStatus
+        provenance: contract white-label.yaml GET /tenant-config/status
+      - kind: banner
+        label: Update the app to continue
+        bindsTo: TenantAppStatus.minimumAppVersion
+        operation: getTenantAppStatus
+        notes: '**Forced upgrade** (decided 28 September, audit R073 (b)): when this app''s version is
+          below `minimumAppVersion` for its platform (`ios` or `android`), the screen shows the forcedUpgrade
+          state with a button to the store and nothing else works until the guest updates. Set live from
+          CMS-001 through `setMaintenanceMode`.'
+        provenance: contract white-label.yaml GET /tenant-config/status
+      - kind: banner
+        label: Sold out or closed today
+        bindsTo: TenantAppStatus.availabilityMessage
+        operation: getTenantAppStatus
+        notes: '**From `getTenantAppStatus.availability`** (`open`, `soldOut`, `closed`) and its `availabilityMessage`,
+          set live from CMS-001 through `setMaintenanceMode` (decided 28 September, audit R073 (f)). `soldOut`
+          and `closed` read differently: sold out means come another day, closed means the venue is not
+          open. Nothing shows while it is `open`.'
         provenance: contract white-label.yaml GET /tenant-config/status
   states:
     loading: The maintenance upgrade, read by `getTenantAppStatus`.
@@ -8758,6 +8619,15 @@ screens:
     offline: '**The offline banner shows instead of this page.** Being offline is the guest''s connection,
       not the venue''s — an error or maintenance page shown for a dropped signal tells a guest the venue
       is down.'
+    forcedUpgrade: '**Update required.** The app''s version is below `getTenantAppStatus.minimumAppVersion`
+      for its platform; the screen offers only the store link, because an app too old to talk to the server
+      cannot be trusted to book or pay (decided 28 September, audit R073 (b)).'
+    soldOut: '**Sold out today.** `getTenantAppStatus.availability` is `soldOut`: the page says so with
+      the tenant''s `availabilityMessage` and offers another day, never a generic error (decided 28 September,
+      audit R073 (f)).'
+    closed: '**Closed.** `getTenantAppStatus.availability` is `closed`: the page says the venue is not
+      open, with the tenant''s `availabilityMessage` and the opening hours from `contact` (decided 28
+      September, audit R073 (f)).'
   apis:
   - operationId: getTenantAppStatus
     contract: white-label
@@ -8788,16 +8658,11 @@ screens:
     exitTo:
     - GST-001
     - GST-002
-    - GST-003
     transitions:
     - to: GST-001
       trigger: Home – Default
       provenance: derived — GST-001 declares entryState.params  and GST-048 holds none of them, so the
         edge carries nothing and GST-001 opens cold
-    - to: GST-003
-      trigger: Event & Attraction Listing
-      provenance: derived — GST-003 declares entryState.params eventId and GST-048 holds none of them,
-        so the edge carries nothing and GST-003 opens cold
   notes: States derived from the screen pattern on 17 August, not individually considered. Purpose derived
     from the screen name and its operations on 17 August, not from a requirement.
   density: comfortable
@@ -8903,16 +8768,11 @@ screens:
     exitTo:
     - GST-001
     - GST-002
-    - GST-003
     transitions:
     - to: GST-001
       trigger: Home – Default
       provenance: derived — GST-001 declares entryState.params  and GST-049 holds none of them, so the
         edge carries nothing and GST-001 opens cold
-    - to: GST-003
-      trigger: Event & Attraction Listing
-      provenance: derived — GST-003 declares entryState.params eventId and GST-049 holds none of them,
-        so the edge carries nothing and GST-003 opens cold
   notes: 'States derived from the screen pattern on 17 August, not individually considered. Purpose derived
     from the screen name and its operations on 17 August, not from a requirement. **Drawn 26 August**
     — `Seat Board 4.dc.html` frame `seat-4a`. **The frame names this screen on its own face**, which is
@@ -9058,7 +8918,6 @@ screens:
     exitTo:
     - GST-001
     - GST-002
-    - GST-003
     - GST-016
     transitions:
     - to: GST-016
@@ -9068,10 +8927,6 @@ screens:
       trigger: Home – Default
       provenance: derived — GST-001 declares entryState.params  and GST-050 holds none of them, so the
         edge carries nothing and GST-001 opens cold
-    - to: GST-003
-      trigger: Event & Attraction Listing
-      provenance: derived — GST-003 declares entryState.params eventId and GST-050 holds none of them,
-        so the edge carries nothing and GST-003 opens cold
   notes: 'Minuted 10 Aug §4.8: *"resource bookings (e.g., cabana rental) decrement a capacity-based inventory
     on booking"*. **Distinct from GST-058**: this is one resource with a price and a booking action; GST-058
     is availability across areas. Confirmed against storyboard boards 7.10 and 8.8 on 18 August.'
@@ -9204,7 +9059,13 @@ screens:
   name: Plan Your Adventure – Start
   module: Engagement & Support
   requiresModule: queue
-  wave: 3
+  wave: 4
+  deferred:
+    release: later
+    decided: '2026-09-28'
+    decision: R187
+    reason: The itinerary planner is deferred to a later release and its five screens leave Block A, since
+      nothing exists to build them against (decided 28 September, audit R187).
   capability: AI-35
   implementation:
     app: guest-app
@@ -9218,7 +9079,6 @@ screens:
     exitTo:
     - GST-001
     - GST-002
-    - GST-003
     - GST-052
     transitions:
     - to: GST-052
@@ -9229,12 +9089,10 @@ screens:
       trigger: Home – Default
       provenance: derived — GST-001 declares entryState.params  and GST-051 holds none of them, so the
         edge carries nothing and GST-001 opens cold
-    - to: GST-003
-      trigger: Event & Attraction Listing
-      provenance: derived — GST-003 declares entryState.params eventId and GST-051 holds none of them,
-        so the edge carries nothing and GST-003 opens cold
-  notes: Minuted 10 Aug §4.9. Benchmarked against Skidata. Tied to a ticket purchase and saved as a personal
-    visit profile.
+  notes: 'Minuted 10 Aug §4.9. Benchmarked against Skidata. Tied to a ticket purchase and saved as a personal
+    visit profile. **Out of the first release** (decided 28 September, audit R187): the itinerary planner
+    is deferred and this screen is `wave: 4` with a `deferred` block. Kept, not deleted, for the release
+    that builds it.'
   density: comfortable
   pattern: listDetail
   patternReason: '`listProducts` reads the population and `getWaitTimes` reads one of them — list, select,
@@ -9361,7 +9219,13 @@ screens:
   name: Suggested Itineraries
   module: Engagement & Support
   requiresModule: ai
-  wave: 3
+  wave: 4
+  deferred:
+    release: later
+    decided: '2026-09-28'
+    decision: R187
+    reason: The itinerary planner is deferred to a later release and its five screens leave Block A, since
+      nothing exists to build them against (decided 28 September, audit R187).
   capability: AI-35
   implementation:
     app: guest-app
@@ -9376,7 +9240,6 @@ screens:
     exitTo:
     - GST-001
     - GST-002
-    - GST-003
     - GST-053
     transitions:
     - to: GST-053
@@ -9387,17 +9250,17 @@ screens:
       trigger: Home – Default
       provenance: derived — GST-001 declares entryState.params  and GST-052 holds none of them, so the
         edge carries nothing and GST-001 opens cold
-    - to: GST-003
-      trigger: Event & Attraction Listing
-      provenance: derived — GST-003 declares entryState.params eventId and GST-052 holds none of them,
-        so the edge carries nothing and GST-003 opens cold
   notes: 'Minuted 10 Aug §4.9. ** wired 24 August.** The board drew four bespoke AI endpoints for itinerary
     planning; **one operation with a kind answers all of them** (ADR-0028), and recording the outcome
     is what lets a model replace the heuristic later. **`recordSuggestionOutcome` removed from the guest
     surface.** `check-screens` refused it and was right: **a guest does not record an outcome — the platform
     observes what they did.** A guest app that self-reports whether it took the advice is a training label
     the guest could forge, and the observation belongs server-side where the plan and the visit can be
-    compared.'
+    compared. **Out of the first release** (decided 28 September, audit R187): the itinerary planner is
+    deferred and this screen is `wave: 4` with a `deferred` block. Kept, not deleted, for the release
+    that builds it. **Itinerary suggestion removed 28 September** (decided 28 September, audit R209):
+    the planner is deferred (R187) and `requestSuggestion` refuses a guest anything but prepPlan, upsell
+    and waitTime, so this screen no longer asks for a day plan.'
   density: comfortable
   pattern: listDetail
   patternReason: '`listProducts` reads a population and nothing reads one of them; the detail is the row
@@ -9482,17 +9345,10 @@ screens:
         - Product.variantCount
         operation: listProducts
         provenance: contract catalogue.yaml GET /products
-    - name: actionBar
-      slot: rowActions
-      components:
-      - kind: primaryButton
-        label: Request suggestion
-        operation: requestSuggestion
-        provenance: contract ai.yaml POST /ai/suggestions
   states:
     loading: The suggested itineraries list.
     error: Could not load. Names which read failed and leaves the suggested itineraries untouched.
-    emptyFirstRun: No suggested itineraries yet. Offers Request suggestion (`requestSuggestion`); distinct
+    emptyFirstRun: No suggested itineraries yet. The itinerary suggestion was removed (audit R209); distinct
       from a filter that matched nothing.
     emptyNoResults: Nothing matches the filter on venueId, kind, isSellable and the suggested itineraries
       are still there. Names the active filter and offers to clear it.
@@ -9511,12 +9367,6 @@ screens:
     contract: catalogue
     purpose: List published bundles
     trigger: onLoad
-  - operationId: requestSuggestion
-    contract: ai
-    purpose: ''
-    trigger: onAction
-    invalidates:
-    - listProducts
   entryState:
     params:
     - name: suggestionId
@@ -9536,28 +9386,17 @@ screens:
   apisNote: Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop pack
     — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
     to the ones that matter is work a person still owes this screen.
-  overlays:
-  - id: formRequestSuggestion
-    component: modal
-    trigger: Request suggestion
-    body: '**Collects what `requestSuggestion` sends before it is called.** Required: `kind`. Optional:
-      `subjectRef`, `horizon`, `context`. Dismissing sends nothing; the screen behind is unchanged.'
-    confirm:
-      label: Request suggestion
-      operation: requestSuggestion
-    dismiss:
-      label: Cancel
-      discards:
-      - kind
-      - subjectRef
-      - horizon
-      - context
-    provenance: contract ai.yaml POST /ai/suggestions
 - id: GST-053
   name: Build Your Own Itinerary
   module: Engagement & Support
   requiresModule: ticketing
-  wave: 3
+  wave: 4
+  deferred:
+    release: later
+    decided: '2026-09-28'
+    decision: R187
+    reason: The itinerary planner is deferred to a later release and its five screens leave Block A, since
+      nothing exists to build them against (decided 28 September, audit R187).
   capability: C02
   implementation:
     app: guest-app
@@ -9572,7 +9411,6 @@ screens:
     exitTo:
     - GST-001
     - GST-002
-    - GST-003
     - GST-054
     transitions:
     - to: GST-054
@@ -9583,12 +9421,10 @@ screens:
       trigger: Home – Default
       provenance: derived — GST-001 declares entryState.params  and GST-053 holds none of them, so the
         edge carries nothing and GST-001 opens cold
-    - to: GST-003
-      trigger: Event & Attraction Listing
-      provenance: derived — GST-003 declares entryState.params eventId and GST-053 holds none of them,
-        so the edge carries nothing and GST-003 opens cold
-  notes: Minuted 10 Aug §4.9. **Group sharing agreed** — an in-app QR a friend scans to join the itinerary
-    (Chinmay raised, Qossai confirmed).
+  notes: 'Minuted 10 Aug §4.9. **Group sharing agreed** — an in-app QR a friend scans to join the itinerary
+    (Chinmay raised, Qossai confirmed). **Out of the first release** (decided 28 September, audit R187):
+    the itinerary planner is deferred and this screen is `wave: 4` with a `deferred` block. Kept, not
+    deleted, for the release that builds it.'
   density: comfortable
   pattern: listDetail
   patternReason: '`listProducts` reads the population and `getCart` reads one of them — list, select,
@@ -9779,7 +9615,13 @@ screens:
   name: AI Optimized Itinerary
   module: Engagement & Support
   requiresModule: ai
-  wave: 3
+  wave: 4
+  deferred:
+    release: later
+    decided: '2026-09-28'
+    decision: R187
+    reason: The itinerary planner is deferred to a later release and its five screens leave Block A, since
+      nothing exists to build them against (decided 28 September, audit R187).
   capability: AI-35
   implementation:
     app: guest-app
@@ -9794,21 +9636,15 @@ screens:
     exitTo:
     - GST-001
     - GST-002
-    - GST-003
     - GST-059
     transitions:
     - to: GST-001
       trigger: Home – Default
       provenance: derived — GST-001 declares entryState.params  and GST-054 holds none of them, so the
         edge carries nothing and GST-001 opens cold
-    - to: GST-003
-      trigger: Event & Attraction Listing
-      provenance: derived — GST-003 declares entryState.params eventId and GST-054 holds none of them,
-        so the edge carries nothing and GST-003 opens cold
     - to: GST-059
       trigger: They follow it through the day
       provenance: flow F49 step 4→5
-      operation: requestSuggestion
       carries:
       - suggestionId
   notes: 'Minuted 10 Aug §4.9. **The AI half is Wave 2** — the manual planner must work without it (CF-41).
@@ -9819,7 +9655,11 @@ screens:
     removed from the guest surface.** `check-screens` refused it and was right: **a guest does not record
     an outcome — the platform observes what they did.** A guest app that self-reports whether it took
     the advice is a training label the guest could forge, and the observation belongs server-side where
-    the plan and the visit can be compared.'
+    the plan and the visit can be compared. **Out of the first release** (decided 28 September, audit
+    R187): the itinerary planner is deferred and this screen is `wave: 4` with a `deferred` block. Kept,
+    not deleted, for the release that builds it. **Itinerary suggestion removed 28 September** (decided
+    28 September, audit R209): the planner is deferred (R187) and `requestSuggestion` refuses a guest
+    anything but prepPlan, upsell and waitTime, so this screen no longer asks for a day plan.'
   density: comfortable
   pattern: listDetail
   patternReason: '`listProducts` reads the population and `getWaitTimes` reads one of them — list, select,
@@ -9913,14 +9753,10 @@ screens:
         label: Send AI message
         operation: sendAiMessage
         provenance: contract ai.yaml POST /conversations/{conversationId}/messages
-      - kind: secondaryButton
-        label: Request suggestion
-        operation: requestSuggestion
-        provenance: contract ai.yaml POST /ai/suggestions
   states:
     loading: The optimized itinerary list.
     error: Could not load. Names which read failed and leaves the optimized itinerary untouched.
-    emptyFirstRun: No optimized itinerary yet. Offers Request suggestion (`requestSuggestion`); distinct
+    emptyFirstRun: No optimized itinerary yet. The itinerary suggestion was removed (audit R209); distinct
       from a filter that matched nothing.
     emptyNoResults: Nothing matches the filter on venueId, kind, isSellable and the optimized itinerary
       are still there. Names the active filter and offers to clear it.
@@ -9942,12 +9778,6 @@ screens:
   - operationId: sendAiMessage
     contract: ai
     purpose: Ask
-    trigger: onAction
-    invalidates:
-    - listProducts
-  - operationId: requestSuggestion
-    contract: ai
-    purpose: ''
     trigger: onAction
     invalidates:
     - listProducts
@@ -9988,22 +9818,6 @@ screens:
       - content
       - collectionIds
     provenance: contract ai.yaml POST /conversations/{conversationId}/messages
-  - id: formRequestSuggestion
-    component: modal
-    trigger: Request suggestion
-    body: '**Collects what `requestSuggestion` sends before it is called.** Required: `kind`. Optional:
-      `subjectRef`, `horizon`, `context`. Dismissing sends nothing; the screen behind is unchanged.'
-    confirm:
-      label: Request suggestion
-      operation: requestSuggestion
-    dismiss:
-      label: Cancel
-      discards:
-      - kind
-      - subjectRef
-      - horizon
-      - context
-    provenance: contract ai.yaml POST /ai/suggestions
 - id: GST-055
   name: Dynamic QR Ticket
   module: Account & Self-Service
@@ -10023,16 +9837,11 @@ screens:
     exitTo:
     - GST-001
     - GST-002
-    - GST-003
     transitions:
     - to: GST-001
       trigger: Home – Default
       provenance: derived — GST-001 declares entryState.params  and GST-055 holds none of them, so the
         edge carries nothing and GST-001 opens cold
-    - to: GST-003
-      trigger: Event & Attraction Listing
-      provenance: derived — GST-003 declares entryState.params eventId and GST-055 holds none of them,
-        so the edge carries nothing and GST-003 opens cold
   notes: States derived from the screen pattern on 17 August, not individually considered. Purpose derived
     from the screen name and its operations on 17 August, not from a requirement.
   density: comfortable
@@ -10079,8 +9888,13 @@ screens:
       - kind: detailPanel
         label: Entitlement credential
         operation: getEntitlementCredential
-        notes: Shows `mediaCode`, `payload`, `expiresAt` from `getEntitlementCredential`'s inline response.
-          **The response has no named schema**, so this cannot bind until the contract names one.
+        notes: 'Shows `mediaCode`, `payload`, `expiresAt` from `getEntitlementCredential`''s inline response.
+          **The response has no named schema**, so this cannot bind until the contract names one. **A
+          rotating code derived on the device** (decided 28 September, audit R230): while online the screen
+          fetches `rotation` (secret, `timeStepSeconds`, `digits`, `algorithm`, valid `validFrom` to `validTo`)
+          and computes the current code from the seed and the clock, with a visible countdown to the next
+          step; it keeps rotating with no signal. A null `rotation` (wristband, wallet pass) shows the
+          static code.'
         provenance: contract access.yaml GET /entitlements/{entitlementId}/credential
       - kind: detailPanel
         label: The entitlement
@@ -10125,9 +9939,9 @@ screens:
     emptyNoAccess: Shown when the caller lacks `ORDER_VIEW`, which `listMyEntitlements` requires, and
       names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody
       to support with the wrong question.
-    offline: '**The offline banner shows.** What was already loaded stays on screen, marked with its age.
-      Anything that spends money, holds capacity or changes the account waits for the connection, and
-      its button says so rather than failing.'
+    offline: '**The offline banner shows.** A ticket already loaded shows its rotating code, derived on
+      the device from its seed, so it changes with no signal (decided 28 September, audit R230). Transferring
+      a ticket needs the connection.'
   apis:
   - operationId: listMyEntitlements
     contract: access
@@ -10139,7 +9953,8 @@ screens:
     trigger: onAction
   - operationId: getEntitlementCredential
     contract: access
-    purpose: The QR code that gets scanned, refreshed
+    purpose: The QR code that gets scanned, refreshed — with the `rotation` seed the device derives the
+      rotating code from (audit R230)
     trigger: onAction
   - operationId: transferOrderTickets
     contract: orders
@@ -10178,16 +9993,11 @@ screens:
     exitTo:
     - GST-001
     - GST-002
-    - GST-003
     transitions:
     - to: GST-001
       trigger: Home – Default
       provenance: derived — GST-001 declares entryState.params  and GST-056 holds none of them, so the
         edge carries nothing and GST-001 opens cold
-    - to: GST-003
-      trigger: Event & Attraction Listing
-      provenance: derived — GST-003 declares entryState.params eventId and GST-056 holds none of them,
-        so the edge carries nothing and GST-003 opens cold
   notes: States derived from the screen pattern on 17 August, not individually considered. Purpose derived
     from the screen name and its operations on 17 August, not from a requirement.
   density: comfortable
@@ -10438,9 +10248,10 @@ screens:
     emptyNoAccess: Shown when the caller lacks `TENANT_CONFIGURE`, which `listContentPages` requires,
       and names that permission. **Never an empty table** — that reads as *there is no data* and sends
       somebody to support with the wrong question.
-    offline: '**The offline banner shows.** What was already loaded stays on screen, marked with its age.
-      Anything that spends money, holds capacity or changes the account waits for the connection, and
-      its button says so rather than failing.'
+    offline: '**The offline banner shows.** Help already loaded stays readable, marked with its age. **Raising
+      a case is disabled offline** — it needs the connection (decided 28 September, audit R148) — and
+      the screen says how to reach staff in person instead: the guest services desk, or any member of
+      staff.'
   apis:
   - operationId: listContentPages
     contract: white-label
@@ -10478,7 +10289,6 @@ screens:
     exitTo:
     - GST-001
     - GST-002
-    - GST-003
     - GST-050
     transitions:
     - to: GST-050
@@ -10488,10 +10298,6 @@ screens:
       trigger: Home – Default
       provenance: derived — GST-001 declares entryState.params  and GST-058 holds none of them, so the
         edge carries nothing and GST-001 opens cold
-    - to: GST-003
-      trigger: Event & Attraction Listing
-      provenance: derived — GST-003 declares entryState.params eventId and GST-058 holds none of them,
-        so the edge carries nothing and GST-003 opens cold
   notes: '**Deliberately separate from GST-050**, and checked on 18 August. Board 8 panel 8 is availability
     across areas with counts remaining; board 7 panel 10 is one cabana with a price and a Book Now. **A
     list and a detail, not a duplicate** — merging them would put a booking action on a browsing screen.'
@@ -10586,7 +10392,13 @@ screens:
   name: Plan My Day – In Progress
   module: Engagement & Support
   requiresModule: ai
-  wave: 3
+  wave: 4
+  deferred:
+    release: later
+    decided: '2026-09-28'
+    decision: R187
+    reason: The itinerary planner is deferred to a later release and its five screens leave Block A, since
+      nothing exists to build them against (decided 28 September, audit R187).
   capability: C02
   implementation:
     app: guest-app
@@ -10601,24 +10413,24 @@ screens:
     exitTo:
     - GST-001
     - GST-002
-    - GST-003
     fromFlows: true
     transitions:
     - to: GST-001
       trigger: Home – Default
       provenance: derived — GST-001 declares entryState.params  and GST-059 holds none of them, so the
         edge carries nothing and GST-001 opens cold
-    - to: GST-003
-      trigger: Event & Attraction Listing
-      provenance: derived — GST-003 declares entryState.params eventId and GST-059 holds none of them,
-        so the edge carries nothing and GST-003 opens cold
   notes: 'Minuted 10 Aug §4.9. **The in-visit half of GST-051** — one capability, two moments. ** wired
     24 August.** The board drew four bespoke AI endpoints for itinerary planning; **one operation with
     a kind answers all of them** (ADR-0028), and recording the outcome is what lets a model replace the
     heuristic later. **`recordSuggestionOutcome` removed from the guest surface.** `check-screens` refused
     it and was right: **a guest does not record an outcome — the platform observes what they did.** A
     guest app that self-reports whether it took the advice is a training label the guest could forge,
-    and the observation belongs server-side where the plan and the visit can be compared.'
+    and the observation belongs server-side where the plan and the visit can be compared. **Out of the
+    first release** (decided 28 September, audit R187): the itinerary planner is deferred and this screen
+    is `wave: 4` with a `deferred` block. Kept, not deleted, for the release that builds it. **Itinerary
+    suggestion removed 28 September** (decided 28 September, audit R209): the planner is deferred (R187)
+    and `requestSuggestion` refuses a guest anything but prepPlan, upsell and waitTime, so this screen
+    no longer asks for a day plan.'
   density: comfortable
   pattern: listDetail
   patternReason: '`listProducts` reads the population and `getWaitTimes` reads one of them — list, select,
@@ -10705,17 +10517,10 @@ screens:
         - WaitTime.asOf
         operation: getWaitTimes
         provenance: contract queue.yaml GET /queues/wait-times
-    - name: actionBar
-      slot: rowActions
-      components:
-      - kind: primaryButton
-        label: Request suggestion
-        operation: requestSuggestion
-        provenance: contract ai.yaml POST /ai/suggestions
   states:
     loading: The plan day progress list.
     error: Could not load. Names which read failed and leaves the plan day progress untouched.
-    emptyFirstRun: No plan day progress yet. Offers Request suggestion (`requestSuggestion`); distinct
+    emptyFirstRun: No plan day progress yet. The itinerary suggestion was removed (audit R209); distinct
       from a filter that matched nothing.
     emptyNoResults: Nothing matches the filter on venueId, kind, isSellable and the plan day progress
       are still there. Names the active filter and offers to clear it.
@@ -10734,12 +10539,6 @@ screens:
     contract: catalogue
     purpose: List products
     trigger: onLoad
-  - operationId: requestSuggestion
-    contract: ai
-    purpose: ''
-    trigger: onAction
-    invalidates:
-    - listProducts
   entryState:
     params:
     - name: suggestionId
@@ -10759,23 +10558,6 @@ screens:
   apisNote: Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop pack
     — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
     to the ones that matter is work a person still owes this screen.
-  overlays:
-  - id: formRequestSuggestion
-    component: modal
-    trigger: Request suggestion
-    body: '**Collects what `requestSuggestion` sends before it is called.** Required: `kind`. Optional:
-      `subjectRef`, `horizon`, `context`. Dismissing sends nothing; the screen behind is unchanged.'
-    confirm:
-      label: Request suggestion
-      operation: requestSuggestion
-    dismiss:
-      label: Cancel
-      discards:
-      - kind
-      - subjectRef
-      - horizon
-      - context
-    provenance: contract ai.yaml POST /ai/suggestions
 - id: GST-061
   name: Menu Item Detail
   module: In-Venue Experience
@@ -11403,7 +11185,7 @@ screens:
       to support with the wrong question.
     offline: '**Nothing here is offered offline, and the banner says so.** An erasure request or a device
       change queued and never sent is worse than one that could not be made — the legal clock starts when
-      the platform receives it, and a second factor set up offline is not a second factor.'
+      the platform receives it, and a device signed out offline is still signed in.'
   apis:
   - operationId: exportSubjectData
     contract: identity
@@ -11717,7 +11499,9 @@ screens:
       permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support
       with the wrong question.
     offline: '**The offline banner shows.** Cases already loaded stay read-only with their age, so a guest
-      can see what they raised without believing a reply arrived. Raising and replying need the connection.'
+      can see what they raised without believing a reply arrived. **Raising a case and replying are disabled
+      offline** — both need the connection (decided 28 September, audit R148) — and the screen says how
+      to reach staff in person instead: the guest services desk, or any member of staff.'
   apis:
   - operationId: createCase
     contract: marketing-crm
@@ -11813,7 +11597,12 @@ screens:
 
     **`pii.subject_biometric` is separate from contact and document precisely so consent and erasure differ
     per kind.** Revocation sits beside enrolment for the same reason — a face a guest cannot withdraw
-    is a face they did not really consent to.'
+    is a face they did not really consent to.
+
+
+    **Who is this for** (decided 28 September, audit R205): the signed-in adult enrols themselves or a
+    linked child, and is recorded as guardian by the server. The age below which a subject is a minor
+    is an open value client counsel sets.'
   density: comfortable
   offline: false
   pattern: statusTracker
@@ -11828,6 +11617,18 @@ screens:
     - name: contentBody
       slot: record
       components:
+      - kind: selectField
+        label: Who is this for
+        bindsTo: DelegatedAccess
+        columns:
+        - DelegatedAccess.overSubjectId
+        - DelegatedAccess.delegationKind
+        operation: listDelegations
+        notes: '**The first step of enrolment** (decided 28 September, audit R205): the signed-in guest,
+          then each child linked to them — the `heldByThisGuest` grants whose `delegationKind` is `familyMember`
+          or `primaryHolder`. The chosen person''s id is the `subjectId` that `enrolFacePass` sends. **No
+          guardian field is collected**: the server records the caller as guardian.'
+        provenance: contract identity.yaml GET /guests/{subjectId}/delegations
       - kind: detailPanel
         label: The face pass enrolment
         bindsTo: FacePassEnrolment
@@ -11866,7 +11667,10 @@ screens:
     component: modal
     trigger: Enrol face pass
     body: '**Collects what `enrolFacePass` sends before it is called.** Required: `subjectId`, `entitlementId`,
-      `template`, `capturedAt`, `source`, `consent`. Dismissing sends nothing; the screen behind is unchanged.'
+      `template`, `capturedAt`, `source`, `consent`. `subjectId` is the person picked in **Who is this
+      for** (the guest or a linked child), not typed; **no guardian is asked for** — the server sets `consent.guardianSubjectId`
+      to the signed-in guest (decided 28 September, audit R205). Dismissing sends nothing; the screen
+      behind is unchanged.'
     confirm:
       label: Enrol face pass
       operation: enrolFacePass
@@ -11892,7 +11696,16 @@ screens:
       to support with the wrong question.
     offline: '**Not available, and the offline banner says why.** Biometric enrolment never happens offline
       — a face captured and queued is a face the guest cannot withdraw until it uploads.'
+    subjectNotLinked: '**Refused: that person is not linked to you** (403 `subject-not-linked`). A guest
+      may enrol only themselves or a child linked to them by a family-member or primary-holder delegation;
+      the screen says so and returns to **Who is this for**, which is refreshed in case the link was just
+      removed (decided 28 September, audit R205).'
   apis:
+  - operationId: listDelegations
+    contract: identity
+    purpose: Who this guest may enrol — themselves and the children linked to them (heldByThisGuest, familyMember
+      or primaryHolder) (decided 28 September, audit R205)
+    trigger: onLoad
   - operationId: enrolFacePass
     contract: access
     purpose: Register a facial profile against an entitlement
@@ -11921,7 +11734,7 @@ screens:
     — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
     to the ones that matter is work a person still owes this screen.
 - id: GST-070
-  name: Reserve a Table or Cabana
+  name: Reserve a Table
   module: In-venue Services
   requiresModule: core
   wave: 2
@@ -11947,33 +11760,29 @@ screens:
       provenance: derived — GST-039 declares entryState.params subjectId and GST-070 holds subjectId,
         so an edge into it carries them
   notes: '**Staff could book a table and a guest could not.** Seven guest-callable operations with no
-    guest surface — reservations, cabanas, and both waitlists.
+    guest surface — reservations, cabanas, and both waitlists. **Table-only since 28 September** (decided
+    28 September, audit R073 (c)): cabanas stay staff-booked (`bookResource` has been staff-only since
+    19 September), so the cabana wording, the `bookResource` button and `getResourceAvailability` are
+    gone and the screen is renamed from *Reserve a Table or Cabana*. **Leave waitlist** is `leaveRestaurantWaitlist`
+    (audit R073 (d)). **No deposit and no no-show fee** on a table reservation in the first release, and
+    cancelling is free (audit R077 (a)).
 
 
     **Leaving a waitlist matters as much as joining one.** A guest who has given up and walked away still
     holds a place, and a queue full of people who left is a queue nobody trusts.'
   density: comfortable
   offline: false
-  pattern: statusTracker
-  patternReason: '`getResourceAvailability` reads one record and nothing reads a population — the screen
-    is about that one thing'
-  purpose: '**Staff could book a table and a guest could not.** Seven guest-callable operations with no
-    guest surface — reservations, cabanas, and both waitlists.'
+  pattern: form
+  patternReason: A booking form (outlet, party size, time) and the restaurant waitlist, each one act;
+    no guest-callable read of table availability exists, so `createTableReservation` is what says a time
+    is full. Changed from `statusTracker` on 28 September when the cabana availability read left (audit
+    R073 (c)).
+  purpose: '**Book a restaurant table, or wait for one.** A guest reserves a table ahead, changes or cancels
+    it, or joins and leaves a restaurant''s waitlist. Tables only: cabanas are booked by staff (decided
+    28 September, audit R073 (c)). No deposit and no no-show fee (audit R077 (a)).'
   layout:
-    template: detail
+    template: form
     regions:
-    - name: contentBody
-      slot: record
-      components:
-      - kind: detailPanel
-        label: The resource availability
-        bindsTo: ResourceAvailability
-        columns:
-        - ResourceAvailability.resourceId
-        - ResourceAvailability.freeWindows
-        - ResourceAvailability.blockedWindows
-        operation: getResourceAvailability
-        provenance: contract resources.yaml GET /resources/{resourceId}/availability
     - name: actionBar
       slot: rowActions
       components:
@@ -11986,13 +11795,15 @@ screens:
         operation: updateTableReservation
         provenance: contract fnb.yaml PATCH /table-reservations/{reservationId}
       - kind: secondaryButton
-        label: Book resource
-        operation: bookResource
-        provenance: contract resources.yaml POST /resource-bookings
-      - kind: secondaryButton
         label: Join restaurant waitlist
         operation: joinRestaurantWaitlist
         provenance: contract fnb.yaml POST /waitlist
+      - kind: destructiveButton
+        label: Leave restaurant waitlist
+        operation: leaveRestaurantWaitlist
+        notes: Leaves the guest's own entry (POST /waitlist/{entryId}/leave); the entry returns `cancelled`
+          and the table goes to the next party (decided 28 September, audit R073 (d)).
+        provenance: contract fnb.yaml POST /waitlist/{entryId}/leave
       - kind: secondaryButton
         label: Join waitlist
         operation: joinWaitlist
@@ -12004,13 +11815,12 @@ screens:
   states:
     loading: Content loads.
     error: Could not load. **Says what failed and offers one way onward**, never a bare failure.
-    emptyFirstRun: '**Nothing reserved.** Availability shows regardless; a guest looking at an empty list
-      should still see what is bookable.'
+    emptyFirstRun: '**Nothing reserved.** The booking form is the screen: pick the restaurant, party size
+      and time, and `createTableReservation` says if that time is full.'
     emptyNoResults: '**Nothing here yet.** The scope is what narrowed it — naming the scope is what stops
       somebody concluding the record does not exist.'
-    emptyNoAccess: Shown when the caller lacks `RESOURCE_VIEW`, which `getResourceAvailability` requires,
-      and names that permission. **Never an empty table** — that reads as *there is no data* and sends
-      somebody to support with the wrong question.
+    emptyNoAccess: '**There is no permission to name — a guest holds none** (ADR-0025). A guest who is
+      not signed in is offered sign-in and brought back here.'
     offline: '**The offline banner shows.** Availability already loaded stays with its age. **Booking
       is not offered** — a table held offline is a table two people think they have.'
   apis:
@@ -12022,15 +11832,16 @@ screens:
     contract: fnb
     purpose: Change or cancel a booking
     trigger: onAction
-  - operationId: getResourceAvailability
-    contract: resources
-    purpose: When it is free, with conflicts already resolved
-    trigger: onLoad
   - operationId: joinRestaurantWaitlist
     contract: fnb
     purpose: Add a party to an outlet's waitlist
     trigger: onAction
     offline: false
+  - operationId: leaveRestaurantWaitlist
+    contract: fnb
+    purpose: Leave the restaurant waitlist; the entry returns cancelled (decided 28 September, audit R073
+      (d))
+    trigger: onAction
   - operationId: joinWaitlist
     contract: catalogue
     purpose: Ask to be told if capacity frees up
@@ -12044,8 +11855,6 @@ screens:
     - name: entryId
       from: deepLink
     - name: reservationId
-      from: deepLink
-    - name: resourceId
       from: deepLink
     - name: subjectId
       from: session
@@ -12064,8 +11873,9 @@ screens:
     trigger: Create table reservation
     body: '**Collects what `createTableReservation` sends before it is called.** Required: `outletId`,
       `partySize`, `startsAt`. Optional: `id`, `subjectId`, `guestName`, `contactPoint`, `durationMinutes`,
-      `tables`, `status`, `groupId`, `notes`, `actualPartySize`, `tableVisitId`. Dismissing sends nothing;
-      the screen behind is unchanged.'
+      `tables`, `status`, `groupId`, `notes`, `actualPartySize`, `tableVisitId`. The form says **no deposit
+      is taken and there is no no-show fee** (decided 28 September, audit R077 (a)). Dismissing sends
+      nothing; the screen behind is unchanged.'
     bindsTo: TableReservation
     confirm:
       label: Create table reservation
@@ -12093,8 +11903,9 @@ screens:
     trigger: Save table reservation
     body: '**Collects what `updateTableReservation` sends before it is called.** Required: `outletId`,
       `partySize`, `startsAt`. Optional: `id`, `subjectId`, `guestName`, `contactPoint`, `durationMinutes`,
-      `tables`, `status`, `groupId`, `notes`, `actualPartySize`, `tableVisitId`. Dismissing sends nothing;
-      the screen behind is unchanged.'
+      `tables`, `status`, `groupId`, `notes`, `actualPartySize`, `tableVisitId`. Cancelling says **it
+      is free — no cancel or no-show fee** in the first release (decided 28 September, audit R077 (a)).
+      Dismissing sends nothing; the screen behind is unchanged.'
     bindsTo: TableReservation
     confirm:
       label: Save table reservation
@@ -12167,6 +11978,12 @@ screens:
       - offerExpiresAt
       - joinedAt
     provenance: contract catalogue.yaml POST /waitlist-entries
+  - id: confirmLeaveRestaurantWaitlist
+    component: confirmDialog
+    trigger: Leave restaurant waitlist
+    body: '**Says the place is given up and the next party moves up**, naming the restaurant and the party
+      size. Leaving cannot be undone; joining again goes to the back (audit R073 (d)).'
+    provenance: contract fnb.yaml POST /waitlist/{entryId}/leave
 - id: GST-071
   name: Payment Methods
   module: Account & Self-Service
@@ -12693,24 +12510,33 @@ screens:
       provenance: derived — GST-039 declares entryState.params subjectId and GST-073 holds subjectId,
         so an edge into it carries them
   notes: '**A guest could enrol a second factor and not manage it.** Small screen, and it is the one a
-    guest reaches after losing a phone.'
+    guest reaches after losing a phone. **No second factor for guests** (decided 28 September, audit R167,
+    R073 (a)): `createMfaChallenge` is removed from this screen. The identity contract still lets a guest
+    surface call it for step-up before a sensitive act on its own account, but a guest cannot enrol a
+    method (the staff kinds only), so nothing here could satisfy it; the decision is to offer none. What
+    the screen offers instead: the sign-in methods linked to the account (`GuestSession.identityProviders`),
+    confirming the email that recovers it (`verifyGuestEmail`), the devices that hold its credentials
+    and signing a lost one out (`listGuestDevices`, `revokeGuestDevice`), and signing out here (`guestLogout`).
+    The contract has no guest operation that lists sessions, so "your sessions" is the device list.'
   density: comfortable
   offline: false
   pattern: configEditor
-  patternReason: the screen declares only writes (`createMfaChallenge`) and no read of a population —
-    it is settings, not a list
-  purpose: '**A guest could enrol a second factor and not manage it.** Small screen, and it is the one
-    a guest reaches after losing a phone.'
+  patternReason: settings for the guest's own sign-in — the linked sign-in methods (`getGuestSession`)
+    and the devices that hold the account (`listGuestDevices`), each with one act; not a list to browse
+  purpose: '**How this guest signs in, and where.** The sign-in methods linked to the account, the email
+    that recovers it, and the devices signed in, with a way to sign a lost phone out. Small screen, and
+    it is the one a guest reaches after losing a phone. No second factor: guests have none (decided 28
+    September, audit R167).'
   layout:
     template: form
     regions:
     - name: actionBar
       slot: publish
       components:
-      - kind: primaryButton
-        label: Create MFA challenge
-        operation: createMfaChallenge
-        provenance: contract identity.yaml POST /auth/mfa/challenge
+      - kind: secondaryButton
+        label: Sign out on this device
+        operation: guestLogout
+        provenance: contract identity.yaml DELETE /auth/guest/session
       - kind: secondaryButton
         label: Register guest device
         operation: registerGuestDevice
@@ -12743,30 +12569,36 @@ screens:
         - GuestDevice.registeredAt
         operation: listGuestDevices
         provenance: contract marketing-crm.yaml GET /guests/{subjectId}/devices
-      - kind: textField
-        label: Action
-        operation: createMfaChallenge
-        notes: Required.
-        provenance: contract identity.yaml POST /auth/mfa/challenge
-      - kind: textField
-        label: Method id
-        operation: createMfaChallenge
-        provenance: contract identity.yaml POST /auth/mfa/challenge
+      - kind: detailPanel
+        label: How you sign in
+        bindsTo: GuestSession
+        columns:
+        - GuestSession.displayName
+        - GuestSession.isVerified
+        - GuestSession.identityProviders
+        operation: getGuestSession
+        notes: The sign-in methods linked to this account (code, password, Apple, Google, UAE Pass) and
+          whether its contact is verified. No second factor is listed or offered (audit R167).
+        provenance: contract identity.yaml GET /auth/guest/session
   states:
     loading: Content loads.
     error: Could not load. **Says what failed and offers one way onward**, never a bare failure.
-    emptyFirstRun: '**No second factor enrolled.** Explains what one protects before asking for a phone
-      number.'
+    emptyFirstRun: '**Only this device is signed in.** The device list holds one row, this one, and the
+      screen says that signing in elsewhere will add a row here.'
     emptyNoAccess: Shown when the caller lacks `GUEST_VIEW`, which `verifyGuestEmail` requires, and names
       that permission. **Never an empty table** — that reads as *there is no data* and sends somebody
       to support with the wrong question.
     offline: '**Nothing here is offered offline, and the banner says so.** An erasure request or a device
       change queued and never sent is worse than one that could not be made — the legal clock starts when
-      the platform receives it, and a second factor set up offline is not a second factor.'
+      the platform receives it, and a device signed out offline is still signed in.'
   apis:
-  - operationId: createMfaChallenge
+  - operationId: getGuestSession
     contract: identity
-    purpose: Step-up authentication for a sensitive action
+    purpose: The sign-in methods linked to the account and whether it is verified
+    trigger: onLoad
+  - operationId: guestLogout
+    contract: identity
+    purpose: Sign out on this device
     trigger: onAction
   - operationId: listGuestDevices
     contract: marketing-crm

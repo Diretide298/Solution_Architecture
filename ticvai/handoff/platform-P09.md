@@ -5,7 +5,7 @@
 | | |
 |---|---|
 | Screens | 676 |
-| Operations | 528 |
+| Operations | 538 |
 | Contracts | 19 |
 | Modules | 14 |
 | Undrawn | 0 |
@@ -30,6 +30,7 @@
 | `removeIndexEntry` | ai | DELETE | Remove one record from the index |
 | `setIndexSource` | ai | PUT | Declare a source indexed |
 | `setSuggestionProvider` | ai | PUT |  |
+| `submitApprovalRequest` | approvals | POST | Send a saved draft for approval |
 | `assessProductChange` | catalogue | POST | What a change would touch, before making it |
 | `bulkChangePrices` | catalogue | POST | Reprice a category or a whole catalogue |
 | `cloneProduct` | catalogue | POST | Copy a product as a new draft |
@@ -59,7 +60,6 @@
 | `listCellConnections` | cross-region | GET | Which cells may talk to which |
 | `listCrossCellRequests` | cross-region | GET | Calls that had to leave a cell |
 | `relinquishWalletAuthorisation` | cross-region | POST | Release a hold without capturing |
-| `setWalletAllocationPolicy` | cross-region | PUT | Set the allocation cap policy |
 | … | | | 171 more |
 
 ### 4 modules split across waves
@@ -94,11 +94,11 @@
 
 | | Name | Module | Wave | Ops | Drawn |
 |---|---|---|---|---|---|
-| `ADM-001` | Platform Login / MFA | Access & Identity | 1 | 7 | yes |
+| `ADM-001` | Platform Login / MFA | Access & Identity | 1 | 12 | yes |
 | `ADM-002` | Platform Dashboard | Overview & Health | 1 | 6 | yes |
 | `ADM-003` | Cross-Tenant Health Dashboard | Overview & Health | 2 | 10 | yes |
 | `ADM-004` | Platform Audit Log | Overview & Health | 2 | 1 | yes |
-| `ADM-005` | Tenant Directory | Tenants & Licensing | 1 | 15 | yes |
+| `ADM-005` | Tenant Directory | Tenants & Licensing | 1 | 16 | yes |
 | `ADM-006` | Tenant Hierarchy Explorer | Tenants & Licensing | 1 | 9 | yes |
 | `ADM-007` | Module & Feature Entitlement | Tenants & Licensing | 1 | 9 | yes |
 | `ADM-008` | Subscription & Plan Management | Tenants & Licensing | 1 | 19 | yes |
@@ -109,10 +109,10 @@
 | `ADM-013` | Tenant Performance Monitor | Overview & Health | 2 | 7 | yes |
 | `ADM-014` | Auto-Scaling Configuration | Infrastructure & Resilience | 3 | 8 | yes |
 | `ADM-015` | API Rate Limit & Quota Management | Tenants & Licensing | 3 | 9 | yes |
-| `ADM-016` | White-Label Branding Management | Branding & Localisation | 2 | 11 | yes |
-| `ADM-017` | Domain & Certificate Management | Branding & Localisation | 2 | 4 | yes |
-| `ADM-018` | Localisation & Language Pack | Branding & Localisation | 2 | 5 | yes |
-| `ADM-019` | Global Configuration & Defaults | Branding & Localisation | 2 | 4 | yes |
+| `ADM-016` | White-Label Branding Management | Branding & Localisation | 2 | 13 | yes |
+| `ADM-017` | Domain & Certificate Management | Branding & Localisation | 2 | 6 | yes |
+| `ADM-018` | Localisation & Language Pack | Branding & Localisation | 2 | 7 | yes |
+| `ADM-019` | Global Configuration & Defaults | Branding & Localisation | 2 | 8 | yes |
 | `ADM-020` | Platform User Directory | Access & Identity | 1 | 4 | yes |
 | `ADM-021` | Platform Role Management | Access & Identity | 1 | 2 | yes |
 | `ADM-022` | Release & Version Management | Releases & Environments | 2 | 7 | yes |
@@ -124,13 +124,13 @@
 | `ADM-028` | Environment Registry | Releases & Environments | 2 | 2 | yes |
 | `ADM-029` | Deployment Monitor | Overview & Health | 2 | 12 | yes |
 | `ADM-030` | Infrastructure Sizing & Scaling Policy | Infrastructure & Resilience | 3 | 9 | yes |
-| `ADM-031` | Security & Compliance Dashboard | Security & Compliance | 3 | 4 | yes |
+| `ADM-031` | Security & Compliance Dashboard | Security & Compliance | 3 | 6 | yes |
 | `ADM-032` | WAF & Security Policy View | Security & Compliance | 3 | 9 | yes |
 | `ADM-033` | Backup & DR Status | Infrastructure & Resilience | 2 | 8 | yes |
 | `ADM-034` | Archival Job Monitor | Infrastructure & Resilience | 3 | 8 | yes |
 | `ADM-035` | Support & Escalation Console | Support & Communications | 3 | 2 | yes |
 | `ADM-036` | Platform Notification Broadcast | Support & Communications | 3 | 4 | yes |
-| `ADM-037` | AI Provider & Credentials | AI | 1 | 4 | yes |
+| `ADM-037` | AI Provider & Credentials | AI | 1 | 8 | yes |
 | `ADM-038` | Communication Service Command Center | Platform | 3 | 1 | yes |
 | `ADM-039` | Channel & Provider Configuration | Platform | 3 | 1 | yes |
 | `ADM-040` | Sender Identity, Domain & Brand Configuration | Platform | 3 | 1 | yes |
@@ -434,7 +434,7 @@
 | `ADM-339` | Governance & Compliance Command Center | Platform | 3 | 2 | yes |
 | `ADM-340` | Segregation of Duties Policy Manager | Platform | 3 | 1 | yes |
 | `ADM-341` | Four-Eyes & Dual-Control Policy | Platform | 3 | 2 | yes |
-| `ADM-342` | Authentication & MFA Policy Manager | Platform | 3 | 3 | yes |
+| `ADM-342` | Authentication & MFA Policy Manager | Platform | 3 | 4 | yes |
 | `ADM-343` | Sensitive Action Confirmation | Platform | 3 | 2 | yes |
 | `ADM-344` | Digital Signature Management | Platform | 3 | 1 | yes |
 | `ADM-345` | Immutable Approval Record & Tamper Detection | Platform | 3 | 1 | yes |
@@ -504,7 +504,7 @@
 | `ADM-409` | Purchase / Trial Journey Selection | Tenants & Licensing | 3 | 1 | yes |
 | `ADM-410` | Contract & Billing Cycle Selection | Tenants & Licensing | 3 | 1 | yes |
 | `ADM-411` | Billing & Legal Entity Information | Tenants & Licensing | 3 | 1 | yes |
-| `ADM-412` | Payment Method & Settlement Setup | Tenants & Licensing | 3 | 1 | yes |
+| `ADM-412` | Payment Method & Settlement Setup | Tenants & Licensing | 3 | 3 | yes |
 | `ADM-413` | Trial Configuration & Conversion Rules | Tenants & Licensing | 3 | 1 | yes |
 | `ADM-414` | Order & Commercial Pricing Review | Tenants & Licensing | 3 | 1 | yes |
 | `ADM-415` | Commercial Agreement, Billable Definition & Customer Acceptance | Tenants & Licensing | 3 | 1 | yes |
@@ -513,7 +513,7 @@
 | `ADM-418` | Subscription Lifecycle & Trial-to-Paid Handoff | Tenants & Licensing | 3 | 1 | yes |
 | `ADM-419` | Provisioning Command Center | Tenants & Licensing | 3 | 1 | yes |
 | `ADM-420` | Tenant & Organization Provisioning | Tenants & Licensing | 3 | 1 | yes |
-| `ADM-421` | Venue & Operational Structure Creation | Tenants & Licensing | 3 | 2 | yes |
+| `ADM-421` | Venue & Operational Structure Creation | Tenants & Licensing | 3 | 4 | yes |
 | `ADM-422` | Administrator & Security Initialization | Tenants & Licensing | 3 | 2 | yes |
 | `ADM-423` | License & Entitlement Activation | Tenants & Licensing | 3 | 1 | yes |
 | `ADM-424` | Module Activation & Dependency Validation | Tenants & Licensing | 3 | 1 | yes |

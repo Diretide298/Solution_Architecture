@@ -1,5 +1,5 @@
 id: LLD-tenancy
-title: tenancy — 46 operations
+title: tenancy — 48 operations
 generatedBy: tools/derive-diagrams.py
 index: diagrams/hld/03-contracts.yaml
 tier: spine
@@ -195,6 +195,17 @@ operations:
   offline: true
   reads:
   - cache:resolution
+  - platform.venue_settings
+  writes: []
+- operation: getVenueSettingsDefaults
+  verb: GET
+  path: /venue-settings-defaults
+  scope: tenant
+  permission: TENANT_VIEW
+  audience:
+  - staff
+  offline: false
+  reads:
   - platform.venue_settings
   writes: []
 - operation: getWorkstation
@@ -521,6 +532,18 @@ operations:
   writes:
   - cache:idempotency
   - cache:resolution
+  - platform.venue_settings
+- operation: setVenueSettingsDefaults
+  verb: PUT
+  path: /venue-settings-defaults
+  scope: tenant
+  permission: TENANT_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - platform.venue_settings
+  writes:
   - platform.venue_settings
 - operation: startDeviceFirmwareRollout
   verb: POST

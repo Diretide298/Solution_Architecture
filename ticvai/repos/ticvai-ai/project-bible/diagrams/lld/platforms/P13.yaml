@@ -1,5 +1,5 @@
 id: LLD-P13
-title: P13 Venue CMS — White Label — 100 screens
+title: P13 Venue CMS — White Label — 99 screens
 generatedBy: tools/derive-diagrams.py
 index: diagrams/hld/00-platform.yaml
 audience: staff
@@ -20,14 +20,14 @@ deployment:
 why: null
 modulesUsed:
 - module: core
-  screens: 98
+  screens: 97
 - module: fnb
   screens: 1
 - module: ticketing
   screens: 1
 servicesCalled:
 - service: VenueOpsService
-  operationCalls: 70
+  operationCalls: 71
 - service: WhiteLabelService
   operationCalls: 56
 - service: MarketingService
@@ -39,9 +39,9 @@ servicesCalled:
 - service: OrderService
   operationCalls: 2
 coverage:
-  screens: 100
+  screens: 99
   inAFlow: 89
-  drawn: 100
+  drawn: 99
   note: '**A screen in no flow has been specified and never walked.** Every flow written in this package
     has found a defect.'
 screens:
@@ -74,9 +74,9 @@ screens:
   - CMS-009
   - CMS-010
   - CMS-011
+  - CMS-015
   - CMS-016
   - CMS-019
-  - CMS-020
   - CMS-021
   - CMS-031
   - CMS-041
@@ -241,6 +241,7 @@ screens:
   operations:
   - createContentPage
   - getHomepageLayout
+  - getModuleEnablement
   - listContentPages
   - setFooter
   - setHomepageLayout
@@ -476,6 +477,7 @@ screens:
   - CMS-001
   - CMS-002
   - CMS-003
+  - CMS-014
   boardFrames: null
   wireframe: wireframes/P13 Venue CMS.dc.html#cms-015
   inFlows:
@@ -584,29 +586,6 @@ screens:
   - CMS-003
   boardFrames: null
   wireframe: wireframes/P13 Venue CMS.dc.html#cms-019
-  inFlows: null
-- screen: CMS-020
-  name: Change Log
-  module: White Label
-  requiresModule: core
-  wave: 2
-  density: compact
-  operations:
-  - listConfigVersions
-  states:
-  - emptyFirstRun
-  - emptyNoAccess
-  - emptyNoResults
-  - error
-  - loading
-  offlineState: false
-  entryParams: []
-  goesTo:
-  - CMS-001
-  - CMS-002
-  - CMS-003
-  boardFrames: null
-  wireframe: wireframes/P13 Venue CMS.dc.html#cms-020
   inFlows: null
 - screen: CMS-021
   name: Privacy & Consent Configuration Command Center
@@ -1874,6 +1853,7 @@ screens:
   operations:
   - deleteMediaAsset
   - findSimilarMediaAssets
+  - updateMediaAsset
   states:
   - emptyFirstRun
   - emptyNoAccess

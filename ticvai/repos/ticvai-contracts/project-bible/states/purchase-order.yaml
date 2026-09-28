@@ -54,7 +54,8 @@ transitions:
   operation: closePurchaseOrderShort
   trigger: operation
   guard: '**Accepting that the balance will not arrive.** Requires approval, because it writes off a
-    committed cost'
+    committed cost. Approved through the approvals engine by a finance approver (kind
+    `purchaseOrderShortClose`; decided 28 September, audit R144)'
   requiresApproval: true
 - from: raised
   to: cancelled
@@ -65,7 +66,8 @@ transitions:
   to: cancelled
   operation: cancelPurchaseOrder
   trigger: operation
-  guard: Cancelled with the supplier
+  guard: Cancelled with the supplier. Approved through the approvals engine by a finance approver (kind
+    `purchaseOrderCancel`; decided 28 September, audit R144)
   requiresApproval: true
 notes: '`closedShort` is the state most systems omit, and it is the one that reconciles. Without it
   a partially received order stays open forever and the committed-cost figure is wrong.'

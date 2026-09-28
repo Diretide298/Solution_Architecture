@@ -107,6 +107,7 @@ operations:
   writes:
   - cache:idempotency
   - ledger.posting
+  - orders.cash_count_line
   - orders.deposit_box
 - operation: closeShift
   verb: POST

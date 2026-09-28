@@ -18,7 +18,8 @@ trigger:
   description: A guest has a problem — something lost, something wrong with an order, a question nobody
     answered.
 offlineBehaviour: '**FAQs cache; cases do not.** A guest with no signal can read help and cannot raise
-  a case, which is the right way round.'
+  or reply to a case, which is the right way round: both buttons are disabled offline and the screen shows
+  how to reach staff in person instead (decided 28 September, audit R148; `raiseMyCase` is not offline-capable).'
 steps:
 - step: 1
   screen: GST-040
@@ -75,6 +76,13 @@ branches:
     none, the case says so rather than silently failing.'
   severity: medium
   resolvedBy: addCaseMessage
+- at: 2
+  condition: The guest has no connection.
+  behaviour: '**Raising and replying are disabled, not queued** (decided 28 September, audit R148). The
+    screen says the case needs a connection and shows how to reach staff in person — the nearest guest
+    services point and the venue phone — rather than holding a message the guest believes was sent.'
+  severity: medium
+  resolvedBy: raiseMyCase
 exitStates:
 - state: selfServed
   description: The FAQ answered it. **The cheapest outcome and the one to measure.**

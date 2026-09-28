@@ -28,10 +28,10 @@ modulesUsed:
 servicesCalled:
 - service: MarketingService
   operationCalls: 55
+- service: IdentityService
+  operationCalls: 9
 - service: ReportingService
   operationCalls: 8
-- service: IdentityService
-  operationCalls: 7
 - service: AiService
   operationCalls: 1
 - service: WhiteLabelService
@@ -54,6 +54,7 @@ screens:
   wave: 3
   density: compact
   operations:
+  - createMfaChallenge
   - forceLogout
   - getCurrentSession
   - listActiveSessions
@@ -61,14 +62,17 @@ screens:
   - listSsoProviders
   - login
   - revokeAllSessions
+  - verifyMfaChallenge
   states:
   - emptyFirstRun
   - emptyNoAccess
   - emptyNoResults
   - error
   - loading
+  - mfaRequired
   offlineState: false
-  entryParams: []
+  entryParams:
+  - challengeId<-navigation
   goesTo:
   - ANL-001
   - BO-001
@@ -136,8 +140,6 @@ screens:
   entryParams: []
   goesTo:
   - SUP-001
-  - SUP-002
-  - SUP-004
   boardFrames: null
   wireframe: wireframes/P12 Venue Support.dc.html#sup-003
   inFlows: null
@@ -238,9 +240,7 @@ screens:
   - version<-deepLink
   goesTo:
   - SUP-001
-  - SUP-002
   - SUP-003
-  - SUP-005
   boardFrames: null
   wireframe: wireframes/P12 Venue Support.dc.html#sup-006
   inFlows: null
@@ -263,7 +263,6 @@ screens:
   entryParams: []
   goesTo:
   - SUP-001
-  - SUP-002
   - SUP-003
   boardFrames: null
   wireframe: wireframes/P12 Venue Support.dc.html#sup-007

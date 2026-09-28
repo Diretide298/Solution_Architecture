@@ -1,5 +1,5 @@
 id: LLD-Rota assignment
-title: Rota assignment — 10 transitions
+title: Rota assignment — 11 transitions
 generatedBy: tools/derive-diagrams.py
 index: diagrams/hld/04-lifecycles.yaml
 source: states/rota-assignment.yaml
@@ -31,6 +31,12 @@ transitions:
   operation: requestShiftSwap
   trigger: operation
   guard: A swap was asked for. Both parties, then the supervisor
+- from: confirmed
+  to: swapPending
+  operation: requestShiftSwap
+  trigger: operation
+  guard: A swap was asked for after the person confirmed. Same role, same venue, and a supervisor approves
+    before it takes effect (audit R129 (6))
 - from: swapPending
   to: published
   operation: requestShiftSwap

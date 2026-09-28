@@ -483,7 +483,7 @@ screens:
     — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
     to the ones that matter is work a person still owes this screen.
 - id: KSK-005
-  name: Choose a session
+  name: Choose a performance
   module: Sell
   requiresModule: ticketing
   wave: 2
@@ -1984,6 +1984,9 @@ screens:
       - kind: secondaryButton
         label: Lookup merchandise
         operation: lookupMerchandise
+        notes: The kiosk is a workstation, so the price check is at its own outlet and sends no `outletId`
+          (a workstation caller's own outlet always wins); an inactive item is not found (decided 28 September,
+          audit R215 (1)).
         provenance: contract retail.yaml GET /merchandise/lookup
   states:
     loading: Products with stock, in-stock first
@@ -2043,7 +2046,9 @@ screens:
     component: modal
     trigger: Reserve merchandise
     body: '**Collects what `reserveMerchandise` sends before it is called.** Required: `id`, `lines`,
-      `expiresAt`. Optional: `subjectId`, `collectionNote`. Dismissing sends nothing; the screen behind
+      `expiresAt`. Optional: `subjectId`, `collectionNote`. **Expiry** (`expiresAt`) is picked from 15
+      minutes ahead up to the close of the venue''s operating day, and the picker offers nothing outside
+      that window (decided 28 September, audit R215 (2)). Dismissing sends nothing; the screen behind
       is unchanged.'
     confirm:
       label: Reserve merchandise

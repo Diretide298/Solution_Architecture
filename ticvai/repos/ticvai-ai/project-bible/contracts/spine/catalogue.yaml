@@ -174,8 +174,14 @@ paths:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
         '409':
-          description: The body leaves out a category that products name. Send it with `isActive` false
-            rather than deleting it.
+          description: 'The body leaves out a category that products name (send it with `isActive` false
+            rather than deleting it), or a category `code` is already used in this tenant, in the body or
+            by another venue''s category (`duplicate-code`, audit R108).
+
+            '
+          x-ticvai-problem-types:
+          - category-still-referenced
+          - duplicate-code
           content:
             application/problem+json:
               schema:
@@ -605,11 +611,19 @@ paths:
         Repricing every adult admission before a season is routine and currently means one call per product.
         **Runs as a dry run first**, for the reason `assessProductChange` exists.
 
+        **Escalates to `PRICE_CONFIGURE` above a value threshold** (decided 28 September, audit R197): a
+        run that changes any price by more than the venue setting `catalogue.bulkPriceChangeEscalationPercent`
+        (proposed 10%) or touches more than `catalogue.bulkPriceChangeEscalationCount` prices (proposed
+        50) needs `PRICE_CONFIGURE`; below both, `PRODUCT_CONFIGURE` is enough. Both are venue settings
+        with a tenant default in `tenancy.VenueSettings`, proposed, client to correct. The dry run
+        reports whether the run escalates; a real run that escalates without `PRICE_CONFIGURE` is a
+        `403` (`price-escalation-required`).
+
         '
       tags:
       - catalogue
       x-ticvai-permission: PRODUCT_CONFIGURE
-      x-ticvai-permission-escalated: PRODUCT_CONFIGURE
+      x-ticvai-permission-escalated: PRICE_CONFIGURE
       x-ticvai-audience:
       - staff
       x-ticvai-scope-level: venue
@@ -815,7 +829,25 @@ paths:
                   - personal
                   - seasonal
                   - other
+                  description: '`other` requires `note` (decided 28 September, audit R222). The notes are
+                    reviewed quarterly to add the real reasons they reveal.
+
+                    '
+                note:
+                  type: string
+                  minLength: 3
+                  maxLength: 500
+                  description: Required when `reason` is `other` (audit R222). Kept as
+                    `access.Entitlement.freezeNote`, with `reason` as `freezeReason`.
       responses:
+        '400':
+          description: '`reason` is `other` with no `note` (audit R222).'
+          x-ticvai-problem-types:
+          - validation
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
         '200':
           headers:
             X-Consistency-Token:
@@ -1077,7 +1109,7 @@ paths:
       - staff
       summary: Who is waiting for capacity
       description: '1.1.25. **Not the same as a queue** (ADR-0012). A queue is people standing at a ride;
-        a waitlist is people who wanted a sold-out session and asked to be told if it frees up.
+        a waitlist is people who wanted a sold-out performance and asked to be told if it frees up.
 
         '
       tags:
@@ -1106,12 +1138,17 @@ paths:
       operationId: joinWaitlist
       x-ticvai-consumed-by:
         - "P01 WEB-040 Virtual Queue"
-        - "P02 GST-070 Reserve a Table or Cabana"
+        - "P02 GST-070 Reserve a Table"
       x-ticvai-audience:
       - guest
       summary: Ask to be told if capacity frees up
-      description: '1.1.25, 4.9.17. **Offered only where the session is genuinely sold out** — a waitlist
+      description: '1.1.25, 4.9.17. **Offered only where the performance is genuinely sold out** — a waitlist
         on something available is a worse experience than selling it.
+
+        **Sold out counts held seats and live leases as sold** (decided 28 September, audit R101). A
+        performance is sold out when sold units, seats on hold and units under an unexpired lease together
+        reach its capacity; the oversell allowance does not reopen it. (A "session" in the design is a
+        Performance, audit R165.)
 
         **Joining reserves nothing.** The guest is told when capacity appears and buys like anyone else,
         because holding capacity for a waitlist is the same as not releasing it.
@@ -1142,7 +1179,8 @@ paths:
               schema:
                 $ref: '#/components/schemas/WaitlistEntry'
         '409':
-          description: 'The session is not sold out. **Refused rather than accepted**, because a waitlist
+          description: 'The performance is not sold out (sold, held and leased units are below capacity,
+            audit R101). **Refused rather than accepted**, because a waitlist
             entry on available capacity will never be notified and the guest will wait forever.
 
             '
@@ -1162,7 +1200,7 @@ paths:
       operationId: leaveWaitlist
       x-ticvai-consumed-by:
         - "P01 WEB-040 Virtual Queue"
-        - "P02 GST-070 Reserve a Table or Cabana"
+        - "P02 GST-070 Reserve a Table"
       x-ticvai-audience:
       - guest
       summary: Stop waiting
@@ -1199,6 +1237,10 @@ paths:
         everyone at once produces a race the fastest guest wins and the rest resent; holding indefinitely
         for someone who is asleep means the seat goes unsold.
 
+        **The window is `VenueSettings.catalogue.waitlistOfferHoldMinutes`**, a venue setting with a tenant
+        default (decided 28 September, audit R094). **Proposed default 30 minutes, client to correct
+        (audit R094).**
+
         '
       tags:
       - catalogue
@@ -1213,7 +1255,8 @@ paths:
           headers:
             X-Consistency-Token:
               $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
-          description: Offered, and held for the configured window
+          description: Offered, and held for `VenueSettings.catalogue.waitlistOfferHoldMinutes` (proposed
+            default 30, audit R094)
           content:
             application/json:
               schema:
@@ -1349,6 +1392,8 @@ paths:
           $ref: ../shared/common.yaml#/components/responses/BadRequest
         '403':
           $ref: ../shared/common.yaml#/components/responses/Forbidden
+        '409':
+          $ref: ../shared/common.yaml#/components/responses/DuplicateCode
   /products/{productId}/eligibility-rule:
     get:
       operationId: getProductEligibilityRule
@@ -1396,7 +1441,7 @@ paths:
       x-ticvai-consumed-by:
         - "P08 BO-161 Guest, Companion & Eligibility Rules"
       summary: Set age, height and supervision limits
-      description: '**Design gap, 23 September.** The design gates rides, slides and kids'' sessions on
+      description: '**Design gap, 23 September.** The design gates rides, slides and kids'' activities on
         height and age before booking (*Height & age eligibility gate*, *Swim ability & height gate*). The
         catalogue had no place for the limits; only games, queues and rentals did.
 
@@ -1448,7 +1493,7 @@ paths:
     post:
       operationId: checkBookingEligibility
       x-ticvai-consumed-by:
-        - "P01 WEB-006 Date & Session Selection"
+        - "P01 WEB-006 Date & Performance Selection"
         - "P02 GST-007 Select Date & Time"
       summary: Can this party take part
       description: 'Checks a party''s declared ages and heights against every product in the booking before
@@ -1785,7 +1830,9 @@ paths:
         '403':
           $ref: ../shared/common.yaml#/components/responses/Forbidden
         '409':
-          description: 'Regeneration would exceed the configured variant ceiling for this product.
+          description: 'Regeneration would exceed the variant ceiling for this product:
+            `VenueSettings.catalogue.maxVariantsPerProduct`, a venue setting with a tenant default (decided
+            28 September, audit R094). **Proposed default 200 variants, client to correct (audit R094).**
 
             '
           content:
@@ -2024,8 +2071,7 @@ paths:
       operationId: listEvents
       x-ticvai-consumed-by:
         - "P08 BO-001 Queue Directory"
-        - "P08 BO-015 Session Calendar"
-        - "P08 BO-016 Session Template"
+        - "P08 BO-015 Performance Calendar"
         - "P08 BO-019 Closures & Blackouts"
         - "P08 BO-063 Opening Hours & Calendar"
         - "P08 BO-694 Event Catalogue Command Center"
@@ -2060,8 +2106,7 @@ paths:
       operationId: createEvent
       x-ticvai-consumed-by:
         - "P08 BO-001 Queue Directory"
-        - "P08 BO-015 Session Calendar"
-        - "P08 BO-016 Session Template"
+        - "P08 BO-015 Performance Calendar"
         - "P08 BO-019 Closures & Blackouts"
         - "P08 BO-063 Opening Hours & Calendar"
       x-ticvai-audience:
@@ -2091,6 +2136,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Event'
+        '409':
+          $ref: ../shared/common.yaml#/components/responses/DuplicateCode
   /events/{eventId}/performances:
     parameters:
     - name: eventId
@@ -2109,8 +2156,7 @@ paths:
         - "P02 GST-005 What's On"
         - "P02 GST-007 Select Date & Time"
         - "P08 BO-001 Queue Directory"
-        - "P08 BO-015 Session Calendar"
-        - "P08 BO-016 Session Template"
+        - "P08 BO-015 Performance Calendar"
         - "P08 BO-019 Closures & Blackouts"
         - "P08 BO-063 Opening Hours & Calendar"
       x-ticvai-audience:
@@ -2148,7 +2194,7 @@ paths:
       responses:
         '200':
           description: Performances, by `startsAt` ascending with `id` as the tiebreak — the order a
-            date-and-session picker shows them in, and the key the cursor pages on.
+            date-and-performance picker shows them in, and the key the cursor pages on.
           content:
             application/json:
               schema:
@@ -2164,8 +2210,7 @@ paths:
       operationId: createPerformances
       x-ticvai-consumed-by:
         - "P08 BO-001 Queue Directory"
-        - "P08 BO-015 Session Calendar"
-        - "P08 BO-016 Session Template"
+        - "P08 BO-015 Performance Calendar"
         - "P08 BO-019 Closures & Blackouts"
         - "P08 BO-063 Opening Hours & Calendar"
       x-ticvai-audience:
@@ -2337,6 +2382,8 @@ paths:
         a general pool any channel may draw from once its own allocation is exhausted.
 
         Reducing an allocation below what a channel has already sold is refused — the seats are gone.
+        What a channel has sold includes its units under an unexpired lease; the oversell allowance does
+        not count (decided 28 September, audit R101).
 
         **What the PUT does.** The body is the whole allocation set for this channel capacity, one entry
         per channel: a channel left out has no allocation of its own and draws only from the general
@@ -2383,7 +2430,8 @@ paths:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
         '409':
-          description: An allocation is below what that channel has already sold
+          description: An allocation is below what that channel has already sold plus its leased units
+            (audit R101)
           content:
             application/problem+json:
               schema:
@@ -2499,6 +2547,12 @@ paths:
 
         Publishing is the act that makes a configuration change visible at point of sale. Until a bundle
         is published, an edited price exists only in the back office.
+
+        **The bundle carries the venue''s sale boards** (`platform.sale_board`, every page and tile;
+        decided 28 September, audit R129 (4)). `tenancy.updateSaleBoard` promises its changes reach
+        terminals with the next bundle, and this is where they do: the snapshot reads the venue''s
+        sale boards with the catalogue, so a board edit is live at the till once a bundle is published
+        and applied.
 
         '
       tags:
@@ -2977,14 +3031,14 @@ paths:
       operationId: getAvailability
       x-ticvai-consumed-by:
         - "P01 WEB-004 Attraction Details"
-        - "P01 WEB-006 Date & Session Selection"
+        - "P01 WEB-006 Date & Performance Selection"
         - "P02 GST-004 Attraction Details"
         - "P02 GST-007 Select Date & Time"
         - "P02 GST-050 Resource Booking – Cabana"
         - "P02 GST-058 Resource Availability (Cabana)"
         - "P04 POS-003 Sell — Timed Entry"
         - "P05 KSK-004 Choose tickets"
-        - "P05 KSK-005 Choose a session"
+        - "P05 KSK-005 Choose a performance"
         - "P05 KSK-015 Assistant"
         - "P10 PTR-007 Availability Search"
       x-ticvai-audience:
@@ -3091,6 +3145,12 @@ paths:
         carries it, which is why the two are different acts with different permissions — a product manager
         approves, an operator publishes.
 
+        **The permission depends on the transition** (decided 28 September, audit R091 (2)): `approve`
+        (review to approved) requires `PRODUCT_APPROVE`, and `publish` (approved to live) requires
+        `PRODUCT_PUBLISH`. Every other transition needs `PRODUCT_CONFIGURE`, the operation''s own
+        permission. A caller without the one its transition needs gets a `403`
+        (`transition-permission-required`), naming the permission.
+
         Withdrawal stops new sales and leaves existing entitlements intact. Archiving is refused while
         entitlements remain unexpired.
 
@@ -3141,10 +3201,15 @@ paths:
               schema:
                 $ref: '#/components/schemas/Product'
         '403':
-          description: 'Approval attempted by the principal who submitted it. Segregation applies here
-            as it does to journals.
+          description: 'Approval attempted by the principal who submitted it (`approver-is-submitter`).
+            Segregation applies here as it does to journals. Or the caller lacks the permission its
+            transition needs: `PRODUCT_APPROVE` for `approve`, `PRODUCT_PUBLISH` for `publish`,
+            `PRODUCT_CONFIGURE` otherwise (`transition-permission-required`, audit R091 (2)).
 
             '
+          x-ticvai-problem-types:
+          - approver-is-submitter
+          - transition-permission-required
           content:
             application/problem+json:
               schema:
@@ -3482,8 +3547,7 @@ paths:
       operationId: getEvent
       x-ticvai-consumed-by:
         - "P08 BO-001 Queue Directory"
-        - "P08 BO-015 Session Calendar"
-        - "P08 BO-016 Session Template"
+        - "P08 BO-015 Performance Calendar"
         - "P08 BO-019 Closures & Blackouts"
         - "P08 BO-063 Opening Hours & Calendar"
       x-ticvai-audience:
@@ -3509,8 +3573,7 @@ paths:
       operationId: updateEvent
       x-ticvai-consumed-by:
         - "P08 BO-001 Queue Directory"
-        - "P08 BO-015 Session Calendar"
-        - "P08 BO-016 Session Template"
+        - "P08 BO-015 Performance Calendar"
         - "P08 BO-019 Closures & Blackouts"
         - "P08 BO-063 Opening Hours & Calendar"
       x-ticvai-audience:
@@ -3562,12 +3625,11 @@ paths:
     get:
       operationId: getPerformance
       x-ticvai-consumed-by:
-        - "P01 WEB-006 Date & Session Selection"
+        - "P01 WEB-006 Date & Performance Selection"
         - "P02 GST-006 Event / Exhibition Details"
         - "P04 POS-004 Sell — Seat Map"
         - "P08 BO-002 Queue Configuration"
-        - "P08 BO-015 Session Calendar"
-        - "P08 BO-016 Session Template"
+        - "P08 BO-015 Performance Calendar"
         - "P08 BO-019 Closures & Blackouts"
         - "P08 BO-063 Opening Hours & Calendar"
       x-ticvai-audience:
@@ -3601,8 +3663,7 @@ paths:
       x-ticvai-consumed-by:
         - "P04 POS-004 Sell — Seat Map"
         - "P08 BO-002 Queue Configuration"
-        - "P08 BO-015 Session Calendar"
-        - "P08 BO-016 Session Template"
+        - "P08 BO-015 Performance Calendar"
         - "P08 BO-019 Closures & Blackouts"
         - "P08 BO-063 Opening Hours & Calendar"
       x-ticvai-audience:
@@ -3673,8 +3734,7 @@ paths:
       operationId: cancelPerformance
       x-ticvai-consumed-by:
         - "P08 BO-002 Queue Configuration"
-        - "P08 BO-015 Session Calendar"
-        - "P08 BO-016 Session Template"
+        - "P08 BO-015 Performance Calendar"
         - "P08 BO-019 Closures & Blackouts"
         - "P08 BO-063 Opening Hours & Calendar"
       x-ticvai-audience:
@@ -3686,10 +3746,19 @@ paths:
 
         Returns the exposure before committing so the person cancelling sees what it costs.
 
+        **A supervisor''s step-up on the same device, not an approval request**, as for a shift reopen
+        (proposed by the coordinator, client to confirm (audit R144): the decision did not name this
+        act). A real run carries `supervisorStepUp`; the rule is `SupervisorStepUp` in `common.yaml`:
+        the PIN is checked against the principal, who must hold `PERFORMANCE_CONFIGURE` at this venue,
+        and a failure is a `403` with nothing written. A dry run needs none. The bulk refund it queues
+        still goes for approval as a refund.
+
         '
       tags:
       - event
       x-ticvai-permission: PERFORMANCE_CONFIGURE
+      x-ticvai-step-up: pin
+      x-ticvai-step-up-reason: Cancels a performance and queues refunds to every holder; a supervisor signs it in place (proposed by the coordinator, client to confirm, audit R144).
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
@@ -3723,6 +3792,10 @@ paths:
                 dryRun:
                   type: boolean
                   default: false
+                supervisorStepUp:
+                  allOf:
+                  - $ref: ../shared/common.yaml#/components/schemas/SupervisorStepUp
+                  description: Required unless `dryRun` (audit R144, proposed by the coordinator).
       responses:
         '200':
           headers:
@@ -3733,6 +3806,16 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/PerformanceCancellationResult'
+        '403':
+          description: The supervisor step-up is missing or failed (audit R144). The PIN did not verify,
+            or the principal does not hold `PERFORMANCE_CONFIGURE` at this venue.
+          x-ticvai-problem-types:
+          - forbidden
+          - supervisor-step-up-refused
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
         '409':
           description: 'The performance is `cancelled`, `completed` or `soldOut`. `states/performance.yaml`
             cancels only from `scheduled`, `onSale` and `suspended`.
@@ -3763,6 +3846,10 @@ paths:
       summary: Amend a channel capacity
       description: 'Capacity may be increased freely. Reducing it below what has already sold is refused
         — the seats are gone, and pretending otherwise oversells the next guest.
+
+        **"Already sold" includes units under an unexpired lease; the oversell allowance does not count**
+        (decided 28 September, audit R101). The floor is sold units plus leased units. An oversell
+        allowance neither raises nor lowers it.
 
         '
       tags:
@@ -3798,7 +3885,8 @@ paths:
               schema:
                 $ref: '#/components/schemas/ChannelCapacity'
         '409':
-          description: Capacity reduced below units already sold
+          description: Capacity reduced below units already sold plus units under an unexpired lease
+            (audit R101)
           content:
             application/problem+json:
               schema:
@@ -9139,12 +9227,13 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
-  /session-templates:
+  /performance-templates:
     get:
-      operationId: listSessionTemplates
+      operationId: listPerformanceTemplates
       x-ticvai-consumed-by:
-        - "P08 BO-721 Activity Session & Slot Template Configuration"
-        - "P08 BO-725 Session Operations Command Center"
+        - "P08 BO-016 Performance Template"
+        - "P08 BO-721 Activity Performance & Slot Template Configuration"
+        - "P08 BO-725 Performance Operations Command Center"
       summary: Slot templates, peak bands and walk-in rules
       description: 'Event board 8. **An activity venue sells time, not seats**, and the template is how
         a day becomes sellable slots: length, turnaround, concurrent capacity, and which bands are
@@ -9153,6 +9242,10 @@ paths:
         **Walk-in is configured, not assumed.** A trampoline park that takes walk-ins holds capacity
         back for them; one that does not says so, and the difference decides whether a family turning
         up on a Sunday is turned away.
+
+        **Named Performance templates** (decided 28 September, audit R165): what the design calls a
+        session is a Performance, and a template is how a day becomes performances. Formerly
+        `listSessionTemplates` on `/session-templates`.
 
         '
       tags:
@@ -9170,14 +9263,19 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/SessionTemplate'
+                  $ref: '#/components/schemas/PerformanceTemplate'
     put:
-      operationId: setSessionTemplate
+      operationId: setPerformanceTemplate
       x-ticvai-consumed-by:
-        - "P08 BO-721 Activity Session & Slot Template Configuration"
+        - "P08 BO-016 Performance Template"
+        - "P08 BO-721 Activity Performance & Slot Template Configuration"
         - "P08 BO-723 Peak, Off-Peak & Super Prime Time Configuration"
         - "P08 BO-724 Walk-In / There-and-Then Booking Configuration"
       summary: Define slot length, capacity, bands and walk-in policy
+      description: 'Formerly `setSessionTemplate`. A session is a Performance (decided 28 September, audit
+        R165).
+
+        '
       tags:
       - events
       x-ticvai-permission: PERFORMANCE_CONFIGURE
@@ -9192,7 +9290,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/SessionTemplate'
+              $ref: '#/components/schemas/PerformanceTemplate'
       responses:
         '200':
           headers:
@@ -9202,7 +9300,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/SessionTemplate'
+                $ref: '#/components/schemas/PerformanceTemplate'
   /prepaid-minute-packages:
     put:
       operationId: setPrepaidMinutePackage
@@ -9242,22 +9340,25 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/PrepaidMinutePackage'
-  /sessions/{sessionId}/media:
+  /performances/{performanceId}/media:
     parameters:
-    - name: sessionId
+    - name: performanceId
       in: path
       required: true
       schema:
         type: string
         format: uuid
     post:
-      operationId: assignSessionMedia
+      operationId: assignPerformanceMedia
       x-ticvai-consumed-by:
         - "P08 BO-726 Participant Photo & Video Assignment"
-      summary: Attach photos and video to the participants in a session
+      summary: Attach photos and video to the participants in a performance
       description: 'Event board 9.2. **The photograph is worthless unless it reaches the right guest**,
-        and a session of thirty children produces two hundred images that have to be attributed before
+        and a performance of thirty children produces two hundred images that have to be attributed before
         anybody will pay for them.
+
+        Formerly `assignSessionMedia` on `/sessions/{sessionId}/media`: a session is a Performance
+        (decided 28 September, audit R165).
 
         Assignment is by participant, and the asset lives in `assets` with the rights and expiry that
         context already models — a photograph of a child has a retention policy, not just a price.
@@ -9832,8 +9933,11 @@ components:
           enum:
           - perPerformance
           - perDay
-          - perSession
           - unlimited
+          description: '`perSession` was removed: a session is a Performance (decided 28 September, audit
+            R165), so `perPerformance` covers it.
+
+            '
         ticketNamesDate:
           type: boolean
           default: true
@@ -10223,10 +10327,12 @@ components:
           - ready
         scopePath:
           type: string
-    SessionTemplate:
+    PerformanceTemplate:
       type: object
-      x-ticvai-persistence: catalogue.session_template
-      description: 'Event board 8. **An activity venue sells time, not seats.**'
+      x-ticvai-persistence: catalogue.performance_template
+      description: 'Event board 8. **An activity venue sells time, not seats.** Each slot the template
+        produces is a Performance. Formerly `SessionTemplate` on `catalogue.session_template`: a session
+        is a Performance (decided 28 September, audit R165).'
       required:
       - code
       properties:
@@ -10404,10 +10510,15 @@ components:
           type: string
           maxLength: 64
           nullable: true
+          x-ticvai-unique: tenant
           description: >
             **Taken from their category tables, 20 September.** Ours had a uuid and a localised
             name, so an importer matching *Beverages* had to match on a display string that a
             venue is free to translate.
+
+            **Unique per tenant where set** (decided 28 September, audit R108): two categories
+            in one tenant never share a code, and `setProductCategories` refuses a body that
+            would, with `409 duplicate-code`.
         nameLocalised:
           type: object
           additionalProperties:
@@ -11608,6 +11719,11 @@ components:
           type: string
           maxLength: 64
           pattern: ^[A-Za-z0-9_-]+$
+          x-ticvai-unique: tenant
+          description: '**Unique per tenant** (decided 28 September, audit R108). A code already used by
+            any product in the tenant, at any venue, is refused with `409 duplicate-code`.
+
+            '
         name:
           type: string
           maxLength: 200
@@ -11906,6 +12022,11 @@ components:
         code:
           type: string
           maxLength: 64
+          x-ticvai-unique: tenant
+          description: '**Unique per tenant** (decided 28 September, audit R108). A code already used by
+            any event in the tenant is refused with `409 duplicate-code`.
+
+            '
         name:
           type: string
           maxLength: 200
@@ -12252,11 +12373,23 @@ components:
         payload:
           type: object
           description: 'Products, variants, price lists, prices, tax codes, events, performances, envelope
-            definitions and data mask field definitions. Shape is versioned with the bundle format, not
-            with this API.
+            definitions, data mask field definitions and the venue''s sale boards. Shape is versioned
+            with the bundle format, not with this API.
 
             '
           additionalProperties: true
+          properties:
+            saleBoards:
+              type: array
+              description: '**The venue''s sale boards as `tenancy.listSaleBoards` returns them**, read from
+                `platform.sale_board` when the bundle is snapshotted (decided 28 September, audit R129
+                (4)). A board changed by `updateSaleBoard` reaches terminals here, with the next bundle,
+                and never mid-transaction.
+
+                '
+              items:
+                type: object
+                additionalProperties: true
     LeaseStatus:
       type: string
       description: '`states/lease.yaml`. **`expired` is set by that model''s timer transition when `expiresAt`
@@ -12300,8 +12433,11 @@ components:
           type: integer
           minimum: 30
           maximum: 3600
+          default: 900
           description: 'Short TTLs limit stranding when a terminal dies; long TTLs survive longer outages.
-            The venue''s default balances the two.
+            The venue''s default balances the two: **15 minutes (900 seconds), from the venue setting
+            `cartLeaseSeconds`** with a tenant default (decided 28 September, audit R169; proposed,
+            client to correct under audit R094).
 
             '
     InventoryHold:
@@ -16212,9 +16348,9 @@ components:
         perDay:
           type: string
           description: Per Day
-        perSession:
+        perPerformance:
           type: string
-          description: Per Session
+          description: Per Performance (the design's "per session"; a session is a Performance, audit R165)
         perResource:
           type: string
           description: Per Resource
@@ -16303,9 +16439,9 @@ components:
         perDay:
           type: string
           description: Per Day
-        perSession:
+        perPerformance:
           type: string
-          description: Per Session
+          description: Per Performance (the design's "per session"; a session is a Performance, audit R165)
         perResource:
           type: string
           description: Per Resource
@@ -16509,9 +16645,9 @@ components:
         equipment:
           type: string
           description: Equipment
-        additionalSession:
+        additionalPerformance:
           type: string
-          description: Additional Session
+          description: Additional Performance (the design's "additional session", audit R165)
         premiumAccess:
           type: string
           description: Premium Access
@@ -17302,9 +17438,6 @@ components:
           type: string
           format: date-time
           description: Arrival Window
-        session:
-          type: string
-          description: Session
         timeOfDayBand:
           type: string
           format: date-time

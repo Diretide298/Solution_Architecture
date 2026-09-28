@@ -404,6 +404,21 @@ def required_of(body, schemas: dict | None = None, _seen=None) -> set:
     return out
 
 
+def _declared_renames() -> list[dict]:
+    """The table renames declared in derive-schema-history.py (`RENAMES`), read from its source
+    so importing it cannot run anything. Empty if the file cannot be read."""
+    import ast
+    try:
+        tree = ast.parse((ROOT / "tools" / "derive-schema-history.py").read_text(encoding="utf-8"))
+    except (OSError, SyntaxError):
+        return []
+    for node in tree.body:
+        if isinstance(node, ast.Assign) and any(getattr(t, "id", None) == "RENAMES"
+                                                for t in node.targets):
+            return ast.literal_eval(node.value)
+    return []
+
+
 def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__.split("\n")[0])
     ap.add_argument("--dry-run", action="store_true")
@@ -529,6 +544,12 @@ def main() -> int:
         schema_part, _, name = table.partition(".")
         for sname, ptable in persisted.items():
             short = ptable.split(".")[-1]
+            # **An implied child lives in its parent's schema.** Matching on the bare name let the
+            # retired `control.footer_config_column` claim `whitelabel.footer_config`'s `columns`
+            # after R163 moved the footer, so the old table was re-derived every run and the
+            # declared rename never took. It was the only cross-schema match in the package.
+            if ptable.split(".")[0] != schema_part:
+                continue
             if ptable == table or not name.startswith(short + "_"):
                 continue
             tail = name[len(short) + 1:]
@@ -1122,6 +1143,40 @@ def main() -> int:
     print(f"  tables holding only keys — contract content missing: {len(_stubs)}")
     for _s in _stubs:
         print(f"     {_s}")
+
+    # **A declared rename retires the old name here, or nowhere.** This tool keeps any table the
+    # contracts no longer describe (it adds knowledge, it does not discard it), so when audit R165
+    # renamed `resources.session_participant` to `performance_participant` and R163 moved
+    # `control.footer_config*` to `whitelabel.*`, the contracts produced the new tables and the old
+    # ones stayed beside them -- the DDL created both, the relationship graph re-derived edges for
+    # both, and `derive-schema-history` reported every one NOT APPLIED. The renames are a
+    # judgement already written down in `derive-schema-history.py`; this reads them rather than
+    # restating them. Only where the new name has columns and the contracts no longer describe the old one:
+    # a rename declared ahead of its contract edit must not delete a table that is still live.
+    # The hand-written note travels with the table, because it describes the same rows.
+    _renamed_tables = []
+    for _r in _declared_renames():
+        _old, _new = _r["from"], _r["to"]
+        # `existing`, not `derived`, for the new name: a child table (`footer_config_column`) is
+        # built from its parent's nested array and never appears in `derived`.
+        if _old not in existing or _old in derived or not existing.get(_new):
+            continue
+        existing.pop(_old, None)
+        _storage = S.get("storage") or {}
+        _note = str(_storage.get(_old) or "")
+        if _note and "No description has been written" not in _note and (
+                "No description has been written" in str(_storage.get(_new) or "")
+                or not str(_storage.get(_new) or "").strip()):
+            _storage[_new] = _note
+        for _k in ("storage", "store", "origin", "lineage"):
+            if isinstance(S.get(_k), dict) and _old in S[_k]:
+                if _k == "store":
+                    S[_k].setdefault(_new, S[_k][_old])
+                S[_k].pop(_old, None)
+        _renamed_tables.append(f"{_old} -> {_new}")
+    print(f"  tables retired by a declared rename: {len(_renamed_tables)}")
+    for _d in _renamed_tables:
+        print(f"     {_d}")
 
     S["cols"] = existing
     ref_path.write_text(json.dumps(S), encoding="utf-8")

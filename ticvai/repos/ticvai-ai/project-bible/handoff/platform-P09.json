@@ -11,7 +11,7 @@
  "note": "Derived by tools/derive-platform.py. **The gaps section is the point** \u2014 a page listing what exists is a directory; one listing what is missing is a worklist.",
  "counts": {
   "screens": 676,
-  "operations": 528,
+  "operations": 538,
   "contracts": 19,
   "modules": 14,
   "undrawn": 0,
@@ -158,23 +158,23 @@
    "operations": 32
   },
   {
-   "contract": "white-label",
-   "operations": 20
+   "contract": "identity",
+   "operations": 25
   },
   {
-   "contract": "identity",
-   "operations": 18
+   "contract": "white-label",
+   "operations": 20
   },
   {
    "contract": "marketing-crm",
    "operations": 12
   },
   {
-   "contract": "finance",
-   "operations": 7
+   "contract": "tenancy",
+   "operations": 10
   },
   {
-   "contract": "tenancy",
+   "contract": "finance",
    "operations": 7
   },
   {
@@ -194,11 +194,11 @@
    "operations": 3
   },
   {
-   "contract": "wallet",
+   "contract": "workforce",
    "operations": 2
   },
   {
-   "contract": "workforce",
+   "contract": "wallet",
    "operations": 2
   },
   {
@@ -213,7 +213,7 @@
    "module": "Access & Identity",
    "wave": 1,
    "route": "/general/platform-login-mfa",
-   "operations": 7,
+   "operations": 12,
    "drawn": true
   },
   {
@@ -249,7 +249,7 @@
    "module": "Tenants & Licensing",
    "wave": 1,
    "route": "/general/tenant-directory",
-   "operations": 15,
+   "operations": 16,
    "drawn": true
   },
   {
@@ -348,7 +348,7 @@
    "module": "Branding & Localisation",
    "wave": 2,
    "route": "/general/white-label-branding-management",
-   "operations": 11,
+   "operations": 13,
    "drawn": true
   },
   {
@@ -357,7 +357,7 @@
    "module": "Branding & Localisation",
    "wave": 2,
    "route": "/general/domain-and-certificate-management",
-   "operations": 4,
+   "operations": 6,
    "drawn": true
   },
   {
@@ -366,7 +366,7 @@
    "module": "Branding & Localisation",
    "wave": 2,
    "route": "/general/localisation-and-language-pack",
-   "operations": 5,
+   "operations": 7,
    "drawn": true
   },
   {
@@ -375,7 +375,7 @@
    "module": "Branding & Localisation",
    "wave": 2,
    "route": "/general/global-configuration-and-defaults",
-   "operations": 4,
+   "operations": 8,
    "drawn": true
   },
   {
@@ -483,7 +483,7 @@
    "module": "Security & Compliance",
    "wave": 3,
    "route": "/general/security-and-compliance-dashboard",
-   "operations": 4,
+   "operations": 6,
    "drawn": true
   },
   {
@@ -537,7 +537,7 @@
    "module": "AI",
    "wave": 1,
    "route": "/ai/providers",
-   "operations": 4,
+   "operations": 8,
    "drawn": true
   },
   {
@@ -3273,7 +3273,7 @@
    "module": "Platform",
    "wave": 3,
    "route": "/platform/authentication-mfa-policy-manager-adm-342",
-   "operations": 3,
+   "operations": 4,
    "drawn": true
   },
   {
@@ -3903,7 +3903,7 @@
    "module": "Tenants & Licensing",
    "wave": 3,
    "route": "/tenants-licensing/payment-method-settlement-setup-adm-412",
-   "operations": 1,
+   "operations": 3,
    "drawn": true
   },
   {
@@ -3984,7 +3984,7 @@
    "module": "Tenants & Licensing",
    "wave": 3,
    "route": "/tenants-licensing/venue-operational-structure-creation-adm-421",
-   "operations": 2,
+   "operations": 4,
    "drawn": true
   },
   {
@@ -6355,6 +6355,12 @@
     "summary": ""
    },
    {
+    "operation": "submitApprovalRequest",
+    "contract": "approvals",
+    "verb": "POST",
+    "summary": "Send a saved draft for approval"
+   },
+   {
     "operation": "assessProductChange",
     "contract": "catalogue",
     "verb": "POST",
@@ -6611,6 +6617,12 @@
     "contract": "identity",
     "verb": "GET",
     "summary": "A membership with its history, usage and renewals"
+   },
+   {
+    "operation": "getPasswordPolicy",
+    "contract": "identity",
+    "verb": "GET",
+    "summary": "Read the password and MFA policy in force"
    },
    {
     "operation": "getPrincipalModuleAccess",
@@ -7129,22 +7141,10 @@
     "summary": "Archive a dashboard"
    },
    {
-    "operation": "deleteReportSchedule",
-    "contract": "reporting",
-    "verb": "DELETE",
-    "summary": "Delete a schedule"
-   },
-   {
     "operation": "listAlertRules",
     "contract": "reporting",
     "verb": "GET",
     "summary": "What raises an alert, and when"
-   },
-   {
-    "operation": "updateReportSchedule",
-    "contract": "reporting",
-    "verb": "PATCH",
-    "summary": "Amend, pause or resume a schedule"
    },
    {
     "operation": "cancelSubscription",

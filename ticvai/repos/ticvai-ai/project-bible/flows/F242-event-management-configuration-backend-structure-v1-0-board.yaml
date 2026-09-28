@@ -1,5 +1,5 @@
 id: F242
-name: 'Event Management Configuration Backend Structure v1.0 board 9: Session Operations Command Center'
+name: 'Event Management Configuration Backend Structure v1.0 board 9: Performance Operations Command Center'
 actor: venueManager
 wave: 3
 frequency: routine
@@ -15,11 +15,11 @@ trigger:
     to be written.
   entryScreen: BO-725
   entryPoints:
-  - Arrives at Session Operations Command Center
+  - Arrives at Performance Operations Command Center
 steps:
 - step: 1
   screen: BO-725
-  action: Opens Session Operations Command Center
+  action: Opens Performance Operations Command Center
   operations: []
   outcome: Provide management with a consolidated backend view of the financial, commercial, sponsorship,
     attendance and operational performance of events.
@@ -31,7 +31,7 @@ steps:
     and flight/activity businesses.
 branches:
 - at: 1
-  condition: Nothing has been set up on Session Operations Command Center yet
+  condition: Nothing has been set up on Performance Operations Command Center yet
   behaviour: The screen declares `emptyFirstRun`. **On a new tenant this is the expected state**, and
     it is a different situation from an empty result on an established one.
   severity: expected

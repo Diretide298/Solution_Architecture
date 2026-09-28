@@ -6,10 +6,10 @@ capability: Incident management
 wave: 2
 frequency: Routine.
 criticality: safety
-primaryContract: workforce
+primaryContract: maintenance
 contracts:
+- maintenance
 - workforce
-- approvals
 - marketing-crm
 platforms:
 - P06
@@ -75,7 +75,10 @@ exitStates:
   description: '**With time and name.**'
 - state: linkedToCase
   description: A guest is involved and the conversation continues elsewhere.
-notes: '**Written 24 August.** `EMP-027` could report a new incident from a detail screen — removed.
+notes: '**Incident handling belongs to maintenance, not workforce** (decided 28 September, audit R139 (d)):
+  `reportIncident`, `getIncident`, `updateIncident`, `listIncidents` and `recordAuthorityNotification`
+  are MaintenanceService operations (states/incident.yaml), so steps 1 to 3 run against `maintenance`.
+  Workforce owns only the announcement in step 4, and `approvals` was never called. **Written 24 August.** `EMP-027` could report a new incident from a detail screen — removed.
   And **`getAnnouncementReach` had never been in a flow**: the platform could broadcast and never ask
   who heard.'
 openQuestions: null

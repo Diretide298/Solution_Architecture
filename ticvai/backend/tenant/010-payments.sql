@@ -306,7 +306,7 @@ CREATE TABLE IF NOT EXISTS payments.reconciliation_source (
     connection_id                     uuid,
     transport                         text CONSTRAINT reconciliation_source_transport_chk CHECK (transport IN ('sftp', 'api', 'email', 'manualUpload')),
     format                            text CONSTRAINT reconciliation_source_format_chk CHECK (format IN ('csv', 'fixedWidth', 'json', 'xml', 'camt053')),
-    expected_schedule                 text,
+    expected_schedule                 text DEFAULT 'daily',
     expected_by_time                  text,
     alert_if_missing                  boolean DEFAULT true,
     field_mapping                     jsonb,

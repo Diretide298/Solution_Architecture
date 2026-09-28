@@ -157,6 +157,22 @@ def build(schedule, keys):
     sched = json.loads(Path(schedule).read_text(encoding="utf-8"))
     week = {k: min(int(v // 5), 6) + 1 for k, v in sched["start"].items()}
     who = sched["assign"]
+    # Each task's timeframe inside its planned week, without dates (asked for 28 September): the week's five
+    # days are shared across that developer's tasks for the week by points, in build order. The schedule keeps
+    # only the week, so this is the planned pace, not a promise; dates stay out so the text survives a slip.
+    slot = {}
+    queues = collections.defaultdict(list)
+    for k, r in rows.items():
+        if r["type"] == "Task" and week.get(k):
+            queues[(who.get(k) or r["assignee"], week[k])].append(k)
+    for q in queues.values():
+        q.sort(key=lambda k: (int(rows[k]["sequence"] or 0), k))
+        pts = [max(float(rows[k]["points"] or 0), 0.5) for k in q]
+        total, done = sum(pts), 0.0
+        for k, p in zip(q, pts):
+            start, end = 5 * done / total, 5 * (done + p) / total
+            slot[k] = (start, end, len(q))
+            done += p
     ops = contract_index()
     slice_ops = set(json.loads((ROOT / "handoff" / "delivery-slice.json").read_text(encoding="utf-8"))["operations"])
     money = MoneyReach()
@@ -272,6 +288,15 @@ def build(schedule, keys):
             # without either being wrong (audit R045).
             out.append(f"- Planned: Block A week {wk}" + (f" (product wave {r['wave']}; the week follows dependency order)"
                                                           if r.get("wave") else ""))
+            if base in slot:
+                s0, s1, n = slot[base]
+                d0, d1 = int(s0) + 1, max(int(s0) + 1, -(-int(s1 * 100) // 100))
+                span = f"day {d0}" if d0 == d1 else f"days {d0}-{d1}"
+                size = s1 - s0
+                size = ("under half a day" if size < 0.5 else "about half a day" if size < 0.75
+                        else "about a day" if size < 1.25 else f"about {round(size * 2) / 2:g} days")
+                out.append(f"- Timeframe: {size}, {span} of week {wk}"
+                           + (f" ({n} tasks in {assignee}'s week)" if assignee else ""))
             # No reviewer on setup or onboarding tickets, and never the person who built it (R058).
             if r["track"] in ("Backend", "Database", "Frontend"):
                 pool = BE_CHECK if r["track"] in ("Backend", "Database") else FE_CHECK

@@ -180,6 +180,19 @@ operations:
   reads:
   - resources.resource_requirement
   writes: []
+- operation: getPerformanceManifest
+  verb: GET
+  path: /performances/{performanceId}/manifest
+  scope: venue
+  permission: RESOURCE_VIEW
+  audience:
+  - staff
+  offline: true
+  reads:
+  - marketing.consent_record
+  - pii.subject
+  - resources.performance_participant
+  writes: []
 - operation: getResource
   verb: GET
   path: /resources/{resourceId}
@@ -291,19 +304,6 @@ operations:
   offline: false
   reads: []
   writes: []
-- operation: getSessionManifest
-  verb: GET
-  path: /sessions/{sessionId}/manifest
-  scope: venue
-  permission: RESOURCE_VIEW
-  audience:
-  - staff
-  offline: true
-  reads:
-  - marketing.consent_record
-  - pii.subject
-  - resources.session_participant
-  writes: []
 - operation: listResourceAttributes
   verb: GET
   path: /resource-attributes
@@ -392,9 +392,9 @@ operations:
   offline: false
   reads: []
   writes: []
-- operation: reorderSessionManifest
+- operation: reorderPerformanceManifest
   verb: PUT
-  path: /sessions/{sessionId}/manifest
+  path: /performances/{performanceId}/manifest
   scope: venue
   permission: RESOURCE_BOOK
   audience:
@@ -402,10 +402,10 @@ operations:
   offline: true
   reads:
   - cache:idempotency
-  - resources.session_participant
+  - resources.performance_participant
   writes:
   - cache:idempotency
-  - resources.session_participant
+  - resources.performance_participant
 - operation: replaceResourceAllocation
   verb: POST
   path: /resource-allocations/{bookingId}/replace

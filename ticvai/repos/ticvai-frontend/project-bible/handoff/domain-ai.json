@@ -32,7 +32,7 @@
    "path": "/proposed-actions/{actionId}/decide",
    "verb": "POST",
    "summary": "Approve or reject a proposal",
-   "permission": "AI_APPROVE",
+   "permission": "AI_USE",
    "guestCallable": false,
    "scopeLevel": "venue"
   },
@@ -98,7 +98,7 @@
    "summary": "Configured providers and their order",
    "permission": "AI_CONFIGURE",
    "guestCallable": false,
-   "scopeLevel": "region"
+   "scopeLevel": "tenant"
   },
   "listIndexFailures": {
    "path": "/index-failures",
@@ -136,7 +136,7 @@
    "path": "/proposed-actions",
    "verb": "GET",
    "summary": "What the assistant has proposed and nobody has decided",
-   "permission": "AI_APPROVE",
+   "permission": "AI_USE",
    "guestCallable": false,
    "scopeLevel": "venue"
   },
@@ -241,9 +241,9 @@
    "path": "/providers",
    "verb": "PUT",
    "summary": "Configure a provider",
-   "permission": "AI_CONFIGURE",
+   "permission": "PLATFORM_TENANT_MANAGE",
    "guestCallable": false,
-   "scopeLevel": "region"
+   "scopeLevel": "tenant"
   },
   "setIndexSource": {
    "path": "/index-sources",
@@ -701,34 +701,13 @@
    ]
   },
   {
-   "id": "GST-052",
-   "name": "Suggested Itineraries",
-   "platform": "P02",
-   "platformName": "Guest App",
-   "wave": 3,
-   "operations": [
-    "requestSuggestion"
-   ]
-  },
-  {
    "id": "GST-054",
    "name": "AI Optimized Itinerary",
    "platform": "P02",
    "platformName": "Guest App",
-   "wave": 3,
+   "wave": 4,
    "operations": [
-    "requestSuggestion",
     "sendAiMessage"
-   ]
-  },
-  {
-   "id": "GST-059",
-   "name": "Plan My Day \u2013 In Progress",
-   "platform": "P02",
-   "platformName": "Guest App",
-   "wave": 3,
-   "operations": [
-    "requestSuggestion"
    ]
   },
   {
@@ -845,17 +824,6 @@
    "platform": "P08",
    "platformName": "Venue Management",
    "wave": 2,
-   "operations": [
-    "askReportingQuestion",
-    "saveNaturalLanguageQuery"
-   ]
-  },
-  {
-   "id": "BO-061",
-   "name": "Scheduled Reports",
-   "platform": "P08",
-   "platformName": "Venue Management",
-   "wave": 3,
    "operations": [
     "askReportingQuestion",
     "saveNaturalLanguageQuery"
@@ -1144,14 +1112,6 @@
    ]
   },
   {
-   "id": "F49",
-   "name": "A guest plans a day and follows it",
-   "wave": 3,
-   "operations": [
-    "requestSuggestion"
-   ]
-  },
-  {
    "id": "F77",
    "name": "A promotion is built, bundled, published and measured",
    "wave": 3,
@@ -1201,6 +1161,12 @@
    "mentions": 1
   },
   {
+   "file": "docs\\active\\ai-suggestion-rules-proposal.md",
+   "title": "AI suggestion rules: one rule and a minimum history per kind",
+   "status": "",
+   "mentions": 3
+  },
+  {
    "file": "docs\\active\\bl-073-cookie-consent-20-september.md",
    "title": "BL-073 \u2014 cookie consent: what to buy, what to build, what is ours either way",
    "status": "",
@@ -1217,6 +1183,12 @@
    "title": "Validating the developer team's Change Log",
    "status": "",
    "mentions": 2
+  },
+  {
+   "file": "docs\\active\\configured-limits-proposal.md",
+   "title": "Configured limits: proposed values",
+   "status": "",
+   "mentions": 1
   },
   {
    "file": "docs\\active\\contract-audit-19-september.md",
@@ -1289,6 +1261,12 @@
    "title": "Phase 0 \u2014 identity pass, all clusters",
    "status": "",
    "mentions": 2
+  },
+  {
+   "file": "docs\\active\\README.md",
+   "title": "Active",
+   "status": "",
+   "mentions": 1
   },
   {
    "file": "docs\\active\\rename-worklist-20-september.md",
@@ -1409,6 +1387,12 @@
    "title": "AI provider credentials \u2014 where the key lives and who can reach it",
    "status": "",
    "mentions": 3
+  },
+  {
+   "file": "docs\\architecture\\ai-system-design.md",
+   "title": "TICVAI AI subsystem: system design",
+   "status": "",
+   "mentions": 14
   },
   {
    "file": "docs\\architecture\\README.md",
@@ -1600,9 +1584,9 @@
   "states": 11,
   "events": 11,
   "tables": 51,
-  "screens": 40,
-  "flows": 11,
-  "documents": 38,
+  "screens": 37,
+  "flows": 10,
+  "documents": 42,
   "openConflicts": 1
  }
 }

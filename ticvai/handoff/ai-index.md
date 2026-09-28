@@ -11,9 +11,9 @@
 | **States** | 11 |
 | **Events** | 11 |
 | **Tables** | 51 |
-| **Screens** | 40 |
-| **Flows** | 11 |
-| **Documents** | 38 |
+| **Screens** | 37 |
+| **Flows** | 10 |
+| **Documents** | 42 |
 | **Open conflicts** | 1 |
 
 ## Reached outside the contract
@@ -60,7 +60,7 @@
 | `ingestKnowledgeDocument` | POST |  | tenant |
 | `listAiConversations` | GET |  | venue |
 | `listAiInteractions` | GET |  | tenant |
-| `listAiProviders` | GET |  | region |
+| `listAiProviders` | GET |  | tenant |
 | `listIndexFailures` | GET |  | tenant |
 | `listIndexJobs` | GET |  | tenant |
 | `listIndexSources` | GET |  | tenant |
@@ -77,7 +77,7 @@
 | `sendAiMessage` | POST |  | venue |
 | `setAiCredential` | PUT |  | tenant |
 | `setAiPolicy` | PUT |  | venue |
-| `setAiProvider` | PUT |  | region |
+| `setAiProvider` | PUT |  | tenant |
 | `setIndexSource` | PUT |  | tenant |
 | `setSuggestionProvider` | PUT |  | tenant |
 | `testAiProvider` | POST |  | tenant |
@@ -148,9 +148,7 @@
 - `GST-031` AI Concierge – Home — wave 2, 3 operations
 - `GST-032` AI Concierge – Chat — wave 2, 1 operation
 - `GST-033` AI Concierge – Contextual Help — wave 2, 1 operation
-- `GST-052` Suggested Itineraries — wave 3, 1 operation
-- `GST-054` AI Optimized Itinerary — wave 3, 2 operations
-- `GST-059` Plan My Day – In Progress — wave 3, 1 operation
+- `GST-054` AI Optimized Itinerary — wave 4, 1 operation
 - `GST-068` Help & My Cases — wave 2, 1 operation
 
 **P04 Venue POS**
@@ -174,7 +172,6 @@
 - `BO-058` Reporting Home — wave 1, 2 operations
 - `BO-059` Sales Reports — wave 1, 2 operations
 - `BO-060` Attendance & Footfall — wave 2, 2 operations
-- `BO-061` Scheduled Reports — wave 3, 2 operations
 - `BO-088` Approval Analytics — wave 3, 1 operation
 - `BO-091` AI Policy & Spend — wave 1, 4 operations
 - `BO-093` Map Import & Labelling — wave 2, 1 operation
@@ -220,7 +217,6 @@
 - **F20** A manager asks a question and gets an answer — wave 1
 - **F24** A guest asks the assistant and ends up with a person — wave 2
 - **F26** A venue maps its site — wave 2
-- **F49** A guest plans a day and follows it — wave 3
 - **F77** A promotion is built, bundled, published and measured — wave 3
 - **F82** A month is analysed from incrementality to a scheduled report — wave 3
 - **F86** A POS layout is designed, previewed and deployed — wave 2
@@ -232,9 +228,11 @@
 |---|---|---|
 | [Action register — 22 September 2026](..\docs\active\action-register-22-september.md) |  | 6 |
 | [AI scope — for confirmation](..\docs\active\ai-scope-for-confirmation.md) |  | 1 |
+| [AI suggestion rules: one rule and a minimum history per kind](..\docs\active\ai-suggestion-rules-proposal.md) |  | 3 |
 | [BL-073 — cookie consent: what to buy, what to build, what is ours either way](..\docs\active\bl-073-cookie-consent-20-september.md) |  | 1 |
 | [Build plan — 20 September 2026](..\docs\active\build-plan-20-september.md) |  | 1 |
 | [Validating the developer team's Change Log](..\docs\active\change-log-validation-18-september.md) |  | 2 |
+| [Configured limits: proposed values](..\docs\active\configured-limits-proposal.md) |  | 1 |
 | [Contract audit — every contract against the four things that must agree with it](..\docs\active\contract-audit-19-september.md) |  | 7 |
 | [The contract run — plan](..\docs\active\contract-run-plan-19-september.md) |  | 1 |
 | [Current work](..\docs\active\current-work.md) |  | 2 |
@@ -247,6 +245,7 @@
 | [Optimisation assessment — RAG, caching, backend, frontend](..\docs\active\optimisation-assessment.md) |  | 4 |
 | [Optimisation adoption plan](..\docs\active\optimisation-plan.md) |  | 3 |
 | [Phase 0 — identity pass, all clusters](..\docs\active\phase0-identity-pass-all-clusters.md) |  | 2 |
+| [Active](..\docs\active\README.md) |  | 1 |
 | [> **SUPERSEDED, 20 September.** Written when 151 of 223 were reviewed and the review was](..\docs\active\rename-worklist-20-september.md) |  | 2 |
 | [Schema merge — the decision log](..\docs\active\schema-merge-decision-log.md) |  | 2 |
 | [Schema merge — final report](..\docs\active\schema-merge-final-report-20-september.md) |  | 2 |
@@ -267,6 +266,7 @@
 | [ADR-0046: On-premise has two configurations, and the difference is a control channel](..\docs\adr\0046-on-premise-has-two-configurations.md) | Accepted | 1 |
 | [ADR-0047: How long data is kept, and where it goes next](..\docs\adr\0047-how-long-data-is-kept-and-where-it-goes-next.md) | Accepted — the RPO floor decided 21 September; one number pe | 2 |
 | [AI provider credentials — where the key lives and who can reach it](..\docs\architecture\ai-credentials.md) |  | 3 |
+| [TICVAI AI subsystem: system design](..\docs\architecture\ai-system-design.md) |  | 14 |
 | [Architecture](..\docs\architecture\README.md) |  | 1 |
 
 ## Conflicts

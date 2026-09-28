@@ -27,6 +27,10 @@ states:
     temperature reading or a cold-chain breach opens this automatically, because an action that depends
     on somebody remembering to raise it is an action that is not raised.
 
+    **The platform sets the severity** (decided 28 September, audit R125 (5)): an out-of-range reading or
+    a cold-chain breach opens at `major`, and a check not taken within its `checkFrequencyMinutes` opens
+    at `minor` with `source: missedCheck`.
+
     '
 - name: actioned
   description: 'Something was done and it is recorded — discarded, reworked, quarantined, returned.

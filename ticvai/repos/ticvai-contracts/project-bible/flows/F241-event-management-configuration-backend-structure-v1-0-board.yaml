@@ -16,11 +16,11 @@ trigger:
     to be written.
   entryScreen: BO-721
   entryPoints:
-  - Arrives at Activity Session & Slot Template Configuration
+  - Arrives at Activity Performance & Slot Template Configuration
 steps:
 - step: 1
   screen: BO-721
-  action: Opens Activity Session & Slot Template Configuration
+  action: Opens Activity Performance & Slot Template Configuration
   operations: []
   outcome: Configure the financial plan and budget against which event performance will be measured.
 - step: 2
@@ -51,7 +51,7 @@ steps:
     accounts.
 branches:
 - at: 1
-  condition: Nothing has been set up on Activity Session & Slot Template Configuration yet
+  condition: Nothing has been set up on Activity Performance & Slot Template Configuration yet
   behaviour: The screen declares `emptyFirstRun`. **On a new tenant this is the expected state**, and
     it is a different situation from an empty result on an established one.
   severity: expected

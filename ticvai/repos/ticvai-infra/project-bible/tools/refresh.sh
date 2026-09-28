@@ -46,16 +46,20 @@ cd "$(dirname "$0")/.."
 # somebody has to decide on rather than have happen to them.
 python3 tools/derive-lineage.py --apply
 
+# **The first-release slice: what the four platforms call, and the setup that feeds it.** Reads the
+# lineage, so it runs after it; services are frozen at 1.0.0 against this list, not typed from memory.
+python3 tools/derive-delivery-slice.py
+python3 tools/derive-schema.py
 # **`service-decomposition.json` is an authored input and half of it is arithmetic.**
 # Which schemas a service owns is a boundary decision and nothing rewrites it; the
 # operation and table counts, and the cross-service read and write edges, are counted
 # from the contracts every run. Its note said 520 tables while the package held 623,
 # and five tools read this file -- including the service allocation.
+# **After derive-schema, because it counts the tables derive-schema writes.** Run before it,
+# the note lagged one refresh behind every table added or renamed: on 28 September it said
+# 678 tables against 683 and check-authored-inputs failed on the arithmetic. Nothing earlier
+# in this script reads this file.
 python3 tools/derive-service-counts.py --apply
-# **The first-release slice: what the four platforms call, and the setup that feeds it.** Reads the
-# lineage, so it runs after it; services are frozen at 1.0.0 against this list, not typed from memory.
-python3 tools/derive-delivery-slice.py
-python3 tools/derive-schema.py
 python3 tools/derive-relationships.py
 python3 tools/derive-ddl.py --apply
 python3 tools/derive-burst-scope.py --apply

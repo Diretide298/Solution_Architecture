@@ -66,9 +66,9 @@ operations:
   - orders.cart
   - orders.sales_order
   writes: []
-- operation: assignSessionMedia
+- operation: assignPerformanceMedia
   verb: POST
-  path: /sessions/{sessionId}/media
+  path: /performances/{performanceId}/media
   scope: venue
   permission: EVENT_CONFIGURE
   audience:
@@ -1124,6 +1124,17 @@ operations:
   offline: false
   reads: []
   writes: []
+- operation: listPerformanceTemplates
+  verb: GET
+  path: /performance-templates
+  scope: venue
+  permission: PERFORMANCE_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - catalogue.performance_template
+  writes: []
 - operation: listPerformances
   verb: GET
   path: /events/{eventId}/performances
@@ -1530,17 +1541,6 @@ operations:
   - staff
   offline: false
   reads: []
-  writes: []
-- operation: listSessionTemplates
-  verb: GET
-  path: /session-templates
-  scope: venue
-  permission: PERFORMANCE_CONFIGURE
-  audience:
-  - staff
-  offline: false
-  reads:
-  - catalogue.session_template
   writes: []
 - operation: listSignalDataQuality
   verb: GET
@@ -2024,6 +2024,18 @@ operations:
   - catalogue.membership_programme
   writes:
   - catalogue.membership_programme
+- operation: setPerformanceTemplate
+  verb: PUT
+  path: /performance-templates
+  scope: venue
+  permission: PERFORMANCE_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - catalogue.performance_template
+  writes:
+  - catalogue.performance_template
 - operation: setPlanBenefits
   verb: PUT
   path: /entitlement-templates/{templateId}/benefits
@@ -2196,18 +2208,6 @@ operations:
   offline: false
   reads: []
   writes: []
-- operation: setSessionTemplate
-  verb: PUT
-  path: /session-templates
-  scope: venue
-  permission: PERFORMANCE_CONFIGURE
-  audience:
-  - staff
-  offline: false
-  reads:
-  - catalogue.session_template
-  writes:
-  - catalogue.session_template
 - operation: setSpace
   verb: PUT
   path: /spaces

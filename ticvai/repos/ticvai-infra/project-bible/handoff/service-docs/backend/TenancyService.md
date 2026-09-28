@@ -7,7 +7,7 @@
 | Tier | foundation: Read by everything, reads nothing above. Deploys first and alone. |
 | Contracts | `tenancy`, `workforce`, `approvals`, `accreditation` |
 | Schemas owned | `platform`, `workforce`, `approvals`, `accreditation`, `tenancy` |
-| Operations in the slice | 23 of 163 |
+| Operations in the slice | 23 of 166 |
 | Scale | Read-heavy and highly cacheable. Config changes are rare. |
 | If it is down | Same as identity — nothing runs without a scope. |
 
@@ -46,11 +46,11 @@
 | workstation | [`configureWorkstation`](#configureworkstation) | PUT | `/workstations/{workstationId}` | core | 1 | BO-036, BO-129, BO-602, POS-016 |
 | workstation | [`createOutlet`](#createoutlet) | POST | `/outlets` | setup | 1 | BO-044 |
 | workstation | [`createSaleBoard`](#createsaleboard) | POST | `/sale-boards` | setup | 1 | BO-124 |
-| workstation | [`listDevices`](#listdevices) | GET | `/devices` | core | 1 | ADM-580, ANL-003, BO-036, BO-124, BO-127, EMP-043 … |
+| workstation | [`listDevices`](#listdevices) | GET | `/devices` | core | 1 | ADM-580, ANL-003, BO-036, BO-124, EMP-043, POS-016 … |
 | workstation | [`listOutlets`](#listoutlets) | GET | `/outlets` | core | 1 | BO-044, BO-727, BO-728, BO-732, POS-011, POS-024 |
 | workstation | [`listSaleBoards`](#listsaleboards) | GET | `/sale-boards` | core | 1 | BO-115, BO-116, BO-117, BO-118, BO-122, BO-123 … |
 | workstation | [`listWorkstations`](#listworkstations) | GET | `/workstations` | core | 2 | BO-036, BO-037, BO-116, BO-126, BO-128, BO-129 … |
-| workstation | [`recordDeviceHeartbeat`](#recorddeviceheartbeat) | POST | `/devices/{deviceId}/heartbeat` | core | 1 | BO-036, BO-124, BO-125, BO-127, POS-016 |
+| workstation | [`recordDeviceHeartbeat`](#recorddeviceheartbeat) | POST | `/devices/{deviceId}/heartbeat` | core | 1 | BO-036, BO-124, BO-125, POS-016 |
 | workstation | [`updateOutlet`](#updateoutlet) | PATCH | `/outlets/{outletId}` | setup | 1 | BO-044, BO-063 |
 | workstation | [`updateSaleBoard`](#updatesaleboard) | PUT | `/sale-boards/{saleBoardId}` | setup | 1 | BO-109, BO-116, BO-117, BO-118, BO-124, BO-125 … |
 
@@ -137,7 +137,11 @@ What requires approval, and who grants it
 **`PUT /approval-matrices`**: Configure what requires approval
 
 11.1.2. Rules are ordered and **the first match wins**, so adding a rule cannot silently change an unrelated one. A matrix with overlapping unordered rules is a matrix nobody can reason about, and the ordering is the thing that makes it reviewable.
-Changing a matrix creates a version (11.1.80). Requests in flight keep the version they were raised under — **a request must be decided by the rules it was raised under**, or an approver is answering a question that changed while they read it.
+Changing a matrix creates a version (11.1.80). Requests in flight keep the version they were raised under — **a request must be decided by the rules it was raised under**, or an approver is answering a question that changed while they read it (confirmed 28 September, audit R129 (2)).
+
+**What counts as loosening — decided 28 September, audit R129 (1).** A rule set here loosens the rule it inherits from the level above when it does **any one** of three things for the same `kind` and an overlapping amount range: **a higher threshold** (a larger `minAmount`, so fewer requests need approval); **fewer approvers** (a smaller `levels`, or `parallel` or `majority` where the parent asks for `sequential` or `consensus`); or **a different approver role** (an `approverRoleIds` entry the parent rule does not name). Dropping a `requiresMfa` or `requiresSignature` the parent sets is loosening too. Any of them is refused `409` `loosensParentRule`.
+
+**Which level a caller sets — decided 28 September, audit R183.** A caller sets only the matrix of the scope node they act at: a venue sets the venue matrix, a region the region matrix and the tenant the tenant default. The body's `scopeLevel` must be that node's level, or the call is refused `400`; nobody writes a matrix for a level above or below their own through this call.
 
 **PUT semantics — keyed on `kind` and the scope, never on an id.** There is no id in the path and `ApprovalMatrix.id` is read-only, so the body names its target: the matrix for `kind` at `scopeLevel`, on the scope node the caller is acting at (`scopePath` is read-only and set from it). Where no matrix exists for that pair, this creates version 1 and answers `201`; where one does, it stores a new version and answers `200`. **The body replaces the rule set whole**: the new version holds exactly the rules in `rules`, in their `order`, and a rule omitted from the body is not in the new version. Rule `id`s are read-only and ignored on input — each version carries its own rule rows. The previous version is kept, never edited, because requests in flight still point at it.
 
@@ -234,6 +238,7 @@ Changing a matrix creates a version (11.1.80). Requests in flight keep the versi
 |---|---|---|
 | 200 |  | Set, as a new version of the existing matrix for this kind and scope |
 | 201 |  | Created — no matrix existed for this kind and scope, so this is version 1 |
+| 400 |  | Validation failed. |
 | 409 |  | Refused, and nothing is stored. |
 
 
@@ -277,6 +282,7 @@ Changing `currencyCode` or `currencyScale` after transactions exist is rejected.
 | dateFormat | string |  | (default dd/MM/yyyy) |
 | numberFormat | string |  | (default #,##0.00) |
 | fiscalYearStartMonth | integer | yes | Varies by country. (min 1; max 12) |
+| allowedAiResidencies | array of string |  | The region's compliance gate on AI providers (decided 28 September, audit R203; ADR-0009). (default []) |
 | placement | Placement |  | Read-only here. (read-only) |
 | placement.mode | enum (shared, dedicated, isolated, clientHosted) | yes |  |
 | placement.cellName | string |  |  |
@@ -294,6 +300,7 @@ Changing `currencyCode` or `currencyScale` after transactions exist is rejected.
 | dateFormat | string |  | (default dd/MM/yyyy) |
 | numberFormat | string |  | (default #,##0.00) |
 | fiscalYearStartMonth | integer | yes | Varies by country. (min 1; max 12) |
+| allowedAiResidencies | array of string |  | The region's compliance gate on AI providers (decided 28 September, audit R203; ADR-0009). (default []) |
 | placement | Placement |  | Read-only here. (read-only) |
 | placement.mode | enum (shared, dedicated, isolated, clientHosted) | yes |  |
 | placement.cellName | string |  |  |
@@ -322,6 +329,7 @@ Raising, deciding and tracking an approval
 Called by the contract that needs the authorisation, not by a person. `createRefund` asks `evaluateApprovalRequirement` first, and where one is required it raises this and holds the refund at `pendingApproval`.
 **The subject is a reference, never a copy.** The request points at the order, the shift or the proposed action; it does not embed it. A copy goes stale between raising and deciding, and an approver reading a stale copy approves something that no longer exists.
 Draft is supported (11.1.51) for the case where a person raises it themselves and wants to gather detail first.
+**A draft is saved, not routed — decided 28 September, audit R129 (3).** `isDraft: true` stores the request at `draft`: nobody is asked, no SLA runs, and it does not count as an open request for the `409` below, so a person may keep a draft while a contract raises the real one. The draft is sent with `submitApprovalRequest`, which is when the matrix is read, the approvers are resolved and `matrixVersion` is fixed. A contract raising a request never drafts.
 
 |  |  |
 |---|---|
@@ -334,7 +342,7 @@ Draft is supported (11.1.51) for the case where a person raises it themselves an
 | Reads | `approvals.decision`, `approvals.delegation`, `approvals.matrix`, `approvals.request`, `approvals.rule`, `cache:idempotency`, `identity.principal` |
 | Writes | `approvals.request`, `cache:idempotency` |
 | Called by | ADM-567, BO-1010, BO-1031, BO-1080, BO-1181, BO-718, BO-771, BO-922, POS-002, POS-020 |
-| State model | Approval request ([states/approval-request.yaml](../../../states/approval-request.yaml)): created as `draft` or `pending`; moves `draft` -> `pending` |
+| State model | Approval request ([states/approval-request.yaml](../../../states/approval-request.yaml)): created as `draft` or `pending` |
 
 **Parameters**
 
@@ -359,7 +367,7 @@ Draft is supported (11.1.51) for the case where a person raises it themselves an
 | amount.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
 | attributes | object |  |  |
 | justification | string |  | (max length 1000) |
-| isDraft | boolean |  | (default False) |
+| isDraft | boolean |  | True saves the request at draft without routing it; submitApprovalRequest sends it later (decided 28 September, audit R129). (default False) |
 
 **Response**: `ApprovalRequest`
 
@@ -881,12 +889,12 @@ Deactivating a node causes every permission query at or beneath it to resolve to
 
 **`GET /venues/{venueId}/settings`**: Operational settings for this venue
 
-**What this returns, and what it does not.** `VenueSettings` holds the venue's trading currency, support hours, quiet hours, biometrics, segregated access and alerting — the things `setVenueSettings` writes. It carries **no module enablement and no F&B or retail setting**, so a section landing that wants *what is enabled here*, or a store or kitchen settings screen, does not get it from this read (pull audit R279). It is gated by `TENANT_CONFIGURE`; a caller holding only a section's view permission is refused `403`.
+**What this returns, and what it does not.** `VenueSettings` holds the venue's trading currency, support hours, quiet hours, biometrics, segregated access and alerting — the things `setVenueSettings` writes. It carries **no module enablement and no retail setting**, so a section landing that wants *what is enabled here*, or a store settings screen, does not get it from this read (pull audit R279). **Since 28 September it does carry the configured limits** (audit R094), the F&B ones among them (`fnb.recallWindowMinutes`, `fnb.compEscalationAmount`, `fnb.foodSafetyLeadPrincipalId`). A limit the venue has not set is null and resolves to the tenant default, which `getVenueSettingsDefaults` returns. It is gated by `TENANT_VIEW` (decided 28 September, audit R091): reading a venue's settings no longer needs the right to change them. A caller holding only a section's view permission is refused `403`.
 **A venue with nothing saved still has settings** (pull audit R175). Where `platform.venue_settings` has no row for this venue the answer is `200` with the schema defaults, no `id`, and `currencyCode` and `currencyScale` null — which already means *resolve from the region*. `404` means the venue does not exist or is outside the caller's scope.
 
 |  |  |
 |---|---|
-| Permission | `TENANT_CONFIGURE` |
+| Permission | `TENANT_VIEW` |
 | Scope level | venue |
 | Part of slice | core |
 | Wave | 1 |
@@ -943,6 +951,55 @@ Deactivating a node causes every permission query at or beneath it to resolve to
 | alerting.channel | enum (dashboardPanel, dashboardAndEmail, dashboardAndWhatsapp) |  | (default dashboardPanel) |
 | alerting.acknowledgementRequired | boolean |  | (default True) |
 | alerting.escalateAfterMinutes | integer |  | (nullable) |
+| displayCurrencies | array of string |  | Which currencies this venue shows guests (decided 28 September, audit R120 (a)). (nullable) |
+| cartLeaseSeconds | integer |  | How long a cart holds capacity (decided 28 September, audit R169): 15 minutes, the default catalogue.acquireInventoryHold takes for ttlSeconds. (min 30; max 3600; default 900; nullable) |
+| cartHoldExtensionMinutes | integer |  | How long one orders.extendCart extension adds. (min 1; max 30; default 5; nullable) |
+| cartMaxExtensions | integer |  | How many extensions a cart may take before extensionCapReached (Cart.maxExtensions). (min 0; max 5; default 1; nullable) |
+| resaleCutoffHours | integer |  | Hours before the performance after which a ticket can no longer be listed for resale (orders.createResaleListing). (min 0; max 168; default 24; nullable) |
+| exchangeCutoffHours | integer |  | Hours before the original performance after which lines can no longer be exchanged (orders.exchangeOrderLines, outsideExchangeWindow). (min 0; max 720; default 24; nullable) |
+| rescheduleCutoffHours | integer |  | Hours before the original performance after which an order can no longer be rescheduled (orders.rescheduleOrder, outsideRescheduleWindow). (min 0; max 720; default 24; nullable) |
+| reservationMaxExtensions | integer |  | How many times orders.extendReservation may extend one reservation. (min 0; max 5; default 1; nullable) |
+| shiftVarianceThreshold | object |  | Over or short at shift close beyond which the shift waits in pendingVariance for shift.acceptShiftVariance. (nullable) |
+| shiftVarianceThreshold.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
+| shiftVarianceThreshold.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
+| shiftVarianceThreshold.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| catalogue | object |  | (nullable) |
+| catalogue.maxVariantsPerProduct | integer |  | Variants one product may generate from its attributes (setProductAttributes refuses above it). (min 1; max 2000; default 200; nullable) |
+| catalogue.waitlistOfferHoldMinutes | integer |  | How long a waitlist offer holds the released capacity for the guest it was offered to. (min 1; max 1440; default 30; nullable) |
+| catalogue.bulkPriceChangeEscalationPercent | number |  | A bulkChangePrices run changing any price by more than this percentage needs PRICE_CONFIGURE (audit R197). (min 0; max 100; default 10; nullable) |
+| catalogue.bulkPriceChangeEscalationCount | integer |  | A bulkChangePrices run touching more prices than this needs PRICE_CONFIGURE (audit R197). (min 1; default 50; nullable) |
+| inventory | object |  | (nullable) |
+| inventory.overReceiptTolerancePercent | number |  | Percent above the outstanding ordered quantity a goods receipt line may record (createGoodsReceipt). (min 0; max 25; default 5; nullable) |
+| inventory.countVarianceTolerancePercent | number |  | Percent difference between counted and expected quantity before a count line is an exception (getCountVariance). (min 0; max 25; default 2; nullable) |
+| inventory.countVarianceApprovalAmount | object |  | Total variance value of a count above which posting it needs approval (postStockCount). (nullable) |
+| inventory.countVarianceApprovalAmount.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
+| inventory.countVarianceApprovalAmount.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
+| inventory.countVarianceApprovalAmount.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| seating | object |  | (nullable) |
+| seating.seatHoldExtensionSeconds | integer |  | What one extendSeatHold adds. (min 60; max 1800; default 300; nullable) |
+| seating.seatHoldMaxExtensions | integer |  | How many times a seat hold may be extended. (min 0; max 5; default 2; nullable) |
+| promotions | object |  | (nullable) |
+| promotions.maxDiscountPercent | number |  | The largest discount one promotion may give (createPromotion refuses above it). (min 0; max 100; default 30; nullable) |
+| promotions.nearZeroLinePrice | object |  | Net line price below which a stacked combination is flagged near-zero in analysePromotionConflicts (audit R096 (5)); a warning, not a refusal. (nullable) |
+| promotions.nearZeroLinePrice.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
+| promotions.nearZeroLinePrice.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
+| promotions.nearZeroLinePrice.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| fnb | object |  | (nullable) |
+| fnb.recallWindowMinutes | integer |  | Minutes after a bump during which recallKitchenTicket still recalls; after it the act is a refire. (min 0; max 60; default 10; nullable) |
+| fnb.compEscalationAmount | object |  | Line value above which compItem needs ORDER_DISCOUNT (audit R197). (nullable) |
+| fnb.compEscalationAmount.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
+| fnb.compEscalationAmount.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
+| fnb.compEscalationAmount.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| fnb.foodSafetyLeadPrincipalId | string (uuid) |  | The venue's food-safety lead, to whom escalateCorrectiveAction sends every escalation (decided 28 September, audit R096 (9)). (nullable) |
+| queue | object |  | (nullable) |
+| queue.crossQueueLimit | integer |  | Virtual queues one guest party may wait in at once (joinQueue, crossQueueLimitReached). (min 1; max 10; default 2; nullable) |
+| reporting | object |  | (nullable) |
+| reporting.inlineRunRowLimit | integer |  | Estimated rows above which runReport answers 202 and runs in the background. (min 1000; max 100000; default 5000; nullable) |
+| reporting.dashboardRefreshBudgetPerMinute | integer |  | Tile refreshes per minute, summed over a dashboard's tiles, that createDashboard allows. (min 1; default 24; nullable) |
+| marketing | object |  | (nullable) |
+| marketing.attributionWindowDays | integer |  | Days after a campaign touch within which a booking is attributed to it (getCampaignPerformance). (min 1; max 30; default 7; nullable) |
+| identity | object |  | (nullable) |
+| identity.guestOtpMaxAttempts | integer |  | Wrong entries allowed per guest one-time code before verifyGuestOtp invalidates it. (min 3; max 10; default 5; nullable) |
 
 **Responses**
 
@@ -1004,6 +1061,7 @@ Board 1 of the client's POS design set. **The package held `lastHeartbeatAt` and
 **The four things a venue answers and no other level can** (CF-100, CF-130, CF-134).
 Support hours were an open conflict for eleven days and were never a design question — the code is identical whether a desk runs 24/7 or nine to six, and **what was missing was somewhere to put the answer.**
 **PUT semantics** (pull audit R103, R175). The target is the venue in the path, and a venue has one settings row. The first save creates it and later saves replace it whole; the answer is `200` either way, because before the first save the venue already had settings — the defaults `getVenueSettings` returns. **An omitted property returns to its default or to null.** `id`, `venueId`, `currencyCode`, `currencyScale`, `segregatedAccess.entitlementGated` and `biometrics.acknowledgedByPrincipalId` are `readOnly` and ignored on input.
+**The configured limits** (audit R094) are set here as venue overrides. A null limit inherits the tenant default (`setVenueSettingsDefaults`); a value outside the field's `minimum` and `maximum` is refused `400` with `errors[]` naming the field.
 **Refused with `422`** (pull audit R078) where the body asks for something the venue cannot evidence: `biometrics.isEnabled` true without both `dpiaReference` and `consentNoticeAcknowledgedAt`, or `segregatedAccess.genderVerification: deviceAssisted` where no device in the venue reports the `genderClassification` capability.
 
 |  |  |
@@ -1066,6 +1124,55 @@ Support hours were an open conflict for eleven days and were never a design ques
 | alerting.channel | enum (dashboardPanel, dashboardAndEmail, dashboardAndWhatsapp) |  | (default dashboardPanel) |
 | alerting.acknowledgementRequired | boolean |  | (default True) |
 | alerting.escalateAfterMinutes | integer |  | (nullable) |
+| displayCurrencies | array of string |  | Which currencies this venue shows guests (decided 28 September, audit R120 (a)). (nullable) |
+| cartLeaseSeconds | integer |  | How long a cart holds capacity (decided 28 September, audit R169): 15 minutes, the default catalogue.acquireInventoryHold takes for ttlSeconds. (min 30; max 3600; default 900; nullable) |
+| cartHoldExtensionMinutes | integer |  | How long one orders.extendCart extension adds. (min 1; max 30; default 5; nullable) |
+| cartMaxExtensions | integer |  | How many extensions a cart may take before extensionCapReached (Cart.maxExtensions). (min 0; max 5; default 1; nullable) |
+| resaleCutoffHours | integer |  | Hours before the performance after which a ticket can no longer be listed for resale (orders.createResaleListing). (min 0; max 168; default 24; nullable) |
+| exchangeCutoffHours | integer |  | Hours before the original performance after which lines can no longer be exchanged (orders.exchangeOrderLines, outsideExchangeWindow). (min 0; max 720; default 24; nullable) |
+| rescheduleCutoffHours | integer |  | Hours before the original performance after which an order can no longer be rescheduled (orders.rescheduleOrder, outsideRescheduleWindow). (min 0; max 720; default 24; nullable) |
+| reservationMaxExtensions | integer |  | How many times orders.extendReservation may extend one reservation. (min 0; max 5; default 1; nullable) |
+| shiftVarianceThreshold | object |  | Over or short at shift close beyond which the shift waits in pendingVariance for shift.acceptShiftVariance. (nullable) |
+| shiftVarianceThreshold.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
+| shiftVarianceThreshold.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
+| shiftVarianceThreshold.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| catalogue | object |  | (nullable) |
+| catalogue.maxVariantsPerProduct | integer |  | Variants one product may generate from its attributes (setProductAttributes refuses above it). (min 1; max 2000; default 200; nullable) |
+| catalogue.waitlistOfferHoldMinutes | integer |  | How long a waitlist offer holds the released capacity for the guest it was offered to. (min 1; max 1440; default 30; nullable) |
+| catalogue.bulkPriceChangeEscalationPercent | number |  | A bulkChangePrices run changing any price by more than this percentage needs PRICE_CONFIGURE (audit R197). (min 0; max 100; default 10; nullable) |
+| catalogue.bulkPriceChangeEscalationCount | integer |  | A bulkChangePrices run touching more prices than this needs PRICE_CONFIGURE (audit R197). (min 1; default 50; nullable) |
+| inventory | object |  | (nullable) |
+| inventory.overReceiptTolerancePercent | number |  | Percent above the outstanding ordered quantity a goods receipt line may record (createGoodsReceipt). (min 0; max 25; default 5; nullable) |
+| inventory.countVarianceTolerancePercent | number |  | Percent difference between counted and expected quantity before a count line is an exception (getCountVariance). (min 0; max 25; default 2; nullable) |
+| inventory.countVarianceApprovalAmount | object |  | Total variance value of a count above which posting it needs approval (postStockCount). (nullable) |
+| inventory.countVarianceApprovalAmount.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
+| inventory.countVarianceApprovalAmount.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
+| inventory.countVarianceApprovalAmount.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| seating | object |  | (nullable) |
+| seating.seatHoldExtensionSeconds | integer |  | What one extendSeatHold adds. (min 60; max 1800; default 300; nullable) |
+| seating.seatHoldMaxExtensions | integer |  | How many times a seat hold may be extended. (min 0; max 5; default 2; nullable) |
+| promotions | object |  | (nullable) |
+| promotions.maxDiscountPercent | number |  | The largest discount one promotion may give (createPromotion refuses above it). (min 0; max 100; default 30; nullable) |
+| promotions.nearZeroLinePrice | object |  | Net line price below which a stacked combination is flagged near-zero in analysePromotionConflicts (audit R096 (5)); a warning, not a refusal. (nullable) |
+| promotions.nearZeroLinePrice.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
+| promotions.nearZeroLinePrice.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
+| promotions.nearZeroLinePrice.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| fnb | object |  | (nullable) |
+| fnb.recallWindowMinutes | integer |  | Minutes after a bump during which recallKitchenTicket still recalls; after it the act is a refire. (min 0; max 60; default 10; nullable) |
+| fnb.compEscalationAmount | object |  | Line value above which compItem needs ORDER_DISCOUNT (audit R197). (nullable) |
+| fnb.compEscalationAmount.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
+| fnb.compEscalationAmount.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
+| fnb.compEscalationAmount.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| fnb.foodSafetyLeadPrincipalId | string (uuid) |  | The venue's food-safety lead, to whom escalateCorrectiveAction sends every escalation (decided 28 September, audit R096 (9)). (nullable) |
+| queue | object |  | (nullable) |
+| queue.crossQueueLimit | integer |  | Virtual queues one guest party may wait in at once (joinQueue, crossQueueLimitReached). (min 1; max 10; default 2; nullable) |
+| reporting | object |  | (nullable) |
+| reporting.inlineRunRowLimit | integer |  | Estimated rows above which runReport answers 202 and runs in the background. (min 1000; max 100000; default 5000; nullable) |
+| reporting.dashboardRefreshBudgetPerMinute | integer |  | Tile refreshes per minute, summed over a dashboard's tiles, that createDashboard allows. (min 1; default 24; nullable) |
+| marketing | object |  | (nullable) |
+| marketing.attributionWindowDays | integer |  | Days after a campaign touch within which a booking is attributed to it (getCampaignPerformance). (min 1; max 30; default 7; nullable) |
+| identity | object |  | (nullable) |
+| identity.guestOtpMaxAttempts | integer |  | Wrong entries allowed per guest one-time code before verifyGuestOtp invalidates it. (min 3; max 10; default 5; nullable) |
 
 **Response**: `VenueSettings`
 
@@ -1107,6 +1214,55 @@ Support hours were an open conflict for eleven days and were never a design ques
 | alerting.channel | enum (dashboardPanel, dashboardAndEmail, dashboardAndWhatsapp) |  | (default dashboardPanel) |
 | alerting.acknowledgementRequired | boolean |  | (default True) |
 | alerting.escalateAfterMinutes | integer |  | (nullable) |
+| displayCurrencies | array of string |  | Which currencies this venue shows guests (decided 28 September, audit R120 (a)). (nullable) |
+| cartLeaseSeconds | integer |  | How long a cart holds capacity (decided 28 September, audit R169): 15 minutes, the default catalogue.acquireInventoryHold takes for ttlSeconds. (min 30; max 3600; default 900; nullable) |
+| cartHoldExtensionMinutes | integer |  | How long one orders.extendCart extension adds. (min 1; max 30; default 5; nullable) |
+| cartMaxExtensions | integer |  | How many extensions a cart may take before extensionCapReached (Cart.maxExtensions). (min 0; max 5; default 1; nullable) |
+| resaleCutoffHours | integer |  | Hours before the performance after which a ticket can no longer be listed for resale (orders.createResaleListing). (min 0; max 168; default 24; nullable) |
+| exchangeCutoffHours | integer |  | Hours before the original performance after which lines can no longer be exchanged (orders.exchangeOrderLines, outsideExchangeWindow). (min 0; max 720; default 24; nullable) |
+| rescheduleCutoffHours | integer |  | Hours before the original performance after which an order can no longer be rescheduled (orders.rescheduleOrder, outsideRescheduleWindow). (min 0; max 720; default 24; nullable) |
+| reservationMaxExtensions | integer |  | How many times orders.extendReservation may extend one reservation. (min 0; max 5; default 1; nullable) |
+| shiftVarianceThreshold | object |  | Over or short at shift close beyond which the shift waits in pendingVariance for shift.acceptShiftVariance. (nullable) |
+| shiftVarianceThreshold.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
+| shiftVarianceThreshold.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
+| shiftVarianceThreshold.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| catalogue | object |  | (nullable) |
+| catalogue.maxVariantsPerProduct | integer |  | Variants one product may generate from its attributes (setProductAttributes refuses above it). (min 1; max 2000; default 200; nullable) |
+| catalogue.waitlistOfferHoldMinutes | integer |  | How long a waitlist offer holds the released capacity for the guest it was offered to. (min 1; max 1440; default 30; nullable) |
+| catalogue.bulkPriceChangeEscalationPercent | number |  | A bulkChangePrices run changing any price by more than this percentage needs PRICE_CONFIGURE (audit R197). (min 0; max 100; default 10; nullable) |
+| catalogue.bulkPriceChangeEscalationCount | integer |  | A bulkChangePrices run touching more prices than this needs PRICE_CONFIGURE (audit R197). (min 1; default 50; nullable) |
+| inventory | object |  | (nullable) |
+| inventory.overReceiptTolerancePercent | number |  | Percent above the outstanding ordered quantity a goods receipt line may record (createGoodsReceipt). (min 0; max 25; default 5; nullable) |
+| inventory.countVarianceTolerancePercent | number |  | Percent difference between counted and expected quantity before a count line is an exception (getCountVariance). (min 0; max 25; default 2; nullable) |
+| inventory.countVarianceApprovalAmount | object |  | Total variance value of a count above which posting it needs approval (postStockCount). (nullable) |
+| inventory.countVarianceApprovalAmount.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
+| inventory.countVarianceApprovalAmount.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
+| inventory.countVarianceApprovalAmount.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| seating | object |  | (nullable) |
+| seating.seatHoldExtensionSeconds | integer |  | What one extendSeatHold adds. (min 60; max 1800; default 300; nullable) |
+| seating.seatHoldMaxExtensions | integer |  | How many times a seat hold may be extended. (min 0; max 5; default 2; nullable) |
+| promotions | object |  | (nullable) |
+| promotions.maxDiscountPercent | number |  | The largest discount one promotion may give (createPromotion refuses above it). (min 0; max 100; default 30; nullable) |
+| promotions.nearZeroLinePrice | object |  | Net line price below which a stacked combination is flagged near-zero in analysePromotionConflicts (audit R096 (5)); a warning, not a refusal. (nullable) |
+| promotions.nearZeroLinePrice.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
+| promotions.nearZeroLinePrice.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
+| promotions.nearZeroLinePrice.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| fnb | object |  | (nullable) |
+| fnb.recallWindowMinutes | integer |  | Minutes after a bump during which recallKitchenTicket still recalls; after it the act is a refire. (min 0; max 60; default 10; nullable) |
+| fnb.compEscalationAmount | object |  | Line value above which compItem needs ORDER_DISCOUNT (audit R197). (nullable) |
+| fnb.compEscalationAmount.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
+| fnb.compEscalationAmount.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
+| fnb.compEscalationAmount.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| fnb.foodSafetyLeadPrincipalId | string (uuid) |  | The venue's food-safety lead, to whom escalateCorrectiveAction sends every escalation (decided 28 September, audit R096 (9)). (nullable) |
+| queue | object |  | (nullable) |
+| queue.crossQueueLimit | integer |  | Virtual queues one guest party may wait in at once (joinQueue, crossQueueLimitReached). (min 1; max 10; default 2; nullable) |
+| reporting | object |  | (nullable) |
+| reporting.inlineRunRowLimit | integer |  | Estimated rows above which runReport answers 202 and runs in the background. (min 1000; max 100000; default 5000; nullable) |
+| reporting.dashboardRefreshBudgetPerMinute | integer |  | Tile refreshes per minute, summed over a dashboard's tiles, that createDashboard allows. (min 1; default 24; nullable) |
+| marketing | object |  | (nullable) |
+| marketing.attributionWindowDays | integer |  | Days after a campaign touch within which a booking is attributed to it (getCampaignPerformance). (min 1; max 30; default 7; nullable) |
+| identity | object |  | (nullable) |
+| identity.guestOtpMaxAttempts | integer |  | Wrong entries allowed per guest one-time code before verifyGuestOtp invalidates it. (min 3; max 10; default 5; nullable) |
 
 **Responses**
 
@@ -1376,7 +1532,7 @@ Physical devices bound to workstations. Distinct from Device Management, which c
 | Read routing | replica |
 | Reads | `platform.device` |
 | Writes | - |
-| Called by | ADM-580, ANL-003, BO-036, BO-124, BO-127, EMP-043, POS-016, POS-025 |
+| Called by | ADM-580, ANL-003, BO-036, BO-124, EMP-043, POS-016, POS-025 |
 
 **Parameters**
 
@@ -1577,7 +1733,7 @@ Reports reachability and consumables — paper low, drawer open, reader offline.
 | Conflict policy | append |
 | Reads | `platform.device` |
 | Writes | `platform.device` |
-| Called by | BO-036, BO-124, BO-125, BO-127, POS-016 |
+| Called by | BO-036, BO-124, BO-125, POS-016 |
 | State model | Registered device ([states/registered-device.yaml](../../../states/registered-device.yaml)): moves `offline` -> `online`, `online` -> `error`, `online` -> `consumableLow`, `consumableLow` -> `online`, `error` -> `online`, `online` -> `needsAttention`, `needsAttention` -> `online`, `unknown` -> `online` |
 
 **Parameters**
@@ -1921,6 +2077,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 | date_format | text | no |  |
 | number_format | text | no |  |
 | fiscal_year_start_month | integer | yes | Varies by country. |
+| allowed_ai_residencies | text[] | no | The region's compliance gate on AI providers (decided 28 September, audit R203; ADR-0009). |
 | placement | jsonb | no |  |
 | cell_name | text | no | The cell serving this region. |
 | id | uuid | yes | Synthesised key. |
@@ -1963,6 +2120,24 @@ Every table this service owns that the slice reads or writes, with its columns a
 | biometrics | jsonb | no | CF-35, BL-096, BL-105, BL-106. |
 | segregated_access | jsonb | no | CF-130. |
 | alerting | jsonb | no | CF-134. |
+| display_currencies | text[] | no | Which currencies this venue shows guests (decided 28 September, audit R120 (a)). |
+| cart_lease_seconds | integer | no | How long a cart holds capacity (decided 28 September, audit R169): 15 minutes, the default catalogue.acquireInventoryHold takes for ttlSeconds. |
+| cart_hold_extension_minutes | integer | no | How long one orders.extendCart extension adds. |
+| cart_max_extensions | integer | no | How many extensions a cart may take before extensionCapReached (Cart.maxExtensions). |
+| resale_cutoff_hours | integer | no | Hours before the performance after which a ticket can no longer be listed for resale (orders.createResaleListing). |
+| exchange_cutoff_hours | integer | no | Hours before the original performance after which lines can no longer be exchanged (orders.exchangeOrderLines, outsideExchangeWindow). |
+| reschedule_cutoff_hours | integer | no | Hours before the original performance after which an order can no longer be rescheduled (orders.rescheduleOrder, outsideRescheduleWindow). |
+| reservation_max_extensions | integer | no | How many times orders.extendReservation may extend one reservation. |
+| shift_variance_threshold | numeric(18,4) | no | Over or short at shift close beyond which the shift waits in pendingVariance for shift.acceptShiftVariance. |
+| catalogue | jsonb | no |  |
+| inventory | jsonb | no |  |
+| seating | jsonb | no |  |
+| promotions | jsonb | no |  |
+| fnb | jsonb | no |  |
+| queue | jsonb | no |  |
+| reporting | jsonb | no |  |
+| marketing | jsonb | no |  |
+| identity | jsonb | no |  |
 | org_unit_id | uuid | yes | Renamed from scope_node_id on 31 August. |
 
 ### `platform.workstation`
@@ -2011,7 +2186,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 
 ## Not in the first release
 
-140 operations, added to this service in later releases without changing any of the above.
+143 operations, added to this service in later releases without changing any of the above.
 
 | Group | Operations |
 |---|---|
@@ -2026,9 +2201,9 @@ Every table this service owns that the slice reads or writes, with its columns a
 | identity | `setRolePermissions` |
 | matrix | `listApprovalMatrices`, `listStepUpPolicies`, `setStepUpPolicy` |
 | region | `getRegionSettings` |
-| request | `escalateApprovalRequest`, `listApprovalRequests`, `resubmitApprovalRequest`, `withdrawApprovalRequest` |
+| request | `escalateApprovalRequest`, `listApprovalRequests`, `resubmitApprovalRequest`, `submitApprovalRequest`, `withdrawApprovalRequest` |
 | rota | `requestShiftSwap`, `updateRotaAssignment` |
 | scope | `getOrgUnit`, `listOrgUnits` |
-| tenancy | `deployConfigurationProfile`, `getConfigurationProfile`, `getConnectivityPolicy`, `getOfflinePolicy`, `listAuditRecords`, `listCellEndpoints`, `listConfigurationProfiles`, `listProfileDeployments`, `setConfigurationProfile`, `setConnectivityThresholds`, `setOfflinePolicy` |
+| tenancy | `deployConfigurationProfile`, `getConfigurationProfile`, `getConnectivityPolicy`, `getOfflinePolicy`, `getVenueSettingsDefaults`, `listAuditRecords`, `listCellEndpoints`, `listConfigurationProfiles`, `listProfileDeployments`, `setConfigurationProfile`, `setConnectivityThresholds`, `setOfflinePolicy`, `setVenueSettingsDefaults` |
 | workforce | `broadcastToGuests`, `claimOpenShift`, `getEmployee`, `getFieldOwnership`, `getLabourCost`, `getStaffingCoverage`, `listEmployees`, `listIntegrationSources`, `listJobTitles`, `listLeaveBalances`, `listLeaveRequests`, `listLeaveTypes`, `listOpenShifts`, `listShiftPatterns`, `listShiftSwapRequests`, `listShiftTemplates`, `listSyncConflicts`, `listSyncRuns`, `listTrainingRecords`, `listWorkAssignments`, `requestLeave`, `resolveSyncConflict`, `setFieldOwnership`, `setIntegrationSource`, `setJobTitle`, `setLeaveType`, `setShiftPattern`, `setShiftTemplate`, `setStaffingRules`, `setWorkAssignment`, `startSync`, `validateWorkforceCompliance` |
 | workstation | `getDevice`, `getOutlet`, `getWorkstation`, `registerDevice` |

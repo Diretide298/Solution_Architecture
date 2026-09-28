@@ -170,6 +170,21 @@ screens:
         label: Login
         operation: login
         provenance: contract identity.yaml POST /auth/login
+      - kind: textField
+        label: Authentication code
+        operation: verifyMfaChallenge
+        provenance: contract identity.yaml POST /auth/mfa/challenge/{challengeId}/verify
+        notes: Shown only in the mfaRequired state (audit R135).
+      - kind: primaryButton
+        label: Verify
+        operation: verifyMfaChallenge
+        provenance: contract identity.yaml POST /auth/mfa/challenge/{challengeId}/verify
+      - kind: secondaryButton
+        label: Email me a code instead
+        operation: createMfaChallenge
+        provenance: contract identity.yaml POST /auth/mfa/challenge
+        notes: The fallback -- issues the challenge against the principal's email (`emailOtp`) method
+          (audit R126 (5)).
   states:
     loading: The sign list.
     error: Could not load. Names which read failed and leaves the sign untouched.
@@ -177,6 +192,12 @@ screens:
       one — and says so rather than showing an empty table.
     emptyNoResults: 'Never shown: `listMfaMethods` takes no filter, so an empty list is always the first-run
       state above.'
+    mfaRequired: '**Signed in, not yet through.** The principal holds a permission that requires MFA (ROLE_MANAGE,
+      LEDGER_APPROVE, any platform-staff permission, or one the tenant added), so after `login` the screen
+      calls `createMfaChallenge` and asks for the authenticator code; `verifyMfaChallenge` completes the
+      sign-in. **Email me a code instead** is the fallback. Five wrong codes lock step-up for the policy''s
+      lockout minutes and the screen says so. A principal with no enrolled method is sent to enrol first
+      (decided 28 September, audit R135, R126).'
     offline: Signs in against the cached principal list. A technician in a basement still needs their
       tasks
   apis:
@@ -196,8 +217,21 @@ screens:
     contract: identity
     purpose: Identity providers configured for this tenant
     trigger: onLoad
+  - operationId: createMfaChallenge
+    contract: identity
+    purpose: Second factor after login when the principal holds a permission in mfaRequiredForPermissions;
+      action `signIn`, the primary method (authenticator app), or the email method as the fallback (decided
+      28 September, audit R135, R126 (5))
+    trigger: onAction
+  - operationId: verifyMfaChallenge
+    contract: identity
+    purpose: Completes sign-in with the code; the session is usable only after it. Five wrong codes lock
+      step-up (audit R126 (6))
+    trigger: onAction
   entryState:
-    params: []
+    params:
+    - name: challengeId
+      from: navigation
     coldEntry: Resolves from the session; a cold arrival is the ordinary case.
     preloaded:
     - MfaMethod.id
@@ -255,8 +289,8 @@ screens:
       provenance: flow F08 step 2→3, F64 step 2→3
     - to: EMP-001
       trigger: Sign in
-      provenance: derived — EMP-001 declares entryState.params  and EMP-002 holds none of them, so the
-        edge carries nothing and EMP-001 opens cold
+      provenance: derived — EMP-001 declares entryState.params challengeId and EMP-002 holds none of them,
+        so the edge carries nothing and EMP-001 opens cold
     - to: EMP-003
       trigger: Home — on duty
       provenance: derived — EMP-003 declares entryState.params incidentId and EMP-002 holds none of them,
@@ -497,8 +531,8 @@ screens:
       provenance: flow F08 step 4→5
     - to: EMP-001
       trigger: Sign in
-      provenance: derived — EMP-001 declares entryState.params  and EMP-003 holds none of them, so the
-        edge carries nothing and EMP-001 opens cold
+      provenance: derived — EMP-001 declares entryState.params challengeId and EMP-003 holds none of them,
+        so the edge carries nothing and EMP-001 opens cold
     - to: EMP-002
       trigger: Select venue & role
       provenance: derived — EMP-002 declares entryState.params  and EMP-003 holds none of them, so the
@@ -525,8 +559,8 @@ screens:
         edge carries nothing and EMP-055 opens cold
     - to: EMP-056
       trigger: Walk-In & Waitlist Management
-      provenance: derived — EMP-056 declares entryState.params  and EMP-003 holds none of them, so the
-        edge carries nothing and EMP-056 opens cold
+      provenance: derived — EMP-056 declares entryState.params entryId and EMP-003 holds none of them,
+        so the edge carries nothing and EMP-056 opens cold
     - to: EMP-057
       trigger: Guest Profile & Dining History
       provenance: derived — EMP-057 declares entryState.params subjectId and EMP-003 holds none of them,
@@ -668,6 +702,10 @@ screens:
       trigger: Emergency mode
       provenance: derived — EMP-047 declares entryState.params announcementId and EMP-003 holds none of
         them, so the edge carries nothing and EMP-047 opens cold
+    - to: EMP-042
+      trigger: Profile
+      provenance: derived — EMP-042 declares entryState.params methodId and EMP-003 holds none of them,
+        so the edge carries nothing and EMP-042 opens cold
     entryFrom:
     - EMP-071
     - EMP-081
@@ -992,8 +1030,10 @@ screens:
   - id: formReopenShift
     component: modal
     trigger: Reopen shift
-    body: '**Collects what `reopenShift` sends before it is called.** Required: `reason`, `approverPrincipalId`.
-      Dismissing sends nothing; the screen behind is unchanged.'
+    body: '**Collects what `reopenShift` sends before it is called.** Required: `reason`, `supervisorStepUp`
+      {`principalId`, `credential`}: the supervisor enters their staff PIN on this device, and may not
+      be the principal who closed the shift. Refused 403 `approver-is-closer` or `supervisor-step-up-refused`
+      (decided 28 September, audit R144). Dismissing sends nothing; the screen behind is unchanged.'
     confirm:
       label: Reopen shift
       operation: reopenShift
@@ -1001,7 +1041,7 @@ screens:
       label: Cancel
       discards:
       - reason
-      - approverPrincipalId
+      - supervisorStepUp
     provenance: contract shift.yaml POST /shifts/{shiftId}/reopen
   - id: formReportIncident
     component: modal
@@ -1217,8 +1257,8 @@ screens:
       provenance: flow F08 step 3→4, F64 step 3→4
     - to: EMP-001
       trigger: Sign in
-      provenance: derived — EMP-001 declares entryState.params  and EMP-048 holds none of them, so the
-        edge carries nothing and EMP-001 opens cold
+      provenance: derived — EMP-001 declares entryState.params challengeId and EMP-048 holds none of them,
+        so the edge carries nothing and EMP-001 opens cold
     - to: EMP-002
       trigger: Select venue & role
       provenance: derived — EMP-002 declares entryState.params  and EMP-048 holds none of them, so the
@@ -1412,8 +1452,8 @@ screens:
     transitions:
     - to: EMP-001
       trigger: Sign in
-      provenance: derived — EMP-001 declares entryState.params  and EMP-009 holds none of them, so the
-        edge carries nothing and EMP-001 opens cold
+      provenance: derived — EMP-001 declares entryState.params challengeId and EMP-009 holds none of them,
+        so the edge carries nothing and EMP-001 opens cold
     - to: EMP-002
       trigger: Select venue & role
       provenance: derived — EMP-002 declares entryState.params  and EMP-009 holds none of them, so the
@@ -1678,8 +1718,10 @@ screens:
   - id: formReopenShift
     component: modal
     trigger: Reopen shift
-    body: '**Collects what `reopenShift` sends before it is called.** Required: `reason`, `approverPrincipalId`.
-      Dismissing sends nothing; the screen behind is unchanged.'
+    body: '**Collects what `reopenShift` sends before it is called.** Required: `reason`, `supervisorStepUp`
+      {`principalId`, `credential`}: the supervisor enters their staff PIN on this device, and may not
+      be the principal who closed the shift. Refused 403 `approver-is-closer` or `supervisor-step-up-refused`
+      (decided 28 September, audit R144). Dismissing sends nothing; the screen behind is unchanged.'
     confirm:
       label: Reopen shift
       operation: reopenShift
@@ -1687,7 +1729,7 @@ screens:
       label: Cancel
       discards:
       - reason
-      - approverPrincipalId
+      - supervisorStepUp
     provenance: contract shift.yaml POST /shifts/{shiftId}/reopen
   - id: formResumeShift
     component: modal
@@ -1827,8 +1869,8 @@ screens:
     transitions:
     - to: EMP-001
       trigger: Sign in
-      provenance: derived — EMP-001 declares entryState.params  and EMP-010 holds none of them, so the
-        edge carries nothing and EMP-001 opens cold
+      provenance: derived — EMP-001 declares entryState.params challengeId and EMP-010 holds none of them,
+        so the edge carries nothing and EMP-001 opens cold
     - to: EMP-002
       trigger: Select venue & role
       provenance: derived — EMP-002 declares entryState.params  and EMP-010 holds none of them, so the
@@ -1893,7 +1935,7 @@ screens:
         - ScanEvent.direction
         - ScanEvent.operatorPrincipalId
         - ScanEvent.deviceId
-        - ScanEvent.overriddenByPrincipalId
+        - ScanEvent.overridesScanId
         operation: listScans
         provenance: contract access.yaml GET /access/scans
       - kind: scanTarget
@@ -1927,7 +1969,7 @@ screens:
         - ScanEvent.direction
         - ScanEvent.operatorPrincipalId
         - ScanEvent.deviceId
-        - ScanEvent.overriddenByPrincipalId
+        - ScanEvent.overridesScanId
         - ScanEvent.overrideReason
         - ScanEvent.recordedAt
         - ScanEvent.syncedAt
@@ -2118,8 +2160,8 @@ screens:
     transitions:
     - to: EMP-001
       trigger: Sign in
-      provenance: derived — EMP-001 declares entryState.params  and EMP-014 holds none of them, so the
-        edge carries nothing and EMP-001 opens cold
+      provenance: derived — EMP-001 declares entryState.params challengeId and EMP-014 holds none of them,
+        so the edge carries nothing and EMP-001 opens cold
     - to: EMP-002
       trigger: Select venue & role
       provenance: derived — EMP-002 declares entryState.params  and EMP-014 holds none of them, so the
@@ -2317,7 +2359,10 @@ screens:
     trigger: Void order
     body: '**Names what `voidOrder` changes and what it leaves alone**, in the consequence rather than
       the verb. A ticket lookup this affects should be identified in the dialog, not just counted. **Collects
-      what `voidOrder` sends before it is called.** Required: `id`, `reason`, `recordedAt`.'
+      what `voidOrder` sends before it is called.** Required: `id`, `reason`, `recordedAt`. `reason` is
+      picked from the void reason list (guestChangedMind, enteredInError, itemUnavailable, qualityIssue,
+      duplicate, other); **`note` is required when the reason is other**, refused 400 without it (decided
+      28 September, audit R125 (4), R222).'
     provenance: contract orders.yaml POST /orders/{orderId}/voids
   - id: formCreateOrder
     component: modal
@@ -2607,8 +2652,8 @@ screens:
     transitions:
     - to: EMP-001
       trigger: Sign in
-      provenance: derived — EMP-001 declares entryState.params  and EMP-015 holds none of them, so the
-        edge carries nothing and EMP-001 opens cold
+      provenance: derived — EMP-001 declares entryState.params challengeId and EMP-015 holds none of them,
+        so the edge carries nothing and EMP-001 opens cold
     - to: EMP-002
       trigger: Select venue & role
       provenance: derived — EMP-002 declares entryState.params  and EMP-015 holds none of them, so the
@@ -2670,7 +2715,7 @@ screens:
         - ScanEvent.direction
         - ScanEvent.operatorPrincipalId
         - ScanEvent.deviceId
-        - ScanEvent.overriddenByPrincipalId
+        - ScanEvent.overridesScanId
         operation: listScans
         provenance: contract access.yaml GET /access/scans
       - kind: scanTarget
@@ -2704,7 +2749,7 @@ screens:
         - ScanEvent.direction
         - ScanEvent.operatorPrincipalId
         - ScanEvent.deviceId
-        - ScanEvent.overriddenByPrincipalId
+        - ScanEvent.overridesScanId
         - ScanEvent.overrideReason
         - ScanEvent.recordedAt
         - ScanEvent.syncedAt
@@ -2901,8 +2946,8 @@ screens:
       provenance: flow F72 step 2→3
     - to: EMP-001
       trigger: Sign in
-      provenance: derived — EMP-001 declares entryState.params  and EMP-017 holds none of them, so the
-        edge carries nothing and EMP-001 opens cold
+      provenance: derived — EMP-001 declares entryState.params challengeId and EMP-017 holds none of them,
+        so the edge carries nothing and EMP-001 opens cold
     - to: EMP-002
       trigger: Select venue & role
       provenance: derived — EMP-002 declares entryState.params  and EMP-017 holds none of them, so the
@@ -2973,7 +3018,7 @@ screens:
         - ScanEvent.direction
         - ScanEvent.operatorPrincipalId
         - ScanEvent.deviceId
-        - ScanEvent.overriddenByPrincipalId
+        - ScanEvent.overridesScanId
         operation: listScans
         provenance: contract access.yaml GET /access/scans
       - kind: scanTarget
@@ -3228,8 +3273,8 @@ screens:
       provenance: flow F71 step 2→3
     - to: EMP-001
       trigger: Sign in
-      provenance: derived — EMP-001 declares entryState.params  and EMP-018 holds none of them, so the
-        edge carries nothing and EMP-001 opens cold
+      provenance: derived — EMP-001 declares entryState.params challengeId and EMP-018 holds none of them,
+        so the edge carries nothing and EMP-001 opens cold
     - to: EMP-002
       trigger: Select venue & role
       provenance: derived — EMP-002 declares entryState.params  and EMP-018 holds none of them, so the
@@ -3391,8 +3436,8 @@ screens:
     transitions:
     - to: EMP-001
       trigger: Sign in
-      provenance: derived — EMP-001 declares entryState.params  and EMP-004 holds none of them, so the
-        edge carries nothing and EMP-001 opens cold
+      provenance: derived — EMP-001 declares entryState.params challengeId and EMP-004 holds none of them,
+        so the edge carries nothing and EMP-001 opens cold
     - to: EMP-002
       trigger: Select venue & role
       provenance: derived — EMP-002 declares entryState.params  and EMP-004 holds none of them, so the
@@ -3536,6 +3581,8 @@ screens:
         label: Reject work order
         operation: rejectWorkOrder
         provenance: contract maintenance.yaml POST /work-orders/{workOrderId}/reject
+        notes: Asks for a reason; when the reason is Other a note is required, and the operation refuses
+          400 without it (decided 28 September, audit R222).
       - kind: secondaryButton
         label: Attach work order evidence
         operation: attachWorkOrderEvidence
@@ -3642,7 +3689,9 @@ screens:
     component: modal
     trigger: Pause work order
     body: '**Collects what `pauseWorkOrder` sends before it is called.** Required: `reason`. Optional:
-      `note`, `requisitionId`. Dismissing sends nothing; the screen behind is unchanged.'
+      `note`, `requisitionId`. **When the reason is Other, `note` is required** — the operation refuses
+      400 without it (decided 28 September, audit R222). Dismissing sends nothing; the screen behind is
+      unchanged.'
     confirm:
       label: Pause work order
       operation: pauseWorkOrder
@@ -3670,7 +3719,9 @@ screens:
     component: modal
     trigger: Record work order time
     body: '**Collects what `recordWorkOrderTime` sends before it is called.** Required: `id`, `action`,
-      `recordedAt`. Optional: `pauseReason`, `note`. Dismissing sends nothing; the screen behind is unchanged.'
+      `recordedAt`. Optional: `pauseReason`, `note`. **When the pause reason is Other, `note` is required**
+      — the operation refuses 400 without it (decided 28 September, audit R222). Dismissing sends nothing;
+      the screen behind is unchanged.'
     confirm:
       label: Record work order time
       operation: recordWorkOrderTime
@@ -3873,8 +3924,8 @@ screens:
       provenance: flow F08 step 6→7, F65 step 4→5
     - to: EMP-001
       trigger: Sign in
-      provenance: derived — EMP-001 declares entryState.params  and EMP-005 holds none of them, so the
-        edge carries nothing and EMP-001 opens cold
+      provenance: derived — EMP-001 declares entryState.params challengeId and EMP-005 holds none of them,
+        so the edge carries nothing and EMP-001 opens cold
     - to: EMP-002
       trigger: Select venue & role
       provenance: derived — EMP-002 declares entryState.params  and EMP-005 holds none of them, so the
@@ -4060,6 +4111,8 @@ screens:
         label: Reject work order
         operation: rejectWorkOrder
         provenance: contract maintenance.yaml POST /work-orders/{workOrderId}/reject
+        notes: Asks for a reason; when the reason is Other a note is required, and the operation refuses
+          400 without it (decided 28 September, audit R222).
       - kind: secondaryButton
         label: Resume work order
         operation: resumeWorkOrder
@@ -4111,7 +4164,9 @@ screens:
     component: modal
     trigger: Pause work order
     body: '**Collects what `pauseWorkOrder` sends before it is called.** Required: `reason`. Optional:
-      `note`, `requisitionId`. Dismissing sends nothing; the screen behind is unchanged.'
+      `note`, `requisitionId`. **When the reason is Other, `note` is required** — the operation refuses
+      400 without it (decided 28 September, audit R222). Dismissing sends nothing; the screen behind is
+      unchanged.'
     confirm:
       label: Pause work order
       operation: pauseWorkOrder
@@ -4175,7 +4230,9 @@ screens:
     component: modal
     trigger: Record work order time
     body: '**Collects what `recordWorkOrderTime` sends before it is called.** Required: `id`, `action`,
-      `recordedAt`. Optional: `pauseReason`, `note`. Dismissing sends nothing; the screen behind is unchanged.'
+      `recordedAt`. Optional: `pauseReason`, `note`. **When the pause reason is Other, `note` is required**
+      — the operation refuses 400 without it (decided 28 September, audit R222). Dismissing sends nothing;
+      the screen behind is unchanged.'
     confirm:
       label: Record work order time
       operation: recordWorkOrderTime
@@ -4366,8 +4423,8 @@ screens:
     transitions:
     - to: EMP-001
       trigger: Sign in
-      provenance: derived — EMP-001 declares entryState.params  and EMP-006 holds none of them, so the
-        edge carries nothing and EMP-001 opens cold
+      provenance: derived — EMP-001 declares entryState.params challengeId and EMP-006 holds none of them,
+        so the edge carries nothing and EMP-001 opens cold
     - to: EMP-002
       trigger: Select venue & role
       provenance: derived — EMP-002 declares entryState.params  and EMP-006 holds none of them, so the
@@ -4540,6 +4597,8 @@ screens:
         label: Reject work order
         operation: rejectWorkOrder
         provenance: contract maintenance.yaml POST /work-orders/{workOrderId}/reject
+        notes: Asks for a reason; when the reason is Other a note is required, and the operation refuses
+          400 without it (decided 28 September, audit R222).
       - kind: secondaryButton
         label: Resume work order
         operation: resumeWorkOrder
@@ -4647,7 +4706,9 @@ screens:
     component: modal
     trigger: Pause work order
     body: '**Collects what `pauseWorkOrder` sends before it is called.** Required: `reason`. Optional:
-      `note`, `requisitionId`. Dismissing sends nothing; the screen behind is unchanged.'
+      `note`, `requisitionId`. **When the reason is Other, `note` is required** — the operation refuses
+      400 without it (decided 28 September, audit R222). Dismissing sends nothing; the screen behind is
+      unchanged.'
     confirm:
       label: Pause work order
       operation: pauseWorkOrder
@@ -4675,7 +4736,9 @@ screens:
     component: modal
     trigger: Record work order time
     body: '**Collects what `recordWorkOrderTime` sends before it is called.** Required: `id`, `action`,
-      `recordedAt`. Optional: `pauseReason`, `note`. Dismissing sends nothing; the screen behind is unchanged.'
+      `recordedAt`. Optional: `pauseReason`, `note`. **When the pause reason is Other, `note` is required**
+      — the operation refuses 400 without it (decided 28 September, audit R222). Dismissing sends nothing;
+      the screen behind is unchanged.'
     confirm:
       label: Record work order time
       operation: recordWorkOrderTime
@@ -4884,8 +4947,8 @@ screens:
       provenance: flow F08 step 7→8
     - to: EMP-001
       trigger: Sign in
-      provenance: derived — EMP-001 declares entryState.params  and EMP-007 holds none of them, so the
-        edge carries nothing and EMP-001 opens cold
+      provenance: derived — EMP-001 declares entryState.params challengeId and EMP-007 holds none of them,
+        so the edge carries nothing and EMP-001 opens cold
     - to: EMP-002
       trigger: Select venue & role
       provenance: derived — EMP-002 declares entryState.params  and EMP-007 holds none of them, so the
@@ -5096,8 +5159,8 @@ screens:
       provenance: flow F72 step 1→2
     - to: EMP-001
       trigger: Sign in
-      provenance: derived — EMP-001 declares entryState.params  and EMP-008 holds none of them, so the
-        edge carries nothing and EMP-001 opens cold
+      provenance: derived — EMP-001 declares entryState.params challengeId and EMP-008 holds none of them,
+        so the edge carries nothing and EMP-001 opens cold
     - to: EMP-002
       trigger: Select venue & role
       provenance: derived — EMP-002 declares entryState.params  and EMP-008 holds none of them, so the
@@ -5321,8 +5384,8 @@ screens:
     transitions:
     - to: EMP-001
       trigger: Sign in
-      provenance: derived — EMP-001 declares entryState.params  and EMP-019 holds none of them, so the
-        edge carries nothing and EMP-001 opens cold
+      provenance: derived — EMP-001 declares entryState.params challengeId and EMP-019 holds none of them,
+        so the edge carries nothing and EMP-001 opens cold
     - to: EMP-002
       trigger: Select venue & role
       provenance: derived — EMP-002 declares entryState.params  and EMP-019 holds none of them, so the
@@ -5497,8 +5560,8 @@ screens:
       provenance: flow F101 step 2→3
     - to: EMP-001
       trigger: Sign in
-      provenance: derived — EMP-001 declares entryState.params  and EMP-020 holds none of them, so the
-        edge carries nothing and EMP-001 opens cold
+      provenance: derived — EMP-001 declares entryState.params challengeId and EMP-020 holds none of them,
+        so the edge carries nothing and EMP-001 opens cold
     - to: EMP-002
       trigger: Select venue & role
       provenance: derived — EMP-002 declares entryState.params  and EMP-020 holds none of them, so the
@@ -5675,8 +5738,8 @@ screens:
     transitions:
     - to: EMP-001
       trigger: Sign in
-      provenance: derived — EMP-001 declares entryState.params  and EMP-031 holds none of them, so the
-        edge carries nothing and EMP-001 opens cold
+      provenance: derived — EMP-001 declares entryState.params challengeId and EMP-031 holds none of them,
+        so the edge carries nothing and EMP-001 opens cold
     - to: EMP-002
       trigger: Select venue & role
       provenance: derived — EMP-002 declares entryState.params  and EMP-031 holds none of them, so the
@@ -5961,8 +6024,8 @@ screens:
       provenance: flow F67 step 2→3
     - to: EMP-001
       trigger: Sign in
-      provenance: derived — EMP-001 declares entryState.params  and EMP-032 holds none of them, so the
-        edge carries nothing and EMP-001 opens cold
+      provenance: derived — EMP-001 declares entryState.params challengeId and EMP-032 holds none of them,
+        so the edge carries nothing and EMP-001 opens cold
     - to: EMP-002
       trigger: Select venue & role
       provenance: derived — EMP-002 declares entryState.params  and EMP-032 holds none of them, so the
@@ -6197,8 +6260,8 @@ screens:
     transitions:
     - to: EMP-001
       trigger: Sign in
-      provenance: derived — EMP-001 declares entryState.params  and EMP-033 holds none of them, so the
-        edge carries nothing and EMP-001 opens cold
+      provenance: derived — EMP-001 declares entryState.params challengeId and EMP-033 holds none of them,
+        so the edge carries nothing and EMP-001 opens cold
     - to: EMP-002
       trigger: Select venue & role
       provenance: derived — EMP-002 declares entryState.params  and EMP-033 holds none of them, so the
@@ -6447,8 +6510,8 @@ screens:
     transitions:
     - to: EMP-001
       trigger: Sign in
-      provenance: derived — EMP-001 declares entryState.params  and EMP-034 holds none of them, so the
-        edge carries nothing and EMP-001 opens cold
+      provenance: derived — EMP-001 declares entryState.params challengeId and EMP-034 holds none of them,
+        so the edge carries nothing and EMP-001 opens cold
     - to: EMP-002
       trigger: Select venue & role
       provenance: derived — EMP-002 declares entryState.params  and EMP-034 holds none of them, so the
@@ -6716,7 +6779,10 @@ screens:
     trigger: Void order
     body: '**Names what `voidOrder` changes and what it leaves alone**, in the consequence rather than
       the verb. A walk-up sale this affects should be identified in the dialog, not just counted. **Collects
-      what `voidOrder` sends before it is called.** Required: `id`, `reason`, `recordedAt`.'
+      what `voidOrder` sends before it is called.** Required: `id`, `reason`, `recordedAt`. `reason` is
+      picked from the void reason list (guestChangedMind, enteredInError, itemUnavailable, qualityIssue,
+      duplicate, other); **`note` is required when the reason is other**, refused 400 without it (decided
+      28 September, audit R125 (4), R222).'
     provenance: contract orders.yaml POST /orders/{orderId}/voids
   - id: formSplitOrder
     component: modal
@@ -7112,8 +7178,8 @@ screens:
       provenance: flow F66 step 2→3
     - to: EMP-001
       trigger: Sign in
-      provenance: derived — EMP-001 declares entryState.params  and EMP-035 holds none of them, so the
-        edge carries nothing and EMP-001 opens cold
+      provenance: derived — EMP-001 declares entryState.params challengeId and EMP-035 holds none of them,
+        so the edge carries nothing and EMP-001 opens cold
     - to: EMP-002
       trigger: Select venue & role
       provenance: derived — EMP-002 declares entryState.params  and EMP-035 holds none of them, so the
@@ -7285,8 +7351,8 @@ screens:
     transitions:
     - to: EMP-001
       trigger: Sign in
-      provenance: derived — EMP-001 declares entryState.params  and EMP-036 holds none of them, so the
-        edge carries nothing and EMP-001 opens cold
+      provenance: derived — EMP-001 declares entryState.params challengeId and EMP-036 holds none of them,
+        so the edge carries nothing and EMP-001 opens cold
     - to: EMP-002
       trigger: Select venue & role
       provenance: derived — EMP-002 declares entryState.params  and EMP-036 holds none of them, so the
@@ -7438,8 +7504,8 @@ screens:
     transitions:
     - to: EMP-001
       trigger: Sign in
-      provenance: derived — EMP-001 declares entryState.params  and EMP-037 holds none of them, so the
-        edge carries nothing and EMP-001 opens cold
+      provenance: derived — EMP-001 declares entryState.params challengeId and EMP-037 holds none of them,
+        so the edge carries nothing and EMP-001 opens cold
     - to: EMP-002
       trigger: Select venue & role
       provenance: derived — EMP-002 declares entryState.params  and EMP-037 holds none of them, so the
@@ -7646,8 +7712,8 @@ screens:
     transitions:
     - to: EMP-001
       trigger: Sign in
-      provenance: derived — EMP-001 declares entryState.params  and EMP-039 holds none of them, so the
-        edge carries nothing and EMP-001 opens cold
+      provenance: derived — EMP-001 declares entryState.params challengeId and EMP-039 holds none of them,
+        so the edge carries nothing and EMP-001 opens cold
     - to: EMP-002
       trigger: Select venue & role
       provenance: derived — EMP-002 declares entryState.params  and EMP-039 holds none of them, so the
@@ -7857,8 +7923,8 @@ screens:
     transitions:
     - to: EMP-001
       trigger: Sign in
-      provenance: derived — EMP-001 declares entryState.params  and EMP-047 holds none of them, so the
-        edge carries nothing and EMP-001 opens cold
+      provenance: derived — EMP-001 declares entryState.params challengeId and EMP-047 holds none of them,
+        so the edge carries nothing and EMP-001 opens cold
     - to: EMP-002
       trigger: Select venue & role
       provenance: derived — EMP-002 declares entryState.params  and EMP-047 holds none of them, so the
@@ -7957,6 +8023,9 @@ screens:
         label: Publish announcement
         operation: publishAnnouncement
         provenance: contract workforce.yaml POST /announcements
+        notes: Kind `emergency` needs ANNOUNCEMENT_EMERGENCY, not ANNOUNCEMENT_PUBLISH; without it the
+          emergency kind is not offered and a publish is refused 403 `emergency-permission-required` (decided
+          28 September, audit R091 (1)).
       - kind: publishGate
         label: What publishing changes
         notes: '**Names what goes live, where, and from when.** A publish with no stated consequence is
@@ -8022,8 +8091,8 @@ screens:
     trigger: Publish announcement
     body: '**Collects what `publishAnnouncement` sends before it is called.** Required: `title`, `body`,
       `kind`, `publishedAt`. Optional: `id`, `venueIds`, `departmentIds`, `roleIds`, `requiresAcknowledgement`,
-      `expiresAt`, `publishedByPrincipalId`, `locale`. Dismissing sends nothing; the screen behind is
-      unchanged.'
+      `expiresAt`, `publishedByPrincipalId`, `locale`. **An `emergency` kind requires ANNOUNCEMENT_EMERGENCY**
+      (audit R091 (1)). Dismissing sends nothing; the screen behind is unchanged.'
     bindsTo: Announcement
     confirm:
       label: Publish announcement
@@ -8074,8 +8143,8 @@ screens:
       provenance: flow F69 step 3→4
     - to: EMP-001
       trigger: Sign in
-      provenance: derived — EMP-001 declares entryState.params  and EMP-050 holds none of them, so the
-        edge carries nothing and EMP-001 opens cold
+      provenance: derived — EMP-001 declares entryState.params challengeId and EMP-050 holds none of them,
+        so the edge carries nothing and EMP-001 opens cold
     - to: EMP-002
       trigger: Select venue & role
       provenance: derived — EMP-002 declares entryState.params  and EMP-050 holds none of them, so the
@@ -8312,8 +8381,8 @@ screens:
     transitions:
     - to: EMP-001
       trigger: Sign in
-      provenance: derived — EMP-001 declares entryState.params  and EMP-021 holds none of them, so the
-        edge carries nothing and EMP-001 opens cold
+      provenance: derived — EMP-001 declares entryState.params challengeId and EMP-021 holds none of them,
+        so the edge carries nothing and EMP-001 opens cold
     - to: EMP-002
       trigger: Select venue & role
       provenance: derived — EMP-002 declares entryState.params  and EMP-021 holds none of them, so the
@@ -8500,8 +8569,8 @@ screens:
     transitions:
     - to: EMP-001
       trigger: Sign in
-      provenance: derived — EMP-001 declares entryState.params  and EMP-022 holds none of them, so the
-        edge carries nothing and EMP-001 opens cold
+      provenance: derived — EMP-001 declares entryState.params challengeId and EMP-022 holds none of them,
+        so the edge carries nothing and EMP-001 opens cold
     - to: EMP-002
       trigger: Select venue & role
       provenance: derived — EMP-002 declares entryState.params  and EMP-022 holds none of them, so the
@@ -8717,8 +8786,8 @@ screens:
       operation: requestShiftSwap
     - to: EMP-001
       trigger: Sign in
-      provenance: derived — EMP-001 declares entryState.params  and EMP-023 holds none of them, so the
-        edge carries nothing and EMP-001 opens cold
+      provenance: derived — EMP-001 declares entryState.params challengeId and EMP-023 holds none of them,
+        so the edge carries nothing and EMP-001 opens cold
     - to: EMP-002
       trigger: Select venue & role
       provenance: derived — EMP-002 declares entryState.params  and EMP-023 holds none of them, so the
@@ -8880,7 +8949,10 @@ screens:
     component: modal
     trigger: Request shift swap
     body: '**Collects what `requestShiftSwap` sends before it is called.** Required: `toPrincipalId`.
-      Optional: `reason`. Dismissing sends nothing; the screen behind is unchanged.'
+      Optional: `reason`. **The colleague picker lists only staff with the same role at the same venue**;
+      anyone else is refused 409 `swap-role-mismatch` or `swap-venue-mismatch`. After the request the
+      assignment shows `swapPending` until a supervisor approves (decided 28 September, audit R129 (6)).
+      Dismissing sends nothing; the screen behind is unchanged.'
     confirm:
       label: Request shift swap
       operation: requestShiftSwap
@@ -8917,8 +8989,8 @@ screens:
     transitions:
     - to: EMP-001
       trigger: Sign in
-      provenance: derived — EMP-001 declares entryState.params  and EMP-024 holds none of them, so the
-        edge carries nothing and EMP-001 opens cold
+      provenance: derived — EMP-001 declares entryState.params challengeId and EMP-024 holds none of them,
+        so the edge carries nothing and EMP-001 opens cold
     - to: EMP-002
       trigger: Select venue & role
       provenance: derived — EMP-002 declares entryState.params  and EMP-024 holds none of them, so the
@@ -8996,12 +9068,24 @@ screens:
         - AttendanceRecord.latitude
         - AttendanceRecord.longitude
         - AttendanceRecord.isAmended
-        - AttendanceRecord.amendedByPrincipalId
-        - AttendanceRecord.amendmentReason
+        - AttendanceRecord.originalOccurredAt
         - AttendanceRecord.originalOccurredAt
         - AttendanceRecord.exception
         operation: listAttendance
         provenance: contract workforce.yaml GET /attendance
+      - kind: timeline
+        label: Corrections
+        bindsTo: AttendanceRecord.amendments
+        columns:
+        - AttendanceAmendment.amendedAt
+        - AttendanceAmendment.amendedByPrincipalId
+        - AttendanceAmendment.occurredAtBefore
+        - AttendanceAmendment.occurredAtAfter
+        - AttendanceAmendment.reason
+        operation: listAttendance
+        provenance: contract workforce.yaml GET /attendance
+        notes: '**Every correction, oldest first** — who, when, the time before and after, and why — rather
+          than only the last amender and reason (decided 28 September, audit R129 (7)).'
     - name: actionBar
       slot: rowActions
       components:
@@ -9124,8 +9208,8 @@ screens:
     transitions:
     - to: EMP-001
       trigger: Sign in
-      provenance: derived — EMP-001 declares entryState.params  and EMP-025 holds none of them, so the
-        edge carries nothing and EMP-001 opens cold
+      provenance: derived — EMP-001 declares entryState.params challengeId and EMP-025 holds none of them,
+        so the edge carries nothing and EMP-001 opens cold
     - to: EMP-002
       trigger: Select venue & role
       provenance: derived — EMP-002 declares entryState.params  and EMP-025 holds none of them, so the
@@ -9309,8 +9393,8 @@ screens:
       operation: reportIncident
     - to: EMP-001
       trigger: Sign in
-      provenance: derived — EMP-001 declares entryState.params  and EMP-026 holds none of them, so the
-        edge carries nothing and EMP-001 opens cold
+      provenance: derived — EMP-001 declares entryState.params challengeId and EMP-026 holds none of them,
+        so the edge carries nothing and EMP-001 opens cold
     - to: EMP-002
       trigger: Select venue & role
       provenance: derived — EMP-002 declares entryState.params  and EMP-026 holds none of them, so the
@@ -9589,8 +9673,8 @@ screens:
     transitions:
     - to: EMP-001
       trigger: Sign in
-      provenance: derived — EMP-001 declares entryState.params  and EMP-027 holds none of them, so the
-        edge carries nothing and EMP-001 opens cold
+      provenance: derived — EMP-001 declares entryState.params challengeId and EMP-027 holds none of them,
+        so the edge carries nothing and EMP-001 opens cold
     - to: EMP-002
       trigger: Select venue & role
       provenance: derived — EMP-002 declares entryState.params  and EMP-027 holds none of them, so the
@@ -9805,8 +9889,8 @@ screens:
     transitions:
     - to: EMP-001
       trigger: Sign in
-      provenance: derived — EMP-001 declares entryState.params  and EMP-028 holds none of them, so the
-        edge carries nothing and EMP-001 opens cold
+      provenance: derived — EMP-001 declares entryState.params challengeId and EMP-028 holds none of them,
+        so the edge carries nothing and EMP-001 opens cold
     - to: EMP-002
       trigger: Select venue & role
       provenance: derived — EMP-002 declares entryState.params  and EMP-028 holds none of them, so the
@@ -10129,8 +10213,8 @@ screens:
       provenance: flow F70 step 1→2
     - to: EMP-001
       trigger: Sign in
-      provenance: derived — EMP-001 declares entryState.params  and EMP-029 holds none of them, so the
-        edge carries nothing and EMP-001 opens cold
+      provenance: derived — EMP-001 declares entryState.params challengeId and EMP-029 holds none of them,
+        so the edge carries nothing and EMP-001 opens cold
     - to: EMP-002
       trigger: Select venue & role
       provenance: derived — EMP-002 declares entryState.params  and EMP-029 holds none of them, so the
@@ -10605,8 +10689,8 @@ screens:
       provenance: flow F70 step 2→3
     - to: EMP-001
       trigger: Sign in
-      provenance: derived — EMP-001 declares entryState.params  and EMP-030 holds none of them, so the
-        edge carries nothing and EMP-001 opens cold
+      provenance: derived — EMP-001 declares entryState.params challengeId and EMP-030 holds none of them,
+        so the edge carries nothing and EMP-001 opens cold
     - to: EMP-002
       trigger: Select venue & role
       provenance: derived — EMP-002 declares entryState.params  and EMP-030 holds none of them, so the
@@ -10800,8 +10884,8 @@ screens:
     transitions:
     - to: EMP-001
       trigger: Sign in
-      provenance: derived — EMP-001 declares entryState.params  and EMP-038 holds none of them, so the
-        edge carries nothing and EMP-001 opens cold
+      provenance: derived — EMP-001 declares entryState.params challengeId and EMP-038 holds none of them,
+        so the edge carries nothing and EMP-001 opens cold
     - to: EMP-002
       trigger: Select venue & role
       provenance: derived — EMP-002 declares entryState.params  and EMP-038 holds none of them, so the
@@ -10892,6 +10976,9 @@ screens:
         label: Publish announcement
         operation: publishAnnouncement
         provenance: contract workforce.yaml POST /announcements
+        notes: Kind `emergency` needs ANNOUNCEMENT_EMERGENCY, not ANNOUNCEMENT_PUBLISH; without it the
+          emergency kind is not offered and a publish is refused 403 `emergency-permission-required` (decided
+          28 September, audit R091 (1)).
       - kind: secondaryButton
         label: Acknowledge announcement
         operation: acknowledgeAnnouncement
@@ -10961,8 +11048,8 @@ screens:
     trigger: Publish announcement
     body: '**Collects what `publishAnnouncement` sends before it is called.** Required: `title`, `body`,
       `kind`, `publishedAt`. Optional: `id`, `venueIds`, `departmentIds`, `roleIds`, `requiresAcknowledgement`,
-      `expiresAt`, `publishedByPrincipalId`, `locale`. Dismissing sends nothing; the screen behind is
-      unchanged.'
+      `expiresAt`, `publishedByPrincipalId`, `locale`. **An `emergency` kind requires ANNOUNCEMENT_EMERGENCY**
+      (audit R091 (1)). Dismissing sends nothing; the screen behind is unchanged.'
     bindsTo: Announcement
     confirm:
       label: Publish announcement
@@ -11010,8 +11097,8 @@ screens:
     transitions:
     - to: EMP-001
       trigger: Sign in
-      provenance: derived — EMP-001 declares entryState.params  and EMP-040 holds none of them, so the
-        edge carries nothing and EMP-001 opens cold
+      provenance: derived — EMP-001 declares entryState.params challengeId and EMP-040 holds none of them,
+        so the edge carries nothing and EMP-001 opens cold
     - to: EMP-002
       trigger: Select venue & role
       provenance: derived — EMP-002 declares entryState.params  and EMP-040 holds none of them, so the
@@ -11099,8 +11186,8 @@ screens:
     transitions:
     - to: EMP-001
       trigger: Sign in
-      provenance: derived — EMP-001 declares entryState.params  and EMP-041 holds none of them, so the
-        edge carries nothing and EMP-001 opens cold
+      provenance: derived — EMP-001 declares entryState.params challengeId and EMP-041 holds none of them,
+        so the edge carries nothing and EMP-001 opens cold
     - to: EMP-002
       trigger: Select venue & role
       provenance: derived — EMP-002 declares entryState.params  and EMP-041 holds none of them, so the
@@ -11237,8 +11324,8 @@ screens:
     transitions:
     - to: EMP-001
       trigger: Sign in
-      provenance: derived — EMP-001 declares entryState.params  and EMP-042 holds none of them, so the
-        edge carries nothing and EMP-001 opens cold
+      provenance: derived — EMP-001 declares entryState.params challengeId and EMP-042 holds none of them,
+        so the edge carries nothing and EMP-001 opens cold
     - to: EMP-002
       trigger: Select venue & role
       provenance: derived — EMP-002 declares entryState.params  and EMP-042 holds none of them, so the
@@ -11327,6 +11414,27 @@ screens:
         - Session.expiresAt
         operation: getCurrentSession
         provenance: contract identity.yaml GET /auth/session
+    - name: actionBar
+      slot: rowActions
+      components:
+      - kind: primaryButton
+        label: Add a sign-in method
+        operation: enrolMfaMethod
+        provenance: contract identity.yaml POST /auth/mfa/methods
+        notes: Offers only an authenticator app (`totp`) and email (`emailOtp`, the fallback); any other
+          kind is refused 422 `mfa-kind-not-allowed` (decided 28 September, audit R126 (5)).
+      - kind: secondaryButton
+        label: Verify the new method
+        operation: verifyMfaEnrolment
+        provenance: contract identity.yaml POST /auth/mfa/methods/{methodId}
+        notes: The method is not active until a code from it is verified.
+      - kind: destructiveButton
+        label: Remove this method
+        operation: removeMfaMethod
+        provenance: contract identity.yaml DELETE /auth/mfa/methods/{methodId}
+        notes: Removing the last active method is refused 409 while the person holds a permission that
+          requires MFA (ROLE_MANAGE, LEDGER_APPROVE, or one the tenant added) (decided 28 September, audit
+          R135).
   states:
     loading: The profile list.
     error: Could not load. Names which read failed and leaves the profile untouched.
@@ -11344,6 +11452,25 @@ screens:
     contract: identity
     purpose: Enrolled MFA methods
     trigger: onLoad
+  - operationId: enrolMfaMethod
+    contract: identity
+    purpose: Start enrolling an authenticator app, or email as the fallback (audit R126 (5), R135)
+    trigger: onAction
+    invalidates:
+    - listMfaMethods
+  - operationId: verifyMfaEnrolment
+    contract: identity
+    purpose: Activate the new method with a code from it
+    trigger: onAction
+    invalidates:
+    - listMfaMethods
+  - operationId: removeMfaMethod
+    contract: identity
+    purpose: Remove a method; the last one is refused 409 while a permission requiring MFA is held (audit
+      R135)
+    trigger: onAction
+    invalidates:
+    - listMfaMethods
   - operationId: listSsoProviders
     contract: identity
     purpose: Identity providers configured for this tenant
@@ -11352,6 +11479,8 @@ screens:
     params:
     - name: sessionId
       from: session
+    - name: methodId
+      from: navigation
     coldEntry: Resolves from the session; a cold arrival is the ordinary case.
     preloaded:
     - MfaMethod.id
@@ -11366,6 +11495,50 @@ screens:
   apisNote: Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack
     — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
     to the ones that matter is work a person still owes this screen.
+  overlays:
+  - id: formEnrolMfaMethod
+    component: modal
+    trigger: Add a sign-in method
+    body: '**Collects what `enrolMfaMethod` sends before it is called.** Required: `kind`, offered as
+      authenticator app (`totp`) or email (`emailOtp`) only (audit R126 (5)). Optional: `target`, the
+      email address for the email method. The response carries the secret and QR code for an authenticator
+      app. Dismissing sends nothing; the screen behind is unchanged.'
+    bindsTo: MfaEnrolment
+    confirm:
+      label: Add method
+      operation: enrolMfaMethod
+    dismiss:
+      label: Cancel
+      discards:
+      - kind
+      - target
+    provenance: contract identity.yaml POST /auth/mfa/methods
+  - id: formVerifyMfaEnrolment
+    component: modal
+    trigger: Verify the new method
+    body: '**Collects what `verifyMfaEnrolment` sends before it is called.** Required: `code`. The method
+      is active only after this. Dismissing sends nothing; the screen behind is unchanged.'
+    confirm:
+      label: Verify
+      operation: verifyMfaEnrolment
+    dismiss:
+      label: Cancel
+      discards:
+      - code
+    provenance: contract identity.yaml POST /auth/mfa/methods/{methodId}
+  - id: confirmRemoveMfaMethod
+    component: confirmDialog
+    trigger: Remove this method
+    body: '**Names the method being removed.** Removing the last active method is refused 409 while the
+      person holds a permission in `PasswordPolicy.mfaRequiredForPermissions`, and the dialog says so
+      before the call rather than after (decided 28 September, audit R135).'
+    confirm:
+      label: Remove method
+      operation: removeMfaMethod
+    dismiss:
+      label: Keep it
+      discards: []
+    provenance: contract identity.yaml DELETE /auth/mfa/methods/{methodId}
 - id: EMP-043
   name: Device settings
   module: Operations
@@ -11398,8 +11571,8 @@ screens:
       operation: listDevices
     - to: EMP-001
       trigger: Sign in
-      provenance: derived — EMP-001 declares entryState.params  and EMP-043 holds none of them, so the
-        edge carries nothing and EMP-001 opens cold
+      provenance: derived — EMP-001 declares entryState.params challengeId and EMP-043 holds none of them,
+        so the edge carries nothing and EMP-001 opens cold
     - to: EMP-002
       trigger: Select venue & role
       provenance: derived — EMP-002 declares entryState.params  and EMP-043 holds none of them, so the
@@ -11586,8 +11759,8 @@ screens:
     transitions:
     - to: EMP-001
       trigger: Sign in
-      provenance: derived — EMP-001 declares entryState.params  and EMP-044 holds none of them, so the
-        edge carries nothing and EMP-001 opens cold
+      provenance: derived — EMP-001 declares entryState.params challengeId and EMP-044 holds none of them,
+        so the edge carries nothing and EMP-001 opens cold
     - to: EMP-002
       trigger: Select venue & role
       provenance: derived — EMP-002 declares entryState.params  and EMP-044 holds none of them, so the
@@ -11650,8 +11823,8 @@ screens:
     transitions:
     - to: EMP-001
       trigger: Sign in
-      provenance: derived — EMP-001 declares entryState.params  and EMP-045 holds none of them, so the
-        edge carries nothing and EMP-001 opens cold
+      provenance: derived — EMP-001 declares entryState.params challengeId and EMP-045 holds none of them,
+        so the edge carries nothing and EMP-001 opens cold
     - to: EMP-002
       trigger: Select venue & role
       provenance: derived — EMP-002 declares entryState.params  and EMP-045 holds none of them, so the
@@ -11715,8 +11888,8 @@ screens:
     transitions:
     - to: EMP-001
       trigger: Sign in
-      provenance: derived — EMP-001 declares entryState.params  and EMP-046 holds none of them, so the
-        edge carries nothing and EMP-001 opens cold
+      provenance: derived — EMP-001 declares entryState.params challengeId and EMP-046 holds none of them,
+        so the edge carries nothing and EMP-001 opens cold
     - to: EMP-002
       trigger: Select venue & role
       provenance: derived — EMP-002 declares entryState.params  and EMP-046 holds none of them, so the
@@ -11798,8 +11971,8 @@ screens:
     transitions:
     - to: EMP-001
       trigger: Sign in
-      provenance: derived — EMP-001 declares entryState.params  and EMP-049 holds none of them, so the
-        edge carries nothing and EMP-001 opens cold
+      provenance: derived — EMP-001 declares entryState.params challengeId and EMP-049 holds none of them,
+        so the edge carries nothing and EMP-001 opens cold
     - to: EMP-002
       trigger: Select venue & role
       provenance: derived — EMP-002 declares entryState.params  and EMP-049 holds none of them, so the
@@ -11861,7 +12034,7 @@ screens:
         - ScanEvent.direction
         - ScanEvent.operatorPrincipalId
         - ScanEvent.deviceId
-        - ScanEvent.overriddenByPrincipalId
+        - ScanEvent.overridesScanId
         operation: listScans
         provenance: contract access.yaml GET /access/scans
       - kind: scanTarget
@@ -11889,7 +12062,7 @@ screens:
         - ScanEvent.direction
         - ScanEvent.operatorPrincipalId
         - ScanEvent.deviceId
-        - ScanEvent.overriddenByPrincipalId
+        - ScanEvent.overridesScanId
         - ScanEvent.overrideReason
         - ScanEvent.recordedAt
         - ScanEvent.syncedAt
@@ -11966,17 +12139,10 @@ screens:
   navigation:
     entryFrom:
     - EMP-003
-    exitTo:
-    - EMP-003
     inferred: false
     notes: '**Returns to EMP-003.** Stated on 4 September: this screen declared where it is reached from
       and no way to leave, so whoever landed on it was stuck. The return path is the same edge travelled
       the other way, not a guess about the product.'
-    transitions:
-    - to: EMP-003
-      trigger: Home — on duty
-      provenance: derived — EMP-003 declares entryState.params incidentId and EMP-051 holds none of them,
-        so the edge carries nothing and EMP-003 opens cold
   notes: '**Added 20 August from the client design board.** P06 had no table or stock operations at all
     — **twenty screens of floor work with nothing behind them** — and every operation these need already
     existed. **Named in the board contents and not written up in it.** **Drawn 31 August** — `FnB Board
@@ -12149,17 +12315,10 @@ screens:
   navigation:
     entryFrom:
     - EMP-003
-    exitTo:
-    - EMP-003
     inferred: false
     notes: '**Returns to EMP-003.** Stated on 4 September: this screen declared where it is reached from
       and no way to leave, so whoever landed on it was stuck. The return path is the same edge travelled
       the other way, not a guess about the product.'
-    transitions:
-    - to: EMP-003
-      trigger: Home — on duty
-      provenance: derived — EMP-003 declares entryState.params incidentId and EMP-052 holds none of them,
-        so the edge carries nothing and EMP-003 opens cold
   notes: '**Added 20 August from the client design board.** P06 had no table or stock operations at all
     — **twenty screens of floor work with nothing behind them** — and every operation these need already
     existed. **Drawn 31 August** — `FnB Board 4.dc.html` frame `fnb-4b`. **Matched on frame title against
@@ -12271,17 +12430,10 @@ screens:
   navigation:
     entryFrom:
     - EMP-003
-    exitTo:
-    - EMP-003
     inferred: false
     notes: '**Returns to EMP-003.** Stated on 4 September: this screen declared where it is reached from
       and no way to leave, so whoever landed on it was stuck. The return path is the same edge travelled
       the other way, not a guess about the product.'
-    transitions:
-    - to: EMP-003
-      trigger: Home — on duty
-      provenance: derived — EMP-003 declares entryState.params incidentId and EMP-053 holds none of them,
-        so the edge carries nothing and EMP-003 opens cold
   notes: '**Added 20 August from the client design board.** P06 had no table or stock operations at all
     — **twenty screens of floor work with nothing behind them** — and every operation these need already
     existed. **Named in the board contents and not written up in it.** **Drawn 31 August** — `FnB Board
@@ -12391,17 +12543,10 @@ screens:
   navigation:
     entryFrom:
     - EMP-003
-    exitTo:
-    - EMP-003
     inferred: false
     notes: '**Returns to EMP-003.** Stated on 4 September: this screen declared where it is reached from
       and no way to leave, so whoever landed on it was stuck. The return path is the same edge travelled
       the other way, not a guess about the product.'
-    transitions:
-    - to: EMP-003
-      trigger: Home — on duty
-      provenance: derived — EMP-003 declares entryState.params incidentId and EMP-054 holds none of them,
-        so the edge carries nothing and EMP-003 opens cold
   notes: '**Added 20 August from the client design board.** P06 had no table or stock operations at all
     — **twenty screens of floor work with nothing behind them** — and every operation these need already
     existed. **Drawn 31 August** — `FnB Board 4.dc.html` frame `fnb-4d`. **Matched on frame title against
@@ -12536,17 +12681,10 @@ screens:
   navigation:
     entryFrom:
     - EMP-003
-    exitTo:
-    - EMP-003
     inferred: false
     notes: '**Returns to EMP-003.** Stated on 4 September: this screen declared where it is reached from
       and no way to leave, so whoever landed on it was stuck. The return path is the same edge travelled
       the other way, not a guess about the product.'
-    transitions:
-    - to: EMP-003
-      trigger: Home — on duty
-      provenance: derived — EMP-003 declares entryState.params incidentId and EMP-055 holds none of them,
-        so the edge carries nothing and EMP-003 opens cold
   notes: '**Added 20 August from the client design board.** P06 had no table or stock operations at all
     — **twenty screens of floor work with nothing behind them** — and every operation these need already
     existed. **Named in the board contents and not written up in it.** **Drawn 31 August** — `FnB Board
@@ -12654,6 +12792,8 @@ screens:
         label: Create table reservation
         operation: createTableReservation
         provenance: contract fnb.yaml POST /table-reservations
+        notes: 'Takes no deposit, and the confirmation and cancel copy name no no-show or cancellation
+          fee: none exists in the first release (decided 28 September, audit R077 (a)).'
       - kind: duplicateMatch
         label: Possible existing guest
         notes: '**Runs while the booking is being typed, not after it is saved.** A duplicate created
@@ -12731,17 +12871,10 @@ screens:
   navigation:
     entryFrom:
     - EMP-003
-    exitTo:
-    - EMP-003
     inferred: false
     notes: '**Returns to EMP-003.** Stated on 4 September: this screen declared where it is reached from
       and no way to leave, so whoever landed on it was stuck. The return path is the same edge travelled
       the other way, not a guess about the product.'
-    transitions:
-    - to: EMP-003
-      trigger: Home — on duty
-      provenance: derived — EMP-003 declares entryState.params incidentId and EMP-056 holds none of them,
-        so the edge carries nothing and EMP-003 opens cold
   notes: '**Added 20 August from the client design board.** P06 had no table or stock operations at all
     — **twenty screens of floor work with nothing behind them** — and every operation these need already
     existed. **Drawn 31 August** — `FnB Board 4.dc.html` frame `fnb-4f`. **Matched on frame title against
@@ -12814,6 +12947,13 @@ screens:
         label: Join restaurant waitlist
         operation: joinRestaurantWaitlist
         provenance: contract fnb.yaml POST /waitlist
+      - kind: destructiveButton
+        label: Leave waitlist
+        operation: leaveRestaurantWaitlist
+        provenance: contract fnb.yaml POST /waitlist/{entryId}/leave
+        notes: Takes the selected party off the list; the entry returns `cancelled`, and a party already
+          called releases its held table at once. Not `walkedAway`, which records a party that left without
+          saying so (decided 28 September, audit R073 (d)).
   states:
     loading: The saved walk-in waitlist.
     error: Could not load. Names which read failed and leaves the walk-in waitlist untouched.
@@ -12830,10 +12970,16 @@ screens:
     contract: fnb
     purpose: Add a party to an outlet's waitlist
     trigger: onAction
+  - operationId: leaveRestaurantWaitlist
+    contract: fnb
+    purpose: Take a party off the waitlist; the entry ends cancelled (audit R073 (d))
+    trigger: onAction
   entryState:
     params:
     - name: venueId
       from: session
+    - name: entryId
+      from: navigation
     coldEntry: '**Resolves from the session and the shift.** A handheld is signed into at the start of
       a shift, not navigated to.'
   wireframe:
@@ -12847,6 +12993,23 @@ screens:
   apisNote: Rebuilt 9 September 2026 from the 1 operation this screen declares, not from a workshop pack
     — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
     to the ones that matter is work a person still owes this screen.
+  overlays:
+  - id: confirmLeaveRestaurantWaitlist
+    component: confirmDialog
+    trigger: Leave waitlist
+    body: '**Names the party and its place in the list.** `leaveRestaurantWaitlist` ends the entry `cancelled`;
+      a party already called releases its held table at once. Optional: `note`, why the party left (audit
+      R073 (d)).'
+    confirm:
+      label: Take them off the list
+      operation: leaveRestaurantWaitlist
+      carries:
+      - entryId
+    dismiss:
+      label: Keep them
+      discards:
+      - note
+    provenance: contract fnb.yaml POST /waitlist/{entryId}/leave
 - id: EMP-057
   name: Guest Profile & Dining History
   module: Floor Service
@@ -12860,17 +13023,10 @@ screens:
   navigation:
     entryFrom:
     - EMP-003
-    exitTo:
-    - EMP-003
     inferred: false
     notes: '**Returns to EMP-003.** Stated on 4 September: this screen declared where it is reached from
       and no way to leave, so whoever landed on it was stuck. The return path is the same edge travelled
       the other way, not a guess about the product.'
-    transitions:
-    - to: EMP-003
-      trigger: Home — on duty
-      provenance: derived — EMP-003 declares entryState.params incidentId and EMP-057 holds none of them,
-        so the edge carries nothing and EMP-003 opens cold
   notes: '**Added 20 August from the client design board.** P06 had no table or stock operations at all
     — **twenty screens of floor work with nothing behind them** — and every operation these need already
     existed. **Named in the board contents and not written up in it.** **Drawn 31 August** — `FnB Board
@@ -13323,7 +13479,9 @@ screens:
     component: modal
     trigger: Transfer table visit
     body: '**Collects what `transferTableVisit` sends before it is called.** Required: `toPrincipalId`,
-      `reason`, `recordedAt`. Dismissing sends nothing; the screen behind is unchanged.'
+      `reason`, `recordedAt`. **`note` is collected too, and required when the reason is Other** — the
+      operation refuses 400 without it (decided 28 September, audit R222). Dismissing sends nothing; the
+      screen behind is unchanged.'
     confirm:
       label: Transfer table visit
       operation: transferTableVisit
@@ -13333,6 +13491,7 @@ screens:
       - toPrincipalId
       - reason
       - recordedAt
+      - note
     provenance: contract fnb.yaml POST /table-visits/{visitId}/transfer
   - id: formSeatTableReservation
     component: modal
@@ -13367,7 +13526,9 @@ screens:
     component: modal
     trigger: Move table visit
     body: '**Collects what `moveTableVisit` sends before it is called.** Required: `toTableId`, `recordedAt`.
-      Optional: `reason`. Dismissing sends nothing; the screen behind is unchanged.'
+      Optional: `reason`. **`note` is collected too, and required when the reason is Other** — the operation
+      refuses 400 without it (decided 28 September, audit R222). Dismissing sends nothing; the screen
+      behind is unchanged.'
     confirm:
       label: Move table visit
       operation: moveTableVisit
@@ -13377,6 +13538,7 @@ screens:
       - toTableId
       - recordedAt
       - reason
+      - note
     provenance: contract fnb.yaml POST /table-visits/{visitId}/move
   - id: formReassignServer
     component: modal
@@ -13445,7 +13607,9 @@ screens:
     component: modal
     trigger: Hold course
     body: '**Collects what `holdCourse` sends before it is called.** Required: `recordedAt`, `course`.
-      Optional: `reason`. Dismissing sends nothing; the screen behind is unchanged.'
+      Optional: `reason`. **`note` is collected too, and required when the reason is Other** — the operation
+      refuses 400 without it (decided 28 September, audit R222). Dismissing sends nothing; the screen
+      behind is unchanged.'
     confirm:
       label: Hold course
       operation: holdCourse
@@ -13455,6 +13619,7 @@ screens:
       - recordedAt
       - course
       - reason
+      - note
     provenance: contract fnb.yaml POST /kitchen-tickets/{ticketId}/hold
   - id: formSetTableCombinations
     component: modal
@@ -13812,7 +13977,9 @@ screens:
     component: modal
     trigger: Comp item
     body: '**Collects what `compItem` sends before it is called.** Required: `orderLineId`, `recordedAt`,
-      `reason`. Optional: `note`. Dismissing sends nothing; the screen behind is unchanged.'
+      `reason`. Optional: `note`. **When the reason is Other, `note` is required** — the operation refuses
+      400 without it (decided 28 September, audit R222). Dismissing sends nothing; the screen behind is
+      unchanged.'
     confirm:
       label: Comp item
       operation: compItem
@@ -13920,7 +14087,6 @@ screens:
     - EMP-003
     - EMP-058
     exitTo:
-    - EMP-003
     - EMP-061
     inferred: false
     notes: '**Returns to EMP-003.** Stated on 4 September: this screen declared where it is reached from
@@ -13930,10 +14096,6 @@ screens:
     - to: EMP-061
       trigger: Retail Inventory Command Center
       provenance: flow F80 step 3→4, F94 step 2→3
-    - to: EMP-003
-      trigger: Home — on duty
-      provenance: derived — EMP-003 declares entryState.params incidentId and EMP-060 holds none of them,
-        so the edge carries nothing and EMP-003 opens cold
   notes: '**Added 20 August from the client design board.** P06 had no table or stock operations at all
     — **twenty screens of floor work with nothing behind them** — and every operation these need already
     existed. **Named in the board contents and not written up in it.**'
@@ -14081,17 +14243,10 @@ screens:
     entryFrom:
     - EMP-003
     - EMP-060
-    exitTo:
-    - EMP-003
     inferred: false
     notes: '**Returns to EMP-003.** Stated on 4 September: this screen declared where it is reached from
       and no way to leave, so whoever landed on it was stuck. The return path is the same edge travelled
       the other way, not a guess about the product.'
-    transitions:
-    - to: EMP-003
-      trigger: Home — on duty
-      provenance: derived — EMP-003 declares entryState.params incidentId and EMP-061 holds none of them,
-        so the edge carries nothing and EMP-003 opens cold
   notes: '**Added 20 August from the client design board.** P06 had no table or stock operations at all
     — **twenty screens of floor work with nothing behind them** — and every operation these need already
     existed. **Named in the board contents and not written up in it.**'
@@ -14391,7 +14546,9 @@ screens:
     component: modal
     trigger: Save item availability
     body: '**Collects what `setItemAvailability` sends before it is called.** Required: `isAvailable`,
-      `recordedAt`. Optional: `reason`, `restoreAt`. Dismissing sends nothing; the screen behind is unchanged.'
+      `recordedAt`. Optional: `reason`, `restoreAt`. **`note` is collected too, and required when the
+      reason is Other** — the operation refuses 400 without it (decided 28 September, audit R222). Dismissing
+      sends nothing; the screen behind is unchanged.'
     confirm:
       label: Save item availability
       operation: setItemAvailability
@@ -14402,6 +14559,7 @@ screens:
       - recordedAt
       - reason
       - restoreAt
+      - note
     provenance: contract fnb.yaml PUT /menu-items/{itemId}/availability
   - id: formLogTemperature
     component: modal
@@ -14442,17 +14600,10 @@ screens:
   navigation:
     entryFrom:
     - EMP-003
-    exitTo:
-    - EMP-003
     inferred: false
     notes: '**Returns to EMP-003.** Stated on 4 September: this screen declared where it is reached from
       and no way to leave, so whoever landed on it was stuck. The return path is the same edge travelled
       the other way, not a guess about the product.'
-    transitions:
-    - to: EMP-003
-      trigger: Home — on duty
-      provenance: derived — EMP-003 declares entryState.params incidentId and EMP-063 holds none of them,
-        so the edge carries nothing and EMP-003 opens cold
   notes: '**Added 20 August from the client design board.** P06 had no table or stock operations at all
     — **twenty screens of floor work with nothing behind them** — and every operation these need already
     existed.'
@@ -14617,17 +14768,10 @@ screens:
   navigation:
     entryFrom:
     - EMP-003
-    exitTo:
-    - EMP-003
     inferred: false
     notes: '**Returns to EMP-003.** Stated on 4 September: this screen declared where it is reached from
       and no way to leave, so whoever landed on it was stuck. The return path is the same edge travelled
       the other way, not a guess about the product.'
-    transitions:
-    - to: EMP-003
-      trigger: Home — on duty
-      provenance: derived — EMP-003 declares entryState.params incidentId and EMP-064 holds none of them,
-        so the edge carries nothing and EMP-003 opens cold
   notes: '**Added 20 August from the client design board.** P06 had no table or stock operations at all
     — **twenty screens of floor work with nothing behind them** — and every operation these need already
     existed.'
@@ -14770,17 +14914,11 @@ screens:
   navigation:
     entryFrom:
     - EMP-003
-    exitTo:
-    - EMP-003
     inferred: false
     notes: '**Returns to EMP-003.** Stated on 4 September: this screen declared where it is reached from
       and no way to leave, so whoever landed on it was stuck. The return path is the same edge travelled
       the other way, not a guess about the product.'
     transitions:
-    - to: EMP-003
-      trigger: Home — on duty
-      provenance: derived — EMP-003 declares entryState.params incidentId and EMP-065 holds none of them,
-        so the edge carries nothing and EMP-003 opens cold
     - to: BO-052
       trigger: The rest is received and the transfer closes short
       provenance: flow F35 step 3→4
@@ -14815,6 +14953,9 @@ screens:
         label: Reject received goods
         operation: rejectReceivedGoods
         provenance: contract inventory.yaml POST /goods-receipts/{receiptId}/reject
+        notes: Rejects by receipt line (`lineId`, the batch and expiry received), not by item (audit R171);
+          when the reason is Other a note is required, and the operation refuses 400 without it (decided
+          28 September, audit R222).
       - kind: secondaryButton
         label: Log cold chain
         operation: logColdChain
@@ -14966,17 +15107,11 @@ screens:
   navigation:
     entryFrom:
     - EMP-003
-    exitTo:
-    - EMP-003
     inferred: false
     notes: '**Returns to EMP-003.** Stated on 4 September: this screen declared where it is reached from
       and no way to leave, so whoever landed on it was stuck. The return path is the same edge travelled
       the other way, not a guess about the product.'
     transitions:
-    - to: EMP-003
-      trigger: Home — on duty
-      provenance: derived — EMP-003 declares entryState.params incidentId and EMP-066 holds none of them,
-        so the edge carries nothing and EMP-003 opens cold
     - to: BO-079
       trigger: The supervisor reviews the variance
       provenance: flow F30 step 3→4, F30 step 6→7
@@ -15017,11 +15152,17 @@ screens:
         - CountVariance.lines
         operation: getCountVariance
         provenance: contract inventory.yaml GET /stock-counts/{countId}/variance
+        notes: '**Shown only after the count is submitted.** While the count is `open` or `counting` the
+          screen shows no expected quantity and no variance, and `getCountVariance` answers 409 whatever
+          the caller''s permission (decided 28 September, audit R110 (a)).'
       - kind: searchField
         label: Search stock count
         provenance: carried from the previous definition
       - kind: cardList
-        notes: '**Cards rather than a table.** One thumb, arm’s length, and a person who is walking.'
+        notes: '**Cards rather than a table.** One thumb, arm’s length, and a person who is walking. **The
+          lines arrive pre-filled from on-hand stock** — one card per item at the location, with a blank
+          count and no expected figure; the counter enters what is on the shelf (audit R110 (a), R171
+          (7)).'
         provenance: carried from the previous definition
       - kind: primaryButton
         label: Confirm
@@ -15070,7 +15211,8 @@ screens:
     trigger: onAction
   - operationId: getCountVariance
     contract: inventory
-    purpose: Variance between counted and expected
+    purpose: Variance between counted and expected, after submission only (409 while open or counting,
+      audit R110 (a))
     trigger: onLoad
   - operationId: enterCountLine
     contract: fnb
@@ -15108,7 +15250,9 @@ screens:
     component: modal
     trigger: Start stock count
     body: '**Collects what `startStockCount` sends before it is called.** Required: `id`, `locationId`,
-      `kind`. Optional: `categoryIds`, `isBlind`. Dismissing sends nothing; the screen behind is unchanged.'
+      `kind`. Optional: `categoryIds`, `isBlind` (defaults true). Starting pre-fills one line per item
+      with stock at the location, expected snapshotted and hidden until submission (audit R110 (a)). Dismissing
+      sends nothing; the screen behind is unchanged.'
     bindsTo: StartStockCountRequest
     confirm:
       label: Start stock count
@@ -15139,8 +15283,10 @@ screens:
     component: modal
     trigger: Enter count line
     body: '**Collects what `enterCountLine` sends before it is called.** Required: `recordedAt`, `itemId`,
-      `countedQuantity`. Optional: `locationId`, `uom`, `batchId`, `note`. Dismissing sends nothing; the
-      screen behind is unchanged.'
+      `countedQuantity`. Optional: `locationId`, `uom`, `batchId`, `note`. `enterCountLine` returns no
+      expected quantity or variance, and the screen shows neither until the count is submitted, then reads
+      `getCountVariance` (decided 28 September, audit R110 (a)). Dismissing sends nothing; the screen
+      behind is unchanged.'
     confirm:
       label: Enter count line
       operation: enterCountLine
@@ -15198,17 +15344,11 @@ screens:
   navigation:
     entryFrom:
     - EMP-003
-    exitTo:
-    - EMP-003
     inferred: false
     notes: '**Returns to EMP-003.** Stated on 4 September: this screen declared where it is reached from
       and no way to leave, so whoever landed on it was stuck. The return path is the same edge travelled
       the other way, not a guess about the product.'
     transitions:
-    - to: EMP-003
-      trigger: Home — on duty
-      provenance: derived — EMP-003 declares entryState.params incidentId and EMP-067 holds none of them,
-        so the edge carries nothing and EMP-003 opens cold
     - to: BO-044
       trigger: The venue manager reviews open and unsigned findings before service
       provenance: flow F28 step 5→6
@@ -15305,7 +15445,7 @@ screens:
     trigger: onAction
   - operationId: createStockMovement
     contract: inventory
-    purpose: Record an issue, return or adjustment
+    purpose: Record an adjustment in or out, or waste; positive quantity, reason required (audit R171)
     trigger: onAction
   - operationId: logTemperature
     contract: fnb
@@ -15345,8 +15485,12 @@ screens:
     component: modal
     trigger: Create stock movement
     body: '**Collects what `createStockMovement` sends before it is called.** Required: `id`, `itemId`,
-      `locationId`, `kind`, `quantity`, `recordedAt`. Optional: `unit`, `reason`, `costCenterId`. Dismissing
-      sends nothing; the screen behind is unchanged.'
+      `locationId`, `kind`, `quantity`, `recordedAt`. Optional: `unit`, `reason`, `costCenterId`. **The
+      kind picker offers `adjustmentIn`, `adjustmentOut` and `waste`** — the kind decides the direction,
+      so the quantity is always entered positive; `countGain` and `countLoss` are shown on movements a
+      count posted but are not offered here. **A reason is mandatory for an adjustment or waste** (400
+      without one) (decided 28 September, audit R171). Dismissing sends nothing; the screen behind is
+      unchanged.'
     bindsTo: CreateStockMovementRequest
     confirm:
       label: Create stock movement
@@ -15417,17 +15561,10 @@ screens:
   navigation:
     entryFrom:
     - EMP-003
-    exitTo:
-    - EMP-003
     inferred: false
     notes: '**Returns to EMP-003.** Stated on 4 September: this screen declared where it is reached from
       and no way to leave, so whoever landed on it was stuck. The return path is the same edge travelled
       the other way, not a guess about the product.'
-    transitions:
-    - to: EMP-003
-      trigger: Home — on duty
-      provenance: derived — EMP-003 declares entryState.params incidentId and EMP-068 holds none of them,
-        so the edge carries nothing and EMP-003 opens cold
   notes: '**Added 20 August from the client design board.** P06 had no table or stock operations at all
     — **twenty screens of floor work with nothing behind them** — and every operation these need already
     existed. **Named in the board contents and not written up in it.** **Drawn 31 August** — `Retail Board
@@ -15554,17 +15691,10 @@ screens:
   navigation:
     entryFrom:
     - EMP-003
-    exitTo:
-    - EMP-003
     inferred: false
     notes: '**Returns to EMP-003.** Stated on 4 September: this screen declared where it is reached from
       and no way to leave, so whoever landed on it was stuck. The return path is the same edge travelled
       the other way, not a guess about the product.'
-    transitions:
-    - to: EMP-003
-      trigger: Home — on duty
-      provenance: derived — EMP-003 declares entryState.params incidentId and EMP-069 holds none of them,
-        so the edge carries nothing and EMP-003 opens cold
   notes: '**Added 20 August from the client design board.** P06 had no table or stock operations at all
     — **twenty screens of floor work with nothing behind them** — and every operation these need already
     existed. **Drawn 31 August** — `Retail Board 4.dc.html` frame `ret-4j`. **Matched on frame title against
@@ -15702,17 +15832,10 @@ screens:
   navigation:
     entryFrom:
     - EMP-003
-    exitTo:
-    - EMP-003
     inferred: false
     notes: '**Returns to EMP-003.** Stated on 4 September: this screen declared where it is reached from
       and no way to leave, so whoever landed on it was stuck. The return path is the same edge travelled
       the other way, not a guess about the product.'
-    transitions:
-    - to: EMP-003
-      trigger: Home — on duty
-      provenance: derived — EMP-003 declares entryState.params incidentId and EMP-070 holds none of them,
-        so the edge carries nothing and EMP-003 opens cold
   notes: '**Added 20 August from the client design board.** P06 had no table or stock operations at all
     — **twenty screens of floor work with nothing behind them** — and every operation these need already
     existed. **Named in the board contents and not written up in it.** **Drawn 31 August** — `Inventory

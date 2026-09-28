@@ -31,7 +31,7 @@
 | asset | [`getMediaAsset`](#getmediaasset) | GET | `/media/{mediaId}` | core | 1 | BO-027, CMS-010, CMS-068, CMS-082, EMP-036, POS-010 |
 | asset | [`replaceMediaAsset`](#replacemediaasset) | POST | `/media/{mediaId}/replace` | core | 2 | BO-027, CMS-010, CMS-076, CMS-095 |
 | asset | [`searchMedia`](#searchmedia) | GET | `/media` | core | 2 | BO-838, CMS-010, CMS-061, CMS-062, CMS-067, CMS-073 |
-| asset | [`updateMediaAsset`](#updatemediaasset) | PATCH | `/media/{mediaId}` | core | 2 | CMS-010, CMS-082 |
+| asset | [`updateMediaAsset`](#updatemediaasset) | PATCH | `/media/{mediaId}` | core | 2 | CMS-010, CMS-075, CMS-082 |
 | card | [`getGameCard`](#getgamecard) | GET | `/game-cards/{cardCode}` | core | 2 | BO-396, BO-454, BO-455, BO-457, BO-462, BO-486 … |
 | card | [`issueGameCard`](#issuegamecard) | POST | `/game-cards` | core | 1 | POS-002 |
 | card | [`transferGameCard`](#transfergamecard) | POST | `/game-cards/{cardCode}/transfer` | core | 1 | POS-002 |
@@ -48,7 +48,7 @@
 | queue | [`listQueues`](#listqueues) | GET | `/queues` | core | 2 | BO-001, BO-002, BO-004, BO-005, BO-038, EMP-031 … |
 | queue | [`updateQueue`](#updatequeue) | PATCH | `/queues/{queueId}` | setup | 1 | BO-001, BO-002, BO-004, BO-005, BO-038 |
 | resources | [`createResource`](#createresource) | POST | `/resources` | setup | 2 | BO-095, BO-857 |
-| resources | [`getResourceAvailability`](#getresourceavailability) | GET | `/resources/{resourceId}/availability` | core | 2 | BO-096, GST-070, WEB-031 |
+| resources | [`getResourceAvailability`](#getresourceavailability) | GET | `/resources/{resourceId}/availability` | core | 2 | BO-096, WEB-031 |
 | resources | [`updateResource`](#updateresource) | PUT | `/resources/{resourceId}` | setup | 2 | BO-857 |
 | rights | [`getExpiringRights`](#getexpiringrights) | GET | `/media/rights-expiring` | core | 2 | CMS-010, CMS-081, CMS-088, CMS-090 |
 | upload | [`completeUpload`](#completeupload) | POST | `/media/uploads/{uploadId}/complete` | core | 2 | CMS-002, CMS-010, CMS-063 |
@@ -68,6 +68,7 @@
 **`DELETE /media/{mediaId}`**: Delete an asset
 
 **Refused while the asset is referenced.** The response names every reference so the holder can be cleared first — deleting the image on a live homepage should not be one keystroke away.
+**Deletion is the only end of an asset's life (decided 28 September, audit STATE-MEDIA).** It removes the row rather than moving the asset to a state; `archived` and `quarantined` are both reversible through `updateMediaAsset`.
 
 |  |  |
 |---|---|
@@ -364,6 +365,7 @@ Filter by kind, tag, collection, venue or usage. `unusedOnly` surfaces assets no
 
 A partial update: only the fields sent change. `collectionIds`, when sent, replaces the asset's collection memberships (`MediaCollectionMember` rows) with exactly that list.
 `status` moves the asset along `states/media.yaml`, and only along the transitions that model gives this operation: `ready` to `archived`, `archived` to `ready`, and `quarantined` to `ready` (the reversal of a scan flag, which the state model marks as requiring approval). **Archiving is refused while the asset is referenced**, for the same reason deletion is: an archived image on a live homepage is a broken image.
+**None of these states is final (decided 28 September, audit STATE-MEDIA).** An archived asset may be restored to `ready`, and a quarantined one released to `ready` after review; the only end of an asset's life is `deleteMediaAsset`.
 
 |  |  |
 |---|---|
@@ -375,7 +377,7 @@ A partial update: only the fields sent change. `collectionIds`, when sent, repla
 | Conflict policy | serverWins |
 | Reads | `assets.media_asset`, `assets.media_usage`, `cache:idempotency` |
 | Writes | `assets.media_asset`, `cache:idempotency` |
-| Called by | CMS-010, CMS-082 |
+| Called by | CMS-010, CMS-075, CMS-082 |
 | State model | Media asset ([states/media.yaml](../../../states/media.yaml)): moves `quarantined` -> `ready`, `ready` -> `archived`, `archived` -> `ready` |
 
 **Parameters**
@@ -489,7 +491,7 @@ The reader path. Offline-capable so a machine can validate a card during a netwo
 
 | Field | Type | Required | Notes |
 |---|---|---|---|
-| cardCode | string | yes |  |
+| cardCode | string | yes | A pre-printed card keeps the code printed on it. |
 | kind | string |  |  |
 | venueId | string (uuid) | yes |  |
 | subjectId | string (uuid) |  | (nullable) |
@@ -551,7 +553,7 @@ Physical cards are pre-printed and activated at sale; digital cards live in the 
 
 | Field | Type | Required | Notes |
 |---|---|---|---|
-| cardCode | string | yes |  |
+| cardCode | string | yes | A pre-printed card keeps the code printed on it. |
 | kind | string |  |  |
 | venueId | string (uuid) | yes |  |
 | subjectId | string (uuid) |  | (nullable) |
@@ -610,7 +612,7 @@ A damaged or lost card. The source moves to status `transferred`, with `transfer
 
 | Field | Type | Required | Notes |
 |---|---|---|---|
-| cardCode | string | yes |  |
+| cardCode | string | yes | A pre-printed card keeps the code printed on it. |
 | kind | string |  |  |
 | venueId | string (uuid) | yes |  |
 | subjectId | string (uuid) |  | (nullable) |
@@ -670,7 +672,7 @@ A damaged or lost card. The source moves to status `transferred`, with `transfer
 | Field | Type | Required | Notes |
 |---|---|---|---|
 | id | string (uuid) | yes |  |
-| name | string | yes |  |
+| name | string | yes | Unique per tenant (decided 28 September, audit R108). |
 | description | string |  | (nullable) |
 | venueId | string (uuid) |  | (nullable) |
 | parentCollectionId | string (uuid) |  | (nullable) |
@@ -682,6 +684,7 @@ A damaged or lost card. The source moves to status `transferred`, with `transfer
 | Code | Shape | Meaning |
 |---|---|---|
 | 201 |  | Created |
+| 409 | DuplicateCode | A business code the request names is already used within its uniqueness scope (the scope the property's x-ticvai-unique names; decided 28 September, audit R108). |
 
 ### listCollections
 
@@ -772,6 +775,7 @@ Position, parties ahead, estimated call time. Polled by the guest app, so it is 
 
 Guest-facing. Returns a position, a party number and a return window.
 **One active entry per guest per queue**, and a configurable cap across queues — a guest holding positions in every queue at once defeats the purpose of a virtual queue for everyone else.
+**The cap is `VenueSettings.queue.crossQueueLimit`**, the number of queues a guest may be waiting in at once in this venue: a venue setting with a tenant default (decided 28 September, audit R094). **Proposed default 2, client to correct (audit R094).** The refusal carries the limit in `crossQueueLimit`.
 Where the party includes someone below the height requirement, the join is refused here rather than at the ride, which is a much better place to find out.
 
 |  |  |
@@ -970,7 +974,7 @@ Enables integration for a venue and selects an adaptor. **TICVAI ships no vendor
 | health | object |  | Whether the feed is currently reporting, computed on read — what listQueueFeeds promises per row. (read-only) |
 | health.feedId | string (uuid) | yes |  |
 | health.adaptor | QueueFeedAdaptor: enum (generic, mock, vendorAdaptor) |  | Vendor adaptors are bespoke work (ADR-0012). |
-| health.isHealthy | boolean | yes |  |
+| health.isHealthy | boolean | yes | Healthy means the last reading arrived within the feed's expected interval (decided 28 September, audit R106 (1)): lastReadingAt is no older than expectedIntervalSeconds. |
 | health.isQuiet | boolean | yes | No reading within the expected interval. |
 | health.lastReadingAt | string (date-time) |  | (nullable) |
 | health.expectedIntervalSeconds | integer |  | The feed's expectedIntervalSeconds — the interval isQuiet is judged against, returned here so a health panel does not need the feed row as well. |
@@ -991,7 +995,7 @@ Enables integration for a venue and selects an adaptor. **TICVAI ships no vendor
 | health | object |  | Whether the feed is currently reporting, computed on read — what listQueueFeeds promises per row. (read-only) |
 | health.feedId | string (uuid) | yes |  |
 | health.adaptor | QueueFeedAdaptor: enum (generic, mock, vendorAdaptor) |  | Vendor adaptors are bespoke work (ADR-0012). |
-| health.isHealthy | boolean | yes |  |
+| health.isHealthy | boolean | yes | Healthy means the last reading arrived within the feed's expected interval (decided 28 September, audit R106 (1)): lastReadingAt is no older than expectedIntervalSeconds. |
 | health.isQuiet | boolean | yes | No reading within the expected interval. |
 | health.lastReadingAt | string (date-time) |  | (nullable) |
 | health.expectedIntervalSeconds | integer |  | The feed's expectedIntervalSeconds — the interval isQuiet is judged against, returned here so a health panel does not need the feed row as well. |
@@ -1012,6 +1016,7 @@ Enables integration for a venue and selects an adaptor. **TICVAI ships no vendor
 **`GET /queue-feeds/{feedId}/health`**: Feed health
 
 Last reading, expected interval, and whether the feed has gone quiet. A silent feed falls back to throughput-derived estimates and the wait time is marked accordingly — it does not simply freeze at the last value.
+**A feed is healthy when its last reading is within its expected interval** (decided 28 September, audit R106 (1)).
 
 |  |  |
 |---|---|
@@ -1038,7 +1043,7 @@ Last reading, expected interval, and whether the feed has gone quiet. A silent f
 |---|---|---|---|
 | feedId | string (uuid) | yes |  |
 | adaptor | QueueFeedAdaptor: enum (generic, mock, vendorAdaptor) |  | Vendor adaptors are bespoke work (ADR-0012). |
-| isHealthy | boolean | yes |  |
+| isHealthy | boolean | yes | Healthy means the last reading arrived within the feed's expected interval (decided 28 September, audit R106 (1)): lastReadingAt is no older than expectedIntervalSeconds. |
 | isQuiet | boolean | yes | No reading within the expected interval. |
 | lastReadingAt | string (date-time) |  | (nullable) |
 | expectedIntervalSeconds | integer |  | The feed's expectedIntervalSeconds — the interval isQuiet is judged against, returned here so a health panel does not need the feed row as well. |
@@ -1221,7 +1226,7 @@ Bound to an attraction and, where one exists, to an asset — so a ride taken ou
 | feed | QueueFeedHealth |  |  |
 | feed.feedId | string (uuid) | yes |  |
 | feed.adaptor | QueueFeedAdaptor: enum (generic, mock, vendorAdaptor) |  | Vendor adaptors are bespoke work (ADR-0012). |
-| feed.isHealthy | boolean | yes |  |
+| feed.isHealthy | boolean | yes | Healthy means the last reading arrived within the feed's expected interval (decided 28 September, audit R106 (1)): lastReadingAt is no older than expectedIntervalSeconds. |
 | feed.isQuiet | boolean | yes | No reading within the expected interval. |
 | feed.lastReadingAt | string (date-time) |  | (nullable) |
 | feed.expectedIntervalSeconds | integer |  | The feed's expectedIntervalSeconds — the interval isQuiet is judged against, returned here so a health panel does not need the feed row as well. |
@@ -1411,7 +1416,7 @@ Guest-facing when called with a guest token — returns only queues that are ope
 | Reads | `cache:idempotency`, `platform.scope`, `resources.resource` |
 | Writes | `cache:idempotency`, `resources.resource` |
 | Called by | BO-095, BO-857 |
-| State model | Resource ([states/resource.yaml](../../../states/resource.yaml)): created as `available`; moves `available` -> `maintenance`, `maintenance` -> `available`, `maintenance` -> `retired`, `available` -> `retired` **(not settled: see the Gaps sheet)** |
+| State model | Resource ([states/resource.yaml](../../../states/resource.yaml)): created as `available`; moves `available` -> `maintenance`, `maintenance` -> `retired`, `available` -> `retired` **(not settled: see the Gaps sheet)** |
 
 **Parameters**
 
@@ -1490,7 +1495,7 @@ Includes maintenance windows and blackouts. **A resource under repair is unavail
 | Guest callable | True |
 | Reads | `maintenance.work_order`, `resources.booking`, `resources.resource` |
 | Writes | - |
-| Called by | BO-096, GST-070, WEB-031 |
+| Called by | BO-096, WEB-031 |
 
 **Parameters**
 
@@ -1602,6 +1607,7 @@ Includes maintenance windows and blackouts. **A resource under repair is unavail
 **`GET /media/rights-expiring`**: Assets whose licence is expiring or expired
 
 A stock photograph licensed for one season and still on a website two years later is a legal problem. Expired assets in active use sort first.
+**"In use" means referenced by live content** (decided 28 September, audit R106 (10)): an asset counts as in use only while a published page, block, menu or other content that is live references it. A reference from a draft, an archived item or a collection does not count, so an expired asset only a draft uses sorts with the unused ones.
 
 |  |  |
 |---|---|
@@ -1934,7 +1940,7 @@ A venue may have several — **a park map and a floor plan per building are diff
 | points[].id | string (uuid) | yes | (read-only) |
 | points[].mapId | string (uuid) | yes | From the path of the operation that writes the point. (read-only) |
 | points[].kind | enum (ride, attraction, show, restaurant, cafe, shop, kiosk, toilet, …) | yes | A closed set, and emergencyExit is separate from exit on purpose. |
-| points[].name | string | yes |  |
+| points[].name | string | yes | Unique per venue (decided 28 September, audit R108). |
 | points[].nameLocalised | object |  | (nullable) |
 | points[].position | object | yes | Drawing coordinates. |
 | points[].position.x | number | yes |  |
@@ -2120,6 +2126,7 @@ Carries every lesson CF-122 taught on the seat importer, because it is the same 
 Publishing creates a version. **The previous version stays readable** so a guest mid-route finishes on the version they started with.
 **What publishing stores.** The working draft's points and paths are copied into a new `VenueMapVersion` snapshot, `publishedVersion` moves to it and `graphVersion` is bumped. The draft stays as the working copy for the next round of edits. Earlier snapshots are kept, which is what `getVenueMap?version=` reads.
 Refuses a draft with unresolved proposals or a point linked to something that no longer exists — **a restaurant point pointing at a closed outlet is worse than no point**, because a guest walks there.
+**Refuses a draft whose graph is disconnected** (decided 28 September, audit R106 (8)). Where `validateVenueMapGraph` finds more than one component, or a public point with no path to it, the publish is refused with a `disconnectedArea` blocker per unreachable point. A venue made of two sites is two maps.
 
 |  |  |
 |---|---|
@@ -2179,7 +2186,7 @@ Refuses a draft with unresolved proposals or a point linked to something that no
 | Code | Shape | Meaning |
 |---|---|---|
 | 200 |  | Published |
-| 409 |  | Unresolved proposals, or a broken link. |
+| 409 |  | Unresolved proposals, a broken link, or a disconnected area (audit R106 (8)). |
 
 ### setVenuePoint
 
@@ -2217,7 +2224,7 @@ Unlinked points are fine and expected — a toilet is a toilet.
 | id | string (uuid) | yes | (read-only) |
 | mapId | string (uuid) | yes | From the path of the operation that writes the point. (read-only) |
 | kind | enum (ride, attraction, show, restaurant, cafe, shop, kiosk, toilet, …) | yes | A closed set, and emergencyExit is separate from exit on purpose. |
-| name | string | yes |  |
+| name | string | yes | Unique per venue (decided 28 September, audit R108). |
 | nameLocalised | object |  | (nullable) |
 | position | object | yes | Drawing coordinates. |
 | position.x | number | yes |  |
@@ -2240,7 +2247,7 @@ Unlinked points are fine and expected — a toilet is a toilet.
 | id | string (uuid) | yes | (read-only) |
 | mapId | string (uuid) | yes | From the path of the operation that writes the point. (read-only) |
 | kind | enum (ride, attraction, show, restaurant, cafe, shop, kiosk, toilet, …) | yes | A closed set, and emergencyExit is separate from exit on purpose. |
-| name | string | yes |  |
+| name | string | yes | Unique per venue (decided 28 September, audit R108). |
 | nameLocalised | object |  | (nullable) |
 | position | object | yes | Drawing coordinates. |
 | position.x | number | yes |  |
@@ -2260,6 +2267,7 @@ Unlinked points are fine and expected — a toilet is a toilet.
 | Code | Shape | Meaning |
 |---|---|---|
 | 200 |  | Placed |
+| 409 | DuplicateCode | A business code the request names is already used within its uniqueness scope (the scope the property's x-ticvai-unique names; decided 28 September, audit R108). |
 
 
 ## Group: waitTime
@@ -2282,7 +2290,7 @@ A guest who waits forty minutes for a fifteen-minute estimate deserves a system 
 | Read routing | replica |
 | Reads | `queue.entry`, `queue.queue`, `queue.reading` |
 | Writes | - |
-| Called by | BO-001, BO-002, BO-004, BO-005, BO-038, EMP-031, EMP-032, GST-003, GST-004, GST-021, GST-022, GST-023, GST-038, GST-046, GST-051, GST-053, GST-054, GST-059, WEB-002, WEB-004, WEB-015, WEB-039, WEB-040 |
+| Called by | BO-001, BO-002, BO-004, BO-005, BO-038, EMP-031, EMP-032, GST-003, GST-004, GST-021, GST-022, GST-023, GST-038, GST-046, WEB-002, WEB-004, WEB-015, WEB-039, WEB-040 |
 
 **Parameters**
 
@@ -2335,7 +2343,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 | Column | Type | Required | Notes |
 |---|---|---|---|
 | id | uuid | yes |  |
-| name | text | yes |  |
+| name | text | yes | Unique per tenant (decided 28 September, audit R108). |
 | description | text | no |  |
 | venue_id | uuid | no |  |
 | parent_collection_id | uuid | no |  |
@@ -2375,7 +2383,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 
 | Column | Type | Required | Notes |
 |---|---|---|---|
-| card_code | text | yes |  |
+| card_code | text | yes | A pre-printed card keeps the code printed on it. |
 | kind | text | no |  |
 | venue_id | uuid | yes |  |
 | subject_id | uuid | no |  |
@@ -2406,7 +2414,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 | escalated_at | timestamptz | no |  |
 | escalation_level | integer | no | Escalation is a clock, not a decision. |
 | id | text | yes |  |
-| work_order_number | text | yes |  |
+| work_order_number | text | yes | Server-assigned: the venue prefix plus a sequence per venue (decided 28 September, audit R152). |
 | title | text | yes |  |
 | venue_id | uuid | yes |  |
 | asset_id | uuid | no |  |
@@ -2646,7 +2654,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 | id | uuid | yes |  |
 | map_id | uuid | yes | From the path of the operation that writes the point. |
 | kind | text | yes | A closed set, and emergencyExit is separate from exit on purpose. |
-| name | text | yes |  |
+| name | text | yes | Unique per venue (decided 28 September, audit R108). |
 | name_localised | jsonb | no |  |
 | position | jsonb | yes | Drawing coordinates. |
 | outlet_id | uuid | no | For a restaurant, cafe, shop or kiosk. |
@@ -2679,7 +2687,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 | prize | `createPrize`, `listPrizes`, `redeemPrize` |
 | queue | `setQueueStatus` |
 | rental | `assessRentalDamage`, `assignRentalEquipment`, `checkOutRental`, `createRentalAgreement`, `createRentalBlackout`, `createRentalBooking`, `createRentalCategory`, `createRentalPricingProfile`, `createRentalProduct`, `explainRentalPrice`, `extendRental`, `getRentalAgreement`, `getRentalAvailability`, `getRentalBooking`, `getRentalProduct`, `importRentalCatalogue`, `listOverdueRentals`, `listRentalAgreements`, `listRentalBookings`, `listRentalCategories`, `listRentalPricingProfiles`, `listRentalProducts`, `publishRentalProduct`, `quoteRentalPrice`, `recordRentalInspection`, `reportRentalIncident`, `requestRentalCommercialOverride`, `returnRental`, `setRentalAgreementRequirements`, `setRentalAvailabilityRules`, `setRentalDepositPolicy`, `setRentalDurationRules`, `setRentalFeePolicy`, `setRentalInventoryModel`, `setRentalOperationalRules`, `setRentalProductLocations`, `signRentalAgreement`, `simulateRentalPricing`, `swapRentalEquipment`, `updateRentalBooking`, `updateRentalPricingProfile`, `updateRentalProduct`, `validateRentalProduct` |
-| resources | `allocateResources`, `bookResource`, `cancelResourceBooking`, `checkInResource`, `checkOutResource`, `cloneResource`, `createResourceAttribute`, `createResourceBlock`, `createResourceCategory`, `createResourcePackage`, `createResourceType`, `getExperienceResourceRequirements`, `getResource`, `getResourceAllocationPolicy`, `getResourceAuditTrail`, `getResourceCalendar`, `getResourceDependencies`, `getResourceHierarchy`, `getResourceQualifications`, `getResourceSchedule`, `getResourceUtilisation`, `getSessionManifest`, `listResourceAttributes`, `listResourceBlocks`, `listResourceBookings`, `listResourceCategories`, `listResourcePackages`, `listResourceTypes`, `listResources`, `releaseResourceBlock`, `reorderSessionManifest`, `replaceResourceAllocation`, `setExperienceResourceRequirements`, `setResourceAllocationPolicy`, `setResourceDependencies`, `setResourceHierarchy`, `setResourceLifecycleState`, `setResourceQualifications`, `setResourceSchedule`, `setResourceSelectionPolicy`, `setResourceVenueAssignment`, `suggestResources`, `updateResourceBooking`, `updateResourceCategory`, `updateResourcePackage`, `updateResourceType` |
+| resources | `allocateResources`, `bookResource`, `cancelResourceBooking`, `checkInResource`, `checkOutResource`, `cloneResource`, `createResourceAttribute`, `createResourceBlock`, `createResourceCategory`, `createResourcePackage`, `createResourceType`, `getExperienceResourceRequirements`, `getPerformanceManifest`, `getResource`, `getResourceAllocationPolicy`, `getResourceAuditTrail`, `getResourceCalendar`, `getResourceDependencies`, `getResourceHierarchy`, `getResourceQualifications`, `getResourceSchedule`, `getResourceUtilisation`, `listResourceAttributes`, `listResourceBlocks`, `listResourceBookings`, `listResourceCategories`, `listResourcePackages`, `listResourceTypes`, `listResources`, `releaseResourceBlock`, `reorderPerformanceManifest`, `replaceResourceAllocation`, `setExperienceResourceRequirements`, `setResourceAllocationPolicy`, `setResourceDependencies`, `setResourceHierarchy`, `setResourceLifecycleState`, `setResourceQualifications`, `setResourceSchedule`, `setResourceSelectionPolicy`, `setResourceVenueAssignment`, `suggestResources`, `updateResourceBooking`, `updateResourceCategory`, `updateResourcePackage`, `updateResourceType` |
 | signage | `getSignageQueueBoard`, `getSignageQueueCalls` |
 | venueMap | `acceptVenueLabelProposals`, `acceptWalkwayProposals`, `getVenueMapImportJob`, `getVenueMapLive`, `listVenueMaps`, `setPathClosure`, `validateVenueMapGraph` |
 | waitTime | `setWaitTime` |

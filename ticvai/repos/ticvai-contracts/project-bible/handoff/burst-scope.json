@@ -6,9 +6,9 @@
   "services": 17,
   "deployed": 3,
   "operations": 34,
-  "ofTotalOperations": 2135,
+  "ofTotalOperations": 2147,
   "tables": 45,
-  "ofTotalTables": 678
+  "ofTotalTables": 683
  },
  "routing": {
   "note": "**Normal traffic and sale traffic are separate systems running concurrently.** The burst environment carries the on-sale and nothing else; everything a venue does that day continues in the shared cell. **They meet once, afterwards, at reconciliation.**",
@@ -17,8 +17,8 @@
     "name": "normal",
     "target": "shared cell",
     "services": 17,
-    "operations": 2101,
-    "tables": 678,
+    "operations": 2113,
+    "tables": 683,
     "exampleLoad": "stadium, routine Saturday: 60,000 guests x 14 requests = 48.5 RPS",
     "description": "**Everything except the sale.** Admission, food, retail, stock, staff back-office, reporting. Runs whether or not a sale is happening."
    },
@@ -266,7 +266,7 @@
   {
    "table": "access.entitlement",
    "schema": "access",
-   "columns": 24,
+   "columns": 26,
    "burstOperations": 4,
    "written": true,
    "contention": null,
@@ -340,7 +340,7 @@
   {
    "table": "orders.order_line",
    "schema": "orders",
-   "columns": 18,
+   "columns": 21,
    "burstOperations": 3,
    "written": true,
    "contention": null,
@@ -461,7 +461,7 @@
   {
    "table": "orders.cart",
    "schema": "orders",
-   "columns": 17,
+   "columns": 18,
    "burstOperations": 2,
    "written": true,
    "contention": null,
@@ -527,7 +527,7 @@
   {
    "table": "access.scan_event",
    "schema": "access",
-   "columns": 15,
+   "columns": 16,
    "burstOperations": 1,
    "written": false,
    "contention": null,
@@ -555,7 +555,7 @@
    "contention": null,
    "contended": false,
    "contentionIndeterminate": false,
-   "note": "One request per action needing authorisation. The subject is a reference, never a copy **Hangs off**: **a root** — nothing above it in its schema; references `identity.principal`. **Reached by**: 7 operations read it and"
+   "note": "One request per action needing authorisation. The subject is a reference, never a copy **Hangs off**: **a root** — nothing above it in its schema; references `identity.principal`. **Reached by**: 8 operations read it and"
   },
   {
    "table": "catalogue.price_list",
@@ -593,7 +593,7 @@
   {
    "table": "ledger.fx_rate",
    "schema": "ledger",
-   "columns": 12,
+   "columns": 13,
    "burstOperations": 1,
    "written": false,
    "contention": null,

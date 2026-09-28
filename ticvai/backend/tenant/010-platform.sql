@@ -12,8 +12,8 @@ CREATE TABLE IF NOT EXISTS platform.audit_read (
 
 -- Written by the platform on every write, not by any one operation (ADR-0022 sits above this).
 -- Naming it on 431 lineage rows would say nothing Hangs off: reaches platform.scope through its
--- keys; references identity.principal, platform.scope, platform.workstation. Reached by: 1
--- operations read it and 2 write it; written by 2 contracts — inventory, tenancy.
+-- keys; references identity.platform_staff_grant, identity.principal, platform.scope. Reached by:
+-- 1 operations read it and 2 write it; written by 2 contracts — inventory, tenancy.
 CREATE TABLE IF NOT EXISTS platform.audit_record (
     id                                uuid PRIMARY KEY NOT NULL,
     principal_id                      uuid,
@@ -21,7 +21,8 @@ CREATE TABLE IF NOT EXISTS platform.audit_record (
     workstation_id                    uuid,
     action                            text NOT NULL,
     subject_ref                       text,
-    occurred_at                       timestamptz NOT NULL
+    occurred_at                       timestamptz NOT NULL,
+    platform_staff_grant_id           text
 );
 
 -- Holds 11 columns. No description has been written for this table — the name is the only thing
@@ -250,6 +251,7 @@ CREATE TABLE IF NOT EXISTS platform.region_settings (
     date_format                       text DEFAULT 'dd/MM/yyyy',
     number_format                     text DEFAULT '#,##0.00',
     fiscal_year_start_month           integer NOT NULL,
+    allowed_ai_residencies            text[],
     placement                         jsonb,
     cell_name                         text,
     id                                uuid PRIMARY KEY NOT NULL,
@@ -306,7 +308,7 @@ CREATE TABLE IF NOT EXISTS platform.tenant (
 );
 
 -- read through composed tenancy operations Hangs off: reaches platform.scope through its keys;
--- references platform.scope. Reached by: 4 operations read it and 1 write it.
+-- references platform.scope. Reached by: 6 operations read it and 2 write it.
 CREATE TABLE IF NOT EXISTS platform.venue_settings (
     id                                uuid PRIMARY KEY,
     venue_id                          uuid,
@@ -317,6 +319,24 @@ CREATE TABLE IF NOT EXISTS platform.venue_settings (
     biometrics                        jsonb,
     segregated_access                 jsonb,
     alerting                          jsonb,
+    display_currencies                text[],
+    cart_lease_seconds                integer DEFAULT 900,
+    cart_hold_extension_minutes       integer DEFAULT 5,
+    cart_max_extensions               integer DEFAULT 1,
+    resale_cutoff_hours               integer DEFAULT 24,
+    exchange_cutoff_hours             integer DEFAULT 24,
+    reschedule_cutoff_hours           integer DEFAULT 24,
+    reservation_max_extensions        integer DEFAULT 1,
+    shift_variance_threshold          numeric(18,4),
+    catalogue                         jsonb,
+    inventory                         jsonb,
+    seating                           jsonb,
+    promotions                        jsonb,
+    fnb                               jsonb,
+    queue                             jsonb,
+    reporting                         jsonb,
+    marketing                         jsonb,
+    identity                          jsonb,
     org_unit_id                       uuid NOT NULL
 );
 

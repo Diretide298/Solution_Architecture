@@ -140,7 +140,7 @@
     },
     {
      "key": "TURNSTILE_MODE_SET",
-     "label": "entry, re-entry, crossover, exit, free, closed",
+     "label": "the podium: operating mode, and free rotation or closed within it (R221)",
      "group": "Access control",
      "operationCount": 1,
      "operations": [
@@ -249,18 +249,6 @@
    "unguardedOperations": 0,
    "capabilities": [
     {
-     "key": "AI_APPROVE",
-     "label": null,
-     "group": "Operations",
-     "operationCount": 2,
-     "operations": [
-      "decideProposedAction",
-      "listProposedActions"
-     ],
-     "elevated": false,
-     "segregationConstrained": false
-    },
-    {
      "key": "AI_AUDIT_VIEW",
      "label": "the AI activity and decision log only",
      "group": "Operations",
@@ -276,7 +264,7 @@
      "key": "AI_CONFIGURE",
      "label": null,
      "group": "Operations",
-     "operationCount": 16,
+     "operationCount": 15,
      "operations": [
       "createKnowledgeCollection",
       "getAiPolicy",
@@ -292,14 +280,14 @@
      "key": "AI_USE",
      "label": null,
      "group": "Operations",
-     "operationCount": 7,
+     "operationCount": 9,
      "operations": [
       "createAiConversation",
+      "decideProposedAction",
       "generateConfiguration",
       "listAiConversations",
-      "recordSuggestionOutcome",
-      "requestSuggestion",
-      "semanticSearch"
+      "listProposedActions",
+      "recordSuggestionOutcome"
      ],
      "elevated": false,
      "segregationConstrained": false
@@ -311,6 +299,17 @@
      "operationCount": 1,
      "operations": [
       "generateVenueLayout"
+     ],
+     "elevated": false,
+     "segregationConstrained": false
+    },
+    {
+     "key": "PLATFORM_TENANT_MANAGE",
+     "label": null,
+     "group": "Control Plane",
+     "operationCount": 1,
+     "operations": [
+      "setAiProvider"
      ],
      "elevated": false,
      "segregationConstrained": false
@@ -391,7 +390,7 @@
      "key": "APPROVAL_REQUEST",
      "label": null,
      "group": "Operations",
-     "operationCount": 13,
+     "operationCount": 14,
      "operations": [
       "approveMatrixMultiLevel",
       "approveRoleAuthorityDelegation",
@@ -509,7 +508,7 @@
      "group": "Catalogue",
      "operationCount": 12,
      "operations": [
-      "assignSessionMedia",
+      "assignPerformanceMedia",
       "cloneEvent",
       "createEvent",
       "getEventResourcePlan",
@@ -551,12 +550,12 @@
      "operations": [
       "cancelPerformance",
       "createPerformances",
-      "listSessionTemplates",
+      "listPerformanceTemplates",
       "rescheduleEvent",
       "setEventSchedule",
-      "setSessionTemplate"
+      "setPerformanceTemplate"
      ],
-     "elevated": false,
+     "elevated": true,
      "segregationConstrained": false
     },
     {
@@ -870,7 +869,7 @@
      "key": "ORDER_MODIFY",
      "label": null,
      "group": "Selling",
-     "operationCount": 32,
+     "operationCount": 33,
      "operations": [
       "acceptFnbOrder",
       "amendFnbOrder",
@@ -918,14 +917,14 @@
      "key": "PRODUCT_VIEW",
      "label": null,
      "group": "Catalogue",
-     "operationCount": 17,
+     "operationCount": 18,
      "operations": [
+      "getAllergenVerification",
       "getFnbDeliveryPolicy",
       "getFnbReservationPolicy",
       "getFnbServiceChargePolicy",
       "getMenu",
-      "getProductionRun",
-      "list86Events"
+      "getProductionRun"
      ],
      "elevated": false,
      "segregationConstrained": false
@@ -1064,9 +1063,20 @@
   },
   "identity": {
    "title": "19 — Guest Mobile App & Branding (auth) + cross-cutting staff auth",
-   "capabilityCount": 10,
-   "unguardedOperations": 24,
+   "capabilityCount": 12,
+   "unguardedOperations": 25,
    "capabilities": [
+    {
+     "key": "AUDIT_VIEW",
+     "label": "the platform audit log: who did what, where and when",
+     "group": "Operations",
+     "operationCount": 1,
+     "operations": [
+      "listPlatformStaffGrants"
+     ],
+     "elevated": false,
+     "segregationConstrained": false
+    },
     {
      "key": "GUEST_MANAGE",
      "label": "amend, merge, configure consent purposes",
@@ -1148,6 +1158,18 @@
      "segregationConstrained": false
     },
     {
+     "key": "PLATFORM_TENANT_ACCESS",
+     "label": "open a time-boxed platform-staff grant into one tenant",
+     "group": "Control Plane",
+     "operationCount": 2,
+     "operations": [
+      "listOwnPlatformStaffGrants",
+      "openPlatformStaffGrant"
+     ],
+     "elevated": true,
+     "segregationConstrained": false
+    },
+    {
      "key": "ROLE_MANAGE",
      "label": "create roles and attach grants",
      "group": "Session and identity",
@@ -1178,8 +1200,9 @@
      "key": "TENANT_CONFIGURE",
      "label": "edit branding, content, navigation, modules",
      "group": "Tenant experience",
-     "operationCount": 1,
+     "operationCount": 2,
      "operations": [
+      "getPasswordPolicy",
       "setPasswordPolicy"
      ],
      "elevated": false,
@@ -1205,16 +1228,18 @@
   },
   "inventory": {
    "title": "15 — Inventory Management",
-   "capabilityCount": 8,
+   "capabilityCount": 10,
    "unguardedOperations": 0,
    "capabilities": [
     {
      "key": "APPROVAL_ACT",
      "label": "approve, reject, return, request info",
      "group": "Operations",
-     "operationCount": 1,
+     "operationCount": 3,
      "operations": [
-      "approveRequisition"
+      "approveRequisition",
+      "rejectRequisition",
+      "returnRequisition"
      ],
      "elevated": false,
      "segregationConstrained": false
@@ -1223,13 +1248,10 @@
      "key": "LEDGER_APPROVE",
      "label": "journal voucher approval",
      "group": "Finance",
-     "operationCount": 5,
+     "operationCount": 2,
      "operations": [
-      "closePurchaseOrderShort",
       "closeTransferShort",
-      "recountStockCount",
-      "rejectRequisition",
-      "returnRequisition"
+      "recountStockCount"
      ],
      "elevated": true,
      "segregationConstrained": false
@@ -1257,24 +1279,58 @@
      "segregationConstrained": false
     },
     {
-     "key": "ORDER_CANCEL",
-     "label": null,
-     "group": "Selling",
-     "operationCount": 1,
+     "key": "PROCUREMENT_MANAGE",
+     "label": "suppliers, quotations; raise, send, cancel and short-close a PO",
+     "group": "Procurement",
+     "operationCount": 8,
      "operations": [
-      "cancelPurchaseOrder"
+      "acknowledgePurchaseOrder",
+      "cancelPurchaseOrder",
+      "closePurchaseOrderShort",
+      "createPurchaseOrder",
+      "createSupplier",
+      "recordQuotation"
      ],
      "elevated": false,
      "segregationConstrained": false
     },
     {
-     "key": "ORDER_CREATE",
-     "label": null,
-     "group": "Selling",
+     "key": "PROCUREMENT_RECEIVE",
+     "label": "record and reject received goods",
+     "group": "Procurement",
      "operationCount": 2,
      "operations": [
-      "createPurchaseOrder",
-      "createRequisition"
+      "createGoodsReceipt",
+      "rejectReceivedGoods"
+     ],
+     "elevated": false,
+     "segregationConstrained": false
+    },
+    {
+     "key": "PROCUREMENT_REQUEST",
+     "label": "raise, amend and cancel a requisition",
+     "group": "Procurement",
+     "operationCount": 3,
+     "operations": [
+      "cancelRequisition",
+      "createRequisition",
+      "updateRequisitionLines"
+     ],
+     "elevated": false,
+     "segregationConstrained": false
+    },
+    {
+     "key": "PROCUREMENT_VIEW",
+     "label": "requisitions, suppliers, quotations, purchase orders, receipts",
+     "group": "Procurement",
+     "operationCount": 7,
+     "operations": [
+      "compareQuotations",
+      "getPurchaseOrder",
+      "getSuggestedRequisitions",
+      "listGoodsReceipts",
+      "listPurchaseOrders",
+      "listRequisitions"
      ],
      "elevated": false,
      "segregationConstrained": false
@@ -1283,14 +1339,14 @@
      "key": "PRODUCT_CONFIGURE",
      "label": null,
      "group": "Catalogue",
-     "operationCount": 20,
+     "operationCount": 11,
      "operations": [
-      "acknowledgePurchaseOrder",
       "bulkUpdateProducts",
-      "cancelRequisition",
       "cancelStockCount",
-      "createGoodsReceipt",
-      "createInventoryItem"
+      "createInventoryItem",
+      "createStockLocation",
+      "createStockMovement",
+      "createStockTransfer"
      ],
      "elevated": false,
      "segregationConstrained": false
@@ -1299,14 +1355,14 @@
      "key": "PRODUCT_VIEW",
      "label": null,
      "group": "Catalogue",
-     "operationCount": 20,
+     "operationCount": 13,
      "operations": [
-      "compareQuotations",
       "getCountVariance",
       "getInventoryItem",
-      "getPurchaseOrder",
       "getStockPositions",
-      "getStockTransfer"
+      "getStockTransfer",
+      "listExpiringBatches",
+      "listInventoryItems"
      ],
      "elevated": false,
      "segregationConstrained": false
@@ -1654,7 +1710,7 @@
   "orders": {
    "title": "2 — Ticketing Sales",
    "capabilityCount": 20,
-   "unguardedOperations": 17,
+   "unguardedOperations": 18,
    "capabilities": [
     {
      "key": "CREDIT_MANAGE",
@@ -2502,7 +2558,7 @@
       "cancelResourceBooking",
       "checkInResource",
       "checkOutResource",
-      "reorderSessionManifest"
+      "reorderPerformanceManifest"
      ],
      "elevated": false,
      "segregationConstrained": false
@@ -2546,11 +2602,11 @@
      "operationCount": 20,
      "operations": [
       "getExperienceResourceRequirements",
+      "getPerformanceManifest",
       "getResource",
       "getResourceAllocationPolicy",
       "getResourceAuditTrail",
-      "getResourceAvailability",
-      "getResourceCalendar"
+      "getResourceAvailability"
      ],
      "elevated": false,
      "segregationConstrained": false
@@ -2688,7 +2744,7 @@
      "key": "CAPACITY_CONFIGURE",
      "label": "envelopes and allocation",
      "group": "Catalogue",
-     "operationCount": 30,
+     "operationCount": 31,
      "operations": [
       "cloneSeatMap",
       "commitImportJob",
@@ -2805,7 +2861,7 @@
      "operations": [
       "acceptShiftVariance"
      ],
-     "elevated": false,
+     "elevated": true,
      "segregationConstrained": false
     },
     {
@@ -2890,7 +2946,7 @@
      "operations": [
       "reopenShift"
      ],
-     "elevated": false,
+     "elevated": true,
      "segregationConstrained": false
     },
     {
@@ -3088,7 +3144,7 @@
   },
   "tenancy": {
    "title": "Cross-cutting — organisation hierarchy",
-   "capabilityCount": 10,
+   "capabilityCount": 11,
    "unguardedOperations": 1,
    "capabilities": [
     {
@@ -3201,14 +3257,28 @@
      "key": "TENANT_CONFIGURE",
      "label": "edit branding, content, navigation, modules",
      "group": "Tenant experience",
-     "operationCount": 11,
+     "operationCount": 9,
      "operations": [
       "deployConfigurationProfile",
       "getConfigurationProfile",
+      "listConfigurationProfiles",
+      "listProfileDeployments",
+      "setConfigurationProfile",
+      "setConnectivityThresholds"
+     ],
+     "elevated": false,
+     "segregationConstrained": false
+    },
+    {
+     "key": "TENANT_VIEW",
+     "label": "read venue settings and policies without being able to change them",
+     "group": "Tenant experience",
+     "operationCount": 4,
+     "operations": [
       "getConnectivityPolicy",
       "getOfflinePolicy",
       "getVenueSettings",
-      "listConfigurationProfiles"
+      "getVenueSettingsDefaults"
      ],
      "elevated": false,
      "segregationConstrained": false
@@ -3433,7 +3503,7 @@
  },
  "unlabelled": {
   "note": "Permission keys used by a contract with no description in contracts/shared/permissions.yaml. **A checklist item nobody can read gets ticked anyway**, so these are the blocker for shipping the grant screen -- not the contract, which is done. One line each, written next to the key in permissions.yaml.",
-  "count": 70,
+  "count": 69,
   "keys": {
    "ACCESS_POINT_CONFIGURE": [
     "addBlacklistEntry",
@@ -3447,10 +3517,6 @@
     "listAccreditationAccessActivity",
     "listAccreditationApplications"
    ],
-   "AI_APPROVE": [
-    "decideProposedAction",
-    "listProposedActions"
-   ],
    "AI_CONFIGURE": [
     "createKnowledgeCollection",
     "getAiPolicy",
@@ -3459,9 +3525,9 @@
    ],
    "AI_USE": [
     "createAiConversation",
+    "decideProposedAction",
     "generateConfiguration",
-    "listAiConversations",
-    "recordSuggestionOutcome"
+    "listAiConversations"
    ],
    "ANNOUNCEMENT_PUBLISH": [
     "broadcastToGuests",
@@ -3540,7 +3606,7 @@
     "listDeviceAuditRecords"
    ],
    "EVENT_CONFIGURE": [
-    "assignSessionMedia",
+    "assignPerformanceMedia",
     "cloneEvent",
     "createEvent",
     "getEventResourcePlan"
@@ -3579,7 +3645,6 @@
     "rejectWorkOrder"
    ],
    "ORDER_CANCEL": [
-    "cancelPurchaseOrder",
     "cancelReservation"
    ],
    "ORDER_CREATE": [
@@ -3638,7 +3703,7 @@
    "PERFORMANCE_CONFIGURE": [
     "cancelPerformance",
     "createPerformances",
-    "listSessionTemplates",
+    "listPerformanceTemplates",
     "rescheduleEvent"
    ],
    "PLATFORM_BILLING_MANAGE": [
@@ -3707,16 +3772,16 @@
     "getCouponCodeBatch"
    ],
    "PRODUCT_CONFIGURE": [
-    "acknowledgePurchaseOrder",
     "applyMenuActions",
     "approvePricingWorkflowAuthority",
-    "approveReviewDecision"
+    "approveReviewDecision",
+    "approveWorkflow"
    ],
    "PRODUCT_VIEW": [
     "checkBookingEligibility",
-    "compareQuotations",
     "diffSeatMapVersions",
-    "explainRecommendation"
+    "explainRecommendation",
+    "getAllergenVerification"
    ],
    "QUEUE_VIEW": [
     "getQueue",
@@ -3752,9 +3817,9 @@
    ],
    "RESOURCE_VIEW": [
     "getExperienceResourceRequirements",
+    "getPerformanceManifest",
     "getResource",
-    "getResourceAllocationPolicy",
-    "getResourceAuditTrail"
+    "getResourceAllocationPolicy"
    ],
    "SETTLEMENT_RECONCILE": [
     "ingestSettlementFile",

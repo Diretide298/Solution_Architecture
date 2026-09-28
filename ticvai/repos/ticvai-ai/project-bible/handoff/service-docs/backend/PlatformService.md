@@ -7,7 +7,7 @@
 | Tier | platform: Provisioning, publishing, reporting, and the one cross-region path. |
 | Contracts | `subscription`, `platform-ops`, `public-api` |
 | Schemas owned | `control`, `subscription` |
-| Operations in the slice | 9 of 184 |
+| Operations in the slice | 10 of 184 |
 | Scale | Low volume, high consequence. Tenant provisioning and licensing. |
 | If it is down | Down blocks provisioning and the developer API. Trading is unaffected. |
 
@@ -30,6 +30,7 @@ Nothing outside itself.
 | plan | [`createPlanVersion`](#createplanversion) | POST | `/plans/{planId}` | setup | 2 | ADM-008, ADM-019, ADM-398 |
 | subscription | [`setSubscription`](#setsubscription) | PUT | `/tenants/{tenantId}/subscription` | setup | 2 | ADM-008, ADM-011, ADM-410, ADM-417, ADM-463, SGN-019 … |
 | tenant | [`createTenant`](#createtenant) | POST | `/tenants` | setup | 2 | ADM-005, ADM-419 |
+| tenant | [`listTenants`](#listtenants) | GET | `/tenants` | core | 2 | ADM-002, ADM-005, ADM-006, ADM-007, ADM-008, ADM-009 … |
 | tenant | [`reactivateTenant`](#reactivatetenant) | POST | `/tenants/{tenantId}/reactivate` | setup | 2 | ADM-005 |
 | tenant | [`suspendTenant`](#suspendtenant) | POST | `/tenants/{tenantId}/suspend` | setup | 2 | ADM-005 |
 | tenant | [`terminateTenant`](#terminatetenant) | POST | `/tenants/{tenantId}/terminate` | setup | 2 | ADM-005 |
@@ -293,6 +294,9 @@ Existing subscribers remain on their version until migrated deliberately. A pric
 
 Upgrades take effect immediately. **Downgrades are checked first**: if the target plan licenses fewer modules than the tenant currently has enabled, or lower limits than they are currently using, the change is refused and the conflicts are named.
 Silently switching off a module a venue is trading on is not an acceptable consequence of a billing change.
+**When a change takes effect, and what is prorated** (decided 28 September, audit R214 (1)). **An upgrade takes effect immediately and is always prorated**: the tenant pays the difference for the rest of the current term. **A downgrade takes effect at the next renewal** (`renewsAt`), is not prorated, and until then is held on `Subscription.scheduledChange`. `effectiveFrom` is therefore set by the server, today for an upgrade and `renewsAt` for a downgrade; a request that sends any other date is refused with 422 `effective-date-not-allowed`.
+**A tenant's first plan starts `active`**, not in `trial`, with `startsAt` today and `renewsAt` one term (`billingPeriod`) after it (decided 28 September, audit R214 (2)). A trial is a separate, explicit choice.
+**A cancelled subscription is reactivated here, on the same record, only within its paid period** (decided 28 September, audit STATE-SUBSCRIPTION). After the period ends it is `expired` and this call refuses with 409 `subscription-expired`; the tenant needs a new subscription.
 
 |  |  |
 |---|---|
@@ -320,8 +324,8 @@ Silently switching off a module a venue is trading on is not an acceptable conse
 |---|---|---|---|
 | planId | string (uuid) | yes |  |
 | planVersion | string |  | Defaults to the current version. |
-| effectiveFrom | string (date) |  |  |
-| prorate | boolean |  | (default True) |
+| effectiveFrom | string (date) |  | Optional, and set by the server if omitted. |
+| prorate | boolean |  | An upgrade is always prorated and a downgrade, which starts at renewal, never is (audit R214 (1)). (default True) |
 | note | string |  | (max length 500) |
 
 **Response**: `Subscription`
@@ -336,6 +340,10 @@ Silently switching off a module a venue is trading on is not an acceptable conse
 | startsAt | string (date) | yes |  |
 | renewsAt | string (date) |  | (nullable) |
 | cancelledAt | string (date) |  | (nullable) |
+| scheduledChange | object |  | A downgrade waiting for the next renewal (decided 28 September, audit R214 (1)). (read-only; nullable) |
+| scheduledChange.planId | string (uuid) |  |  |
+| scheduledChange.planVersion | string |  |  |
+| scheduledChange.effectiveFrom | string (date) |  | Always the renewsAt it was scheduled against. |
 | currentPrice | Money |  | On the wire this is three fields; in the database it is one column. |
 | currentPrice.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
 | currentPrice.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
@@ -348,6 +356,7 @@ Silently switching off a module a venue is trading on is not an acceptable conse
 |---|---|---|
 | 200 |  | Applied |
 | 409 |  | Downgrade conflicts with current usage. |
+| 422 |  | effectiveFrom was sent and is not the date the change must take effect: today for an upgrade, the next renewal for a downgrade (effective-date-not-allowed, audit R214 (1)). |
 
 
 ## Group: tenant
@@ -408,6 +417,7 @@ Creates the record only. **No cell exists until a region is provisioned** — a 
 | planName | string |  | (nullable) |
 | cellCount | integer |  |  |
 | venueCount | integer |  |  |
+| regionId | string (uuid) |  | The tenant's home region: the tenancy region node whose RegionSettings govern tenant-wide gates, today allowedAiResidencies (decided 28 September, audit R203). (read-only; nullable) |
 | billingEmail | string |  |  |
 | billingAddress | string |  | Accepted by createTenant and updateTenant; stored here so the response can return what was sent. (max length 500; nullable) |
 | accountManagerPrincipalId | string (uuid) |  | (nullable) |
@@ -420,6 +430,69 @@ Creates the record only. **No cell exists until a region is provisioned** — a 
 |---|---|---|
 | 201 |  | Created. |
 | 409 |  | Code already in use |
+
+### listTenants
+
+**`GET /tenants`**: List tenants
+
+|  |  |
+|---|---|
+| Permission | `PLATFORM_TENANT_VIEW` |
+| Scope level | tenant |
+| Part of slice | core |
+| Wave | 2 |
+| Offline | no |
+| Conflict policy | serverWins |
+| Read routing | replica |
+| Reads | `control.tenant` |
+| Writes | - |
+| Called by | ADM-002, ADM-005, ADM-006, ADM-007, ADM-008, ADM-009, ADM-010, ADM-011, ADM-012, ADM-015, ADM-016, ADM-017, ADM-018, ADM-019, ADM-031, ADM-037, ADM-369, ADM-370, ADM-374, ADM-412, ADM-421, BO-594 |
+
+**Parameters**
+
+| Name | In | Required | Type | Notes |
+|---|---|---|---|---|
+| status | query |  | TenantStatus: enum (onboarding, active, suspended, terminating, terminated) |  |
+| planId | query |  | string (uuid) |  |
+| pageSize | query |  | integer |  |
+| cursor | query |  | string | Opaque cursor: the nextCursor of the previous page. |
+
+**Response**: `object`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| items | array of Tenant | yes |  |
+| items[].id | string (uuid) | yes |  |
+| items[].code | string | yes |  |
+| items[].name | string | yes |  |
+| items[].status | TenantStatus: enum (onboarding, active, suspended, terminating, terminated) | yes |  |
+| items[].suspensionMode | SuspensionMode: enum (readOnly, noNewSales, fullLockout) |  | Access validation continues under every mode. |
+| items[].suspensionReason | string |  | (nullable) |
+| items[].suspensionEffectiveAt | string (date-time) |  | When the suspension takes, or took, effect — suspendTenant.effectiveAt. (nullable) |
+| items[].suspensionNoticeMessage | LocalisedText |  | The notice shown to the tenant's users about the suspension — suspendTenant.noticeMessage. |
+| items[].terminationScheduledAt | string (date-time) |  | When terminateTenant started the retention window. (nullable) |
+| items[].terminationRetentionUntil | string (date-time) |  | terminationScheduledAt plus the request's retentionDays. (nullable) |
+| items[].terminationReason | string |  | (max length 1000; nullable) |
+| items[].terminationRequestedByPrincipalId | string (uuid) |  | (nullable) |
+| items[].planId | string (uuid) |  | (nullable) |
+| items[].planName | string |  | (nullable) |
+| items[].cellCount | integer |  |  |
+| items[].venueCount | integer |  |  |
+| items[].regionId | string (uuid) |  | The tenant's home region: the tenancy region node whose RegionSettings govern tenant-wide gates, today allowedAiResidencies (decided 28 September, audit R203). (read-only; nullable) |
+| items[].billingEmail | string |  |  |
+| items[].billingAddress | string |  | Accepted by createTenant and updateTenant; stored here so the response can return what was sent. (max length 500; nullable) |
+| items[].accountManagerPrincipalId | string (uuid) |  | (nullable) |
+| items[].createdAt | string (date-time) | yes |  |
+| items[].activatedAt | string (date-time) |  | (nullable) |
+| nextCursor | string |  |  |
+| hasMore | boolean | yes |  |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 200 |  | Tenants |
+| 403 | Forbidden | Authenticated but not permitted at the requested scope |
 
 ### reactivateTenant
 
@@ -465,6 +538,7 @@ Creates the record only. **No cell exists until a region is provisioned** — a 
 | planName | string |  | (nullable) |
 | cellCount | integer |  |  |
 | venueCount | integer |  |  |
+| regionId | string (uuid) |  | The tenant's home region: the tenancy region node whose RegionSettings govern tenant-wide gates, today allowedAiResidencies (decided 28 September, audit R203). (read-only; nullable) |
 | billingEmail | string |  |  |
 | billingAddress | string |  | Accepted by createTenant and updateTenant; stored here so the response can return what was sent. (max length 500; nullable) |
 | accountManagerPrincipalId | string (uuid) |  | (nullable) |
@@ -534,6 +608,7 @@ Graceful and reversible. Data is retained, cells stay provisioned, and the behav
 | planName | string |  | (nullable) |
 | cellCount | integer |  |  |
 | venueCount | integer |  |  |
+| regionId | string (uuid) |  | The tenant's home region: the tenancy region node whose RegionSettings govern tenant-wide gates, today allowedAiResidencies (decided 28 September, audit R203). (read-only; nullable) |
 | billingEmail | string |  |  |
 | billingAddress | string |  | Accepted by createTenant and updateTenant; stored here so the response can return what was sent. (max length 500; nullable) |
 | accountManagerPrincipalId | string (uuid) |  | (nullable) |
@@ -604,6 +679,8 @@ A tenant with unsettled ledger balances cannot be terminated — the money has t
 
 **`PATCH /tenants/{tenantId}`**: Amend tenant details
 
+**A suspended tenant may be amended; a terminated one may not** (decided 28 September, audit R214 (3)). Suspension is reversible and the details may need correcting to lift it; termination is not, and its record stays as it was when it ended.
+
 |  |  |
 |---|---|
 | Permission | `PLATFORM_TENANT_MANAGE` |
@@ -653,6 +730,7 @@ A tenant with unsettled ledger balances cannot be terminated — the money has t
 | planName | string |  | (nullable) |
 | cellCount | integer |  |  |
 | venueCount | integer |  |  |
+| regionId | string (uuid) |  | The tenant's home region: the tenancy region node whose RegionSettings govern tenant-wide gates, today allowedAiResidencies (decided 28 September, audit R203). (read-only; nullable) |
 | billingEmail | string |  |  |
 | billingAddress | string |  | Accepted by createTenant and updateTenant; stored here so the response can return what was sent. (max length 500; nullable) |
 | accountManagerPrincipalId | string (uuid) |  | (nullable) |
@@ -664,6 +742,7 @@ A tenant with unsettled ledger balances cannot be terminated — the money has t
 | Code | Shape | Meaning |
 |---|---|---|
 | 200 |  | Updated |
+| 409 |  | The tenant is terminated (tenant-terminated, audit R214 (3)). |
 
 ## Tables
 
@@ -712,6 +791,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 | plan_name | text | no |  |
 | cell_count | integer | no |  |
 | venue_count | integer | no |  |
+| region_id | uuid | no | The tenant's home region: the tenancy region node whose RegionSettings govern tenant-wide gates, today allowedAiResidencies (decided 28 September, audit R203). |
 | billing_email | text | no |  |
 | billing_address | text | no | Accepted by createTenant and updateTenant; stored here so the response can return what was sent. |
 | account_manager_principal_id | uuid | no |  |
@@ -731,6 +811,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 | starts_at | date | yes |  |
 | renews_at | date | no |  |
 | cancelled_at | date | no |  |
+| scheduled_change | jsonb | no | A downgrade waiting for the next renewal (decided 28 September, audit R214 (1)). |
 | current_price | numeric(18,4) | no |  |
 | billing_period | text | no |  |
 | id | uuid | yes | Synthesised key. |
@@ -774,7 +855,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 
 ## Not in the first release
 
-175 operations, added to this service in later releases without changing any of the above.
+174 operations, added to this service in later releases without changing any of the above.
 
 | Group | Operations |
 |---|---|
@@ -794,4 +875,4 @@ Every table this service owns that the slice reads or writes, with its columns a
 | release | `createRelease`, `getRelease`, `getReleaseReadiness`, `listReleases`, `promoteRelease`, `rejectRelease`, `withdrawRelease` |
 | rollout | `getRollout`, `listRollouts`, `pauseRollout`, `rollbackRollout`, `startRollout` |
 | subscription | `addCapacityPack`, `cancelSubscription`, `createPartnerAgreement`, `createPartnerUser`, `decommissionBurstEnvironment`, `drainBurstEnvironment`, `exportPartnerInvoice`, `getBillingReconciliation`, `getCommissionStatement`, `getGoLiveReadiness`, `getLicenceEnforcement`, `getPlanTiers`, `getSubscription`, `getVsiModel`, `listBurstEnvironments`, `listChannelListings`, `listLicensingModels`, `listModuleCatalogue`, `listPartnerAgreements`, `listPartnerUsers`, `listVenueTypeTemplates`, `previewSubscriptionChange`, `reconcileBurstEnvironment`, `registerPartner`, `requestBurstEnvironment`, `runGoLiveValidation`, `scoreVsiAssessment`, `setChannelListing`, `setLicenceEnforcementPolicy`, `setLicensingModel`, `setModuleListing`, `setPlanTiers`, `setTrialConfiguration`, `setVsiModel`, `settleAiUsage`, `simulateCommercialPackage`, `submitOnboardingApplication`, `updatePartnerAgreement` |
-| tenant | `getTenant`, `listTenants` |
+| tenant | `getTenant` |

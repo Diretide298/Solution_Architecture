@@ -46,6 +46,18 @@ properties:
            technician, storekeeper, marketer, agent, partner, platformAdmin, system]
   capability: { type: string }
   wave: { type: integer, minimum: 1, maximum: 4 }
+  deferred:
+    type: object
+    required: [release, decided, decision, reason]
+    description: >
+      **A journey kept in the package but taken out of the first release** by a client decision,
+      with `wave: 4`. Added 28 September 2026 for audit R187 (F49, the itinerary planner). Its
+      screens carry the same block (screens/_schema.yaml).
+    properties:
+      release: { type: string, enum: [later] }
+      decided: { type: string }
+      decision: { type: string }
+      reason: { type: string }
   frequency:
     type: string
     enum: [constant, hourly, daily, weekly, monthly, rare]

@@ -11,16 +11,17 @@
  "note": "Derived by tools/derive-platform.py. **The gaps section is the point** \u2014 a page listing what exists is a directory; one listing what is missing is a worklist.",
  "counts": {
   "screens": 46,
-  "operations": 166,
+  "operations": 155,
   "contracts": 18,
   "modules": 13,
   "undrawn": 0,
-  "operationsWithNoScreen": 15
+  "operationsWithNoScreen": 18
  },
  "waves": {
   "wave1": 21,
-  "wave2": 21,
-  "wave3": 4
+  "wave2": 20,
+  "wave3": 4,
+  "wave4": 1
  },
  "modules": [
   {
@@ -29,7 +30,8 @@
    "waves": [
     1,
     2,
-    3
+    3,
+    4
    ]
   },
   {
@@ -125,15 +127,11 @@
  "contracts": [
   {
    "contract": "orders",
-   "operations": 33
+   "operations": 34
   },
   {
    "contract": "marketing-crm",
-   "operations": 32
-  },
-  {
-   "contract": "identity",
-   "operations": 24
+   "operations": 30
   },
   {
    "contract": "catalogue",
@@ -141,11 +139,15 @@
   },
   {
    "contract": "fnb",
-   "operations": 14
+   "operations": 15
+  },
+  {
+   "contract": "identity",
+   "operations": 15
   },
   {
    "contract": "access",
-   "operations": 10
+   "operations": 9
   },
   {
    "contract": "promotions",
@@ -156,15 +158,11 @@
    "operations": 5
   },
   {
-   "contract": "retail",
+   "contract": "wallet",
    "operations": 4
   },
   {
    "contract": "white-label",
-   "operations": 4
-  },
-  {
-   "contract": "wallet",
    "operations": 4
   },
   {
@@ -176,12 +174,20 @@
    "operations": 3
   },
   {
-   "contract": "venue-map",
-   "operations": 2
+   "contract": "retail",
+   "operations": 3
   },
   {
    "contract": "payments",
    "operations": 2
+  },
+  {
+   "contract": "venue-map",
+   "operations": 2
+  },
+  {
+   "contract": "resources",
+   "operations": 1
   },
   {
    "contract": "finance",
@@ -189,10 +195,6 @@
   },
   {
    "contract": "games",
-   "operations": 1
-  },
-  {
-   "contract": "resources",
    "operations": 1
   }
  ],
@@ -203,7 +205,7 @@
    "module": "Discovery & Browse",
    "wave": 1,
    "route": "/discovery-and-browse/home-landing",
-   "operations": 3,
+   "operations": 4,
    "drawn": true
   },
   {
@@ -244,7 +246,7 @@
   },
   {
    "id": "WEB-006",
-   "name": "Date & Session Selection",
+   "name": "Date & Performance Selection",
    "module": "Booking & Selection",
    "wave": 1,
    "route": "/booking-and-selection/date-and-session-selection",
@@ -284,7 +286,7 @@
    "module": "Cart & Checkout",
    "wave": 1,
    "route": "/cart-and-checkout/shopping-cart",
-   "operations": 10,
+   "operations": 11,
    "drawn": true
   },
   {
@@ -302,7 +304,7 @@
    "module": "Cart & Checkout",
    "wave": 1,
    "route": "/cart-and-checkout/checkout-payment",
-   "operations": 7,
+   "operations": 5,
    "drawn": true
   },
   {
@@ -338,7 +340,7 @@
    "module": "Account & Self-Service",
    "wave": 1,
    "route": "/account-and-self-service/login-register",
-   "operations": 20,
+   "operations": 11,
    "drawn": true
   },
   {
@@ -491,7 +493,7 @@
    "module": "Retail",
    "wave": 2,
    "route": "/shop",
-   "operations": 4,
+   "operations": 5,
    "drawn": true
   },
   {
@@ -518,7 +520,7 @@
    "module": "In-venue Services",
    "wave": 2,
    "route": "/fandb--browse-and-order",
-   "operations": 12,
+   "operations": 13,
    "drawn": true
   },
   {
@@ -563,7 +565,7 @@
    "module": "In-venue Services",
    "wave": 2,
    "route": "/parking--reserve-and-pay",
-   "operations": 3,
+   "operations": 5,
    "drawn": true
   },
   {
@@ -572,7 +574,7 @@
    "module": "Retail",
    "wave": 2,
    "route": "/retail-and-shop-and-drop",
-   "operations": 4,
+   "operations": 6,
    "drawn": true
   },
   {
@@ -606,7 +608,7 @@
    "id": "WEB-046",
    "name": "In-Venue Notifications",
    "module": "Engagement & Support",
-   "wave": 2,
+   "wave": 4,
    "route": "/in-venue-notifications",
    "operations": 1,
    "drawn": true
@@ -614,6 +616,12 @@
  ],
  "gaps": {
   "operationsWithNoScreen": [
+   {
+    "operation": "createParkingEntitlement",
+    "contract": "access",
+    "verb": "POST",
+    "summary": "A guest bought parking"
+   },
    {
     "operation": "getPlanBenefits",
     "contract": "catalogue",
@@ -637,6 +645,18 @@
     "contract": "identity",
     "verb": "GET",
     "summary": "Memberships a customer holds"
+   },
+   {
+    "operation": "checkGuestCheckoutMatch",
+    "contract": "marketing-crm",
+    "verb": "POST",
+    "summary": "Does this contact already have a profile here"
+   },
+   {
+    "operation": "decideGuestCheckoutMatch",
+    "contract": "marketing-crm",
+    "verb": "POST",
+    "summary": "Use the existing profile or keep this booking separate"
    },
    {
     "operation": "getForm",
@@ -719,7 +739,8 @@
     "waves": [
      1,
      2,
-     3
+     3,
+     4
     ]
    },
    {

@@ -18,33 +18,35 @@ offlineBehaviour: '**Reading health needs the network by definition** — a work
   reports nothing, and that absence is itself the signal.'
 steps:
 - step: 1
-  screen: BO-036
-  action: Device Registry.
-  operations:
-  - mergeGuestProfiles
-  - registerDevice
-  - searchGuests
-  - updateGuestProfile
-  outcome: '**Drawn by the client as POS-1A.**'
-- step: 2
-  screen: BO-124
-  action: Layout & Journey Builder.
-  operations:
-  - createSaleBoard
-  - deployConfigurationProfile
-  - listAuditRecords
-  - listDevices
-  outcome: '**Drawn by the client as POS-1B.**'
-  crossesDevice: true
-- step: 3
-  screen: BO-125
-  action: Product & Category Button Configuration.
+  screen: BO-128
+  action: The fleet is watched.
   operations:
   - getWorkstationHealth
+  - listWorkstations
+  outcome: '**A workstation that stops reporting is itself the signal.**'
+- step: 2
+  screen: BO-036
+  action: The failing till is found, with its alerts.
+  operations:
+  - getWorkstation
   - listAlerts
-  - listProducts
-  - recordDeviceHeartbeat
-  outcome: '**Drawn by the client as POS-1C.**'
+  outcome: Which device, where, and what it last said.
+  crossesDevice: true
+- step: 3
+  screen: BO-070
+  action: A work order is raised to fix it.
+  operations:
+  - createWorkOrder
+  - completeWorkOrder
+  outcome: '**Fixed, and known to be fixed.** A printer swapped without a work order is a repair nobody
+    can count.'
+  crossesDevice: true
+- step: 4
+  screen: BO-036
+  action: The till is confirmed healthy again.
+  operations:
+  - getWorkstationHealth
+  outcome: Reporting again, and the alert clears.
   crossesDevice: true
 branches:
 - at: 1
@@ -58,7 +60,7 @@ exitStates:
   description: The chain ran as the client drew it.
 - state: stoppedAtModule
   description: '**A licence boundary, not a failure.**'
-notes: '**POS board 1 from the fleet view inward.** F79 walks registering and deploying; this walks
+notes: '**Re-authored 28 September to follow the purpose of each screen it visits** (decided 28 September, audit R261): the journey started at Device Registry but walked guest-merge operations; it now watches the fleet, finds the device, fixes it through a maintenance work order and confirms it. **POS board 1 from the fleet view inward.** F79 walks registering and deploying; this walks
   the failure. **A till that will not print cannot take money**, which is the sentence the client put
   on the board. **Derived from the client''s declared `GOES TO` edges.**'
 openQuestions: null

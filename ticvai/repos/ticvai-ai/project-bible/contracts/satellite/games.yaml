@@ -413,6 +413,13 @@ paths:
         of it is a machine earning nothing. Plays replay on reconnect and are deduplicated on the play
         ID; a play against an exhausted balance is reported for reconciliation rather than silently accepted.
 
+        **Too few credits: refused online, accepted from an offline device** (decided 28 September, audit
+        R106 (3)). A play posted live (`playedOffline` false) against a balance that cannot cover it is
+        refused `409` (insufficient credits) and the machine does not start. A play recorded while the
+        reader was offline (`playedOffline` true, or replayed through `syncGamePlays`) already happened:
+        it is accepted, the balance is taken to zero, and the shortfall is reported as a divergence for
+        reconciliation.
+
         **One key, not two.** The body `id` is the play ID and must equal the `Idempotency-Key` header.
         A replay with the same key returns the stored original response. A body `id` that differs from
         the header, or a key reused with a different body, is refused with the shared 409 `Conflict`
@@ -447,7 +454,8 @@ paths:
               schema:
                 $ref: '#/components/schemas/PlayResult'
         '409':
-          description: 'Insufficient credits, card blocked, or the game is out of service.
+          description: 'Insufficient credits on a live play (never on an offline one, audit R106 (3)), card
+            blocked, or the game is out of service.
 
             '
           content:
@@ -2629,6 +2637,13 @@ components:
       properties:
         cardCode:
           type: string
+          description: '**A pre-printed card keeps the code printed on it. A generated code** (a digital
+            card, or a card issued with no printed code) **is the venue prefix plus a sequence per
+            venue** (decided 28 September, audit R152). Each till holds a reserved range of that
+            sequence, so a card issued offline takes its code at once. Not gapless; only tax invoices
+            are gapless, per legal entity.
+
+            '
         kind:
           type: string
         venueId:
@@ -2763,6 +2778,15 @@ components:
         sequence:
           type: integer
           description: Monotonic per reader. Preserves order across an offline batch.
+        playedOffline:
+          type: boolean
+          default: false
+          description: '**True where the reader recorded the play while offline** and is replaying it. Such
+            a play is accepted even against too few credits and reported for reconciliation; a live play
+            (false) is refused instead (decided 28 September, audit R106 (3)). Every play in a `syncGamePlays`
+            batch is treated as offline.
+
+            '
         recordedAt:
           type: string
           format: date-time

@@ -3,7 +3,13 @@ id: F49
 name: A guest plans a day and follows it
 actor: guest
 capability: Itinerary planning
-wave: 3
+wave: 4
+deferred:
+  release: later
+  decided: '2026-09-28'
+  decision: R187
+  reason: The itinerary planner is deferred to a later release and its five screens leave Block A,
+    since no itinerary schema, operation, table or on-device store exists to build them against.
 frequency: Routine.
 criticality: revenue
 primaryContract: ai
@@ -45,9 +51,11 @@ steps:
   screen: GST-054
   action: An optimised order is proposed.
   operations:
-  - requestSuggestion
-  outcome: '**`kind=scenario` through the one suggestion operation** — not a bespoke endpoint, which
-    is the whole point of the abstraction.'
+  - listProducts
+  - getWaitTimes
+  outcome: '**No AI suggestion for an itinerary** (decided 28 September, audit R209): the planner is deferred
+    (R187) and `requestSuggestion` has no guest itinerary kind; `scenario` is staff-only. The later release
+    decides how an order is proposed.'
   crossesDevice: true
 - step: 5
   screen: GST-059
@@ -64,9 +72,12 @@ exitStates:
 branches:
 - at: 4
   condition: There is not enough history to optimise.
-  behaviour: '**Refused with a reason** — `requestSuggestion` returns 422 naming what is missing. A
-    confident itinerary built on nothing teaches a guest not to trust the next one.'
+  behaviour: '**Refused with a reason**, naming what is missing. A confident itinerary built on nothing
+    teaches a guest not to trust the next one. (The mechanism is the later release''s to choose; not
+    `requestSuggestion`, audit R209.)'
   severity: medium
-  resolvedBy: requestSuggestion
-notes: '**Written 24 August.** Five screens, and `GST-054` is the first guest-facing use of `requestSuggestion`.'
+  resolvedBy: Later release
+notes: '**Written 24 August.** Five screens. **Deferred to a later release on 28 September** (audit R187):
+  all five screens (GST-051 to GST-054, GST-059) carry a `deferred` block, and neither this flow nor
+  its screens count toward Block A. `GST-054` no longer calls `requestSuggestion` (audit R209).'
 openQuestions: null

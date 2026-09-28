@@ -2,7 +2,7 @@ openapi: 3.1.0
 info:
   title: TICVAI Inventory & Procurement
   version: 0.1.0
-  x-ticvai-screen-count: 49
+  x-ticvai-screen-count: 50
   x-ticvai-tier: satellite
   x-ticvai-module: 15 — Inventory Management
   x-ticvai-requirements: 98
@@ -93,8 +93,7 @@ paths:
         '
       tags:
       - inventory
-      x-ticvai-permission: PRODUCT_CONFIGURE
-      x-ticvai-permission-escalated: PRODUCT_CONFIGURE
+      x-ticvai-permission: PROCUREMENT_MANAGE
       x-ticvai-audience:
       - staff
       x-ticvai-scope-level: tenant
@@ -180,6 +179,9 @@ paths:
         asks one question — *what is missing* — and two calls to answer it is two chances to answer it
         differently.
 
+        **Readable from both ends** (decided 28 September, audit R183): a caller at the source venue or at
+        the destination venue may read it.
+
         '
       tags:
       - inventory
@@ -221,10 +223,14 @@ paths:
         **Refused once approved.** An approved requisition edited afterwards is an approval for something
         nobody approved.
 
+        **"Approved" means `approved` and every later status: `approved`, `ordered` and `closed`** (decided
+        28 September, audit R171). Lines are editable in `draft`, `pendingApproval` and `returnedForInfo`.
+        `rejected` and `cancelled` are not edited either: a rejected requisition is copied into a new draft.
+
         '
       tags:
       - inventory
-      x-ticvai-permission: PRODUCT_CONFIGURE
+      x-ticvai-permission: PROCUREMENT_REQUEST
       x-ticvai-audience:
       - staff
       x-ticvai-scope-level: venue
@@ -277,8 +283,9 @@ paths:
               schema:
                 $ref: '#/components/schemas/Requisition'
         '409':
-          description: '**Already approved.** The correct act is a new requisition, which the response
-            names.
+          description: '**Already approved**: the requisition is `approved`, `ordered` or `closed` (audit
+            R171), or it is `rejected` or `cancelled`. The correct act is a new requisition, which the
+            response names.
 
             '
           content:
@@ -389,7 +396,6 @@ paths:
       tags:
       - inventory
       x-ticvai-permission: PRODUCT_CONFIGURE
-      x-ticvai-permission-escalated: PRODUCT_CONFIGURE
       x-ticvai-audience:
       - staff
       x-ticvai-scope-level: venue
@@ -713,6 +719,8 @@ paths:
                 categoryId:
                   type: string
                   format: uuid
+                  nullable: true
+                  description: Null clears the category (decided 28 September, audit R171).
                 reorderPoint:
                   type: number
                   minimum: 0
@@ -725,6 +733,8 @@ paths:
                 preferredSupplierId:
                   type: string
                   format: uuid
+                  nullable: true
+                  description: Null clears the preferred supplier (decided 28 September, audit R171).
                 isActive:
                   type: boolean
                 costingMethod:
@@ -1055,6 +1065,12 @@ paths:
         Adjustments require a reason and are surfaced separately in reporting. Frequent adjustments on
         one item is the signal shrinkage produces.
 
+        **Adjustments and waste need a reason, and the kind decides the direction** (decided 28 September,
+        audit R171). `quantity` is always positive. `receipt`, `transferIn`, `adjustmentIn`, `countGain`
+        and `production` add stock; `issue`, `saleDepletion`, `waste`, `adjustmentOut`, `transferOut`,
+        `countLoss` and `supplierReturn` remove it. `adjustmentIn`, `adjustmentOut` and `waste` without a
+        `reason` are a `400`.
+
         '
       tags:
       - movement
@@ -1081,7 +1097,16 @@ paths:
               schema:
                 $ref: '#/components/schemas/StockMovement'
         '400':
-          $ref: ../shared/common.yaml#/components/responses/BadRequest
+          description: 'Validation failed, including an `adjustmentIn`, `adjustmentOut` or `waste` movement
+            with no `reason` (audit R171).
+
+            '
+          x-ticvai-problem-types:
+          - validation
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
         '409':
           description: Insufficient stock, and the item does not permit negative balances
           content:
@@ -1140,6 +1165,12 @@ paths:
       description: '**Blind by default.** The expected figure is not returned to the counting device —
         a counter who can see it will reconcile to the number rather than to the shelf.
 
+        **Lines are pre-filled from on-hand stock** (decided 28 September, audit R171): starting a count
+        creates one line for every item with stock at the location (restricted to `categoryIds` for a cycle
+        count), with its expected quantity snapshotted then. **In a blind count the expected quantity and
+        the variance are hidden from every caller until the count is submitted** (decided 28 September,
+        audit R110): no response returns them while the count is `open` or `counting`.
+
         Full or cycle. A cycle count targets a category or location on rotation, which is how a large
         store stays accurate without closing.
 
@@ -1163,7 +1194,8 @@ paths:
           headers:
             X-Consistency-Token:
               $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
-          description: Started. Expected quantities are withheld when blind
+          description: Started, with lines pre-filled from on-hand stock. Expected quantities are withheld
+            when blind (audit R110, R171)
           content:
             application/json:
               schema:
@@ -1184,6 +1216,8 @@ paths:
         pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
     post:
       operationId: submitCountLines
+      x-ticvai-consumed-by:
+        - "P08 BO-079 Stock Count"
       x-ticvai-audience:
       - staff
       summary: Submit counted quantities
@@ -1191,7 +1225,11 @@ paths:
         on return.
 
         Recounting an item replaces the prior figure for that count and is recorded — a line counted three
-        times is itself a finding.
+        times is itself a finding. **A recount replaces the earlier count line as the figure that posts**
+        (decided 28 September, audit R171); the earlier figure is kept beside it as history.
+
+        **Returns no expected quantity and no variance.** In a blind count both stay hidden until the count
+        is submitted (decided 28 September, audit R110).
 
         '
       tags:
@@ -1272,6 +1310,14 @@ paths:
       summary: Variance between counted and expected
       description: 'Revealed only after counting closes. Lines beyond the configured tolerance are flagged
         for review rather than posted silently.
+
+        **Hidden until the count is submitted** (decided 28 September, audit R110): while the count is
+        `open` or `counting` this is a `409`, whatever the caller''s permission.
+
+        **The tolerance is `VenueSettings.inventory.countVarianceTolerancePercent`**, a venue setting with a
+        tenant default (decided 28 September, audit R094): a line whose variance exceeds that percentage
+        of its expected quantity is an exception. **Proposed default 2 per cent, client to correct (audit
+        R094).**
 
         '
       tags:
@@ -1370,10 +1416,17 @@ paths:
       description: 'The alternative to accepting a variance. A large discrepancy is more often a miscount
         than a loss, and recounting is cheaper than investigating.
 
+        **A supervisor''s step-up on the same device, not an approval request** (decided 28 September,
+        audit R144). The body carries `supervisorStepUp`; the rule is `SupervisorStepUp` in
+        `common.yaml`: the PIN is checked against the principal, who must hold `LEDGER_APPROVE` at
+        this venue, and a failure is a `403` with nothing written.
+
         '
       tags:
       - count
       x-ticvai-permission: LEDGER_APPROVE
+      x-ticvai-step-up: pin
+      x-ticvai-step-up-reason: Sends a submitted count back, discarding its variance; a supervisor signs it in place (audit R144).
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
@@ -1387,10 +1440,13 @@ paths:
               type: object
               required:
               - reason
+              - supervisorStepUp
               properties:
                 reason:
                   type: string
                   description: Kept as `StockCount.recountReason`.
+                supervisorStepUp:
+                  $ref: ../shared/common.yaml#/components/schemas/SupervisorStepUp
       responses:
         '200':
           headers:
@@ -1401,6 +1457,15 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/StockCount'
+        '403':
+          description: The supervisor step-up failed (audit R144). The PIN did not verify, or the
+            principal does not hold `LEDGER_APPROVE` at this venue.
+          x-ticvai-problem-types:
+          - supervisor-step-up-refused
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
         '409':
           description: Not in a state that permits this
           content:
@@ -1425,6 +1490,11 @@ paths:
       summary: Post a count and adjust stock
       description: 'Generates adjustment movements for every variance and posts the value to the stock
         loss or gain account. Requires approval where variance exceeds the venue''s threshold.
+
+        **The threshold is `VenueSettings.inventory.countVarianceApprovalAmount`**, the total variance value
+        of the count, a venue setting with a tenant default (decided 28 September, audit R094). **Proposed
+        default 1,000.00 in the venue currency, client finance to correct (audit R094).** Movements are
+        `countGain` or `countLoss` (audit R171).
 
         '
       tags:
@@ -1471,6 +1541,10 @@ paths:
       - staff
       x-ticvai-read-routing: replica
       summary: List transfers
+      description: '**Both venues see a transfer between them** (decided 28 September, audit R183): the
+        list returns every transfer whose source or destination location is in the caller''s venue.
+
+        '
       tags:
       - transfer
       x-ticvai-permission: PRODUCT_VIEW
@@ -1564,10 +1638,18 @@ paths:
         because without this state a partially received transfer stays open and the stock figure is wrong
         at both ends.
 
+        **A supervisor''s step-up on the same device, not an approval request**, as for a shift reopen
+        (proposed by the coordinator, client to confirm (audit R144): the decision did not name this
+        act). The body carries `supervisorStepUp`; the rule is `SupervisorStepUp` in `common.yaml`: the
+        PIN is checked against the principal, who must hold `LEDGER_APPROVE` at this venue, and a
+        failure is a `403` with nothing written.
+
         '
       tags:
       - transfer
       x-ticvai-permission: LEDGER_APPROVE
+      x-ticvai-step-up: pin
+      x-ticvai-step-up-reason: Writes off stock in transit; a supervisor signs it in place (proposed by the coordinator, client to confirm, audit R144).
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
@@ -1581,10 +1663,13 @@ paths:
               type: object
               required:
               - reason
+              - supervisorStepUp
               properties:
                 reason:
                   type: string
                   description: Kept as `StockTransfer.closeShortReason`.
+                supervisorStepUp:
+                  $ref: ../shared/common.yaml#/components/schemas/SupervisorStepUp
       responses:
         '200':
           headers:
@@ -1595,6 +1680,15 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/StockTransfer'
+        '403':
+          description: The supervisor step-up failed (audit R144). The PIN did not verify, or the
+            principal does not hold `LEDGER_APPROVE` at this venue.
+          x-ticvai-problem-types:
+          - supervisor-step-up-refused
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
         '409':
           description: Not in a state that permits this
           content:
@@ -1685,7 +1779,7 @@ paths:
       summary: List requisitions
       tags:
       - requisition
-      x-ticvai-permission: PRODUCT_VIEW
+      x-ticvai-permission: PROCUREMENT_VIEW
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: true
       x-ticvai-offline-note: '24 August: A storekeeper walks a stockroom with no signal. **The list is
@@ -1735,7 +1829,7 @@ paths:
         '
       tags:
       - requisition
-      x-ticvai-permission: ORDER_CREATE
+      x-ticvai-permission: PROCUREMENT_REQUEST
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: true
       x-ticvai-conflict-policy: append
@@ -1776,7 +1870,7 @@ paths:
         '
       tags:
       - requisition
-      x-ticvai-permission: PRODUCT_VIEW
+      x-ticvai-permission: PROCUREMENT_VIEW
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
@@ -1821,7 +1915,7 @@ paths:
         '
       tags:
       - procurement
-      x-ticvai-permission: LEDGER_APPROVE
+      x-ticvai-permission: APPROVAL_ACT
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
@@ -1876,7 +1970,7 @@ paths:
         '
       tags:
       - procurement
-      x-ticvai-permission: LEDGER_APPROVE
+      x-ticvai-permission: APPROVAL_ACT
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
@@ -1930,7 +2024,7 @@ paths:
         '
       tags:
       - procurement
-      x-ticvai-permission: PRODUCT_CONFIGURE
+      x-ticvai-permission: PROCUREMENT_REQUEST
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
@@ -2053,10 +2147,14 @@ paths:
       - staff
       x-ticvai-read-routing: replica
       summary: List suppliers
+      description: 'Suppliers are owned at tenant and read from any venue beneath it, which is where
+        requisitions and quotations are raised (decided 28 September, audit R183).
+
+        '
       tags:
       - supplier
-      x-ticvai-permission: PRODUCT_VIEW
-      x-ticvai-scope-level: region
+      x-ticvai-permission: PROCUREMENT_VIEW
+      x-ticvai-scope-level: venue
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
       parameters:
@@ -2083,10 +2181,15 @@ paths:
       x-ticvai-audience:
       - staff
       summary: Create a supplier
+      description: '**Suppliers are owned at tenant** (decided 28 September, audit R183); every venue in
+        the tenant may quote against them. **`code` is unique per tenant** (audit R108): a code already
+        used is a `409 duplicate-code`.
+
+        '
       tags:
       - supplier
-      x-ticvai-permission: PRODUCT_CONFIGURE
-      x-ticvai-scope-level: region
+      x-ticvai-permission: PROCUREMENT_MANAGE
+      x-ticvai-scope-level: tenant
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
       parameters:
@@ -2107,6 +2210,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Supplier'
+        '409':
+          $ref: ../shared/common.yaml#/components/responses/DuplicateCode
   /suppliers/{supplierId}/quotations:
     parameters:
     - name: supplierId
@@ -2126,6 +2231,9 @@ paths:
         them is what makes the comparison auditable — a decision without the alternatives on record is
         not a comparison.
 
+        **Recorded at venue against a tenant supplier** (decided 28 September, audit R183): the supplier is
+        the tenant''s, the quotation is the venue''s and carries the venue''s `scopePath`.
+
         '
       x-ticvai-not-config: true
       x-ticvai-not-config-note: '**Not configuration.** A supplier quotation is a commercial record with
@@ -2135,7 +2243,7 @@ paths:
         '
       tags:
       - supplier
-      x-ticvai-permission: PRODUCT_CONFIGURE
+      x-ticvai-permission: PROCUREMENT_MANAGE
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
@@ -2179,7 +2287,7 @@ paths:
         '
       tags:
       - supplier
-      x-ticvai-permission: PRODUCT_VIEW
+      x-ticvai-permission: PROCUREMENT_VIEW
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
@@ -2194,6 +2302,7 @@ paths:
     get:
       operationId: listPurchaseOrders
       x-ticvai-consumed-by:
+        - "P08 BO-051 Purchase Orders"
         - "P08 BO-052 Goods Receipt"
         - "P08 BO-105 Stock & Supply"
       x-ticvai-audience:
@@ -2202,7 +2311,7 @@ paths:
       summary: List purchase orders
       tags:
       - purchaseOrder
-      x-ticvai-permission: PRODUCT_VIEW
+      x-ticvai-permission: PROCUREMENT_VIEW
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
@@ -2235,6 +2344,7 @@ paths:
     post:
       operationId: createPurchaseOrder
       x-ticvai-consumed-by:
+        - "P08 BO-051 Purchase Orders"
         - "P08 BO-052 Goods Receipt"
       x-ticvai-audience:
       - staff
@@ -2242,10 +2352,19 @@ paths:
       description: 'Requires an approved requisition and a selected quotation. Raising one without either
         is refused — that is the control the chain exists to enforce.
 
+        **The line price comes from the selected quotation and is editable with a reason** (decided 28
+        September, audit R171). A line that omits `unitPrice` takes the quotation line''s price; a line
+        whose `unitPrice` differs from it must carry `priceOverrideReason`, or the request is a `400`.
+
+        **Purchase order numbers are per venue, in sequence** (decided 28 September, audit R171): each venue
+        numbers its orders from its own gap-free sequence; a tenant-level order with no venue draws from
+        the tenant''s. Proposed format `PO-<venue code>-<sequence, six digits>`, client to correct (audit
+        R171).
+
         '
       tags:
       - purchaseOrder
-      x-ticvai-permission: ORDER_CREATE
+      x-ticvai-permission: PROCUREMENT_MANAGE
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
@@ -2267,6 +2386,15 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/PurchaseOrder'
+        '400':
+          description: A line price differs from the selected quotation with no `priceOverrideReason`
+            (audit R171).
+          x-ticvai-problem-types:
+          - validation
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
         '409':
           description: Requisition is not approved, or the quotation does not match it
           content:
@@ -2284,6 +2412,7 @@ paths:
     get:
       operationId: getPurchaseOrder
       x-ticvai-consumed-by:
+        - "P08 BO-051 Purchase Orders"
         - "P08 BO-052 Goods Receipt"
       x-ticvai-audience:
       - staff
@@ -2291,7 +2420,7 @@ paths:
       summary: Read a purchase order with receipt progress
       tags:
       - purchaseOrder
-      x-ticvai-permission: PRODUCT_VIEW
+      x-ticvai-permission: PROCUREMENT_VIEW
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
@@ -2315,6 +2444,7 @@ paths:
     post:
       operationId: sendPurchaseOrder
       x-ticvai-consumed-by:
+        - "P08 BO-051 Purchase Orders"
         - "P08 BO-052 Goods Receipt"
       x-ticvai-audience:
       - staff
@@ -2325,7 +2455,7 @@ paths:
         '
       tags:
       - procurement
-      x-ticvai-permission: PRODUCT_CONFIGURE
+      x-ticvai-permission: PROCUREMENT_MANAGE
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
@@ -2358,6 +2488,7 @@ paths:
     post:
       operationId: acknowledgePurchaseOrder
       x-ticvai-consumed-by:
+        - "P08 BO-051 Purchase Orders"
         - "P08 BO-052 Goods Receipt"
       x-ticvai-audience:
       - staff
@@ -2368,7 +2499,7 @@ paths:
         '
       tags:
       - procurement
-      x-ticvai-permission: PRODUCT_CONFIGURE
+      x-ticvai-permission: PROCUREMENT_MANAGE
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
@@ -2413,6 +2544,7 @@ paths:
     post:
       operationId: closePurchaseOrderShort
       x-ticvai-consumed-by:
+        - "P08 BO-051 Purchase Orders"
         - "P08 BO-052 Goods Receipt"
       x-ticvai-audience:
       - staff
@@ -2420,10 +2552,18 @@ paths:
       description: '**Writes off a committed cost**, so it needs approval. Without this state a partially
         received order stays open indefinitely and the committed-cost figure is permanently wrong.
 
+        **Goes through the approvals engine to a finance approver** (decided 28 September, audit R144).
+        The call asks `approvals.evaluateApprovalRequirement` with kind `purchaseOrderShortClose`; where
+        an approval is required (the tenant default matrix requires one) it raises
+        `approvals.createApprovalRequest` (kind `purchaseOrderShortClose`), routed to the finance
+        approver role, never the caller, and answers `202` with the order still `partiallyReceived`
+        and `approvalRequestId` set (the request is `pending`). The order moves to `closedShort` when
+        the request is approved. Where the matrix requires none it closes at once with `200`.
+
         '
       tags:
       - procurement
-      x-ticvai-permission: LEDGER_APPROVE
+      x-ticvai-permission: PROCUREMENT_MANAGE
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
@@ -2446,7 +2586,17 @@ paths:
           headers:
             X-Consistency-Token:
               $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
-          description: Closed short
+          description: Closed short (no approval was required)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PurchaseOrder'
+        '202':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: Waiting for a finance approver. The order is still `partiallyReceived`;
+            `approvalRequestId` names the pending request (audit R144).
           content:
             application/json:
               schema:
@@ -2468,14 +2618,25 @@ paths:
     post:
       operationId: cancelPurchaseOrder
       x-ticvai-consumed-by:
+        - "P08 BO-051 Purchase Orders"
         - "P08 BO-052 Goods Receipt"
       x-ticvai-audience:
       - staff
       summary: Cancel a purchase order
-      description: Partially received orders are closed short rather than cancelled.
+      description: 'Partially received orders are closed short rather than cancelled.
+
+        **Goes through the approvals engine to a finance approver** (decided 28 September, audit R144).
+        The call asks `approvals.evaluateApprovalRequirement` with kind `purchaseOrderCancel`; where an
+        approval is required (the tenant default matrix requires one for a `sent` order) it raises
+        `approvals.createApprovalRequest` (kind `purchaseOrderCancel`), routed to the finance approver
+        role, never the caller, and answers `202` with the order unchanged and `approvalRequestId` set
+        (the request is `pending`). The order moves to `cancelled` when the request is approved. Where
+        the matrix requires none it cancels at once with `200`.
+
+        '
       tags:
       - purchaseOrder
-      x-ticvai-permission: ORDER_CANCEL
+      x-ticvai-permission: PROCUREMENT_MANAGE
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
@@ -2500,7 +2661,17 @@ paths:
           headers:
             X-Consistency-Token:
               $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
-          description: Cancelled
+          description: Cancelled (no approval was required)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PurchaseOrder'
+        '202':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: Waiting for a finance approver. The order is unchanged; `approvalRequestId` names
+            the pending request (audit R144).
           content:
             application/json:
               schema:
@@ -2523,7 +2694,7 @@ paths:
       summary: List goods receipts
       tags:
       - receipt
-      x-ticvai-permission: PRODUCT_VIEW
+      x-ticvai-permission: PROCUREMENT_VIEW
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
@@ -2561,12 +2732,16 @@ paths:
       description: 'Partial receipts are normal and expected. Over-receipt beyond the configured tolerance
         is refused — a delivery larger than the order is a supplier error, not a windfall.
 
+        **The tolerance is `VenueSettings.inventory.overReceiptTolerancePercent`**, a venue setting with a
+        tenant default (decided 28 September, audit R094): a line may receive up to that percentage above
+        its outstanding ordered quantity. **Proposed default 5 per cent, client to correct (audit R094).**
+
         Receipt increments stock and creates the accrual the invoice will later match against.
 
         '
       tags:
       - receipt
-      x-ticvai-permission: PRODUCT_CONFIGURE
+      x-ticvai-permission: PROCUREMENT_RECEIVE
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: true
       x-ticvai-conflict-policy: append
@@ -2589,7 +2764,8 @@ paths:
               schema:
                 $ref: '#/components/schemas/GoodsReceipt'
         '409':
-          description: Over-receipt beyond tolerance, or the purchase order is closed
+          description: Over-receipt beyond `VenueSettings.inventory.overReceiptTolerancePercent` (proposed
+            default 5, audit R094), or the purchase order is closed
           content:
             application/problem+json:
               schema:
@@ -2613,10 +2789,16 @@ paths:
       description: 'Quality failure, damage, wrong item, expiry too near. Reverses the stock increment
         and creates a supplier return.
 
+        **Rejected by receipt line, not by item** (decided 28 September, audit R171): a receipt can hold one
+        item on several batch or expiry lines, and each line names the one it rejects by `lineId`.
+
+        **`other` needs a `note`** (decided 28 September, audit R222); the notes are reviewed quarterly to
+        add the real reasons they reveal.
+
         '
       tags:
       - receipt
-      x-ticvai-permission: PRODUCT_CONFIGURE
+      x-ticvai-permission: PROCUREMENT_RECEIVE
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
@@ -2638,12 +2820,16 @@ paths:
                   items:
                     type: object
                     required:
-                    - itemId
+                    - lineId
                     - quantity
                     properties:
-                      itemId:
+                      lineId:
                         type: string
-                        format: uuid
+                        pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+                        description: '`GoodsReceipt.lines[].lineId`, the batch or expiry line rejected
+                          (audit R171).
+
+                          '
                       quantity:
                         type: number
                         minimum: 0
@@ -2656,9 +2842,13 @@ paths:
                   - shortDated
                   - overDelivery
                   - other
+                  description: '`other` requires `note` (decided 28 September, audit R222).
+
+                    '
                 note:
                   type: string
                   maxLength: 1000
+                  description: Required, at least 3 characters, when `reason` is `other` (audit R222).
       responses:
         '200':
           headers:
@@ -2669,9 +2859,17 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/GoodsReceipt'
+        '400':
+          description: '`reason` is `other` with no `note` (audit R222).'
+          x-ticvai-problem-types:
+          - validation
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
         '409':
-          description: A line rejects more than was received and not already rejected on this receipt,
-            or names an item the receipt does not hold
+          description: A line rejects more than was received and not already rejected on it, or names
+            a `lineId` the receipt does not hold (audit R171)
           content:
             application/problem+json:
               schema:
@@ -3107,6 +3305,8 @@ components:
             type: number
           available:
             type: number
+            description: On-hand minus allocated, where allocated is stock reserved for orders (decided
+              28 September, audit R171).
           averageCost:
             $ref: ../shared/common.yaml#/components/schemas/Money
           lastPurchasePrice:
@@ -3171,9 +3371,17 @@ components:
           type: number
         allocated:
           type: number
-          description: Committed to a transfer or open requisition.
+          description: '**Reserved for orders**: the quantity under an active stock reservation for an
+            order (decided 28 September, audit R171). A transfer is not allocation: dispatched stock has
+            already left on-hand and sits in transit.
+
+            '
         available:
           type: number
+          description: '**On-hand minus allocated** (decided 28 September, audit R171). What can still be
+            sold or issued.
+
+            '
         unit:
           type: string
         value:
@@ -3227,15 +3435,24 @@ components:
                 $ref: ../shared/common.yaml#/components/schemas/Money
     MovementKind:
       type: string
+      description: '**The kind decides the direction** (decided 28 September, audit R171). In: `receipt`,
+        `transferIn`, `adjustmentIn`, `countGain`, `production` (the finished item entering stock; the
+        ingredients leave as `issue`). Out: `issue`, `saleDepletion`, `waste`, `adjustmentOut`,
+        `transferOut`, `countLoss`, `supplierReturn`. `adjustment` and `countAdjustment` were split into
+        an in and an out kind so that no kind has two directions.
+
+        '
       enum:
       - receipt
       - issue
       - saleDepletion
       - waste
-      - adjustment
+      - adjustmentIn
+      - adjustmentOut
       - transferOut
       - transferIn
-      - countAdjustment
+      - countGain
+      - countLoss
       - supplierReturn
       - production
     CreateStockMovementRequest:
@@ -3262,13 +3479,20 @@ components:
           $ref: '#/components/schemas/MovementKind'
         quantity:
           type: number
-          description: Positive increases stock, negative decreases it.
+          exclusiveMinimum: 0
+          description: 'Always positive. **The `kind` decides whether it adds or removes stock**, not the
+            sign (decided 28 September, audit R171).
+
+            '
         unit:
           type: string
         reason:
           type: string
           maxLength: 500
-          description: Required for adjustments, which are reported separately.
+          description: '**Required for `adjustmentIn`, `adjustmentOut` and `waste`** (decided 28 September,
+            audit R171); adjustments are reported separately.
+
+            '
         costCenterId:
           type: string
           format: uuid
@@ -3347,7 +3571,9 @@ components:
           type: boolean
           default: true
           description: 'Expected quantities withheld from the counting device. Defaults true because a
-            counter who can see the figure reconciles to it rather than to the shelf.
+            counter who can see the figure reconciles to it rather than to the shelf. **The expected
+            quantity and the variance stay hidden until the count is submitted** (decided 28 September,
+            audit R110).
 
             '
     StockCount:
@@ -3410,6 +3636,12 @@ components:
           type: string
           nullable: true
           description: Why the count was last sent back by `recountStockCount`.
+        recountSignedByPrincipalId:
+          type: string
+          format: uuid
+          nullable: true
+          readOnly: true
+          description: The supervisor whose step-up sent the count back last (audit R144).
         cancelReason:
           type: string
           nullable: true
@@ -3429,7 +3661,8 @@ components:
           $ref: ../shared/common.yaml#/components/schemas/Money
         exceptionCount:
           type: integer
-          description: Lines beyond tolerance, requiring review before posting.
+          description: Lines beyond `VenueSettings.inventory.countVarianceTolerancePercent` (proposed
+            default 2 per cent, audit R094), requiring review before posting.
         lines:
           type: array
           items:
@@ -3579,11 +3812,39 @@ components:
           type: string
           nullable: true
           description: Why the balance was written off, from `closeTransferShort`.
+        closeShortSignedByPrincipalId:
+          type: string
+          format: uuid
+          nullable: true
+          readOnly: true
+          description: The supervisor whose step-up closed the transfer short (audit R144).
+        fromVenueId:
+          type: string
+          format: uuid
+          readOnly: true
+          description: The venue of `fromLocationId`. Set by the server (audit R183).
+        toVenueId:
+          type: string
+          format: uuid
+          readOnly: true
+          description: The venue of `toLocationId`. Set by the server (audit R183).
         scopePath:
           type: string
           description: '**The partition key** (ADR-0005). `fromLocationId` and `toLocationId` give the
-            endpoints; **this gives the owner.** A transfer between two venues belongs to the tenant above
-            both, and without it the row is addressable from neither end.'
+            endpoints; **this gives the owner**, the source venue''s scope.
+
+
+            **Both venues see a transfer between them** (decided 28 September, audit R183). It used to sit
+            at the tenant above both, where neither venue could see it. The row is owned at the source venue
+            and `toScopePath` admits the destination venue too.'
+        toScopePath:
+          type: string
+          readOnly: true
+          description: 'The destination venue''s scope. Row-level security admits a caller whose scope
+            matches `scopePath` or `toScopePath`, so both venues read the transfer (decided 28 September,
+            audit R183).
+
+            '
     RequisitionStatus:
       type: string
       enum:
@@ -3809,6 +4070,10 @@ components:
         code:
           type: string
           maxLength: 64
+          x-ticvai-unique: tenant
+          description: '**Unique per tenant** (decided 28 September, audit R108).
+
+            '
         name:
           type: string
           maxLength: 200
@@ -3864,7 +4129,8 @@ components:
             `uae.dubai.marina`, and one index answers every level of the walk.
 
 
-            **Operations write it at `region`, `tenant` scope.**'
+            **Operations write it at `tenant` scope.** Suppliers are owned at tenant and venues quote
+            against them (decided 28 September, audit R183).'
     CreateQuotationRequest:
       x-ticvai-persistence: none — request only
       type: object
@@ -3936,7 +4202,8 @@ components:
             format: date-time
           scopePath:
             type: string
-            description: The partition key. A quotation is sought by somebody and the scope says who.
+            description: The partition key. A quotation is sought by somebody and the scope says who,
+              the venue that recorded it, against a tenant supplier (audit R183).
     QuotationComparison:
       x-ticvai-persistence: none — computed
       type: object
@@ -4027,7 +4294,6 @@ components:
             required:
             - itemId
             - quantity
-            - unitPrice
             properties:
               itemId:
                 type: string
@@ -4038,7 +4304,17 @@ components:
               unit:
                 type: string
               unitPrice:
-                $ref: ../shared/common.yaml#/components/schemas/Money
+                allOf:
+                - $ref: ../shared/common.yaml#/components/schemas/Money
+                description: 'Omitted, the selected quotation line''s price. **Editable with a reason**
+                  (decided 28 September, audit R171).
+
+                  '
+              priceOverrideReason:
+                type: string
+                maxLength: 500
+                nullable: true
+                description: Required when `unitPrice` differs from the quotation line (audit R171).
         expectedDelivery:
           type: string
           format: date
@@ -4062,6 +4338,12 @@ components:
           pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
         purchaseOrderNumber:
           type: string
+          readOnly: true
+          description: '**Per venue, in sequence** (decided 28 September, audit R171). Assigned by the
+            server from the venue''s gap-free sequence, or the tenant''s for an order with no venue.
+            Proposed format `PO-<venue code>-<sequence, six digits>`, client to correct.
+
+            '
         requisitionId:
           type: string
           pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
@@ -4166,6 +4448,15 @@ components:
                 type: number
               unitPrice:
                 $ref: ../shared/common.yaml#/components/schemas/Money
+              quotedUnitPrice:
+                allOf:
+                - $ref: ../shared/common.yaml#/components/schemas/Money
+                nullable: true
+                description: The selected quotation line's price, kept beside `unitPrice` (audit R171).
+              priceOverrideReason:
+                type: string
+                nullable: true
+                description: Why `unitPrice` differs from `quotedUnitPrice` (audit R171).
               lineTotal:
                 $ref: ../shared/common.yaml#/components/schemas/Money
         subtotal:
@@ -4207,6 +4498,14 @@ components:
           type: string
           nullable: true
           description: From `cancelPurchaseOrder`.
+        approvalRequestId:
+          type: string
+          format: uuid
+          nullable: true
+          readOnly: true
+          description: The pending approval request raised by `cancelPurchaseOrder` or
+            `closePurchaseOrderShort` (kinds `purchaseOrderCancel`, `purchaseOrderShortClose`; audit
+            R144). Null when none is open.
         cancelledAt:
           type: string
           format: date-time
@@ -4289,6 +4588,13 @@ components:
           pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
         receiptNumber:
           type: string
+          readOnly: true
+          description: '**Server-assigned: the venue prefix plus a sequence per venue** (decided 28
+            September, audit R152), e.g. `MAR-GR-000431`. Not gapless; only tax invoices are gapless,
+            per legal entity. A receipt recorded offline takes the next number from the range its
+            device holds in reserve.
+
+            '
         purchaseOrderId:
           type: string
           pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
@@ -4303,6 +4609,14 @@ components:
           items:
             type: object
             properties:
+              lineId:
+                type: string
+                pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+                readOnly: true
+                description: 'One batch or expiry line of the receipt. What `rejectReceivedGoods` addresses
+                  (decided 28 September, audit R171).
+
+                  '
               itemId:
                 type: string
                 format: uuid

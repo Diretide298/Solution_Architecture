@@ -5,16 +5,16 @@
 | | |
 |---|---|
 | Screens | 28 |
-| Operations | 54 |
+| Operations | 56 |
 | Contracts | 7 |
 | Modules | 5 |
 | Undrawn | 0 |
-| Operations with no screen | 84 |
+| Operations with no screen | 83 |
 | Waves | wave2 2 · wave3 26 |
 
 ## Gaps
 
-### 84 operations with no screen here
+### 83 operations with no screen here
 
 **In a contract this platform uses, callable by its audience, and reaching no screen on any platform serving that audience.** Either a screen is missing or the endpoint should not exist — and the second is worth considering first.
 
@@ -43,6 +43,7 @@
 | `getAccessPolicy` | identity | GET | One policy, at a version |
 | `getAccessPolicyBundle` | identity | GET | The policies a device needs to decide for itself |
 | `getMembership` | identity | GET | A membership with its history, usage and renewals |
+| `getPasswordPolicy` | identity | GET | Read the password and MFA policy in force |
 | `getPrincipalModuleAccess` | identity | GET | What this person may do, as ticks |
 | `listAccessDecisions` | identity | GET | What was decided, for whom, where and why |
 | `listAccessPolicyHistory` | identity | GET | Every version, who changed it and why |
@@ -59,8 +60,7 @@
 | `setCapabilityTemplate` | identity | PUT | Save a tick-set under a name |
 | `setPrincipalModuleAccess` | identity | PUT | Tick what they may do |
 | `updateAccessPolicy` | identity | PUT | Change a policy, as a new version |
-| `addGuestNote` | marketing-crm | POST | What the floor needs to know about this table |
-| … | | | 44 more |
+| … | | | 43 more |
 
 ## Modules
 
@@ -76,7 +76,7 @@
 
 | | Name | Module | Wave | Ops | Drawn |
 |---|---|---|---|---|---|
-| `SUP-001` | Venue Management Sign In | Access & Availability | 3 | 7 | yes |
+| `SUP-001` | Venue Management Sign In | Access & Availability | 3 | 9 | yes |
 | `SUP-002` | Agent Dashboard | Overview | 3 | 9 | yes |
 | `SUP-003` | Availability & Routing Settings | Access & Availability | 3 | 1 | yes |
 | `SUP-004` | Conversation Queue | Conversations | 2 | 10 | yes |

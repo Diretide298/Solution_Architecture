@@ -31,7 +31,7 @@
 | finance | [`setFxProvider`](#setfxprovider) | PUT | `/fx-rates/providers` | setup | 1 |  |
 | ledger | [`listFxRates`](#listfxrates) | GET | `/fx-rates` | core | 1 | BO-077, GST-044, WEB-035 |
 | ledger | [`setFxRate`](#setfxrate) | PUT | `/fx-rates` | setup | 1 | BO-077 |
-| reporting | [`getFinancialReport`](#getfinancialreport) | GET | `/reports/financial` | core | 2 | BO-029, BO-058, BO-059, BO-060, BO-061, POS-008 … |
+| reporting | [`getFinancialReport`](#getfinancialreport) | GET | `/reports/financial` | core | 2 | BO-029, BO-058, BO-059, BO-060, POS-008, PTR-018 … |
 
 ## Group: accounts
 
@@ -111,6 +111,7 @@ Accounts may be created natively or mapped to a chart maintained externally in t
 **`PATCH /accounts/{accountId}`**: Rename, remap or deactivate an account
 
 The code is immutable once entries exist; until then it can be corrected here. Remapping is `externalCode`, the code in the client's own ERP chart. Deactivation prevents new postings and leaves history intact.
+**Once an account has been posted to, a remap changes `externalCode` only** (decided 28 September, audit R127 (5)). The account `type` is fixed from its first posting, and is not accepted by this call at all.
 **Changed in place.** An account is configuration, not a posting, so this edits the row rather than adding one. The postings made to it are untouched.
 
 |  |  |
@@ -237,6 +238,7 @@ The code is immutable once entries exist; until then it can be corrected here. R
 | rates[].effectiveFrom | string (date-time) | yes |  |
 | rates[].effectiveTo | string (date-time) |  | A rate change is a new row. (nullable) |
 | rates[].setByPrincipalId | string (uuid) |  | (read-only) |
+| rates[].note | string |  | Why this rate, and from where. (max length 500; nullable) |
 | rates[].providerReference | string |  | The provider's own identifier for this quote. (read-only; nullable) |
 | rates[].fetchedAt | string (date-time) |  | When the rate was pulled. (read-only; nullable) |
 
@@ -302,6 +304,7 @@ The code is immutable once entries exist; until then it can be corrected here. R
 **Policy, settled 14 August: every transaction is stored in the base currency of the region it was transacted in.**
 A guest paying USD 100 in a UAE venue has the dirham equivalent stored at the configured rate. The foreign amount is retained for the cashier's declaration and for the foreign-tender report — it is never what the ledger holds.
 The consequence is that most of the questions FX usually raises do not arise. There is no rate to lock at redemption, none at expiry, and none at refund, because the stored amount was never in a foreign currency. Allam: *"the value of the currency doesn't matter whether it goes high or down. They are purchasing a product equivalent to that currency… at the end they are paying that base currency value, and they get a refund for the base currency value."*
+**Rates are set per region; each venue picks which currencies it shows** (decided 28 September, audit R120 (a)). A guest screen passes `venueId` and gets the region's rates narrowed to the currencies that venue has chosen to display (`tenancy.VenueSettings.displayCurrencies`); the rate itself is never set per venue.
 
 |  |  |
 |---|---|
@@ -322,6 +325,7 @@ The consequence is that most of the questions FX usually raises do not arise. Th
 |---|---|---|---|---|
 | asAt | query |  | string (date-time) | Rates in force at this instant. |
 | purpose | query |  | FxRatePurpose: enum (tender, interEntity, reporting, revaluation) |  |
+| venueId | query |  | string (uuid) | Narrows the region's rates to the currencies this venue shows. |
 | pageSize | query |  | integer |  |
 | cursor | query |  | string | Opaque cursor: the nextCursor of the previous page. |
 
@@ -339,6 +343,7 @@ The consequence is that most of the questions FX usually raises do not arise. Th
 | items[].effectiveFrom | string (date-time) | yes |  |
 | items[].effectiveTo | string (date-time) |  | A rate change is a new row. (nullable) |
 | items[].setByPrincipalId | string (uuid) |  | (read-only) |
+| items[].note | string |  | Why this rate, and from where. (max length 500; nullable) |
 | items[].providerReference | string |  | The provider's own identifier for this quote. (read-only; nullable) |
 | items[].fetchedAt | string (date-time) |  | When the rate was pulled. (read-only; nullable) |
 | nextCursor | string |  |  |
@@ -359,6 +364,7 @@ A rate change is a new row with its own effective window; the old one's rate is 
 **Tender rates carry a spread.** The rate a venue accepts dollars at is not the interbank rate, and pretending otherwise makes every foreign-tender sale look like a small loss.
 **A new rate supersedes the one in force.** Where the rate in force for the same pair and purpose is open-ended (no `effectiveTo`) and started before the new `effectiveFrom`, that row is closed at the new `effectiveFrom`, which is the only change ever made to an existing row; its rate is not touched. A new window that overlaps a bounded window, or starts at or before the start of the rate in force, is refused. Without this an open-ended rate would block every later rate.
 The server sets `source` to `manual` and `setByPrincipalId` to the caller; `fetchedAt` and `providerReference` belong to `ingestFxRates` and are ignored here.
+**A rate set by hand is `manual` and carries a note** (decided 28 September, audit R127 (4)). No other source may be recorded through this call, and a rate without `note` is refused with 400.
 
 |  |  |
 |---|---|
@@ -392,6 +398,7 @@ The server sets `source` to `manual` and `setByPrincipalId` to the caller; `fetc
 | effectiveFrom | string (date-time) | yes |  |
 | effectiveTo | string (date-time) |  | A rate change is a new row. (nullable) |
 | setByPrincipalId | string (uuid) |  | (read-only) |
+| note | string |  | Why this rate, and from where. (max length 500; nullable) |
 | providerReference | string |  | The provider's own identifier for this quote. (read-only; nullable) |
 | fetchedAt | string (date-time) |  | When the rate was pulled. (read-only; nullable) |
 
@@ -408,6 +415,7 @@ The server sets `source` to `manual` and `setByPrincipalId` to the caller; `fetc
 | effectiveFrom | string (date-time) | yes |  |
 | effectiveTo | string (date-time) |  | A rate change is a new row. (nullable) |
 | setByPrincipalId | string (uuid) |  | (read-only) |
+| note | string |  | Why this rate, and from where. (max length 500; nullable) |
 | providerReference | string |  | The provider's own identifier for this quote. (read-only; nullable) |
 | fetchedAt | string (date-time) |  | When the rate was pulled. (read-only; nullable) |
 
@@ -416,6 +424,7 @@ The server sets `source` to `manual` and `setByPrincipalId` to the caller; `fetc
 | Code | Shape | Meaning |
 |---|---|---|
 | 201 |  | Set |
+| 400 |  | No note was given. |
 | 409 |  | Effective window overlaps an existing bounded rate for the same pair and purpose, or does not start after the rate in force |
 
 
@@ -439,7 +448,7 @@ Six reports, named by `report`: profit and loss, balance sheet, cash flow, reven
 | Read routing | analytical |
 | Reads | `ledger.account`, `ledger.posting`, `ledger.event_budget`, `ledger.fiscal_period` |
 | Writes | - |
-| Called by | BO-029, BO-058, BO-059, BO-060, BO-061, POS-008, PTR-018, SUP-008 |
+| Called by | BO-029, BO-058, BO-059, BO-060, POS-008, PTR-018, SUP-008 |
 
 **Parameters**
 
@@ -467,7 +476,7 @@ Six reports, named by `report`: profit and loss, balance sheet, cash flow, reven
 | sections[].lines[].label | string |  |  |
 | sections[].lines[].accountCode | string |  | (nullable) |
 | sections[].lines[].amount | Money |  | On the wire this is three fields; in the database it is one column. |
-| sections[].lines[].priorPeriodAmount | Money |  | On the wire this is three fields; in the database it is one column. |
+| sections[].lines[].priorPeriodAmount | object |  | The same line for the same period last year (decided 28 September, audit R127 (3)). |
 | sections[].total | Money | yes | On the wire this is three fields; in the database it is one column. |
 | sections[].total.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
 | sections[].total.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
@@ -529,6 +538,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 | status | text | yes |  |
 | closed_by_principal_id | uuid | no |  |
 | closed_at | timestamptz | no |  |
+| approval_request_id | uuid | no | The approval request a close or reopen is waiting on (approvals), routed to a finance approver (decided 28 September, audit R144). |
 
 ### `ledger.fx_provider_assignment`
 
@@ -554,6 +564,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 | effective_from | timestamptz | yes |  |
 | effective_to | timestamptz | no | A rate change is a new row. |
 | set_by_principal_id | uuid | no |  |
+| note | text | no | Why this rate, and from where. |
 | provider_reference | text | no | The provider's own identifier for this quote. |
 | fetched_at | timestamptz | no | When the rate was pulled. |
 | region_id | uuid | yes | Points at platform.org_unit. |

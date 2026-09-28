@@ -1,4 +1,4 @@
--- control — 52 tables
+-- control — 49 tables
 -- **Derived. Do not hand-edit.**
 
 -- The one credential model (CF-135a). 2.7.52, 7.1.25 and 7.1.30 each asserted their own. Bound to
@@ -266,32 +266,6 @@ CREATE TABLE IF NOT EXISTS control.environment (
     current_release_version           text,
     is_active                         boolean,
     cell_id                           uuid NOT NULL
-);
-
--- Footer columns and legal links (BL-002). A header is chrome and a footer is a link surface —
--- legal links are held separately so a tenant cannot remove the privacy notice by accident
-CREATE TABLE IF NOT EXISTS control.footer_config (
-    id                                uuid PRIMARY KEY NOT NULL,
-    scope_path                        ltree NOT NULL,
-    legal_links                       jsonb,
-    copyright_text                    text
-);
-
--- Holds 3 columns. No description has been written for this table — the name is the only thing
--- saying what it is
-CREATE TABLE IF NOT EXISTS control.footer_config_column (
-    footer_config_id                  uuid NOT NULL,
-    heading                           text,
-    id                                uuid PRIMARY KEY NOT NULL
-);
-
--- Holds 4 columns. No description has been written for this table — the name is the only thing
--- saying what it is
-CREATE TABLE IF NOT EXISTS control.footer_config_social_link (
-    footer_config_id                  uuid NOT NULL,
-    platform                          text,
-    url                               text,
-    id                                uuid PRIMARY KEY NOT NULL
 );
 
 -- A published third-party integration (13.1.50). A listing, not an installation — the code runs on
@@ -689,6 +663,7 @@ CREATE TABLE IF NOT EXISTS control.tenant (
     plan_name                         text,
     cell_count                        integer,
     venue_count                       integer,
+    region_id                         uuid,
     billing_email                     text,
     billing_address                   text CONSTRAINT tenant_billing_address_chk CHECK (char_length(billing_address) <= 500),
     account_manager_principal_id      uuid,

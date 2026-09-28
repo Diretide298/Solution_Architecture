@@ -352,7 +352,7 @@ tables:
   - retail
   foreignWriters: null
 - table: retail.shop_and_drop
-  columns: 14
+  columns: 15
   store: postgres
   parent: null
   writtenBy:

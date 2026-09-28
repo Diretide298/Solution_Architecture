@@ -2,7 +2,7 @@ openapi: 3.1.0
 info:
   title: TICVAI Order & Payment
   version: 0.1.0
-  x-ticvai-screen-count: 169
+  x-ticvai-screen-count: 170
   x-ticvai-tier: spine
   x-ticvai-module: 2 — Ticketing Sales
   x-ticvai-requirements: 343
@@ -253,7 +253,6 @@ paths:
       tags:
       - orders
       x-ticvai-permission: ORDER_MODIFY
-      x-ticvai-permission-escalated: ORDER_MODIFY
       x-ticvai-audience:
       - staff
       x-ticvai-scope-level: tenant
@@ -1351,6 +1350,10 @@ paths:
         admits is always one the venue issued.** That is what stops a screenshot at the gate.
 
         Refuses where the entitlement is partly consumed, name-bound, or past its resale window.
+
+        **The resale window is a venue setting with a tenant default**, `resaleCutoffHours`: listing
+        closes that many hours before the performance starts (decided 28 September, audit R094).
+        **Proposed default, client to correct (audit R094): 24 hours.**
 
         '
       tags:
@@ -2493,11 +2496,15 @@ paths:
     post:
       operationId: addCartLine
       x-ticvai-consumed-by:
-        - "P01 WEB-006 Date & Session Selection"
+        - "P01 WEB-006 Date & Performance Selection"
         - "P01 WEB-008 Add-ons & Upsell"
         - "P01 WEB-010 Shopping Cart"
         - "P01 WEB-033 Shop"
+        - "P01 WEB-041 Parking – Reserve & Pay"
+        - "P01 WEB-042 Retail & Shop and Drop"
         - "P02 GST-009 Review & Payment"
+        - "P02 GST-026 Retail / Merchandise"
+        - "P02 GST-027 Parking – Reserve & Pay"
         - "P02 GST-032 AI Concierge – Chat"
         - "P02 GST-048 Upsell / Cross-Sell"
         - "P02 GST-050 Resource Booking – Cabana"
@@ -2506,7 +2513,7 @@ paths:
         - "P04 POS-002 Sell — Ticket Catalogue"
         - "P04 POS-021 Sell — Food & Drink"
         - "P04 POS-023 Sell — Merchandise"
-        - "P05 KSK-005 Choose a session"
+        - "P05 KSK-005 Choose a performance"
         - "P05 KSK-006 Review"
         - "P05 KSK-017 Shop"
         - "P10 PTR-010 Cart & Quote"
@@ -2517,6 +2524,14 @@ paths:
       description: '2.9.4. **Acquiring the lease is the whole reason this is a server operation.** A capacity-bound
         product added to a cart reserves capacity for a configured window, and a cart held in a browser
         cannot reserve anything.
+
+        **The window is 15 minutes** (decided 28 September, audit R169): the cart lease is acquired for
+        900 seconds unless the venue sets otherwise, and `extendCart` adds to it.
+
+        **Parking is sold here like any other line** (decided 28 September, audit R166). A parking
+        product goes through the cart and `checkoutCart`, so the parking entitlement is issued at payment
+        carrying this order''s id. There is no live space count in the first release: a car park at its
+        capacity refuses the line with `soldOutForDay`.
 
         **Refused rather than added where capacity has gone.** A line added optimistically and removed
         at checkout is a guest who thinks they bought something.
@@ -2588,6 +2603,9 @@ paths:
         it. **Releasing immediately matters** — a guest reducing from six to two should return four seats
         to sale now, not in twenty minutes.
 
+        **A quantity of 0 removes the line**, exactly as `removeCartLine` does: its lease is released and
+        the line is gone from the returned cart (decided 28 September, audit R123 (1)).
+
         '
       tags:
       - cart
@@ -2609,6 +2627,7 @@ paths:
                 quantity:
                   type: integer
                   minimum: 0
+                  description: The new quantity. 0 removes the line (audit R123 (1)).
       responses:
         '200':
           headers:
@@ -2672,6 +2691,11 @@ paths:
       summary: Give the guest more time
       description: 'Extends every lease in the cart. **Capped, and the cap is configuration** — an indefinitely
         extendable hold is capacity permanently removed from sale by someone who left the tab open.
+
+        **Two venue settings, each with a tenant default** (decided 28 September, audit R094):
+        `cartHoldExtensionMinutes`, how long one extension adds, and `cartMaxExtensions`, how many a cart
+        may take (`Cart.maxExtensions` reports it). **Proposed defaults, client to correct (audit R094):
+        5 minutes, and 1 extension.**
 
         Offered once, typically, and the interface should say it is the last extension rather than letting
         a guest discover the cap by hitting it.
@@ -2757,7 +2781,12 @@ paths:
       operationId: checkoutCart
       x-ticvai-consumed-by:
         - "P01 WEB-010 Shopping Cart"
+        - "P01 WEB-033 Shop"
+        - "P01 WEB-041 Parking – Reserve & Pay"
+        - "P01 WEB-042 Retail & Shop and Drop"
         - "P02 GST-009 Review & Payment"
+        - "P02 GST-026 Retail / Merchandise"
+        - "P02 GST-027 Parking – Reserve & Pay"
         - "P02 GST-032 AI Concierge – Chat"
         - "P02 GST-041 Checkout Entry"
         - "P05 KSK-006 Review"
@@ -2786,6 +2815,23 @@ paths:
         matrix 2.6.1 §2.4). Anyone may fill a cart. The fork between signing in and supplying guest
         details belongs to the checkout page — `WEB-011`, `GST-041` — and this call refuses until one
         of them has completed, keeping the cart so the guest resumes rather than restarts.
+
+        **A verified contact that matches an existing profile attaches the order to it automatically**
+        (ADR-0045 section 4; decided 28 September, audit R120 (b)). The guest is not asked, and gets no
+        session on that profile: they see this order and nothing else of its history until they sign in
+        as its owner. Only a verified contact attaches automatically; any other candidate match goes to
+        staff review.
+
+        **A promotion whose budget this order would exceed is not applied** (decided 28 September, audit
+        R101 (8)). At checkout each promotion''s remaining `budgetCap` is checked against the discount
+        this order would take from it; where the discount would exceed it, the order is re-priced
+        without that promotion, and the order names it in `droppedPromotions` so the guest sees why the
+        price changed before paying. Budget is refused at checkout, not only reported.
+
+        **Merchandise bought for collection is paid here, online, first** (decided 28 September, audit
+        R236). When the order is paid, each retail line marked for collection becomes a shop-and-drop
+        (`retail.createShopAndDrop`) for the guest to collect on the way out. Nothing is reserved unpaid
+        from this channel.
 
         '
       tags:
@@ -3106,8 +3152,6 @@ paths:
         - "P08 BO-023 Refunds & Exchanges"
         - "P08 BO-026 Group Bookings"
         - "P08 BO-047 Order Corrections & Exceptions"
-        - "P08 BO-051 Purchase Orders"
-        - "P08 BO-070 Work Orders"
         - "P08 BO-082 Stock Movements"
         - "P08 BO-101 Orders & Money"
         - "P10 PTR-002 Partner Dashboard"
@@ -3203,8 +3247,6 @@ paths:
         - "P08 BO-023 Refunds & Exchanges"
         - "P08 BO-026 Group Bookings"
         - "P08 BO-047 Order Corrections & Exceptions"
-        - "P08 BO-051 Purchase Orders"
-        - "P08 BO-070 Work Orders"
         - "P08 BO-130 Offline Policy & Rules Configuration"
         - "P10 PTR-002 Partner Dashboard"
         - "P10 PTR-005 Inventory & Allocation View"
@@ -3221,6 +3263,11 @@ paths:
 
         Where they differ the order is still accepted at the quoted price and `priceVariance` is populated.
         The client shows nothing; the variance is a finance concern, not a cashier concern.
+
+        **A promotion whose budget cap this order would exceed is not applied** (decided 28 September,
+        audit R101 (8)), as at `checkoutCart`: an order created online is priced without it and names it
+        in `droppedPromotions`. An order replayed from an offline till keeps the price the cashier quoted,
+        as above, and the overrun is recorded against the promotion''s budget as a variance.
 
         Offline-capable. The client writes to its local journal, acknowledges the cashier, and replays
         through `/sync/orders` on reconnect.
@@ -3282,6 +3329,7 @@ paths:
         - "P02 GST-010 Booking Confirmation"
         - "P02 GST-018 Add to Calendar / Reminders"
         - "P02 GST-019 Order History"
+        - "P02 GST-028 Parking – Reservation Confirmed"
         - "P04 POS-002 Sell — Ticket Catalogue"
         - "P04 POS-006 Held Orders"
         - "P05 KSK-009 Ticket issued"
@@ -3292,8 +3340,6 @@ paths:
         - "P08 BO-023 Refunds & Exchanges"
         - "P08 BO-026 Group Bookings"
         - "P08 BO-047 Order Corrections & Exceptions"
-        - "P08 BO-051 Purchase Orders"
-        - "P08 BO-070 Work Orders"
         - "P10 PTR-002 Partner Dashboard"
         - "P10 PTR-005 Inventory & Allocation View"
         - "P10 PTR-008 Booking Creation"
@@ -3466,8 +3512,6 @@ paths:
         - "P08 BO-023 Refunds & Exchanges"
         - "P08 BO-026 Group Bookings"
         - "P08 BO-047 Order Corrections & Exceptions"
-        - "P08 BO-051 Purchase Orders"
-        - "P08 BO-070 Work Orders"
         - "P10 PTR-002 Partner Dashboard"
         - "P10 PTR-005 Inventory & Allocation View"
         - "P10 PTR-008 Booking Creation"
@@ -3562,8 +3606,6 @@ paths:
         - "P08 BO-023 Refunds & Exchanges"
         - "P08 BO-026 Group Bookings"
         - "P08 BO-047 Order Corrections & Exceptions"
-        - "P08 BO-051 Purchase Orders"
-        - "P08 BO-070 Work Orders"
         - "P10 PTR-002 Partner Dashboard"
         - "P10 PTR-005 Inventory & Allocation View"
         - "P10 PTR-008 Booking Creation"
@@ -3578,6 +3620,12 @@ paths:
         Prices are re-evaluated. Where a price, a promotion or an availability has moved since the hold,
         the response says so and the cashier decides. Silently charging the old price loses money; silently
         charging the new one loses the guest.
+
+        **The cashier has two choices, keep prices or discard** (decided 28 September, audit R123 (5)).
+        Keeping continues the sale at the prices it was parked at; the re-evaluation is reported in
+        `changes` and never applied. Discarding voids the sale (`voidOrder`). There is no reprice in
+        place: a cashier who wants current prices discards and rings the sale again. A line that cannot
+        be kept at all (`soldOut`, `seatHoldExpired`, `productWithdrawn`) is removed whichever is chosen.
 
         '
       tags:
@@ -3625,8 +3673,6 @@ paths:
         - "P08 BO-023 Refunds & Exchanges"
         - "P08 BO-026 Group Bookings"
         - "P08 BO-047 Order Corrections & Exceptions"
-        - "P08 BO-051 Purchase Orders"
-        - "P08 BO-070 Work Orders"
         - "P10 PTR-002 Partner Dashboard"
         - "P10 PTR-005 Inventory & Allocation View"
         - "P10 PTR-008 Booking Creation"
@@ -3700,8 +3746,6 @@ paths:
         - "P08 BO-023 Refunds & Exchanges"
         - "P08 BO-026 Group Bookings"
         - "P08 BO-047 Order Corrections & Exceptions"
-        - "P08 BO-051 Purchase Orders"
-        - "P08 BO-070 Work Orders"
         - "P10 PTR-002 Partner Dashboard"
         - "P10 PTR-005 Inventory & Allocation View"
         - "P10 PTR-008 Booking Creation"
@@ -3713,6 +3757,13 @@ paths:
       summary: Void an order
       description: 'Only before settlement and only within the same shift. After that it is a refund —
         the money has moved.
+
+        **Voids the whole order**, never one line: a single F&B line removed after preparation is voided
+        by voiding its order (`fnb.amendFnbOrder`, `fnb.cancelFnbOrder` point here).
+
+        **The reason comes from the void reason list** (`VoidReason`; decided 28 September, audit R125
+        (4)), the one list every void takes, F&B included. `other` requires a `note` (audit R222); the
+        notes are reviewed quarterly to add real reasons.
 
         '
       tags:
@@ -3740,9 +3791,13 @@ paths:
                   description: Client-generated ULID of this void, and its idempotency key — it must
                     equal the `Idempotency-Key` header.
                 reason:
+                  $ref: '#/components/schemas/VoidReason'
+                note:
                   type: string
                   minLength: 3
                   maxLength: 500
+                  nullable: true
+                  description: Required when `reason` is `other` (audit R222); optional otherwise.
                 recordedAt:
                   type: string
                   format: date-time
@@ -3784,8 +3839,6 @@ paths:
         - "P08 BO-023 Refunds & Exchanges"
         - "P08 BO-026 Group Bookings"
         - "P08 BO-047 Order Corrections & Exceptions"
-        - "P08 BO-051 Purchase Orders"
-        - "P08 BO-070 Work Orders"
         - "P09 ADM-609 Refund & Payment Adjustment Command Center\t116"
         - "P10 PTR-002 Partner Dashboard"
         - "P10 PTR-005 Inventory & Allocation View"
@@ -3853,6 +3906,10 @@ paths:
         Sequencing is ledger-first: the ledger entry is written, then the gateway is called, then the
         outcome is reconciled. A gateway call that succeeds against an unwritten ledger entry is money
         that left with no record.
+
+        **The ledger entry is a `refundIssued` posting** to the accounts `finance.setAccountMappings`
+        holds for the venue, in the fiscal period open for the refund date (decided 28 September, audit
+        R191).
 
         '
       tags:
@@ -3973,6 +4030,10 @@ paths:
       summary: Refund every order against an event, performance or date
       description: 'Cancellation handling. Always requires approval regardless of individual thresholds
         — the aggregate is what matters, not each line.
+
+        **The selection criteria combine with AND** (decided 28 September, audit R096 (7)): an order is
+        in the batch only when it matches every criterion sent in `scope` (performance, event, venue and
+        the date range together). A criterion left out does not narrow the selection.
 
         '
       tags:
@@ -4181,12 +4242,28 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/RefundPolicy'
+        '422':
+          description: 'The thresholds do not ascend: `selfAuthoriseLimit` above `requiresSecondUserAbove`,
+            or either above `requiresApprovalAbove` (`refund-thresholds-not-ascending`, audit R123 (6)).
+
+            '
+          x-ticvai-problem-types:
+          - refund-thresholds-not-ascending
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
   /payments:
     post:
       operationId: createPayment
       x-ticvai-consumed-by:
         - "P01 WEB-012 Checkout — Payment"
+        - "P01 WEB-033 Shop"
+        - "P01 WEB-041 Parking – Reserve & Pay"
+        - "P01 WEB-042 Retail & Shop and Drop"
         - "P02 GST-009 Review & Payment"
+        - "P02 GST-026 Retail / Merchandise"
+        - "P02 GST-027 Parking – Reserve & Pay"
         - "P04 POS-002 Sell — Ticket Catalogue"
         - "P04 POS-004 Sell — Seat Map"
         - "P04 POS-005 Payment"
@@ -4204,6 +4281,19 @@ paths:
 
         A card payment returns `pendingConfirmation` when the terminal has been instructed but no result
         has arrived. **Do not assume failure.** Poll `/payments/{id}/inquiry`.
+
+        **Which tenders each channel takes** (decided 28 September, audit R080 (a) and (d)). **In the guest
+        app and on the guest web, card or wallet** (`card`, `wallet`): any other `tender` from a guest
+        caller is refused with 409 `tenderNotAllowedOnChannel`. **At the till, all five the payment screen
+        offers**: card, cash, digital wallet (`wallet`), gift card or voucher (`giftCard`, `voucher`), and
+        online payment, which is a payment link the guest pays on their own device (`createPaymentLink`)
+        rather than a tender on this call.
+
+        **Posts to the ledger through the account mappings** (decided 28 September, audit R191): a
+        captured `cash` payment posts `cashReceived`, `card` posts `cardReceived` and `wallet` posts
+        `walletReceived`, each to the accounts `finance.setAccountMappings` holds for the venue, and to
+        the fiscal period that is open for the payment date. An offline cash payment replayed through
+        `syncOrders` posts the same event, dated by its `recordedAt`.
 
         '
       tags:
@@ -4237,8 +4327,9 @@ paths:
               schema:
                 $ref: '#/components/schemas/PaymentProblem'
         '409':
-          description: Tender unavailable offline (`tenderUnavailableOffline`), or amount exceeds the
-            balance due (`exceedsBalanceDue`).
+          description: Tender unavailable offline (`tenderUnavailableOffline`), amount exceeds the
+            balance due (`exceedsBalanceDue`), or a guest channel sent a tender other than card or wallet
+            (`tenderNotAllowedOnChannel`, audit R080).
           content:
             application/problem+json:
               schema:
@@ -4274,6 +4365,10 @@ paths:
 
         This queries the provider directly and reconciles. A background reconciler runs the same operation
         for payments left unconfirmed past a threshold, so recovery does not depend on an operator noticing.
+
+        **The reconciler threshold is the provider''s own recommended status-poll interval** (Stripe and
+        Network International each publish one), held per provider in the adapter configuration and
+        never shorter than that interval. Proposed, client to correct (decided 28 September, audit R065).
 
         '
       tags:
@@ -4692,8 +4787,6 @@ paths:
         - "P08 BO-023 Refunds & Exchanges"
         - "P08 BO-026 Group Bookings"
         - "P08 BO-047 Order Corrections & Exceptions"
-        - "P08 BO-051 Purchase Orders"
-        - "P08 BO-070 Work Orders"
         - "P10 PTR-002 Partner Dashboard"
         - "P10 PTR-005 Inventory & Allocation View"
         - "P10 PTR-008 Booking Creation"
@@ -4875,8 +4968,6 @@ paths:
         - "P08 BO-023 Refunds & Exchanges"
         - "P08 BO-026 Group Bookings"
         - "P08 BO-047 Order Corrections & Exceptions"
-        - "P08 BO-051 Purchase Orders"
-        - "P08 BO-070 Work Orders"
         - "P10 PTR-002 Partner Dashboard"
         - "P10 PTR-005 Inventory & Allocation View"
         - "P10 PTR-008 Booking Creation"
@@ -4891,6 +4982,11 @@ paths:
         unable to rebook when the new date turns out to be full.
 
         The replacement is held before the original is released, never the other way round.
+
+        **The exchange window is a venue setting with a tenant default**, `exchangeCutoffHours`: an
+        exchange is refused with `outsideExchangeWindow` once the original performance is fewer than that
+        many hours away (decided 28 September, audit R094). **Proposed default, client to correct (audit
+        R094): 24 hours.**
 
         '
       tags:
@@ -4946,8 +5042,6 @@ paths:
         - "P08 BO-023 Refunds & Exchanges"
         - "P08 BO-026 Group Bookings"
         - "P08 BO-047 Order Corrections & Exceptions"
-        - "P08 BO-051 Purchase Orders"
-        - "P08 BO-070 Work Orders"
         - "P10 PTR-002 Partner Dashboard"
         - "P10 PTR-005 Inventory & Allocation View"
         - "P10 PTR-008 Booking Creation"
@@ -5012,7 +5106,10 @@ paths:
                 $ref: '#/components/schemas/OrderExchangeResult'
         '409':
           description: Target performance is unavailable (`targetUnavailable`) or outside the
-            reschedule window (`outsideRescheduleWindow`).
+            reschedule window (`outsideRescheduleWindow`). The window is the venue setting
+            `rescheduleCutoffHours`, with a tenant default; a reschedule is refused once the original
+            performance is fewer than that many hours away (decided 28 September, audit R094). **Proposed
+            default, client to correct (audit R094) - 24 hours.**
           content:
             application/problem+json:
               schema:
@@ -5039,8 +5136,6 @@ paths:
         - "P08 BO-023 Refunds & Exchanges"
         - "P08 BO-026 Group Bookings"
         - "P08 BO-047 Order Corrections & Exceptions"
-        - "P08 BO-051 Purchase Orders"
-        - "P08 BO-070 Work Orders"
         - "P10 PTR-002 Partner Dashboard"
         - "P10 PTR-005 Inventory & Allocation View"
         - "P10 PTR-008 Booking Creation"
@@ -5390,8 +5485,6 @@ paths:
         - "P08 BO-023 Refunds & Exchanges"
         - "P08 BO-026 Group Bookings"
         - "P08 BO-047 Order Corrections & Exceptions"
-        - "P08 BO-051 Purchase Orders"
-        - "P08 BO-070 Work Orders"
         - "P10 PTR-002 Partner Dashboard"
         - "P10 PTR-005 Inventory & Allocation View"
         - "P10 PTR-008 Booking Creation"
@@ -5612,6 +5705,9 @@ paths:
       summary: Extend a reservation
       description: 'Bounded by the venue''s maximum, so a reservation cannot be renewed indefinitely against
         a busy performance.
+
+        **The maximum is the venue setting `reservationMaxExtensions`, with a tenant default** (decided 28
+        September, audit R094). **Proposed default, client to correct (audit R094): 1 extension.**
 
         '
       tags:
@@ -7823,7 +7919,7 @@ paths:
     get:
       operationId: listTicketReissueFulfillment
       x-ticvai-consumed-by:
-        - "P08 BO-320 Ticket Reissue & Fulfillment Regeneration"
+        - "P08 BO-027 Reissue & Media Replacement"
       x-ticvai-audience:
       - staff
       x-ticvai-provisional: true
@@ -10021,8 +10117,89 @@ paths:
                       type: array
                       items:
                         $ref: '#/components/schemas/OrdersUpgrade'
+  /carts/{cartId}/promo-codes:
+    parameters:
+    - name: cartId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    post:
+      operationId: applyCartPromoCode
+      x-ticvai-consumed-by:
+        - "P01 WEB-010 Shopping Cart"
+        - "P02 GST-041 Checkout Entry"
+      x-ticvai-audience:
+      - guest
+      - partner
+      summary: Apply a promo code to the cart
+      description: '**Decided 28 September, audit R073 (e): WEB-010 promised a promo code field and the cart
+        had no way to take one.**
+
+        The code is evaluated the way the cart already evaluates promotions: the cart''s lines, venue,
+        channel and subject are sent to `promotions.evaluatePromotions` with the cart''s `couponCodes`
+        plus this one. **A code that unlocks nothing is refused, not stored**, so the guest learns at
+        once rather than at checkout. An accepted code is kept on `Cart.couponCodes` and re-evaluated on
+        every read, like `appliedPromotionIds`.
+
+        Applying a code the cart already holds returns the cart unchanged.
+
+        '
+      tags:
+      - cart
+      x-ticvai-permission: null
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ApplyCartPromoCodeRequest'
+      responses:
+        '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: Applied, and the cart re-priced
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Cart'
+        '410':
+          description: Expired (`cartExpired`), as for `getCart`.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/CartProblem'
+        '422':
+          description: 'The code is not accepted: no such code, voided or used up (`promoCodeInvalid`), or a
+            real code that nothing in this cart qualifies for (`promoCodeNotApplicable`). The two read
+            differently to a guest, so they are separate reasons.
+
+            '
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/CartProblem'
+
 components:
   schemas:
+    ApplyCartPromoCodeRequest:
+      type: object
+      x-ticvai-persistence: none — request only
+      required:
+      - code
+      properties:
+        code:
+          type: string
+          minLength: 1
+          maxLength: 100
+          description: The code as the guest typed it.
     OrdersDeposit:
       type: object
       x-ticvai-persistence: orders.deposit
@@ -10620,6 +10797,10 @@ components:
       x-ticvai-persistence: orders.visit_reminder
       description: '**One reminder per booking, set by the guest.** Not a marketing message: it is sent
         only for a booking the guest holds, and only on channels they still consent to.
+
+        **One per booking per guest** (decided 28 September, audit R123 (8)): unique on `orderId` and
+        `subjectId`. Two guests sharing a booking each keep their own reminder, and `setVisitReminder`
+        replaces the caller''s own rather than adding a second.
 
         '
       required:
@@ -12580,6 +12761,13 @@ components:
 
     TenderKind:
       type: string
+      description: '`wallet` is a **digital wallet** (Apple Pay, Google Pay and the like, taken through the
+        gateway), the value the guest channels accept beside `card` (decided 28 September, audit R080
+        (a)). **The stored-value TICVAI wallet is a separate tender**: it is spent through
+        `authoriseStoredValue` and `captureStoredValue` (`StoredValueKind` `wallet`), never as this
+        value, so the client can see which of the two the decision meant.
+
+        '
       enum:
       - cash
       - card
@@ -12665,10 +12853,13 @@ components:
             uncontended products.
         seatIds:
           type: array
+          maxItems: 10
           items:
             type: string
             pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
-          description: Seated products only, as `seating.Seat.id`. Not available offline.
+          description: Seated products only, as `seating.Seat.id`. Not available offline. **At most 10
+            seats per sale**, across all the lines of one order (decided 28 September, audit R080 (c));
+            `createOrder` refuses more with 400.
         quantity:
           type: integer
           minimum: 1
@@ -12964,6 +13155,18 @@ components:
           items:
             type: string
             format: uuid
+        couponCodes:
+          type: array
+          readOnly: true
+          description: 'The promo codes the guest entered through `applyCartPromoCode` (decided 28 September,
+            audit R073 (e)). **Sent as `couponCodes` on every promotions evaluation of this cart**, so a code
+            is re-checked on each read like any promotion; a code that stops qualifying stays listed here
+            and its promotion drops out of `appliedPromotionIds`.
+
+            '
+          items:
+            type: string
+            maxLength: 100
         expiresAt:
           type: string
           format: date-time
@@ -13001,6 +13204,8 @@ components:
           format: uuid
         seatIds:
           type: array
+          maxItems: 10
+          description: At most 10 seats per sale (decided 28 September, audit R080 (c)).
           items:
             type: string
             pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
@@ -13076,6 +13281,21 @@ components:
           format: date-time
         remindersSent:
           type: integer
+    VoidReason:
+      type: string
+      description: '**The void reason list** (decided 28 September, audit R125 (4)): the one list
+        `voidOrder` takes, and the list `fnb.amendFnbOrder` and `fnb.cancelFnbOrder` point to. `other`
+        requires a note (audit R222), and the notes are reviewed quarterly to add real reasons.
+        Proposed, client to correct.
+
+        '
+      enum:
+      - guestChangedMind
+      - enteredInError
+      - itemUnavailable
+      - qualityIssue
+      - duplicate
+      - other
     Order:
       x-ticvai-persistence: orders.sales_order + orders.order_line
       type: object
@@ -13100,6 +13320,15 @@ components:
           description: The client ULID from `CreateOrderRequest.id`.
         orderNumber:
           type: string
+          readOnly: true
+          description: 'The number a guest reads and a cashier types. **Server-assigned: the venue prefix and
+            a sequence per venue**, for example `DXB1-000123` (decided 28 September, audit R152). A till
+            holds a reserved range of the venue sequence, so an order taken offline gets its number on the
+            till and keeps it through `syncOrders`. **Not gapless**: an unused reserved range leaves a gap,
+            and that is allowed. Only tax invoices are gapless, per legal entity. The receipt carries this
+            number.
+
+            '
         channel:
           allOf:
           - $ref: '#/components/schemas/OrderChannel'
@@ -13145,6 +13374,29 @@ components:
           $ref: ../shared/common.yaml#/components/schemas/Money
         refundedAmount:
           $ref: ../shared/common.yaml#/components/schemas/Money
+        droppedPromotions:
+          type: array
+          readOnly: true
+          x-ticvai-persisted: false
+          description: '**Promotions left off this order at checkout because their budget cap would have
+            been exceeded** (decided 28 September, audit R101 (8)). Empty when none was dropped. Returned
+            by `checkoutCart` and `createOrder`, not stored.
+
+            '
+          items:
+            type: object
+            required:
+            - promotionId
+            properties:
+              promotionId:
+                type: string
+                format: uuid
+              name:
+                type: string
+              reason:
+                type: string
+                enum:
+                - budgetCapReached
         totalPriceVariance:
           allOf:
           - $ref: ../shared/common.yaml#/components/schemas/Money
@@ -13246,6 +13498,10 @@ components:
       description: 'Venue-configured. Thresholds are policy, not permission scope — venues run different
         policies and the permission model should not encode commercial rules.
 
+        **The three thresholds must ascend** (decided 28 September, audit R123 (6)):
+        `selfAuthoriseLimit` <= `requiresSecondUserAbove` <= `requiresApprovalAbove`, where the second is
+        set. `setRefundPolicy` refuses a policy that does not with 422 `refund-thresholds-not-ascending`.
+
         '
       required:
       - venueId
@@ -13310,11 +13566,17 @@ components:
         refundWindowDays:
           type: integer
           nullable: true
+          minimum: 0
+          description: Days after purchase within which a refund may be made. 0 is allowed and means the
+            day of purchase only; null means no window (decided 28 September, audit R123 (6)).
         varianceThreshold:
           allOf:
           - $ref: ../shared/common.yaml#/components/schemas/Money
           description: 'Price variance above this is an exception requiring review rather than a routine
             posting (CF-38). Venue-configured.
+
+            **A venue setting with a tenant default** (decided 28 September, audit R094). **Proposed default,
+            client to correct (audit R094): AED 5.00 per order line.**
 
             '
     RefundPolicyProblem:
@@ -13383,6 +13645,8 @@ components:
             credential:
               type: string
               maxLength: 512
+              description: The second person's staff PIN, as they sign in at a till with it. **A PIN,
+                never a password** (decided 28 September, audit R123 (7)).
         refundToOriginalTender:
           type: boolean
           default: true
@@ -14206,6 +14470,7 @@ components:
             - providerDeclined             # createPayment 402, capturePayment 402
             - tenderUnavailableOffline     # createPayment
             - exceedsBalanceDue            # createPayment
+            - tenderNotAllowedOnChannel    # createPayment: a guest channel takes card or wallet only (R080)
             - providerUnreachable          # inquirePaymentStatus 503
             - notAuthorised                # capturePayment, voidPayment: not in `authorised`
             - alreadyCaptured              # voidPayment: refund it instead
@@ -14273,6 +14538,8 @@ components:
             - notSellableOnChannel   # addCartLine
             - noCapacity             # updateCartLine, extendCart
             - extensionCapReached    # extendCart
+            - promoCodeInvalid       # applyCartPromoCode: no such code, voided, or used up (R073)
+            - promoCodeNotApplicable # applyCartPromoCode: the code exists and nothing in the cart qualifies (R073)
             - leaseExpired           # checkoutCart 409
             - sessionNotVerified     # checkoutCart 403 (ADR-0045)
             - contactNotConfirmed    # checkoutCart 403 (ADR-0045)

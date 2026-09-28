@@ -13,8 +13,8 @@ scale: Bursty on send, read-heavy otherwise. **The one to watch for a split.**
 ifDown: Down stops campaigns and guest lookup. Neither stops trading.
 coverage:
   operations: 213
-  inAFlow: 109
-  percent: 51%
+  inAFlow: 102
+  percent: 48%
   note: '**Flow coverage is how much of this service a journey has walked.** A service under 40% is
     unwalked rather than under-documented.'
 schemas:
@@ -2460,7 +2460,6 @@ writesOutside:
 screens:
 - P01:WEB-009 Wishlist
 - P01:WEB-011 Guest Details & Attendee Forms
-- P01:WEB-012 Checkout — Payment
 - P01:WEB-017 My Account Dashboard
 - P01:WEB-020 Profile & Preferences
 - P01:WEB-024 Devices, Wishlist & Consent
@@ -2471,7 +2470,6 @@ screens:
 - P01:WEB-043 Loyalty & Rewards
 - P01:WEB-044 AI Concierge – Home
 - P02:GST-001 Home – Default
-- P02:GST-009 Review & Payment
 - P02:GST-020 Saved Items / Wishlist
 - P02:GST-031 AI Concierge – Home
 - P02:GST-032 AI Concierge – Chat
@@ -2498,7 +2496,6 @@ screens:
 - P06:EMP-057 Guest Profile & Dining History
 - P06:EMP-088 Overdue Rental Management
 - P08:BO-005 Queue Monitor
-- P08:BO-036 Device Registry
 - P08:BO-073 Lost & Found Register
 - P08:BO-107 Guests & Marketing
 - P08:BO-118 Campaign & Audience Management
@@ -2724,7 +2721,5 @@ flows:
 - F58 A ticket is sold at a till, added to, and refunded
 - F70 A guest needs help and something is lost
 - F75 A kiosk serves itself and calls for help
-- F79 A workstation is registered, configured and rolled out
 - F82 A month is analysed from incrementality to a scheduled report
 - F86 A POS layout is designed, previewed and deployed
-- F95 A fleet is watched, a fault is found, and a station is fixed

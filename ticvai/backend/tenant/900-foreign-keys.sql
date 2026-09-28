@@ -3,7 +3,7 @@
 -- its use** — orders reaches catalogue, catalogue reaches platform, and something
 -- reaches back. Tables first, constraints last, is the only ordering that terminates.
 --
--- 595 of 631 declared references. The ones that reach the
+-- 597 of 630 declared references. The ones that reach the
 -- other database are in ../990-cross-database-references.sql and are not constraints
 -- any more.
 
@@ -503,7 +503,6 @@ ALTER TABLE resources.booking ADD CONSTRAINT booking_subject_id_fkey FOREIGN KEY
 ALTER TABLE resources.resource ADD CONSTRAINT resource_principal_id_fkey FOREIGN KEY (principal_id) REFERENCES identity.principal(id);
 ALTER TABLE resources.resource ADD CONSTRAINT resource_venue_id_fkey FOREIGN KEY (venue_id) REFERENCES platform.scope(id);
 ALTER TABLE resources.resource_dependency ADD CONSTRAINT resource_dependency_venue_id_fkey FOREIGN KEY (venue_id) REFERENCES platform.scope(id);
-ALTER TABLE resources.session_participant ADD CONSTRAINT session_participant_subject_id_fkey FOREIGN KEY (subject_id) REFERENCES pii.subject(id);
 ALTER TABLE retail."return" ADD CONSTRAINT return_accepted_by_principal_id_fkey FOREIGN KEY (accepted_by_principal_id) REFERENCES identity.principal(id);
 ALTER TABLE retail."return" ADD CONSTRAINT return_refund_id_fkey FOREIGN KEY (refund_id) REFERENCES orders.refund(id);
 ALTER TABLE retail."return" ADD CONSTRAINT return_sale_id_fkey FOREIGN KEY (sale_id) REFERENCES retail.sale(id);
@@ -578,10 +577,13 @@ ALTER TABLE whitelabel.banner ADD CONSTRAINT banner_tenant_config_id_fkey FOREIG
 ALTER TABLE whitelabel.config_version ADD CONSTRAINT config_version_published_by_principal_id_fkey FOREIGN KEY (published_by_principal_id) REFERENCES identity.principal(id);
 ALTER TABLE whitelabel.faq_entry ADD CONSTRAINT faq_entry_faq_category_id_fkey FOREIGN KEY (faq_category_id) REFERENCES whitelabel.faq_category(id);
 ALTER TABLE whitelabel.feature_toggle ADD CONSTRAINT feature_toggle_tenant_config_id_fkey FOREIGN KEY (tenant_config_id) REFERENCES whitelabel.tenant_config(id);
+ALTER TABLE whitelabel.footer_config_column ADD CONSTRAINT footer_config_column_footer_config_id_fkey FOREIGN KEY (footer_config_id) REFERENCES whitelabel.footer_config(id);
+ALTER TABLE whitelabel.footer_config_social_link ADD CONSTRAINT footer_config_social_link_footer_config_id_fkey FOREIGN KEY (footer_config_id) REFERENCES whitelabel.footer_config(id);
 ALTER TABLE whitelabel.homepage_section ADD CONSTRAINT homepage_section_content_page_id_fkey FOREIGN KEY (content_page_id) REFERENCES whitelabel.content_page(id);
 ALTER TABLE whitelabel.module_enablement ADD CONSTRAINT module_enablement_tenant_config_id_fkey FOREIGN KEY (tenant_config_id) REFERENCES whitelabel.tenant_config(id);
 ALTER TABLE whitelabel.policy ADD CONSTRAINT policy_published_by_principal_id_fkey FOREIGN KEY (published_by_principal_id) REFERENCES identity.principal(id);
 ALTER TABLE whitelabel.promo_block ADD CONSTRAINT promo_block_promotion_id_fkey FOREIGN KEY (promotion_id) REFERENCES promotions.promotion(id);
+ALTER TABLE whitelabel.tenant_config ADD CONSTRAINT tenant_config_footer_config_id_fkey FOREIGN KEY (footer_config_id) REFERENCES whitelabel.footer_config(id);
 ALTER TABLE whitelabel.tenant_config ADD CONSTRAINT tenant_config_homepage_section_id_fkey FOREIGN KEY (homepage_section_id) REFERENCES whitelabel.homepage_section(id);
 ALTER TABLE whitelabel.tenant_config ADD CONSTRAINT tenant_config_navigation_item_id_fkey FOREIGN KEY (navigation_item_id) REFERENCES whitelabel.navigation_item(id);
 ALTER TABLE whitelabel.tenant_config ADD CONSTRAINT tenant_config_tenant_id_fkey FOREIGN KEY (tenant_id) REFERENCES platform.tenant(id);

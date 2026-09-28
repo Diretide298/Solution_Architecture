@@ -101,6 +101,16 @@ RENAMES = [
      "why": "moved with wallet.wallet"},
     {"from": "retail.gift_card", "to": "wallet.gift_card", "on": "2026-09-19",
      "why": "moved with wallet.wallet"},
+    {"from": "catalogue.session_template", "to": "catalogue.performance_template", "on": "2026-09-28",
+     "why": "a session in the design is a Performance (decided 28 September, audit R165)"},
+    {"from": "resources.session_participant", "to": "resources.performance_participant", "on": "2026-09-28",
+     "why": "audit R165: the manifest is per Performance; session_id becomes performance_id, a foreign key to catalogue.performance"},
+    {"from": "control.footer_config", "to": "whitelabel.footer_config", "on": "2026-09-28",
+     "why": "the footer is tenant configuration, not control plane (audit R163)"},
+    {"from": "control.footer_config_column", "to": "whitelabel.footer_config_column", "on": "2026-09-28",
+     "why": "moved with whitelabel.footer_config (audit R163)"},
+    {"from": "control.footer_config_social_link", "to": "whitelabel.footer_config_social_link", "on": "2026-09-28",
+     "why": "moved with whitelabel.footer_config (audit R163)"},
 ]
 
 

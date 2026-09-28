@@ -1,4 +1,4 @@
--- whitelabel — 13 tables
+-- whitelabel — 16 tables
 -- **Derived. Do not hand-edit.**
 
 -- A notice on a tenant storefront, scheduled
@@ -50,7 +50,7 @@ CREATE TABLE IF NOT EXISTS whitelabel.content_page (
 -- A tenant's own hostname and its certificate (24 August). No domain or certificate operation
 -- existed anywhere in 1,010 — and ADM-017 Domain & Certificate Management declared 41 operations,
 -- none of them about a domain. Verification before issuance, always. Hangs off: reaches
--- whitelabel.tenant_config through its keys; references platform.tenant. Reached by: 4 operations
+-- whitelabel.footer_config through its keys; references platform.tenant. Reached by: 4 operations
 -- read it and 3 write it.
 CREATE TABLE IF NOT EXISTS whitelabel.custom_domain (
     id                                uuid PRIMARY KEY NOT NULL,
@@ -66,7 +66,7 @@ CREATE TABLE IF NOT EXISTS whitelabel.custom_domain (
     failure_reason                    text
 );
 
--- A grouping of FAQ entries. Hangs off: reaches whitelabel.tenant_config through its keys. Reached
+-- A grouping of FAQ entries. Hangs off: reaches whitelabel.footer_config through its keys. Reached
 -- by: 2 operations read it and 1 write it; 1 tables reference it.
 CREATE TABLE IF NOT EXISTS whitelabel.faq_category (
     code                              text NOT NULL,
@@ -97,6 +97,32 @@ CREATE TABLE IF NOT EXISTS whitelabel.feature_toggle (
     tenant_config_id                  uuid NOT NULL
 );
 
+-- Footer columns and legal links (BL-002). A header is chrome and a footer is a link surface —
+-- legal links are held separately so a tenant cannot remove the privacy notice by accident
+CREATE TABLE IF NOT EXISTS whitelabel.footer_config (
+    id                                uuid PRIMARY KEY NOT NULL,
+    scope_path                        ltree NOT NULL,
+    legal_links                       jsonb,
+    copyright_text                    text
+);
+
+-- Holds 3 columns. No description has been written for this table — the name is the only thing
+-- saying what it is
+CREATE TABLE IF NOT EXISTS whitelabel.footer_config_column (
+    footer_config_id                  uuid NOT NULL,
+    heading                           text,
+    id                                uuid PRIMARY KEY NOT NULL
+);
+
+-- Holds 4 columns. No description has been written for this table — the name is the only thing
+-- saying what it is
+CREATE TABLE IF NOT EXISTS whitelabel.footer_config_social_link (
+    footer_config_id                  uuid NOT NULL,
+    platform                          text,
+    url                               text,
+    id                                uuid PRIMARY KEY NOT NULL
+);
+
 -- A block on a tenant homepage, ordered. A section naming a disabled module must not render at all
 CREATE TABLE IF NOT EXISTS whitelabel.homepage_section (
     id                                uuid PRIMARY KEY,
@@ -115,7 +141,7 @@ CREATE TABLE IF NOT EXISTS whitelabel.module_enablement (
     tenant_config_id                  uuid NOT NULL
 );
 
--- One entry in a tenant’s own navigation. Hangs off: reaches whitelabel.tenant_config through its
+-- One entry in a tenant’s own navigation. Hangs off: reaches whitelabel.footer_config through its
 -- keys. Reached by: 4 operations read it and 2 write it; 1 tables reference it.
 CREATE TABLE IF NOT EXISTS whitelabel.navigation_item (
     id                                uuid PRIMARY KEY,
@@ -176,6 +202,10 @@ CREATE TABLE IF NOT EXISTS whitelabel.tenant_config (
     is_in_maintenance                 boolean DEFAULT false,
     maintenance_message               jsonb,
     expected_back_at                  timestamptz,
+    minimum_app_version               jsonb,
+    contact                           jsonb,
+    availability                      text,
+    availability_message              jsonb,
     id                                uuid PRIMARY KEY NOT NULL
 );
 

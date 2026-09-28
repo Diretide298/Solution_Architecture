@@ -15,7 +15,7 @@
   "contracts": 11,
   "modules": 1,
   "undrawn": 0,
-  "operationsWithNoScreen": 149
+  "operationsWithNoScreen": 148
  },
  "waves": {
   "wave3": 69
@@ -39,11 +39,11 @@
    "operations": 4
   },
   {
-   "contract": "inventory",
+   "contract": "marketing-crm",
    "operations": 3
   },
   {
-   "contract": "marketing-crm",
+   "contract": "inventory",
    "operations": 3
   },
   {
@@ -51,15 +51,7 @@
    "operations": 2
   },
   {
-   "contract": "orders",
-   "operations": 1
-  },
-  {
-   "contract": "approvals",
-   "operations": 1
-  },
-  {
-   "contract": "tenancy",
+   "contract": "access",
    "operations": 1
   },
   {
@@ -67,11 +59,19 @@
    "operations": 1
   },
   {
-   "contract": "access",
+   "contract": "approvals",
    "operations": 1
   },
   {
    "contract": "promotions",
+   "operations": 1
+  },
+  {
+   "contract": "tenancy",
+   "operations": 1
+  },
+  {
+   "contract": "orders",
    "operations": 1
   }
  ],
@@ -791,6 +791,12 @@
     "summary": ""
    },
    {
+    "operation": "submitApprovalRequest",
+    "contract": "approvals",
+    "verb": "POST",
+    "summary": "Send a saved draft for approval"
+   },
+   {
     "operation": "assessProductChange",
     "contract": "catalogue",
     "verb": "POST",
@@ -959,6 +965,12 @@
     "summary": "A membership with its history, usage and renewals"
    },
    {
+    "operation": "getPasswordPolicy",
+    "contract": "identity",
+    "verb": "GET",
+    "summary": "Read the password and MFA policy in force"
+   },
+   {
     "operation": "getPrincipalModuleAccess",
     "contract": "identity",
     "verb": "GET",
@@ -1059,12 +1071,6 @@
     "contract": "inventory",
     "verb": "GET",
     "summary": "Soft holds on stock"
-   },
-   {
-    "operation": "submitCountLines",
-    "contract": "inventory",
-    "verb": "POST",
-    "summary": "Submit counted quantities"
    },
    {
     "operation": "addGuestNote",
@@ -1481,22 +1487,10 @@
     "summary": "Archive a dashboard"
    },
    {
-    "operation": "deleteReportSchedule",
-    "contract": "reporting",
-    "verb": "DELETE",
-    "summary": "Delete a schedule"
-   },
-   {
     "operation": "listAlertRules",
     "contract": "reporting",
     "verb": "GET",
     "summary": "What raises an alert, and when"
-   },
-   {
-    "operation": "updateReportSchedule",
-    "contract": "reporting",
-    "verb": "PATCH",
-    "summary": "Amend, pause or resume a schedule"
    },
    {
     "operation": "getConfigurationProfile",

@@ -19,36 +19,60 @@ offlineBehaviour: '**Never offline.** A credential validated locally is a creden
 steps:
 - step: 1
   screen: ADM-001
-  action: Platform Login / MFA.
+  action: The operator signs in with username and password.
   operations:
-  - forceLogout
-  - getCurrentSession
-  - listActiveSessions
-  - revokeAllSessions
-  outcome: 4 operations, 4 of them previously unwalked.
+  - login
+  outcome: '**Signed in, not yet through.** Every platform operator holds a `PLATFORM_*` permission, and
+    MFA is required by permission (decided 28 September, audit R135), so the session is not usable yet.'
 - step: 2
-  screen: PTR-001
-  action: Partner Login / MFA.
+  screen: ADM-001
+  action: The second factor is asked for and given.
   operations:
-  - forceLogout
-  - getCurrentSession
-  - listActiveSessions
-  - listPartnerAgreements
-  - overrideCreditLimit
-  - revokeAllSessions
-  outcome: 7 operations, 7 of them previously unwalked.
-  crossesDevice: true
+  - createMfaChallenge
+  - verifyMfaChallenge
+  outcome: '**The authenticator code, or an emailed code as the fallback** (audit R126 (5)). `verifyMfaChallenge`
+    completes the sign-in; five wrong codes lock step-up for the policy''s lockout minutes (audit R126
+    (6)).'
 - step: 3
-  screen: SUP-001
-  action: Agent Login.
+  screen: ADM-001
+  action: The session opens with its cross-tenant reach.
   operations:
-  - forceLogout
   - getCurrentSession
   - listActiveSessions
-  - revokeAllSessions
-  outcome: 4 operations, 4 of them previously unwalked.
+  outcome: The operator sees their session and every other active one they may end.
+- step: 4
+  screen: PTR-001
+  action: A partner user signs in through the same door.
+  operations:
+  - login
+  - createMfaChallenge
+  - verifyMfaChallenge
+  outcome: '**The second factor only where a permission requires it** — a partner user holding none
+    of the listed permissions signs in with the password alone (audit R135).'
+  crossesDevice: true
+- step: 5
+  screen: SUP-001
+  action: A back-office user signs in through the same door.
+  operations:
+  - login
+  - createMfaChallenge
+  - verifyMfaChallenge
+  outcome: '**ROLE_MANAGE and LEDGER_APPROVE holders give a second factor; others do not** (audit R135).'
   crossesDevice: true
 branches:
+- at: 2
+  condition: The operator has no MFA method enrolled yet.
+  behaviour: '**Enrolled before they get in.** A platform operator cannot finish signing in without a
+    method, so ADM-001 enrols an authenticator app (or email) with `enrolMfaMethod` and `verifyMfaEnrolment`
+    first; staff may enrol only those two kinds (decided 28 September, audit R126 (5)).'
+  severity: high
+  resolvedBy: enrolMfaMethod
+- at: 2
+  condition: Five wrong codes.
+  behaviour: '**Step-up locks for the policy''s lockout minutes, never permanently** (audit R126 (6)).
+    The screen says so and when it lifts; a permanent lock is a denial of service anybody can run.'
+  severity: medium
+  resolvedBy: verifyMfaChallenge
 - at: 1
   condition: The acting principal lacks the permission at this scope.
   behaviour: '**Refused at the first step, not the last.** ADR-0002 makes authorisation user-driven

@@ -20,21 +20,30 @@ offlineBehaviour: '**The ticket must work offline.** A car park with no signal i
 steps:
 - step: 1
   screen: GST-027
-  action: They reserve parking on the way.
+  action: They add parking to their cart on the way.
   operations:
-  - createParkingEntitlement
-  outcome: '**Parking is an entitlement, not a booking.** It goes on the same media as the ticket, which
-    is why a barrier and a gate read the same thing.'
+  - addCartLine
+  outcome: '**Parking is a product in the ordinary cart**, not a separate booking (decided 28 September,
+    audit R166). **No live availability in the first release**: the line is accepted or refused against
+    the facility''s capacity, never against a sensor count.'
 - step: 2
-  screen: GST-028
-  action: It is confirmed with a facility and a bay type.
+  screen: GST-027
+  action: They pay, and the parking entitlement is issued.
   operations:
-  - listParkingFacilities
-  - createParkingEntitlement
-  outcome: '**Facility, not space.** Reserving a numbered bay is a promise a venue cannot keep on a
-    busy Saturday.'
-  crossesDevice: true
+  - checkoutCart
+  - createPayment
+  outcome: '**Payment issues the parking entitlement, carrying the order id** (audit R166). It goes on
+    the same media as the ticket, which is why a barrier and a gate read the same thing.'
 - step: 3
+  screen: GST-028
+  action: It is confirmed with a facility.
+  operations:
+  - getOrder
+  - listParkingFacilities
+  outcome: '**Facility, not space.** Reserving a numbered bay is a promise a venue cannot keep on a busy
+    Saturday.'
+  crossesDevice: true
+- step: 4
   screen: GST-012
   action: They open their tickets.
   operations:
@@ -42,7 +51,7 @@ steps:
   - getEntitlement
   outcome: Everything they hold, for today and later.
   crossesDevice: true
-- step: 4
+- step: 5
   screen: GST-013
   action: They open the one for now.
   operations:
@@ -51,7 +60,7 @@ steps:
   outcome: '**The credential, not the ticket.** What a gate reads is a rotating credential — and the
     history is what answers *has this been used*.'
   crossesDevice: true
-- step: 5
+- step: 6
   screen: GST-055
   action: The QR rotates as they walk to the gate.
   operations:
@@ -69,11 +78,12 @@ exitStates:
 branches:
 - at: 1
   condition: The car park is full.
-  behaviour: Told before they drive, not at the barrier. **A guest turned away at a full car park has
-    already spent forty minutes.**
+  behaviour: '**`addCartLine` refuses the parking line `soldOutForDay`**: the entitlements issued for the
+    day have reached the facility''s capacity (decided 28 September, audit R166). Told before they drive,
+    not at the barrier. **A guest turned away at a full car park has already spent forty minutes.**'
   severity: high
-  resolvedBy: listParkingFacilities
-- at: 5
+  resolvedBy: addCartLine
+- at: 6
   condition: The phone has no signal at the gate.
   behaviour: '**The credential is already on the device and rotates locally.** This is the case it was
     designed for.'

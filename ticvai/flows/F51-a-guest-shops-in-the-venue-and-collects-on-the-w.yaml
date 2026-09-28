@@ -18,8 +18,8 @@ platforms:
 trigger:
   description: A guest buys something heavy at 11am and does not want to carry it round a venue all
     day.
-offlineBehaviour: '**Browsing works from cache; reserving does not.** A reservation against stock the
-  device cannot see is a guest promised something already sold.'
+offlineBehaviour: '**Browsing works from cache; paying does not.** A purchase against stock the device
+  cannot see is a guest promised something already sold.'
 steps:
 - step: 1
   screen: WEB-033
@@ -32,11 +32,13 @@ steps:
     at the counter.'
 - step: 2
   screen: WEB-033
-  action: The item is reserved for collection.
+  action: They pay online at checkout, marking the item for collection.
   operations:
-  - reserveMerchandise
-  outcome: '**Reserved at purchase, not at collection.** A guest who paid and finds it gone has been
-    sold something the venue did not have.'
+  - checkoutCart
+  - createPayment
+  outcome: '**Paid online at checkout, and the payment creates the shop-and-drop** (decided 28 September,
+    audit R236). Nothing is reserved before payment: stock is committed when the money is, so a guest
+    who paid never finds it gone.'
 - step: 3
   screen: GST-062
   action: On the way out they find their collection point.
@@ -56,10 +58,10 @@ steps:
 branches:
 - at: 2
   condition: The last one sells at a till while the guest is paying online.
-  behaviour: '**The reservation fails and the sale is refused rather than accepted and disappointed.**
-    An oversell the venue knows about at purchase is a refund it never has to make.'
+  behaviour: '**Checkout refuses the line rather than accepting it and disappointing** (audit R236). An
+    oversell the venue knows about at purchase is a refund it never has to make.'
   severity: high
-  resolvedBy: reserveMerchandise
+  resolvedBy: checkoutCart
 - at: 3
   condition: The guest leaves without collecting.
   behaviour: '**Held to the venue policy and then returned to stock.** A collection point full of uncollected

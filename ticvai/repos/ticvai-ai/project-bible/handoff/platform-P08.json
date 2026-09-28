@@ -10,22 +10,22 @@
  "generated": "2026-09-28",
  "note": "Derived by tools/derive-platform.py. **The gaps section is the point** \u2014 a page listing what exists is a directory; one listing what is missing is a worklist.",
  "counts": {
-  "screens": 1182,
-  "operations": 1103,
+  "screens": 1178,
+  "operations": 1112,
   "contracts": 31,
   "modules": 13,
   "undrawn": 0,
-  "operationsWithNoScreen": 256
+  "operationsWithNoScreen": 257
  },
  "waves": {
   "wave1": 60,
-  "wave2": 79,
-  "wave3": 1043
+  "wave2": 78,
+  "wave3": 1040
  },
  "modules": [
   {
    "module": "Access & Venue",
-   "screens": 382,
+   "screens": 381,
    "waves": [
     1,
     2,
@@ -41,7 +41,7 @@
   },
   {
    "module": "Orders & Money",
-   "screens": 161,
+   "screens": 159,
    "waves": [
     1,
     2,
@@ -66,7 +66,7 @@
   },
   {
    "module": "Games & Rides",
-   "screens": 100,
+   "screens": 99,
    "waves": [
     3
    ]
@@ -135,7 +135,7 @@
   },
   {
    "contract": "marketing-crm",
-   "operations": 123
+   "operations": 121
   },
   {
    "contract": "orders",
@@ -151,7 +151,7 @@
   },
   {
    "contract": "inventory",
-   "operations": 48
+   "operations": 49
   },
   {
    "contract": "resources",
@@ -179,11 +179,11 @@
   },
   {
    "contract": "maintenance",
-   "operations": 31
+   "operations": 33
   },
   {
    "contract": "tenancy",
-   "operations": 29
+   "operations": 31
   },
   {
    "contract": "accreditation",
@@ -207,26 +207,26 @@
   },
   {
    "contract": "reporting",
-   "operations": 19
+   "operations": 22
   },
   {
    "contract": "shift",
-   "operations": 16
+   "operations": 18
+  },
+  {
+   "contract": "identity",
+   "operations": 13
   },
   {
    "contract": "queue",
    "operations": 13
   },
   {
-   "contract": "identity",
-   "operations": 12
-  },
-  {
-   "contract": "retail",
+   "contract": "venue-map",
    "operations": 10
   },
   {
-   "contract": "venue-map",
+   "contract": "retail",
    "operations": 10
   },
   {
@@ -242,11 +242,11 @@
    "operations": 7
   },
   {
-   "contract": "payments",
+   "contract": "assets",
    "operations": 3
   },
   {
-   "contract": "assets",
+   "contract": "payments",
    "operations": 3
   },
   {
@@ -297,7 +297,7 @@
    "module": "Access & Venue",
    "wave": 1,
    "route": "/queue-management/queue-monitor",
-   "operations": 19,
+   "operations": 20,
    "drawn": true
   },
   {
@@ -383,7 +383,7 @@
   },
   {
    "id": "BO-015",
-   "name": "Session Calendar",
+   "name": "Performance Calendar",
    "module": "Sell",
    "wave": 1,
    "route": "/venue-operations/session-calendar",
@@ -392,11 +392,11 @@
   },
   {
    "id": "BO-016",
-   "name": "Session Template",
+   "name": "Performance Template",
    "module": "Sell",
    "wave": 1,
    "route": "/venue-operations/session-template",
-   "operations": 11,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -495,7 +495,7 @@
    "module": "Orders & Money",
    "wave": 2,
    "route": "/venue-operations/reissue-media-replacement",
-   "operations": 4,
+   "operations": 6,
    "drawn": true
   },
   {
@@ -576,7 +576,7 @@
    "module": "Venue Operations",
    "wave": 2,
    "route": "/venue-operations/device-registry",
-   "operations": 20,
+   "operations": 10,
    "drawn": true
   },
   {
@@ -621,7 +621,7 @@
    "module": "Orders & Money",
    "wave": 2,
    "route": "/venue-operations/cash-movements",
-   "operations": 13,
+   "operations": 5,
    "drawn": true
   },
   {
@@ -630,7 +630,7 @@
    "module": "Orders & Money",
    "wave": 2,
    "route": "/venue-operations/banking-safe",
-   "operations": 13,
+   "operations": 5,
    "drawn": true
   },
   {
@@ -711,7 +711,7 @@
    "module": "Orders & Money",
    "wave": 2,
    "route": "/venue-operations/purchase-orders",
-   "operations": 13,
+   "operations": 7,
    "drawn": true
   },
   {
@@ -801,7 +801,7 @@
    "module": "Orders & Money",
    "wave": 3,
    "route": "/venue-operations/scheduled-reports",
-   "operations": 9,
+   "operations": 5,
    "drawn": true
   },
   {
@@ -864,7 +864,7 @@
    "module": "Guests & Marketing",
    "wave": 2,
    "route": "/venue-operations/audit-log",
-   "operations": 2,
+   "operations": 3,
    "drawn": true
   },
   {
@@ -879,10 +879,10 @@
   {
    "id": "BO-070",
    "name": "Work Orders",
-   "module": "Orders & Money",
+   "module": "Venue Operations",
    "wave": 2,
    "route": "/venue-operations/work-orders",
-   "operations": 13,
+   "operations": 9,
    "drawn": true
   },
   {
@@ -963,7 +963,7 @@
    "module": "Stock & Supply",
    "wave": 1,
    "route": "/inventory/stock-count",
-   "operations": 8,
+   "operations": 9,
    "drawn": true
   },
   {
@@ -1139,7 +1139,7 @@
   },
   {
    "id": "BO-099",
-   "name": "Session Manifest",
+   "name": "Performance Manifest",
    "module": "Access & Venue",
    "wave": 2,
    "route": "/resources/session-manifest",
@@ -1152,7 +1152,7 @@
    "module": "Venue Operations",
    "wave": 1,
    "route": "/home",
-   "operations": 2,
+   "operations": 3,
    "drawn": true
   },
   {
@@ -1449,7 +1449,7 @@
    "module": "Access & Venue",
    "wave": 1,
    "route": "/access-venue",
-   "operations": 3,
+   "operations": 4,
    "drawn": true
   },
   {
@@ -1548,7 +1548,7 @@
    "module": "Food & Beverage",
    "wave": 1,
    "route": "/food-beverage",
-   "operations": 3,
+   "operations": 4,
    "drawn": true
   },
   {
@@ -1647,7 +1647,7 @@
    "module": "Stock & Supply",
    "wave": 1,
    "route": "/stock-supply",
-   "operations": 4,
+   "operations": 5,
    "drawn": true
   },
   {
@@ -1746,7 +1746,7 @@
    "module": "People & Access Rights",
    "wave": 1,
    "route": "/people-access-rights",
-   "operations": 2,
+   "operations": 3,
    "drawn": true
   },
   {
@@ -1773,7 +1773,7 @@
    "module": "Access & Venue",
    "wave": 3,
    "route": "/access-venue/tenant-brand-context-bo-1062",
-   "operations": 1,
+   "operations": 3,
    "drawn": true
   },
   {
@@ -1845,7 +1845,7 @@
    "module": "Guests & Marketing",
    "wave": 1,
    "route": "/guests-marketing",
-   "operations": 3,
+   "operations": 4,
    "drawn": true
   },
   {
@@ -1944,7 +1944,7 @@
    "module": "Venue Operations",
    "wave": 1,
    "route": "/venue-operations",
-   "operations": 4,
+   "operations": 5,
    "drawn": true
   },
   {
@@ -3034,15 +3034,6 @@
    "wave": 2,
    "route": "/sell/deployment-preview-audit",
    "operations": 7,
-   "drawn": true
-  },
-  {
-   "id": "BO-127",
-   "name": "Hardware & Peripherals Management",
-   "module": "Venue Operations",
-   "wave": 2,
-   "route": "/venue-operations/hardware-peripherals-management",
-   "operations": 3,
    "drawn": true
   },
   {
@@ -4774,15 +4765,6 @@
    "drawn": true
   },
   {
-   "id": "BO-320",
-   "name": "Ticket Reissue & Fulfillment Regeneration",
-   "module": "Orders & Money",
-   "wave": 3,
-   "route": "/orders-money/ticket-reissue-fulfillment-regeneration-bo-320",
-   "operations": 1,
-   "drawn": true
-  },
-  {
    "id": "BO-321",
    "name": "After-Sales Financial Settlement & Adjustment Workspace",
    "module": "Orders & Money",
@@ -6138,15 +6120,6 @@
    "module": "Games & Rides",
    "wave": 3,
    "route": "/games-rides/offline-synchronization-recovery-monitor-bo-471",
-   "operations": 1,
-   "drawn": true
-  },
-  {
-   "id": "BO-472",
-   "name": "Operational Alerts & Exception Center",
-   "module": "Games & Rides",
-   "wave": 3,
-   "route": "/games-rides/operational-alerts-exception-center-bo-472",
    "operations": 1,
    "drawn": true
   },
@@ -7762,15 +7735,6 @@
    "drawn": true
   },
   {
-   "id": "BO-652",
-   "name": "Credential Replacement & Reissue",
-   "module": "Access & Venue",
-   "wave": 3,
-   "route": "/access-venue/credential-replacement-reissue-bo-652",
-   "operations": 1,
-   "drawn": true
-  },
-  {
    "id": "BO-653",
    "name": "Credential Registry & Credential History",
    "module": "Access & Venue",
@@ -8384,7 +8348,7 @@
   },
   {
    "id": "BO-721",
-   "name": "Activity Session & Slot Template Configuration",
+   "name": "Activity Performance & Slot Template Configuration",
    "module": "Sell",
    "wave": 3,
    "route": "/sell/activity-session-slot-template-configuration-bo-721",
@@ -8420,7 +8384,7 @@
   },
   {
    "id": "BO-725",
-   "name": "Session Operations Command Center",
+   "name": "Performance Operations Command Center",
    "module": "Sell",
    "wave": 3,
    "route": "/sell/session-operations-command-center-bo-725",
@@ -8514,7 +8478,7 @@
    "module": "Engagement & Support",
    "wave": 3,
    "route": "/engagement-support/guest-directory-bo-735",
-   "operations": 2,
+   "operations": 7,
    "drawn": true
   },
   {
@@ -10993,6 +10957,12 @@
     "summary": ""
    },
    {
+    "operation": "submitApprovalRequest",
+    "contract": "approvals",
+    "verb": "POST",
+    "summary": "Send a saved draft for approval"
+   },
+   {
     "operation": "assessProductChange",
     "contract": "catalogue",
     "verb": "POST",
@@ -11215,6 +11185,12 @@
     "summary": "Escalate a finding"
    },
    {
+    "operation": "getAllergenVerification",
+    "contract": "fnb",
+    "verb": "GET",
+    "summary": "The last allergen verdict recorded for a dish"
+   },
+   {
     "operation": "getFnbReservationPolicy",
     "contract": "fnb",
     "verb": "GET",
@@ -11365,6 +11341,12 @@
     "summary": "A membership with its history, usage and renewals"
    },
    {
+    "operation": "getPasswordPolicy",
+    "contract": "identity",
+    "verb": "GET",
+    "summary": "Read the password and MFA policy in force"
+   },
+   {
     "operation": "getPrincipalModuleAccess",
     "contract": "identity",
     "verb": "GET",
@@ -11465,12 +11447,6 @@
     "contract": "inventory",
     "verb": "GET",
     "summary": "Soft holds on stock"
-   },
-   {
-    "operation": "submitCountLines",
-    "contract": "inventory",
-    "verb": "POST",
-    "summary": "Submit counted quantities"
    },
    {
     "operation": "addGuestNote",
@@ -11929,22 +11905,10 @@
     "summary": "Archive a dashboard"
    },
    {
-    "operation": "deleteReportSchedule",
-    "contract": "reporting",
-    "verb": "DELETE",
-    "summary": "Delete a schedule"
-   },
-   {
     "operation": "listAlertRules",
     "contract": "reporting",
     "verb": "GET",
     "summary": "What raises an alert, and when"
-   },
-   {
-    "operation": "updateReportSchedule",
-    "contract": "reporting",
-    "verb": "PATCH",
-    "summary": "Amend, pause or resume a schedule"
    },
    {
     "operation": "getResourceQualifications",
@@ -11999,6 +11963,12 @@
     "contract": "retail",
     "verb": "GET",
     "summary": "List returns"
+   },
+   {
+    "operation": "updateSeatCategory",
+    "contract": "seating",
+    "verb": "PATCH",
+    "summary": "Rename, re-rank or re-price a seat category"
    },
    {
     "operation": "approveShiftClose",

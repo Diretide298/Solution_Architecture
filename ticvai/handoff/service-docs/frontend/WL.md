@@ -26,16 +26,16 @@ White Labelling is a module, not an app. Its screens live in the CMS (P13) and t
 
 | ID | Screen | Module | Wave | Operations |
 |---|---|---|---|---|
-| [ADM-016](#adm-016-white-label-branding-management) | White-Label Branding Management | Branding & Localisation | 2 | 11 |
-| [ADM-017](#adm-017-domain-certificate-management) | Domain & Certificate Management | Branding & Localisation | 2 | 4 |
-| [ADM-018](#adm-018-localisation-language-pack) | Localisation & Language Pack | Branding & Localisation | 2 | 5 |
+| [ADM-016](#adm-016-white-label-branding-management) | White-Label Branding Management | Branding & Localisation | 2 | 13 |
+| [ADM-017](#adm-017-domain-certificate-management) | Domain & Certificate Management | Branding & Localisation | 2 | 6 |
+| [ADM-018](#adm-018-localisation-language-pack) | Localisation & Language Pack | Branding & Localisation | 2 | 7 |
 | [CMS-001](#cms-001-tenant-workspace) | Tenant Workspace | White Label | 2 | 7 |
 | [CMS-002](#cms-002-brand-kit) | Brand Kit | White Label | 2 | 4 |
 | [CMS-003](#cms-003-typography) | Typography | White Label | 2 | 4 |
 | [CMS-004](#cms-004-logo-assets) | Logo & Assets | White Label | 2 | 4 |
 | [CMS-005](#cms-005-theme-editor) | Theme Editor | White Label | 2 | 2 |
 | [CMS-006](#cms-006-component-preview) | Component Preview | White Label | 2 | 5 |
-| [CMS-007](#cms-007-page-builder) | Page Builder | White Label | 2 | 6 |
+| [CMS-007](#cms-007-page-builder) | Page Builder | White Label | 2 | 7 |
 | [CMS-008](#cms-008-content-blocks) | Content Blocks | White Label | 2 | 7 |
 | [CMS-009](#cms-009-navigation-menus) | Navigation & Menus | White Label | 2 | 5 |
 | [CMS-010](#cms-010-media-library) | Media Library | White Label | 2 | 12 |
@@ -48,7 +48,6 @@ White Labelling is a module, not an app. Its screens live in the CMS (P13) and t
 | [CMS-017](#cms-017-domain-certificate) | Domain & Certificate | White Label | 2 | 4 |
 | [CMS-018](#cms-018-consent-legal) | Consent & Legal | White Label | 2 | 4 |
 | [CMS-019](#cms-019-user-access) | User Access | White Label | 2 | 2 |
-| [CMS-020](#cms-020-change-log) | Change Log | White Label | 2 | 1 |
 
 ## ADM-016 White-Label Branding Management
 
@@ -76,6 +75,8 @@ White Labelling is a module, not an app. Its screens live in the CMS (P13) and t
 
 | Operation | Service | When | Purpose | Permission |
 |---|---|---|---|---|
+| `openPlatformStaffGrant` | [IdentityService](../backend/IdentityService.md#openplatformstaffgrant) | onAction | Open a time-boxed, audited platform-staff grant into the picked tenant before any tenant-scoped operation here; the tenant sees it (decided 28 September, audit R098) | `PLATFORM_TENANT_ACCESS` |
+| `listTenants` | [PlatformService](../backend/PlatformService.md#listtenants) | onLoad | The tenant picker — the operator picks a tenant before acting in its cell (audit R098) | `PLATFORM_TENANT_VIEW` |
 | `createPreview` | [WhiteLabelService](../backend/WhiteLabelService.md#createpreview) | onAction | Generate a preview link | `TENANT_CONFIGURE` |
 | `diffConfigVersion` | [WhiteLabelService](../backend/WhiteLabelService.md#diffconfigversion) | onAction | Compare a version against the working draft | `TENANT_CONFIGURE` |
 | `getAppIcons` | [WhiteLabelService](../backend/WhiteLabelService.md#getappicons) | onLoad | Read app icon set | `TENANT_CONFIGURE` |
@@ -97,6 +98,7 @@ White Labelling is a module, not an app. Its screens live in the CMS (P13) and t
 | emptyFirstRun | No white-label branding yet. Offers Create preview (`createPreview`). |
 | emptyNoResults | Never shown: `listConfigVersions` takes no filter, so an empty list is always the first-run state above. |
 | emptyNoAccess | Shown when the caller lacks `TENANT_CONFIGURE`, which `getAppIcons` requires, and names that permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| grantRequired | No access into this tenant yet. A tenant is picked and no platform-staff grant into it is open, so every tenant action is disabled and the screen offers Open access grant (`openPlatformStaffGrant`: reason, permissions, expiry). The same state returns when the grant reaches `expiresAt` (decided 28 September, audit R098). |
 
 **Goes to**
 
@@ -104,7 +106,6 @@ White Labelling is a module, not an app. Its screens live in the CMS (P13) and t
 |---|---|---|---|
 | ADM-001 | Platform Login / MFA |  |  |
 | ADM-002 | Platform Dashboard |  |  |
-| ADM-003 | Cross-Tenant Health Dashboard |  |  |
 
 ## ADM-017 Domain & Certificate Management
 
@@ -133,6 +134,8 @@ White Labelling is a module, not an app. Its screens live in the CMS (P13) and t
 
 | Operation | Service | When | Purpose | Permission |
 |---|---|---|---|---|
+| `openPlatformStaffGrant` | [IdentityService](../backend/IdentityService.md#openplatformstaffgrant) | onAction | Open a time-boxed, audited platform-staff grant into the picked tenant before any tenant-scoped operation here; the tenant sees it (decided 28 September, audit R098) | `PLATFORM_TENANT_ACCESS` |
+| `listTenants` | [PlatformService](../backend/PlatformService.md#listtenants) | onLoad | The tenant picker — the operator picks a tenant before acting in its cell (audit R098) | `PLATFORM_TENANT_VIEW` |
 | `listCustomDomains` | [WhiteLabelService](../backend/WhiteLabelService.md#listcustomdomains) | onLoad | The domains this tenant has claimed | `TENANT_CONFIGURE` |
 | `claimCustomDomain` | [WhiteLabelService](../backend/WhiteLabelService.md#claimcustomdomain) | onAction | Claim a domain and get a verification token | `TENANT_CONFIGURE` |
 | `verifyCustomDomain` | [WhiteLabelService](../backend/WhiteLabelService.md#verifycustomdomain) | onAction | Check the record and issue the certificate | `TENANT_CONFIGURE` |
@@ -147,6 +150,7 @@ White Labelling is a module, not an app. Its screens live in the CMS (P13) and t
 | emptyFirstRun | No domain certificate yet. Offers no create action — this screen declares no operation that makes one — and says so rather than showing an empty table. |
 | emptyNoResults | Never shown: `listCustomDomains` takes no filter, so an empty list is always the first-run state above. |
 | emptyNoAccess | Shown when the caller lacks `TENANT_CONFIGURE`, which `listCustomDomains` requires, and names that permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| grantRequired | No access into this tenant yet. A tenant is picked and no platform-staff grant into it is open, so every tenant action is disabled and the screen offers Open access grant (`openPlatformStaffGrant`: reason, permissions, expiry). The same state returns when the grant reaches `expiresAt` (decided 28 September, audit R098). |
 
 **Goes to**
 
@@ -154,7 +158,6 @@ White Labelling is a module, not an app. Its screens live in the CMS (P13) and t
 |---|---|---|---|
 | ADM-001 | Platform Login / MFA |  |  |
 | ADM-002 | Platform Dashboard |  |  |
-| ADM-003 | Cross-Tenant Health Dashboard |  |  |
 | ADM-016 | White-Label Branding Management | bannerId, pageId, policyKind, version |  |
 
 ## ADM-018 Localisation & Language Pack
@@ -183,6 +186,8 @@ White Labelling is a module, not an app. Its screens live in the CMS (P13) and t
 
 | Operation | Service | When | Purpose | Permission |
 |---|---|---|---|---|
+| `openPlatformStaffGrant` | [IdentityService](../backend/IdentityService.md#openplatformstaffgrant) | onAction | Open a time-boxed, audited platform-staff grant into the picked tenant before any tenant-scoped operation here; the tenant sees it (decided 28 September, audit R098) | `PLATFORM_TENANT_ACCESS` |
+| `listTenants` | [PlatformService](../backend/PlatformService.md#listtenants) | onLoad | The tenant picker — the operator picks a tenant before acting in its cell (audit R098) | `PLATFORM_TENANT_VIEW` |
 | `setLanguages` | [WhiteLabelService](../backend/WhiteLabelService.md#setlanguages) | onAction | from page inventory | `TENANT_CONFIGURE` |
 | `listFaqs` | [WhiteLabelService](../backend/WhiteLabelService.md#listfaqs) | onLoad | List FAQs | `TENANT_CONFIGURE` |
 | `listPolicies` | [WhiteLabelService](../backend/WhiteLabelService.md#listpolicies) | onLoad | List legal policies | `TENANT_CONFIGURE` |
@@ -198,6 +203,7 @@ White Labelling is a module, not an app. Its screens live in the CMS (P13) and t
 | emptyFirstRun | No localisation language pack yet. Offers no create action — this screen declares no operation that makes one — and says so rather than showing an empty table. |
 | emptyNoResults | Never shown: `listFaqs` takes no filter, so an empty list is always the first-run state above. |
 | emptyNoAccess | Shown when the caller lacks `TENANT_CONFIGURE`, which `listFaqs` requires, and names that permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| grantRequired | No access into this tenant yet. A tenant is picked and no platform-staff grant into it is open, so every tenant action is disabled and the screen offers Open access grant (`openPlatformStaffGrant`: reason, permissions, expiry). The same state returns when the grant reaches `expiresAt` (decided 28 September, audit R098). |
 
 **Goes to**
 
@@ -205,7 +211,6 @@ White Labelling is a module, not an app. Its screens live in the CMS (P13) and t
 |---|---|---|---|
 | ADM-001 | Platform Login / MFA |  |  |
 | ADM-002 | Platform Dashboard |  |  |
-| ADM-003 | Cross-Tenant Health Dashboard |  |  |
 
 ## CMS-001 Tenant Workspace
 
@@ -230,7 +235,7 @@ White Labelling is a module, not an app. Its screens live in the CMS (P13) and t
 | `getFeatureToggles` | [WhiteLabelService](../backend/WhiteLabelService.md#getfeaturetoggles) | onLoad | Which features are switched on | `TENANT_CONFIGURE` |
 | `setModuleEnablement` | [WhiteLabelService](../backend/WhiteLabelService.md#setmoduleenablement) | onAction | Switch a module on or off for guests | `TENANT_CONFIGURE` |
 | `setFeatureToggles` | [WhiteLabelService](../backend/WhiteLabelService.md#setfeaturetoggles) | onAction | Switch a feature on or off | `TENANT_CONFIGURE` |
-| `setMaintenanceMode` | [WhiteLabelService](../backend/WhiteLabelService.md#setmaintenancemode) | onAction | Put the guest web and app into maintenance | `TENANT_CONFIGURE` |
+| `setMaintenanceMode` | [WhiteLabelService](../backend/WhiteLabelService.md#setmaintenancemode) | onAction | Put the guest web and app into maintenance, and set the rest of the live app status — minimum app version, contact details, availability (decided 28 September, audit R073) | `TENANT_CONFIGURE` |
 
 **States**
 
@@ -257,7 +262,7 @@ White Labelling is a module, not an app. Its screens live in the CMS (P13) and t
 | CMS-011 | Translations |  |  |
 | CMS-016 | Site Settings |  |  |
 | CMS-019 | User Access |  |  |
-| CMS-020 | Change Log |  |  |
+| CMS-015 | Version History | version |  |
 | CMS-021 | Privacy & Consent Configuration Command Center |  |  |
 | CMS-031 | Privacy Operations Command Center |  |  |
 | CMS-041 | Waiver & Consent Command Center |  |  |
@@ -517,6 +522,7 @@ White Labelling is a module, not an app. Its screens live in the CMS (P13) and t
 | `setFooter` | [WhiteLabelService](../backend/WhiteLabelService.md#setfooter) | onAction | Set the guest web and app footer | `TENANT_CONFIGURE` |
 | `getHomepageLayout` | [WhiteLabelService](../backend/WhiteLabelService.md#gethomepagelayout) | onLoad | Read homepage layout | `TENANT_CONFIGURE` |
 | `setHomepageLayout` | [WhiteLabelService](../backend/WhiteLabelService.md#sethomepagelayout) | onAction | Set homepage section order | `TENANT_CONFIGURE` |
+| `getModuleEnablement` | [WhiteLabelService](../backend/WhiteLabelService.md#getmoduleenablement) | onLoad | Which modules are on, so a section whose module is off is disabled in the builder (decided 28 September, audit R163 (4)) | `TENANT_CONFIGURE` |
 
 **States**
 
@@ -840,7 +846,7 @@ White Labelling is a module, not an app. Its screens live in the CMS (P13) and t
 
 ## CMS-015 Version History
 
-**See what changed and go back if it was wrong.**
+**See who changed what and go back if it was wrong — by restoring into the draft, reviewing, then publishing.**
 
 |  |  |
 |---|---|
@@ -863,7 +869,7 @@ White Labelling is a module, not an app. Its screens live in the CMS (P13) and t
 |---|---|---|---|---|
 | `listConfigVersions` | [WhiteLabelService](../backend/WhiteLabelService.md#listconfigversions) | onLoad | Version history | `TENANT_CONFIGURE` |
 | `diffConfigVersion` | [WhiteLabelService](../backend/WhiteLabelService.md#diffconfigversion) | onAction | Compare a version against the working draft | `TENANT_CONFIGURE` |
-| `restoreConfigVersion` | [WhiteLabelService](../backend/WhiteLabelService.md#restoreconfigversion) | onAction | Restore a previous version | `TENANT_PUBLISH` |
+| `restoreConfigVersion` | [WhiteLabelService](../backend/WhiteLabelService.md#restoreconfigversion) | onAction | Restore a previous version into the working draft; it does not publish (audit R139 (b)) | `TENANT_PUBLISH` |
 
 **States**
 
@@ -882,6 +888,7 @@ White Labelling is a module, not an app. Its screens live in the CMS (P13) and t
 | CMS-001 | Tenant Workspace |  |  |
 | CMS-002 | Brand Kit |  |  |
 | CMS-003 | Typography | version |  |
+| CMS-014 | Review and publish the restored draft |  |  |
 
 ## CMS-016 Site Settings
 
@@ -1052,40 +1059,3 @@ White Labelling is a module, not an app. Its screens live in the CMS (P13) and t
 | CMS-001 | Tenant Workspace |  |  |
 | CMS-002 | Brand Kit |  |  |
 | CMS-003 | Typography |  |  |
-
-## CMS-020 Change Log
-
-**See who changed what, before the publish that carried it.**
-
-|  |  |
-|---|---|
-| Module | White Label |
-| Wave | 2 |
-| Licensed module | core |
-| Route | `/white-label/change-log` |
-| Component | `apps/venue-management-web/src/routes/white-label/ChangeLogDetail.tsx` |
-| Pattern | listDetail |
-
-**Operations**
-
-| Operation | Service | When | Purpose | Permission |
-|---|---|---|---|---|
-| `listConfigVersions` | [WhiteLabelService](../backend/WhiteLabelService.md#listconfigversions) | onLoad | Version history | `TENANT_CONFIGURE` |
-
-**States**
-
-| State | Behaviour |
-|---|---|
-| loading | The change log list. |
-| error | Could not load. Names which read failed and leaves the change log untouched. |
-| emptyFirstRun | No change log yet. Offers no create action — this screen declares no operation that makes one — and says so rather than showing an empty table. |
-| emptyNoResults | Never shown: `listConfigVersions` takes no filter, so an empty list is always the first-run state above. |
-| emptyNoAccess | Shown when the caller lacks `TENANT_CONFIGURE`, which `listConfigVersions` requires, and names that permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
-
-**Goes to**
-
-| To | Trigger | Carries | Guard |
-|---|---|---|---|
-| CMS-001 | Tenant Workspace |  |  |
-| CMS-002 | Brand Kit |  |  |
-| CMS-003 | Typography | version |  |

@@ -19,44 +19,38 @@ offlineBehaviour: None of it offline. Publishing changes what every till charges
 steps:
 - step: 1
   screen: BO-083
-  action: Suppliers.
+  action: The supplier is found or set up, and its quotation recorded.
   operations:
-  - createSupplier
-  - getSupplierPerformance
   - listSuppliers
+  - createSupplier
   - recordQuotation
-  - updateSupplier
-  outcome: '**Drawn by the client as RET-2G.** 5 operations on this step.'
+  outcome: '**Suppliers are the tenant''s; a venue records the quotation** (audit R183). The quoted
+    price is what a purchase order line later prefills.'
 - step: 2
   screen: BO-007
-  action: Product Directory.
+  action: The new range becomes products in the directory.
   operations:
-  - bulkUpdateProducts
   - createMerchandise
   - createProduct
-  - listAlternativeCodes
-  - listMenus
-  - resolveProductByCode
-  outcome: '**Drawn by the client as RET-2B.** 10 operations on this step.'
+  - setAlternativeCodes
+  outcome: '**One product per sellable thing, with its barcodes.** A range that is not in the directory
+    cannot be priced or scanned.'
   crossesDevice: true
 - step: 3
-  screen: BO-112
-  action: Production Planning & Production Sheets.
+  screen: BO-009
+  action: The range is priced.
   operations:
-  - planProductionRun
-  outcome: '**Drawn by the client as RET-2A.** 1 operations on this step.'
+  - listPriceLists
+  - setPrices
+  outcome: What the tills will charge, from when.
   crossesDevice: true
 - step: 4
-  screen: BO-009
-  action: Pricing Rules.
+  screen: BO-014
+  action: The priced range is published to the tills.
   operations:
-  - copyPriceList
-  - createPriceList
-  - getPriceList
-  - listPriceLists
-  - listPrices
-  - setPrices
-  outcome: '**Drawn by the client as RET-2E.** 7 operations on this step.'
+  - transitionProductLifecycle
+  - publishBundle
+  outcome: '**Publishing is what changes what every till charges**, which is why it is its own step.'
   crossesDevice: true
 branches:
 - at: 1
@@ -71,7 +65,7 @@ exitStates:
   description: The chain ran as the client drew it.
 - state: stoppedAtModule
   description: '**A licence boundary, not a failure.**'
-notes: '**Supplier to shelf, as the client drew it.** `updateSupplier` and `getStockTransfer` were both
+notes: '**Re-authored 28 September to follow the purpose of each screen it visits** (decided 28 September, audit R261): production planning (BO-112) left the journey, since a kitchen production sheet is no part of setting up a supplier and pricing a range, and the publish step now lands on Catalogue Publishing. **Supplier to shelf, as the client drew it.** `updateSupplier` and `getStockTransfer` were both
   built on 24 August because this board named them and nothing answered. **Derived from the client''s
   own `GOES TO` edges**, not from an inferred path — a pair of frames the client linked is evidence;
   a chain assembled from unrelated pairs is a guess.'

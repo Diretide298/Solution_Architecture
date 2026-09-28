@@ -189,6 +189,21 @@ screens:
         label: Login
         operation: login
         provenance: contract identity.yaml POST /auth/login
+      - kind: textField
+        label: Authentication code
+        operation: verifyMfaChallenge
+        provenance: contract identity.yaml POST /auth/mfa/challenge/{challengeId}/verify
+        notes: Shown only in the mfaRequired state (audit R135).
+      - kind: primaryButton
+        label: Verify
+        operation: verifyMfaChallenge
+        provenance: contract identity.yaml POST /auth/mfa/challenge/{challengeId}/verify
+      - kind: secondaryButton
+        label: Email me a code instead
+        operation: createMfaChallenge
+        provenance: contract identity.yaml POST /auth/mfa/challenge
+        notes: The fallback -- issues the challenge against the principal's email (`emailOtp`) method
+          (audit R126 (5)).
       - kind: secondaryButton
         label: Select role
         operation: selectRole
@@ -207,6 +222,12 @@ screens:
     emptyNoAccess: Shown when the caller lacks `SHIFT_OPEN`, which `getCurrentShift` requires, and names
       that permission. **Never an empty table** — that reads as *there is no data* and sends somebody
       to support with the wrong question.
+    mfaRequired: '**Signed in, not yet through.** The principal holds a permission that requires MFA (ROLE_MANAGE,
+      LEDGER_APPROVE, any platform-staff permission, or one the tenant added), so after `login` the screen
+      calls `createMfaChallenge` and asks for the authenticator code; `verifyMfaChallenge` completes the
+      sign-in. **Email me a code instead** is the fallback. Five wrong codes lock step-up for the policy''s
+      lockout minutes and the screen says so. A principal with no enrolled method is sent to enrol first
+      (decided 28 September, audit R135, R126).'
     offline: '**Signs in against the cached principal list from the last bundle.** A steward locked out
       at 08:00 because the venue wifi is down is a gate that does not open'
   apis:
@@ -242,10 +263,23 @@ screens:
     trigger: onAction
     invalidates:
     - listMfaMethods
+  - operationId: createMfaChallenge
+    contract: identity
+    purpose: Second factor after login when the principal holds a permission in mfaRequiredForPermissions;
+      action `signIn`, the primary method (authenticator app), or the email method as the fallback (decided
+      28 September, audit R135, R126 (5))
+    trigger: onAction
+  - operationId: verifyMfaChallenge
+    contract: identity
+    purpose: Completes sign-in with the code; the session is usable only after it. Five wrong codes lock
+      step-up (audit R126 (6))
+    trigger: onAction
   entryState:
     params:
     - name: shiftId
       from: session
+    - name: challengeId
+      from: navigation
     coldEntry: Resolves from the session; a cold arrival is the ordinary case.
     preloaded:
     - MfaMethod.id
@@ -333,8 +367,8 @@ screens:
       provenance: flow F06 step 2→3, F61 step 2→3
     - to: SCN-001
       trigger: Sign in
-      provenance: derived — SCN-001 declares entryState.params  and SCN-002 holds none of them, so the
-        edge carries nothing and SCN-001 opens cold
+      provenance: derived — SCN-001 declares entryState.params challengeId and SCN-002 holds none of them,
+        so the edge carries nothing and SCN-001 opens cold
     - to: SCN-003
       trigger: Ready to scan
       provenance: derived — SCN-003 declares entryState.params mediaCode, rightId and SCN-002 holds none
@@ -351,9 +385,10 @@ screens:
     is created in the back office and a geofence is a venue decision — a handheld at a lane that can redefine
     the lane is a handheld that can admit anywhere. **`setTurnstileMode` belongs here and flow F06 is
     why.** It was taken off on 4 September on the reasoning that this screen only reads — but F06 *guest
-    enters the venue* step 2 is ''confirms access point and direction'', and confirming the direction
-    IS setting the mode. The flow is the authority on the journey; the screen was right and the tidy-up
-    was wrong.'
+    enters the venue* step 2 is ''confirms access point and direction''. **Since 28 September (audit R221)
+    confirming the direction is not setting the mode**: the direction is fixed per access point and shown
+    here read-only; what the operator sets is the operating mode (required), with the turnstile mode (freeRotation
+    or closed) as an optional narrowing under normal or podium only.'
   density: comfortable
   pattern: listDetail
   patternReason: '`listAccessPoints` reads the population and `getAccessPoint` reads one of them — list,
@@ -415,7 +450,7 @@ screens:
       slot: rowActions
       components:
       - kind: primaryButton
-        label: Save turnstile mode
+        label: Save gate mode
         operation: setTurnstileMode
         provenance: contract access.yaml PUT /access-points/{accessPointId}/mode
   states:
@@ -440,7 +475,8 @@ screens:
     trigger: onAction
   - operationId: setTurnstileMode
     contract: access
-    purpose: Confirm the direction this gate runs in
+    purpose: Set the gate's operating mode (required), optionally narrowed by the turnstile mode; the
+      direction is display-only (audit R221)
     trigger: onAction
     invalidates:
     - listAccessPoints
@@ -469,15 +505,20 @@ screens:
   overlays:
   - id: formSetTurnstileMode
     component: modal
-    trigger: Save turnstile mode
-    body: '**Collects what `setTurnstileMode` sends before it is called.** Required: `mode`. Optional:
-      `reason`. Dismissing sends nothing; the screen behind is unchanged.'
+    trigger: Save gate mode
+    body: '**Collects what `setTurnstileMode` sends before it is called.** Required: `operatingMode` (normal,
+      freeFlow, dropArm, closed, podium, maintenance). Optional: `mode` (freeRotation or closed), offered
+      only with normal or podium, since the other four already decide the arm and the server refuses it
+      400; and `reason`. **Direction is not on this form**: it is fixed per access point and set in the
+      back office (BO-064) with createAccessPoint/updateAccessPoint (decided 28 September, audit R221).
+      Dismissing sends nothing; the screen behind is unchanged.'
     confirm:
-      label: Save turnstile mode
+      label: Save gate mode
       operation: setTurnstileMode
     dismiss:
       label: Cancel
       discards:
+      - operatingMode
       - mode
       - reason
     provenance: contract access.yaml PUT /access-points/{accessPointId}/mode
@@ -513,8 +554,8 @@ screens:
       provenance: flow F06 step 5→6, F19 step 3→4
     - to: SCN-001
       trigger: Sign in
-      provenance: derived — SCN-001 declares entryState.params  and SCN-003 holds none of them, so the
-        edge carries nothing and SCN-001 opens cold
+      provenance: derived — SCN-001 declares entryState.params challengeId and SCN-003 holds none of them,
+        so the edge carries nothing and SCN-001 opens cold
     - to: SCN-002
       trigger: Access point & direction
       carries:
@@ -599,7 +640,7 @@ screens:
         - ScanEvent.direction
         - ScanEvent.operatorPrincipalId
         - ScanEvent.deviceId
-        - ScanEvent.overriddenByPrincipalId
+        - ScanEvent.overridesScanId
         operation: listScans
         provenance: contract access.yaml GET /access/scans
       - kind: dataTable
@@ -645,7 +686,7 @@ screens:
         - ScanEvent.direction
         - ScanEvent.operatorPrincipalId
         - ScanEvent.deviceId
-        - ScanEvent.overriddenByPrincipalId
+        - ScanEvent.overridesScanId
         - ScanEvent.overrideReason
         - ScanEvent.recordedAt
         - ScanEvent.syncedAt
@@ -885,8 +926,8 @@ screens:
     transitions:
     - to: SCN-001
       trigger: Sign in
-      provenance: derived — SCN-001 declares entryState.params  and SCN-007 holds none of them, so the
-        edge carries nothing and SCN-001 opens cold
+      provenance: derived — SCN-001 declares entryState.params challengeId and SCN-007 holds none of them,
+        so the edge carries nothing and SCN-001 opens cold
     - to: SCN-002
       trigger: Access point & direction
       carries:
@@ -953,7 +994,7 @@ screens:
         - ScanEvent.direction
         - ScanEvent.operatorPrincipalId
         - ScanEvent.deviceId
-        - ScanEvent.overriddenByPrincipalId
+        - ScanEvent.overridesScanId
         operation: listScans
         provenance: contract access.yaml GET /access/scans
       - kind: scanTarget
@@ -987,7 +1028,7 @@ screens:
         - ScanEvent.direction
         - ScanEvent.operatorPrincipalId
         - ScanEvent.deviceId
-        - ScanEvent.overriddenByPrincipalId
+        - ScanEvent.overridesScanId
         - ScanEvent.overrideReason
         - ScanEvent.recordedAt
         - ScanEvent.syncedAt
@@ -1181,8 +1222,8 @@ screens:
       operation: lookupTicket
     - to: SCN-001
       trigger: Sign in
-      provenance: derived — SCN-001 declares entryState.params  and SCN-008 holds none of them, so the
-        edge carries nothing and SCN-001 opens cold
+      provenance: derived — SCN-001 declares entryState.params challengeId and SCN-008 holds none of them,
+        so the edge carries nothing and SCN-001 opens cold
     - to: SCN-002
       trigger: Access point & direction
       carries:
@@ -1249,7 +1290,7 @@ screens:
         - ScanEvent.direction
         - ScanEvent.operatorPrincipalId
         - ScanEvent.deviceId
-        - ScanEvent.overriddenByPrincipalId
+        - ScanEvent.overridesScanId
         operation: listScans
         provenance: contract access.yaml GET /access/scans
       - kind: searchField
@@ -1283,7 +1324,7 @@ screens:
         - ScanEvent.direction
         - ScanEvent.operatorPrincipalId
         - ScanEvent.deviceId
-        - ScanEvent.overriddenByPrincipalId
+        - ScanEvent.overridesScanId
         - ScanEvent.overrideReason
         - ScanEvent.recordedAt
         - ScanEvent.syncedAt
@@ -1479,8 +1520,8 @@ screens:
     transitions:
     - to: SCN-001
       trigger: Sign in
-      provenance: derived — SCN-001 declares entryState.params  and SCN-009 holds none of them, so the
-        edge carries nothing and SCN-001 opens cold
+      provenance: derived — SCN-001 declares entryState.params challengeId and SCN-009 holds none of them,
+        so the edge carries nothing and SCN-001 opens cold
     - to: SCN-002
       trigger: Access point & direction
       carries:
@@ -1546,7 +1587,7 @@ screens:
         - ScanEvent.direction
         - ScanEvent.operatorPrincipalId
         - ScanEvent.deviceId
-        - ScanEvent.overriddenByPrincipalId
+        - ScanEvent.overridesScanId
         operation: listScans
         provenance: contract access.yaml GET /access/scans
       - kind: searchField
@@ -1580,7 +1621,7 @@ screens:
         - ScanEvent.direction
         - ScanEvent.operatorPrincipalId
         - ScanEvent.deviceId
-        - ScanEvent.overriddenByPrincipalId
+        - ScanEvent.overridesScanId
         - ScanEvent.overrideReason
         - ScanEvent.recordedAt
         - ScanEvent.syncedAt
@@ -1772,8 +1813,8 @@ screens:
     transitions:
     - to: SCN-001
       trigger: Sign in
-      provenance: derived — SCN-001 declares entryState.params  and SCN-011 holds none of them, so the
-        edge carries nothing and SCN-001 opens cold
+      provenance: derived — SCN-001 declares entryState.params challengeId and SCN-011 holds none of them,
+        so the edge carries nothing and SCN-001 opens cold
     - to: SCN-002
       trigger: Access point & direction
       provenance: derived — SCN-002 declares entryState.params accessPointId and SCN-011 holds none of
@@ -1909,8 +1950,8 @@ screens:
       operation: listScans
     - to: SCN-001
       trigger: Sign in
-      provenance: derived — SCN-001 declares entryState.params  and SCN-013 holds none of them, so the
-        edge carries nothing and SCN-001 opens cold
+      provenance: derived — SCN-001 declares entryState.params challengeId and SCN-013 holds none of them,
+        so the edge carries nothing and SCN-001 opens cold
     - to: SCN-002
       trigger: Access point & direction
       carries:
@@ -1977,7 +2018,7 @@ screens:
         - ScanEvent.direction
         - ScanEvent.operatorPrincipalId
         - ScanEvent.deviceId
-        - ScanEvent.overriddenByPrincipalId
+        - ScanEvent.overridesScanId
         operation: listScans
         provenance: contract access.yaml GET /access/scans
       - kind: scanTarget
@@ -2011,7 +2052,7 @@ screens:
         - ScanEvent.direction
         - ScanEvent.operatorPrincipalId
         - ScanEvent.deviceId
-        - ScanEvent.overriddenByPrincipalId
+        - ScanEvent.overridesScanId
         - ScanEvent.overrideReason
         - ScanEvent.recordedAt
         - ScanEvent.syncedAt
@@ -2204,8 +2245,8 @@ screens:
     transitions:
     - to: SCN-001
       trigger: Sign in
-      provenance: derived — SCN-001 declares entryState.params  and SCN-014 holds none of them, so the
-        edge carries nothing and SCN-001 opens cold
+      provenance: derived — SCN-001 declares entryState.params challengeId and SCN-014 holds none of them,
+        so the edge carries nothing and SCN-001 opens cold
     - to: SCN-002
       trigger: Access point & direction
       carries:
@@ -2285,7 +2326,7 @@ screens:
         - ScanEvent.direction
         - ScanEvent.operatorPrincipalId
         - ScanEvent.deviceId
-        - ScanEvent.overriddenByPrincipalId
+        - ScanEvent.overridesScanId
         operation: listScans
         provenance: contract access.yaml GET /access/scans
       - kind: scanTarget
@@ -2534,8 +2575,8 @@ screens:
       operation: getOfflinePackage
     - to: SCN-001
       trigger: Sign in
-      provenance: derived — SCN-001 declares entryState.params  and SCN-015 holds none of them, so the
-        edge carries nothing and SCN-001 opens cold
+      provenance: derived — SCN-001 declares entryState.params challengeId and SCN-015 holds none of them,
+        so the edge carries nothing and SCN-001 opens cold
     - to: SCN-002
       trigger: Access point & direction
       carries:
@@ -2602,7 +2643,7 @@ screens:
         - ScanEvent.direction
         - ScanEvent.operatorPrincipalId
         - ScanEvent.deviceId
-        - ScanEvent.overriddenByPrincipalId
+        - ScanEvent.overridesScanId
         operation: listScans
         provenance: contract access.yaml GET /access/scans
       - kind: scanTarget
@@ -2636,7 +2677,7 @@ screens:
         - ScanEvent.direction
         - ScanEvent.operatorPrincipalId
         - ScanEvent.deviceId
-        - ScanEvent.overriddenByPrincipalId
+        - ScanEvent.overridesScanId
         - ScanEvent.overrideReason
         - ScanEvent.recordedAt
         - ScanEvent.syncedAt
@@ -2828,8 +2869,8 @@ screens:
     transitions:
     - to: SCN-001
       trigger: Sign in
-      provenance: derived — SCN-001 declares entryState.params  and SCN-016 holds none of them, so the
-        edge carries nothing and SCN-001 opens cold
+      provenance: derived — SCN-001 declares entryState.params challengeId and SCN-016 holds none of them,
+        so the edge carries nothing and SCN-001 opens cold
     - to: SCN-002
       trigger: Access point & direction
       carries:
@@ -2844,7 +2885,10 @@ screens:
     still to be written. **Authoring operations removed 24 August**: createAccessPoint, setAccessPointGeofence,
     updateAccessPoint. **A scanner reads the gate configuration; it does not write it.** An access point
     is created in the back office and a geofence is a venue decision — a handheld at a lane that can redefine
-    the lane is a handheld that can admit anywhere.'
+    the lane is a handheld that can admit anywhere. **The podium sets the operating mode** (normal, freeFlow,
+    dropArm, closed, podium, maintenance), required on every save; the turnstile mode (freeRotation or
+    closed) is optional and offered only under normal or podium. **Direction is display-only here**: it
+    is fixed per access point and set in the back office (BO-064) (decided 28 September, audit R221).'
   density: comfortable
   pattern: listDetail
   patternReason: '`listAccessPoints` reads the population and `getAccessPoint` reads one of them — list,
@@ -2906,7 +2950,7 @@ screens:
       slot: rowActions
       components:
       - kind: primaryButton
-        label: Save turnstile mode
+        label: Save gate mode
         operation: setTurnstileMode
         provenance: contract access.yaml PUT /access-points/{accessPointId}/mode
   states:
@@ -2924,7 +2968,8 @@ screens:
   apis:
   - operationId: setTurnstileMode
     contract: access
-    purpose: From the flow it appears in
+    purpose: Podium sets the operating mode (required), optionally narrowed by the turnstile mode under
+      normal or podium; direction is display-only (audit R221)
     trigger: onAction
   - operationId: getAccessPoint
     contract: access
@@ -2959,15 +3004,20 @@ screens:
   overlays:
   - id: formSetTurnstileMode
     component: modal
-    trigger: Save turnstile mode
-    body: '**Collects what `setTurnstileMode` sends before it is called.** Required: `mode`. Optional:
-      `reason`. Dismissing sends nothing; the screen behind is unchanged.'
+    trigger: Save gate mode
+    body: '**Collects what `setTurnstileMode` sends before it is called.** Required: `operatingMode` (normal,
+      freeFlow, dropArm, closed, podium, maintenance). Optional: `mode` (freeRotation or closed), offered
+      only with normal or podium, since the other four already decide the arm and the server refuses it
+      400; and `reason`. **Direction is not on this form**: it is fixed per access point and set in the
+      back office (BO-064) with createAccessPoint/updateAccessPoint (decided 28 September, audit R221).
+      Dismissing sends nothing; the screen behind is unchanged.'
     confirm:
-      label: Save turnstile mode
+      label: Save gate mode
       operation: setTurnstileMode
     dismiss:
       label: Cancel
       discards:
+      - operatingMode
       - mode
       - reason
     provenance: contract access.yaml PUT /access-points/{accessPointId}/mode

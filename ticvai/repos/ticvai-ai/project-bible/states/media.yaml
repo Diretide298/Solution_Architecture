@@ -10,11 +10,7 @@ enumSchema: MediaStatus
 owner: assets
 initial:
 - processing
-terminal:
-- ready
-- quarantined
-- failed
-- archived
+terminal: []
 transitions:
 - from: processing
   to: ready
@@ -51,4 +47,9 @@ transitions:
   guard: Restored
   isReversal: true
 notes: '`processing` is the state most systems omit and the one that breaks things. An upload completes
-  before its derivatives exist, and a screen showing "done" too early produces a broken image.'
+  before its derivatives exist, and a screen showing "done" too early produces a broken image.
+
+  **No state is terminal (decided 28 September, audit STATE-MEDIA).** Restore is allowed: `archived`
+  to `ready` and `quarantined` to `ready` (after review) stay. An asset''s life ends only by
+  `deleteMediaAsset`, which removes the row rather than moving it to a state. `failed` has no way out
+  because a file nothing can derive from is re-uploaded, not repaired; it too ends by deletion.'

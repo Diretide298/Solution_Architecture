@@ -1,5 +1,5 @@
 id: LLD-VenueOpsService
-title: VenueOpsService — 224 operations, 97 tables
+title: VenueOpsService — 224 operations, 98 tables
 generatedBy: tools/derive-diagrams.py
 tier: operations
 index: diagrams/hld/02-services.yaml
@@ -22,7 +22,7 @@ schemas:
   - postgres
   largestTable: queue.queue
 - schema: maintenance
-  tables: 14
+  tables: 15
   stores:
   - postgres
   largestTable: maintenance.work_order
@@ -35,7 +35,7 @@ schemas:
   tables: 5
   stores:
   - postgres
-  largestTable: venuemap.map
+  largestTable: venuemap.point
 - schema: assets
   tables: 13
   stores:
@@ -159,6 +159,14 @@ operationsByContract:
     offline: false
     reads: 1
     writes: 0
+  - operation: getPerformanceManifest
+    verb: GET
+    path: /performances/{performanceId}/manifest
+    scope: venue
+    permission: RESOURCE_VIEW
+    offline: true
+    reads: 3
+    writes: 0
   - operation: getResource
     verb: GET
     path: /resources/{resourceId}
@@ -239,14 +247,6 @@ operationsByContract:
     offline: false
     reads: 0
     writes: 0
-  - operation: getSessionManifest
-    verb: GET
-    path: /sessions/{sessionId}/manifest
-    scope: venue
-    permission: RESOURCE_VIEW
-    offline: true
-    reads: 3
-    writes: 0
   - operation: listResourceAttributes
     verb: GET
     path: /resource-attributes
@@ -311,9 +311,9 @@ operationsByContract:
     offline: false
     reads: 0
     writes: 0
-  - operation: reorderSessionManifest
+  - operation: reorderPerformanceManifest
     verb: PUT
-    path: /sessions/{sessionId}/manifest
+    path: /performances/{performanceId}/manifest
     scope: venue
     permission: RESOURCE_BOOK
     offline: true
@@ -899,7 +899,7 @@ operationsByContract:
     scope: venue
     permission: INCIDENT_VIEW
     offline: false
-    reads: 3
+    reads: 4
     writes: 0
   - operation: getWorkOrder
     verb: GET
@@ -1917,7 +1917,7 @@ tables:
   - redeemPrize
   - redeemWaitingGuest
   - rejectWorkOrder
-  - reorderSessionManifest
+  - reorderPerformanceManifest
   - replaceMediaAsset
   - reportIncident
   - resumeWorkOrder
@@ -1981,7 +1981,7 @@ tables:
   - redeemPrize
   - redeemWaitingGuest
   - rejectWorkOrder
-  - reorderSessionManifest
+  - reorderPerformanceManifest
   - replaceMediaAsset
   - reportIncident
   - resumeWorkOrder
@@ -2298,6 +2298,12 @@ tables:
   parent: maintenance.incident
   writtenBy: []
   foreignWriters: null
+- table: maintenance.incident_investigation_note
+  columns: 5
+  store: postgres
+  parent: maintenance.incident
+  writtenBy: []
+  foreignWriters: null
 - table: maintenance.incident_involved_party
   columns: 5
   store: postgres
@@ -2567,6 +2573,13 @@ tables:
   writtenBy:
   - resources
   foreignWriters: null
+- table: resources.performance_participant
+  columns: 10
+  store: postgres
+  parent: null
+  writtenBy:
+  - resources
+  foreignWriters: null
 - table: resources.qualification
   columns: 9
   store: postgres
@@ -2638,13 +2651,6 @@ tables:
   foreignWriters: null
 - table: resources.resource_type
   columns: 19
-  store: postgres
-  parent: null
-  writtenBy:
-  - resources
-  foreignWriters: null
-- table: resources.session_participant
-  columns: 10
   store: postgres
   parent: null
   writtenBy:
@@ -2775,7 +2781,6 @@ screens:
 - P02:GST-053 Build Your Own Itinerary
 - P02:GST-054 AI Optimized Itinerary
 - P02:GST-059 Plan My Day – In Progress
-- P02:GST-070 Reserve a Table or Cabana
 - P04:POS-002 Sell — Ticket Catalogue
 - P04:POS-010 Add to Existing Ticket
 - P04:POS-029 Order Queue
@@ -2833,6 +2838,7 @@ screens:
 - P08:BO-031 Asset Register
 - P08:BO-038 Reconciliation Queue
 - P08:BO-069 Asset Register
+- P08:BO-070 Work Orders
 - P08:BO-071 Planned Maintenance
 - P08:BO-072 Incident Log
 - P08:BO-092 Venue Maps
@@ -2842,7 +2848,7 @@ screens:
 - P08:BO-096 Resource Calendar
 - P08:BO-097 Check Out & Check In
 - P08:BO-098 Qualifications
-- P08:BO-099 Session Manifest
+- P08:BO-099 Performance Manifest
 - P08:BO-1061 Platform Command Center
 - P08:BO-108 Venue Operations
 - P08:BO-125 Product & Category Button Configuration
@@ -3138,3 +3144,4 @@ flows:
 - F67 A queue is monitored and capacity is held
 - F69 An incident is reported, escalated and closed
 - F70 A guest needs help and something is lost
+- F95 A fleet is watched, a fault is found, and a station is fixed

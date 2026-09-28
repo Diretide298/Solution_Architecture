@@ -20,13 +20,15 @@ transitions:
   operation: startRollout
   trigger: operation
   guard: '**First cell only.** A canary that is itself a shared cell risks many tenants, so the orchestrator
-    prefers a dedicated cell or the smallest shared one (ADR-0001)'
+    prefers a dedicated cell or the smallest shared one (ADR-0001). Approved by the platform release manager
+    through the approvals engine (kind `releasePromotion`; decided 28 September, audit R144)'
   requiresApproval: true
 - from: canary
   to: rolling
   operation: startRollout
   trigger: operation
-  guard: Canary held. Fanning out
+  guard: Canary held. Fanning out, once the platform release manager approves (`releasePromotion`, audit
+    R144)
   requiresApproval: true
 - from: canary
   to: rolledBack
@@ -43,7 +45,7 @@ transitions:
   to: rolling
   operation: startRollout
   trigger: operation
-  guard: Resumed
+  guard: Resumed, once the platform release manager approves (`releasePromotion`, audit R144)
   requiresApproval: true
 - from: rolling
   to: complete
@@ -57,9 +59,9 @@ transitions:
   to: rolledBack
   operation: rollbackRollout
   trigger: operation
-  guard: Abandoned and reversed
+  guard: Abandoned and reversed. **No approval** because audit R144 names starting a rollout, and a rollback
+    that waits for a second person is an outage that lasts longer
   isReversal: true
-  requiresApproval: true
 notes: '`paused` leaves the estate at two schema versions on purpose. That is expected during a rollout
   and a defect outside one, and the skew report is what tells them apart — with on-premise cells a third
   case, legitimately behind indefinitely (ADR-0017).'

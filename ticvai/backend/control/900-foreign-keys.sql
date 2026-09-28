@@ -3,15 +3,13 @@
 -- its use** — orders reaches catalogue, catalogue reaches platform, and something
 -- reaches back. Tables first, constraints last, is the only ordering that terminates.
 --
--- 20 of 631 declared references. The ones that reach the
+-- 18 of 630 declared references. The ones that reach the
 -- other database are in ../990-cross-database-references.sql and are not constraints
 -- any more.
 
 ALTER TABLE control.api_licence ADD CONSTRAINT api_licence_tenant_id_fkey FOREIGN KEY (tenant_id) REFERENCES control.tenant(id);
 ALTER TABLE control.cell_job ADD CONSTRAINT cell_job_cell_id_fkey FOREIGN KEY (cell_id) REFERENCES control.cell(id);
 ALTER TABLE control.environment ADD CONSTRAINT environment_cell_id_fkey FOREIGN KEY (cell_id) REFERENCES control.cell(id);
-ALTER TABLE control.footer_config_column ADD CONSTRAINT footer_config_column_footer_config_id_fkey FOREIGN KEY (footer_config_id) REFERENCES control.footer_config(id);
-ALTER TABLE control.footer_config_social_link ADD CONSTRAINT footer_config_social_link_footer_config_id_fkey FOREIGN KEY (footer_config_id) REFERENCES control.footer_config(id);
 ALTER TABLE control.invoice_line ADD CONSTRAINT invoice_line_invoice_id_fkey FOREIGN KEY (invoice_id) REFERENCES control.invoice(id);
 ALTER TABLE control.licence_add_on_limit ADD CONSTRAINT licence_add_on_limit_licence_add_on_id_fkey FOREIGN KEY (licence_add_on_id) REFERENCES control.licence_add_on(id);
 ALTER TABLE control.migration ADD CONSTRAINT migration_release_id_fkey FOREIGN KEY (release_id) REFERENCES control.release(id);
