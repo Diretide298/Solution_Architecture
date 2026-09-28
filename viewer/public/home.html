@@ -61,12 +61,19 @@
     <div class="home-scrim" aria-hidden="true"></div>
 
     <header class="home-hero">
-      <a class="home-lockup" href="/landing.html" aria-label="Adam">
-        <!-- Two cuts, as everywhere the lockup lands on a surface that changes:
-             the white-ink one disappears on the day ground. -->
-        <img class="home-lockup-day" src="/brand/adam-lockup-day.png" alt="Adam" />
-        <img class="home-lockup-night" src="/brand/adam-lockup-night.png" alt="" aria-hidden="true" />
-      </a>
+      <div class="home-lockup-row">
+        <a class="home-lockup" href="/landing.html" aria-label="Adam">
+          <!-- Two cuts, as everywhere the lockup lands on a surface that changes:
+               the white-ink one disappears on the day ground. -->
+          <img class="home-lockup-day" src="/brand/adam-lockup-day.png" alt="Adam" />
+          <img class="home-lockup-night" src="/brand/adam-lockup-night.png" alt="" aria-hidden="true" />
+        </a>
+        <!-- ADAM beside its own lockup, the same pairing as the landing page.
+             Decorative and inert: the canvas behind this page is its only real
+             control, so the figure must not take a click anywhere it stands. -->
+        <img class="home-mascot" id="home-mascot" src="/brand/mascot/hero.webp" alt=""
+             aria-hidden="true" width="355" height="560" decoding="async" />
+      </div>
       <!-- What somebody came here to choose. Filled from /pkg/projects; one
            row per registered package, the current one marked. -->
       <p class="home-eyebrow">Projects</p>
@@ -105,10 +112,6 @@
          clicks would break the graph wherever it happened to stand. It appears
          only on windows wide enough to have empty space to the right of the
          graph and left of the rail -- see home.css. -->
-    <div class="home-mascot" id="home-mascot" aria-hidden="true">
-      <img src="/brand/mascot/hero.webp" alt="" width="355" height="560" decoding="async" />
-    </div>
-
     <!-- The way out, on the canvas's own layer. Escape does the same thing and
          always has; a page whose main control is a canvas cannot rely on a
          reader knowing that. Hidden until there is something to come back

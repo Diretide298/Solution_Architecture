@@ -546,60 +546,43 @@
 .home-rail .rail-away:hover .rail-name { color: var(--accent-bright, #6fe3d8); }
 
 /* ── the mascot ──────────────────────────────────────────────────────
- * ADAM standing in its own graph, bottom right.
+ * ADAM beside its own lockup, the same pairing as the landing page.
  *
- * **Only where there is genuinely room for it.** The page already spends its
- * width: the hero and the colophon own the left column, the rail owns the
- * right edge, and the panel opens over the left. Below 1400px those meet in the
- * middle and a 400px figure becomes something covering the graph -- so it is
- * not scaled down there, it is not shown. A mascot is worth nothing and costs
- * layout, which makes "hide it" the easy call rather than a sad one.
+ * It stood in the band between the text column and the graph before that, and
+ * at 430px tall it was the loudest thing on a page whose subject is the graph.
+ * Small and next to the wordmark is the version that reads as a mark rather
+ * than as an illustration.
  *
- * It is inert. `pointer-events: none` keeps every pixel of the canvas
- * clickable, because the canvas is the page's only real control and a figure
- * that swallowed clicks would break panning exactly where it happened to stand.
+ * Kept small on purpose. It is a mark beside the wordmark, not an illustration:
+ * at 54px it is a little over half the lockup's 96px, which reads as a
+ * companion rather than as something competing with the graph. Both scale on
+ * the same viewport clamp, so the pair holds together all the way down.
  *
- * `right` clears the rail rather than guessing at it: the rail sits at
- * right: 52px and its rows are labels that grow with the longest layer name,
- * so the figure is parked a rail's width further in again.
+ * Inert. `pointer-events: none` -- the canvas behind this page is its only real
+ * control, and `.home-hero > *` turns pointer events back on for the row.
  */
+.home-lockup-row {
+  display: flex;
+  align-items: center;
+  /* The wordmark's M has no trailing padding in the cut, so a small gap
+     leaves the figure touching it. 22px is the first that reads as beside. */
+  gap: 22px;
+}
+
 .home-mascot {
-  position: fixed;
-  /* In the band between the text column and the graph, not over the graph.
-     Standing at the bottom right put the figure on top of the clusters, which
-     is the one thing on this page anybody came to look at. The column is
-     430px at 52px, so this clears it and leaves the scene to itself. */
-  left: 518px;
-  top: 50%;
-  transform: translateY(-50%);
-  height: min(46vh, 430px);
-  aspect-ratio: 355 / 560;
-  z-index: 1;                 /* over the canvas, under the rail and the panel */
+  height: clamp(28px, 5.6vw, 54px);
+  width: auto;
   pointer-events: none;
   user-select: none;
-  opacity: 0.92;
+  opacity: 0.94;
   animation: home-mascot-float 7s ease-in-out infinite;
 }
 
-.home-mascot img {
-  width: 100%;
-  height: 100%;
-  object-fit: contain;
-  object-position: bottom center;
-}
-
 /* A slow drift, the same idea as the hint's breathing: it says the thing is
-   alive without asking for attention. Four pixels, because anything more reads
-   as an animation somebody has to wait out. */
+   alive without asking for attention. */
 @keyframes home-mascot-float {
-  0%, 100% { transform: translateY(-50%); }
-  50%      { transform: translateY(calc(-50% - 9px)); }
-}
-
-/* Under this the text column and the graph meet, and there is no band to
-   stand in. */
-@media (max-width: 1280px) {
-  .home-mascot { display: none; }
+  0%, 100% { transform: translateY(0); }
+  50%      { transform: translateY(-6px); }
 }
 
 @media (prefers-reduced-motion: reduce) {
