@@ -39,10 +39,9 @@ the corner of the home page's graph. Twenty poses came out of the delivered shee
 thinking, sleepy, error, and the rest — cleaned the same way the first set was: the sheet arrives
 with a faint wash over the background that shows up as a pale rectangle on any dark panel.
 
-On the home page it becomes **video** where that is wanted: the same clip the corner dock plays,
-with the same switch turning it off, and never fetched at all if you have asked for reduced motion,
-are on a metered connection, or have scrolled past without it ever being on screen. The still is
-what the page draws first and what it keeps if any of that says no.
+These are stills, not video. The clips the corner dock plays are keyed out of a dark render at
+runtime, and both of these pages have a light theme — the key leaves a haze that is invisible on the
+viewer's dark panel and would not be here. The dock is unchanged.
 
 ## 24 September 2026
 

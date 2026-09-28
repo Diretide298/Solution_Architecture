@@ -99,14 +99,6 @@ html:has(body.landing) { scroll-behavior: smooth; }
 .lp-lede { font-size: 17.5px; line-height: 1.58; color: var(--body); text-wrap: pretty; max-width: 52ch; }
 .lp-pipeline { font-family: var(--mono); font-size: 12px; line-height: 1.9; letter-spacing: .04em; color: var(--muted); }
 .lp-hero-cta { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
-/* ADAM at the row's right end, in the empty space beside the headline. */
-/* Negative margins take it out of the row's height, so the buttons keep their
-   place under the pipeline line and the figure hangs into the space below. */
-.lp-hero-cta .lp-adam {
-  --adam-h: clamp(110px, 12vw, 170px);
-  height: var(--adam-h); margin-left: auto;
-  margin-top: calc(var(--adam-h) * -.12); margin-bottom: calc(var(--adam-h) * -.78);
-}
 
 /* ── hero animation ─────────────────────────────────────────────────── */
 .lp-scene-section { margin-top: clamp(28px, 4vw, 52px); }
@@ -309,9 +301,15 @@ html:has(body.landing) { scroll-behavior: smooth; }
 }
 
 .lp-adam {
-  /* Tied to the lockup's own clamp, one notch larger, so the two scale
-     together instead of drifting apart at the ends of the range. */
-  height: clamp(62px, 7.8vw, 106px);
+  /* Pushed to the far end of the row, and sized to the space that is actually
+     there. The headline's second line is set to fill its column exactly -- its
+     ink ends within 3px of the column edge at every width from 1080 to 1920 --
+     so the only free area in this half of the hero is the block between the
+     lockup and the headline, right of the wordmark. The figure fills it in both
+     directions: across, by sitting at the column's right edge, and down, by
+     making the row tall enough to close the gap above the headline. */
+  margin-left: auto;
+  height: clamp(84px, 10.4vw, 152px);
   width: auto;
   user-select: none;
   animation: lp-adam-float 7s ease-in-out infinite;

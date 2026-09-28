@@ -170,7 +170,8 @@ function glitch(from, to, ms, done) {
 
 // ── keying the backdrop out ──────────────────────────────────────────
 //
-// Lives in mascot-keyer.js, shared with the landing and home page figures.
+// Lives in mascot-keyer.js. Extracted when the page figures were going to share
+// it; they use the still instead, so the dock is its only caller for now.
 
 // ── the dock ─────────────────────────────────────────────────────────
 

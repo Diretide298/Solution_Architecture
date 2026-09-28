@@ -565,45 +565,40 @@
  */
 .home-mascot {
   position: fixed;
-  right: 260px;
-  bottom: 0;
-  height: min(44vh, 400px);
+  /* In the band between the text column and the graph, not over the graph.
+     Standing at the bottom right put the figure on top of the clusters, which
+     is the one thing on this page anybody came to look at. The column is
+     430px at 52px, so this clears it and leaves the scene to itself. */
+  left: 518px;
+  top: 50%;
+  transform: translateY(-50%);
+  height: min(46vh, 430px);
   aspect-ratio: 355 / 560;
   z-index: 1;                 /* over the canvas, under the rail and the panel */
   pointer-events: none;
   user-select: none;
-  /* It is standing in a dark field, not pasted onto one. The fade carries the
-     base of the figure into the ground instead of ending it on a hard edge,
-     which is what gives away a cut-out. */
-  -webkit-mask-image: linear-gradient(180deg, #000 74%, transparent 99%);
-  mask-image: linear-gradient(180deg, #000 74%, transparent 99%);
   opacity: 0.92;
   animation: home-mascot-float 7s ease-in-out infinite;
 }
 
-.home-mascot img,
-.home-mascot canvas {
-  position: absolute;
-  inset: 0;
+.home-mascot img {
   width: 100%;
   height: 100%;
   object-fit: contain;
+  object-position: bottom center;
 }
-/* The still is what the page renders; the canvas replaces it only once a real
-   frame has been drawn on it. Fading rather than switching, because the two
-   compositions are not pixel-identical and a hard cut shows that. */
-.home-mascot img { transition: opacity 420ms ease; }
-.home-mascot[data-figure="playing"] img { opacity: 0; }
 
 /* A slow drift, the same idea as the hint's breathing: it says the thing is
    alive without asking for attention. Four pixels, because anything more reads
    as an animation somebody has to wait out. */
 @keyframes home-mascot-float {
-  0%, 100% { transform: translateY(0); }
-  50%      { transform: translateY(-9px); }
+  0%, 100% { transform: translateY(-50%); }
+  50%      { transform: translateY(calc(-50% - 9px)); }
 }
 
-@media (max-width: 1400px) {
+/* Under this the text column and the graph meet, and there is no band to
+   stand in. */
+@media (max-width: 1280px) {
   .home-mascot { display: none; }
 }
 
