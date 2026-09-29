@@ -103,11 +103,11 @@
    "operations": 3
   },
   {
-   "contract": "queue",
+   "contract": "approvals",
    "operations": 3
   },
   {
-   "contract": "approvals",
+   "contract": "queue",
    "operations": 3
   },
   {
@@ -119,7 +119,7 @@
    "operations": 2
   },
   {
-   "contract": "inventory",
+   "contract": "finance",
    "operations": 1
   },
   {
@@ -131,7 +131,7 @@
    "operations": 1
   },
   {
-   "contract": "finance",
+   "contract": "inventory",
    "operations": 1
   }
  ],

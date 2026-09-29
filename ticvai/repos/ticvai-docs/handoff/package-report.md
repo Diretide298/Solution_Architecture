@@ -27,8 +27,8 @@
 
 | Link | | | |
 |---|---:|---:|---|
-| Requirements in scope | 2788 / 3184 | 88% | matrix rows, less the ones deliberately parked |
-| Requirements contracted | 2650 / 2788 | 95% | an operation or schema field demonstrably serves it |
+| Requirements in scope | 2848 / 3184 | 89% | matrix rows, less the ones deliberately parked |
+| Requirements contracted | 2781 / 2848 | 98% | an operation or schema field demonstrably serves it |
 | Operations declaring a service | 2405 / 2405 | 100% | the operation is owned by one of the seventeen deployables |
 | Operations declaring a permission | 2282 / 2405 | 95% | the checklist a grant screen renders is built from these |
 | Operations with resolved lineage | 2399 / 2405 | 100% | names the tables it reads and writes -- the join the DDL cannot make itself |
@@ -158,9 +158,9 @@
 |---|---:|
 | Conflicts Open | 9 |
 | Conflicts Blocking | 0 |
-| Requirements Gap Contract | 89 |
-| Requirements Gap Decision | 5 |
-| Requirements Partial | 44 |
+| Requirements Gap Contract | 5 |
+| Requirements Gap Decision | 0 |
+| Requirements Partial | 62 |
 | Operations No Screen | 218 |
 | Screens No Operation | 106 |
 | Operations No Lineage | 6 |

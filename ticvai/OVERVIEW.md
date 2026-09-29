@@ -32,7 +32,7 @@ package has been bitten by that three times.
 
 | | | |
 |---|---:|---|
-| Requirements contracted | **2,650** of 3,184 | **95% of what is in scope** |
+| Requirements contracted | **2,781** of 3,184 | **98% of what is in scope** |
 | Operations reaching a screen | 2187 of 2405 | 91% |
 | Screens reachable from an entry point | 2439 of 2440 | 100% |
 | Screens drawn on a board | 2440 of 2440 | 100% |
@@ -105,7 +105,7 @@ cd viewer && npm start        →  http://localhost:4173
 
 **Put last on purpose.** A landing page that only lists what exists is a landing page that misleads.
 
-**Build is 0%.** 983 tables are designed and none is written. No migration has run, no service is scaffolded, and nothing has executed. **The design is 95% of in-scope requirements and the gap to build is the entire remaining risk.**
+**Build is 0%.** 983 tables are designed and none is written. No migration has run, no service is scaffolded, and nothing has executed. **The design is 98% of in-scope requirements and the gap to build is the entire remaining risk.**
 
 **96 journeys of a target 60.** Seventeen contracts have exactly one — `subscription` has one over 2405 operations. **Every journey written so far has found a defect**, which is the argument for writing more.
 

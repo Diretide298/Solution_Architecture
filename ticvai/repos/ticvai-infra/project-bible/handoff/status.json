@@ -89,9 +89,9 @@
    },
    {
     "name": "Requirements contracted",
-    "done": 2650,
-    "total": 2788,
-    "percent": 95,
+    "done": 2781,
+    "total": 2848,
+    "percent": 98,
     "note": "Read row by row from traceability.json. Excludes deliberately parked requirements."
    },
    {

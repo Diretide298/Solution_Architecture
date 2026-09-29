@@ -5558,6 +5558,61 @@
    "blockedOnDomains": [],
    "closed": "2026-09-20",
    "closedBy": "**Closed 20 September.** `RegisteredDevice.capabilities` carries a `DeviceCapability`, whose first member is `genderClassification` — so a driver can now report what it does, and `segregatedAccess.genderVerification: deviceAssisted` stops being a switch with nothing behind it. **A capability absent is a capability unavailable, not one assumed**: a venue setting that needs hardware is refused where no device in scope reports it, rather than silently doing nothing at the gate.\n\n`ValidationResult.advisory` is the path to the steward — a classification, a **confidence** and the device that reported it. The confidence is not decoration: `overrideRateAlertThreshold` already exists to catch a steward who has stopped deciding, and **that number means nothing unless the steward could see how sure the device was.**\n\n**It is never persisted, and that is a PDPL position rather than a storage preference.** An inferred classification kept against a guest is sensitive personal data with no consent behind it — **a guest agreed to be admitted, not to be classified.** Face Pass and Face Tag carry `consent_purpose_id` and `consent_given_at` because somebody enrolled; **nobody enrols in being looked at by a turnstile.** `ValidationResult` stays `x-ticvai-persistence: none`, so `access.scan_event` records that an override happened and never what the device thought — which keeps the override-rate metric working without building a register nobody agreed to.\n\n**Advisory, never decisive.** It cannot reach `outcome` or `denyReason`, and `entitlementGated` stays `true` and read-only: the gate admits on the entitlement and everything else sits on top without replacing it. 3.2.45 asks for rejection and CF-130 records why the package deviates — a Ladies Night ticket is already gendered at the point of sale, and these events are staffed.\n\n**Remaining: the steward's display, which is a screen rather than a contract.**"
+  },
+  {
+   "id": "BL-180",
+   "section": "12.1",
+   "refs": [
+    "12.1.2",
+    "12.1.16",
+    "12.1.18",
+    "12.1.19",
+    "12.1.21",
+    "12.1.22",
+    "12.1.33",
+    "12.1.37",
+    "12.1.45",
+    "12.1.50",
+    "12.1.53",
+    "12.1.55",
+    "12.1.56"
+   ],
+   "contracts": [
+    "accreditation",
+    "reporting",
+    "public-api"
+   ],
+   "what": "Accreditation is contracted, but 13 requirements are only partly served.",
+   "why": "**Found by the 29 September re-trace.** Domain 12 was parked as having no contract (CF-21) until `accreditation.yaml` landed. Re-tracing it moved 48 rows to contracted; these 13 have the configuration or the record but not the operation that completes them.",
+   "fix": "Add a read of an application's documents; a holder-callable read and delivery of their own mobile credential; a `qr` credential kind with its symbology; a resubmit path after rejection; a `renewAccreditation` operation and a renewal-window event; accreditation KPIs in reporting; accreditation events in `events/` for webhooks; an accreditation export; and a programme template that copies categories, requirements, validity and badges. Also fix `accreditation.yaml` citing `access.validateEntry` (the operation is `validateAccess`), and rebind P11 from the approvals stubs to the accreditation operations.",
+   "lane": "settled",
+   "status": "open",
+   "blockedOnSections": [],
+   "blockedOnConflicts": [],
+   "blockedOnDomains": [],
+   "closed": null,
+   "closedBy": null
+  },
+  {
+   "id": "BL-181",
+   "section": "18.8",
+   "refs": [
+    "18.8.3"
+   ],
+   "contracts": [
+    "accreditation",
+    "access"
+   ],
+   "what": "A staff user cannot verify a presented accreditation.",
+   "why": "**Found by the 29 September re-trace.** `access.validateAccess` returns a `ValidationResult` about tickets only: no holder, photo, category or zones, so the staff app has nothing to show when someone presents an accreditation credential.",
+   "fix": "Add `verifyAccreditationCredential` to accreditation (credential identifier in, holder photo, category, zones and validity out), or an accreditation block on `ValidationResult`; bind it on the staff app scan screen.",
+   "lane": "settled",
+   "status": "open",
+   "blockedOnSections": [],
+   "blockedOnConflicts": [],
+   "blockedOnDomains": [],
+   "closed": null,
+   "closedBy": null
   }
  ],
  "phase": "discovery",

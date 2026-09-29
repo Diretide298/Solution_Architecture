@@ -84,11 +84,11 @@
    "operations": 13
   },
   {
-   "contract": "marketing-crm",
+   "contract": "identity",
    "operations": 12
   },
   {
-   "contract": "identity",
+   "contract": "marketing-crm",
    "operations": 12
   },
   {
@@ -108,19 +108,19 @@
    "operations": 4
   },
   {
-   "contract": "venue-map",
-   "operations": 2
-  },
-  {
    "contract": "retail",
    "operations": 2
   },
   {
-   "contract": "reporting",
+   "contract": "tenancy",
    "operations": 2
   },
   {
-   "contract": "tenancy",
+   "contract": "venue-map",
+   "operations": 2
+  },
+  {
+   "contract": "reporting",
    "operations": 2
   },
   {

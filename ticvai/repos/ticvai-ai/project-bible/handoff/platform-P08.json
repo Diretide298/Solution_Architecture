@@ -189,11 +189,11 @@
    "operations": 37
   },
   {
-   "contract": "promotions",
+   "contract": "tenancy",
    "operations": 36
   },
   {
-   "contract": "tenancy",
+   "contract": "promotions",
    "operations": 36
   },
   {
@@ -205,11 +205,11 @@
    "operations": 29
   },
   {
-   "contract": "approvals",
+   "contract": "subscription",
    "operations": 27
   },
   {
-   "contract": "subscription",
+   "contract": "approvals",
    "operations": 27
   },
   {
@@ -221,11 +221,11 @@
    "operations": 23
   },
   {
-   "contract": "identity",
+   "contract": "shift",
    "operations": 18
   },
   {
-   "contract": "shift",
+   "contract": "identity",
    "operations": 18
   },
   {

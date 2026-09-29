@@ -24,16 +24,16 @@
  "chain": [
   {
    "link": "Requirements in scope",
-   "done": 2788,
+   "done": 2848,
    "total": 3184,
-   "percent": 88,
+   "percent": 89,
    "note": "matrix rows, less the ones deliberately parked"
   },
   {
    "link": "Requirements contracted",
-   "done": 2650,
-   "total": 2788,
-   "percent": 95,
+   "done": 2781,
+   "total": 2848,
+   "percent": 98,
    "note": "an operation or schema field demonstrably serves it"
   },
   {
@@ -851,9 +851,9 @@
  "open": {
   "conflictsOpen": 9,
   "conflictsBlocking": 0,
-  "requirementsGapContract": 89,
-  "requirementsGapDecision": 5,
-  "requirementsPartial": 44,
+  "requirementsGapContract": 5,
+  "requirementsGapDecision": 0,
+  "requirementsPartial": 62,
   "operationsNoScreen": 218,
   "screensNoOperation": 106,
   "operationsNoLineage": 6,

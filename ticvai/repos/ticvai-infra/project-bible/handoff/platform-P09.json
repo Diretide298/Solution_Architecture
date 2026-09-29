@@ -178,7 +178,7 @@
    "operations": 7
   },
   {
-   "contract": "cross-region",
+   "contract": "ai",
    "operations": 5
   },
   {
@@ -186,7 +186,7 @@
    "operations": 5
   },
   {
-   "contract": "ai",
+   "contract": "cross-region",
    "operations": 5
   },
   {
@@ -194,11 +194,11 @@
    "operations": 5
   },
   {
-   "contract": "wallet",
+   "contract": "workforce",
    "operations": 2
   },
   {
-   "contract": "workforce",
+   "contract": "wallet",
    "operations": 2
   },
   {

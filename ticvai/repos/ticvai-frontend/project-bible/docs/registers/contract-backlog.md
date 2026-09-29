@@ -1,6 +1,6 @@
 # Contract backlog — index
 
-**179 edits raised by the requirement walk — 2 open, 175 done, 2 withdrawn.**
+**181 edits raised by the requirement walk — 4 open, 175 done, 2 withdrawn.**
 
 Generated from `handoff/contract-backlog.json` by `tools/build-backlog-index.py`.
 Every gap the walk finds lands here. **The ones carrying a decision or a cost also carry a CF** and are in `conflicts.md`; the rest are work rather than conflict, and putting them in the conflict register would bury the open decisions among them.
@@ -9,8 +9,8 @@ Every gap the walk finds lands here. **The ones carrying a decision or a cost al
 |---|---|
 | Needs a decision | **2** |
 | Deferred | **0** |
-| Settled | **0** |
-| **Total open** | **2** |
+| Settled | **2** |
+| **Total open** | **4** |
 
 
 ## Needs a decision — tracked as a conflict — 2
@@ -21,6 +21,15 @@ Each of these has a CF. The register holds the reasoning; this is the index.
 |---|---|---|---|---|---|---|
 | **BL-073** | 2.6 | 2.6.51, 2.6.52, 2.6.53, 2.6.54, 2.6.55, 2.6… | No cookie consent management — banner, categorisation, scanning, script blocking, multi-domain preference sharing or consent analytics. | `white-label` | — | CF-127 |
 | **BL-140** | 5.7 | 5.7.93, 5.7.94, 5.10.3, 6.1.1, 6.1.23, 20.7.7 | No invoice, no credit memo, and no statement of what a compliant receipt must show. | `finance` | — | CF-133 |
+
+## Settled — made at section close — 2
+
+One contract, and that contract already shows how it should look.
+
+| ID | Section | Refs | What | Contracts | Blocked on | CF |
+|---|---|---|---|---|---|---|
+| **BL-180** | 12.1 | 12.1.2, 12.1.16, 12.1.18, 12.1.19, 12.1.21,… | Accreditation is contracted, but 13 requirements are only partly served. | `accreditation, reporting, public-api` | — | — |
+| **BL-181** | 18.8 | 18.8.3 | A staff user cannot verify a presented accreditation. | `accreditation, access` | — | — |
 
 ## Closed
 

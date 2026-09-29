@@ -74,11 +74,11 @@
    "operations": 2
   },
   {
-   "contract": "maintenance",
+   "contract": "tenancy",
    "operations": 1
   },
   {
-   "contract": "tenancy",
+   "contract": "maintenance",
    "operations": 1
   }
  ],

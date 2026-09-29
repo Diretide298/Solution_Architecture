@@ -40,7 +40,7 @@ schemas:
   tables: 28
   stores:
   - postgres
-  largestTable: approvals.workflow_version
+  largestTable: approvals.workflow_instance
 - schema: accreditation
   tables: 14
   stores:
