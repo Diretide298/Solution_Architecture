@@ -1,0 +1,30 @@
+# seat.blocked v1 — published by seating
+# Checked by tools/check-states.py against states/ and the contracts.
+
+name: seat.blocked
+version: 1
+publisher: seating
+description: A seat was blocked out of general sale (house seats, kills, production holds).
+aggregate: seat
+emittedWhen: SeatStatus available to blocked (createSeatBlock)
+payload:
+- field: seatId
+  type: string
+- field: performanceId
+  type: uuid
+- field: venueId
+  type: uuid
+- field: blockId
+  type: uuid
+- field: reason
+  type: string
+  required: false
+- field: blockedAt
+  type: timestamp
+consumers:
+- context: public-api
+  purpose: Deliver to webhook subscriptions taking seat.blocked (21.13.4)
+  idempotencyKey: blockId + seatId
+  onFailure: retryThenDeadLetter
+  isCritical: false
+retention: 7 days after publication

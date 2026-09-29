@@ -1,0 +1,36 @@
+# AI policy exception — state model
+# Contract: ai.AiPolicyException.status
+# Checked by tools/check-states.py. Added 29 September (build pass, group OWN, from the AI group's handoff).
+
+entity: AI policy exception
+contract: ai
+enum: AiPolicyException.status
+enumKind: inline
+enumSchema: AiPolicyException
+enumProperty: status
+owner: ai
+description: '**A temporary, recorded exception to a governance policy** (AIC-162, ADM-526), granted by
+  `createAiPolicyException` with an expiry, compensating controls and the approver, who is the caller.
+  Governance is never bypassed silently.'
+initial:
+- active
+terminal:
+- expired
+- revoked
+transitions:
+- from: active
+  to: expired
+  trigger: timer
+  guard: '`expiresAt` passed. An exception with no end is a policy change, and goes through publication'
+- from: active
+  to: revoked
+  operation: revokeAiPolicyException
+  trigger: operation
+  guard: Ended before it expires, with a reason (ADM-526); the effective policy stops showing it at once
+- from: active
+  to: revoked
+  operation: containAiIncident
+  trigger: operation
+  guard: Containment action `revokeException` on an incident, recorded on the incident
+notes: '`expired` and `revoked` are final: an exception that is needed again is granted again, as a new record
+  with its own approver and expiry.'

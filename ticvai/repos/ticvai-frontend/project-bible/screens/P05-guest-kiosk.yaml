@@ -404,8 +404,8 @@ screens:
       provenance: flow F07 step 4→5
     - to: KSK-015
       trigger: Assistant
-      provenance: derived — KSK-015 declares entryState.params conversationId and KSK-004 holds none of
-        them, so the edge carries nothing and KSK-015 opens cold
+      provenance: derived — KSK-015 declares entryState.params conversationId, messageId and KSK-004 holds
+        none of them, so the edge carries nothing and KSK-015 opens cold
   notes: Definition derived from the wireframe board on 14 August. Components, states and operations still
     to be written.
   density: touchLarge
@@ -1677,10 +1677,17 @@ screens:
     trigger: onAction
     invalidates:
     - listProducts
+  - operationId: recordAnswerFeedback
+    contract: ai
+    purpose: Say whether an answer helped
+    trigger: onAction
+    provenance: build, 29 September 2026
   entryState:
     params:
     - name: conversationId
       from: deepLink
+    - name: messageId
+      from: navigation
     coldEntry: A conversation link an agent opens from a notification. Resolves, or says it was closed
       and by whom.
     preloaded: []

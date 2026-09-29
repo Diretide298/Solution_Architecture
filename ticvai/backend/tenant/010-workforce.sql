@@ -1,4 +1,4 @@
--- workforce — 24 tables
+-- workforce — 28 tables
 -- **Derived. Do not hand-edit.**
 
 -- Targeted by venue, department or role. emergency is not a louder operational Hangs off: reaches
@@ -13,6 +13,7 @@ CREATE TABLE IF NOT EXISTS workforce.announcement (
     department_ids                    text[],
     role_ids                          text[],
     requires_acknowledgement          boolean,
+    delivery_channels                 text[],
     expires_at                        timestamptz,
     published_by_principal_id         uuid,
     published_at                      timestamptz NOT NULL,
@@ -106,6 +107,24 @@ CREATE TABLE IF NOT EXISTS workforce.field_ownership (
     master                            text NOT NULL CONSTRAINT field_ownership_master_chk CHECK (master IN ('ticvai', 'external')),
     source_id                         uuid,
     on_conflict                       text CONSTRAINT field_ownership_on_conflict_chk CHECK (on_conflict IN ('externalWins', 'ticvaiWins', 'flagForReview')),
+    scope_path                        ltree NOT NULL
+);
+
+-- Holds 13 columns. No description has been written for this table — the name is the only thing
+-- saying what it is. Reached by: 1 operations read it and 0 write it.
+CREATE TABLE IF NOT EXISTS workforce.forecast_requirement (
+    id                                uuid PRIMARY KEY,
+    requirement_id                    uuid NOT NULL,
+    version_id                        uuid NOT NULL,
+    venue_id                          uuid,
+    position_code                     text,
+    period_start                      timestamptz NOT NULL,
+    period_end                        timestamptz NOT NULL,
+    quantity                          numeric(18,4) NOT NULL,
+    quantity_p90                      numeric(18,4),
+    unit                              text,
+    received_at                       timestamptz,
+    superseded_at                     timestamptz,
     scope_path                        ltree NOT NULL
 );
 
@@ -298,6 +317,42 @@ CREATE TABLE IF NOT EXISTS workforce.shift_template (
     cost_centre                       text,
     hourly_rate                       numeric(18,4),
     scope_path                        ltree NOT NULL
+);
+
+-- Holds 8 columns. No description has been written for this table — the name is the only thing
+-- saying what it is. Reached by: 2 operations read it and 1 write it; 2 tables reference it.
+CREATE TABLE IF NOT EXISTS workforce.staff_conversation (
+    id                                uuid PRIMARY KEY NOT NULL,
+    venue_id                          uuid NOT NULL,
+    scope_path                        ltree NOT NULL,
+    kind                              text NOT NULL CONSTRAINT staff_conversation_kind_chk CHECK (kind IN ('direct', 'group')),
+    title                             text CONSTRAINT staff_conversation_title_chk CHECK (char_length(title) <= 120),
+    created_by_principal_id           uuid NOT NULL,
+    created_at                        timestamptz NOT NULL,
+    last_message_at                   timestamptz
+);
+
+-- Holds 6 columns. No description has been written for this table — the name is the only thing
+-- saying what it is. Reached by: 4 operations read it and 2 write it.
+CREATE TABLE IF NOT EXISTS workforce.staff_conversation_participant (
+    staff_conversation_id             uuid NOT NULL,
+    principal_id                      uuid NOT NULL,
+    joined_at                         timestamptz NOT NULL,
+    last_read_message_id              text,
+    muted_until                       timestamptz,
+    id                                uuid PRIMARY KEY NOT NULL
+);
+
+-- Holds 7 columns. No description has been written for this table — the name is the only thing
+-- saying what it is. Reached by: 4 operations read it and 1 write it; 1 tables reference it.
+CREATE TABLE IF NOT EXISTS workforce.staff_message (
+    id                                text PRIMARY KEY NOT NULL,
+    staff_conversation_id             uuid NOT NULL,
+    sender_principal_id               uuid NOT NULL,
+    body                              text NOT NULL CONSTRAINT staff_message_body_chk CHECK (char_length(body) <= 2000),
+    attachment_asset_id               uuid,
+    sent_at                           timestamptz NOT NULL,
+    received_at                       timestamptz
 );
 
 -- Holds 8 columns. No description has been written for this table — the name is the only thing

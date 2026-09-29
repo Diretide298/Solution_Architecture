@@ -418,6 +418,13 @@ paths:
 
         Where the party includes someone below the height requirement, the join is refused
         here rather than at the ride, which is a much better place to find out.
+
+        **Priority is decided here, by the server** (decided 29 September, build pass; 5.6.7,
+        5.6.34). On a lane with a `QueueFastPass` block the party joins as priority when it holds
+        a listed entitlement, is in a listed loyalty tier, qualifies for a listed live promotion
+        (or presents its `promotionCode`), or declares an accessibility need where the lane
+        accepts one; the entry records which as `priorityBasis`. On a `fastPass` lane a party
+        meeting none of them is refused `entitlementRequired`.
       tags: [entry]
       x-ticvai-permission: null   # a guest session. Reads and writes the guest’s own data only
       x-ticvai-scope-level: venue
@@ -1283,13 +1290,53 @@ components:
         side of it: which products it honours, the return window, a per-guest daily cap and the
         access points that redeem it. Stored on the queue row. Only meaningful where `kind` is
         `fastPass` or `fastPassAllocationPercent` is above 0.
+
+        **Four ways into priority, not one** (decided 29 September, build pass; 5.6.7 and 5.6.34).
+        A guest joins this lane as priority when they hold an entitlement from
+        `entitlementProductIds` (VIP, annual pass, premium package), are a member of a tier in
+        `loyaltyTierIds`, qualify for a live promotion in `promotionIds`, or declare an
+        accessibility need where `accessibilityPriority` is on. The first criterion met is
+        recorded on the entry as `WaitingGuest.priorityBasis`. Every criterion is resolved by the
+        server at join time; nothing the request asserts about a tier or a promotion is trusted.
+        All four draw on the same reserved `fastPassAllocationPercent`, so widening who qualifies
+        never widens the share of the ride they take.
       required: [entitlementProductIds]
       properties:
         entitlementProductIds:
           type: array
-          minItems: 1
-          description: Catalogue products whose entitlement admits to this lane.
+          description: >
+            Catalogue products whose entitlement admits to this lane. May be empty where priority
+            comes only from a tier, a promotion or an accessibility need.
           items: { type: string, format: uuid }
+        loyaltyTierIds:
+          type: array
+          description: >
+            5.6.7 and 5.6.34 (decided 29 September, build pass). Loyalty programme tiers
+            (`marketing.programme_tier`) whose members join this lane as priority. Read from the
+            guest's own loyalty position at join time, never from the request, so a guest cannot
+            claim a tier they do not hold. Empty: tier grants nothing on this lane.
+          items: { type: string, format: uuid }
+        promotionIds:
+          type: array
+          description: >
+            5.6.34 (decided 29 September, build pass). Promotions that grant queue privilege on
+            this lane while they are live. A guest qualifies when the promotion's conditions hold
+            for them at join (the evaluation `promotions` already makes for a price), or by
+            presenting its code in `JoinQueueRequest.promotionCode`. A paused or expired
+            promotion grants nothing.
+          items: { type: string, format: uuid }
+        accessibilityPriority:
+          type: boolean
+          default: false
+          description: >
+            5.6.7 (decided 29 September, build pass). A party that declares an accessibility need
+            (`JoinQueueRequest.accessibilityNeedDeclared`) joins as priority. **Taken on trust**,
+            because asking for proof at a ride entrance is worse than the occasional abuse; the
+            declaration is on the entry, so the operator at the front sees it
+            (`listQueueEntries`). A venue that wants proof sells or issues an accessibility pass
+            and lists it in `entitlementProductIds` instead. **Not the `accessible` lane**: that
+            is where a guest who cannot stand in a switchback waits; this moves them ahead in the
+            lane they chose.
         returnWindowMinutes:
           type: integer
           minimum: 1
@@ -1397,6 +1444,21 @@ components:
             Where the queue has a height requirement. Refusing here is far better than
             refusing at the ride, in front of a child who has already waited.
           items: { type: integer }
+        accessibilityNeedDeclared:
+          type: boolean
+          default: false
+          description: >
+            The party declares an accessibility need (5.6.7; decided 29 September, build pass).
+            Grants priority only on a lane whose `QueueFastPass.accessibilityPriority` is on, and
+            is recorded on the entry either way.
+        promotionCode:
+          type: string
+          maxLength: 64
+          nullable: true
+          description: >
+            A promotion code the guest holds, checked against the lane's
+            `QueueFastPass.promotionIds` (5.6.34). A code for a promotion the lane does not list
+            grants nothing and is not an error.
         recordedAt: { type: string, format: date-time }
 
     QueueJoinProblem:
@@ -1447,6 +1509,29 @@ components:
         partiesAhead: { type: integer, nullable: true }
         estimatedCallAt: { type: string, format: date-time, nullable: true }
         isFastPass: { type: boolean }
+        priorityBasis:
+          type: string
+          enum: [none, entitlement, loyaltyTier, promotion, accessibility]
+          default: none
+          description: >
+            Why this party is priority, when it is (decided 29 September, build pass; 5.6.7,
+            5.6.34): the first `QueueFastPass` criterion met at join, in the order entitlement,
+            loyalty tier, promotion, accessibility. `isFastPass` is true whenever this is not
+            `none`. Kept on the entry so a disputed priority can be explained afterwards.
+        priorityTierId:
+          type: string
+          format: uuid
+          nullable: true
+          description: The loyalty tier that granted priority, where `priorityBasis` is `loyaltyTier`.
+        priorityPromotionId:
+          type: string
+          format: uuid
+          nullable: true
+          description: The promotion that granted priority, where `priorityBasis` is `promotion`.
+        accessibilityNeedDeclared:
+          type: boolean
+          default: false
+          description: What the party declared at join, shown to the operator at the front.
         entitlementId: { type: string, nullable: true }
         calledAt: { type: string, format: date-time, nullable: true }
         returnWindowEndsAt: { type: string, format: date-time, nullable: true }

@@ -23,8 +23,8 @@ steps:
   screen: BO-119
   action: Cross-Sell, Upsell & Recommendation Rules.
   operations:
-  - getRecommendations
-  - getUpsellSuggestions
+  - createUpsellRule
+  - decideRecommendations
   outcome: '**Drawn by the client as RET-5D.**'
 - step: 2
   screen: BO-010

@@ -1,0 +1,50 @@
+# ai.insightRaised v1 — published by ai
+# Checked by tools/check-states.py.
+
+name: ai.insightRaised
+version: 1
+publisher: ai
+description: An insight (an anomaly, a forecast deviation, a trend or an opportunity) was raised.
+aggregate: aiInsight
+emittedWhen: AiInsight created in new
+payload:
+- field: tenantId
+  type: uuid
+- field: scopePath
+  type: string
+- field: insightId
+  type: uuid
+- field: kind
+  type: string
+  notes: 'anomaly, forecastDeviation, trend, opportunity, executiveSummary, rootCause; since 29 September (build)
+    also forecastThreshold (a published forecast crossed a configured threshold, 8.2.20, 8.2.41) and
+    marketingRecommendation (a recommendation on a campaign or journey, 22.1.16, 22.3.17)'
+- field: metricKey
+  type: string
+- field: priority
+  type: string
+- field: correlationKey
+  type: string
+- field: detectedAt
+  type: timestamp
+consumers:
+- context: marketing
+  purpose: Notify the metric owner where the priority is high or critical
+  idempotencyKey: insightId
+  onFailure: retry
+  isCritical: false
+- context: reporting
+  purpose: Show the insight on the dashboards that carry the metric
+  idempotencyKey: insightId
+  onFailure: retry
+  isCritical: false
+retention: Kept with the insight
+notes: 'One situation produces one insight through the correlation key (AIP-090), so the event fires once
+  per situation, not once per detector.
+
+
+  **Carries ids and scope, never prompt text or personal data beyond ids** (AI design 3.2).
+
+
+  No state model emits this: the AI service has no state files under `states/` for this aggregate yet,
+  and the transition is named in `emittedWhen` (AI design 3.2, 29 September).'

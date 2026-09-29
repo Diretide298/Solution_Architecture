@@ -1,0 +1,30 @@
+id: LLD-AI evidence package
+title: AI evidence package — 2 transitions
+generatedBy: tools/derive-diagrams.py
+index: diagrams/hld/04-lifecycles.yaml
+source: states/ai-evidence-package.yaml
+entity: AI evidence package
+contract: ai
+enum: AiEvidencePackage.status
+enumKind: inline
+enumSchema: AiEvidencePackage
+enumProperty: status
+owner: ai
+description: '**A tamper-evident evidence package** (AIC-205, ADM-547), requested by `exportAiEvidencePackage`
+  and built asynchronously into immutable storage, with masking and tenant isolation applied.'
+initial:
+- building
+terminal:
+- ready
+- failed
+transitions:
+- from: building
+  to: ready
+  trigger: job
+  guard: The file is written as an immutable Blob (`blobRef`) and its `manifestHash` is kept
+- from: building
+  to: failed
+  trigger: job
+  guard: The package could not be built; nothing partial is kept as evidence
+notes: 'A package is never rebuilt in place: a newer export is a new package, so every manifest hash
+  names one file.'

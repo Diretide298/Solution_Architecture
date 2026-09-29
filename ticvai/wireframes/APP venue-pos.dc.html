@@ -664,7 +664,7 @@ border-radius:9px;font:800 13px/1.5 Manrope,system-ui,sans-serif;letter-spacing:
 
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; createRefund · exchangeOrderLines · getReturnPolicy · adjustDepositBoxFloat +5</div>
+          <div><b>OPERATIONS</b> &middot; createRefund · exchangeOrderLines · getReturnPolicy · adjustDepositBoxFloat +6</div>
           <div><b>STATES</b> &middot; <span class="warn">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess · offline</span></div>
           <div><b>ARRIVES WITH</b> &middot; workstationId&larr;session, orderId&larr;deepLink, outletId&larr;deepLink</div>
           <div><b>GOES TO</b> &middot; <a href="#pos-002">POS-002</a>  &mdash; <i>Sell — Ticket Catalogue</i> <span class="car">orderId</span><br><a href="#pos-012">POS-012</a>  &mdash; <i>Omnichannel Order &amp; Fulfilment Center</i> <span class="car">orderId · outletId</span></div>
@@ -1771,10 +1771,10 @@ border-radius:9px;font:800 13px/1.5 Manrope,system-ui,sans-serif;letter-spacing:
 
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; reprintReceipt · reprintOrder · reissueEntitlement</div>
+          <div><b>OPERATIONS</b> &middot; reprintReceipt · reprintOrder · reissueEntitlement · issueTaxInvoice +2</div>
           <div><b>STATES</b> &middot; <span class="warn">loading · error · emptyFirstRun · emptyNoAccess · offline</span></div>
           <div><b>ARRIVES WITH</b> &middot; orderId&larr;navigation, workstationId&larr;session, saleId&larr;navigation</div>
-          <div><b>GOES TO</b> &middot; <a href="#pos-025">POS-025</a>  &mdash; <i>Till Home</i><br><a href="#pos-011">POS-011</a>  &mdash; <i>Returns, Refunds &amp; Exchanges</i> <span class="car">orderId</span></div>
+          <div><b>GOES TO</b> &middot; <a href="#pos-025">POS-025</a>  &mdash; <i>Till Home</i><br><a href="#pos-011">POS-011</a>  &mdash; <i>Returns, Refunds &amp; Exchanges</i> <span class="car">invoiceId · orderId</span></div>
           
           
         </div>

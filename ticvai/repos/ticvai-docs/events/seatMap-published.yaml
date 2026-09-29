@@ -1,0 +1,32 @@
+# seatMap.published v1 — published by seating
+# Checked by tools/check-states.py against states/ and the contracts.
+
+name: seatMap.published
+version: 1
+publisher: seating
+description: A seat map version was published and is now the layout sold against.
+aggregate: seatMap
+emittedWhen: seat map validated to published, or archived to published (publishSeatMap)
+payload:
+- field: seatMapId
+  type: uuid
+- field: venueId
+  type: uuid
+- field: version
+  type: integer
+- field: seatCount
+  type: integer
+- field: publishedAt
+  type: timestamp
+consumers:
+- context: public-api
+  purpose: Deliver to webhook subscriptions taking seatMap.published (21.13.4)
+  idempotencyKey: seatMapId + version
+  onFailure: retryThenDeadLetter
+  isCritical: false
+- context: catalogue
+  purpose: Re-read capacity for performances sold against this map
+  idempotencyKey: seatMapId + version
+  onFailure: retryThenDeadLetter
+  isCritical: true
+retention: 30 days after publication

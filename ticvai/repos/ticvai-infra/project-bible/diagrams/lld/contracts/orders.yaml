@@ -1,5 +1,5 @@
 id: LLD-orders
-title: orders — 215 operations
+title: orders — 219 operations
 generatedBy: tools/derive-diagrams.py
 index: diagrams/hld/03-contracts.yaml
 tier: spine
@@ -190,6 +190,23 @@ operations:
   - cache:idempotency
   - orders.order_event
   - orders.refund
+- operation: assignChargeback
+  verb: POST
+  path: /chargebacks/{chargebackId}/assign
+  scope: venue
+  permission: ORDER_REFUND_APPROVE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - cache:idempotency
+  - orders.chargeback
+  - orders.chargeback_evidence
+  - orders.chargeback_investigation_log
+  writes:
+  - cache:idempotency
+  - orders.chargeback
+  - platform.audit_record
 - operation: authoriseStoredValue
   verb: POST
   path: /stored-value/authorisations
@@ -274,6 +291,7 @@ operations:
   - embedded as window_starts_at and window_ends_at on orders.cart_line and orders.order_line
   - orders.cart
   - orders.cart_line
+  - orders.fraud_rule
   - orders.order_line
   - orders.order_line_eligibility
   - orders.payment
@@ -320,6 +338,7 @@ operations:
   - access.entitlement
   - cache:idempotency
   - orders.ticket_transfer
+  - platform.outbox
 - operation: cleanupFailedPayment
   verb: POST
   path: /payments/{paymentId}/cleanup
@@ -577,6 +596,7 @@ operations:
   offline: false
   reads:
   - cache:idempotency
+  - orders.fraud_rule
   - orders.payment
   - orders.refund
   - orders.sales_order
@@ -597,6 +617,7 @@ operations:
   offline: false
   reads:
   - cache:idempotency
+  - orders.fraud_rule
   - orders.refund_policy
   - orders.sales_order
   writes:
@@ -620,6 +641,7 @@ operations:
   writes:
   - cache:idempotency
   - orders.resale_listing
+  - platform.outbox
 - operation: createReservation
   verb: POST
   path: /reservations
@@ -695,6 +717,7 @@ operations:
   - embedded as window_starts_at and window_ends_at on orders.cart_line and orders.order_line
   - orders.order_event
   - orders.sales_order
+  - platform.outbox
 - operation: extendCart
   verb: POST
   path: /carts/{cartId}/extend
@@ -757,6 +780,7 @@ operations:
   - staff
   offline: false
   reads:
+  - ledger.tax_invoice_line
   - orders.payment
   - orders.sales_order
   - payments.dunning_case
@@ -780,6 +804,22 @@ operations:
   - orders.cart
   - orders.cart_line
   - promotions.promotion
+  writes: []
+- operation: getChargebackAnalytics
+  verb: GET
+  path: /chargebacks/analytics
+  scope: venue
+  permission: ORDER_REFUND_APPROVE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - catalogue.product
+  - catalogue.product_category
+  - orders.chargeback
+  - orders.order_line
+  - orders.payment
+  - orders.sales_order
   writes: []
 - operation: getDepositPolicy
   verb: GET
@@ -1197,6 +1237,8 @@ operations:
   offline: false
   reads:
   - orders.chargeback
+  - orders.chargeback_evidence
+  - orders.chargeback_investigation_log
   - orders.payment
   writes: []
 - operation: listCreateListingResale
@@ -2462,6 +2504,55 @@ operations:
   - catalogue.product
   - orders.sales_order
   writes: []
+- operation: recordChargeback
+  verb: POST
+  path: /chargebacks/intake
+  scope: venue
+  permission: ORDER_REFUND_APPROVE
+  audience:
+  - staff
+  - service
+  offline: false
+  reads:
+  - cache:idempotency
+  - ledger.account_mapping
+  - ledger.fiscal_period
+  - orders.chargeback
+  - orders.chargeback_evidence
+  - orders.chargeback_investigation_log
+  - orders.order_line
+  - orders.payment
+  - orders.sales_order
+  writes:
+  - cache:idempotency
+  - ledger.journal_entry
+  - ledger.journal_line
+  - ledger.posting
+  - orders.chargeback
+  - platform.outbox
+- operation: recordChargebackOutcome
+  verb: POST
+  path: /chargebacks/{chargebackId}/outcome
+  scope: venue
+  permission: ORDER_REFUND_APPROVE
+  audience:
+  - staff
+  - service
+  offline: false
+  reads:
+  - cache:idempotency
+  - ledger.account_mapping
+  - ledger.fiscal_period
+  - orders.chargeback
+  - orders.chargeback_evidence
+  - orders.chargeback_investigation_log
+  writes:
+  - cache:idempotency
+  - ledger.journal_entry
+  - ledger.journal_line
+  - ledger.posting
+  - orders.chargeback
+  - platform.outbox
 - operation: recordExternalReference
   verb: POST
   path: /orders/{orderId}/external-references
@@ -2665,12 +2756,16 @@ operations:
   - access.scan_event
   - cache:idempotency
   - orders.chargeback
+  - orders.chargeback_evidence
+  - orders.chargeback_investigation_log
   - orders.payment
   - orders.sales_order
   writes:
   - cache:idempotency
   - ledger.posting
   - orders.chargeback
+  - orders.chargeback_evidence
+  - platform.outbox
 - operation: resumeOrder
   verb: POST
   path: /orders/{orderId}/resume
@@ -3361,6 +3456,7 @@ operations:
   - orders.order_line
   - orders.payment
   - orders.sales_order
+  - platform.outbox
 - operation: voidPayment
   verb: POST
   path: /payments/{paymentId}/void

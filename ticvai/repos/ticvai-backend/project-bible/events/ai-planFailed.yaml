@@ -1,0 +1,48 @@
+# ai.planFailed v1 — published by ai
+# Checked by tools/check-states.py.
+
+name: ai.planFailed
+version: 1
+publisher: ai
+description: An action plan failed and was compensated or paused for a person.
+aggregate: aiActionPlan
+emittedWhen: AiActionPlan executing to failed, compensated or paused on a step failure after its retries
+payload:
+- field: tenantId
+  type: uuid
+- field: scopePath
+  type: string
+- field: planId
+  type: uuid
+- field: status
+  type: string
+  notes: failed, compensated or paused
+- field: failedStepNumber
+  type: integer
+- field: reason
+  type: string
+  notes: plan-drifted, a step error, or budget-exceeded
+- field: requestedByPrincipalId
+  type: uuid
+- field: failedAt
+  type: timestamp
+consumers:
+- context: marketing
+  purpose: Tell the requester and the approver that the plan stopped, and where
+  idempotencyKey: planId
+  onFailure: retryThenDeadLetter
+  isCritical: true
+- context: reporting
+  purpose: AI action analytics; approved-then-failed kept distinct from succeeded
+  idempotencyKey: planId
+  onFailure: retry
+  isCritical: false
+retention: Kept with the plan
+notes: '**Approved-then-failed is not succeeded** (design 1.2 Audit). Nothing is left half-applied: the
+  plan compensates in reverse dependency order or pauses at a step boundary (AIC-098, AIC-134).
+
+
+  **Carries ids and scope, never prompt text or personal data beyond ids** (AI design 3.2).
+
+
+  Emitted by states/ai-action-plan.yaml on `executing` to `failed`, `compensated`, or `paused` on a step failure, drift or budget (added 29 September, build pass, group OWN).'

@@ -203,6 +203,9 @@ paths:
         And a stage or a pillar sells nothing while **deciding what the seats behind it are worth**, which
         is the only reason to draw it.
 
+        **Accepts `Prefer: validate-only`** (29 September, build): validates and answers 200 with the
+        would-be result without writing, for the AI executor''s plan validation.
+
         '
       tags:
       - seating
@@ -214,6 +217,7 @@ paths:
       x-ticvai-conflict-policy: serverWins
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      - $ref: ../shared/common.yaml#/components/parameters/PreferValidateOnly
       requestBody:
         required: true
         content:
@@ -296,6 +300,9 @@ paths:
       description: 'Created in `draft`. A draft map cannot be attached to a performance — only a published
         map can be sold from.
 
+        **Accepts `Prefer: validate-only`** (29 September, build): validates and answers 200 with the
+        would-be result without writing, for the AI executor''s plan validation.
+
         '
       tags:
       - seatMap
@@ -305,6 +312,7 @@ paths:
       x-ticvai-conflict-policy: serverWins
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      - $ref: ../shared/common.yaml#/components/parameters/PreferValidateOnly
       requestBody:
         required: true
         content:
@@ -312,6 +320,12 @@ paths:
             schema:
               $ref: '#/components/schemas/CreateSeatMapRequest'
       responses:
+        '200':
+          description: 'Validate-only: the would-be result, nothing written'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SeatMap'
         '201':
           headers:
             X-Consistency-Token:
@@ -371,6 +385,9 @@ paths:
       description: 'Structural changes to a published map are rejected. Clone it, amend the clone, and
         publish that — a map with tickets sold against it cannot change shape underneath them.
 
+        **Accepts `Prefer: validate-only`** (29 September, build): validates and answers 200 with the
+        would-be result without writing, for the AI executor''s plan validation.
+
         '
       tags:
       - seatMap
@@ -380,6 +397,7 @@ paths:
       x-ticvai-conflict-policy: serverWins
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      - $ref: ../shared/common.yaml#/components/parameters/PreferValidateOnly
       requestBody:
         required: true
         content:
@@ -499,6 +517,10 @@ paths:
       summary: Clone a map, optionally into another venue
       description: 'The practical route to a refit, and to rolling a proven layout out across venues.
 
+        **Accepts `Prefer: validate-only`** (29 September, build pass, group G2, from group G1''s handoff):
+        validates and answers 200 with the would-be result without writing, so the clone step of an
+        `ai.proposeSeatMapChanges` stage-variant plan validates like the other seating steps (1.4.25).
+
         '
       tags:
       - seatMap
@@ -508,6 +530,7 @@ paths:
       x-ticvai-conflict-policy: serverWins
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      - $ref: ../shared/common.yaml#/components/parameters/PreferValidateOnly
       requestBody:
         required: true
         content:
@@ -531,6 +554,12 @@ paths:
                   type: boolean
                   default: true
       responses:
+        '200':
+          description: 'Validate-only: the would-be result, nothing written'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SeatMap'
         '201':
           headers:
             X-Consistency-Token:
@@ -611,6 +640,9 @@ paths:
       description: 'Category assignment, attributes and status across a selection. Bulk is the only practical
         mode — a venue with thirty thousand seats is not edited one at a time.
 
+        **Accepts `Prefer: validate-only`** (29 September, build): validates and answers 200 with the
+        would-be result without writing, for the AI executor''s plan validation.
+
         '
       tags:
       - seatMap
@@ -620,6 +652,7 @@ paths:
       x-ticvai-conflict-policy: serverWins
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      - $ref: ../shared/common.yaml#/components/parameters/PreferValidateOnly
       requestBody:
         required: true
         content:
@@ -986,6 +1019,10 @@ paths:
       x-ticvai-audience:
       - staff
       summary: Create a seat category
+      description: '**Accepts `Prefer: validate-only`** (29 September, build): validates and answers 200
+        with the would-be result without writing, for the AI executor''s plan validation.
+
+        '
       tags:
       - category
       x-ticvai-permission: CAPACITY_CONFIGURE
@@ -994,6 +1031,7 @@ paths:
       x-ticvai-conflict-policy: serverWins
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      - $ref: ../shared/common.yaml#/components/parameters/PreferValidateOnly
       requestBody:
         required: true
         content:
@@ -1026,6 +1064,12 @@ paths:
                   items:
                     $ref: '#/components/schemas/SeatPriceBand'
       responses:
+        '200':
+          description: 'Validate-only: the would-be result, nothing written'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SeatCategory'
         '201':
           headers:
             X-Consistency-Token:
@@ -1055,6 +1099,9 @@ paths:
         list; a band left out is removed. A band change applies to sales from its `effectiveFrom`, never
         to seats already sold.
 
+        **Accepts `Prefer: validate-only`** (29 September, build): validates and answers 200 with the
+        would-be result without writing, for the AI executor''s plan validation.
+
         '
       tags:
       - category
@@ -1064,6 +1111,7 @@ paths:
       x-ticvai-conflict-policy: serverWins
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      - $ref: ../shared/common.yaml#/components/parameters/PreferValidateOnly
       requestBody:
         required: true
         content:
@@ -1630,6 +1678,9 @@ paths:
         Orphan prevention is the one operators most often want and least often ask for by name: refusing
         a selection that would leave a single unsellable seat between two parties.
 
+        **Accepts `Prefer: validate-only`** (29 September, build): validates and answers 200 with the
+        would-be result without writing, for the AI executor''s plan validation.
+
         '
       tags:
       - rules
@@ -1639,6 +1690,7 @@ paths:
       x-ticvai-conflict-policy: serverWins
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      - $ref: ../shared/common.yaml#/components/parameters/PreferValidateOnly
       requestBody:
         required: true
         content:

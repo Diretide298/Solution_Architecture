@@ -1569,7 +1569,8 @@
    "platform.device"
   ],
   "writes": [
-   "platform.device"
+   "platform.device",
+   "platform.outbox"
   ],
   "routing": "",
   "scope": "workstation",
@@ -1583,7 +1584,8 @@
   ],
   "audience": [
    "device"
-  ]
+  ],
+  "lineageNote": "every RegisteredDevice.status change emits device.statusChanged (never on an unchanged heartbeat)"
  },
  "listOrders": {
   "contract": "orders",
@@ -1807,7 +1809,8 @@
    "orders.order_event",
    "orders.order_line",
    "orders.payment",
-   "orders.sales_order"
+   "orders.sales_order",
+   "platform.outbox"
   ],
   "routing": "",
   "scope": "venue",
@@ -1824,7 +1827,7 @@
    "staff",
    "partner"
   ],
-  "lineageNote": "order_event writer (29 September: writers pass; DM5 open item)"
+  "lineageNote": "pending->voided emits order.cancelled"
  },
  "listOrderRefunds": {
   "contract": "orders",
@@ -1855,6 +1858,7 @@
   "path": "/orders/{orderId}/refunds",
   "reads": [
    "cache:idempotency",
+   "orders.fraud_rule",
    "orders.payment",
    "orders.refund",
    "orders.sales_order"
@@ -1883,7 +1887,7 @@
    "staff",
    "partner"
   ],
-  "lineageNote": "order_event writer (29 September: writers pass; DM5 open item)"
+  "lineageNote": "now reads orders.fraud_rule (appliesTo refund) before the money moves (5.3.33)"
  },
  "approveRefund": {
   "contract": "orders",
@@ -1950,6 +1954,7 @@
   "path": "/refund-requests",
   "reads": [
    "cache:idempotency",
+   "orders.fraud_rule",
    "orders.refund_policy",
    "orders.sales_order"
   ],
@@ -1970,7 +1975,8 @@
   ],
   "audience": [
    "guest"
-  ]
+  ],
+  "lineageNote": "now reads orders.fraud_rule (appliesTo refund) (5.3.33)"
  },
  "getRefundPolicy": {
   "contract": "orders",
@@ -2359,7 +2365,8 @@
    "embedded as attributes (jsonb) on orders.cart_line and orders.order_line",
    "embedded as window_starts_at and window_ends_at on orders.cart_line and orders.order_line",
    "orders.order_event",
-   "orders.sales_order"
+   "orders.sales_order",
+   "platform.outbox"
   ],
   "routing": "",
   "scope": "venue",
@@ -2376,7 +2383,7 @@
    "staff",
    "partner"
   ],
-  "lineageNote": "order_event writer (29 September: writers pass; DM5 open item)"
+  "lineageNote": "emits order.exchanged"
  },
  "rescheduleOrder": {
   "contract": "orders",
@@ -2478,7 +2485,8 @@
   "writes": [
    "access.entitlement",
    "cache:idempotency",
-   "orders.ticket_transfer"
+   "orders.ticket_transfer",
+   "platform.outbox"
   ],
   "routing": "",
   "scope": "venue",
@@ -2493,7 +2501,8 @@
   ],
   "audience": [
    "guest"
-  ]
+  ],
+  "lineageNote": "offered->claimed emits entitlement.transferred"
  },
  "getOrderStatement": {
   "contract": "orders",
@@ -2759,9 +2768,13 @@
   "path": "/access/validate",
   "reads": [
    "access.access_point",
+   "access.accreditation_credential",
    "access.admission_rules",
    "access.blacklist",
+   "access.dynamic_policy",
+   "access.dynamic_policy_version",
    "access.entitlement",
+   "access.policy_scope_assignment",
    "cache:idempotency",
    "catalogue.entitlement_template"
   ],
@@ -2786,7 +2799,7 @@
   "audience": [
    "staff"
   ],
-  "lineageNote": "a biometric check writes access.biometric_audit_event (non-simulated rows)"
+  "lineageNote": "reads access.accreditation_credential (new) for a code that is no ticket's media; also emits access.rejected on a deny (AI events handoff)"
  },
  "overrideAccess": {
   "contract": "access",
@@ -2851,6 +2864,7 @@
   ],
   "writes": [
    "access.scan_event",
+   "platform.outbox",
    "sync.rejection"
   ],
   "routing": "",
@@ -2866,7 +2880,8 @@
   ],
   "audience": [
    "staff"
-  ]
+  ],
+  "lineageNote": "a replayed offline deny, or a server downgrade of an offline admit, emits access.rejected"
  },
  "listScans": {
   "contract": "access",
@@ -2896,6 +2911,7 @@
   "path": "/access/offline-package",
   "reads": [
    "access.access_point",
+   "access.accreditation_credential",
    "access.admission_rules",
    "access.blacklist",
    "cache:resolution",
@@ -3221,6 +3237,9 @@
   "reads": [
    "access.access_point",
    "access.admission_rules",
+   "access.dynamic_policy",
+   "access.dynamic_policy_version",
+   "access.policy_scope_assignment",
    "cache:idempotency",
    "catalogue.entitlement_template"
   ],
@@ -3241,7 +3260,8 @@
   ],
   "audience": [
    "staff"
-  ]
+  ],
+  "lineageNote": "same dynamic policy evaluation as validateAccess"
  },
  "setAccessPointGeofence": {
   "contract": "access",
@@ -4035,8 +4055,9 @@
   ],
   "writes": [
    "cache:idempotency",
+   "identity.refresh_token",
    "identity.session",
-   "identity.refresh_token"
+   "platform.outbox"
   ],
   "routing": "",
   "scope": "tenant",
@@ -4052,7 +4073,8 @@
   "audience": [
    "anonymous",
    "partner"
-  ]
+  ],
+  "lineageNote": "emits identity.loginRecorded on success and failure"
  },
  "selectRole": {
   "contract": "identity",
@@ -4477,7 +4499,8 @@
    "cache:idempotency",
    "identity.guest_session",
    "pii.subject",
-   "pii.subject_contact"
+   "pii.subject_contact",
+   "platform.outbox"
   ],
   "routing": "",
   "scope": "tenant",
@@ -4492,7 +4515,8 @@
   ],
   "audience": [
    "anonymous"
-  ]
+  ],
+  "lineageNote": "emits identity.loginRecorded (first sign-in)"
  },
  "requestGuestOtp": {
   "contract": "identity",
@@ -4504,7 +4528,8 @@
   ],
   "writes": [
    "cache:idempotency",
-   "identity.otp_challenge"
+   "identity.otp_challenge",
+   "platform.outbox"
   ],
   "routing": "",
   "scope": "tenant",
@@ -4519,7 +4544,8 @@
   ],
   "audience": [
    "anonymous"
-  ]
+  ],
+  "lineageNote": "adds platform.outbox for purpose passwordReset (identity.credentialResetRequested)"
  },
  "verifyGuestOtp": {
   "contract": "identity",
@@ -4534,7 +4560,8 @@
   "writes": [
    "cache:idempotency",
    "identity.guest_session",
-   "pii.subject_contact"
+   "pii.subject_contact",
+   "platform.outbox"
   ],
   "routing": "",
   "scope": "tenant",
@@ -4549,7 +4576,8 @@
   ],
   "audience": [
    "anonymous"
-  ]
+  ],
+  "lineageNote": "emits identity.loginRecorded"
  },
  "guestSocialLogin": {
   "contract": "identity",
@@ -4563,7 +4591,8 @@
   "writes": [
    "cache:idempotency",
    "identity.guest_session",
-   "pii.subject"
+   "pii.subject",
+   "platform.outbox"
   ],
   "routing": "",
   "scope": "tenant",
@@ -4578,7 +4607,8 @@
   ],
   "audience": [
    "anonymous"
-  ]
+  ],
+  "lineageNote": "emits identity.loginRecorded"
  },
  "guestUaePassLogin": {
   "contract": "identity",
@@ -4593,7 +4623,8 @@
    "cache:idempotency",
    "identity.guest_session",
    "pii.subject",
-   "pii.subject_document"
+   "pii.subject_document",
+   "platform.outbox"
   ],
   "routing": "",
   "scope": "tenant",
@@ -4608,7 +4639,8 @@
   ],
   "audience": [
    "anonymous"
-  ]
+  ],
+  "lineageNote": "emits identity.loginRecorded"
  },
  "getGuestSession": {
   "contract": "identity",
@@ -4774,7 +4806,8 @@
   ],
   "writes": [
    "cache:idempotency",
-   "identity.session"
+   "identity.session",
+   "platform.outbox"
   ],
   "routing": "",
   "scope": "tenant",
@@ -4789,7 +4822,8 @@
   ],
   "audience": [
    "anonymous"
-  ]
+  ],
+  "lineageNote": "emits identity.loginRecorded"
  },
  "getSsoConfig": {
   "contract": "identity",
@@ -4998,7 +5032,8 @@
    "cache:idempotency",
    "identity.mfa_challenge",
    "identity.mfa_recovery_code",
-   "identity.session"
+   "identity.session",
+   "platform.outbox"
   ],
   "routing": "",
   "scope": "tenant",
@@ -5015,7 +5050,8 @@
    "staff",
    "partner",
    "guest"
-  ]
+  ],
+  "lineageNote": "emits identity.loginRecorded (action signIn)"
  },
  "listActiveSessions": {
   "contract": "identity",
@@ -6794,6 +6830,7 @@
   "path": "/campaigns",
   "reads": [
    "marketing.campaign",
+   "marketing.campaign_variant",
    "marketing.segment_criterion"
   ],
   "writes": [],
@@ -6818,13 +6855,15 @@
   "reads": [
    "cache:idempotency",
    "marketing.campaign",
+   "marketing.campaign_variant",
    "marketing.segment_criterion"
   ],
   "writes": [
    "cache:idempotency",
    "marketing.campaign",
-   "marketing.segment_criterion",
-   "marketing.campaign_target"
+   "marketing.campaign_target",
+   "marketing.campaign_variant",
+   "marketing.segment_criterion"
   ],
   "routing": "",
   "scope": "venue",
@@ -6847,8 +6886,9 @@
   "path": "/campaigns/{campaignId}",
   "reads": [
    "marketing.campaign",
-   "marketing.segment_criterion",
-   "marketing.campaign_target"
+   "marketing.campaign_target",
+   "marketing.campaign_variant",
+   "marketing.segment_criterion"
   ],
   "writes": [],
   "routing": "replica",
@@ -6872,6 +6912,7 @@
   "reads": [
    "cache:idempotency",
    "marketing.campaign",
+   "marketing.campaign_variant",
    "marketing.segment_criterion"
   ],
   "writes": [
@@ -6928,11 +6969,14 @@
   "path": "/campaigns/{campaignId}/launch",
   "reads": [
    "cache:idempotency",
-   "marketing.campaign"
+   "marketing.attribution_touch",
+   "marketing.campaign",
+   "marketing.campaign_variant"
   ],
   "writes": [
    "cache:idempotency",
-   "marketing.campaign"
+   "marketing.campaign",
+   "marketing.message_dispatch"
   ],
   "routing": "",
   "scope": "venue",
@@ -6947,7 +6991,8 @@
   ],
   "audience": [
    "staff"
-  ]
+  ],
+  "lineageNote": "per-recipient hour from ai.requestSuggestion kind sendTime (a service call, not a table read); dispatch rows carry campaign_variant_id and planned_send_at"
  },
  "pauseCampaign": {
   "contract": "marketing-crm",
@@ -6956,6 +7001,7 @@
   "reads": [
    "cache:idempotency",
    "marketing.campaign",
+   "marketing.campaign_variant",
    "marketing.segment_criterion"
   ],
   "writes": [
@@ -6984,6 +7030,7 @@
   "reads": [
    "cache:idempotency",
    "marketing.campaign",
+   "marketing.campaign_variant",
    "marketing.segment_criterion"
   ],
   "writes": [
@@ -7012,6 +7059,7 @@
   "reads": [
    "cache:idempotency",
    "marketing.campaign",
+   "marketing.campaign_variant",
    "marketing.segment_criterion"
   ],
   "writes": [
@@ -7041,7 +7089,9 @@
   "reads": [
    "marketing.attribution_touch",
    "marketing.campaign",
-   "marketing.message_delivery"
+   "marketing.campaign_variant",
+   "marketing.message_delivery",
+   "marketing.message_dispatch"
   ],
   "writes": [],
   "routing": "analytical",
@@ -7056,7 +7106,8 @@
   ],
   "audience": [
    "staff"
-  ]
+  ],
+  "lineageNote": "per-variant figures from message_dispatch.campaign_variant_id; existing lineage names marketing.message_delivery, which looks stale against CampaignPerformance's own persistence note (marketing.message_dispatch)"
  },
  "listMessageTemplates": {
   "contract": "marketing-crm",
@@ -7754,6 +7805,7 @@
   "path": "/plans",
   "reads": [
    "cache:idempotency",
+   "control.tenant",
    "subscription.plan",
    "subscription.plan_limit",
    "subscription.plan_module"
@@ -7776,7 +7828,8 @@
   ],
   "audience": [
    "staff"
-  ]
+  ],
+  "lineageNote": "new columns package_kind, offered_to_tenant_id; control.tenant read to validate offeredToTenantId"
  },
  "getPlan": {
   "contract": "subscription",
@@ -7808,6 +7861,7 @@
   "path": "/plans/{planId}",
   "reads": [
    "cache:idempotency",
+   "control.tenant",
    "subscription.plan",
    "subscription.plan_limit",
    "subscription.plan_module"
@@ -7830,7 +7884,8 @@
   ],
   "audience": [
    "staff"
-  ]
+  ],
+  "lineageNote": "as createPlan"
  },
  "getSubscription": {
   "contract": "subscription",
@@ -7860,7 +7915,8 @@
   "path": "/tenants/{tenantId}/subscription",
   "reads": [
    "cache:idempotency",
-   "subscription.contract"
+   "subscription.contract",
+   "subscription.plan"
   ],
   "writes": [
    "cache:idempotency",
@@ -7879,7 +7935,8 @@
   ],
   "audience": [
    "staff"
-  ]
+  ],
+  "lineageNote": "adds subscription.plan read for the plan-not-offered check"
  },
  "previewSubscriptionChange": {
   "contract": "subscription",
@@ -8580,12 +8637,19 @@
   "path": "/tenants/{tenantId}/invoices",
   "reads": [
    "cache:idempotency",
+   "control.credit_note",
    "control.invoice",
-   "control.invoice_line"
+   "control.invoice_line",
+   "control.usage_record",
+   "subscription.contract",
+   "subscription.module_listing",
+   "subscription.plan",
+   "subscription.plan_module"
   ],
   "writes": [
    "cache:idempotency",
-   "control.invoice"
+   "control.invoice",
+   "control.invoice_line"
   ],
   "routing": "",
   "scope": "tenant",
@@ -8600,7 +8664,8 @@
   ],
   "audience": [
    "staff"
-  ]
+  ],
+  "lineageNote": "adds the reads that price per-module and metered lines and offset credit notes; invoice_line gains module_code, audience; invoice gains credited_total"
  },
  "listDiningOutlets": {
   "contract": "fnb",
@@ -9814,6 +9879,7 @@
   ],
   "writes": [
    "cache:idempotency",
+   "platform.outbox",
    "seating.seat_map",
    "seating.section"
   ],
@@ -9830,7 +9896,8 @@
   ],
   "audience": [
    "staff"
-  ]
+  ],
+  "lineageNote": "emits seatMap.published"
  },
  "cloneSeatMap": {
   "contract": "seating",
@@ -10176,6 +10243,7 @@
   ],
   "writes": [
    "cache:idempotency",
+   "platform.outbox",
    "seating.seat_hold"
   ],
   "routing": "",
@@ -10193,7 +10261,8 @@
   "audience": [
    "staff",
    "guest"
-  ]
+  ],
+  "lineageNote": "available->held emits seat.held"
  },
  "getSeatHold": {
   "contract": "seating",
@@ -10277,6 +10346,7 @@
   ],
   "writes": [
    "cache:idempotency",
+   "platform.outbox",
    "seating.seat_block"
   ],
   "routing": "",
@@ -10293,7 +10363,8 @@
   "audience": [
    "staff",
    "partner"
-  ]
+  ],
+  "lineageNote": "available->blocked emits seat.blocked"
  },
  "allocateBlockedSeats": {
   "contract": "seating",
@@ -11647,11 +11718,13 @@
   "path": "/retail-sales",
   "reads": [
    "cache:idempotency",
+   "inventory.kit_component",
    "retail.sale",
    "retail.sale_line"
   ],
   "writes": [
    "cache:idempotency",
+   "inventory.movement",
    "retail.sale",
    "retail.sale_line"
   ],
@@ -11668,7 +11741,8 @@
   ],
   "audience": [
    "staff"
-  ]
+  ],
+  "lineageNote": "one saleDepletion inventory.movement per kit component (or per ordinary item), none for the kit (4.4.20)"
  },
  "getRetailSale": {
   "contract": "retail",
@@ -11772,11 +11846,13 @@
   "path": "/retail-returns",
   "reads": [
    "cache:idempotency",
+   "inventory.kit_component",
    "retail.return",
    "retail.return_line"
   ],
   "writes": [
    "cache:idempotency",
+   "inventory.movement",
    "retail.return",
    "retail.return_line"
   ],
@@ -11793,7 +11869,8 @@
   ],
   "audience": [
    "staff"
-  ]
+  ],
+  "lineageNote": "restock or write-off per component for a kit; the refund is raised in orders (RetailReturn.refundId), where orders.fraud_rule refund rules are read"
  },
  "createRetailExchange": {
   "contract": "retail",
@@ -13757,15 +13834,18 @@
    "ai.policy",
    "ai.provider",
    "cache:idempotency",
+   "reporting.kpi_definition",
+   "reporting.natural_language_query",
    "reporting.report_column",
-   "reporting.report_filter"
+   "reporting.report_filter",
+   "reporting.semantic_model"
   ],
   "writes": [
    "ai.activity",
    "cache:idempotency",
+   "reporting.natural_language_query",
    "reporting.report_column",
-   "reporting.report_filter",
-   "reporting.natural_language_query"
+   "reporting.report_filter"
   ],
   "routing": "",
   "scope": "venue",
@@ -13782,7 +13862,8 @@
   "audience": [
    "staff",
    "partner"
-  ]
+  ],
+  "lineageNote": "reporting.natural_language_query gains semantic_spec; report_column/report_filter dropped (stored inside generated_query jsonb, not rows); ai.knowledge_gap for an unmodelled question is written by the ai service. derive-lineage never updates an existing entry: hand update"
  },
  "saveNaturalLanguageQuery": {
   "contract": "reporting",
@@ -14562,6 +14643,7 @@
   ],
   "writes": [
    "cache:idempotency",
+   "platform.outbox",
    "promotions.promotion",
    "promotions.promotion_audit",
    "promotions.promotion_channel_publication"
@@ -14581,7 +14663,7 @@
    "staff",
    "partner"
   ],
-  "lineageNote": "published channel rows -> suspended; audit promotionPaused. Existing lineage entry: derive-lineage --apply is additive-only, so the coordinator must update this entry in handoff/api-data-lineage.json by hand."
+  "lineageNote": "adds platform.outbox"
  },
  "endPromotion": {
   "contract": "promotions",
@@ -14594,6 +14676,7 @@
   ],
   "writes": [
    "cache:idempotency",
+   "platform.outbox",
    "promotions.promotion",
    "promotions.promotion_audit",
    "promotions.promotion_channel_publication"
@@ -14613,7 +14696,7 @@
    "staff",
    "partner"
   ],
-  "lineageNote": "published channel rows -> suspended; audit promotionEnded (new eventType value). Existing lineage entry: derive-lineage --apply is additive-only, so the coordinator must update this entry in handoff/api-data-lineage.json by hand."
+  "lineageNote": "adds platform.outbox"
  },
  "unschedulePromotion": {
   "contract": "promotions",
@@ -14656,6 +14739,7 @@
   ],
   "writes": [
    "cache:idempotency",
+   "platform.outbox",
    "promotions.promotion",
    "promotions.promotion_audit",
    "promotions.promotion_channel_publication"
@@ -14675,7 +14759,7 @@
    "staff",
    "partner"
   ],
-  "lineageNote": "Description now says: one channel row per sales channel -> pendingPublication (created or resumed from suspended); audit promotionActivated. Existing lineage entry: derive-lineage --apply is additive-only, so the coordinator must update this entry in handoff/api-data-lineage.json by hand."
+  "lineageNote": "adds platform.outbox (kind offers, recommendable promotions)"
  },
  "analysePromotionConflicts": {
   "contract": "promotions",
@@ -15355,6 +15439,9 @@
   "verb": "POST",
   "path": "/conversations/{conversationId}/messages",
   "reads": [
+   "ai.assistant_profile",
+   "ai.capability",
+   "ai.chunk_embedding",
    "ai.chunk_ref",
    "ai.conversation",
    "ai.knowledge_document",
@@ -15368,6 +15455,8 @@
   ],
   "writes": [
    "ai.activity",
+   "ai.decision_record",
+   "ai.knowledge_gap",
    "ai.message",
    "ai.proposed_action",
    "cache:answer",
@@ -15390,16 +15479,19 @@
   "audience": [
    "staff",
    "guest"
-  ]
+  ],
+  "lineageNote": "ai.chunk_ref and qdrant:knowledge replaced by ai.chunk_embedding (pgvector in the tenant database, design 5.8)."
  },
  "semanticSearch": {
   "contract": "ai",
   "verb": "POST",
   "path": "/search",
   "reads": [
+   "ai.chunk_embedding",
    "ai.chunk_ref",
    "ai.knowledge_collection",
    "ai.knowledge_document",
+   "assets.media_asset",
    "cache:answer",
    "cache:idempotency",
    "catalogue.product",
@@ -15426,7 +15518,8 @@
   ],
   "audience": [
    "staff"
-  ]
+  ],
+  "lineageNote": "Media hits are re-checked against assets.media_asset as the caller."
  },
  "listKnowledgeCollections": {
   "contract": "ai",
@@ -15490,12 +15583,14 @@
   "path": "/collections/{collectionId}/documents",
   "reads": [
    "ai.chunk_ref",
+   "ai.knowledge_collection",
    "ai.knowledge_document",
    "cache:embedding",
    "cache:idempotency",
    "qdrant:knowledge"
   ],
   "writes": [
+   "ai.chunk_embedding",
    "ai.knowledge_document",
    "cache:embedding",
    "cache:idempotency",
@@ -15515,25 +15610,29 @@
   ],
   "audience": [
    "staff"
-  ]
+  ],
+  "lineageNote": "Chunks embedded in-cell (BGE-M3) into ai.chunk_embedding; knowledge_document gains scope_path."
  },
  "generateConfiguration": {
   "contract": "ai",
   "verb": "POST",
   "path": "/generate/configuration",
   "reads": [
+   "ai.chunk_embedding",
    "ai.chunk_ref",
+   "ai.knowledge_document",
    "ai.policy",
    "ai.provider",
+   "ai.tool",
    "cache:idempotency",
-   "catalogue.variant_dimension",
-   "catalogue.entitlement_template",
    "catalogue.channel_capacity",
+   "catalogue.entitlement_template",
    "catalogue.event",
    "catalogue.performance",
    "catalogue.price",
    "catalogue.price_list",
    "catalogue.product",
+   "catalogue.variant_dimension",
    "marketing.loyalty_programme",
    "platform.region_settings",
    "platform.scope",
@@ -15546,7 +15645,10 @@
    "seating.section"
   ],
   "writes": [
+   "ai.action_plan",
+   "ai.action_step",
    "ai.activity",
+   "ai.decision_record",
    "ai.proposed_action",
    "cache:idempotency",
    "qdrant:knowledge"
@@ -15566,7 +15668,8 @@
   ],
   "audience": [
    "staff"
-  ]
+  ],
+  "lineageNote": "Existing reads of the owning modules' configuration tables are unchanged (22 tables, hand-mapped); ai.chunk_ref and qdrant:knowledge replaced by ai.chunk_embedding (pgvector, design 5.8)."
  },
  "generateVenueLayout": {
   "contract": "ai",
@@ -15648,11 +15751,14 @@
   "verb": "POST",
   "path": "/proposed-actions/{actionId}/decide",
   "reads": [
+   "ai.action_plan",
    "ai.proposed_action",
    "cache:idempotency"
   ],
   "writes": [
+   "ai.action_plan",
    "ai.activity",
+   "ai.decision_record",
    "ai.proposed_action",
    "cache:idempotency"
   ],
@@ -15670,14 +15776,16 @@
   ],
   "audience": [
    "staff"
-  ]
+  ],
+  "lineageNote": "Tier 2 and matrix-caught actions call approvals.evaluateApprovalRequirement and approvals.createApprovalRequest through the API."
  },
  "getAiUsage": {
   "contract": "ai",
   "verb": "GET",
   "path": "/usage",
   "reads": [
-   "ai.activity"
+   "ai.activity",
+   "ai.model"
   ],
   "writes": [],
   "routing": "analytical",
@@ -15692,7 +15800,8 @@
   ],
   "audience": [
    "staff"
-  ]
+  ],
+  "lineageNote": "groupBy model reads the catalogue for names."
  },
  "listAiProviders": {
   "contract": "ai",
@@ -15721,6 +15830,8 @@
   "verb": "PUT",
   "path": "/providers",
   "reads": [
+   "ai.byok_enablement",
+   "ai.model",
    "ai.provider",
    "cache:idempotency"
   ],
@@ -15741,7 +15852,8 @@
   ],
   "audience": [
    "staff"
-  ]
+  ],
+  "lineageNote": "BYOK gate reads ai.byok_enablement."
  },
  "getAiPolicy": {
   "contract": "ai",
@@ -15930,7 +16042,10 @@
   "path": "/waiting-guests",
   "reads": [
    "cache:idempotency",
-   "queue.entry"
+   "marketing.loyalty_position",
+   "promotions.promotion",
+   "queue.entry",
+   "queue.queue"
   ],
   "writes": [
    "cache:idempotency",
@@ -15949,7 +16064,8 @@
   ],
   "audience": [
    "guest"
-  ]
+  ],
+  "lineageNote": "Priority resolved at join from the lane's fastPass block (queue.queue), the guest's loyalty tier (marketing.loyalty_position, by service call) and live promotions (promotions.promotion via evaluatePromotions); entry gains priority_basis etc."
  },
  "getWaitingGuest": {
   "contract": "queue",
@@ -17879,6 +17995,7 @@
    "whitelabel.policy"
   ],
   "writes": [
+   "ai.chunk_embedding",
    "ai.index_entry",
    "ai.index_job",
    "cache:embedding",
@@ -17899,7 +18016,8 @@
   ],
   "audience": [
    "staff"
-  ]
+  ],
+  "lineageNote": "Existing source-table reads unchanged; qdrant:knowledge replaced by ai.chunk_embedding (shadow table and swap)."
  },
  "removeIndexEntry": {
   "contract": "ai",
@@ -17911,6 +18029,7 @@
    "cache:idempotency"
   ],
   "writes": [
+   "ai.chunk_embedding",
    "ai.index_entry",
    "cache:embedding",
    "cache:idempotency",
@@ -17930,7 +18049,8 @@
   ],
   "audience": [
    "staff"
-  ]
+  ],
+  "lineageNote": "qdrant:knowledge replaced by ai.chunk_embedding."
  },
  "listIndexJobs": {
   "contract": "ai",
@@ -18120,7 +18240,8 @@
   "writes": [
    "approvals.escalation",
    "approvals.request",
-   "cache:idempotency"
+   "cache:idempotency",
+   "platform.outbox"
   ],
   "routing": "",
   "scope": "venue",
@@ -18135,7 +18256,8 @@
   ],
   "audience": [
    "staff"
-  ]
+  ],
+  "lineageNote": "pending->escalated emits approval.escalated"
  },
  "resubmitApprovalRequest": {
   "contract": "approvals",
@@ -18193,6 +18315,7 @@
   "verb": "PUT",
   "path": "/approval-matrices",
   "reads": [
+   "approvals.external_provider",
    "approvals.matrix",
    "approvals.rule",
    "cache:idempotency"
@@ -18215,7 +18338,8 @@
   ],
   "audience": [
    "staff"
-  ]
+  ],
+  "lineageNote": "table changed: approvals.rule.external_provider_id"
  },
  "listApprovalDelegations": {
   "contract": "approvals",
@@ -18736,6 +18860,7 @@
   "reads": [
    "cache:idempotency",
    "identity.role",
+   "platform.device",
    "platform.scope",
    "workforce.announcement"
   ],
@@ -18757,7 +18882,8 @@
   ],
   "audience": [
    "staff"
-  ]
+  ],
+  "lineageNote": "workforce.announcement gains delivery_channels; push targets are platform.device rows of kind mobileHandset with a push token"
  },
  "acknowledgeAnnouncement": {
   "contract": "workforce",
@@ -19092,6 +19218,7 @@
    "embedded as window_starts_at and window_ends_at on orders.cart_line and orders.order_line",
    "orders.cart",
    "orders.cart_line",
+   "orders.fraud_rule",
    "orders.order_line",
    "orders.order_line_eligibility",
    "orders.payment",
@@ -19117,7 +19244,8 @@
   "audience": [
    "guest",
    "partner"
-  ]
+  ],
+  "lineageNote": "copies cart_line.recommendation_id to order_line.recommendation_id; reads orders.fraud_rule (charge rules) then calls ai scoreTransactionRisk (service call, no table); existing embedded attributes/window entries unchanged"
  },
  "listAbandonedCarts": {
   "contract": "orders",
@@ -20388,6 +20516,7 @@
   "verb": "PUT",
   "path": "/ai-providers/{providerId}/credential",
   "reads": [
+   "ai.byok_enablement",
    "ai.provider",
    "cache:idempotency"
   ],
@@ -22474,6 +22603,8 @@
   "path": "/chargebacks",
   "reads": [
    "orders.chargeback",
+   "orders.chargeback_evidence",
+   "orders.chargeback_investigation_log",
    "orders.payment"
   ],
   "writes": [],
@@ -22499,13 +22630,17 @@
    "access.scan_event",
    "cache:idempotency",
    "orders.chargeback",
+   "orders.chargeback_evidence",
+   "orders.chargeback_investigation_log",
    "orders.payment",
    "orders.sales_order"
   ],
   "writes": [
    "cache:idempotency",
    "ledger.posting",
-   "orders.chargeback"
+   "orders.chargeback",
+   "orders.chargeback_evidence",
+   "platform.outbox"
   ],
   "routing": "",
   "scope": "venue",
@@ -22520,7 +22655,8 @@
   ],
   "audience": [
    "staff"
-  ]
+  ],
+  "lineageNote": "adds platform.outbox: accepting (conceding) publishes order.chargebackRecorded stage decided (clears the ADR-0033 warning check-states now raises)"
  },
  "listPartnerUsers": {
   "contract": "subscription",
@@ -23207,7 +23343,8 @@
   ],
   "writes": [
    "cache:idempotency",
-   "orders.resale_listing"
+   "orders.resale_listing",
+   "platform.outbox"
   ],
   "routing": "",
   "scope": "venue",
@@ -23224,7 +23361,8 @@
    "staff",
    "guest"
   ],
-  "guestCallable": true
+  "guestCallable": true,
+  "lineageNote": "reserved->sold emits entitlement.transferred"
  },
  "quoteUpgrade": {
   "contract": "orders",
@@ -24866,7 +25004,9 @@
    "ai.policy",
    "ai.provider",
    "cache:idempotency",
-   "control.content_block"
+   "control.content_block",
+   "marketing.message_template",
+   "marketing.message_template_version"
   ],
   "writes": [
    "ai.activity",
@@ -24887,7 +25027,8 @@
   ],
   "audience": [
    "staff"
-  ]
+  ],
+  "lineageNote": "The messageTemplates scope reads every channel's template."
  },
  "broadcastToGuests": {
   "contract": "workforce",
@@ -26339,10 +26480,24 @@
   "verb": "POST",
   "path": "/ai/suggestions",
   "reads": [
+   "ai.forecast_point",
+   "ai.forecast_version",
+   "ai.insight",
+   "ai.operational_requirement",
    "ai.policy",
    "ai.provider",
+   "ai.rec_decline",
+   "ai.release",
    "ai.suggestion",
-   "cache:idempotency"
+   "cache:idempotency",
+   "cache:rec-candidates",
+   "fnb.production_plan",
+   "inventory.movement",
+   "inventory.stock_batch",
+   "marketing.attribution_touch",
+   "marketing.segment",
+   "queue.queue",
+   "queue.reading"
   ],
   "writes": [
    "ai.activity",
@@ -26365,7 +26520,8 @@
    "staff",
    "guest"
   ],
-  "guestCallable": true
+  "guestCallable": true,
+  "lineageNote": "sendTime, wasteRisk and queueBalancing read the owners' tables on the analytical replica as the caller."
  },
  "recordSuggestionOutcome": {
   "contract": "ai",
@@ -26402,6 +26558,7 @@
   "reads": [
    "ai.policy",
    "ai.provider",
+   "ai.release",
    "cache:idempotency"
   ],
   "writes": [
@@ -26422,7 +26579,8 @@
   ],
   "audience": [
    "staff"
-  ]
+  ],
+  "lineageNote": "Shadow assignment is the release pipeline shadow stage (ai.release)."
  },
  "createCombo": {
   "contract": "fnb",
@@ -37037,6 +37195,8 @@
   "reads": [
    "marketing.consent_propagation",
    "marketing.consent_record",
+   "marketing.device_consent",
+   "marketing.device_consent_category",
    "marketing.privacy_action",
    "marketing.privacy_exception",
    "marketing.privacy_request",
@@ -37058,7 +37218,7 @@
    "postgres",
    "redis"
   ],
-  "lineageNote": "KPIs over consent_record, privacy_request, privacy_action, retention_policy, privacy_exception, tracking_technology; propagation success from consent_propagation"
+  "lineageNote": "adds marketing.device_consent and marketing.device_consent_category to the existing reads"
  },
  "listPrivacyConsent": {
   "contract": "marketing-crm",
@@ -44504,6 +44664,7 @@
   ],
   "writes": [
    "cache:idempotency",
+   "platform.outbox",
    "seating.seat_block"
   ],
   "routing": null,
@@ -44521,7 +44682,7 @@
    "postgres",
    "redis"
   ],
-  "lineageNote": "DELETE /seat-blocks/{blockId} idempotent; sets seat_block.released_at; neighbour createSeatBlock on seating.seat_block"
+  "lineageNote": "blocked->available emits seat.released"
  },
  "relinquishSeatHold": {
   "contract": "seating",
@@ -44531,6 +44692,7 @@
    "seating.seat_hold"
   ],
   "writes": [
+   "platform.outbox",
    "seating.seat_hold"
   ],
   "routing": null,
@@ -44546,7 +44708,8 @@
   "stores": [
    "postgres",
    "redis"
-  ]
+  ],
+  "lineageNote": "held->available emits seat.released"
  },
  "relinquishStoredValue": {
   "contract": "orders",
@@ -45054,7 +45217,10 @@
   "reads": [
    "promotions.recommendation_experiment"
   ],
-  "writes": [],
+  "writes": [
+   "platform.outbox",
+   "promotions.recommendation_experiment"
+  ],
   "routing": null,
   "scope": "venue",
   "perm": "PRODUCT_CONFIGURE",
@@ -45068,7 +45234,8 @@
   "stores": [
    "postgres",
    "redis"
-  ]
+  ],
+  "lineageNote": "concluding promotes a strategy and emits promotions.recommendationStrategyPublished (per the event file); the derived entry wrote nothing"
  },
  "createAccessPolicy": {
   "contract": "identity",
@@ -45448,9 +45615,12 @@
   "verb": "POST",
   "path": "/recommendation-strategies",
   "reads": [
+   "cache:idempotency",
    "promotions.recommendation_strategy"
   ],
   "writes": [
+   "cache:idempotency",
+   "platform.outbox",
    "promotions.recommendation_strategy"
   ],
   "routing": null,
@@ -45466,7 +45636,8 @@
   "stores": [
    "postgres",
    "redis"
-  ]
+  ],
+  "lineageNote": "emits promotions.recommendationStrategyPublished when created active; accepts Prefer: validate-only (writes nothing then)"
  },
  "createRentalBlackout": {
   "contract": "rental",
@@ -45852,9 +46023,19 @@
   "verb": "POST",
   "path": "/accreditation-applications/{applicationId}/decide",
   "reads": [
-   "accreditation.application"
+   "accreditation.application",
+   "accreditation.document",
+   "accreditation.holder",
+   "accreditation.requirements",
+   "cache:idempotency"
   ],
-  "writes": [],
+  "writes": [
+   "accreditation.application",
+   "accreditation.audit",
+   "accreditation.holder",
+   "cache:idempotency",
+   "platform.outbox"
+  ],
   "routing": null,
   "scope": "venue",
   "perm": "ACCREDITATION_APPROVE",
@@ -45867,7 +46048,8 @@
   "service": "TenancyService",
   "stores": [
    "postgres"
-  ]
+  ],
+  "lineageNote": "CORRECTED: the derived lineage says it writes nothing; it writes the decision, creates (or, for renewsHolderId, extends) the holder, and publishes accreditation.applicationDecided"
  },
  "decideDuplicateCandidate": {
   "contract": "marketing-crm",
@@ -45920,10 +46102,13 @@
   "verb": "POST",
   "path": "/devices/{deviceId}/enrolment",
   "reads": [
+   "cache:idempotency",
    "platform.device"
   ],
   "writes": [
-   "platform.device"
+   "cache:idempotency",
+   "platform.device",
+   "platform.outbox"
   ],
   "routing": null,
   "scope": "venue",
@@ -45938,7 +46123,8 @@
   "stores": [
    "postgres",
    "redis"
-  ]
+  ],
+  "lineageNote": "emits device.enrolmentChanged"
  },
  "evaluateAccess": {
   "contract": "identity",
@@ -46709,6 +46895,10 @@
   "verb": "GET",
   "path": "/kpi-values",
   "reads": [
+   "accreditation.application",
+   "accreditation.credential",
+   "accreditation.holder",
+   "accreditation.validity",
    "reporting.kpi_definition",
    "reporting.kpi_target"
   ],
@@ -46728,7 +46918,8 @@
    "postgres",
    "postgres-analytical",
    "redis"
-  ]
+  ],
+  "lineageNote": "accreditation system KPIs read the analytical replica of the accreditation tables"
  },
  "getLabourCost": {
   "contract": "workforce",
@@ -47431,6 +47622,7 @@
   "verb": "GET",
   "path": "/staffing-coverage",
   "reads": [
+   "workforce.forecast_requirement",
    "workforce.open_shift",
    "workforce.position_requirement",
    "workforce.rota_assignment",
@@ -47453,7 +47645,7 @@
    "postgres",
    "redis"
   ],
-  "lineageNote": "Required headcount and qualifications per position and time window from workforce.position_requirement (child of staffing_rules, DM2) against rostered rota_assignment + open_shift, qualifications checked against training_record."
+  "lineageNote": "adds workforce.forecast_requirement (basis forecastRequirement / higherOfBoth); the table is written by workforce's consumer of ai.operationalRequirementIssued, not by an operation"
  },
  "getVsiModel": {
   "contract": "subscription",
@@ -47643,10 +47835,13 @@
   "verb": "POST",
   "path": "/accreditation-credentials",
   "reads": [
-   "accreditation.credential"
+   "accreditation.credential",
+   "cache:idempotency"
   ],
   "writes": [
-   "accreditation.credential"
+   "accreditation.credential",
+   "cache:idempotency",
+   "platform.outbox"
   ],
   "routing": null,
   "scope": "venue",
@@ -47660,7 +47855,8 @@
   "service": "TenancyService",
   "stores": [
    "postgres"
-  ]
+  ],
+  "lineageNote": "credential gains symbology; publishes accreditation.credentialIssued"
  },
  "issueDeviceCredential": {
   "contract": "tenancy",
@@ -48265,6 +48461,7 @@
   "verb": "GET",
   "path": "/device-firmware",
   "reads": [
+   "platform.device",
    "tenancy.device_firmware"
   ],
   "writes": [],
@@ -48281,7 +48478,8 @@
   "stores": [
    "postgres",
    "redis"
-  ]
+  ],
+  "lineageNote": "table changed (new columns); installedCount from platform.device"
  },
  "listDeviceTamperEvents": {
   "contract": "tenancy",
@@ -49506,9 +49704,11 @@
   "verb": "POST",
   "path": "/device-tamper-events",
   "reads": [
+   "platform.device",
    "tenancy.device_tamper_event"
   ],
   "writes": [
+   "platform.outbox",
    "tenancy.device_tamper_event"
   ],
   "routing": null,
@@ -49524,7 +49724,8 @@
   "stores": [
    "postgres",
    "redis"
-  ]
+  ],
+  "lineageNote": "emits device.tamperDetected"
  },
  "recordRecommendationOutcome": {
   "contract": "promotions",
@@ -49631,9 +49832,14 @@
   "verb": "POST",
   "path": "/accreditation-credentials/{credentialId}/replace",
   "reads": [
-   "accreditation.credential"
+   "accreditation.credential",
+   "cache:idempotency"
   ],
-  "writes": [],
+  "writes": [
+   "accreditation.credential",
+   "cache:idempotency",
+   "platform.outbox"
+  ],
   "routing": null,
   "scope": "venue",
   "perm": "ACCREDITATION_ISSUE",
@@ -49646,7 +49852,8 @@
   "service": "TenancyService",
   "stores": [
    "postgres"
-  ]
+  ],
+  "lineageNote": "CORRECTED: the derived lineage says it writes nothing; it invalidates the old credential and inserts the new; publishes accreditation.credentialIssued"
  },
  "replaceResourceAllocation": {
   "contract": "resources",
@@ -49875,9 +50082,14 @@
   "verb": "POST",
   "path": "/device-firmware/rollouts/{rolloutId}/rollback",
   "reads": [
+   "cache:idempotency",
    "tenancy.device_rollout"
   ],
-  "writes": [],
+  "writes": [
+   "cache:idempotency",
+   "platform.outbox",
+   "tenancy.device_rollout"
+  ],
   "routing": null,
   "scope": "tenant",
   "perm": "DEVICE_MANAGE",
@@ -49891,7 +50103,8 @@
   "stores": [
    "postgres",
    "redis"
-  ]
+  ],
+  "lineageNote": "emits device.firmwareRolloutCompleted (outcome rolledBack); the derived entry wrote nothing"
  },
  "runDataRetention": {
   "contract": "marketing-crm",
@@ -50100,9 +50313,17 @@
   "verb": "POST",
   "path": "/accreditation-holders/{holderId}/status",
   "reads": [
-   "accreditation.holder"
+   "accreditation.credential",
+   "accreditation.holder",
+   "cache:idempotency"
   ],
-  "writes": [],
+  "writes": [
+   "accreditation.audit",
+   "accreditation.credential",
+   "accreditation.holder",
+   "cache:idempotency",
+   "platform.outbox"
+  ],
   "routing": null,
   "scope": "venue",
   "perm": "ACCREDITATION_MANAGE",
@@ -50115,7 +50336,8 @@
   "service": "TenancyService",
   "stores": [
    "postgres"
-  ]
+  ],
+  "lineageNote": "CORRECTED: the derived lineage says it writes nothing; revocation invalidates credentials; publishes accreditation.holderStatusChanged"
  },
  "setAccreditationValidity": {
   "contract": "accreditation",
@@ -50171,10 +50393,12 @@
   "verb": "PUT",
   "path": "/approval-retention",
   "reads": [
-   "approvals.retention_policy"
+   "approvals.retention_policy",
+   "cache:idempotency"
   ],
   "writes": [
-   "approvals.retention_policy"
+   "approvals.retention_policy",
+   "cache:idempotency"
   ],
   "routing": null,
   "scope": "tenant",
@@ -50189,7 +50413,8 @@
   "stores": [
    "postgres",
    "redis"
-  ]
+  ],
+  "lineageNote": "table changed: retain_years nullable; the default comes from tenancy.data_retention_setting (approvalRecord) at job time"
  },
  "setApprovalSlaPolicy": {
   "contract": "approvals",
@@ -50367,9 +50592,11 @@
   "verb": "PUT",
   "path": "/retention-policies",
   "reads": [
-   "marketing.retention_policy"
+   "marketing.retention_policy",
+   "tenancy.data_retention_setting"
   ],
   "writes": [
+   "cache:idempotency",
    "marketing.retention_policy"
   ],
   "routing": null,
@@ -50385,7 +50612,8 @@
   "stores": [
    "postgres",
    "redis"
-  ]
+  ],
+  "lineageNote": "reads the tenant's guestProfile period to refuse a longer rule (422)"
  },
  "setDeviceAssignment": {
   "contract": "tenancy",
@@ -51308,7 +51536,9 @@
   "verb": "PUT",
   "path": "/payment-terminals",
   "reads": [
-   "payments.terminal"
+   "payments.terminal",
+   "payments.terminal_certification",
+   "payments.terminal_certification_level3"
   ],
   "writes": [
    "payments.terminal"
@@ -51325,7 +51555,8 @@
   "service": "OrderService",
   "stores": [
    "postgres"
-  ]
+  ],
+  "lineageNote": "payments.terminal gains terminal_model_code, entry_modes, dcc_enabled, dcc_provider_connection_id; activation checks the model certification"
  },
  "setPrepaidMinutePackage": {
   "contract": "catalogue",
@@ -51385,6 +51616,7 @@
    "promotions.product_relationship"
   ],
   "writes": [
+   "platform.outbox",
    "promotions.product_relationship"
   ],
   "routing": null,
@@ -51400,7 +51632,8 @@
   "stores": [
    "postgres",
    "redis"
-  ]
+  ],
+  "lineageNote": "emits promotions.recommendationStrategyPublished"
  },
  "setReaderConfiguration": {
   "contract": "games",
@@ -51435,6 +51668,7 @@
    "promotions.recommendation_suppression"
   ],
   "writes": [
+   "platform.outbox",
    "promotions.recommendation_suppression"
   ],
   "routing": null,
@@ -51450,7 +51684,8 @@
   "stores": [
    "postgres",
    "redis"
-  ]
+  ],
+  "lineageNote": "emits promotions.recommendationStrategyPublished"
  },
  "setReconciliationMatchingRules": {
   "contract": "payments",
@@ -52607,9 +52842,13 @@
   "verb": "POST",
   "path": "/device-firmware/rollouts",
   "reads": [
+   "cache:idempotency",
+   "platform.device",
+   "tenancy.device_firmware",
    "tenancy.device_rollout"
   ],
   "writes": [
+   "cache:idempotency",
    "tenancy.device_rollout"
   ],
   "routing": null,
@@ -52625,7 +52864,8 @@
   "stores": [
    "postgres",
    "redis"
-  ]
+  ],
+  "lineageNote": "now reads the release to refuse one that is not released"
  },
  "submitAccreditationDocument": {
   "contract": "accreditation",
@@ -52882,9 +53122,12 @@
   "verb": "PUT",
   "path": "/recommendation-strategies/{strategyId}",
   "reads": [
+   "cache:idempotency",
    "promotions.recommendation_strategy"
   ],
   "writes": [
+   "cache:idempotency",
+   "platform.outbox",
    "promotions.recommendation_strategy"
   ],
   "routing": null,
@@ -52900,7 +53143,8 @@
   "stores": [
    "postgres",
    "redis"
-  ]
+  ],
+  "lineageNote": "emits promotions.recommendationStrategyPublished when an active strategy changes or enters/leaves active"
  },
  "updateRentalBooking": {
   "contract": "rental",
@@ -55284,9 +55528,14 @@
   "verb": "POST",
   "path": "/face-tag/enrolments",
   "reads": [
+   "access.biometric_profile",
+   "cache:idempotency",
    "pii.subject_biometric"
   ],
-  "writes": [],
+  "writes": [
+   "cache:idempotency",
+   "pii.subject_biometric"
+  ],
   "routing": null,
   "scope": "venue",
   "perm": "GUEST_MANAGE",
@@ -55300,16 +55549,18 @@
   "stores": [
    "postgres",
    "redis"
-  ]
+  ],
+  "lineageNote": "Reads the venue's faceTagEnrolment profile for consentCapture and deletionTrigger; existing lineage listed no write, the enrolment writes pii.subject_biometric (kind faceTag)"
  },
  "getBillingStatement": {
   "contract": "orders",
   "verb": "GET",
   "path": "/billing-statements/{statementId}",
   "reads": [
+   "ledger.tax_invoice_line",
    "orders.payment",
-   "payments.dunning_case",
-   "orders.sales_order"
+   "orders.sales_order",
+   "payments.dunning_case"
   ],
   "writes": [],
   "routing": "replica",
@@ -55326,7 +55577,8 @@
   "stores": [
    "postgres",
    "redis"
-  ]
+  ],
+  "lineageNote": "tax, discount and taxInvoiceId per line; format=pdf renders to object storage and returns pdfUrl"
  },
  "getDunningPolicy": {
   "contract": "payments",
@@ -56004,7 +56256,8 @@
   "writes": [
    "cache:idempotency",
    "identity.principal_credential",
-   "identity.session"
+   "identity.session",
+   "platform.outbox"
   ],
   "routing": null,
   "scope": "venue",
@@ -56019,7 +56272,8 @@
   "stores": [
    "postgres",
    "redis"
-  ]
+  ],
+  "lineageNote": "adds platform.outbox (identity.credentialResetRequested)"
  },
  "setDenominations": {
   "contract": "shift",
@@ -57349,7 +57603,9 @@
   "reads": [
    "identity.mfa_method"
   ],
-  "writes": [],
+  "writes": [
+   "platform.outbox"
+  ],
   "routing": null,
   "scope": "tenant",
   "perm": null,
@@ -57363,7 +57619,8 @@
   "stores": [
    "postgres",
    "redis"
-  ]
+  ],
+  "lineageNote": "emits identity.loginRecorded; the derived entry writes nothing else (session writes not traced here)"
  },
  "leaveRestaurantWaitlist": {
   "contract": "fnb",
@@ -57539,9 +57796,15 @@
   "path": "/approval-requests/{requestId}/submit",
   "reads": [
    "approvals.decision",
-   "approvals.request"
+   "approvals.request",
+   "approvals.rule",
+   "cache:idempotency"
   ],
-  "writes": [],
+  "writes": [
+   "approvals.request",
+   "cache:idempotency",
+   "platform.outbox"
+  ],
   "routing": null,
   "scope": "venue",
   "perm": "APPROVAL_REQUEST",
@@ -57555,7 +57818,8 @@
   "stores": [
    "postgres",
    "redis"
-  ]
+  ],
+  "lineageNote": "draft->pending emits approval.requested (derived entry wrote nothing)"
  },
  "updateSeatCategory": {
   "contract": "seating",
@@ -59789,14 +60053,16 @@
   "contract": "access",
   "verb": "PUT",
   "path": "/biometric-lifecycle-retention",
-  "reads": [],
+  "reads": [
+   "tenancy.data_retention_setting"
+  ],
   "writes": [],
   "routing": "primary",
   "scope": "venue",
   "perm": "ACCESS_POINT_CONFIGURE",
   "offline": false,
   "summary": "Save a biometric retention rule",
-  "source": "derived",
+  "source": "hand-mapped 29 September (readiness close-out)",
   "audience": [
    "staff"
   ],
@@ -59804,7 +60070,8 @@
   "stores": [
    "postgres",
    "redis"
-  ]
+  ],
+  "lineageNote": "reads the tenant's faceTagBiometric/facePassBiometric period to refuse a longer rule (422); the rule itself has no table (BiometricLifecycleRetentionDeletionInput is request-only), unchanged"
  },
  "setBrandingLocalizationTemplate": {
   "contract": "access",
@@ -62919,7 +63186,8 @@
    "accreditation.holder",
    "accreditation.holder_access",
    "accreditation.identity_conflict",
-   "cache:idempotency"
+   "cache:idempotency",
+   "platform.outbox"
   ],
   "routing": null,
   "scope": "venue",
@@ -62934,7 +63202,7 @@
   "stores": [
    "postgres"
   ],
-  "lineageNote": "pending -> merged | rejected. Merge: the survivor keeps its accreditation; the other holders' applications and documents are re-pointed to it; the other holders are archived, their credentials invalidated and their holder_access ended (pushed to the gates). Reject: the pair is kept and never raised again."
+  "lineageNote": "adds platform.outbox: archiving the non-surviving holders publishes accreditation.holderStatusChanged"
  },
  "retryChannelIncident": {
   "contract": "catalogue",
@@ -64755,5 +65023,5971 @@
    "postgres",
    "redis"
   ]
+ },
+ "addRiskCaseEvidence": {
+  "contract": "ai",
+  "verb": "POST",
+  "path": "/risk/cases/{caseId}/evidence",
+  "reads": [
+   "ai.case_evidence",
+   "ai.risk_case",
+   "cache:idempotency"
+  ],
+  "writes": [
+   "ai.case_evidence",
+   "cache:idempotency"
+  ],
+  "routing": null,
+  "scope": "venue",
+  "perm": "RISK_INVESTIGATE",
+  "offline": false,
+  "summary": "Add evidence to a case",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "AiService",
+  "stores": [
+   "postgres",
+   "postgres-analytical",
+   "qdrant",
+   "redis"
+  ]
+ },
+ "answerConfigurationQuestion": {
+  "contract": "ai",
+  "verb": "POST",
+  "path": "/configuration-sessions/{sessionId}/answers",
+  "reads": [
+   "ai.blueprint",
+   "ai.blueprint_decision",
+   "ai.config_session",
+   "ai.policy",
+   "ai.provider",
+   "cache:idempotency"
+  ],
+  "writes": [
+   "ai.activity",
+   "ai.blueprint",
+   "ai.blueprint_decision",
+   "ai.config_session",
+   "cache:idempotency"
+  ],
+  "routing": null,
+  "scope": "venue",
+  "perm": "AI_USE",
+  "offline": false,
+  "summary": "Answer the current question",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "AiService",
+  "stores": [
+   "postgres",
+   "postgres-analytical",
+   "qdrant",
+   "redis"
+  ]
+ },
+ "assignChargeback": {
+  "contract": "orders",
+  "verb": "POST",
+  "path": "/chargebacks/{chargebackId}/assign",
+  "reads": [
+   "cache:idempotency",
+   "orders.chargeback",
+   "orders.chargeback_evidence",
+   "orders.chargeback_investigation_log"
+  ],
+  "writes": [
+   "cache:idempotency",
+   "orders.chargeback",
+   "platform.audit_record"
+  ],
+  "routing": null,
+  "scope": "venue",
+  "perm": "ORDER_REFUND_APPROVE",
+  "offline": false,
+  "summary": "Give a chargeback to an investigator, with a note",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "OrderService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "attachConfigurationSource": {
+  "contract": "ai",
+  "verb": "POST",
+  "path": "/configuration-sessions/{sessionId}/sources",
+  "reads": [
+   "ai.config_session",
+   "ai.config_source",
+   "ai.governance_policy_version",
+   "ai.policy",
+   "ai.provider",
+   "assets.media_asset",
+   "cache:idempotency"
+  ],
+  "writes": [
+   "ai.activity",
+   "ai.blueprint_decision",
+   "ai.config_source",
+   "cache:idempotency"
+  ],
+  "routing": null,
+  "scope": "venue",
+  "perm": "AI_USE",
+  "offline": false,
+  "summary": "Seed a configuration session from an uploaded document",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "AiService",
+  "stores": [
+   "postgres",
+   "postgres-analytical",
+   "qdrant",
+   "redis"
+  ],
+  "lineageNote": "The extraction job writes each value as an ai.blueprint_decision with provenance inferred and source_id/source_citation."
+ },
+ "backtestRiskStrategy": {
+  "contract": "ai",
+  "verb": "POST",
+  "path": "/risk/strategy/backtest",
+  "reads": [
+   "ai.risk_assessment",
+   "ai.risk_case",
+   "ai.risk_strategy",
+   "cache:idempotency"
+  ],
+  "writes": [
+   "ai.risk_strategy",
+   "cache:idempotency"
+  ],
+  "routing": "analytical",
+  "scope": "tenant",
+  "perm": "AI_CONFIGURE",
+  "offline": false,
+  "summary": "Backtest a draft strategy",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "AiService",
+  "stores": [
+   "postgres",
+   "postgres-analytical",
+   "qdrant",
+   "redis"
+  ],
+  "lineageNote": "ai.decision_record, forecast_point, signal_observation, risk_assessment, rec_decision, rec_event, control_test and eval_run live in the AI log database (design 2.4); table names unchanged."
+ },
+ "buildConfigurationPlan": {
+  "contract": "ai",
+  "verb": "POST",
+  "path": "/configuration-sessions/{sessionId}/plan",
+  "reads": [
+   "ai.action_plan",
+   "ai.action_step",
+   "ai.blueprint",
+   "ai.blueprint_decision",
+   "ai.capability",
+   "ai.config_session",
+   "ai.governance_policy_version",
+   "ai.tool",
+   "cache:idempotency"
+  ],
+  "writes": [
+   "ai.action_plan",
+   "ai.action_step",
+   "ai.config_session",
+   "ai.decision_record",
+   "ai.proposed_action",
+   "cache:idempotency"
+  ],
+  "routing": null,
+  "scope": "venue",
+  "perm": "AI_USE",
+  "offline": false,
+  "summary": "Compile the blueprint into a plan",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "AiService",
+  "stores": [
+   "postgres",
+   "postgres-analytical",
+   "qdrant",
+   "redis"
+  ],
+  "lineageNote": "ai.decision_record, forecast_point, signal_observation, risk_assessment, rec_decision, rec_event, control_test and eval_run live in the AI log database (design 2.4); table names unchanged."
+ },
+ "cancelActionPlan": {
+  "contract": "ai",
+  "verb": "POST",
+  "path": "/action-plans/{planId}/cancel",
+  "reads": [
+   "ai.action_plan",
+   "ai.action_step",
+   "cache:idempotency"
+  ],
+  "writes": [
+   "ai.action_plan",
+   "ai.action_step",
+   "ai.decision_record",
+   "ai.intervention",
+   "cache:idempotency"
+  ],
+  "routing": null,
+  "scope": "venue",
+  "perm": "AI_USE",
+  "offline": false,
+  "summary": "Cancel a plan",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "AiService",
+  "stores": [
+   "postgres",
+   "postgres-analytical",
+   "qdrant",
+   "redis"
+  ],
+  "lineageNote": "ai.decision_record, forecast_point, signal_observation, risk_assessment, rec_decision, rec_event, control_test and eval_run live in the AI log database (design 2.4); table names unchanged."
+ },
+ "claimDeviceConsent": {
+  "contract": "marketing-crm",
+  "verb": "POST",
+  "path": "/guests/{subjectId}/consents/claim-device",
+  "reads": [
+   "cache:idempotency",
+   "marketing.consent_record",
+   "marketing.device_consent",
+   "marketing.device_consent_category",
+   "marketing.guest_profile",
+   "marketing.tracking_technology"
+  ],
+  "writes": [
+   "cache:idempotency",
+   "marketing.consent_propagation",
+   "marketing.consent_record",
+   "marketing.device_consent",
+   "platform.outbox"
+  ],
+  "routing": null,
+  "scope": "subject",
+  "perm": null,
+  "offline": false,
+  "summary": "Attach a browser's cookie decision to the guest who turned out to own it",
+  "source": "hand-mapped 29 September (readiness close-out)",
+  "audience": [
+   "guest"
+  ],
+  "service": "MarketingService",
+  "stores": [
+   "postgres",
+   "redis"
+  ],
+  "lineageNote": "RB's lineage + outbox for consent.deviceConsentClaimed"
+ },
+ "cloneAccreditationProgramme": {
+  "contract": "accreditation",
+  "verb": "POST",
+  "path": "/accreditation-programmes/{programmeId}/clone",
+  "reads": [
+   "accreditation.notification_rules",
+   "accreditation.programme",
+   "accreditation.requirements",
+   "accreditation.validity",
+   "cache:idempotency"
+  ],
+  "writes": [
+   "accreditation.notification_rules",
+   "accreditation.programme",
+   "accreditation.requirements",
+   "accreditation.validity",
+   "cache:idempotency"
+  ],
+  "routing": null,
+  "scope": "venue",
+  "perm": "ACCREDITATION_CONFIGURE",
+  "offline": false,
+  "summary": "Start a programme from a template or last season's programme",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "TenancyService",
+  "stores": [
+   "postgres"
+  ],
+  "lineageNote": "never applications, holders or credentials"
+ },
+ "closeAiIncident": {
+  "contract": "ai",
+  "verb": "POST",
+  "path": "/incidents/{incidentId}/close",
+  "reads": [
+   "ai.incident",
+   "cache:idempotency"
+  ],
+  "writes": [
+   "ai.incident",
+   "cache:idempotency"
+  ],
+  "routing": null,
+  "scope": "tenant",
+  "perm": "AI_APPROVE",
+  "offline": false,
+  "summary": "Close an incident",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "AiService",
+  "stores": [
+   "postgres",
+   "postgres-analytical",
+   "qdrant",
+   "redis"
+  ]
+ },
+ "closeRiskCase": {
+  "contract": "ai",
+  "verb": "POST",
+  "path": "/risk/cases/{caseId}/close",
+  "reads": [
+   "ai.case_action",
+   "ai.risk_case",
+   "cache:idempotency"
+  ],
+  "writes": [
+   "ai.decision_record",
+   "ai.entity_risk",
+   "ai.risk_case",
+   "cache:idempotency"
+  ],
+  "routing": null,
+  "scope": "venue",
+  "perm": "RISK_INVESTIGATE",
+  "offline": false,
+  "summary": "Close a case with an outcome",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "AiService",
+  "stores": [
+   "postgres",
+   "postgres-analytical",
+   "qdrant",
+   "redis"
+  ],
+  "lineageNote": "ai.decision_record, forecast_point, signal_observation, risk_assessment, rec_decision, rec_event, control_test and eval_run live in the AI log database (design 2.4); table names unchanged.",
+  "note": "Its event leaves through AiService's own outbox in the AI log database (design 2.4); AI writes no platform table (ADR-0020)."
+ },
+ "compareForecastScenarios": {
+  "contract": "ai",
+  "verb": "POST",
+  "path": "/forecast-scenarios/compare",
+  "reads": [
+   "ai.forecast_point",
+   "ai.forecast_scenario",
+   "cache:idempotency"
+  ],
+  "writes": [
+   "cache:idempotency"
+  ],
+  "routing": "replica",
+  "scope": "venue",
+  "perm": "AI_USE",
+  "offline": false,
+  "summary": "Compare scenarios",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "AiService",
+  "stores": [
+   "postgres",
+   "postgres-analytical",
+   "qdrant",
+   "redis"
+  ],
+  "lineageNote": "ai.decision_record, forecast_point, signal_observation, risk_assessment, rec_decision, rec_event, control_test and eval_run live in the AI log database (design 2.4); table names unchanged."
+ },
+ "configureAiCapability": {
+  "contract": "ai",
+  "verb": "PUT",
+  "path": "/governance/capabilities/{capabilityKey}",
+  "reads": [
+   "ai.capability",
+   "cache:idempotency"
+  ],
+  "writes": [
+   "ai.capability",
+   "ai.decision_record",
+   "cache:idempotency"
+  ],
+  "routing": null,
+  "scope": "tenant",
+  "perm": "AI_CONFIGURE",
+  "offline": false,
+  "summary": "Register a capability, or change its owner, risk class or autonomy",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "AiService",
+  "stores": [
+   "postgres",
+   "postgres-analytical",
+   "qdrant",
+   "redis"
+  ],
+  "lineageNote": "ai.decision_record, forecast_point, signal_observation, risk_assessment, rec_decision, rec_event, control_test and eval_run live in the AI log database (design 2.4); table names unchanged."
+ },
+ "configureAnomalyDetector": {
+  "contract": "ai",
+  "verb": "PUT",
+  "path": "/anomaly-detectors/{detectorKey}",
+  "reads": [
+   "ai.anomaly_detector",
+   "ai.forecast_definition",
+   "cache:idempotency"
+  ],
+  "writes": [
+   "ai.anomaly_detector",
+   "cache:idempotency"
+  ],
+  "routing": null,
+  "scope": "venue",
+  "perm": "AI_CONFIGURE",
+  "offline": false,
+  "summary": "Set up anomaly detection on a KPI",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "AiService",
+  "stores": [
+   "postgres",
+   "postgres-analytical",
+   "qdrant",
+   "redis"
+  ],
+  "lineageNote": "ai.anomaly_detector gains source, forecast_source, device_health_source. Forecast-source detectors run on ai.forecastPublished; device-health detectors consume device.statusChanged."
+ },
+ "configureAssistantProfile": {
+  "contract": "ai",
+  "verb": "PUT",
+  "path": "/assistant-profiles/{profileKey}",
+  "reads": [
+   "ai.assistant_profile",
+   "ai.policy",
+   "cache:idempotency"
+  ],
+  "writes": [
+   "ai.assistant_profile",
+   "cache:idempotency"
+  ],
+  "routing": null,
+  "scope": "tenant",
+  "perm": "AI_CONFIGURE",
+  "offline": false,
+  "summary": "Define an assistant profile",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "AiService",
+  "stores": [
+   "postgres",
+   "postgres-analytical",
+   "qdrant",
+   "redis"
+  ]
+ },
+ "configureForecastSignalSource": {
+  "contract": "ai",
+  "verb": "PUT",
+  "path": "/forecast-signals/{signalKey}",
+  "reads": [
+   "ai.signal_source",
+   "cache:idempotency"
+  ],
+  "writes": [
+   "ai.signal_source",
+   "cache:idempotency"
+  ],
+  "routing": null,
+  "scope": "tenant",
+  "perm": "AI_CONFIGURE",
+  "offline": false,
+  "summary": "Set up a forecast signal",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "AiService",
+  "stores": [
+   "postgres",
+   "postgres-analytical",
+   "qdrant",
+   "redis"
+  ]
+ },
+ "configureRiskStrategy": {
+  "contract": "ai",
+  "verb": "PUT",
+  "path": "/risk/strategy",
+  "reads": [
+   "ai.risk_strategy",
+   "cache:idempotency"
+  ],
+  "writes": [
+   "ai.decision_record",
+   "ai.risk_strategy",
+   "cache:idempotency"
+  ],
+  "routing": null,
+  "scope": "tenant",
+  "perm": "AI_CONFIGURE",
+  "offline": false,
+  "summary": "Set the risk strategy",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "AiService",
+  "stores": [
+   "postgres",
+   "postgres-analytical",
+   "qdrant",
+   "redis"
+  ],
+  "lineageNote": "ai.decision_record, forecast_point, signal_observation, risk_assessment, rec_decision, rec_event, control_test and eval_run live in the AI log database (design 2.4); table names unchanged."
+ },
+ "containAiIncident": {
+  "contract": "ai",
+  "verb": "POST",
+  "path": "/incidents/{incidentId}/contain",
+  "reads": [
+   "ai.incident",
+   "cache:idempotency"
+  ],
+  "writes": [
+   "ai.capability",
+   "ai.decision_record",
+   "ai.incident",
+   "ai.intervention",
+   "ai.policy_exception",
+   "ai.release",
+   "cache:idempotency"
+  ],
+  "routing": null,
+  "scope": "tenant",
+  "perm": "AI_APPROVE",
+  "offline": false,
+  "summary": "Contain an incident",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "AiService",
+  "stores": [
+   "postgres",
+   "postgres-analytical",
+   "qdrant",
+   "redis"
+  ],
+  "lineageNote": "ai.decision_record, forecast_point, signal_observation, risk_assessment, rec_decision, rec_event, control_test and eval_run live in the AI log database (design 2.4); table names unchanged."
+ },
+ "createAccessReviewCampaign": {
+  "contract": "identity",
+  "verb": "POST",
+  "path": "/access-review-campaigns",
+  "reads": [
+   "cache:idempotency",
+   "identity.access_decision",
+   "identity.access_review_campaign",
+   "identity.delegated_access",
+   "identity.principal",
+   "identity.role_permission",
+   "identity.segregation_rule",
+   "workforce.employee",
+   "workforce.work_assignment"
+  ],
+  "writes": [
+   "cache:idempotency",
+   "identity.access_review_campaign",
+   "identity.access_review_item"
+  ],
+  "routing": null,
+  "scope": "venue",
+  "perm": "PERMISSION_MANAGE",
+  "offline": false,
+  "summary": "Start an access review, one item per grant in scope",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "IdentityService",
+  "stores": [
+   "postgres",
+   "redis"
+  ],
+  "lineageNote": "items snapshotted in the same transaction, one per allow grant in scope; findings computed as listPermissionFindings; reviewer = line manager from the primary work assignment or the named reviewers"
+ },
+ "createAiGovernancePolicyDraft": {
+  "contract": "ai",
+  "verb": "POST",
+  "path": "/governance/policy-drafts",
+  "reads": [
+   "ai.governance_policy",
+   "ai.governance_policy_version",
+   "cache:idempotency"
+  ],
+  "writes": [
+   "ai.governance_policy",
+   "ai.governance_policy_version",
+   "cache:idempotency"
+  ],
+  "routing": null,
+  "scope": "tenant",
+  "perm": "AI_CONFIGURE",
+  "offline": false,
+  "summary": "Draft a governance policy, or a new version of one",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "AiService",
+  "stores": [
+   "postgres",
+   "postgres-analytical",
+   "qdrant",
+   "redis"
+  ]
+ },
+ "createAiPolicyException": {
+  "contract": "ai",
+  "verb": "POST",
+  "path": "/governance/policy-exceptions",
+  "reads": [
+   "ai.governance_policy",
+   "ai.policy_exception",
+   "cache:idempotency"
+  ],
+  "writes": [
+   "ai.decision_record",
+   "ai.policy_exception",
+   "cache:idempotency"
+  ],
+  "routing": null,
+  "scope": "tenant",
+  "perm": "AI_APPROVE",
+  "offline": false,
+  "summary": "Grant a temporary exception to a governance policy",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "AiService",
+  "stores": [
+   "postgres",
+   "postgres-analytical",
+   "qdrant",
+   "redis"
+  ],
+  "lineageNote": "ai.decision_record, forecast_point, signal_observation, risk_assessment, rec_decision, rec_event, control_test and eval_run live in the AI log database (design 2.4); table names unchanged."
+ },
+ "createDeliveryLocation": {
+  "contract": "fnb",
+  "verb": "POST",
+  "path": "/delivery-locations",
+  "reads": [
+   "cache:idempotency",
+   "fnb.delivery_location",
+   "fnb.dining_table",
+   "platform.outlet"
+  ],
+  "writes": [
+   "cache:idempotency",
+   "fnb.delivery_location",
+   "fnb.delivery_location_outlet"
+  ],
+  "routing": null,
+  "scope": "venue",
+  "perm": "PRODUCT_CONFIGURE",
+  "offline": false,
+  "summary": "Add a place food can be delivered to",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "FnbService",
+  "stores": [
+   "derived",
+   "postgres",
+   "postgres-analytical",
+   "redis"
+  ]
+ },
+ "createDeviceFirmware": {
+  "contract": "tenancy",
+  "verb": "POST",
+  "path": "/device-firmware",
+  "reads": [
+   "assets.media_asset",
+   "cache:idempotency",
+   "tenancy.device_firmware"
+  ],
+  "writes": [
+   "cache:idempotency",
+   "tenancy.device_firmware"
+  ],
+  "routing": null,
+  "scope": "tenant",
+  "perm": "DEVICE_MANAGE",
+  "offline": false,
+  "summary": "Register a firmware or software release before it is deployed",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "TenancyService",
+  "stores": [
+   "postgres",
+   "redis"
+  ],
+  "lineageNote": "artefactAssetId is an uploaded asset; unique on (deviceKind, version) within the tenant"
+ },
+ "createForecastScenario": {
+  "contract": "ai",
+  "verb": "POST",
+  "path": "/forecast-scenarios",
+  "reads": [
+   "ai.forecast_point",
+   "ai.forecast_scenario",
+   "ai.forecast_version",
+   "cache:idempotency"
+  ],
+  "writes": [
+   "ai.forecast_point",
+   "ai.forecast_scenario",
+   "cache:idempotency"
+  ],
+  "routing": null,
+  "scope": "venue",
+  "perm": "AI_USE",
+  "offline": false,
+  "summary": "Run a what-if",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "AiService",
+  "stores": [
+   "postgres",
+   "postgres-analytical",
+   "qdrant",
+   "redis"
+  ],
+  "lineageNote": "ai.decision_record, forecast_point, signal_observation, risk_assessment, rec_decision, rec_event, control_test and eval_run live in the AI log database (design 2.4); table names unchanged."
+ },
+ "createInstalmentPlan": {
+  "contract": "payments",
+  "verb": "POST",
+  "path": "/instalment-plans",
+  "reads": [
+   "cache:idempotency",
+   "orders.payment",
+   "orders.sales_order",
+   "payments.instalment",
+   "payments.instalment_plan",
+   "payments.instalment_policy",
+   "payments.token"
+  ],
+  "writes": [
+   "cache:idempotency",
+   "orders.payment",
+   "payments.instalment",
+   "payments.instalment_plan",
+   "platform.outbox"
+  ],
+  "routing": null,
+  "scope": "venue",
+  "perm": "ORDER_CREATE",
+  "offline": false,
+  "summary": "Split an order's payment into scheduled instalments on a stored card",
+  "source": "derived",
+  "audience": [
+   "staff",
+   "guest",
+   "service"
+  ],
+  "service": "OrderService",
+  "stores": [
+   "postgres"
+  ],
+  "lineageNote": "the first instalment is charged as an orders.payment; later ones by the scheduler; a failed one opens payments.dunning_case"
+ },
+ "createRiskCase": {
+  "contract": "ai",
+  "verb": "POST",
+  "path": "/risk/cases",
+  "reads": [
+   "ai.risk_alert",
+   "ai.risk_case",
+   "cache:idempotency"
+  ],
+  "writes": [
+   "ai.case_evidence",
+   "ai.risk_alert",
+   "ai.risk_case",
+   "cache:idempotency"
+  ],
+  "routing": null,
+  "scope": "venue",
+  "perm": "RISK_INVESTIGATE",
+  "offline": false,
+  "summary": "Open an investigation",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "AiService",
+  "stores": [
+   "postgres",
+   "postgres-analytical",
+   "qdrant",
+   "redis"
+  ]
+ },
+ "createSupplierContract": {
+  "contract": "inventory",
+  "verb": "POST",
+  "path": "/suppliers/{supplierId}/contracts",
+  "reads": [
+   "cache:idempotency",
+   "inventory.supplier",
+   "inventory.supplier_contract"
+  ],
+  "writes": [
+   "cache:idempotency",
+   "inventory.supplier_contract",
+   "platform.audit_record"
+  ],
+  "routing": null,
+  "scope": "tenant",
+  "perm": "PROCUREMENT_MANAGE",
+  "offline": false,
+  "summary": "Record a purchasing contract with a supplier",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "InventoryService",
+  "stores": [
+   "derived",
+   "postgres",
+   "redis"
+  ]
+ },
+ "decideAccessReviewItem": {
+  "contract": "identity",
+  "verb": "POST",
+  "path": "/access-review-items/{itemId}/decision",
+  "reads": [
+   "cache:idempotency",
+   "identity.access_review_campaign",
+   "identity.access_review_item",
+   "identity.delegated_access"
+  ],
+  "writes": [
+   "cache:idempotency",
+   "cache:resolution",
+   "identity.access_review_campaign",
+   "identity.access_review_item",
+   "identity.delegated_access",
+   "identity.session"
+  ],
+  "routing": null,
+  "scope": "venue",
+  "perm": "PERMISSION_GRANT",
+  "offline": false,
+  "summary": "Certify a grant, or revoke it",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "IdentityService",
+  "stores": [
+   "postgres",
+   "redis"
+  ],
+  "lineageNote": "revoke ends the grant (delegated_access valid_to = now) and the holder's sessions, invalidating the resolution cache as createDelegatedAccess does; campaign counters and completed status in the same write"
+ },
+ "decideAiGovernanceAlert": {
+  "contract": "ai",
+  "verb": "POST",
+  "path": "/governance-alerts/{alertId}/decide",
+  "reads": [
+   "ai.governance_alert",
+   "cache:idempotency"
+  ],
+  "writes": [
+   "ai.governance_alert",
+   "ai.incident",
+   "cache:idempotency"
+  ],
+  "routing": null,
+  "scope": "venue",
+  "perm": "AI_CONFIGURE",
+  "offline": false,
+  "summary": "Acknowledge, dismiss, resolve, or open an incident",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "AiService",
+  "stores": [
+   "postgres",
+   "postgres-analytical",
+   "qdrant",
+   "redis"
+  ]
+ },
+ "decideAiInsight": {
+  "contract": "ai",
+  "verb": "POST",
+  "path": "/insights/{insightId}/decide",
+  "reads": [
+   "ai.insight",
+   "cache:idempotency"
+  ],
+  "writes": [
+   "ai.anomaly_detector",
+   "ai.insight",
+   "cache:idempotency"
+  ],
+  "routing": null,
+  "scope": "venue",
+  "perm": "AI_USE",
+  "offline": false,
+  "summary": "Review, accept, reject or mark an insight actioned",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "AiService",
+  "stores": [
+   "postgres",
+   "postgres-analytical",
+   "qdrant",
+   "redis"
+  ]
+ },
+ "decideBlueprintRecommendation": {
+  "contract": "ai",
+  "verb": "POST",
+  "path": "/configuration-sessions/{sessionId}/decisions/{decisionKey}",
+  "reads": [
+   "ai.blueprint",
+   "ai.blueprint_decision",
+   "cache:idempotency"
+  ],
+  "writes": [
+   "ai.blueprint",
+   "ai.blueprint_decision",
+   "cache:idempotency"
+  ],
+  "routing": null,
+  "scope": "venue",
+  "perm": "AI_USE",
+  "offline": false,
+  "summary": "Accept, modify, reject or defer a blueprint decision",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "AiService",
+  "stores": [
+   "postgres",
+   "postgres-analytical",
+   "qdrant",
+   "redis"
+  ]
+ },
+ "decideGuestIdentityVerification": {
+  "contract": "identity",
+  "verb": "POST",
+  "path": "/guest-identity-verifications/{verificationId}/decision",
+  "reads": [
+   "cache:idempotency",
+   "identity.guest_identity_verification",
+   "identity.guest_verification_policy"
+  ],
+  "writes": [
+   "cache:idempotency",
+   "identity.guest_identity_verification",
+   "pii.subject_document"
+  ],
+  "routing": null,
+  "scope": "tenant",
+  "perm": "GUEST_MANAGE",
+  "offline": false,
+  "summary": "Verify or refuse a guest's identity document",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "IdentityService",
+  "stores": [
+   "postgres",
+   "redis"
+  ],
+  "lineageNote": "verified stamps pii.subject_document.verified_at; scan deleted per documentImageRetention"
+ },
+ "decideOperationalRequirement": {
+  "contract": "ai",
+  "verb": "POST",
+  "path": "/operational-requirements/{requirementId}/decide",
+  "reads": [
+   "ai.operational_requirement",
+   "cache:idempotency"
+  ],
+  "writes": [
+   "ai.decision_record",
+   "ai.operational_requirement",
+   "cache:idempotency"
+  ],
+  "routing": null,
+  "scope": "venue",
+  "perm": "AI_USE",
+  "offline": false,
+  "summary": "Accept, modify or reject a requirement",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "AiService",
+  "stores": [
+   "postgres",
+   "postgres-analytical",
+   "qdrant",
+   "redis"
+  ],
+  "lineageNote": "ai.decision_record, forecast_point, signal_observation, risk_assessment, rec_decision, rec_event, control_test and eval_run live in the AI log database (design 2.4); table names unchanged.",
+  "note": "Its event leaves through AiService's own outbox in the AI log database (design 2.4); AI writes no platform table (ADR-0020)."
+ },
+ "decideRecommendations": {
+  "contract": "ai",
+  "verb": "POST",
+  "path": "/recommendations/decide",
+  "reads": [
+   "ai.rec_decline",
+   "ai.release",
+   "cache:idempotency",
+   "cache:rec-candidates",
+   "cache:rec-features"
+  ],
+  "writes": [
+   "ai.decision_record",
+   "ai.rec_decision",
+   "cache:idempotency"
+  ],
+  "routing": null,
+  "scope": "venue",
+  "perm": "AI_USE",
+  "offline": false,
+  "summary": "Fill a recommendation slot",
+  "source": "hand-mapped 29 September (readiness close-out)",
+  "audience": [
+   "staff",
+   "guest",
+   "anonymous"
+  ],
+  "service": "AiService",
+  "stores": [
+   "postgres",
+   "postgres-analytical",
+   "qdrant",
+   "redis"
+  ],
+  "lineageNote": "ai.decision_record, forecast_point, signal_observation, risk_assessment, rec_decision, rec_event, control_test and eval_run live in the AI log database (design 2.4); table names unchanged. Candidates, features and published strategies are read from Redis (cache:rec-candidates, cache:rec-features), kept current from promotions strategy events; ai.rec_decision is written after the response."
+ },
+ "decideRiskAlert": {
+  "contract": "ai",
+  "verb": "POST",
+  "path": "/risk/alerts/{alertId}/decide",
+  "reads": [
+   "ai.risk_alert",
+   "cache:idempotency"
+  ],
+  "writes": [
+   "ai.case_evidence",
+   "ai.risk_alert",
+   "ai.risk_case",
+   "cache:idempotency"
+  ],
+  "routing": null,
+  "scope": "venue",
+  "perm": "RISK_REVIEW",
+  "offline": false,
+  "summary": "Dismiss, monitor, mark false positive, or escalate",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "AiService",
+  "stores": [
+   "postgres",
+   "postgres-analytical",
+   "qdrant",
+   "redis"
+  ]
+ },
+ "deliverAccreditationCredential": {
+  "contract": "accreditation",
+  "verb": "POST",
+  "path": "/accreditation-credentials/{credentialId}/deliver",
+  "reads": [
+   "accreditation.credential",
+   "accreditation.holder",
+   "accreditation.mobile_credential_delivery",
+   "cache:idempotency"
+  ],
+  "writes": [
+   "accreditation.credential",
+   "accreditation.mobile_credential_delivery",
+   "cache:idempotency"
+  ],
+  "routing": null,
+  "scope": "venue",
+  "perm": "ACCREDITATION_ISSUE",
+  "offline": false,
+  "summary": "Send a mobile credential to its holder",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "TenancyService",
+  "stores": [
+   "postgres"
+  ],
+  "lineageNote": "credential.activated_at set on open when activateOnDelivery"
+ },
+ "evaluateAiGovernance": {
+  "contract": "ai",
+  "verb": "POST",
+  "path": "/governance/evaluate",
+  "reads": [
+   "ai.capability",
+   "ai.governance_policy_version",
+   "ai.policy",
+   "ai.policy_exception",
+   "cache:governance-policy",
+   "cache:idempotency"
+  ],
+  "writes": [
+   "ai.decision_record",
+   "cache:idempotency"
+  ],
+  "routing": null,
+  "scope": "venue",
+  "perm": null,
+  "offline": false,
+  "summary": "Ask the governance decision point (service callers)",
+  "source": "hand-mapped 29 September (readiness close-out)",
+  "audience": [
+   "service"
+  ],
+  "service": "AiService",
+  "stores": [
+   "postgres",
+   "postgres-analytical",
+   "qdrant",
+   "redis"
+  ],
+  "lineageNote": "ai.decision_record, forecast_point, signal_observation, risk_assessment, rec_decision, rec_event, control_test and eval_run live in the AI log database (design 2.4); table names unchanged. Service audience (serviceAuth), no screen."
+ },
+ "expandRiskNetwork": {
+  "contract": "ai",
+  "verb": "GET",
+  "path": "/risk/network",
+  "reads": [
+   "ai.entity_risk",
+   "ai.risk_edge"
+  ],
+  "writes": [],
+  "routing": "replica",
+  "scope": "venue",
+  "perm": "RISK_INVESTIGATE",
+  "offline": false,
+  "summary": "Expand the relationship graph around an entity",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "AiService",
+  "stores": [
+   "postgres",
+   "postgres-analytical",
+   "qdrant",
+   "redis"
+  ]
+ },
+ "explainMetricChange": {
+  "contract": "ai",
+  "verb": "POST",
+  "path": "/insights/explain-metric-change",
+  "reads": [
+   "ai.insight",
+   "ai.policy",
+   "cache:idempotency"
+  ],
+  "writes": [
+   "ai.activity",
+   "ai.insight",
+   "cache:idempotency"
+  ],
+  "routing": "analytical",
+  "scope": "venue",
+  "perm": "AI_USE",
+  "offline": false,
+  "summary": "Why did this metric change",
+  "source": "hand-mapped 29 September (readiness close-out)",
+  "audience": [
+   "staff"
+  ],
+  "service": "AiService",
+  "stores": [
+   "postgres",
+   "postgres-analytical",
+   "qdrant",
+   "redis"
+  ]
+ },
+ "explainRecommendationDecision": {
+  "contract": "ai",
+  "verb": "GET",
+  "path": "/recommendations/decisions/{decisionId}/explanation",
+  "reads": [
+   "ai.decision_record",
+   "ai.rec_decision"
+  ],
+  "writes": [],
+  "routing": "analytical",
+  "scope": "venue",
+  "perm": "AI_USE",
+  "offline": false,
+  "summary": "Why these recommendations",
+  "source": "hand-mapped 29 September (readiness close-out)",
+  "audience": [
+   "staff"
+  ],
+  "service": "AiService",
+  "stores": [
+   "postgres",
+   "postgres-analytical",
+   "qdrant",
+   "redis"
+  ],
+  "lineageNote": "ai.decision_record, forecast_point, signal_observation, risk_assessment, rec_decision, rec_event, control_test and eval_run live in the AI log database (design 2.4); table names unchanged."
+ },
+ "exportAccreditationData": {
+  "contract": "accreditation",
+  "verb": "POST",
+  "path": "/accreditation-exports",
+  "reads": [
+   "accreditation.application",
+   "accreditation.credential",
+   "accreditation.data_export",
+   "accreditation.document",
+   "accreditation.holder",
+   "accreditation.holder_access",
+   "cache:idempotency"
+  ],
+  "writes": [
+   "accreditation.audit",
+   "accreditation.data_export",
+   "cache:idempotency"
+  ],
+  "routing": null,
+  "scope": "venue",
+  "perm": "ACCREDITATION_MANAGE",
+  "offline": false,
+  "summary": "Export holders, applications, credentials or access assignments",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "TenancyService",
+  "stores": [
+   "postgres"
+  ],
+  "lineageNote": "dataset tables read by the export job; audit row when includePersonalData"
+ },
+ "exportAiEvidencePackage": {
+  "contract": "ai",
+  "verb": "POST",
+  "path": "/evidence-packages",
+  "reads": [
+   "ai.activity",
+   "ai.decision_record",
+   "ai.evidence_package",
+   "cache:idempotency"
+  ],
+  "writes": [
+   "ai.evidence_package",
+   "cache:idempotency"
+  ],
+  "routing": null,
+  "scope": "venue",
+  "perm": "AI_AUDIT_VIEW",
+  "offline": false,
+  "summary": "Export an evidence package",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "AiService",
+  "stores": [
+   "postgres",
+   "postgres-analytical",
+   "qdrant",
+   "redis"
+  ],
+  "lineageNote": "ai.decision_record, forecast_point, signal_observation, risk_assessment, rec_decision, rec_event, control_test and eval_run live in the AI log database (design 2.4); table names unchanged."
+ },
+ "exportForecastVersion": {
+  "contract": "ai",
+  "verb": "POST",
+  "path": "/forecast-versions/{versionId}/exports",
+  "reads": [
+   "ai.forecast_definition",
+   "ai.forecast_export",
+   "ai.forecast_point",
+   "ai.forecast_scenario",
+   "ai.forecast_version",
+   "cache:idempotency"
+  ],
+  "writes": [
+   "ai.forecast_export",
+   "cache:idempotency"
+  ],
+  "routing": null,
+  "scope": "venue",
+  "perm": "AI_USE",
+  "offline": false,
+  "summary": "Export a forecast version as a file",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "AiService",
+  "stores": [
+   "postgres",
+   "postgres-analytical",
+   "qdrant",
+   "redis"
+  ],
+  "lineageNote": "ai.decision_record, risk_assessment, rec_decision, rec_event and forecast_point live in the AI log database (design 2.4); table names unchanged. The file is an immutable Blob; blobRef on the row."
+ },
+ "getAccessRiskScore": {
+  "contract": "access",
+  "verb": "GET",
+  "path": "/access-risk-scores",
+  "reads": [
+   "access.blacklist",
+   "access.entitlement",
+   "access.fraud_rule",
+   "access.identity_lock",
+   "access.risk_scoring_config",
+   "access.security_alert"
+  ],
+  "writes": [],
+  "routing": "primary",
+  "scope": "venue",
+  "perm": "SCOPE_VIEW",
+  "offline": false,
+  "summary": "The current access risk score of a person, credential or device, with its signals",
+  "source": "hand-mapped 29 September (readiness close-out)",
+  "audience": [
+   "staff"
+  ],
+  "service": "AccessService",
+  "stores": [
+   "postgres",
+   "redis"
+  ],
+  "lineageNote": "Sum of weights of enabled rules with non-dismissed alerts on the target within timeWindow plus configured context factors, capped at 100, banded by the scope config; lock or blacklist forces critical"
+ },
+ "getAccreditationApplication": {
+  "contract": "accreditation",
+  "verb": "GET",
+  "path": "/accreditation-applications/{applicationId}",
+  "reads": [
+   "accreditation.application"
+  ],
+  "writes": [],
+  "routing": "replica",
+  "scope": "venue",
+  "perm": "ACCREDITATION_VIEW",
+  "offline": false,
+  "summary": "One application, with where each requirement stands",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "TenancyService",
+  "stores": [
+   "postgres"
+  ]
+ },
+ "getAccreditationExport": {
+  "contract": "accreditation",
+  "verb": "GET",
+  "path": "/accreditation-exports/{exportId}",
+  "reads": [
+   "accreditation.data_export"
+  ],
+  "writes": [],
+  "routing": null,
+  "scope": "venue",
+  "perm": "ACCREDITATION_MANAGE",
+  "offline": false,
+  "summary": "One export, and its download link once ready",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "TenancyService",
+  "stores": [
+   "postgres"
+  ]
+ },
+ "getActionPlan": {
+  "contract": "ai",
+  "verb": "GET",
+  "path": "/action-plans/{planId}",
+  "reads": [
+   "ai.action_plan",
+   "ai.action_step"
+  ],
+  "writes": [],
+  "routing": "primary",
+  "scope": "venue",
+  "perm": "AI_USE",
+  "offline": false,
+  "summary": "A plan with its steps",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "AiService",
+  "stores": [
+   "postgres",
+   "postgres-analytical",
+   "qdrant",
+   "redis"
+  ]
+ },
+ "getAiByokEnablement": {
+  "contract": "ai",
+  "verb": "GET",
+  "path": "/tenants/{tenantId}/byok",
+  "reads": [
+   "ai.byok_enablement"
+  ],
+  "writes": [],
+  "routing": "replica",
+  "scope": "tenant",
+  "perm": "AI_CONFIGURE",
+  "offline": false,
+  "summary": "Whether a tenant may bring its own key",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "AiService",
+  "stores": [
+   "postgres",
+   "postgres-analytical",
+   "qdrant",
+   "redis"
+  ]
+ },
+ "getAiDecisionTrace": {
+  "contract": "ai",
+  "verb": "GET",
+  "path": "/decision-records/{decisionRecordId}/trace",
+  "reads": [
+   "ai.action_plan",
+   "ai.action_step",
+   "ai.activity",
+   "ai.decision_record",
+   "ai.intervention"
+  ],
+  "writes": [],
+  "routing": "analytical",
+  "scope": "venue",
+  "perm": "AI_AUDIT_VIEW",
+  "offline": false,
+  "summary": "The full trace of a decision",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "AiService",
+  "stores": [
+   "postgres",
+   "postgres-analytical",
+   "qdrant",
+   "redis"
+  ]
+ },
+ "getApprovalRequestScore": {
+  "contract": "ai",
+  "verb": "GET",
+  "path": "/approval-requests/{approvalRequestId}/score",
+  "reads": [
+   "ai.approval_request_score"
+  ],
+  "writes": [],
+  "routing": "replica",
+  "scope": "venue",
+  "perm": "APPROVAL_VIEW",
+  "offline": false,
+  "summary": "The latest context score of an approval request",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "AiService",
+  "stores": [
+   "postgres",
+   "postgres-analytical",
+   "qdrant",
+   "redis"
+  ]
+ },
+ "getChargebackAnalytics": {
+  "contract": "orders",
+  "verb": "GET",
+  "path": "/chargebacks/analytics",
+  "reads": [
+   "catalogue.product",
+   "catalogue.product_category",
+   "orders.chargeback",
+   "orders.order_line",
+   "orders.payment",
+   "orders.sales_order"
+  ],
+  "writes": [],
+  "routing": "analytical",
+  "scope": "venue",
+  "perm": "ORDER_REFUND_APPROVE",
+  "offline": false,
+  "summary": "Chargeback rate, win and loss, by reason, provider, outcome and period",
+  "source": "hand-mapped 29 September (readiness close-out)",
+  "audience": [
+   "staff"
+  ],
+  "service": "OrderService",
+  "stores": [
+   "postgres",
+   "redis"
+  ],
+  "lineageNote": "analytical replica; order_line/product for groupBy product/productCategory, sales_order.subject for customer"
+ },
+ "getConfigurationBlueprint": {
+  "contract": "ai",
+  "verb": "GET",
+  "path": "/configuration-sessions/{sessionId}/blueprint",
+  "reads": [
+   "ai.blueprint",
+   "ai.blueprint_decision",
+   "ai.config_session",
+   "ai.config_source"
+  ],
+  "writes": [],
+  "routing": "primary",
+  "scope": "venue",
+  "perm": "AI_USE",
+  "offline": false,
+  "summary": "The blueprint so far",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "AiService",
+  "stores": [
+   "postgres",
+   "postgres-analytical",
+   "qdrant",
+   "redis"
+  ],
+  "lineageNote": "ai.blueprint_decision gains source_id, source_citation."
+ },
+ "getCookieConsentRuntime": {
+  "contract": "marketing-crm",
+  "verb": "GET",
+  "path": "/storefront/cookie-consent",
+  "reads": [
+   "marketing.cookie_banner_design",
+   "marketing.device_consent",
+   "marketing.device_consent_category",
+   "marketing.tracking_technology"
+  ],
+  "writes": [],
+  "routing": "replica",
+  "scope": "tenant",
+  "perm": null,
+  "offline": false,
+  "summary": "What the page must show and what it may load",
+  "source": "derived",
+  "audience": [
+   "anonymous",
+   "guest"
+  ],
+  "service": "MarketingService",
+  "stores": [
+   "postgres",
+   "redis"
+  ],
+  "lineageNote": "edge-cached per tenant, channel, brand, language and notice version when no key is presented"
+ },
+ "getCustomerRecommendationProfile": {
+  "contract": "ai",
+  "verb": "GET",
+  "path": "/recommendations/customers/{subjectId}/profile",
+  "reads": [
+   "ai.rec_decision",
+   "ai.rec_decline",
+   "ai.rec_event",
+   "cache:rec-features"
+  ],
+  "writes": [],
+  "routing": "analytical",
+  "scope": "venue",
+  "perm": "AI_USE",
+  "offline": false,
+  "summary": "What the engine knows about a customer",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "AiService",
+  "stores": [
+   "postgres",
+   "postgres-analytical",
+   "qdrant",
+   "redis"
+  ],
+  "lineageNote": "ai.decision_record, forecast_point, signal_observation, risk_assessment, rec_decision, rec_event, control_test and eval_run live in the AI log database (design 2.4); table names unchanged."
+ },
+ "getDeviceConsentHistory": {
+  "contract": "marketing-crm",
+  "verb": "GET",
+  "path": "/consent/device/history",
+  "reads": [
+   "marketing.device_consent",
+   "marketing.device_consent_category"
+  ],
+  "writes": [],
+  "routing": "replica",
+  "scope": "tenant",
+  "perm": null,
+  "offline": false,
+  "summary": "A visitor's own cookie decisions, oldest first",
+  "source": "derived",
+  "audience": [
+   "anonymous",
+   "guest"
+  ],
+  "service": "MarketingService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "getDeviceFirmware": {
+  "contract": "tenancy",
+  "verb": "GET",
+  "path": "/device-firmware/{firmwareId}",
+  "reads": [
+   "platform.device",
+   "tenancy.device_firmware"
+  ],
+  "writes": [],
+  "routing": "replica",
+  "scope": "tenant",
+  "perm": "DEVICE_VIEW",
+  "offline": false,
+  "summary": "Read one firmware release, and how much of the fleet is on it",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "TenancyService",
+  "stores": [
+   "postgres",
+   "redis"
+  ],
+  "lineageNote": "installedCount counts platform.device rows reporting this version for the kind"
+ },
+ "getEffectiveAiPolicy": {
+  "contract": "ai",
+  "verb": "GET",
+  "path": "/governance/effective-policy",
+  "reads": [
+   "ai.capability",
+   "ai.governance_policy",
+   "ai.governance_policy_version",
+   "ai.policy",
+   "ai.policy_exception"
+  ],
+  "writes": [],
+  "routing": "replica",
+  "scope": "venue",
+  "perm": "AI_USE",
+  "offline": false,
+  "summary": "The policy in force for a capability at a scope",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "AiService",
+  "stores": [
+   "postgres",
+   "postgres-analytical",
+   "qdrant",
+   "redis"
+  ]
+ },
+ "getEntityRisk": {
+  "contract": "ai",
+  "verb": "GET",
+  "path": "/risk/entities/{entityType}/{entityRef}",
+  "reads": [
+   "ai.entity_risk"
+  ],
+  "writes": [],
+  "routing": "replica",
+  "scope": "tenant",
+  "perm": "RISK_REVIEW",
+  "offline": false,
+  "summary": "Current risk of an entity",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "AiService",
+  "stores": [
+   "postgres",
+   "postgres-analytical",
+   "qdrant",
+   "redis"
+  ]
+ },
+ "getForecast": {
+  "contract": "ai",
+  "verb": "GET",
+  "path": "/forecasts",
+  "reads": [
+   "ai.forecast_definition",
+   "ai.forecast_point",
+   "ai.forecast_version"
+  ],
+  "writes": [],
+  "routing": "replica",
+  "scope": "venue",
+  "perm": "AI_USE",
+  "offline": false,
+  "summary": "Forecast values",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "AiService",
+  "stores": [
+   "postgres",
+   "postgres-analytical",
+   "qdrant",
+   "redis"
+  ],
+  "lineageNote": "ai.decision_record, forecast_point, signal_observation, risk_assessment, rec_decision, rec_event, control_test and eval_run live in the AI log database (design 2.4); table names unchanged."
+ },
+ "getForecastAccuracy": {
+  "contract": "ai",
+  "verb": "GET",
+  "path": "/forecast-accuracy",
+  "reads": [
+   "ai.forecast_accuracy"
+  ],
+  "writes": [],
+  "routing": "analytical",
+  "scope": "venue",
+  "perm": "AI_USE",
+  "offline": false,
+  "summary": "Measured forecast accuracy",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "AiService",
+  "stores": [
+   "postgres",
+   "postgres-analytical",
+   "qdrant",
+   "redis"
+  ]
+ },
+ "getGuestVerificationPolicy": {
+  "contract": "identity",
+  "verb": "GET",
+  "path": "/guest-verification-policy",
+  "reads": [
+   "identity.guest_verification_policy"
+  ],
+  "writes": [],
+  "routing": "replica",
+  "scope": "tenant",
+  "perm": "TENANT_CONFIGURE",
+  "offline": false,
+  "summary": "The tenant's guest identity-verification workflow",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "IdentityService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "getGuidedChoiceSuggestion": {
+  "contract": "ai",
+  "verb": "GET",
+  "path": "/guided-choice-suggestions/{suggestionId}",
+  "reads": [
+   "ai.guided_choice_suggestion"
+  ],
+  "writes": [],
+  "routing": "primary",
+  "scope": "venue",
+  "perm": "AI_USE",
+  "offline": false,
+  "summary": "The reasons behind a Help me choose suggestion",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "AiService",
+  "stores": [
+   "postgres",
+   "postgres-analytical",
+   "qdrant",
+   "redis"
+  ]
+ },
+ "getInstalmentPolicy": {
+  "contract": "payments",
+  "verb": "GET",
+  "path": "/instalment-policy",
+  "reads": [
+   "payments.instalment_policy"
+  ],
+  "writes": [],
+  "routing": "primary",
+  "scope": "tenant",
+  "perm": "PAYMENT_VIEW",
+  "offline": false,
+  "summary": "What may be paid in instalments, and on what terms",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "OrderService",
+  "stores": [
+   "postgres"
+  ]
+ },
+ "getInventoryKitDefinition": {
+  "contract": "inventory",
+  "verb": "GET",
+  "path": "/inventory-items/{itemId}/kit-definition",
+  "reads": [
+   "inventory.item",
+   "inventory.kit_component"
+  ],
+  "writes": [],
+  "routing": "replica",
+  "scope": "venue",
+  "perm": "PRODUCT_VIEW",
+  "offline": false,
+  "summary": "The components a kit item is made of",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "InventoryService",
+  "stores": [
+   "derived",
+   "postgres",
+   "redis"
+  ]
+ },
+ "getMyIdentityVerification": {
+  "contract": "identity",
+  "verb": "GET",
+  "path": "/auth/guest/identity-verifications/current",
+  "reads": [
+   "identity.guest_identity_verification"
+  ],
+  "writes": [],
+  "routing": "primary",
+  "scope": "tenant",
+  "perm": null,
+  "offline": false,
+  "summary": "The guest's own latest identity verification",
+  "source": "derived",
+  "audience": [
+   "guest"
+  ],
+  "service": "IdentityService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "getPlanRecommendations": {
+  "contract": "subscription",
+  "verb": "GET",
+  "path": "/plan-recommendations",
+  "reads": [
+   "control.licence_add_on",
+   "control.licence_add_on_limit",
+   "control.usage_record",
+   "subscription.capacity_pack",
+   "subscription.contract",
+   "subscription.enforcement_policy",
+   "subscription.licensing_model",
+   "subscription.module_listing",
+   "subscription.plan",
+   "subscription.plan_limit",
+   "subscription.plan_module",
+   "subscription.tier_allowance",
+   "subscription.tier_module"
+  ],
+  "writes": [],
+  "routing": "replica",
+  "scope": "platform",
+  "perm": "PLATFORM_BILLING_VIEW",
+  "offline": false,
+  "summary": "Which plan, module or pack would fit this tenant better, and what it would cost or save",
+  "source": "hand-mapped 29 September (readiness close-out)",
+  "audience": [
+   "staff"
+  ],
+  "service": "PlatformService",
+  "stores": [
+   "postgres",
+   "postgres-analytical",
+   "redis"
+  ],
+  "lineageNote": "projection as getLicenceEnforcement, pricing as simulateCommercialPackage (same tables), computed at read time"
+ },
+ "getRiskCase": {
+  "contract": "ai",
+  "verb": "GET",
+  "path": "/risk/cases/{caseId}",
+  "reads": [
+   "ai.case_action",
+   "ai.case_evidence",
+   "ai.risk_alert",
+   "ai.risk_case"
+  ],
+  "writes": [],
+  "routing": "primary",
+  "scope": "venue",
+  "perm": "RISK_INVESTIGATE",
+  "offline": false,
+  "summary": "A case with its evidence and actions",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "AiService",
+  "stores": [
+   "postgres",
+   "postgres-analytical",
+   "qdrant",
+   "redis"
+  ]
+ },
+ "getStorefrontInsights": {
+  "contract": "white-label",
+  "verb": "GET",
+  "path": "/tenant-config/analytics-insights",
+  "reads": [
+   "whitelabel.analytics_provider"
+  ],
+  "writes": [],
+  "routing": "replica",
+  "scope": "venue",
+  "perm": "MARKETING_VIEW",
+  "offline": false,
+  "summary": "Page performance, engagement, conversion and visitor behaviour",
+  "source": "hand-mapped 29 September (readiness close-out)",
+  "audience": [
+   "staff"
+  ],
+  "service": "WhiteLabelService",
+  "stores": [
+   "postgres",
+   "redis"
+  ],
+  "lineageNote": "read through the connected platform's reporting API (external); nothing stored"
+ },
+ "getTaxDocumentRendition": {
+  "contract": "finance",
+  "verb": "GET",
+  "path": "/tax-documents/{documentId}/rendition",
+  "reads": [
+   "ledger.credit_memo",
+   "ledger.tax_invoice"
+  ],
+  "writes": [],
+  "routing": "replica",
+  "scope": "region",
+  "perm": "LEDGER_VIEW",
+  "offline": false,
+  "summary": "The PDF of a tax invoice or credit memo, in a language",
+  "source": "hand-mapped 29 September (readiness close-out)",
+  "audience": [
+   "staff",
+   "guest"
+  ],
+  "service": "LedgerService",
+  "stores": [
+   "postgres",
+   "redis"
+  ],
+  "lineageNote": "signs a link to the PDF stored at issue"
+ },
+ "getTaxInvoice": {
+  "contract": "finance",
+  "verb": "GET",
+  "path": "/tax-invoices/{invoiceId}",
+  "reads": [
+   "ledger.credit_memo",
+   "ledger.einvoice_transmission",
+   "ledger.tax_invoice",
+   "ledger.tax_invoice_line"
+  ],
+  "writes": [],
+  "routing": "replica",
+  "scope": "region",
+  "perm": "LEDGER_VIEW",
+  "offline": false,
+  "summary": "One tax invoice, with its lines, VAT per rate and credit memos",
+  "source": "derived",
+  "audience": [
+   "staff",
+   "guest"
+  ],
+  "service": "LedgerService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "getVatReturn": {
+  "contract": "finance",
+  "verb": "GET",
+  "path": "/tax/vat-returns",
+  "reads": [
+   "ledger.journal_entry",
+   "ledger.legal_entity",
+   "ledger.posting",
+   "ledger.tax_code"
+  ],
+  "writes": [],
+  "routing": "analytical",
+  "scope": "region",
+  "perm": "LEDGER_VIEW",
+  "offline": false,
+  "summary": "A legal entity's VAT return for a tax period, in the FTA's boxes",
+  "source": "hand-mapped 29 September (readiness close-out)",
+  "audience": [
+   "staff"
+  ],
+  "service": "LedgerService",
+  "stores": [
+   "postgres",
+   "redis"
+  ],
+  "lineageNote": "analytical replica; emirate from the venue address"
+ },
+ "getWalletAutoReloadSetting": {
+  "contract": "wallet",
+  "verb": "GET",
+  "path": "/wallets/{walletId}/auto-reload",
+  "reads": [
+   "wallet.auto_reload_setting",
+   "wallet.wallet"
+  ],
+  "writes": [],
+  "routing": "replica",
+  "scope": "venue",
+  "perm": "WALLET_VIEW",
+  "offline": false,
+  "summary": "A wallet's own auto top-up, if the holder set one",
+  "source": "derived",
+  "audience": [
+   "staff",
+   "guest"
+  ],
+  "service": "WalletService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "getWalletExitBalance": {
+  "contract": "wallet",
+  "verb": "GET",
+  "path": "/wallets/{walletId}/exit-balance",
+  "reads": [
+   "payments.stored_forward",
+   "wallet.balance",
+   "wallet.credit_lot",
+   "wallet.refund_policy",
+   "wallet.wallet"
+  ],
+  "writes": [],
+  "routing": "primary",
+  "scope": "venue",
+  "perm": "WALLET_VIEW",
+  "offline": false,
+  "summary": "What the holder owes or is owed on leaving",
+  "source": "hand-mapped 29 September (readiness close-out)",
+  "audience": [
+   "staff",
+   "guest"
+  ],
+  "service": "WalletService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "issueCreditMemo": {
+  "contract": "finance",
+  "verb": "POST",
+  "path": "/tax-invoices/{invoiceId}/credit-memos",
+  "reads": [
+   "cache:idempotency",
+   "ledger.credit_memo",
+   "ledger.credit_memo_line",
+   "ledger.tax_invoice",
+   "ledger.tax_invoice_line",
+   "ledger.tax_invoice_template",
+   "orders.refund"
+  ],
+  "writes": [
+   "cache:idempotency",
+   "control.invoice_line",
+   "ledger.credit_memo",
+   "ledger.credit_memo_line",
+   "ledger.tax_invoice",
+   "ledger.tax_invoice_line",
+   "ledger.tax_invoice_template",
+   "platform.audit_record",
+   "platform.outbox"
+  ],
+  "routing": null,
+  "scope": "venue",
+  "perm": "LEDGER_POST",
+  "offline": false,
+  "summary": "Credit all or part of a tax invoice",
+  "source": "derived",
+  "audience": [
+   "staff",
+   "service"
+  ],
+  "service": "LedgerService",
+  "stores": [
+   "postgres",
+   "redis"
+  ],
+  "lineageNote": "invoice status and line credited_amount move; the ledger movement is the refund or reversal, not this document"
+ },
+ "issueCreditNote": {
+  "contract": "subscription",
+  "verb": "POST",
+  "path": "/invoices/{invoiceId}/credit-notes",
+  "reads": [
+   "cache:idempotency",
+   "control.credit_note",
+   "control.credit_note_line",
+   "control.invoice",
+   "control.invoice_line"
+  ],
+  "writes": [
+   "cache:idempotency",
+   "control.credit_note",
+   "control.credit_note_line",
+   "control.invoice_line"
+  ],
+  "routing": null,
+  "scope": "tenant",
+  "perm": "PLATFORM_BILLING_MANAGE",
+  "offline": false,
+  "summary": "Issue a credit note against a tenant invoice, in full or in part",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "PlatformService",
+  "stores": [
+   "postgres",
+   "postgres-analytical",
+   "redis"
+  ],
+  "lineageNote": "the invoice is not written; creditedTotal is the sum of its credit notes"
+ },
+ "issueMyAccreditationWalletPass": {
+  "contract": "accreditation",
+  "verb": "POST",
+  "path": "/my/accreditation-credentials/{credentialId}/wallet-pass",
+  "reads": [
+   "accreditation.credential",
+   "accreditation.holder",
+   "accreditation.mobile_credential_delivery",
+   "cache:idempotency"
+  ],
+  "writes": [
+   "accreditation.mobile_credential_delivery",
+   "cache:idempotency"
+  ],
+  "routing": null,
+  "scope": "venue",
+  "perm": "ACCREDITATION_APPLY",
+  "offline": false,
+  "summary": "Put my accreditation credential in Apple or Google Wallet",
+  "source": "derived",
+  "audience": [
+   "guest"
+  ],
+  "service": "TenancyService",
+  "stores": [
+   "postgres"
+  ]
+ },
+ "issueTaxInvoice": {
+  "contract": "finance",
+  "verb": "POST",
+  "path": "/tax-invoices",
+  "reads": [
+   "cache:idempotency",
+   "ledger.legal_entity",
+   "ledger.tax_code",
+   "ledger.tax_invoice",
+   "ledger.tax_invoice_line",
+   "ledger.tax_invoice_template",
+   "orders.order_line",
+   "orders.payment",
+   "orders.sales_order"
+  ],
+  "writes": [
+   "cache:idempotency",
+   "ledger.tax_invoice",
+   "ledger.tax_invoice_line",
+   "ledger.tax_invoice_template",
+   "platform.audit_record",
+   "platform.outbox"
+  ],
+  "routing": null,
+  "scope": "venue",
+  "perm": "LEDGER_POST",
+  "offline": false,
+  "summary": "Issue a tax invoice for one or more paid orders",
+  "source": "derived",
+  "audience": [
+   "staff",
+   "guest",
+   "service"
+  ],
+  "service": "LedgerService",
+  "stores": [
+   "postgres",
+   "redis"
+  ],
+  "lineageNote": "tax_invoice_template is written for the series counter (next_number); the PDF goes to object storage and its id onto the invoice; outbox raises the e-invoicing send"
+ },
+ "listAccessPolicyEffectiveness": {
+  "contract": "identity",
+  "verb": "GET",
+  "path": "/access-policy-effectiveness",
+  "reads": [
+   "identity.access_decision",
+   "identity.access_override",
+   "identity.access_policy"
+  ],
+  "writes": [],
+  "routing": "replica",
+  "scope": "tenant",
+  "perm": "PERMISSION_VIEW",
+  "offline": false,
+  "summary": "How each software-permission policy has behaved over a period",
+  "source": "hand-mapped 29 September (readiness close-out)",
+  "audience": [
+   "staff"
+  ],
+  "service": "IdentityService",
+  "stores": [
+   "postgres",
+   "redis"
+  ],
+  "lineageNote": "Aggregated from access_decision.matchedPolicies over from..to"
+ },
+ "listAccessReviewCampaigns": {
+  "contract": "identity",
+  "verb": "GET",
+  "path": "/access-review-campaigns",
+  "reads": [
+   "identity.access_review_campaign"
+  ],
+  "writes": [],
+  "routing": "replica",
+  "scope": "venue",
+  "perm": "PERMISSION_VIEW",
+  "offline": false,
+  "summary": "Access review campaigns, open first",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "IdentityService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "listAccessReviewItems": {
+  "contract": "identity",
+  "verb": "GET",
+  "path": "/access-review-campaigns/{campaignId}/items",
+  "reads": [
+   "identity.access_review_campaign",
+   "identity.access_review_item",
+   "identity.principal",
+   "identity.role"
+  ],
+  "writes": [],
+  "routing": "replica",
+  "scope": "venue",
+  "perm": "PERMISSION_VIEW",
+  "offline": false,
+  "summary": "The grants a campaign asks somebody to certify or revoke",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "IdentityService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "listAccreditationDocuments": {
+  "contract": "accreditation",
+  "verb": "GET",
+  "path": "/accreditation-documents",
+  "reads": [
+   "accreditation.document"
+  ],
+  "writes": [],
+  "routing": "replica",
+  "scope": "venue",
+  "perm": "ACCREDITATION_VIEW",
+  "offline": false,
+  "summary": "Documents supplied, by holder, application, requirement or state",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "TenancyService",
+  "stores": [
+   "postgres"
+  ]
+ },
+ "listAccreditationExports": {
+  "contract": "accreditation",
+  "verb": "GET",
+  "path": "/accreditation-exports",
+  "reads": [
+   "accreditation.data_export"
+  ],
+  "writes": [],
+  "routing": "replica",
+  "scope": "venue",
+  "perm": "ACCREDITATION_MANAGE",
+  "offline": false,
+  "summary": "Exports taken, by whom, of what",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "TenancyService",
+  "stores": [
+   "postgres"
+  ]
+ },
+ "listAiCapabilities": {
+  "contract": "ai",
+  "verb": "GET",
+  "path": "/governance/capabilities",
+  "reads": [
+   "ai.capability"
+  ],
+  "writes": [],
+  "routing": "replica",
+  "scope": "venue",
+  "perm": "AI_USE",
+  "offline": false,
+  "summary": "The capability registry",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "AiService",
+  "stores": [
+   "postgres",
+   "postgres-analytical",
+   "qdrant",
+   "redis"
+  ]
+ },
+ "listAiControls": {
+  "contract": "ai",
+  "verb": "GET",
+  "path": "/controls",
+  "reads": [
+   "ai.control",
+   "ai.control_test"
+  ],
+  "writes": [],
+  "routing": "replica",
+  "scope": "tenant",
+  "perm": "AI_USE",
+  "offline": false,
+  "summary": "Governance controls",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "AiService",
+  "stores": [
+   "postgres",
+   "postgres-analytical",
+   "qdrant",
+   "redis"
+  ],
+  "lineageNote": "ai.decision_record, forecast_point, signal_observation, risk_assessment, rec_decision, rec_event, control_test and eval_run live in the AI log database (design 2.4); table names unchanged."
+ },
+ "listAiEvaluations": {
+  "contract": "ai",
+  "verb": "GET",
+  "path": "/evaluations",
+  "reads": [
+   "ai.eval_run",
+   "ai.eval_suite"
+  ],
+  "writes": [],
+  "routing": "analytical",
+  "scope": "tenant",
+  "perm": "AI_USE",
+  "offline": false,
+  "summary": "Evaluation runs",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "AiService",
+  "stores": [
+   "postgres",
+   "postgres-analytical",
+   "qdrant",
+   "redis"
+  ],
+  "lineageNote": "ai.decision_record, forecast_point, signal_observation, risk_assessment, rec_decision, rec_event, control_test and eval_run live in the AI log database (design 2.4); table names unchanged."
+ },
+ "listAiGovernanceAlerts": {
+  "contract": "ai",
+  "verb": "GET",
+  "path": "/governance-alerts",
+  "reads": [
+   "ai.governance_alert"
+  ],
+  "writes": [],
+  "routing": "replica",
+  "scope": "venue",
+  "perm": "AI_USE",
+  "offline": false,
+  "summary": "Governance alerts",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "AiService",
+  "stores": [
+   "postgres",
+   "postgres-analytical",
+   "qdrant",
+   "redis"
+  ]
+ },
+ "listAiGovernancePolicyVersions": {
+  "contract": "ai",
+  "verb": "GET",
+  "path": "/governance/policy-versions",
+  "reads": [
+   "ai.governance_policy",
+   "ai.governance_policy_version"
+  ],
+  "writes": [],
+  "routing": "replica",
+  "scope": "tenant",
+  "perm": "AI_USE",
+  "offline": false,
+  "summary": "Governance policies and their versions",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "AiService",
+  "stores": [
+   "postgres",
+   "postgres-analytical",
+   "qdrant",
+   "redis"
+  ]
+ },
+ "listAiIncidents": {
+  "contract": "ai",
+  "verb": "GET",
+  "path": "/incidents",
+  "reads": [
+   "ai.incident"
+  ],
+  "writes": [],
+  "routing": "replica",
+  "scope": "tenant",
+  "perm": "AI_USE",
+  "offline": false,
+  "summary": "AI incidents",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "AiService",
+  "stores": [
+   "postgres",
+   "postgres-analytical",
+   "qdrant",
+   "redis"
+  ]
+ },
+ "listAiInsights": {
+  "contract": "ai",
+  "verb": "GET",
+  "path": "/insights",
+  "reads": [
+   "ai.insight"
+  ],
+  "writes": [],
+  "routing": "replica",
+  "scope": "venue",
+  "perm": "AI_USE",
+  "offline": false,
+  "summary": "Insights and anomalies",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "AiService",
+  "stores": [
+   "postgres",
+   "postgres-analytical",
+   "qdrant",
+   "redis"
+  ]
+ },
+ "listAiModels": {
+  "contract": "ai",
+  "verb": "GET",
+  "path": "/models",
+  "reads": [
+   "ai.model"
+  ],
+  "writes": [],
+  "routing": "replica",
+  "scope": "tenant",
+  "perm": "AI_USE",
+  "offline": false,
+  "summary": "The model catalogue",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "AiService",
+  "stores": [
+   "postgres",
+   "postgres-analytical",
+   "qdrant",
+   "redis"
+  ]
+ },
+ "listAiRiskRegister": {
+  "contract": "ai",
+  "verb": "GET",
+  "path": "/risk-register",
+  "reads": [
+   "ai.risk_register"
+  ],
+  "writes": [],
+  "routing": "replica",
+  "scope": "tenant",
+  "perm": "AI_USE",
+  "offline": false,
+  "summary": "The AI risk register",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "AiService",
+  "stores": [
+   "postgres",
+   "postgres-analytical",
+   "qdrant",
+   "redis"
+  ]
+ },
+ "listAiTools": {
+  "contract": "ai",
+  "verb": "GET",
+  "path": "/tools",
+  "reads": [
+   "ai.tool"
+  ],
+  "writes": [],
+  "routing": "replica",
+  "scope": "tenant",
+  "perm": "AI_USE",
+  "offline": false,
+  "summary": "The tool registry",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "AiService",
+  "stores": [
+   "postgres",
+   "postgres-analytical",
+   "qdrant",
+   "redis"
+  ]
+ },
+ "listAnalyticsProviders": {
+  "contract": "white-label",
+  "verb": "GET",
+  "path": "/tenant-config/analytics-providers",
+  "reads": [
+   "whitelabel.analytics_provider"
+  ],
+  "writes": [],
+  "routing": "replica",
+  "scope": "venue",
+  "perm": "TENANT_CONFIGURE",
+  "offline": false,
+  "summary": "The analytics platforms the storefront and app report to",
+  "source": "derived",
+  "audience": [
+   "staff",
+   "guest"
+  ],
+  "service": "WhiteLabelService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "listAnomalyDetectors": {
+  "contract": "ai",
+  "verb": "GET",
+  "path": "/anomaly-detectors",
+  "reads": [
+   "ai.anomaly_detector"
+  ],
+  "writes": [],
+  "routing": "replica",
+  "scope": "venue",
+  "perm": "AI_USE",
+  "offline": false,
+  "summary": "Anomaly detectors",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "AiService",
+  "stores": [
+   "postgres",
+   "postgres-analytical",
+   "qdrant",
+   "redis"
+  ]
+ },
+ "listApprovalExternalDispatches": {
+  "contract": "approvals",
+  "verb": "GET",
+  "path": "/approval-external-dispatches",
+  "reads": [
+   "approvals.external_dispatch"
+  ],
+  "writes": [],
+  "routing": "replica",
+  "scope": "venue",
+  "perm": "APPROVAL_VIEW",
+  "offline": false,
+  "summary": "What was sent to external workflow systems, and what came back",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "TenancyService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "listApprovalExternalProviders": {
+  "contract": "approvals",
+  "verb": "GET",
+  "path": "/approval-external-providers",
+  "reads": [
+   "approvals.external_provider"
+  ],
+  "writes": [],
+  "routing": "replica",
+  "scope": "tenant",
+  "perm": "APPROVAL_VIEW",
+  "offline": false,
+  "summary": "The external workflow systems approval levels may be sent to",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "TenancyService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "listAssistantProfiles": {
+  "contract": "ai",
+  "verb": "GET",
+  "path": "/assistant-profiles",
+  "reads": [
+   "ai.assistant_profile"
+  ],
+  "writes": [],
+  "routing": "replica",
+  "scope": "tenant",
+  "perm": "AI_USE",
+  "offline": false,
+  "summary": "Assistant profiles",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "AiService",
+  "stores": [
+   "postgres",
+   "postgres-analytical",
+   "qdrant",
+   "redis"
+  ]
+ },
+ "listConfigurationSessions": {
+  "contract": "ai",
+  "verb": "GET",
+  "path": "/configuration-sessions",
+  "reads": [
+   "ai.config_session"
+  ],
+  "writes": [],
+  "routing": "replica",
+  "scope": "venue",
+  "perm": "AI_USE",
+  "offline": false,
+  "summary": "Configuration-assistant sessions",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "AiService",
+  "stores": [
+   "postgres",
+   "postgres-analytical",
+   "qdrant",
+   "redis"
+  ]
+ },
+ "listConfigurationSources": {
+  "contract": "ai",
+  "verb": "GET",
+  "path": "/configuration-sessions/{sessionId}/sources",
+  "reads": [
+   "ai.config_session",
+   "ai.config_source"
+  ],
+  "writes": [],
+  "routing": "primary",
+  "scope": "venue",
+  "perm": "AI_USE",
+  "offline": false,
+  "summary": "Documents attached to a configuration session",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "AiService",
+  "stores": [
+   "postgres",
+   "postgres-analytical",
+   "qdrant",
+   "redis"
+  ]
+ },
+ "listCookieScanPolicies": {
+  "contract": "marketing-crm",
+  "verb": "GET",
+  "path": "/cookie-scan-policy",
+  "reads": [
+   "marketing.cookie_scan_policy"
+  ],
+  "writes": [],
+  "routing": "replica",
+  "scope": "venue",
+  "perm": "GUEST_VIEW",
+  "offline": false,
+  "summary": "Scan schedules per channel",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "MarketingService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "listCookieScans": {
+  "contract": "marketing-crm",
+  "verb": "GET",
+  "path": "/cookie-tracking-digital/scans",
+  "reads": [
+   "marketing.cookie_scan_run"
+  ],
+  "writes": [],
+  "routing": "replica",
+  "scope": "venue",
+  "perm": "GUEST_VIEW",
+  "offline": false,
+  "summary": "Scan runs and what each found",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "MarketingService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "listCreditMemos": {
+  "contract": "finance",
+  "verb": "GET",
+  "path": "/credit-memos",
+  "reads": [
+   "ledger.credit_memo",
+   "ledger.credit_memo_line"
+  ],
+  "writes": [],
+  "routing": "replica",
+  "scope": "region",
+  "perm": "LEDGER_VIEW",
+  "offline": false,
+  "summary": "Credit memos issued, newest first",
+  "source": "derived",
+  "audience": [
+   "staff",
+   "guest"
+  ],
+  "service": "LedgerService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "listCreditNotes": {
+  "contract": "subscription",
+  "verb": "GET",
+  "path": "/tenants/{tenantId}/credit-notes",
+  "reads": [
+   "control.credit_note",
+   "control.credit_note_line"
+  ],
+  "writes": [],
+  "routing": "replica",
+  "scope": "tenant",
+  "perm": "PLATFORM_BILLING_VIEW",
+  "offline": false,
+  "summary": "List a tenant's credit notes",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "PlatformService",
+  "stores": [
+   "postgres",
+   "postgres-analytical",
+   "redis"
+  ]
+ },
+ "listDataRetentionSettings": {
+  "contract": "tenancy",
+  "verb": "GET",
+  "path": "/data-retention-settings",
+  "reads": [
+   "tenancy.data_retention_setting"
+  ],
+  "writes": [],
+  "routing": "replica",
+  "scope": "tenant",
+  "perm": "TENANT_VIEW",
+  "offline": false,
+  "summary": "How long the tenant keeps each class of data",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "TenancyService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "listDeviceConsents": {
+  "contract": "marketing-crm",
+  "verb": "GET",
+  "path": "/consent/device",
+  "reads": [
+   "marketing.device_consent",
+   "marketing.device_consent_category"
+  ],
+  "writes": [],
+  "routing": "replica",
+  "scope": "venue",
+  "perm": "GUEST_VIEW",
+  "offline": false,
+  "summary": "Visitors' cookie decisions, as evidence",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "MarketingService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "listDynamicPolicyEffectiveness": {
+  "contract": "access",
+  "verb": "GET",
+  "path": "/dynamic-policy-effectiveness",
+  "reads": [
+   "access.dynamic_policy",
+   "access.dynamic_policy_version",
+   "access.policy_scope_assignment",
+   "access.scan_event"
+  ],
+  "writes": [],
+  "routing": "replica",
+  "scope": "venue",
+  "perm": "SCOPE_VIEW",
+  "offline": false,
+  "summary": "How each gate admission policy has behaved over a period",
+  "source": "hand-mapped 29 September (readiness close-out)",
+  "audience": [
+   "staff"
+  ],
+  "service": "AccessService",
+  "stores": [
+   "postgres",
+   "redis"
+  ],
+  "lineageNote": "Counts scan_event rows by dynamic_policy_id/version/result; overrides are rows whose overrides_scan_id names a denied scan of the policy"
+ },
+ "listEInvoiceTransmissions": {
+  "contract": "finance",
+  "verb": "GET",
+  "path": "/e-invoicing/transmissions",
+  "reads": [
+   "ledger.einvoice_transmission"
+  ],
+  "writes": [],
+  "routing": "replica",
+  "scope": "region",
+  "perm": "LEDGER_VIEW",
+  "offline": false,
+  "summary": "What was sent to the e-invoicing provider, and what came back",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "LedgerService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "listEInvoicingProviders": {
+  "contract": "finance",
+  "verb": "GET",
+  "path": "/e-invoicing/providers",
+  "reads": [
+   "ledger.einvoicing_provider"
+  ],
+  "writes": [],
+  "routing": "replica",
+  "scope": "tenant",
+  "perm": "LEDGER_VIEW",
+  "offline": false,
+  "summary": "The e-invoicing service provider connection per legal entity",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "LedgerService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "listForecastDefinitions": {
+  "contract": "ai",
+  "verb": "GET",
+  "path": "/forecast-definitions",
+  "reads": [
+   "ai.forecast_definition"
+  ],
+  "writes": [],
+  "routing": "replica",
+  "scope": "venue",
+  "perm": "AI_USE",
+  "offline": false,
+  "summary": "What is forecast",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "AiService",
+  "stores": [
+   "postgres",
+   "postgres-analytical",
+   "qdrant",
+   "redis"
+  ]
+ },
+ "listForecastSignals": {
+  "contract": "ai",
+  "verb": "GET",
+  "path": "/forecast-signals",
+  "reads": [
+   "ai.signal_source"
+  ],
+  "writes": [],
+  "routing": "replica",
+  "scope": "tenant",
+  "perm": "AI_USE",
+  "offline": false,
+  "summary": "Forecast signals and their freshness",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "AiService",
+  "stores": [
+   "postgres",
+   "postgres-analytical",
+   "qdrant",
+   "redis"
+  ]
+ },
+ "listForecastVersions": {
+  "contract": "ai",
+  "verb": "GET",
+  "path": "/forecast-versions",
+  "reads": [
+   "ai.forecast_version"
+  ],
+  "writes": [],
+  "routing": "replica",
+  "scope": "venue",
+  "perm": "AI_USE",
+  "offline": false,
+  "summary": "Forecast versions",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "AiService",
+  "stores": [
+   "postgres",
+   "postgres-analytical",
+   "qdrant",
+   "redis"
+  ]
+ },
+ "listGuestIdentityVerifications": {
+  "contract": "identity",
+  "verb": "GET",
+  "path": "/guest-identity-verifications",
+  "reads": [
+   "identity.guest_identity_verification",
+   "pii.subject",
+   "pii.subject_document"
+  ],
+  "writes": [],
+  "routing": "replica",
+  "scope": "tenant",
+  "perm": "GUEST_VIEW_PII",
+  "offline": false,
+  "summary": "Guest identity verifications, the review queue first",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "IdentityService",
+  "stores": [
+   "postgres",
+   "redis"
+  ],
+  "lineageNote": "Review queue, oldest pending first"
+ },
+ "listInstalmentPlans": {
+  "contract": "payments",
+  "verb": "GET",
+  "path": "/instalment-plans",
+  "reads": [
+   "payments.instalment",
+   "payments.instalment_plan"
+  ],
+  "writes": [],
+  "routing": "replica",
+  "scope": "venue",
+  "perm": "PAYMENT_VIEW",
+  "offline": false,
+  "summary": "Instalment plans and their schedules",
+  "source": "derived",
+  "audience": [
+   "staff",
+   "guest"
+  ],
+  "service": "OrderService",
+  "stores": [
+   "postgres"
+  ]
+ },
+ "listKnowledgeGaps": {
+  "contract": "ai",
+  "verb": "GET",
+  "path": "/knowledge-gaps",
+  "reads": [
+   "ai.knowledge_gap"
+  ],
+  "writes": [],
+  "routing": "replica",
+  "scope": "tenant",
+  "perm": "AI_USE",
+  "offline": false,
+  "summary": "Questions the assistant could not answer",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "AiService",
+  "stores": [
+   "postgres",
+   "postgres-analytical",
+   "qdrant",
+   "redis"
+  ]
+ },
+ "listMarketingRecommendations": {
+  "contract": "ai",
+  "verb": "GET",
+  "path": "/marketing-recommendations",
+  "reads": [
+   "ai.insight"
+  ],
+  "writes": [],
+  "routing": "replica",
+  "scope": "venue",
+  "perm": "AI_USE",
+  "offline": false,
+  "summary": "Recommendations on marketing campaigns and journeys",
+  "source": "hand-mapped 29 September (readiness close-out)",
+  "audience": [
+   "staff"
+  ],
+  "service": "AiService",
+  "stores": [
+   "postgres",
+   "postgres-analytical",
+   "qdrant",
+   "redis"
+  ],
+  "lineageNote": "The producer (nightly and on demand) reads marketing.campaign, marketing.journey, marketing.journey_step and marketing.attribution_touch on the analytical replica and writes ai.insight (kind marketingRecommendation)."
+ },
+ "listMyAccreditationApplications": {
+  "contract": "accreditation",
+  "verb": "GET",
+  "path": "/my/accreditation-applications",
+  "reads": [
+   "accreditation.application",
+   "accreditation.holder"
+  ],
+  "writes": [],
+  "routing": "replica",
+  "scope": "venue",
+  "perm": "ACCREDITATION_APPLY",
+  "offline": false,
+  "summary": "The applications this person made, or that were made for them",
+  "source": "derived",
+  "audience": [
+   "guest"
+  ],
+  "service": "TenancyService",
+  "stores": [
+   "postgres"
+  ],
+  "lineageNote": "scoped to the caller: submittedByPrincipalId or holder.subject_id"
+ },
+ "listMyAccreditationCredentials": {
+  "contract": "accreditation",
+  "verb": "GET",
+  "path": "/my/accreditation-credentials",
+  "reads": [
+   "accreditation.credential",
+   "accreditation.holder",
+   "accreditation.holder_access",
+   "accreditation.programme"
+  ],
+  "writes": [],
+  "routing": "replica",
+  "scope": "venue",
+  "perm": "ACCREDITATION_APPLY",
+  "offline": false,
+  "summary": "The credentials this person holds, with where each is valid",
+  "source": "derived",
+  "audience": [
+   "guest"
+  ],
+  "service": "TenancyService",
+  "stores": [
+   "postgres"
+  ],
+  "lineageNote": "scoped to the caller through holder.subject_id"
+ },
+ "listOperationalRequirements": {
+  "contract": "ai",
+  "verb": "GET",
+  "path": "/operational-requirements",
+  "reads": [
+   "ai.forecast_version",
+   "ai.operational_requirement"
+  ],
+  "writes": [],
+  "routing": "replica",
+  "scope": "venue",
+  "perm": "AI_USE",
+  "offline": false,
+  "summary": "Requirements derived from the forecast",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "AiService",
+  "stores": [
+   "postgres",
+   "postgres-analytical",
+   "qdrant",
+   "redis"
+  ]
+ },
+ "listPaymentTerminalCertifications": {
+  "contract": "payments",
+  "verb": "GET",
+  "path": "/payment-terminal-certifications",
+  "reads": [
+   "payments.terminal_certification",
+   "payments.terminal_certification_level3"
+  ],
+  "writes": [],
+  "routing": "replica",
+  "scope": "tenant",
+  "perm": "PAYMENT_VIEW",
+  "offline": false,
+  "summary": "EMV and PCI certification of each terminal model and kernel",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "OrderService",
+  "stores": [
+   "postgres"
+  ]
+ },
+ "listPermissionFindings": {
+  "contract": "identity",
+  "verb": "GET",
+  "path": "/permission-findings",
+  "reads": [
+   "identity.access_decision",
+   "identity.access_policy",
+   "identity.delegated_access",
+   "identity.principal",
+   "identity.role",
+   "identity.role_permission",
+   "identity.segregation_rule"
+  ],
+  "writes": [],
+  "routing": "replica",
+  "scope": "venue",
+  "perm": "PERMISSION_VIEW",
+  "offline": false,
+  "summary": "Excessive, missing and conflicting permissions, per principal or role",
+  "source": "hand-mapped 29 September (readiness close-out)",
+  "audience": [
+   "staff"
+  ],
+  "service": "IdentityService",
+  "stores": [
+   "postgres",
+   "redis"
+  ],
+  "lineageNote": "Computed; excessive from permits in the lookback, missing from denials vs role peers, conflicting as listSegregationViolations"
+ },
+ "listPromptTemplates": {
+  "contract": "ai",
+  "verb": "GET",
+  "path": "/prompt-templates",
+  "reads": [
+   "ai.prompt_template"
+  ],
+  "writes": [],
+  "routing": "replica",
+  "scope": "tenant",
+  "perm": "AI_USE",
+  "offline": false,
+  "summary": "The prompt registry",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "AiService",
+  "stores": [
+   "postgres",
+   "postgres-analytical",
+   "qdrant",
+   "redis"
+  ]
+ },
+ "listPublishedTrackingTechnologies": {
+  "contract": "marketing-crm",
+  "verb": "GET",
+  "path": "/storefront/cookie-consent/technologies",
+  "reads": [
+   "marketing.tracking_technology"
+  ],
+  "writes": [],
+  "routing": "replica",
+  "scope": "tenant",
+  "perm": null,
+  "offline": false,
+  "summary": "The approved cookie registry, as the preference centre shows it",
+  "source": "hand-mapped 29 September (readiness close-out)",
+  "audience": [
+   "anonymous",
+   "guest"
+  ],
+  "service": "MarketingService",
+  "stores": [
+   "postgres",
+   "redis"
+  ],
+  "lineageNote": "approved rows only, guest-facing columns"
+ },
+ "listRiskAlerts": {
+  "contract": "ai",
+  "verb": "GET",
+  "path": "/risk/alerts",
+  "reads": [
+   "ai.risk_alert"
+  ],
+  "writes": [],
+  "routing": "replica",
+  "scope": "venue",
+  "perm": "RISK_REVIEW",
+  "offline": false,
+  "summary": "Risk alerts",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "AiService",
+  "stores": [
+   "postgres",
+   "postgres-analytical",
+   "qdrant",
+   "redis"
+  ]
+ },
+ "listStaffConversations": {
+  "contract": "workforce",
+  "verb": "GET",
+  "path": "/staff-conversations",
+  "reads": [
+   "workforce.employee",
+   "workforce.staff_conversation",
+   "workforce.staff_conversation_participant",
+   "workforce.staff_message"
+  ],
+  "writes": [],
+  "routing": "replica",
+  "scope": "venue",
+  "perm": "WORKFORCE_VIEW",
+  "offline": true,
+  "summary": "The caller's staff conversations, newest activity first",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "TenancyService",
+  "stores": [
+   "postgres",
+   "redis"
+  ],
+  "lineageNote": "Caller's conversations via participant rows; unread = messages after lastReadMessageId; display names from workforce.employee"
+ },
+ "listStaffMessages": {
+  "contract": "workforce",
+  "verb": "GET",
+  "path": "/staff-conversations/{conversationId}/messages",
+  "reads": [
+   "workforce.staff_conversation_participant",
+   "workforce.staff_message"
+  ],
+  "writes": [],
+  "routing": "replica",
+  "scope": "venue",
+  "perm": "WORKFORCE_VIEW",
+  "offline": true,
+  "summary": "Messages in one staff conversation, newest first",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "TenancyService",
+  "stores": [
+   "postgres",
+   "redis"
+  ],
+  "lineageNote": "Participant check first (404 otherwise)"
+ },
+ "listSupplierContracts": {
+  "contract": "inventory",
+  "verb": "GET",
+  "path": "/supplier-contracts",
+  "reads": [
+   "inventory.supplier",
+   "inventory.supplier_contract"
+  ],
+  "writes": [],
+  "routing": "replica",
+  "scope": "venue",
+  "perm": "PROCUREMENT_VIEW",
+  "offline": false,
+  "summary": "Supplier contracts, by supplier, status or expiry",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "InventoryService",
+  "stores": [
+   "derived",
+   "postgres",
+   "redis"
+  ]
+ },
+ "listTaxInvoiceTemplates": {
+  "contract": "finance",
+  "verb": "GET",
+  "path": "/tax-invoice-templates",
+  "reads": [
+   "ledger.tax_invoice_template"
+  ],
+  "writes": [],
+  "routing": "replica",
+  "scope": "tenant",
+  "perm": "LEDGER_VIEW",
+  "offline": false,
+  "summary": "Invoice and credit memo templates and number series, per legal entity",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "LedgerService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "listTaxInvoices": {
+  "contract": "finance",
+  "verb": "GET",
+  "path": "/tax-invoices",
+  "reads": [
+   "ledger.tax_invoice",
+   "ledger.tax_invoice_line"
+  ],
+  "writes": [],
+  "routing": "replica",
+  "scope": "region",
+  "perm": "LEDGER_VIEW",
+  "offline": false,
+  "summary": "Tax invoices issued, newest first",
+  "source": "derived",
+  "audience": [
+   "staff",
+   "guest"
+  ],
+  "service": "LedgerService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "listWebhookEventTypes": {
+  "contract": "public-api",
+  "verb": "GET",
+  "path": "/webhook-event-types",
+  "reads": [],
+  "writes": [],
+  "routing": "replica",
+  "scope": "tenant",
+  "perm": "DEVELOPER_VIEW",
+  "offline": false,
+  "summary": "The events a webhook may subscribe to",
+  "source": "derived",
+  "audience": [
+   "staff",
+   "partner"
+  ],
+  "service": "PlatformService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "markStaffConversationRead": {
+  "contract": "workforce",
+  "verb": "POST",
+  "path": "/staff-conversations/{conversationId}/read",
+  "reads": [
+   "cache:idempotency",
+   "workforce.staff_conversation_participant",
+   "workforce.staff_message"
+  ],
+  "writes": [
+   "cache:idempotency",
+   "workforce.staff_conversation_participant"
+  ],
+  "routing": null,
+  "scope": "venue",
+  "perm": "WORKFORCE_VIEW",
+  "offline": true,
+  "summary": "Mark a staff conversation read up to a message",
+  "source": "hand-mapped 29 September (readiness close-out)",
+  "audience": [
+   "staff"
+  ],
+  "service": "TenancyService",
+  "stores": [
+   "postgres",
+   "redis"
+  ],
+  "lineageNote": "Moves lastReadMessageId forward only"
+ },
+ "openAiIncident": {
+  "contract": "ai",
+  "verb": "POST",
+  "path": "/incidents",
+  "reads": [
+   "ai.governance_alert",
+   "ai.incident",
+   "cache:idempotency"
+  ],
+  "writes": [
+   "ai.governance_alert",
+   "ai.incident",
+   "cache:idempotency"
+  ],
+  "routing": null,
+  "scope": "tenant",
+  "perm": "AI_CONFIGURE",
+  "offline": false,
+  "summary": "Open an AI incident",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "AiService",
+  "stores": [
+   "postgres",
+   "postgres-analytical",
+   "qdrant",
+   "redis"
+  ],
+  "note": "Its event leaves through AiService's own outbox in the AI log database (design 2.4); AI writes no platform table (ADR-0020)."
+ },
+ "overrideAiDecision": {
+  "contract": "ai",
+  "verb": "POST",
+  "path": "/decision-records/{decisionRecordId}/override",
+  "reads": [
+   "ai.decision_record",
+   "ai.intervention",
+   "cache:idempotency"
+  ],
+  "writes": [
+   "ai.decision_record",
+   "ai.intervention",
+   "cache:idempotency"
+  ],
+  "routing": null,
+  "scope": "venue",
+  "perm": "AI_APPROVE",
+  "offline": false,
+  "summary": "Override an AI decision",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "AiService",
+  "stores": [
+   "postgres",
+   "postgres-analytical",
+   "qdrant",
+   "redis"
+  ],
+  "lineageNote": "ai.decision_record, forecast_point, signal_observation, risk_assessment, rec_decision, rec_event, control_test and eval_run live in the AI log database (design 2.4); table names unchanged."
+ },
+ "pauseActionPlan": {
+  "contract": "ai",
+  "verb": "POST",
+  "path": "/action-plans/{planId}/pause",
+  "reads": [
+   "ai.action_plan",
+   "cache:idempotency"
+  ],
+  "writes": [
+   "ai.action_plan",
+   "ai.decision_record",
+   "ai.intervention",
+   "cache:idempotency"
+  ],
+  "routing": null,
+  "scope": "venue",
+  "perm": "AI_APPROVE",
+  "offline": false,
+  "summary": "Pause an executing plan",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "AiService",
+  "stores": [
+   "postgres",
+   "postgres-analytical",
+   "qdrant",
+   "redis"
+  ],
+  "lineageNote": "ai.decision_record, forecast_point, signal_observation, risk_assessment, rec_decision, rec_event, control_test and eval_run live in the AI log database (design 2.4); table names unchanged."
+ },
+ "pauseAiCapability": {
+  "contract": "ai",
+  "verb": "POST",
+  "path": "/governance/capabilities/{capabilityKey}/pause",
+  "reads": [
+   "ai.capability",
+   "cache:idempotency"
+  ],
+  "writes": [
+   "ai.action_plan",
+   "ai.capability",
+   "ai.decision_record",
+   "ai.intervention",
+   "cache:idempotency"
+  ],
+  "routing": null,
+  "scope": "tenant",
+  "perm": "AI_CONFIGURE",
+  "offline": false,
+  "summary": "Stop a capability now",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "AiService",
+  "stores": [
+   "postgres",
+   "postgres-analytical",
+   "qdrant",
+   "redis"
+  ],
+  "lineageNote": "ai.decision_record, forecast_point, signal_observation, risk_assessment, rec_decision, rec_event, control_test and eval_run live in the AI log database (design 2.4); table names unchanged.",
+  "note": "Its event leaves through AiService's own outbox in the AI log database (design 2.4); AI writes no platform table (ADR-0020)."
+ },
+ "promoteAiRelease": {
+  "contract": "ai",
+  "verb": "POST",
+  "path": "/releases/{releaseId}/promote",
+  "reads": [
+   "ai.eval_run",
+   "ai.governance_alert",
+   "ai.release",
+   "cache:idempotency"
+  ],
+  "writes": [
+   "ai.decision_record",
+   "ai.forecast_definition",
+   "ai.governance_alert",
+   "ai.policy",
+   "ai.release",
+   "cache:idempotency"
+  ],
+  "routing": null,
+  "scope": "tenant",
+  "perm": "AI_APPROVE",
+  "offline": false,
+  "summary": "Promote a release to its next stage (a person)",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "AiService",
+  "stores": [
+   "postgres",
+   "postgres-analytical",
+   "qdrant",
+   "redis"
+  ],
+  "lineageNote": "ai.decision_record, forecast_point, signal_observation, risk_assessment, rec_decision, rec_event, control_test and eval_run live in the AI log database (design 2.4); table names unchanged."
+ },
+ "proposeLookalikeSegment": {
+  "contract": "ai",
+  "verb": "POST",
+  "path": "/ai/segment-suggestions",
+  "reads": [
+   "ai.policy",
+   "cache:idempotency",
+   "marketing.audience_list",
+   "marketing.consent_record",
+   "marketing.guest_profile",
+   "marketing.loyalty_position",
+   "marketing.segment",
+   "marketing.segment_criterion",
+   "orders.order_line"
+  ],
+  "writes": [
+   "ai.decision_record",
+   "ai.proposed_action",
+   "cache:idempotency"
+  ],
+  "routing": "analytical",
+  "scope": "venue",
+  "perm": "AI_USE",
+  "offline": false,
+  "summary": "Propose a lookalike segment from a seed, for a person to save",
+  "source": "hand-mapped 29 September (readiness close-out)",
+  "audience": [
+   "staff"
+  ],
+  "service": "AiService",
+  "stores": [
+   "postgres",
+   "postgres-analytical",
+   "qdrant",
+   "redis"
+  ],
+  "lineageNote": "ai.decision_record, risk_assessment, rec_decision, rec_event and forecast_point live in the AI log database (design 2.4); table names unchanged. Guest reads on the analytical replica under the caller's RLS; only criteria and a count leave."
+ },
+ "proposeMarketingContent": {
+  "contract": "ai",
+  "verb": "POST",
+  "path": "/ai/content-drafts",
+  "reads": [
+   "ai.capability",
+   "ai.governance_policy_version",
+   "ai.policy",
+   "ai.prompt_template",
+   "ai.provider",
+   "cache:idempotency",
+   "catalogue.event",
+   "catalogue.product",
+   "control.content_block",
+   "marketing.campaign",
+   "marketing.message_template",
+   "promotions.promotion",
+   "whitelabel.banner",
+   "whitelabel.content_page",
+   "whitelabel.homepage_section",
+   "whitelabel.promo_block"
+  ],
+  "writes": [
+   "ai.activity",
+   "ai.decision_record",
+   "ai.proposed_action",
+   "cache:idempotency"
+  ],
+  "routing": null,
+  "scope": "venue",
+  "perm": "AI_USE",
+  "offline": false,
+  "summary": "Draft marketing content for a person to edit and apply",
+  "source": "hand-mapped 29 September (readiness close-out)",
+  "audience": [
+   "staff"
+  ],
+  "service": "AiService",
+  "stores": [
+   "postgres",
+   "postgres-analytical",
+   "qdrant",
+   "redis"
+  ],
+  "lineageNote": "ai.decision_record, risk_assessment, rec_decision, rec_event and forecast_point live in the AI log database (design 2.4); table names unchanged. Grounding and target reads run as the caller; drafts are ai.proposed_action rows applied by a person through the owner's operation, never written into marketing or whitelabel tables here."
+ },
+ "proposeRiskAction": {
+  "contract": "ai",
+  "verb": "POST",
+  "path": "/risk/cases/{caseId}/actions",
+  "reads": [
+   "ai.capability",
+   "ai.case_action",
+   "ai.risk_case",
+   "ai.tool",
+   "cache:idempotency"
+  ],
+  "writes": [
+   "ai.action_plan",
+   "ai.action_step",
+   "ai.case_action",
+   "ai.decision_record",
+   "cache:idempotency"
+  ],
+  "routing": null,
+  "scope": "venue",
+  "perm": "RISK_INVESTIGATE",
+  "offline": false,
+  "summary": "Propose a restrictive action from a case",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "AiService",
+  "stores": [
+   "postgres",
+   "postgres-analytical",
+   "qdrant",
+   "redis"
+  ],
+  "lineageNote": "ai.decision_record, forecast_point, signal_observation, risk_assessment, rec_decision, rec_event, control_test and eval_run live in the AI log database (design 2.4); table names unchanged."
+ },
+ "proposeSeatMapChanges": {
+  "contract": "ai",
+  "verb": "POST",
+  "path": "/ai/seat-maps/{seatMapId}/proposals",
+  "reads": [
+   "ai.capability",
+   "ai.governance_policy_version",
+   "ai.tool",
+   "cache:idempotency",
+   "orders.order_line",
+   "seating.accessible",
+   "seating.seat",
+   "seating.seat_category",
+   "seating.seat_map",
+   "seating.section",
+   "seating.zone"
+  ],
+  "writes": [
+   "ai.action_plan",
+   "ai.action_step",
+   "ai.decision_record",
+   "ai.proposed_action",
+   "cache:idempotency"
+  ],
+  "routing": null,
+  "scope": "venue",
+  "perm": "CAPACITY_CONFIGURE",
+  "offline": false,
+  "summary": "Propose changes to an existing seat map, as a plan a person approves",
+  "source": "hand-mapped 29 September (readiness close-out)",
+  "audience": [
+   "staff"
+  ],
+  "service": "AiService",
+  "stores": [
+   "postgres",
+   "postgres-analytical",
+   "qdrant",
+   "redis"
+  ],
+  "lineageNote": "ai.decision_record, risk_assessment, rec_decision, rec_event and forecast_point live in the AI log database (design 2.4); table names unchanged. Seat sales history from the analytical replica. Steps validated against seating with Prefer: validate-only; nothing in seating is written until a person approves and the executor runs the plan."
+ },
+ "publishAiGovernancePolicy": {
+  "contract": "ai",
+  "verb": "POST",
+  "path": "/governance/policy-versions/{versionId}/publish",
+  "reads": [
+   "ai.governance_policy_version",
+   "cache:idempotency"
+  ],
+  "writes": [
+   "ai.decision_record",
+   "ai.governance_policy",
+   "ai.governance_policy_version",
+   "cache:governance-policy",
+   "cache:idempotency"
+  ],
+  "routing": null,
+  "scope": "tenant",
+  "perm": "AI_APPROVE",
+  "offline": false,
+  "summary": "Publish a simulated policy version",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "AiService",
+  "stores": [
+   "postgres",
+   "postgres-analytical",
+   "qdrant",
+   "redis"
+  ],
+  "lineageNote": "ai.decision_record, forecast_point, signal_observation, risk_assessment, rec_decision, rec_event, control_test and eval_run live in the AI log database (design 2.4); table names unchanged."
+ },
+ "publishForecastVersion": {
+  "contract": "ai",
+  "verb": "POST",
+  "path": "/forecast-versions/{versionId}/publish",
+  "reads": [
+   "ai.forecast_definition",
+   "ai.forecast_version",
+   "cache:idempotency"
+  ],
+  "writes": [
+   "ai.decision_record",
+   "ai.forecast_version",
+   "ai.operational_requirement",
+   "cache:idempotency"
+  ],
+  "routing": null,
+  "scope": "venue",
+  "perm": "AI_APPROVE",
+  "offline": false,
+  "summary": "Publish a forecast version",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "AiService",
+  "stores": [
+   "postgres",
+   "postgres-analytical",
+   "qdrant",
+   "redis"
+  ],
+  "lineageNote": "ai.decision_record, forecast_point, signal_observation, risk_assessment, rec_decision, rec_event, control_test and eval_run live in the AI log database (design 2.4); table names unchanged.",
+  "note": "Its event leaves through AiService's own outbox in the AI log database (design 2.4); AI writes no platform table (ADR-0020)."
+ },
+ "publishPromptTemplate": {
+  "contract": "ai",
+  "verb": "POST",
+  "path": "/prompt-templates/{templateKey}/versions",
+  "reads": [
+   "ai.prompt_template",
+   "cache:idempotency"
+  ],
+  "writes": [
+   "ai.prompt_template",
+   "ai.release",
+   "cache:idempotency"
+  ],
+  "routing": null,
+  "scope": "tenant",
+  "perm": "AI_APPROVE",
+  "offline": false,
+  "summary": "Publish a prompt template version",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "AiService",
+  "stores": [
+   "postgres",
+   "postgres-analytical",
+   "qdrant",
+   "redis"
+  ]
+ },
+ "recordAnswerFeedback": {
+  "contract": "ai",
+  "verb": "POST",
+  "path": "/messages/{messageId}/feedback",
+  "reads": [
+   "ai.answer_feedback",
+   "ai.message",
+   "cache:idempotency"
+  ],
+  "writes": [
+   "ai.answer_feedback",
+   "ai.knowledge_gap",
+   "cache:idempotency"
+  ],
+  "routing": null,
+  "scope": "venue",
+  "perm": "AI_USE",
+  "offline": false,
+  "summary": "Say whether an answer helped",
+  "source": "derived",
+  "audience": [
+   "staff",
+   "guest"
+  ],
+  "service": "AiService",
+  "stores": [
+   "postgres",
+   "postgres-analytical",
+   "qdrant",
+   "redis"
+  ]
+ },
+ "recordChargeback": {
+  "contract": "orders",
+  "verb": "POST",
+  "path": "/chargebacks/intake",
+  "reads": [
+   "cache:idempotency",
+   "ledger.account_mapping",
+   "ledger.fiscal_period",
+   "orders.chargeback",
+   "orders.chargeback_evidence",
+   "orders.chargeback_investigation_log",
+   "orders.order_line",
+   "orders.payment",
+   "orders.sales_order"
+  ],
+  "writes": [
+   "cache:idempotency",
+   "ledger.journal_entry",
+   "ledger.journal_line",
+   "ledger.posting",
+   "orders.chargeback",
+   "platform.outbox"
+  ],
+  "routing": null,
+  "scope": "venue",
+  "perm": "ORDER_REFUND_APPROVE",
+  "offline": false,
+  "summary": "Take in a chargeback notified by a provider",
+  "source": "derived",
+  "audience": [
+   "staff",
+   "service"
+  ],
+  "service": "OrderService",
+  "stores": [
+   "postgres",
+   "redis"
+  ],
+  "lineageNote": "outbox row = order.chargebackRecorded stage received (payload carries productIds and subjectId from the order)"
+ },
+ "recordChargebackOutcome": {
+  "contract": "orders",
+  "verb": "POST",
+  "path": "/chargebacks/{chargebackId}/outcome",
+  "reads": [
+   "cache:idempotency",
+   "ledger.account_mapping",
+   "ledger.fiscal_period",
+   "orders.chargeback",
+   "orders.chargeback_evidence",
+   "orders.chargeback_investigation_log"
+  ],
+  "writes": [
+   "cache:idempotency",
+   "ledger.journal_entry",
+   "ledger.journal_line",
+   "ledger.posting",
+   "orders.chargeback",
+   "platform.outbox"
+  ],
+  "routing": null,
+  "scope": "venue",
+  "perm": "ORDER_REFUND_APPROVE",
+  "offline": false,
+  "summary": "Record the bank's decision and adjust the ledger",
+  "source": "derived",
+  "audience": [
+   "staff",
+   "service"
+  ],
+  "service": "OrderService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "recordCookieScan": {
+  "contract": "marketing-crm",
+  "verb": "POST",
+  "path": "/cookie-tracking-digital/scans",
+  "reads": [
+   "cache:idempotency",
+   "marketing.cookie_scan_policy",
+   "marketing.cookie_scan_run",
+   "marketing.tracking_technology"
+  ],
+  "writes": [
+   "cache:idempotency",
+   "marketing.cookie_scan_run",
+   "marketing.tracking_technology"
+  ],
+  "routing": "primary",
+  "scope": "venue",
+  "perm": "GUEST_MANAGE",
+  "offline": false,
+  "summary": "Take in the result of a site or app scan",
+  "source": "derived",
+  "audience": [
+   "staff",
+   "service"
+  ],
+  "service": "MarketingService",
+  "stores": [
+   "postgres",
+   "redis"
+  ],
+  "lineageNote": "upserts detected rows / lastSeenAt; alert recipients from cookie_scan_policy"
+ },
+ "recordDeviceConsent": {
+  "contract": "marketing-crm",
+  "verb": "POST",
+  "path": "/consent/device",
+  "reads": [
+   "cache:idempotency",
+   "marketing.cookie_banner_design",
+   "marketing.device_consent",
+   "marketing.device_consent_category"
+  ],
+  "writes": [
+   "cache:idempotency",
+   "marketing.device_consent",
+   "marketing.device_consent_category",
+   "pii.consent_identifier",
+   "platform.outbox"
+  ],
+  "routing": null,
+  "scope": "subject",
+  "perm": null,
+  "offline": false,
+  "summary": "Record a visitor's cookie decision, before anyone is known",
+  "source": "derived",
+  "audience": [
+   "anonymous",
+   "guest"
+  ],
+  "service": "MarketingService",
+  "stores": [
+   "postgres",
+   "redis"
+  ],
+  "lineageNote": "RB's lineage + outbox for consent.deviceConsentRecorded"
+ },
+ "recordEInvoiceTransmissionStatus": {
+  "contract": "finance",
+  "verb": "POST",
+  "path": "/e-invoicing/transmissions/{transmissionId}/status",
+  "reads": [
+   "cache:idempotency",
+   "ledger.einvoice_transmission"
+  ],
+  "writes": [
+   "cache:idempotency",
+   "ledger.einvoice_transmission",
+   "ledger.einvoicing_provider"
+  ],
+  "routing": null,
+  "scope": "region",
+  "perm": null,
+  "offline": false,
+  "summary": "Record the provider's answer for one transmission",
+  "source": "derived",
+  "audience": [
+   "service"
+  ],
+  "service": "LedgerService",
+  "stores": [
+   "postgres",
+   "redis"
+  ],
+  "lineageNote": "einvoicing_provider.last_accepted_test_at on the first accepted test"
+ },
+ "recordExternalApprovalDecision": {
+  "contract": "approvals",
+  "verb": "POST",
+  "path": "/approval-requests/{requestId}/external-decision",
+  "reads": [
+   "approvals.decision",
+   "approvals.external_dispatch",
+   "approvals.external_provider",
+   "approvals.request",
+   "approvals.rule",
+   "cache:idempotency"
+  ],
+  "writes": [
+   "approvals.decision",
+   "approvals.external_dispatch",
+   "approvals.request",
+   "cache:idempotency",
+   "platform.outbox"
+  ],
+  "routing": null,
+  "scope": "venue",
+  "perm": "APPROVAL_DECIDE",
+  "offline": false,
+  "summary": "An external workflow system returns its decision on a level",
+  "source": "derived",
+  "audience": [
+   "partner"
+  ],
+  "service": "TenancyService",
+  "stores": [
+   "postgres",
+   "redis"
+  ],
+  "lineageNote": "decides the level as decideApprovalRequest does; emits approval.stepCompleted / approval.granted / approval.rejected"
+ },
+ "recordPaymentTerminalCertification": {
+  "contract": "payments",
+  "verb": "PUT",
+  "path": "/payment-terminal-certifications/{modelCode}",
+  "reads": [
+   "cache:idempotency",
+   "payments.provider_connection",
+   "payments.terminal_certification",
+   "payments.terminal_certification_level3"
+  ],
+  "writes": [
+   "cache:idempotency",
+   "payments.terminal_certification",
+   "payments.terminal_certification_level3",
+   "platform.audit_record"
+  ],
+  "routing": null,
+  "scope": "tenant",
+  "perm": "PAYMENT_PROVIDER_MANAGE",
+  "offline": false,
+  "summary": "Record a terminal model's EMV and PCI certification",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "OrderService",
+  "stores": [
+   "postgres"
+  ]
+ },
+ "recordRecommendationEvents": {
+  "contract": "ai",
+  "verb": "POST",
+  "path": "/recommendations/events",
+  "reads": [
+   "ai.rec_decision",
+   "cache:idempotency"
+  ],
+  "writes": [
+   "ai.rec_decline",
+   "ai.rec_event",
+   "cache:idempotency"
+  ],
+  "routing": null,
+  "scope": "venue",
+  "perm": "AI_USE",
+  "offline": false,
+  "summary": "Report what happened to recommended items",
+  "source": "hand-mapped 29 September (readiness close-out)",
+  "audience": [
+   "staff",
+   "guest",
+   "anonymous"
+  ],
+  "service": "AiService",
+  "stores": [
+   "postgres",
+   "postgres-analytical",
+   "qdrant",
+   "redis"
+  ],
+  "lineageNote": "ai.decision_record, forecast_point, signal_observation, risk_assessment, rec_decision, rec_event, control_test and eval_run live in the AI log database (design 2.4); table names unchanged."
+ },
+ "recordStorefrontSessionEvents": {
+  "contract": "white-label",
+  "verb": "POST",
+  "path": "/storefront/session-events",
+  "reads": [
+   "cache:idempotency"
+  ],
+  "writes": [
+   "cache:idempotency",
+   "platform.outbox"
+  ],
+  "routing": null,
+  "scope": "tenant",
+  "perm": null,
+  "offline": false,
+  "summary": "Report a batch of browsing behaviour for fraud prevention, hashed and without personal data",
+  "source": "hand-mapped 29 September (readiness close-out)",
+  "audience": [
+   "guest",
+   "anonymous"
+  ],
+  "service": "WhiteLabelService",
+  "stores": [
+   "postgres",
+   "redis"
+  ],
+  "lineageNote": "nothing stored but the outbox row (storefront.sessionEvent)"
+ },
+ "renewAccreditation": {
+  "contract": "accreditation",
+  "verb": "POST",
+  "path": "/accreditation-holders/{holderId}/renew",
+  "reads": [
+   "accreditation.application",
+   "accreditation.document",
+   "accreditation.holder",
+   "accreditation.programme",
+   "accreditation.validity",
+   "cache:idempotency"
+  ],
+  "writes": [
+   "accreditation.application",
+   "accreditation.audit",
+   "accreditation.holder",
+   "cache:idempotency",
+   "platform.outbox"
+  ],
+  "routing": null,
+  "scope": "venue",
+  "perm": "ACCREDITATION_APPLY",
+  "offline": false,
+  "summary": "Renew a holder's accreditation for another period",
+  "source": "derived",
+  "audience": [
+   "staff",
+   "guest"
+  ],
+  "service": "TenancyService",
+  "stores": [
+   "postgres"
+  ],
+  "lineageNote": "holder and outbox written only where the renewal is approved at once (no reverification)"
+ },
+ "replayAiDecision": {
+  "contract": "ai",
+  "verb": "POST",
+  "path": "/decision-records/{decisionRecordId}/replay",
+  "reads": [
+   "ai.decision_record",
+   "cache:idempotency"
+  ],
+  "writes": [
+   "ai.activity",
+   "cache:idempotency"
+  ],
+  "routing": null,
+  "scope": "venue",
+  "perm": "AI_AUDIT_VIEW",
+  "offline": false,
+  "summary": "Re-simulate a decision",
+  "source": "hand-mapped 29 September (readiness close-out)",
+  "audience": [
+   "staff"
+  ],
+  "service": "AiService",
+  "stores": [
+   "postgres",
+   "postgres-analytical",
+   "qdrant",
+   "redis"
+  ],
+  "lineageNote": "ai.decision_record, forecast_point, signal_observation, risk_assessment, rec_decision, rec_event, control_test and eval_run live in the AI log database (design 2.4); table names unchanged."
+ },
+ "restoreAccessPolicyVersion": {
+  "contract": "identity",
+  "verb": "POST",
+  "path": "/access-policies/{policyId}/restore",
+  "reads": [
+   "cache:idempotency",
+   "identity.access_policy",
+   "identity.access_policy_version"
+  ],
+  "writes": [
+   "cache:idempotency",
+   "identity.access_policy",
+   "identity.access_policy_version"
+  ],
+  "routing": null,
+  "scope": "tenant",
+  "perm": "PERMISSION_MANAGE",
+  "offline": false,
+  "summary": "Put a previously approved policy version back, as a new version",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "IdentityService",
+  "stores": [
+   "postgres",
+   "redis"
+  ],
+  "lineageNote": "Target version must have approvedBy; writes a new pendingApproval version with the old content; approval routed as setAccessPolicyState"
+ },
+ "resubmitAccreditationApplication": {
+  "contract": "accreditation",
+  "verb": "POST",
+  "path": "/accreditation-applications/{applicationId}/resubmit",
+  "reads": [
+   "accreditation.application",
+   "accreditation.document",
+   "accreditation.programme",
+   "accreditation.requirements",
+   "cache:idempotency"
+  ],
+  "writes": [
+   "accreditation.application",
+   "accreditation.document",
+   "cache:idempotency"
+  ],
+  "routing": null,
+  "scope": "venue",
+  "perm": "ACCREDITATION_APPLY",
+  "offline": false,
+  "summary": "Send an application back after a return for information or a rejection",
+  "source": "derived",
+  "audience": [
+   "staff",
+   "guest"
+  ],
+  "service": "TenancyService",
+  "stores": [
+   "postgres"
+  ],
+  "lineageNote": "rejected: inserts a new application and re-points still-valid documents; informationRequested: updates the same row"
+ },
+ "resumeActionPlan": {
+  "contract": "ai",
+  "verb": "POST",
+  "path": "/action-plans/{planId}/resume",
+  "reads": [
+   "ai.action_plan",
+   "ai.action_step",
+   "cache:idempotency"
+  ],
+  "writes": [
+   "ai.action_plan",
+   "ai.decision_record",
+   "ai.intervention",
+   "cache:idempotency"
+  ],
+  "routing": null,
+  "scope": "venue",
+  "perm": "AI_APPROVE",
+  "offline": false,
+  "summary": "Resume a paused plan",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "AiService",
+  "stores": [
+   "postgres",
+   "postgres-analytical",
+   "qdrant",
+   "redis"
+  ],
+  "lineageNote": "ai.decision_record, forecast_point, signal_observation, risk_assessment, rec_decision, rec_event, control_test and eval_run live in the AI log database (design 2.4); table names unchanged."
+ },
+ "resumeAiCapability": {
+  "contract": "ai",
+  "verb": "POST",
+  "path": "/governance/capabilities/{capabilityKey}/resume",
+  "reads": [
+   "ai.capability",
+   "cache:idempotency"
+  ],
+  "writes": [
+   "ai.capability",
+   "ai.decision_record",
+   "ai.intervention",
+   "cache:idempotency"
+  ],
+  "routing": null,
+  "scope": "tenant",
+  "perm": "AI_APPROVE",
+  "offline": false,
+  "summary": "Resume a paused capability",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "AiService",
+  "stores": [
+   "postgres",
+   "postgres-analytical",
+   "qdrant",
+   "redis"
+  ],
+  "lineageNote": "ai.decision_record, forecast_point, signal_observation, risk_assessment, rec_decision, rec_event, control_test and eval_run live in the AI log database (design 2.4); table names unchanged."
+ },
+ "retryActionStep": {
+  "contract": "ai",
+  "verb": "POST",
+  "path": "/action-plans/{planId}/steps/{stepNumber}/retry",
+  "reads": [
+   "ai.action_step",
+   "cache:idempotency"
+  ],
+  "writes": [
+   "ai.action_step",
+   "ai.decision_record",
+   "ai.intervention",
+   "cache:idempotency"
+  ],
+  "routing": null,
+  "scope": "venue",
+  "perm": "AI_APPROVE",
+  "offline": false,
+  "summary": "Retry a failed step",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "AiService",
+  "stores": [
+   "postgres",
+   "postgres-analytical",
+   "qdrant",
+   "redis"
+  ],
+  "lineageNote": "ai.decision_record, forecast_point, signal_observation, risk_assessment, rec_decision, rec_event, control_test and eval_run live in the AI log database (design 2.4); table names unchanged."
+ },
+ "revokeAiPolicyException": {
+  "contract": "ai",
+  "verb": "POST",
+  "path": "/governance/policy-exceptions/{exceptionId}/revoke",
+  "reads": [
+   "ai.policy_exception",
+   "cache:idempotency"
+  ],
+  "writes": [
+   "ai.decision_record",
+   "ai.policy_exception",
+   "cache:idempotency"
+  ],
+  "routing": null,
+  "scope": "tenant",
+  "perm": "AI_APPROVE",
+  "offline": false,
+  "summary": "End an exception before it expires",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "AiService",
+  "stores": [
+   "postgres",
+   "postgres-analytical",
+   "qdrant",
+   "redis"
+  ],
+  "lineageNote": "ai.decision_record, forecast_point, signal_observation, risk_assessment, rec_decision, rec_event, control_test and eval_run live in the AI log database (design 2.4); table names unchanged."
+ },
+ "rollbackActionPlan": {
+  "contract": "ai",
+  "verb": "POST",
+  "path": "/action-plans/{planId}/rollback",
+  "reads": [
+   "ai.action_plan",
+   "ai.action_step",
+   "ai.tool",
+   "cache:idempotency"
+  ],
+  "writes": [
+   "ai.action_plan",
+   "ai.action_step",
+   "ai.decision_record",
+   "ai.proposed_action",
+   "cache:idempotency"
+  ],
+  "routing": null,
+  "scope": "venue",
+  "perm": "AI_APPROVE",
+  "offline": false,
+  "summary": "Plan a rollback",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "AiService",
+  "stores": [
+   "postgres",
+   "postgres-analytical",
+   "qdrant",
+   "redis"
+  ],
+  "lineageNote": "ai.decision_record, forecast_point, signal_observation, risk_assessment, rec_decision, rec_event, control_test and eval_run live in the AI log database (design 2.4); table names unchanged."
+ },
+ "rollbackAiRelease": {
+  "contract": "ai",
+  "verb": "POST",
+  "path": "/releases/{releaseId}/rollback",
+  "reads": [
+   "ai.release",
+   "cache:idempotency"
+  ],
+  "writes": [
+   "ai.decision_record",
+   "ai.forecast_definition",
+   "ai.policy",
+   "ai.release",
+   "cache:idempotency"
+  ],
+  "routing": null,
+  "scope": "tenant",
+  "perm": "AI_APPROVE",
+  "offline": false,
+  "summary": "Roll a release back",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "AiService",
+  "stores": [
+   "postgres",
+   "postgres-analytical",
+   "qdrant",
+   "redis"
+  ],
+  "lineageNote": "ai.decision_record, forecast_point, signal_observation, risk_assessment, rec_decision, rec_event, control_test and eval_run live in the AI log database (design 2.4); table names unchanged."
+ },
+ "runAiControlTest": {
+  "contract": "ai",
+  "verb": "POST",
+  "path": "/controls/{controlKey}/tests",
+  "reads": [
+   "ai.activity",
+   "ai.control",
+   "ai.control_test",
+   "ai.decision_record",
+   "ai.proposed_action",
+   "cache:idempotency"
+  ],
+  "writes": [
+   "ai.control",
+   "ai.control_test",
+   "ai.governance_alert",
+   "cache:idempotency"
+  ],
+  "routing": null,
+  "scope": "tenant",
+  "perm": "AI_AUDIT_VIEW",
+  "offline": false,
+  "summary": "Test a control now",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "AiService",
+  "stores": [
+   "postgres",
+   "postgres-analytical",
+   "qdrant",
+   "redis"
+  ],
+  "lineageNote": "ai.decision_record, forecast_point, signal_observation, risk_assessment, rec_decision, rec_event, control_test and eval_run live in the AI log database (design 2.4); table names unchanged."
+ },
+ "runAiEvaluation": {
+  "contract": "ai",
+  "verb": "POST",
+  "path": "/evaluations",
+  "reads": [
+   "ai.eval_run",
+   "ai.eval_suite",
+   "ai.release",
+   "cache:idempotency"
+  ],
+  "writes": [
+   "ai.eval_run",
+   "ai.release",
+   "cache:idempotency"
+  ],
+  "routing": null,
+  "scope": "tenant",
+  "perm": "AI_CONFIGURE",
+  "offline": false,
+  "summary": "Evaluate a candidate",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "AiService",
+  "stores": [
+   "postgres",
+   "postgres-analytical",
+   "qdrant",
+   "redis"
+  ],
+  "lineageNote": "ai.decision_record, forecast_point, signal_observation, risk_assessment, rec_decision, rec_event, control_test and eval_run live in the AI log database (design 2.4); table names unchanged."
+ },
+ "runForecast": {
+  "contract": "ai",
+  "verb": "POST",
+  "path": "/forecast-definitions/{definitionKey}/runs",
+  "reads": [
+   "ai.forecast_definition",
+   "ai.forecast_version",
+   "ai.release",
+   "ai.signal_observation",
+   "cache:idempotency",
+   "marketing.guest_profile",
+   "marketing.segment",
+   "orders.order_line"
+  ],
+  "writes": [
+   "ai.forecast_accuracy",
+   "ai.forecast_point",
+   "ai.forecast_version",
+   "ai.insight",
+   "cache:idempotency"
+  ],
+  "routing": null,
+  "scope": "venue",
+  "perm": "AI_CONFIGURE",
+  "offline": false,
+  "summary": "Run a forecast now",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "AiService",
+  "stores": [
+   "postgres",
+   "postgres-analytical",
+   "qdrant",
+   "redis"
+  ],
+  "lineageNote": "ai.decision_record, risk_assessment, rec_decision, rec_event and forecast_point live in the AI log database (design 2.4); table names unchanged. The snapshot now carries customerSegment and originCountry per booking and admission; forecast-threshold detectors raise ai.insight on publish."
+ },
+ "runSemanticQuery": {
+  "contract": "reporting",
+  "verb": "POST",
+  "path": "/semantic-queries",
+  "reads": [
+   "cache:idempotency",
+   "reporting.kpi_definition",
+   "reporting.report_column",
+   "reporting.report_filter",
+   "reporting.semantic_model"
+  ],
+  "writes": [
+   "cache:idempotency"
+  ],
+  "routing": "analytical",
+  "scope": "venue",
+  "perm": "REPORT_VIEW_VENUE",
+  "offline": false,
+  "summary": "Run a semantic query spec on the analytical replica (service callers)",
+  "source": "derived",
+  "audience": [
+   "service"
+  ],
+  "service": "ReportingService",
+  "stores": [
+   "derived",
+   "postgres",
+   "postgres-analytical",
+   "redis"
+  ],
+  "lineageNote": "new; routing analytical; plus whatever analytical-replica datasets the spec compiles to"
+ },
+ "scoreApprovalRequest": {
+  "contract": "ai",
+  "verb": "POST",
+  "path": "/approval-requests/{approvalRequestId}/score",
+  "reads": [
+   "ai.approval_request_score",
+   "ai.entity_risk",
+   "approvals.request",
+   "approvals.sla_policy",
+   "cache:idempotency"
+  ],
+  "writes": [
+   "ai.approval_request_score",
+   "ai.decision_record",
+   "cache:idempotency"
+  ],
+  "routing": null,
+  "scope": "venue",
+  "perm": null,
+  "offline": false,
+  "summary": "Score a pending approval request, as context for its reviewer (Approvals)",
+  "source": "derived",
+  "audience": [
+   "service"
+  ],
+  "service": "AiService",
+  "stores": [
+   "postgres",
+   "postgres-analytical",
+   "qdrant",
+   "redis"
+  ],
+  "lineageNote": "ai.decision_record, risk_assessment, rec_decision, rec_event and forecast_point live in the AI log database (design 2.4); table names unchanged. Service audience, no screen. Context only: no approve/reject output."
+ },
+ "scoreTransactionRisk": {
+  "contract": "ai",
+  "verb": "POST",
+  "path": "/risk/transaction-scores",
+  "reads": [
+   "ai.entity_risk",
+   "ai.risk_strategy",
+   "cache:idempotency",
+   "cache:risk-features"
+  ],
+  "writes": [
+   "ai.decision_record",
+   "ai.risk_alert",
+   "ai.risk_assessment",
+   "cache:idempotency"
+  ],
+  "routing": null,
+  "scope": "venue",
+  "perm": null,
+  "offline": false,
+  "summary": "Score a payment attempt (Orders)",
+  "source": "hand-mapped 29 September (readiness close-out)",
+  "audience": [
+   "service"
+  ],
+  "service": "AiService",
+  "stores": [
+   "postgres",
+   "postgres-analytical",
+   "qdrant",
+   "redis"
+  ],
+  "lineageNote": "ai.decision_record, forecast_point, signal_observation, risk_assessment, rec_decision, rec_event, control_test and eval_run live in the AI log database (design 2.4); table names unchanged. Service audience (serviceAuth), no screen. Velocity counters and entity features from Redis (cache:risk-features)."
+ },
+ "searchAiDecisions": {
+  "contract": "ai",
+  "verb": "GET",
+  "path": "/decision-records",
+  "reads": [
+   "ai.decision_record"
+  ],
+  "writes": [],
+  "routing": "analytical",
+  "scope": "venue",
+  "perm": "AI_AUDIT_VIEW",
+  "offline": false,
+  "summary": "Find AI decisions",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "AiService",
+  "stores": [
+   "postgres",
+   "postgres-analytical",
+   "qdrant",
+   "redis"
+  ]
+ },
+ "sendStaffMessage": {
+  "contract": "workforce",
+  "verb": "POST",
+  "path": "/staff-messages",
+  "reads": [
+   "cache:idempotency",
+   "workforce.employment",
+   "workforce.staff_conversation",
+   "workforce.staff_conversation_participant",
+   "workforce.staff_message"
+  ],
+  "writes": [
+   "cache:idempotency",
+   "workforce.staff_conversation",
+   "workforce.staff_conversation_participant",
+   "workforce.staff_message"
+  ],
+  "routing": null,
+  "scope": "venue",
+  "perm": "WORKFORCE_VIEW",
+  "offline": true,
+  "summary": "Send a message to a colleague or a small group",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "TenancyService",
+  "stores": [
+   "postgres",
+   "redis"
+  ],
+  "lineageNote": "Recipients checked against employments at the caller's venue; creates the conversation and participants on first send; push to staff devices through the notification outbox"
+ },
+ "setAiByokEnablement": {
+  "contract": "ai",
+  "verb": "PUT",
+  "path": "/tenants/{tenantId}/byok",
+  "reads": [
+   "ai.byok_enablement",
+   "cache:idempotency"
+  ],
+  "writes": [
+   "ai.byok_enablement",
+   "cache:idempotency"
+  ],
+  "routing": null,
+  "scope": "tenant",
+  "perm": "PLATFORM_AI_MANAGE",
+  "offline": false,
+  "summary": "Enable or disable bring-your-own-key for a tenant (platform)",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "AiService",
+  "stores": [
+   "postgres",
+   "postgres-analytical",
+   "qdrant",
+   "redis"
+  ]
+ },
+ "setAiModel": {
+  "contract": "ai",
+  "verb": "PUT",
+  "path": "/models/{modelId}",
+  "reads": [
+   "ai.model",
+   "cache:idempotency"
+  ],
+  "writes": [
+   "ai.model",
+   "cache:idempotency"
+  ],
+  "routing": null,
+  "scope": "platform",
+  "perm": "PLATFORM_AI_MANAGE",
+  "offline": false,
+  "summary": "Add or change a platform model (platform)",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "AiService",
+  "stores": [
+   "postgres",
+   "postgres-analytical",
+   "qdrant",
+   "redis"
+  ]
+ },
+ "setAiRiskRegisterEntry": {
+  "contract": "ai",
+  "verb": "PUT",
+  "path": "/risk-register/{entryId}",
+  "reads": [
+   "ai.risk_register",
+   "cache:idempotency"
+  ],
+  "writes": [
+   "ai.risk_register",
+   "cache:idempotency"
+  ],
+  "routing": null,
+  "scope": "tenant",
+  "perm": "AI_CONFIGURE",
+  "offline": false,
+  "summary": "Record or update a risk register entry",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "AiService",
+  "stores": [
+   "postgres",
+   "postgres-analytical",
+   "qdrant",
+   "redis"
+  ]
+ },
+ "setAiTool": {
+  "contract": "ai",
+  "verb": "PUT",
+  "path": "/tools/{toolKey}",
+  "reads": [
+   "ai.tool",
+   "cache:idempotency"
+  ],
+  "writes": [
+   "ai.tool",
+   "cache:idempotency"
+  ],
+  "routing": null,
+  "scope": "platform",
+  "perm": "PLATFORM_AI_MANAGE",
+  "offline": false,
+  "summary": "Register or change a tool (platform)",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "AiService",
+  "stores": [
+   "postgres",
+   "postgres-analytical",
+   "qdrant",
+   "redis"
+  ]
+ },
+ "setAnalyticsProvider": {
+  "contract": "white-label",
+  "verb": "PUT",
+  "path": "/tenant-config/analytics-providers",
+  "reads": [
+   "cache:idempotency",
+   "whitelabel.analytics_provider"
+  ],
+  "writes": [
+   "cache:idempotency",
+   "whitelabel.analytics_provider"
+  ],
+  "routing": null,
+  "scope": "venue",
+  "perm": "TENANT_CONFIGURE",
+  "offline": false,
+  "summary": "Connect the storefront and app to an analytics platform",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "WhiteLabelService",
+  "stores": [
+   "postgres",
+   "redis"
+  ],
+  "lineageNote": "reporting credential is a vault reference, write-only"
+ },
+ "setApprovalExternalProvider": {
+  "contract": "approvals",
+  "verb": "PUT",
+  "path": "/approval-external-providers",
+  "reads": [
+   "approvals.external_provider",
+   "cache:idempotency",
+   "control.api_client"
+  ],
+  "writes": [
+   "approvals.external_provider",
+   "cache:idempotency"
+  ],
+  "routing": null,
+  "scope": "tenant",
+  "perm": "APPROVAL_CONFIGURE",
+  "offline": false,
+  "summary": "Register a third-party workflow system as an approver",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "TenancyService",
+  "stores": [
+   "postgres",
+   "redis"
+  ],
+  "lineageNote": "upsert keyed on code; apiClientId must be an active tenant API client"
+ },
+ "setCookieScanPolicy": {
+  "contract": "marketing-crm",
+  "verb": "PUT",
+  "path": "/cookie-scan-policy",
+  "reads": [
+   "cache:idempotency",
+   "marketing.cookie_scan_policy"
+  ],
+  "writes": [
+   "cache:idempotency",
+   "marketing.cookie_scan_policy"
+  ],
+  "routing": "primary",
+  "scope": "venue",
+  "perm": "GUEST_MANAGE",
+  "offline": false,
+  "summary": "Set how often a channel is scanned and who is alerted",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "MarketingService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "setDataRetentionSetting": {
+  "contract": "tenancy",
+  "verb": "PUT",
+  "path": "/data-retention-settings/{dataClass}",
+  "reads": [
+   "cache:idempotency",
+   "tenancy.data_retention_setting"
+  ],
+  "writes": [
+   "cache:idempotency",
+   "tenancy.data_retention_setting"
+  ],
+  "routing": null,
+  "scope": "tenant",
+  "perm": "TENANT_CONFIGURE",
+  "offline": false,
+  "summary": "Set how long the tenant keeps one class of data",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "TenancyService",
+  "stores": [
+   "postgres",
+   "redis"
+  ],
+  "lineageNote": "read by the retention jobs of marketing, access, approvals and ai (handoffs)"
+ },
+ "setDeliveryLocationOutletMapping": {
+  "contract": "fnb",
+  "verb": "PUT",
+  "path": "/venues/{venueId}/delivery-location-outlets",
+  "reads": [
+   "cache:idempotency",
+   "fnb.delivery_location",
+   "platform.outlet"
+  ],
+  "writes": [
+   "cache:idempotency",
+   "cache:resolution",
+   "fnb.delivery_location_outlet"
+  ],
+  "routing": null,
+  "scope": "venue",
+  "perm": "PRODUCT_CONFIGURE",
+  "offline": false,
+  "summary": "Set which outlets deliver to which delivery locations",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "FnbService",
+  "stores": [
+   "derived",
+   "postgres",
+   "postgres-analytical",
+   "redis"
+  ]
+ },
+ "setDeviceFirmwareStatus": {
+  "contract": "tenancy",
+  "verb": "POST",
+  "path": "/device-firmware/{firmwareId}/status",
+  "reads": [
+   "cache:idempotency",
+   "tenancy.device_firmware",
+   "tenancy.device_rollout"
+  ],
+  "writes": [
+   "cache:idempotency",
+   "platform.outbox",
+   "tenancy.device_audit",
+   "tenancy.device_firmware",
+   "tenancy.device_rollout"
+  ],
+  "routing": null,
+  "scope": "tenant",
+  "perm": "DEVICE_MANAGE",
+  "offline": false,
+  "summary": "Release, deprecate or withdraw a firmware release",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "TenancyService",
+  "stores": [
+   "postgres",
+   "redis"
+  ],
+  "lineageNote": "withdrawn halts running rollouts of the release (device_rollout.status halted); released emits device.firmwareReleased"
+ },
+ "setEInvoicingProvider": {
+  "contract": "finance",
+  "verb": "PUT",
+  "path": "/e-invoicing/providers",
+  "reads": [
+   "cache:idempotency",
+   "ledger.einvoice_transmission",
+   "ledger.einvoicing_provider",
+   "ledger.legal_entity"
+  ],
+  "writes": [
+   "cache:idempotency",
+   "cache:resolution",
+   "ledger.einvoicing_provider",
+   "platform.audit_record"
+  ],
+  "routing": null,
+  "scope": "tenant",
+  "perm": "TAX_CONFIGURE",
+  "offline": false,
+  "summary": "Connect a legal entity to its accredited e-invoicing service provider",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "LedgerService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "setForecastDefinition": {
+  "contract": "ai",
+  "verb": "PUT",
+  "path": "/forecast-definitions/{definitionKey}",
+  "reads": [
+   "ai.forecast_definition",
+   "ai.signal_source",
+   "cache:idempotency"
+  ],
+  "writes": [
+   "ai.forecast_definition",
+   "cache:idempotency"
+  ],
+  "routing": null,
+  "scope": "venue",
+  "perm": "AI_CONFIGURE",
+  "offline": false,
+  "summary": "Define a forecast",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "AiService",
+  "stores": [
+   "postgres",
+   "postgres-analytical",
+   "qdrant",
+   "redis"
+  ]
+ },
+ "setGuestVerificationPolicy": {
+  "contract": "identity",
+  "verb": "PUT",
+  "path": "/guest-verification-policy",
+  "reads": [
+   "cache:idempotency",
+   "identity.guest_verification_policy"
+  ],
+  "writes": [
+   "cache:idempotency",
+   "identity.guest_verification_policy"
+  ],
+  "routing": null,
+  "scope": "tenant",
+  "perm": "TENANT_CONFIGURE",
+  "offline": false,
+  "summary": "Set which verifications a guest must pass, and when",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "IdentityService",
+  "stores": [
+   "postgres",
+   "redis"
+  ],
+  "lineageNote": "One row per tenant; PUT replaces"
+ },
+ "setInstalmentPolicy": {
+  "contract": "payments",
+  "verb": "PUT",
+  "path": "/instalment-policy",
+  "reads": [
+   "cache:idempotency",
+   "payments.instalment_policy"
+  ],
+  "writes": [
+   "cache:idempotency",
+   "cache:resolution",
+   "payments.instalment_policy"
+  ],
+  "routing": null,
+  "scope": "tenant",
+  "perm": "PAYMENT_CONFIGURE",
+  "offline": false,
+  "summary": "Set which products may be paid in instalments, how many and how often",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "OrderService",
+  "stores": [
+   "postgres"
+  ]
+ },
+ "setInventoryKitDefinition": {
+  "contract": "inventory",
+  "verb": "PUT",
+  "path": "/inventory-items/{itemId}/kit-definition",
+  "reads": [
+   "cache:idempotency",
+   "inventory.item",
+   "inventory.kit_component",
+   "inventory.movement"
+  ],
+  "writes": [
+   "cache:idempotency",
+   "cache:resolution",
+   "inventory.kit_component"
+  ],
+  "routing": null,
+  "scope": "venue",
+  "perm": "PRODUCT_CONFIGURE",
+  "offline": false,
+  "summary": "Make an item a kit of other stocked items",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "InventoryService",
+  "stores": [
+   "derived",
+   "postgres",
+   "redis"
+  ]
+ },
+ "setTaxInvoiceTemplate": {
+  "contract": "finance",
+  "verb": "PUT",
+  "path": "/tax-invoice-templates",
+  "reads": [
+   "cache:idempotency",
+   "ledger.legal_entity",
+   "ledger.tax_invoice_template"
+  ],
+  "writes": [
+   "cache:idempotency",
+   "cache:resolution",
+   "ledger.tax_invoice_template",
+   "platform.audit_record"
+  ],
+  "routing": null,
+  "scope": "tenant",
+  "perm": "TAX_CONFIGURE",
+  "offline": false,
+  "summary": "Set a legal entity's template and number series for one document kind",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "LedgerService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "setWalletAutoReloadSetting": {
+  "contract": "wallet",
+  "verb": "PUT",
+  "path": "/wallets/{walletId}/auto-reload",
+  "reads": [
+   "cache:idempotency",
+   "payments.token",
+   "wallet.auto_reload_setting",
+   "wallet.funding_rules",
+   "wallet.wallet"
+  ],
+  "writes": [
+   "cache:idempotency",
+   "cache:resolution",
+   "wallet.auto_reload_setting"
+  ],
+  "routing": null,
+  "scope": "subject",
+  "perm": "WALLET_OPERATE",
+  "offline": false,
+  "summary": "Top the wallet up automatically from a stored card when it runs low",
+  "source": "derived",
+  "audience": [
+   "staff",
+   "guest"
+  ],
+  "service": "WalletService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "settleWalletAtExit": {
+  "contract": "wallet",
+  "verb": "POST",
+  "path": "/wallets/{walletId}/exit-settlement",
+  "reads": [
+   "cache:idempotency",
+   "payments.stored_forward",
+   "wallet.balance",
+   "wallet.credit_lot",
+   "wallet.exit_settlement",
+   "wallet.refund_policy",
+   "wallet.wallet"
+  ],
+  "writes": [
+   "cache:idempotency",
+   "orders.payment",
+   "orders.refund",
+   "platform.outbox",
+   "wallet.exit_settlement",
+   "wallet.wallet",
+   "wallet.wallet_transaction"
+  ],
+  "routing": null,
+  "scope": "venue",
+  "perm": "WALLET_OPERATE",
+  "offline": false,
+  "summary": "Settle a short balance, or refund a credit, when the holder leaves",
+  "source": "derived",
+  "audience": [
+   "staff",
+   "guest"
+  ],
+  "service": "WalletService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "simulateActionPlan": {
+  "contract": "ai",
+  "verb": "POST",
+  "path": "/action-plans/{planId}/simulate",
+  "reads": [
+   "ai.action_plan",
+   "ai.action_step",
+   "ai.tool",
+   "cache:idempotency"
+  ],
+  "writes": [
+   "ai.action_plan",
+   "ai.action_step",
+   "cache:idempotency"
+  ],
+  "routing": null,
+  "scope": "venue",
+  "perm": "AI_USE",
+  "offline": false,
+  "summary": "Validate and simulate a plan without changing anything",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "AiService",
+  "stores": [
+   "postgres",
+   "postgres-analytical",
+   "qdrant",
+   "redis"
+  ]
+ },
+ "simulateAiGovernancePolicy": {
+  "contract": "ai",
+  "verb": "POST",
+  "path": "/governance/policy-versions/{versionId}/simulate",
+  "reads": [
+   "ai.decision_record",
+   "ai.governance_policy_version",
+   "cache:idempotency"
+  ],
+  "writes": [
+   "ai.governance_policy_version",
+   "cache:idempotency"
+  ],
+  "routing": null,
+  "scope": "tenant",
+  "perm": "AI_CONFIGURE",
+  "offline": false,
+  "summary": "Test a draft policy before it is published",
+  "source": "hand-mapped 29 September (readiness close-out)",
+  "audience": [
+   "staff"
+  ],
+  "service": "AiService",
+  "stores": [
+   "postgres",
+   "postgres-analytical",
+   "qdrant",
+   "redis"
+  ],
+  "lineageNote": "ai.decision_record, forecast_point, signal_observation, risk_assessment, rec_decision, rec_event, control_test and eval_run live in the AI log database (design 2.4); table names unchanged."
+ },
+ "simulateRecommendationDecision": {
+  "contract": "ai",
+  "verb": "POST",
+  "path": "/recommendations/simulate",
+  "reads": [
+   "ai.rec_decision",
+   "cache:idempotency",
+   "cache:rec-candidates"
+  ],
+  "writes": [
+   "cache:idempotency"
+  ],
+  "routing": null,
+  "scope": "venue",
+  "perm": null,
+  "offline": false,
+  "summary": "Run the engine in simulation (Promotions)",
+  "source": "hand-mapped 29 September (readiness close-out)",
+  "audience": [
+   "service"
+  ],
+  "service": "AiService",
+  "stores": [
+   "postgres",
+   "postgres-analytical",
+   "qdrant",
+   "redis"
+  ],
+  "lineageNote": "ai.decision_record, forecast_point, signal_observation, risk_assessment, rec_decision, rec_event, control_test and eval_run live in the AI log database (design 2.4); table names unchanged. Service audience (serviceAuth), no screen."
+ },
+ "startConfigurationSession": {
+  "contract": "ai",
+  "verb": "POST",
+  "path": "/configuration-sessions",
+  "reads": [
+   "ai.capability",
+   "ai.config_session",
+   "ai.policy",
+   "cache:idempotency"
+  ],
+  "writes": [
+   "ai.activity",
+   "ai.config_session",
+   "cache:idempotency"
+  ],
+  "routing": null,
+  "scope": "venue",
+  "perm": "AI_USE",
+  "offline": false,
+  "summary": "Start the configuration assistant",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "AiService",
+  "stores": [
+   "postgres",
+   "postgres-analytical",
+   "qdrant",
+   "redis"
+  ]
+ },
+ "submitAccreditationApplication": {
+  "contract": "accreditation",
+  "verb": "POST",
+  "path": "/accreditation-applications/{applicationId}/submit",
+  "reads": [
+   "accreditation.application",
+   "accreditation.document",
+   "accreditation.programme",
+   "accreditation.requirements",
+   "cache:idempotency"
+  ],
+  "writes": [
+   "accreditation.application",
+   "cache:idempotency"
+  ],
+  "routing": null,
+  "scope": "venue",
+  "perm": "ACCREDITATION_APPLY",
+  "offline": false,
+  "summary": "Send a draft for review",
+  "source": "derived",
+  "audience": [
+   "staff",
+   "guest"
+  ],
+  "service": "TenancyService",
+  "stores": [
+   "postgres"
+  ],
+  "lineageNote": "routes to approvals through its API where the programme configures a workflow"
+ },
+ "submitGuestIdentityDocument": {
+  "contract": "identity",
+  "verb": "POST",
+  "path": "/auth/guest/identity-verifications",
+  "reads": [
+   "assets.media_asset",
+   "cache:idempotency",
+   "identity.guest_identity_verification",
+   "identity.guest_verification_policy"
+  ],
+  "writes": [
+   "cache:idempotency",
+   "identity.guest_identity_verification",
+   "pii.subject_document"
+  ],
+  "routing": null,
+  "scope": "tenant",
+  "perm": null,
+  "offline": false,
+  "summary": "Submit an identity document for verification",
+  "source": "derived",
+  "audience": [
+   "guest"
+  ],
+  "service": "IdentityService",
+  "stores": [
+   "postgres",
+   "redis"
+  ],
+  "lineageNote": "Number hashed into pii.subject_document.number_hash with number_last4; scan is the uploaded media asset (document_asset_ref)"
+ },
+ "suggestGuidedChoice": {
+  "contract": "ai",
+  "verb": "POST",
+  "path": "/venues/{venueId}/guided-choice-suggestions",
+  "reads": [
+   "ai.guided_choice_suggestion",
+   "ai.policy",
+   "ai.prompt_template",
+   "cache:idempotency"
+  ],
+  "writes": [
+   "ai.activity",
+   "ai.decision_record",
+   "ai.guided_choice_suggestion",
+   "cache:idempotency"
+  ],
+  "routing": null,
+  "scope": "venue",
+  "perm": "AI_USE",
+  "offline": false,
+  "summary": "Suggest a Help me choose set-up from the venue's catalogue",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "AiService",
+  "stores": [
+   "postgres",
+   "postgres-analytical",
+   "qdrant",
+   "redis"
+  ],
+  "lineageNote": "Also calls catalogue.listProducts with the venue permissions (reads catalogue.product through the API, not the database) and white-label.proposeGuidedChoice (writes whitelabel.guided_choice* through the API)."
+ },
+ "suggestRoleAssignment": {
+  "contract": "identity",
+  "verb": "GET",
+  "path": "/role-suggestions",
+  "reads": [
+   "identity.access_decision",
+   "identity.delegated_access",
+   "identity.principal",
+   "identity.role",
+   "identity.role_permission",
+   "workforce.employee",
+   "workforce.work_assignment"
+  ],
+  "writes": [],
+  "routing": "replica",
+  "scope": "venue",
+  "perm": "PERMISSION_VIEW",
+  "offline": false,
+  "summary": "Which roles a person should probably hold, from peers with the same job and posting",
+  "source": "hand-mapped 29 September (readiness close-out)",
+  "audience": [
+   "staff"
+  ],
+  "service": "IdentityService",
+  "stores": [
+   "postgres",
+   "redis"
+  ],
+  "lineageNote": "peers = principals (workforce.employee.principal_id) whose primary in-force work_assignment has the same job_title_id and posting scope; grants from delegated_access, usage from access_decision permits in lookbackDays. Replica read; cross-contract read of workforce as listDemandBookingCurve reads orders"
+ },
+ "transmitEInvoices": {
+  "contract": "finance",
+  "verb": "POST",
+  "path": "/e-invoicing/transmissions",
+  "reads": [
+   "cache:idempotency",
+   "ledger.credit_memo",
+   "ledger.credit_memo_line",
+   "ledger.einvoice_transmission",
+   "ledger.einvoicing_provider",
+   "ledger.tax_invoice",
+   "ledger.tax_invoice_line"
+  ],
+  "writes": [
+   "cache:idempotency",
+   "ledger.einvoice_transmission",
+   "platform.outbox"
+  ],
+  "routing": null,
+  "scope": "region",
+  "perm": "LEDGER_POST",
+  "offline": false,
+  "summary": "Send issued tax documents to the e-invoicing provider",
+  "source": "derived",
+  "audience": [
+   "staff",
+   "service"
+  ],
+  "service": "LedgerService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "updateAccreditationApplication": {
+  "contract": "accreditation",
+  "verb": "PUT",
+  "path": "/accreditation-applications/{applicationId}",
+  "reads": [
+   "accreditation.application",
+   "accreditation.requirements",
+   "cache:idempotency"
+  ],
+  "writes": [
+   "accreditation.application",
+   "cache:idempotency"
+  ],
+  "routing": null,
+  "scope": "venue",
+  "perm": "ACCREDITATION_APPLY",
+  "offline": false,
+  "summary": "Save a draft, or amend an application returned for information",
+  "source": "derived",
+  "audience": [
+   "staff",
+   "guest"
+  ],
+  "service": "TenancyService",
+  "stores": [
+   "postgres"
+  ],
+  "lineageNote": "only draft or informationRequested"
+ },
+ "updateAccreditationProgramme": {
+  "contract": "accreditation",
+  "verb": "PUT",
+  "path": "/accreditation-programmes/{programmeId}",
+  "reads": [
+   "accreditation.programme",
+   "cache:idempotency"
+  ],
+  "writes": [
+   "accreditation.programme",
+   "cache:idempotency"
+  ],
+  "routing": null,
+  "scope": "venue",
+  "perm": "ACCREDITATION_CONFIGURE",
+  "offline": false,
+  "summary": "Amend a programme, link its registration form, or mark it a template",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "TenancyService",
+  "stores": [
+   "postgres"
+  ]
+ },
+ "updateDeliveryLocation": {
+  "contract": "fnb",
+  "verb": "PATCH",
+  "path": "/delivery-locations/{locationId}",
+  "reads": [
+   "cache:idempotency",
+   "fnb.delivery_location"
+  ],
+  "writes": [
+   "cache:idempotency",
+   "fnb.delivery_location"
+  ],
+  "routing": null,
+  "scope": "venue",
+  "perm": "PRODUCT_CONFIGURE",
+  "offline": false,
+  "summary": "Rename a delivery location, or take it out of service",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "FnbService",
+  "stores": [
+   "derived",
+   "postgres",
+   "postgres-analytical",
+   "redis"
+  ]
+ },
+ "updateSupplierContract": {
+  "contract": "inventory",
+  "verb": "PATCH",
+  "path": "/supplier-contracts/{contractId}",
+  "reads": [
+   "cache:idempotency",
+   "inventory.supplier_contract"
+  ],
+  "writes": [
+   "cache:idempotency",
+   "inventory.supplier_contract",
+   "platform.audit_record"
+  ],
+  "routing": null,
+  "scope": "tenant",
+  "perm": "PROCUREMENT_MANAGE",
+  "offline": false,
+  "summary": "Extend, activate or end a supplier contract",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "InventoryService",
+  "stores": [
+   "derived",
+   "postgres",
+   "redis"
+  ]
+ },
+ "verifyAccreditationCredential": {
+  "contract": "accreditation",
+  "verb": "GET",
+  "path": "/accreditation-credentials/verify",
+  "reads": [
+   "accreditation.access_profile",
+   "accreditation.credential",
+   "accreditation.holder",
+   "accreditation.holder_access",
+   "accreditation.programme"
+  ],
+  "writes": [],
+  "routing": "replica",
+  "scope": "venue",
+  "perm": "ACCESS_VALIDATE",
+  "offline": false,
+  "summary": "Who holds this credential, and where may they go",
+  "source": "hand-mapped 29 September (readiness close-out)",
+  "audience": [
+   "staff"
+  ],
+  "service": "TenancyService",
+  "stores": [
+   "postgres"
+  ],
+  "lineageNote": "read-only; records no scan"
+ },
+ "withdrawAccreditationApplication": {
+  "contract": "accreditation",
+  "verb": "POST",
+  "path": "/accreditation-applications/{applicationId}/withdraw",
+  "reads": [
+   "accreditation.application",
+   "cache:idempotency"
+  ],
+  "writes": [
+   "accreditation.application",
+   "cache:idempotency"
+  ],
+  "routing": null,
+  "scope": "venue",
+  "perm": "ACCREDITATION_APPLY",
+  "offline": false,
+  "summary": "Withdraw an application before it is decided",
+  "source": "derived",
+  "audience": [
+   "staff",
+   "guest"
+  ],
+  "service": "TenancyService",
+  "stores": [
+   "postgres"
+  ],
+  "lineageNote": "cancels any open approvals request through its API"
  }
 }

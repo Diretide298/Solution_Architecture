@@ -16,7 +16,7 @@ scale: Read-heavy, bundle-published to tills. **The catalogue bundle is this ser
 ifDown: A bad publish reaches every workstation. Versioned and rollback-able for that reason.
 coverage:
   operations: 444
-  inAFlow: 257
+  inAFlow: 256
   percent: 58%
   note: '**Flow coverage is how much of this service a journey has walked.** A service under 40% is
     unwalked rather than under-documented.'
@@ -1975,7 +1975,7 @@ operationsByContract:
     permission: PRODUCT_CONFIGURE
     offline: false
     reads: 1
-    writes: 0
+    writes: 2
   - operation: createBundle
     verb: POST
     path: /bundles
@@ -2022,8 +2022,8 @@ operationsByContract:
     scope: venue
     permission: PRODUCT_CONFIGURE
     offline: false
-    reads: 1
-    writes: 1
+    reads: 2
+    writes: 3
   - operation: createUpsellRule
     verb: POST
     path: /upsell-rules
@@ -2055,7 +2055,7 @@ operationsByContract:
     permission: PRICE_CONFIGURE
     offline: false
     reads: 3
-    writes: 4
+    writes: 5
   - operation: evaluatePromotions
     verb: POST
     path: /promotions/evaluate
@@ -2895,7 +2895,7 @@ operationsByContract:
     permission: PRICE_CONFIGURE
     offline: false
     reads: 3
-    writes: 4
+    writes: 5
   - operation: previewAllocationSplit
     verb: POST
     path: /allocation-splits/preview
@@ -2911,7 +2911,7 @@ operationsByContract:
     permission: PRICE_CONFIGURE
     offline: false
     reads: 3
-    writes: 4
+    writes: 5
   - operation: recordRecommendationOutcome
     verb: POST
     path: /recommendations/outcomes
@@ -3039,7 +3039,7 @@ operationsByContract:
     permission: PRODUCT_CONFIGURE
     offline: false
     reads: 1
-    writes: 1
+    writes: 2
   - operation: setPromotionRule
     verb: PUT
     path: /promotion-rule
@@ -3071,7 +3071,7 @@ operationsByContract:
     permission: PRODUCT_CONFIGURE
     offline: false
     reads: 1
-    writes: 1
+    writes: 2
   - operation: setRuleTestRecommendation
     verb: PUT
     path: /rule-test-recommendation
@@ -3142,8 +3142,8 @@ operationsByContract:
     scope: venue
     permission: PRODUCT_CONFIGURE
     offline: false
-    reads: 1
-    writes: 1
+    reads: 2
+    writes: 3
   - operation: voidCouponCode
     verb: POST
     path: /coupon-codes/{code}/void
@@ -3226,7 +3226,7 @@ operationsByContract:
     permission: CAPACITY_CONFIGURE
     offline: false
     reads: 2
-    writes: 2
+    writes: 3
   - operation: createSeatCategory
     verb: POST
     path: /seat-categories
@@ -3242,7 +3242,7 @@ operationsByContract:
     permission: ORDER_CREATE
     offline: false
     reads: 2
-    writes: 2
+    writes: 3
   - operation: createSeatHoldPool
     verb: POST
     path: /seat-hold-pools
@@ -3466,7 +3466,7 @@ operationsByContract:
     permission: CAPACITY_CONFIGURE
     offline: false
     reads: 3
-    writes: 3
+    writes: 4
   - operation: reassignSeats
     verb: POST
     path: /seat-reassignment
@@ -3498,7 +3498,7 @@ operationsByContract:
     permission: CAPACITY_CONFIGURE
     offline: false
     reads: 3
-    writes: 2
+    writes: 3
   - operation: relinquishSeatHold
     verb: DELETE
     path: /seat-holds/{holdId}
@@ -3506,7 +3506,7 @@ operationsByContract:
     permission: ORDER_CREATE
     offline: false
     reads: 1
-    writes: 1
+    writes: 2
   - operation: setAccessibleSeating
     verb: PUT
     path: /accessible-seating
@@ -3651,6 +3651,7 @@ tables:
   - createPriceList
   - createProduct
   - createPromotion
+  - createRecommendationStrategy
   - createSeatBlock
   - createSeatCategory
   - createSeatHold
@@ -3772,6 +3773,7 @@ tables:
   - updatePriceList
   - updateProduct
   - updatePromotion
+  - updateRecommendationStrategy
   - updateSeatMap
   - updateSeats
   - validateSeatMap
@@ -3811,6 +3813,7 @@ tables:
   - createPriceList
   - createProduct
   - createPromotion
+  - createRecommendationStrategy
   - createSeatBlock
   - createSeatCategory
   - createSeatHold
@@ -3929,6 +3932,7 @@ tables:
   - updatePriceList
   - updateProduct
   - updatePromotion
+  - updateRecommendationStrategy
   - updateSeatMap
   - updateSeats
   - validateSeatMap
@@ -4067,7 +4071,7 @@ tables:
   - catalogue
   foreignWriters: null
 - table: catalogue.demand_forecast
-  columns: 26
+  columns: 27
   store: postgres
   parent: null
   writtenBy: []
@@ -4101,7 +4105,7 @@ tables:
   - catalogue
   foreignWriters: null
 - table: catalogue.entitlement_template
-  columns: 31
+  columns: 32
   store: postgres
   parent: null
   writtenBy:
@@ -4352,7 +4356,7 @@ tables:
   - catalogue
   foreignWriters: null
 - table: catalogue.pricing_recommendation
-  columns: 29
+  columns: 34
   store: postgres
   parent: null
   writtenBy:
@@ -4635,7 +4639,7 @@ tables:
   - promotions
   foreignWriters: null
 - table: promotions.promotion
-  columns: 22
+  columns: 24
   store: postgres
   parent: null
   writtenBy:
@@ -4705,7 +4709,7 @@ tables:
   - promotions
   foreignWriters: null
 - table: promotions.recommendation_strategy
-  columns: 17
+  columns: 18
   store: postgres
   parent: null
   writtenBy:
@@ -4913,7 +4917,7 @@ readsFrom:
   operations: 1
 writesOutside:
 - service: TenancyService
-  operations: 12
+  operations: 25
   rule: 'ADR-0028: the owner defines the row; a foreign writer may only append, through a path the owner
     published.'
   why: '**The lineage records these writes, not how they honour the rule.** It does not say whether
@@ -4926,7 +4930,19 @@ writesOutside:
   - operation: cancelPricingRollback
     tables:
     - platform.outbox
+  - operation: concludeRecommendationExperiment
+    tables:
+    - platform.outbox
   - operation: createLiveDynamicPrice
+    tables:
+    - platform.outbox
+  - operation: createRecommendationStrategy
+    tables:
+    - platform.outbox
+  - operation: createSeatBlock
+    tables:
+    - platform.outbox
+  - operation: createSeatHold
     tables:
     - platform.outbox
   - operation: decidePricingChangeRequest
@@ -4935,7 +4951,25 @@ writesOutside:
   - operation: decidePricingRecommendation
     tables:
     - platform.outbox
+  - operation: endPromotion
+    tables:
+    - platform.outbox
+  - operation: pausePromotion
+    tables:
+    - platform.outbox
   - operation: publishPricingEffectiveDate
+    tables:
+    - platform.outbox
+  - operation: publishPromotion
+    tables:
+    - platform.outbox
+  - operation: publishSeatMap
+    tables:
+    - platform.outbox
+  - operation: relinquishSeatBlock
+    tables:
+    - platform.outbox
+  - operation: relinquishSeatHold
     tables:
     - platform.outbox
   - operation: requestPricingRollback
@@ -4950,10 +4984,19 @@ writesOutside:
   - operation: setEventLifecycleState
     tables:
     - platform.outbox
+  - operation: setProductRelationships
+    tables:
+    - platform.outbox
+  - operation: setRecommendationSuppression
+    tables:
+    - platform.outbox
   - operation: submitPricingChangeRequest
     tables:
     - platform.outbox
   - operation: transitionProductLifecycle
+    tables:
+    - platform.outbox
+  - operation: updateRecommendationStrategy
     tables:
     - platform.outbox
 - service: AccessService
@@ -5006,7 +5049,6 @@ screens:
 - P02:GST-038 Digital Companion Mode
 - P02:GST-041 Checkout Entry
 - P02:GST-044 Multi-Currency & Pricing
-- P02:GST-048 Upsell / Cross-Sell
 - P02:GST-049 Interactive Seat Selection
 - P02:GST-050 Resource Booking – Cabana
 - P02:GST-051 Plan Your Adventure – Start
@@ -5098,7 +5140,6 @@ screens:
 - P08:BO-1045 Price Bands & Categories
 - P08:BO-1046 Inventory Forecasting
 - P08:BO-1047 Section Revenue Forecast
-- P08:BO-1048 Seat Upsell Recommendations
 - P08:BO-1049 Scenario & What-If Planning
 - P08:BO-1050 Revenue Analytics & Audit
 - P08:BO-1051 Seat Analytics Command Center
@@ -5477,14 +5518,11 @@ screens:
 - P09:ADM-677 Contextual Trigger, Frequency & Experience Controls
 - P09:ADM-678 Journey Simulator, Decision Trace & AI Optimization
 - P09:ADM-679 Personalization & NBO Command Center
-- P09:ADM-680 Customer Recommendation Profile
 - P09:ADM-681 Customer Feature & Signal Configuration
 - P09:ADM-682 Propensity Model & Customer Intent Manager
 - P09:ADM-683 Next-Best-Offer Decision Studio
 - P09:ADM-684 Personalized Ranking & Decision Policy Builder
 - P09:ADM-685 Customer Preference, Fatigue & Suppression Intelligence
-- P09:ADM-686 Anonymous, Known & Identity-Transition Personalization.123
-- P09:ADM-687 AI Explainability, Confidence & Model Governance
 - P09:ADM-688 Personalization Simulator & Next-Best-Offer Lab
 - P09:ADM-689 Recommendation Performance Command Center
 - P09:ADM-690 Recommendation Strategy & Placement Analytics
@@ -5493,8 +5531,6 @@ screens:
 - P09:ADM-693 Recommendation Attribution & Incrementality Analytics
 - P09:ADM-694 AI Model Performance & Drift Monitor
 - P09:ADM-695 Recommendation Governance & Deployment Control
-- P09:ADM-696 AI Risk, Fairness, Explainability & Safety Center
-- P09:ADM-697 Recommendation Audit, Decision Trace & Investigation
 - P09:ADM-698 AI Optimization & Recommendation Intelligence Lab
 - P10:PTR-005 Inventory & Allocation View
 - P10:PTR-006 Product Catalog (B2B Pricing)

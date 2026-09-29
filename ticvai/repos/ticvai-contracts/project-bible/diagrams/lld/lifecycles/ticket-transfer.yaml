@@ -22,6 +22,8 @@ transitions:
   operation: claimTicketTransfer
   trigger: operation
   guard: '**The entitlement moves and the original holder loses it.** One ticket, one holder'
+  emits:
+  - entitlement.transferred
 - from: offered
   to: expired
   trigger: timer

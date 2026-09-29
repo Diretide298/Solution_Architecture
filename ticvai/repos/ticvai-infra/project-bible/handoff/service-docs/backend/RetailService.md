@@ -17,7 +17,9 @@ Merchandise, wallets and gift cards. Modest at 35 operations, and separate becau
 
 ## Depends on
 
-Nothing outside itself.
+| Service | Tables it reads |
+|---|---|
+| [InventoryService](InventoryService.md) | `inventory.kit_component` |
 
 ## Operations in the first release
 
@@ -404,7 +406,8 @@ Two callers. **The back office** lists and manages the range. **The guest shop s
 **`POST /retail-returns`**: Accept a return
 
 **A return is not a negative sale.** It records the condition of the goods, restores stock only where condition permits, and refunds through the venue's retail return policy — which is separate from the ticket refund policy.
-Goods returned damaged or opened are written off rather than restocked, and that write-off is a movement with a reason rather than a silent absence.
+Goods returned damaged or opened are written off rather than restocked, and that write-off is a movement with a reason rather than a silent absence. **A returned kit reverses its components** (4.4.20): each component is restocked or written off, never the kit itself.
+**The money goes back as a refund raised in the Order & Payment context** (`refundId`), so the orders `FraudRule` refund rules (`refundCount`, `refundValue`, `refundRatio` per guest or card, 5.3.33) are evaluated on retail returns as on every other refund; a held refund goes to approval rather than being refused at the till.
 
 **A refused return is recorded** (F34 `refusedReturn`: a refused return is a guest who may complain). The 409 writes a `RetailReturn` with `status: refused`, the `refusedReason`, nothing refunded, restocked or written off, and a new id that the server assigns and returns as `refusalId`. The request's own `id` stays unused, so the same return can be sent again, under a new `Idempotency-Key`, once the second authoriser is in hand.
 
@@ -418,8 +421,8 @@ Goods returned damaged or opened are written off rather than restocked, and that
 | Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
-| Reads | `cache:idempotency`, `retail.return`, `retail.return_line` |
-| Writes | `cache:idempotency`, `retail.return`, `retail.return_line` |
+| Reads | `cache:idempotency`, `inventory.kit_component`, `retail.return`, `retail.return_line` |
+| Writes | `cache:idempotency`, `inventory.movement`, `retail.return`, `retail.return_line` |
 | Called by | POS-002, POS-011 |
 | State model | SerialisedItem ([states/serialised-item.yaml](../../../states/serialised-item.yaml)): moves `sold` -> `returned` |
 
@@ -717,6 +720,7 @@ By receipt number, order number or the barcode printed on the receipt. A guest a
 
 **Not offline-capable.** Stock depletes in real time and a specific unit cannot be leased the way a timed product can, so a terminal without a connection cannot complete a retail sale.
 Creates an order in the Order & Payment context and a `saleDepletion` movement in the inventory ledger, in one transaction. There is no second stock counter maintained by the till.
+**A kit sells as one line and leaves stock as its components** (4.4.20, 29 September build). Where the line's item has an `inventory.kit_component` bill of materials (inventory `setInventoryKitDefinition`), one `saleDepletion` is posted per component, quantity times the line quantity, and none for the kit; `insufficientStock` is judged on the components.
 
 |  |  |
 |---|---|
@@ -726,8 +730,8 @@ Creates an order in the Order & Payment context and a `saleDepletion` movement i
 | Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
-| Reads | `cache:idempotency`, `retail.sale`, `retail.sale_line` |
-| Writes | `cache:idempotency`, `retail.sale`, `retail.sale_line` |
+| Reads | `cache:idempotency`, `inventory.kit_component`, `retail.sale`, `retail.sale_line` |
+| Writes | `cache:idempotency`, `inventory.movement`, `retail.sale`, `retail.sale_line` |
 | Called by | POS-002, POS-005, POS-023 |
 | State model | SerialisedItem ([states/serialised-item.yaml](../../../states/serialised-item.yaml)): moves `reserved` -> `sold`, `inStock` -> `sold` |
 

@@ -40,10 +40,10 @@ servicesCalled:
   operationCalls: 2
 - service: MarketingService
   operationCalls: 2
+- service: AiService
+  operationCalls: 2
 - service: FnbService
   operationCalls: 2
-- service: AiService
-  operationCalls: 1
 coverage:
   screens: 17
   inAFlow: 13
@@ -444,6 +444,7 @@ screens:
   - getAvailability
   - handoverToAgent
   - listProducts
+  - recordAnswerFeedback
   - sendAiMessage
   states:
   - emptyFirstRun
@@ -454,6 +455,7 @@ screens:
   offlineState: false
   entryParams:
   - conversationId<-deepLink
+  - messageId<-navigation
   goesTo:
   - KSK-001
   boardFrames:

@@ -2,7 +2,7 @@ openapi: 3.1.0
 info:
   title: TICVAI White Label Builder
   version: 0.1.0
-  x-ticvai-screen-count: 57
+  x-ticvai-screen-count: 61
   x-ticvai-tier: satellite
   x-ticvai-module: 19 — Guest Mobile App & Branding (builder)
   x-ticvai-requirements: 107
@@ -892,6 +892,10 @@ paths:
         at configuration time rather than at audit. **Refused, not warned (confirmed 28 September,
         audit R139)**: flow F22 is corrected to match.
 
+        **Accepts `Prefer: validate-only`** (29 September, build pass, group G2): validates and answers 200
+        with the would-be result without writing, for the AI executor''s plan validation; registered as an
+        AI tool (`ai.AiTool`, 1.2.59, 2.6.50).
+
         '
       tags:
       - theme
@@ -901,6 +905,7 @@ paths:
       x-ticvai-conflict-policy: serverWins
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      - $ref: ../shared/common.yaml#/components/parameters/PreferValidateOnly
       requestBody:
         required: true
         content:
@@ -962,6 +967,10 @@ paths:
         audit R163).** Then `primaryArabic` is required, and **`secondaryArabic` is required whenever
         `secondaryLatin` is set**; either missing is a 400.
 
+        **Accepts `Prefer: validate-only`** (29 September, build pass, group G2): validates and answers 200
+        with the would-be result without writing, for the AI executor''s plan validation; registered as an
+        AI tool (`ai.AiTool`, 1.2.59, 2.6.50).
+
         '
       tags:
       - theme
@@ -971,6 +980,7 @@ paths:
       x-ticvai-conflict-policy: serverWins
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      - $ref: ../shared/common.yaml#/components/parameters/PreferValidateOnly
       requestBody:
         required: true
         content:
@@ -1002,6 +1012,11 @@ paths:
       x-ticvai-audience:
       - staff
       summary: Configure the header
+      description: '**Accepts `Prefer: validate-only`** (29 September, build pass, group G2): validates and answers 200
+        with the would-be result without writing, for the AI executor''s plan validation; registered as an
+        AI tool (`ai.AiTool`, 1.2.59, 2.6.50).
+
+        '
       tags:
       - navigation
       x-ticvai-permission: TENANT_CONFIGURE
@@ -1010,6 +1025,7 @@ paths:
       x-ticvai-conflict-policy: serverWins
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      - $ref: ../shared/common.yaml#/components/parameters/PreferValidateOnly
       requestBody:
         required: true
         content:
@@ -1060,6 +1076,10 @@ paths:
 
         Bottom navigation is capped at five visible items; the remainder moves to the overflow menu.
 
+        **Accepts `Prefer: validate-only`** (29 September, build pass, group G2): validates and answers 200
+        with the would-be result without writing, for the AI executor''s plan validation; registered as an
+        AI tool (`ai.AiTool`, 1.2.59, 2.6.50).
+
         '
       tags:
       - navigation
@@ -1069,6 +1089,7 @@ paths:
       x-ticvai-conflict-policy: serverWins
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      - $ref: ../shared/common.yaml#/components/parameters/PreferValidateOnly
       requestBody:
         required: true
         content:
@@ -1130,6 +1151,10 @@ paths:
         **A section whose module is disabled is refused (400)**, by the mapping on `HomepageSectionKind`,
         which is proposed, client to correct (audit R163).
 
+        **Accepts `Prefer: validate-only`** (29 September, build pass, group G2): validates and answers 200
+        with the would-be result without writing, for the AI executor''s plan validation; registered as an
+        AI tool (`ai.AiTool`, 1.2.59, 2.6.50).
+
         '
       tags:
       - homepage
@@ -1139,6 +1164,7 @@ paths:
       x-ticvai-conflict-policy: serverWins
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      - $ref: ../shared/common.yaml#/components/parameters/PreferValidateOnly
       requestBody:
         required: true
         content:
@@ -1584,6 +1610,10 @@ paths:
       description: 'Always created as a `draft`; `id`, `status`, `isReferenced` and `scopePath` are the
         server''s and are ignored if sent.
 
+        **Accepts `Prefer: validate-only`** (29 September, build pass, group G2): validates and answers 200
+        with the would-be result without writing, for the AI executor''s plan validation; registered as an
+        AI tool (`ai.AiTool`, 1.2.59, 2.6.50).
+
         '
       tags:
       - content
@@ -1593,6 +1623,7 @@ paths:
       x-ticvai-conflict-policy: serverWins
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      - $ref: ../shared/common.yaml#/components/parameters/PreferValidateOnly
       requestBody:
         required: true
         content:
@@ -1600,6 +1631,12 @@ paths:
             schema:
               $ref: '#/components/schemas/ContentPage'
       responses:
+        '200':
+          description: 'Validate-only: the would-be result, nothing written'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ContentPage'
         '201':
           headers:
             X-Consistency-Token:
@@ -2518,6 +2555,10 @@ paths:
         is never published by the system**: this operation cannot publish, and `publishGuidedChoice` refuses
         a service caller.
 
+        **The caller is ai `suggestGuidedChoice`** (29 September, build; AI system design 3.11). `suggestionRef`
+        is the id of its `AiGuidedChoiceSuggestion`, which the review screen passes to ai
+        `getGuidedChoiceSuggestion` to show why each question, answer and target was proposed.
+
         '
       tags:
       - content
@@ -2543,7 +2584,7 @@ paths:
                 properties:
                   suggestionRef:
                     type: string
-                    description: The id of the `ai` job that produced the proposal.
+                    description: The id of the ai `AiGuidedChoiceSuggestion` that produced the proposal (`suggestGuidedChoice`); ai `getGuidedChoiceSuggestion` reads it back.
       responses:
         '201':
           headers:
@@ -2809,9 +2850,545 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+  /tenant-config/analytics-providers:
+    get:
+      operationId: listAnalyticsProviders
+      x-ticvai-consumed-by:
+        - "P01 WEB-001 Home / Landing"
+        - "P02 GST-001 Home – Default"
+        - "P13 CMS-016 Site Settings"
+      x-ticvai-audience:
+      - staff
+      - guest
+      x-ticvai-read-routing: replica
+      x-ticvai-agreed: '29 September: matrix 22.10.29 (CMS integrates with analytics platforms); BL-073 design §4a (analytics injection built against the cookie runtime, not retrofitted behind it); shape follows getTenantConfig (staff get the settings, a guest the published runtime)'
+      summary: The analytics platforms the storefront and app report to
+      description: >
+        **Staff get every row as configured, guests get what the tag loader needs.** A staff caller
+        sees each provider with its venue, surfaces, consent category and reporting link. **A guest
+        caller gets only the enabled rows in force for the venue they are browsing** (the venue's own
+        row, else the tenant-wide one), with `provider`, `measurementId`, `surfaces` and
+        `consentCategory` and nothing else; `TENANT_CONFIGURE` is not needed for that, as with
+        `getTenantConfig`. **The loader injects a provider only once marketing-crm
+        `getCookieConsentRuntime` says its `consentCategory` is granted**; before that nothing is sent
+        to it (2.6.58). Ordered by `venueId` (tenant-wide first) then `provider`; keyset cursor.
+      tags:
+      - overview
+      x-ticvai-permission: TENANT_CONFIGURE
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      security:
+      - guestAuth: []
+      - bearerAuth: []
+      parameters:
+      - name: venueId
+        in: query
+        required: false
+        description: Staff, the rows of this venue only; guest, the venue being browsed, so its rows win over the tenant's
+        schema:
+          type: string
+          format: uuid
+      - $ref: ../shared/common.yaml#/components/parameters/PageSize
+      - $ref: ../shared/common.yaml#/components/parameters/PageCursor
+      responses:
+        '200':
+          description: Analytics providers
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: ../shared/common.yaml#/components/schemas/Page
+                - type: object
+                  properties:
+                    items:
+                      type: array
+                      items:
+                        $ref: '#/components/schemas/StorefrontAnalyticsProvider'
+        '403':
+          $ref: ../shared/common.yaml#/components/responses/Forbidden
+    put:
+      operationId: setAnalyticsProvider
+      x-ticvai-consumed-by:
+        - "P13 CMS-016 Site Settings"
+      x-ticvai-audience:
+      - staff
+      x-ticvai-agreed: '29 September: matrix 22.10.29; Chinmay''s brief for the build (venue configuration: provider, measurement id, the consent category it waits on); BL-073 design §4a; shape follows setBookingFlowConfig'
+      summary: Connect the storefront and app to an analytics platform
+      description: >
+        **An upsert keyed on `venueId` + `provider`** (22.10.29). A null `venueId` is the tenant-wide
+        default; a venue's own row replaces it for that venue (ADR-0018, nearest wins). `measurementId`
+        is what the page tag or app SDK reports to (a GA4 `G-` id, a Tag Manager `GTM-` container, a
+        pixel id); it is public by nature, and the reporting credential is not: `reportingCredentialRef`
+        names a secret in the platform vault, is write-only and is never returned.
+
+        **Every provider waits on a consent category** (`consentCategory`, `analytics` unless set): it is
+        not loaded, and no hit is sent, until the visitor's decision grants that category. `strictlyNecessary`
+        is not offered: no analytics platform is necessary for the site to work. Takes effect with
+        `publishTenantConfig`, like the rest of the storefront configuration.
+      tags:
+      - overview
+      x-ticvai-permission: TENANT_CONFIGURE
+      x-ticvai-scope-level: venue
+      x-ticvai-config-scope: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/StorefrontAnalyticsProvider'
+      responses:
+        '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: Saved
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StorefrontAnalyticsProvider'
+        '400':
+          $ref: ../shared/common.yaml#/components/responses/BadRequest
+        '403':
+          $ref: ../shared/common.yaml#/components/responses/Forbidden
+        '422':
+          description: A `measurementId` that does not match the provider's format, or a `venueId` not among the tenant's active venues
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
+  /tenant-config/analytics-insights:
+    get:
+      operationId: getStorefrontInsights
+      x-ticvai-consumed-by:
+        - "P08 BO-834 Digital Experience Center"
+        - "P08 BO-843 Publishing, Analytics & Audit"
+      x-ticvai-audience:
+      - staff
+      x-ticvai-read-routing: replica
+      x-ticvai-agreed: '29 September: matrix 22.10.29 (insights on page performance, engagement, conversions and visitor behaviour); board reading for BO-843 (report page/app views, engagement, conversion); shape follows getTenantAppStatus'
+      summary: Page performance, engagement, conversion and visitor behaviour
+      description: >
+        **Read through, not stored** (22.10.29). The figures come from the analytics platform the
+        tenant connected (`setAnalyticsProvider`, the row with a reporting property and credential),
+        asked through its reporting API at read time for the period and venue, so there is no copy to
+        drift from the source. Totals (sessions, users, page views, engagement time, bounce rate,
+        conversions and conversion rate), the top pages with their own figures, and traffic by source
+        and by device. **Only consented traffic is in it**: a visitor who declined analytics was never
+        sent. Revenue and orders are not taken from the analytics platform; they are the orders
+        contract's and reporting's.
+      tags:
+      - overview
+      x-ticvai-permission: MARKETING_VIEW
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+      - name: from
+        in: query
+        required: true
+        schema:
+          type: string
+          format: date
+      - name: to
+        in: query
+        required: true
+        schema:
+          type: string
+          format: date
+      - name: venueId
+        in: query
+        required: false
+        schema:
+          type: string
+          format: uuid
+      - name: surface
+        in: query
+        required: false
+        schema:
+          type: string
+          enum:
+          - guestWeb
+          - guestApp
+      - name: topPages
+        in: query
+        required: false
+        description: How many pages to rank, most viewed first
+        schema:
+          type: integer
+          minimum: 1
+          maximum: 100
+          default: 20
+      responses:
+        '200':
+          description: Insights for the period
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StorefrontPageInsights'
+        '403':
+          $ref: ../shared/common.yaml#/components/responses/Forbidden
+        '404':
+          description: No enabled provider with a reporting property and credential for this venue (`not-configured`)
+          x-ticvai-problem-types:
+          - not-configured
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
+        '502':
+          description: The analytics platform did not answer or refused the credential (`provider-unavailable`)
+          x-ticvai-problem-types:
+          - provider-unavailable
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
+  /storefront/session-events:
+    post:
+      operationId: recordStorefrontSessionEvents
+      x-ticvai-consumed-by:
+        - "P01 WEB-001 Home / Landing"
+        - "P02 GST-001 Home – Default"
+      x-ticvai-audience:
+      - guest
+      - anonymous
+      x-ticvai-agreed: '29 September: our build plan (8.3.40 browsing behaviour as a risk signal; AI system design 3.2
+        events into ai-realtime); shape follows setAnalyticsProvider''s guest runtime and identity.loginRecorded''s
+        hashing'
+      summary: Report a batch of browsing behaviour for fraud prevention, hashed and without personal data
+      description: '8.3.40 (decided 29 September, build pass, group G2). **The storefront and guest app runtime posts
+        this as a beacon**, every 50 interactions or 30 seconds and when the page is hidden, for every page of the
+        session; it is part of the runtime shell, not of any one screen. Each accepted batch publishes one
+        `storefront.sessionEvent` (ADR-0033: the outbox row is the only write) for the risk engine, which joins it to a
+        later payment through `sessionRef`.
+
+
+        **No personal data is accepted.** The session id and device id are identifiers the runtime minted for itself,
+        SHA-256 hashed in the browser and hashed again with the tenant key on arrival; a page is sent as its route
+        family, never its URL; no search text, form value or guest id is taken (a signed-in session says only
+        `signedIn` true). A body carrying anything else is refused with 400 rather than stored, so a runtime bug cannot
+        leak what this was built not to hold.
+
+
+        **Cheap and lossy by design.** Answers 202 without waiting for the publish; a batch dropped by the rate limit
+        (per session and per address, `429`) is not retried. Nothing a guest sees depends on it. The address is
+        hashed at the edge with the same tenant key as the `ipHash` `ai.scoreTransactionRisk` receives, and added
+        to the event; the runtime never sends it.
+
+        '
+      tags:
+      - overview
+      x-ticvai-permission: null
+      x-ticvai-scope-level: tenant
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      security:
+      - {}
+      - guestAuth: []
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/WhiteLabelStorefrontSessionBatch'
+      responses:
+        '202':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: Accepted for publication. Nothing is returned.
+        '400':
+          description: A field outside the batch shape (a URL with a query, free text, an unhashed id), or more than
+            50 interactions.
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: ../shared/common.yaml#/components/responses/TooManyRequests
 
 components:
   schemas:
+    WhiteLabelStorefrontSessionBatch:
+      type: object
+      x-ticvai-persistence: none — request only; published as storefront.sessionEvent through platform.outbox
+      description: 'One beacon from the storefront or guest-app runtime (8.3.40; decided 29 September, build pass, group
+        G2). **Closed shape** (`additionalProperties: false`): hashes, route families, product ids and counts only.'
+      additionalProperties: false
+      required:
+      - batchId
+      - sessionRef
+      - surface
+      - sessionStartedAt
+      - interactions
+      properties:
+        batchId:
+          type: string
+          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+          description: ULID minted by the runtime; a retried beacon repeats it.
+        sessionRef:
+          type: string
+          maxLength: 128
+          description: The runtime's own session id, SHA-256 hashed in the browser; hashed again with the tenant key
+            on arrival and published as `storefront.sessionEvent.sessionRef`. The checkout passes the same value to
+            `ai.scoreTransactionRisk`.
+        deviceIdHash:
+          type: string
+          maxLength: 128
+          nullable: true
+        surface:
+          type: string
+          enum:
+          - guestWeb
+          - guestApp
+        venueId:
+          type: string
+          format: uuid
+          nullable: true
+        sessionStartedAt:
+          type: string
+          format: date-time
+        interactions:
+          type: array
+          minItems: 1
+          maxItems: 50
+          items:
+            type: object
+            additionalProperties: false
+            required:
+            - kind
+            - at
+            properties:
+              kind:
+                type: string
+                enum:
+                - pageView
+                - productView
+                - seatMapOpened
+                - addToCart
+                - removeFromCart
+                - checkoutStarted
+                - paymentPageViewed
+                - promoCodeTried
+                - search
+              pageKind:
+                type: string
+                nullable: true
+                enum:
+                - home
+                - product
+                - seatMap
+                - cart
+                - checkout
+                - account
+                - content
+                - null
+              productId:
+                type: string
+                format: uuid
+                nullable: true
+              at:
+                type: string
+                format: date-time
+              dwellMs:
+                type: integer
+                minimum: 0
+                nullable: true
+        automationHints:
+          type: object
+          nullable: true
+          additionalProperties: false
+          properties:
+            webdriver:
+              type: boolean
+            headless:
+              type: boolean
+            pointerEvents:
+              type: integer
+              minimum: 0
+            interactionsPerMinute:
+              type: number
+              minimum: 0
+    StorefrontAnalyticsProvider:
+      type: object
+      x-ticvai-persistence: whitelabel.analytics_provider
+      description: '**One analytics platform the storefront or app reports to** (22.10.29, 29 September build). Venue
+        configuration: a null `venueId` is the tenant-wide default a venue''s own row replaces.'
+      required:
+      - provider
+      - measurementId
+      - surfaces
+      - consentCategory
+      - isEnabled
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        venueId:
+          type: string
+          format: uuid
+          nullable: true
+        provider:
+          type: string
+          enum:
+          - googleAnalytics4
+          - googleTagManager
+          - adobeAnalytics
+          - metaPixel
+          - matomo
+          - other
+        providerLabel:
+          type: string
+          maxLength: 100
+          nullable: true
+          description: The name, when `provider` is `other`.
+        measurementId:
+          type: string
+          maxLength: 100
+          description: What the tag or SDK reports to (GA4 `G-...`, Tag Manager `GTM-...`, a pixel id).
+        surfaces:
+          type: array
+          minItems: 1
+          items:
+            type: string
+            enum:
+            - guestWeb
+            - guestApp
+        consentCategory:
+          type: string
+          enum:
+          - functional
+          - analytics
+          - personalisation
+          - marketing
+          default: analytics
+          description: The cookie category the visitor must grant before this provider loads (marketing-crm `CookieCategory`).
+        isEnabled:
+          type: boolean
+          default: true
+        reportingPropertyId:
+          type: string
+          maxLength: 100
+          nullable: true
+          description: The property `getStorefrontInsights` asks the reporting API about (a GA4 property id). Staff only.
+        reportingCredentialRef:
+          type: string
+          maxLength: 200
+          nullable: true
+          writeOnly: true
+          description: The vault reference of the reporting credential. Accepted, never returned.
+        hasReportingCredential:
+          type: boolean
+          readOnly: true
+          description: Whether a reporting credential is held, since the reference itself is never returned.
+        scopePath:
+          type: string
+          readOnly: true
+          description: '**The partition key** (ADR-0005).'
+        updatedAt:
+          type: string
+          format: date-time
+          readOnly: true
+    StorefrontPageInsights:
+      type: object
+      x-ticvai-persistence: none — read through from the connected analytics platform's reporting API at request time
+      description: Page performance, engagement, conversion and visitor behaviour for a period (22.10.29).
+      required:
+      - from
+      - to
+      - provider
+      - totals
+      properties:
+        from:
+          type: string
+          format: date
+        to:
+          type: string
+          format: date
+        provider:
+          type: string
+        asOf:
+          type: string
+          format: date-time
+          description: When the platform last processed the data it answered with.
+        totals:
+          type: object
+          properties:
+            sessions:
+              type: integer
+            users:
+              type: integer
+            newUsers:
+              type: integer
+            pageViews:
+              type: integer
+            averageEngagementSeconds:
+              type: number
+            bounceRate:
+              type: number
+              description: 0 to 1.
+            conversions:
+              type: integer
+            conversionRate:
+              type: number
+              description: Conversions per session, 0 to 1.
+        topPages:
+          type: array
+          items:
+            type: object
+            properties:
+              path:
+                type: string
+              title:
+                type: string
+                nullable: true
+              pageViews:
+                type: integer
+              averageEngagementSeconds:
+                type: number
+              exitRate:
+                type: number
+              conversions:
+                type: integer
+        bySource:
+          type: array
+          description: Visitor behaviour by where they came from.
+          items:
+            type: object
+            properties:
+              source:
+                type: string
+              medium:
+                type: string
+                nullable: true
+              sessions:
+                type: integer
+              conversions:
+                type: integer
+        byDevice:
+          type: array
+          items:
+            type: object
+            properties:
+              deviceCategory:
+                type: string
+                enum:
+                - desktop
+                - mobile
+                - tablet
+                - app
+              sessions:
+                type: integer
+              conversions:
+                type: integer
     GuidedChoiceStatus:
       type: string
       description: '**Draft until a person publishes it (decided 29 September, rev 3 REV3-11).** Guests

@@ -1,17 +1,17 @@
 id: LLD-FnbService
-title: FnbService — 117 operations, 50 tables
+title: FnbService — 120 operations, 50 tables
 generatedBy: tools/derive-diagrams.py
 tier: operations
 index: diagrams/hld/02-services.yaml
-why: '**117 operations and 50 tables — the largest single domain after marketing.** Its own service
+why: '**120 operations and 50 tables — the largest single domain after marketing.** Its own service
   because a kitchen pass has a latency profile nothing else shares: a bump must land in under a second
   on a display that may be offline.'
 scale: Write-heavy during service, idle between. **Two peaks a day, sharply.**
 ifDown: Down means the kitchen falls back to paper. Offline-capable by design.
 coverage:
-  operations: 117
+  operations: 120
   inAFlow: 70
-  percent: 60%
+  percent: 58%
   note: '**Flow coverage is how much of this service a journey has walked.** A service under 40% is
     unwalked rather than under-documented.'
 schemas:
@@ -22,7 +22,7 @@ schemas:
   largestTable: fnb.table_reservation
 operationsByContract:
 - contract: fnb
-  count: 117
+  count: 120
   operations:
   - operation: acceptFnbOrder
     verb: POST
@@ -143,6 +143,14 @@ operationsByContract:
     permission: PRODUCT_CONFIGURE
     offline: false
     reads: 5
+    writes: 3
+  - operation: createDeliveryLocation
+    verb: POST
+    path: /delivery-locations
+    scope: venue
+    permission: PRODUCT_CONFIGURE
+    offline: false
+    reads: 4
     writes: 3
   - operation: createFnbOrder
     verb: POST
@@ -752,6 +760,14 @@ operationsByContract:
     offline: false
     reads: 2
     writes: 3
+  - operation: setDeliveryLocationOutletMapping
+    verb: PUT
+    path: /venues/{venueId}/delivery-location-outlets
+    scope: venue
+    permission: PRODUCT_CONFIGURE
+    offline: false
+    reads: 3
+    writes: 3
   - operation: setFnbDeliveryPolicy
     verb: PUT
     path: /fnb-delivery-policy
@@ -920,6 +936,14 @@ operationsByContract:
     offline: true
     reads: 5
     writes: 2
+  - operation: updateDeliveryLocation
+    verb: PATCH
+    path: /delivery-locations/{locationId}
+    scope: venue
+    permission: PRODUCT_CONFIGURE
+    offline: false
+    reads: 2
+    writes: 2
   - operation: updateMenu
     verb: PATCH
     path: /menus/{menuId}
@@ -988,6 +1012,7 @@ tables:
   - compItem
   - completeProductionRun
   - createCombo
+  - createDeliveryLocation
   - createFnbOrder
   - createGuestFnbOrder
   - createMenu
@@ -1029,6 +1054,7 @@ tables:
   - sendOrderNotification
   - setComboSlots
   - setCourseRules
+  - setDeliveryLocationOutletMapping
   - setItemAvailability
   - setKitchenSla
   - setKitchenStations
@@ -1044,6 +1070,7 @@ tables:
   - splitBill
   - transferOrderItems
   - transferTableVisit
+  - updateDeliveryLocation
   - updateMenu
   - updateTable
   - updateTableReservation
@@ -1064,6 +1091,7 @@ tables:
   - compItem
   - completeProductionRun
   - createCombo
+  - createDeliveryLocation
   - createFnbOrder
   - createGuestFnbOrder
   - createMenu
@@ -1105,6 +1133,7 @@ tables:
   - sendOrderNotification
   - setComboSlots
   - setCourseRules
+  - setDeliveryLocationOutletMapping
   - setItemAvailability
   - setKitchenSla
   - setKitchenStations
@@ -1120,6 +1149,7 @@ tables:
   - splitBill
   - transferOrderItems
   - transferTableVisit
+  - updateDeliveryLocation
   - updateMenu
   - updateTable
   - updateTableReservation
@@ -1143,6 +1173,7 @@ tables:
   - rollbackMenu
   - scheduleMenuPublish
   - setCourseRules
+  - setDeliveryLocationOutletMapping
   - setKitchenSla
   - setSectionLayout
   - setSubstitutionRules
@@ -1205,13 +1236,15 @@ tables:
   columns: 11
   store: postgres
   parent: null
-  writtenBy: []
+  writtenBy:
+  - fnb
   foreignWriters: null
 - table: fnb.delivery_location_outlet
   columns: 3
   store: postgres
   parent: fnb.delivery_location
-  writtenBy: []
+  writtenBy:
+  - fnb
   foreignWriters: null
 - table: fnb.delivery_policy
   columns: 16
@@ -1496,9 +1529,9 @@ tables:
 readsFrom:
 - service: IdentityService
   operations: 10
-- service: InventoryService
-  operations: 6
 - service: TenancyService
+  operations: 8
+- service: InventoryService
   operations: 6
 - service: OrderService
   operations: 4

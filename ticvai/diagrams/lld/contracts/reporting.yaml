@@ -1,5 +1,5 @@
 id: LLD-reporting
-title: reporting — 47 operations
+title: reporting — 48 operations
 generatedBy: tools/derive-diagrams.py
 index: diagrams/hld/03-contracts.yaml
 tier: satellite
@@ -33,8 +33,11 @@ operations:
   - ai.policy
   - ai.provider
   - cache:idempotency
+  - reporting.kpi_definition
+  - reporting.natural_language_query
   - reporting.report_column
   - reporting.report_filter
+  - reporting.semantic_model
   writes:
   - ai.activity
   - cache:idempotency
@@ -254,6 +257,10 @@ operations:
   - staff
   offline: false
   reads:
+  - accreditation.application
+  - accreditation.credential
+  - accreditation.holder
+  - accreditation.validity
   - reporting.kpi_definition
   - reporting.kpi_target
   writes: []
@@ -524,6 +531,22 @@ operations:
   writes:
   - cache:idempotency
   - reporting.execution
+- operation: runSemanticQuery
+  verb: POST
+  path: /semantic-queries
+  scope: venue
+  permission: REPORT_VIEW_VENUE
+  audience:
+  - service
+  offline: false
+  reads:
+  - cache:idempotency
+  - reporting.kpi_definition
+  - reporting.report_column
+  - reporting.report_filter
+  - reporting.semantic_model
+  writes:
+  - cache:idempotency
 - operation: saveNaturalLanguageQuery
   verb: POST
   path: /reports/ask/{conversationId}/save

@@ -877,6 +877,11 @@ screens:
     trigger: onAction
     invalidates:
     - listWebhookSubscriptions
+  - operationId: listWebhookEventTypes
+    contract: public-api
+    purpose: Events a subscription can take
+    trigger: onLoad
+    provenance: build, 29 September 2026
   entryState:
     params:
     - name: subscriptionId

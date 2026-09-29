@@ -2243,6 +2243,28 @@
    "status": "pending"
   },
   {
+   "id": "WS124",
+   "kind": "workshop",
+   "label": "AI Governance board 4",
+   "platform": "P09",
+   "screens": [
+    "ADM-549",
+    "ADM-550",
+    "ADM-551",
+    "ADM-552",
+    "ADM-553",
+    "ADM-554",
+    "ADM-555",
+    "ADM-556",
+    "ADM-557",
+    "ADM-558"
+   ],
+   "drawable": 7,
+   "thin": 3,
+   "frames": 0,
+   "status": "pending"
+  },
+  {
    "id": "WS125",
    "kind": "workshop",
    "label": "Event Management Configuration Backend Structure v1.0 board 1",
@@ -2318,6 +2340,28 @@
     "ADM-566",
     "ADM-567",
     "ADM-568"
+   ],
+   "drawable": 7,
+   "thin": 3,
+   "frames": 0,
+   "status": "pending"
+  },
+  {
+   "id": "WS154",
+   "kind": "workshop",
+   "label": "Payment Payment Orchestration board 8",
+   "platform": "P09",
+   "screens": [
+    "ADM-629",
+    "ADM-630",
+    "ADM-631",
+    "ADM-632",
+    "ADM-633",
+    "ADM-634",
+    "ADM-635",
+    "ADM-636",
+    "ADM-637",
+    "ADM-638"
    ],
    "drawable": 7,
    "thin": 3,
@@ -2787,28 +2831,6 @@
    "status": "pending"
   },
   {
-   "id": "WS124",
-   "kind": "workshop",
-   "label": "AI Governance board 4",
-   "platform": "P09",
-   "screens": [
-    "ADM-549",
-    "ADM-550",
-    "ADM-551",
-    "ADM-552",
-    "ADM-553",
-    "ADM-554",
-    "ADM-555",
-    "ADM-556",
-    "ADM-557",
-    "ADM-558"
-   ],
-   "drawable": 6,
-   "thin": 4,
-   "frames": 0,
-   "status": "pending"
-  },
-  {
    "id": "WS129",
    "kind": "workshop",
    "label": "Event Management Configuration Backend Structure v1.0 board 5",
@@ -2878,28 +2900,6 @@
     "ADM-586",
     "ADM-587",
     "ADM-588"
-   ],
-   "drawable": 6,
-   "thin": 4,
-   "frames": 0,
-   "status": "pending"
-  },
-  {
-   "id": "WS154",
-   "kind": "workshop",
-   "label": "Payment Payment Orchestration board 8",
-   "platform": "P09",
-   "screens": [
-    "ADM-629",
-    "ADM-630",
-    "ADM-631",
-    "ADM-632",
-    "ADM-633",
-    "ADM-634",
-    "ADM-635",
-    "ADM-636",
-    "ADM-637",
-    "ADM-638"
    ],
    "drawable": 6,
    "thin": 4,
@@ -3206,6 +3206,28 @@
     "ADM-476",
     "ADM-477",
     "ADM-478"
+   ],
+   "drawable": 5,
+   "thin": 5,
+   "frames": 0,
+   "status": "pending"
+  },
+  {
+   "id": "WS121",
+   "kind": "workshop",
+   "label": "AI Governance board 1",
+   "platform": "P09",
+   "screens": [
+    "ADM-519",
+    "ADM-520",
+    "ADM-521",
+    "ADM-522",
+    "ADM-523",
+    "ADM-524",
+    "ADM-525",
+    "ADM-526",
+    "ADM-527",
+    "ADM-528"
    ],
    "drawable": 5,
    "thin": 5,
@@ -3801,6 +3823,28 @@
    "status": "pending"
   },
   {
+   "id": "WS118",
+   "kind": "workshop",
+   "label": "AI Configuration Assistant board 3",
+   "platform": "P09",
+   "screens": [
+    "ADM-489",
+    "ADM-490",
+    "ADM-491",
+    "ADM-492",
+    "ADM-493",
+    "ADM-494",
+    "ADM-495",
+    "ADM-496",
+    "ADM-497",
+    "ADM-498"
+   ],
+   "drawable": 4,
+   "thin": 6,
+   "frames": 0,
+   "status": "pending"
+  },
+  {
    "id": "WS130",
    "kind": "workshop",
    "label": "Event Management Configuration Backend Structure v1.0 board 6",
@@ -4073,6 +4117,28 @@
    "status": "pending"
   },
   {
+   "id": "WS70",
+   "kind": "workshop",
+   "label": "Unified BI Reporting and AI Analytics Platform board 9",
+   "platform": "P16",
+   "screens": [
+    "ANL-051",
+    "ANL-052",
+    "ANL-053",
+    "ANL-054",
+    "ANL-055",
+    "ANL-056",
+    "ANL-057",
+    "ANL-058",
+    "ANL-059",
+    "ANL-060"
+   ],
+   "drawable": 3,
+   "thin": 7,
+   "frames": 0,
+   "status": "pending"
+  },
+  {
    "id": "WS81",
    "kind": "workshop",
    "label": "Game and Ride board 4",
@@ -4337,28 +4403,6 @@
    "status": "pending"
   },
   {
-   "id": "WS121",
-   "kind": "workshop",
-   "label": "AI Governance board 1",
-   "platform": "P09",
-   "screens": [
-    "ADM-519",
-    "ADM-520",
-    "ADM-521",
-    "ADM-522",
-    "ADM-523",
-    "ADM-524",
-    "ADM-525",
-    "ADM-526",
-    "ADM-527",
-    "ADM-528"
-   ],
-   "drawable": 3,
-   "thin": 7,
-   "frames": 0,
-   "status": "pending"
-  },
-  {
    "id": "WS122",
    "kind": "workshop",
    "label": "AI Governance board 2",
@@ -4535,28 +4579,6 @@
    "status": "pending"
   },
   {
-   "id": "WS70",
-   "kind": "workshop",
-   "label": "Unified BI Reporting and AI Analytics Platform board 9",
-   "platform": "P16",
-   "screens": [
-    "ANL-051",
-    "ANL-052",
-    "ANL-053",
-    "ANL-054",
-    "ANL-055",
-    "ANL-056",
-    "ANL-057",
-    "ANL-058",
-    "ANL-059",
-    "ANL-060"
-   ],
-   "drawable": 2,
-   "thin": 8,
-   "frames": 0,
-   "status": "pending"
-  },
-  {
    "id": "WS94",
    "kind": "workshop",
    "label": "Rental Management board 7",
@@ -4666,28 +4688,6 @@
    "status": "pending"
   },
   {
-   "id": "WS118",
-   "kind": "workshop",
-   "label": "AI Configuration Assistant board 3",
-   "platform": "P09",
-   "screens": [
-    "ADM-489",
-    "ADM-490",
-    "ADM-491",
-    "ADM-492",
-    "ADM-493",
-    "ADM-494",
-    "ADM-495",
-    "ADM-496",
-    "ADM-497",
-    "ADM-498"
-   ],
-   "drawable": 2,
-   "thin": 8,
-   "frames": 0,
-   "status": "pending"
-  },
-  {
    "id": "WS123",
    "kind": "workshop",
    "label": "AI Governance board 3",
@@ -4710,6 +4710,28 @@
    "status": "pending"
   },
   {
+   "id": "WS135",
+   "kind": "workshop",
+   "label": "Marketing CRM Configuration Reference v1.0 board 1",
+   "platform": "P08",
+   "screens": [
+    "BO-734",
+    "BO-735",
+    "BO-736",
+    "BO-737",
+    "BO-738",
+    "BO-739",
+    "BO-740",
+    "BO-741",
+    "BO-742",
+    "BO-743"
+   ],
+   "drawable": 2,
+   "thin": 8,
+   "frames": 0,
+   "status": "pending"
+  },
+  {
    "id": "WS144",
    "kind": "workshop",
    "label": "Marketing CRM Configuration Reference v1.0 board 10",
@@ -4725,6 +4747,28 @@
     "BO-831",
     "BO-832",
     "BO-833"
+   ],
+   "drawable": 2,
+   "thin": 8,
+   "frames": 0,
+   "status": "pending"
+  },
+  {
+   "id": "WS162",
+   "kind": "workshop",
+   "label": "Resource Management Configuration board 8",
+   "platform": "P08",
+   "screens": [
+    "BO-923",
+    "BO-924",
+    "BO-925",
+    "BO-926",
+    "BO-927",
+    "BO-928",
+    "BO-929",
+    "BO-930",
+    "BO-931",
+    "BO-932"
    ],
    "drawable": 2,
    "thin": 8,
@@ -5037,28 +5081,6 @@
    "status": "pending"
   },
   {
-   "id": "WS135",
-   "kind": "workshop",
-   "label": "Marketing CRM Configuration Reference v1.0 board 1",
-   "platform": "P08",
-   "screens": [
-    "BO-734",
-    "BO-735",
-    "BO-736",
-    "BO-737",
-    "BO-738",
-    "BO-739",
-    "BO-740",
-    "BO-741",
-    "BO-742",
-    "BO-743"
-   ],
-   "drawable": 1,
-   "thin": 9,
-   "frames": 0,
-   "status": "pending"
-  },
-  {
    "id": "WS137",
    "kind": "workshop",
    "label": "Marketing CRM Configuration Reference v1.0 board 3",
@@ -5074,6 +5096,28 @@
     "BO-761",
     "BO-762",
     "BO-763"
+   ],
+   "drawable": 1,
+   "thin": 9,
+   "frames": 0,
+   "status": "pending"
+  },
+  {
+   "id": "WS138",
+   "kind": "workshop",
+   "label": "Marketing CRM Configuration Reference v1.0 board 4",
+   "platform": "P08",
+   "screens": [
+    "BO-764",
+    "BO-765",
+    "BO-766",
+    "BO-767",
+    "BO-768",
+    "BO-769",
+    "BO-770",
+    "BO-771",
+    "BO-772",
+    "BO-773"
    ],
    "drawable": 1,
    "thin": 9,
@@ -5118,28 +5162,6 @@
     "BO-841",
     "BO-842",
     "BO-843"
-   ],
-   "drawable": 1,
-   "thin": 9,
-   "frames": 0,
-   "status": "pending"
-  },
-  {
-   "id": "WS162",
-   "kind": "workshop",
-   "label": "Resource Management Configuration board 8",
-   "platform": "P08",
-   "screens": [
-    "BO-923",
-    "BO-924",
-    "BO-925",
-    "BO-926",
-    "BO-927",
-    "BO-928",
-    "BO-929",
-    "BO-930",
-    "BO-931",
-    "BO-932"
    ],
    "drawable": 1,
    "thin": 9,
@@ -5272,28 +5294,6 @@
     "BO-751",
     "BO-752",
     "BO-753"
-   ],
-   "drawable": 0,
-   "thin": 10,
-   "frames": 0,
-   "status": "pending"
-  },
-  {
-   "id": "WS138",
-   "kind": "workshop",
-   "label": "Marketing CRM Configuration Reference v1.0 board 4",
-   "platform": "P08",
-   "screens": [
-    "BO-764",
-    "BO-765",
-    "BO-766",
-    "BO-767",
-    "BO-768",
-    "BO-769",
-    "BO-770",
-    "BO-771",
-    "BO-772",
-    "BO-773"
    ],
    "drawable": 0,
    "thin": 10,

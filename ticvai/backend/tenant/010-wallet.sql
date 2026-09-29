@@ -1,4 +1,4 @@
--- wallet — 29 tables
+-- wallet — 31 tables
 -- **Derived. Do not hand-edit.**
 
 -- Holds 3 columns. No description has been written for this table — the name is the only thing
@@ -27,6 +27,22 @@ CREATE TABLE IF NOT EXISTS wallet.adjustment (
 -- Holds 2 columns. No description has been written for this table — the name is the only thing
 -- saying what it is
 CREATE TABLE IF NOT EXISTS wallet.authentication_policy (
+    scope_path                        ltree NOT NULL,
+    id                                uuid PRIMARY KEY NOT NULL
+);
+
+-- Holds 11 columns. No description has been written for this table — the name is the only thing
+-- saying what it is. Reached by: 2 operations read it and 1 write it.
+CREATE TABLE IF NOT EXISTS wallet.auto_reload_setting (
+    wallet_id                         uuid,
+    subject_id                        uuid,
+    is_enabled                        boolean NOT NULL,
+    threshold_amount                  numeric(18,4),
+    reload_amount                     numeric(18,4),
+    payment_token_id                  uuid,
+    maximum_per_day                   integer,
+    status                            text CONSTRAINT auto_reload_setting_status_chk CHECK (status IN ('active', 'suspendedAfterDecline', 'disabledByVenue')),
+    last_reload_at                    timestamptz,
     scope_path                        ltree NOT NULL,
     id                                uuid PRIMARY KEY NOT NULL
 );
@@ -178,6 +194,24 @@ CREATE TABLE IF NOT EXISTS wallet.dispute (
     resolved_by                       uuid,
     resolved_at                       timestamptz,
     adjustment_id                     uuid,
+    scope_path                        ltree NOT NULL
+);
+
+-- Holds 13 columns. No description has been written for this table — the name is the only thing
+-- saying what it is. Reached by: 1 operations read it and 1 write it.
+CREATE TABLE IF NOT EXISTS wallet.exit_settlement (
+    id                                uuid PRIMARY KEY NOT NULL,
+    wallet_id                         uuid NOT NULL,
+    action                            text NOT NULL CONSTRAINT exit_settlement_action_chk CHECK (action IN ('collect', 'refund', 'waive')),
+    method                            text CONSTRAINT exit_settlement_method_chk CHECK (method IN ('card', 'cash', 'storedCard', 'originalPayment')),
+    amount                            numeric(18,4) NOT NULL,
+    balance_before                    numeric(18,4),
+    payment_id                        text,
+    refund_id                         text,
+    wallet_transaction_id             text,
+    reason                            text,
+    settled_by_principal_id           uuid,
+    settled_at                        timestamptz NOT NULL,
     scope_path                        ltree NOT NULL
 );
 

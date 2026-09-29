@@ -7,10 +7,10 @@ description: '**Derived from what each app''s screens call, not decided here.** 
   and the approval hierarchy are deliberately absent: who at a venue may configure pricing is the client''s
   decision and a plausible answer written here would be read as one they made.'
 theTwoVocabularies:
-  onOperations: 167
+  onOperations: 170
   inRolesYaml: 43
   shared: 0
-  note: '**Zero shared keys.** The contracts carry 167 permission keys across 2284 operations; `roles.yaml`
+  note: '**Zero shared keys.** The contracts carry 170 permission keys across 2474 operations; `roles.yaml`
     grants 43, all of them POS. `check-screens` validates a screen''s `guard` against `roles.yaml`, so
     the only guards anyone could write were POS ones — and that is what the package shows: venue-pos declares
     every guard in it and the other four apps declare none. **Joining these two is the work; this file
@@ -30,8 +30,8 @@ apps:
     - P02
     - P05
     screens: 143
-    operations: 193
-    permissions: 24
+    operations: 215
+    permissions: 26
     tiers:
       read:
       - CASE_VIEW
@@ -39,6 +39,7 @@ apps:
       - LEDGER_VIEW
       - MARKETING_VIEW
       - ORDER_VIEW
+      - PAYMENT_VIEW
       - PRICE_VIEW
       - PRODUCT_VIEW
       - QUEUE_VIEW
@@ -48,6 +49,7 @@ apps:
       operate:
       - AI_USE
       - GUEST_VIEW_PII
+      - LEDGER_POST
       - LOYALTY_REDEEM
       - ORDER_CANCEL
       - ORDER_CREATE
@@ -68,6 +70,7 @@ apps:
     - bindCredentialDevice
     - checkoutCart
     - claimCart
+    - claimDeviceConsent
     - claimLocationSession
     - claimTableSession
     - claimTicketTransfer
@@ -82,12 +85,15 @@ apps:
     - enrolMfaMethod
     - extendCart
     - getCart
+    - getCookieConsentRuntime
+    - getDeviceConsentHistory
     - getGameCard
     - getGuestBill
     - getGuestMenu
     - getGuestOrderStatus
     - getGuestSession
     - getLoyaltyPosition
+    - getMyIdentityVerification
     - getNextTransportDeparture
     - getPublishedGuidedChoice
     - getTenantAppStatus
@@ -97,11 +103,7 @@ apps:
     - getWaitTimes
     - getWaitingGuest
     - getWishlist
-    - guestLogout
-    - guestPasswordLogin
-    - guestSocialLogin
-    - guestUaePassLogin
-    operationsWithNoPermissionCount: 86
+    operationsWithNoPermissionCount: 94
   ticvai-control:
     name: TICVAI Control
     platforms:
@@ -111,8 +113,8 @@ apps:
     - P14
     - P17
     screens: 767
-    operations: 726
-    permissions: 85
+    operations: 858
+    permissions: 89
     tiers:
       read:
       - ACCREDITATION_VIEW
@@ -143,8 +145,8 @@ apps:
       operate:
       - ACCREDITATION_APPLY
       - ACCREDITATION_APPROVE
-      - ACCREDITATION_ISSUE
       - AI_APPROVE
+      - AI_USE
       - APPROVAL_ACT
       - APPROVAL_DECIDE
       - APPROVAL_REQUEST
@@ -167,6 +169,8 @@ apps:
       - PLATFORM_TENANT_TERMINATE
       - PRODUCT_APPROVE
       - REPORT_VIEW_VENUE
+      - RISK_INVESTIGATE
+      - RISK_REVIEW
       - SESSION_FORCE_LOGOUT
       - SETTLEMENT_RECONCILE
       - TICKET_LOOKUP
@@ -186,6 +190,7 @@ apps:
       - PAYMENT_CONFIGURE
       - PAYMENT_PROVIDER_MANAGE
       - PERMISSION_GRANT
+      - PLATFORM_AI_MANAGE
       - PLATFORM_BILLING_MANAGE
       - PLATFORM_CELL_MANAGE
       - PLATFORM_PLAN_MANAGE
@@ -197,6 +202,7 @@ apps:
       - REPORT_MANAGE
       - ROLE_MANAGE
       - SCOPE_MANAGE
+      - TAX_CONFIGURE
       - TENANT_CONFIGURE
       - TENANT_PUBLISH
       - USER_MANAGE
@@ -230,8 +236,8 @@ apps:
     - P13
     - P16
     screens: 1383
-    operations: 1503
-    permissions: 142
+    operations: 1611
+    permissions: 146
     tiers:
       read:
       - ACCREDITATION_VIEW
@@ -274,6 +280,7 @@ apps:
       - ACCREDITATION_APPLY
       - ACCREDITATION_APPROVE
       - ACCREDITATION_ISSUE
+      - AI_APPROVE
       - AI_USE
       - APPROVAL_ACT
       - APPROVAL_DECIDE
@@ -316,6 +323,8 @@ apps:
       - REPORT_VIEW_VENUE
       - REPORT_VIEW_WORKSTATION
       - RESOURCE_BOOK
+      - RISK_INVESTIGATE
+      - RISK_REVIEW
       - SESSION_FORCE_LOGOUT
       - SETTLEMENT_RECONCILE
       - SHIFT_APPROVE_OPEN
@@ -352,6 +361,7 @@ apps:
       - PARTNER_MANAGE
       - PAYMENT_CONFIGURE
       - PERFORMANCE_CONFIGURE
+      - PERMISSION_GRANT
       - PERMISSION_MANAGE
       - PLATFORM_CELL_MANAGE
       - PLATFORM_TENANT_MANAGE
@@ -414,8 +424,8 @@ apps:
     - P04
     - P15
     screens: 40
-    operations: 163
-    permissions: 48
+    operations: 167
+    permissions: 50
     tiers:
       read:
       - APPROVAL_VIEW
@@ -423,6 +433,7 @@ apps:
       - DEVICE_VIEW
       - GUEST_VIEW
       - INCIDENT_VIEW
+      - LEDGER_VIEW
       - ORDER_VIEW
       - PRICE_VIEW
       - PRODUCT_VIEW
@@ -438,6 +449,7 @@ apps:
       - CASH_LIFT
       - CASH_NO_SALE
       - INCIDENT_REPORT
+      - LEDGER_POST
       - LOYALTY_REDEEM
       - ORDER_CREATE
       - ORDER_DISCOUNT
@@ -487,7 +499,7 @@ apps:
     - P06
     - P07
     screens: 107
-    operations: 222
+    operations: 231
     permissions: 63
     tiers:
       read:

@@ -1,29 +1,29 @@
 id: LLD-InventoryService
-title: InventoryService — 51 operations, 21 tables
+title: InventoryService — 56 operations, 22 tables
 generatedBy: tools/derive-diagrams.py
 tier: operations
 index: diagrams/hld/02-services.yaml
 why: '**Stock, counting and procurement.** Its own service because `inventory.stock_level` is derived
-  from movements — a rule 51 operations broke on 20 August — and that derivation is expensive enough
+  from movements — a rule 56 operations broke on 20 August — and that derivation is expensive enough
   to want its own read path.'
 scale: Mixed. Counting is bursty; procurement is not.
 ifDown: Down blocks receiving and counting; selling continues from the till's cache.
 coverage:
-  operations: 51
+  operations: 56
   inAFlow: 47
-  percent: 92%
+  percent: 84%
   note: '**Flow coverage is how much of this service a journey has walked.** A service under 40% is
     unwalked rather than under-documented.'
 schemas:
 - schema: inventory
-  tables: 21
+  tables: 22
   stores:
   - derived
   - postgres
   largestTable: inventory.purchase_order
 operationsByContract:
 - contract: inventory
-  count: 51
+  count: 56
   operations:
   - operation: acknowledgePurchaseOrder
     verb: POST
@@ -161,6 +161,14 @@ operationsByContract:
     offline: false
     reads: 2
     writes: 2
+  - operation: createSupplierContract
+    verb: POST
+    path: /suppliers/{supplierId}/contracts
+    scope: tenant
+    permission: PROCUREMENT_MANAGE
+    offline: false
+    reads: 3
+    writes: 3
   - operation: getCountVariance
     verb: GET
     path: /stock-counts/{countId}/variance
@@ -176,6 +184,14 @@ operationsByContract:
     permission: PRODUCT_VIEW
     offline: true
     reads: 1
+    writes: 0
+  - operation: getInventoryKitDefinition
+    verb: GET
+    path: /inventory-items/{itemId}/kit-definition
+    scope: venue
+    permission: PRODUCT_VIEW
+    offline: false
+    reads: 2
     writes: 0
   - operation: getPurchaseOrder
     verb: GET
@@ -305,6 +321,14 @@ operationsByContract:
     offline: false
     reads: 2
     writes: 0
+  - operation: listSupplierContracts
+    verb: GET
+    path: /supplier-contracts
+    scope: venue
+    permission: PROCUREMENT_VIEW
+    offline: false
+    reads: 2
+    writes: 0
   - operation: listSuppliers
     verb: GET
     path: /suppliers
@@ -393,6 +417,14 @@ operationsByContract:
     offline: false
     reads: 2
     writes: 2
+  - operation: setInventoryKitDefinition
+    verb: PUT
+    path: /inventory-items/{itemId}/kit-definition
+    scope: venue
+    permission: PRODUCT_CONFIGURE
+    offline: false
+    reads: 4
+    writes: 3
   - operation: startStockCount
     verb: POST
     path: /stock-counts
@@ -433,6 +465,14 @@ operationsByContract:
     offline: false
     reads: 2
     writes: 5
+  - operation: updateSupplierContract
+    verb: PATCH
+    path: /supplier-contracts/{contractId}
+    scope: tenant
+    permission: PROCUREMENT_MANAGE
+    offline: false
+    reads: 2
+    writes: 3
 tables:
 - store: cache:idempotency
   kind: cache
@@ -462,6 +502,7 @@ tables:
   - createStockMovement
   - createStockTransfer
   - createSupplier
+  - createSupplierContract
   - postStockCount
   - receiveStockTransfer
   - recordQuotation
@@ -471,11 +512,13 @@ tables:
   - returnRequisition
   - sendPurchaseOrder
   - setDailyCount
+  - setInventoryKitDefinition
   - startStockCount
   - submitCountLines
   - updateInventoryItem
   - updateRequisitionLines
   - updateSupplier
+  - updateSupplierContract
   readBy:
   - acknowledgePurchaseOrder
   - approveRequisition
@@ -493,6 +536,7 @@ tables:
   - createStockMovement
   - createStockTransfer
   - createSupplier
+  - createSupplierContract
   - postStockCount
   - receiveStockTransfer
   - recordQuotation
@@ -502,11 +546,13 @@ tables:
   - returnRequisition
   - sendPurchaseOrder
   - setDailyCount
+  - setInventoryKitDefinition
   - startStockCount
   - submitCountLines
   - updateInventoryItem
   - updateRequisitionLines
   - updateSupplier
+  - updateSupplierContract
 - store: cache:resolution
   kind: cache
   columns: 4
@@ -520,6 +566,7 @@ tables:
   writtenBy:
   - bulkUpdateProducts
   - setDailyCount
+  - setInventoryKitDefinition
   - updateSupplier
   readBy: null
   gap: '**The lineage names this store, not the key.** Which resolution entry each writer below evicts
@@ -556,6 +603,13 @@ tables:
   foreignWriters: null
 - table: inventory.item
   columns: 26
+  store: postgres
+  parent: null
+  writtenBy:
+  - inventory
+  foreignWriters: null
+- table: inventory.kit_component
+  columns: 6
   store: postgres
   parent: null
   writtenBy:
@@ -655,7 +709,7 @@ tables:
   - inventory
   foreignWriters: null
 - table: inventory.supplier_contract
-  columns: 12
+  columns: 13
   store: postgres
   parent: inventory.supplier
   writtenBy:
@@ -684,7 +738,7 @@ readsFrom:
   operations: 1
 writesOutside:
 - service: TenancyService
-  operations: 3
+  operations: 5
   rule: 'ADR-0028: the owner defines the row; a foreign writer may only append, through a path the owner
     published.'
   why: '**The lineage records these writes, not how they honour the rule.** It does not say whether
@@ -694,10 +748,16 @@ writesOutside:
   - operation: createGoodsReceipt
     tables:
     - platform.outbox
+  - operation: createSupplierContract
+    tables:
+    - platform.audit_record
   - operation: postStockCount
     tables:
     - platform.outbox
   - operation: updateSupplier
+    tables:
+    - platform.audit_record
+  - operation: updateSupplierContract
     tables:
     - platform.audit_record
 - service: CatalogueService
@@ -749,6 +809,7 @@ screens:
 - P08:BO-511 Inventory Transfer Management
 - P08:BO-512 Inventory Adjustment & Exception Management
 - P08:BO-513 Inventory Intelligence & Rebalancing
+- P09:ADM-189 Component Inventory & Availability Matrix
 - P16:ANL-005 Cost, Margin & Profitability
 - P16:ANL-006 Inventory & Waste Intelligence
 flows:

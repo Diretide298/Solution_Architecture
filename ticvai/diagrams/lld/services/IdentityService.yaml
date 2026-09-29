@@ -1,5 +1,5 @@
 id: LLD-IdentityService
-title: IdentityService — 75 operations, 33 tables
+title: IdentityService — 89 operations, 38 tables
 generatedBy: tools/derive-diagrams.py
 tier: foundation
 index: diagrams/hld/02-services.yaml
@@ -9,26 +9,26 @@ why: '**Twelve contracts read it and it reads almost nothing.** The one service 
 scale: Read-heavy, latency-critical, cached hard. Every request resolves a principal.
 ifDown: '**A restart is an outage everywhere.** Deploys go out first and alone.'
 coverage:
-  operations: 75
+  operations: 89
   inAFlow: 23
-  percent: 31%
+  percent: 26%
   note: '**Flow coverage is how much of this service a journey has walked.** A service under 40% is
     unwalked rather than under-documented.'
 schemas:
 - schema: identity
-  tables: 29
+  tables: 33
   stores:
   - postgres
   - redis
   largestTable: identity.delegated_access
 - schema: pii
-  tables: 4
+  tables: 5
   stores:
   - postgres
   largestTable: pii.subject
 operationsByContract:
 - contract: identity
-  count: 75
+  count: 89
   operations:
   - operation: changeOwnCredential
     verb: POST
@@ -45,7 +45,7 @@ operationsByContract:
     permission: null
     offline: false
     reads: 4
-    writes: 2
+    writes: 3
   - operation: createAccessPolicy
     verb: POST
     path: /access-policies
@@ -54,6 +54,14 @@ operationsByContract:
     offline: false
     reads: 1
     writes: 1
+  - operation: createAccessReviewCampaign
+    verb: POST
+    path: /access-review-campaigns
+    scope: venue
+    permission: PERMISSION_MANAGE
+    offline: false
+    reads: 9
+    writes: 3
   - operation: createDelegatedAccess
     verb: POST
     path: /delegated-access
@@ -93,6 +101,22 @@ operationsByContract:
     permission: ROLE_MANAGE
     offline: false
     reads: 2
+    writes: 3
+  - operation: decideAccessReviewItem
+    verb: POST
+    path: /access-review-items/{itemId}/decision
+    scope: venue
+    permission: PERMISSION_GRANT
+    offline: false
+    reads: 4
+    writes: 6
+  - operation: decideGuestIdentityVerification
+    verb: POST
+    path: /guest-identity-verifications/{verificationId}/decision
+    scope: tenant
+    permission: GUEST_MANAGE
+    offline: false
+    reads: 3
     writes: 3
   - operation: deleteDelegatedAccess
     verb: DELETE
@@ -174,6 +198,14 @@ operationsByContract:
     offline: true
     reads: 3
     writes: 0
+  - operation: getGuestVerificationPolicy
+    verb: GET
+    path: /guest-verification-policy
+    scope: tenant
+    permission: TENANT_CONFIGURE
+    offline: false
+    reads: 1
+    writes: 0
   - operation: getMembership
     verb: GET
     path: /memberships/{membershipId}
@@ -181,6 +213,14 @@ operationsByContract:
     permission: GUEST_VIEW
     offline: false
     reads: 3
+    writes: 0
+  - operation: getMyIdentityVerification
+    verb: GET
+    path: /auth/guest/identity-verifications/current
+    scope: tenant
+    permission: null
+    offline: false
+    reads: 1
     writes: 0
   - operation: getPasswordPolicy
     verb: GET
@@ -237,7 +277,7 @@ operationsByContract:
     permission: null
     offline: false
     reads: 1
-    writes: 0
+    writes: 1
   - operation: guestSocialLogin
     verb: POST
     path: /auth/guest/social
@@ -245,7 +285,7 @@ operationsByContract:
     permission: null
     offline: false
     reads: 3
-    writes: 3
+    writes: 4
   - operation: guestUaePassLogin
     verb: POST
     path: /auth/guest/uae-pass
@@ -253,7 +293,7 @@ operationsByContract:
     permission: null
     offline: false
     reads: 3
-    writes: 4
+    writes: 5
   - operation: linkGuestCheckout
     verb: POST
     path: /auth/guest/link-checkout
@@ -278,6 +318,14 @@ operationsByContract:
     offline: false
     reads: 1
     writes: 0
+  - operation: listAccessPolicyEffectiveness
+    verb: GET
+    path: /access-policy-effectiveness
+    scope: tenant
+    permission: PERMISSION_VIEW
+    offline: false
+    reads: 3
+    writes: 0
   - operation: listAccessPolicyHistory
     verb: GET
     path: /access-policies/{policyId}/history
@@ -293,6 +341,22 @@ operationsByContract:
     permission: PERMISSION_VIEW
     offline: false
     reads: 1
+    writes: 0
+  - operation: listAccessReviewCampaigns
+    verb: GET
+    path: /access-review-campaigns
+    scope: venue
+    permission: PERMISSION_VIEW
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: listAccessReviewItems
+    verb: GET
+    path: /access-review-campaigns/{campaignId}/items
+    scope: venue
+    permission: PERMISSION_VIEW
+    offline: false
+    reads: 4
     writes: 0
   - operation: listActiveSessions
     verb: GET
@@ -334,6 +398,14 @@ operationsByContract:
     offline: false
     reads: 3
     writes: 0
+  - operation: listGuestIdentityVerifications
+    verb: GET
+    path: /guest-identity-verifications
+    scope: tenant
+    permission: GUEST_VIEW_PII
+    offline: false
+    reads: 3
+    writes: 0
   - operation: listMfaMethods
     verb: GET
     path: /auth/mfa/methods
@@ -365,6 +437,14 @@ operationsByContract:
     permission: PLATFORM_TENANT_ACCESS
     offline: false
     reads: 1
+    writes: 0
+  - operation: listPermissionFindings
+    verb: GET
+    path: /permission-findings
+    scope: venue
+    permission: PERMISSION_VIEW
+    offline: false
+    reads: 7
     writes: 0
   - operation: listPermissions
     verb: GET
@@ -429,7 +509,7 @@ operationsByContract:
     permission: null
     offline: false
     reads: 6
-    writes: 3
+    writes: 4
   - operation: logout
     verb: POST
     path: /auth/logout
@@ -469,7 +549,7 @@ operationsByContract:
     permission: null
     offline: false
     reads: 3
-    writes: 4
+    writes: 5
   - operation: removeMfaMethod
     verb: DELETE
     path: /auth/mfa/methods/{methodId}
@@ -485,7 +565,7 @@ operationsByContract:
     permission: null
     offline: false
     reads: 2
-    writes: 2
+    writes: 3
   - operation: resetPrincipalCredential
     verb: POST
     path: /principals/{principalId}/credential-reset
@@ -493,7 +573,7 @@ operationsByContract:
     permission: USER_MANAGE
     offline: false
     reads: 3
-    writes: 3
+    writes: 4
   - operation: resolvePermissions
     verb: POST
     path: /permissions/resolve
@@ -502,6 +582,14 @@ operationsByContract:
     offline: false
     reads: 7
     writes: 2
+  - operation: restoreAccessPolicyVersion
+    verb: POST
+    path: /access-policies/{policyId}/restore
+    scope: tenant
+    permission: PERMISSION_MANAGE
+    offline: false
+    reads: 3
+    writes: 3
   - operation: revokeAllSessions
     verb: POST
     path: /auth/sessions/revoke-all
@@ -534,6 +622,14 @@ operationsByContract:
     offline: false
     reads: 1
     writes: 1
+  - operation: setGuestVerificationPolicy
+    verb: PUT
+    path: /guest-verification-policy
+    scope: tenant
+    permission: TENANT_CONFIGURE
+    offline: false
+    reads: 2
+    writes: 2
   - operation: setPasswordPolicy
     verb: PUT
     path: /password-policy
@@ -582,6 +678,22 @@ operationsByContract:
     offline: false
     reads: 1
     writes: 0
+  - operation: submitGuestIdentityDocument
+    verb: POST
+    path: /auth/guest/identity-verifications
+    scope: tenant
+    permission: null
+    offline: false
+    reads: 4
+    writes: 3
+  - operation: suggestRoleAssignment
+    verb: GET
+    path: /role-suggestions
+    scope: venue
+    permission: PERMISSION_VIEW
+    offline: false
+    reads: 7
+    writes: 0
   - operation: updateAccessPolicy
     verb: PUT
     path: /access-policies/{policyId}
@@ -613,7 +725,7 @@ operationsByContract:
     permission: null
     offline: false
     reads: 4
-    writes: 3
+    writes: 4
   - operation: verifyMfaChallenge
     verb: POST
     path: /auth/mfa/challenge/{challengeId}/verify
@@ -621,7 +733,7 @@ operationsByContract:
     permission: null
     offline: false
     reads: 3
-    writes: 4
+    writes: 5
   - operation: verifyMfaEnrolment
     verb: POST
     path: /auth/mfa/methods/{methodId}
@@ -645,10 +757,13 @@ tables:
   writtenBy:
   - changeOwnCredential
   - completeSsoAuthorization
+  - createAccessReviewCampaign
   - createDelegatedAccess
   - createMfaChallenge
   - createPrincipal
   - createRole
+  - decideAccessReviewItem
+  - decideGuestIdentityVerification
   - deleteDelegatedAccess
   - deleteGuestAccount
   - enrolMfaMethod
@@ -666,11 +781,14 @@ tables:
   - requestGuestOtp
   - resetPrincipalCredential
   - resolvePermissions
+  - restoreAccessPolicyVersion
   - revokeAllSessions
   - selectRole
+  - setGuestVerificationPolicy
   - setPasswordPolicy
   - setSegregationRules
   - setSsoConfig
+  - submitGuestIdentityDocument
   - updatePrincipal
   - verifyGuestEmail
   - verifyGuestOtp
@@ -679,10 +797,13 @@ tables:
   readBy:
   - changeOwnCredential
   - completeSsoAuthorization
+  - createAccessReviewCampaign
   - createDelegatedAccess
   - createMfaChallenge
   - createPrincipal
   - createRole
+  - decideAccessReviewItem
+  - decideGuestIdentityVerification
   - deleteDelegatedAccess
   - deleteGuestAccount
   - enrolMfaMethod
@@ -700,11 +821,14 @@ tables:
   - requestGuestOtp
   - resetPrincipalCredential
   - resolvePermissions
+  - restoreAccessPolicyVersion
   - revokeAllSessions
   - selectRole
+  - setGuestVerificationPolicy
   - setPasswordPolicy
   - setSegregationRules
   - setSsoConfig
+  - submitGuestIdentityDocument
   - updatePrincipal
   - verifyGuestEmail
   - verifyGuestOtp
@@ -723,6 +847,7 @@ tables:
   writtenBy:
   - createDelegatedAccess
   - createRole
+  - decideAccessReviewItem
   - deleteDelegatedAccess
   - getCurrentSession
   - resolvePermissions
@@ -756,7 +881,22 @@ tables:
   columns: 10
   store: postgres
   parent: identity.access_policy
-  writtenBy: []
+  writtenBy:
+  - identity
+  foreignWriters: null
+- table: identity.access_review_campaign
+  columns: 17
+  store: postgres
+  parent: null
+  writtenBy:
+  - identity
+  foreignWriters: null
+- table: identity.access_review_item
+  columns: 14
+  store: postgres
+  parent: null
+  writtenBy:
+  - identity
   foreignWriters: null
 - table: identity.authz_audit
   columns: 3
@@ -796,9 +936,23 @@ tables:
   foreignWriters:
   - orders
   - public-api
+- table: identity.guest_identity_verification
+  columns: 13
+  store: postgres
+  parent: null
+  writtenBy:
+  - identity
+  foreignWriters: null
 - table: identity.guest_session
   columns: 2
   store: redis
+  parent: null
+  writtenBy:
+  - identity
+  foreignWriters: null
+- table: identity.guest_verification_policy
+  columns: 13
+  store: postgres
   parent: null
   writtenBy:
   - identity
@@ -933,6 +1087,14 @@ tables:
   writtenBy:
   - identity
   foreignWriters: null
+- table: pii.consent_identifier
+  columns: 6
+  store: postgres
+  parent: null
+  writtenBy:
+  - marketing-crm
+  foreignWriters:
+  - marketing-crm
 - table: pii.subject
   columns: 13
   store: postgres
@@ -965,37 +1127,58 @@ tables:
   - identity
   foreignWriters: null
 readsFrom:
+- service: TenancyService
+  operations: 3
 - service: MarketingService
   operations: 2
 - service: OrderService
   operations: 2
 - service: AccessService
   operations: 1
-- service: TenancyService
+- service: VenueOpsService
   operations: 1
 writesOutside:
-- service: OrderService
-  operations: 1
-  rule: 'ADR-0028: the owner defines the row; a foreign writer may only append, through a path the owner
-    published.'
-  why: '**The lineage records these writes, not how they honour the rule.** It does not say whether
-    each inserts or updates, or which operation or event OrderService published for it — check each
-    against ADR-0028.'
-  writes:
-  - operation: linkGuestCheckout
-    tables:
-    - orders.sales_order
 - service: TenancyService
-  operations: 1
+  operations: 11
   rule: 'ADR-0028: the owner defines the row; a foreign writer may only append, through a path the owner
     published.'
   why: '**The lineage records these writes, not how they honour the rule.** It does not say whether
     each inserts or updates, or which operation or event TenancyService published for it — check each
     against ADR-0028.'
   writes:
+  - operation: completeSsoAuthorization
+    tables:
+    - platform.outbox
   - operation: deleteGuestAccount
     tables:
     - platform.dsar_request
+  - operation: guestPasswordLogin
+    tables:
+    - platform.outbox
+  - operation: guestSocialLogin
+    tables:
+    - platform.outbox
+  - operation: guestUaePassLogin
+    tables:
+    - platform.outbox
+  - operation: login
+    tables:
+    - platform.outbox
+  - operation: registerGuest
+    tables:
+    - platform.outbox
+  - operation: requestGuestOtp
+    tables:
+    - platform.outbox
+  - operation: resetPrincipalCredential
+    tables:
+    - platform.outbox
+  - operation: verifyGuestOtp
+    tables:
+    - platform.outbox
+  - operation: verifyMfaChallenge
+    tables:
+    - platform.outbox
 - service: MarketingService
   operations: 1
   rule: 'ADR-0028: the owner defines the row; a foreign writer may only append, through a path the owner
@@ -1007,6 +1190,17 @@ writesOutside:
   - operation: verifyGuestEmail
     tables:
     - marketing.message_dispatch
+- service: OrderService
+  operations: 1
+  rule: 'ADR-0028: the owner defines the row; a foreign writer may only append, through a path the owner
+    published.'
+  why: '**The lineage records these writes, not how they honour the rule.** It does not say whether
+    each inserts or updates, or which operation or event OrderService published for it — check each
+    against ADR-0028.'
+  writes:
+  - operation: linkGuestCheckout
+    tables:
+    - orders.sales_order
 screens:
 - P01:WEB-016 Login / Register
 - P01:WEB-020 Profile & Preferences
@@ -1034,6 +1228,7 @@ screens:
 - P08:BO-142 Store Rules, Controls & Permissions
 - P08:BO-295 Member 360° Membership Account Workspace
 - P08:BO-385 Delegation Management
+- P08:BO-739 Contact & Preferences
 - P08:BO-873 Staff Resource Directory
 - P08:BO-874 Staff Resource Profile
 - P09:ADM-001 Platform Login / MFA

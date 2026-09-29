@@ -11,11 +11,11 @@
  "note": "Derived by tools/derive-platform.py. **The gaps section is the point** \u2014 a page listing what exists is a directory; one listing what is missing is a worklist.",
  "counts": {
   "screens": 28,
-  "operations": 59,
+  "operations": 62,
   "contracts": 7,
   "modules": 5,
   "undrawn": 0,
-  "operationsWithNoScreen": 88
+  "operationsWithNoScreen": 84
  },
  "waves": {
   "wave2": 2,
@@ -72,7 +72,11 @@
    "operations": 8
   },
   {
-   "contract": "queue",
+   "contract": "ai",
+   "operations": 4
+  },
+  {
+   "contract": "white-label",
    "operations": 1
   },
   {
@@ -80,11 +84,7 @@
    "operations": 1
   },
   {
-   "contract": "ai",
-   "operations": 1
-  },
-  {
-   "contract": "white-label",
+   "contract": "queue",
    "operations": 1
   }
  ],
@@ -140,7 +140,7 @@
    "module": "Knowledge & Responses",
    "wave": 3,
    "route": "/general/knowledge-base-search",
-   "operations": 2,
+   "operations": 3,
    "drawn": true
   },
   {
@@ -248,7 +248,7 @@
    "module": "Support",
    "wave": 3,
    "route": "/support/ai-customer-service-copilot-knowledge-workspace-sup-018",
-   "operations": 1,
+   "operations": 3,
    "drawn": true
   },
   {
@@ -369,12 +369,6 @@
     "summary": "What is indexed, and how current it is"
    },
    {
-    "operation": "proposeTranslations",
-    "contract": "ai",
-    "verb": "POST",
-    "summary": ""
-   },
-   {
     "operation": "proposeWalkways",
     "contract": "ai",
     "verb": "POST",
@@ -493,12 +487,6 @@
     "contract": "identity",
     "verb": "GET",
     "summary": "What was decided, for whom, where and why"
-   },
-   {
-    "operation": "listAccessPolicyHistory",
-    "contract": "identity",
-    "verb": "GET",
-    "summary": "Every version, who changed it and why"
    },
    {
     "operation": "listAccessPolicyTemplates",
@@ -753,12 +741,6 @@
     "summary": "Create or change a governed contact-centre automation"
    },
    {
-    "operation": "setCookieBannerDesign",
-    "contract": "marketing-crm",
-    "verb": "PUT",
-    "summary": "Save a cookie banner design as a new version"
-   },
-   {
     "operation": "setDataProcessingPurpose",
     "contract": "marketing-crm",
     "verb": "PUT",
@@ -805,12 +787,6 @@
     "contract": "marketing-crm",
     "verb": "PUT",
     "summary": "Record or advance a quality evaluation"
-   },
-   {
-    "operation": "setTrackingTechnology",
-    "contract": "marketing-crm",
-    "verb": "PUT",
-    "summary": "Add, classify or retire a tracking technology"
    },
    {
     "operation": "setWaiverAssociation",

@@ -1,0 +1,28 @@
+# AI forecast scenario — state model
+# Contract: ai.AiForecastScenario.status
+# Checked by tools/check-states.py. Added 29 September (build pass, group OWN, from the AI group's handoff).
+
+entity: AI forecast scenario
+contract: ai
+enum: AiForecastScenario.status
+enumKind: inline
+enumSchema: AiForecastScenario
+enumProperty: status
+owner: ai
+description: '**A what-if against a published forecast version** (ADM-507, ADM-517, BO-931), created `computing`
+  by `createForecastScenario`. Changes nothing in production; its points are written with `scenarioId`.'
+initial:
+- computing
+terminal:
+- ready
+- failed
+transitions:
+- from: computing
+  to: ready
+  trigger: job
+  guard: The scenario was computed against its base version and `result` holds the deltas by subject and period
+- from: computing
+  to: failed
+  trigger: job
+  guard: The scenario could not be computed against its base version
+notes: 'A scenario is not edited: a different what-if is a new scenario, compared with `compareForecastScenarios`.'

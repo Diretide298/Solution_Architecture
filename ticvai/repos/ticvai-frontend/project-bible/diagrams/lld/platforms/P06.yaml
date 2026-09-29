@@ -49,7 +49,7 @@ servicesCalled:
 - service: FnbService
   operationCalls: 50
 - service: TenancyService
-  operationCalls: 35
+  operationCalls: 40
 - service: AccessService
   operationCalls: 23
 - service: MarketingService
@@ -61,10 +61,10 @@ servicesCalled:
 - service: CatalogueService
   operationCalls: 17
 - service: AiService
-  operationCalls: 8
-- service: RetailService
-  operationCalls: 2
+  operationCalls: 10
 - service: ReportingService
+  operationCalls: 6
+- service: RetailService
   operationCalls: 2
 coverage:
   screens: 96
@@ -312,6 +312,7 @@ screens:
   - syncScans
   - validateAccess
   - validateGroupAccess
+  - verifyAccreditationCredential
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -690,6 +691,7 @@ screens:
   operations:
   - createAiConversation
   - listAiConversations
+  - recordAnswerFeedback
   - sendAiMessage
   states:
   - emptyFirstRun
@@ -701,6 +703,7 @@ screens:
   offlineState: true
   entryParams:
   - conversationId<-deepLink
+  - messageId<-navigation
   goesTo:
   - EMP-001
   - EMP-002
@@ -723,6 +726,7 @@ screens:
   - getWaitTimes
   - listQueueEntries
   - listQueues
+  - requestSuggestion
   - setQueueStatus
   - setWaitTime
   states:
@@ -925,7 +929,11 @@ screens:
   - acknowledgeAnnouncement
   - getAnnouncementReach
   - listAnnouncements
+  - listStaffConversations
+  - listStaffMessages
+  - markStaffConversationRead
   - publishAnnouncement
+  - sendStaffMessage
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -936,6 +944,7 @@ screens:
   offlineState: true
   entryParams:
   - announcementId<-deepLink
+  - conversationId<-navigation
   goesTo:
   - EMP-001
   - EMP-002
@@ -1859,7 +1868,11 @@ screens:
   wave: 2
   density: comfortable
   operations:
+  - acknowledgeAlert
+  - getDashboard
+  - getKpiValues
   - getStockPositions
+  - listAlerts
   - listStockMovements
   states:
   - emptyFirstRun
@@ -1871,6 +1884,8 @@ screens:
   offlineState: true
   entryParams:
   - venueId<-session
+  - alertId<-navigation
+  - dashboardId<-navigation
   goesTo: []
   boardFrames:
   - FnB Board 4.dc.html#fnb-4d

@@ -2,7 +2,7 @@ openapi: 3.1.0
 info:
   title: TICVAI Order & Payment
   version: 0.1.0
-  x-ticvai-screen-count: 196
+  x-ticvai-screen-count: 202
   x-ticvai-tier: spine
   x-ticvai-module: 2 — Ticketing Sales
   x-ticvai-requirements: 343
@@ -202,6 +202,9 @@ paths:
   /fraud-rules:
     get:
       operationId: listFraudRules
+      x-ticvai-consumed-by:
+        - "P09 ADM-614 Refund Approval & Exception Workflow\t121"
+        - "P09 ADM-630 Payment Risk Rule & Decision Engine\t167"
       summary: The rules evaluated before a charge
       description: 'BL-118. **`orders.fraud_rule` existed with six columns and no operation read or wrote
         it** — found on 20 August by auditing which tables no operation names.
@@ -242,6 +245,9 @@ paths:
                           $ref: '#/components/schemas/FraudRule'
     put:
       operationId: setFraudRules
+      x-ticvai-consumed-by:
+        - "P09 ADM-614 Refund Approval & Exception Workflow\t121"
+        - "P09 ADM-630 Payment Risk Rule & Decision Engine\t167"
       summary: Change what holds a transaction
       description: '**The whole set in one call**, because a rule set edited one rule at a time spends
         time in states nobody intended — a threshold lowered before its companion is raised.
@@ -2587,6 +2593,10 @@ paths:
         **Refused rather than added where capacity has gone.** A line added optimistically and removed
         at checkout is a guest who thinks they bought something.
 
+        **A line added from a recommendation carries its `recommendationId`** (29 September, build;
+        AI system design 2.2 A step 8): the `trackingId` of the ai `decideRecommendations` item, kept on
+        the cart line and the order line so the purchase is attributed rather than guessed.
+
         **An hourly product carries its booked window** (decided 29 September, rev 3 REV3-13).
         A meeting room is a product with a `length` variant, and the line sends `bookedWindow`
         `{startsAt, endsAt}`, which must span exactly the variant''s length. The lease holds capacity of
@@ -2959,6 +2969,21 @@ paths:
         `attributes.transport`** on the order line (rev 3 REV3-21), so the ticket shows the route, the
         stations and the departure.
 
+        **Transaction risk before the charge** (29 September, build; AI system design 2.2 B). After the
+        orders `FraudRule` charge rules, checkout calls ai `scoreTransactionRisk` (service audience, 80 ms
+        timeout) with the order id, amount, channel, product mix, payment token reference (never card
+        data), hashed device id, account, subject and attempt number, and (29 September, build pass, group
+        G2, from group G1''s handoff; 8.3.8, 8.3.40) `ipHash` and `ipCountry` computed at the edge from the
+        caller''s address (the address itself is not passed) and `sessionRef`, the storefront session the
+        checkout came from, which joins the browsing in `storefront.sessionEvent`. `allow` and `monitor` proceed;
+        `stepUp` asks for 3-D Secure through Payments; `holdForReview` takes the same hold a `FraudRule`
+        `hold` takes, so the order waits for review and is not declined. **On a timeout or an error
+        checkout proceeds on its own rules** (fail-open); a tenant set to fail closed holds, and never
+        declines.
+
+        **A line''s `recommendationId` is carried to the order line** (design 2.2 A step 8), so
+        `order.completed` attributes the purchase to the recommendation it came from.
+
         '
       tags:
       - cart
@@ -3268,6 +3293,21 @@ paths:
         schema:
           type: string
           format: uuid
+      - name: format
+        in: query
+        description: 2.14.23. `pdf` also renders the statement, lines with tax and discount, and returns a
+          short-lived link in `pdfUrl` (29 September, build pass). The JSON is the same either way.
+        schema:
+          type: string
+          enum:
+          - json
+          - pdf
+          default: json
+      - name: language
+        in: query
+        schema:
+          type: string
+          pattern: ^[a-z]{2}(-[A-Z]{2})?$
       responses:
         '200':
           description: Statement
@@ -12726,9 +12766,443 @@ paths:
                         $ref: '#/components/schemas/PaymentAllocationRule'
         '403':
           $ref: ../shared/common.yaml#/components/responses/Forbidden
+  /chargebacks/intake:
+    post:
+      operationId: recordChargeback
+      x-ticvai-consumed-by:
+        - "P08 BO-025 Chargebacks & Disputes"
+        - "P09 ADM-634 Chargeback & Dispute Command Center\t172"
+      x-ticvai-audience:
+      - staff
+      - service
+      x-ticvai-agreed: '29 September: our build plan (retrace 5.7.92); shape follows respondToChargeback'
+      summary: Take in a chargeback notified by a provider
+      description: >
+        5.7.92, BL-118. **Where a chargeback enters the platform.** The payments integration calls this
+        (`service`) for each dispute notification a provider sends; staff call it for a case read from an
+        acquirer portal that sends none. The case is matched to its payment by the provider's transaction
+        reference, created in `received` with the evidence deadline the provider gave, and the money the
+        acquirer took back is posted at once: `chargebackDebit` for the amount and `chargebackFee` for any
+        fee, to the fiscal period open for the notification date. **The ledger reflects the loss when the
+        bank takes the money, not when the case is decided.**
+
+        The same `providerCaseReference` from the same provider is one case: a repeat notification returns
+        the existing case unchanged (200) rather than posting twice.
+
+        **Publishes `order.chargebackRecorded` with stage `received`** in the same transaction as the case
+        and the debit (29 September, build pass, group G2; ADR-0033): the chargeback signal the risk engine
+        scores the guest, card token and device on (8.3.11, 8.3.14). A repeat notification publishes nothing.
+      tags:
+      - orders
+      x-ticvai-permission: ORDER_REFUND_APPROVE
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - providerId
+              - providerCaseReference
+              - amount
+              - reason
+              - evidenceDueBy
+              properties:
+                providerId:
+                  type: string
+                  format: uuid
+                providerCaseReference:
+                  type: string
+                  maxLength: 200
+                providerTransactionReference:
+                  type: string
+                  maxLength: 200
+                  description: Matched to the payment. Either this or `paymentId`.
+                paymentId:
+                  type: string
+                  pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+                amount:
+                  $ref: ../shared/common.yaml#/components/schemas/Money
+                feeAmount:
+                  $ref: ../shared/common.yaml#/components/schemas/Money
+                reason:
+                  type: string
+                  enum:
+                  - fraudulent
+                  - productNotReceived
+                  - productUnacceptable
+                  - duplicate
+                  - subscriptionCancelled
+                  - creditNotProcessed
+                  - unrecognised
+                  - other
+                schemeReasonCode:
+                  type: string
+                  maxLength: 20
+                  nullable: true
+                evidenceDueBy:
+                  type: string
+                  format: date-time
+                notifiedAt:
+                  type: string
+                  format: date-time
+      responses:
+        '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: Already recorded; the existing case, unchanged
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Chargeback'
+        '201':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: Recorded and the debit posted
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Chargeback'
+        '404':
+          description: No payment matches the reference given.
+          x-ticvai-problem-types:
+          - payment-not-found
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
+        '409':
+          description: The fiscal period for the notification date is not open.
+          x-ticvai-problem-types:
+          - fiscal-period-not-open
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
+  /chargebacks/{chargebackId}/assign:
+    parameters:
+    - name: chargebackId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    post:
+      operationId: assignChargeback
+      x-ticvai-consumed-by:
+        - "P08 BO-025 Chargebacks & Disputes"
+        - "P09 ADM-633 Fraud Alert, Investigation & Case Management\t170"
+        - "P09 ADM-634 Chargeback & Dispute Command Center\t172"
+      x-ticvai-audience:
+      - staff
+      x-ticvai-agreed: '29 September: our build plan (retrace 5.7.92 investigation workflow); shape follows respondToChargeback'
+      summary: Give a chargeback to an investigator, with a note
+      description: >
+        5.7.92. **The investigation step between receipt and response.** Names who owns the case and moves
+        it from `received` to `underReview`; a later call reassigns it. Each call appends its note to the
+        case's investigation log with who wrote it and when, so the representment can say what was checked.
+      tags:
+      - orders
+      x-ticvai-permission: ORDER_REFUND_APPROVE
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - assigneePrincipalId
+              properties:
+                assigneePrincipalId:
+                  type: string
+                  format: uuid
+                note:
+                  type: string
+                  maxLength: 2000
+                  nullable: true
+      responses:
+        '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: Assigned
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Chargeback'
+        '404':
+          $ref: ../shared/common.yaml#/components/responses/NotFound
+        '409':
+          description: The case is already decided (`won`, `lost`, `accepted` or `expired`).
+          x-ticvai-problem-types:
+          - chargebackClosed
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/PaymentProblem'
+  /chargebacks/{chargebackId}/outcome:
+    parameters:
+    - name: chargebackId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    post:
+      operationId: recordChargebackOutcome
+      x-ticvai-consumed-by:
+        - "P08 BO-025 Chargebacks & Disputes"
+        - "P09 ADM-634 Chargeback & Dispute Command Center\t172"
+      x-ticvai-audience:
+      - staff
+      - service
+      x-ticvai-agreed: '29 September: our build plan (retrace 5.7.92 ledger adjustment); shape follows respondToChargeback'
+      summary: Record the bank's decision and adjust the ledger
+      description: >
+        5.7.92. **The provider's final answer.** `won`: the money comes back and `chargebackReversal` posts
+        the amount back against the debit posted at intake. `lost`: the debit stands and nothing further
+        posts except any additional fee. `expired`: the deadline passed without a response and it is treated
+        as lost. The journal entry posted is kept on the case (`outcomeJournalEntryId`), so finance can
+        trace a case to its postings both ways.
+
+        **Publishes `order.chargebackRecorded` with stage `decided` and the outcome** (29 September, build
+        pass, group G2): the label the risk engine learns from (`states/chargeback.yaml`).
+      tags:
+      - orders
+      x-ticvai-permission: ORDER_REFUND_APPROVE
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - outcome
+              properties:
+                outcome:
+                  type: string
+                  enum:
+                  - won
+                  - lost
+                  - expired
+                additionalFeeAmount:
+                  $ref: ../shared/common.yaml#/components/schemas/Money
+                decidedAt:
+                  type: string
+                  format: date-time
+                note:
+                  type: string
+                  maxLength: 2000
+                  nullable: true
+      responses:
+        '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: Outcome recorded and posted
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Chargeback'
+        '404':
+          $ref: ../shared/common.yaml#/components/responses/NotFound
+        '409':
+          description: The case already has an outcome, or was `accepted` by the venue (a conceded case cannot be
+            won), or the fiscal period for the decision date is not open.
+          x-ticvai-problem-types:
+          - chargebackClosed
+          - fiscal-period-not-open
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/PaymentProblem'
+  /chargebacks/analytics:
+    get:
+      operationId: getChargebackAnalytics
+      x-ticvai-consumed-by:
+        - "P08 BO-025 Chargebacks & Disputes"
+        - "P09 ADM-633 Fraud Alert, Investigation & Case Management\t170"
+        - "P09 ADM-634 Chargeback & Dispute Command Center\t172"
+        - "P09 ADM-637 AI Fraud, Anomaly & Payment Intelligence Center\t175"
+      x-ticvai-audience:
+      - staff
+      x-ticvai-agreed: '29 September: our build plan (retrace 4.2.21); shape follows getPaymentPerformance'
+      x-ticvai-read-routing: analytical
+      summary: Chargeback rate, win and loss, by reason, provider, outcome and period
+      description: >
+        4.2.21. **What the chargeback queue cannot show: whether it is getting worse.** For a period, the
+        count and value of chargebacks, the chargeback rate against card payments captured in the same
+        period (by count and by value, the measure schemes monitor), the win rate of cases decided, fees
+        paid, and cases lost to a missed deadline, grouped by `groupBy`. Computed from the reporting
+        replica; nothing is stored.
+
+        **By product and by customer** (29 September, build pass, group G2; 8.3.12, 8.3.13). `product`
+        attributes each chargeback to the products on the order lines its payment settled (a chargeback on a
+        payment for two products counts once under each, with its amount split by line value, so the group
+        amounts add up to the total); `productCategory` rolls that up to the product's category. `customer`
+        groups by the guest the order belongs to (`subjectId`; anonymous purchases fall under the key
+        `anonymous`), and with `minChargebacks` it is the list of **customers with repeated chargebacks**:
+        only groups with at least that many in the period are returned, most first. The customer's display
+        name is given only to a caller holding `GUEST_VIEW_PII`; otherwise `label` is null and the key is the
+        id.
+      tags:
+      - orders
+      x-ticvai-permission: ORDER_REFUND_APPROVE
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+      - name: periodFrom
+        in: query
+        required: true
+        schema:
+          type: string
+          format: date
+      - name: periodTo
+        in: query
+        required: true
+        schema:
+          type: string
+          format: date
+      - name: groupBy
+        in: query
+        schema:
+          type: string
+          enum:
+          - reason
+          - provider
+          - outcome
+          - venue
+          - month
+          - product
+          - productCategory
+          - customer
+          default: reason
+      - name: minChargebacks
+        in: query
+        description: Only groups with at least this many chargebacks in the period, ordered by count, most
+          first. Meant for `groupBy` `customer` (repeat chargebacks, 8.3.12); applies to any grouping.
+        schema:
+          type: integer
+          minimum: 1
+      - name: productId
+        in: query
+        schema:
+          type: string
+          format: uuid
+      - name: venueId
+        in: query
+        schema:
+          type: string
+          format: uuid
+      - name: providerId
+        in: query
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: Analytics for the period
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrdChargebackAnalytics'
 
 components:
   schemas:
+    OrdChargebackAnalytics:
+      x-ticvai-persistence: none — computed from orders.chargeback and orders.payment on the reporting replica
+      type: object
+      description: 4.2.21. Chargeback measures for a period, in total and per group.
+      required:
+      - periodFrom
+      - periodTo
+      - groupBy
+      - totals
+      - groups
+      properties:
+        periodFrom:
+          type: string
+          format: date
+        periodTo:
+          type: string
+          format: date
+        groupBy:
+          type: string
+        totals:
+          $ref: '#/components/schemas/OrdChargebackMeasures'
+        groups:
+          type: array
+          items:
+            allOf:
+            - $ref: '#/components/schemas/OrdChargebackMeasures'
+            - type: object
+              required:
+              - key
+              properties:
+                key:
+                  type: string
+                  description: The reason, provider id, outcome, venue id, month (`YYYY-MM`), product id,
+                    product category id, or guest `subjectId` (`anonymous` for purchases with no guest) of the
+                    group.
+                label:
+                  type: string
+                  nullable: true
+                  description: The display name of the group's key. Null for `customer` unless the caller holds
+                    `GUEST_VIEW_PII`.
+    OrdChargebackMeasures:
+      x-ticvai-persistence: none — computed
+      type: object
+      properties:
+        chargebackCount:
+          type: integer
+        chargebackAmount:
+          $ref: ../shared/common.yaml#/components/schemas/Money
+        cardPaymentCount:
+          type: integer
+        chargebackRateByCount:
+          type: number
+          description: Chargebacks received per card payment captured in the period, as a fraction.
+        chargebackRateByValue:
+          type: number
+        decidedCount:
+          type: integer
+        wonCount:
+          type: integer
+        lostCount:
+          type: integer
+        acceptedCount:
+          type: integer
+        expiredCount:
+          type: integer
+          description: Lost to a missed evidence deadline.
+        winRate:
+          type: number
+          nullable: true
+          description: Won over decided (won, lost, expired); null with none decided.
+        recoveredAmount:
+          $ref: ../shared/common.yaml#/components/schemas/Money
+        feeAmount:
+          $ref: ../shared/common.yaml#/components/schemas/Money
+        openCount:
+          type: integer
     ResaleSettlementProblem:
       x-ticvai-persistence: none — error shape
       allOf:
@@ -17899,7 +18373,7 @@ components:
           type: boolean
     Chargeback:
       type: object
-      x-ticvai-persistence: orders.chargeback
+      x-ticvai-persistence: orders.chargeback + orders.chargeback_evidence + orders.chargeback_investigation_log
       description: 'BL-118, CF-144. **A chargeback is not a refund**, and treating it as one is how a
         venue loses them by default.
 
@@ -17976,6 +18450,9 @@ components:
             that admitted them, the delivery, the terms accepted, the IP and device. A venue answering
             a chargeback by hand is a venue answering it late.
 
+            Held as rows of `orders.chargeback_evidence`, one per item (29 September, build: a list of
+            objects needs its own table to be stored at all).
+
             '
           items:
             type: object
@@ -17996,6 +18473,45 @@ components:
           type: string
           format: date-time
           nullable: true
+        schemeReasonCode:
+          type: string
+          nullable: true
+          description: The card scheme's own reason code as notified, beside the mapped `reason` (5.7.92).
+        notifiedAt:
+          type: string
+          format: date-time
+          nullable: true
+          description: When the provider notified the case; the date its debit posts to (`recordChargeback`).
+        assigneePrincipalId:
+          type: string
+          format: uuid
+          nullable: true
+          description: Who is investigating (`assignChargeback`).
+        investigationLog:
+          type: array
+          description: Notes from `assignChargeback` and `recordChargebackOutcome`, oldest first, with who wrote
+            each and when. Append-only. Held as rows of `orders.chargeback_investigation_log` (29 September, build).
+          items:
+            type: object
+            properties:
+              note:
+                type: string
+              principalId:
+                type: string
+                format: uuid
+              at:
+                type: string
+                format: date-time
+        debitJournalEntryId:
+          type: string
+          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+          nullable: true
+          description: The `chargebackDebit` (and `chargebackFee`) entry posted at intake.
+        outcomeJournalEntryId:
+          type: string
+          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+          nullable: true
+          description: The `chargebackReversal` entry posted when the case is won, or the additional fee when lost.
     FraudRule:
       type: object
       x-ticvai-persistence: orders.fraud_rule
@@ -18022,6 +18538,48 @@ components:
           type: object
           description: Velocity, amount, issuer country, device reuse, mismatched billing.
           additionalProperties: true
+        appliesTo:
+          type: string
+          description: '**`refund` rules are evaluated on `createRefund` and `createRefundRequest`** (5.3.33, 29
+            September build pass), before the money moves: a hold sends the refund to approval rather than
+            refusing it. `charge` rules are evaluated before a charge, as before.'
+          enum:
+          - charge
+          - refund
+          default: charge
+        signal:
+          type: string
+          nullable: true
+          description: 'The measured signal where the rule is one of the named ones; `condition` carries anything
+            else. **`refundCount`, `refundValue` and `refundRatio` detect excessive refunds by one guest** (or
+            one payment card, per `subjectKey`) over `windowDays`: the number of refunds, their total value, or
+            refunds as a share of what that guest bought in the window. **Counted over every sales channel**
+            (5.3.33): tickets, F&B, retail (a retail return raises its refund here, `RetailReturn.refundId`) and
+            every other line, because every refund is an `orders.refund` whichever channel sold it. The access
+            `excessiveRefunds` signal is the gate-side view of ticket refunds only.'
+          enum:
+          - velocityCount
+          - velocityAmount
+          - issuerCountry
+          - deviceReuse
+          - billingMismatch
+          - refundCount
+          - refundValue
+          - refundRatio
+        subjectKey:
+          type: string
+          enum:
+          - guest
+          - paymentToken
+          - device
+          default: guest
+        threshold:
+          type: number
+          nullable: true
+        windowDays:
+          type: integer
+          minimum: 1
+          nullable: true
         action:
           type: string
           enum:
@@ -19165,6 +19723,22 @@ components:
           $ref: ../shared/common.yaml#/components/schemas/Money
         description:
           type: string
+        netAmount:
+          $ref: ../shared/common.yaml#/components/schemas/Money
+        discountAmount:
+          $ref: ../shared/common.yaml#/components/schemas/Money
+        taxAmount:
+          $ref: ../shared/common.yaml#/components/schemas/Money
+        taxRate:
+          type: number
+          nullable: true
+          description: 2.14.23. The VAT rate the charge was posted with; `amount` is the gross.
+        taxInvoiceId:
+          type: string
+          format: uuid
+          nullable: true
+          description: The finance tax invoice issued for this charge, where one was (`issueTaxInvoice`); the
+            guest downloads it with `getTaxDocumentRendition`.
         declineClass:
           type: string
           nullable: true
@@ -19209,6 +19783,17 @@ components:
             $ref: '#/components/schemas/BillingStatementLine'
         total:
           $ref: ../shared/common.yaml#/components/schemas/Money
+        taxTotal:
+          $ref: ../shared/common.yaml#/components/schemas/Money
+        discountTotal:
+          $ref: ../shared/common.yaml#/components/schemas/Money
+        pdfUrl:
+          type: string
+          format: uri
+          nullable: true
+          readOnly: true
+          description: Set when `getBillingStatement` is called with `format=pdf`; a short-lived link. The PDF is
+            a statement, not a tax invoice; the tax invoices for its charges are linked per line.
         isTaxInvoice:
           type: boolean
           default: false
@@ -19304,6 +19889,14 @@ components:
         variantId:
           type: string
           format: uuid
+        recommendationId:
+          type: string
+          format: uuid
+          nullable: true
+          description: >
+            The `trackingId` of the ai `decideRecommendations` item this line came from (29 September,
+            build, AI system design 2.2 A step 8), so a purchase is attributed to the recommendation that
+            led to it rather than guessed. Carried from the cart line at checkout; stored on `orders.order_line` and sent in `order.completed` lines.
         performanceId:
           type: string
           format: uuid
@@ -19473,6 +20066,14 @@ components:
           nullable: true
         bookedWindow:
           $ref: '#/components/schemas/BookedWindow'
+        recommendationId:
+          type: string
+          format: uuid
+          nullable: true
+          description: >
+            The `trackingId` of the ai `decideRecommendations` item this line came from (29 September,
+            build, AI system design 2.2 A step 8), so a purchase is attributed to the recommendation that
+            led to it rather than guessed. Set from `addCartLine`; checkout copies it to the order line.
         tableReservationId:
           type: string
           format: uuid
@@ -19759,6 +20360,14 @@ components:
           format: uuid
         bookedWindow:
           $ref: '#/components/schemas/BookedWindow'
+        recommendationId:
+          type: string
+          format: uuid
+          nullable: true
+          description: >
+            The `trackingId` of the ai `decideRecommendations` item this line came from (29 September,
+            build, AI system design 2.2 A step 8), so a purchase is attributed to the recommendation that
+            led to it rather than guessed. Optional; sent by a page or till that shows the engine's recommendations. Not validated against the engine: an unknown id only fails to attribute.
         tableReservationId:
           type: string
           format: uuid

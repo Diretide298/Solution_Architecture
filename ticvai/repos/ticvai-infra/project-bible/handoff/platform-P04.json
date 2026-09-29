@@ -11,11 +11,11 @@
  "note": "Derived by tools/derive-platform.py. **The gaps section is the point** \u2014 a page listing what exists is a directory; one listing what is missing is a worklist.",
  "counts": {
   "screens": 30,
-  "operations": 144,
+  "operations": 148,
   "contracts": 20,
   "modules": 4,
   "undrawn": 0,
-  "operationsWithNoScreen": 153
+  "operationsWithNoScreen": 151
  },
  "waves": {
   "wave1": 27,
@@ -95,6 +95,10 @@
    "operations": 5
   },
   {
+   "contract": "finance",
+   "operations": 5
+  },
+  {
    "contract": "marketing-crm",
    "operations": 4
   },
@@ -119,19 +123,15 @@
    "operations": 2
   },
   {
-   "contract": "finance",
-   "operations": 1
-  },
-  {
    "contract": "assets",
    "operations": 1
   },
   {
-   "contract": "inventory",
+   "contract": "wallet",
    "operations": 1
   },
   {
-   "contract": "wallet",
+   "contract": "inventory",
    "operations": 1
   }
  ],
@@ -241,7 +241,7 @@
    "module": "Sell",
    "wave": 1,
    "route": "/sell/returns-refunds-exchanges",
-   "operations": 9,
+   "operations": 10,
    "drawn": true
   },
   {
@@ -376,7 +376,7 @@
    "module": "Sell",
    "wave": 1,
    "route": "/sell/receipt",
-   "operations": 3,
+   "operations": 6,
    "drawn": true
   },
   {
@@ -650,12 +650,6 @@
     "summary": "What was decided, for whom, where and why"
    },
    {
-    "operation": "listAccessPolicyHistory",
-    "contract": "identity",
-    "verb": "GET",
-    "summary": "Every version, who changed it and why"
-   },
-   {
     "operation": "listAccessPolicyTemplates",
     "contract": "identity",
     "verb": "GET",
@@ -914,12 +908,6 @@
     "summary": "Create or change a governed contact-centre automation"
    },
    {
-    "operation": "setCookieBannerDesign",
-    "contract": "marketing-crm",
-    "verb": "PUT",
-    "summary": "Save a cookie banner design as a new version"
-   },
-   {
     "operation": "setDataProcessingPurpose",
     "contract": "marketing-crm",
     "verb": "PUT",
@@ -966,12 +954,6 @@
     "contract": "marketing-crm",
     "verb": "PUT",
     "summary": "Record or advance a quality evaluation"
-   },
-   {
-    "operation": "setTrackingTechnology",
-    "contract": "marketing-crm",
-    "verb": "PUT",
-    "summary": "Add, classify or retire a tracking technology"
    },
    {
     "operation": "setWaiverAssociation",
@@ -1040,12 +1022,6 @@
     "summary": "Deposits and their authorisation state"
    },
    {
-    "operation": "listFraudRules",
-    "contract": "orders",
-    "verb": "GET",
-    "summary": ""
-   },
-   {
     "operation": "listInvitationAllowances",
     "contract": "orders",
     "verb": "GET",
@@ -1106,16 +1082,28 @@
     "summary": "Take back a share"
    },
    {
-    "operation": "setFraudRules",
-    "contract": "orders",
-    "verb": "PUT",
-    "summary": ""
+    "operation": "explainRecommendation",
+    "contract": "promotions",
+    "verb": "POST",
+    "summary": "Why this was offered, and what was suppressed"
    },
    {
     "operation": "getCouponCodeBatch",
     "contract": "promotions",
     "verb": "GET",
     "summary": "Progress and export of a code batch"
+   },
+   {
+    "operation": "getRecommendations",
+    "contract": "promotions",
+    "verb": "POST",
+    "summary": "What else this guest might want"
+   },
+   {
+    "operation": "getUpsellSuggestions",
+    "contract": "promotions",
+    "verb": "POST",
+    "summary": "Suggestions for a cart"
    },
    {
     "operation": "listAllocationSplits",

@@ -68,7 +68,9 @@ operations:
   offline: false
   reads:
   - promotions.recommendation_experiment
-  writes: []
+  writes:
+  - platform.outbox
+  - promotions.recommendation_experiment
 - operation: createBundle
   verb: POST
   path: /bundles
@@ -160,8 +162,11 @@ operations:
   - staff
   offline: false
   reads:
+  - cache:idempotency
   - promotions.recommendation_strategy
   writes:
+  - cache:idempotency
+  - platform.outbox
   - promotions.recommendation_strategy
 - operation: createUpsellRule
   verb: POST
@@ -220,6 +225,7 @@ operations:
   - promotions.promotion_channel_publication
   writes:
   - cache:idempotency
+  - platform.outbox
   - promotions.promotion
   - promotions.promotion_audit
   - promotions.promotion_channel_publication
@@ -1625,6 +1631,7 @@ operations:
   - promotions.promotion_channel_publication
   writes:
   - cache:idempotency
+  - platform.outbox
   - promotions.promotion
   - promotions.promotion_audit
   - promotions.promotion_channel_publication
@@ -1658,6 +1665,7 @@ operations:
   - promotions.promotion_channel_publication
   writes:
   - cache:idempotency
+  - platform.outbox
   - promotions.promotion
   - promotions.promotion_audit
   - promotions.promotion_channel_publication
@@ -1908,6 +1916,7 @@ operations:
   reads:
   - promotions.product_relationship
   writes:
+  - platform.outbox
   - promotions.product_relationship
 - operation: setPromotionRule
   verb: PUT
@@ -1969,6 +1978,7 @@ operations:
   reads:
   - promotions.recommendation_suppression
   writes:
+  - platform.outbox
   - promotions.recommendation_suppression
 - operation: setRuleTestRecommendation
   verb: PUT
@@ -2114,8 +2124,11 @@ operations:
   - staff
   offline: false
   reads:
+  - cache:idempotency
   - promotions.recommendation_strategy
   writes:
+  - cache:idempotency
+  - platform.outbox
   - promotions.recommendation_strategy
 - operation: voidCouponCode
   verb: POST

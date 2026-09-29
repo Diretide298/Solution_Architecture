@@ -85,6 +85,10 @@ screens:
       back: false
       carries:
       - challengeId
+    - to: ADM-004
+      trigger: Platform Audit Log
+      provenance: derived — ADM-004 declares entryState.params decisionRecordId and ADM-001 holds none
+        of them, so the edge carries nothing and ADM-004 opens cold
   notes: Purpose derived from the screen name and its operations on 17 August, not from a requirement.
   density: compact
   pattern: listDetail
@@ -807,8 +811,8 @@ screens:
       trigger: AI Provider & Credentials
       carries:
       - regionId
-      provenance: derived — ADM-037 declares entryState.params providerId, regionId and ADM-002 holds
-        regionId, so an edge into it carries them
+      provenance: derived — ADM-037 declares entryState.params modelId, providerId, regionId, templateKey
+        and ADM-002 holds regionId, so an edge into it carries them
     - to: ADM-138
       trigger: Promotion Command Center Dashboard
       provenance: derived — ADM-138 declares entryState.params promotionId and ADM-002 holds none of them,
@@ -1159,6 +1163,10 @@ screens:
       back: false
       carries:
       - rightId
+    - to: ADM-004
+      trigger: Platform Audit Log
+      provenance: derived — ADM-004 declares entryState.params decisionRecordId and ADM-003 holds none
+        of them, so the edge carries nothing and ADM-004 opens cold
   notes: 'Purpose derived from the screen name and its operations on 17 August, not from a requirement.
     **Cross-platform navigation removed 24 August**: SCN-003. **A till does not navigate to a back office
     and a guest app does not navigate to either** — those are device handovers, and a flow declares them
@@ -1602,6 +1610,11 @@ screens:
     contract: ai
     purpose: Every prompt, response and action
     trigger: onLoad
+  - operationId: getAiDecisionTrace
+    contract: ai
+    purpose: The full trace of a decision
+    trigger: onAction
+    provenance: build, 29 September 2026
   entryState:
     preloaded:
     - AiInteraction.id
@@ -1609,6 +1622,9 @@ screens:
     - AiInteraction.principalId
     - AiInteraction.audience
     - AiInteraction.subjectId
+    params:
+    - name: decisionRecordId
+      from: navigation
   wireframe:
     status: notStarted
     provenance: generated
@@ -3605,6 +3621,11 @@ screens:
     contract: subscription
     purpose: List tenants
     trigger: onLoad
+  - operationId: listCreditNotes
+    contract: subscription
+    purpose: Credit notes beside the invoices
+    trigger: onLoad
+    provenance: build, 29 September 2026
   entryState:
     params:
     - name: tenantId
@@ -10437,6 +10458,12 @@ screens:
     - name: contentBody
       slot: collection
       components:
+      - kind: publishGate
+        impliedBy: publishPromptTemplate
+        notes: 'Declares `publishPromptTemplate`. **The gate names what the publish will affect before
+          it happens**: which tenants, venues or capabilities take the new version, and that the previous
+          one stays available to roll back to.'
+        provenance: check-screens publish rule, 29 September 2026
       - kind: selectField
         label: Tenant
         bindsTo: Tenant
@@ -10595,6 +10622,36 @@ screens:
     trigger: onAction
     invalidates:
     - listAiProviders
+  - operationId: listAiModels
+    contract: ai
+    purpose: The model catalogue
+    trigger: onLoad
+    provenance: build, 29 September 2026
+  - operationId: setAiModel
+    contract: ai
+    purpose: Add or change a platform model (platform)
+    trigger: onAction
+    provenance: build, 29 September 2026
+  - operationId: listPromptTemplates
+    contract: ai
+    purpose: The prompt registry
+    trigger: onLoad
+    provenance: build, 29 September 2026
+  - operationId: publishPromptTemplate
+    contract: ai
+    purpose: Publish a prompt template version
+    trigger: onAction
+    provenance: build, 29 September 2026
+  - operationId: setAiByokEnablement
+    contract: ai
+    purpose: Enable or disable bring-your-own-key for a tenant (platform)
+    trigger: onAction
+    provenance: build, 29 September 2026
+  - operationId: getAiByokEnablement
+    contract: ai
+    purpose: Whether a tenant may bring its own key
+    trigger: onLoad
+    provenance: build, 29 September 2026
   entryState:
     params:
     - name: providerId
@@ -10602,6 +10659,12 @@ screens:
     - name: regionId
       from: navigation
       optional: true
+    - name: modelId
+      from: navigation
+    - name: templateKey
+      from: navigation
+    - name: tenantId
+      from: session
     coldEntry: '**A platform-admin link resolves against the tenant in the link and refuses if the operator
       does not hold that tenant.** A link is not authorisation. If the target is gone the screen says
       so and returns to the directory — **an admin console that silently shows the wrong tenant is worse
@@ -11812,6 +11875,11 @@ screens:
     contract: marketing-crm
     purpose: AI Delivery Optimization & Communication Platform Diagnostics
     trigger: onLoad
+  - operationId: requestSuggestion
+    contract: ai
+    purpose: 'Send-time suggestion (kind sendTime): best hour and channel per recipient'
+    trigger: onAction
+    provenance: build, 29 September 2026
   entryState:
     preloaded: []
   wireframe:
@@ -14587,6 +14655,16 @@ screens:
     contract: catalogue
     purpose: Tax, Fee & Calculation Command Center
     trigger: onLoad
+  - operationId: listTaxInvoices
+    contract: finance
+    purpose: List tax invoices
+    trigger: onLoad
+    provenance: build, 29 September 2026
+  - operationId: getVatReturn
+    contract: finance
+    purpose: VAT return (FTA boxes) for a period
+    trigger: onLoad
+    provenance: build, 29 September 2026
   entryState:
     preloaded:
     - TaxFeeCalculationCommandCenterSummary.activeTaxProfiles
@@ -14718,6 +14796,26 @@ screens:
     contract: catalogue
     purpose: Tax Profile & Jurisdiction Configuration
     trigger: onAction
+  - operationId: listTaxInvoiceTemplates
+    contract: finance
+    purpose: Show invoice templates and number series
+    trigger: onLoad
+    provenance: build, 29 September 2026
+  - operationId: setTaxInvoiceTemplate
+    contract: finance
+    purpose: Edit an invoice template and series
+    trigger: onAction
+    provenance: build, 29 September 2026
+  - operationId: listEInvoicingProviders
+    contract: finance
+    purpose: Show the e-invoicing provider connection
+    trigger: onLoad
+    provenance: build, 29 September 2026
+  - operationId: setEInvoicingProvider
+    contract: finance
+    purpose: Configure the e-invoicing provider
+    trigger: onAction
+    provenance: build, 29 September 2026
   wireframe:
     status: notStarted
     provenance: generated
@@ -15672,6 +15770,15 @@ screens:
         impliedBy: listCalculationValidationReconciliation
         notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
           a venue''s busiest hour is a list that skips rows.'
+      - kind: primaryButton
+        derived: true
+        impliedBy: transmitEInvoices
+        notes: The act the screen exists for.
+      - kind: secondaryButton
+        label: Cancel
+        notes: '**A screen that can submit must be leaveable without submitting.**'
+        derived: true
+        impliedBy: transmitEInvoices
   states:
     loading: The calculation validation reconciliation list.
     error: Could not load. Names which read failed and leaves the calculation validation reconciliation
@@ -15687,6 +15794,21 @@ screens:
     contract: catalogue
     purpose: Calculation Validation, Reconciliation & Service Interface
     trigger: onLoad
+  - operationId: listEInvoicingProviders
+    contract: finance
+    purpose: Show the e-invoicing provider connection
+    trigger: onLoad
+    provenance: build, 29 September 2026
+  - operationId: listEInvoiceTransmissions
+    contract: finance
+    purpose: E-invoicing transmission log and failures
+    trigger: onLoad
+    provenance: build, 29 September 2026
+  - operationId: transmitEInvoices
+    contract: finance
+    purpose: Send / resend documents to e-invoicing
+    trigger: onAction
+    provenance: build, 29 September 2026
   entryState:
     preloaded:
     - CalculationValidationReconciliationServiceInterfaceView.code
@@ -29675,6 +29797,10 @@ screens:
         impliedBy: listComponentInventoryAvailability
         notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
           a venue''s busiest hour is a list that skips rows.'
+      - kind: detailPanel
+        derived: true
+        impliedBy: getInventoryKitDefinition
+        notes: One record, read-only.
   states:
     loading: The component inventory availability list.
     error: Could not load. Names which read failed and leaves the component inventory availability untouched.
@@ -29689,9 +29815,17 @@ screens:
     contract: promotions
     purpose: Component Inventory & Availability Matrix
     trigger: onLoad
+  - operationId: getInventoryKitDefinition
+    contract: inventory
+    purpose: Show kit components
+    trigger: onLoad
+    provenance: build, 29 September 2026
   entryState:
     preloaded:
     - ComponentInventoryAvailabilityMatrixView.availabilitySource
+    params:
+    - name: itemId
+      from: navigation
   wireframe:
     status: notStarted
     provenance: generated
@@ -36512,6 +36646,12 @@ screens:
     provenance: decided 29 September, readiness close-out (QA wiring note)
     invalidates:
     - listApprovalRequests
+  - operationId: getApprovalRequestScore
+    contract: ai
+    purpose: Risk band, priority and suggested escalation for the request, as context only (no approve/reject
+      suggestion)
+    trigger: onLoad
+    provenance: build, 29 September 2026
   entryState:
     preloaded:
     - ApprovalRequest.id
@@ -36522,6 +36662,8 @@ screens:
     - UnifiedApprovalInboxDecisionWorkspaceView.priority
     params:
     - name: requestId
+      from: navigation
+    - name: approvalRequestId
       from: navigation
   wireframe:
     status: notStarted
@@ -47777,6 +47919,16 @@ screens:
     purpose: Which methods approvers have enrolled, because a policy demanding a factor nobody holds locks
       the action
     trigger: onLoad
+  - operationId: getGuestVerificationPolicy
+    contract: identity
+    purpose: The tenant's guest identity-verification workflow
+    trigger: onLoad
+    provenance: build, 29 September 2026
+  - operationId: setGuestVerificationPolicy
+    contract: identity
+    purpose: Set which verifications guests must pass, and when
+    trigger: onAction
+    provenance: build, 29 September 2026
   wireframe:
     status: notStarted
     board: wireframes/P09 TICVAI Web.dc.html#adm-342
@@ -48139,6 +48291,16 @@ screens:
     provenance: board reading, 19 September 2026
     invalidates:
     - getApprovalRecord
+  - operationId: listDataRetentionSettings
+    contract: tenancy
+    purpose: Retention period per data class
+    trigger: onLoad
+    provenance: build, 29 September 2026
+  - operationId: setDataRetentionSetting
+    contract: tenancy
+    purpose: Set a class's period (approvalRecord, aiDecisionRecords)
+    trigger: onAction
+    provenance: build, 29 September 2026
   wireframe:
     status: notStarted
     board: wireframes/P09 TICVAI Web.dc.html#adm-346
@@ -48147,6 +48309,10 @@ screens:
     0 of 0 labels bound to a contract property; 8 of 16 pack bullets carried onto the screen — the rest
     are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts
     rather than here.
+  entryState:
+    params:
+    - name: dataClass
+      from: navigation
 - id: ADM-347
   name: Regulatory Audit & Evidence Center
   module: Platform
@@ -48418,6 +48584,16 @@ screens:
     purpose: Which modules raise approvals
     trigger: onLoad
     provenance: board reading, 19 September 2026
+  - operationId: listApprovalExternalProviders
+    contract: approvals
+    purpose: External providers and their health
+    trigger: onLoad
+    provenance: build, 29 September 2026
+  - operationId: listApprovalExternalDispatches
+    contract: approvals
+    purpose: Levels waiting on or failed in external systems
+    trigger: onLoad
+    provenance: build, 29 September 2026
   entryState:
     preloaded:
     - Connected TICVAI Modules
@@ -48668,6 +48844,11 @@ screens:
     trigger: onAction
     provenance: board reading, 19 September 2026
     invalidates: *id004
+  - operationId: listWebhookEventTypes
+    contract: public-api
+    purpose: Workflow events published through the event framework (publisher=approvals)
+    trigger: onLoad
+    provenance: build, 29 September 2026
   wireframe:
     status: notStarted
     board: wireframes/P09 TICVAI Web.dc.html#adm-352
@@ -48748,6 +48929,16 @@ screens:
     purpose: Webhook subscriptions
     trigger: onAction
     provenance: board reading, 19 September 2026
+  - operationId: listWebhookEventTypes
+    contract: public-api
+    purpose: Events a subscription can take
+    trigger: onLoad
+    provenance: build, 29 September 2026
+  - operationId: listWebhookSubscriptions
+    contract: public-api
+    purpose: Existing subscriptions
+    trigger: onLoad
+    provenance: build, 29 September 2026
   wireframe:
     status: notStarted
     board: wireframes/P09 TICVAI Web.dc.html#adm-353
@@ -48831,6 +49022,16 @@ screens:
     purpose: External workflow systems
     trigger: onLoad
     provenance: board reading, 19 September 2026
+  - operationId: listApprovalExternalProviders
+    contract: approvals
+    purpose: Registered external workflow systems
+    trigger: onLoad
+    provenance: build, 29 September 2026
+  - operationId: setApprovalExternalProvider
+    contract: approvals
+    purpose: Register or change a provider
+    trigger: onAction
+    provenance: build, 29 September 2026
   wireframe:
     status: notStarted
     board: wireframes/P09 TICVAI Web.dc.html#adm-354
@@ -49077,6 +49278,11 @@ screens:
     purpose: Errors and retries
     trigger: onLoad
     provenance: board reading, 19 September 2026
+  - operationId: listApprovalExternalDispatches
+    contract: approvals
+    purpose: External dispatch errors and retries
+    trigger: onLoad
+    provenance: build, 29 September 2026
   wireframe:
     status: notStarted
     board: wireframes/P09 TICVAI Web.dc.html#adm-357
@@ -49820,7 +50026,11 @@ screens:
     template: split
     regions:
     - name: contentBody
-      components: []
+      components:
+      - kind: detailPanel
+        derived: true
+        impliedBy: getApprovalRequestScore
+        notes: One record, read-only.
   states:
     loading: The approval intelligence list.
     error: Could not load. Names which read failed and leaves the approval intelligence untouched.
@@ -49836,6 +50046,12 @@ screens:
     purpose: What the models see
     trigger: onLoad
     provenance: board reading, 19 September 2026
+  - operationId: getApprovalRequestScore
+    contract: ai
+    purpose: Risk band, priority and suggested escalation for the request, as context only (no approve/reject
+      suggestion)
+    trigger: onLoad
+    provenance: build, 29 September 2026
   wireframe:
     status: notStarted
     board: wireframes/P09 TICVAI Web.dc.html#adm-366
@@ -49844,6 +50060,10 @@ screens:
     0 of 0 labels bound to a contract property; 0 of 13 pack bullets carried onto the screen — the rest
     are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts
     rather than here.
+  entryState:
+    params:
+    - name: approvalRequestId
+      from: navigation
 - id: ADM-367
   name: AI Optimization & What-If Simulator
   module: Platform
@@ -51182,6 +51402,11 @@ screens:
     purpose: Exceptions and overage
     trigger: onLoad
     provenance: board reading, 19 September 2026
+  - operationId: getPlanRecommendations
+    contract: subscription
+    purpose: Commercial recommendations beside the enforcement position
+    trigger: onLoad
+    provenance: build, 29 September 2026
   entryState:
     preloaded:
     - Active Customers
@@ -56368,6 +56593,11 @@ screens:
     purpose: Thresholds and position
     trigger: onLoad
     provenance: board reading, 19 September 2026
+  - operationId: getPlanRecommendations
+    contract: subscription
+    purpose: What to do about a unit approaching or over its limit (tier versus capacity pack)
+    trigger: onAction
+    provenance: build, 29 September 2026
   wireframe:
     status: notStarted
     board: wireframes/P09 TICVAI Web.dc.html#adm-452
@@ -57232,7 +57462,16 @@ screens:
     template: split
     regions:
     - name: contentBody
-      components: []
+      components:
+      - kind: primaryButton
+        derived: true
+        impliedBy: settleAiUsage
+        notes: The act the screen exists for.
+      - kind: secondaryButton
+        label: Cancel
+        notes: '**A screen that can submit must be leaveable without submitting.**'
+        derived: true
+        impliedBy: settleAiUsage
   states:
     loading: The consumption reconciliation billing list.
     error: Could not load. Names which read failed and leaves the consumption reconciliation billing untouched.
@@ -57248,6 +57487,11 @@ screens:
     purpose: Consumption against invoice
     trigger: onLoad
     provenance: board reading, 19 September 2026
+  - operationId: settleAiUsage
+    contract: subscription
+    purpose: Settle the period's AI token usage into metered billing lines
+    trigger: onAction
+    provenance: build, 29 September 2026
   wireframe:
     status: notStarted
     board: wireframes/P09 TICVAI Web.dc.html#adm-461
@@ -57337,6 +57581,16 @@ screens:
     purpose: Invoices raised
     trigger: onLoad
     provenance: board reading, 19 September 2026
+  - operationId: issueCreditNote
+    contract: subscription
+    purpose: Issue a full or partial credit note
+    trigger: onAction
+    provenance: build, 29 September 2026
+  - operationId: listCreditNotes
+    contract: subscription
+    purpose: Credit notes issued
+    trigger: onLoad
+    provenance: build, 29 September 2026
   wireframe:
     status: notStarted
     board: wireframes/P09 TICVAI Web.dc.html#adm-462
@@ -57668,6 +57922,11 @@ screens:
     purpose: Right-sizing options
     trigger: onAction
     provenance: board reading, 19 September 2026
+  - operationId: getPlanRecommendations
+    contract: subscription
+    purpose: Upgrade, downgrade and right-sizing recommendations for the tenant, priced
+    trigger: onLoad
+    provenance: build, 29 September 2026
   wireframe:
     status: notStarted
     board: wireframes/P09 TICVAI Web.dc.html#adm-465
@@ -57858,6 +58117,16 @@ screens:
     purpose: Raise a dispute
     trigger: onAction
     provenance: board reading, 19 September 2026
+  - operationId: issueCreditNote
+    contract: subscription
+    purpose: Credit an invoice in full or in part
+    trigger: onAction
+    provenance: build, 29 September 2026
+  - operationId: listCreditNotes
+    contract: subscription
+    purpose: Credits against the tenant's invoices
+    trigger: onLoad
+    provenance: build, 29 September 2026
   wireframe:
     status: notStarted
     board: wireframes/P09 TICVAI Web.dc.html#adm-467
@@ -57870,6 +58139,8 @@ screens:
     params:
     - name: invoiceId
       from: navigation
+    - name: tenantId
+      from: session
 - id: ADM-468
   name: Renewal Approval, Activation & Commercial Handoff
   module: Tenants & Licensing
@@ -58108,7 +58379,22 @@ screens:
       and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: startConfigurationSession
+    contract: ai
+    purpose: Start the configuration assistant
+    trigger: onAction
+    provenance: build, 29 September 2026
+  - operationId: listConfigurationSessions
+    contract: ai
+    purpose: Configuration-assistant sessions
+    trigger: onLoad
+    provenance: build, 29 September 2026
+  - operationId: attachConfigurationSource
+    contract: ai
+    purpose: Attach an uploaded brief, brochure, price list, spreadsheet or brand asset to seed the session
+    trigger: onAction
+    provenance: build, 29 September 2026
   entryState:
     preloaded:
     - Museum
@@ -58117,6 +58403,9 @@ screens:
     - Zoo
     - Aquarium
     - Theatre
+    params:
+    - name: sessionId
+      from: session
   wireframe:
     status: notStarted
     board: wireframes/P09 TICVAI Web.dc.html#adm-469
@@ -58223,7 +58512,27 @@ screens:
       data* and sends somebody to support with the wrong question.
     emptyNoResults: '**Nothing matched.** The filter or the scope narrowed it — naming which is what stops
       somebody concluding the record does not exist'
-  apis: []
+  apis:
+  - operationId: startConfigurationSession
+    contract: ai
+    purpose: Start the configuration assistant
+    trigger: onAction
+    provenance: build, 29 September 2026
+  - operationId: answerConfigurationQuestion
+    contract: ai
+    purpose: Answer the current question
+    trigger: onAction
+    provenance: build, 29 September 2026
+  - operationId: attachConfigurationSource
+    contract: ai
+    purpose: Attach an uploaded brief, brochure, price list, spreadsheet or brand asset to seed the session
+    trigger: onAction
+    provenance: build, 29 September 2026
+  - operationId: listConfigurationSources
+    contract: ai
+    purpose: Attached documents with extraction status and what they could not read
+    trigger: onLoad
+    provenance: build, 29 September 2026
   wireframe:
     status: notStarted
     board: wireframes/P09 TICVAI Web.dc.html#adm-470
@@ -58232,6 +58541,10 @@ screens:
     labels bound to a contract property; 15 of 46 pack bullets carried onto the screen — the rest are
     acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather
     than here.
+  entryState:
+    params:
+    - name: sessionId
+      from: session
 - id: ADM-471
   name: Venue & Business Model Discovery
   module: Platform
@@ -58380,7 +58693,17 @@ screens:
       data* and sends somebody to support with the wrong question.
     emptyNoResults: '**Nothing matched.** The filter or the scope narrowed it — naming which is what stops
       somebody concluding the record does not exist'
-  apis: []
+  apis:
+  - operationId: answerConfigurationQuestion
+    contract: ai
+    purpose: Answer the current question
+    trigger: onAction
+    provenance: build, 29 September 2026
+  - operationId: getConfigurationBlueprint
+    contract: ai
+    purpose: The blueprint so far
+    trigger: onLoad
+    provenance: build, 29 September 2026
   wireframe:
     status: notStarted
     board: wireframes/P09 TICVAI Web.dc.html#adm-471
@@ -58389,6 +58712,10 @@ screens:
     labels bound to a contract property; 47 of 65 pack bullets carried onto the screen — the rest are
     acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather
     than here.
+  entryState:
+    params:
+    - name: sessionId
+      from: session
 - id: ADM-472
   name: Guided Question & Answer Workspace
   module: Platform
@@ -58436,7 +58763,20 @@ screens:
     template: split
     regions:
     - name: contentBody
-      components: []
+      components:
+      - kind: primaryButton
+        derived: true
+        impliedBy: answerConfigurationQuestion
+        notes: The act the screen exists for.
+      - kind: detailPanel
+        derived: true
+        impliedBy: getConfigurationBlueprint
+        notes: One record, read-only.
+      - kind: secondaryButton
+        label: Cancel
+        notes: '**A screen that can submit must be leaveable without submitting.**'
+        derived: true
+        impliedBy: answerConfigurationQuestion
   states:
     loading: The guided question answer list.
     error: Could not load. Names which read failed and leaves the guided question answer untouched.
@@ -58446,7 +58786,17 @@ screens:
       filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: answerConfigurationQuestion
+    contract: ai
+    purpose: Answer the current question
+    trigger: onAction
+    provenance: build, 29 September 2026
+  - operationId: getConfigurationBlueprint
+    contract: ai
+    purpose: The blueprint so far
+    trigger: onLoad
+    provenance: build, 29 September 2026
   wireframe:
     status: notStarted
     board: wireframes/P09 TICVAI Web.dc.html#adm-472
@@ -58455,6 +58805,10 @@ screens:
     labels bound to a contract property; 0 of 54 pack bullets carried onto the screen — the rest are acceptance
     prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than
     here.
+  entryState:
+    params:
+    - name: sessionId
+      from: session
 - id: ADM-473
   name: Product & Admission Model Discovery
   module: Platform
@@ -58501,7 +58855,20 @@ screens:
     template: split
     regions:
     - name: contentBody
-      components: []
+      components:
+      - kind: primaryButton
+        derived: true
+        impliedBy: answerConfigurationQuestion
+        notes: The act the screen exists for.
+      - kind: detailPanel
+        derived: true
+        impliedBy: getConfigurationBlueprint
+        notes: One record, read-only.
+      - kind: secondaryButton
+        label: Cancel
+        notes: '**A screen that can submit must be leaveable without submitting.**'
+        derived: true
+        impliedBy: answerConfigurationQuestion
   states:
     loading: The product admission model list.
     error: Could not load. Names which read failed and leaves the product admission model untouched.
@@ -58511,7 +58878,17 @@ screens:
       active filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: answerConfigurationQuestion
+    contract: ai
+    purpose: Answer the current question
+    trigger: onAction
+    provenance: build, 29 September 2026
+  - operationId: getConfigurationBlueprint
+    contract: ai
+    purpose: The blueprint so far
+    trigger: onLoad
+    provenance: build, 29 September 2026
   wireframe:
     status: notStarted
     board: wireframes/P09 TICVAI Web.dc.html#adm-473
@@ -58520,6 +58897,10 @@ screens:
     labels bound to a contract property; 0 of 51 pack bullets carried onto the screen — the rest are acceptance
     prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than
     here.
+  entryState:
+    params:
+    - name: sessionId
+      from: session
 - id: ADM-474
   name: Operational Requirement Discovery
   module: Platform
@@ -58578,7 +58959,16 @@ screens:
         label: Confirm Operations | Add Requirement | Continue
         provenance: pack AI_Configuration_Assistant_Reference.pdf, page 12 §Actions
     - name: contentBody
-      components: []
+      components:
+      - kind: detailPanel
+        derived: true
+        impliedBy: getConfigurationBlueprint
+        notes: One record, read-only.
+      - kind: secondaryButton
+        label: Cancel
+        notes: '**A screen that can submit must be leaveable without submitting.**'
+        derived: true
+        impliedBy: answerConfigurationQuestion
   states:
     loading: The operational requirement discovery list.
     error: Could not load. Names which read failed and leaves the operational requirement discovery untouched.
@@ -58588,7 +58978,17 @@ screens:
       Names the active filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: answerConfigurationQuestion
+    contract: ai
+    purpose: Answer the current question
+    trigger: onAction
+    provenance: build, 29 September 2026
+  - operationId: getConfigurationBlueprint
+    contract: ai
+    purpose: The blueprint so far
+    trigger: onLoad
+    provenance: build, 29 September 2026
   wireframe:
     status: notStarted
     board: wireframes/P09 TICVAI Web.dc.html#adm-474
@@ -58597,6 +58997,10 @@ screens:
     labels bound to a contract property; 1 of 47 pack bullets carried onto the screen — the rest are acceptance
     prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than
     here.
+  entryState:
+    params:
+    - name: sessionId
+      from: session
 - id: ADM-475
   name: Commercial Requirement Discovery
   module: Platform
@@ -58644,7 +59048,20 @@ screens:
     template: split
     regions:
     - name: contentBody
-      components: []
+      components:
+      - kind: primaryButton
+        derived: true
+        impliedBy: answerConfigurationQuestion
+        notes: The act the screen exists for.
+      - kind: detailPanel
+        derived: true
+        impliedBy: getConfigurationBlueprint
+        notes: One record, read-only.
+      - kind: secondaryButton
+        label: Cancel
+        notes: '**A screen that can submit must be leaveable without submitting.**'
+        derived: true
+        impliedBy: answerConfigurationQuestion
   states:
     loading: The commercial requirement discovery list.
     error: Could not load. Names which read failed and leaves the commercial requirement discovery untouched.
@@ -58654,7 +59071,17 @@ screens:
       the active filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: answerConfigurationQuestion
+    contract: ai
+    purpose: Answer the current question
+    trigger: onAction
+    provenance: build, 29 September 2026
+  - operationId: getConfigurationBlueprint
+    contract: ai
+    purpose: The blueprint so far
+    trigger: onLoad
+    provenance: build, 29 September 2026
   wireframe:
     status: notStarted
     board: wireframes/P09 TICVAI Web.dc.html#adm-475
@@ -58663,6 +59090,10 @@ screens:
     labels bound to a contract property; 0 of 45 pack bullets carried onto the screen — the rest are acceptance
     prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than
     here.
+  entryState:
+    params:
+    - name: sessionId
+      from: session
 - id: ADM-476
   name: Required, Recommended & Optional Decisions
   module: Platform
@@ -58721,7 +59152,17 @@ screens:
       data* and sends somebody to support with the wrong question.
     emptyNoResults: '**Nothing matched.** The filter or the scope narrowed it — naming which is what stops
       somebody concluding the record does not exist'
-  apis: []
+  apis:
+  - operationId: getConfigurationBlueprint
+    contract: ai
+    purpose: The blueprint so far
+    trigger: onLoad
+    provenance: build, 29 September 2026
+  - operationId: decideBlueprintRecommendation
+    contract: ai
+    purpose: Accept, modify, reject or defer a blueprint decision
+    trigger: onAction
+    provenance: build, 29 September 2026
   wireframe:
     status: notStarted
     board: wireframes/P09 TICVAI Web.dc.html#adm-476
@@ -58730,6 +59171,12 @@ screens:
     labels bound to a contract property; 4 of 40 pack bullets carried onto the screen — the rest are acceptance
     prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than
     here.
+  entryState:
+    params:
+    - name: decisionKey
+      from: navigation
+    - name: sessionId
+      from: session
 - id: ADM-477
   name: Missing Information & Clarification Center
   module: Platform
@@ -58792,7 +59239,32 @@ screens:
       Names the active filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: answerConfigurationQuestion
+    contract: ai
+    purpose: Answer the current question
+    trigger: onAction
+    provenance: build, 29 September 2026
+  - operationId: getConfigurationBlueprint
+    contract: ai
+    purpose: The blueprint so far
+    trigger: onLoad
+    provenance: build, 29 September 2026
+  - operationId: decideBlueprintRecommendation
+    contract: ai
+    purpose: Accept, modify, reject or defer a blueprint decision
+    trigger: onAction
+    provenance: build, 29 September 2026
+  - operationId: attachConfigurationSource
+    contract: ai
+    purpose: Attach an uploaded brief, brochure, price list, spreadsheet or brand asset to seed the session
+    trigger: onAction
+    provenance: build, 29 September 2026
+  - operationId: listConfigurationSources
+    contract: ai
+    purpose: Attached documents with extraction status and what they could not read
+    trigger: onLoad
+    provenance: build, 29 September 2026
   wireframe:
     status: notStarted
     board: wireframes/P09 TICVAI Web.dc.html#adm-477
@@ -58801,6 +59273,12 @@ screens:
     labels bound to a contract property; 5 of 26 pack bullets carried onto the screen — the rest are acceptance
     prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than
     here.
+  entryState:
+    params:
+    - name: decisionKey
+      from: navigation
+    - name: sessionId
+      from: session
 - id: ADM-478
   name: Configuration Blueprint & Dependency Map
   module: Platform
@@ -58848,7 +59326,20 @@ screens:
     template: split
     regions:
     - name: contentBody
-      components: []
+      components:
+      - kind: detailPanel
+        derived: true
+        impliedBy: getConfigurationBlueprint
+        notes: One record, read-only.
+      - kind: primaryButton
+        derived: true
+        impliedBy: buildConfigurationPlan
+        notes: The act the screen exists for.
+      - kind: secondaryButton
+        label: Cancel
+        notes: '**A screen that can submit must be leaveable without submitting.**'
+        derived: true
+        impliedBy: buildConfigurationPlan
   states:
     loading: The blueprint dependency map list.
     error: Could not load. Names which read failed and leaves the blueprint dependency map untouched.
@@ -58858,7 +59349,17 @@ screens:
       own statuses are Blueprint Ready — the state names which is selected.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: getConfigurationBlueprint
+    contract: ai
+    purpose: The blueprint so far
+    trigger: onLoad
+    provenance: build, 29 September 2026
+  - operationId: buildConfigurationPlan
+    contract: ai
+    purpose: Compile the blueprint into a plan
+    trigger: onAction
+    provenance: build, 29 September 2026
   wireframe:
     status: notStarted
     board: wireframes/P09 TICVAI Web.dc.html#adm-478
@@ -58867,6 +59368,10 @@ screens:
     labels bound to a contract property; 5 of 16 pack bullets carried onto the screen — the rest are acceptance
     prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than
     here.
+  entryState:
+    params:
+    - name: sessionId
+      from: session
 - id: ADM-479
   name: AI Configuration Build Command Center
   module: Platform
@@ -58904,30 +59409,55 @@ screens:
     - to: ADM-480
       trigger: Venue & Organization Configuration
       provenance: structural — pack board 2 wiring, 19 September 2026
+      carries:
+      - decisionKey
+      - planId
     - to: ADM-481
       trigger: Product Configuration Assistant
       provenance: structural — pack board 2 wiring, 19 September 2026
+      carries:
+      - decisionKey
+      - planId
     - to: ADM-482
       trigger: Schedule, Capacity & Availability Configuration
       provenance: structural — pack board 2 wiring, 19 September 2026
+      carries:
+      - decisionKey
+      - planId
     - to: ADM-483
       trigger: Pricing & Commercial Configuration
       provenance: structural — pack board 2 wiring, 19 September 2026
+      carries:
+      - decisionKey
+      - planId
     - to: ADM-484
       trigger: Promotion, Bundle & Upsell Configuration
       provenance: structural — pack board 2 wiring, 19 September 2026
+      carries:
+      - decisionKey
+      - planId
     - to: ADM-485
       trigger: Seating, Access & Operational Configuration
       provenance: structural — pack board 2 wiring, 19 September 2026
+      carries:
+      - decisionKey
+      - planId
     - to: ADM-486
       trigger: Channel, Media & Fulfillment Configuration
       provenance: structural — pack board 2 wiring, 19 September 2026
+      carries:
+      - decisionKey
+      - planId
     - to: ADM-487
       trigger: Cross-Module Conflict & Dependency Validation
       provenance: structural — pack board 2 wiring, 19 September 2026
+      carries:
+      - planId
     - to: ADM-488
       trigger: Configuration Preview & Impact Analysis
       provenance: structural — pack board 2 wiring, 19 September 2026
+      carries:
+      - planId
   density: compact
   pattern: commandCentre
   patternReason: the pack gives this screen a metric directory (§Header KPIs) and no per-row directory
@@ -58973,7 +59503,22 @@ screens:
       Building Configuration — the state names which is selected.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: getActionPlan
+    contract: ai
+    purpose: A plan with its steps
+    trigger: onLoad
+    provenance: build, 29 September 2026
+  - operationId: getConfigurationBlueprint
+    contract: ai
+    purpose: The blueprint so far
+    trigger: onLoad
+    provenance: build, 29 September 2026
+  - operationId: buildConfigurationPlan
+    contract: ai
+    purpose: Compile the blueprint into a plan
+    trigger: onAction
+    provenance: build, 29 September 2026
   wireframe:
     status: notStarted
     board: wireframes/P09 TICVAI Web.dc.html#adm-479
@@ -58982,6 +59527,12 @@ screens:
     labels bound to a contract property; 12 of 62 pack bullets carried onto the screen — the rest are
     acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather
     than here.
+  entryState:
+    params:
+    - name: planId
+      from: navigation
+    - name: sessionId
+      from: session
 - id: ADM-480
   name: Venue & Organization Configuration
   module: Platform
@@ -59007,6 +59558,8 @@ screens:
       trigger: Back to AI Configuration Build Command Center
       provenance: structural — pack board 2 wiring, 19 September 2026
       back: true
+      carries:
+      - planId
   density: compact
   pattern: listDetail
   patternReason: '**nothing in the pack chooses a pattern for this screen** — no metric directory, no
@@ -59029,7 +59582,20 @@ screens:
     template: split
     regions:
     - name: contentBody
-      components: []
+      components:
+      - kind: detailPanel
+        derived: true
+        impliedBy: getActionPlan
+        notes: One record, read-only.
+      - kind: primaryButton
+        derived: true
+        impliedBy: decideBlueprintRecommendation
+        notes: The act the screen exists for.
+      - kind: secondaryButton
+        label: Cancel
+        notes: '**A screen that can submit must be leaveable without submitting.**'
+        derived: true
+        impliedBy: decideBlueprintRecommendation
   states:
     loading: The venue organization list.
     error: Could not load. Names which read failed and leaves the venue organization untouched.
@@ -59039,7 +59605,22 @@ screens:
       filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: getActionPlan
+    contract: ai
+    purpose: A plan with its steps
+    trigger: onLoad
+    provenance: build, 29 September 2026
+  - operationId: getConfigurationBlueprint
+    contract: ai
+    purpose: The blueprint so far
+    trigger: onLoad
+    provenance: build, 29 September 2026
+  - operationId: decideBlueprintRecommendation
+    contract: ai
+    purpose: Accept, modify, reject or defer a blueprint decision
+    trigger: onAction
+    provenance: build, 29 September 2026
   wireframe:
     status: notStarted
     board: wireframes/P09 TICVAI Web.dc.html#adm-480
@@ -59048,6 +59629,14 @@ screens:
     labels bound to a contract property; 0 of 43 pack bullets carried onto the screen — the rest are acceptance
     prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than
     here.
+  entryState:
+    params:
+    - name: decisionKey
+      from: navigation
+    - name: planId
+      from: navigation
+    - name: sessionId
+      from: session
 - id: ADM-481
   name: Product Configuration Assistant
   module: Platform
@@ -59073,6 +59662,8 @@ screens:
       trigger: Back to AI Configuration Build Command Center
       provenance: structural — pack board 2 wiring, 19 September 2026
       back: true
+      carries:
+      - planId
   density: compact
   pattern: listDetail
   patternReason: '**nothing in the pack chooses a pattern for this screen** — no metric directory, no
@@ -59096,7 +59687,20 @@ screens:
     template: split
     regions:
     - name: contentBody
-      components: []
+      components:
+      - kind: detailPanel
+        derived: true
+        impliedBy: getActionPlan
+        notes: One record, read-only.
+      - kind: primaryButton
+        derived: true
+        impliedBy: decideBlueprintRecommendation
+        notes: The act the screen exists for.
+      - kind: secondaryButton
+        label: Cancel
+        notes: '**A screen that can submit must be leaveable without submitting.**'
+        derived: true
+        impliedBy: decideBlueprintRecommendation
   states:
     loading: The product assistant list.
     error: Could not load. Names which read failed and leaves the product assistant untouched.
@@ -59106,7 +59710,22 @@ screens:
       filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: getActionPlan
+    contract: ai
+    purpose: A plan with its steps
+    trigger: onLoad
+    provenance: build, 29 September 2026
+  - operationId: getConfigurationBlueprint
+    contract: ai
+    purpose: The blueprint so far
+    trigger: onLoad
+    provenance: build, 29 September 2026
+  - operationId: decideBlueprintRecommendation
+    contract: ai
+    purpose: Accept, modify, reject or defer a blueprint decision
+    trigger: onAction
+    provenance: build, 29 September 2026
   wireframe:
     status: notStarted
     board: wireframes/P09 TICVAI Web.dc.html#adm-481
@@ -59115,6 +59734,14 @@ screens:
     labels bound to a contract property; 0 of 53 pack bullets carried onto the screen — the rest are acceptance
     prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than
     here.
+  entryState:
+    params:
+    - name: decisionKey
+      from: navigation
+    - name: planId
+      from: navigation
+    - name: sessionId
+      from: session
 - id: ADM-482
   name: Schedule, Capacity & Availability Configuration
   module: Platform
@@ -59140,6 +59767,8 @@ screens:
       trigger: Back to AI Configuration Build Command Center
       provenance: structural — pack board 2 wiring, 19 September 2026
       back: true
+      carries:
+      - planId
   density: compact
   pattern: listDetail
   patternReason: '**nothing in the pack chooses a pattern for this screen** — no metric directory, no
@@ -59162,7 +59791,20 @@ screens:
     template: split
     regions:
     - name: contentBody
-      components: []
+      components:
+      - kind: detailPanel
+        derived: true
+        impliedBy: getActionPlan
+        notes: One record, read-only.
+      - kind: primaryButton
+        derived: true
+        impliedBy: decideBlueprintRecommendation
+        notes: The act the screen exists for.
+      - kind: secondaryButton
+        label: Cancel
+        notes: '**A screen that can submit must be leaveable without submitting.**'
+        derived: true
+        impliedBy: decideBlueprintRecommendation
   states:
     loading: The schedule capacity availability list.
     error: Could not load. Names which read failed and leaves the schedule capacity availability untouched.
@@ -59172,7 +59814,22 @@ screens:
       the active filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: getActionPlan
+    contract: ai
+    purpose: A plan with its steps
+    trigger: onLoad
+    provenance: build, 29 September 2026
+  - operationId: getConfigurationBlueprint
+    contract: ai
+    purpose: The blueprint so far
+    trigger: onLoad
+    provenance: build, 29 September 2026
+  - operationId: decideBlueprintRecommendation
+    contract: ai
+    purpose: Accept, modify, reject or defer a blueprint decision
+    trigger: onAction
+    provenance: build, 29 September 2026
   wireframe:
     status: notStarted
     board: wireframes/P09 TICVAI Web.dc.html#adm-482
@@ -59181,6 +59838,14 @@ screens:
     labels bound to a contract property; 0 of 55 pack bullets carried onto the screen — the rest are acceptance
     prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than
     here.
+  entryState:
+    params:
+    - name: decisionKey
+      from: navigation
+    - name: planId
+      from: navigation
+    - name: sessionId
+      from: session
 - id: ADM-483
   name: Pricing & Commercial Configuration
   module: Platform
@@ -59206,6 +59871,8 @@ screens:
       trigger: Back to AI Configuration Build Command Center
       provenance: structural — pack board 2 wiring, 19 September 2026
       back: true
+      carries:
+      - planId
   density: compact
   pattern: listDetail
   patternReason: the pack gives this screen a display directory (§Show) and no metric row
@@ -59263,6 +59930,21 @@ screens:
     contract: catalogue
     purpose: Channel Pricing & Commercial Profile Assignment
     trigger: onAction
+  - operationId: getActionPlan
+    contract: ai
+    purpose: A plan with its steps
+    trigger: onLoad
+    provenance: build, 29 September 2026
+  - operationId: getConfigurationBlueprint
+    contract: ai
+    purpose: The blueprint so far
+    trigger: onLoad
+    provenance: build, 29 September 2026
+  - operationId: decideBlueprintRecommendation
+    contract: ai
+    purpose: Accept, modify, reject or defer a blueprint decision
+    trigger: onAction
+    provenance: build, 29 September 2026
   entryState:
     preloaded:
     - Dynamic Pricing Configuration Required →
@@ -59270,6 +59952,13 @@ screens:
     - Adult / Saturday / B2C
     - AED 120
     - AED 20
+    params:
+    - name: decisionKey
+      from: navigation
+    - name: planId
+      from: navigation
+    - name: sessionId
+      from: session
   wireframe:
     status: notStarted
     board: wireframes/P09 TICVAI Web.dc.html#adm-483
@@ -59303,6 +59992,8 @@ screens:
       trigger: Back to AI Configuration Build Command Center
       provenance: structural — pack board 2 wiring, 19 September 2026
       back: true
+      carries:
+      - planId
   density: compact
   pattern: listDetail
   patternReason: '**nothing in the pack chooses a pattern for this screen** — no metric directory, no
@@ -59325,7 +60016,20 @@ screens:
     template: split
     regions:
     - name: contentBody
-      components: []
+      components:
+      - kind: detailPanel
+        derived: true
+        impliedBy: getActionPlan
+        notes: One record, read-only.
+      - kind: primaryButton
+        derived: true
+        impliedBy: decideBlueprintRecommendation
+        notes: The act the screen exists for.
+      - kind: secondaryButton
+        label: Cancel
+        notes: '**A screen that can submit must be leaveable without submitting.**'
+        derived: true
+        impliedBy: decideBlueprintRecommendation
   states:
     loading: The promotion bundle upsell list.
     error: Could not load. Names which read failed and leaves the promotion bundle upsell untouched.
@@ -59335,7 +60039,22 @@ screens:
       active filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: getActionPlan
+    contract: ai
+    purpose: A plan with its steps
+    trigger: onLoad
+    provenance: build, 29 September 2026
+  - operationId: getConfigurationBlueprint
+    contract: ai
+    purpose: The blueprint so far
+    trigger: onLoad
+    provenance: build, 29 September 2026
+  - operationId: decideBlueprintRecommendation
+    contract: ai
+    purpose: Accept, modify, reject or defer a blueprint decision
+    trigger: onAction
+    provenance: build, 29 September 2026
   wireframe:
     status: notStarted
     board: wireframes/P09 TICVAI Web.dc.html#adm-484
@@ -59344,6 +60063,14 @@ screens:
     labels bound to a contract property; 0 of 43 pack bullets carried onto the screen — the rest are acceptance
     prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than
     here.
+  entryState:
+    params:
+    - name: decisionKey
+      from: navigation
+    - name: planId
+      from: navigation
+    - name: sessionId
+      from: session
 - id: ADM-485
   name: Seating, Access & Operational Configuration
   module: Platform
@@ -59369,6 +60096,8 @@ screens:
       trigger: Back to AI Configuration Build Command Center
       provenance: structural — pack board 2 wiring, 19 September 2026
       back: true
+      carries:
+      - planId
   density: compact
   pattern: listDetail
   patternReason: '**nothing in the pack chooses a pattern for this screen** — no metric directory, no
@@ -59392,7 +60121,20 @@ screens:
     template: split
     regions:
     - name: contentBody
-      components: []
+      components:
+      - kind: detailPanel
+        derived: true
+        impliedBy: getActionPlan
+        notes: One record, read-only.
+      - kind: primaryButton
+        derived: true
+        impliedBy: decideBlueprintRecommendation
+        notes: The act the screen exists for.
+      - kind: secondaryButton
+        label: Cancel
+        notes: '**A screen that can submit must be leaveable without submitting.**'
+        derived: true
+        impliedBy: decideBlueprintRecommendation
   states:
     loading: The seating access operational list.
     error: Could not load. Names which read failed and leaves the seating access operational untouched.
@@ -59402,7 +60144,22 @@ screens:
       active filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: getActionPlan
+    contract: ai
+    purpose: A plan with its steps
+    trigger: onLoad
+    provenance: build, 29 September 2026
+  - operationId: getConfigurationBlueprint
+    contract: ai
+    purpose: The blueprint so far
+    trigger: onLoad
+    provenance: build, 29 September 2026
+  - operationId: decideBlueprintRecommendation
+    contract: ai
+    purpose: Accept, modify, reject or defer a blueprint decision
+    trigger: onAction
+    provenance: build, 29 September 2026
   wireframe:
     status: notStarted
     board: wireframes/P09 TICVAI Web.dc.html#adm-485
@@ -59411,6 +60168,14 @@ screens:
     labels bound to a contract property; 0 of 32 pack bullets carried onto the screen — the rest are acceptance
     prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than
     here.
+  entryState:
+    params:
+    - name: decisionKey
+      from: navigation
+    - name: planId
+      from: navigation
+    - name: sessionId
+      from: session
 - id: ADM-486
   name: Channel, Media & Fulfillment Configuration
   module: Platform
@@ -59436,6 +60201,8 @@ screens:
       trigger: Back to AI Configuration Build Command Center
       provenance: structural — pack board 2 wiring, 19 September 2026
       back: true
+      carries:
+      - planId
   density: compact
   pattern: listDetail
   patternReason: '**nothing in the pack chooses a pattern for this screen** — no metric directory, no
@@ -59457,7 +60224,20 @@ screens:
     template: split
     regions:
     - name: contentBody
-      components: []
+      components:
+      - kind: detailPanel
+        derived: true
+        impliedBy: getActionPlan
+        notes: One record, read-only.
+      - kind: primaryButton
+        derived: true
+        impliedBy: decideBlueprintRecommendation
+        notes: The act the screen exists for.
+      - kind: secondaryButton
+        label: Cancel
+        notes: '**A screen that can submit must be leaveable without submitting.**'
+        derived: true
+        impliedBy: decideBlueprintRecommendation
   states:
     loading: The channel media fulfillment list.
     error: Could not load. Names which read failed and leaves the channel media fulfillment untouched.
@@ -59467,7 +60247,22 @@ screens:
       active filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: getActionPlan
+    contract: ai
+    purpose: A plan with its steps
+    trigger: onLoad
+    provenance: build, 29 September 2026
+  - operationId: getConfigurationBlueprint
+    contract: ai
+    purpose: The blueprint so far
+    trigger: onLoad
+    provenance: build, 29 September 2026
+  - operationId: decideBlueprintRecommendation
+    contract: ai
+    purpose: Accept, modify, reject or defer a blueprint decision
+    trigger: onAction
+    provenance: build, 29 September 2026
   wireframe:
     status: notStarted
     board: wireframes/P09 TICVAI Web.dc.html#adm-486
@@ -59476,6 +60271,14 @@ screens:
     labels bound to a contract property; 0 of 42 pack bullets carried onto the screen — the rest are acceptance
     prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than
     here.
+  entryState:
+    params:
+    - name: decisionKey
+      from: navigation
+    - name: planId
+      from: navigation
+    - name: sessionId
+      from: session
 - id: ADM-487
   name: Cross-Module Conflict & Dependency Validation
   module: Platform
@@ -59501,6 +60304,8 @@ screens:
       trigger: Back to AI Configuration Build Command Center
       provenance: structural — pack board 2 wiring, 19 September 2026
       back: true
+      carries:
+      - planId
   density: compact
   pattern: commandCentre
   patternReason: the pack gives this screen a metric directory (§Header KPIs) and no per-row directory
@@ -59559,7 +60364,17 @@ screens:
       the active filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: getActionPlan
+    contract: ai
+    purpose: A plan with its steps
+    trigger: onLoad
+    provenance: build, 29 September 2026
+  - operationId: simulateActionPlan
+    contract: ai
+    purpose: Validate and simulate a plan without changing anything
+    trigger: onAction
+    provenance: build, 29 September 2026
   wireframe:
     status: notStarted
     board: wireframes/P09 TICVAI Web.dc.html#adm-487
@@ -59568,6 +60383,10 @@ screens:
     labels bound to a contract property; 9 of 45 pack bullets carried onto the screen — the rest are acceptance
     prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than
     here.
+  entryState:
+    params:
+    - name: planId
+      from: navigation
 - id: ADM-488
   name: Configuration Preview & Impact Analysis
   module: Platform
@@ -59593,6 +60412,8 @@ screens:
       trigger: Back to AI Configuration Build Command Center
       provenance: structural — pack board 2 wiring, 19 September 2026
       back: true
+      carries:
+      - planId
   density: compact
   pattern: configEditor
   patternReason: the pack gives this screen a configuration directory (§Critical AI Configuration Object
@@ -59686,7 +60507,17 @@ screens:
       data* and sends somebody to support with the wrong question.
     emptyNoResults: '**Nothing matched.** The filter or the scope narrowed it — naming which is what stops
       somebody concluding the record does not exist'
-  apis: []
+  apis:
+  - operationId: getActionPlan
+    contract: ai
+    purpose: A plan with its steps
+    trigger: onLoad
+    provenance: build, 29 September 2026
+  - operationId: simulateActionPlan
+    contract: ai
+    purpose: Validate and simulate a plan without changing anything
+    trigger: onAction
+    provenance: build, 29 September 2026
   wireframe:
     status: notStarted
     board: wireframes/P09 TICVAI Web.dc.html#adm-488
@@ -59695,6 +60526,10 @@ screens:
     labels bound to a contract property; 24 of 195 pack bullets carried onto the screen — the rest are
     acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather
     than here.
+  entryState:
+    params:
+    - name: planId
+      from: navigation
 - id: ADM-489
   name: AI Configuration Readiness Center
   module: Platform
@@ -59732,27 +60567,40 @@ screens:
     - to: ADM-490
       trigger: Configuration Validation Results
       provenance: structural — pack board 3 wiring, 19 September 2026
+      carries:
+      - planId
     - to: ADM-491
       trigger: AI Recommendations & Best-Practice Review
       provenance: structural — pack board 3 wiring, 19 September 2026
     - to: ADM-492
       trigger: Configuration Approval Workflow
       provenance: structural — pack board 3 wiring, 19 September 2026
+      carries:
+      - planId
     - to: ADM-493
       trigger: AI Configuration Execution Center
       provenance: structural — pack board 3 wiring, 19 September 2026
+      carries:
+      - planId
     - to: ADM-494
       trigger: Execution Progress & Dependency Monitor
       provenance: structural — pack board 3 wiring, 19 September 2026
+      carries:
+      - planId
+      - stepNumber
     - to: ADM-495
       trigger: Configuration Results & Object Mapping
       provenance: structural — pack board 3 wiring, 19 September 2026
+      carries:
+      - planId
     - to: ADM-496
       trigger: Configuration Change & Modification Assistant
       provenance: structural — pack board 3 wiring, 19 September 2026
     - to: ADM-497
       trigger: Configuration History, Versions & Rollback
       provenance: structural — pack board 3 wiring, 19 September 2026
+      carries:
+      - planId
     - to: ADM-498
       trigger: AI Configuration Audit & Governance
       provenance: structural — pack board 3 wiring, 19 September 2026
@@ -59801,7 +60649,17 @@ screens:
       and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: getEffectiveAiPolicy
+    contract: ai
+    purpose: The policy in force for a capability at a scope
+    trigger: onLoad
+    provenance: build, 29 September 2026
+  - operationId: getActionPlan
+    contract: ai
+    purpose: A plan with its steps
+    trigger: onLoad
+    provenance: build, 29 September 2026
   wireframe:
     status: notStarted
     board: wireframes/P09 TICVAI Web.dc.html#adm-489
@@ -59810,6 +60668,10 @@ screens:
     labels bound to a contract property; 8 of 56 pack bullets carried onto the screen — the rest are acceptance
     prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than
     here.
+  entryState:
+    params:
+    - name: planId
+      from: navigation
 - id: ADM-490
   name: Configuration Validation Results
   module: Platform
@@ -59835,6 +60697,8 @@ screens:
       trigger: Back to AI Configuration Readiness Center
       provenance: structural — pack board 3 wiring, 19 September 2026
       back: true
+      carries:
+      - planId
   density: compact
   pattern: listDetail
   patternReason: '**nothing in the pack chooses a pattern for this screen** — no metric directory, no
@@ -59857,7 +60721,20 @@ screens:
     template: split
     regions:
     - name: contentBody
-      components: []
+      components:
+      - kind: detailPanel
+        derived: true
+        impliedBy: getActionPlan
+        notes: One record, read-only.
+      - kind: primaryButton
+        derived: true
+        impliedBy: simulateActionPlan
+        notes: The act the screen exists for.
+      - kind: secondaryButton
+        label: Cancel
+        notes: '**A screen that can submit must be leaveable without submitting.**'
+        derived: true
+        impliedBy: simulateActionPlan
   states:
     loading: The validation results list.
     error: Could not load. Names which read failed and leaves the validation results untouched.
@@ -59867,7 +60744,17 @@ screens:
       filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: getActionPlan
+    contract: ai
+    purpose: A plan with its steps
+    trigger: onLoad
+    provenance: build, 29 September 2026
+  - operationId: simulateActionPlan
+    contract: ai
+    purpose: Validate and simulate a plan without changing anything
+    trigger: onAction
+    provenance: build, 29 September 2026
   wireframe:
     status: notStarted
     board: wireframes/P09 TICVAI Web.dc.html#adm-490
@@ -59876,6 +60763,10 @@ screens:
     labels bound to a contract property; 0 of 35 pack bullets carried onto the screen — the rest are acceptance
     prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than
     here.
+  entryState:
+    params:
+    - name: planId
+      from: navigation
 - id: ADM-491
   name: AI Recommendations & Best-Practice Review
   module: Platform
@@ -59957,7 +60848,17 @@ screens:
       Names the active filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: getConfigurationBlueprint
+    contract: ai
+    purpose: The blueprint so far
+    trigger: onLoad
+    provenance: build, 29 September 2026
+  - operationId: decideBlueprintRecommendation
+    contract: ai
+    purpose: Accept, modify, reject or defer a blueprint decision
+    trigger: onAction
+    provenance: build, 29 September 2026
   entryState:
     preloaded:
     - Recommendation
@@ -59966,6 +60867,11 @@ screens:
     - Rejected
     - By
     - Administrator
+    params:
+    - name: decisionKey
+      from: navigation
+    - name: sessionId
+      from: session
   wireframe:
     status: notStarted
     board: wireframes/P09 TICVAI Web.dc.html#adm-491
@@ -59999,6 +60905,8 @@ screens:
       trigger: Back to AI Configuration Readiness Center
       provenance: structural — pack board 3 wiring, 19 September 2026
       back: true
+      carries:
+      - planId
   density: compact
   pattern: listDetail
   patternReason: '**nothing in the pack chooses a pattern for this screen** — no metric directory, no
@@ -60047,6 +60955,21 @@ screens:
     contract: catalogue
     purpose: Approval Workflow Designer
     trigger: onAction
+  - operationId: getActionPlan
+    contract: ai
+    purpose: A plan with its steps
+    trigger: onLoad
+    provenance: build, 29 September 2026
+  - operationId: listProposedActions
+    contract: ai
+    purpose: What the assistant has proposed and nobody has decided
+    trigger: onLoad
+    provenance: build, 29 September 2026
+  - operationId: decideProposedAction
+    contract: ai
+    purpose: Approve or reject a proposal (tier 1 here; tier 2 routed to Approvals)
+    trigger: onAction
+    provenance: build, 29 September 2026
   wireframe:
     status: notStarted
     board: wireframes/P09 TICVAI Web.dc.html#adm-492
@@ -60055,6 +60978,12 @@ screens:
     labels bound to a contract property; 0 of 61 pack bullets carried onto the screen — the rest are acceptance
     prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than
     here.
+  entryState:
+    params:
+    - name: actionId
+      from: navigation
+    - name: planId
+      from: navigation
 - id: ADM-493
   name: AI Configuration Execution Center
   module: Platform
@@ -60080,6 +61009,8 @@ screens:
       trigger: Back to AI Configuration Readiness Center
       provenance: structural — pack board 3 wiring, 19 September 2026
       back: true
+      carries:
+      - planId
   density: compact
   pattern: listDetail
   patternReason: '**nothing in the pack chooses a pattern for this screen** — no metric directory, no
@@ -60102,7 +61033,27 @@ screens:
     template: split
     regions:
     - name: contentBody
-      components: []
+      components:
+      - kind: detailPanel
+        derived: true
+        impliedBy: getActionPlan
+        notes: One record, read-only.
+      - kind: primaryButton
+        derived: true
+        impliedBy: pauseActionPlan
+        notes: The act the screen exists for.
+      - kind: destructiveButton
+        derived: true
+        impliedBy: cancelActionPlan
+        label: Cancel action plan
+        notes: '**Always confirms, never the default focus.** The consequence goes in the body — which
+          action plan is affected and what goes with it, in the screen''s own words; *are you sure* is
+          not a confirmation.'
+      - kind: secondaryButton
+        label: Cancel
+        notes: '**A screen that can submit must be leaveable without submitting.**'
+        derived: true
+        impliedBy: pauseActionPlan
   states:
     loading: The execution list.
     error: Could not load. Names which read failed and leaves the execution untouched.
@@ -60111,7 +61062,22 @@ screens:
       and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: getActionPlan
+    contract: ai
+    purpose: A plan with its steps
+    trigger: onLoad
+    provenance: build, 29 September 2026
+  - operationId: pauseActionPlan
+    contract: ai
+    purpose: Pause an executing plan
+    trigger: onAction
+    provenance: build, 29 September 2026
+  - operationId: cancelActionPlan
+    contract: ai
+    purpose: Cancel a plan
+    trigger: onAction
+    provenance: build, 29 September 2026
   wireframe:
     status: notStarted
     board: wireframes/P09 TICVAI Web.dc.html#adm-493
@@ -60120,6 +61086,10 @@ screens:
     labels bound to a contract property; 0 of 45 pack bullets carried onto the screen — the rest are acceptance
     prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than
     here.
+  entryState:
+    params:
+    - name: planId
+      from: navigation
 - id: ADM-494
   name: Execution Progress & Dependency Monitor
   module: Platform
@@ -60145,6 +61115,8 @@ screens:
       trigger: Back to AI Configuration Readiness Center
       provenance: structural — pack board 3 wiring, 19 September 2026
       back: true
+      carries:
+      - planId
   density: compact
   pattern: listDetail
   patternReason: the pack gives this screen a display directory (§Show) and no metric row
@@ -60229,7 +61201,27 @@ screens:
       the active filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: getActionPlan
+    contract: ai
+    purpose: A plan with its steps
+    trigger: onLoad
+    provenance: build, 29 September 2026
+  - operationId: pauseActionPlan
+    contract: ai
+    purpose: Pause an executing plan
+    trigger: onAction
+    provenance: build, 29 September 2026
+  - operationId: resumeActionPlan
+    contract: ai
+    purpose: Resume a paused plan
+    trigger: onAction
+    provenance: build, 29 September 2026
+  - operationId: retryActionStep
+    contract: ai
+    purpose: Retry a failed step
+    trigger: onAction
+    provenance: build, 29 September 2026
   entryState:
     preloaded:
     - Venue ✓
@@ -60238,6 +61230,11 @@ screens:
     - Products ✓
     - Timeslots ✓
     - Capacity ●
+    params:
+    - name: planId
+      from: navigation
+    - name: stepNumber
+      from: navigation
   wireframe:
     status: notStarted
     board: wireframes/P09 TICVAI Web.dc.html#adm-494
@@ -60271,6 +61268,8 @@ screens:
       trigger: Back to AI Configuration Readiness Center
       provenance: structural — pack board 3 wiring, 19 September 2026
       back: true
+      carries:
+      - planId
   density: compact
   pattern: listDetail
   patternReason: the pack gives this screen a display directory (§Show) and no metric row
@@ -60328,7 +61327,17 @@ screens:
       filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: getActionPlan
+    contract: ai
+    purpose: A plan with its steps
+    trigger: onLoad
+    provenance: build, 29 September 2026
+  - operationId: rollbackActionPlan
+    contract: ai
+    purpose: Plan a rollback
+    trigger: onAction
+    provenance: build, 29 September 2026
   entryState:
     preloaded:
     - VEN-1028
@@ -60337,6 +61346,9 @@ screens:
     - SCH-0291
     - CAP-0218
     - PRC-3002
+    params:
+    - name: planId
+      from: navigation
   wireframe:
     status: notStarted
     board: wireframes/P09 TICVAI Web.dc.html#adm-495
@@ -60370,6 +61382,8 @@ screens:
       trigger: Back to AI Configuration Readiness Center
       provenance: structural — pack board 3 wiring, 19 September 2026
       back: true
+      carries:
+      - planId
   density: compact
   pattern: listDetail
   patternReason: '**nothing in the pack chooses a pattern for this screen** — no metric directory, no
@@ -60404,7 +61418,12 @@ screens:
         label: Prepare Change | Ask More | Cancel
         provenance: pack AI_Configuration_Assistant_Reference.pdf, page 54 §Actions
     - name: contentBody
-      components: []
+      components:
+      - kind: secondaryButton
+        label: Cancel
+        notes: '**A screen that can submit must be leaveable without submitting.**'
+        derived: true
+        impliedBy: startConfigurationSession
   states:
     loading: The change modification assistant list.
     error: Could not load. Names which read failed and leaves the change modification assistant untouched.
@@ -60414,7 +61433,22 @@ screens:
       the active filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: startConfigurationSession
+    contract: ai
+    purpose: Start the configuration assistant
+    trigger: onAction
+    provenance: build, 29 September 2026
+  - operationId: answerConfigurationQuestion
+    contract: ai
+    purpose: Answer the current question
+    trigger: onAction
+    provenance: build, 29 September 2026
+  - operationId: buildConfigurationPlan
+    contract: ai
+    purpose: Compile the blueprint into a plan
+    trigger: onAction
+    provenance: build, 29 September 2026
   wireframe:
     status: notStarted
     board: wireframes/P09 TICVAI Web.dc.html#adm-496
@@ -60423,6 +61457,10 @@ screens:
     labels bound to a contract property; 1 of 25 pack bullets carried onto the screen — the rest are acceptance
     prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than
     here.
+  entryState:
+    params:
+    - name: sessionId
+      from: session
 - id: ADM-497
   name: Configuration History, Versions & Rollback
   module: Platform
@@ -60448,6 +61486,8 @@ screens:
       trigger: Back to AI Configuration Readiness Center
       provenance: structural — pack board 3 wiring, 19 September 2026
       back: true
+      carries:
+      - planId
   density: compact
   pattern: listDetail
   patternReason: '**nothing in the pack chooses a pattern for this screen** — no metric directory, no
@@ -60470,7 +61510,25 @@ screens:
     template: split
     regions:
     - name: contentBody
-      components: []
+      components:
+      - kind: detailPanel
+        derived: true
+        impliedBy: getActionPlan
+        notes: One record, read-only.
+      - kind: primaryButton
+        derived: true
+        impliedBy: rollbackActionPlan
+        notes: The act the screen exists for.
+      - kind: dataTable
+        derived: true
+        impliedBy: listConfigurationSessions
+        notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
+          a venue''s busiest hour is a list that skips rows.'
+      - kind: secondaryButton
+        label: Cancel
+        notes: '**A screen that can submit must be leaveable without submitting.**'
+        derived: true
+        impliedBy: rollbackActionPlan
   states:
     loading: The history versions rollback list.
     error: Could not load. Names which read failed and leaves the history versions rollback untouched.
@@ -60480,7 +61538,22 @@ screens:
       active filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: getActionPlan
+    contract: ai
+    purpose: A plan with its steps
+    trigger: onLoad
+    provenance: build, 29 September 2026
+  - operationId: rollbackActionPlan
+    contract: ai
+    purpose: Plan a rollback
+    trigger: onAction
+    provenance: build, 29 September 2026
+  - operationId: listConfigurationSessions
+    contract: ai
+    purpose: Configuration-assistant sessions
+    trigger: onLoad
+    provenance: build, 29 September 2026
   wireframe:
     status: notStarted
     board: wireframes/P09 TICVAI Web.dc.html#adm-497
@@ -60489,6 +61562,10 @@ screens:
     labels bound to a contract property; 0 of 49 pack bullets carried onto the screen — the rest are acceptance
     prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than
     here.
+  entryState:
+    params:
+    - name: planId
+      from: navigation
 - id: ADM-498
   name: AI Configuration Audit & Governance
   module: Platform
@@ -60514,6 +61591,8 @@ screens:
       trigger: Back to AI Configuration Readiness Center
       provenance: structural — pack board 3 wiring, 19 September 2026
       back: true
+      carries:
+      - planId
   density: compact
   pattern: commandCentre
   patternReason: the pack gives this screen both a metric directory (§Header KPIs; Show) and a per-row
@@ -60688,7 +61767,17 @@ screens:
       filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: searchAiDecisions
+    contract: ai
+    purpose: Find AI decisions
+    trigger: onLoad
+    provenance: build, 29 September 2026
+  - operationId: getAiDecisionTrace
+    contract: ai
+    purpose: The full trace of a decision
+    trigger: onAction
+    provenance: build, 29 September 2026
   wireframe:
     status: notStarted
     board: wireframes/P09 TICVAI Web.dc.html#adm-498
@@ -60697,6 +61786,10 @@ screens:
     labels bound to a contract property; 61 of 192 pack bullets carried onto the screen — the rest are
     acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather
     than here.
+  entryState:
+    params:
+    - name: decisionRecordId
+      from: navigation
 - id: ADM-499
   name: Forecasting Command Center
   module: Analytics
@@ -60734,9 +61827,13 @@ screens:
     - to: ADM-500
       trigger: Forecast Configuration & Forecasting Strategy
       provenance: structural — pack board 1 wiring, 19 September 2026
+      carries:
+      - definitionKey
     - to: ADM-501
       trigger: Forecast Data & Signal Configuration
       provenance: structural — pack board 1 wiring, 19 September 2026
+      carries:
+      - definitionKey
     - to: ADM-502
       trigger: Attendance & Visitation Forecast
       provenance: structural — pack board 1 wiring, 19 September 2026
@@ -60758,6 +61855,9 @@ screens:
     - to: ADM-508
       trigger: Forecast Accuracy, Review & Publication Center
       provenance: structural — pack board 1 wiring, 19 September 2026
+      carries:
+      - definitionKey
+      - versionId
   density: compact
   pattern: commandCentre
   patternReason: the pack gives this screen a metric directory (§Header KPIs) and no per-row directory
@@ -60816,7 +61916,22 @@ screens:
       and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: listForecastDefinitions
+    contract: ai
+    purpose: What is forecast
+    trigger: onLoad
+    provenance: build, 29 September 2026
+  - operationId: getForecast
+    contract: ai
+    purpose: Forecast values
+    trigger: onLoad
+    provenance: build, 29 September 2026
+  - operationId: exportForecastVersion
+    contract: ai
+    purpose: Export the forecast version as CSV, Excel or JSON
+    trigger: onAction
+    provenance: build, 29 September 2026
   wireframe:
     status: notStarted
     board: wireframes/P09 TICVAI Web.dc.html#adm-499
@@ -60825,6 +61940,10 @@ screens:
     page 4. 0 of 0 labels bound to a contract property; 12 of 43 pack bullets carried onto the screen
     — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and
     the contracts rather than here.
+  entryState:
+    params:
+    - name: versionId
+      from: navigation
 - id: ADM-500
   name: Forecast Configuration & Forecasting Strategy
   module: Analytics
@@ -60961,7 +62080,22 @@ screens:
       data* and sends somebody to support with the wrong question.
     emptyNoResults: '**Nothing matched.** The filter or the scope narrowed it — naming which is what stops
       somebody concluding the record does not exist'
-  apis: []
+  apis:
+  - operationId: listForecastDefinitions
+    contract: ai
+    purpose: What is forecast
+    trigger: onLoad
+    provenance: build, 29 September 2026
+  - operationId: setForecastDefinition
+    contract: ai
+    purpose: Define a forecast
+    trigger: onAction
+    provenance: build, 29 September 2026
+  - operationId: runForecast
+    contract: ai
+    purpose: Run a forecast now
+    trigger: onAction
+    provenance: build, 29 September 2026
   wireframe:
     status: notStarted
     board: wireframes/P09 TICVAI Web.dc.html#adm-500
@@ -60970,6 +62104,10 @@ screens:
     page 6. 0 of 0 labels bound to a contract property; 57 of 80 pack bullets carried onto the screen
     — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and
     the contracts rather than here.
+  entryState:
+    params:
+    - name: definitionKey
+      from: navigation
 - id: ADM-501
   name: Forecast Data & Signal Configuration
   module: Analytics
@@ -61016,7 +62154,22 @@ screens:
     template: split
     regions:
     - name: contentBody
-      components: []
+      components:
+      - kind: primaryButton
+        derived: true
+        impliedBy: setForecastDefinition
+        label: Save forecast definition
+        notes: The act the screen exists for.
+      - kind: dataTable
+        derived: true
+        impliedBy: listForecastSignals
+        notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
+          a venue''s busiest hour is a list that skips rows.'
+      - kind: secondaryButton
+        label: Cancel
+        notes: '**A screen that can submit must be leaveable without submitting.**'
+        derived: true
+        impliedBy: setForecastDefinition
   states:
     loading: The forecast data signal list.
     error: Could not load. Names which read failed and leaves the forecast data signal untouched.
@@ -61026,7 +62179,22 @@ screens:
       filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: setForecastDefinition
+    contract: ai
+    purpose: Define a forecast
+    trigger: onAction
+    provenance: build, 29 September 2026
+  - operationId: listForecastSignals
+    contract: ai
+    purpose: Forecast signals and their freshness
+    trigger: onLoad
+    provenance: build, 29 September 2026
+  - operationId: configureForecastSignalSource
+    contract: ai
+    purpose: Set up a forecast signal
+    trigger: onAction
+    provenance: build, 29 September 2026
   wireframe:
     status: notStarted
     board: wireframes/P09 TICVAI Web.dc.html#adm-501
@@ -61035,6 +62203,12 @@ screens:
     page 8. 0 of 0 labels bound to a contract property; 0 of 88 pack bullets carried onto the screen —
     the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the
     contracts rather than here.
+  entryState:
+    params:
+    - name: definitionKey
+      from: navigation
+    - name: signalKey
+      from: navigation
 - id: ADM-502
   name: Attendance & Visitation Forecast
   module: Analytics
@@ -61060,6 +62234,8 @@ screens:
       trigger: Back to Forecasting Command Center
       provenance: structural — pack board 1 wiring, 19 September 2026
       back: true
+      carries:
+      - versionId
   density: compact
   pattern: listDetail
   patternReason: '**nothing in the pack chooses a pattern for this screen** — no metric directory, no
@@ -61081,7 +62257,21 @@ screens:
     template: split
     regions:
     - name: contentBody
-      components: []
+      components:
+      - kind: primaryButton
+        derived: true
+        impliedBy: configureAnomalyDetector
+        notes: The act the screen exists for.
+      - kind: dataTable
+        derived: true
+        impliedBy: listAiInsights
+        notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
+          a venue''s busiest hour is a list that skips rows.'
+      - kind: secondaryButton
+        label: Cancel
+        notes: '**A screen that can submit must be leaveable without submitting.**'
+        derived: true
+        impliedBy: configureAnomalyDetector
   states:
     loading: The attendance visitation forecast list.
     error: Could not load. Names which read failed and leaves the attendance visitation forecast untouched.
@@ -61091,7 +62281,23 @@ screens:
       the active filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: getForecast
+    contract: ai
+    purpose: Forecast values
+    trigger: onLoad
+    provenance: build, 29 September 2026
+  - operationId: configureAnomalyDetector
+    contract: ai
+    purpose: Set an alert when the forecast crosses a threshold (e.g. attendance p50 above N, occupancy
+      above % of capacity)
+    trigger: onAction
+    provenance: build, 29 September 2026
+  - operationId: listAiInsights
+    contract: ai
+    purpose: Forecast threshold alerts (kind forecastThreshold)
+    trigger: onLoad
+    provenance: build, 29 September 2026
   wireframe:
     status: notStarted
     board: wireframes/P09 TICVAI Web.dc.html#adm-502
@@ -61100,6 +62306,10 @@ screens:
     page 11. 0 of 0 labels bound to a contract property; 0 of 51 pack bullets carried onto the screen
     — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and
     the contracts rather than here.
+  entryState:
+    params:
+    - name: detectorKey
+      from: navigation
 - id: ADM-503
   name: Ticket, Product & Timeslot Demand Forecast
   module: Analytics
@@ -61125,6 +62335,8 @@ screens:
       trigger: Back to Forecasting Command Center
       provenance: structural — pack board 1 wiring, 19 September 2026
       back: true
+      carries:
+      - versionId
   density: compact
   pattern: listDetail
   patternReason: the pack gives this screen a display directory (§Show) and no metric row
@@ -61179,7 +62391,12 @@ screens:
       active filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: getForecast
+    contract: ai
+    purpose: Forecast values
+    trigger: onLoad
+    provenance: build, 29 September 2026
   entryState:
     preloaded:
     - Days Before Visit
@@ -61221,6 +62438,8 @@ screens:
       trigger: Back to Forecasting Command Center
       provenance: structural — pack board 1 wiring, 19 September 2026
       back: true
+      carries:
+      - versionId
   density: compact
   pattern: listDetail
   patternReason: the pack gives this screen a display directory (§Forecast) and no metric row
@@ -61287,7 +62506,12 @@ screens:
       filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: getForecast
+    contract: ai
+    purpose: Forecast values
+    trigger: onLoad
+    provenance: build, 29 September 2026
   entryState:
     preloaded:
     - B2C Website
@@ -61329,6 +62553,8 @@ screens:
       trigger: Back to Forecasting Command Center
       provenance: structural — pack board 1 wiring, 19 September 2026
       back: true
+      carries:
+      - versionId
   density: compact
   pattern: commandCentre
   patternReason: the pack gives this screen a metric directory (§Revenue KPIs) and no per-row directory
@@ -61378,7 +62604,12 @@ screens:
       the active filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: getForecast
+    contract: ai
+    purpose: Forecast values
+    trigger: onLoad
+    provenance: build, 29 September 2026
   wireframe:
     status: notStarted
     board: wireframes/P09 TICVAI Web.dc.html#adm-505
@@ -61412,6 +62643,8 @@ screens:
       trigger: Back to Forecasting Command Center
       provenance: structural — pack board 1 wiring, 19 September 2026
       back: true
+      carries:
+      - versionId
   density: compact
   pattern: listDetail
   patternReason: the pack gives this screen a display directory (§Show) and no metric row
@@ -61483,7 +62716,27 @@ screens:
       the active filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: explainMetricChange
+    contract: ai
+    purpose: Why did this metric change
+    trigger: onAction
+    provenance: build, 29 September 2026
+  - operationId: listForecastVersions
+    contract: ai
+    purpose: Forecast versions
+    trigger: onLoad
+    provenance: build, 29 September 2026
+  - operationId: getForecast
+    contract: ai
+    purpose: Forecast values
+    trigger: onLoad
+    provenance: build, 29 September 2026
+  - operationId: getForecastAccuracy
+    contract: ai
+    purpose: Measured forecast accuracy
+    trigger: onLoad
+    provenance: build, 29 September 2026
   entryState:
     preloaded:
     - Limited Historical Data
@@ -61525,6 +62778,8 @@ screens:
       trigger: Back to Forecasting Command Center
       provenance: structural — pack board 1 wiring, 19 September 2026
       back: true
+      carries:
+      - versionId
   density: compact
   pattern: listDetail
   patternReason: the pack gives this screen a display directory (§Show) and no metric row
@@ -61581,7 +62836,22 @@ screens:
       active filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: getForecast
+    contract: ai
+    purpose: Forecast values
+    trigger: onLoad
+    provenance: build, 29 September 2026
+  - operationId: createForecastScenario
+    contract: ai
+    purpose: Run a what-if
+    trigger: onAction
+    provenance: build, 29 September 2026
+  - operationId: compareForecastScenarios
+    contract: ai
+    purpose: Compare scenarios
+    trigger: onAction
+    provenance: build, 29 September 2026
   entryState:
     preloaded:
     - Attendance
@@ -61623,6 +62893,8 @@ screens:
       trigger: Back to Forecasting Command Center
       provenance: structural — pack board 1 wiring, 19 September 2026
       back: true
+      carries:
+      - versionId
   density: compact
   pattern: listDetail
   patternReason: the pack gives this screen a display directory (§Analyze) and no metric row
@@ -61641,6 +62913,12 @@ screens:
     - name: contentBody
       slot: collection
       components:
+      - kind: publishGate
+        impliedBy: publishForecastVersion
+        notes: 'Declares `publishForecastVersion`. **The gate names what the publish will affect before
+          it happens**: which tenants, venues or capabilities take the new version, and that the previous
+          one stays available to roll back to.'
+        provenance: check-screens publish rule, 29 September 2026
       - kind: dataTable
         label: Every forecast accuracy review
         columns:
@@ -61720,7 +62998,32 @@ screens:
       active filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: runForecast
+    contract: ai
+    purpose: Run a forecast now
+    trigger: onAction
+    provenance: build, 29 September 2026
+  - operationId: listForecastVersions
+    contract: ai
+    purpose: Forecast versions
+    trigger: onLoad
+    provenance: build, 29 September 2026
+  - operationId: publishForecastVersion
+    contract: ai
+    purpose: Publish a forecast version
+    trigger: onAction
+    provenance: build, 29 September 2026
+  - operationId: getForecastAccuracy
+    contract: ai
+    purpose: Measured forecast accuracy
+    trigger: onLoad
+    provenance: build, 29 September 2026
+  - operationId: exportForecastVersion
+    contract: ai
+    purpose: Export the forecast version as CSV, Excel or JSON
+    trigger: onAction
+    provenance: build, 29 September 2026
   entryState:
     preloaded:
     - Venue
@@ -61729,6 +63032,11 @@ screens:
     - Timeslot
     - Day Type
     - Forecast Horizon
+    params:
+    - name: definitionKey
+      from: navigation
+    - name: versionId
+      from: navigation
   wireframe:
     status: notStarted
     board: wireframes/P09 TICVAI Web.dc.html#adm-508
@@ -61876,7 +63184,17 @@ screens:
       active filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: getForecast
+    contract: ai
+    purpose: Forecast values
+    trigger: onLoad
+    provenance: build, 29 September 2026
+  - operationId: listOperationalRequirements
+    contract: ai
+    purpose: Requirements derived from the forecast
+    trigger: onLoad
+    provenance: build, 29 September 2026
   wireframe:
     status: notStarted
     board: wireframes/P09 TICVAI Web.dc.html#adm-509
@@ -61931,7 +63249,21 @@ screens:
     template: split
     regions:
     - name: contentBody
-      components: []
+      components:
+      - kind: dataTable
+        derived: true
+        impliedBy: listOperationalRequirements
+        notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
+          a venue''s busiest hour is a list that skips rows.'
+      - kind: primaryButton
+        derived: true
+        impliedBy: configureAnomalyDetector
+        notes: The act the screen exists for.
+      - kind: secondaryButton
+        label: Cancel
+        notes: '**A screen that can submit must be leaveable without submitting.**'
+        derived: true
+        impliedBy: configureAnomalyDetector
   states:
     loading: The capacity occupancy forecast list.
     error: Could not load. Names which read failed and leaves the capacity occupancy forecast untouched.
@@ -61941,7 +63273,28 @@ screens:
       the active filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: getForecast
+    contract: ai
+    purpose: Forecast values
+    trigger: onLoad
+    provenance: build, 29 September 2026
+  - operationId: listOperationalRequirements
+    contract: ai
+    purpose: Requirements derived from the forecast
+    trigger: onLoad
+    provenance: build, 29 September 2026
+  - operationId: configureAnomalyDetector
+    contract: ai
+    purpose: Set an alert when the forecast crosses a threshold (e.g. attendance p50 above N, occupancy
+      above % of capacity)
+    trigger: onAction
+    provenance: build, 29 September 2026
+  - operationId: listAiInsights
+    contract: ai
+    purpose: Forecast threshold alerts (kind forecastThreshold)
+    trigger: onLoad
+    provenance: build, 29 September 2026
   wireframe:
     status: notStarted
     board: wireframes/P09 TICVAI Web.dc.html#adm-510
@@ -61950,6 +63303,10 @@ screens:
     page 34. 0 of 0 labels bound to a contract property; 0 of 51 pack bullets carried onto the screen
     — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and
     the contracts rather than here.
+  entryState:
+    params:
+    - name: detectorKey
+      from: navigation
 - id: ADM-511
   name: Attraction Utilization & Queue Forecast
   module: Analytics
@@ -61997,7 +63354,21 @@ screens:
     template: split
     regions:
     - name: contentBody
-      components: []
+      components:
+      - kind: dataTable
+        derived: true
+        impliedBy: listOperationalRequirements
+        notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
+          a venue''s busiest hour is a list that skips rows.'
+      - kind: primaryButton
+        derived: true
+        impliedBy: requestSuggestion
+        notes: The act the screen exists for.
+      - kind: secondaryButton
+        label: Cancel
+        notes: '**A screen that can submit must be leaveable without submitting.**'
+        derived: true
+        impliedBy: requestSuggestion
   states:
     loading: The attraction utilization queue list.
     error: Could not load. Names which read failed and leaves the attraction utilization queue untouched.
@@ -62007,7 +63378,22 @@ screens:
       the active filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: getForecast
+    contract: ai
+    purpose: Forecast values
+    trigger: onLoad
+    provenance: build, 29 September 2026
+  - operationId: listOperationalRequirements
+    contract: ai
+    purpose: Requirements derived from the forecast
+    trigger: onLoad
+    provenance: build, 29 September 2026
+  - operationId: requestSuggestion
+    contract: ai
+    purpose: 'Queue-balancing suggestion (kind queueBalancing): return-slot allocation and redirection'
+    trigger: onAction
+    provenance: build, 29 September 2026
   wireframe:
     status: notStarted
     board: wireframes/P09 TICVAI Web.dc.html#adm-511
@@ -62062,7 +63448,12 @@ screens:
     template: split
     regions:
     - name: contentBody
-      components: []
+      components:
+      - kind: dataTable
+        derived: true
+        impliedBy: listOperationalRequirements
+        notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
+          a venue''s busiest hour is a list that skips rows.'
   states:
     loading: The entry access guest list.
     error: Could not load. Names which read failed and leaves the entry access guest untouched.
@@ -62072,7 +63463,17 @@ screens:
       filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: getForecast
+    contract: ai
+    purpose: Forecast values
+    trigger: onLoad
+    provenance: build, 29 September 2026
+  - operationId: listOperationalRequirements
+    contract: ai
+    purpose: Requirements derived from the forecast
+    trigger: onLoad
+    provenance: build, 29 September 2026
   wireframe:
     status: notStarted
     board: wireframes/P09 TICVAI Web.dc.html#adm-512
@@ -62165,7 +63566,22 @@ screens:
       active filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: getForecast
+    contract: ai
+    purpose: Forecast values
+    trigger: onLoad
+    provenance: build, 29 September 2026
+  - operationId: listOperationalRequirements
+    contract: ai
+    purpose: Requirements derived from the forecast
+    trigger: onLoad
+    provenance: build, 29 September 2026
+  - operationId: getStaffingCoverage
+    contract: workforce
+    purpose: Workforce demand and staffing forecast against rostered staff (basis=forecastRequirement)
+    trigger: onLoad
+    provenance: build, 29 September 2026
   entryState:
     preloaded:
     - Required Staff
@@ -62264,7 +63680,17 @@ screens:
       filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: getForecast
+    contract: ai
+    purpose: Forecast values
+    trigger: onLoad
+    provenance: build, 29 September 2026
+  - operationId: listOperationalRequirements
+    contract: ai
+    purpose: Requirements derived from the forecast
+    trigger: onLoad
+    provenance: build, 29 September 2026
   entryState:
     preloaded:
     - POS Counters
@@ -62329,7 +63755,12 @@ screens:
     template: split
     regions:
     - name: contentBody
-      components: []
+      components:
+      - kind: dataTable
+        derived: true
+        impliedBy: listOperationalRequirements
+        notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
+          a venue''s busiest hour is a list that skips rows.'
   states:
     loading: The retail inventory demand list.
     error: Could not load. Names which read failed and leaves the retail inventory demand untouched.
@@ -62339,7 +63770,17 @@ screens:
       active filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: getForecast
+    contract: ai
+    purpose: Forecast values
+    trigger: onLoad
+    provenance: build, 29 September 2026
+  - operationId: listOperationalRequirements
+    contract: ai
+    purpose: Requirements derived from the forecast
+    trigger: onLoad
+    provenance: build, 29 September 2026
   wireframe:
     status: notStarted
     board: wireframes/P09 TICVAI Web.dc.html#adm-515
@@ -62394,7 +63835,12 @@ screens:
     template: split
     regions:
     - name: contentBody
-      components: []
+      components:
+      - kind: dataTable
+        derived: true
+        impliedBy: listOperationalRequirements
+        notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
+          a venue''s busiest hour is a list that skips rows.'
   states:
     loading: The resource equipment facility list.
     error: Could not load. Names which read failed and leaves the resource equipment facility untouched.
@@ -62404,7 +63850,17 @@ screens:
       the active filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: getForecast
+    contract: ai
+    purpose: Forecast values
+    trigger: onLoad
+    provenance: build, 29 September 2026
+  - operationId: listOperationalRequirements
+    contract: ai
+    purpose: Requirements derived from the forecast
+    trigger: onLoad
+    provenance: build, 29 September 2026
   wireframe:
     status: notStarted
     board: wireframes/P09 TICVAI Web.dc.html#adm-516
@@ -62475,7 +63931,22 @@ screens:
       the active filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: createForecastScenario
+    contract: ai
+    purpose: Run a what-if
+    trigger: onAction
+    provenance: build, 29 September 2026
+  - operationId: compareForecastScenarios
+    contract: ai
+    purpose: Compare scenarios
+    trigger: onAction
+    provenance: build, 29 September 2026
+  - operationId: listOperationalRequirements
+    contract: ai
+    purpose: Requirements derived from the forecast
+    trigger: onLoad
+    provenance: build, 29 September 2026
   wireframe:
     status: notStarted
     board: wireframes/P09 TICVAI Web.dc.html#adm-517
@@ -62575,7 +64046,17 @@ screens:
       the active filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: listOperationalRequirements
+    contract: ai
+    purpose: Requirements derived from the forecast
+    trigger: onLoad
+    provenance: build, 29 September 2026
+  - operationId: decideOperationalRequirement
+    contract: ai
+    purpose: Accept, modify or reject a requirement
+    trigger: onAction
+    provenance: build, 29 September 2026
   wireframe:
     status: notStarted
     board: wireframes/P09 TICVAI Web.dc.html#adm-518
@@ -62584,6 +64065,10 @@ screens:
     page 45. 0 of 0 labels bound to a contract property; 20 of 172 pack bullets carried onto the screen
     — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and
     the contracts rather than here.
+  entryState:
+    params:
+    - name: requirementId
+      from: navigation
 - id: ADM-519
   name: AI Governance Command Center
   module: Platform
@@ -62621,12 +64106,18 @@ screens:
     - to: ADM-520
       trigger: AI Capability Registry & Ownership
       provenance: structural — pack board 1 wiring, 19 September 2026
+      carries:
+      - capabilityKey
     - to: ADM-521
       trigger: AI Risk Classification & Assessment
       provenance: structural — pack board 1 wiring, 19 September 2026
+      carries:
+      - capabilityKey
     - to: ADM-522
       trigger: AI Autonomy Level Configuration
       provenance: structural — pack board 1 wiring, 19 September 2026
+      carries:
+      - capabilityKey
     - to: ADM-523
       trigger: AI Action & Permission Policy Builder
       provenance: structural — pack board 1 wiring, 19 September 2026
@@ -62657,6 +64148,12 @@ screens:
     - name: contentBody
       slot: headline
       components:
+      - kind: publishGate
+        impliedBy: promoteAiRelease
+        notes: 'Declares `promoteAiRelease`. **The gate names what the publish will affect before it happens**:
+          which tenants, venues or capabilities take the new version, and that the previous one stays
+          available to roll back to.'
+        provenance: check-screens publish rule, 29 September 2026
       - kind: metricTile
         label: AI Capabilities Registered
         provenance: pack AI_Governance_Reference.pdf, page 4 §Header KPIs
@@ -62695,7 +64192,27 @@ screens:
       and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: listAiCapabilities
+    contract: ai
+    purpose: The capability registry
+    trigger: onLoad
+    provenance: build, 29 September 2026
+  - operationId: pauseAiCapability
+    contract: ai
+    purpose: Stop a capability now
+    trigger: onAction
+    provenance: build, 29 September 2026
+  - operationId: promoteAiRelease
+    contract: ai
+    purpose: Promote a release to its next stage (a person)
+    trigger: onAction
+    provenance: build, 29 September 2026
+  - operationId: listAiGovernanceAlerts
+    contract: ai
+    purpose: Governance alerts
+    trigger: onLoad
+    provenance: build, 29 September 2026
   wireframe:
     status: notStarted
     board: wireframes/P09 TICVAI Web.dc.html#adm-519
@@ -62703,6 +64220,12 @@ screens:
   apisNote: Regenerated 9 September 2026 from AI_Governance_Reference.pdf page 4. 0 of 0 labels bound
     to a contract property; 10 of 39 pack bullets carried onto the screen — the rest are acceptance prose,
     worked examples and AI narrative, which belong to the matrix and the contracts rather than here.
+  entryState:
+    params:
+    - name: capabilityKey
+      from: navigation
+    - name: releaseId
+      from: navigation
 - id: ADM-520
   name: AI Capability Registry & Ownership
   module: Platform
@@ -62728,6 +64251,8 @@ screens:
       trigger: Back to AI Governance Command Center
       provenance: structural — pack board 1 wiring, 19 September 2026
       back: true
+      carries:
+      - capabilityKey
   density: compact
   pattern: listDetail
   patternReason: '**nothing in the pack chooses a pattern for this screen** — no metric directory, no
@@ -62750,7 +64275,21 @@ screens:
     template: split
     regions:
     - name: contentBody
-      components: []
+      components:
+      - kind: dataTable
+        derived: true
+        impliedBy: listAiCapabilities
+        notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
+          a venue''s busiest hour is a list that skips rows.'
+      - kind: primaryButton
+        derived: true
+        impliedBy: configureAiCapability
+        notes: The act the screen exists for.
+      - kind: secondaryButton
+        label: Cancel
+        notes: '**A screen that can submit must be leaveable without submitting.**'
+        derived: true
+        impliedBy: configureAiCapability
   states:
     loading: The capability registry ownership list.
     error: Could not load. Names which read failed and leaves the capability registry ownership untouched.
@@ -62760,7 +64299,17 @@ screens:
       the active filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: listAiCapabilities
+    contract: ai
+    purpose: The capability registry
+    trigger: onLoad
+    provenance: build, 29 September 2026
+  - operationId: configureAiCapability
+    contract: ai
+    purpose: Register a capability, or change its owner, risk class or autonomy
+    trigger: onAction
+    provenance: build, 29 September 2026
   wireframe:
     status: notStarted
     board: wireframes/P09 TICVAI Web.dc.html#adm-520
@@ -62768,6 +64317,10 @@ screens:
   apisNote: Regenerated 9 September 2026 from AI_Governance_Reference.pdf page 5. 0 of 0 labels bound
     to a contract property; 0 of 59 pack bullets carried onto the screen — the rest are acceptance prose,
     worked examples and AI narrative, which belong to the matrix and the contracts rather than here.
+  entryState:
+    params:
+    - name: capabilityKey
+      from: navigation
 - id: ADM-521
   name: AI Risk Classification & Assessment
   module: Platform
@@ -62793,6 +64346,8 @@ screens:
       trigger: Back to AI Governance Command Center
       provenance: structural — pack board 1 wiring, 19 September 2026
       back: true
+      carries:
+      - capabilityKey
   density: compact
   pattern: listDetail
   patternReason: '**nothing in the pack chooses a pattern for this screen** — no metric directory, no
@@ -62816,7 +64371,21 @@ screens:
     template: split
     regions:
     - name: contentBody
-      components: []
+      components:
+      - kind: dataTable
+        derived: true
+        impliedBy: listAiCapabilities
+        notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
+          a venue''s busiest hour is a list that skips rows.'
+      - kind: primaryButton
+        derived: true
+        impliedBy: configureAiCapability
+        notes: The act the screen exists for.
+      - kind: secondaryButton
+        label: Cancel
+        notes: '**A screen that can submit must be leaveable without submitting.**'
+        derived: true
+        impliedBy: configureAiCapability
   states:
     loading: The risk classification assessment list.
     error: Could not load. Names which read failed and leaves the risk classification assessment untouched.
@@ -62826,7 +64395,17 @@ screens:
       the active filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: listAiCapabilities
+    contract: ai
+    purpose: The capability registry
+    trigger: onLoad
+    provenance: build, 29 September 2026
+  - operationId: configureAiCapability
+    contract: ai
+    purpose: Register a capability, or change its owner, risk class or autonomy
+    trigger: onAction
+    provenance: build, 29 September 2026
   wireframe:
     status: notStarted
     board: wireframes/P09 TICVAI Web.dc.html#adm-521
@@ -62834,6 +64413,10 @@ screens:
   apisNote: Regenerated 9 September 2026 from AI_Governance_Reference.pdf page 7. 0 of 0 labels bound
     to a contract property; 0 of 61 pack bullets carried onto the screen — the rest are acceptance prose,
     worked examples and AI narrative, which belong to the matrix and the contracts rather than here.
+  entryState:
+    params:
+    - name: capabilityKey
+      from: navigation
 - id: ADM-522
   name: AI Autonomy Level Configuration
   module: Platform
@@ -62859,6 +64442,8 @@ screens:
       trigger: Back to AI Governance Command Center
       provenance: structural — pack board 1 wiring, 19 September 2026
       back: true
+      carries:
+      - capabilityKey
   density: compact
   pattern: configEditor
   patternReason: the pack gives this screen a configuration directory (§Configure by) and no display directory
@@ -62908,7 +64493,22 @@ screens:
       data* and sends somebody to support with the wrong question.
     emptyNoResults: '**Nothing matched.** The filter or the scope narrowed it — naming which is what stops
       somebody concluding the record does not exist'
-  apis: []
+  apis:
+  - operationId: listAiCapabilities
+    contract: ai
+    purpose: The capability registry
+    trigger: onLoad
+    provenance: build, 29 September 2026
+  - operationId: configureAiCapability
+    contract: ai
+    purpose: Register a capability, or change its owner, risk class or autonomy
+    trigger: onAction
+    provenance: build, 29 September 2026
+  - operationId: getEffectiveAiPolicy
+    contract: ai
+    purpose: The policy in force for a capability at a scope
+    trigger: onLoad
+    provenance: build, 29 September 2026
   wireframe:
     status: notStarted
     board: wireframes/P09 TICVAI Web.dc.html#adm-522
@@ -62916,6 +64516,10 @@ screens:
   apisNote: Regenerated 9 September 2026 from AI_Governance_Reference.pdf page 9. 0 of 0 labels bound
     to a contract property; 9 of 57 pack bullets carried onto the screen — the rest are acceptance prose,
     worked examples and AI narrative, which belong to the matrix and the contracts rather than here.
+  entryState:
+    params:
+    - name: capabilityKey
+      from: navigation
 - id: ADM-523
   name: AI Action & Permission Policy Builder
   module: Platform
@@ -63019,7 +64623,27 @@ screens:
       active filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: createAiGovernancePolicyDraft
+    contract: ai
+    purpose: Draft a governance policy, or a new version of one
+    trigger: onAction
+    provenance: build, 29 September 2026
+  - operationId: listAiGovernancePolicyVersions
+    contract: ai
+    purpose: Governance policies and their versions
+    trigger: onLoad
+    provenance: build, 29 September 2026
+  - operationId: listAiTools
+    contract: ai
+    purpose: The tool registry
+    trigger: onLoad
+    provenance: build, 29 September 2026
+  - operationId: setAiTool
+    contract: ai
+    purpose: Register or change a tool (platform)
+    trigger: onAction
+    provenance: build, 29 September 2026
   wireframe:
     status: notStarted
     board: wireframes/P09 TICVAI Web.dc.html#adm-523
@@ -63027,6 +64651,10 @@ screens:
   apisNote: Regenerated 9 September 2026 from AI_Governance_Reference.pdf page 11. 0 of 0 labels bound
     to a contract property; 19 of 52 pack bullets carried onto the screen — the rest are acceptance prose,
     worked examples and AI narrative, which belong to the matrix and the contracts rather than here.
+  entryState:
+    params:
+    - name: toolKey
+      from: navigation
 - id: ADM-524
   name: AI Data Access & Usage Policy
   module: Platform
@@ -63074,7 +64702,22 @@ screens:
     template: split
     regions:
     - name: contentBody
-      components: []
+      components:
+      - kind: primaryButton
+        derived: true
+        impliedBy: createAiGovernancePolicyDraft
+        label: Create
+        notes: The act the screen exists for.
+      - kind: dataTable
+        derived: true
+        impliedBy: listAiGovernancePolicyVersions
+        notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
+          a venue''s busiest hour is a list that skips rows.'
+      - kind: secondaryButton
+        label: Cancel
+        notes: '**A screen that can submit must be leaveable without submitting.**'
+        derived: true
+        impliedBy: createAiGovernancePolicyDraft
   states:
     loading: The data access usage list.
     error: Could not load. Names which read failed and leaves the data access usage untouched.
@@ -63084,7 +64727,27 @@ screens:
       filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: createAiGovernancePolicyDraft
+    contract: ai
+    purpose: Draft a governance policy, or a new version of one
+    trigger: onAction
+    provenance: build, 29 September 2026
+  - operationId: listAiGovernancePolicyVersions
+    contract: ai
+    purpose: Governance policies and their versions
+    trigger: onLoad
+    provenance: build, 29 September 2026
+  - operationId: listDataRetentionSettings
+    contract: tenancy
+    purpose: AI data retention (prompts, conversations, decision records, index)
+    trigger: onLoad
+    provenance: build, 29 September 2026
+  - operationId: setDataRetentionSetting
+    contract: tenancy
+    purpose: Set an AI class's period
+    trigger: onAction
+    provenance: build, 29 September 2026
   wireframe:
     status: notStarted
     board: wireframes/P09 TICVAI Web.dc.html#adm-524
@@ -63092,6 +64755,10 @@ screens:
   apisNote: Regenerated 9 September 2026 from AI_Governance_Reference.pdf page 13. 0 of 0 labels bound
     to a contract property; 0 of 41 pack bullets carried onto the screen — the rest are acceptance prose,
     worked examples and AI narrative, which belong to the matrix and the contracts rather than here.
+  entryState:
+    params:
+    - name: dataClass
+      from: navigation
 - id: ADM-525
   name: Environment, Tenant & Scope Governance
   module: Platform
@@ -63117,6 +64784,8 @@ screens:
       trigger: Back to AI Governance Command Center
       provenance: structural — pack board 1 wiring, 19 September 2026
       back: true
+      carries:
+      - capabilityKey
   density: compact
   pattern: listDetail
   patternReason: '**nothing in the pack chooses a pattern for this screen** — no metric directory, no
@@ -63168,7 +64837,17 @@ screens:
       active filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: getEffectiveAiPolicy
+    contract: ai
+    purpose: The policy in force for a capability at a scope
+    trigger: onLoad
+    provenance: build, 29 September 2026
+  - operationId: createAiGovernancePolicyDraft
+    contract: ai
+    purpose: Draft a governance policy, or a new version of one
+    trigger: onAction
+    provenance: build, 29 September 2026
   wireframe:
     status: notStarted
     board: wireframes/P09 TICVAI Web.dc.html#adm-525
@@ -63201,6 +64880,8 @@ screens:
       trigger: Back to AI Governance Command Center
       provenance: structural — pack board 1 wiring, 19 September 2026
       back: true
+      carries:
+      - capabilityKey
   density: compact
   pattern: listDetail
   patternReason: '**nothing in the pack chooses a pattern for this screen** — no metric directory, no
@@ -63223,7 +64904,29 @@ screens:
     template: split
     regions:
     - name: contentBody
-      components: []
+      components:
+      - kind: dataTable
+        derived: true
+        impliedBy: listAiGovernancePolicyVersions
+        notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
+          a venue''s busiest hour is a list that skips rows.'
+      - kind: primaryButton
+        derived: true
+        impliedBy: createAiPolicyException
+        label: Create AI policy exception
+        notes: The act the screen exists for.
+      - kind: destructiveButton
+        derived: true
+        impliedBy: revokeAiPolicyException
+        label: Revoke AI policy exception
+        notes: '**Always confirms, never the default focus.** The consequence goes in the body — which
+          AI policy exception is affected and what goes with it, in the screen''s own words; *are you
+          sure* is not a confirmation.'
+      - kind: secondaryButton
+        label: Cancel
+        notes: '**A screen that can submit must be leaveable without submitting.**'
+        derived: true
+        impliedBy: createAiPolicyException
   states:
     loading: The policy conflict exception list.
     error: Could not load. Names which read failed and leaves the policy conflict exception untouched.
@@ -63233,7 +64936,27 @@ screens:
       active filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: getEffectiveAiPolicy
+    contract: ai
+    purpose: The policy in force for a capability at a scope
+    trigger: onLoad
+    provenance: build, 29 September 2026
+  - operationId: listAiGovernancePolicyVersions
+    contract: ai
+    purpose: Governance policies and their versions
+    trigger: onLoad
+    provenance: build, 29 September 2026
+  - operationId: createAiPolicyException
+    contract: ai
+    purpose: Grant a temporary exception to a governance policy
+    trigger: onAction
+    provenance: build, 29 September 2026
+  - operationId: revokeAiPolicyException
+    contract: ai
+    purpose: End an exception before it expires
+    trigger: onAction
+    provenance: build, 29 September 2026
   wireframe:
     status: notStarted
     board: wireframes/P09 TICVAI Web.dc.html#adm-526
@@ -63241,6 +64964,10 @@ screens:
   apisNote: Regenerated 9 September 2026 from AI_Governance_Reference.pdf page 17. 0 of 0 labels bound
     to a contract property; 0 of 45 pack bullets carried onto the screen — the rest are acceptance prose,
     worked examples and AI narrative, which belong to the matrix and the contracts rather than here.
+  entryState:
+    params:
+    - name: exceptionId
+      from: navigation
 - id: ADM-527
   name: AI Policy Testing & Governance Simulation
   module: Platform
@@ -63266,6 +64993,8 @@ screens:
       trigger: Back to AI Governance Command Center
       provenance: structural — pack board 1 wiring, 19 September 2026
       back: true
+      carries:
+      - capabilityKey
   density: compact
   pattern: listDetail
   patternReason: '**nothing in the pack chooses a pattern for this screen** — no metric directory, no
@@ -63293,7 +65022,21 @@ screens:
     template: split
     regions:
     - name: contentBody
-      components: []
+      components:
+      - kind: primaryButton
+        derived: true
+        impliedBy: simulateAiGovernancePolicy
+        notes: The act the screen exists for.
+      - kind: dataTable
+        derived: true
+        impliedBy: listAiGovernancePolicyVersions
+        notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
+          a venue''s busiest hour is a list that skips rows.'
+      - kind: secondaryButton
+        label: Cancel
+        notes: '**A screen that can submit must be leaveable without submitting.**'
+        derived: true
+        impliedBy: simulateAiGovernancePolicy
   states:
     loading: The policy testing governance list.
     error: Could not load. Names which read failed and leaves the policy testing governance untouched.
@@ -63303,7 +65046,17 @@ screens:
       active filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: simulateAiGovernancePolicy
+    contract: ai
+    purpose: Test a draft policy before it is published
+    trigger: onAction
+    provenance: build, 29 September 2026
+  - operationId: listAiGovernancePolicyVersions
+    contract: ai
+    purpose: Governance policies and their versions
+    trigger: onLoad
+    provenance: build, 29 September 2026
   wireframe:
     status: notStarted
     board: wireframes/P09 TICVAI Web.dc.html#adm-527
@@ -63311,6 +65064,10 @@ screens:
   apisNote: Regenerated 9 September 2026 from AI_Governance_Reference.pdf page 18. 0 of 0 labels bound
     to a contract property; 0 of 65 pack bullets carried onto the screen — the rest are acceptance prose,
     worked examples and AI narrative, which belong to the matrix and the contracts rather than here.
+  entryState:
+    params:
+    - name: versionId
+      from: navigation
 - id: ADM-528
   name: AI Governance Policy Publication & Effective Policy Map
   module: Platform
@@ -63336,6 +65093,8 @@ screens:
       trigger: Back to AI Governance Command Center
       provenance: structural — pack board 1 wiring, 19 September 2026
       back: true
+      carries:
+      - capabilityKey
   density: compact
   pattern: listDetail
   patternReason: '**nothing in the pack chooses a pattern for this screen** — no metric directory, no
@@ -63358,7 +65117,28 @@ screens:
     template: split
     regions:
     - name: contentBody
-      components: []
+      components:
+      - kind: publishGate
+        impliedBy: publishAiGovernancePolicy
+        notes: 'Declares `publishAiGovernancePolicy`. **The gate names what the publish will affect before
+          it happens**: which tenants, venues or capabilities take the new version, and that the previous
+          one stays available to roll back to.'
+        provenance: check-screens publish rule, 29 September 2026
+      - kind: primaryButton
+        derived: true
+        impliedBy: publishAiGovernancePolicy
+        label: Publish AI governance policy
+        notes: The act the screen exists for.
+      - kind: dataTable
+        derived: true
+        impliedBy: listAiGovernancePolicyVersions
+        notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
+          a venue''s busiest hour is a list that skips rows.'
+      - kind: secondaryButton
+        label: Cancel
+        notes: '**A screen that can submit must be leaveable without submitting.**'
+        derived: true
+        impliedBy: publishAiGovernancePolicy
   states:
     loading: The governance policy publication list.
     error: Could not load. Names which read failed and leaves the governance policy publication untouched.
@@ -63368,7 +65148,22 @@ screens:
       the active filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: getEffectiveAiPolicy
+    contract: ai
+    purpose: The policy in force for a capability at a scope
+    trigger: onLoad
+    provenance: build, 29 September 2026
+  - operationId: publishAiGovernancePolicy
+    contract: ai
+    purpose: Publish a simulated policy version
+    trigger: onAction
+    provenance: build, 29 September 2026
+  - operationId: listAiGovernancePolicyVersions
+    contract: ai
+    purpose: Governance policies and their versions
+    trigger: onLoad
+    provenance: build, 29 September 2026
   wireframe:
     status: notStarted
     board: wireframes/P09 TICVAI Web.dc.html#adm-528
@@ -63376,6 +65171,10 @@ screens:
   apisNote: Regenerated 9 September 2026 from AI_Governance_Reference.pdf page 20. 0 of 0 labels bound
     to a contract property; 0 of 266 pack bullets carried onto the screen — the rest are acceptance prose,
     worked examples and AI narrative, which belong to the matrix and the contracts rather than here.
+  entryState:
+    params:
+    - name: versionId
+      from: navigation
 - id: ADM-529
   name: AI Human Oversight Command Center
   module: Platform
@@ -63416,27 +65215,39 @@ screens:
     - to: ADM-531
       trigger: AI Approval Review Workspace
       provenance: structural — pack board 2 wiring, 19 September 2026
+      carries:
+      - planId
     - to: ADM-532
       trigger: Conditional Approval & Approval Conditions
       provenance: structural — pack board 2 wiring, 19 September 2026
+      carries:
+      - planId
     - to: ADM-533
       trigger: Human Review, Challenge & AI Clarification Workspace
       provenance: structural — pack board 2 wiring, 19 September 2026
     - to: ADM-534
       trigger: Escalation, Delegation & Approval SLA Management
       provenance: structural — pack board 2 wiring, 19 September 2026
+      carries:
+      - planId
     - to: ADM-535
       trigger: Live AI Execution Oversight & Human Intervention
       provenance: structural — pack board 2 wiring, 19 September 2026
+      carries:
+      - planId
     - to: ADM-536
       trigger: Human Override & Manual Control Center
       provenance: structural — pack board 2 wiring, 19 September 2026
+      carries:
+      - planId
     - to: ADM-537
       trigger: Approval & Intervention History / Decision Timeline
       provenance: structural — pack board 2 wiring, 19 September 2026
     - to: ADM-538
       trigger: Human Oversight Workflow Simulator & Readiness Center
       provenance: structural — pack board 2 wiring, 19 September 2026
+      carries:
+      - planId
   density: compact
   pattern: commandCentre
   patternReason: the pack gives this screen a metric directory (§Header KPIs) and no per-row directory
@@ -63511,7 +65322,17 @@ screens:
       and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: getActionPlan
+    contract: ai
+    purpose: A plan with its steps
+    trigger: onAction
+    provenance: build, 29 September 2026
+  - operationId: listProposedActions
+    contract: ai
+    purpose: What the assistant has proposed and nobody has decided
+    trigger: onLoad
+    provenance: build, 29 September 2026
   wireframe:
     status: notStarted
     board: wireframes/P09 TICVAI Web.dc.html#adm-529
@@ -63519,6 +65340,10 @@ screens:
   apisNote: Regenerated 9 September 2026 from AI_Governance_Reference.pdf page 30. 0 of 10 labels bound
     to a contract property; 20 of 43 pack bullets carried onto the screen — the rest are acceptance prose,
     worked examples and AI narrative, which belong to the matrix and the contracts rather than here.
+  entryState:
+    params:
+    - name: planId
+      from: navigation
 - id: ADM-530
   name: AI Approval Requirement & Routing Configuration
   module: Platform
@@ -63609,7 +65434,22 @@ screens:
       the active filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: createAiGovernancePolicyDraft
+    contract: ai
+    purpose: Draft a governance policy, or a new version of one
+    trigger: onAction
+    provenance: build, 29 September 2026
+  - operationId: listAiGovernancePolicyVersions
+    contract: ai
+    purpose: Governance policies and their versions
+    trigger: onLoad
+    provenance: build, 29 September 2026
+  - operationId: listAiTools
+    contract: ai
+    purpose: The tool registry
+    trigger: onLoad
+    provenance: build, 29 September 2026
   wireframe:
     status: notStarted
     board: wireframes/P09 TICVAI Web.dc.html#adm-530
@@ -63642,6 +65482,8 @@ screens:
       trigger: Back to AI Human Oversight Command Center
       provenance: structural — pack board 2 wiring, 19 September 2026
       back: true
+      carries:
+      - planId
   density: compact
   pattern: configEditor
   patternReason: the pack gives this screen a configuration directory (§Configuration Current Proposed)
@@ -63669,7 +65511,22 @@ screens:
       data* and sends somebody to support with the wrong question.
     emptyNoResults: '**Nothing matched.** The filter or the scope narrowed it — naming which is what stops
       somebody concluding the record does not exist'
-  apis: []
+  apis:
+  - operationId: getActionPlan
+    contract: ai
+    purpose: A plan with its steps
+    trigger: onLoad
+    provenance: build, 29 September 2026
+  - operationId: simulateActionPlan
+    contract: ai
+    purpose: Validate and simulate a plan without changing anything
+    trigger: onAction
+    provenance: build, 29 September 2026
+  - operationId: decideProposedAction
+    contract: ai
+    purpose: Approve or reject a proposal (tier 1 here; tier 2 routed to Approvals)
+    trigger: onAction
+    provenance: build, 29 September 2026
   wireframe:
     status: notStarted
     board: wireframes/P09 TICVAI Web.dc.html#adm-531
@@ -63677,6 +65534,12 @@ screens:
   apisNote: Regenerated 9 September 2026 from AI_Governance_Reference.pdf page 33. 0 of 0 labels bound
     to a contract property; 2 of 29 pack bullets carried onto the screen — the rest are acceptance prose,
     worked examples and AI narrative, which belong to the matrix and the contracts rather than here.
+  entryState:
+    params:
+    - name: actionId
+      from: navigation
+    - name: planId
+      from: navigation
 - id: ADM-532
   name: Conditional Approval & Approval Conditions
   module: Platform
@@ -63702,6 +65565,8 @@ screens:
       trigger: Back to AI Human Oversight Command Center
       provenance: structural — pack board 2 wiring, 19 September 2026
       back: true
+      carries:
+      - planId
   density: compact
   pattern: listDetail
   patternReason: '**nothing in the pack chooses a pattern for this screen** — no metric directory, no
@@ -63724,7 +65589,20 @@ screens:
     template: split
     regions:
     - name: contentBody
-      components: []
+      components:
+      - kind: detailPanel
+        derived: true
+        impliedBy: getActionPlan
+        notes: One record, read-only.
+      - kind: primaryButton
+        derived: true
+        impliedBy: decideProposedAction
+        notes: The act the screen exists for.
+      - kind: secondaryButton
+        label: Cancel
+        notes: '**A screen that can submit must be leaveable without submitting.**'
+        derived: true
+        impliedBy: decideProposedAction
   states:
     loading: The conditional approval approval list.
     error: Could not load. Names which read failed and leaves the conditional approval approval untouched.
@@ -63734,7 +65612,17 @@ screens:
       the active filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: getActionPlan
+    contract: ai
+    purpose: A plan with its steps
+    trigger: onLoad
+    provenance: build, 29 September 2026
+  - operationId: decideProposedAction
+    contract: ai
+    purpose: Approve or reject a proposal (tier 1 here; tier 2 routed to Approvals)
+    trigger: onAction
+    provenance: build, 29 September 2026
   wireframe:
     status: notStarted
     board: wireframes/P09 TICVAI Web.dc.html#adm-532
@@ -63742,6 +65630,12 @@ screens:
   apisNote: Regenerated 9 September 2026 from AI_Governance_Reference.pdf page 35. 0 of 0 labels bound
     to a contract property; 0 of 44 pack bullets carried onto the screen — the rest are acceptance prose,
     worked examples and AI narrative, which belong to the matrix and the contracts rather than here.
+  entryState:
+    params:
+    - name: actionId
+      from: navigation
+    - name: planId
+      from: navigation
 - id: ADM-533
   name: Human Review, Challenge & AI Clarification Workspace
   module: Platform
@@ -63767,6 +65661,8 @@ screens:
       trigger: Back to AI Human Oversight Command Center
       provenance: structural — pack board 2 wiring, 19 September 2026
       back: true
+      carries:
+      - planId
   density: compact
   pattern: listDetail
   patternReason: the pack gives this screen a display directory (§Show) and no metric row
@@ -63825,7 +65721,22 @@ screens:
       filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: overrideAiDecision
+    contract: ai
+    purpose: Override an AI decision
+    trigger: onAction
+    provenance: build, 29 September 2026
+  - operationId: getAiDecisionTrace
+    contract: ai
+    purpose: The full trace of a decision
+    trigger: onLoad
+    provenance: build, 29 September 2026
+  - operationId: sendAiMessage
+    contract: ai
+    purpose: Ask the assistant
+    trigger: onAction
+    provenance: build, 29 September 2026
   entryState:
     preloaded:
     - Proposed Action
@@ -63834,6 +65745,11 @@ screens:
     - Impact
     - AI Recommendation
     - Validation
+    params:
+    - name: conversationId
+      from: navigation
+    - name: decisionRecordId
+      from: navigation
   wireframe:
     status: notStarted
     board: wireframes/P09 TICVAI Web.dc.html#adm-533
@@ -63866,6 +65782,8 @@ screens:
       trigger: Back to AI Human Oversight Command Center
       provenance: structural — pack board 2 wiring, 19 September 2026
       back: true
+      carries:
+      - planId
   density: compact
   pattern: listDetail
   patternReason: '**nothing in the pack chooses a pattern for this screen** — no metric directory, no
@@ -63888,7 +65806,16 @@ screens:
     template: split
     regions:
     - name: contentBody
-      components: []
+      components:
+      - kind: detailPanel
+        derived: true
+        impliedBy: getActionPlan
+        notes: One record, read-only.
+      - kind: dataTable
+        derived: true
+        impliedBy: listProposedActions
+        notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
+          a venue''s busiest hour is a list that skips rows.'
   states:
     loading: The escalation delegation approval list.
     error: Could not load. Names which read failed and leaves the escalation delegation approval untouched.
@@ -63898,7 +65825,17 @@ screens:
       the active filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: getActionPlan
+    contract: ai
+    purpose: A plan with its steps
+    trigger: onAction
+    provenance: build, 29 September 2026
+  - operationId: listProposedActions
+    contract: ai
+    purpose: What the assistant has proposed and nobody has decided
+    trigger: onLoad
+    provenance: build, 29 September 2026
   wireframe:
     status: notStarted
     board: wireframes/P09 TICVAI Web.dc.html#adm-534
@@ -63906,6 +65843,10 @@ screens:
   apisNote: Regenerated 9 September 2026 from AI_Governance_Reference.pdf page 37. 0 of 0 labels bound
     to a contract property; 0 of 49 pack bullets carried onto the screen — the rest are acceptance prose,
     worked examples and AI narrative, which belong to the matrix and the contracts rather than here.
+  entryState:
+    params:
+    - name: planId
+      from: navigation
 - id: ADM-535
   name: Live AI Execution Oversight & Human Intervention
   module: Platform
@@ -63931,6 +65872,8 @@ screens:
       trigger: Back to AI Human Oversight Command Center
       provenance: structural — pack board 2 wiring, 19 September 2026
       back: true
+      carries:
+      - planId
   density: compact
   pattern: listDetail
   patternReason: the pack gives this screen a display directory (§High-impact intervention should show)
@@ -63994,7 +65937,27 @@ screens:
       active filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: getActionPlan
+    contract: ai
+    purpose: A plan with its steps
+    trigger: onLoad
+    provenance: build, 29 September 2026
+  - operationId: pauseActionPlan
+    contract: ai
+    purpose: Pause an executing plan
+    trigger: onAction
+    provenance: build, 29 September 2026
+  - operationId: resumeActionPlan
+    contract: ai
+    purpose: Resume a paused plan
+    trigger: onAction
+    provenance: build, 29 September 2026
+  - operationId: cancelActionPlan
+    contract: ai
+    purpose: Cancel a plan
+    trigger: onAction
+    provenance: build, 29 September 2026
   entryState:
     preloaded:
     - Impact of Pausing
@@ -64003,6 +65966,9 @@ screens:
     - No active transaction affected
     - Emergency Stop
     - Emergency Stop AI Execution
+    params:
+    - name: planId
+      from: navigation
   wireframe:
     status: notStarted
     board: wireframes/P09 TICVAI Web.dc.html#adm-535
@@ -64035,6 +66001,8 @@ screens:
       trigger: Back to AI Human Oversight Command Center
       provenance: structural — pack board 2 wiring, 19 September 2026
       back: true
+      carries:
+      - planId
   density: compact
   pattern: listDetail
   patternReason: '**nothing in the pack chooses a pattern for this screen** — no metric directory, no
@@ -64057,7 +66025,16 @@ screens:
     template: split
     regions:
     - name: contentBody
-      components: []
+      components:
+      - kind: primaryButton
+        derived: true
+        impliedBy: pauseAiCapability
+        notes: The act the screen exists for.
+      - kind: secondaryButton
+        label: Cancel
+        notes: '**A screen that can submit must be leaveable without submitting.**'
+        derived: true
+        impliedBy: pauseAiCapability
   states:
     loading: The human override manual list.
     error: Could not load. Names which read failed and leaves the human override manual untouched.
@@ -64067,7 +66044,27 @@ screens:
       filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: pauseAiCapability
+    contract: ai
+    purpose: Stop a capability now
+    trigger: onAction
+    provenance: build, 29 September 2026
+  - operationId: resumeAiCapability
+    contract: ai
+    purpose: Resume a paused capability
+    trigger: onAction
+    provenance: build, 29 September 2026
+  - operationId: pauseActionPlan
+    contract: ai
+    purpose: Pause an executing plan
+    trigger: onAction
+    provenance: build, 29 September 2026
+  - operationId: overrideAiDecision
+    contract: ai
+    purpose: Override an AI decision
+    trigger: onAction
+    provenance: build, 29 September 2026
   wireframe:
     status: notStarted
     board: wireframes/P09 TICVAI Web.dc.html#adm-536
@@ -64075,6 +66072,14 @@ screens:
   apisNote: Regenerated 9 September 2026 from AI_Governance_Reference.pdf page 41. 0 of 0 labels bound
     to a contract property; 0 of 54 pack bullets carried onto the screen — the rest are acceptance prose,
     worked examples and AI narrative, which belong to the matrix and the contracts rather than here.
+  entryState:
+    params:
+    - name: capabilityKey
+      from: navigation
+    - name: decisionRecordId
+      from: navigation
+    - name: planId
+      from: navigation
 - id: ADM-537
   name: Approval & Intervention History / Decision Timeline
   module: Platform
@@ -64100,6 +66105,8 @@ screens:
       trigger: Back to AI Human Oversight Command Center
       provenance: structural — pack board 2 wiring, 19 September 2026
       back: true
+      carries:
+      - planId
   density: compact
   pattern: listDetail
   patternReason: '**nothing in the pack chooses a pattern for this screen** — no metric directory, no
@@ -64145,7 +66152,17 @@ screens:
       the active filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: searchAiDecisions
+    contract: ai
+    purpose: Find AI decisions
+    trigger: onLoad
+    provenance: build, 29 September 2026
+  - operationId: getAiDecisionTrace
+    contract: ai
+    purpose: The full trace of a decision
+    trigger: onAction
+    provenance: build, 29 September 2026
   wireframe:
     status: notStarted
     board: wireframes/P09 TICVAI Web.dc.html#adm-537
@@ -64153,6 +66170,10 @@ screens:
   apisNote: Regenerated 9 September 2026 from AI_Governance_Reference.pdf page 42. 0 of 9 labels bound
     to a contract property; 9 of 63 pack bullets carried onto the screen — the rest are acceptance prose,
     worked examples and AI narrative, which belong to the matrix and the contracts rather than here.
+  entryState:
+    params:
+    - name: decisionRecordId
+      from: navigation
 - id: ADM-538
   name: Human Oversight Workflow Simulator & Readiness Center
   module: Platform
@@ -64178,6 +66199,8 @@ screens:
       trigger: Back to AI Human Oversight Command Center
       provenance: structural — pack board 2 wiring, 19 September 2026
       back: true
+      carries:
+      - planId
   density: compact
   pattern: configEditor
   patternReason: the pack gives this screen a configuration directory (§Board 1 defines) and no display
@@ -64233,7 +66256,17 @@ screens:
       data* and sends somebody to support with the wrong question.
     emptyNoResults: '**Nothing matched.** The filter or the scope narrowed it — naming which is what stops
       somebody concluding the record does not exist'
-  apis: []
+  apis:
+  - operationId: simulateAiGovernancePolicy
+    contract: ai
+    purpose: Test a draft policy before it is published
+    trigger: onAction
+    provenance: build, 29 September 2026
+  - operationId: simulateActionPlan
+    contract: ai
+    purpose: Validate and simulate a plan without changing anything
+    trigger: onAction
+    provenance: build, 29 September 2026
   wireframe:
     status: notStarted
     board: wireframes/P09 TICVAI Web.dc.html#adm-538
@@ -64241,6 +66274,12 @@ screens:
   apisNote: Regenerated 9 September 2026 from AI_Governance_Reference.pdf page 44. 0 of 0 labels bound
     to a contract property; 8 of 269 pack bullets carried onto the screen — the rest are acceptance prose,
     worked examples and AI narrative, which belong to the matrix and the contracts rather than here.
+  entryState:
+    params:
+    - name: planId
+      from: navigation
+    - name: versionId
+      from: navigation
 - id: ADM-539
   name: AI Explainability & Audit Command Center
   module: Platform
@@ -64376,7 +66415,12 @@ screens:
       filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: searchAiDecisions
+    contract: ai
+    purpose: Find AI decisions
+    trigger: onLoad
+    provenance: build, 29 September 2026
   wireframe:
     status: notStarted
     board: wireframes/P09 TICVAI Web.dc.html#adm-539
@@ -64439,7 +66483,16 @@ screens:
     template: split
     regions:
     - name: contentBody
-      components: []
+      components:
+      - kind: searchField
+        derived: true
+        impliedBy: searchAiDecisions
+        label: Search
+        notes: A search that returns nothing must say so differently from a search not yet run.
+      - kind: detailPanel
+        derived: true
+        impliedBy: getAiDecisionTrace
+        notes: One record, read-only.
   states:
     loading: The decision search list.
     error: Could not load. Names which read failed and leaves the decision search untouched.
@@ -64449,7 +66502,17 @@ screens:
       and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: searchAiDecisions
+    contract: ai
+    purpose: Find AI decisions
+    trigger: onLoad
+    provenance: build, 29 September 2026
+  - operationId: getAiDecisionTrace
+    contract: ai
+    purpose: The full trace of a decision
+    trigger: onAction
+    provenance: build, 29 September 2026
   wireframe:
     status: notStarted
     board: wireframes/P09 TICVAI Web.dc.html#adm-540
@@ -64457,6 +66520,10 @@ screens:
   apisNote: Regenerated 9 September 2026 from AI_Governance_Reference.pdf page 56. 0 of 0 labels bound
     to a contract property; 0 of 61 pack bullets carried onto the screen — the rest are acceptance prose,
     worked examples and AI narrative, which belong to the matrix and the contracts rather than here.
+  entryState:
+    params:
+    - name: decisionRecordId
+      from: navigation
 - id: ADM-541
   name: AI Decision Explanation Workspace
   module: Platform
@@ -64503,7 +66570,11 @@ screens:
     template: split
     regions:
     - name: contentBody
-      components: []
+      components:
+      - kind: detailPanel
+        derived: true
+        impliedBy: getAiDecisionTrace
+        notes: One record, read-only.
   states:
     loading: The decision explanation list.
     error: Could not load. Names which read failed and leaves the decision explanation untouched.
@@ -64513,7 +66584,12 @@ screens:
       filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: getAiDecisionTrace
+    contract: ai
+    purpose: The full trace of a decision
+    trigger: onLoad
+    provenance: build, 29 September 2026
   wireframe:
     status: notStarted
     board: wireframes/P09 TICVAI Web.dc.html#adm-541
@@ -64521,6 +66597,10 @@ screens:
   apisNote: Regenerated 9 September 2026 from AI_Governance_Reference.pdf page 58. 0 of 0 labels bound
     to a contract property; 0 of 54 pack bullets carried onto the screen — the rest are acceptance prose,
     worked examples and AI narrative, which belong to the matrix and the contracts rather than here.
+  entryState:
+    params:
+    - name: decisionRecordId
+      from: navigation
 - id: ADM-542
   name: Data, Feature & Evidence Provenance
   module: Platform
@@ -64568,7 +66648,11 @@ screens:
     template: split
     regions:
     - name: contentBody
-      components: []
+      components:
+      - kind: detailPanel
+        derived: true
+        impliedBy: getAiDecisionTrace
+        notes: One record, read-only.
   states:
     loading: The data feature evidence list.
     error: Could not load. Names which read failed and leaves the data feature evidence untouched.
@@ -64578,7 +66662,12 @@ screens:
       filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: getAiDecisionTrace
+    contract: ai
+    purpose: The full trace of a decision
+    trigger: onLoad
+    provenance: build, 29 September 2026
   wireframe:
     status: notStarted
     board: wireframes/P09 TICVAI Web.dc.html#adm-542
@@ -64586,6 +66675,10 @@ screens:
   apisNote: Regenerated 9 September 2026 from AI_Governance_Reference.pdf page 60. 0 of 0 labels bound
     to a contract property; 0 of 60 pack bullets carried onto the screen — the rest are acceptance prose,
     worked examples and AI narrative, which belong to the matrix and the contracts rather than here.
+  entryState:
+    params:
+    - name: decisionRecordId
+      from: navigation
 - id: ADM-543
   name: Candidate, Rule & Decision Path Trace
   module: Platform
@@ -64668,7 +66761,17 @@ screens:
       active filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: explainRecommendationDecision
+    contract: ai
+    purpose: Why these recommendations
+    trigger: onAction
+    provenance: build, 29 September 2026
+  - operationId: getAiDecisionTrace
+    contract: ai
+    purpose: The full trace of a decision
+    trigger: onLoad
+    provenance: build, 29 September 2026
   entryState:
     preloaded:
     - Rule
@@ -64677,6 +66780,11 @@ screens:
     - Exclusion Trace
     - VIP Tour
     - Remaining Capacity = 0
+    params:
+    - name: decisionId
+      from: navigation
+    - name: decisionRecordId
+      from: navigation
   wireframe:
     status: notStarted
     board: wireframes/P09 TICVAI Web.dc.html#adm-543
@@ -64795,7 +66903,17 @@ screens:
       filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: listAiModels
+    contract: ai
+    purpose: The model catalogue
+    trigger: onLoad
+    provenance: build, 29 September 2026
+  - operationId: getAiDecisionTrace
+    contract: ai
+    purpose: The full trace of a decision
+    trigger: onLoad
+    provenance: build, 29 September 2026
   entryState:
     preloaded:
     - AI Capability
@@ -64804,6 +66922,9 @@ screens:
     - Model
     - Model Version
     - Deployment Reference
+    params:
+    - name: decisionRecordId
+      from: navigation
   wireframe:
     status: notStarted
     board: wireframes/P09 TICVAI Web.dc.html#adm-544
@@ -64857,7 +66978,11 @@ screens:
     template: split
     regions:
     - name: contentBody
-      components: []
+      components:
+      - kind: detailPanel
+        derived: true
+        impliedBy: getAiDecisionTrace
+        notes: One record, read-only.
   states:
     loading: The governance approval human list.
     error: Could not load. Names which read failed and leaves the governance approval human untouched.
@@ -64867,7 +66992,12 @@ screens:
       active filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: getAiDecisionTrace
+    contract: ai
+    purpose: The full trace of a decision
+    trigger: onLoad
+    provenance: build, 29 September 2026
   wireframe:
     status: notStarted
     board: wireframes/P09 TICVAI Web.dc.html#adm-545
@@ -64875,6 +67005,10 @@ screens:
   apisNote: Regenerated 9 September 2026 from AI_Governance_Reference.pdf page 66. 0 of 0 labels bound
     to a contract property; 0 of 65 pack bullets carried onto the screen — the rest are acceptance prose,
     worked examples and AI narrative, which belong to the matrix and the contracts rather than here.
+  entryState:
+    params:
+    - name: decisionRecordId
+      from: navigation
 - id: ADM-546
   name: Execution & Business Outcome Trace
   module: Platform
@@ -64926,7 +67060,11 @@ screens:
     template: split
     regions:
     - name: contentBody
-      components: []
+      components:
+      - kind: detailPanel
+        derived: true
+        impliedBy: getActionPlan
+        notes: One record, read-only.
   states:
     loading: The execution business outcome list.
     error: Could not load. Names which read failed and leaves the execution business outcome untouched.
@@ -64936,7 +67074,17 @@ screens:
       active filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: getActionPlan
+    contract: ai
+    purpose: A plan with its steps
+    trigger: onAction
+    provenance: build, 29 September 2026
+  - operationId: getAiDecisionTrace
+    contract: ai
+    purpose: The full trace of a decision
+    trigger: onLoad
+    provenance: build, 29 September 2026
   wireframe:
     status: notStarted
     board: wireframes/P09 TICVAI Web.dc.html#adm-546
@@ -64944,6 +67092,12 @@ screens:
   apisNote: Regenerated 9 September 2026 from AI_Governance_Reference.pdf page 68. 0 of 0 labels bound
     to a contract property; 0 of 65 pack bullets carried onto the screen — the rest are acceptance prose,
     worked examples and AI narrative, which belong to the matrix and the contracts rather than here.
+  entryState:
+    params:
+    - name: decisionRecordId
+      from: navigation
+    - name: planId
+      from: navigation
 - id: ADM-547
   name: AI Audit Record & Evidence Package
   module: Platform
@@ -65027,7 +67181,17 @@ screens:
       filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: searchAiDecisions
+    contract: ai
+    purpose: Find AI decisions
+    trigger: onLoad
+    provenance: build, 29 September 2026
+  - operationId: exportAiEvidencePackage
+    contract: ai
+    purpose: Export an evidence package
+    trigger: onAction
+    provenance: build, 29 September 2026
   wireframe:
     status: notStarted
     board: wireframes/P09 TICVAI Web.dc.html#adm-547
@@ -65116,7 +67280,17 @@ screens:
       active filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: getAiDecisionTrace
+    contract: ai
+    purpose: The full trace of a decision
+    trigger: onLoad
+    provenance: build, 29 September 2026
+  - operationId: replayAiDecision
+    contract: ai
+    purpose: Re-simulate a decision
+    trigger: onAction
+    provenance: build, 29 September 2026
   entryState:
     preloaded:
     - Model v3.2
@@ -65125,6 +67299,9 @@ screens:
     - Governance v1.4
     - Governance v1.5
     - Comparison
+    params:
+    - name: decisionRecordId
+      from: navigation
   wireframe:
     status: notStarted
     board: wireframes/P09 TICVAI Web.dc.html#adm-548
@@ -65181,12 +67358,18 @@ screens:
     - to: ADM-554
       trigger: AI Quality, Behavior & Governance Drift Monitoring
       provenance: structural — pack board 4 wiring, 19 September 2026
+      carries:
+      - releaseId
     - to: ADM-555
       trigger: AI Governance Alert & Detection Center
       provenance: structural — pack board 4 wiring, 19 September 2026
     - to: ADM-556
       trigger: AI Incident & Remediation Management
       provenance: structural — pack board 4 wiring, 19 September 2026
+      carries:
+      - capabilityKey
+      - incidentId
+      - releaseId
     - to: ADM-557
       trigger: AI Compliance, Assurance & Governance Reporting
       provenance: structural — pack board 4 wiring, 19 September 2026
@@ -65278,6 +67461,16 @@ screens:
     contract: catalogue
     purpose: Governance Risk, AI Monitoring & Control Center
     trigger: onLoad
+  - operationId: listAiGovernanceAlerts
+    contract: ai
+    purpose: Governance alerts
+    trigger: onLoad
+    provenance: build, 29 September 2026
+  - operationId: listAiIncidents
+    contract: ai
+    purpose: AI incidents
+    trigger: onLoad
+    provenance: build, 29 September 2026
   wireframe:
     status: notStarted
     board: wireframes/P09 TICVAI Web.dc.html#adm-549
@@ -65376,7 +67569,17 @@ screens:
       filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: listAiRiskRegister
+    contract: ai
+    purpose: The AI risk register
+    trigger: onLoad
+    provenance: build, 29 September 2026
+  - operationId: setAiRiskRegisterEntry
+    contract: ai
+    purpose: Record or update a risk register entry
+    trigger: onAction
+    provenance: build, 29 September 2026
   wireframe:
     status: notStarted
     board: wireframes/P09 TICVAI Web.dc.html#adm-550
@@ -65384,6 +67587,10 @@ screens:
   apisNote: Regenerated 9 September 2026 from AI_Governance_Reference.pdf page 84. 0 of 0 labels bound
     to a contract property; 21 of 64 pack bullets carried onto the screen — the rest are acceptance prose,
     worked examples and AI narrative, which belong to the matrix and the contracts rather than here.
+  entryState:
+    params:
+    - name: entryId
+      from: navigation
 - id: ADM-551
   name: AI Governance Control Library & Control Effectiveness
   module: Platform
@@ -65431,7 +67638,21 @@ screens:
     template: split
     regions:
     - name: contentBody
-      components: []
+      components:
+      - kind: dataTable
+        derived: true
+        impliedBy: listAiControls
+        notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
+          a venue''s busiest hour is a list that skips rows.'
+      - kind: primaryButton
+        derived: true
+        impliedBy: runAiControlTest
+        notes: The act the screen exists for.
+      - kind: secondaryButton
+        label: Cancel
+        notes: '**A screen that can submit must be leaveable without submitting.**'
+        derived: true
+        impliedBy: runAiControlTest
   states:
     loading: The governance effectiveness list.
     error: Could not load. Names which read failed and leaves the governance effectiveness untouched.
@@ -65441,7 +67662,17 @@ screens:
       active filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: listAiControls
+    contract: ai
+    purpose: Governance controls
+    trigger: onLoad
+    provenance: build, 29 September 2026
+  - operationId: runAiControlTest
+    contract: ai
+    purpose: Test a control now
+    trigger: onAction
+    provenance: build, 29 September 2026
   wireframe:
     status: notStarted
     board: wireframes/P09 TICVAI Web.dc.html#adm-551
@@ -65449,6 +67680,10 @@ screens:
   apisNote: Regenerated 9 September 2026 from AI_Governance_Reference.pdf page 86. 0 of 0 labels bound
     to a contract property; 0 of 56 pack bullets carried onto the screen — the rest are acceptance prose,
     worked examples and AI narrative, which belong to the matrix and the contracts rather than here.
+  entryState:
+    params:
+    - name: controlKey
+      from: navigation
 - id: ADM-552
   name: AI Policy Compliance & Violation Monitoring
   module: Platform
@@ -65553,7 +67788,17 @@ screens:
       the active filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: listAiGovernanceAlerts
+    contract: ai
+    purpose: Governance alerts
+    trigger: onLoad
+    provenance: build, 29 September 2026
+  - operationId: decideAiGovernanceAlert
+    contract: ai
+    purpose: Acknowledge, dismiss, resolve, or open an incident
+    trigger: onAction
+    provenance: build, 29 September 2026
   wireframe:
     status: notStarted
     board: wireframes/P09 TICVAI Web.dc.html#adm-552
@@ -65561,6 +67806,10 @@ screens:
   apisNote: Regenerated 9 September 2026 from AI_Governance_Reference.pdf page 87. 0 of 7 labels bound
     to a contract property; 14 of 45 pack bullets carried onto the screen — the rest are acceptance prose,
     worked examples and AI narrative, which belong to the matrix and the contracts rather than here.
+  entryState:
+    params:
+    - name: alertId
+      from: navigation
 - id: ADM-553
   name: AI Data, Privacy & Usage Compliance Monitoring
   module: Platform
@@ -65690,7 +67939,17 @@ screens:
       filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: listAiGovernanceAlerts
+    contract: ai
+    purpose: Governance alerts
+    trigger: onLoad
+    provenance: build, 29 September 2026
+  - operationId: decideAiGovernanceAlert
+    contract: ai
+    purpose: Acknowledge, dismiss, resolve, or open an incident
+    trigger: onAction
+    provenance: build, 29 September 2026
   wireframe:
     status: notStarted
     board: wireframes/P09 TICVAI Web.dc.html#adm-553
@@ -65698,6 +67957,10 @@ screens:
   apisNote: Regenerated 9 September 2026 from AI_Governance_Reference.pdf page 89. 0 of 17 labels bound
     to a contract property; 25 of 48 pack bullets carried onto the screen — the rest are acceptance prose,
     worked examples and AI narrative, which belong to the matrix and the contracts rather than here.
+  entryState:
+    params:
+    - name: alertId
+      from: navigation
 - id: ADM-554
   name: AI Quality, Behavior & Governance Drift Monitoring
   module: Platform
@@ -65745,7 +68008,27 @@ screens:
     template: split
     regions:
     - name: contentBody
-      components: []
+      components:
+      - kind: publishGate
+        impliedBy: promoteAiRelease
+        notes: 'Declares `promoteAiRelease`. **The gate names what the publish will affect before it happens**:
+          which tenants, venues or capabilities take the new version, and that the previous one stays
+          available to roll back to.'
+        provenance: check-screens publish rule, 29 September 2026
+      - kind: primaryButton
+        derived: true
+        impliedBy: runAiEvaluation
+        notes: The act the screen exists for.
+      - kind: dataTable
+        derived: true
+        impliedBy: listAiEvaluations
+        notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
+          a venue''s busiest hour is a list that skips rows.'
+      - kind: secondaryButton
+        label: Cancel
+        notes: '**A screen that can submit must be leaveable without submitting.**'
+        derived: true
+        impliedBy: runAiEvaluation
   states:
     loading: The quality behavior governance list.
     error: Could not load. Names which read failed and leaves the quality behavior governance untouched.
@@ -65755,7 +68038,32 @@ screens:
       the active filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: runAiEvaluation
+    contract: ai
+    purpose: Evaluate a candidate
+    trigger: onAction
+    provenance: build, 29 September 2026
+  - operationId: listAiEvaluations
+    contract: ai
+    purpose: Evaluation runs
+    trigger: onLoad
+    provenance: build, 29 September 2026
+  - operationId: promoteAiRelease
+    contract: ai
+    purpose: Promote a release to its next stage (a person)
+    trigger: onAction
+    provenance: build, 29 September 2026
+  - operationId: rollbackAiRelease
+    contract: ai
+    purpose: Roll a release back
+    trigger: onAction
+    provenance: build, 29 September 2026
+  - operationId: listAiGovernanceAlerts
+    contract: ai
+    purpose: Governance alerts
+    trigger: onLoad
+    provenance: build, 29 September 2026
   wireframe:
     status: notStarted
     board: wireframes/P09 TICVAI Web.dc.html#adm-554
@@ -65763,6 +68071,10 @@ screens:
   apisNote: Regenerated 9 September 2026 from AI_Governance_Reference.pdf page 90. 0 of 0 labels bound
     to a contract property; 0 of 56 pack bullets carried onto the screen — the rest are acceptance prose,
     worked examples and AI narrative, which belong to the matrix and the contracts rather than here.
+  entryState:
+    params:
+    - name: releaseId
+      from: navigation
 - id: ADM-555
   name: AI Governance Alert & Detection Center
   module: Platform
@@ -65810,7 +68122,21 @@ screens:
     template: split
     regions:
     - name: contentBody
-      components: []
+      components:
+      - kind: dataTable
+        derived: true
+        impliedBy: listAiGovernanceAlerts
+        notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
+          a venue''s busiest hour is a list that skips rows.'
+      - kind: primaryButton
+        derived: true
+        impliedBy: decideAiGovernanceAlert
+        notes: The act the screen exists for.
+      - kind: secondaryButton
+        label: Cancel
+        notes: '**A screen that can submit must be leaveable without submitting.**'
+        derived: true
+        impliedBy: decideAiGovernanceAlert
   states:
     loading: The governance alert detection list.
     error: Could not load. Names which read failed and leaves the governance alert detection untouched.
@@ -65820,7 +68146,22 @@ screens:
       active filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: listAiGovernanceAlerts
+    contract: ai
+    purpose: Governance alerts
+    trigger: onLoad
+    provenance: build, 29 September 2026
+  - operationId: decideAiGovernanceAlert
+    contract: ai
+    purpose: Acknowledge, dismiss, resolve, or open an incident
+    trigger: onAction
+    provenance: build, 29 September 2026
+  - operationId: openAiIncident
+    contract: ai
+    purpose: Open an AI incident
+    trigger: onAction
+    provenance: build, 29 September 2026
   wireframe:
     status: notStarted
     board: wireframes/P09 TICVAI Web.dc.html#adm-555
@@ -65828,6 +68169,10 @@ screens:
   apisNote: Regenerated 9 September 2026 from AI_Governance_Reference.pdf page 92. 0 of 0 labels bound
     to a contract property; 0 of 52 pack bullets carried onto the screen — the rest are acceptance prose,
     worked examples and AI narrative, which belong to the matrix and the contracts rather than here.
+  entryState:
+    params:
+    - name: alertId
+      from: navigation
 - id: ADM-556
   name: AI Incident & Remediation Management
   module: Platform
@@ -65911,7 +68256,37 @@ screens:
       data* and sends somebody to support with the wrong question.
     emptyNoResults: '**Nothing matched.** The filter or the scope narrowed it — naming which is what stops
       somebody concluding the record does not exist'
-  apis: []
+  apis:
+  - operationId: pauseAiCapability
+    contract: ai
+    purpose: Stop a capability now
+    trigger: onAction
+    provenance: build, 29 September 2026
+  - operationId: rollbackAiRelease
+    contract: ai
+    purpose: Roll a release back
+    trigger: onAction
+    provenance: build, 29 September 2026
+  - operationId: listAiIncidents
+    contract: ai
+    purpose: AI incidents
+    trigger: onLoad
+    provenance: build, 29 September 2026
+  - operationId: openAiIncident
+    contract: ai
+    purpose: Open an AI incident
+    trigger: onAction
+    provenance: build, 29 September 2026
+  - operationId: containAiIncident
+    contract: ai
+    purpose: Contain an incident
+    trigger: onAction
+    provenance: build, 29 September 2026
+  - operationId: closeAiIncident
+    contract: ai
+    purpose: Close an incident
+    trigger: onAction
+    provenance: build, 29 September 2026
   wireframe:
     status: notStarted
     board: wireframes/P09 TICVAI Web.dc.html#adm-556
@@ -65919,6 +68294,14 @@ screens:
   apisNote: Regenerated 9 September 2026 from AI_Governance_Reference.pdf page 94. 0 of 0 labels bound
     to a contract property; 9 of 51 pack bullets carried onto the screen — the rest are acceptance prose,
     worked examples and AI narrative, which belong to the matrix and the contracts rather than here.
+  entryState:
+    params:
+    - name: capabilityKey
+      from: navigation
+    - name: incidentId
+      from: navigation
+    - name: releaseId
+      from: navigation
 - id: ADM-557
   name: AI Compliance, Assurance & Governance Reporting
   module: Platform
@@ -66010,7 +68393,22 @@ screens:
       the active filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: exportAiEvidencePackage
+    contract: ai
+    purpose: Export an evidence package
+    trigger: onAction
+    provenance: build, 29 September 2026
+  - operationId: listAiRiskRegister
+    contract: ai
+    purpose: The AI risk register
+    trigger: onLoad
+    provenance: build, 29 September 2026
+  - operationId: listAiControls
+    contract: ai
+    purpose: Governance controls
+    trigger: onLoad
+    provenance: build, 29 September 2026
   wireframe:
     status: notStarted
     board: wireframes/P09 TICVAI Web.dc.html#adm-557
@@ -66079,7 +68477,17 @@ screens:
       data* and sends somebody to support with the wrong question.
     emptyNoResults: '**Nothing matched.** The filter or the scope narrowed it — naming which is what stops
       somebody concluding the record does not exist'
-  apis: []
+  apis:
+  - operationId: listAiGovernanceAlerts
+    contract: ai
+    purpose: Governance alerts
+    trigger: onLoad
+    provenance: build, 29 September 2026
+  - operationId: listAiRiskRegister
+    contract: ai
+    purpose: The AI risk register
+    trigger: onLoad
+    provenance: build, 29 September 2026
   wireframe:
     status: notStarted
     board: wireframes/P09 TICVAI Web.dc.html#adm-558
@@ -68429,6 +70837,16 @@ screens:
     purpose: The device register behind it
     trigger: onLoad
     provenance: board reading, 19 September 2026
+  - operationId: listPaymentTerminalCertifications
+    contract: payments
+    purpose: Terminal model certifications
+    trigger: onLoad
+    provenance: build, 29 September 2026
+  - operationId: recordPaymentTerminalCertification
+    contract: payments
+    purpose: Record a terminal model certification
+    trigger: onAction
+    provenance: build, 29 September 2026
   wireframe:
     status: notStarted
     board: wireframes/P09 TICVAI Web.dc.html#adm-580
@@ -68437,6 +70855,10 @@ screens:
     bound to a contract property; 5 of 35 pack bullets carried onto the screen — the rest are acceptance
     prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than
     here.
+  entryState:
+    params:
+    - name: modelCode
+      from: navigation
 - id: ADM-581
   name: Terminal Provisioning & Device Configuration\t51
   module: Commercial
@@ -69178,6 +71600,21 @@ screens:
     purpose: Raise a repair
     trigger: onAction
     provenance: board reading, 19 September 2026
+  - operationId: listDeviceFirmware
+    contract: tenancy
+    purpose: Terminal firmware versions across the fleet
+    trigger: onLoad
+    provenance: build, 29 September 2026
+  - operationId: getDeviceFirmware
+    contract: tenancy
+    purpose: Open a release
+    trigger: onAction
+    provenance: build, 29 September 2026
+  - operationId: createDeviceFirmware
+    contract: tenancy
+    purpose: Register a terminal firmware release
+    trigger: onAction
+    provenance: build, 29 September 2026
   wireframe:
     status: notStarted
     board: wireframes/P09 TICVAI Web.dc.html#adm-587
@@ -69190,6 +71627,8 @@ screens:
     params:
     - name: deviceId
       from: session
+    - name: firmwareId
+      from: navigation
 - id: ADM-588
   name: Terminal Simulator, Certification & AI Operations Advisor\t59
   module: Commercial
@@ -69325,6 +71764,16 @@ screens:
     trigger: onAction
     provenance: board reading, 19 September 2026
     invalidates: *id012
+  - operationId: listPaymentTerminalCertifications
+    contract: payments
+    purpose: Terminal model certifications
+    trigger: onLoad
+    provenance: build, 29 September 2026
+  - operationId: recordPaymentTerminalCertification
+    contract: payments
+    purpose: Record a terminal model certification
+    trigger: onAction
+    provenance: build, 29 September 2026
   wireframe:
     status: notStarted
     board: wireframes/P09 TICVAI Web.dc.html#adm-588
@@ -69336,6 +71785,8 @@ screens:
   entryState:
     params:
     - name: connectionId
+      from: navigation
+    - name: modelCode
       from: navigation
 - id: ADM-589
   name: Digital Payments Command Center\t71
@@ -71045,6 +73496,16 @@ screens:
     provenance: board reading, 19 September 2026
     invalidates:
     - listB2bCreditAccounts
+  - operationId: getInstalmentPolicy
+    contract: payments
+    purpose: Show the instalment policy
+    trigger: onLoad
+    provenance: build, 29 September 2026
+  - operationId: setInstalmentPolicy
+    contract: payments
+    purpose: Edit the instalment policy
+    trigger: onAction
+    provenance: build, 29 September 2026
   wireframe:
     status: notStarted
     board: wireframes/P09 TICVAI Web.dc.html#adm-603
@@ -72257,6 +74718,16 @@ screens:
     purpose: Approve above threshold
     trigger: onAction
     provenance: board reading, 19 September 2026
+  - operationId: listFraudRules
+    contract: orders
+    purpose: Show refund-abuse and charge fraud rules
+    trigger: onLoad
+    provenance: build, 29 September 2026
+  - operationId: setFraudRules
+    contract: orders
+    purpose: Edit refund-abuse and charge fraud rules
+    trigger: onAction
+    provenance: build, 29 September 2026
   entryState:
     preloaded:
     - Request
@@ -74070,6 +76541,16 @@ screens:
     purpose: Rules and decisions
     trigger: onAction
     provenance: board reading, 19 September 2026
+  - operationId: listFraudRules
+    contract: orders
+    purpose: Show refund-abuse and charge fraud rules
+    trigger: onLoad
+    provenance: build, 29 September 2026
+  - operationId: setFraudRules
+    contract: orders
+    purpose: Edit refund-abuse and charge fraud rules
+    trigger: onAction
+    provenance: build, 29 September 2026
   wireframe:
     status: notStarted
     board: wireframes/P09 TICVAI Web.dc.html#adm-630
@@ -74388,6 +76869,61 @@ screens:
     purpose: Cases to investigate
     trigger: onLoad
     provenance: board reading, 19 September 2026
+  - operationId: getEntityRisk
+    contract: ai
+    purpose: Current risk of an entity
+    trigger: onAction
+    provenance: build, 29 September 2026
+  - operationId: listRiskAlerts
+    contract: ai
+    purpose: Risk alerts
+    trigger: onLoad
+    provenance: build, 29 September 2026
+  - operationId: decideRiskAlert
+    contract: ai
+    purpose: Dismiss, monitor, mark false positive, or escalate
+    trigger: onAction
+    provenance: build, 29 September 2026
+  - operationId: createRiskCase
+    contract: ai
+    purpose: Open an investigation
+    trigger: onAction
+    provenance: build, 29 September 2026
+  - operationId: getRiskCase
+    contract: ai
+    purpose: A case with its evidence and actions
+    trigger: onAction
+    provenance: build, 29 September 2026
+  - operationId: addRiskCaseEvidence
+    contract: ai
+    purpose: Add evidence to a case
+    trigger: onAction
+    provenance: build, 29 September 2026
+  - operationId: expandRiskNetwork
+    contract: ai
+    purpose: Expand the relationship graph around an entity
+    trigger: onAction
+    provenance: build, 29 September 2026
+  - operationId: proposeRiskAction
+    contract: ai
+    purpose: Propose a restrictive action from a case
+    trigger: onAction
+    provenance: build, 29 September 2026
+  - operationId: closeRiskCase
+    contract: ai
+    purpose: Close a case with an outcome
+    trigger: onAction
+    provenance: build, 29 September 2026
+  - operationId: assignChargeback
+    contract: orders
+    purpose: Assign a chargeback to an investigator
+    trigger: onAction
+    provenance: build, 29 September 2026
+  - operationId: getChargebackAnalytics
+    contract: orders
+    purpose: Customers with repeated chargebacks (groupBy=customer, minChargebacks)
+    trigger: onAction
+    provenance: build, 29 September 2026
   entryState:
     preloaded:
     - Case ID
@@ -74396,6 +76932,17 @@ screens:
     - Transaction
     - Order
     - Payment method
+    params:
+    - name: alertId
+      from: navigation
+    - name: caseId
+      from: navigation
+    - name: chargebackId
+      from: navigation
+    - name: entityRef
+      from: navigation
+    - name: entityType
+      from: navigation
   wireframe:
     status: notStarted
     board: wireframes/P09 TICVAI Web.dc.html#adm-633
@@ -74540,6 +77087,31 @@ screens:
     purpose: Respond
     trigger: onAction
     provenance: board reading, 19 September 2026
+  - operationId: recordChargeback
+    contract: orders
+    purpose: Record a chargeback read from an acquirer portal
+    trigger: onAction
+    provenance: build, 29 September 2026
+  - operationId: assignChargeback
+    contract: orders
+    purpose: Assign a chargeback to an investigator
+    trigger: onAction
+    provenance: build, 29 September 2026
+  - operationId: recordChargebackOutcome
+    contract: orders
+    purpose: Record the bank decision on a chargeback
+    trigger: onAction
+    provenance: build, 29 September 2026
+  - operationId: getChargebackAnalytics
+    contract: orders
+    purpose: Chargeback analytics panel
+    trigger: onLoad
+    provenance: build, 29 September 2026
+  - operationId: getChargebackAnalytics
+    contract: orders
+    purpose: Chargeback analytics, groupBy product/customer
+    trigger: onLoad
+    provenance: build, 29 September 2026
   wireframe:
     status: notStarted
     board: wireframes/P09 TICVAI Web.dc.html#adm-634
@@ -74772,7 +77344,25 @@ screens:
     template: split
     regions:
     - name: contentBody
-      components: []
+      components:
+      - kind: detailPanel
+        derived: true
+        impliedBy: getEntityRisk
+        notes: One record, read-only.
+      - kind: primaryButton
+        derived: true
+        impliedBy: configureRiskStrategy
+        notes: The act the screen exists for.
+      - kind: dataTable
+        derived: true
+        impliedBy: listRiskAlerts
+        notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
+          a venue''s busiest hour is a list that skips rows.'
+      - kind: secondaryButton
+        label: Cancel
+        notes: '**A screen that can submit must be leaveable without submitting.**'
+        derived: true
+        impliedBy: configureRiskStrategy
   states:
     loading: The fraud anomaly payment list.
     error: Could not load. Names which read failed and leaves the fraud anomaly payment untouched.
@@ -74788,6 +77378,31 @@ screens:
     purpose: Anomalies in payment behaviour
     trigger: onLoad
     provenance: board reading, 19 September 2026
+  - operationId: getEntityRisk
+    contract: ai
+    purpose: Current risk of an entity
+    trigger: onAction
+    provenance: build, 29 September 2026
+  - operationId: configureRiskStrategy
+    contract: ai
+    purpose: Set the risk strategy
+    trigger: onAction
+    provenance: build, 29 September 2026
+  - operationId: listRiskAlerts
+    contract: ai
+    purpose: Risk alerts
+    trigger: onLoad
+    provenance: build, 29 September 2026
+  - operationId: getChargebackAnalytics
+    contract: orders
+    purpose: Chargeback analytics panel
+    trigger: onLoad
+    provenance: build, 29 September 2026
+  - operationId: getChargebackAnalytics
+    contract: orders
+    purpose: Chargeback trend beside payment risk
+    trigger: onLoad
+    provenance: build, 29 September 2026
   wireframe:
     status: notStarted
     board: wireframes/P09 TICVAI Web.dc.html#adm-637
@@ -74796,6 +77411,12 @@ screens:
     bound to a contract property; 0 of 27 pack bullets carried onto the screen — the rest are acceptance
     prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than
     here.
+  entryState:
+    params:
+    - name: entityRef
+      from: navigation
+    - name: entityType
+      from: navigation
 - id: ADM-638
   name: Payment Executive Intelligence, Risk Simulator & AI Advisor\t176
   module: Commercial
@@ -74882,6 +77503,11 @@ screens:
     purpose: Executive simulation
     trigger: onAction
     provenance: board reading, 19 September 2026
+  - operationId: backtestRiskStrategy
+    contract: ai
+    purpose: Backtest a draft strategy
+    trigger: onAction
+    provenance: build, 29 September 2026
   wireframe:
     status: notStarted
     board: wireframes/P09 TICVAI Web.dc.html#adm-638
@@ -78812,16 +81438,16 @@ screens:
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
   apis:
-  - operationId: explainRecommendation
-    contract: promotions
-    purpose: The decision trace
-    trigger: onAction
-    provenance: board reading, 19 September 2026
   - operationId: simulateRecommendationStrategy
     contract: promotions
     purpose: Simulate the journey
     trigger: onAction
     provenance: board reading, 19 September 2026
+  - operationId: explainRecommendationDecision
+    contract: ai
+    purpose: Why these recommendations
+    trigger: onAction
+    provenance: build, 29 September 2026
   wireframe:
     status: notStarted
     board: wireframes/P09 TICVAI Web.dc.html#adm-678
@@ -78829,6 +81455,10 @@ screens:
   apisNote: Regenerated 9 September 2026 from Upsell,CrossSellEngine.pdf page 110. 0 of 0 labels bound
     to a contract property; 0 of 150 pack bullets carried onto the screen — the rest are acceptance prose,
     worked examples and AI narrative, which belong to the matrix and the contracts rather than here.
+  entryState:
+    params:
+    - name: decisionId
+      from: navigation
 - id: ADM-679
   name: Personalization & NBO Command Center
   module: Commercial
@@ -79037,11 +81667,16 @@ screens:
     purpose: The guest behind the recommendation
     trigger: onAction
     provenance: board reading, 19 September 2026
-  - operationId: explainRecommendation
-    contract: promotions
-    purpose: What we would offer them
+  - operationId: getCustomerRecommendationProfile
+    contract: ai
+    purpose: What the engine knows about a customer
+    trigger: onLoad
+    provenance: build, 29 September 2026
+  - operationId: explainRecommendationDecision
+    contract: ai
+    purpose: Why these recommendations
     trigger: onAction
-    provenance: board reading, 19 September 2026
+    provenance: build, 29 September 2026
   wireframe:
     status: notStarted
     board: wireframes/P09 TICVAI Web.dc.html#adm-680
@@ -79052,6 +81687,8 @@ screens:
   entryState:
     params:
     - name: subjectId
+      from: navigation
+    - name: decisionId
       from: navigation
 - id: ADM-681
   name: Customer Feature & Signal Configuration
@@ -79324,11 +81961,11 @@ screens:
     trigger: onAction
     provenance: board reading, 19 September 2026
     invalidates: *id014
-  - operationId: explainRecommendation
-    contract: promotions
-    purpose: Trace a decision
+  - operationId: explainRecommendationDecision
+    contract: ai
+    purpose: Why these recommendations
     trigger: onAction
-    provenance: board reading, 19 September 2026
+    provenance: build, 29 September 2026
   wireframe:
     status: notStarted
     board: wireframes/P09 TICVAI Web.dc.html#adm-683
@@ -79339,6 +81976,8 @@ screens:
   entryState:
     params:
     - name: strategyId
+      from: navigation
+    - name: decisionId
       from: navigation
 - id: ADM-684
   name: Personalized Ranking & Decision Policy Builder
@@ -79624,11 +82263,11 @@ screens:
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
   apis:
-  - operationId: explainRecommendation
-    contract: promotions
-    purpose: Anonymous and known, side by side
+  - operationId: explainRecommendationDecision
+    contract: ai
+    purpose: Why these recommendations
     trigger: onAction
-    provenance: board reading, 19 September 2026
+    provenance: build, 29 September 2026
   wireframe:
     status: notStarted
     board: wireframes/P09 TICVAI Web.dc.html#adm-686
@@ -79636,6 +82275,10 @@ screens:
   apisNote: Regenerated 9 September 2026 from Upsell,CrossSellEngine.pdf page 135. 0 of 0 labels bound
     to a contract property; 0 of 24 pack bullets carried onto the screen — the rest are acceptance prose,
     worked examples and AI narrative, which belong to the matrix and the contracts rather than here.
+  entryState:
+    params:
+    - name: decisionId
+      from: navigation
 - id: ADM-687
   name: AI Explainability, Confidence & Model Governance
   module: Commercial
@@ -79726,11 +82369,11 @@ screens:
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
   apis:
-  - operationId: explainRecommendation
-    contract: promotions
-    purpose: Factors and confidence
+  - operationId: explainRecommendationDecision
+    contract: ai
+    purpose: Why these recommendations
     trigger: onAction
-    provenance: board reading, 19 September 2026
+    provenance: build, 29 September 2026
   entryState:
     preloaded:
     - Model
@@ -79739,6 +82382,9 @@ screens:
     - Owner
     - Status
     - Confidence threshold
+    params:
+    - name: decisionId
+      from: navigation
   wireframe:
     status: notStarted
     board: wireframes/P09 TICVAI Web.dc.html#adm-687
@@ -80745,11 +83391,11 @@ screens:
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
   apis:
-  - operationId: explainRecommendation
-    contract: promotions
-    purpose: Explainability and safety
+  - operationId: explainRecommendationDecision
+    contract: ai
+    purpose: Why these recommendations
     trigger: onAction
-    provenance: board reading, 19 September 2026
+    provenance: build, 29 September 2026
   wireframe:
     status: notStarted
     board: wireframes/P09 TICVAI Web.dc.html#adm-696
@@ -80757,6 +83403,10 @@ screens:
   apisNote: Regenerated 9 September 2026 from Upsell,CrossSellEngine.pdf page 164. 0 of 0 labels bound
     to a contract property; 5 of 26 pack bullets carried onto the screen — the rest are acceptance prose,
     worked examples and AI narrative, which belong to the matrix and the contracts rather than here.
+  entryState:
+    params:
+    - name: decisionId
+      from: navigation
 - id: ADM-697
   name: Recommendation Audit, Decision Trace & Investigation
   module: Commercial
@@ -80829,11 +83479,11 @@ screens:
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
   apis:
-  - operationId: explainRecommendation
-    contract: promotions
-    purpose: Investigate one decision
+  - operationId: explainRecommendationDecision
+    contract: ai
+    purpose: Why these recommendations
     trigger: onAction
-    provenance: board reading, 19 September 2026
+    provenance: build, 29 September 2026
   wireframe:
     status: notStarted
     board: wireframes/P09 TICVAI Web.dc.html#adm-697
@@ -80841,6 +83491,10 @@ screens:
   apisNote: Regenerated 9 September 2026 from Upsell,CrossSellEngine.pdf page 166. 0 of 9 labels bound
     to a contract property; 9 of 38 pack bullets carried onto the screen — the rest are acceptance prose,
     worked examples and AI narrative, which belong to the matrix and the contracts rather than here.
+  entryState:
+    params:
+    - name: decisionId
+      from: navigation
 - id: ADM-698
   name: AI Optimization & Recommendation Intelligence Lab
   module: Commercial

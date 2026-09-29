@@ -1,5 +1,5 @@
 id: LLD-access
-title: access — 243 operations
+title: access — 245 operations
 generatedBy: tools/derive-diagrams.py
 index: diagrams/hld/03-contracts.yaml
 tier: spine
@@ -298,8 +298,12 @@ operations:
   - staff
   offline: false
   reads:
+  - access.biometric_profile
+  - cache:idempotency
   - pii.subject_biometric
-  writes: []
+  writes:
+  - cache:idempotency
+  - pii.subject_biometric
 - operation: getAccessPoint
   verb: GET
   path: /access-points/{accessPointId}
@@ -310,6 +314,22 @@ operations:
   offline: true
   reads:
   - access.access_point
+  writes: []
+- operation: getAccessRiskScore
+  verb: GET
+  path: /access-risk-scores
+  scope: venue
+  permission: SCOPE_VIEW
+  audience:
+  - staff
+  offline: false
+  reads:
+  - access.blacklist
+  - access.entitlement
+  - access.fraud_rule
+  - access.identity_lock
+  - access.risk_scoring_config
+  - access.security_alert
   writes: []
 - operation: getCredentialIssuanceRetryPolicy
   verb: GET
@@ -384,6 +404,7 @@ operations:
   offline: false
   reads:
   - access.access_point
+  - access.accreditation_credential
   - access.admission_rules
   - access.blacklist
   - cache:resolution
@@ -932,6 +953,20 @@ operations:
 - operation: listDynamicAccessPolicy
   verb: GET
   path: /dynamic-access-policy
+  scope: venue
+  permission: SCOPE_VIEW
+  audience:
+  - staff
+  offline: false
+  reads:
+  - access.dynamic_policy
+  - access.dynamic_policy_version
+  - access.policy_scope_assignment
+  - access.scan_event
+  writes: []
+- operation: listDynamicPolicyEffectiveness
+  verb: GET
+  path: /dynamic-policy-effectiveness
   scope: venue
   permission: SCOPE_VIEW
   audience:
@@ -2280,7 +2315,8 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
+  reads:
+  - tenancy.data_retention_setting
   writes: []
 - operation: setBiometricVerificationProfile
   verb: PUT
@@ -3336,6 +3372,7 @@ operations:
   - access.access_point
   writes:
   - access.scan_event
+  - platform.outbox
   - sync.rejection
 - operation: updateAccessDevice
   verb: PUT
@@ -3422,9 +3459,13 @@ operations:
   offline: true
   reads:
   - access.access_point
+  - access.accreditation_credential
   - access.admission_rules
   - access.blacklist
+  - access.dynamic_policy
+  - access.dynamic_policy_version
   - access.entitlement
+  - access.policy_scope_assignment
   - cache:idempotency
   - catalogue.entitlement_template
   writes:
@@ -3443,6 +3484,9 @@ operations:
   reads:
   - access.access_point
   - access.admission_rules
+  - access.dynamic_policy
+  - access.dynamic_policy_version
+  - access.policy_scope_assignment
   - cache:idempotency
   - catalogue.entitlement_template
   writes:

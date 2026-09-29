@@ -1,0 +1,93 @@
+# storefront.sessionEvent v1 — published by whitelabel
+# Checked by tools/check-states.py against states/ and the contracts.
+
+name: storefront.sessionEvent
+version: 1
+publisher: whitelabel
+description: A batch of browsing behaviour from one storefront or guest-app session — hashed, counted, and with
+  no personal data.
+aggregate: storefrontSession
+emittedWhen: recordStorefrontSessionEvents accepts a batch (one event per accepted batch)
+payload:
+- field: batchId
+  type: string
+  notes: ULID minted by the storefront for the batch. The idempotency key; a retried beacon carries the same one
+- field: sessionRef
+  type: string
+  notes: 'The storefront session id hashed with the tenant key. **The join to a later checkout**: the checkout
+    passes the same value to `ai.scoreTransactionRisk` as `sessionRef`, so the risk engine can read the browsing
+    that preceded a payment without either side naming a person'
+- field: deviceIdHash
+  type: string
+  required: false
+  notes: Hashed, keyed per tenant, as on identity.loginRecorded
+- field: surface
+  type: string
+  notes: guestWeb or guestApp
+- field: venueId
+  type: uuid
+  required: false
+- field: signedIn
+  type: boolean
+  notes: Whether a guest session was attached. **The guest's id is not carried**
+- field: ipHash
+  type: string
+  required: false
+  notes: The client address hashed with the tenant key at the edge, the same hash `ai.scoreTransactionRisk`
+    receives as `ipHash`. The address itself is not carried
+- field: ipCountry
+  type: string
+  required: false
+  notes: ISO 3166-1 alpha-2, resolved at the edge
+- field: userAgentFamily
+  type: string
+  required: false
+  notes: Browser or app family and major version only, e.g. `chrome-128`, `ticvai-ios-4`
+- field: interactions
+  type: array
+  notes: Up to 50 items `{kind, pageKind, productId?, at, dwellMs?}`. kind is pageView, productView,
+    seatMapOpened, addToCart, removeFromCart, checkoutStarted, paymentPageViewed, promoCodeTried or search;
+    pageKind is the route family (home, product, seatMap, cart, checkout, account, content), never a URL with a
+    query string. No free text, so no search term is carried
+- field: automationHints
+  type: object
+  required: false
+  notes: '`{webdriver, headless, pointerEvents, interactionsPerMinute}` as the runtime observed them: the
+    bot-like signals, counted, not recorded'
+- field: sessionStartedAt
+  type: timestamp
+- field: batchEndedAt
+  type: timestamp
+- field: scopePath
+  type: string
+- field: tenantId
+  type: uuid
+consumers:
+- context: ai
+  purpose: 'Browsing behaviour as a risk signal (8.3.40): session speed, straight-to-checkout, many cards or
+    promo codes tried, automation hints, joined to the payment through sessionRef; kept as entity baseline
+    counters in `ai-realtime`, not as a browsing history (AI system design section 3.2)'
+  idempotencyKey: batchId
+  onFailure: retry
+  isCritical: false
+retention: 7 days after publication; the risk engine keeps counters per session and device hash, not the events
+notes: '**Added 29 September (build pass, group G2), closing 8.3.40.** The risk engine saw purchases, sign-ins
+  and scans and nothing of what a buyer did before paying; `cart.abandoned` was the only storefront behaviour
+  that reached it.
+
+
+  **No personal data.** No guest id, no name, no contact point, no address, no URL query, no search text:
+  hashes keyed per tenant, route families, product ids and counts. Two tenants cannot join a device on it.
+
+
+  No state model emits this: a session has no lifecycle the platform keeps. `recordStorefrontSessionEvents`
+  writes `platform.outbox` and nothing else (ADR-0033).
+
+
+  **Not offered to webhooks**: it is high-volume behavioural telemetry for fraud prevention, not a business
+  fact a receiver acts on.'
+x-ticvai-make-or-break: 'Under UAE PDPL and the tenant''s cookie policy, may browsing behaviour be collected for
+  fraud prevention without an analytics consent (as a security or strictly-necessary purpose), or only once the
+  visitor grants a consent category? Built as security purpose, sent regardless of the analytics decision; if
+  the answer is consent, the storefront runtime gates the beacon on `getCookieConsentRuntime` like the analytics
+  providers.'

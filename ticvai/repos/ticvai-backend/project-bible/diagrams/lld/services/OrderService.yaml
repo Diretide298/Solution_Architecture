@@ -1,9 +1,9 @@
 id: LLD-OrderService
-title: OrderService — 277 operations, 106 tables
+title: OrderService — 287 operations, 113 tables
 generatedBy: tools/derive-diagrams.py
 tier: commerce
 index: diagrams/hld/02-services.yaml
-why: '**The transactional core.** 277 operations, 106 tables, and the highest write rate in the platform.
+why: '**The transactional core.** 287 operations, 113 tables, and the highest write rate in the platform.
   Separate because its scaling profile is unlike anything else — a Saturday evening is ten times a Tuesday
   morning.
 
@@ -27,25 +27,25 @@ why: '**The transactional core.** 277 operations, 106 tables, and the highest wr
 scale: Write-heavy, spiky, latency-critical. **The one that autoscales.**
 ifDown: '**Down means no sales.** Highest availability target in the platform.'
 coverage:
-  operations: 277
+  operations: 287
   inAFlow: 142
-  percent: 51%
+  percent: 49%
   note: '**Flow coverage is how much of this service a journey has walked.** A service under 40% is
     unwalked rather than under-documented.'
 schemas:
 - schema: orders
-  tables: 79
+  tables: 81
   stores:
   - postgres
   largestTable: orders.upgrade_rule
 - schema: payments
-  tables: 27
+  tables: 32
   stores:
   - postgres
-  largestTable: payments.payment_attempt
+  largestTable: payments.method
 operationsByContract:
 - contract: orders
-  count: 215
+  count: 219
   operations:
   - operation: abandonCart
     verb: DELETE
@@ -127,6 +127,14 @@ operationsByContract:
     offline: false
     reads: 2
     writes: 3
+  - operation: assignChargeback
+    verb: POST
+    path: /chargebacks/{chargebackId}/assign
+    scope: venue
+    permission: ORDER_REFUND_APPROVE
+    offline: false
+    reads: 4
+    writes: 3
   - operation: authoriseStoredValue
     verb: POST
     path: /stored-value/authorisations
@@ -165,7 +173,7 @@ operationsByContract:
     scope: venue
     permission: null
     offline: false
-    reads: 10
+    reads: 11
     writes: 4
   - operation: claimCart
     verb: POST
@@ -182,7 +190,7 @@ operationsByContract:
     permission: null
     offline: false
     reads: 3
-    writes: 3
+    writes: 4
   - operation: cleanupFailedPayment
     verb: POST
     path: /payments/{paymentId}/cleanup
@@ -301,7 +309,7 @@ operationsByContract:
     scope: venue
     permission: ORDER_REFUND
     offline: false
-    reads: 4
+    reads: 5
     writes: 6
   - operation: createRefundRequest
     verb: POST
@@ -309,7 +317,7 @@ operationsByContract:
     scope: venue
     permission: null
     offline: false
-    reads: 3
+    reads: 4
     writes: 2
   - operation: createResaleListing
     verb: POST
@@ -318,7 +326,7 @@ operationsByContract:
     permission: ORDER_CREATE
     offline: false
     reads: 5
-    writes: 2
+    writes: 3
   - operation: createReservation
     verb: POST
     path: /reservations
@@ -350,7 +358,7 @@ operationsByContract:
     permission: ORDER_EXCHANGE
     offline: false
     reads: 2
-    writes: 5
+    writes: 6
   - operation: extendCart
     verb: POST
     path: /carts/{cartId}/extend
@@ -381,7 +389,7 @@ operationsByContract:
     scope: tenant
     permission: ORDER_VIEW
     offline: false
-    reads: 3
+    reads: 4
     writes: 0
   - operation: getCart
     verb: GET
@@ -390,6 +398,14 @@ operationsByContract:
     permission: null
     offline: false
     reads: 9
+    writes: 0
+  - operation: getChargebackAnalytics
+    verb: GET
+    path: /chargebacks/analytics
+    scope: venue
+    permission: ORDER_REFUND_APPROVE
+    offline: false
+    reads: 6
     writes: 0
   - operation: getDepositPolicy
     verb: GET
@@ -613,7 +629,7 @@ operationsByContract:
     scope: venue
     permission: ORDER_REFUND_APPROVE
     offline: false
-    reads: 2
+    reads: 4
     writes: 0
   - operation: listCreateListingResale
     verb: GET
@@ -1303,6 +1319,22 @@ operationsByContract:
     offline: false
     reads: 4
     writes: 0
+  - operation: recordChargeback
+    verb: POST
+    path: /chargebacks/intake
+    scope: venue
+    permission: ORDER_REFUND_APPROVE
+    offline: false
+    reads: 9
+    writes: 6
+  - operation: recordChargebackOutcome
+    verb: POST
+    path: /chargebacks/{chargebackId}/outcome
+    scope: venue
+    permission: ORDER_REFUND_APPROVE
+    offline: false
+    reads: 6
+    writes: 6
   - operation: recordExternalReference
     verb: POST
     path: /orders/{orderId}/external-references
@@ -1413,8 +1445,8 @@ operationsByContract:
     scope: venue
     permission: ORDER_REFUND_APPROVE
     offline: false
-    reads: 5
-    writes: 3
+    reads: 7
+    writes: 5
   - operation: resumeOrder
     verb: POST
     path: /orders/{orderId}/resume
@@ -1758,7 +1790,7 @@ operationsByContract:
     permission: ORDER_VOID
     offline: true
     reads: 7
-    writes: 5
+    writes: 6
   - operation: voidPayment
     verb: POST
     path: /payments/{paymentId}/void
@@ -1768,7 +1800,7 @@ operationsByContract:
     reads: 2
     writes: 3
 - contract: payments
-  count: 41
+  count: 47
   operations:
   - operation: createB2bCreditAccount
     verb: POST
@@ -1778,6 +1810,14 @@ operationsByContract:
     offline: false
     reads: 1
     writes: 1
+  - operation: createInstalmentPlan
+    verb: POST
+    path: /instalment-plans
+    scope: venue
+    permission: ORDER_CREATE
+    offline: false
+    reads: 7
+    writes: 5
   - operation: createPaymentMethod
     verb: POST
     path: /payment-methods
@@ -1799,6 +1839,14 @@ operationsByContract:
     path: /dunning-policy
     scope: tenant
     permission: PAYMENT_CONFIGURE
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: getInstalmentPolicy
+    verb: GET
+    path: /instalment-policy
+    scope: tenant
+    permission: PAYMENT_VIEW
     offline: false
     reads: 1
     writes: 0
@@ -1866,6 +1914,14 @@ operationsByContract:
     offline: false
     reads: 1
     writes: 0
+  - operation: listInstalmentPlans
+    verb: GET
+    path: /instalment-plans
+    scope: venue
+    permission: PAYMENT_VIEW
+    offline: false
+    reads: 2
+    writes: 0
   - operation: listMerchantAccounts
     verb: GET
     path: /merchant-accounts
@@ -1906,6 +1962,14 @@ operationsByContract:
     offline: false
     reads: 1
     writes: 0
+  - operation: listPaymentTerminalCertifications
+    verb: GET
+    path: /payment-terminal-certifications
+    scope: tenant
+    permission: PAYMENT_VIEW
+    offline: false
+    reads: 2
+    writes: 0
   - operation: listPaymentTerminals
     verb: GET
     path: /payment-terminals
@@ -1938,6 +2002,14 @@ operationsByContract:
     offline: false
     reads: 1
     writes: 1
+  - operation: recordPaymentTerminalCertification
+    verb: PUT
+    path: /payment-terminal-certifications/{modelCode}
+    scope: tenant
+    permission: PAYMENT_PROVIDER_MANAGE
+    offline: false
+    reads: 4
+    writes: 4
   - operation: resolveDunningCase
     verb: POST
     path: /dunning-cases/{caseId}/resolve
@@ -1978,6 +2050,14 @@ operationsByContract:
     offline: false
     reads: 1
     writes: 1
+  - operation: setInstalmentPolicy
+    verb: PUT
+    path: /instalment-policy
+    scope: tenant
+    permission: PAYMENT_CONFIGURE
+    offline: false
+    reads: 2
+    writes: 3
   - operation: setMerchantAccount
     verb: PUT
     path: /merchant-accounts
@@ -2040,7 +2120,7 @@ operationsByContract:
     scope: venue
     permission: PAYMENT_CONFIGURE
     offline: false
-    reads: 1
+    reads: 3
     writes: 1
   - operation: setReconciliationMatchingRules
     verb: PUT
@@ -2295,6 +2375,7 @@ tables:
   - approveListingModeration
   - approveRefund
   - approveShiftOpen
+  - assignChargeback
   - authoriseStoredValue
   - cancelReservation
   - capturePayment
@@ -2310,6 +2391,7 @@ tables:
   - createCart
   - createCashMovement
   - createGroupBooking
+  - createInstalmentPlan
   - createListingSeller
   - createOrder
   - createOrderSourceChannel
@@ -2335,7 +2417,10 @@ tables:
   - payByLink
   - printTicketProof
   - pushWalletPassUpdate
+  - recordChargeback
+  - recordChargebackOutcome
   - recordNoSale
+  - recordPaymentTerminalCertification
   - reissueEntitlement
   - removeCartLine
   - reopenShift
@@ -2359,6 +2444,7 @@ tables:
   - setGroupOperationalPlanning
   - setGroupPackageExperience
   - setGroupQuotationProposal
+  - setInstalmentPolicy
   - setMultiPaymentSplit
   - setOrderAmendment
   - setOrderDetailTransaction
@@ -2398,6 +2484,7 @@ tables:
   - approveListingModeration
   - approveRefund
   - approveShiftOpen
+  - assignChargeback
   - cancelReservation
   - capturePayment
   - checkoutCart
@@ -2411,6 +2498,7 @@ tables:
   - createCart
   - createCashMovement
   - createGroupBooking
+  - createInstalmentPlan
   - createListingSeller
   - createOrder
   - createOrderSourceChannel
@@ -2436,7 +2524,10 @@ tables:
   - payByLink
   - printTicketProof
   - pushWalletPassUpdate
+  - recordChargeback
+  - recordChargebackOutcome
   - recordNoSale
+  - recordPaymentTerminalCertification
   - reissueEntitlement
   - removeCartLine
   - reopenShift
@@ -2460,6 +2551,7 @@ tables:
   - setGroupOperationalPlanning
   - setGroupPackageExperience
   - setGroupQuotationProposal
+  - setInstalmentPolicy
   - setMultiPaymentSplit
   - setOrderAmendment
   - setOrderDetailTransaction
@@ -2498,6 +2590,7 @@ tables:
   writtenBy:
   - getRefundPolicy
   - setFraudRules
+  - setInstalmentPolicy
   - setRefundPolicy
   readBy:
   - getRefundPolicy
@@ -2543,7 +2636,7 @@ tables:
   foreignWriters:
   - marketing-crm
 - table: orders.cart_line
-  columns: 22
+  columns: 23
   store: postgres
   parent: orders.cart
   writtenBy:
@@ -2564,11 +2657,24 @@ tables:
   - shift
   foreignWriters: null
 - table: orders.chargeback
-  columns: 11
+  columns: 16
   store: postgres
   parent: null
   writtenBy:
   - orders
+  foreignWriters: null
+- table: orders.chargeback_evidence
+  columns: 4
+  store: postgres
+  parent: orders.chargeback
+  writtenBy:
+  - orders
+  foreignWriters: null
+- table: orders.chargeback_investigation_log
+  columns: 5
+  store: postgres
+  parent: orders.chargeback
+  writtenBy: []
   foreignWriters: null
 - table: orders.credit_override
   columns: 7
@@ -2632,7 +2738,7 @@ tables:
   - orders
   foreignWriters: null
 - table: orders.fraud_rule
-  columns: 7
+  columns: 12
   store: postgres
   parent: null
   writtenBy:
@@ -2797,7 +2903,7 @@ tables:
   writtenBy: []
   foreignWriters: null
 - table: orders.order_line
-  columns: 26
+  columns: 27
   store: postgres
   parent: promotions.promotion
   writtenBy:
@@ -2833,9 +2939,12 @@ tables:
   parent: null
   writtenBy:
   - orders
+  - payments
   - subscription
+  - wallet
   foreignWriters:
   - subscription
+  - wallet
 - table: orders.payment_allocation_rule
   columns: 11
   store: postgres
@@ -2881,7 +2990,9 @@ tables:
   parent: null
   writtenBy:
   - orders
-  foreignWriters: null
+  - wallet
+  foreignWriters:
+  - wallet
 - table: orders.refund_batch
   columns: 14
   store: postgres
@@ -2965,7 +3076,7 @@ tables:
   - orders
   foreignWriters: null
 - table: orders.reservation_line
-  columns: 15
+  columns: 16
   store: postgres
   parent: orders.reservation
   writtenBy:
@@ -3131,6 +3242,27 @@ tables:
   writtenBy:
   - payments
   foreignWriters: null
+- table: payments.instalment
+  columns: 9
+  store: postgres
+  parent: payments.instalment_plan
+  writtenBy:
+  - payments
+  foreignWriters: null
+- table: payments.instalment_plan
+  columns: 11
+  store: postgres
+  parent: null
+  writtenBy:
+  - payments
+  foreignWriters: null
+- table: payments.instalment_policy
+  columns: 10
+  store: postgres
+  parent: null
+  writtenBy:
+  - payments
+  foreignWriters: null
 - table: payments.matching_rules
   columns: 8
   store: postgres
@@ -3230,9 +3362,23 @@ tables:
   writtenBy: []
   foreignWriters: null
 - table: payments.terminal
-  columns: 11
+  columns: 15
   store: postgres
   parent: platform.device
+  writtenBy:
+  - payments
+  foreignWriters: null
+- table: payments.terminal_certification
+  columns: 11
+  store: postgres
+  parent: null
+  writtenBy:
+  - payments
+  foreignWriters: null
+- table: payments.terminal_certification_level3
+  columns: 7
+  store: postgres
+  parent: payments.terminal_certification
   writtenBy:
   - payments
   foreignWriters: null
@@ -3247,11 +3393,11 @@ readsFrom:
 - service: AccessService
   operations: 43
 - service: CatalogueService
-  operations: 42
+  operations: 43
 - service: IdentityService
   operations: 22
 - service: LedgerService
-  operations: 12
+  operations: 15
 - service: MarketingService
   operations: 10
 - service: TenancyService
@@ -3261,6 +3407,71 @@ readsFrom:
 - service: WalletService
   operations: 1
 writesOutside:
+- service: TenancyService
+  operations: 19
+  rule: 'ADR-0028: the owner defines the row; a foreign writer may only append, through a path the owner
+    published.'
+  why: '**The lineage records these writes, not how they honour the rule.** It does not say whether
+    each inserts or updates, or which operation or event TenancyService published for it — check each
+    against ADR-0028.'
+  writes:
+  - operation: acceptShiftVariance
+    tables:
+    - platform.outbox
+  - operation: assignChargeback
+    tables:
+    - platform.audit_record
+  - operation: capturePayment
+    tables:
+    - platform.outbox
+  - operation: claimTicketTransfer
+    tables:
+    - platform.outbox
+  - operation: createInstalmentPlan
+    tables:
+    - platform.outbox
+  - operation: createPayment
+    tables:
+    - platform.outbox
+  - operation: createRefund
+    tables:
+    - platform.outbox
+  - operation: createResaleListing
+    tables:
+    - platform.outbox
+  - operation: exchangeOrderLines
+    tables:
+    - platform.outbox
+  - operation: holdResaleSettlement
+    tables:
+    - platform.outbox
+  - operation: inquirePaymentStatus
+    tables:
+    - platform.outbox
+  - operation: mergeOrders
+    tables:
+    - platform.outbox
+  - operation: recordChargeback
+    tables:
+    - platform.outbox
+  - operation: recordChargebackOutcome
+    tables:
+    - platform.outbox
+  - operation: recordPaymentTerminalCertification
+    tables:
+    - platform.audit_record
+  - operation: releaseResaleSettlementHold
+    tables:
+    - platform.outbox
+  - operation: respondToChargeback
+    tables:
+    - platform.outbox
+  - operation: setDenominations
+    tables:
+    - platform.denomination
+  - operation: voidOrder
+    tables:
+    - platform.outbox
 - service: AccessService
   operations: 9
   rule: 'ADR-0028: the owner defines the row; a foreign writer may only append, through a path the owner
@@ -3296,41 +3507,45 @@ writesOutside:
   - operation: transferOrderTickets
     tables:
     - access.entitlement
-- service: TenancyService
-  operations: 9
+- service: LedgerService
+  operations: 8
   rule: 'ADR-0028: the owner defines the row; a foreign writer may only append, through a path the owner
     published.'
   why: '**The lineage records these writes, not how they honour the rule.** It does not say whether
-    each inserts or updates, or which operation or event TenancyService published for it — check each
+    each inserts or updates, or which operation or event LedgerService published for it — check each
     against ADR-0028.'
   writes:
-  - operation: acceptShiftVariance
+  - operation: closeDepositBoxes
     tables:
-    - platform.outbox
-  - operation: capturePayment
+    - ledger.posting
+  - operation: closeShift
     tables:
-    - platform.outbox
+    - ledger.journal_entry
   - operation: createPayment
     tables:
-    - platform.outbox
+    - ledger.journal_entry
+    - ledger.posting
   - operation: createRefund
     tables:
-    - platform.outbox
-  - operation: holdResaleSettlement
-    tables:
-    - platform.outbox
-  - operation: inquirePaymentStatus
-    tables:
-    - platform.outbox
+    - ledger.journal_entry
+    - ledger.posting
   - operation: mergeOrders
     tables:
-    - platform.outbox
-  - operation: releaseResaleSettlementHold
+    - ledger.journal_entry
+    - ledger.posting
+  - operation: recordChargeback
     tables:
-    - platform.outbox
-  - operation: setDenominations
+    - ledger.journal_entry
+    - ledger.journal_line
+    - ledger.posting
+  - operation: recordChargebackOutcome
     tables:
-    - platform.denomination
+    - ledger.journal_entry
+    - ledger.journal_line
+    - ledger.posting
+  - operation: respondToChargeback
+    tables:
+    - ledger.posting
 - service: CatalogueService
   operations: 7
   rule: 'ADR-0028: the owner defines the row; a foreign writer may only append, through a path the owner
@@ -3360,35 +3575,6 @@ writesOutside:
   - operation: updateCartLine
     tables:
     - catalogue.inventory_hold
-- service: LedgerService
-  operations: 6
-  rule: 'ADR-0028: the owner defines the row; a foreign writer may only append, through a path the owner
-    published.'
-  why: '**The lineage records these writes, not how they honour the rule.** It does not say whether
-    each inserts or updates, or which operation or event LedgerService published for it — check each
-    against ADR-0028.'
-  writes:
-  - operation: closeDepositBoxes
-    tables:
-    - ledger.posting
-  - operation: closeShift
-    tables:
-    - ledger.journal_entry
-  - operation: createPayment
-    tables:
-    - ledger.journal_entry
-    - ledger.posting
-  - operation: createRefund
-    tables:
-    - ledger.journal_entry
-    - ledger.posting
-  - operation: mergeOrders
-    tables:
-    - ledger.journal_entry
-    - ledger.posting
-  - operation: respondToChargeback
-    tables:
-    - ledger.posting
 - service: MarketingService
   operations: 3
   rule: 'ADR-0028: the owner defines the row; a foreign writer may only append, through a path the owner
@@ -3532,6 +3718,7 @@ screens:
 - P08:BO-022 Order Detail
 - P08:BO-023 Refunds & Exchanges
 - P08:BO-024 Payment Exceptions
+- P08:BO-025 Chargebacks & Disputes
 - P08:BO-026 Group Bookings
 - P08:BO-027 Reissue & Media Replacement
 - P08:BO-028 Refund Approval Queue

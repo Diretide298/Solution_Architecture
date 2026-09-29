@@ -1,0 +1,61 @@
+# order.exchanged v1 — published by orders
+# Checked by tools/check-states.py against states/ and the contracts.
+
+name: order.exchanged
+version: 1
+publisher: orders
+description: Lines on a paid order were exchanged for different products, dates or performances, settling
+  only the difference.
+aggregate: order
+emittedWhen: exchangeOrderLines succeeds
+payload:
+- field: orderId
+  type: string
+- field: lines
+  type: array
+  notes: direction (out or in), productId, quantity, amount — the lines given up and the lines that
+    replaced them
+- field: outgoingValue
+  type: Money
+- field: incomingValue
+  type: Money
+- field: difference
+  type: Money
+  notes: Signed. What settled, charged or refunded
+- field: reason
+  type: string
+  required: false
+- field: channel
+  type: string
+  notes: pos, kiosk, guestApp, guestWeb, callCentre, partner, api, backOffice
+- field: principalId
+  type: uuid
+  required: false
+  notes: The staff member who made the exchange, where staff-initiated. Null for a partner exchange
+- field: revokedEntitlementIds
+  type: array
+- field: issuedEntitlementIds
+  type: array
+- field: scopePath
+  type: string
+- field: tenantId
+  type: uuid
+- field: at
+  type: timestamp
+consumers:
+- context: ai
+  purpose: Staff leakage and refund-abuse risk (exchanges that return value without a refund record),
+    forecast actuals moved from the old date to the new one, and recommendation attribution reversed on the
+    lines given up (AI system design section 3.2)
+  idempotencyKey: orderId + eventId
+  onFailure: retryThenDeadLetter
+  isCritical: false
+retention: 30 days after publication
+notes: '**Added 29 September (build pass, group OWN, from the AI group''s handoff).** An exchange is a
+  refund and a sale in one act; a risk model that sees only refunds is blind to the downgrade exchange that
+  moves value back to a guest.
+
+
+  No state model emits this: `exchangeOrderLines` swaps lines on an order that stays `paid` or `completed`
+  — `OrderStatus` does not move, so there is no transition to carry the emit. The operation writes
+  `platform.outbox` in the same transaction as the order and its lines (ADR-0033).'

@@ -1,0 +1,37 @@
+# approval.escalated v1 — published by approvals
+# Checked by tools/check-states.py against states/ and the contracts.
+
+name: approval.escalated
+version: 1
+publisher: approvals
+description: An approval request was escalated, by a person or because its SLA was breached.
+aggregate: approvalRequest
+emittedWhen: ApprovalStatus pending to escalated (escalateApprovalRequest, or the SLA timer)
+payload:
+- field: requestId
+  type: string
+- field: kind
+  type: string
+- field: scopePath
+  type: string
+- field: level
+  type: integer
+- field: cause
+  type: string
+  notes: manual or slaBreached
+- field: escalatedToRoleIds
+  type: array
+- field: escalatedAt
+  type: timestamp
+consumers:
+- context: public-api
+  purpose: Deliver to webhook subscriptions taking approval.escalated (11.1.64, 11.1.66)
+  idempotencyKey: requestId + level + escalatedAt
+  onFailure: retryThenDeadLetter
+  isCritical: false
+- context: reporting
+  purpose: Escalation and bottleneck analytics
+  idempotencyKey: requestId + level + escalatedAt
+  onFailure: retry
+  isCritical: false
+retention: Retained with the request. This is an audit record, not an operational message

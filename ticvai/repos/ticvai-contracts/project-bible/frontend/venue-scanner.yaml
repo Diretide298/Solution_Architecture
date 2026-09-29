@@ -22,6 +22,7 @@ packages:
 - offline-core
 contracts:
 - access
+- accreditation
 - cross-region
 - identity
 - orders

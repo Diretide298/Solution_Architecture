@@ -32,6 +32,8 @@ servicesCalled:
   operationCalls: 3
 - service: CrossRegionService
   operationCalls: 3
+- service: TenancyService
+  operationCalls: 1
 coverage:
   screens: 11
   inAFlow: 9
@@ -126,6 +128,7 @@ screens:
   - syncScans
   - validateAccess
   - validateGroupAccess
+  - verifyAccreditationCredential
   states:
   - admitted
   - blocked

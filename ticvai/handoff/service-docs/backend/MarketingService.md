@@ -7,7 +7,7 @@
 | Tier | engagement: Guests and intelligence. Nothing that takes money depends on these. |
 | Contracts | `marketing-crm` |
 | Schemas owned | `marketing` |
-| Operations in the slice | 47 of 253 |
+| Operations in the slice | 60 of 263 |
 | Scale | Bursty on send, read-heavy otherwise. The one to watch for a split. |
 | If it is down | Down stops campaigns and guest lookup. Neither stops trading. |
 
@@ -31,16 +31,27 @@
 
 | Group | Operation | Method | Path | Part | Wave | Called by |
 |---|---|---|---|---|---|---|
+| campaign | [`createCampaign`](#createcampaign) | POST | `/campaigns` | setup | 2 | BO-005, BO-107, BO-118, BO-121, BO-767 |
+| campaign | [`launchCampaign`](#launchcampaign) | POST | `/campaigns/{campaignId}/launch` | setup | 2 | BO-005 |
+| campaign | [`stopCampaign`](#stopcampaign) | POST | `/campaigns/{campaignId}/stop` | setup | 2 | BO-005 |
+| campaign | [`updateCampaign`](#updatecampaign) | PATCH | `/campaigns/{campaignId}` | setup | 2 | BO-005, BO-767, BO-768, BO-769, BO-772 |
 | case | [`createCase`](#createcase) | POST | `/cases` | core | 1 | BO-806, EMP-028, EMP-029, GST-068, PTR-021, SUP-002 … |
 | case | [`listCases`](#listcases) | GET | `/cases` | core | 1 | BO-804, BO-805, BO-813, EMP-028, EMP-029, GST-068 … |
+| consent | [`claimDeviceConsent`](#claimdeviceconsent) | POST | `/guests/{subjectId}/consents/claim-device` | core | 1 | GST-042, WEB-016 |
 | consent | [`createConsentQuestion`](#createconsentquestion) | POST | `/consent-questions` | core | 2 | CMS-018 |
+| consent | [`getCookieConsentRuntime`](#getcookieconsentruntime) | GET | `/storefront/cookie-consent` | core | 1 | GST-001, GST-066, WEB-001, WEB-024 |
+| consent | [`getDeviceConsentHistory`](#getdeviceconsenthistory) | GET | `/consent/device/history` | core | 2 | GST-066, WEB-024 |
 | consent | [`getGuestConsents`](#getguestconsents) | GET | `/guests/{subjectId}/consents` | core | 2 | BO-749, GST-066, WEB-024 |
 | consent | [`listConsentAnswers`](#listconsentanswers) | GET | `/consent-answers` | core | 2 | CMS-018 |
 | consent | [`listConsentPurposes`](#listconsentpurposes) | GET | `/consent-purposes` | core | 1 | BO-747, CMS-018, GST-065, WEB-011, WEB-020 |
 | consent | [`listConsentQuestions`](#listconsentquestions) | GET | `/consent-questions` | core | 2 | BO-008, CMS-016, CMS-018 |
+| consent | [`listPublishedTrackingTechnologies`](#listpublishedtrackingtechnologies) | GET | `/storefront/cookie-consent/technologies` | core | 2 | GST-066, WEB-024 |
 | consent | [`recordConsent`](#recordconsent) | POST | `/guests/{subjectId}/consents` | core | 1 | BO-748, GST-039, GST-065, WEB-011, WEB-017, WEB-020 … |
 | consent | [`recordConsentAnswers`](#recordconsentanswers) | POST | `/consent-answers` | core | 1 | GST-007, WEB-006, WEB-011 |
+| consent | [`recordDeviceConsent`](#recorddeviceconsent) | POST | `/consent/device` | core | 1 | GST-001, GST-066, WEB-001, WEB-024 |
 | consent | [`setConsentPurposes`](#setconsentpurposes) | PUT | `/consent-purposes` | core | 2 | BO-747, CMS-018, CMS-023 |
+| consent | [`setCookieBannerDesign`](#setcookiebannerdesign) | PUT | `/cookie-banner-preference` | setup | 1 | CMS-026 |
+| consent | [`setTrackingTechnology`](#settrackingtechnology) | PUT | `/cookie-tracking-digital` | setup | 1 | CMS-025 |
 | consent | [`updateConsentQuestion`](#updateconsentquestion) | PATCH | `/consent-questions/{questionId}` | core | 2 | CMS-018 |
 | feedback | [`submitReview`](#submitreview) | POST | `/reviews` | core | 3 | GST-035, WEB-026 |
 | guest | [`addToWishlist`](#addtowishlist) | POST | `/guests/{subjectId}/wishlist` | core | 1 | GST-020, WEB-009, WEB-011, WEB-017, WEB-024, WEB-027 |
@@ -76,8 +87,430 @@
 | marketing | [`updateGuestPreferences`](#updateguestpreferences) | PUT | `/guests/{subjectId}/preferences` | core | 1 | BO-740, GST-066, WEB-020 |
 | marketing | [`updateMyProfile`](#updatemyprofile) | PATCH | `/guests/me/profile` | core | 1 | GST-039, WEB-011, WEB-020 |
 | marketing | [`uploadGuestDocument`](#uploadguestdocument) | POST | `/guest-documents` | core | 1 | BO-743, GST-066, WEB-011 |
+| message | [`createMessageTemplate`](#createmessagetemplate) | POST | `/message-templates` | setup | 2 | BO-785, BO-786, BO-787, SUP-007 |
 | message | [`listMyNotifications`](#listmynotifications) | GET | `/me/notifications` | core | 2 | GST-030, WEB-046 |
 | message | [`markMyNotificationsRead`](#markmynotificationsread) | POST | `/me/notifications/read` | core | 2 | GST-030, WEB-046 |
+| segment | [`createSegment`](#createsegment) | POST | `/segments` | setup | 2 | ANL-007, BO-755, BO-757, BO-758, BO-759, BO-760 … |
+
+## Group: campaign
+
+### createCampaign
+
+**`POST /campaigns`**: Create a campaign
+
+Created in draft. One-off, scheduled, or triggered by an event such as a booking, a visit or a birthday.
+
+|  |  |
+|---|---|
+| Permission | `MARKETING_MANAGE` |
+| Scope level | venue |
+| Part of slice | setup, makes `marketing.campaign` non-empty |
+| Wave | 2 |
+| Offline | no |
+| Conflict policy | serverWins |
+| Reads | `cache:idempotency`, `marketing.campaign`, `marketing.campaign_variant`, `marketing.segment_criterion` |
+| Writes | `cache:idempotency`, `marketing.campaign`, `marketing.campaign_target`, `marketing.campaign_variant`, `marketing.segment_criterion` |
+| Called by | BO-005, BO-107, BO-118, BO-121, BO-767 |
+| State model | Campaign ([states/campaign.yaml](../../../states/campaign.yaml)): created as `draft` |
+
+**Parameters**
+
+| Name | In | Required | Type | Notes |
+|---|---|---|---|---|
+| Idempotency-Key | header | yes | string | Client-generated ULID. |
+
+**Request body**: `CreateCampaignRequest`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| name | string | yes | (max length 200) |
+| kind | CampaignKind: enum (oneOff, scheduled, triggered, recurring) | yes |  |
+| channel | MessageChannel: enum (email, sms, whatsapp, push, inApp, post) | yes |  |
+| venueId | string (uuid) |  |  |
+| segmentId | string (uuid) | yes |  |
+| content | CampaignContent | yes |  |
+| content.templateId | string (uuid) | yes |  |
+| content.subjectOverride | object |  |  |
+| content.mergeDefaults | object |  | Fallback values for the template's mergeFields, by name, used where a guest has no value. |
+| content.promotionId | string (uuid) |  | Offer carried by the campaign. (nullable) |
+| trigger | CampaignTrigger |  |  |
+| trigger.event | enum (bookingConfirmed, visitCompleted, membershipExpiring, birthday, abandonedCart, firstVisit, inactivity, entitlementExpiring) |  | entitlementExpiring (29 September, build pass, group G2; 5.5.30) fires on entitlement.expiringSoon: a ticket or pass the guest still holds comes within its template's expiryNoticeDays of validTo. |
+| trigger.delayHours | integer |  |  |
+| trigger.conditions | array of SegmentCriterion |  |  |
+| trigger.conditions[].attribute | string | yes | Behavioural or profile attribute — visit count, last visit, lifetime value, product purchased, membership tier, venue visited, language. |
+| trigger.conditions[].operator | enum (equals, notEquals, greaterThan, lessThan, between, in, notIn, exists, …) | yes |  |
+| trigger.conditions[].value | object |  |  |
+| trigger.conditions[].values | array of object |  |  |
+| scheduledFor | string (date-time) |  |  |
+| consentPurpose | object |  | (default marketing) |
+| sendWindow | object |  | Hours during which sending is permitted. |
+| sendWindow.startTime | string |  |  |
+| sendWindow.endTime | string |  |  |
+| sendWindow.timeZone | string |  |  |
+| sendTimeMode | enum (fixed, optimised) |  | optimised sends each recipient at the hour ai.requestSuggestion (kind sendTime) gives for them, inside sendWindow (29 September, build pass, group G2; 22.3.19). (default fixed) |
+| optimiseChannel | boolean |  | With sendTimeMode optimised, route each recipient to the channel the suggestion names, among the channels they consented to (22.9.16). (default False) |
+| variants | array of MarketingCampaignVariant |  | A/B (or up to five-way) content and subject variants (29 September, build pass, group G2; 22.1.17, BO-772). (max items 5; nullable) |
+| variants[].id | string (uuid) |  | (read-only) |
+| variants[].campaignId | string (uuid) |  | (read-only) |
+| variants[].label | string | yes | A, B, C... (max length 20) |
+| variants[].subjectOverride | object |  | Subject line by locale. (nullable) |
+| variants[].templateId | string (uuid) |  | A different template for this variant; null uses the campaign's content.templateId. (nullable) |
+| variants[].splitPercent | integer |  | Share of the test group; null splits evenly. (min 1; max 100; nullable) |
+| variants[].source | enum (manual, aiDraft) |  | (default manual) |
+| variants[].aiDecisionRecordId | string |  | The decision record of the ai.proposeMarketingContent draft it came from, for aiDraft. (nullable) |
+| variants[].isWinner | boolean |  | (default False; read-only) |
+| variants[].scopePath | string |  | The partition key (ADR-0005), the campaign's. (read-only) |
+| abTest | object |  | How the variants are tested. (nullable) |
+| abTest.testPercent | integer |  | Share of the audience the variants are tested on; 100 splits everyone and picks no winner. (min 5; max 100; default 20) |
+| abTest.successMetric | enum (openRate, clickRate, conversionRate, attributedRevenue) |  | (default clickRate) |
+| abTest.decideAfterHours | integer |  | (min 1; max 168; default 4) |
+| abTest.winnerRule | enum (automatic, manual) |  | (default automatic) |
+| abTest.minimumSamplePerVariant | integer |  | Below this many sends per variant no winner is declared automatically; a person picks. (min 1; default 500) |
+| abTest.winningVariantId | string (uuid) |  | Set by the automatic rule, or by a person through updateCampaign. (nullable) |
+
+**Response**: `Campaign`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| name | string | yes | (max length 200) |
+| kind | CampaignKind: enum (oneOff, scheduled, triggered, recurring) | yes |  |
+| channel | MessageChannel: enum (email, sms, whatsapp, push, inApp, post) | yes |  |
+| venueId | string (uuid) |  |  |
+| segmentId | string (uuid) | yes |  |
+| content | CampaignContent | yes |  |
+| content.templateId | string (uuid) | yes |  |
+| content.subjectOverride | object |  |  |
+| content.mergeDefaults | object |  | Fallback values for the template's mergeFields, by name, used where a guest has no value. |
+| content.promotionId | string (uuid) |  | Offer carried by the campaign. (nullable) |
+| trigger | CampaignTrigger |  |  |
+| trigger.event | enum (bookingConfirmed, visitCompleted, membershipExpiring, birthday, abandonedCart, firstVisit, inactivity, entitlementExpiring) |  | entitlementExpiring (29 September, build pass, group G2; 5.5.30) fires on entitlement.expiringSoon: a ticket or pass the guest still holds comes within its template's expiryNoticeDays of validTo. |
+| trigger.delayHours | integer |  |  |
+| trigger.conditions | array of SegmentCriterion |  |  |
+| trigger.conditions[].attribute | string | yes | Behavioural or profile attribute — visit count, last visit, lifetime value, product purchased, membership tier, venue visited, language. |
+| trigger.conditions[].operator | enum (equals, notEquals, greaterThan, lessThan, between, in, notIn, exists, …) | yes |  |
+| trigger.conditions[].value | object |  |  |
+| trigger.conditions[].values | array of object |  |  |
+| scheduledFor | string (date-time) |  |  |
+| consentPurpose | object |  | (default marketing) |
+| sendWindow | object |  | Hours during which sending is permitted. |
+| sendWindow.startTime | string |  |  |
+| sendWindow.endTime | string |  |  |
+| sendWindow.timeZone | string |  |  |
+| sendTimeMode | enum (fixed, optimised) |  | optimised sends each recipient at the hour ai.requestSuggestion (kind sendTime) gives for them, inside sendWindow (29 September, build pass, group G2; 22.3.19). (default fixed) |
+| optimiseChannel | boolean |  | With sendTimeMode optimised, route each recipient to the channel the suggestion names, among the channels they consented to (22.9.16). (default False) |
+| variants | array of MarketingCampaignVariant |  | A/B (or up to five-way) content and subject variants (29 September, build pass, group G2; 22.1.17, BO-772). (max items 5; nullable) |
+| variants[].id | string (uuid) |  | (read-only) |
+| variants[].campaignId | string (uuid) |  | (read-only) |
+| variants[].label | string | yes | A, B, C... (max length 20) |
+| variants[].subjectOverride | object |  | Subject line by locale. (nullable) |
+| variants[].templateId | string (uuid) |  | A different template for this variant; null uses the campaign's content.templateId. (nullable) |
+| variants[].splitPercent | integer |  | Share of the test group; null splits evenly. (min 1; max 100; nullable) |
+| variants[].source | enum (manual, aiDraft) |  | (default manual) |
+| variants[].aiDecisionRecordId | string |  | The decision record of the ai.proposeMarketingContent draft it came from, for aiDraft. (nullable) |
+| variants[].isWinner | boolean |  | (default False; read-only) |
+| variants[].scopePath | string |  | The partition key (ADR-0005), the campaign's. (read-only) |
+| abTest | object |  | How the variants are tested. (nullable) |
+| abTest.testPercent | integer |  | Share of the audience the variants are tested on; 100 splits everyone and picks no winner. (min 5; max 100; default 20) |
+| abTest.successMetric | enum (openRate, clickRate, conversionRate, attributedRevenue) |  | (default clickRate) |
+| abTest.decideAfterHours | integer |  | (min 1; max 168; default 4) |
+| abTest.winnerRule | enum (automatic, manual) |  | (default automatic) |
+| abTest.minimumSamplePerVariant | integer |  | Below this many sends per variant no winner is declared automatically; a person picks. (min 1; default 500) |
+| abTest.winningVariantId | string (uuid) |  | Set by the automatic rule, or by a person through updateCampaign. (nullable) |
+| id | string (uuid) | yes |  |
+| budgetCap | Money |  | On the wire this is three fields; in the database it is one column. |
+| budgetCap.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
+| budgetCap.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
+| budgetCap.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| budgetSpent | object |  | BL-169. (read-only) |
+| budgetSpent.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
+| budgetSpent.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
+| budgetSpent.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| status | CampaignStatus: enum (draft, scheduled, sending, paused, completed, stopped, failed) | yes |  |
+| isPaused | boolean |  |  |
+| createdByPrincipalId | string (uuid) |  |  |
+| createdAt | string (date-time) | yes |  |
+| launchedAt | string (date-time) |  | (nullable) |
+| completedAt | string (date-time) |  | (nullable) |
+| sentCount | integer |  | How many messages went out, counted from marketing.message_dispatch at read time rather than kept as a counter on the campaign row, so it cannot drift from the dispatch records it summarises. (read-only) |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 201 |  | Created in draft |
+| 400 | BadRequest | Validation failed |
+
+### launchCampaign
+
+**`POST /campaigns/{campaignId}/launch`**: Launch or schedule a campaign
+
+Evaluates the segment, applies consent and suppression, and queues the send. The response reports how many were excluded and why, before anything goes out.
+**Consent is checked at send time, not at segment build time** — a guest may withdraw between the two, and the later check is the one that matters.
+**Per-recipient send time and A/B variants** (29 September, build pass, group G2, from group G1's handoff; 22.3.19, 22.9.16, 22.1.17). With `sendTimeMode` `optimised`, launch asks `ai.requestSuggestion` (kind `sendTime`) for the audience and queues each dispatch at that recipient's suggested hour inside `sendWindow` (`MessageDispatch.plannedSendAt`), on the suggested channel where `optimiseChannel` is set and the guest has consented to it; a recipient with no suggestion, or any recipient when AI is off, is sent at `scheduledFor` as before. **Nothing is sent outside `sendWindow` or quiet hours because of it.** With `variants` and `abTest`, launch sends each variant to its share of `abTest.testPercent` of the audience, holds the rest, and after `decideAfterHours` sends the winner on `successMetric` to the remainder (`winnerRule` `automatic`) or waits for a person to pick it (`manual`, `updateCampaign` with `winningVariantId`).
+
+|  |  |
+|---|---|
+| Permission | `MARKETING_SEND` |
+| Scope level | venue |
+| Part of slice | setup, makes `marketing.campaign` non-empty |
+| Wave | 2 |
+| Offline | no |
+| Conflict policy | serverWins |
+| Reads | `cache:idempotency`, `marketing.attribution_touch`, `marketing.campaign`, `marketing.campaign_variant` |
+| Writes | `cache:idempotency`, `marketing.campaign`, `marketing.message_dispatch` |
+| Called by | BO-005 |
+| State model | Campaign ([states/campaign.yaml](../../../states/campaign.yaml)): moves `draft` -> `scheduled`, `paused` -> `sending` |
+
+**Parameters**
+
+| Name | In | Required | Type | Notes |
+|---|---|---|---|---|
+| campaignId | path | yes | string (uuid) |  |
+| Idempotency-Key | header | yes | string | Client-generated ULID. |
+
+**Request body**
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| scheduledFor | string (date-time) |  |  |
+| confirmAudienceSize | integer |  | Guard against a segment that has grown unexpectedly. |
+
+**Response**: `LaunchResult`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| campaignId | string (uuid) | yes |  |
+| audienceSize | integer | yes |  |
+| queuedCount | integer | yes |  |
+| excluded | array of object | yes | Why each excluded guest was excluded, in aggregate. |
+| excluded[].reason | enum (noConsent, consentRequiresRenewal, suppressed, noAddress, frequencyCap, outsideSendWindow) |  |  |
+| excluded[].count | integer |  |  |
+| scheduledFor | string (date-time) |  | (nullable) |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 202 |  | Queued |
+| 403 | Forbidden | Authenticated but not permitted at the requested scope |
+| 409 |  | Already launched (alreadyLaunched), audience size differs beyond tolerance (audienceSizeChanged), or every recipient was excluded (noReachableRecipients). |
+
+### stopCampaign
+
+**`POST /campaigns/{campaignId}/stop`**: Stop a campaign mid-send
+
+Halts remaining sends immediately. Messages already dispatched cannot be recalled, and the response reports how many went out, in `Campaign.sentCount`.
+**Only a campaign that is `sending` or `paused` can be stopped.** A `scheduled` one has sent nothing and is unscheduled instead; a `completed`, `stopped` or `failed` one has nothing left to stop.
+
+|  |  |
+|---|---|
+| Permission | `MARKETING_SEND` |
+| Scope level | venue |
+| Part of slice | setup, makes `marketing.campaign` non-empty |
+| Wave | 2 |
+| Offline | no |
+| Conflict policy | serverWins |
+| Reads | `cache:idempotency`, `marketing.campaign`, `marketing.campaign_variant`, `marketing.segment_criterion` |
+| Writes | `cache:idempotency`, `marketing.campaign`, `marketing.segment_criterion` |
+| Called by | BO-005 |
+| State model | Campaign ([states/campaign.yaml](../../../states/campaign.yaml)): moves `paused` -> `stopped` |
+
+**Parameters**
+
+| Name | In | Required | Type | Notes |
+|---|---|---|---|---|
+| campaignId | path | yes | string (uuid) |  |
+| Idempotency-Key | header | yes | string | Client-generated ULID. |
+
+**Request body**
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| reason | string | yes | (min length 3; max length 500) |
+
+**Response**: `Campaign`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| name | string | yes | (max length 200) |
+| kind | CampaignKind: enum (oneOff, scheduled, triggered, recurring) | yes |  |
+| channel | MessageChannel: enum (email, sms, whatsapp, push, inApp, post) | yes |  |
+| venueId | string (uuid) |  |  |
+| segmentId | string (uuid) | yes |  |
+| content | CampaignContent | yes |  |
+| content.templateId | string (uuid) | yes |  |
+| content.subjectOverride | object |  |  |
+| content.mergeDefaults | object |  | Fallback values for the template's mergeFields, by name, used where a guest has no value. |
+| content.promotionId | string (uuid) |  | Offer carried by the campaign. (nullable) |
+| trigger | CampaignTrigger |  |  |
+| trigger.event | enum (bookingConfirmed, visitCompleted, membershipExpiring, birthday, abandonedCart, firstVisit, inactivity, entitlementExpiring) |  | entitlementExpiring (29 September, build pass, group G2; 5.5.30) fires on entitlement.expiringSoon: a ticket or pass the guest still holds comes within its template's expiryNoticeDays of validTo. |
+| trigger.delayHours | integer |  |  |
+| trigger.conditions | array of SegmentCriterion |  |  |
+| trigger.conditions[].attribute | string | yes | Behavioural or profile attribute — visit count, last visit, lifetime value, product purchased, membership tier, venue visited, language. |
+| trigger.conditions[].operator | enum (equals, notEquals, greaterThan, lessThan, between, in, notIn, exists, …) | yes |  |
+| trigger.conditions[].value | object |  |  |
+| trigger.conditions[].values | array of object |  |  |
+| scheduledFor | string (date-time) |  |  |
+| consentPurpose | object |  | (default marketing) |
+| sendWindow | object |  | Hours during which sending is permitted. |
+| sendWindow.startTime | string |  |  |
+| sendWindow.endTime | string |  |  |
+| sendWindow.timeZone | string |  |  |
+| sendTimeMode | enum (fixed, optimised) |  | optimised sends each recipient at the hour ai.requestSuggestion (kind sendTime) gives for them, inside sendWindow (29 September, build pass, group G2; 22.3.19). (default fixed) |
+| optimiseChannel | boolean |  | With sendTimeMode optimised, route each recipient to the channel the suggestion names, among the channels they consented to (22.9.16). (default False) |
+| variants | array of MarketingCampaignVariant |  | A/B (or up to five-way) content and subject variants (29 September, build pass, group G2; 22.1.17, BO-772). (max items 5; nullable) |
+| variants[].id | string (uuid) |  | (read-only) |
+| variants[].campaignId | string (uuid) |  | (read-only) |
+| variants[].label | string | yes | A, B, C... (max length 20) |
+| variants[].subjectOverride | object |  | Subject line by locale. (nullable) |
+| variants[].templateId | string (uuid) |  | A different template for this variant; null uses the campaign's content.templateId. (nullable) |
+| variants[].splitPercent | integer |  | Share of the test group; null splits evenly. (min 1; max 100; nullable) |
+| variants[].source | enum (manual, aiDraft) |  | (default manual) |
+| variants[].aiDecisionRecordId | string |  | The decision record of the ai.proposeMarketingContent draft it came from, for aiDraft. (nullable) |
+| variants[].isWinner | boolean |  | (default False; read-only) |
+| variants[].scopePath | string |  | The partition key (ADR-0005), the campaign's. (read-only) |
+| abTest | object |  | How the variants are tested. (nullable) |
+| abTest.testPercent | integer |  | Share of the audience the variants are tested on; 100 splits everyone and picks no winner. (min 5; max 100; default 20) |
+| abTest.successMetric | enum (openRate, clickRate, conversionRate, attributedRevenue) |  | (default clickRate) |
+| abTest.decideAfterHours | integer |  | (min 1; max 168; default 4) |
+| abTest.winnerRule | enum (automatic, manual) |  | (default automatic) |
+| abTest.minimumSamplePerVariant | integer |  | Below this many sends per variant no winner is declared automatically; a person picks. (min 1; default 500) |
+| abTest.winningVariantId | string (uuid) |  | Set by the automatic rule, or by a person through updateCampaign. (nullable) |
+| id | string (uuid) | yes |  |
+| budgetCap | Money |  | On the wire this is three fields; in the database it is one column. |
+| budgetCap.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
+| budgetCap.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
+| budgetCap.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| budgetSpent | object |  | BL-169. (read-only) |
+| budgetSpent.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
+| budgetSpent.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
+| budgetSpent.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| status | CampaignStatus: enum (draft, scheduled, sending, paused, completed, stopped, failed) | yes |  |
+| isPaused | boolean |  |  |
+| createdByPrincipalId | string (uuid) |  |  |
+| createdAt | string (date-time) | yes |  |
+| launchedAt | string (date-time) |  | (nullable) |
+| completedAt | string (date-time) |  | (nullable) |
+| sentCount | integer |  | How many messages went out, counted from marketing.message_dispatch at read time rather than kept as a counter on the campaign row, so it cannot drift from the dispatch records it summarises. (read-only) |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 200 |  | Stopped |
+| 409 |  | The campaign is not sending or paused (statusDoesNotPermit). |
+
+### updateCampaign
+
+**`PATCH /campaigns/{campaignId}`**: Amend, pause or resume a campaign
+
+Content and audience are editable only in draft. A live campaign may be paused, rescheduled or stopped — nothing else. Changing the audience mid-send produces a campaign nobody can report on afterwards.
+**One more change on a live A/B campaign** (29 September, build pass, group G2; 22.1.17): with `abTest.winnerRule` `manual`, a person sets `abTest.winningVariantId` once the test phase has run, and the winner goes to the rest of the audience. Variants themselves, like all content, are editable only in draft.
+
+|  |  |
+|---|---|
+| Permission | `MARKETING_MANAGE` |
+| Scope level | venue |
+| Part of slice | setup, makes `marketing.campaign` non-empty |
+| Wave | 2 |
+| Offline | no |
+| Conflict policy | serverWins |
+| Reads | `cache:idempotency`, `marketing.campaign`, `marketing.campaign_variant`, `marketing.segment_criterion` |
+| Writes | `cache:idempotency`, `marketing.campaign`, `marketing.segment_criterion`, `marketing.campaign_target` |
+| Called by | BO-005, BO-767, BO-768, BO-769, BO-772 |
+
+**Parameters**
+
+| Name | In | Required | Type | Notes |
+|---|---|---|---|---|
+| campaignId | path | yes | string (uuid) |  |
+| Idempotency-Key | header | yes | string | Client-generated ULID. |
+
+**Request body**
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| name | string |  | (max length 200) |
+| isPaused | boolean |  |  |
+| scheduledFor | string (date-time) |  |  |
+| content | CampaignContent |  |  |
+| content.templateId | string (uuid) | yes |  |
+| content.subjectOverride | object |  |  |
+| content.mergeDefaults | object |  | Fallback values for the template's mergeFields, by name, used where a guest has no value. |
+| content.promotionId | string (uuid) |  | Offer carried by the campaign. (nullable) |
+
+**Response**: `Campaign`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| name | string | yes | (max length 200) |
+| kind | CampaignKind: enum (oneOff, scheduled, triggered, recurring) | yes |  |
+| channel | MessageChannel: enum (email, sms, whatsapp, push, inApp, post) | yes |  |
+| venueId | string (uuid) |  |  |
+| segmentId | string (uuid) | yes |  |
+| content | CampaignContent | yes |  |
+| content.templateId | string (uuid) | yes |  |
+| content.subjectOverride | object |  |  |
+| content.mergeDefaults | object |  | Fallback values for the template's mergeFields, by name, used where a guest has no value. |
+| content.promotionId | string (uuid) |  | Offer carried by the campaign. (nullable) |
+| trigger | CampaignTrigger |  |  |
+| trigger.event | enum (bookingConfirmed, visitCompleted, membershipExpiring, birthday, abandonedCart, firstVisit, inactivity, entitlementExpiring) |  | entitlementExpiring (29 September, build pass, group G2; 5.5.30) fires on entitlement.expiringSoon: a ticket or pass the guest still holds comes within its template's expiryNoticeDays of validTo. |
+| trigger.delayHours | integer |  |  |
+| trigger.conditions | array of SegmentCriterion |  |  |
+| trigger.conditions[].attribute | string | yes | Behavioural or profile attribute — visit count, last visit, lifetime value, product purchased, membership tier, venue visited, language. |
+| trigger.conditions[].operator | enum (equals, notEquals, greaterThan, lessThan, between, in, notIn, exists, …) | yes |  |
+| trigger.conditions[].value | object |  |  |
+| trigger.conditions[].values | array of object |  |  |
+| scheduledFor | string (date-time) |  |  |
+| consentPurpose | object |  | (default marketing) |
+| sendWindow | object |  | Hours during which sending is permitted. |
+| sendWindow.startTime | string |  |  |
+| sendWindow.endTime | string |  |  |
+| sendWindow.timeZone | string |  |  |
+| sendTimeMode | enum (fixed, optimised) |  | optimised sends each recipient at the hour ai.requestSuggestion (kind sendTime) gives for them, inside sendWindow (29 September, build pass, group G2; 22.3.19). (default fixed) |
+| optimiseChannel | boolean |  | With sendTimeMode optimised, route each recipient to the channel the suggestion names, among the channels they consented to (22.9.16). (default False) |
+| variants | array of MarketingCampaignVariant |  | A/B (or up to five-way) content and subject variants (29 September, build pass, group G2; 22.1.17, BO-772). (max items 5; nullable) |
+| variants[].id | string (uuid) |  | (read-only) |
+| variants[].campaignId | string (uuid) |  | (read-only) |
+| variants[].label | string | yes | A, B, C... (max length 20) |
+| variants[].subjectOverride | object |  | Subject line by locale. (nullable) |
+| variants[].templateId | string (uuid) |  | A different template for this variant; null uses the campaign's content.templateId. (nullable) |
+| variants[].splitPercent | integer |  | Share of the test group; null splits evenly. (min 1; max 100; nullable) |
+| variants[].source | enum (manual, aiDraft) |  | (default manual) |
+| variants[].aiDecisionRecordId | string |  | The decision record of the ai.proposeMarketingContent draft it came from, for aiDraft. (nullable) |
+| variants[].isWinner | boolean |  | (default False; read-only) |
+| variants[].scopePath | string |  | The partition key (ADR-0005), the campaign's. (read-only) |
+| abTest | object |  | How the variants are tested. (nullable) |
+| abTest.testPercent | integer |  | Share of the audience the variants are tested on; 100 splits everyone and picks no winner. (min 5; max 100; default 20) |
+| abTest.successMetric | enum (openRate, clickRate, conversionRate, attributedRevenue) |  | (default clickRate) |
+| abTest.decideAfterHours | integer |  | (min 1; max 168; default 4) |
+| abTest.winnerRule | enum (automatic, manual) |  | (default automatic) |
+| abTest.minimumSamplePerVariant | integer |  | Below this many sends per variant no winner is declared automatically; a person picks. (min 1; default 500) |
+| abTest.winningVariantId | string (uuid) |  | Set by the automatic rule, or by a person through updateCampaign. (nullable) |
+| id | string (uuid) | yes |  |
+| budgetCap | Money |  | On the wire this is three fields; in the database it is one column. |
+| budgetCap.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
+| budgetCap.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
+| budgetCap.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| budgetSpent | object |  | BL-169. (read-only) |
+| budgetSpent.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
+| budgetSpent.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
+| budgetSpent.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| status | CampaignStatus: enum (draft, scheduled, sending, paused, completed, stopped, failed) | yes |  |
+| isPaused | boolean |  |  |
+| createdByPrincipalId | string (uuid) |  |  |
+| createdAt | string (date-time) | yes |  |
+| launchedAt | string (date-time) |  | (nullable) |
+| completedAt | string (date-time) |  | (nullable) |
+| sentCount | integer |  | How many messages went out, counted from marketing.message_dispatch at read time rather than kept as a counter on the campaign row, so it cannot drift from the dispatch records it summarises. (read-only) |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 200 |  | Updated |
+| 409 |  | content amended on a campaign that is no longer in draft (statusDoesNotPermit). |
+
 
 ## Group: case
 
@@ -228,6 +661,61 @@ Staff, partner or guest raise it; `channel` records how the guest reached the ve
 
 ## Group: consent
 
+### claimDeviceConsent
+
+**`POST /guests/{subjectId}/consents/claim-device`**: Attach a browser's cookie decision to the guest who turned out to own it
+
+**At sign-in or registration the browser holds a decision and the platform gains a subject; this joins them, and it is where CF-160 runs.** Per category the result is **the narrower of the two**: a guest who declined analytics on this browser and granted it on their profile ends declined, and the reverse also ends declined. Inheriting the more permissive answer is how a merge becomes a breach (`mergeGuestProfiles` says the same).
+Writes one `ConsentRecord` per affected purpose through the `recordConsent` path, source `cookieBanner`, so `getConsentHistory` and `listConsentEvidenceWithdrawal` show the claim as evidence; the purposes are the ones the category's approved technologies serve (`processingPurposeCode`). The guest's tracking choices (`listCustomerPrivacyConsent`) come from the claimed rows. **`claimedBySubjectId` is set once and never cleared**, so a shared kiosk browser cannot later hand one guest's decision to the next: a second claim by another subject is 409, and a repeat claim by the same subject returns the same state.
+**Publishes `consent.deviceConsentClaimed`** on the first claim of a key (29 September, build, 2.6.65), carrying the subject and the narrowed categories, so a CDP or CRM can join the anonymous visitor's consent to the known profile. A repeat claim publishes nothing.
+
+|  |  |
+|---|---|
+| Permission | `None` |
+| Scope level | subject |
+| Part of slice | core |
+| Wave | 1 |
+| Offline | no |
+| Config scope | subject |
+| Conflict policy | append |
+| Reads | `cache:idempotency`, `marketing.consent_record`, `marketing.device_consent`, `marketing.device_consent_category`, `marketing.guest_profile`, `marketing.tracking_technology` |
+| Writes | `cache:idempotency`, `marketing.consent_propagation`, `marketing.consent_record`, `marketing.device_consent`, `platform.outbox` |
+| Called by | GST-042, WEB-016 |
+
+**Parameters**
+
+| Name | In | Required | Type | Notes |
+|---|---|---|---|---|
+| subjectId | path | yes | string (uuid) |  |
+| Idempotency-Key | header | yes | string | Client-generated ULID. |
+
+**Request body**: `ClaimDeviceConsentRequest`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| consentKey | string | yes | (max length 64) |
+
+**Response**: `ConsentState`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| subjectId | string (uuid) | yes |  |
+| purposes | array of object | yes |  |
+| purposes[].purpose | ConsentPurpose: enum (marketing, personalisation, profiling, thirdPartySharing, aiProcessing, transactional) | yes |  |
+| purposes[].decision | ConsentDecision: enum (granted, withdrawn, notAsked) | yes |  |
+| purposes[].channels | array of MessageChannel: enum (email, sms, whatsapp, push, inApp, post) |  |  |
+| purposes[].noticeVersion | string |  | (nullable) |
+| purposes[].requiresRenewal | boolean | yes | True where the notice has been superseded since consent was given. |
+| purposes[].decidedAt | string (date-time) |  | (nullable) |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 200 |  | The guest's consent state after narrowing |
+| 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
+| 409 |  | The key is already claimed by another subject (already-claimed) |
+
 ### createConsentQuestion
 
 **`POST /consent-questions`**: Define a consent question
@@ -292,6 +780,175 @@ Staff, partner or guest raise it; `channel` records how the guest reached the ve
 | 201 |  | Created, at version 1 |
 | 400 | BadRequest | Validation failed |
 | 403 | Forbidden | Authenticated but not permitted at the requested scope |
+
+### getCookieConsentRuntime
+
+**`GET /storefront/cookie-consent`**: What the page must show and what it may load
+
+**The storefront and the app SDK ask this before they inject anything** (2.6.52, 2.6.58). It returns the **published** banner and preference-centre design for the channel and brand (the corporate design where the brand has none), the notice version in force, the approved technologies each category unlocks, and, when the caller presents its consent key, the decision already recorded, so a returning visitor is not asked twice.
+**Enforcement is the loader's, and this is what it enforces against**: nothing outside `strictlyNecessary` loads until its category is granted, and a technology that is not in `allowedTechnologies` never loads at all (a `detected` one is blocked until approved). `consentModeSignals` are the same decision in Google consent-mode terms, so Google Analytics and Tag Manager are told rather than guessed (2.6.65). `requiresDecision` is true with no decision, an expired one, or one given against a superseded notice.
+**Anonymous and unauthenticated by necessity**: a token would be state set before consent to set state. Without a key the answer is the same for every visitor of a channel, brand, language and notice version and is cached at the edge, which is how the one-second banner budget (2.6.65) is met.
+
+|  |  |
+|---|---|
+| Permission | `None` |
+| Scope level | tenant |
+| Part of slice | core |
+| Wave | 1 |
+| Offline | no |
+| Conflict policy | serverWins |
+| Read routing | replica |
+| Reads | `marketing.cookie_banner_design`, `marketing.device_consent`, `marketing.device_consent_category`, `marketing.tracking_technology` |
+| Writes | - |
+| Called by | GST-001, GST-066, WEB-001, WEB-024 |
+
+**Parameters**
+
+| Name | In | Required | Type | Notes |
+|---|---|---|---|---|
+| channel | query | yes | CookieConsentChannel: enum (b2cWebsite, customerPortal, mobileApp, embeddedCheckout, whiteLabelSite, partnerMicrosite) |  |
+| brandId | query |  | string (uuid) |  |
+| language | query |  | string | One of the design's languages; the tenant's default where omitted |
+| X-Consent-Key | header |  | string | The key the visitor's browser or app holds, if any |
+
+**Response**: `CookieConsentRuntime`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| banner | CookieBannerPreferenceCenterDesignerView | yes | One version of a cookie banner and preference-centre design (pack 17.1.6). |
+| banner.id | string (uuid) |  | (read-only) |
+| banner.brandId | string (uuid) |  | Null for the corporate design every brand inherits. (nullable) |
+| banner.inheritsFromId | string (uuid) |  | (nullable) |
+| banner.channel | enum (b2cWebsite, customerPortal, mobileApp, embeddedCheckout, whiteLabelSite, partnerMicrosite) | yes |  |
+| banner.logoAssetId | string (uuid) |  | (nullable) |
+| banner.title | LocalisedText |  | Text keyed by locale code, one entry per locale the venue publishes. |
+| banner.body | LocalisedText |  | Text keyed by locale code, one entry per locale the venue publishes. |
+| banner.position | enum (top, bottom, popup, modal) | yes |  |
+| banner.themeId | string |  | The white-label theme it takes colours and fonts from. (nullable) |
+| banner.buttons | array of object |  |  |
+| banner.buttons[].action | enum (acceptAll, rejectNonEssential, managePreferences, savePreferences, doNotSellOrShare) | yes |  |
+| banner.buttons[].label | LocalisedText |  | Text keyed by locale code, one entry per locale the venue publishes. |
+| banner.rejectIsOneClick | boolean | yes | Must be true. (default True) |
+| banner.links | array of object |  |  |
+| banner.links[].label | LocalisedText | yes | Text keyed by locale code, one entry per locale the venue publishes. |
+| banner.links[].policyKind | enum (privacy, cookie, termsAndConditions) | yes |  |
+| banner.categories | array of object | yes | (min items 1) |
+| banner.categories[].category | enum (strictlyNecessary, functional, analytics, personalisation, marketing) | yes |  |
+| banner.categories[].description | LocalisedText |  | Text keyed by locale code, one entry per locale the venue publishes. |
+| banner.categories[].defaultOn | boolean | yes | True only for strictlyNecessary, which is always active. |
+| banner.languages | array of string | yes | Every language the storefront serves; Arabic renders right to left. (min items 1) |
+| banner.regulatoryRegimes | array of enum (gdpr, ePrivacy, ccpaCpra, lgpd, uaePdpl, saudiPdpl) |  | 2.6.60 (29 September, build). |
+| banner.recordIpAddress | boolean |  | 2.6.55, "if legally permitted" (29 September, build). (default False) |
+| banner.noticeVersion | string |  | Moves with the cookie policy (white-label setPolicy, kind cookie). (read-only) |
+| banner.version | integer |  | (min 1; read-only) |
+| banner.status | enum (draft, published, superseded) |  | (read-only) |
+| banner.scopePath | string |  | The partition key (ADR-0005). (read-only) |
+| banner.updatedAt | string (date-time) |  | (read-only) |
+| noticeVersion | string | yes |  |
+| requiresDecision | boolean | yes | True with no decision, an expired one, or one given against a superseded notice. |
+| decision | object |  | The latest decision for the presented key; null without a key. (nullable) |
+| decision.id | string (uuid) |  | (read-only) |
+| decision.consentKey | string | yes | Opaque, minted by us, not a device fingerprint. (max length 64; read-only) |
+| decision.channel | CookieConsentChannel: enum (b2cWebsite, customerPortal, mobileApp, embeddedCheckout, whiteLabelSite, partnerMicrosite) | yes | The six governed surfaces, as the registry and the banner design name them (pack 17.1.5-17.1.6). |
+| decision.brandId | string (uuid) |  | (nullable) |
+| decision.bannerDesignId | string (uuid) |  | The published CookieBannerPreferenceCenterDesignerView version the visitor was shown. (nullable) |
+| decision.action | DeviceConsentAction: enum (acceptAll, rejectNonEssential, savePreferences, withdraw, doNotSellOrShare) | yes | What the visitor pressed. |
+| decision.categories | array of object | yes | Every category of the design, with the decision this row gives it. (min items 1) |
+| decision.categories[].category | CookieCategory: enum (strictlyNecessary, functional, analytics, personalisation, marketing) | yes | 2.6.53. |
+| decision.categories[].decision | enum (granted, declined) | yes |  |
+| decision.noticeVersion | string | yes | The cookie notice version decided against (white-label setPolicy, kind cookie). |
+| decision.language | string |  | (max length 10; nullable) |
+| decision.globalPrivacyControl | boolean |  | The browser sent a Global Privacy Control signal; honoured as a CCPA/CPRA opt-out of sale and sharing. (default False) |
+| decision.source | ConsentSource: enum (guestApp, website, kiosk, pos, callCentre, import, agentRecorded, cookieBanner) |  | cookieBanner (29 September, build; BL-073 §4b): a decision made on the cookie banner or preference centre and moved onto the guest by claimDeviceConsent. |
+| decision.country | string |  | The edge's geolocation of the request, for the geographic statistics (2.6.63). (pattern ^[A-Z]{2}$; read-only; nullable) |
+| decision.decidedAt | string (date-time) | yes |  |
+| decision.expiresAt | string (date-time) |  | A device consent expires and a subject consent does not. (read-only; nullable) |
+| decision.claimedBySubjectId | string (uuid) |  | Set once, by claimDeviceConsent. (read-only; nullable) |
+| decision.claimedAt | string (date-time) |  | (read-only; nullable) |
+| decision.scopePath | string |  | The partition key (ADR-0005), tenant-scoped: a decision with no subject still belongs to one tenant. (read-only) |
+| allowedTechnologies | array of object | yes | Per category, the approved technologies it unlocks. |
+| allowedTechnologies[].category | CookieCategory: enum (strictlyNecessary, functional, analytics, personalisation, marketing) | yes | 2.6.53. |
+| allowedTechnologies[].granted | boolean |  | Whether the presented decision grants it; always true for strictlyNecessary. |
+| allowedTechnologies[].technologies | array of object | yes |  |
+| allowedTechnologies[].technologies[].name | string | yes |  |
+| allowedTechnologies[].technologies[].provider | string | yes |  |
+| allowedTechnologies[].technologies[].technologyType | string |  |  |
+| consentModeSignals | object | yes | The decision in Google consent-mode terms (2.6.65), so Analytics and Tag Manager are told, not left to guess. |
+| consentModeSignals.adStorage | enum (granted, denied) |  |  |
+| consentModeSignals.adUserData | enum (granted, denied) |  |  |
+| consentModeSignals.adPersonalization | enum (granted, denied) |  |  |
+| consentModeSignals.analyticsStorage | enum (granted, denied) |  |  |
+| consentModeSignals.functionalityStorage | enum (granted, denied) |  |  |
+| consentModeSignals.personalizationStorage | enum (granted, denied) |  |  |
+| consentModeSignals.securityStorage | enum (granted) |  |  |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 200 |  | The runtime answer |
+| 404 |  | No published banner design for this channel (not-configured); the storefront loads nothing but strictlyNecessary |
+
+### getDeviceConsentHistory
+
+**`GET /consent/device/history`**: A visitor's own cookie decisions, oldest first
+
+**What the preference centre shows a visitor who has not signed in** (2.6.61): every decision recorded against the key their browser or app holds, oldest first by `decidedAt` then `id`, keyset cursor. Changing or withdrawing is `recordDeviceConsent`; a signed-in guest reads their own consents with `getGuestConsents`, and deletion is identity `deleteGuestAccount`. **The key is the only credential**, so it travels in a header, not the URL. A key claimed by a guest answers 404: its decisions are that guest's now, and a shared browser must not show them to the next person.
+
+|  |  |
+|---|---|
+| Permission | `None` |
+| Scope level | tenant |
+| Part of slice | core |
+| Wave | 2 |
+| Offline | no |
+| Conflict policy | serverWins |
+| Read routing | replica |
+| Reads | `marketing.device_consent`, `marketing.device_consent_category` |
+| Writes | - |
+| Called by | GST-066, WEB-024 |
+
+**Parameters**
+
+| Name | In | Required | Type | Notes |
+|---|---|---|---|---|
+| X-Consent-Key | header | yes | string | The key the visitor's browser or app holds |
+| pageSize | query |  | integer |  |
+| cursor | query |  | string | Opaque cursor: the nextCursor of the previous page. |
+
+**Response**: `object`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| items | array of DeviceConsent | yes |  |
+| items[].id | string (uuid) |  | (read-only) |
+| items[].consentKey | string | yes | Opaque, minted by us, not a device fingerprint. (max length 64; read-only) |
+| items[].channel | CookieConsentChannel: enum (b2cWebsite, customerPortal, mobileApp, embeddedCheckout, whiteLabelSite, partnerMicrosite) | yes | The six governed surfaces, as the registry and the banner design name them (pack 17.1.5-17.1.6). |
+| items[].brandId | string (uuid) |  | (nullable) |
+| items[].bannerDesignId | string (uuid) |  | The published CookieBannerPreferenceCenterDesignerView version the visitor was shown. (nullable) |
+| items[].action | DeviceConsentAction: enum (acceptAll, rejectNonEssential, savePreferences, withdraw, doNotSellOrShare) | yes | What the visitor pressed. |
+| items[].categories | array of object | yes | Every category of the design, with the decision this row gives it. (min items 1) |
+| items[].categories[].category | CookieCategory: enum (strictlyNecessary, functional, analytics, personalisation, marketing) | yes | 2.6.53. |
+| items[].categories[].decision | enum (granted, declined) | yes |  |
+| items[].noticeVersion | string | yes | The cookie notice version decided against (white-label setPolicy, kind cookie). |
+| items[].language | string |  | (max length 10; nullable) |
+| items[].globalPrivacyControl | boolean |  | The browser sent a Global Privacy Control signal; honoured as a CCPA/CPRA opt-out of sale and sharing. (default False) |
+| items[].source | ConsentSource: enum (guestApp, website, kiosk, pos, callCentre, import, agentRecorded, cookieBanner) |  | cookieBanner (29 September, build; BL-073 §4b): a decision made on the cookie banner or preference centre and moved onto the guest by claimDeviceConsent. |
+| items[].country | string |  | The edge's geolocation of the request, for the geographic statistics (2.6.63). (pattern ^[A-Z]{2}$; read-only; nullable) |
+| items[].decidedAt | string (date-time) | yes |  |
+| items[].expiresAt | string (date-time) |  | A device consent expires and a subject consent does not. (read-only; nullable) |
+| items[].claimedBySubjectId | string (uuid) |  | Set once, by claimDeviceConsent. (read-only; nullable) |
+| items[].claimedAt | string (date-time) |  | (read-only; nullable) |
+| items[].scopePath | string |  | The partition key (ADR-0005), tenant-scoped: a decision with no subject still belongs to one tenant. (read-only) |
+| nextCursor | string |  |  |
+| hasMore | boolean | yes |  |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 200 |  | The visitor's decisions |
+| 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
 
 ### getGuestConsents
 
@@ -388,7 +1045,7 @@ Current position per purpose and channel, with the version of the notice consent
 | items[].personSubjectId | string (uuid) |  | (nullable) |
 | items[].answeredBySubjectId | string (uuid) |  | The guest who answered, from the session. (read-only; nullable) |
 | items[].answeredByPrincipalId | string (uuid) |  | The staff member who answered on the guest's behalf. (read-only; nullable) |
-| items[].source | ConsentSource: enum (guestApp, website, kiosk, pos, callCentre, import, agentRecorded) | yes |  |
+| items[].source | ConsentSource: enum (guestApp, website, kiosk, pos, callCentre, import, agentRecorded, cookieBanner) | yes | cookieBanner (29 September, build; BL-073 §4b): a decision made on the cookie banner or preference centre and moved onto the guest by claimDeviceConsent. |
 | items[].answeredAt | string (date-time) | yes |  |
 | items[].supersededAt | string (date-time) |  | (read-only; nullable) |
 | items[].scopePath | string |  | The partition key (ADR-0005). (read-only) |
@@ -501,6 +1158,56 @@ Current position per purpose and channel, with the version of the notice consent
 | 200 |  | Questions |
 | 403 | Forbidden | Authenticated but not permitted at the requested scope |
 
+### listPublishedTrackingTechnologies
+
+**`GET /storefront/cookie-consent/technologies`**: The approved cookie registry, as the preference centre shows it
+
+**The guest-facing view of the registry** (2.6.54): only `approved` technologies on the channel, with what the preference centre tells a visitor about each (name, provider, purpose, expiry in days, first or third party, category). `detected`, `blocked` and `retired` entries and the governance fields (`processingPurposeCode`, scan dates, `scopePath`) are never shown. Ordered by `category` then `name`; keyset cursor. Cached at the edge per tenant and channel.
+
+|  |  |
+|---|---|
+| Permission | `None` |
+| Scope level | tenant |
+| Part of slice | core |
+| Wave | 2 |
+| Offline | no |
+| Conflict policy | serverWins |
+| Read routing | replica |
+| Reads | `marketing.tracking_technology` |
+| Writes | - |
+| Called by | GST-066, WEB-024 |
+
+**Parameters**
+
+| Name | In | Required | Type | Notes |
+|---|---|---|---|---|
+| channel | query | yes | CookieConsentChannel: enum (b2cWebsite, customerPortal, mobileApp, embeddedCheckout, whiteLabelSite, partnerMicrosite) |  |
+| category | query |  | CookieCategory: enum (strictlyNecessary, functional, analytics, personalisation, marketing) |  |
+| pageSize | query |  | integer |  |
+| cursor | query |  | string | Opaque cursor: the nextCursor of the previous page. |
+
+**Response**: `object`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| items | array of PublishedTrackingTechnology | yes |  |
+| items[].name | string | yes |  |
+| items[].provider | string | yes |  |
+| items[].category | CookieCategory: enum (strictlyNecessary, functional, analytics, personalisation, marketing) | yes | 2.6.53. |
+| items[].technologyType | string |  |  |
+| items[].purpose | string |  | (nullable) |
+| items[].durationDays | integer |  | Null for session storage. (nullable) |
+| items[].isThirdParty | boolean | yes |  |
+| items[].privacyInformation | string |  | (nullable) |
+| nextCursor | string |  |  |
+| hasMore | boolean | yes |  |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 200 |  | Approved technologies |
+
 ### recordConsent
 
 **`POST /guests/{subjectId}/consents`**: Record a consent decision
@@ -538,7 +1245,7 @@ Every record captures the notice version, the channel, the purpose, the source a
 | decision | ConsentDecision: enum (granted, withdrawn, notAsked) | yes |  |
 | channels | array of MessageChannel: enum (email, sms, whatsapp, push, inApp, post) |  | Omit to apply to every channel the purpose covers. |
 | noticeVersion | string | yes |  |
-| source | ConsentSource: enum (guestApp, website, kiosk, pos, callCentre, import, agentRecorded) | yes |  |
+| source | ConsentSource: enum (guestApp, website, kiosk, pos, callCentre, import, agentRecorded, cookieBanner) | yes | cookieBanner (29 September, build; BL-073 §4b): a decision made on the cookie banner or preference centre and moved onto the guest by claimDeviceConsent. |
 | recordedAt | string (date-time) | yes |  |
 
 **Response**: `ConsentState`
@@ -601,7 +1308,7 @@ Every record captures the notice version, the channel, the purpose, the source a
 | answers[].personIndex | integer |  | For a perPerson question, the person's row in that line's eligibilityDeclaration, counting from 0. (min 0; nullable) |
 | answers[].personName | string |  | (max length 120; nullable) |
 | answers[].personSubjectId | string (uuid) |  | Where the person is a known guest, such as the booker or a family member. (nullable) |
-| source | ConsentSource: enum (guestApp, website, kiosk, pos, callCentre, import, agentRecorded) | yes |  |
+| source | ConsentSource: enum (guestApp, website, kiosk, pos, callCentre, import, agentRecorded, cookieBanner) | yes | cookieBanner (29 September, build; BL-073 §4b): a decision made on the cookie banner or preference centre and moved onto the guest by claimDeviceConsent. |
 | answeredAt | string (date-time) | yes |  |
 
 **Response**: `object`
@@ -625,7 +1332,7 @@ Every record captures the notice version, the channel, the purpose, the source a
 | items[].personSubjectId | string (uuid) |  | (nullable) |
 | items[].answeredBySubjectId | string (uuid) |  | The guest who answered, from the session. (read-only; nullable) |
 | items[].answeredByPrincipalId | string (uuid) |  | The staff member who answered on the guest's behalf. (read-only; nullable) |
-| items[].source | ConsentSource: enum (guestApp, website, kiosk, pos, callCentre, import, agentRecorded) | yes |  |
+| items[].source | ConsentSource: enum (guestApp, website, kiosk, pos, callCentre, import, agentRecorded, cookieBanner) | yes | cookieBanner (29 September, build; BL-073 §4b): a decision made on the cookie banner or preference centre and moved onto the guest by claimDeviceConsent. |
 | items[].answeredAt | string (date-time) | yes |  |
 | items[].supersededAt | string (date-time) |  | (read-only; nullable) |
 | items[].scopePath | string |  | The partition key (ADR-0005). (read-only) |
@@ -637,6 +1344,85 @@ Every record captures the notice version, the channel, the purpose, the source a
 | 201 |  | Recorded |
 | 409 |  | The question has changed since the cart was read (questionVersionSuperseded); the client re-reads the cart and asks the current version. |
 | 422 |  | A perPerson question answered without a person (personRequired), a question this cart does not ask (questionNotAsked), or a retired one (questionRetired). |
+
+### recordDeviceConsent
+
+**`POST /consent/device`**: Record a visitor's cookie decision, before anyone is known
+
+**The banner's and the preference centre's write, for a visitor nobody has identified yet** (2.6.52, 2.6.55). **Append-only, like `recordConsent`**: a change of mind or a withdrawal is a new row, never an edit, so the trail from first decision to last is the evidence (2.6.56). Where no `consentKey` is sent the server mints one and returns it; the browser or app keeps it as a first-party, strictly necessary cookie or local key, which is the one thing that may be set before consent. **The key is the tenant's, not the domain's** (2.6.62): the storefront on any of the tenant's verified domains (white-label `claimCustomDomain`) presents the same key and gets the same answer; it is never shared across tenants, because two tenants are two controllers.
+**What the action writes.** `acceptAll` grants every category; `rejectNonEssential` and `withdraw` decline every category but `strictlyNecessary`; `savePreferences` records the categories as sent, and a category not sent is declined (off by default, BL-073); `doNotSellOrShare` declines `marketing` (CCPA/CPRA). **A `globalPrivacyControl` signal declines `marketing` whatever else was chosen.** `strictlyNecessary` is always granted and cannot be declined (422). The decision expires after the tenant's device-consent term and the banner asks again; so does a new `noticeVersion`.
+**Personal data stays out of `marketing`** (ADR-0023, BL-073 §3): where the published banner design has `recordIpAddress` on, the request's IP address and user agent are written to `pii.consent_identifier` against this row, never beside it. `country` is the edge's geolocation of the request, kept for the geographic consent statistics (2.6.63) without keeping the address. A key already claimed by a guest (`claimDeviceConsent`) is closed: a decision sent against it mints a new key.
+**Publishes `consent.deviceConsentRecorded`** (29 September, build, 2.6.65) in the same transaction as the row, without the IP address or user agent, so a CDP or CRM subscribed through the webhook catalogue receives the consent signal; Google Analytics and Tag Manager read it in the page (`getCookieConsentRuntime`).
+
+|  |  |
+|---|---|
+| Permission | `None` |
+| Scope level | subject |
+| Part of slice | core |
+| Wave | 1 |
+| Offline | no |
+| Config scope | subject |
+| Conflict policy | append |
+| Reads | `cache:idempotency`, `marketing.cookie_banner_design`, `marketing.device_consent`, `marketing.device_consent_category` |
+| Writes | `cache:idempotency`, `marketing.device_consent`, `marketing.device_consent_category`, `pii.consent_identifier`, `platform.outbox` |
+| Called by | GST-001, GST-066, WEB-001, WEB-024 |
+
+**Parameters**
+
+| Name | In | Required | Type | Notes |
+|---|---|---|---|---|
+| Idempotency-Key | header | yes | string | Client-generated ULID. |
+
+**Request body**: `RecordDeviceConsentRequest`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| consentKey | string |  | The key the browser or app already holds; omitted on a first decision, and one is minted. (max length 64; nullable) |
+| channel | CookieConsentChannel: enum (b2cWebsite, customerPortal, mobileApp, embeddedCheckout, whiteLabelSite, partnerMicrosite) | yes | The six governed surfaces, as the registry and the banner design name them (pack 17.1.5-17.1.6). |
+| brandId | string (uuid) |  | (nullable) |
+| bannerDesignId | string (uuid) |  | (nullable) |
+| action | DeviceConsentAction: enum (acceptAll, rejectNonEssential, savePreferences, withdraw, doNotSellOrShare) | yes | What the visitor pressed. |
+| categories | array of object |  | Required for savePreferences; ignored for the other actions, which decide every category themselves. |
+| categories[].category | CookieCategory: enum (strictlyNecessary, functional, analytics, personalisation, marketing) | yes | 2.6.53. |
+| categories[].decision | enum (granted, declined) | yes |  |
+| noticeVersion | string | yes |  |
+| language | string |  | (max length 10; nullable) |
+| globalPrivacyControl | boolean |  | (default False) |
+| source | ConsentSource: enum (guestApp, website, kiosk, pos, callCentre, import, agentRecorded, cookieBanner) |  | cookieBanner (29 September, build; BL-073 §4b): a decision made on the cookie banner or preference centre and moved onto the guest by claimDeviceConsent. |
+| decidedAt | string (date-time) | yes |  |
+
+**Response**: `DeviceConsent`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| id | string (uuid) |  | (read-only) |
+| consentKey | string | yes | Opaque, minted by us, not a device fingerprint. (max length 64; read-only) |
+| channel | CookieConsentChannel: enum (b2cWebsite, customerPortal, mobileApp, embeddedCheckout, whiteLabelSite, partnerMicrosite) | yes | The six governed surfaces, as the registry and the banner design name them (pack 17.1.5-17.1.6). |
+| brandId | string (uuid) |  | (nullable) |
+| bannerDesignId | string (uuid) |  | The published CookieBannerPreferenceCenterDesignerView version the visitor was shown. (nullable) |
+| action | DeviceConsentAction: enum (acceptAll, rejectNonEssential, savePreferences, withdraw, doNotSellOrShare) | yes | What the visitor pressed. |
+| categories | array of object | yes | Every category of the design, with the decision this row gives it. (min items 1) |
+| categories[].category | CookieCategory: enum (strictlyNecessary, functional, analytics, personalisation, marketing) | yes | 2.6.53. |
+| categories[].decision | enum (granted, declined) | yes |  |
+| noticeVersion | string | yes | The cookie notice version decided against (white-label setPolicy, kind cookie). |
+| language | string |  | (max length 10; nullable) |
+| globalPrivacyControl | boolean |  | The browser sent a Global Privacy Control signal; honoured as a CCPA/CPRA opt-out of sale and sharing. (default False) |
+| source | ConsentSource: enum (guestApp, website, kiosk, pos, callCentre, import, agentRecorded, cookieBanner) |  | cookieBanner (29 September, build; BL-073 §4b): a decision made on the cookie banner or preference centre and moved onto the guest by claimDeviceConsent. |
+| country | string |  | The edge's geolocation of the request, for the geographic statistics (2.6.63). (pattern ^[A-Z]{2}$; read-only; nullable) |
+| decidedAt | string (date-time) | yes |  |
+| expiresAt | string (date-time) |  | A device consent expires and a subject consent does not. (read-only; nullable) |
+| claimedBySubjectId | string (uuid) |  | Set once, by claimDeviceConsent. (read-only; nullable) |
+| claimedAt | string (date-time) |  | (read-only; nullable) |
+| scopePath | string |  | The partition key (ADR-0005), tenant-scoped: a decision with no subject still belongs to one tenant. (read-only) |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 201 |  | Recorded; carries the consentKey to keep |
+| 400 |  | No published banner design with this id for the channel, or a category the design does not offer |
+| 409 |  | noticeVersion is no longer the published one (notice-superseded); read getCookieConsentRuntime again and show the current banner |
+| 422 |  | strictlyNecessary declined, or savePreferences with no categories |
 
 ### setConsentPurposes
 
@@ -681,6 +1467,192 @@ Each purpose names the channels it covers, whether it is required for service, a
 | Code | Shape | Meaning |
 |---|---|---|
 | 200 |  | Configured |
+
+### setCookieBannerDesign
+
+**`PUT /cookie-banner-preference`**: Save a cookie banner design as a new version
+
+**An upsert keyed on `brandId` + `channel` that always writes a new version** (the pack: banner wording and configuration must be version controlled). Saved as `draft`; publishing goes through `approvePrivacyTesting`. `rejectIsOneClick: false`, a non-essential category with `defaultOn: true` or a missing `strictlyNecessary` description is refused (422), and so is a design whose `regulatoryRegimes` include `ccpaCpra` with no `doNotSellOrShare` button (29 September, build). The published version is what visitors get from `getCookieConsentRuntime` and decide against with `recordDeviceConsent`. (decided 29 September, readiness close-out)
+
+|  |  |
+|---|---|
+| Permission | `GUEST_MANAGE` |
+| Scope level | venue |
+| Part of slice | setup, makes `marketing.cookie_banner_design` non-empty |
+| Wave | 1 |
+| Offline | no |
+| Conflict policy | serverWins |
+| Read routing | primary |
+| Reads | `marketing.cookie_banner_design` |
+| Writes | `marketing.cookie_banner_design` |
+| Called by | CMS-026 |
+
+**Parameters**
+
+| Name | In | Required | Type | Notes |
+|---|---|---|---|---|
+| Idempotency-Key | header | yes | string | Client-generated ULID. |
+
+**Request body**: `CookieBannerPreferenceCenterDesignerView`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| id | string (uuid) |  | (read-only) |
+| brandId | string (uuid) |  | Null for the corporate design every brand inherits. (nullable) |
+| inheritsFromId | string (uuid) |  | (nullable) |
+| channel | enum (b2cWebsite, customerPortal, mobileApp, embeddedCheckout, whiteLabelSite, partnerMicrosite) | yes |  |
+| logoAssetId | string (uuid) |  | (nullable) |
+| title | LocalisedText |  | Text keyed by locale code, one entry per locale the venue publishes. |
+| body | LocalisedText |  | Text keyed by locale code, one entry per locale the venue publishes. |
+| position | enum (top, bottom, popup, modal) | yes |  |
+| themeId | string |  | The white-label theme it takes colours and fonts from. (nullable) |
+| buttons | array of object |  |  |
+| buttons[].action | enum (acceptAll, rejectNonEssential, managePreferences, savePreferences, doNotSellOrShare) | yes |  |
+| buttons[].label | LocalisedText |  | Text keyed by locale code, one entry per locale the venue publishes. |
+| rejectIsOneClick | boolean | yes | Must be true. (default True) |
+| links | array of object |  |  |
+| links[].label | LocalisedText | yes | Text keyed by locale code, one entry per locale the venue publishes. |
+| links[].policyKind | enum (privacy, cookie, termsAndConditions) | yes |  |
+| categories | array of object | yes | (min items 1) |
+| categories[].category | enum (strictlyNecessary, functional, analytics, personalisation, marketing) | yes |  |
+| categories[].description | LocalisedText |  | Text keyed by locale code, one entry per locale the venue publishes. |
+| categories[].defaultOn | boolean | yes | True only for strictlyNecessary, which is always active. |
+| languages | array of string | yes | Every language the storefront serves; Arabic renders right to left. (min items 1) |
+| regulatoryRegimes | array of enum (gdpr, ePrivacy, ccpaCpra, lgpd, uaePdpl, saudiPdpl) |  | 2.6.60 (29 September, build). |
+| recordIpAddress | boolean |  | 2.6.55, "if legally permitted" (29 September, build). (default False) |
+| noticeVersion | string |  | Moves with the cookie policy (white-label setPolicy, kind cookie). (read-only) |
+| version | integer |  | (min 1; read-only) |
+| status | enum (draft, published, superseded) |  | (read-only) |
+| scopePath | string |  | The partition key (ADR-0005). (read-only) |
+| updatedAt | string (date-time) |  | (read-only) |
+
+**Response**: `CookieBannerPreferenceCenterDesignerView`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| id | string (uuid) |  | (read-only) |
+| brandId | string (uuid) |  | Null for the corporate design every brand inherits. (nullable) |
+| inheritsFromId | string (uuid) |  | (nullable) |
+| channel | enum (b2cWebsite, customerPortal, mobileApp, embeddedCheckout, whiteLabelSite, partnerMicrosite) | yes |  |
+| logoAssetId | string (uuid) |  | (nullable) |
+| title | LocalisedText |  | Text keyed by locale code, one entry per locale the venue publishes. |
+| body | LocalisedText |  | Text keyed by locale code, one entry per locale the venue publishes. |
+| position | enum (top, bottom, popup, modal) | yes |  |
+| themeId | string |  | The white-label theme it takes colours and fonts from. (nullable) |
+| buttons | array of object |  |  |
+| buttons[].action | enum (acceptAll, rejectNonEssential, managePreferences, savePreferences, doNotSellOrShare) | yes |  |
+| buttons[].label | LocalisedText |  | Text keyed by locale code, one entry per locale the venue publishes. |
+| rejectIsOneClick | boolean | yes | Must be true. (default True) |
+| links | array of object |  |  |
+| links[].label | LocalisedText | yes | Text keyed by locale code, one entry per locale the venue publishes. |
+| links[].policyKind | enum (privacy, cookie, termsAndConditions) | yes |  |
+| categories | array of object | yes | (min items 1) |
+| categories[].category | enum (strictlyNecessary, functional, analytics, personalisation, marketing) | yes |  |
+| categories[].description | LocalisedText |  | Text keyed by locale code, one entry per locale the venue publishes. |
+| categories[].defaultOn | boolean | yes | True only for strictlyNecessary, which is always active. |
+| languages | array of string | yes | Every language the storefront serves; Arabic renders right to left. (min items 1) |
+| regulatoryRegimes | array of enum (gdpr, ePrivacy, ccpaCpra, lgpd, uaePdpl, saudiPdpl) |  | 2.6.60 (29 September, build). |
+| recordIpAddress | boolean |  | 2.6.55, "if legally permitted" (29 September, build). (default False) |
+| noticeVersion | string |  | Moves with the cookie policy (white-label setPolicy, kind cookie). (read-only) |
+| version | integer |  | (min 1; read-only) |
+| status | enum (draft, published, superseded) |  | (read-only) |
+| scopePath | string |  | The partition key (ADR-0005). (read-only) |
+| updatedAt | string (date-time) |  | (read-only) |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 200 |  | The new draft version |
+| 400 | BadRequest | Validation failed |
+| 422 |  | A design that makes rejecting harder than accepting, pre-ticks a non-essential category, or names ccpaCpra without a doNotSellOrShare button. |
+
+### setTrackingTechnology
+
+**`PUT /cookie-tracking-digital`**: Add, classify or retire a tracking technology
+
+**An upsert keyed on `name` + `provider` + `domainApplication`.** Approving a `detected` technology requires a `category`; `consentRequired` cannot be false for anything but `strictlyNecessary` (422). Retired rather than deleted: the registry is evidence of what a site did on a date. (decided 29 September, readiness close-out)
+
+|  |  |
+|---|---|
+| Permission | `GUEST_MANAGE` |
+| Scope level | venue |
+| Part of slice | setup, makes `marketing.tracking_technology` non-empty |
+| Wave | 1 |
+| Offline | no |
+| Conflict policy | serverWins |
+| Read routing | primary |
+| Reads | `marketing.tracking_technology` |
+| Writes | `marketing.tracking_technology` |
+| Called by | CMS-025 |
+
+**Parameters**
+
+| Name | In | Required | Type | Notes |
+|---|---|---|---|---|
+| Idempotency-Key | header | yes | string | Client-generated ULID. |
+
+**Request body**: `CookieTrackingDigitalTechnologyRegistryView`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| technologyId | string (uuid) |  | (read-only) |
+| name | string | yes | The cookie, SDK, pixel or storage key as it appears on the device. (max length 200) |
+| provider | string | yes | (max length 150) |
+| domainApplication | string |  | The domain, or the app and version, it was found on. (max length 255; nullable) |
+| technologyType | enum (firstPartyCookie, thirdPartyCookie, mobileSdk, analyticsTracker, advertisingPixel, sessionTechnology, personalisationTechnology, embeddedService, …) | yes |  |
+| category | enum (strictlyNecessary, functional, analytics, personalisation, marketing, other) |  | Null until an administrator classifies it. (nullable) |
+| otherCategoryLabel | string |  | The organisation-defined category, when category is other. (max length 80; nullable) |
+| purpose | string |  | (max length 500; nullable) |
+| dataCollected | string |  | (max length 500; nullable) |
+| durationDays | integer |  | Null for session storage. (min 0; nullable) |
+| isThirdParty | boolean | yes |  |
+| channels | array of enum (b2cWebsite, customerPortal, mobileApp, embeddedCheckout, whiteLabelSite, partnerMicrosite) | yes | (min items 1) |
+| countries | array of string |  | Empty means every country. |
+| processingPurposeCode | string |  | The DataProcessingPurposeLawfulBasisRegistryView.purposeCode it serves. (nullable) |
+| consentRequired | boolean |  | False only for strictlyNecessary. (default True) |
+| privacyInformation | string |  | What the preference centre tells the guest about it. (max length 1000; nullable) |
+| source | enum (manual, scan) |  | (default manual; read-only) |
+| status | enum (detected, approved, blocked, retired) | yes | detected is treated as blocked until approved. |
+| firstDetectedAt | string (date-time) |  | (read-only; nullable) |
+| lastSeenAt | string (date-time) |  | (read-only; nullable) |
+| scopePath | string |  | The partition key (ADR-0005). (read-only) |
+| updatedAt | string (date-time) |  | (read-only) |
+
+**Response**: `CookieTrackingDigitalTechnologyRegistryView`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| technologyId | string (uuid) |  | (read-only) |
+| name | string | yes | The cookie, SDK, pixel or storage key as it appears on the device. (max length 200) |
+| provider | string | yes | (max length 150) |
+| domainApplication | string |  | The domain, or the app and version, it was found on. (max length 255; nullable) |
+| technologyType | enum (firstPartyCookie, thirdPartyCookie, mobileSdk, analyticsTracker, advertisingPixel, sessionTechnology, personalisationTechnology, embeddedService, …) | yes |  |
+| category | enum (strictlyNecessary, functional, analytics, personalisation, marketing, other) |  | Null until an administrator classifies it. (nullable) |
+| otherCategoryLabel | string |  | The organisation-defined category, when category is other. (max length 80; nullable) |
+| purpose | string |  | (max length 500; nullable) |
+| dataCollected | string |  | (max length 500; nullable) |
+| durationDays | integer |  | Null for session storage. (min 0; nullable) |
+| isThirdParty | boolean | yes |  |
+| channels | array of enum (b2cWebsite, customerPortal, mobileApp, embeddedCheckout, whiteLabelSite, partnerMicrosite) | yes | (min items 1) |
+| countries | array of string |  | Empty means every country. |
+| processingPurposeCode | string |  | The DataProcessingPurposeLawfulBasisRegistryView.purposeCode it serves. (nullable) |
+| consentRequired | boolean |  | False only for strictlyNecessary. (default True) |
+| privacyInformation | string |  | What the preference centre tells the guest about it. (max length 1000; nullable) |
+| source | enum (manual, scan) |  | (default manual; read-only) |
+| status | enum (detected, approved, blocked, retired) | yes | detected is treated as blocked until approved. |
+| firstDetectedAt | string (date-time) |  | (read-only; nullable) |
+| lastSeenAt | string (date-time) |  | (read-only; nullable) |
+| scopePath | string |  | The partition key (ADR-0005). (read-only) |
+| updatedAt | string (date-time) |  | (read-only) |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 200 |  | The technology as stored |
+| 400 | BadRequest | Validation failed |
+| 422 |  | Approved with no category, or a non-essential technology marked as needing no consent. |
 
 ### updateConsentQuestion
 
@@ -2906,6 +3878,70 @@ BL-133. **Deliberately not `assets`.** A guest's passport scan is not a marketin
 
 ## Group: message
 
+### createMessageTemplate
+
+**`POST /message-templates`**: Create a message template
+
+Per-language bodies with named merge fields. A template missing a version in an enabled language is flagged rather than silently falling back — a guest receiving English when they chose Arabic is a defect, not a graceful degradation.
+
+|  |  |
+|---|---|
+| Permission | `MARKETING_MANAGE` |
+| Scope level | tenant |
+| Part of slice | setup, makes `marketing.message_template` non-empty |
+| Wave | 2 |
+| Offline | no |
+| Config scope | tenant |
+| Conflict policy | serverWins |
+| Reads | `cache:idempotency`, `marketing.message_template` |
+| Writes | `cache:idempotency`, `marketing.message_template`, `marketing.message_template_version` |
+| Called by | BO-785, BO-786, BO-787, SUP-007 |
+
+**Parameters**
+
+| Name | In | Required | Type | Notes |
+|---|---|---|---|---|
+| Idempotency-Key | header | yes | string | Client-generated ULID. |
+
+**Request body**: `MessageTemplate`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| id | string (uuid) | yes | (read-only) |
+| code | string | yes | (max length 64) |
+| name | string | yes | (max length 200) |
+| channel | MessageChannel: enum (email, sms, whatsapp, push, inApp, post) | yes |  |
+| subjects | object |  | Per language. |
+| bodies | object | yes | Per language, keyed by ISO 639-1 code. |
+| mergeFields | array of string |  |  |
+| missingLanguages | array of string |  | Enabled languages without a body. (read-only) |
+| providerTemplateId | string |  | Required for WhatsApp, where templates are pre-approved by the provider. (nullable) |
+| brandId | string (uuid) |  | The brand whose identity the template carries; null for the tenant default. (nullable) |
+| ownership | enum (platform, crm) |  | platform = a transactional template owned by the communication service; crm = a marketing template owned by CRM (listSystemTransactionalTemplate). (default crm) |
+
+**Response**: `MessageTemplate`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| id | string (uuid) | yes | (read-only) |
+| code | string | yes | (max length 64) |
+| name | string | yes | (max length 200) |
+| channel | MessageChannel: enum (email, sms, whatsapp, push, inApp, post) | yes |  |
+| subjects | object |  | Per language. |
+| bodies | object | yes | Per language, keyed by ISO 639-1 code. |
+| mergeFields | array of string |  |  |
+| missingLanguages | array of string |  | Enabled languages without a body. (read-only) |
+| providerTemplateId | string |  | Required for WhatsApp, where templates are pre-approved by the provider. (nullable) |
+| brandId | string (uuid) |  | The brand whose identity the template carries; null for the tenant default. (nullable) |
+| ownership | enum (platform, crm) |  | platform = a transactional template owned by the communication service; crm = a marketing template owned by CRM (listSystemTransactionalTemplate). (default crm) |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 201 |  | Created |
+| 400 |  | Unknown merge field, or a required language is missing |
+
 ### listMyNotifications
 
 **`GET /me/notifications`**: The signed-in guest's notification feed
@@ -3003,6 +4039,74 @@ Marks the given notifications, or all of them when `all` is true, as opened. Onl
 |---|---|---|
 | 200 |  | Marked. |
 
+
+## Group: segment
+
+### createSegment
+
+**`POST /segments`**: Create a segment
+
+**A definition, not a list.** Evaluated when used, so it cannot go stale. A materialised audience list is out of date the moment a guest transacts, which is how people receive offers for things they have already bought.
+
+|  |  |
+|---|---|
+| Permission | `MARKETING_MANAGE` |
+| Scope level | venue |
+| Part of slice | setup, makes `marketing.segment` non-empty |
+| Wave | 2 |
+| Offline | no |
+| Conflict policy | serverWins |
+| Reads | `cache:idempotency`, `marketing.segment`, `marketing.segment_criterion` |
+| Writes | `cache:idempotency`, `marketing.segment`, `marketing.segment_criterion` |
+| Called by | ANL-007, BO-755, BO-757, BO-758, BO-759, BO-760, BO-762 |
+
+**Parameters**
+
+| Name | In | Required | Type | Notes |
+|---|---|---|---|---|
+| Idempotency-Key | header | yes | string | Client-generated ULID. |
+
+**Request body**: `CreateSegmentRequest`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| name | string | yes | (max length 200) |
+| description | string |  | (max length 1000) |
+| venueId | string (uuid) |  |  |
+| match | enum (all, any) |  | (default all) |
+| criteria | array of SegmentCriterion | yes | (min items 1) |
+| criteria[].attribute | string | yes | Behavioural or profile attribute — visit count, last visit, lifetime value, product purchased, membership tier, venue visited, language. |
+| criteria[].operator | enum (equals, notEquals, greaterThan, lessThan, between, in, notIn, exists, …) | yes |  |
+| criteria[].value | object |  |  |
+| criteria[].values | array of object |  |  |
+| excludeSegmentIds | array of string (uuid) |  |  |
+
+**Response**: `Segment`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| name | string | yes | (max length 200) |
+| description | string |  | (max length 1000) |
+| venueId | string (uuid) |  |  |
+| match | enum (all, any) |  | (default all) |
+| criteria | array of SegmentCriterion | yes | (min items 1) |
+| criteria[].attribute | string | yes | Behavioural or profile attribute — visit count, last visit, lifetime value, product purchased, membership tier, venue visited, language. |
+| criteria[].operator | enum (equals, notEquals, greaterThan, lessThan, between, in, notIn, exists, …) | yes |  |
+| criteria[].value | object |  |  |
+| criteria[].values | array of object |  |  |
+| excludeSegmentIds | array of string (uuid) |  |  |
+| id | string (uuid) | yes |  |
+| lastEvaluatedSize | integer |  | (nullable) |
+| lastEvaluatedAt | string (date-time) |  | (nullable) |
+| createdAt | string (date-time) | yes |  |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 201 |  | Created |
+| 400 |  | Criteria are contradictory or reference unknown attributes |
+
 ## Tables
 
 Every table this service owns that the slice reads or writes, with its columns as derived into `backend/tenant/*.sql`.
@@ -3018,6 +4122,19 @@ Every table this service owns that the slice reads or writes, with its columns a
 | queue_ids | text[] | no |  |
 | expires_at | timestamptz | no | When this state lapses on its own — availability expires rather than persisting through a closed laptop. |
 | updated_at | timestamptz | no |  |
+
+### `marketing.attribution_touch`
+
+| Column | Type | Required | Notes |
+|---|---|---|---|
+| id | uuid | yes |  |
+| subject_id | uuid | yes |  |
+| campaign_id | uuid | yes |  |
+| journey_id | uuid | no |  |
+| touched_at | timestamptz | yes |  |
+| channel | text | yes |  |
+| interaction | text | no |  |
+| order_id | text | no | Set on the converting touch. |
 
 ### `marketing.booking_consent_record`
 
@@ -3043,6 +4160,60 @@ Every table this service owns that the slice reads or writes, with its columns a
 | answered_at | timestamptz | yes |  |
 | superseded_at | timestamptz | no |  |
 | scope_path | text | no | The partition key (ADR-0005). |
+
+### `marketing.campaign`
+
+| Column | Type | Required | Notes |
+|---|---|---|---|
+| name | text | yes |  |
+| kind | text | yes |  |
+| channel | text | yes |  |
+| venue_id | uuid | no |  |
+| segment_id | uuid | yes |  |
+| content | jsonb | yes |  |
+| trigger | jsonb | no |  |
+| scheduled_for | timestamptz | no |  |
+| consent_purpose | text | no |  |
+| send_window | jsonb | no | Hours during which sending is permitted. |
+| send_time_mode | text | no | optimised sends each recipient at the hour ai.requestSuggestion (kind sendTime) gives for them, inside sendWindow (29 September, build pass, group G2; 22.3.19). |
+| optimise_channel | boolean | no | With sendTimeMode optimised, route each recipient to the channel the suggestion names, among the channels they consented to (22.9.16). |
+| ab_test | jsonb | no | How the variants are tested. |
+| id | uuid | yes |  |
+| budget_cap | numeric(18,4) | no |  |
+| budget_spent | numeric(18,4) | no | BL-169. |
+| status | text | yes |  |
+| is_paused | boolean | no |  |
+| created_by_principal_id | uuid | no |  |
+| created_at | timestamptz | yes |  |
+| launched_at | timestamptz | no |  |
+| completed_at | timestamptz | no |  |
+
+### `marketing.campaign_target`
+
+| Column | Type | Required | Notes |
+|---|---|---|---|
+| id | uuid | no |  |
+| campaign_id | uuid | yes |  |
+| domain | text | yes |  |
+| type | text | yes |  |
+| target_id | uuid | yes |  |
+| is_primary | boolean | yes |  |
+| created_at | timestamptz | yes |  |
+
+### `marketing.campaign_variant`
+
+| Column | Type | Required | Notes |
+|---|---|---|---|
+| id | uuid | no |  |
+| campaign_id | uuid | no |  |
+| label | text | yes | A, B, C... |
+| subject_override | jsonb | no | Subject line by locale. |
+| template_id | uuid | no | A different template for this variant; null uses the campaign's content.templateId. |
+| split_percent | integer | no | Share of the test group; null splits evenly. |
+| source | text | no |  |
+| ai_decision_record_id | text | no | The decision record of the ai.proposeMarketingContent draft it came from, for aiDraft. |
+| is_winner | boolean | no |  |
+| scope_path | text | no | The partition key (ADR-0005), the campaign's. |
 
 ### `marketing.case`
 
@@ -3243,6 +4414,59 @@ Every table this service owns that the slice reads or writes, with its columns a
 | conversation_message_id | uuid | yes | The parent row. |
 | asset_id | uuid | no |  |
 | kind | text | no |  |
+| id | uuid | yes | Synthesised key. |
+
+### `marketing.cookie_banner_design`
+
+| Column | Type | Required | Notes |
+|---|---|---|---|
+| id | uuid | no |  |
+| brand_id | uuid | no | Null for the corporate design every brand inherits. |
+| inherits_from_id | uuid | no |  |
+| channel | text | yes |  |
+| logo_asset_id | uuid | no |  |
+| title | jsonb | no |  |
+| body | jsonb | no |  |
+| position | text | yes |  |
+| theme_id | text | no | The white-label theme it takes colours and fonts from. |
+| reject_is_one_click | boolean | yes | Must be true. |
+| languages | text[] | yes | Every language the storefront serves; Arabic renders right to left. |
+| regulatory_regimes | text[] | no | 2.6.60 (29 September, build). |
+| record_ip_address | boolean | no | 2.6.55, "if legally permitted" (29 September, build). |
+| notice_version | text | no | Moves with the cookie policy (white-label setPolicy, kind cookie). |
+| version | integer | no |  |
+| status | text | no |  |
+| scope_path | text | no | The partition key (ADR-0005). |
+| updated_at | timestamptz | no |  |
+
+### `marketing.device_consent`
+
+| Column | Type | Required | Notes |
+|---|---|---|---|
+| id | uuid | no |  |
+| consent_key | text | yes | Opaque, minted by us, not a device fingerprint. |
+| channel | text | yes |  |
+| brand_id | uuid | no |  |
+| banner_design_id | uuid | no | The published CookieBannerPreferenceCenterDesignerView version the visitor was shown. |
+| action | text | yes |  |
+| notice_version | text | yes | The cookie notice version decided against (white-label setPolicy, kind cookie). |
+| language | text | no |  |
+| global_privacy_control | boolean | no | The browser sent a Global Privacy Control signal; honoured as a CCPA/CPRA opt-out of sale and sharing. |
+| source | text | no |  |
+| country | text | no | The edge's geolocation of the request, for the geographic statistics (2.6.63). |
+| decided_at | timestamptz | yes |  |
+| expires_at | timestamptz | no | A device consent expires and a subject consent does not. |
+| claimed_by_subject_id | uuid | no | Set once, by claimDeviceConsent. |
+| claimed_at | timestamptz | no |  |
+| scope_path | text | no | The partition key (ADR-0005), tenant-scoped: a decision with no subject still belongs to one tenant. |
+
+### `marketing.device_consent_category`
+
+| Column | Type | Required | Notes |
+|---|---|---|---|
+| device_consent_id | uuid | yes | The parent row. |
+| category | text | yes |  |
+| decision | text | yes |  |
 | id | uuid | yes | Synthesised key. |
 
 ### `marketing.form_definition`
@@ -3470,6 +4694,8 @@ Every table this service owns that the slice reads or writes, with its columns a
 | channel | text | yes |  |
 | template_id | uuid | no |  |
 | message_trigger_id | uuid | no | The MessageTrigger that fired it, and through its event the BusinessEvent and source module; null for a campaign or a direct send. |
+| campaign_variant_id | uuid | no | The A/B variant sent (22.1.17; 29 September, build pass, group G2). |
+| planned_send_at | timestamptz | no | The per-recipient hour chosen by sendTimeMode optimised (22.3.19, 22.9.16); null when sent at the scheduled time. |
 | status | text | yes |  |
 | failure_reason | text | no |  |
 | provider_reference | text | no |  |
@@ -3480,6 +4706,44 @@ Every table this service owns that the slice reads or writes, with its columns a
 | clicked_at | timestamptz | no |  |
 | complained_at | timestamptz | no |  |
 | unsubscribed_at | timestamptz | no |  |
+
+### `marketing.message_template`
+
+| Column | Type | Required | Notes |
+|---|---|---|---|
+| id | uuid | yes |  |
+| code | text | yes |  |
+| name | text | yes |  |
+| channel | text | yes |  |
+| subjects | jsonb | no | Per language. |
+| bodies | jsonb | yes | Per language, keyed by ISO 639-1 code. |
+| merge_fields | text[] | no |  |
+| missing_languages | text[] | no | Enabled languages without a body. |
+| provider_template_id | text | no | Required for WhatsApp, where templates are pre-approved by the provider. |
+| brand_id | uuid | no | The brand whose identity the template carries; null for the tenant default. |
+| ownership | text | no | platform = a transactional template owned by the communication service; crm = a marketing template owned by CRM (listSystemTransactionalTemplate). |
+| tenant_id | uuid | yes | Points at platform.tenant. |
+
+### `marketing.message_template_version`
+
+| Column | Type | Required | Notes |
+|---|---|---|---|
+| id | uuid | yes |  |
+| message_template_id | uuid | yes |  |
+| language | text | yes | BCP 47 tag. |
+| version | integer | yes | Unique per template and language. |
+| status | text | yes |  |
+| subject | text | no | Email only. |
+| header | text | no |  |
+| body | text | no |  |
+| footer | text | no |  |
+| cta_label | text | no |  |
+| cta_url | text | no | May contain variables, e.g. |
+| attachment_kinds | text[] | no |  |
+| variables | text[] | no | Dynamic variables the content uses (e.g. |
+| published_at | timestamptz | no |  |
+| published_by_principal_id | uuid | no |  |
+| created_at | timestamptz | no |  |
 
 ### `marketing.points_earning_rule`
 
@@ -3559,6 +4823,31 @@ Every table this service owns that the slice reads or writes, with its columns a
 | responded_by_principal_id | uuid | no |  |
 | opened_case_id | text | no | Case raised automatically where the rating fell below the venue's threshold. |
 
+### `marketing.segment`
+
+| Column | Type | Required | Notes |
+|---|---|---|---|
+| name | text | yes |  |
+| description | text | no |  |
+| venue_id | uuid | no |  |
+| match | text | no |  |
+| exclude_segment_ids | text[] | no |  |
+| id | uuid | yes |  |
+| last_evaluated_size | integer | no |  |
+| last_evaluated_at | timestamptz | no |  |
+| created_at | timestamptz | yes |  |
+
+### `marketing.segment_criterion`
+
+| Column | Type | Required | Notes |
+|---|---|---|---|
+| segment_id | uuid | yes | The parent row. |
+| attribute | text | yes | Behavioural or profile attribute — visit count, last visit, lifetime value, product purchased, membership tier, venue visited, language. |
+| operator | text | yes |  |
+| value | text | no |  |
+| values | text[] | no |  |
+| id | uuid | yes | Synthesised key. |
+
 ### `marketing.subscription`
 
 | Column | Type | Required | Notes |
@@ -3571,6 +4860,34 @@ Every table this service owns that the slice reads or writes, with its columns a
 | source | text | no | Where the opt-in happened, because a regulator asks. |
 | unsubscribe_token | text | no | Unsubscribe must work without a login. |
 | updated_at | timestamptz | no |  |
+
+### `marketing.tracking_technology`
+
+| Column | Type | Required | Notes |
+|---|---|---|---|
+| technology_id | uuid | no |  |
+| name | text | yes | The cookie, SDK, pixel or storage key as it appears on the device. |
+| provider | text | yes |  |
+| domain_application | text | no | The domain, or the app and version, it was found on. |
+| technology_type | text | yes |  |
+| category | text | no | Null until an administrator classifies it. |
+| other_category_label | text | no | The organisation-defined category, when category is other. |
+| purpose | text | no |  |
+| data_collected | text | no |  |
+| duration_days | integer | no | Null for session storage. |
+| is_third_party | boolean | yes |  |
+| channels | text[] | yes |  |
+| countries | text[] | no | Empty means every country. |
+| processing_purpose_code | text | no | The DataProcessingPurposeLawfulBasisRegistryView.purposeCode it serves. |
+| is_consent_required | boolean | no | False only for strictlyNecessary. |
+| privacy_information | text | no | What the preference centre tells the guest about it. |
+| source | text | no |  |
+| status | text | yes | detected is treated as blocked until approved. |
+| first_detected_at | timestamptz | no |  |
+| last_seen_at | timestamptz | no |  |
+| scope_path | text | no | The partition key (ADR-0005). |
+| updated_at | timestamptz | no |  |
+| id | uuid | yes | Synthesised key. |
 
 ### `marketing.wishlist_item`
 
@@ -3591,17 +4908,17 @@ Every table this service owns that the slice reads or writes, with its columns a
 
 ## Not in the first release
 
-206 operations, added to this service in later releases without changing any of the above.
+203 operations, added to this service in later releases without changing any of the above.
 
 | Group | Operations |
 |---|---|
-| campaign | `createCampaign`, `getCampaign`, `getCampaignPerformance`, `launchCampaign`, `listCampaigns`, `pauseCampaign`, `stopCampaign`, `testSendCampaign`, `unscheduleCampaign`, `updateCampaign` |
+| campaign | `getCampaign`, `getCampaignPerformance`, `listCampaigns`, `pauseCampaign`, `testSendCampaign`, `unscheduleCampaign` |
 | case | `addCaseMessage`, `createCaseClassificationIntelligent`, `escalateCase`, `getCase`, `getCaseInvestigationResolution`, `listAgentWorkloadAvailability`, `listCaseCategories`, `listCaseResolutionClosure`, `listContact`, `listContactAutomation`, `listCustomerService`, `listCustomerServiceProfile`, `listEscalationCollaborationInternal`, `listEscalationCriticalCase`, `listIntelligentRoutingSkills`, `listQualityAgentEvaluation`, `listServiceQueues`, `listServiceRootCause`, `listSlaPolicyService`, `listUnifiedInteractionCommunication`, `reopenCase`, `setAgentServiceProfile`, `setCaseCategoryDefinition`, `setCaseInternalRequest`, `setCaseInvestigationResolution`, `setCaseResolution`, `setContactAutomation`, `setCustomerServiceCopilot`, `setIntelligentRoutingSkill`, `setOrderBookingTicket`, `setQualityEvaluation`, `setRefundCompensationService`, `setServiceQueueDefinition`, `updateCase` |
-| consent | `actOnWaiverRequirements`, `addSuppression`, `approvePrivacyTesting`, `approveWaiverTesting`, `getConsentHistory`, `getDigitalWaiverForm`, `getLocalizationBrandingCustomer`, `getSignatorySignatureGuardian`, `getSuppressionList`, `getWaiverTesting`, `listComplianceEvidenceWaiver`, `listConsentEvidenceWithdrawal`, `listConsentPreferenceCommunication`, `listCookieBannerPreference`, `listCookieTrackingDigital`, `listCustomerPrivacyConsent`, `listDataProcessingPurpose`, `listDataRetentionExpiry`, `listDataSubjectCustomer`, `listDeletionAnonymizationRestriction`, `listDigitalSigningCollection`, `listDynamicFieldQuestion`, `listMinorGuardianGroup`, `listMissingExpiredInvalid`, `listParticipantWaiverStatus`, `listPrivacy`, `listPrivacyCompliance`, `listPrivacyComplianceExceptions`, `listPrivacyConsent`, `listPrivacyEvidenceCompliance`, `listPrivacyNoticePolicy`, `listProductEventExperience`, `listSiteWaiverException`, `listVersioningEffectiveDate`, `listWaiver`, `listWaiverComplianceOperational`, `listWaiverComplianceRisk`, `listWaiverConsent`, `listWaiverTemplateMaster`, `listWaiverTriggerEligibility`, `listWaiverVerificationQueue`, `setCommunicationPreferenceMarketing`, `setConsentCapturePoint`, `setCookieBannerDesign`, `setDataDiscoveryAccess`, `setDataProcessingPurpose`, `setDigitalWaiverForm`, `setDynamicFieldQuestion`, `setLegalHold`, `setLocalizationBrandingCustomer`, `setMinorGuardianAge`, `setPrivacyAction`, `setPrivacyComplianceException`, `setPrivacyNoticePolicyGovernance`, `setPrivacyRequest`, `setPrivacyRequestTypes`, `setSignatorySignatureGuardian`, `setTrackingTechnology`, `setWaiverAssociation`, `setWaiverException`, `setWaiverTemplateMaster`, `setWaiverTriggerRule`, `setWaiverVerificationValidation` |
+| consent | `actOnWaiverRequirements`, `addSuppression`, `approvePrivacyTesting`, `approveWaiverTesting`, `getConsentHistory`, `getDigitalWaiverForm`, `getLocalizationBrandingCustomer`, `getSignatorySignatureGuardian`, `getSuppressionList`, `getWaiverTesting`, `listComplianceEvidenceWaiver`, `listConsentEvidenceWithdrawal`, `listConsentPreferenceCommunication`, `listCookieBannerPreference`, `listCookieScanPolicies`, `listCookieScans`, `listCookieTrackingDigital`, `listCustomerPrivacyConsent`, `listDataProcessingPurpose`, `listDataRetentionExpiry`, `listDataSubjectCustomer`, `listDeletionAnonymizationRestriction`, `listDeviceConsents`, `listDigitalSigningCollection`, `listDynamicFieldQuestion`, `listMinorGuardianGroup`, `listMissingExpiredInvalid`, `listParticipantWaiverStatus`, `listPrivacy`, `listPrivacyCompliance`, `listPrivacyComplianceExceptions`, `listPrivacyConsent`, `listPrivacyEvidenceCompliance`, `listPrivacyNoticePolicy`, `listProductEventExperience`, `listSiteWaiverException`, `listVersioningEffectiveDate`, `listWaiver`, `listWaiverComplianceOperational`, `listWaiverComplianceRisk`, `listWaiverConsent`, `listWaiverTemplateMaster`, `listWaiverTriggerEligibility`, `listWaiverVerificationQueue`, `recordCookieScan`, `setCommunicationPreferenceMarketing`, `setConsentCapturePoint`, `setCookieScanPolicy`, `setDataDiscoveryAccess`, `setDataProcessingPurpose`, `setDigitalWaiverForm`, `setDynamicFieldQuestion`, `setLegalHold`, `setLocalizationBrandingCustomer`, `setMinorGuardianAge`, `setPrivacyAction`, `setPrivacyComplianceException`, `setPrivacyNoticePolicyGovernance`, `setPrivacyRequest`, `setPrivacyRequestTypes`, `setSignatorySignatureGuardian`, `setWaiverAssociation`, `setWaiverException`, `setWaiverTemplateMaster`, `setWaiverTriggerRule`, `setWaiverVerificationValidation` |
 | feedback | `listCustomerSatisfactionFeedback`, `listReviews`, `respondToReview` |
 | guest | `mergeGuestProfiles`, `updateGuestProfile` |
 | guests | `activateAudience`, `checkGuestCheckoutMatch`, `decideDuplicateCandidate`, `decideGuestCheckoutMatch`, `getAudienceOverlap`, `getGuestAttributeModel`, `getGuestIntelligence`, `getGuestMatchPolicy`, `getGuestRelationships`, `getGuestTimeline`, `getIdentityResolutionRules`, `importAudienceList`, `listAudienceActivations`, `listAudienceLists`, `listDuplicateCandidates`, `runDataRetention`, `setDataRetentionPolicy`, `setGuestAttributeModel`, `setGuestMatchPolicy`, `setGuestRelationships`, `setIdentityResolutionRules` |
 | loyalty | `adjustLoyaltyPoints`, `awardBadge`, `getGuestLoyalty`, `getLoyaltyRules`, `issueReward`, `listBadges`, `listCustomerBadges`, `listLeaderboard`, `listLoyaltyCampaigns`, `listLoyaltyPointEntries`, `listRewardAssignments`, `listRewards`, `setBadge`, `setLeaderboardNickname`, `setLoyaltyCampaign`, `setReward` |
 | marketing | `accrueLoyaltyPoints`, `activateJourney`, `addGuestNote`, `claimConversation`, `closeConversation`, `createJourney`, `createUrlRedirect`, `endKioskAssist`, `getConversation`, `getForm`, `getGuestExtraValues`, `getJourneyPerformance`, `getLostItemMatches`, `getMyProfile`, `getSeoMetadata`, `listConversations`, `listForms`, `listGuestExtraFields`, `listJourneys`, `listLostItems`, `listMessageTriggers`, `listSlaPolicies`, `listWaiverSignatures`, `matchGuest`, `matchLostItem`, `mergeGuests`, `recordLostItem`, `recordPrivacyIncident`, `recordTouchPoint`, `retryMessageDispatch`, `setCallDisposition`, `setGuestExtraFields`, `setGuestExtraValues`, `setMessageTrigger`, `setSlaPolicy`, `startKioskAssist`, `submitForm`, `transferConversation` |
-| message | `createMessageTemplate`, `getMessageStatus`, `listBusinessEventNotification`, `listCommunicationService`, `listDeliveryCommunicationPlatform`, `listDeliveryQueueFailure`, `listMessageTemplates`, `listProviderHealthUsage`, `listRoutingPriorityThrottling`, `listSystemTransactionalTemplate`, `sendTransactionalMessage`, `setBusinessEventMapping`, `setChannelProvider`, `setCommunicationRoutingRule`, `setSenderIdentityDomain` |
-| segment | `createSegment`, `listSegmentMembers`, `listSegments`, `previewSegment` |
+| message | `getMessageStatus`, `listBusinessEventNotification`, `listCommunicationService`, `listDeliveryCommunicationPlatform`, `listDeliveryQueueFailure`, `listMessageTemplates`, `listProviderHealthUsage`, `listRoutingPriorityThrottling`, `listSystemTransactionalTemplate`, `sendTransactionalMessage`, `setBusinessEventMapping`, `setChannelProvider`, `setCommunicationRoutingRule`, `setSenderIdentityDomain` |
+| segment | `listSegmentMembers`, `listSegments`, `previewSegment` |

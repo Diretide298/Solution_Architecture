@@ -7,7 +7,7 @@
 | Tier | commerce: The sale path. Highest availability, highest write rate. |
 | Contracts | `wallet` |
 | Schemas owned | `wallet` |
-| Operations in the slice | 11 of 59 |
+| Operations in the slice | 14 of 63 |
 | Scale | Read-heavy on the sale path — every till and reader resolves a balance — and write-heavy on top-up. Latency-critical in a way LedgerService is not, which is why the two are separate: the ledger is append-only and batch-tolerant, a balance check is neither. |
 | If it is down | It holds a liability owed to a customer. A wallet that double-spends is a financial loss, not a bug report. Deduction order across credit lots is FEFO and is decided here, once, rather than per caller. |
 
@@ -20,6 +20,7 @@
 | Service | Tables it reads |
 |---|---|
 | [IdentityService](IdentityService.md) | `pii.subject` |
+| [OrderService](OrderService.md) | `payments.stored_forward`, `payments.token` |
 | [VenueOpsService](VenueOpsService.md) | `games.card` |
 
 ## Operations in the first release
@@ -28,15 +29,18 @@
 |---|---|---|---|---|---|---|
 | card | [`loadGameCredits`](#loadgamecredits) | POST | `/game-cards/{cardCode}/load` | core | 1 | POS-002 |
 | giftCard | [`getGiftCard`](#getgiftcard) | GET | `/gift-cards/{cardCode}` | core | 2 | BO-1123, GST-071, WEB-021 |
+| retail | [`getWalletAutoReloadSetting`](#getwalletautoreloadsetting) | GET | `/wallets/{walletId}/auto-reload` | core | 2 | BO-416, GST-011, WEB-021 |
+| retail | [`getWalletExitBalance`](#getwalletexitbalance) | GET | `/wallets/{walletId}/exit-balance` | core | 2 | BO-416, BO-487, GST-011, WEB-021 |
+| retail | [`setWalletAutoReloadSetting`](#setwalletautoreloadsetting) | PUT | `/wallets/{walletId}/auto-reload` | core | 2 | BO-416, GST-011, WEB-021 |
+| retail | [`settleWalletAtExit`](#settlewalletatexit) | POST | `/wallets/{walletId}/exit-settlement` | core | 2 | BO-416, BO-487, GST-011, WEB-021 |
 | retail | [`transferWalletBalance`](#transferwalletbalance) | POST | `/wallets/{walletId}/transfer` | core | 2 | BO-1116, BO-1121, GST-071, WEB-021 |
-| wallet | [`createCreditType`](#createcredittype) | POST | `/credit-types` | setup | 1 | BO-1088, BO-1104, BO-415 |
 | wallet | [`expireCreditLots`](#expirecreditlots) | POST | `/credit-lots/expire` | setup | 1 | BO-1111, BO-1130 |
 | wallet | [`getWallet`](#getwallet) | GET | `/wallets/{subjectId}` | core | 2 | BO-1086, BO-414, BO-416, BO-448, BO-487, GST-011 … |
 | wallet | [`listWalletTransactions`](#listwallettransactions) | GET | `/wallets/{subjectId}/transactions` | core | 2 | BO-1093, BO-1102, BO-1142, BO-1143, BO-414, BO-423 … |
-| wallet | [`publishWalletConfiguration`](#publishwalletconfiguration) | POST | `/wallet-configuration/publish` | setup | 1 | BO-1092, BO-1112, BO-1132, BO-1162, BO-1173, BO-1180 … |
-| wallet | [`restoreWalletConfigurationVersion`](#restorewalletconfigurationversion) | POST | `/wallet-configuration/versions/{version}/restore` | setup | 1 | BO-1162 |
-| wallet | [`setWalletAccountingMapping`](#setwalletaccountingmapping) | PUT | `/wallet-accounting` | setup | 1 | BO-1164, BO-1169 |
-| wallet | [`updateCreditType`](#updatecredittype) | PUT | `/credit-types/{creditTypeId}` | setup | 1 | BO-1088, BO-1104, BO-1105, BO-1108, BO-420 |
+| wallet | [`publishWalletConfiguration`](#publishwalletconfiguration) | POST | `/wallet-configuration/publish` | setup | 2 | BO-1092, BO-1112, BO-1132, BO-1162, BO-1173, BO-1180 … |
+| wallet | [`restoreWalletConfigurationVersion`](#restorewalletconfigurationversion) | POST | `/wallet-configuration/versions/{version}/restore` | setup | 2 | BO-1162 |
+| wallet | [`setWalletFundingRules`](#setwalletfundingrules) | PUT | `/wallet-funding-rules` | setup | 2 | BO-1094, BO-1095, BO-1096, BO-1097, BO-1098, BO-1099 … |
+| wallet | [`setWalletRefundPolicy`](#setwalletrefundpolicy) | PUT | `/wallet-refund-policy` | setup | 2 | ADM-612, BO-1146, BO-1147 |
 
 ## Group: card
 
@@ -174,6 +178,268 @@ Bonus credits from a promotion are tracked separately because they are typically
 
 ## Group: retail
 
+### getWalletAutoReloadSetting
+
+**`GET /wallets/{walletId}/auto-reload`**: A wallet's own auto top-up, if the holder set one
+
+|  |  |
+|---|---|
+| Permission | `WALLET_VIEW` |
+| Scope level | venue |
+| Part of slice | core |
+| Wave | 2 |
+| Offline | no |
+| Conflict policy | serverWins |
+| Read routing | replica |
+| Guest callable | True |
+| Reads | `wallet.auto_reload_setting`, `wallet.wallet` |
+| Writes | - |
+| Called by | BO-416, GST-011, WEB-021 |
+
+**Parameters**
+
+| Name | In | Required | Type | Notes |
+|---|---|---|---|---|
+| walletId | path | yes | string (uuid) |  |
+
+**Response**: `WalletAutoReloadSetting`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| walletId | string (uuid) |  | (read-only) |
+| subjectId | string (uuid) |  | (read-only) |
+| enabled | boolean | yes |  |
+| thresholdAmount | Money |  | On the wire this is three fields; in the database it is one column. |
+| thresholdAmount.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
+| thresholdAmount.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
+| thresholdAmount.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| reloadAmount | Money |  | On the wire this is three fields; in the database it is one column. |
+| reloadAmount.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
+| reloadAmount.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
+| reloadAmount.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| paymentTokenId | string (uuid) |  | (nullable) |
+| maximumPerDay | integer |  | (min 1; nullable) |
+| status | enum (active, suspendedAfterDecline, disabledByVenue) |  | (read-only) |
+| lastReloadAt | string (date-time) |  | (read-only; nullable) |
+| scopePath | string |  | The partition key (ADR-0005). (read-only) |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 200 |  | The setting; enabled false where none was set |
+| 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
+
+### getWalletExitBalance
+
+**`GET /wallets/{walletId}/exit-balance`**: What the holder owes or is owed on leaving
+
+4.3.4. **The check at exit.** The balance including transactions still held offline on terminals, what is due where it is short (spend taken offline beyond the balance, or a post-paid credential), and what may be refunded where it is in credit, under the wallet refund policy.
+
+|  |  |
+|---|---|
+| Permission | `WALLET_VIEW` |
+| Scope level | venue |
+| Part of slice | core |
+| Wave | 2 |
+| Offline | no |
+| Conflict policy | serverWins |
+| Read routing | primary |
+| Guest callable | True |
+| Reads | `payments.stored_forward`, `wallet.balance`, `wallet.credit_lot`, `wallet.refund_policy`, `wallet.wallet` |
+| Writes | - |
+| Called by | BO-416, BO-487, GST-011, WEB-021 |
+
+**Parameters**
+
+| Name | In | Required | Type | Notes |
+|---|---|---|---|---|
+| walletId | path | yes | string (uuid) |  |
+
+**Response**: `WalletExitBalance`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| walletId | string (uuid) | yes |  |
+| balance | Money | yes | On the wire this is three fields; in the database it is one column. |
+| balance.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
+| balance.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
+| balance.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| pendingOfflineAmount | Money |  | On the wire this is three fields; in the database it is one column. |
+| pendingOfflineAmount.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
+| pendingOfflineAmount.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
+| pendingOfflineAmount.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| amountDue | Money | yes | On the wire this is three fields; in the database it is one column. |
+| amountDue.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
+| amountDue.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
+| amountDue.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| refundable | Money | yes | On the wire this is three fields; in the database it is one column. |
+| refundable.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
+| refundable.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
+| refundable.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| nonRefundableCredit | Money |  | On the wire this is three fields; in the database it is one column. |
+| nonRefundableCredit.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
+| nonRefundableCredit.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
+| nonRefundableCredit.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| waiveAllowedUpTo | Money |  | On the wire this is three fields; in the database it is one column. |
+| waiveAllowedUpTo.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
+| waiveAllowedUpTo.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
+| waiveAllowedUpTo.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| asAt | string (date-time) |  |  |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 200 |  | Balance at exit |
+| 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
+
+### setWalletAutoReloadSetting
+
+**`PUT /wallets/{walletId}/auto-reload`**: Top the wallet up automatically from a stored card when it runs low
+
+4.2.17, 4.3.28. **The holder's own auto top-up**, within the venue's `WalletFundingRules.autoReload`: when the balance falls below `thresholdAmount`, `reloadAmount` is charged to the stored card (`paymentTokenId`, one of the caller's own) and loaded as cash credit. The venue's rules bound it (minimum and maximum top-up, velocity limits, `maximumPerDay`); this is refused where the venue has auto-reload disabled. A declined charge suspends the setting until the holder updates it, rather than retrying a card that has said no. The holder sets it for their own wallet; staff set it for a guest at a counter with the guest present.
+
+|  |  |
+|---|---|
+| Permission | `WALLET_OPERATE` |
+| Scope level | subject |
+| Part of slice | core |
+| Wave | 2 |
+| Offline | no |
+| Config scope | subject |
+| Conflict policy | serverWins |
+| Guest callable | True |
+| Reads | `cache:idempotency`, `payments.token`, `wallet.auto_reload_setting`, `wallet.funding_rules`, `wallet.wallet` |
+| Writes | `cache:idempotency`, `cache:resolution`, `wallet.auto_reload_setting` |
+| Called by | BO-416, GST-011, WEB-021 |
+
+**Parameters**
+
+| Name | In | Required | Type | Notes |
+|---|---|---|---|---|
+| walletId | path | yes | string (uuid) |  |
+| Idempotency-Key | header | yes | string | Client-generated ULID. |
+
+**Request body**: `WalletAutoReloadSetting`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| walletId | string (uuid) |  | (read-only) |
+| subjectId | string (uuid) |  | (read-only) |
+| enabled | boolean | yes |  |
+| thresholdAmount | Money |  | On the wire this is three fields; in the database it is one column. |
+| thresholdAmount.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
+| thresholdAmount.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
+| thresholdAmount.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| reloadAmount | Money |  | On the wire this is three fields; in the database it is one column. |
+| reloadAmount.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
+| reloadAmount.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
+| reloadAmount.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| paymentTokenId | string (uuid) |  | (nullable) |
+| maximumPerDay | integer |  | (min 1; nullable) |
+| status | enum (active, suspendedAfterDecline, disabledByVenue) |  | (read-only) |
+| lastReloadAt | string (date-time) |  | (read-only; nullable) |
+| scopePath | string |  | The partition key (ADR-0005). (read-only) |
+
+**Response**: `WalletAutoReloadSetting`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| walletId | string (uuid) |  | (read-only) |
+| subjectId | string (uuid) |  | (read-only) |
+| enabled | boolean | yes |  |
+| thresholdAmount | Money |  | On the wire this is three fields; in the database it is one column. |
+| thresholdAmount.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
+| thresholdAmount.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
+| thresholdAmount.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| reloadAmount | Money |  | On the wire this is three fields; in the database it is one column. |
+| reloadAmount.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
+| reloadAmount.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
+| reloadAmount.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| paymentTokenId | string (uuid) |  | (nullable) |
+| maximumPerDay | integer |  | (min 1; nullable) |
+| status | enum (active, suspendedAfterDecline, disabledByVenue) |  | (read-only) |
+| lastReloadAt | string (date-time) |  | (read-only; nullable) |
+| scopePath | string |  | The partition key (ADR-0005). (read-only) |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 200 |  | Set |
+| 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
+| 409 |  | The venue has auto-reload disabled for this wallet type, or the wallet is suspended or closed. |
+| 422 |  | An amount outside the venue's funding rules, or a payment token that is not the holder's. |
+
+### settleWalletAtExit
+
+**`POST /wallets/{walletId}/exit-settlement`**: Settle a short balance, or refund a credit, when the holder leaves
+
+4.3.4. **A wallet that went short must be settled before the holder is gone.** `collect` takes the amount due by card, cash or the stored card and brings the balance to zero; `refund` returns the refundable credit under the wallet refund policy; `waive` writes a small shortfall off with a reason (approval above the venue's threshold, as `adjustWallet`). Each settlement is recorded with who did it, the method and the payment or refund it made, and posts through the ledger as its payment or refund does. The amount settled is the one `getWalletExitBalance` returns at the time of the call, never an amount typed.
+
+|  |  |
+|---|---|
+| Permission | `WALLET_OPERATE` |
+| Scope level | venue |
+| Part of slice | core |
+| Wave | 2 |
+| Offline | no |
+| Conflict policy | serverWins |
+| Guest callable | True |
+| Reads | `cache:idempotency`, `payments.stored_forward`, `wallet.balance`, `wallet.credit_lot`, `wallet.exit_settlement`, `wallet.refund_policy`, `wallet.wallet` |
+| Writes | `cache:idempotency`, `orders.payment`, `orders.refund`, `platform.outbox`, `wallet.exit_settlement`, `wallet.wallet`, `wallet.wallet_transaction` |
+| Called by | BO-416, BO-487, GST-011, WEB-021 |
+
+**Parameters**
+
+| Name | In | Required | Type | Notes |
+|---|---|---|---|---|
+| walletId | path | yes | string (uuid) |  |
+| Idempotency-Key | header | yes | string | Client-generated ULID. |
+
+**Request body**
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| action | enum (collect, refund, waive) | yes |  |
+| method | enum (card, cash, storedCard, originalPayment) |  | How money is collected or refunded. |
+| paymentTokenId | string (uuid) |  | (nullable) |
+| reason | string |  | Required with waive. (max length 500; nullable) |
+
+**Response**: `WalletExitSettlement`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| id | string (uuid) | yes |  |
+| walletId | string (uuid) | yes |  |
+| action | enum (collect, refund, waive) | yes |  |
+| method | enum (card, cash, storedCard, originalPayment) |  | (nullable) |
+| amount | Money | yes | On the wire this is three fields; in the database it is one column. |
+| amount.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
+| amount.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
+| amount.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| balanceBefore | Money |  | On the wire this is three fields; in the database it is one column. |
+| balanceBefore.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
+| balanceBefore.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
+| balanceBefore.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| paymentId | string |  | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$; nullable) |
+| refundId | string |  | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$; nullable) |
+| walletTransactionId | string |  | (nullable) |
+| reason | string |  | (nullable) |
+| settledByPrincipalId | string (uuid) |  | (nullable) |
+| settledAt | string (date-time) | yes |  |
+| scopePath | string |  | (read-only) |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 201 |  | Settled |
+| 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
+| 409 |  | Nothing is due or refundable, or the action does not match the balance (collect on a wallet in credit), or waive by a guest. |
+| 422 |  | The card was declined, or waive without a reason. |
+
 ### transferWalletBalance
 
 **`POST /wallets/{walletId}/transfer`**: Send balance to another guest
@@ -244,74 +510,6 @@ Both wallets must belong to the same tenant. **A transfer across tenants is a pa
 
 
 ## Group: wallet
-
-### createCreditType
-
-**`POST /credit-types`**: Define a kind of credit, without a release
-
-|  |  |
-|---|---|
-| Permission | `WALLET_CONFIGURE` |
-| Scope level | tenant |
-| Part of slice | setup, makes `wallet.credit_type` non-empty |
-| Wave | 1 |
-| Offline | no |
-| Config scope | tenant |
-| Reads | `wallet.credit_type` |
-| Writes | `wallet.credit_type` |
-| Called by | BO-1088, BO-1104, BO-415 |
-
-**Parameters**
-
-| Name | In | Required | Type | Notes |
-|---|---|---|---|---|
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
-
-**Request body**: `CreditType`
-
-| Field | Type | Required | Notes |
-|---|---|---|---|
-| id | string (uuid) |  |  |
-| code | string | yes |  |
-| name | string | yes |  |
-| category | enum (cash, refund, bonus, promotional, giftCard, membership, loyalty, ride, …) |  |  |
-| monetary | boolean |  | Loyalty points are not money. (default True) |
-| conversionRate | number |  | (nullable) |
-| refundable | boolean |  | Promotional credit is not refundable and cash credit is. (default False) |
-| transferable | boolean |  | (default False) |
-| expires | boolean |  | (default False) |
-| validityDays | integer |  | (nullable) |
-| breakageEligible | boolean |  | (default False) |
-| ledgerAccountCode | string |  | (nullable) |
-| priority | integer |  | (default 0) |
-| scopePath | string |  |  |
-| isActive | boolean |  | (default True) |
-
-**Response**: `CreditType`
-
-| Field | Type | Required | Notes |
-|---|---|---|---|
-| id | string (uuid) |  |  |
-| code | string | yes |  |
-| name | string | yes |  |
-| category | enum (cash, refund, bonus, promotional, giftCard, membership, loyalty, ride, …) |  |  |
-| monetary | boolean |  | Loyalty points are not money. (default True) |
-| conversionRate | number |  | (nullable) |
-| refundable | boolean |  | Promotional credit is not refundable and cash credit is. (default False) |
-| transferable | boolean |  | (default False) |
-| expires | boolean |  | (default False) |
-| validityDays | integer |  | (nullable) |
-| breakageEligible | boolean |  | (default False) |
-| ledgerAccountCode | string |  | (nullable) |
-| priority | integer |  | (default 0) |
-| scopePath | string |  |  |
-| isActive | boolean |  | (default True) |
-
-**Responses**
-
-| Code | Shape | Meaning |
-|---|---|---|
-| 201 |  | Created |
 
 ### expireCreditLots
 
@@ -502,7 +700,7 @@ Published as a version, so a change can be rolled back and so `getApprovalRecord
 | Permission | `WALLET_CONFIGURE` |
 | Scope level | tenant |
 | Part of slice | setup, makes `wallet.configuration_version`, `wallet.configuration_version_snapshot` non-empty |
-| Wave | 1 |
+| Wave | 2 |
 | Offline | no |
 | Config scope | tenant |
 | Reads | `cache:idempotency`, `wallet.accounting_mapping`, `wallet.authentication_policy`, `wallet.channel_rules`, `wallet.configuration_version`, `wallet.consumption_policy`, `wallet.credit_type`, `wallet.funding_rules`, `wallet.integration_mapping`, `wallet.reconciliation_source`, `wallet.refund_policy`, `wallet.risk_rules`, `wallet.transfer_rules`, `wallet.wallet_type` |
@@ -553,8 +751,8 @@ Board 8, p.98. Copies the chosen version's configuration into the working draft 
 |---|---|
 | Permission | `WALLET_CONFIGURE` |
 | Scope level | tenant |
-| Part of slice | setup, makes `wallet.accounting_mapping`, `wallet.credit_type` non-empty |
-| Wave | 1 |
+| Part of slice | setup, makes `wallet.funding_rules`, `wallet.refund_policy` non-empty |
+| Wave | 2 |
 | Offline | no |
 | Config scope | tenant |
 | Conflict policy | serverWins |
@@ -596,24 +794,25 @@ Board 8, p.98. Copies the chosen version's configuration into the working draft 
 | 200 |  | Restored into the working draft, unpublished |
 | 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
 
-### setWalletAccountingMapping
+### setWalletFundingRules
 
-**`PUT /wallet-accounting`**: Which ledger account each credit type sits in
+**`PUT /wallet-funding-rules`**: Amounts, channels, bonuses, limits and velocity
 
-Boards 9.2 and 9.3. **27 August, minuted:** *"every financial transaction is tied to a chart-of-account entry… total wallet balances outstanding are reported as a liability owed to customers."*
-**Different credit types are different liabilities.** Cash loaded by a guest is money the venue owes back. Promotional credit it gave away is not — it is a marketing cost already incurred, and booking the two together overstates the liability by whatever the marketing department did last quarter.
+**Board 2 is the 27 August minute, one screen for one**, and the matrix agrees on four of them: auto-reload on threshold (4.3.28), calendar-based recurring funding (4.3.29, *"distinct from auto-reload"*), minimum and maximum amounts with velocity controls (4.3.30) and the funding audit trail (4.3.35).
+**Auto-reload and recurring funding are genuinely different** and the minute says so. One fires when the balance drops; the other fires on a date. A venue that models the second as the first cannot give a parent a weekly allowance.
+**Velocity limits are a fraud control, not a commercial one.** Ten top-ups of ninety-nine in an hour is a card being tested, and a daily cap expressed only in total value does not catch it.
 
 |  |  |
 |---|---|
 | Permission | `WALLET_CONFIGURE` |
-| Scope level | tenant |
-| Part of slice | setup, makes `wallet.accounting_mapping` non-empty |
-| Wave | 1 |
+| Scope level | venue |
+| Part of slice | setup, makes `wallet.funding_rules` non-empty |
+| Wave | 2 |
 | Offline | no |
-| Config scope | tenant |
-| Reads | `wallet.accounting_mapping` |
-| Writes | `wallet.accounting_mapping` |
-| Called by | BO-1164, BO-1169 |
+| Config scope | venue |
+| Reads | `wallet.funding_rules` |
+| Writes | `wallet.funding_rules` |
+| Called by | BO-1094, BO-1095, BO-1096, BO-1097, BO-1098, BO-1099, BO-1101, BO-417, BO-418 |
 
 **Parameters**
 
@@ -621,32 +820,142 @@ Boards 9.2 and 9.3. **27 August, minuted:** *"every financial transaction is tie
 |---|---|---|---|---|
 | Idempotency-Key | header | yes | string | Client-generated ULID. |
 
-**Request body**: `WalletAccountingMapping`
+**Request body**: `WalletFundingRules`
 
 | Field | Type | Required | Notes |
 |---|---|---|---|
-| mappings | array of object |  |  |
-| mappings[].creditTypeId | string (uuid) |  |  |
-| mappings[].liabilityAccountCode | string |  |  |
-| mappings[].breakageRevenueAccountCode | string |  | (nullable) |
-| mappings[].costAccountCode | string |  | For credit the venue gave away. (nullable) |
-| breakagePolicy | object |  |  |
-| breakagePolicy.recogniseAfterMonths | integer |  | Recognised on a policy, not on the expiry date. (nullable) |
-| breakagePolicy.requiresApproval | boolean |  | (default True) |
+| walletTypeId | string (uuid) |  | (nullable) |
+| minimumTopUp | Money |  | On the wire this is three fields; in the database it is one column. |
+| minimumTopUp.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
+| minimumTopUp.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
+| minimumTopUp.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| maximumTopUp | Money |  | On the wire this is three fields; in the database it is one column. |
+| maximumTopUp.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
+| maximumTopUp.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
+| maximumTopUp.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| presetAmounts | array of Money |  |  |
+| presetAmounts[].amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
+| presetAmounts[].currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
+| presetAmounts[].scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| allowedChannels | array of string |  |  |
+| allowedFundingSources | array of enum (card, cash, bankTransfer, voucher, corporateAccount, loyaltyConversion) |  |  |
+| bonusRules | array of object |  | Board 2.3. |
+| bonusRules[].minimumAmount | Money |  | On the wire this is three fields; in the database it is one column. |
+| bonusRules[].minimumAmount.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
+| bonusRules[].minimumAmount.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
+| bonusRules[].minimumAmount.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| bonusRules[].bonusAmount | Money |  | On the wire this is three fields; in the database it is one column. |
+| bonusRules[].bonusAmount.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
+| bonusRules[].bonusAmount.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
+| bonusRules[].bonusAmount.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| bonusRules[].bonusPercent | number |  | (nullable) |
+| bonusRules[].bonusCreditTypeId | string (uuid) |  |  |
+| bonusRules[].validFrom | string (date) |  | (nullable) |
+| bonusRules[].validTo | string (date) |  | (nullable) |
+| autoReload | object |  | Board 2.5, matrix 4.3.28. |
+| autoReload.enabled | boolean |  | (default False) |
+| autoReload.thresholdAmount | Money |  | On the wire this is three fields; in the database it is one column. |
+| autoReload.thresholdAmount.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
+| autoReload.thresholdAmount.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
+| autoReload.thresholdAmount.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| autoReload.reloadAmount | Money |  | On the wire this is three fields; in the database it is one column. |
+| autoReload.reloadAmount.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
+| autoReload.reloadAmount.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
+| autoReload.reloadAmount.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| autoReload.maximumPerDay | integer |  | (nullable) |
+| recurringFunding | object |  | Board 2.6, matrix 4.3.29 — *"distinct from auto-reload"*. |
+| recurringFunding.enabled | boolean |  | (default False) |
+| recurringFunding.cadence | enum (daily, weekly, monthly) |  |  |
+| recurringFunding.amount | Money |  | On the wire this is three fields; in the database it is one column. |
+| recurringFunding.amount.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
+| recurringFunding.amount.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
+| recurringFunding.amount.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| recurringFunding.dayOfWeek | string |  | (nullable) |
+| recurringFunding.dayOfMonth | integer |  | (nullable) |
+| approvalAboveAmount | Money |  | On the wire this is three fields; in the database it is one column. |
+| approvalAboveAmount.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
+| approvalAboveAmount.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
+| approvalAboveAmount.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| velocityLimits | object |  | A fraud control, not a commercial one. |
+| velocityLimits.maxTransactionsPerHour | integer |  | (nullable) |
+| velocityLimits.maxTransactionsPerDay | integer |  | (nullable) |
+| velocityLimits.maxAmountPerDay | Money |  | On the wire this is three fields; in the database it is one column. |
+| velocityLimits.maxAmountPerDay.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
+| velocityLimits.maxAmountPerDay.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
+| velocityLimits.maxAmountPerDay.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| velocityLimits.maxAmountPerMonth | Money |  | On the wire this is three fields; in the database it is one column. |
+| velocityLimits.maxAmountPerMonth.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
+| velocityLimits.maxAmountPerMonth.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
+| velocityLimits.maxAmountPerMonth.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
 | scopePath | string |  |  |
 
-**Response**: `WalletAccountingMapping`
+**Response**: `WalletFundingRules`
 
 | Field | Type | Required | Notes |
 |---|---|---|---|
-| mappings | array of object |  |  |
-| mappings[].creditTypeId | string (uuid) |  |  |
-| mappings[].liabilityAccountCode | string |  |  |
-| mappings[].breakageRevenueAccountCode | string |  | (nullable) |
-| mappings[].costAccountCode | string |  | For credit the venue gave away. (nullable) |
-| breakagePolicy | object |  |  |
-| breakagePolicy.recogniseAfterMonths | integer |  | Recognised on a policy, not on the expiry date. (nullable) |
-| breakagePolicy.requiresApproval | boolean |  | (default True) |
+| walletTypeId | string (uuid) |  | (nullable) |
+| minimumTopUp | Money |  | On the wire this is three fields; in the database it is one column. |
+| minimumTopUp.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
+| minimumTopUp.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
+| minimumTopUp.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| maximumTopUp | Money |  | On the wire this is three fields; in the database it is one column. |
+| maximumTopUp.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
+| maximumTopUp.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
+| maximumTopUp.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| presetAmounts | array of Money |  |  |
+| presetAmounts[].amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
+| presetAmounts[].currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
+| presetAmounts[].scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| allowedChannels | array of string |  |  |
+| allowedFundingSources | array of enum (card, cash, bankTransfer, voucher, corporateAccount, loyaltyConversion) |  |  |
+| bonusRules | array of object |  | Board 2.3. |
+| bonusRules[].minimumAmount | Money |  | On the wire this is three fields; in the database it is one column. |
+| bonusRules[].minimumAmount.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
+| bonusRules[].minimumAmount.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
+| bonusRules[].minimumAmount.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| bonusRules[].bonusAmount | Money |  | On the wire this is three fields; in the database it is one column. |
+| bonusRules[].bonusAmount.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
+| bonusRules[].bonusAmount.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
+| bonusRules[].bonusAmount.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| bonusRules[].bonusPercent | number |  | (nullable) |
+| bonusRules[].bonusCreditTypeId | string (uuid) |  |  |
+| bonusRules[].validFrom | string (date) |  | (nullable) |
+| bonusRules[].validTo | string (date) |  | (nullable) |
+| autoReload | object |  | Board 2.5, matrix 4.3.28. |
+| autoReload.enabled | boolean |  | (default False) |
+| autoReload.thresholdAmount | Money |  | On the wire this is three fields; in the database it is one column. |
+| autoReload.thresholdAmount.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
+| autoReload.thresholdAmount.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
+| autoReload.thresholdAmount.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| autoReload.reloadAmount | Money |  | On the wire this is three fields; in the database it is one column. |
+| autoReload.reloadAmount.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
+| autoReload.reloadAmount.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
+| autoReload.reloadAmount.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| autoReload.maximumPerDay | integer |  | (nullable) |
+| recurringFunding | object |  | Board 2.6, matrix 4.3.29 — *"distinct from auto-reload"*. |
+| recurringFunding.enabled | boolean |  | (default False) |
+| recurringFunding.cadence | enum (daily, weekly, monthly) |  |  |
+| recurringFunding.amount | Money |  | On the wire this is three fields; in the database it is one column. |
+| recurringFunding.amount.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
+| recurringFunding.amount.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
+| recurringFunding.amount.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| recurringFunding.dayOfWeek | string |  | (nullable) |
+| recurringFunding.dayOfMonth | integer |  | (nullable) |
+| approvalAboveAmount | Money |  | On the wire this is three fields; in the database it is one column. |
+| approvalAboveAmount.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
+| approvalAboveAmount.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
+| approvalAboveAmount.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| velocityLimits | object |  | A fraud control, not a commercial one. |
+| velocityLimits.maxTransactionsPerHour | integer |  | (nullable) |
+| velocityLimits.maxTransactionsPerDay | integer |  | (nullable) |
+| velocityLimits.maxAmountPerDay | Money |  | On the wire this is three fields; in the database it is one column. |
+| velocityLimits.maxAmountPerDay.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
+| velocityLimits.maxAmountPerDay.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
+| velocityLimits.maxAmountPerDay.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| velocityLimits.maxAmountPerMonth | Money |  | On the wire this is three fields; in the database it is one column. |
+| velocityLimits.maxAmountPerMonth.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
+| velocityLimits.maxAmountPerMonth.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
+| velocityLimits.maxAmountPerMonth.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
 | scopePath | string |  |  |
 
 **Responses**
@@ -655,76 +964,58 @@ Boards 9.2 and 9.3. **27 August, minuted:** *"every financial transaction is tie
 |---|---|---|
 | 200 |  | Set |
 
-### updateCreditType
+### setWalletRefundPolicy
 
-**`PUT /credit-types/{creditTypeId}`**: Change a kind of credit
+**`PUT /wallet-refund-policy`**: What a refund puts back, and where
 
-**Changing expiry or refundability does not reach credit already issued.** A lot carries the terms it was issued under, because retro-expiring somebody's gift card is the kind of change that ends up in a regulator's inbox.
+Boards 7.4 and 7.5. **A refund to a wallet and a refund to a card are different promises**, and which one a guest gets should not depend on who is at the counter.
+**Restoration is to the lot, not to the balance.** A purchase made from an expiring promotional lot and a gift card, refunded, has to put each part back where it came from — otherwise the guest either gains expiry they were never given or loses it.
 
 |  |  |
 |---|---|
 | Permission | `WALLET_CONFIGURE` |
-| Scope level | tenant |
-| Part of slice | setup, makes `wallet.credit_type` non-empty |
-| Wave | 1 |
+| Scope level | venue |
+| Part of slice | setup, makes `wallet.refund_policy` non-empty |
+| Wave | 2 |
 | Offline | no |
-| Config scope | tenant |
-| Reads | `wallet.credit_type` |
-| Writes | `wallet.credit_type` |
-| Called by | BO-1088, BO-1104, BO-1105, BO-1108, BO-420 |
+| Config scope | venue |
+| Reads | `wallet.refund_policy` |
+| Writes | `wallet.refund_policy` |
+| Called by | ADM-612, BO-1146, BO-1147 |
 
 **Parameters**
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
-| creditTypeId | path | yes | string (uuid) |  |
 | Idempotency-Key | header | yes | string | Client-generated ULID. |
 
-**Request body**: `CreditType`
+**Request body**: `WalletRefundPolicy`
 
 | Field | Type | Required | Notes |
 |---|---|---|---|
-| id | string (uuid) |  |  |
-| code | string | yes |  |
-| name | string | yes |  |
-| category | enum (cash, refund, bonus, promotional, giftCard, membership, loyalty, ride, …) |  |  |
-| monetary | boolean |  | Loyalty points are not money. (default True) |
-| conversionRate | number |  | (nullable) |
-| refundable | boolean |  | Promotional credit is not refundable and cash credit is. (default False) |
-| transferable | boolean |  | (default False) |
-| expires | boolean |  | (default False) |
-| validityDays | integer |  | (nullable) |
-| breakageEligible | boolean |  | (default False) |
-| ledgerAccountCode | string |  | (nullable) |
-| priority | integer |  | (default 0) |
+| defaultDestination | enum (originalTender, wallet, guestChoice) |  |  |
+| walletRefundCreditTypeId | string (uuid) |  |  |
+| restoreToOriginalLots | boolean |  | (default True) |
+| restoreOriginalExpiry | boolean |  | Refunding into a new lot with a fresh expiry is a gift. (default True) |
+| walletRefundBonusPercent | number |  | An incentive to take the refund as credit rather than to a card. (nullable) |
 | scopePath | string |  |  |
-| isActive | boolean |  | (default True) |
 
-**Response**: `CreditType`
+**Response**: `WalletRefundPolicy`
 
 | Field | Type | Required | Notes |
 |---|---|---|---|
-| id | string (uuid) |  |  |
-| code | string | yes |  |
-| name | string | yes |  |
-| category | enum (cash, refund, bonus, promotional, giftCard, membership, loyalty, ride, …) |  |  |
-| monetary | boolean |  | Loyalty points are not money. (default True) |
-| conversionRate | number |  | (nullable) |
-| refundable | boolean |  | Promotional credit is not refundable and cash credit is. (default False) |
-| transferable | boolean |  | (default False) |
-| expires | boolean |  | (default False) |
-| validityDays | integer |  | (nullable) |
-| breakageEligible | boolean |  | (default False) |
-| ledgerAccountCode | string |  | (nullable) |
-| priority | integer |  | (default 0) |
+| defaultDestination | enum (originalTender, wallet, guestChoice) |  |  |
+| walletRefundCreditTypeId | string (uuid) |  |  |
+| restoreToOriginalLots | boolean |  | (default True) |
+| restoreOriginalExpiry | boolean |  | Refunding into a new lot with a fresh expiry is a gift. (default True) |
+| walletRefundBonusPercent | number |  | An incentive to take the refund as credit rather than to a card. (nullable) |
 | scopePath | string |  |  |
-| isActive | boolean |  | (default True) |
 
 **Responses**
 
 | Code | Shape | Meaning |
 |---|---|---|
-| 200 |  | Updated |
+| 200 |  | Set |
 
 ## Tables
 
@@ -758,6 +1049,36 @@ Every table this service owns that the slice reads or writes, with its columns a
 | Column | Type | Required | Notes |
 |---|---|---|---|
 | scope_path | text | no |  |
+| id | uuid | yes | Synthesised key. |
+
+### `wallet.auto_reload_setting`
+
+| Column | Type | Required | Notes |
+|---|---|---|---|
+| wallet_id | uuid | no |  |
+| subject_id | uuid | no |  |
+| is_enabled | boolean | yes |  |
+| threshold_amount | numeric(18,4) | no |  |
+| reload_amount | numeric(18,4) | no |  |
+| payment_token_id | uuid | no |  |
+| maximum_per_day | integer | no |  |
+| status | text | no |  |
+| last_reload_at | timestamptz | no |  |
+| scope_path | text | no | The partition key (ADR-0005). |
+| id | uuid | yes | Synthesised key. |
+
+### `wallet.balance`
+
+| Column | Type | Required | Notes |
+|---|---|---|---|
+| wallet_balance_id | uuid | yes |  |
+| wallet_id | uuid | yes |  |
+| available_balance | numeric | yes |  |
+| hold_balance | numeric | yes |  |
+| balance_amount | numeric | yes |  |
+| currency_code | text | yes |  |
+| version | integer | yes |  |
+| updated_at | timestamptz | yes |  |
 | id | uuid | yes | Synthesised key. |
 
 ### `wallet.channel_rules`
@@ -845,6 +1166,24 @@ Every table this service owns that the slice reads or writes, with its columns a
 | priority | integer | no |  |
 | scope_path | text | no |  |
 | is_active | boolean | no |  |
+
+### `wallet.exit_settlement`
+
+| Column | Type | Required | Notes |
+|---|---|---|---|
+| id | uuid | yes |  |
+| wallet_id | uuid | yes |  |
+| action | text | yes |  |
+| method | text | no |  |
+| amount | numeric(18,4) | yes |  |
+| balance_before | numeric(18,4) | no |  |
+| payment_id | text | no |  |
+| refund_id | text | no |  |
+| wallet_transaction_id | text | no |  |
+| reason | text | no |  |
+| settled_by_principal_id | uuid | no |  |
+| settled_at | timestamptz | yes |  |
+| scope_path | text | no |  |
 
 ### `wallet.funding_rules`
 
@@ -988,11 +1327,11 @@ Every table this service owns that the slice reads or writes, with its columns a
 
 ## Not in the first release
 
-48 operations, added to this service in later releases without changing any of the above.
+49 operations, added to this service in later releases without changing any of the above.
 
 | Group | Operations |
 |---|---|
 | card | `adjustGameCard` |
 | giftCard | `blockGiftCard`, `issueGiftCard` |
 | retail | `activateGiftCard`, `closeWallet`, `redeemGiftCard`, `reinstateWallet`, `suspendWallet` |
-| wallet | `adjustWallet`, `createSharedWallet`, `createVoucherType`, `createWalletType`, `diffWalletConfigurationVersion`, `getCreditConsumptionPolicy`, `getWalletBalance`, `getWalletFundingRules`, `getWalletLiability`, `getWalletReconciliation`, `linkWalletCredential`, `listCreditLots`, `listCreditTypes`, `listSharedWallets`, `listVoucherTypes`, `listWalletConfigurationVersions`, `listWalletDisputes`, `listWalletHolds`, `listWalletTypes`, `raiseWalletDispute`, `resolveWalletDispute`, `reverseWalletFunding`, `setCreditConsumptionPolicy`, `setCreditEligibilityRules`, `setGiftCardProduct`, `setSharedWalletMembers`, `setWalletAuthenticationPolicy`, `setWalletChannelRules`, `setWalletFundingRules`, `setWalletIntegrationMapping`, `setWalletReconciliationSources`, `setWalletRefundPolicy`, `setWalletRestriction`, `setWalletRiskRuleStatus`, `setWalletRiskRules`, `setWalletTransferRules`, `simulateCreditConsumption`, `topUpWallet`, `updateWalletType`, `withdrawWalletDispute` |
+| wallet | `adjustWallet`, `createCreditType`, `createSharedWallet`, `createVoucherType`, `createWalletType`, `diffWalletConfigurationVersion`, `getCreditConsumptionPolicy`, `getWalletBalance`, `getWalletFundingRules`, `getWalletLiability`, `getWalletReconciliation`, `linkWalletCredential`, `listCreditLots`, `listCreditTypes`, `listSharedWallets`, `listVoucherTypes`, `listWalletConfigurationVersions`, `listWalletDisputes`, `listWalletHolds`, `listWalletTypes`, `raiseWalletDispute`, `resolveWalletDispute`, `reverseWalletFunding`, `setCreditConsumptionPolicy`, `setCreditEligibilityRules`, `setGiftCardProduct`, `setSharedWalletMembers`, `setWalletAccountingMapping`, `setWalletAuthenticationPolicy`, `setWalletChannelRules`, `setWalletIntegrationMapping`, `setWalletReconciliationSources`, `setWalletRestriction`, `setWalletRiskRuleStatus`, `setWalletRiskRules`, `setWalletTransferRules`, `simulateCreditConsumption`, `topUpWallet`, `updateCreditType`, `updateWalletType`, `withdrawWalletDispute` |

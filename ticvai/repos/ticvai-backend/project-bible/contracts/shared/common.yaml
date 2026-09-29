@@ -79,6 +79,25 @@ components:
       schema:
         type: string
         pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+    PreferValidateOnly:
+      name: Prefer
+      in: header
+      required: false
+      description: '**Validate, do not write** (29 September, AI system design 2.3 and 2.2 D step 4). With
+        `Prefer: validate-only` the owner validates the request exactly as it would for a real write and
+        returns what would change without writing: `200` with the would-be result, or the same `4xx` it
+        would return. Nothing is persisted, no event is published, and no idempotency key is consumed, so
+        the real write can follow with the same `Idempotency-Key`.
+
+        Used by the AI executor to validate an action plan step against its owner before approval and again
+        before execution. Only operations that name this parameter accept it; the tool registry records
+        which (`ai.AiTool.validateOnly`). Absent, the request is an ordinary write.
+
+        '
+      schema:
+        type: string
+        enum:
+        - validate-only
     ConsistencyToken:
       name: X-Consistency-Token
       in: header

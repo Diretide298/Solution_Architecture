@@ -1,0 +1,50 @@
+# entitlement.transferred v1 — published by catalogue
+# Checked by tools/check-states.py against states/ and the contracts.
+
+name: entitlement.transferred
+version: 1
+publisher: catalogue
+description: An entitlement changed holder — a guest's transfer was claimed, or a resale completed. The
+  same entitlement, a new owner.
+aggregate: entitlement
+emittedWhen: TicketTransfer.status offered to claimed (claimTicketTransfer), or ResaleListing.status reserved
+  to sold (createResaleListing)
+payload:
+- field: entitlementId
+  type: string
+- field: fromSubjectId
+  type: uuid
+- field: toSubjectId
+  type: uuid
+- field: channel
+  type: string
+  notes: transfer or resale
+- field: sourceId
+  type: string
+  notes: The `TicketTransfer.id` or `ResaleListing.id` that moved it
+- field: scopePath
+  type: string
+- field: tenantId
+  type: uuid
+- field: at
+  type: timestamp
+consumers:
+- context: ai
+  purpose: Resale and transfer risk — an edge from the old holder to the new one in the risk graph, so a
+    ring of accounts passing tickets to a tout is visible as a ring (AI system design section 3.2)
+  idempotencyKey: entitlementId + at
+  onFailure: retryThenDeadLetter
+  isCritical: false
+retention: 30 days after publication
+notes: '**Added 29 September (build pass, group OWN, from the AI group''s handoff).** One event per
+  entitlement, not per transfer: a family transfer of four tickets is four edges, because the graph works
+  at entitlement grain.
+
+
+  **A state model transition is the cause**, twice: `states/ticket-transfer.yaml` offered → claimed
+  (`claimTicketTransfer`, "the entitlement moves") and `states/resale-listing.yaml` reserved → sold
+  (`createResaleListing`, "the buyer becomes the owner of the same entitlement") should each carry
+  `emits: [entitlement.transferred]`, and both operations write `platform.outbox` in the same transaction
+  as `access.entitlement` (ADR-0033). **Publisher is catalogue, as for `entitlement.issued`**, though both
+  transitions are run by OrderService; the outbox row is written in OrderService''s transaction under the
+  catalogue event name.'

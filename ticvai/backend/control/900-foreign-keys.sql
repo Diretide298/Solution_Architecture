@@ -3,12 +3,13 @@
 -- its use** — orders reaches catalogue, catalogue reaches platform, and something
 -- reaches back. Tables first, constraints last, is the only ordering that terminates.
 --
--- 23 of 690 declared references. The ones that reach the
+-- 24 of 778 declared references. The ones that reach the
 -- other database are in ../990-cross-database-references.sql and are not constraints
 -- any more.
 
 ALTER TABLE control.api_licence ADD CONSTRAINT api_licence_tenant_id_fkey FOREIGN KEY (tenant_id) REFERENCES control.tenant(id);
 ALTER TABLE control.cell_job ADD CONSTRAINT cell_job_cell_id_fkey FOREIGN KEY (cell_id) REFERENCES control.cell(id);
+ALTER TABLE control.credit_note_line ADD CONSTRAINT credit_note_line_credit_note_id_fkey FOREIGN KEY (credit_note_id) REFERENCES control.credit_note(id);
 ALTER TABLE control.environment ADD CONSTRAINT environment_cell_id_fkey FOREIGN KEY (cell_id) REFERENCES control.cell(id);
 ALTER TABLE control.invoice_line ADD CONSTRAINT invoice_line_invoice_id_fkey FOREIGN KEY (invoice_id) REFERENCES control.invoice(id);
 ALTER TABLE control.licence_add_on_limit ADD CONSTRAINT licence_add_on_limit_licence_add_on_id_fkey FOREIGN KEY (licence_add_on_id) REFERENCES control.licence_add_on(id);

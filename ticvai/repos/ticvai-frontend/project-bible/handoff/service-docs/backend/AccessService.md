@@ -7,7 +7,7 @@
 | Tier | commerce: The sale path. Highest availability, highest write rate. |
 | Contracts | `access` |
 | Schemas owned | `access` |
-| Operations in the slice | 34 of 243 |
+| Operations in the slice | 34 of 245 |
 | Scale | Read-heavy, extreme latency sensitivity, edge-cached. `frozenDays` is held rather than replayed precisely because the gate cannot afford the arithmetic. |
 | If it is down | Down means the gates stop. Runs at the edge with a local decision cache. |
 
@@ -42,13 +42,13 @@
 | access | [`listParkingFacilities`](#listparkingfacilities) | GET | `/parking-facilities` | core | 2 | BO-006, GST-027, GST-028, WEB-041 |
 | access | [`revokeFacePass`](#revokefacepass) | DELETE | `/face-pass/enrolments/{enrolmentId}` | core | 2 | GST-069, WEB-024 |
 | access | [`setAccessPointGroup`](#setaccesspointgroup) | PUT | `/access-point-groups` | setup | 1 | BO-151 |
-| access | [`setBiometricVerificationProfile`](#setbiometricverificationprofile) | PUT | `/biometric-verification-profile` | setup | 2 | BO-184, BO-185, BO-191 |
+| access | [`setBiometricVerificationProfile`](#setbiometricverificationprofile) | PUT | `/biometric-verification-profile` | setup | 1 | BO-184, BO-185, BO-191 |
 | access | [`setBleBeaconGeofence`](#setblebeacongeofence) | PUT | `/ble-beacon-geofence` | setup | 1 | BO-168 |
 | access | [`setCredentialActivationDisplay`](#setcredentialactivationdisplay) | PUT | `/credential-activation-display` | setup | 1 | BO-166 |
 | access | [`setDeviceBindingPolicy`](#setdevicebindingpolicy) | PUT | `/device-binding-policy` | setup | 1 | BO-164, BO-167 |
-| access | [`setFaceMatchingVerification`](#setfacematchingverification) | PUT | `/face-matching-verification` | setup | 2 | BO-189 |
-| access | [`setFacePassEnrollment`](#setfacepassenrollment) | PUT | `/face-pass-enrollment` | setup | 2 | BO-184, BO-186 |
-| access | [`setFaceTagTemporaryEnrollment`](#setfacetagtemporaryenrollment) | PUT | `/face-tag-temporary` | setup | 2 | BO-188 |
+| access | [`setFaceMatchingVerification`](#setfacematchingverification) | PUT | `/face-matching-verification` | setup | 1 | BO-189 |
+| access | [`setFacePassEnrollment`](#setfacepassenrollment) | PUT | `/face-pass-enrollment` | setup | 1 | BO-184, BO-186 |
+| access | [`setFaceTagTemporaryEnrollment`](#setfacetagtemporaryenrollment) | PUT | `/face-tag-temporary` | setup | 1 | BO-188 |
 | access | [`setGateModePolicy`](#setgatemodepolicy) | PUT | `/gate-mode-policies` | setup | 1 | BO-201 |
 | access | [`setParkingFacility`](#setparkingfacility) | PUT | `/parking-facilities` | setup | 2 | BO-006 |
 | access | [`setVirtualTicketIdentity`](#setvirtualticketidentity) | PUT | `/virtual-ticket-identity` | setup | 1 | BO-335 |
@@ -313,10 +313,10 @@ No image is stored — a template is. **The template cannot reconstruct the face
 
 ### enrolFaceTag
 
-**`POST /face-tag/enrolments`**: Capture a same-visit facial model that dies at close of day
+**`POST /face-tag/enrolments`**: Capture a same-visit facial model, deleted when the ticket is fully redeemed
 
-3.2.44. **A Face Tag is not a short Face Pass.** It is taken at a ticket counter or an entry gate, it is anchored to the ticket rather than to a pass, and it is purged at the close of the operating day — which is the posture that makes it defensible at all.
-**Consent is still explicit and still recorded.** PDPL Article 4 is a closed list of exceptions with **no legitimate-interests basis**, so there is no route that makes a short-lived biometric consent-free. What a short life changes is what the consent is *for*, not whether it is needed — and a design that skipped it because the data dies at midnight would be wrong about the law rather than lenient about it.
+3.2.44. **A Face Tag is not a short Face Pass.** It is taken at a ticket counter or an entry gate, it is anchored to the ticket rather than to a pass, and it is deleted at the venue Face Tag profile's `deletionTrigger`: **when the ticket is fully redeemed** unless the venue chose otherwise (`setFaceTagTemporaryEnrollment`; corrected 29 September, build pass, from an earlier "close of the operating day" that the profile never said) — which is the posture that makes it defensible at all.
+**No consent form to sign, and consent is still explicit and recorded.** The matrix asks that a Face Tag need no signed consent form, and it does not: `consent.method` `onScreenAcknowledgement` is a tap on the counter or gate screen after the notice is shown, recorded with the purpose and the time (decided 29 September, build pass). PDPL Article 4 is a closed list of exceptions with **no legitimate-interests basis**, so there is no route that makes a short-lived biometric consent-free; what a short life changes is what the consent is *for*, not whether it is needed. Whether a notice alone would do is the make-or-break question on this operation (CF-35).
 **Refused where `VenueSettings.biometrics.isEnabled` is false**, and that switch cannot be turned on without a DPIA reference and a consent-notice acknowledgement (CF-35).
 **A template is stored, never an image**, and the template cannot reconstruct the face.
 
@@ -328,8 +328,8 @@ No image is stored — a template is. **The template cannot reconstruct the face
 | Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
-| Reads | `pii.subject_biometric` |
-| Writes | - |
+| Reads | `access.biometric_profile`, `cache:idempotency`, `pii.subject_biometric` |
+| Writes | `cache:idempotency`, `pii.subject_biometric` |
 | Called by | POS-005 |
 
 **Parameters**
@@ -349,6 +349,7 @@ No image is stored — a template is. **The template cannot reconstruct the face
 | source | enum (ticketCounter, entryGate) | yes | The two surfaces 3.2.44 allows, and a gate is present here exactly where it is absent from Face Pass: this one does not outlive the visit. |
 | consent | object | yes | Per-visit rather than enduring, and still explicit. |
 | consent.purposeId | string (uuid) | yes |  |
+| consent.method | enum (onScreenAcknowledgement, signedForm) |  | How the guest consented (added 29 September, build pass, 3.2.44). (default onScreenAcknowledgement) |
 | consent.givenAt | string (date-time) | yes |  |
 | consent.guardianSubjectId | string (uuid) |  | Required where the subject is a minor (3.2.12). (nullable) |
 | consent.guardianRelationship | string |  | (nullable) |
@@ -375,7 +376,7 @@ No image is stored — a template is. **The template cannot reconstruct the face
 | Code | Shape | Meaning |
 |---|---|---|
 | 201 |  | Tagged |
-| 409 |  | Biometrics are not enabled at this venue, or this ticket type's biometricPolicy is disabled. |
+| 409 |  | Biometrics are not enabled at this venue, this ticket type's biometricPolicy is disabled, or consent.method is not the one the venue's Face Tag profile requires (consentCapture). |
 | 422 |  | Capture quality too low to match against later in the visit. |
 
 ### getEntitlement
@@ -892,7 +893,7 @@ A group may not be its own ancestor (`409 group-cycle`), and every member access
 | Permission | `ACCESS_POINT_CONFIGURE` |
 | Scope level | venue |
 | Part of slice | setup, makes `access.biometric_profile` non-empty |
-| Wave | 2 |
+| Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
 | Read routing | primary |
@@ -1172,7 +1173,7 @@ A rule takes effect for credentials rendered after the save; a QR already shown 
 | Permission | `ACCESS_POINT_CONFIGURE` |
 | Scope level | venue |
 | Part of slice | setup, makes `access.biometric_profile` non-empty |
-| Wave | 2 |
+| Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
 | Read routing | primary |
@@ -1245,7 +1246,7 @@ A rule takes effect for credentials rendered after the save; a QR already shown 
 | Permission | `ACCESS_POINT_CONFIGURE` |
 | Scope level | venue |
 | Part of slice | setup, makes `access.biometric_profile` non-empty |
-| Wave | 2 |
+| Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
 | Read routing | primary |
@@ -1312,7 +1313,7 @@ A rule takes effect for credentials rendered after the save; a QR already shown 
 | Permission | `ACCESS_POINT_CONFIGURE` |
 | Scope level | venue |
 | Part of slice | setup, makes `access.biometric_profile` non-empty |
-| Wave | 2 |
+| Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
 | Read routing | primary |
@@ -1338,6 +1339,7 @@ A rule takes effect for credentials rendered after the save; a QR already shown 
 | bindTo | enum (ticket, visit, temporaryCredential) | yes | What the Face Tag is bound to (default ticket) |
 | deletionTrigger | enum (ticketFullyRedeemed, endOfVisit, ticketExpiration, credentialCancellation, operationalRetentionThreshold) | yes | When the Face Tag is deleted automatically. (default ticketFullyRedeemed) |
 | retentionThresholdHours | integer |  | Used only when deletionTrigger is operationalRetentionThreshold, and then required. (min 1) |
+| consentCapture | enum (onScreenAcknowledgement, signedForm) |  | How consent is taken when a Face Tag is captured (3.2.44; added 29 September, build pass). (default onScreenAcknowledgement) |
 | status | enum (active, inactive) |  | Switches the profile on or off; an inactive profile is not applied at any gate and stays for reuse (decided 29 September, writers pass) (default active) |
 
 **Response**: `FaceTagTemporaryEnrollmentView`
@@ -1351,6 +1353,7 @@ A rule takes effect for credentials rendered after the save; a QR already shown 
 | venueId | string |  |  |
 | name | string |  |  |
 | retentionThresholdHours | integer |  | Used when deletionTrigger is operationalRetentionThreshold. |
+| consentCapture | enum (onScreenAcknowledgement, signedForm) |  | How consent is taken at capture; onScreenAcknowledgement (no form to sign) unless set |
 
 **Responses**
 
@@ -2302,6 +2305,7 @@ Changes take effect at terminals after the next offline package refresh, not imm
 Pulled by scanners and venue edge nodes so validation continues through a WAN outage. Returns entitlements valid within the requested window for the session's access point, plus the deny rules needed to evaluate them.
 `etag` supports conditional refresh — a device on a slow link should not re-download an unchanged package.
 **Workstation-scoped: the access point is the session's.** A caller whose session has no workstation — a back-office browser, a partner, a guest — is refused `403`, because there is no access point to build a package for.
+**Accreditation credentials travel in the package** (29 September, build; BL-181): `accreditationCredentials` carries the admitting `access.accreditation_credential` rows whose zones include this access point's, so an accredited person is admitted, and a suspended or revoked one refused, with no network. A holder status change or a replacement changes the `etag`, so the next conditional refresh takes it.
 
 |  |  |
 |---|---|
@@ -2312,7 +2316,7 @@ Pulled by scanners and venue edge nodes so validation continues through a WAN ou
 | Offline | no |
 | Conflict policy | serverWins |
 | Read routing | replica |
-| Reads | `access.access_point`, `access.admission_rules`, `access.blacklist`, `cache:resolution`, `catalogue.entitlement_template`, `identity.principal`, `venuemap.map`, `venuemap.path`, `venuemap.point` |
+| Reads | `access.access_point`, `access.accreditation_credential`, `access.admission_rules`, `access.blacklist`, `cache:resolution`, `catalogue.entitlement_template`, `identity.principal`, `venuemap.map`, `venuemap.path`, `venuemap.point` |
 | Writes | `cache:resolution` |
 | Called by | BO-034, BO-035, BO-037, BO-060, BO-207, EMP-010, EMP-015, EMP-017, POS-013, SCN-003, SCN-007, SCN-008, SCN-009, SCN-013, SCN-014, SCN-015 |
 
@@ -2361,6 +2365,19 @@ Pulled by scanners and venue edge nodes so validation continues through a WAN ou
 | admissionRules[].closeMinutesAfter | integer | yes |  |
 | admissionRules[].maxDurationMinutes | integer |  | (nullable) |
 | admissionRules[].requiresExitBeforeReentry | boolean |  |  |
+| accreditationCredentials | array of AccessAccreditationCredential |  | Accreditation credentials that admit at this access point, from access.accreditation_credential (29 September, build; BL-181). |
+| accreditationCredentials[].id | string (uuid) | yes | The accreditation credential's id (credentialId on the events). |
+| accreditationCredentials[].holderId | string (uuid) | yes |  |
+| accreditationCredentials[].programmeId | string (uuid) |  | (nullable) |
+| accreditationCredentials[].kind | string |  | printedBadge, mobileCredential, qr, nfcCard, rfidCard or wristband, as issued. |
+| accreditationCredentials[].encodedIdentifier | string | yes | What the gate reads from the credential. |
+| accreditationCredentials[].validFrom | string (date) |  | (nullable) |
+| accreditationCredentials[].validTo | string (date) |  | (nullable) |
+| accreditationCredentials[].zoneIds | array of string (uuid) |  | The holder's effective zones, from the event (effectiveZones). |
+| accreditationCredentials[].holderStatus | enum (active, suspended, revoked, expired, archived) |  | The holder's status as last published; only active admits. |
+| accreditationCredentials[].admits | boolean | yes | False once the credential is replaced or the holder is not active. |
+| accreditationCredentials[].sourceChangedAt | string (date-time) |  | The issuedAt or changedAt of the event last applied; an older event arriving late is ignored. |
+| accreditationCredentials[].scopePath | string | yes | The partition key (ADR-0005), the accreditation programme's scope. |
 
 **Responses**
 
@@ -2461,6 +2478,23 @@ Every table this service owns that the slice reads or writes, with its columns a
 | created_at | timestamptz | no |  |
 | updated_at | timestamptz | no |  |
 
+### `access.accreditation_credential`
+
+| Column | Type | Required | Notes |
+|---|---|---|---|
+| id | uuid | yes | The accreditation credential's id (credentialId on the events). |
+| holder_id | uuid | yes |  |
+| programme_id | uuid | no |  |
+| kind | text | no | printedBadge, mobileCredential, qr, nfcCard, rfidCard or wristband, as issued. |
+| encoded_identifier | text | yes | What the gate reads from the credential. |
+| valid_from | date | no |  |
+| valid_to | date | no |  |
+| zone_ids | text[] | no | The holder's effective zones, from the event (effectiveZones). |
+| holder_status | text | no | The holder's status as last published; only active admits. |
+| admits | boolean | yes | False once the credential is replaced or the holder is not active. |
+| source_changed_at | timestamptz | no | The issuedAt or changedAt of the event last applied; an older event arriving late is ignored. |
+| scope_path | text | yes | The partition key (ADR-0005), the accreditation programme's scope. |
+
 ### `access.admission_rules`
 
 | Column | Type | Required | Notes |
@@ -2539,6 +2573,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 | bind_to | text | no | faceTagEnrolment rows. |
 | deletion_trigger | text | no | faceTagEnrolment rows. |
 | retention_threshold_hours | integer | no | faceTagEnrolment rows, required when deletionTrigger is operationalRetentionThreshold. |
+| consent_capture | text | no | faceTagEnrolment rows. |
 | access_context | text | no | faceMatch rows. |
 | high_confidence_min | numeric | no | faceMatch rows. |
 | review_range_min | numeric | no | faceMatch rows. |
@@ -2785,6 +2820,9 @@ Every table this service owns that the slice reads or writes, with its columns a
 | device_id | uuid | no |  |
 | overrides_scan_id | text | no | Set only on an override row, naming the denied scan it admits against (decided 28 September, audit R228). |
 | override_reason | text | no | The supervisor's justification, on the override row only. |
+| dynamic_policy_id | uuid | no | The dynamic access policy (access.dynamic_policy) whose result decided this scan; null when no dynamic policy matched and the entitlement alone decided (added 29 September, build pass, 3.3.48). |
+| dynamic_policy_version | integer | no | The version of that policy in force at the scan, so a report spanning a change counts each version apart. |
+| dynamic_policy_result | text | no | What the policy decided, which for a step-up is not the same as the scan's outcome. |
 | quantity | integer | no | Admissions this scan counted. |
 | local_sequence | integer | no | The device-local sequence number of a scan recorded offline; null for an online scan (added 29 September, data-model close-out DM1). |
 | package_version | text | no | The offline package (access.edge_package) the device validated against; null for an online scan (added 29 September, data-model close-out DM1). |
@@ -2794,11 +2832,11 @@ Every table this service owns that the slice reads or writes, with its columns a
 
 ## Not in the first release
 
-209 operations, added to this service in later releases without changing any of the above.
+211 operations, added to this service in later releases without changing any of the above.
 
 | Group | Operations |
 |---|---|
-| access | `approveMultiMediaPreview`, `archiveMediaTemplate`, `cancelGateModeChange`, `createParkingEntitlement`, `deleteJourneySequenceRule`, `deleteMediaBindingRule`, `deleteOperatingCalendarEntry`, `deletePodium`, `deleteReasonCode`, `deliverCredential`, `endPodiumShift`, `getCredentialIssuanceRetryPolicy`, `listAccess`, `listAccessAttributeCatalog`, `listAccessChanges`, `listAccessExecutiveInsight`, `listAccessLocationGrouping`, `listAccessMonitoring`, `listAccessReportScheduled`, `listAccessRiskScoring`, `listAccessRule`, `listAccessSecurityFraud`, `listAccessValidityTime`, `listAntiPassbackJourney`, `listAttendanceAdmission`, `listAuthorizationGovernanceTemporary`, `listBiometric`, `listBiometricAccess`, `listBiometricIdentityIntegrity`, `listBiometricValidationGate`, `listBrandingLocalizationTemplate`, `listConnectivityFailureDegraded`, `listCredential`, `listCredentialActivationDisplay`, `listCredentialDeliveryDistribution`, `listCredentialDisableBlacklist`, `listCredentialGenerationIssuance`, `listCredentialIdentityToken`, `listCredentialReplacementReissue`, `listCredentialRevocationLifecycle`, `listCredentialSecurity`, `listCredentialSecurityOperational`, `listCredentialSharingConcurrent`, `listCredentialTransferRebinding`, `listCredentialUsageCross`, `listDeviceBindingSession`, `listDeviceGate`, `listDeviceTypeHardware`, `listDigitalCredentialSecurity`, `listDynamicAccessPolicy`, `listEdgePackageData`, `listEdgeSecurityDeployment`, `listEntitlementConsumption`, `listEntitlementCrossMedia`, `listEntryExitCrossover`, `listEntryExitRule`, `listEntryRulePoints`, `listEntryTemporaryExit`, `listExternalPartnerCredential`, `listFaceChangeEnrollment`, `listFaceMatchingVerification`, `listFaceTagTemporary`, `listFailedGenerationDelivery`, `listFamilyChildPod`, `listFastPassAttraction`, `listFraudDetectionRule`, `listGateModeFree`, `listGraphicalAccessMap`, `listGroupAdmissionQuantity`, `listGroupAttendancePartial`, `listGroupLeaderFast`, `listGuestCompanionEligibility`, `listGuestDwellTime`, `listGuestJourney`, `listHardwareCompatibilityHealth`, `listHotelWalletExternal`, `listIdentityMembershipAccreditation`, `listLiveAccess`, `listLiveGateMode`, `listLiveVenueOccupancy`, `listMediaActivationPriority`, `listMediaCredential`, `listMediaDesign`, `listMediaIssuanceEncoding`, `listMediaReplacementRevocation`, `listMediaSwapReplacement`, `listMediaTypeCredential`, `listMediaTypeTechnology`, `listMultiMediaBinding`, `listMultiParkCrossover`, `listMultiParkCrossover2`, `listOfflineCredentialRevocation`, `listOfflineCryptographicValidation`, `listOfflineEdge`, `listOfflineEntitlementUsage`, `listOperatingCalendarSpecial`, `listPhysicalDeviceRegistration`, `listPodiumConsole`, `listPolicyEvaluationArchitecture`, `listPolicyScopeHierarchy`, `listQueueThroughputLane`, `listReconnectionSynchronizationConflict`, `listRelationshipCompanionFraud`, `listSecurityDetectionGovernance`, `listShiftHandoverSummary`, `listSpecialEventFree`, `listThroughputQueueValidation`, `listTicketCredentialInvestigation`, `listTicketMedia`, `listUnifiedIdentityCredential`, `listValidationExceptionReason`, `listValidationOutcomeRejection`, `listVenueParkAccess`, `listVerificationMethodSelection`, `listVirtualCredentialMedia`, `listVirtualTicket`, `listVirtualTicketArchitecture`, `listVirtualTicketStatus`, `lockIdentity`, `publishHardwareDeployment`, `publishMediaCompatibilityTesting`, `publishRuleConflictCheck`, `publishTopologyValidation`, `registerAccessDevice`, `releaseCredentialDevice`, `releaseIdentityLock`, `replaceCredential`, `resolveCredentialException`, `retryCredentialGeneration`, `reviewFaceReenrolment`, `rollbackAccessPolicy`, `rollbackConfigurationVersion`, `setAccessAreaZone`, `setAccessAttributeCatalog`, `setAccessGraphicalMap`, `setAppleWalletPass`, `setAttractionAccess`, `setBiometricLifecycleRetention`, `setBrandingLocalizationTemplate`, `setContextTimeEvent`, `setCredentialEventPropagationRule`, `setCredentialIssuanceRetryPolicy`, `setDeviceSoftwareContent`, `setDigitalBarcodeTicket`, `setDigitalCardMembership`, `setDynamicFieldData`, `setDynamicSecurityProfile`, `setEdgeNodeLocal`, `setEmbeddedEntitlementPayload`, `setEntitlementConsumption`, `setEntryRulePoints`, `setFastPassProfile`, `setFraudDetectionRule`, `setGateLane`, `setGateOfflinePolicy`, `setGoogleWalletPass`, `setGroupAdmissionProfile`, `setGuestCompanionEligibility`, `setHandheldMobileAccess`, `setHardwareModel`, `setHotelWalletExternal`, `setJourneyProfile`, `setJourneySequenceRule`, `setMediaBindingActivation`, `setMediaBindingRule`, `setMediaIssuanceEncoding`, `setMediaReplacementRevocation`, `setMediaTypeTechnology`, `setOperatingCalendarEntry`, `setOperationalIncidentException`, `setPdfPrintablePos`, `setPodium`, `setPolicyEvaluationSetting`, `setPolicyScopeHierarchy`, `setReaderScannerPeripheral`, `setRealTimeSecurity`, `setReasonCode`, `setRelationshipFraudRule`, `setRfidNfc`, `setRfidNfcCard`, `setRiskScoringConfig`, `setSecurityInvestigationEvidence`, `setTicketStatusTransition`, `setTurnstileLaneBehavior`, `setValidationOutcomeGuest`, `setVerificationMethodPolicy`, `setVirtualTicketCredential`, `setVisualDynamicPolicy`, `simulateBiometricConfiguration`, `simulateGuestJourney`, `simulateOfflineResilienceTesting`, `simulatePolicyConflictImpact`, `startPodiumShift`, `updateAccessDevice`, `updateSecurityAlert`, `verifyIdentity` |
+| access | `approveMultiMediaPreview`, `archiveMediaTemplate`, `cancelGateModeChange`, `createParkingEntitlement`, `deleteJourneySequenceRule`, `deleteMediaBindingRule`, `deleteOperatingCalendarEntry`, `deletePodium`, `deleteReasonCode`, `deliverCredential`, `endPodiumShift`, `getAccessRiskScore`, `getCredentialIssuanceRetryPolicy`, `listAccess`, `listAccessAttributeCatalog`, `listAccessChanges`, `listAccessExecutiveInsight`, `listAccessLocationGrouping`, `listAccessMonitoring`, `listAccessReportScheduled`, `listAccessRiskScoring`, `listAccessRule`, `listAccessSecurityFraud`, `listAccessValidityTime`, `listAntiPassbackJourney`, `listAttendanceAdmission`, `listAuthorizationGovernanceTemporary`, `listBiometric`, `listBiometricAccess`, `listBiometricIdentityIntegrity`, `listBiometricValidationGate`, `listBrandingLocalizationTemplate`, `listConnectivityFailureDegraded`, `listCredential`, `listCredentialActivationDisplay`, `listCredentialDeliveryDistribution`, `listCredentialDisableBlacklist`, `listCredentialGenerationIssuance`, `listCredentialIdentityToken`, `listCredentialReplacementReissue`, `listCredentialRevocationLifecycle`, `listCredentialSecurity`, `listCredentialSecurityOperational`, `listCredentialSharingConcurrent`, `listCredentialTransferRebinding`, `listCredentialUsageCross`, `listDeviceBindingSession`, `listDeviceGate`, `listDeviceTypeHardware`, `listDigitalCredentialSecurity`, `listDynamicAccessPolicy`, `listDynamicPolicyEffectiveness`, `listEdgePackageData`, `listEdgeSecurityDeployment`, `listEntitlementConsumption`, `listEntitlementCrossMedia`, `listEntryExitCrossover`, `listEntryExitRule`, `listEntryRulePoints`, `listEntryTemporaryExit`, `listExternalPartnerCredential`, `listFaceChangeEnrollment`, `listFaceMatchingVerification`, `listFaceTagTemporary`, `listFailedGenerationDelivery`, `listFamilyChildPod`, `listFastPassAttraction`, `listFraudDetectionRule`, `listGateModeFree`, `listGraphicalAccessMap`, `listGroupAdmissionQuantity`, `listGroupAttendancePartial`, `listGroupLeaderFast`, `listGuestCompanionEligibility`, `listGuestDwellTime`, `listGuestJourney`, `listHardwareCompatibilityHealth`, `listHotelWalletExternal`, `listIdentityMembershipAccreditation`, `listLiveAccess`, `listLiveGateMode`, `listLiveVenueOccupancy`, `listMediaActivationPriority`, `listMediaCredential`, `listMediaDesign`, `listMediaIssuanceEncoding`, `listMediaReplacementRevocation`, `listMediaSwapReplacement`, `listMediaTypeCredential`, `listMediaTypeTechnology`, `listMultiMediaBinding`, `listMultiParkCrossover`, `listMultiParkCrossover2`, `listOfflineCredentialRevocation`, `listOfflineCryptographicValidation`, `listOfflineEdge`, `listOfflineEntitlementUsage`, `listOperatingCalendarSpecial`, `listPhysicalDeviceRegistration`, `listPodiumConsole`, `listPolicyEvaluationArchitecture`, `listPolicyScopeHierarchy`, `listQueueThroughputLane`, `listReconnectionSynchronizationConflict`, `listRelationshipCompanionFraud`, `listSecurityDetectionGovernance`, `listShiftHandoverSummary`, `listSpecialEventFree`, `listThroughputQueueValidation`, `listTicketCredentialInvestigation`, `listTicketMedia`, `listUnifiedIdentityCredential`, `listValidationExceptionReason`, `listValidationOutcomeRejection`, `listVenueParkAccess`, `listVerificationMethodSelection`, `listVirtualCredentialMedia`, `listVirtualTicket`, `listVirtualTicketArchitecture`, `listVirtualTicketStatus`, `lockIdentity`, `publishHardwareDeployment`, `publishMediaCompatibilityTesting`, `publishRuleConflictCheck`, `publishTopologyValidation`, `registerAccessDevice`, `releaseCredentialDevice`, `releaseIdentityLock`, `replaceCredential`, `resolveCredentialException`, `retryCredentialGeneration`, `reviewFaceReenrolment`, `rollbackAccessPolicy`, `rollbackConfigurationVersion`, `setAccessAreaZone`, `setAccessAttributeCatalog`, `setAccessGraphicalMap`, `setAppleWalletPass`, `setAttractionAccess`, `setBiometricLifecycleRetention`, `setBrandingLocalizationTemplate`, `setContextTimeEvent`, `setCredentialEventPropagationRule`, `setCredentialIssuanceRetryPolicy`, `setDeviceSoftwareContent`, `setDigitalBarcodeTicket`, `setDigitalCardMembership`, `setDynamicFieldData`, `setDynamicSecurityProfile`, `setEdgeNodeLocal`, `setEmbeddedEntitlementPayload`, `setEntitlementConsumption`, `setEntryRulePoints`, `setFastPassProfile`, `setFraudDetectionRule`, `setGateLane`, `setGateOfflinePolicy`, `setGoogleWalletPass`, `setGroupAdmissionProfile`, `setGuestCompanionEligibility`, `setHandheldMobileAccess`, `setHardwareModel`, `setHotelWalletExternal`, `setJourneyProfile`, `setJourneySequenceRule`, `setMediaBindingActivation`, `setMediaBindingRule`, `setMediaIssuanceEncoding`, `setMediaReplacementRevocation`, `setMediaTypeTechnology`, `setOperatingCalendarEntry`, `setOperationalIncidentException`, `setPdfPrintablePos`, `setPodium`, `setPolicyEvaluationSetting`, `setPolicyScopeHierarchy`, `setReaderScannerPeripheral`, `setRealTimeSecurity`, `setReasonCode`, `setRelationshipFraudRule`, `setRfidNfc`, `setRfidNfcCard`, `setRiskScoringConfig`, `setSecurityInvestigationEvidence`, `setTicketStatusTransition`, `setTurnstileLaneBehavior`, `setValidationOutcomeGuest`, `setVerificationMethodPolicy`, `setVirtualTicketCredential`, `setVisualDynamicPolicy`, `simulateBiometricConfiguration`, `simulateGuestJourney`, `simulateOfflineResilienceTesting`, `simulatePolicyConflictImpact`, `startPodiumShift`, `updateAccessDevice`, `updateSecurityAlert`, `verifyIdentity` |
 | accessPoint | `getAccessPoint`, `listAccessPoints`, `listAdmissionRules`, `listBlacklist`, `removeBlacklistEntry` |
 | drafted | `listBiometricConsentGuardian`, `listBiometricLifecycleRetention` |
 | sync | `listScans`, `syncScans` |

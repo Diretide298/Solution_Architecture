@@ -1733,6 +1733,10 @@ paths:
         forty-minute private lesson and a ninety-minute group lesson, and the constraint being modelled
         is the resource''s — how finely its time can be cut.
 
+        **Accepts `Prefer: validate-only`** (29 September, build pass, group G2): validates and answers 200
+        with the would-be result without writing, for the AI executor''s plan validation; registered as an
+        AI tool (`ai.AiTool`, 1.2.59, 2.6.50).
+
         '
       tags:
       - resources
@@ -1744,6 +1748,7 @@ paths:
       x-ticvai-conflict-policy: serverWins
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      - $ref: ../shared/common.yaml#/components/parameters/PreferValidateOnly
       requestBody:
         required: true
         content:
@@ -1782,6 +1787,10 @@ paths:
         not a cancel and a rebook — the deposit, the check-out state and the order reference stay
         attached, and a cancel/rebook would release the deposit and take it again.
 
+        **Accepts `Prefer: validate-only`** (29 September, build pass, group G2): validates and answers 200
+        with the would-be result without writing, for the AI executor''s plan validation; registered as an
+        AI tool (`ai.AiTool`, 1.2.59, 2.6.50).
+
         '
       tags:
       - resources
@@ -1793,6 +1802,7 @@ paths:
       x-ticvai-conflict-policy: serverWins
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      - $ref: ../shared/common.yaml#/components/parameters/PreferValidateOnly
       requestBody:
         required: true
         content:
@@ -2023,6 +2033,10 @@ paths:
         minute). If no room is free, which the line''s capacity hold should have prevented, `409` names
         the requirement and the checkout refuses the line `windowUnavailable`.
 
+        **Accepts `Prefer: validate-only`** (29 September, build pass, group G2): validates and answers 200
+        with the would-be result without writing, for the AI executor''s plan validation; registered as an
+        AI tool (`ai.AiTool`, 1.2.59, 2.6.50).
+
         '
       tags:
       - resources
@@ -2034,6 +2048,7 @@ paths:
       x-ticvai-conflict-policy: serverWins
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      - $ref: ../shared/common.yaml#/components/parameters/PreferValidateOnly
       requestBody:
         required: true
         content:
@@ -2077,6 +2092,14 @@ paths:
 
                     '
       responses:
+        '200':
+          description: 'Validate-only: the would-be allocation, nothing written'
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ResourceBooking'
         '201':
           headers:
             X-Consistency-Token:

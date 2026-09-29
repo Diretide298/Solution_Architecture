@@ -46,6 +46,12 @@ consumers:
   idempotencyKey: entitlementId
   onFailure: retry
   isCritical: false
+- context: ai
+  purpose: Membership conversion (a membership entitlement issued closes the conversion the recommender
+    or a campaign opened) (AI system design section 3.2)
+  idempotencyKey: entitlementId
+  onFailure: retry
+  isCritical: false
 retention: 30 days after publication
 notes: '**The access consumer is why this is critical.** An entitlement that never reaches the offline
   bundle is a guest refused at a gate holding a valid ticket, and the terminal cannot tell them why.

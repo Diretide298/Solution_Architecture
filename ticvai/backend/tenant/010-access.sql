@@ -1,4 +1,4 @@
--- access — 75 tables
+-- access — 76 tables
 -- **Derived. Do not hand-edit.**
 
 -- Holds 27 columns. No description has been written for this table — the name is the only thing
@@ -185,6 +185,26 @@ CREATE TABLE IF NOT EXISTS access.access_point_group (
     updated_at                        timestamptz
 );
 
+-- What a gate needs to admit an accredited person, kept by access (29 September, BL-181). Written
+-- only by the consumers of accreditation.credentialIssued and accreditation.holderStatusChanged;
+-- admits goes false when a credential is replaced or its holder is suspended, revoked, expired or
+-- archived. Read by validateAccess and shipped in the offline package, so a revoked badge stops
+-- opening doors on a
+CREATE TABLE IF NOT EXISTS access.accreditation_credential (
+    id                                uuid PRIMARY KEY NOT NULL,
+    holder_id                         uuid NOT NULL,
+    programme_id                      uuid,
+    kind                              text,
+    encoded_identifier                text NOT NULL,
+    valid_from                        date,
+    valid_to                          date,
+    zone_ids                          text[],
+    holder_status                     text CONSTRAINT accreditation_credential_holder_status_chk CHECK (holder_status IN ('active', 'suspended', 'revoked', 'expired', 'archived')),
+    admits                            boolean NOT NULL,
+    source_changed_at                 timestamptz,
+    scope_path                        ltree NOT NULL
+);
+
 -- What a gate checks before it opens — how early, how late, how many times, and which credentials
 -- count. Renamed from admission_rules, because *profile* reads as a person
 CREATE TABLE IF NOT EXISTS access.admission_rules (
@@ -288,6 +308,7 @@ CREATE TABLE IF NOT EXISTS access.biometric_profile (
     bind_to                           text CONSTRAINT biometric_profile_bind_to_chk CHECK (bind_to IN ('ticket', 'visit', 'temporaryCredential')),
     deletion_trigger                  text CONSTRAINT biometric_profile_deletion_trigger_chk CHECK (deletion_trigger IN ('ticketFullyRedeemed', 'endOfVisit', 'ticketExpiration', 'credentialCancellation', 'operationalRetentionThreshold')),
     retention_threshold_hours         integer,
+    consent_capture                   text CONSTRAINT biometric_profile_consent_capture_chk CHECK (consent_capture IN ('onScreenAcknowledgement', 'signedForm')),
     access_context                    text CONSTRAINT biometric_profile_access_context_chk CHECK (char_length(access_context) <= 100),
     high_confidence_min               numeric(18,4),
     review_range_min                  numeric(18,4),
@@ -913,7 +934,7 @@ CREATE TABLE IF NOT EXISTS access.fraud_rule (
     id                                text PRIMARY KEY NOT NULL,
     scope_path                        ltree NOT NULL,
     rule_kind                         text NOT NULL CONSTRAINT fraud_rule_rule_kind_chk CHECK (rule_kind IN ('signal', 'relationship')),
-    signal                            text CONSTRAINT fraud_rule_signal_chk CHECK (signal IN ('excessiveQrActivations', 'multipleActiveSessions', 'credentialCopied', 'excessiveRefreshAttempts', 'invalidSignature', 'expiredCredential', 'revokedCredential', 'screenshotReplayAttempt', 'abnormalTransferFrequency', 'repeatedFailedValidation', 'newDevice', 'multipleDevices', 'deviceBindingMismatch', 'rootedCompromisedDevice', 'abnormalDeviceChanges', 'impossibleDeviceMovement', 'suspiciousScannerDeviceActivity', 'duplicateEntry', 'simultaneousUse', 'antiPassbackViolations', 'unusualReEntry', 'unusualCrossover', 'excessiveAttractionUse', 'repeatedWrongGateAttempts', 'abnormalFastPassConsumption', 'faceMismatch', 'unusualFaceChange', 'multipleIdentitiesLinked', 'suspiciousCompanionChanges', 'podNannyRelationshipAnomalies')),
+    signal                            text CONSTRAINT fraud_rule_signal_chk CHECK (signal IN ('excessiveQrActivations', 'multipleActiveSessions', 'credentialCopied', 'excessiveRefreshAttempts', 'invalidSignature', 'expiredCredential', 'revokedCredential', 'screenshotReplayAttempt', 'abnormalTransferFrequency', 'repeatedFailedValidation', 'newDevice', 'multipleDevices', 'deviceBindingMismatch', 'rootedCompromisedDevice', 'abnormalDeviceChanges', 'impossibleDeviceMovement', 'suspiciousScannerDeviceActivity', 'duplicateEntry', 'simultaneousUse', 'antiPassbackViolations', 'unusualReEntry', 'unusualCrossover', 'excessiveAttractionUse', 'repeatedWrongGateAttempts', 'abnormalFastPassConsumption', 'faceMismatch', 'unusualFaceChange', 'multipleIdentitiesLinked', 'suspiciousCompanionChanges', 'podNannyRelationshipAnomalies', 'excessiveRefunds')),
     signal_category                   text CONSTRAINT fraud_rule_signal_category_chk CHECK (signal_category IN ('credential', 'device', 'access', 'identity')),
     relationship_rule_type            text CONSTRAINT fraud_rule_relationship_rule_type_chk CHECK (relationship_rule_type IN ('companionChangedDuringVisit', 'nannyCredentialWithoutPrimaryGuest', 'childWithUnauthorizedAdult', 'companionLinkedToMultiplePrimaries', 'excessiveRelationshipChanges', 'groupLeaderAcrossUnrelatedGroups')),
     relationship_type                 text CONSTRAINT fraud_rule_relationship_type_chk CHECK (relationship_type IN ('childAdult', 'podCompanion', 'guestNanny', 'groupLeaderGroup', 'membershipDependent')),
@@ -1487,6 +1508,9 @@ CREATE TABLE IF NOT EXISTS access.scan_event (
     device_id                         uuid,
     overrides_scan_id                 text,
     override_reason                   text,
+    dynamic_policy_id                 uuid,
+    dynamic_policy_version            integer,
+    dynamic_policy_result             text CONSTRAINT scan_event_dynamic_policy_result_chk CHECK (dynamic_policy_result IN ('allow', 'deny', 'review', 'requireId', 'requireBiometric', 'requireCompanion', 'requireSupervisor')),
     quantity                          integer DEFAULT 1,
     local_sequence                    integer,
     package_version                   text,

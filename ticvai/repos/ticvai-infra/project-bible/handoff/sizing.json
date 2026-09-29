@@ -58,7 +58,7 @@
     "services": {
      "CatalogueService": {
       "share": 24.0,
-      "rpsAtLoad": 91.9,
+      "rpsAtLoad": 91.7,
       "rpsPerReplica": 400,
       "impliedByLoad": 1,
       "floor": 2,
@@ -254,14 +254,14 @@
      },
      "AiService": {
       "share": 1.1,
-      "rpsAtLoad": 4.0,
+      "rpsAtLoad": 4.2,
       "rpsPerReplica": 100,
       "impliedByLoad": 1,
       "floor": 2,
       "steadyState": 2,
       "max": null,
       "targetUtilisation": 0.6,
-      "utilisationAtSteady": 0.02,
+      "utilisationAtSteady": 0.021,
       "scaleOutAt": 60,
       "stepAddsAt": 65,
       "drivenBy": "survivability floor"
@@ -310,14 +310,14 @@
     "services": {
      "CatalogueService": {
       "share": 24.0,
-      "rpsAtLoad": 544.2,
+      "rpsAtLoad": 543.1,
       "rpsPerReplica": 400,
       "impliedByLoad": 3,
       "floor": 2,
       "steadyState": 3,
       "max": null,
       "targetUtilisation": 0.6,
-      "utilisationAtSteady": 0.454,
+      "utilisationAtSteady": 0.453,
       "scaleOutAt": 240,
       "stepAddsAt": 260,
       "drivenBy": "load"
@@ -506,14 +506,14 @@
      },
      "AiService": {
       "share": 1.1,
-      "rpsAtLoad": 23.9,
+      "rpsAtLoad": 25.0,
       "rpsPerReplica": 100,
       "impliedByLoad": 1,
       "floor": 2,
       "steadyState": 2,
       "max": null,
       "targetUtilisation": 0.6,
-      "utilisationAtSteady": 0.119,
+      "utilisationAtSteady": 0.125,
       "scaleOutAt": 60,
       "stepAddsAt": 65,
       "drivenBy": "survivability floor"
@@ -562,14 +562,14 @@
     "services": {
      "CatalogueService": {
       "share": 24.0,
-      "rpsAtLoad": 1690.3,
+      "rpsAtLoad": 1686.8,
       "rpsPerReplica": 400,
       "impliedByLoad": 8,
       "floor": 2,
       "steadyState": 8,
       "max": null,
       "targetUtilisation": 0.6,
-      "utilisationAtSteady": 0.528,
+      "utilisationAtSteady": 0.527,
       "scaleOutAt": 240,
       "stepAddsAt": 260,
       "drivenBy": "load"
@@ -758,14 +758,14 @@
      },
      "AiService": {
       "share": 1.1,
-      "rpsAtLoad": 74.1,
+      "rpsAtLoad": 77.6,
       "rpsPerReplica": 100,
       "impliedByLoad": 2,
       "floor": 2,
       "steadyState": 2,
       "max": null,
       "targetUtilisation": 0.6,
-      "utilisationAtSteady": 0.371,
+      "utilisationAtSteady": 0.388,
       "scaleOutAt": 60,
       "stepAddsAt": 65,
       "drivenBy": "survivability floor"

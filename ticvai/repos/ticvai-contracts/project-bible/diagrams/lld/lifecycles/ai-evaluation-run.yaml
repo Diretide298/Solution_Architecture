@@ -1,0 +1,47 @@
+id: LLD-AI evaluation run
+title: AI evaluation run — 5 transitions
+generatedBy: tools/derive-diagrams.py
+index: diagrams/hld/04-lifecycles.yaml
+source: states/ai-evaluation-run.yaml
+entity: AI evaluation run
+contract: ai
+enum: AiEvaluationRun.status
+enumKind: inline
+enumSchema: AiEvaluationRun
+enumProperty: status
+owner: ai
+description: '**One evaluation of a candidate against its baseline** (AI design 3.5): offline golden
+  set, backtest or shadow comparison, requested by `runAiEvaluation` (created `queued`). Append-only,
+  in the AI log database.'
+initial:
+- queued
+terminal:
+- passed
+- failed
+- error
+transitions:
+- from: queued
+  to: running
+  trigger: job
+  guard: The evaluation worker picked the run up
+- from: running
+  to: passed
+  trigger: job
+  guard: Every gate threshold passed **and every isolation and permission case passed 100%** (`isolationCasesPassed`,
+    AIC-255)
+- from: running
+  to: failed
+  trigger: job
+  guard: A gate threshold was missed, or one isolation or permission case failed, which fails the run
+    whatever the other metrics say (AIC-255)
+- from: running
+  to: error
+  trigger: job
+  guard: The run could not complete (the suite, the candidate or the baseline could not be run). Says
+    nothing about the candidate's quality
+- from: queued
+  to: error
+  trigger: job
+  guard: The run could not start
+notes: '`failed` and `error` are kept apart: one is a candidate that is worse, the other is an evaluation
+  that did not happen. A candidate is re-evaluated by a new run.'

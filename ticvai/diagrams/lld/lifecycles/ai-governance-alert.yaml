@@ -1,0 +1,71 @@
+id: LLD-AI governance alert
+title: AI governance alert — 9 transitions
+generatedBy: tools/derive-diagrams.py
+index: diagrams/hld/04-lifecycles.yaml
+source: states/ai-governance-alert.yaml
+entity: AI governance alert
+contract: ai
+enum: AiGovernanceAlert.status
+enumKind: inline
+enumSchema: AiGovernanceAlert
+enumProperty: status
+owner: ai
+description: '**A governance alert** (AI design 4.4, AIC-210..223; ADM-549..555), raised by monitoring,
+  by a failed control test (`runAiControlTest`, `controlFailed`) or by a shadow model passing its gate
+  (`promotionReady`, design 3.12). Kept separate from operational incidents (AIC-250).'
+initial:
+- open
+terminal:
+- dismissed
+- resolved
+- incidentOpened
+transitions:
+- from: open
+  to: acknowledged
+  operation: decideAiGovernanceAlert
+  trigger: operation
+  guard: Decision `acknowledge`. Someone has seen it; it stays live
+- from: open
+  to: dismissed
+  operation: decideAiGovernanceAlert
+  trigger: operation
+  guard: Decision `dismiss`, with a note. A dismissed `promotionReady` alert leaves the model in shadow
+- from: acknowledged
+  to: dismissed
+  operation: decideAiGovernanceAlert
+  trigger: operation
+  guard: Dismissed after acknowledgement, with a note
+- from: open
+  to: resolved
+  operation: decideAiGovernanceAlert
+  trigger: operation
+  guard: Decision `resolve`; the condition was fixed
+- from: acknowledged
+  to: resolved
+  operation: decideAiGovernanceAlert
+  trigger: operation
+  guard: Resolved after acknowledgement
+- from: open
+  to: resolved
+  operation: promoteAiRelease
+  trigger: operation
+  guard: A `promotionReady` alert is resolved when a person promotes the release it names (design 3.12).
+    **Monitoring never switches a model** (AIC-252)
+- from: acknowledged
+  to: resolved
+  operation: promoteAiRelease
+  trigger: operation
+  guard: A `promotionReady` alert, acknowledged, resolved by the promotion
+- from: open
+  to: incidentOpened
+  operation: decideAiGovernanceAlert
+  trigger: operation
+  guard: Decision `openIncident`. Opens an AI incident, or adds the alert to the one named by `incidentId`
+- from: acknowledged
+  to: incidentOpened
+  operation: decideAiGovernanceAlert
+  trigger: operation
+  guard: An incident opened after acknowledgement
+notes: '`dismissed`, `resolved` and `incidentOpened` are final; a closed alert is refused (`409 alert-not-open`).
+  A condition that recurs raises a new alert. Where `openIncident` creates the incident, `ai.incidentOpened`
+  is published by that creation (states/ai-incident.yaml), not by this alert.'

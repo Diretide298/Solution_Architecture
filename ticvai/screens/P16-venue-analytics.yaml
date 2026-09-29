@@ -191,6 +191,8 @@ screens:
     - to: ANL-017
       trigger: Customer, Membership & Loyalty Pulse
       provenance: structural — ANL-001 is P16's home screen and its exits are its launcher
+      carries:
+      - dashboardId
     - to: ANL-018
       trigger: Alerts & Exception Center
       provenance: structural — ANL-001 is P16's home screen and its exits are its launcher
@@ -372,6 +374,11 @@ screens:
     purpose: Record that a dashboard was opened — fired once when the dashboard renders; nothing on the
       screen waits for it.
     trigger: background
+  - operationId: listAiInsights
+    contract: ai
+    purpose: Insights and anomalies
+    trigger: onLoad
+    provenance: build, 29 September 2026
   entryState:
     params:
     - name: venueId
@@ -1413,6 +1420,11 @@ screens:
     purpose: Record that a dashboard was opened — fired once when the dashboard renders; nothing on the
       screen waits for it.
     trigger: background
+  - operationId: requestSuggestion
+    contract: ai
+    purpose: 'Waste-risk suggestion (kind wasteRisk): items at risk with a recommended action'
+    trigger: onAction
+    provenance: build, 29 September 2026
   entryState:
     params:
     - name: venueId
@@ -1805,6 +1817,11 @@ screens:
     purpose: Record that a dashboard was opened — fired once when the dashboard renders; nothing on the
       screen waits for it.
     trigger: background
+  - operationId: getForecast
+    contract: ai
+    purpose: Forecast values
+    trigger: onLoad
+    provenance: build, 29 September 2026
   entryState:
     params:
     - name: venueId
@@ -2099,6 +2116,11 @@ screens:
     trigger: onAction
     invalidates:
     - listAlerts
+  - operationId: getActionPlan
+    contract: ai
+    purpose: A plan with its steps
+    trigger: onAction
+    provenance: build, 29 September 2026
   entryState:
     params:
     - name: venueId
@@ -2112,6 +2134,8 @@ screens:
       from: deepLink
     - name: actionId
       from: deepLink
+    - name: planId
+      from: navigation
     coldEntry: '**A bookmarked dashboard is the normal way in** — a manager opens the same view every
       Monday. The domain and the window come from the link where it carries them, and from the last view
       where it does not. A proposed action opened from the queue or an alert.'
@@ -2973,8 +2997,11 @@ screens:
       back: true
     - to: ANL-001
       trigger: Executive Command Center
+      carries:
+      - dashboardId
+      - reportId
       provenance: derived — ANL-001 declares entryState.params dashboardId, reportId and ANL-017 holds
-        none of them, so the edge carries nothing and ANL-001 opens cold
+        dashboardId, reportId, so an edge into it carries them
   density: compact
   purposeNote: Authorized users can understand customer acquisition, engagement, retention, membership
     and loyalty performance without accessing separate CRM dashboards.
@@ -3075,6 +3102,11 @@ screens:
     purpose: Membership and loyalty
     trigger: onLoad
     provenance: board reading, 19 September 2026
+  - operationId: getDashboard
+    contract: reporting
+    purpose: Loyalty dashboard (active members, tiers, liability, breakage, retention)
+    trigger: onLoad
+    provenance: build, 29 September 2026
   entryState:
     preloaded:
     - Unique Customers
@@ -3083,6 +3115,9 @@ screens:
     - Repeat Visit %
     - Average Customer Spend
     - Customer Lifetime Value
+    params:
+    - name: dashboardId
+      from: navigation
   wireframe:
     status: notStarted
     board: wireframes/P16 Venue Analytics.dc.html#anl-017
@@ -3299,6 +3334,21 @@ screens:
     purpose: What moved unexpectedly
     trigger: onLoad
     provenance: board reading, 19 September 2026
+  - operationId: listAiInsights
+    contract: ai
+    purpose: Insights and anomalies
+    trigger: onLoad
+    provenance: build, 29 September 2026
+  - operationId: decideAiInsight
+    contract: ai
+    purpose: Review, accept, reject or mark an insight actioned
+    trigger: onAction
+    provenance: build, 29 September 2026
+  - operationId: explainMetricChange
+    contract: ai
+    purpose: Why did this metric change
+    trigger: onAction
+    provenance: build, 29 September 2026
   wireframe:
     status: notStarted
     board: wireframes/P16 Venue Analytics.dc.html#anl-019
@@ -3307,6 +3357,10 @@ screens:
     page 10. 0 of 0 labels bound to a contract property; 0 of 24 pack bullets carried onto the screen
     — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and
     the contracts rather than here.
+  entryState:
+    params:
+    - name: insightId
+      from: navigation
 - id: ANL-020
   name: Multi-Site & Performance Comparison
   module: Analytics
@@ -7169,6 +7223,16 @@ screens:
     provenance: board reading, 19 September 2026
     invalidates:
     - getApprovalRecord
+  - operationId: listDataRetentionSettings
+    contract: tenancy
+    purpose: Retention period per data class
+    trigger: onLoad
+    provenance: build, 29 September 2026
+  - operationId: setDataRetentionSetting
+    contract: tenancy
+    purpose: Set a class's period
+    trigger: onAction
+    provenance: build, 29 September 2026
   wireframe:
     status: notStarted
     board: wireframes/P16 Venue Analytics.dc.html#anl-050
@@ -7177,6 +7241,10 @@ screens:
     page 50. 0 of 0 labels bound to a contract property; 14 of 47 pack bullets carried onto the screen
     — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and
     the contracts rather than here.
+  entryState:
+    params:
+    - name: dataClass
+      from: navigation
 - id: ANL-051
   name: AI Analytics Command Center
   module: Analytics
@@ -7721,6 +7789,21 @@ screens:
     purpose: Anomalies, with severity
     trigger: onLoad
     provenance: board reading, 19 September 2026
+  - operationId: listAiInsights
+    contract: ai
+    purpose: Insights and anomalies
+    trigger: onLoad
+    provenance: build, 29 September 2026
+  - operationId: configureAnomalyDetector
+    contract: ai
+    purpose: Set up anomaly detection on a KPI
+    trigger: onAction
+    provenance: build, 29 September 2026
+  - operationId: listAnomalyDetectors
+    contract: ai
+    purpose: Anomaly detectors
+    trigger: onLoad
+    provenance: build, 29 September 2026
   entryState:
     preloaded:
     - KPI
@@ -7729,6 +7812,9 @@ screens:
     - Variance
     - Severity
     - Start Time
+    params:
+    - name: detectorKey
+      from: navigation
   wireframe:
     status: notStarted
     board: wireframes/P16 Venue Analytics.dc.html#anl-055
@@ -7821,6 +7907,11 @@ screens:
     purpose: Follow the thread
     trigger: onAction
     provenance: board reading, 19 September 2026
+  - operationId: explainMetricChange
+    contract: ai
+    purpose: Why did this metric change
+    trigger: onAction
+    provenance: build, 29 September 2026
   wireframe:
     status: notStarted
     board: wireframes/P16 Venue Analytics.dc.html#anl-056
@@ -7948,6 +8039,26 @@ screens:
     purpose: The series being forecast
     trigger: onLoad
     provenance: board reading, 19 September 2026
+  - operationId: listForecastDefinitions
+    contract: ai
+    purpose: What is forecast
+    trigger: onLoad
+    provenance: build, 29 September 2026
+  - operationId: getForecast
+    contract: ai
+    purpose: Forecast values
+    trigger: onLoad
+    provenance: build, 29 September 2026
+  - operationId: createForecastScenario
+    contract: ai
+    purpose: Run a what-if
+    trigger: onAction
+    provenance: build, 29 September 2026
+  - operationId: exportForecastVersion
+    contract: ai
+    purpose: Export the forecast version as CSV, Excel or JSON
+    trigger: onAction
+    provenance: build, 29 September 2026
   wireframe:
     status: notStarted
     board: wireframes/P16 Venue Analytics.dc.html#anl-057
@@ -7956,6 +8067,10 @@ screens:
     page 116. 0 of 0 labels bound to a contract property; 18 of 32 pack bullets carried onto the screen
     — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and
     the contracts rather than here.
+  entryState:
+    params:
+    - name: versionId
+      from: navigation
 - id: ANL-058
   name: AI Recommendation & Next-Best-Action Center
   module: Analytics
@@ -8025,6 +8140,11 @@ screens:
     purpose: What to act on
     trigger: onLoad
     provenance: board reading, 19 September 2026
+  - operationId: listAiInsights
+    contract: ai
+    purpose: Insights and anomalies
+    trigger: onLoad
+    provenance: build, 29 September 2026
   wireframe:
     status: notStarted
     board: wireframes/P16 Venue Analytics.dc.html#anl-058
@@ -8098,6 +8218,16 @@ screens:
     purpose: Past insights and their evidence
     trigger: onLoad
     provenance: board reading, 19 September 2026
+  - operationId: listAiInsights
+    contract: ai
+    purpose: Insights and anomalies
+    trigger: onLoad
+    provenance: build, 29 September 2026
+  - operationId: decideAiInsight
+    contract: ai
+    purpose: Review, accept, reject or mark an insight actioned
+    trigger: onAction
+    provenance: build, 29 September 2026
   wireframe:
     status: notStarted
     board: wireframes/P16 Venue Analytics.dc.html#anl-059
@@ -8106,6 +8236,10 @@ screens:
     page 118. 0 of 0 labels bound to a contract property; 5 of 28 pack bullets carried onto the screen
     — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and
     the contracts rather than here.
+  entryState:
+    params:
+    - name: insightId
+      from: navigation
 - id: ANL-060
   name: AI Analytics Governance & Model Control
   module: Analytics
@@ -8148,6 +8282,12 @@ screens:
     - name: contentBody
       slot: collection
       components:
+      - kind: publishGate
+        impliedBy: publishPromptTemplate
+        notes: 'Declares `publishPromptTemplate`. **The gate names what the publish will affect before
+          it happens**: which tenants, venues or capabilities take the new version, and that the previous
+          one stays available to roll back to.'
+        provenance: check-screens publish rule, 29 September 2026
       - kind: dataTable
         label: Every analytics governance model
         columns:
@@ -8208,7 +8348,47 @@ screens:
       active filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: listAiCapabilities
+    contract: ai
+    purpose: The capability registry
+    trigger: onLoad
+    provenance: build, 29 September 2026
+  - operationId: configureAiCapability
+    contract: ai
+    purpose: Register a capability, or change its owner, risk class or autonomy
+    trigger: onAction
+    provenance: build, 29 September 2026
+  - operationId: getEffectiveAiPolicy
+    contract: ai
+    purpose: The policy in force for a capability at a scope
+    trigger: onLoad
+    provenance: build, 29 September 2026
+  - operationId: listAiModels
+    contract: ai
+    purpose: The model catalogue
+    trigger: onLoad
+    provenance: build, 29 September 2026
+  - operationId: listPromptTemplates
+    contract: ai
+    purpose: The prompt registry
+    trigger: onLoad
+    provenance: build, 29 September 2026
+  - operationId: publishPromptTemplate
+    contract: ai
+    purpose: Publish a prompt template version
+    trigger: onAction
+    provenance: build, 29 September 2026
+  - operationId: runAiEvaluation
+    contract: ai
+    purpose: Evaluate a candidate
+    trigger: onAction
+    provenance: build, 29 September 2026
+  - operationId: listAiEvaluations
+    contract: ai
+    purpose: Evaluation runs
+    trigger: onLoad
+    provenance: build, 29 September 2026
   entryState:
     preloaded:
     - AI Service
@@ -8217,6 +8397,11 @@ screens:
     - Status
     - Consumption
     - Cost
+    params:
+    - name: capabilityKey
+      from: navigation
+    - name: templateKey
+      from: navigation
   wireframe:
     status: notStarted
     board: wireframes/P16 Venue Analytics.dc.html#anl-060

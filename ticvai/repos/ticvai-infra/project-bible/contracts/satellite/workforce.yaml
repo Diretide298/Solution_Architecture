@@ -2,7 +2,7 @@ openapi: 3.1.0
 info:
   title: TICVAI — Workforce
   version: 1.0.0
-  x-ticvai-screen-count: 43
+  x-ticvai-screen-count: 47
   x-ticvai-module: "18 — Employee Mobile App & AI Assistant (workforce)"
   x-ticvai-platforms:
     - P06 Venue Staff App
@@ -574,6 +574,14 @@ paths:
         to declare an emergency: **`kind` `emergency` requires `ANNOUNCEMENT_EMERGENCY`** (decided
         28 September, audit R091 (1)), and an emergency published without it is a `403`. Every
         other kind needs `ANNOUNCEMENT_PUBLISH` only.
+
+        **Delivered in the staff app and by push** (29 September, build, 18.1.5). `deliveryChannels`
+        names them: `inApp` is the announcement list and the home-screen banner; `push` goes to every
+        targeted person's staff phones, the tenancy `RegisteredDevice` rows of kind `mobileHandset` with a
+        push token (`registerDevice`), through the platform's push provider. A person with no registered
+        handset still gets it in the app. `emergency` always goes by both, whatever is sent, and bypasses
+        quiet hours; a push that fails is retried and counted on the handset (`pushFailureCount`), and
+        `AnnouncementReach` counts delivery per person, not per device.
       tags: [announcements]
       x-ticvai-permission: ANNOUNCEMENT_PUBLISH
       x-ticvai-permission-escalated: ANNOUNCEMENT_EMERGENCY
@@ -841,6 +849,8 @@ paths:
         - "P08 BO-883 Workforce Roster Command Center"
         - "P08 BO-886 Staffing Gap & Coverage Control Center"
         - "P08 BO-892 AI Workforce Planner & Roster Optimization"
+        - "P08 BO-927 AI Staffing Requirement Forecast"
+        - "P09 ADM-513 Workforce Demand & Staffing Forecast"
       summary: Where the rota is short, and by how much
       description: 'Resource board 4.4. **The gap is the product.** A rota screen showing who is on
         shows nothing a manager cannot see; a screen showing that the north gate is one short at
@@ -848,6 +858,18 @@ paths:
 
         Computed against minimum staffing and the qualifications each position requires — a position
         filled by somebody not qualified for it is still a gap.
+
+        **Against the forecast as well as the minimum** (29 September, build pass, group G2; 8.2.49).
+        `basis` `forecastRequirement` measures the rota against the staff requirement the AI forecast
+        handed over (`ai.operationalRequirementIssued`, kind `staff`, kept in `workforce.forecast_requirement`
+        per position and period), and `higherOfBoth` against whichever is larger, so a Saturday the forecast
+        says will be busy shows as short even where the fixed minimum is met. Each row then carries the
+        forecast figure, its busy-case (p90) figure and the forecast version it came from. A period with no
+        handed-over requirement falls back to the minimum and says so (`basisApplied`).
+
+        **The shortage alert goes through reporting**: an `AlertRule` on metric `staffingShortfall` (the
+        largest `gap` in the window against the forecast requirement) raises an `Alert` to the dashboard panel
+        and the roles named, like any other operational alert. Workforce computes; it does not notify.
 
         '
       tags:
@@ -877,6 +899,18 @@ paths:
         schema:
           type: string
           format: uuid
+      - name: basis
+        in: query
+        description: What `required` is measured from. `minimum` is the configured minimum staffing (the
+          behaviour before 29 September, and the default); `forecastRequirement` the handed-over forecast
+          staff requirement; `higherOfBoth` the larger of the two.
+        schema:
+          type: string
+          enum:
+          - minimum
+          - forecastRequirement
+          - higherOfBoth
+          default: minimum
       responses:
         '200':
           description: Coverage and its gaps
@@ -1936,6 +1970,214 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+  /staff-conversations:
+    get:
+      operationId: listStaffConversations
+      x-ticvai-consumed-by:
+        - "P06 EMP-037 Notifications"
+      x-ticvai-agreed: '29 September: our build plan (BL-163 asked for a decision on internal messaging; 18.9.5
+        Internal Messaging); shape follows listLabourBudgets with the Page envelope'
+      summary: The caller's staff conversations, newest activity first
+      description: '18.9.5, Internal Messaging (decided 29 September, build pass). **Announcements are one way;
+        this is the other half**: a direct or small-group conversation between staff, so a supervisor can
+        tell one attendant something without broadcasting it to the venue.
+
+
+        **Only the caller''s own conversations.** A manager does not read other people''s messages through
+        this list, whatever their permissions; a conversation is visible to its participants and no one
+        else. Each row carries the caller''s unread count.
+
+        '
+      tags:
+      - announcements
+      x-ticvai-permission: WORKFORCE_VIEW
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: true
+      x-ticvai-conflict-policy: serverWins
+      x-ticvai-read-routing: replica
+      parameters:
+      - name: unreadOnly
+        in: query
+        schema:
+          type: boolean
+          default: false
+      - $ref: ../shared/common.yaml#/components/parameters/PageSize
+      - $ref: ../shared/common.yaml#/components/parameters/PageCursor
+      responses:
+        '200':
+          description: Conversations
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: ../shared/common.yaml#/components/schemas/Page
+                - type: object
+                  properties:
+                    items:
+                      type: array
+                      items:
+                        $ref: '#/components/schemas/WorkforceStaffConversationSummary'
+  /staff-conversations/{conversationId}/messages:
+    parameters:
+    - name: conversationId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    get:
+      operationId: listStaffMessages
+      x-ticvai-consumed-by:
+        - "P06 EMP-037 Notifications"
+      x-ticvai-agreed: '29 September: our build plan (18.9.5 Internal Messaging, BL-163); shape follows
+        listLabourBudgets with the Page envelope'
+      summary: Messages in one staff conversation, newest first
+      description: 'Newest first, paged backwards with the cursor. **A caller who is not a participant gets a
+        `404`, not a `403`**: whether a conversation exists between two other people is itself not the
+        caller''s business.
+
+        '
+      tags:
+      - announcements
+      x-ticvai-permission: WORKFORCE_VIEW
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: true
+      x-ticvai-conflict-policy: serverWins
+      x-ticvai-read-routing: replica
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/PageSize
+      - $ref: ../shared/common.yaml#/components/parameters/PageCursor
+      responses:
+        '200':
+          description: Messages
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: ../shared/common.yaml#/components/schemas/Page
+                - type: object
+                  properties:
+                    items:
+                      type: array
+                      items:
+                        $ref: '#/components/schemas/WorkforceStaffMessage'
+        '404':
+          $ref: ../shared/common.yaml#/components/responses/NotFound
+  /staff-conversations/{conversationId}/read:
+    parameters:
+    - name: conversationId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    post:
+      operationId: markStaffConversationRead
+      x-ticvai-consumed-by:
+        - "P06 EMP-037 Notifications"
+      x-ticvai-agreed: '29 September: our build plan (18.9.5 Internal Messaging); shape follows
+        acknowledgeAnnouncement'
+      summary: Mark a staff conversation read up to a message
+      description: 'Moves the caller''s read marker forward to `upToMessageId` (never back), which is what the
+        unread count in `listStaffConversations` is computed from. Queued offline, like
+        `acknowledgeAnnouncement`. A caller who is not a participant gets a `404`.
+
+        '
+      tags:
+      - announcements
+      x-ticvai-permission: WORKFORCE_VIEW
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: true
+      x-ticvai-conflict-policy: append
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - upToMessageId
+              properties:
+                upToMessageId:
+                  type: string
+                  pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+      responses:
+        '204':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: Marked read
+        '404':
+          $ref: ../shared/common.yaml#/components/responses/NotFound
+  /staff-messages:
+    post:
+      operationId: sendStaffMessage
+      x-ticvai-consumed-by:
+        - "P06 EMP-037 Notifications"
+      x-ticvai-agreed: '29 September: our build plan (18.9.5 Internal Messaging; BL-163 "a decision on
+        internal messaging": decided, staff-to-staff conversations in workforce); shape follows
+        publishAnnouncement'
+      summary: Send a message to a colleague or a small group
+      description: '18.9.5 (decided 29 September, build pass). **Either into an existing conversation or to
+        named colleagues.** With `conversationId` the message joins that conversation; with
+        `recipientPrincipalIds` and no `conversationId` it reuses the caller''s direct conversation with a
+        single recipient, or starts a group conversation with several. One of the two is required (`422`).
+
+
+        **Recipients are staff of the caller''s venue** (a principal with an employment at it); anyone else is
+        a `422` naming them. A group is capped at 50 participants: past that it is an announcement, and
+        `publishAnnouncement` is the tool, with its targeting and acknowledgement.
+
+
+        **Queued offline and delivered once.** The client generates `id` (a ULID); a replay of the same `id`
+        returns the stored message rather than sending twice. New messages push to the recipients'' staff
+        devices. Messages are workforce records under the tenant''s retention policy (ADR-0047); nothing here
+        is guest data.
+
+        '
+      tags:
+      - announcements
+      x-ticvai-permission: WORKFORCE_VIEW
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: true
+      x-ticvai-conflict-policy: append
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/WorkforceSendStaffMessageRequest'
+      responses:
+        '201':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: Sent
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WorkforceStaffMessage'
+        '404':
+          $ref: ../shared/common.yaml#/components/responses/NotFound
+        '422':
+          description: Neither conversationId nor recipientPrincipalIds, a recipient who is not staff of the
+            caller's venue, or a group over 50 participants
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
 
 components:
   securitySchemes:
@@ -1944,6 +2186,190 @@ components:
       scheme: bearer
       bearerFormat: JWT
   schemas:
+    WorkforceStaffConversation:
+      type: object
+      x-ticvai-persistence: workforce.staff_conversation
+      description: '**One direct or group conversation between staff of a venue** (18.9.5 Internal Messaging;
+        decided 29 September, build pass). Created by `sendStaffMessage` the first time colleagues are
+        messaged; its participants are `workforce.staff_conversation_participant` rows. Announcements stay the
+        one-to-many channel; this is the one-to-one and small-group one.'
+      required:
+      - id
+      - venueId
+      - kind
+      - createdByPrincipalId
+      - createdAt
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        venueId:
+          type: string
+          format: uuid
+        scopePath:
+          type: string
+        kind:
+          type: string
+          enum:
+          - direct
+          - group
+          description: A direct conversation has exactly two participants and at most one exists per pair.
+        title:
+          type: string
+          maxLength: 120
+          nullable: true
+          description: Group conversations only; null on a direct one.
+        createdByPrincipalId:
+          type: string
+          format: uuid
+        createdAt:
+          type: string
+          format: date-time
+          readOnly: true
+        lastMessageAt:
+          type: string
+          format: date-time
+          nullable: true
+          readOnly: true
+    WorkforceStaffConversationParticipant:
+      type: object
+      x-ticvai-persistence: workforce.staff_conversation_participant
+      description: One staff member in one conversation, with their read marker (decided 29 September, build
+        pass). The unread count is the messages after `lastReadMessageId`.
+      required:
+      - staffConversationId
+      - principalId
+      - joinedAt
+      properties:
+        staffConversationId:
+          type: string
+          format: uuid
+        principalId:
+          type: string
+          format: uuid
+        joinedAt:
+          type: string
+          format: date-time
+        lastReadMessageId:
+          type: string
+          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+          nullable: true
+          description: Moved forward only, by `markStaffConversationRead`.
+        mutedUntil:
+          type: string
+          format: date-time
+          nullable: true
+    WorkforceStaffMessage:
+      type: object
+      x-ticvai-persistence: workforce.staff_message
+      description: One message in a staff conversation (decided 29 September, build pass). Never edited
+        through the API, so a conversation reads the same to everyone in it afterwards.
+      required:
+      - id
+      - staffConversationId
+      - senderPrincipalId
+      - body
+      - sentAt
+      properties:
+        id:
+          type: string
+          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+          description: The client-generated ULID from the send, the key an offline replay deduplicates on.
+        staffConversationId:
+          type: string
+          format: uuid
+        senderPrincipalId:
+          type: string
+          format: uuid
+        body:
+          type: string
+          maxLength: 2000
+        attachmentAssetId:
+          type: string
+          format: uuid
+          nullable: true
+          description: A photo or file, held as a media asset.
+        sentAt:
+          type: string
+          format: date-time
+          description: When the sender sent it, which for a message queued offline is before it arrived.
+        receivedAt:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+    WorkforceStaffConversationSummary:
+      type: object
+      x-ticvai-persistence: none — projection over workforce.staff_conversation, its participants and its latest
+        message, for the caller
+      description: One row of `listStaffConversations`, as the caller sees it.
+      required:
+      - conversation
+      - unreadCount
+      properties:
+        conversation:
+          $ref: '#/components/schemas/WorkforceStaffConversation'
+        participants:
+          type: array
+          items:
+            type: object
+            properties:
+              principalId:
+                type: string
+                format: uuid
+              displayName:
+                type: string
+              onShift:
+                type: boolean
+        lastMessage:
+          allOf:
+          - $ref: '#/components/schemas/WorkforceStaffMessage'
+          nullable: true
+        unreadCount:
+          type: integer
+          minimum: 0
+    WorkforceSendStaffMessageRequest:
+      type: object
+      x-ticvai-persistence: none — request only
+      required:
+      - id
+      - body
+      - sentAt
+      properties:
+        id:
+          type: string
+          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+          description: Client-generated ULID; a replay of the same id returns the stored message.
+        conversationId:
+          type: string
+          format: uuid
+          nullable: true
+          description: An existing conversation the caller is in. Absent means `recipientPrincipalIds`.
+        recipientPrincipalIds:
+          type: array
+          maxItems: 49
+          items:
+            type: string
+            format: uuid
+          description: Colleagues to message when there is no `conversationId`. One reuses the direct
+            conversation; several start a group.
+        title:
+          type: string
+          maxLength: 120
+          nullable: true
+          description: A new group's title; ignored otherwise.
+        body:
+          type: string
+          minLength: 1
+          maxLength: 2000
+        attachmentAssetId:
+          type: string
+          format: uuid
+          nullable: true
+        sentAt:
+          type: string
+          format: date-time
 
     WorkforceEmployeeProfile:
       type: object
@@ -2753,6 +3179,99 @@ components:
           items:
             type: string
             format: uuid
+        basisApplied:
+          type: string
+          enum:
+          - minimum
+          - forecastRequirement
+          description: Which figure `required` is for this row. With `higherOfBoth`, the larger; with
+            `forecastRequirement` and no handed-over requirement for the period, `minimum`.
+        minimumRequired:
+          type: integer
+          nullable: true
+          description: The configured minimum for the position and window.
+        forecastRequired:
+          type: number
+          nullable: true
+          description: The forecast staff requirement (p50) for the position and window, from
+            `workforce.forecast_requirement`. Null where none was handed over.
+        forecastRequiredP90:
+          type: number
+          nullable: true
+          description: The busy-case requirement, for planning to the busy case.
+        forecastVersionId:
+          type: string
+          format: uuid
+          nullable: true
+          description: The AI forecast version the requirement is bound to (AIP-067), so a manager can open the
+            forecast behind it.
+    WorkforceForecastRequirement:
+      type: object
+      x-ticvai-persistence: workforce.forecast_requirement
+      description: '**The staff requirement a forecast handed over** (29 September, build pass, group G2; 8.2.49).
+        Written by workforce''s consumer of `ai.operationalRequirementIssued` (kind `staff`, target `workforce`), one
+        row per requirement, never through the API: workforce keeps its own copy so `getStaffingCoverage` compares the
+        rota with it without reading the AI service. **A recommendation, never a rota change** (AI design 1.3
+        constraint 1): the manager still rosters people; this only moves what counts as short. A later requirement for
+        the same position and period supersedes the earlier one (`supersededAt`).'
+      required:
+      - requirementId
+      - versionId
+      - periodStart
+      - periodEnd
+      - quantity
+      - scopePath
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        requirementId:
+          type: string
+          format: uuid
+          description: '`AiOperationalRequirement.id` from the event; the idempotency key of the consumer. Not a foreign
+            key: the requirement lives in the AI service.'
+        versionId:
+          type: string
+          format: uuid
+          description: The forecast version it is bound to.
+        venueId:
+          type: string
+          format: uuid
+          nullable: true
+        positionCode:
+          type: string
+          nullable: true
+          description: The event's `subjectRef` (a role or position); matched to `StaffingRules` positions. Null is the
+            venue total.
+        periodStart:
+          type: string
+          format: date-time
+        periodEnd:
+          type: string
+          format: date-time
+        quantity:
+          type: number
+          description: Staff required at the forecast's median.
+        quantityP90:
+          type: number
+          nullable: true
+        unit:
+          type: string
+          nullable: true
+        receivedAt:
+          type: string
+          format: date-time
+          readOnly: true
+        supersededAt:
+          type: string
+          format: date-time
+          nullable: true
+          readOnly: true
+        scopePath:
+          type: string
+          readOnly: true
+          description: '**The partition key** (ADR-0005), the requirement''s scope.'
     LeaveRequest:
       type: object
       x-ticvai-persistence: workforce.leave_request
@@ -3220,6 +3739,14 @@ components:
           type: array
           items: { type: string, format: uuid }
         requiresAcknowledgement: { type: boolean }
+        deliveryChannels:
+          type: array
+          description: >
+            How it reaches people (29 September, build, 18.1.5). `inApp` always; `push` to the targeted
+            people's registered staff phones (tenancy `RegisteredDevice`, kind `mobileHandset`).
+            `emergency` is sent by both whatever is set here.
+          items: { type: string, enum: [inApp, push] }
+          default: [inApp, push]
         expiresAt: { type: string, format: date-time, nullable: true }
         publishedByPrincipalId: { type: string, format: uuid, readOnly: true }
         publishedAt: { type: string, format: date-time }

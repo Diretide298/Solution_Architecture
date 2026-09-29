@@ -18,6 +18,7 @@ terminal:
 transitions:
 - from: received
   to: underReview
+  operation: assignChargeback
   trigger: operation
   guard: Being worked. **The money is already gone** — this is an argument, not a reversal
 - from: underReview
@@ -31,25 +32,44 @@ transitions:
   trigger: operation
   guard: '**Conceded deliberately.** A 40 AED case with a 30 AED fee is one to give up on purpose rather
     than by forgetting'
+  emits:
+  - order.chargebackRecorded
 - from: evidenceSubmitted
   to: won
-  trigger: timer
-  guard: The scheme found for the venue
+  operation: recordChargebackOutcome
+  trigger: operation
+  guard: The scheme found for the venue; `chargebackReversal` posts
+  emits:
+  - order.chargebackRecorded
 - from: evidenceSubmitted
   to: lost
-  trigger: timer
+  operation: recordChargebackOutcome
+  trigger: operation
   guard: The scheme found for the cardholder
+  emits:
+  - order.chargebackRecorded
 - from: received
   to: expired
   trigger: timer
   guard: '**`evidenceDueBy` passed with nothing filed.** A case lost on merit nobody read'
+  emits:
+  - order.chargebackRecorded
 - from: underReview
   to: expired
   trigger: timer
   guard: Same, and worse — somebody had it open
+  emits:
+  - order.chargebackRecorded
 notes: '**`expired` is the state this whole model exists to prevent.** A deadline missed is a case lost
   regardless of merit, which is why `listChargebacks` sorts by `evidenceDueBy` rather than by date received.
 
 
   **`accepted` is a legitimate outcome and is separated from `lost`** — one is a decision and the other
-  is an outcome, and a venue conceding small cases on purpose should not look like a venue losing them.'
+  is an outcome, and a venue conceding small cases on purpose should not look like a venue losing them.
+
+
+  **Every move into a decided state emits `order.chargebackRecorded` with stage `decided`** (29 September, build
+  pass, group G2): it is the label the risk engine learns from. The `received` stage is published by
+  `recordChargeback` itself, because a case is created in `received` rather than moved into it. The provider''s
+  answer is `recordChargebackOutcome` (credited here since it was contracted, 5.7.92) and the investigator''s
+  first assignment is `assignChargeback`.'

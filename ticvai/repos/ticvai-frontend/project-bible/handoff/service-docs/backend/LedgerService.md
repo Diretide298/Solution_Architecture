@@ -7,7 +7,7 @@
 | Tier | commerce: The sale path. Highest availability, highest write rate. |
 | Contracts | `finance` |
 | Schemas owned | `ledger` |
-| Operations in the slice | 7 of 57 |
+| Operations in the slice | 18 of 71 |
 | Scale | Write-heavy, batch-tolerant, not latency-critical. Recognition and revaluation are jobs. |
 | If it is down | Correctness over availability. A ledger that is briefly unavailable is recoverable; one that is briefly wrong is not. |
 
@@ -19,6 +19,7 @@
 
 | Service | Tables it reads |
 |---|---|
+| [OrderService](OrderService.md) | `orders.order_line`, `orders.payment`, `orders.refund`, `orders.sales_order` |
 | [TenancyService](TenancyService.md) | `platform.region_settings` |
 
 ## Operations in the first release
@@ -29,9 +30,20 @@
 | accounts | [`updateAccount`](#updateaccount) | PATCH | `/accounts/{accountId}` | setup | 2 | BO-074 |
 | finance | [`ingestFxRates`](#ingestfxrates) | POST | `/fx-rates/ingest` | setup | 1 | BO-077 |
 | finance | [`setFxProvider`](#setfxprovider) | PUT | `/fx-rates/providers` | setup | 1 |  |
+| fiscal | [`createLegalEntity`](#createlegalentity) | POST | `/legal-entities` | setup | 1 | ADM-411, BO-074, SGN-020 |
 | ledger | [`listFxRates`](#listfxrates) | GET | `/fx-rates` | core | 1 | BO-077, GST-044, WEB-035 |
 | ledger | [`setFxRate`](#setfxrate) | PUT | `/fx-rates` | setup | 1 | BO-077 |
 | reporting | [`getFinancialReport`](#getfinancialreport) | GET | `/reports/financial` | core | 2 | BO-029, BO-058, BO-059, BO-060, POS-008, PTR-018 … |
+| tax | [`createTaxCode`](#createtaxcode) | POST | `/tax-codes` | setup | 1 | BO-075 |
+| tax | [`getTaxDocumentRendition`](#gettaxdocumentrendition) | GET | `/tax-documents/{documentId}/rendition` | core | 1 | BO-022, BO-023, GST-019, POS-026, WEB-019 |
+| tax | [`getTaxInvoice`](#gettaxinvoice) | GET | `/tax-invoices/{invoiceId}` | core | 1 | BO-022, GST-019, POS-026, WEB-019 |
+| tax | [`issueCreditMemo`](#issuecreditmemo) | POST | `/tax-invoices/{invoiceId}/credit-memos` | core | 1 | BO-022, BO-023, POS-011 |
+| tax | [`issueTaxInvoice`](#issuetaxinvoice) | POST | `/tax-invoices` | core | 1 | BO-022, GST-019, POS-026, WEB-019 |
+| tax | [`listCreditMemos`](#listcreditmemos) | GET | `/credit-memos` | core | 1 | BO-023, BO-1081, GST-019, WEB-019 |
+| tax | [`listTaxInvoices`](#listtaxinvoices) | GET | `/tax-invoices` | core | 1 | ADM-068, BO-022, BO-1081, GST-019, WEB-019 |
+| tax | [`setEInvoicingProvider`](#seteinvoicingprovider) | PUT | `/e-invoicing/providers` | setup | 1 | ADM-069 |
+| tax | [`transmitEInvoices`](#transmiteinvoices) | POST | `/e-invoicing/transmissions` | setup | 1 | ADM-077 |
+| tax | [`updateTaxCode`](#updatetaxcode) | PATCH | `/tax-codes/{taxCodeId}` | setup | 1 | BO-075 |
 
 ## Group: accounts
 
@@ -295,6 +307,69 @@ The code is immutable once entries exist; until then it can be corrected here. R
 | 200 |  | The assignments now in force, one per purpose that has one. |
 
 
+## Group: fiscal
+
+### createLegalEntity
+
+**`POST /legal-entities`**: Create a legal entity
+
+|  |  |
+|---|---|
+| Permission | `ACCOUNT_CONFIGURE` |
+| Scope level | tenant |
+| Part of slice | setup, makes `ledger.legal_entity` non-empty |
+| Wave | 1 |
+| Offline | no |
+| Conflict policy | serverWins |
+| Reads | `cache:idempotency`, `ledger.legal_entity` |
+| Writes | `cache:idempotency`, `ledger.legal_entity` |
+| Called by | ADM-411, BO-074, SGN-020 |
+
+**Parameters**
+
+| Name | In | Required | Type | Notes |
+|---|---|---|---|---|
+| Idempotency-Key | header | yes | string | Client-generated ULID. |
+
+**Request body**: `LegalEntity`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| id | string (uuid) | yes | (read-only) |
+| code | string | yes | (max length 64) |
+| name | string | yes | (max length 200) |
+| countryCode | string | yes | (pattern ^[A-Z]{2}$) |
+| currency | string | yes | (pattern ^[A-Z]{3}$) |
+| currencyScale | integer | yes | (min 0; max 4) |
+| taxRegistrationNumber | string |  | (nullable) |
+| fiscalYearStartMonth | integer | yes | (min 1; max 12) |
+| regionIds | array of string (uuid) |  |  |
+| isActive | boolean |  |  |
+| scopePath | string |  | The partition key (ADR-0005). (read-only) |
+
+**Response**: `LegalEntity`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| id | string (uuid) | yes | (read-only) |
+| code | string | yes | (max length 64) |
+| name | string | yes | (max length 200) |
+| countryCode | string | yes | (pattern ^[A-Z]{2}$) |
+| currency | string | yes | (pattern ^[A-Z]{3}$) |
+| currencyScale | integer | yes | (min 0; max 4) |
+| taxRegistrationNumber | string |  | (nullable) |
+| fiscalYearStartMonth | integer | yes | (min 1; max 12) |
+| regionIds | array of string (uuid) |  |  |
+| isActive | boolean |  |  |
+| scopePath | string |  | The partition key (ADR-0005). (read-only) |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 201 |  | Created |
+
+
 ## Group: ledger
 
 ### listFxRates
@@ -489,6 +564,910 @@ Six reports, named by `report`: profit and loss, balance sheet, cash flow, reven
 | 200 |  | Report |
 | 403 | Forbidden | Authenticated but not permitted at the requested scope |
 
+
+## Group: tax
+
+### createTaxCode
+
+**`POST /tax-codes`**: Create a tax code
+
+Supports compound tax — a code may apply on top of another code's result rather than on the net amount. Order matters, and `compoundOnTaxCodeId` makes it explicit rather than implied by sequence.
+
+|  |  |
+|---|---|
+| Permission | `TAX_CONFIGURE` |
+| Scope level | region |
+| Part of slice | setup, makes `ledger.tax_code` non-empty |
+| Wave | 1 |
+| Offline | no |
+| Conflict policy | serverWins |
+| Reads | `cache:idempotency`, `ledger.tax_code` |
+| Writes | `cache:idempotency`, `ledger.tax_code` |
+| Called by | BO-075 |
+
+**Parameters**
+
+| Name | In | Required | Type | Notes |
+|---|---|---|---|---|
+| Idempotency-Key | header | yes | string | Client-generated ULID. |
+
+**Request body**: `CreateTaxCodeRequest`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| code | string | yes | (max length 64) |
+| name | string | yes | (max length 200) |
+| countryCode | string | yes | (pattern ^[A-Z]{2}$) |
+| rate | number | yes | (min 0; max 100) |
+| compoundOnTaxCodeId | string (uuid) |  |  |
+| isInclusive | boolean |  | (default False) |
+| accountId | string (uuid) | yes |  |
+| effectiveFrom | string (date) | yes | A day in the region's time zone, local midnight to local midnight. |
+
+**Response**: `TaxCode`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| id | string (uuid) | yes |  |
+| code | string | yes | (max length 64) |
+| name | string | yes | (max length 200) |
+| countryCode | string | yes | (pattern ^[A-Z]{2}$) |
+| appliesTo | array of enum (goods, services, admission, food, accommodation, donation, gratuity, fee) |  | What this code covers, and donation is why the field exists (CF-84). |
+| rate | number | yes | (min 0; max 100) |
+| compoundOnTaxCodeId | string (uuid) |  | When set, this tax applies to the base plus the referenced tax, not to the base alone. (nullable) |
+| isInclusive | boolean |  | True when the displayed price already contains this tax. |
+| accountId | string (uuid) |  |  |
+| effectiveFrom | string (date) | yes | A day in the region's time zone, local midnight to local midnight. |
+| effectiveTo | string (date) |  | A day in the region's time zone, local midnight to local midnight. (nullable) |
+| isActive | boolean | yes |  |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 201 |  | Created |
+| 400 |  | Compound reference is circular or crosses countries |
+
+### getTaxDocumentRendition
+
+**`GET /tax-documents/{documentId}/rendition`**: The PDF of a tax invoice or credit memo, in a language
+
+5.7.93, 5.7.94. **A short-lived link to the PDF rendered at issue**, never a re-render: the document a guest downloads next year is the one issued today. `language` picks one of the template's languages (bilingual templates render both on one page and ignore it). A guest may read only their own documents.
+
+|  |  |
+|---|---|
+| Permission | `LEDGER_VIEW` |
+| Scope level | region |
+| Part of slice | core |
+| Wave | 1 |
+| Offline | no |
+| Conflict policy | serverWins |
+| Read routing | replica |
+| Reads | `ledger.credit_memo`, `ledger.tax_invoice` |
+| Writes | - |
+| Called by | BO-022, BO-023, GST-019, POS-026, WEB-019 |
+
+**Parameters**
+
+| Name | In | Required | Type | Notes |
+|---|---|---|---|---|
+| documentId | path | yes | string (uuid) | A tax invoice id or a credit memo id. |
+| language | query |  | string |  |
+
+**Response**: `FinTaxDocumentRendition`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| documentId | string (uuid) | yes |  |
+| documentKind | enum (taxInvoice, creditMemo) | yes |  |
+| documentNumber | string |  |  |
+| language | string |  | (nullable) |
+| contentType | string |  | (default application/pdf) |
+| url | string (uri) | yes |  |
+| expiresAt | string (date-time) | yes |  |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 200 |  | Link to the PDF |
+| 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
+
+### getTaxInvoice
+
+**`GET /tax-invoices/{invoiceId}`**: One tax invoice, with its lines, VAT per rate and credit memos
+
+5.7.93. The invoice as issued, its lines, the VAT summary per rate, what has been credited against it and its e-invoicing status. A guest may read only invoices issued to them.
+
+|  |  |
+|---|---|
+| Permission | `LEDGER_VIEW` |
+| Scope level | region |
+| Part of slice | core |
+| Wave | 1 |
+| Offline | no |
+| Conflict policy | serverWins |
+| Read routing | replica |
+| Reads | `ledger.credit_memo`, `ledger.einvoice_transmission`, `ledger.tax_invoice`, `ledger.tax_invoice_line` |
+| Writes | - |
+| Called by | BO-022, GST-019, POS-026, WEB-019 |
+
+**Parameters**
+
+| Name | In | Required | Type | Notes |
+|---|---|---|---|---|
+| invoiceId | path | yes | string (uuid) |  |
+
+**Response**: `FinTaxInvoice`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| id | string (uuid) | yes | (read-only) |
+| invoiceNumber | string | yes | Server-assigned from the legal entity's series for the document kind, in sequence and without gaps, e.g. (read-only) |
+| invoiceType | FinTaxInvoiceType: enum (simplified, full, consolidated) | yes | 5.7.93. |
+| status | FinTaxInvoiceStatus: enum (issued, partiallyCredited, fullyCredited, superseded) | yes | issued until a credit memo is issued against it; superseded where a full invoice replaced a simplified one for the same supply (only if the law allows it; see issueTaxInvoice). |
+| legalEntityId | string (uuid) | yes |  |
+| templateId | string (uuid) |  | (nullable) |
+| venueId | string (uuid) |  | (nullable) |
+| orderIds | array of string |  |  |
+| supplierName | string |  |  |
+| supplierAddress | string |  | (nullable) |
+| supplierTaxRegistrationNumber | string |  | (nullable) |
+| buyerSubjectId | string (uuid) |  | The guest the orders belong to; the key a guest's own reads filter on. (nullable) |
+| buyerName | string |  | (nullable) |
+| buyerAddress | string |  | (nullable) |
+| buyerCountryCode | string |  | (pattern ^[A-Z]{2}$; nullable) |
+| buyerTaxRegistrationNumber | string |  | (nullable) |
+| customerAccountId | string (uuid) |  | (nullable) |
+| issuedAt | string (date-time) | yes |  |
+| supplyDate | string (date) | yes | The date of supply where it differs from the issue date (the latest order's payment date on a consolidated invoice). |
+| currency | string | yes | (pattern ^[A-Z]{3}$) |
+| netAmount | Money | yes | On the wire this is three fields; in the database it is one column. |
+| netAmount.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
+| netAmount.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
+| netAmount.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| discountAmount | Money |  | On the wire this is three fields; in the database it is one column. |
+| discountAmount.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
+| discountAmount.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
+| discountAmount.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| taxAmount | Money | yes | On the wire this is three fields; in the database it is one column. |
+| taxAmount.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
+| taxAmount.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
+| taxAmount.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| grossAmount | Money | yes | On the wire this is three fields; in the database it is one column. |
+| grossAmount.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
+| grossAmount.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
+| grossAmount.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| taxAmountInLegalCurrency | Money |  | On the wire this is three fields; in the database it is one column. |
+| taxAmountInLegalCurrency.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
+| taxAmountInLegalCurrency.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
+| taxAmountInLegalCurrency.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| creditedAmount | Money |  | On the wire this is three fields; in the database it is one column. |
+| creditedAmount.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
+| creditedAmount.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
+| creditedAmount.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| languages | array of string |  |  |
+| supersedesInvoiceId | string (uuid) |  | (nullable) |
+| renditionAssetId | string (uuid) |  | The PDF rendered at issue; read through getTaxDocumentRendition. (read-only; nullable) |
+| eInvoiceStatus | FinEInvoiceTransmissionStatus: enum (notRequired, queued, sent, accepted, rejected, failed) |  | 6.1.1. |
+| issuedByPrincipalId | string (uuid) |  | Null where the platform issued it. (read-only; nullable) |
+| lines | array of FinTaxInvoiceLine | yes |  |
+| lines[].lineNumber | integer | yes | (min 1) |
+| lines[].orderId | string |  | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
+| lines[].orderLineId | string |  | (nullable) |
+| lines[].description | string | yes | (max length 500) |
+| lines[].quantity | number | yes |  |
+| lines[].unitPrice | Money |  | On the wire this is three fields; in the database it is one column. |
+| lines[].unitPrice.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
+| lines[].unitPrice.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
+| lines[].unitPrice.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| lines[].discountAmount | Money |  | On the wire this is three fields; in the database it is one column. |
+| lines[].discountAmount.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
+| lines[].discountAmount.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
+| lines[].discountAmount.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| lines[].netAmount | Money | yes | On the wire this is three fields; in the database it is one column. |
+| lines[].netAmount.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
+| lines[].netAmount.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
+| lines[].netAmount.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| lines[].taxCodeId | string (uuid) |  | (nullable) |
+| lines[].taxRate | number |  | (min 0; max 100) |
+| lines[].taxCategory | FinTaxCategory: enum (standardRated, zeroRated, exempt, outOfScope, reverseCharge) | yes | How a line is treated for VAT. |
+| lines[].taxAmount | Money | yes | On the wire this is three fields; in the database it is one column. |
+| lines[].taxAmount.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
+| lines[].taxAmount.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
+| lines[].taxAmount.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| lines[].grossAmount | Money | yes | On the wire this is three fields; in the database it is one column. |
+| lines[].grossAmount.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
+| lines[].grossAmount.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
+| lines[].grossAmount.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| lines[].creditedAmount | Money |  | On the wire this is three fields; in the database it is one column. |
+| lines[].creditedAmount.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
+| lines[].creditedAmount.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
+| lines[].creditedAmount.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| taxSummary | array of object |  | VAT per rate and category, summed from the lines for the response. |
+| taxSummary[].taxCategory | FinTaxCategory: enum (standardRated, zeroRated, exempt, outOfScope, reverseCharge) |  | How a line is treated for VAT. |
+| taxSummary[].taxRate | number |  |  |
+| taxSummary[].taxableAmount | Money |  | On the wire this is three fields; in the database it is one column. |
+| taxSummary[].taxableAmount.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
+| taxSummary[].taxableAmount.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
+| taxSummary[].taxableAmount.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| taxSummary[].taxAmount | Money |  | On the wire this is three fields; in the database it is one column. |
+| taxSummary[].taxAmount.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
+| taxSummary[].taxAmount.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
+| taxSummary[].taxAmount.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| scopePath | string |  | The partition key (ADR-0005). (read-only) |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 200 |  | Invoice |
+| 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
+
+### issueCreditMemo
+
+**`POST /tax-invoices/{invoiceId}/credit-memos`**: Credit all or part of a tax invoice
+
+5.7.94. **The document a refund or a cancellation owes the guest when a tax invoice was issued.** `full` credits every remaining line; `partial` credits the lines and amounts given. It is linked to the invoice it credits and, where one caused it, to the refund (`refundId`) or the cancelled order. The platform issues one itself (`service`) when a refund is approved on an invoiced order; staff issue one for a price adjustment or a billing error.
+A credit memo has its **own series** per legal entity (`setTaxInvoiceTemplate`, document kind `creditMemo`), numbered at issue without gaps, and is never edited or deleted. The VAT credited is the invoice's own rate per line, never today's. Issuing one moves the invoice to `partiallyCredited` or `fullyCredited`; the ledger movement is the refund's or the reversal's, not this document's. Who issued it, when and why is kept on the memo and in the audit record.
+
+|  |  |
+|---|---|
+| Permission | `LEDGER_POST` |
+| Scope level | venue |
+| Part of slice | core |
+| Wave | 1 |
+| Offline | no |
+| Conflict policy | serverWins |
+| Reads | `cache:idempotency`, `ledger.credit_memo`, `ledger.credit_memo_line`, `ledger.tax_invoice`, `ledger.tax_invoice_line`, `ledger.tax_invoice_template`, `orders.refund` |
+| Writes | `cache:idempotency`, `control.invoice_line`, `ledger.credit_memo`, `ledger.credit_memo_line`, `ledger.tax_invoice`, `ledger.tax_invoice_line`, `ledger.tax_invoice_template`, `platform.audit_record`, `platform.outbox` |
+| Called by | BO-022, BO-023, POS-011 |
+
+**Parameters**
+
+| Name | In | Required | Type | Notes |
+|---|---|---|---|---|
+| invoiceId | path | yes | string (uuid) |  |
+| Idempotency-Key | header | yes | string | Client-generated ULID. |
+
+**Request body**: `FinIssueCreditMemoRequest`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| kind | enum (full, partial) | yes |  |
+| reason | enum (refund, cancellation, priceAdjustment, returnOfGoods, billingError, other) | yes |  |
+| refundId | string |  | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$; nullable) |
+| cancelledOrderId | string |  | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$; nullable) |
+| lines | array of object |  | Required for partial. |
+| lines[].lineNumber | integer | yes | (min 1) |
+| lines[].quantity | number |  | (nullable) |
+| lines[].netAmount | Money |  | On the wire this is three fields; in the database it is one column. |
+| lines[].netAmount.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
+| lines[].netAmount.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
+| lines[].netAmount.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| note | string |  | (max length 500; nullable) |
+
+**Response**: `FinCreditMemo`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| id | string (uuid) | yes | (read-only) |
+| creditMemoNumber | string | yes | Server-assigned from the legal entity's credit memo series, in sequence without gaps. (read-only) |
+| taxInvoiceId | string (uuid) | yes |  |
+| taxInvoiceNumber | string |  | (read-only) |
+| kind | enum (full, partial) | yes |  |
+| reason | enum (refund, cancellation, priceAdjustment, returnOfGoods, billingError, other) | yes |  |
+| refundId | string |  | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$; nullable) |
+| cancelledOrderId | string |  | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$; nullable) |
+| legalEntityId | string (uuid) | yes |  |
+| buyerSubjectId | string (uuid) |  | (nullable) |
+| issuedAt | string (date-time) | yes |  |
+| currency | string | yes | (pattern ^[A-Z]{3}$) |
+| netAmount | Money | yes | On the wire this is three fields; in the database it is one column. |
+| netAmount.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
+| netAmount.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
+| netAmount.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| taxAmount | Money | yes | On the wire this is three fields; in the database it is one column. |
+| taxAmount.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
+| taxAmount.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
+| taxAmount.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| grossAmount | Money | yes | On the wire this is three fields; in the database it is one column. |
+| grossAmount.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
+| grossAmount.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
+| grossAmount.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| taxAmountInLegalCurrency | Money |  | On the wire this is three fields; in the database it is one column. |
+| taxAmountInLegalCurrency.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
+| taxAmountInLegalCurrency.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
+| taxAmountInLegalCurrency.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| note | string |  | (nullable) |
+| renditionAssetId | string (uuid) |  | (read-only; nullable) |
+| eInvoiceStatus | FinEInvoiceTransmissionStatus: enum (notRequired, queued, sent, accepted, rejected, failed) |  | 6.1.1. |
+| issuedByPrincipalId | string (uuid) |  | (read-only; nullable) |
+| lines | array of FinCreditMemoLine | yes |  |
+| lines[].invoiceLineNumber | integer | yes | (min 1) |
+| lines[].description | string |  | (max length 500) |
+| lines[].quantity | number |  | (nullable) |
+| lines[].netAmount | Money | yes | On the wire this is three fields; in the database it is one column. |
+| lines[].netAmount.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
+| lines[].netAmount.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
+| lines[].netAmount.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| lines[].taxRate | number |  |  |
+| lines[].taxCategory | FinTaxCategory: enum (standardRated, zeroRated, exempt, outOfScope, reverseCharge) |  | How a line is treated for VAT. |
+| lines[].taxAmount | Money | yes | On the wire this is three fields; in the database it is one column. |
+| lines[].taxAmount.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
+| lines[].taxAmount.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
+| lines[].taxAmount.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| lines[].grossAmount | Money | yes | On the wire this is three fields; in the database it is one column. |
+| lines[].grossAmount.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
+| lines[].grossAmount.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
+| lines[].grossAmount.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| scopePath | string |  | (read-only) |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 201 |  | Issued, numbered and rendered |
+| 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
+| 409 |  | The invoice is already fullyCredited or superseded. |
+| 422 |  | A partial memo with no lines, a line not on the invoice, or an amount above what remains uncredited on that line. |
+
+### issueTaxInvoice
+
+**`POST /tax-invoices`**: Issue a tax invoice for one or more paid orders
+
+5.7.93, 5.10.3. **The document a guest or a company can reclaim or file VAT against**, which a billing statement (`isTaxInvoice` false) and a receipt are not. Three kinds:
+- `simplified`: one order, no recipient details required. Issued by the platform (`service`) when
+  an order is paid and the venue's template says so; this is the receipt that carries VAT.
+- `full`: one order, with the recipient's name, address and, where registered, their TRN. Asked for
+  by the guest (their own order), at a till or from the back office.
+- `consolidated`: several paid orders of one buyer, one legal entity and one currency on one
+  invoice, for a corporate account or a group booking. Each order may be on one consolidated
+  invoice only.
+
+The server takes the lines, rates and tax from the orders as they were posted (`calculateTax` at sale); **nothing on an invoice is re-priced**. The number is assigned from the legal entity's series for the document kind (`setTaxInvoiceTemplate`), in sequence and without gaps, when the invoice is issued; it is never reused. The supplier block is a snapshot of the legal entity at issue. The PDF, in the template's languages, is produced at issue (`getTaxDocumentRendition`).
+An invoice is never edited or deleted: a correction is a credit memo (`issueCreditMemo`) and, where needed, a new invoice. A guest may call this for their own paid orders only.
+
+|  |  |
+|---|---|
+| Permission | `LEDGER_POST` |
+| Scope level | venue |
+| Part of slice | core |
+| Wave | 1 |
+| Offline | no |
+| Conflict policy | serverWins |
+| Reads | `cache:idempotency`, `ledger.legal_entity`, `ledger.tax_code`, `ledger.tax_invoice`, `ledger.tax_invoice_line`, `ledger.tax_invoice_template`, `orders.order_line`, `orders.payment`, `orders.sales_order` |
+| Writes | `cache:idempotency`, `ledger.tax_invoice`, `ledger.tax_invoice_line`, `ledger.tax_invoice_template`, `platform.audit_record`, `platform.outbox` |
+| Called by | BO-022, GST-019, POS-026, WEB-019 |
+
+**Parameters**
+
+| Name | In | Required | Type | Notes |
+|---|---|---|---|---|
+| Idempotency-Key | header | yes | string | Client-generated ULID. |
+
+**Request body**: `FinIssueTaxInvoiceRequest`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| invoiceType | FinTaxInvoiceType: enum (simplified, full, consolidated) | yes | 5.7.93. |
+| orderIds | array of string | yes | One order for simplified and full; one or more for consolidated. (min items 1) |
+| recipient | FinTaxInvoiceRecipient |  | Who the invoice is addressed to. |
+| recipient.name | string | yes | (max length 300) |
+| recipient.address | string |  | (max length 1000; nullable) |
+| recipient.countryCode | string |  | (pattern ^[A-Z]{2}$; nullable) |
+| recipient.taxRegistrationNumber | string |  | The recipient's TRN where they are VAT-registered. (max length 30; nullable) |
+| recipient.customerAccountId | string (uuid) |  | The B2B credit account (payments B2bCreditAccount) where a company is invoiced. (nullable) |
+| languages | array of string |  | Overrides the template's languages for this document, within those the template offers. |
+| supersedesInvoiceId | string (uuid) |  | A simplified invoice this full invoice replaces for the same supply. (nullable) |
+| deliverToEmail | string (email) |  | Sends the PDF on issue as well as returning it. (nullable) |
+
+**Response**: `FinTaxInvoice`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| id | string (uuid) | yes | (read-only) |
+| invoiceNumber | string | yes | Server-assigned from the legal entity's series for the document kind, in sequence and without gaps, e.g. (read-only) |
+| invoiceType | FinTaxInvoiceType: enum (simplified, full, consolidated) | yes | 5.7.93. |
+| status | FinTaxInvoiceStatus: enum (issued, partiallyCredited, fullyCredited, superseded) | yes | issued until a credit memo is issued against it; superseded where a full invoice replaced a simplified one for the same supply (only if the law allows it; see issueTaxInvoice). |
+| legalEntityId | string (uuid) | yes |  |
+| templateId | string (uuid) |  | (nullable) |
+| venueId | string (uuid) |  | (nullable) |
+| orderIds | array of string |  |  |
+| supplierName | string |  |  |
+| supplierAddress | string |  | (nullable) |
+| supplierTaxRegistrationNumber | string |  | (nullable) |
+| buyerSubjectId | string (uuid) |  | The guest the orders belong to; the key a guest's own reads filter on. (nullable) |
+| buyerName | string |  | (nullable) |
+| buyerAddress | string |  | (nullable) |
+| buyerCountryCode | string |  | (pattern ^[A-Z]{2}$; nullable) |
+| buyerTaxRegistrationNumber | string |  | (nullable) |
+| customerAccountId | string (uuid) |  | (nullable) |
+| issuedAt | string (date-time) | yes |  |
+| supplyDate | string (date) | yes | The date of supply where it differs from the issue date (the latest order's payment date on a consolidated invoice). |
+| currency | string | yes | (pattern ^[A-Z]{3}$) |
+| netAmount | Money | yes | On the wire this is three fields; in the database it is one column. |
+| netAmount.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
+| netAmount.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
+| netAmount.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| discountAmount | Money |  | On the wire this is three fields; in the database it is one column. |
+| discountAmount.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
+| discountAmount.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
+| discountAmount.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| taxAmount | Money | yes | On the wire this is three fields; in the database it is one column. |
+| taxAmount.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
+| taxAmount.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
+| taxAmount.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| grossAmount | Money | yes | On the wire this is three fields; in the database it is one column. |
+| grossAmount.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
+| grossAmount.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
+| grossAmount.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| taxAmountInLegalCurrency | Money |  | On the wire this is three fields; in the database it is one column. |
+| taxAmountInLegalCurrency.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
+| taxAmountInLegalCurrency.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
+| taxAmountInLegalCurrency.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| creditedAmount | Money |  | On the wire this is three fields; in the database it is one column. |
+| creditedAmount.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
+| creditedAmount.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
+| creditedAmount.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| languages | array of string |  |  |
+| supersedesInvoiceId | string (uuid) |  | (nullable) |
+| renditionAssetId | string (uuid) |  | The PDF rendered at issue; read through getTaxDocumentRendition. (read-only; nullable) |
+| eInvoiceStatus | FinEInvoiceTransmissionStatus: enum (notRequired, queued, sent, accepted, rejected, failed) |  | 6.1.1. |
+| issuedByPrincipalId | string (uuid) |  | Null where the platform issued it. (read-only; nullable) |
+| lines | array of FinTaxInvoiceLine | yes |  |
+| lines[].lineNumber | integer | yes | (min 1) |
+| lines[].orderId | string |  | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
+| lines[].orderLineId | string |  | (nullable) |
+| lines[].description | string | yes | (max length 500) |
+| lines[].quantity | number | yes |  |
+| lines[].unitPrice | Money |  | On the wire this is three fields; in the database it is one column. |
+| lines[].unitPrice.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
+| lines[].unitPrice.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
+| lines[].unitPrice.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| lines[].discountAmount | Money |  | On the wire this is three fields; in the database it is one column. |
+| lines[].discountAmount.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
+| lines[].discountAmount.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
+| lines[].discountAmount.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| lines[].netAmount | Money | yes | On the wire this is three fields; in the database it is one column. |
+| lines[].netAmount.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
+| lines[].netAmount.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
+| lines[].netAmount.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| lines[].taxCodeId | string (uuid) |  | (nullable) |
+| lines[].taxRate | number |  | (min 0; max 100) |
+| lines[].taxCategory | FinTaxCategory: enum (standardRated, zeroRated, exempt, outOfScope, reverseCharge) | yes | How a line is treated for VAT. |
+| lines[].taxAmount | Money | yes | On the wire this is three fields; in the database it is one column. |
+| lines[].taxAmount.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
+| lines[].taxAmount.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
+| lines[].taxAmount.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| lines[].grossAmount | Money | yes | On the wire this is three fields; in the database it is one column. |
+| lines[].grossAmount.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
+| lines[].grossAmount.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
+| lines[].grossAmount.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| lines[].creditedAmount | Money |  | On the wire this is three fields; in the database it is one column. |
+| lines[].creditedAmount.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
+| lines[].creditedAmount.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
+| lines[].creditedAmount.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| taxSummary | array of object |  | VAT per rate and category, summed from the lines for the response. |
+| taxSummary[].taxCategory | FinTaxCategory: enum (standardRated, zeroRated, exempt, outOfScope, reverseCharge) |  | How a line is treated for VAT. |
+| taxSummary[].taxRate | number |  |  |
+| taxSummary[].taxableAmount | Money |  | On the wire this is three fields; in the database it is one column. |
+| taxSummary[].taxableAmount.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
+| taxSummary[].taxableAmount.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
+| taxSummary[].taxableAmount.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| taxSummary[].taxAmount | Money |  | On the wire this is three fields; in the database it is one column. |
+| taxSummary[].taxAmount.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
+| taxSummary[].taxAmount.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
+| taxSummary[].taxAmount.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| scopePath | string |  | The partition key (ADR-0005). (read-only) |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 201 |  | Issued, numbered and rendered |
+| 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
+| 409 |  | An order is not paid, is already on a tax invoice of the same or a wider kind (order-already-invoiced), or the legal entity has no active template for the document kind (no-invoice-template). |
+| 422 |  | A full or consolidated invoice without a recipient name and address, a consolidated invoice whose orders span buyers, legal entities or currencies, more than one order on a simplified or full invoice… |
+
+### listCreditMemos
+
+**`GET /credit-memos`**: Credit memos issued, newest first
+
+5.7.94. Credit memos by invoice, refund, legal entity or issue date. A guest sees only memos against invoices issued to them. Ordered by `issuedAt` descending, `id` as the tiebreak.
+
+|  |  |
+|---|---|
+| Permission | `LEDGER_VIEW` |
+| Scope level | region |
+| Part of slice | core |
+| Wave | 1 |
+| Offline | no |
+| Conflict policy | serverWins |
+| Read routing | replica |
+| Reads | `ledger.credit_memo`, `ledger.credit_memo_line` |
+| Writes | - |
+| Called by | BO-023, BO-1081, GST-019, WEB-019 |
+
+**Parameters**
+
+| Name | In | Required | Type | Notes |
+|---|---|---|---|---|
+| taxInvoiceId | query |  | string (uuid) |  |
+| refundId | query |  | string |  |
+| legalEntityId | query |  | string (uuid) |  |
+| issuedFrom | query |  | string (date) |  |
+| issuedTo | query |  | string (date) |  |
+| pageSize | query |  | integer |  |
+| cursor | query |  | string | Opaque cursor: the nextCursor of the previous page. |
+
+**Response**: `object`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| items | array of FinCreditMemo | yes |  |
+| items[].id | string (uuid) | yes | (read-only) |
+| items[].creditMemoNumber | string | yes | Server-assigned from the legal entity's credit memo series, in sequence without gaps. (read-only) |
+| items[].taxInvoiceId | string (uuid) | yes |  |
+| items[].taxInvoiceNumber | string |  | (read-only) |
+| items[].kind | enum (full, partial) | yes |  |
+| items[].reason | enum (refund, cancellation, priceAdjustment, returnOfGoods, billingError, other) | yes |  |
+| items[].refundId | string |  | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$; nullable) |
+| items[].cancelledOrderId | string |  | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$; nullable) |
+| items[].legalEntityId | string (uuid) | yes |  |
+| items[].buyerSubjectId | string (uuid) |  | (nullable) |
+| items[].issuedAt | string (date-time) | yes |  |
+| items[].currency | string | yes | (pattern ^[A-Z]{3}$) |
+| items[].netAmount | Money | yes | On the wire this is three fields; in the database it is one column. |
+| items[].netAmount.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
+| items[].netAmount.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
+| items[].netAmount.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| items[].taxAmount | Money | yes | On the wire this is three fields; in the database it is one column. |
+| items[].taxAmount.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
+| items[].taxAmount.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
+| items[].taxAmount.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| items[].grossAmount | Money | yes | On the wire this is three fields; in the database it is one column. |
+| items[].grossAmount.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
+| items[].grossAmount.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
+| items[].grossAmount.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| items[].taxAmountInLegalCurrency | Money |  | On the wire this is three fields; in the database it is one column. |
+| items[].taxAmountInLegalCurrency.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
+| items[].taxAmountInLegalCurrency.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
+| items[].taxAmountInLegalCurrency.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| items[].note | string |  | (nullable) |
+| items[].renditionAssetId | string (uuid) |  | (read-only; nullable) |
+| items[].eInvoiceStatus | FinEInvoiceTransmissionStatus: enum (notRequired, queued, sent, accepted, rejected, failed) |  | 6.1.1. |
+| items[].issuedByPrincipalId | string (uuid) |  | (read-only; nullable) |
+| items[].lines | array of FinCreditMemoLine | yes |  |
+| items[].lines[].invoiceLineNumber | integer | yes | (min 1) |
+| items[].lines[].description | string |  | (max length 500) |
+| items[].lines[].quantity | number |  | (nullable) |
+| items[].lines[].netAmount | Money | yes | On the wire this is three fields; in the database it is one column. |
+| items[].lines[].taxRate | number |  |  |
+| items[].lines[].taxCategory | FinTaxCategory: enum (standardRated, zeroRated, exempt, outOfScope, reverseCharge) |  | How a line is treated for VAT. |
+| items[].lines[].taxAmount | Money | yes | On the wire this is three fields; in the database it is one column. |
+| items[].lines[].grossAmount | Money | yes | On the wire this is three fields; in the database it is one column. |
+| items[].scopePath | string |  | (read-only) |
+| nextCursor | string |  |  |
+| hasMore | boolean | yes |  |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 200 |  | Credit memos, newest first |
+
+### listTaxInvoices
+
+**`GET /tax-invoices`**: Tax invoices issued, newest first
+
+5.7.93. **Every guest tax invoice the platform has issued**, simplified, full and consolidated, filtered by order, legal entity, type, status or issue date. A guest sees only the invoices issued to them (`buyerSubjectId` is the caller); staff see the legal entities their scope reaches.
+Ordered by `issuedAt` descending, `id` as the tiebreak.
+
+|  |  |
+|---|---|
+| Permission | `LEDGER_VIEW` |
+| Scope level | region |
+| Part of slice | core |
+| Wave | 1 |
+| Offline | no |
+| Conflict policy | serverWins |
+| Read routing | replica |
+| Reads | `ledger.tax_invoice`, `ledger.tax_invoice_line` |
+| Writes | - |
+| Called by | ADM-068, BO-022, BO-1081, GST-019, WEB-019 |
+
+**Parameters**
+
+| Name | In | Required | Type | Notes |
+|---|---|---|---|---|
+| orderId | query |  | string | Invoices covering this order, including a consolidated invoice that names it. |
+| legalEntityId | query |  | string (uuid) |  |
+| invoiceType | query |  | FinTaxInvoiceType: enum (simplified, full, consolidated) |  |
+| status | query |  | FinTaxInvoiceStatus: enum (issued, partiallyCredited, fullyCredited, superseded) |  |
+| issuedFrom | query |  | string (date) | A day in the region's time zone, local midnight to local midnight. |
+| issuedTo | query |  | string (date) | A day in the region's time zone, local midnight to local midnight. |
+| pageSize | query |  | integer |  |
+| cursor | query |  | string | Opaque cursor: the nextCursor of the previous page. |
+
+**Response**: `object`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| items | array of FinTaxInvoice | yes |  |
+| items[].id | string (uuid) | yes | (read-only) |
+| items[].invoiceNumber | string | yes | Server-assigned from the legal entity's series for the document kind, in sequence and without gaps, e.g. (read-only) |
+| items[].invoiceType | FinTaxInvoiceType: enum (simplified, full, consolidated) | yes | 5.7.93. |
+| items[].status | FinTaxInvoiceStatus: enum (issued, partiallyCredited, fullyCredited, superseded) | yes | issued until a credit memo is issued against it; superseded where a full invoice replaced a simplified one for the same supply (only if the law allows it; see issueTaxInvoice). |
+| items[].legalEntityId | string (uuid) | yes |  |
+| items[].templateId | string (uuid) |  | (nullable) |
+| items[].venueId | string (uuid) |  | (nullable) |
+| items[].orderIds | array of string |  |  |
+| items[].supplierName | string |  |  |
+| items[].supplierAddress | string |  | (nullable) |
+| items[].supplierTaxRegistrationNumber | string |  | (nullable) |
+| items[].buyerSubjectId | string (uuid) |  | The guest the orders belong to; the key a guest's own reads filter on. (nullable) |
+| items[].buyerName | string |  | (nullable) |
+| items[].buyerAddress | string |  | (nullable) |
+| items[].buyerCountryCode | string |  | (pattern ^[A-Z]{2}$; nullable) |
+| items[].buyerTaxRegistrationNumber | string |  | (nullable) |
+| items[].customerAccountId | string (uuid) |  | (nullable) |
+| items[].issuedAt | string (date-time) | yes |  |
+| items[].supplyDate | string (date) | yes | The date of supply where it differs from the issue date (the latest order's payment date on a consolidated invoice). |
+| items[].currency | string | yes | (pattern ^[A-Z]{3}$) |
+| items[].netAmount | Money | yes | On the wire this is three fields; in the database it is one column. |
+| items[].netAmount.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
+| items[].netAmount.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
+| items[].netAmount.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| items[].discountAmount | Money |  | On the wire this is three fields; in the database it is one column. |
+| items[].discountAmount.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
+| items[].discountAmount.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
+| items[].discountAmount.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| items[].taxAmount | Money | yes | On the wire this is three fields; in the database it is one column. |
+| items[].taxAmount.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
+| items[].taxAmount.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
+| items[].taxAmount.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| items[].grossAmount | Money | yes | On the wire this is three fields; in the database it is one column. |
+| items[].grossAmount.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
+| items[].grossAmount.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
+| items[].grossAmount.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| items[].taxAmountInLegalCurrency | Money |  | On the wire this is three fields; in the database it is one column. |
+| items[].taxAmountInLegalCurrency.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
+| items[].taxAmountInLegalCurrency.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
+| items[].taxAmountInLegalCurrency.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| items[].creditedAmount | Money |  | On the wire this is three fields; in the database it is one column. |
+| items[].creditedAmount.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
+| items[].creditedAmount.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
+| items[].creditedAmount.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| items[].languages | array of string |  |  |
+| items[].supersedesInvoiceId | string (uuid) |  | (nullable) |
+| items[].renditionAssetId | string (uuid) |  | The PDF rendered at issue; read through getTaxDocumentRendition. (read-only; nullable) |
+| items[].eInvoiceStatus | FinEInvoiceTransmissionStatus: enum (notRequired, queued, sent, accepted, rejected, failed) |  | 6.1.1. |
+| items[].issuedByPrincipalId | string (uuid) |  | Null where the platform issued it. (read-only; nullable) |
+| items[].lines | array of FinTaxInvoiceLine | yes |  |
+| items[].lines[].lineNumber | integer | yes | (min 1) |
+| items[].lines[].orderId | string |  | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
+| items[].lines[].orderLineId | string |  | (nullable) |
+| items[].lines[].description | string | yes | (max length 500) |
+| items[].lines[].quantity | number | yes |  |
+| items[].lines[].unitPrice | Money |  | On the wire this is three fields; in the database it is one column. |
+| items[].lines[].discountAmount | Money |  | On the wire this is three fields; in the database it is one column. |
+| items[].lines[].netAmount | Money | yes | On the wire this is three fields; in the database it is one column. |
+| items[].lines[].taxCodeId | string (uuid) |  | (nullable) |
+| items[].lines[].taxRate | number |  | (min 0; max 100) |
+| items[].lines[].taxCategory | FinTaxCategory: enum (standardRated, zeroRated, exempt, outOfScope, reverseCharge) | yes | How a line is treated for VAT. |
+| items[].lines[].taxAmount | Money | yes | On the wire this is three fields; in the database it is one column. |
+| items[].lines[].grossAmount | Money | yes | On the wire this is three fields; in the database it is one column. |
+| items[].lines[].creditedAmount | Money |  | On the wire this is three fields; in the database it is one column. |
+| items[].taxSummary | array of object |  | VAT per rate and category, summed from the lines for the response. |
+| items[].taxSummary[].taxCategory | FinTaxCategory: enum (standardRated, zeroRated, exempt, outOfScope, reverseCharge) |  | How a line is treated for VAT. |
+| items[].taxSummary[].taxRate | number |  |  |
+| items[].taxSummary[].taxableAmount | Money |  | On the wire this is three fields; in the database it is one column. |
+| items[].taxSummary[].taxAmount | Money |  | On the wire this is three fields; in the database it is one column. |
+| items[].scopePath | string |  | The partition key (ADR-0005). (read-only) |
+| nextCursor | string |  |  |
+| hasMore | boolean | yes |  |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 200 |  | Invoices, newest first |
+
+### setEInvoicingProvider
+
+**`PUT /e-invoicing/providers`**: Connect a legal entity to its accredited e-invoicing service provider
+
+6.1.1. **UAE e-invoicing runs through an accredited service provider** on the Peppol network (PINT AE), which passes the document to the buyer's provider and reports it to the FTA. This holds the connection per legal entity: the provider, its endpoint, the credential reference (a secret in the vault, never the secret), the entity's participant identifier, and the mode (`disabled`, `test`, `live`). Keyed by legal entity; a second call replaces the first. `live` is refused until a `test` transmission has been accepted.
+
+|  |  |
+|---|---|
+| Permission | `TAX_CONFIGURE` |
+| Scope level | tenant |
+| Part of slice | setup, makes `ledger.einvoicing_provider` non-empty |
+| Wave | 1 |
+| Offline | no |
+| Config scope | tenant |
+| Conflict policy | serverWins |
+| Reads | `cache:idempotency`, `ledger.einvoice_transmission`, `ledger.einvoicing_provider`, `ledger.legal_entity` |
+| Writes | `cache:idempotency`, `cache:resolution`, `ledger.einvoicing_provider`, `platform.audit_record` |
+| Called by | ADM-069 |
+
+**Parameters**
+
+| Name | In | Required | Type | Notes |
+|---|---|---|---|---|
+| Idempotency-Key | header | yes | string | Client-generated ULID. |
+
+**Request body**: `FinEInvoicingProvider`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| id | string (uuid) |  | (read-only) |
+| legalEntityId | string (uuid) | yes |  |
+| providerName | string | yes | The accredited service provider the client appoints. (max length 200) |
+| endpointUrl | string (uri) |  | (nullable) |
+| testEndpointUrl | string (uri) |  | (nullable) |
+| credentialRef | string |  | A reference to the secret in the vault; the secret is never stored here. (max length 300; nullable) |
+| participantId | string |  | The legal entity's Peppol participant identifier. (max length 100; nullable) |
+| documentFormat | enum (pintAe) |  | (default pintAe) |
+| mode | enum (disabled, test, live) | yes |  |
+| transmitWithinHours | integer |  | (min 1; nullable) |
+| lastAcceptedTestAt | string (date-time) |  | (read-only; nullable) |
+| scopePath | string |  | The partition key (ADR-0005). (read-only) |
+
+**Response**: `FinEInvoicingProvider`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| id | string (uuid) |  | (read-only) |
+| legalEntityId | string (uuid) | yes |  |
+| providerName | string | yes | The accredited service provider the client appoints. (max length 200) |
+| endpointUrl | string (uri) |  | (nullable) |
+| testEndpointUrl | string (uri) |  | (nullable) |
+| credentialRef | string |  | A reference to the secret in the vault; the secret is never stored here. (max length 300; nullable) |
+| participantId | string |  | The legal entity's Peppol participant identifier. (max length 100; nullable) |
+| documentFormat | enum (pintAe) |  | (default pintAe) |
+| mode | enum (disabled, test, live) | yes |  |
+| transmitWithinHours | integer |  | (min 1; nullable) |
+| lastAcceptedTestAt | string (date-time) |  | (read-only; nullable) |
+| scopePath | string |  | The partition key (ADR-0005). (read-only) |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 200 |  | Set |
+| 409 |  | live requested before any test transmission from this legal entity was accepted. |
+
+### transmitEInvoices
+
+**`POST /e-invoicing/transmissions`**: Send issued tax documents to the e-invoicing provider
+
+6.1.1. **Shares issued tax invoices and credit memos with the external e-invoicing solution.** The platform calls this itself (`service`) within the provider's `transmitWithinHours` of issue; staff call it to resend a `failed` document or a range. Each document is converted to the provider's format (`pintAe`), hashed, sent, and recorded as a transmission in `queued`, then `sent`; the provider's answer arrives through `recordEInvoiceTransmissionStatus`.
+A document already `accepted` is never sent again. Nothing is sent for a legal entity whose provider is `disabled`; `test` sends to the provider's test endpoint only.
+
+|  |  |
+|---|---|
+| Permission | `LEDGER_POST` |
+| Scope level | region |
+| Part of slice | setup, makes `ledger.einvoice_transmission` non-empty |
+| Wave | 1 |
+| Offline | no |
+| Conflict policy | serverWins |
+| Reads | `cache:idempotency`, `ledger.credit_memo`, `ledger.credit_memo_line`, `ledger.einvoice_transmission`, `ledger.einvoicing_provider`, `ledger.tax_invoice`, `ledger.tax_invoice_line` |
+| Writes | `cache:idempotency`, `ledger.einvoice_transmission`, `platform.outbox` |
+| Called by | ADM-077 |
+
+**Parameters**
+
+| Name | In | Required | Type | Notes |
+|---|---|---|---|---|
+| Idempotency-Key | header | yes | string | Client-generated ULID. |
+
+**Request body**
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| legalEntityId | string (uuid) | yes |  |
+| documentIds | array of string (uuid) |  | Tax invoice or credit memo ids. |
+| issuedFrom | string (date) |  |  |
+| issuedTo | string (date) |  |  |
+
+**Response**: `object`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| queued | integer |  |  |
+| skippedAlreadyAccepted | integer |  |  |
+| transmissions | array of FinEInvoiceTransmission |  |  |
+| transmissions[].id | string (uuid) | yes |  |
+| transmissions[].documentKind | enum (taxInvoice, creditMemo) | yes |  |
+| transmissions[].documentId | string (uuid) | yes |  |
+| transmissions[].documentNumber | string |  |  |
+| transmissions[].legalEntityId | string (uuid) | yes |  |
+| transmissions[].providerId | string (uuid) |  | (nullable) |
+| transmissions[].mode | enum (test, live) |  |  |
+| transmissions[].status | FinEInvoiceTransmissionStatus: enum (notRequired, queued, sent, accepted, rejected, failed) | yes | 6.1.1. |
+| transmissions[].payloadHash | string |  | SHA-256 of the document as sent, so a resend can be shown to be the same document. (nullable) |
+| transmissions[].providerMessageId | string |  | (nullable) |
+| transmissions[].attempt | integer |  | (min 1) |
+| transmissions[].errorCodes | array of string |  |  |
+| transmissions[].errorMessage | string |  | (nullable) |
+| transmissions[].sentAt | string (date-time) |  | (nullable) |
+| transmissions[].answeredAt | string (date-time) |  | (nullable) |
+| transmissions[].createdAt | string (date-time) | yes |  |
+| transmissions[].scopePath | string |  | (read-only) |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 202 |  | Queued; one transmission per document |
+| 409 |  | The legal entity has no provider, or its provider is disabled. |
+
+### updateTaxCode
+
+**`PATCH /tax-codes/{taxCodeId}`**: Amend a tax code
+
+Rate changes are versioned with an effective date, never applied retrospectively. Historic entries keep the rate that was in force when they were posted.
+**How a rate change is versioned.** A body carrying `rate` must carry `effectiveFrom`, a day later than today in the region's time zone. The row addressed is closed from that day (its `effectiveTo` is set so the two windows meet without overlapping) and **a new row is inserted** with a new `id`, the same `code` and the new `rate`, in force from `effectiveFrom`; `compoundOnTaxCodeId`, `isInclusive`, `accountId` and `appliesTo` carry over. **The 200 returns the new row.** This is the same rule `setFxRate` follows: the old rate is never rewritten.
+`name` and `isActive` alone are not a rate change: they edit the addressed row in place and the 200 returns it. Only the row in force (no `effectiveTo`) takes a rate change.
+
+|  |  |
+|---|---|
+| Permission | `TAX_CONFIGURE` |
+| Scope level | region |
+| Part of slice | setup, makes `ledger.tax_code` non-empty |
+| Wave | 1 |
+| Offline | no |
+| Conflict policy | serverWins |
+| Reads | `cache:idempotency`, `ledger.tax_code` |
+| Writes | `cache:idempotency`, `ledger.tax_code` |
+| Called by | BO-075 |
+
+**Parameters**
+
+| Name | In | Required | Type | Notes |
+|---|---|---|---|---|
+| taxCodeId | path | yes | string (uuid) |  |
+| Idempotency-Key | header | yes | string | Client-generated ULID. |
+
+**Request body**
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| name | string |  | (max length 200) |
+| rate | number |  | (min 0; max 100) |
+| effectiveFrom | string (date) |  | Required with rate, and only meaningful with it. |
+| isActive | boolean |  |  |
+
+**Response**: `TaxCode`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| id | string (uuid) | yes |  |
+| code | string | yes | (max length 64) |
+| name | string | yes | (max length 200) |
+| countryCode | string | yes | (pattern ^[A-Z]{2}$) |
+| appliesTo | array of enum (goods, services, admission, food, accommodation, donation, gratuity, fee) |  | What this code covers, and donation is why the field exists (CF-84). |
+| rate | number | yes | (min 0; max 100) |
+| compoundOnTaxCodeId | string (uuid) |  | When set, this tax applies to the base plus the referenced tax, not to the base alone. (nullable) |
+| isInclusive | boolean |  | True when the displayed price already contains this tax. |
+| accountId | string (uuid) |  |  |
+| effectiveFrom | string (date) | yes | A day in the region's time zone, local midnight to local midnight. |
+| effectiveTo | string (date) |  | A day in the region's time zone, local midnight to local midnight. (nullable) |
+| isActive | boolean | yes |  |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 200 |  | Updated. |
+| 400 |  | rate without effectiveFrom, or effectiveFrom without rate. |
+| 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
+| 409 |  | A rate change whose effectiveFrom is today or earlier, which would reprice postings already made; or a rate change addressed to a row that is no longer in force. |
+
 ## Tables
 
 Every table this service owns that the slice reads or writes, with its columns as derived into `backend/tenant/*.sql`.
@@ -512,6 +1491,86 @@ Every table this service owns that the slice reads or writes, with its columns a
 | is_postable | boolean | yes | False for parent accounts, which aggregate only. |
 | is_active | boolean | yes |  |
 | balance | numeric(18,4) | no |  |
+
+### `ledger.credit_memo`
+
+| Column | Type | Required | Notes |
+|---|---|---|---|
+| id | uuid | yes |  |
+| credit_memo_number | text | yes | Server-assigned from the legal entity's credit memo series, in sequence without gaps. |
+| tax_invoice_id | uuid | yes |  |
+| tax_invoice_number | text | no |  |
+| kind | text | yes |  |
+| reason | text | yes |  |
+| refund_id | text | no |  |
+| cancelled_order_id | text | no |  |
+| legal_entity_id | uuid | yes |  |
+| buyer_subject_id | uuid | no |  |
+| issued_at | timestamptz | yes |  |
+| currency | text | yes |  |
+| net_amount | numeric(18,4) | yes |  |
+| tax_amount | numeric(18,4) | yes |  |
+| gross_amount | numeric(18,4) | yes |  |
+| tax_amount_in_legal_currency | numeric(18,4) | no |  |
+| note | text | no |  |
+| rendition_asset_id | uuid | no |  |
+| e_invoice_status | text | no |  |
+| issued_by_principal_id | uuid | no |  |
+| scope_path | text | no |  |
+
+### `ledger.credit_memo_line`
+
+| Column | Type | Required | Notes |
+|---|---|---|---|
+| credit_memo_id | uuid | yes | The parent row. |
+| invoice_line_number | integer | yes |  |
+| description | text | no |  |
+| quantity | numeric | no |  |
+| net_amount | numeric(18,4) | yes |  |
+| tax_rate | numeric | no |  |
+| tax_category | text | no |  |
+| tax_amount | numeric(18,4) | yes |  |
+| gross_amount | numeric(18,4) | yes |  |
+| id | uuid | yes | Synthesised key. |
+
+### `ledger.einvoice_transmission`
+
+| Column | Type | Required | Notes |
+|---|---|---|---|
+| id | uuid | yes |  |
+| document_kind | text | yes |  |
+| document_id | uuid | yes |  |
+| document_number | text | no |  |
+| legal_entity_id | uuid | yes |  |
+| provider_id | uuid | no |  |
+| mode | text | no |  |
+| status | text | yes |  |
+| payload_hash | text | no | SHA-256 of the document as sent, so a resend can be shown to be the same document. |
+| provider_message_id | text | no |  |
+| attempt | integer | no |  |
+| error_codes | text[] | no |  |
+| error_message | text | no |  |
+| sent_at | timestamptz | no |  |
+| answered_at | timestamptz | no |  |
+| created_at | timestamptz | yes |  |
+| scope_path | text | no |  |
+
+### `ledger.einvoicing_provider`
+
+| Column | Type | Required | Notes |
+|---|---|---|---|
+| id | uuid | no |  |
+| legal_entity_id | uuid | yes |  |
+| provider_name | text | yes | The accredited service provider the client appoints. |
+| endpoint_url | text | no |  |
+| test_endpoint_url | text | no |  |
+| credential_ref | text | no | A reference to the secret in the vault; the secret is never stored here. |
+| participant_id | text | no | The legal entity's Peppol participant identifier. |
+| document_format | text | no |  |
+| mode | text | yes |  |
+| transmit_within_hours | integer | no |  |
+| last_accepted_test_at | timestamptz | no |  |
+| scope_path | text | no | The partition key (ADR-0005). |
 
 ### `ledger.event_budget`
 
@@ -569,6 +1628,22 @@ Every table this service owns that the slice reads or writes, with its columns a
 | fetched_at | timestamptz | no | When the rate was pulled. |
 | region_id | uuid | yes | Points at platform.org_unit. |
 
+### `ledger.legal_entity`
+
+| Column | Type | Required | Notes |
+|---|---|---|---|
+| id | uuid | yes |  |
+| code | text | yes |  |
+| name | text | yes |  |
+| country_code | text | yes |  |
+| currency | text | yes |  |
+| currency_scale | integer | yes |  |
+| tax_registration_number | text | no |  |
+| fiscal_year_start_month | integer | yes |  |
+| region_ids | text[] | no |  |
+| is_active | boolean | no |  |
+| scope_path | text | no | The partition key (ADR-0005). |
+
 ### `ledger.posting`
 
 | Column | Type | Required | Notes |
@@ -586,19 +1661,117 @@ Every table this service owns that the slice reads or writes, with its columns a
 | description | text | no |  |
 | posted_at | timestamptz | yes |  |
 
+### `ledger.tax_code`
+
+| Column | Type | Required | Notes |
+|---|---|---|---|
+| id | uuid | yes |  |
+| code | text | yes |  |
+| name | text | yes |  |
+| country_code | text | yes |  |
+| applies_to | text[] | no | What this code covers, and donation is why the field exists (CF-84). |
+| rate | numeric | yes |  |
+| compound_on_tax_code_id | uuid | no | When set, this tax applies to the base plus the referenced tax, not to the base alone. |
+| is_inclusive | boolean | no | True when the displayed price already contains this tax. |
+| account_id | uuid | no |  |
+| effective_from | date | yes | A day in the region's time zone, local midnight to local midnight. |
+| effective_to | date | no | A day in the region's time zone, local midnight to local midnight. |
+| is_active | boolean | yes |  |
+
+### `ledger.tax_invoice`
+
+| Column | Type | Required | Notes |
+|---|---|---|---|
+| id | uuid | yes |  |
+| invoice_number | text | yes | Server-assigned from the legal entity's series for the document kind, in sequence and without gaps, e.g. |
+| invoice_type | text | yes |  |
+| status | text | yes |  |
+| legal_entity_id | uuid | yes |  |
+| template_id | uuid | no |  |
+| venue_id | uuid | no |  |
+| order_ids | text[] | no |  |
+| supplier_name | text | no |  |
+| supplier_address | text | no |  |
+| supplier_tax_registration_number | text | no |  |
+| buyer_subject_id | uuid | no | The guest the orders belong to; the key a guest's own reads filter on. |
+| buyer_name | text | no |  |
+| buyer_address | text | no |  |
+| buyer_country_code | text | no |  |
+| buyer_tax_registration_number | text | no |  |
+| customer_account_id | uuid | no |  |
+| issued_at | timestamptz | yes |  |
+| supply_date | date | yes | The date of supply where it differs from the issue date (the latest order's payment date on a consolidated invoice). |
+| currency | text | yes |  |
+| net_amount | numeric(18,4) | yes |  |
+| discount_amount | numeric(18,4) | no |  |
+| tax_amount | numeric(18,4) | yes |  |
+| gross_amount | numeric(18,4) | yes |  |
+| tax_amount_in_legal_currency | numeric(18,4) | no | The tax in the legal entity's currency (AED in the UAE) where the invoice currency differs, at the rate the orders were stored at. |
+| credited_amount | numeric(18,4) | no |  |
+| languages | text[] | no |  |
+| supersedes_invoice_id | uuid | no |  |
+| rendition_asset_id | uuid | no | The PDF rendered at issue; read through getTaxDocumentRendition. |
+| e_invoice_status | text | no |  |
+| issued_by_principal_id | uuid | no | Null where the platform issued it. |
+| scope_path | text | no | The partition key (ADR-0005). |
+
+### `ledger.tax_invoice_line`
+
+| Column | Type | Required | Notes |
+|---|---|---|---|
+| tax_invoice_id | uuid | yes | The parent row. |
+| line_number | integer | yes |  |
+| order_id | text | no |  |
+| order_line_id | text | no |  |
+| description | text | yes |  |
+| quantity | numeric | yes |  |
+| unit_price | numeric(18,4) | no |  |
+| discount_amount | numeric(18,4) | no |  |
+| net_amount | numeric(18,4) | yes |  |
+| tax_code_id | uuid | no |  |
+| tax_rate | numeric | no |  |
+| tax_category | text | yes |  |
+| tax_amount | numeric(18,4) | yes |  |
+| gross_amount | numeric(18,4) | yes |  |
+| credited_amount | numeric(18,4) | no |  |
+| id | uuid | yes | Synthesised key. |
+
+### `ledger.tax_invoice_template`
+
+| Column | Type | Required | Notes |
+|---|---|---|---|
+| id | uuid | no |  |
+| legal_entity_id | uuid | yes |  |
+| document_kind | text | yes |  |
+| number_prefix | text | yes | e.g. |
+| resets_yearly | boolean | no | A new series per fiscal year of the legal entity. |
+| next_number | integer | no | May be raised, never lowered below the last number issued. |
+| number_padding | integer | no |  |
+| languages | text[] | yes | Rendered on one page in this order, e.g. |
+| title | jsonb | no | The document title per language, e.g. |
+| footer_text | jsonb | no |  |
+| logo_asset_id | uuid | no |  |
+| layout_key | text | no |  |
+| is_auto_issue_on_payment | boolean | no | For simplifiedTaxInvoice, issue one on every paid order (the VAT receipt). |
+| simplified_allowed_up_to | numeric(18,4) | no |  |
+| show_legal_currency_tax | boolean | no | Show the tax in the legal entity's currency when the invoice currency differs. |
+| effective_from | date | no |  |
+| is_active | boolean | no |  |
+| scope_path | text | no | The partition key (ADR-0005). |
+
 ## Not in the first release
 
-50 operations, added to this service in later releases without changing any of the above.
+53 operations, added to this service in later releases without changing any of the above.
 
 | Group | Operations |
 |---|---|
 | accounts | `createCostCenter`, `getAccount`, `listAccountMappings`, `listAccounts`, `listCostCenters`, `setAccountMappings` |
 | finance | `disputeObligation`, `getUnifiedReconciliation`, `recordDeposit`, `recordSettlement`, `recordWriteOff`, `resolveObligationDispute`, `settleDeposit`, `validateRecognitionSchedules` |
-| fiscal | `closeFiscalPeriod`, `createLegalEntity`, `listFiscalPeriods`, `listLegalEntities` |
+| fiscal | `closeFiscalPeriod`, `listFiscalPeriods`, `listLegalEntities` |
 | journal | `approveJournalEntry`, `createJournalEntry`, `getJournalEntry`, `listJournalEntries`, `reverseJournalEntry` |
 | ledger | `abandonPeriodClose`, `beginPeriodClose`, `getTrialBalance`, `listInterEntityObligations`, `listLedgerEntries`, `rejectJournal`, `reopenPeriod`, `runFxRevaluation` |
 | recognition | `createRecognitionSchedule`, `getDeferredRevenue`, `listRecognitionSchedules`, `runRecognition` |
-| reporting | `getForeignTenderReport` |
+| reporting | `getForeignTenderReport`, `getVatReturn` |
 | settlement | `getSettlement`, `ingestSettlementFile`, `listSettlementExceptions`, `listSettlements`, `resolveSettlementException` |
-| tax | `calculateTax`, `createTaxCode`, `createTaxExemption`, `listTaxCodes`, `listTaxExemptions`, `updateTaxCode`, `verifyTaxExemption` |
+| tax | `calculateTax`, `createTaxExemption`, `listEInvoiceTransmissions`, `listEInvoicingProviders`, `listTaxCodes`, `listTaxExemptions`, `listTaxInvoiceTemplates`, `recordEInvoiceTransmissionStatus`, `setTaxInvoiceTemplate`, `verifyTaxExemption` |
 | variance | `listPriceVariances`, `reviewPriceVariance` |

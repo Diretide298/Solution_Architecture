@@ -1,0 +1,29 @@
+# seat.held v1 — published by seating
+# Checked by tools/check-states.py against states/ and the contracts.
+
+name: seat.held
+version: 1
+publisher: seating
+description: A seat was held for a buyer and is not available to anyone else until the hold ends.
+aggregate: seat
+emittedWhen: SeatStatus available to held (createSeatHold)
+payload:
+- field: seatId
+  type: string
+- field: performanceId
+  type: uuid
+- field: venueId
+  type: uuid
+- field: holdId
+  type: uuid
+- field: expiresAt
+  type: timestamp
+- field: heldAt
+  type: timestamp
+consumers:
+- context: public-api
+  purpose: Deliver to webhook subscriptions taking seat.held (21.13.4)
+  idempotencyKey: holdId + seatId
+  onFailure: retryThenDeadLetter
+  isCritical: false
+retention: 7 days after publication

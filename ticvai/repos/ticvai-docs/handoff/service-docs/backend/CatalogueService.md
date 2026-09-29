@@ -7,7 +7,7 @@
 | Tier | commerce: The sale path. Highest availability, highest write rate. |
 | Contracts | `catalogue`, `promotions`, `seating` |
 | Schemas owned | `catalogue`, `pricing`, `promotions`, `seating` |
-| Operations in the slice | 112 of 444 |
+| Operations in the slice | 109 of 444 |
 | Scale | Read-heavy, bundle-published to tills. The catalogue bundle is this service's output (ADR-0013). |
 | If it is down | A bad publish reaches every workstation. Versioned and rollback-able for that reason. |
 
@@ -89,7 +89,7 @@
 | drafted | [`setPromotionRule`](#setpromotionrule) | PUT | `/promotion-rule` | setup | 1 | ADM-148, ADM-210 |
 | drafted | [`setRateStructure`](#setratestructure) | PUT | `/rate-structure` | setup | 1 | ADM-051 |
 | drafted | [`setRulePriorityConflict`](#setrulepriorityconflict) | PUT | `/rule-priority-conflict` | setup | 1 | ADM-097, BO-441 |
-| entitlement | [`createEntitlementTemplate`](#createentitlementtemplate) | POST | `/entitlement-templates` | setup | 1 | BO-012 |
+| entitlement | [`createEntitlementTemplate`](#createentitlementtemplate) | POST | `/entitlement-templates` | setup | 1 | BO-012, BO-288 |
 | evaluation | [`evaluatePromotions`](#evaluatepromotions) | POST | `/promotions/evaluate` | core | 1 | BO-010, KSK-006, POS-002, POS-021, POS-023, PTR-010 … |
 | event | [`createEvent`](#createevent) | POST | `/events` | setup | 1 | BO-001, BO-015, BO-019, BO-063 |
 | event | [`getPerformance`](#getperformance) | GET | `/performances/{performanceId}` | core | 1 | BO-002, BO-015, BO-019, BO-063, GST-006, GST-041 … |
@@ -137,9 +137,6 @@
 | promotion | [`updatePromotion`](#updatepromotion) | PATCH | `/promotions/{promotionId}` | setup | 1 | BO-010 |
 | promotions | [`setPromotionVariants`](#setpromotionvariants) | PUT | `/promotions/{promotionId}/variants` | setup | 1 | BO-010 |
 | recommendation | [`recommendSeats`](#recommendseats) | POST | `/performances/{performanceId}/seat-recommendations` | core | 2 | BO-002, BO-015, BO-019, BO-063, BO-1001, BO-1002 … |
-| upsell | [`createUpsellRule`](#createupsellrule) | POST | `/upsell-rules` | setup | 2 | BO-119 |
-| upsell | [`deleteUpsellRule`](#deleteupsellrule) | DELETE | `/upsell-rules/{ruleId}` | setup | 2 | BO-119 |
-| upsell | [`getUpsellSuggestions`](#getupsellsuggestions) | POST | `/upsell-suggestions` | core | 2 | BO-102, BO-119, GST-048, WEB-008 |
 
 ## Group: availability
 
@@ -2394,6 +2391,8 @@ Rules: `fixedAmount` needs `amount`, `percentage` needs `percentage`, `tiered` n
 
 **`POST /seat-categories`**: Create a seat category
 
+**Accepts `Prefer: validate-only`** (29 September, build): validates and answers 200 with the would-be result without writing, for the AI executor's plan validation.
+
 |  |  |
 |---|---|
 | Permission | `CAPACITY_CONFIGURE` |
@@ -2411,6 +2410,7 @@ Rules: `fixedAmount` needs `amount`, `percentage` needs `percentage`, `tiered` n
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
 | Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Prefer | header |  | enum (validate-only) | Validate, do not write (29 September, AI system design 2.3 and 2.2 D step 4). |
 
 **Request body**
 
@@ -2466,6 +2466,7 @@ Rules: `fixedAmount` needs `amount`, `percentage` needs `percentage`, `tiered` n
 
 | Code | Shape | Meaning |
 |---|---|---|
+| 200 |  | Validate-only: the would-be result, nothing written |
 | 201 |  | Created |
 
 
@@ -4841,7 +4842,7 @@ The resolution method defaults to `highestPriorityWins`; lowest-price-wins is ne
 | Conflict policy | serverWins |
 | Reads | `cache:idempotency`, `catalogue.entitlement_template` |
 | Writes | `cache:idempotency`, `catalogue.entitlement_template` |
-| Called by | BO-012 |
+| Called by | BO-012, BO-288 |
 
 **Parameters**
 
@@ -4863,6 +4864,7 @@ The resolution method defaults to `highestPriorityWins`; lowest-price-wins is ne
 | daysOfWeek | array of enum (mon, tue, wed, thu, fri, sat, sun) |  | 1.1.7 and 1.1.82. (nullable) |
 | expiryAnchor | enum (offsetDays, endOfMonth, endOfQuarter, endOfYear, fixedDate, seasonEnd) |  | 1.1.90 to 1.1.92. (nullable) |
 | expiryDate | string (date) |  | Where expiryAnchor is fixedDate. (nullable) |
+| expiryNoticeDays | integer |  | How many days before validTo access raises entitlement.expiringSoon for an entitlement of this template still issued or partiallyConsumed (29 September, build pass, group G2; 5.5.30). (min 1; max 180; nullable) |
 | carriesStoredValue | boolean |  | BL-033. (default False) |
 | includedValue | Money |  | On the wire this is three fields; in the database it is one column. |
 | includedValue.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
@@ -4917,6 +4919,7 @@ The resolution method defaults to `highestPriorityWins`; lowest-price-wins is ne
 | daysOfWeek | array of enum (mon, tue, wed, thu, fri, sat, sun) |  | 1.1.7 and 1.1.82. (nullable) |
 | expiryAnchor | enum (offsetDays, endOfMonth, endOfQuarter, endOfYear, fixedDate, seasonEnd) |  | 1.1.90 to 1.1.92. (nullable) |
 | expiryDate | string (date) |  | Where expiryAnchor is fixedDate. (nullable) |
+| expiryNoticeDays | integer |  | How many days before validTo access raises entitlement.expiringSoon for an entitlement of this template still issued or partiallyConsumed (29 September, build pass, group G2; 5.5.30). (min 1; max 180; nullable) |
 | carriesStoredValue | boolean |  | BL-033. (default False) |
 | includedValue | Money |  | On the wire this is three fields; in the database it is one column. |
 | includedValue.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
@@ -5481,7 +5484,7 @@ Where seating rules apply, holding a seat may implicitly buffer its neighbours �
 | Conflict policy | serverWins |
 | Lock | rowExclusive |
 | Reads | `cache:idempotency`, `seating.seat_hold` |
-| Writes | `cache:idempotency`, `seating.seat_hold` |
+| Writes | `cache:idempotency`, `platform.outbox`, `seating.seat_hold` |
 | Called by | BO-994, GST-049, POS-004, WEB-007 |
 | State model | Seat hold ([states/seat-hold.yaml](../../../states/seat-hold.yaml)): created as `held`<br/>Seat ([states/seat.yaml](../../../states/seat.yaml)): moves `available` -> `held` |
 
@@ -5647,7 +5650,7 @@ Releases buffered neighbours alongside the held seats.
 | Conflict policy | serverWins |
 | Guest callable | True |
 | Reads | `seating.seat_hold` |
-| Writes | `seating.seat_hold` |
+| Writes | `platform.outbox`, `seating.seat_hold` |
 | Called by | BO-998, BO-999, GST-049, POS-004, WEB-007 |
 | State model | Seat hold ([states/seat-hold.yaml](../../../states/seat-hold.yaml)): moves `held` -> `released`<br/>Seat ([states/seat.yaml](../../../states/seat.yaml)): moves `held` -> `available` |
 
@@ -5997,6 +6000,8 @@ Next season's prices from this season's, uplifted by a percentage. The alternati
 
 **`POST /price-lists`**: Create a price list
 
+**Accepts `Prefer: validate-only`** (29 September, build): validates and answers 200 with the would-be result without writing, for the AI executor's plan validation.
+
 |  |  |
 |---|---|
 | Permission | `PRICE_CONFIGURE` |
@@ -6014,6 +6019,7 @@ Next season's prices from this season's, uplifted by a percentage. The alternati
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
 | Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Prefer | header |  | enum (validate-only) | Validate, do not write (29 September, AI system design 2.3 and 2.2 D step 4). |
 
 **Request body**: `CreatePriceListRequest`
 
@@ -6066,6 +6072,7 @@ Next season's prices from this season's, uplifted by a percentage. The alternati
 
 | Code | Shape | Meaning |
 |---|---|---|
+| 200 |  | Validate-only: the would-be result, nothing written |
 | 201 |  | Created |
 | 400 | BadRequest | Validation failed |
 
@@ -6074,6 +6081,7 @@ Next season's prices from this season's, uplifted by a percentage. The alternati
 **`PUT /price-lists/{priceListId}/prices`**: Set prices in bulk
 
 Currency must match the region's currency and scale. A price in a currency the region does not use is rejected — money carries its scale, and a mismatched scale silently truncates.
+**Accepts `Prefer: validate-only`** (29 September, build): validates and answers 200 with the would-be result without writing, for the AI executor's plan validation.
 
 |  |  |
 |---|---|
@@ -6093,6 +6101,7 @@ Currency must match the region's currency and scale. A price in a currency the r
 |---|---|---|---|---|
 | priceListId | path | yes | string (uuid) |  |
 | Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Prefer | header |  | enum (validate-only) | Validate, do not write (29 September, AI system design 2.3 and 2.2 D step 4). |
 
 **Request body**
 
@@ -6256,6 +6265,8 @@ Checks a party's declared ages and heights against every product in the booking 
 
 **`POST /products`**: Create a product
 
+**Accepts `Prefer: validate-only`** (29 September, build): validates and answers 200 with the would-be result without writing, for the AI executor's plan validation.
+
 |  |  |
 |---|---|
 | Permission | `PRODUCT_CONFIGURE` |
@@ -6274,6 +6285,7 @@ Checks a party's declared ages and heights against every product in the booking 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
 | Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Prefer | header |  | enum (validate-only) | Validate, do not write (29 September, AI system design 2.3 and 2.2 D step 4). |
 
 **Request body**: `CreateProductRequest`
 
@@ -6361,6 +6373,7 @@ Checks a party's declared ages and heights against every product in the booking 
 
 | Code | Shape | Meaning |
 |---|---|---|
+| 200 |  | Validate-only: the would-be result, nothing written |
 | 201 |  | Created. |
 | 400 | BadRequest | Validation failed |
 | 403 | Forbidden | Authenticated but not permitted at the requested scope |
@@ -7118,6 +7131,8 @@ Withdrawal stops new sales and leaves existing entitlements intact. Archiving is
 
 **`PATCH /products/{productId}`**: Update a product
 
+**Accepts `Prefer: validate-only`** (29 September, build): validates and answers 200 with the would-be result without writing, for the AI executor's plan validation.
+
 |  |  |
 |---|---|
 | Permission | `PRODUCT_CONFIGURE` |
@@ -7136,6 +7151,7 @@ Withdrawal stops new sales and leaves existing entitlements intact. Archiving is
 |---|---|---|---|---|
 | productId | path | yes | string (uuid) |  |
 | Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Prefer | header |  | enum (validate-only) | Validate, do not write (29 September, AI system design 2.3 and 2.2 D step 4). |
 
 **Request body**: `UpdateProductRequest`
 
@@ -7445,6 +7461,8 @@ Created in `draft`. A draft promotion never evaluates — publishing is the act 
 | budgetCap.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
 | budgetCap.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
 | campaignId | string (uuid) |  | The commercial campaign (promotions.campaign) this promotion belongs to; null for a promotion run on its own. (nullable) |
+| recommendable | boolean |  | May the recommendation engine show this offer to a guest (8.6.30 to 8.6.36; 29 September, build pass, group G2, from group G1's handoff). (default False) |
+| recommendableSegmentIds | array of string (uuid) |  | The marketing-crm segments the offer may be recommended to; null means every guest its own conditions admit. (nullable) |
 
 **Response**: `Promotion`
 
@@ -7513,6 +7531,8 @@ Created in `draft`. A draft promotion never evaluates — publishing is the act 
 | budgetCap.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
 | budgetCap.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
 | campaignId | string (uuid) |  | The commercial campaign (promotions.campaign) this promotion belongs to; null for a promotion run on its own. (nullable) |
+| recommendable | boolean |  | May the recommendation engine show this offer to a guest (8.6.30 to 8.6.36; 29 September, build pass, group G2, from group G1's handoff). (default False) |
+| recommendableSegmentIds | array of string (uuid) |  | The marketing-crm segments the offer may be recommended to; null means every guest its own conditions admit. (nullable) |
 | id | string (uuid) | yes |  |
 | status | PromotionStatus: enum (draft, scheduled, live, paused, expired, ended) | yes |  |
 | isPaused | boolean |  |  |
@@ -7681,7 +7701,7 @@ Runs conflict analysis first. A promotion that stacks with an existing one to pr
 | Offline | no |
 | Conflict policy | serverWins |
 | Reads | `cache:idempotency`, `promotions.promotion`, `promotions.promotion_channel_publication` |
-| Writes | `cache:idempotency`, `promotions.promotion`, `promotions.promotion_audit`, `promotions.promotion_channel_publication` |
+| Writes | `cache:idempotency`, `platform.outbox`, `promotions.promotion`, `promotions.promotion_audit`, `promotions.promotion_channel_publication` |
 | Called by | BO-010 |
 | State model | Promotion channel publication ([states/promotion-channel-publication.yaml](../../../states/promotion-channel-publication.yaml)): moves `notAssigned` -> `pendingPublication`, `suspended` -> `pendingPublication`<br/>Promotion ([states/promotion.yaml](../../../states/promotion.yaml)): moves `draft` -> `scheduled`, `paused` -> `live` |
 
@@ -7759,6 +7779,8 @@ Runs conflict analysis first. A promotion that stacks with an existing one to pr
 | budgetCap.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
 | budgetCap.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
 | campaignId | string (uuid) |  | The commercial campaign (promotions.campaign) this promotion belongs to; null for a promotion run on its own. (nullable) |
+| recommendable | boolean |  | May the recommendation engine show this offer to a guest (8.6.30 to 8.6.36; 29 September, build pass, group G2, from group G1's handoff). (default False) |
+| recommendableSegmentIds | array of string (uuid) |  | The marketing-crm segments the offer may be recommended to; null means every guest its own conditions admit. (nullable) |
 | id | string (uuid) | yes |  |
 | status | PromotionStatus: enum (draft, scheduled, live, paused, expired, ended) | yes |  |
 | isPaused | boolean |  |  |
@@ -8005,6 +8027,8 @@ Amending a live promotion changes behaviour mid-sale. Conditions and discount ar
 | budgetCap.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
 | budgetCap.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
 | campaignId | string (uuid) |  | The commercial campaign (promotions.campaign) this promotion belongs to; null for a promotion run on its own. (nullable) |
+| recommendable | boolean |  | May the recommendation engine show this offer to a guest (8.6.30 to 8.6.36; 29 September, build pass, group G2, from group G1's handoff). (default False) |
+| recommendableSegmentIds | array of string (uuid) |  | The marketing-crm segments the offer may be recommended to; null means every guest its own conditions admit. (nullable) |
 | id | string (uuid) | yes |  |
 | status | PromotionStatus: enum (draft, scheduled, live, paused, expired, ended) | yes |  |
 | isPaused | boolean |  |  |
@@ -8148,171 +8172,6 @@ Returns contiguous groups where the party requires them — a family of four spl
 |---|---|---|
 | 200 |  | Recommendations, best first |
 | 404 |  | No selection satisfies the constraints |
-
-
-## Group: upsell
-
-### createUpsellRule
-
-**`POST /upsell-rules`**: Create an upsell rule
-
-Rules apply across every channel by default — POS, kiosk, web, app, call centre, B2B and API (3.7.12). A rule that fires on the website but not at a counter is a guest experience inconsistency, so channel restriction is opt-in rather than the default.
-**Owned at region, read at venue** (decided 28 September, audit R183). The rule records its owning `regionId`, and every venue under that region evaluates it.
-
-|  |  |
-|---|---|
-| Permission | `PRODUCT_CONFIGURE` |
-| Scope level | region |
-| Part of slice | setup, makes `promotions.upsell_rule` non-empty |
-| Wave | 2 |
-| Offline | no |
-| Config scope | region |
-| Conflict policy | serverWins |
-| Reads | `cache:idempotency`, `promotions.upsell_rule` |
-| Writes | `cache:idempotency`, `promotions.upsell_rule` |
-| Called by | BO-119 |
-
-**Parameters**
-
-| Name | In | Required | Type | Notes |
-|---|---|---|---|---|
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
-
-**Request body**: `UpsellRule`
-
-| Field | Type | Required | Notes |
-|---|---|---|---|
-| id | string (uuid) | yes |  |
-| regionId | string (uuid) |  | The region that owns the rule. (read-only) |
-| name | string | yes | (max length 200) |
-| placement | UpsellPlacement: enum (productDetail, cart, checkout, postPurchase, atGate, inVenue) | yes |  |
-| triggerVariantIds | array of string (uuid) | yes |  |
-| triggerCategoryIds | array of string (uuid) |  |  |
-| suggestedVariantIds | array of string (uuid) | yes | (min items 1) |
-| suggestedBundleId | string (uuid) |  | (nullable) |
-| channels | array of string |  | Empty applies to every channel. |
-| priority | integer |  | (default 0) |
-| maxSuggestions | integer |  | (default 3) |
-| isActive | boolean |  |  |
-
-**Response**: `UpsellRule`
-
-| Field | Type | Required | Notes |
-|---|---|---|---|
-| id | string (uuid) | yes |  |
-| regionId | string (uuid) |  | The region that owns the rule. (read-only) |
-| name | string | yes | (max length 200) |
-| placement | UpsellPlacement: enum (productDetail, cart, checkout, postPurchase, atGate, inVenue) | yes |  |
-| triggerVariantIds | array of string (uuid) | yes |  |
-| triggerCategoryIds | array of string (uuid) |  |  |
-| suggestedVariantIds | array of string (uuid) | yes | (min items 1) |
-| suggestedBundleId | string (uuid) |  | (nullable) |
-| channels | array of string |  | Empty applies to every channel. |
-| priority | integer |  | (default 0) |
-| maxSuggestions | integer |  | (default 3) |
-| isActive | boolean |  |  |
-
-**Responses**
-
-| Code | Shape | Meaning |
-|---|---|---|
-| 201 |  | Created |
-
-### deleteUpsellRule
-
-**`DELETE /upsell-rules/{ruleId}`**: Remove an upsell rule
-
-Upsell rules are owned at region and read at venue (decided 28 September, audit R183), so a rule is removed at the region that owns it, never from one venue beneath it.
-
-|  |  |
-|---|---|
-| Permission | `PRODUCT_CONFIGURE` |
-| Scope level | region |
-| Part of slice | setup, makes `promotions.upsell_rule` non-empty |
-| Wave | 2 |
-| Offline | no |
-| Config scope | region |
-| Conflict policy | serverWins |
-| Reads | `cache:idempotency`, `promotions.upsell_rule` |
-| Writes | `cache:idempotency`, `promotions.upsell_rule` |
-| Called by | BO-119 |
-
-**Parameters**
-
-| Name | In | Required | Type | Notes |
-|---|---|---|---|---|
-| ruleId | path | yes | string (uuid) |  |
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
-
-**Responses**
-
-| Code | Shape | Meaning |
-|---|---|---|
-| 204 |  | Removed |
-| 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
-
-### getUpsellSuggestions
-
-**`POST /upsell-suggestions`**: Suggestions for a cart
-
-Rule-based today. Where the recommendation engine is enabled it augments this rather than replacing it — a configured rule always outranks a model, because the operator who wrote it had a commercial reason.
-
-|  |  |
-|---|---|
-| Permission | `PRODUCT_VIEW` |
-| Scope level | venue |
-| Part of slice | core |
-| Wave | 2 |
-| Offline | yes |
-| Conflict policy | serverWins |
-| Reads | `cache:idempotency`, `catalogue.product`, `promotions.upsell_rule` |
-| Writes | `cache:idempotency` |
-| Called by | BO-102, BO-119, GST-048, WEB-008 |
-
-**Parameters**
-
-| Name | In | Required | Type | Notes |
-|---|---|---|---|---|
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
-
-**Request body**
-
-| Field | Type | Required | Notes |
-|---|---|---|---|
-| venueId | string (uuid) | yes |  |
-| placement | UpsellPlacement: enum (productDetail, cart, checkout, postPurchase, atGate, inVenue) | yes |  |
-| channel | SalesChannel: enum (pos, kiosk, guestApp, guestWeb, callCentre, partner, api, backOffice, …) |  | Where a sale came from. |
-| subjectId | string (uuid) |  |  |
-| cartLines | array of object | yes |  |
-| cartLines[].variantId | string (uuid) |  |  |
-| cartLines[].quantity | integer |  |  |
-
-**Response**: `object`
-
-| Field | Type | Required | Notes |
-|---|---|---|---|
-| suggestions | array of UpsellSuggestion | yes |  |
-| suggestions[].variantId | string (uuid) | yes |  |
-| suggestions[].bundleId | string (uuid) |  | (nullable) |
-| suggestions[].name | string | yes |  |
-| suggestions[].price | Money | yes | On the wire this is three fields; in the database it is one column. |
-| suggestions[].price.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
-| suggestions[].price.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
-| suggestions[].price.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
-| suggestions[].discountedPrice | Money |  | On the wire this is three fields; in the database it is one column. |
-| suggestions[].discountedPrice.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
-| suggestions[].discountedPrice.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
-| suggestions[].discountedPrice.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
-| suggestions[].source | enum (rule, recommendation) | yes | A configured rule always outranks a model. |
-| suggestions[].ruleId | string (uuid) |  | (nullable) |
-| suggestions[].rank | integer | yes |  |
-| suggestions[].rationale | string |  | (nullable) |
-
-**Responses**
-
-| Code | Shape | Meaning |
-|---|---|---|
-| 200 |  | Suggestions, best first |
 
 ## Tables
 
@@ -8594,6 +8453,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 | days_of_week | text[] | no | 1.1.7 and 1.1.82. |
 | expiry_anchor | text | no | 1.1.90 to 1.1.92. |
 | expiry_date | date | no | Where expiryAnchor is fixedDate. |
+| expiry_notice_days | integer | no | How many days before validTo access raises entitlement.expiringSoon for an entitlement of this template still issued or partiallyConsumed (29 September, build pass, group G2; 5.5.30). |
 | carries_stored_value | boolean | no | BL-033. |
 | included_value | numeric(18,4) | no |  |
 | blackout_dates | text[] | no | Calendar exceptions on the entitlement. |
@@ -9439,6 +9299,8 @@ Every table this service owns that the slice reads or writes, with its columns a
 | max_redemptions_per_guest | integer | no |  |
 | budget_cap | numeric(18,4) | no | Total discount value after which the promotion stops automatically. |
 | campaign_id | uuid | no | The commercial campaign (promotions.campaign) this promotion belongs to; null for a promotion run on its own. |
+| is_recommendable | boolean | no | May the recommendation engine show this offer to a guest (8.6.30 to 8.6.36; 29 September, build pass, group G2, from group G1's handoff). |
+| recommendable_segment_ids | text[] | no | The marketing-crm segments the offer may be recommended to; null means every guest its own conditions admit. |
 | id | uuid | yes |  |
 | status | text | yes |  |
 | is_paused | boolean | no |  |
@@ -9522,23 +9384,6 @@ Every table this service owns that the slice reads or writes, with its columns a
 | traffic_percent | integer | yes | Share of traffic. |
 | discount_percent | numeric | no |  |
 
-### `promotions.upsell_rule`
-
-| Column | Type | Required | Notes |
-|---|---|---|---|
-| id | uuid | yes |  |
-| region_id | uuid | no | The region that owns the rule. |
-| name | text | yes |  |
-| placement | text | yes |  |
-| trigger_variant_ids | text[] | yes |  |
-| trigger_category_ids | text[] | no |  |
-| suggested_variant_ids | text[] | yes |  |
-| suggested_bundle_id | uuid | no |  |
-| channels | text[] | no | Empty applies to every channel. |
-| priority | integer | no |  |
-| max_suggestions | integer | no |  |
-| is_active | boolean | no |  |
-
 ### `seating.seat`
 
 | Column | Type | Required | Notes |
@@ -9601,7 +9446,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 
 ## Not in the first release
 
-332 operations, added to this service in later releases without changing any of the above.
+335 operations, added to this service in later releases without changing any of the above.
 
 | Group | Operations |
 |---|---|
@@ -9626,5 +9471,5 @@ Every table this service owns that the slice reads or writes, with its columns a
 | rules | `getSeatingRules`, `setSeatingRules` |
 | seatMap | `cloneSeatMap`, `createSeatMap`, `createSeatMapTemplate`, `getSeatMap`, `listSeatMapTemplates`, `listSeatMaps`, `listSeats`, `publishSeatMap`, `updateSeatMap`, `updateSeats`, `validateSeatMap` |
 | seating | `allocateGroupSeats`, `assignSeats`, `copySeatMapSection`, `createGroupSeatRequest`, `createSeatHoldPool`, `diffSeatMapVersions`, `getAccessibleSeating`, `getSeatInventory`, `getSeatMapImport`, `getSeatRecommendationRules`, `getSeatReconciliation`, `getSeatRules`, `importSeatMap`, `listGroupSeatRequests`, `listSeatHoldPools`, `listSeatHoldTypes`, `reassignSeats`, `releaseSeatHoldPool`, `setAccessibleSeating`, `setGroupSeatRoster`, `setMapZones`, `setSeatHoldType`, `setSeatRecommendationRules`, `setSeatRules`, `validateSeatCompliance` |
-| upsell | `listUpsellRules` |
+| upsell | `createUpsellRule`, `deleteUpsellRule`, `getUpsellSuggestions`, `listUpsellRules` |
 | voucher | `createVoucherBatch`, `listVoucherBatches`, `redeemVoucher` |

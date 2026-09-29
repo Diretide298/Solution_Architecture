@@ -30,6 +30,8 @@ transitions:
   guard: '**Available to sell against.** Publishing an unvalidated map is how a venue discovers on the
     night that two seats share a number'
   requiresApproval: true
+  emits:
+  - seatMap.published
 - from: published
   to: archived
   operation: updateSeatMap
@@ -43,6 +45,8 @@ transitions:
   guard: Restored
   isReversal: true
   requiresApproval: true
+  emits:
+  - seatMap.published
 - from: draft
   to: archived
   operation: updateSeatMap

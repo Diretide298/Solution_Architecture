@@ -2,7 +2,7 @@ openapi: 3.1.0
 info:
   title: TICVAI Finance & Ledger
   version: 0.1.0
-  x-ticvai-screen-count: 49
+  x-ticvai-screen-count: 62
   x-ticvai-tier: spine
   x-ticvai-module: 5 — F&B & Guest Management (accounting and revenue recognition)
   x-ticvai-requirements: 327
@@ -3408,9 +3408,1671 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+  /tax-invoices:
+    get:
+      operationId: listTaxInvoices
+      x-ticvai-consumed-by:
+        - "P01 WEB-019 Order History"
+        - "P02 GST-019 Order History"
+        - "P08 BO-022 Order Detail"
+        - "P08 BO-1081 Finance Dashboard"
+        - "P09 ADM-068 Tax, Fee & Calculation Command Center"
+      x-ticvai-audience:
+      - staff
+      - guest
+      x-ticvai-agreed: '29 September: our build plan (retrace 5.7.93, build pass); shape follows listJournalEntries'
+      x-ticvai-read-routing: replica
+      summary: Tax invoices issued, newest first
+      description: >
+        5.7.93. **Every guest tax invoice the platform has issued**, simplified, full and consolidated,
+        filtered by order, legal entity, type, status or issue date. A guest sees only the invoices
+        issued to them (`buyerSubjectId` is the caller); staff see the legal entities their scope reaches.
+
+        Ordered by `issuedAt` descending, `id` as the tiebreak.
+      tags:
+      - tax
+      x-ticvai-permission: LEDGER_VIEW
+      x-ticvai-self-scoped: subject
+      x-ticvai-scope-level: region
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      security:
+      - guestAuth: []
+      - bearerAuth: []
+      parameters:
+      - name: orderId
+        in: query
+        description: Invoices covering this order, including a consolidated invoice that names it.
+        schema:
+          type: string
+          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+      - name: legalEntityId
+        in: query
+        schema:
+          type: string
+          format: uuid
+      - name: invoiceType
+        in: query
+        schema:
+          $ref: '#/components/schemas/FinTaxInvoiceType'
+      - name: status
+        in: query
+        schema:
+          $ref: '#/components/schemas/FinTaxInvoiceStatus'
+      - name: issuedFrom
+        in: query
+        description: A day in the region's time zone, local midnight to local midnight.
+        schema:
+          type: string
+          format: date
+      - name: issuedTo
+        in: query
+        description: A day in the region's time zone, local midnight to local midnight.
+        schema:
+          type: string
+          format: date
+      - $ref: ../shared/common.yaml#/components/parameters/PageSize
+      - $ref: ../shared/common.yaml#/components/parameters/PageCursor
+      responses:
+        '200':
+          description: Invoices, newest first
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: ../shared/common.yaml#/components/schemas/Page
+                - type: object
+                  properties:
+                    items:
+                      type: array
+                      items:
+                        $ref: '#/components/schemas/FinTaxInvoice'
+    post:
+      operationId: issueTaxInvoice
+      x-ticvai-consumed-by:
+        - "P01 WEB-019 Order History"
+        - "P02 GST-019 Order History"
+        - "P04 POS-026 Receipt & Reprint"
+        - "P08 BO-022 Order Detail"
+      x-ticvai-audience:
+      - staff
+      - guest
+      - service
+      x-ticvai-agreed: '29 September: our build plan (retrace 5.7.93, 5.10.3; CF-133 open on the legal field set only); shape follows createJournalEntry'
+      x-ticvai-make-or-break: 'Which fields must a UAE tax invoice and a simplified tax invoice show, in which
+        language, and may a simplified tax invoice already issued be replaced by a full one for the same supply
+        or must it be credited first? The shape carries the Executive Regulation Article 59 set (supplier and
+        recipient TRN, sequential number, dates, per-line rate and tax, totals and tax in AED); the list is law
+        and CF-133 is still open with the client and their tax adviser.'
+      summary: Issue a tax invoice for one or more paid orders
+      description: >
+        5.7.93, 5.10.3. **The document a guest or a company can reclaim or file VAT against**, which a
+        billing statement (`isTaxInvoice` false) and a receipt are not. Three kinds:
+
+        - `simplified`: one order, no recipient details required. Issued by the platform (`service`) when
+          an order is paid and the venue's template says so; this is the receipt that carries VAT.
+        - `full`: one order, with the recipient's name, address and, where registered, their TRN. Asked for
+          by the guest (their own order), at a till or from the back office.
+        - `consolidated`: several paid orders of one buyer, one legal entity and one currency on one
+          invoice, for a corporate account or a group booking. Each order may be on one consolidated
+          invoice only.
+
+        The server takes the lines, rates and tax from the orders as they were posted (`calculateTax` at
+        sale); **nothing on an invoice is re-priced**. The number is assigned from the legal entity's series
+        for the document kind (`setTaxInvoiceTemplate`), in sequence and without gaps, when the invoice is
+        issued; it is never reused. The supplier block is a snapshot of the legal entity at issue.
+        The PDF, in the template's languages, is produced at issue (`getTaxDocumentRendition`).
+
+        An invoice is never edited or deleted: a correction is a credit memo (`issueCreditMemo`) and, where
+        needed, a new invoice. A guest may call this for their own paid orders only.
+      tags:
+      - tax
+      x-ticvai-permission: LEDGER_POST
+      x-ticvai-self-scoped: subject
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      security:
+      - guestAuth: []
+      - bearerAuth: []
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FinIssueTaxInvoiceRequest'
+      responses:
+        '201':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: Issued, numbered and rendered
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FinTaxInvoice'
+        '404':
+          $ref: ../shared/common.yaml#/components/responses/NotFound
+        '409':
+          description: An order is not paid, is already on a tax invoice of the same or a wider kind
+            (`order-already-invoiced`), or the legal entity has no active template for the document kind
+            (`no-invoice-template`).
+          x-ticvai-problem-types:
+          - order-already-invoiced
+          - order-not-paid
+          - no-invoice-template
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
+        '422':
+          description: A `full` or `consolidated` invoice without a recipient name and address, a
+            `consolidated` invoice whose orders span buyers, legal entities or currencies, more than one
+            order on a `simplified` or `full` invoice, or a `simplified` invoice the template does not allow
+            for this recipient or amount, or a `supersedesInvoiceId` while replacing an issued simplified
+            invoice is not allowed.
+          x-ticvai-problem-types:
+          - recipient-required
+          - supersede-not-allowed
+          - orders-not-consolidatable
+          - simplified-not-allowed
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
+  /tax-invoices/{invoiceId}:
+    parameters:
+    - name: invoiceId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    get:
+      operationId: getTaxInvoice
+      x-ticvai-consumed-by:
+        - "P01 WEB-019 Order History"
+        - "P02 GST-019 Order History"
+        - "P04 POS-026 Receipt & Reprint"
+        - "P08 BO-022 Order Detail"
+      x-ticvai-audience:
+      - staff
+      - guest
+      x-ticvai-agreed: '29 September: our build plan (retrace 5.7.93); shape follows getJournalEntry'
+      x-ticvai-read-routing: replica
+      summary: One tax invoice, with its lines, VAT per rate and credit memos
+      description: >
+        5.7.93. The invoice as issued, its lines, the VAT summary per rate, what has been credited against
+        it and its e-invoicing status. A guest may read only invoices issued to them.
+      tags:
+      - tax
+      x-ticvai-permission: LEDGER_VIEW
+      x-ticvai-self-scoped: subject
+      x-ticvai-scope-level: region
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      security:
+      - guestAuth: []
+      - bearerAuth: []
+      responses:
+        '200':
+          description: Invoice
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FinTaxInvoice'
+        '404':
+          $ref: ../shared/common.yaml#/components/responses/NotFound
+  /tax-invoices/{invoiceId}/credit-memos:
+    parameters:
+    - name: invoiceId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    post:
+      operationId: issueCreditMemo
+      x-ticvai-consumed-by:
+        - "P04 POS-011 Returns, Refunds & Exchanges"
+        - "P08 BO-022 Order Detail"
+        - "P08 BO-023 Refunds & Exchanges"
+      x-ticvai-audience:
+      - staff
+      - service
+      x-ticvai-agreed: '29 September: our build plan (retrace 5.7.94; CF-133 open on the legal field set only); shape follows reverseJournalEntry'
+      x-ticvai-make-or-break: 'Which fields must a UAE tax credit note show (Executive Regulation Article 60:
+        the words "Tax Credit Note", the original invoice number and date, the value and tax credited in AED,
+        the reason), and within what period after the adjustment must it be issued? CF-133.'
+      summary: Credit all or part of a tax invoice
+      description: >
+        5.7.94. **The document a refund or a cancellation owes the guest when a tax invoice was issued.**
+        `full` credits every remaining line; `partial` credits the lines and amounts given. It is linked to
+        the invoice it credits and, where one caused it, to the refund (`refundId`) or the cancelled order.
+        The platform issues one itself (`service`) when a refund is approved on an invoiced order; staff
+        issue one for a price adjustment or a billing error.
+
+        A credit memo has its **own series** per legal entity (`setTaxInvoiceTemplate`, document kind
+        `creditMemo`), numbered at issue without gaps, and is never edited or deleted. The VAT credited is
+        the invoice's own rate per line, never today's. Issuing one moves the invoice to
+        `partiallyCredited` or `fullyCredited`; the ledger movement is the refund's or the reversal's, not
+        this document's. Who issued it, when and why is kept on the memo and in the audit record.
+      tags:
+      - tax
+      x-ticvai-permission: LEDGER_POST
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FinIssueCreditMemoRequest'
+      responses:
+        '201':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: Issued, numbered and rendered
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FinCreditMemo'
+        '404':
+          $ref: ../shared/common.yaml#/components/responses/NotFound
+        '409':
+          description: The invoice is already `fullyCredited` or `superseded`.
+          x-ticvai-problem-types:
+          - invoice-fully-credited
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
+        '422':
+          description: A `partial` memo with no lines, a line not on the invoice, or an amount above what
+            remains uncredited on that line.
+          x-ticvai-problem-types:
+          - credit-exceeds-invoice
+          - line-not-on-invoice
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
+  /credit-memos:
+    get:
+      operationId: listCreditMemos
+      x-ticvai-consumed-by:
+        - "P01 WEB-019 Order History"
+        - "P02 GST-019 Order History"
+        - "P08 BO-023 Refunds & Exchanges"
+        - "P08 BO-1081 Finance Dashboard"
+      x-ticvai-audience:
+      - staff
+      - guest
+      x-ticvai-agreed: '29 September: our build plan (retrace 5.7.94); shape follows listJournalEntries'
+      x-ticvai-read-routing: replica
+      summary: Credit memos issued, newest first
+      description: >
+        5.7.94. Credit memos by invoice, refund, legal entity or issue date. A guest sees only memos against
+        invoices issued to them. Ordered by `issuedAt` descending, `id` as the tiebreak.
+      tags:
+      - tax
+      x-ticvai-permission: LEDGER_VIEW
+      x-ticvai-self-scoped: subject
+      x-ticvai-scope-level: region
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      security:
+      - guestAuth: []
+      - bearerAuth: []
+      parameters:
+      - name: taxInvoiceId
+        in: query
+        schema:
+          type: string
+          format: uuid
+      - name: refundId
+        in: query
+        schema:
+          type: string
+          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+      - name: legalEntityId
+        in: query
+        schema:
+          type: string
+          format: uuid
+      - name: issuedFrom
+        in: query
+        schema:
+          type: string
+          format: date
+      - name: issuedTo
+        in: query
+        schema:
+          type: string
+          format: date
+      - $ref: ../shared/common.yaml#/components/parameters/PageSize
+      - $ref: ../shared/common.yaml#/components/parameters/PageCursor
+      responses:
+        '200':
+          description: Credit memos, newest first
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: ../shared/common.yaml#/components/schemas/Page
+                - type: object
+                  properties:
+                    items:
+                      type: array
+                      items:
+                        $ref: '#/components/schemas/FinCreditMemo'
+  /tax-documents/{documentId}/rendition:
+    parameters:
+    - name: documentId
+      in: path
+      required: true
+      description: A tax invoice id or a credit memo id.
+      schema:
+        type: string
+        format: uuid
+    get:
+      operationId: getTaxDocumentRendition
+      x-ticvai-consumed-by:
+        - "P01 WEB-019 Order History"
+        - "P02 GST-019 Order History"
+        - "P04 POS-026 Receipt & Reprint"
+        - "P08 BO-022 Order Detail"
+        - "P08 BO-023 Refunds & Exchanges"
+      x-ticvai-audience:
+      - staff
+      - guest
+      x-ticvai-agreed: '29 September: our build plan (retrace 5.7.93 PDF and language); shape follows getTaxInvoice'
+      x-ticvai-read-routing: replica
+      summary: The PDF of a tax invoice or credit memo, in a language
+      description: >
+        5.7.93, 5.7.94. **A short-lived link to the PDF rendered at issue**, never a re-render: the document
+        a guest downloads next year is the one issued today. `language` picks one of the template's
+        languages (bilingual templates render both on one page and ignore it). A guest may read only their
+        own documents.
+      tags:
+      - tax
+      x-ticvai-permission: LEDGER_VIEW
+      x-ticvai-self-scoped: subject
+      x-ticvai-scope-level: region
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      security:
+      - guestAuth: []
+      - bearerAuth: []
+      parameters:
+      - name: language
+        in: query
+        schema:
+          type: string
+          pattern: ^[a-z]{2}(-[A-Z]{2})?$
+      responses:
+        '200':
+          description: Link to the PDF
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FinTaxDocumentRendition'
+        '404':
+          $ref: ../shared/common.yaml#/components/responses/NotFound
+  /tax-invoice-templates:
+    get:
+      operationId: listTaxInvoiceTemplates
+      x-ticvai-consumed-by:
+        - "P09 ADM-069 Tax Profile & Jurisdiction Configuration"
+      x-ticvai-audience:
+      - staff
+      x-ticvai-agreed: '29 September: our build plan (retrace 5.7.93 template, numbering, language); shape follows listLegalEntities'
+      x-ticvai-read-routing: replica
+      summary: Invoice and credit memo templates and number series, per legal entity
+      tags:
+      - tax
+      x-ticvai-permission: LEDGER_VIEW
+      x-ticvai-scope-level: tenant
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+      - name: legalEntityId
+        in: query
+        schema:
+          type: string
+          format: uuid
+      - $ref: ../shared/common.yaml#/components/parameters/PageSize
+      - $ref: ../shared/common.yaml#/components/parameters/PageCursor
+      responses:
+        '200':
+          description: Templates
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: ../shared/common.yaml#/components/schemas/Page
+                - type: object
+                  properties:
+                    items:
+                      type: array
+                      items:
+                        $ref: '#/components/schemas/FinTaxInvoiceTemplate'
+    put:
+      operationId: setTaxInvoiceTemplate
+      x-ticvai-consumed-by:
+        - "P09 ADM-069 Tax Profile & Jurisdiction Configuration"
+      x-ticvai-audience:
+      - staff
+      x-ticvai-agreed: '29 September: our build plan (retrace 5.7.93 template, numbering, language); shape follows createLegalEntity'
+      summary: Set a legal entity's template and number series for one document kind
+      description: >
+        5.7.93, 5.7.94. **One template per legal entity and document kind** (`taxInvoice`,
+        `simplifiedTaxInvoice`, `creditMemo`): the number prefix and series, the languages rendered, the
+        layout and logo, the footer text per language, and when a simplified invoice is allowed. Keyed by
+        legal entity and document kind; a second call replaces the first from `effectiveFrom`.
+
+        **The series cannot move backwards.** `nextNumber` may be raised (a migration from another system
+        continues its numbering) and never lowered, and a prefix change starts a new series rather than
+        renumbering issued documents.
+      tags:
+      - tax
+      x-ticvai-permission: TAX_CONFIGURE
+      x-ticvai-scope-level: tenant
+      x-ticvai-config-scope: tenant
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FinTaxInvoiceTemplate'
+      responses:
+        '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: Set
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FinTaxInvoiceTemplate'
+        '404':
+          $ref: ../shared/common.yaml#/components/responses/NotFound
+        '422':
+          description: '`nextNumber` below the last number issued in the series, or a language the legal
+            entity''s region does not offer.'
+          x-ticvai-problem-types:
+          - series-would-move-backwards
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
+  /e-invoicing/providers:
+    get:
+      operationId: listEInvoicingProviders
+      x-ticvai-consumed-by:
+        - "P09 ADM-069 Tax Profile & Jurisdiction Configuration"
+        - "P09 ADM-077 Calculation Validation, Reconciliation & Service Interface"
+      x-ticvai-audience:
+      - staff
+      x-ticvai-agreed: '29 September: our build plan (retrace 6.1.1); shape follows listLegalEntities'
+      x-ticvai-read-routing: replica
+      summary: The e-invoicing service provider connection per legal entity
+      tags:
+      - tax
+      x-ticvai-permission: LEDGER_VIEW
+      x-ticvai-scope-level: tenant
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/PageSize
+      - $ref: ../shared/common.yaml#/components/parameters/PageCursor
+      responses:
+        '200':
+          description: Connections
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: ../shared/common.yaml#/components/schemas/Page
+                - type: object
+                  properties:
+                    items:
+                      type: array
+                      items:
+                        $ref: '#/components/schemas/FinEInvoicingProvider'
+    put:
+      operationId: setEInvoicingProvider
+      x-ticvai-consumed-by:
+        - "P09 ADM-069 Tax Profile & Jurisdiction Configuration"
+      x-ticvai-audience:
+      - staff
+      x-ticvai-agreed: '29 September: our build plan (retrace 6.1.1); shape follows setFxProvider'
+      x-ticvai-make-or-break: 'Which accredited e-invoicing service provider (ASP) does the client appoint, under
+        which account and Peppol participant identifier per legal entity, and from which date does the UAE
+        e-invoicing mandate bind each of their legal entities? The provider and the date are the client''s;
+        the PINT AE field mapping is the regulator''s (CF-133).'
+      summary: Connect a legal entity to its accredited e-invoicing service provider
+      description: >
+        6.1.1. **UAE e-invoicing runs through an accredited service provider** on the Peppol network (PINT
+        AE), which passes the document to the buyer's provider and reports it to the FTA. This holds the
+        connection per legal entity: the provider, its endpoint, the credential reference (a secret in the
+        vault, never the secret), the entity's participant identifier, and the mode (`disabled`, `test`,
+        `live`). Keyed by legal entity; a second call replaces the first. `live` is refused until a `test`
+        transmission has been accepted.
+      tags:
+      - tax
+      x-ticvai-permission: TAX_CONFIGURE
+      x-ticvai-scope-level: tenant
+      x-ticvai-config-scope: tenant
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FinEInvoicingProvider'
+      responses:
+        '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: Set
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FinEInvoicingProvider'
+        '409':
+          description: '`live` requested before any `test` transmission from this legal entity was accepted.'
+          x-ticvai-problem-types:
+          - einvoicing-not-tested
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
+  /e-invoicing/transmissions:
+    get:
+      operationId: listEInvoiceTransmissions
+      x-ticvai-consumed-by:
+        - "P08 BO-1081 Finance Dashboard"
+        - "P09 ADM-077 Calculation Validation, Reconciliation & Service Interface"
+      x-ticvai-audience:
+      - staff
+      x-ticvai-agreed: '29 September: our build plan (retrace 6.1.1); shape follows listSettlementExceptions'
+      x-ticvai-read-routing: replica
+      summary: What was sent to the e-invoicing provider, and what came back
+      description: >
+        6.1.1. One row per document per attempt, by status, legal entity or document. `rejected` and
+        `failed` are the work queue: a rejected document is corrected by a credit memo and a new invoice,
+        never by editing and resending. Ordered by `createdAt` descending, `id` as the tiebreak.
+      tags:
+      - tax
+      x-ticvai-permission: LEDGER_VIEW
+      x-ticvai-scope-level: region
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+      - name: legalEntityId
+        in: query
+        schema:
+          type: string
+          format: uuid
+      - name: status
+        in: query
+        schema:
+          $ref: '#/components/schemas/FinEInvoiceTransmissionStatus'
+      - name: documentId
+        in: query
+        schema:
+          type: string
+          format: uuid
+      - $ref: ../shared/common.yaml#/components/parameters/PageSize
+      - $ref: ../shared/common.yaml#/components/parameters/PageCursor
+      responses:
+        '200':
+          description: Transmissions, newest first
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: ../shared/common.yaml#/components/schemas/Page
+                - type: object
+                  properties:
+                    items:
+                      type: array
+                      items:
+                        $ref: '#/components/schemas/FinEInvoiceTransmission'
+    post:
+      operationId: transmitEInvoices
+      x-ticvai-consumed-by:
+        - "P09 ADM-077 Calculation Validation, Reconciliation & Service Interface"
+      x-ticvai-audience:
+      - staff
+      - service
+      x-ticvai-agreed: '29 September: our build plan (retrace 6.1.1; PINT AE mapping make-or-break); shape follows ingestSettlementFile'
+      x-ticvai-make-or-break: 'Which PINT AE fields are mandatory for each document kind (the regulator lists
+        51 for a tax invoice) and how are simplified invoices and credit memos reported? The mapping from
+        FinTaxInvoice and FinCreditMemo to PINT AE is defined by the Ministry of Finance and the FTA, not by us
+        (CF-133).'
+      summary: Send issued tax documents to the e-invoicing provider
+      description: >
+        6.1.1. **Shares issued tax invoices and credit memos with the external e-invoicing solution.** The
+        platform calls this itself (`service`) within the provider's `transmitWithinHours` of issue; staff
+        call it to resend a `failed` document or a range. Each document is converted to the provider's
+        format (`pintAe`), hashed, sent, and recorded as a transmission in `queued`, then `sent`; the
+        provider's answer arrives through `recordEInvoiceTransmissionStatus`.
+
+        A document already `accepted` is never sent again. Nothing is sent for a legal entity whose provider
+        is `disabled`; `test` sends to the provider's test endpoint only.
+      tags:
+      - tax
+      x-ticvai-permission: LEDGER_POST
+      x-ticvai-scope-level: region
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - legalEntityId
+              properties:
+                legalEntityId:
+                  type: string
+                  format: uuid
+                documentIds:
+                  type: array
+                  description: Tax invoice or credit memo ids. Omit to send everything issued in the range and
+                    not yet `accepted`.
+                  items:
+                    type: string
+                    format: uuid
+                issuedFrom:
+                  type: string
+                  format: date
+                issuedTo:
+                  type: string
+                  format: date
+      responses:
+        '202':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: Queued; one transmission per document
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  queued:
+                    type: integer
+                  skippedAlreadyAccepted:
+                    type: integer
+                  transmissions:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/FinEInvoiceTransmission'
+        '409':
+          description: The legal entity has no provider, or its provider is `disabled`.
+          x-ticvai-problem-types:
+          - einvoicing-not-configured
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
+  /e-invoicing/transmissions/{transmissionId}/status:
+    parameters:
+    - name: transmissionId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    post:
+      operationId: recordEInvoiceTransmissionStatus
+      x-ticvai-audience:
+      - service
+      x-ticvai-agreed: '29 September: our build plan (retrace 6.1.1); shape follows proposeGuidedChoice (service caller)'
+      summary: Record the provider's answer for one transmission
+      description: >
+        6.1.1. The provider's acknowledgement, acceptance or rejection, relayed by the integration that
+        receives its callbacks. `rejected` carries the provider's codes and message; the document itself is
+        not changed. A status never moves back from `accepted`.
+      tags:
+      - tax
+      x-ticvai-permission: null
+      x-ticvai-auth: service
+      x-ticvai-scope-level: region
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      security:
+      - serviceAuth: []
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - status
+              properties:
+                status:
+                  type: string
+                  enum:
+                  - sent
+                  - accepted
+                  - rejected
+                  - failed
+                providerMessageId:
+                  type: string
+                  maxLength: 200
+                  nullable: true
+                errorCodes:
+                  type: array
+                  items:
+                    type: string
+                errorMessage:
+                  type: string
+                  maxLength: 2000
+                  nullable: true
+                occurredAt:
+                  type: string
+                  format: date-time
+      responses:
+        '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: Recorded
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FinEInvoiceTransmission'
+        '404':
+          $ref: ../shared/common.yaml#/components/responses/NotFound
+        '409':
+          description: The transmission is already `accepted`.
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
+  /tax/vat-returns:
+    get:
+      operationId: getVatReturn
+      x-ticvai-consumed-by:
+        - "P08 BO-090 Period Close"
+        - "P09 ADM-068 Tax, Fee & Calculation Command Center"
+      x-ticvai-audience:
+      - staff
+      x-ticvai-agreed: '29 September: our build plan (retrace 6.1.23); shape follows getFinancialReport'
+      x-ticvai-make-or-break: 'Is the FTA VAT 201 box layout (supplies by emirate, zero-rated, exempt, reverse
+        charge, imports, tourist refunds, inputs) still the form the client files, and does the client''s tax
+        adviser want the emirate taken from the venue address? The form is the regulator''s (CF-133).'
+      x-ticvai-read-routing: analytical
+      summary: A legal entity's VAT return for a tax period, in the FTA's boxes
+      description: >
+        6.1.23. **The tax summary laid out as the return is filed**: the FTA VAT 201 boxes, from the postings
+        of the period, with standard-rated supplies split by emirate (from each venue's address), zero-rated,
+        exempt and reverse-charge supplies, imports, tourist refunds, recoverable input tax and the net
+        payable or refundable. Each box carries the tax codes and posting count behind it so it can be traced.
+        `format` `csv` or `xlsx` returns the same boxes as a file link for the adviser; `json` for screens.
+        Computed from the reporting replica; nothing is stored or filed by this call.
+      tags:
+      - reporting
+      x-ticvai-permission: LEDGER_VIEW
+      x-ticvai-scope-level: region
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+      - name: legalEntityId
+        in: query
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: periodFrom
+        in: query
+        required: true
+        description: A day in the region's time zone, local midnight to local midnight.
+        schema:
+          type: string
+          format: date
+      - name: periodTo
+        in: query
+        required: true
+        description: A day in the region's time zone, local midnight to local midnight.
+        schema:
+          type: string
+          format: date
+      - name: format
+        in: query
+        schema:
+          type: string
+          enum:
+          - json
+          - csv
+          - xlsx
+          default: json
+      responses:
+        '200':
+          description: The return
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FinVatReturn'
+        '422':
+          description: The period is not whole tax months, or the legal entity has no tax registration number.
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
 
 components:
   schemas:
+    FinTaxInvoiceType:
+      type: string
+      description: 5.7.93. `simplified` for one order with no recipient details, `full` for one order with
+        them, `consolidated` for several paid orders of one buyer on one invoice.
+      enum:
+      - simplified
+      - full
+      - consolidated
+    FinTaxInvoiceStatus:
+      type: string
+      description: '`issued` until a credit memo is issued against it; `superseded` where a full invoice replaced
+        a simplified one for the same supply (only if the law allows it; see issueTaxInvoice).'
+      enum:
+      - issued
+      - partiallyCredited
+      - fullyCredited
+      - superseded
+    FinTaxCategory:
+      type: string
+      description: How a line is treated for VAT. Taken from the tax code the line was posted with.
+      enum:
+      - standardRated
+      - zeroRated
+      - exempt
+      - outOfScope
+      - reverseCharge
+    FinIssueTaxInvoiceRequest:
+      x-ticvai-persistence: none — request only
+      type: object
+      required:
+      - invoiceType
+      - orderIds
+      properties:
+        invoiceType:
+          $ref: '#/components/schemas/FinTaxInvoiceType'
+        orderIds:
+          type: array
+          minItems: 1
+          description: One order for `simplified` and `full`; one or more for `consolidated`. Every order must
+            be paid, of one buyer, one legal entity and one currency.
+          items:
+            type: string
+            pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+        recipient:
+          $ref: '#/components/schemas/FinTaxInvoiceRecipient'
+        languages:
+          type: array
+          description: Overrides the template's languages for this document, within those the template offers.
+          items:
+            type: string
+            pattern: ^[a-z]{2}(-[A-Z]{2})?$
+        supersedesInvoiceId:
+          type: string
+          format: uuid
+          nullable: true
+          description: A simplified invoice this full invoice replaces for the same supply. Refused unless the law
+            allows it (make-or-break on issueTaxInvoice).
+        deliverToEmail:
+          type: string
+          format: email
+          nullable: true
+          description: Sends the PDF on issue as well as returning it.
+    FinTaxInvoiceRecipient:
+      x-ticvai-persistence: none — copied onto the invoice as buyer columns
+      type: object
+      description: Who the invoice is addressed to. Required for `full` and `consolidated`.
+      required:
+      - name
+      properties:
+        name:
+          type: string
+          maxLength: 300
+        address:
+          type: string
+          maxLength: 1000
+          nullable: true
+        countryCode:
+          type: string
+          pattern: ^[A-Z]{2}$
+          nullable: true
+        taxRegistrationNumber:
+          type: string
+          maxLength: 30
+          nullable: true
+          description: The recipient's TRN where they are VAT-registered.
+        customerAccountId:
+          type: string
+          format: uuid
+          nullable: true
+          description: The B2B credit account (payments `B2bCreditAccount`) where a company is invoiced.
+    FinTaxInvoiceLine:
+      type: object
+      description: One line as it was sold and taxed. Amounts are in the invoice currency.
+      required:
+      - lineNumber
+      - description
+      - quantity
+      - netAmount
+      - taxAmount
+      - grossAmount
+      - taxCategory
+      properties:
+        lineNumber:
+          type: integer
+          minimum: 1
+        orderId:
+          type: string
+          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+        orderLineId:
+          type: string
+          nullable: true
+        description:
+          type: string
+          maxLength: 500
+        quantity:
+          type: number
+        unitPrice:
+          $ref: ../shared/common.yaml#/components/schemas/Money
+        discountAmount:
+          $ref: ../shared/common.yaml#/components/schemas/Money
+        netAmount:
+          $ref: ../shared/common.yaml#/components/schemas/Money
+        taxCodeId:
+          type: string
+          format: uuid
+          nullable: true
+        taxRate:
+          type: number
+          minimum: 0
+          maximum: 100
+        taxCategory:
+          $ref: '#/components/schemas/FinTaxCategory'
+        taxAmount:
+          $ref: ../shared/common.yaml#/components/schemas/Money
+        grossAmount:
+          $ref: ../shared/common.yaml#/components/schemas/Money
+        creditedAmount:
+          $ref: ../shared/common.yaml#/components/schemas/Money
+    FinTaxInvoice:
+      x-ticvai-persistence: ledger.tax_invoice + ledger.tax_invoice_line
+      type: object
+      description: '5.7.93, 5.10.3. **A guest tax invoice, as issued, never edited.** Corrections are credit
+        memos. The supplier block is a snapshot of the legal entity at issue, so a later change of address does
+        not change a document already given to a guest.'
+      required:
+      - id
+      - invoiceNumber
+      - invoiceType
+      - status
+      - legalEntityId
+      - issuedAt
+      - supplyDate
+      - currency
+      - netAmount
+      - taxAmount
+      - grossAmount
+      - lines
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        invoiceNumber:
+          type: string
+          readOnly: true
+          description: Server-assigned from the legal entity's series for the document kind, in sequence and
+            without gaps, e.g. `INV-2026-000123`. Never reused.
+        invoiceType:
+          $ref: '#/components/schemas/FinTaxInvoiceType'
+        status:
+          $ref: '#/components/schemas/FinTaxInvoiceStatus'
+        legalEntityId:
+          type: string
+          format: uuid
+        templateId:
+          type: string
+          format: uuid
+          nullable: true
+        venueId:
+          type: string
+          format: uuid
+          nullable: true
+        orderIds:
+          type: array
+          items:
+            type: string
+            pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+        supplierName:
+          type: string
+        supplierAddress:
+          type: string
+          nullable: true
+        supplierTaxRegistrationNumber:
+          type: string
+          nullable: true
+        buyerSubjectId:
+          type: string
+          format: uuid
+          nullable: true
+          description: The guest the orders belong to; the key a guest's own reads filter on.
+        buyerName:
+          type: string
+          nullable: true
+        buyerAddress:
+          type: string
+          nullable: true
+        buyerCountryCode:
+          type: string
+          pattern: ^[A-Z]{2}$
+          nullable: true
+        buyerTaxRegistrationNumber:
+          type: string
+          nullable: true
+        customerAccountId:
+          type: string
+          format: uuid
+          nullable: true
+        issuedAt:
+          type: string
+          format: date-time
+        supplyDate:
+          type: string
+          format: date
+          description: The date of supply where it differs from the issue date (the latest order's payment date
+            on a consolidated invoice). A day in the region's time zone.
+        currency:
+          type: string
+          pattern: ^[A-Z]{3}$
+        netAmount:
+          $ref: ../shared/common.yaml#/components/schemas/Money
+        discountAmount:
+          $ref: ../shared/common.yaml#/components/schemas/Money
+        taxAmount:
+          $ref: ../shared/common.yaml#/components/schemas/Money
+        grossAmount:
+          $ref: ../shared/common.yaml#/components/schemas/Money
+        taxAmountInLegalCurrency:
+          $ref: ../shared/common.yaml#/components/schemas/Money
+          description: The tax in the legal entity's currency (AED in the UAE) where the invoice currency differs,
+            at the rate the orders were stored at.
+        creditedAmount:
+          $ref: ../shared/common.yaml#/components/schemas/Money
+        languages:
+          type: array
+          items:
+            type: string
+        supersedesInvoiceId:
+          type: string
+          format: uuid
+          nullable: true
+        renditionAssetId:
+          type: string
+          format: uuid
+          nullable: true
+          readOnly: true
+          description: The PDF rendered at issue; read through getTaxDocumentRendition.
+        eInvoiceStatus:
+          $ref: '#/components/schemas/FinEInvoiceTransmissionStatus'
+        issuedByPrincipalId:
+          type: string
+          format: uuid
+          nullable: true
+          readOnly: true
+          description: Null where the platform issued it.
+        lines:
+          type: array
+          items:
+            $ref: '#/components/schemas/FinTaxInvoiceLine'
+        taxSummary:
+          type: array
+          x-ticvai-persisted: false
+          description: VAT per rate and category, summed from the lines for the response.
+          items:
+            type: object
+            properties:
+              taxCategory:
+                $ref: '#/components/schemas/FinTaxCategory'
+              taxRate:
+                type: number
+              taxableAmount:
+                $ref: ../shared/common.yaml#/components/schemas/Money
+              taxAmount:
+                $ref: ../shared/common.yaml#/components/schemas/Money
+        scopePath:
+          type: string
+          readOnly: true
+          description: '**The partition key** (ADR-0005). Written at the scope of the venue the orders were sold
+            at, or the region for a consolidated invoice across venues.'
+    FinIssueCreditMemoRequest:
+      x-ticvai-persistence: none — request only
+      type: object
+      required:
+      - kind
+      - reason
+      properties:
+        kind:
+          type: string
+          enum:
+          - full
+          - partial
+        reason:
+          type: string
+          enum:
+          - refund
+          - cancellation
+          - priceAdjustment
+          - returnOfGoods
+          - billingError
+          - other
+        refundId:
+          type: string
+          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+          nullable: true
+        cancelledOrderId:
+          type: string
+          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+          nullable: true
+        lines:
+          type: array
+          description: Required for `partial`. Each names an invoice line and the quantity or amount credited.
+          items:
+            type: object
+            required:
+            - lineNumber
+            properties:
+              lineNumber:
+                type: integer
+                minimum: 1
+              quantity:
+                type: number
+                nullable: true
+              netAmount:
+                $ref: ../shared/common.yaml#/components/schemas/Money
+        note:
+          type: string
+          maxLength: 500
+          nullable: true
+    FinCreditMemoLine:
+      type: object
+      required:
+      - invoiceLineNumber
+      - netAmount
+      - taxAmount
+      - grossAmount
+      properties:
+        invoiceLineNumber:
+          type: integer
+          minimum: 1
+        description:
+          type: string
+          maxLength: 500
+        quantity:
+          type: number
+          nullable: true
+        netAmount:
+          $ref: ../shared/common.yaml#/components/schemas/Money
+        taxRate:
+          type: number
+        taxCategory:
+          $ref: '#/components/schemas/FinTaxCategory'
+        taxAmount:
+          $ref: ../shared/common.yaml#/components/schemas/Money
+        grossAmount:
+          $ref: ../shared/common.yaml#/components/schemas/Money
+    FinCreditMemo:
+      x-ticvai-persistence: ledger.credit_memo + ledger.credit_memo_line
+      type: object
+      description: '5.7.94. **A tax credit note against one tax invoice**, with its own series. Never edited.'
+      required:
+      - id
+      - creditMemoNumber
+      - taxInvoiceId
+      - kind
+      - reason
+      - legalEntityId
+      - issuedAt
+      - currency
+      - netAmount
+      - taxAmount
+      - grossAmount
+      - lines
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        creditMemoNumber:
+          type: string
+          readOnly: true
+          description: Server-assigned from the legal entity's credit memo series, in sequence without gaps.
+        taxInvoiceId:
+          type: string
+          format: uuid
+        taxInvoiceNumber:
+          type: string
+          readOnly: true
+        kind:
+          type: string
+          enum:
+          - full
+          - partial
+        reason:
+          type: string
+          enum:
+          - refund
+          - cancellation
+          - priceAdjustment
+          - returnOfGoods
+          - billingError
+          - other
+        refundId:
+          type: string
+          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+          nullable: true
+        cancelledOrderId:
+          type: string
+          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+          nullable: true
+        legalEntityId:
+          type: string
+          format: uuid
+        buyerSubjectId:
+          type: string
+          format: uuid
+          nullable: true
+        issuedAt:
+          type: string
+          format: date-time
+        currency:
+          type: string
+          pattern: ^[A-Z]{3}$
+        netAmount:
+          $ref: ../shared/common.yaml#/components/schemas/Money
+        taxAmount:
+          $ref: ../shared/common.yaml#/components/schemas/Money
+        grossAmount:
+          $ref: ../shared/common.yaml#/components/schemas/Money
+        taxAmountInLegalCurrency:
+          $ref: ../shared/common.yaml#/components/schemas/Money
+        note:
+          type: string
+          nullable: true
+        renditionAssetId:
+          type: string
+          format: uuid
+          nullable: true
+          readOnly: true
+        eInvoiceStatus:
+          $ref: '#/components/schemas/FinEInvoiceTransmissionStatus'
+        issuedByPrincipalId:
+          type: string
+          format: uuid
+          nullable: true
+          readOnly: true
+        lines:
+          type: array
+          items:
+            $ref: '#/components/schemas/FinCreditMemoLine'
+        scopePath:
+          type: string
+          readOnly: true
+    FinTaxDocumentRendition:
+      x-ticvai-persistence: none — a signed link to the stored PDF
+      type: object
+      required:
+      - documentId
+      - documentKind
+      - url
+      - expiresAt
+      properties:
+        documentId:
+          type: string
+          format: uuid
+        documentKind:
+          type: string
+          enum:
+          - taxInvoice
+          - creditMemo
+        documentNumber:
+          type: string
+        language:
+          type: string
+          nullable: true
+        contentType:
+          type: string
+          default: application/pdf
+        url:
+          type: string
+          format: uri
+        expiresAt:
+          type: string
+          format: date-time
+    FinTaxInvoiceTemplate:
+      x-ticvai-persistence: ledger.tax_invoice_template
+      type: object
+      description: '5.7.93, 5.7.94. Also the `setTaxInvoiceTemplate` body. One per legal entity and document kind.'
+      required:
+      - legalEntityId
+      - documentKind
+      - numberPrefix
+      - languages
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        legalEntityId:
+          type: string
+          format: uuid
+        documentKind:
+          type: string
+          enum:
+          - taxInvoice
+          - simplifiedTaxInvoice
+          - creditMemo
+        numberPrefix:
+          type: string
+          maxLength: 20
+          description: e.g. `INV-`, `SINV-`, `CN-`. The year is added by the series when `resetsYearly`.
+        resetsYearly:
+          type: boolean
+          default: true
+          description: A new series per fiscal year of the legal entity.
+        nextNumber:
+          type: integer
+          minimum: 1
+          description: May be raised, never lowered below the last number issued.
+        numberPadding:
+          type: integer
+          minimum: 1
+          maximum: 12
+          default: 6
+        languages:
+          type: array
+          minItems: 1
+          description: Rendered on one page in this order, e.g. `en`, `ar`.
+          items:
+            type: string
+            pattern: ^[a-z]{2}(-[A-Z]{2})?$
+        title:
+          type: object
+          description: The document title per language, e.g. "Tax Invoice". Prescribed wording is law (CF-133).
+          additionalProperties:
+            type: string
+        footerText:
+          type: object
+          additionalProperties:
+            type: string
+        logoAssetId:
+          type: string
+          format: uuid
+          nullable: true
+        layoutKey:
+          type: string
+          maxLength: 64
+          nullable: true
+        autoIssueOnPayment:
+          type: boolean
+          default: false
+          description: For `simplifiedTaxInvoice`, issue one on every paid order (the VAT receipt).
+        simplifiedAllowedUpTo:
+          $ref: ../shared/common.yaml#/components/schemas/Money
+        showLegalCurrencyTax:
+          type: boolean
+          default: true
+          description: Show the tax in the legal entity's currency when the invoice currency differs.
+        effectiveFrom:
+          type: string
+          format: date
+        isActive:
+          type: boolean
+          default: true
+        scopePath:
+          type: string
+          readOnly: true
+          description: '**The partition key** (ADR-0005). Operations write it at `tenant` scope.'
+    FinEInvoiceTransmissionStatus:
+      type: string
+      description: 6.1.1. `notRequired` where the legal entity's provider is `disabled` or absent.
+      enum:
+      - notRequired
+      - queued
+      - sent
+      - accepted
+      - rejected
+      - failed
+    FinEInvoicingProvider:
+      x-ticvai-persistence: ledger.einvoicing_provider
+      type: object
+      description: 6.1.1. Also the `setEInvoicingProvider` body. One per legal entity.
+      required:
+      - legalEntityId
+      - providerName
+      - mode
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        legalEntityId:
+          type: string
+          format: uuid
+        providerName:
+          type: string
+          maxLength: 200
+          description: The accredited service provider the client appoints.
+        endpointUrl:
+          type: string
+          format: uri
+          nullable: true
+        testEndpointUrl:
+          type: string
+          format: uri
+          nullable: true
+        credentialRef:
+          type: string
+          maxLength: 300
+          nullable: true
+          description: A reference to the secret in the vault; the secret is never stored here.
+        participantId:
+          type: string
+          maxLength: 100
+          nullable: true
+          description: The legal entity's Peppol participant identifier.
+        documentFormat:
+          type: string
+          enum:
+          - pintAe
+          default: pintAe
+        mode:
+          type: string
+          enum:
+          - disabled
+          - test
+          - live
+        transmitWithinHours:
+          type: integer
+          minimum: 1
+          nullable: true
+        lastAcceptedTestAt:
+          type: string
+          format: date-time
+          nullable: true
+          readOnly: true
+        scopePath:
+          type: string
+          readOnly: true
+          description: '**The partition key** (ADR-0005). Operations write it at `tenant` scope.'
+    FinEInvoiceTransmission:
+      x-ticvai-persistence: ledger.einvoice_transmission
+      type: object
+      description: 6.1.1. One attempt to send one tax document to the provider, and its answer.
+      required:
+      - id
+      - documentKind
+      - documentId
+      - legalEntityId
+      - status
+      - createdAt
+      properties:
+        id:
+          type: string
+          format: uuid
+        documentKind:
+          type: string
+          enum:
+          - taxInvoice
+          - creditMemo
+        documentId:
+          type: string
+          format: uuid
+        documentNumber:
+          type: string
+        legalEntityId:
+          type: string
+          format: uuid
+        providerId:
+          type: string
+          format: uuid
+          nullable: true
+        mode:
+          type: string
+          enum:
+          - test
+          - live
+        status:
+          $ref: '#/components/schemas/FinEInvoiceTransmissionStatus'
+        payloadHash:
+          type: string
+          nullable: true
+          description: SHA-256 of the document as sent, so a resend can be shown to be the same document.
+        providerMessageId:
+          type: string
+          nullable: true
+        attempt:
+          type: integer
+          minimum: 1
+        errorCodes:
+          type: array
+          items:
+            type: string
+        errorMessage:
+          type: string
+          nullable: true
+        sentAt:
+          type: string
+          format: date-time
+          nullable: true
+        answeredAt:
+          type: string
+          format: date-time
+          nullable: true
+        createdAt:
+          type: string
+          format: date-time
+        scopePath:
+          type: string
+          readOnly: true
+    FinVatReturn:
+      x-ticvai-persistence: none — computed from ledger postings on the reporting replica
+      type: object
+      description: 6.1.23. The FTA VAT 201 boxes for one legal entity and tax period.
+      required:
+      - legalEntityId
+      - periodFrom
+      - periodTo
+      - boxes
+      - netTaxPayable
+      properties:
+        legalEntityId:
+          type: string
+          format: uuid
+        taxRegistrationNumber:
+          type: string
+        periodFrom:
+          type: string
+          format: date
+        periodTo:
+          type: string
+          format: date
+        boxes:
+          type: array
+          items:
+            type: object
+            required:
+            - box
+            - amount
+            - taxAmount
+            properties:
+              box:
+                type: string
+                description: The form's box, e.g. `1a` (standard-rated supplies, Abu Dhabi) ... `1g`, `2`
+                  (tourist refunds), `3` (reverse charge), `4` (zero-rated), `5` (exempt), `6` and `7`
+                  (imports), `9` (standard-rated expenses), `10` (reverse charge inputs).
+              label:
+                type: string
+              emirate:
+                type: string
+                nullable: true
+              amount:
+                $ref: ../shared/common.yaml#/components/schemas/Money
+              taxAmount:
+                $ref: ../shared/common.yaml#/components/schemas/Money
+              adjustmentAmount:
+                $ref: ../shared/common.yaml#/components/schemas/Money
+              taxCodeIds:
+                type: array
+                items:
+                  type: string
+                  format: uuid
+              postingCount:
+                type: integer
+        totalOutputTax:
+          $ref: ../shared/common.yaml#/components/schemas/Money
+        totalRecoverableTax:
+          $ref: ../shared/common.yaml#/components/schemas/Money
+        netTaxPayable:
+          $ref: ../shared/common.yaml#/components/schemas/Money
+        fileUrl:
+          type: string
+          format: uri
+          nullable: true
+          description: Set for `format` `csv` or `xlsx`; a short-lived link.
+        generatedAt:
+          type: string
+          format: date-time
     AccountType:
       type: string
       enum:
@@ -3760,6 +5422,9 @@ components:
       - settlementClearing
       - gameCreditLoaded
       - pointsAccrued
+      - chargebackDebit     # orders recordChargeback: the acquirer took the money back (29 September, build pass)
+      - chargebackReversal  # orders recordChargebackOutcome won: the money returned
+      - chargebackFee       # the scheme or acquirer fee, won or lost
     AccountMapping:
       x-ticvai-persistence: ledger.account_mapping
       type: object
@@ -4344,6 +6009,7 @@ components:
       - variance
       - reversal
       - writeOff   # posted by recordWriteOff
+      - chargeback # posted by orders recordChargeback and recordChargebackOutcome (29 September)
     JournalLine:
       type: object
       required:

@@ -33,6 +33,12 @@ consumers:
   idempotencyKey: tenantId + effectiveAt
   onFailure: retry
   isCritical: false
+- context: ai
+  purpose: Stop the tenant's batch work (indexing, forecasting, risk scoring) and freeze its action
+    plans so nothing executes on a suspended tenant (AI system design section 3.2)
+  idempotencyKey: tenantId + effectiveAt
+  onFailure: retryThenDeadLetter
+  isCritical: true
 retention: 30 days after publication
 notes: '**Access validation is deliberately not a consumer.** A commercial dispute must not strand guests
   at a gate holding valid tickets, under any mode.'

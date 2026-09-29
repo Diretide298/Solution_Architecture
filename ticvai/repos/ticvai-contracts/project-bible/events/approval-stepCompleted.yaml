@@ -1,0 +1,44 @@
+# approval.stepCompleted v1 — published by approvals
+# Checked by tools/check-states.py against states/ and the contracts.
+
+name: approval.stepCompleted
+version: 1
+publisher: approvals
+description: One level of a multi-level approval chain was approved and the request moved to the next level.
+aggregate: approvalRequest
+emittedWhen: A level approved with levels remaining (decideApprovalRequest or recordExternalApprovalDecision)
+payload:
+- field: requestId
+  type: string
+- field: kind
+  type: string
+- field: scopePath
+  type: string
+- field: completedLevel
+  type: integer
+- field: nextLevel
+  type: integer
+- field: decidedByPrincipalId
+  type: uuid
+  required: false
+  notes: Null when an external workflow system decided the level
+- field: externalProviderId
+  type: uuid
+  required: false
+- field: completedAt
+  type: timestamp
+consumers:
+- context: public-api
+  purpose: Deliver to webhook subscriptions taking approval.stepCompleted (11.1.64)
+  idempotencyKey: requestId + completedLevel
+  onFailure: retryThenDeadLetter
+  isCritical: false
+- context: reporting
+  purpose: Per-level processing time
+  idempotencyKey: requestId + completedLevel
+  onFailure: retry
+  isCritical: false
+retention: Retained with the request. This is an audit record, not an operational message
+notes: '**Added 29 September (build pass, group RD).** A level approved on a pending request that stays pending is
+  not a status change, so states/approval-request.yaml credits this on escalated to pending and the operation emits
+  it for the level advance inside pending as well.'

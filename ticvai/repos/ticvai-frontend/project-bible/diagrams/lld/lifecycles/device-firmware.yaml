@@ -1,0 +1,44 @@
+id: LLD-Device firmware release
+title: Device firmware release — 5 transitions
+generatedBy: tools/derive-diagrams.py
+index: diagrams/hld/04-lifecycles.yaml
+source: states/device-firmware.yaml
+entity: Device firmware release
+contract: tenancy
+enum: DeviceFirmware.status
+enumKind: inline
+enumSchema: DeviceFirmware
+enumProperty: status
+owner: tenancy
+initial:
+- draft
+terminal:
+- withdrawn
+transitions:
+- from: draft
+  to: released
+  operation: setDeviceFirmwareStatus
+  trigger: operation
+  guard: Cleared for the fleet. Only a released image can start a rollout
+  emits:
+  - device.firmwareReleased
+- from: draft
+  to: withdrawn
+  operation: setDeviceFirmwareStatus
+  trigger: operation
+  guard: An image that never shipped
+- from: released
+  to: deprecated
+  operation: setDeviceFirmwareStatus
+  trigger: operation
+  guard: Superseded; devices on it stay on it, and no new rollout starts from it
+- from: released
+  to: withdrawn
+  operation: setDeviceFirmwareStatus
+  trigger: operation
+  guard: Pulled. Running rollouts of it are halted
+- from: deprecated
+  to: withdrawn
+  operation: setDeviceFirmwareStatus
+  trigger: operation
+  guard: Pulled after deprecation

@@ -2,7 +2,7 @@ openapi: 3.1.0
 info:
   title: TICVAI Subscription & Licensing
   version: 0.1.0
-  x-ticvai-screen-count: 125
+  x-ticvai-screen-count: 129
   x-ticvai-tier: satellite
   x-ticvai-module: 20 — Subscription & Licensing Management
   x-ticvai-requirements: 59
@@ -345,6 +345,8 @@ paths:
   /ai-usage/settle:
     post:
       operationId: settleAiUsage
+      x-ticvai-consumed-by:
+        - "P09 ADM-461 Consumption Reconciliation & Billing Approval"
       x-ticvai-audience:
       - staff
       summary: Turn metered AI interactions into a billable usage record
@@ -356,7 +358,9 @@ paths:
 
         Runs per tenant per period, aggregating from the interaction log and writing one `control.usage_record`
         per audience — **staff and guest billed as separate lines**, because they behave differently and
-        a venue needs to see which one moved.
+        a venue needs to see which one moved. The record carries the `audience`, and `generateInvoice` turns
+        each into a `metered` invoice line (metric `aiTokens`) at the AI module''s metered price (decided 29
+        September: AI token usage is a metered line).
 
         **Reads the primary, not the analytical replica.** `ai.interaction` sits on the analytical store
         (ADR-0020) and replica lag at period close would invoice a number that changes after it is sent.
@@ -1161,12 +1165,33 @@ paths:
       - staff
       x-ticvai-read-routing: replica
       summary: List subscription plans
+      description: '**Packages, standard and custom (decided 29 September, Chinmay).** With `offeredToTenantId`,
+        what that tenant may be sold: the standard packages and the custom packages offered to it, never
+        another tenant''s private package. Without it, every plan, for platform staff configuring them.
+
+        '
       tags:
       - plan
       x-ticvai-permission: PLATFORM_TENANT_VIEW
       x-ticvai-scope-level: tenant
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
+      parameters:
+      - name: offeredToTenantId
+        in: query
+        required: false
+        description: Only what this tenant may be sold (standard packages and its own custom ones)
+        schema:
+          type: string
+          format: uuid
+      - name: packageKind
+        in: query
+        required: false
+        schema:
+          type: string
+          enum:
+          - standard
+          - custom
       responses:
         '200':
           description: Plans
@@ -1187,6 +1212,13 @@ paths:
       summary: Create a subscription plan
       description: 'A plan bundles licensed modules, entitlement limits and a cell tier. Plans are versioned:
         existing subscriptions stay on the version they were sold, so a price change never applies retroactively.
+
+        **A plan is a package, and billing is per module (decided 29 September, Chinmay).** TICVAI sells
+        three standard packages (`packageKind` `standard`) and may make custom ones (`custom`); every package
+        is invoiced one line per licensed module at the price TICVAI configured for that module on the
+        platform (`setModuleListing`), plus `basePrice` as the package''s own fee where it has one (it may be
+        zero). **A custom package can be private to one tenant** (`offeredToTenantId`): it is listed and sold
+        to that tenant only. `offeredToTenantId` on a `standard` package is refused (422).
 
         '
       tags:
@@ -1213,6 +1245,12 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Plan'
+        '422':
+          description: '`offeredToTenantId` on a standard package, or a tenant that does not exist'
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
   /plans/{planId}:
     parameters:
     - name: planId
@@ -1283,6 +1321,12 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Plan'
+        '422':
+          description: '`offeredToTenantId` on a standard package, or a tenant that does not exist'
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
   /tenants/{tenantId}/subscription:
     parameters:
     - name: tenantId
@@ -1392,11 +1436,13 @@ paths:
                 $ref: '#/components/schemas/DowngradeConflictProblem'
         '422':
           description: '`effectiveFrom` was sent and is not the date the change must take effect: today for an
-            upgrade, the next renewal for a downgrade (`effective-date-not-allowed`, audit R214 (1)).
+            upgrade, the next renewal for a downgrade (`effective-date-not-allowed`, audit R214 (1)). Or the plan
+            is a custom package private to another tenant (`plan-not-offered`, decided 29 September).
 
             '
           x-ticvai-problem-types:
           - effective-date-not-allowed
+          - plan-not-offered
           content:
             application/problem+json:
               schema:
@@ -2764,6 +2810,14 @@ paths:
       summary: Generate an invoice for a period
       description: 'Prices the metered usage against the subscription''s plan version. Idempotent per
         tenant and period — running twice does not double-bill, which matters because it will be scheduled.
+
+        **The lines, per module (decided 29 September, Chinmay).** One `module` line for each module the
+        tenant licensed (the package''s modules and each add-on), at the module''s price set on the platform
+        (`setModuleListing`); a `basePlan` line for the package''s own fee where it has one; `overage` for
+        limits exceeded. **AI token usage is a `metered` line** (metric `aiTokens`, `moduleCode` the AI
+        module): the tokens `settleAiUsage` recorded for the period beyond the plan''s `includedAiTokens`,
+        at the AI module''s metered price, staff and guest as separate lines. Credit notes issued since the
+        last invoice with settlement `offsetNextInvoice` come off as `credit` lines.
 
         '
       tags:
@@ -7880,7 +7934,9 @@ paths:
 
         Rules: `basePricingProfile` and `taxProfile` must name an active pricing and tax profile (422 otherwise);
         `autoRenewPayment` in `paymentTerms` needs the product''s `autoRenewEligible` (422); `installments`
-        only where the payments module supports them (422). A product `retired` or `expired` answers 409.'
+        only where the payments module supports them (422). A recurring `billingFrequency` without `autoRenewPayment`
+        or `installments`, or a billing cycle longer than the product''s term, is refused (422, 29 September, build:
+        2.14.19). A product `retired` or `expired` answers 409.'
       tags:
       - subscription
       x-ticvai-permission: PLATFORM_CELL_MANAGE
@@ -7921,7 +7977,8 @@ paths:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
         '422':
           description: An unknown or inactive profile, autoRenewPayment on a product that is not auto-renew eligible,
-            or installments where payments does not support them
+            or installments where payments does not support them, or a recurring billing frequency without them or longer
+            than the term
           content:
             application/problem+json:
               schema:
@@ -9046,9 +9103,455 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+  /invoices/{invoiceId}/credit-notes:
+    parameters:
+    - name: invoiceId
+      in: path
+      required: true
+      schema:
+        type: string
+    post:
+      operationId: issueCreditNote
+      x-ticvai-consumed-by:
+        - "P09 ADM-462 Invoice & Payment Management"
+        - "P09 ADM-467 Discount, Credit & Commercial Override Management"
+      x-ticvai-audience:
+      - staff
+      x-ticvai-agreed: '29 September: matrix 20.7.7 (credit note generation); BL-140; the invoice number rule decided 28 September (audit R152, gapless per legal entity) applied to the credit note''s own sequence; shape follows cancelInvoice and generateInvoice'
+      summary: Issue a credit note against a tenant invoice, in full or in part
+      description: >
+        **A credit note is its own tax document** (20.7.7): it has its own number from its own gapless
+        sequence per issuing legal entity (the rule R152 set for invoices, applied to a second
+        sequence), names the invoice it credits, and carries its own lines, tax and total. **The
+        invoice is never edited**: it stays as issued, and what has been credited against it is the sum
+        of its credit notes (`SubscriptionInvoice.creditedTotal`).
+
+        **Full or partial.** Lines may credit whole invoice lines or part of one (a quantity or an
+        amount); tax is recalculated on the credited lines at the invoice's rates. The credits against
+        one invoice can never exceed its total (422). A draft or cancelled invoice cannot be credited
+        (409): a draft is changed by regenerating it, and a cancellation already credited it in full
+        (`cancelInvoice`). `settlement` says whether the credit reduces the tenant's next invoice or is
+        refunded against a payment already received. A dispute resolved in the tenant's favour
+        (`resolveInvoiceDispute`) is settled with one of these.
+      tags:
+      - billing
+      x-ticvai-permission: PLATFORM_BILLING_MANAGE
+      x-ticvai-scope-level: tenant
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/IssueCreditNoteRequest'
+      responses:
+        '201':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: Issued
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SubscriptionCreditNote'
+        '404':
+          $ref: ../shared/common.yaml#/components/responses/NotFound
+        '409':
+          description: The invoice is a draft or cancelled and cannot be credited
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
+        '422':
+          description: The credit would take the invoice's credited total above its total, or a line names no line of the invoice
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
+  /tenants/{tenantId}/credit-notes:
+    parameters:
+    - name: tenantId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    get:
+      operationId: listCreditNotes
+      x-ticvai-consumed-by:
+        - "P09 ADM-009 Tenant Billing & Invoicing"
+        - "P09 ADM-462 Invoice & Payment Management"
+        - "P09 ADM-467 Discount, Credit & Commercial Override Management"
+      x-ticvai-audience:
+      - staff
+      x-ticvai-read-routing: replica
+      x-ticvai-agreed: '29 September: matrix 20.7.7; BL-140; shape follows listSubscriptionInvoices'
+      summary: List a tenant's credit notes
+      description: >
+        Every credit note issued to the tenant, newest first by `issuedAt` then `id`; keyset cursor.
+        With `invoiceId`, the credits against one invoice.
+      tags:
+      - billing
+      x-ticvai-permission: PLATFORM_BILLING_VIEW
+      x-ticvai-scope-level: tenant
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+      - name: invoiceId
+        in: query
+        required: false
+        schema:
+          type: string
+      - $ref: ../shared/common.yaml#/components/parameters/PageSize
+      - $ref: ../shared/common.yaml#/components/parameters/PageCursor
+      responses:
+        '200':
+          description: Credit notes
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: ../shared/common.yaml#/components/schemas/Page
+                - type: object
+                  properties:
+                    items:
+                      type: array
+                      items:
+                        $ref: '#/components/schemas/SubscriptionCreditNote'
+  /plan-recommendations:
+    get:
+      operationId: getPlanRecommendations
+      x-ticvai-consumed-by:
+        - "P09 ADM-378 Executive AI Commercial Intelligence"
+        - "P09 ADM-452 Operational Usage & Threshold Monitor"
+        - "P09 ADM-465 AI Upgrade, Downgrade & Commercial Right-Sizing"
+      x-ticvai-audience:
+      - staff
+      x-ticvai-agreed: '29 September: our build plan (20.8.4, 20.8.5 plan-fit and cost-saving recommendations to
+        existing tenants); shape follows getLicenceEnforcement, priced as simulateCommercialPackage prices'
+      summary: Which plan, module or pack would fit this tenant better, and what it would cost or save
+      description: '20.8.4, 20.8.5 (decided 29 September, build pass, group G2). **Plan fit from usage, for TICVAI
+        staff.** For one tenant, the moves its usage argues for, each priced against staying as it is:
+
+        - **`upgrade`**: projected usage over `horizonMonths` (the `getLicenceEnforcement` projection per billable
+        unit) crosses the current tier''s allowance, and the next tier costs less than the projected overage. Names
+        the tier (`targetPlanId`).
+
+        - **`capacityPack`**: the same overage is cheaper covered by a capacity pack than by the next tier (a
+        seasonal peak rather than growth); names the unit and pack size.
+
+        - **`downgrade`**: usage sat below the next tier down''s allowance for the whole window and is projected to
+        stay there.
+
+        - **`addModule`**: the tenant repeatedly hits a capability a module provides (denied calls or feature
+        requests against `getEntitlementUsage`) and the module costs less than the workaround it is paying for.
+
+        - **`removeModule`** and **`removeAddOn`**: enabled and unused for the window (no metered use, no active
+        configuration).
+
+
+        **Every price is the one `simulateCommercialPackage` would quote** for the tenant''s package with that one
+        change, so a recommendation and a quote cannot disagree. **Rules over the usage record, not a model**, so it
+        is explainable line by line (`basis`).
+
+
+        **A person acts**: an account manager applies an accepted recommendation through `previewSubscriptionChange`
+        then `setSubscription`, or `addCapacityPack`; nothing is changed by this read and the tenant is not told by it.
+
+        '
+      tags:
+      - subscription
+      x-ticvai-permission: PLATFORM_BILLING_VIEW
+      x-ticvai-scope-level: platform
+      x-ticvai-read-routing: replica
+      parameters:
+      - name: tenantId
+        in: query
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: horizonMonths
+        in: query
+        description: How far ahead usage is projected. Proposed default 3, the renewal notice window (our build plan).
+        schema:
+          type: integer
+          minimum: 1
+          maximum: 12
+          default: 3
+      - name: kind
+        in: query
+        schema:
+          type: string
+          enum:
+          - upgrade
+          - downgrade
+          - addModule
+          - removeModule
+          - removeAddOn
+          - capacityPack
+      - $ref: ../shared/common.yaml#/components/parameters/PageSize
+      - $ref: ../shared/common.yaml#/components/parameters/PageCursor
+      responses:
+        '200':
+          description: Recommendations, largest saving or smallest added cost first
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: ../shared/common.yaml#/components/schemas/Page
+                - type: object
+                  properties:
+                    currentMonthlyCost:
+                      $ref: ../shared/common.yaml#/components/schemas/Money
+                    items:
+                      type: array
+                      items:
+                        $ref: '#/components/schemas/SubscriptionPlanRecommendation'
+        '403':
+          $ref: ../shared/common.yaml#/components/responses/Forbidden
+        '404':
+          $ref: ../shared/common.yaml#/components/responses/NotFound
 
 components:
   schemas:
+    SubscriptionPlanRecommendation:
+      type: object
+      x-ticvai-persistence: none — computed from control.usage_record, the plan, tier and add-on limits and capacity
+        packs, priced as simulateCommercialPackage prices
+      description: One plan-fit move for a tenant, priced against staying as it is (20.8.4, 20.8.5; decided 29
+        September, build pass, group G2).
+      required:
+      - kind
+      - reason
+      - projectedMonthlyCost
+      properties:
+        kind:
+          type: string
+          enum:
+          - upgrade
+          - downgrade
+          - addModule
+          - removeModule
+          - removeAddOn
+          - capacityPack
+        targetPlanId:
+          type: string
+          format: uuid
+          nullable: true
+          description: The tier to move to, for `upgrade` and `downgrade`.
+        moduleCode:
+          type: string
+          nullable: true
+          description: For `addModule` and `removeModule`.
+        addOnCode:
+          type: string
+          nullable: true
+          description: For `removeAddOn`.
+        billableUnit:
+          type: string
+          nullable: true
+          description: The unit that drives it (for `upgrade`, `downgrade` and `capacityPack`), as `getLicenceEnforcement`
+            names it.
+        capacityPackSize:
+          type: integer
+          nullable: true
+          description: For `capacityPack`, the pack size that covers the projected overage.
+        projectedMonthlyCost:
+          $ref: ../shared/common.yaml#/components/schemas/Money
+        projectedSaving:
+          allOf:
+          - $ref: ../shared/common.yaml#/components/schemas/Money
+          nullable: true
+          description: Against staying as it is over the horizon, monthly. Set where the move saves money.
+        projectedAddedCost:
+          allOf:
+          - $ref: ../shared/common.yaml#/components/schemas/Money
+          nullable: true
+          description: Where the move costs more than today but less than the alternative named in `comparedWith`.
+        comparedWith:
+          type: string
+          enum:
+          - currentPackage
+          - projectedOverage
+          - nextTier
+          - capacityPack
+          description: What the move is cheaper than. An `upgrade` is compared with paying the projected overage; a
+            `capacityPack` with the next tier.
+        reason:
+          type: string
+          maxLength: 500
+          description: One sentence a person can repeat to the customer.
+        basis:
+          type: object
+          description: The numbers it rests on.
+          properties:
+            usageWindowDays:
+              type: integer
+            usedAverage:
+              type: number
+              nullable: true
+            usedPeak:
+              type: number
+              nullable: true
+            projectedPeak:
+              type: number
+              nullable: true
+            currentLimit:
+              type: number
+              nullable: true
+            targetLimit:
+              type: number
+              nullable: true
+            lastUsedAt:
+              type: string
+              format: date-time
+              nullable: true
+              description: For `removeModule` and `removeAddOn`, the last metered use; null for never.
+        applyWith:
+          type: string
+          enum:
+          - setSubscription
+          - addCapacityPack
+          description: The operation a person uses to carry it out (after `previewSubscriptionChange` for
+            `setSubscription`).
+    IssueCreditNoteRequest:
+      type: object
+      x-ticvai-persistence: none — request only
+      required:
+      - reasonCode
+      - settlement
+      - lines
+      properties:
+        reasonCode:
+          type: string
+          enum:
+          - billingError
+          - serviceCredit
+          - disputeResolution
+          - goodwill
+          - other
+        reason:
+          type: string
+          maxLength: 500
+          nullable: true
+        settlement:
+          type: string
+          enum:
+          - offsetNextInvoice
+          - refund
+        lines:
+          type: array
+          minItems: 1
+          items:
+            type: object
+            required:
+            - invoiceLineIndex
+            properties:
+              invoiceLineIndex:
+                type: integer
+                minimum: 0
+                description: The line of the invoice being credited, by its position in `SubscriptionInvoice.lines`.
+              quantity:
+                type: number
+                minimum: 0
+                nullable: true
+                description: Part of the line's quantity; null with `amount`, or for the whole line.
+              amount:
+                allOf:
+                - $ref: ../shared/common.yaml#/components/schemas/Money
+                nullable: true
+                description: Part of the line's amount, net of tax; null with `quantity`, or for the whole line.
+    SubscriptionCreditNote:
+      type: object
+      x-ticvai-persistence: control.credit_note + control.credit_note_line
+      description: '**A credit note against one tenant invoice** (20.7.7, 29 September build): its own number, lines, tax and
+        total. The invoice it credits is never edited.'
+      required:
+      - id
+      - creditNoteNumber
+      - invoiceId
+      - tenantId
+      - reasonCode
+      - settlement
+      - total
+      - issuedAt
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        creditNoteNumber:
+          type: string
+          readOnly: true
+          description: '**Gapless, per issuing legal entity, in its own sequence** (the R152 rule for invoices, decided 28
+            September, applied to credit notes): assigned at issue, never reused.'
+        invoiceId:
+          type: string
+          description: The invoice credited.
+        tenantId:
+          type: string
+          format: uuid
+        reasonCode:
+          type: string
+          enum:
+          - billingError
+          - serviceCredit
+          - disputeResolution
+          - goodwill
+          - other
+        reason:
+          type: string
+          maxLength: 500
+          nullable: true
+        settlement:
+          type: string
+          enum:
+          - offsetNextInvoice
+          - refund
+        settlementStatus:
+          type: string
+          enum:
+          - pending
+          - offset
+          - refunded
+          readOnly: true
+          description: '`offset` once a later invoice has taken it; `refunded` once the refund is recorded.'
+        lines:
+          type: array
+          items:
+            type: object
+            properties:
+              invoiceLineIndex:
+                type: integer
+              description:
+                type: string
+              quantity:
+                type: number
+                nullable: true
+              unitPrice:
+                $ref: ../shared/common.yaml#/components/schemas/Money
+              amount:
+                $ref: ../shared/common.yaml#/components/schemas/Money
+        subtotal:
+          x-ticvai-column: net_amount
+          $ref: ../shared/common.yaml#/components/schemas/Money
+        taxAmount:
+          $ref: ../shared/common.yaml#/components/schemas/Money
+        total:
+          x-ticvai-column: gross_amount
+          $ref: ../shared/common.yaml#/components/schemas/Money
+        issuedAt:
+          type: string
+          format: date-time
+          readOnly: true
+        issuedByPrincipalId:
+          type: string
+          format: uuid
+          readOnly: true
     PartnerApplicationReviewAction:
       type: object
       x-ticvai-persistence: "none — request only; applied to control.partner_application and control.partner_application_review_task, and to control.partner on startReview and withdraw (decided 29 September, writers pass; DM4)"
@@ -9404,6 +9907,35 @@ components:
           - invitationOnly
           - capacityLimited
           description: Sales Period (pack p.15); the window itself is the catalogue product's sales window
+        billingFrequency:
+          type: string
+          enum:
+          - upFront
+          - monthly
+          - quarterly
+          - semiAnnual
+          - annual
+          - custom
+          default: upFront
+          description: '2.14.19 (29 September, build). **How often the member is charged, independent of the validity
+            term**: an annual membership may be billed monthly or quarterly. `upFront` charges the whole term at sale.
+            A recurring frequency needs `autoRenewPayment` or `installments` in `paymentTerms` and a card on file under
+            a recurring mandate; each cycle is an instalment of the plan payments `createInstalmentPlan` schedules at
+            sale, charged to the stored card on its due date.'
+        billingIntervalMonths:
+          type: integer
+          minimum: 1
+          maximum: 24
+          nullable: true
+          description: For `custom`, every how many months. Null otherwise.
+        billingAnchor:
+          type: string
+          enum:
+          - purchaseDate
+          - calendarMonthStart
+          default: purchaseDate
+          description: '`purchaseDate` bills on the purchase day each cycle; `calendarMonthStart` on the 1st of the month,
+            the first cycle prorated. A cycle longer than the term is refused (422).'
     PlanTierDetail:
       type: object
       x-ticvai-persistence: none — composed from a tier's allowances and modules
@@ -9703,6 +10235,11 @@ components:
       description: 'Board 4.6. **A marketplace without a dependency graph sells combinations that
         cannot be provisioned.**
 
+        **TICVAI configures each module''s price here, and tenants are billed per module (decided 29
+        September, Chinmay).** A usage-priced module (the AI module''s tokens) has `pricingBasis` `metered`:
+        `price` is then per `meteredUnitSize` units of `meteredMetric`, and the invoice carries it as a
+        `metered` line.
+
         '
       required:
       - moduleCode
@@ -9740,6 +10277,17 @@ components:
           - perVenue
           - perUnit
           - revenueShare
+          - metered
+        meteredMetric:
+          allOf:
+          - $ref: '#/components/schemas/UsageMetric'
+          nullable: true
+          description: For `metered`, what is counted (`aiTokens` for the AI module). Null otherwise.
+        meteredUnitSize:
+          type: integer
+          minimum: 1
+          nullable: true
+          description: For `metered`, how many units `price` buys (e.g. 1000 tokens). Null otherwise.
         provisioningMinutes:
           type: integer
           nullable: true
@@ -13862,6 +14410,22 @@ components:
         includedAiTokens:
           type: integer
           nullable: true
+          description: AI tokens the package includes per billing period. Usage beyond it is a `metered` invoice
+            line at the AI module's price (decided 29 September).
+        packageKind:
+          type: string
+          enum:
+          - standard
+          - custom
+          default: standard
+          description: '**Three standard packages, and custom ones allowed** (decided 29 September, Chinmay).'
+        offeredToTenantId:
+          type: string
+          format: uuid
+          nullable: true
+          description: '**Private to one tenant** (decided 29 September, Chinmay): a custom package offered only to this
+            tenant; `listPlans` shows it to no other tenant and `setSubscription` refuses it for any other (422
+            `plan-not-offered`). Null for a package any tenant may buy. Custom packages only.'
     Plan:
       x-ticvai-persistence: subscription.plan + subscription.plan_module + subscription.plan_limit
       description: '**A plan''s modules and limits are rows, keyed on `plan_id`.** `licensedModules`
@@ -14964,6 +15528,14 @@ components:
           type: string
           nullable: true
           description: For AI token usage — which capability consumed them.
+        audience:
+          type: string
+          enum:
+          - staff
+          - guest
+          nullable: true
+          description: For AI token usage, whose interactions they were. `settleAiUsage` writes one record per audience
+            and the invoice bills them as separate `metered` lines; without this column the split had nowhere to live.
         recordedAt:
           type: string
           format: date-time
@@ -15073,10 +15645,25 @@ components:
                 type: string
                 enum:
                 - basePlan
+                - module
                 - addOn
                 - overage
+                - metered
                 - oneOff
                 - credit
+                description: '`module`, one per licensed module at its platform price, and `metered`, usage such as AI
+                  tokens (decided 29 September).'
+              moduleCode:
+                type: string
+                nullable: true
+                description: The module a `module` or `metered` line charges for.
+              audience:
+                type: string
+                enum:
+                - staff
+                - guest
+                nullable: true
+                description: For an AI `metered` line, whose usage it is.
               metric:
                 $ref: '#/components/schemas/UsageMetric'
               quantity:
@@ -15096,6 +15683,13 @@ components:
         planVersionUsed:
           type: string
           description: Priced against the version the tenant is subscribed to, not the latest.
+        creditedTotal:
+          allOf:
+          - $ref: ../shared/common.yaml#/components/schemas/Money
+          readOnly: true
+          nullable: true
+          description: The sum of the credit notes issued against this invoice (`issueCreditNote`); the invoice itself is never
+            edited. Null with none.
         issuedAt:
           type: string
           format: date-time
@@ -16635,6 +17229,35 @@ components:
             - invitationOnly
             - capacityLimited
           description: Sales Period (pack p.15)
+        billingFrequency:
+          type: string
+          enum:
+          - upFront
+          - monthly
+          - quarterly
+          - semiAnnual
+          - annual
+          - custom
+          default: upFront
+          description: '2.14.19 (29 September, build). **How often the member is charged, independent of the validity
+            term**: an annual membership may be billed monthly or quarterly. `upFront` charges the whole term at sale.
+            A recurring frequency needs `autoRenewPayment` or `installments` in `paymentTerms` and a card on file under
+            a recurring mandate; each cycle is an instalment of the plan payments `createInstalmentPlan` schedules at
+            sale, charged to the stored card on its due date.'
+        billingIntervalMonths:
+          type: integer
+          minimum: 1
+          maximum: 24
+          nullable: true
+          description: For `custom`, every how many months. Null otherwise.
+        billingAnchor:
+          type: string
+          enum:
+          - purchaseDate
+          - calendarMonthStart
+          default: purchaseDate
+          description: '`purchaseDate` bills on the purchase day each cycle; `calendarMonthStart` on the 1st of the month,
+            the first cycle prorated. A cycle longer than the term is refused (422).'
         salesWindowFrom:
           type: string
           format: date
@@ -17307,6 +17930,35 @@ components:
           - invitationOnly
           - capacityLimited
           description: Sales Period (pack p.15)
+        billingFrequency:
+          type: string
+          enum:
+          - upFront
+          - monthly
+          - quarterly
+          - semiAnnual
+          - annual
+          - custom
+          default: upFront
+          description: '2.14.19 (29 September, build). **How often the member is charged, independent of the validity
+            term**: an annual membership may be billed monthly or quarterly. `upFront` charges the whole term at sale.
+            A recurring frequency needs `autoRenewPayment` or `installments` in `paymentTerms` and a card on file under
+            a recurring mandate; each cycle is an instalment of the plan payments `createInstalmentPlan` schedules at
+            sale, charged to the stored card on its due date.'
+        billingIntervalMonths:
+          type: integer
+          minimum: 1
+          maximum: 24
+          nullable: true
+          description: For `custom`, every how many months. Null otherwise.
+        billingAnchor:
+          type: string
+          enum:
+          - purchaseDate
+          - calendarMonthStart
+          default: purchaseDate
+          description: '`purchaseDate` bills on the purchase day each cycle; `calendarMonthStart` on the 1st of the month,
+            the first cycle prorated. A cycle longer than the term is refused (422).'
         multipleMembershipsAllowed:
           type: boolean
           description: 'Multiple Memberships Allowed: false means one membership of this product per customer.

@@ -1,0 +1,31 @@
+# seat.released v1 — published by seating
+# Checked by tools/check-states.py against states/ and the contracts.
+
+name: seat.released
+version: 1
+publisher: seating
+description: A held or blocked seat became available again.
+aggregate: seat
+emittedWhen: SeatStatus held to available (relinquishSeatHold, or the hold timer) or blocked to available (relinquishSeatBlock)
+payload:
+- field: seatId
+  type: string
+- field: performanceId
+  type: uuid
+- field: venueId
+  type: uuid
+- field: releasedFrom
+  type: string
+  notes: held or blocked
+- field: cause
+  type: string
+  notes: relinquished or expired
+- field: releasedAt
+  type: timestamp
+consumers:
+- context: public-api
+  purpose: Deliver to webhook subscriptions taking seat.released (21.13.4)
+  idempotencyKey: seatId + performanceId + releasedAt
+  onFailure: retryThenDeadLetter
+  isCritical: false
+retention: 7 days after publication

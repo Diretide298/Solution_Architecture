@@ -5,16 +5,16 @@
 | | |
 |---|---|
 | Screens | 69 |
-| Operations | 58 |
+| Operations | 78 |
 | Contracts | 11 |
 | Modules | 1 |
 | Undrawn | 0 |
-| Operations with no screen | 126 |
+| Operations with no screen | 123 |
 | Waves | wave3 69 |
 
 ## Gaps
 
-### 126 operations with no screen here
+### 123 operations with no screen here
 
 **In a contract this platform uses, callable by its audience, and reaching no screen on any platform serving that audience.** Either a screen is missing or the endpoint should not exist — and the second is worth considering first.
 
@@ -28,7 +28,6 @@
 | `generateVenueLayout` | ai | POST | Draft a seat map from an uploaded plan |
 | `ingestKnowledgeDocument` | ai | POST | Add a document |
 | `listIndexSources` | ai | GET | What is indexed, and how current it is |
-| `proposeTranslations` | ai | POST |  |
 | `proposeWalkways` | ai | POST | Find walkable space in a drawing that has no vectors |
 | `reindexSource` | ai | POST | Rebuild a source |
 | `removeIndexEntry` | ai | DELETE | Remove one record from the index |
@@ -51,7 +50,6 @@
 | `getPasswordPolicy` | identity | GET | Read the password and MFA policy in force |
 | `getPrincipalModuleAccess` | identity | GET | What this person may do, as ticks |
 | `listAccessDecisions` | identity | GET | What was decided, for whom, where and why |
-| `listAccessPolicyHistory` | identity | GET | Every version, who changed it and why |
 | `listAccessPolicyTemplates` | identity | GET | Reusable policy shapes |
 | `listCapabilityTemplates` | identity | GET | Saved tick-sets |
 | `listCustomerMemberships` | identity | GET | Memberships a customer holds |
@@ -60,7 +58,9 @@
 | `listPermissions` | identity | GET | Every permission key the contracts enforce |
 | `listSegregationRules` | identity | GET | Read the conflicting-permission rules back |
 | `listSegregationViolations` | identity | GET | Who already holds a conflicting pair |
-| … | | | 86 more |
+| `setPrincipalModuleAccess` | identity | PUT | Tick what they may do |
+| `listStockReservations` | inventory | GET | Soft holds on stock |
+| … | | | 83 more |
 
 ## Modules
 
@@ -72,24 +72,24 @@
 
 | | Name | Module | Wave | Ops | Drawn |
 |---|---|---|---|---|---|
-| `ANL-001` | Executive Command Center | Analytics | 3 | 6 | yes |
+| `ANL-001` | Executive Command Center | Analytics | 3 | 7 | yes |
 | `ANL-002` | Sales, Revenue & Channel | Analytics | 3 | 3 | yes |
 | `ANL-003` | Operational Performance | Analytics | 3 | 6 | yes |
 | `ANL-004` | Product Performance | Analytics | 3 | 4 | yes |
 | `ANL-005` | Cost, Margin & Profitability | Analytics | 3 | 4 | yes |
-| `ANL-006` | Inventory & Waste Intelligence | Analytics | 3 | 5 | yes |
+| `ANL-006` | Inventory & Waste Intelligence | Analytics | 3 | 6 | yes |
 | `ANL-007` | Guest & Conversion Intelligence | Analytics | 3 | 6 | yes |
-| `ANL-008` | Demand Forecasting | Analytics | 3 | 3 | yes |
-| `ANL-009` | AI Assistant & Action Center | Analytics | 3 | 8 | yes |
+| `ANL-008` | Demand Forecasting | Analytics | 3 | 4 | yes |
+| `ANL-009` | AI Assistant & Action Center | Analytics | 3 | 9 | yes |
 | `ANL-010` | Suggestions & Advice | Analytics | 3 | 2 | yes |
 | `ANL-012` | Live Operations Dashboard | Analytics | 3 | 2 | yes |
 | `ANL-013` | Revenue Pulse | Analytics | 3 | 1 | yes |
 | `ANL-014` | Attendance & Footfall Intelligence | Analytics | 3 | 1 | yes |
 | `ANL-015` | Capacity & Utilization Monitor | Analytics | 3 | 1 | yes |
 | `ANL-016` | Sales & Channel Performance | Analytics | 3 | 1 | yes |
-| `ANL-017` | Customer, Membership & Loyalty Pulse | Analytics | 3 | 1 | yes |
+| `ANL-017` | Customer, Membership & Loyalty Pulse | Analytics | 3 | 2 | yes |
 | `ANL-018` | Alerts & Exception Center | Analytics | 3 | 1 | yes |
-| `ANL-019` | AI Management Insights | Analytics | 3 | 2 | yes |
+| `ANL-019` | AI Management Insights | Analytics | 3 | 5 | yes |
 | `ANL-020` | Multi-Site & Performance Comparison | Analytics | 3 | 2 | yes |
 | `ANL-021` | Dashboard Library | Analytics | 3 | 4 | yes |
 | `ANL-022` | Dashboard Creation Wizard | Analytics | 3 | 1 | yes |
@@ -120,17 +120,17 @@
 | `ANL-047` | Report Access & Sharing Control | Analytics | 3 | 1 | yes |
 | `ANL-048` | Delivery Monitoring & Failure Management | Analytics | 3 | 1 | yes |
 | `ANL-049` | Report Audit Trail & Compliance | Analytics | 3 | 1 | yes |
-| `ANL-050` | Retention, Archive & Governance Policy | Analytics | 3 | 1 | yes |
+| `ANL-050` | Retention, Archive & Governance Policy | Analytics | 3 | 3 | yes |
 | `ANL-051` | AI Analytics Command Center | Analytics | 3 | 1 | yes |
 | `ANL-052` | Ask TICVAI — Natural Language Analytics | Analytics | 3 | 2 | yes |
 | `ANL-053` | AI-Generated Dashboard Studio | Analytics | 3 | 1 | yes |
 | `ANL-054` | AI Report Generator | Analytics | 3 | 1 | yes |
-| `ANL-055` | Anomaly Detection Center | Analytics | 3 | 1 | yes |
-| `ANL-056` | Root-Cause Analysis Explorer | Analytics | 3 | 2 | yes |
-| `ANL-057` | Forecasting & Predictive Analytics Studio | Analytics | 3 | 1 | yes |
-| `ANL-058` | AI Recommendation & Next-Best-Action Center | Analytics | 3 | 1 | yes |
-| `ANL-059` | AI Insight History, Evidence & Explainability | Analytics | 3 | 1 | yes |
-| `ANL-060` | AI Analytics Governance & Model Control | Analytics | 3 | 0 | yes |
+| `ANL-055` | Anomaly Detection Center | Analytics | 3 | 4 | yes |
+| `ANL-056` | Root-Cause Analysis Explorer | Analytics | 3 | 3 | yes |
+| `ANL-057` | Forecasting & Predictive Analytics Studio | Analytics | 3 | 5 | yes |
+| `ANL-058` | AI Recommendation & Next-Best-Action Center | Analytics | 3 | 2 | yes |
+| `ANL-059` | AI Insight History, Evidence & Explainability | Analytics | 3 | 3 | yes |
+| `ANL-060` | AI Analytics Governance & Model Control | Analytics | 3 | 8 | yes |
 | `ANL-061` | BI & Analytics Administration Command Center | Analytics | 3 | 2 | yes |
 | `ANL-062` | Enterprise KPI Library | Analytics | 3 | 2 | yes |
 | `ANL-063` | KPI Targets, Thresholds & Scorecards | Analytics | 3 | 2 | yes |

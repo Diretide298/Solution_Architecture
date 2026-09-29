@@ -7,7 +7,7 @@
 | Tier | operations: What a venue does with what it sold. Licensed per module. |
 | Contracts | `inventory` |
 | Schemas owned | `inventory` |
-| Operations in the slice | 6 of 51 |
+| Operations in the slice | 7 of 56 |
 | Scale | Mixed. Counting is bursty; procurement is not. |
 | If it is down | Down blocks receiving and counting; selling continues from the till's cache. |
 
@@ -28,6 +28,7 @@
 | inventory | [`bulkUpdateProducts`](#bulkupdateproducts) | POST | `/products/bulk` | setup | 1 | BO-007 |
 | inventory | [`listSerialisedItems`](#listserialiseditems) | GET | `/serialised-items` | core | 1 | BO-114, BO-505, EMP-069, POS-011 |
 | item | [`createInventoryItem`](#createinventoryitem) | POST | `/inventory-items` | setup | 1 | BO-081, BO-105 |
+| item | [`setInventoryKitDefinition`](#setinventorykitdefinition) | PUT | `/inventory-items/{itemId}/kit-definition` | setup | 1 | BO-081 |
 | item | [`updateInventoryItem`](#updateinventoryitem) | PATCH | `/inventory-items/{itemId}` | setup | 1 | BO-081 |
 | receipt | [`createGoodsReceipt`](#creategoodsreceipt) | POST | `/goods-receipts` | setup | 2 | BO-052, BO-080, EMP-065 |
 | receipt | [`rejectReceivedGoods`](#rejectreceivedgoods) | POST | `/goods-receipts/{receiptId}/reject` | setup | 2 | BO-052, EMP-065 |
@@ -230,6 +231,64 @@ Retail Board 4. **A lot number answers which delivery; a serial answers which on
 | 201 |  | Created |
 | 400 | BadRequest | Validation failed |
 | 409 |  | SKU already in use in this venue |
+
+### setInventoryKitDefinition
+
+**`PUT /inventory-items/{itemId}/kit-definition`**: Make an item a kit of other stocked items
+
+4.4.20. **A kit or retail bundle sells as one item and leaves stock as its components.** This sets the bill of materials: each component item and the quantity one kit consumes. **When a kit sells, one `saleDepletion` movement is posted per component, never for the kit itself**, at the location the sale was made from, with the sale as its source; a return reverses the same components. The kit's available quantity is the fewest whole kits its components make (`getStockPositions`). The whole list is replaced in one call; an empty list makes the item an ordinary stocked item again. A component cannot itself be a kit, and an item with movements of its own cannot become one.
+
+|  |  |
+|---|---|
+| Permission | `PRODUCT_CONFIGURE` |
+| Scope level | venue |
+| Part of slice | setup, makes `inventory.kit_component` non-empty |
+| Wave | 1 |
+| Offline | no |
+| Config scope | venue |
+| Conflict policy | serverWins |
+| Reads | `cache:idempotency`, `inventory.item`, `inventory.kit_component`, `inventory.movement` |
+| Writes | `cache:idempotency`, `cache:resolution`, `inventory.kit_component` |
+| Called by | BO-081 |
+
+**Parameters**
+
+| Name | In | Required | Type | Notes |
+|---|---|---|---|---|
+| itemId | path | yes | string (uuid) |  |
+| Idempotency-Key | header | yes | string | Client-generated ULID. |
+
+**Request body**: `InventoryKitDefinition`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| kitItemId | string (uuid) |  | (read-only) |
+| components | array of InventoryKitComponent | yes |  |
+| components[].kitItemId | string (uuid) |  | (read-only) |
+| components[].componentItemId | string (uuid) | yes |  |
+| components[].quantity | number | yes |  |
+| components[].unit | string |  | The component's base unit where omitted. (nullable) |
+| components[].scopePath | string |  | The partition key (ADR-0005). (read-only) |
+
+**Response**: `InventoryKitDefinition`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| kitItemId | string (uuid) |  | (read-only) |
+| components | array of InventoryKitComponent | yes |  |
+| components[].kitItemId | string (uuid) |  | (read-only) |
+| components[].componentItemId | string (uuid) | yes |  |
+| components[].quantity | number | yes |  |
+| components[].unit | string |  | The component's base unit where omitted. (nullable) |
+| components[].scopePath | string |  | The partition key (ADR-0005). (read-only) |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 200 |  | Set |
+| 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
+| 422 |  | A component that is itself a kit, the kit named as its own component, a component of another venue, or a kit item that already has movements of its own. |
 
 ### updateInventoryItem
 
@@ -542,6 +601,39 @@ Every table this service owns that the slice reads or writes, with its columns a
 | has_movements | boolean | no | True locks costing method and base unit. |
 | is_active | boolean | yes |  |
 
+### `inventory.kit_component`
+
+| Column | Type | Required | Notes |
+|---|---|---|---|
+| kit_item_id | uuid | no |  |
+| component_item_id | uuid | yes |  |
+| quantity | numeric | yes |  |
+| unit | text | no | The component's base unit where omitted. |
+| scope_path | text | no | The partition key (ADR-0005). |
+| id | uuid | yes | Synthesised key. |
+
+### `inventory.movement`
+
+| Column | Type | Required | Notes |
+|---|---|---|---|
+| id | text | yes |  |
+| item_id | uuid | yes |  |
+| location_id | uuid | yes |  |
+| kind | text | yes |  |
+| quantity | numeric | yes | Always positive. |
+| unit | text | no |  |
+| reason | text | no | Required for adjustmentIn, adjustmentOut and waste (decided 28 September, audit R171); adjustments are reported separately. |
+| cost_center_id | uuid | no |  |
+| recorded_at | timestamptz | yes |  |
+| balance_after | numeric | yes |  |
+| unit_cost | numeric(18,4) | no |  |
+| net_cost_amount | numeric(18,4) | no |  |
+| principal_id | uuid | yes |  |
+| source_type | text | no | What generated it — an order, a count, a transfer. |
+| source_id | text | no |  |
+| journal_entry_id | text | no |  |
+| created_at | timestamptz | yes |  |
+
 ### `inventory.serialised_item`
 
 | Column | Type | Required | Notes |
@@ -573,18 +665,18 @@ Every table this service owns that the slice reads or writes, with its columns a
 
 ## Not in the first release
 
-45 operations, added to this service in later releases without changing any of the above.
+49 operations, added to this service in later releases without changing any of the above.
 
 | Group | Operations |
 |---|---|
 | count | `cancelStockCount`, `getCountVariance`, `listStockCounts`, `postStockCount`, `recountStockCount`, `startStockCount`, `submitCountLines` |
 | inventory | `getStockTransfer`, `listExpiringBatches`, `listStockReservations`, `setDailyCount`, `updateRequisitionLines`, `updateSupplier` |
-| item | `getInventoryItem`, `listInventoryItems`, `lookupInventoryItem` |
+| item | `getInventoryItem`, `getInventoryKitDefinition`, `listInventoryItems`, `lookupInventoryItem` |
 | movement | `createStockMovement`, `listStockMovements` |
 | procurement | `acknowledgePurchaseOrder`, `cancelRequisition`, `closePurchaseOrderShort`, `rejectRequisition`, `returnRequisition`, `sendPurchaseOrder` |
 | purchaseOrder | `cancelPurchaseOrder`, `createPurchaseOrder`, `getPurchaseOrder`, `listPurchaseOrders` |
 | receipt | `listGoodsReceipts` |
 | requisition | `approveRequisition`, `createRequisition`, `getSuggestedRequisitions`, `listRequisitions` |
 | stock | `createStockLocation`, `getStockPositions`, `getStockValuation`, `listStockLocations` |
-| supplier | `compareQuotations`, `createSupplier`, `listSuppliers`, `recordQuotation` |
+| supplier | `compareQuotations`, `createSupplier`, `createSupplierContract`, `listSupplierContracts`, `listSuppliers`, `recordQuotation`, `updateSupplierContract` |
 | transfer | `closeTransferShort`, `createStockTransfer`, `listStockTransfers`, `receiveStockTransfer` |

@@ -1,0 +1,126 @@
+# Accreditation holder — state model
+# Contract: accreditation.AccreditationHolder.status
+# Checked by tools/check-states.py. Added 29 September (build pass, group OWN, from group RA's handoff).
+
+entity: Accreditation holder
+contract: accreditation
+enum: AccreditationHolder.status
+enumKind: inline
+enumSchema: AccreditationHolder
+enumProperty: status
+owner: accreditation
+description: '**An accredited person under a programme** (boards 6.7, 6.8, 6.9; 12.1.37). Created `active` when
+  an application is approved (or by a committed `importAccreditationHolders`), and the status is what every
+  gate reads: only an `active` holder''s credentials admit.'
+initial:
+- active
+terminal:
+- archived
+transitions:
+- from: active
+  to: suspended
+  operation: setAccreditationStatus
+  trigger: operation
+  guard: With a reason and, usually, a `reviewAt`. **Suspension expects the person back** — a contractor
+    returns after a safety briefing. Credentials stop admitting and the gates are told at once
+  emits:
+  - accreditation.holderStatusChanged
+- from: suspended
+  to: active
+  operation: setAccreditationStatus
+  trigger: operation
+  guard: Reinstated, with a reason. The same credentials admit again
+  isReversal: true
+  emits:
+  - accreditation.holderStatusChanged
+- from: active
+  to: revoked
+  operation: setAccreditationStatus
+  trigger: operation
+  guard: '**Revocation invalidates every credential immediately and pushes to the gates.** A revoked person
+    does not come back on this record; they apply afresh'
+  emits:
+  - accreditation.holderStatusChanged
+- from: suspended
+  to: revoked
+  operation: setAccreditationStatus
+  trigger: operation
+  guard: A suspension that ended in revocation
+  emits:
+  - accreditation.holderStatusChanged
+- from: active
+  to: expired
+  trigger: job
+  guard: The daily expiry run found `validTo` passed and the programme's `onExpiry` is not `autoRenew` (a grace
+    period keeps the holder `active` until it ends)
+  emits:
+  - accreditation.holderStatusChanged
+- from: active
+  to: expired
+  operation: setAccreditationStatus
+  trigger: operation
+  guard: Ended early by a coordinator, with a reason — the assignment finished before the validity did
+  emits:
+  - accreditation.holderStatusChanged
+- from: expired
+  to: active
+  operation: renewAccreditation
+  trigger: operation
+  guard: Inside the renewal window or grace period, and the programme does not require reverification, so the
+    renewal is approved at once and `validTo` is extended. Credentials stay the same
+  isReversal: true
+  emits:
+  - accreditation.holderStatusChanged
+- from: expired
+  to: active
+  operation: decideAccreditationApplication
+  trigger: operation
+  guard: A renewal application (`renewsHolderId`) was approved; the same holder's `validTo` is extended
+  isReversal: true
+  emits:
+  - accreditation.holderStatusChanged
+- from: active
+  to: archived
+  operation: resolveIdentityConflict
+  trigger: operation
+  guard: '**Merged into another holder** (outcome `merged`, this holder not the survivor). Every credential is
+    invalidated and pushed to the gates at once, as a revocation is'
+  emits:
+  - accreditation.holderStatusChanged
+- from: suspended
+  to: archived
+  operation: resolveIdentityConflict
+  trigger: operation
+  guard: Merged into another holder while suspended
+  emits:
+  - accreditation.holderStatusChanged
+- from: expired
+  to: archived
+  operation: resolveIdentityConflict
+  trigger: operation
+  guard: Merged into another holder after expiry
+  emits:
+  - accreditation.holderStatusChanged
+- from: revoked
+  to: archived
+  operation: setAccreditationStatus
+  trigger: operation
+  guard: The record is retired. Kept, never deleted, as evidence of who was admitted when
+  emits:
+  - accreditation.holderStatusChanged
+- from: expired
+  to: archived
+  operation: setAccreditationStatus
+  trigger: operation
+  guard: Retired after expiry without renewal
+  emits:
+  - accreditation.holderStatusChanged
+notes: '**Validity extended on an `active` holder is not a status change.** A renewal inside the window
+  (`renewAccreditation` approved at once, or `decideAccreditationApplication` approving an application with
+  `renewsHolderId`) keeps the holder `active` and publishes `accreditation.holderStatusChanged` with
+  `change: validityExtended`, from the operation rather than a transition, so wallet passes and the offline
+  bundle take the new `validTo`.
+
+
+  `revoked` is not terminal only because a revoked record can be archived; it never returns to `active`.
+  `renewAccreditation` refuses a `revoked` holder (`409`).'

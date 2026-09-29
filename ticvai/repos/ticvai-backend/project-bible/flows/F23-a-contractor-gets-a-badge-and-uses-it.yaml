@@ -30,14 +30,14 @@ steps:
   screen: ACC-007
   action: A reviewer checks and approves
   operations:
-  - listAccreditationApplications
+  - getAccreditationApplication
   - decideAccreditationApplication
   outcome: '**Through `approvals`** — one mechanism, not a fifth'
 - step: 3
   screen: ACC-005
   action: The badge is issued
   operations:
-  - issueAccreditationCredential
+  - listMyAccreditationCredentials
   outcome: QR, NFC or printed — `MediaKind` already covers all four
 - step: 4
   screen: SCN-003

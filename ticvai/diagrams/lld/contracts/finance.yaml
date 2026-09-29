@@ -1,5 +1,5 @@
 id: LLD-finance
-title: finance — 57 operations
+title: finance — 71 operations
 generatedBy: tools/derive-diagrams.py
 index: diagrams/hld/03-contracts.yaml
 tier: spine
@@ -271,6 +271,34 @@ operations:
   reads:
   - ledger.settlement
   writes: []
+- operation: getTaxDocumentRendition
+  verb: GET
+  path: /tax-documents/{documentId}/rendition
+  scope: region
+  permission: LEDGER_VIEW
+  audience:
+  - staff
+  - guest
+  offline: false
+  reads:
+  - ledger.credit_memo
+  - ledger.tax_invoice
+  writes: []
+- operation: getTaxInvoice
+  verb: GET
+  path: /tax-invoices/{invoiceId}
+  scope: region
+  permission: LEDGER_VIEW
+  audience:
+  - staff
+  - guest
+  offline: false
+  reads:
+  - ledger.credit_memo
+  - ledger.einvoice_transmission
+  - ledger.tax_invoice
+  - ledger.tax_invoice_line
+  writes: []
 - operation: getTrialBalance
   verb: GET
   path: /ledger/trial-balance
@@ -298,6 +326,20 @@ operations:
   - ledger.settlement
   - orders.payment
   - wallet.wallet_transaction
+  writes: []
+- operation: getVatReturn
+  verb: GET
+  path: /tax/vat-returns
+  scope: region
+  permission: LEDGER_VIEW
+  audience:
+  - staff
+  offline: false
+  reads:
+  - ledger.journal_entry
+  - ledger.legal_entity
+  - ledger.posting
+  - ledger.tax_code
   writes: []
 - operation: ingestFxRates
   verb: POST
@@ -331,6 +373,60 @@ operations:
   - cache:idempotency
   - ledger.settlement
   - payments.provider_cost
+- operation: issueCreditMemo
+  verb: POST
+  path: /tax-invoices/{invoiceId}/credit-memos
+  scope: venue
+  permission: LEDGER_POST
+  audience:
+  - staff
+  - service
+  offline: false
+  reads:
+  - cache:idempotency
+  - ledger.credit_memo
+  - ledger.credit_memo_line
+  - ledger.tax_invoice
+  - ledger.tax_invoice_line
+  - ledger.tax_invoice_template
+  - orders.refund
+  writes:
+  - cache:idempotency
+  - control.invoice_line
+  - ledger.credit_memo
+  - ledger.credit_memo_line
+  - ledger.tax_invoice
+  - ledger.tax_invoice_line
+  - ledger.tax_invoice_template
+  - platform.audit_record
+  - platform.outbox
+- operation: issueTaxInvoice
+  verb: POST
+  path: /tax-invoices
+  scope: venue
+  permission: LEDGER_POST
+  audience:
+  - staff
+  - guest
+  - service
+  offline: false
+  reads:
+  - cache:idempotency
+  - ledger.legal_entity
+  - ledger.tax_code
+  - ledger.tax_invoice
+  - ledger.tax_invoice_line
+  - ledger.tax_invoice_template
+  - orders.order_line
+  - orders.payment
+  - orders.sales_order
+  writes:
+  - cache:idempotency
+  - ledger.tax_invoice
+  - ledger.tax_invoice_line
+  - ledger.tax_invoice_template
+  - platform.audit_record
+  - platform.outbox
 - operation: listAccountMappings
   verb: GET
   path: /account-mappings
@@ -363,6 +459,41 @@ operations:
   offline: false
   reads:
   - ledger.cost_center
+  writes: []
+- operation: listCreditMemos
+  verb: GET
+  path: /credit-memos
+  scope: region
+  permission: LEDGER_VIEW
+  audience:
+  - staff
+  - guest
+  offline: false
+  reads:
+  - ledger.credit_memo
+  - ledger.credit_memo_line
+  writes: []
+- operation: listEInvoiceTransmissions
+  verb: GET
+  path: /e-invoicing/transmissions
+  scope: region
+  permission: LEDGER_VIEW
+  audience:
+  - staff
+  offline: false
+  reads:
+  - ledger.einvoice_transmission
+  writes: []
+- operation: listEInvoicingProviders
+  verb: GET
+  path: /e-invoicing/providers
+  scope: tenant
+  permission: LEDGER_VIEW
+  audience:
+  - staff
+  offline: false
+  reads:
+  - ledger.einvoicing_provider
   writes: []
 - operation: listFiscalPeriods
   verb: GET
@@ -501,6 +632,30 @@ operations:
   reads:
   - ledger.tax_exemption
   writes: []
+- operation: listTaxInvoiceTemplates
+  verb: GET
+  path: /tax-invoice-templates
+  scope: tenant
+  permission: LEDGER_VIEW
+  audience:
+  - staff
+  offline: false
+  reads:
+  - ledger.tax_invoice_template
+  writes: []
+- operation: listTaxInvoices
+  verb: GET
+  path: /tax-invoices
+  scope: region
+  permission: LEDGER_VIEW
+  audience:
+  - staff
+  - guest
+  offline: false
+  reads:
+  - ledger.tax_invoice
+  - ledger.tax_invoice_line
+  writes: []
 - operation: recordDeposit
   verb: POST
   path: /deposits
@@ -519,6 +674,21 @@ operations:
   - cache:idempotency
   - ledger.deposit
   - ledger.posting
+- operation: recordEInvoiceTransmissionStatus
+  verb: POST
+  path: /e-invoicing/transmissions/{transmissionId}/status
+  scope: region
+  permission: null
+  audience:
+  - service
+  offline: false
+  reads:
+  - cache:idempotency
+  - ledger.einvoice_transmission
+  writes:
+  - cache:idempotency
+  - ledger.einvoice_transmission
+  - ledger.einvoicing_provider
 - operation: recordSettlement
   verb: POST
   path: /inter-entity-obligations/{obligationId}/settle
@@ -690,6 +860,24 @@ operations:
   writes:
   - cache:idempotency
   - ledger.account_mapping
+- operation: setEInvoicingProvider
+  verb: PUT
+  path: /e-invoicing/providers
+  scope: tenant
+  permission: TAX_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - cache:idempotency
+  - ledger.einvoice_transmission
+  - ledger.einvoicing_provider
+  - ledger.legal_entity
+  writes:
+  - cache:idempotency
+  - cache:resolution
+  - ledger.einvoicing_provider
+  - platform.audit_record
 - operation: setFxProvider
   verb: PUT
   path: /fx-rates/providers
@@ -719,6 +907,23 @@ operations:
   writes:
   - cache:idempotency
   - ledger.fx_rate
+- operation: setTaxInvoiceTemplate
+  verb: PUT
+  path: /tax-invoice-templates
+  scope: tenant
+  permission: TAX_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - cache:idempotency
+  - ledger.legal_entity
+  - ledger.tax_invoice_template
+  writes:
+  - cache:idempotency
+  - cache:resolution
+  - ledger.tax_invoice_template
+  - platform.audit_record
 - operation: settleDeposit
   verb: POST
   path: /deposits/{depositId}/settle
@@ -736,6 +941,27 @@ operations:
   - cache:idempotency
   - ledger.deposit
   - ledger.posting
+- operation: transmitEInvoices
+  verb: POST
+  path: /e-invoicing/transmissions
+  scope: region
+  permission: LEDGER_POST
+  audience:
+  - staff
+  - service
+  offline: false
+  reads:
+  - cache:idempotency
+  - ledger.credit_memo
+  - ledger.credit_memo_line
+  - ledger.einvoice_transmission
+  - ledger.einvoicing_provider
+  - ledger.tax_invoice
+  - ledger.tax_invoice_line
+  writes:
+  - cache:idempotency
+  - ledger.einvoice_transmission
+  - platform.outbox
 - operation: updateAccount
   verb: PATCH
   path: /accounts/{accountId}

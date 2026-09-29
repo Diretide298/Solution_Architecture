@@ -130,7 +130,10 @@ operations:
   offline: false
   reads:
   - cache:idempotency
+  - marketing.loyalty_position
+  - promotions.promotion
   - queue.entry
+  - queue.queue
   writes:
   - cache:idempotency
   - queue.entry

@@ -1,4 +1,4 @@
--- approvals — 28 tables
+-- approvals — 30 tables
 -- **Derived. Do not hand-edit.**
 
 -- The badge an approved accreditation actually issues, held apart from the request that granted
@@ -125,7 +125,7 @@ CREATE TABLE IF NOT EXISTS approvals.control_policy (
 
 -- Every decision at every level. Immutable once the request completes — an approval is evidence
 -- Hangs off: reaches approvals.request through its keys; references approvals.request,
--- identity.principal. Reached by: 15 operations read it and 2 write it.
+-- identity.principal. Reached by: 16 operations read it and 3 write it.
 CREATE TABLE IF NOT EXISTS approvals.decision (
     id                                uuid PRIMARY KEY,
     level                             integer NOT NULL,
@@ -225,6 +225,44 @@ CREATE TABLE IF NOT EXISTS approvals.evidence_package (
     scope_path                        ltree NOT NULL
 );
 
+-- Holds 14 columns. No description has been written for this table — the name is the only thing
+-- saying what it is. Reached by: 2 operations read it and 1 write it.
+CREATE TABLE IF NOT EXISTS approvals.external_dispatch (
+    id                                uuid PRIMARY KEY NOT NULL,
+    request_id                        text NOT NULL,
+    provider_id                       uuid NOT NULL,
+    level                             integer NOT NULL,
+    status                            text NOT NULL CONSTRAINT external_dispatch_status_chk CHECK (status IN ('pending', 'sent', 'failed', 'decided', 'timedOut', 'cancelled')),
+    attempt_count                     integer DEFAULT 0,
+    external_reference                text,
+    last_response_code                integer,
+    last_error                        text,
+    sent_at                           timestamptz,
+    answered_at                       timestamptz,
+    external_outcome                  text,
+    external_approver_ref             text,
+    scope_path                        ltree NOT NULL
+);
+
+-- Holds 14 columns. No description has been written for this table — the name is the only thing
+-- saying what it is. Reached by: 4 operations read it and 1 write it; 2 tables reference it.
+CREATE TABLE IF NOT EXISTS approvals.external_provider (
+    id                                uuid PRIMARY KEY,
+    code                              text NOT NULL,
+    name                              text NOT NULL,
+    endpoint_url                      text NOT NULL,
+    outbound_auth                     text DEFAULT 'oauthClientCredentials' CONSTRAINT external_provider_outbound_auth_chk CHECK (outbound_auth IN ('bearerToken', 'basic', 'oauthClientCredentials', 'mutualTls')),
+    outbound_credential               text,
+    signing_secret                    text,
+    api_client_id                     uuid NOT NULL,
+    timeout_minutes                   integer DEFAULT 1440,
+    on_timeout                        text DEFAULT 'fallBackToRoles' CONSTRAINT external_provider_on_timeout_chk CHECK (on_timeout IN ('fallBackToRoles', 'escalate', 'reject')),
+    max_attempts                      integer DEFAULT 5,
+    status                            text DEFAULT 'active' CONSTRAINT external_provider_status_chk CHECK (status IN ('active', 'paused', 'disabled')),
+    last_success_at                   timestamptz,
+    scope_path                        ltree NOT NULL
+);
+
 -- What requires approval where. Versioned, because a request must be decided by the rules it was
 -- raised under Hangs off: reaches approvals.request through its keys. Reached by: 8 operations
 -- read it and 2 write it; 1 tables reference it.
@@ -238,8 +276,8 @@ CREATE TABLE IF NOT EXISTS approvals.matrix (
 );
 
 -- One request per action needing authorisation. The subject is a reference, never a copy Hangs
--- off: a root — nothing above it in its schema; references identity.principal. Reached by: 29
--- operations read it and 22 write it; 46 tables reference it; written by 3 contracts — approvals,
+-- off: a root — nothing above it in its schema; references identity.principal. Reached by: 31
+-- operations read it and 24 write it; 50 tables reference it; written by 3 contracts — approvals,
 -- subscription, workforce.
 CREATE TABLE IF NOT EXISTS approvals.request (
     id                                text PRIMARY KEY NOT NULL,
@@ -267,7 +305,8 @@ CREATE TABLE IF NOT EXISTS approvals.request (
     is_sla_breached                   boolean,
     expires_at                        timestamptz,
     requested_at                      timestamptz NOT NULL,
-    completed_at                      timestamptz
+    completed_at                      timestamptz,
+    ai_assessment                     jsonb
 );
 
 -- Holds 9 columns. No description has been written for this table — the name is the only thing
@@ -285,7 +324,7 @@ CREATE TABLE IF NOT EXISTS approvals.retention_policy (
 );
 
 -- Ordered within a matrix. First match wins, so adding a rule cannot silently change another Hangs
--- off: reaches approvals.request through its keys; references approvals.matrix. Reached by: 13
+-- off: reaches approvals.request through its keys; references approvals.matrix. Reached by: 15
 -- operations read it and 2 write it; 3 tables reference it.
 CREATE TABLE IF NOT EXISTS approvals.rule (
     id                                uuid PRIMARY KEY,
@@ -304,6 +343,7 @@ CREATE TABLE IF NOT EXISTS approvals.rule (
     escalate_after_minutes            integer,
     escalate_to_role_ids              text[],
     expires_after_minutes             integer,
+    external_provider_id              uuid,
     matrix_id                         uuid NOT NULL
 );
 

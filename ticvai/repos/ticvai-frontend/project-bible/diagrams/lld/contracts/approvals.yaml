@@ -1,5 +1,5 @@
 id: LLD-approvals
-title: approvals — 49 operations
+title: approvals — 53 operations
 generatedBy: tools/derive-diagrams.py
 index: diagrams/hld/03-contracts.yaml
 tier: spine
@@ -200,6 +200,7 @@ operations:
   - approvals.escalation
   - approvals.request
   - cache:idempotency
+  - platform.outbox
 - operation: evaluateApprovalRequirement
   verb: POST
   path: /approval-requests/evaluate
@@ -287,6 +288,28 @@ operations:
   reads:
   - approvals.delegation
   - identity.principal
+  writes: []
+- operation: listApprovalExternalDispatches
+  verb: GET
+  path: /approval-external-dispatches
+  scope: venue
+  permission: APPROVAL_VIEW
+  audience:
+  - staff
+  offline: false
+  reads:
+  - approvals.external_dispatch
+  writes: []
+- operation: listApprovalExternalProviders
+  verb: GET
+  path: /approval-external-providers
+  scope: tenant
+  permission: APPROVAL_VIEW
+  audience:
+  - staff
+  offline: false
+  reads:
+  - approvals.external_provider
   writes: []
 - operation: listApprovalMatrices
   verb: GET
@@ -512,6 +535,27 @@ operations:
   - approvals.workflow_instance
   - approvals.workflow_step_execution
   writes: []
+- operation: recordExternalApprovalDecision
+  verb: POST
+  path: /approval-requests/{requestId}/external-decision
+  scope: venue
+  permission: APPROVAL_DECIDE
+  audience:
+  - partner
+  offline: false
+  reads:
+  - approvals.decision
+  - approvals.external_dispatch
+  - approvals.external_provider
+  - approvals.request
+  - approvals.rule
+  - cache:idempotency
+  writes:
+  - approvals.decision
+  - approvals.external_dispatch
+  - approvals.request
+  - cache:idempotency
+  - platform.outbox
 - operation: resolveApprovedActionExecution
   verb: POST
   path: /approved-action-executions/{executionId}/resolve
@@ -564,6 +608,21 @@ operations:
   - approvals.control_policy
   writes:
   - approvals.control_policy
+- operation: setApprovalExternalProvider
+  verb: PUT
+  path: /approval-external-providers
+  scope: tenant
+  permission: APPROVAL_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - approvals.external_provider
+  - cache:idempotency
+  - control.api_client
+  writes:
+  - approvals.external_provider
+  - cache:idempotency
 - operation: setApprovalMatrix
   verb: PUT
   path: /approval-matrices
@@ -573,6 +632,7 @@ operations:
   - staff
   offline: false
   reads:
+  - approvals.external_provider
   - approvals.matrix
   - approvals.rule
   - cache:idempotency
@@ -590,8 +650,10 @@ operations:
   offline: false
   reads:
   - approvals.retention_policy
+  - cache:idempotency
   writes:
   - approvals.retention_policy
+  - cache:idempotency
 - operation: setApprovalSlaPolicy
   verb: PUT
   path: /approval-sla-policies
@@ -721,7 +783,12 @@ operations:
   reads:
   - approvals.decision
   - approvals.request
-  writes: []
+  - approvals.rule
+  - cache:idempotency
+  writes:
+  - approvals.request
+  - cache:idempotency
+  - platform.outbox
 - operation: withdrawApprovalRequest
   verb: POST
   path: /approval-requests/{requestId}/withdraw

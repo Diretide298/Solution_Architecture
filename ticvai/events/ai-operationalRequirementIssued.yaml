@@ -1,0 +1,72 @@
+# ai.operationalRequirementIssued v1 — published by ai
+# Checked by tools/check-states.py.
+
+name: ai.operationalRequirementIssued
+version: 1
+publisher: ai
+description: An operational requirement derived from a forecast was accepted and handed to the module
+  that applies it.
+aggregate: aiOperationalRequirement
+emittedWhen: AiOperationalRequirement issued, accepted or modified to handedOver (decideOperationalRequirement)
+payload:
+- field: tenantId
+  type: uuid
+- field: scopePath
+  type: string
+- field: requirementId
+  type: uuid
+- field: versionId
+  type: uuid
+  notes: The forecast version it is bound to (AIP-067)
+- field: kind
+  type: string
+  notes: staff, pos, kiosk, gates, fnb, retail, stock, resource, equipment, facility
+- field: targetContract
+  type: string
+  notes: The owning module that applies it
+- field: subjectRef
+  type: string
+- field: periodStart
+  type: timestamp
+- field: periodEnd
+  type: timestamp
+- field: quantity
+  type: number
+- field: unit
+  type: string
+consumers:
+- context: workforce
+  purpose: Show the requirement on the rota as a recommendation a manager applies (autonomy L2, design
+    3.8)
+  idempotencyKey: requirementId
+  onFailure: retryThenDeadLetter
+  isCritical: true
+- context: inventory
+  purpose: Show stock requirements as a replenishment recommendation
+  idempotencyKey: requirementId
+  onFailure: retry
+  isCritical: false
+- context: fnb
+  purpose: Show prep requirements on the outlet
+  idempotencyKey: requirementId
+  onFailure: retry
+  isCritical: false
+- context: resources
+  purpose: Show resource and equipment requirements on the plan
+  idempotencyKey: requirementId
+  onFailure: retry
+  isCritical: false
+- context: marketing
+  purpose: Notify the owning manager that a requirement is waiting
+  idempotencyKey: requirementId
+  onFailure: retry
+  isCritical: false
+retention: Kept with the requirement
+notes: '**A recommendation, never a write.** The owning module decides whether and how to apply it; AI
+  changes nothing there (design 1.3 constraint 1).
+
+
+  **Carries ids and scope, never prompt text or personal data beyond ids** (AI design 3.2).
+
+
+  Emitted by states/ai-operational-requirement.yaml on `accepted` or `modified` to `handedOver`, in the same transaction as `decideOperationalRequirement` (added 29 September, build pass, group OWN).'

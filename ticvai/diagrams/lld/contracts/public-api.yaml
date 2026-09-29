@@ -1,5 +1,5 @@
 id: LLD-public-api
-title: public-api — 24 operations
+title: public-api — 25 operations
 generatedBy: tools/derive-diagrams.py
 index: diagrams/hld/03-contracts.yaml
 tier: satellite
@@ -168,6 +168,17 @@ operations:
   offline: false
   reads:
   - control.webhook_delivery
+  writes: []
+- operation: listWebhookEventTypes
+  verb: GET
+  path: /webhook-event-types
+  scope: tenant
+  permission: DEVELOPER_VIEW
+  audience:
+  - staff
+  - partner
+  offline: false
+  reads: []
   writes: []
 - operation: listWebhookSubscriptions
   verb: GET

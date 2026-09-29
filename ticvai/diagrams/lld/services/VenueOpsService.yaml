@@ -45,7 +45,7 @@ schemas:
   tables: 23
   stores:
   - postgres
-  largestTable: games.entitlement
+  largestTable: games.game
 - schema: rental
   tables: 24
   stores:
@@ -2052,7 +2052,7 @@ operationsByContract:
     scope: venue
     permission: null
     offline: false
-    reads: 2
+    reads: 5
     writes: 2
   - operation: leaveQueue
     verb: DELETE
@@ -2832,7 +2832,7 @@ tables:
   - maintenance
   foreignWriters: null
 - table: queue.entry
-  columns: 18
+  columns: 22
   store: postgres
   parent: null
   writtenBy:
@@ -2846,7 +2846,7 @@ tables:
   - queue
   foreignWriters: null
 - table: queue.queue
-  columns: 37
+  columns: 40
   store: postgres
   parent: null
   writtenBy:
@@ -3291,16 +3291,16 @@ tables:
 readsFrom:
 - service: TenancyService
   operations: 4
+- service: CatalogueService
+  operations: 3
 - service: IdentityService
   operations: 3
 - service: AccessService
   operations: 2
-- service: CatalogueService
-  operations: 2
 - service: AiService
   operations: 2
 - service: MarketingService
-  operations: 1
+  operations: 2
 writesOutside:
 - service: TenancyService
   operations: 2

@@ -22,7 +22,7 @@
   {
    "name": "Every model call leaves an audit record",
    "holds": true,
-   "detail": "10 operations write an `ai.interaction` (8.3.55).",
+   "detail": "17 operations write an `ai.interaction` (8.3.55).",
    "enforcedBy": "tools/check-package.py \u2014 a model-calling operation with no interaction fails"
   },
   {
@@ -33,52 +33,52 @@
   }
  ],
  "stores": {
+  "postgres": 117,
   "postgres-analytical": 5,
-  "postgres": 41,
-  "redis": 4,
+  "redis": 8,
   "qdrant": 1
  },
  "generated": "2026-09-29",
  "note": "Derived by closure from the contract, not listed. See handoff/README.md \u2014 the hand-maintained version of this drifted four times in one day.",
  "counts": {
-  "operations": 33,
-  "schemas": 34,
-  "states": 11,
-  "events": 11,
-  "tables": 51,
-  "screens": 37,
+  "operations": 135,
+  "schemas": 116,
+  "states": 42,
+  "events": 46,
+  "tables": 131,
+  "screens": 193,
   "flows": 10,
-  "documents": 43,
+  "documents": 44,
   "openConflicts": 1
  },
  "metrics": {
   "design": [
    {
     "name": "Operations in the contract",
-    "done": 31,
-    "total": 31,
+    "done": 133,
+    "total": 133,
     "percent": 100,
     "note": "The seed of the closure."
    },
    {
     "name": "Lifecycles modelled",
-    "done": 4,
-    "total": 4,
-    "percent": 100,
+    "done": 19,
+    "total": 32,
+    "percent": 59,
     "note": "Status enums in the domain contract with a state model."
    },
    {
     "name": "Operations reaching a screen",
-    "done": 21,
-    "total": 31,
-    "percent": 68,
+    "done": 120,
+    "total": 133,
+    "percent": 90,
     "note": "This domain's own operations that a screen calls. Jobs and internal operations legitimately reach none."
    },
    {
     "name": "Events with a critical consumer",
-    "done": 11,
-    "total": 11,
-    "percent": 100,
+    "done": 30,
+    "total": 46,
+    "percent": 65,
     "note": "An event whose loss breaks something must say which consumer."
    }
   ],
@@ -93,21 +93,30 @@
   ]
  },
  "headline": {
-  "design": 87,
+  "design": 88,
   "build": 0
  },
  "waves": {
-  "wave2": 15,
+  "wave1": 11,
+  "wave2": 27,
   "wave4": 1,
-  "wave1": 6,
-  "wave3": 15
+  "wave3": 154
  },
  "reachedOutsideTheContract": [
   {
    "file": "approval-request.yaml",
    "contract": "approvals",
    "via": [
-    "approval.granted"
+    "approval.expired",
+    "approval.granted",
+    "approval.rejected"
+   ]
+  },
+  {
+   "file": "cart.yaml",
+   "contract": "orders",
+   "via": [
+    "cart.abandoned"
    ]
   },
   {
@@ -115,6 +124,13 @@
    "contract": "marketing-crm",
    "via": [
     "marketing.caseClosed"
+   ]
+  },
+  {
+   "file": "chargeback.yaml",
+   "contract": "orders",
+   "via": [
+    "order.chargebackRecorded"
    ]
   },
   {
@@ -132,10 +148,48 @@
    ]
   },
   {
+   "file": "entitlement-status.yaml",
+   "contract": "orders",
+   "via": [
+    "access.validated"
+   ]
+  },
+  {
    "file": "media.yaml",
    "contract": "assets",
    "via": [
     "assets.documentIndexed"
+   ]
+  },
+  {
+   "file": "order.yaml",
+   "contract": "orders",
+   "via": [
+    "order.cancelled",
+    "order.completed",
+    "order.paid",
+    "order.refunded"
+   ]
+  },
+  {
+   "file": "payment.yaml",
+   "contract": "orders",
+   "via": [
+    "order.paid"
+   ]
+  },
+  {
+   "file": "performance.yaml",
+   "contract": "catalogue",
+   "via": [
+    "performance.cancelled"
+   ]
+  },
+  {
+   "file": "period.yaml",
+   "contract": "finance",
+   "via": [
+    "ledger.periodClosed"
    ]
   },
   {
@@ -146,15 +200,78 @@
    ]
   },
   {
+   "file": "promotion.yaml",
+   "contract": "promotions",
+   "via": [
+    "promotions.recommendationStrategyPublished"
+   ]
+  },
+  {
+   "file": "refund.yaml",
+   "contract": "orders",
+   "via": [
+    "order.refunded"
+   ]
+  },
+  {
+   "file": "registered-device.yaml",
+   "contract": "tenancy",
+   "via": [
+    "device.statusChanged"
+   ]
+  },
+  {
+   "file": "resale-listing.yaml",
+   "contract": "orders",
+   "via": [
+    "entitlement.transferred"
+   ]
+  },
+  {
    "file": "schedule.yaml",
    "contract": "white-label",
    "via": [
     "whitelabel.contentPublished"
    ]
+  },
+  {
+   "file": "seat.yaml",
+   "contract": "seating",
+   "via": [
+    "seat.sold"
+   ]
+  },
+  {
+   "file": "shift.yaml",
+   "contract": "shift",
+   "via": [
+    "shift.closed"
+   ]
+  },
+  {
+   "file": "stock-count.yaml",
+   "contract": "inventory",
+   "via": [
+    "stock.depleted"
+   ]
+  },
+  {
+   "file": "tenant.yaml",
+   "contract": "subscription",
+   "via": [
+    "tenant.suspended"
+   ]
+  },
+  {
+   "file": "ticket-transfer.yaml",
+   "contract": "orders",
+   "via": [
+    "entitlement.transferred"
+   ]
   }
  ],
  "governedOperations": {
-  "count": 10,
+  "count": 17,
   "note": "Operations that call a model and write an ai.activity (8.3.55)."
  },
  "guestCallable": {
@@ -162,9 +279,9 @@
   "operations": []
  },
  "storage": {
+  "postgres": 117,
   "postgres-analytical": 5,
-  "postgres": 41,
-  "redis": 4,
+  "redis": 8,
   "qdrant": 1
  },
  "inboundKeys": [],
@@ -175,7 +292,21 @@
    "CF-165"
   ]
  },
- "unmodelledLifecycles": [],
+ "unmodelledLifecycles": [
+  "AiPromptTemplate.status",
+  "AiGovernancePolicy.status",
+  "AiActionStep.status",
+  "AiConfigurationSession.status",
+  "AiBlueprintDecision.status",
+  "AiKnowledgeGap.status",
+  "AiRiskStrategy.status",
+  "AiRiskAlert.status",
+  "AiRiskCaseAction.status",
+  "AiRiskRegisterEntry.status",
+  "AiConfigurationSource.status",
+  "AiMarketingRecommendation.status",
+  "AiForecastExport.status"
+ ],
  "documents": [
   {
    "file": "docs\\active\\action-register-22-september.md",
@@ -310,6 +441,11 @@
   {
    "file": "docs\\active\\screen-regeneration-plan.md",
    "title": "Regenerating the screen layer \u2014 plan",
+   "status": ""
+  },
+  {
+   "file": "docs\\active\\six-month-plan-29-september.md",
+   "title": "Six-month build plan, re-planned 29 September 2026",
    "status": ""
   },
   {

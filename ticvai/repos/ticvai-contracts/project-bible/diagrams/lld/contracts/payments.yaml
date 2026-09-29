@@ -1,5 +1,5 @@
 id: LLD-payments
-title: payments — 41 operations
+title: payments — 47 operations
 generatedBy: tools/derive-diagrams.py
 index: diagrams/hld/03-contracts.yaml
 tier: satellite
@@ -17,6 +17,30 @@ operations:
   - payments.credit_account
   writes:
   - payments.credit_account
+- operation: createInstalmentPlan
+  verb: POST
+  path: /instalment-plans
+  scope: venue
+  permission: ORDER_CREATE
+  audience:
+  - staff
+  - guest
+  - service
+  offline: false
+  reads:
+  - cache:idempotency
+  - orders.payment
+  - orders.sales_order
+  - payments.instalment
+  - payments.instalment_plan
+  - payments.instalment_policy
+  - payments.token
+  writes:
+  - cache:idempotency
+  - orders.payment
+  - payments.instalment
+  - payments.instalment_plan
+  - platform.outbox
 - operation: createPaymentMethod
   verb: POST
   path: /payment-methods
@@ -51,6 +75,17 @@ operations:
   offline: false
   reads:
   - payments.dunning_policy
+  writes: []
+- operation: getInstalmentPolicy
+  verb: GET
+  path: /instalment-policy
+  scope: tenant
+  permission: PAYMENT_VIEW
+  audience:
+  - staff
+  offline: false
+  reads:
+  - payments.instalment_policy
   writes: []
 - operation: getMixedTenderRules
   verb: GET
@@ -154,6 +189,19 @@ operations:
   reads:
   - payments.dunning_case
   writes: []
+- operation: listInstalmentPlans
+  verb: GET
+  path: /instalment-plans
+  scope: venue
+  permission: PAYMENT_VIEW
+  audience:
+  - staff
+  - guest
+  offline: false
+  reads:
+  - payments.instalment
+  - payments.instalment_plan
+  writes: []
 - operation: listMerchantAccounts
   verb: GET
   path: /merchant-accounts
@@ -209,6 +257,18 @@ operations:
   reads:
   - payments.routing_rule
   writes: []
+- operation: listPaymentTerminalCertifications
+  verb: GET
+  path: /payment-terminal-certifications
+  scope: tenant
+  permission: PAYMENT_VIEW
+  audience:
+  - staff
+  offline: false
+  reads:
+  - payments.terminal_certification
+  - payments.terminal_certification_level3
+  writes: []
 - operation: listPaymentTerminals
   verb: GET
   path: /payment-terminals
@@ -254,6 +314,24 @@ operations:
   - payments.deposit_activity
   writes:
   - payments.deposit_activity
+- operation: recordPaymentTerminalCertification
+  verb: PUT
+  path: /payment-terminal-certifications/{modelCode}
+  scope: tenant
+  permission: PAYMENT_PROVIDER_MANAGE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - cache:idempotency
+  - payments.provider_connection
+  - payments.terminal_certification
+  - payments.terminal_certification_level3
+  writes:
+  - cache:idempotency
+  - payments.terminal_certification
+  - payments.terminal_certification_level3
+  - platform.audit_record
 - operation: resolveDunningCase
   verb: POST
   path: /dunning-cases/{caseId}/resolve
@@ -315,6 +393,21 @@ operations:
   - payments.hosted_checkout
   writes:
   - payments.hosted_checkout
+- operation: setInstalmentPolicy
+  verb: PUT
+  path: /instalment-policy
+  scope: tenant
+  permission: PAYMENT_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - cache:idempotency
+  - payments.instalment_policy
+  writes:
+  - cache:idempotency
+  - cache:resolution
+  - payments.instalment_policy
 - operation: setMerchantAccount
   verb: PUT
   path: /merchant-accounts
@@ -413,6 +506,8 @@ operations:
   offline: false
   reads:
   - payments.terminal
+  - payments.terminal_certification
+  - payments.terminal_certification_level3
   writes:
   - payments.terminal
 - operation: setReconciliationMatchingRules

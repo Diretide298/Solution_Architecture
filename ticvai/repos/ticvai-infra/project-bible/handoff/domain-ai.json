@@ -3,6 +3,22 @@
  "derivedFrom": "closure over contracts, states, events, lineage, screens, flows and docs",
  "note": "Nothing in this file is hand-typed. Regenerate with `python3 tools/derive-domain.py ai` after any change.",
  "operations": {
+  "addRiskCaseEvidence": {
+   "path": "/risk/cases/{caseId}/evidence",
+   "verb": "POST",
+   "summary": "Add evidence to a case",
+   "permission": "RISK_INVESTIGATE",
+   "guestCallable": false,
+   "scopeLevel": "venue"
+  },
+  "answerConfigurationQuestion": {
+   "path": "/configuration-sessions/{sessionId}/answers",
+   "verb": "POST",
+   "summary": "Answer the current question",
+   "permission": "AI_USE",
+   "guestCallable": false,
+   "scopeLevel": "venue"
+  },
   "askReportingQuestion": {
    "path": "/reports/ask",
    "verb": "POST",
@@ -12,12 +28,140 @@
    "scopeLevel": "venue",
    "foreignContract": "reporting"
   },
+  "attachConfigurationSource": {
+   "path": "/configuration-sessions/{sessionId}/sources",
+   "verb": "POST",
+   "summary": "Seed a configuration session from an uploaded document",
+   "permission": "AI_USE",
+   "guestCallable": false,
+   "scopeLevel": "venue"
+  },
+  "backtestRiskStrategy": {
+   "path": "/risk/strategy/backtest",
+   "verb": "POST",
+   "summary": "Backtest a draft strategy",
+   "permission": "AI_CONFIGURE",
+   "guestCallable": false,
+   "scopeLevel": "tenant"
+  },
+  "buildConfigurationPlan": {
+   "path": "/configuration-sessions/{sessionId}/plan",
+   "verb": "POST",
+   "summary": "Compile the blueprint into a plan",
+   "permission": "AI_USE",
+   "guestCallable": false,
+   "scopeLevel": "venue"
+  },
+  "cancelActionPlan": {
+   "path": "/action-plans/{planId}/cancel",
+   "verb": "POST",
+   "summary": "Cancel a plan",
+   "permission": "AI_USE",
+   "guestCallable": false,
+   "scopeLevel": "venue"
+  },
+  "closeAiIncident": {
+   "path": "/incidents/{incidentId}/close",
+   "verb": "POST",
+   "summary": "Close an incident",
+   "permission": "AI_APPROVE",
+   "guestCallable": false,
+   "scopeLevel": "tenant"
+  },
+  "closeRiskCase": {
+   "path": "/risk/cases/{caseId}/close",
+   "verb": "POST",
+   "summary": "Close a case with an outcome",
+   "permission": "RISK_INVESTIGATE",
+   "guestCallable": false,
+   "scopeLevel": "venue"
+  },
+  "compareForecastScenarios": {
+   "path": "/forecast-scenarios/compare",
+   "verb": "POST",
+   "summary": "Compare scenarios",
+   "permission": "AI_USE",
+   "guestCallable": false,
+   "scopeLevel": "venue"
+  },
+  "configureAiCapability": {
+   "path": "/governance/capabilities/{capabilityKey}",
+   "verb": "PUT",
+   "summary": "Register a capability, or change its owner, risk class or autonomy",
+   "permission": "AI_CONFIGURE",
+   "guestCallable": false,
+   "scopeLevel": "tenant"
+  },
+  "configureAnomalyDetector": {
+   "path": "/anomaly-detectors/{detectorKey}",
+   "verb": "PUT",
+   "summary": "Set up anomaly detection on a KPI",
+   "permission": "AI_CONFIGURE",
+   "guestCallable": false,
+   "scopeLevel": "venue"
+  },
+  "configureAssistantProfile": {
+   "path": "/assistant-profiles/{profileKey}",
+   "verb": "PUT",
+   "summary": "Define an assistant profile",
+   "permission": "AI_CONFIGURE",
+   "guestCallable": false,
+   "scopeLevel": "tenant"
+  },
+  "configureForecastSignalSource": {
+   "path": "/forecast-signals/{signalKey}",
+   "verb": "PUT",
+   "summary": "Set up a forecast signal",
+   "permission": "AI_CONFIGURE",
+   "guestCallable": false,
+   "scopeLevel": "tenant"
+  },
+  "configureRiskStrategy": {
+   "path": "/risk/strategy",
+   "verb": "PUT",
+   "summary": "Set the risk strategy",
+   "permission": "AI_CONFIGURE",
+   "guestCallable": false,
+   "scopeLevel": "tenant"
+  },
+  "containAiIncident": {
+   "path": "/incidents/{incidentId}/contain",
+   "verb": "POST",
+   "summary": "Contain an incident",
+   "permission": "AI_APPROVE",
+   "guestCallable": false,
+   "scopeLevel": "tenant"
+  },
   "createAiConversation": {
    "path": "/conversations",
    "verb": "POST",
    "summary": "Open a conversation",
    "permission": "AI_USE",
    "guestCallable": true,
+   "scopeLevel": "venue"
+  },
+  "createAiGovernancePolicyDraft": {
+   "path": "/governance/policy-drafts",
+   "verb": "POST",
+   "summary": "Draft a governance policy, or a new version of one",
+   "permission": "AI_CONFIGURE",
+   "guestCallable": false,
+   "scopeLevel": "tenant"
+  },
+  "createAiPolicyException": {
+   "path": "/governance/policy-exceptions",
+   "verb": "POST",
+   "summary": "Grant a temporary exception to a governance policy",
+   "permission": "AI_APPROVE",
+   "guestCallable": false,
+   "scopeLevel": "tenant"
+  },
+  "createForecastScenario": {
+   "path": "/forecast-scenarios",
+   "verb": "POST",
+   "summary": "Run a what-if",
+   "permission": "AI_USE",
+   "guestCallable": false,
    "scopeLevel": "venue"
   },
   "createKnowledgeCollection": {
@@ -28,10 +172,114 @@
    "guestCallable": false,
    "scopeLevel": "tenant"
   },
+  "createRiskCase": {
+   "path": "/risk/cases",
+   "verb": "POST",
+   "summary": "Open an investigation",
+   "permission": "RISK_INVESTIGATE",
+   "guestCallable": false,
+   "scopeLevel": "venue"
+  },
+  "decideAiGovernanceAlert": {
+   "path": "/governance-alerts/{alertId}/decide",
+   "verb": "POST",
+   "summary": "Acknowledge, dismiss, resolve, or open an incident",
+   "permission": "AI_CONFIGURE",
+   "guestCallable": false,
+   "scopeLevel": "venue"
+  },
+  "decideAiInsight": {
+   "path": "/insights/{insightId}/decide",
+   "verb": "POST",
+   "summary": "Review, accept, reject or mark an insight actioned",
+   "permission": "AI_USE",
+   "guestCallable": false,
+   "scopeLevel": "venue"
+  },
+  "decideBlueprintRecommendation": {
+   "path": "/configuration-sessions/{sessionId}/decisions/{decisionKey}",
+   "verb": "POST",
+   "summary": "Accept, modify, reject or defer a blueprint decision",
+   "permission": "AI_USE",
+   "guestCallable": false,
+   "scopeLevel": "venue"
+  },
+  "decideOperationalRequirement": {
+   "path": "/operational-requirements/{requirementId}/decide",
+   "verb": "POST",
+   "summary": "Accept, modify or reject a requirement",
+   "permission": "AI_USE",
+   "guestCallable": false,
+   "scopeLevel": "venue"
+  },
   "decideProposedAction": {
    "path": "/proposed-actions/{actionId}/decide",
    "verb": "POST",
    "summary": "Approve or reject a proposal",
+   "permission": "AI_USE",
+   "guestCallable": false,
+   "scopeLevel": "venue"
+  },
+  "decideRecommendations": {
+   "path": "/recommendations/decide",
+   "verb": "POST",
+   "summary": "Fill a recommendation slot",
+   "permission": "AI_USE",
+   "guestCallable": true,
+   "scopeLevel": "venue"
+  },
+  "decideRiskAlert": {
+   "path": "/risk/alerts/{alertId}/decide",
+   "verb": "POST",
+   "summary": "Dismiss, monitor, mark false positive, or escalate",
+   "permission": "RISK_REVIEW",
+   "guestCallable": false,
+   "scopeLevel": "venue"
+  },
+  "evaluateAiGovernance": {
+   "path": "/governance/evaluate",
+   "verb": "POST",
+   "summary": "Ask the governance decision point (service callers)",
+   "permission": null,
+   "guestCallable": false,
+   "scopeLevel": "venue"
+  },
+  "expandRiskNetwork": {
+   "path": "/risk/network",
+   "verb": "GET",
+   "summary": "Expand the relationship graph around an entity",
+   "permission": "RISK_INVESTIGATE",
+   "guestCallable": false,
+   "scopeLevel": "venue"
+  },
+  "explainMetricChange": {
+   "path": "/insights/explain-metric-change",
+   "verb": "POST",
+   "summary": "Why did this metric change",
+   "permission": "AI_USE",
+   "guestCallable": false,
+   "scopeLevel": "venue"
+  },
+  "explainRecommendationDecision": {
+   "path": "/recommendations/decisions/{decisionId}/explanation",
+   "verb": "GET",
+   "summary": "Why these recommendations",
+   "permission": "AI_USE",
+   "guestCallable": false,
+   "scopeLevel": "venue"
+  },
+  "exportAiEvidencePackage": {
+   "path": "/evidence-packages",
+   "verb": "POST",
+   "summary": "Export an evidence package",
+   "permission": "AI_AUDIT_VIEW",
+   "guestCallable": false,
+   "scopeLevel": "venue"
+  },
+  "exportForecastVersion": {
+   "path": "/forecast-versions/{versionId}/exports",
+   "verb": "POST",
+   "summary": "Export a forecast version as a file",
    "permission": "AI_USE",
    "guestCallable": false,
    "scopeLevel": "venue"
@@ -52,6 +300,30 @@
    "guestCallable": false,
    "scopeLevel": "venue"
   },
+  "getActionPlan": {
+   "path": "/action-plans/{planId}",
+   "verb": "GET",
+   "summary": "A plan with its steps",
+   "permission": "AI_USE",
+   "guestCallable": false,
+   "scopeLevel": "venue"
+  },
+  "getAiByokEnablement": {
+   "path": "/tenants/{tenantId}/byok",
+   "verb": "GET",
+   "summary": "Whether a tenant may bring its own key",
+   "permission": "AI_CONFIGURE",
+   "guestCallable": false,
+   "scopeLevel": "tenant"
+  },
+  "getAiDecisionTrace": {
+   "path": "/decision-records/{decisionRecordId}/trace",
+   "verb": "GET",
+   "summary": "The full trace of a decision",
+   "permission": "AI_AUDIT_VIEW",
+   "guestCallable": false,
+   "scopeLevel": "venue"
+  },
   "getAiPolicy": {
    "path": "/policy",
    "verb": "GET",
@@ -68,11 +340,99 @@
    "guestCallable": false,
    "scopeLevel": "tenant"
   },
+  "getApprovalRequestScore": {
+   "path": "/approval-requests/{approvalRequestId}/score",
+   "verb": "GET",
+   "summary": "The latest context score of an approval request",
+   "permission": "APPROVAL_VIEW",
+   "guestCallable": false,
+   "scopeLevel": "venue"
+  },
+  "getConfigurationBlueprint": {
+   "path": "/configuration-sessions/{sessionId}/blueprint",
+   "verb": "GET",
+   "summary": "The blueprint so far",
+   "permission": "AI_USE",
+   "guestCallable": false,
+   "scopeLevel": "venue"
+  },
+  "getCustomerRecommendationProfile": {
+   "path": "/recommendations/customers/{subjectId}/profile",
+   "verb": "GET",
+   "summary": "What the engine knows about a customer",
+   "permission": "AI_USE",
+   "guestCallable": false,
+   "scopeLevel": "venue"
+  },
+  "getEffectiveAiPolicy": {
+   "path": "/governance/effective-policy",
+   "verb": "GET",
+   "summary": "The policy in force for a capability at a scope",
+   "permission": "AI_USE",
+   "guestCallable": false,
+   "scopeLevel": "venue"
+  },
+  "getEntityRisk": {
+   "path": "/risk/entities/{entityType}/{entityRef}",
+   "verb": "GET",
+   "summary": "Current risk of an entity",
+   "permission": "RISK_REVIEW",
+   "guestCallable": false,
+   "scopeLevel": "tenant"
+  },
+  "getForecast": {
+   "path": "/forecasts",
+   "verb": "GET",
+   "summary": "Forecast values",
+   "permission": "AI_USE",
+   "guestCallable": false,
+   "scopeLevel": "venue"
+  },
+  "getForecastAccuracy": {
+   "path": "/forecast-accuracy",
+   "verb": "GET",
+   "summary": "Measured forecast accuracy",
+   "permission": "AI_USE",
+   "guestCallable": false,
+   "scopeLevel": "venue"
+  },
+  "getGuidedChoiceSuggestion": {
+   "path": "/guided-choice-suggestions/{suggestionId}",
+   "verb": "GET",
+   "summary": "The reasons behind a Help me choose suggestion",
+   "permission": "AI_USE",
+   "guestCallable": false,
+   "scopeLevel": "venue"
+  },
+  "getRiskCase": {
+   "path": "/risk/cases/{caseId}",
+   "verb": "GET",
+   "summary": "A case with its evidence and actions",
+   "permission": "RISK_INVESTIGATE",
+   "guestCallable": false,
+   "scopeLevel": "venue"
+  },
   "ingestKnowledgeDocument": {
    "path": "/collections/{collectionId}/documents",
    "verb": "POST",
    "summary": "Add a document",
    "permission": "AI_CONFIGURE",
+   "guestCallable": false,
+   "scopeLevel": "tenant"
+  },
+  "listAiCapabilities": {
+   "path": "/governance/capabilities",
+   "verb": "GET",
+   "summary": "The capability registry",
+   "permission": "AI_USE",
+   "guestCallable": false,
+   "scopeLevel": "venue"
+  },
+  "listAiControls": {
+   "path": "/controls",
+   "verb": "GET",
+   "summary": "Governance controls",
+   "permission": "AI_USE",
    "guestCallable": false,
    "scopeLevel": "tenant"
   },
@@ -84,11 +444,59 @@
    "guestCallable": true,
    "scopeLevel": "venue"
   },
+  "listAiEvaluations": {
+   "path": "/evaluations",
+   "verb": "GET",
+   "summary": "Evaluation runs",
+   "permission": "AI_USE",
+   "guestCallable": false,
+   "scopeLevel": "tenant"
+  },
+  "listAiGovernanceAlerts": {
+   "path": "/governance-alerts",
+   "verb": "GET",
+   "summary": "Governance alerts",
+   "permission": "AI_USE",
+   "guestCallable": false,
+   "scopeLevel": "venue"
+  },
+  "listAiGovernancePolicyVersions": {
+   "path": "/governance/policy-versions",
+   "verb": "GET",
+   "summary": "Governance policies and their versions",
+   "permission": "AI_USE",
+   "guestCallable": false,
+   "scopeLevel": "tenant"
+  },
+  "listAiIncidents": {
+   "path": "/incidents",
+   "verb": "GET",
+   "summary": "AI incidents",
+   "permission": "AI_USE",
+   "guestCallable": false,
+   "scopeLevel": "tenant"
+  },
+  "listAiInsights": {
+   "path": "/insights",
+   "verb": "GET",
+   "summary": "Insights and anomalies",
+   "permission": "AI_USE",
+   "guestCallable": false,
+   "scopeLevel": "venue"
+  },
   "listAiInteractions": {
    "path": "/interactions",
    "verb": "GET",
    "summary": "Every prompt, response and action",
    "permission": "AI_AUDIT_VIEW",
+   "guestCallable": false,
+   "scopeLevel": "tenant"
+  },
+  "listAiModels": {
+   "path": "/models",
+   "verb": "GET",
+   "summary": "The model catalogue",
+   "permission": "AI_USE",
    "guestCallable": false,
    "scopeLevel": "tenant"
   },
@@ -99,6 +507,78 @@
    "permission": "AI_CONFIGURE",
    "guestCallable": false,
    "scopeLevel": "tenant"
+  },
+  "listAiRiskRegister": {
+   "path": "/risk-register",
+   "verb": "GET",
+   "summary": "The AI risk register",
+   "permission": "AI_USE",
+   "guestCallable": false,
+   "scopeLevel": "tenant"
+  },
+  "listAiTools": {
+   "path": "/tools",
+   "verb": "GET",
+   "summary": "The tool registry",
+   "permission": "AI_USE",
+   "guestCallable": false,
+   "scopeLevel": "tenant"
+  },
+  "listAnomalyDetectors": {
+   "path": "/anomaly-detectors",
+   "verb": "GET",
+   "summary": "Anomaly detectors",
+   "permission": "AI_USE",
+   "guestCallable": false,
+   "scopeLevel": "venue"
+  },
+  "listAssistantProfiles": {
+   "path": "/assistant-profiles",
+   "verb": "GET",
+   "summary": "Assistant profiles",
+   "permission": "AI_USE",
+   "guestCallable": false,
+   "scopeLevel": "tenant"
+  },
+  "listConfigurationSessions": {
+   "path": "/configuration-sessions",
+   "verb": "GET",
+   "summary": "Configuration-assistant sessions",
+   "permission": "AI_USE",
+   "guestCallable": false,
+   "scopeLevel": "venue"
+  },
+  "listConfigurationSources": {
+   "path": "/configuration-sessions/{sessionId}/sources",
+   "verb": "GET",
+   "summary": "Documents attached to a configuration session",
+   "permission": "AI_USE",
+   "guestCallable": false,
+   "scopeLevel": "venue"
+  },
+  "listForecastDefinitions": {
+   "path": "/forecast-definitions",
+   "verb": "GET",
+   "summary": "What is forecast",
+   "permission": "AI_USE",
+   "guestCallable": false,
+   "scopeLevel": "venue"
+  },
+  "listForecastSignals": {
+   "path": "/forecast-signals",
+   "verb": "GET",
+   "summary": "Forecast signals and their freshness",
+   "permission": "AI_USE",
+   "guestCallable": false,
+   "scopeLevel": "tenant"
+  },
+  "listForecastVersions": {
+   "path": "/forecast-versions",
+   "verb": "GET",
+   "summary": "Forecast versions",
+   "permission": "AI_USE",
+   "guestCallable": false,
+   "scopeLevel": "venue"
   },
   "listIndexFailures": {
    "path": "/index-failures",
@@ -132,11 +612,123 @@
    "guestCallable": false,
    "scopeLevel": "tenant"
   },
+  "listKnowledgeGaps": {
+   "path": "/knowledge-gaps",
+   "verb": "GET",
+   "summary": "Questions the assistant could not answer",
+   "permission": "AI_USE",
+   "guestCallable": false,
+   "scopeLevel": "tenant"
+  },
+  "listMarketingRecommendations": {
+   "path": "/marketing-recommendations",
+   "verb": "GET",
+   "summary": "Recommendations on marketing campaigns and journeys",
+   "permission": "AI_USE",
+   "guestCallable": false,
+   "scopeLevel": "venue"
+  },
+  "listOperationalRequirements": {
+   "path": "/operational-requirements",
+   "verb": "GET",
+   "summary": "Requirements derived from the forecast",
+   "permission": "AI_USE",
+   "guestCallable": false,
+   "scopeLevel": "venue"
+  },
+  "listPromptTemplates": {
+   "path": "/prompt-templates",
+   "verb": "GET",
+   "summary": "The prompt registry",
+   "permission": "AI_USE",
+   "guestCallable": false,
+   "scopeLevel": "tenant"
+  },
   "listProposedActions": {
    "path": "/proposed-actions",
    "verb": "GET",
    "summary": "What the assistant has proposed and nobody has decided",
    "permission": "AI_USE",
+   "guestCallable": false,
+   "scopeLevel": "venue"
+  },
+  "listRiskAlerts": {
+   "path": "/risk/alerts",
+   "verb": "GET",
+   "summary": "Risk alerts",
+   "permission": "RISK_REVIEW",
+   "guestCallable": false,
+   "scopeLevel": "venue"
+  },
+  "openAiIncident": {
+   "path": "/incidents",
+   "verb": "POST",
+   "summary": "Open an AI incident",
+   "permission": "AI_CONFIGURE",
+   "guestCallable": false,
+   "scopeLevel": "tenant"
+  },
+  "overrideAiDecision": {
+   "path": "/decision-records/{decisionRecordId}/override",
+   "verb": "POST",
+   "summary": "Override an AI decision",
+   "permission": "AI_APPROVE",
+   "guestCallable": false,
+   "scopeLevel": "venue"
+  },
+  "pauseActionPlan": {
+   "path": "/action-plans/{planId}/pause",
+   "verb": "POST",
+   "summary": "Pause an executing plan",
+   "permission": "AI_APPROVE",
+   "guestCallable": false,
+   "scopeLevel": "venue"
+  },
+  "pauseAiCapability": {
+   "path": "/governance/capabilities/{capabilityKey}/pause",
+   "verb": "POST",
+   "summary": "Stop a capability now",
+   "permission": "AI_CONFIGURE",
+   "guestCallable": false,
+   "scopeLevel": "tenant"
+  },
+  "promoteAiRelease": {
+   "path": "/releases/{releaseId}/promote",
+   "verb": "POST",
+   "summary": "Promote a release to its next stage (a person)",
+   "permission": "AI_APPROVE",
+   "guestCallable": false,
+   "scopeLevel": "tenant"
+  },
+  "proposeLookalikeSegment": {
+   "path": "/ai/segment-suggestions",
+   "verb": "POST",
+   "summary": "Propose a lookalike segment from a seed, for a person to save",
+   "permission": "AI_USE",
+   "guestCallable": false,
+   "scopeLevel": "venue"
+  },
+  "proposeMarketingContent": {
+   "path": "/ai/content-drafts",
+   "verb": "POST",
+   "summary": "Draft marketing content for a person to edit and apply",
+   "permission": "AI_USE",
+   "guestCallable": false,
+   "scopeLevel": "venue"
+  },
+  "proposeRiskAction": {
+   "path": "/risk/cases/{caseId}/actions",
+   "verb": "POST",
+   "summary": "Propose a restrictive action from a case",
+   "permission": "RISK_INVESTIGATE",
+   "guestCallable": false,
+   "scopeLevel": "venue"
+  },
+  "proposeSeatMapChanges": {
+   "path": "/ai/seat-maps/{seatMapId}/proposals",
+   "verb": "POST",
+   "summary": "Propose changes to an existing seat map, as a plan a person approves",
+   "permission": "CAPACITY_CONFIGURE",
    "guestCallable": false,
    "scopeLevel": "venue"
   },
@@ -164,6 +756,46 @@
    "guestCallable": false,
    "scopeLevel": "venue"
   },
+  "publishAiGovernancePolicy": {
+   "path": "/governance/policy-versions/{versionId}/publish",
+   "verb": "POST",
+   "summary": "Publish a simulated policy version",
+   "permission": "AI_APPROVE",
+   "guestCallable": false,
+   "scopeLevel": "tenant"
+  },
+  "publishForecastVersion": {
+   "path": "/forecast-versions/{versionId}/publish",
+   "verb": "POST",
+   "summary": "Publish a forecast version",
+   "permission": "AI_APPROVE",
+   "guestCallable": false,
+   "scopeLevel": "venue"
+  },
+  "publishPromptTemplate": {
+   "path": "/prompt-templates/{templateKey}/versions",
+   "verb": "POST",
+   "summary": "Publish a prompt template version",
+   "permission": "AI_APPROVE",
+   "guestCallable": false,
+   "scopeLevel": "tenant"
+  },
+  "recordAnswerFeedback": {
+   "path": "/messages/{messageId}/feedback",
+   "verb": "POST",
+   "summary": "Say whether an answer helped",
+   "permission": "AI_USE",
+   "guestCallable": true,
+   "scopeLevel": "venue"
+  },
+  "recordRecommendationEvents": {
+   "path": "/recommendations/events",
+   "verb": "POST",
+   "summary": "Report what happened to recommended items",
+   "permission": "AI_USE",
+   "guestCallable": true,
+   "scopeLevel": "venue"
+  },
   "recordSuggestionOutcome": {
    "path": "/ai/suggestions/{suggestionId}/outcome",
    "verb": "POST",
@@ -188,12 +820,92 @@
    "guestCallable": false,
    "scopeLevel": "tenant"
   },
+  "replayAiDecision": {
+   "path": "/decision-records/{decisionRecordId}/replay",
+   "verb": "POST",
+   "summary": "Re-simulate a decision",
+   "permission": "AI_AUDIT_VIEW",
+   "guestCallable": false,
+   "scopeLevel": "venue"
+  },
   "requestSuggestion": {
    "path": "/ai/suggestions",
    "verb": "POST",
    "summary": "Ask for an answer, however it is currently produced",
    "permission": "AI_USE",
    "guestCallable": true,
+   "scopeLevel": "venue"
+  },
+  "resumeActionPlan": {
+   "path": "/action-plans/{planId}/resume",
+   "verb": "POST",
+   "summary": "Resume a paused plan",
+   "permission": "AI_APPROVE",
+   "guestCallable": false,
+   "scopeLevel": "venue"
+  },
+  "resumeAiCapability": {
+   "path": "/governance/capabilities/{capabilityKey}/resume",
+   "verb": "POST",
+   "summary": "Resume a paused capability",
+   "permission": "AI_APPROVE",
+   "guestCallable": false,
+   "scopeLevel": "tenant"
+  },
+  "retryActionStep": {
+   "path": "/action-plans/{planId}/steps/{stepNumber}/retry",
+   "verb": "POST",
+   "summary": "Retry a failed step",
+   "permission": "AI_APPROVE",
+   "guestCallable": false,
+   "scopeLevel": "venue"
+  },
+  "revokeAiPolicyException": {
+   "path": "/governance/policy-exceptions/{exceptionId}/revoke",
+   "verb": "POST",
+   "summary": "End an exception before it expires",
+   "permission": "AI_APPROVE",
+   "guestCallable": false,
+   "scopeLevel": "tenant"
+  },
+  "rollbackActionPlan": {
+   "path": "/action-plans/{planId}/rollback",
+   "verb": "POST",
+   "summary": "Plan a rollback",
+   "permission": "AI_APPROVE",
+   "guestCallable": false,
+   "scopeLevel": "venue"
+  },
+  "rollbackAiRelease": {
+   "path": "/releases/{releaseId}/rollback",
+   "verb": "POST",
+   "summary": "Roll a release back",
+   "permission": "AI_APPROVE",
+   "guestCallable": false,
+   "scopeLevel": "tenant"
+  },
+  "runAiControlTest": {
+   "path": "/controls/{controlKey}/tests",
+   "verb": "POST",
+   "summary": "Test a control now",
+   "permission": "AI_AUDIT_VIEW",
+   "guestCallable": false,
+   "scopeLevel": "tenant"
+  },
+  "runAiEvaluation": {
+   "path": "/evaluations",
+   "verb": "POST",
+   "summary": "Evaluate a candidate",
+   "permission": "AI_CONFIGURE",
+   "guestCallable": false,
+   "scopeLevel": "tenant"
+  },
+  "runForecast": {
+   "path": "/forecast-definitions/{definitionKey}/runs",
+   "verb": "POST",
+   "summary": "Run a forecast now",
+   "permission": "AI_CONFIGURE",
+   "guestCallable": false,
    "scopeLevel": "venue"
   },
   "saveNaturalLanguageQuery": {
@@ -204,6 +916,30 @@
    "guestCallable": false,
    "scopeLevel": "venue",
    "foreignContract": "reporting"
+  },
+  "scoreApprovalRequest": {
+   "path": "/approval-requests/{approvalRequestId}/score",
+   "verb": "POST",
+   "summary": "Score a pending approval request, as context for its reviewer (Approvals)",
+   "permission": null,
+   "guestCallable": false,
+   "scopeLevel": "venue"
+  },
+  "scoreTransactionRisk": {
+   "path": "/risk/transaction-scores",
+   "verb": "POST",
+   "summary": "Score a payment attempt (Orders)",
+   "permission": null,
+   "guestCallable": false,
+   "scopeLevel": "venue"
+  },
+  "searchAiDecisions": {
+   "path": "/decision-records",
+   "verb": "GET",
+   "summary": "Find AI decisions",
+   "permission": "AI_AUDIT_VIEW",
+   "guestCallable": false,
+   "scopeLevel": "venue"
   },
   "semanticSearch": {
    "path": "/search",
@@ -221,6 +957,14 @@
    "guestCallable": true,
    "scopeLevel": "venue"
   },
+  "setAiByokEnablement": {
+   "path": "/tenants/{tenantId}/byok",
+   "verb": "PUT",
+   "summary": "Enable or disable bring-your-own-key for a tenant (platform)",
+   "permission": "PLATFORM_AI_MANAGE",
+   "guestCallable": false,
+   "scopeLevel": "tenant"
+  },
   "setAiCredential": {
    "path": "/ai-providers/{providerId}/credential",
    "verb": "PUT",
@@ -228,6 +972,14 @@
    "permission": "AI_CONFIGURE",
    "guestCallable": false,
    "scopeLevel": "tenant"
+  },
+  "setAiModel": {
+   "path": "/models/{modelId}",
+   "verb": "PUT",
+   "summary": "Add or change a platform model (platform)",
+   "permission": "PLATFORM_AI_MANAGE",
+   "guestCallable": false,
+   "scopeLevel": "platform"
   },
   "setAiPolicy": {
    "path": "/policy",
@@ -245,6 +997,30 @@
    "guestCallable": false,
    "scopeLevel": "tenant"
   },
+  "setAiRiskRegisterEntry": {
+   "path": "/risk-register/{entryId}",
+   "verb": "PUT",
+   "summary": "Record or update a risk register entry",
+   "permission": "AI_CONFIGURE",
+   "guestCallable": false,
+   "scopeLevel": "tenant"
+  },
+  "setAiTool": {
+   "path": "/tools/{toolKey}",
+   "verb": "PUT",
+   "summary": "Register or change a tool (platform)",
+   "permission": "PLATFORM_AI_MANAGE",
+   "guestCallable": false,
+   "scopeLevel": "platform"
+  },
+  "setForecastDefinition": {
+   "path": "/forecast-definitions/{definitionKey}",
+   "verb": "PUT",
+   "summary": "Define a forecast",
+   "permission": "AI_CONFIGURE",
+   "guestCallable": false,
+   "scopeLevel": "venue"
+  },
   "setIndexSource": {
    "path": "/index-sources",
    "verb": "PUT",
@@ -261,6 +1037,46 @@
    "guestCallable": false,
    "scopeLevel": "tenant"
   },
+  "simulateActionPlan": {
+   "path": "/action-plans/{planId}/simulate",
+   "verb": "POST",
+   "summary": "Validate and simulate a plan without changing anything",
+   "permission": "AI_USE",
+   "guestCallable": false,
+   "scopeLevel": "venue"
+  },
+  "simulateAiGovernancePolicy": {
+   "path": "/governance/policy-versions/{versionId}/simulate",
+   "verb": "POST",
+   "summary": "Test a draft policy before it is published",
+   "permission": "AI_CONFIGURE",
+   "guestCallable": false,
+   "scopeLevel": "tenant"
+  },
+  "simulateRecommendationDecision": {
+   "path": "/recommendations/simulate",
+   "verb": "POST",
+   "summary": "Run the engine in simulation (Promotions)",
+   "permission": null,
+   "guestCallable": false,
+   "scopeLevel": "venue"
+  },
+  "startConfigurationSession": {
+   "path": "/configuration-sessions",
+   "verb": "POST",
+   "summary": "Start the configuration assistant",
+   "permission": "AI_USE",
+   "guestCallable": false,
+   "scopeLevel": "venue"
+  },
+  "suggestGuidedChoice": {
+   "path": "/venues/{venueId}/guided-choice-suggestions",
+   "verb": "POST",
+   "summary": "Suggest a Help me choose set-up from the venue's catalogue",
+   "permission": "AI_USE",
+   "guestCallable": false,
+   "scopeLevel": "venue"
+  },
   "testAiProvider": {
    "path": "/ai-providers/{providerId}/test",
    "verb": "POST",
@@ -271,15 +1087,97 @@
   }
  },
  "schemas": [
+  "AiActionPlan",
+  "AiActionPlanDetail",
+  "AiActionStep",
+  "AiAnomalyDetector",
+  "AiAnswerFeedback",
+  "AiApprovalRequestScore",
+  "AiAssistantProfile",
+  "AiAutonomyLevel",
+  "AiBlueprintDecision",
+  "AiBlueprintIssue",
+  "AiBlueprintIssueList",
+  "AiBlueprintView",
+  "AiByokEnablement",
   "AiCapability",
+  "AiCapabilityFamily",
+  "AiCapabilityRegistration",
+  "AiConfigurationBlueprint",
+  "AiConfigurationQuestion",
+  "AiConfigurationSession",
+  "AiConfigurationSource",
+  "AiConfigurationTurn",
+  "AiContentDraftSet",
+  "AiControl",
+  "AiControlTest",
   "AiConversation",
+  "AiCustomerRecommendationProfile",
+  "AiDecisionRecord",
+  "AiDecisionTrace",
+  "AiEffectivePolicy",
+  "AiEntityRisk",
+  "AiEvaluationRun",
+  "AiEvidenceItem",
+  "AiEvidenceItemList",
+  "AiEvidencePackage",
+  "AiForecastAccuracy",
+  "AiForecastDefinition",
+  "AiForecastExport",
+  "AiForecastPoint",
+  "AiForecastScenario",
+  "AiForecastVersion",
+  "AiGovernanceAlert",
+  "AiGovernanceDecision",
+  "AiGovernanceOutcome",
+  "AiGovernancePolicyVersion",
+  "AiGovernanceRule",
+  "AiGovernanceRuleList",
+  "AiGuidedChoiceSuggestion",
+  "AiIncident",
+  "AiInsight",
   "AiInteraction",
+  "AiIntervention",
+  "AiKnowledgeGap",
+  "AiLookalikeSegmentProposal",
+  "AiMarketingRecommendation",
   "AiMessage",
+  "AiMetricChangeExplanation",
+  "AiModel",
+  "AiOperationalRequirement",
   "AiPolicy",
+  "AiPolicyException",
+  "AiPolicySimulation",
+  "AiPromptTemplate",
+  "AiProvenance",
   "AiProvider",
   "AiProviderKind",
+  "AiRecommendationDecision",
+  "AiRecommendationDecline",
+  "AiRecommendationExplanation",
+  "AiRecommendationItem",
+  "AiRecommendationItemList",
+  "AiRecommendationResult",
+  "AiRelease",
+  "AiReplayResult",
+  "AiRiskAlert",
+  "AiRiskBacktest",
+  "AiRiskCase",
+  "AiRiskCaseAction",
+  "AiRiskCaseDetail",
+  "AiRiskCaseEvidence",
+  "AiRiskClass",
+  "AiRiskEdge",
+  "AiRiskNetwork",
+  "AiRiskRegisterEntry",
+  "AiRiskStrategy",
+  "AiScenarioComparison",
+  "AiSeatMapProposal",
+  "AiSignalSource",
   "AiSource",
   "AiSourceList",
+  "AiTool",
+  "AiTransactionRiskScore",
   "AiUsageReport",
   "GeneratedConfiguration",
   "IndexFailure",
@@ -307,28 +1205,170 @@
   "WalkwayProposal"
  ],
  "enums": [
+  "AiActionPlan.status",
+  "AiActionStep.status",
+  "AiBlueprintDecision.status",
   "AiCapability",
+  "AiCapabilityFamily",
+  "AiCapabilityRegistration.status",
+  "AiConfigurationSession.status",
+  "AiConfigurationSource.status",
+  "AiEvaluationRun.status",
+  "AiEvidencePackage.status",
+  "AiForecastExport.status",
+  "AiForecastScenario.status",
+  "AiForecastVersion.status",
+  "AiGovernanceAlert.status",
+  "AiGovernanceOutcome",
+  "AiGovernancePolicyVersion.status",
+  "AiGuidedChoiceSuggestion.status",
+  "AiIncident.status",
+  "AiInsight.status",
+  "AiKnowledgeGap.status",
+  "AiMarketingRecommendation.status",
+  "AiOperationalRequirement.status",
+  "AiPolicyException.status",
+  "AiPromptTemplate.status",
+  "AiProvenance",
   "AiProviderKind",
+  "AiRiskAlert.status",
+  "AiRiskCase.status",
+  "AiRiskCaseAction.status",
+  "AiRiskClass",
+  "AiRiskRegisterEntry.status",
+  "AiRiskStrategy.status",
+  "AiTool.status",
   "ApprovalStatus",
+  "CartStatus",
   "CaseStatus",
+  "Chargeback.status",
   "ContentStatus",
   "ConversationState",
+  "CountStatus",
+  "EntitlementStatus",
   "IndexJob.status",
   "KnowledgeDocument.status",
   "LayoutDraft.status",
   "MediaStatus",
+  "OrderStatus",
+  "Payment.status",
+  "Performance.status",
+  "PeriodStatus",
   "ProductLifecycleState",
+  "PromotionStatus",
   "ProposedAction.status",
+  "Refund.status",
+  "RegisteredDevice.status",
+  "ResaleListing.status",
   "ScheduleState",
+  "SeatStatus",
+  "ShiftStatus",
   "SuggestionBasis",
-  "SuggestionKind"
+  "SuggestionKind",
+  "TenantStatus",
+  "TicketTransfer.status"
  ],
  "states": [
+  {
+   "file": "ai-action-plan.yaml",
+   "entity": "AI action plan",
+   "contract": "ai",
+   "enum": "AiActionPlan.status",
+   "foreignContract": false,
+   "emits": [
+    "ai.planExecuted",
+    "ai.planFailed"
+   ]
+  },
+  {
+   "file": "ai-capability.yaml",
+   "entity": "AI capability",
+   "contract": "ai",
+   "enum": "AiCapabilityRegistration.status",
+   "foreignContract": false,
+   "emits": [
+    "ai.capabilityPaused"
+   ]
+  },
+  {
+   "file": "ai-evaluation-run.yaml",
+   "entity": "AI evaluation run",
+   "contract": "ai",
+   "enum": "AiEvaluationRun.status",
+   "foreignContract": false,
+   "emits": []
+  },
+  {
+   "file": "ai-evidence-package.yaml",
+   "entity": "AI evidence package",
+   "contract": "ai",
+   "enum": "AiEvidencePackage.status",
+   "foreignContract": false,
+   "emits": []
+  },
+  {
+   "file": "ai-forecast-scenario.yaml",
+   "entity": "AI forecast scenario",
+   "contract": "ai",
+   "enum": "AiForecastScenario.status",
+   "foreignContract": false,
+   "emits": []
+  },
+  {
+   "file": "ai-forecast-version.yaml",
+   "entity": "AI forecast version",
+   "contract": "ai",
+   "enum": "AiForecastVersion.status",
+   "foreignContract": false,
+   "emits": [
+    "ai.forecastPublished"
+   ]
+  },
+  {
+   "file": "ai-governance-alert.yaml",
+   "entity": "AI governance alert",
+   "contract": "ai",
+   "enum": "AiGovernanceAlert.status",
+   "foreignContract": false,
+   "emits": []
+  },
+  {
+   "file": "ai-governance-policy-version.yaml",
+   "entity": "AI governance policy version",
+   "contract": "ai",
+   "enum": "AiGovernancePolicyVersion.status",
+   "foreignContract": false,
+   "emits": []
+  },
+  {
+   "file": "ai-guided-choice-suggestion.yaml",
+   "entity": "AI guided choice suggestion",
+   "contract": "ai",
+   "enum": "AiGuidedChoiceSuggestion.status",
+   "foreignContract": false,
+   "emits": []
+  },
+  {
+   "file": "ai-incident.yaml",
+   "entity": "AI incident",
+   "contract": "ai",
+   "enum": "AiIncident.status",
+   "foreignContract": false,
+   "emits": []
+  },
   {
    "file": "ai-index-job.yaml",
    "entity": "AI index job",
    "contract": "ai",
    "enum": "IndexJob.status",
+   "foreignContract": false,
+   "emits": []
+  },
+  {
+   "file": "ai-insight.yaml",
+   "entity": "AI insight",
+   "contract": "ai",
+   "enum": "AiInsight.status",
    "foreignContract": false,
    "emits": []
   },
@@ -349,10 +1389,46 @@
    "emits": []
   },
   {
+   "file": "ai-operational-requirement.yaml",
+   "entity": "AI operational requirement",
+   "contract": "ai",
+   "enum": "AiOperationalRequirement.status",
+   "foreignContract": false,
+   "emits": [
+    "ai.operationalRequirementIssued"
+   ]
+  },
+  {
+   "file": "ai-policy-exception.yaml",
+   "entity": "AI policy exception",
+   "contract": "ai",
+   "enum": "AiPolicyException.status",
+   "foreignContract": false,
+   "emits": []
+  },
+  {
    "file": "ai-proposed-action.yaml",
    "entity": "AI proposed action",
    "contract": "ai",
    "enum": "ProposedAction.status",
+   "foreignContract": false,
+   "emits": []
+  },
+  {
+   "file": "ai-risk-case.yaml",
+   "entity": "AI risk case",
+   "contract": "ai",
+   "enum": "AiRiskCase.status",
+   "foreignContract": false,
+   "emits": [
+    "ai.riskCaseClosed"
+   ]
+  },
+  {
+   "file": "ai-tool.yaml",
+   "entity": "AI tool",
+   "contract": "ai",
+   "enum": "AiTool.status",
    "foreignContract": false,
    "emits": []
   },
@@ -363,11 +1439,30 @@
    "enum": "ApprovalStatus",
    "foreignContract": true,
    "reachedVia": [
-    "approval.granted"
-   ],
-   "emits": [
+    "approval.expired",
     "approval.granted",
     "approval.rejected"
+   ],
+   "emits": [
+    "approval.escalated",
+    "approval.expired",
+    "approval.granted",
+    "approval.rejected",
+    "approval.requested",
+    "approval.stepCompleted"
+   ]
+  },
+  {
+   "file": "cart.yaml",
+   "entity": "Cart",
+   "contract": "orders",
+   "enum": "CartStatus",
+   "foreignContract": true,
+   "reachedVia": [
+    "cart.abandoned"
+   ],
+   "emits": [
+    "cart.abandoned"
    ]
   },
   {
@@ -381,6 +1476,19 @@
    ],
    "emits": [
     "marketing.caseClosed"
+   ]
+  },
+  {
+   "file": "chargeback.yaml",
+   "entity": "Chargeback",
+   "contract": "orders",
+   "enum": "Chargeback.status",
+   "foreignContract": true,
+   "reachedVia": [
+    "order.chargebackRecorded"
+   ],
+   "emits": [
+    "order.chargebackRecorded"
    ]
   },
   {
@@ -410,6 +1518,19 @@
    ]
   },
   {
+   "file": "entitlement-status.yaml",
+   "entity": "Entitlement",
+   "contract": "orders",
+   "enum": "EntitlementStatus",
+   "foreignContract": true,
+   "reachedVia": [
+    "access.validated"
+   ],
+   "emits": [
+    "access.validated"
+   ]
+  },
+  {
    "file": "media.yaml",
    "entity": "Media asset",
    "contract": "assets",
@@ -420,6 +1541,64 @@
    ],
    "emits": [
     "assets.documentIndexed"
+   ]
+  },
+  {
+   "file": "order.yaml",
+   "entity": "Order",
+   "contract": "orders",
+   "enum": "OrderStatus",
+   "foreignContract": true,
+   "reachedVia": [
+    "order.cancelled",
+    "order.completed",
+    "order.paid",
+    "order.refunded"
+   ],
+   "emits": [
+    "order.cancelled",
+    "order.completed",
+    "order.paid",
+    "order.refunded"
+   ]
+  },
+  {
+   "file": "payment.yaml",
+   "entity": "Payment",
+   "contract": "orders",
+   "enum": "Payment.status",
+   "foreignContract": true,
+   "reachedVia": [
+    "order.paid"
+   ],
+   "emits": [
+    "order.paid"
+   ]
+  },
+  {
+   "file": "performance.yaml",
+   "entity": "Performance",
+   "contract": "catalogue",
+   "enum": "Performance.status",
+   "foreignContract": true,
+   "reachedVia": [
+    "performance.cancelled"
+   ],
+   "emits": [
+    "performance.cancelled"
+   ]
+  },
+  {
+   "file": "period.yaml",
+   "entity": "Fiscal period",
+   "contract": "finance",
+   "enum": "PeriodStatus",
+   "foreignContract": true,
+   "reachedVia": [
+    "ledger.periodClosed"
+   ],
+   "emits": [
+    "ledger.periodClosed"
    ]
   },
   {
@@ -436,6 +1615,58 @@
    ]
   },
   {
+   "file": "promotion.yaml",
+   "entity": "Promotion",
+   "contract": "promotions",
+   "enum": "PromotionStatus",
+   "foreignContract": true,
+   "reachedVia": [
+    "promotions.recommendationStrategyPublished"
+   ],
+   "emits": [
+    "promotions.recommendationStrategyPublished"
+   ]
+  },
+  {
+   "file": "refund.yaml",
+   "entity": "Refund",
+   "contract": "orders",
+   "enum": "Refund.status",
+   "foreignContract": true,
+   "reachedVia": [
+    "order.refunded"
+   ],
+   "emits": [
+    "order.refunded"
+   ]
+  },
+  {
+   "file": "registered-device.yaml",
+   "entity": "Registered device",
+   "contract": "tenancy",
+   "enum": "RegisteredDevice.status",
+   "foreignContract": true,
+   "reachedVia": [
+    "device.statusChanged"
+   ],
+   "emits": [
+    "device.statusChanged"
+   ]
+  },
+  {
+   "file": "resale-listing.yaml",
+   "entity": "Resale listing",
+   "contract": "orders",
+   "enum": "ResaleListing.status",
+   "foreignContract": true,
+   "reachedVia": [
+    "entitlement.transferred"
+   ],
+   "emits": [
+    "entitlement.transferred"
+   ]
+  },
+  {
    "file": "schedule.yaml",
    "entity": "Content schedule",
    "contract": "white-label",
@@ -447,14 +1678,154 @@
    "emits": [
     "whitelabel.contentPublished"
    ]
+  },
+  {
+   "file": "seat.yaml",
+   "entity": "Seat",
+   "contract": "seating",
+   "enum": "SeatStatus",
+   "foreignContract": true,
+   "reachedVia": [
+    "seat.sold"
+   ],
+   "emits": [
+    "seat.blocked",
+    "seat.held",
+    "seat.released",
+    "seat.sold"
+   ]
+  },
+  {
+   "file": "shift.yaml",
+   "entity": "Shift",
+   "contract": "shift",
+   "enum": "ShiftStatus",
+   "foreignContract": true,
+   "reachedVia": [
+    "shift.closed"
+   ],
+   "emits": [
+    "shift.closed"
+   ]
+  },
+  {
+   "file": "stock-count.yaml",
+   "entity": "Stock count",
+   "contract": "inventory",
+   "enum": "CountStatus",
+   "foreignContract": true,
+   "reachedVia": [
+    "stock.depleted"
+   ],
+   "emits": [
+    "stock.depleted"
+   ]
+  },
+  {
+   "file": "tenant.yaml",
+   "entity": "Tenant",
+   "contract": "subscription",
+   "enum": "TenantStatus",
+   "foreignContract": true,
+   "reachedVia": [
+    "tenant.suspended"
+   ],
+   "emits": [
+    "tenant.suspended"
+   ]
+  },
+  {
+   "file": "ticket-transfer.yaml",
+   "entity": "Ticket transfer",
+   "contract": "orders",
+   "enum": "TicketTransfer.status",
+   "foreignContract": true,
+   "reachedVia": [
+    "entitlement.transferred"
+   ],
+   "emits": [
+    "entitlement.transferred"
+   ]
   }
  ],
  "events": [
+  {
+   "name": "access.rejected",
+   "publisher": "access",
+   "role": "consumes",
+   "critical": false
+  },
+  {
+   "name": "access.validated",
+   "publisher": "access",
+   "role": "consumes",
+   "critical": true
+  },
+  {
+   "name": "ai.capabilityPaused",
+   "publisher": "ai",
+   "role": "publishes",
+   "critical": true
+  },
   {
    "name": "ai.ceilingApproaching",
    "publisher": "ai",
    "role": "publishes",
    "critical": true
+  },
+  {
+   "name": "ai.forecastPublished",
+   "publisher": "ai",
+   "role": "publishes",
+   "critical": false
+  },
+  {
+   "name": "ai.incidentOpened",
+   "publisher": "ai",
+   "role": "publishes",
+   "critical": true
+  },
+  {
+   "name": "ai.insightRaised",
+   "publisher": "ai",
+   "role": "publishes",
+   "critical": false
+  },
+  {
+   "name": "ai.operationalRequirementIssued",
+   "publisher": "ai",
+   "role": "publishes",
+   "critical": true
+  },
+  {
+   "name": "ai.planExecuted",
+   "publisher": "ai",
+   "role": "publishes",
+   "critical": true
+  },
+  {
+   "name": "ai.planFailed",
+   "publisher": "ai",
+   "role": "publishes",
+   "critical": true
+  },
+  {
+   "name": "ai.riskAlertRaised",
+   "publisher": "ai",
+   "role": "publishes",
+   "critical": true
+  },
+  {
+   "name": "ai.riskCaseClosed",
+   "publisher": "ai",
+   "role": "publishes",
+   "critical": true
+  },
+  {
+   "name": "approval.expired",
+   "publisher": "approvals",
+   "role": "consumes",
+   "critical": false
   },
   {
    "name": "approval.granted",
@@ -463,8 +1834,20 @@
    "critical": true
   },
   {
+   "name": "approval.rejected",
+   "publisher": "approvals",
+   "role": "consumes",
+   "critical": true
+  },
+  {
    "name": "assets.documentIndexed",
    "publisher": "assets",
+   "role": "consumes",
+   "critical": true
+  },
+  {
+   "name": "cart.abandoned",
+   "publisher": "orders",
    "role": "consumes",
    "critical": true
   },
@@ -481,8 +1864,50 @@
    "critical": true
   },
   {
+   "name": "device.statusChanged",
+   "publisher": "tenancy",
+   "role": "consumes",
+   "critical": false
+  },
+  {
+   "name": "entitlement.expiringSoon",
+   "publisher": "access",
+   "role": "consumes",
+   "critical": false
+  },
+  {
+   "name": "entitlement.issued",
+   "publisher": "catalogue",
+   "role": "consumes",
+   "critical": true
+  },
+  {
+   "name": "entitlement.transferred",
+   "publisher": "catalogue",
+   "role": "consumes",
+   "critical": false
+  },
+  {
    "name": "fnb.menuPublished",
    "publisher": "fnb",
+   "role": "consumes",
+   "critical": true
+  },
+  {
+   "name": "identity.credentialResetRequested",
+   "publisher": "identity",
+   "role": "consumes",
+   "critical": false
+  },
+  {
+   "name": "identity.loginRecorded",
+   "publisher": "identity",
+   "role": "consumes",
+   "critical": false
+  },
+  {
+   "name": "ledger.periodClosed",
+   "publisher": "ledger",
    "role": "consumes",
    "critical": true
   },
@@ -499,6 +1924,60 @@
    "critical": true
   },
   {
+   "name": "order.cancelled",
+   "publisher": "orders",
+   "role": "consumes",
+   "critical": false
+  },
+  {
+   "name": "order.chargebackRecorded",
+   "publisher": "orders",
+   "role": "consumes",
+   "critical": false
+  },
+  {
+   "name": "order.completed",
+   "publisher": "orders",
+   "role": "consumes",
+   "critical": false
+  },
+  {
+   "name": "order.exchanged",
+   "publisher": "orders",
+   "role": "consumes",
+   "critical": false
+  },
+  {
+   "name": "order.paid",
+   "publisher": "orders",
+   "role": "consumes",
+   "critical": true
+  },
+  {
+   "name": "order.refunded",
+   "publisher": "orders",
+   "role": "consumes",
+   "critical": true
+  },
+  {
+   "name": "payment.attemptFailed",
+   "publisher": "payments",
+   "role": "consumes",
+   "critical": false
+  },
+  {
+   "name": "performance.cancelled",
+   "publisher": "catalogue",
+   "role": "consumes",
+   "critical": true
+  },
+  {
+   "name": "promotions.recommendationStrategyPublished",
+   "publisher": "promotions",
+   "role": "consumes",
+   "critical": false
+  },
+  {
    "name": "reporting.definitionPublished",
    "publisher": "reporting",
    "role": "consumes",
@@ -511,6 +1990,36 @@
    "critical": true
   },
   {
+   "name": "seat.sold",
+   "publisher": "seating",
+   "role": "consumes",
+   "critical": true
+  },
+  {
+   "name": "shift.closed",
+   "publisher": "shift",
+   "role": "consumes",
+   "critical": true
+  },
+  {
+   "name": "stock.depleted",
+   "publisher": "inventory",
+   "role": "consumes",
+   "critical": true
+  },
+  {
+   "name": "storefront.sessionEvent",
+   "publisher": "whitelabel",
+   "role": "consumes",
+   "critical": false
+  },
+  {
+   "name": "tenant.suspended",
+   "publisher": "subscription",
+   "role": "consumes",
+   "critical": true
+  },
+  {
    "name": "whitelabel.contentPublished",
    "publisher": "whitelabel",
    "role": "consumes",
@@ -519,26 +2028,85 @@
  ],
  "tables": {
   "reads": [
+   "ai.action_plan",
+   "ai.action_step",
    "ai.activity",
+   "ai.anomaly_detector",
+   "ai.answer_feedback",
+   "ai.approval_request_score",
+   "ai.assistant_profile",
+   "ai.blueprint",
+   "ai.blueprint_decision",
+   "ai.byok_enablement",
+   "ai.capability",
+   "ai.case_action",
+   "ai.case_evidence",
+   "ai.chunk_embedding",
    "ai.chunk_ref",
+   "ai.config_session",
+   "ai.config_source",
+   "ai.control",
+   "ai.control_test",
    "ai.conversation",
+   "ai.decision_record",
+   "ai.entity_risk",
+   "ai.eval_run",
+   "ai.eval_suite",
+   "ai.evidence_package",
+   "ai.forecast_accuracy",
+   "ai.forecast_definition",
+   "ai.forecast_export",
+   "ai.forecast_point",
+   "ai.forecast_scenario",
+   "ai.forecast_version",
+   "ai.governance_alert",
+   "ai.governance_policy",
+   "ai.governance_policy_version",
+   "ai.guided_choice_suggestion",
+   "ai.incident",
    "ai.index_entry",
    "ai.index_failure",
    "ai.index_job",
    "ai.index_source",
+   "ai.insight",
+   "ai.intervention",
    "ai.knowledge_collection",
    "ai.knowledge_document",
+   "ai.knowledge_gap",
    "ai.layout_draft",
    "ai.message",
+   "ai.model",
+   "ai.operational_requirement",
    "ai.policy",
+   "ai.policy_exception",
+   "ai.prompt_template",
    "ai.proposed_action",
    "ai.provider",
+   "ai.rec_decision",
+   "ai.rec_decline",
+   "ai.rec_event",
+   "ai.release",
+   "ai.risk_alert",
+   "ai.risk_assessment",
+   "ai.risk_case",
+   "ai.risk_edge",
+   "ai.risk_register",
+   "ai.risk_strategy",
+   "ai.signal_observation",
+   "ai.signal_source",
    "ai.suggestion",
    "ai.suggestion_outcome",
+   "ai.tool",
+   "approvals.request",
+   "approvals.sla_policy",
    "assets.media_asset",
    "cache:answer",
    "cache:embedding",
+   "cache:governance-policy",
    "cache:idempotency",
+   "cache:rec-candidates",
+   "cache:rec-features",
+   "cache:risk-features",
    "catalogue.channel_capacity",
    "catalogue.entitlement_template",
    "catalogue.event",
@@ -549,68 +2117,188 @@
    "catalogue.variant_dimension",
    "control.content_block",
    "fnb.menu_item",
+   "fnb.production_plan",
+   "inventory.movement",
+   "inventory.stock_batch",
    "maintenance.inspection_template",
+   "marketing.attribution_touch",
+   "marketing.audience_list",
+   "marketing.campaign",
    "marketing.case",
+   "marketing.consent_record",
+   "marketing.guest_profile",
+   "marketing.loyalty_position",
    "marketing.loyalty_programme",
+   "marketing.message_template",
+   "marketing.message_template_version",
+   "marketing.segment",
+   "marketing.segment_criterion",
+   "orders.order_line",
    "platform.region_settings",
    "platform.scope",
    "promotions.promotion",
    "qdrant:knowledge",
+   "queue.queue",
+   "queue.reading",
    "reporting.report_definition",
    "retail.merchandise",
+   "seating.accessible",
    "seating.seat",
    "seating.seat_category",
    "seating.seat_map",
    "seating.seating_rules",
    "seating.section",
+   "seating.zone",
    "venuemap.import_job",
    "venuemap.map",
    "venuemap.point",
+   "whitelabel.banner",
    "whitelabel.content_page",
    "whitelabel.faq_entry",
-   "whitelabel.policy"
+   "whitelabel.homepage_section",
+   "whitelabel.policy",
+   "whitelabel.promo_block"
   ],
   "writes": [
+   "ai.action_plan",
+   "ai.action_step",
    "ai.activity",
+   "ai.anomaly_detector",
+   "ai.answer_feedback",
+   "ai.approval_request_score",
+   "ai.assistant_profile",
+   "ai.blueprint",
+   "ai.blueprint_decision",
+   "ai.byok_enablement",
+   "ai.capability",
+   "ai.case_action",
+   "ai.case_evidence",
+   "ai.chunk_embedding",
+   "ai.config_session",
+   "ai.config_source",
+   "ai.control",
+   "ai.control_test",
    "ai.conversation",
+   "ai.decision_record",
+   "ai.entity_risk",
+   "ai.eval_run",
+   "ai.evidence_package",
+   "ai.forecast_accuracy",
+   "ai.forecast_definition",
+   "ai.forecast_export",
+   "ai.forecast_point",
+   "ai.forecast_scenario",
+   "ai.forecast_version",
+   "ai.governance_alert",
+   "ai.governance_policy",
+   "ai.governance_policy_version",
+   "ai.guided_choice_suggestion",
+   "ai.incident",
    "ai.index_entry",
    "ai.index_job",
    "ai.index_source",
+   "ai.insight",
+   "ai.intervention",
    "ai.knowledge_collection",
    "ai.knowledge_document",
+   "ai.knowledge_gap",
    "ai.layout_draft",
    "ai.message",
+   "ai.model",
+   "ai.operational_requirement",
    "ai.policy",
+   "ai.policy_exception",
+   "ai.prompt_template",
    "ai.proposed_action",
    "ai.provider",
+   "ai.rec_decision",
+   "ai.rec_decline",
+   "ai.rec_event",
+   "ai.release",
+   "ai.risk_alert",
+   "ai.risk_assessment",
+   "ai.risk_case",
+   "ai.risk_register",
+   "ai.risk_strategy",
+   "ai.signal_source",
    "ai.suggestion",
    "ai.suggestion_outcome",
+   "ai.tool",
    "cache:answer",
    "cache:embedding",
+   "cache:governance-policy",
    "cache:idempotency",
    "cache:resolution",
    "qdrant:knowledge"
   ],
   "byStore": {
-   "postgres-analytical": [
-    "ai.activity",
-    "ai.conversation",
-    "ai.message",
-    "ai.suggestion",
-    "ai.suggestion_outcome"
-   ],
    "postgres": [
+    "ai.action_plan",
+    "ai.action_step",
+    "ai.anomaly_detector",
+    "ai.answer_feedback",
+    "ai.approval_request_score",
+    "ai.assistant_profile",
+    "ai.blueprint",
+    "ai.blueprint_decision",
+    "ai.byok_enablement",
+    "ai.capability",
+    "ai.case_action",
+    "ai.case_evidence",
+    "ai.chunk_embedding",
     "ai.chunk_ref",
+    "ai.config_session",
+    "ai.config_source",
+    "ai.control",
+    "ai.control_test",
+    "ai.decision_record",
+    "ai.entity_risk",
+    "ai.eval_run",
+    "ai.eval_suite",
+    "ai.evidence_package",
+    "ai.forecast_accuracy",
+    "ai.forecast_definition",
+    "ai.forecast_export",
+    "ai.forecast_point",
+    "ai.forecast_scenario",
+    "ai.forecast_version",
+    "ai.governance_alert",
+    "ai.governance_policy",
+    "ai.governance_policy_version",
+    "ai.guided_choice_suggestion",
+    "ai.incident",
     "ai.index_entry",
     "ai.index_failure",
     "ai.index_job",
     "ai.index_source",
+    "ai.insight",
+    "ai.intervention",
     "ai.knowledge_collection",
     "ai.knowledge_document",
+    "ai.knowledge_gap",
     "ai.layout_draft",
+    "ai.model",
+    "ai.operational_requirement",
     "ai.policy",
+    "ai.policy_exception",
+    "ai.prompt_template",
     "ai.proposed_action",
     "ai.provider",
+    "ai.rec_decision",
+    "ai.rec_decline",
+    "ai.rec_event",
+    "ai.release",
+    "ai.risk_alert",
+    "ai.risk_assessment",
+    "ai.risk_case",
+    "ai.risk_edge",
+    "ai.risk_register",
+    "ai.risk_strategy",
+    "ai.signal_observation",
+    "ai.signal_source",
+    "ai.tool",
+    "approvals.request",
+    "approvals.sla_policy",
     "assets.media_asset",
     "catalogue.channel_capacity",
     "catalogue.entitlement_template",
@@ -622,31 +2310,63 @@
     "catalogue.variant_dimension",
     "control.content_block",
     "fnb.menu_item",
+    "fnb.production_plan",
+    "inventory.movement",
+    "inventory.stock_batch",
     "maintenance.inspection_template",
+    "marketing.attribution_touch",
+    "marketing.audience_list",
+    "marketing.campaign",
     "marketing.case",
+    "marketing.consent_record",
+    "marketing.guest_profile",
+    "marketing.loyalty_position",
     "marketing.loyalty_programme",
+    "marketing.message_template",
+    "marketing.message_template_version",
+    "marketing.segment",
+    "marketing.segment_criterion",
+    "orders.order_line",
     "platform.region_settings",
     "platform.scope",
     "promotions.promotion",
+    "queue.queue",
+    "queue.reading",
     "reporting.report_definition",
     "retail.merchandise",
+    "seating.accessible",
     "seating.seat",
     "seating.seat_category",
     "seating.seat_map",
     "seating.seating_rules",
     "seating.section",
+    "seating.zone",
     "venuemap.import_job",
     "venuemap.map",
     "venuemap.point",
+    "whitelabel.banner",
     "whitelabel.content_page",
     "whitelabel.faq_entry",
-    "whitelabel.policy"
+    "whitelabel.homepage_section",
+    "whitelabel.policy",
+    "whitelabel.promo_block"
+   ],
+   "postgres-analytical": [
+    "ai.activity",
+    "ai.conversation",
+    "ai.message",
+    "ai.suggestion",
+    "ai.suggestion_outcome"
    ],
    "redis": [
     "cache:answer",
     "cache:embedding",
+    "cache:governance-policy",
     "cache:idempotency",
-    "cache:resolution"
+    "cache:rec-candidates",
+    "cache:rec-features",
+    "cache:resolution",
+    "cache:risk-features"
    ],
    "qdrant": [
     "qdrant:knowledge"
@@ -656,6 +2376,39 @@
  },
  "screens": [
   {
+   "id": "WEB-001",
+   "name": "Home / Landing",
+   "platform": "P01",
+   "platformName": "Guest Web",
+   "wave": 1,
+   "operations": [
+    "decideRecommendations",
+    "recordRecommendationEvents"
+   ]
+  },
+  {
+   "id": "WEB-008",
+   "name": "Add-ons & Upsell",
+   "platform": "P01",
+   "platformName": "Guest Web",
+   "wave": 2,
+   "operations": [
+    "decideRecommendations",
+    "recordRecommendationEvents"
+   ]
+  },
+  {
+   "id": "WEB-043",
+   "name": "Loyalty & Rewards",
+   "platform": "P01",
+   "platformName": "Guest Web",
+   "wave": 2,
+   "operations": [
+    "decideRecommendations",
+    "recordRecommendationEvents"
+   ]
+  },
+  {
    "id": "WEB-044",
    "name": "AI Concierge \u2013 Home",
    "platform": "P01",
@@ -664,8 +2417,20 @@
    "operations": [
     "createAiConversation",
     "listAiConversations",
+    "recordAnswerFeedback",
     "requestSuggestion",
     "sendAiMessage"
+   ]
+  },
+  {
+   "id": "GST-001",
+   "name": "Home \u2013 Default",
+   "platform": "P02",
+   "platformName": "Guest App",
+   "wave": 1,
+   "operations": [
+    "decideRecommendations",
+    "recordRecommendationEvents"
    ]
   },
   {
@@ -687,6 +2452,7 @@
    "platformName": "Guest App",
    "wave": 2,
    "operations": [
+    "recordAnswerFeedback",
     "sendAiMessage"
    ]
   },
@@ -698,6 +2464,28 @@
    "wave": 2,
    "operations": [
     "sendAiMessage"
+   ]
+  },
+  {
+   "id": "GST-036",
+   "name": "Loyalty & Rewards",
+   "platform": "P02",
+   "platformName": "Guest App",
+   "wave": 2,
+   "operations": [
+    "decideRecommendations",
+    "recordRecommendationEvents"
+   ]
+  },
+  {
+   "id": "GST-048",
+   "name": "Upsell / Cross-Sell",
+   "platform": "P02",
+   "platformName": "Guest App",
+   "wave": 2,
+   "operations": [
+    "decideRecommendations",
+    "recordRecommendationEvents"
    ]
   },
   {
@@ -738,6 +2526,7 @@
    "platformName": "Guest Kiosk",
    "wave": 2,
    "operations": [
+    "recordAnswerFeedback",
     "sendAiMessage"
    ]
   },
@@ -762,7 +2551,18 @@
    "operations": [
     "createAiConversation",
     "listAiConversations",
+    "recordAnswerFeedback",
     "sendAiMessage"
+   ]
+  },
+  {
+   "id": "EMP-031",
+   "name": "Queue monitor",
+   "platform": "P06",
+   "platformName": "Venue Staff App",
+   "wave": 2,
+   "operations": [
+    "requestSuggestion"
    ]
   },
   {
@@ -783,6 +2583,16 @@
    "wave": 3,
    "operations": [
     "semanticSearch"
+   ]
+  },
+  {
+   "id": "BO-005",
+   "name": "Queue Monitor",
+   "platform": "P08",
+   "platformName": "Venue Management",
+   "wave": 1,
+   "operations": [
+    "requestSuggestion"
    ]
   },
   {
@@ -830,6 +2640,16 @@
    ]
   },
   {
+   "id": "BO-084",
+   "name": "Approval Inbox",
+   "platform": "P08",
+   "platformName": "Venue Management",
+   "wave": 1,
+   "operations": [
+    "getApprovalRequestScore"
+   ]
+  },
+  {
    "id": "BO-088",
    "name": "Approval Analytics",
    "platform": "P08",
@@ -846,8 +2666,12 @@
    "platformName": "Venue Management",
    "wave": 1,
    "operations": [
+    "configureAssistantProfile",
     "getAiPolicy",
     "getAiUsage",
+    "getEffectiveAiPolicy",
+    "listAiCapabilities",
+    "listAssistantProfiles",
     "listIndexFailures",
     "setAiPolicy"
    ]
@@ -860,6 +2684,17 @@
    "wave": 2,
    "operations": [
     "proposeVenueLabels"
+   ]
+  },
+  {
+   "id": "BO-102",
+   "name": "Sell",
+   "platform": "P08",
+   "platformName": "Venue Management",
+   "wave": 1,
+   "operations": [
+    "decideRecommendations",
+    "recordRecommendationEvents"
    ]
   },
   {
@@ -884,6 +2719,56 @@
    ]
   },
   {
+   "id": "BO-119",
+   "name": "Cross-Sell, Upsell & Recommendation Rules",
+   "platform": "P08",
+   "platformName": "Venue Management",
+   "wave": 2,
+   "operations": [
+    "decideRecommendations"
+   ]
+  },
+  {
+   "id": "BO-138",
+   "name": "Production Execution & Batch Management",
+   "platform": "P08",
+   "platformName": "Venue Management",
+   "wave": 2,
+   "operations": [
+    "requestSuggestion"
+   ]
+  },
+  {
+   "id": "BO-139",
+   "name": "Wastage, Spoilage, Returns & Write-Off",
+   "platform": "P08",
+   "platformName": "Venue Management",
+   "wave": 2,
+   "operations": [
+    "requestSuggestion"
+   ]
+  },
+  {
+   "id": "BO-367",
+   "name": "Approval Request Detail",
+   "platform": "P08",
+   "platformName": "Venue Management",
+   "wave": 3,
+   "operations": [
+    "getApprovalRequestScore"
+   ]
+  },
+  {
+   "id": "BO-369",
+   "name": "High Priority & Risk Queue",
+   "platform": "P08",
+   "platformName": "Venue Management",
+   "wave": 3,
+   "operations": [
+    "getApprovalRequestScore"
+   ]
+  },
+  {
    "id": "BO-593",
    "name": "AI Rental Management Copilot & Action Center",
    "platform": "P08",
@@ -900,7 +2785,8 @@
    "platformName": "Venue Management",
    "wave": 3,
    "operations": [
-    "generateConfiguration"
+    "generateConfiguration",
+    "getActionPlan"
    ]
   },
   {
@@ -910,7 +2796,299 @@
    "platformName": "Venue Management",
    "wave": 3,
    "operations": [
-    "generateConfiguration"
+    "generateConfiguration",
+    "getActionPlan"
+   ]
+  },
+  {
+   "id": "BO-761",
+   "name": "AI Audience Discovery",
+   "platform": "P08",
+   "platformName": "Venue Management",
+   "wave": 3,
+   "operations": [
+    "proposeLookalikeSegment"
+   ]
+  },
+  {
+   "id": "BO-762",
+   "name": "Predictive Audiences",
+   "platform": "P08",
+   "platformName": "Venue Management",
+   "wave": 3,
+   "operations": [
+    "decideProposedAction",
+    "proposeLookalikeSegment"
+   ]
+  },
+  {
+   "id": "BO-764",
+   "name": "Campaign Command Center",
+   "platform": "P08",
+   "platformName": "Venue Management",
+   "wave": 3,
+   "operations": [
+    "listMarketingRecommendations"
+   ]
+  },
+  {
+   "id": "BO-766",
+   "name": "Campaign Builder",
+   "platform": "P08",
+   "platformName": "Venue Management",
+   "wave": 3,
+   "operations": [
+    "proposeMarketingContent"
+   ]
+  },
+  {
+   "id": "BO-772",
+   "name": "A/B & AI Optimization",
+   "platform": "P08",
+   "platformName": "Venue Management",
+   "wave": 3,
+   "operations": [
+    "decideAiInsight",
+    "listMarketingRecommendations",
+    "proposeMarketingContent",
+    "requestSuggestion"
+   ]
+  },
+  {
+   "id": "BO-782",
+   "name": "AI Journey Optimization",
+   "platform": "P08",
+   "platformName": "Venue Management",
+   "wave": 3,
+   "operations": [
+    "decideAiInsight",
+    "listMarketingRecommendations",
+    "requestSuggestion"
+   ]
+  },
+  {
+   "id": "BO-785",
+   "name": "Template Library",
+   "platform": "P08",
+   "platformName": "Venue Management",
+   "wave": 3,
+   "operations": [
+    "proposeMarketingContent",
+    "proposeTranslations"
+   ]
+  },
+  {
+   "id": "BO-786",
+   "name": "Newsletter Builder",
+   "platform": "P08",
+   "platformName": "Venue Management",
+   "wave": 3,
+   "operations": [
+    "proposeMarketingContent"
+   ]
+  },
+  {
+   "id": "BO-787",
+   "name": "Content Blocks & Product Feed",
+   "platform": "P08",
+   "platformName": "Venue Management",
+   "wave": 3,
+   "operations": [
+    "proposeMarketingContent"
+   ]
+  },
+  {
+   "id": "BO-789",
+   "name": "Transactional Notification Rules",
+   "platform": "P08",
+   "platformName": "Venue Management",
+   "wave": 3,
+   "operations": [
+    "proposeMarketingContent"
+   ]
+  },
+  {
+   "id": "BO-793",
+   "name": "AI Content, Translation & Audit",
+   "platform": "P08",
+   "platformName": "Venue Management",
+   "wave": 3,
+   "operations": [
+    "decideProposedAction",
+    "proposeMarketingContent",
+    "proposeTranslations"
+   ]
+  },
+  {
+   "id": "BO-798",
+   "name": "Intent & Knowledge Management",
+   "platform": "P08",
+   "platformName": "Venue Management",
+   "wave": 3,
+   "operations": [
+    "listKnowledgeGaps"
+   ]
+  },
+  {
+   "id": "BO-919",
+   "name": "AI Event Resource Forecasting",
+   "platform": "P08",
+   "platformName": "Venue Management",
+   "wave": 3,
+   "operations": [
+    "createForecastScenario",
+    "getForecast",
+    "listOperationalRequirements"
+   ]
+  },
+  {
+   "id": "BO-925",
+   "name": "AI Staff Recommendation & Workforce Matching",
+   "platform": "P08",
+   "platformName": "Venue Management",
+   "wave": 3,
+   "operations": [
+    "listOperationalRequirements",
+    "requestSuggestion"
+   ]
+  },
+  {
+   "id": "BO-926",
+   "name": "Resource Demand Forecasting",
+   "platform": "P08",
+   "platformName": "Venue Management",
+   "wave": 3,
+   "operations": [
+    "getForecast",
+    "listOperationalRequirements"
+   ]
+  },
+  {
+   "id": "BO-927",
+   "name": "AI Staffing Requirement Forecast",
+   "platform": "P08",
+   "platformName": "Venue Management",
+   "wave": 3,
+   "operations": [
+    "decideOperationalRequirement",
+    "getForecast",
+    "listOperationalRequirements"
+   ]
+  },
+  {
+   "id": "BO-928",
+   "name": "AI Conflict Resolution Assistant",
+   "platform": "P08",
+   "platformName": "Venue Management",
+   "wave": 3,
+   "operations": [
+    "createAiConversation",
+    "decideProposedAction",
+    "listProposedActions",
+    "sendAiMessage"
+   ]
+  },
+  {
+   "id": "BO-929",
+   "name": "Automatic Schedule Optimization",
+   "platform": "P08",
+   "platformName": "Venue Management",
+   "wave": 3,
+   "operations": [
+    "decideProposedAction",
+    "listProposedActions",
+    "sendAiMessage"
+   ]
+  },
+  {
+   "id": "BO-931",
+   "name": "Operational Scenario Simulator & Digital Twin",
+   "platform": "P08",
+   "platformName": "Venue Management",
+   "wave": 3,
+   "operations": [
+    "compareForecastScenarios",
+    "createForecastScenario"
+   ]
+  },
+  {
+   "id": "BO-932",
+   "name": "Conversational AI Resource Copilot",
+   "platform": "P08",
+   "platformName": "Venue Management",
+   "wave": 3,
+   "operations": [
+    "createAiConversation",
+    "listAiConversations",
+    "sendAiMessage"
+   ]
+  },
+  {
+   "id": "BO-959",
+   "name": "Stage & Focal Point",
+   "platform": "P08",
+   "platformName": "Venue Management",
+   "wave": 3,
+   "operations": [
+    "proposeSeatMapChanges"
+   ]
+  },
+  {
+   "id": "BO-970",
+   "name": "AI Numbering & Labeling",
+   "platform": "P08",
+   "platformName": "Venue Management",
+   "wave": 3,
+   "operations": [
+    "decideProposedAction",
+    "getActionPlan",
+    "proposeSeatMapChanges"
+   ]
+  },
+  {
+   "id": "BO-975",
+   "name": "Event-Specific Layout",
+   "platform": "P08",
+   "platformName": "Venue Management",
+   "wave": 3,
+   "operations": [
+    "decideProposedAction",
+    "getActionPlan",
+    "proposeSeatMapChanges"
+   ]
+  },
+  {
+   "id": "BO-982",
+   "name": "Approval, Publish & Rollback",
+   "platform": "P08",
+   "platformName": "Venue Management",
+   "wave": 3,
+   "operations": [
+    "proposeSeatMapChanges"
+   ]
+  },
+  {
+   "id": "BO-1048",
+   "name": "Seat Upsell Recommendations",
+   "platform": "P08",
+   "platformName": "Venue Management",
+   "wave": 3,
+   "operations": [
+    "decideRecommendations"
+   ]
+  },
+  {
+   "id": "BO-1160",
+   "name": "Fraud Alert & Investigation Case Management",
+   "platform": "P08",
+   "platformName": "Venue Management",
+   "wave": 3,
+   "operations": [
+    "closeRiskCase",
+    "createRiskCase",
+    "decideRiskAlert",
+    "getRiskCase",
+    "listRiskAlerts"
    ]
   },
   {
@@ -920,6 +3098,7 @@
    "platformName": "TICVAI Web",
    "wave": 2,
    "operations": [
+    "getAiDecisionTrace",
     "listAiInteractions"
    ]
   },
@@ -930,10 +3109,1198 @@
    "platformName": "TICVAI Web",
    "wave": 1,
    "operations": [
+    "getAiByokEnablement",
+    "listAiModels",
     "listAiProviders",
+    "listPromptTemplates",
+    "publishPromptTemplate",
+    "setAiByokEnablement",
     "setAiCredential",
+    "setAiModel",
     "setAiProvider",
     "testAiProvider"
+   ]
+  },
+  {
+   "id": "ADM-047",
+   "name": "AI Delivery Optimization & Communication Platform Diagnostics",
+   "platform": "P09",
+   "platformName": "TICVAI Web",
+   "wave": 3,
+   "operations": [
+    "requestSuggestion"
+   ]
+  },
+  {
+   "id": "ADM-249",
+   "name": "Unified Approval Inbox & Decision Workspace",
+   "platform": "P09",
+   "platformName": "TICVAI Web",
+   "wave": 3,
+   "operations": [
+    "getApprovalRequestScore"
+   ]
+  },
+  {
+   "id": "ADM-366",
+   "name": "AI Approval Intelligence Center",
+   "platform": "P09",
+   "platformName": "TICVAI Web",
+   "wave": 3,
+   "operations": [
+    "getApprovalRequestScore"
+   ]
+  },
+  {
+   "id": "ADM-469",
+   "name": "AI Configuration Home & Start",
+   "platform": "P09",
+   "platformName": "TICVAI Web",
+   "wave": 3,
+   "operations": [
+    "attachConfigurationSource",
+    "listConfigurationSessions",
+    "startConfigurationSession"
+   ]
+  },
+  {
+   "id": "ADM-470",
+   "name": "Setup Type & Business Intent Discovery",
+   "platform": "P09",
+   "platformName": "TICVAI Web",
+   "wave": 3,
+   "operations": [
+    "answerConfigurationQuestion",
+    "attachConfigurationSource",
+    "listConfigurationSources",
+    "startConfigurationSession"
+   ]
+  },
+  {
+   "id": "ADM-471",
+   "name": "Venue & Business Model Discovery",
+   "platform": "P09",
+   "platformName": "TICVAI Web",
+   "wave": 3,
+   "operations": [
+    "answerConfigurationQuestion",
+    "getConfigurationBlueprint"
+   ]
+  },
+  {
+   "id": "ADM-472",
+   "name": "Guided Question & Answer Workspace",
+   "platform": "P09",
+   "platformName": "TICVAI Web",
+   "wave": 3,
+   "operations": [
+    "answerConfigurationQuestion",
+    "getConfigurationBlueprint"
+   ]
+  },
+  {
+   "id": "ADM-473",
+   "name": "Product & Admission Model Discovery",
+   "platform": "P09",
+   "platformName": "TICVAI Web",
+   "wave": 3,
+   "operations": [
+    "answerConfigurationQuestion",
+    "getConfigurationBlueprint"
+   ]
+  },
+  {
+   "id": "ADM-474",
+   "name": "Operational Requirement Discovery",
+   "platform": "P09",
+   "platformName": "TICVAI Web",
+   "wave": 3,
+   "operations": [
+    "answerConfigurationQuestion",
+    "getConfigurationBlueprint"
+   ]
+  },
+  {
+   "id": "ADM-475",
+   "name": "Commercial Requirement Discovery",
+   "platform": "P09",
+   "platformName": "TICVAI Web",
+   "wave": 3,
+   "operations": [
+    "answerConfigurationQuestion",
+    "getConfigurationBlueprint"
+   ]
+  },
+  {
+   "id": "ADM-476",
+   "name": "Required, Recommended & Optional Decisions",
+   "platform": "P09",
+   "platformName": "TICVAI Web",
+   "wave": 3,
+   "operations": [
+    "decideBlueprintRecommendation",
+    "getConfigurationBlueprint"
+   ]
+  },
+  {
+   "id": "ADM-477",
+   "name": "Missing Information & Clarification Center",
+   "platform": "P09",
+   "platformName": "TICVAI Web",
+   "wave": 3,
+   "operations": [
+    "answerConfigurationQuestion",
+    "attachConfigurationSource",
+    "decideBlueprintRecommendation",
+    "getConfigurationBlueprint",
+    "listConfigurationSources"
+   ]
+  },
+  {
+   "id": "ADM-478",
+   "name": "Configuration Blueprint & Dependency Map",
+   "platform": "P09",
+   "platformName": "TICVAI Web",
+   "wave": 3,
+   "operations": [
+    "buildConfigurationPlan",
+    "getConfigurationBlueprint"
+   ]
+  },
+  {
+   "id": "ADM-479",
+   "name": "AI Configuration Build Command Center",
+   "platform": "P09",
+   "platformName": "TICVAI Web",
+   "wave": 3,
+   "operations": [
+    "buildConfigurationPlan",
+    "getActionPlan",
+    "getConfigurationBlueprint"
+   ]
+  },
+  {
+   "id": "ADM-480",
+   "name": "Venue & Organization Configuration",
+   "platform": "P09",
+   "platformName": "TICVAI Web",
+   "wave": 3,
+   "operations": [
+    "decideBlueprintRecommendation",
+    "getActionPlan",
+    "getConfigurationBlueprint"
+   ]
+  },
+  {
+   "id": "ADM-481",
+   "name": "Product Configuration Assistant",
+   "platform": "P09",
+   "platformName": "TICVAI Web",
+   "wave": 3,
+   "operations": [
+    "decideBlueprintRecommendation",
+    "getActionPlan",
+    "getConfigurationBlueprint"
+   ]
+  },
+  {
+   "id": "ADM-482",
+   "name": "Schedule, Capacity & Availability Configuration",
+   "platform": "P09",
+   "platformName": "TICVAI Web",
+   "wave": 3,
+   "operations": [
+    "decideBlueprintRecommendation",
+    "getActionPlan",
+    "getConfigurationBlueprint"
+   ]
+  },
+  {
+   "id": "ADM-483",
+   "name": "Pricing & Commercial Configuration",
+   "platform": "P09",
+   "platformName": "TICVAI Web",
+   "wave": 3,
+   "operations": [
+    "decideBlueprintRecommendation",
+    "getActionPlan",
+    "getConfigurationBlueprint"
+   ]
+  },
+  {
+   "id": "ADM-484",
+   "name": "Promotion, Bundle & Upsell Configuration",
+   "platform": "P09",
+   "platformName": "TICVAI Web",
+   "wave": 3,
+   "operations": [
+    "decideBlueprintRecommendation",
+    "getActionPlan",
+    "getConfigurationBlueprint"
+   ]
+  },
+  {
+   "id": "ADM-485",
+   "name": "Seating, Access & Operational Configuration",
+   "platform": "P09",
+   "platformName": "TICVAI Web",
+   "wave": 3,
+   "operations": [
+    "decideBlueprintRecommendation",
+    "getActionPlan",
+    "getConfigurationBlueprint"
+   ]
+  },
+  {
+   "id": "ADM-486",
+   "name": "Channel, Media & Fulfillment Configuration",
+   "platform": "P09",
+   "platformName": "TICVAI Web",
+   "wave": 3,
+   "operations": [
+    "decideBlueprintRecommendation",
+    "getActionPlan",
+    "getConfigurationBlueprint"
+   ]
+  },
+  {
+   "id": "ADM-487",
+   "name": "Cross-Module Conflict & Dependency Validation",
+   "platform": "P09",
+   "platformName": "TICVAI Web",
+   "wave": 3,
+   "operations": [
+    "getActionPlan",
+    "simulateActionPlan"
+   ]
+  },
+  {
+   "id": "ADM-488",
+   "name": "Configuration Preview & Impact Analysis",
+   "platform": "P09",
+   "platformName": "TICVAI Web",
+   "wave": 3,
+   "operations": [
+    "getActionPlan",
+    "simulateActionPlan"
+   ]
+  },
+  {
+   "id": "ADM-489",
+   "name": "AI Configuration Readiness Center",
+   "platform": "P09",
+   "platformName": "TICVAI Web",
+   "wave": 3,
+   "operations": [
+    "getActionPlan",
+    "getEffectiveAiPolicy"
+   ]
+  },
+  {
+   "id": "ADM-490",
+   "name": "Configuration Validation Results",
+   "platform": "P09",
+   "platformName": "TICVAI Web",
+   "wave": 3,
+   "operations": [
+    "getActionPlan",
+    "simulateActionPlan"
+   ]
+  },
+  {
+   "id": "ADM-491",
+   "name": "AI Recommendations & Best-Practice Review",
+   "platform": "P09",
+   "platformName": "TICVAI Web",
+   "wave": 3,
+   "operations": [
+    "decideBlueprintRecommendation",
+    "getConfigurationBlueprint"
+   ]
+  },
+  {
+   "id": "ADM-492",
+   "name": "Configuration Approval Workflow",
+   "platform": "P09",
+   "platformName": "TICVAI Web",
+   "wave": 3,
+   "operations": [
+    "decideProposedAction",
+    "getActionPlan",
+    "listProposedActions"
+   ]
+  },
+  {
+   "id": "ADM-493",
+   "name": "AI Configuration Execution Center",
+   "platform": "P09",
+   "platformName": "TICVAI Web",
+   "wave": 3,
+   "operations": [
+    "cancelActionPlan",
+    "getActionPlan",
+    "pauseActionPlan"
+   ]
+  },
+  {
+   "id": "ADM-494",
+   "name": "Execution Progress & Dependency Monitor",
+   "platform": "P09",
+   "platformName": "TICVAI Web",
+   "wave": 3,
+   "operations": [
+    "getActionPlan",
+    "pauseActionPlan",
+    "resumeActionPlan",
+    "retryActionStep"
+   ]
+  },
+  {
+   "id": "ADM-495",
+   "name": "Configuration Results & Object Mapping",
+   "platform": "P09",
+   "platformName": "TICVAI Web",
+   "wave": 3,
+   "operations": [
+    "getActionPlan",
+    "rollbackActionPlan"
+   ]
+  },
+  {
+   "id": "ADM-496",
+   "name": "Configuration Change & Modification Assistant",
+   "platform": "P09",
+   "platformName": "TICVAI Web",
+   "wave": 3,
+   "operations": [
+    "answerConfigurationQuestion",
+    "buildConfigurationPlan",
+    "startConfigurationSession"
+   ]
+  },
+  {
+   "id": "ADM-497",
+   "name": "Configuration History, Versions & Rollback",
+   "platform": "P09",
+   "platformName": "TICVAI Web",
+   "wave": 3,
+   "operations": [
+    "getActionPlan",
+    "listConfigurationSessions",
+    "rollbackActionPlan"
+   ]
+  },
+  {
+   "id": "ADM-498",
+   "name": "AI Configuration Audit & Governance",
+   "platform": "P09",
+   "platformName": "TICVAI Web",
+   "wave": 3,
+   "operations": [
+    "getAiDecisionTrace",
+    "searchAiDecisions"
+   ]
+  },
+  {
+   "id": "ADM-499",
+   "name": "Forecasting Command Center",
+   "platform": "P09",
+   "platformName": "TICVAI Web",
+   "wave": 3,
+   "operations": [
+    "exportForecastVersion",
+    "getForecast",
+    "listForecastDefinitions"
+   ]
+  },
+  {
+   "id": "ADM-500",
+   "name": "Forecast Configuration & Forecasting Strategy",
+   "platform": "P09",
+   "platformName": "TICVAI Web",
+   "wave": 3,
+   "operations": [
+    "listForecastDefinitions",
+    "runForecast",
+    "setForecastDefinition"
+   ]
+  },
+  {
+   "id": "ADM-501",
+   "name": "Forecast Data & Signal Configuration",
+   "platform": "P09",
+   "platformName": "TICVAI Web",
+   "wave": 3,
+   "operations": [
+    "configureForecastSignalSource",
+    "listForecastSignals",
+    "setForecastDefinition"
+   ]
+  },
+  {
+   "id": "ADM-502",
+   "name": "Attendance & Visitation Forecast",
+   "platform": "P09",
+   "platformName": "TICVAI Web",
+   "wave": 3,
+   "operations": [
+    "configureAnomalyDetector",
+    "getForecast",
+    "listAiInsights"
+   ]
+  },
+  {
+   "id": "ADM-503",
+   "name": "Ticket, Product & Timeslot Demand Forecast",
+   "platform": "P09",
+   "platformName": "TICVAI Web",
+   "wave": 3,
+   "operations": [
+    "getForecast"
+   ]
+  },
+  {
+   "id": "ADM-504",
+   "name": "Channel & Booking Pace Forecast",
+   "platform": "P09",
+   "platformName": "TICVAI Web",
+   "wave": 3,
+   "operations": [
+    "getForecast"
+   ]
+  },
+  {
+   "id": "ADM-505",
+   "name": "Revenue & Commercial Forecast",
+   "platform": "P09",
+   "platformName": "TICVAI Web",
+   "wave": 3,
+   "operations": [
+    "getForecast"
+   ]
+  },
+  {
+   "id": "ADM-506",
+   "name": "Forecast Drivers, Confidence & Explainability",
+   "platform": "P09",
+   "platformName": "TICVAI Web",
+   "wave": 3,
+   "operations": [
+    "explainMetricChange",
+    "getForecast",
+    "getForecastAccuracy",
+    "listForecastVersions"
+   ]
+  },
+  {
+   "id": "ADM-507",
+   "name": "Forecast Scenario & What-If Simulator",
+   "platform": "P09",
+   "platformName": "TICVAI Web",
+   "wave": 3,
+   "operations": [
+    "compareForecastScenarios",
+    "createForecastScenario",
+    "getForecast"
+   ]
+  },
+  {
+   "id": "ADM-508",
+   "name": "Forecast Accuracy, Review & Publication Center",
+   "platform": "P09",
+   "platformName": "TICVAI Web",
+   "wave": 3,
+   "operations": [
+    "exportForecastVersion",
+    "getForecastAccuracy",
+    "listForecastVersions",
+    "publishForecastVersion",
+    "runForecast"
+   ]
+  },
+  {
+   "id": "ADM-509",
+   "name": "Operational Forecasting Command Center",
+   "platform": "P09",
+   "platformName": "TICVAI Web",
+   "wave": 3,
+   "operations": [
+    "getForecast",
+    "listOperationalRequirements"
+   ]
+  },
+  {
+   "id": "ADM-510",
+   "name": "Capacity & Occupancy Forecast",
+   "platform": "P09",
+   "platformName": "TICVAI Web",
+   "wave": 3,
+   "operations": [
+    "configureAnomalyDetector",
+    "getForecast",
+    "listAiInsights",
+    "listOperationalRequirements"
+   ]
+  },
+  {
+   "id": "ADM-511",
+   "name": "Attraction Utilization & Queue Forecast",
+   "platform": "P09",
+   "platformName": "TICVAI Web",
+   "wave": 3,
+   "operations": [
+    "getForecast",
+    "listOperationalRequirements",
+    "requestSuggestion"
+   ]
+  },
+  {
+   "id": "ADM-512",
+   "name": "Entry, Access & Guest Flow Forecast",
+   "platform": "P09",
+   "platformName": "TICVAI Web",
+   "wave": 3,
+   "operations": [
+    "getForecast",
+    "listOperationalRequirements"
+   ]
+  },
+  {
+   "id": "ADM-513",
+   "name": "Workforce Demand & Staffing Forecast",
+   "platform": "P09",
+   "platformName": "TICVAI Web",
+   "wave": 3,
+   "operations": [
+    "getForecast",
+    "listOperationalRequirements"
+   ]
+  },
+  {
+   "id": "ADM-514",
+   "name": "POS, Kiosk & Frontline Service Forecast",
+   "platform": "P09",
+   "platformName": "TICVAI Web",
+   "wave": 3,
+   "operations": [
+    "getForecast",
+    "listOperationalRequirements"
+   ]
+  },
+  {
+   "id": "ADM-515",
+   "name": "F&B, Retail & Inventory Demand Forecast",
+   "platform": "P09",
+   "platformName": "TICVAI Web",
+   "wave": 3,
+   "operations": [
+    "getForecast",
+    "listOperationalRequirements"
+   ]
+  },
+  {
+   "id": "ADM-516",
+   "name": "Resource, Equipment & Facility Requirement Forecast",
+   "platform": "P09",
+   "platformName": "TICVAI Web",
+   "wave": 3,
+   "operations": [
+    "getForecast",
+    "listOperationalRequirements"
+   ]
+  },
+  {
+   "id": "ADM-517",
+   "name": "Operational Scenario & Readiness Simulator",
+   "platform": "P09",
+   "platformName": "TICVAI Web",
+   "wave": 3,
+   "operations": [
+    "compareForecastScenarios",
+    "createForecastScenario",
+    "listOperationalRequirements"
+   ]
+  },
+  {
+   "id": "ADM-518",
+   "name": "Operational Forecast Review, Recommendations & Handover",
+   "platform": "P09",
+   "platformName": "TICVAI Web",
+   "wave": 3,
+   "operations": [
+    "decideOperationalRequirement",
+    "listOperationalRequirements"
+   ]
+  },
+  {
+   "id": "ADM-519",
+   "name": "AI Governance Command Center",
+   "platform": "P09",
+   "platformName": "TICVAI Web",
+   "wave": 3,
+   "operations": [
+    "listAiCapabilities",
+    "listAiGovernanceAlerts",
+    "pauseAiCapability",
+    "promoteAiRelease"
+   ]
+  },
+  {
+   "id": "ADM-520",
+   "name": "AI Capability Registry & Ownership",
+   "platform": "P09",
+   "platformName": "TICVAI Web",
+   "wave": 3,
+   "operations": [
+    "configureAiCapability",
+    "listAiCapabilities"
+   ]
+  },
+  {
+   "id": "ADM-521",
+   "name": "AI Risk Classification & Assessment",
+   "platform": "P09",
+   "platformName": "TICVAI Web",
+   "wave": 3,
+   "operations": [
+    "configureAiCapability",
+    "listAiCapabilities"
+   ]
+  },
+  {
+   "id": "ADM-522",
+   "name": "AI Autonomy Level Configuration",
+   "platform": "P09",
+   "platformName": "TICVAI Web",
+   "wave": 3,
+   "operations": [
+    "configureAiCapability",
+    "getEffectiveAiPolicy",
+    "listAiCapabilities"
+   ]
+  },
+  {
+   "id": "ADM-523",
+   "name": "AI Action & Permission Policy Builder",
+   "platform": "P09",
+   "platformName": "TICVAI Web",
+   "wave": 3,
+   "operations": [
+    "createAiGovernancePolicyDraft",
+    "listAiGovernancePolicyVersions",
+    "listAiTools",
+    "setAiTool"
+   ]
+  },
+  {
+   "id": "ADM-524",
+   "name": "AI Data Access & Usage Policy",
+   "platform": "P09",
+   "platformName": "TICVAI Web",
+   "wave": 3,
+   "operations": [
+    "createAiGovernancePolicyDraft",
+    "listAiGovernancePolicyVersions"
+   ]
+  },
+  {
+   "id": "ADM-525",
+   "name": "Environment, Tenant & Scope Governance",
+   "platform": "P09",
+   "platformName": "TICVAI Web",
+   "wave": 3,
+   "operations": [
+    "createAiGovernancePolicyDraft",
+    "getEffectiveAiPolicy"
+   ]
+  },
+  {
+   "id": "ADM-526",
+   "name": "AI Policy Conflict, Exception & Override Management",
+   "platform": "P09",
+   "platformName": "TICVAI Web",
+   "wave": 3,
+   "operations": [
+    "createAiPolicyException",
+    "getEffectiveAiPolicy",
+    "listAiGovernancePolicyVersions",
+    "revokeAiPolicyException"
+   ]
+  },
+  {
+   "id": "ADM-527",
+   "name": "AI Policy Testing & Governance Simulation",
+   "platform": "P09",
+   "platformName": "TICVAI Web",
+   "wave": 3,
+   "operations": [
+    "listAiGovernancePolicyVersions",
+    "simulateAiGovernancePolicy"
+   ]
+  },
+  {
+   "id": "ADM-528",
+   "name": "AI Governance Policy Publication & Effective Policy Map",
+   "platform": "P09",
+   "platformName": "TICVAI Web",
+   "wave": 3,
+   "operations": [
+    "getEffectiveAiPolicy",
+    "listAiGovernancePolicyVersions",
+    "publishAiGovernancePolicy"
+   ]
+  },
+  {
+   "id": "ADM-529",
+   "name": "AI Human Oversight Command Center",
+   "platform": "P09",
+   "platformName": "TICVAI Web",
+   "wave": 3,
+   "operations": [
+    "getActionPlan",
+    "listProposedActions"
+   ]
+  },
+  {
+   "id": "ADM-530",
+   "name": "AI Approval Requirement & Routing Configuration",
+   "platform": "P09",
+   "platformName": "TICVAI Web",
+   "wave": 3,
+   "operations": [
+    "createAiGovernancePolicyDraft",
+    "listAiGovernancePolicyVersions",
+    "listAiTools"
+   ]
+  },
+  {
+   "id": "ADM-531",
+   "name": "AI Approval Review Workspace",
+   "platform": "P09",
+   "platformName": "TICVAI Web",
+   "wave": 3,
+   "operations": [
+    "decideProposedAction",
+    "getActionPlan",
+    "simulateActionPlan"
+   ]
+  },
+  {
+   "id": "ADM-532",
+   "name": "Conditional Approval & Approval Conditions",
+   "platform": "P09",
+   "platformName": "TICVAI Web",
+   "wave": 3,
+   "operations": [
+    "decideProposedAction",
+    "getActionPlan"
+   ]
+  },
+  {
+   "id": "ADM-533",
+   "name": "Human Review, Challenge & AI Clarification Workspace",
+   "platform": "P09",
+   "platformName": "TICVAI Web",
+   "wave": 3,
+   "operations": [
+    "getAiDecisionTrace",
+    "overrideAiDecision",
+    "sendAiMessage"
+   ]
+  },
+  {
+   "id": "ADM-534",
+   "name": "Escalation, Delegation & Approval SLA Management",
+   "platform": "P09",
+   "platformName": "TICVAI Web",
+   "wave": 3,
+   "operations": [
+    "getActionPlan",
+    "listProposedActions"
+   ]
+  },
+  {
+   "id": "ADM-535",
+   "name": "Live AI Execution Oversight & Human Intervention",
+   "platform": "P09",
+   "platformName": "TICVAI Web",
+   "wave": 3,
+   "operations": [
+    "cancelActionPlan",
+    "getActionPlan",
+    "pauseActionPlan",
+    "resumeActionPlan"
+   ]
+  },
+  {
+   "id": "ADM-536",
+   "name": "Human Override & Manual Control Center",
+   "platform": "P09",
+   "platformName": "TICVAI Web",
+   "wave": 3,
+   "operations": [
+    "overrideAiDecision",
+    "pauseActionPlan",
+    "pauseAiCapability",
+    "resumeAiCapability"
+   ]
+  },
+  {
+   "id": "ADM-537",
+   "name": "Approval & Intervention History / Decision Timeline",
+   "platform": "P09",
+   "platformName": "TICVAI Web",
+   "wave": 3,
+   "operations": [
+    "getAiDecisionTrace",
+    "searchAiDecisions"
+   ]
+  },
+  {
+   "id": "ADM-538",
+   "name": "Human Oversight Workflow Simulator & Readiness Center",
+   "platform": "P09",
+   "platformName": "TICVAI Web",
+   "wave": 3,
+   "operations": [
+    "simulateActionPlan",
+    "simulateAiGovernancePolicy"
+   ]
+  },
+  {
+   "id": "ADM-539",
+   "name": "AI Explainability & Audit Command Center",
+   "platform": "P09",
+   "platformName": "TICVAI Web",
+   "wave": 3,
+   "operations": [
+    "searchAiDecisions"
+   ]
+  },
+  {
+   "id": "ADM-540",
+   "name": "AI Decision Explorer & Search",
+   "platform": "P09",
+   "platformName": "TICVAI Web",
+   "wave": 3,
+   "operations": [
+    "getAiDecisionTrace",
+    "searchAiDecisions"
+   ]
+  },
+  {
+   "id": "ADM-541",
+   "name": "AI Decision Explanation Workspace",
+   "platform": "P09",
+   "platformName": "TICVAI Web",
+   "wave": 3,
+   "operations": [
+    "getAiDecisionTrace"
+   ]
+  },
+  {
+   "id": "ADM-542",
+   "name": "Data, Feature & Evidence Provenance",
+   "platform": "P09",
+   "platformName": "TICVAI Web",
+   "wave": 3,
+   "operations": [
+    "getAiDecisionTrace"
+   ]
+  },
+  {
+   "id": "ADM-543",
+   "name": "Candidate, Rule & Decision Path Trace",
+   "platform": "P09",
+   "platformName": "TICVAI Web",
+   "wave": 3,
+   "operations": [
+    "explainRecommendationDecision",
+    "getAiDecisionTrace"
+   ]
+  },
+  {
+   "id": "ADM-544",
+   "name": "Model, Provider & AI Runtime Trace",
+   "platform": "P09",
+   "platformName": "TICVAI Web",
+   "wave": 3,
+   "operations": [
+    "getAiDecisionTrace",
+    "listAiModels"
+   ]
+  },
+  {
+   "id": "ADM-545",
+   "name": "Governance, Approval & Human Decision Trace",
+   "platform": "P09",
+   "platformName": "TICVAI Web",
+   "wave": 3,
+   "operations": [
+    "getAiDecisionTrace"
+   ]
+  },
+  {
+   "id": "ADM-546",
+   "name": "Execution & Business Outcome Trace",
+   "platform": "P09",
+   "platformName": "TICVAI Web",
+   "wave": 3,
+   "operations": [
+    "getActionPlan",
+    "getAiDecisionTrace"
+   ]
+  },
+  {
+   "id": "ADM-547",
+   "name": "AI Audit Record & Evidence Package",
+   "platform": "P09",
+   "platformName": "TICVAI Web",
+   "wave": 3,
+   "operations": [
+    "exportAiEvidencePackage",
+    "searchAiDecisions"
+   ]
+  },
+  {
+   "id": "ADM-548",
+   "name": "AI Trace Investigation & Replay Simulator",
+   "platform": "P09",
+   "platformName": "TICVAI Web",
+   "wave": 3,
+   "operations": [
+    "getAiDecisionTrace",
+    "replayAiDecision"
+   ]
+  },
+  {
+   "id": "ADM-549",
+   "name": "AI Governance Monitoring Command Center",
+   "platform": "P09",
+   "platformName": "TICVAI Web",
+   "wave": 3,
+   "operations": [
+    "listAiGovernanceAlerts",
+    "listAiIncidents"
+   ]
+  },
+  {
+   "id": "ADM-550",
+   "name": "AI Risk Register & Risk Exposure Management",
+   "platform": "P09",
+   "platformName": "TICVAI Web",
+   "wave": 3,
+   "operations": [
+    "listAiRiskRegister",
+    "setAiRiskRegisterEntry"
+   ]
+  },
+  {
+   "id": "ADM-551",
+   "name": "AI Governance Control Library & Control Effectiveness",
+   "platform": "P09",
+   "platformName": "TICVAI Web",
+   "wave": 3,
+   "operations": [
+    "listAiControls",
+    "runAiControlTest"
+   ]
+  },
+  {
+   "id": "ADM-552",
+   "name": "AI Policy Compliance & Violation Monitoring",
+   "platform": "P09",
+   "platformName": "TICVAI Web",
+   "wave": 3,
+   "operations": [
+    "decideAiGovernanceAlert",
+    "listAiGovernanceAlerts"
+   ]
+  },
+  {
+   "id": "ADM-553",
+   "name": "AI Data, Privacy & Usage Compliance Monitoring",
+   "platform": "P09",
+   "platformName": "TICVAI Web",
+   "wave": 3,
+   "operations": [
+    "decideAiGovernanceAlert",
+    "listAiGovernanceAlerts"
+   ]
+  },
+  {
+   "id": "ADM-554",
+   "name": "AI Quality, Behavior & Governance Drift Monitoring",
+   "platform": "P09",
+   "platformName": "TICVAI Web",
+   "wave": 3,
+   "operations": [
+    "listAiEvaluations",
+    "listAiGovernanceAlerts",
+    "promoteAiRelease",
+    "rollbackAiRelease",
+    "runAiEvaluation"
+   ]
+  },
+  {
+   "id": "ADM-555",
+   "name": "AI Governance Alert & Detection Center",
+   "platform": "P09",
+   "platformName": "TICVAI Web",
+   "wave": 3,
+   "operations": [
+    "decideAiGovernanceAlert",
+    "listAiGovernanceAlerts",
+    "openAiIncident"
+   ]
+  },
+  {
+   "id": "ADM-556",
+   "name": "AI Incident & Remediation Management",
+   "platform": "P09",
+   "platformName": "TICVAI Web",
+   "wave": 3,
+   "operations": [
+    "closeAiIncident",
+    "containAiIncident",
+    "listAiIncidents",
+    "openAiIncident",
+    "pauseAiCapability",
+    "rollbackAiRelease"
+   ]
+  },
+  {
+   "id": "ADM-557",
+   "name": "AI Compliance, Assurance & Governance Reporting",
+   "platform": "P09",
+   "platformName": "TICVAI Web",
+   "wave": 3,
+   "operations": [
+    "exportAiEvidencePackage",
+    "listAiControls",
+    "listAiRiskRegister"
+   ]
+  },
+  {
+   "id": "ADM-558",
+   "name": "AI Governance Review, Action Plan & Continuous Improvement",
+   "platform": "P09",
+   "platformName": "TICVAI Web",
+   "wave": 3,
+   "operations": [
+    "listAiGovernanceAlerts",
+    "listAiRiskRegister"
+   ]
+  },
+  {
+   "id": "ADM-633",
+   "name": "Fraud Alert, Investigation & Case Management\\t170",
+   "platform": "P09",
+   "platformName": "TICVAI Web",
+   "wave": 3,
+   "operations": [
+    "addRiskCaseEvidence",
+    "closeRiskCase",
+    "createRiskCase",
+    "decideRiskAlert",
+    "expandRiskNetwork",
+    "getEntityRisk",
+    "getRiskCase",
+    "listRiskAlerts",
+    "proposeRiskAction"
+   ]
+  },
+  {
+   "id": "ADM-637",
+   "name": "AI Fraud, Anomaly & Payment Intelligence Center\\t175",
+   "platform": "P09",
+   "platformName": "TICVAI Web",
+   "wave": 3,
+   "operations": [
+    "configureRiskStrategy",
+    "getEntityRisk",
+    "listRiskAlerts"
+   ]
+  },
+  {
+   "id": "ADM-638",
+   "name": "Payment Executive Intelligence, Risk Simulator & AI Advisor\\t176",
+   "platform": "P09",
+   "platformName": "TICVAI Web",
+   "wave": 3,
+   "operations": [
+    "backtestRiskStrategy"
+   ]
+  },
+  {
+   "id": "ADM-678",
+   "name": "Journey Simulator, Decision Trace & AI Optimization",
+   "platform": "P09",
+   "platformName": "TICVAI Web",
+   "wave": 3,
+   "operations": [
+    "explainRecommendationDecision"
+   ]
+  },
+  {
+   "id": "ADM-680",
+   "name": "Customer Recommendation Profile",
+   "platform": "P09",
+   "platformName": "TICVAI Web",
+   "wave": 3,
+   "operations": [
+    "explainRecommendationDecision",
+    "getCustomerRecommendationProfile"
+   ]
+  },
+  {
+   "id": "ADM-683",
+   "name": "Next-Best-Offer Decision Studio",
+   "platform": "P09",
+   "platformName": "TICVAI Web",
+   "wave": 3,
+   "operations": [
+    "explainRecommendationDecision"
+   ]
+  },
+  {
+   "id": "ADM-686",
+   "name": "Anonymous, Known & Identity-Transition Personalization.123",
+   "platform": "P09",
+   "platformName": "TICVAI Web",
+   "wave": 3,
+   "operations": [
+    "explainRecommendationDecision"
+   ]
+  },
+  {
+   "id": "ADM-687",
+   "name": "AI Explainability, Confidence & Model Governance",
+   "platform": "P09",
+   "platformName": "TICVAI Web",
+   "wave": 3,
+   "operations": [
+    "explainRecommendationDecision"
+   ]
+  },
+  {
+   "id": "ADM-696",
+   "name": "AI Risk, Fairness, Explainability & Safety Center",
+   "platform": "P09",
+   "platformName": "TICVAI Web",
+   "wave": 3,
+   "operations": [
+    "explainRecommendationDecision"
+   ]
+  },
+  {
+   "id": "ADM-697",
+   "name": "Recommendation Audit, Decision Trace & Investigation",
+   "platform": "P09",
+   "platformName": "TICVAI Web",
+   "wave": 3,
+   "operations": [
+    "explainRecommendationDecision"
    ]
   },
   {
@@ -954,7 +4321,8 @@
    "platformName": "Venue Support",
    "wave": 3,
    "operations": [
-    "listKnowledgeCollections"
+    "listKnowledgeCollections",
+    "listKnowledgeGaps"
    ]
   },
   {
@@ -966,6 +4334,70 @@
    "operations": [
     "askReportingQuestion",
     "saveNaturalLanguageQuery"
+   ]
+  },
+  {
+   "id": "SUP-018",
+   "name": "AI Customer Service Copilot & Knowledge Workspace",
+   "platform": "P12",
+   "platformName": "Venue Support",
+   "wave": 3,
+   "operations": [
+    "configureAssistantProfile",
+    "listAssistantProfiles"
+   ]
+  },
+  {
+   "id": "CMS-007",
+   "name": "Page Builder",
+   "platform": "P13",
+   "platformName": "Venue CMS",
+   "wave": 2,
+   "operations": [
+    "decideProposedAction",
+    "proposeMarketingContent"
+   ]
+  },
+  {
+   "id": "CMS-008",
+   "name": "Content Blocks",
+   "platform": "P13",
+   "platformName": "Venue CMS",
+   "wave": 2,
+   "operations": [
+    "decideProposedAction",
+    "proposeMarketingContent"
+   ]
+  },
+  {
+   "id": "CMS-010",
+   "name": "Media Library",
+   "platform": "P13",
+   "platformName": "Venue CMS",
+   "wave": 2,
+   "operations": [
+    "semanticSearch"
+   ]
+  },
+  {
+   "id": "CMS-062",
+   "name": "Central Digital Asset Library",
+   "platform": "P13",
+   "platformName": "Venue CMS",
+   "wave": 3,
+   "operations": [
+    "semanticSearch"
+   ]
+  },
+  {
+   "id": "CMS-101",
+   "name": "Help Me Choose",
+   "platform": "P13",
+   "platformName": "Venue CMS",
+   "wave": 2,
+   "operations": [
+    "getGuidedChoiceSuggestion",
+    "suggestGuidedChoice"
    ]
   },
   {
@@ -985,6 +4417,17 @@
    "platformName": "Venue Analytics",
    "wave": 3,
    "operations": [
+    "listAiInsights",
+    "requestSuggestion"
+   ]
+  },
+  {
+   "id": "ANL-006",
+   "name": "Inventory & Waste Intelligence",
+   "platform": "P16",
+   "platformName": "Venue Analytics",
+   "wave": 3,
+   "operations": [
     "requestSuggestion"
    ]
   },
@@ -995,7 +4438,8 @@
    "platformName": "Venue Analytics",
    "wave": 3,
    "operations": [
-    "askReportingQuestion"
+    "askReportingQuestion",
+    "getForecast"
    ]
   },
   {
@@ -1007,6 +4451,7 @@
    "operations": [
     "askReportingQuestion",
     "decideProposedAction",
+    "getActionPlan",
     "listProposedActions"
    ]
   },
@@ -1028,7 +4473,10 @@
    "platformName": "Venue Analytics",
    "wave": 3,
    "operations": [
-    "askReportingQuestion"
+    "askReportingQuestion",
+    "decideAiInsight",
+    "explainMetricChange",
+    "listAiInsights"
    ]
   },
   {
@@ -1043,13 +4491,77 @@
    ]
   },
   {
+   "id": "ANL-055",
+   "name": "Anomaly Detection Center",
+   "platform": "P16",
+   "platformName": "Venue Analytics",
+   "wave": 3,
+   "operations": [
+    "configureAnomalyDetector",
+    "listAiInsights",
+    "listAnomalyDetectors"
+   ]
+  },
+  {
    "id": "ANL-056",
    "name": "Root-Cause Analysis Explorer",
    "platform": "P16",
    "platformName": "Venue Analytics",
    "wave": 3,
    "operations": [
-    "askReportingQuestion"
+    "askReportingQuestion",
+    "explainMetricChange"
+   ]
+  },
+  {
+   "id": "ANL-057",
+   "name": "Forecasting & Predictive Analytics Studio",
+   "platform": "P16",
+   "platformName": "Venue Analytics",
+   "wave": 3,
+   "operations": [
+    "createForecastScenario",
+    "exportForecastVersion",
+    "getForecast",
+    "listForecastDefinitions"
+   ]
+  },
+  {
+   "id": "ANL-058",
+   "name": "AI Recommendation & Next-Best-Action Center",
+   "platform": "P16",
+   "platformName": "Venue Analytics",
+   "wave": 3,
+   "operations": [
+    "listAiInsights"
+   ]
+  },
+  {
+   "id": "ANL-059",
+   "name": "AI Insight History, Evidence & Explainability",
+   "platform": "P16",
+   "platformName": "Venue Analytics",
+   "wave": 3,
+   "operations": [
+    "decideAiInsight",
+    "listAiInsights"
+   ]
+  },
+  {
+   "id": "ANL-060",
+   "name": "AI Analytics Governance & Model Control",
+   "platform": "P16",
+   "platformName": "Venue Analytics",
+   "wave": 3,
+   "operations": [
+    "configureAiCapability",
+    "getEffectiveAiPolicy",
+    "listAiCapabilities",
+    "listAiEvaluations",
+    "listAiModels",
+    "listPromptTemplates",
+    "publishPromptTemplate",
+    "runAiEvaluation"
    ]
   }
  ],
@@ -1143,7 +4655,8 @@
    "wave": 3,
    "operations": [
     "askReportingQuestion",
-    "decideProposedAction"
+    "decideProposedAction",
+    "decideRecommendations"
    ]
   }
  ],
@@ -1311,6 +4824,12 @@
    "mentions": 1
   },
   {
+   "file": "docs\\active\\six-month-plan-29-september.md",
+   "title": "Six-month build plan, re-planned 29 September 2026",
+   "status": "",
+   "mentions": 1
+  },
+  {
    "file": "docs\\active\\spec-coverage-19-september.md",
    "title": "Ch03 capability coverage - the client's list against our screens",
    "status": "",
@@ -1398,7 +4917,7 @@
    "file": "docs\\architecture\\ai-system-design.md",
    "title": "TICVAI AI subsystem: system design",
    "status": "",
-   "mentions": 14
+   "mentions": 150
   },
   {
    "file": "docs\\architecture\\README.md",
@@ -1585,14 +5104,14 @@
   }
  ],
  "counts": {
-  "operations": 33,
-  "schemas": 34,
-  "states": 11,
-  "events": 11,
-  "tables": 51,
-  "screens": 37,
+  "operations": 135,
+  "schemas": 116,
+  "states": 42,
+  "events": 46,
+  "tables": 131,
+  "screens": 193,
   "flows": 10,
-  "documents": 43,
+  "documents": 44,
   "openConflicts": 1
  }
 }

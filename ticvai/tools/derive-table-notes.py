@@ -505,6 +505,67 @@ WHAT = {
         "and holds a `failure_sample`; this is where the other 4,999 go. **`stage` decides who "
         "fixes it** \u2014 a parse failure is a document problem, an embed failure is a provider one."),
 
+    "marketing.device_consent": (
+        "**One cookie decision by a visitor nobody has identified yet** (BL-073, 29 September). "
+        "Append-only: a change of mind is a new row, so the trail from first decision to last is "
+        "the evidence. Keyed for the visitor by `consent_key`, which the platform mints; "
+        "`claimed_by_subject_id` is set once, by the claim at sign-in, and never cleared. **No IP "
+        "address or user agent here** — those are in `pii.consent_identifier`."),
+    "marketing.device_consent_category": (
+        "**The per-category decision of one `marketing.device_consent` row** — granted or "
+        "declined for each cookie category the banner offered. A row per category, so a statistic "
+        "of who declined analytics is a count, not a parse of a list."),
+    "pii.consent_identifier": (
+        "**The IP address and user agent a cookie decision was made from**, kept only where the "
+        "published banner design has `record_ip_address` on (ADR-0023). Held in `pii` and pointed "
+        "at the decision, never beside it, so the consent log can be read and reported without "
+        "reading personal data."),
+    "marketing.cookie_scan_run": (
+        "**One cookie and tracker scan of a storefront, taken in**: what was found, which "
+        "trackers the banner does not declare, and when. The difference between what a site sets "
+        "and what its banner admits to is the finding a regulator asks about."),
+    "marketing.cookie_scan_policy": (
+        "**How often each channel is scanned for cookies and trackers, and who is told** when a "
+        "scan finds something undeclared. One row per channel; the scan runs land in "
+        "`marketing.cookie_scan_run`."),
+    "whitelabel.analytics_provider": (
+        "**An analytics platform a storefront or app reports to**, per venue: which provider, its "
+        "property or container id and which consent category gates it. The banner's consent-mode "
+        "signals are what switch it on, so a provider with no category never loads."),
+    "control.credit_note": (
+        "**A credit note against a tenant invoice** — TICVAI crediting its own customer, not a "
+        "venue crediting a guest. Points at the invoice it corrects; an invoice is never edited, "
+        "it is credited and reissued."),
+    "control.credit_note_line": (
+        "**One line of a `control.credit_note`**: what is credited, against which invoice line, "
+        "and for how much."),
+    "orders.chargeback_evidence": (
+        "**One item of evidence assembled for a chargeback** (29 September): the order, the scan "
+        "that admitted them, the delivery, the terms accepted, a communication or a device "
+        "fingerprint, each a `kind` and a `reference`. Its own rows because a list of objects has "
+        "nowhere else to be stored, and because which evidence wins depends on the chargeback's "
+        "reason."),
+    "orders.chargeback_investigation_log": (
+        "**The investigation notes on a chargeback, oldest first** (29 September), each with who "
+        "wrote it and when. Append-only: `assignChargeback` and `recordChargebackOutcome` add to "
+        "it and nothing edits it."),
+    "access.accreditation_credential": (
+        "**What a gate needs to admit an accredited person, kept by `access`** (29 September, "
+        "BL-181). Written only by the consumers of `accreditation.credentialIssued` and "
+        "`accreditation.holderStatusChanged`; `admits` goes false when a credential is replaced "
+        "or its holder is suspended, revoked, expired or archived. Read by `validateAccess` and "
+        "shipped in the offline package, **so a revoked badge stops opening doors on a gate with "
+        "no network**. The record of truth stays in `accreditation`."),
+    "accreditation.mobile_credential_delivery": (
+        "**One send of a mobile accreditation credential to its holder** — wallet pass, email or "
+        "SMS link — and how far it got: queued, sent, delivered, opened, failed or superseded by "
+        "a later send. A credential that never arrived is a person at a gate with nothing to "
+        "show."),
+    "accreditation.data_export": (
+        "**One export of accreditation data**, asynchronous: what was asked for (holders, "
+        "applications, credentials, access or documents, filtered), in which format, why, by "
+        "whom, and where the file is until it expires. Personal data leaves only with a stated "
+        "purpose, and this row is that record."),
 }
 
 

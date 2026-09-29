@@ -11,7 +11,7 @@
  "note": "Derived by tools/derive-platform.py. **The gaps section is the point** \u2014 a page listing what exists is a directory; one listing what is missing is a worklist.",
  "counts": {
   "screens": 8,
-  "operations": 21,
+  "operations": 22,
   "contracts": 1,
   "modules": 1,
   "undrawn": 0,
@@ -34,7 +34,7 @@
  "contracts": [
   {
    "contract": "public-api",
-   "operations": 21
+   "operations": 22
   }
  ],
  "screens": [
@@ -80,7 +80,7 @@
    "module": "Developer & API",
    "wave": 2,
    "route": "/developer/webhooks",
-   "operations": 4,
+   "operations": 5,
    "drawn": true
   },
   {

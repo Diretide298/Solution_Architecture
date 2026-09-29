@@ -7,7 +7,7 @@
 | Tier | platform: Provisioning, publishing, reporting, and the one cross-region path. |
 | Contracts | `reporting` |
 | Schemas owned | `reporting` |
-| Operations in the slice | 15 of 47 |
+| Operations in the slice | 17 of 48 |
 | Scale | Analytical. Runs against the replica and the analytical store. |
 | If it is down | Down stops dashboards. Nothing operational depends on it. |
 
@@ -38,9 +38,11 @@
 | execution | [`runReport`](#runreport) | POST | `/reports/{reportId}/run` | core | 1 | ANL-001, ANL-002, ANL-003, ANL-004, ANL-005, ANL-006 … |
 | naturalLanguage | [`askReportingQuestion`](#askreportingquestion) | POST | `/reports/ask` | core | 2 | ANL-008, ANL-009, ANL-019, ANL-052, ANL-056, BO-029 … |
 | naturalLanguage | [`saveNaturalLanguageQuery`](#savenaturallanguagequery) | POST | `/reports/ask/{conversationId}/save` | core | 2 | ANL-052, BO-029, BO-058, BO-059, BO-060, POS-008 … |
+| reporting | [`createKpi`](#createkpi) | POST | `/kpis` | setup | 2 | ANL-025, ANL-062 |
 | reporting | [`deleteDashboard`](#deletedashboard) | DELETE | `/dashboards/{dashboardId}` | setup | 2 | ANL-023 |
 | reporting | [`listAlerts`](#listalerts) | GET | `/alerts` | core | 1 | ANL-001, ANL-003, ANL-009, ANL-012, BO-036, BO-125 … |
-| reporting | [`setAlertRule`](#setalertrule) | PUT | `/alert-rules` | setup | 1 | ANL-009, BO-133 |
+| reporting | [`setAlertRule`](#setalertrule) | PUT | `/alert-rules` | setup | 1 | ANL-009, BO-133, BO-886 |
+| reporting | [`setSemanticModel`](#setsemanticmodel) | PUT | `/semantic-model` | setup | 2 | ANL-066 |
 
 ## Group: catalogue
 
@@ -548,7 +550,7 @@ Tiles reference report definitions. Each tile carries its own refresh interval, 
 | Read routing | analytical |
 | Reads | `reporting.dashboard`, `reporting.dashboard_tile` |
 | Writes | - |
-| Called by | ADM-031, ANL-001, ANL-002, ANL-003, ANL-004, ANL-005, ANL-006, ANL-007, ANL-008, ANL-021, ANL-023, ANL-030, BO-010, KIT-010 |
+| Called by | ADM-031, ANL-001, ANL-002, ANL-003, ANL-004, ANL-005, ANL-006, ANL-007, ANL-008, ANL-017, ANL-021, ANL-023, ANL-030, BO-010, BO-833, EMP-061, KIT-010 |
 
 **Parameters**
 
@@ -747,7 +749,7 @@ Scope is applied from the caller's resolved permissions. Parameters narrow; they
 | Conflict policy | serverWins |
 | Reads | `cache:idempotency`, `reporting.execution`, `reporting.report_definition`, `reporting.report_parameter` |
 | Writes | `cache:idempotency`, `reporting.execution` |
-| Called by | ANL-001, ANL-002, ANL-003, ANL-004, ANL-005, ANL-006, ANL-007, ANL-009, ANL-039, ANL-040, BO-010, BO-029, BO-058, BO-059, BO-060, BO-1059, BO-1082, BO-115, BO-118, BO-126, BO-133, BO-262, POS-008, POS-020, PTR-018, SUP-008 |
+| Called by | ANL-001, ANL-002, ANL-003, ANL-004, ANL-005, ANL-006, ANL-007, ANL-009, ANL-039, ANL-040, BO-010, BO-029, BO-058, BO-059, BO-060, BO-1059, BO-1082, BO-115, BO-118, BO-126, BO-133, BO-262, BO-682, POS-008, POS-020, PTR-018, SUP-008 |
 
 **Parameters**
 
@@ -804,6 +806,8 @@ AI-57, Phase 1. Queries data that already exists, so it works from day one — u
 **Returns the generated query alongside the answer.** An answer nobody can check is worse than no answer, and a finance user asked to trust an unexplained number will rightly refuse.
 Runs under the caller's resolved permissions. The generated query cannot widen scope, because scope is applied after generation, not by it.
 **The generated query is kept, not just returned.** Each answer writes a `reporting.natural_language_query` row (`NaturalLanguageQuery`) against its `conversationId`, because `saveNaturalLanguageQuery` turns it into a definition in a later call and `ai.activity` holds only free-text prompt and response.
+**The model writes a semantic query spec, not SQL** (decided 29 September, AI system design 2.2 E and 5.7). It sees only the semantic-model metrics and dimensions this caller may see, and returns `semanticSpec` (metric, dimensions, filters, period, comparison). Reporting validates the spec against the published `SemanticModel` and compiles it deterministically, the same compile `runSemanticQuery` performs, so *revenue* in an answer is the dashboards' revenue. **The compiled SQL is still returned**, in `generatedQuery.compiledSql`, beside `semanticSpec`, `dataAsOf` and a `reliability` category (`grounded`, `partial`, `conflictingSources`, `insufficientEvidence`), which replaces the bare `confidence` percentage (design 5.6). A follow-up in the same conversation edits the kept spec, and permissions are re-checked on every turn.
+**A question outside the semantic model answers "not available yet"**, never an improvised query: `200` with `reliability` `insufficientEvidence`, `unavailableReason` naming which part is not modelled, `interpretation` saying so in plain language, and `semanticSpec`, `generatedQuery`, `result` and `dataAsOf` null. No `NaturalLanguageQuery` is kept for it. The `ai` service records the question as an `ai.knowledge_gap` of `kind` `analytics`, so the semantic-model owner gets a task rather than a log line. A metric the caller may not see is treated as not modelled, so the answer does not reveal that it exists.
 
 |  |  |
 |---|---|
@@ -813,8 +817,8 @@ Runs under the caller's resolved permissions. The generated query cannot widen s
 | Wave | 2 |
 | Offline | no |
 | Conflict policy | serverWins |
-| Reads | `ai.policy`, `ai.provider`, `cache:idempotency`, `reporting.report_column`, `reporting.report_filter` |
-| Writes | `ai.activity`, `cache:idempotency`, `reporting.report_column`, `reporting.report_filter`, `reporting.natural_language_query` |
+| Reads | `ai.policy`, `ai.provider`, `cache:idempotency`, `reporting.kpi_definition`, `reporting.natural_language_query`, `reporting.report_column`, `reporting.report_filter`, `reporting.semantic_model` |
+| Writes | `ai.activity`, `cache:idempotency`, `reporting.natural_language_query`, `reporting.report_column`, `reporting.report_filter` |
 | Called by | ANL-008, ANL-009, ANL-019, ANL-052, ANL-056, BO-029, BO-058, BO-059, BO-060, BO-593, KIT-010, POS-008, PTR-018, SUP-008 |
 
 **Parameters**
@@ -838,7 +842,17 @@ Runs under the caller's resolved permissions. The generated query cannot widen s
 | conversationId | string | yes |  |
 | question | string | yes |  |
 | interpretation | string | yes | What the question was understood to mean, in plain language. |
-| generatedQuery | GeneratedQuery |  | The structured query a natural-language question produced — data source, columns, filters, grouping. |
+| semanticSpec | object |  | What the model returned instead of SQL (design 2.2 E, 5.7): metric, dimensions, filters, period, comparison, as validated against the semantic model. (nullable) |
+| semanticSpec.metric | string | yes | A measure field code in the SemanticModel, or a KpiDefinition.code. |
+| semanticSpec.dimensions | array of string |  | Field codes to group by. (max items 5) |
+| semanticSpec.filters | array of object |  |  |
+| semanticSpec.filters[].field | string | yes | A SemanticModel field code. |
+| semanticSpec.filters[].operator | enum (equals, notEquals, greaterThan, lessThan, between, in, notIn, isNull, …) | yes |  |
+| semanticSpec.filters[].values | array of object |  | Open on purpose; typed by the field. |
+| semanticSpec.period | string | yes | ISO 8601 interval in the venue's time zone, e.g. |
+| semanticSpec.comparison | enum (previousPeriod, samePeriodLastYear, target, benchmark) |  | As getKpiValues compareTo. (nullable) |
+| semanticSpec.semanticModelVersion | integer |  | The SemanticModel.version the spec was validated and compiled against. (read-only) |
+| generatedQuery | object |  | The query the spec compiled to: data source, columns, filters, grouping, and the compiled SQL in compiledSql. (nullable) |
 | generatedQuery.dataSource | DataSource: enum (orders, orderLines, payments, refunds, shifts, scanEvents, entitlements, products, …) |  | What a report may be built over. |
 | generatedQuery.columns | array of ReportColumn |  |  |
 | generatedQuery.columns[].id | string (uuid) |  | Added 20 August. (read-only) |
@@ -856,7 +870,8 @@ Runs under the caller's resolved permissions. The generated query cannot widen s
 | generatedQuery.filters[].values | array of object |  | The values for in and notIn, or exactly two (from, to) for between. |
 | generatedQuery.filters[].isParameter | boolean |  | Prompted at run time rather than fixed. (default False) |
 | generatedQuery.groupBy | array of string |  |  |
-| result | ReportResult | yes |  |
+| generatedQuery.compiledSql | string |  | The SQL the semantic spec compiled to, exactly as run on the analytical replica (29 September, design 5.7). (nullable) |
+| result | object | yes | Null when the question is outside the semantic model. (nullable) |
 | result.executionId | string | yes |  |
 | result.columns | array of object | yes |  |
 | result.columns[].key | string |  |  |
@@ -868,7 +883,10 @@ Runs under the caller's resolved permissions. The generated query cannot widen s
 | result.nextCursor | string |  | (nullable) |
 | result.generatedAt | string (date-time) |  |  |
 | result.dataAsOf | string (date-time) |  | Replica position the result was read at. |
-| confidence | number | yes | (min 0; max 1) |
+| dataAsOf | string (date-time) |  | Replica position the answer was read at, the result's dataAsOf, stated beside the answer so a figure that moved is not argued about. (nullable) |
+| reliability | ReportingAnswerReliability: enum (grounded, partial, conflictingSources, insufficientEvidence) | yes | How far an analytics answer can be relied on (decided 29 September, AI system design 5.6): a category, never a bare percentage. |
+| unavailableReason | object |  | Set only when reliability is insufficientEvidence because the question is outside the semantic model ("not available yet"); names which part is not modelled. (nullable) |
+| confidence | number |  | Superseded by reliability on 29 September (design 5.6, never a bare percentage for analytics). (min 0; max 1) |
 | suggestedFollowUps | array of string |  |  |
 | modelVersion | string |  |  |
 | tokensUsed | integer |  |  |
@@ -965,6 +983,68 @@ Turns a one-off question into something schedulable. The generated query becomes
 
 ## Group: reporting
 
+### createKpi
+
+**`POST /kpis`**: Define a KPI once, for everywhere
+
+|  |  |
+|---|---|
+| Permission | `REPORT_MANAGE` |
+| Scope level | tenant |
+| Part of slice | setup, makes `reporting.kpi_definition` non-empty |
+| Wave | 2 |
+| Offline | no |
+| Config scope | tenant |
+| Reads | `reporting.kpi_definition` |
+| Writes | `reporting.kpi_definition` |
+| Called by | ANL-025, ANL-062 |
+
+**Parameters**
+
+| Name | In | Required | Type | Notes |
+|---|---|---|---|---|
+| Idempotency-Key | header | yes | string | Client-generated ULID. |
+
+**Request body**: `KpiDefinition`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| id | string (uuid) |  |  |
+| code | string | yes | takings and admissions are seeded for every tenant as system KPIs (decided 28 September, audit R283), and the five accreditation KPIs for every tenant with the accreditation module (29 September, bui… |
+| name | string | yes |  |
+| description | string |  | (nullable) |
+| domain | string |  | (nullable) |
+| formula | string |  | Expressed against the semantic model, not against tables. |
+| unit | enum (currency, count, percentage, duration, ratio, score) |  |  |
+| higherIsBetter | boolean |  | Refund rate and revenue both go up. (default True) |
+| defaultPeriod | string |  | (nullable) |
+| owner | string (uuid) |  | (nullable) |
+| scopePath | string |  |  |
+| isActive | boolean |  | (default True) |
+
+**Response**: `KpiDefinition`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| id | string (uuid) |  |  |
+| code | string | yes | takings and admissions are seeded for every tenant as system KPIs (decided 28 September, audit R283), and the five accreditation KPIs for every tenant with the accreditation module (29 September, bui… |
+| name | string | yes |  |
+| description | string |  | (nullable) |
+| domain | string |  | (nullable) |
+| formula | string |  | Expressed against the semantic model, not against tables. |
+| unit | enum (currency, count, percentage, duration, ratio, score) |  |  |
+| higherIsBetter | boolean |  | Refund rate and revenue both go up. (default True) |
+| defaultPeriod | string |  | (nullable) |
+| owner | string (uuid) |  | (nullable) |
+| scopePath | string |  |  |
+| isActive | boolean |  | (default True) |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 201 |  | Created |
+
 ### deleteDashboard
 
 **`DELETE /dashboards/{dashboardId}`**: Archive a dashboard
@@ -1016,7 +1096,7 @@ The tiles go with it and come back with it. `reporting.dashboard_tile` carries `
 | Read routing | replica |
 | Reads | `reporting.alert`, `reporting.alert_rule` |
 | Writes | - |
-| Called by | ANL-001, ANL-003, ANL-009, ANL-012, BO-036, BO-125, BO-133, BO-141, EMP-070, POS-009, POS-020, POS-025 |
+| Called by | ANL-001, ANL-003, ANL-009, ANL-012, BO-036, BO-125, BO-133, BO-141, BO-886, EMP-061, EMP-070, POS-009, POS-020, POS-025 |
 
 **Parameters**
 
@@ -1053,7 +1133,7 @@ BL-152. **The metric comes from the closed set**, so a rule cannot watch somethi
 | Conflict policy | serverWins |
 | Reads | `cache:idempotency`, `identity.role`, `reporting.alert_rule` |
 | Writes | `cache:idempotency`, `reporting.alert_rule` |
-| Called by | ANL-009, BO-133 |
+| Called by | ANL-009, BO-133, BO-886 |
 
 **Parameters**
 
@@ -1073,7 +1153,7 @@ BL-152. **The metric comes from the closed set**, so a rule cannot watch somethi
 | thresholdUpper | object |  | Required when comparator is outsideRange (decided 28 September, audit R158): the range is threshold to thresholdUpper, and a rule missing either, or with the upper not above the lower, is refused by… (nullable) |
 | windowMinutes | integer |  | The window is what stops an alert firing on noise. (default 15) |
 | severity | AlertSeverity: enum (info, warning, critical) | yes | How urgent an alert rule's breach is. |
-| deliverTo | array of enum (dashboardPanel, email, whatsapp, sms) |  | CF-134. |
+| deliverTo | array of enum (dashboardPanel, email, whatsapp, sms, push) |  | CF-134. |
 | recipientRoleIds | array of string (uuid) |  |  |
 | cooldownMinutes | integer |  | How long before the same rule may fire again. (default 30) |
 | isActive | boolean | yes |  |
@@ -1091,7 +1171,7 @@ BL-152. **The metric comes from the closed set**, so a rule cannot watch somethi
 | thresholdUpper | object |  | Required when comparator is outsideRange (decided 28 September, audit R158): the range is threshold to thresholdUpper, and a rule missing either, or with the upper not above the lower, is refused by… (nullable) |
 | windowMinutes | integer |  | The window is what stops an alert firing on noise. (default 15) |
 | severity | AlertSeverity: enum (info, warning, critical) | yes | How urgent an alert rule's breach is. |
-| deliverTo | array of enum (dashboardPanel, email, whatsapp, sms) |  | CF-134. |
+| deliverTo | array of enum (dashboardPanel, email, whatsapp, sms, push) |  | CF-134. |
 | recipientRoleIds | array of string (uuid) |  |  |
 | cooldownMinutes | integer |  | How long before the same rule may fire again. (default 30) |
 | isActive | boolean | yes |  |
@@ -1104,6 +1184,78 @@ BL-152. **The metric comes from the closed set**, so a rule cannot watch somethi
 | 200 |  | Replaced — a rule with this id already existed |
 | 201 |  | Created — no rule with this id existed |
 | 400 |  | An outsideRange rule without both threshold and thresholdUpper, or with the upper not above the lower (audit R158) |
+
+### setSemanticModel
+
+**`PUT /semantic-model`**: Publish the catalogue
+
+**PUT semantics — a full replace of the tenant's one semantic model.** The body is the whole model: a domain, dataset, field or relationship left out of it is not in the published model. The server assigns `version` and `publishedAt`; values sent for them are ignored. The first publish for a tenant creates the model (`201`); every later one replaces it (`200`).
+
+|  |  |
+|---|---|
+| Permission | `REPORT_MANAGE` |
+| Scope level | tenant |
+| Part of slice | setup, makes `reporting.semantic_model` non-empty |
+| Wave | 2 |
+| Offline | no |
+| Reads | `reporting.semantic_model` |
+| Writes | `reporting.semantic_model` |
+| Called by | ANL-066 |
+
+**Parameters**
+
+| Name | In | Required | Type | Notes |
+|---|---|---|---|---|
+| Idempotency-Key | header | yes | string | Client-generated ULID. |
+
+**Request body**: `SemanticModel`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| version | integer |  | Assigned by the server on each publish. (read-only) |
+| domains | array of object |  |  |
+| domains[].code | string |  |  |
+| domains[].name | string |  |  |
+| domains[].description | string |  | (nullable) |
+| domains[].datasets | array of object |  |  |
+| domains[].datasets[].code | string |  |  |
+| domains[].datasets[].name | string |  |  |
+| domains[].datasets[].grain | string |  | What one row means. |
+| domains[].datasets[].fields | array of object |  |  |
+| relationships | array of object |  |  |
+| relationships[].fromDataset | string |  |  |
+| relationships[].toDataset | string |  |  |
+| relationships[].cardinality | enum (oneToOne, oneToMany, manyToOne, manyToMany) |  |  |
+| publishedAt | string (date-time) |  | (read-only; nullable) |
+| scopePath | string |  |  |
+
+**Response**: `SemanticModel`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| version | integer |  | Assigned by the server on each publish. (read-only) |
+| domains | array of object |  |  |
+| domains[].code | string |  |  |
+| domains[].name | string |  |  |
+| domains[].description | string |  | (nullable) |
+| domains[].datasets | array of object |  |  |
+| domains[].datasets[].code | string |  |  |
+| domains[].datasets[].name | string |  |  |
+| domains[].datasets[].grain | string |  | What one row means. |
+| domains[].datasets[].fields | array of object |  |  |
+| relationships | array of object |  |  |
+| relationships[].fromDataset | string |  |  |
+| relationships[].toDataset | string |  |  |
+| relationships[].cardinality | enum (oneToOne, oneToMany, manyToOne, manyToMany) |  |  |
+| publishedAt | string (date-time) |  | (read-only; nullable) |
+| scopePath | string |  |  |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 200 |  | Published, replacing the previous model |
+| 201 |  | Published — the tenant's first model |
 
 ## Tables
 
@@ -1208,6 +1360,23 @@ Every table this service owns that the slice reads or writes, with its columns a
 | completed_at | timestamptz | no |  |
 | expires_at | timestamptz | no | Results are retained for a limited period, then discarded. |
 
+### `reporting.kpi_definition`
+
+| Column | Type | Required | Notes |
+|---|---|---|---|
+| id | uuid | no |  |
+| code | text | yes | takings and admissions are seeded for every tenant as system KPIs (decided 28 September, audit R283), and the five accreditation KPIs for every tenant with the accreditation module (29 September, bui… |
+| name | text | yes |  |
+| description | text | no |  |
+| domain | text | no |  |
+| formula | text | no | Expressed against the semantic model, not against tables. |
+| unit | text | no |  |
+| higher_is_better | boolean | no | Refund rate and revenue both go up. |
+| default_period | text | no |  |
+| owner | uuid | no |  |
+| scope_path | text | no |  |
+| is_active | boolean | no |  |
+
 ### `reporting.natural_language_query`
 
 | Column | Type | Required | Notes |
@@ -1217,6 +1386,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 | question | text | yes |  |
 | interpretation | text | no |  |
 | generated_query | jsonb | yes | Stored whole. |
+| semantic_spec | jsonb | no | The spec the model returned and generatedQuery was compiled from, stored whole (29 September, design 2.2 E). |
 | asked_by_principal_id | uuid | yes |  |
 | asked_at | timestamptz | yes |  |
 | scope_path | text | no | The partition key (ADR-0005). |
@@ -1291,9 +1461,18 @@ Every table this service owns that the slice reads or writes, with its columns a
 | id | uuid | yes | Synthesised key. |
 | definition_id | uuid | yes | Points at reporting.report_definition. |
 
+### `reporting.semantic_model`
+
+| Column | Type | Required | Notes |
+|---|---|---|---|
+| version | integer | no | Assigned by the server on each publish. |
+| published_at | timestamptz | no |  |
+| scope_path | text | no |  |
+| id | uuid | yes | Synthesised key. |
+
 ## Not in the first release
 
-32 operations, added to this service in later releases without changing any of the above.
+31 operations, added to this service in later releases without changing any of the above.
 
 | Group | Operations |
 |---|---|
@@ -1301,5 +1480,6 @@ Every table this service owns that the slice reads or writes, with its columns a
 | dashboard | `getCommandCentre`, `listDashboards` |
 | execution | `cancelReportExecution`, `getReportExecution`, `getReportResult`, `listReportExecutions` |
 | export | `exportReportResult`, `getReportExport` |
-| reporting | `acknowledgeAlert`, `createKpi`, `createReportSubscription`, `getAnalyticsBenchmark`, `getAnalyticsUsage`, `getKpiValues`, `getSemanticModel`, `getSupplierPerformance`, `listAlertRules`, `listAnalyticsAnomalies`, `listAnalyticsPipelines`, `listKpis`, `listReportDeliveries`, `listReportSubscriptions`, `listSeededReports`, `listSiteNormalisationBases`, `setKpiTargets`, `setSemanticModel`, `setSiteNormalisationBasis` |
+| naturalLanguage | `runSemanticQuery` |
+| reporting | `acknowledgeAlert`, `createReportSubscription`, `getAnalyticsBenchmark`, `getAnalyticsUsage`, `getKpiValues`, `getSemanticModel`, `getSupplierPerformance`, `listAlertRules`, `listAnalyticsAnomalies`, `listAnalyticsPipelines`, `listKpis`, `listReportDeliveries`, `listReportSubscriptions`, `listSeededReports`, `listSiteNormalisationBases`, `setKpiTargets`, `setSiteNormalisationBasis` |
 | schedule | `createReportSchedule`, `deleteReportSchedule`, `listReportSchedules`, `updateReportSchedule` |

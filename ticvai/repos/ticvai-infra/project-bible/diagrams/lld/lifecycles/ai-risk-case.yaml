@@ -1,0 +1,70 @@
+id: LLD-AI risk case
+title: AI risk case — 6 transitions
+generatedBy: tools/derive-diagrams.py
+index: diagrams/hld/04-lifecycles.yaml
+source: states/ai-risk-case.yaml
+entity: AI risk case
+contract: ai
+enum: AiRiskCase.status
+enumKind: inline
+enumSchema: AiRiskCase
+enumProperty: status
+owner: ai
+description: '**An investigation** (AIP-150..160), opened from one or more alerts or entities by `createRiskCase`,
+  or by `decideRiskAlert` with `escalate` where no `caseId` is given. Its evidence and actions are `ai.case_evidence`
+  and `ai.case_action`; the outcome is a person''s.'
+initial:
+- open
+terminal:
+- closed
+transitions:
+- from: open
+  to: investigating
+  operation: addRiskCaseEvidence
+  trigger: operation
+  guard: An analyst adds evidence beyond the alerts' assessments attached at opening. Evidence is never
+    edited; a correction is new evidence (AIP-155)
+- from: open
+  to: pendingAction
+  operation: proposeRiskAction
+  trigger: operation
+  guard: A restrictive action is proposed straight from the case (AIP-136). At the first-release ceiling
+    (L1 advisory) it is a recommendation the owning module's operator applies; where the tenant raised
+    the level, a plan is prepared for approval
+- from: investigating
+  to: pendingAction
+  operation: proposeRiskAction
+  trigger: operation
+  guard: A restrictive action is proposed from the investigation; it goes to the owning module through
+    the action pipeline, never straight from review (AIP-136)
+- from: open
+  to: closed
+  operation: closeRiskCase
+  trigger: operation
+  guard: Closed with an outcome (`confirmedFraud`, `notFraud` or `inconclusive`) and a note, without
+    further evidence, where the alerts' assessments settle it
+  emits:
+  - ai.riskCaseClosed
+- from: investigating
+  to: closed
+  operation: closeRiskCase
+  trigger: operation
+  guard: '**Closed with an outcome and a note.** Alert, case and confirmed fraud stay distinct (AIP-163);
+    the outcome is the label the next candidate model trains on (design 3.5)'
+  emits:
+  - ai.riskCaseClosed
+- from: pendingAction
+  to: closed
+  operation: closeRiskCase
+  trigger: operation
+  guard: No proposed action is still awaiting approval (`409 case-actions-open`); closed with an outcome
+    and a note
+  emits:
+  - ai.riskCaseClosed
+notes: '**`closed` is final.** Evidence and actions are refused on a closed case (`409 case-closed`),
+  so a suspicion that returns is a new case, linked through the alerts and entities it shares.
+
+
+  `ai.riskCaseClosed` is published on every close. The event''s `emittedWhen` names `investigating`
+  and `pendingAction`; `closeRiskCase` does not refuse an `open` case, so the move from `open` publishes
+  it too.'

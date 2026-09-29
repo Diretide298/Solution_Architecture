@@ -2,7 +2,7 @@ openapi: 3.1.0
 info:
   title: TICVAI Promotions & Bundles
   version: 0.1.0
-  x-ticvai-screen-count: 147
+  x-ticvai-screen-count: 144
   x-ticvai-tier: satellite
   x-ticvai-module: 4 — Bundles and Promotions
   x-ticvai-requirements: 229
@@ -223,11 +223,16 @@ paths:
   /recommendations:
     post:
       operationId: getRecommendations
-      x-ticvai-consumed-by:
-        - "P08 BO-1048 Seat Upsell Recommendations"
-        - "P08 BO-119 Cross-Sell, Upsell & Recommendation Rules"
       summary: What else this guest might want
-      description: 'BL-068. **Rule-based recommendation exists; profile-and-cart-driven does not**, and
+      deprecated: true
+      x-ticvai-superseded-by: 'decideRecommendations'
+      description: '**Deprecated for one release (29 September, AI system design 2.3 and 5.4).** Forwarded
+        to the AI recommendation engine as a placement: the call becomes `ai.decideRecommendations` with
+        `surface` as the placement, and the engine''s items come back in this response''s shape. Removed
+        after one release; new screens bind `ai.decideRecommendations`. The text below describes the
+        behaviour the engine now carries.
+
+        BL-068. **Rule-based recommendation exists; profile-and-cart-driven does not**, and
         the difference is whether a guest who has already bought a family ticket is offered another one.
 
         **Deterministic fallback, always.** A recommender that returns nothing when the model is unavailable
@@ -1820,16 +1825,19 @@ paths:
   /upsell-suggestions:
     post:
       operationId: getUpsellSuggestions
-      x-ticvai-consumed-by:
-        - "P01 WEB-008 Add-ons & Upsell"
-        - "P02 GST-048 Upsell / Cross-Sell"
-        - "P08 BO-102 Sell"
-        - "P08 BO-119 Cross-Sell, Upsell & Recommendation Rules"
       x-ticvai-audience:
       - staff
       - guest
       summary: Suggestions for a cart
-      description: 'Rule-based today. Where the recommendation engine is enabled it augments this rather
+      deprecated: true
+      x-ticvai-superseded-by: 'decideRecommendations'
+      description: '**Deprecated for one release (29 September, AI system design 2.3 and 5.4).** Forwarded
+        to the AI recommendation engine as a placement: the call becomes `ai.decideRecommendations` with
+        placement `cart` or `checkout` (from `placement`) and the same cart lines, and the engine''s items
+        come back in this response''s shape. Removed after one release; new screens bind
+        `ai.decideRecommendations`.
+
+        Rule-based today. Where the recommendation engine is enabled it augments this rather
         than replacing it — a configured rule always outranks a model, because the operator who wrote
         it had a commercial reason.
 
@@ -6931,6 +6939,14 @@ paths:
         because one without the other is dangerous.** *Maximise attach revenue* with no cap produces a
         checkout with nine upsells; a cap with no objective produces a recommender optimising nothing.
 
+        **Accepts `Prefer: validate-only`** (29 September, build): validates and answers 200 with the
+        would-be result without writing, for the AI executor''s plan validation.
+
+        **Publishes `promotions.recommendationStrategyPublished`** (29 September, AI system design 2.2 A and
+        5.4) through `platform.outbox` in the same transaction as the write, when the strategy is created
+        `active`. `ai` consumes it to refresh its strategy and candidate cache, so a live slot never ranks
+        against configuration that has changed.
+
         '
       tags:
       - recommendations
@@ -6941,6 +6957,7 @@ paths:
       x-ticvai-config-scope: venue
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      - $ref: ../shared/common.yaml#/components/parameters/PreferValidateOnly
       requestBody:
         required: true
         content:
@@ -6948,6 +6965,12 @@ paths:
             schema:
               $ref: '#/components/schemas/RecommendationStrategy'
       responses:
+        '200':
+          description: 'Validate-only: the would-be result, nothing written'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RecommendationStrategy'
         '201':
           headers:
             X-Consistency-Token:
@@ -6989,6 +7012,15 @@ paths:
         - "P09 ADM-684 Personalized Ranking & Decision Policy Builder"
         - "P09 ADM-695 Recommendation Governance & Deployment Control"
       summary: Change a strategy
+      description: '**Accepts `Prefer: validate-only`** (29 September, build): validates and answers 200
+        with the would-be result without writing, for the AI executor''s plan validation.
+
+        **Publishes `promotions.recommendationStrategyPublished`** (29 September, AI system design 2.2 A and
+        5.4) through `platform.outbox` in the same transaction as the write, when the write changes an
+        `active` strategy or moves one into or out of `active`. `ai` consumes it to refresh its strategy and
+        candidate cache, so a live slot never ranks against configuration that has changed.
+
+        '
       tags:
       - recommendations
       x-ticvai-permission: PRODUCT_CONFIGURE
@@ -6998,6 +7030,7 @@ paths:
       x-ticvai-config-scope: venue
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      - $ref: ../shared/common.yaml#/components/parameters/PreferValidateOnly
       requestBody:
         required: true
         content:
@@ -7065,6 +7098,12 @@ paths:
         - "P09 ADM-663 Cross-Category Recommendation Manager"
         - "P09 ADM-664 Multi-Attraction, Destination & Partner Cross-Sell"
       summary: Declare what upgrades to, pairs with or replaces what
+      description: '**Publishes `promotions.recommendationStrategyPublished`** (29 September, AI system
+        design 2.2 A and 5.4) through `platform.outbox` in the same transaction as the write, on every
+        committed write of the relationship set. `ai` consumes it to refresh its strategy and candidate
+        cache, so a live slot never ranks against configuration that has changed.
+
+        '
       tags:
       - recommendations
       x-ticvai-permission: PRODUCT_CONFIGURE
@@ -7150,16 +7189,15 @@ paths:
   /recommendations/explain:
     post:
       operationId: explainRecommendation
-      x-ticvai-consumed-by:
-        - "P09 ADM-678 Journey Simulator, Decision Trace & AI Optimization"
-        - "P09 ADM-680 Customer Recommendation Profile"
-        - "P09 ADM-683 Next-Best-Offer Decision Studio"
-        - "P09 ADM-686 Anonymous, Known & Identity-Transition Personalization.123"
-        - "P09 ADM-687 AI Explainability, Confidence & Model Governance"
-        - "P09 ADM-696 AI Risk, Fairness, Explainability & Safety Center"
-        - "P09 ADM-697 Recommendation Audit, Decision Trace & Investigation"
       summary: Why this was offered, and what was suppressed
-      description: 'Upsell boards 4.10 and 6.9. **The decision trace, including what did not make the
+      deprecated: true
+      x-ticvai-superseded-by: 'explainRecommendationDecision'
+      description: '**Deprecated for one release (29 September, AI system design 2.3 and 5.4).** Forwarded
+        to the AI recommendation engine: the trace, suppressions included, is read from the engine''s
+        decision record through `ai.explainRecommendationDecision`. Removed after one release; new screens
+        bind `ai.explainRecommendationDecision`.
+
+        Upsell boards 4.10 and 6.9. **The decision trace, including what did not make the
         list.** A merchandiser asking *why are we not offering the parking upsell* is asking about a
         suppression, and a response that only names the winners cannot answer them.
 
@@ -7189,7 +7227,14 @@ paths:
     post:
       operationId: recordRecommendationOutcome
       summary: Shown, clicked, accepted or dismissed
-      description: 'Upsell board 6.5. **Without this there is no attribution and no learning.** A
+      deprecated: true
+      x-ticvai-superseded-by: 'recordRecommendationEvents'
+      description: '**Deprecated for one release (29 September, AI system design 2.3 and 5.4).** Forwarded
+        to the AI recommendation engine: each outcome is recorded through `ai.recordRecommendationEvents`,
+        where decision records, attribution and experiments live. Removed after one release; new callers use
+        `ai.recordRecommendationEvents`.
+
+        Upsell board 6.5. **Without this there is no attribution and no learning.** A
         recommender that cannot see its own outcomes is a rule engine somebody has to tune by intuition.
 
         **Impressions matter as much as conversions.** Acceptance rate needs a denominator, and the
@@ -7319,6 +7364,9 @@ paths:
                   nullable: true
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Concluded
           content:
             application/json:
@@ -7410,6 +7458,11 @@ paths:
         Hard exclusions are separate from caps: *never offer alcohol to a guest in a family segment* is
         not a frequency question.
 
+        **Publishes `promotions.recommendationStrategyPublished`** (29 September, AI system design 2.2 A and
+        5.4) through `platform.outbox` in the same transaction as the write, on every committed write of the
+        suppression set. `ai` consumes it to refresh its strategy and candidate cache, so a live slot never
+        ranks against configuration that has changed.
+
         '
       tags:
       - recommendations
@@ -7450,6 +7503,11 @@ paths:
         the pack telling us something.** Recommendation changes are invisible until they are live and
         then affect every guest at once, so the only safe way to evaluate one is against baskets that
         already happened.
+
+        **Runs on the AI recommendation engine** (29 September, AI system design 2.3 and 5.4). It stays in
+        Promotions and calls `ai.simulateRecommendationDecision` (service audience) in simulation mode, so
+        the replay uses the same eligibility, ranking and guardrails as the live slot. Promotions owns the
+        strategy; the engine decides.
 
         '
       tags:
@@ -8048,8 +8106,25 @@ components:
             - bundle
             - nextBestOffer
             - reactivation
+        itemKinds:
+          type: array
+          description: 'What the strategy may put in a slot (29 September, build pass, group G2, from group G1''s
+            handoff; 8.6.30 to 8.6.36, 5.4.21, 22.6.18): `product` (the default and the behaviour before), `offer`
+            (a live promotion marked `recommendable`), `reward` (a marketing-crm loyalty reward the guest can redeem)
+            and `challenge` (a challenge they can join). Mirrors `ai.decideRecommendations` item kinds.'
+          default:
+          - product
+          items:
+            type: string
+            enum:
+            - product
+            - offer
+            - reward
+            - challenge
         placements:
           type: array
+          description: '`homepage` (8.6.10) and `loyalty` (5.4.21, 22.6.18) added 29 September (build pass, group G2),
+            matching the placements `ai.decideRecommendations` fills.'
           items:
             type: string
             enum:
@@ -8063,6 +8138,8 @@ components:
             - pos
             - signage
             - callCentre
+            - homepage
+            - loyalty
         channels:
           type: array
           items:
@@ -8804,6 +8881,24 @@ components:
           description: 'The commercial campaign (`promotions.campaign`) this promotion belongs to; null
             for a promotion run on its own. The directory, calendar and campaign budget screens group
             by it. (DM5, 29 September: data model for the agreed operations)'
+        recommendable:
+          type: boolean
+          default: false
+          description: '**May the recommendation engine show this offer to a guest** (8.6.30 to 8.6.36; 29 September,
+            build pass, group G2, from group G1''s handoff). False keeps a promotion to the basket, where
+            `evaluatePromotions` applies it as before. True makes a live promotion a candidate item of kind `offer`
+            in `ai.decideRecommendations` for the guests its conditions and `recommendableSegmentIds` admit: while it
+            is live, `promotions.recommendationStrategyPublished` (kind `offers`) keeps the engine''s candidate cache
+            current, and it leaves the cache when it is paused, ends or expires. **The engine shows the offer; the
+            discount is still computed here at the basket**, never by ai.'
+        recommendableSegmentIds:
+          type: array
+          nullable: true
+          description: The marketing-crm segments the offer may be recommended to; null means every guest its own
+            conditions admit.
+          items:
+            type: string
+            format: uuid
     Promotion:
       x-ticvai-persistence: promotions.promotion
       allOf:

@@ -7,7 +7,7 @@
 | Tier | platform: Provisioning, publishing, reporting, and the one cross-region path. |
 | Contracts | `subscription`, `platform-ops`, `public-api` |
 | Schemas owned | `control`, `subscription` |
-| Operations in the slice | 10 of 202 |
+| Operations in the slice | 15 of 206 |
 | Scale | Low volume, high consequence. Tenant provisioning and licensing. |
 | If it is down | Down blocks provisioning and the developer API. Trading is unaffected. |
 
@@ -19,7 +19,9 @@ Splitting them would give three services writing one schema, which is the arrang
 
 ## Depends on
 
-Nothing outside itself.
+| Service | Tables it reads |
+|---|---|
+| [IdentityService](IdentityService.md) | `identity.principal` |
 
 ## Operations in the first release
 
@@ -28,6 +30,11 @@ Nothing outside itself.
 | licensing | [`addLicenceAddOn`](#addlicenceaddon) | POST | `/tenants/{tenantId}/licences/add-ons` | setup | 2 | ADM-005, ADM-007, ADM-011, ADM-422 |
 | plan | [`createPlan`](#createplan) | POST | `/plans` | setup | 2 | ADM-008, ADM-019, ADM-392 |
 | plan | [`createPlanVersion`](#createplanversion) | POST | `/plans/{planId}` | setup | 2 | ADM-008, ADM-019, ADM-398 |
+| publicApi | [`createApiClient`](#createapiclient) | POST | `/api-clients` | setup | 1 | BO-067, BO-1073, BO-1173, BO-1177, DEV-003, PTR-019 |
+| publicApi | [`registerDeveloper`](#registerdeveloper) | POST | `/developers` | setup | 1 | DEV-002 |
+| publicApi | [`rotateApiCredential`](#rotateapicredential) | POST | `/api-clients/{clientId}/credentials` | setup | 1 | DEV-003, PTR-019 |
+| publicApi | [`setApiLicensing`](#setapilicensing) | PUT | `/api-licensing` | setup | 1 | DEV-008 |
+| publicApi | [`setDeveloperMembers`](#setdevelopermembers) | PUT | `/developers/{developerId}/members` | setup | 1 | DEV-002 |
 | subscription | [`setSubscription`](#setsubscription) | PUT | `/tenants/{tenantId}/subscription` | setup | 2 | ADM-008, ADM-011, ADM-410, ADM-417, ADM-463, SGN-019 … |
 | tenant | [`createTenant`](#createtenant) | POST | `/tenants` | setup | 2 | ADM-005, ADM-419 |
 | tenant | [`listTenants`](#listtenants) | GET | `/tenants` | core | 2 | ADM-002, ADM-005, ADM-006, ADM-007, ADM-008, ADM-009 … |
@@ -119,6 +126,7 @@ A module or limit increase sold separately. Add-ons survive a plan change unless
 **`POST /plans`**: Create a subscription plan
 
 A plan bundles licensed modules, entitlement limits and a cell tier. Plans are versioned: existing subscriptions stay on the version they were sold, so a price change never applies retroactively.
+**A plan is a package, and billing is per module (decided 29 September, Chinmay).** TICVAI sells three standard packages (`packageKind` `standard`) and may make custom ones (`custom`); every package is invoiced one line per licensed module at the price TICVAI configured for that module on the platform (`setModuleListing`), plus `basePrice` as the package's own fee where it has one (it may be zero). **A custom package can be private to one tenant** (`offeredToTenantId`): it is listed and sold to that tenant only. `offeredToTenantId` on a `standard` package is refused (422).
 
 |  |  |
 |---|---|
@@ -128,7 +136,7 @@ A plan bundles licensed modules, entitlement limits and a cell tier. Plans are v
 | Wave | 2 |
 | Offline | no |
 | Conflict policy | serverWins |
-| Reads | `cache:idempotency`, `subscription.plan`, `subscription.plan_limit`, `subscription.plan_module` |
+| Reads | `cache:idempotency`, `control.tenant`, `subscription.plan`, `subscription.plan_limit`, `subscription.plan_module` |
 | Writes | `cache:idempotency`, `subscription.plan`, `subscription.plan_limit` |
 | Called by | ADM-008, ADM-019, ADM-392 |
 
@@ -161,7 +169,9 @@ A plan bundles licensed modules, entitlement limits and a cell tier. Plans are v
 | basePrice.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
 | billingPeriod | enum (monthly, quarterly, annual) |  |  |
 | includesBrandedApp | boolean |  | Branded native publishing carries per-tenant operational cost and is priced, not absorbed. |
-| includedAiTokens | integer |  | (nullable) |
+| includedAiTokens | integer |  | AI tokens the package includes per billing period. (nullable) |
+| packageKind | enum (standard, custom) |  | Three standard packages, and custom ones allowed (decided 29 September, Chinmay). (default standard) |
+| offeredToTenantId | string (uuid) |  | Private to one tenant (decided 29 September, Chinmay): a custom package offered only to this tenant; listPlans shows it to no other tenant and setSubscription refuses it for any other (422 plan-not-o… (nullable) |
 
 **Response**: `Plan`
 
@@ -186,7 +196,9 @@ A plan bundles licensed modules, entitlement limits and a cell tier. Plans are v
 | basePrice.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
 | billingPeriod | enum (monthly, quarterly, annual) |  |  |
 | includesBrandedApp | boolean |  | Branded native publishing carries per-tenant operational cost and is priced, not absorbed. |
-| includedAiTokens | integer |  | (nullable) |
+| includedAiTokens | integer |  | AI tokens the package includes per billing period. (nullable) |
+| packageKind | enum (standard, custom) |  | Three standard packages, and custom ones allowed (decided 29 September, Chinmay). (default standard) |
+| offeredToTenantId | string (uuid) |  | Private to one tenant (decided 29 September, Chinmay): a custom package offered only to this tenant; listPlans shows it to no other tenant and setSubscription refuses it for any other (422 plan-not-o… (nullable) |
 | id | string (uuid) | yes |  |
 | version | string | yes | Existing subscribers stay on the version they were sold. |
 | isActive | boolean | yes |  |
@@ -198,6 +210,7 @@ A plan bundles licensed modules, entitlement limits and a cell tier. Plans are v
 | Code | Shape | Meaning |
 |---|---|---|
 | 201 |  | Created |
+| 422 |  | offeredToTenantId on a standard package, or a tenant that does not exist |
 
 ### createPlanVersion
 
@@ -213,7 +226,7 @@ Existing subscribers remain on their version until migrated deliberately. A pric
 | Wave | 2 |
 | Offline | no |
 | Conflict policy | serverWins |
-| Reads | `cache:idempotency`, `subscription.plan`, `subscription.plan_limit`, `subscription.plan_module` |
+| Reads | `cache:idempotency`, `control.tenant`, `subscription.plan`, `subscription.plan_limit`, `subscription.plan_module` |
 | Writes | `cache:idempotency`, `subscription.plan`, `subscription.plan_limit` |
 | Called by | ADM-008, ADM-019, ADM-398 |
 
@@ -247,7 +260,9 @@ Existing subscribers remain on their version until migrated deliberately. A pric
 | basePrice.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
 | billingPeriod | enum (monthly, quarterly, annual) |  |  |
 | includesBrandedApp | boolean |  | Branded native publishing carries per-tenant operational cost and is priced, not absorbed. |
-| includedAiTokens | integer |  | (nullable) |
+| includedAiTokens | integer |  | AI tokens the package includes per billing period. (nullable) |
+| packageKind | enum (standard, custom) |  | Three standard packages, and custom ones allowed (decided 29 September, Chinmay). (default standard) |
+| offeredToTenantId | string (uuid) |  | Private to one tenant (decided 29 September, Chinmay): a custom package offered only to this tenant; listPlans shows it to no other tenant and setSubscription refuses it for any other (422 plan-not-o… (nullable) |
 
 **Response**: `Plan`
 
@@ -272,7 +287,9 @@ Existing subscribers remain on their version until migrated deliberately. A pric
 | basePrice.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
 | billingPeriod | enum (monthly, quarterly, annual) |  |  |
 | includesBrandedApp | boolean |  | Branded native publishing carries per-tenant operational cost and is priced, not absorbed. |
-| includedAiTokens | integer |  | (nullable) |
+| includedAiTokens | integer |  | AI tokens the package includes per billing period. (nullable) |
+| packageKind | enum (standard, custom) |  | Three standard packages, and custom ones allowed (decided 29 September, Chinmay). (default standard) |
+| offeredToTenantId | string (uuid) |  | Private to one tenant (decided 29 September, Chinmay): a custom package offered only to this tenant; listPlans shows it to no other tenant and setSubscription refuses it for any other (422 plan-not-o… (nullable) |
 | id | string (uuid) | yes |  |
 | version | string | yes | Existing subscribers stay on the version they were sold. |
 | isActive | boolean | yes |  |
@@ -284,6 +301,274 @@ Existing subscribers remain on their version until migrated deliberately. A pric
 | Code | Shape | Meaning |
 |---|---|---|
 | 201 |  | New version published |
+| 422 |  | offeredToTenantId on a standard package, or a tenant that does not exist |
+
+
+## Group: publicApi
+
+### createApiClient
+
+**`POST /api-clients`**: Create a client with scopes and an environment
+
+13.1.11 to 13.1.13, and **CF-135a: the credential model was owned by nobody.** 2.7.52, 7.1.25 and 7.1.30 each asserted their own, so a partner API key, a POS integration credential and a webstore credential were three unrelated things. **This is the one that exists.**
+**A client is bound to one environment.** A sandbox client cannot reach production, which is stated on the object rather than enforced by a naming convention — **a key that works in both is a key somebody will use in the wrong one.**
+
+|  |  |
+|---|---|
+| Permission | `DEVELOPER_MANAGE` |
+| Scope level | tenant |
+| Part of slice | setup, makes `control.api_client` non-empty |
+| Wave | 1 |
+| Offline | no |
+| Conflict policy | serverWins |
+| Reads | `cache:idempotency`, `control.api_client`, `control.api_licence`, `control.developer_account` |
+| Writes | `cache:idempotency`, `control.api_client` |
+| Called by | BO-067, BO-1073, BO-1173, BO-1177, DEV-003, PTR-019 |
+
+**Parameters**
+
+| Name | In | Required | Type | Notes |
+|---|---|---|---|---|
+| Idempotency-Key | header | yes | string | Client-generated ULID. |
+
+**Request body**: `ApiClient`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| id | string (uuid) | yes | (read-only) |
+| developerId | string (uuid) | yes |  |
+| name | string | yes |  |
+| clientId | string |  | (read-only) |
+| environment | enum (sandbox, production) | yes | Bound to one, stated on the object rather than by naming convention. |
+| scopes | array of string | yes | Resolved against the tenant's licence at token issue (13.3.24). |
+| allowedTenantIds | array of string (uuid) |  | 13.1.46. |
+| ipAllowList | array of string |  | 13.1.38. |
+| status | enum (active, suspended, revoked) | yes | (read-only) |
+| lastUsedAt | string (date-time) |  | A credential unused for a year is a credential nobody will notice being stolen. (read-only; nullable) |
+
+**Response**: `object`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| client | ApiClient |  | CF-135a. |
+| client.id | string (uuid) | yes | (read-only) |
+| client.developerId | string (uuid) | yes |  |
+| client.name | string | yes |  |
+| client.clientId | string |  | (read-only) |
+| client.environment | enum (sandbox, production) | yes | Bound to one, stated on the object rather than by naming convention. |
+| client.scopes | array of string | yes | Resolved against the tenant's licence at token issue (13.3.24). |
+| client.allowedTenantIds | array of string (uuid) |  | 13.1.46. |
+| client.ipAllowList | array of string |  | 13.1.38. |
+| client.status | enum (active, suspended, revoked) | yes | (read-only) |
+| client.lastUsedAt | string (date-time) |  | A credential unused for a year is a credential nobody will notice being stolen. (read-only; nullable) |
+| clientSecret | string (password) |  |  |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 201 |  | Created. |
+
+### registerDeveloper
+
+**`POST /developers`**: Register a developer or organisation
+
+13.1.6 to 13.1.9. **An organisation, not a person** — an integration outlives the engineer who built it, and a credential tied to somebody's personal account dies when they leave.
+A developer account is **not a tenant and not a partner.** A partner resells tickets; a developer writes software. Conflating them was the confusion CF-135 opened on.
+
+|  |  |
+|---|---|
+| Permission | `DEVELOPER_VIEW` |
+| Scope level | tenant |
+| Part of slice | setup, makes `control.developer_account` non-empty |
+| Wave | 1 |
+| Offline | no |
+| Conflict policy | serverWins |
+| Reads | `cache:idempotency`, `control.developer_account` |
+| Writes | `cache:idempotency`, `control.developer_account` |
+| Called by | DEV-002 |
+| State model | Developer account ([states/developer-account.yaml](../../../states/developer-account.yaml)): created as `pending` |
+
+**Parameters**
+
+| Name | In | Required | Type | Notes |
+|---|---|---|---|---|
+| Idempotency-Key | header | yes | string | Client-generated ULID. |
+
+**Request body**: `DeveloperAccount`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| id | string (uuid) | yes | (read-only) |
+| organisationName | string | yes |  |
+| contactEmail | string (email) | yes |  |
+| websiteUrl | string |  | (nullable) |
+| countryCode | string |  |  |
+| partnerId | string (uuid) |  | Where this developer is also a commercial partner. (nullable) |
+| status | enum (pending, verified, suspended, closed) | yes | (read-only) |
+| verifiedAt | string (date-time) |  | (read-only; nullable) |
+
+**Response**: `DeveloperAccount`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| id | string (uuid) | yes | (read-only) |
+| organisationName | string | yes |  |
+| contactEmail | string (email) | yes |  |
+| websiteUrl | string |  | (nullable) |
+| countryCode | string |  |  |
+| partnerId | string (uuid) |  | Where this developer is also a commercial partner. (nullable) |
+| status | enum (pending, verified, suspended, closed) | yes | (read-only) |
+| verifiedAt | string (date-time) |  | (read-only; nullable) |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 201 |  | Registered, pending verification |
+
+### rotateApiCredential
+
+**`POST /api-clients/{clientId}/credentials`**: Issue a new secret, with an overlap window
+
+13.1.15. **Rotation without an overlap is an outage.** Both secrets are valid until `oldSecretExpiresAt`, which gives the integrator time to deploy — and **a rotation with no overlap is one nobody performs until they are breached.**
+
+|  |  |
+|---|---|
+| Permission | `DEVELOPER_MANAGE` |
+| Scope level | tenant |
+| Part of slice | setup, makes `control.api_client` non-empty |
+| Wave | 1 |
+| Offline | no |
+| Conflict policy | serverWins |
+| Reads | `cache:idempotency`, `control.api_client` |
+| Writes | `cache:idempotency`, `control.api_client` |
+| Called by | DEV-003, PTR-019 |
+| State model | API client ([states/api-client.yaml](../../../states/api-client.yaml)): moves `suspended` -> `active` |
+
+**Parameters**
+
+| Name | In | Required | Type | Notes |
+|---|---|---|---|---|
+| clientId | path | yes | string (uuid) |  |
+| Idempotency-Key | header | yes | string | Client-generated ULID. |
+
+**Request body**
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| overlapHours | integer |  | (default 72) |
+
+**Response**: `object`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| clientSecret | string (password) |  |  |
+| oldSecretExpiresAt | string (date-time) |  |  |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 201 |  | Rotated |
+
+### setApiLicensing
+
+**`PUT /api-licensing`**: Which API modules a tenant has licensed, and on what terms
+
+13.3.24, decision D5. **Configuration, not code** — rates and terms change without a release, which is the whole point of the decision.
+**The example in the requirement is the shape**: a venue licensing the ticketing API and not the F&B one. A scope the tenant has not licensed produces no token, and the refusal happens at issue rather than at call time.
+**The rates themselves are CF-135c and remain open.** This is the surface they will be set through.
+
+|  |  |
+|---|---|
+| Permission | `DEVELOPER_ADMIN` |
+| Scope level | tenant |
+| Part of slice | setup, makes `control.api_licence` non-empty |
+| Wave | 1 |
+| Offline | no |
+| Config scope | tenant |
+| Conflict policy | serverWins |
+| Reads | `cache:idempotency`, `control.api_licence` |
+| Writes | `cache:idempotency`, `cache:resolution`, `control.api_licence` |
+| Called by | DEV-008 |
+
+**Parameters**
+
+| Name | In | Required | Type | Notes |
+|---|---|---|---|---|
+| Idempotency-Key | header | yes | string | Client-generated ULID. |
+
+**Request body**: `ApiLicence`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| id | string (uuid) |  | Added 20 August. (read-only) |
+| tenantId | string (uuid) | yes |  |
+| licensedModules | array of string | yes | The example in the requirement is the shape: a venue licensing the ticketing API and not the F&B one. |
+| callAllowancePerMonth | integer |  | (nullable) |
+| overageRatePerThousand | number |  | (nullable) |
+| revenueSharePercent | number |  | (nullable) |
+| effectiveFrom | string (date) |  |  |
+| effectiveTo | string (date) |  | (nullable) |
+
+**Response**: `ApiLicence`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| id | string (uuid) |  | Added 20 August. (read-only) |
+| tenantId | string (uuid) | yes |  |
+| licensedModules | array of string | yes | The example in the requirement is the shape: a venue licensing the ticketing API and not the F&B one. |
+| callAllowancePerMonth | integer |  | (nullable) |
+| overageRatePerThousand | number |  | (nullable) |
+| revenueSharePercent | number |  | (nullable) |
+| effectiveFrom | string (date) |  |  |
+| effectiveTo | string (date) |  | (nullable) |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 200 |  | Set |
+
+### setDeveloperMembers
+
+**`PUT /developers/{developerId}/members`**: Who at this organisation may do what
+
+13.1.10. **The organisation administers its own people**, because TICVAI maintaining every integrator's staff list is TICVAI doing their HR — the same reasoning as `PartnerUser`.
+
+|  |  |
+|---|---|
+| Permission | `DEVELOPER_MANAGE` |
+| Scope level | tenant |
+| Part of slice | setup, makes `control.developer_account` non-empty |
+| Wave | 1 |
+| Offline | no |
+| Conflict policy | serverWins |
+| Reads | `cache:idempotency`, `control.developer_account`, `identity.principal` |
+| Writes | `cache:idempotency`, `control.developer_account`, `identity.delegated_access` |
+| Called by | DEV-002 |
+
+**Parameters**
+
+| Name | In | Required | Type | Notes |
+|---|---|---|---|---|
+| developerId | path | yes | string (uuid) |  |
+| Idempotency-Key | header | yes | string | Client-generated ULID. |
+
+**Request body**
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| members | array of object | yes |  |
+| members[].email | string (email) |  |  |
+| members[].role | enum (owner, admin, developer, readOnly) |  |  |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 200 |  | Set |
 
 
 ## Group: subscription
@@ -306,7 +591,7 @@ Silently switching off a module a venue is trading on is not an acceptable conse
 | Wave | 2 |
 | Offline | no |
 | Conflict policy | serverWins |
-| Reads | `cache:idempotency`, `subscription.contract` |
+| Reads | `cache:idempotency`, `subscription.contract`, `subscription.plan` |
 | Writes | `cache:idempotency`, `subscription.contract` |
 | Called by | ADM-008, ADM-011, ADM-410, ADM-417, ADM-463, SGN-019, SGN-024 |
 | State model | Tenant subscription ([states/subscription.yaml](../../../states/subscription.yaml)): moves `trial` -> `active`, `pastDue` -> `active`, `cancelled` -> `active` |
@@ -748,6 +1033,47 @@ A tenant with unsettled ledger balances cannot be terminated — the money has t
 
 Every table this service owns that the slice reads or writes, with its columns as derived into `backend/tenant/*.sql`.
 
+### `control.api_client`
+
+| Column | Type | Required | Notes |
+|---|---|---|---|
+| id | uuid | yes |  |
+| developer_id | uuid | yes |  |
+| name | text | yes |  |
+| client_id | text | no |  |
+| environment | text | yes | Bound to one, stated on the object rather than by naming convention. |
+| scopes | text[] | yes | Resolved against the tenant's licence at token issue (13.3.24). |
+| allowed_tenant_ids | text[] | no | 13.1.46. |
+| ip_allow_list | text[] | no | 13.1.38. |
+| status | text | yes |  |
+| last_used_at | timestamptz | no | A credential unused for a year is a credential nobody will notice being stolen. |
+
+### `control.api_licence`
+
+| Column | Type | Required | Notes |
+|---|---|---|---|
+| id | uuid | no | Added 20 August. |
+| tenant_id | uuid | yes |  |
+| licensed_modules | text[] | yes | The example in the requirement is the shape: a venue licensing the ticketing API and not the F&B one. |
+| call_allowance_per_month | integer | no |  |
+| overage_rate_per_thousand | numeric | no |  |
+| revenue_share_percent | numeric | no |  |
+| effective_from | date | no |  |
+| effective_to | date | no |  |
+
+### `control.developer_account`
+
+| Column | Type | Required | Notes |
+|---|---|---|---|
+| id | uuid | yes |  |
+| organisation_name | text | yes |  |
+| contact_email | text | yes |  |
+| website_url | text | no |  |
+| country_code | text | no |  |
+| partner_id | uuid | no | Where this developer is also a commercial partner. |
+| status | text | yes |  |
+| verified_at | timestamptz | no |  |
+
 ### `control.licence_add_on`
 
 | Column | Type | Required | Notes |
@@ -827,7 +1153,9 @@ Every table this service owns that the slice reads or writes, with its columns a
 | base_price | numeric(18,4) | yes |  |
 | billing_period | text | no |  |
 | includes_branded_app | boolean | no | Branded native publishing carries per-tenant operational cost and is priced, not absorbed. |
-| included_ai_tokens | integer | no |  |
+| included_ai_tokens | integer | no | AI tokens the package includes per billing period. |
+| package_kind | text | no | Three standard packages, and custom ones allowed (decided 29 September, Chinmay). |
+| offered_to_tenant_id | uuid | no | Private to one tenant (decided 29 September, Chinmay): a custom package offered only to this tenant; listPlans shows it to no other tenant and setSubscription refuses it for any other (422 plan-not-o… |
 | id | uuid | yes |  |
 | version | text | yes | Existing subscribers stay on the version they were sold. |
 | is_active | boolean | yes |  |
@@ -855,11 +1183,11 @@ Every table this service owns that the slice reads or writes, with its columns a
 
 ## Not in the first release
 
-192 operations, added to this service in later releases without changing any of the above.
+191 operations, added to this service in later releases without changing any of the above.
 
 | Group | Operations |
 |---|---|
-| billing | `cancelInvoice`, `disputeInvoice`, `generateInvoice`, `listSubscriptionInvoices`, `recordInvoicePayment`, `resolveInvoiceDispute` |
+| billing | `cancelInvoice`, `disputeInvoice`, `generateInvoice`, `issueCreditNote`, `listCreditNotes`, `listSubscriptionInvoices`, `recordInvoicePayment`, `resolveInvoiceDispute` |
 | cell | `cancelDecommission`, `decommissionCell`, `executeTenantMigration`, `getCell`, `getCellCapacity`, `getCellHealth`, `launchCellCluster`, `listCellClusters`, `listCellJobs`, `listTenantCells`, `listTenantMigrations`, `planTenantMigration`, `provisionCell`, `rollbackTenantMigration`, `updateCellTier` |
 | drafted | `approveBookingLimitCommercial`, `approveMembershipProductValidation`, `approvePartnerStatuLifecycle`, `listCommercialAgreement`, `listCommercialAgreementHealth`, `listCommercialAllocationQuota`, `listCommissionCalculationSettlement`, `listCommissionMarginIncentive`, `listCreditLimitExposure`, `listDepositGuaranteeFinancial`, `listMember`, `listMemberExceptionOverride`, `listMemberLifecycleCase`, `listMembershipActivationCredential`, `listMembershipAnnualPass`, `listMembershipCommercialPricing`, `listMembershipFreezeSuspension`, `listMembershipRenewalRetention`, `listMembershipUpgradeDowngrade`, `listMembershipUsageVisit`, `listPartner`, `listPartner2`, `listPartnerAccessRole`, `listPartnerCancellationRefund`, `listPartnerContactUser`, `listPartnerDisputeCase`, `listPartnerDocumentationCompliance`, `listPartnerOnboardingApplication`, `listPartnerOrderBooking`, `listPartnerPerformanceScorecard`, `listPartnerProfileReadiness`, `listPartnerReconciliationException`, `listPartnerRelationship`, `listPartnerStatementAccount`, `listRenewalAuto`, `listReservationHoldRelease`, `listTerritoryMarketDistribution`, `listVisitAdmissionEntitlement`, `setAgreementContractTerm`, `setFamilyHouseholdDependent`, `setMemberMembershipAccount`, `setMembershipEligibilityQualification`, `setMembershipEntitlementAdmission`, `setMembershipProductTier`, `setPartnerBrandVenue`, `setPartnerProfileOrganization`, `setPartnerRateNet`, `setPaymentTermBilling`, `setRenewalAutoMembership`, `setValidityActivationExpiry` |
 | environment | `listEnvironments`, `registerEnvironment` |
@@ -871,8 +1199,8 @@ Every table this service owns that the slice reads or writes, with its columns a
 | plan | `getPlan`, `listPlans` |
 | platform | `getScalingPolicy`, `listArchivalJobs`, `listBackupRuns`, `listWafRules`, `setScalingPolicy`, `setWafPolicy` |
 | platform-ops | `listDeadLetters`, `replayDeadLetter`, `skipRolloutCell` |
-| publicApi | `certifyIntegration`, `createApiClient`, `createSandbox`, `createWebhookSubscription`, `deprecateApiVersion`, `getApiUsage`, `issueApiToken`, `listApiClients`, `listApiVersions`, `listIntegrationListings`, `listSandboxes`, `listWebhookDeliveries`, `listWebhookSubscriptions`, `registerDeveloper`, `replayEvents`, `resetSandbox`, `revokeApiCredential`, `rotateApiCredential`, `setApiClientStatus`, `setApiLicensing`, `setApiQuota`, `setDeveloperMembers`, `submitIntegrationListing`, `testWebhookSubscription` |
+| publicApi | `certifyIntegration`, `createSandbox`, `createWebhookSubscription`, `deprecateApiVersion`, `getApiUsage`, `issueApiToken`, `listApiClients`, `listApiVersions`, `listIntegrationListings`, `listSandboxes`, `listWebhookDeliveries`, `listWebhookEventTypes`, `listWebhookSubscriptions`, `replayEvents`, `resetSandbox`, `revokeApiCredential`, `setApiClientStatus`, `setApiQuota`, `submitIntegrationListing`, `testWebhookSubscription` |
 | release | `createRelease`, `getRelease`, `getReleaseReadiness`, `listReleases`, `promoteRelease`, `rejectRelease`, `withdrawRelease` |
 | rollout | `getRollout`, `listRollouts`, `pauseRollout`, `rollbackRollout`, `startRollout` |
-| subscription | `actOnPartnerApplicationReview`, `actOnPartnerCase`, `actOnPartnerCommissionLine`, `actOnPartnerReconciliationException`, `actOnPartnerSettlementBatch`, `addCapacityPack`, `cancelSubscription`, `createPartnerAgreement`, `createPartnerCase`, `createPartnerChangeRequest`, `createPartnerUser`, `decommissionBurstEnvironment`, `drainBurstEnvironment`, `exportPartnerInvoice`, `getBillingReconciliation`, `getCommissionStatement`, `getGoLiveReadiness`, `getLicenceEnforcement`, `getPlanTiers`, `getSubscription`, `getVsiModel`, `listBurstEnvironments`, `listChannelListings`, `listLicensingModels`, `listModuleCatalogue`, `listPartnerAgreements`, `listPartnerUsers`, `listVenueTypeTemplates`, `previewSubscriptionChange`, `reconcileBurstEnvironment`, `registerPartner`, `requestBurstEnvironment`, `runGoLiveValidation`, `scoreVsiAssessment`, `setChannelListing`, `setLicenceEnforcementPolicy`, `setLicensingModel`, `setMembershipCommercialConfig`, `setMembershipUsagePolicy`, `setModuleListing`, `setPartnerAllocations`, `setPartnerCapabilityGrants`, `setPartnerCommissionRules`, `setPartnerContact`, `setPartnerCreditProfile`, `setPartnerDistributionRights`, `setPartnerSecurity`, `setPlanTiers`, `setTrialConfiguration`, `setVsiModel`, `settleAiUsage`, `simulateCommercialPackage`, `submitOnboardingApplication`, `updatePartnerAgreement` |
+| subscription | `actOnPartnerApplicationReview`, `actOnPartnerCase`, `actOnPartnerCommissionLine`, `actOnPartnerReconciliationException`, `actOnPartnerSettlementBatch`, `addCapacityPack`, `cancelSubscription`, `createPartnerAgreement`, `createPartnerCase`, `createPartnerChangeRequest`, `createPartnerUser`, `decommissionBurstEnvironment`, `drainBurstEnvironment`, `exportPartnerInvoice`, `getBillingReconciliation`, `getCommissionStatement`, `getGoLiveReadiness`, `getLicenceEnforcement`, `getPlanRecommendations`, `getPlanTiers`, `getSubscription`, `getVsiModel`, `listBurstEnvironments`, `listChannelListings`, `listLicensingModels`, `listModuleCatalogue`, `listPartnerAgreements`, `listPartnerUsers`, `listVenueTypeTemplates`, `previewSubscriptionChange`, `reconcileBurstEnvironment`, `registerPartner`, `requestBurstEnvironment`, `runGoLiveValidation`, `scoreVsiAssessment`, `setChannelListing`, `setLicenceEnforcementPolicy`, `setLicensingModel`, `setMembershipCommercialConfig`, `setMembershipUsagePolicy`, `setModuleListing`, `setPartnerAllocations`, `setPartnerCapabilityGrants`, `setPartnerCommissionRules`, `setPartnerContact`, `setPartnerCreditProfile`, `setPartnerDistributionRights`, `setPartnerSecurity`, `setPlanTiers`, `setTrialConfiguration`, `setVsiModel`, `settleAiUsage`, `simulateCommercialPackage`, `submitOnboardingApplication`, `updatePartnerAgreement` |
 | tenant | `getTenant` |

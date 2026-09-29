@@ -1,0 +1,128 @@
+# Accreditation application — state model
+# Contract: accreditation.AccreditationApplication.status
+# Checked by tools/check-states.py. Added 29 September (build pass, group OWN, from group RA's handoff).
+
+entity: Accreditation application
+contract: accreditation
+enum: AccreditationApplication.status
+enumKind: inline
+enumSchema: AccreditationApplication
+enumProperty: status
+owner: accreditation
+description: '**One request to be accredited under a programme** (boards 1.3, 3.2, 3.6; 12.1.2, 12.1.33,
+  12.1.37). Made by the person or by an organisation on their behalf, reviewed once, and kept as the record
+  of who asked, what they supplied and what was decided.'
+initial:
+- draft
+- submitted
+- approved
+terminal:
+- rejected
+- withdrawn
+- expired
+transitions:
+- from: draft
+  to: submitted
+  operation: submitAccreditationApplication
+  trigger: operation
+  guard: The requirements that block submission are met (`422` listing the unmet `requirementCode`s) and the
+    programme's window is open (`409`). Stamps `submittedAt` and routes to `approvals` where the programme
+    configures a workflow
+- from: submitted
+  to: underReview
+  operation: decideAccreditationApplication
+  trigger: operation
+  guard: Decision `escalate`. The reviewer passed it up a level (through `approvals` where the programme
+    configures a workflow); the decision is recorded and published, the application is not yet decided
+  emits:
+  - accreditation.applicationDecided
+- from: submitted
+  to: approved
+  operation: decideAccreditationApplication
+  trigger: operation
+  guard: Decision `approve`. Creates the holder, or extends the renewed holder's `validTo` where
+    `renewsHolderId` is set
+  emits:
+  - accreditation.applicationDecided
+- from: underReview
+  to: approved
+  operation: decideAccreditationApplication
+  trigger: operation
+  guard: Approved after escalation
+  emits:
+  - accreditation.applicationDecided
+- from: submitted
+  to: rejected
+  operation: decideAccreditationApplication
+  trigger: operation
+  guard: '**Decision `reject`, with a reason and the missing requirements.** A refusal with no explanation
+    produces a phone call at best and a person turning up at a gate at worst'
+  emits:
+  - accreditation.applicationDecided
+- from: underReview
+  to: rejected
+  operation: decideAccreditationApplication
+  trigger: operation
+  guard: Rejected after escalation, with a reason
+  emits:
+  - accreditation.applicationDecided
+- from: submitted
+  to: informationRequested
+  operation: decideAccreditationApplication
+  trigger: operation
+  guard: Decision `returnForInformation`, with a reason and `missingRequirements`. A wait on the applicant,
+    not an outcome
+  emits:
+  - accreditation.applicationDecided
+- from: underReview
+  to: informationRequested
+  operation: decideAccreditationApplication
+  trigger: operation
+  guard: Returned for information after escalation
+  emits:
+  - accreditation.applicationDecided
+- from: informationRequested
+  to: submitted
+  operation: resubmitAccreditationApplication
+  trigger: operation
+  guard: The missing requirements are supplied (`submitAccreditationDocument`, `updateAccreditationApplication`)
+    and `changes` says what was done. The same application goes back to the reviewer with its history
+- from: draft
+  to: withdrawn
+  operation: withdrawAccreditationApplication
+  trigger: operation
+  guard: The applicant or the coordinator gave up before sending it
+- from: submitted
+  to: withdrawn
+  operation: withdrawAccreditationApplication
+  trigger: operation
+  guard: '**Not a rejection** — nobody refused it. Any open `approvals` request is cancelled with it'
+- from: underReview
+  to: withdrawn
+  operation: withdrawAccreditationApplication
+  trigger: operation
+  guard: Withdrawn after escalation; the open `approvals` request is cancelled with it
+- from: informationRequested
+  to: withdrawn
+  operation: withdrawAccreditationApplication
+  trigger: operation
+  guard: The applicant gave up rather than supply what was asked
+- from: approved
+  to: expired
+  trigger: job
+  guard: The accreditation it granted reached the end of its validity (the daily expiry run, the same one that
+    moves the holder to `expired`). The application stays as the record of the grant
+notes: '**Three initial states.** `createAccreditationApplication` saves a `draft` when asked to and otherwise
+  creates the application already `submitted`; `renewAccreditation`, where the programme''s
+  `AccreditationValidity.renewalRequiresReverification` is false, creates the renewal application already
+  `approved` and publishes `accreditation.applicationDecided` on creation, as the event''s `emittedWhen`
+  says, because there is no from-state for a transition to carry it.
+
+
+  `rejected` is terminal. `resubmitAccreditationApplication` from `rejected` creates **a new application**
+  linked by `resubmissionOfApplicationId`, created `submitted`, so the rejection stays in the record — the
+  same shape as `approvals`.
+
+
+  A decided application is not withdrawn (`409`): an approved accreditation is ended on the holder, with
+  `setAccreditationStatus` (states/accreditation-holder.yaml).'

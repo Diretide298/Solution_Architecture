@@ -35,20 +35,20 @@ White Labelling is a module, not an app. Its screens live in the CMS (P13) and t
 | [CMS-004](#cms-004-logo-assets) | Logo & Assets | White Label | 2 | 4 |
 | [CMS-005](#cms-005-theme-editor) | Theme Editor | White Label | 2 | 2 |
 | [CMS-006](#cms-006-component-preview) | Component Preview | White Label | 2 | 5 |
-| [CMS-007](#cms-007-page-builder) | Page Builder | White Label | 2 | 9 |
-| [CMS-008](#cms-008-content-blocks) | Content Blocks | White Label | 2 | 8 |
+| [CMS-007](#cms-007-page-builder) | Page Builder | White Label | 2 | 11 |
+| [CMS-008](#cms-008-content-blocks) | Content Blocks | White Label | 2 | 10 |
 | [CMS-009](#cms-009-navigation-menus) | Navigation & Menus | White Label | 2 | 6 |
-| [CMS-010](#cms-010-media-library) | Media Library | White Label | 2 | 12 |
+| [CMS-010](#cms-010-media-library) | Media Library | White Label | 2 | 13 |
 | [CMS-011](#cms-011-translations) | Translations | White Label | 2 | 1 |
 | [CMS-012](#cms-012-rtl-preview) | RTL Preview | White Label | 2 | 2 |
 | [CMS-013](#cms-013-seo-metadata) | SEO & Metadata | White Label | 2 | 1 |
 | [CMS-014](#cms-014-publishing-workflow) | Publishing Workflow | White Label | 2 | 3 |
 | [CMS-015](#cms-015-version-history) | Version History | White Label | 2 | 3 |
-| [CMS-016](#cms-016-site-settings) | Site Settings | White Label | 2 | 5 |
+| [CMS-016](#cms-016-site-settings) | Site Settings | White Label | 2 | 7 |
 | [CMS-017](#cms-017-domain-certificate) | Domain & Certificate | White Label | 2 | 4 |
 | [CMS-018](#cms-018-consent-legal) | Consent & Legal | White Label | 2 | 8 |
 | [CMS-019](#cms-019-user-access) | User Access | White Label | 2 | 2 |
-| [CMS-101](#cms-101-help-me-choose) | Help Me Choose | White Label | 2 | 9 |
+| [CMS-101](#cms-101-help-me-choose) | Help Me Choose | White Label | 2 | 11 |
 
 ## ADM-016 White-Label Branding Management
 
@@ -512,6 +512,7 @@ White Labelling is a module, not an app. Its screens live in the CMS (P13) and t
 | Parameter | From |
 |---|---|
 | pageId | navigation |
+| actionId | navigation |
 
 **Operations**
 
@@ -526,6 +527,8 @@ White Labelling is a module, not an app. Its screens live in the CMS (P13) and t
 | `getModuleEnablement` | [WhiteLabelService](../backend/WhiteLabelService.md#getmoduleenablement) | onLoad | Which modules are on, so a section whose module is off is disabled in the builder (decided 28 September, audit R163 (4)) | `TENANT_CONFIGURE` |
 | `setHeader` | [WhiteLabelService](../backend/WhiteLabelService.md#setheader) | onAction | Configure the header | `TENANT_CONFIGURE` |
 | `deleteContentPage` | [WhiteLabelService](../backend/WhiteLabelService.md#deletecontentpage) | onAction | Delete a content page | `TENANT_CONFIGURE` |
+| `proposeMarketingContent` | [AiService](../backend/AiService.md#proposemarketingcontent) | onAction | Draft subject lines, message bodies or content variants from a brief, for the author to edit and apply | `AI_USE` |
+| `decideProposedAction` | [AiService](../backend/AiService.md#decideproposedaction) | onAction | Record which AI draft or proposal was used, or why it was refused | `AI_USE` |
 
 **States**
 
@@ -564,6 +567,7 @@ White Labelling is a module, not an app. Its screens live in the CMS (P13) and t
 |---|---|
 | bannerId | navigation |
 | promoBlockId | navigation |
+| actionId | navigation |
 
 **Operations**
 
@@ -577,6 +581,8 @@ White Labelling is a module, not an app. Its screens live in the CMS (P13) and t
 | `listPromoBlocks` | [WhiteLabelService](../backend/WhiteLabelService.md#listpromoblocks) | onLoad | List promotional blocks | `TENANT_CONFIGURE` |
 | `listBanners` | [WhiteLabelService](../backend/WhiteLabelService.md#listbanners) | onLoad | List banners | `TENANT_CONFIGURE` |
 | `deleteBanner` | [WhiteLabelService](../backend/WhiteLabelService.md#deletebanner) | onAction | Delete a banner | `TENANT_CONFIGURE` |
+| `proposeMarketingContent` | [AiService](../backend/AiService.md#proposemarketingcontent) | onAction | Draft subject lines, message bodies or content variants from a brief, for the author to edit and apply | `AI_USE` |
+| `decideProposedAction` | [AiService](../backend/AiService.md#decideproposedaction) | onAction | Record which AI draft or proposal was used, or why it was refused | `AI_USE` |
 
 **States**
 
@@ -681,6 +687,7 @@ White Labelling is a module, not an app. Its screens live in the CMS (P13) and t
 | `listCollections` | [VenueOpsService](../backend/VenueOpsService.md#listcollections) | onLoad | List collections | `ASSET_LIBRARY_VIEW` |
 | `replaceMediaAsset` | [VenueOpsService](../backend/VenueOpsService.md#replacemediaasset) | onAction | Replace the file behind an asset | `ASSET_LIBRARY_MANAGE` |
 | `updateMediaAsset` | [VenueOpsService](../backend/VenueOpsService.md#updatemediaasset) | onAction | Amend metadata, tags or rights | `ASSET_LIBRARY_MANAGE` |
+| `semanticSearch` | [AiService](../backend/AiService.md#semanticsearch) | onAction | Natural-language search of the media library (kind media) | `AI_USE` |
 
 **States**
 
@@ -917,6 +924,8 @@ White Labelling is a module, not an app. Its screens live in the CMS (P13) and t
 | `getTenantConfig` | [WhiteLabelService](../backend/WhiteLabelService.md#gettenantconfig) | onLoad | Full working configuration | `TENANT_CONFIGURE` |
 | `listConsentQuestions` | [MarketingService](../backend/MarketingService.md#listconsentquestions) | onLoad | The venue's consent questions, to attach to the booking flow (rev 3 REV3-26) | `GUEST_VIEW` |
 | `listOrgUnits` | [TenancyService](../backend/TenancyService.md#listorgunits) | onLoad | The tenant's venues, for the per-venue override picker (rev 3 CFG-11) | `SCOPE_VIEW` |
+| `listAnalyticsProviders` | [WhiteLabelService](../backend/WhiteLabelService.md#listanalyticsproviders) | onLoad | Connected analytics platforms | `TENANT_CONFIGURE` |
+| `setAnalyticsProvider` | [WhiteLabelService](../backend/WhiteLabelService.md#setanalyticsprovider) | onAction | Connect or change an analytics platform | `TENANT_CONFIGURE` |
 
 **States**
 
@@ -1093,6 +1102,7 @@ White Labelling is a module, not an app. Its screens live in the CMS (P13) and t
 |---|---|
 | venueId | session |
 | guidedChoiceId | navigation |
+| suggestionId | navigation |
 
 **Operations**
 
@@ -1107,6 +1117,8 @@ White Labelling is a module, not an app. Its screens live in the CMS (P13) and t
 | `listProducts` | [CatalogueService](../backend/CatalogueService.md#listproducts) | onAction | Products an answer can open | `PRODUCT_VIEW` |
 | `listProductCategories` | [CatalogueService](../backend/CatalogueService.md#listproductcategories) | onAction | Categories an answer can open | `PRODUCT_VIEW` |
 | `listEvents` | [CatalogueService](../backend/CatalogueService.md#listevents) | onAction | Events an answer can open | `PRODUCT_VIEW` |
+| `suggestGuidedChoice` | [AiService](../backend/AiService.md#suggestguidedchoice) | onAction | Suggest a Help me choose set-up from the venue's catalogue | `AI_USE` |
+| `getGuidedChoiceSuggestion` | [AiService](../backend/AiService.md#getguidedchoicesuggestion) | onAction | The reasons behind a Help me choose suggestion | `AI_USE` |
 
 **States**
 

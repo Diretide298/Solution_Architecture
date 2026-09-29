@@ -1,5 +1,5 @@
 id: LLD-workforce
-title: workforce — 45 operations
+title: workforce — 49 operations
 generatedBy: tools/derive-diagrams.py
 index: diagrams/hld/03-contracts.yaml
 tier: satellite
@@ -142,6 +142,7 @@ operations:
   - staff
   offline: false
   reads:
+  - workforce.forecast_requirement
   - workforce.open_shift
   - workforce.position_requirement
   - workforce.rota_assignment
@@ -307,6 +308,32 @@ operations:
   reads:
   - workforce.shift_template
   writes: []
+- operation: listStaffConversations
+  verb: GET
+  path: /staff-conversations
+  scope: venue
+  permission: WORKFORCE_VIEW
+  audience:
+  - staff
+  offline: true
+  reads:
+  - workforce.employee
+  - workforce.staff_conversation
+  - workforce.staff_conversation_participant
+  - workforce.staff_message
+  writes: []
+- operation: listStaffMessages
+  verb: GET
+  path: /staff-conversations/{conversationId}/messages
+  scope: venue
+  permission: WORKFORCE_VIEW
+  audience:
+  - staff
+  offline: true
+  reads:
+  - workforce.staff_conversation_participant
+  - workforce.staff_message
+  writes: []
 - operation: listSyncConflicts
   verb: GET
   path: /sync-conflicts
@@ -351,6 +378,21 @@ operations:
   reads:
   - workforce.work_assignment
   writes: []
+- operation: markStaffConversationRead
+  verb: POST
+  path: /staff-conversations/{conversationId}/read
+  scope: venue
+  permission: WORKFORCE_VIEW
+  audience:
+  - staff
+  offline: true
+  reads:
+  - cache:idempotency
+  - workforce.staff_conversation_participant
+  - workforce.staff_message
+  writes:
+  - cache:idempotency
+  - workforce.staff_conversation_participant
 - operation: publishAnnouncement
   verb: POST
   path: /announcements
@@ -362,6 +404,7 @@ operations:
   reads:
   - cache:idempotency
   - identity.role
+  - platform.device
   - platform.scope
   - workforce.announcement
   writes:
@@ -425,6 +468,25 @@ operations:
   reads:
   - workforce.sync_conflict
   writes: []
+- operation: sendStaffMessage
+  verb: POST
+  path: /staff-messages
+  scope: venue
+  permission: WORKFORCE_VIEW
+  audience:
+  - staff
+  offline: true
+  reads:
+  - cache:idempotency
+  - workforce.employment
+  - workforce.staff_conversation
+  - workforce.staff_conversation_participant
+  - workforce.staff_message
+  writes:
+  - cache:idempotency
+  - workforce.staff_conversation
+  - workforce.staff_conversation_participant
+  - workforce.staff_message
 - operation: setFieldOwnership
   verb: PUT
   path: /integration-sources/{sourceId}/field-ownership

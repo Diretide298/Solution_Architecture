@@ -1,5 +1,5 @@
 id: LLD-white-label
-title: white-label — 60 operations
+title: white-label — 64 operations
 generatedBy: tools/derive-diagrams.py
 index: diagrams/hld/03-contracts.yaml
 tier: satellite
@@ -288,6 +288,17 @@ operations:
   - whitelabel.guided_choice_answer
   - whitelabel.guided_choice_question
   writes: []
+- operation: getStorefrontInsights
+  verb: GET
+  path: /tenant-config/analytics-insights
+  scope: venue
+  permission: MARKETING_VIEW
+  audience:
+  - staff
+  offline: false
+  reads:
+  - whitelabel.analytics_provider
+  writes: []
 - operation: getTenantAppStatus
   verb: GET
   path: /tenant-config/status
@@ -335,6 +346,18 @@ operations:
   - whitelabel.tenant_config
   writes:
   - cache:resolution
+- operation: listAnalyticsProviders
+  verb: GET
+  path: /tenant-config/analytics-providers
+  scope: venue
+  permission: TENANT_CONFIGURE
+  audience:
+  - staff
+  - guest
+  offline: false
+  reads:
+  - whitelabel.analytics_provider
+  writes: []
 - operation: listBanners
   verb: GET
   path: /tenant-config/banners
@@ -489,6 +512,20 @@ operations:
   - cache:resolution
   - platform.outbox
   - whitelabel.config_version
+- operation: recordStorefrontSessionEvents
+  verb: POST
+  path: /storefront/session-events
+  scope: tenant
+  permission: null
+  audience:
+  - guest
+  - anonymous
+  offline: false
+  reads:
+  - cache:idempotency
+  writes:
+  - cache:idempotency
+  - platform.outbox
 - operation: relinquishCustomDomain
   verb: DELETE
   path: /tenant-domains/{domainId}
@@ -527,6 +564,20 @@ operations:
   - whitelabel.module_enablement
   - whitelabel.navigation_item
   - whitelabel.tenant_config
+- operation: setAnalyticsProvider
+  verb: PUT
+  path: /tenant-config/analytics-providers
+  scope: venue
+  permission: TENANT_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - cache:idempotency
+  - whitelabel.analytics_provider
+  writes:
+  - cache:idempotency
+  - whitelabel.analytics_provider
 - operation: setAppIcons
   verb: PUT
   path: /tenant-config/app-icons

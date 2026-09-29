@@ -37,6 +37,12 @@ CREATE INDEX IF NOT EXISTS content_block_approved_by_principal_id_idx ON control
 CREATE INDEX IF NOT EXISTS content_block_audience_segment_id_idx ON control.content_block (audience_segment_id);
 -- convention, not declared: control.content_block.page_id -> whitelabel.content_page
 CREATE INDEX IF NOT EXISTS content_block_page_id_idx ON control.content_block (page_id);
+-- convention, not declared: control.credit_note.invoice_id -> control.invoice
+CREATE INDEX IF NOT EXISTS credit_note_invoice_id_idx ON control.credit_note (invoice_id);
+-- convention, not declared: control.credit_note.issued_by_principal_id -> identity.principal
+CREATE INDEX IF NOT EXISTS credit_note_issued_by_principal_id_idx ON control.credit_note (issued_by_principal_id);
+-- convention, not declared: control.credit_note.tenant_id -> control.tenant
+CREATE INDEX IF NOT EXISTS credit_note_tenant_id_idx ON control.credit_note (tenant_id);
 -- convention, not declared: control.developer_account.partner_id -> control.partner
 CREATE INDEX IF NOT EXISTS developer_account_partner_id_idx ON control.developer_account (partner_id);
 -- convention, not declared: control.integration_listing.developer_id -> control.developer_account
@@ -299,6 +305,8 @@ CREATE INDEX IF NOT EXISTS usage_record_venue_id_idx ON control.usage_record (ve
 CREATE INDEX IF NOT EXISTS api_licence_tenant_id_idx ON control.api_licence (tenant_id);
 -- declared: control.cell_job.cell_id -> control.cell
 CREATE INDEX IF NOT EXISTS cell_job_cell_id_idx ON control.cell_job (cell_id);
+-- declared: control.credit_note_line.credit_note_id -> control.credit_note
+CREATE INDEX IF NOT EXISTS credit_note_line_credit_note_id_idx ON control.credit_note_line (credit_note_id);
 -- declared: control.environment.cell_id -> control.cell
 CREATE INDEX IF NOT EXISTS environment_cell_id_idx ON control.environment (cell_id);
 -- declared: control.invoice_line.invoice_id -> control.invoice

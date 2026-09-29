@@ -1,0 +1,95 @@
+# AI forecast version — state model
+# Contract: ai.AiForecastVersion.status
+# Checked by tools/check-states.py. Added 29 September (build pass, group OWN, from the AI group's handoff).
+
+entity: AI forecast version
+contract: ai
+enum: AiForecastVersion.status
+enumKind: inline
+enumSchema: AiForecastVersion
+enumProperty: status
+owner: ai
+description: '**An immutable forecast version** (AIP-032): producer, model version, data cut-off, horizon and
+  status. Created `running` by the nightly run or by `runForecast` (AI design 2.2 C). Nothing is overwritten;
+  yesterday''s actuals are scored against every earlier version.'
+initial:
+- running
+terminal:
+- superseded
+- rejected
+- failed
+transitions:
+- from: running
+  to: draft
+  trigger: job
+  guard: The run finished (snapshot, produce, reconcile, score) and its `qualityChecks` are recorded
+- from: running
+  to: failed
+  trigger: job
+  guard: The run could not produce a version (the producer errored or its input could not be read). Kept as
+    the record of the attempt
+- from: draft
+  to: published
+  trigger: job
+  guard: '**Auto-publish**: the definition''s autonomy allows it (L4, design 3.8) and every quality gate passed
+    (completeness, no blocking signal missing, no accuracy regression; design 2.2 C step 5).
+    `publishedByPrincipalId` stays null'
+  emits:
+  - ai.forecastPublished
+- from: draft
+  to: awaitingApproval
+  trigger: job
+  guard: The definition does not auto-publish (L3, "forecast publication where not auto"), or an automatic
+    publication failed a gate. **The version waits for an `AI_APPROVE` holder** (design 2.2 C step 5)
+- from: draft
+  to: published
+  operation: publishForecastVersion
+  trigger: operation
+  guard: An `AI_APPROVE` holder publishes the latest draft of its definition (`409 version-not-current`); the
+    quality gates must pass (`409 quality-gate-failed`). Operational requirements are derived from it
+  emits:
+  - ai.forecastPublished
+- from: awaitingApproval
+  to: published
+  operation: publishForecastVersion
+  trigger: operation
+  guard: '**Publication where it is not automatic** (autonomy L3, design 3.8; ADM-508) by an `AI_APPROVE`
+    holder, with the same gates. Operational requirements are derived from it'
+  emits:
+  - ai.forecastPublished
+- from: awaitingApproval
+  to: rejected
+  trigger: operation
+  guard: The `AI_APPROVE` holder declines to publish it. **No operation in `ai.yaml` records this yet** (see
+    openQuestions); until one does, a version left unpublished is superseded by the next run
+- from: draft
+  to: superseded
+  trigger: cascade
+  guard: A later version of the same definition was published before this draft was; only the latest draft is
+    publishable (`version-not-current`)
+- from: awaitingApproval
+  to: superseded
+  trigger: cascade
+  guard: A later version of the same definition was published while this one waited
+- from: published
+  to: superseded
+  operation: publishForecastVersion
+  trigger: operation
+  guard: '**The next version of the definition was published by a person.** The previous published version is
+    superseded in the same transaction; it keeps its numbers, so accuracy is scored against it'
+- from: published
+  to: superseded
+  trigger: job
+  guard: The next version of the definition was auto-published by the run, in the same transaction
+notes: '**`published` is not terminal**: every published version is superseded by the next one of its
+  definition, in the transaction that publishes that one. `superseded`, `rejected` and `failed` versions are
+  never deleted or edited (AIP-032); a forecast is changed by producing a new version.
+
+
+  `ai.forecastPublished` is published on every move into `published`, by `publishForecastVersion` or by the run
+  where the definition auto-publishes, as the event''s `emittedWhen` says. The event carries ids only; the
+  numbers are read with `getForecast`.'
+openQuestions:
+- '`rejected` is in the enum and no `ai.yaml` operation writes it. A decline beside `publishForecastVersion`
+  (for example a `decision` of `publish` or `reject` on the same call) would give `awaitingApproval -> rejected`
+  an operation; handed back to the AI group.'

@@ -1,0 +1,89 @@
+{
+ "date": "2026-09-29",
+ "source": "Chinmay, in session, on the AI system design draft",
+ "rule": "AI design questions are ours to answer; none was make-or-break, so none goes to the client",
+ "decisions": [
+  {
+   "id": "AI-D01",
+   "q": "Rules-first, evidence-gated ML",
+   "a": "Yes; our own models per tenant"
+  },
+  {
+   "id": "AI-D02",
+   "q": "Provider and billing",
+   "a": "Managed Azure OpenAI re-billed per token; billing per selected module; 3 packages plus custom; module prices configured by TICVAI on the platform"
+  },
+  {
+   "id": "AI-D03",
+   "q": "Region",
+   "a": "UAE North for now; other regions configured tenant by tenant"
+  },
+  {
+   "id": "AI-D04",
+   "q": "Autonomy scale",
+   "a": "GOV 0-4; access-security capped at advisory"
+  },
+  {
+   "id": "AI-D05",
+   "q": "Retention",
+   "a": "All AI data retention is a TENANT configuration with a period per data class (prompts/responses, conversations, decision records, approvals). 90 days default for prompts; audit period is the default for decision records, not fixed. Law floors stay make-or-break. AI keeps metadata so it fetches from an index."
+  },
+  {
+   "id": "AI-D06",
+   "q": "Fraud default",
+   "a": "Fail-open with holds"
+  },
+  {
+   "id": "AI-D07",
+   "q": "Cross-channel decline",
+   "a": "Ignored is not a decline"
+  },
+  {
+   "id": "AI-D08",
+   "q": "OTA/reseller recommendations",
+   "a": "None in first release"
+  },
+  {
+   "id": "AI-D09",
+   "q": "Guest-visible reasons",
+   "a": "Yes, from templates"
+  },
+  {
+   "id": "AI-D10",
+   "q": "Weather API",
+   "a": "Yes, with its cost"
+  },
+  {
+   "id": "AI-D11",
+   "q": "Staffing",
+   "a": "Start with minuted team; recommend second engineer if pace does not meet Block B"
+  },
+  {
+   "id": "AI-D12",
+   "q": "5.1-5.6, 5.8 trade-offs",
+   "a": "Accepted (5.8 pgvector: for now)"
+  },
+  {
+   "id": "AI-D13",
+   "q": "5.7 vector store for staff questions",
+   "a": "Knowledge from the vector store, live numbers from the semantic layer; numbers only from query results"
+  },
+  {
+   "id": "AI-D14",
+   "q": "5.9 BYOK",
+   "a": "Available; TICVAI decides per tenant whether to enable it"
+  },
+  {
+   "id": "AI-D15",
+   "q": "5.10 LLM-based reports",
+   "a": "Model never works on data directly: scrub and bind figures, or the model writes code the platform runs"
+  },
+  {
+   "id": "AI-D16",
+   "q": "3.12 model promotion",
+   "a": "Raise to admin at threshold; never auto-switch"
+  }
+ ],
+ "recorded_in": "docs/architecture/ai-system-design.md section 8",
+ "note": "The AI system design questions and trade-offs, answered by Chinmay on 29 September. Read by tools/build-decisions-workbook.py."
+}

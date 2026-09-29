@@ -2362,6 +2362,11 @@ screens:
     trigger: onAction
     invalidates:
     - listQueueEntries
+  - operationId: requestSuggestion
+    contract: ai
+    purpose: 'Queue-balancing suggestion (kind queueBalancing): return-slot allocation and redirection'
+    trigger: onAction
+    provenance: build, 29 September 2026
   entryState:
     params:
     - name: campaignId
@@ -8373,10 +8378,39 @@ screens:
     trigger: onAction
     invalidates:
     - listOrders
+  - operationId: listTaxInvoices
+    contract: finance
+    purpose: List tax invoices
+    trigger: onLoad
+    provenance: build, 29 September 2026
+  - operationId: issueTaxInvoice
+    contract: finance
+    purpose: Issue a tax invoice
+    trigger: onAction
+    provenance: build, 29 September 2026
+  - operationId: getTaxInvoice
+    contract: finance
+    purpose: Show a tax invoice
+    trigger: onLoad
+    provenance: build, 29 September 2026
+  - operationId: issueCreditMemo
+    contract: finance
+    purpose: Issue a credit memo
+    trigger: onAction
+    provenance: build, 29 September 2026
+  - operationId: getTaxDocumentRendition
+    contract: finance
+    purpose: Download the invoice / credit memo PDF
+    trigger: onLoad
+    provenance: build, 29 September 2026
   entryState:
     params:
     - name: orderId
       from: deepLink
+    - name: documentId
+      from: navigation
+    - name: invoiceId
+      from: navigation
     coldEntry: '**A guest opening an order link weeks later.** Shows the order if it still resolves; if
       it was refunded or the performance passed, says which and offers the order list rather than an error.'
     preloaded:
@@ -8858,12 +8892,31 @@ screens:
     contract: orders
     purpose: The policy this refund is judged against
     trigger: onLoad
+  - operationId: issueCreditMemo
+    contract: finance
+    purpose: Issue a credit memo
+    trigger: onAction
+    provenance: build, 29 September 2026
+  - operationId: listCreditMemos
+    contract: finance
+    purpose: List credit memos
+    trigger: onLoad
+    provenance: build, 29 September 2026
+  - operationId: getTaxDocumentRendition
+    contract: finance
+    purpose: Download the invoice / credit memo PDF
+    trigger: onLoad
+    provenance: build, 29 September 2026
   entryState:
     params:
     - name: orderId
       from: deepLink
     - name: venueId
       from: session
+    - name: documentId
+      from: navigation
+    - name: invoiceId
+      from: navigation
     coldEntry: '**A guest opening an order link weeks later.** Shows the order if it still resolves; if
       it was refunded or the performance passed, says which and offers the order list rather than an error.
       **The venue comes from the session** — a back-office user works one venue at a time and the refund
@@ -9256,10 +9309,37 @@ screens:
     contract: finance
     purpose: List settlement batches
     trigger: onLoad
+  - operationId: recordChargeback
+    contract: orders
+    purpose: Record a chargeback read from an acquirer portal
+    trigger: onAction
+    provenance: build, 29 September 2026
+  - operationId: assignChargeback
+    contract: orders
+    purpose: Assign a chargeback to an investigator
+    trigger: onAction
+    provenance: build, 29 September 2026
+  - operationId: recordChargebackOutcome
+    contract: orders
+    purpose: Record the bank decision on a chargeback
+    trigger: onAction
+    provenance: build, 29 September 2026
+  - operationId: getChargebackAnalytics
+    contract: orders
+    purpose: Chargeback analytics panel
+    trigger: onLoad
+    provenance: build, 29 September 2026
+  - operationId: getChargebackAnalytics
+    contract: orders
+    purpose: Chargeback rate by reason, product and customer
+    trigger: onLoad
+    provenance: build, 29 September 2026
   entryState:
     params:
     - name: settlementId
       from: deepLink
+    - name: chargebackId
+      from: navigation
     coldEntry: '**A staff link opened cold resolves the thing or says plainly that it is gone.** No silent
       redirect — a supervisor following a link from an alert needs to know whether the record moved, closed
       or never existed, because those are three different next actions. **The scope is resolved from the
@@ -15068,6 +15148,11 @@ screens:
     - getGuestMenu
     - getTableMap
     - listFnbOrders
+  - operationId: setDeliveryLocationOutletMapping
+    contract: fnb
+    purpose: Assign serving outlets to delivery locations
+    trigger: onAction
+    provenance: build, 29 September 2026
   entryState:
     params:
     - name: outletId
@@ -15075,6 +15160,8 @@ screens:
     - name: actionId
       from: deepLink
       optional: true
+    - name: venueId
+      from: session
     coldEntry: '**A staff link opened cold resolves the thing or says plainly that it is gone.** No silent
       redirect — a supervisor following a link from an alert needs to know whether the record moved, closed
       or never existed, because those are three different next actions. **The scope is resolved from the
@@ -17735,6 +17822,12 @@ screens:
     invalidates:
     - listJobTitles
     - listWorkAssignments
+  - operationId: suggestRoleAssignment
+    contract: identity
+    purpose: Roles to grant a new or moved member of staff (by principal, or by job title and posting
+      before the principal exists)
+    trigger: onAction
+    provenance: build, 29 September 2026
   entryState:
     params:
     - name: principalId
@@ -17898,6 +17991,26 @@ screens:
     provenance: decided 29 September, VM close-out (venue management and configuration)
     invalidates:
     - listRoles
+  - operationId: listPermissionFindings
+    contract: identity
+    purpose: Unused and missing permissions for the role being assigned
+    trigger: onAction
+    provenance: build, 29 September 2026
+  - operationId: suggestRoleAssignment
+    contract: identity
+    purpose: Suggested roles for the selected person from peers with the same job title and posting
+    trigger: onAction
+    provenance: build, 29 September 2026
+  - operationId: listAccessReviewCampaigns
+    contract: identity
+    purpose: Open access reviews
+    trigger: onLoad
+    provenance: build, 29 September 2026
+  - operationId: listAccessReviewItems
+    contract: identity
+    purpose: My pending review items (assignedToMe)
+    trigger: onAction
+    provenance: build, 29 September 2026
   entryState:
     preloaded:
     - Role.id
@@ -17905,6 +18018,9 @@ screens:
     - Role.name
     - Role.description
     - Role.permissions
+    params:
+    - name: campaignId
+      from: navigation
   wireframe:
     status: notStarted
     provenance: generated
@@ -21038,10 +21154,27 @@ screens:
     contract: tenancy
     purpose: The venue's settings, with the tenant default each empty one inherits
     trigger: onLoad
+  - operationId: setDeliveryLocationOutletMapping
+    contract: fnb
+    purpose: Assign serving outlets to delivery locations
+    trigger: onAction
+    provenance: build, 29 September 2026
+  - operationId: createDeliveryLocation
+    contract: fnb
+    purpose: Add a delivery location
+    trigger: onAction
+    provenance: build, 29 September 2026
+  - operationId: updateDeliveryLocation
+    contract: fnb
+    purpose: Edit a delivery location
+    trigger: onAction
+    provenance: build, 29 September 2026
   entryState:
     params:
     - name: venueId
       from: session
+    - name: locationId
+      from: navigation
     coldEntry: Resolves from the session; a cold arrival is the ordinary case.
     preloaded:
     - DiningOutlet.outletId
@@ -25174,6 +25307,16 @@ screens:
     trigger: onAction
     invalidates:
     - listInventoryItems
+  - operationId: getInventoryKitDefinition
+    contract: inventory
+    purpose: Show kit components
+    trigger: onLoad
+    provenance: build, 29 September 2026
+  - operationId: setInventoryKitDefinition
+    contract: inventory
+    purpose: Edit kit components
+    trigger: onAction
+    provenance: build, 29 September 2026
   entryState:
     params:
     - name: itemId
@@ -25675,10 +25818,27 @@ screens:
     contract: reporting
     purpose: getSupplierPerformance
     trigger: onAction
+  - operationId: listSupplierContracts
+    contract: inventory
+    purpose: Supplier contracts list
+    trigger: onLoad
+    provenance: build, 29 September 2026
+  - operationId: createSupplierContract
+    contract: inventory
+    purpose: Add a supplier contract
+    trigger: onAction
+    provenance: build, 29 September 2026
+  - operationId: updateSupplierContract
+    contract: inventory
+    purpose: Edit, activate or end a supplier contract
+    trigger: onAction
+    provenance: build, 29 September 2026
   entryState:
     params:
     - name: supplierId
       from: deepLink
+    - name: contractId
+      from: navigation
     coldEntry: '**A staff link opened cold resolves the thing or says plainly that it is gone.** No silent
       redirect — a supervisor following a link from an alert needs to know whether the record moved, closed
       or never existed, because those are three different next actions. **The scope is resolved from the
@@ -25920,10 +26080,18 @@ screens:
     trigger: onAction
     invalidates:
     - listApprovalRequests
+  - operationId: getApprovalRequestScore
+    contract: ai
+    purpose: Risk band, priority and suggested escalation for the request, as context only (no approve/reject
+      suggestion)
+    trigger: onLoad
+    provenance: build, 29 September 2026
   entryState:
     params:
     - name: requestId
       from: deepLink
+    - name: approvalRequestId
+      from: navigation
     coldEntry: '**A staff link opened cold resolves the thing or says plainly that it is gone.** No silent
       redirect — a supervisor following a link from an alert needs to know whether the record moved, closed
       or never existed, because those are three different next actions. **The scope is resolved from the
@@ -25996,9 +26164,10 @@ screens:
     - to: BO-084
       trigger: Approval Inbox
       carries:
+      - approvalRequestId
       - requestId
-      provenance: derived — BO-084 declares entryState.params requestId and BO-085 holds requestId, so
-        an edge into it carries them
+      provenance: derived — BO-084 declares entryState.params approvalRequestId, requestId and BO-085
+        holds approvalRequestId, requestId, so an edge into it carries them
     - to: BO-087
       trigger: Approval Delegations
       provenance: derived — BO-087 declares entryState.params delegationId and BO-085 holds none of them,
@@ -26249,8 +26418,8 @@ screens:
     transitions:
     - to: BO-084
       trigger: Approval Inbox
-      provenance: derived — BO-084 declares entryState.params requestId and BO-086 holds none of them,
-        so the edge carries nothing and BO-084 opens cold
+      provenance: derived — BO-084 declares entryState.params approvalRequestId, requestId and BO-086
+        holds none of them, so the edge carries nothing and BO-084 opens cold
     - to: BO-085
       trigger: Approval Request
       provenance: derived — BO-085 declares entryState.params requestId and BO-086 holds none of them,
@@ -26392,8 +26561,8 @@ screens:
     transitions:
     - to: BO-084
       trigger: Approval Inbox
-      provenance: derived — BO-084 declares entryState.params requestId and BO-087 holds none of them,
-        so the edge carries nothing and BO-084 opens cold
+      provenance: derived — BO-084 declares entryState.params approvalRequestId, requestId and BO-087
+        holds none of them, so the edge carries nothing and BO-084 opens cold
     - to: BO-085
       trigger: Approval Request
       provenance: derived — BO-085 declares entryState.params requestId and BO-087 holds none of them,
@@ -26557,8 +26726,8 @@ screens:
     transitions:
     - to: BO-084
       trigger: Approval Inbox
-      provenance: derived — BO-084 declares entryState.params requestId and BO-088 holds none of them,
-        so the edge carries nothing and BO-084 opens cold
+      provenance: derived — BO-084 declares entryState.params approvalRequestId, requestId and BO-088
+        holds none of them, so the edge carries nothing and BO-084 opens cold
     - to: BO-085
       trigger: Approval Request
       provenance: derived — BO-085 declares entryState.params requestId and BO-088 holds none of them,
@@ -27091,6 +27260,11 @@ screens:
     contract: finance
     purpose: Trial balance for a period
     trigger: onLoad
+  - operationId: getVatReturn
+    contract: finance
+    purpose: VAT return (FTA boxes) for a period
+    trigger: onLoad
+    provenance: build, 29 September 2026
   entryState:
     params:
     - name: periodId
@@ -27255,6 +27429,26 @@ screens:
     contract: ai
     purpose: Records an index could not embed, and at which stage
     trigger: onLoad
+  - operationId: listAiCapabilities
+    contract: ai
+    purpose: The capability registry
+    trigger: onLoad
+    provenance: build, 29 September 2026
+  - operationId: getEffectiveAiPolicy
+    contract: ai
+    purpose: The policy in force for a capability at a scope
+    trigger: onLoad
+    provenance: build, 29 September 2026
+  - operationId: configureAssistantProfile
+    contract: ai
+    purpose: Define an assistant profile
+    trigger: onAction
+    provenance: build, 29 September 2026
+  - operationId: listAssistantProfiles
+    contract: ai
+    purpose: Assistant profiles
+    trigger: onLoad
+    provenance: build, 29 September 2026
   entryState:
     preloaded:
     - AiPolicy.id
@@ -27262,6 +27456,9 @@ screens:
     - AiPolicy.enabledCapabilities
     - AiPolicy.allowedRoleIds
     - AiPolicy.maskedFields
+    params:
+    - name: profileKey
+      from: navigation
   wireframe:
     status: notStarted
     provenance: generated
@@ -29391,12 +29588,12 @@ screens:
         holds none of them, so the edge carries nothing and BO-008 opens cold
     - to: BO-022
       trigger: Order Detail
-      provenance: derived — BO-022 declares entryState.params orderId and BO-101 holds none of them, so
-        the edge carries nothing and BO-022 opens cold
+      provenance: derived — BO-022 declares entryState.params documentId, invoiceId, orderId and BO-101
+        holds none of them, so the edge carries nothing and BO-022 opens cold
     - to: BO-023
       trigger: Refunds & Exchanges
-      provenance: derived — BO-023 declares entryState.params orderId and BO-101 holds none of them, so
-        the edge carries nothing and BO-023 opens cold
+      provenance: derived — BO-023 declares entryState.params documentId, invoiceId, orderId and BO-101
+        holds none of them, so the edge carries nothing and BO-023 opens cold
     - to: BO-024
       trigger: Payment Exceptions
       provenance: derived — BO-024 declares entryState.params depositId, paymentId and BO-101 holds none
@@ -29405,8 +29602,8 @@ screens:
       trigger: Chargebacks & Disputes
       carries:
       - settlementId
-      provenance: derived — BO-025 declares entryState.params settlementId and BO-101 holds settlementId,
-        so an edge into it carries them
+      provenance: derived — BO-025 declares entryState.params chargebackId, settlementId and BO-101 holds
+        settlementId, so an edge into it carries them
     - to: BO-026
       trigger: Group Bookings
       provenance: derived — BO-026 declares entryState.params groupBookingId, orderId and BO-101 holds
@@ -29463,8 +29660,8 @@ screens:
         carries nothing and BO-062 opens cold
     - to: BO-065
       trigger: Venue Configuration
-      provenance: derived — BO-065 declares entryState.params  and BO-101 holds none of them, so the edge
-        carries nothing and BO-065 opens cold
+      provenance: derived — BO-065 declares entryState.params locationId and BO-101 holds none of them,
+        so the edge carries nothing and BO-065 opens cold
     - to: BO-074
       trigger: Chart of Accounts
       provenance: derived — BO-074 declares entryState.params accountId and BO-101 holds none of them,
@@ -29708,10 +29905,8 @@ screens:
         cold
     - to: BO-011
       trigger: Packages & Bundles
-      carries:
-      - bundleId
       provenance: derived — BO-011 declares entryState.params bundleId, comboId, productId, version and
-        BO-102 holds bundleId, so an edge into it carries them
+        BO-102 holds none of them, so the edge carries nothing and BO-011 opens cold
     - to: BO-012
       trigger: Membership Products
       provenance: derived — BO-012 declares entryState.params productId and BO-102 holds none of them,
@@ -29794,10 +29989,8 @@ screens:
         of them, so the edge carries nothing and BO-118 opens cold
     - to: BO-119
       trigger: Cross-Sell, Upsell & Recommendation Rules
-      carries:
-      - ruleId
-      provenance: derived — BO-119 declares entryState.params ruleId and BO-102 holds ruleId, so an edge
-        into it carries them
+      provenance: derived — BO-119 declares entryState.params ruleId and BO-102 holds none of them, so
+        the edge carries nothing and BO-119 opens cold
     - to: BO-120
       trigger: Omnichannel Commerce & Journey Configuration
       provenance: derived — BO-120 declares entryState.params  and BO-102 holds none of them, so the edge
@@ -29953,10 +30146,16 @@ screens:
     contract: promotions
     purpose: Upsell rules in force, read-only — owned at region (decided 28 September, audit R183)
     trigger: onLoad
-  - operationId: getUpsellSuggestions
-    contract: promotions
-    purpose: What to offer this basket
+  - operationId: decideRecommendations
+    contract: ai
+    purpose: Fill a recommendation slot
     trigger: onLoad
+    provenance: build, 29 September 2026
+  - operationId: recordRecommendationEvents
+    contract: ai
+    purpose: Report what happened to recommended items
+    trigger: onAction
+    provenance: build, 29 September 2026
   entryState:
     params:
     - name: venueId
@@ -30548,8 +30747,8 @@ screens:
       trigger: Suppliers
       carries:
       - supplierId
-      provenance: derived — BO-083 declares entryState.params supplierId and BO-105 holds supplierId,
-        so an edge into it carries them
+      provenance: derived — BO-083 declares entryState.params contractId, supplierId and BO-105 holds
+        supplierId, so an edge into it carries them
     - to: BO-137
       trigger: Recipe Consumption & Theoretical Inventory
       provenance: derived — BO-137 declares entryState.params countId, runId and BO-105 holds none of
@@ -30846,8 +31045,8 @@ screens:
         them, so the edge carries nothing and BO-066 opens cold
     - to: BO-084
       trigger: Approval Inbox
-      provenance: derived — BO-084 declares entryState.params requestId and BO-106 holds none of them,
-        so the edge carries nothing and BO-084 opens cold
+      provenance: derived — BO-084 declares entryState.params approvalRequestId, requestId and BO-106
+        holds none of them, so the edge carries nothing and BO-084 opens cold
     - to: BO-085
       trigger: Approval Request
       provenance: derived — BO-085 declares entryState.params requestId and BO-106 holds none of them,
@@ -30856,6 +31055,10 @@ screens:
       trigger: Approval Delegations
       provenance: derived — BO-087 declares entryState.params delegationId and BO-106 holds none of them,
         so the edge carries nothing and BO-087 opens cold
+    - to: BO-054
+      trigger: Role Assignment
+      provenance: derived — BO-054 declares entryState.params campaignId and BO-106 holds none of them,
+        so the edge carries nothing and BO-054 opens cold
   notes: Section landing. **11 screens reach the entry point through here** — before 20 August they reached
     it through nothing.
   density: compact
@@ -31003,6 +31206,10 @@ screens:
       trigger: Lost & Found Register
       provenance: derived — BO-073 declares entryState.params itemId and BO-107 holds none of them, so
         the edge carries nothing and BO-073 opens cold
+    - to: BO-091
+      trigger: AI Policy & Spend
+      provenance: derived — BO-091 declares entryState.params profileKey and BO-107 holds none of them,
+        so the edge carries nothing and BO-091 opens cold
   notes: Section landing. **3 screens reach the entry point through here** — before 20 August they reached
     it through nothing.
   density: compact
@@ -31246,8 +31453,8 @@ screens:
         so the edge carries nothing and BO-128 opens cold
     - to: BO-129
       trigger: Software, Configuration & Version Management
-      provenance: derived — BO-129 declares entryState.params profileId, rolloutId, workstationId and
-        BO-108 holds none of them, so the edge carries nothing and BO-129 opens cold
+      provenance: derived — BO-129 declares entryState.params firmwareId, profileId, rolloutId, workstationId
+        and BO-108 holds none of them, so the edge carries nothing and BO-129 opens cold
     - to: BO-130
       trigger: Offline Policy & Rules Configuration
       provenance: derived — BO-130 declares entryState.params  and BO-108 holds none of them, so the edge
@@ -33465,14 +33672,6 @@ screens:
       names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody
       to support with the wrong question.
   apis:
-  - operationId: getRecommendations
-    contract: promotions
-    purpose: What else this guest might want
-    trigger: onAction
-  - operationId: getUpsellSuggestions
-    contract: promotions
-    purpose: Suggestions for a cart
-    trigger: onAction
   - operationId: createUpsellRule
     contract: promotions
     purpose: Create an upsell rule
@@ -33483,6 +33682,11 @@ screens:
     purpose: Remove an upsell rule
     trigger: onAction
     provenance: decided 29 September, VM close-out (venue management and configuration)
+  - operationId: decideRecommendations
+    contract: ai
+    purpose: Fill a recommendation slot
+    trigger: onAction
+    provenance: build, 29 September 2026
   entryState:
     params:
     - name: venueId
@@ -35291,6 +35495,21 @@ screens:
     - getWorkstationHealth
     - listWorkstations
     - listDeviceFirmware
+  - operationId: createDeviceFirmware
+    contract: tenancy
+    purpose: Register a firmware release
+    trigger: onAction
+    provenance: build, 29 September 2026
+  - operationId: getDeviceFirmware
+    contract: tenancy
+    purpose: Open a release
+    trigger: onAction
+    provenance: build, 29 September 2026
+  - operationId: setDeviceFirmwareStatus
+    contract: tenancy
+    purpose: Release, deprecate or withdraw
+    trigger: onAction
+    provenance: build, 29 September 2026
   entryState:
     params:
     - name: venueId
@@ -35300,6 +35519,8 @@ screens:
     - name: workstationId
       from: deepLink
     - name: rolloutId
+      from: navigation
+    - name: firmwareId
       from: navigation
     coldEntry: Resolves from the session. A principal with more than one venue is asked which first. Resolves
       from the session — a till is signed into.
@@ -37070,6 +37291,11 @@ screens:
     contract: inventory
     purpose: What is about to go out of date
     trigger: onLoad
+  - operationId: requestSuggestion
+    contract: ai
+    purpose: 'Waste-risk suggestion (kind wasteRisk): items at risk with a recommended action'
+    trigger: onAction
+    provenance: build, 29 September 2026
   entryState:
     params:
     - name: venueId
@@ -37218,6 +37444,11 @@ screens:
     contract: fnb
     purpose: Record waste
     trigger: onAction
+  - operationId: requestSuggestion
+    contract: ai
+    purpose: 'Waste-risk suggestion (kind wasteRisk): items at risk with a recommended action'
+    trigger: onAction
+    provenance: build, 29 September 2026
   entryState:
     params:
     - name: venueId
@@ -43528,6 +43759,11 @@ screens:
     contract: access
     purpose: Save retention rule
     trigger: onAction
+  - operationId: listDataRetentionSettings
+    contract: tenancy
+    purpose: Tenant biometric retention and its legal limit
+    trigger: onLoad
+    provenance: build, 29 September 2026
   wireframe:
     status: notStarted
     provenance: generated
@@ -48707,6 +48943,11 @@ screens:
     provenance: decided 29 September, VM close-out (venue management and configuration)
     invalidates:
     - listDynamicAccessPolicy
+  - operationId: listDynamicPolicyEffectiveness
+    contract: access
+    purpose: Open a policy's effectiveness from the command center
+    trigger: onAction
+    provenance: build, 29 September 2026
   entryState:
     preloaded:
     - DynamicAccessPolicyCommandCenterViewSummary.activePolicies
@@ -49631,6 +49872,11 @@ screens:
     contract: access
     purpose: Roll back policy
     trigger: onAction
+  - operationId: listDynamicPolicyEffectiveness
+    contract: access
+    purpose: Per-policy triggers, denials, overrides and trend over a period
+    trigger: onLoad
+    provenance: build, 29 September 2026
   entryState:
     preloaded:
     - →
@@ -49876,6 +50122,11 @@ screens:
     trigger: onAction
     invalidates:
     - listAccessSecurityFraud
+  - operationId: getAccessRiskScore
+    contract: access
+    purpose: Risk score behind an alert's identity or credential
+    trigger: onAction
+    provenance: build, 29 September 2026
   entryState:
     preloaded:
     - AccessSecurityFraudCommandCenterViewSummary.activeSecurityAlerts
@@ -50669,6 +50920,11 @@ screens:
     trigger: onAction
     invalidates:
     - listAccessRiskScoring
+  - operationId: getAccessRiskScore
+    contract: access
+    purpose: Look up the calculated score of a guest, credential or device with its signals
+    trigger: onAction
+    provenance: build, 29 September 2026
   entryState:
     preloaded: []
   wireframe:
@@ -55559,6 +55815,11 @@ screens:
     contract: catalogue
     purpose: The membership plan templates whose benefits are set
     trigger: onLoad
+  - operationId: createEntitlementTemplate
+    contract: catalogue
+    purpose: Set expiryNoticeDays on a pass template (pre-expiry notice)
+    trigger: onAction
+    provenance: build, 29 September 2026
   wireframe:
     status: notStarted
     provenance: generated
@@ -60386,6 +60647,16 @@ screens:
     contract: orders
     purpose: Payment & Order Financial Command Center
     trigger: onLoad
+  - operationId: listInstalmentPlans
+    contract: payments
+    purpose: Instalment plans and schedule
+    trigger: onLoad
+    provenance: build, 29 September 2026
+  - operationId: createInstalmentPlan
+    contract: payments
+    purpose: Pay in instalments
+    trigger: onAction
+    provenance: build, 29 September 2026
   entryState:
     preloaded:
     - PaymentOrderFinancialCommandCenterView.grossOrderValue
@@ -65821,12 +66092,16 @@ screens:
     - to: BO-367
       trigger: Approval Request Detail
       provenance: structural — pack board 1 wiring, 9 September 2026
+      carries:
+      - approvalRequestId
     - to: BO-368
       trigger: AI Decision Support
       provenance: structural — pack board 1 wiring, 9 September 2026
     - to: BO-369
       trigger: High Priority & Risk Queue
       provenance: structural — pack board 1 wiring, 9 September 2026
+      carries:
+      - approvalRequestId
     - to: BO-370
       trigger: Escalated Approval Center
       provenance: structural — pack board 1 wiring, 9 September 2026
@@ -66211,6 +66486,12 @@ screens:
     - listApprovalRequests
     - getApprovalRecord
     - getApprovalAnalytics
+  - operationId: getApprovalRequestScore
+    contract: ai
+    purpose: Risk band, priority and suggested escalation for the request, as context only (no approve/reject
+      suggestion)
+    trigger: onLoad
+    provenance: build, 29 September 2026
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-367
@@ -66222,6 +66503,8 @@ screens:
   entryState:
     params:
     - name: requestId
+      from: navigation
+    - name: approvalRequestId
       from: navigation
 - id: BO-368
   name: AI Decision Support
@@ -66294,6 +66577,12 @@ screens:
     purpose: What the rules say
     trigger: onLoad
     provenance: board reading, 19 September 2026
+  - operationId: listApprovalRequests
+    contract: approvals
+    purpose: 'Requests with their AI context (aiAssessment: risk, priority, escalation suggestion) for
+      the reviewer; context only'
+    trigger: onLoad
+    provenance: build, 29 September 2026
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-368
@@ -66354,6 +66643,10 @@ screens:
         impliedBy: listApprovalRequests
         notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
           a venue''s busiest hour is a list that skips rows.'
+      - kind: detailPanel
+        derived: true
+        impliedBy: getApprovalRequestScore
+        notes: One record, read-only.
   states:
     loading: The high priority risk list.
     error: Could not load. Names which read failed and leaves the high priority risk untouched.
@@ -66369,6 +66662,12 @@ screens:
     purpose: High priority and risk
     trigger: onLoad
     provenance: board reading, 19 September 2026
+  - operationId: getApprovalRequestScore
+    contract: ai
+    purpose: Risk band, priority and suggested escalation for the request, as context only (no approve/reject
+      suggestion)
+    trigger: onLoad
+    provenance: build, 29 September 2026
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-369
@@ -66377,6 +66676,10 @@ screens:
     0 of 0 labels bound to a contract property; 0 of 5 pack bullets carried onto the screen — the rest
     are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts
     rather than here.
+  entryState:
+    params:
+    - name: approvalRequestId
+      from: navigation
 - id: BO-370
   name: Escalated Approval Center
   module: Venue Operations
@@ -68746,6 +69049,16 @@ screens:
     purpose: Where the SLA is failing
     trigger: onLoad
     provenance: board reading, 19 September 2026
+  - operationId: listApprovalRequests
+    contract: approvals
+    purpose: Pending requests with AI escalation suggestions (sort=aiPriority)
+    trigger: onLoad
+    provenance: build, 29 September 2026
+  - operationId: escalateApprovalRequest
+    contract: approvals
+    purpose: A person acts on an escalation suggestion
+    trigger: onAction
+    provenance: build, 29 September 2026
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-393
@@ -68758,6 +69071,10 @@ screens:
     as plain labels): Predicted SLA breaches (next 60 min), Predicted average wait time, Recommendation
     text, Expected impact (before/after), Risk level (HIGH/...), Bottleneck share of breaches (e.g. 38%),
     Grouping by approval stage or department.'
+  entryState:
+    params:
+    - name: requestId
+      from: navigation
 - id: BO-394
   name: Game & Ride Operations Dashboard
   module: Games & Rides
@@ -71268,6 +71585,26 @@ screens:
     invalidates:
     - getWallet
     - listCreditLots
+  - operationId: getWalletAutoReloadSetting
+    contract: wallet
+    purpose: Show auto top-up
+    trigger: onLoad
+    provenance: build, 29 September 2026
+  - operationId: setWalletAutoReloadSetting
+    contract: wallet
+    purpose: Set auto top-up
+    trigger: onAction
+    provenance: build, 29 September 2026
+  - operationId: getWalletExitBalance
+    contract: wallet
+    purpose: Balance due / refundable at exit
+    trigger: onLoad
+    provenance: build, 29 September 2026
+  - operationId: settleWalletAtExit
+    contract: wallet
+    purpose: Settle the wallet at exit
+    trigger: onAction
+    provenance: build, 29 September 2026
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-416
@@ -78338,6 +78675,16 @@ screens:
     purpose: Balance summary
     trigger: onAction
     provenance: board reading, 19 September 2026
+  - operationId: getWalletExitBalance
+    contract: wallet
+    purpose: Balance due / refundable at exit
+    trigger: onLoad
+    provenance: build, 29 September 2026
+  - operationId: settleWalletAtExit
+    contract: wallet
+    purpose: Settle the wallet at exit
+    trigger: onAction
+    provenance: build, 29 September 2026
   entryState:
     preloaded:
     - Card Status
@@ -78345,6 +78692,8 @@ screens:
     - Last Recharge
     params:
     - name: subjectId
+      from: navigation
+    - name: walletId
       from: navigation
   wireframe:
     status: notStarted
@@ -89399,6 +89748,11 @@ screens:
     purpose: Draft the configuration
     trigger: onAction
     provenance: board reading, 19 September 2026
+  - operationId: getActionPlan
+    contract: ai
+    purpose: A plan with its steps
+    trigger: onAction
+    provenance: build, 29 September 2026
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-597
@@ -89407,6 +89761,10 @@ screens:
     0 labels bound to a contract property; 0 of 13 pack bullets carried onto the screen — the rest are
     acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather
     than here.
+  entryState:
+    params:
+    - name: planId
+      from: navigation
 - id: BO-598
   name: AI Draft Review & Approval
   module: Setup & Go-Live
@@ -89481,6 +89839,11 @@ screens:
     purpose: Review and accept a draft
     trigger: onAction
     provenance: board reading, 19 September 2026
+  - operationId: getActionPlan
+    contract: ai
+    purpose: A plan with its steps
+    trigger: onLoad
+    provenance: build, 29 September 2026
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-598
@@ -89489,6 +89852,10 @@ screens:
     0 labels bound to a contract property; 0 of 15 pack bullets carried onto the screen — the rest are
     acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather
     than here.
+  entryState:
+    params:
+    - name: planId
+      from: navigation
 - id: BO-599
   name: Manual Configuration Center
   module: Setup & Go-Live
@@ -91110,12 +91477,16 @@ screens:
     - to: BO-618
       trigger: Accreditation Form Builder
       provenance: structural — pack board 1 wiring, 19 September 2026
+      carries:
+      - programmeId
     - to: BO-619
       trigger: Accreditation Category Management
       provenance: structural — pack board 1 wiring, 19 September 2026
     - to: BO-620
       trigger: Accreditation Program Setup
       provenance: structural — pack board 1 wiring, 19 September 2026
+      carries:
+      - programmeId
     - to: BO-621
       trigger: Applicant Type Configuration
       provenance: structural — pack board 1 wiring, 19 September 2026
@@ -91128,6 +91499,8 @@ screens:
     - to: BO-624
       trigger: Registration Rules & Publication
       provenance: structural — pack board 1 wiring, 19 September 2026
+      carries:
+      - programmeId
   density: compact
   pattern: listDetail
   patternReason: '**nothing in the pack chooses a pattern for this screen** — no metric directory, no
@@ -91278,6 +91651,11 @@ screens:
     purpose: The directory
     trigger: onLoad
     provenance: board reading, 19 September 2026
+  - operationId: withdrawAccreditationApplication
+    contract: accreditation
+    purpose: Withdraw an application on the applicant's behalf
+    trigger: onAction
+    provenance: build, 29 September 2026
   entryState:
     preloaded:
     - Application ID
@@ -91286,6 +91664,9 @@ screens:
     - Accreditation category
     - Organization/company
     - Event
+    params:
+    - name: applicationId
+      from: navigation
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-616
@@ -91367,6 +91748,16 @@ screens:
     provenance: board reading, 19 September 2026
     invalidates:
     - listAccreditationApplications
+  - operationId: updateAccreditationApplication
+    contract: accreditation
+    purpose: Save a draft application
+    trigger: onAction
+    provenance: build, 29 September 2026
+  - operationId: submitAccreditationApplication
+    contract: accreditation
+    purpose: Submit the draft
+    trigger: onAction
+    provenance: build, 29 September 2026
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-617
@@ -91374,6 +91765,10 @@ screens:
   apisNote: Regenerated 9 September 2026 from ACCREDITATION.pdf page 5. 0 of 0 labels bound to a contract
     property; 0 of 21 pack bullets carried onto the screen — the rest are acceptance prose, worked examples
     and AI narrative, which belong to the matrix and the contracts rather than here.
+  entryState:
+    params:
+    - name: applicationId
+      from: navigation
 - id: BO-618
   name: Accreditation Form Builder
   module: Access & Venue
@@ -91437,6 +91832,11 @@ screens:
     purpose: Build the application form
     trigger: onAction
     provenance: board reading, 19 September 2026
+  - operationId: updateAccreditationProgramme
+    contract: accreditation
+    purpose: Link the built form to the programme (formId)
+    trigger: onAction
+    provenance: build, 29 September 2026
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-618
@@ -91444,6 +91844,10 @@ screens:
   apisNote: Regenerated 9 September 2026 from ACCREDITATION.pdf page 5. 0 of 0 labels bound to a contract
     property; 2 of 20 pack bullets carried onto the screen — the rest are acceptance prose, worked examples
     and AI narrative, which belong to the matrix and the contracts rather than here.
+  entryState:
+    params:
+    - name: programmeId
+      from: navigation
 - id: BO-619
   name: Accreditation Category Management
   module: Access & Venue
@@ -91597,6 +92001,21 @@ screens:
     provenance: board reading, 19 September 2026
     invalidates: &id030
     - listAccreditationProgrammes
+  - operationId: listAccreditationProgrammes
+    contract: accreditation
+    purpose: Templates to start from (isTemplate=true)
+    trigger: onLoad
+    provenance: build, 29 September 2026
+  - operationId: cloneAccreditationProgramme
+    contract: accreditation
+    purpose: Create from template or from last season
+    trigger: onAction
+    provenance: build, 29 September 2026
+  - operationId: updateAccreditationProgramme
+    contract: accreditation
+    purpose: Amend a programme, or save it as a template
+    trigger: onAction
+    provenance: build, 29 September 2026
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-620
@@ -91604,6 +92023,10 @@ screens:
   apisNote: Regenerated 9 September 2026 from ACCREDITATION.pdf page 7. 0 of 0 labels bound to a contract
     property; 0 of 19 pack bullets carried onto the screen — the rest are acceptance prose, worked examples
     and AI narrative, which belong to the matrix and the contracts rather than here.
+  entryState:
+    params:
+    - name: programmeId
+      from: navigation
 - id: BO-621
   name: Applicant Type Configuration
   module: Access & Venue
@@ -91957,6 +92380,11 @@ screens:
     trigger: onAction
     provenance: board reading, 19 September 2026
     invalidates: *id030
+  - operationId: updateAccreditationProgramme
+    contract: accreditation
+    purpose: Set the application window and open or close the programme
+    trigger: onAction
+    provenance: build, 29 September 2026
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-624
@@ -91964,6 +92392,10 @@ screens:
   apisNote: Regenerated 9 September 2026 from ACCREDITATION.pdf page 9. 0 of 0 labels bound to a contract
     property; 0 of 31 pack bullets carried onto the screen — the rest are acceptance prose, worked examples
     and AI narrative, which belong to the matrix and the contracts rather than here.
+  entryState:
+    params:
+    - name: programmeId
+      from: navigation
 - id: BO-625
   name: Accreditation Holder Directory
   module: Access & Venue
@@ -92457,6 +92889,11 @@ screens:
     provenance: board reading, 19 September 2026
     invalidates:
     - getAccreditationHolder
+  - operationId: listAccreditationDocuments
+    contract: accreditation
+    purpose: Documents stored, by holder or application
+    trigger: onLoad
+    provenance: build, 29 September 2026
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-629
@@ -92538,6 +92975,11 @@ screens:
     provenance: board reading, 19 September 2026
     invalidates:
     - getAccreditationHolder
+  - operationId: listAccreditationDocuments
+    contract: accreditation
+    purpose: 'The queue: status=submitted, oldest first'
+    trigger: onLoad
+    provenance: build, 29 September 2026
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-630
@@ -93155,6 +93597,16 @@ screens:
     purpose: The application
     trigger: onLoad
     provenance: board reading, 19 September 2026
+  - operationId: getAccreditationApplication
+    contract: accreditation
+    purpose: The application being decided
+    trigger: onLoad
+    provenance: build, 29 September 2026
+  - operationId: listAccreditationDocuments
+    contract: accreditation
+    purpose: The application's documents
+    trigger: onLoad
+    provenance: build, 29 September 2026
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-636
@@ -93479,6 +93931,21 @@ screens:
     trigger: onAction
     provenance: board reading, 19 September 2026
     invalidates: *id032
+  - operationId: getAccreditationApplication
+    contract: accreditation
+    purpose: The rejected or returned application
+    trigger: onLoad
+    provenance: build, 29 September 2026
+  - operationId: resubmitAccreditationApplication
+    contract: accreditation
+    purpose: Resubmit on the applicant's behalf
+    trigger: onAction
+    provenance: build, 29 September 2026
+  - operationId: updateAccreditationApplication
+    contract: accreditation
+    purpose: Amend an application returned for information
+    trigger: onAction
+    provenance: build, 29 September 2026
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-640
@@ -94255,6 +94722,11 @@ screens:
     purpose: The print queue
     trigger: onLoad
     provenance: board reading, 19 September 2026
+  - operationId: deliverAccreditationCredential
+    contract: accreditation
+    purpose: Send a mobile credential to its holder
+    trigger: onAction
+    provenance: build, 29 September 2026
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-649
@@ -94262,6 +94734,10 @@ screens:
   apisNote: Regenerated 9 September 2026 from ACCREDITATION.pdf page 32. 0 of 0 labels bound to a contract
     property; 0 of 23 pack bullets carried onto the screen — the rest are acceptance prose, worked examples
     and AI narrative, which belong to the matrix and the contracts rather than here.
+  entryState:
+    params:
+    - name: credentialId
+      from: navigation
 - id: BO-650
   name: NFC & RFID Credential Encoding
   module: Access & Venue
@@ -94413,6 +94889,11 @@ screens:
     trigger: onAction
     provenance: board reading, 19 September 2026
     invalidates: *id034
+  - operationId: deliverAccreditationCredential
+    contract: accreditation
+    purpose: Deliver, and optionally activate on open
+    trigger: onAction
+    provenance: build, 29 September 2026
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-651
@@ -94420,6 +94901,10 @@ screens:
   apisNote: Regenerated 9 September 2026 from ACCREDITATION.pdf page 33. 0 of 0 labels bound to a contract
     property; 0 of 16 pack bullets carried onto the screen — the rest are acceptance prose, worked examples
     and AI narrative, which belong to the matrix and the contracts rather than here.
+  entryState:
+    params:
+    - name: credentialId
+      from: navigation
 - id: BO-653
   name: Credential Registry & Credential History
   module: Access & Venue
@@ -95454,6 +95939,8 @@ screens:
     - to: BO-667
       trigger: Event & Venue Accreditation Assignment
       provenance: structural — pack board 6 wiring, 19 September 2026
+      carries:
+      - programmeId
     - to: BO-668
       trigger: Multi-Venue Accreditation Management
       provenance: structural — pack board 6 wiring, 19 September 2026
@@ -95759,6 +96246,11 @@ screens:
     trigger: onAction
     provenance: board reading, 19 September 2026
     invalidates: *id030
+  - operationId: cloneAccreditationProgramme
+    contract: accreditation
+    purpose: Assign a programme to a new event by cloning it
+    trigger: onAction
+    provenance: build, 29 September 2026
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-667
@@ -95766,6 +96258,10 @@ screens:
   apisNote: Regenerated 9 September 2026 from ACCREDITATION.pdf page 49. 0 of 0 labels bound to a contract
     property; 0 of 14 pack bullets carried onto the screen — the rest are acceptance prose, worked examples
     and AI narrative, which belong to the matrix and the contracts rather than here.
+  entryState:
+    params:
+    - name: programmeId
+      from: navigation
 - id: BO-668
   name: Multi-Venue Accreditation Management
   module: Access & Venue
@@ -96152,6 +96648,15 @@ screens:
         impliedBy: listAccreditationHolders
         notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
           a venue''s busiest hour is a list that skips rows.'
+      - kind: primaryButton
+        derived: true
+        impliedBy: renewAccreditation
+        notes: The act the screen exists for.
+      - kind: secondaryButton
+        label: Cancel
+        notes: '**A screen that can submit must be leaveable without submitting.**'
+        derived: true
+        impliedBy: renewAccreditation
   states:
     loading: The expiry expiration rules list.
     error: Could not load. Names which read failed and leaves the expiry expiration rules untouched.
@@ -96167,6 +96672,11 @@ screens:
     purpose: Expiring soon
     trigger: onLoad
     provenance: board reading, 19 September 2026
+  - operationId: renewAccreditation
+    contract: accreditation
+    purpose: Renew a holder approaching expiry
+    trigger: onAction
+    provenance: build, 29 September 2026
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-672
@@ -96174,6 +96684,10 @@ screens:
   apisNote: Regenerated 9 September 2026 from ACCREDITATION.pdf page 52. 0 of 0 labels bound to a contract
     property; 0 of 19 pack bullets carried onto the screen — the rest are acceptance prose, worked examples
     and AI narrative, which belong to the matrix and the contracts rather than here.
+  entryState:
+    params:
+    - name: holderId
+      from: navigation
 - id: BO-673
   name: Accreditation Renewal Workspace
   module: Access & Venue
@@ -96247,6 +96761,16 @@ screens:
     trigger: onAction
     provenance: board reading, 19 September 2026
     invalidates: *id038
+  - operationId: listAccreditationHolders
+    contract: accreditation
+    purpose: Holders inside the renewal window (expiringWithinDays)
+    trigger: onLoad
+    provenance: build, 29 September 2026
+  - operationId: renewAccreditation
+    contract: accreditation
+    purpose: Renew without recreating the holder
+    trigger: onAction
+    provenance: build, 29 September 2026
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-673
@@ -96254,6 +96778,10 @@ screens:
   apisNote: Regenerated 9 September 2026 from ACCREDITATION.pdf page 53. 0 of 0 labels bound to a contract
     property; 0 of 13 pack bullets carried onto the screen — the rest are acceptance prose, worked examples
     and AI narrative, which belong to the matrix and the contracts rather than here.
+  entryState:
+    params:
+    - name: holderId
+      from: navigation
 - id: BO-674
   name: Accreditation Communications Command Center
   module: Access & Venue
@@ -97050,6 +97578,31 @@ screens:
     purpose: Export
     trigger: onLoad
     provenance: board reading, 19 September 2026
+  - operationId: listAccreditationExports
+    contract: accreditation
+    purpose: 'Export history: requested by, date, filters, fields, records, status'
+    trigger: onLoad
+    provenance: build, 29 September 2026
+  - operationId: exportAccreditationData
+    contract: accreditation
+    purpose: Request an export
+    trigger: onAction
+    provenance: build, 29 September 2026
+  - operationId: getAccreditationExport
+    contract: accreditation
+    purpose: Status and download link
+    trigger: onAction
+    provenance: build, 29 September 2026
+  - operationId: runReport
+    contract: reporting
+    purpose: Report over the accreditation data sources
+    trigger: onAction
+    provenance: build, 29 September 2026
+  - operationId: exportReportResult
+    contract: reporting
+    purpose: csv or xlsx extract
+    trigger: onAction
+    provenance: build, 29 September 2026
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-682
@@ -97057,6 +97610,14 @@ screens:
   apisNote: Regenerated 9 September 2026 from ACCREDITATION.pdf page 61. 0 of 0 labels bound to a contract
     property; 7 of 24 pack bullets carried onto the screen — the rest are acceptance prose, worked examples
     and AI narrative, which belong to the matrix and the contracts rather than here.
+  entryState:
+    params:
+    - name: executionId
+      from: navigation
+    - name: exportId
+      from: navigation
+    - name: reportId
+      from: navigation
 - id: BO-683
   name: Delivery, Batch & Operational History
   module: Access & Venue
@@ -97254,6 +97815,11 @@ screens:
     purpose: The executive view
     trigger: onLoad
     provenance: board reading, 19 September 2026
+  - operationId: getKpiValues
+    contract: reporting
+    purpose: Accreditation KPIs (kpiCodes=accreditation*)
+    trigger: onLoad
+    provenance: build, 29 September 2026
   entryState:
     preloaded:
     - Tenant
@@ -97336,6 +97902,11 @@ screens:
     purpose: Status and portfolio
     trigger: onLoad
     provenance: board reading, 19 September 2026
+  - operationId: getKpiValues
+    contract: reporting
+    purpose: Applications by status, active holders by category (groupBy)
+    trigger: onLoad
+    provenance: build, 29 September 2026
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-685
@@ -97992,6 +98563,26 @@ screens:
     purpose: Webhooks
     trigger: onLoad
     provenance: board reading, 19 September 2026
+  - operationId: listWebhookEventTypes
+    contract: public-api
+    purpose: Accreditation events (publisher=accreditation)
+    trigger: onLoad
+    provenance: build, 29 September 2026
+  - operationId: createWebhookSubscription
+    contract: public-api
+    purpose: Subscribe an endpoint to accreditation events
+    trigger: onAction
+    provenance: build, 29 September 2026
+  - operationId: testWebhookSubscription
+    contract: public-api
+    purpose: Send a signed test event
+    trigger: onAction
+    provenance: build, 29 September 2026
+  - operationId: listWebhookDeliveries
+    contract: public-api
+    purpose: Delivery log
+    trigger: onAction
+    provenance: build, 29 September 2026
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-692
@@ -97999,6 +98590,10 @@ screens:
   apisNote: Regenerated 9 September 2026 from ACCREDITATION.pdf page 71. 0 of 0 labels bound to a contract
     property; 8 of 22 pack bullets carried onto the screen — the rest are acceptance prose, worked examples
     and AI narrative, which belong to the matrix and the contracts rather than here.
+  entryState:
+    params:
+    - name: subscriptionId
+      from: navigation
 - id: BO-693
   name: Integration & Data Exchange Monitor
   module: Access & Venue
@@ -102502,6 +103097,20 @@ screens:
         derived: true
         impliedBy: getGuestTimeline
         notes: One record, read-only.
+      - kind: dataTable
+        derived: true
+        impliedBy: listGuestIdentityVerifications
+        notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
+          a venue''s busiest hour is a list that skips rows.'
+      - kind: primaryButton
+        derived: true
+        impliedBy: decideGuestIdentityVerification
+        notes: The act the screen exists for.
+      - kind: secondaryButton
+        label: Cancel
+        notes: '**A screen that can submit must be leaveable without submitting.**'
+        derived: true
+        impliedBy: decideGuestIdentityVerification
   states:
     loading: The contact preferences list.
     error: Could not load. Names which read failed and leaves the contact preferences untouched.
@@ -102517,6 +103126,16 @@ screens:
     purpose: Everything they did, in order
     trigger: onAction
     provenance: board reading, 19 September 2026
+  - operationId: listGuestIdentityVerifications
+    contract: identity
+    purpose: Guest ID documents awaiting review
+    trigger: onLoad
+    provenance: build, 29 September 2026
+  - operationId: decideGuestIdentityVerification
+    contract: identity
+    purpose: Verify, reject or ask for resubmission
+    trigger: onAction
+    provenance: build, 29 September 2026
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-739
@@ -102528,6 +103147,8 @@ screens:
   entryState:
     params:
     - name: guestId
+      from: navigation
+    - name: verificationId
       from: navigation
 - id: BO-740
   name: Family & Guardians
@@ -103752,6 +104373,16 @@ screens:
     invalidates:
     - listDataRetentionExpiry
     - searchGuests
+  - operationId: listDataRetentionSettings
+    contract: tenancy
+    purpose: Retention period per data class
+    trigger: onLoad
+    provenance: build, 29 September 2026
+  - operationId: setDataRetentionSetting
+    contract: tenancy
+    purpose: Set a class's period
+    trigger: onAction
+    provenance: build, 29 September 2026
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-751
@@ -103760,6 +104391,10 @@ screens:
     0 of 0 labels bound to a contract property; 0 of 10 pack bullets carried onto the screen — the rest
     are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts
     rather than here.
+  entryState:
+    params:
+    - name: dataClass
+      from: navigation
 - id: BO-752
   name: Privacy & AI Governance
   module: Engagement & Support
@@ -104678,6 +105313,15 @@ screens:
         impliedBy: listAudienceDiscoveryTargeting
         notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
           a venue''s busiest hour is a list that skips rows.'
+      - kind: primaryButton
+        derived: true
+        impliedBy: proposeLookalikeSegment
+        notes: The act the screen exists for.
+      - kind: secondaryButton
+        label: Cancel
+        notes: '**A screen that can submit must be leaveable without submitting.**'
+        derived: true
+        impliedBy: proposeLookalikeSegment
   states:
     loading: The audience discovery list.
     error: Could not load. Names which read failed and leaves the audience discovery untouched.
@@ -104692,6 +105336,11 @@ screens:
     contract: promotions
     purpose: AI Audience Discovery & Targeting Optimization
     trigger: onLoad
+  - operationId: proposeLookalikeSegment
+    contract: ai
+    purpose: Propose a lookalike segment from a seed segment or list, as rules to save
+    trigger: onAction
+    provenance: build, 29 September 2026
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-761
@@ -104784,6 +105433,16 @@ screens:
     purpose: Threshold simulation
     trigger: onAction
     provenance: board reading, 19 September 2026
+  - operationId: decideProposedAction
+    contract: ai
+    purpose: Record which AI draft or proposal was used, or why it was refused
+    trigger: onAction
+    provenance: build, 29 September 2026
+  - operationId: proposeLookalikeSegment
+    contract: ai
+    purpose: Propose a lookalike segment from a seed segment or list, as rules to save
+    trigger: onAction
+    provenance: build, 29 September 2026
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-762
@@ -104795,6 +105454,8 @@ screens:
   entryState:
     params:
     - name: segmentId
+      from: navigation
+    - name: actionId
       from: navigation
 - id: BO-763
   name: Activation & Governance
@@ -105021,6 +105682,11 @@ screens:
     contract: marketing-crm
     purpose: List campaigns
     trigger: onLoad
+  - operationId: listMarketingRecommendations
+    contract: ai
+    purpose: AI recommendations on this campaign or journey, with expected impact and evidence
+    trigger: onLoad
+    provenance: build, 29 September 2026
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-764
@@ -105204,6 +105870,12 @@ screens:
     provenance: decided 29 September, VM close-out (venue management and configuration)
     invalidates:
     - listCampaigns
+  - operationId: proposeMarketingContent
+    contract: ai
+    purpose: Draft subject lines, message bodies or content variants from a brief, for the author to edit
+      and apply
+    trigger: onAction
+    provenance: build, 29 September 2026
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-766
@@ -105754,6 +106426,20 @@ screens:
         derived: true
         impliedBy: getCampaignPerformance
         notes: One record, read-only.
+      - kind: primaryButton
+        derived: true
+        impliedBy: proposeMarketingContent
+        notes: The act the screen exists for.
+      - kind: dataTable
+        derived: true
+        impliedBy: listMarketingRecommendations
+        notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
+          a venue''s busiest hour is a list that skips rows.'
+      - kind: secondaryButton
+        label: Cancel
+        notes: '**A screen that can submit must be leaveable without submitting.**'
+        derived: true
+        impliedBy: proposeMarketingContent
   states:
     loading: The optimization list.
     error: Could not load. Names which read failed and leaves the optimization untouched.
@@ -105769,6 +106455,32 @@ screens:
     purpose: Budget, goals and pacing
     trigger: onAction
     provenance: board reading, 19 September 2026
+  - operationId: proposeMarketingContent
+    contract: ai
+    purpose: Draft subject lines, message bodies or content variants from a brief, for the author to edit
+      and apply
+    trigger: onAction
+    provenance: build, 29 September 2026
+  - operationId: listMarketingRecommendations
+    contract: ai
+    purpose: AI recommendations on this campaign or journey, with expected impact and evidence
+    trigger: onLoad
+    provenance: build, 29 September 2026
+  - operationId: decideAiInsight
+    contract: ai
+    purpose: Accept, reject or mark a campaign or journey recommendation actioned
+    trigger: onAction
+    provenance: build, 29 September 2026
+  - operationId: requestSuggestion
+    contract: ai
+    purpose: 'Send-time suggestion (kind sendTime): best hour and channel per recipient'
+    trigger: onAction
+    provenance: build, 29 September 2026
+  - operationId: updateCampaign
+    contract: marketing-crm
+    purpose: Set up A/B variants and the test, and pick a winner by hand (winnerRule manual)
+    trigger: onAction
+    provenance: build, 29 September 2026
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-772
@@ -105780,6 +106492,8 @@ screens:
   entryState:
     params:
     - name: campaignId
+      from: navigation
+    - name: insightId
       from: navigation
 - id: BO-773
   name: Attribution & Audit
@@ -106686,6 +107400,15 @@ screens:
         impliedBy: listJourneys
         notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
           a venue''s busiest hour is a list that skips rows.'
+      - kind: primaryButton
+        derived: true
+        impliedBy: decideAiInsight
+        notes: The act the screen exists for.
+      - kind: secondaryButton
+        label: Cancel
+        notes: '**A screen that can submit must be leaveable without submitting.**'
+        derived: true
+        impliedBy: decideAiInsight
   states:
     loading: The journey optimization list.
     error: Could not load. Names which read failed and leaves the journey optimization untouched.
@@ -106700,6 +107423,21 @@ screens:
     contract: marketing-crm
     purpose: Automated journeys
     trigger: onLoad
+  - operationId: listMarketingRecommendations
+    contract: ai
+    purpose: AI recommendations on this campaign or journey, with expected impact and evidence
+    trigger: onLoad
+    provenance: build, 29 September 2026
+  - operationId: decideAiInsight
+    contract: ai
+    purpose: Accept, reject or mark a campaign or journey recommendation actioned
+    trigger: onAction
+    provenance: build, 29 September 2026
+  - operationId: requestSuggestion
+    contract: ai
+    purpose: 'Send-time suggestion (kind sendTime): best hour and channel per recipient'
+    trigger: onAction
+    provenance: build, 29 September 2026
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-782
@@ -106708,6 +107446,10 @@ screens:
     0 of 0 labels bound to a contract property; 0 of 10 pack bullets carried onto the screen — the rest
     are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts
     rather than here.
+  entryState:
+    params:
+    - name: insightId
+      from: navigation
 - id: BO-783
   name: Journey Analytics & Audit
   module: Engagement & Support
@@ -106994,6 +107736,17 @@ screens:
     purpose: Create one
     trigger: onAction
     provenance: board reading, 19 September 2026
+  - operationId: proposeMarketingContent
+    contract: ai
+    purpose: Draft subject lines, message bodies or content variants from a brief, for the author to edit
+      and apply
+    trigger: onAction
+    provenance: build, 29 September 2026
+  - operationId: proposeTranslations
+    contract: ai
+    purpose: Draft other languages of a message template (any channel) for review
+    trigger: onAction
+    provenance: build, 29 September 2026
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-785
@@ -107085,6 +107838,12 @@ screens:
     purpose: Build a newsletter
     trigger: onAction
     provenance: board reading, 19 September 2026
+  - operationId: proposeMarketingContent
+    contract: ai
+    purpose: Draft subject lines, message bodies or content variants from a brief, for the author to edit
+      and apply
+    trigger: onAction
+    provenance: build, 29 September 2026
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-786
@@ -107172,6 +107931,12 @@ screens:
     purpose: Content blocks and product feed
     trigger: onAction
     provenance: board reading, 19 September 2026
+  - operationId: proposeMarketingContent
+    contract: ai
+    purpose: Draft subject lines, message bodies or content variants from a brief, for the author to edit
+      and apply
+    trigger: onAction
+    provenance: build, 29 September 2026
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-787
@@ -107367,6 +108132,12 @@ screens:
     purpose: Notification rules
     trigger: onAction
     provenance: board reading, 19 September 2026
+  - operationId: proposeMarketingContent
+    contract: ai
+    purpose: Draft subject lines, message bodies or content variants from a brief, for the author to edit
+      and apply
+    trigger: onAction
+    provenance: build, 29 September 2026
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-789
@@ -107717,6 +108488,22 @@ screens:
     purpose: Content, translation and branding
     trigger: onAction
     provenance: board reading, 19 September 2026
+  - operationId: proposeMarketingContent
+    contract: ai
+    purpose: Draft subject lines, message bodies or content variants from a brief, for the author to edit
+      and apply
+    trigger: onAction
+    provenance: build, 29 September 2026
+  - operationId: decideProposedAction
+    contract: ai
+    purpose: Record which AI draft or proposal was used, or why it was refused
+    trigger: onAction
+    provenance: build, 29 September 2026
+  - operationId: proposeTranslations
+    contract: ai
+    purpose: Draft other languages of a message template (any channel) for review
+    trigger: onAction
+    provenance: build, 29 September 2026
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-793
@@ -107725,6 +108512,10 @@ screens:
     0 of 0 labels bound to a contract property; 0 of 28 pack bullets carried onto the screen — the rest
     are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts
     rather than here.
+  entryState:
+    params:
+    - name: actionId
+      from: navigation
 - id: BO-794
   name: Omnichannel Command Center
   module: Engagement & Support
@@ -108204,6 +108995,11 @@ screens:
     purpose: Intent and knowledge
     trigger: onAction
     provenance: board reading, 19 September 2026
+  - operationId: listKnowledgeGaps
+    contract: ai
+    purpose: Questions the assistant could not answer
+    trigger: onLoad
+    provenance: build, 29 September 2026
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-798
@@ -111785,6 +112581,10 @@ screens:
         impliedBy: listLoyaltyProgrammes
         notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
           a venue''s busiest hour is a list that skips rows.'
+      - kind: detailPanel
+        derived: true
+        impliedBy: getDashboard
+        notes: One record, read-only.
   states:
     loading: The gamification analytics audit list.
     error: Could not load. Names which read failed and leaves the gamification analytics audit untouched.
@@ -111800,6 +112600,16 @@ screens:
     purpose: Gamification analytics
     trigger: onLoad
     provenance: board reading, 19 September 2026
+  - operationId: getKpiValues
+    contract: reporting
+    purpose: Participation, loyalty/membership impact, retention
+    trigger: onLoad
+    provenance: build, 29 September 2026
+  - operationId: getDashboard
+    contract: reporting
+    purpose: Gamification analytics dashboard
+    trigger: onLoad
+    provenance: build, 29 September 2026
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-833
@@ -111808,6 +112618,10 @@ screens:
     0 of 0 labels bound to a contract property; 0 of 25 pack bullets carried onto the screen — the rest
     are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts
     rather than here.
+  entryState:
+    params:
+    - name: dashboardId
+      from: navigation
 - id: BO-834
   name: Digital Experience Center
   module: Engagement & Support
@@ -111999,6 +112813,11 @@ screens:
     purpose: Site and tenant configuration
     trigger: onLoad
     provenance: board reading, 19 September 2026
+  - operationId: getStorefrontInsights
+    contract: white-label
+    purpose: Low-performing pages and conversion
+    trigger: onLoad
+    provenance: build, 29 September 2026
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-834
@@ -112821,6 +113640,11 @@ screens:
     purpose: Publish
     trigger: onAction
     provenance: board reading, 19 September 2026
+  - operationId: getStorefrontInsights
+    contract: white-label
+    purpose: Page/app views, engagement, conversion and visitor behaviour
+    trigger: onLoad
+    provenance: build, 29 September 2026
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-843
@@ -117913,6 +118737,16 @@ screens:
     purpose: Gaps, by severity
     trigger: onLoad
     provenance: board reading, 19 September 2026
+  - operationId: listAlerts
+    contract: reporting
+    purpose: Staffing shortage alerts (metric staffingShortfall)
+    trigger: onLoad
+    provenance: build, 29 September 2026
+  - operationId: setAlertRule
+    contract: reporting
+    purpose: Configure the shortage alert (metric staffingShortfall, above 0, window, recipients)
+    trigger: onAction
+    provenance: build, 29 September 2026
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-886
@@ -122097,7 +122931,22 @@ screens:
       active filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: getForecast
+    contract: ai
+    purpose: Forecast values
+    trigger: onLoad
+    provenance: build, 29 September 2026
+  - operationId: createForecastScenario
+    contract: ai
+    purpose: Run a what-if
+    trigger: onAction
+    provenance: build, 29 September 2026
+  - operationId: listOperationalRequirements
+    contract: ai
+    purpose: Requirements derived from the forecast
+    trigger: onLoad
+    provenance: build, 29 September 2026
   entryState:
     preloaded:
     - Configured
@@ -122773,7 +123622,21 @@ screens:
     template: split
     regions:
     - name: contentBody
-      components: []
+      components:
+      - kind: dataTable
+        derived: true
+        impliedBy: listOperationalRequirements
+        notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
+          a venue''s busiest hour is a list that skips rows.'
+      - kind: primaryButton
+        derived: true
+        impliedBy: requestSuggestion
+        notes: The act the screen exists for.
+      - kind: secondaryButton
+        label: Cancel
+        notes: '**A screen that can submit must be leaveable without submitting.**'
+        derived: true
+        impliedBy: requestSuggestion
   states:
     loading: The staff recommendation workforce list.
     error: Could not load. Names which read failed and leaves the staff recommendation workforce untouched.
@@ -122783,7 +123646,17 @@ screens:
       the active filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: listOperationalRequirements
+    contract: ai
+    purpose: Requirements derived from the forecast
+    trigger: onLoad
+    provenance: build, 29 September 2026
+  - operationId: requestSuggestion
+    contract: ai
+    purpose: Ask for a suggestion (staffing)
+    trigger: onAction
+    provenance: build, 29 September 2026
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-925
@@ -122865,7 +123738,17 @@ screens:
       the active filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: getForecast
+    contract: ai
+    purpose: Forecast values
+    trigger: onLoad
+    provenance: build, 29 September 2026
+  - operationId: listOperationalRequirements
+    contract: ai
+    purpose: Requirements derived from the forecast
+    trigger: onLoad
+    provenance: build, 29 September 2026
   entryState:
     preloaded:
     - Historical
@@ -122920,6 +123803,20 @@ screens:
       - kind: textField
         label: 1 Lifeguard / 250 guests
         provenance: pack Resource_Management_Configuration_Reference.pdf, page 122 §Configured rule
+      - kind: dataTable
+        derived: true
+        impliedBy: listOperationalRequirements
+        notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
+          a venue''s busiest hour is a list that skips rows.'
+      - kind: primaryButton
+        derived: true
+        impliedBy: decideOperationalRequirement
+        notes: The act the screen exists for.
+      - kind: secondaryButton
+        label: Cancel
+        notes: '**A screen that can submit must be leaveable without submitting.**'
+        derived: true
+        impliedBy: decideOperationalRequirement
   states:
     loading: The staffing requirement forecast configuration as saved.
     error: Could not load. Names which read failed and leaves the staffing requirement forecast untouched.
@@ -122929,7 +123826,28 @@ screens:
       data* and sends somebody to support with the wrong question.
     emptyNoResults: '**Nothing matched.** The filter or the scope narrowed it — naming which is what stops
       somebody concluding the record does not exist'
-  apis: []
+  apis:
+  - operationId: getForecast
+    contract: ai
+    purpose: Forecast values
+    trigger: onLoad
+    provenance: build, 29 September 2026
+  - operationId: listOperationalRequirements
+    contract: ai
+    purpose: Requirements derived from the forecast
+    trigger: onLoad
+    provenance: build, 29 September 2026
+  - operationId: decideOperationalRequirement
+    contract: ai
+    purpose: Accept, modify or reject a requirement
+    trigger: onAction
+    provenance: build, 29 September 2026
+  - operationId: getStaffingCoverage
+    contract: workforce
+    purpose: 'AI staffing requirement against the rota (basis=forecastRequirement): forecast figure, p90,
+      version, gap'
+    trigger: onLoad
+    provenance: build, 29 September 2026
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-927
@@ -122938,6 +123856,10 @@ screens:
     0 of 0 labels bound to a contract property; 1 of 24 pack bullets carried onto the screen — the rest
     are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts
     rather than here.
+  entryState:
+    params:
+    - name: requirementId
+      from: navigation
 - id: BO-928
   name: AI Conflict Resolution Assistant
   module: Rentals
@@ -123023,7 +123945,27 @@ screens:
       the active filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: createAiConversation
+    contract: ai
+    purpose: Open a conversation
+    trigger: onAction
+    provenance: build, 29 September 2026
+  - operationId: sendAiMessage
+    contract: ai
+    purpose: Ask the assistant
+    trigger: onAction
+    provenance: build, 29 September 2026
+  - operationId: listProposedActions
+    contract: ai
+    purpose: What the assistant has proposed and nobody has decided
+    trigger: onLoad
+    provenance: build, 29 September 2026
+  - operationId: decideProposedAction
+    contract: ai
+    purpose: Approve or reject a proposal (tier 1 here; tier 2 routed to Approvals)
+    trigger: onAction
+    provenance: build, 29 September 2026
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-928
@@ -123034,6 +123976,12 @@ screens:
     rather than here. **Pack actions reconciled 29 September (VM close-out):** Double booking, Certification
     expiry, Equipment maintenance, Venue conflict, Capacity conflict, Dependency conflict, Travel-time
     conflict, Setup conflict … dropped (AI design pending review).
+  entryState:
+    params:
+    - name: actionId
+      from: navigation
+    - name: conversationId
+      from: navigation
 - id: BO-929
   name: Automatic Schedule Optimization
   module: Rentals
@@ -123081,7 +124029,22 @@ screens:
     template: split
     regions:
     - name: contentBody
-      components: []
+      components:
+      - kind: primaryButton
+        derived: true
+        impliedBy: sendAiMessage
+        label: Send AI message
+        notes: The act the screen exists for.
+      - kind: dataTable
+        derived: true
+        impliedBy: listProposedActions
+        notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
+          a venue''s busiest hour is a list that skips rows.'
+      - kind: secondaryButton
+        label: Cancel
+        notes: '**A screen that can submit must be leaveable without submitting.**'
+        derived: true
+        impliedBy: sendAiMessage
   states:
     loading: The automatic schedule optimization list.
     error: Could not load. Names which read failed and leaves the automatic schedule optimization untouched.
@@ -123091,7 +124054,22 @@ screens:
       the active filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: sendAiMessage
+    contract: ai
+    purpose: Ask the assistant
+    trigger: onAction
+    provenance: build, 29 September 2026
+  - operationId: listProposedActions
+    contract: ai
+    purpose: What the assistant has proposed and nobody has decided
+    trigger: onLoad
+    provenance: build, 29 September 2026
+  - operationId: decideProposedAction
+    contract: ai
+    purpose: Approve or reject a proposal (tier 1 here; tier 2 routed to Approvals)
+    trigger: onAction
+    provenance: build, 29 September 2026
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-929
@@ -123100,6 +124078,12 @@ screens:
     0 of 0 labels bound to a contract property; 0 of 41 pack bullets carried onto the screen — the rest
     are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts
     rather than here.
+  entryState:
+    params:
+    - name: actionId
+      from: navigation
+    - name: conversationId
+      from: navigation
 - id: BO-930
   name: Alternative & Replacement Resource
   module: Rentals
@@ -123221,7 +124205,17 @@ screens:
     template: split
     regions:
     - name: contentBody
-      components: []
+      components:
+      - kind: primaryButton
+        derived: true
+        impliedBy: createForecastScenario
+        label: Create forecast scenario
+        notes: The act the screen exists for.
+      - kind: secondaryButton
+        label: Cancel
+        notes: '**A screen that can submit must be leaveable without submitting.**'
+        derived: true
+        impliedBy: createForecastScenario
   states:
     loading: The operational scenario simulator list.
     error: Could not load. Names which read failed and leaves the operational scenario simulator untouched.
@@ -123231,7 +124225,17 @@ screens:
       the active filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: createForecastScenario
+    contract: ai
+    purpose: Run a what-if
+    trigger: onAction
+    provenance: build, 29 September 2026
+  - operationId: compareForecastScenarios
+    contract: ai
+    purpose: Compare scenarios
+    trigger: onAction
+    provenance: build, 29 September 2026
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-931
@@ -123302,7 +124306,22 @@ screens:
     template: split
     regions:
     - name: contentBody
-      components: []
+      components:
+      - kind: dataTable
+        derived: true
+        impliedBy: listAiConversations
+        notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
+          a venue''s busiest hour is a list that skips rows.'
+      - kind: primaryButton
+        derived: true
+        impliedBy: createAiConversation
+        label: Create AI conversation
+        notes: The act the screen exists for.
+      - kind: secondaryButton
+        label: Cancel
+        notes: '**A screen that can submit must be leaveable without submitting.**'
+        derived: true
+        impliedBy: createAiConversation
   states:
     loading: The conversational resource copilot list.
     error: Could not load. Names which read failed and leaves the conversational resource copilot untouched.
@@ -123312,7 +124331,22 @@ screens:
       the active filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: listAiConversations
+    contract: ai
+    purpose: Conversation history
+    trigger: onLoad
+    provenance: build, 29 September 2026
+  - operationId: createAiConversation
+    contract: ai
+    purpose: Open a conversation
+    trigger: onAction
+    provenance: build, 29 September 2026
+  - operationId: sendAiMessage
+    contract: ai
+    purpose: Ask the assistant
+    trigger: onAction
+    provenance: build, 29 September 2026
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-932
@@ -123321,6 +124355,10 @@ screens:
     0 of 0 labels bound to a contract property; 0 of 168 pack bullets carried onto the screen — the rest
     are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts
     rather than here.
+  entryState:
+    params:
+    - name: conversationId
+      from: navigation
 - id: BO-933
   name: My Resource Operations Home
   module: Rentals
@@ -126504,6 +127542,11 @@ screens:
     purpose: Stage and focal point
     trigger: onAction
     invalidates: *id063
+  - operationId: proposeSeatMapChanges
+    contract: ai
+    purpose: Propose categories, numbering, a stage variant or consistency findings for this map
+    trigger: onAction
+    provenance: build, 29 September 2026
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-959
@@ -127684,6 +128727,21 @@ screens:
     purpose: Numbering and labelling
     trigger: onAction
     provenance: board reading, 19 September 2026
+  - operationId: decideProposedAction
+    contract: ai
+    purpose: Record which AI draft or proposal was used, or why it was refused
+    trigger: onAction
+    provenance: build, 29 September 2026
+  - operationId: proposeSeatMapChanges
+    contract: ai
+    purpose: Propose categories, numbering, a stage variant or consistency findings for this map
+    trigger: onAction
+    provenance: build, 29 September 2026
+  - operationId: getActionPlan
+    contract: ai
+    purpose: The seat-map plan's steps before approval
+    trigger: onAction
+    provenance: build, 29 September 2026
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-970
@@ -127695,6 +128753,10 @@ screens:
   entryState:
     params:
     - name: seatMapId
+      from: navigation
+    - name: actionId
+      from: navigation
+    - name: planId
       from: navigation
 - id: BO-971
   name: Validation & Correction
@@ -128219,6 +129281,21 @@ screens:
     purpose: Publish it
     trigger: onAction
     provenance: board reading, 19 September 2026
+  - operationId: decideProposedAction
+    contract: ai
+    purpose: Record which AI draft or proposal was used, or why it was refused
+    trigger: onAction
+    provenance: build, 29 September 2026
+  - operationId: proposeSeatMapChanges
+    contract: ai
+    purpose: Propose categories, numbering, a stage variant or consistency findings for this map
+    trigger: onAction
+    provenance: build, 29 September 2026
+  - operationId: getActionPlan
+    contract: ai
+    purpose: The seat-map plan's steps before approval
+    trigger: onAction
+    provenance: build, 29 September 2026
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-975
@@ -128230,6 +129307,10 @@ screens:
   entryState:
     params:
     - name: seatMapId
+      from: navigation
+    - name: actionId
+      from: navigation
+    - name: planId
       from: navigation
 - id: BO-976
   name: Clone & Inheritance
@@ -128960,6 +130041,11 @@ screens:
     purpose: Publish or roll back
     trigger: onAction
     invalidates: *id064
+  - operationId: proposeSeatMapChanges
+    contract: ai
+    purpose: Propose categories, numbering, a stage variant or consistency findings for this map
+    trigger: onAction
+    provenance: build, 29 September 2026
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-982
@@ -135661,11 +136747,11 @@ screens:
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
   apis:
-  - operationId: getRecommendations
-    contract: promotions
-    purpose: Seat upsell offers
+  - operationId: decideRecommendations
+    contract: ai
+    purpose: Fill a recommendation slot
     trigger: onAction
-    provenance: board reading, 19 September 2026
+    provenance: build, 29 September 2026
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-1048
@@ -137664,6 +138750,46 @@ screens:
     provenance: decided 29 September, VM close-out (venue management and configuration)
     invalidates:
     - listAccessPolicies
+  - operationId: listAccessPolicyHistory
+    contract: identity
+    purpose: Versions of a policy, to compare and pick one to restore
+    trigger: onAction
+    provenance: build, 29 September 2026
+  - operationId: restoreAccessPolicyVersion
+    contract: identity
+    purpose: Restore an approved version as a new version
+    trigger: onAction
+    provenance: build, 29 September 2026
+  - operationId: listAccessPolicyEffectiveness
+    contract: identity
+    purpose: How each permission policy has behaved over a period
+    trigger: onAction
+    provenance: build, 29 September 2026
+  - operationId: listPermissionFindings
+    contract: identity
+    purpose: Excessive, missing and conflicting permissions, or those a draft would create
+    trigger: onLoad
+    provenance: build, 29 September 2026
+  - operationId: listAccessReviewCampaigns
+    contract: identity
+    purpose: Access review campaigns and progress
+    trigger: onLoad
+    provenance: build, 29 September 2026
+  - operationId: createAccessReviewCampaign
+    contract: identity
+    purpose: Start a periodic access review
+    trigger: onAction
+    provenance: build, 29 September 2026
+  - operationId: listAccessReviewItems
+    contract: identity
+    purpose: Items of a campaign with their findings
+    trigger: onAction
+    provenance: build, 29 September 2026
+  - operationId: decideAccessReviewItem
+    contract: identity
+    purpose: Certify or revoke a grant
+    trigger: onAction
+    provenance: build, 29 September 2026
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-1066
@@ -137675,6 +138801,10 @@ screens:
   entryState:
     params:
     - name: policyId
+      from: navigation
+    - name: campaignId
+      from: navigation
+    - name: itemId
       from: navigation
 - id: BO-1067
   name: Seat Approval Workflows
@@ -138434,6 +139564,11 @@ screens:
     purpose: Subscribe
     trigger: onAction
     provenance: board reading, 19 September 2026
+  - operationId: listWebhookEventTypes
+    contract: public-api
+    purpose: Events a subscription can take
+    trigger: onLoad
+    provenance: build, 29 September 2026
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-1074
@@ -138511,11 +139646,11 @@ screens:
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
   apis:
-  - operationId: listApiVersions
+  - operationId: listWebhookEventTypes
     contract: public-api
-    purpose: The seat event catalogue
+    purpose: The seat event catalogue (publisher=seating)
     trigger: onLoad
-    provenance: board reading, 19 September 2026
+    provenance: build, 29 September 2026
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-1075
@@ -139073,6 +140208,21 @@ screens:
     purpose: Where the money stands
     trigger: onLoad
     provenance: board reading, 19 September 2026
+  - operationId: listTaxInvoices
+    contract: finance
+    purpose: List tax invoices
+    trigger: onLoad
+    provenance: build, 29 September 2026
+  - operationId: listCreditMemos
+    contract: finance
+    purpose: List credit memos
+    trigger: onLoad
+    provenance: build, 29 September 2026
+  - operationId: listEInvoiceTransmissions
+    contract: finance
+    purpose: E-invoicing transmission log and failures
+    trigger: onLoad
+    provenance: build, 29 September 2026
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-1081
@@ -149368,6 +150518,31 @@ screens:
     purpose: Fraud cases
     trigger: onLoad
     provenance: board reading, 19 September 2026
+  - operationId: listRiskAlerts
+    contract: ai
+    purpose: Risk alerts
+    trigger: onLoad
+    provenance: build, 29 September 2026
+  - operationId: decideRiskAlert
+    contract: ai
+    purpose: Dismiss, monitor, mark false positive, or escalate
+    trigger: onAction
+    provenance: build, 29 September 2026
+  - operationId: createRiskCase
+    contract: ai
+    purpose: Open an investigation
+    trigger: onAction
+    provenance: build, 29 September 2026
+  - operationId: getRiskCase
+    contract: ai
+    purpose: A case with its evidence and actions
+    trigger: onAction
+    provenance: build, 29 September 2026
+  - operationId: closeRiskCase
+    contract: ai
+    purpose: Close a case with an outcome
+    trigger: onAction
+    provenance: build, 29 September 2026
   entryState:
     preloaded:
     - Alert ID
@@ -149376,6 +150551,11 @@ screens:
     - Transaction
     - Amount
     - Risk score
+    params:
+    - name: alertId
+      from: navigation
+    - name: caseId
+      from: navigation
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-1160

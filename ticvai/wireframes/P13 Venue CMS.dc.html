@@ -339,9 +339,9 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; listContentPages · createContentPage · updateContentPage · setFooter +5</div>
+          <div><b>OPERATIONS</b> &middot; listContentPages · createContentPage · updateContentPage · setFooter +7</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoAccess</span></div>
-          <div><b>ARRIVES WITH</b> &middot; pageId&larr;navigation</div>
+          <div><b>ARRIVES WITH</b> &middot; pageId&larr;navigation, actionId&larr;navigation</div>
           <div><b>GOES TO</b> &middot; <a href="#cms-001">CMS-001</a>  &mdash; <i>Tenant Workspace</i><br><a href="#cms-002">CMS-002</a>  &mdash; <i>Brand Kit</i><br><a href="#cms-003">CMS-003</a>  &mdash; <i>Typography</i> <span class="car">pageId</span><br><a href="#cms-012">CMS-012</a>  &mdash; <i>Previews in both directions</i></div>
           
           <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formCreateContentPage &middot; <i>Create content page</i> &middot; <b>Create content page</b> &middot; Cancel <span class="dis">discards id · slug · title · body · status · isEnabled · iconAssetRef · categoryCode · sortOrder · isReferenced · scopePath</span></div><div class="ov"><b>modal</b> formUpdateContentPage &middot; <i>Save content page</i> &middot; <b>Save content page</b> &middot; Cancel <span class="dis">discards slug · title · body · isEnabled · iconAssetRef · categoryCode · sortOrder · status</span></div><div class="ov"><b>modal</b> formSetFooter &middot; <i>Save footer</i> &middot; <b>Save footer</b> &middot; Cancel <span class="dis">discards id · scopePath · columns · legalLinks · copyrightText · socialLinks</span></div><div class="ov"><b>modal</b> formSetHomepageLayout &middot; <i>Save homepage layout</i> &middot; <b>Save homepage layout</b> &middot; Cancel <span class="dis">discards sections · id</span></div></div>
@@ -369,9 +369,9 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; createBanner · updateBanner · createPromoBlock · updatePromoBlock +4</div>
+          <div><b>OPERATIONS</b> &middot; createBanner · updateBanner · createPromoBlock · updatePromoBlock +6</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess</span></div>
-          <div><b>ARRIVES WITH</b> &middot; bannerId&larr;navigation, promoBlockId&larr;navigation</div>
+          <div><b>ARRIVES WITH</b> &middot; bannerId&larr;navigation, promoBlockId&larr;navigation, actionId&larr;navigation</div>
           <div><b>GOES TO</b> &middot; <a href="#cms-001">CMS-001</a>  &mdash; <i>Tenant Workspace</i><br><a href="#cms-002">CMS-002</a>  &mdash; <i>Brand Kit</i><br><a href="#cms-003">CMS-003</a>  &mdash; <i>Typography</i> <span class="car">bannerId</span></div>
           
           <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formCreateBanner &middot; <i>Create banner</i> &middot; <b>Create banner</b> &middot; Cancel <span class="dis">discards id · title · imageAssetRef · startsAt · subtitle · placement · linkTarget · endsAt · state · sortOrder · isActive</span></div><div class="ov"><b>modal</b> formUpdateBanner &middot; <i>Save banner</i> &middot; <b>Save banner</b> &middot; Cancel <span class="dis">discards title · subtitle · imageAssetRef · placement · linkTarget · startsAt · endsAt · sortOrder · isActive</span></div><div class="ov"><b>modal</b> formCreatePromoBlock &middot; <i>Create promo block</i> &middot; <b>Create promo block</b> &middot; Cancel <span class="dis">discards id · title · description · iconAssetRef · promotionId · linkTarget · startsAt · endsAt · state · sortOrder · scopePath</span></div><div class="ov"><b>modal</b> formUpdatePromoBlock &middot; <i>Save promo block</i> &middot; <b>Save promo block</b> &middot; Cancel <span class="dis">discards title · description · iconAssetRef · promotionId · linkTarget · startsAt · endsAt · sortOrder</span></div><div class="ov"><b>confirmDialog</b> confirmDeletePromoBlock &middot; <i>Delete promo block</i></div></div>
@@ -429,7 +429,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; getMediaEntitlements · searchMedia · appendEntitlementToMedia · completeUpload +8</div>
+          <div><b>OPERATIONS</b> &middot; getMediaEntitlements · searchMedia · appendEntitlementToMedia · completeUpload +9</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess</span></div>
           <div><b>ARRIVES WITH</b> &middot; mediaCode&larr;deepLink, mediaId&larr;deepLink, uploadId&larr;deepLink</div>
           <div><b>GOES TO</b> &middot; <a href="#cms-001">CMS-001</a>  &mdash; <i>Tenant Workspace</i><br><a href="#cms-002">CMS-002</a>  &mdash; <i>Brand Kit</i> <span class="car">uploadId</span><br><a href="#cms-003">CMS-003</a>  &mdash; <i>Typography</i></div>
@@ -610,7 +610,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; getBookingFlowConfig · setBookingFlowConfig · getTenantConfig · listConsentQuestions +1</div>
+          <div><b>OPERATIONS</b> &middot; getBookingFlowConfig · setBookingFlowConfig · getTenantConfig · listConsentQuestions +3</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyNoResults · emptyFirstRun · emptyNoAccess</span></div>
           
           <div><b>GOES TO</b> &middot; <a href="#cms-001">CMS-001</a>  &mdash; <i>Tenant Workspace</i><br><a href="#cms-002">CMS-002</a>  &mdash; <i>Brand Kit</i><br><a href="#cms-003">CMS-003</a>  &mdash; <i>Typography</i> <span class="car">version</span><br><a href="#cms-013">CMS-013</a> <br><a href="#cms-017">CMS-017</a>  &mdash; <i>Domain &amp; Certificate</i><br><a href="#cms-018">CMS-018</a>  &mdash; <i>Consent &amp; Legal</i><br><a href="#cms-101">CMS-101</a>  &mdash; <i>Help me choose</i></div>
@@ -730,9 +730,9 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; listGuidedChoices · createGuidedChoice · updateGuidedChoice · deleteGuidedChoice +5</div>
+          <div><b>OPERATIONS</b> &middot; listGuidedChoices · createGuidedChoice · updateGuidedChoice · deleteGuidedChoice +7</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess</span></div>
-          <div><b>ARRIVES WITH</b> &middot; venueId&larr;session, guidedChoiceId&larr;navigation</div>
+          <div><b>ARRIVES WITH</b> &middot; venueId&larr;session, guidedChoiceId&larr;navigation, suggestionId&larr;navigation</div>
           <div><b>GOES TO</b> &middot; <a href="#cms-016">CMS-016</a>  &mdash; <i>Back to Site Settings</i></div>
           
           <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formCreateGuidedChoice &middot; <i>New set-up</i> &middot; <b>Create draft</b> &middot; Cancel <span class="dis">discards name · mode · showBanner · questions</span></div><div class="ov"><b>confirmDialog</b> confirmPublishGuidedChoice &middot; <i>Publish</i> &middot; <b>Publish to guests</b> &middot; Cancel</div><div class="ov"><b>confirmDialog</b> confirmDeleteGuidedChoice &middot; <i>Delete draft or dismiss suggestion</i> &middot; <b>Delete</b> &middot; Keep it</div></div>
@@ -880,7 +880,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; listCookieTrackingDigital</div>
+          <div><b>OPERATIONS</b> &middot; listCookieTrackingDigital · setTrackingTechnology · recordCookieScan · listCookieScans +2</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess</span></div>
           
           <div><b>GOES TO</b> &middot; <a href="#cms-021">CMS-021</a>  &mdash; <i>Returns to the board&#x27;s landing screen</i></div>
@@ -910,7 +910,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; listCookieBannerPreference</div>
+          <div><b>OPERATIONS</b> &middot; listCookieBannerPreference · setCookieBannerDesign</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoAccess</span></div>
           
           <div><b>GOES TO</b> &middot; <a href="#cms-021">CMS-021</a>  &mdash; <i>Returns to the board&#x27;s landing screen</i></div>
@@ -1120,7 +1120,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; listConsentEvidenceWithdrawal</div>
+          <div><b>OPERATIONS</b> &middot; listConsentEvidenceWithdrawal · listDeviceConsents</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess</span></div>
           
           <div><b>GOES TO</b> &middot; <a href="#cms-031">CMS-031</a>  &mdash; <i>Returns to the board&#x27;s landing screen</i></div>
@@ -1300,7 +1300,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; listPrivacyEvidenceCompliance</div>
+          <div><b>OPERATIONS</b> &middot; listPrivacyEvidenceCompliance · listDeviceConsents</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoAccess</span></div>
           
           <div><b>GOES TO</b> &middot; <a href="#cms-031">CMS-031</a>  &mdash; <i>Returns to the board&#x27;s landing screen</i></div>
@@ -1990,7 +1990,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; searchMedia · listCollections</div>
+          <div><b>OPERATIONS</b> &middot; searchMedia · listCollections · semanticSearch</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess</span></div>
           
           <div><b>GOES TO</b> &middot; <a href="#cms-061">CMS-061</a>  &mdash; <i>Back to Digital Asset Management Command Cen</i></div>

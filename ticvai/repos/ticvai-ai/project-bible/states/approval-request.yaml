@@ -24,21 +24,30 @@ transitions:
   guard: Submitted by the requester who saved the draft, and no other request for the subject is open.
     Routing, the matrix version and the SLA start here, not when the draft was saved (decided 28 September,
     audit R129). A contract raising a request creates it at pending and never drafts
+  emits:
+  - approval.requested
 - from: pending
   to: escalated
   operation: escalateApprovalRequest
   trigger: operation
   guard: Moved up a level. **Adds an approver rather than replacing one** — who was asked and did not
     answer is the question the escalation report exists for
+  emits:
+  - approval.escalated
 - from: pending
   to: escalated
   trigger: timer
   guard: SLA breached and the rule names an escalation target
+  emits:
+  - approval.escalated
 - from: escalated
   to: pending
   operation: decideApprovalRequest
   trigger: operation
-  guard: A level approved and the chain continues
+  guard: A level approved and the chain continues. A level approved inside `pending` (no escalation) is not
+    a status change; decideApprovalRequest emits approval.stepCompleted for that advance as well
+  emits:
+  - approval.stepCompleted
 - from: pending
   to: approved
   operation: decideApprovalRequest
@@ -130,10 +139,14 @@ transitions:
   trigger: timer
   guard: '**Nobody answered.** Usually a routing defect rather than a busy approver, which is why expired
     is counted separately from rejected'
+  emits:
+  - approval.expired
 - from: escalated
   to: expired
   trigger: timer
   guard: Nobody answered after escalation
+  emits:
+  - approval.expired
 - from: rejected
   to: pending
   operation: resubmitApprovalRequest

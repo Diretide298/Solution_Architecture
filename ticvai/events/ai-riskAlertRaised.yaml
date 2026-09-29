@@ -1,0 +1,55 @@
+# ai.riskAlertRaised v1 — published by ai
+# Checked by tools/check-states.py.
+
+name: ai.riskAlertRaised
+version: 1
+publisher: ai
+description: A risk alert was raised on an entity or transaction.
+aggregate: aiRiskAlert
+emittedWhen: AiRiskAlert created in open (scoring or re-scoring crossed the strategy threshold)
+payload:
+- field: tenantId
+  type: uuid
+- field: scopePath
+  type: string
+- field: alertId
+  type: uuid
+- field: kind
+  type: string
+  notes: 'transaction, velocity, entity, network, staffLeakage, scanAbuse, accountTakeover; since 29 September
+    (build) also chargeback (a customer or payment token with repeated chargebacks, from order.chargebackRecorded;
+    8.3.12, 8.3.15)'
+- field: entityType
+  type: string
+- field: entityRef
+  type: string
+  notes: An id, a hashed device id, a hashed IP address or a token reference; never a card number or a raw IP (AIP-112)
+- field: band
+  type: string
+- field: score
+  type: integer
+- field: correlationKey
+  type: string
+- field: raisedAt
+  type: timestamp
+consumers:
+- context: marketing
+  purpose: Notify the fraud analysts on duty (RISK_REVIEW)
+  idempotencyKey: alertId
+  onFailure: retryThenDeadLetter
+  isCritical: true
+- context: reporting
+  purpose: Risk alert analytics
+  idempotencyKey: alertId
+  onFailure: retry
+  isCritical: false
+retention: Two years, with the risk records
+notes: '**An alert is a signal, not a finding** (AIP-163). Restrictive actions never follow from the event;
+  they go through a case and the action pipeline (AIP-136).
+
+
+  **Carries ids and scope, never prompt text or personal data beyond ids** (AI design 3.2).
+
+
+  No state model emits this: the AI service has no state files under `states/` for this aggregate yet,
+  and the transition is named in `emittedWhen` (AI design 3.2, 29 September).'

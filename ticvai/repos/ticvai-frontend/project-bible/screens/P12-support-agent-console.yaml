@@ -1746,6 +1746,11 @@ screens:
     contract: white-label
     purpose: Published answers, as the guest sees them
     trigger: onLoad
+  - operationId: listKnowledgeGaps
+    contract: ai
+    purpose: Questions the assistant could not answer
+    trigger: onLoad
+    provenance: build, 29 September 2026
   entryState:
     params:
     - name: bannerId
@@ -3524,6 +3529,16 @@ screens:
     contract: marketing-crm
     purpose: AI Customer Service Copilot & Knowledge Workspace
     trigger: onAction
+  - operationId: configureAssistantProfile
+    contract: ai
+    purpose: Define an assistant profile
+    trigger: onAction
+    provenance: build, 29 September 2026
+  - operationId: listAssistantProfiles
+    contract: ai
+    purpose: Assistant profiles
+    trigger: onLoad
+    provenance: build, 29 September 2026
   wireframe:
     status: notStarted
     provenance: generated
@@ -3532,6 +3547,10 @@ screens:
   apisNote: Regenerated 9 September 2026 from Customer Service_Reference.pdf page 19. 0 of 0 labels bound
     to a contract property; 1 of 96 pack bullets carried onto the screen — the rest are acceptance prose,
     worked examples and AI narrative, which belong to the matrix and the contracts rather than here.
+  entryState:
+    params:
+    - name: profileKey
+      from: navigation
 - id: SUP-019
   name: Contact Center Operations Command Center
   module: Support

@@ -41,6 +41,12 @@ consumers:
   idempotencyKey: shiftId
   onFailure: retry
   isCritical: false
+- context: ai
+  purpose: Staff leakage signals — voids, refunds and cash variance per cashier and till against their
+    peers (AI system design section 3.2)
+  idempotencyKey: shiftId
+  onFailure: retry
+  isCritical: false
 retention: 30 days after publication
 notes: Carries expected and counted rather than only the variance. A consumer that receives a difference
   and not the inputs cannot explain it later.

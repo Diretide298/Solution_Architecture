@@ -13,7 +13,8 @@ CREATE TABLE IF NOT EXISTS platform.audit_read (
 -- Written by the platform on every write, not by any one operation (ADR-0022 sits above this).
 -- Naming it on 431 lineage rows would say nothing Hangs off: reaches platform.scope through its
 -- keys; references identity.platform_staff_grant, identity.principal, platform.scope. Reached by:
--- 1 operations read it and 2 write it; written by 2 contracts — inventory, tenancy.
+-- 1 operations read it and 10 write it; written by 5 contracts — finance, inventory, orders,
+-- payments.
 CREATE TABLE IF NOT EXISTS platform.audit_record (
     id                                uuid PRIMARY KEY NOT NULL,
     principal_id                      uuid,
@@ -128,10 +129,10 @@ CREATE TABLE IF NOT EXISTS platform.device (
     state                             text NOT NULL CONSTRAINT device_state_chk CHECK (state IN ('enrolled', 'provisioned', 'active', 'deactivated', 'retired')),
     reason                            text,
     id                                uuid PRIMARY KEY NOT NULL,
-    kind                              text NOT NULL CONSTRAINT device_kind_chk CHECK (kind IN ('receiptPrinter', 'ticketPrinter', 'labelPrinter', 'cashDrawer', 'barcodeScanner', 'rfidReader', 'nfcReader', 'cardReader', 'idReader', 'biometricReader', 'accessReader', 'paymentTerminal', 'customerDisplay', 'signageDisplay', 'kitchenDisplay', 'turnstileController', 'wristbandEncoder', 'signaturePad', 'scale', 'camera')),
+    kind                              text NOT NULL CONSTRAINT device_kind_chk CHECK (kind IN ('receiptPrinter', 'ticketPrinter', 'labelPrinter', 'cashDrawer', 'barcodeScanner', 'rfidReader', 'nfcReader', 'cardReader', 'idReader', 'biometricReader', 'accessReader', 'paymentTerminal', 'customerDisplay', 'signageDisplay', 'kitchenDisplay', 'turnstileController', 'wristbandEncoder', 'signaturePad', 'scale', 'camera', 'mobileHandset')),
     driver                            text NOT NULL,
     identifier                        text,
-    workstation_id                    uuid NOT NULL,
+    workstation_id                    uuid,
     model                             text,
     push_token                        text,
     push_platform                     text CONSTRAINT device_push_platform_chk CHECK (push_platform IN ('ios', 'android', 'web', 'windows')),
@@ -194,8 +195,8 @@ CREATE TABLE IF NOT EXISTS platform.offline_policy (
 
 -- Written in the same transaction as the state change, by the platform, not by an operation. That
 -- is what makes it exactly-once Hangs off: reaches platform.scope through its keys. Reached by: 3
--- operations read it and 36 write it; 1 tables reference it; written by 13 contracts — access,
--- approvals, catalogue, finance.
+-- operations read it and 94 write it; 1 tables reference it; written by 21 contracts — access,
+-- accreditation, ai, approvals.
 CREATE TABLE IF NOT EXISTS platform.outbox (
     id                                uuid PRIMARY KEY NOT NULL,
     event_name                        text NOT NULL,
@@ -301,7 +302,7 @@ CREATE TABLE IF NOT EXISTS platform.scope (
 );
 
 -- read-only projection of control.tenant, outside every cell Hangs off: reaches platform.scope
--- through its keys; references platform.scope. Reached by: 2 operations read it and 0 write it; 16
+-- through its keys; references platform.scope. Reached by: 2 operations read it and 0 write it; 18
 -- tables reference it.
 CREATE TABLE IF NOT EXISTS platform.tenant (
     id                                uuid PRIMARY KEY NOT NULL,

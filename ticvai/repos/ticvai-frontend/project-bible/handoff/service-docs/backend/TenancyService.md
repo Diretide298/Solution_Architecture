@@ -7,7 +7,7 @@
 | Tier | foundation: Read by everything, reads nothing above. Deploys first and alone. |
 | Contracts | `tenancy`, `workforce`, `approvals`, `accreditation` |
 | Schemas owned | `platform`, `workforce`, `approvals`, `accreditation`, `tenancy` |
-| Operations in the slice | 27 of 172 |
+| Operations in the slice | 28 of 202 |
 | Scale | Read-heavy and highly cacheable. Config changes are rare. |
 | If it is down | Same as identity — nothing runs without a scope. |
 
@@ -25,6 +25,7 @@
 |---|---|
 | [AccessService](AccessService.md) | `access.access_point` |
 | [IdentityService](IdentityService.md) | `identity.delegated_access`, `identity.principal` |
+| [PlatformService](PlatformService.md) | `control.api_client` |
 
 ## Operations in the first release
 
@@ -34,6 +35,7 @@
 | approvals | [`approveRoleAuthorityDelegation`](#approveroleauthoritydelegation) | PUT | `/role-authority-delegation` | setup | 1 |  |
 | delegation | [`createApprovalDelegation`](#createapprovaldelegation) | POST | `/delegations` | setup | 1 | ADM-243, BO-087, BO-385 |
 | devices | [`setDeviceAssignment`](#setdeviceassignment) | PUT | `/devices/{deviceId}/assignment` | core | 1 | ADM-582, POS-016 |
+| matrix | [`setApprovalExternalProvider`](#setapprovalexternalprovider) | PUT | `/approval-external-providers` | setup | 1 | ADM-354 |
 | matrix | [`setApprovalMatrix`](#setapprovalmatrix) | PUT | `/approval-matrices` | setup | 1 | ADM-242, ADM-243, ADM-330, ADM-331, ADM-332, ADM-333 … |
 | region | [`updateRegionSettings`](#updateregionsettings) | PUT | `/regions/{regionId}/settings` | setup | 1 | ADM-425, BO-1065 |
 | request | [`createApprovalRequest`](#createapprovalrequest) | POST | `/approval-requests` | core | 1 | ADM-567, BO-1010, BO-1031, BO-1080, BO-1181, BO-243 … |
@@ -392,6 +394,93 @@ The delegate cannot exceed the delegator's own authority, and **cannot approve a
 
 What requires approval, and who grants it
 
+### setApprovalExternalProvider
+
+**`PUT /approval-external-providers`**: Register a third-party workflow system as an approver
+
+11.1.65. **A client that already runs approvals in ServiceNow, SAP or its own workflow tool can have a level decided there**, instead of re-keying the same decision in two systems. A rule names the provider (`ApprovalRule.externalProviderId`); when a request reaches that level, TICVAI sends the provider the request mapped through `requestMapping`, signed, with retry, and waits for the provider to call `recordExternalApprovalDecision`.
+
+**The provider decides a level; it does not replace the controls.** Segregation of duties, the reason on a rejection and the immutability of a completed record hold exactly as for a person. If the provider does not answer inside `timeoutMinutes`, `onTimeout` says what happens — by default the level falls back to the rule's `approverRoleIds`, so a dead integration cannot hold a refund for ever.
+
+**PUT semantics — an upsert keyed on `code`**, as `setApprovalSlaPolicy`. Where no provider has that `code` one is created (`201`); where one does, the body replaces it whole (`200`). `id`, `status` changes by the platform, and `lastSuccessAt` are the server's. `outboundCredential` and `signingSecret` are write-only; omitting them on a replace keeps the stored ones. An `endpointUrl` that is not `https`, an `apiClientId` that is not an active API client of the tenant, or a `decisionMapping` that maps no value to `approve` and `reject` is `422`.
+
+|  |  |
+|---|---|
+| Permission | `APPROVAL_CONFIGURE` |
+| Scope level | tenant |
+| Part of slice | setup, makes `approvals.external_provider` non-empty |
+| Wave | 1 |
+| Offline | no |
+| Config scope | tenant |
+| Conflict policy | serverWins |
+| Reads | `approvals.external_provider`, `cache:idempotency`, `control.api_client` |
+| Writes | `approvals.external_provider`, `cache:idempotency` |
+| Called by | ADM-354 |
+
+**Parameters**
+
+| Name | In | Required | Type | Notes |
+|---|---|---|---|---|
+| Idempotency-Key | header | yes | string | Client-generated ULID. |
+
+**Request body**: `ApprovalExternalProvider`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| id | string (uuid) |  | (read-only) |
+| code | string | yes | The provider's stable name, and the key setApprovalExternalProvider upserts on. |
+| name | string | yes |  |
+| endpointUrl | string | yes | https only. |
+| outboundAuth | enum (bearerToken, basic, oauthClientCredentials, mutualTls) |  | (default oauthClientCredentials) |
+| outboundCredential | string (password) |  | The credential TICVAI presents to the provider. (nullable) |
+| signingSecret | string (password) |  | Signs every request TICVAI sends, as webhook deliveries are signed, so the provider can tell it came from TICVAI. (nullable) |
+| apiClientId | string (uuid) | yes | The public-api client the provider calls back as. |
+| requestMapping | array of object |  | Which request fields go to the provider, under which names. |
+| requestMapping[].from | string | yes | A field of ApprovalRequest, e.g. |
+| requestMapping[].to | string | yes | The provider's field name. |
+| decisionMapping | array of object | yes | The provider's outcome values and the decision each means. (min items 2) |
+| decisionMapping[].externalValue | string | yes |  |
+| decisionMapping[].decision | enum (approve, reject, return, requestInformation) | yes |  |
+| timeoutMinutes | integer |  | How long a level waits for the provider before onTimeout applies. (default 1440) |
+| onTimeout | enum (fallBackToRoles, escalate, reject) |  | (default fallBackToRoles) |
+| maxAttempts | integer |  | Delivery attempts, with backoff, before a dispatch is failed and the level falls back as on timeout. (default 5) |
+| status | enum (active, paused, disabled) |  | paused sends nothing and every level that names it falls back at once; the platform sets disabled after repeated failures, as it disables a failing webhook. (default active) |
+| lastSuccessAt | string (date-time) |  | (read-only; nullable) |
+| scopePath | string |  | (read-only) |
+
+**Response**: `ApprovalExternalProvider`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| id | string (uuid) |  | (read-only) |
+| code | string | yes | The provider's stable name, and the key setApprovalExternalProvider upserts on. |
+| name | string | yes |  |
+| endpointUrl | string | yes | https only. |
+| outboundAuth | enum (bearerToken, basic, oauthClientCredentials, mutualTls) |  | (default oauthClientCredentials) |
+| outboundCredential | string (password) |  | The credential TICVAI presents to the provider. (nullable) |
+| signingSecret | string (password) |  | Signs every request TICVAI sends, as webhook deliveries are signed, so the provider can tell it came from TICVAI. (nullable) |
+| apiClientId | string (uuid) | yes | The public-api client the provider calls back as. |
+| requestMapping | array of object |  | Which request fields go to the provider, under which names. |
+| requestMapping[].from | string | yes | A field of ApprovalRequest, e.g. |
+| requestMapping[].to | string | yes | The provider's field name. |
+| decisionMapping | array of object | yes | The provider's outcome values and the decision each means. (min items 2) |
+| decisionMapping[].externalValue | string | yes |  |
+| decisionMapping[].decision | enum (approve, reject, return, requestInformation) | yes |  |
+| timeoutMinutes | integer |  | How long a level waits for the provider before onTimeout applies. (default 1440) |
+| onTimeout | enum (fallBackToRoles, escalate, reject) |  | (default fallBackToRoles) |
+| maxAttempts | integer |  | Delivery attempts, with backoff, before a dispatch is failed and the level falls back as on timeout. (default 5) |
+| status | enum (active, paused, disabled) |  | paused sends nothing and every level that names it falls back at once; the platform sets disabled after repeated failures, as it disables a failing webhook. (default active) |
+| lastSuccessAt | string (date-time) |  | (read-only; nullable) |
+| scopePath | string |  | (read-only) |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 200 |  | Set — an existing provider with this code, replaced |
+| 201 |  | Created — no provider had this code |
+| 422 |  | The endpoint is not https, the API client is not an active client of the tenant, or the decision mapping has no value for approve or for reject |
+
 ### setApprovalMatrix
 
 **`PUT /approval-matrices`**: Configure what requires approval
@@ -414,7 +503,7 @@ Changing a matrix creates a version (11.1.80). Requests in flight keep the versi
 | Offline | no |
 | Config scope | venue |
 | Conflict policy | serverWins |
-| Reads | `approvals.matrix`, `approvals.rule`, `cache:idempotency` |
+| Reads | `approvals.external_provider`, `approvals.matrix`, `approvals.rule`, `cache:idempotency` |
 | Writes | `approvals.matrix`, `approvals.rule`, `cache:idempotency` |
 | Called by | ADM-242, ADM-243, ADM-330, ADM-331, ADM-332, ADM-333, ADM-334, ADM-335, BO-086, BO-1120, BO-1149, BO-639, BO-863 |
 
@@ -456,6 +545,7 @@ Changing a matrix creates a version (11.1.80). Requests in flight keep the versi
 | rules[].escalateAfterMinutes | integer |  | (nullable) |
 | rules[].escalateToRoleIds | array of string (uuid) |  | Role ids from identity.listRoles, as approverRoleIds. |
 | rules[].expiresAfterMinutes | integer |  | 11.1.53. (nullable) |
+| rules[].externalProviderId | string (uuid) |  | 11.1.65 (29 September). (nullable) |
 | isActive | boolean |  |  |
 
 **Response**: `ApprovalMatrix`
@@ -490,6 +580,7 @@ Changing a matrix creates a version (11.1.80). Requests in flight keep the versi
 | rules[].escalateAfterMinutes | integer |  | (nullable) |
 | rules[].escalateToRoleIds | array of string (uuid) |  | Role ids from identity.listRoles, as approverRoleIds. |
 | rules[].expiresAfterMinutes | integer |  | 11.1.53. (nullable) |
+| rules[].externalProviderId | string (uuid) |  | 11.1.65 (29 September). (nullable) |
 | isActive | boolean |  |  |
 
 **Responses**
@@ -685,6 +776,20 @@ Draft is supported (11.1.51) for the case where a person raises it themselves an
 | expiresAt | string (date-time) |  | (nullable) |
 | requestedAt | string (date-time) | yes |  |
 | completedAt | string (date-time) |  | (nullable) |
+| aiAssessment | object |  | AI context for the reviewer, never an input to the decision (11.1.73 to 11.1.75; MoM 8 September; 29 September, build pass, group G2). (read-only; nullable) |
+| aiAssessment.riskScore | integer |  | (min 0; max 100) |
+| aiAssessment.riskBand | enum (low, medium, high, critical) |  |  |
+| aiAssessment.priorityScore | integer |  | (min 0; max 100) |
+| aiAssessment.escalationSuggestion | object |  | A suggestion a person may act on through escalateApprovalRequest, or the tenant's own SLA policy may; nothing escalates because of it. |
+| aiAssessment.escalationSuggestion.action | enum (escalate, addBackupApprover, none) |  |  |
+| aiAssessment.escalationSuggestion.reason | string |  | (nullable) |
+| aiAssessment.signals | array of object |  | The signals behind the scores, largest first, as ai.AiApprovalRequestScore.signals. (max items 10) |
+| aiAssessment.signals[].code | string |  |  |
+| aiAssessment.signals[].contribution | number |  |  |
+| aiAssessment.signals[].detail | string |  | (nullable) |
+| aiAssessment.scoreId | string (uuid) |  | The ai.approval_request_score row it was copied from; ai.getApprovalRequestScore gives the full context. |
+| aiAssessment.decisionRecordId | string |  | The ai decision record, for the audit of what the AI said and why. |
+| aiAssessment.assessedAt | string (date-time) |  |  |
 
 **Responses**
 
@@ -788,6 +893,20 @@ A rejection requires a reason (11.1.21). An approval may carry a comment (11.1.2
 | expiresAt | string (date-time) |  | (nullable) |
 | requestedAt | string (date-time) | yes |  |
 | completedAt | string (date-time) |  | (nullable) |
+| aiAssessment | object |  | AI context for the reviewer, never an input to the decision (11.1.73 to 11.1.75; MoM 8 September; 29 September, build pass, group G2). (read-only; nullable) |
+| aiAssessment.riskScore | integer |  | (min 0; max 100) |
+| aiAssessment.riskBand | enum (low, medium, high, critical) |  |  |
+| aiAssessment.priorityScore | integer |  | (min 0; max 100) |
+| aiAssessment.escalationSuggestion | object |  | A suggestion a person may act on through escalateApprovalRequest, or the tenant's own SLA policy may; nothing escalates because of it. |
+| aiAssessment.escalationSuggestion.action | enum (escalate, addBackupApprover, none) |  |  |
+| aiAssessment.escalationSuggestion.reason | string |  | (nullable) |
+| aiAssessment.signals | array of object |  | The signals behind the scores, largest first, as ai.AiApprovalRequestScore.signals. (max items 10) |
+| aiAssessment.signals[].code | string |  |  |
+| aiAssessment.signals[].contribution | number |  |  |
+| aiAssessment.signals[].detail | string |  | (nullable) |
+| aiAssessment.scoreId | string (uuid) |  | The ai.approval_request_score row it was copied from; ai.getApprovalRequestScore gives the full context. |
+| aiAssessment.decisionRecordId | string |  | The ai decision record, for the audit of what the AI said and why. |
+| aiAssessment.assessedAt | string (date-time) |  |  |
 
 **Responses**
 
@@ -864,6 +983,7 @@ Read-only and deliberately cheap. It runs on the hot path — every refund, ever
 | matchedRule.escalateAfterMinutes | integer |  | (nullable) |
 | matchedRule.escalateToRoleIds | array of string (uuid) |  | Role ids from identity.listRoles, as approverRoleIds. |
 | matchedRule.expiresAfterMinutes | integer |  | 11.1.53. (nullable) |
+| matchedRule.externalProviderId | string (uuid) |  | 11.1.65 (29 September). (nullable) |
 | matrixVersion | integer |  | (nullable) |
 | approvers | array of object |  | Resolved, with delegations applied. |
 | approvers[].principalId | string (uuid) |  |  |
@@ -1641,7 +1761,7 @@ Support hours were an open conflict for eleven days and were never a design ques
 | departmentId | string (uuid) |  | (nullable) |
 | accessPointId | string (uuid) |  | (nullable) |
 | devices | array of DeviceBinding |  |  |
-| devices[].kind | DeviceKind: enum (receiptPrinter, ticketPrinter, labelPrinter, cashDrawer, barcodeScanner, rfidReader, nfcReader, cardReader, …) | yes |  |
+| devices[].kind | DeviceKind: enum (receiptPrinter, ticketPrinter, labelPrinter, cashDrawer, barcodeScanner, rfidReader, nfcReader, cardReader, …) | yes | mobileHandset (18.1.5, added 29 September): a staff phone or tablet running the staff app, registered for push and bound to no workstation. |
 | devices[].driver | string | yes | Driver identifier. |
 | devices[].identifier | string |  | Serial |
 | devices[].isRequired | boolean |  | When true, the workstation refuses to open a shift if the device is absent. (default False) |
@@ -1666,7 +1786,7 @@ Support hours were an open conflict for eleven days and were never a design ques
 | saleBoard.name | string |  |  |
 | accessPointId | string (uuid) |  | Inherited from the workstation, never selected by the operator. (nullable) |
 | devices | array of DeviceBinding |  |  |
-| devices[].kind | DeviceKind: enum (receiptPrinter, ticketPrinter, labelPrinter, cashDrawer, barcodeScanner, rfidReader, nfcReader, cardReader, …) | yes |  |
+| devices[].kind | DeviceKind: enum (receiptPrinter, ticketPrinter, labelPrinter, cashDrawer, barcodeScanner, rfidReader, nfcReader, cardReader, …) | yes | mobileHandset (18.1.5, added 29 September): a staff phone or tablet running the staff app, registered for push and bound to no workstation. |
 | devices[].driver | string | yes | Driver identifier. |
 | devices[].identifier | string |  | Serial |
 | devices[].isRequired | boolean |  | When true, the workstation refuses to open a shift if the device is absent. (default False) |
@@ -1842,7 +1962,8 @@ Tiles reference catalogue variants and are grouped into pages. A cashier finds a
 
 **`GET /devices`**: List registered devices
 
-Physical devices bound to workstations. Distinct from Device Management, which covers the full estate lifecycle — this is the binding a workstation needs at boot.
+Physical devices bound to workstations, and staff handsets (`mobileHandset`), which are bound to no workstation. Distinct from Device Management, which covers the full estate lifecycle — this is the binding a workstation needs at boot.
+**`platform.device` is the device register of record** (decided 29 September, build pass). Every device's identity, enrolment, credential, firmware and push registration lives here, whatever else refers to it. `access.access_device` (access `registerAccessDevice`) is the access topology's placement of an access-control device — gate, lane, hardware model, network references — and holds a second copy of serial, versions, health and lifecycle. That duplication is known and recorded, not merged yet; where the two disagree, this register wins.
 **`pushToken` is never in a row** (pull audit R164). It is `writeOnly`: a push token is a credential, and a list at venue level is not where a credential is read back.
 
 |  |  |
@@ -1873,10 +1994,10 @@ Physical devices bound to workstations. Distinct from Device Management, which c
 |---|---|---|---|
 | items | array of RegisteredDevice | yes |  |
 | items[].id | string (uuid) | yes | (read-only) |
-| items[].kind | DeviceKind: enum (receiptPrinter, ticketPrinter, labelPrinter, cashDrawer, barcodeScanner, rfidReader, nfcReader, cardReader, …) | yes |  |
+| items[].kind | DeviceKind: enum (receiptPrinter, ticketPrinter, labelPrinter, cashDrawer, barcodeScanner, rfidReader, nfcReader, cardReader, …) | yes | mobileHandset (18.1.5, added 29 September): a staff phone or tablet running the staff app, registered for push and bound to no workstation. |
 | items[].driver | string | yes | Built to an open standard where one exists — ESC/POS, UnifiedPOS, OSDP. |
 | items[].identifier | string |  | (nullable) |
-| items[].workstationId | string (uuid) | yes |  |
+| items[].workstationId | string (uuid) |  | Required for every kind except mobileHandset, which is bound to no workstation (18.1.5, 29 September); registerDevice refuses either mistake with 422. (nullable) |
 | items[].model | string |  | (nullable) |
 | items[].pushToken | string (password) |  | BL-163. (nullable) |
 | items[].pushPlatform | enum (ios, android, web, windows) |  | (nullable) |
@@ -2011,7 +2132,7 @@ The configured front ends a workstation may load. A board determines presentatio
 | items[].saleBoard.name | string |  |  |
 | items[].accessPointId | string (uuid) |  | Inherited from the workstation, never selected by the operator. (nullable) |
 | items[].devices | array of DeviceBinding |  |  |
-| items[].devices[].kind | DeviceKind: enum (receiptPrinter, ticketPrinter, labelPrinter, cashDrawer, barcodeScanner, rfidReader, nfcReader, cardReader, …) | yes |  |
+| items[].devices[].kind | DeviceKind: enum (receiptPrinter, ticketPrinter, labelPrinter, cashDrawer, barcodeScanner, rfidReader, nfcReader, cardReader, …) | yes | mobileHandset (18.1.5, added 29 September): a staff phone or tablet running the staff app, registered for push and bound to no workstation. |
 | items[].devices[].driver | string | yes | Driver identifier. |
 | items[].devices[].identifier | string |  | Serial |
 | items[].devices[].isRequired | boolean |  | When true, the workstation refuses to open a shift if the device is absent. (default False) |
@@ -2056,7 +2177,7 @@ Reports reachability and consumables — paper low, drawer open, reader offline.
 | Offline | no |
 | Conflict policy | append |
 | Reads | `platform.device` |
-| Writes | `platform.device` |
+| Writes | `platform.device`, `platform.outbox` |
 | Called by | BO-036, BO-124, BO-125, POS-016 |
 | State model | Registered device ([states/registered-device.yaml](../../../states/registered-device.yaml)): moves `offline` -> `online`, `online` -> `error`, `online` -> `consumableLow`, `consumableLow` -> `online`, `error` -> `online`, `online` -> `needsAttention`, `needsAttention` -> `online`, `unknown` -> `online` |
 
@@ -2261,6 +2382,25 @@ Every table this service owns that the slice reads or writes, with its columns a
 | is_active | boolean | no |  |
 | scope_path | text | no | The partition key (ADR-0005). |
 
+### `approvals.external_provider`
+
+| Column | Type | Required | Notes |
+|---|---|---|---|
+| id | uuid | no |  |
+| code | text | yes | The provider's stable name, and the key setApprovalExternalProvider upserts on. |
+| name | text | yes |  |
+| endpoint_url | text | yes | https only. |
+| outbound_auth | text | no |  |
+| outbound_credential | text | no | The credential TICVAI presents to the provider. |
+| signing_secret | text | no | Signs every request TICVAI sends, as webhook deliveries are signed, so the provider can tell it came from TICVAI. |
+| api_client_id | uuid | yes | The public-api client the provider calls back as. |
+| timeout_minutes | integer | no | How long a level waits for the provider before onTimeout applies. |
+| on_timeout | text | no |  |
+| max_attempts | integer | no | Delivery attempts, with backoff, before a dispatch is failed and the level falls back as on timeout. |
+| status | text | no | paused sends nothing and every level that names it falls back at once; the platform sets disabled after repeated failures, as it disables a failing webhook. |
+| last_success_at | timestamptz | no |  |
+| scope_path | text | no |  |
+
 ### `approvals.matrix`
 
 | Column | Type | Required | Notes |
@@ -2302,6 +2442,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 | expires_at | timestamptz | no |  |
 | requested_at | timestamptz | yes |  |
 | completed_at | timestamptz | no |  |
+| ai_assessment | jsonb | no | AI context for the reviewer, never an input to the decision (11.1.73 to 11.1.75; MoM 8 September; 29 September, build pass, group G2). |
 
 ### `approvals.rule`
 
@@ -2323,6 +2464,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 | escalate_after_minutes | integer | no |  |
 | escalate_to_role_ids | text[] | no | Role ids from identity.listRoles, as approverRoleIds. |
 | expires_after_minutes | integer | no | 11.1.53. |
+| external_provider_id | uuid | no | 11.1.65 (29 September). |
 | matrix_id | uuid | yes | Points at approvals.matrix. |
 
 ### `platform.device`
@@ -2335,7 +2477,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 | kind | text | yes |  |
 | driver | text | yes | Built to an open standard where one exists — ESC/POS, UnifiedPOS, OSDP. |
 | identifier | text | no |  |
-| workstation_id | uuid | yes |  |
+| workstation_id | uuid | no | Required for every kind except mobileHandset, which is bound to no workstation (18.1.5, 29 September); registerDevice refuses either mistake with 422. |
 | model | text | no |  |
 | push_token | text | no | BL-163. |
 | push_platform | text | no |  |
@@ -2543,23 +2685,23 @@ Every table this service owns that the slice reads or writes, with its columns a
 
 ## Not in the first release
 
-145 operations, added to this service in later releases without changing any of the above.
+174 operations, added to this service in later releases without changing any of the above.
 
 | Group | Operations |
 |---|---|
-| accreditation | `createAccreditationApplication`, `createAccreditationProgramme`, `createBadgePrintJob`, `decideAccreditationApplication`, `getAccreditationHolder`, `importAccreditationHolders`, `issueAccreditationCredential`, `listAccessProfiles`, `listAccreditationAccessActivity`, `listAccreditationApplications`, `listAccreditationAudit`, `listAccreditationCredentials`, `listAccreditationHolders`, `listAccreditationIdentityConflicts`, `listAccreditationProgrammes`, `listBadgePrintJobs`, `listBadgeTemplates`, `previewAccessImpact`, `replaceAccreditationCredential`, `resolveIdentityConflict`, `setAccessProfile`, `setAccreditationNotificationRules`, `setAccreditationRequirements`, `setAccreditationStatus`, `setAccreditationValidity`, `setBadgeTemplate`, `setHolderAccess`, `submitAccreditationDocument`, `updateAccreditationHolder`, `verifyAccreditationDocument` |
+| accreditation | `cloneAccreditationProgramme`, `createAccreditationApplication`, `createAccreditationProgramme`, `createBadgePrintJob`, `decideAccreditationApplication`, `deliverAccreditationCredential`, `exportAccreditationData`, `getAccreditationApplication`, `getAccreditationExport`, `getAccreditationHolder`, `importAccreditationHolders`, `issueAccreditationCredential`, `issueMyAccreditationWalletPass`, `listAccessProfiles`, `listAccreditationAccessActivity`, `listAccreditationApplications`, `listAccreditationAudit`, `listAccreditationCredentials`, `listAccreditationDocuments`, `listAccreditationExports`, `listAccreditationHolders`, `listAccreditationIdentityConflicts`, `listAccreditationProgrammes`, `listBadgePrintJobs`, `listBadgeTemplates`, `listMyAccreditationApplications`, `listMyAccreditationCredentials`, `previewAccessImpact`, `renewAccreditation`, `replaceAccreditationCredential`, `resolveIdentityConflict`, `resubmitAccreditationApplication`, `setAccessProfile`, `setAccreditationNotificationRules`, `setAccreditationRequirements`, `setAccreditationStatus`, `setAccreditationValidity`, `setBadgeTemplate`, `setHolderAccess`, `submitAccreditationApplication`, `submitAccreditationDocument`, `updateAccreditationApplication`, `updateAccreditationHolder`, `updateAccreditationProgramme`, `verifyAccreditationCredential`, `verifyAccreditationDocument`, `withdrawAccreditationApplication` |
 | analytics | `getApprovalAnalytics` |
-| announcements | `acknowledgeAnnouncement`, `getAnnouncementReach`, `listAnnouncements`, `publishAnnouncement` |
+| announcements | `acknowledgeAnnouncement`, `getAnnouncementReach`, `listAnnouncements`, `listStaffConversations`, `listStaffMessages`, `markStaffConversationRead`, `publishAnnouncement`, `sendStaffMessage` |
 | approvals | `actOnWorkflowInstance`, `approveUnifiedDecision`, `approveVersioningGovernance`, `createApprovalEvidencePackage`, `createAutomationAutonomouAction`, `getApprovalRecord`, `issueAccreditationBadge`, `listAccreditationBadges`, `listApprovalControlPolicies`, `listConditionDecisionLogic`, `listCrossModuleOrchestration`, `listProcessAutomationOpportunity`, `listRuleWorkflow`, `listSlaEscalationBottleneck`, `listSlaEscalationReminder`, `listWorkflow`, `listWorkflowAutonomouGovernance`, `listWorkflowExceptionFailure`, `listWorkflowInstanceProcess`, `listWorkflowProcessPerformance`, `setApprovalControlPolicy`, `setApprovalRetentionPolicy`, `setApprovalSlaPolicy`, `setApproverAvailability`, `setTriggerActionCross`, `setVisualBusinessRule`, `setVisualWorkflow`, `signApprovalDecision`, `simulateWorkflowTestingImpact` |
 | attendance | `amendAttendance`, `listAttendance`, `recordAttendance` |
 | delegation | `listApprovalDelegations`, `revokeApprovalDelegation` |
-| devices | `enrolDevice`, `getDeviceTelemetry`, `issueDeviceCredential`, `listDeviceAuditRecords`, `listDeviceFirmware`, `listDeviceTamperEvents`, `recordDeviceTamperEvent`, `revokeDeviceCredential`, `rollbackDeviceFirmware`, `startDeviceFirmwareRollout` |
+| devices | `createDeviceFirmware`, `enrolDevice`, `getDeviceFirmware`, `getDeviceTelemetry`, `issueDeviceCredential`, `listDeviceAuditRecords`, `listDeviceFirmware`, `listDeviceTamperEvents`, `recordDeviceTamperEvent`, `revokeDeviceCredential`, `rollbackDeviceFirmware`, `setDeviceFirmwareStatus`, `startDeviceFirmwareRollout` |
 | identity | `setRolePermissions` |
-| matrix | `listApprovalMatrices`, `listStepUpPolicies`, `setStepUpPolicy` |
+| matrix | `listApprovalExternalProviders`, `listApprovalMatrices`, `listStepUpPolicies`, `setStepUpPolicy` |
 | region | `getRegionSettings` |
-| request | `escalateApprovalRequest`, `listApprovalRequests`, `listApprovedActionExecutions`, `resolveApprovedActionExecution`, `resubmitApprovalRequest`, `submitApprovalRequest`, `withdrawApprovalRequest` |
+| request | `escalateApprovalRequest`, `listApprovalExternalDispatches`, `listApprovalRequests`, `listApprovedActionExecutions`, `recordExternalApprovalDecision`, `resolveApprovedActionExecution`, `resubmitApprovalRequest`, `submitApprovalRequest`, `withdrawApprovalRequest` |
 | rota | `requestShiftSwap`, `updateRotaAssignment` |
 | scope | `getOrgUnit` |
-| tenancy | `deployConfigurationProfile`, `getConfigurationProfile`, `getConnectivityPolicy`, `getOfflinePolicy`, `getVenueSettingsDefaults`, `listAuditRecords`, `listCellEndpoints`, `listConfigurationProfiles`, `listProfileDeployments`, `setConfigurationProfile`, `setConnectivityThresholds`, `setOfflinePolicy`, `setVenueSettingsDefaults` |
+| tenancy | `deployConfigurationProfile`, `getConfigurationProfile`, `getConnectivityPolicy`, `getOfflinePolicy`, `getVenueSettingsDefaults`, `listAuditRecords`, `listCellEndpoints`, `listConfigurationProfiles`, `listDataRetentionSettings`, `listProfileDeployments`, `setConfigurationProfile`, `setConnectivityThresholds`, `setDataRetentionSetting`, `setOfflinePolicy`, `setVenueSettingsDefaults` |
 | workforce | `broadcastToGuests`, `claimOpenShift`, `getEmployee`, `getFieldOwnership`, `getLabourCost`, `getStaffingCoverage`, `listEmployees`, `listIntegrationSources`, `listJobTitles`, `listLabourBudgets`, `listLeaveBalances`, `listLeaveRequests`, `listLeaveTypes`, `listOpenShifts`, `listShiftPatterns`, `listShiftSwapRequests`, `listShiftTemplates`, `listSyncConflicts`, `listSyncRuns`, `listTrainingRecords`, `listWorkAssignments`, `requestLeave`, `resolveSyncConflict`, `setFieldOwnership`, `setIntegrationSource`, `setJobTitle`, `setLabourBudget`, `setLeaveType`, `setShiftPattern`, `setShiftTemplate`, `setStaffingRules`, `setWorkAssignment`, `startSync`, `validateWorkforceCompliance` |
 | workstation | `getDevice`, `getOutlet`, `getWorkstation`, `registerDevice` |

@@ -8,6 +8,6 @@
 -- A cell registry that exists two hundred times is two hundred registries that can
 -- disagree, and the first thing that disagrees is which of them is authoritative.
 --
--- 73 tables. Applied once per region, to the instance.
+-- 75 tables. Applied once per region, to the instance.
 
 CREATE SCHEMA IF NOT EXISTS control;

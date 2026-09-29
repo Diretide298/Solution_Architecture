@@ -1,0 +1,86 @@
+# entitlement.expiringSoon v1 — published by access
+# Checked by tools/check-states.py against states/ and the contracts.
+
+name: entitlement.expiringSoon
+version: 1
+publisher: access
+description: A ticket or pass a guest still holds expires within its template's notice period.
+aggregate: entitlement
+emittedWhen: The daily expiry-notice run finds an entitlement in `issued` or `partiallyConsumed` whose validTo is
+  within EntitlementTemplate.expiryNoticeDays and which was issued more than that many days before validTo; once
+  per entitlement per validTo
+payload:
+- field: entitlementId
+  type: string
+- field: templateId
+  type: uuid
+- field: productId
+  type: uuid
+- field: orderId
+  type: string
+- field: subjectId
+  type: uuid
+  notes: The holder. What a campaign or message trigger addresses; the message itself is resolved by marketing
+    from the guest record, never carried here
+- field: membershipId
+  type: string
+  required: false
+  notes: Set when the entitlement belongs to a membership, so a membership renewal journey and a pass reminder
+    are not both sent
+- field: status
+  type: string
+  notes: issued or partiallyConsumed
+- field: remainingUses
+  type: integer
+  required: false
+  notes: For a count-limited pass, the entries left. **An unused pass about to lapse is the message worth
+    sending**
+- field: validTo
+  type: timestamp
+- field: daysRemaining
+  type: integer
+- field: venueId
+  type: uuid
+- field: scopePath
+  type: string
+- field: raisedAt
+  type: timestamp
+consumers:
+- context: marketing
+  purpose: 'Pre-expiry alerts (5.5.30): fires a `MessageTrigger` on `entitlement.expiringSoon` and a triggered
+    campaign with `CampaignTrigger.event` `entitlementExpiring`, and keeps the segment attribute
+    `entitlementExpiringWithinDays` current for the holder'
+  idempotencyKey: entitlementId + validTo
+  onFailure: retry
+  isCritical: false
+- context: ai
+  purpose: Renewal and upgrade candidates for `decideRecommendations` (a pass about to lapse is a renewal or
+    an upgrade moment), and the churn signal for guest intelligence
+  idempotencyKey: entitlementId + validTo
+  onFailure: retry
+  isCritical: false
+- context: public-api
+  purpose: Deliver to webhook subscriptions taking entitlement.expiringSoon, for a tenant's own CRM
+  idempotencyKey: entitlementId + validTo
+  onFailure: retryThenDeadLetter
+  isCritical: false
+retention: 30 days after publication
+notes: '**Added 29 September (build pass, group G2), closing 5.5.30.** Expiry warnings existed for memberships
+  (`CampaignTrigger` `membershipExpiring`), points and wallet credit, and not for the ticket or pass itself:
+  `entitlement.statusChanged` fires at a freeze or a renewal, never before expiry, so an annual pass lapsed
+  unused with nobody told.
+
+
+  **N is configured on the template** (`catalogue.EntitlementTemplate.expiryNoticeDays`, venue scope through
+  `createEntitlementTemplate`): an annual pass wants thirty days, a day ticket none. Null means no notice. **An
+  entitlement bought inside its own notice period raises nothing**, so buying Friday''s ticket on Wednesday does
+  not produce an expiry warning at checkout.
+
+
+  **Keyed on entitlement and validTo**, so a freeze or renewal that moves validTo (entitlement.statusChanged
+  validityExtended) raises the next notice once, and a rerun of the daily job raises nothing twice.
+
+
+  No state model emits this: the notice period opening is a date passing, not a state change; the entitlement
+  stays `issued` or `partiallyConsumed`. The daily run in access reads `access.entitlement` and writes
+  `platform.outbox` once per entitlement and validTo.'

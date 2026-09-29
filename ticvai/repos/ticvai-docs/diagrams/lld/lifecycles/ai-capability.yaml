@@ -1,0 +1,46 @@
+id: LLD-AI capability
+title: AI capability — 3 transitions
+generatedBy: tools/derive-diagrams.py
+index: diagrams/hld/04-lifecycles.yaml
+source: states/ai-capability.yaml
+entity: AI capability
+contract: ai
+enum: AiCapabilityRegistration.status
+enumKind: inline
+enumSchema: AiCapabilityRegistration
+enumProperty: status
+owner: ai
+description: '**An entry in the capability registry** (AI design 3.1 Registry, AIC-144, AIC-145; ADM-520),
+  registered by `configureAiCapability`. `status` is the kill switch: a paused capability answers from
+  its declared degradation mode until resumed (design 3.7).'
+initial:
+- active
+terminal: []
+transitions:
+- from: active
+  to: paused
+  operation: pauseAiCapability
+  trigger: operation
+  guard: '**The kill switch** (AIC-189, ADM-519, ADM-536, ADM-556), with a reason and, where an incident
+    caused it, its `incidentId` (`409` if already paused). Recommendations leave the slot empty, fraud
+    scoring falls back to the owners'' rules, the concierge offers a person; in-flight plans pause at
+    their next checkpoint'
+  emits:
+  - ai.capabilityPaused
+- from: active
+  to: paused
+  operation: containAiIncident
+  trigger: operation
+  guard: Containment action `pauseCapability` on an incident. The same move as `pauseAiCapability`,
+    recorded on the incident
+  emits:
+  - ai.capabilityPaused
+- from: paused
+  to: active
+  operation: resumeAiCapability
+  trigger: operation
+  guard: '**Resuming needs more authority than pausing** (`AI_APPROVE`): stopping is always safe, starting
+    again is a decision. Plans paused by the pause stay paused and are resumed one by one with `resumeActionPlan`'
+notes: '**No terminal state, by design** (`terminal: []`): a registration is configuration, paused and
+  resumed, never finished. `configureAiCapability` changes its owner, risk class or autonomy and does
+  not move `status`.'

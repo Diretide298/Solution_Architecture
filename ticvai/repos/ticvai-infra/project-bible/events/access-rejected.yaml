@@ -1,0 +1,63 @@
+# access.rejected v1 — published by access
+# Checked by tools/check-states.py against states/ and the contracts.
+
+name: access.rejected
+version: 1
+publisher: access
+description: Media was presented at an access point and refused, with the reason the gate gave.
+aggregate: accessPoint
+emittedWhen: validateAccess returns outcome denied, or syncScans accepts a replayed offline scan that was
+  denied at the gate or that the server downgraded from admitted to denied
+payload:
+- field: scanId
+  type: string
+  notes: ULID. The idempotency key for every consumer, and the key `access.validated` uses
+- field: credentialRef
+  type: string
+  required: false
+  notes: The `entitlementId` where the media resolved to one. **Never the raw media code** — for media
+    that resolved to nothing (`notFound`) it is a keyed hash of the code, so repeated tries of one forged
+    code still join
+- field: accessPointId
+  type: uuid
+  notes: The gate
+- field: reason
+  type: string
+  notes: 'The `DenyReason` value, verbatim. The risk model groups them: invalid (notFound, mediaDeactivated,
+    unpaid), used (alreadyUsed, reentryLimitReached), expired (expired, notYetValid, outsideAdmissionWindow),
+    wrongZone (wrongAccessPoint, wrongPerformance, journeyNotCovered), blocked (blacklisted,
+    entitlementSuspended), passback (exitRequiredBeforeReentry); the rest are not abuse signals'
+- field: deviceId
+  type: uuid
+  notes: The scanning device (the workstation the session is on)
+- field: direction
+  type: string
+  notes: in or out
+- field: wasOffline
+  type: boolean
+  notes: True where the terminal refused against its bundle and synced later, or the server downgraded an
+    offline admission on replay
+- field: scopePath
+  type: string
+- field: tenantId
+  type: uuid
+- field: at
+  type: timestamp
+  notes: When it happened at the gate (`recordedAt`)
+consumers:
+- context: ai
+  purpose: Scan-abuse risk (the same ticket refused at several gates, passback, forged-code bursts at one
+    access point) and entry-flow forecast actuals — refusals are demand the gate turned away (AI system
+    design section 3.2)
+  idempotencyKey: scanId
+  onFailure: retry
+  isCritical: false
+retention: 7 days, as `access.validated`. At scan volume the outbox is the largest table in the cell
+notes: '**Added 29 September (build pass, group OWN, from the AI group''s handoff).** `access.validated`
+  only ever carried admissions, so a ticket tried at four gates in a minute looked like nothing at all.
+
+
+  No state model emits this: **a refusal changes no state** — the entitlement is exactly as it was before
+  the scan, which is what a refusal means. The scan is **created** as an `access.scan_event` row by the
+  operation, and `validateAccess` (and `syncScans` on replay) writes `platform.outbox` in the same
+  transaction as that row (ADR-0033).'

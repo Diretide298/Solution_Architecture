@@ -1,0 +1,102 @@
+# order.chargebackRecorded v1 — published by orders
+# Checked by tools/check-states.py against states/ and the contracts.
+
+name: order.chargebackRecorded
+version: 1
+publisher: orders
+description: A chargeback was taken in against a payment, or the provider's final answer on one was recorded.
+aggregate: chargeback
+emittedWhen: recordChargeback creates the case in `received` (stage received, not a repeat notification), and
+  recordChargebackOutcome or the deadline timer moves it to won, lost or expired (stage decided); respondToChargeback
+  conceding it moves it to accepted (stage decided)
+payload:
+- field: chargebackEventId
+  type: string
+  notes: ULID minted in the writing transaction. With `stage`, what makes a delivery a duplicate
+- field: chargebackId
+  type: uuid
+- field: stage
+  type: string
+  notes: received (the case was taken in) or decided (it reached won, lost, accepted or expired)
+- field: outcome
+  type: string
+  required: false
+  notes: won, lost, accepted or expired. Null at stage received
+- field: paymentId
+  type: string
+- field: orderId
+  type: string
+  required: false
+  notes: The order the payment settled. Null for a payment with no order (a wallet top-up)
+- field: subjectId
+  type: uuid
+  required: false
+  notes: The guest the order belongs to. Null for an anonymous purchase. **An id, never a name or contact
+    point**
+- field: paymentTokenRef
+  type: string
+  required: false
+  notes: The provider token reference the payment was made with, as `ai.scoreTransactionRisk` receives it
+    (`paymentTokenRef`), so the chargeback lands on the same payment-token entity. Never a card number
+- field: deviceIdHash
+  type: string
+  required: false
+  notes: The device the payment was attempted from, hashed per tenant as on identity.loginRecorded, where the
+    payment attempt recorded one
+- field: providerId
+  type: uuid
+- field: reason
+  type: string
+  notes: fraudulent, productNotReceived, productUnacceptable, duplicate, subscriptionCancelled,
+    creditNotProcessed, unrecognised or other (the mapped reason on `Chargeback`)
+- field: schemeReasonCode
+  type: string
+  required: false
+- field: amount
+  type: Money
+- field: productIds
+  type: array
+  notes: The products on the order lines the payment settled, so a consumer can attribute the chargeback
+    without reading the order
+- field: venueId
+  type: uuid
+- field: scopePath
+  type: string
+- field: tenantId
+  type: uuid
+- field: recordedAt
+  type: timestamp
+consumers:
+- context: ai
+  purpose: 'Chargeback count and rate on the customer, account, payment-token and device entity risk; an alert of
+    kind chargeback where a customer or token repeats; the training label for the order''s risk assessment, joined
+    by orderId (8.3.11 to 8.3.15). Stage decided refines the label (a `fraudulent` case the venue lost or accepted
+    is a confirmed fraud; one it won is not). In `ai-realtime` (AI system design section 3.2)'
+  idempotencyKey: chargebackEventId
+  onFailure: retryThenDeadLetter
+  isCritical: false
+- context: public-api
+  purpose: Deliver to webhook subscriptions taking order.chargebackRecorded, for a tenant's own finance or
+    fraud tooling
+  idempotencyKey: chargebackEventId
+  onFailure: retryThenDeadLetter
+  isCritical: false
+retention: 30 days after publication
+notes: '**Added 29 September (build pass, group G2), closing 8.3.11 to 8.3.15.** Chargebacks were recorded and
+  posted to the ledger (`recordChargeback`, 5.7.92) and nothing outside orders heard about them, so the risk
+  engine could neither learn from a lost case nor warn about a customer with three.
+
+
+  **Two stages, one event.** A chargeback is a signal the day it arrives (the bank has taken the money) and a
+  label the day it is decided (the venue proved it or did not); a consumer that only wants the first reads
+  `stage` received. Both carry the same `chargebackId`, so ordering per chargeback is what the aggregate gives.
+
+
+  The `received` stage is published by `recordChargeback` in the same transaction that creates the case and
+  posts the debit (ADR-0033); a case is **created** in `received`, which no transition in
+  `states/chargeback.yaml` can express, so that emit sits on the operation. A repeat notification for the same
+  `providerCaseReference` returns the existing case (200) and publishes nothing. The `decided` stage is on the
+  transitions into won, lost, accepted and expired.
+
+
+  **Carries ids, hashes and scope, never personal data beyond ids** (AI design 3.2).'

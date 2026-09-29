@@ -1,5 +1,5 @@
 id: LLD-identity
-title: identity — 75 operations
+title: identity — 89 operations
 generatedBy: tools/derive-diagrams.py
 index: diagrams/hld/03-contracts.yaml
 tier: spine
@@ -39,6 +39,7 @@ operations:
   writes:
   - cache:idempotency
   - identity.session
+  - platform.outbox
 - operation: createAccessPolicy
   verb: POST
   path: /access-policies
@@ -51,6 +52,28 @@ operations:
   - identity.access_policy
   writes:
   - identity.access_policy
+- operation: createAccessReviewCampaign
+  verb: POST
+  path: /access-review-campaigns
+  scope: venue
+  permission: PERMISSION_MANAGE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - cache:idempotency
+  - identity.access_decision
+  - identity.access_review_campaign
+  - identity.delegated_access
+  - identity.principal
+  - identity.role_permission
+  - identity.segregation_rule
+  - workforce.employee
+  - workforce.work_assignment
+  writes:
+  - cache:idempotency
+  - identity.access_review_campaign
+  - identity.access_review_item
 - operation: createDelegatedAccess
   verb: POST
   path: /delegated-access
@@ -125,6 +148,42 @@ operations:
   - cache:idempotency
   - cache:resolution
   - identity.role
+- operation: decideAccessReviewItem
+  verb: POST
+  path: /access-review-items/{itemId}/decision
+  scope: venue
+  permission: PERMISSION_GRANT
+  audience:
+  - staff
+  offline: false
+  reads:
+  - cache:idempotency
+  - identity.access_review_campaign
+  - identity.access_review_item
+  - identity.delegated_access
+  writes:
+  - cache:idempotency
+  - cache:resolution
+  - identity.access_review_campaign
+  - identity.access_review_item
+  - identity.delegated_access
+  - identity.session
+- operation: decideGuestIdentityVerification
+  verb: POST
+  path: /guest-identity-verifications/{verificationId}/decision
+  scope: tenant
+  permission: GUEST_MANAGE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - cache:idempotency
+  - identity.guest_identity_verification
+  - identity.guest_verification_policy
+  writes:
+  - cache:idempotency
+  - identity.guest_identity_verification
+  - pii.subject_document
 - operation: deleteDelegatedAccess
   verb: DELETE
   path: /delegated-access/{delegatedAccessId}
@@ -274,6 +333,17 @@ operations:
   - identity.mfa_method
   - pii.subject
   writes: []
+- operation: getGuestVerificationPolicy
+  verb: GET
+  path: /guest-verification-policy
+  scope: tenant
+  permission: TENANT_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - identity.guest_verification_policy
+  writes: []
 - operation: getMembership
   verb: GET
   path: /memberships/{membershipId}
@@ -286,6 +356,17 @@ operations:
   - identity.benefit_usage
   - identity.customer_membership
   - identity.membership_history
+  writes: []
+- operation: getMyIdentityVerification
+  verb: GET
+  path: /auth/guest/identity-verifications/current
+  scope: tenant
+  permission: null
+  audience:
+  - guest
+  offline: false
+  reads:
+  - identity.guest_identity_verification
   writes: []
 - operation: getPasswordPolicy
   verb: GET
@@ -371,7 +452,8 @@ operations:
   offline: false
   reads:
   - identity.mfa_method
-  writes: []
+  writes:
+  - platform.outbox
 - operation: guestSocialLogin
   verb: POST
   path: /auth/guest/social
@@ -388,6 +470,7 @@ operations:
   - cache:idempotency
   - identity.guest_session
   - pii.subject
+  - platform.outbox
 - operation: guestUaePassLogin
   verb: POST
   path: /auth/guest/uae-pass
@@ -405,6 +488,7 @@ operations:
   - identity.guest_session
   - pii.subject
   - pii.subject_document
+  - platform.outbox
 - operation: linkGuestCheckout
   verb: POST
   path: /auth/guest/link-checkout
@@ -444,6 +528,19 @@ operations:
   reads:
   - identity.access_policy
   writes: []
+- operation: listAccessPolicyEffectiveness
+  verb: GET
+  path: /access-policy-effectiveness
+  scope: tenant
+  permission: PERMISSION_VIEW
+  audience:
+  - staff
+  offline: false
+  reads:
+  - identity.access_decision
+  - identity.access_override
+  - identity.access_policy
+  writes: []
 - operation: listAccessPolicyHistory
   verb: GET
   path: /access-policies/{policyId}/history
@@ -466,6 +563,31 @@ operations:
   offline: false
   reads:
   - identity.access_policy
+  writes: []
+- operation: listAccessReviewCampaigns
+  verb: GET
+  path: /access-review-campaigns
+  scope: venue
+  permission: PERMISSION_VIEW
+  audience:
+  - staff
+  offline: false
+  reads:
+  - identity.access_review_campaign
+  writes: []
+- operation: listAccessReviewItems
+  verb: GET
+  path: /access-review-campaigns/{campaignId}/items
+  scope: venue
+  permission: PERMISSION_VIEW
+  audience:
+  - staff
+  offline: false
+  reads:
+  - identity.access_review_campaign
+  - identity.access_review_item
+  - identity.principal
+  - identity.role
   writes: []
 - operation: listActiveSessions
   verb: GET
@@ -529,6 +651,19 @@ operations:
   - marketing.guest_profile
   - pii.subject
   writes: []
+- operation: listGuestIdentityVerifications
+  verb: GET
+  path: /guest-identity-verifications
+  scope: tenant
+  permission: GUEST_VIEW_PII
+  audience:
+  - staff
+  offline: false
+  reads:
+  - identity.guest_identity_verification
+  - pii.subject
+  - pii.subject_document
+  writes: []
 - operation: listMfaMethods
   verb: GET
   path: /auth/mfa/methods
@@ -575,6 +710,23 @@ operations:
   offline: false
   reads:
   - identity.platform_staff_grant
+  writes: []
+- operation: listPermissionFindings
+  verb: GET
+  path: /permission-findings
+  scope: venue
+  permission: PERMISSION_VIEW
+  audience:
+  - staff
+  offline: false
+  reads:
+  - identity.access_decision
+  - identity.access_policy
+  - identity.delegated_access
+  - identity.principal
+  - identity.role
+  - identity.role_permission
+  - identity.segregation_rule
   writes: []
 - operation: listPermissions
   verb: GET
@@ -678,6 +830,7 @@ operations:
   - cache:idempotency
   - identity.refresh_token
   - identity.session
+  - platform.outbox
 - operation: logout
   verb: POST
   path: /auth/logout
@@ -752,6 +905,7 @@ operations:
   - identity.guest_session
   - pii.subject
   - pii.subject_contact
+  - platform.outbox
 - operation: removeMfaMethod
   verb: DELETE
   path: /auth/mfa/methods/{methodId}
@@ -782,6 +936,7 @@ operations:
   writes:
   - cache:idempotency
   - identity.otp_challenge
+  - platform.outbox
 - operation: resetPrincipalCredential
   verb: POST
   path: /principals/{principalId}/credential-reset
@@ -798,6 +953,7 @@ operations:
   - cache:idempotency
   - identity.principal_credential
   - identity.session
+  - platform.outbox
 - operation: resolvePermissions
   verb: POST
   path: /permissions/resolve
@@ -817,6 +973,22 @@ operations:
   writes:
   - cache:idempotency
   - cache:resolution
+- operation: restoreAccessPolicyVersion
+  verb: POST
+  path: /access-policies/{policyId}/restore
+  scope: tenant
+  permission: PERMISSION_MANAGE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - cache:idempotency
+  - identity.access_policy
+  - identity.access_policy_version
+  writes:
+  - cache:idempotency
+  - identity.access_policy
+  - identity.access_policy_version
 - operation: revokeAllSessions
   verb: POST
   path: /auth/sessions/revoke-all
@@ -871,6 +1043,20 @@ operations:
   - identity.capability_template
   writes:
   - identity.capability_template
+- operation: setGuestVerificationPolicy
+  verb: PUT
+  path: /guest-verification-policy
+  scope: tenant
+  permission: TENANT_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - cache:idempotency
+  - identity.guest_verification_policy
+  writes:
+  - cache:idempotency
+  - identity.guest_verification_policy
 - operation: setPasswordPolicy
   verb: PUT
   path: /password-policy
@@ -951,6 +1137,40 @@ operations:
   reads:
   - identity.sso_provider
   writes: []
+- operation: submitGuestIdentityDocument
+  verb: POST
+  path: /auth/guest/identity-verifications
+  scope: tenant
+  permission: null
+  audience:
+  - guest
+  offline: false
+  reads:
+  - assets.media_asset
+  - cache:idempotency
+  - identity.guest_identity_verification
+  - identity.guest_verification_policy
+  writes:
+  - cache:idempotency
+  - identity.guest_identity_verification
+  - pii.subject_document
+- operation: suggestRoleAssignment
+  verb: GET
+  path: /role-suggestions
+  scope: venue
+  permission: PERMISSION_VIEW
+  audience:
+  - staff
+  offline: false
+  reads:
+  - identity.access_decision
+  - identity.delegated_access
+  - identity.principal
+  - identity.role
+  - identity.role_permission
+  - workforce.employee
+  - workforce.work_assignment
+  writes: []
 - operation: updateAccessPolicy
   verb: PUT
   path: /access-policies/{policyId}
@@ -1013,6 +1233,7 @@ operations:
   - cache:idempotency
   - identity.guest_session
   - pii.subject_contact
+  - platform.outbox
 - operation: verifyMfaChallenge
   verb: POST
   path: /auth/mfa/challenge/{challengeId}/verify
@@ -1032,6 +1253,7 @@ operations:
   - identity.mfa_challenge
   - identity.mfa_recovery_code
   - identity.session
+  - platform.outbox
 - operation: verifyMfaEnrolment
   verb: POST
   path: /auth/mfa/methods/{methodId}

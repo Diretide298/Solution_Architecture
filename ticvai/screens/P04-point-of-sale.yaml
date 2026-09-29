@@ -355,8 +355,8 @@ screens:
       provenance: structural — POS-001 is P04's home screen and its exits are its launcher
     - to: POS-011
       trigger: Returns, Refunds & Exchanges
-      provenance: derived — POS-011 declares entryState.params orderId, outletId and POS-001 holds none
-        of them, so the edge carries nothing and POS-011 opens cold
+      provenance: derived — POS-011 declares entryState.params invoiceId, orderId, outletId and POS-001
+        holds none of them, so the edge carries nothing and POS-011 opens cold
     - to: POS-012
       trigger: Omnichannel Order & Fulfilment Center
       provenance: derived — POS-012 declares entryState.params orderId, outletId and POS-001 holds none
@@ -1052,6 +1052,8 @@ screens:
       operation: evaluateApprovalRequirement
       crossesDevice: true
       back: false
+      carries:
+      - approvalRequestId
     - to: BO-130
       trigger: Four transactions are rejected — a product retired while the till was offline
       provenance: flow F33 step 6→7
@@ -6190,6 +6192,11 @@ screens:
     contract: inventory
     purpose: listSerialisedItems
     trigger: onLoad
+  - operationId: issueCreditMemo
+    contract: finance
+    purpose: Issue a credit memo
+    trigger: onAction
+    provenance: build, 29 September 2026
   entryState:
     params:
     - name: workstationId
@@ -6200,6 +6207,8 @@ screens:
       from: deepLink
     - name: boxId
       from: session
+    - name: invoiceId
+      from: navigation
     coldEntry: '**Resolves from the session, which carries the workstation** — a till is signed into,
       not navigated to. The deposit box allocated to this till for the shift.'
     preloaded:
@@ -9762,9 +9771,10 @@ screens:
     - to: POS-011
       trigger: Returns, Refunds & Exchanges
       carries:
+      - invoiceId
       - orderId
-      provenance: derived — POS-011 declares entryState.params orderId, outletId and POS-026 holds orderId,
-        so an edge into it carries them
+      provenance: derived — POS-011 declares entryState.params invoiceId, orderId, outletId and POS-026
+        holds invoiceId, orderId, so an edge into it carries them
   notes: '**`reprintReceipt` has existed in the contracts all along and no screen called it.** The prototype
     puts it at the counter because that is where the guest is standing — a reprint requested from the
     back office is a different, slower thing.'
@@ -9809,6 +9819,21 @@ screens:
     contract: orders
     purpose: Reissue the ticket or wristband
     trigger: onAction
+  - operationId: issueTaxInvoice
+    contract: finance
+    purpose: Issue a tax invoice
+    trigger: onAction
+    provenance: build, 29 September 2026
+  - operationId: getTaxInvoice
+    contract: finance
+    purpose: Show a tax invoice
+    trigger: onLoad
+    provenance: build, 29 September 2026
+  - operationId: getTaxDocumentRendition
+    contract: finance
+    purpose: Download the invoice / credit memo PDF
+    trigger: onLoad
+    provenance: build, 29 September 2026
   entryState:
     params:
     - name: orderId
@@ -9818,6 +9843,10 @@ screens:
     - name: saleId
       from: navigation
     - name: entitlementId
+      from: navigation
+    - name: documentId
+      from: navigation
+    - name: invoiceId
       from: navigation
     coldEntry: '**Resolves from the session, which carries the workstation** — a till is signed into,
       not navigated to.'

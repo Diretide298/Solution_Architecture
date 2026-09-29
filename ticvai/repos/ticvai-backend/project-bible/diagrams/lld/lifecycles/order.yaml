@@ -66,6 +66,8 @@ transitions:
   operation: voidOrder
   trigger: operation
   guard: Nothing captured. A void before payment is not a refund and must not post one
+  emits:
+  - order.cancelled
 - from: paid
   to: refunded
   operation: createRefund

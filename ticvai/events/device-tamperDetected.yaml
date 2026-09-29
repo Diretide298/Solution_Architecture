@@ -1,0 +1,35 @@
+# device.tamperDetected v1 — published by tenancy
+# Checked by tools/check-states.py against states/ and the contracts.
+
+name: device.tamperDetected
+version: 1
+publisher: tenancy
+description: A device reported physical or logical interference and is now untrusted until someone clears it.
+aggregate: device
+emittedWhen: recordDeviceTamperEvent succeeds
+payload:
+- field: tamperEventId
+  type: uuid
+- field: deviceId
+  type: uuid
+- field: scopePath
+  type: string
+- field: kind
+  type: string
+  notes: What the device reported (enclosure opened, cable cut, and so on)
+- field: detectedAt
+  type: timestamp
+consumers:
+- context: public-api
+  purpose: Deliver to webhook subscriptions taking device.tamperDetected (16.9.56)
+  idempotencyKey: tamperEventId
+  onFailure: retryThenDeadLetter
+  isCritical: false
+- context: reporting
+  purpose: Raise the tamper alert to the venue's security roles
+  idempotencyKey: tamperEventId
+  onFailure: retryThenDeadLetter
+  isCritical: true
+retention: 1 year after publication
+notes: '**Added 29 September (build pass, group RD).** No state model emits this: a tamper report is a record,
+  not a status, so the emit sits on `recordDeviceTamperEvent`.'

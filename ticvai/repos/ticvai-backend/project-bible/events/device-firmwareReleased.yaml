@@ -1,0 +1,28 @@
+# device.firmwareReleased v1 — published by tenancy
+# Checked by tools/check-states.py against states/ and the contracts.
+
+name: device.firmwareReleased
+version: 1
+publisher: tenancy
+description: A firmware or software release was cleared for the fleet.
+aggregate: deviceFirmware
+emittedWhen: DeviceFirmware.status draft to released (setDeviceFirmwareStatus)
+payload:
+- field: firmwareId
+  type: uuid
+- field: deviceKind
+  type: string
+- field: version
+  type: string
+- field: minimumPreviousVersion
+  type: string
+  required: false
+- field: releasedAt
+  type: timestamp
+consumers:
+- context: public-api
+  purpose: Deliver to webhook subscriptions taking device.firmwareReleased (16.9.56)
+  idempotencyKey: firmwareId
+  onFailure: retryThenDeadLetter
+  isCritical: false
+retention: 30 days after publication

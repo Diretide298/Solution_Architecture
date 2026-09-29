@@ -192,7 +192,7 @@ screens:
       trigger: Wallet Overview
       carries:
       - subjectId
-      provenance: derived — GST-011 declares entryState.params subjectId and GST-001 holds subjectId,
+      provenance: derived — GST-011 declares entryState.params subjectId, walletId and GST-001 holds subjectId,
         so an edge into it carries them
     - to: GST-012
       trigger: My Tickets
@@ -238,8 +238,8 @@ screens:
       trigger: Order History
       carries:
       - orderId
-      provenance: derived — GST-019 declares entryState.params orderId and GST-001 holds orderId, so an
-        edge into it carries them
+      provenance: derived — GST-019 declares entryState.params documentId, invoiceId, orderId and GST-001
+        holds orderId, so an edge into it carries them
     - to: GST-020
       trigger: Saved Items / Wishlist
       carries:
@@ -284,8 +284,8 @@ screens:
       trigger: AI Concierge – Chat
       carries:
       - orderId
-      provenance: derived — GST-032 declares entryState.params conversationId, orderId and GST-001 holds
-        orderId, so an edge into it carries them
+      provenance: derived — GST-032 declares entryState.params conversationId, messageId, orderId and
+        GST-001 holds orderId, so an edge into it carries them
     - to: GST-033
       trigger: AI Concierge – Contextual Help
       provenance: derived — GST-033 declares entryState.params conversationId and GST-001 holds none of
@@ -318,8 +318,10 @@ screens:
         and GST-001 holds productId, so an edge into it carries them
     - to: GST-042
       trigger: Simple Registration & OTP
-      provenance: derived — GST-042 declares entryState.params challengeId and GST-001 holds none of them,
-        so the edge carries nothing and GST-042 opens cold
+      carries:
+      - subjectId
+      provenance: derived — GST-042 declares entryState.params challengeId, subjectId and GST-001 holds
+        subjectId, so an edge into it carries them
     - to: GST-045
       trigger: Ticket Delivery & Sharing
       carries:
@@ -660,6 +662,36 @@ screens:
     contract: white-label
     purpose: Branding, currency and what this venue enables
     trigger: onLoad
+  - operationId: getCookieConsentRuntime
+    contract: marketing-crm
+    purpose: Tracking consent prompt on first launch and the SDK gate
+    trigger: onLoad
+    provenance: build, 29 September 2026
+  - operationId: recordDeviceConsent
+    contract: marketing-crm
+    purpose: Accept, reject or customise tracking on first launch
+    trigger: onAction
+    provenance: build, 29 September 2026
+  - operationId: listAnalyticsProviders
+    contract: white-label
+    purpose: Analytics SDKs to start once their consent category is granted
+    trigger: onLoad
+    provenance: build, 29 September 2026
+  - operationId: decideRecommendations
+    contract: ai
+    purpose: 'Recommendation slot (homepage / loyalty placement: products, offers, rewards, challenges)'
+    trigger: onLoad
+    provenance: build, 29 September 2026
+  - operationId: recordRecommendationEvents
+    contract: ai
+    purpose: Report impressions, clicks and declines of recommended items
+    trigger: onAction
+    provenance: build, 29 September 2026
+  - operationId: recordStorefrontSessionEvents
+    contract: white-label
+    purpose: App-shell beacon of hashed browsing behaviour for fraud prevention
+    trigger: onLoad
+    provenance: build, 29 September 2026
   entryState:
     params:
     - name: subjectId
@@ -2677,10 +2709,32 @@ screens:
     contract: wallet
     purpose: Wallet transaction history
     trigger: onLoad
+  - operationId: getWalletAutoReloadSetting
+    contract: wallet
+    purpose: Show auto top-up
+    trigger: onLoad
+    provenance: build, 29 September 2026
+  - operationId: setWalletAutoReloadSetting
+    contract: wallet
+    purpose: Set auto top-up
+    trigger: onAction
+    provenance: build, 29 September 2026
+  - operationId: getWalletExitBalance
+    contract: wallet
+    purpose: Balance due / refundable at exit
+    trigger: onLoad
+    provenance: build, 29 September 2026
+  - operationId: settleWalletAtExit
+    contract: wallet
+    purpose: Settle the wallet at exit
+    trigger: onAction
+    provenance: build, 29 September 2026
   entryState:
     params:
     - name: subjectId
       from: GST-001
+    - name: walletId
+      from: navigation
     coldEntry: Resolves from the session; a cold arrival is the ordinary case.
     preloaded:
     - WalletTransaction.id
@@ -3599,6 +3653,16 @@ screens:
     contract: catalogue
     purpose: A guest's memberships, benefits and history
     trigger: onLoad
+  - operationId: listInstalmentPlans
+    contract: payments
+    purpose: Instalment plans and schedule
+    trigger: onLoad
+    provenance: build, 29 September 2026
+  - operationId: createInstalmentPlan
+    contract: payments
+    purpose: Pay in instalments
+    trigger: onAction
+    provenance: build, 29 September 2026
   entryState:
     params:
     - name: guestLinkId
@@ -4379,10 +4443,39 @@ screens:
     trigger: onAction
     invalidates:
     - listOrders
+  - operationId: listTaxInvoices
+    contract: finance
+    purpose: List tax invoices
+    trigger: onLoad
+    provenance: build, 29 September 2026
+  - operationId: issueTaxInvoice
+    contract: finance
+    purpose: Issue a tax invoice
+    trigger: onAction
+    provenance: build, 29 September 2026
+  - operationId: getTaxInvoice
+    contract: finance
+    purpose: Show a tax invoice
+    trigger: onLoad
+    provenance: build, 29 September 2026
+  - operationId: listCreditMemos
+    contract: finance
+    purpose: List credit memos
+    trigger: onLoad
+    provenance: build, 29 September 2026
+  - operationId: getTaxDocumentRendition
+    contract: finance
+    purpose: Download the invoice / credit memo PDF
+    trigger: onLoad
+    provenance: build, 29 September 2026
   entryState:
     params:
     - name: orderId
       from: deepLink
+    - name: documentId
+      from: navigation
+    - name: invoiceId
+      from: navigation
     coldEntry: '**A guest opening an order link weeks later.** Shows the order if it still resolves; if
       it was refunded or the performance passed, says which and offers the order list rather than an error.'
     preloaded:
@@ -6543,8 +6636,8 @@ screens:
       trigger: AI Concierge – Chat
       carries:
       - conversationId
-      provenance: derived — GST-032 declares entryState.params conversationId, orderId and GST-031 holds
-        conversationId, so an edge into it carries them
+      provenance: derived — GST-032 declares entryState.params conversationId, messageId, orderId and
+        GST-031 holds conversationId, so an edge into it carries them
   notes: 'States derived from the screen pattern on 17 August, not individually considered. Purpose derived
     from the screen name and its operations on 17 August, not from a requirement. **Guest concierge confirmed
     in Phase 1 on 17 August (CF-14), charged per token and bounded by `AiPolicy.guestCapabilityScope`.**
@@ -6861,6 +6954,11 @@ screens:
     contract: marketing-crm
     purpose: Pass an assistant conversation to a person
     trigger: onAction
+  - operationId: recordAnswerFeedback
+    contract: ai
+    purpose: Say whether an answer helped
+    trigger: onAction
+    provenance: build, 29 September 2026
   entryState:
     params:
     - name: cartId
@@ -6869,6 +6967,8 @@ screens:
       from: deepLink
     - name: orderId
       from: deepLink
+    - name: messageId
+      from: navigation
     coldEntry: A conversation link an agent opens from a notification. Resolves, or says it was closed
       and by whom. **A guest opening an order link weeks later.** Shows the order if it still resolves;
       if it was refunded or the performance passed, says which and offers the order list rather than an
@@ -7527,6 +7627,16 @@ screens:
     contract: promotions
     purpose: List promotions
     trigger: onLoad
+  - operationId: decideRecommendations
+    contract: ai
+    purpose: 'Recommendation slot (homepage / loyalty placement: products, offers, rewards, challenges)'
+    trigger: onLoad
+    provenance: build, 29 September 2026
+  - operationId: recordRecommendationEvents
+    contract: ai
+    purpose: Report impressions, clicks and declines of recommended items
+    trigger: onAction
+    provenance: build, 29 September 2026
   wireframe:
     status: notStarted
     provenance: client-verified
@@ -8564,6 +8674,7 @@ screens:
       back: false
       carries:
       - challengeId
+      - subjectId
   notes: 'States derived from the screen pattern on 17 August, not individually considered. Purpose derived
     from the screen name and its operations on 17 August, not from a requirement. **Corrected 24 August**:
     removed getCurrentSession, logout, selectRole. **A guest surface has no roles to select and its own
@@ -8892,11 +9003,18 @@ screens:
     trigger: onAction
     invalidates:
     - getGuestSession
+  - operationId: claimDeviceConsent
+    contract: marketing-crm
+    purpose: Attach this device's tracking decision to the guest after sign-in or registration
+    trigger: onAction
+    provenance: build, 29 September 2026
   entryState:
     params:
     - name: cartId
       from: session
     - name: challengeId
+      from: navigation
+    - name: subjectId
       from: navigation
     coldEntry: '**Needs nothing.** A guest arriving cold signs in and goes Home; one sent from the cart
       carries `cartId` and goes back to it. The SSO deep-link parameter (`providerId`) went with the operations
@@ -9564,10 +9682,16 @@ screens:
     contract: orders
     purpose: Add something
     trigger: onAction
-  - operationId: getUpsellSuggestions
-    contract: promotions
-    purpose: Suggestions for a cart
+  - operationId: decideRecommendations
+    contract: ai
+    purpose: Fill a recommendation slot
+    trigger: onLoad
+    provenance: build, 29 September 2026
+  - operationId: recordRecommendationEvents
+    contract: ai
+    purpose: Report what happened to recommended items
     trigger: onAction
+    provenance: build, 29 September 2026
   entryState:
     params:
     - name: cartId
@@ -12328,6 +12452,26 @@ screens:
     contract: marketing-crm
     purpose: Store a guest photo, ID or signed document
     trigger: onAction
+  - operationId: getCookieConsentRuntime
+    contract: marketing-crm
+    purpose: 'Tracking preferences: categories and the current decision'
+    trigger: onLoad
+    provenance: build, 29 September 2026
+  - operationId: listPublishedTrackingTechnologies
+    contract: marketing-crm
+    purpose: Each SDK and tracker the app uses
+    trigger: onLoad
+    provenance: build, 29 September 2026
+  - operationId: getDeviceConsentHistory
+    contract: marketing-crm
+    purpose: My tracking decisions so far
+    trigger: onLoad
+    provenance: build, 29 September 2026
+  - operationId: recordDeviceConsent
+    contract: marketing-crm
+    purpose: Change or withdraw tracking preferences
+    trigger: onAction
+    provenance: build, 29 September 2026
   entryState:
     params:
     - name: subjectId
@@ -13866,6 +14010,16 @@ screens:
     contract: identity
     purpose: Check the step-up code
     trigger: onAction
+  - operationId: getMyIdentityVerification
+    contract: identity
+    purpose: Show the guest's ID verification status
+    trigger: onLoad
+    provenance: build, 29 September 2026
+  - operationId: submitGuestIdentityDocument
+    contract: identity
+    purpose: Upload an ID document for verification
+    trigger: onAction
+    provenance: build, 29 September 2026
   entryState:
     params:
     - name: subjectId

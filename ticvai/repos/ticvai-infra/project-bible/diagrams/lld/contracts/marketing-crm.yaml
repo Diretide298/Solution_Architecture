@@ -1,5 +1,5 @@
 id: LLD-marketing-crm
-title: marketing-crm — 253 operations
+title: marketing-crm — 263 operations
 generatedBy: tools/derive-diagrams.py
 index: diagrams/hld/03-contracts.yaml
 tier: satellite
@@ -206,6 +206,27 @@ operations:
   writes:
   - cache:idempotency
   - marketing.conversation
+- operation: claimDeviceConsent
+  verb: POST
+  path: /guests/{subjectId}/consents/claim-device
+  scope: subject
+  permission: null
+  audience:
+  - guest
+  offline: false
+  reads:
+  - cache:idempotency
+  - marketing.consent_record
+  - marketing.device_consent
+  - marketing.device_consent_category
+  - marketing.guest_profile
+  - marketing.tracking_technology
+  writes:
+  - cache:idempotency
+  - marketing.consent_propagation
+  - marketing.consent_record
+  - marketing.device_consent
+  - platform.outbox
 - operation: closeConversation
   verb: POST
   path: /conversations/{conversationId}/close
@@ -234,11 +255,13 @@ operations:
   reads:
   - cache:idempotency
   - marketing.campaign
+  - marketing.campaign_variant
   - marketing.segment_criterion
   writes:
   - cache:idempotency
   - marketing.campaign
   - marketing.campaign_target
+  - marketing.campaign_variant
   - marketing.segment_criterion
 - operation: createCase
   verb: POST
@@ -520,6 +543,7 @@ operations:
   reads:
   - marketing.campaign
   - marketing.campaign_target
+  - marketing.campaign_variant
   - marketing.segment_criterion
   writes: []
 - operation: getCampaignPerformance
@@ -533,7 +557,9 @@ operations:
   reads:
   - marketing.attribution_touch
   - marketing.campaign
+  - marketing.campaign_variant
   - marketing.message_delivery
+  - marketing.message_dispatch
   writes: []
 - operation: getCase
   verb: GET
@@ -584,6 +610,34 @@ operations:
   - marketing.conversation_message
   - marketing.conversation_message_attachment
   - pii.subject
+  writes: []
+- operation: getCookieConsentRuntime
+  verb: GET
+  path: /storefront/cookie-consent
+  scope: tenant
+  permission: null
+  audience:
+  - anonymous
+  - guest
+  offline: false
+  reads:
+  - marketing.cookie_banner_design
+  - marketing.device_consent
+  - marketing.device_consent_category
+  - marketing.tracking_technology
+  writes: []
+- operation: getDeviceConsentHistory
+  verb: GET
+  path: /consent/device/history
+  scope: tenant
+  permission: null
+  audience:
+  - anonymous
+  - guest
+  offline: false
+  reads:
+  - marketing.device_consent
+  - marketing.device_consent_category
   writes: []
 - operation: getDigitalWaiverForm
   verb: GET
@@ -990,10 +1044,13 @@ operations:
   offline: false
   reads:
   - cache:idempotency
+  - marketing.attribution_touch
   - marketing.campaign
+  - marketing.campaign_variant
   writes:
   - cache:idempotency
   - marketing.campaign
+  - marketing.message_dispatch
 - operation: listAgentWorkloadAvailability
   verb: GET
   path: /agent-workload-availability
@@ -1067,6 +1124,7 @@ operations:
   offline: false
   reads:
   - marketing.campaign
+  - marketing.campaign_variant
   - marketing.segment_criterion
   writes: []
 - operation: listCaseCategories
@@ -1257,6 +1315,28 @@ operations:
   reads:
   - marketing.cookie_banner_design
   writes: []
+- operation: listCookieScanPolicies
+  verb: GET
+  path: /cookie-scan-policy
+  scope: venue
+  permission: GUEST_VIEW
+  audience:
+  - staff
+  offline: false
+  reads:
+  - marketing.cookie_scan_policy
+  writes: []
+- operation: listCookieScans
+  verb: GET
+  path: /cookie-tracking-digital/scans
+  scope: venue
+  permission: GUEST_VIEW
+  audience:
+  - staff
+  offline: false
+  reads:
+  - marketing.cookie_scan_run
+  writes: []
 - operation: listCookieTrackingDigital
   verb: GET
   path: /cookie-tracking-digital
@@ -1426,6 +1506,18 @@ operations:
   - marketing.message_dispatch_attempt
   - marketing.message_template
   - marketing.message_trigger
+  writes: []
+- operation: listDeviceConsents
+  verb: GET
+  path: /consent/device
+  scope: venue
+  permission: GUEST_VIEW
+  audience:
+  - staff
+  offline: false
+  reads:
+  - marketing.device_consent
+  - marketing.device_consent_category
   writes: []
 - operation: listDigitalSigningCollection
   verb: GET
@@ -1735,6 +1827,8 @@ operations:
   reads:
   - marketing.consent_propagation
   - marketing.consent_record
+  - marketing.device_consent
+  - marketing.device_consent_category
   - marketing.privacy_action
   - marketing.privacy_exception
   - marketing.privacy_request
@@ -1812,6 +1906,18 @@ operations:
   - marketing.communication_provider
   - marketing.message_dispatch
   - marketing.message_dispatch_attempt
+  writes: []
+- operation: listPublishedTrackingTechnologies
+  verb: GET
+  path: /storefront/cookie-consent/technologies
+  scope: tenant
+  permission: null
+  audience:
+  - anonymous
+  - guest
+  offline: false
+  reads:
+  - marketing.tracking_technology
   writes: []
 - operation: listQualityAgentEvaluation
   verb: GET
@@ -2198,6 +2304,7 @@ operations:
   reads:
   - cache:idempotency
   - marketing.campaign
+  - marketing.campaign_variant
   - marketing.segment_criterion
   writes:
   - cache:idempotency
@@ -2259,6 +2366,44 @@ operations:
   reads:
   - marketing.booking_consent_record
   writes: []
+- operation: recordCookieScan
+  verb: POST
+  path: /cookie-tracking-digital/scans
+  scope: venue
+  permission: GUEST_MANAGE
+  audience:
+  - staff
+  - service
+  offline: false
+  reads:
+  - cache:idempotency
+  - marketing.cookie_scan_policy
+  - marketing.cookie_scan_run
+  - marketing.tracking_technology
+  writes:
+  - cache:idempotency
+  - marketing.cookie_scan_run
+  - marketing.tracking_technology
+- operation: recordDeviceConsent
+  verb: POST
+  path: /consent/device
+  scope: subject
+  permission: null
+  audience:
+  - anonymous
+  - guest
+  offline: false
+  reads:
+  - cache:idempotency
+  - marketing.cookie_banner_design
+  - marketing.device_consent
+  - marketing.device_consent_category
+  writes:
+  - cache:idempotency
+  - marketing.device_consent
+  - marketing.device_consent_category
+  - pii.consent_identifier
+  - platform.outbox
 - operation: recordLostItem
   verb: POST
   path: /lost-items
@@ -2721,6 +2866,20 @@ operations:
   - marketing.cookie_banner_design
   writes:
   - marketing.cookie_banner_design
+- operation: setCookieScanPolicy
+  verb: PUT
+  path: /cookie-scan-policy
+  scope: venue
+  permission: GUEST_MANAGE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - cache:idempotency
+  - marketing.cookie_scan_policy
+  writes:
+  - cache:idempotency
+  - marketing.cookie_scan_policy
 - operation: setCustomerServiceCopilot
   verb: PUT
   path: /customer-service-copilot
@@ -2767,7 +2926,9 @@ operations:
   offline: false
   reads:
   - marketing.retention_policy
+  - tenancy.data_retention_setting
   writes:
+  - cache:idempotency
   - marketing.retention_policy
 - operation: setDigitalWaiverForm
   verb: PUT
@@ -3270,6 +3431,7 @@ operations:
   reads:
   - cache:idempotency
   - marketing.campaign
+  - marketing.campaign_variant
   - marketing.segment_criterion
   writes:
   - cache:idempotency
@@ -3352,6 +3514,7 @@ operations:
   reads:
   - cache:idempotency
   - marketing.campaign
+  - marketing.campaign_variant
   - marketing.segment_criterion
   writes:
   - cache:idempotency
@@ -3367,6 +3530,7 @@ operations:
   reads:
   - cache:idempotency
   - marketing.campaign
+  - marketing.campaign_variant
   - marketing.segment_criterion
   writes:
   - cache:idempotency

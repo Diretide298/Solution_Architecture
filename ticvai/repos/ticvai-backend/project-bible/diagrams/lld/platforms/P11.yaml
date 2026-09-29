@@ -23,7 +23,7 @@ modulesUsed:
   screens: 8
 servicesCalled:
 - service: TenancyService
-  operationCalls: 10
+  operationCalls: 20
 coverage:
   screens: 8
   inAFlow: 3
@@ -61,6 +61,7 @@ screens:
   operations:
   - createAccreditationApplication
   - submitAccreditationDocument
+  - updateAccreditationApplication
   states:
   - denied
   - emptyFirstRun
@@ -69,6 +70,7 @@ screens:
   offlineState: false
   entryParams:
   - applicationRef<-deepLink
+  - applicationId<-navigation
   goesTo:
   - ACC-001
   - ACC-003
@@ -85,6 +87,8 @@ screens:
   density: compact
   operations:
   - createAccreditationApplication
+  - submitAccreditationApplication
+  - updateAccreditationApplication
   states:
   - denied
   - emptyFirstRun
@@ -94,6 +98,7 @@ screens:
   offlineState: false
   entryParams:
   - applicationRef<-ACC-002
+  - applicationId<-navigation
   goesTo:
   - ACC-002
   - ACC-004
@@ -107,7 +112,11 @@ screens:
   wave: 3
   density: compact
   operations:
-  - listAccreditationApplications
+  - listMyAccreditationApplications
+  - resubmitAccreditationApplication
+  - submitAccreditationDocument
+  - updateAccreditationApplication
+  - withdrawAccreditationApplication
   states:
   - denied
   - emptyFirstRun
@@ -117,6 +126,7 @@ screens:
   offlineState: false
   entryParams:
   - applicationRef<-deepLink
+  - applicationId<-navigation
   goesTo:
   - ACC-001
   - ACC-005
@@ -130,8 +140,9 @@ screens:
   wave: 3
   density: touchLarge
   operations:
-  - issueAccreditationCredential
-  - listAccreditationCredentials
+  - issueMyAccreditationWalletPass
+  - listMyAccreditationCredentials
+  - renewAccreditation
   states:
   - emptyFirstRun
   - emptyNoResults
@@ -141,6 +152,8 @@ screens:
   offlineState: true
   entryParams:
   - applicationRef<-ACC-004
+  - credentialId<-navigation
+  - holderId<-navigation
   goesTo:
   - ACC-004
   boardFrames: null
@@ -178,7 +191,9 @@ screens:
   density: compact
   operations:
   - decideAccreditationApplication
-  - listAccreditationApplications
+  - getAccreditationApplication
+  - listAccreditationDocuments
+  - verifyAccreditationDocument
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -188,6 +203,7 @@ screens:
   offlineState: false
   entryParams:
   - applicationId<-ACC-006
+  - documentId<-navigation
   goesTo:
   - ACC-005
   - ACC-006

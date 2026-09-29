@@ -2,7 +2,7 @@ openapi: 3.1.0
 info:
   title: TICVAI Identity & Authorisation
   version: 1.0.0
-  x-ticvai-screen-count: 56
+  x-ticvai-screen-count: 71
   x-ticvai-tier: spine
   x-ticvai-module: 19 — Guest Mobile App & Branding (auth) + cross-cutting staff auth
   x-ticvai-requirements: 107
@@ -1271,6 +1271,10 @@ paths:
         (`changeOwnCredential`), so the supervisor who set it never knows the credential in use. All
         sessions of the principal are ended, and the reset is audited with `reason`.
 
+        **Publishes `identity.credentialResetRequested`** (kind `staffReset`) in the same transaction
+        (29 September, build pass, group G2; ADR-0033): a reset is the step an account takeover takes before
+        the sign-in that looks ordinary, and the risk engine reads it beside `identity.loginRecorded` (8.3.34).
+
         '
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
@@ -1771,6 +1775,11 @@ paths:
 
         **The response never reveals whether the identifier exists.** It is the same either way; only
         the message differs, and only the owner receives it.
+
+        **With `purpose` `passwordReset` it publishes `identity.credentialResetRequested`** (kind
+        `guestSelfService`, the identifier hashed with the tenant key) whether or not the identifier exists
+        (29 September, build pass, group G2; 8.3.34): a burst of resets against identifiers that resolve to
+        nobody is the pattern worth seeing, and the answer to the caller stays the same.
 
         '
       tags:
@@ -3415,6 +3424,12 @@ paths:
         reportable, and an investigation into a denial needs to know *which condition failed* — a bare
         DENY sends somebody to read forty policies by hand.
 
+        **What it decides is a permission** (clarified 29 September, build pass): may this principal use
+        this permission here, now. Admission at a gate or turnstile is decided by the access contract''s
+        validation against `AccessDynamicPolicy`; a gate calls this only where a staff principal''s
+        permission is the question (a supervisor authorising an override at the gate).
+        See `AccessPolicy` for the split.
+
         **Offline is a different operation on purpose.** 3.3.30 wants local evaluation when offline, and
         that is `getAccessPolicyBundle` plus a device-side evaluator — not this call with a longer
         timeout. A gate that waits for the network is a gate that stops working when the network does.
@@ -3524,6 +3539,8 @@ paths:
         format: uuid
     get:
       operationId: listAccessPolicyHistory
+      x-ticvai-consumed-by:
+        - "P08 BO-1066 Roles, Permissions & Masking"
       summary: Every version, who changed it and why
       description: '3.3.36 and 3.3.39. **Policy changes and access decisions are two different audits**
         and this is the first. Conflating them makes the common question — *who widened this and when* —
@@ -4045,8 +4062,1546 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/IdentityPermission'
+  /access-policies/{policyId}/restore:
+    parameters:
+    - name: policyId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    post:
+      operationId: restoreAccessPolicyVersion
+      x-ticvai-consumed-by:
+        - "P08 BO-1066 Roles, Permissions & Masking"
+      x-ticvai-agreed: '29 September: our build plan (7.1.46 "allow rollback to previous approved versions");
+        shape follows access rollbackAccessPolicy and restoreProductVersion'
+      summary: Put a previously approved policy version back, as a new version
+      description: '7.1.46 (decided 29 September, build pass). **Restoring writes a new version with the old
+        content; it never rewinds.** The version being replaced stays in `listAccessPolicyHistory`, because a
+        decision taken under it (`listAccessDecisions` names the version) must still be explainable.
+
+
+        **Only a version that was approved can be restored** (`AccessPolicyVersion.approvedBy` set): a draft
+        that never passed approval is not a known-good state to go back to. The new version is
+        `pendingApproval` and goes through the same approval route as any policy change (`setAccessPolicyState`,
+        routed to `approvals`); the current version stays in force until it is approved. `409` when the target
+        version was never approved, is the current version, or the policy is `retired`.
+
+        '
+      tags:
+      - administration
+      x-ticvai-permission: PERMISSION_MANAGE
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: tenant
+      x-ticvai-config-scope: tenant
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - targetVersion
+              - reason
+              properties:
+                targetVersion:
+                  type: integer
+                  minimum: 1
+                  description: The approved version whose content is restored.
+                reason:
+                  type: string
+                  minLength: 3
+                  maxLength: 300
+                  description: Kept on the new version as `AccessPolicyVersion.reason`.
+      responses:
+        '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: Restored as a new version, pending approval
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessPolicy'
+        '404':
+          $ref: ../shared/common.yaml#/components/responses/NotFound
+        '409':
+          description: The target version was never approved, is the current version, or the policy is retired
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
+  /access-policy-effectiveness:
+    get:
+      operationId: listAccessPolicyEffectiveness
+      x-ticvai-consumed-by:
+        - "P08 BO-1066 Roles, Permissions & Masking"
+      x-ticvai-agreed: '29 September: our build plan (3.3.48 "reporting on policy effectiveness"); shape follows
+        listLabourBudgets with the Page envelope'
+      summary: How each software-permission policy has behaved over a period
+      description: '3.3.48 for the policies in this contract (decided 29 September, build pass). One row per
+        `AccessPolicy`: how often it was evaluated, how often it matched, how often it was the deciding policy
+        for a permit or a deny, how many emergency overrides were opened against its scope, and a daily trend.
+        Computed from `identity.access_decision` (`matchedPolicies` names the policy and version) and
+        `identity.access_override`.
+
+
+        **These are the software-permission policies.** Gate admission policies are the access contract''s
+        `AccessDynamicPolicy`, reported by `listDynamicPolicyEffectiveness`; see `AccessPolicy` for which engine
+        governs what.
+
+        '
+      tags:
+      - administration
+      x-ticvai-permission: PERMISSION_VIEW
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: tenant
+      x-ticvai-read-routing: replica
+      parameters:
+      - name: from
+        in: query
+        required: true
+        schema:
+          type: string
+          format: date-time
+      - name: to
+        in: query
+        required: true
+        schema:
+          type: string
+          format: date-time
+      - name: policyId
+        in: query
+        schema:
+          type: string
+          format: uuid
+      - name: scopePath
+        in: query
+        description: Policies written at this node or beneath it (prefix match, as `listAccessPolicies`).
+        schema:
+          type: string
+      - $ref: ../shared/common.yaml#/components/parameters/PageSize
+      - $ref: ../shared/common.yaml#/components/parameters/PageCursor
+      responses:
+        '200':
+          description: One row per policy
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: ../shared/common.yaml#/components/schemas/Page
+                - type: object
+                  properties:
+                    items:
+                      type: array
+                      items:
+                        $ref: '#/components/schemas/IdentityAccessPolicyEffectiveness'
+        '422':
+          description: '`to` is before `from`, or the range is longer than 366 days'
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
+  /permission-findings:
+    get:
+      operationId: listPermissionFindings
+      x-ticvai-consumed-by:
+        - "P08 BO-054 Role Assignment"
+        - "P08 BO-1066 Roles, Permissions & Masking"
+      x-ticvai-agreed: '29 September: our build plan (7.1.47 "identify conflicts, missing permissions and excessive
+        permissions"); shape follows listSegregationViolations, paged with the Page envelope'
+      summary: Excessive, missing and conflicting permissions, per principal or role
+      description: '7.1.47 (decided 29 September, build pass). **The analysis half of the sandbox**:
+        `simulateAccessPolicy` shows what a draft would decide, and this says what is wrong with the grants as
+        they stand, or as they would stand with a draft policy active (`draftPolicyId`).
+
+
+        Three kinds of finding, each with the evidence that produced it:
+
+        - **`excessive`**: a permission a principal holds (by role, delegation or policy) that no decision in
+        `lookbackDays` used. Recommendation `revoke`.
+
+        - **`missing`**: a permission the principal was denied `deniedThreshold` times or more in the window,
+        which most holders of the same role at the same scope do hold. Recommendation `grant` or `review`.
+
+        - **`conflicting`**: a pair a `SegregationRule` forbids, held together (the same test
+        `listSegregationViolations` runs), so one screen shows all three.
+
+
+        **Advisory.** Nothing is revoked or granted by this read; a change goes through `createDelegatedAccess`,
+        the role, or a policy, with their approvals.
+
+        '
+      tags:
+      - administration
+      x-ticvai-permission: PERMISSION_VIEW
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      x-ticvai-read-routing: replica
+      parameters:
+      - name: principalId
+        in: query
+        schema:
+          type: string
+          format: uuid
+      - name: roleId
+        in: query
+        schema:
+          type: string
+          format: uuid
+      - name: scopePath
+        in: query
+        schema:
+          type: string
+      - name: kind
+        in: query
+        schema:
+          type: string
+          enum:
+          - excessive
+          - missing
+          - conflicting
+      - name: lookbackDays
+        in: query
+        description: The usage window for `excessive` and `missing`. Proposed default 90 (our build plan).
+        schema:
+          type: integer
+          minimum: 7
+          maximum: 365
+          default: 90
+      - name: deniedThreshold
+        in: query
+        schema:
+          type: integer
+          minimum: 1
+          default: 3
+      - name: draftPolicyId
+        in: query
+        description: Evaluate as if this draft `AccessPolicy` were active, so a policy can be checked for the
+          grants it would widen or leave missing before it is submitted.
+        schema:
+          type: string
+          format: uuid
+      - $ref: ../shared/common.yaml#/components/parameters/PageSize
+      - $ref: ../shared/common.yaml#/components/parameters/PageCursor
+      responses:
+        '200':
+          description: Findings
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: ../shared/common.yaml#/components/schemas/Page
+                - type: object
+                  properties:
+                    items:
+                      type: array
+                      items:
+                        $ref: '#/components/schemas/IdentityPermissionFinding'
+  /auth/guest/identity-verifications:
+    post:
+      operationId: submitGuestIdentityDocument
+      x-ticvai-consumed-by:
+        - "P01 WEB-020 Profile & Preferences"
+        - "P02 GST-073 Security & Sign-in"
+      x-ticvai-agreed: '29 September: our build plan (5.3.21 "ID verification, and configurable identity
+        workflows"; BL-096); document storage follows pii.subject_document'
+      summary: Submit an identity document for verification
+      description: '5.3.21 (decided 29 September, build pass). **The guest-side ID verification the sign-in methods
+        lacked.** Email (`verifyGuestEmail`), mobile OTP (`verifyGuestOtp`), social and UAE Pass prove a contact
+        or an account; this proves the person, where the tenant''s `IdentityGuestVerificationPolicy` asks for it
+        (an age-restricted purchase, a resident rate, a high-value account).
+
+
+        **The number is hashed on arrival and never returned**; only the last four characters are kept in clear,
+        in `pii.subject_document`, as they are for every document in the package. The scan is an uploaded media
+        asset and is deleted when the verification is decided, unless the policy keeps it
+        (`documentImageRetention`).
+
+
+        Creates a `pending` verification. `409` while another is pending for this guest; `422` when the document
+        has expired or its kind is not one the tenant accepts. A guest verified through UAE Pass where the policy
+        counts it (`uaePassSatisfiesIdDocument`) is never asked.
+
+        '
+      tags:
+      - guestAuth
+      x-ticvai-permission: null
+      x-ticvai-audience:
+      - guest
+      x-ticvai-scope-level: tenant
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      x-ticvai-self-scoped: subject
+      security:
+      - guestAuth: []
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/IdentityGuestDocumentSubmission'
+      responses:
+        '201':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: Submitted, pending
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IdentityGuestVerification'
+        '401':
+          $ref: ../shared/common.yaml#/components/responses/Unauthorized
+        '409':
+          description: A verification is already pending for this guest
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
+        '422':
+          description: The document has expired, or its kind is not accepted by the tenant's policy
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
+  /auth/guest/identity-verifications/current:
+    get:
+      operationId: getMyIdentityVerification
+      x-ticvai-consumed-by:
+        - "P01 WEB-020 Profile & Preferences"
+        - "P02 GST-073 Security & Sign-in"
+      x-ticvai-agreed: '29 September: our build plan (5.3.21); shape follows getGuestSession'
+      summary: The guest's own latest identity verification
+      description: 'Status, outcome and, where it was refused or needs resubmission, the reason the guest is shown.
+        `404` when the guest has never submitted one.
+
+        '
+      tags:
+      - guestAuth
+      x-ticvai-permission: null
+      x-ticvai-audience:
+      - guest
+      x-ticvai-scope-level: tenant
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      x-ticvai-self-scoped: subject
+      x-ticvai-read-routing: primary
+      security:
+      - guestAuth: []
+      responses:
+        '200':
+          description: The latest verification
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IdentityGuestVerification'
+        '401':
+          $ref: ../shared/common.yaml#/components/responses/Unauthorized
+        '404':
+          $ref: ../shared/common.yaml#/components/responses/NotFound
+  /guest-identity-verifications:
+    get:
+      operationId: listGuestIdentityVerifications
+      x-ticvai-consumed-by:
+        - "P08 BO-739 Contact & Preferences"
+      x-ticvai-agreed: '29 September: our build plan (5.3.21); the review queue, shape follows listLabourBudgets
+        with the Page envelope'
+      summary: Guest identity verifications, the review queue first
+      description: 'Staff review queue for guest ID documents (decided 29 September, build pass). Oldest `pending`
+        first by default, so nobody waits behind a newer submission. Personal fields are returned only to a
+        caller holding `GUEST_VIEW_PII`, the permission this operation requires.
+
+        '
+      tags:
+      - identity
+      x-ticvai-permission: GUEST_VIEW_PII
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: tenant
+      x-ticvai-read-routing: replica
+      parameters:
+      - name: status
+        in: query
+        schema:
+          type: string
+          enum:
+          - pending
+          - verified
+          - rejected
+          - resubmissionRequested
+      - name: subjectId
+        in: query
+        schema:
+          type: string
+          format: uuid
+      - $ref: ../shared/common.yaml#/components/parameters/PageSize
+      - $ref: ../shared/common.yaml#/components/parameters/PageCursor
+      responses:
+        '200':
+          description: Verifications
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: ../shared/common.yaml#/components/schemas/Page
+                - type: object
+                  properties:
+                    items:
+                      type: array
+                      items:
+                        $ref: '#/components/schemas/IdentityGuestVerification'
+  /guest-identity-verifications/{verificationId}/decision:
+    parameters:
+    - name: verificationId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    post:
+      operationId: decideGuestIdentityVerification
+      x-ticvai-consumed-by:
+        - "P08 BO-739 Contact & Preferences"
+      x-ticvai-agreed: '29 September: our build plan (5.3.21); shape follows verifyAccreditationDocument (verified
+        or rejected, with verifier and reason)'
+      summary: Verify or refuse a guest's identity document
+      description: 'Records the outcome, the method and who decided (decided 29 September, build pass). `verified`
+        stamps `pii.subject_document.verified_at` and makes the guest ''ID verified'' for everything the policy
+        gates; `rejected` and `resubmissionRequested` carry a reason the guest sees. The document scan is deleted
+        now unless the policy keeps it. **Decided once**: a second decision is a `409`, and a guest who was
+        refused submits again.
+
+        '
+      tags:
+      - identity
+      x-ticvai-permission: GUEST_MANAGE
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: tenant
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - outcome
+              - method
+              properties:
+                outcome:
+                  type: string
+                  enum:
+                  - verified
+                  - rejected
+                  - resubmissionRequested
+                method:
+                  type: string
+                  enum:
+                  - manualReview
+                  - documentScanner
+                  - provider
+                  description: How the document was checked. `provider` is a result returned by an external
+                    verification service, recorded here by the service account or a reviewer.
+                reason:
+                  type: string
+                  maxLength: 300
+                  nullable: true
+                  description: Required for rejected and resubmissionRequested (`422` without it); shown to
+                    the guest.
+      responses:
+        '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: Decided
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IdentityGuestVerification'
+        '404':
+          $ref: ../shared/common.yaml#/components/responses/NotFound
+        '409':
+          description: Already decided
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
+        '422':
+          description: A rejection or resubmission request without a reason
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
+  /guest-verification-policy:
+    get:
+      operationId: getGuestVerificationPolicy
+      x-ticvai-consumed-by:
+        - "P09 ADM-342 Authentication & MFA Policy Manager"
+      x-ticvai-agreed: '29 September: our build plan (5.3.21 "configurable identity workflows"); shape follows
+        getPasswordPolicy'
+      summary: The tenant's guest identity-verification workflow
+      tags:
+      - identity
+      x-ticvai-permission: TENANT_CONFIGURE
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: tenant
+      x-ticvai-read-routing: replica
+      responses:
+        '200':
+          description: The policy; the defaults where the tenant has not set one
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IdentityGuestVerificationPolicy'
+    put:
+      operationId: setGuestVerificationPolicy
+      x-ticvai-consumed-by:
+        - "P09 ADM-342 Authentication & MFA Policy Manager"
+      x-ticvai-agreed: '29 September: our build plan (5.3.21 "configurable identity workflows"); shape follows
+        setPasswordPolicy'
+      x-ticvai-make-or-break: 'Which identity-verification provider, if any, does the client contract for
+        reviewMode provider or providerThenManual? — why: a name and an account only the client has. Manual
+        review works without one and is the default.'
+      summary: Set which verifications a guest must pass, and when
+      description: '5.3.21 (decided 29 September, build pass). **The configurable identity workflow**: which
+        verifications registration requires, which moments require a verified ID document, which documents are
+        accepted, who reviews them, and how long the scan is kept. One policy per tenant (identity is tenant-level
+        under ADR-0018); PUT replaces it whole.
+
+        '
+      tags:
+      - identity
+      x-ticvai-permission: TENANT_CONFIGURE
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: tenant
+      x-ticvai-config-scope: tenant
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/IdentityGuestVerificationPolicy'
+      responses:
+        '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: Set
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IdentityGuestVerificationPolicy'
+  /role-suggestions:
+    get:
+      operationId: suggestRoleAssignment
+      x-ticvai-consumed-by:
+        - "P08 BO-053 Staff Directory"
+        - "P08 BO-054 Role Assignment"
+      x-ticvai-audience:
+      - staff
+      x-ticvai-agreed: '29 September: our build plan (7.1.35, 7.1.56 role-assignment and provisioning recommendations);
+        shape follows listPermissionFindings, paged with the Page envelope'
+      summary: Which roles a person should probably hold, from peers with the same job and posting
+      description: '7.1.35, 7.1.56 (decided 29 September, build pass, group G2). **Provisioning by precedent.** For a
+        principal, or for a job title and posting before the principal exists, the roles held by **peers**: principals
+        whose primary work assignment (`workforce.work_assignment`, `isPrimary`, in force today) has the same
+        `jobTitleId` at the same posting (the assignment''s venue, department or outlet, `scopePath`). Each suggestion
+        is a role at a scope with the share of peers holding it there and the evidence: how many peers, how many hold
+        it, and whether the peers who hold it used it in `lookbackDays` (a role most peers hold and none use is shown
+        with `recommendation` `review`, not `grant`).
+
+
+        **Rules, not a model**: a count over grants (`identity.delegated_access`) and decisions
+        (`identity.access_decision`), so it works on the first day. Roles the principal already holds at that scope
+        are returned with `alreadyHeld` true and never recommended again.
+
+
+        **Advisory. A person grants** (`createDelegatedAccess`, with its approvals where the role needs them); nothing
+        is written by this read. Fewer than `minPeers` peers answers an empty page with `insufficientPeers` true,
+        because a suggestion from one colleague is a copy of that colleague''s access, not a pattern.
+
+        '
+      tags:
+      - administration
+      x-ticvai-permission: PERMISSION_VIEW
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      x-ticvai-read-routing: replica
+      parameters:
+      - name: principalId
+        in: query
+        description: The person to suggest for. Their primary work assignment gives the job title and posting. Either
+          this or `jobTitleId` with `scopePath`.
+        schema:
+          type: string
+          format: uuid
+      - name: jobTitleId
+        in: query
+        description: For somebody not yet created as a principal (onboarding). With `scopePath`.
+        schema:
+          type: string
+          format: uuid
+      - name: scopePath
+        in: query
+        description: The posting (venue, department or outlet) the peers are drawn from.
+        schema:
+          type: string
+      - name: minPeerShare
+        in: query
+        description: Only roles held by at least this share of peers, percent. Proposed default 60 (our build plan).
+        schema:
+          type: integer
+          minimum: 1
+          maximum: 100
+          default: 60
+      - name: minPeers
+        in: query
+        schema:
+          type: integer
+          minimum: 2
+          default: 3
+      - name: lookbackDays
+        in: query
+        schema:
+          type: integer
+          minimum: 7
+          maximum: 365
+          default: 90
+      - $ref: ../shared/common.yaml#/components/parameters/PageSize
+      - $ref: ../shared/common.yaml#/components/parameters/PageCursor
+      responses:
+        '200':
+          description: Suggested roles, highest peer share first
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: ../shared/common.yaml#/components/schemas/Page
+                - type: object
+                  properties:
+                    insufficientPeers:
+                      type: boolean
+                      description: True when fewer than `minPeers` peers were found; the page is then empty.
+                    peerCount:
+                      type: integer
+                    items:
+                      type: array
+                      items:
+                        $ref: '#/components/schemas/IdentityRoleSuggestion'
+        '400':
+          description: Neither `principalId` nor `jobTitleId` with `scopePath`, or both.
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
+        '403':
+          $ref: ../shared/common.yaml#/components/responses/Forbidden
+        '404':
+          description: The principal has no primary work assignment in force, so there is no job title to compare
+            (`no-work-assignment`).
+          x-ticvai-problem-types:
+          - no-work-assignment
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
+  /access-review-campaigns:
+    get:
+      operationId: listAccessReviewCampaigns
+      x-ticvai-consumed-by:
+        - "P08 BO-054 Role Assignment"
+        - "P08 BO-1066 Roles, Permissions & Masking"
+      x-ticvai-audience:
+      - staff
+      x-ticvai-agreed: '29 September: our build plan (7.1.35, 7.1.56 periodic access reviews); shape follows
+        listPermissionFindings'
+      summary: Access review campaigns, open first
+      description: 'Campaigns in the caller''s scope with their progress (`itemCount`, `decidedCount`, `revokedCount`),
+        open ones first, then by `dueAt`; keyset cursor on `dueAt`, `id`.
+
+        '
+      tags:
+      - administration
+      x-ticvai-permission: PERMISSION_VIEW
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      x-ticvai-read-routing: replica
+      parameters:
+      - name: status
+        in: query
+        schema:
+          type: string
+          enum:
+          - open
+          - completed
+          - expired
+      - $ref: ../shared/common.yaml#/components/parameters/PageSize
+      - $ref: ../shared/common.yaml#/components/parameters/PageCursor
+      responses:
+        '200':
+          description: Campaigns
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: ../shared/common.yaml#/components/schemas/Page
+                - type: object
+                  properties:
+                    items:
+                      type: array
+                      items:
+                        $ref: '#/components/schemas/IdentityAccessReviewCampaign'
+        '403':
+          $ref: ../shared/common.yaml#/components/responses/Forbidden
+    post:
+      operationId: createAccessReviewCampaign
+      x-ticvai-consumed-by:
+        - "P08 BO-1066 Roles, Permissions & Masking"
+      x-ticvai-audience:
+      - staff
+      x-ticvai-agreed: '29 September: our build plan (7.1.35, 7.1.56 periodic access reviews, pre-filled from
+        listPermissionFindings); shape follows createDelegatedAccess'
+      summary: Start an access review, one item per grant in scope
+      description: '7.1.35, 7.1.56 (decided 29 September, build pass, group G2). **A periodic re-certification of who
+        holds what.** Creating the campaign snapshots, in the same transaction, one `IdentityAccessReviewItem` per
+        grant (`identity.delegated_access`, allow, in force) inside `scopePath`, narrowed to `roleIds` where given.
+        Each item names its reviewer (`reviewerMode`: the principal''s line manager from their primary work
+        assignment, or the named reviewers in turn) and, with `prefillFromFindings`, carries what
+        `listPermissionFindings` says about that grant (`excessive`: unused in `lookbackDays`, recommendation
+        `revoke`; `conflicting`: a segregation pair, `review`; otherwise `certify`).
+
+
+        **The reviewer decides; the findings only pre-fill** (`decideAccessReviewItem`). At `dueAt` undecided items
+        become `notReviewed` and the grant is left as it is: **an access review that silently revokes what nobody
+        looked at locks people out of their work**, so the report says what was not reviewed rather than acting on
+        it. `recurrence` repeats the campaign on the same terms (a job creates the next one at the end of this one).
+
+        '
+      tags:
+      - administration
+      x-ticvai-permission: PERMISSION_MANAGE
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/IdentityAccessReviewCampaign'
+      responses:
+        '201':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: Created, with its items
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IdentityAccessReviewCampaign'
+        '400':
+          $ref: ../shared/common.yaml#/components/responses/BadRequest
+        '403':
+          $ref: ../shared/common.yaml#/components/responses/Forbidden
+        '422':
+          description: '`dueAt` not in the future, `reviewerMode` `named` with no `reviewerPrincipalIds`, a
+            `scopePath` outside the caller''s own, or no grant in scope to review (`nothing-to-review`).
+
+            '
+          x-ticvai-problem-types:
+          - nothing-to-review
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
+  /access-review-campaigns/{campaignId}/items:
+    parameters:
+    - name: campaignId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    get:
+      operationId: listAccessReviewItems
+      x-ticvai-consumed-by:
+        - "P08 BO-054 Role Assignment"
+        - "P08 BO-1066 Roles, Permissions & Masking"
+      x-ticvai-audience:
+      - staff
+      x-ticvai-agreed: '29 September: our build plan (7.1.35, 7.1.56); shape follows listPermissionFindings'
+      summary: The grants a campaign asks somebody to certify or revoke
+      description: 'One row per grant in the campaign, with the finding that pre-filled it and the decision so far.
+        `assignedToMe` is the reviewer''s own queue. Ordered by `recommendation` (revoke first), then principal; keyset
+        cursor.
+
+        '
+      tags:
+      - administration
+      x-ticvai-permission: PERMISSION_VIEW
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      x-ticvai-read-routing: replica
+      parameters:
+      - name: status
+        in: query
+        schema:
+          type: string
+          enum:
+          - pending
+          - certified
+          - revoked
+          - notReviewed
+      - name: assignedToMe
+        in: query
+        schema:
+          type: boolean
+      - name: findingKind
+        in: query
+        schema:
+          type: string
+          enum:
+          - none
+          - excessive
+          - conflicting
+      - $ref: ../shared/common.yaml#/components/parameters/PageSize
+      - $ref: ../shared/common.yaml#/components/parameters/PageCursor
+      responses:
+        '200':
+          description: Review items
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: ../shared/common.yaml#/components/schemas/Page
+                - type: object
+                  properties:
+                    items:
+                      type: array
+                      items:
+                        $ref: '#/components/schemas/IdentityAccessReviewItem'
+        '403':
+          $ref: ../shared/common.yaml#/components/responses/Forbidden
+        '404':
+          $ref: ../shared/common.yaml#/components/responses/NotFound
+  /access-review-items/{itemId}/decision:
+    parameters:
+    - name: itemId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    post:
+      operationId: decideAccessReviewItem
+      x-ticvai-consumed-by:
+        - "P08 BO-1066 Roles, Permissions & Masking"
+      x-ticvai-audience:
+      - staff
+      x-ticvai-agreed: '29 September: our build plan (7.1.35, 7.1.56 certify or revoke each grant); shape follows
+        createDelegatedAccess'
+      summary: Certify a grant, or revoke it
+      description: '**`certify`** records that the reviewer confirmed the grant is still needed. **`revoke`** ends the
+        grant in the same transaction (`identity.delegated_access` ends now, as when a grant is withdrawn any other
+        way) and ends the holder''s live sessions, so it applies at once (audit R126). `reason` is required for
+        `revoke`, and for `certify` where the item''s recommendation was `revoke` (overriding the evidence is what an
+        auditor asks about).
+
+
+        **Segregation of duties**: nobody decides an item for a grant they hold themselves (403). The reviewer must
+        hold `PERMISSION_GRANT` at the grant''s scope, as they would to change it any other way.
+
+        '
+      tags:
+      - administration
+      x-ticvai-permission: PERMISSION_GRANT
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - decision
+              properties:
+                decision:
+                  type: string
+                  enum:
+                  - certify
+                  - revoke
+                reason:
+                  type: string
+                  maxLength: 1000
+                  nullable: true
+      responses:
+        '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: Decided
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IdentityAccessReviewItem'
+        '400':
+          description: '`revoke` without a `reason`, or `certify` against a `revoke` recommendation without one.'
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
+        '403':
+          description: The item is for a grant the caller holds, or the caller lacks `PERMISSION_GRANT` at its scope.
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
+        '404':
+          $ref: ../shared/common.yaml#/components/responses/NotFound
+        '409':
+          description: Already decided, or the campaign is no longer `open` (`campaign-closed`).
+          x-ticvai-problem-types:
+          - item-decided
+          - campaign-closed
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
+
 components:
   schemas:
+    IdentityRoleSuggestion:
+      type: object
+      x-ticvai-persistence: none — computed from workforce.work_assignment peers, identity.delegated_access and
+        identity.access_decision
+      description: One role suggested for a person because peers with the same job title and posting hold it (7.1.35,
+        7.1.56; decided 29 September, build pass, group G2).
+      required:
+      - roleId
+      - scopePath
+      - peersHoldingPercent
+      - recommendation
+      properties:
+        roleId:
+          type: string
+          format: uuid
+        roleCode:
+          type: string
+        roleName:
+          type: string
+        scopePath:
+          type: string
+          description: Where the peers hold it, and so where it would be granted.
+        peerCount:
+          type: integer
+          description: Principals with the same job title at the same posting.
+        peersHolding:
+          type: integer
+        peersHoldingPercent:
+          type: number
+          minimum: 0
+          maximum: 100
+        peersUsingPercent:
+          type: number
+          minimum: 0
+          maximum: 100
+          nullable: true
+          description: Of the peers holding it, the share with a permit using one of its permissions in `lookbackDays`.
+        alreadyHeld:
+          type: boolean
+        recommendation:
+          type: string
+          enum:
+          - grant
+          - review
+          - held
+          description: '`grant` where most peers hold and use it; `review` where they hold it and do not use it;
+            `held` where the person has it already.'
+        evidence:
+          type: object
+          description: What the suggestion rests on, so the person granting can check it.
+          properties:
+            jobTitleId:
+              type: string
+              format: uuid
+            postingScopePath:
+              type: string
+            samplePeerPrincipalIds:
+              type: array
+              maxItems: 5
+              items:
+                type: string
+                format: uuid
+            requiresApproval:
+              type: boolean
+              description: Whether granting this role raises an approval (a role carrying permission or price
+                authority, ApprovalKind level 2).
+    IdentityAccessReviewCampaign:
+      type: object
+      x-ticvai-persistence: identity.access_review_campaign
+      description: '**A periodic access review** (7.1.35, 7.1.56; decided 29 September, build pass, group G2): which
+        grants, reviewed by whom, by when. Its items are `identity.access_review_item`. Lifecycle in
+        `states/access-review-campaign.yaml`.'
+      required:
+      - name
+      - scopePath
+      - reviewerMode
+      - dueAt
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        name:
+          type: string
+          maxLength: 200
+        scopePath:
+          type: string
+          description: '**The partition key** (ADR-0005), and what is reviewed: every grant at or below it. Inside the
+            caller''s own scope. Operations write it at `venue` scope.'
+        roleIds:
+          type: array
+          nullable: true
+          description: Only grants of these roles; null reviews every grant in scope.
+          items:
+            type: string
+            format: uuid
+        reviewerMode:
+          type: string
+          enum:
+          - lineManager
+          - named
+          description: '`lineManager`: each item goes to the holder''s manager from their primary work assignment,
+            falling back to the named reviewers where none is found. `named`: the named reviewers share the items.'
+        reviewerPrincipalIds:
+          type: array
+          nullable: true
+          items:
+            type: string
+            format: uuid
+        dueAt:
+          type: string
+          format: date-time
+        recurrence:
+          type: string
+          enum:
+          - none
+          - quarterly
+          - semiAnnual
+          - annual
+          default: none
+        prefillFromFindings:
+          type: boolean
+          default: true
+        lookbackDays:
+          type: integer
+          minimum: 7
+          maximum: 365
+          default: 90
+        status:
+          type: string
+          enum:
+          - open
+          - completed
+          - expired
+          readOnly: true
+        itemCount:
+          type: integer
+          readOnly: true
+        decidedCount:
+          type: integer
+          readOnly: true
+          description: Kept by `decideAccessReviewItem` in the same write, so the campaign list needs no count query.
+        revokedCount:
+          type: integer
+          readOnly: true
+        createdByPrincipalId:
+          type: string
+          format: uuid
+          readOnly: true
+        createdAt:
+          type: string
+          format: date-time
+          readOnly: true
+        closedAt:
+          type: string
+          format: date-time
+          nullable: true
+          readOnly: true
+    IdentityAccessReviewItem:
+      type: object
+      x-ticvai-persistence: identity.access_review_item
+      description: One grant under review in a campaign, with the finding that pre-filled it and the reviewer's decision
+        (decided 29 September, build pass, group G2). Lifecycle in `states/access-review-item.yaml`.
+      required:
+      - campaignId
+      - delegatedAccessId
+      - principalId
+      - status
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        campaignId:
+          type: string
+          format: uuid
+          x-ticvai-references: identity.access_review_campaign
+        delegatedAccessId:
+          type: string
+          format: uuid
+          x-ticvai-references: identity.delegated_access
+          description: The grant under review.
+        principalId:
+          type: string
+          format: uuid
+          x-ticvai-references: identity.principal
+        roleId:
+          type: string
+          format: uuid
+          nullable: true
+          x-ticvai-references: identity.role
+        scopePath:
+          type: string
+          description: The grant's scope. **The partition key** (ADR-0005).
+        reviewerPrincipalId:
+          type: string
+          format: uuid
+          nullable: true
+          x-ticvai-references: identity.principal
+        findingKind:
+          type: string
+          enum:
+          - none
+          - excessive
+          - conflicting
+          default: none
+        lastUsedAt:
+          type: string
+          format: date-time
+          nullable: true
+        recommendation:
+          type: string
+          enum:
+          - certify
+          - revoke
+          - review
+        status:
+          type: string
+          enum:
+          - pending
+          - certified
+          - revoked
+          - notReviewed
+          readOnly: true
+        decidedByPrincipalId:
+          type: string
+          format: uuid
+          nullable: true
+          readOnly: true
+        decidedAt:
+          type: string
+          format: date-time
+          nullable: true
+          readOnly: true
+        reason:
+          type: string
+          maxLength: 1000
+          nullable: true
+    IdentityAccessPolicyEffectiveness:
+      type: object
+      x-ticvai-persistence: none — computed from identity.access_decision and identity.access_override over the
+        requested period
+      description: One `AccessPolicy` over a period (3.3.48; decided 29 September, build pass).
+      required:
+      - policyId
+      - evaluations
+      properties:
+        policyId:
+          type: string
+          format: uuid
+        code:
+          type: string
+        name:
+          type: string
+        status:
+          type: string
+          enum:
+          - draft
+          - pendingApproval
+          - active
+          - suspended
+          - retired
+        versionsInPeriod:
+          type: array
+          items:
+            type: integer
+          description: The versions that decided anything in the period.
+        evaluations:
+          type: integer
+          minimum: 0
+          description: Decisions that evaluated this policy.
+        matched:
+          type: integer
+          minimum: 0
+          description: Evaluations in which every condition held (or one, for `anyMayMatch`).
+        decisivePermits:
+          type: integer
+          minimum: 0
+          description: Permits this policy decided.
+        decisiveDenies:
+          type: integer
+          minimum: 0
+          description: Denies this policy decided, deny winning over any permit.
+        overridesAtScope:
+          type: integer
+          minimum: 0
+          description: Emergency overrides opened in the period at or beneath the policy's scope for a
+            permission it speaks to - the times people had to go around it.
+        lastMatchedAt:
+          type: string
+          format: date-time
+          nullable: true
+        neverMatched:
+          type: boolean
+          description: True when the policy was evaluated and never matched in the period, the usual sign of a
+            condition written backwards or a policy nobody needs.
+        trend:
+          type: array
+          description: One point per day in the period.
+          items:
+            type: object
+            properties:
+              date:
+                type: string
+                format: date
+              evaluations:
+                type: integer
+              decisiveDenies:
+                type: integer
+    IdentityPermissionFinding:
+      type: object
+      x-ticvai-persistence: none — computed from grants (roles, delegations, policies) against
+        identity.access_decision and identity.segregation_rule
+      description: One excessive, missing or conflicting permission (7.1.47; decided 29 September, build pass).
+      required:
+      - kind
+      - principalId
+      - permission
+      properties:
+        kind:
+          type: string
+          enum:
+          - excessive
+          - missing
+          - conflicting
+        principalId:
+          type: string
+          format: uuid
+        roleId:
+          type: string
+          format: uuid
+          nullable: true
+          description: The role that grants it, for excessive and conflicting; the role whose peers hold it, for
+            missing.
+        permission:
+          type: string
+        conflictingPermission:
+          type: string
+          nullable: true
+          description: The other half of the pair, for conflicting.
+        segregationRuleId:
+          type: string
+          format: uuid
+          nullable: true
+        scopePath:
+          type: string
+        grantedBy:
+          type: string
+          enum:
+          - role
+          - delegation
+          - policy
+          nullable: true
+        lastUsedAt:
+          type: string
+          format: date-time
+          nullable: true
+          description: The last permit that used it; null when never used in the window.
+        deniedCount:
+          type: integer
+          nullable: true
+          description: For missing, the denials in the window.
+        peersHoldingPercent:
+          type: number
+          minimum: 0
+          maximum: 100
+          nullable: true
+          description: For missing, the share of the role's holders at the same scope who hold the permission.
+        recommendation:
+          type: string
+          enum:
+          - revoke
+          - grant
+          - review
+        asDraft:
+          type: boolean
+          default: false
+          description: True when the finding exists only because of the `draftPolicyId` evaluated.
+    IdentityGuestDocumentSubmission:
+      type: object
+      x-ticvai-persistence: none — request only; the document goes to pii.subject_document and the verification to
+        identity.guest_identity_verification
+      required:
+      - documentKind
+      - documentNumber
+      - documentAssetId
+      properties:
+        documentKind:
+          type: string
+          enum:
+          - passport
+          - emiratesId
+          - nationalId
+          - drivingLicence
+          - residencePermit
+          - other
+          description: The vocabulary of `pii.subject_document.kind`.
+        documentNumber:
+          type: string
+          format: password
+          writeOnly: true
+          maxLength: 64
+          description: '**Write-only, never returned.** Hashed on arrival; only the last four are kept in clear.'
+        issuingCountry:
+          type: string
+          pattern: ^[A-Z]{2}$
+          nullable: true
+        expiresOn:
+          type: string
+          format: date
+          nullable: true
+        documentAssetId:
+          type: string
+          format: uuid
+          description: The uploaded scan or photo of the document.
+        selfieAssetId:
+          type: string
+          format: uuid
+          nullable: true
+          description: A live photo for the reviewer to compare, where the policy asks for one. Deleted with the
+            scan.
+        reason:
+          type: string
+          enum:
+          - policyRequired
+          - ageRestrictedPurchase
+          - residentPricing
+          - accountRecovery
+          default: policyRequired
+          description: What the guest is verifying for; the review queue shows it.
+    IdentityGuestVerification:
+      type: object
+      x-ticvai-persistence: identity.guest_identity_verification
+      description: '**One guest identity-document verification** (5.3.21; decided 29 September, build pass):
+        the document it checks, its status, the method and who decided. The document itself is
+        `pii.subject_document`; this row holds no document number.'
+      required:
+      - id
+      - subjectId
+      - status
+      - submittedAt
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        subjectId:
+          type: string
+          format: uuid
+        subjectDocumentId:
+          type: string
+          format: uuid
+          description: The `pii.subject_document` row submitted.
+        documentKind:
+          type: string
+          enum:
+          - passport
+          - emiratesId
+          - nationalId
+          - drivingLicence
+          - residencePermit
+          - other
+        documentNumberLast4:
+          type: string
+          maxLength: 4
+          nullable: true
+          readOnly: true
+        reason:
+          type: string
+          enum:
+          - policyRequired
+          - ageRestrictedPurchase
+          - residentPricing
+          - accountRecovery
+        status:
+          type: string
+          enum:
+          - pending
+          - verified
+          - rejected
+          - resubmissionRequested
+          readOnly: true
+        method:
+          type: string
+          enum:
+          - manualReview
+          - documentScanner
+          - provider
+          nullable: true
+          readOnly: true
+        decisionReason:
+          type: string
+          maxLength: 300
+          nullable: true
+          readOnly: true
+        decidedByPrincipalId:
+          type: string
+          format: uuid
+          nullable: true
+          readOnly: true
+        submittedAt:
+          type: string
+          format: date-time
+          readOnly: true
+        decidedAt:
+          type: string
+          format: date-time
+          nullable: true
+          readOnly: true
+        documentImageDeletedAt:
+          type: string
+          format: date-time
+          nullable: true
+          readOnly: true
+          description: When the scan (and any selfie) was deleted under the policy's retention.
+    IdentityGuestVerificationPolicy:
+      type: object
+      x-ticvai-persistence: identity.guest_verification_policy
+      description: '**The tenant''s configurable identity workflow for guests** (5.3.21; decided 29 September,
+        build pass). Which verifications registration needs, which moments need a verified ID document, what is
+        accepted and who reviews it. Proposed defaults are ours (our build plan).'
+      required:
+      - registrationRequires
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        scopePath:
+          type: string
+          readOnly: true
+          description: 'The tenant, written by the server (`x-ticvai-config-scope: tenant`).'
+        registrationRequires:
+          type: array
+          description: Verifications a new account must pass before it is usable. Proposed default
+            `[mobileOtp]`.
+          items:
+            type: string
+            enum:
+            - email
+            - mobileOtp
+        idDocumentRequiredFor:
+          type: array
+          description: The moments that need a verified ID document. Empty (the default) asks for none.
+          items:
+            type: string
+            enum:
+            - accountCreation
+            - ageRestrictedPurchase
+            - residentPricing
+            - accountRecovery
+            - walletTopUpAboveLimit
+        walletTopUpLimit:
+          $ref: ../shared/common.yaml#/components/schemas/Money
+        acceptedDocumentKinds:
+          type: array
+          description: Proposed default passport, emiratesId, nationalId.
+          items:
+            type: string
+            enum:
+            - passport
+            - emiratesId
+            - nationalId
+            - drivingLicence
+            - residencePermit
+            - other
+        uaePassSatisfiesIdDocument:
+          type: boolean
+          default: true
+          description: A guest signed in with UAE Pass (`guestUaePassLogin`) counts as ID-verified, since the
+            national identity has already checked the person.
+        socialLoginCountsAsEmailVerified:
+          type: boolean
+          default: true
+        selfieRequired:
+          type: boolean
+          default: false
+        reviewMode:
+          type: string
+          enum:
+          - manual
+          - provider
+          - providerThenManual
+          default: manual
+          description: Who checks a document. `provider` and `providerThenManual` need the client's verification
+            provider (make-or-break on `setGuestVerificationPolicy`).
+        documentImageRetention:
+          type: string
+          enum:
+          - deleteOnDecision
+          - keepUntilDocumentExpiry
+          default: deleteOnDecision
+          description: How long the scan is kept. The outcome and the hashed number are kept either way.
+        maxResubmissions:
+          type: integer
+          minimum: 0
+          maximum: 10
+          default: 3
+        updatedAt:
+          type: string
+          format: date-time
+          readOnly: true
     MembershipDetail:
       type: object
       x-ticvai-persistence: none — composed from the membership and three related tables
@@ -4434,6 +5989,18 @@ components:
       x-ticvai-persistence: identity.access_policy
       description: '3.3. **Conditions and an effect, evaluated by one engine.** A role says who you are;
         a policy says under what circumstances that is enough.
+
+
+        **Which of the two policy engines this is** (stated 29 September, build pass). The package has two:
+        this one, and the access contract''s `AccessDynamicPolicy` (`access.dynamic_policy`). **This one
+        governs who may do what in the software**: a principal''s permissions on operations and screens
+        (`permissions` names them), narrowed or extended by who, where, when and on what device, and decided by
+        `evaluateAccess`. **`AccessDynamicPolicy` governs who may pass which gate**: a guest''s, holder''s or
+        employee''s admission at an access point, decided in the gate''s validation with results such as
+        `requireId` or `requireSupervisor` that mean nothing to a permission check. A staff member''s badge
+        opening a staff door is a gate decision (access); the same staff member approving a refund is a
+        permission decision (here). The overlap that remains is listed in the build readiness open items
+        rather than merged in this pass.
 
         '
       required:

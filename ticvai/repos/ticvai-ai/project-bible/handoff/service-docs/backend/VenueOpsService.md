@@ -7,7 +7,7 @@
 | Tier | operations: What a venue does with what it sold. Licensed per module. |
 | Contracts | `queue`, `maintenance`, `resources`, `venue-map`, `assets`, `games`, `rental`, `transport` |
 | Schemas owned | `queue`, `maintenance`, `resources`, `venuemap`, `assets`, `games`, `rental`, `transport` |
-| Operations in the slice | 62 of 274 |
+| Operations in the slice | 63 of 274 |
 | Scale | Low and steady. Queue readings are the only frequent write. |
 | If it is down | Down degrades venue operations. Selling and admitting continue. |
 
@@ -20,7 +20,8 @@
 | Service | Tables it reads |
 |---|---|
 | [AccessService](AccessService.md) | `access.access_point` |
-| [CatalogueService](CatalogueService.md) | `catalogue.product` |
+| [CatalogueService](CatalogueService.md) | `catalogue.product`, `promotions.promotion` |
+| [MarketingService](MarketingService.md) | `marketing.loyalty_position` |
 | [TenancyService](TenancyService.md) | `platform.outlet`, `platform.scope` |
 
 ## Operations in the first release
@@ -51,6 +52,7 @@
 | favourite | [`saveFavouriteRoute`](#savefavouriteroute) | POST | `/transport/favourite-routes` | core | 3 | GST-077, WEB-049 |
 | feed | [`configureQueueFeed`](#configurequeuefeed) | PUT | `/queue-feeds` | setup | 1 | BO-001, BO-003 |
 | feed | [`getQueueFeedHealth`](#getqueuefeedhealth) | GET | `/queue-feeds/{feedId}/health` | core | 1 | BO-001, BO-003, POS-029 |
+| inspection | [`createInspectionTemplate`](#createinspectiontemplate) | POST | `/inspection-templates` | setup | 2 | EMP-048 |
 | pass | [`listTransportPassOffers`](#listtransportpassoffers) | GET | `/transport/pass-offers` | core | 3 | GST-078, WEB-049 |
 | queue | [`createQueue`](#createqueue) | POST | `/queues` | setup | 1 | BO-001, BO-002, BO-004, BO-005, BO-038 |
 | queue | [`getQueue`](#getqueue) | GET | `/queues/{queueId}` | core | 1 | BO-001, BO-002, BO-004, BO-005, BO-038, EMP-031 … |
@@ -925,6 +927,10 @@ Position, parties ahead, estimated call time. Polled by the guest app, so it is 
 | partiesAhead | integer |  | (nullable) |
 | estimatedCallAt | string (date-time) |  | (nullable) |
 | isFastPass | boolean |  |  |
+| priorityBasis | enum (none, entitlement, loyaltyTier, promotion, accessibility) |  | Why this party is priority, when it is (decided 29 September, build pass; 5.6.7, 5.6.34): the first QueueFastPass criterion met at join, in the order entitlement, loyalty tier, promotion, accessibili… (default none) |
+| priorityTierId | string (uuid) |  | The loyalty tier that granted priority, where priorityBasis is loyaltyTier. (nullable) |
+| priorityPromotionId | string (uuid) |  | The promotion that granted priority, where priorityBasis is promotion. (nullable) |
+| accessibilityNeedDeclared | boolean |  | What the party declared at join, shown to the operator at the front. (default False) |
 | entitlementId | string |  | (nullable) |
 | calledAt | string (date-time) |  | (nullable) |
 | returnWindowEndsAt | string (date-time) |  | (nullable) |
@@ -948,6 +954,7 @@ Guest-facing. Returns a position, a party number and a return window.
 **One active entry per guest per queue**, and a configurable cap across queues — a guest holding positions in every queue at once defeats the purpose of a virtual queue for everyone else.
 **The cap is `VenueSettings.queue.crossQueueLimit`**, the number of queues a guest may be waiting in at once in this venue: a venue setting with a tenant default (decided 28 September, audit R094). **Proposed default 2, client to correct (audit R094).** The refusal carries the limit in `crossQueueLimit`.
 Where the party includes someone below the height requirement, the join is refused here rather than at the ride, which is a much better place to find out.
+**Priority is decided here, by the server** (decided 29 September, build pass; 5.6.7, 5.6.34). On a lane with a `QueueFastPass` block the party joins as priority when it holds a listed entitlement, is in a listed loyalty tier, qualifies for a listed live promotion (or presents its `promotionCode`), or declares an accessibility need where the lane accepts one; the entry records which as `priorityBasis`. On a `fastPass` lane a party meeting none of them is refused `entitlementRequired`.
 
 |  |  |
 |---|---|
@@ -957,7 +964,7 @@ Where the party includes someone below the height requirement, the join is refus
 | Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
-| Reads | `cache:idempotency`, `queue.entry` |
+| Reads | `cache:idempotency`, `marketing.loyalty_position`, `promotions.promotion`, `queue.entry`, `queue.queue` |
 | Writes | `cache:idempotency`, `queue.entry` |
 | Called by | GST-023, GST-046, WEB-015, WEB-040 |
 | State model | Queue entry ([states/queue-entry.yaml](../../../states/queue-entry.yaml)): created as `waiting` |
@@ -977,6 +984,8 @@ Where the party includes someone below the height requirement, the join is refus
 | partySize | integer | yes | (min 1) |
 | entitlementId | string |  | Fast Pass or priority entitlement. (nullable) |
 | partyHeightsCm | array of integer |  | Where the queue has a height requirement. |
+| accessibilityNeedDeclared | boolean |  | The party declares an accessibility need (5.6.7; decided 29 September, build pass). (default False) |
+| promotionCode | string |  | A promotion code the guest holds, checked against the lane's QueueFastPass.promotionIds (5.6.34). (max length 64; nullable) |
 | recordedAt | string (date-time) | yes |  |
 
 **Response**: `WaitingGuest`
@@ -994,6 +1003,10 @@ Where the party includes someone below the height requirement, the join is refus
 | partiesAhead | integer |  | (nullable) |
 | estimatedCallAt | string (date-time) |  | (nullable) |
 | isFastPass | boolean |  |  |
+| priorityBasis | enum (none, entitlement, loyaltyTier, promotion, accessibility) |  | Why this party is priority, when it is (decided 29 September, build pass; 5.6.7, 5.6.34): the first QueueFastPass criterion met at join, in the order entitlement, loyalty tier, promotion, accessibili… (default none) |
+| priorityTierId | string (uuid) |  | The loyalty tier that granted priority, where priorityBasis is loyaltyTier. (nullable) |
+| priorityPromotionId | string (uuid) |  | The promotion that granted priority, where priorityBasis is promotion. (nullable) |
+| accessibilityNeedDeclared | boolean |  | What the party declared at join, shown to the operator at the front. (default False) |
 | entitlementId | string |  | (nullable) |
 | calledAt | string (date-time) |  | (nullable) |
 | returnWindowEndsAt | string (date-time) |  | (nullable) |
@@ -1085,6 +1098,10 @@ Operator view. Position order, with no-shows and expiries visible.
 | items[].partiesAhead | integer |  | (nullable) |
 | items[].estimatedCallAt | string (date-time) |  | (nullable) |
 | items[].isFastPass | boolean |  |  |
+| items[].priorityBasis | enum (none, entitlement, loyaltyTier, promotion, accessibility) |  | Why this party is priority, when it is (decided 29 September, build pass; 5.6.7, 5.6.34): the first QueueFastPass criterion met at join, in the order entitlement, loyalty tier, promotion, accessibili… (default none) |
+| items[].priorityTierId | string (uuid) |  | The loyalty tier that granted priority, where priorityBasis is loyaltyTier. (nullable) |
+| items[].priorityPromotionId | string (uuid) |  | The promotion that granted priority, where priorityBasis is promotion. (nullable) |
+| items[].accessibilityNeedDeclared | boolean |  | What the party declared at join, shown to the operator at the front. (default False) |
 | items[].entitlementId | string |  | (nullable) |
 | items[].calledAt | string (date-time) |  | (nullable) |
 | items[].returnWindowEndsAt | string (date-time) |  | (nullable) |
@@ -1616,6 +1633,88 @@ Last reading, expected interval, and whether the feed has gone quiet. A silent f
 | 200 |  | Health |
 
 
+## Group: inspection
+
+### createInspectionTemplate
+
+**`POST /inspection-templates`**: Create an inspection template
+
+Items may be marked safety-critical. **A failed safety-critical item blocks the inspection from passing** — it cannot be overridden by completing the rest.
+
+|  |  |
+|---|---|
+| Permission | `INSPECTION_MANAGE` |
+| Scope level | tenant |
+| Part of slice | setup, makes `maintenance.inspection_template` non-empty |
+| Wave | 2 |
+| Offline | no |
+| Config scope | tenant |
+| Conflict policy | serverWins |
+| Reads | `cache:idempotency`, `maintenance.inspection_template`, `maintenance.inspection_template_item` |
+| Writes | `cache:idempotency`, `maintenance.inspection_template`, `maintenance.inspection_template_item` |
+| Called by | EMP-048 |
+
+**Parameters**
+
+| Name | In | Required | Type | Notes |
+|---|---|---|---|---|
+| Idempotency-Key | header | yes | string | Client-generated ULID. |
+
+**Request body**: `InspectionTemplate`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| instructions | string |  | The procedure itself. |
+| id | string (uuid) | yes |  |
+| code | string | yes | (max length 64) |
+| name | string | yes | (max length 200) |
+| venueId | string (uuid) |  | (nullable) |
+| appliesToAssetCategoryId | string (uuid) |  | (nullable) |
+| frequency | enum (preOpening, postClosing, daily, weekly, monthly, annual, adHoc) |  |  |
+| items | array of object | yes | (min items 1) |
+| items[].key | string | yes |  |
+| items[].label | string | yes |  |
+| items[].kind | InspectionItemKind: enum (passFail, yesNo, numeric, text, photo, signature) | yes |  |
+| items[].isRequired | boolean | yes |  |
+| items[].isSafetyCritical | boolean |  | A failed safety-critical item blocks the inspection from passing and cannot be overridden by completing the rest. (default False) |
+| items[].requiresPhotoOnFail | boolean |  | (default True) |
+| items[].minValue | number |  | (nullable) |
+| items[].maxValue | number |  | (nullable) |
+| items[].guidance | string |  | (nullable) |
+| retentionYears | integer |  | Compliance inspections are retained alongside the financial trail. (default 7) |
+| isActive | boolean |  |  |
+
+**Response**: `InspectionTemplate`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| instructions | string |  | The procedure itself. |
+| id | string (uuid) | yes |  |
+| code | string | yes | (max length 64) |
+| name | string | yes | (max length 200) |
+| venueId | string (uuid) |  | (nullable) |
+| appliesToAssetCategoryId | string (uuid) |  | (nullable) |
+| frequency | enum (preOpening, postClosing, daily, weekly, monthly, annual, adHoc) |  |  |
+| items | array of object | yes | (min items 1) |
+| items[].key | string | yes |  |
+| items[].label | string | yes |  |
+| items[].kind | InspectionItemKind: enum (passFail, yesNo, numeric, text, photo, signature) | yes |  |
+| items[].isRequired | boolean | yes |  |
+| items[].isSafetyCritical | boolean |  | A failed safety-critical item blocks the inspection from passing and cannot be overridden by completing the rest. (default False) |
+| items[].requiresPhotoOnFail | boolean |  | (default True) |
+| items[].minValue | number |  | (nullable) |
+| items[].maxValue | number |  | (nullable) |
+| items[].guidance | string |  | (nullable) |
+| retentionYears | integer |  | Compliance inspections are retained alongside the financial trail. (default 7) |
+| isActive | boolean |  |  |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 201 |  | Created |
+
+
 ## Group: pass
 
 ### listTransportPassOffers
@@ -1733,7 +1832,10 @@ Bound to an attraction and, where one exists, to an asset — so a ride taken ou
 | fastPassAllocationPercent | number |  | Share of each cycle reserved for Fast Pass holders. (min 0; max 100; default 0) |
 | zone | string |  | (nullable) |
 | fastPass | object |  | The lane's Fast Pass block (decided 29 September, VM close-out). (nullable) |
-| fastPass.entitlementProductIds | array of string (uuid) | yes | Catalogue products whose entitlement admits to this lane. (min items 1) |
+| fastPass.entitlementProductIds | array of string (uuid) | yes | Catalogue products whose entitlement admits to this lane. |
+| fastPass.loyaltyTierIds | array of string (uuid) |  | 5.6.7 and 5.6.34 (decided 29 September, build pass). |
+| fastPass.promotionIds | array of string (uuid) |  | 5.6.34 (decided 29 September, build pass). |
+| fastPass.accessibilityPriority | boolean |  | 5.6.7 (decided 29 September, build pass). (default False) |
 | fastPass.returnWindowMinutes | integer |  | How long after the booked return time a Fast Pass holder may still enter. (min 1; max 240; default 60) |
 | fastPass.maxPerGuestPerDay | integer |  | Fast Pass redemptions one guest may make on this lane per day; null is no cap. (min 1; nullable) |
 | fastPass.allowedAccessPointIds | array of string (uuid) |  | Access points that redeem Fast Pass for this lane; empty is the queue's own. |
@@ -1766,7 +1868,10 @@ Bound to an attraction and, where one exists, to an asset — so a ride taken ou
 | fastPassAllocationPercent | number |  | Share of each cycle reserved for Fast Pass holders. (min 0; max 100; default 0) |
 | zone | string |  | (nullable) |
 | fastPass | object |  | The lane's Fast Pass block (decided 29 September, VM close-out). (nullable) |
-| fastPass.entitlementProductIds | array of string (uuid) | yes | Catalogue products whose entitlement admits to this lane. (min items 1) |
+| fastPass.entitlementProductIds | array of string (uuid) | yes | Catalogue products whose entitlement admits to this lane. |
+| fastPass.loyaltyTierIds | array of string (uuid) |  | 5.6.7 and 5.6.34 (decided 29 September, build pass). |
+| fastPass.promotionIds | array of string (uuid) |  | 5.6.34 (decided 29 September, build pass). |
+| fastPass.accessibilityPriority | boolean |  | 5.6.7 (decided 29 September, build pass). (default False) |
 | fastPass.returnWindowMinutes | integer |  | How long after the booked return time a Fast Pass holder may still enter. (min 1; max 240; default 60) |
 | fastPass.maxPerGuestPerDay | integer |  | Fast Pass redemptions one guest may make on this lane per day; null is no cap. (min 1; nullable) |
 | fastPass.allowedAccessPointIds | array of string (uuid) |  | Access points that redeem Fast Pass for this lane; empty is the queue's own. |
@@ -1840,7 +1945,10 @@ Bound to an attraction and, where one exists, to an asset — so a ride taken ou
 | fastPassAllocationPercent | number |  | Share of each cycle reserved for Fast Pass holders. (min 0; max 100; default 0) |
 | zone | string |  | (nullable) |
 | fastPass | object |  | The lane's Fast Pass block (decided 29 September, VM close-out). (nullable) |
-| fastPass.entitlementProductIds | array of string (uuid) | yes | Catalogue products whose entitlement admits to this lane. (min items 1) |
+| fastPass.entitlementProductIds | array of string (uuid) | yes | Catalogue products whose entitlement admits to this lane. |
+| fastPass.loyaltyTierIds | array of string (uuid) |  | 5.6.7 and 5.6.34 (decided 29 September, build pass). |
+| fastPass.promotionIds | array of string (uuid) |  | 5.6.34 (decided 29 September, build pass). |
+| fastPass.accessibilityPriority | boolean |  | 5.6.7 (decided 29 September, build pass). (default False) |
 | fastPass.returnWindowMinutes | integer |  | How long after the booked return time a Fast Pass holder may still enter. (min 1; max 240; default 60) |
 | fastPass.maxPerGuestPerDay | integer |  | Fast Pass redemptions one guest may make on this lane per day; null is no cap. (min 1; nullable) |
 | fastPass.allowedAccessPointIds | array of string (uuid) |  | Access points that redeem Fast Pass for this lane; empty is the queue's own. |
@@ -1933,7 +2041,10 @@ Guest-facing when called with a guest token — returns only queues that are ope
 | items[].fastPassAllocationPercent | number |  | Share of each cycle reserved for Fast Pass holders. (min 0; max 100; default 0) |
 | items[].zone | string |  | (nullable) |
 | items[].fastPass | object |  | The lane's Fast Pass block (decided 29 September, VM close-out). (nullable) |
-| items[].fastPass.entitlementProductIds | array of string (uuid) | yes | Catalogue products whose entitlement admits to this lane. (min items 1) |
+| items[].fastPass.entitlementProductIds | array of string (uuid) | yes | Catalogue products whose entitlement admits to this lane. |
+| items[].fastPass.loyaltyTierIds | array of string (uuid) |  | 5.6.7 and 5.6.34 (decided 29 September, build pass). |
+| items[].fastPass.promotionIds | array of string (uuid) |  | 5.6.34 (decided 29 September, build pass). |
+| items[].fastPass.accessibilityPriority | boolean |  | 5.6.7 (decided 29 September, build pass). (default False) |
 | items[].fastPass.returnWindowMinutes | integer |  | How long after the booked return time a Fast Pass holder may still enter. (min 1; max 240; default 60) |
 | items[].fastPass.maxPerGuestPerDay | integer |  | Fast Pass redemptions one guest may make on this lane per day; null is no cap. (min 1; nullable) |
 | items[].fastPass.allowedAccessPointIds | array of string (uuid) |  | Access points that redeem Fast Pass for this lane; empty is the queue's own. |
@@ -1993,7 +2104,10 @@ Guest-facing when called with a guest token — returns only queues that are ope
 | heightRequirementCm | integer |  | (nullable) |
 | fastPassAllocationPercent | number |  | (min 0; max 100) |
 | fastPass | object |  | The lane's Fast Pass block (decided 29 September, VM close-out). (nullable) |
-| fastPass.entitlementProductIds | array of string (uuid) | yes | Catalogue products whose entitlement admits to this lane. (min items 1) |
+| fastPass.entitlementProductIds | array of string (uuid) | yes | Catalogue products whose entitlement admits to this lane. |
+| fastPass.loyaltyTierIds | array of string (uuid) |  | 5.6.7 and 5.6.34 (decided 29 September, build pass). |
+| fastPass.promotionIds | array of string (uuid) |  | 5.6.34 (decided 29 September, build pass). |
+| fastPass.accessibilityPriority | boolean |  | 5.6.7 (decided 29 September, build pass). (default False) |
 | fastPass.returnWindowMinutes | integer |  | How long after the booked return time a Fast Pass holder may still enter. (min 1; max 240; default 60) |
 | fastPass.maxPerGuestPerDay | integer |  | Fast Pass redemptions one guest may make on this lane per day; null is no cap. (min 1; nullable) |
 | fastPass.allowedAccessPointIds | array of string (uuid) |  | Access points that redeem Fast Pass for this lane; empty is the queue's own. |
@@ -2026,7 +2140,10 @@ Guest-facing when called with a guest token — returns only queues that are ope
 | fastPassAllocationPercent | number |  | Share of each cycle reserved for Fast Pass holders. (min 0; max 100; default 0) |
 | zone | string |  | (nullable) |
 | fastPass | object |  | The lane's Fast Pass block (decided 29 September, VM close-out). (nullable) |
-| fastPass.entitlementProductIds | array of string (uuid) | yes | Catalogue products whose entitlement admits to this lane. (min items 1) |
+| fastPass.entitlementProductIds | array of string (uuid) | yes | Catalogue products whose entitlement admits to this lane. |
+| fastPass.loyaltyTierIds | array of string (uuid) |  | 5.6.7 and 5.6.34 (decided 29 September, build pass). |
+| fastPass.promotionIds | array of string (uuid) |  | 5.6.34 (decided 29 September, build pass). |
+| fastPass.accessibilityPriority | boolean |  | 5.6.7 (decided 29 September, build pass). (default False) |
 | fastPass.returnWindowMinutes | integer |  | How long after the booked return time a Fast Pass holder may still enter. (min 1; max 240; default 60) |
 | fastPass.maxPerGuestPerDay | integer |  | Fast Pass redemptions one guest may make on this lane per day; null is no cap. (min 1; nullable) |
 | fastPass.allowedAccessPointIds | array of string (uuid) |  | Access points that redeem Fast Pass for this lane; empty is the queue's own. |
@@ -2750,6 +2867,7 @@ Requirements are stated as type and quantity with optional qualifications — *o
 
 Boards 2.03 and 2.04. **A pattern, not a list of days.** A schedule written as concrete dates has to be rewritten every season and silently expires; a recurring pattern with exceptions does not.
 **Slot length is here and not on the product**, because the same instructor may teach a forty-minute private lesson and a ninety-minute group lesson, and the constraint being modelled is the resource's — how finely its time can be cut.
+**Accepts `Prefer: validate-only`** (29 September, build pass, group G2): validates and answers 200 with the would-be result without writing, for the AI executor's plan validation; registered as an AI tool (`ai.AiTool`, 1.2.59, 2.6.50).
 
 |  |  |
 |---|---|
@@ -2769,6 +2887,7 @@ Boards 2.03 and 2.04. **A pattern, not a list of days.** A schedule written as c
 |---|---|---|---|---|
 | resourceId | path | yes | string (uuid) |  |
 | Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Prefer | header |  | enum (validate-only) | Validate, do not write (29 September, AI system design 2.3 and 2.2 D step 4). |
 
 **Request body**: `ResourceSchedule`
 
@@ -4407,6 +4526,36 @@ Every table this service owns that the slice reads or writes, with its columns a
 | id | uuid | yes | Synthesised key. |
 | card_id | text | yes | Points at games.card. |
 
+### `maintenance.inspection_template`
+
+| Column | Type | Required | Notes |
+|---|---|---|---|
+| instructions | text | no | The procedure itself. |
+| id | uuid | yes |  |
+| code | text | yes |  |
+| name | text | yes |  |
+| venue_id | uuid | no |  |
+| applies_to_asset_category_id | uuid | no |  |
+| frequency | text | no |  |
+| retention_years | integer | no | Compliance inspections are retained alongside the financial trail. |
+| is_active | boolean | no |  |
+
+### `maintenance.inspection_template_item`
+
+| Column | Type | Required | Notes |
+|---|---|---|---|
+| inspection_template_id | uuid | yes | The parent row. |
+| key | text | yes |  |
+| label | text | yes |  |
+| kind | text | yes |  |
+| is_required | boolean | yes |  |
+| is_safety_critical | boolean | no | A failed safety-critical item blocks the inspection from passing and cannot be overridden by completing the rest. |
+| requires_photo_on_fail | boolean | no |  |
+| min_value | numeric | no |  |
+| max_value | numeric | no |  |
+| guidance | text | no |  |
+| id | uuid | yes | Synthesised key. |
+
 ### `maintenance.work_order`
 
 | Column | Type | Required | Notes |
@@ -4479,6 +4628,10 @@ Every table this service owns that the slice reads or writes, with its columns a
 | parties_ahead | integer | no |  |
 | estimated_call_at | timestamptz | no |  |
 | is_fast_pass | boolean | no |  |
+| priority_basis | text | no | Why this party is priority, when it is (decided 29 September, build pass; 5.6.7, 5.6.34): the first QueueFastPass criterion met at join, in the order entitlement, loyalty tier, promotion, accessibili… |
+| priority_tier_id | uuid | no | The loyalty tier that granted priority, where priorityBasis is loyaltyTier. |
+| priority_promotion_id | uuid | no | The promotion that granted priority, where priorityBasis is promotion. |
+| is_accessibility_need_declared | boolean | no | What the party declared at join, shown to the operator at the front. |
 | entitlement_id | text | no |  |
 | called_at | timestamptz | no |  |
 | return_window_ends_at | timestamptz | no |  |
@@ -4537,6 +4690,9 @@ Every table this service owns that the slice reads or writes, with its columns a
 | throughput_last_hour | integer | no |  |
 | no_show_rate_percent | numeric | no |  |
 | entitlement_product_ids | text[] | yes | Catalogue products whose entitlement admits to this lane. |
+| loyalty_tier_ids | text[] | no | 5.6.7 and 5.6.34 (decided 29 September, build pass). |
+| promotion_ids | text[] | no | 5.6.34 (decided 29 September, build pass). |
+| accessibility_priority | boolean | no | 5.6.7 (decided 29 September, build pass). |
 | return_window_minutes | integer | no | How long after the booked return time a Fast Pass holder may still enter. |
 | max_per_guest_per_day | integer | no | Fast Pass redemptions one guest may make on this lane per day; null is no cap. |
 | allowed_access_point_ids | text[] | no | Access points that redeem Fast Pass for this lane; empty is the queue's own. |
@@ -4929,7 +5085,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 
 ## Not in the first release
 
-212 operations, added to this service in later releases without changing any of the above.
+211 operations, added to this service in later releases without changing any of the above.
 
 | Group | Operations |
 |---|---|
@@ -4941,7 +5097,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 | game | `cloneGame`, `createGame`, `listGames`, `updateGame` |
 | games | `authoriseGameplay`, `cloneReaderConfiguration`, `createGameEntitlement`, `deployReaderConfiguration`, `getGameEligibility`, `getGamePricing`, `getGameplaySyncStatus`, `getGameplayValidationRules`, `listAttractionTypes`, `listGameEntitlements`, `listGameplayTransactions`, `listReaders`, `reportReaderQueue`, `setAttractionType`, `setGameCardExpiryRules`, `setGameCardLifecycle`, `setGameKioskConfiguration`, `setGameOperationalConfiguration`, `setGamePricing`, `setGameplayValidationRules`, `setPrizeCost`, `setReaderConfiguration`, `setReaderProfile`, `setRedemptionRules`, `simulateGameplayAuthorisation`, `testReader`, `validateGameConfiguration` |
 | incident | `getIncident`, `listIncidents`, `recordAuthorityNotification`, `reportIncident`, `updateIncident` |
-| inspection | `createInspectionTemplate`, `listInspectionTemplates`, `listInspections`, `submitInspection` |
+| inspection | `listInspectionTemplates`, `listInspections`, `submitInspection` |
 | maintenance | `acceptWorkOrder`, `attachWorkOrderEvidence`, `closeWorkOrder`, `pauseWorkOrder`, `rejectWorkOrder`, `resumeWorkOrder`, `startWorkOrder` |
 | networkImport | `applyTransportNetworkImport`, `getTransportNetworkImport`, `importTransportNetwork` |
 | pass | `createTransportPassType`, `listTransportPassTypes`, `updateTransportPassType` |

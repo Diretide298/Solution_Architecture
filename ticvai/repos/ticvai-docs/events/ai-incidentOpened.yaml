@@ -1,0 +1,52 @@
+# ai.incidentOpened v1 — published by ai
+# Checked by tools/check-states.py.
+
+name: ai.incidentOpened
+version: 1
+publisher: ai
+description: An AI governance incident was opened.
+aggregate: aiIncident
+emittedWhen: AiIncident created in open (openAiIncident, or decideAiGovernanceAlert with openIncident)
+payload:
+- field: tenantId
+  type: uuid
+- field: scopePath
+  type: string
+- field: incidentId
+  type: uuid
+- field: reference
+  type: string
+- field: severity
+  type: string
+- field: kind
+  type: string
+  notes: governance, operational or both
+- field: capabilityKeys
+  type: array
+- field: openedAt
+  type: timestamp
+consumers:
+- context: marketing
+  purpose: Page the governance team where the severity is high or critical
+  idempotencyKey: incidentId
+  onFailure: retryThenDeadLetter
+  isCritical: true
+- context: platform-ops
+  purpose: Link to the operational incident where both apply (AIC-250)
+  idempotencyKey: incidentId
+  onFailure: retry
+  isCritical: false
+- context: reporting
+  purpose: Governance analytics
+  idempotencyKey: incidentId
+  onFailure: retry
+  isCritical: false
+retention: Two years, with the governance records
+notes: 'Carries ids and scope only; the evidence is read with `listAiIncidents` under `AI_USE`.
+
+
+  **Carries ids and scope, never prompt text or personal data beyond ids** (AI design 3.2).
+
+
+  No state model emits this: the AI service has no state files under `states/` for this aggregate yet,
+  and the transition is named in `emittedWhen` (AI design 3.2, 29 September).'

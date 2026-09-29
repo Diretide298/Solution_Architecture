@@ -1,0 +1,75 @@
+# promotions.recommendationStrategyPublished v1 — published by promotions
+# Checked by tools/check-states.py against states/ and the contracts.
+
+name: promotions.recommendationStrategyPublished
+version: 1
+publisher: promotions
+description: What a placement may recommend changed — a recommendation strategy went live or changed while
+  live, or the product relationships or suppressions it ranks with were set.
+aggregate: recommendationStrategy
+emittedWhen: createRecommendationStrategy or updateRecommendationStrategy leaves a strategy `active` (or
+  moves one out of `active`); setProductRelationships or setRecommendationSuppression replaces a scope's
+  relationship or suppression set; concludeRecommendationExperiment rolls a winning variant's strategy
+  out; a promotion marked `recommendable` goes live, is paused, resumes, ends or expires (kind offers, 29
+  September, build pass, group G2)
+payload:
+- field: kind
+  type: string
+  notes: strategy, productRelationships, suppressions or offers. Tells the consumer which cache entry to drop
+- field: promotionId
+  type: uuid
+  required: false
+  notes: Set for kind offers, the promotion whose recommendability changed. With `status` live it enters the
+    candidate cache for the segments in `segmentIds`; with any other status it leaves it
+- field: segmentIds
+  type: array
+  required: false
+  notes: For kind offers, `Promotion.recommendableSegmentIds` (empty means every guest the promotion's own
+    conditions admit)
+- field: strategyId
+  type: uuid
+  required: false
+  notes: Set for kind strategy. Null for a relationship or suppression set, which belongs to a scope,
+    not to a strategy
+- field: version
+  type: integer
+  notes: Monotonic per strategy (per scope and kind for a set). A consumer holding a higher version drops
+    the older delivery rather than overwriting with it
+- field: status
+  type: string
+  required: false
+  notes: The strategy's status after the change (active, paused, retired). A strategy leaving `active`
+    must leave the candidate cache as fast as a new one enters it
+- field: placements
+  type: array
+  notes: The placements whose candidates this changes (productPage, cart, checkout, postPurchase,
+    preVisitEmail, inVenueApp, kiosk, pos, signage, callCentre, homepage, loyalty). Every placement for a set
+    or an offer
+- field: scopePath
+  type: string
+- field: tenantId
+  type: uuid
+- field: publishedAt
+  type: timestamp
+consumers:
+- context: ai
+  purpose: Refresh the Redis strategy and candidate cache for the named placements, so Help me choose and
+    the recommendation slots rank with what the merchandiser published rather than what was live before;
+    for kind offers, add or drop the promotion as an `offer` candidate (8.6.30 to 8.6.36) (AI system design
+    section 3.2)
+  idempotencyKey: strategyId + version (scopePath + kind + version for a relationship or suppression set;
+    promotionId + version for an offer)
+  onFailure: retryThenDeadLetter
+  isCritical: false
+retention: 30 days after publication
+notes: '**Added 29 September (build pass, group OWN, from the AI group''s handoff).** A strategy paused
+  in the back office and still served from a stale cache is a guardrail the venue switched on and the guest
+  never saw.
+
+
+  No state model emits this: product relationships and suppressions are sets **replaced by an operation**
+  and have no lifecycle, and `RecommendationStrategy.status` (draft, active, paused, retired) has no state
+  model in states/ today, so there is no transition to carry the emit. The event fires on the write. All
+  five operations write `platform.outbox` in the same transaction as the row they change (ADR-0033). If a
+  state model for `promotions.RecommendationStrategy.status` is written, its transitions into and out of
+  `active` should carry this emit.'

@@ -1,0 +1,207 @@
+id: LLD-AI action plan
+title: AI action plan — 29 transitions
+generatedBy: tools/derive-diagrams.py
+index: diagrams/hld/04-lifecycles.yaml
+source: states/ai-action-plan.yaml
+entity: AI action plan
+contract: ai
+enum: AiActionPlan.status
+enumKind: inline
+enumSchema: AiActionPlan
+enumProperty: status
+owner: ai
+description: '**Plan, validate, simulate, approve, execute, with rollback** (AI design 2.2 D, 3.8; AIC-086..107).
+  Created by `buildConfigurationPlan`, by `generateConfiguration` as a one-step plan, and by `rollbackActionPlan`
+  as a rollback plan (`origin: rollback`, `rollbackOfPlanId`). Independent of any conversation (AIC-102);
+  the change set is hashed so what was approved is what runs (AIC-181).'
+initial:
+- draft
+terminal:
+- compensated
+- cancelled
+- rolledBack
+transitions:
+- from: draft
+  to: validated
+  trigger: job
+  guard: The pipeline validates each step against its target request schema and the configuration knowledge
+    model's cross-module rules as the plan is built (flow D step 4; `generateConfiguration` plans are
+    "validated, simulated and governed like any plan")
+- from: draft
+  to: simulated
+  operation: simulateActionPlan
+  trigger: operation
+  guard: '**Validate, then simulate** in one call (ADM-487, ADM-488, ADM-490): every step validates
+    (the owner''s `Prefer: validate-only` where supported) and the simulation compares current and proposed
+    state. Nothing is written in any owning module'
+- from: validated
+  to: simulated
+  operation: simulateActionPlan
+  trigger: operation
+  guard: The simulation of a validated plan; nothing is written in any owning module
+- from: validated
+  to: simulated
+  trigger: job
+  guard: The pipeline simulates the plan after validation, before it is governed (flow D step 4)
+- from: simulated
+  to: awaitingApproval
+  trigger: job
+  guard: The decision point scores risk and applies the autonomy ceiling, and the plan is presented
+    as one `ProposedAction` with its hashed change set (flow D step 5; `proposedActionId`). Tier 2,
+    or a plan the approvals matrix catches, also opens an `approvals` request (`approvalRequestId`)
+- from: awaitingApproval
+  to: approved
+  operation: decideProposedAction
+  trigger: operation
+  guard: Tier 1, decision `approve` on the plan's proposed action by the requester (flow D step 6).
+    The change-set hash still matches what was simulated
+- from: awaitingApproval
+  to: approved
+  trigger: cascade
+  guard: '**Tier 2 or matrix-caught: `approval.granted` arrives** for the plan''s `approvalRequestId`.
+    Separation of duties, thresholds and escalation live in the shared approvals service (AIC-190)'
+  requiresApproval: true
+- from: awaitingApproval
+  to: cancelled
+  operation: decideProposedAction
+  trigger: operation
+  guard: Tier 1, decision `reject`, with a reason. Nothing ran
+- from: awaitingApproval
+  to: cancelled
+  trigger: cascade
+  guard: '`approval.rejected` or `approval.expired` arrives for the plan''s approvals request, or the
+    proposed action expired undecided (7 days, audit R213). Nothing ran'
+- from: draft
+  to: cancelled
+  operation: cancelActionPlan
+  trigger: operation
+  guard: Before execution the requester may cancel their own plan
+- from: validated
+  to: cancelled
+  operation: cancelActionPlan
+  trigger: operation
+  guard: Cancelled before execution by the requester
+- from: simulated
+  to: cancelled
+  operation: cancelActionPlan
+  trigger: operation
+  guard: Cancelled before execution by the requester
+- from: awaitingApproval
+  to: cancelled
+  operation: cancelActionPlan
+  trigger: operation
+  guard: Cancelled while awaiting approval; any open `approvals` request is withdrawn with it
+- from: approved
+  to: cancelled
+  operation: cancelActionPlan
+  trigger: operation
+  guard: Approved but not started; the requester may still cancel
+- from: approved
+  to: executing
+  trigger: job
+  guard: '**The executor revalidates first** (AIC-182): each step''s target object is still at the version
+    it was planned against. Steps then run in DAG order through the owning APIs on an on-behalf-of token
+    for the requester, bounded by the approver''s authority (flow D step 7)'
+- from: executing
+  to: completed
+  trigger: job
+  guard: Every step succeeded. **Success is the owning services' responses, not a model's judgement**
+    (AIC-097)
+  emits:
+  - ai.planExecuted
+- from: executing
+  to: partiallyCompleted
+  trigger: job
+  guard: A step failed after its 3 attempts (AIC-135) and `partialCompletionAllowed` is set because
+    governance allows a partial completion (AIC-098); the remaining dependent steps are skipped
+  emits:
+  - ai.planExecuted
+- from: executing
+  to: compensated
+  trigger: job
+  guard: A step failed after its 3 attempts and partial completion is not allowed; the completed steps
+    are compensated in reverse dependency order (AIC-098, AIC-134). Nothing is left half-applied
+  emits:
+  - ai.planFailed
+- from: executing
+  to: failed
+  trigger: job
+  guard: A step failed after its 3 attempts and the completed steps cannot all be compensated (a non-reversible
+    step such as a refund or a publish already ran, or a compensation itself failed). Left for a person,
+    who plans a rollback or forward fix with `rollbackActionPlan`
+  emits:
+  - ai.planFailed
+- from: executing
+  to: paused
+  trigger: job
+  guard: '**Stopped for a person at a step boundary**: a step failed after its 3 attempts and the plan
+    pauses rather than compensates, a target object drifted (`plan-drifted`, AIC-182), or the budget
+    ran out (`budget-exceeded`)'
+  emits:
+  - ai.planFailed
+- from: executing
+  to: paused
+  operation: pauseActionPlan
+  trigger: operation
+  guard: A person intervening after approval (AIC-187, ADM-535), with a reason, recorded as an intervention.
+    The executor stops at the next step boundary. Not a failure, so `ai.planFailed` is not published
+- from: executing
+  to: paused
+  trigger: cascade
+  guard: '`pauseAiCapability` on the plan''s capability: in-flight plans pause at their next checkpoint
+    and stay paused when the capability resumes'
+- from: paused
+  to: executing
+  operation: resumeActionPlan
+  trigger: operation
+  guard: '**Revalidates first**: every remaining step''s target object is still at its planned version,
+    otherwise `409 plan-drifted` and the plan stays paused'
+- from: paused
+  to: executing
+  operation: retryActionStep
+  trigger: operation
+  guard: The failed step has attempts left (at most 3, AIC-135; otherwise `409 retry-limit-reached`);
+    execution continues from that step
+- from: executing
+  to: cancelled
+  operation: cancelActionPlan
+  trigger: operation
+  guard: Once executing, cancelling needs `AI_APPROVE`, and the completed steps are compensated in reverse
+    dependency order (AIC-134)
+- from: paused
+  to: cancelled
+  operation: cancelActionPlan
+  trigger: operation
+  guard: A person gives up on a paused plan (`AI_APPROVE`); the completed steps are compensated in reverse
+    dependency order
+- from: completed
+  to: rolledBack
+  trigger: cascade
+  guard: A rollback plan for this one (`rollbackActionPlan`, `rollbackOfPlanId`) went through its own
+    approval and completed. **A rollback is its own plan** (AIC-139)
+  isReversal: true
+- from: partiallyCompleted
+  to: rolledBack
+  trigger: cascade
+  guard: The rollback plan for the steps that did apply completed
+  isReversal: true
+- from: failed
+  to: rolledBack
+  trigger: cascade
+  guard: The rollback or forward-fix plan for what the failed plan left applied completed
+  isReversal: true
+notes: '**`completed`, `partiallyCompleted` and `failed` are not terminal**, because a later rollback
+  plan can reverse what they applied. `rollbackActionPlan` only creates that plan (`409 plan-not-applied`
+  where no step completed); it is validated, simulated and approved like any other plan and follows
+  this same model, and the original moves to `rolledBack` only when it completes. A compensated or cancelled
+  plan left nothing applied, so there is nothing to roll back.
+
+
+  `ai.planExecuted` is published on `completed` and `partiallyCompleted`; `ai.planFailed` on `compensated`,
+  `failed`, and a pause caused by a step failure, drift or budget. **Approved-then-failed is not succeeded**
+  (design 1.2). A pause by a person or by the capability kill switch is an intervention and publishes
+  neither.
+
+
+  There is no `rejected` status: a plan refused at approval ends `cancelled`, and the refusal is on
+  its proposed action (`ProposedAction.status = rejected`) and its approvals request.'

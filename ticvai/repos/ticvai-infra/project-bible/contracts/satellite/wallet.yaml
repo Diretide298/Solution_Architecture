@@ -2,7 +2,7 @@ openapi: 3.1.0
 info:
   title: TICVAI — Wallet Configuration
   version: 1.0.0
-  x-ticvai-screen-count: 53
+  x-ticvai-screen-count: 57
   x-ticvai-tier: satellite
   x-ticvai-module: 4 — Bundles and Promotions
   x-ticvai-platforms:
@@ -2800,9 +2800,326 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+  /wallets/{walletId}/auto-reload:
+    parameters:
+      - name: walletId
+        in: path
+        required: true
+        schema: { type: string, format: uuid }
+    get:
+      operationId: getWalletAutoReloadSetting
+      x-ticvai-consumed-by:
+        - "P01 WEB-021 Wallet & Gift Cards"
+        - "P02 GST-011 Wallet Overview"
+        - "P08 BO-416 Wallet Account & Balance View"
+      x-ticvai-agreed: '29 September: our build plan (retrace 4.2.17 auto top-up); shape follows getWallet'
+      summary: A wallet's own auto top-up, if the holder set one
+      tags: [retail]
+      x-ticvai-permission: WALLET_VIEW
+      x-ticvai-guest-callable: true
+      x-ticvai-audience: [staff, guest]
+      x-ticvai-scope-level: venue
+      x-ticvai-read-routing: replica
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      responses:
+        '200':
+          description: The setting; `enabled` false where none was set
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/WalletAutoReloadSetting' }
+        '404': { $ref: '../shared/common.yaml#/components/responses/NotFound' }
+    put:
+      operationId: setWalletAutoReloadSetting
+      x-ticvai-consumed-by:
+        - "P01 WEB-021 Wallet & Gift Cards"
+        - "P02 GST-011 Wallet Overview"
+        - "P08 BO-416 Wallet Account & Balance View"
+      x-ticvai-agreed: '29 September: our build plan (retrace 4.2.17 auto top-up); shape follows transferWalletBalance'
+      summary: Top the wallet up automatically from a stored card when it runs low
+      description: >
+        4.2.17, 4.3.28. **The holder's own auto top-up**, within the venue's `WalletFundingRules.autoReload`:
+        when the balance falls below `thresholdAmount`, `reloadAmount` is charged to the stored card
+        (`paymentTokenId`, one of the caller's own) and loaded as cash credit. The venue's rules bound it
+        (minimum and maximum top-up, velocity limits, `maximumPerDay`); this is refused where the venue has
+        auto-reload disabled. A declined charge suspends the setting until the holder updates it, rather
+        than retrying a card that has said no. The holder sets it for their own wallet; staff set it for
+        a guest at a counter with the guest present.
+      tags: [retail]
+      x-ticvai-permission: WALLET_OPERATE
+      x-ticvai-guest-callable: true
+      x-ticvai-audience: [staff, guest]
+      x-ticvai-scope-level: subject
+      x-ticvai-config-scope: subject
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/WalletAutoReloadSetting' }
+      responses:
+        '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: Set
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/WalletAutoReloadSetting' }
+        '404': { $ref: '../shared/common.yaml#/components/responses/NotFound' }
+        '409':
+          description: The venue has auto-reload disabled for this wallet type, or the wallet is suspended or
+            closed.
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+        '422':
+          description: An amount outside the venue's funding rules, or a payment token that is not the holder's.
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+  /wallets/{walletId}/exit-balance:
+    parameters:
+      - name: walletId
+        in: path
+        required: true
+        schema: { type: string, format: uuid }
+    get:
+      operationId: getWalletExitBalance
+      x-ticvai-consumed-by:
+        - "P01 WEB-021 Wallet & Gift Cards"
+        - "P02 GST-011 Wallet Overview"
+        - "P08 BO-416 Wallet Account & Balance View"
+        - "P08 BO-487 Customer Wallet & Balance Summary"
+      x-ticvai-agreed: '29 September: our build plan (retrace 4.3.4 exit settlement); shape follows getWalletBalance'
+      summary: What the holder owes or is owed on leaving
+      description: >
+        4.3.4. **The check at exit.** The balance including transactions still held offline on terminals,
+        what is due where it is short (spend taken offline beyond the balance, or a post-paid credential),
+        and what may be refunded where it is in credit, under the wallet refund policy.
+      tags: [retail]
+      x-ticvai-permission: WALLET_VIEW
+      x-ticvai-guest-callable: true
+      x-ticvai-audience: [staff, guest]
+      x-ticvai-scope-level: venue
+      x-ticvai-read-routing: primary
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      responses:
+        '200':
+          description: Balance at exit
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/WalletExitBalance' }
+        '404': { $ref: '../shared/common.yaml#/components/responses/NotFound' }
+  /wallets/{walletId}/exit-settlement:
+    parameters:
+      - name: walletId
+        in: path
+        required: true
+        schema: { type: string, format: uuid }
+    post:
+      operationId: settleWalletAtExit
+      x-ticvai-consumed-by:
+        - "P01 WEB-021 Wallet & Gift Cards"
+        - "P02 GST-011 Wallet Overview"
+        - "P08 BO-416 Wallet Account & Balance View"
+        - "P08 BO-487 Customer Wallet & Balance Summary"
+      x-ticvai-agreed: '29 September: our build plan (retrace 4.3.4 exit settlement); shape follows adjustWallet'
+      summary: Settle a short balance, or refund a credit, when the holder leaves
+      description: >
+        4.3.4. **A wallet that went short must be settled before the holder is gone.** `collect` takes the
+        amount due by card, cash or the stored card and brings the balance to zero; `refund` returns the
+        refundable credit under the wallet refund policy; `waive` writes a small shortfall off with a reason
+        (approval above the venue's threshold, as `adjustWallet`). Each settlement is recorded with who did
+        it, the method and the payment or refund it made, and posts through the ledger as its payment or
+        refund does. The amount settled is the one `getWalletExitBalance` returns at the time of the call,
+        never an amount typed.
+      tags: [retail]
+      x-ticvai-permission: WALLET_OPERATE
+      x-ticvai-guest-callable: true
+      x-ticvai-audience: [staff, guest]
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [action]
+              properties:
+                action:
+                  type: string
+                  enum: [collect, refund, waive]
+                method:
+                  type: string
+                  enum: [card, cash, storedCard, originalPayment]
+                  description: How money is collected or refunded. A guest may use `card` or `storedCard` only.
+                paymentTokenId: { type: string, format: uuid, nullable: true }
+                reason: { type: string, maxLength: 500, nullable: true, description: Required with `waive`. }
+      responses:
+        '201':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: Settled
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/WalletExitSettlement' }
+        '404': { $ref: '../shared/common.yaml#/components/responses/NotFound' }
+        '409':
+          description: Nothing is due or refundable, or the action does not match the balance (`collect` on a
+            wallet in credit), or `waive` by a guest.
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+        '422':
+          description: The card was declined, or `waive` without a reason.
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
 
 components:
   schemas:
+    WalletAutoReloadSetting:
+      type: object
+      x-ticvai-persistence: wallet.auto_reload_setting
+      description: '4.2.17, 4.3.28. Also the `setWalletAutoReloadSetting` body. One per wallet; the holder''s own
+        setting within the venue''s `WalletFundingRules.autoReload`.'
+      required:
+      - enabled
+      properties:
+        walletId:
+          type: string
+          format: uuid
+          readOnly: true
+        subjectId:
+          type: string
+          format: uuid
+          readOnly: true
+        enabled:
+          type: boolean
+        thresholdAmount:
+          $ref: ../shared/common.yaml#/components/schemas/Money
+        reloadAmount:
+          $ref: ../shared/common.yaml#/components/schemas/Money
+        paymentTokenId:
+          type: string
+          format: uuid
+          nullable: true
+        maximumPerDay:
+          type: integer
+          minimum: 1
+          nullable: true
+        status:
+          type: string
+          readOnly: true
+          enum:
+          - active
+          - suspendedAfterDecline
+          - disabledByVenue
+        lastReloadAt:
+          type: string
+          format: date-time
+          nullable: true
+          readOnly: true
+        scopePath:
+          type: string
+          readOnly: true
+          description: '**The partition key** (ADR-0005). Written at the wallet''s venue scope.'
+    WalletExitBalance:
+      type: object
+      x-ticvai-persistence: none — computed from wallet.wallet, wallet.credit_lot and held offline transactions
+      required:
+      - walletId
+      - balance
+      - amountDue
+      - refundable
+      properties:
+        walletId:
+          type: string
+          format: uuid
+        balance:
+          $ref: ../shared/common.yaml#/components/schemas/Money
+        pendingOfflineAmount:
+          $ref: ../shared/common.yaml#/components/schemas/Money
+        amountDue:
+          $ref: ../shared/common.yaml#/components/schemas/Money
+        refundable:
+          $ref: ../shared/common.yaml#/components/schemas/Money
+        nonRefundableCredit:
+          $ref: ../shared/common.yaml#/components/schemas/Money
+        waiveAllowedUpTo:
+          $ref: ../shared/common.yaml#/components/schemas/Money
+        asAt:
+          type: string
+          format: date-time
+    WalletExitSettlement:
+      type: object
+      x-ticvai-persistence: wallet.exit_settlement
+      description: 4.3.4. One settlement of a wallet at exit.
+      required:
+      - id
+      - walletId
+      - action
+      - amount
+      - settledAt
+      properties:
+        id:
+          type: string
+          format: uuid
+        walletId:
+          type: string
+          format: uuid
+        action:
+          type: string
+          enum:
+          - collect
+          - refund
+          - waive
+        method:
+          type: string
+          nullable: true
+          enum:
+          - card
+          - cash
+          - storedCard
+          - originalPayment
+        amount:
+          $ref: ../shared/common.yaml#/components/schemas/Money
+        balanceBefore:
+          $ref: ../shared/common.yaml#/components/schemas/Money
+        paymentId:
+          type: string
+          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+          nullable: true
+        refundId:
+          type: string
+          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+          nullable: true
+        walletTransactionId:
+          type: string
+          nullable: true
+        reason:
+          type: string
+          nullable: true
+        settledByPrincipalId:
+          type: string
+          format: uuid
+          nullable: true
+        settledAt:
+          type: string
+          format: date-time
+        scopePath:
+          type: string
+          readOnly: true
     WalletAuthenticationPolicy:
       type: object
       x-ticvai-persistence: wallet.authentication_policy
@@ -4157,6 +4474,17 @@ components:
                 - dormantThenLarge
                 - repeatedFailure
                 - refundPattern
+                - accountSharing
+                - duplicateTransaction
+                - aiRiskScore
+                description: '4.3.32 (29 September, build pass). **`accountSharing`**: one wallet or credential
+                  used from more devices or places at once than one person can be (`threshold` concurrent
+                  devices within `windowMinutes`). **`duplicateTransaction`**: the same amount at the same
+                  acceptance point within `windowMinutes` (`threshold` repeats). **`aiRiskScore`**: the score
+                  the `ai` risk engine returns for the wallet operation (`scoreTransactionRisk`, rules first
+                  and statistical baselines as history builds, ai-system-design 3.10); `threshold` is the
+                  score at or above which the rule acts. The wallet keeps its own rules and actions; the AI
+                  finding and its case are the `ai` contract''s (`listRiskAlerts`).'
               threshold:
                 type: number
               windowMinutes:

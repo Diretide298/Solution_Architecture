@@ -1,5 +1,5 @@
 id: LLD-WalletService
-title: WalletService — 59 operations, 29 tables
+title: WalletService — 63 operations, 31 tables
 generatedBy: tools/derive-diagrams.py
 tier: commerce
 index: diagrams/hld/02-services.yaml
@@ -17,20 +17,20 @@ ifDown: '**It holds a liability owed to a customer.** A wallet that double-spend
   not a bug report. Deduction order across credit lots is FEFO and is decided here, once, rather than
   per caller.'
 coverage:
-  operations: 59
+  operations: 63
   inAFlow: 3
   percent: 5%
   note: '**Flow coverage is how much of this service a journey has walked.** A service under 40% is
     unwalked rather than under-documented.'
 schemas:
 - schema: wallet
-  tables: 29
+  tables: 31
   stores:
   - postgres
   largestTable: wallet.wallet_type
 operationsByContract:
 - contract: wallet
-  count: 59
+  count: 63
   operations:
   - operation: activateGiftCard
     verb: POST
@@ -144,6 +144,14 @@ operationsByContract:
     offline: false
     reads: 2
     writes: 0
+  - operation: getWalletAutoReloadSetting
+    verb: GET
+    path: /wallets/{walletId}/auto-reload
+    scope: venue
+    permission: WALLET_VIEW
+    offline: false
+    reads: 2
+    writes: 0
   - operation: getWalletBalance
     verb: GET
     path: /wallets/{walletId}/balance
@@ -151,6 +159,14 @@ operationsByContract:
     permission: WALLET_VIEW
     offline: false
     reads: 1
+    writes: 0
+  - operation: getWalletExitBalance
+    verb: GET
+    path: /wallets/{walletId}/exit-balance
+    scope: venue
+    permission: WALLET_VIEW
+    offline: false
+    reads: 5
     writes: 0
   - operation: getWalletFundingRules
     verb: GET
@@ -376,6 +392,14 @@ operationsByContract:
     offline: false
     reads: 1
     writes: 1
+  - operation: setWalletAutoReloadSetting
+    verb: PUT
+    path: /wallets/{walletId}/auto-reload
+    scope: subject
+    permission: WALLET_OPERATE
+    offline: false
+    reads: 5
+    writes: 3
   - operation: setWalletChannelRules
     verb: PUT
     path: /wallet-channel-rules
@@ -448,6 +472,14 @@ operationsByContract:
     offline: false
     reads: 1
     writes: 1
+  - operation: settleWalletAtExit
+    verb: POST
+    path: /wallets/{walletId}/exit-settlement
+    scope: venue
+    permission: WALLET_OPERATE
+    offline: false
+    reads: 7
+    writes: 7
   - operation: simulateCreditConsumption
     verb: POST
     path: /credit-consumption/simulate
@@ -529,6 +561,8 @@ tables:
   - redeemGiftCard
   - reinstateWallet
   - restoreWalletConfigurationVersion
+  - setWalletAutoReloadSetting
+  - settleWalletAtExit
   - simulateCreditConsumption
   - suspendWallet
   - topUpWallet
@@ -546,10 +580,29 @@ tables:
   - redeemGiftCard
   - reinstateWallet
   - restoreWalletConfigurationVersion
+  - setWalletAutoReloadSetting
+  - settleWalletAtExit
   - simulateCreditConsumption
   - suspendWallet
   - topUpWallet
   - transferWalletBalance
+- store: cache:resolution
+  kind: cache
+  columns: 4
+  backing: redis
+  owned: false
+  why: '**Not a table and not owned by a service.** Derived from something already read, losable without
+    consequence — no migration, no backup, no owner.'
+  key: scope_path + what is being resolved — permissions, configuration, a price list
+  eviction:
+  - 'version: Bumped by the write that evicts it. **A config change nobody evicts is a stale permission**'
+  writtenBy:
+  - setWalletAutoReloadSetting
+  readBy: null
+  gap: '**The lineage names this store, not the key.** Which resolution entry each writer below evicts
+    or bumps — permissions, configuration, a price list, and whether child scopes under its `scope_path`
+    are affected — is not recorded for any operation, so a writer here cannot yet be implemented from
+    the package alone.'
 - table: wallet.accounting_mapping
   columns: 3
   store: postgres
@@ -568,6 +621,13 @@ tables:
   columns: 2
   store: postgres
   parent: null
+  writtenBy:
+  - wallet
+  foreignWriters: null
+- table: wallet.auto_reload_setting
+  columns: 11
+  store: postgres
+  parent: wallet.wallet
   writtenBy:
   - wallet
   foreignWriters: null
@@ -635,6 +695,13 @@ tables:
   foreignWriters: null
 - table: wallet.dispute
   columns: 15
+  store: postgres
+  parent: null
+  writtenBy:
+  - wallet
+  foreignWriters: null
+- table: wallet.exit_settlement
+  columns: 13
   store: postgres
   parent: null
   writtenBy:
@@ -754,6 +821,8 @@ tables:
   - wallet
   foreignWriters: null
 readsFrom:
+- service: OrderService
+  operations: 3
 - service: VenueOpsService
   operations: 2
 - service: IdentityService
@@ -773,6 +842,29 @@ writesOutside:
   - operation: loadGameCredits
     tables:
     - games.card
+- service: OrderService
+  operations: 1
+  rule: 'ADR-0028: the owner defines the row; a foreign writer may only append, through a path the owner
+    published.'
+  why: '**The lineage records these writes, not how they honour the rule.** It does not say whether
+    each inserts or updates, or which operation or event OrderService published for it — check each
+    against ADR-0028.'
+  writes:
+  - operation: settleWalletAtExit
+    tables:
+    - orders.payment
+    - orders.refund
+- service: TenancyService
+  operations: 1
+  rule: 'ADR-0028: the owner defines the row; a foreign writer may only append, through a path the owner
+    published.'
+  why: '**The lineage records these writes, not how they honour the rule.** It does not say whether
+    each inserts or updates, or which operation or event TenancyService published for it — check each
+    against ADR-0028.'
+  writes:
+  - operation: settleWalletAtExit
+    tables:
+    - platform.outbox
 screens:
 - P01:WEB-021 Wallet & Gift Cards
 - P02:GST-011 Wallet Overview

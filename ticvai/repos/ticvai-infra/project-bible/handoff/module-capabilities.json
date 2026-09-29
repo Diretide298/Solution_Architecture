@@ -204,14 +204,14 @@
      "key": "SCOPE_VIEW",
      "label": "read the hierarchy",
      "group": "Organisation",
-     "operationCount": 91,
+     "operationCount": 93,
      "operations": [
       "getAccessPoint",
+      "getAccessRiskScore",
       "getCredentialIssuanceRetryPolicy",
       "listAccess",
       "listAccessAttributeCatalog",
-      "listAccessLocationGrouping",
-      "listAccessPoints"
+      "listAccessLocationGrouping"
      ],
      "elevated": false,
      "segregationConstrained": false
@@ -247,17 +247,32 @@
   },
   "accreditation": {
    "title": "12 — Accreditation & Credential Management",
-   "capabilityCount": 6,
+   "capabilityCount": 7,
    "unguardedOperations": 0,
    "capabilities": [
+    {
+     "key": "ACCESS_VALIDATE",
+     "label": "scan and admit",
+     "group": "Access control",
+     "operationCount": 1,
+     "operations": [
+      "verifyAccreditationCredential"
+     ],
+     "elevated": false,
+     "segregationConstrained": false
+    },
     {
      "key": "ACCREDITATION_APPLY",
      "label": "submit an application or a document",
      "group": "Accreditation",
-     "operationCount": 2,
+     "operationCount": 10,
      "operations": [
       "createAccreditationApplication",
-      "submitAccreditationDocument"
+      "issueMyAccreditationWalletPass",
+      "listMyAccreditationApplications",
+      "listMyAccreditationCredentials",
+      "renewAccreditation",
+      "resubmitAccreditationApplication"
      ],
      "elevated": false,
      "segregationConstrained": false
@@ -278,14 +293,14 @@
      "key": "ACCREDITATION_CONFIGURE",
      "label": "programmes, requirements, access profiles, badges",
      "group": "Accreditation",
-     "operationCount": 8,
+     "operationCount": 10,
      "operations": [
+      "cloneAccreditationProgramme",
       "createAccreditationProgramme",
       "listBadgeTemplates",
       "previewAccessImpact",
       "setAccessProfile",
-      "setAccreditationNotificationRules",
-      "setAccreditationRequirements"
+      "setAccreditationNotificationRules"
      ],
      "elevated": false,
      "segregationConstrained": false
@@ -294,9 +309,10 @@
      "key": "ACCREDITATION_ISSUE",
      "label": "produce, encode and replace a credential",
      "group": "Accreditation",
-     "operationCount": 4,
+     "operationCount": 5,
      "operations": [
       "createBadgePrintJob",
+      "deliverAccreditationCredential",
       "issueAccreditationCredential",
       "listBadgePrintJobs",
       "replaceAccreditationCredential"
@@ -308,14 +324,14 @@
      "key": "ACCREDITATION_MANAGE",
      "label": "amend a holder, assign access, suspend, revoke",
      "group": "Accreditation",
-     "operationCount": 6,
+     "operationCount": 9,
      "operations": [
+      "exportAccreditationData",
+      "getAccreditationExport",
       "importAccreditationHolders",
+      "listAccreditationExports",
       "listAccreditationIdentityConflicts",
-      "resolveIdentityConflict",
-      "setAccreditationStatus",
-      "setHolderAccess",
-      "updateAccreditationHolder"
+      "resolveIdentityConflict"
      ],
      "elevated": false,
      "segregationConstrained": false
@@ -324,14 +340,14 @@
      "key": "ACCREDITATION_VIEW",
      "label": null,
      "group": "Accreditation",
-     "operationCount": 8,
+     "operationCount": 10,
      "operations": [
+      "getAccreditationApplication",
       "getAccreditationHolder",
       "listAccessProfiles",
       "listAccreditationAccessActivity",
       "listAccreditationApplications",
-      "listAccreditationAudit",
-      "listAccreditationCredentials"
+      "listAccreditationAudit"
      ],
      "elevated": false,
      "segregationConstrained": false
@@ -340,17 +356,37 @@
   },
   "ai": {
    "title": "8 — Unified Operations Dashboard (AI)",
-   "capabilityCount": 7,
-   "unguardedOperations": 0,
+   "capabilityCount": 12,
+   "unguardedOperations": 4,
    "capabilities": [
+    {
+     "key": "AI_APPROVE",
+     "label": null,
+     "group": "Operations",
+     "operationCount": 15,
+     "operations": [
+      "closeAiIncident",
+      "containAiIncident",
+      "createAiPolicyException",
+      "overrideAiDecision",
+      "pauseActionPlan",
+      "promoteAiRelease"
+     ],
+     "elevated": false,
+     "segregationConstrained": false
+    },
     {
      "key": "AI_AUDIT_VIEW",
      "label": "the AI activity and decision log only",
      "group": "Operations",
-     "operationCount": 2,
+     "operationCount": 7,
      "operations": [
+      "exportAiEvidencePackage",
+      "getAiDecisionTrace",
       "getAiUsage",
-      "listAiInteractions"
+      "listAiInteractions",
+      "replayAiDecision",
+      "runAiControlTest"
      ],
      "elevated": false,
      "segregationConstrained": false
@@ -359,14 +395,14 @@
      "key": "AI_CONFIGURE",
      "label": null,
      "group": "Operations",
-     "operationCount": 15,
+     "operationCount": 31,
      "operations": [
-      "createKnowledgeCollection",
-      "getAiPolicy",
-      "ingestKnowledgeDocument",
-      "listAiProviders",
-      "listIndexFailures",
-      "listIndexJobs"
+      "backtestRiskStrategy",
+      "configureAiCapability",
+      "configureAnomalyDetector",
+      "configureAssistantProfile",
+      "configureForecastSignalSource",
+      "configureRiskStrategy"
      ],
      "elevated": false,
      "segregationConstrained": false
@@ -375,14 +411,25 @@
      "key": "AI_USE",
      "label": null,
      "group": "Operations",
-     "operationCount": 9,
+     "operationCount": 57,
      "operations": [
-      "createAiConversation",
-      "decideProposedAction",
-      "generateConfiguration",
-      "listAiConversations",
-      "listProposedActions",
-      "recordSuggestionOutcome"
+      "answerConfigurationQuestion",
+      "attachConfigurationSource",
+      "buildConfigurationPlan",
+      "cancelActionPlan",
+      "compareForecastScenarios",
+      "createAiConversation"
+     ],
+     "elevated": false,
+     "segregationConstrained": false
+    },
+    {
+     "key": "APPROVAL_VIEW",
+     "label": null,
+     "group": "Operations",
+     "operationCount": 1,
+     "operations": [
+      "getApprovalRequestScore"
      ],
      "elevated": false,
      "segregationConstrained": false
@@ -391,9 +438,23 @@
      "key": "CAPACITY_CONFIGURE",
      "label": "envelopes and allocation",
      "group": "Catalogue",
-     "operationCount": 1,
+     "operationCount": 2,
      "operations": [
-      "generateVenueLayout"
+      "generateVenueLayout",
+      "proposeSeatMapChanges"
+     ],
+     "elevated": false,
+     "segregationConstrained": false
+    },
+    {
+     "key": "PLATFORM_AI_MANAGE",
+     "label": "the platform model catalogue, tool and prompt registries, BYOK enablement (AI design 29 September)",
+     "group": "Control Plane",
+     "operationCount": 3,
+     "operations": [
+      "setAiByokEnablement",
+      "setAiModel",
+      "setAiTool"
      ],
      "elevated": false,
      "segregationConstrained": false
@@ -405,6 +466,35 @@
      "operationCount": 1,
      "operations": [
       "setAiProvider"
+     ],
+     "elevated": false,
+     "segregationConstrained": false
+    },
+    {
+     "key": "RISK_INVESTIGATE",
+     "label": "fraud analysts: cases, evidence, network expansion",
+     "group": "Operations",
+     "operationCount": 6,
+     "operations": [
+      "addRiskCaseEvidence",
+      "closeRiskCase",
+      "createRiskCase",
+      "expandRiskNetwork",
+      "getRiskCase",
+      "proposeRiskAction"
+     ],
+     "elevated": false,
+     "segregationConstrained": false
+    },
+    {
+     "key": "RISK_REVIEW",
+     "label": "fraud analysts: work alerts; not an AI user (AI design 29 September)",
+     "group": "Operations",
+     "operationCount": 3,
+     "operations": [
+      "decideRiskAlert",
+      "getEntityRisk",
+      "listRiskAlerts"
      ],
      "elevated": false,
      "segregationConstrained": false
@@ -456,7 +546,7 @@
      "key": "APPROVAL_CONFIGURE",
      "label": null,
      "group": "Operations",
-     "operationCount": 15,
+     "operationCount": 16,
      "operations": [
       "approveMatrixMultiLevel",
       "approveRoleAuthorityDelegation",
@@ -472,14 +562,14 @@
      "key": "APPROVAL_DECIDE",
      "label": null,
      "group": "Operations",
-     "operationCount": 6,
+     "operationCount": 7,
      "operations": [
       "approveUnifiedDecision",
       "createApprovalDelegation",
       "decideApprovalRequest",
+      "recordExternalApprovalDecision",
       "revokeApprovalDelegation",
-      "setApproverAvailability",
-      "signApprovalDecision"
+      "setApproverAvailability"
      ],
      "elevated": true,
      "segregationConstrained": false
@@ -503,7 +593,7 @@
      "key": "APPROVAL_VIEW",
      "label": null,
      "group": "Operations",
-     "operationCount": 18,
+     "operationCount": 20,
      "operations": [
       "createApprovalEvidencePackage",
       "evaluateApprovalRequirement",
@@ -835,7 +925,7 @@
   "finance": {
    "title": "5 — F&B & Guest Management (accounting and revenue recognition)",
    "capabilityCount": 8,
-   "unguardedOperations": 0,
+   "unguardedOperations": 1,
    "capabilities": [
     {
      "key": "ACCOUNT_CONFIGURE",
@@ -873,14 +963,14 @@
      "key": "LEDGER_POST",
      "label": null,
      "group": "Finance",
-     "operationCount": 8,
+     "operationCount": 11,
      "operations": [
       "createJournalEntry",
       "disputeObligation",
+      "issueCreditMemo",
+      "issueTaxInvoice",
       "recordDeposit",
-      "recordSettlement",
-      "recordWriteOff",
-      "resolveObligationDispute"
+      "recordSettlement"
      ],
      "elevated": false,
      "segregationConstrained": false
@@ -889,14 +979,14 @@
      "key": "LEDGER_VIEW",
      "label": null,
      "group": "Finance",
-     "operationCount": 21,
+     "operationCount": 29,
      "operations": [
       "calculateTax",
       "getAccount",
       "getDeferredRevenue",
       "getForeignTenderReport",
       "getJournalEntry",
-      "getTrialBalance"
+      "getTaxDocumentRendition"
      ],
      "elevated": false,
      "segregationConstrained": false
@@ -941,10 +1031,12 @@
      "key": "TAX_CONFIGURE",
      "label": null,
      "group": "Finance",
-     "operationCount": 4,
+     "operationCount": 6,
      "operations": [
       "createTaxCode",
       "createTaxExemption",
+      "setEInvoicingProvider",
+      "setTaxInvoiceTemplate",
       "updateTaxCode",
       "verifyTaxExemption"
      ],
@@ -1045,14 +1137,14 @@
      "key": "PRODUCT_CONFIGURE",
      "label": null,
      "group": "Catalogue",
-     "operationCount": 35,
+     "operationCount": 38,
      "operations": [
       "applyMenuActions",
       "attachModifierGroup",
       "buildProductionPlan",
       "completeProductionRun",
       "createCombo",
-      "createMenu"
+      "createDeliveryLocation"
      ],
      "elevated": false,
      "segregationConstrained": false
@@ -1209,7 +1301,7 @@
   "identity": {
    "title": "19 — Guest Mobile App & Branding (auth) + cross-cutting staff auth",
    "capabilityCount": 12,
-   "unguardedOperations": 25,
+   "unguardedOperations": 27,
    "capabilities": [
     {
      "key": "AUDIT_VIEW",
@@ -1226,8 +1318,9 @@
      "key": "GUEST_MANAGE",
      "label": "amend, merge, configure consent purposes",
      "group": "Guest engagement",
-     "operationCount": 2,
+     "operationCount": 3,
      "operations": [
+      "decideGuestIdentityVerification",
       "grantDelegation",
       "recordBenefitUsage"
      ],
@@ -1252,9 +1345,10 @@
      "key": "GUEST_VIEW_PII",
      "label": "personal fields. Distinct from GUEST_VIEW by design",
      "group": "Guest engagement",
-     "operationCount": 1,
+     "operationCount": 2,
      "operations": [
-      "exportSubjectData"
+      "exportSubjectData",
+      "listGuestIdentityVerifications"
      ],
      "elevated": false,
      "segregationConstrained": false
@@ -1263,9 +1357,10 @@
      "key": "PERMISSION_GRANT",
      "label": "assign grants to a principal",
      "group": "Session and identity",
-     "operationCount": 3,
+     "operationCount": 4,
      "operations": [
       "createDelegatedAccess",
+      "decideAccessReviewItem",
       "deleteDelegatedAccess",
       "setPrincipalModuleAccess"
      ],
@@ -1276,10 +1371,12 @@
      "key": "PERMISSION_MANAGE",
      "label": "author, approve and retire access policies",
      "group": "Session and identity",
-     "operationCount": 4,
+     "operationCount": 6,
      "operations": [
       "createAccessPolicy",
+      "createAccessReviewCampaign",
       "createEmergencyAccessOverride",
+      "restoreAccessPolicyVersion",
       "setAccessPolicyState",
       "updateAccessPolicy"
      ],
@@ -1290,7 +1387,7 @@
      "key": "PERMISSION_VIEW",
      "label": "view the grant set of others",
      "group": "Session and identity",
-     "operationCount": 17,
+     "operationCount": 22,
      "operations": [
       "evaluateAccess",
       "getAccessPolicy",
@@ -1345,9 +1442,11 @@
      "key": "TENANT_CONFIGURE",
      "label": "edit branding, content, navigation, modules",
      "group": "Tenant experience",
-     "operationCount": 2,
+     "operationCount": 4,
      "operations": [
+      "getGuestVerificationPolicy",
       "getPasswordPolicy",
+      "setGuestVerificationPolicy",
       "setPasswordPolicy"
      ],
      "elevated": false,
@@ -1427,14 +1526,14 @@
      "key": "PROCUREMENT_MANAGE",
      "label": "suppliers, quotations; raise, send, cancel and short-close a PO",
      "group": "Procurement",
-     "operationCount": 8,
+     "operationCount": 10,
      "operations": [
       "acknowledgePurchaseOrder",
       "cancelPurchaseOrder",
       "closePurchaseOrderShort",
       "createPurchaseOrder",
       "createSupplier",
-      "recordQuotation"
+      "createSupplierContract"
      ],
      "elevated": false,
      "segregationConstrained": false
@@ -1468,7 +1567,7 @@
      "key": "PROCUREMENT_VIEW",
      "label": "requisitions, suppliers, quotations, purchase orders, receipts",
      "group": "Procurement",
-     "operationCount": 7,
+     "operationCount": 8,
      "operations": [
       "compareQuotations",
       "getPurchaseOrder",
@@ -1484,7 +1583,7 @@
      "key": "PRODUCT_CONFIGURE",
      "label": null,
      "group": "Catalogue",
-     "operationCount": 11,
+     "operationCount": 12,
      "operations": [
       "bulkUpdateProducts",
       "cancelStockCount",
@@ -1500,14 +1599,14 @@
      "key": "PRODUCT_VIEW",
      "label": null,
      "group": "Catalogue",
-     "operationCount": 13,
+     "operationCount": 14,
      "operations": [
       "getCountVariance",
       "getInventoryItem",
+      "getInventoryKitDefinition",
       "getStockPositions",
       "getStockTransfer",
-      "listExpiringBatches",
-      "listInventoryItems"
+      "listExpiringBatches"
      ],
      "elevated": false,
      "segregationConstrained": false
@@ -1690,7 +1789,7 @@
   "marketing-crm": {
    "title": "22 — Marketing & CRM",
    "capabilityCount": 15,
-   "unguardedOperations": 21,
+   "unguardedOperations": 26,
    "capabilities": [
     {
      "key": "AI_CONFIGURE",
@@ -1751,7 +1850,7 @@
      "key": "GUEST_MANAGE",
      "label": "amend, merge, configure consent purposes",
      "group": "Guest engagement",
-     "operationCount": 41,
+     "operationCount": 43,
      "operations": [
       "actOnWaiverRequirements",
       "addGuestNote",
@@ -1767,7 +1866,7 @@
      "key": "GUEST_VIEW",
      "label": "profiles, behavioural attributes, consent state",
      "group": "Guest engagement",
-     "operationCount": 52,
+     "operationCount": 55,
      "operations": [
       "getConsentHistory",
       "getDigitalWaiverForm",
@@ -2019,11 +2118,14 @@
      "key": "ORDER_REFUND_APPROVE",
      "label": "authorise above threshold. See NOTE-1",
      "group": "Selling",
-     "operationCount": 3,
+     "operationCount": 7,
      "operations": [
       "approveRefund",
+      "assignChargeback",
+      "getChargebackAnalytics",
       "listChargebacks",
-      "respondToChargeback"
+      "recordChargeback",
+      "recordChargebackOutcome"
      ],
      "elevated": true,
      "segregationConstrained": false
@@ -2168,7 +2270,7 @@
   },
   "payments": {
    "title": "4 — Bundles and Promotions",
-   "capabilityCount": 5,
+   "capabilityCount": 6,
    "unguardedOperations": 2,
    "capabilities": [
     {
@@ -2184,10 +2286,21 @@
      "segregationConstrained": false
     },
     {
+     "key": "ORDER_CREATE",
+     "label": null,
+     "group": "Selling",
+     "operationCount": 1,
+     "operations": [
+      "createInstalmentPlan"
+     ],
+     "elevated": false,
+     "segregationConstrained": false
+    },
+    {
      "key": "PAYMENT_CONFIGURE",
      "label": "methods, routing, failover, terminals, tender rules",
      "group": "Payment orchestration",
-     "operationCount": 19,
+     "operationCount": 20,
      "operations": [
       "createPaymentMethod",
       "getDunningPolicy",
@@ -2214,9 +2327,10 @@
      "key": "PAYMENT_PROVIDER_MANAGE",
      "label": "connect a gateway and hold its credentials",
      "group": "Payment orchestration",
-     "operationCount": 2,
+     "operationCount": 3,
      "operations": [
       "createPaymentProviderConnection",
+      "recordPaymentTerminalCertification",
       "testPaymentProviderConnection"
      ],
      "elevated": false,
@@ -2226,14 +2340,14 @@
      "key": "PAYMENT_VIEW",
      "label": "methods, providers, routing, health, economics",
      "group": "Payment orchestration",
-     "operationCount": 15,
+     "operationCount": 18,
      "operations": [
+      "getInstalmentPolicy",
       "getMixedTenderRules",
       "getPaymentPerformance",
       "getPaymentProviderEconomics",
       "getPaymentProviderHealth",
-      "getPaymentRules",
-      "listB2bCreditAccounts"
+      "getPaymentRules"
      ],
      "elevated": false,
      "segregationConstrained": false
@@ -2481,7 +2595,7 @@
      "key": "DEVELOPER_VIEW",
      "label": null,
      "group": "Guest engagement",
-     "operationCount": 9,
+     "operationCount": 10,
      "operations": [
       "getApiUsage",
       "issueApiToken",
@@ -2737,7 +2851,7 @@
      "key": "REPORT_VIEW_VENUE",
      "label": null,
      "group": "Reporting",
-     "operationCount": 22,
+     "operationCount": 23,
      "operations": [
       "acknowledgeAlert",
       "askReportingQuestion",
@@ -3280,14 +3394,14 @@
      "key": "PLATFORM_BILLING_MANAGE",
      "label": null,
      "group": "Control Plane",
-     "operationCount": 8,
+     "operationCount": 9,
      "operations": [
       "addCapacityPack",
       "cancelInvoice",
       "cancelSubscription",
       "disputeInvoice",
       "generateInvoice",
-      "recordInvoicePayment"
+      "issueCreditNote"
      ],
      "elevated": false,
      "segregationConstrained": false
@@ -3296,10 +3410,12 @@
      "key": "PLATFORM_BILLING_VIEW",
      "label": null,
      "group": "Control Plane",
-     "operationCount": 3,
+     "operationCount": 5,
      "operations": [
       "getBillingReconciliation",
       "getLicenceEnforcement",
+      "getPlanRecommendations",
+      "listCreditNotes",
       "listSubscriptionInvoices"
      ],
      "elevated": false,
@@ -3454,14 +3570,14 @@
      "key": "DEVICE_MANAGE",
      "label": "enrol, assign, re-key, roll out firmware, retire",
      "group": "Operations",
-     "operationCount": 6,
+     "operationCount": 8,
      "operations": [
+      "createDeviceFirmware",
       "enrolDevice",
       "issueDeviceCredential",
       "revokeDeviceCredential",
       "rollbackDeviceFirmware",
-      "setDeviceAssignment",
-      "startDeviceFirmwareRollout"
+      "setDeviceAssignment"
      ],
      "elevated": false,
      "segregationConstrained": false
@@ -3470,14 +3586,14 @@
      "key": "DEVICE_VIEW",
      "label": null,
      "group": "Operations",
-     "operationCount": 8,
+     "operationCount": 9,
      "operations": [
       "getDevice",
+      "getDeviceFirmware",
       "getDeviceTelemetry",
       "getWorkstationHealth",
       "listDeviceAuditRecords",
-      "listDeviceFirmware",
-      "listDeviceTamperEvents"
+      "listDeviceFirmware"
      ],
      "elevated": false,
      "segregationConstrained": false
@@ -3538,7 +3654,7 @@
      "key": "TENANT_CONFIGURE",
      "label": "edit branding, content, navigation, modules",
      "group": "Tenant experience",
-     "operationCount": 9,
+     "operationCount": 10,
      "operations": [
       "deployConfigurationProfile",
       "getConfigurationProfile",
@@ -3554,12 +3670,13 @@
      "key": "TENANT_VIEW",
      "label": "read venue settings and policies without being able to change them",
      "group": "Tenant experience",
-     "operationCount": 4,
+     "operationCount": 5,
      "operations": [
       "getConnectivityPolicy",
       "getOfflinePolicy",
       "getVenueSettings",
-      "getVenueSettingsDefaults"
+      "getVenueSettingsDefaults",
+      "listDataRetentionSettings"
      ],
      "elevated": false,
      "segregationConstrained": false
@@ -3704,7 +3821,7 @@
      "key": "WALLET_OPERATE",
      "label": "adjust, reverse, freeze, relink a credential",
      "group": "Wallet and stored value",
-     "operationCount": 21,
+     "operationCount": 23,
      "operations": [
       "activateGiftCard",
       "adjustGameCard",
@@ -3720,14 +3837,14 @@
      "key": "WALLET_VIEW",
      "label": "balances, lots, liability, disputes",
      "group": "Wallet and stored value",
-     "operationCount": 18,
+     "operationCount": 20,
      "operations": [
       "diffWalletConfigurationVersion",
       "getCreditConsumptionPolicy",
       "getGiftCard",
       "getWallet",
-      "getWalletBalance",
-      "getWalletFundingRules"
+      "getWalletAutoReloadSetting",
+      "getWalletBalance"
      ],
      "elevated": false,
      "segregationConstrained": false
@@ -3736,14 +3853,25 @@
   },
   "white-label": {
    "title": "19 — Guest Mobile App & Branding (builder)",
-   "capabilityCount": 2,
-   "unguardedOperations": 3,
+   "capabilityCount": 3,
+   "unguardedOperations": 4,
    "capabilities": [
+    {
+     "key": "MARKETING_VIEW",
+     "label": "segments, campaigns, loyalty, reviews",
+     "group": "Guest engagement",
+     "operationCount": 1,
+     "operations": [
+      "getStorefrontInsights"
+     ],
+     "elevated": false,
+     "segregationConstrained": false
+    },
     {
      "key": "TENANT_CONFIGURE",
      "label": "edit branding, content, navigation, modules",
      "group": "Tenant experience",
-     "operationCount": 52,
+     "operationCount": 54,
      "operations": [
       "claimCustomDomain",
       "createBanner",
@@ -3820,7 +3948,7 @@
      "key": "WORKFORCE_VIEW",
      "label": null,
      "group": "Operations",
-     "operationCount": 28,
+     "operationCount": 32,
      "operations": [
       "acknowledgeAnnouncement",
       "claimOpenShift",
@@ -3846,26 +3974,28 @@
     "createAccessPoint"
    ],
    "ACCREDITATION_VIEW": [
+    "getAccreditationApplication",
     "getAccreditationHolder",
     "listAccessProfiles",
-    "listAccreditationAccessActivity",
-    "listAccreditationApplications"
+    "listAccreditationAccessActivity"
    ],
    "AI_APPROVE": [
-    "decideCatalogueAiFinding",
-    "decidePricingRecommendation"
+    "closeAiIncident",
+    "containAiIncident",
+    "createAiPolicyException",
+    "decideCatalogueAiFinding"
    ],
    "AI_CONFIGURE": [
-    "createKnowledgeCollection",
-    "getAiPolicy",
-    "ingestKnowledgeDocument",
-    "listAiProviders"
+    "backtestRiskStrategy",
+    "configureAiCapability",
+    "configureAnomalyDetector",
+    "configureAssistantProfile"
    ],
    "AI_USE": [
-    "createAiConversation",
-    "decideProposedAction",
-    "generateConfiguration",
-    "listAiConversations"
+    "answerConfigurationQuestion",
+    "attachConfigurationSource",
+    "buildConfigurationPlan",
+    "cancelActionPlan"
    ],
    "ANNOUNCEMENT_PUBLISH": [
     "broadcastToGuests",
@@ -3881,7 +4011,7 @@
     "approveUnifiedDecision",
     "createApprovalDelegation",
     "decideApprovalRequest",
-    "revokeApprovalDelegation"
+    "recordExternalApprovalDecision"
    ],
    "APPROVAL_REQUEST": [
     "createApprovalRequest",
@@ -3939,9 +4069,9 @@
    ],
    "DEVICE_VIEW": [
     "getDevice",
+    "getDeviceFirmware",
     "getDeviceTelemetry",
-    "getWorkstationHealth",
-    "listDeviceAuditRecords"
+    "getWorkstationHealth"
    ],
    "EVENT_CONFIGURE": [
     "assignPerformanceMedia",
@@ -3965,7 +4095,7 @@
     "adjustLoyaltyPoints",
     "createJournalEntry",
     "disputeObligation",
-    "postStockCount"
+    "issueCreditMemo"
    ],
    "LEDGER_VIEW": [
     "calculateTax",
@@ -4057,7 +4187,8 @@
    "PLATFORM_BILLING_VIEW": [
     "getBillingReconciliation",
     "getLicenceEnforcement",
-    "listSubscriptionInvoices"
+    "getPlanRecommendations",
+    "listCreditNotes"
    ],
    "PLATFORM_CELL_MANAGE": [
     "approveBookingLimitCommercial",
@@ -4187,8 +4318,8 @@
    "TAX_CONFIGURE": [
     "createTaxCode",
     "createTaxExemption",
-    "updateTaxCode",
-    "verifyTaxExemption"
+    "setEInvoicingProvider",
+    "setTaxInvoiceTemplate"
    ],
    "VENUE_MAP_VIEW": [
     "getVenueMap",

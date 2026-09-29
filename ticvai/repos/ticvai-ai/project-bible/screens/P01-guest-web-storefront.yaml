@@ -182,8 +182,8 @@ screens:
         entitlementId, orderId, so an edge into it carries them
     - to: WEB-019
       trigger: Order History
-      provenance: derived — WEB-019 declares entryState.params orderId and WEB-001 holds none of them,
-        so the edge carries nothing and WEB-019 opens cold
+      provenance: derived — WEB-019 declares entryState.params documentId, invoiceId, orderId and WEB-001
+        holds none of them, so the edge carries nothing and WEB-019 opens cold
     - to: WEB-021
       trigger: Wallet & Gift Cards
       provenance: derived — WEB-021 declares entryState.params cardCode, walletId and WEB-001 holds none
@@ -453,6 +453,37 @@ screens:
     purpose: The guest's upcoming tickets, so a visit day can suggest the ticket's venue (decided 28 September,
       audit R267); only when signed in
     trigger: onLoad
+  - operationId: getCookieConsentRuntime
+    contract: marketing-crm
+    purpose: Cookie banner on first visit and what the tag loader may load
+    trigger: onLoad
+    provenance: build, 29 September 2026
+  - operationId: recordDeviceConsent
+    contract: marketing-crm
+    purpose: Accept all, reject non-essential or save preferences from the banner
+    trigger: onAction
+    provenance: build, 29 September 2026
+  - operationId: listAnalyticsProviders
+    contract: white-label
+    purpose: Analytics tags to inject once their consent category is granted
+    trigger: onLoad
+    provenance: build, 29 September 2026
+  - operationId: decideRecommendations
+    contract: ai
+    purpose: 'Recommendation slot (homepage / loyalty placement: products, offers, rewards, challenges)'
+    trigger: onLoad
+    provenance: build, 29 September 2026
+  - operationId: recordRecommendationEvents
+    contract: ai
+    purpose: Report impressions, clicks and declines of recommended items
+    trigger: onAction
+    provenance: build, 29 September 2026
+  - operationId: recordStorefrontSessionEvents
+    contract: white-label
+    purpose: Runtime-shell beacon of hashed browsing behaviour for fraud prevention (every page of the
+      session; bound on the home screen as the shell's entry)
+    trigger: onLoad
+    provenance: build, 29 September 2026
   entryState:
     coldEntry: '**A cold arrival is the ordinary case.** **The venue comes from the device** (decided
       28 September, audit R267): on first open the guest picks one, it is remembered on the device and
@@ -2164,10 +2195,6 @@ screens:
     contract: orders
     purpose: Add something
     trigger: onAction
-  - operationId: getUpsellSuggestions
-    contract: promotions
-    purpose: Suggestions for a cart
-    trigger: onAction
   - operationId: getBundle
     contract: promotions
     purpose: A bundle offered as an upsell
@@ -2176,6 +2203,16 @@ screens:
     contract: catalogue
     purpose: Which bundles apply here
     trigger: onLoad
+  - operationId: decideRecommendations
+    contract: ai
+    purpose: Fill a recommendation slot
+    trigger: onLoad
+    provenance: build, 29 September 2026
+  - operationId: recordRecommendationEvents
+    contract: ai
+    purpose: Report what happened to recommended items
+    trigger: onAction
+    provenance: build, 29 September 2026
   entryState:
     params:
     - name: cartId
@@ -2426,8 +2463,10 @@ screens:
       provenance: flow F01 step 5→6, F02 step 3→4, F55 step 1→2
     - to: WEB-016
       trigger: Login / Register
-      provenance: derived — WEB-016 declares entryState.params challengeId and WEB-010 holds none of them,
-        so the edge carries nothing and WEB-016 opens cold
+      carries:
+      - subjectId
+      provenance: derived — WEB-016 declares entryState.params challengeId, subjectId and WEB-010 holds
+        subjectId, so an edge into it carries them
     - to: WEB-030
       trigger: They transfer three tickets
       provenance: flow F55 step 3→4
@@ -3968,13 +4007,8 @@ screens:
         none of them, so the edge carries nothing and WEB-018 opens cold
     - to: WEB-019
       trigger: Order History
-      provenance: derived — WEB-019 declares entryState.params orderId and WEB-016 holds none of them,
-        so the edge carries nothing and WEB-019 opens cold
-    - to: GST-039
-      trigger: They set a profile
-      provenance: flow F56 step 3→4
-      crossesDevice: true
-      back: false
+      provenance: derived — WEB-019 declares entryState.params documentId, invoiceId, orderId and WEB-016
+        holds none of them, so the edge carries nothing and WEB-019 opens cold
     - to: WEB-010
       trigger: Signed in and verified — back to the cart
       precondition: arrived from the cart
@@ -3990,6 +4024,13 @@ screens:
       trigger: Checkout — Payment
       provenance: derived — WEB-012 declares entryState.params orderId, paymentId and WEB-016 holds none
         of them, so the edge carries nothing and WEB-012 opens cold
+    - to: GST-039
+      trigger: They set a profile
+      provenance: flow F56 step 3→4
+      crossesDevice: true
+      back: false
+      carries:
+      - subjectId
   notes: 'Purpose derived from the screen name and its operations on 17 August, not from a requirement.
     **Corrected 24 August**: removed getCurrentSession, logout, selectRole. **A guest surface has no roles
     to select and its own logout** — `selectRole` is ADR-0002 staff authorisation and `getCurrentSession`
@@ -4334,11 +4375,18 @@ screens:
     trigger: onAction
     invalidates:
     - getGuestSession
+  - operationId: claimDeviceConsent
+    contract: marketing-crm
+    purpose: Attach this browser's cookie decision to the guest after sign-in or registration
+    trigger: onAction
+    provenance: build, 29 September 2026
   entryState:
     params:
     - name: cartId
       from: session
     - name: challengeId
+      from: navigation
+    - name: subjectId
       from: navigation
     coldEntry: '**Needs nothing.** A guest arriving cold signs in and goes to My Account; one sent from
       the cart carries `cartId` and goes back to it. The SSO deep-link parameter (`providerId`) went with
@@ -4384,16 +4432,19 @@ screens:
     transitions:
     - to: WEB-016
       trigger: Login / Register
-      provenance: derived — WEB-016 declares entryState.params challengeId and WEB-017 holds none of them,
-        so the edge carries nothing and WEB-016 opens cold
+      carries:
+      - challengeId
+      - subjectId
+      provenance: derived — WEB-016 declares entryState.params challengeId, subjectId and WEB-017 holds
+        challengeId, subjectId, so an edge into it carries them
     - to: WEB-018
       trigger: My Tickets
       provenance: derived — WEB-018 declares entryState.params entitlementId, orderId and WEB-017 holds
         none of them, so the edge carries nothing and WEB-018 opens cold
     - to: WEB-019
       trigger: Order History
-      provenance: derived — WEB-019 declares entryState.params orderId and WEB-017 holds none of them,
-        so the edge carries nothing and WEB-019 opens cold
+      provenance: derived — WEB-019 declares entryState.params documentId, invoiceId, orderId and WEB-017
+        holds none of them, so the edge carries nothing and WEB-019 opens cold
   notes: Purpose derived from the screen name and its operations on 17 August, not from a requirement.
     **Drawn 26 August** — `Dashboards Board` frame `web-017`. **One board draws five dashboards across
     five platforms** — platform admin, partner, support, guest web and cross-tenant health. A dashboard
@@ -4714,8 +4765,8 @@ screens:
     transitions:
     - to: WEB-016
       trigger: Login / Register
-      provenance: derived — WEB-016 declares entryState.params challengeId and WEB-018 holds none of them,
-        so the edge carries nothing and WEB-016 opens cold
+      provenance: derived — WEB-016 declares entryState.params challengeId, subjectId and WEB-018 holds
+        none of them, so the edge carries nothing and WEB-016 opens cold
     - to: WEB-017
       trigger: My Account Dashboard
       provenance: derived — WEB-017 declares entryState.params deviceId, itemId, token and WEB-018 holds
@@ -4724,8 +4775,8 @@ screens:
       trigger: Order History
       carries:
       - orderId
-      provenance: derived — WEB-019 declares entryState.params orderId and WEB-018 holds orderId, so an
-        edge into it carries them
+      provenance: derived — WEB-019 declares entryState.params documentId, invoiceId, orderId and WEB-018
+        holds orderId, so an edge into it carries them
   notes: 'Dynamic QR with a visible countdown: a rotating code derived in the page from the `rotation`
     seed that `getEntitlementCredential` returns, with the seconds to the next step shown (audit R230).
     **No screenshot blocking on the web** — a browser cannot enforce it, so the page promises none (decided
@@ -5012,8 +5063,10 @@ screens:
     transitions:
     - to: WEB-016
       trigger: Login / Register
-      provenance: derived — WEB-016 declares entryState.params challengeId and WEB-019 holds none of them,
-        so the edge carries nothing and WEB-016 opens cold
+      carries:
+      - subjectId
+      provenance: derived — WEB-016 declares entryState.params challengeId, subjectId and WEB-019 holds
+        subjectId, so an edge into it carries them
     - to: WEB-017
       trigger: My Account Dashboard
       provenance: derived — WEB-017 declares entryState.params deviceId, itemId, token and WEB-019 holds
@@ -5155,10 +5208,39 @@ screens:
     contract: orders
     purpose: Ask for a refund
     trigger: onAction
+  - operationId: listTaxInvoices
+    contract: finance
+    purpose: List tax invoices
+    trigger: onLoad
+    provenance: build, 29 September 2026
+  - operationId: issueTaxInvoice
+    contract: finance
+    purpose: Issue a tax invoice
+    trigger: onAction
+    provenance: build, 29 September 2026
+  - operationId: getTaxInvoice
+    contract: finance
+    purpose: Show a tax invoice
+    trigger: onLoad
+    provenance: build, 29 September 2026
+  - operationId: listCreditMemos
+    contract: finance
+    purpose: List credit memos
+    trigger: onLoad
+    provenance: build, 29 September 2026
+  - operationId: getTaxDocumentRendition
+    contract: finance
+    purpose: Download the invoice / credit memo PDF
+    trigger: onLoad
+    provenance: build, 29 September 2026
   entryState:
     params:
     - name: orderId
       from: deepLink
+    - name: documentId
+      from: navigation
+    - name: invoiceId
+      from: navigation
     coldEntry: '**A guest opening an order link weeks later.** Shows the order if it still resolves; if
       it was refunded or the performance passed, says which and offers the order list rather than an error.'
     preloaded:
@@ -5236,8 +5318,10 @@ screens:
     transitions:
     - to: WEB-016
       trigger: Login / Register
-      provenance: derived — WEB-016 declares entryState.params challengeId and WEB-020 holds none of them,
-        so the edge carries nothing and WEB-016 opens cold
+      carries:
+      - subjectId
+      provenance: derived — WEB-016 declares entryState.params challengeId, subjectId and WEB-020 holds
+        subjectId, so an edge into it carries them
     - to: WEB-017
       trigger: My Account Dashboard
       provenance: derived — WEB-017 declares entryState.params deviceId, itemId, token and WEB-020 holds
@@ -5380,6 +5464,16 @@ screens:
     contract: marketing-crm
     purpose: Change contact and consent preferences
     trigger: onAction
+  - operationId: getMyIdentityVerification
+    contract: identity
+    purpose: Show the guest's ID verification status
+    trigger: onLoad
+    provenance: build, 29 September 2026
+  - operationId: submitGuestIdentityDocument
+    contract: identity
+    purpose: Upload an ID document for verification
+    trigger: onAction
+    provenance: build, 29 September 2026
   entryState:
     params:
     - name: subjectId
@@ -5683,6 +5777,26 @@ screens:
     contract: wallet
     purpose: Move value between wallets
     trigger: onAction
+  - operationId: getWalletAutoReloadSetting
+    contract: wallet
+    purpose: Show auto top-up
+    trigger: onLoad
+    provenance: build, 29 September 2026
+  - operationId: setWalletAutoReloadSetting
+    contract: wallet
+    purpose: Set auto top-up
+    trigger: onAction
+    provenance: build, 29 September 2026
+  - operationId: getWalletExitBalance
+    contract: wallet
+    purpose: Balance due / refundable at exit
+    trigger: onLoad
+    provenance: build, 29 September 2026
+  - operationId: settleWalletAtExit
+    contract: wallet
+    purpose: Settle the wallet at exit
+    trigger: onAction
+    provenance: build, 29 September 2026
   entryState:
     params:
     - name: cardCode
@@ -6153,6 +6267,16 @@ screens:
     contract: catalogue
     purpose: A guest's memberships, benefits and history
     trigger: onLoad
+  - operationId: listInstalmentPlans
+    contract: payments
+    purpose: Instalment plans and schedule
+    trigger: onLoad
+    provenance: build, 29 September 2026
+  - operationId: createInstalmentPlan
+    contract: payments
+    purpose: Pay in instalments
+    trigger: onAction
+    provenance: build, 29 September 2026
   entryState:
     params:
     - name: orderId
@@ -6665,6 +6789,26 @@ screens:
     trigger: onAction
     invalidates:
     - listMfaMethods
+  - operationId: getCookieConsentRuntime
+    contract: marketing-crm
+    purpose: 'Preference centre: categories and the current decision'
+    trigger: onLoad
+    provenance: build, 29 September 2026
+  - operationId: listPublishedTrackingTechnologies
+    contract: marketing-crm
+    purpose: Each cookie's name, provider, purpose, expiry and party
+    trigger: onLoad
+    provenance: build, 29 September 2026
+  - operationId: getDeviceConsentHistory
+    contract: marketing-crm
+    purpose: My cookie decisions so far
+    trigger: onLoad
+    provenance: build, 29 September 2026
+  - operationId: recordDeviceConsent
+    contract: marketing-crm
+    purpose: Change or withdraw cookie preferences
+    trigger: onAction
+    provenance: build, 29 September 2026
   entryState:
     params:
     - name: deviceId
@@ -10464,6 +10608,16 @@ screens:
     contract: marketing-crm
     purpose: Spend points
     trigger: onAction
+  - operationId: decideRecommendations
+    contract: ai
+    purpose: 'Recommendation slot (homepage / loyalty placement: products, offers, rewards, challenges)'
+    trigger: onLoad
+    provenance: build, 29 September 2026
+  - operationId: recordRecommendationEvents
+    contract: ai
+    purpose: Report impressions, clicks and declines of recommended items
+    trigger: onAction
+    provenance: build, 29 September 2026
   entryState:
     params: []
     coldEntry: '**A guest arriving cold on a link that no longer resolves is shown what happened and one
@@ -10657,12 +10811,19 @@ screens:
     contract: marketing-crm
     purpose: Ask the concierge something
     trigger: onAction
+  - operationId: recordAnswerFeedback
+    contract: ai
+    purpose: Say whether an answer helped
+    trigger: onAction
+    provenance: build, 29 September 2026
   entryState:
     params:
     - name: conversationId
       from: deepLink
     - name: outletId
       from: session
+    - name: messageId
+      from: navigation
     coldEntry: '**A guest arriving cold on a link that no longer resolves is shown what happened and one
       way onward — never a 404.** A shared link, a scanned code and a forwarded confirmation all land
       here, and the person holding it did nothing wrong. Arrives with `conversationId`.'
@@ -11424,6 +11585,8 @@ screens:
       trigger: Sign in to save or see favourite routes
       returnsTo: WEB-049
       provenance: decided 29 September, rev 3 REV3-21
+      carries:
+      - subjectId
     - to: WEB-001
       trigger: Home
       back: true

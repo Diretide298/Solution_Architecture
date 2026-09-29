@@ -1,0 +1,35 @@
+# Access review item — state model
+# Contract: identity.IdentityAccessReviewItem.status
+# Checked by tools/check-states.py. Added 29 September (build pass, group G2; 7.1.35, 7.1.56).
+
+entity: Access review item
+contract: identity
+enum: IdentityAccessReviewItem.status
+enumKind: inline
+enumSchema: IdentityAccessReviewItem
+enumProperty: status
+owner: identity
+description: One grant under review. Created `pending` when its campaign is created.
+initial:
+- pending
+terminal:
+- certified
+- revoked
+- notReviewed
+transitions:
+- from: pending
+  to: certified
+  operation: decideAccessReviewItem
+  trigger: operation
+  guard: Decision `certify` by a reviewer who does not hold the grant; a reason where the recommendation was `revoke`
+- from: pending
+  to: revoked
+  operation: decideAccessReviewItem
+  trigger: operation
+  guard: Decision `revoke` with a reason. **The grant ends in the same write** and the holder's sessions end
+- from: pending
+  to: notReviewed
+  trigger: timer
+  guard: The campaign's `dueAt` passed. The grant is left as it is
+notes: A decided item is evidence and is never changed; a grant certified in error is revoked the ordinary way or in
+  the next campaign.

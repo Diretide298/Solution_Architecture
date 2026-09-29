@@ -11,11 +11,11 @@
  "note": "Derived by tools/derive-platform.py. **The gaps section is the point** \u2014 a page listing what exists is a directory; one listing what is missing is a worklist.",
  "counts": {
   "screens": 100,
-  "operations": 142,
-  "contracts": 9,
+  "operations": 156,
+  "contracts": 10,
   "modules": 3,
   "undrawn": 0,
-  "operationsWithNoScreen": 111
+  "operationsWithNoScreen": 115
  },
  "waves": {
   "wave2": 20,
@@ -47,15 +47,19 @@
  "contracts": [
   {
    "contract": "white-label",
-   "operations": 53
+   "operations": 55
   },
   {
    "contract": "marketing-crm",
-   "operations": 47
+   "operations": 54
   },
   {
    "contract": "assets",
    "operations": 26
+  },
+  {
+   "contract": "ai",
+   "operations": 5
   },
   {
    "contract": "fnb",
@@ -143,7 +147,7 @@
    "module": "White Label",
    "wave": 2,
    "route": "/white-label/page-builder",
-   "operations": 9,
+   "operations": 11,
    "drawn": true
   },
   {
@@ -152,7 +156,7 @@
    "module": "White Label",
    "wave": 2,
    "route": "/white-label/content-blocks",
-   "operations": 8,
+   "operations": 10,
    "drawn": true
   },
   {
@@ -170,7 +174,7 @@
    "module": "White Label",
    "wave": 2,
    "route": "/white-label/media-library",
-   "operations": 12,
+   "operations": 13,
    "drawn": true
   },
   {
@@ -224,7 +228,7 @@
    "module": "White Label",
    "wave": 2,
    "route": "/white-label/site-settings",
-   "operations": 5,
+   "operations": 7,
    "drawn": true
   },
   {
@@ -296,7 +300,7 @@
    "module": "Policy",
    "wave": 3,
    "route": "/policy/cookie-tracking-digital-technology-registry-cms-025",
-   "operations": 1,
+   "operations": 6,
    "drawn": true
   },
   {
@@ -305,7 +309,7 @@
    "module": "Policy",
    "wave": 3,
    "route": "/policy/cookie-banner-preference-center-designer-cms-026",
-   "operations": 1,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -368,7 +372,7 @@
    "module": "Policy",
    "wave": 3,
    "route": "/policy/consent-evidence-history-withdrawal-management-cms-033",
-   "operations": 1,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -422,7 +426,7 @@
    "module": "Policy",
    "wave": 3,
    "route": "/policy/privacy-audit-evidence-compliance-reporting-cms-039",
-   "operations": 1,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -629,7 +633,7 @@
    "module": "Media Library",
    "wave": 3,
    "route": "/media-library/central-digital-asset-library-cms-062",
-   "operations": 2,
+   "operations": 3,
    "drawn": true
   },
   {
@@ -980,12 +984,66 @@
    "module": "White Label",
    "wave": 2,
    "route": "/white-label/help-me-choose",
-   "operations": 9,
+   "operations": 11,
    "drawn": true
   }
  ],
  "gaps": {
   "operationsWithNoScreen": [
+   {
+    "operation": "createKnowledgeCollection",
+    "contract": "ai",
+    "verb": "POST",
+    "summary": "Create a collection"
+   },
+   {
+    "operation": "generateVenueLayout",
+    "contract": "ai",
+    "verb": "POST",
+    "summary": "Draft a seat map from an uploaded plan"
+   },
+   {
+    "operation": "ingestKnowledgeDocument",
+    "contract": "ai",
+    "verb": "POST",
+    "summary": "Add a document"
+   },
+   {
+    "operation": "listIndexSources",
+    "contract": "ai",
+    "verb": "GET",
+    "summary": "What is indexed, and how current it is"
+   },
+   {
+    "operation": "proposeWalkways",
+    "contract": "ai",
+    "verb": "POST",
+    "summary": "Find walkable space in a drawing that has no vectors"
+   },
+   {
+    "operation": "reindexSource",
+    "contract": "ai",
+    "verb": "POST",
+    "summary": "Rebuild a source"
+   },
+   {
+    "operation": "removeIndexEntry",
+    "contract": "ai",
+    "verb": "DELETE",
+    "summary": "Remove one record from the index"
+   },
+   {
+    "operation": "setIndexSource",
+    "contract": "ai",
+    "verb": "PUT",
+    "summary": "Declare a source indexed"
+   },
+   {
+    "operation": "setSuggestionProvider",
+    "contract": "ai",
+    "verb": "PUT",
+    "summary": ""
+   },
    {
     "operation": "getCatalogueImportJob",
     "contract": "catalogue",
@@ -1117,12 +1175,6 @@
     "contract": "identity",
     "verb": "GET",
     "summary": "What was decided, for whom, where and why"
-   },
-   {
-    "operation": "listAccessPolicyHistory",
-    "contract": "identity",
-    "verb": "GET",
-    "summary": "Every version, who changed it and why"
    },
    {
     "operation": "listAccessPolicyTemplates",
@@ -1377,12 +1429,6 @@
     "summary": "Create or change a governed contact-centre automation"
    },
    {
-    "operation": "setCookieBannerDesign",
-    "contract": "marketing-crm",
-    "verb": "PUT",
-    "summary": "Save a cookie banner design as a new version"
-   },
-   {
     "operation": "setDataProcessingPurpose",
     "contract": "marketing-crm",
     "verb": "PUT",
@@ -1429,12 +1475,6 @@
     "contract": "marketing-crm",
     "verb": "PUT",
     "summary": "Record or advance a quality evaluation"
-   },
-   {
-    "operation": "setTrackingTechnology",
-    "contract": "marketing-crm",
-    "verb": "PUT",
-    "summary": "Add, classify or retire a tracking technology"
    },
    {
     "operation": "setWaiverAssociation",
@@ -1503,12 +1543,6 @@
     "summary": "Deposits and their authorisation state"
    },
    {
-    "operation": "listFraudRules",
-    "contract": "orders",
-    "verb": "GET",
-    "summary": ""
-   },
-   {
     "operation": "listInvitationAllowances",
     "contract": "orders",
     "verb": "GET",
@@ -1567,12 +1601,6 @@
     "contract": "orders",
     "verb": "POST",
     "summary": "Take back a share"
-   },
-   {
-    "operation": "setFraudRules",
-    "contract": "orders",
-    "verb": "PUT",
-    "summary": ""
    },
    {
     "operation": "getConfigurationProfile",

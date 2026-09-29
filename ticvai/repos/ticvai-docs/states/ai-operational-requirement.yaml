@@ -1,0 +1,65 @@
+# AI operational requirement — state model
+# Contract: ai.AiOperationalRequirement.status
+# Checked by tools/check-states.py. Added 29 September (build pass, group OWN, from the AI group's handoff).
+
+entity: AI operational requirement
+contract: ai
+enum: AiOperationalRequirement.status
+enumKind: inline
+enumSchema: AiOperationalRequirement
+enumProperty: status
+owner: ai
+description: '**A requirement derived from a forecast version** (AI design 2.2 C step 6, AIP-067): staff, POS,
+  gates, F&B, stock or resources. Created `issued` when its forecast version is published. **Autonomy L2
+  (prepare)**: it goes to the owning module as a recommendation bound to that version, and a person applies it
+  there.'
+initial:
+- issued
+terminal:
+- rejected
+- handedOver
+- expired
+transitions:
+- from: issued
+  to: accepted
+  operation: decideOperationalRequirement
+  trigger: operation
+  guard: Decision `accept`, as derived. Only an `issued` requirement is decided (`409 requirement-not-open`)
+- from: issued
+  to: modified
+  operation: decideOperationalRequirement
+  trigger: operation
+  guard: Decision `modify`, with the person's `quantity` replacing the derived one
+- from: issued
+  to: rejected
+  operation: decideOperationalRequirement
+  trigger: operation
+  guard: Decision `reject`, with a note. Nothing reaches the owning module
+- from: accepted
+  to: handedOver
+  trigger: cascade
+  guard: '**Handed over in the same transaction as the decision** (`decideOperationalRequirement`): the
+    requirement goes to its `targetContract` as a recommendation bound to its forecast version. Nothing is
+    written in the owning module from here; `handoverRef` is filled when the module records it'
+  emits:
+  - ai.operationalRequirementIssued
+- from: modified
+  to: handedOver
+  trigger: cascade
+  guard: Handed over, at the modified quantity, in the same transaction as the decision
+  emits:
+  - ai.operationalRequirementIssued
+- from: issued
+  to: expired
+  trigger: timer
+  guard: Nobody decided it before its `periodStart`; a requirement for a period already begun is no longer a
+    plan
+- from: issued
+  to: expired
+  trigger: cascade
+  guard: Its forecast version was superseded before anyone decided it; the new version derives its own
+    requirements (AIP-067)
+notes: '**A recommendation, never a write** (design 1.3 constraint 1). `accepted` and `modified` are the
+  decision; `handedOver` is the hand-over that follows it in the same call, and it is the move that publishes
+  `ai.operationalRequirementIssued`, which is how the owning module learns of it. What the module then does with
+  the recommendation is its own record, not a status here.'

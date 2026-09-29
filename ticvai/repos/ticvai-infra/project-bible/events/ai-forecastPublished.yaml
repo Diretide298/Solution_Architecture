@@ -1,0 +1,72 @@
+# ai.forecastPublished v1 — published by ai
+# Checked by tools/check-states.py.
+
+name: ai.forecastPublished
+version: 1
+publisher: ai
+description: A forecast version was published and is now the one every consumer reads.
+aggregate: aiForecastVersion
+emittedWhen: AiForecastVersion draft or awaitingApproval to published (publishForecastVersion, or the
+  nightly run where the definition auto-publishes)
+payload:
+- field: tenantId
+  type: uuid
+- field: scopePath
+  type: string
+- field: versionId
+  type: uuid
+- field: definitionKey
+  type: string
+- field: subject
+  type: string
+  notes: attendance, productDemand, revenue, staffing...
+- field: basis
+  type: string
+  notes: 'heuristic, statistical or model: the producer behind the numbers'
+- field: horizonStart
+  type: timestamp
+- field: horizonEnd
+  type: timestamp
+- field: dataCutoffAt
+  type: timestamp
+- field: supersedesVersionId
+  type: uuid
+  notes: Null for the first version
+- field: publishedAt
+  type: timestamp
+consumers:
+- context: reporting
+  purpose: Dashboards read the published version rather than forecasting on their own (design 5.2)
+  idempotencyKey: versionId
+  onFailure: retry
+  isCritical: false
+- context: workforce
+  purpose: Refresh staffing views bound to the forecast
+  idempotencyKey: versionId
+  onFailure: retry
+  isCritical: false
+- context: fnb
+  purpose: Refresh prep and par views bound to the forecast
+  idempotencyKey: versionId
+  onFailure: retry
+  isCritical: false
+- context: inventory
+  purpose: Refresh replenishment views bound to the forecast
+  idempotencyKey: versionId
+  onFailure: retry
+  isCritical: false
+- context: resources
+  purpose: Refresh resource demand views bound to the forecast
+  idempotencyKey: versionId
+  onFailure: retry
+  isCritical: false
+retention: Kept with the version it announces
+notes: '**Numbers never travel in the event.** A consumer reads the version with `getForecast`; the event
+  says which version is now live. Nothing is overwritten (AIP-032), so a consumer that misses the event
+  still reads the latest published version on its next load.
+
+
+  **Carries ids and scope, never prompt text or personal data beyond ids** (AI design 3.2).
+
+
+  Emitted by states/ai-forecast-version.yaml on every move into `published`, by `publishForecastVersion` and by the auto-publishing run (added 29 September, build pass, group OWN).'

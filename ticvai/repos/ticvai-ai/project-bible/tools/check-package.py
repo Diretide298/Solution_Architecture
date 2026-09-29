@@ -891,6 +891,10 @@ def main() -> int:
     # supplier invoices in their own, an account is denominated, a partner settles in theirs.
     # Those four keep a stored currency and every other one is a defect.
     CURRENCY_OK = {
+        # **A tax invoice and its credit memo are fixed at issue** (29 September). The FTA requires the
+        # invoice currency, with the AED equivalent, on the document, and a later change to the
+        # region's currency must not rewrite an issued invoice.
+        "ledger.tax_invoice", "ledger.credit_memo",
         "orders.payment", "inventory.supplier", "ledger.account", "ledger.legal_entity",
         "control.partner_agreement", "platform.region_settings", "platform.denomination",
         # **A stored-value balance is denominated and the denomination is part of the balance.**

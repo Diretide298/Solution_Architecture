@@ -1,0 +1,78 @@
+# accreditation.holderStatusChanged v1 — published by accreditation
+# Checked by tools/check-states.py against states/ and the contracts.
+
+name: accreditation.holderStatusChanged
+version: 1
+publisher: accreditation
+description: An accredited person was suspended, reactivated, revoked, expired, archived or had their validity extended by a renewal.
+aggregate: accreditationHolder
+emittedWhen: setAccreditationStatus succeeds; resolveIdentityConflict archives the non-surviving holders of a merge; the expiry run moves a holder past validTo to expired; a renewal extends validTo (renewAccreditation approved at once, or decideAccreditationApplication approving an application with renewsHolderId)
+payload:
+- field: holderId
+  type: uuid
+- field: accreditationNumber
+  type: string
+- field: programmeId
+  type: uuid
+- field: organisationId
+  type: uuid
+  required: false
+- field: previousStatus
+  type: string
+- field: status
+  type: string
+  notes: One of active, suspended, revoked, expired, archived
+- field: change
+  type: string
+  notes: One of statusChanged, validityExtended
+- field: validFrom
+  type: date
+  required: false
+- field: validTo
+  type: date
+  required: false
+  notes: The validity after the change
+- field: reason
+  type: string
+  required: false
+- field: credentialIds
+  type: array
+  notes: Every credential the holder holds. On suspended, revoked, expired and archived these stop admitting
+- field: changedByPrincipalId
+  type: uuid
+  required: false
+  notes: Absent when the expiry run made the change
+- field: scopePath
+  type: string
+- field: changedAt
+  type: timestamp
+consumers:
+- context: access
+  purpose: Refresh the gates and the offline validation bundle, so a suspended or revoked accreditation stops opening doors at once, including on a gate without a network
+  idempotencyKey: holderId + changedAt
+  onFailure: retryThenDeadLetter
+  isCritical: true
+- context: public-api
+  purpose: Deliver to webhook subscriptions taking accreditation.holderStatusChanged (12.1.53)
+  idempotencyKey: holderId + changedAt
+  onFailure: retryThenDeadLetter
+  isCritical: false
+- context: marketing
+  purpose: Tell the holder and their organisation, per the notification rules (suspended, revoked, expired), and push the new validity to wallet passes
+  idempotencyKey: holderId + changedAt
+  onFailure: retry
+  isCritical: false
+- context: reporting
+  purpose: Accreditation KPIs — active holders, suspensions, revocations and renewals by period (12.1.50)
+  idempotencyKey: holderId + changedAt
+  onFailure: retry
+  isCritical: false
+retention: 30 days after publication; the change itself is kept in accreditation.audit
+notes: '**Added 29 September (build pass, BL-180, 12.1.53).** The access consumer is why this is critical:
+  `setAccreditationStatus` promises that revocation pushes to the gates, and this is the push. **A badge
+  revoked in a database and live at a turnstile is worse than no system.**
+
+
+  Emitted by every transition in `states/accreditation-holder.yaml` (added the same evening); a validity
+  extension on an `active` holder is not a status change, so the renewing operation emits it with
+  `change: validityExtended`. Each writes `platform.outbox` in the same transaction as the change (ADR-0033).'

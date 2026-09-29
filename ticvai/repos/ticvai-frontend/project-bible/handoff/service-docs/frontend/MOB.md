@@ -24,7 +24,7 @@
 
 | ID | Screen | Module | Wave | Operations |
 |---|---|---|---|---|
-| [GST-001](#gst-001-home-default) | Home – Default | Discovery & Browse | 1 | 5 |
+| [GST-001](#gst-001-home-default) | Home – Default | Discovery & Browse | 1 | 11 |
 | [GST-002](#gst-002-explore-categories) | Explore Categories | Discovery & Browse | 1 | 2 |
 | [GST-003](#gst-003-event-attraction-listing) | Event & Attraction Listing | Discovery & Browse | 1 | 4 |
 | [GST-004](#gst-004-attraction-details) | Attraction Details | Discovery & Browse | 1 | 5 |
@@ -38,18 +38,18 @@
 | [GST-013](#gst-013-ticket-details) | Ticket Details | Account & Self-Service | 1 | 5 |
 | [GST-039](#gst-039-profile) | Profile | Account & Self-Service | 1 | 2 |
 | [GST-041](#gst-041-checkout-entry) | Checkout Entry | Cart & Checkout | 1 | 11 |
-| [GST-042](#gst-042-simple-registration-otp) | Simple Registration & OTP | Account & Self-Service | 1 | 12 |
+| [GST-042](#gst-042-simple-registration-otp) | Simple Registration & OTP | Account & Self-Service | 1 | 13 |
 | [GST-043](#gst-043-arabic-rtl-experience) | Arabic / RTL Experience | System States | 1 | 0 |
 | [GST-046](#gst-046-branded-queue-waiting-room) | Branded Queue / Waiting Room | High-Demand Access | 1 | 3 |
 | [GST-047](#gst-047-maintenance-upgrade-page) | Maintenance / Upgrade Page | System States | 1 | 1 |
 | [GST-055](#gst-055-dynamic-qr-ticket) | Dynamic QR Ticket | Account & Self-Service | 1 | 5 |
 | [GST-063](#gst-063-search) | Search | Discovery | 1 | 1 |
-| [GST-011](#gst-011-wallet-overview) | Wallet Overview | Membership, Loyalty & Value | 2 | 2 |
+| [GST-011](#gst-011-wallet-overview) | Wallet Overview | Membership, Loyalty & Value | 2 | 6 |
 | [GST-014](#gst-014-ticket-transfer) | Ticket Transfer | Ticketing | 2 | 3 |
-| [GST-015](#gst-015-memberships) | Memberships | Membership, Loyalty & Value | 2 | 9 |
+| [GST-015](#gst-015-memberships) | Memberships | Membership, Loyalty & Value | 2 | 11 |
 | [GST-016](#gst-016-my-reservations) | My Reservations | Ticketing | 2 | 3 |
 | [GST-017](#gst-017-reservation-details) | Reservation Details | Ticketing | 2 | 2 |
-| [GST-019](#gst-019-order-history) | Order History | Account & Self-Service | 2 | 4 |
+| [GST-019](#gst-019-order-history) | Order History | Account & Self-Service | 2 | 9 |
 | [GST-021](#gst-021-interactive-map) | Interactive Map | In-venue Services | 2 | 4 |
 | [GST-022](#gst-022-attraction-wait-times) | Attraction Wait Times | In-venue Services | 2 | 1 |
 | [GST-024](#gst-024-f-b-browse-order) | F&B – Browse & Order | In-venue Services | 2 | 10 |
@@ -58,27 +58,27 @@
 | [GST-029](#gst-029-venue-info-services) | Venue Info & Services | In-venue Services | 2 | 3 |
 | [GST-030](#gst-030-in-venue-notifications) | In-Venue Notifications | Engagement & Support | 2 | 3 |
 | [GST-031](#gst-031-ai-concierge-home) | AI Concierge – Home | Engagement & Support | 2 | 5 |
-| [GST-032](#gst-032-ai-concierge-chat) | AI Concierge – Chat | Engagement & Support | 2 | 8 |
+| [GST-032](#gst-032-ai-concierge-chat) | AI Concierge – Chat | Engagement & Support | 2 | 9 |
 | [GST-033](#gst-033-ai-concierge-contextual-help) | AI Concierge – Contextual Help | Engagement & Support | 2 | 1 |
 | [GST-034](#gst-034-lost-found) | Lost & Found | Support | 2 | 3 |
-| [GST-036](#gst-036-loyalty-rewards) | Loyalty & Rewards | Membership, Loyalty & Value | 2 | 3 |
+| [GST-036](#gst-036-loyalty-rewards) | Loyalty & Rewards | Membership, Loyalty & Value | 2 | 5 |
 | [GST-037](#gst-037-offers-promotions) | Offers & Promotions | Promotions | 2 | 3 |
 | [GST-040](#gst-040-help-support) | Help & Support | Engagement & Support | 2 | 6 |
 | [GST-044](#gst-044-multi-currency-pricing) | Multi-Currency & Pricing | Ticketing | 2 | 2 |
 | [GST-045](#gst-045-ticket-delivery-sharing) | Ticket Delivery & Sharing | Account & Self-Service | 2 | 1 |
-| [GST-048](#gst-048-upsell-cross-sell) | Upsell / Cross-Sell | Booking & Selection | 2 | 2 |
+| [GST-048](#gst-048-upsell-cross-sell) | Upsell / Cross-Sell | Booking & Selection | 2 | 3 |
 | [GST-049](#gst-049-interactive-seat-selection) | Interactive Seat Selection | Booking & Selection | 2 | 5 |
 | [GST-056](#gst-056-bundle-package) | Bundle Package | Booking & Selection | 2 | 3 |
 | [GST-057](#gst-057-accessibility-information) | Accessibility Information | Discovery & Browse | 2 | 1 |
 | [GST-061](#gst-061-menu-item-detail) | Menu Item Detail | In-Venue Experience | 2 | 2 |
-| [GST-066](#gst-066-privacy-my-data) | Privacy & My Data | Account & Self-Service | 2 | 5 |
+| [GST-066](#gst-066-privacy-my-data) | Privacy & My Data | Account & Self-Service | 2 | 9 |
 | [GST-067](#gst-067-refunds-resale) | Refunds & Resale | Account & Self-Service | 2 | 3 |
 | [GST-068](#gst-068-help-my-cases) | Help & My Cases | Engagement & Support | 2 | 3 |
 | [GST-069](#gst-069-face-pass) | Face Pass | Account & Self-Service | 2 | 4 |
 | [GST-070](#gst-070-reserve-a-table) | Reserve a Table | In-venue Services | 2 | 7 |
 | [GST-071](#gst-071-payment-methods) | Payment Methods | Account & Self-Service | 2 | 5 |
 | [GST-072](#gst-072-share-group-booking) | Share & Group Booking | Booking & Selection | 2 | 8 |
-| [GST-073](#gst-073-security-sign-in) | Security & Sign-in | Account & Self-Service | 2 | 12 |
+| [GST-073](#gst-073-security-sign-in) | Security & Sign-in | Account & Self-Service | 2 | 14 |
 | [GST-018](#gst-018-add-to-calendar-reminders) | Add to Calendar / Reminders | Account & Self-Service | 3 | 6 |
 | [GST-020](#gst-020-saved-items-wishlist) | Saved Items / Wishlist | Account & Self-Service | 3 | 3 |
 | [GST-023](#gst-023-virtual-queue) | Virtual Queue | In-venue Services | 3 | 5 |
@@ -125,6 +125,12 @@
 | `listMyEntitlements` | [AccessService](../backend/AccessService.md#listmyentitlements) | onLoad | Every ticket, pass and membership this guest holds; on a visit day, the ticket's venue is suggested (decided 28 September, audit R267) | `ORDER_VIEW` |
 | `searchCatalogue` | [CatalogueService](../backend/CatalogueService.md#searchcatalogue) | onAction | Find something by name | `None` |
 | `getTenantConfig` | [WhiteLabelService](../backend/WhiteLabelService.md#gettenantconfig) | onLoad | Branding, currency and what this venue enables | `TENANT_CONFIGURE` |
+| `getCookieConsentRuntime` | [MarketingService](../backend/MarketingService.md#getcookieconsentruntime) | onLoad | Tracking consent prompt on first launch and the SDK gate | `None` |
+| `recordDeviceConsent` | [MarketingService](../backend/MarketingService.md#recorddeviceconsent) | onAction | Accept, reject or customise tracking on first launch | `None` |
+| `listAnalyticsProviders` | [WhiteLabelService](../backend/WhiteLabelService.md#listanalyticsproviders) | onLoad | Analytics SDKs to start once their consent category is granted | `TENANT_CONFIGURE` |
+| `decideRecommendations` | [AiService](../backend/AiService.md#deciderecommendations) | onLoad | Recommendation slot (homepage / loyalty placement: products, offers, rewards, challenges) | `AI_USE` |
+| `recordRecommendationEvents` | [AiService](../backend/AiService.md#recordrecommendationevents) | onAction | Report impressions, clicks and declines of recommended items | `AI_USE` |
+| `recordStorefrontSessionEvents` | [WhiteLabelService](../backend/WhiteLabelService.md#recordstorefrontsessionevents) | onLoad | App-shell beacon of hashed browsing behaviour for fraud prevention | `None` |
 
 **States**
 
@@ -174,7 +180,7 @@
 | GST-039 | Profile | subjectId |  |
 | GST-040 | Help & Support |  |  |
 | GST-041 | Checkout Entry | productId |  |
-| GST-042 | Simple Registration & OTP |  |  |
+| GST-042 | Simple Registration & OTP | subjectId |  |
 | GST-045 | Ticket Delivery & Sharing | orderId |  |
 | GST-046 | Branded Queue / Waiting Room |  |  |
 | GST-049 | Interactive Seat Selection |  |  |
@@ -854,6 +860,7 @@
 |---|---|
 | cartId | session |
 | challengeId | navigation |
+| subjectId | navigation |
 
 **Operations**
 
@@ -871,6 +878,7 @@
 | `verifyGuestOtp` | [IdentityService](../backend/IdentityService.md#verifyguestotp) | onAction | Verify a one-time code and issue a session | `None` |
 | `createMfaChallenge` | [IdentityService](../backend/IdentityService.md#createmfachallenge) | onAction | Ask for the second factor (`action: signIn`) when the session comes back `requiresMfa` at a venue with guest two-step verification on | `None` |
 | `verifyMfaChallenge` | [IdentityService](../backend/IdentityService.md#verifymfachallenge) | onAction | Check the code and release the session | `None` |
+| `claimDeviceConsent` | [MarketingService](../backend/MarketingService.md#claimdeviceconsent) | onAction | Attach this device's tracking decision to the guest after sign-in or registration | `None` |
 
 **States**
 
@@ -889,7 +897,7 @@
 |---|---|---|---|
 | GST-001 | Home – Default |  |  |
 | GST-041 | Signed in and verified — back to the cart | cartId | arrived from the cart |
-| WEB-016 | A guest who checked out anonymously links their order | challengeId |  |
+| WEB-016 | A guest who checked out anonymously links their order | challengeId, subjectId |  |
 
 ## GST-043 Arabic / RTL Experience
 
@@ -1098,6 +1106,7 @@
 | Parameter | From |
 |---|---|
 | subjectId | GST-001 |
+| walletId | navigation |
 
 **Operations**
 
@@ -1105,6 +1114,10 @@
 |---|---|---|---|---|
 | `getWallet` | [WalletService](../backend/WalletService.md#getwallet) | onLoad | Read a guest wallet | `WALLET_VIEW` |
 | `listWalletTransactions` | [WalletService](../backend/WalletService.md#listwallettransactions) | onLoad | Wallet transaction history | `WALLET_VIEW` |
+| `getWalletAutoReloadSetting` | [WalletService](../backend/WalletService.md#getwalletautoreloadsetting) | onLoad | Show auto top-up | `WALLET_VIEW` |
+| `setWalletAutoReloadSetting` | [WalletService](../backend/WalletService.md#setwalletautoreloadsetting) | onAction | Set auto top-up | `WALLET_OPERATE` |
+| `getWalletExitBalance` | [WalletService](../backend/WalletService.md#getwalletexitbalance) | onLoad | Balance due / refundable at exit | `WALLET_VIEW` |
+| `settleWalletAtExit` | [WalletService](../backend/WalletService.md#settlewalletatexit) | onAction | Settle the wallet at exit | `WALLET_OPERATE` |
 
 **States**
 
@@ -1204,6 +1217,8 @@
 | `grantDelegation` | [IdentityService](../backend/IdentityService.md#grantdelegation) | onAction | Let one guest act for another | `GUEST_MANAGE` |
 | `listProducts` | [CatalogueService](../backend/CatalogueService.md#listproducts) | onLoad | List products | `PRODUCT_VIEW` |
 | `listGuestMemberships` | [CatalogueService](../backend/CatalogueService.md#listguestmemberships) | onLoad | A guest's memberships, benefits and history | `PRODUCT_VIEW` |
+| `listInstalmentPlans` | [OrderService](../backend/OrderService.md#listinstalmentplans) | onLoad | Instalment plans and schedule | `PAYMENT_VIEW` |
+| `createInstalmentPlan` | [OrderService](../backend/OrderService.md#createinstalmentplan) | onAction | Pay in instalments | `ORDER_CREATE` |
 
 **States**
 
@@ -1328,6 +1343,8 @@
 | Parameter | From |
 |---|---|
 | orderId | deepLink |
+| documentId | navigation |
+| invoiceId | navigation |
 
 **Operations**
 
@@ -1337,6 +1354,11 @@
 | `getOrder` | [OrderService](../backend/OrderService.md#getorder) | onAction | Read an order | `ORDER_VIEW` |
 | `listMyOrders` | [OrderService](../backend/OrderService.md#listmyorders) | onLoad | The orders this guest placed | `None` |
 | `transferOrderTickets` | [OrderService](../backend/OrderService.md#transferordertickets) | onAction | Transfer tickets to another guest | `None` |
+| `listTaxInvoices` | [LedgerService](../backend/LedgerService.md#listtaxinvoices) | onLoad | List tax invoices | `LEDGER_VIEW` |
+| `issueTaxInvoice` | [LedgerService](../backend/LedgerService.md#issuetaxinvoice) | onAction | Issue a tax invoice | `LEDGER_POST` |
+| `getTaxInvoice` | [LedgerService](../backend/LedgerService.md#gettaxinvoice) | onLoad | Show a tax invoice | `LEDGER_VIEW` |
+| `listCreditMemos` | [LedgerService](../backend/LedgerService.md#listcreditmemos) | onLoad | List credit memos | `LEDGER_VIEW` |
+| `getTaxDocumentRendition` | [LedgerService](../backend/LedgerService.md#gettaxdocumentrendition) | onLoad | Download the invoice / credit memo PDF | `LEDGER_VIEW` |
 
 **States**
 
@@ -1741,6 +1763,7 @@
 | cartId | session |
 | conversationId | deepLink |
 | orderId | deepLink |
+| messageId | navigation |
 
 **Operations**
 
@@ -1754,6 +1777,7 @@
 | `sendAiMessage` | [AiService](../backend/AiService.md#sendaimessage) | onAction | Ask | `AI_USE` |
 | `sendConversationMessage` | [MarketingService](../backend/MarketingService.md#sendconversationmessage) | onAction | Say something, as a guest or an agent | `CASE_MANAGE` |
 | `handoverToAgent` | [MarketingService](../backend/MarketingService.md#handovertoagent) | onAction | Pass an assistant conversation to a person | `None` |
+| `recordAnswerFeedback` | [AiService](../backend/AiService.md#recordanswerfeedback) | onAction | Say whether an answer helped | `AI_USE` |
 
 **States**
 
@@ -1877,6 +1901,8 @@
 | `getLoyaltyPosition` | [MarketingService](../backend/MarketingService.md#getloyaltyposition) | onLoad | A guest's points, tier and what is within reach | `None` |
 | `listLoyaltyProgrammes` | [MarketingService](../backend/MarketingService.md#listloyaltyprogrammes) | onLoad | List loyalty programmes | `MARKETING_VIEW` |
 | `listPromotions` | [CatalogueService](../backend/CatalogueService.md#listpromotions) | onLoad | List promotions | `PRICE_VIEW` |
+| `decideRecommendations` | [AiService](../backend/AiService.md#deciderecommendations) | onLoad | Recommendation slot (homepage / loyalty placement: products, offers, rewards, challenges) | `AI_USE` |
+| `recordRecommendationEvents` | [AiService](../backend/AiService.md#recordrecommendationevents) | onAction | Report impressions, clicks and declines of recommended items | `AI_USE` |
 
 **States**
 
@@ -2091,7 +2117,8 @@
 | Operation | Service | When | Purpose | Permission |
 |---|---|---|---|---|
 | `addCartLine` | [OrderService](../backend/OrderService.md#addcartline) | onAction | Add something | `None` |
-| `getUpsellSuggestions` | [CatalogueService](../backend/CatalogueService.md#getupsellsuggestions) | onAction | Suggestions for a cart | `PRODUCT_VIEW` |
+| `decideRecommendations` | [AiService](../backend/AiService.md#deciderecommendations) | onLoad | Fill a recommendation slot | `AI_USE` |
+| `recordRecommendationEvents` | [AiService](../backend/AiService.md#recordrecommendationevents) | onAction | Report what happened to recommended items | `AI_USE` |
 
 **States**
 
@@ -2309,6 +2336,10 @@
 | `getGuestConsents` | [MarketingService](../backend/MarketingService.md#getguestconsents) | onLoad | Read a guest's consent state | `GUEST_VIEW` |
 | `updateGuestPreferences` | [MarketingService](../backend/MarketingService.md#updateguestpreferences) | onAction | The things a regular should not have to say twice | `GUEST_MANAGE` |
 | `uploadGuestDocument` | [MarketingService](../backend/MarketingService.md#uploadguestdocument) | onAction | Store a guest photo, ID or signed document | `GUEST_VIEW_PII` |
+| `getCookieConsentRuntime` | [MarketingService](../backend/MarketingService.md#getcookieconsentruntime) | onLoad | Tracking preferences: categories and the current decision | `None` |
+| `listPublishedTrackingTechnologies` | [MarketingService](../backend/MarketingService.md#listpublishedtrackingtechnologies) | onLoad | Each SDK and tracker the app uses | `None` |
+| `getDeviceConsentHistory` | [MarketingService](../backend/MarketingService.md#getdeviceconsenthistory) | onLoad | My tracking decisions so far | `None` |
+| `recordDeviceConsent` | [MarketingService](../backend/MarketingService.md#recorddeviceconsent) | onAction | Change or withdraw tracking preferences | `None` |
 
 **States**
 
@@ -2653,6 +2684,8 @@
 | `removeMfaMethod` | [IdentityService](../backend/IdentityService.md#removemfamethod) | onAction | Remove a method | `None` |
 | `createMfaChallenge` | [IdentityService](../backend/IdentityService.md#createmfachallenge) | onAction | Step-up before a sensitive act at a venue that has it on | `None` |
 | `verifyMfaChallenge` | [IdentityService](../backend/IdentityService.md#verifymfachallenge) | onAction | Check the step-up code | `None` |
+| `getMyIdentityVerification` | [IdentityService](../backend/IdentityService.md#getmyidentityverification) | onLoad | Show the guest's ID verification status | `None` |
+| `submitGuestIdentityDocument` | [IdentityService](../backend/IdentityService.md#submitguestidentitydocument) | onAction | Upload an ID document for verification | `None` |
 
 **States**
 

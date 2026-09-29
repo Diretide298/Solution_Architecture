@@ -1,10 +1,30 @@
 id: LLD-accreditation
-title: accreditation — 30 operations
+title: accreditation — 47 operations
 generatedBy: tools/derive-diagrams.py
 index: diagrams/hld/03-contracts.yaml
 tier: satellite
 service: TenancyService
 operations:
+- operation: cloneAccreditationProgramme
+  verb: POST
+  path: /accreditation-programmes/{programmeId}/clone
+  scope: venue
+  permission: ACCREDITATION_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - accreditation.notification_rules
+  - accreditation.programme
+  - accreditation.requirements
+  - accreditation.validity
+  - cache:idempotency
+  writes:
+  - accreditation.notification_rules
+  - accreditation.programme
+  - accreditation.requirements
+  - accreditation.validity
+  - cache:idempotency
 - operation: createAccreditationApplication
   verb: POST
   path: /accreditation-applications
@@ -57,6 +77,74 @@ operations:
   offline: false
   reads:
   - accreditation.application
+  - accreditation.document
+  - accreditation.holder
+  - accreditation.requirements
+  - cache:idempotency
+  writes:
+  - accreditation.application
+  - accreditation.audit
+  - accreditation.holder
+  - cache:idempotency
+  - platform.outbox
+- operation: deliverAccreditationCredential
+  verb: POST
+  path: /accreditation-credentials/{credentialId}/deliver
+  scope: venue
+  permission: ACCREDITATION_ISSUE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - accreditation.credential
+  - accreditation.holder
+  - accreditation.mobile_credential_delivery
+  - cache:idempotency
+  writes:
+  - accreditation.credential
+  - accreditation.mobile_credential_delivery
+  - cache:idempotency
+- operation: exportAccreditationData
+  verb: POST
+  path: /accreditation-exports
+  scope: venue
+  permission: ACCREDITATION_MANAGE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - accreditation.application
+  - accreditation.credential
+  - accreditation.data_export
+  - accreditation.document
+  - accreditation.holder
+  - accreditation.holder_access
+  - cache:idempotency
+  writes:
+  - accreditation.audit
+  - accreditation.data_export
+  - cache:idempotency
+- operation: getAccreditationApplication
+  verb: GET
+  path: /accreditation-applications/{applicationId}
+  scope: venue
+  permission: ACCREDITATION_VIEW
+  audience:
+  - staff
+  offline: false
+  reads:
+  - accreditation.application
+  writes: []
+- operation: getAccreditationExport
+  verb: GET
+  path: /accreditation-exports/{exportId}
+  scope: venue
+  permission: ACCREDITATION_MANAGE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - accreditation.data_export
   writes: []
 - operation: getAccreditationHolder
   verb: GET
@@ -98,8 +186,27 @@ operations:
   offline: false
   reads:
   - accreditation.credential
+  - cache:idempotency
   writes:
   - accreditation.credential
+  - cache:idempotency
+  - platform.outbox
+- operation: issueMyAccreditationWalletPass
+  verb: POST
+  path: /my/accreditation-credentials/{credentialId}/wallet-pass
+  scope: venue
+  permission: ACCREDITATION_APPLY
+  audience:
+  - guest
+  offline: false
+  reads:
+  - accreditation.credential
+  - accreditation.holder
+  - accreditation.mobile_credential_delivery
+  - cache:idempotency
+  writes:
+  - accreditation.mobile_credential_delivery
+  - cache:idempotency
 - operation: listAccessProfiles
   verb: GET
   path: /accreditation-access-profiles
@@ -156,6 +263,28 @@ operations:
   offline: false
   reads:
   - accreditation.credential
+  writes: []
+- operation: listAccreditationDocuments
+  verb: GET
+  path: /accreditation-documents
+  scope: venue
+  permission: ACCREDITATION_VIEW
+  audience:
+  - staff
+  offline: false
+  reads:
+  - accreditation.document
+  writes: []
+- operation: listAccreditationExports
+  verb: GET
+  path: /accreditation-exports
+  scope: venue
+  permission: ACCREDITATION_MANAGE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - accreditation.data_export
   writes: []
 - operation: listAccreditationHolders
   verb: GET
@@ -214,6 +343,32 @@ operations:
   reads:
   - accreditation.badge_template
   writes: []
+- operation: listMyAccreditationApplications
+  verb: GET
+  path: /my/accreditation-applications
+  scope: venue
+  permission: ACCREDITATION_APPLY
+  audience:
+  - guest
+  offline: false
+  reads:
+  - accreditation.application
+  - accreditation.holder
+  writes: []
+- operation: listMyAccreditationCredentials
+  verb: GET
+  path: /my/accreditation-credentials
+  scope: venue
+  permission: ACCREDITATION_APPLY
+  audience:
+  - guest
+  offline: false
+  reads:
+  - accreditation.credential
+  - accreditation.holder
+  - accreditation.holder_access
+  - accreditation.programme
+  writes: []
 - operation: previewAccessImpact
   verb: POST
   path: /accreditation-access-profiles/preview
@@ -225,6 +380,28 @@ operations:
   reads: []
   writes:
   - accreditation.access_profile
+- operation: renewAccreditation
+  verb: POST
+  path: /accreditation-holders/{holderId}/renew
+  scope: venue
+  permission: ACCREDITATION_APPLY
+  audience:
+  - staff
+  - guest
+  offline: false
+  reads:
+  - accreditation.application
+  - accreditation.document
+  - accreditation.holder
+  - accreditation.programme
+  - accreditation.validity
+  - cache:idempotency
+  writes:
+  - accreditation.application
+  - accreditation.audit
+  - accreditation.holder
+  - cache:idempotency
+  - platform.outbox
 - operation: replaceAccreditationCredential
   verb: POST
   path: /accreditation-credentials/{credentialId}/replace
@@ -235,7 +412,11 @@ operations:
   offline: false
   reads:
   - accreditation.credential
-  writes: []
+  - cache:idempotency
+  writes:
+  - accreditation.credential
+  - cache:idempotency
+  - platform.outbox
 - operation: resolveIdentityConflict
   verb: POST
   path: /accreditation-identity-conflicts/{conflictId}/resolve
@@ -257,6 +438,26 @@ operations:
   - accreditation.holder
   - accreditation.holder_access
   - accreditation.identity_conflict
+  - cache:idempotency
+  - platform.outbox
+- operation: resubmitAccreditationApplication
+  verb: POST
+  path: /accreditation-applications/{applicationId}/resubmit
+  scope: venue
+  permission: ACCREDITATION_APPLY
+  audience:
+  - staff
+  - guest
+  offline: false
+  reads:
+  - accreditation.application
+  - accreditation.document
+  - accreditation.programme
+  - accreditation.requirements
+  - cache:idempotency
+  writes:
+  - accreditation.application
+  - accreditation.document
   - cache:idempotency
 - operation: setAccessProfile
   verb: PUT
@@ -303,8 +504,15 @@ operations:
   - staff
   offline: false
   reads:
+  - accreditation.credential
   - accreditation.holder
-  writes: []
+  - cache:idempotency
+  writes:
+  - accreditation.audit
+  - accreditation.credential
+  - accreditation.holder
+  - cache:idempotency
+  - platform.outbox
 - operation: setAccreditationValidity
   verb: PUT
   path: /accreditation-validity
@@ -341,6 +549,24 @@ operations:
   - accreditation.holder_access
   writes:
   - accreditation.holder_access
+- operation: submitAccreditationApplication
+  verb: POST
+  path: /accreditation-applications/{applicationId}/submit
+  scope: venue
+  permission: ACCREDITATION_APPLY
+  audience:
+  - staff
+  - guest
+  offline: false
+  reads:
+  - accreditation.application
+  - accreditation.document
+  - accreditation.programme
+  - accreditation.requirements
+  - cache:idempotency
+  writes:
+  - accreditation.application
+  - cache:idempotency
 - operation: submitAccreditationDocument
   verb: POST
   path: /accreditation-documents
@@ -354,6 +580,22 @@ operations:
   - accreditation.document
   writes:
   - accreditation.document
+- operation: updateAccreditationApplication
+  verb: PUT
+  path: /accreditation-applications/{applicationId}
+  scope: venue
+  permission: ACCREDITATION_APPLY
+  audience:
+  - staff
+  - guest
+  offline: false
+  reads:
+  - accreditation.application
+  - accreditation.requirements
+  - cache:idempotency
+  writes:
+  - accreditation.application
+  - cache:idempotency
 - operation: updateAccreditationHolder
   verb: PUT
   path: /accreditation-holders/{holderId}
@@ -366,6 +608,35 @@ operations:
   - accreditation.holder
   writes:
   - accreditation.holder
+- operation: updateAccreditationProgramme
+  verb: PUT
+  path: /accreditation-programmes/{programmeId}
+  scope: venue
+  permission: ACCREDITATION_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - accreditation.programme
+  - cache:idempotency
+  writes:
+  - accreditation.programme
+  - cache:idempotency
+- operation: verifyAccreditationCredential
+  verb: GET
+  path: /accreditation-credentials/verify
+  scope: venue
+  permission: ACCESS_VALIDATE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - accreditation.access_profile
+  - accreditation.credential
+  - accreditation.holder
+  - accreditation.holder_access
+  - accreditation.programme
+  writes: []
 - operation: verifyAccreditationDocument
   verb: POST
   path: /accreditation-documents/{documentId}/verify
@@ -377,3 +648,18 @@ operations:
   reads:
   - accreditation.document
   writes: []
+- operation: withdrawAccreditationApplication
+  verb: POST
+  path: /accreditation-applications/{applicationId}/withdraw
+  scope: venue
+  permission: ACCREDITATION_APPLY
+  audience:
+  - staff
+  - guest
+  offline: false
+  reads:
+  - accreditation.application
+  - cache:idempotency
+  writes:
+  - accreditation.application
+  - cache:idempotency

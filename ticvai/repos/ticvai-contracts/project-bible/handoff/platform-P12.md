@@ -5,16 +5,16 @@
 | | |
 |---|---|
 | Screens | 28 |
-| Operations | 59 |
+| Operations | 62 |
 | Contracts | 7 |
 | Modules | 5 |
 | Undrawn | 0 |
-| Operations with no screen | 88 |
+| Operations with no screen | 84 |
 | Waves | wave2 2 · wave3 26 |
 
 ## Gaps
 
-### 88 operations with no screen here
+### 84 operations with no screen here
 
 **In a contract this platform uses, callable by its audience, and reaching no screen on any platform serving that audience.** Either a screen is missing or the endpoint should not exist — and the second is worth considering first.
 
@@ -24,7 +24,6 @@
 | `generateVenueLayout` | ai | POST | Draft a seat map from an uploaded plan |
 | `ingestKnowledgeDocument` | ai | POST | Add a document |
 | `listIndexSources` | ai | GET | What is indexed, and how current it is |
-| `proposeTranslations` | ai | POST |  |
 | `proposeWalkways` | ai | POST | Find walkable space in a drawing that has no vectors |
 | `reindexSource` | ai | POST | Rebuild a source |
 | `removeIndexEntry` | ai | DELETE | Remove one record from the index |
@@ -45,7 +44,6 @@
 | `getPasswordPolicy` | identity | GET | Read the password and MFA policy in force |
 | `getPrincipalModuleAccess` | identity | GET | What this person may do, as ticks |
 | `listAccessDecisions` | identity | GET | What was decided, for whom, where and why |
-| `listAccessPolicyHistory` | identity | GET | Every version, who changed it and why |
 | `listAccessPolicyTemplates` | identity | GET | Reusable policy shapes |
 | `listCapabilityTemplates` | identity | GET | Saved tick-sets |
 | `listCustomerMemberships` | identity | GET | Memberships a customer holds |
@@ -60,7 +58,9 @@
 | `getDigitalWaiverForm` | marketing-crm | GET | Load the layout of a waiver version |
 | `getForm` | marketing-crm | GET | One form, to fill in or to edit |
 | `getGuestExtraValues` | marketing-crm | GET | What a guest answered |
-| … | | | 48 more |
+| `getLocalizationBrandingCustomer` | marketing-crm | GET | Load a waiver version's languages, branding and channels |
+| `getLostItemMatches` | marketing-crm | GET | Candidate matches, scored |
+| … | | | 44 more |
 
 ## Modules
 
@@ -81,7 +81,7 @@
 | `SUP-003` | Availability & Routing Settings | Access & Availability | 3 | 1 | yes |
 | `SUP-004` | Conversation Queue | Conversations | 2 | 10 | yes |
 | `SUP-005` | Live Chat Workspace | Conversations | 2 | 11 | yes |
-| `SUP-006` | Knowledge Base Search | Knowledge & Responses | 3 | 2 | yes |
+| `SUP-006` | Knowledge Base Search | Knowledge & Responses | 3 | 3 | yes |
 | `SUP-007` | Canned Response Management | Knowledge & Responses | 3 | 2 | yes |
 | `SUP-008` | Agent Performance & SLA View | Overview | 3 | 10 | yes |
 | `SUP-009` | Customer Service Command Center | Support | 3 | 2 | yes |
@@ -93,7 +93,7 @@
 | `SUP-015` | Refund, Compensation & Service Exception Workspace | Support | 3 | 1 | yes |
 | `SUP-016` | Escalation, Collaboration & Internal Resolution | Support | 3 | 1 | yes |
 | `SUP-017` | Case Resolution, Closure & Customer Feedback | Support | 3 | 1 | yes |
-| `SUP-018` | AI Customer Service Copilot & Knowledge Workspace | Support | 3 | 1 | yes |
+| `SUP-018` | AI Customer Service Copilot & Knowledge Workspace | Support | 3 | 3 | yes |
 | `SUP-019` | Contact Center Operations Command Center | Support | 3 | 1 | yes |
 | `SUP-020` | Queue Configuration & Management | Support | 3 | 3 | yes |
 | `SUP-021` | Intelligent Routing, Skills & Assignment Engine | Support | 3 | 3 | yes |

@@ -11,11 +11,11 @@
  "note": "Derived by tools/derive-platform.py. **The gaps section is the point** \u2014 a page listing what exists is a directory; one listing what is missing is a worklist.",
  "counts": {
   "screens": 96,
-  "operations": 212,
-  "contracts": 18,
+  "operations": 221,
+  "contracts": 19,
   "modules": 4,
   "undrawn": 0,
-  "operationsWithNoScreen": 140
+  "operationsWithNoScreen": 135
  },
  "waves": {
   "wave1": 25,
@@ -72,15 +72,19 @@
    "operations": 17
   },
   {
+   "contract": "workforce",
+   "operations": 15
+  },
+  {
    "contract": "inventory",
    "operations": 15
   },
   {
-   "contract": "rental",
+   "contract": "shift",
    "operations": 13
   },
   {
-   "contract": "shift",
+   "contract": "rental",
    "operations": 13
   },
   {
@@ -92,36 +96,36 @@
    "operations": 12
   },
   {
-   "contract": "workforce",
-   "operations": 11
+   "contract": "access",
+   "operations": 7
   },
   {
    "contract": "queue",
    "operations": 7
   },
   {
-   "contract": "access",
-   "operations": 7
-  },
-  {
    "contract": "ai",
-   "operations": 4
+   "operations": 6
   },
   {
-   "contract": "retail",
-   "operations": 2
+   "contract": "reporting",
+   "operations": 4
   },
   {
    "contract": "venue-map",
    "operations": 2
   },
   {
-   "contract": "reporting",
+   "contract": "retail",
    "operations": 2
   },
   {
    "contract": "tenancy",
    "operations": 2
+  },
+  {
+   "contract": "accreditation",
+   "operations": 1
   },
   {
    "contract": "assets",
@@ -216,7 +220,7 @@
    "module": "Operations",
    "wave": 1,
    "route": "/operations/scan-ready",
-   "operations": 7,
+   "operations": 8,
    "drawn": true
   },
   {
@@ -270,7 +274,7 @@
    "module": "Operations",
    "wave": 1,
    "route": "/operations/ai-assistant-answer",
-   "operations": 3,
+   "operations": 4,
    "drawn": true
   },
   {
@@ -369,7 +373,7 @@
    "module": "Operations",
    "wave": 2,
    "route": "/operations/queue-monitor",
-   "operations": 7,
+   "operations": 8,
    "drawn": true
   },
   {
@@ -423,7 +427,7 @@
    "module": "Operations",
    "wave": 1,
    "route": "/operations/notifications",
-   "operations": 4,
+   "operations": 8,
    "drawn": true
   },
   {
@@ -639,7 +643,7 @@
    "module": "Stock on the Floor",
    "wave": 2,
    "route": "/operations/retail-inventory-command-center",
-   "operations": 2,
+   "operations": 6,
    "drawn": true
   },
   {
@@ -1021,6 +1025,12 @@
     "summary": "Check the person presenting against the person entitled"
    },
    {
+    "operation": "replaceAccreditationCredential",
+    "contract": "accreditation",
+    "verb": "POST",
+    "summary": "Reissue after loss, damage or a name change"
+   },
+   {
     "operation": "createKnowledgeCollection",
     "contract": "ai",
     "verb": "POST",
@@ -1043,12 +1053,6 @@
     "contract": "ai",
     "verb": "GET",
     "summary": "What is indexed, and how current it is"
-   },
-   {
-    "operation": "proposeTranslations",
-    "contract": "ai",
-    "verb": "POST",
-    "summary": ""
    },
    {
     "operation": "proposeWalkways",
@@ -1211,12 +1215,6 @@
     "contract": "identity",
     "verb": "GET",
     "summary": "What was decided, for whom, where and why"
-   },
-   {
-    "operation": "listAccessPolicyHistory",
-    "contract": "identity",
-    "verb": "GET",
-    "summary": "Every version, who changed it and why"
    },
    {
     "operation": "listAccessPolicyTemplates",
@@ -1477,12 +1475,6 @@
     "summary": "Create or change a governed contact-centre automation"
    },
    {
-    "operation": "setCookieBannerDesign",
-    "contract": "marketing-crm",
-    "verb": "PUT",
-    "summary": "Save a cookie banner design as a new version"
-   },
-   {
     "operation": "setDataProcessingPurpose",
     "contract": "marketing-crm",
     "verb": "PUT",
@@ -1529,12 +1521,6 @@
     "contract": "marketing-crm",
     "verb": "PUT",
     "summary": "Record or advance a quality evaluation"
-   },
-   {
-    "operation": "setTrackingTechnology",
-    "contract": "marketing-crm",
-    "verb": "PUT",
-    "summary": "Add, classify or retire a tracking technology"
    },
    {
     "operation": "setWaiverAssociation",
@@ -1603,12 +1589,6 @@
     "summary": "Deposits and their authorisation state"
    },
    {
-    "operation": "listFraudRules",
-    "contract": "orders",
-    "verb": "GET",
-    "summary": ""
-   },
-   {
     "operation": "listInvitationAllowances",
     "contract": "orders",
     "verb": "GET",
@@ -1667,12 +1647,6 @@
     "contract": "orders",
     "verb": "POST",
     "summary": "Take back a share"
-   },
-   {
-    "operation": "setFraudRules",
-    "contract": "orders",
-    "verb": "PUT",
-    "summary": ""
    },
    {
     "operation": "overrideWaitingGuest",

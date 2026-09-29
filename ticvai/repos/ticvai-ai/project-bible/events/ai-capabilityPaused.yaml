@@ -1,0 +1,52 @@
+# ai.capabilityPaused v1 — published by ai
+# Checked by tools/check-states.py.
+
+name: ai.capabilityPaused
+version: 1
+publisher: ai
+description: An AI capability was paused and now answers from its degradation mode.
+aggregate: aiCapability
+emittedWhen: AiCapabilityRegistration active to paused (pauseAiCapability, or containAiIncident)
+payload:
+- field: tenantId
+  type: uuid
+- field: scopePath
+  type: string
+- field: capabilityKey
+  type: string
+- field: family
+  type: string
+- field: reason
+  type: string
+- field: incidentId
+  type: uuid
+  notes: Where an incident caused it
+- field: pausedByPrincipalId
+  type: uuid
+- field: pausedAt
+  type: timestamp
+consumers:
+- context: cache
+  purpose: Drop cached answers the capability produced
+  idempotencyKey: capabilityKey+pausedAt
+  onFailure: retryThenDeadLetter
+  isCritical: true
+- context: marketing
+  purpose: Notify the capability owner and the governance team
+  idempotencyKey: capabilityKey+pausedAt
+  onFailure: retry
+  isCritical: false
+- context: reporting
+  purpose: Governance analytics
+  idempotencyKey: capabilityKey+pausedAt
+  onFailure: retry
+  isCritical: false
+retention: Two years, with the governance records
+notes: 'Surfaces that show the capability read its state from `listAiCapabilities`; this event lets them
+  stop showing it at once rather than on their next load.
+
+
+  **Carries ids and scope, never prompt text or personal data beyond ids** (AI design 3.2).
+
+
+  Emitted by states/ai-capability.yaml on `active` to `paused`, by `pauseAiCapability` and by `containAiIncident` (added 29 September, build pass, group OWN).'

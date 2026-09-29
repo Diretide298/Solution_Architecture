@@ -24,7 +24,7 @@
 
 | ID | Screen | Module | Wave | Operations |
 |---|---|---|---|---|
-| [WEB-001](#web-001-home-landing) | Home / Landing | Discovery & Browse | 1 | 4 |
+| [WEB-001](#web-001-home-landing) | Home / Landing | Discovery & Browse | 1 | 10 |
 | [WEB-002](#web-002-event-attraction-listing) | Event & Attraction Listing | Discovery & Browse | 1 | 5 |
 | [WEB-003](#web-003-search-results) | Search Results | Discovery & Browse | 1 | 2 |
 | [WEB-004](#web-004-attraction-details) | Attraction Details | Discovery & Browse | 1 | 5 |
@@ -35,22 +35,22 @@
 | [WEB-012](#web-012-checkout-payment) | Checkout — Payment | Cart & Checkout | 1 | 5 |
 | [WEB-013](#web-013-booking-confirmation) | Booking Confirmation | Cart & Checkout | 1 | 3 |
 | [WEB-014](#web-014-pay-for-a-booking) | Pay for a Booking | Cart & Checkout | 1 | 2 |
-| [WEB-016](#web-016-login-register) | Login / Register | Account & Self-Service | 1 | 13 |
+| [WEB-016](#web-016-login-register) | Login / Register | Account & Self-Service | 1 | 14 |
 | [WEB-017](#web-017-my-account-dashboard) | My Account Dashboard | Account & Self-Service | 1 | 9 |
 | [WEB-018](#web-018-my-tickets) | My Tickets | Account & Self-Service | 1 | 8 |
-| [WEB-019](#web-019-order-history) | Order History | Account & Self-Service | 1 | 5 |
-| [WEB-020](#web-020-profile-preferences) | Profile & Preferences | Account & Self-Service | 1 | 6 |
+| [WEB-019](#web-019-order-history) | Order History | Account & Self-Service | 1 | 10 |
+| [WEB-020](#web-020-profile-preferences) | Profile & Preferences | Account & Self-Service | 1 | 8 |
 | [WEB-025](#web-025-help-centre-faq) | Help Centre / FAQ | Engagement & Support | 1 | 3 |
 | [WEB-028](#web-028-contact-venue-information) | Contact & Venue Information | Engagement & Support | 1 | 1 |
 | [WEB-029](#web-029-error-sold-out-maintenance) | Error / Sold Out / Maintenance | System States | 1 | 1 |
 | [WEB-030](#web-030-ticket-transfer) | Ticket Transfer | Ticketing | 1 | 4 |
 | [WEB-035](#web-035-multi-currency-pricing) | Multi-Currency & Pricing | Ticketing | 1 | 2 |
 | [WEB-007](#web-007-interactive-seat-selection) | Interactive Seat Selection | Booking & Selection | 2 | 5 |
-| [WEB-008](#web-008-add-ons-upsell) | Add-ons & Upsell | Booking & Selection | 2 | 4 |
+| [WEB-008](#web-008-add-ons-upsell) | Add-ons & Upsell | Booking & Selection | 2 | 5 |
 | [WEB-015](#web-015-branded-queue-waiting-room) | Branded Queue / Waiting Room | High-Demand Access | 2 | 3 |
-| [WEB-021](#web-021-wallet-gift-cards) | Wallet & Gift Cards | Membership, Loyalty & Value | 2 | 7 |
+| [WEB-021](#web-021-wallet-gift-cards) | Wallet & Gift Cards | Membership, Loyalty & Value | 2 | 11 |
 | [WEB-022](#web-022-membership-plans) | Membership Plans | Membership, Loyalty & Value | 2 | 4 |
-| [WEB-023](#web-023-membership-management) | Membership Management | Membership, Loyalty & Value | 2 | 7 |
+| [WEB-023](#web-023-membership-management) | Membership Management | Membership, Loyalty & Value | 2 | 9 |
 | [WEB-027](#web-027-newsletter-subscription) | Newsletter Subscription | Engagement & Support | 2 | 9 |
 | [WEB-031](#web-031-my-reservations) | My Reservations | Ticketing | 2 | 9 |
 | [WEB-032](#web-032-offers-promotions) | Offers & Promotions | Promotions | 2 | 2 |
@@ -62,12 +62,12 @@
 | [WEB-040](#web-040-virtual-queue) | Virtual Queue | In-venue Services | 2 | 6 |
 | [WEB-041](#web-041-parking-reserve-pay) | Parking – Reserve & Pay | In-venue Services | 2 | 5 |
 | [WEB-042](#web-042-retail-shop-and-drop) | Retail & Shop and Drop | Retail | 2 | 6 |
-| [WEB-043](#web-043-loyalty-rewards) | Loyalty & Rewards | Membership, Loyalty & Value | 2 | 5 |
-| [WEB-044](#web-044-ai-concierge-home) | AI Concierge – Home | Engagement & Support | 2 | 7 |
+| [WEB-043](#web-043-loyalty-rewards) | Loyalty & Rewards | Membership, Loyalty & Value | 2 | 7 |
+| [WEB-044](#web-044-ai-concierge-home) | AI Concierge – Home | Engagement & Support | 2 | 8 |
 | [WEB-045](#web-045-help-centre-accessibility) | Help Centre & Accessibility | Support | 2 | 3 |
 | [WEB-046](#web-046-in-venue-notifications) | In-Venue Notifications | Engagement & Support | 2 | 3 |
 | [WEB-009](#web-009-wishlist) | Wishlist | Booking & Selection | 3 | 3 |
-| [WEB-024](#web-024-devices-wishlist-consent) | Devices, Wishlist & Consent | Membership, Loyalty & Value | 3 | 19 |
+| [WEB-024](#web-024-devices-wishlist-consent) | Devices, Wishlist & Consent | Membership, Loyalty & Value | 3 | 23 |
 | [WEB-026](#web-026-survey-feedback) | Survey & Feedback | Engagement & Support | 3 | 1 |
 | [WEB-034](#web-034-lost-found) | Lost & Found | Support | 3 | 3 |
 | [WEB-047](#web-047-map-booking-cabanas-spots) | Map Booking — Cabanas & Spots | Booking & Selection | 3 | 8 |
@@ -95,6 +95,12 @@
 | `getTenantConfig` | [WhiteLabelService](../backend/WhiteLabelService.md#gettenantconfig) | onLoad | Full working configuration | `TENANT_CONFIGURE` |
 | `listProducts` | [CatalogueService](../backend/CatalogueService.md#listproducts) | onLoad | List products | `PRODUCT_VIEW` |
 | `listMyEntitlements` | [AccessService](../backend/AccessService.md#listmyentitlements) | onLoad | The guest's upcoming tickets, so a visit day can suggest the ticket's venue (decided 28 September, audit R267); only when signed in | `ORDER_VIEW` |
+| `getCookieConsentRuntime` | [MarketingService](../backend/MarketingService.md#getcookieconsentruntime) | onLoad | Cookie banner on first visit and what the tag loader may load | `None` |
+| `recordDeviceConsent` | [MarketingService](../backend/MarketingService.md#recorddeviceconsent) | onAction | Accept all, reject non-essential or save preferences from the banner | `None` |
+| `listAnalyticsProviders` | [WhiteLabelService](../backend/WhiteLabelService.md#listanalyticsproviders) | onLoad | Analytics tags to inject once their consent category is granted | `TENANT_CONFIGURE` |
+| `decideRecommendations` | [AiService](../backend/AiService.md#deciderecommendations) | onLoad | Recommendation slot (homepage / loyalty placement: products, offers, rewards, challenges) | `AI_USE` |
+| `recordRecommendationEvents` | [AiService](../backend/AiService.md#recordrecommendationevents) | onAction | Report impressions, clicks and declines of recommended items | `AI_USE` |
+| `recordStorefrontSessionEvents` | [WhiteLabelService](../backend/WhiteLabelService.md#recordstorefrontsessionevents) | onLoad | Runtime-shell beacon of hashed browsing behaviour for fraud prevention (every page of the session; bound on the home screen as the shell's entry) | `None` |
 
 **States**
 
@@ -446,7 +452,7 @@
 | WEB-012 | Checkout — Payment | orderId, paymentId |  |
 | WEB-013 | Booking Confirmation | orderId |  |
 | WEB-011 | Enters contact details and answers consent |  |  |
-| WEB-016 | Login / Register |  |  |
+| WEB-016 | Login / Register | subjectId |  |
 | WEB-030 | They transfer three tickets | orderId |  |
 
 ## WEB-011 Guest Details & Attendee Forms
@@ -666,6 +672,7 @@
 |---|---|
 | cartId | session |
 | challengeId | navigation |
+| subjectId | navigation |
 
 **Operations**
 
@@ -684,6 +691,7 @@
 | `claimCart` | [OrderService](../backend/OrderService.md#claimcart) | onAction | Attach an anonymous cart to a guest | `None` |
 | `createMfaChallenge` | [IdentityService](../backend/IdentityService.md#createmfachallenge) | onAction | Ask for the second factor (`action: signIn`) when the session comes back `requiresMfa` at a venue with guest two-step verification on | `None` |
 | `verifyMfaChallenge` | [IdentityService](../backend/IdentityService.md#verifymfachallenge) | onAction | Check the second-factor code and release the session | `None` |
+| `claimDeviceConsent` | [MarketingService](../backend/MarketingService.md#claimdeviceconsent) | onAction | Attach this browser's cookie decision to the guest after sign-in or registration | `None` |
 
 **States**
 
@@ -703,10 +711,10 @@
 | WEB-017 | My Account Dashboard |  |  |
 | WEB-018 | My Tickets |  |  |
 | WEB-019 | Order History |  |  |
-| GST-039 | They set a profile |  |  |
 | WEB-010 | Signed in and verified — back to the cart | cartId | arrived from the cart |
 | WEB-011 | Guest Details & Attendee Forms |  |  |
 | WEB-012 | Checkout — Payment |  |  |
+| GST-039 | They set a profile | subjectId |  |
 
 ## WEB-017 My Account Dashboard
 
@@ -759,7 +767,7 @@
 
 | To | Trigger | Carries | Guard |
 |---|---|---|---|
-| WEB-016 | Login / Register |  |  |
+| WEB-016 | Login / Register | challengeId, subjectId |  |
 | WEB-018 | My Tickets |  |  |
 | WEB-019 | Order History |  |  |
 
@@ -833,6 +841,8 @@
 | Parameter | From |
 |---|---|
 | orderId | deepLink |
+| documentId | navigation |
+| invoiceId | navigation |
 
 **Operations**
 
@@ -843,6 +853,11 @@
 | `getOrder` | [OrderService](../backend/OrderService.md#getorder) | onAction | Read an order | `ORDER_VIEW` |
 | `listOrders` | [OrderService](../backend/OrderService.md#listorders) | onLoad | List orders | `ORDER_VIEW` |
 | `createRefundRequest` | [OrderService](../backend/OrderService.md#createrefundrequest) | onAction | Ask for a refund | `None` |
+| `listTaxInvoices` | [LedgerService](../backend/LedgerService.md#listtaxinvoices) | onLoad | List tax invoices | `LEDGER_VIEW` |
+| `issueTaxInvoice` | [LedgerService](../backend/LedgerService.md#issuetaxinvoice) | onAction | Issue a tax invoice | `LEDGER_POST` |
+| `getTaxInvoice` | [LedgerService](../backend/LedgerService.md#gettaxinvoice) | onLoad | Show a tax invoice | `LEDGER_VIEW` |
+| `listCreditMemos` | [LedgerService](../backend/LedgerService.md#listcreditmemos) | onLoad | List credit memos | `LEDGER_VIEW` |
+| `getTaxDocumentRendition` | [LedgerService](../backend/LedgerService.md#gettaxdocumentrendition) | onLoad | Download the invoice / credit memo PDF | `LEDGER_VIEW` |
 
 **States**
 
@@ -859,7 +874,7 @@
 
 | To | Trigger | Carries | Guard |
 |---|---|---|---|
-| WEB-016 | Login / Register |  |  |
+| WEB-016 | Login / Register | subjectId |  |
 | WEB-017 | My Account Dashboard |  |  |
 | WEB-018 | My Tickets | orderId |  |
 
@@ -892,6 +907,8 @@
 | `listConsentPurposes` | [MarketingService](../backend/MarketingService.md#listconsentpurposes) | onLoad | Configured consent purposes | `GUEST_VIEW` |
 | `verifyGuestEmail` | [IdentityService](../backend/IdentityService.md#verifyguestemail) | onAction | Send a verification link, or consume one | `GUEST_VIEW` |
 | `updateGuestPreferences` | [MarketingService](../backend/MarketingService.md#updateguestpreferences) | onAction | Change contact and consent preferences | `GUEST_MANAGE` |
+| `getMyIdentityVerification` | [IdentityService](../backend/IdentityService.md#getmyidentityverification) | onLoad | Show the guest's ID verification status | `None` |
+| `submitGuestIdentityDocument` | [IdentityService](../backend/IdentityService.md#submitguestidentitydocument) | onAction | Upload an ID document for verification | `None` |
 
 **States**
 
@@ -908,7 +925,7 @@
 
 | To | Trigger | Carries | Guard |
 |---|---|---|---|
-| WEB-016 | Login / Register |  |  |
+| WEB-016 | Login / Register | subjectId |  |
 | WEB-017 | My Account Dashboard |  |  |
 | WEB-018 | My Tickets |  |  |
 
@@ -1176,9 +1193,10 @@
 | Operation | Service | When | Purpose | Permission |
 |---|---|---|---|---|
 | `addCartLine` | [OrderService](../backend/OrderService.md#addcartline) | onAction | Add something | `None` |
-| `getUpsellSuggestions` | [CatalogueService](../backend/CatalogueService.md#getupsellsuggestions) | onAction | Suggestions for a cart | `PRODUCT_VIEW` |
 | `getBundle` | [CatalogueService](../backend/CatalogueService.md#getbundle) | onAction | A bundle offered as an upsell | `PRODUCT_VIEW` |
 | `listCatalogueBundles` | [CatalogueService](../backend/CatalogueService.md#listcataloguebundles) | onLoad | Which bundles apply here | `PRODUCT_VIEW` |
+| `decideRecommendations` | [AiService](../backend/AiService.md#deciderecommendations) | onLoad | Fill a recommendation slot | `AI_USE` |
+| `recordRecommendationEvents` | [AiService](../backend/AiService.md#recordrecommendationevents) | onAction | Report what happened to recommended items | `AI_USE` |
 
 **States**
 
@@ -1270,6 +1288,10 @@
 | `listPaymentTokens` | [OrderService](../backend/OrderService.md#listpaymenttokens) | onLoad | Saved cards on this account | `ORDER_VIEW` |
 | `storePaymentToken` | [OrderService](../backend/OrderService.md#storepaymenttoken) | onAction | Save a card for next time | `ORDER_CREATE` |
 | `transferWalletBalance` | [WalletService](../backend/WalletService.md#transferwalletbalance) | onAction | Move value between wallets | `WALLET_OPERATE` |
+| `getWalletAutoReloadSetting` | [WalletService](../backend/WalletService.md#getwalletautoreloadsetting) | onLoad | Show auto top-up | `WALLET_VIEW` |
+| `setWalletAutoReloadSetting` | [WalletService](../backend/WalletService.md#setwalletautoreloadsetting) | onAction | Set auto top-up | `WALLET_OPERATE` |
+| `getWalletExitBalance` | [WalletService](../backend/WalletService.md#getwalletexitbalance) | onLoad | Balance due / refundable at exit | `WALLET_VIEW` |
+| `settleWalletAtExit` | [WalletService](../backend/WalletService.md#settlewalletatexit) | onAction | Settle the wallet at exit | `WALLET_OPERATE` |
 
 **States**
 
@@ -1369,6 +1391,8 @@
 | `transferOrderTickets` | [OrderService](../backend/OrderService.md#transferordertickets) | onAction | Transfer tickets to another guest | `None` |
 | `getMyMemberships` | [CatalogueService](../backend/CatalogueService.md#getmymemberships) | onLoad | A guest's own memberships, benefits and history | `PRODUCT_VIEW` |
 | `listGuestMemberships` | [CatalogueService](../backend/CatalogueService.md#listguestmemberships) | onLoad | A guest's memberships, benefits and history | `PRODUCT_VIEW` |
+| `listInstalmentPlans` | [OrderService](../backend/OrderService.md#listinstalmentplans) | onLoad | Instalment plans and schedule | `PAYMENT_VIEW` |
+| `createInstalmentPlan` | [OrderService](../backend/OrderService.md#createinstalmentplan) | onAction | Pay in instalments | `ORDER_CREATE` |
 
 **States**
 
@@ -1890,6 +1914,8 @@
 | `listPromotions` | [CatalogueService](../backend/CatalogueService.md#listpromotions) | onLoad | List promotions | `PRICE_VIEW` |
 | `createReferral` | [MarketingService](../backend/MarketingService.md#createreferral) | onAction | Refer a friend | `MARKETING_MANAGE` |
 | `redeemLoyaltyPoints` | [MarketingService](../backend/MarketingService.md#redeemloyaltypoints) | onAction | Spend points | `LOYALTY_REDEEM` |
+| `decideRecommendations` | [AiService](../backend/AiService.md#deciderecommendations) | onLoad | Recommendation slot (homepage / loyalty placement: products, offers, rewards, challenges) | `AI_USE` |
+| `recordRecommendationEvents` | [AiService](../backend/AiService.md#recordrecommendationevents) | onAction | Report impressions, clicks and declines of recommended items | `AI_USE` |
 
 **States**
 
@@ -1921,6 +1947,7 @@
 |---|---|
 | conversationId | deepLink |
 | outletId | session |
+| messageId | navigation |
 
 **Operations**
 
@@ -1933,6 +1960,7 @@
 | `getGuestMenu` | [FnbService](../backend/FnbService.md#getguestmenu) | onLoad | The menu a guest sees | `None` |
 | `listAiConversations` | [AiService](../backend/AiService.md#listaiconversations) | onLoad | Earlier conversations | `AI_USE` |
 | `sendConversationMessage` | [MarketingService](../backend/MarketingService.md#sendconversationmessage) | onAction | Ask the concierge something | `CASE_MANAGE` |
+| `recordAnswerFeedback` | [AiService](../backend/AiService.md#recordanswerfeedback) | onAction | Say whether an answer helped | `AI_USE` |
 
 **States**
 
@@ -2101,6 +2129,10 @@
 | `enrolMfaMethod` | [IdentityService](../backend/IdentityService.md#enrolmfamethod) | onAction | Enrol an authenticator (email code as fallback) | `None` |
 | `verifyMfaEnrolment` | [IdentityService](../backend/IdentityService.md#verifymfaenrolment) | onAction | Confirm the enrolment with a first code | `None` |
 | `removeMfaMethod` | [IdentityService](../backend/IdentityService.md#removemfamethod) | onAction | Remove a method | `None` |
+| `getCookieConsentRuntime` | [MarketingService](../backend/MarketingService.md#getcookieconsentruntime) | onLoad | Preference centre: categories and the current decision | `None` |
+| `listPublishedTrackingTechnologies` | [MarketingService](../backend/MarketingService.md#listpublishedtrackingtechnologies) | onLoad | Each cookie's name, provider, purpose, expiry and party | `None` |
+| `getDeviceConsentHistory` | [MarketingService](../backend/MarketingService.md#getdeviceconsenthistory) | onLoad | My cookie decisions so far | `None` |
+| `recordDeviceConsent` | [MarketingService](../backend/MarketingService.md#recorddeviceconsent) | onAction | Change or withdraw cookie preferences | `None` |
 
 **States**
 
@@ -2359,5 +2391,5 @@
 |---|---|---|---|
 | WEB-007 | Choose seats on this departure | performanceId | the departure has a seat map |
 | WEB-010 | Continue to payment | cartId |  |
-| WEB-016 | Sign in to save or see favourite routes |  |  |
+| WEB-016 | Sign in to save or see favourite routes | subjectId |  |
 | WEB-001 | Home |  |  |

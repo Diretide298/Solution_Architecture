@@ -5,16 +5,16 @@
 | | |
 |---|---|
 | Screens | 30 |
-| Operations | 144 |
+| Operations | 148 |
 | Contracts | 20 |
 | Modules | 4 |
 | Undrawn | 0 |
-| Operations with no screen | 153 |
+| Operations with no screen | 151 |
 | Waves | wave1 27 · wave2 3 |
 
 ## Gaps
 
-### 153 operations with no screen here
+### 151 operations with no screen here
 
 **In a contract this platform uses, callable by its audience, and reaching no screen on any platform serving that audience.** Either a screen is missing or the endpoint should not exist — and the second is worth considering first.
 
@@ -60,7 +60,7 @@
 | `getPasswordPolicy` | identity | GET | Read the password and MFA policy in force |
 | `getPrincipalModuleAccess` | identity | GET | What this person may do, as ticks |
 | `listAccessDecisions` | identity | GET | What was decided, for whom, where and why |
-| … | | | 113 more |
+| … | | | 111 more |
 
 ### 2 modules split across waves
 
@@ -93,7 +93,7 @@
 | `POS-008` | Reports | Reports | 2 | 7 | yes |
 | `POS-009` | Staff Roster | Shift | 2 | 16 | yes |
 | `POS-010` | Add to Existing Ticket | Sell | 1 | 5 | yes |
-| `POS-011` | Returns, Refunds & Exchanges | Sell | 1 | 9 | yes |
+| `POS-011` | Returns, Refunds & Exchanges | Sell | 1 | 10 | yes |
 | `POS-012` | Omnichannel Order & Fulfilment Center | Sell | 1 | 7 | yes |
 | `POS-013` | Mobile POS, Event Sales & Offline Operations | Sell | 1 | 8 | yes |
 | `POS-014` | Sales Exceptions, Controls & Operational Actions | Sell | 1 | 3 | yes |
@@ -108,7 +108,7 @@
 | `POS-023` | Sell — Merchandise | Sell | 1 | 5 | yes |
 | `POS-024` | Outlet Setup | Sell | 1 | 5 | yes |
 | `POS-025` | Till Home | Sell | 1 | 5 | yes |
-| `POS-026` | Receipt & Reprint | Sell | 1 | 3 | yes |
+| `POS-026` | Receipt & Reprint | Sell | 1 | 6 | yes |
 | `POS-027` | Guest Lookup | Sell | 1 | 2 | yes |
 | `POS-028` | Table Service | Sell | 1 | 8 | yes |
 | `POS-029` | Order Queue | Sell | 1 | 4 | yes |

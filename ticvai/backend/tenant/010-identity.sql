@@ -1,4 +1,4 @@
--- identity — 27 tables
+-- identity — 31 tables
 -- **Derived. Do not hand-edit.**
 
 -- Holds 11 columns. No description has been written for this table — the name is the only thing
@@ -66,6 +66,47 @@ CREATE TABLE IF NOT EXISTS identity.access_policy_version (
     current_id                        uuid,
     scope_path                        ltree NOT NULL,
     id                                uuid PRIMARY KEY NOT NULL
+);
+
+-- Holds 17 columns. No description has been written for this table — the name is the only thing
+-- saying what it is. Reached by: 4 operations read it and 2 write it; 1 tables reference it.
+CREATE TABLE IF NOT EXISTS identity.access_review_campaign (
+    id                                uuid PRIMARY KEY,
+    name                              text NOT NULL CONSTRAINT access_review_campaign_name_chk CHECK (char_length(name) <= 200),
+    scope_path                        ltree NOT NULL,
+    role_ids                          text[],
+    reviewer_mode                     text NOT NULL CONSTRAINT access_review_campaign_reviewer_mode_chk CHECK (reviewer_mode IN ('lineManager', 'named')),
+    reviewer_principal_ids            text[],
+    due_at                            timestamptz NOT NULL,
+    recurrence                        text DEFAULT 'none' CONSTRAINT access_review_campaign_recurrence_chk CHECK (recurrence IN ('none', 'quarterly', 'semiAnnual', 'annual')),
+    prefill_from_findings             boolean DEFAULT true,
+    lookback_days                     integer DEFAULT 90,
+    status                            text CONSTRAINT access_review_campaign_status_chk CHECK (status IN ('open', 'completed', 'expired')),
+    item_count                        integer,
+    decided_count                     integer,
+    revoked_count                     integer,
+    created_by_principal_id           uuid,
+    created_at                        timestamptz,
+    closed_at                         timestamptz
+);
+
+-- Holds 14 columns. No description has been written for this table — the name is the only thing
+-- saying what it is. Reached by: 2 operations read it and 2 write it.
+CREATE TABLE IF NOT EXISTS identity.access_review_item (
+    id                                uuid PRIMARY KEY,
+    campaign_id                       uuid NOT NULL,
+    delegated_access_id               uuid NOT NULL,
+    principal_id                      uuid NOT NULL,
+    role_id                           uuid,
+    scope_path                        ltree NOT NULL,
+    reviewer_principal_id             uuid,
+    finding_kind                      text DEFAULT 'none' CONSTRAINT access_review_item_finding_kind_chk CHECK (finding_kind IN ('none', 'excessive', 'conflicting')),
+    last_used_at                      timestamptz,
+    recommendation                    text CONSTRAINT access_review_item_recommendation_chk CHECK (recommendation IN ('certify', 'revoke', 'review')),
+    status                            text NOT NULL CONSTRAINT access_review_item_status_chk CHECK (status IN ('pending', 'certified', 'revoked', 'notReviewed')),
+    decided_by_principal_id           uuid,
+    decided_at                        timestamptz,
+    reason                            text CONSTRAINT access_review_item_reason_chk CHECK (char_length(reason) <= 1000)
 );
 
 -- Written by the authorisation layer on every call, not by an operation Hangs off: reaches
@@ -144,6 +185,42 @@ CREATE TABLE IF NOT EXISTS identity.delegated_access (
     granted_by_principal_id           uuid NOT NULL,
     revoked_by_principal_id           uuid,
     scope_id                          uuid NOT NULL
+);
+
+-- Holds 13 columns. No description has been written for this table — the name is the only thing
+-- saying what it is. Reached by: 4 operations read it and 2 write it.
+CREATE TABLE IF NOT EXISTS identity.guest_identity_verification (
+    id                                uuid PRIMARY KEY NOT NULL,
+    subject_id                        uuid NOT NULL,
+    subject_document_id               uuid,
+    document_kind                     text CONSTRAINT guest_identity_verification_document_kind_chk CHECK (document_kind IN ('passport', 'emiratesId', 'nationalId', 'drivingLicence', 'residencePermit', 'other')),
+    document_number_last4             text CONSTRAINT guest_identity_verification_document_number_last4_chk CHECK (char_length(document_number_last4) <= 4),
+    reason                            text CONSTRAINT guest_identity_verification_reason_chk CHECK (reason IN ('policyRequired', 'ageRestrictedPurchase', 'residentPricing', 'accountRecovery')),
+    status                            text NOT NULL CONSTRAINT guest_identity_verification_status_chk CHECK (status IN ('pending', 'verified', 'rejected', 'resubmissionRequested')),
+    method                            text CONSTRAINT guest_identity_verification_method_chk CHECK (method IN ('manualReview', 'documentScanner', 'provider')),
+    decision_reason                   text CONSTRAINT guest_identity_verification_decision_reason_chk CHECK (char_length(decision_reason) <= 300),
+    decided_by_principal_id           uuid,
+    submitted_at                      timestamptz NOT NULL,
+    decided_at                        timestamptz,
+    document_image_deleted_at         timestamptz
+);
+
+-- Holds 13 columns. No description has been written for this table — the name is the only thing
+-- saying what it is. Reached by: 4 operations read it and 1 write it.
+CREATE TABLE IF NOT EXISTS identity.guest_verification_policy (
+    id                                uuid PRIMARY KEY,
+    scope_path                        ltree NOT NULL,
+    registration_requires             text[] NOT NULL,
+    id_document_required_for          text[],
+    wallet_top_up_limit               numeric(18,4),
+    accepted_document_kinds           text[],
+    uae_pass_satisfies_id_document    boolean DEFAULT true,
+    is_social_login_counts_as_email_verified boolean DEFAULT true,
+    is_selfie_required                boolean DEFAULT false,
+    review_mode                       text DEFAULT 'manual' CONSTRAINT guest_verification_policy_review_mode_chk CHECK (review_mode IN ('manual', 'provider', 'providerThenManual')),
+    document_image_retention          text DEFAULT 'deleteOnDecision' CONSTRAINT guest_verification_policy_document_image_retention_chk CHECK (document_image_retention IN ('deleteOnDecision', 'keepUntilDocumentExpiry')),
+    max_resubmissions                 integer DEFAULT 3,
+    updated_at                        timestamptz
 );
 
 -- Holds 7 columns. No description has been written for this table — the name is the only thing
@@ -334,11 +411,11 @@ CREATE TABLE IF NOT EXISTS identity.role (
 );
 
 -- child of role, returned nested Hangs off: a child of identity.role; reaches identity.principal
--- through its keys; references identity.principal, identity.role. Reached by: 3 operations read it
+-- through its keys; references identity.principal, identity.role. Reached by: 6 operations read it
 -- and 1 write it.
 CREATE TABLE IF NOT EXISTS identity.role_permission (
     role_id                           uuid NOT NULL,
-    permission                        text NOT NULL CONSTRAINT role_permission_permission_chk CHECK (permission IN ('SESSION_FORCE_LOGOUT', 'USER_MANAGE', 'ROLE_MANAGE', 'PERMISSION_GRANT', 'PERMISSION_VIEW', 'PERMISSION_MANAGE', 'PLATFORM_TENANT_VIEW', 'PLATFORM_TENANT_MANAGE', 'PLATFORM_TENANT_TERMINATE', 'PLATFORM_PLAN_MANAGE', 'PLATFORM_CELL_VIEW', 'PLATFORM_CELL_MANAGE', 'PLATFORM_BILLING_VIEW', 'PLATFORM_BILLING_MANAGE', 'PLATFORM_RELEASE_VIEW', 'PLATFORM_RELEASE_MANAGE', 'PLATFORM_RELEASE_PROMOTE', 'PLATFORM_MIGRATION_VIEW', 'PLATFORM_MIGRATION_APPLY', 'PLATFORM_TENANT_ACCESS', 'TENANT_CONFIGURE', 'TENANT_VIEW', 'TENANT_PUBLISH', 'SCOPE_VIEW', 'SCOPE_MANAGE', 'REGION_CONFIGURE', 'WORKSTATION_CONFIGURE', 'PRODUCT_VIEW', 'PRODUCT_CONFIGURE', 'PRODUCT_APPROVE', 'PRODUCT_PUBLISH', 'PRICE_VIEW', 'PRICE_CONFIGURE', 'EVENT_CONFIGURE', 'PERFORMANCE_CONFIGURE', 'CAPACITY_CONFIGURE', 'ORDER_VIEW', 'ORDER_VIEW_OTHER', 'ORDER_CREATE', 'ORDER_MODIFY', 'ORDER_DISCOUNT', 'ORDER_CANCEL', 'ORDER_VOID', 'ORDER_REFUND', 'ORDER_REFUND_APPROVE', 'ORDER_REFUND_BULK', 'ORDER_EXCHANGE', 'ORDER_RESCHEDULE', 'ORDER_REPRINT', 'PRICE_OVERRIDE', 'DISCOUNT_APPLY', 'CREDIT_MANAGE', 'CREDIT_OVERRIDE', 'WALLET_VIEW', 'WALLET_OPERATE', 'WALLET_CONFIGURE', 'PAYMENT_VIEW', 'PAYMENT_CONFIGURE', 'PAYMENT_PROVIDER_MANAGE', 'PAYMENT_DISPUTE', 'SHIFT_OPEN', 'SHIFT_CLOSE', 'SHIFT_SUSPEND', 'SHIFT_CLOSE_OTHER', 'SHIFT_APPROVE_OPEN', 'SHIFT_APPROVE_CLOSE', 'SHIFT_REOPEN', 'CASH_LIFT', 'CASH_ADD', 'CASH_NO_SALE', 'DEPOSIT_BOX_MODIFY_OWN', 'DEPOSIT_BOX_MODIFY_OTHER', 'OVERSHORT_ACCEPT', 'ACCESS_VALIDATE', 'ACCESS_OVERRIDE', 'ACCESS_POINT_CONFIGURE', 'TURNSTILE_MODE_SET', 'TICKET_LOOKUP', 'ACCREDITATION_VIEW', 'ACCREDITATION_APPLY', 'ACCREDITATION_APPROVE', 'ACCREDITATION_ISSUE', 'ACCREDITATION_MANAGE', 'ACCREDITATION_CONFIGURE', 'REPORT_VIEW_OWN', 'REPORT_VIEW_WORKSTATION', 'REPORT_VIEW_VENUE', 'REPORT_VIEW_REGION', 'REPORT_VIEW_TENANT', 'REPORT_EXPORT', 'REPORT_EXPORT_PII', 'REPORT_MANAGE', 'REPORT_SCHEDULE', 'LEDGER_VIEW', 'LEDGER_POST', 'LEDGER_APPROVE', 'TAX_CONFIGURE', 'ACCOUNT_CONFIGURE', 'SETTLEMENT_VIEW', 'SETTLEMENT_RECONCILE', 'GUEST_VIEW', 'GUEST_VIEW_PII', 'GUEST_MANAGE', 'VENUE_MAP_VIEW', 'VENUE_MAP_MANAGE', 'VENUE_MAP_PUBLISH', 'RESOURCE_VIEW', 'RESOURCE_BOOK', 'RESOURCE_MANAGE', 'RESOURCE_CONFIGURE', 'RENTAL_VIEW', 'RENTAL_BOOK', 'RENTAL_OPERATE', 'RENTAL_MANAGE', 'RENTAL_CONFIGURE', 'RENTAL_PRICE', 'RENTAL_APPROVE', 'RENTAL_OVERRIDE', 'DEVELOPER_VIEW', 'DEVELOPER_MANAGE', 'DEVELOPER_ADMIN', 'LOYALTY_ACCRUE', 'LOYALTY_REDEEM', 'LOYALTY_ADJUST', 'MARKETING_VIEW', 'MARKETING_MANAGE', 'MARKETING_SEND', 'CASE_VIEW', 'CASE_MANAGE', 'ASSET_LIBRARY_VIEW', 'ASSET_LIBRARY_MANAGE', 'ASSET_LIBRARY_APPROVE', 'ASSET_LIBRARY_SHARE', 'QUEUE_VIEW', 'QUEUE_MANAGE', 'QUEUE_REDEEM', 'QUEUE_OVERRIDE', 'TRANSPORT_VIEW', 'TRANSPORT_MANAGE', 'TRANSPORT_PRICE', 'ASSET_VIEW', 'ASSET_MANAGE', 'WORK_ORDER_VIEW', 'WORK_ORDER_MANAGE', 'WORK_ORDER_VERIFY', 'INSPECTION_VIEW', 'INSPECTION_SUBMIT', 'INSPECTION_MANAGE', 'INCIDENT_REPORT', 'INCIDENT_VIEW', 'INCIDENT_MANAGE', 'KIOSK_ATTEND', 'DEVICE_VIEW', 'DEVICE_CONFIGURE', 'DEVICE_MANAGE', 'APPROVAL_ACT', 'APPROVAL_DELEGATE', 'AI_USE', 'AI_CONFIGURE', 'AI_APPROVE', 'AI_AUDIT_VIEW', 'AUDIT_VIEW', 'APPROVAL_VIEW', 'APPROVAL_REQUEST', 'APPROVAL_DECIDE', 'APPROVAL_CONFIGURE', 'MAINTENANCE_EXECUTE', 'MAINTENANCE_APPROVE', 'WORKFORCE_VIEW', 'WORKFORCE_MANAGE', 'ATTENDANCE_RECORD', 'ANNOUNCEMENT_PUBLISH', 'ANNOUNCEMENT_EMERGENCY', 'PARTNER_VIEW', 'PARTNER_MANAGE', 'PARKING_CONFIGURE', 'PAYMENT_VOID', 'PROCUREMENT_VIEW', 'PROCUREMENT_REQUEST', 'PROCUREMENT_MANAGE', 'PROCUREMENT_RECEIVE')),
+    permission                        text NOT NULL CONSTRAINT role_permission_permission_chk CHECK (permission IN ('SESSION_FORCE_LOGOUT', 'USER_MANAGE', 'ROLE_MANAGE', 'PERMISSION_GRANT', 'PERMISSION_VIEW', 'PERMISSION_MANAGE', 'PLATFORM_TENANT_VIEW', 'PLATFORM_TENANT_MANAGE', 'PLATFORM_TENANT_TERMINATE', 'PLATFORM_PLAN_MANAGE', 'PLATFORM_CELL_VIEW', 'PLATFORM_CELL_MANAGE', 'PLATFORM_BILLING_VIEW', 'PLATFORM_AI_MANAGE', 'PLATFORM_BILLING_MANAGE', 'PLATFORM_RELEASE_VIEW', 'PLATFORM_RELEASE_MANAGE', 'PLATFORM_RELEASE_PROMOTE', 'PLATFORM_MIGRATION_VIEW', 'PLATFORM_MIGRATION_APPLY', 'PLATFORM_TENANT_ACCESS', 'TENANT_CONFIGURE', 'TENANT_VIEW', 'TENANT_PUBLISH', 'SCOPE_VIEW', 'SCOPE_MANAGE', 'REGION_CONFIGURE', 'WORKSTATION_CONFIGURE', 'PRODUCT_VIEW', 'PRODUCT_CONFIGURE', 'PRODUCT_APPROVE', 'PRODUCT_PUBLISH', 'PRICE_VIEW', 'PRICE_CONFIGURE', 'EVENT_CONFIGURE', 'PERFORMANCE_CONFIGURE', 'CAPACITY_CONFIGURE', 'ORDER_VIEW', 'ORDER_VIEW_OTHER', 'ORDER_CREATE', 'ORDER_MODIFY', 'ORDER_DISCOUNT', 'ORDER_CANCEL', 'ORDER_VOID', 'ORDER_REFUND', 'ORDER_REFUND_APPROVE', 'ORDER_REFUND_BULK', 'ORDER_EXCHANGE', 'ORDER_RESCHEDULE', 'ORDER_REPRINT', 'PRICE_OVERRIDE', 'DISCOUNT_APPLY', 'CREDIT_MANAGE', 'CREDIT_OVERRIDE', 'WALLET_VIEW', 'WALLET_OPERATE', 'WALLET_CONFIGURE', 'PAYMENT_VIEW', 'PAYMENT_CONFIGURE', 'PAYMENT_PROVIDER_MANAGE', 'PAYMENT_DISPUTE', 'SHIFT_OPEN', 'SHIFT_CLOSE', 'SHIFT_SUSPEND', 'SHIFT_CLOSE_OTHER', 'SHIFT_APPROVE_OPEN', 'SHIFT_APPROVE_CLOSE', 'SHIFT_REOPEN', 'CASH_LIFT', 'CASH_ADD', 'CASH_NO_SALE', 'DEPOSIT_BOX_MODIFY_OWN', 'DEPOSIT_BOX_MODIFY_OTHER', 'OVERSHORT_ACCEPT', 'ACCESS_VALIDATE', 'ACCESS_OVERRIDE', 'ACCESS_POINT_CONFIGURE', 'TURNSTILE_MODE_SET', 'TICKET_LOOKUP', 'ACCREDITATION_VIEW', 'ACCREDITATION_APPLY', 'ACCREDITATION_APPROVE', 'ACCREDITATION_ISSUE', 'ACCREDITATION_MANAGE', 'ACCREDITATION_CONFIGURE', 'REPORT_VIEW_OWN', 'REPORT_VIEW_WORKSTATION', 'REPORT_VIEW_VENUE', 'REPORT_VIEW_REGION', 'REPORT_VIEW_TENANT', 'REPORT_EXPORT', 'REPORT_EXPORT_PII', 'REPORT_MANAGE', 'REPORT_SCHEDULE', 'LEDGER_VIEW', 'LEDGER_POST', 'LEDGER_APPROVE', 'TAX_CONFIGURE', 'ACCOUNT_CONFIGURE', 'SETTLEMENT_VIEW', 'SETTLEMENT_RECONCILE', 'GUEST_VIEW', 'GUEST_VIEW_PII', 'GUEST_MANAGE', 'VENUE_MAP_VIEW', 'VENUE_MAP_MANAGE', 'VENUE_MAP_PUBLISH', 'RESOURCE_VIEW', 'RESOURCE_BOOK', 'RESOURCE_MANAGE', 'RESOURCE_CONFIGURE', 'RENTAL_VIEW', 'RENTAL_BOOK', 'RENTAL_OPERATE', 'RENTAL_MANAGE', 'RENTAL_CONFIGURE', 'RENTAL_PRICE', 'RENTAL_APPROVE', 'RENTAL_OVERRIDE', 'DEVELOPER_VIEW', 'DEVELOPER_MANAGE', 'DEVELOPER_ADMIN', 'LOYALTY_ACCRUE', 'LOYALTY_REDEEM', 'LOYALTY_ADJUST', 'MARKETING_VIEW', 'MARKETING_MANAGE', 'MARKETING_SEND', 'CASE_VIEW', 'CASE_MANAGE', 'ASSET_LIBRARY_VIEW', 'ASSET_LIBRARY_MANAGE', 'ASSET_LIBRARY_APPROVE', 'ASSET_LIBRARY_SHARE', 'QUEUE_VIEW', 'QUEUE_MANAGE', 'QUEUE_REDEEM', 'QUEUE_OVERRIDE', 'TRANSPORT_VIEW', 'TRANSPORT_MANAGE', 'TRANSPORT_PRICE', 'ASSET_VIEW', 'ASSET_MANAGE', 'WORK_ORDER_VIEW', 'WORK_ORDER_MANAGE', 'WORK_ORDER_VERIFY', 'INSPECTION_VIEW', 'INSPECTION_SUBMIT', 'INSPECTION_MANAGE', 'INCIDENT_REPORT', 'INCIDENT_VIEW', 'INCIDENT_MANAGE', 'KIOSK_ATTEND', 'DEVICE_VIEW', 'DEVICE_CONFIGURE', 'DEVICE_MANAGE', 'APPROVAL_ACT', 'APPROVAL_DELEGATE', 'AI_USE', 'AI_CONFIGURE', 'AI_APPROVE', 'AI_AUDIT_VIEW', 'RISK_REVIEW', 'RISK_INVESTIGATE', 'AUDIT_VIEW', 'APPROVAL_VIEW', 'APPROVAL_REQUEST', 'APPROVAL_DECIDE', 'APPROVAL_CONFIGURE', 'MAINTENANCE_EXECUTE', 'MAINTENANCE_APPROVE', 'WORKFORCE_VIEW', 'WORKFORCE_MANAGE', 'ATTENDANCE_RECORD', 'ANNOUNCEMENT_PUBLISH', 'ANNOUNCEMENT_EMERGENCY', 'PARTNER_VIEW', 'PARTNER_MANAGE', 'PARKING_CONFIGURE', 'PAYMENT_VOID', 'PROCUREMENT_VIEW', 'PROCUREMENT_REQUEST', 'PROCUREMENT_MANAGE', 'PROCUREMENT_RECEIVE')),
     granted_at                        timestamptz,
     granted_by_principal_id           uuid,
     is_active                         boolean DEFAULT true,

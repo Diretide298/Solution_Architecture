@@ -1,0 +1,37 @@
+id: LLD-Access review campaign
+title: Access review campaign — 2 transitions
+generatedBy: tools/derive-diagrams.py
+index: diagrams/hld/04-lifecycles.yaml
+source: states/access-review-campaign.yaml
+entity: Access review campaign
+contract: identity
+enum: IdentityAccessReviewCampaign.status
+enumKind: inline
+enumSchema: IdentityAccessReviewCampaign
+enumProperty: status
+owner: identity
+description: '**A periodic access review.** Created `open` by `createAccessReviewCampaign` with one
+  item per grant in scope; it closes when every item is decided or when `dueAt` passes.'
+initial:
+- open
+terminal:
+- completed
+- expired
+transitions:
+- from: open
+  to: completed
+  operation: decideAccessReviewItem
+  trigger: operation
+  guard: The decision just recorded was the last pending item
+- from: open
+  to: expired
+  trigger: timer
+  guard: '`dueAt` passed with items still pending. **They become `notReviewed` and their grants are
+    left as they are** — the report names what nobody looked at rather than revoking it'
+notes: '**Nothing revokes on expiry.** An access review that silently removes whatever nobody reviewed
+  locks people out of their work on the morning after the deadline, and the next review would then start
+  from a false picture.
+
+
+  A campaign with `recurrence` is followed by a new campaign on the same terms, created by the job that
+  closes this one; the new one is a new record in `open`, not a transition of this one.'

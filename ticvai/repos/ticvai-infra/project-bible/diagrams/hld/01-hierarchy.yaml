@@ -34,17 +34,17 @@ levels:
 - level: tenant
   branch: root
   parent: null
-  operations: 475
-  configurations: 88
+  operations: 542
+  configurations: 105
   configuredBy:
   - claimCustomDomain
+  - configureAiCapability
+  - configureAssistantProfile
+  - configureForecastSignalSource
+  - configureRiskStrategy
   - createAccessPolicy
-  - createCreditType
-  - createDashboard
-  - createInspectionTemplate
-  - createKnowledgeCollection
-  - createKpi
-  - createLoyaltyProgramme
+  - createAiGovernancePolicyDraft
+  - createAiPolicyException
   owns:
   - Plans and licences
   - Roles and permissions
@@ -68,7 +68,7 @@ levels:
 - level: region
   branch: organisational
   parent: brand
-  operations: 56
+  operations: 64
   configurations: 11
   configuredBy:
   - createSeatMapTemplate
@@ -91,17 +91,17 @@ levels:
 - level: venue
   branch: organisational
   parent: region
-  operations: 1808
-  configurations: 164
+  operations: 1930
+  configurations: 172
   configuredBy:
+  - cloneAccreditationProgramme
   - cloneReaderConfiguration
   - cloneTicketTemplate
+  - configureAnomalyDetector
   - configureQueueFeed
   - configureWorkstation
   - createAccreditationProgramme
   - createAdmissionRules
-  - createConsentQuestion
-  - createDonationCampaign
   owns:
   - Almost everything operational
   - Kitchen SLA and section layout

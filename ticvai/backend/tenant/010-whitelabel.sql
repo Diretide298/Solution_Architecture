@@ -1,5 +1,25 @@
--- whitelabel — 19 tables
+-- whitelabel — 20 tables
 -- **Derived. Do not hand-edit.**
+
+-- An analytics platform a storefront or app reports to, per venue: which provider, its property or
+-- container id and which consent category gates it. The banner's consent-mode signals are what
+-- switch it on, so a provider with no category never loads. Reached by: 3 operations read it and 1
+-- write it.
+CREATE TABLE IF NOT EXISTS whitelabel.analytics_provider (
+    id                                uuid PRIMARY KEY,
+    venue_id                          uuid,
+    provider                          text NOT NULL CONSTRAINT analytics_provider_provider_chk CHECK (provider IN ('googleAnalytics4', 'googleTagManager', 'adobeAnalytics', 'metaPixel', 'matomo', 'other')),
+    provider_label                    text CONSTRAINT analytics_provider_provider_label_chk CHECK (char_length(provider_label) <= 100),
+    measurement_id                    text NOT NULL CONSTRAINT analytics_provider_measurement_id_chk CHECK (char_length(measurement_id) <= 100),
+    surfaces                          text[] NOT NULL,
+    consent_category                  text NOT NULL DEFAULT 'analytics' CONSTRAINT analytics_provider_consent_category_chk CHECK (consent_category IN ('functional', 'analytics', 'personalisation', 'marketing')),
+    is_enabled                        boolean NOT NULL DEFAULT true,
+    reporting_property_id             text CONSTRAINT analytics_provider_reporting_property_id_chk CHECK (char_length(reporting_property_id) <= 100),
+    reporting_credential_ref          text CONSTRAINT analytics_provider_reporting_credential_ref_chk CHECK (char_length(reporting_credential_ref) <= 200),
+    has_reporting_credential          boolean,
+    scope_path                        ltree NOT NULL,
+    updated_at                        timestamptz
+);
 
 -- A notice on a tenant storefront, scheduled
 CREATE TABLE IF NOT EXISTS whitelabel.banner (

@@ -1,5 +1,5 @@
 id: LLD-WhiteLabelService
-title: WhiteLabelService — 60 operations, 19 tables
+title: WhiteLabelService — 64 operations, 20 tables
 generatedBy: tools/derive-diagrams.py
 tier: platform
 index: diagrams/hld/02-services.yaml
@@ -9,20 +9,20 @@ why: Branding, content, navigation and the tenant's own app configuration. Separ
 scale: Read-heavy and heavily cached. Published, not queried.
 ifDown: Down freezes the current published config. Guests see the last good version.
 coverage:
-  operations: 60
+  operations: 64
   inAFlow: 24
-  percent: 40%
+  percent: 38%
   note: '**Flow coverage is how much of this service a journey has walked.** A service under 40% is
     unwalked rather than under-documented.'
 schemas:
 - schema: whitelabel
-  tables: 19
+  tables: 20
   stores:
   - postgres
   largestTable: whitelabel.tenant_config
 operationsByContract:
 - contract: white-label
-  count: 60
+  count: 64
   operations:
   - operation: claimCustomDomain
     verb: POST
@@ -192,6 +192,14 @@ operationsByContract:
     offline: true
     reads: 3
     writes: 0
+  - operation: getStorefrontInsights
+    verb: GET
+    path: /tenant-config/analytics-insights
+    scope: venue
+    permission: MARKETING_VIEW
+    offline: false
+    reads: 1
+    writes: 0
   - operation: getTenantAppStatus
     verb: GET
     path: /tenant-config/status
@@ -216,6 +224,14 @@ operationsByContract:
     offline: false
     reads: 2
     writes: 1
+  - operation: listAnalyticsProviders
+    verb: GET
+    path: /tenant-config/analytics-providers
+    scope: venue
+    permission: TENANT_CONFIGURE
+    offline: false
+    reads: 1
+    writes: 0
   - operation: listBanners
     verb: GET
     path: /tenant-config/banners
@@ -312,6 +328,14 @@ operationsByContract:
     offline: false
     reads: 2
     writes: 4
+  - operation: recordStorefrontSessionEvents
+    verb: POST
+    path: /storefront/session-events
+    scope: tenant
+    permission: null
+    offline: false
+    reads: 1
+    writes: 2
   - operation: relinquishCustomDomain
     verb: DELETE
     path: /tenant-domains/{domainId}
@@ -328,6 +352,14 @@ operationsByContract:
     offline: false
     reads: 9
     writes: 7
+  - operation: setAnalyticsProvider
+    verb: PUT
+    path: /tenant-config/analytics-providers
+    scope: venue
+    permission: TENANT_CONFIGURE
+    offline: false
+    reads: 2
+    writes: 2
   - operation: setAppIcons
     verb: PUT
     path: /tenant-config/app-icons
@@ -529,7 +561,9 @@ tables:
   - deletePromoBlock
   - publishContentBlock
   - publishTenantConfig
+  - recordStorefrontSessionEvents
   - restoreConfigVersion
+  - setAnalyticsProvider
   - setAppIcons
   - setBookingFlowConfig
   - setBrandIdentity
@@ -563,7 +597,9 @@ tables:
   - deletePromoBlock
   - publishContentBlock
   - publishTenantConfig
+  - recordStorefrontSessionEvents
   - restoreConfigVersion
+  - setAnalyticsProvider
   - setAppIcons
   - setBookingFlowConfig
   - setBrandIdentity
@@ -619,6 +655,13 @@ tables:
     or bumps — permissions, configuration, a price list, and whether child scopes under its `scope_path`
     are affected — is not recorded for any operation, so a writer here cannot yet be implemented from
     the package alone.'
+- table: whitelabel.analytics_provider
+  columns: 13
+  store: postgres
+  parent: null
+  writtenBy:
+  - white-label
+  foreignWriters: null
 - table: whitelabel.banner
   columns: 12
   store: postgres
@@ -775,7 +818,7 @@ writesOutside:
     tables:
     - control.content_block
 - service: TenancyService
-  operations: 1
+  operations: 2
   rule: 'ADR-0028: the owner defines the row; a foreign writer may only append, through a path the owner
     published.'
   why: '**The lineage records these writes, not how they honour the rule.** It does not say whether
@@ -783,6 +826,9 @@ writesOutside:
     against ADR-0028.'
   writes:
   - operation: publishTenantConfig
+    tables:
+    - platform.outbox
+  - operation: recordStorefrontSessionEvents
     tables:
     - platform.outbox
 screens:

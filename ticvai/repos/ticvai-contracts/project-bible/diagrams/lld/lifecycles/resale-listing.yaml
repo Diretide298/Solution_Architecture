@@ -52,6 +52,8 @@ transitions:
   guard: '**The buyer becomes the owner of the same entitlement; its media is re-issued and the transfer
     is logged** (MoM 1 Sep 4.14: the virtual ticket ID is preserved) — the media that admits is always
     one the venue issued'
+  emits:
+  - entitlement.transferred
 - from: reserved
   to: listed
   operation: createResaleListing

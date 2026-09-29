@@ -31,6 +31,12 @@ consumers:
   idempotencyKey: fiscalPeriodId
   onFailure: retryThenDeadLetter
   isCritical: true
+- context: ai
+  purpose: Close the forecast accuracy window for the period against figures that will not move again
+    (AI system design section 3.2)
+  idempotencyKey: fiscalPeriodId
+  onFailure: retry
+  isCritical: false
 retention: Retained with the period. This is an audit record, not an operational message
 notes: '**Billing consumes this rather than a timer.** Invoicing on a calendar date while the period
   is still closing bills against figures that are still moving.'

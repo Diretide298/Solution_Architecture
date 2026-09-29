@@ -1,5 +1,5 @@
 id: LLD-tenancy
-title: tenancy — 48 operations
+title: tenancy — 53 operations
 generatedBy: tools/derive-diagrams.py
 index: diagrams/hld/03-contracts.yaml
 tier: spine
@@ -21,6 +21,21 @@ operations:
   - cache:idempotency
   - platform.device
   - platform.workstation
+- operation: createDeviceFirmware
+  verb: POST
+  path: /device-firmware
+  scope: tenant
+  permission: DEVICE_MANAGE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - assets.media_asset
+  - cache:idempotency
+  - tenancy.device_firmware
+  writes:
+  - cache:idempotency
+  - tenancy.device_firmware
 - operation: createOrgUnit
   verb: POST
   path: /org-units
@@ -92,9 +107,12 @@ operations:
   - staff
   offline: false
   reads:
+  - cache:idempotency
   - platform.device
   writes:
+  - cache:idempotency
   - platform.device
+  - platform.outbox
 - operation: getConfigurationProfile
   verb: GET
   path: /configuration-profiles/{profileId}
@@ -127,6 +145,18 @@ operations:
   offline: false
   reads:
   - platform.device
+  writes: []
+- operation: getDeviceFirmware
+  verb: GET
+  path: /device-firmware/{firmwareId}
+  scope: tenant
+  permission: DEVICE_VIEW
+  audience:
+  - staff
+  offline: false
+  reads:
+  - platform.device
+  - tenancy.device_firmware
   writes: []
 - operation: getDeviceTelemetry
   verb: GET
@@ -283,6 +313,17 @@ operations:
   reads:
   - platform.configuration_profile
   writes: []
+- operation: listDataRetentionSettings
+  verb: GET
+  path: /data-retention-settings
+  scope: tenant
+  permission: TENANT_VIEW
+  audience:
+  - staff
+  offline: false
+  reads:
+  - tenancy.data_retention_setting
+  writes: []
 - operation: listDeviceAuditRecords
   verb: GET
   path: /devices/{deviceId}/audit
@@ -303,6 +344,7 @@ operations:
   - staff
   offline: false
   reads:
+  - platform.device
   - tenancy.device_firmware
   writes: []
 - operation: listDeviceTamperEvents
@@ -399,6 +441,7 @@ operations:
   - platform.device
   writes:
   - platform.device
+  - platform.outbox
 - operation: recordDeviceTamperEvent
   verb: POST
   path: /device-tamper-events
@@ -408,8 +451,10 @@ operations:
   - staff
   offline: true
   reads:
+  - platform.device
   - tenancy.device_tamper_event
   writes:
+  - platform.outbox
   - tenancy.device_tamper_event
 - operation: registerDevice
   verb: POST
@@ -449,8 +494,12 @@ operations:
   - staff
   offline: false
   reads:
+  - cache:idempotency
   - tenancy.device_rollout
-  writes: []
+  writes:
+  - cache:idempotency
+  - platform.outbox
+  - tenancy.device_rollout
 - operation: setConfigurationProfile
   verb: PUT
   path: /configuration-profiles
@@ -481,6 +530,20 @@ operations:
   - cache:idempotency
   - cache:resolution
   - platform.connectivity_policy
+- operation: setDataRetentionSetting
+  verb: PUT
+  path: /data-retention-settings/{dataClass}
+  scope: tenant
+  permission: TENANT_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - cache:idempotency
+  - tenancy.data_retention_setting
+  writes:
+  - cache:idempotency
+  - tenancy.data_retention_setting
 - operation: setDeviceAssignment
   verb: PUT
   path: /devices/{deviceId}/assignment
@@ -493,6 +556,24 @@ operations:
   - tenancy.device_assignment
   writes:
   - tenancy.device_assignment
+- operation: setDeviceFirmwareStatus
+  verb: POST
+  path: /device-firmware/{firmwareId}/status
+  scope: tenant
+  permission: DEVICE_MANAGE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - cache:idempotency
+  - tenancy.device_firmware
+  - tenancy.device_rollout
+  writes:
+  - cache:idempotency
+  - platform.outbox
+  - tenancy.device_audit
+  - tenancy.device_firmware
+  - tenancy.device_rollout
 - operation: setOfflinePolicy
   verb: PUT
   path: /offline-policy
@@ -563,8 +644,12 @@ operations:
   - staff
   offline: false
   reads:
+  - cache:idempotency
+  - platform.device
+  - tenancy.device_firmware
   - tenancy.device_rollout
   writes:
+  - cache:idempotency
   - tenancy.device_rollout
 - operation: updateOrgUnit
   verb: PATCH

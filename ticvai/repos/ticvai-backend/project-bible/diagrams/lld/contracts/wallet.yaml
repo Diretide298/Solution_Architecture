@@ -1,5 +1,5 @@
 id: LLD-wallet
-title: wallet — 59 operations
+title: wallet — 63 operations
 generatedBy: tools/derive-diagrams.py
 index: diagrams/hld/03-contracts.yaml
 tier: satellite
@@ -210,6 +210,19 @@ operations:
   - wallet.credit_lot
   - wallet.wallet
   writes: []
+- operation: getWalletAutoReloadSetting
+  verb: GET
+  path: /wallets/{walletId}/auto-reload
+  scope: venue
+  permission: WALLET_VIEW
+  audience:
+  - staff
+  - guest
+  offline: false
+  reads:
+  - wallet.auto_reload_setting
+  - wallet.wallet
+  writes: []
 - operation: getWalletBalance
   verb: GET
   path: /wallets/{walletId}/balance
@@ -220,6 +233,22 @@ operations:
   offline: false
   reads:
   - wallet.balance
+  writes: []
+- operation: getWalletExitBalance
+  verb: GET
+  path: /wallets/{walletId}/exit-balance
+  scope: venue
+  permission: WALLET_VIEW
+  audience:
+  - staff
+  - guest
+  offline: false
+  reads:
+  - payments.stored_forward
+  - wallet.balance
+  - wallet.credit_lot
+  - wallet.refund_policy
+  - wallet.wallet
   writes: []
 - operation: getWalletFundingRules
   verb: GET
@@ -591,6 +620,25 @@ operations:
   - wallet.authentication_policy
   writes:
   - wallet.authentication_policy
+- operation: setWalletAutoReloadSetting
+  verb: PUT
+  path: /wallets/{walletId}/auto-reload
+  scope: subject
+  permission: WALLET_OPERATE
+  audience:
+  - staff
+  - guest
+  offline: false
+  reads:
+  - cache:idempotency
+  - payments.token
+  - wallet.auto_reload_setting
+  - wallet.funding_rules
+  - wallet.wallet
+  writes:
+  - cache:idempotency
+  - cache:resolution
+  - wallet.auto_reload_setting
 - operation: setWalletChannelRules
   verb: PUT
   path: /wallet-channel-rules
@@ -698,6 +746,31 @@ operations:
   - wallet.transfer_rules
   writes:
   - wallet.transfer_rules
+- operation: settleWalletAtExit
+  verb: POST
+  path: /wallets/{walletId}/exit-settlement
+  scope: venue
+  permission: WALLET_OPERATE
+  audience:
+  - staff
+  - guest
+  offline: false
+  reads:
+  - cache:idempotency
+  - payments.stored_forward
+  - wallet.balance
+  - wallet.credit_lot
+  - wallet.exit_settlement
+  - wallet.refund_policy
+  - wallet.wallet
+  writes:
+  - cache:idempotency
+  - orders.payment
+  - orders.refund
+  - platform.outbox
+  - wallet.exit_settlement
+  - wallet.wallet
+  - wallet.wallet_transaction
 - operation: simulateCreditConsumption
   verb: POST
   path: /credit-consumption/simulate

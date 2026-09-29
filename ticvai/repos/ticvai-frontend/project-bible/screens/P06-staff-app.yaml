@@ -579,8 +579,8 @@ screens:
         so the edge carries nothing and EMP-060 opens cold
     - to: EMP-061
       trigger: Retail Inventory Command Center
-      provenance: derived — EMP-061 declares entryState.params  and EMP-003 holds none of them, so the
-        edge carries nothing and EMP-061 opens cold
+      provenance: derived — EMP-061 declares entryState.params alertId, dashboardId and EMP-003 holds
+        none of them, so the edge carries nothing and EMP-061 opens cold
     - to: EMP-062
       trigger: Store Stock & SKU Availability
       provenance: derived — EMP-062 declares entryState.params itemId and EMP-003 holds none of them,
@@ -688,8 +688,8 @@ screens:
         of them, so the edge carries nothing and EMP-034 opens cold
     - to: EMP-037
       trigger: Notifications
-      provenance: derived — EMP-037 declares entryState.params announcementId and EMP-003 holds none of
-        them, so the edge carries nothing and EMP-037 opens cold
+      provenance: derived — EMP-037 declares entryState.params announcementId, conversationId and EMP-003
+        holds none of them, so the edge carries nothing and EMP-037 opens cold
     - to: EMP-038
       trigger: Broadcast to team
       provenance: derived — EMP-038 declares entryState.params announcementId and EMP-003 holds none of
@@ -2121,6 +2121,11 @@ screens:
     trigger: onAction
     invalidates:
     - listScans
+  - operationId: verifyAccreditationCredential
+    contract: accreditation
+    purpose: 'Verify a presented accreditation: photo, name, category, zones allowed now, validity'
+    trigger: onAction
+    provenance: build, 29 September 2026
   entryState:
     preloaded:
     - ScanEvent.id
@@ -5664,10 +5669,17 @@ screens:
     contract: ai
     purpose: A principal's conversation history
     trigger: onLoad
+  - operationId: recordAnswerFeedback
+    contract: ai
+    purpose: Say whether an answer helped
+    trigger: onAction
+    provenance: build, 29 September 2026
   entryState:
     params:
     - name: conversationId
       from: deepLink
+    - name: messageId
+      from: navigation
     coldEntry: A conversation link an agent opens from a notification. Resolves, or says it was closed
       and by whom.
     preloaded:
@@ -5927,6 +5939,11 @@ screens:
     trigger: onAction
     invalidates:
     - listQueues
+  - operationId: requestSuggestion
+    contract: ai
+    purpose: 'Queue-balancing suggestion (kind queueBalancing): return-slot allocation and redirection'
+    trigger: onAction
+    provenance: build, 29 September 2026
   entryState:
     params:
     - name: queueId
@@ -7637,10 +7654,32 @@ screens:
     trigger: onAction
     invalidates:
     - listAnnouncements
+  - operationId: listStaffConversations
+    contract: workforce
+    purpose: My conversations with colleagues, unread first
+    trigger: onLoad
+    provenance: build, 29 September 2026
+  - operationId: listStaffMessages
+    contract: workforce
+    purpose: Open a conversation
+    trigger: onAction
+    provenance: build, 29 September 2026
+  - operationId: sendStaffMessage
+    contract: workforce
+    purpose: Message a colleague or a small group
+    trigger: onAction
+    provenance: build, 29 September 2026
+  - operationId: markStaffConversationRead
+    contract: workforce
+    purpose: Mark a conversation read
+    trigger: onAction
+    provenance: build, 29 September 2026
   entryState:
     params:
     - name: announcementId
       from: deepLink
+    - name: conversationId
+      from: navigation
     coldEntry: '**A staff link opened cold resolves the thing or says plainly that it is gone.** No silent
       redirect — a supervisor following a link from an alert needs to know whether the record moved, closed
       or never existed, because those are three different next actions. **The scope is resolved from the
@@ -14410,10 +14449,34 @@ screens:
     contract: inventory
     purpose: The movement ledger
     trigger: onLoad
+  - operationId: getKpiValues
+    contract: reporting
+    purpose: Today's takings and revenue KPIs on the phone
+    trigger: onLoad
+    provenance: build, 29 September 2026
+  - operationId: getDashboard
+    contract: reporting
+    purpose: Store manager's mobile dashboard
+    trigger: onLoad
+    provenance: build, 29 September 2026
+  - operationId: listAlerts
+    contract: reporting
+    purpose: Daily revenue alerts (also pushed, deliverTo push)
+    trigger: onLoad
+    provenance: build, 29 September 2026
+  - operationId: acknowledgeAlert
+    contract: reporting
+    purpose: Acknowledge an alert
+    trigger: onAction
+    provenance: build, 29 September 2026
   entryState:
     params:
     - name: venueId
       from: session
+    - name: alertId
+      from: navigation
+    - name: dashboardId
+      from: navigation
     coldEntry: '**Resolves from the session and the shift.** A handheld is signed into at the start of
       a shift, not navigated to.'
     preloaded:

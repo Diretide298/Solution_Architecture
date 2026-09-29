@@ -2,7 +2,7 @@ openapi: 3.1.0
 info:
   title: TICVAI — Payment Orchestration
   version: 1.0.0
-  x-ticvai-screen-count: 41
+  x-ticvai-screen-count: 47
   x-ticvai-tier: satellite
   x-ticvai-module: 4 — Bundles and Promotions
   x-ticvai-platforms:
@@ -857,6 +857,17 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/PaymentTerminal'
+        '422':
+          description: 'Status `active` for a terminal whose model has no current Level 3 certification for its
+            acquirer (`recordPaymentTerminalCertification`), or `dccEnabled` with no DCC provider connection
+            (29 September, build pass).'
+          x-ticvai-problem-types:
+          - terminal-not-certified
+          - dcc-provider-missing
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
   /payment-terminals/{terminalId}/forwarded:
     parameters:
     - name: terminalId
@@ -1310,6 +1321,14 @@ paths:
         blocking does — refuse, challenge, or allow and flag — because a venue will want different
         answers for a known chargeback abuser and a card their own fraud team is watching.
 
+        **`blockIp` added 29 September** (build pass, group G2; 8.3.8): a list of IP addresses and CIDR
+        ranges, matched at the edge against the address a payment is attempted from, with a `listHit`
+        rule saying what a hit does. The address is compared at the edge and never carried further: the
+        risk engine receives only the country and a keyed hash (`ai.scoreTransactionRisk` `ipHash`,
+        `ipCountry`). **Each single-address entry is also kept as that same keyed hash** (the tenant''s IP
+        hashing key, the one the edge uses for `ipHash`), so the list and the AI signal compare equal values
+        and ai can treat a listed address as a strong signal; a CIDR range is matched at the edge only.
+
         '
       tags:
       - payments
@@ -1607,8 +1626,541 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/PaymentsDepositActivity'
+  /payment-terminal-certifications:
+    get:
+      operationId: listPaymentTerminalCertifications
+      x-ticvai-consumed-by:
+        - "P09 ADM-580 Payment Terminal & Device Inventory\t49"
+        - "P09 ADM-588 Terminal Simulator, Certification & AI Operations Advisor\t59"
+      x-ticvai-audience:
+      - staff
+      x-ticvai-agreed: '29 September: our build plan (retrace 4.3.1); shape follows listMerchantAccounts'
+      x-ticvai-read-routing: replica
+      summary: EMV and PCI certification of each terminal model and kernel
+      description: >
+        4.3.1. **Certification belongs to the terminal model and its kernel, not to one terminal.** EMV
+        Level 1 (hardware) and Level 2 (kernel) approvals, the Level 3 certification per acquirer and card
+        scheme, and the PCI PTS approval, each with its reference and expiry. Filter by model or by what
+        expires before a date, which is the list somebody has to act on.
+      tags:
+      - payments
+      x-ticvai-permission: PAYMENT_VIEW
+      x-ticvai-scope-level: tenant
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+      - name: modelCode
+        in: query
+        schema:
+          type: string
+      - name: expiringBefore
+        in: query
+        schema:
+          type: string
+          format: date
+      - $ref: ../shared/common.yaml#/components/parameters/PageSize
+      - $ref: ../shared/common.yaml#/components/parameters/PageCursor
+      responses:
+        '200':
+          description: Certifications
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: ../shared/common.yaml#/components/schemas/Page
+                - type: object
+                  properties:
+                    items:
+                      type: array
+                      items:
+                        $ref: '#/components/schemas/PayTerminalCertification'
+  /payment-terminal-certifications/{modelCode}:
+    parameters:
+    - name: modelCode
+      in: path
+      required: true
+      schema:
+        type: string
+        maxLength: 100
+    put:
+      operationId: recordPaymentTerminalCertification
+      x-ticvai-consumed-by:
+        - "P09 ADM-580 Payment Terminal & Device Inventory\t49"
+        - "P09 ADM-588 Terminal Simulator, Certification & AI Operations Advisor\t59"
+      x-ticvai-audience:
+      - staff
+      x-ticvai-agreed: '29 September: our build plan (retrace 4.3.1); shape follows setMerchantAccount'
+      summary: Record a terminal model's EMV and PCI certification
+      description: >
+        4.3.1. Records the approvals a terminal model and its kernel hold, from the vendor's and acquirer's
+        letters, with the document kept. Replaces the record for the model; the previous one is kept in
+        the audit record. `setPaymentTerminalConfiguration` refuses to activate a terminal whose model has no
+        current Level 3 certification for the acquirer it is being connected to.
+      tags:
+      - payments
+      x-ticvai-permission: PAYMENT_PROVIDER_MANAGE
+      x-ticvai-scope-level: tenant
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PayTerminalCertification'
+      responses:
+        '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: Recorded
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PayTerminalCertification'
+        '422':
+          description: An expiry before the approval date, or a Level 3 entry for an acquirer connection that
+            does not exist.
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
+  /instalment-policy:
+    get:
+      operationId: getInstalmentPolicy
+      x-ticvai-consumed-by:
+        - "P09 ADM-603 B2B Invoice, On-Account & Payment Terms Configuration\t96"
+      x-ticvai-audience:
+      - staff
+      x-ticvai-agreed: '29 September: our build plan (retrace 4.2.17, 2.14.19); shape follows getDunningPolicy'
+      x-ticvai-read-routing: primary
+      summary: What may be paid in instalments, and on what terms
+      tags:
+      - payments
+      x-ticvai-permission: PAYMENT_VIEW
+      x-ticvai-scope-level: tenant
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      responses:
+        '200':
+          description: Policy
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PayInstalmentPolicy'
+    put:
+      operationId: setInstalmentPolicy
+      x-ticvai-consumed-by:
+        - "P09 ADM-603 B2B Invoice, On-Account & Payment Terms Configuration\t96"
+      x-ticvai-audience:
+      - staff
+      x-ticvai-agreed: '29 September: our build plan (retrace 4.2.17, 2.14.19); shape follows setDunningPolicy'
+      summary: Set which products may be paid in instalments, how many and how often
+      description: >
+        4.2.17, 2.14.19. **The terms a plan is created within**: which product kinds qualify (an annual pass,
+        a membership, a group booking), the minimum order value, the number of instalments allowed, the
+        frequencies offered (`monthly`, `quarterly`, or `custom` dates), the share due at purchase, and
+        whether a card on file is required. A failed instalment is chased by the dunning policy, never by
+        a second schedule. What the guest is charged in total never changes with the plan: no interest
+        and no fee unless `instalmentFee` is set.
+      tags:
+      - payments
+      x-ticvai-permission: PAYMENT_CONFIGURE
+      x-ticvai-scope-level: tenant
+      x-ticvai-config-scope: tenant
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PayInstalmentPolicy'
+      responses:
+        '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: Set
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PayInstalmentPolicy'
+        '422':
+          description: A share due at purchase outside 0-100, or more instalments than the frequency allows
+            within the product's term.
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
+  /instalment-plans:
+    get:
+      operationId: listInstalmentPlans
+      x-ticvai-consumed-by:
+        - "P01 WEB-023 Membership Management"
+        - "P02 GST-015 Memberships"
+        - "P08 BO-324 Payment & Order Financial Command Center"
+      x-ticvai-audience:
+      - staff
+      - guest
+      x-ticvai-agreed: '29 September: our build plan (retrace 4.2.17); shape follows listDunningCases'
+      x-ticvai-read-routing: replica
+      summary: Instalment plans and their schedules
+      description: >
+        4.2.17. Plans with every instalment, its due date, amount and outcome. A guest sees their own; staff
+        filter by order, status or the next due date. Ordered by the next instalment due, `id` as the
+        tiebreak.
+      tags:
+      - payments
+      x-ticvai-permission: PAYMENT_VIEW
+      x-ticvai-self-scoped: subject
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      security:
+      - guestAuth: []
+      - bearerAuth: []
+      parameters:
+      - name: orderId
+        in: query
+        schema:
+          type: string
+          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+      - name: status
+        in: query
+        schema:
+          type: string
+          enum:
+          - active
+          - completed
+          - inArrears
+          - cancelled
+      - $ref: ../shared/common.yaml#/components/parameters/PageSize
+      - $ref: ../shared/common.yaml#/components/parameters/PageCursor
+      responses:
+        '200':
+          description: Plans
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: ../shared/common.yaml#/components/schemas/Page
+                - type: object
+                  properties:
+                    items:
+                      type: array
+                      items:
+                        $ref: '#/components/schemas/PayInstalmentPlan'
+    post:
+      operationId: createInstalmentPlan
+      x-ticvai-consumed-by:
+        - "P01 WEB-023 Membership Management"
+        - "P02 GST-015 Memberships"
+        - "P08 BO-324 Payment & Order Financial Command Center"
+      x-ticvai-audience:
+      - staff
+      - guest
+      - service
+      x-ticvai-agreed: '29 September: our build plan (retrace 4.2.17, 2.14.19); shape follows createB2bCreditAccount'
+      summary: Split an order's payment into scheduled instalments on a stored card
+      description: >
+        4.2.17, 2.14.19. **An instalment schedule, independent of the product's term**: an annual membership
+        billed monthly is a twelve-month term with twelve instalments. Created for one order within the
+        instalment policy; the first instalment (the share due at purchase) is charged with the order, and
+        the rest are charged on their due dates to the stored card (`paymentTokenId`) under the recurring
+        mandate. A failed instalment opens a dunning case; the plan is `inArrears` until it is paid.
+        A guest may create a plan for their own order only.
+      tags:
+      - payments
+      x-ticvai-permission: ORDER_CREATE
+      x-ticvai-self-scoped: subject
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      security:
+      - guestAuth: []
+      - bearerAuth: []
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - orderId
+              - frequency
+              - instalmentCount
+              - paymentTokenId
+              properties:
+                orderId:
+                  type: string
+                  pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+                frequency:
+                  type: string
+                  enum:
+                  - monthly
+                  - quarterly
+                  - custom
+                instalmentCount:
+                  type: integer
+                  minimum: 2
+                firstDueDate:
+                  type: string
+                  format: date
+                customDueDates:
+                  type: array
+                  description: Required with `custom`; one per instalment after the first.
+                  items:
+                    type: string
+                    format: date
+                paymentTokenId:
+                  type: string
+                  format: uuid
+      responses:
+        '201':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: Plan created; the first instalment charged
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PayInstalmentPlan'
+        '409':
+          description: The order already has a plan, or is already paid in full.
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
+        '422':
+          description: The order or product does not qualify under the instalment policy, or the count or
+            frequency is outside it, or the first instalment was declined.
+          x-ticvai-problem-types:
+          - not-eligible-for-instalments
+          - first-instalment-declined
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
+
 components:
   schemas:
+    PayTerminalCertification:
+      type: object
+      x-ticvai-persistence: payments.terminal_certification + payments.terminal_certification_level3
+      description: '4.3.1. Also the `recordPaymentTerminalCertification` body. **One per terminal model**; a
+        terminal names its model in `PaymentTerminal.terminalModelCode`.'
+      required:
+      - modelCode
+      - manufacturer
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        modelCode:
+          type: string
+          maxLength: 100
+        manufacturer:
+          type: string
+          maxLength: 200
+        emvLevel1ApprovalReference:
+          type: string
+          nullable: true
+        emvLevel1ExpiresAt:
+          type: string
+          format: date
+          nullable: true
+        emvLevel2KernelVersions:
+          type: array
+          description: Contact and contactless kernels with their EMVCo approval, e.g. `EMV Contact 4.3 / ref`.
+          items:
+            type: string
+        emvLevel2ExpiresAt:
+          type: string
+          format: date
+          nullable: true
+        level3Certifications:
+          type: array
+          description: Per acquirer and card scheme; a terminal is activated only against an acquirer listed here
+            and not expired.
+          items:
+            type: object
+            properties:
+              acquirerConnectionId:
+                type: string
+                format: uuid
+              cardScheme:
+                type: string
+              reference:
+                type: string
+              certifiedAt:
+                type: string
+                format: date
+              expiresAt:
+                type: string
+                format: date
+                nullable: true
+        pciPtsApprovalNumber:
+          type: string
+          nullable: true
+        pciPtsExpiresAt:
+          type: string
+          format: date
+          nullable: true
+        documentAssetIds:
+          type: array
+          items:
+            type: string
+            format: uuid
+        scopePath:
+          type: string
+          readOnly: true
+          description: '**The partition key** (ADR-0005). Operations write it at `tenant` scope.'
+    PayInstalmentPolicy:
+      type: object
+      x-ticvai-persistence: payments.instalment_policy
+      description: 4.2.17, 2.14.19. Also the `setInstalmentPolicy` body.
+      properties:
+        enabled:
+          type: boolean
+          default: false
+        eligibleProductKinds:
+          type: array
+          items:
+            type: string
+            enum:
+            - membership
+            - annualPass
+            - seasonPass
+            - groupBooking
+            - event
+        minimumOrderValue:
+          $ref: ../shared/common.yaml#/components/schemas/Money
+        allowedFrequencies:
+          type: array
+          items:
+            type: string
+            enum:
+            - monthly
+            - quarterly
+            - custom
+        maximumInstalments:
+          type: integer
+          minimum: 2
+        dueAtPurchasePercent:
+          type: number
+          minimum: 0
+          maximum: 100
+        instalmentFee:
+          $ref: ../shared/common.yaml#/components/schemas/Money
+        requireStoredCard:
+          type: boolean
+          default: true
+        scopePath:
+          type: string
+          readOnly: true
+          description: '**The partition key** (ADR-0005). Operations write it at `tenant` scope.'
+    PayInstalment:
+      type: object
+      description: One scheduled charge in an instalment plan.
+      required:
+      - sequence
+      - dueDate
+      - amount
+      - status
+      properties:
+        sequence:
+          type: integer
+          minimum: 1
+        dueDate:
+          type: string
+          format: date
+        amount:
+          $ref: ../shared/common.yaml#/components/schemas/Money
+        status:
+          type: string
+          enum:
+          - scheduled
+          - paid
+          - failed
+          - waived
+          - cancelled
+        paymentId:
+          type: string
+          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+          nullable: true
+        dunningCaseId:
+          type: string
+          format: uuid
+          nullable: true
+        attemptedAt:
+          type: string
+          format: date-time
+          nullable: true
+    PayInstalmentPlan:
+      type: object
+      x-ticvai-persistence: payments.instalment_plan + payments.instalment
+      description: 4.2.17. A schedule of charges for one order, independent of the product's term.
+      required:
+      - id
+      - orderId
+      - frequency
+      - status
+      - total
+      - instalments
+      properties:
+        id:
+          type: string
+          format: uuid
+        orderId:
+          type: string
+          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+        subjectId:
+          type: string
+          format: uuid
+          nullable: true
+        frequency:
+          type: string
+          enum:
+          - monthly
+          - quarterly
+          - custom
+        paymentTokenId:
+          type: string
+          format: uuid
+        status:
+          type: string
+          enum:
+          - active
+          - completed
+          - inArrears
+          - cancelled
+        total:
+          $ref: ../shared/common.yaml#/components/schemas/Money
+        paidToDate:
+          $ref: ../shared/common.yaml#/components/schemas/Money
+        nextDueDate:
+          type: string
+          format: date
+          nullable: true
+        instalments:
+          type: array
+          items:
+            $ref: '#/components/schemas/PayInstalment'
+        createdAt:
+          type: string
+          format: date-time
+        scopePath:
+          type: string
+          readOnly: true
+          description: '**The partition key** (ADR-0005). Written at the scope of the venue the order was sold at.'
     DeclineClass:
       type: string
       description: >
@@ -2725,6 +3277,33 @@ components:
         emvConfigurationVersion:
           type: string
           nullable: true
+        terminalModelCode:
+          type: string
+          nullable: true
+          description: 4.3.1. The model whose EMV and PCI certification applies (`listPaymentTerminalCertifications`).
+        entryModes:
+          type: array
+          description: '4.3.2. The card entry modes this terminal accepts. **`magstripe` (swipe) is off unless
+            listed**, since a swiped card carries no chip cryptogram; it stays available as a fallback where the
+            acquirer allows it.'
+          items:
+            type: string
+            enum:
+            - chip
+            - contactless
+            - magstripe
+            - manualEntry
+            - mobileWallet
+        dccEnabled:
+          type: boolean
+          default: false
+          description: 4.3.2. Offer Dynamic Currency Conversion on a foreign card at this terminal. The rate is the
+            provider's and is recorded on the payment (`fxRateSource` `cardScheme`); the ledger still holds the
+            base currency.
+        dccProviderConnectionId:
+          type: string
+          format: uuid
+          nullable: true
         contactlessLimit:
           $ref: ../shared/common.yaml#/components/schemas/Money
         pinBypassAllowed:
@@ -3181,7 +3760,11 @@ components:
                 - blockBin
                 - blockEmail
                 - blockDevice
+                - blockIp
                 - allowAlways
+                description: '`blockIp` entries are IPv4 or IPv6 addresses or CIDR ranges (no wider than /16
+                  for IPv4 or /32 for IPv6, so one entry cannot block a country''s mobile network), matched at
+                  the edge (29 September, build pass; 8.3.8).'
               entries:
                 type: integer
                 readOnly: true

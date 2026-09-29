@@ -415,6 +415,7 @@ CREATE TABLE IF NOT EXISTS catalogue.demand_forecast (
     event_id                          uuid,
     performance_id                    uuid,
     price_category_id                 uuid,
+    section_code                      text CONSTRAINT demand_forecast_section_code_chk CHECK (char_length(section_code) <= 40),
     forecast_date                     date,
     timeslot                          text CONSTRAINT demand_forecast_timeslot_chk CHECK (char_length(timeslot) <= 40),
     channel                           text,
@@ -577,6 +578,7 @@ CREATE TABLE IF NOT EXISTS catalogue.entitlement_template (
     days_of_week                      text[],
     expiry_anchor                     text CONSTRAINT entitlement_template_expiry_anchor_chk CHECK (expiry_anchor IN ('offsetDays', 'endOfMonth', 'endOfQuarter', 'endOfYear', 'fixedDate', 'seasonEnd')),
     expiry_date                       date,
+    expiry_notice_days                integer,
     carries_stored_value              boolean DEFAULT false,
     included_value                    numeric(18,4),
     blackout_dates                    text[],
@@ -1294,7 +1296,12 @@ CREATE TABLE IF NOT EXISTS catalogue.pricing_recommendation (
     status                            text NOT NULL DEFAULT 'pending' CONSTRAINT pricing_recommendation_status_chk CHECK (status IN ('pending', 'accepted', 'rejected', 'modified', 'ignored', 'sentToSimulation', 'sentForApproval')),
     model_version                     text CONSTRAINT pricing_recommendation_model_version_chk CHECK (char_length(model_version) <= 60),
     generated_at                      timestamptz NOT NULL,
-    expires_at                        timestamptz
+    expires_at                        timestamptz,
+    recommendation_type               text DEFAULT 'standard' CONSTRAINT pricing_recommendation_recommendation_type_chk CHECK (recommendation_type IN ('standard', 'earlyBird', 'lastMinute', 'volumeDiscount', 'conversion')),
+    valid_from                        timestamptz,
+    valid_to                          timestamptz,
+    quantity_tier                     jsonb,
+    objective                         text DEFAULT 'revenue' CONSTRAINT pricing_recommendation_objective_chk CHECK (objective IN ('revenue', 'occupancy', 'conversion'))
 );
 
 -- Holds 13 columns. No description has been written for this table — the name is the only thing

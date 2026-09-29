@@ -133,6 +133,7 @@ operations:
   - seating.seat_block
   writes:
   - cache:idempotency
+  - platform.outbox
   - seating.seat_block
 - operation: createSeatCategory
   verb: POST
@@ -164,6 +165,7 @@ operations:
   - seating.seat_hold
   writes:
   - cache:idempotency
+  - platform.outbox
   - seating.seat_hold
 - operation: createSeatHoldPool
   verb: POST
@@ -517,6 +519,7 @@ operations:
   - seating.section
   writes:
   - cache:idempotency
+  - platform.outbox
   - seating.seat_map
   - seating.section
 - operation: reassignSeats
@@ -568,6 +571,7 @@ operations:
   - seating.seat_block_item
   writes:
   - cache:idempotency
+  - platform.outbox
   - seating.seat_block
 - operation: relinquishSeatHold
   verb: DELETE
@@ -580,6 +584,7 @@ operations:
   reads:
   - seating.seat_hold
   writes:
+  - platform.outbox
   - seating.seat_hold
 - operation: setAccessibleSeating
   verb: PUT

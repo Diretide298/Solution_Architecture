@@ -1,4 +1,4 @@
--- payments — 27 tables
+-- payments — 32 tables
 -- **Derived. Do not hand-edit.**
 
 -- Holds 9 columns. No description has been written for this table — the name is the only thing
@@ -167,6 +167,51 @@ CREATE TABLE IF NOT EXISTS payments.hosted_checkout (
     session_timeout_minutes           integer DEFAULT 15,
     orphan_reconciliation_window_minutes integer DEFAULT 60,
     branding_asset_id                 uuid,
+    scope_path                        ltree NOT NULL,
+    id                                uuid PRIMARY KEY NOT NULL
+);
+
+-- Holds 9 columns. No description has been written for this table — the name is the only thing
+-- saying what it is
+CREATE TABLE IF NOT EXISTS payments.instalment (
+    instalment_plan_id                uuid NOT NULL,
+    sequence                          integer NOT NULL,
+    due_date                          date NOT NULL,
+    amount                            numeric(18,4) NOT NULL,
+    status                            text NOT NULL,
+    payment_id                        text,
+    dunning_case_id                   uuid,
+    attempted_at                      timestamptz,
+    id                                uuid PRIMARY KEY NOT NULL
+);
+
+-- Holds 11 columns. No description has been written for this table — the name is the only thing
+-- saying what it is. Reached by: 2 operations read it and 1 write it; 1 tables reference it.
+CREATE TABLE IF NOT EXISTS payments.instalment_plan (
+    id                                uuid PRIMARY KEY NOT NULL,
+    order_id                          text NOT NULL,
+    subject_id                        uuid,
+    frequency                         text NOT NULL CONSTRAINT instalment_plan_frequency_chk CHECK (frequency IN ('monthly', 'quarterly', 'custom')),
+    payment_token_id                  uuid,
+    status                            text NOT NULL CONSTRAINT instalment_plan_status_chk CHECK (status IN ('active', 'completed', 'inArrears', 'cancelled')),
+    total                             numeric(18,4) NOT NULL,
+    paid_to_date                      numeric(18,4),
+    next_due_date                     date,
+    created_at                        timestamptz,
+    scope_path                        ltree NOT NULL
+);
+
+-- Holds 10 columns. No description has been written for this table — the name is the only thing
+-- saying what it is. Reached by: 3 operations read it and 1 write it.
+CREATE TABLE IF NOT EXISTS payments.instalment_policy (
+    is_enabled                        boolean DEFAULT false,
+    eligible_product_kinds            text[],
+    minimum_order_value               numeric(18,4),
+    allowed_frequencies               text[],
+    maximum_instalments               integer,
+    due_at_purchase_percent           numeric(18,4),
+    instalment_fee                    numeric(18,4),
+    require_stored_card               boolean DEFAULT true,
     scope_path                        ltree NOT NULL,
     id                                uuid PRIMARY KEY NOT NULL
 );
@@ -390,11 +435,43 @@ CREATE TABLE IF NOT EXISTS payments.terminal (
     acquirer_connection_id            uuid,
     terminal_identifier               text,
     emv_configuration_version         text,
+    terminal_model_code               text,
+    entry_modes                       text[],
+    is_dcc_enabled                    boolean DEFAULT false,
+    dcc_provider_connection_id        uuid,
     contactless_limit                 numeric(18,4),
     is_pin_bypass_allowed             boolean DEFAULT false,
     store_and_forward                 jsonb,
     status                            text CONSTRAINT terminal_status_chk CHECK (status IN ('unconfigured', 'active', 'offline', 'suspended')),
     scope_path                        ltree NOT NULL,
+    id                                uuid PRIMARY KEY NOT NULL
+);
+
+-- Holds 11 columns. No description has been written for this table — the name is the only thing
+-- saying what it is. Reached by: 3 operations read it and 1 write it; 1 tables reference it.
+CREATE TABLE IF NOT EXISTS payments.terminal_certification (
+    id                                uuid PRIMARY KEY,
+    model_code                        text NOT NULL CONSTRAINT terminal_certification_model_code_chk CHECK (char_length(model_code) <= 100),
+    manufacturer                      text NOT NULL CONSTRAINT terminal_certification_manufacturer_chk CHECK (char_length(manufacturer) <= 200),
+    emv_level1_approval_reference     text,
+    emv_level1_expires_at             date,
+    emv_level2_kernel_versions        text[],
+    emv_level2_expires_at             date,
+    pci_pts_approval_number           text,
+    pci_pts_expires_at                date,
+    document_asset_ids                text[],
+    scope_path                        ltree NOT NULL
+);
+
+-- Holds 7 columns. No description has been written for this table — the name is the only thing
+-- saying what it is
+CREATE TABLE IF NOT EXISTS payments.terminal_certification_level3 (
+    terminal_certification_id         uuid NOT NULL,
+    acquirer_connection_id            uuid,
+    card_scheme                       text,
+    reference                         text,
+    certified_at                      date,
+    expires_at                        date,
     id                                uuid PRIMARY KEY NOT NULL
 );
 

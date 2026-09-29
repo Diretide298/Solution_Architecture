@@ -1,5 +1,5 @@
 id: LLD-AccessService
-title: AccessService — 243 operations, 76 tables
+title: AccessService — 245 operations, 77 tables
 generatedBy: tools/derive-diagrams.py
 tier: commerce
 index: diagrams/hld/02-services.yaml
@@ -9,20 +9,20 @@ scale: Read-heavy, extreme latency sensitivity, edge-cached. **`frozenDays` is h
   precisely because the gate cannot afford the arithmetic.
 ifDown: Down means the gates stop. Runs at the edge with a local decision cache.
 coverage:
-  operations: 243
+  operations: 245
   inAFlow: 161
   percent: 66%
   note: '**Flow coverage is how much of this service a journey has walked.** A service under 40% is
     unwalked rather than under-documented.'
 schemas:
 - schema: access
-  tables: 76
+  tables: 77
   stores:
   - postgres
   largestTable: access.media_type
 operationsByContract:
 - contract: access
-  count: 243
+  count: 245
   operations:
   - operation: addBlacklistEntry
     verb: POST
@@ -174,8 +174,8 @@ operationsByContract:
     scope: venue
     permission: GUEST_MANAGE
     offline: false
-    reads: 1
-    writes: 0
+    reads: 3
+    writes: 2
   - operation: getAccessPoint
     verb: GET
     path: /access-points/{accessPointId}
@@ -183,6 +183,14 @@ operationsByContract:
     permission: SCOPE_VIEW
     offline: true
     reads: 1
+    writes: 0
+  - operation: getAccessRiskScore
+    verb: GET
+    path: /access-risk-scores
+    scope: venue
+    permission: SCOPE_VIEW
+    offline: false
+    reads: 6
     writes: 0
   - operation: getCredentialIssuanceRetryPolicy
     verb: GET
@@ -230,7 +238,7 @@ operationsByContract:
     scope: workstation
     permission: ACCESS_VALIDATE
     offline: false
-    reads: 9
+    reads: 10
     writes: 1
   - operation: listAccess
     verb: GET
@@ -571,6 +579,14 @@ operationsByContract:
   - operation: listDynamicAccessPolicy
     verb: GET
     path: /dynamic-access-policy
+    scope: venue
+    permission: SCOPE_VIEW
+    offline: false
+    reads: 4
+    writes: 0
+  - operation: listDynamicPolicyEffectiveness
+    verb: GET
+    path: /dynamic-policy-effectiveness
     scope: venue
     permission: SCOPE_VIEW
     offline: false
@@ -1358,7 +1374,7 @@ operationsByContract:
     scope: venue
     permission: ACCESS_POINT_CONFIGURE
     offline: false
-    reads: 0
+    reads: 1
     writes: 0
   - operation: setBiometricVerificationProfile
     verb: PUT
@@ -1903,7 +1919,7 @@ operationsByContract:
     permission: ACCESS_VALIDATE
     offline: false
     reads: 1
-    writes: 2
+    writes: 3
   - operation: updateAccessDevice
     verb: PUT
     path: /access-devices/{deviceId}
@@ -1950,7 +1966,7 @@ operationsByContract:
     scope: workstation
     permission: ACCESS_VALIDATE
     offline: true
-    reads: 6
+    reads: 10
     writes: 4
   - operation: validateGroupAccess
     verb: POST
@@ -1958,7 +1974,7 @@ operationsByContract:
     scope: workstation
     permission: ACCESS_VALIDATE
     offline: true
-    reads: 4
+    reads: 7
     writes: 2
   - operation: verifyIdentity
     verb: POST
@@ -1999,6 +2015,7 @@ tables:
   - deliverCredential
   - endPodiumShift
   - enrolFacePass
+  - enrolFaceTag
   - lockIdentity
   - overrideAccess
   - publishMediaCompatibilityTesting
@@ -2114,6 +2131,7 @@ tables:
   - deliverCredential
   - endPodiumShift
   - enrolFacePass
+  - enrolFaceTag
   - lockIdentity
   - overrideAccess
   - publishMediaCompatibilityTesting
@@ -2291,6 +2309,12 @@ tables:
   writtenBy:
   - access
   foreignWriters: null
+- table: access.accreditation_credential
+  columns: 12
+  store: postgres
+  parent: null
+  writtenBy: []
+  foreignWriters: null
 - table: access.admission_rules
   columns: 21
   store: postgres
@@ -2313,7 +2337,7 @@ tables:
   - access
   foreignWriters: null
 - table: access.biometric_profile
-  columns: 36
+  columns: 37
   store: postgres
   parent: null
   writtenBy:
@@ -2714,7 +2738,7 @@ tables:
   - access
   foreignWriters: null
 - table: access.scan_event
-  columns: 19
+  columns: 22
   store: postgres
   parent: null
   writtenBy:
@@ -2774,9 +2798,11 @@ readsFrom:
   operations: 3
 - service: MarketingService
   operations: 1
+- service: TenancyService
+  operations: 1
 writesOutside:
 - service: IdentityService
-  operations: 3
+  operations: 4
   rule: 'ADR-0028: the owner defines the row; a foreign writer may only append, through a path the owner
     published.'
   why: '**The lineage records these writes, not how they honour the rule.** It does not say whether
@@ -2786,12 +2812,29 @@ writesOutside:
   - operation: enrolFacePass
     tables:
     - pii.subject_biometric
+  - operation: enrolFaceTag
+    tables:
+    - pii.subject_biometric
   - operation: reviewFaceReenrolment
     tables:
     - pii.subject_biometric
   - operation: revokeFacePass
     tables:
     - pii.subject_biometric
+- service: TenancyService
+  operations: 2
+  rule: 'ADR-0028: the owner defines the row; a foreign writer may only append, through a path the owner
+    published.'
+  why: '**The lineage records these writes, not how they honour the rule.** It does not say whether
+    each inserts or updates, or which operation or event TenancyService published for it — check each
+    against ADR-0028.'
+  writes:
+  - operation: syncScans
+    tables:
+    - platform.outbox
+  - operation: validateAccess
+    tables:
+    - platform.outbox
 - service: CrossRegionService
   operations: 1
   rule: 'ADR-0028: the owner defines the row; a foreign writer may only append, through a path the owner
@@ -2814,17 +2857,6 @@ writesOutside:
   - operation: enrolFacePass
     tables:
     - marketing.consent_record
-- service: TenancyService
-  operations: 1
-  rule: 'ADR-0028: the owner defines the row; a foreign writer may only append, through a path the owner
-    published.'
-  why: '**The lineage records these writes, not how they honour the rule.** It does not say whether
-    each inserts or updates, or which operation or event TenancyService published for it — check each
-    against ADR-0028.'
-  writes:
-  - operation: validateAccess
-    tables:
-    - platform.outbox
 screens:
 - P01:WEB-001 Home / Landing
 - P01:WEB-018 My Tickets

@@ -43,29 +43,29 @@ modulesUsed:
   screens: 1
 servicesCalled:
 - service: MarketingService
-  operationCalls: 62
+  operationCalls: 69
 - service: OrderService
-  operationCalls: 61
+  operationCalls: 63
 - service: CatalogueService
-  operationCalls: 46
+  operationCalls: 45
 - service: VenueOpsService
   operationCalls: 36
 - service: IdentityService
-  operationCalls: 21
+  operationCalls: 23
 - service: FnbService
   operationCalls: 21
+- service: WhiteLabelService
+  operationCalls: 11
+- service: AiService
+  operationCalls: 11
 - service: AccessService
   operationCalls: 10
-- service: WhiteLabelService
-  operationCalls: 9
+- service: WalletService
+  operationCalls: 8
+- service: LedgerService
+  operationCalls: 6
 - service: RetailService
   operationCalls: 5
-- service: WalletService
-  operationCalls: 4
-- service: AiService
-  operationCalls: 4
-- service: LedgerService
-  operationCalls: 1
 coverage:
   screens: 49
   inAFlow: 14
@@ -80,10 +80,16 @@ screens:
   wave: 1
   density: compact
   operations:
+  - decideRecommendations
+  - getCookieConsentRuntime
   - getTenantAppStatus
   - getTenantConfig
+  - listAnalyticsProviders
   - listMyEntitlements
   - listProducts
+  - recordDeviceConsent
+  - recordRecommendationEvents
+  - recordStorefrontSessionEvents
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -338,9 +344,10 @@ screens:
   density: compact
   operations:
   - addCartLine
+  - decideRecommendations
   - getBundle
-  - getUpsellSuggestions
   - listCatalogueBundles
+  - recordRecommendationEvents
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -599,6 +606,7 @@ screens:
   density: compact
   operations:
   - claimCart
+  - claimDeviceConsent
   - createMfaChallenge
   - getGuestSession
   - guestLogout
@@ -622,6 +630,7 @@ screens:
   entryParams:
   - cartId<-session
   - challengeId<-navigation
+  - subjectId<-navigation
   goesTo:
   - WEB-001
   - WEB-010
@@ -715,8 +724,13 @@ screens:
   operations:
   - createRefundRequest
   - getOrder
+  - getTaxDocumentRendition
+  - getTaxInvoice
+  - issueTaxInvoice
+  - listCreditMemos
   - listMyOrders
   - listOrders
+  - listTaxInvoices
   - transferOrderTickets
   states:
   - emptyFirstRun
@@ -728,6 +742,8 @@ screens:
   offlineState: true
   entryParams:
   - orderId<-deepLink
+  - documentId<-navigation
+  - invoiceId<-navigation
   goesTo:
   - WEB-001
   - WEB-016
@@ -744,8 +760,10 @@ screens:
   density: compact
   operations:
   - getGuestProfile
+  - getMyIdentityVerification
   - listConsentPurposes
   - recordConsent
+  - submitGuestIdentityDocument
   - updateGuestPreferences
   - updateMyProfile
   - verifyGuestEmail
@@ -777,8 +795,12 @@ screens:
   - getGameCard
   - getGiftCard
   - getWallet
+  - getWalletAutoReloadSetting
+  - getWalletExitBalance
   - listPaymentTokens
   - listWalletTransactions
+  - setWalletAutoReloadSetting
+  - settleWalletAtExit
   - storePaymentToken
   - transferWalletBalance
   states:
@@ -837,10 +859,12 @@ screens:
   wave: 2
   density: compact
   operations:
+  - createInstalmentPlan
   - getBillingStatement
   - getMyMemberships
   - listBillingStatements
   - listGuestMemberships
+  - listInstalmentPlans
   - listMyPaymentIssues
   - retryMyDunningPayment
   - transferOrderTickets
@@ -875,6 +899,8 @@ screens:
   - deleteGuestAccount
   - enrolMfaMethod
   - exportSubjectData
+  - getCookieConsentRuntime
+  - getDeviceConsentHistory
   - getFacePassEnrolment
   - getGuestConsents
   - getWaiverStatus
@@ -883,7 +909,9 @@ screens:
   - listDelegations
   - listGuestDevices
   - listMfaMethods
+  - listPublishedTrackingTechnologies
   - recordConsent
+  - recordDeviceConsent
   - registerGuestDevice
   - removeFromWishlist
   - removeMfaMethod
@@ -1430,9 +1458,11 @@ screens:
   density: compact
   operations:
   - createReferral
+  - decideRecommendations
   - getLoyaltyPosition
   - listLoyaltyProgrammes
   - listPromotions
+  - recordRecommendationEvents
   - redeemLoyaltyPoints
   states:
   - emptyFirstRun
@@ -1459,6 +1489,7 @@ screens:
   - getGuestMenu
   - handoverToAgent
   - listAiConversations
+  - recordAnswerFeedback
   - requestSuggestion
   - sendAiMessage
   - sendConversationMessage
@@ -1473,6 +1504,7 @@ screens:
   entryParams:
   - conversationId<-deepLink
   - outletId<-session
+  - messageId<-navigation
   goesTo:
   - WEB-001
   boardFrames: null

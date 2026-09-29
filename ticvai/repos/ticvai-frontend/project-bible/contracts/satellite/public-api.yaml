@@ -2,7 +2,7 @@ openapi: 3.1.0
 info:
   title: TICVAI — Public API and developer access
   version: 1.0.0
-  x-ticvai-screen-count: 23
+  x-ticvai-screen-count: 24
   x-ticvai-tier: satellite
   x-ticvai-module: "13 — Developer & API Management"
   x-ticvai-platforms:
@@ -448,6 +448,7 @@ paths:
         - "P08 BO-1173 Wallet Integration Command Center"
         - "P08 BO-1179 Integration Monitoring & Exception Workbench"
         - "P08 BO-692 Accreditation Webhook Management"
+        - "P09 ADM-353 Webhook Configuration & Subscription Manager"
         - "P14 DEV-005 Webhooks"
       summary: The tenant's webhook subscriptions, filterable by API client
       description: >
@@ -481,12 +482,19 @@ paths:
         - "P08 BO-067 Integrations"
         - "P08 BO-1074 Webhook Configuration"
         - "P08 BO-1176 Wallet Events, Webhooks & Notification Orchestration"
+        - "P08 BO-692 Accreditation Webhook Management"
         - "P09 ADM-353 Webhook Configuration & Subscription Manager"
         - "P14 DEV-005 Webhooks"
       summary: Subscribe to business events
       description: >
-        13.1.26, 13.3.17, 13.3.18 and 13.3.22. **The events exist** — 29 of them, published through
+        13.1.26, 13.3.17, 13.3.18 and 13.3.22. **The events exist**, published through
         `platform.outbox`. What was missing is a way for anything outside TICVAI to receive one.
+
+        **`eventTypes` come from the webhook event catalogue** (`WebhookEventType`, read with
+        `listWebhookEventTypes`). A name not in it is `422`: a subscription to an event nobody
+        publishes is a receiver waiting for nothing. Device, accreditation, approval-workflow and
+        seat events joined the catalogue on 29 September (16.9.56, 12.1.53, 11.1.64, 11.1.66,
+        21.13.4).
 
         **Filtered at subscription, not at delivery.** A subscriber taking every event and
         discarding 99% is a subscriber the platform pays to talk to.
@@ -515,6 +523,65 @@ paths:
           content:
             application/json:
               schema: { $ref: '#/components/schemas/WebhookSubscription' }
+        '422':
+          description: An entry in `eventTypes` is not in the webhook event catalogue.
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+
+  /webhook-event-types:
+    get:
+      operationId: listWebhookEventTypes
+      x-ticvai-consumed-by:
+        - "P08 BO-1074 Webhook Configuration"
+        - "P08 BO-1075 Seat Event Catalog"
+        - "P08 BO-692 Accreditation Webhook Management"
+        - "P09 ADM-352 Workflow Event Framework"
+        - "P09 ADM-353 Webhook Configuration & Subscription Manager"
+        - "P14 DEV-005 Webhooks"
+      x-ticvai-agreed: >-
+        29 September: re-trace 16.9.56, 12.1.53, 11.1.64, 11.1.66 and 21.13.4 (events existed or were
+        named with nothing to subscribe to them from); our build plan; shape follows
+        listWebhookSubscriptions, paged as tenancy listDevices
+      summary: The events a webhook may subscribe to
+      description: >
+        **The webhook event catalogue.** One entry per `WebhookEventType`: the name, its version, the
+        context that publishes it, what it is about, when it is emitted and the payload fields a
+        receiver gets. Read from the event catalogue shipped with the release (`events/*.yaml`), so it
+        never lists an event the platform does not publish, and a new event becomes subscribable in
+        the release that publishes it.
+
+        `publisher` narrows it to one context — `tenancy` for device events, `accreditation`,
+        `approvals`, `seating`. The same list for every tenant and every partner; what a subscription
+        then receives is still filtered to the caller's tenant and the subscription's `filters`.
+      tags: [publicApi]
+      x-ticvai-permission: DEVELOPER_VIEW
+      x-ticvai-audience: [staff, partner]
+      x-ticvai-scope-level: tenant
+      x-ticvai-read-routing: replica
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - name: publisher
+          in: query
+          required: false
+          description: Only events this context publishes.
+          schema: { type: string }
+        - $ref: '../shared/common.yaml#/components/parameters/PageSize'
+        - $ref: '../shared/common.yaml#/components/parameters/PageCursor'
+      responses:
+        '200':
+          description: The catalogue
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '../shared/common.yaml#/components/schemas/Page'
+                  - type: object
+                    properties:
+                      items:
+                        type: array
+                        items: { $ref: '#/components/schemas/WebhookEventCatalogueEntry' }
 
   /webhook-subscriptions/{subscriptionId}/deliveries:
     parameters:
@@ -527,6 +594,7 @@ paths:
       x-ticvai-consumed-by:
         - "P08 BO-067 Integrations"
         - "P08 BO-1078 Monitoring, Retry & Reconciliation"
+        - "P08 BO-692 Accreditation Webhook Management"
         - "P14 DEV-005 Webhooks"
       summary: What was sent, what failed, and why
       description: >
@@ -588,7 +656,7 @@ paths:
               properties:
                 from: { type: string, format: date-time }
                 to: { type: string, format: date-time, nullable: true }
-                eventTypes: { type: array, items: { type: string } }
+                eventTypes: { type: array, items: { $ref: '#/components/schemas/WebhookEventType' } }
       responses:
         '202':
           headers:
@@ -680,7 +748,6 @@ paths:
     get:
       operationId: listApiVersions
       x-ticvai-consumed-by:
-        - "P08 BO-1075 Seat Event Catalog"
         - "P14 DEV-001 API Reference"
       summary: Versions, their status and their sunset dates
       description: >
@@ -973,6 +1040,7 @@ paths:
       operationId: testWebhookSubscription
       x-ticvai-consumed-by:
         - "P08 BO-1173 Wallet Integration Command Center"
+        - "P08 BO-692 Accreditation Webhook Management"
       x-ticvai-agreed: >-
         29 September: VM close-out; pack 'Wallet_Configuration_Backend_Structure_v1.0.pdf' board 10
         p.115 (Test Connection); shape follows replayEvents
@@ -1001,7 +1069,7 @@ paths:
             schema:
               type: object
               properties:
-                eventType: { type: string }
+                eventType: { $ref: '#/components/schemas/WebhookEventType' }
       responses:
         '200':
           description: The test delivery and what the endpoint answered
@@ -1138,6 +1206,114 @@ components:
             empty venue tests nothing.
         locale: { type: string, default: en-AE }
 
+    WebhookEventType:
+      type: string
+      description: >
+        **The webhook event catalogue: every event a subscription may name** (29 September, build
+        pass). Each value is the `name` of an event in `events/` — `aggregate.pastTenseFact`,
+        published through `platform.outbox` by exactly one context. A name is added here in the same
+        change that adds its event file, and never before.
+
+        **Added 29 September**, each closing a requirement that had the webhook mechanism and nothing
+        to subscribe to:
+
+        | Events | Publisher | Requirement |
+        |---|---|---|
+        | `device.statusChanged`, `device.tamperDetected`, `device.enrolmentChanged`, `device.firmwareReleased`, `device.firmwareRolloutCompleted` | tenancy | 16.9.56 |
+        | `accreditation.applicationDecided`, `accreditation.holderStatusChanged`, `accreditation.credentialIssued`, `accreditation.renewalDue` | accreditation | 12.1.53 |
+        | `approval.requested`, `approval.escalated`, `approval.stepCompleted`, `approval.expired` | approvals | 11.1.64, 11.1.66 |
+        | `seat.held`, `seat.released`, `seat.blocked`, `seatMap.published` | seating | 21.13.4 |
+        | `consent.deviceConsentRecorded`, `consent.deviceConsentClaimed` | marketing | 2.6.65 |
+        | `order.chargebackRecorded` | orders | 8.3.11 to 8.3.15 (a tenant's own finance or fraud tooling) |
+        | `entitlement.expiringSoon` | access | 5.5.30 (a tenant's own CRM) |
+
+        **Published and deliberately not offered** (29 September, build pass, group G2):
+        `identity.credentialResetRequested` and `identity.loginRecorded` are security signals, and a stream of
+        them to an outside receiver is a map of which accounts are under attack; `storefront.sessionEvent` is
+        high-volume fraud telemetry, not a business fact a receiver acts on.
+      enum:
+        - access.validated
+        - accreditation.applicationDecided
+        - accreditation.credentialIssued
+        - accreditation.holderStatusChanged
+        - accreditation.renewalDue
+        - ai.ceilingApproaching
+        - approval.escalated
+        - approval.expired
+        - approval.granted
+        - approval.rejected
+        - approval.requested
+        - approval.stepCompleted
+        - assets.documentIndexed
+        - cart.abandoned
+        - catalogue.productPublished
+        - consent.deviceConsentClaimed
+        - consent.deviceConsentRecorded
+        - conversation.handedOver
+        - device.enrolmentChanged
+        - device.firmwareReleased
+        - device.firmwareRolloutCompleted
+        - device.statusChanged
+        - device.tamperDetected
+        - entitlement.expiringSoon
+        - entitlement.issued
+        - entitlement.statusChanged
+        - fnb.menuPublished
+        - fnb.orderReady
+        - inventory.purchaseOrderReceived
+        - ledger.journalPosted
+        - ledger.periodClosed
+        - maintenance.assetReturnedToService
+        - maintenance.templatePublished
+        - maintenance.workOrderCompleted
+        - marketing.caseClosed
+        - order.chargebackRecorded
+        - order.completed
+        - order.paid
+        - order.refunded
+        - performance.cancelled
+        - reporting.definitionPublished
+        - retail.merchandisePublished
+        - seat.blocked
+        - seat.held
+        - seat.released
+        - seat.sold
+        - seatMap.published
+        - shift.closed
+        - stock.depleted
+        - tenant.suspended
+        - whitelabel.contentPublished
+
+    WebhookEventCatalogueEntry:
+      type: object
+      x-ticvai-persistence: none — read from the event catalogue (events/*.yaml) shipped with the release
+      description: >
+        One event a webhook may subscribe to, as the event catalogue declares it. What a receiver
+        needs to write a handler: the name, the version in the payload, who publishes it, what it is
+        about and when, and the payload fields.
+      required: [name, version, publisher]
+      properties:
+        name: { $ref: '#/components/schemas/WebhookEventType' }
+        version: { type: integer, minimum: 1 }
+        publisher:
+          type: string
+          description: The one context that publishes it.
+        aggregate:
+          type: string
+          description: What the event is about. Delivery is ordered within one instance of it.
+        description: { type: string }
+        emittedWhen: { type: string, nullable: true }
+        payload:
+          type: array
+          items:
+            type: object
+            required: [field, type]
+            properties:
+              field: { type: string }
+              type: { type: string }
+              required: { type: boolean, default: true }
+              notes: { type: string, nullable: true }
+
     WebhookSubscription:
       type: object
       x-ticvai-persistence: "control.webhook_subscription"
@@ -1153,8 +1329,9 @@ components:
           type: array
           description: >
             **Filtered at subscription, not at delivery.** A subscriber taking every event and
-            discarding 99% is a subscriber the platform pays to talk to.
-          items: { type: string }
+            discarding 99% is a subscriber the platform pays to talk to. Each entry is a name from
+            the webhook event catalogue (`WebhookEventType`).
+          items: { $ref: '#/components/schemas/WebhookEventType' }
         filters:
           type: object
           nullable: true

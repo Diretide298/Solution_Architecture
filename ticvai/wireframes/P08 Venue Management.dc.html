@@ -278,7 +278,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; getKpiValues · listQueueEntries · callNextParties · getWaitTimes +16</div>
+          <div><b>OPERATIONS</b> &middot; getKpiValues · listQueueEntries · callNextParties · getWaitTimes +17</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess</span></div>
           <div><b>ARRIVES WITH</b> &middot; campaignId&larr;deepLink, queueId&larr;BO-001</div>
           <div><b>GOES TO</b> &middot; <a href="#bo-001">BO-001</a>  &mdash; <i>Queue Directory</i> <span class="car">feedId · queueId</span><br><a href="#bo-002">BO-002</a>  &mdash; <i>Queue Configuration</i> <span class="car">queueId</span><br><a href="#bo-003">BO-003</a>  &mdash; <i>Queue Integration Setup</i> <span class="car">feedId</span></div>
@@ -2350,7 +2350,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; listBiometricLifecycleRetention · setBiometricLifecycleRetention</div>
+          <div><b>OPERATIONS</b> &middot; listBiometricLifecycleRetention · setBiometricLifecycleRetention · listDataRetentionSettings</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoAccess</span></div>
           
           <div><b>GOES TO</b> &middot; <a href="#bo-184">BO-184</a>  &mdash; <i>Returns to the board&#x27;s landing screen</i></div>
@@ -3610,7 +3610,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; listDynamicAccessPolicy · setVisualDynamicPolicy</div>
+          <div><b>OPERATIONS</b> &middot; listDynamicAccessPolicy · setVisualDynamicPolicy · listDynamicPolicyEffectiveness</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess</span></div>
           
           <div><b>GOES TO</b> &middot; <a href="#bo-100">BO-100</a>  &mdash; <i>Venue Home</i><br><a href="#bo-235">BO-235</a>  &mdash; <i>Works in Access Attribute Catalog</i><br><a href="#bo-236">BO-236</a>  &mdash; <i>Works in Visual Dynamic Policy Builder</i><br><a href="#bo-237">BO-237</a>  &mdash; <i>Works in Context, Time, Event &amp; Capacity Pol</i><br><a href="#bo-238">BO-238</a>  &mdash; <i>Works in Identity, Membership &amp; Accreditatio</i><br><a href="#bo-239">BO-239</a>  &mdash; <i>Works in Policy Scope, Hierarchy &amp; Inheritan</i><br><a href="#bo-240">BO-240</a>  &mdash; <i>Works in Authorization Governance &amp; Temporar</i><br><a href="#bo-241">BO-241</a>  &mdash; <i>Works in Policy Evaluation Architecture &amp; Of</i><br><a href="#bo-242">BO-242</a>  &mdash; <i>Works in Policy Simulation, Conflict &amp; Impac</i><br><a href="#bo-243">BO-243</a>  &mdash; <i>Works in Policy Approval, Audit, Analytics &amp;</i> <span class="car">policyId</span></div>
@@ -3880,7 +3880,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; listPolicies · listDynamicAccessPolicy · createApprovalRequest · decideApprovalRequest +1</div>
+          <div><b>OPERATIONS</b> &middot; listPolicies · listDynamicAccessPolicy · createApprovalRequest · decideApprovalRequest +2</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess</span></div>
           <div><b>ARRIVES WITH</b> &middot; policyId&larr;navigation, requestId&larr;navigation</div>
           <div><b>GOES TO</b> &middot; <a href="#bo-234">BO-234</a> </div>
@@ -3910,7 +3910,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; listAccessSecurityFraud · lockIdentity · updateSecurityAlert</div>
+          <div><b>OPERATIONS</b> &middot; listAccessSecurityFraud · lockIdentity · updateSecurityAlert · getAccessRiskScore</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess</span></div>
           <div><b>ARRIVES WITH</b> &middot; alertId&larr;navigation</div>
           <div><b>GOES TO</b> &middot; <a href="#bo-100">BO-100</a>  &mdash; <i>Venue Home</i><br><a href="#bo-245">BO-245</a>  &mdash; <i>Works in Fraud Detection Rule &amp; Signal Libra</i><br><a href="#bo-246">BO-246</a>  &mdash; <i>Works in Credential Sharing &amp; Concurrent Usa</i> <span class="car">alertId</span><br><a href="#bo-247">BO-247</a>  &mdash; <i>Works in Unified Identity &amp; Credential Lock </i><br><a href="#bo-248">BO-248</a>  &mdash; <i>Works in Biometric &amp; Identity Integrity Moni</i> <span class="car">alertId</span><br><a href="#bo-249">BO-249</a>  &mdash; <i>Works in Relationship &amp; Companion Fraud Moni</i><br><a href="#bo-250">BO-250</a>  &mdash; <i>Works in Access Risk Scoring &amp; Decision Engi</i><br><a href="#bo-251">BO-251</a>  &mdash; <i>Works in Real-Time Security Response &amp; Playb</i><br><a href="#bo-252">BO-252</a>  &mdash; <i>Works in Security Investigation &amp; Evidence W</i><br><a href="#bo-253">BO-253</a>  &mdash; <i>Works in Security Analytics, AI Detection &amp; </i> <span class="car">alertId</span></div>
@@ -4090,7 +4090,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; listAccessRiskScoring · setRiskScoringConfig</div>
+          <div><b>OPERATIONS</b> &middot; listAccessRiskScoring · setRiskScoringConfig · getAccessRiskScore</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess</span></div>
           
           <div><b>GOES TO</b> &middot; <a href="#bo-244">BO-244</a>  &mdash; <i>Returns to the board&#x27;s landing screen</i></div>
@@ -5413,7 +5413,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           <div><b>OPERATIONS</b> &middot; listAccreditationApplications · listAccreditationHolders</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess</span></div>
           
-          <div><b>GOES TO</b> &middot; <a href="#bo-100">BO-100</a>  &mdash; <i>Back to Venue Home</i><br><a href="#bo-616">BO-616</a>  &mdash; <i>Accreditation Application Directory</i><br><a href="#bo-617">BO-617</a>  &mdash; <i>New Accreditation Application</i><br><a href="#bo-618">BO-618</a>  &mdash; <i>Accreditation Form Builder</i><br><a href="#bo-619">BO-619</a>  &mdash; <i>Accreditation Category Management</i><br><a href="#bo-620">BO-620</a>  &mdash; <i>Accreditation Program Setup</i><br><a href="#bo-621">BO-621</a>  &mdash; <i>Applicant Type Configuration</i><br><a href="#bo-622">BO-622</a>  &mdash; <i>Application Requirements Matrix</i><br><a href="#bo-623">BO-623</a>  &mdash; <i>Accreditation Intake Monitor</i><br><a href="#bo-624">BO-624</a>  &mdash; <i>Registration Rules &amp; Publication</i></div>
+          <div><b>GOES TO</b> &middot; <a href="#bo-100">BO-100</a>  &mdash; <i>Back to Venue Home</i><br><a href="#bo-616">BO-616</a>  &mdash; <i>Accreditation Application Directory</i><br><a href="#bo-617">BO-617</a>  &mdash; <i>New Accreditation Application</i><br><a href="#bo-618">BO-618</a>  &mdash; <i>Accreditation Form Builder</i> <span class="car">programmeId</span><br><a href="#bo-619">BO-619</a>  &mdash; <i>Accreditation Category Management</i><br><a href="#bo-620">BO-620</a>  &mdash; <i>Accreditation Program Setup</i> <span class="car">programmeId</span><br><a href="#bo-621">BO-621</a>  &mdash; <i>Applicant Type Configuration</i><br><a href="#bo-622">BO-622</a>  &mdash; <i>Application Requirements Matrix</i><br><a href="#bo-623">BO-623</a>  &mdash; <i>Accreditation Intake Monitor</i><br><a href="#bo-624">BO-624</a>  &mdash; <i>Registration Rules &amp; Publication</i> <span class="car">programmeId</span></div>
           
           
         </div>
@@ -5440,9 +5440,9 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; listAccreditationApplications</div>
+          <div><b>OPERATIONS</b> &middot; listAccreditationApplications · withdrawAccreditationApplication</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess</span></div>
-          
+          <div><b>ARRIVES WITH</b> &middot; applicationId&larr;navigation</div>
           <div><b>GOES TO</b> &middot; <a href="#bo-615">BO-615</a>  &mdash; <i>Back to Accreditation Command Center</i></div>
           
           
@@ -5470,9 +5470,9 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; createAccreditationApplication</div>
+          <div><b>OPERATIONS</b> &middot; createAccreditationApplication · updateAccreditationApplication · submitAccreditationApplication</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess</span></div>
-          
+          <div><b>ARRIVES WITH</b> &middot; applicationId&larr;navigation</div>
           <div><b>GOES TO</b> &middot; <a href="#bo-615">BO-615</a>  &mdash; <i>Back to Accreditation Command Center</i></div>
           
           
@@ -5500,9 +5500,9 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; createForm</div>
+          <div><b>OPERATIONS</b> &middot; createForm · updateAccreditationProgramme</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoAccess · emptyNoResults</span></div>
-          
+          <div><b>ARRIVES WITH</b> &middot; programmeId&larr;navigation</div>
           <div><b>GOES TO</b> &middot; <a href="#bo-615">BO-615</a>  &mdash; <i>Back to Accreditation Command Center</i></div>
           
           
@@ -5560,9 +5560,9 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; createAccreditationProgramme</div>
+          <div><b>OPERATIONS</b> &middot; createAccreditationProgramme · listAccreditationProgrammes · cloneAccreditationProgramme · updateAccreditationProgramme</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess</span></div>
-          
+          <div><b>ARRIVES WITH</b> &middot; programmeId&larr;navigation</div>
           <div><b>GOES TO</b> &middot; <a href="#bo-615">BO-615</a>  &mdash; <i>Back to Accreditation Command Center</i></div>
           
           
@@ -5680,9 +5680,9 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; createAccreditationProgramme</div>
+          <div><b>OPERATIONS</b> &middot; createAccreditationProgramme · updateAccreditationProgramme</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess</span></div>
-          
+          <div><b>ARRIVES WITH</b> &middot; programmeId&larr;navigation</div>
           <div><b>GOES TO</b> &middot; <a href="#bo-615">BO-615</a>  &mdash; <i>Back to Accreditation Command Center</i></div>
           
           
@@ -5830,7 +5830,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; submitAccreditationDocument</div>
+          <div><b>OPERATIONS</b> &middot; submitAccreditationDocument · listAccreditationDocuments</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess</span></div>
           
           <div><b>GOES TO</b> &middot; <a href="#bo-625">BO-625</a>  &mdash; <i>Back to Accreditation Holder Directory</i></div>
@@ -5860,7 +5860,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; verifyAccreditationDocument</div>
+          <div><b>OPERATIONS</b> &middot; verifyAccreditationDocument · listAccreditationDocuments</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess</span></div>
           <div><b>ARRIVES WITH</b> &middot; documentId&larr;navigation</div>
           <div><b>GOES TO</b> &middot; <a href="#bo-625">BO-625</a>  &mdash; <i>Back to Accreditation Holder Directory</i></div>
@@ -6040,7 +6040,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; decideAccreditationApplication · listAccreditationApplications</div>
+          <div><b>OPERATIONS</b> &middot; decideAccreditationApplication · listAccreditationApplications · getAccreditationApplication · listAccreditationDocuments</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess</span></div>
           <div><b>ARRIVES WITH</b> &middot; applicationId&larr;navigation</div>
           <div><b>GOES TO</b> &middot; <a href="#bo-635">BO-635</a>  &mdash; <i>Back to Accreditation Review Queue</i></div>
@@ -6160,7 +6160,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; decideAccreditationApplication</div>
+          <div><b>OPERATIONS</b> &middot; decideAccreditationApplication · getAccreditationApplication · resubmitAccreditationApplication · updateAccreditationApplication</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess</span></div>
           <div><b>ARRIVES WITH</b> &middot; applicationId&larr;navigation</div>
           <div><b>GOES TO</b> &middot; <a href="#bo-635">BO-635</a>  &mdash; <i>Back to Accreditation Review Queue</i></div>
@@ -6430,9 +6430,9 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; createBadgePrintJob · listBadgePrintJobs</div>
+          <div><b>OPERATIONS</b> &middot; createBadgePrintJob · listBadgePrintJobs · deliverAccreditationCredential</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess</span></div>
-          
+          <div><b>ARRIVES WITH</b> &middot; credentialId&larr;navigation</div>
           <div><b>GOES TO</b> &middot; <a href="#bo-644">BO-644</a>  &mdash; <i>Back to Credential Issuance Command Center</i></div>
           
           
@@ -6490,9 +6490,9 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; issueAccreditationCredential</div>
+          <div><b>OPERATIONS</b> &middot; issueAccreditationCredential · deliverAccreditationCredential</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess</span></div>
-          
+          <div><b>ARRIVES WITH</b> &middot; credentialId&larr;navigation</div>
           <div><b>GOES TO</b> &middot; <a href="#bo-644">BO-644</a>  &mdash; <i>Back to Credential Issuance Command Center</i></div>
           
           
@@ -6853,7 +6853,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           <div><b>OPERATIONS</b> &middot; listAccreditationHolders</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess</span></div>
           
-          <div><b>GOES TO</b> &middot; <a href="#bo-100">BO-100</a>  &mdash; <i>Back to Venue Home</i><br><a href="#bo-665">BO-665</a>  &mdash; <i>Accreditation Status Workflow</i><br><a href="#bo-666">BO-666</a>  &mdash; <i>Validity Period Configuration</i><br><a href="#bo-667">BO-667</a>  &mdash; <i>Event &amp; Venue Accreditation Assignment</i><br><a href="#bo-668">BO-668</a>  &mdash; <i>Multi-Venue Accreditation Management</i><br><a href="#bo-669">BO-669</a>  &mdash; <i>Temporary &amp; Seasonal Accreditation</i><br><a href="#bo-670">BO-670</a>  &mdash; <i>Suspension &amp; Reactivation Management</i><br><a href="#bo-671">BO-671</a>  &mdash; <i>Accreditation Revocation Management</i><br><a href="#bo-672">BO-672</a>  &mdash; <i>Expiry Monitor &amp; Expiration Rules</i><br><a href="#bo-673">BO-673</a>  &mdash; <i>Accreditation Renewal Workspace</i></div>
+          <div><b>GOES TO</b> &middot; <a href="#bo-100">BO-100</a>  &mdash; <i>Back to Venue Home</i><br><a href="#bo-665">BO-665</a>  &mdash; <i>Accreditation Status Workflow</i><br><a href="#bo-666">BO-666</a>  &mdash; <i>Validity Period Configuration</i><br><a href="#bo-667">BO-667</a>  &mdash; <i>Event &amp; Venue Accreditation Assignment</i> <span class="car">programmeId</span><br><a href="#bo-668">BO-668</a>  &mdash; <i>Multi-Venue Accreditation Management</i><br><a href="#bo-669">BO-669</a>  &mdash; <i>Temporary &amp; Seasonal Accreditation</i><br><a href="#bo-670">BO-670</a>  &mdash; <i>Suspension &amp; Reactivation Management</i><br><a href="#bo-671">BO-671</a>  &mdash; <i>Accreditation Revocation Management</i><br><a href="#bo-672">BO-672</a>  &mdash; <i>Expiry Monitor &amp; Expiration Rules</i><br><a href="#bo-673">BO-673</a>  &mdash; <i>Accreditation Renewal Workspace</i></div>
           
           
         </div>
@@ -6940,9 +6940,9 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; createAccreditationProgramme</div>
+          <div><b>OPERATIONS</b> &middot; createAccreditationProgramme · cloneAccreditationProgramme</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess</span></div>
-          
+          <div><b>ARRIVES WITH</b> &middot; programmeId&larr;navigation</div>
           <div><b>GOES TO</b> &middot; <a href="#bo-664">BO-664</a>  &mdash; <i>Back to Accreditation Lifecycle Command Cent</i></div>
           
           
@@ -7085,14 +7085,14 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
             
             <div class="canvas">
               <div class="kpis"><div class="kpi"><b>Total</b><span>1,248</span></div><div class="kpi"><b>Active</b><span>978</span></div><div class="kpi"><b>Attention</b><span>142</span></div><div class="kpi"><b>Offline</b><span>12</span></div></div>
-              <div class="two"><div class="grow"><div class="panel"><span class="kind">dataTable</span><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div><span class="why">**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue&#x27;s busiest hour is a list that skips rows.</span></div></div></div>
+              <div class="two"><div class="grow"><div class="panel"><span class="kind">dataTable</span><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div><span class="why">**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue&#x27;s busiest hour is a list that skips rows.</span></div><div class="panel"><span class="kind">primaryButton</span><div class="chip cta">primaryButton</div><span class="why">The act the screen exists for.</span></div><div class="panel"><b>Cancel</b><div class="chip">Cancel</div><span class="why">**A screen that can submit must be leaveable without submitting.**</span></div></div></div>
             </div>
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; listAccreditationHolders</div>
+          <div><b>OPERATIONS</b> &middot; listAccreditationHolders · renewAccreditation</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess</span></div>
-          
+          <div><b>ARRIVES WITH</b> &middot; holderId&larr;navigation</div>
           <div><b>GOES TO</b> &middot; <a href="#bo-664">BO-664</a>  &mdash; <i>Back to Accreditation Lifecycle Command Cent</i></div>
           
           
@@ -7120,9 +7120,9 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; setAccreditationValidity</div>
+          <div><b>OPERATIONS</b> &middot; setAccreditationValidity · listAccreditationHolders · renewAccreditation</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess</span></div>
-          
+          <div><b>ARRIVES WITH</b> &middot; holderId&larr;navigation</div>
           <div><b>GOES TO</b> &middot; <a href="#bo-664">BO-664</a>  &mdash; <i>Back to Accreditation Lifecycle Command Cent</i></div>
           
           
@@ -7390,9 +7390,9 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; listAccreditationHolders</div>
+          <div><b>OPERATIONS</b> &middot; listAccreditationHolders · listAccreditationExports · exportAccreditationData · getAccreditationExport +2</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoAccess · emptyNoResults</span></div>
-          
+          <div><b>ARRIVES WITH</b> &middot; executionId&larr;navigation, exportId&larr;navigation, reportId&larr;navigation</div>
           <div><b>GOES TO</b> &middot; <a href="#bo-674">BO-674</a>  &mdash; <i>Back to Accreditation Communications Command</i></div>
           
           
@@ -7450,7 +7450,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; listAccreditationHolders</div>
+          <div><b>OPERATIONS</b> &middot; listAccreditationHolders · getKpiValues</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess</span></div>
           
           <div><b>GOES TO</b> &middot; <a href="#bo-100">BO-100</a>  &mdash; <i>Back to Venue Home</i><br><a href="#bo-685">BO-685</a>  &mdash; <i>Accreditation Status &amp; Portfolio Reporting</i><br><a href="#bo-686">BO-686</a>  &mdash; <i>Accreditation Utilization Analytics</i><br><a href="#bo-687">BO-687</a>  &mdash; <i>Accreditation Access Activity Reporting</i><br><a href="#bo-688">BO-688</a>  &mdash; <i>Accreditation Trend &amp; Comparative Analysis</i><br><a href="#bo-689">BO-689</a>  &mdash; <i>Accreditation Audit Reporting</i><br><a href="#bo-690">BO-690</a>  &mdash; <i>Immutable Accreditation Audit Log</i><br><a href="#bo-691">BO-691</a>  &mdash; <i>Accreditation API Management</i><br><a href="#bo-692">BO-692</a>  &mdash; <i>Accreditation Webhook Management</i><br><a href="#bo-693">BO-693</a>  &mdash; <i>Integration &amp; Data Exchange Monitor</i></div>
@@ -7480,7 +7480,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; listAccreditationHolders</div>
+          <div><b>OPERATIONS</b> &middot; listAccreditationHolders · getKpiValues</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess</span></div>
           
           <div><b>GOES TO</b> &middot; <a href="#bo-684">BO-684</a>  &mdash; <i>Back to Accreditation Executive Dashboard</i></div>
@@ -7690,9 +7690,9 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; listWebhookSubscriptions</div>
+          <div><b>OPERATIONS</b> &middot; listWebhookSubscriptions · listWebhookEventTypes · createWebhookSubscription · testWebhookSubscription +1</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoAccess · emptyNoResults</span></div>
-          
+          <div><b>ARRIVES WITH</b> &middot; subscriptionId&larr;navigation</div>
           <div><b>GOES TO</b> &middot; <a href="#bo-684">BO-684</a>  &mdash; <i>Back to Accreditation Executive Dashboard</i></div>
           
           
@@ -7930,7 +7930,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; setMapZones</div>
+          <div><b>OPERATIONS</b> &middot; setMapZones · proposeSeatMapChanges</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess</span></div>
           <div><b>ARRIVES WITH</b> &middot; seatMapId&larr;navigation</div>
           <div><b>GOES TO</b> &middot; <a href="#bo-953">BO-953</a>  &mdash; <i>Back to Seat Map Command Center</i></div>
@@ -8260,9 +8260,9 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; updateSeats</div>
+          <div><b>OPERATIONS</b> &middot; updateSeats · decideProposedAction · proposeSeatMapChanges · getActionPlan</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess</span></div>
-          <div><b>ARRIVES WITH</b> &middot; seatMapId&larr;navigation</div>
+          <div><b>ARRIVES WITH</b> &middot; seatMapId&larr;navigation, actionId&larr;navigation, planId&larr;navigation</div>
           <div><b>GOES TO</b> &middot; <a href="#bo-963">BO-963</a>  &mdash; <i>Back to Import Command Center</i> <span class="car">seatMapId</span></div>
           
           
@@ -8410,9 +8410,9 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; getSeatMap · publishSeatMap</div>
+          <div><b>OPERATIONS</b> &middot; getSeatMap · publishSeatMap · decideProposedAction · proposeSeatMapChanges +1</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess</span></div>
-          <div><b>ARRIVES WITH</b> &middot; seatMapId&larr;navigation</div>
+          <div><b>ARRIVES WITH</b> &middot; seatMapId&larr;navigation, actionId&larr;navigation, planId&larr;navigation</div>
           <div><b>GOES TO</b> &middot; <a href="#bo-973">BO-973</a>  &mdash; <i>Back to Layout Command Center</i></div>
           
           
@@ -8620,7 +8620,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; validateSeatMap · publishSeatMap</div>
+          <div><b>OPERATIONS</b> &middot; validateSeatMap · publishSeatMap · proposeSeatMapChanges</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess</span></div>
           <div><b>ARRIVES WITH</b> &middot; seatMapId&larr;navigation</div>
           <div><b>GOES TO</b> &middot; <a href="#bo-973">BO-973</a>  &mdash; <i>Back to Layout Command Center</i></div>
@@ -10600,7 +10600,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; getRecommendations</div>
+          <div><b>OPERATIONS</b> &middot; decideRecommendations</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess</span></div>
           
           <div><b>GOES TO</b> &middot; <a href="#bo-1043">BO-1043</a>  &mdash; <i>Back to Revenue Command Center</i></div>
@@ -11140,9 +11140,9 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; listAccessPolicies · createAccessPolicy · simulateAccessPolicy · updateAccessPolicy +2</div>
+          <div><b>OPERATIONS</b> &middot; listAccessPolicies · createAccessPolicy · simulateAccessPolicy · updateAccessPolicy +10</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess</span></div>
-          <div><b>ARRIVES WITH</b> &middot; policyId&larr;navigation</div>
+          <div><b>ARRIVES WITH</b> &middot; policyId&larr;navigation, campaignId&larr;navigation, itemId&larr;navigation</div>
           <div><b>GOES TO</b> &middot; <a href="#bo-1061">BO-1061</a>  &mdash; <i>Back to Platform Command Center</i></div>
           
           
@@ -11380,7 +11380,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; listWebhookSubscriptions · createWebhookSubscription</div>
+          <div><b>OPERATIONS</b> &middot; listWebhookSubscriptions · createWebhookSubscription · listWebhookEventTypes</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess</span></div>
           
           <div><b>GOES TO</b> &middot; <a href="#bo-1071">BO-1071</a>  &mdash; <i>Back to Integration Command Center</i></div>
@@ -11410,7 +11410,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; listApiVersions</div>
+          <div><b>OPERATIONS</b> &middot; listWebhookEventTypes</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess</span></div>
           
           <div><b>GOES TO</b> &middot; <a href="#bo-1071">BO-1071</a>  &mdash; <i>Back to Integration Command Center</i></div>
@@ -12013,10 +12013,10 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; getVenueSettings · listUpsellRules · getUpsellSuggestions</div>
+          <div><b>OPERATIONS</b> &middot; getVenueSettings · listUpsellRules · decideRecommendations · recordRecommendationEvents</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess</span></div>
           <div><b>ARRIVES WITH</b> &middot; venueId&larr;session</div>
-          <div><b>GOES TO</b> &middot; <a href="#bo-007">BO-007</a>  &mdash; <i>Product Directory</i><br><a href="#bo-009">BO-009</a>  &mdash; <i>Pricing Rules</i><br><a href="#bo-010">BO-010</a>  &mdash; <i>Promotions &amp; Coupons</i><br><a href="#bo-011">BO-011</a>  &mdash; <i>Packages &amp; Bundles</i> <span class="car">bundleId</span><br><a href="#bo-012">BO-012</a>  &mdash; <i>Membership Products</i><br><a href="#bo-013">BO-013</a>  &mdash; <i>Channel &amp; Distribution</i><br><a href="#bo-014">BO-014</a>  &mdash; <i>Catalogue Publishing</i><br><a href="#bo-015">BO-015</a>  &mdash; <i>Performance Calendar</i><br><a href="#bo-016">BO-016</a>  &mdash; <i>Performance Template</i><br><a href="#bo-017">BO-017</a>  &mdash; <i>Capacity Management</i><br><a href="#bo-018">BO-018</a>  &mdash; <i>Allocation &amp; Holds</i><br><a href="#bo-019">BO-019</a>  &mdash; <i>Closures &amp; Blackouts</i><br><a href="#bo-037">BO-037</a>  &mdash; <i>Offline Package Status</i><br><a href="#bo-063">BO-063</a>  &mdash; <i>Opening Hours &amp; Calendar</i><br><a href="#bo-109">BO-109</a>  &mdash; <i>Menu Builder &amp; POS Layout Designer</i><br><a href="#bo-110">BO-110</a>  &mdash; <i>Recipe &amp; BOM Management</i><br><a href="#bo-111">BO-111</a>  &mdash; <i>Ingredient Substitution, Allergen &amp; Nutritio</i><br><a href="#bo-112">BO-112</a>  &mdash; <i>Production Planning &amp; Production Sheets</i><br><a href="#bo-113">BO-113</a>  &mdash; <i>Central Kitchen &amp; Commissary Management</i><br><a href="#bo-114">BO-114</a>  &mdash; <i>Variants, Attributes, Barcode &amp; RFID Managem</i><br><a href="#bo-115">BO-115</a>  &mdash; <i>Category, Brand &amp; Merchandise Hierarchy</i><br><a href="#bo-116">BO-116</a>  &mdash; <i>Merchandising &amp; Product Presentation</i><br><a href="#bo-117">BO-117</a>  &mdash; <i>Product Import, Governance &amp; AI Configuratio</i><br><a href="#bo-118">BO-118</a>  &mdash; <i>Campaign &amp; Audience Management</i><br><a href="#bo-119">BO-119</a>  &mdash; <i>Cross-Sell, Upsell &amp; Recommendation Rules</i> <span class="car">ruleId</span><br><a href="#bo-120">BO-120</a>  &mdash; <i>Omnichannel Commerce &amp; Journey Configuration</i><br><a href="#bo-121">BO-121</a>  &mdash; <i>Personalized Offers &amp; Guest Engagement</i><br><a href="#bo-122">BO-122</a>  &mdash; <i>POS Experience Dashboard</i><br><a href="#bo-123">BO-123</a>  &mdash; <i>POS Profile Management</i><br><a href="#bo-124">BO-124</a>  &mdash; <i>Layout &amp; Journey Builder</i><br><a href="#bo-125">BO-125</a>  &mdash; <i>Product &amp; Category Button Configuration</i><br><a href="#bo-126">BO-126</a>  &mdash; <i>Deployment, Preview &amp; Audit</i><br><a href="#bo-142">BO-142</a>  &mdash; <i>Store Rules, Controls &amp; Permissions</i><br><a href="#bo-143">BO-143</a>  &mdash; <i>Retail Global Settings &amp; Controls</i><br><a href="#bo-1190">BO-1190</a>  &mdash; <i>Donation Campaigns</i></div>
+          <div><b>GOES TO</b> &middot; <a href="#bo-007">BO-007</a>  &mdash; <i>Product Directory</i><br><a href="#bo-009">BO-009</a>  &mdash; <i>Pricing Rules</i><br><a href="#bo-010">BO-010</a>  &mdash; <i>Promotions &amp; Coupons</i><br><a href="#bo-011">BO-011</a>  &mdash; <i>Packages &amp; Bundles</i><br><a href="#bo-012">BO-012</a>  &mdash; <i>Membership Products</i><br><a href="#bo-013">BO-013</a>  &mdash; <i>Channel &amp; Distribution</i><br><a href="#bo-014">BO-014</a>  &mdash; <i>Catalogue Publishing</i><br><a href="#bo-015">BO-015</a>  &mdash; <i>Performance Calendar</i><br><a href="#bo-016">BO-016</a>  &mdash; <i>Performance Template</i><br><a href="#bo-017">BO-017</a>  &mdash; <i>Capacity Management</i><br><a href="#bo-018">BO-018</a>  &mdash; <i>Allocation &amp; Holds</i><br><a href="#bo-019">BO-019</a>  &mdash; <i>Closures &amp; Blackouts</i><br><a href="#bo-037">BO-037</a>  &mdash; <i>Offline Package Status</i><br><a href="#bo-063">BO-063</a>  &mdash; <i>Opening Hours &amp; Calendar</i><br><a href="#bo-109">BO-109</a>  &mdash; <i>Menu Builder &amp; POS Layout Designer</i><br><a href="#bo-110">BO-110</a>  &mdash; <i>Recipe &amp; BOM Management</i><br><a href="#bo-111">BO-111</a>  &mdash; <i>Ingredient Substitution, Allergen &amp; Nutritio</i><br><a href="#bo-112">BO-112</a>  &mdash; <i>Production Planning &amp; Production Sheets</i><br><a href="#bo-113">BO-113</a>  &mdash; <i>Central Kitchen &amp; Commissary Management</i><br><a href="#bo-114">BO-114</a>  &mdash; <i>Variants, Attributes, Barcode &amp; RFID Managem</i><br><a href="#bo-115">BO-115</a>  &mdash; <i>Category, Brand &amp; Merchandise Hierarchy</i><br><a href="#bo-116">BO-116</a>  &mdash; <i>Merchandising &amp; Product Presentation</i><br><a href="#bo-117">BO-117</a>  &mdash; <i>Product Import, Governance &amp; AI Configuratio</i><br><a href="#bo-118">BO-118</a>  &mdash; <i>Campaign &amp; Audience Management</i><br><a href="#bo-119">BO-119</a>  &mdash; <i>Cross-Sell, Upsell &amp; Recommendation Rules</i><br><a href="#bo-120">BO-120</a>  &mdash; <i>Omnichannel Commerce &amp; Journey Configuration</i><br><a href="#bo-121">BO-121</a>  &mdash; <i>Personalized Offers &amp; Guest Engagement</i><br><a href="#bo-122">BO-122</a>  &mdash; <i>POS Experience Dashboard</i><br><a href="#bo-123">BO-123</a>  &mdash; <i>POS Profile Management</i><br><a href="#bo-124">BO-124</a>  &mdash; <i>Layout &amp; Journey Builder</i><br><a href="#bo-125">BO-125</a>  &mdash; <i>Product &amp; Category Button Configuration</i><br><a href="#bo-126">BO-126</a>  &mdash; <i>Deployment, Preview &amp; Audit</i><br><a href="#bo-142">BO-142</a>  &mdash; <i>Store Rules, Controls &amp; Permissions</i><br><a href="#bo-143">BO-143</a>  &mdash; <i>Retail Global Settings &amp; Controls</i><br><a href="#bo-1190">BO-1190</a>  &mdash; <i>Donation Campaigns</i></div>
           
           
         </div>
@@ -12343,7 +12343,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; getRecommendations · getUpsellSuggestions · createUpsellRule · deleteUpsellRule</div>
+          <div><b>OPERATIONS</b> &middot; createUpsellRule · deleteUpsellRule · decideRecommendations</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoAccess</span></div>
           <div><b>ARRIVES WITH</b> &middot; venueId&larr;session, ruleId&larr;navigation</div>
           <div><b>GOES TO</b> &middot; <a href="#bo-010">BO-010</a>  &mdash; <i>Promotions &amp; Coupons</i><br><a href="#bo-102">BO-102</a>  &mdash; <i>Sell</i></div>
@@ -13363,7 +13363,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; setMembershipEntitlementAdmission · setMembershipBenefit · setPlanBenefits · listEntitlementTemplates</div>
+          <div><b>OPERATIONS</b> &middot; setMembershipEntitlementAdmission · setMembershipBenefit · setPlanBenefits · listEntitlementTemplates +1</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoAccess</span></div>
           <div><b>ARRIVES WITH</b> &middot; templateId&larr;navigation</div>
           <div><b>GOES TO</b> &middot; <a href="#bo-284">BO-284</a>  &mdash; <i>Returns to the board&#x27;s landing screen</i></div>
@@ -14893,9 +14893,9 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; listOrders · getOrder · createOrder · applyManualDiscount +10</div>
+          <div><b>OPERATIONS</b> &middot; listOrders · getOrder · createOrder · applyManualDiscount +15</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess</span></div>
-          <div><b>ARRIVES WITH</b> &middot; orderId&larr;deepLink</div>
+          <div><b>ARRIVES WITH</b> &middot; orderId&larr;deepLink, documentId&larr;navigation, invoiceId&larr;navigation</div>
           <div><b>GOES TO</b> &middot; <a href="#bo-008">BO-008</a>  &mdash; <i>Product Detail &amp; Variants</i></div>
           
           <div><b>OVERLAYS</b><div class="ov"><b>confirmDialog</b> confirmVoidOrder &middot; <i>Void order</i></div><div class="ov"><b>modal</b> formCreateOrder &middot; <i>Create order</i> &middot; <b>Create order</b> &middot; Cancel <span class="dis">discards id · venueId · channel · lines · recordedAt · shiftId · subjectId · guestLinkId · catalogueBundleVersion</span></div><div class="ov"><b>modal</b> formApplyManualDiscount &middot; <i>Apply manual discount</i> &middot; <b>Apply manual discount</b> &middot; Cancel <span class="dis">discards id · reason · recordedAt · lineId · amount · percentage · reasonCode · approverPrincipalId</span></div><div class="ov"><b>modal</b> formCreateRefund &middot; <i>Create refund</i> &middot; <b>Create refund</b> &middot; Cancel <span class="dis">discards id · amount · reason · recordedAt · lineIds · secondaryAuthorisation · refundToOriginalTender · alternateTender</span></div><div class="ov"><b>modal</b> formExchangeOrderLines &middot; <i>Exchange order lines</i> &middot; <b>Exchange order lines</b> &middot; Cancel <span class="dis">discards id · outgoingLineIds · incomingLines · recordedAt · waiveFee · reason</span></div><div class="ov"><b>modal</b> formHoldOrder &middot; <i>Hold order</i> &middot; <b>Hold order</b> &middot; Cancel <span class="dis">discards recordedAt · label · holdUntil</span></div><div class="ov"><b>modal</b> formModifyOrder &middot; <i>Modify order</i> &middot; <b>Modify order</b> &middot; Cancel <span class="dis">discards id · recordedAt · addLines · removeLineIds · reason</span></div><div class="ov"><b>modal</b> formReprintOrder &middot; <i>Reprint order</i> &middot; <b>Reprint order</b> &middot; Cancel <span class="dis">discards delivery · recordedAt · destination · lineIds · reason</span></div><div class="ov"><b>modal</b> formRescheduleOrder &middot; <i>Reschedule order</i> &middot; <b>Reschedule order</b> &middot; Cancel <span class="dis">discards targetPerformanceId · recordedAt · lineIds · waiveFee · reason</span></div></div>
@@ -14923,9 +14923,9 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; listOrderRefunds · createRefund · applyManualDiscount · createOrder +11</div>
+          <div><b>OPERATIONS</b> &middot; listOrderRefunds · createRefund · applyManualDiscount · createOrder +14</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess</span></div>
-          <div><b>ARRIVES WITH</b> &middot; orderId&larr;deepLink, venueId&larr;session</div>
+          <div><b>ARRIVES WITH</b> &middot; orderId&larr;deepLink, venueId&larr;session, documentId&larr;navigation</div>
           <div><b>GOES TO</b> &middot; <a href="#bo-004">BO-004</a>  &mdash; <i>Authorises the bulk refund</i> <span class="car">refundId</span><br><a href="#bo-008">BO-008</a>  &mdash; <i>Product Detail &amp; Variants</i></div>
           
           <div><b>OVERLAYS</b><div class="ov"><b>confirmDialog</b> confirmVoidOrder &middot; <i>Void order</i></div><div class="ov"><b>modal</b> formCreateRefund &middot; <i>Create refund</i> &middot; <b>Create refund</b> &middot; Cancel <span class="dis">discards id · amount · reason · recordedAt · lineIds · secondaryAuthorisation · refundToOriginalTender · alternateTender</span></div><div class="ov"><b>modal</b> formApplyManualDiscount &middot; <i>Apply manual discount</i> &middot; <b>Apply manual discount</b> &middot; Cancel <span class="dis">discards id · reason · recordedAt · lineId · amount · percentage · reasonCode · approverPrincipalId</span></div><div class="ov"><b>modal</b> formCreateOrder &middot; <i>Create order</i> &middot; <b>Create order</b> &middot; Cancel <span class="dis">discards id · venueId · channel · lines · recordedAt · shiftId · subjectId · guestLinkId · catalogueBundleVersion</span></div><div class="ov"><b>modal</b> formExchangeOrderLines &middot; <i>Exchange order lines</i> &middot; <b>Exchange order lines</b> &middot; Cancel <span class="dis">discards id · outgoingLineIds · incomingLines · recordedAt · waiveFee · reason</span></div><div class="ov"><b>modal</b> formHoldOrder &middot; <i>Hold order</i> &middot; <b>Hold order</b> &middot; Cancel <span class="dis">discards recordedAt · label · holdUntil</span></div><div class="ov"><b>modal</b> formModifyOrder &middot; <i>Modify order</i> &middot; <b>Modify order</b> &middot; Cancel <span class="dis">discards id · recordedAt · addLines · removeLineIds · reason</span></div><div class="ov"><b>modal</b> formReprintOrder &middot; <i>Reprint order</i> &middot; <b>Reprint order</b> &middot; Cancel <span class="dis">discards delivery · recordedAt · destination · lineIds · reason</span></div><div class="ov"><b>modal</b> formRescheduleOrder &middot; <i>Reschedule order</i> &middot; <b>Reschedule order</b> &middot; Cancel <span class="dis">discards targetPerformanceId · recordedAt · lineIds · waiveFee · reason</span></div></div>
@@ -14983,9 +14983,9 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; listSettlementExceptions · resolveSettlementException · getSettlement · ingestSettlementFile +1</div>
+          <div><b>OPERATIONS</b> &middot; listSettlementExceptions · resolveSettlementException · getSettlement · ingestSettlementFile +6</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess</span></div>
-          <div><b>ARRIVES WITH</b> &middot; settlementId&larr;deepLink</div>
+          <div><b>ARRIVES WITH</b> &middot; settlementId&larr;deepLink, chargebackId&larr;navigation</div>
           <div><b>GOES TO</b> &middot; <a href="#bo-008">BO-008</a>  &mdash; <i>Product Detail &amp; Variants</i><br><a href="#bo-024">BO-024</a>  &mdash; <i>Payment Exceptions</i> <span class="car">paymentId</span></div>
           
           <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formResolveSettlementException &middot; <i>Resolve settlement exception</i> &middot; <b>Resolve settlement exception</b> &middot; Cancel <span class="dis">discards exceptionId · resolution · note · matchedPaymentId</span></div><div class="ov"><b>modal</b> formIngestSettlementFile &middot; <i>Ingest settlement file</i> &middot; <b>Ingest settlement file</b> &middot; Cancel <span class="dis">discards providerName · periodStart · periodEnd · fileReference · format</span></div></div>
@@ -15433,9 +15433,9 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; getRefundPolicy · listDiningOutlets · setRefundPolicy · listDeliveryLocations +2</div>
+          <div><b>OPERATIONS</b> &middot; getRefundPolicy · listDiningOutlets · setRefundPolicy · listDeliveryLocations +5</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess</span></div>
-          <div><b>ARRIVES WITH</b> &middot; venueId&larr;session</div>
+          <div><b>ARRIVES WITH</b> &middot; venueId&larr;session, locationId&larr;navigation</div>
           <div><b>GOES TO</b> &middot; <a href="#bo-008">BO-008</a>  &mdash; <i>Product Detail &amp; Variants</i></div>
           
           <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formSetRefundPolicy &middot; <i>Save refund policy</i> &middot; <b>Save refund policy</b> &middot; Cancel <span class="dis">discards venueId · selfAuthoriseLimit · requiresApprovalAbove · id · requiresSecondUserAbove · timeBands · allowPartial · refundWindowDays · varianceThreshold</span></div><div class="ov"><b>modal</b> formSetVenueSettings &middot; <i>Save venue settings</i> &middot; <b>Save venue settings</b> &middot; Cancel <span class="dis">discards id · venueId · currencyCode · currencyScale · supportHours · quietHours · biometrics · segregatedAccess · alerting · displayCurrencies · catalogue · inventory · seating · promotions · fnb · queue · reporting · identity</span></div></div>
@@ -15613,7 +15613,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; listFiscalPeriods · beginPeriodClose · closeFiscalPeriod · abandonPeriodClose +2</div>
+          <div><b>OPERATIONS</b> &middot; listFiscalPeriods · beginPeriodClose · closeFiscalPeriod · abandonPeriodClose +3</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess</span></div>
           <div><b>ARRIVES WITH</b> &middot; periodId&larr;deepLink</div>
           <div><b>GOES TO</b> &middot; <a href="#bo-040">BO-040</a>  &mdash; <i>Clears outstanding shift variances</i><br><a href="#bo-074">BO-074</a>  &mdash; <i>Chart of Accounts</i> <span class="car">accountId</span><br><a href="#bo-075">BO-075</a>  &mdash; <i>Account Mapping</i><br><a href="#bo-076">BO-076</a> </div>
@@ -16243,7 +16243,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; listPaymentOrderFinancial</div>
+          <div><b>OPERATIONS</b> &middot; listPaymentOrderFinancial · listInstalmentPlans · createInstalmentPlan</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess</span></div>
           
           <div><b>GOES TO</b> &middot; <a href="#bo-100">BO-100</a>  &mdash; <i>Venue Home</i><br><a href="#bo-325">BO-325</a>  &mdash; <i>Works in Order Payment Detail &amp; Transaction </i><br><a href="#bo-326">BO-326</a>  &mdash; <i>Works in Multi-Payment, Split Tender &amp; Payme</i><br><a href="#bo-327">BO-327</a>  &mdash; <i>Works in Deposit, Partial Payment &amp; Outstand</i><br><a href="#bo-328">BO-328</a>  &mdash; <i>Works in Order Split, Merge &amp; Transaction Re</i> <span class="car">orderId</span><br><a href="#bo-329">BO-329</a>  &mdash; <i>Works in Related Order &amp; Transaction Relatio</i><br><a href="#bo-330">BO-330</a>  &mdash; <i>Works in External Payment, Partner &amp; Settlem</i> <span class="car">orderId</span><br><a href="#bo-331">BO-331</a>  &mdash; <i>Works in Payment Reconciliation &amp; Exception </i><br><a href="#bo-332">BO-332</a>  &mdash; <i>Works in Financial Traceability, Control &amp; A</i><br><a href="#bo-333">BO-333</a>  &mdash; <i>Works in Order Financial Analytics &amp; AI Reco</i></div>
@@ -16543,7 +16543,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; getKpiValues · getUnifiedReconciliation</div>
+          <div><b>OPERATIONS</b> &middot; getKpiValues · getUnifiedReconciliation · listTaxInvoices · listCreditMemos +1</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess</span></div>
           
           <div><b>GOES TO</b> &middot; <a href="#bo-100">BO-100</a>  &mdash; <i>Back to Venue Home</i></div>
@@ -18913,9 +18913,9 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; listWalletDisputes</div>
+          <div><b>OPERATIONS</b> &middot; listWalletDisputes · listRiskAlerts · decideRiskAlert · createRiskCase +2</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess</span></div>
-          
+          <div><b>ARRIVES WITH</b> &middot; alertId&larr;navigation, caseId&larr;navigation</div>
           <div><b>GOES TO</b> &middot; <a href="#bo-1153">BO-1153</a>  &mdash; <i>Back to Wallet Security &amp; Risk Command Cente</i></div>
           
           
@@ -19874,9 +19874,9 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; getFnbDeliveryPolicy · setFnbDeliveryPolicy · listOutlets · getGuestMenu +16</div>
+          <div><b>OPERATIONS</b> &middot; getFnbDeliveryPolicy · setFnbDeliveryPolicy · listOutlets · getGuestMenu +17</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess</span></div>
-          <div><b>ARRIVES WITH</b> &middot; outletId&larr;deepLink, actionId&larr;deepLink</div>
+          <div><b>ARRIVES WITH</b> &middot; outletId&larr;deepLink, actionId&larr;deepLink, venueId&larr;session</div>
           <div><b>GOES TO</b> &middot; nothing declared</div>
           
           <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formSetFnbDeliveryPolicy &middot; <i>Save F&amp;B delivery policy</i> &middot; <b>Save F&amp;B delivery policy</b> &middot; Cancel <span class="dis">discards outletId · id · collectionEnabled · deliveryEnabled · collectionPoint · collectionHoldMinutes · asapCollectionMinutes · asapDeliveryMinutes · slotMinutes · minimumOrder · deliveryFee · freeDeliveryAbove · radiusKm · emiratesServed · cutleryOptIn · scopePath</span></div><div class="ov"><b>modal</b> formCreateOutlet &middot; <i>Create outlet</i> &middot; <b>Create outlet</b> &middot; Cancel <span class="dis">discards id · code · name · venueId · kind · zone · stockLocationId · costCenterId · openingHours · isActive</span></div><div class="ov"><b>modal</b> formRecordWaste &middot; <i>Record waste</i> &middot; <b>Record waste</b> &middot; Cancel <span class="dis">discards id · lines · reason · recordedAt · note</span></div><div class="ov"><b>modal</b> formReserveMerchandise &middot; <i>Reserve merchandise</i> &middot; <b>Reserve merchandise</b> &middot; Cancel <span class="dis">discards id · lines · expiresAt · subjectId · collectionNote</span></div><div class="ov"><b>modal</b> formSetReturnPolicy &middot; <i>Save return policy</i> &middot; <b>Save return policy</b> &middot; Cancel <span class="dis">discards outletId · defaultWindowDays · requiresReceipt · id · allowCashRefundOnCardSale · selfAuthoriseLimit · requiresSecondUserAbove · requiresApprovalAbove · restockableConditions · nonReturnableCategoryIds</span></div><div class="ov"><b>modal</b> formSetTableLayout &middot; <i>Save table layout</i> &middot; <b>Save table layout</b> &middot; Cancel <span class="dis">discards tables</span></div><div class="ov"><b>modal</b> formUpdateOutlet &middot; <i>Save outlet</i> &middot; <b>Save outlet</b> &middot; Cancel <span class="dis">discards name · stockLocationId · costCenterId · openingHours · isActive</span></div><div class="ov"><b>modal</b> formSignCorrectiveAction &middot; <i>Sign corrective action</i> &middot; <b>Sign corrective action</b> &middot; Cancel <span class="dis">discards actionTaken · disposal</span></div></div>
@@ -20144,7 +20144,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; setConfigurationProfile · deployConfigurationProfile · configureWorkstation · getWorkstationHealth +5</div>
+          <div><b>OPERATIONS</b> &middot; setConfigurationProfile · deployConfigurationProfile · configureWorkstation · getWorkstationHealth +8</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess</span></div>
           <div><b>ARRIVES WITH</b> &middot; venueId&larr;session, profileId&larr;deepLink, workstationId&larr;deepLink</div>
           <div><b>GOES TO</b> &middot; <a href="#bo-037">BO-037</a>  &mdash; <i>Each device&#x27;s cached package is checked</i> <span class="car">version</span><br><a href="#bo-108">BO-108</a>  &mdash; <i>Venue Operations</i><br><a href="#bo-124">BO-124</a>  &mdash; <i>Its sale board layout is built</i> <span class="car">profileId</span><br><a href="#bo-130">BO-130</a>  &mdash; <i>Offline Policy &amp; Rules Configuration</i></div>
@@ -20297,7 +20297,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           <div><b>OPERATIONS</b> &middot; getApprovalAnalytics · listApprovalRequests</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess</span></div>
           
-          <div><b>GOES TO</b> &middot; <a href="#bo-100">BO-100</a>  &mdash; <i>Back to Venue Home</i><br><a href="#bo-365">BO-365</a>  &mdash; <i>My Approval Inbox</i><br><a href="#bo-366">BO-366</a>  &mdash; <i>Team / Shared Approval Queue</i><br><a href="#bo-367">BO-367</a>  &mdash; <i>Approval Request Detail</i><br><a href="#bo-368">BO-368</a>  &mdash; <i>AI Decision Support</i><br><a href="#bo-369">BO-369</a>  &mdash; <i>High Priority &amp; Risk Queue</i><br><a href="#bo-370">BO-370</a>  &mdash; <i>Escalated Approval Center</i><br><a href="#bo-371">BO-371</a>  &mdash; <i>Completed Approval History</i><br><a href="#bo-372">BO-372</a>  &mdash; <i>Approval SLA &amp; Workload Monitor</i><br><a href="#bo-373">BO-373</a>  &mdash; <i>Approval Activity &amp; Notification Center</i></div>
+          <div><b>GOES TO</b> &middot; <a href="#bo-100">BO-100</a>  &mdash; <i>Back to Venue Home</i><br><a href="#bo-365">BO-365</a>  &mdash; <i>My Approval Inbox</i><br><a href="#bo-366">BO-366</a>  &mdash; <i>Team / Shared Approval Queue</i><br><a href="#bo-367">BO-367</a>  &mdash; <i>Approval Request Detail</i> <span class="car">approvalRequestId</span><br><a href="#bo-368">BO-368</a>  &mdash; <i>AI Decision Support</i><br><a href="#bo-369">BO-369</a>  &mdash; <i>High Priority &amp; Risk Queue</i> <span class="car">approvalRequestId</span><br><a href="#bo-370">BO-370</a>  &mdash; <i>Escalated Approval Center</i><br><a href="#bo-371">BO-371</a>  &mdash; <i>Completed Approval History</i><br><a href="#bo-372">BO-372</a>  &mdash; <i>Approval SLA &amp; Workload Monitor</i><br><a href="#bo-373">BO-373</a>  &mdash; <i>Approval Activity &amp; Notification Center</i></div>
           
           
         </div>
@@ -20384,9 +20384,9 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; listApprovalRequests · decideApprovalRequest</div>
+          <div><b>OPERATIONS</b> &middot; listApprovalRequests · decideApprovalRequest · getApprovalRequestScore</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess</span></div>
-          <div><b>ARRIVES WITH</b> &middot; requestId&larr;navigation</div>
+          <div><b>ARRIVES WITH</b> &middot; requestId&larr;navigation, approvalRequestId&larr;navigation</div>
           <div><b>GOES TO</b> &middot; <a href="#bo-364">BO-364</a>  &mdash; <i>Back to Approval Command Center Dashboard</i></div>
           
           
@@ -20414,7 +20414,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; evaluateApprovalRequirement</div>
+          <div><b>OPERATIONS</b> &middot; evaluateApprovalRequirement · listApprovalRequests</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess</span></div>
           
           <div><b>GOES TO</b> &middot; <a href="#bo-364">BO-364</a>  &mdash; <i>Back to Approval Command Center Dashboard</i></div>
@@ -20439,14 +20439,14 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
             
             <div class="canvas">
               <div class="kpis"><div class="kpi"><b>Total</b><span>1,248</span></div><div class="kpi"><b>Active</b><span>978</span></div><div class="kpi"><b>Attention</b><span>142</span></div><div class="kpi"><b>Offline</b><span>12</span></div></div>
-              <div class="two"><div class="grow"><div class="panel"><span class="kind">dataTable</span><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div><span class="why">**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue&#x27;s busiest hour is a list that skips rows.</span></div></div></div>
+              <div class="two"><div class="grow"><div class="panel"><span class="kind">dataTable</span><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div><span class="why">**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue&#x27;s busiest hour is a list that skips rows.</span></div><div class="panel"><span class="kind">detailPanel</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">One record, read-only.</span></div></div></div>
             </div>
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; listApprovalRequests</div>
+          <div><b>OPERATIONS</b> &middot; listApprovalRequests · getApprovalRequestScore</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess</span></div>
-          
+          <div><b>ARRIVES WITH</b> &middot; approvalRequestId&larr;navigation</div>
           <div><b>GOES TO</b> &middot; <a href="#bo-364">BO-364</a>  &mdash; <i>Back to Approval Command Center Dashboard</i></div>
           
           
@@ -21164,9 +21164,9 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; getApprovalAnalytics</div>
+          <div><b>OPERATIONS</b> &middot; getApprovalAnalytics · listApprovalRequests · escalateApprovalRequest</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess</span></div>
-          
+          <div><b>ARRIVES WITH</b> &middot; requestId&larr;navigation</div>
           <div><b>GOES TO</b> &middot; <a href="#bo-384">BO-384</a>  &mdash; <i>Back to Delegation &amp; Escalation Command Cent</i></div>
           
           
@@ -21404,7 +21404,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; listInventoryItems · getInventoryItem · createInventoryItem · updateInventoryItem +3</div>
+          <div><b>OPERATIONS</b> &middot; listInventoryItems · getInventoryItem · createInventoryItem · updateInventoryItem +5</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess</span></div>
           <div><b>ARRIVES WITH</b> &middot; itemId&larr;deepLink</div>
           <div><b>GOES TO</b> &middot; <a href="#bo-078">BO-078</a>  &mdash; <i>Requisitions</i><br><a href="#bo-079">BO-079</a>  &mdash; <i>Stock Count</i><br><a href="#bo-080">BO-080</a>  &mdash; <i>Stock Transfers</i></div>
@@ -21464,9 +21464,9 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; listSuppliers · createSupplier · recordQuotation · updateSupplier +1</div>
+          <div><b>OPERATIONS</b> &middot; listSuppliers · createSupplier · recordQuotation · updateSupplier +4</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess</span></div>
-          <div><b>ARRIVES WITH</b> &middot; supplierId&larr;deepLink</div>
+          <div><b>ARRIVES WITH</b> &middot; supplierId&larr;deepLink, contractId&larr;navigation</div>
           <div><b>GOES TO</b> &middot; <a href="#bo-007">BO-007</a>  &mdash; <i>The new range becomes products in the direct</i><br><a href="#bo-078">BO-078</a>  &mdash; <i>Requisitions</i> <span class="car">requisitionId</span><br><a href="#bo-079">BO-079</a>  &mdash; <i>Stock Count</i><br><a href="#bo-080">BO-080</a>  &mdash; <i>Stock Transfers</i></div>
           
           <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formCreateSupplier &middot; <i>Create supplier</i> &middot; <b>Create supplier</b> &middot; Cancel <span class="dis">discards id · code · name · contactName · contactEmail · contactPhone · taxRegistrationNumber · paymentTermsDays · leadTimeDays · currency · accountId · isActive · status · statusReason · minimumOrderValue · scopePath</span></div><div class="ov"><b>modal</b> formRecordQuotation &middot; <i>Record quotation</i> &middot; <b>Record quotation</b> &middot; Cancel <span class="dis">discards requisitionId · lines · validUntil · reference · leadTimeDays · note</span></div><div class="ov"><b>modal</b> formUpdateSupplier &middot; <i>Save supplier</i> &middot; <b>Save supplier</b> &middot; Cancel <span class="dis">discards name · status · statusReason · paymentTermDays · leadTimeDays · minimumOrderValue · contacts</span></div></div>
@@ -21554,7 +21554,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; planProductionRun · completeProductionRun · listExpiringBatches</div>
+          <div><b>OPERATIONS</b> &middot; planProductionRun · completeProductionRun · listExpiringBatches · requestSuggestion</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess</span></div>
           <div><b>ARRIVES WITH</b> &middot; venueId&larr;session, runId&larr;deepLink</div>
           <div><b>GOES TO</b> &middot; <a href="#bo-105">BO-105</a>  &mdash; <i>Stock &amp; Supply</i></div>
@@ -21584,7 +21584,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; recordWaste</div>
+          <div><b>OPERATIONS</b> &middot; recordWaste · requestSuggestion</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoAccess</span></div>
           <div><b>ARRIVES WITH</b> &middot; venueId&larr;session, outletId&larr;deepLink</div>
           <div><b>GOES TO</b> &middot; <a href="#bo-105">BO-105</a>  &mdash; <i>Stock &amp; Supply</i></div>
@@ -21674,7 +21674,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; resetPrincipalCredential · listPrincipals · getPrincipal · createPrincipal +5</div>
+          <div><b>OPERATIONS</b> &middot; resetPrincipalCredential · listPrincipals · getPrincipal · createPrincipal +6</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess</span></div>
           <div><b>ARRIVES WITH</b> &middot; principalId&larr;session</div>
           <div><b>GOES TO</b> &middot; nothing declared</div>
@@ -21704,9 +21704,9 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; listRoles · createRole · setCapabilityTemplate</div>
+          <div><b>OPERATIONS</b> &middot; listRoles · createRole · setCapabilityTemplate · listPermissionFindings +3</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess</span></div>
-          
+          <div><b>ARRIVES WITH</b> &middot; campaignId&larr;navigation</div>
           <div><b>GOES TO</b> &middot; nothing declared</div>
           
           <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formCreateRole &middot; <i>Create role</i> &middot; <b>Create role</b> &middot; Cancel <span class="dis">discards code · name · description</span></div></div>
@@ -21855,9 +21855,9 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; listApprovalRequests · decideApprovalRequest · escalateApprovalRequest</div>
+          <div><b>OPERATIONS</b> &middot; listApprovalRequests · decideApprovalRequest · escalateApprovalRequest · getApprovalRequestScore</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess</span></div>
-          <div><b>ARRIVES WITH</b> &middot; requestId&larr;deepLink</div>
+          <div><b>ARRIVES WITH</b> &middot; requestId&larr;deepLink, approvalRequestId&larr;navigation</div>
           <div><b>GOES TO</b> &middot; <a href="#bo-052">BO-052</a>  &mdash; <i>The goods arrive and are received</i><br><a href="#bo-085">BO-085</a>  &mdash; <i>Approves it</i> <span class="car">requestId</span><br><a href="#bo-086">BO-086</a> <br><a href="#bo-087">BO-087</a>  &mdash; <i>Approval Delegations</i></div>
           
           <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formDecideApprovalRequest &middot; <i>Decide approval request</i> &middot; <b>Decide approval request</b> &middot; Cancel <span class="dis">discards decision · comment · reason · stepUpToken · signature</span></div><div class="ov"><b>modal</b> formEscalateApprovalRequest &middot; <i>Escalate approval request</i> &middot; <b>Escalate approval request</b> &middot; Cancel <span class="dis">discards reason</span></div></div>
@@ -21888,7 +21888,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           <div><b>OPERATIONS</b> &middot; listApprovalRequests · decideApprovalRequest · resubmitApprovalRequest · withdrawApprovalRequest +1</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess</span></div>
           <div><b>ARRIVES WITH</b> &middot; requestId&larr;deepLink</div>
-          <div><b>GOES TO</b> &middot; <a href="#bo-084">BO-084</a>  &mdash; <i>Approval Inbox</i> <span class="car">requestId</span><br><a href="#bo-086">BO-086</a> <br><a href="#bo-087">BO-087</a>  &mdash; <i>Approval Delegations</i></div>
+          <div><b>GOES TO</b> &middot; <a href="#bo-084">BO-084</a>  &mdash; <i>Approval Inbox</i> <span class="car">approvalRequestId · requestId</span><br><a href="#bo-086">BO-086</a> <br><a href="#bo-087">BO-087</a>  &mdash; <i>Approval Delegations</i></div>
           
           <div><b>OVERLAYS</b><div class="ov"><b>confirmDialog</b> confirmWithdrawApprovalRequest &middot; <i>Withdraw approval request</i></div><div class="ov"><b>modal</b> formDecideApprovalRequest &middot; <i>Decide approval request</i> &middot; <b>Decide approval request</b> &middot; Cancel <span class="dis">discards decision · comment · reason · stepUpToken · signature</span></div><div class="ov"><b>modal</b> formResubmitApprovalRequest &middot; <i>Resubmit approval request</i> &middot; <b>Resubmit approval request</b> &middot; Cancel <span class="dis">discards changes · amount</span></div><div class="ov"><b>modal</b> formEvaluateApprovalRequirement &middot; <i>Evaluate approval requirement</i> &middot; <b>Evaluate approval requirement</b> &middot; Cancel <span class="dis">discards kind · scopePath · amount · attributes</span></div></div>
         </div>
@@ -22008,7 +22008,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           <div><b>OPERATIONS</b> &middot; getKpiValues · getVenueSettings · listRoles</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess</span></div>
           <div><b>ARRIVES WITH</b> &middot; venueId&larr;session</div>
-          <div><b>GOES TO</b> &middot; <a href="#bo-053">BO-053</a>  &mdash; <i>Staff Directory</i><br><a href="#bo-054">BO-054</a> <br><a href="#bo-055">BO-055</a>  &mdash; <i>Rota &amp; Scheduling</i><br><a href="#bo-056">BO-056</a>  &mdash; <i>Time &amp; Attendance</i><br><a href="#bo-057">BO-057</a> <br><a href="#bo-066">BO-066</a>  &mdash; <i>Notification Settings</i><br><a href="#bo-084">BO-084</a>  &mdash; <i>Approval Inbox</i><br><a href="#bo-085">BO-085</a>  &mdash; <i>Approval Request</i><br><a href="#bo-086">BO-086</a> <br><a href="#bo-087">BO-087</a>  &mdash; <i>Approval Delegations</i><br><a href="#bo-088">BO-088</a> </div>
+          <div><b>GOES TO</b> &middot; <a href="#bo-053">BO-053</a>  &mdash; <i>Staff Directory</i><br><a href="#bo-054">BO-054</a>  &mdash; <i>Role Assignment</i><br><a href="#bo-055">BO-055</a>  &mdash; <i>Rota &amp; Scheduling</i><br><a href="#bo-056">BO-056</a>  &mdash; <i>Time &amp; Attendance</i><br><a href="#bo-057">BO-057</a> <br><a href="#bo-066">BO-066</a>  &mdash; <i>Notification Settings</i><br><a href="#bo-084">BO-084</a>  &mdash; <i>Approval Inbox</i><br><a href="#bo-085">BO-085</a>  &mdash; <i>Approval Request</i><br><a href="#bo-086">BO-086</a> <br><a href="#bo-087">BO-087</a>  &mdash; <i>Approval Delegations</i><br><a href="#bo-088">BO-088</a> </div>
           
           
         </div>
@@ -22095,9 +22095,9 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; getAiPolicy · setAiPolicy · getAiUsage · listIndexFailures</div>
+          <div><b>OPERATIONS</b> &middot; getAiPolicy · setAiPolicy · getAiUsage · listIndexFailures +4</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess</span></div>
-          
+          <div><b>ARRIVES WITH</b> &middot; profileKey&larr;navigation</div>
           <div><b>GOES TO</b> &middot; nothing declared</div>
           
           <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formSetAiPolicy &middot; <i>Save AI policy</i> &middot; <b>Save AI policy</b> &middot; Cancel <span class="dis">discards scopeLevel · scopePath · enabledCapabilities · id · allowedRoleIds · maskedFields · requiresApprovalFor · monthlyTokenCeiling · ceilingBehaviour · ceilingWarningPercent · guestCapabilityScope · retrieveTopK · rerankTopK · cacheAnswers · cacheTtlMinutes · retainInteractionsDays · semanticCacheThreshold · negativeCacheTtlSeconds</span></div></div>
@@ -22128,7 +22128,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           <div><b>OPERATIONS</b> &middot; getKpiValues · getVenueSettings · listCampaigns · createCampaign</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess</span></div>
           <div><b>ARRIVES WITH</b> &middot; venueId&larr;session</div>
-          <div><b>GOES TO</b> &middot; <a href="#bo-068">BO-068</a> <br><a href="#bo-073">BO-073</a>  &mdash; <i>Lost &amp; Found Register</i><br><a href="#bo-091">BO-091</a> </div>
+          <div><b>GOES TO</b> &middot; <a href="#bo-068">BO-068</a> <br><a href="#bo-073">BO-073</a>  &mdash; <i>Lost &amp; Found Register</i><br><a href="#bo-091">BO-091</a>  &mdash; <i>AI Policy &amp; Spend</i></div>
           
           <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formCreateCampaign &middot; <i>Create campaign</i> &middot; <b>Create campaign</b> &middot; Cancel <span class="dis">discards name · kind · channel · segmentId · content · venueId · trigger · scheduledFor · consentPurpose · sendWindow</span></div></div>
         </div>
@@ -22815,7 +22815,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; getWallet · listCreditLots · adjustWallet · suspendWallet</div>
+          <div><b>OPERATIONS</b> &middot; getWallet · listCreditLots · adjustWallet · suspendWallet +4</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess</span></div>
           <div><b>ARRIVES WITH</b> &middot; subjectId&larr;navigation, walletId&larr;navigation</div>
           <div><b>GOES TO</b> &middot; <a href="#bo-414">BO-414</a>  &mdash; <i>Back to Wallet &amp; Credit Management Dashboard</i> <span class="car">subjectId</span></div>
@@ -24915,9 +24915,9 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; getWallet</div>
+          <div><b>OPERATIONS</b> &middot; getWallet · getWalletExitBalance · settleWalletAtExit</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess</span></div>
-          <div><b>ARRIVES WITH</b> &middot; subjectId&larr;navigation</div>
+          <div><b>ARRIVES WITH</b> &middot; subjectId&larr;navigation, walletId&larr;navigation</div>
           <div><b>GOES TO</b> &middot; <a href="#bo-484">BO-484</a>  &mdash; <i>Back to Self-Service Experience Command Cent</i></div>
           
           
@@ -29085,7 +29085,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; getStaffingCoverage</div>
+          <div><b>OPERATIONS</b> &middot; getStaffingCoverage · listAlerts · setAlertRule</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess</span></div>
           
           <div><b>GOES TO</b> &middot; <a href="#bo-883">BO-883</a>  &mdash; <i>Back to Workforce Roster Command Center</i></div>
@@ -30075,7 +30075,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; none declared</div>
+          <div><b>OPERATIONS</b> &middot; getForecast · createForecastScenario · listOperationalRequirements</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess</span></div>
           
           <div><b>GOES TO</b> &middot; <a href="#bo-913">BO-913</a>  &mdash; <i>Back to Event Resource Planning Command Cent</i></div>
@@ -30250,12 +30250,12 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
             
             <div class="canvas">
               <div class="kpis"><div class="kpi"><b>Total</b><span>1,248</span></div><div class="kpi"><b>Active</b><span>978</span></div><div class="kpi"><b>Attention</b><span>142</span></div><div class="kpi"><b>Offline</b><span>12</span></div></div>
-              <div class="two"><div class="grow"><div class="panel"><span class="kind">dataTable</span><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div><span class="why">Implied by the split template — not declared on the screen.</span></div></div></div>
+              <div class="two"><div class="grow"><div class="panel"><span class="kind">dataTable</span><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div><span class="why">**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue&#x27;s busiest hour is a list that skips rows.</span></div><div class="panel"><span class="kind">primaryButton</span><div class="chip cta">primaryButton</div><span class="why">The act the screen exists for.</span></div><div class="panel"><b>Cancel</b><div class="chip">Cancel</div><span class="why">**A screen that can submit must be leaveable without submitting.**</span></div></div></div>
             </div>
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; none declared</div>
+          <div><b>OPERATIONS</b> &middot; listOperationalRequirements · requestSuggestion</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess</span></div>
           
           <div><b>GOES TO</b> &middot; <a href="#bo-923">BO-923</a>  &mdash; <i>Back to AI Resource Intelligence Command Cen</i></div>
@@ -30285,7 +30285,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; none declared</div>
+          <div><b>OPERATIONS</b> &middot; getForecast · listOperationalRequirements</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess</span></div>
           
           <div><b>GOES TO</b> &middot; <a href="#bo-923">BO-923</a>  &mdash; <i>Back to AI Resource Intelligence Command Cen</i></div>
@@ -30310,14 +30310,14 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
             
             <div class="canvas">
               <div class="kpis"><div class="kpi"><b>Total</b><span>1,248</span></div><div class="kpi"><b>Active</b><span>978</span></div><div class="kpi"><b>Attention</b><span>142</span></div><div class="kpi"><b>Offline</b><span>12</span></div></div>
-              <div class="two"><div class="grow"><div class="panel"><b>1 Lifeguard / 250 guests</b><div class="chip">1 Lifeguard / 250 guests</div></div><div class="panel"><span class="kind">primaryButton</span><div class="chip cta">primaryButton</div><span class="why">Implied by the form template — not declared on the screen.</span></div></div></div>
+              <div class="two"><div class="grow"><div class="panel"><b>1 Lifeguard / 250 guests</b><div class="chip">1 Lifeguard / 250 guests</div></div><div class="panel"><span class="kind">dataTable</span><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div><span class="why">**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue&#x27;s busiest hour is a list that skips rows.</span></div><div class="panel"><span class="kind">primaryButton</span><div class="chip cta">primaryButton</div><span class="why">The act the screen exists for.</span></div></div><div class="side"><div class="panel"><b>Cancel</b><div class="chip">Cancel</div><span class="why">**A screen that can submit must be leaveable without submitting.**</span></div></div></div>
             </div>
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; none declared</div>
+          <div><b>OPERATIONS</b> &middot; getForecast · listOperationalRequirements · decideOperationalRequirement · getStaffingCoverage</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoAccess · emptyNoResults</span></div>
-          
+          <div><b>ARRIVES WITH</b> &middot; requirementId&larr;navigation</div>
           <div><b>GOES TO</b> &middot; <a href="#bo-923">BO-923</a>  &mdash; <i>Back to AI Resource Intelligence Command Cen</i></div>
           
           
@@ -30345,9 +30345,9 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; none declared</div>
+          <div><b>OPERATIONS</b> &middot; createAiConversation · sendAiMessage · listProposedActions · decideProposedAction</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess</span></div>
-          
+          <div><b>ARRIVES WITH</b> &middot; actionId&larr;navigation, conversationId&larr;navigation</div>
           <div><b>GOES TO</b> &middot; <a href="#bo-923">BO-923</a>  &mdash; <i>Back to AI Resource Intelligence Command Cen</i></div>
           
           
@@ -30370,14 +30370,14 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
             
             <div class="canvas">
               <div class="kpis"><div class="kpi"><b>Total</b><span>1,248</span></div><div class="kpi"><b>Active</b><span>978</span></div><div class="kpi"><b>Attention</b><span>142</span></div><div class="kpi"><b>Offline</b><span>12</span></div></div>
-              <div class="two"><div class="grow"><div class="panel"><span class="kind">dataTable</span><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div><span class="why">Implied by the split template — not declared on the screen.</span></div></div></div>
+              <div class="two"><div class="grow"><div class="panel"><b>Send AI message</b><div class="chip cta">Send AI message</div><span class="why">The act the screen exists for.</span></div><div class="panel"><span class="kind">dataTable</span><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div><span class="why">**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue&#x27;s busiest hour is a list that skips rows.</span></div><div class="panel"><b>Cancel</b><div class="chip">Cancel</div><span class="why">**A screen that can submit must be leaveable without submitting.**</span></div></div></div>
             </div>
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; none declared</div>
+          <div><b>OPERATIONS</b> &middot; sendAiMessage · listProposedActions · decideProposedAction</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess</span></div>
-          
+          <div><b>ARRIVES WITH</b> &middot; actionId&larr;navigation, conversationId&larr;navigation</div>
           <div><b>GOES TO</b> &middot; <a href="#bo-923">BO-923</a>  &mdash; <i>Back to AI Resource Intelligence Command Cen</i></div>
           
           
@@ -30430,12 +30430,12 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
             
             <div class="canvas">
               <div class="kpis"><div class="kpi"><b>Total</b><span>1,248</span></div><div class="kpi"><b>Active</b><span>978</span></div><div class="kpi"><b>Attention</b><span>142</span></div><div class="kpi"><b>Offline</b><span>12</span></div></div>
-              <div class="two"><div class="grow"><div class="panel"><span class="kind">dataTable</span><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div><span class="why">Implied by the split template — not declared on the screen.</span></div></div></div>
+              <div class="two"><div class="grow"><div class="panel"><b>Create forecast scenario</b><div class="chip cta">Create forecast scenario</div><span class="why">The act the screen exists for.</span></div><div class="panel"><b>Cancel</b><div class="chip">Cancel</div><span class="why">**A screen that can submit must be leaveable without submitting.**</span></div></div></div>
             </div>
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; none declared</div>
+          <div><b>OPERATIONS</b> &middot; createForecastScenario · compareForecastScenarios</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess</span></div>
           
           <div><b>GOES TO</b> &middot; <a href="#bo-923">BO-923</a>  &mdash; <i>Back to AI Resource Intelligence Command Cen</i></div>
@@ -30460,14 +30460,14 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
             
             <div class="canvas">
               <div class="kpis"><div class="kpi"><b>Total</b><span>1,248</span></div><div class="kpi"><b>Active</b><span>978</span></div><div class="kpi"><b>Attention</b><span>142</span></div><div class="kpi"><b>Offline</b><span>12</span></div></div>
-              <div class="two"><div class="grow"><div class="panel"><span class="kind">dataTable</span><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div><span class="why">Implied by the split template — not declared on the screen.</span></div></div></div>
+              <div class="two"><div class="grow"><div class="panel"><span class="kind">dataTable</span><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div><span class="why">**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue&#x27;s busiest hour is a list that skips rows.</span></div><div class="panel"><b>Create AI conversation</b><div class="chip cta">Create AI conversation</div><span class="why">The act the screen exists for.</span></div><div class="panel"><b>Cancel</b><div class="chip">Cancel</div><span class="why">**A screen that can submit must be leaveable without submitting.**</span></div></div></div>
             </div>
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; none declared</div>
+          <div><b>OPERATIONS</b> &middot; listAiConversations · createAiConversation · sendAiMessage</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess</span></div>
-          
+          <div><b>ARRIVES WITH</b> &middot; conversationId&larr;navigation</div>
           <div><b>GOES TO</b> &middot; <a href="#bo-923">BO-923</a>  &mdash; <i>Back to AI Resource Intelligence Command Cen</i></div>
           
           
@@ -31185,9 +31185,9 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; generateConfiguration</div>
+          <div><b>OPERATIONS</b> &middot; generateConfiguration · getActionPlan</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess</span></div>
-          
+          <div><b>ARRIVES WITH</b> &middot; planId&larr;navigation</div>
           <div><b>GOES TO</b> &middot; <a href="#bo-595">BO-595</a>  &mdash; <i>Back to AI Setup Command Center</i></div>
           
           
@@ -31215,9 +31215,9 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; generateConfiguration</div>
+          <div><b>OPERATIONS</b> &middot; generateConfiguration · getActionPlan</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess</span></div>
-          
+          <div><b>ARRIVES WITH</b> &middot; planId&larr;navigation</div>
           <div><b>GOES TO</b> &middot; <a href="#bo-595">BO-595</a>  &mdash; <i>Back to AI Setup Command Center</i></div>
           
           
@@ -32080,14 +32080,14 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
             
             <div class="canvas">
               <div class="kpis"><div class="kpi"><b>Total</b><span>1,248</span></div><div class="kpi"><b>Active</b><span>978</span></div><div class="kpi"><b>Attention</b><span>142</span></div><div class="kpi"><b>Offline</b><span>12</span></div></div>
-              <div class="two"><div class="grow"><div class="panel"><span class="kind">detailPanel</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">One record, read-only.</span></div><div class="panel"><span class="kind">dataTable</span><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div><span class="why">Implied by the split template — not declared on the screen.</span></div></div></div>
+              <div class="two"><div class="grow"><div class="panel"><span class="kind">detailPanel</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">One record, read-only.</span></div><div class="panel"><span class="kind">dataTable</span><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div><span class="why">**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue&#x27;s busiest hour is a list that skips rows.</span></div><div class="panel"><span class="kind">primaryButton</span><div class="chip cta">primaryButton</div><span class="why">The act the screen exists for.</span></div></div><div class="side"><div class="panel"><b>Cancel</b><div class="chip">Cancel</div><span class="why">**A screen that can submit must be leaveable without submitting.**</span></div></div></div>
             </div>
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; getGuestTimeline</div>
+          <div><b>OPERATIONS</b> &middot; getGuestTimeline · listGuestIdentityVerifications · decideGuestIdentityVerification</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess</span></div>
-          <div><b>ARRIVES WITH</b> &middot; guestId&larr;navigation</div>
+          <div><b>ARRIVES WITH</b> &middot; guestId&larr;navigation, verificationId&larr;navigation</div>
           <div><b>GOES TO</b> &middot; <a href="#bo-734">BO-734</a>  &mdash; <i>Back to CRM Command Center</i></div>
           
           
@@ -32445,9 +32445,9 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; setDataRetentionPolicy · runDataRetention</div>
+          <div><b>OPERATIONS</b> &middot; setDataRetentionPolicy · runDataRetention · listDataRetentionSettings · setDataRetentionSetting</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess</span></div>
-          
+          <div><b>ARRIVES WITH</b> &middot; dataClass&larr;navigation</div>
           <div><b>GOES TO</b> &middot; <a href="#bo-744">BO-744</a>  &mdash; <i>Back to Data Governance Center</i></div>
           
           
@@ -32740,12 +32740,12 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
             
             <div class="canvas">
               <div class="kpis"><div class="kpi"><b>Total</b><span>1,248</span></div><div class="kpi"><b>Active</b><span>978</span></div><div class="kpi"><b>Attention</b><span>142</span></div><div class="kpi"><b>Offline</b><span>12</span></div></div>
-              <div class="two"><div class="grow"><div class="panel"><span class="kind">dataTable</span><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div><span class="why">**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue&#x27;s busiest hour is a list that skips rows.</span></div></div></div>
+              <div class="two"><div class="grow"><div class="panel"><span class="kind">dataTable</span><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div><span class="why">**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue&#x27;s busiest hour is a list that skips rows.</span></div><div class="panel"><span class="kind">primaryButton</span><div class="chip cta">primaryButton</div><span class="why">The act the screen exists for.</span></div><div class="panel"><b>Cancel</b><div class="chip">Cancel</div><span class="why">**A screen that can submit must be leaveable without submitting.**</span></div></div></div>
             </div>
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; listAudienceDiscoveryTargeting</div>
+          <div><b>OPERATIONS</b> &middot; listAudienceDiscoveryTargeting · proposeLookalikeSegment</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess</span></div>
           
           <div><b>GOES TO</b> &middot; <a href="#bo-754">BO-754</a>  &mdash; <i>Back to Audience Intelligence</i></div>
@@ -32775,9 +32775,9 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; createSegment · previewSegment</div>
+          <div><b>OPERATIONS</b> &middot; createSegment · previewSegment · decideProposedAction · proposeLookalikeSegment</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess</span></div>
-          <div><b>ARRIVES WITH</b> &middot; segmentId&larr;navigation</div>
+          <div><b>ARRIVES WITH</b> &middot; segmentId&larr;navigation, actionId&larr;navigation</div>
           <div><b>GOES TO</b> &middot; <a href="#bo-754">BO-754</a>  &mdash; <i>Back to Audience Intelligence</i></div>
           
           
@@ -32835,7 +32835,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; listCampaigns</div>
+          <div><b>OPERATIONS</b> &middot; listCampaigns · listMarketingRecommendations</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess</span></div>
           
           <div><b>GOES TO</b> &middot; <a href="#bo-100">BO-100</a>  &mdash; <i>Back to Venue Home</i><br><a href="#bo-765">BO-765</a>  &mdash; <i>Campaign Library &amp; Calendar</i><br><a href="#bo-766">BO-766</a>  &mdash; <i>Campaign Builder</i><br><a href="#bo-767">BO-767</a>  &mdash; <i>Audience &amp; Offer Selection</i> <span class="car">campaignId</span><br><a href="#bo-768">BO-768</a>  &mdash; <i>Multichannel Composer</i> <span class="car">campaignId</span><br><a href="#bo-769">BO-769</a>  &mdash; <i>Schedule &amp; Trigger Rules</i> <span class="car">campaignId</span><br><a href="#bo-770">BO-770</a>  &mdash; <i>Campaign Approval Workflow</i><br><a href="#bo-771">BO-771</a>  &mdash; <i>Budget, Goals &amp; Forecast</i> <span class="car">campaignId</span><br><a href="#bo-772">BO-772</a>  &mdash; <i>A/B &amp; AI Optimization</i> <span class="car">campaignId</span><br><a href="#bo-773">BO-773</a>  &mdash; <i>Attribution &amp; Audit</i> <span class="car">campaignId</span></div>
@@ -32895,7 +32895,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; listCampaigns · createInvitationCampaign</div>
+          <div><b>OPERATIONS</b> &middot; listCampaigns · createInvitationCampaign · proposeMarketingContent</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess</span></div>
           
           <div><b>GOES TO</b> &middot; <a href="#bo-764">BO-764</a>  &mdash; <i>Back to Campaign Command Center</i></div>
@@ -33070,14 +33070,14 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
             
             <div class="canvas">
               <div class="kpis"><div class="kpi"><b>Total</b><span>1,248</span></div><div class="kpi"><b>Active</b><span>978</span></div><div class="kpi"><b>Attention</b><span>142</span></div><div class="kpi"><b>Offline</b><span>12</span></div></div>
-              <div class="two"><div class="grow"><div class="panel"><span class="kind">detailPanel</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">One record, read-only.</span></div><div class="panel"><span class="kind">dataTable</span><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div><span class="why">Implied by the split template — not declared on the screen.</span></div></div></div>
+              <div class="two"><div class="grow"><div class="panel"><span class="kind">detailPanel</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">One record, read-only.</span></div><div class="panel"><span class="kind">primaryButton</span><div class="chip cta">primaryButton</div><span class="why">The act the screen exists for.</span></div><div class="panel"><span class="kind">dataTable</span><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div><span class="why">**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue&#x27;s busiest hour is a list that skips rows.</span></div></div><div class="side"><div class="panel"><b>Cancel</b><div class="chip">Cancel</div><span class="why">**A screen that can submit must be leaveable without submitting.**</span></div></div></div>
             </div>
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; getCampaignPerformance</div>
+          <div><b>OPERATIONS</b> &middot; getCampaignPerformance · proposeMarketingContent · listMarketingRecommendations · decideAiInsight +2</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess</span></div>
-          <div><b>ARRIVES WITH</b> &middot; campaignId&larr;navigation</div>
+          <div><b>ARRIVES WITH</b> &middot; campaignId&larr;navigation, insightId&larr;navigation</div>
           <div><b>GOES TO</b> &middot; <a href="#bo-764">BO-764</a>  &mdash; <i>Back to Campaign Command Center</i></div>
           
           
@@ -33370,14 +33370,14 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
             
             <div class="canvas">
               <div class="kpis"><div class="kpi"><b>Total</b><span>1,248</span></div><div class="kpi"><b>Active</b><span>978</span></div><div class="kpi"><b>Attention</b><span>142</span></div><div class="kpi"><b>Offline</b><span>12</span></div></div>
-              <div class="two"><div class="grow"><div class="panel"><span class="kind">dataTable</span><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div><span class="why">**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue&#x27;s busiest hour is a list that skips rows.</span></div></div></div>
+              <div class="two"><div class="grow"><div class="panel"><span class="kind">dataTable</span><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div><span class="why">**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue&#x27;s busiest hour is a list that skips rows.</span></div><div class="panel"><span class="kind">primaryButton</span><div class="chip cta">primaryButton</div><span class="why">The act the screen exists for.</span></div><div class="panel"><b>Cancel</b><div class="chip">Cancel</div><span class="why">**A screen that can submit must be leaveable without submitting.**</span></div></div></div>
             </div>
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; listJourneys</div>
+          <div><b>OPERATIONS</b> &middot; listJourneys · listMarketingRecommendations · decideAiInsight · requestSuggestion</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess</span></div>
-          
+          <div><b>ARRIVES WITH</b> &middot; insightId&larr;navigation</div>
           <div><b>GOES TO</b> &middot; <a href="#bo-774">BO-774</a>  &mdash; <i>Back to Journey Automation Center</i></div>
           
           
@@ -33465,7 +33465,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; listMessageTemplates · createMessageTemplate</div>
+          <div><b>OPERATIONS</b> &middot; listMessageTemplates · createMessageTemplate · proposeMarketingContent · proposeTranslations</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess</span></div>
           
           <div><b>GOES TO</b> &middot; <a href="#bo-784">BO-784</a>  &mdash; <i>Back to Communications Center</i></div>
@@ -33495,7 +33495,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; createMessageTemplate</div>
+          <div><b>OPERATIONS</b> &middot; createMessageTemplate · proposeMarketingContent</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess</span></div>
           
           <div><b>GOES TO</b> &middot; <a href="#bo-784">BO-784</a>  &mdash; <i>Back to Communications Center</i></div>
@@ -33525,7 +33525,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; createMessageTemplate</div>
+          <div><b>OPERATIONS</b> &middot; createMessageTemplate · proposeMarketingContent</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess</span></div>
           
           <div><b>GOES TO</b> &middot; <a href="#bo-784">BO-784</a>  &mdash; <i>Back to Communications Center</i></div>
@@ -33585,7 +33585,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; listSystemTransactionalTemplate · setMessageTrigger</div>
+          <div><b>OPERATIONS</b> &middot; listSystemTransactionalTemplate · setMessageTrigger · proposeMarketingContent</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess</span></div>
           
           <div><b>GOES TO</b> &middot; <a href="#bo-784">BO-784</a>  &mdash; <i>Back to Communications Center</i></div>
@@ -33705,9 +33705,9 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; setLocalizationBrandingCustomer</div>
+          <div><b>OPERATIONS</b> &middot; setLocalizationBrandingCustomer · proposeMarketingContent · decideProposedAction · proposeTranslations</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess</span></div>
-          
+          <div><b>ARRIVES WITH</b> &middot; actionId&larr;navigation</div>
           <div><b>GOES TO</b> &middot; <a href="#bo-784">BO-784</a>  &mdash; <i>Back to Communications Center</i></div>
           
           
@@ -33855,7 +33855,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; setCustomerServiceCopilot</div>
+          <div><b>OPERATIONS</b> &middot; setCustomerServiceCopilot · listKnowledgeGaps</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess</span></div>
           
           <div><b>GOES TO</b> &middot; <a href="#bo-794">BO-794</a>  &mdash; <i>Back to Omnichannel Command Center</i></div>
@@ -34900,14 +34900,14 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
             
             <div class="canvas">
               <div class="kpis"><div class="kpi"><b>Total</b><span>1,248</span></div><div class="kpi"><b>Active</b><span>978</span></div><div class="kpi"><b>Attention</b><span>142</span></div><div class="kpi"><b>Offline</b><span>12</span></div></div>
-              <div class="two"><div class="grow"><div class="panel"><span class="kind">dataTable</span><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div><span class="why">**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue&#x27;s busiest hour is a list that skips rows.</span></div></div></div>
+              <div class="two"><div class="grow"><div class="panel"><span class="kind">dataTable</span><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div><span class="why">**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue&#x27;s busiest hour is a list that skips rows.</span></div><div class="panel"><span class="kind">detailPanel</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">One record, read-only.</span></div></div></div>
             </div>
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; listLoyaltyProgrammes</div>
+          <div><b>OPERATIONS</b> &middot; listLoyaltyProgrammes · getKpiValues · getDashboard</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess</span></div>
-          
+          <div><b>ARRIVES WITH</b> &middot; dashboardId&larr;navigation</div>
           <div><b>GOES TO</b> &middot; <a href="#bo-824">BO-824</a>  &mdash; <i>Back to Gamification Command Center</i></div>
           
           
@@ -34935,7 +34935,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; getTenantConfig</div>
+          <div><b>OPERATIONS</b> &middot; getTenantConfig · getStorefrontInsights</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess</span></div>
           
           <div><b>GOES TO</b> &middot; <a href="#bo-100">BO-100</a>  &mdash; <i>Back to Venue Home</i><br><a href="#bo-835">BO-835</a>  &mdash; <i>Site, Brand &amp; Domain Setup</i><br><a href="#bo-836">BO-836</a>  &mdash; <i>Design System &amp; Components</i><br><a href="#bo-837">BO-837</a>  &mdash; <i>Page &amp; Landing Builder</i><br><a href="#bo-838">BO-838</a>  &mdash; <i>Content, Media &amp; Forms</i><br><a href="#bo-839">BO-839</a>  &mdash; <i>Dynamic Product Pages</i><br><a href="#bo-840">BO-840</a>  &mdash; <i>Mobile App CMS</i><br><a href="#bo-841">BO-841</a>  &mdash; <i>Personalization &amp; Localization</i><br><a href="#bo-842">BO-842</a>  &mdash; <i>SEO Management</i><br><a href="#bo-843">BO-843</a>  &mdash; <i>Publishing, Analytics &amp; Audit</i></div>
@@ -35205,7 +35205,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; publishTenantConfig</div>
+          <div><b>OPERATIONS</b> &middot; publishTenantConfig · getStorefrontInsights</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess</span></div>
           
           <div><b>GOES TO</b> &middot; <a href="#bo-834">BO-834</a>  &mdash; <i>Back to Digital Experience Center</i></div>

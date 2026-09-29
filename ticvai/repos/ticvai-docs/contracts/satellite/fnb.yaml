@@ -2,7 +2,7 @@ openapi: 3.1.0
 info:
   title: TICVAI Food & Beverage
   version: 0.1.0
-  x-ticvai-screen-count: 106
+  x-ticvai-screen-count: 109
   x-ticvai-tier: satellite
   x-ticvai-module: 7 — F&B POS  ·  5 — F&B & Guest Management (service)
   x-ticvai-requirements: 151
@@ -6664,7 +6664,15 @@ paths:
     get:
       operationId: listFnbRecommendations
       summary: Upsell and pairing suggestions for F&B
+      deprecated: true
+      x-ticvai-superseded-by: 'decideRecommendations'
       description: >
+        **Deprecated for one release (29 September, AI system design 2.3 and 5.4).** Forwarded to the AI
+        recommendation engine as a placement: the call becomes `ai.decideRecommendations` with placement
+        `fnbMenu`, and the engine's items come back in this response's shape. Removed after one release; new
+        screens bind `ai.decideRecommendations`. The configured pairings below stay the engine's candidate
+        input.
+
         **Seventeen columns and no way to read them.** Kept whole from the backend workbook when the
         ten duplicate catalogue tables were collapsed, because we have nothing like it —
         `promotions.getUpsellSuggestions` computes, and this is what a venue configured.
@@ -6873,9 +6881,232 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+  /venues/{venueId}/delivery-location-outlets:
+    parameters:
+    - name: venueId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    put:
+      operationId: setDeliveryLocationOutletMapping
+      x-ticvai-consumed-by:
+        - "P08 BO-044 F&B Outlets"
+        - "P08 BO-065 Venue Configuration"
+      x-ticvai-audience:
+      - staff
+      x-ticvai-agreed: '29 September: writers pass (fnb.delivery_location_outlet had no writer; listDeliveryLocations only reads it); shape follows setFnbDeliveryPolicy'
+      summary: Set which outlets deliver to which delivery locations
+      description: >
+        4.6.26. **The join `listDeliveryLocations` reads and nothing wrote.** Each entry names a delivery
+        location and the outlets that deliver to it; the set given replaces that location's serving outlets,
+        and locations not named are left as they are. An empty `servingOutletIds` means nothing serves the
+        location, which `listDeliveryLocations` then reports as not serviceable rather than hiding.
+        Every outlet must be an F&B outlet of the same venue as the location.
+      tags:
+      - guestOrdering
+      x-ticvai-permission: PRODUCT_CONFIGURE
+      x-ticvai-scope-level: venue
+      x-ticvai-config-scope: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - mappings
+              properties:
+                mappings:
+                  type: array
+                  minItems: 1
+                  items:
+                    type: object
+                    required:
+                    - locationId
+                    - servingOutletIds
+                    properties:
+                      locationId:
+                        type: string
+                        format: uuid
+                      servingOutletIds:
+                        type: array
+                        items:
+                          type: string
+                          format: uuid
+      responses:
+        '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: Saved. The locations named, as they now stand.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/DeliveryLocation'
+        '404':
+          $ref: ../shared/common.yaml#/components/responses/NotFound
+        '422':
+          description: An outlet that is not an F&B outlet of this venue, or a location of another venue.
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
+  /delivery-locations:
+    post:
+      operationId: createDeliveryLocation
+      x-ticvai-consumed-by:
+        - "P08 BO-065 Venue Configuration"
+      x-ticvai-audience:
+      - staff
+      x-ticvai-agreed: '29 September: writers pass (fnb.delivery_location had no writer); shape follows createOutlet'
+      summary: Add a place food can be delivered to
+      description: >
+        4.6.26. A table, seat, cabana, sunbed or named point. A `table` location names its `tableId` so it
+        shares the table's state; a `seat` location names its `seatId` on the seat map. Serving outlets are
+        set with `setDeliveryLocationOutletMapping`, or given here for a new location.
+      tags:
+      - guestOrdering
+      x-ticvai-permission: PRODUCT_CONFIGURE
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - venueId
+              - kind
+              - label
+              properties:
+                venueId:
+                  type: string
+                  format: uuid
+                kind:
+                  $ref: '#/components/schemas/DeliveryLocationKind'
+                label:
+                  type: string
+                  maxLength: 200
+                zone:
+                  type: string
+                  nullable: true
+                tableId:
+                  type: string
+                  format: uuid
+                  nullable: true
+                seatId:
+                  type: string
+                  nullable: true
+                servingOutletIds:
+                  type: array
+                  items:
+                    type: string
+                    format: uuid
+                walkTimeMinutes:
+                  type: integer
+                  minimum: 0
+                  nullable: true
+      responses:
+        '201':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeliveryLocation'
+        '409':
+          description: A location with the same label already exists in the venue.
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
+        '422':
+          description: A `table` location without `tableId`, a `seat` location without `seatId`, or a table of
+            another venue.
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
+  /delivery-locations/{locationId}:
+    parameters:
+    - name: locationId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    patch:
+      operationId: updateDeliveryLocation
+      x-ticvai-consumed-by:
+        - "P08 BO-065 Venue Configuration"
+      x-ticvai-audience:
+      - staff
+      x-ticvai-agreed: '29 September: writers pass (fnb.delivery_location had no writer); shape follows updateInventoryItem'
+      summary: Rename a delivery location, or take it out of service
+      description: >
+        4.6.26. `isServiceable` false with a reason stops new orders to the location (a closed section,
+        weather, no runner) without deleting it; orders already placed are delivered.
+      tags:
+      - guestOrdering
+      x-ticvai-permission: PRODUCT_CONFIGURE
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              minProperties: 1
+              properties:
+                label:
+                  type: string
+                  maxLength: 200
+                zone:
+                  type: string
+                  nullable: true
+                isServiceable:
+                  type: boolean
+                unserviceableReason:
+                  type: string
+                  nullable: true
+                walkTimeMinutes:
+                  type: integer
+                  minimum: 0
+                  nullable: true
+      responses:
+        '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: Updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeliveryLocation'
+        '404':
+          $ref: ../shared/common.yaml#/components/responses/NotFound
 
 components:
   schemas:
+
     OutletTemplateType:
       type: string
       enum:

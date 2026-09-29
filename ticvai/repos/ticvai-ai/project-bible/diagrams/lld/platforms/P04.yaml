@@ -50,11 +50,11 @@ servicesCalled:
   operationCalls: 6
 - service: MarketingService
   operationCalls: 6
+- service: LedgerService
+  operationCalls: 5
 - service: AccessService
   operationCalls: 3
 - service: WalletService
-  operationCalls: 1
-- service: LedgerService
   operationCalls: 1
 - service: InventoryService
   operationCalls: 1
@@ -585,6 +585,7 @@ screens:
   - createRetailReturn
   - exchangeOrderLines
   - getReturnPolicy
+  - issueCreditMemo
   - listDenominations
   - listOutlets
   - listSerialisedItems
@@ -602,6 +603,7 @@ screens:
   - orderId<-deepLink
   - outletId<-deepLink
   - boxId<-session
+  - invoiceId<-navigation
   goesTo:
   - POS-002
   - POS-012
@@ -1059,6 +1061,9 @@ screens:
   wave: 1
   density: touchLarge
   operations:
+  - getTaxDocumentRendition
+  - getTaxInvoice
+  - issueTaxInvoice
   - reissueEntitlement
   - reprintOrder
   - reprintReceipt
@@ -1074,6 +1079,8 @@ screens:
   - workstationId<-session
   - saleId<-navigation
   - entitlementId<-navigation
+  - documentId<-navigation
+  - invoiceId<-navigation
   goesTo:
   - POS-011
   - POS-025

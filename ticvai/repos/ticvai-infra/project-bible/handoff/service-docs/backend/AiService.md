@@ -7,7 +7,7 @@
 | Tier | engagement: Guests and intelligence. Nothing that takes money depends on these. |
 | Contracts | `ai` |
 | Schemas owned | `ai`, `qdrant` |
-| Operations in the slice | 9 of 31 |
+| Operations in the slice | 39 of 133 |
 | Scale | Latency-tolerant, cost-sensitive, token-metered. Different hardware from everything else. |
 | If it is down | Down degrades suggestions and the concierge. Nothing that takes money depends on it. |
 
@@ -17,21 +17,62 @@
 
 ## Depends on
 
-Nothing outside itself.
+| Service | Tables it reads |
+|---|---|
+| [CatalogueService](CatalogueService.md) | `catalogue.entitlement_template`, `catalogue.event`, `catalogue.product`, `promotions.promotion` |
+| [FnbService](FnbService.md) | `fnb.menu_item`, `fnb.production_plan` |
+| [InventoryService](InventoryService.md) | `inventory.movement`, `inventory.stock_batch` |
+| [MarketingService](MarketingService.md) | `marketing.attribution_touch`, `marketing.campaign`, `marketing.case`, `marketing.guest_profile`, `marketing.message_template`, `marketing.segment` |
+| [OrderService](OrderService.md) | `orders.order_line` |
+| [PlatformService](PlatformService.md) | `control.content_block` |
+| [ReportingService](ReportingService.md) | `reporting.report_definition` |
+| [RetailService](RetailService.md) | `retail.merchandise` |
+| [VenueOpsService](VenueOpsService.md) | `assets.media_asset`, `maintenance.inspection_template`, `queue.queue`, `queue.reading` |
+| [WhiteLabelService](WhiteLabelService.md) | `whitelabel.banner`, `whitelabel.content_page`, `whitelabel.faq_entry`, `whitelabel.homepage_section`, `whitelabel.policy`, `whitelabel.promo_block` |
 
 ## Operations in the first release
 
 | Group | Operation | Method | Path | Part | Wave | Called by |
 |---|---|---|---|---|---|---|
-| ai | [`requestSuggestion`](#requestsuggestion) | POST | `/ai/suggestions` | core | 2 | ANL-001, ANL-010, BO-115, BO-117, GST-031, WEB-044 |
+| ai | [`requestSuggestion`](#requestsuggestion) | POST | `/ai/suggestions` | core | 2 | ADM-047, ADM-511, ANL-001, ANL-006, ANL-010, BO-005 … |
 | ai | [`setAiCredential`](#setaicredential) | PUT | `/ai-providers/{providerId}/credential` | setup | 2 | ADM-037 |
 | ai | [`setSuggestionProvider`](#setsuggestionprovider) | PUT | `/ai/suggestion-providers` | setup | 2 |  |
-| assist | [`createAiConversation`](#createaiconversation) | POST | `/conversations` | core | 2 | EMP-019, EMP-020, GST-031, WEB-044 |
-| assist | [`listAiConversations`](#listaiconversations) | GET | `/conversations` | core | 2 | EMP-019, EMP-020, GST-068, WEB-044 |
-| assist | [`sendAiMessage`](#sendaimessage) | POST | `/conversations/{conversationId}/messages` | core | 2 | EMP-019, EMP-020, GST-031, GST-032, GST-033, KSK-015 … |
+| assist | [`createAiConversation`](#createaiconversation) | POST | `/conversations` | core | 2 | BO-928, BO-932, EMP-019, EMP-020, GST-031, WEB-044 |
+| assist | [`listAiConversations`](#listaiconversations) | GET | `/conversations` | core | 2 | BO-932, EMP-019, EMP-020, GST-068, WEB-044 |
+| assist | [`sendAiMessage`](#sendaimessage) | POST | `/conversations/{conversationId}/messages` | core | 2 | ADM-533, BO-928, BO-929, BO-932, EMP-019, EMP-020 … |
+| config | [`setAiByokEnablement`](#setaibyokenablement) | PUT | `/tenants/{tenantId}/byok` | setup | 2 | ADM-037 |
 | config | [`setAiPolicy`](#setaipolicy) | PUT | `/policy` | setup | 2 | BO-091 |
 | config | [`setAiProvider`](#setaiprovider) | PUT | `/providers` | setup | 2 | ADM-037 |
+| configure | [`getGuidedChoiceSuggestion`](#getguidedchoicesuggestion) | GET | `/guided-choice-suggestions/{suggestionId}` | core | 2 | CMS-101 |
+| configure | [`suggestGuidedChoice`](#suggestguidedchoice) | POST | `/venues/{venueId}/guided-choice-suggestions` | core | 2 | CMS-101 |
+| forecast | [`createForecastScenario`](#createforecastscenario) | POST | `/forecast-scenarios` | setup | 2 | ADM-507, ADM-517, ANL-057, BO-919, BO-931 |
+| forecast | [`decideOperationalRequirement`](#decideoperationalrequirement) | POST | `/operational-requirements/{requirementId}/decide` | setup | 2 | ADM-518, BO-927 |
+| forecast | [`publishForecastVersion`](#publishforecastversion) | POST | `/forecast-versions/{versionId}/publish` | setup | 2 | ADM-508 |
+| forecast | [`runForecast`](#runforecast) | POST | `/forecast-definitions/{definitionKey}/runs` | setup | 2 | ADM-500, ADM-508 |
+| generate | [`proposeMarketingContent`](#proposemarketingcontent) | POST | `/ai/content-drafts` | core | 2 | BO-766, BO-772, BO-785, BO-786, BO-787, BO-789 … |
+| governance | [`configureAiCapability`](#configureaicapability) | PUT | `/governance/capabilities/{capabilityKey}` | setup | 2 | ADM-520, ADM-521, ADM-522, ANL-060 |
+| governance | [`createAiGovernancePolicyDraft`](#createaigovernancepolicydraft) | POST | `/governance/policy-drafts` | setup | 2 | ADM-523, ADM-524, ADM-525, ADM-530 |
+| governance | [`decideProposedAction`](#decideproposedaction) | POST | `/proposed-actions/{actionId}/decide` | core | 2 | ADM-492, ADM-531, ADM-532, ANL-009, BO-762, BO-793 … |
+| governance | [`publishAiGovernancePolicy`](#publishaigovernancepolicy) | POST | `/governance/policy-versions/{versionId}/publish` | setup | 2 | ADM-528 |
+| governance | [`resumeAiCapability`](#resumeaicapability) | POST | `/governance/capabilities/{capabilityKey}/resume` | setup | 2 | ADM-536 |
+| governance | [`simulateAiGovernancePolicy`](#simulateaigovernancepolicy) | POST | `/governance/policy-versions/{versionId}/simulate` | setup | 2 | ADM-527, ADM-538 |
+| insights | [`decideAiInsight`](#decideaiinsight) | POST | `/insights/{insightId}/decide` | setup | 2 | ANL-019, ANL-059, BO-772, BO-782 |
+| insights | [`explainMetricChange`](#explainmetricchange) | POST | `/insights/explain-metric-change` | setup | 2 | ADM-506, ANL-019, ANL-056 |
+| knowledge | [`configureAssistantProfile`](#configureassistantprofile) | PUT | `/assistant-profiles/{profileKey}` | setup | 2 | BO-091, SUP-018 |
+| knowledge | [`recordAnswerFeedback`](#recordanswerfeedback) | POST | `/messages/{messageId}/feedback` | core | 2 | EMP-020, GST-032, KSK-015, WEB-044 |
+| models | [`promoteAiRelease`](#promoteairelease) | POST | `/releases/{releaseId}/promote` | setup | 1 | ADM-519, ADM-554 |
+| models | [`publishPromptTemplate`](#publishprompttemplate) | POST | `/prompt-templates/{templateKey}/versions` | setup | 1 | ADM-037, ANL-060 |
+| models | [`rollbackAiRelease`](#rollbackairelease) | POST | `/releases/{releaseId}/rollback` | setup | 1 | ADM-554, ADM-556 |
+| models | [`runAiEvaluation`](#runaievaluation) | POST | `/evaluations` | setup | 1 | ADM-554, ANL-060 |
+| models | [`setAiModel`](#setaimodel) | PUT | `/models/{modelId}` | setup | 2 | ADM-037 |
+| monitoring | [`containAiIncident`](#containaiincident) | POST | `/incidents/{incidentId}/contain` | setup | 1 | ADM-556 |
+| recommend | [`decideRecommendations`](#deciderecommendations) | POST | `/recommendations/decide` | core | 1 | BO-102, BO-1048, BO-119, GST-001, GST-036, GST-048 … |
+| recommend | [`recordRecommendationEvents`](#recordrecommendationevents) | POST | `/recommendations/events` | core | 1 | BO-102, GST-001, GST-036, GST-048, WEB-001, WEB-008 … |
+| retrieval | [`createKnowledgeCollection`](#createknowledgecollection) | POST | `/collections` | setup | 2 |  |
 | retrieval | [`ingestKnowledgeDocument`](#ingestknowledgedocument) | POST | `/collections/{collectionId}/documents` | setup | 2 |  |
+| retrieval | [`reindexSource`](#reindexsource) | POST | `/index-sources/{sourceId}/reindex` | setup | 2 |  |
+| retrieval | [`semanticSearch`](#semanticsearch) | POST | `/search` | core | 2 | CMS-010, CMS-062, EMP-040, EMP-041 |
+| retrieval | [`setIndexSource`](#setindexsource) | PUT | `/index-sources` | setup | 2 |  |
 
 ## Group: ai
 
@@ -43,6 +84,9 @@ Nothing outside itself.
 **Ships answering from heuristics.** A price suggestion is a margin rule; a replenishment is par level minus on-hand plus lead time. **Every one of those is a stated rule that works on day one and is beaten by a model on day four hundred** — and the swap is a provider change, not a contract change.
 **The response always names its basis.** A manager must be able to see that today's answer is arithmetic and next quarter's is a trained model, on the same screen, without being told.
 **Never acts.** A suggestion that can order stock is a suggestion that will order stock wrongly at three in the morning — this proposes, and `decideProposedAction` decides.
+**Routed to the engines (AI design 2.3, 29 September).** `demandForecast`, `staffing` and `scenario` are answered by the forecasting service from the latest published version (`getForecast`, `listOperationalRequirements`, `createForecastScenario`); `anomaly` by the anomaly detectors (`listAiInsights`); `upsell` by the recommendation engine (`decideRecommendations`, placement `cart`). **The kinds and `SuggestionBasis` are unchanged; only the producer changes**, and the basis on the answer still says which producer it was.
+
+**Three kinds added 29 September (build)**, each answered from a stated rule first and applied by a person in the owning module: `sendTime` (22.3.19, 22.9.16) gives the best send hour and channel per recipient inside a send window, for marketing-crm to schedule; `wasteRisk` (4.1.19, 4.8.15) gives the items at risk of waste with quantity, value and a recommended action (reduce prep, promote, transfer, use in a recipe), applied through `fnb.planProductionRun`, promotions or `inventory.createStockTransfer`; `queueBalancing` (5.6.27, 8.9.9) gives per queue the forecast wait against capacity, a virtual-queue return-slot allocation by queue type and where to redirect guests, applied through `queue.updateQueue`. Rules and minimum history are on `SuggestionKind`. All three are staff-only.
 
 |  |  |
 |---|---|
@@ -53,9 +97,9 @@ Nothing outside itself.
 | Offline | no |
 | Conflict policy | serverWins |
 | Guest callable | True |
-| Reads | `ai.policy`, `ai.provider`, `ai.suggestion`, `cache:idempotency` |
+| Reads | `ai.forecast_point`, `ai.forecast_version`, `ai.insight`, `ai.operational_requirement`, `ai.policy`, `ai.provider`, `ai.rec_decline`, `ai.release`, `ai.suggestion`, `cache:idempotency`, `cache:rec-candidates`, `fnb.production_plan`, `inventory.movement`, `inventory.stock_batch`, `marketing.attribution_touch`, `marketing.segment`, `queue.queue`, `queue.reading` |
 | Writes | `ai.activity`, `ai.suggestion`, `cache:idempotency` |
-| Called by | ANL-001, ANL-010, BO-115, BO-117, GST-031, WEB-044 |
+| Called by | ADM-047, ADM-511, ANL-001, ANL-006, ANL-010, BO-005, BO-115, BO-117, BO-138, BO-139, BO-772, BO-782, BO-925, EMP-031, GST-031, WEB-044 |
 
 **Parameters**
 
@@ -103,6 +147,7 @@ Nothing outside itself.
 **The key goes to the vault and never to the database.** The request carries the secret once; what is stored is a `credentialRef`, and every read of this provider thereafter returns the reference rather than the value.
 **No surface ever holds a provider key.** A kiosk, an app and a browser all call TICVAI, and TICVAI calls the provider — because a token that reaches a client is a token that bills the tenant from somebody else's machine.
 Rotation is the same operation. The previous key is revoked at the vault after a grace window, so an in-flight request does not fail mid-answer. **The window is 24 hours (decided 28 September, audit R096)**: a replaced key keeps working for `graceMinutes`, 1,440 unless a shorter window is sent — a compromised key is rotated with `graceMinutes: 0`.
+**Only a tenant-managed provider takes a key here** (AI design 5.9, decided 29 September). A provider with `managedBy: ticvai` runs on TICVAI's Azure OpenAI subscription with a per-tenant key the platform provisions for attribution; nobody types it, and this refuses it with 409 `provider-managed-by-ticvai`.
 
 |  |  |
 |---|---|
@@ -112,7 +157,7 @@ Rotation is the same operation. The previous key is revoked at the vault after a
 | Wave | 2 |
 | Offline | no |
 | Conflict policy | serverWins |
-| Reads | `ai.provider`, `cache:idempotency` |
+| Reads | `ai.byok_enablement`, `ai.provider`, `cache:idempotency` |
 | Writes | `ai.provider`, `cache:idempotency` |
 | Called by | ADM-037 |
 
@@ -136,7 +181,7 @@ Rotation is the same operation. The previous key is revoked at the vault after a
 | Field | Type | Required | Notes |
 |---|---|---|---|
 | id | string (uuid) |  | Assigned on create. |
-| kind | AiProviderKind: enum (openai, gemini, anthropic, azureOpenai, localLlm) | yes |  |
+| kind | AiProviderKind: enum (openai, gemini, anthropic, azureOpenai, localLlm, openaiCompatible) | yes | openaiCompatible (added 29 September, AI design 3.3): a customer endpoint that speaks the OpenAI API, taken with no custom development (AIC-009). |
 | capability | AiCapability: enum (chat, embedding, vision, rerank, speechToText, textToSpeech) | yes | What a capability needs, not which provider serves it. |
 | model | string |  |  |
 | failoverProviderId | string (uuid) |  | BL-151. (nullable) |
@@ -153,12 +198,15 @@ Rotation is the same operation. The previous key is revoked at the vault after a
 | residency | string |  | Where inference physically happens. |
 | maxTokens | integer |  |  |
 | isActive | boolean | yes |  |
+| managedBy | enum (ticvai, tenant) |  | Who holds the provider account, and so who pays (AI design 5.9, decided 29 September). (default ticvai) |
+| modelId | string (uuid) |  | The model in the catalogue (listAiModels) this provider serves. (nullable) |
 
 **Responses**
 
 | Code | Shape | Meaning |
 |---|---|---|
 | 200 |  | Stored, with a reference and no secret |
+| 409 |  | The provider is TICVAI-managed; its key is provisioned by the platform (provider-managed-by-ticvai). |
 
 ### setSuggestionProvider
 
@@ -169,6 +217,7 @@ Rotation is the same operation. The previous key is revoked at the vault after a
 **A guard rail is not optional for a `model` basis.** A price suggestion outside a stated band is refused and falls back to the rule — **an unbounded model in a pricing path is one bad inference from a free lunch for a thousand guests.**
 **Where it is kept.** The assignments are stored on the tenant's `ai.policy` row, in `AiPolicy.suggestionProviders`, which is what `requestSuggestion` reads to route a kind to its producer. `setAiPolicy` does not change them; this operation is the only writer.
 **What the PUT does.** Each assignment is matched on `kind`. An assignment in the body replaces the stored one for that kind, or adds it where the kind had none; **a kind left out of the body keeps its current assignment** — a partial body never leaves a question with nobody to answer it. The response is the full set after the write.
+**Also written by `promoteAiRelease`** (AI design 2.3, 3.5). Shadow mode here is the release pipeline's shadow stage: a `shadowProducerRef` is a release in `shadow`, and when it passes its gate a `promotionReady` governance alert is raised. **A person promotes it; nothing switches by itself** (decided 29 September). Setting a `model` basis here directly remains possible for a producer that has already been promoted.
 
 |  |  |
 |---|---|
@@ -179,7 +228,7 @@ Rotation is the same operation. The previous key is revoked at the vault after a
 | Offline | no |
 | Config scope | tenant |
 | Conflict policy | serverWins |
-| Reads | `ai.policy`, `ai.provider`, `cache:idempotency` |
+| Reads | `ai.policy`, `ai.provider`, `ai.release`, `cache:idempotency` |
 | Writes | `ai.policy`, `cache:idempotency`, `cache:resolution` |
 | Called by | **no screen**: no screen lists it in its apis, so it is reachable only by API or import until one does (README, Known gaps) |
 
@@ -239,7 +288,7 @@ Scoped to a module and a role, because the same question means different things 
 | Conflict policy | serverWins |
 | Reads | `ai.conversation`, `cache:idempotency` |
 | Writes | `ai.conversation`, `cache:idempotency` |
-| Called by | EMP-019, EMP-020, GST-031, WEB-044 |
+| Called by | BO-928, BO-932, EMP-019, EMP-020, GST-031, WEB-044 |
 
 **Parameters**
 
@@ -290,7 +339,7 @@ Scoped to a module and a role, because the same question means different things 
 | Read routing | replica |
 | Reads | `ai.conversation` |
 | Writes | - |
-| Called by | EMP-019, EMP-020, GST-068, WEB-044 |
+| Called by | BO-932, EMP-019, EMP-020, GST-068, WEB-044 |
 
 **Parameters**
 
@@ -338,9 +387,9 @@ Every response carries a trace id, the model and provider that produced it, toke
 | Wave | 2 |
 | Offline | no |
 | Conflict policy | append |
-| Reads | `ai.chunk_ref`, `ai.conversation`, `ai.knowledge_document`, `ai.message`, `ai.policy`, `ai.proposed_action`, `ai.provider`, `cache:answer`, `cache:idempotency`, `qdrant:knowledge` |
-| Writes | `ai.activity`, `ai.message`, `ai.proposed_action`, `cache:answer`, `cache:idempotency`, `qdrant:knowledge` |
-| Called by | EMP-019, EMP-020, GST-031, GST-032, GST-033, KSK-015, WEB-044 |
+| Reads | `ai.assistant_profile`, `ai.capability`, `ai.chunk_embedding`, `ai.chunk_ref`, `ai.conversation`, `ai.knowledge_document`, `ai.message`, `ai.policy`, `ai.proposed_action`, `ai.provider`, `cache:answer`, `cache:idempotency`, `qdrant:knowledge` |
+| Writes | `ai.activity`, `ai.decision_record`, `ai.knowledge_gap`, `ai.message`, `ai.proposed_action`, `cache:answer`, `cache:idempotency`, `qdrant:knowledge` |
+| Called by | ADM-533, BO-928, BO-929, BO-932, EMP-019, EMP-020, GST-031, GST-032, GST-033, KSK-015, WEB-044 |
 
 **Parameters**
 
@@ -376,7 +425,7 @@ Every response carries a trace id, the model and provider that produced it, toke
 | proposedAction | object |  | Present where the answer suggests a change. (nullable) |
 | proposedAction.id | string (uuid) | yes |  |
 | proposedAction.interactionId | string (uuid) |  |  |
-| proposedAction.kind | enum (pricing, promotion, operational, financial, configuration) | yes |  |
+| proposedAction.kind | enum (pricing, promotion, operational, financial, configuration, content, audience) | yes | content (a marketing or storefront draft from proposeMarketingContent) and audience (a lookalike segment from proposeLookalikeSegment) added 29 September (build); both are applied by a person in the… |
 | proposedAction.targetContract | string | yes | Which contract would perform it. |
 | proposedAction.targetOperation | string | yes |  |
 | proposedAction.payload | object | yes | The request body a person would submit, ready to review. |
@@ -388,8 +437,12 @@ Every response carries a trace id, the model and provider that produced it, toke
 | proposedAction.decisionReason | string |  | Required on rejection. (nullable) |
 | proposedAction.proposedAt | string (date-time) |  |  |
 | proposedAction.decidedAt | string (date-time) |  | (nullable) |
+| proposedAction.scopePath | string |  | Added 29 September (AI design 3.1): ai.proposed_action had no policy — its only references were nullable. (read-only) |
+| proposedAction.planId | string (uuid) |  | The plan this action presents for a decision (AI design 2.2 D, 3.8). (read-only; nullable) |
+| proposedAction.approvalRequestId | string (uuid) |  | The approvals request deciding a tier 2 or matrix-caught action (AI design 2.3). (read-only; nullable) |
+| proposedAction.changeSetHash | string |  | Hash of the change set approved; execution refuses a plan whose hash differs (AIC-181). (read-only; nullable) |
 | traceId | string |  |  |
-| provider | AiProviderKind: enum (openai, gemini, anthropic, azureOpenai, localLlm) |  |  |
+| provider | AiProviderKind: enum (openai, gemini, anthropic, azureOpenai, localLlm, openaiCompatible) |  | openaiCompatible (added 29 September, AI design 3.3): a customer endpoint that speaks the OpenAI API, taken with no custom development (AIC-009). |
 | model | string |  |  |
 | promptTokens | integer |  |  |
 | completionTokens | integer |  |  |
@@ -409,6 +462,70 @@ Every response carries a trace id, the model and provider that produced it, toke
 
 Providers, models and policy
 
+### setAiByokEnablement
+
+**`PUT /tenants/{tenantId}/byok`**: Enable or disable bring-your-own-key for a tenant (platform)
+
+**TICVAI decides, per tenant** (decided 29 September; design 8 on 5.9). BYOK is an override, not tenant self-service: `PLATFORM_AI_MANAGE` from the platform token, and an open platform-staff grant into the tenant (`openPlatformStaffGrant`, audit R098), without which it refuses `403 platform-grant-required`. Once enabled, the tenant's key is set per task or for everything through `setAiProvider` (`managedBy: tenant`) and `setAiCredential`; the tenant then pays the provider directly and TICVAI meters for visibility only. Disabling does not delete the tenant's providers; `setAiProvider` stops accepting new ones and the gateway routes back to TICVAI-managed models.
+
+|  |  |
+|---|---|
+| Permission | `PLATFORM_AI_MANAGE` |
+| Scope level | tenant |
+| Part of slice | setup, makes `ai.byok_enablement` non-empty |
+| Wave | 2 |
+| Offline | no |
+| Config scope | tenant |
+| Conflict policy | serverWins |
+| Reads | `ai.byok_enablement`, `cache:idempotency` |
+| Writes | `ai.byok_enablement`, `cache:idempotency` |
+| Called by | ADM-037 |
+
+**Parameters**
+
+| Name | In | Required | Type | Notes |
+|---|---|---|---|---|
+| tenantId | path | yes | string (uuid) |  |
+| Idempotency-Key | header | yes | string | Client-generated ULID. |
+
+**Request body**: `AiByokEnablement`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| id | string (uuid) |  | (read-only) |
+| tenantId | string (uuid) | yes |  |
+| enabled | boolean | yes |  |
+| coverage | enum (perTask, allTasks) |  | Whether the tenant may supply a key per task or one key for everything. (default perTask) |
+| allowedTasks | array of string |  | Where coverage is perTask: the gateway tasks a tenant key may serve. |
+| reason | string |  | (max length 1000) |
+| platformStaffGrantId | string (uuid) |  | The open platform-staff grant the change was made under (audit R098). (read-only) |
+| decidedByPrincipalId | string (uuid) |  | (read-only) |
+| decidedAt | string (date-time) |  | (read-only) |
+| scopePath | string |  | The partition key (ADR-0005). (read-only) |
+
+**Response**: `AiByokEnablement`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| id | string (uuid) |  | (read-only) |
+| tenantId | string (uuid) | yes |  |
+| enabled | boolean | yes |  |
+| coverage | enum (perTask, allTasks) |  | Whether the tenant may supply a key per task or one key for everything. (default perTask) |
+| allowedTasks | array of string |  | Where coverage is perTask: the gateway tasks a tenant key may serve. |
+| reason | string |  | (max length 1000) |
+| platformStaffGrantId | string (uuid) |  | The open platform-staff grant the change was made under (audit R098). (read-only) |
+| decidedByPrincipalId | string (uuid) |  | (read-only) |
+| decidedAt | string (date-time) |  | (read-only) |
+| scopePath | string |  | The partition key (ADR-0005). (read-only) |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 200 |  | Enable or disable bring-your-own-key for a tenant (platform) |
+| 403 |  | No platform-staff grant into this tenant is open (platform-grant-required, audit R098). |
+| 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
+
 ### setAiPolicy
 
 **`PUT /policy`**: Set the policy
@@ -416,7 +533,8 @@ Providers, models and policy
 **Tenant sets the default; a venue may narrow it and never widen it** (8.4.4 and 8.4.5, adjacent requirements asking for both, which is ADR-0018's inheritance rule stated by the matrix itself).
 Masking is the part to get right. `maskedFields` names what is redacted before a prompt leaves the platform, and it defaults to every field in the `pii` schema — **a default that fails closed, because a masking list somebody forgot to fill in should send nothing rather than everything.**
 **Which row it writes.** The body's `scopeLevel` and `scopePath` name the target: `tenant` with the tenant's node writes the default, `venue` with a venue's node writes that venue's narrowing. There is one row per `scopePath`. A `scopePath` outside the caller's grants is refused (403), and a venue row that would widen the tenant's — a capability, role or guest scope the tenant does not allow, fewer masked fields, or a higher ceiling — is refused as a validation failure.
-**What the PUT does.** It replaces the whole row at that `scopePath`: a field left out takes its default, not its old value. It returns 200 where the row existed and 201 where this created it — a venue's first narrowing. `suggestionProviders` is not written here; `setSuggestionProvider` is its only writer, and it is kept as it was.
+**What the PUT does.** It replaces the whole row at that `scopePath`: a field left out takes its default, not its old value. It returns 200 where the row existed and 201 where this created it — a venue's first narrowing. `suggestionProviders` is not written here; `setSuggestionProvider` and `promoteAiRelease` are its writers, and it is kept as it was.
+**`autonomyOverrides` only tighten** (AIC-151): a level above the capability's ceiling, or above the tenant row's override on a venue row, is refused as a validation failure.
 
 |  |  |
 |---|---|
@@ -444,12 +562,18 @@ Masking is the part to get right. `maskedFields` names what is redacted before a
 | id | string (uuid) |  | Added 20 August. (read-only) |
 | scopeLevel | enum (tenant, venue) | yes | Tenant sets the default; a venue may narrow it and never widen it. |
 | scopePath | string | yes | The node this row belongs to, and the key it is written under — the tenant's node where scopeLevel is tenant, a venue's where it is venue. |
-| enabledCapabilities | array of enum (assist, search, generateConfiguration, generateLayout, summarise, explain) | yes |  |
+| enabledCapabilities | array of enum (assist, search, generateConfiguration, generateLayout, summarise, explain, gatewayAndModels, governance, …) | yes | Extended on 29 September to the fourteen capabilities of the AI design (section 1.1, AiCapabilityFamily). |
 | allowedRoleIds | array of string (uuid) |  |  |
 | maskedFields | array of string |  | Redacted before a prompt leaves the platform (8.3.73). |
 | requiresApprovalFor | array of enum (pricing, promotion, operational, financial, configuration) |  | 8.3.61–8.3.64. |
 | monthlyTokenCeiling | integer |  | (nullable) |
 | ceilingBehaviour | enum (warn, warnThenDisable, block) |  | Decided 17 August: warn, and let the venue manager choose. (default warn) |
+| ceilingBehaviourByCapability | array of object |  | Ceiling behaviour per capability (AI design 5.9, AIC-227), so a budget never silently disables fraud scoring, which spends no tokens, or a critical capability. |
+| ceilingBehaviourByCapability[].capability | string | yes | An AiCapabilityFamily value, or a registered capability key. |
+| ceilingBehaviourByCapability[].behaviour | enum (warn, warnThenDisable, block, neverRestrict) | yes |  |
+| autonomyOverrides | array of object |  | Tighten only (AI design 3.8, AIC-151). |
+| autonomyOverrides[].capabilityKey | string | yes |  |
+| autonomyOverrides[].autonomyLevel | integer | yes | One autonomy scale for every capability (design 3.8 and 5.5, GOV 0 to 4; ADR-0050). (min 0; max 4) |
 | ceilingWarningPercent | integer |  | Warn before the ceiling, not at it. (default 80) |
 | guestCapabilityScope | array of enum (ticketSelection, promotions, faq, recommendations, checkout, waitTimes, wayfinding) |  | What a guest-facing assistant may help with, and nothing else (2.1.28). |
 | retrieveTopK | integer |  | How many chunks retrieval returns before reranking. (default 30) |
@@ -485,12 +609,18 @@ Masking is the part to get right. `maskedFields` names what is redacted before a
 | id | string (uuid) |  | Added 20 August. (read-only) |
 | scopeLevel | enum (tenant, venue) | yes | Tenant sets the default; a venue may narrow it and never widen it. |
 | scopePath | string | yes | The node this row belongs to, and the key it is written under — the tenant's node where scopeLevel is tenant, a venue's where it is venue. |
-| enabledCapabilities | array of enum (assist, search, generateConfiguration, generateLayout, summarise, explain) | yes |  |
+| enabledCapabilities | array of enum (assist, search, generateConfiguration, generateLayout, summarise, explain, gatewayAndModels, governance, …) | yes | Extended on 29 September to the fourteen capabilities of the AI design (section 1.1, AiCapabilityFamily). |
 | allowedRoleIds | array of string (uuid) |  |  |
 | maskedFields | array of string |  | Redacted before a prompt leaves the platform (8.3.73). |
 | requiresApprovalFor | array of enum (pricing, promotion, operational, financial, configuration) |  | 8.3.61–8.3.64. |
 | monthlyTokenCeiling | integer |  | (nullable) |
 | ceilingBehaviour | enum (warn, warnThenDisable, block) |  | Decided 17 August: warn, and let the venue manager choose. (default warn) |
+| ceilingBehaviourByCapability | array of object |  | Ceiling behaviour per capability (AI design 5.9, AIC-227), so a budget never silently disables fraud scoring, which spends no tokens, or a critical capability. |
+| ceilingBehaviourByCapability[].capability | string | yes | An AiCapabilityFamily value, or a registered capability key. |
+| ceilingBehaviourByCapability[].behaviour | enum (warn, warnThenDisable, block, neverRestrict) | yes |  |
+| autonomyOverrides | array of object |  | Tighten only (AI design 3.8, AIC-151). |
+| autonomyOverrides[].capabilityKey | string | yes |  |
+| autonomyOverrides[].autonomyLevel | integer | yes | One autonomy scale for every capability (design 3.8 and 5.5, GOV 0 to 4; ADR-0050). (min 0; max 4) |
 | ceilingWarningPercent | integer |  | Warn before the ceiling, not at it. (default 80) |
 | guestCapabilityScope | array of enum (ticketSelection, promotions, faq, recommendations, checkout, waitTimes, wayfinding) |  | What a guest-facing assistant may help with, and nothing else (2.1.28). |
 | retrieveTopK | integer |  | How many chunks retrieval returns before reranking. (default 30) |
@@ -534,6 +664,7 @@ Masking is the part to get right. `maskedFields` names what is redacted before a
 **How the permission is honoured in the tenant's cell** (decided 28 September, audit R203). `PLATFORM_TENANT_MANAGE` is a platform permission: it is read from the operator's platform token, never from a platform-staff grant, which refuses `PLATFORM_*` values. The cell additionally requires the operator to have a grant into this tenant open (`openPlatformStaffGrant`, audit R098), so the change is audited against that grant (`AuditRecord.platformStaffGrantId`); without one it refuses `403 platform-grant-required`. A tenant's own staff cannot set a provider, whatever they hold.
 Credentials are a key-vault reference, never the key.
 **What the PUT does.** The body is one whole provider configuration, matched on `id`. With an `id`, it replaces that provider's configuration in full — a field left out takes its default or null, not its old value — and returns 200; an `id` that names no provider at the caller's scope is a 404. Without an `id`, it creates a provider and returns 201 with the new id. The other providers are never touched: this is not a replace-the-list call.
+**Who pays, and bring-your-own-key** (AI design 5.9, decided 29 September). `managedBy: ticvai` is the default: TICVAI-managed Azure OpenAI in UAE North, metered per tenant and re-billed per token. `managedBy: tenant` is bring-your-own-key, which **TICVAI enables per tenant** with `setAiByokEnablement` (`PLATFORM_AI_MANAGE`); until it is enabled, a tenant-managed provider is refused with 409 `byok-not-enabled`, and a task outside `AiByokEnablement.allowedTasks` likewise. `modelId` names the model in the catalogue (`listAiModels`) the provider serves.
 
 |  |  |
 |---|---|
@@ -544,7 +675,7 @@ Credentials are a key-vault reference, never the key.
 | Offline | no |
 | Config scope | tenant |
 | Conflict policy | serverWins |
-| Reads | `ai.provider`, `cache:idempotency` |
+| Reads | `ai.byok_enablement`, `ai.model`, `ai.provider`, `cache:idempotency` |
 | Writes | `ai.provider`, `cache:idempotency` |
 | Called by | ADM-037 |
 
@@ -559,7 +690,7 @@ Credentials are a key-vault reference, never the key.
 | Field | Type | Required | Notes |
 |---|---|---|---|
 | id | string (uuid) |  | Assigned on create. |
-| kind | AiProviderKind: enum (openai, gemini, anthropic, azureOpenai, localLlm) | yes |  |
+| kind | AiProviderKind: enum (openai, gemini, anthropic, azureOpenai, localLlm, openaiCompatible) | yes | openaiCompatible (added 29 September, AI design 3.3): a customer endpoint that speaks the OpenAI API, taken with no custom development (AIC-009). |
 | capability | AiCapability: enum (chat, embedding, vision, rerank, speechToText, textToSpeech) | yes | What a capability needs, not which provider serves it. |
 | model | string |  |  |
 | failoverProviderId | string (uuid) |  | BL-151. (nullable) |
@@ -576,13 +707,15 @@ Credentials are a key-vault reference, never the key.
 | residency | string |  | Where inference physically happens. |
 | maxTokens | integer |  |  |
 | isActive | boolean | yes |  |
+| managedBy | enum (ticvai, tenant) |  | Who holds the provider account, and so who pays (AI design 5.9, decided 29 September). (default ticvai) |
+| modelId | string (uuid) |  | The model in the catalogue (listAiModels) this provider serves. (nullable) |
 
 **Response**: `AiProvider`
 
 | Field | Type | Required | Notes |
 |---|---|---|---|
 | id | string (uuid) |  | Assigned on create. |
-| kind | AiProviderKind: enum (openai, gemini, anthropic, azureOpenai, localLlm) | yes |  |
+| kind | AiProviderKind: enum (openai, gemini, anthropic, azureOpenai, localLlm, openaiCompatible) | yes | openaiCompatible (added 29 September, AI design 3.3): a customer endpoint that speaks the OpenAI API, taken with no custom development (AIC-009). |
 | capability | AiCapability: enum (chat, embedding, vision, rerank, speechToText, textToSpeech) | yes | What a capability needs, not which provider serves it. |
 | model | string |  |  |
 | failoverProviderId | string (uuid) |  | BL-151. (nullable) |
@@ -599,6 +732,8 @@ Credentials are a key-vault reference, never the key.
 | residency | string |  | Where inference physically happens. |
 | maxTokens | integer |  |  |
 | isActive | boolean | yes |  |
+| managedBy | enum (ticvai, tenant) |  | Who holds the provider account, and so who pays (AI design 5.9, decided 29 September). (default ticvai) |
+| modelId | string (uuid) |  | The model in the catalogue (listAiModels) this provider serves. (nullable) |
 
 **Responses**
 
@@ -608,12 +743,1779 @@ Credentials are a key-vault reference, never the key.
 | 201 |  | Created — the body carried no id |
 | 403 |  | The caller lacks PLATFORM_TENANT_MANAGE on their platform token, or has no platform-staff grant into this tenant open (platform-grant-required, audit R203). |
 | 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
-| 409 |  | The provider's residency is not in the tenant's region's allowedAiResidencies (audit R203). |
+| 409 |  | The provider's residency is not in the tenant's region's allowedAiResidencies (residency-refused, audit R203), or it is tenant-managed (managedBy is tenant) and bring-your-own-key is not enabled for… |
+
+
+## Group: configure
+
+The configuration assistant and Help me choose suggestions (design C7)
+
+### getGuidedChoiceSuggestion
+
+**`GET /guided-choice-suggestions/{suggestionId}`**: The reasons behind a Help me choose suggestion
+
+**Why these questions** (design 3.11): the products read, the attributes chosen and dropped with the split each makes, the answer mapping, and whether the wording came from a model or the attribute names. `suggestionId` is the `suggestionRef` on the white-label draft, so the review screen (CMS-101) opens it from the draft.
+
+|  |  |
+|---|---|
+| Permission | `AI_USE` |
+| Scope level | venue |
+| Part of slice | core |
+| Wave | 2 |
+| Offline | no |
+| Conflict policy | serverWins |
+| Read routing | primary |
+| Reads | `ai.guided_choice_suggestion` |
+| Writes | - |
+| Called by | CMS-101 |
+
+**Parameters**
+
+| Name | In | Required | Type | Notes |
+|---|---|---|---|---|
+| suggestionId | path | yes | string (uuid) |  |
+
+**Response**: `AiGuidedChoiceSuggestion`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| id | string (uuid) |  | (read-only) |
+| venueId | string (uuid) | yes |  |
+| trigger | enum (productsUploaded, mappedProductWithdrawn, productsUncovered, manual) | yes |  |
+| status | enum (running, proposed, noSuggestion, failed, superseded) | yes | (read-only) |
+| productCount | integer |  | (min 0; read-only) |
+| questions | array of object |  | The questions chosen, in the order asked. (read-only) |
+| questions[].attribute | string |  | The catalogue attribute asked about: audience, level, minimum height or age, duration, price band, format, language. |
+| questions[].order | integer |  | (min 1) |
+| questions[].split | object |  | How evenly it divides the bookable products: products per answer. |
+| questions[].droppedBecause | string |  | Set where an attribute was considered and dropped (an answer would leave nothing bookable). (nullable) |
+| questions[].answers | array of object |  |  |
+| questions[].answers[].value | string |  |  |
+| questions[].answers[].leadsTo | enum (product, category, flow) |  |  |
+| questions[].answers[].targetRef | string |  |  |
+| wordingSource | enum (model, attributeNames) |  | Where the text came from. (read-only) |
+| modelVersion | string |  | (read-only; nullable) |
+| promptTemplateVersion | string |  | (read-only; nullable) |
+| guidedChoiceId | string (uuid) |  | The white-label draft GuidedChoice it produced. (read-only; nullable) |
+| decisionRecordId | string (uuid) |  | (read-only; nullable) |
+| createdAt | string (date-time) |  | (read-only) |
+| scopePath | string |  | The partition key (ADR-0005). (read-only) |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 200 |  | The reasons behind a Help me choose suggestion |
+| 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
+
+### suggestGuidedChoice
+
+**`POST /venues/{venueId}/guided-choice-suggestions`**: Suggest a Help me choose set-up from the venue's catalogue
+
+**The Help me choose job** (design 3.11, decided 29 September; C7 at autonomy "suggest"). Runs automatically when a venue's products are uploaded (`catalogue.productPublished`), when a mapped product is withdrawn, or when new products are left out by every answer; this is the same job on request. **Rules first:** it reads the products through the catalogue API with the venue's permissions, picks the one or two attributes that split them most evenly (dropping any where an answer would leave nothing bookable), maps each answer to a product, category or flow, and only then asks a language model to word the questions in the tenant's languages from the attributes alone, never guest data. With no model, the attribute names are used as they are. The draft lands through `white-label.proposeGuidedChoice` with `source: aiSuggested` and this suggestion's id as `suggestionRef`, and a decision record keeps the inputs, splits and versions. **Nothing is published**: publishing is `white-label.publishGuidedChoice`, by a person.
+
+|  |  |
+|---|---|
+| Permission | `AI_USE` |
+| Scope level | venue |
+| Part of slice | core |
+| Wave | 2 |
+| Offline | no |
+| Conflict policy | serverWins |
+| Reads | `ai.guided_choice_suggestion`, `ai.policy`, `ai.prompt_template`, `cache:idempotency` |
+| Writes | `ai.activity`, `ai.decision_record`, `ai.guided_choice_suggestion`, `cache:idempotency` |
+| Called by | CMS-101 |
+
+**Parameters**
+
+| Name | In | Required | Type | Notes |
+|---|---|---|---|---|
+| venueId | path | yes | string (uuid) |  |
+| Idempotency-Key | header | yes | string | Client-generated ULID. |
+
+**Request body**
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| trigger | enum (manual) |  | (default manual) |
+| locales | array of string |  |  |
+
+**Response**: `AiGuidedChoiceSuggestion`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| id | string (uuid) |  | (read-only) |
+| venueId | string (uuid) | yes |  |
+| trigger | enum (productsUploaded, mappedProductWithdrawn, productsUncovered, manual) | yes |  |
+| status | enum (running, proposed, noSuggestion, failed, superseded) | yes | (read-only) |
+| productCount | integer |  | (min 0; read-only) |
+| questions | array of object |  | The questions chosen, in the order asked. (read-only) |
+| questions[].attribute | string |  | The catalogue attribute asked about: audience, level, minimum height or age, duration, price band, format, language. |
+| questions[].order | integer |  | (min 1) |
+| questions[].split | object |  | How evenly it divides the bookable products: products per answer. |
+| questions[].droppedBecause | string |  | Set where an attribute was considered and dropped (an answer would leave nothing bookable). (nullable) |
+| questions[].answers | array of object |  |  |
+| questions[].answers[].value | string |  |  |
+| questions[].answers[].leadsTo | enum (product, category, flow) |  |  |
+| questions[].answers[].targetRef | string |  |  |
+| wordingSource | enum (model, attributeNames) |  | Where the text came from. (read-only) |
+| modelVersion | string |  | (read-only; nullable) |
+| promptTemplateVersion | string |  | (read-only; nullable) |
+| guidedChoiceId | string (uuid) |  | The white-label draft GuidedChoice it produced. (read-only; nullable) |
+| decisionRecordId | string (uuid) |  | (read-only; nullable) |
+| createdAt | string (date-time) |  | (read-only) |
+| scopePath | string |  | The partition key (ADR-0005). (read-only) |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 202 |  | Accepted: suggest a Help me choose set-up from the venue's catalogue |
+| 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
+| 409 |  | A suggestion for this venue is already running (suggestion-in-progress). |
+
+
+## Group: forecast
+
+Forecasting and operational requirements (design C8)
+
+### createForecastScenario
+
+**`POST /forecast-scenarios`**: Run a what-if
+
+**Test future conditions without changing production** (ADM-507, ADM-517, BO-931): price, capacity, opening hours, weather, an event, marketing, staffing or a closure, against a published version.
+
+|  |  |
+|---|---|
+| Permission | `AI_USE` |
+| Scope level | venue |
+| Part of slice | setup, makes `ai.forecast_point` non-empty |
+| Wave | 2 |
+| Offline | no |
+| Conflict policy | serverWins |
+| Reads | `ai.forecast_point`, `ai.forecast_scenario`, `ai.forecast_version`, `cache:idempotency` |
+| Writes | `ai.forecast_point`, `ai.forecast_scenario`, `cache:idempotency` |
+| Called by | ADM-507, ADM-517, ANL-057, BO-919, BO-931 |
+
+**Parameters**
+
+| Name | In | Required | Type | Notes |
+|---|---|---|---|---|
+| Idempotency-Key | header | yes | string | Client-generated ULID. |
+
+**Request body**: `AiForecastScenario`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| id | string (uuid) |  | (read-only) |
+| name | string |  |  |
+| baseVersionId | string (uuid) | yes |  |
+| changes | array of object | yes | (min items 1) |
+| changes[].lever | enum (price, capacity, openingHours, weather, event, marketing, staffing, closure) | yes |  |
+| changes[].target | string |  | (nullable) |
+| changes[].value | object |  | (nullable) |
+| status | enum (computing, ready, failed) |  | (read-only) |
+| result | object |  | Deltas against the base version by subject and period. (read-only; nullable) |
+| createdByPrincipalId | string (uuid) |  | (read-only) |
+| createdAt | string (date-time) |  | (read-only) |
+| scopePath | string |  | The partition key (ADR-0005). (read-only) |
+
+**Response**: `AiForecastScenario`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| id | string (uuid) |  | (read-only) |
+| name | string |  |  |
+| baseVersionId | string (uuid) | yes |  |
+| changes | array of object | yes | (min items 1) |
+| changes[].lever | enum (price, capacity, openingHours, weather, event, marketing, staffing, closure) | yes |  |
+| changes[].target | string |  | (nullable) |
+| changes[].value | object |  | (nullable) |
+| status | enum (computing, ready, failed) |  | (read-only) |
+| result | object |  | Deltas against the base version by subject and period. (read-only; nullable) |
+| createdByPrincipalId | string (uuid) |  | (read-only) |
+| createdAt | string (date-time) |  | (read-only) |
+| scopePath | string |  | The partition key (ADR-0005). (read-only) |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 202 |  | Accepted: run a what-if |
+
+### decideOperationalRequirement
+
+**`POST /operational-requirements/{requirementId}/decide`**: Accept, modify or reject a requirement
+
+**Autonomy L2: prepare** (design 3.8). Accepting hands the requirement to the owning module as a recommendation bound to its forecast version (a rota in Workforce, a par in Inventory); a person applies it there. Nothing is written in the owning module from here. Emits `ai.operationalRequirementIssued` on hand-over.
+
+|  |  |
+|---|---|
+| Permission | `AI_USE` |
+| Scope level | venue |
+| Part of slice | setup, makes `ai.operational_requirement` non-empty |
+| Wave | 2 |
+| Offline | no |
+| Conflict policy | serverWins |
+| Reads | `ai.operational_requirement`, `cache:idempotency` |
+| Writes | `ai.decision_record`, `ai.operational_requirement`, `cache:idempotency` |
+| Called by | ADM-518, BO-927 |
+| State model | AI operational requirement ([states/ai-operational-requirement.yaml](../../../states/ai-operational-requirement.yaml)): moves `issued` -> `accepted`, `issued` -> `modified`, `issued` -> `rejected` |
+
+**Parameters**
+
+| Name | In | Required | Type | Notes |
+|---|---|---|---|---|
+| requirementId | path | yes | string (uuid) |  |
+| Idempotency-Key | header | yes | string | Client-generated ULID. |
+
+**Request body**
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| decision | enum (accept, modify, reject) | yes |  |
+| quantity | number |  | (nullable) |
+| note | string |  | (max length 1000; nullable) |
+
+**Response**: `AiOperationalRequirement`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| id | string (uuid) |  | (read-only) |
+| versionId | string (uuid) | yes |  |
+| kind | enum (staff, pos, kiosk, gates, fnb, retail, stock, resource, …) | yes |  |
+| targetContract | string |  | The owning module that applies it: workforce, fnb, inventory, resources, access. |
+| subjectRef | string |  | A role, outlet, gate, item or resource type. (nullable) |
+| periodStart | string (date-time) | yes |  |
+| periodEnd | string (date-time) |  |  |
+| quantity | number | yes |  |
+| quantityP90 | number |  | The requirement at the forecast's 90th percentile, for planning to the busy case. (nullable) |
+| unit | string |  |  |
+| productivityStandard | object |  | The standard used, e.g. (nullable) |
+| status | enum (issued, accepted, modified, rejected, handedOver, expired) |  | (read-only) |
+| decidedByPrincipalId | string (uuid) |  | (read-only; nullable) |
+| decidedAt | string (date-time) |  | (read-only; nullable) |
+| decisionNote | string |  | (nullable) |
+| handoverRef | string |  | The owning module's record once handed over. (read-only; nullable) |
+| scopePath | string |  | The partition key (ADR-0005). (read-only) |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 200 |  | Accept, modify or reject a requirement |
+| 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
+| 409 |  | The requirement is no longer issued (requirement-not-open). |
+
+### publishForecastVersion
+
+**`POST /forecast-versions/{versionId}/publish`**: Publish a forecast version
+
+**Forecast publication where it is not automatic** (autonomy L3, design 3.8; ADM-508). The quality gates must pass (completeness, no blocking signal missing, no accuracy regression). The previous published version is superseded; operational requirements are derived from the new one. Emits `ai.forecastPublished`.
+
+|  |  |
+|---|---|
+| Permission | `AI_APPROVE` |
+| Scope level | venue |
+| Part of slice | setup, makes `ai.forecast_version`, `ai.operational_requirement` non-empty |
+| Wave | 2 |
+| Offline | no |
+| Conflict policy | serverWins |
+| Reads | `ai.forecast_definition`, `ai.forecast_version`, `cache:idempotency` |
+| Writes | `ai.decision_record`, `ai.forecast_version`, `ai.operational_requirement`, `cache:idempotency` |
+| Called by | ADM-508 |
+| State model | AI forecast version ([states/ai-forecast-version.yaml](../../../states/ai-forecast-version.yaml)): moves `draft` -> `published`, `awaitingApproval` -> `published`, `published` -> `superseded` |
+
+**Parameters**
+
+| Name | In | Required | Type | Notes |
+|---|---|---|---|---|
+| versionId | path | yes | string (uuid) |  |
+| Idempotency-Key | header | yes | string | Client-generated ULID. |
+
+**Request body**
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| note | string |  | (max length 1000; nullable) |
+
+**Response**: `AiForecastVersion`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| id | string (uuid) |  | (read-only) |
+| definitionId | string (uuid) | yes |  |
+| versionNumber | integer | yes | (min 1) |
+| status | enum (running, draft, awaitingApproval, published, superseded, rejected, failed) | yes | (read-only) |
+| basis | SuggestionBasis: enum (heuristic, statistical, model, hybrid, manual) | yes | How the answer was reached, and this is the field the whole design exists for. |
+| producerRef | string |  |  |
+| modelVersion | string |  | (nullable) |
+| dataCutoffAt | string (date-time) |  | The analytical replica watermark the snapshot was taken at. |
+| horizonStart | string (date-time) |  |  |
+| horizonEnd | string (date-time) |  |  |
+| qualityChecks | object |  | Each gate and whether it passed. (read-only) |
+| publishedByPrincipalId | string (uuid) |  | Null where the definition auto-published. (read-only; nullable) |
+| publishedAt | string (date-time) |  | (read-only; nullable) |
+| decisionRecordId | string (uuid) |  | (read-only; nullable) |
+| createdAt | string (date-time) |  | (read-only) |
+| scopePath | string |  | The partition key (ADR-0005). (read-only) |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 200 |  | Publish a forecast version |
+| 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
+| 409 |  | Not publishable: a quality gate failed (quality-gate-failed) or the version is not the latest draft (version-not-current). |
+
+### runForecast
+
+**`POST /forecast-definitions/{definitionKey}/runs`**: Run a forecast now
+
+Outside the nightly run (design 2.2 C): snapshot, produce, reconcile, score. Returns the new version in `running`; it publishes by itself only where the definition auto-publishes and the gates pass.
+
+|  |  |
+|---|---|
+| Permission | `AI_CONFIGURE` |
+| Scope level | venue |
+| Part of slice | setup, makes `ai.forecast_point`, `ai.forecast_version`, `ai.insight` non-empty |
+| Wave | 2 |
+| Offline | no |
+| Conflict policy | serverWins |
+| Reads | `ai.forecast_definition`, `ai.forecast_version`, `ai.release`, `ai.signal_observation`, `cache:idempotency`, `marketing.guest_profile`, `marketing.segment`, `orders.order_line` |
+| Writes | `ai.forecast_accuracy`, `ai.forecast_point`, `ai.forecast_version`, `ai.insight`, `cache:idempotency` |
+| Called by | ADM-500, ADM-508 |
+
+**Parameters**
+
+| Name | In | Required | Type | Notes |
+|---|---|---|---|---|
+| definitionKey | path | yes | string |  |
+| Idempotency-Key | header | yes | string | Client-generated ULID. |
+
+**Response**: `AiForecastVersion`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| id | string (uuid) |  | (read-only) |
+| definitionId | string (uuid) | yes |  |
+| versionNumber | integer | yes | (min 1) |
+| status | enum (running, draft, awaitingApproval, published, superseded, rejected, failed) | yes | (read-only) |
+| basis | SuggestionBasis: enum (heuristic, statistical, model, hybrid, manual) | yes | How the answer was reached, and this is the field the whole design exists for. |
+| producerRef | string |  |  |
+| modelVersion | string |  | (nullable) |
+| dataCutoffAt | string (date-time) |  | The analytical replica watermark the snapshot was taken at. |
+| horizonStart | string (date-time) |  |  |
+| horizonEnd | string (date-time) |  |  |
+| qualityChecks | object |  | Each gate and whether it passed. (read-only) |
+| publishedByPrincipalId | string (uuid) |  | Null where the definition auto-published. (read-only; nullable) |
+| publishedAt | string (date-time) |  | (read-only; nullable) |
+| decisionRecordId | string (uuid) |  | (read-only; nullable) |
+| createdAt | string (date-time) |  | (read-only) |
+| scopePath | string |  | The partition key (ADR-0005). (read-only) |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 202 |  | Accepted: run a forecast now |
+| 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
+| 409 |  | A run of this definition is in progress. |
+
+
+## Group: generate
+
+Draft a configuration a person then reviews
+
+### proposeMarketingContent
+
+**`POST /ai/content-drafts`**: Draft marketing content for a person to edit and apply
+
+22.1.17, 22.3.18, 22.4.9, 22.4.10, 22.9.17, 22.10.14, 22.10.16, 22.10.17. **Drafts only, never a publish.** A language model, through the gateway (design 3.3), writes message bodies, subject lines and their variants, notification wording, content blocks, pages, banners, promo blocks and app homepage sections from a brief. Nothing is trained on the tenant's content, and no language model sits on a path that takes money.
+
+**Each variant in each locale is one `ai.proposed_action`** (kind `content`). Its `targetOperation` is the owner's own save operation and its `payload` that operation's request body: `marketing-crm.createMessageTemplate` for an email, SMS, push, WhatsApp or in-app template and for notification wording; `marketing-crm.updateCampaign` (`CampaignContent.subjectOverride`) for a subject line; `white-label.createContentBlock`, `createContentPage` or `updateContentPage`, `createBanner` or `updateBanner`, `createPromoBlock` or `updatePromoBlock`, and `setHomepageLayout` for storefront and app content. **A person applies it in the owning screen**, editing first if they wish, under their own permission (`MARKETING_MANAGE`, `TENANT_CONFIGURE`), and `decideProposedAction` records which draft was used or why every draft was refused; that refusal is the label a better prompt is judged on. **Publishing stays the owner's separate act** (`launchCampaign`, `publishContentBlock`, `publishTenantConfig`).
+
+**Grounded, not invented.** Product names, dates and offers come only from `groundingRefs`, read as the caller; a price is a Pricing reference placeholder the channel renders, never a number the model wrote. Glossary terms are kept verbatim, and a draft that breaks one comes back with the violation listed rather than silently fixed. Template placeholders (`{{guest.firstName}}`) are protected.
+
+**Variants are for testing, not for choosing on the person's behalf**: up to five per locale, each with the objective it was written for. Testing them against each other is the owner's (marketing-crm campaign variants).
+
+|  |  |
+|---|---|
+| Permission | `AI_USE` |
+| Scope level | venue |
+| Part of slice | core |
+| Wave | 2 |
+| Offline | no |
+| Conflict policy | serverWins |
+| Reads | `ai.capability`, `ai.governance_policy_version`, `ai.policy`, `ai.prompt_template`, `ai.provider`, `cache:idempotency`, `catalogue.event`, `catalogue.product`, `control.content_block`, `marketing.campaign`, `marketing.message_template`, `promotions.promotion`, `whitelabel.banner`, `whitelabel.content_page`, `whitelabel.homepage_section`, `whitelabel.promo_block` |
+| Writes | `ai.activity`, `ai.decision_record`, `ai.proposed_action`, `cache:idempotency` |
+| Called by | BO-766, BO-772, BO-785, BO-786, BO-787, BO-789, BO-793, CMS-007, CMS-008 |
+
+**Parameters**
+
+| Name | In | Required | Type | Notes |
+|---|---|---|---|---|
+| Idempotency-Key | header | yes | string | Client-generated ULID. |
+
+**Request body**
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| targetKind | enum (messageTemplate, subjectLine, notificationWording, contentBlock, contentPage, banner, promoBlock, homepageSection) | yes |  |
+| targetRef | string |  | The template, campaign, block, page, banner or promo block the draft is for. (nullable) |
+| channel | enum (email, sms, push, whatsapp, inApp, web, app) |  | Sets the length and form limits (an SMS segment, a push title) the draft must meet. (nullable) |
+| brief | string | yes | What the content is for, in the author's words. (min length 10; max length 4000) |
+| objective | enum (awareness, conversion, retention, reactivation, information) |  | (nullable) |
+| tone | string |  | (max length 200; nullable) |
+| locales | array of string | yes | (min items 1; max items 10) |
+| variants | integer |  | (min 1; max 5; default 1) |
+| glossaryRef | string |  | Terms that must not be changed or translated, as for proposeTranslations. (nullable) |
+| groundingRefs | array of string |  | Products, events, offers or pages the text may cite, read as the caller. (max items 50) |
+
+**Response**: `AiContentDraftSet`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| targetKind | enum (messageTemplate, subjectLine, notificationWording, contentBlock, contentPage, banner, promoBlock, homepageSection) | yes |  |
+| targetRef | string |  | (nullable) |
+| drafts | array of object | yes |  |
+| drafts[].proposedActionId | string (uuid) | yes | The ai.proposed_action row; decideProposedAction takes it. |
+| drafts[].locale | string | yes |  |
+| drafts[].variantNumber | integer | yes | (min 1; max 5) |
+| drafts[].targetContract | string |  | marketing-crm or white-label. |
+| drafts[].targetOperation | string |  | The owner's save operation the draft is shaped for. |
+| drafts[].fields | object | yes | The drafted text by field, e.g. |
+| drafts[].glossaryViolations | array of string |  | Glossary terms the draft changed. |
+| drafts[].decisionRecordId | string (uuid) |  |  |
+| traceId | string |  |  |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 202 |  | Drafted, for review. |
+| 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
+| 409 |  | Drafting is not allowed at this scope now: the capability is paused (capability-paused) or governance blocks it (governance-blocked, naming the policy and version). |
+| 429 |  | A token ceiling was reached; same cases as sendAiMessage 429. |
+
+
+## Group: governance
+
+Logging, approval, explainability and cost
+
+### configureAiCapability
+
+**`PUT /governance/capabilities/{capabilityKey}`**: Register a capability, or change its owner, risk class or autonomy
+
+**`setAiCapability` in the design, renamed so the configuration-scope rules reach it** (tools/check-config-scope.py). Writes one registry entry (AIC-144, AIC-145; ADM-520..522). **Autonomy only tightens below the platform ceiling** (AIC-151): a level above `autonomyCeiling` is refused with 409 `autonomy-above-ceiling`, and a venue row cannot raise what the tenant row set. Autonomy is separate from user permission (AIC-154). The change is itself a governed decision and writes a decision record.
+
+**What the PUT does.** Matched on `capabilityKey`: replaces that entry in full (200), or creates it (201).
+
+|  |  |
+|---|---|
+| Permission | `AI_CONFIGURE` |
+| Scope level | tenant |
+| Part of slice | setup, makes `ai.capability` non-empty |
+| Wave | 2 |
+| Offline | no |
+| Config scope | tenant |
+| Conflict policy | serverWins |
+| Reads | `ai.capability`, `cache:idempotency` |
+| Writes | `ai.capability`, `ai.decision_record`, `cache:idempotency` |
+| Called by | ADM-520, ADM-521, ADM-522, ANL-060 |
+| State model | AI capability ([states/ai-capability.yaml](../../../states/ai-capability.yaml)): created as `active` |
+
+**Parameters**
+
+| Name | In | Required | Type | Notes |
+|---|---|---|---|---|
+| capabilityKey | path | yes | string |  |
+| Idempotency-Key | header | yes | string | Client-generated ULID. |
+
+**Request body**: `AiCapabilityRegistration`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| id | string (uuid) |  | (read-only) |
+| capabilityKey | string | yes | Stable key, unique per tenant: assistant.guest, forecast.attendance, risk.transaction, config.assistant, recommend.checkout. |
+| family | AiCapabilityFamily: enum (gatewayAndModels, governance, actionPipeline, knowledgeRetrieval, assistants, analyticsInsights, configurationAssistant, forecasting, …) | yes | The fourteen capabilities of the AI system design (section 1.1), C1 to C14 in order: gateway and model registry, governance decision point, action pipeline and human oversight, knowledge and retrieva… |
+| name | string |  |  |
+| description | string |  | (nullable) |
+| ownerPrincipalId | string (uuid) |  | The accountable business owner (AIC-144). (nullable) |
+| businessFunction | string |  | (nullable) |
+| riskClass | AiRiskClass: enum (low, medium, high, critical) | yes | Business, customer, financial, operational, security and compliance impact of a capability or action type (AIC-144, ADM-521). |
+| autonomyCeiling | object |  | The first-release ceiling for this capability (design 3.8 table). (read-only) |
+| autonomyLevel | object | yes | The level in force at this scope. |
+| dataCategories | array of string |  | Data categories the capability reads (ADM-524). |
+| lifecycle | object |  | Lifecycle per environment (AIC-145): a capability or model can be live in staging and still a draft in production. |
+| lifecycle.development | enum (draft, pilot, active, retired) |  |  |
+| lifecycle.staging | enum (draft, pilot, active, retired) |  |  |
+| lifecycle.production | enum (draft, pilot, active, retired) |  |  |
+| degradationMode | enum (rulesOnly, searchOnly, humanHandoff, hidden, failOpen, lastPublished) |  | What the capability does when its model or the service is unavailable (design 3.7, AIC-241). |
+| status | enum (active, paused) |  | Paused by pauseAiCapability: the capability answers from its degradation mode until resumed. (read-only) |
+| pausedReason | string |  | (read-only; nullable) |
+| pausedAt | string (date-time) |  | (read-only; nullable) |
+| updatedAt | string (date-time) |  | (read-only) |
+| scopePath | string |  | The partition key (ADR-0005). (read-only) |
+
+**Response**: `AiCapabilityRegistration`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| id | string (uuid) |  | (read-only) |
+| capabilityKey | string | yes | Stable key, unique per tenant: assistant.guest, forecast.attendance, risk.transaction, config.assistant, recommend.checkout. |
+| family | AiCapabilityFamily: enum (gatewayAndModels, governance, actionPipeline, knowledgeRetrieval, assistants, analyticsInsights, configurationAssistant, forecasting, …) | yes | The fourteen capabilities of the AI system design (section 1.1), C1 to C14 in order: gateway and model registry, governance decision point, action pipeline and human oversight, knowledge and retrieva… |
+| name | string |  |  |
+| description | string |  | (nullable) |
+| ownerPrincipalId | string (uuid) |  | The accountable business owner (AIC-144). (nullable) |
+| businessFunction | string |  | (nullable) |
+| riskClass | AiRiskClass: enum (low, medium, high, critical) | yes | Business, customer, financial, operational, security and compliance impact of a capability or action type (AIC-144, ADM-521). |
+| autonomyCeiling | object |  | The first-release ceiling for this capability (design 3.8 table). (read-only) |
+| autonomyLevel | object | yes | The level in force at this scope. |
+| dataCategories | array of string |  | Data categories the capability reads (ADM-524). |
+| lifecycle | object |  | Lifecycle per environment (AIC-145): a capability or model can be live in staging and still a draft in production. |
+| lifecycle.development | enum (draft, pilot, active, retired) |  |  |
+| lifecycle.staging | enum (draft, pilot, active, retired) |  |  |
+| lifecycle.production | enum (draft, pilot, active, retired) |  |  |
+| degradationMode | enum (rulesOnly, searchOnly, humanHandoff, hidden, failOpen, lastPublished) |  | What the capability does when its model or the service is unavailable (design 3.7, AIC-241). |
+| status | enum (active, paused) |  | Paused by pauseAiCapability: the capability answers from its degradation mode until resumed. (read-only) |
+| pausedReason | string |  | (read-only; nullable) |
+| pausedAt | string (date-time) |  | (read-only; nullable) |
+| updatedAt | string (date-time) |  | (read-only) |
+| scopePath | string |  | The partition key (ADR-0005). (read-only) |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 200 |  | Register a capability, or change its owner, risk class or autonomy |
+| 201 |  | Registered: the key had no entry |
+| 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
+| 409 |  | The requested autonomyLevel is above the capability's autonomyCeiling (AIC-151). |
+
+### createAiGovernancePolicyDraft
+
+**`POST /governance/policy-drafts`**: Draft a governance policy, or a new version of one
+
+**`draftAiGovernancePolicy` in the design, renamed so the configuration-scope rules reach it.** Writes a `draft` version (ADM-523 action and permission rules, ADM-524 data access and purpose, ADM-525 environment and scope, ADM-530 approval routing). With `policyId`, a new version of that policy; without, a new policy at version 1. A draft decides nothing until it is simulated and published.
+
+|  |  |
+|---|---|
+| Permission | `AI_CONFIGURE` |
+| Scope level | tenant |
+| Part of slice | setup, makes `ai.governance_policy_version` non-empty |
+| Wave | 2 |
+| Offline | no |
+| Config scope | tenant |
+| Conflict policy | serverWins |
+| Reads | `ai.governance_policy`, `ai.governance_policy_version`, `cache:idempotency` |
+| Writes | `ai.governance_policy`, `ai.governance_policy_version`, `cache:idempotency` |
+| Called by | ADM-523, ADM-524, ADM-525, ADM-530 |
+| State model | AI governance policy version ([states/ai-governance-policy-version.yaml](../../../states/ai-governance-policy-version.yaml)): created as `draft` |
+
+**Parameters**
+
+| Name | In | Required | Type | Notes |
+|---|---|---|---|---|
+| Idempotency-Key | header | yes | string | Client-generated ULID. |
+
+**Request body**
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| policyId | string (uuid) |  | An existing policy to draft the next version of. (nullable) |
+| policyKey | string |  | Required for a new policy. (nullable) |
+| name | string |  | (nullable) |
+| kind | enum (action, data, scope, autonomy, approval, environment) |  | (nullable) |
+| capabilityKeys | array of string |  |  |
+| rules | array of AiGovernanceRule | yes | (min items 1) |
+| rules[].effect | AiGovernanceOutcome: enum (allow, allowWithConditions, prepareOnly, approvalRequired, escalate, block) | yes | What the governance decision point returns (design 3.8, AIC-166). |
+| rules[].capabilityKeys | array of string |  | Registered capabilities it applies to. |
+| rules[].actions | array of enum (read, analyze, recommend, generate, prepare, create, modify, publish, …) |  | ADM-523: what AI may do, from reading to executing. |
+| rules[].dataCategories | array of string |  | Data categories (ADM-524), e.g. |
+| rules[].purposes | array of string |  | Permitted purposes for those categories (AIC-156, AIR-182). |
+| rules[].maxAmount | object |  | Above this value the effect escalates one step (for example to approvalRequired). (nullable) |
+| rules[].maxAmount.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
+| rules[].maxAmount.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
+| rules[].maxAmount.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| rules[].roleIds | array of string (uuid) |  | Roles the rule applies to; empty means every role. |
+| rules[].environments | array of enum (development, staging, production) |  | ADM-525. |
+| rules[].conditions | object |  | Conditions attached to an allowWithConditions effect, for example maskFields or requireCitation. (nullable) |
+| changeNote | string |  | (nullable) |
+
+**Response**: `AiGovernancePolicyVersion`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| id | string (uuid) |  | (read-only) |
+| policyId | string (uuid) | yes |  |
+| version | integer | yes | (min 1) |
+| status | enum (draft, simulated, published, superseded) | yes |  |
+| rules | array of AiGovernanceRule |  | The rules of one policy version, stored with the version as one jsonb column. |
+| rules[].effect | AiGovernanceOutcome: enum (allow, allowWithConditions, prepareOnly, approvalRequired, escalate, block) | yes | What the governance decision point returns (design 3.8, AIC-166). |
+| rules[].capabilityKeys | array of string |  | Registered capabilities it applies to. |
+| rules[].actions | array of enum (read, analyze, recommend, generate, prepare, create, modify, publish, …) |  | ADM-523: what AI may do, from reading to executing. |
+| rules[].dataCategories | array of string |  | Data categories (ADM-524), e.g. |
+| rules[].purposes | array of string |  | Permitted purposes for those categories (AIC-156, AIR-182). |
+| rules[].maxAmount | object |  | Above this value the effect escalates one step (for example to approvalRequired). (nullable) |
+| rules[].maxAmount.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
+| rules[].maxAmount.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
+| rules[].maxAmount.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| rules[].roleIds | array of string (uuid) |  | Roles the rule applies to; empty means every role. |
+| rules[].environments | array of enum (development, staging, production) |  | ADM-525. |
+| rules[].conditions | object |  | Conditions attached to an allowWithConditions effect, for example maskFields or requireCitation. (nullable) |
+| changeNote | string |  | (nullable) |
+| simulationSummary | object |  | The last simulateAiGovernancePolicy result: decisions that would change, by outcome. (read-only; nullable) |
+| draftedByPrincipalId | string (uuid) |  | (read-only) |
+| publishedByPrincipalId | string (uuid) |  | (read-only; nullable) |
+| publishedAt | string (date-time) |  | (read-only; nullable) |
+| supersededAt | string (date-time) |  | (read-only; nullable) |
+| scopePath | string |  | The partition key (ADR-0005). (read-only) |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 201 |  | Draft a governance policy, or a new version of one |
+
+### decideProposedAction
+
+**`POST /proposed-actions/{actionId}/decide`**: Approve or reject a proposal
+
+**Approval is recorded here; execution happens in the owning contract under the approver's own permission.** This operation does not apply the change.
+That separation matters: an approval endpoint that also executes would let a person approve something they could not themselves do, and the whole control depends on them being the same person.
+A rejection carries a reason. It is the only signal that the assistant is proposing badly, and without it a bad model degrades silently.
+**Who may approve (decided 28 September, audit R213 (3)).** An action at `approvalLevel` 2, anything touching prices or permissions, needs a manager: a principal holding `AI_APPROVE` who is not the one who prompted it. An action at level 1 is approved by the requester themselves. A proposal past its `expiresAt` is refused with 409.
+**The permission model says the same thing.** The operation's permission is `AI_USE`, the one the requester already holds to prompt the assistant, and it lets them decide **only their own level 1 proposals**. Deciding a level 2 proposal requires `AI_APPROVE` (`x-ticvai-permission-escalated`) and a caller other than the requester. Deciding somebody else's level 1 proposal is refused unless the caller holds `AI_APPROVE`. Each refusal is a `403` naming which rule failed.
+**Tier 1 is decided here; tier 2 and matrix-caught actions are decided in Approvals** (AI design 2.3, 3.8; M18). For an action at `approvalLevel` 2, or one `approvals.evaluateApprovalRequirement` says the matrix catches, this call does not decide: it opens the request with `approvals.createApprovalRequest` (once), returns `202` with the action carrying its `approvalRequestId`, and the action moves when `approval.granted` or `approval.rejected` arrives. Separation of duties, thresholds and escalation then live in the shared approvals service (AIC-190). `approvalLevel` is the approval tier, not an autonomy level.
+
+|  |  |
+|---|---|
+| Permission | `AI_USE` |
+| Scope level | venue |
+| Part of slice | core |
+| Wave | 2 |
+| Offline | no |
+| Conflict policy | serverWins |
+| Reads | `ai.action_plan`, `ai.proposed_action`, `cache:idempotency` |
+| Writes | `ai.action_plan`, `ai.activity`, `ai.decision_record`, `ai.proposed_action`, `cache:idempotency` |
+| Called by | ADM-492, ADM-531, ADM-532, ANL-009, BO-762, BO-793, BO-928, BO-929, BO-970, BO-975, CMS-007, CMS-008 |
+| State model | AI action plan ([states/ai-action-plan.yaml](../../../states/ai-action-plan.yaml)): moves `awaitingApproval` -> `approved`, `awaitingApproval` -> `cancelled`<br/>AI proposed action ([states/ai-proposed-action.yaml](../../../states/ai-proposed-action.yaml)): moves `proposed` -> `approved`, `proposed` -> `rejected` |
+
+**Parameters**
+
+| Name | In | Required | Type | Notes |
+|---|---|---|---|---|
+| actionId | path | yes | string (uuid) |  |
+| Idempotency-Key | header | yes | string | Client-generated ULID. |
+
+**Request body**
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| decision | enum (approve, reject) | yes |  |
+| reason | string |  | (max length 500) |
+
+**Response**: `ProposedAction`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| id | string (uuid) | yes |  |
+| interactionId | string (uuid) |  |  |
+| kind | enum (pricing, promotion, operational, financial, configuration, content, audience) | yes | content (a marketing or storefront draft from proposeMarketingContent) and audience (a lookalike segment from proposeLookalikeSegment) added 29 September (build); both are applied by a person in the… |
+| targetContract | string | yes | Which contract would perform it. |
+| targetOperation | string | yes |  |
+| payload | object | yes | The request body a person would submit, ready to review. |
+| summary | string |  |  |
+| status | enum (proposed, approved, rejected, applied, expired) | yes | Expiry (decided 28 September, audit R213): a proposed action expires 7 days after proposedAt; an approved action not applied expires 24 hours after decidedAt. |
+| expiresAt | string (date-time) |  | When the expiry timer moves this action to expired — proposedAt plus 7 days while proposed, decidedAt plus 24 hours once approved, null once rejected, applied or expired (audit R213). (read-only; nullable) |
+| approvalLevel | integer |  | 8.3.65. (min 1; max 2) |
+| decidedByPrincipalId | string (uuid) |  | (nullable) |
+| decisionReason | string |  | Required on rejection. (nullable) |
+| proposedAt | string (date-time) |  |  |
+| decidedAt | string (date-time) |  | (nullable) |
+| scopePath | string |  | Added 29 September (AI design 3.1): ai.proposed_action had no policy — its only references were nullable. (read-only) |
+| planId | string (uuid) |  | The plan this action presents for a decision (AI design 2.2 D, 3.8). (read-only; nullable) |
+| approvalRequestId | string (uuid) |  | The approvals request deciding a tier 2 or matrix-caught action (AI design 2.3). (read-only; nullable) |
+| changeSetHash | string |  | Hash of the change set approved; execution refuses a plan whose hash differs (AIC-181). (read-only; nullable) |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 200 |  | Decided |
+| 202 |  | Routed to Approvals — a tier 2 or matrix-caught action; approvalRequestId names the request that decides it |
+| 403 |  | The caller may not decide this proposal (audit R213 (3)): a level 2 proposal and the caller lacks AI_APPROVE (approval-level-requires-manager), a level 2 proposal the caller prompted themselves (appr… |
+| 409 |  | The action is no longer proposed — already decided, or expired (7 days after it was proposed, audit R213). |
+
+### publishAiGovernancePolicy
+
+**`POST /governance/policy-versions/{versionId}/publish`**: Publish a simulated policy version
+
+**No material governance policy becomes active without a controlled review** (ADM-528). The version must be `simulated`, and the publisher must not be who drafted it. The previous published version becomes `superseded` in the same transaction, and every cache key carrying the policy version is invalidated (design 3.6).
+
+|  |  |
+|---|---|
+| Permission | `AI_APPROVE` |
+| Scope level | tenant |
+| Part of slice | setup, makes `ai.governance_policy_version` non-empty |
+| Wave | 2 |
+| Offline | no |
+| Config scope | tenant |
+| Conflict policy | serverWins |
+| Reads | `ai.governance_policy_version`, `cache:idempotency` |
+| Writes | `ai.decision_record`, `ai.governance_policy`, `ai.governance_policy_version`, `cache:governance-policy`, `cache:idempotency` |
+| Called by | ADM-528 |
+| State model | AI governance policy version ([states/ai-governance-policy-version.yaml](../../../states/ai-governance-policy-version.yaml)): moves `simulated` -> `published`, `published` -> `superseded` |
+
+**Parameters**
+
+| Name | In | Required | Type | Notes |
+|---|---|---|---|---|
+| versionId | path | yes | string (uuid) |  |
+| Idempotency-Key | header | yes | string | Client-generated ULID. |
+
+**Response**: `AiGovernancePolicyVersion`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| id | string (uuid) |  | (read-only) |
+| policyId | string (uuid) | yes |  |
+| version | integer | yes | (min 1) |
+| status | enum (draft, simulated, published, superseded) | yes |  |
+| rules | array of AiGovernanceRule |  | The rules of one policy version, stored with the version as one jsonb column. |
+| rules[].effect | AiGovernanceOutcome: enum (allow, allowWithConditions, prepareOnly, approvalRequired, escalate, block) | yes | What the governance decision point returns (design 3.8, AIC-166). |
+| rules[].capabilityKeys | array of string |  | Registered capabilities it applies to. |
+| rules[].actions | array of enum (read, analyze, recommend, generate, prepare, create, modify, publish, …) |  | ADM-523: what AI may do, from reading to executing. |
+| rules[].dataCategories | array of string |  | Data categories (ADM-524), e.g. |
+| rules[].purposes | array of string |  | Permitted purposes for those categories (AIC-156, AIR-182). |
+| rules[].maxAmount | object |  | Above this value the effect escalates one step (for example to approvalRequired). (nullable) |
+| rules[].maxAmount.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
+| rules[].maxAmount.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
+| rules[].maxAmount.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| rules[].roleIds | array of string (uuid) |  | Roles the rule applies to; empty means every role. |
+| rules[].environments | array of enum (development, staging, production) |  | ADM-525. |
+| rules[].conditions | object |  | Conditions attached to an allowWithConditions effect, for example maskFields or requireCitation. (nullable) |
+| changeNote | string |  | (nullable) |
+| simulationSummary | object |  | The last simulateAiGovernancePolicy result: decisions that would change, by outcome. (read-only; nullable) |
+| draftedByPrincipalId | string (uuid) |  | (read-only) |
+| publishedByPrincipalId | string (uuid) |  | (read-only; nullable) |
+| publishedAt | string (date-time) |  | (read-only; nullable) |
+| supersededAt | string (date-time) |  | (read-only; nullable) |
+| scopePath | string |  | The partition key (ADR-0005). (read-only) |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 200 |  | Publish a simulated policy version |
+| 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
+| 409 |  | Not publishable: the version has not been simulated (policy-not-simulated), or the caller drafted it (approver-is-requester). |
+
+### resumeAiCapability
+
+**`POST /governance/capabilities/{capabilityKey}/resume`**: Resume a paused capability
+
+Resuming needs more authority than pausing (`AI_APPROVE`): stopping is always safe, starting again is a decision. Plans paused by the pause stay paused and are resumed one by one with `resumeActionPlan`, which revalidates them.
+
+|  |  |
+|---|---|
+| Permission | `AI_APPROVE` |
+| Scope level | tenant |
+| Part of slice | setup, makes `ai.capability` non-empty |
+| Wave | 2 |
+| Offline | no |
+| Conflict policy | serverWins |
+| Reads | `ai.capability`, `cache:idempotency` |
+| Writes | `ai.capability`, `ai.decision_record`, `ai.intervention`, `cache:idempotency` |
+| Called by | ADM-536 |
+| State model | AI capability ([states/ai-capability.yaml](../../../states/ai-capability.yaml)): moves `paused` -> `active` |
+
+**Parameters**
+
+| Name | In | Required | Type | Notes |
+|---|---|---|---|---|
+| capabilityKey | path | yes | string |  |
+| Idempotency-Key | header | yes | string | Client-generated ULID. |
+
+**Request body**
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| reason | string | yes | (max length 1000) |
+
+**Response**: `AiCapabilityRegistration`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| id | string (uuid) |  | (read-only) |
+| capabilityKey | string | yes | Stable key, unique per tenant: assistant.guest, forecast.attendance, risk.transaction, config.assistant, recommend.checkout. |
+| family | AiCapabilityFamily: enum (gatewayAndModels, governance, actionPipeline, knowledgeRetrieval, assistants, analyticsInsights, configurationAssistant, forecasting, …) | yes | The fourteen capabilities of the AI system design (section 1.1), C1 to C14 in order: gateway and model registry, governance decision point, action pipeline and human oversight, knowledge and retrieva… |
+| name | string |  |  |
+| description | string |  | (nullable) |
+| ownerPrincipalId | string (uuid) |  | The accountable business owner (AIC-144). (nullable) |
+| businessFunction | string |  | (nullable) |
+| riskClass | AiRiskClass: enum (low, medium, high, critical) | yes | Business, customer, financial, operational, security and compliance impact of a capability or action type (AIC-144, ADM-521). |
+| autonomyCeiling | object |  | The first-release ceiling for this capability (design 3.8 table). (read-only) |
+| autonomyLevel | object | yes | The level in force at this scope. |
+| dataCategories | array of string |  | Data categories the capability reads (ADM-524). |
+| lifecycle | object |  | Lifecycle per environment (AIC-145): a capability or model can be live in staging and still a draft in production. |
+| lifecycle.development | enum (draft, pilot, active, retired) |  |  |
+| lifecycle.staging | enum (draft, pilot, active, retired) |  |  |
+| lifecycle.production | enum (draft, pilot, active, retired) |  |  |
+| degradationMode | enum (rulesOnly, searchOnly, humanHandoff, hidden, failOpen, lastPublished) |  | What the capability does when its model or the service is unavailable (design 3.7, AIC-241). |
+| status | enum (active, paused) |  | Paused by pauseAiCapability: the capability answers from its degradation mode until resumed. (read-only) |
+| pausedReason | string |  | (read-only; nullable) |
+| pausedAt | string (date-time) |  | (read-only; nullable) |
+| updatedAt | string (date-time) |  | (read-only) |
+| scopePath | string |  | The partition key (ADR-0005). (read-only) |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 200 |  | Resume a paused capability |
+| 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
+| 409 |  | Not paused. |
+
+### simulateAiGovernancePolicy
+
+**`POST /governance/policy-versions/{versionId}/simulate`**: Test a draft policy before it is published
+
+**A policy mistake either gives AI too much autonomy or stops it working** (ADM-527). Replays the draft over recorded decisions in a window and over the capability's test cases, and reports what would change. Moves the version to `simulated`, which publication requires. Runs no action.
+
+|  |  |
+|---|---|
+| Permission | `AI_CONFIGURE` |
+| Scope level | tenant |
+| Part of slice | setup, makes `ai.governance_policy_version` non-empty |
+| Wave | 2 |
+| Offline | no |
+| Conflict policy | serverWins |
+| Reads | `ai.decision_record`, `ai.governance_policy_version`, `cache:idempotency` |
+| Writes | `ai.governance_policy_version`, `cache:idempotency` |
+| Called by | ADM-527, ADM-538 |
+| State model | AI governance policy version ([states/ai-governance-policy-version.yaml](../../../states/ai-governance-policy-version.yaml)): moves `draft` -> `simulated` |
+
+**Parameters**
+
+| Name | In | Required | Type | Notes |
+|---|---|---|---|---|
+| versionId | path | yes | string (uuid) |  |
+| Idempotency-Key | header | yes | string | Client-generated ULID. |
+
+**Request body**
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| from | string (date-time) |  | (nullable) |
+| to | string (date-time) |  | (nullable) |
+| capabilityKeys | array of string |  |  |
+
+**Response**: `AiPolicySimulation`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| evaluated | integer | yes |  |
+| wouldChange | integer |  |  |
+| byOutcome | object |  | Counts per outcome, current against draft. |
+| examples | array of object |  |  |
+| examples[].decisionRecordId | string (uuid) |  |  |
+| examples[].current | AiGovernanceOutcome: enum (allow, allowWithConditions, prepareOnly, approvalRequired, escalate, block) |  | What the governance decision point returns (design 3.8, AIC-166). |
+| examples[].draft | AiGovernanceOutcome: enum (allow, allowWithConditions, prepareOnly, approvalRequired, escalate, block) |  | What the governance decision point returns (design 3.8, AIC-166). |
+| examples[].capabilityKey | string |  |  |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 200 |  | Test a draft policy before it is published |
+| 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
+| 409 |  | The version is not a draft (already published or superseded). |
+
+
+## Group: insights
+
+Insights, anomaly detection and root cause (design C6, C9)
+
+### decideAiInsight
+
+**`POST /insights/{insightId}/decide`**: Review, accept, reject or mark an insight actioned
+
+Moves an insight along new → reviewed → accepted/rejected → actioned (AIP-181); `measured` is set by the job that measures the effect. A rejection with a reason is the false-alarm signal a detector is judged on.
+
+|  |  |
+|---|---|
+| Permission | `AI_USE` |
+| Scope level | venue |
+| Part of slice | setup, makes `ai.insight` non-empty |
+| Wave | 2 |
+| Offline | no |
+| Conflict policy | serverWins |
+| Reads | `ai.insight`, `cache:idempotency` |
+| Writes | `ai.anomaly_detector`, `ai.insight`, `cache:idempotency` |
+| Called by | ANL-019, ANL-059, BO-772, BO-782 |
+| State model | AI insight ([states/ai-insight.yaml](../../../states/ai-insight.yaml)): moves `new` -> `reviewed`, `reviewed` -> `accepted`, `reviewed` -> `rejected`, `accepted` -> `actioned` |
+
+**Parameters**
+
+| Name | In | Required | Type | Notes |
+|---|---|---|---|---|
+| insightId | path | yes | string (uuid) |  |
+| Idempotency-Key | header | yes | string | Client-generated ULID. |
+
+**Request body**
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| decision | enum (review, accept, reject, actioned) | yes |  |
+| reason | string |  | (max length 1000; nullable) |
+| actionRef | string |  | (nullable) |
+
+**Response**: `AiInsight`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| id | string (uuid) |  | (read-only) |
+| kind | enum (anomaly, forecastDeviation, trend, opportunity, executiveSummary, rootCause, forecastThreshold, marketingRecommendation) | yes |  |
+| detectorId | string (uuid) |  | (nullable) |
+| metricKey | string |  | (nullable) |
+| subjectKind | enum (campaign, journey, forecastDefinition, venue) |  | What the insight is about where it is not a KPI (29 September, build): a marketing-crm campaign or journey for marketingRecommendation, a forecast definition for forecastThreshold. (nullable) |
+| subjectRef | string |  | (nullable) |
+| recommendedAction | object |  | For marketingRecommendation: {recommendation, parameters} as AiMarketingRecommendation. (nullable) |
+| expectedImpact | object |  | A range on a named metric (metric, low, high), never a single number (design 5.6). (nullable) |
+| title | string | yes |  |
+| narrative | string |  | (nullable) |
+| evidence | array of AiEvidenceItem |  | The evidence of one decision record, stored with it. |
+| evidence[].label | enum (source, derived, modelInferred) | yes |  |
+| evidence[].kind | string | yes | What it is: feature, rule, document, metric, transaction, candidateSet. |
+| evidence[].ref | string |  | Where it came from: a table and id, a document chunk, a metric key. (nullable) |
+| evidence[].name | string |  |  |
+| evidence[].value | object |  | (nullable) |
+| evidence[].observedAt | string (date-time) |  | (nullable) |
+| magnitude | number |  | (nullable) |
+| priority | enum (low, medium, high, critical) |  |  |
+| correlationKey | string |  | (nullable) |
+| status | enum (new, reviewed, accepted, rejected, actioned, measured) | yes | (read-only) |
+| decidedByPrincipalId | string (uuid) |  | (read-only; nullable) |
+| decidedAt | string (date-time) |  | (read-only; nullable) |
+| actionRef | string |  | (nullable) |
+| measuredImpact | object |  | (read-only; nullable) |
+| decisionRecordId | string (uuid) |  | (read-only; nullable) |
+| detectedAt | string (date-time) |  | (read-only) |
+| scopePath | string |  | The partition key (ADR-0005). (read-only) |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 200 |  | Review, accept, reject or mark an insight actioned |
+| 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
+| 409 |  | The move is not allowed from the insight's state. |
+
+### explainMetricChange
+
+**`POST /insights/explain-metric-change`**: Why did this metric change
+
+**Root cause over the semantic layer** (AIP-176..180; ANL-056, ADM-506). Decomposes the change in a governed metric by its dimensions, computed by Reporting on the analytical replica where RLS applies. **A number in the narrative can only come from a query result** (design 5.7, decision 29 September). Kept as a `rootCause` insight when `keep` is true.
+
+|  |  |
+|---|---|
+| Permission | `AI_USE` |
+| Scope level | venue |
+| Part of slice | setup, makes `ai.insight` non-empty |
+| Wave | 2 |
+| Offline | no |
+| Conflict policy | serverWins |
+| Read routing | analytical |
+| Reads | `ai.insight`, `ai.policy`, `cache:idempotency` |
+| Writes | `ai.activity`, `ai.insight`, `cache:idempotency` |
+| Called by | ADM-506, ANL-019, ANL-056 |
+
+**Parameters**
+
+| Name | In | Required | Type | Notes |
+|---|---|---|---|---|
+| Idempotency-Key | header | yes | string | Client-generated ULID. |
+
+**Request body**
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| metricKey | string | yes |  |
+| period | string | yes | ISO period, e.g. |
+| comparison | enum (previousPeriod, samePeriodLastYear, forecast) |  | (default previousPeriod) |
+| dimensions | array of string |  |  |
+| keep | boolean |  | (default False) |
+
+**Response**: `AiMetricChangeExplanation`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| metricKey | string | yes |  |
+| period | string |  |  |
+| comparison | string |  |  |
+| change | number | yes |  |
+| changePercent | number |  | (nullable) |
+| drivers | array of object | yes |  |
+| drivers[].dimension | string |  |  |
+| drivers[].member | string |  |  |
+| drivers[].contribution | number |  |  |
+| drivers[].evidence | AiEvidenceItem |  | One piece of evidence behind a decision, labelled by origin (AIC-197): read from a source system, derived by a rule or feature, or inferred by a model. |
+| drivers[].evidence.label | enum (source, derived, modelInferred) | yes |  |
+| drivers[].evidence.kind | string | yes | What it is: feature, rule, document, metric, transaction, candidateSet. |
+| drivers[].evidence.ref | string |  | Where it came from: a table and id, a document chunk, a metric key. (nullable) |
+| drivers[].evidence.name | string |  |  |
+| drivers[].evidence.value | object |  | (nullable) |
+| drivers[].evidence.observedAt | string (date-time) |  | (nullable) |
+| narrative | string |  | (nullable) |
+| reliability | enum (grounded, partial, conflictingSources, insufficientEvidence) |  |  |
+| dataAsOf | string (date-time) |  |  |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 200 |  | Why did this metric change |
+
+
+## Group: knowledge
+
+Knowledge gaps, answer feedback and assistant profiles (design C4, C5)
+
+### configureAssistantProfile
+
+**`PUT /assistant-profiles/{profileKey}`**: Define an assistant profile
+
+**`setAssistantProfile` in the design, renamed so the configuration-scope rules reach it.** One runtime, many profiles (design 5.10): the profile decides audience, roles, sources, tools, model task and guest scope. A guest profile's scope cannot be wider than `AiPolicy.guestCapabilityScope`. Matched on `profileKey`: replaces (200) or creates (201).
+
+|  |  |
+|---|---|
+| Permission | `AI_CONFIGURE` |
+| Scope level | tenant |
+| Part of slice | setup, makes `ai.assistant_profile` non-empty |
+| Wave | 2 |
+| Offline | no |
+| Config scope | tenant |
+| Conflict policy | serverWins |
+| Reads | `ai.assistant_profile`, `ai.policy`, `cache:idempotency` |
+| Writes | `ai.assistant_profile`, `cache:idempotency` |
+| Called by | BO-091, SUP-018 |
+
+**Parameters**
+
+| Name | In | Required | Type | Notes |
+|---|---|---|---|---|
+| profileKey | path | yes | string |  |
+| Idempotency-Key | header | yes | string | Client-generated ULID. |
+
+**Request body**: `AiAssistantProfile`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| id | string (uuid) |  | (read-only) |
+| profileKey | string | yes |  |
+| name | string |  |  |
+| audience | enum (staff, guest, support) | yes |  |
+| roleIds | array of string (uuid) |  |  |
+| module | object |  | (nullable) |
+| collectionIds | array of string (uuid) |  | Knowledge collections it retrieves from. |
+| toolKeys | array of string |  | Registered tools it may propose (an assistant only reads; a change request goes to the configuration assistant, AIC-078). |
+| modelTask | string |  | The gateway task, e.g. |
+| guestCapabilityScope | array of string |  | For a guest profile: the same values as AiPolicy.guestCapabilityScope, narrowed. |
+| locales | array of string |  |  |
+| handoverTarget | string |  | Where "ask a person" goes: a support queue or a staff role. (nullable) |
+| isActive | boolean |  | (default True) |
+| scopePath | string |  | The partition key (ADR-0005). (read-only) |
+
+**Response**: `AiAssistantProfile`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| id | string (uuid) |  | (read-only) |
+| profileKey | string | yes |  |
+| name | string |  |  |
+| audience | enum (staff, guest, support) | yes |  |
+| roleIds | array of string (uuid) |  |  |
+| module | object |  | (nullable) |
+| collectionIds | array of string (uuid) |  | Knowledge collections it retrieves from. |
+| toolKeys | array of string |  | Registered tools it may propose (an assistant only reads; a change request goes to the configuration assistant, AIC-078). |
+| modelTask | string |  | The gateway task, e.g. |
+| guestCapabilityScope | array of string |  | For a guest profile: the same values as AiPolicy.guestCapabilityScope, narrowed. |
+| locales | array of string |  |  |
+| handoverTarget | string |  | Where "ask a person" goes: a support queue or a staff role. (nullable) |
+| isActive | boolean |  | (default True) |
+| scopePath | string |  | The partition key (ADR-0005). (read-only) |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 200 |  | Define an assistant profile |
+| 201 |  | Created: the key had no profile |
+| 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
+
+### recordAnswerFeedback
+
+**`POST /messages/{messageId}/feedback`**: Say whether an answer helped
+
+One label per message per person (AIC-062): helpful or not, and why. Guests can give it on the concierge. Labels feed golden sets and knowledge gaps; nothing is learned online (design 3.5).
+
+|  |  |
+|---|---|
+| Permission | `AI_USE` |
+| Scope level | venue |
+| Part of slice | core |
+| Wave | 2 |
+| Offline | no |
+| Conflict policy | lastWriterWins |
+| Guest callable | True |
+| Reads | `ai.answer_feedback`, `ai.message`, `cache:idempotency` |
+| Writes | `ai.answer_feedback`, `ai.knowledge_gap`, `cache:idempotency` |
+| Called by | EMP-020, GST-032, KSK-015, WEB-044 |
+
+**Parameters**
+
+| Name | In | Required | Type | Notes |
+|---|---|---|---|---|
+| messageId | path | yes | string (uuid) |  |
+| Idempotency-Key | header | yes | string | Client-generated ULID. |
+
+**Request body**
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| rating | enum (helpful, notHelpful) | yes |  |
+| reason | enum (wrong, outdated, incomplete, notGrounded, unsafe, other) |  | (nullable) |
+| comment | string |  | (max length 1000; nullable) |
+
+**Response**: `AiAnswerFeedback`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| id | string (uuid) |  | (read-only) |
+| messageId | string (uuid) | yes |  |
+| conversationId | string (uuid) |  | (nullable) |
+| rating | enum (helpful, notHelpful) | yes |  |
+| reason | enum (wrong, outdated, incomplete, notGrounded, unsafe, other) |  | (nullable) |
+| comment | string |  | (max length 1000; nullable) |
+| audience | enum (staff, guest) |  | (read-only) |
+| principalId | string (uuid) |  | (read-only; nullable) |
+| subjectId | string (uuid) |  | The guest, where the audience is guest. (read-only; nullable) |
+| createdAt | string (date-time) |  | (read-only) |
+| scopePath | string |  | The partition key (ADR-0005). (read-only) |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 201 |  | Say whether an answer helped |
+| 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
+
+
+## Group: models
+
+Model catalogue, prompt registry, evaluation and release (design C1, C13)
+
+### promoteAiRelease
+
+**`POST /releases/{releaseId}/promote`**: Promote a release to its next stage (a person)
+
+**A trained model goes live only when a person promotes it** (design 3.12, decided 29 September). When a shadow run passes its gate the platform raises a `promotionReady` governance alert; nothing switches by itself. This moves the release one stage (shadow to canary, canary to production). A tenant release needs `AI_APPROVE`; a platform release needs `PLATFORM_AI_MANAGE`. **Refused to a service caller.** Where the capability answers a `requestSuggestion` kind, production rewrites that kind's assignment in `AiPolicy.suggestionProviders`, the only writer besides `setSuggestionProvider`. Resolves the `promotionReady` alert.
+
+|  |  |
+|---|---|
+| Permission | `AI_APPROVE` |
+| Scope level | tenant |
+| Part of slice | setup, makes `ai.policy`, `ai.release` non-empty |
+| Wave | 1 |
+| Offline | no |
+| Conflict policy | serverWins |
+| Reads | `ai.eval_run`, `ai.governance_alert`, `ai.release`, `cache:idempotency` |
+| Writes | `ai.decision_record`, `ai.forecast_definition`, `ai.governance_alert`, `ai.policy`, `ai.release`, `cache:idempotency` |
+| Called by | ADM-519, ADM-554 |
+| State model | AI governance alert ([states/ai-governance-alert.yaml](../../../states/ai-governance-alert.yaml)): moves `open` -> `resolved`, `acknowledged` -> `resolved` |
+
+**Parameters**
+
+| Name | In | Required | Type | Notes |
+|---|---|---|---|---|
+| releaseId | path | yes | string (uuid) |  |
+| Idempotency-Key | header | yes | string | Client-generated ULID. |
+
+**Request body**
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| toStage | enum (canary, production) |  | (nullable) |
+| canaryScope | object |  | (nullable) |
+| note | string |  | (max length 1000; nullable) |
+
+**Response**: `AiRelease`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| id | string (uuid) |  | (read-only) |
+| capabilityKey | string | yes |  |
+| artefactKind | enum (model, prompt, routing, embedding, retrieval, rule) | yes |  |
+| candidateRef | string | yes |  |
+| currentRef | string |  | What production runs now: the rule, or the previously promoted artefact. (nullable) |
+| previousRef | string |  | (read-only; nullable) |
+| layer | enum (platform, tenant) | yes |  |
+| suggestionKind | object |  | Where the capability answers a requestSuggestion kind: promotion rewrites that kind's assignment in AiPolicy.suggestionProviders. (nullable) |
+| stage | enum (draft, offlineEval, shadow, canary, production, monitored, rolledBack, rejected) | yes | (read-only) |
+| shadowStartedAt | string (date-time) |  | (read-only; nullable) |
+| gatePassedAt | string (date-time) |  | When the shadow run passed its gate and promotionReady was raised. (read-only; nullable) |
+| canaryScope | object |  | Venues or share of traffic in canary. (nullable) |
+| promotedByPrincipalId | string (uuid) |  | (read-only; nullable) |
+| promotedAt | string (date-time) |  | (read-only; nullable) |
+| rolledBackByPrincipalId | string (uuid) |  | (read-only; nullable) |
+| rolledBackAt | string (date-time) |  | (read-only; nullable) |
+| scopePath | string |  | The partition key (ADR-0005). (read-only) |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 200 |  | Promote a release to its next stage (a person) |
+| 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
+| 409 |  | Not promotable: the gate has not passed (gate-not-passed), an isolation case failed (isolation-cases-failed), or the stage cannot follow the current one (stage-out-of-order). |
+
+### publishPromptTemplate
+
+**`POST /prompt-templates/{templateKey}/versions`**: Publish a prompt template version
+
+**Immutable once published** (AIC-022): this creates the next version. A tenant variant needs `AI_APPROVE`; a platform template needs `PLATFORM_AI_MANAGE` from the platform token. A published template reaches production through the release stages like any other change (design 3.5).
+
+|  |  |
+|---|---|
+| Permission | `AI_APPROVE` |
+| Scope level | tenant |
+| Part of slice | setup, makes `ai.prompt_template`, `ai.release` non-empty |
+| Wave | 1 |
+| Offline | no |
+| Config scope | tenant |
+| Conflict policy | serverWins |
+| Reads | `ai.prompt_template`, `cache:idempotency` |
+| Writes | `ai.prompt_template`, `ai.release`, `cache:idempotency` |
+| Called by | ADM-037, ANL-060 |
+
+**Parameters**
+
+| Name | In | Required | Type | Notes |
+|---|---|---|---|---|
+| templateKey | path | yes | string |  |
+| Idempotency-Key | header | yes | string | Client-generated ULID. |
+
+**Request body**
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| layer | enum (platform, tenant) | yes |  |
+| task | string | yes |  |
+| body | string | yes |  |
+| variables | array of string |  |  |
+| outputSchema | object |  | (nullable) |
+
+**Response**: `AiPromptTemplate`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| id | string (uuid) |  | (read-only) |
+| templateKey | string | yes |  |
+| version | integer | yes | (min 1) |
+| layer | enum (platform, tenant) | yes |  |
+| task | string | yes | The gateway task it serves (design 3.3), e.g. |
+| body | string |  | The template text. |
+| variables | array of string |  |  |
+| outputSchema | object |  | JSON Schema the structured output must satisfy, where the task has one. (nullable) |
+| status | enum (draft, published, retired) | yes |  |
+| contentHash | string |  | (read-only) |
+| publishedByPrincipalId | string (uuid) |  | (read-only; nullable) |
+| publishedAt | string (date-time) |  | (read-only; nullable) |
+| scopePath | string |  | The partition key (ADR-0005). (read-only) |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 201 |  | Publish a prompt template version |
+| 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
+
+### rollbackAiRelease
+
+**`POST /releases/{releaseId}/rollback`**: Roll a release back
+
+**A pointer switch** (design 3.5): production returns to the previous artefact, or to the rule. Same permissions as promotion.
+
+|  |  |
+|---|---|
+| Permission | `AI_APPROVE` |
+| Scope level | tenant |
+| Part of slice | setup, makes `ai.policy`, `ai.release` non-empty |
+| Wave | 1 |
+| Offline | no |
+| Conflict policy | serverWins |
+| Reads | `ai.release`, `cache:idempotency` |
+| Writes | `ai.decision_record`, `ai.forecast_definition`, `ai.policy`, `ai.release`, `cache:idempotency` |
+| Called by | ADM-554, ADM-556 |
+
+**Parameters**
+
+| Name | In | Required | Type | Notes |
+|---|---|---|---|---|
+| releaseId | path | yes | string (uuid) |  |
+| Idempotency-Key | header | yes | string | Client-generated ULID. |
+
+**Request body**
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| reason | string | yes | (max length 1000) |
+
+**Response**: `AiRelease`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| id | string (uuid) |  | (read-only) |
+| capabilityKey | string | yes |  |
+| artefactKind | enum (model, prompt, routing, embedding, retrieval, rule) | yes |  |
+| candidateRef | string | yes |  |
+| currentRef | string |  | What production runs now: the rule, or the previously promoted artefact. (nullable) |
+| previousRef | string |  | (read-only; nullable) |
+| layer | enum (platform, tenant) | yes |  |
+| suggestionKind | object |  | Where the capability answers a requestSuggestion kind: promotion rewrites that kind's assignment in AiPolicy.suggestionProviders. (nullable) |
+| stage | enum (draft, offlineEval, shadow, canary, production, monitored, rolledBack, rejected) | yes | (read-only) |
+| shadowStartedAt | string (date-time) |  | (read-only; nullable) |
+| gatePassedAt | string (date-time) |  | When the shadow run passed its gate and promotionReady was raised. (read-only; nullable) |
+| canaryScope | object |  | Venues or share of traffic in canary. (nullable) |
+| promotedByPrincipalId | string (uuid) |  | (read-only; nullable) |
+| promotedAt | string (date-time) |  | (read-only; nullable) |
+| rolledBackByPrincipalId | string (uuid) |  | (read-only; nullable) |
+| rolledBackAt | string (date-time) |  | (read-only; nullable) |
+| scopePath | string |  | The partition key (ADR-0005). (read-only) |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 200 |  | Roll a release back |
+| 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
+| 409 |  | Nothing to roll back to (no-previous-release). |
+
+### runAiEvaluation
+
+**`POST /evaluations`**: Evaluate a candidate
+
+Offline golden set, backtest or shadow comparison of a candidate against its baseline (design 3.5). **Isolation and permission cases must pass 100%**; one failure fails the run (AIC-255).
+
+|  |  |
+|---|---|
+| Permission | `AI_CONFIGURE` |
+| Scope level | tenant |
+| Part of slice | setup, makes `ai.release` non-empty |
+| Wave | 1 |
+| Offline | no |
+| Conflict policy | serverWins |
+| Reads | `ai.eval_run`, `ai.eval_suite`, `ai.release`, `cache:idempotency` |
+| Writes | `ai.eval_run`, `ai.release`, `cache:idempotency` |
+| Called by | ADM-554, ANL-060 |
+
+**Parameters**
+
+| Name | In | Required | Type | Notes |
+|---|---|---|---|---|
+| Idempotency-Key | header | yes | string | Client-generated ULID. |
+
+**Request body**
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| suiteId | string (uuid) | yes |  |
+| releaseId | string (uuid) |  | (nullable) |
+| candidateRef | string | yes |  |
+| baselineRef | string |  | (nullable) |
+| kind | enum (offline, backtest, shadow) | yes |  |
+
+**Response**: `AiEvaluationRun`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| id | string (uuid) |  | (read-only) |
+| suiteId | string (uuid) | yes |  |
+| releaseId | string (uuid) |  | (nullable) |
+| kind | enum (offline, backtest, shadow) | yes |  |
+| candidateRef | string |  |  |
+| baselineRef | string |  | (nullable) |
+| status | enum (queued, running, passed, failed, error) | yes | (read-only) |
+| metrics | object |  | (read-only; nullable) |
+| gate | object |  | The promotion gate thresholds (design 3.5 table) and whether each passed. (read-only; nullable) |
+| isolationCasesPassed | boolean |  | False blocks release, whatever the other metrics say. (read-only) |
+| requestedByPrincipalId | string (uuid) |  | (read-only; nullable) |
+| startedAt | string (date-time) |  | (read-only) |
+| completedAt | string (date-time) |  | (read-only; nullable) |
+| scopePath | string |  | The partition key (ADR-0005). (read-only) |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 202 |  | Accepted: evaluate a candidate |
+
+### setAiModel
+
+**`PUT /models/{modelId}`**: Add or change a platform model (platform)
+
+**Platform layer only** (`PLATFORM_AI_MANAGE`, from the platform token). A tenant's own model arrives through `setAiProvider` with `managedBy: tenant` and `modelId`, where bring-your-own-key is enabled. Mastered in the control plane and replicated read-only into every tenant database; no configuration scope.
+
+|  |  |
+|---|---|
+| Permission | `PLATFORM_AI_MANAGE` |
+| Scope level | platform |
+| Part of slice | setup, makes `ai.model` non-empty |
+| Wave | 2 |
+| Offline | no |
+| Conflict policy | serverWins |
+| Reads | `ai.model`, `cache:idempotency` |
+| Writes | `ai.model`, `cache:idempotency` |
+| Called by | ADM-037 |
+
+**Parameters**
+
+| Name | In | Required | Type | Notes |
+|---|---|---|---|---|
+| modelId | path | yes | string (uuid) |  |
+| Idempotency-Key | header | yes | string | Client-generated ULID. |
+
+**Request body**: `AiModel`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| id | string (uuid) |  | (read-only) |
+| layer | enum (platform, tenant) | yes |  |
+| providerKind | object |  | (nullable) |
+| producerType | enum (llm, embedding, reranker, classical, rule) | yes |  |
+| modelName | string | yes | The deployment or model name as the provider knows it, or the package and version for a classical model. |
+| capabilities | array of AiCapability: enum (chat, embedding, vision, rerank, speechToText, textToSpeech) |  |  |
+| contextTokens | integer |  | (nullable) |
+| toolCalling | boolean |  | (default False) |
+| structuredOutput | boolean |  | (default False) |
+| languages | array of string |  |  |
+| residency | string |  | Where inference happens. (nullable) |
+| inputCostPerMillionTokens | object |  | (nullable) |
+| inputCostPerMillionTokens.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
+| inputCostPerMillionTokens.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
+| inputCostPerMillionTokens.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| outputCostPerMillionTokens | object |  | (nullable) |
+| outputCostPerMillionTokens.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
+| outputCostPerMillionTokens.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
+| outputCostPerMillionTokens.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| lifecycle | object |  | Lifecycle per environment (AIC-145): a capability or model can be live in staging and still a draft in production. |
+| lifecycle.development | enum (draft, pilot, active, retired) |  |  |
+| lifecycle.staging | enum (draft, pilot, active, retired) |  |  |
+| lifecycle.production | enum (draft, pilot, active, retired) |  |  |
+| isDefaultForTasks | array of string |  | Tasks this model is the default for (AIC-010), e.g. |
+| scopePath | string |  | The partition key (ADR-0005). (read-only) |
+
+**Response**: `AiModel`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| id | string (uuid) |  | (read-only) |
+| layer | enum (platform, tenant) | yes |  |
+| providerKind | object |  | (nullable) |
+| producerType | enum (llm, embedding, reranker, classical, rule) | yes |  |
+| modelName | string | yes | The deployment or model name as the provider knows it, or the package and version for a classical model. |
+| capabilities | array of AiCapability: enum (chat, embedding, vision, rerank, speechToText, textToSpeech) |  |  |
+| contextTokens | integer |  | (nullable) |
+| toolCalling | boolean |  | (default False) |
+| structuredOutput | boolean |  | (default False) |
+| languages | array of string |  |  |
+| residency | string |  | Where inference happens. (nullable) |
+| inputCostPerMillionTokens | object |  | (nullable) |
+| inputCostPerMillionTokens.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
+| inputCostPerMillionTokens.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
+| inputCostPerMillionTokens.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| outputCostPerMillionTokens | object |  | (nullable) |
+| outputCostPerMillionTokens.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
+| outputCostPerMillionTokens.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
+| outputCostPerMillionTokens.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| lifecycle | object |  | Lifecycle per environment (AIC-145): a capability or model can be live in staging and still a draft in production. |
+| lifecycle.development | enum (draft, pilot, active, retired) |  |  |
+| lifecycle.staging | enum (draft, pilot, active, retired) |  |  |
+| lifecycle.production | enum (draft, pilot, active, retired) |  |  |
+| isDefaultForTasks | array of string |  | Tasks this model is the default for (AIC-010), e.g. |
+| scopePath | string |  | The partition key (ADR-0005). (read-only) |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 200 |  | Add or change a platform model (platform) |
+| 201 |  | Created |
+| 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
+
+
+## Group: monitoring
+
+Governance alerts, incidents, risk register and controls (design C13)
+
+### containAiIncident
+
+**`POST /incidents/{incidentId}/contain`**: Contain an incident
+
+Records containment and performs it: pause a capability, roll back a release, revoke an exception or disable a tool. Each action is the same as its own operation and is recorded on the incident.
+
+|  |  |
+|---|---|
+| Permission | `AI_APPROVE` |
+| Scope level | tenant |
+| Part of slice | setup, makes `ai.capability`, `ai.release` non-empty |
+| Wave | 1 |
+| Offline | no |
+| Conflict policy | serverWins |
+| Reads | `ai.incident`, `cache:idempotency` |
+| Writes | `ai.capability`, `ai.decision_record`, `ai.incident`, `ai.intervention`, `ai.policy_exception`, `ai.release`, `cache:idempotency` |
+| Called by | ADM-556 |
+| State model | AI capability ([states/ai-capability.yaml](../../../states/ai-capability.yaml)): moves `active` -> `paused`<br/>AI incident ([states/ai-incident.yaml](../../../states/ai-incident.yaml)): moves `open` -> `contained`<br/>AI policy exception ([states/ai-policy-exception.yaml](../../../states/ai-policy-exception.yaml)): moves `active` -> `revoked`<br/>AI tool ([states/ai-tool.yaml](../../../states/ai-tool.yaml)): moves `active` -> `disabled` |
+
+**Parameters**
+
+| Name | In | Required | Type | Notes |
+|---|---|---|---|---|
+| incidentId | path | yes | string (uuid) |  |
+| Idempotency-Key | header | yes | string | Client-generated ULID. |
+
+**Request body**
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| actions | array of object | yes | (min items 1) |
+| actions[].action | enum (pauseCapability, rollbackRelease, revokeException, disableTool) | yes |  |
+| actions[].targetRef | string | yes |  |
+| note | string |  | (max length 1000; nullable) |
+
+**Response**: `AiIncident`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| id | string (uuid) |  | (read-only) |
+| reference | string | yes | (read-only) |
+| title | string | yes |  |
+| kind | enum (governance, operational, both) |  |  |
+| severity | enum (low, medium, high, critical) | yes |  |
+| status | enum (open, contained, investigating, remediating, closed) | yes | (read-only) |
+| capabilityKeys | array of string |  |  |
+| alertIds | array of string (uuid) |  |  |
+| operationalIncidentRef | string |  | The linked operational incident, where both apply (AIC-250). (nullable) |
+| containment | array of object |  | (read-only) |
+| containment[].action | string |  |  |
+| containment[].targetRef | string |  |  |
+| containment[].at | string (date-time) |  |  |
+| containment[].byPrincipalId | string (uuid) |  |  |
+| rootCause | string |  | (nullable) |
+| remediation | string |  | (nullable) |
+| ownerPrincipalId | string (uuid) |  | (nullable) |
+| openedAt | string (date-time) |  | (read-only) |
+| containedAt | string (date-time) |  | (read-only; nullable) |
+| closedAt | string (date-time) |  | (read-only; nullable) |
+| scopePath | string |  | The partition key (ADR-0005). (read-only) |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 200 |  | Contain an incident |
+| 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
+| 409 |  | The incident is closed (incident-closed). |
+
+
+## Group: recommend
+
+The recommendation and upsell engine (design C11)
+
+### decideRecommendations
+
+**`POST /recommendations/decide`**: Fill a recommendation slot
+
+**One engine for every placement and channel** (design 2.2 A, 5.4; AIR-053). The page requests the slot in parallel with a 200 ms deadline; the pay button never waits. Context, candidates, hard eligibility with every removal's reason, rules-first ranking, ranking policy and TTL. Items carry a tracking id, a template reason and a Pricing price reference, never a computed price (AIR-029). **No language model decides.** On a budget miss or AI down the slot stays empty; POS offline uses the bundle's precomputed list. Replaces `promotions.getRecommendations`, `getUpsellSuggestions`, `fnb.listFnbRecommendations` and `retail.listRetailRecommendations`, which forward here for one release. No recommendations to OTA or reseller channels in the first release (decision 8).
+
+**Widened 29 September (build).** Placements `homepage` (8.6.10) and `loyalty` (5.4.21, 22.6.18). Item kind `offer` (8.6.30 to 8.6.36): a published promotion or coupon campaign the guest is eligible for, carried as `promotionId` or `couponRef` from the candidate cache Promotions keeps current; eligibility is Promotions' own rules precomputed per segment, and the discount is still computed by `promotions.evaluatePromotions` at the basket, never here. Kinds `reward` and `challenge` (5.4.21, 22.6.18): a marketing-crm loyalty reward the guest can redeem or a challenge they can join, carried as `rewardId` or `challengeId` in place of `productId`. The engine also consumes `entitlement.expiringSoon`, so a pass or ticket nearing its end ranks its renewal or upgrade for that guest, and `portfolioScope` widens that to the people the guest may act for (5.5.30).
+
+|  |  |
+|---|---|
+| Permission | `AI_USE` |
+| Scope level | venue |
+| Part of slice | core |
+| Wave | 1 |
+| Offline | no |
+| Conflict policy | serverWins |
+| Guest callable | True |
+| Reads | `ai.rec_decline`, `ai.release`, `cache:idempotency`, `cache:rec-candidates`, `cache:rec-features` |
+| Writes | `ai.decision_record`, `ai.rec_decision`, `cache:idempotency` |
+| Called by | BO-102, BO-1048, BO-119, GST-001, GST-036, GST-048, WEB-001, WEB-008, WEB-043 |
+
+**Parameters**
+
+| Name | In | Required | Type | Notes |
+|---|---|---|---|---|
+| Idempotency-Key | header | yes | string | Client-generated ULID. |
+
+**Request body**
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| placement | enum (productPage, cart, checkout, postPurchase, preVisit, inVenue, posBasket, kioskBasket, …) | yes |  |
+| channel | string | yes |  |
+| cartId | string (uuid) |  | (nullable) |
+| productId | string (uuid) |  | The product in view, for a product-page placement. (nullable) |
+| subjectId | string (uuid) |  | Known customer, where signed in. (nullable) |
+| sessionRef | string |  | (nullable) |
+| maxItems | integer |  | (min 1; max 12; default 4) |
+| locale | string |  | (nullable) |
+| itemKinds | array of enum (upsell, crossSell, upgrade, bundle, addOn, membership, nextBestOffer, offer, …) |  | Only these kinds may fill the slot (29 September, build). |
+| portfolioScope | boolean |  | Also consider the entitlements of the people the guest may act for under a delegated access (CF-132 household), not only their own (5.5.30). (default False) |
+
+**Response**: `AiRecommendationResult`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| decisionId | string (uuid) | yes |  |
+| placement | enum (productPage, cart, checkout, postPurchase, preVisit, inVenue, posBasket, kioskBasket, …) |  |  |
+| mode | enum (personalised, contextual, rulesOnly, fallback) | yes |  |
+| items | array of AiRecommendationItem | yes |  |
+| items[].trackingId | string (uuid) | yes | Echoed on every recordRecommendationEvents event and as orders.addCartLine.recommendationId, so attribution never guesses. |
+| items[].productId | string (uuid) |  | The product recommended. (nullable) |
+| items[].promotionId | string (uuid) |  | For offer, a published promotion the guest is eligible for. (nullable) |
+| items[].couponRef | string |  | For offer, a coupon campaign; a code is assigned only when the guest takes it (promotions.assignCoupon). (nullable) |
+| items[].rewardId | string (uuid) |  | For reward, a marketing-crm loyalty reward the guest can redeem. (nullable) |
+| items[].challengeId | string (uuid) |  | For challenge, a marketing-crm challenge the guest can join. (nullable) |
+| items[].kind | enum (upsell, crossSell, upgrade, bundle, addOn, membership, nextBestOffer, offer, …) |  |  |
+| items[].rank | integer | yes | (min 1) |
+| items[].priceRef | string |  | The Pricing reference the channel resolves to a price. (nullable) |
+| items[].reasonTemplateKey | string |  | The template reason (decided 29 September, decision 9): no model writes guest-visible reasons. (nullable) |
+| items[].reasonText | string |  | The rendered template in the session locale, where the channel shows reasons. (nullable) |
+| items[].confidenceBand | enum (high, medium, low) |  | Design 5.6: a band, never a bare percentage. |
+| items[].score | number |  | Normalised score. (nullable) |
+| expiresAt | string (date-time) | yes |  |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 200 |  | Fill a recommendation slot |
+
+### recordRecommendationEvents
+
+**`POST /recommendations/events`**: Report what happened to recommended items
+
+Impressions, clicks, add-to-cart, dismissals and explicit declines, batched. A `decline` is written to the cross-channel decline store (AIR-065); "ignored" is not a decline (decision 7). Purchases are attributed from `order.completed` through the cart line's `recommendationId`, not from here.
+
+|  |  |
+|---|---|
+| Permission | `AI_USE` |
+| Scope level | venue |
+| Part of slice | core |
+| Wave | 1 |
+| Offline | no |
+| Conflict policy | append |
+| Guest callable | True |
+| Reads | `ai.rec_decision`, `cache:idempotency` |
+| Writes | `ai.rec_decline`, `ai.rec_event`, `cache:idempotency` |
+| Called by | BO-102, GST-001, GST-036, GST-048, WEB-001, WEB-008, WEB-043 |
+
+**Parameters**
+
+| Name | In | Required | Type | Notes |
+|---|---|---|---|---|
+| Idempotency-Key | header | yes | string | Client-generated ULID. |
+
+**Request body**
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| events | array of object | yes | (min items 1) |
+| events[].decisionId | string (uuid) |  | (nullable) |
+| events[].trackingId | string (uuid) | yes |  |
+| events[].eventType | enum (impression, click, addToCart, dismiss, decline) | yes |  |
+| events[].productId | string (uuid) |  | (nullable) |
+| events[].occurredAt | string (date-time) | yes |  |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 202 |  | Accepted: report what happened to recommended items |
 
 
 ## Group: retrieval
 
 Semantic search and the collections it searches
+
+### createKnowledgeCollection
+
+**`POST /collections`**: Create a collection
+
+Approved enterprise knowledge sources (8.4.38) — operating procedures, policies, product notes. **Named sources, not the open web.**
+
+|  |  |
+|---|---|
+| Permission | `AI_CONFIGURE` |
+| Scope level | tenant |
+| Part of slice | setup, makes `ai.knowledge_collection` non-empty |
+| Wave | 2 |
+| Offline | no |
+| Config scope | tenant |
+| Conflict policy | serverWins |
+| Reads | `ai.chunk_ref`, `ai.knowledge_collection`, `cache:idempotency`, `qdrant:knowledge` |
+| Writes | `ai.knowledge_collection`, `cache:idempotency`, `qdrant:knowledge` |
+| Called by | **no screen**: no screen lists it in its apis, so it is reachable only by API or import until one does (README, Known gaps) |
+
+**Parameters**
+
+| Name | In | Required | Type | Notes |
+|---|---|---|---|---|
+| Idempotency-Key | header | yes | string | Client-generated ULID. |
+
+**Request body**: `KnowledgeCollection`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| id | string (uuid) |  | (read-only) |
+| name | string | yes |  |
+| description | string |  |  |
+| scopeLevel | enum (tenant, region, venue) | yes |  |
+| scopePath | string |  | (read-only) |
+| documentCount | integer |  | (read-only) |
+| shardKey | string |  | The tenant boundary on shared placement (ADR-0021). (read-only) |
+| retrieval | enum (dense, hybrid) |  | Set at creation and not changeable. (default hybrid) |
+| sparseModel | string |  | The sparse signal, where retrieval is hybrid. (nullable) |
+| idfScope | enum (shard, tenant, venue) |  | Which population the sparse score measures rarity against (ADR-0021). (default tenant) |
+| embeddingModel | string |  | This is what decides how many collections exist (ADR-0021). (read-only) |
+| isActive | boolean |  |  |
+
+**Response**: `KnowledgeCollection`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| id | string (uuid) |  | (read-only) |
+| name | string | yes |  |
+| description | string |  |  |
+| scopeLevel | enum (tenant, region, venue) | yes |  |
+| scopePath | string |  | (read-only) |
+| documentCount | integer |  | (read-only) |
+| shardKey | string |  | The tenant boundary on shared placement (ADR-0021). (read-only) |
+| retrieval | enum (dense, hybrid) |  | Set at creation and not changeable. (default hybrid) |
+| sparseModel | string |  | The sparse signal, where retrieval is hybrid. (nullable) |
+| idfScope | enum (shard, tenant, venue) |  | Which population the sparse score measures rarity against (ADR-0021). (default tenant) |
+| embeddingModel | string |  | This is what decides how many collections exist (ADR-0021). (read-only) |
+| isActive | boolean |  |  |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 201 |  | Created |
 
 ### ingestKnowledgeDocument
 
@@ -630,12 +2532,12 @@ Sending both, or naming a document in another collection or in a state the trans
 |---|---|
 | Permission | `AI_CONFIGURE` |
 | Scope level | tenant |
-| Part of slice | setup, makes `ai.knowledge_document` non-empty |
+| Part of slice | setup, makes `ai.chunk_embedding`, `ai.knowledge_document` non-empty |
 | Wave | 2 |
 | Offline | no |
 | Conflict policy | serverWins |
-| Reads | `ai.chunk_ref`, `ai.knowledge_document`, `cache:embedding`, `cache:idempotency`, `qdrant:knowledge` |
-| Writes | `ai.knowledge_document`, `cache:embedding`, `cache:idempotency`, `qdrant:knowledge` |
+| Reads | `ai.chunk_ref`, `ai.knowledge_collection`, `ai.knowledge_document`, `cache:embedding`, `cache:idempotency`, `qdrant:knowledge` |
+| Writes | `ai.chunk_embedding`, `ai.knowledge_document`, `cache:embedding`, `cache:idempotency`, `qdrant:knowledge` |
 | Called by | **no screen**: no screen lists it in its apis, so it is reachable only by API or import until one does (README, Known gaps) |
 | State model | AI knowledge document ([states/ai-knowledge-document.yaml](../../../states/ai-knowledge-document.yaml)): moves `indexed` -> `processing`, `indexed` -> `superseded`, `failed` -> `processing` |
 
@@ -661,6 +2563,7 @@ Sending both, or naming a document in another collection or in a state the trans
 | chunkCount | integer |  | (read-only) |
 | failureReason | string |  | (read-only; nullable) |
 | indexedAt | string (date-time) |  | (read-only; nullable) |
+| scopePath | string |  | Added 29 September (AI design 3.1): ai.knowledge_document had no policy, so neither did its chunks. (read-only) |
 
 **Response**: `KnowledgeDocument`
 
@@ -677,6 +2580,7 @@ Sending both, or naming a document in another collection or in a state the trans
 | chunkCount | integer |  | (read-only) |
 | failureReason | string |  | (read-only; nullable) |
 | indexedAt | string (date-time) |  | (read-only; nullable) |
+| scopePath | string |  | Added 29 September (AI design 3.1): ai.knowledge_document had no policy, so neither did its chunks. (read-only) |
 
 **Responses**
 
@@ -684,9 +2588,207 @@ Sending both, or naming a document in another collection or in a state the trans
 |---|---|---|
 | 202 |  | Accepted for indexing |
 
+### reindexSource
+
+**`POST /index-sources/{sourceId}/reindex`**: Rebuild a source
+
+Needed for three reasons and worth naming them: the embedding model changed, the `textFields` changed, or incremental indexing drifted and nobody knows why.
+**Builds into a shadow collection and swaps on completion.** Reindexing in place leaves the assistant answering from a half-built index, which is worse than answering from a stale one — a stale answer is wrong in a knowable way.
+
+|  |  |
+|---|---|
+| Permission | `AI_CONFIGURE` |
+| Scope level | tenant |
+| Part of slice | setup, makes `ai.chunk_embedding` non-empty |
+| Wave | 2 |
+| Offline | no |
+| Conflict policy | serverWins |
+| Reads | `ai.index_job`, `ai.index_source`, `assets.media_asset`, `cache:embedding`, `cache:idempotency`, `catalogue.entitlement_template`, `catalogue.product`, `fnb.menu_item`, `maintenance.inspection_template`, `marketing.case`, `reporting.report_definition`, `retail.merchandise`, `whitelabel.content_page`, `whitelabel.faq_entry`, `whitelabel.policy` |
+| Writes | `ai.chunk_embedding`, `ai.index_entry`, `ai.index_job`, `cache:embedding`, `cache:idempotency`, `qdrant:knowledge` |
+| Called by | **no screen**: no screen lists it in its apis, so it is reachable only by API or import until one does (README, Known gaps) |
+| State model | AI index job ([states/ai-index-job.yaml](../../../states/ai-index-job.yaml)): moves `queued` -> `building`, `failed` -> `queued` |
+
+**Parameters**
+
+| Name | In | Required | Type | Notes |
+|---|---|---|---|---|
+| sourceId | path | yes | string (uuid) |  |
+| Idempotency-Key | header | yes | string | Client-generated ULID. |
+
+**Request body**
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| reason | enum (embeddingModelChanged, fieldsChanged, driftSuspected, initialBuild) |  |  |
+
+**Response**: `IndexJob`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| id | string (uuid) | yes |  |
+| sourceId | string (uuid) | yes |  |
+| kind | enum (full, incremental, removal) |  |  |
+| reason | string |  |  |
+| status | enum (queued, building, verifying, swapping, complete, failed) | yes |  |
+| recordsTotal | integer |  |  |
+| recordsEmbedded | integer |  |  |
+| recordsFailed | integer |  | The number to watch. |
+| failureSample | array of string |  |  |
+| shadowCollection | string |  | A full rebuild writes here and swaps on completion. (nullable) |
+| shardKey | string |  | The tenant boundary on shared placement (ADR-0021). (read-only) |
+| embeddingModel | string |  |  |
+| startedAt | string (date-time) | yes |  |
+| completedAt | string (date-time) |  | (nullable) |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 202 |  | Rebuilding |
+| 409 |  | Already rebuilding |
+
+### semanticSearch
+
+**`POST /search`**: Search meaning, not words
+
+8.4.39. Across products, tickets, memberships, documents and knowledge collections.
+Separate from the conversational path because most of the time a person wants a list and not a paragraph, and generating prose to answer "which annual passes do we sell" costs tokens to produce something worse than a table.
+Results are scoped to the principal, and each carries the collection it came from so a wrong answer can be traced to a wrong document rather than blamed on the model.
+
+**Media added 29 September (build; 23.1.6).** Kind `media` searches the media library in plain language ("sunset over the lazy river with families"): an index source over `assets.media_asset` embeds each asset's title, description, tags and the AI description `assets.analyseMediaAsset` writes, one chunk per asset, re-embedded on `assets.documentIndexed` and by the nightly incremental reindex. Results carry `assetId` and `mediaType` and are scoped to the caller like every other kind: an asset the caller could not open through `assets.searchMedia` is never returned.
+
+|  |  |
+|---|---|
+| Permission | `AI_USE` |
+| Scope level | venue |
+| Part of slice | core |
+| Wave | 2 |
+| Offline | no |
+| Conflict policy | serverWins |
+| Read routing | replica |
+| Reads | `ai.chunk_embedding`, `ai.chunk_ref`, `ai.knowledge_collection`, `ai.knowledge_document`, `assets.media_asset`, `cache:answer`, `cache:idempotency`, `catalogue.product`, `qdrant:knowledge` |
+| Writes | `ai.activity`, `cache:answer`, `cache:idempotency`, `qdrant:knowledge` |
+| Called by | CMS-010, CMS-062, EMP-040, EMP-041 |
+
+**Parameters**
+
+| Name | In | Required | Type | Notes |
+|---|---|---|---|---|
+| Idempotency-Key | header | yes | string | Client-generated ULID. |
+
+**Request body**
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| query | string | yes | (min length 2; max length 500) |
+| kinds | array of enum (product, entitlement, membership, document, knowledge, faq, report, media) |  |  |
+| limit | integer |  | (max 100; default 20) |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 200 |  | Results |
+
+### setIndexSource
+
+**`PUT /index-sources`**: Declare a source indexed
+
+Names the table, the fields that carry retrievable text, the collection it lands in and the event that invalidates it.
+**`textFields` is the important one.** Indexing an entire row embeds ids, timestamps and foreign keys as though they were meaning, and a search for "annual pass" then matches a UUID. Only the fields a person would read are embedded; the rest becomes payload used for filtering.
+**What the PUT does.** One declaration per indexed table, so the match key is `table`. A body naming a table already declared replaces that declaration in full — a field left out takes its default, not its old value — and returns 200; a table not yet declared is created and returns 201. Other declarations are never touched. A change to `textFields` or `chunkStrategy` does not re-embed anything by itself; `reindexSource` does.
+
+|  |  |
+|---|---|
+| Permission | `AI_CONFIGURE` |
+| Scope level | tenant |
+| Part of slice | setup, makes `ai.index_source` non-empty |
+| Wave | 2 |
+| Offline | no |
+| Config scope | tenant |
+| Conflict policy | serverWins |
+| Reads | `ai.index_source`, `ai.knowledge_collection`, `cache:idempotency` |
+| Writes | `ai.index_source`, `cache:idempotency` |
+| Called by | **no screen**: no screen lists it in its apis, so it is reachable only by API or import until one does (README, Known gaps) |
+
+**Parameters**
+
+| Name | In | Required | Type | Notes |
+|---|---|---|---|---|
+| Idempotency-Key | header | yes | string | Client-generated ULID. |
+
+**Request body**: `IndexSource`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| id | string (uuid) |  | (read-only) |
+| table | string | yes | Schema-qualified, e.g. |
+| contract | string |  | Which contract owns it, for tracing back. |
+| textFields | array of string | yes | The fields a person would read. (min items 1) |
+| payloadFields | array of string |  | Carried alongside the vector for filtering, not embedded. |
+| collection | string | yes | Which embedding table it lands in (ai.chunk_embedding for the default model; one table per embedding model, AI design 5.8). |
+| scopeLevel | enum (tenant, region, venue) | yes |  |
+| invalidatedBy | array of string |  | Domain events that make an entry stale. |
+| chunkStrategy | enum (wholeRecord, paragraph, fixedTokens, section, semanticSection, parentChild) |  | Changes what is stored, so it cannot be altered without a reindex. |
+| parentField | string |  | Which field carries the parent context, where chunkStrategy is parentChild. (nullable) |
+| isActive | boolean |  |  |
+| entryCount | integer |  | (read-only) |
+| lastIndexedAt | string (date-time) |  | (read-only; nullable) |
+| staleCount | integer |  | Records changed since their last embedding. (read-only) |
+
+**Response**: `IndexSource`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| id | string (uuid) |  | (read-only) |
+| table | string | yes | Schema-qualified, e.g. |
+| contract | string |  | Which contract owns it, for tracing back. |
+| textFields | array of string | yes | The fields a person would read. (min items 1) |
+| payloadFields | array of string |  | Carried alongside the vector for filtering, not embedded. |
+| collection | string | yes | Which embedding table it lands in (ai.chunk_embedding for the default model; one table per embedding model, AI design 5.8). |
+| scopeLevel | enum (tenant, region, venue) | yes |  |
+| invalidatedBy | array of string |  | Domain events that make an entry stale. |
+| chunkStrategy | enum (wholeRecord, paragraph, fixedTokens, section, semanticSection, parentChild) |  | Changes what is stored, so it cannot be altered without a reindex. |
+| parentField | string |  | Which field carries the parent context, where chunkStrategy is parentChild. (nullable) |
+| isActive | boolean |  |  |
+| entryCount | integer |  | (read-only) |
+| lastIndexedAt | string (date-time) |  | (read-only; nullable) |
+| staleCount | integer |  | Records changed since their last embedding. (read-only) |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 200 |  | Declared — the table's existing declaration replaced |
+| 201 |  | Declared — the table had no declaration |
+
 ## Tables
 
 Every table this service owns that the slice reads or writes, with its columns as derived into `backend/tenant/*.sql`.
+
+### `ai.action_plan`
+
+| Column | Type | Required | Notes |
+|---|---|---|---|
+| id | uuid | no |  |
+| origin | text | yes |  |
+| origin_ref | text | no |  |
+| summary | text | no |  |
+| status | text | yes |  |
+| autonomy_level | jsonb | no |  |
+| approval_tier | integer | no | The approval tier (1 or 2), the floor the approvals matrix adds to (design 3.8). |
+| approval_request_id | uuid | no | The approvals request, where tier 2 or the matrix caught the plan. |
+| proposed_action_id | uuid | no | The ai.proposed_action the plan is presented as for a decision. |
+| change_set_hash | text | no |  |
+| governance_outcome | text | no |  |
+| policy_version_ref | text | no | The governance policy version that decided it. |
+| simulation | jsonb | no | Current versus proposed state, channels, future orders and issued tickets affected (flow D step 4). |
+| is_partial_completion_allowed | boolean | no | Where governance allows a partial completion; otherwise a failure compensates in reverse dependency order (AIC-098, AIC-134). |
+| rollback_of_plan_id | uuid | no |  |
+| requested_by_principal_id | uuid | no |  |
+| created_at | timestamptz | no |  |
+| completed_at | timestamptz | no |  |
+| scope_path | text | no | The partition key (ADR-0005). |
 
 ### `ai.activity`
 
@@ -713,7 +2815,117 @@ Every table this service owns that the slice reads or writes, with its columns a
 | latency_ms | integer | no |  |
 | masked_field_count | integer | no | How many fields were redacted. |
 | trace_id | text | no |  |
+| decision_record_id | uuid | no | The ai.decision_record this call belongs to, where it was part of a governed decision (AI design 2.3, 3.9). |
+| cache_layer | text | no | Which cache answered, where one did (AI design 3.6). |
 | created_at | timestamptz | yes |  |
+
+### `ai.anomaly_detector`
+
+| Column | Type | Required | Notes |
+|---|---|---|---|
+| id | uuid | no |  |
+| detector_key | text | yes |  |
+| source | text | no | What is watched (29 September, build): a semantic-layer KPI, a published forecast (8.2.20, 8.2.41), or device status events (8.9.9). |
+| metric_key | text | no | A metric of the semantic layer (Reporting KPI). |
+| forecast_source | jsonb | no | Required where source is forecast; method is then threshold. |
+| device_health_source | jsonb | no | Required where source is deviceHealth. |
+| method | text | yes |  |
+| thresholds | jsonb | no |  |
+| sensitivity | text | no |  |
+| dimensions | text[] | no |  |
+| cadence | text | no |  |
+| is_active | boolean | no |  |
+| false_alarm_rate | numeric | no | Share of its insights rejected over 90 days. |
+| scope_path | text | no | The partition key (ADR-0005). |
+
+### `ai.answer_feedback`
+
+| Column | Type | Required | Notes |
+|---|---|---|---|
+| id | uuid | no |  |
+| message_id | uuid | yes |  |
+| conversation_id | uuid | no |  |
+| rating | text | yes |  |
+| reason | text | no |  |
+| comment | text | no |  |
+| audience | text | no |  |
+| principal_id | uuid | no |  |
+| subject_id | uuid | no | The guest, where the audience is guest. |
+| created_at | timestamptz | no |  |
+| scope_path | text | no | The partition key (ADR-0005). |
+
+### `ai.assistant_profile`
+
+| Column | Type | Required | Notes |
+|---|---|---|---|
+| id | uuid | no |  |
+| profile_key | text | yes |  |
+| name | text | no |  |
+| audience | text | yes |  |
+| role_ids | text[] | no |  |
+| module | text | no |  |
+| collection_ids | text[] | no | Knowledge collections it retrieves from. |
+| tool_keys | text[] | no | Registered tools it may propose (an assistant only reads; a change request goes to the configuration assistant, AIC-078). |
+| model_task | text | no | The gateway task, e.g. |
+| guest_capability_scope | text[] | no | For a guest profile: the same values as AiPolicy.guestCapabilityScope, narrowed. |
+| locales | text[] | no |  |
+| handover_target | text | no | Where "ask a person" goes: a support queue or a staff role. |
+| is_active | boolean | no |  |
+| scope_path | text | no | The partition key (ADR-0005). |
+
+### `ai.byok_enablement`
+
+| Column | Type | Required | Notes |
+|---|---|---|---|
+| id | uuid | no |  |
+| tenant_id | uuid | yes |  |
+| is_enabled | boolean | yes |  |
+| coverage | text | no | Whether the tenant may supply a key per task or one key for everything. |
+| allowed_tasks | text[] | no | Where coverage is perTask: the gateway tasks a tenant key may serve. |
+| reason | text | no |  |
+| platform_staff_grant_id | uuid | no | The open platform-staff grant the change was made under (audit R098). |
+| decided_by_principal_id | uuid | no |  |
+| decided_at | timestamptz | no |  |
+| scope_path | text | no | The partition key (ADR-0005). |
+
+### `ai.capability`
+
+| Column | Type | Required | Notes |
+|---|---|---|---|
+| id | uuid | no |  |
+| capability_key | text | yes | Stable key, unique per tenant: assistant.guest, forecast.attendance, risk.transaction, config.assistant, recommend.checkout. |
+| family | text | yes |  |
+| name | text | no |  |
+| description | text | no |  |
+| owner_principal_id | uuid | no | The accountable business owner (AIC-144). |
+| business_function | text | no |  |
+| risk_class | text | yes |  |
+| autonomy_ceiling | jsonb | no | The first-release ceiling for this capability (design 3.8 table). |
+| autonomy_level | jsonb | yes | The level in force at this scope. |
+| data_categories | text[] | no | Data categories the capability reads (ADM-524). |
+| lifecycle | jsonb | no | Lifecycle per environment (AIC-145): a capability or model can be live in staging and still a draft in production. |
+| degradation_mode | text | no | What the capability does when its model or the service is unavailable (design 3.7, AIC-241). |
+| status | text | no | Paused by pauseAiCapability: the capability answers from its degradation mode until resumed. |
+| paused_reason | text | no |  |
+| paused_at | timestamptz | no |  |
+| updated_at | timestamptz | no |  |
+| scope_path | text | no | The partition key (ADR-0005). |
+
+### `ai.chunk_embedding`
+
+| Column | Type | Required | Notes |
+|---|---|---|---|
+| id | uuid | no |  |
+| document_id | uuid | yes |  |
+| chunk_index | integer | yes |  |
+| parent_chunk_id | uuid | no | The parent section, where the source uses parentChild chunking. |
+| content | text | no | The chunk text. |
+| embedding_model | text | yes |  |
+| dense | text | no | Dense vector, halfvec(1024) in the DDL. |
+| sparse | jsonb | no | Learned sparse weights, sparsevec in the DDL. |
+| token_count | integer | no |  |
+| content_hash | text | no |  |
+| created_at | timestamptz | no |  |
 
 ### `ai.chunk_ref`
 
@@ -735,6 +2947,354 @@ Every table this service owns that the slice reads or writes, with its columns a
 | started_at | timestamptz | yes |  |
 | last_message_at | timestamptz | no |  |
 
+### `ai.decision_record`
+
+| Column | Type | Required | Notes |
+|---|---|---|---|
+| id | uuid | no |  |
+| trace_id | text | yes |  |
+| capability_key | text | yes |  |
+| task | text | no |  |
+| subject_kind | text | no |  |
+| subject_ref | text | no |  |
+| inputs_ref | text | no | Where the inputs are kept (Blob or ai.activity), never the prompt text itself. |
+| evidence | jsonb | no |  |
+| producer | text | no |  |
+| model_version | text | no |  |
+| prompt_template_version | text | no |  |
+| feature_set_version | text | no |  |
+| knowledge_version | text | no |  |
+| rule_versions | jsonb | no |  |
+| governance_outcome | text | no |  |
+| policy_version | text | no |  |
+| approvals | jsonb | no | Approval requests and their decisions. |
+| human_decision | jsonb | no | Override or intervention, where a person changed the outcome. |
+| execution_result | jsonb | no |  |
+| outcome_ref | text | no | The business outcome it links to (an order, a published version, a closed case). |
+| outcome | text | yes | approvedThenFailed is kept distinct from executed (design 1.2 Audit). |
+| previous_hash | text | no |  |
+| record_hash | text | yes |  |
+| created_at | timestamptz | no |  |
+| scope_path | text | no | The partition key (ADR-0005). |
+
+### `ai.eval_run`
+
+| Column | Type | Required | Notes |
+|---|---|---|---|
+| id | uuid | no |  |
+| suite_id | uuid | yes |  |
+| release_id | uuid | no |  |
+| kind | text | yes |  |
+| candidate_ref | text | no |  |
+| baseline_ref | text | no |  |
+| status | text | yes |  |
+| metrics | jsonb | no |  |
+| gate | jsonb | no | The promotion gate thresholds (design 3.5 table) and whether each passed. |
+| is_isolation_cases_passed | boolean | no | False blocks release, whatever the other metrics say. |
+| requested_by_principal_id | uuid | no |  |
+| started_at | timestamptz | no |  |
+| completed_at | timestamptz | no |  |
+| scope_path | text | no | The partition key (ADR-0005). |
+
+### `ai.eval_suite`
+
+| Column | Type | Required | Notes |
+|---|---|---|---|
+| id | uuid | no |  |
+| suite_key | text | yes |  |
+| capability_key | text | yes |  |
+| layer | text | yes |  |
+| version | integer | no |  |
+| case_count | integer | no |  |
+| includes_isolation_cases | boolean | no |  |
+| blob_ref | text | no |  |
+| scope_path | text | no | The partition key (ADR-0005). |
+
+### `ai.forecast_accuracy`
+
+| Column | Type | Required | Notes |
+|---|---|---|---|
+| id | uuid | no |  |
+| definition_id | uuid | yes |  |
+| version_id | uuid | no |  |
+| producer_ref | text | no |  |
+| horizon_days | integer | yes |  |
+| period_start | timestamptz | yes |  |
+| period_end | timestamptz | no |  |
+| wape | numeric | no |  |
+| bias | numeric | no |  |
+| interval_coverage | numeric | no | Share of actuals inside the 10th-90th percentile band. |
+| baseline_wape | numeric | no |  |
+| measured_at | timestamptz | no |  |
+| scope_path | text | no | The partition key (ADR-0005). |
+
+### `ai.forecast_definition`
+
+| Column | Type | Required | Notes |
+|---|---|---|---|
+| id | uuid | no |  |
+| definition_key | text | yes |  |
+| name | text | no |  |
+| subject | text | yes |  |
+| grain | text | yes |  |
+| dimensions | text[] | no | Breakdowns forecast directly or reconciled to. |
+| segment_ids | text[] | no | The marketing-crm segments customerSegment breaks down by, in priority order where a guest is in several. |
+| horizon_days | integer | yes |  |
+| refresh_cadence | text | no |  |
+| producer | text | yes | Which producer is live (design 3.10). |
+| producer_ref | text | no |  |
+| shadow_producer_ref | text | no | Runs alongside and is recorded, never shown (design 3.5). |
+| is_auto_publish | boolean | no | Publish without approval when the quality gates pass (autonomy L4, design 3.8). |
+| quality_gates | jsonb | no | Completeness, blocking signals and accuracy-regression thresholds a version must pass to publish. |
+| signal_keys | text[] | no | Signal sources this definition may use (ADM-501). |
+| is_active | boolean | no |  |
+| scope_path | text | no | The partition key (ADR-0005). |
+
+### `ai.forecast_point`
+
+| Column | Type | Required | Notes |
+|---|---|---|---|
+| id | uuid | no |  |
+| version_id | uuid | yes |  |
+| scenario_id | uuid | no | Set where the point belongs to a what-if scenario rather than the version itself. |
+| target_start | timestamptz | yes |  |
+| target_end | timestamptz | no |  |
+| dimension_key | text | no | Canonical key of the breakdown, e.g. |
+| p10 | numeric | no |  |
+| p50 | numeric | yes |  |
+| p90 | numeric | no |  |
+| unit | text | no |  |
+| drivers | jsonb | no | Component decomposition or SHAP contributions, largest first (ADM-506). |
+| scope_path | text | no | The partition key (ADR-0005). |
+
+### `ai.forecast_scenario`
+
+| Column | Type | Required | Notes |
+|---|---|---|---|
+| id | uuid | no |  |
+| name | text | no |  |
+| base_version_id | uuid | yes |  |
+| status | text | no |  |
+| result | jsonb | no | Deltas against the base version by subject and period. |
+| created_by_principal_id | uuid | no |  |
+| created_at | timestamptz | no |  |
+| scope_path | text | no | The partition key (ADR-0005). |
+
+### `ai.forecast_version`
+
+| Column | Type | Required | Notes |
+|---|---|---|---|
+| id | uuid | no |  |
+| definition_id | uuid | yes |  |
+| version_number | integer | yes |  |
+| status | text | yes |  |
+| basis | text | yes |  |
+| producer_ref | text | no |  |
+| model_version | text | no |  |
+| data_cutoff_at | timestamptz | no | The analytical replica watermark the snapshot was taken at. |
+| horizon_start | timestamptz | no |  |
+| horizon_end | timestamptz | no |  |
+| quality_checks | jsonb | no | Each gate and whether it passed. |
+| published_by_principal_id | uuid | no | Null where the definition auto-published. |
+| published_at | timestamptz | no |  |
+| decision_record_id | uuid | no |  |
+| created_at | timestamptz | no |  |
+| scope_path | text | no | The partition key (ADR-0005). |
+
+### `ai.governance_alert`
+
+| Column | Type | Required | Notes |
+|---|---|---|---|
+| id | uuid | no |  |
+| kind | text | yes |  |
+| severity | text | yes |  |
+| capability_key | text | no |  |
+| release_id | uuid | no | For promotionReady and evaluationRegression: the release concerned. |
+| subject_ref | text | no |  |
+| evidence | jsonb | no |  |
+| status | text | yes |  |
+| incident_id | uuid | no |  |
+| raised_at | timestamptz | no |  |
+| decided_by_principal_id | uuid | no |  |
+| decided_at | timestamptz | no |  |
+| note | text | no |  |
+| scope_path | text | no | The partition key (ADR-0005). |
+
+### `ai.governance_policy`
+
+| Column | Type | Required | Notes |
+|---|---|---|---|
+| id | uuid | no |  |
+| policy_key | text | yes |  |
+| name | text | no |  |
+| kind | text | yes |  |
+| capability_keys | text[] | no |  |
+| current_version | integer | no | The published version in force, null until one is published. |
+| status | text | no |  |
+| created_at | timestamptz | no |  |
+| scope_path | text | no | The partition key (ADR-0005). |
+
+### `ai.governance_policy_version`
+
+| Column | Type | Required | Notes |
+|---|---|---|---|
+| id | uuid | no |  |
+| policy_id | uuid | yes |  |
+| version | integer | yes |  |
+| status | text | yes |  |
+| rules | jsonb | no |  |
+| change_note | text | no |  |
+| simulation_summary | jsonb | no | The last simulateAiGovernancePolicy result: decisions that would change, by outcome. |
+| drafted_by_principal_id | uuid | no |  |
+| published_by_principal_id | uuid | no |  |
+| published_at | timestamptz | no |  |
+| superseded_at | timestamptz | no |  |
+| scope_path | text | no | The partition key (ADR-0005). |
+
+### `ai.guided_choice_suggestion`
+
+| Column | Type | Required | Notes |
+|---|---|---|---|
+| id | uuid | no |  |
+| venue_id | uuid | yes |  |
+| trigger | text | yes |  |
+| status | text | yes |  |
+| product_count | integer | no |  |
+| wording_source | text | no | Where the text came from. |
+| model_version | text | no |  |
+| prompt_template_version | text | no |  |
+| guided_choice_id | uuid | no | The white-label draft GuidedChoice it produced. |
+| decision_record_id | uuid | no |  |
+| created_at | timestamptz | no |  |
+| scope_path | text | no | The partition key (ADR-0005). |
+
+### `ai.incident`
+
+| Column | Type | Required | Notes |
+|---|---|---|---|
+| id | uuid | no |  |
+| reference | text | yes |  |
+| title | text | yes |  |
+| kind | text | no |  |
+| severity | text | yes |  |
+| status | text | yes |  |
+| capability_keys | text[] | no |  |
+| alert_ids | text[] | no |  |
+| operational_incident_ref | text | no | The linked operational incident, where both apply (AIC-250). |
+| root_cause | text | no |  |
+| remediation | text | no |  |
+| owner_principal_id | uuid | no |  |
+| opened_at | timestamptz | no |  |
+| contained_at | timestamptz | no |  |
+| closed_at | timestamptz | no |  |
+| scope_path | text | no | The partition key (ADR-0005). |
+
+### `ai.index_entry`
+
+| Column | Type | Required | Notes |
+|---|---|---|---|
+| id | uuid | yes | Synthesised key. |
+| source_id | uuid | yes | Points at ai.index_source. |
+
+### `ai.index_job`
+
+| Column | Type | Required | Notes |
+|---|---|---|---|
+| id | uuid | yes |  |
+| source_id | uuid | yes |  |
+| kind | text | no |  |
+| reason | text | no |  |
+| status | text | yes |  |
+| records_total | integer | no |  |
+| records_embedded | integer | no |  |
+| records_failed | integer | no | The number to watch. |
+| failure_sample | text[] | no |  |
+| shadow_collection | text | no | A full rebuild writes here and swaps on completion. |
+| shard_key | text | no | The tenant boundary on shared placement (ADR-0021). |
+| embedding_model | text | no |  |
+| started_at | timestamptz | yes |  |
+| completed_at | timestamptz | no |  |
+
+### `ai.index_source`
+
+| Column | Type | Required | Notes |
+|---|---|---|---|
+| id | uuid | no |  |
+| table_name | text | yes | Schema-qualified, e.g. |
+| contract | text | no | Which contract owns it, for tracing back. |
+| text_fields | text[] | yes | The fields a person would read. |
+| payload_fields | text[] | no | Carried alongside the vector for filtering, not embedded. |
+| collection | text | yes | Which embedding table it lands in (ai.chunk_embedding for the default model; one table per embedding model, AI design 5.8). |
+| scope_level | text | yes |  |
+| invalidated_by | text[] | no | Domain events that make an entry stale. |
+| chunk_strategy | text | no | Changes what is stored, so it cannot be altered without a reindex. |
+| parent_field | text | no | Which field carries the parent context, where chunkStrategy is parentChild. |
+| is_active | boolean | no |  |
+| entry_count | integer | no |  |
+| last_indexed_at | timestamptz | no |  |
+| stale_count | integer | no | Records changed since their last embedding. |
+| collection_id | uuid | yes | Points at ai.knowledge_collection. |
+
+### `ai.insight`
+
+| Column | Type | Required | Notes |
+|---|---|---|---|
+| id | uuid | no |  |
+| kind | text | yes |  |
+| detector_id | uuid | no |  |
+| metric_key | text | no |  |
+| subject_kind | text | no | What the insight is about where it is not a KPI (29 September, build): a marketing-crm campaign or journey for marketingRecommendation, a forecast definition for forecastThreshold. |
+| subject_ref | text | no |  |
+| recommended_action | jsonb | no | For marketingRecommendation: {recommendation, parameters} as AiMarketingRecommendation. |
+| expected_impact | jsonb | no | A range on a named metric (metric, low, high), never a single number (design 5.6). |
+| title | text | yes |  |
+| narrative | text | no |  |
+| evidence | jsonb | no |  |
+| magnitude | numeric | no |  |
+| priority | text | no |  |
+| correlation_key | text | no |  |
+| status | text | yes |  |
+| decided_by_principal_id | uuid | no |  |
+| decided_at | timestamptz | no |  |
+| action_ref | text | no |  |
+| measured_impact | jsonb | no |  |
+| decision_record_id | uuid | no |  |
+| detected_at | timestamptz | no |  |
+| scope_path | text | no | The partition key (ADR-0005). |
+
+### `ai.intervention`
+
+| Column | Type | Required | Notes |
+|---|---|---|---|
+| id | uuid | no |  |
+| kind | text | yes |  |
+| target_kind | text | yes |  |
+| target_ref | text | yes |  |
+| decision_record_id | uuid | no |  |
+| original_decision | jsonb | no |  |
+| human_decision | jsonb | no |  |
+| reason | text | no |  |
+| principal_id | uuid | no |  |
+| created_at | timestamptz | no |  |
+| scope_path | text | no | The partition key (ADR-0005). |
+
+### `ai.knowledge_collection`
+
+| Column | Type | Required | Notes |
+|---|---|---|---|
+| id | uuid | no |  |
+| name | text | yes |  |
+| description | text | no |  |
+| scope_level | text | yes |  |
+| scope_path | text | no |  |
+| document_count | integer | no |  |
+| shard_key | text | no | The tenant boundary on shared placement (ADR-0021). |
+| retrieval | text | no | Set at creation and not changeable. |
+| sparse_model | text | no | The sparse signal, where retrieval is hybrid. |
+| idf_scope | text | no | Which population the sparse score measures rarity against (ADR-0021). |
+| embedding_model | text | no | This is what decides how many collections exist (ADR-0021). |
+| is_active | boolean | no |  |
+
 ### `ai.knowledge_document`
 
 | Column | Type | Required | Notes |
@@ -749,6 +3309,25 @@ Every table this service owns that the slice reads or writes, with its columns a
 | chunk_count | integer | no |  |
 | failure_reason | text | no |  |
 | indexed_at | timestamptz | no |  |
+| scope_path | text | no | Added 29 September (AI design 3.1): ai.knowledge_document had no policy, so neither did its chunks. |
+
+### `ai.knowledge_gap`
+
+| Column | Type | Required | Notes |
+|---|---|---|---|
+| id | uuid | no |  |
+| question | text | yes | The normalised question. |
+| examples | text[] | no | Up to ten phrasings as asked, with personal data masked. |
+| occurrences | integer | no |  |
+| audience | text | no |  |
+| locale | text | no |  |
+| kind | text | no |  |
+| suggested_collection_id | uuid | no |  |
+| owner_principal_id | uuid | no |  |
+| status | text | yes |  |
+| resolved_document_id | uuid | no |  |
+| last_asked_at | timestamptz | no |  |
+| scope_path | text | no | The partition key (ADR-0005). |
 
 ### `ai.message`
 
@@ -770,6 +3349,49 @@ Every table this service owns that the slice reads or writes, with its columns a
 | latency_ms | integer | no |  |
 | created_at | timestamptz | yes |  |
 
+### `ai.model`
+
+| Column | Type | Required | Notes |
+|---|---|---|---|
+| id | uuid | no |  |
+| layer | text | yes |  |
+| provider_kind | text | no |  |
+| producer_type | text | yes |  |
+| model_name | text | yes | The deployment or model name as the provider knows it, or the package and version for a classical model. |
+| capabilities | text[] | no |  |
+| context_tokens | integer | no |  |
+| tool_calling | boolean | no |  |
+| structured_output | boolean | no |  |
+| languages | text[] | no |  |
+| residency | text | no | Where inference happens. |
+| input_cost_per_million_tokens | numeric(18,4) | no |  |
+| output_cost_per_million_tokens | numeric(18,4) | no |  |
+| lifecycle | jsonb | no | Lifecycle per environment (AIC-145): a capability or model can be live in staging and still a draft in production. |
+| is_default_for_tasks | text[] | no | Tasks this model is the default for (AIC-010), e.g. |
+| scope_path | text | no | The partition key (ADR-0005). |
+
+### `ai.operational_requirement`
+
+| Column | Type | Required | Notes |
+|---|---|---|---|
+| id | uuid | no |  |
+| version_id | uuid | yes |  |
+| kind | text | yes |  |
+| target_contract | text | no | The owning module that applies it: workforce, fnb, inventory, resources, access. |
+| subject_ref | text | no | A role, outlet, gate, item or resource type. |
+| period_start | timestamptz | yes |  |
+| period_end | timestamptz | no |  |
+| quantity | numeric | yes |  |
+| quantity_p90 | numeric | no | The requirement at the forecast's 90th percentile, for planning to the busy case. |
+| unit | text | no |  |
+| productivity_standard | jsonb | no | The standard used, e.g. |
+| status | text | no |  |
+| decided_by_principal_id | uuid | no |  |
+| decided_at | timestamptz | no |  |
+| decision_note | text | no |  |
+| handover_ref | text | no | The owning module's record once handed over. |
+| scope_path | text | no | The partition key (ADR-0005). |
+
 ### `ai.policy`
 
 | Column | Type | Required | Notes |
@@ -777,7 +3399,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 | id | uuid | no | Added 20 August. |
 | scope_level | text | yes | Tenant sets the default; a venue may narrow it and never widen it. |
 | scope_path | text | yes | The node this row belongs to, and the key it is written under — the tenant's node where scopeLevel is tenant, a venue's where it is venue. |
-| enabled_capabilities | text[] | yes |  |
+| enabled_capabilities | text[] | yes | Extended on 29 September to the fourteen capabilities of the AI design (section 1.1, AiCapabilityFamily). |
 | allowed_role_ids | text[] | no |  |
 | masked_fields | text[] | no | Redacted before a prompt leaves the platform (8.3.73). |
 | requires_approval_for | text[] | no | 8.3.61–8.3.64. |
@@ -803,13 +3425,49 @@ Every table this service owns that the slice reads or writes, with its columns a
 | suggestion_providers | jsonb | no | Which producer answers each SuggestionKind, and what requestSuggestion routes by. |
 | tenant_id | uuid | yes | Points at platform.tenant. |
 
+### `ai.policy_exception`
+
+| Column | Type | Required | Notes |
+|---|---|---|---|
+| id | uuid | no |  |
+| policy_id | uuid | yes |  |
+| capability_key | text | no |  |
+| reason | text | yes |  |
+| compensating_controls | text[] | no |  |
+| starts_at | timestamptz | no |  |
+| expires_at | timestamptz | yes | Required. |
+| status | text | no |  |
+| approved_by_principal_id | uuid | no |  |
+| revoked_by_principal_id | uuid | no |  |
+| revoked_at | timestamptz | no |  |
+| revoke_reason | text | no |  |
+| scope_path | text | no | The partition key (ADR-0005). |
+
+### `ai.prompt_template`
+
+| Column | Type | Required | Notes |
+|---|---|---|---|
+| id | uuid | no |  |
+| template_key | text | yes |  |
+| version | integer | yes |  |
+| layer | text | yes |  |
+| task | text | yes | The gateway task it serves (design 3.3), e.g. |
+| body | text | no | The template text. |
+| variables | text[] | no |  |
+| output_schema | jsonb | no | JSON Schema the structured output must satisfy, where the task has one. |
+| status | text | yes |  |
+| content_hash | text | no |  |
+| published_by_principal_id | uuid | no |  |
+| published_at | timestamptz | no |  |
+| scope_path | text | no | The partition key (ADR-0005). |
+
 ### `ai.proposed_action`
 
 | Column | Type | Required | Notes |
 |---|---|---|---|
 | id | uuid | yes |  |
 | interaction_id | uuid | no |  |
-| kind | text | yes |  |
+| kind | text | yes | content (a marketing or storefront draft from proposeMarketingContent) and audience (a lookalike segment from proposeLookalikeSegment) added 29 September (build); both are applied by a person in the… |
 | target_contract | text | yes | Which contract would perform it. |
 | target_operation | text | yes |  |
 | payload | jsonb | yes | The request body a person would submit, ready to review. |
@@ -821,6 +3479,10 @@ Every table this service owns that the slice reads or writes, with its columns a
 | decision_reason | text | no | Required on rejection. |
 | proposed_at | timestamptz | no |  |
 | decided_at | timestamptz | no |  |
+| scope_path | text | no | Added 29 September (AI design 3.1): ai.proposed_action had no policy — its only references were nullable. |
+| plan_id | uuid | no | The plan this action presents for a decision (AI design 2.2 D, 3.8). |
+| approval_request_id | uuid | no | The approvals request deciding a tier 2 or matrix-caught action (AI design 2.3). |
+| change_set_hash | text | no | Hash of the change set approved; execution refuses a plan whose hash differs (AIC-181). |
 
 ### `ai.provider`
 
@@ -844,7 +3506,98 @@ Every table this service owns that the slice reads or writes, with its columns a
 | residency | text | no | Where inference physically happens. |
 | max_tokens | integer | no |  |
 | is_active | boolean | yes |  |
+| managed_by | text | no | Who holds the provider account, and so who pays (AI design 5.9, decided 29 September). |
+| model_id | uuid | no | The model in the catalogue (listAiModels) this provider serves. |
 | region_id | uuid | yes | Points at platform.org_unit. |
+
+### `ai.rec_decision`
+
+| Column | Type | Required | Notes |
+|---|---|---|---|
+| id | uuid | no |  |
+| placement | text | yes |  |
+| channel | text | no |  |
+| cart_id | uuid | no |  |
+| session_ref | text | no |  |
+| subject_id | uuid | no |  |
+| mode | text | yes | Personalised only where context is sufficient and consent allows (AIR-114, AIR-187). |
+| strategy_ref | text | no |  |
+| strategy_version | integer | no |  |
+| model_version | text | no |  |
+| feature_set_version | text | no |  |
+| funnel | jsonb | no | Candidate counts at each stage: generated, eligible, ranked, returned. |
+| exclusions | jsonb | no | Removed candidates by reason: unsaleable, capacity, inventory, owned, inCart, conflict, declined, frequencyCap, guardrail. |
+| items | jsonb | yes |  |
+| experiment_arm | text | no |  |
+| latency_ms | integer | no |  |
+| expires_at | timestamptz | no | Decision TTL: 30 s where capacity-sensitive, 30 min otherwise (AIR-208). |
+| decided_at | timestamptz | no |  |
+| scope_path | text | no | The partition key (ADR-0005). |
+
+### `ai.rec_decline`
+
+| Column | Type | Required | Notes |
+|---|---|---|---|
+| id | uuid | no |  |
+| subject_id | uuid | no |  |
+| session_ref | text | no |  |
+| product_id | uuid | no | The declined product. |
+| item_ref | text | no | For a declined offer, reward or challenge item (29 September, build): its promotionId, couponRef, rewardId or challengeId, prefixed with the kind (offer:, reward:, challenge:), resolved from the even… |
+| placement | text | no |  |
+| channel | text | no |  |
+| declined_at | timestamptz | yes |  |
+| expires_at | timestamptz | no |  |
+| scope_path | text | no | The partition key (ADR-0005). |
+
+### `ai.rec_event`
+
+| Column | Type | Required | Notes |
+|---|---|---|---|
+| id | uuid | no |  |
+| decision_id | uuid | no |  |
+| tracking_id | uuid | yes |  |
+| event_type | text | yes |  |
+| product_id | uuid | no |  |
+| order_id | uuid | no |  |
+| channel | text | no |  |
+| session_ref | text | no |  |
+| subject_id | uuid | no |  |
+| occurred_at | timestamptz | yes |  |
+| scope_path | text | no | The partition key (ADR-0005). |
+
+### `ai.release`
+
+| Column | Type | Required | Notes |
+|---|---|---|---|
+| id | uuid | no |  |
+| capability_key | text | yes |  |
+| artefact_kind | text | yes |  |
+| candidate_ref | text | yes |  |
+| current_ref | text | no | What production runs now: the rule, or the previously promoted artefact. |
+| previous_ref | text | no |  |
+| layer | text | yes |  |
+| suggestion_kind | text | no | Where the capability answers a requestSuggestion kind: promotion rewrites that kind's assignment in AiPolicy.suggestionProviders. |
+| stage | text | yes |  |
+| shadow_started_at | timestamptz | no |  |
+| gate_passed_at | timestamptz | no | When the shadow run passed its gate and promotionReady was raised. |
+| canary_scope | jsonb | no | Venues or share of traffic in canary. |
+| promoted_by_principal_id | uuid | no |  |
+| promoted_at | timestamptz | no |  |
+| rolled_back_by_principal_id | uuid | no |  |
+| rolled_back_at | timestamptz | no |  |
+| scope_path | text | no | The partition key (ADR-0005). |
+
+### `ai.signal_observation`
+
+| Column | Type | Required | Notes |
+|---|---|---|---|
+| id | uuid | no |  |
+| source_id | uuid | yes |  |
+| observed_for | timestamptz | yes |  |
+| value | jsonb | no |  |
+| availability | text | yes |  |
+| received_at | timestamptz | no |  |
+| scope_path | text | no | The partition key (ADR-0005). |
 
 ### `ai.suggestion`
 
@@ -865,12 +3618,22 @@ Every table this service owns that the slice reads or writes, with its columns a
 
 ## Not in the first release
 
-22 operations, added to this service in later releases without changing any of the above.
+94 operations, added to this service in later releases without changing any of the above.
 
 | Group | Operations |
 |---|---|
+| actions | `cancelActionPlan`, `getActionPlan`, `listAiTools`, `overrideAiDecision`, `pauseActionPlan`, `resumeActionPlan`, `retryActionStep`, `rollbackActionPlan`, `setAiTool`, `simulateActionPlan` |
 | ai | `proposeTranslations`, `proposeVenueLabels`, `proposeWalkways`, `recordSuggestionOutcome`, `testAiProvider` |
-| config | `getAiPolicy`, `listAiProviders` |
-| generate | `generateConfiguration`, `generateVenueLayout` |
-| governance | `decideProposedAction`, `getAiUsage`, `listAiInteractions`, `listProposedActions` |
-| retrieval | `createKnowledgeCollection`, `listIndexFailures`, `listIndexJobs`, `listIndexSources`, `listKnowledgeCollections`, `reindexSource`, `removeIndexEntry`, `semanticSearch`, `setIndexSource` |
+| audit | `exportAiEvidencePackage`, `getAiDecisionTrace`, `replayAiDecision`, `searchAiDecisions` |
+| config | `getAiByokEnablement`, `getAiPolicy`, `listAiProviders` |
+| configure | `answerConfigurationQuestion`, `attachConfigurationSource`, `buildConfigurationPlan`, `decideBlueprintRecommendation`, `getConfigurationBlueprint`, `listConfigurationSessions`, `listConfigurationSources`, `proposeSeatMapChanges`, `startConfigurationSession` |
+| forecast | `compareForecastScenarios`, `configureForecastSignalSource`, `exportForecastVersion`, `getForecast`, `getForecastAccuracy`, `listForecastDefinitions`, `listForecastSignals`, `listForecastVersions`, `listOperationalRequirements`, `setForecastDefinition` |
+| generate | `generateConfiguration`, `generateVenueLayout`, `proposeLookalikeSegment` |
+| governance | `createAiPolicyException`, `evaluateAiGovernance`, `getAiUsage`, `getEffectiveAiPolicy`, `listAiCapabilities`, `listAiGovernancePolicyVersions`, `listAiInteractions`, `listProposedActions`, `pauseAiCapability`, `revokeAiPolicyException` |
+| insights | `configureAnomalyDetector`, `listAiInsights`, `listAnomalyDetectors`, `listMarketingRecommendations` |
+| knowledge | `listAssistantProfiles`, `listKnowledgeGaps` |
+| models | `listAiEvaluations`, `listAiModels`, `listPromptTemplates` |
+| monitoring | `closeAiIncident`, `decideAiGovernanceAlert`, `listAiControls`, `listAiGovernanceAlerts`, `listAiIncidents`, `listAiRiskRegister`, `openAiIncident`, `runAiControlTest`, `setAiRiskRegisterEntry` |
+| recommend | `explainRecommendationDecision`, `getCustomerRecommendationProfile`, `simulateRecommendationDecision` |
+| retrieval | `listIndexFailures`, `listIndexJobs`, `listIndexSources`, `listKnowledgeCollections`, `removeIndexEntry` |
+| risk | `addRiskCaseEvidence`, `backtestRiskStrategy`, `closeRiskCase`, `configureRiskStrategy`, `createRiskCase`, `decideRiskAlert`, `expandRiskNetwork`, `getApprovalRequestScore`, `getEntityRisk`, `getRiskCase`, `listRiskAlerts`, `proposeRiskAction`, `scoreApprovalRequest`, `scoreTransactionRisk` |

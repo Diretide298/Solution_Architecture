@@ -934,6 +934,11 @@ screens:
     contract: access
     purpose: From the flow it appears in
     trigger: onLoad
+  - operationId: verifyAccreditationCredential
+    contract: accreditation
+    purpose: Verify an accreditation credential presented at a service gate
+    trigger: onAction
+    provenance: build, 29 September 2026
   entryState:
     params:
     - name: mediaCode

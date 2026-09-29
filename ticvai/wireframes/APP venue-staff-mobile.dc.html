@@ -311,7 +311,7 @@ border-radius:9px;font:800 13px/1.5 Manrope,system-ui,sans-serif;letter-spacing:
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; listScans · syncScans · getOfflinePackage · lookupTicket +3</div>
+          <div><b>OPERATIONS</b> &middot; listScans · syncScans · getOfflinePackage · lookupTicket +4</div>
           <div><b>STATES</b> &middot; <span class="warn">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess · offline</span></div>
           
           <div><b>GOES TO</b> &middot; <a href="#emp-001">EMP-001</a>  &mdash; <i>Sign in</i><br><a href="#emp-002">EMP-002</a>  &mdash; <i>Select venue &amp; role</i><br><a href="#emp-003">EMP-003</a>  &mdash; <i>Home — on duty</i><br><a href="#emp-015">EMP-015</a> </div>
@@ -642,9 +642,9 @@ border-radius:9px;font:800 13px/1.5 Manrope,system-ui,sans-serif;letter-spacing:
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; sendAiMessage · createAiConversation · listAiConversations</div>
+          <div><b>OPERATIONS</b> &middot; sendAiMessage · createAiConversation · listAiConversations · recordAnswerFeedback</div>
           <div><b>STATES</b> &middot; <span class="warn">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess · offline</span></div>
-          <div><b>ARRIVES WITH</b> &middot; conversationId&larr;deepLink</div>
+          <div><b>ARRIVES WITH</b> &middot; conversationId&larr;deepLink, messageId&larr;navigation</div>
           <div><b>GOES TO</b> &middot; <a href="#emp-001">EMP-001</a>  &mdash; <i>Sign in</i><br><a href="#emp-002">EMP-002</a>  &mdash; <i>Select venue &amp; role</i><br><a href="#emp-003">EMP-003</a>  &mdash; <i>Home — on duty</i><br><a href="#emp-040">EMP-040</a>  &mdash; <i>Knowledge base</i></div>
           
           <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formSendAiMessage &middot; <i>Send AI message</i> &middot; <b>Send AI message</b> &middot; Cancel <span class="dis">discards content · collectionIds</span></div><div class="ov"><b>modal</b> formCreateAiConversation &middot; <i>Create AI conversation</i> &middot; <b>Create AI conversation</b> &middot; Cancel <span class="dis">discards module · locale</span></div></div>
@@ -672,7 +672,7 @@ border-radius:9px;font:800 13px/1.5 Manrope,system-ui,sans-serif;letter-spacing:
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; listQueues · getQueue · callNextParties · getWaitTimes +3</div>
+          <div><b>OPERATIONS</b> &middot; listQueues · getQueue · callNextParties · getWaitTimes +4</div>
           <div><b>STATES</b> &middot; <span class="warn">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess · offline</span></div>
           <div><b>ARRIVES WITH</b> &middot; queueId&larr;deepLink</div>
           <div><b>GOES TO</b> &middot; <a href="#emp-001">EMP-001</a>  &mdash; <i>Sign in</i><br><a href="#emp-002">EMP-002</a>  &mdash; <i>Select venue &amp; role</i><br><a href="#emp-003">EMP-003</a>  &mdash; <i>Home — on duty</i><br><a href="#emp-032">EMP-032</a>  &mdash; <i>The sensor is wrong, so a wait is entered by</i> <span class="car">queueId</span></div>
@@ -853,9 +853,9 @@ border-radius:9px;font:800 13px/1.5 Manrope,system-ui,sans-serif;letter-spacing:
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; listAnnouncements · acknowledgeAnnouncement · getAnnouncementReach · publishAnnouncement</div>
+          <div><b>OPERATIONS</b> &middot; listAnnouncements · acknowledgeAnnouncement · getAnnouncementReach · publishAnnouncement +4</div>
           <div><b>STATES</b> &middot; <span class="warn">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess · offline</span></div>
-          <div><b>ARRIVES WITH</b> &middot; announcementId&larr;deepLink</div>
+          <div><b>ARRIVES WITH</b> &middot; announcementId&larr;deepLink, conversationId&larr;navigation</div>
           <div><b>GOES TO</b> &middot; <a href="#emp-001">EMP-001</a>  &mdash; <i>Sign in</i><br><a href="#emp-002">EMP-002</a>  &mdash; <i>Select venue &amp; role</i><br><a href="#emp-003">EMP-003</a>  &mdash; <i>Home — on duty</i></div>
           
           <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formPublishAnnouncement &middot; <i>Publish announcement</i> &middot; <b>Publish announcement</b> &middot; Cancel <span class="dis">discards title · body · kind · publishedAt · id · venueIds · departmentIds · roleIds · requiresAcknowledgement · expiresAt · publishedByPrincipalId · locale</span></div></div>
@@ -1846,9 +1846,9 @@ border-radius:9px;font:800 13px/1.5 Manrope,system-ui,sans-serif;letter-spacing:
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; getStockPositions · listStockMovements</div>
+          <div><b>OPERATIONS</b> &middot; getStockPositions · listStockMovements · getKpiValues · getDashboard +2</div>
           <div><b>STATES</b> &middot; <span class="warn">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess · offline</span></div>
-          <div><b>ARRIVES WITH</b> &middot; venueId&larr;session</div>
+          <div><b>ARRIVES WITH</b> &middot; venueId&larr;session, alertId&larr;navigation, dashboardId&larr;navigation</div>
           <div><b>GOES TO</b> &middot; nothing declared</div>
           
           
@@ -3106,7 +3106,7 @@ border-radius:9px;font:800 13px/1.5 Manrope,system-ui,sans-serif;letter-spacing:
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; listScans · syncScans · getOfflinePackage · lookupTicket +5</div>
+          <div><b>OPERATIONS</b> &middot; listScans · syncScans · getOfflinePackage · lookupTicket +6</div>
           <div><b>STATES</b> &middot; <span class="warn">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess · offline · admitted</span></div>
           <div><b>ARRIVES WITH</b> &middot; mediaCode&larr;deepLink, rightId&larr;deepLink</div>
           <div><b>GOES TO</b> &middot; <a href="#scn-001">SCN-001</a>  &mdash; <i>Sign in</i><br><a href="#scn-002">SCN-002</a>  &mdash; <i>Access point &amp; direction</i> <span class="car">accessPointId</span><br><a href="#scn-003">SCN-003</a>  &mdash; <i>Ready to scan</i> <span class="car">mediaCode · rightId</span><br><a href="#scn-007">SCN-007</a>  &mdash; <i>A school party of forty arrives on one booki</i><br><a href="#scn-008">SCN-008</a> <br><a href="#scn-009">SCN-009</a> <br><a href="#scn-011">SCN-011</a>  &mdash; <i>Delegated right</i> <span class="car">rightId</span><br><a href="#scn-014">SCN-014</a>  &mdash; <i>Syncs the journal when signal returns</i></div>

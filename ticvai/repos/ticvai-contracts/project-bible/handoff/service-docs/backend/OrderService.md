@@ -7,7 +7,7 @@
 | Tier | commerce: The sale path. Highest availability, highest write rate. |
 | Contracts | `orders`, `shift`, `payments` |
 | Schemas owned | `orders`, `payments` |
-| Operations in the slice | 80 of 277 |
+| Operations in the slice | 83 of 287 |
 | Scale | Write-heavy, spiky, latency-critical. The one that autoscales. |
 | If it is down | Down means no sales. Highest availability target in the platform. |
 
@@ -28,7 +28,7 @@
 | [AccessService](AccessService.md) | `access.entitlement`, `access.scan_event` |
 | [CatalogueService](CatalogueService.md) | `catalogue.channel_capacity`, `catalogue.entitlement_template`, `catalogue.group_package`, `catalogue.inventory_hold`, `catalogue.performance`, `catalogue.product`, `catalogue.variant`, `promotions.promotion` |
 | [IdentityService](IdentityService.md) | `identity.delegated_access`, `identity.principal`, `pii.subject` |
-| [LedgerService](LedgerService.md) | `ledger.fx_rate`, `ledger.posting` |
+| [LedgerService](LedgerService.md) | `ledger.fx_rate`, `ledger.posting`, `ledger.tax_invoice_line` |
 | [MarketingService](MarketingService.md) | `marketing.consent_question`, `marketing.consent_question_version`, `marketing.consent_record` |
 | [TenancyService](TenancyService.md) | `platform.denomination`, `platform.region_settings`, `platform.scope`, `platform.venue_settings`, `platform.workstation` |
 
@@ -89,7 +89,10 @@
 | payment | [`capturePayment`](#capturepayment) | POST | `/payments/{paymentId}/capture` | core | 1 | BO-024, EMP-035, POS-005, PTR-012 |
 | payment | [`createPayment`](#createpayment) | POST | `/payments` | core | 1 | BO-024, EMP-035, EMP-059, GST-009, GST-026, GST-027 … |
 | payment | [`inquirePaymentStatus`](#inquirepaymentstatus) | POST | `/payments/{paymentId}/inquiry` | core | 1 | ADM-595, ADM-597, ADM-615, BO-024, EMP-035, GST-009 … |
+| payments | [`createInstalmentPlan`](#createinstalmentplan) | POST | `/instalment-plans` | core | 2 | BO-324, GST-015, WEB-023 |
 | payments | [`createPaymentProviderConnection`](#createpaymentproviderconnection) | POST | `/payment-providers` | setup | 1 | ADM-570, ADM-571 |
+| payments | [`listInstalmentPlans`](#listinstalmentplans) | GET | `/instalment-plans` | core | 2 | BO-324, GST-015, WEB-023 |
+| payments | [`setInstalmentPolicy`](#setinstalmentpolicy) | PUT | `/instalment-policy` | setup | 2 | ADM-603 |
 | policy | [`setRefundPolicy`](#setrefundpolicy) | PUT | `/venues/{venueId}/refund-policy` | setup | 1 | ADM-611, BO-062, BO-065, BO-1146, BO-318 |
 | refund | [`createRefund`](#createrefund) | POST | `/orders/{orderId}/refunds` | core | 1 | ADM-616, BO-022, BO-023, BO-026, BO-047, BO-1147 … |
 | refund | [`createRefundRequest`](#createrefundrequest) | POST | `/refund-requests` | core | 1 | ADM-610, BO-028, GST-067, WEB-019 |
@@ -161,6 +164,7 @@ Distinct from expiry: this is a decision, and the recovery campaign must not cha
 **The window is 15 minutes** (decided 28 September, audit R169): the cart lease is acquired for 900 seconds unless the venue sets otherwise, and `extendCart` adds to it.
 **Parking is sold here like any other line** (decided 28 September, audit R166). A parking product goes through the cart and `checkoutCart`, so the parking entitlement is issued at payment carrying this order's id. There is no live space count in the first release: a car park at its capacity refuses the line with `soldOutForDay`.
 **Refused rather than added where capacity has gone.** A line added optimistically and removed at checkout is a guest who thinks they bought something.
+**A line added from a recommendation carries its `recommendationId`** (29 September, build; AI system design 2.2 A step 8): the `trackingId` of the ai `decideRecommendations` item, kept on the cart line and the order line so the purchase is attributed rather than guessed.
 **An hourly product carries its booked window** (decided 29 September, rev 3 REV3-13). A meeting room is a product with a `length` variant, and the line sends `bookedWindow` `{startsAt, endsAt}`, which must span exactly the variant's length. The lease holds capacity of that room type for the window; the room is picked at checkout by `resources.allocateResources`.
 **A table deposit is a line only where the venue enabled one** (decided 29 September, rev 3 REV3-8b and REV3-8). The line names the booking in `tableReservationId` and is priced from its deposit; a table booking with no deposit is confirmed by `fnb.createTableReservation` and never added here.
 **A resource picked on a venue map is a line carrying its hold** (decided 29 September, rev 3 REV3-15 and GAP-C2). The guest held cabana B09 with `resources.createResourceHold`; the line sends `resourceHoldId` with `variantId` = the placed resource's price-band variant (for the Coastal Aqua cabanas: Family 6, Medium 10, Large 15, XL 20) and `quantity` 1. **The hold is the capacity**: no catalogue inventory hold is taken and `catalogue.getAvailability` is not consulted for this line, and the line's `leaseExpiresAt` is the hold's `expiresAt`, so the one countdown the guest sees (audit R169) is the hold's. A hold that has expired, been converted or released, or is not the caller's is refused 409 `resourceHoldInvalid`.
@@ -199,6 +203,7 @@ Returns the cart with any conflicts the addition created (2.9.5) — golf at 13:
 | bookedWindow | BookedWindow |  | The booked time window of an hourly product, such as a meeting room (decided 29 September, rev 3 REV3-13: meeting rooms by the hour are in scope). (nullable) |
 | bookedWindow.startsAt | string (date-time) | yes |  |
 | bookedWindow.endsAt | string (date-time) | yes | After startsAt, on the same venue day. |
+| recommendationId | string (uuid) |  | The trackingId of the ai decideRecommendations item this line came from (29 September, build, AI system design 2.2 A step 8), so a purchase is attributed to the recommendation that led to it rather t… (nullable) |
 | tableReservationId | string (uuid) |  | A table deposit line (decided 29 September, rev 3 REV3-8b): the fnb.TableReservation in awaitingDeposit this pays for, sent with variantId set to the booking's deposit.variantId and quantity 1. (nullable) |
 | seatIds | array of string |  | At most VenueSettings.seating.maxSeatsPerGuestOrder seats per booking on a guest channel (default 10, bounds 1 to 50, decided 29 September, rev 3 REV3-7); at most 10 per sale on staff and POS (audit… (max items 50) |
 | resourceHoldId | string |  | A resources.ResourceHold on a resource the guest picked on a venue map (decided 29 September, rev 3 REV3-15); variantId is the placed resource's price-band variant and quantity is 1. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$; nullable) |
@@ -231,6 +236,7 @@ Returns the cart with any conflicts the addition created (2.9.5) — golf at 13:
 | lines[].bookedWindow | BookedWindow |  | The booked time window of an hourly product, such as a meeting room (decided 29 September, rev 3 REV3-13: meeting rooms by the hour are in scope). (nullable) |
 | lines[].bookedWindow.startsAt | string (date-time) | yes |  |
 | lines[].bookedWindow.endsAt | string (date-time) | yes | After startsAt, on the same venue day. |
+| lines[].recommendationId | string (uuid) |  | The trackingId of the ai decideRecommendations item this line came from (29 September, build, AI system design 2.2 A step 8), so a purchase is attributed to the recommendation that led to it rather t… (nullable) |
 | lines[].tableReservationId | string (uuid) |  | Set on a table deposit line only (decided 29 September, rev 3 REV3-8b): the fnb.TableReservation this line secures. (nullable) |
 | lines[].seatIds | array of string |  | (max items 50) |
 | lines[].resourceHoldId | string |  | The resources.ResourceHold this line buys (decided 29 September, rev 3 REV3-15). (pattern ^[0-9A-HJKMNP-TV-Z]{26}$; nullable) |
@@ -358,6 +364,7 @@ Applying a code the cart already holds returns the cart unchanged.
 | lines[].bookedWindow | BookedWindow |  | The booked time window of an hourly product, such as a meeting room (decided 29 September, rev 3 REV3-13: meeting rooms by the hour are in scope). (nullable) |
 | lines[].bookedWindow.startsAt | string (date-time) | yes |  |
 | lines[].bookedWindow.endsAt | string (date-time) | yes | After startsAt, on the same venue day. |
+| lines[].recommendationId | string (uuid) |  | The trackingId of the ai decideRecommendations item this line came from (29 September, build, AI system design 2.2 A step 8), so a purchase is attributed to the recommendation that led to it rather t… (nullable) |
 | lines[].tableReservationId | string (uuid) |  | Set on a table deposit line only (decided 29 September, rev 3 REV3-8b): the fnb.TableReservation this line secures. (nullable) |
 | lines[].seatIds | array of string |  | (max items 50) |
 | lines[].resourceHoldId | string |  | The resources.ResourceHold this line buys (decided 29 September, rev 3 REV3-15). (pattern ^[0-9A-HJKMNP-TV-Z]{26}$; nullable) |
@@ -448,6 +455,8 @@ The cart is retained, not deleted — a checkout that fails at payment must be r
 **Consent questions are answered before the order exists** (decided 29 September, rev 3 REV3-26). While a required question in `Cart.consentQuestions` has no answer the call is refused 422 `consentRequired`; where an answer is the one the venue set to block the booking it is refused 422 `consentAnswerBlocks`, naming the lines. On success the answers are bound to the new order, so each consent record names the order and line it was given for.
 **A table deposit line becomes an `orders.deposit` row, not revenue** (rev 3 REV3-8b): authorised or taken as `DepositPolicy.dining.collection` says, with the booking's id, and the booking moves from `awaitingDeposit` to `booked` when the payment is authorised. **A booked window is carried to the order line** (rev 3 REV3-13) and `resources.allocateResources` assigns the room for it.
 **A line carrying `resourceHoldId` keeps its hold into the order** (rev 3 REV3-15): the hold is converted to a `ResourceBooking` as `createOrder` describes, never released and re-taken. An expired hold is refused 409 `resourceHoldInvalid`, naming the line. **A transport line keeps its `attributes.transport`** on the order line (rev 3 REV3-21), so the ticket shows the route, the stations and the departure.
+**Transaction risk before the charge** (29 September, build; AI system design 2.2 B). After the orders `FraudRule` charge rules, checkout calls ai `scoreTransactionRisk` (service audience, 80 ms timeout) with the order id, amount, channel, product mix, payment token reference (never card data), hashed device id, account, subject and attempt number, and (29 September, build pass, group G2, from group G1's handoff; 8.3.8, 8.3.40) `ipHash` and `ipCountry` computed at the edge from the caller's address (the address itself is not passed) and `sessionRef`, the storefront session the checkout came from, which joins the browsing in `storefront.sessionEvent`. `allow` and `monitor` proceed; `stepUp` asks for 3-D Secure through Payments; `holdForReview` takes the same hold a `FraudRule` `hold` takes, so the order waits for review and is not declined. **On a timeout or an error checkout proceeds on its own rules** (fail-open); a tenant set to fail closed holds, and never declines.
+**A line's `recommendationId` is carried to the order line** (design 2.2 A step 8), so `order.completed` attributes the purchase to the recommendation it came from.
 
 |  |  |
 |---|---|
@@ -457,7 +466,7 @@ The cart is retained, not deleted — a checkout that fails at payment must be r
 | Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
-| Reads | `cache:idempotency`, `catalogue.inventory_hold`, `embedded as attributes (jsonb) on orders.cart_line and orders.order_line`, `embedded as window_starts_at and window_ends_at on orders.cart_line and orders.order_line`, `orders.cart`, `orders.cart_line`, `orders.order_line`, `orders.order_line_eligibility`, `orders.payment`, `orders.sales_order` |
+| Reads | `cache:idempotency`, `catalogue.inventory_hold`, `embedded as attributes (jsonb) on orders.cart_line and orders.order_line`, `embedded as window_starts_at and window_ends_at on orders.cart_line and orders.order_line`, `orders.cart`, `orders.cart_line`, `orders.fraud_rule`, `orders.order_line`, `orders.order_line_eligibility`, `orders.payment`, `orders.sales_order` |
 | Writes | `cache:idempotency`, `orders.cart`, `orders.order_line`, `orders.sales_order` |
 | Called by | GST-009, GST-026, GST-027, GST-032, GST-041, KSK-006, PTR-010, WEB-010, WEB-033, WEB-041, WEB-042 |
 | State model | Cart ([states/cart.yaml](../../../states/cart.yaml)): moves `active` -> `checkedOut`, `expiring` -> `checkedOut`<br/>Order ([states/order.yaml](../../../states/order.yaml)): created as `pending` |
@@ -517,6 +526,7 @@ The cart is retained, not deleted — a checkout that fails at payment must be r
 | lines | array of OrderLine | yes |  |
 | lines[].id | string | yes | Client-generated ULID of the line. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
 | lines[].variantId | string (uuid) | yes |  |
+| lines[].recommendationId | string (uuid) |  | The trackingId of the ai decideRecommendations item this line came from (29 September, build, AI system design 2.2 A step 8), so a purchase is attributed to the recommendation that led to it rather t… (nullable) |
 | lines[].performanceId | string (uuid) |  |  |
 | lines[].bookedWindow | BookedWindow |  | The booked time window of an hourly product, such as a meeting room (decided 29 September, rev 3 REV3-13: meeting rooms by the hour are in scope). (nullable) |
 | lines[].bookedWindow.startsAt | string (date-time) | yes |  |
@@ -651,6 +661,7 @@ Where the guest already has a cart, the two **merge rather than one replacing th
 | cart.lines[].quantity | integer | yes | (min 1) |
 | cart.lines[].performanceId | string (uuid) |  | (nullable) |
 | cart.lines[].bookedWindow | BookedWindow |  | The booked time window of an hourly product, such as a meeting room (decided 29 September, rev 3 REV3-13: meeting rooms by the hour are in scope). (nullable) |
+| cart.lines[].recommendationId | string (uuid) |  | The trackingId of the ai decideRecommendations item this line came from (29 September, build, AI system design 2.2 A step 8), so a purchase is attributed to the recommendation that led to it rather t… (nullable) |
 | cart.lines[].tableReservationId | string (uuid) |  | Set on a table deposit line only (decided 29 September, rev 3 REV3-8b): the fnb.TableReservation this line secures. (nullable) |
 | cart.lines[].seatIds | array of string |  | (max items 50) |
 | cart.lines[].resourceHoldId | string |  | The resources.ResourceHold this line buys (decided 29 September, rev 3 REV3-15). (pattern ^[0-9A-HJKMNP-TV-Z]{26}$; nullable) |
@@ -773,6 +784,7 @@ Created against a guest subject where one is known, or an anonymous token where 
 | lines[].bookedWindow | BookedWindow |  | The booked time window of an hourly product, such as a meeting room (decided 29 September, rev 3 REV3-13: meeting rooms by the hour are in scope). (nullable) |
 | lines[].bookedWindow.startsAt | string (date-time) | yes |  |
 | lines[].bookedWindow.endsAt | string (date-time) | yes | After startsAt, on the same venue day. |
+| lines[].recommendationId | string (uuid) |  | The trackingId of the ai decideRecommendations item this line came from (29 September, build, AI system design 2.2 A step 8), so a purchase is attributed to the recommendation that led to it rather t… (nullable) |
 | lines[].tableReservationId | string (uuid) |  | Set on a table deposit line only (decided 29 September, rev 3 REV3-8b): the fnb.TableReservation this line secures. (nullable) |
 | lines[].seatIds | array of string |  | (max items 50) |
 | lines[].resourceHoldId | string |  | The resources.ResourceHold this line buys (decided 29 September, rev 3 REV3-15). (pattern ^[0-9A-HJKMNP-TV-Z]{26}$; nullable) |
@@ -893,6 +905,7 @@ Offered once, typically, and the interface should say it is the last extension r
 | lines[].bookedWindow | BookedWindow |  | The booked time window of an hourly product, such as a meeting room (decided 29 September, rev 3 REV3-13: meeting rooms by the hour are in scope). (nullable) |
 | lines[].bookedWindow.startsAt | string (date-time) | yes |  |
 | lines[].bookedWindow.endsAt | string (date-time) | yes | After startsAt, on the same venue day. |
+| lines[].recommendationId | string (uuid) |  | The trackingId of the ai decideRecommendations item this line came from (29 September, build, AI system design 2.2 A step 8), so a purchase is attributed to the recommendation that led to it rather t… (nullable) |
 | lines[].tableReservationId | string (uuid) |  | Set on a table deposit line only (decided 29 September, rev 3 REV3-8b): the fnb.TableReservation this line secures. (nullable) |
 | lines[].seatIds | array of string |  | (max items 50) |
 | lines[].resourceHoldId | string |  | The resources.ResourceHold this line buys (decided 29 September, rev 3 REV3-15). (pattern ^[0-9A-HJKMNP-TV-Z]{26}$; nullable) |
@@ -1012,6 +1025,7 @@ Returns the conflicts (2.9.5) and the leases with their remaining time, so the i
 | lines[].bookedWindow | BookedWindow |  | The booked time window of an hourly product, such as a meeting room (decided 29 September, rev 3 REV3-13: meeting rooms by the hour are in scope). (nullable) |
 | lines[].bookedWindow.startsAt | string (date-time) | yes |  |
 | lines[].bookedWindow.endsAt | string (date-time) | yes | After startsAt, on the same venue day. |
+| lines[].recommendationId | string (uuid) |  | The trackingId of the ai decideRecommendations item this line came from (29 September, build, AI system design 2.2 A step 8), so a purchase is attributed to the recommendation that led to it rather t… (nullable) |
 | lines[].tableReservationId | string (uuid) |  | Set on a table deposit line only (decided 29 September, rev 3 REV3-8b): the fnb.TableReservation this line secures. (nullable) |
 | lines[].seatIds | array of string |  | (max items 50) |
 | lines[].resourceHoldId | string |  | The resources.ResourceHold this line buys (decided 29 September, rev 3 REV3-15). (pattern ^[0-9A-HJKMNP-TV-Z]{26}$; nullable) |
@@ -1131,6 +1145,7 @@ Releases its lease immediately.
 | lines[].bookedWindow | BookedWindow |  | The booked time window of an hourly product, such as a meeting room (decided 29 September, rev 3 REV3-13: meeting rooms by the hour are in scope). (nullable) |
 | lines[].bookedWindow.startsAt | string (date-time) | yes |  |
 | lines[].bookedWindow.endsAt | string (date-time) | yes | After startsAt, on the same venue day. |
+| lines[].recommendationId | string (uuid) |  | The trackingId of the ai decideRecommendations item this line came from (29 September, build, AI system design 2.2 A step 8), so a purchase is attributed to the recommendation that led to it rather t… (nullable) |
 | lines[].tableReservationId | string (uuid) |  | Set on a table deposit line only (decided 29 September, rev 3 REV3-8b): the fnb.TableReservation this line secures. (nullable) |
 | lines[].seatIds | array of string |  | (max items 50) |
 | lines[].resourceHoldId | string |  | The resources.ResourceHold this line buys (decided 29 September, rev 3 REV3-15). (pattern ^[0-9A-HJKMNP-TV-Z]{26}$; nullable) |
@@ -1256,6 +1271,7 @@ Increasing extends the lease and may fail on capacity; decreasing releases part 
 | lines[].bookedWindow | BookedWindow |  | The booked time window of an hourly product, such as a meeting room (decided 29 September, rev 3 REV3-13: meeting rooms by the hour are in scope). (nullable) |
 | lines[].bookedWindow.startsAt | string (date-time) | yes |  |
 | lines[].bookedWindow.endsAt | string (date-time) | yes | After startsAt, on the same venue day. |
+| lines[].recommendationId | string (uuid) |  | The trackingId of the ai decideRecommendations item this line came from (29 September, build, AI system design 2.2 A step 8), so a purchase is attributed to the recommendation that led to it rather t… (nullable) |
 | lines[].tableReservationId | string (uuid) |  | Set on a table deposit line only (decided 29 September, rev 3 REV3-8b): the fnb.TableReservation this line secures. (nullable) |
 | lines[].seatIds | array of string |  | (max items 50) |
 | lines[].resourceHoldId | string |  | The resources.ResourceHold this line buys (decided 29 September, rev 3 REV3-15). (pattern ^[0-9A-HJKMNP-TV-Z]{26}$; nullable) |
@@ -1706,6 +1722,7 @@ The media is the join, not the order. That is why this operation is keyed on `me
 | order.lines | array of OrderLine | yes |  |
 | order.lines[].id | string | yes | Client-generated ULID of the line. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
 | order.lines[].variantId | string (uuid) | yes |  |
+| order.lines[].recommendationId | string (uuid) |  | The trackingId of the ai decideRecommendations item this line came from (29 September, build, AI system design 2.2 A step 8), so a purchase is attributed to the recommendation that led to it rather t… (nullable) |
 | order.lines[].performanceId | string (uuid) |  |  |
 | order.lines[].bookedWindow | BookedWindow |  | The booked time window of an hourly product, such as a meeting room (decided 29 September, rev 3 REV3-13: meeting rooms by the hour are in scope). (nullable) |
 | order.lines[].inventoryHoldId | string |  | Lease the units were drawn from — a catalogue.InventoryHold.id. (nullable) |
@@ -1862,6 +1879,7 @@ Posts to a discount account, never as a price change. A line sold at a reduced p
 | lines | array of OrderLine | yes |  |
 | lines[].id | string | yes | Client-generated ULID of the line. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
 | lines[].variantId | string (uuid) | yes |  |
+| lines[].recommendationId | string (uuid) |  | The trackingId of the ai decideRecommendations item this line came from (29 September, build, AI system design 2.2 A step 8), so a purchase is attributed to the recommendation that led to it rather t… (nullable) |
 | lines[].performanceId | string (uuid) |  |  |
 | lines[].bookedWindow | BookedWindow |  | The booked time window of an hourly product, such as a meeting room (decided 29 September, rev 3 REV3-13: meeting rooms by the hour are in scope). (nullable) |
 | lines[].bookedWindow.startsAt | string (date-time) | yes |  |
@@ -1963,7 +1981,7 @@ Posts to a discount account, never as a price change. A line sold at a reduced p
 | Offline | no |
 | Conflict policy | serverWins |
 | Reads | `access.entitlement`, `cache:idempotency`, `orders.ticket_transfer` |
-| Writes | `access.entitlement`, `cache:idempotency`, `orders.ticket_transfer` |
+| Writes | `access.entitlement`, `cache:idempotency`, `orders.ticket_transfer`, `platform.outbox` |
 | Called by | GST-014, WEB-030 |
 | State model | Ticket transfer ([states/ticket-transfer.yaml](../../../states/ticket-transfer.yaml)): moves `offered` -> `claimed` |
 
@@ -2049,6 +2067,7 @@ Offline-capable. The client writes to its local journal, acknowledges the cashie
 | lines | array of CreateOrderLine | yes | (min items 1) |
 | lines[].id | string | yes | Client-generated ULID of the line. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
 | lines[].variantId | string (uuid) | yes |  |
+| lines[].recommendationId | string (uuid) |  | The trackingId of the ai decideRecommendations item this line came from (29 September, build, AI system design 2.2 A step 8), so a purchase is attributed to the recommendation that led to it rather t… (nullable) |
 | lines[].performanceId | string (uuid) |  |  |
 | lines[].bookedWindow | BookedWindow |  | The booked time window of an hourly product, such as a meeting room (decided 29 September, rev 3 REV3-13: meeting rooms by the hour are in scope). (nullable) |
 | lines[].bookedWindow.startsAt | string (date-time) | yes |  |
@@ -2112,6 +2131,7 @@ Offline-capable. The client writes to its local journal, acknowledges the cashie
 | lines | array of OrderLine | yes |  |
 | lines[].id | string | yes | Client-generated ULID of the line. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
 | lines[].variantId | string (uuid) | yes |  |
+| lines[].recommendationId | string (uuid) |  | The trackingId of the ai decideRecommendations item this line came from (29 September, build, AI system design 2.2 A step 8), so a purchase is attributed to the recommendation that led to it rather t… (nullable) |
 | lines[].performanceId | string (uuid) |  |  |
 | lines[].bookedWindow | BookedWindow |  | The booked time window of an hourly product, such as a meeting room (decided 29 September, rev 3 REV3-13: meeting rooms by the hour are in scope). (nullable) |
 | lines[].bookedWindow.startsAt | string (date-time) | yes |  |
@@ -2221,7 +2241,7 @@ The replacement is held before the original is released, never the other way rou
 | Offline | no |
 | Conflict policy | serverWins |
 | Reads | `cache:idempotency`, `orders.sales_order` |
-| Writes | `cache:idempotency`, `embedded as attributes (jsonb) on orders.cart_line and orders.order_line`, `embedded as window_starts_at and window_ends_at on orders.cart_line and orders.order_line`, `orders.order_event`, `orders.sales_order` |
+| Writes | `cache:idempotency`, `embedded as attributes (jsonb) on orders.cart_line and orders.order_line`, `embedded as window_starts_at and window_ends_at on orders.cart_line and orders.order_line`, `orders.order_event`, `orders.sales_order`, `platform.outbox` |
 | Called by | BO-022, BO-023, BO-026, BO-047, EMP-014, EMP-034, POS-002, POS-006, POS-010, POS-011, PTR-002, PTR-005, PTR-008, PTR-015, PTR-016 |
 
 **Parameters**
@@ -2240,6 +2260,7 @@ The replacement is held before the original is released, never the other way rou
 | incomingLines | array of CreateOrderLine | yes | (min items 1) |
 | incomingLines[].id | string | yes | Client-generated ULID of the line. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
 | incomingLines[].variantId | string (uuid) | yes |  |
+| incomingLines[].recommendationId | string (uuid) |  | The trackingId of the ai decideRecommendations item this line came from (29 September, build, AI system design 2.2 A step 8), so a purchase is attributed to the recommendation that led to it rather t… (nullable) |
 | incomingLines[].performanceId | string (uuid) |  |  |
 | incomingLines[].bookedWindow | BookedWindow |  | The booked time window of an hourly product, such as a meeting room (decided 29 September, rev 3 REV3-13: meeting rooms by the hour are in scope). (nullable) |
 | incomingLines[].bookedWindow.startsAt | string (date-time) | yes |  |
@@ -2417,6 +2438,7 @@ Scanned at a counter before adding something. Shows what the guest holds so a ca
 | lines | array of OrderLine | yes |  |
 | lines[].id | string | yes | Client-generated ULID of the line. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
 | lines[].variantId | string (uuid) | yes |  |
+| lines[].recommendationId | string (uuid) |  | The trackingId of the ai decideRecommendations item this line came from (29 September, build, AI system design 2.2 A step 8), so a purchase is attributed to the recommendation that led to it rather t… (nullable) |
 | lines[].performanceId | string (uuid) |  |  |
 | lines[].bookedWindow | BookedWindow |  | The booked time window of an hourly product, such as a meeting room (decided 29 September, rev 3 REV3-13: meeting rooms by the hour are in scope). (nullable) |
 | lines[].bookedWindow.startsAt | string (date-time) | yes |  |
@@ -2728,6 +2750,7 @@ Held orders expire. A till that accumulates parked sales across a shift cannot b
 | lines | array of OrderLine | yes |  |
 | lines[].id | string | yes | Client-generated ULID of the line. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
 | lines[].variantId | string (uuid) | yes |  |
+| lines[].recommendationId | string (uuid) |  | The trackingId of the ai decideRecommendations item this line came from (29 September, build, AI system design 2.2 A step 8), so a purchase is attributed to the recommendation that led to it rather t… (nullable) |
 | lines[].performanceId | string (uuid) |  |  |
 | lines[].bookedWindow | BookedWindow |  | The booked time window of an hourly product, such as a meeting room (decided 29 September, rev 3 REV3-13: meeting rooms by the hour are in scope). (nullable) |
 | lines[].bookedWindow.startsAt | string (date-time) | yes |  |
@@ -2915,6 +2938,7 @@ Lines whose entitlement has been redeemed cannot be removed. The guest has used 
 | addLines | array of CreateOrderLine |  |  |
 | addLines[].id | string | yes | Client-generated ULID of the line. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
 | addLines[].variantId | string (uuid) | yes |  |
+| addLines[].recommendationId | string (uuid) |  | The trackingId of the ai decideRecommendations item this line came from (29 September, build, AI system design 2.2 A step 8), so a purchase is attributed to the recommendation that led to it rather t… (nullable) |
 | addLines[].performanceId | string (uuid) |  |  |
 | addLines[].bookedWindow | BookedWindow |  | The booked time window of an hourly product, such as a meeting room (decided 29 September, rev 3 REV3-13: meeting rooms by the hour are in scope). (nullable) |
 | addLines[].bookedWindow.startsAt | string (date-time) | yes |  |
@@ -2981,6 +3005,7 @@ Lines whose entitlement has been redeemed cannot be removed. The guest has used 
 | order.lines | array of OrderLine | yes |  |
 | order.lines[].id | string | yes | Client-generated ULID of the line. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
 | order.lines[].variantId | string (uuid) | yes |  |
+| order.lines[].recommendationId | string (uuid) |  | The trackingId of the ai decideRecommendations item this line came from (29 September, build, AI system design 2.2 A step 8), so a purchase is attributed to the recommendation that led to it rather t… (nullable) |
 | order.lines[].performanceId | string (uuid) |  |  |
 | order.lines[].bookedWindow | BookedWindow |  | The booked time window of an hourly product, such as a meeting room (decided 29 September, rev 3 REV3-13: meeting rooms by the hour are in scope). (nullable) |
 | order.lines[].inventoryHoldId | string |  | Lease the units were drawn from — a catalogue.InventoryHold.id. (nullable) |
@@ -3241,6 +3266,7 @@ Prices are re-evaluated. Where a price, a promotion or an availability has moved
 | order.lines | array of OrderLine | yes |  |
 | order.lines[].id | string | yes | Client-generated ULID of the line. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
 | order.lines[].variantId | string (uuid) | yes |  |
+| order.lines[].recommendationId | string (uuid) |  | The trackingId of the ai decideRecommendations item this line came from (29 September, build, AI system design 2.2 A step 8), so a purchase is attributed to the recommendation that led to it rather t… (nullable) |
 | order.lines[].performanceId | string (uuid) |  |  |
 | order.lines[].bookedWindow | BookedWindow |  | The booked time window of an hourly product, such as a meeting room (decided 29 September, rev 3 REV3-13: meeting rooms by the hour are in scope). (nullable) |
 | order.lines[].inventoryHoldId | string |  | Lease the units were drawn from — a catalogue.InventoryHold.id. (nullable) |
@@ -3445,7 +3471,7 @@ Only before settlement and only within the same shift. After that it is a refund
 | Offline | yes |
 | Conflict policy | append |
 | Reads | `cache:idempotency`, `embedded as attributes (jsonb) on orders.cart_line and orders.order_line`, `embedded as window_starts_at and window_ends_at on orders.cart_line and orders.order_line`, `orders.order_line`, `orders.order_line_eligibility`, `orders.payment`, `orders.sales_order` |
-| Writes | `cache:idempotency`, `orders.order_event`, `orders.order_line`, `orders.payment`, `orders.sales_order` |
+| Writes | `cache:idempotency`, `orders.order_event`, `orders.order_line`, `orders.payment`, `orders.sales_order`, `platform.outbox` |
 | Called by | BO-022, BO-023, BO-026, BO-047, BO-319, EMP-014, EMP-034, POS-002, POS-006, POS-014, PTR-002, PTR-005, PTR-008, PTR-015, PTR-016 |
 | State model | Order ([states/order.yaml](../../../states/order.yaml)): moves `pending` -> `voided` |
 
@@ -3504,6 +3530,7 @@ Only before settlement and only within the same shift. After that it is a refund
 | lines | array of OrderLine | yes |  |
 | lines[].id | string | yes | Client-generated ULID of the line. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
 | lines[].variantId | string (uuid) | yes |  |
+| lines[].recommendationId | string (uuid) |  | The trackingId of the ai decideRecommendations item this line came from (29 September, build, AI system design 2.2 A step 8), so a purchase is attributed to the recommendation that led to it rather t… (nullable) |
 | lines[].performanceId | string (uuid) |  |  |
 | lines[].bookedWindow | BookedWindow |  | The booked time window of an hourly product, such as a meeting room (decided 29 September, rev 3 REV3-13: meeting rooms by the hour are in scope). (nullable) |
 | lines[].bookedWindow.startsAt | string (date-time) | yes |  |
@@ -3613,7 +3640,7 @@ Refuses where the entitlement is partly consumed, name-bound, or past its resale
 | Conflict policy | serverWins |
 | Guest callable | True |
 | Reads | `access.entitlement`, `cache:idempotency`, `catalogue.entitlement_template`, `orders.resale_listing`, `orders.sales_order` |
-| Writes | `cache:idempotency`, `orders.resale_listing` |
+| Writes | `cache:idempotency`, `orders.resale_listing`, `platform.outbox` |
 | Called by | GST-067, WEB-030 |
 | State model | Resale listing ([states/resale-listing.yaml](../../../states/resale-listing.yaml)): created as `listed` or `pendingReview`; moves `pendingReview` -> `withdrawn`, `listed` -> `reserved`, `reserved` -> `sold`, `reserved` -> `listed`, `listed` -> `withdrawn` **(not settled: see the Gaps sheet)** |
 
@@ -3747,7 +3774,7 @@ BL-100. **The lines are the point.** A total with no breakdown is what a guest r
 | Offline | no |
 | Conflict policy | serverWins |
 | Read routing | replica |
-| Reads | `orders.payment`, `payments.dunning_case`, `orders.sales_order` |
+| Reads | `ledger.tax_invoice_line`, `orders.payment`, `orders.sales_order`, `payments.dunning_case` |
 | Writes | - |
 | Called by | GST-015, WEB-023 |
 
@@ -3756,6 +3783,8 @@ BL-100. **The lines are the point.** A total with no breakdown is what a guest r
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
 | statementId | path | yes | string (uuid) |  |
+| format | query |  | enum (json, pdf) | 2.14.23. |
+| language | query |  | string |  |
 
 **Response**: `BillingStatement`
 
@@ -3773,11 +3802,34 @@ BL-100. **The lines are the point.** A total with no breakdown is what a guest r
 | lines[].amount.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
 | lines[].amount.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
 | lines[].description | string |  |  |
+| lines[].netAmount | Money |  | On the wire this is three fields; in the database it is one column. |
+| lines[].netAmount.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
+| lines[].netAmount.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
+| lines[].netAmount.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| lines[].discountAmount | Money |  | On the wire this is three fields; in the database it is one column. |
+| lines[].discountAmount.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
+| lines[].discountAmount.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
+| lines[].discountAmount.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| lines[].taxAmount | Money |  | On the wire this is three fields; in the database it is one column. |
+| lines[].taxAmount.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
+| lines[].taxAmount.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
+| lines[].taxAmount.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| lines[].taxRate | number |  | 2.14.23. (nullable) |
+| lines[].taxInvoiceId | string (uuid) |  | The finance tax invoice issued for this charge, where one was (issueTaxInvoice); the guest downloads it with getTaxDocumentRendition. (nullable) |
 | lines[].declineClass | string |  | Present on failedAttempt only, and it is what turns *"your payment failed"* into something a guest can act on: a soft decline means try again, a hard one means the card needs replacing. (nullable) |
 | total | Money | yes | On the wire this is three fields; in the database it is one column. |
 | total.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
 | total.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
 | total.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| taxTotal | Money |  | On the wire this is three fields; in the database it is one column. |
+| taxTotal.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
+| taxTotal.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
+| taxTotal.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| discountTotal | Money |  | On the wire this is three fields; in the database it is one column. |
+| discountTotal.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
+| discountTotal.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
+| discountTotal.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| pdfUrl | string (uri) |  | Set when getBillingStatement is called with format=pdf; a short-lived link. (read-only; nullable) |
 | isTaxInvoice | boolean | yes | Always false, and stated rather than assumed. (default False; read-only) |
 
 **Responses**
@@ -3885,6 +3937,7 @@ Returns the lines, the total and the deadline. **Never the guest's other orders*
 | lines | array of OrderLine |  |  |
 | lines[].id | string | yes | Client-generated ULID of the line. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
 | lines[].variantId | string (uuid) | yes |  |
+| lines[].recommendationId | string (uuid) |  | The trackingId of the ai decideRecommendations item this line came from (29 September, build, AI system design 2.2 A step 8), so a purchase is attributed to the recommendation that led to it rather t… (nullable) |
 | lines[].performanceId | string (uuid) |  |  |
 | lines[].bookedWindow | BookedWindow |  | The booked time window of an hourly product, such as a meeting room (decided 29 September, rev 3 REV3-13: meeting rooms by the hour are in scope). (nullable) |
 | lines[].bookedWindow.startsAt | string (date-time) | yes |  |
@@ -4042,11 +4095,25 @@ BL-029. **A wallet pass is a live object, not a download.** Its value over a PDF
 | items[].lines[].kind | enum (charge, refund, failedAttempt, adjustment) | yes |  |
 | items[].lines[].amount | Money | yes | On the wire this is three fields; in the database it is one column. |
 | items[].lines[].description | string |  |  |
+| items[].lines[].netAmount | Money |  | On the wire this is three fields; in the database it is one column. |
+| items[].lines[].discountAmount | Money |  | On the wire this is three fields; in the database it is one column. |
+| items[].lines[].taxAmount | Money |  | On the wire this is three fields; in the database it is one column. |
+| items[].lines[].taxRate | number |  | 2.14.23. (nullable) |
+| items[].lines[].taxInvoiceId | string (uuid) |  | The finance tax invoice issued for this charge, where one was (issueTaxInvoice); the guest downloads it with getTaxDocumentRendition. (nullable) |
 | items[].lines[].declineClass | string |  | Present on failedAttempt only, and it is what turns *"your payment failed"* into something a guest can act on: a soft decline means try again, a hard one means the card needs replacing. (nullable) |
 | items[].total | Money | yes | On the wire this is three fields; in the database it is one column. |
 | items[].total.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
 | items[].total.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
 | items[].total.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| items[].taxTotal | Money |  | On the wire this is three fields; in the database it is one column. |
+| items[].taxTotal.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
+| items[].taxTotal.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
+| items[].taxTotal.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| items[].discountTotal | Money |  | On the wire this is three fields; in the database it is one column. |
+| items[].discountTotal.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
+| items[].discountTotal.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
+| items[].discountTotal.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| items[].pdfUrl | string (uri) |  | Set when getBillingStatement is called with format=pdf; a short-lived link. (read-only; nullable) |
 | items[].isTaxInvoice | boolean | yes | Always false, and stated rather than assumed. (default False; read-only) |
 | nextCursor | string |  |  |
 | hasMore | boolean | yes |  |
@@ -4126,6 +4193,7 @@ BL-029. **A wallet pass is a live object, not a download.** Its value over a PDF
 | items[].lines | array of OrderLine | yes |  |
 | items[].lines[].id | string | yes | Client-generated ULID of the line. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
 | items[].lines[].variantId | string (uuid) | yes |  |
+| items[].lines[].recommendationId | string (uuid) |  | The trackingId of the ai decideRecommendations item this line came from (29 September, build, AI system design 2.2 A step 8), so a purchase is attributed to the recommendation that led to it rather t… (nullable) |
 | items[].lines[].performanceId | string (uuid) |  |  |
 | items[].lines[].bookedWindow | BookedWindow |  | The booked time window of an hourly product, such as a meeting room (decided 29 September, rev 3 REV3-13: meeting rooms by the hour are in scope). (nullable) |
 | items[].lines[].inventoryHoldId | string |  | Lease the units were drawn from — a catalogue.InventoryHold.id. (nullable) |
@@ -4993,6 +5061,82 @@ This queries the provider directly and reconciles. A background reconciler runs 
 
 ## Group: payments
 
+### createInstalmentPlan
+
+**`POST /instalment-plans`**: Split an order's payment into scheduled instalments on a stored card
+
+4.2.17, 2.14.19. **An instalment schedule, independent of the product's term**: an annual membership billed monthly is a twelve-month term with twelve instalments. Created for one order within the instalment policy; the first instalment (the share due at purchase) is charged with the order, and the rest are charged on their due dates to the stored card (`paymentTokenId`) under the recurring mandate. A failed instalment opens a dunning case; the plan is `inArrears` until it is paid. A guest may create a plan for their own order only.
+
+|  |  |
+|---|---|
+| Permission | `ORDER_CREATE` |
+| Scope level | venue |
+| Part of slice | core |
+| Wave | 2 |
+| Offline | no |
+| Conflict policy | serverWins |
+| Reads | `cache:idempotency`, `orders.payment`, `orders.sales_order`, `payments.instalment`, `payments.instalment_plan`, `payments.instalment_policy`, `payments.token` |
+| Writes | `cache:idempotency`, `orders.payment`, `payments.instalment`, `payments.instalment_plan`, `platform.outbox` |
+| Called by | BO-324, GST-015, WEB-023 |
+
+**Parameters**
+
+| Name | In | Required | Type | Notes |
+|---|---|---|---|---|
+| Idempotency-Key | header | yes | string | Client-generated ULID. |
+
+**Request body**
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| orderId | string | yes | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
+| frequency | enum (monthly, quarterly, custom) | yes |  |
+| instalmentCount | integer | yes | (min 2) |
+| firstDueDate | string (date) |  |  |
+| customDueDates | array of string (date) |  | Required with custom; one per instalment after the first. |
+| paymentTokenId | string (uuid) | yes |  |
+
+**Response**: `PayInstalmentPlan`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| id | string (uuid) | yes |  |
+| orderId | string | yes | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
+| subjectId | string (uuid) |  | (nullable) |
+| frequency | enum (monthly, quarterly, custom) | yes |  |
+| paymentTokenId | string (uuid) |  |  |
+| status | enum (active, completed, inArrears, cancelled) | yes |  |
+| total | Money | yes | On the wire this is three fields; in the database it is one column. |
+| total.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
+| total.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
+| total.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| paidToDate | Money |  | On the wire this is three fields; in the database it is one column. |
+| paidToDate.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
+| paidToDate.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
+| paidToDate.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| nextDueDate | string (date) |  | (nullable) |
+| instalments | array of PayInstalment | yes |  |
+| instalments[].sequence | integer | yes | (min 1) |
+| instalments[].dueDate | string (date) | yes |  |
+| instalments[].amount | Money | yes | On the wire this is three fields; in the database it is one column. |
+| instalments[].amount.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
+| instalments[].amount.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
+| instalments[].amount.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| instalments[].status | enum (scheduled, paid, failed, waived, cancelled) | yes |  |
+| instalments[].paymentId | string |  | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$; nullable) |
+| instalments[].dunningCaseId | string (uuid) |  | (nullable) |
+| instalments[].attemptedAt | string (date-time) |  | (nullable) |
+| createdAt | string (date-time) |  |  |
+| scopePath | string |  | The partition key (ADR-0005). (read-only) |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 201 |  | Plan created; the first instalment charged |
+| 409 |  | The order already has a plan, or is already paid in full. |
+| 422 |  | The order or product does not qualify under the instalment policy, or the count or frequency is outside it, or the first instalment was declined. |
+
 ### createPaymentProviderConnection
 
 **`POST /payment-providers`**: Connect a provider
@@ -5070,6 +5214,145 @@ This queries the provider directly and reconciles. A background reconciler runs 
 | Code | Shape | Meaning |
 |---|---|---|
 | 201 |  | Connected |
+
+### listInstalmentPlans
+
+**`GET /instalment-plans`**: Instalment plans and their schedules
+
+4.2.17. Plans with every instalment, its due date, amount and outcome. A guest sees their own; staff filter by order, status or the next due date. Ordered by the next instalment due, `id` as the tiebreak.
+
+|  |  |
+|---|---|
+| Permission | `PAYMENT_VIEW` |
+| Scope level | venue |
+| Part of slice | core |
+| Wave | 2 |
+| Offline | no |
+| Conflict policy | serverWins |
+| Read routing | replica |
+| Reads | `payments.instalment`, `payments.instalment_plan` |
+| Writes | - |
+| Called by | BO-324, GST-015, WEB-023 |
+
+**Parameters**
+
+| Name | In | Required | Type | Notes |
+|---|---|---|---|---|
+| orderId | query |  | string |  |
+| status | query |  | enum (active, completed, inArrears, cancelled) |  |
+| pageSize | query |  | integer |  |
+| cursor | query |  | string | Opaque cursor: the nextCursor of the previous page. |
+
+**Response**: `object`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| items | array of PayInstalmentPlan | yes |  |
+| items[].id | string (uuid) | yes |  |
+| items[].orderId | string | yes | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
+| items[].subjectId | string (uuid) |  | (nullable) |
+| items[].frequency | enum (monthly, quarterly, custom) | yes |  |
+| items[].paymentTokenId | string (uuid) |  |  |
+| items[].status | enum (active, completed, inArrears, cancelled) | yes |  |
+| items[].total | Money | yes | On the wire this is three fields; in the database it is one column. |
+| items[].total.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
+| items[].total.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
+| items[].total.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| items[].paidToDate | Money |  | On the wire this is three fields; in the database it is one column. |
+| items[].paidToDate.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
+| items[].paidToDate.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
+| items[].paidToDate.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| items[].nextDueDate | string (date) |  | (nullable) |
+| items[].instalments | array of PayInstalment | yes |  |
+| items[].instalments[].sequence | integer | yes | (min 1) |
+| items[].instalments[].dueDate | string (date) | yes |  |
+| items[].instalments[].amount | Money | yes | On the wire this is three fields; in the database it is one column. |
+| items[].instalments[].status | enum (scheduled, paid, failed, waived, cancelled) | yes |  |
+| items[].instalments[].paymentId | string |  | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$; nullable) |
+| items[].instalments[].dunningCaseId | string (uuid) |  | (nullable) |
+| items[].instalments[].attemptedAt | string (date-time) |  | (nullable) |
+| items[].createdAt | string (date-time) |  |  |
+| items[].scopePath | string |  | The partition key (ADR-0005). (read-only) |
+| nextCursor | string |  |  |
+| hasMore | boolean | yes |  |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 200 |  | Plans |
+
+### setInstalmentPolicy
+
+**`PUT /instalment-policy`**: Set which products may be paid in instalments, how many and how often
+
+4.2.17, 2.14.19. **The terms a plan is created within**: which product kinds qualify (an annual pass, a membership, a group booking), the minimum order value, the number of instalments allowed, the frequencies offered (`monthly`, `quarterly`, or `custom` dates), the share due at purchase, and whether a card on file is required. A failed instalment is chased by the dunning policy, never by a second schedule. What the guest is charged in total never changes with the plan: no interest and no fee unless `instalmentFee` is set.
+
+|  |  |
+|---|---|
+| Permission | `PAYMENT_CONFIGURE` |
+| Scope level | tenant |
+| Part of slice | setup, makes `payments.instalment_policy` non-empty |
+| Wave | 2 |
+| Offline | no |
+| Config scope | tenant |
+| Conflict policy | serverWins |
+| Reads | `cache:idempotency`, `payments.instalment_policy` |
+| Writes | `cache:idempotency`, `cache:resolution`, `payments.instalment_policy` |
+| Called by | ADM-603 |
+
+**Parameters**
+
+| Name | In | Required | Type | Notes |
+|---|---|---|---|---|
+| Idempotency-Key | header | yes | string | Client-generated ULID. |
+
+**Request body**: `PayInstalmentPolicy`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| enabled | boolean |  | (default False) |
+| eligibleProductKinds | array of enum (membership, annualPass, seasonPass, groupBooking, event) |  |  |
+| minimumOrderValue | Money |  | On the wire this is three fields; in the database it is one column. |
+| minimumOrderValue.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
+| minimumOrderValue.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
+| minimumOrderValue.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| allowedFrequencies | array of enum (monthly, quarterly, custom) |  |  |
+| maximumInstalments | integer |  | (min 2) |
+| dueAtPurchasePercent | number |  | (min 0; max 100) |
+| instalmentFee | Money |  | On the wire this is three fields; in the database it is one column. |
+| instalmentFee.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
+| instalmentFee.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
+| instalmentFee.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| requireStoredCard | boolean |  | (default True) |
+| scopePath | string |  | The partition key (ADR-0005). (read-only) |
+
+**Response**: `PayInstalmentPolicy`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| enabled | boolean |  | (default False) |
+| eligibleProductKinds | array of enum (membership, annualPass, seasonPass, groupBooking, event) |  |  |
+| minimumOrderValue | Money |  | On the wire this is three fields; in the database it is one column. |
+| minimumOrderValue.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
+| minimumOrderValue.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
+| minimumOrderValue.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| allowedFrequencies | array of enum (monthly, quarterly, custom) |  |  |
+| maximumInstalments | integer |  | (min 2) |
+| dueAtPurchasePercent | number |  | (min 0; max 100) |
+| instalmentFee | Money |  | On the wire this is three fields; in the database it is one column. |
+| instalmentFee.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
+| instalmentFee.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
+| instalmentFee.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| requireStoredCard | boolean |  | (default True) |
+| scopePath | string |  | The partition key (ADR-0005). (read-only) |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 200 |  | Set |
+| 422 |  | A share due at purchase outside 0-100, or more instalments than the frequency allows within the product's term. |
 
 
 ## Group: policy
@@ -5182,7 +5465,7 @@ Sequencing is ledger-first: the ledger entry is written, then the gateway is cal
 | Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
-| Reads | `cache:idempotency`, `orders.payment`, `orders.refund`, `orders.sales_order` |
+| Reads | `cache:idempotency`, `orders.fraud_rule`, `orders.payment`, `orders.refund`, `orders.sales_order` |
 | Writes | `cache:idempotency`, `ledger.journal_entry`, `ledger.posting`, `orders.order_event`, `orders.refund`, `platform.outbox` |
 | Called by | ADM-616, BO-022, BO-023, BO-026, BO-047, BO-1147, EMP-014, EMP-034, POS-002, POS-006, POS-011, PTR-008, PTR-015 |
 | State model | Coupon code ([states/coupon.yaml](../../../states/coupon.yaml)): moves `redeemed` -> `issued`<br/>Entitlement ([states/entitlement-status.yaml](../../../states/entitlement-status.yaml)): moves `issued` -> `cancelled`, `partiallyConsumed` -> `cancelled`<br/>F&B order ([states/fnb-order.yaml](../../../states/fnb-order.yaml)): moves `served` -> `refunded`, `collected` -> `refunded`, `delivered` -> `refunded`<br/>Order ([states/order.yaml](../../../states/order.yaml)): moves `paid` -> `refunded`, `completed` -> `refunded`, `paid` -> `partiallyRefunded`, `completed` -> `partiallyRefunded`, `partiallyRefunded` -> `refunded`<br/>Payment ([states/payment.yaml](../../../states/payment.yaml)): moves `captured` -> `refunded`<br/>Refund ([states/refund.yaml](../../../states/refund.yaml)): moves `failed` -> `pendingGateway`<br/>Seat ([states/seat.yaml](../../../states/seat.yaml)): moves `sold` -> `available` |
@@ -5265,7 +5548,7 @@ Raised from the guest app. Enters the operations approval queue rather than refu
 | Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
-| Reads | `cache:idempotency`, `orders.refund_policy`, `orders.sales_order` |
+| Reads | `cache:idempotency`, `orders.fraud_rule`, `orders.refund_policy`, `orders.sales_order` |
 | Writes | `cache:idempotency`, `orders.refund` |
 | Called by | ADM-610, BO-028, GST-067, WEB-019 |
 
@@ -5436,6 +5719,7 @@ A guest reads only a reservation held for them; another guest's is the shared 40
 | lines | array of CreateOrderLine |  |  |
 | lines[].id | string | yes | Client-generated ULID of the line. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
 | lines[].variantId | string (uuid) | yes |  |
+| lines[].recommendationId | string (uuid) |  | The trackingId of the ai decideRecommendations item this line came from (29 September, build, AI system design 2.2 A step 8), so a purchase is attributed to the recommendation that led to it rather t… (nullable) |
 | lines[].performanceId | string (uuid) |  |  |
 | lines[].bookedWindow | BookedWindow |  | The booked time window of an hourly product, such as a meeting room (decided 29 September, rev 3 REV3-13: meeting rooms by the hour are in scope). (nullable) |
 | lines[].bookedWindow.startsAt | string (date-time) | yes |  |
@@ -5509,6 +5793,7 @@ A guest reads only a reservation held for them; another guest's is the shared 40
 | items[].lines | array of CreateOrderLine |  |  |
 | items[].lines[].id | string | yes | Client-generated ULID of the line. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
 | items[].lines[].variantId | string (uuid) | yes |  |
+| items[].lines[].recommendationId | string (uuid) |  | The trackingId of the ai decideRecommendations item this line came from (29 September, build, AI system design 2.2 A step 8), so a purchase is attributed to the recommendation that led to it rather t… (nullable) |
 | items[].lines[].performanceId | string (uuid) |  |  |
 | items[].lines[].bookedWindow | BookedWindow |  | The booked time window of an hourly product, such as a meeting room (decided 29 September, rev 3 REV3-13: meeting rooms by the hour are in scope). (nullable) |
 | items[].lines[].inventoryHoldId | string |  | Lease the units were drawn from — a catalogue.InventoryHold.id. (nullable) |
@@ -7286,6 +7571,7 @@ Every line is re-priced on ingest. Variances are returned per order and posted t
 | orders[].lines | array of CreateOrderLine | yes | (min items 1) |
 | orders[].lines[].id | string | yes | Client-generated ULID of the line. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
 | orders[].lines[].variantId | string (uuid) | yes |  |
+| orders[].lines[].recommendationId | string (uuid) |  | The trackingId of the ai decideRecommendations item this line came from (29 September, build, AI system design 2.2 A step 8), so a purchase is attributed to the recommendation that led to it rather t… (nullable) |
 | orders[].lines[].performanceId | string (uuid) |  |  |
 | orders[].lines[].bookedWindow | BookedWindow |  | The booked time window of an hourly product, such as a meeting room (decided 29 September, rev 3 REV3-13: meeting rooms by the hour are in scope). (nullable) |
 | orders[].lines[].inventoryHoldId | string |  | Lease the units were drawn from — a catalogue.InventoryHold.id. (nullable) |
@@ -7378,6 +7664,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 | quantity | integer | yes |  |
 | performance_id | uuid | no |  |
 | booked_window | jsonb | no |  |
+| recommendation_id | uuid | no | The trackingId of the ai decideRecommendations item this line came from (29 September, build, AI system design 2.2 A step 8), so a purchase is attributed to the recommendation that led to it rather t… |
 | table_reservation_id | uuid | no | Set on a table deposit line only (decided 29 September, rev 3 REV3-8b): the fnb.TableReservation this line secures. |
 | seat_ids | text[] | no |  |
 | resource_hold_id | text | no | The resources.ResourceHold this line buys (decided 29 September, rev 3 REV3-15). |
@@ -7470,6 +7757,23 @@ Every table this service owns that the slice reads or writes, with its columns a
 | count | integer | yes |  |
 | id | uuid | yes | Synthesised key. |
 
+### `orders.fraud_rule`
+
+| Column | Type | Required | Notes |
+|---|---|---|---|
+| id | uuid | yes |  |
+| name | text | yes |  |
+| condition | jsonb | yes | Velocity, amount, issuer country, device reuse, mismatched billing. |
+| applies_to | text | no | refund rules are evaluated on createRefund and createRefundRequest (5.3.33, 29 September build pass), before the money moves: a hold sends the refund to approval rather than refusing it. |
+| signal | text | no | The measured signal where the rule is one of the named ones; condition carries anything else. |
+| subject_key | text | no |  |
+| threshold | numeric | no |  |
+| window_days | integer | no |  |
+| action | text | yes |  |
+| risk_weight | integer | no |  |
+| is_active | boolean | yes |  |
+| scope_path | text | no | The partition key (ADR-0005). |
+
 ### `orders.group_booking`
 
 | Column | Type | Required | Notes |
@@ -7540,6 +7844,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 | sales_order_id | text | yes | The parent row. |
 | id | text | yes | Client-generated ULID of the line. |
 | variant_id | uuid | yes |  |
+| recommendation_id | uuid | no | The trackingId of the ai decideRecommendations item this line came from (29 September, build, AI system design 2.2 A step 8), so a purchase is attributed to the recommendation that led to it rather t… |
 | performance_id | uuid | no |  |
 | booked_window | jsonb | no |  |
 | inventory_hold_id | text | no | Lease the units were drawn from — a catalogue.InventoryHold.id. |
@@ -7749,6 +8054,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 | reservation_id | text | yes | The parent row. |
 | id | text | yes | Client-generated ULID of the line. |
 | variant_id | uuid | yes |  |
+| recommendation_id | uuid | no | The trackingId of the ai decideRecommendations item this line came from (29 September, build, AI system design 2.2 A step 8), so a purchase is attributed to the recommendation that led to it rather t… |
 | performance_id | uuid | no |  |
 | booked_window | jsonb | no |  |
 | inventory_hold_id | text | no | Lease the units were drawn from — a catalogue.InventoryHold.id. |
@@ -7872,6 +8178,51 @@ Every table this service owns that the slice reads or writes, with its columns a
 | resolved_by_principal_id | uuid | no | Who closed it. |
 | scope_path | text | no | The partition key (ADR-0005). |
 
+### `payments.instalment`
+
+| Column | Type | Required | Notes |
+|---|---|---|---|
+| instalment_plan_id | uuid | yes | The parent row. |
+| sequence | integer | yes |  |
+| due_date | date | yes |  |
+| amount | numeric(18,4) | yes |  |
+| status | text | yes |  |
+| payment_id | text | no |  |
+| dunning_case_id | uuid | no |  |
+| attempted_at | timestamptz | no |  |
+| id | uuid | yes | Synthesised key. |
+
+### `payments.instalment_plan`
+
+| Column | Type | Required | Notes |
+|---|---|---|---|
+| id | uuid | yes |  |
+| order_id | text | yes |  |
+| subject_id | uuid | no |  |
+| frequency | text | yes |  |
+| payment_token_id | uuid | no |  |
+| status | text | yes |  |
+| total | numeric(18,4) | yes |  |
+| paid_to_date | numeric(18,4) | no |  |
+| next_due_date | date | no |  |
+| created_at | timestamptz | no |  |
+| scope_path | text | no | The partition key (ADR-0005). |
+
+### `payments.instalment_policy`
+
+| Column | Type | Required | Notes |
+|---|---|---|---|
+| is_enabled | boolean | no |  |
+| eligible_product_kinds | text[] | no |  |
+| minimum_order_value | numeric(18,4) | no |  |
+| allowed_frequencies | text[] | no |  |
+| maximum_instalments | integer | no |  |
+| due_at_purchase_percent | numeric | no |  |
+| instalment_fee | numeric(18,4) | no |  |
+| require_stored_card | boolean | no |  |
+| scope_path | text | no | The partition key (ADR-0005). |
+| id | uuid | yes | Synthesised key. |
+
 ### `payments.payment_attempt`
 
 | Column | Type | Required | Notes |
@@ -7959,7 +8310,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 
 ## Not in the first release
 
-197 operations, added to this service in later releases without changing any of the above.
+204 operations, added to this service in later releases without changing any of the above.
 
 | Group | Operations |
 |---|---|
@@ -7967,8 +8318,8 @@ Every table this service owns that the slice reads or writes, with its columns a
 | cart | `listAbandonedCarts` |
 | drafted | `approveExceptionServiceRecovery`, `approveGroupDiscountException`, `approveListingModeration`, `createListingSeller`, `createOrderSourceChannel`, `createUpgradeCredentialRegeneration`, `listAmendmentAfterSale`, `listAmendmentAfterSale2`, `listBulkGroupAssisted`, `listBuyerCheckoutInventory`, `listBuyerPurchaseResale`, `listCapacityInventoryReconciliation`, `listCapacityReservationInventory`, `listCreateListingResale`, `listCredentialRevocationRegeneration`, `listDepositPartialPayment`, `listExternalPaymentPartner`, `listFeeSellerProceed`, `listFinancialTraceability`, `listGroupAmendmentCancellation`, `listGroupArrivalCheck`, `listGroupBooking`, `listGroupBookingReconciliation`, `listGroupCustomerOrganization`, `listGroupEnquiryOpportunity`, `listGroupPaymentDeposit`, `listGroupRequirementAvailability`, `listGroupSale`, `listGroupSale2`, `listGroupTicketFulfillment`, `listGroupTicketSeat`, `listListingLifecycleExpiry`, `listOfficialResaleMarketplace`, `listOrderFinancialReconciliation`, `listOrderLifecycleTimeline`, `listOrderLineProduct`, `listOrderPaymentDetail`, `listOrderReservation`, `listOrderSplitMerge`, `listParticipantGuestList`, `listPaymentOrderFinancial`, `listPaymentReconciliationException`, `listPersonTypeProduct`, `listQuoteBookingConversion`, `listQuoteRevisionNegotiation`, `listRefundDisputeResale`, `listRelatedOrderTransaction`, `listResale`, `listResale2`, `listResaleConfirmationOwnership`, `listResaleEligibilityTicket`, `listResaleFeeCommission`, `listResaleFraudDuplicate`, `listResaleInventoryAvailability`, `listResaleListingSeller`, `listResaleMarketplace`, `listResaleOwnership`, `listResalePolicyMarketplace`, `listResalePricingPrice`, `listResaleTicketDetail`, `listReservationConfirmationExpiry`, `listSellerSettlementPayout`, `listTicketOwnershipTransfer`, `listTicketReissueFulfillment`, `listTicketResaleMarketplace`, `listUpgradeConversion`, `listUpgradeEligibilityQualification`, `listUpgradeException`, `listUpgradeFinancialTreatment`, `listUpgradeTimingUsage`, `listVoidReversalSame`, `listWhiteLabelMarketplace`, `setAfterSaleFinancial`, `setAmendmentEligibilityPolicy`, `setCancellationPartialPolicy`, `setCustomerGuestAccount`, `setGroupBookingHandover`, `setGroupOperationalPlanning`, `setGroupPackageExperience`, `setGroupQuotationProposal`, `setMultiPaymentSplit`, `setOrderAmendment`, `setOrderDetailTransaction`, `setOrderReservationStatus`, `setProRataResidual`, `setResaleEligibilityRule`, `setResaleMarketplaceRecommendation`, `setReservationHoldPolicy`, `setUpgradeConversionPath` |
 | order | `getDepositPolicy`, `listTicketTransfers`, `setDepositPolicy` |
-| orders | `authoriseStoredValue`, `captureStoredValue`, `cleanupFailedPayment`, `cloneTicketTemplate`, `convertToTermProduct`, `createGroupBooking`, `createGroupEnquiry`, `createMemberException`, `createPaymentLink`, `getResaleFeePolicy`, `getResaleMarketplaceConfig`, `holdResaleSettlement`, `importTicketTemplate`, `issueInvitation`, `listChargebacks`, `listDeposits`, `listExternalReferenceMappings`, `listFraudRules`, `listInvitationAllowances`, `listMembershipRenewals`, `listOrderDiscounts`, `listOrderFees`, `listPaymentAllocationRules`, `listPaymentProviders`, `listTicketTemplates`, `listUpgrades`, `mergeOrders`, `migrateMembership`, `openGuestCreditAccount`, `printTicketProof`, `pushWalletPassUpdate`, `quoteUpgrade`, `recordExternalReference`, `recordGroupCheckIn`, `releaseResaleSettlementHold`, `relinquishStoredValue`, `renewMembership`, `resendPaymentLink`, `resolveMembershipActivation`, `respondToChargeback`, `revokeEntitlementShare`, `setFraudRules`, `setGroupCustomerOrganization`, `setGroupPaymentSchedule`, `setGroupTicketAllocation`, `setGroupTicketFulfillment`, `setParticipantGuestList`, `setResaleFeePolicy`, `setResaleMarketplaceConfig`, `splitOrder`, `updateGroupBooking`, `voidEntitlement`, `voidPayment` |
-| payments | `createB2bCreditAccount`, `createPaymentMethod`, `getDunningPolicy`, `getMixedTenderRules`, `getPaymentPerformance`, `getPaymentProviderEconomics`, `getPaymentProviderHealth`, `getPaymentRules`, `listB2bCreditAccounts`, `listDepositActivity`, `listDunningCases`, `listMerchantAccounts`, `listPaymentMethods`, `listPaymentProviderConnections`, `listPaymentRoutingRules`, `listPaymentTerminals`, `listReconciliationSources`, `listStoredForwardTransactions`, `recordDepositActivity`, `resolveDunningCase`, `setB2bPaymentTerms`, `setDunningPolicy`, `setHostedCheckoutConfiguration`, `setMerchantAccount`, `setMixedTenderRules`, `setPaymentAuthenticationPolicy`, `setPaymentFailoverPolicy`, `setPaymentRiskRules`, `setPaymentRoutingRules`, `setPaymentRules`, `setPaymentTerminalConfiguration`, `setReconciliationMatchingRules`, `setReconciliationSource`, `simulatePaymentConfiguration`, `simulatePaymentRouting`, `submitChargebackEvidence`, `testPaymentProviderConnection`, `updatePaymentMethod` |
+| orders | `assignChargeback`, `authoriseStoredValue`, `captureStoredValue`, `cleanupFailedPayment`, `cloneTicketTemplate`, `convertToTermProduct`, `createGroupBooking`, `createGroupEnquiry`, `createMemberException`, `createPaymentLink`, `getChargebackAnalytics`, `getResaleFeePolicy`, `getResaleMarketplaceConfig`, `holdResaleSettlement`, `importTicketTemplate`, `issueInvitation`, `listChargebacks`, `listDeposits`, `listExternalReferenceMappings`, `listFraudRules`, `listInvitationAllowances`, `listMembershipRenewals`, `listOrderDiscounts`, `listOrderFees`, `listPaymentAllocationRules`, `listPaymentProviders`, `listTicketTemplates`, `listUpgrades`, `mergeOrders`, `migrateMembership`, `openGuestCreditAccount`, `printTicketProof`, `pushWalletPassUpdate`, `quoteUpgrade`, `recordChargeback`, `recordChargebackOutcome`, `recordExternalReference`, `recordGroupCheckIn`, `releaseResaleSettlementHold`, `relinquishStoredValue`, `renewMembership`, `resendPaymentLink`, `resolveMembershipActivation`, `respondToChargeback`, `revokeEntitlementShare`, `setFraudRules`, `setGroupCustomerOrganization`, `setGroupPaymentSchedule`, `setGroupTicketAllocation`, `setGroupTicketFulfillment`, `setParticipantGuestList`, `setResaleFeePolicy`, `setResaleMarketplaceConfig`, `splitOrder`, `updateGroupBooking`, `voidEntitlement`, `voidPayment` |
+| payments | `createB2bCreditAccount`, `createPaymentMethod`, `getDunningPolicy`, `getInstalmentPolicy`, `getMixedTenderRules`, `getPaymentPerformance`, `getPaymentProviderEconomics`, `getPaymentProviderHealth`, `getPaymentRules`, `listB2bCreditAccounts`, `listDepositActivity`, `listDunningCases`, `listMerchantAccounts`, `listPaymentMethods`, `listPaymentProviderConnections`, `listPaymentRoutingRules`, `listPaymentTerminalCertifications`, `listPaymentTerminals`, `listReconciliationSources`, `listStoredForwardTransactions`, `recordDepositActivity`, `recordPaymentTerminalCertification`, `resolveDunningCase`, `setB2bPaymentTerms`, `setDunningPolicy`, `setHostedCheckoutConfiguration`, `setMerchantAccount`, `setMixedTenderRules`, `setPaymentAuthenticationPolicy`, `setPaymentFailoverPolicy`, `setPaymentRiskRules`, `setPaymentRoutingRules`, `setPaymentRules`, `setPaymentTerminalConfiguration`, `setReconciliationMatchingRules`, `setReconciliationSource`, `simulatePaymentConfiguration`, `simulatePaymentRouting`, `submitChargebackEvidence`, `testPaymentProviderConnection`, `updatePaymentMethod` |
 | policy | `getRefundPolicy`, `setRefundCalculationPolicy` |
 | refund | `approveRefund`, `createBulkRefund` |
 | reservation | `convertReservation`, `createReservation`, `extendReservation` |

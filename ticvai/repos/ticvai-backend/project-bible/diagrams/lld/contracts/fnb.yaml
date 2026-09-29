@@ -1,5 +1,5 @@
 id: LLD-fnb
-title: fnb — 117 operations
+title: fnb — 120 operations
 generatedBy: tools/derive-diagrams.py
 index: diagrams/hld/03-contracts.yaml
 tier: satellite
@@ -245,6 +245,23 @@ operations:
   - cache:idempotency
   - fnb.combo
   - fnb.combo_slot
+- operation: createDeliveryLocation
+  verb: POST
+  path: /delivery-locations
+  scope: venue
+  permission: PRODUCT_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - cache:idempotency
+  - fnb.delivery_location
+  - fnb.dining_table
+  - platform.outlet
+  writes:
+  - cache:idempotency
+  - fnb.delivery_location
+  - fnb.delivery_location_outlet
 - operation: createFnbOrder
   verb: POST
   path: /fnb-orders
@@ -1330,6 +1347,22 @@ operations:
   - cache:idempotency
   - cache:resolution
   - fnb.course_rule
+- operation: setDeliveryLocationOutletMapping
+  verb: PUT
+  path: /venues/{venueId}/delivery-location-outlets
+  scope: venue
+  permission: PRODUCT_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - cache:idempotency
+  - fnb.delivery_location
+  - platform.outlet
+  writes:
+  - cache:idempotency
+  - cache:resolution
+  - fnb.delivery_location_outlet
 - operation: setFnbDeliveryPolicy
   verb: PUT
   path: /fnb-delivery-policy
@@ -1634,6 +1667,20 @@ operations:
   writes:
   - cache:idempotency
   - fnb.table_visit
+- operation: updateDeliveryLocation
+  verb: PATCH
+  path: /delivery-locations/{locationId}
+  scope: venue
+  permission: PRODUCT_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - cache:idempotency
+  - fnb.delivery_location
+  writes:
+  - cache:idempotency
+  - fnb.delivery_location
 - operation: updateMenu
   verb: PATCH
   path: /menus/{menuId}

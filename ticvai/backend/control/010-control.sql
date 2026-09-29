@@ -1,4 +1,4 @@
--- control — 73 tables
+-- control — 75 tables
 -- **Derived. Do not hand-edit.**
 
 -- The one credential model (CF-135a). 2.7.52, 7.1.25 and 7.1.30 each asserted their own. Bound to
@@ -241,6 +241,37 @@ CREATE TABLE IF NOT EXISTS control.content_block (
     scope_path                        ltree NOT NULL
 );
 
+-- A credit note against a tenant invoice — TICVAI crediting its own customer, not a venue
+-- crediting a guest. Points at the invoice it corrects; an invoice is never edited, it is credited
+-- and reissued. Reached by: 3 operations read it and 1 write it; 1 tables reference it.
+CREATE TABLE IF NOT EXISTS control.credit_note (
+    id                                uuid PRIMARY KEY NOT NULL,
+    credit_note_number                text NOT NULL,
+    invoice_id                        text NOT NULL,
+    tenant_id                         uuid NOT NULL,
+    reason_code                       text NOT NULL CONSTRAINT credit_note_reason_code_chk CHECK (reason_code IN ('billingError', 'serviceCredit', 'disputeResolution', 'goodwill', 'other')),
+    reason                            text CONSTRAINT credit_note_reason_chk CHECK (char_length(reason) <= 500),
+    settlement                        text NOT NULL CONSTRAINT credit_note_settlement_chk CHECK (settlement IN ('offsetNextInvoice', 'refund')),
+    settlement_status                 text CONSTRAINT credit_note_settlement_status_chk CHECK (settlement_status IN ('pending', 'offset', 'refunded')),
+    net_amount                        numeric(18,4),
+    tax_amount                        numeric(18,4),
+    gross_amount                      numeric(18,4) NOT NULL,
+    issued_at                         timestamptz NOT NULL,
+    issued_by_principal_id            uuid
+);
+
+-- One line of a control.credit_note: what is credited, against which invoice line, and for how
+-- much
+CREATE TABLE IF NOT EXISTS control.credit_note_line (
+    credit_note_id                    uuid NOT NULL,
+    invoice_line_index                integer,
+    description                       text,
+    quantity                          numeric(18,4),
+    unit_price                        numeric(18,4),
+    amount                            numeric(18,4),
+    id                                uuid PRIMARY KEY NOT NULL
+);
+
 -- A developer organisation (13.1.6–13.1.9). An organisation, because an integration outlives the
 -- engineer who built it — and not a tenant or a partner
 CREATE TABLE IF NOT EXISTS control.developer_account (
@@ -296,6 +327,7 @@ CREATE TABLE IF NOT EXISTS control.invoice (
     tax_amount                        numeric(18,4),
     gross_amount                      numeric(18,4) NOT NULL,
     plan_version_used                 text,
+    credited_total                    numeric(18,4),
     issued_at                         timestamptz,
     due_at                            date,
     paid_at                           timestamptz
@@ -306,6 +338,8 @@ CREATE TABLE IF NOT EXISTS control.invoice_line (
     invoice_id                        uuid NOT NULL,
     description                       text,
     kind                              text,
+    module_code                       text,
+    audience                          text,
     metric                            text,
     quantity                          numeric(18,4),
     unit_price                        numeric(18,4),
@@ -314,7 +348,7 @@ CREATE TABLE IF NOT EXISTS control.invoice_line (
 );
 
 -- Something bought beyond the plan. Hangs off: a child of control.tenant; reaches control.partner
--- through its keys; references control.tenant. Reached by: 7 operations read it and 2 write it; 1
+-- through its keys; references control.tenant. Reached by: 8 operations read it and 2 write it; 1
 -- tables reference it.
 CREATE TABLE IF NOT EXISTS control.licence_add_on (
     tenant_id                         uuid,
@@ -1320,6 +1354,7 @@ CREATE TABLE IF NOT EXISTS control.usage_record (
     quantity                          numeric(18,4) NOT NULL,
     venue_id                          uuid,
     capability                        text,
+    audience                          text CONSTRAINT usage_record_audience_chk CHECK (audience IN ('staff', 'guest')),
     recorded_at                       timestamptz NOT NULL
 );
 

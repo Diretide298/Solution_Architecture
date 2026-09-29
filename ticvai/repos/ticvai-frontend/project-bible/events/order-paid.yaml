@@ -55,6 +55,13 @@ consumers:
   idempotencyKey: orderId
   onFailure: retry
   isCritical: false
+- context: ai
+  purpose: Recommendation attribution through the order lines' recommendationId, risk velocity and
+    entity risk on the guest, device and channel, and forecasting actuals (AI system design section
+    3.2)
+  idempotencyKey: orderId
+  onFailure: retryThenDeadLetter
+  isCritical: false
 retention: 30 days after publication
-notes: '**The most consumed event in the platform.** Five consumers, three of them critical. A dead-lettered
+notes: '**The most consumed event in the platform.** Six consumers, three of them critical. A dead-lettered
   order.paid means a guest paid and holds nothing, so it pages rather than logs.'

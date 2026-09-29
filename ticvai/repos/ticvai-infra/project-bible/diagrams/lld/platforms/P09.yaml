@@ -33,29 +33,31 @@ modulesUsed:
   screens: 19
 servicesCalled:
 - service: CatalogueService
-  operationCalls: 371
+  operationCalls: 364
 - service: PlatformService
-  operationCalls: 296
+  operationCalls: 308
+- service: AiService
+  operationCalls: 267
 - service: OrderService
-  operationCalls: 157
+  operationCalls: 176
 - service: TenancyService
-  operationCalls: 95
+  operationCalls: 108
 - service: IdentityService
-  operationCalls: 45
+  operationCalls: 47
 - service: WhiteLabelService
   operationCalls: 20
+- service: LedgerService
+  operationCalls: 18
 - service: MarketingService
   operationCalls: 12
-- service: LedgerService
-  operationCalls: 9
 - service: CrossRegionService
-  operationCalls: 5
-- service: AiService
   operationCalls: 5
 - service: ReportingService
   operationCalls: 5
 - service: WalletService
   operationCalls: 2
+- service: InventoryService
+  operationCalls: 1
 - service: VenueOpsService
   operationCalls: 1
 coverage:
@@ -278,6 +280,7 @@ screens:
   wave: 2
   density: compact
   operations:
+  - getAiDecisionTrace
   - listAiInteractions
   states:
   - emptyFirstRun
@@ -286,7 +289,8 @@ screens:
   - error
   - loading
   offlineState: false
-  entryParams: []
+  entryParams:
+  - decisionRecordId<-navigation
   goesTo:
   - ADM-001
   - ADM-002
@@ -468,6 +472,7 @@ screens:
   - getSubscription
   - getTenant
   - getTenantLicences
+  - listCreditNotes
   - listSubscriptionInvoices
   - listTenantCells
   - listTenants
@@ -1319,12 +1324,18 @@ screens:
   wave: 1
   density: compact
   operations:
+  - getAiByokEnablement
   - getRegionSettings
+  - listAiModels
   - listAiProviders
   - listOwnPlatformStaffGrants
+  - listPromptTemplates
   - listTenants
   - openPlatformStaffGrant
+  - publishPromptTemplate
+  - setAiByokEnablement
   - setAiCredential
+  - setAiModel
   - setAiProvider
   - testAiProvider
   states:
@@ -1338,6 +1349,9 @@ screens:
   entryParams:
   - providerId<-deepLink
   - regionId<-navigation
+  - modelId<-navigation
+  - templateKey<-navigation
+  - tenantId<-session
   goesTo:
   - ADM-001
   boardFrames: null
@@ -1555,6 +1569,7 @@ screens:
   density: compact
   operations:
   - listDeliveryCommunicationPlatform
+  - requestSuggestion
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -2037,7 +2052,9 @@ screens:
   wave: 3
   density: compact
   operations:
+  - getVatReturn
   - listTaxFeeCalculation
+  - listTaxInvoices
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -2068,6 +2085,10 @@ screens:
   wave: 3
   density: compact
   operations:
+  - listEInvoicingProviders
+  - listTaxInvoiceTemplates
+  - setEInvoicingProvider
+  - setTaxInvoiceTemplate
   - setTaxProfileJurisdiction
   states:
   - emptyFirstRun
@@ -2242,6 +2263,9 @@ screens:
   density: compact
   operations:
   - listCalculationValidationReconciliation
+  - listEInvoiceTransmissions
+  - listEInvoicingProviders
+  - transmitEInvoices
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -4848,6 +4872,7 @@ screens:
   wave: 3
   density: compact
   operations:
+  - getInventoryKitDefinition
   - listComponentInventoryAvailability
   states:
   - emptyFirstRun
@@ -4856,7 +4881,8 @@ screens:
   - error
   - loading
   offlineState: false
-  entryParams: []
+  entryParams:
+  - itemId<-navigation
   goesTo:
   - ADM-188
   boardFrames: null
@@ -6230,6 +6256,7 @@ screens:
   density: compact
   operations:
   - decideApprovalRequest
+  - getApprovalRequestScore
   - listApprovalRequests
   states:
   - emptyFirstRun
@@ -6240,6 +6267,7 @@ screens:
   offlineState: false
   entryParams:
   - requestId<-navigation
+  - approvalRequestId<-navigation
   goesTo:
   - ADM-248
   boardFrames: null
@@ -8359,8 +8387,10 @@ screens:
   wave: 3
   density: compact
   operations:
+  - getGuestVerificationPolicy
   - listMfaMethods
   - listStepUpPolicies
+  - setGuestVerificationPolicy
   - setPasswordPolicy
   - setStepUpPolicy
   states:
@@ -8451,14 +8481,17 @@ screens:
   wave: 3
   density: compact
   operations:
+  - listDataRetentionSettings
   - setApprovalRetentionPolicy
+  - setDataRetentionSetting
   states:
   - emptyFirstRun
   - emptyNoAccess
   - error
   - loading
   offlineState: false
-  entryParams: []
+  entryParams:
+  - dataClass<-navigation
   goesTo:
   - ADM-339
   boardFrames: null
@@ -8516,6 +8549,8 @@ screens:
   wave: 3
   density: compact
   operations:
+  - listApprovalExternalDispatches
+  - listApprovalExternalProviders
   - listCrossModuleOrchestration
   states:
   - emptyFirstRun
@@ -8590,6 +8625,7 @@ screens:
   wave: 3
   density: compact
   operations:
+  - listWebhookEventTypes
   - setTriggerActionCross
   states:
   - emptyFirstRun
@@ -8613,6 +8649,8 @@ screens:
   density: compact
   operations:
   - createWebhookSubscription
+  - listWebhookEventTypes
+  - listWebhookSubscriptions
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -8634,6 +8672,8 @@ screens:
   density: compact
   operations:
   - listApiClients
+  - listApprovalExternalProviders
+  - setApprovalExternalProvider
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -8698,6 +8738,7 @@ screens:
   wave: 3
   density: compact
   operations:
+  - listApprovalExternalDispatches
   - listWorkflowExceptionFailure
   states:
   - emptyFirstRun
@@ -8907,6 +8948,7 @@ screens:
   density: compact
   operations:
   - getApprovalAnalytics
+  - getApprovalRequestScore
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -8914,7 +8956,8 @@ screens:
   - error
   - loading
   offlineState: false
-  entryParams: []
+  entryParams:
+  - approvalRequestId<-navigation
   goesTo:
   - ADM-359
   boardFrames: null
@@ -9185,6 +9228,7 @@ screens:
   density: compact
   operations:
   - getLicenceEnforcement
+  - getPlanRecommendations
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -10429,6 +10473,7 @@ screens:
   density: compact
   operations:
   - getLicenceEnforcement
+  - getPlanRecommendations
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -10640,6 +10685,7 @@ screens:
   density: compact
   operations:
   - getBillingReconciliation
+  - settleAiUsage
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -10661,6 +10707,8 @@ screens:
   wave: 3
   density: compact
   operations:
+  - issueCreditNote
+  - listCreditNotes
   - listSubscriptionInvoices
   - recordInvoicePayment
   states:
@@ -10733,6 +10781,7 @@ screens:
   wave: 3
   density: compact
   operations:
+  - getPlanRecommendations
   - simulateCommercialPackage
   states:
   - emptyFirstRun
@@ -10779,6 +10828,8 @@ screens:
   operations:
   - cancelInvoice
   - disputeInvoice
+  - issueCreditNote
+  - listCreditNotes
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -10788,6 +10839,7 @@ screens:
   offlineState: false
   entryParams:
   - invoiceId<-navigation
+  - tenantId<-session
   goesTo:
   - ADM-459
   boardFrames: null
@@ -10822,7 +10874,10 @@ screens:
   requiresModule: ai
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - attachConfigurationSource
+  - listConfigurationSessions
+  - startConfigurationSession
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -10830,7 +10885,8 @@ screens:
   - error
   - loading
   offlineState: false
-  entryParams: []
+  entryParams:
+  - sessionId<-session
   goesTo:
   - ADM-002
   - ADM-470
@@ -10852,7 +10908,11 @@ screens:
   requiresModule: ai
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - answerConfigurationQuestion
+  - attachConfigurationSource
+  - listConfigurationSources
+  - startConfigurationSession
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -10860,7 +10920,8 @@ screens:
   - error
   - loading
   offlineState: false
-  entryParams: []
+  entryParams:
+  - sessionId<-session
   goesTo:
   - ADM-469
   boardFrames: null
@@ -10873,7 +10934,9 @@ screens:
   requiresModule: ai
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - answerConfigurationQuestion
+  - getConfigurationBlueprint
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -10881,7 +10944,8 @@ screens:
   - error
   - loading
   offlineState: false
-  entryParams: []
+  entryParams:
+  - sessionId<-session
   goesTo:
   - ADM-469
   boardFrames: null
@@ -10894,7 +10958,9 @@ screens:
   requiresModule: ai
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - answerConfigurationQuestion
+  - getConfigurationBlueprint
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -10902,7 +10968,8 @@ screens:
   - error
   - loading
   offlineState: false
-  entryParams: []
+  entryParams:
+  - sessionId<-session
   goesTo:
   - ADM-469
   boardFrames: null
@@ -10915,7 +10982,9 @@ screens:
   requiresModule: ai
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - answerConfigurationQuestion
+  - getConfigurationBlueprint
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -10923,7 +10992,8 @@ screens:
   - error
   - loading
   offlineState: false
-  entryParams: []
+  entryParams:
+  - sessionId<-session
   goesTo:
   - ADM-469
   boardFrames: null
@@ -10936,7 +11006,9 @@ screens:
   requiresModule: ai
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - answerConfigurationQuestion
+  - getConfigurationBlueprint
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -10944,7 +11016,8 @@ screens:
   - error
   - loading
   offlineState: false
-  entryParams: []
+  entryParams:
+  - sessionId<-session
   goesTo:
   - ADM-469
   boardFrames: null
@@ -10957,7 +11030,9 @@ screens:
   requiresModule: ai
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - answerConfigurationQuestion
+  - getConfigurationBlueprint
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -10965,7 +11040,8 @@ screens:
   - error
   - loading
   offlineState: false
-  entryParams: []
+  entryParams:
+  - sessionId<-session
   goesTo:
   - ADM-469
   boardFrames: null
@@ -10978,7 +11054,9 @@ screens:
   requiresModule: ai
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - decideBlueprintRecommendation
+  - getConfigurationBlueprint
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -10986,7 +11064,9 @@ screens:
   - error
   - loading
   offlineState: false
-  entryParams: []
+  entryParams:
+  - decisionKey<-navigation
+  - sessionId<-session
   goesTo:
   - ADM-469
   boardFrames: null
@@ -10999,7 +11079,12 @@ screens:
   requiresModule: ai
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - answerConfigurationQuestion
+  - attachConfigurationSource
+  - decideBlueprintRecommendation
+  - getConfigurationBlueprint
+  - listConfigurationSources
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -11007,7 +11092,9 @@ screens:
   - error
   - loading
   offlineState: false
-  entryParams: []
+  entryParams:
+  - decisionKey<-navigation
+  - sessionId<-session
   goesTo:
   - ADM-469
   boardFrames: null
@@ -11020,7 +11107,9 @@ screens:
   requiresModule: ai
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - buildConfigurationPlan
+  - getConfigurationBlueprint
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -11028,7 +11117,8 @@ screens:
   - error
   - loading
   offlineState: false
-  entryParams: []
+  entryParams:
+  - sessionId<-session
   goesTo:
   - ADM-469
   boardFrames: null
@@ -11041,7 +11131,10 @@ screens:
   requiresModule: ai
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - buildConfigurationPlan
+  - getActionPlan
+  - getConfigurationBlueprint
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -11049,7 +11142,9 @@ screens:
   - error
   - loading
   offlineState: false
-  entryParams: []
+  entryParams:
+  - planId<-navigation
+  - sessionId<-session
   goesTo:
   - ADM-002
   - ADM-480
@@ -11071,7 +11166,10 @@ screens:
   requiresModule: ai
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - decideBlueprintRecommendation
+  - getActionPlan
+  - getConfigurationBlueprint
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -11079,7 +11177,10 @@ screens:
   - error
   - loading
   offlineState: false
-  entryParams: []
+  entryParams:
+  - decisionKey<-navigation
+  - planId<-navigation
+  - sessionId<-session
   goesTo:
   - ADM-479
   boardFrames: null
@@ -11092,7 +11193,10 @@ screens:
   requiresModule: ai
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - decideBlueprintRecommendation
+  - getActionPlan
+  - getConfigurationBlueprint
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -11100,7 +11204,10 @@ screens:
   - error
   - loading
   offlineState: false
-  entryParams: []
+  entryParams:
+  - decisionKey<-navigation
+  - planId<-navigation
+  - sessionId<-session
   goesTo:
   - ADM-479
   boardFrames: null
@@ -11113,7 +11220,10 @@ screens:
   requiresModule: ai
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - decideBlueprintRecommendation
+  - getActionPlan
+  - getConfigurationBlueprint
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -11121,7 +11231,10 @@ screens:
   - error
   - loading
   offlineState: false
-  entryParams: []
+  entryParams:
+  - decisionKey<-navigation
+  - planId<-navigation
+  - sessionId<-session
   goesTo:
   - ADM-479
   boardFrames: null
@@ -11135,6 +11248,9 @@ screens:
   wave: 3
   density: compact
   operations:
+  - decideBlueprintRecommendation
+  - getActionPlan
+  - getConfigurationBlueprint
   - setChannelPricingCommercial
   states:
   - emptyFirstRun
@@ -11143,7 +11259,10 @@ screens:
   - error
   - loading
   offlineState: false
-  entryParams: []
+  entryParams:
+  - decisionKey<-navigation
+  - planId<-navigation
+  - sessionId<-session
   goesTo:
   - ADM-479
   boardFrames: null
@@ -11156,7 +11275,10 @@ screens:
   requiresModule: ai
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - decideBlueprintRecommendation
+  - getActionPlan
+  - getConfigurationBlueprint
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -11164,7 +11286,10 @@ screens:
   - error
   - loading
   offlineState: false
-  entryParams: []
+  entryParams:
+  - decisionKey<-navigation
+  - planId<-navigation
+  - sessionId<-session
   goesTo:
   - ADM-479
   boardFrames: null
@@ -11177,7 +11302,10 @@ screens:
   requiresModule: ai
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - decideBlueprintRecommendation
+  - getActionPlan
+  - getConfigurationBlueprint
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -11185,7 +11313,10 @@ screens:
   - error
   - loading
   offlineState: false
-  entryParams: []
+  entryParams:
+  - decisionKey<-navigation
+  - planId<-navigation
+  - sessionId<-session
   goesTo:
   - ADM-479
   boardFrames: null
@@ -11198,7 +11329,10 @@ screens:
   requiresModule: ai
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - decideBlueprintRecommendation
+  - getActionPlan
+  - getConfigurationBlueprint
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -11206,7 +11340,10 @@ screens:
   - error
   - loading
   offlineState: false
-  entryParams: []
+  entryParams:
+  - decisionKey<-navigation
+  - planId<-navigation
+  - sessionId<-session
   goesTo:
   - ADM-479
   boardFrames: null
@@ -11219,7 +11356,9 @@ screens:
   requiresModule: ai
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - getActionPlan
+  - simulateActionPlan
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -11227,7 +11366,8 @@ screens:
   - error
   - loading
   offlineState: false
-  entryParams: []
+  entryParams:
+  - planId<-navigation
   goesTo:
   - ADM-479
   boardFrames: null
@@ -11240,7 +11380,9 @@ screens:
   requiresModule: ai
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - getActionPlan
+  - simulateActionPlan
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -11248,7 +11390,8 @@ screens:
   - error
   - loading
   offlineState: false
-  entryParams: []
+  entryParams:
+  - planId<-navigation
   goesTo:
   - ADM-479
   boardFrames: null
@@ -11261,7 +11404,9 @@ screens:
   requiresModule: ai
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - getActionPlan
+  - getEffectiveAiPolicy
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -11269,7 +11414,8 @@ screens:
   - error
   - loading
   offlineState: false
-  entryParams: []
+  entryParams:
+  - planId<-navigation
   goesTo:
   - ADM-002
   - ADM-490
@@ -11291,7 +11437,9 @@ screens:
   requiresModule: ai
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - getActionPlan
+  - simulateActionPlan
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -11299,7 +11447,8 @@ screens:
   - error
   - loading
   offlineState: false
-  entryParams: []
+  entryParams:
+  - planId<-navigation
   goesTo:
   - ADM-489
   boardFrames: null
@@ -11312,7 +11461,9 @@ screens:
   requiresModule: ai
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - decideBlueprintRecommendation
+  - getConfigurationBlueprint
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -11320,7 +11471,9 @@ screens:
   - error
   - loading
   offlineState: false
-  entryParams: []
+  entryParams:
+  - decisionKey<-navigation
+  - sessionId<-session
   goesTo:
   - ADM-489
   boardFrames: null
@@ -11335,6 +11488,9 @@ screens:
   density: compact
   operations:
   - approveWorkflow
+  - decideProposedAction
+  - getActionPlan
+  - listProposedActions
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -11342,7 +11498,9 @@ screens:
   - error
   - loading
   offlineState: false
-  entryParams: []
+  entryParams:
+  - actionId<-navigation
+  - planId<-navigation
   goesTo:
   - ADM-489
   boardFrames: null
@@ -11355,7 +11513,10 @@ screens:
   requiresModule: ai
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - cancelActionPlan
+  - getActionPlan
+  - pauseActionPlan
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -11363,7 +11524,8 @@ screens:
   - error
   - loading
   offlineState: false
-  entryParams: []
+  entryParams:
+  - planId<-navigation
   goesTo:
   - ADM-489
   boardFrames: null
@@ -11376,7 +11538,11 @@ screens:
   requiresModule: ai
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - getActionPlan
+  - pauseActionPlan
+  - resumeActionPlan
+  - retryActionStep
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -11384,7 +11550,9 @@ screens:
   - error
   - loading
   offlineState: false
-  entryParams: []
+  entryParams:
+  - planId<-navigation
+  - stepNumber<-navigation
   goesTo:
   - ADM-489
   boardFrames: null
@@ -11397,7 +11565,9 @@ screens:
   requiresModule: ai
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - getActionPlan
+  - rollbackActionPlan
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -11405,7 +11575,8 @@ screens:
   - error
   - loading
   offlineState: false
-  entryParams: []
+  entryParams:
+  - planId<-navigation
   goesTo:
   - ADM-489
   boardFrames: null
@@ -11418,7 +11589,10 @@ screens:
   requiresModule: ai
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - answerConfigurationQuestion
+  - buildConfigurationPlan
+  - startConfigurationSession
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -11426,7 +11600,8 @@ screens:
   - error
   - loading
   offlineState: false
-  entryParams: []
+  entryParams:
+  - sessionId<-session
   goesTo:
   - ADM-489
   boardFrames: null
@@ -11439,7 +11614,10 @@ screens:
   requiresModule: ai
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - getActionPlan
+  - listConfigurationSessions
+  - rollbackActionPlan
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -11447,7 +11625,8 @@ screens:
   - error
   - loading
   offlineState: false
-  entryParams: []
+  entryParams:
+  - planId<-navigation
   goesTo:
   - ADM-489
   boardFrames: null
@@ -11460,7 +11639,9 @@ screens:
   requiresModule: ai
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - getAiDecisionTrace
+  - searchAiDecisions
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -11468,7 +11649,8 @@ screens:
   - error
   - loading
   offlineState: false
-  entryParams: []
+  entryParams:
+  - decisionRecordId<-navigation
   goesTo:
   - ADM-489
   boardFrames: null
@@ -11481,7 +11663,10 @@ screens:
   requiresModule: analytics
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - exportForecastVersion
+  - getForecast
+  - listForecastDefinitions
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -11489,7 +11674,8 @@ screens:
   - error
   - loading
   offlineState: false
-  entryParams: []
+  entryParams:
+  - versionId<-navigation
   goesTo:
   - ADM-002
   - ADM-500
@@ -11511,7 +11697,10 @@ screens:
   requiresModule: analytics
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - listForecastDefinitions
+  - runForecast
+  - setForecastDefinition
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -11519,7 +11708,8 @@ screens:
   - error
   - loading
   offlineState: false
-  entryParams: []
+  entryParams:
+  - definitionKey<-navigation
   goesTo:
   - ADM-499
   boardFrames: null
@@ -11532,7 +11722,10 @@ screens:
   requiresModule: analytics
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - configureForecastSignalSource
+  - listForecastSignals
+  - setForecastDefinition
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -11540,7 +11733,9 @@ screens:
   - error
   - loading
   offlineState: false
-  entryParams: []
+  entryParams:
+  - definitionKey<-navigation
+  - signalKey<-navigation
   goesTo:
   - ADM-499
   boardFrames: null
@@ -11553,7 +11748,10 @@ screens:
   requiresModule: analytics
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - configureAnomalyDetector
+  - getForecast
+  - listAiInsights
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -11561,7 +11759,8 @@ screens:
   - error
   - loading
   offlineState: false
-  entryParams: []
+  entryParams:
+  - detectorKey<-navigation
   goesTo:
   - ADM-499
   boardFrames: null
@@ -11574,7 +11773,8 @@ screens:
   requiresModule: analytics
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - getForecast
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -11595,7 +11795,8 @@ screens:
   requiresModule: analytics
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - getForecast
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -11616,7 +11817,8 @@ screens:
   requiresModule: analytics
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - getForecast
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -11637,7 +11839,11 @@ screens:
   requiresModule: analytics
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - explainMetricChange
+  - getForecast
+  - getForecastAccuracy
+  - listForecastVersions
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -11658,7 +11864,10 @@ screens:
   requiresModule: analytics
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - compareForecastScenarios
+  - createForecastScenario
+  - getForecast
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -11679,7 +11888,12 @@ screens:
   requiresModule: analytics
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - exportForecastVersion
+  - getForecastAccuracy
+  - listForecastVersions
+  - publishForecastVersion
+  - runForecast
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -11687,7 +11901,9 @@ screens:
   - error
   - loading
   offlineState: false
-  entryParams: []
+  entryParams:
+  - definitionKey<-navigation
+  - versionId<-navigation
   goesTo:
   - ADM-499
   boardFrames: null
@@ -11700,7 +11916,9 @@ screens:
   requiresModule: analytics
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - getForecast
+  - listOperationalRequirements
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -11730,7 +11948,11 @@ screens:
   requiresModule: analytics
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - configureAnomalyDetector
+  - getForecast
+  - listAiInsights
+  - listOperationalRequirements
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -11738,7 +11960,8 @@ screens:
   - error
   - loading
   offlineState: false
-  entryParams: []
+  entryParams:
+  - detectorKey<-navigation
   goesTo:
   - ADM-509
   boardFrames: null
@@ -11751,7 +11974,10 @@ screens:
   requiresModule: analytics
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - getForecast
+  - listOperationalRequirements
+  - requestSuggestion
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -11772,7 +11998,9 @@ screens:
   requiresModule: analytics
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - getForecast
+  - listOperationalRequirements
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -11793,7 +12021,10 @@ screens:
   requiresModule: analytics
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - getForecast
+  - getStaffingCoverage
+  - listOperationalRequirements
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -11814,7 +12045,9 @@ screens:
   requiresModule: analytics
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - getForecast
+  - listOperationalRequirements
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -11835,7 +12068,9 @@ screens:
   requiresModule: analytics
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - getForecast
+  - listOperationalRequirements
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -11856,7 +12091,9 @@ screens:
   requiresModule: analytics
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - getForecast
+  - listOperationalRequirements
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -11877,7 +12114,10 @@ screens:
   requiresModule: analytics
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - compareForecastScenarios
+  - createForecastScenario
+  - listOperationalRequirements
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -11898,7 +12138,9 @@ screens:
   requiresModule: analytics
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - decideOperationalRequirement
+  - listOperationalRequirements
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -11906,7 +12148,8 @@ screens:
   - error
   - loading
   offlineState: false
-  entryParams: []
+  entryParams:
+  - requirementId<-navigation
   goesTo:
   - ADM-509
   boardFrames: null
@@ -11919,7 +12162,11 @@ screens:
   requiresModule: ai
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - listAiCapabilities
+  - listAiGovernanceAlerts
+  - pauseAiCapability
+  - promoteAiRelease
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -11927,7 +12174,9 @@ screens:
   - error
   - loading
   offlineState: false
-  entryParams: []
+  entryParams:
+  - capabilityKey<-navigation
+  - releaseId<-navigation
   goesTo:
   - ADM-002
   - ADM-520
@@ -11949,7 +12198,9 @@ screens:
   requiresModule: ai
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - configureAiCapability
+  - listAiCapabilities
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -11957,7 +12208,8 @@ screens:
   - error
   - loading
   offlineState: false
-  entryParams: []
+  entryParams:
+  - capabilityKey<-navigation
   goesTo:
   - ADM-519
   boardFrames: null
@@ -11970,7 +12222,9 @@ screens:
   requiresModule: ai
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - configureAiCapability
+  - listAiCapabilities
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -11978,7 +12232,8 @@ screens:
   - error
   - loading
   offlineState: false
-  entryParams: []
+  entryParams:
+  - capabilityKey<-navigation
   goesTo:
   - ADM-519
   boardFrames: null
@@ -11991,7 +12246,10 @@ screens:
   requiresModule: ai
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - configureAiCapability
+  - getEffectiveAiPolicy
+  - listAiCapabilities
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -11999,7 +12257,8 @@ screens:
   - error
   - loading
   offlineState: false
-  entryParams: []
+  entryParams:
+  - capabilityKey<-navigation
   goesTo:
   - ADM-519
   boardFrames: null
@@ -12012,7 +12271,11 @@ screens:
   requiresModule: ai
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - createAiGovernancePolicyDraft
+  - listAiGovernancePolicyVersions
+  - listAiTools
+  - setAiTool
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -12020,7 +12283,8 @@ screens:
   - error
   - loading
   offlineState: false
-  entryParams: []
+  entryParams:
+  - toolKey<-navigation
   goesTo:
   - ADM-519
   boardFrames: null
@@ -12033,7 +12297,11 @@ screens:
   requiresModule: ai
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - createAiGovernancePolicyDraft
+  - listAiGovernancePolicyVersions
+  - listDataRetentionSettings
+  - setDataRetentionSetting
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -12041,7 +12309,8 @@ screens:
   - error
   - loading
   offlineState: false
-  entryParams: []
+  entryParams:
+  - dataClass<-navigation
   goesTo:
   - ADM-519
   boardFrames: null
@@ -12054,7 +12323,9 @@ screens:
   requiresModule: ai
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - createAiGovernancePolicyDraft
+  - getEffectiveAiPolicy
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -12075,7 +12346,11 @@ screens:
   requiresModule: ai
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - createAiPolicyException
+  - getEffectiveAiPolicy
+  - listAiGovernancePolicyVersions
+  - revokeAiPolicyException
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -12083,7 +12358,8 @@ screens:
   - error
   - loading
   offlineState: false
-  entryParams: []
+  entryParams:
+  - exceptionId<-navigation
   goesTo:
   - ADM-519
   boardFrames: null
@@ -12096,7 +12372,9 @@ screens:
   requiresModule: ai
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - listAiGovernancePolicyVersions
+  - simulateAiGovernancePolicy
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -12104,7 +12382,8 @@ screens:
   - error
   - loading
   offlineState: false
-  entryParams: []
+  entryParams:
+  - versionId<-navigation
   goesTo:
   - ADM-519
   boardFrames: null
@@ -12117,7 +12396,10 @@ screens:
   requiresModule: ai
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - getEffectiveAiPolicy
+  - listAiGovernancePolicyVersions
+  - publishAiGovernancePolicy
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -12125,7 +12407,8 @@ screens:
   - error
   - loading
   offlineState: false
-  entryParams: []
+  entryParams:
+  - versionId<-navigation
   goesTo:
   - ADM-519
   boardFrames: null
@@ -12138,7 +12421,9 @@ screens:
   requiresModule: ai
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - getActionPlan
+  - listProposedActions
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -12146,7 +12431,8 @@ screens:
   - error
   - loading
   offlineState: false
-  entryParams: []
+  entryParams:
+  - planId<-navigation
   goesTo:
   - ADM-002
   - ADM-530
@@ -12168,7 +12454,10 @@ screens:
   requiresModule: ai
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - createAiGovernancePolicyDraft
+  - listAiGovernancePolicyVersions
+  - listAiTools
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -12189,7 +12478,10 @@ screens:
   requiresModule: ai
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - decideProposedAction
+  - getActionPlan
+  - simulateActionPlan
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -12197,7 +12489,9 @@ screens:
   - error
   - loading
   offlineState: false
-  entryParams: []
+  entryParams:
+  - actionId<-navigation
+  - planId<-navigation
   goesTo:
   - ADM-529
   boardFrames: null
@@ -12210,7 +12504,9 @@ screens:
   requiresModule: ai
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - decideProposedAction
+  - getActionPlan
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -12218,7 +12514,9 @@ screens:
   - error
   - loading
   offlineState: false
-  entryParams: []
+  entryParams:
+  - actionId<-navigation
+  - planId<-navigation
   goesTo:
   - ADM-529
   boardFrames: null
@@ -12231,7 +12529,10 @@ screens:
   requiresModule: ai
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - getAiDecisionTrace
+  - overrideAiDecision
+  - sendAiMessage
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -12239,7 +12540,9 @@ screens:
   - error
   - loading
   offlineState: false
-  entryParams: []
+  entryParams:
+  - conversationId<-navigation
+  - decisionRecordId<-navigation
   goesTo:
   - ADM-529
   boardFrames: null
@@ -12252,7 +12555,9 @@ screens:
   requiresModule: ai
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - getActionPlan
+  - listProposedActions
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -12260,7 +12565,8 @@ screens:
   - error
   - loading
   offlineState: false
-  entryParams: []
+  entryParams:
+  - planId<-navigation
   goesTo:
   - ADM-529
   boardFrames: null
@@ -12273,7 +12579,11 @@ screens:
   requiresModule: ai
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - cancelActionPlan
+  - getActionPlan
+  - pauseActionPlan
+  - resumeActionPlan
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -12281,7 +12591,8 @@ screens:
   - error
   - loading
   offlineState: false
-  entryParams: []
+  entryParams:
+  - planId<-navigation
   goesTo:
   - ADM-529
   boardFrames: null
@@ -12294,7 +12605,11 @@ screens:
   requiresModule: ai
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - overrideAiDecision
+  - pauseActionPlan
+  - pauseAiCapability
+  - resumeAiCapability
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -12302,7 +12617,10 @@ screens:
   - error
   - loading
   offlineState: false
-  entryParams: []
+  entryParams:
+  - capabilityKey<-navigation
+  - decisionRecordId<-navigation
+  - planId<-navigation
   goesTo:
   - ADM-529
   boardFrames: null
@@ -12315,7 +12633,9 @@ screens:
   requiresModule: ai
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - getAiDecisionTrace
+  - searchAiDecisions
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -12323,7 +12643,8 @@ screens:
   - error
   - loading
   offlineState: false
-  entryParams: []
+  entryParams:
+  - decisionRecordId<-navigation
   goesTo:
   - ADM-529
   boardFrames: null
@@ -12336,7 +12657,9 @@ screens:
   requiresModule: ai
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - simulateActionPlan
+  - simulateAiGovernancePolicy
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -12344,7 +12667,9 @@ screens:
   - error
   - loading
   offlineState: false
-  entryParams: []
+  entryParams:
+  - planId<-navigation
+  - versionId<-navigation
   goesTo:
   - ADM-529
   boardFrames: null
@@ -12357,7 +12682,8 @@ screens:
   requiresModule: ai
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - searchAiDecisions
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -12387,7 +12713,9 @@ screens:
   requiresModule: ai
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - getAiDecisionTrace
+  - searchAiDecisions
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -12395,7 +12723,8 @@ screens:
   - error
   - loading
   offlineState: false
-  entryParams: []
+  entryParams:
+  - decisionRecordId<-navigation
   goesTo:
   - ADM-539
   boardFrames: null
@@ -12408,7 +12737,8 @@ screens:
   requiresModule: ai
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - getAiDecisionTrace
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -12416,7 +12746,8 @@ screens:
   - error
   - loading
   offlineState: false
-  entryParams: []
+  entryParams:
+  - decisionRecordId<-navigation
   goesTo:
   - ADM-539
   boardFrames: null
@@ -12429,7 +12760,8 @@ screens:
   requiresModule: ai
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - getAiDecisionTrace
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -12437,7 +12769,8 @@ screens:
   - error
   - loading
   offlineState: false
-  entryParams: []
+  entryParams:
+  - decisionRecordId<-navigation
   goesTo:
   - ADM-539
   boardFrames: null
@@ -12450,7 +12783,9 @@ screens:
   requiresModule: ai
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - explainRecommendationDecision
+  - getAiDecisionTrace
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -12458,7 +12793,9 @@ screens:
   - error
   - loading
   offlineState: false
-  entryParams: []
+  entryParams:
+  - decisionId<-navigation
+  - decisionRecordId<-navigation
   goesTo:
   - ADM-539
   boardFrames: null
@@ -12471,7 +12808,9 @@ screens:
   requiresModule: ai
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - getAiDecisionTrace
+  - listAiModels
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -12479,7 +12818,8 @@ screens:
   - error
   - loading
   offlineState: false
-  entryParams: []
+  entryParams:
+  - decisionRecordId<-navigation
   goesTo:
   - ADM-539
   boardFrames: null
@@ -12492,7 +12832,8 @@ screens:
   requiresModule: ai
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - getAiDecisionTrace
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -12500,7 +12841,8 @@ screens:
   - error
   - loading
   offlineState: false
-  entryParams: []
+  entryParams:
+  - decisionRecordId<-navigation
   goesTo:
   - ADM-539
   boardFrames: null
@@ -12513,7 +12855,9 @@ screens:
   requiresModule: ai
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - getActionPlan
+  - getAiDecisionTrace
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -12521,7 +12865,9 @@ screens:
   - error
   - loading
   offlineState: false
-  entryParams: []
+  entryParams:
+  - decisionRecordId<-navigation
+  - planId<-navigation
   goesTo:
   - ADM-539
   boardFrames: null
@@ -12534,7 +12880,9 @@ screens:
   requiresModule: ai
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - exportAiEvidencePackage
+  - searchAiDecisions
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -12555,7 +12903,9 @@ screens:
   requiresModule: ai
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - getAiDecisionTrace
+  - replayAiDecision
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -12563,7 +12913,8 @@ screens:
   - error
   - loading
   offlineState: false
-  entryParams: []
+  entryParams:
+  - decisionRecordId<-navigation
   goesTo:
   - ADM-539
   boardFrames: null
@@ -12577,6 +12928,8 @@ screens:
   wave: 3
   density: compact
   operations:
+  - listAiGovernanceAlerts
+  - listAiIncidents
   - listGovernanceRiskMonitoring
   states:
   - emptyFirstRun
@@ -12607,7 +12960,9 @@ screens:
   requiresModule: ai
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - listAiRiskRegister
+  - setAiRiskRegisterEntry
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -12615,7 +12970,8 @@ screens:
   - error
   - loading
   offlineState: false
-  entryParams: []
+  entryParams:
+  - entryId<-navigation
   goesTo:
   - ADM-549
   boardFrames: null
@@ -12628,7 +12984,9 @@ screens:
   requiresModule: ai
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - listAiControls
+  - runAiControlTest
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -12636,7 +12994,8 @@ screens:
   - error
   - loading
   offlineState: false
-  entryParams: []
+  entryParams:
+  - controlKey<-navigation
   goesTo:
   - ADM-549
   boardFrames: null
@@ -12649,7 +13008,9 @@ screens:
   requiresModule: ai
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - decideAiGovernanceAlert
+  - listAiGovernanceAlerts
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -12657,7 +13018,8 @@ screens:
   - error
   - loading
   offlineState: false
-  entryParams: []
+  entryParams:
+  - alertId<-navigation
   goesTo:
   - ADM-549
   boardFrames: null
@@ -12670,7 +13032,9 @@ screens:
   requiresModule: ai
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - decideAiGovernanceAlert
+  - listAiGovernanceAlerts
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -12678,7 +13042,8 @@ screens:
   - error
   - loading
   offlineState: false
-  entryParams: []
+  entryParams:
+  - alertId<-navigation
   goesTo:
   - ADM-549
   boardFrames: null
@@ -12691,7 +13056,12 @@ screens:
   requiresModule: ai
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - listAiEvaluations
+  - listAiGovernanceAlerts
+  - promoteAiRelease
+  - rollbackAiRelease
+  - runAiEvaluation
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -12699,7 +13069,8 @@ screens:
   - error
   - loading
   offlineState: false
-  entryParams: []
+  entryParams:
+  - releaseId<-navigation
   goesTo:
   - ADM-549
   boardFrames: null
@@ -12712,7 +13083,10 @@ screens:
   requiresModule: ai
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - decideAiGovernanceAlert
+  - listAiGovernanceAlerts
+  - openAiIncident
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -12720,7 +13094,8 @@ screens:
   - error
   - loading
   offlineState: false
-  entryParams: []
+  entryParams:
+  - alertId<-navigation
   goesTo:
   - ADM-549
   boardFrames: null
@@ -12733,7 +13108,13 @@ screens:
   requiresModule: ai
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - closeAiIncident
+  - containAiIncident
+  - listAiIncidents
+  - openAiIncident
+  - pauseAiCapability
+  - rollbackAiRelease
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -12741,7 +13122,10 @@ screens:
   - error
   - loading
   offlineState: false
-  entryParams: []
+  entryParams:
+  - capabilityKey<-navigation
+  - incidentId<-navigation
+  - releaseId<-navigation
   goesTo:
   - ADM-549
   boardFrames: null
@@ -12754,7 +13138,10 @@ screens:
   requiresModule: ai
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - exportAiEvidencePackage
+  - listAiControls
+  - listAiRiskRegister
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -12775,7 +13162,9 @@ screens:
   requiresModule: ai
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - listAiGovernanceAlerts
+  - listAiRiskRegister
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -13303,7 +13692,9 @@ screens:
   density: compact
   operations:
   - listDevices
+  - listPaymentTerminalCertifications
   - listPaymentTerminals
+  - recordPaymentTerminalCertification
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -13311,7 +13702,8 @@ screens:
   - error
   - loading
   offlineState: false
-  entryParams: []
+  entryParams:
+  - modelCode<-navigation
   goesTo:
   - ADM-579
   boardFrames: null
@@ -13463,8 +13855,11 @@ screens:
   wave: 3
   density: compact
   operations:
+  - createDeviceFirmware
   - createWorkOrder
+  - getDeviceFirmware
   - getDeviceTelemetry
+  - listDeviceFirmware
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -13474,6 +13869,7 @@ screens:
   offlineState: false
   entryParams:
   - deviceId<-session
+  - firmwareId<-navigation
   goesTo:
   - ADM-579
   boardFrames: null
@@ -13487,6 +13883,8 @@ screens:
   wave: 3
   density: compact
   operations:
+  - listPaymentTerminalCertifications
+  - recordPaymentTerminalCertification
   - testPaymentProviderConnection
   states:
   - emptyFirstRun
@@ -13497,6 +13895,7 @@ screens:
   offlineState: false
   entryParams:
   - connectionId<-navigation
+  - modelCode<-navigation
   goesTo:
   - ADM-579
   boardFrames: null
@@ -13848,7 +14247,9 @@ screens:
   wave: 3
   density: compact
   operations:
+  - getInstalmentPolicy
   - setB2bPaymentTerms
+  - setInstalmentPolicy
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -14113,6 +14514,8 @@ screens:
   density: compact
   operations:
   - approveRefund
+  - listFraudRules
+  - setFraudRules
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -14490,6 +14893,8 @@ screens:
   wave: 3
   density: compact
   operations:
+  - listFraudRules
+  - setFraudRules
   - setPaymentRiskRules
   states:
   - emptyFirstRun
@@ -14556,7 +14961,18 @@ screens:
   wave: 3
   density: compact
   operations:
+  - addRiskCaseEvidence
+  - assignChargeback
+  - closeRiskCase
+  - createRiskCase
+  - decideRiskAlert
+  - expandRiskNetwork
+  - getChargebackAnalytics
+  - getEntityRisk
+  - getRiskCase
   - listChargebacks
+  - listRiskAlerts
+  - proposeRiskAction
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -14564,7 +14980,12 @@ screens:
   - error
   - loading
   offlineState: false
-  entryParams: []
+  entryParams:
+  - alertId<-navigation
+  - caseId<-navigation
+  - chargebackId<-navigation
+  - entityRef<-navigation
+  - entityType<-navigation
   goesTo:
   - ADM-629
   boardFrames: null
@@ -14578,7 +14999,12 @@ screens:
   wave: 3
   density: compact
   operations:
+  - assignChargeback
+  - getChargebackAnalytics
+  - getChargebackAnalytics
   - listChargebacks
+  - recordChargeback
+  - recordChargebackOutcome
   - respondToChargeback
   states:
   - emptyFirstRun
@@ -14647,7 +15073,12 @@ screens:
   wave: 3
   density: compact
   operations:
+  - configureRiskStrategy
+  - getChargebackAnalytics
+  - getChargebackAnalytics
+  - getEntityRisk
   - getPaymentPerformance
+  - listRiskAlerts
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -14655,7 +15086,9 @@ screens:
   - error
   - loading
   offlineState: false
-  entryParams: []
+  entryParams:
+  - entityRef<-navigation
+  - entityType<-navigation
   goesTo:
   - ADM-629
   boardFrames: null
@@ -14669,6 +15102,7 @@ screens:
   wave: 3
   density: compact
   operations:
+  - backtestRiskStrategy
   - simulatePaymentConfiguration
   states:
   - emptyFirstRun
@@ -15613,7 +16047,7 @@ screens:
   wave: 3
   density: compact
   operations:
-  - explainRecommendation
+  - explainRecommendationDecision
   - simulateRecommendationStrategy
   states:
   - emptyFirstRun
@@ -15622,7 +16056,8 @@ screens:
   - error
   - loading
   offlineState: false
-  entryParams: []
+  entryParams:
+  - decisionId<-navigation
   goesTo:
   - ADM-669
   boardFrames: null
@@ -15667,7 +16102,8 @@ screens:
   wave: 3
   density: compact
   operations:
-  - explainRecommendation
+  - explainRecommendationDecision
+  - getCustomerRecommendationProfile
   - getGuestProfile
   states:
   - emptyFirstRun
@@ -15678,6 +16114,7 @@ screens:
   offlineState: false
   entryParams:
   - subjectId<-navigation
+  - decisionId<-navigation
   goesTo:
   - ADM-679
   boardFrames: null
@@ -15736,7 +16173,7 @@ screens:
   wave: 3
   density: compact
   operations:
-  - explainRecommendation
+  - explainRecommendationDecision
   - updateRecommendationStrategy
   states:
   - emptyFirstRun
@@ -15747,6 +16184,7 @@ screens:
   offlineState: false
   entryParams:
   - strategyId<-navigation
+  - decisionId<-navigation
   goesTo:
   - ADM-679
   boardFrames: null
@@ -15805,7 +16243,7 @@ screens:
   wave: 3
   density: compact
   operations:
-  - explainRecommendation
+  - explainRecommendationDecision
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -15813,7 +16251,8 @@ screens:
   - error
   - loading
   offlineState: false
-  entryParams: []
+  entryParams:
+  - decisionId<-navigation
   goesTo:
   - ADM-679
   boardFrames: null
@@ -15827,7 +16266,7 @@ screens:
   wave: 3
   density: compact
   operations:
-  - explainRecommendation
+  - explainRecommendationDecision
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -15835,7 +16274,8 @@ screens:
   - error
   - loading
   offlineState: false
-  entryParams: []
+  entryParams:
+  - decisionId<-navigation
   goesTo:
   - ADM-679
   boardFrames: null
@@ -16039,7 +16479,7 @@ screens:
   wave: 3
   density: compact
   operations:
-  - explainRecommendation
+  - explainRecommendationDecision
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -16047,7 +16487,8 @@ screens:
   - error
   - loading
   offlineState: false
-  entryParams: []
+  entryParams:
+  - decisionId<-navigation
   goesTo:
   - ADM-689
   boardFrames: null
@@ -16061,7 +16502,7 @@ screens:
   wave: 3
   density: compact
   operations:
-  - explainRecommendation
+  - explainRecommendationDecision
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -16069,7 +16510,8 @@ screens:
   - error
   - loading
   offlineState: false
-  entryParams: []
+  entryParams:
+  - decisionId<-navigation
   goesTo:
   - ADM-689
   boardFrames: null

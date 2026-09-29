@@ -1,5 +1,19 @@
--- tenancy — 7 tables
+-- tenancy — 8 tables
 -- **Derived. Do not hand-edit.**
+
+-- Holds 9 columns. No description has been written for this table — the name is the only thing
+-- saying what it is. Reached by: 4 operations read it and 1 write it.
+CREATE TABLE IF NOT EXISTS tenancy.data_retention_setting (
+    id                                uuid PRIMARY KEY,
+    data_class                        text NOT NULL,
+    retain_amount                     integer,
+    retain_unit                       text CONSTRAINT data_retention_setting_retain_unit_chk CHECK (retain_unit IN ('days', 'months', 'years')),
+    follows_data_class                text,
+    on_expiry                         text DEFAULT 'archive' CONSTRAINT data_retention_setting_on_expiry_chk CHECK (on_expiry IN ('archive', 'anonymise', 'delete')),
+    updated_at                        timestamptz,
+    updated_by_principal_id           uuid,
+    scope_path                        ltree NOT NULL
+);
 
 -- Holds 12 columns. No description has been written for this table — the name is the only thing
 -- saying what it is
@@ -52,15 +66,19 @@ CREATE TABLE IF NOT EXISTS tenancy.device_credential (
 -- saying what it is
 CREATE TABLE IF NOT EXISTS tenancy.device_firmware (
     id                                uuid PRIMARY KEY,
-    device_kind                       text,
-    version                           text,
+    device_kind                       text NOT NULL,
+    version                           text NOT NULL,
+    vendor                            text,
+    checksum_algorithm                text DEFAULT 'sha256' CONSTRAINT device_firmware_checksum_algorithm_chk CHECK (checksum_algorithm IN ('sha256', 'sha512')),
     release_notes                     text,
     artefact_asset_id                 uuid,
     checksum                          text,
     minimum_previous_version          text,
     released_at                       timestamptz,
     installed_count                   integer,
-    status                            text CONSTRAINT device_firmware_status_chk CHECK (status IN ('draft', 'released', 'deprecated', 'withdrawn'))
+    status                            text DEFAULT 'draft' CONSTRAINT device_firmware_status_chk CHECK (status IN ('draft', 'released', 'deprecated', 'withdrawn')),
+    status_reason                     text,
+    scope_path                        ltree NOT NULL
 );
 
 -- Holds 10 columns. No description has been written for this table — the name is the only thing

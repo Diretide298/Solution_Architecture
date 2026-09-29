@@ -11,11 +11,11 @@
  "note": "Derived by tools/derive-platform.py. **The gaps section is the point** \u2014 a page listing what exists is a directory; one listing what is missing is a worklist.",
  "counts": {
   "screens": 17,
-  "operations": 22,
+  "operations": 23,
   "contracts": 8,
   "modules": 2,
   "undrawn": 0,
-  "operationsWithNoScreen": 15
+  "operationsWithNoScreen": 16
  },
  "waves": {
   "wave2": 17
@@ -54,19 +54,19 @@
    "operations": 2
   },
   {
-   "contract": "fnb",
-   "operations": 2
-  },
-  {
    "contract": "white-label",
    "operations": 2
   },
   {
-   "contract": "promotions",
-   "operations": 1
+   "contract": "fnb",
+   "operations": 2
   },
   {
    "contract": "ai",
+   "operations": 2
+  },
+  {
+   "contract": "promotions",
    "operations": 1
   }
  ],
@@ -203,7 +203,7 @@
    "module": "AI",
    "wave": 2,
    "route": "/kiosk/assistant",
-   "operations": 4,
+   "operations": 5,
    "drawn": true
   },
   {
@@ -310,6 +310,12 @@
     "contract": "orders",
     "verb": "POST",
     "summary": "Take back a share"
+   },
+   {
+    "operation": "getUpsellSuggestions",
+    "contract": "promotions",
+    "verb": "POST",
+    "summary": "Suggestions for a cart"
    },
    {
     "operation": "recordRecommendationOutcome",

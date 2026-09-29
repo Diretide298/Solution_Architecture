@@ -9,9 +9,9 @@ about: '**A multi-tenant venue platform.** One tenant operates several venues; a
   contracts persist to 26 schemas, and every artefact in the package is drawn by resolving against that
   join rather than by being written twice.'
 scale:
-  operations: 2405
+  operations: 2608
   contracts: 33
-  tables: 987
+  tables: 1080
   tablesNote: '**Postgres tables only.** `status.json` reports 379 because it counts five non-table
     stores. **They own no service and should not**: a cache entry is derived from something already
     read, invalidated by an event already consumed, and losable without consequence. **Both numbers
@@ -29,8 +29,8 @@ scale:
   apps: 13
   screens: 2440
   flows: 288
-  stateModels: 186
-  events: 30
+  stateModels: 206
+  events: 69
   decisions: 49
   requirements: 3184
   buildPercent: 0
@@ -40,7 +40,7 @@ actors:
   - P01
   - P02
   - P05
-  operations: 215
+  operations: 246
   note: Buys, arrives, is admitted, spends. **Never sees a staff surface** — `check-screens` refuses
     a guest screen declaring a staff permission.
 - actor: venue staff
@@ -51,13 +51,13 @@ actors:
   - P08
   - P15
   - P16
-  operations: 2254
+  operations: 2439
   note: Sells, admits, cooks, counts, configures. **Authority is carried by the person, not the device**
     (ADR-0002) — which is what makes a shared handheld safe.
 - actor: partner
   reaches:
   - P10
-  operations: 171
+  operations: 173
   note: Resellers and agents, with their own credit and settlement.
 - actor: platform operator
   reaches:
@@ -255,6 +255,7 @@ surfaces:
   - CrossRegionService
   - IdentityService
   - OrderService
+  - TenancyService
   ref: diagrams/lld/platforms/P07.yaml
 - platform: P08
   name: Venue Management — Back Office
@@ -320,6 +321,7 @@ surfaces:
   - CatalogueService
   - CrossRegionService
   - IdentityService
+  - InventoryService
   - LedgerService
   - MarketingService
   - OrderService
@@ -397,6 +399,7 @@ surfaces:
   - fnb
   - ticketing
   callsServices:
+  - AiService
   - CatalogueService
   - FnbService
   - IdentityService
@@ -502,38 +505,38 @@ services:
     - WhiteLabelService
 stores:
 - store: postgres
-  operations: 2391
+  operations: 2594
   usedBy:
   - service: CatalogueService
     operations: 444
   - service: OrderService
-    operations: 277
+    operations: 287
   - service: VenueOpsService
     operations: 274
   - service: MarketingService
-    operations: 253
+    operations: 263
   - service: AccessService
-    operations: 243
+    operations: 245
   - service: PlatformService
-    operations: 202
+    operations: 206
   - service: TenancyService
-    operations: 172
-  - service: FnbService
-    operations: 114
-  - service: IdentityService
-    operations: 70
-  - service: WhiteLabelService
-    operations: 60
-  - service: WalletService
-    operations: 59
-  - service: LedgerService
-    operations: 57
-  - service: InventoryService
-    operations: 51
-  - service: ReportingService
-    operations: 46
+    operations: 202
   - service: AiService
-    operations: 26
+    operations: 128
+  - service: FnbService
+    operations: 117
+  - service: IdentityService
+    operations: 84
+  - service: LedgerService
+    operations: 71
+  - service: WhiteLabelService
+    operations: 64
+  - service: WalletService
+    operations: 63
+  - service: InventoryService
+    operations: 56
+  - service: ReportingService
+    operations: 47
   - service: RetailService
     operations: 25
   - service: CrossRegionService
@@ -541,38 +544,38 @@ stores:
   note: '**One Postgres per cell**, 26 schemas inside it. Not one database per tenant (ADR-0005) — tenancy
     is a partition key, not a deployment boundary.'
 - store: redis
-  operations: 1900
+  operations: 2080
   usedBy:
   - service: CatalogueService
     operations: 389
   - service: AccessService
-    operations: 229
+    operations: 231
   - service: MarketingService
-    operations: 221
+    operations: 231
   - service: OrderService
-    operations: 209
+    operations: 213
   - service: VenueOpsService
     operations: 195
   - service: PlatformService
-    operations: 155
+    operations: 159
   - service: TenancyService
-    operations: 127
-  - service: FnbService
-    operations: 93
-  - service: IdentityService
-    operations: 66
-  - service: WhiteLabelService
-    operations: 47
-  - service: ReportingService
-    operations: 33
-  - service: LedgerService
-    operations: 31
-  - service: InventoryService
-    operations: 31
-  - service: WalletService
-    operations: 23
+    operations: 140
   - service: AiService
-    operations: 21
+    operations: 123
+  - service: FnbService
+    operations: 96
+  - service: IdentityService
+    operations: 80
+  - service: WhiteLabelService
+    operations: 51
+  - service: LedgerService
+    operations: 45
+  - service: InventoryService
+    operations: 36
+  - service: ReportingService
+    operations: 34
+  - service: WalletService
+    operations: 27
   - service: RetailService
     operations: 17
   - service: CrossRegionService
@@ -580,32 +583,32 @@ stores:
   note: Sessions, resolution caches, idempotency. **Losable without consequence** — nothing treats a
     cache entry as a source of truth.
 - store: postgres-analytical
-  operations: 141
+  operations: 250
   usedBy:
-  - service: PlatformService
-    operations: 87
-  - service: ReportingService
-    operations: 20
-  - service: FnbService
-    operations: 19
   - service: AiService
-    operations: 15
+    operations: 117
+  - service: PlatformService
+    operations: 90
+  - service: FnbService
+    operations: 22
+  - service: ReportingService
+    operations: 21
   note: Reporting and AI interactions. **Never the transactional primary** (ADR-0016).
 - store: qdrant
-  operations: 9
+  operations: 111
   usedBy:
   - service: AiService
-    operations: 9
+    operations: 111
   note: Vector search for the concierge and semantic lookup.
 - store: derived
-  operations: 42
+  operations: 51
   usedBy:
   - service: FnbService
-    operations: 20
+    operations: 23
   - service: ReportingService
-    operations: 19
+    operations: 20
   - service: InventoryService
-    operations: 3
+    operations: 8
   note: '**Computed, never stored.** `inventory.stock_level` is the example: a stored level and a movement
     ledger that disagree is a stock count nobody can reconcile.'
 external:
@@ -613,6 +616,7 @@ external:
   via:
   - OrderService
   - PlatformService
+  - WalletService
   reachedThrough: orders.payment
   note: '**Tenant as merchant of record for phase 1**; PayFac deferred. The highest-consequence unresolved
     payment assumption.'
@@ -668,9 +672,9 @@ layers:
 - layer: frontend
   holds: 477 screens, 93 flows, 15 platforms, 12 apps
 - layer: contracts
-  holds: 2405 operations across 28 contracts — the join
+  holds: 2608 operations across 28 contracts — the join
 - layer: backend
-  holds: 987 tables in 26 schemas, 910 relationships
+  holds: 1080 tables in 26 schemas, 910 relationships
 - layer: domain
   holds: 113 state models, 29 events
 - layer: decisions

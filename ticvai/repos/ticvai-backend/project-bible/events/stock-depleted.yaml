@@ -43,6 +43,12 @@ consumers:
   idempotencyKey: movementId
   onFailure: ignore
   isCritical: false
+- context: ai
+  purpose: Candidate availability (an item out of stock at a location is not offered there) and forecast
+    and risk context (AI system design section 3.2)
+  idempotencyKey: movementId
+  onFailure: retry
+  isCritical: false
 retention: 30 days after publication
 notes: One event for every reason a movement happens. A separate event per reason would mean the ledger
   subscribing to six things to answer one question.

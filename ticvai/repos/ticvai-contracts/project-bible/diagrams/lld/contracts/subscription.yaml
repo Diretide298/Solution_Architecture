@@ -1,5 +1,5 @@
 id: LLD-subscription
-title: subscription — 145 operations
+title: subscription — 148 operations
 generatedBy: tools/derive-diagrams.py
 index: diagrams/hld/03-contracts.yaml
 tier: satellite
@@ -340,6 +340,7 @@ operations:
   offline: false
   reads:
   - cache:idempotency
+  - control.tenant
   - subscription.plan
   - subscription.plan_limit
   - subscription.plan_module
@@ -357,6 +358,7 @@ operations:
   offline: false
   reads:
   - cache:idempotency
+  - control.tenant
   - subscription.plan
   - subscription.plan_limit
   - subscription.plan_module
@@ -471,11 +473,18 @@ operations:
   offline: false
   reads:
   - cache:idempotency
+  - control.credit_note
   - control.invoice
   - control.invoice_line
+  - control.usage_record
+  - subscription.contract
+  - subscription.module_listing
+  - subscription.plan
+  - subscription.plan_module
   writes:
   - cache:idempotency
   - control.invoice
+  - control.invoice_line
 - operation: getBillingReconciliation
   verb: GET
   path: /billing-reconciliation
@@ -597,6 +606,29 @@ operations:
   - subscription.plan_limit
   - subscription.plan_module
   writes: []
+- operation: getPlanRecommendations
+  verb: GET
+  path: /plan-recommendations
+  scope: platform
+  permission: PLATFORM_BILLING_VIEW
+  audience:
+  - staff
+  offline: false
+  reads:
+  - control.licence_add_on
+  - control.licence_add_on_limit
+  - control.usage_record
+  - subscription.capacity_pack
+  - subscription.contract
+  - subscription.enforcement_policy
+  - subscription.licensing_model
+  - subscription.module_listing
+  - subscription.plan
+  - subscription.plan_limit
+  - subscription.plan_module
+  - subscription.tier_allowance
+  - subscription.tier_module
+  writes: []
 - operation: getPlanTiers
   verb: GET
   path: /plans/{planId}/tiers
@@ -670,6 +702,25 @@ operations:
   reads:
   - subscription.vsi_model
   writes: []
+- operation: issueCreditNote
+  verb: POST
+  path: /invoices/{invoiceId}/credit-notes
+  scope: tenant
+  permission: PLATFORM_BILLING_MANAGE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - cache:idempotency
+  - control.credit_note
+  - control.credit_note_line
+  - control.invoice
+  - control.invoice_line
+  writes:
+  - cache:idempotency
+  - control.credit_note
+  - control.credit_note_line
+  - control.invoice_line
 - operation: launchCellCluster
   verb: POST
   path: /cell-clusters
@@ -842,6 +893,18 @@ operations:
   - ledger.posting
   - orders.payment
   - orders.sales_order
+  writes: []
+- operation: listCreditNotes
+  verb: GET
+  path: /tenants/{tenantId}/credit-notes
+  scope: tenant
+  permission: PLATFORM_BILLING_VIEW
+  audience:
+  - staff
+  offline: false
+  reads:
+  - control.credit_note
+  - control.credit_note_line
   writes: []
 - operation: listDepositGuaranteeFinancial
   verb: GET
@@ -2097,6 +2160,7 @@ operations:
   reads:
   - cache:idempotency
   - subscription.contract
+  - subscription.plan
   writes:
   - cache:idempotency
   - subscription.contract

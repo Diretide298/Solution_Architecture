@@ -51,6 +51,12 @@ consumers:
   idempotencyKey: performanceId
   onFailure: retry
   isCritical: false
+- context: ai
+  purpose: Drop the performance from recommendation candidates, close forecasts for it, and give risk
+    context to the refund run it causes (AI system design section 3.2)
+  idempotencyKey: performanceId
+  onFailure: retry
+  isCritical: false
 retention: Permanent. A cancellation is referenced by every refund it caused
 notes: '**Two consumers are critical and they must not race.** Voiding the entitlement before the refund
   completes leaves a guest with no ticket and no money; refunding without voiding leaves a valid ticket

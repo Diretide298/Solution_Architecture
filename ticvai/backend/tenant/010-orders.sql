@@ -1,4 +1,4 @@
--- orders — 78 tables
+-- orders — 80 tables
 -- **Derived. Do not hand-edit.**
 
 -- Holds 33 columns. No description has been written for this table — the name is the only thing
@@ -103,7 +103,7 @@ CREATE TABLE IF NOT EXISTS orders.b2b_credit (
 
 -- A cart holds leases; an order holds money. Retained after expiry so a recovery link lands on
 -- something Hangs off: reaches orders.sales_order through its keys; references pii.subject,
--- platform.scope. Reached by: 23 operations read it and 7 write it; 4 tables reference it; written
+-- platform.scope. Reached by: 23 operations read it and 7 write it; 5 tables reference it; written
 -- by 2 contracts — marketing-crm, orders.
 CREATE TABLE IF NOT EXISTS orders.cart (
     id                                uuid PRIMARY KEY NOT NULL,
@@ -137,6 +137,7 @@ CREATE TABLE IF NOT EXISTS orders.cart_line (
     quantity                          integer NOT NULL,
     performance_id                    uuid,
     booked_window                     jsonb,
+    recommendation_id                 uuid,
     table_reservation_id              uuid,
     seat_ids                          text[],
     resource_hold_id                  text,
@@ -203,7 +204,33 @@ CREATE TABLE IF NOT EXISTS orders.chargeback (
     status                            text NOT NULL CONSTRAINT chargeback_status_chk CHECK (status IN ('received', 'underReview', 'evidenceSubmitted', 'won', 'lost', 'accepted', 'expired')),
     evidence_due_by                   timestamptz NOT NULL,
     evidence_submitted_at             timestamptz,
-    outcome_at                        timestamptz
+    outcome_at                        timestamptz,
+    scheme_reason_code                text,
+    notified_at                       timestamptz,
+    assignee_principal_id             uuid,
+    debit_journal_entry_id            text,
+    outcome_journal_entry_id          text
+);
+
+-- One item of evidence assembled for a chargeback (29 September): the order, the scan that
+-- admitted them, the delivery, the terms accepted, a communication or a device fingerprint, each a
+-- kind and a reference. Its own rows because a list of objects has nowhere else to be stored, and
+-- because which evidence wins depends on the chargeback's reason
+CREATE TABLE IF NOT EXISTS orders.chargeback_evidence (
+    chargeback_id                     uuid NOT NULL,
+    kind                              text,
+    reference                         text,
+    id                                uuid PRIMARY KEY NOT NULL
+);
+
+-- The investigation notes on a chargeback, oldest first (29 September), each with who wrote it and
+-- when. Append-only: assignChargeback and recordChargebackOutcome add to it and nothing edits it
+CREATE TABLE IF NOT EXISTS orders.chargeback_investigation_log (
+    chargeback_id                     uuid NOT NULL,
+    note                              text,
+    principal_id                      uuid,
+    at                                timestamptz,
+    id                                uuid PRIMARY KEY NOT NULL
 );
 
 -- a manual override of a partner credit limit, recorded with who and why. Second table on a marker
@@ -363,6 +390,11 @@ CREATE TABLE IF NOT EXISTS orders.fraud_rule (
     id                                uuid PRIMARY KEY NOT NULL,
     name                              text NOT NULL,
     condition                         jsonb NOT NULL,
+    applies_to                        text DEFAULT 'charge' CONSTRAINT fraud_rule_applies_to_chk CHECK (applies_to IN ('charge', 'refund')),
+    signal                            text CONSTRAINT fraud_rule_signal_chk CHECK (signal IN ('velocityCount', 'velocityAmount', 'issuerCountry', 'deviceReuse', 'billingMismatch', 'refundCount', 'refundValue', 'refundRatio')),
+    subject_key                       text DEFAULT 'guest' CONSTRAINT fraud_rule_subject_key_chk CHECK (subject_key IN ('guest', 'paymentToken', 'device')),
+    threshold                         numeric(18,4),
+    window_days                       integer,
     action                            text NOT NULL CONSTRAINT fraud_rule_action_chk CHECK (action IN ('allow', 'flagForReview', 'requireStepUp', 'hold', 'decline')),
     risk_weight                       integer,
     is_active                         boolean NOT NULL,
@@ -784,6 +816,7 @@ CREATE TABLE IF NOT EXISTS orders.order_line (
     sales_order_id                    text NOT NULL,
     id                                text PRIMARY KEY NOT NULL,
     variant_id                        uuid NOT NULL,
+    recommendation_id                 uuid,
     performance_id                    uuid,
     booked_window                     jsonb,
     inventory_hold_id                 text,
@@ -1235,6 +1268,7 @@ CREATE TABLE IF NOT EXISTS orders.reservation_line (
     reservation_id                    text NOT NULL,
     id                                text PRIMARY KEY NOT NULL,
     variant_id                        uuid NOT NULL,
+    recommendation_id                 uuid,
     performance_id                    uuid,
     booked_window                     jsonb,
     inventory_hold_id                 text,

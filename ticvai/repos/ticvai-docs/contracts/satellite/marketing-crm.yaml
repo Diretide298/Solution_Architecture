@@ -2,7 +2,7 @@ openapi: 3.1.0
 info:
   title: TICVAI Marketing & CRM
   version: 0.1.0
-  x-ticvai-screen-count: 199
+  x-ticvai-screen-count: 211
   x-ticvai-tier: satellite
   x-ticvai-module: 22 — Marketing & CRM
   x-ticvai-requirements: 319
@@ -1931,6 +1931,13 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/MessageTrigger'
+        '400':
+          description: '`sendTimeMode` `optimised` on a trigger whose `priority` is `operational` or `transactional`
+            (29 September, build pass, group G2), or an `event` not in the event catalogue.'
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
   /message-dispatches/{dispatchId}/retry:
     parameters:
     - name: dispatchId
@@ -4293,12 +4300,17 @@ paths:
         - "P08 BO-767 Audience & Offer Selection"
         - "P08 BO-768 Multichannel Composer"
         - "P08 BO-769 Schedule & Trigger Rules"
+        - "P08 BO-772 A/B & AI Optimization"
       x-ticvai-audience:
       - staff
       summary: Amend, pause or resume a campaign
       description: 'Content and audience are editable only in draft. A live campaign may be paused, rescheduled
         or stopped — nothing else. Changing the audience mid-send produces a campaign nobody can report
         on afterwards.
+
+        **One more change on a live A/B campaign** (29 September, build pass, group G2; 22.1.17): with
+        `abTest.winnerRule` `manual`, a person sets `abTest.winningVariantId` once the test phase has run, and the
+        winner goes to the rest of the audience. Variants themselves, like all content, are editable only in draft.
 
         '
       tags:
@@ -4431,6 +4443,17 @@ paths:
 
         **Consent is checked at send time, not at segment build time** — a guest may withdraw between
         the two, and the later check is the one that matters.
+
+        **Per-recipient send time and A/B variants** (29 September, build pass, group G2, from group G1''s
+        handoff; 22.3.19, 22.9.16, 22.1.17). With `sendTimeMode` `optimised`, launch asks
+        `ai.requestSuggestion` (kind `sendTime`) for the audience and queues each dispatch at that
+        recipient''s suggested hour inside `sendWindow` (`MessageDispatch.plannedSendAt`), on the suggested
+        channel where `optimiseChannel` is set and the guest has consented to it; a recipient with no
+        suggestion, or any recipient when AI is off, is sent at `scheduledFor` as before. **Nothing is sent
+        outside `sendWindow` or quiet hours because of it.** With `variants` and `abTest`, launch sends
+        each variant to its share of `abTest.testPercent` of the audience, holds the rest, and after
+        `decideAfterHours` sends the winner on `successMetric` to the remainder (`winnerRule` `automatic`)
+        or waits for a person to pick it (`manual`, `updateCampaign` with `winningVariantId`).
 
         '
       tags:
@@ -5375,8 +5398,17 @@ paths:
         - "P08 BO-735 Guest Directory"
       x-ticvai-audience:
       - staff
+      - service
       x-ticvai-read-routing: replica
       summary: A guest's loyalty position
+      description: '**A named guest''s points and tier, read by staff or by another service.** The back office
+        and a till read it for the guest in front of them; the caller''s own position is `getLoyaltyPosition`.
+
+        **`service` audience added 29 September (build pass, from group RC2)** so `queue` `joinQueue` can
+        resolve the guest''s current `tierId` at join and match it against `QueueFastPass.loyaltyTierIds`
+        without a staff session; the service caller holds `GUEST_VIEW` for the venue the queue sits in.
+
+        '
       tags:
       - loyalty
       x-ticvai-permission: GUEST_VIEW
@@ -6924,6 +6956,7 @@ paths:
             - sessionTechnology
             - personalisationTechnology
             - embeddedService
+            - localStorageItem
             - other
         - name: category
           in: query
@@ -6985,6 +7018,8 @@ paths:
           $ref: ../shared/common.yaml#/components/responses/Forbidden
     put:
       operationId: setTrackingTechnology
+      x-ticvai-consumed-by:
+        - "P13 CMS-025 Cookie, Tracking & Digital Technology Registry"
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: pack ''Privacy__Consent___Preference_Management_Reference.pdf'' p.10 (17.1.5 Registry Fields); BL-073 §4a'
@@ -7102,6 +7137,8 @@ paths:
           $ref: ../shared/common.yaml#/components/responses/Forbidden
     put:
       operationId: setCookieBannerDesign
+      x-ticvai-consumed-by:
+        - "P13 CMS-026 Cookie Banner & Preference Center Designer"
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: pack ''Privacy__Consent___Preference_Management_Reference.pdf'' pp.11-12 (17.1.6 Banner Designer, Versioning); BL-073 §4a'
@@ -7110,8 +7147,10 @@ paths:
         **An upsert keyed on `brandId` + `channel` that always writes a new version** (the pack:
         banner wording and configuration must be version controlled). Saved as `draft`; publishing goes
         through `approvePrivacyTesting`. `rejectIsOneClick: false`, a non-essential category with
-        `defaultOn: true` or a missing `strictlyNecessary` description is refused (422).
-        (decided 29 September, readiness close-out)
+        `defaultOn: true` or a missing `strictlyNecessary` description is refused (422), and so is a
+        design whose `regulatoryRegimes` include `ccpaCpra` with no `doNotSellOrShare` button (29 September,
+        build). The published version is what visitors get from `getCookieConsentRuntime` and decide
+        against with `recordDeviceConsent`. (decided 29 September, readiness close-out)
       tags:
         - consent
       x-ticvai-permission: GUEST_MANAGE
@@ -7140,7 +7179,7 @@ paths:
         '400':
           $ref: ../shared/common.yaml#/components/responses/BadRequest
         '422':
-          description: A design that makes rejecting harder than accepting, or pre-ticks a non-essential category.
+          description: A design that makes rejecting harder than accepting, pre-ticks a non-essential category, or names `ccpaCpra` without a `doNotSellOrShare` button.
           content:
             application/problem+json:
               schema:
@@ -8512,7 +8551,10 @@ paths:
         **One object: privacy analytics for the period and filters, with AI findings for a human to
         investigate.** Rates, request resolution and SLA compliance, deletion and retention compliance,
         policy acceptance, guardian consent completion, exceptions and propagation failures, plus
-        cookie acceptance by category and the consent funnel. `riskFindings` are AI-detected patterns and
+        cookie acceptance by category and the consent funnel. **Cookie acceptance, rejection and category
+        selection, by country and brand, are counted from `marketing.device_consent`** (29 September, build:
+        visitors' decisions, `recordDeviceConsent`), so anonymous visitors are in the figures (2.6.63).
+        `riskFindings` are AI-detected patterns and
         configured-rule-versus-observed-behaviour mismatches; **each is a flag, never an action** —
         acting on one is a privacy exception (`setPrivacyComplianceException`). Natural-language questions
         go through the AI assistant, which answers from this and the other privacy reads under the
@@ -10120,6 +10162,14 @@ paths:
         follow-up case (`createCase`, kind `complaint`) assigned to the queue supervisor, and the comment
         carries its `followUpCaseId`. The period defaults to the last 7 days, compared with the 7 before.
         (decided 29 September, readiness close-out)
+
+        **A narrative summary of the feedback in the view** (29 September, build pass, group G2; 22.5.12):
+        `aiSummary` is a few sentences on what customers said for exactly the filters given (a product, a
+        venue, an event, a period), written by the AI gateway from the classified comments and themes in
+        the view, with the number of items it rests on and the model version. It is generated once per
+        filter set and period and cached until new feedback arrives. **Empty when AI is off** for the
+        tenant or venue, or where fewer than 5 items match, and never used for anything but display: no
+        case is opened or closed from it.
       tags:
         - feedback
       x-ticvai-permission: CASE_VIEW
@@ -10168,6 +10218,14 @@ paths:
         - name: eventId
           in: query
           required: false
+          schema:
+            type: string
+            format: uuid
+        - name: productId
+          in: query
+          required: false
+          description: Feedback about this product only (29 September, build pass, group G2; 22.5.12), so the summary
+            and figures are for one product.
           schema:
             type: string
             format: uuid
@@ -13489,6 +13547,14 @@ paths:
         that destroys data irrecoverably at scale, and the dependencies it would break — an order whose
         guest is gone, a waiver with no signatory — have to be visible before rather than after.
 
+        **Narrows the tenant''s setting, never lengthens it** (decided 29 September, Chinmay: all data
+        retention is tenant configuration, one setting per class). The tenant''s period for guest data is
+        tenancy `setDataRetentionSetting` class `guestProfile`; a rule here may keep a category, a
+        jurisdiction or a purpose for **less** than that, and `retainMonths` longer than the tenant''s
+        effective `guestProfile` period is `422`. Payment and financial records are not guest data and
+        are not set here: their periods, and the legal floors under them (4.3.4, 6.1.78), are tenancy
+        classes `paymentRecord` and `financialRecord`.
+
         '
       tags:
       - guests
@@ -13517,6 +13583,13 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/DataRetentionPolicy'
+        '422':
+          description: '`retainMonths` longer than the tenant''s effective `guestProfile` retention
+            period (tenancy `setDataRetentionSetting`); a rule here may only shorten it'
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
   /retention-runs:
     post:
       operationId: runDataRetention
@@ -15176,9 +15249,1170 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+  /consent/device:
+    post:
+      operationId: recordDeviceConsent
+      x-ticvai-consumed-by:
+        - "P01 WEB-001 Home / Landing"
+        - "P01 WEB-024 Devices, Wishlist & Consent"
+        - "P02 GST-001 Home – Default"
+        - "P02 GST-066 Privacy & My Data"
+      x-ticvai-requires-module: core   # cookie consent is the law on every storefront, licensed marketing or not (decided 29 September, build)
+      x-ticvai-audience:
+      - anonymous
+      - guest
+      security: []
+      x-ticvai-agreed: '29 September: BL-073 design (docs/active/bl-073-cookie-consent-20-september.md §3 and §4b, the record, the claim and the merge); strictest posture decided 29 September (readiness close-out); matrix 2.6.52, 2.6.55, 2.6.60, 2.6.62, 22.13.10; shape follows recordConsent'
+      summary: Record a visitor's cookie decision, before anyone is known
+      description: >
+        **The banner's and the preference centre's write, for a visitor nobody has identified yet**
+        (2.6.52, 2.6.55). **Append-only, like `recordConsent`**: a change of mind or a withdrawal is a
+        new row, never an edit, so the trail from first decision to last is the evidence (2.6.56).
+        Where no `consentKey` is sent the server mints one and returns it; the browser or app keeps it
+        as a first-party, strictly necessary cookie or local key, which is the one thing that may be set
+        before consent. **The key is the tenant's, not the domain's** (2.6.62): the storefront on any of
+        the tenant's verified domains (white-label `claimCustomDomain`) presents the same key and gets
+        the same answer; it is never shared across tenants, because two tenants are two controllers.
+
+        **What the action writes.** `acceptAll` grants every category; `rejectNonEssential` and
+        `withdraw` decline every category but `strictlyNecessary`; `savePreferences` records the
+        categories as sent, and a category not sent is declined (off by default, BL-073);
+        `doNotSellOrShare` declines `marketing` (CCPA/CPRA). **A `globalPrivacyControl` signal declines
+        `marketing` whatever else was chosen.** `strictlyNecessary` is always granted and cannot be
+        declined (422). The decision expires after the tenant's device-consent term and the banner asks
+        again; so does a new `noticeVersion`.
+
+        **Personal data stays out of `marketing`** (ADR-0023, BL-073 §3): where the published banner
+        design has `recordIpAddress` on, the request's IP address and user agent are written to
+        `pii.consent_identifier` against this row, never beside it. `country` is the edge's
+        geolocation of the request, kept for the geographic consent statistics (2.6.63) without
+        keeping the address. A key already claimed by a guest (`claimDeviceConsent`) is closed: a
+        decision sent against it mints a new key.
+
+        **Publishes `consent.deviceConsentRecorded`** (29 September, build, 2.6.65) in the same transaction
+        as the row, without the IP address or user agent, so a CDP or CRM subscribed through the webhook
+        catalogue receives the consent signal; Google Analytics and Tag Manager read it in the page
+        (`getCookieConsentRuntime`).
+      tags:
+      - consent
+      x-ticvai-permission: null
+      x-ticvai-scope-level: subject
+      x-ticvai-config-scope: subject
+      x-ticvai-config-scope-note: '29 September (build): **`subject`, as `recordConsent`: the answer is the visitor''s own,
+        not the venue''s.** It does not inherit down the scope tree and an operator cannot override it; the
+        question (banner, categories) is the tenant''s and is configured by `setCookieBannerDesign`.'
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: append
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RecordDeviceConsentRequest'
+      responses:
+        '201':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: Recorded; carries the `consentKey` to keep
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeviceConsent'
+        '400':
+          description: No published banner design with this id for the channel, or a category the design does not offer
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
+        '409':
+          description: '`noticeVersion` is no longer the published one (`notice-superseded`); read `getCookieConsentRuntime` again and show the current banner'
+          x-ticvai-problem-types:
+          - notice-superseded
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
+        '422':
+          description: '`strictlyNecessary` declined, or `savePreferences` with no categories'
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
+    get:
+      operationId: listDeviceConsents
+      x-ticvai-consumed-by:
+        - "P13 CMS-033 Consent Evidence, History & Withdrawal Management"
+        - "P13 CMS-039 Privacy Audit, Evidence & Compliance Reporting"
+      x-ticvai-requires-module: core   # cookie consent is the law on every storefront, licensed marketing or not (decided 29 September, build)
+      x-ticvai-audience:
+      - staff
+      x-ticvai-agreed: '29 September: BL-073 design §3 (marketing.device_consent is ours whichever way CF-127 goes); matrix 2.6.56 and 2.6.64 (review consent logs); shape follows listConsentEvidenceWithdrawal'
+      summary: Visitors' cookie decisions, as evidence
+      description: >
+        **The consent log for decisions made before anyone signed in** (2.6.56, 2.6.64): every row
+        `recordDeviceConsent` wrote, with its categories, notice and banner version, action, channel,
+        brand, country and whether and when it was claimed. **No personal data**: the IP address and
+        user agent stay in `pii.consent_identifier` and are not joined here. A claimed decision also
+        appears in `listConsentEvidenceWithdrawal` as the guest's `ConsentRecord` with source
+        `cookieBanner`. Newest first by `decidedAt` then `id`; keyset cursor.
+      tags:
+      - consent
+      x-ticvai-permission: GUEST_VIEW
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      x-ticvai-read-routing: replica
+      parameters:
+      - name: channel
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/CookieConsentChannel'
+      - name: brandId
+        in: query
+        required: false
+        schema:
+          type: string
+          format: uuid
+      - name: action
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/DeviceConsentAction'
+      - name: category
+        in: query
+        required: false
+        description: Decisions that include this category
+        schema:
+          $ref: '#/components/schemas/CookieCategory'
+      - name: country
+        in: query
+        required: false
+        schema:
+          type: string
+          pattern: ^[A-Z]{2}$
+      - name: claimed
+        in: query
+        required: false
+        schema:
+          type: boolean
+      - name: consentKey
+        in: query
+        required: false
+        description: One visitor's trail
+        schema:
+          type: string
+      - name: from
+        in: query
+        required: false
+        schema:
+          type: string
+          format: date-time
+      - name: to
+        in: query
+        required: false
+        schema:
+          type: string
+          format: date-time
+      - $ref: ../shared/common.yaml#/components/parameters/PageSize
+      - $ref: ../shared/common.yaml#/components/parameters/PageCursor
+      responses:
+        '200':
+          description: Decisions
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: ../shared/common.yaml#/components/schemas/Page
+                - type: object
+                  properties:
+                    items:
+                      type: array
+                      items:
+                        $ref: '#/components/schemas/DeviceConsent'
+        '403':
+          $ref: ../shared/common.yaml#/components/responses/Forbidden
+  /consent/device/history:
+    get:
+      operationId: getDeviceConsentHistory
+      x-ticvai-consumed-by:
+        - "P01 WEB-024 Devices, Wishlist & Consent"
+        - "P02 GST-066 Privacy & My Data"
+      x-ticvai-requires-module: core   # cookie consent is the law on every storefront, licensed marketing or not (decided 29 September, build)
+      x-ticvai-audience:
+      - anonymous
+      - guest
+      security: []
+      x-ticvai-agreed: '29 September: matrix 2.6.61 (review consent history, change preferences, withdraw); BL-073 design §4b; shape follows getConsentHistory'
+      summary: A visitor's own cookie decisions, oldest first
+      description: >
+        **What the preference centre shows a visitor who has not signed in** (2.6.61): every decision
+        recorded against the key their browser or app holds, oldest first by `decidedAt` then `id`,
+        keyset cursor. Changing or withdrawing is `recordDeviceConsent`; a signed-in guest reads their
+        own consents with `getGuestConsents`, and deletion is identity `deleteGuestAccount`.
+        **The key is the only credential**, so it travels in a header, not the URL. A key claimed by a
+        guest answers 404: its decisions are that guest's now, and a shared browser must not show them
+        to the next person.
+      tags:
+      - consent
+      x-ticvai-permission: null
+      x-ticvai-scope-level: tenant
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      x-ticvai-read-routing: replica
+      parameters:
+      - name: X-Consent-Key
+        in: header
+        required: true
+        description: The key the visitor's browser or app holds
+        schema:
+          type: string
+          maxLength: 64
+      - $ref: ../shared/common.yaml#/components/parameters/PageSize
+      - $ref: ../shared/common.yaml#/components/parameters/PageCursor
+      responses:
+        '200':
+          description: The visitor's decisions
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: ../shared/common.yaml#/components/schemas/Page
+                - type: object
+                  properties:
+                    items:
+                      type: array
+                      items:
+                        $ref: '#/components/schemas/DeviceConsent'
+        '404':
+          $ref: ../shared/common.yaml#/components/responses/NotFound
+  /guests/{subjectId}/consents/claim-device:
+    parameters:
+    - name: subjectId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    post:
+      operationId: claimDeviceConsent
+      x-ticvai-consumed-by:
+        - "P01 WEB-016 Login / Register"
+        - "P02 GST-042 Simple Registration & OTP"
+      x-ticvai-requires-module: core   # cookie consent is the law on every storefront, licensed marketing or not (decided 29 September, build)
+      x-ticvai-audience:
+      - guest
+      security:
+      - guestAuth: []
+      - bearerAuth: []
+      x-ticvai-self-scoped: subject
+      x-ticvai-agreed: '29 September: BL-073 design §4b (the claim, CF-160 narrowing); shape follows recordConsent and mergeGuestProfiles'
+      summary: Attach a browser's cookie decision to the guest who turned out to own it
+      description: >
+        **At sign-in or registration the browser holds a decision and the platform gains a subject;
+        this joins them, and it is where CF-160 runs.** Per category the result is **the narrower of
+        the two**: a guest who declined analytics on this browser and granted it on their profile ends
+        declined, and the reverse also ends declined. Inheriting the more permissive answer is how a
+        merge becomes a breach (`mergeGuestProfiles` says the same).
+
+        Writes one `ConsentRecord` per affected purpose through the `recordConsent` path, source
+        `cookieBanner`, so `getConsentHistory` and `listConsentEvidenceWithdrawal` show the claim as
+        evidence; the purposes are the ones the category's approved technologies serve
+        (`processingPurposeCode`). The guest's tracking choices (`listCustomerPrivacyConsent`) come from
+        the claimed rows. **`claimedBySubjectId` is set once and never cleared**, so a shared kiosk
+        browser cannot later hand one guest's decision to the next: a second claim by another subject
+        is 409, and a repeat claim by the same subject returns the same state.
+
+        **Publishes `consent.deviceConsentClaimed`** on the first claim of a key (29 September, build,
+        2.6.65), carrying the subject and the narrowed categories, so a CDP or CRM can join the anonymous
+        visitor's consent to the known profile. A repeat claim publishes nothing.
+      tags:
+      - consent
+      x-ticvai-permission: null
+      x-ticvai-scope-level: subject
+      x-ticvai-config-scope: subject
+      x-ticvai-config-scope-note: '29 September (build): **`subject`, as `recordConsent`**: the value belongs to the
+        guest, and the claim only moves it from their browser to their profile.'
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: append
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ClaimDeviceConsentRequest'
+      responses:
+        '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: The guest's consent state after narrowing
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConsentState'
+        '404':
+          $ref: ../shared/common.yaml#/components/responses/NotFound
+        '409':
+          description: The key is already claimed by another subject (`already-claimed`)
+          x-ticvai-problem-types:
+          - already-claimed
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
+  /storefront/cookie-consent:
+    get:
+      operationId: getCookieConsentRuntime
+      x-ticvai-consumed-by:
+        - "P01 WEB-001 Home / Landing"
+        - "P01 WEB-024 Devices, Wishlist & Consent"
+        - "P02 GST-001 Home – Default"
+        - "P02 GST-066 Privacy & My Data"
+      x-ticvai-requires-module: core   # cookie consent is the law on every storefront, licensed marketing or not (decided 29 September, build)
+      x-ticvai-audience:
+      - anonymous
+      - guest
+      security: []
+      x-ticvai-agreed: '29 September: BL-073 design §4a (getCookieRuntime: what the page must render and what it must not load); matrix 2.6.52, 2.6.58, 2.6.65 (Google Analytics and Tag Manager consent mode), 22.13.10; the banner and registry live in marketing-crm (setCookieBannerDesign, setTrackingTechnology), so the runtime read does too'
+      summary: What the page must show and what it may load
+      description: >
+        **The storefront and the app SDK ask this before they inject anything** (2.6.52, 2.6.58). It
+        returns the **published** banner and preference-centre design for the channel and brand (the
+        corporate design where the brand has none), the notice version in force, the approved
+        technologies each category unlocks, and, when the caller presents its consent key, the
+        decision already recorded, so a returning visitor is not asked twice.
+
+        **Enforcement is the loader's, and this is what it enforces against**: nothing outside
+        `strictlyNecessary` loads until its category is granted, and a technology that is not in
+        `allowedTechnologies` never loads at all (a `detected` one is blocked until approved).
+        `consentModeSignals` are the same decision in Google consent-mode terms, so Google Analytics
+        and Tag Manager are told rather than guessed (2.6.65). `requiresDecision` is true with no
+        decision, an expired one, or one given against a superseded notice.
+
+        **Anonymous and unauthenticated by necessity**: a token would be state set before consent to
+        set state. Without a key the answer is the same for every visitor of a channel, brand, language
+        and notice version and is cached at the edge, which is how the one-second banner budget
+        (2.6.65) is met.
+      tags:
+      - consent
+      x-ticvai-permission: null
+      x-ticvai-scope-level: tenant
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      x-ticvai-read-routing: replica
+      parameters:
+      - name: channel
+        in: query
+        required: true
+        schema:
+          $ref: '#/components/schemas/CookieConsentChannel'
+      - name: brandId
+        in: query
+        required: false
+        schema:
+          type: string
+          format: uuid
+      - name: language
+        in: query
+        required: false
+        description: One of the design's languages; the tenant's default where omitted
+        schema:
+          type: string
+          maxLength: 10
+      - name: X-Consent-Key
+        in: header
+        required: false
+        description: The key the visitor's browser or app holds, if any
+        schema:
+          type: string
+          maxLength: 64
+      responses:
+        '200':
+          description: The runtime answer
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CookieConsentRuntime'
+        '404':
+          description: No published banner design for this channel (`not-configured`); the storefront loads nothing but `strictlyNecessary`
+          x-ticvai-problem-types:
+          - not-configured
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
+  /storefront/cookie-consent/technologies:
+    get:
+      operationId: listPublishedTrackingTechnologies
+      x-ticvai-consumed-by:
+        - "P01 WEB-024 Devices, Wishlist & Consent"
+        - "P02 GST-066 Privacy & My Data"
+      x-ticvai-requires-module: core   # cookie consent is the law on every storefront, licensed marketing or not (decided 29 September, build)
+      x-ticvai-audience:
+      - anonymous
+      - guest
+      security: []
+      x-ticvai-agreed: '29 September: matrix 2.6.54 (preference centre: cookie name, provider, purpose, expiry, first or third party); BL-073 design §4a; shape follows listCookieTrackingDigital'
+      summary: The approved cookie registry, as the preference centre shows it
+      description: >
+        **The guest-facing view of the registry** (2.6.54): only `approved` technologies on the
+        channel, with what the preference centre tells a visitor about each (name, provider, purpose,
+        expiry in days, first or third party, category). `detected`, `blocked` and `retired` entries
+        and the governance fields (`processingPurposeCode`, scan dates, `scopePath`) are never shown.
+        Ordered by `category` then `name`; keyset cursor. Cached at the edge per tenant and channel.
+      tags:
+      - consent
+      x-ticvai-permission: null
+      x-ticvai-scope-level: tenant
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      x-ticvai-read-routing: replica
+      parameters:
+      - name: channel
+        in: query
+        required: true
+        schema:
+          $ref: '#/components/schemas/CookieConsentChannel'
+      - name: category
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/CookieCategory'
+      - $ref: ../shared/common.yaml#/components/parameters/PageSize
+      - $ref: ../shared/common.yaml#/components/parameters/PageCursor
+      responses:
+        '200':
+          description: Approved technologies
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: ../shared/common.yaml#/components/schemas/Page
+                - type: object
+                  properties:
+                    items:
+                      type: array
+                      items:
+                        $ref: '#/components/schemas/PublishedTrackingTechnology'
+  /cookie-tracking-digital/scans:
+    post:
+      operationId: recordCookieScan
+      x-ticvai-consumed-by:
+        - "P13 CMS-025 Cookie, Tracking & Digital Technology Registry"
+      x-ticvai-requires-module: core   # cookie consent is the law on every storefront, licensed marketing or not (decided 29 September, build)
+      x-ticvai-audience:
+      - staff
+      - service
+      security:
+      - bearerAuth: []
+      - serviceAuth: []
+      x-ticvai-agreed: '29 September: BL-073 design §4a (recordCookieScan: the one operation the buy-or-build call changes, and only who calls it); matrix 2.6.57; shape follows setTrackingTechnology'
+      summary: Take in the result of a site or app scan
+      description: >
+        **Scan intake** (2.6.57). Whoever scans (a bought scanner through a service credential, our own
+        crawler, or an administrator uploading a report) posts the same payload, so CF-127's
+        buy-or-build answer changes who calls this and nothing downstream. Each finding is matched to
+        the registry on `name` + `provider` + `domainApplication`: a known one has `lastSeenAt`
+        moved; **a new one lands as `detected`, never `approved`**, and is treated as blocked until an
+        administrator classifies it with `setTrackingTechnology`. New cookies, third-party cookies,
+        SDKs, pixel tags and local-storage keys are all findings (`technologyType`).
+
+        **Every newly detected technology raises an administrator alert** to the recipients the scan
+        policy names (`setCookieScanPolicy`); the scan run is kept with its counts. A technology
+        missing from two consecutive scans of its channel is flagged for retirement, never retired
+        automatically.
+      tags:
+      - consent
+      x-ticvai-permission: GUEST_MANAGE
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      x-ticvai-read-routing: primary
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RecordCookieScanRequest'
+      responses:
+        '202':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: Accepted; the run with its counts
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CookieScanRun'
+        '400':
+          $ref: ../shared/common.yaml#/components/responses/BadRequest
+    get:
+      operationId: listCookieScans
+      x-ticvai-consumed-by:
+        - "P13 CMS-025 Cookie, Tracking & Digital Technology Registry"
+      x-ticvai-requires-module: core   # cookie consent is the law on every storefront, licensed marketing or not (decided 29 September, build)
+      x-ticvai-audience:
+      - staff
+      x-ticvai-agreed: '29 September: matrix 2.6.57; BL-073 design §4a; shape follows listCookieTrackingDigital'
+      summary: Scan runs and what each found
+      description: >
+        **The scan history** (2.6.57): one entry per run, with its source, channel, domain or app,
+        how many findings it carried and how many were new. Newest first by `scannedAt` then `id`;
+        keyset cursor.
+      tags:
+      - consent
+      x-ticvai-permission: GUEST_VIEW
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      x-ticvai-read-routing: replica
+      parameters:
+      - name: channel
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/CookieConsentChannel'
+      - $ref: ../shared/common.yaml#/components/parameters/PageSize
+      - $ref: ../shared/common.yaml#/components/parameters/PageCursor
+      responses:
+        '200':
+          description: Scan runs
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: ../shared/common.yaml#/components/schemas/Page
+                - type: object
+                  properties:
+                    items:
+                      type: array
+                      items:
+                        $ref: '#/components/schemas/CookieScanRun'
+        '403':
+          $ref: ../shared/common.yaml#/components/responses/Forbidden
+  /cookie-scan-policy:
+    get:
+      operationId: listCookieScanPolicies
+      x-ticvai-consumed-by:
+        - "P13 CMS-025 Cookie, Tracking & Digital Technology Registry"
+      x-ticvai-requires-module: core   # cookie consent is the law on every storefront, licensed marketing or not (decided 29 September, build)
+      x-ticvai-audience:
+      - staff
+      x-ticvai-agreed: '29 September: matrix 2.6.64 (configure cookie scanning schedules); BL-073 design §4; shape follows listCookieTrackingDigital'
+      summary: Scan schedules per channel
+      description: >
+        **One scan schedule per channel and domain or app** (2.6.64), with who is alerted when a scan
+        finds something new. Ordered by `channel` then `domainApplication`; keyset cursor.
+      tags:
+      - consent
+      x-ticvai-permission: GUEST_VIEW
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      x-ticvai-read-routing: replica
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/PageSize
+      - $ref: ../shared/common.yaml#/components/parameters/PageCursor
+      responses:
+        '200':
+          description: Scan schedules
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: ../shared/common.yaml#/components/schemas/Page
+                - type: object
+                  properties:
+                    items:
+                      type: array
+                      items:
+                        $ref: '#/components/schemas/CookieScanPolicy'
+        '403':
+          $ref: ../shared/common.yaml#/components/responses/Forbidden
+    put:
+      operationId: setCookieScanPolicy
+      x-ticvai-consumed-by:
+        - "P13 CMS-025 Cookie, Tracking & Digital Technology Registry"
+      x-ticvai-requires-module: core   # cookie consent is the law on every storefront, licensed marketing or not (decided 29 September, build)
+      x-ticvai-audience:
+      - staff
+      x-ticvai-agreed: '29 September: matrix 2.6.64; BL-073 design §4 (the schedule is ours whichever way CF-127 goes: a bought scanner reads it or ignores it, our crawler runs on it); shape follows setConsentCapturePoint'
+      summary: Set how often a channel is scanned and who is alerted
+      description: >
+        **An upsert keyed on `channel` + `domainApplication`** (2.6.64). `frequency` `off` keeps the
+        row and stops the schedule. `alertRecipientPrincipalIds` receive the new-technology alert
+        `recordCookieScan` raises; with none, the alert goes to holders of `GUEST_MANAGE` at the
+        venue. **The scanner itself is CF-127's question** (buy or build, still the client's): this
+        is the schedule either one follows.
+      tags:
+      - consent
+      x-ticvai-permission: GUEST_MANAGE
+      x-ticvai-scope-level: venue
+      x-ticvai-config-scope: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      x-ticvai-read-routing: primary
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CookieScanPolicy'
+      responses:
+        '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: The schedule as stored
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CookieScanPolicy'
+        '400':
+          $ref: ../shared/common.yaml#/components/responses/BadRequest
+        '422':
+          description: A weekly schedule with no `dayOfWeek`, or a monthly one with no `dayOfMonth`
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
 
 components:
   schemas:
+    CookieCategory:
+      type: string
+      enum:
+      - strictlyNecessary
+      - functional
+      - analytics
+      - personalisation
+      - marketing
+      description: '2.6.53. The five categories the banner design (`CookieBannerPreferenceCenterDesignerView.categories`)
+        offers; the matrix''s "preference" category is `personalisation` (British spelling, as `ConsentPurpose`).'
+    CookieConsentChannel:
+      type: string
+      enum:
+      - b2cWebsite
+      - customerPortal
+      - mobileApp
+      - embeddedCheckout
+      - whiteLabelSite
+      - partnerMicrosite
+      description: The six governed surfaces, as the registry and the banner design name them (pack 17.1.5-17.1.6).
+    DeviceConsentAction:
+      type: string
+      enum:
+      - acceptAll
+      - rejectNonEssential
+      - savePreferences
+      - withdraw
+      - doNotSellOrShare
+      description: 'What the visitor pressed. `doNotSellOrShare` is the CCPA/CPRA opt-out link, shown where the design''s
+        `regulatoryRegimes` include `ccpaCpra`.'
+    DeviceConsent:
+      type: object
+      x-ticvai-persistence: marketing.device_consent + marketing.device_consent_category
+      description: '**One cookie decision by a visitor nobody has identified yet** (BL-073 §4b, decided 29 September).
+        Append-only: a change of mind is a new row. Keyed for the visitor by `consentKey`, which the platform mints; the
+        categories are child rows. The IP address and user agent, where recorded at all, are in `pii.consent_identifier`
+        (`ConsentCaptureIdentifier`), never here.'
+      required:
+      - consentKey
+      - channel
+      - action
+      - categories
+      - noticeVersion
+      - decidedAt
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        consentKey:
+          type: string
+          maxLength: 64
+          readOnly: true
+          description: '**Opaque, minted by us, not a device fingerprint.** It answers 2.6.55''s "user identifier/session ID"
+            and is the join key `claimDeviceConsent` needs. Shared by all the tenant''s domains (2.6.62), never across tenants.'
+        channel:
+          $ref: '#/components/schemas/CookieConsentChannel'
+        brandId:
+          type: string
+          format: uuid
+          nullable: true
+        bannerDesignId:
+          type: string
+          format: uuid
+          nullable: true
+          description: The published `CookieBannerPreferenceCenterDesignerView` version the visitor was shown.
+        action:
+          $ref: '#/components/schemas/DeviceConsentAction'
+        categories:
+          type: array
+          minItems: 1
+          description: Every category of the design, with the decision this row gives it.
+          items:
+            type: object
+            required:
+            - category
+            - decision
+            properties:
+              category:
+                $ref: '#/components/schemas/CookieCategory'
+              decision:
+                type: string
+                enum:
+                - granted
+                - declined
+        noticeVersion:
+          type: string
+          description: The cookie notice version decided against (white-label `setPolicy`, kind `cookie`).
+        language:
+          type: string
+          maxLength: 10
+          nullable: true
+        globalPrivacyControl:
+          type: boolean
+          default: false
+          description: The browser sent a Global Privacy Control signal; honoured as a CCPA/CPRA opt-out of sale and sharing.
+        source:
+          $ref: '#/components/schemas/ConsentSource'
+        country:
+          type: string
+          pattern: ^[A-Z]{2}$
+          nullable: true
+          readOnly: true
+          description: The edge's geolocation of the request, for the geographic statistics (2.6.63). The address is not kept here.
+        decidedAt:
+          type: string
+          format: date-time
+        expiresAt:
+          type: string
+          format: date-time
+          nullable: true
+          readOnly: true
+          description: '**A device consent expires and a subject consent does not.** Set from the tenant''s device-consent term;
+            after it the banner asks again.'
+        claimedBySubjectId:
+          type: string
+          format: uuid
+          nullable: true
+          readOnly: true
+          description: Set once, by `claimDeviceConsent`. Never cleared.
+        claimedAt:
+          type: string
+          format: date-time
+          nullable: true
+          readOnly: true
+        scopePath:
+          type: string
+          readOnly: true
+          description: '**The partition key** (ADR-0005), tenant-scoped: a decision with no subject still belongs to one tenant.'
+    RecordDeviceConsentRequest:
+      type: object
+      x-ticvai-persistence: none — request only
+      description: What the banner or preference centre sends to `recordDeviceConsent`.
+      required:
+      - channel
+      - action
+      - noticeVersion
+      - decidedAt
+      properties:
+        consentKey:
+          type: string
+          maxLength: 64
+          nullable: true
+          description: The key the browser or app already holds; omitted on a first decision, and one is minted.
+        channel:
+          $ref: '#/components/schemas/CookieConsentChannel'
+        brandId:
+          type: string
+          format: uuid
+          nullable: true
+        bannerDesignId:
+          type: string
+          format: uuid
+          nullable: true
+        action:
+          $ref: '#/components/schemas/DeviceConsentAction'
+        categories:
+          type: array
+          description: Required for `savePreferences`; ignored for the other actions, which decide every category themselves.
+          items:
+            type: object
+            required:
+            - category
+            - decision
+            properties:
+              category:
+                $ref: '#/components/schemas/CookieCategory'
+              decision:
+                type: string
+                enum:
+                - granted
+                - declined
+        noticeVersion:
+          type: string
+        language:
+          type: string
+          maxLength: 10
+          nullable: true
+        globalPrivacyControl:
+          type: boolean
+          default: false
+        source:
+          $ref: '#/components/schemas/ConsentSource'
+        decidedAt:
+          type: string
+          format: date-time
+    ClaimDeviceConsentRequest:
+      type: object
+      x-ticvai-persistence: none — request only
+      required:
+      - consentKey
+      properties:
+        consentKey:
+          type: string
+          maxLength: 64
+    ConsentCaptureIdentifier:
+      type: object
+      x-ticvai-persistence: pii.consent_identifier
+      description: '**The only personal data in the consent path, kept in `pii`** (ADR-0023, BL-073 §3): the IP address and
+        user agent a cookie decision was made from, written only where the published banner design has `recordIpAddress`
+        on (2.6.55, "if legally permitted"). Erasure reaches it with the rest of `pii`; the decision itself survives as
+        evidence without it.'
+      required:
+      - deviceConsentId
+      - capturedAt
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        deviceConsentId:
+          type: string
+          format: uuid
+          description: The `DeviceConsent` row it was captured with.
+        ipAddress:
+          type: string
+          maxLength: 45
+          nullable: true
+        userAgent:
+          type: string
+          maxLength: 500
+          nullable: true
+        capturedAt:
+          type: string
+          format: date-time
+        scopePath:
+          type: string
+          readOnly: true
+          description: '**The partition key** (ADR-0005), the decision''s.'
+    CookieConsentRuntime:
+      type: object
+      x-ticvai-persistence: none — assembled at read time from marketing.cookie_banner_design, marketing.tracking_technology and marketing.device_consent
+      description: What `getCookieConsentRuntime` gives the storefront tag loader and the app SDK gate (2.6.52, 2.6.58).
+      required:
+      - banner
+      - noticeVersion
+      - requiresDecision
+      - allowedTechnologies
+      - consentModeSignals
+      properties:
+        banner:
+          $ref: '#/components/schemas/CookieBannerPreferenceCenterDesignerView'
+        noticeVersion:
+          type: string
+        requiresDecision:
+          type: boolean
+          description: True with no decision, an expired one, or one given against a superseded notice.
+        decision:
+          allOf:
+          - $ref: '#/components/schemas/DeviceConsent'
+          nullable: true
+          description: The latest decision for the presented key; null without a key.
+        allowedTechnologies:
+          type: array
+          description: Per category, the approved technologies it unlocks. Anything not listed never loads.
+          items:
+            type: object
+            required:
+            - category
+            - technologies
+            properties:
+              category:
+                $ref: '#/components/schemas/CookieCategory'
+              granted:
+                type: boolean
+                description: Whether the presented decision grants it; always true for `strictlyNecessary`.
+              technologies:
+                type: array
+                items:
+                  type: object
+                  required:
+                  - name
+                  - provider
+                  properties:
+                    name:
+                      type: string
+                    provider:
+                      type: string
+                    technologyType:
+                      type: string
+        consentModeSignals:
+          type: object
+          description: '**The decision in Google consent-mode terms** (2.6.65), so Analytics and Tag Manager are told, not
+            left to guess. `denied` wherever no decision grants the category.'
+          properties:
+            adStorage:
+              type: string
+              enum:
+              - granted
+              - denied
+            adUserData:
+              type: string
+              enum:
+              - granted
+              - denied
+            adPersonalization:
+              type: string
+              enum:
+              - granted
+              - denied
+            analyticsStorage:
+              type: string
+              enum:
+              - granted
+              - denied
+            functionalityStorage:
+              type: string
+              enum:
+              - granted
+              - denied
+            personalizationStorage:
+              type: string
+              enum:
+              - granted
+              - denied
+            securityStorage:
+              type: string
+              enum:
+              - granted
+    PublishedTrackingTechnology:
+      type: object
+      x-ticvai-persistence: none — the approved rows of marketing.tracking_technology, guest-facing fields only
+      description: One approved technology as the preference centre shows it (2.6.54).
+      required:
+      - name
+      - provider
+      - category
+      - isThirdParty
+      properties:
+        name:
+          type: string
+        provider:
+          type: string
+        category:
+          $ref: '#/components/schemas/CookieCategory'
+        technologyType:
+          type: string
+        purpose:
+          type: string
+          nullable: true
+        durationDays:
+          type: integer
+          nullable: true
+          description: Null for session storage.
+        isThirdParty:
+          type: boolean
+        privacyInformation:
+          type: string
+          nullable: true
+    RecordCookieScanRequest:
+      type: object
+      x-ticvai-persistence: none — request only
+      required:
+      - scannedAt
+      - channel
+      - findings
+      properties:
+        scannedAt:
+          type: string
+          format: date-time
+        channel:
+          $ref: '#/components/schemas/CookieConsentChannel'
+        domainApplication:
+          type: string
+          maxLength: 255
+          nullable: true
+          description: The domain, or the app and version, scanned.
+        scannerRef:
+          type: string
+          maxLength: 200
+          nullable: true
+          description: The vendor and scan id where the scanner is bought; null for ours or a manual upload.
+        findings:
+          type: array
+          items:
+            type: object
+            required:
+            - name
+            - provider
+            - technologyType
+            - isThirdParty
+            properties:
+              name:
+                type: string
+                maxLength: 200
+              provider:
+                type: string
+                maxLength: 150
+              technologyType:
+                type: string
+                enum:
+                - firstPartyCookie
+                - thirdPartyCookie
+                - mobileSdk
+                - analyticsTracker
+                - advertisingPixel
+                - sessionTechnology
+                - personalisationTechnology
+                - embeddedService
+                - localStorageItem
+                - other
+              isThirdParty:
+                type: boolean
+              durationDays:
+                type: integer
+                minimum: 0
+                nullable: true
+              domainApplication:
+                type: string
+                maxLength: 255
+                nullable: true
+    CookieScanRun:
+      type: object
+      x-ticvai-persistence: marketing.cookie_scan_run
+      description: One scan taken in by `recordCookieScan` (2.6.57).
+      required:
+      - channel
+      - scannedAt
+      - source
+      - findingsCount
+      - newlyDetectedCount
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        channel:
+          $ref: '#/components/schemas/CookieConsentChannel'
+        domainApplication:
+          type: string
+          maxLength: 255
+          nullable: true
+        source:
+          type: string
+          enum:
+          - boughtScanner
+          - ownCrawler
+          - manualUpload
+        scannerRef:
+          type: string
+          maxLength: 200
+          nullable: true
+        scannedAt:
+          type: string
+          format: date-time
+        findingsCount:
+          type: integer
+          minimum: 0
+        newlyDetectedCount:
+          type: integer
+          minimum: 0
+          description: What the administrator alert is raised from.
+        missingCount:
+          type: integer
+          minimum: 0
+          description: Registry entries for this channel the scan did not see.
+        alertedAt:
+          type: string
+          format: date-time
+          nullable: true
+        scopePath:
+          type: string
+          readOnly: true
+          description: '**The partition key** (ADR-0005).'
+    CookieScanPolicy:
+      type: object
+      x-ticvai-persistence: marketing.cookie_scan_policy
+      description: How often one channel's domain or app is scanned and who is alerted (2.6.64).
+      required:
+      - channel
+      - frequency
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        channel:
+          $ref: '#/components/schemas/CookieConsentChannel'
+        domainApplication:
+          type: string
+          maxLength: 255
+          nullable: true
+        frequency:
+          type: string
+          enum:
+          - daily
+          - weekly
+          - monthly
+          - off
+        dayOfWeek:
+          type: integer
+          minimum: 1
+          maximum: 7
+          nullable: true
+          description: ISO day, for `weekly`.
+        dayOfMonth:
+          type: integer
+          minimum: 1
+          maximum: 28
+          nullable: true
+          description: For `monthly`.
+        alertRecipientPrincipalIds:
+          type: array
+          items:
+            type: string
+            format: uuid
+        lastRunAt:
+          type: string
+          format: date-time
+          nullable: true
+          readOnly: true
+        nextRunAt:
+          type: string
+          format: date-time
+          nullable: true
+          readOnly: true
+        scopePath:
+          type: string
+          readOnly: true
+          description: '**The partition key** (ADR-0005).'
+        updatedAt:
+          type: string
+          format: date-time
+          readOnly: true
     GuestNotification:
       type: object
       description: One in-app message as the guest sees it. A view of `marketing.message_dispatch`, channel `inApp`.
@@ -15936,6 +17170,14 @@ components:
           type: string
           format: uuid
           nullable: true
+        sendTimeMode:
+          type: string
+          nullable: true
+          description: '`JourneyStep.sendTimeMode` (fixed or optimised; 29 September, build pass, group G2).'
+        channelMode:
+          type: string
+          nullable: true
+          description: '`JourneyStep.channelMode` (preference or optimised).'
         isActive:
           type: boolean
         createdAt:
@@ -16837,6 +18079,8 @@ components:
             type: string
         retainMonths:
           type: integer
+          description: At most the tenant's effective `guestProfile` period (tenancy `setDataRetentionSetting`,
+            decided 29 September); a rule may only shorten it.
         action:
           type: string
           enum:
@@ -18597,6 +19841,23 @@ components:
           nullable: true
           x-ticvai-column: message_template_id
           description: For `send`. Channel is resolved from the guest's preference at the moment of sending.
+        sendTimeMode:
+          type: string
+          enum:
+          - fixed
+          - optimised
+          default: fixed
+          description: 'For `send` (29 September, build pass, group G2; 22.3.19). `optimised` delays the send, after
+            the step is reached, to the recipient''s suggested hour from `ai.requestSuggestion` (kind `sendTime`)
+            within the next 24 hours and inside `waitUntil`; no suggestion or AI off sends at once, as `fixed`.'
+        channelMode:
+          type: string
+          enum:
+          - preference
+          - optimised
+          default: preference
+          description: For `send`. `optimised` tries first the consented channel the send-time suggestion names, then
+            `channelPreference` in order (22.9.16).
         channelPreference:
           type: array
           nullable: true
@@ -18702,6 +19963,10 @@ components:
             **Named from the event catalogue** (`BusinessEvent.eventType`), so a trigger cannot bind to
             something nothing publishes. Its conditions are `MessageTriggerCondition` rows.
 
+            **`entitlement.expiringSoon` is in the catalogue since 29 September** (build pass, group G2; 5.5.30):
+            the pre-expiry reminder for a ticket or pass. Its anchor is the event time; the notice period is the
+            template''s `expiryNoticeDays`, so `offsetMinutes` is normally 0.
+
             '
         templateId:
           type: string
@@ -18731,6 +19996,16 @@ components:
             the same dispatch.** `operational` bypasses batching and quiet hours; `marketing` never does.
 
             '
+        sendTimeMode:
+          type: string
+          enum:
+          - fixed
+          - optimised
+          default: fixed
+          description: '**Only for `priority` `marketing`** (29 September, build pass, group G2; 22.9.16): `optimised`
+            holds the notification to the recipient''s suggested hour from `ai.requestSuggestion` (kind `sendTime`)
+            within the next 24 hours, on the suggested consented channel. `operational` and `transactional` messages
+            are never delayed for it, and a `setMessageTrigger` asking for it on them is refused (400).'
         isActive:
           type: boolean
           default: true
@@ -19165,6 +20440,10 @@ components:
       - callCentre
       - import
       - agentRecorded
+      - cookieBanner
+      description: '`cookieBanner` (29 September, build; BL-073 §4b): a decision made on the cookie banner or preference
+        centre and moved onto the guest by `claimDeviceConsent`. Kept apart from `website`, a form submission, because the
+        audit trail (2.6.56) has to tell the two apart.'
     GuestMatchPolicy:
       type: object
       x-ticvai-persistence: marketing.guest_match_policy
@@ -19819,6 +21098,11 @@ components:
             message every member about a household total** — that is how a venue tells a teenager what
             their parent spends.
 
+            `entitlementExpiringWithinDays` (29 September, build pass, group G2; 5.5.30): the guest holds a ticket
+            or pass in `issued` or `partiallyConsumed` whose `validTo` is within that many days, kept current from
+            `entitlement.expiringSoon` and the entitlement read model. **Unused passes about to lapse** are this
+            attribute with `entitlementRemainingUses` greater than zero.
+
             '
         operator:
           type: string
@@ -19957,6 +21241,12 @@ components:
           - abandonedCart
           - firstVisit
           - inactivity
+          - entitlementExpiring
+          description: '`entitlementExpiring` (29 September, build pass, group G2; 5.5.30) fires on
+            `entitlement.expiringSoon`: a ticket or pass the guest still holds comes within its template''s
+            `expiryNoticeDays` of `validTo`. The notice period is set on the template, so `delayHours` shifts the
+            send within it rather than setting it. An entitlement belonging to a membership is left to
+            `membershipExpiring`, so a member is not told twice.'
         delayHours:
           type: integer
         conditions:
@@ -20034,6 +21324,71 @@ components:
               type: string
             timeZone:
               type: string
+        sendTimeMode:
+          type: string
+          enum:
+          - fixed
+          - optimised
+          default: fixed
+          description: '`optimised` sends each recipient at the hour `ai.requestSuggestion` (kind `sendTime`) gives
+            for them, inside `sendWindow` (29 September, build pass, group G2; 22.3.19). `fixed` is the behaviour
+            before. Falls back to `scheduledFor` per recipient where there is no suggestion or AI is off.'
+        optimiseChannel:
+          type: boolean
+          default: false
+          description: With `sendTimeMode` `optimised`, route each recipient to the channel the suggestion names,
+            among the channels they consented to (22.9.16). Off keeps `channel`.
+        variants:
+          type: array
+          maxItems: 5
+          nullable: true
+          description: '**A/B (or up to five-way) content and subject variants** (29 September, build pass, group G2;
+            22.1.17, BO-772). Each is a subject override and optionally a different template, written by a person
+            or taken from an AI draft (`ai.proposeMarketingContent`, `source` `aiDraft`). Held as rows of
+            `marketing.campaign_variant`. Null or empty is a single-content campaign.'
+          items:
+            $ref: '#/components/schemas/MarketingCampaignVariant'
+        abTest:
+          type: object
+          nullable: true
+          description: How the variants are tested. Required when `variants` has two or more.
+          properties:
+            testPercent:
+              type: integer
+              minimum: 5
+              maximum: 100
+              default: 20
+              description: Share of the audience the variants are tested on; 100 splits everyone and picks no
+                winner.
+            successMetric:
+              type: string
+              enum:
+              - openRate
+              - clickRate
+              - conversionRate
+              - attributedRevenue
+              default: clickRate
+            decideAfterHours:
+              type: integer
+              minimum: 1
+              maximum: 168
+              default: 4
+            winnerRule:
+              type: string
+              enum:
+              - automatic
+              - manual
+              default: automatic
+            minimumSamplePerVariant:
+              type: integer
+              minimum: 1
+              default: 500
+              description: Below this many sends per variant no winner is declared automatically; a person picks.
+            winningVariantId:
+              type: string
+              format: uuid
+              nullable: true
+              description: Set by the automatic rule, or by a person through `updateCampaign`.
     Campaign:
       x-ticvai-persistence: marketing.campaign
       allOf:
@@ -20535,6 +21890,89 @@ components:
           minimum: 1
           description: The window these figures were attributed over, from `VenueSettings.marketing.attributionWindowDays`
             (proposed default 7, audit R094).
+        variants:
+          type: array
+          description: Per variant of an A/B campaign, from `MessageDispatch.campaignVariantId` (29 September, build
+            pass, group G2; 22.1.17). Empty for a single-content campaign.
+          items:
+            type: object
+            properties:
+              variantId:
+                type: string
+                format: uuid
+              label:
+                type: string
+              sent:
+                type: integer
+              opened:
+                type: integer
+              clicked:
+                type: integer
+              attributedOrders:
+                type: integer
+              attributedRevenue:
+                $ref: ../shared/common.yaml#/components/schemas/Money
+              isWinner:
+                type: boolean
+        sendTimeOptimisedCount:
+          type: integer
+          description: Messages sent at a per-recipient optimised hour rather than the scheduled time.
+    MarketingCampaignVariant:
+      type: object
+      x-ticvai-persistence: marketing.campaign_variant
+      description: 'One content or subject variant of a campaign, for an A/B test (22.1.17; 29 September, build pass,
+        group G2, from group G1''s handoff). Written with its campaign by `createCampaign` and `updateCampaign`.'
+      required:
+      - label
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        campaignId:
+          type: string
+          format: uuid
+          readOnly: true
+          x-ticvai-references: marketing.campaign
+        label:
+          type: string
+          maxLength: 20
+          description: A, B, C...
+        subjectOverride:
+          type: object
+          nullable: true
+          description: Subject line by locale.
+          additionalProperties:
+            type: string
+        templateId:
+          type: string
+          format: uuid
+          nullable: true
+          description: A different template for this variant; null uses the campaign's `content.templateId`.
+        splitPercent:
+          type: integer
+          minimum: 1
+          maximum: 100
+          nullable: true
+          description: Share of the test group; null splits evenly.
+        source:
+          type: string
+          enum:
+          - manual
+          - aiDraft
+          default: manual
+        aiDecisionRecordId:
+          type: string
+          nullable: true
+          description: The decision record of the `ai.proposeMarketingContent` draft it came from, for `aiDraft`.
+        isWinner:
+          type: boolean
+          default: false
+          readOnly: true
+        scopePath:
+          type: string
+          readOnly: true
+          description: '**The partition key** (ADR-0005), the campaign''s.'
     MessageTemplate:
       x-ticvai-persistence: marketing.message_template
       type: object
@@ -20630,6 +22068,19 @@ components:
           description: The `MessageTrigger` that fired it, and through its `event` the `BusinessEvent` and
             source module; null for a campaign or a direct send. Attempts are in `MessageDispatchAttempt`.
             (decided 29 September, data model for the agreed operations)
+        campaignVariantId:
+          type: string
+          format: uuid
+          nullable: true
+          x-ticvai-references: marketing.campaign_variant
+          description: The A/B variant sent (22.1.17; 29 September, build pass, group G2). Null for a single-content
+            campaign or a triggered message.
+        plannedSendAt:
+          type: string
+          format: date-time
+          nullable: true
+          description: The per-recipient hour chosen by `sendTimeMode` `optimised` (22.3.19, 22.9.16); null when sent
+            at the scheduled time.
         status:
           type: string
           enum:
@@ -22967,6 +24418,7 @@ components:
           - sessionTechnology
           - personalisationTechnology
           - embeddedService
+          - localStorageItem
           - other
         category:
           type: string
@@ -23129,6 +24581,7 @@ components:
                 - rejectNonEssential
                 - managePreferences
                 - savePreferences
+                - doNotSellOrShare
               label:
                 $ref: '#/components/schemas/LocalisedText'
         rejectIsOneClick:
@@ -23180,6 +24633,26 @@ components:
             type: string
             maxLength: 10
           description: Every language the storefront serves; Arabic renders right to left.
+        regulatoryRegimes:
+          type: array
+          items:
+            type: string
+            enum:
+            - gdpr
+            - ePrivacy
+            - ccpaCpra
+            - lgpd
+            - uaePdpl
+            - saudiPdpl
+          description: '2.6.60 (29 September, build). **The laws this design is published to satisfy**, so compliance is
+            stated rather than assumed. The strictest posture (opt-in, one-click reject, every non-essential category off)
+            already meets GDPR/ePrivacy, LGPD and both PDPLs; `ccpaCpra` adds the "Do not sell or share" button
+            (`doNotSellOrShare`) and honours a Global Privacy Control signal as that opt-out.'
+        recordIpAddress:
+          type: boolean
+          default: false
+          description: '2.6.55, "if legally permitted" (29 September, build). On, `recordDeviceConsent` writes the IP address
+            and user agent to `pii.consent_identifier`; off, they are not kept anywhere. Off by default.'
         noticeVersion:
           type: string
           readOnly: true
@@ -28367,6 +29840,29 @@ components:
           type: number
           nullable: true
           description: Relative change in `csat` against the previous period of equal length.
+        aiSummary:
+          type: object
+          nullable: true
+          description: 'AI-derived narrative of the feedback matching the filters (22.5.12; 29 September, build
+            pass, group G2), labelled as AI on screen. Null when AI is off or fewer than 5 items match.'
+          required:
+          - text
+          - basedOnCount
+          - modelVersion
+          properties:
+            text:
+              type: string
+              maxLength: 2000
+            basedOnCount:
+              type: integer
+              minimum: 0
+              description: The feedback items the summary was written from.
+            modelVersion:
+              type: string
+              maxLength: 60
+            generatedAt:
+              type: string
+              format: date-time
         breakdown:
           type: array
           description: One row per value of the `groupBy` dimension, most responses first.

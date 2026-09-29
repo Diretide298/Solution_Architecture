@@ -29,9 +29,11 @@ servicesCalled:
 - service: VenueOpsService
   operationCalls: 71
 - service: WhiteLabelService
-  operationCalls: 66
+  operationCalls: 68
 - service: MarketingService
-  operationCalls: 52
+  operationCalls: 60
+- service: AiService
+  operationCalls: 8
 - service: FnbService
   operationCalls: 5
 - service: IdentityService
@@ -244,10 +246,12 @@ screens:
   density: compact
   operations:
   - createContentPage
+  - decideProposedAction
   - deleteContentPage
   - getHomepageLayout
   - getModuleEnablement
   - listContentPages
+  - proposeMarketingContent
   - setFooter
   - setHeader
   - setHomepageLayout
@@ -260,6 +264,7 @@ screens:
   offlineState: false
   entryParams:
   - pageId<-navigation
+  - actionId<-navigation
   goesTo:
   - CMS-001
   - CMS-002
@@ -278,10 +283,12 @@ screens:
   operations:
   - createBanner
   - createPromoBlock
+  - decideProposedAction
   - deleteBanner
   - deletePromoBlock
   - listBanners
   - listPromoBlocks
+  - proposeMarketingContent
   - updateBanner
   - updatePromoBlock
   states:
@@ -294,6 +301,7 @@ screens:
   entryParams:
   - bannerId<-navigation
   - promoBlockId<-navigation
+  - actionId<-navigation
   goesTo:
   - CMS-001
   - CMS-002
@@ -348,6 +356,7 @@ screens:
   - listCollections
   - replaceMediaAsset
   - searchMedia
+  - semanticSearch
   - updateMediaAsset
   states:
   - emptyFirstRun
@@ -499,8 +508,10 @@ screens:
   operations:
   - getBookingFlowConfig
   - getTenantConfig
+  - listAnalyticsProviders
   - listConsentQuestions
   - listOrgUnits
+  - setAnalyticsProvider
   - setBookingFlowConfig
   states:
   - emptyFirstRun
@@ -711,7 +722,12 @@ screens:
   wave: 3
   density: compact
   operations:
+  - listCookieScanPolicies
+  - listCookieScans
   - listCookieTrackingDigital
+  - recordCookieScan
+  - setCookieScanPolicy
+  - setTrackingTechnology
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -735,6 +751,7 @@ screens:
   density: compact
   operations:
   - listCookieBannerPreference
+  - setCookieBannerDesign
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -901,6 +918,7 @@ screens:
   density: compact
   operations:
   - listConsentEvidenceWithdrawal
+  - listDeviceConsents
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -1032,6 +1050,7 @@ screens:
   wave: 3
   density: compact
   operations:
+  - listDeviceConsents
   - listPrivacyEvidenceCompliance
   states:
   - emptyFirstRun
@@ -1561,6 +1580,7 @@ screens:
   operations:
   - listCollections
   - searchMedia
+  - semanticSearch
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -2486,11 +2506,13 @@ screens:
   operations:
   - createGuidedChoice
   - deleteGuidedChoice
+  - getGuidedChoiceSuggestion
   - listEvents
   - listGuidedChoices
   - listProductCategories
   - listProducts
   - publishGuidedChoice
+  - suggestGuidedChoice
   - unpublishGuidedChoice
   - updateGuidedChoice
   states:
@@ -2503,6 +2525,7 @@ screens:
   entryParams:
   - venueId<-session
   - guidedChoiceId<-navigation
+  - suggestionId<-navigation
   goesTo:
   - CMS-016
   boardFrames: null

@@ -1,0 +1,53 @@
+# device.statusChanged v1 — published by tenancy
+# Checked by tools/check-states.py against states/ and the contracts.
+
+name: device.statusChanged
+version: 1
+publisher: tenancy
+description: A registered device's reported status changed — it went offline, came back, reported a fault or ran low on a consumable.
+aggregate: device
+emittedWhen: RegisteredDevice.status changes (states/registered-device.yaml), on a heartbeat or on the heartbeat timeout
+payload:
+- field: deviceId
+  type: uuid
+- field: kind
+  type: string
+  notes: DeviceKind
+- field: workstationId
+  type: uuid
+  required: false
+  notes: Null for a mobileHandset
+- field: scopePath
+  type: string
+- field: previousStatus
+  type: string
+- field: status
+  type: string
+- field: health
+  type: string
+- field: detail
+  type: string
+  required: false
+- field: changedAt
+  type: timestamp
+consumers:
+- context: public-api
+  purpose: Deliver to webhook subscriptions taking device.statusChanged (16.9.56)
+  idempotencyKey: deviceId + changedAt
+  onFailure: retryThenDeadLetter
+  isCritical: false
+- context: reporting
+  purpose: Device uptime and alert rules on device state
+  idempotencyKey: deviceId + changedAt
+  onFailure: retry
+  isCritical: false
+- context: ai
+  purpose: 'Device-health anomaly detectors: failure or offline rate across the devices of a venue (8.9.9); added
+    29 September (build pass, group G2, from group G1''s handoff)'
+  idempotencyKey: deviceId + changedAt
+  onFailure: retry
+  isCritical: false
+retention: 30 days after publication
+notes: '**Added 29 September (build pass, group RD) so a device outage can leave TICVAI.** Emitted on a change of
+  status only, never on every heartbeat — a fleet of scanners heartbeating each minute would otherwise be a webhook
+  flood carrying no news.'

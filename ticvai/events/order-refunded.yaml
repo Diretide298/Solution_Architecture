@@ -54,6 +54,12 @@ consumers:
   idempotencyKey: refundId
   onFailure: retryThenDeadLetter
   isCritical: true
+- context: ai
+  purpose: Reverse the recommendation attribution the refunded lines earned, refund-abuse velocity and
+    entity risk, and net the forecasting actuals (AI system design section 3.2)
+  idempotencyKey: refundId
+  onFailure: retryThenDeadLetter
+  isCritical: false
 retention: 30 days after publication
 notes: A refund that reaches the ledger and not the entitlement leaves a guest holding a valid ticket
   for something they were paid back for.

@@ -229,6 +229,7 @@ paths:
       operationId: setAlertRule
       x-ticvai-consumed-by:
         - "P08 BO-133 Offline Alerts, Limits & Audit"
+        - "P08 BO-886 Staffing Gap & Coverage Control Center"
         - "P16 ANL-009 AI Assistant & Action Center"
       summary: Watch a metric and tell somebody
       description: 'BL-152. **The metric comes from the closed set**, so a rule cannot watch something
@@ -294,11 +295,13 @@ paths:
         - "P04 POS-009 Staff Roster"
         - "P04 POS-020 Shift Exceptions & Alerts"
         - "P04 POS-025 Till Home"
+        - "P06 EMP-061 Retail Inventory Command Center"
         - "P06 EMP-070 Inventory Exceptions, AI Replenishment & Action Center"
         - "P08 BO-036 Device Registry"
         - "P08 BO-125 Product & Category Button Configuration"
         - "P08 BO-133 Offline Alerts, Limits & Audit"
         - "P08 BO-141 Operational Alerts, AI Replenishment & Action Center"
+        - "P08 BO-886 Staffing Gap & Coverage Control Center"
         - "P16 ANL-001 Executive Command Center"
         - "P16 ANL-003 Operational Performance"
         - "P16 ANL-009 AI Assistant & Action Center"
@@ -373,6 +376,7 @@ paths:
     post:
       operationId: acknowledgeAlert
       x-ticvai-consumed-by:
+        - "P06 EMP-061 Retail Inventory Command Center"
         - "P06 EMP-070 Inventory Exceptions, AI Replenishment & Action Center"
         - "P08 BO-141 Operational Alerts, AI Replenishment & Action Center"
         - "P16 ANL-009 AI Assistant & Action Center"
@@ -743,6 +747,7 @@ paths:
         - "P08 BO-126 Deployment, Preview & Audit"
         - "P08 BO-133 Offline Alerts, Limits & Audit"
         - "P08 BO-262 Access Reports, Scheduled Reporting & Data Export"
+        - "P08 BO-682 Accreditation Export & Data Extract Center"
         - "P10 PTR-018 Reports & Sales Performance"
         - "P12 SUP-008 Agent Performance & SLA View"
         - "P16 ANL-001 Executive Command Center"
@@ -1151,6 +1156,7 @@ paths:
       operationId: exportReportResult
       x-ticvai-consumed-by:
         - "P08 BO-1060 Report Builder, Export & Audit"
+        - "P08 BO-682 Accreditation Export & Data Extract Center"
         - "P16 ANL-045 Export & Download Center"
       x-ticvai-audience:
       - staff
@@ -1397,7 +1403,9 @@ paths:
     get:
       operationId: getDashboard
       x-ticvai-consumed-by:
+        - "P06 EMP-061 Retail Inventory Command Center"
         - "P08 BO-010 Promotions & Coupons"
+        - "P08 BO-833 Gamification Analytics & Audit"
         - "P09 ADM-031 Security & Compliance Dashboard"
         - "P15 KIT-010 Kitchen Performance, AI & Operational Optimization"
         - "P16 ANL-001 Executive Command Center"
@@ -1408,6 +1416,7 @@ paths:
         - "P16 ANL-006 Inventory & Waste Intelligence"
         - "P16 ANL-007 Guest & Conversion Intelligence"
         - "P16 ANL-008 Demand Forecasting"
+        - "P16 ANL-017 Customer, Membership & Loyalty Pulse"
         - "P16 ANL-021 Dashboard Library"
         - "P16 ANL-023 Drag-and-Drop Dashboard Canvas"
         - "P16 ANL-030 Dashboard Preview, Validation & Health"
@@ -1572,6 +1581,24 @@ paths:
         because `saveNaturalLanguageQuery` turns it into a definition in a later call and
         `ai.activity` holds only free-text prompt and response.
 
+        **The model writes a semantic query spec, not SQL** (decided 29 September, AI system design 2.2 E
+        and 5.7). It sees only the semantic-model metrics and dimensions this caller may see, and returns
+        `semanticSpec` (metric, dimensions, filters, period, comparison). Reporting validates the spec
+        against the published `SemanticModel` and compiles it deterministically, the same compile
+        `runSemanticQuery` performs, so *revenue* in an answer is the dashboards'' revenue. **The compiled
+        SQL is still returned**, in `generatedQuery.compiledSql`, beside `semanticSpec`, `dataAsOf` and a
+        `reliability` category (`grounded`, `partial`, `conflictingSources`, `insufficientEvidence`), which
+        replaces the bare `confidence` percentage (design 5.6). A follow-up in the same conversation edits
+        the kept spec, and permissions are re-checked on every turn.
+
+        **A question outside the semantic model answers "not available yet"**, never an improvised
+        query: `200` with `reliability` `insufficientEvidence`, `unavailableReason` naming which part is
+        not modelled, `interpretation` saying so in plain language, and `semanticSpec`, `generatedQuery`,
+        `result` and `dataAsOf` null. No `NaturalLanguageQuery` is kept for it. The `ai` service records
+        the question as an `ai.knowledge_gap` of `kind` `analytics`, so the semantic-model owner gets a
+        task rather than a log line. A metric the caller may not see is treated as not modelled, so the
+        answer does not reveal that it exists.
+
         '
       tags:
       - naturalLanguage
@@ -1686,6 +1713,107 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ReportDefinition'
+  /semantic-queries:
+    post:
+      operationId: runSemanticQuery
+      x-ticvai-agreed: '29 September: AI system design 2.2 E and 5.7; shape follows askReportingQuestion'
+      x-ticvai-audience:
+      - service
+      security:
+      - serviceAuth: []
+      summary: Run a semantic query spec on the analytical replica (service callers)
+      description: '**The deterministic half of natural-language analytics, as a service** (decided 29
+        September, AI system design 2.2 E and 5.7). Takes a `ReportingSemanticQuerySpec` (metric,
+        dimensions, filters, period, comparison), validates it against the published `SemanticModel`,
+        compiles it to SQL and runs it on the analytical replica. Returns the rows, the compiled SQL and
+        `dataAsOf`. **No model is involved here**: the same spec compiles to the same SQL for the same
+        model version.
+
+        Called by the `ai` service: `explainMetricChange` decomposes a metric change through it, and the
+        staff assistant answers a live-number question through it (flow E). **A number in an AI answer
+        can only come from a result of this operation or `askReportingQuestion`**, never from a document.
+
+        **Runs under the row-level security of `principalId`**, the staff member the call is made for, not
+        the calling service. `x-ticvai-permission` is checked against that principal at `venueId` (or at
+        each venue in their scope when it is omitted), and the replica''s row-level security applies to
+        the compiled SQL beneath it, so a service credential cannot widen what the person could see. A
+        metric or field the principal may not see is refused as not modelled, not as forbidden, so the
+        refusal does not reveal that it exists.
+
+        Reads only; writes nothing. `422` when the spec names something outside the semantic model, with
+        `unavailableReason`, which the caller turns into "not available yet" and an `ai.knowledge_gap` of
+        `kind` `analytics`.
+
+        '
+      tags:
+      - naturalLanguage
+      x-ticvai-permission: REPORT_VIEW_VENUE
+      x-ticvai-scope-level: venue
+      x-ticvai-read-routing: analytical
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - spec
+              - principalId
+              properties:
+                spec:
+                  $ref: '#/components/schemas/ReportingSemanticQuerySpec'
+                principalId:
+                  type: string
+                  format: uuid
+                  x-ticvai-references: identity.principal
+                  description: The staff member the query is run for. Their resolved permissions and the
+                    replica's row-level security decide what the rows can contain.
+                venueId:
+                  type: string
+                  format: uuid
+                  description: 'Narrows the query to one venue. Omitting it answers over everything the
+                    principal''s scope permits; it cannot reach beyond that. The same rule as
+                    `askReportingQuestion`.
+
+                    '
+                maxRows:
+                  type: integer
+                  minimum: 1
+                  maximum: 10000
+                  default: 1000
+                  description: Rows returned at most. `result.rowCount` gives the full count.
+      responses:
+        '200':
+          description: Rows, with the compiled SQL and the replica position they were read at
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReportingSemanticQueryResult'
+        '400':
+          description: The spec is malformed, such as a period that ends before it starts or a filter
+            value of the wrong type for its field
+          x-ticvai-problem-types:
+          - validation
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
+        '403':
+          $ref: ../shared/common.yaml#/components/responses/Forbidden
+        '422':
+          description: The spec names a metric, dimension, filter field or comparison outside the semantic
+            model, or one the principal may not see. The problem carries `unavailableReason` and the codes
+            it could not resolve; the caller answers "not available yet".
+          x-ticvai-problem-types:
+          - semantic-spec-not-modelled
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ReportingSemanticQueryProblem'
   /kpis:
     get:
       operationId: listKpis
@@ -1817,6 +1945,7 @@ paths:
     get:
       operationId: getKpiValues
       x-ticvai-consumed-by:
+        - "P06 EMP-061 Retail Inventory Command Center"
         - "P08 BO-005 Queue Monitor"
         - "P08 BO-100 Venue Home"
         - "P08 BO-103 Access & Venue"
@@ -1832,8 +1961,11 @@ paths:
         - "P08 BO-1081 Finance Dashboard"
         - "P08 BO-1082 Admissions Revenue"
         - "P08 BO-585 Rental Revenue & Commercial Analytics"
+        - "P08 BO-684 Accreditation Executive Dashboard"
+        - "P08 BO-685 Accreditation Status & Portfolio Reporting"
         - "P08 BO-688 Accreditation Trend & Comparative Analysis"
         - "P08 BO-733 Service Channel Configuration"
+        - "P08 BO-833 Gamification Analytics & Audit"
         - "P16 ANL-012 Live Operations Dashboard"
         - "P16 ANL-013 Revenue Pulse"
         - "P16 ANL-014 Attendance & Footfall Intelligence"
@@ -1853,6 +1985,19 @@ paths:
         payments less refunds), and `admissions`, admitted in-direction scans in the period (count, from
         `access.scan_event`). With no `period`, the period is today in the venue''s time zone. The
         back-office hubs and the Queue Monitor read their takings and admissions tiles here.
+
+
+        **Accreditation KPIs are seeded too, where the accreditation module is on** (12.1.50, 29 September,
+        build pass): `accreditationApplications`, `accreditationTimeToDecision`,
+        `accreditationCredentialsIssued`, `accreditationActiveHolders` and `accreditationRenewalsDue`.
+        `ReportingSystemKpi` lists every seeded code with its source.
+
+
+        **Trend and breakdown in the same read** (29 September, build pass). `interval` returns one value
+        per bucket across `period` (`bucketStart` set on each), which is the time series a trend chart
+        draws; `groupBy` splits each value by one dimension the KPI''s source carries — `status` and
+        `categoryCode` for the accreditation KPIs, `tierCode` for the loyalty ones — with `groupKey` set.
+        Without either, one value per KPI, as before.
 
         '
       tags:
@@ -1890,7 +2035,25 @@ paths:
           - samePeriodLastYear
           - target
           - benchmark
+      - name: interval
+        in: query
+        description: One value per bucket of this size across `period` — the trend read (12.1.50).
+        schema:
+          type: string
+          enum:
+          - hour
+          - day
+          - week
+          - month
+      - name: groupBy
+        in: query
+        description: Split each value by one dimension of the KPI's source, e.g. `status`, `categoryCode`,
+          `tierCode`. A dimension the source does not carry is `400`.
+        schema:
+          type: string
       responses:
+        '400':
+          $ref: ../shared/common.yaml#/components/responses/BadRequest
         '200':
           description: Values
           content:
@@ -2459,7 +2622,8 @@ components:
         code:
           type: string
           description: '`takings` and `admissions` are seeded for every tenant as system KPIs (decided 28
-            September, audit R283).
+            September, audit R283), and the five accreditation KPIs for every tenant with the accreditation
+            module (29 September, build pass). The seeded codes are `ReportingSystemKpi`.
 
             '
         name:
@@ -2504,6 +2668,37 @@ components:
         isActive:
           type: boolean
           default: true
+    ReportingSystemKpi:
+      type: string
+      description: '**The KPIs seeded at provisioning**, as `reporting.kpi_definition` rows a hub can ask for
+        by code without knowing an id. Each names its source, checked against the schema as `MetricSource`
+        is.
+
+
+        | Code | Unit | Source | Seeded for |
+        |---|---|---|---|
+        | `takings` | currency | `orders` payments less refunds in the period | every tenant (R283) |
+        | `admissions` | count | admitted in-direction `access.scan_event` in the period | every tenant (R283) |
+        | `accreditationApplications` | count | `accreditation.application` submitted in the period; `groupBy=status` gives applications by status | accreditation module (12.1.50) |
+        | `accreditationTimeToDecision` | duration | mean `decided_at` minus `submitted_at` of `accreditation.application` decided in the period (`higherIsBetter` false) | accreditation module |
+        | `accreditationCredentialsIssued` | count | `accreditation.credential` with `issued_at` in the period; `groupBy=kind` | accreditation module |
+        | `accreditationActiveHolders` | count | `accreditation.holder` with status `active` at period end; `groupBy=categoryCode` gives active holders by category | accreditation module |
+        | `accreditationRenewalsDue` | count | `accreditation.holder` active whose `valid_to` falls inside the programme''s `accreditation.validity.renewal_window_days` at period end | accreditation module |
+
+
+        **Seeded, not locked.** A tenant may set targets on them (`setKpiTargets`) and put them on any
+        dashboard; the formula and source are the platform''s, so *time to decision* means the same thing on
+        every screen that shows it.
+
+        '
+      enum:
+      - takings
+      - admissions
+      - accreditationApplications
+      - accreditationTimeToDecision
+      - accreditationCredentialsIssued
+      - accreditationActiveHolders
+      - accreditationRenewalsDue
     KpiTarget:
       type: object
       x-ticvai-persistence: reporting.kpi_target
@@ -2545,6 +2740,17 @@ components:
           format: uuid
         code:
           type: string
+        bucketStart:
+          type: string
+          format: date-time
+          nullable: true
+          description: The start of the bucket this value covers, when `getKpiValues` was asked for an
+            `interval`; null otherwise.
+        groupKey:
+          type: string
+          nullable: true
+          description: The value of the `groupBy` dimension this row is for (a status, a category code, a
+            tier); null when no `groupBy` was asked.
         name:
           type: string
         scopePath:
@@ -3132,6 +3338,13 @@ components:
             - email
             - whatsapp
             - sms
+            - push
+          x-ticvai-push-note: '**`push` added 29 September** (6.1.56, 18.1.5, build pass): delivered to every
+            staff-app handset registered for a recipient (tenancy `RegisteredDevice`, kind `mobileHandset`,
+            with a push token). It is how a daily revenue alert reaches a manager''s phone, which a panel on a
+            web dashboard does not.
+
+            '
         recipientRoleIds:
           type: array
           items:
@@ -3315,12 +3528,64 @@ components:
       - meanTimeToRepair
       - challengeCompletionRate
       - attributedRevenue
+      - loyaltyActiveMembers
+      - loyaltyTierDistribution
+      - loyaltyPointsLiability
+      - loyaltyBreakageRate
+      - loyaltyMemberRetention
+      - challengeParticipationRate
+      - gamificationLoyaltyImpact
+      - gamificationMembershipImpact
+      - gamificationRetention
+      - accreditationApplications
+      - accreditationTimeToDecision
+      - accreditationCredentialsIssued
+      - accreditationActiveHolders
+      - accreditationRenewalsDue
+      - staffingShortfall
       x-ticvai-money-valued:
       - inventoryValuation
       - resaleCommission
       - revenuePerEntitlement
       - revenuePerVisitor
       - attributedRevenue
+      - loyaltyPointsLiability
+      x-ticvai-extended-29-september: '**Fourteen metrics added 29 September (build pass)**, each checked
+        against the schema of the contract that produces it.
+
+
+        | Metric | Source | Requirement |
+        |---|---|---|
+        | `loyaltyActiveMembers` | `marketing.loyalty_position` members with a `marketing.loyalty_points` movement in the period | 5.4.27 |
+        | `loyaltyTierDistribution` | `marketing.loyalty_position.tier_id` against `marketing.programme_tier`, members per tier | 5.4.27 |
+        | `loyaltyPointsLiability` | the balance of `ledger.journal_line` on each programme''s `pointsLiabilityAccountId`, where points post on accrual and release on redemption or expiry | 5.4.27 |
+        | `loyaltyBreakageRate` | `marketing.loyalty_points` expiry movements over points earned, in the period | 5.4.27 |
+        | `loyaltyMemberRetention` | members with a movement in the previous period who also have one in this period | 5.4.27 |
+        | `challengeParticipationRate` | distinct `marketing.challenge_progress.subject_id` over active loyalty members | 22.6.20 |
+        | `gamificationLoyaltyImpact` | points earned per member, challenge participants against non-participants (`marketing.loyalty_points` split by `marketing.challenge_progress`) | 22.6.20 |
+        | `gamificationMembershipImpact` | joins and renewals in `identity.customer_membership`, participants against non-participants | 22.6.20 |
+        | `gamificationRetention` | return visits (`access.scan_event`, in-direction) of participants against non-participants | 22.6.20 |
+        | `accreditationApplications` | `accreditation.application` by `status` | 12.1.50 |
+        | `accreditationTimeToDecision` | `accreditation.application.decided_at` minus `submitted_at` | 12.1.50 |
+        | `accreditationCredentialsIssued` | `accreditation.credential.issued_at` | 12.1.50 |
+        | `accreditationActiveHolders` | `accreditation.holder` `active`, by `category_code` | 12.1.50 |
+        | `accreditationRenewalsDue` | `accreditation.holder.valid_to` inside `accreditation.validity.renewal_window_days` | 12.1.50 |
+
+
+        **`staffingShortfall` added the same evening (build pass, group G2; 8.2.49)**: the largest gap in the
+        window between the staff rostered and the staff the forecast requires, per venue and position, from
+        `workforce.forecast_requirement` (the handed-over AI staff requirement) against `workforce.rota_assignment`
+        and `workforce.open_shift`, computed as `workforce.getStaffingCoverage` with `basis`
+        `forecastRequirement`. An `AlertRule` on it with `comparator` `above` and `threshold` 0 is the staffing
+        shortage alert; `windowMinutes` looks ahead rather than back for this metric (the rota for the coming
+        window), and `cooldownMinutes` stops one short shift alerting every quarter hour.
+
+
+        **Points issued, points redeemed, campaign performance and reward redemption were already served**
+        by the `loyalty` and `campaigns` sources, and challenge completion and revenue attribution by
+        `challengeCompletionRate` and `attributedRevenue`.
+
+        '
       x-ticvai-money-valued-note: '**`salesByOperator`, `salesByWorkstation` and `resaleVolume` are not
         listed because the package does not say whether they count sales or sum their value.** Until
         that is decided, a rule on them carries a plain number.
@@ -3358,6 +3623,17 @@ components:
         **Adding a source is a decision, not an omission.** `principals`, `guests`, `loyalty` and `reviews`
         all name a person, and `REPORT_EXPORT_PII` gates them.
 
+
+        **`forecastPoints` added 29 September** (8.2.55, build pass, group G2): the points of published AI
+        forecast versions; see `x-ticvai-forecast-points`.
+
+
+        **Three accreditation sources added 29 September** (12.1.50, build pass): `accreditationApplications`,
+        `accreditationHolders` and `accreditationCredentials`, over `accreditation.application`,
+        `accreditation.holder` and `accreditation.credential`. They are what the accreditation KPIs and any
+        accreditation report or export (`exportReportResult`, csv or xlsx) are built over. **All three name
+        a person**, and `REPORT_EXPORT_PII` gates them as it gates `guests`.
+
         '
       enum:
       - orders
@@ -3394,6 +3670,20 @@ components:
       - challenges
       - wallets
       - resaleListings
+      - accreditationApplications
+      - accreditationHolders
+      - accreditationCredentials
+      - forecastPoints
+      x-ticvai-forecast-points: '**`forecastPoints` added 29 September (build pass, group G2; 8.2.55)**: one row per
+        forecast point (`ai.forecast_point`) of a **published** forecast version (`ai.forecast_version` status
+        `published`), with the definition it belongs to (`ai.forecast_definition`: subject, grain, unit), the
+        period, the dimension key and the p10, p50 and p90 values. Draft, awaiting-approval and superseded versions are not
+        reachable, and scenario points (`scenarioId` set) only with the scenario named as a filter: **a forecast
+        leaves the platform as the one somebody published**. It is how a forecast is exported (`runReport` then
+        `exportReportResult`, csv or xlsx), scheduled or put on a dashboard. Names no person, so `REPORT_EXPORT` is
+        enough. Read from the reporting replica of the AI log database (design 2.4), never from the model service.
+
+        '
     FieldType:
       type: string
       enum:
@@ -4326,7 +4616,7 @@ components:
       - question
       - interpretation
       - result
-      - confidence
+      - reliability
       properties:
         conversationId:
           type: string
@@ -4334,20 +4624,53 @@ components:
           type: string
         interpretation:
           type: string
-          description: What the question was understood to mean, in plain language.
+          description: What the question was understood to mean, in plain language. When the question
+            is outside the semantic model, the "not available yet" sentence.
+        semanticSpec:
+          allOf:
+          - $ref: '#/components/schemas/ReportingSemanticQuerySpec'
+          nullable: true
+          description: 'What the model returned instead of SQL (design 2.2 E, 5.7): metric, dimensions,
+            filters, period, comparison, as validated against the semantic model. Null when the question
+            is outside it. **Also kept**, on `NaturalLanguageQuery`, so a follow-up edits it.
+
+            '
         generatedQuery:
-          $ref: '#/components/schemas/GeneratedQuery'
-          description: 'The structured query produced — data source, columns, filters, grouping. Returned
-            so the answer can be checked. An answer nobody can verify is worse than no answer.
-            **Also kept, as `NaturalLanguageQuery`**, for `saveNaturalLanguageQuery`.
+          allOf:
+          - $ref: '#/components/schemas/GeneratedQuery'
+          nullable: true
+          description: 'The query the spec compiled to: data source, columns, filters, grouping, and the
+            compiled SQL in `compiledSql`. Returned so the answer can be checked. An answer nobody can
+            verify is worse than no answer. **Also kept, as `NaturalLanguageQuery`**, for
+            `saveNaturalLanguageQuery`. Null when the question is outside the semantic model.
 
             '
         result:
-          $ref: '#/components/schemas/ReportResult'
+          allOf:
+          - $ref: '#/components/schemas/ReportResult'
+          nullable: true
+          description: Null when the question is outside the semantic model.
+        dataAsOf:
+          type: string
+          format: date-time
+          nullable: true
+          description: Replica position the answer was read at, the result's `dataAsOf`, stated beside
+            the answer so a figure that moved is not argued about. Null when nothing was run.
+        reliability:
+          $ref: '#/components/schemas/ReportingAnswerReliability'
+        unavailableReason:
+          allOf:
+          - $ref: '#/components/schemas/ReportingUnavailableReason'
+          nullable: true
+          description: Set only when `reliability` is `insufficientEvidence` because the question is
+            outside the semantic model ("not available yet"); names which part is not modelled.
         confidence:
           type: number
           minimum: 0
           maximum: 1
+          deprecated: true
+          description: Superseded by `reliability` on 29 September (design 5.6, never a bare percentage
+            for analytics). Returned for one release, then removed.
         suggestedFollowUps:
           type: array
           items:
@@ -4378,6 +4701,14 @@ components:
           type: array
           items:
             type: string
+        compiledSql:
+          type: string
+          nullable: true
+          description: 'The SQL the semantic spec compiled to, exactly as run on the analytical replica
+            (29 September, design 5.7). The replica''s row-level security applies beneath it, so it does
+            not need to carry the caller''s scope. Null on queries kept before the semantic compile.
+
+            '
     NaturalLanguageQuery:
       x-ticvai-persistence: reporting.natural_language_query
       type: object
@@ -4413,6 +4744,15 @@ components:
         generatedQuery:
           $ref: '#/components/schemas/GeneratedQuery'
           description: Stored whole.
+        semanticSpec:
+          allOf:
+          - $ref: '#/components/schemas/ReportingSemanticQuerySpec'
+          nullable: true
+          description: 'The spec the model returned and `generatedQuery` was compiled from, stored whole
+            (29 September, design 2.2 E). **A follow-up edits this**, rather than asking the model to
+            rewrite SQL. Null on rows kept before the semantic compile.
+
+            '
         askedByPrincipalId:
           type: string
           format: uuid
@@ -4438,6 +4778,148 @@ components:
             type: array
             description: Questions close to the one asked that the service can answer, most likely
               first. May be empty.
+            items:
+              type: string
+    ReportingSemanticQuerySpec:
+      x-ticvai-persistence: none — embedded; stored whole in `reporting.natural_language_query`
+      type: object
+      description: '**A question in the semantic model''s own vocabulary** (decided 29 September, AI
+        system design 2.2 E and 5.7). What the model returns for a live-number question instead of SQL,
+        and what `runSemanticQuery` takes. Every code is a `SemanticModel` field code or a KPI code;
+        Reporting validates the spec against the published model and compiles it deterministically, so
+        the same spec compiles to the same SQL for the same model version.
+
+        '
+      required:
+      - metric
+      - period
+      properties:
+        metric:
+          type: string
+          description: A measure field code in the `SemanticModel`, or a `KpiDefinition.code`. The
+            governed definition the dashboards use, so the number matches them.
+        dimensions:
+          type: array
+          maxItems: 5
+          description: Field codes to group by. Each must be reachable from the metric's dataset through
+            a relationship the semantic model declares.
+          items:
+            type: string
+        filters:
+          type: array
+          items:
+            type: object
+            required:
+            - field
+            - operator
+            properties:
+              field:
+                type: string
+                description: A `SemanticModel` field code.
+              operator:
+                type: string
+                enum:
+                - equals
+                - notEquals
+                - greaterThan
+                - lessThan
+                - between
+                - in
+                - notIn
+                - isNull
+                - isNotNull
+              values:
+                type: array
+                description: '**Open on purpose; typed by the field.** One value for the comparison
+                  operators, exactly two (from, to) for `between`, any number for `in` and `notIn`,
+                  none for `isNull` and `isNotNull`.
+
+                  '
+                items: {}
+        period:
+          type: string
+          description: ISO 8601 interval in the venue's time zone, e.g. `2026-09-21/2026-09-27`, the
+            form `explainMetricChange` takes.
+        comparison:
+          type: string
+          nullable: true
+          description: As `getKpiValues` `compareTo`. With one, each row carries the metric for the
+            comparison beside the current value.
+          enum:
+          - previousPeriod
+          - samePeriodLastYear
+          - target
+          - benchmark
+        semanticModelVersion:
+          type: integer
+          readOnly: true
+          description: The `SemanticModel.version` the spec was validated and compiled against. Set by
+            Reporting.
+    ReportingSemanticQueryResult:
+      x-ticvai-persistence: none — computed
+      type: object
+      description: What `runSemanticQuery` returns (29 September, design 2.2 E and 5.7).
+      required:
+      - spec
+      - generatedQuery
+      - result
+      - dataAsOf
+      properties:
+        spec:
+          $ref: '#/components/schemas/ReportingSemanticQuerySpec'
+          description: The spec as validated, with `semanticModelVersion` set.
+        generatedQuery:
+          $ref: '#/components/schemas/GeneratedQuery'
+          description: What the spec compiled to, with the SQL in `compiledSql`.
+        result:
+          $ref: '#/components/schemas/ReportResult'
+        dataAsOf:
+          type: string
+          format: date-time
+          description: Replica position the rows were read at, as `ReportResult.dataAsOf`.
+    ReportingAnswerReliability:
+      type: string
+      description: '**How far an analytics answer can be relied on** (decided 29 September, AI system
+        design 5.6): a category, never a bare percentage. `grounded`: every figure comes from a result
+        of the compiled spec. `partial`: part of the question was answered and the rest was not
+        modelled. `conflictingSources`: the result and a cited source disagree. `insufficientEvidence`:
+        the question could not be answered, including "not available yet" outside the semantic model.
+        The same four values as `ai.yaml`''s assistant answers.
+
+        '
+      enum:
+      - grounded
+      - partial
+      - conflictingSources
+      - insufficientEvidence
+    ReportingUnavailableReason:
+      type: string
+      description: Which part of a question is outside the semantic model, so the answer is "not
+        available yet" (design 5.7). A metric or field the caller may not see is reported as not
+        modelled, so the reason does not reveal that it exists.
+      enum:
+      - metricNotModelled
+      - dimensionNotModelled
+      - filterNotModelled
+      - comparisonNotAvailable
+      - periodOutsideHistory
+    ReportingSemanticQueryProblem:
+      x-ticvai-persistence: none — error shape
+      description: '`runSemanticQuery` could not resolve the spec against the semantic model. The shared
+        `Problem` has no field for which part, so this carries it.
+
+        '
+      allOf:
+      - $ref: ../shared/common.yaml#/components/schemas/Problem
+      - type: object
+        required:
+        - unavailableReason
+        properties:
+          unavailableReason:
+            $ref: '#/components/schemas/ReportingUnavailableReason'
+          unresolvedCodes:
+            type: array
+            description: The metric, dimension or field codes that did not resolve, as given in the spec.
             items:
               type: string
     MetricValue:
@@ -4492,3 +4974,9 @@ components:
       type: http
       scheme: bearer
       bearerFormat: JWT
+    serviceAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: Cell-to-cell, as `../shared/common.yaml` `serviceAuth`. Used by `runSemanticQuery`,
+        which the `ai` service calls for a staff member named in the request.

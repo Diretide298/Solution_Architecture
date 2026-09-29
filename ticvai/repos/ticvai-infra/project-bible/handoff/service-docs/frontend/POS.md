@@ -32,7 +32,7 @@
 | [POS-006](#pos-006-held-orders) | Held Orders | Sell | 1 | 14 |
 | [POS-007](#pos-007-close-shift) | Close Shift | Shift | 1 | 17 |
 | [POS-010](#pos-010-add-to-existing-ticket) | Add to Existing Ticket | Sell | 1 | 5 |
-| [POS-011](#pos-011-returns-refunds-exchanges) | Returns, Refunds & Exchanges | Sell | 1 | 9 |
+| [POS-011](#pos-011-returns-refunds-exchanges) | Returns, Refunds & Exchanges | Sell | 1 | 10 |
 | [POS-012](#pos-012-omnichannel-order-fulfilment-center) | Omnichannel Order & Fulfilment Center | Sell | 1 | 7 |
 | [POS-013](#pos-013-mobile-pos-event-sales-offline-operations) | Mobile POS, Event Sales & Offline Operations | Sell | 1 | 8 |
 | [POS-014](#pos-014-sales-exceptions-controls-operational-actions) | Sales Exceptions, Controls & Operational Actions | Sell | 1 | 3 |
@@ -47,7 +47,7 @@
 | [POS-023](#pos-023-sell-merchandise) | Sell — Merchandise | Sell | 1 | 5 |
 | [POS-024](#pos-024-outlet-setup) | Outlet Setup | Sell | 1 | 5 |
 | [POS-025](#pos-025-till-home) | Till Home | Sell | 1 | 5 |
-| [POS-026](#pos-026-receipt-reprint) | Receipt & Reprint | Sell | 1 | 3 |
+| [POS-026](#pos-026-receipt-reprint) | Receipt & Reprint | Sell | 1 | 6 |
 | [POS-027](#pos-027-guest-lookup) | Guest Lookup | Sell | 1 | 2 |
 | [POS-028](#pos-028-table-service) | Table Service | Sell | 1 | 8 |
 | [POS-029](#pos-029-order-queue) | Order Queue | Sell | 1 | 4 |
@@ -287,7 +287,7 @@
 | POS-006 | Recall held | orderId | sale.resume |
 | BO-045 | The new price is wrong on eleven items |  |  |
 | POS-013 | A guest wants cash back and the drawer is heavy |  |  |
-| BO-084 | The manager sees it in their inbox |  |  |
+| BO-084 | The manager sees it in their inbox | approvalRequestId |  |
 | BO-130 | Four transactions are rejected — a product retired while the till was offline |  |  |
 | BO-133 | The venue's offline exposure crosses a ceiling |  |  |
 | POS-007 | Close Shift | saleId |  |
@@ -609,6 +609,7 @@
 | orderId | deepLink |
 | outletId | deepLink |
 | boxId | session |
+| invoiceId | navigation |
 
 **Operations**
 
@@ -623,6 +624,7 @@
 | `lookupRetailSale` | [RetailService](../backend/RetailService.md#lookupretailsale) | onAction | Find a sale from a receipt; returns a list with matchedBy, a pick list when several match (audit R215) | `ORDER_VIEW` |
 | `createRetailReturn` | [RetailService](../backend/RetailService.md#createretailreturn) | onAction | Accept a return | `ORDER_REFUND` |
 | `listSerialisedItems` | [InventoryService](../backend/InventoryService.md#listserialiseditems) | onLoad | listSerialisedItems | `PRODUCT_VIEW` |
+| `issueCreditMemo` | [LedgerService](../backend/LedgerService.md#issuecreditmemo) | onAction | Issue a credit memo | `LEDGER_POST` |
 
 **States**
 
@@ -1350,6 +1352,8 @@
 | workstationId | session |
 | saleId | navigation |
 | entitlementId | navigation |
+| documentId | navigation |
+| invoiceId | navigation |
 
 **Operations**
 
@@ -1358,6 +1362,9 @@
 | `reprintReceipt` | [RetailService](../backend/RetailService.md#reprintreceipt) | onAction | Print the receipt again | `ORDER_REPRINT` |
 | `reprintOrder` | [OrderService](../backend/OrderService.md#reprintorder) | onAction | Print the whole order again | `ORDER_REPRINT` |
 | `reissueEntitlement` | [OrderService](../backend/OrderService.md#reissueentitlement) | onAction | Reissue the ticket or wristband | `ORDER_EXCHANGE` |
+| `issueTaxInvoice` | [LedgerService](../backend/LedgerService.md#issuetaxinvoice) | onAction | Issue a tax invoice | `LEDGER_POST` |
+| `getTaxInvoice` | [LedgerService](../backend/LedgerService.md#gettaxinvoice) | onLoad | Show a tax invoice | `LEDGER_VIEW` |
+| `getTaxDocumentRendition` | [LedgerService](../backend/LedgerService.md#gettaxdocumentrendition) | onLoad | Download the invoice / credit memo PDF | `LEDGER_VIEW` |
 
 **States**
 
@@ -1374,7 +1381,7 @@
 | To | Trigger | Carries | Guard |
 |---|---|---|---|
 | POS-025 | Till Home |  |  |
-| POS-011 | Returns, Refunds & Exchanges | orderId |  |
+| POS-011 | Returns, Refunds & Exchanges | invoiceId, orderId |  |
 
 ## POS-027 Guest Lookup
 

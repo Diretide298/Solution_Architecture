@@ -1,0 +1,44 @@
+# device.enrolmentChanged v1 — published by tenancy
+# Checked by tools/check-states.py against states/ and the contracts.
+
+name: device.enrolmentChanged
+version: 1
+publisher: tenancy
+description: A device moved through its lifecycle — enrolled, provisioned, activated, deactivated or retired.
+aggregate: device
+emittedWhen: enrolDevice succeeds (RegisteredDevice.enrolmentState changes)
+payload:
+- field: deviceId
+  type: uuid
+- field: kind
+  type: string
+- field: scopePath
+  type: string
+- field: fromState
+  type: string
+- field: toState
+  type: string
+- field: reason
+  type: string
+  required: false
+- field: configurationProfileId
+  type: uuid
+  required: false
+- field: changedAt
+  type: timestamp
+consumers:
+- context: public-api
+  purpose: Deliver to webhook subscriptions taking device.enrolmentChanged (16.9.56)
+  idempotencyKey: deviceId + changedAt
+  onFailure: retryThenDeadLetter
+  isCritical: false
+- context: access
+  purpose: Keep access.access_device's lifecycle in step with the register of record (platform.device), so a retired
+    device is refused at the gate whatever its topology row says
+  idempotencyKey: deviceId + changedAt
+  onFailure: retryThenDeadLetter
+  isCritical: true
+retention: 1 year after publication
+notes: '**Added 29 September (build pass, group RD).** No state model emits this yet: `enrolmentState` has no state model (check-states warns on
+  `tenancy.DeviceEnrolment.state`), so the emit sits on `enrolDevice`. The access consumer is the interim answer to the
+  duplicated device register listed in RD.json `open`.'

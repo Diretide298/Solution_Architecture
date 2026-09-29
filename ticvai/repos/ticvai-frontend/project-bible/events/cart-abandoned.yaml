@@ -48,6 +48,12 @@ consumers:
   idempotencyKey: cartId
   onFailure: retry
   isCritical: false
+- context: ai
+  purpose: Recommendation attribution (an offer shown and not bought), and abandonment in the demand
+    forecast (AI system design section 3.2)
+  idempotencyKey: cartId
+  onFailure: retryThenDeadLetter
+  isCritical: false
 retention: 90 days, with the recovery window. Beyond that it is a reporting aggregate, not a cart
 notes: '**Fires on expiry, not on `abandonCart`.** A guest who emptied their cart deliberately said
   no, and a recovery campaign that chases them is the difference between a reminder and a nuisance.

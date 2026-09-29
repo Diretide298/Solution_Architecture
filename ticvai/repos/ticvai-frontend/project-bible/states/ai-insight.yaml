@@ -1,0 +1,46 @@
+# AI insight — state model
+# Contract: ai.AiInsight.status
+# Checked by tools/check-states.py. Added 29 September (build pass, group OWN, from the AI group's handoff).
+
+entity: AI insight
+contract: ai
+enum: AiInsight.status
+enumKind: inline
+enumSchema: AiInsight
+enumProperty: status
+owner: ai
+description: '**An insight with a lifecycle** (AIP-181): anomalies, forecast deviations, trends, opportunities,
+  executive summaries and root causes. Created `new` by the detectors, or by `explainMetricChange` with `keep`.'
+initial:
+- new
+terminal:
+- rejected
+- measured
+transitions:
+- from: new
+  to: reviewed
+  operation: decideAiInsight
+  trigger: operation
+  guard: Decision `review`. Someone has looked at it
+- from: reviewed
+  to: accepted
+  operation: decideAiInsight
+  trigger: operation
+  guard: Decision `accept`; the insight is real and worth acting on
+- from: reviewed
+  to: rejected
+  operation: decideAiInsight
+  trigger: operation
+  guard: Decision `reject`, with a reason. **The false-alarm signal a detector is judged on**
+- from: accepted
+  to: actioned
+  operation: decideAiInsight
+  trigger: operation
+  guard: Decision `actioned`, with the `actionRef` of what was done
+- from: actioned
+  to: measured
+  trigger: job
+  guard: The job that measures the effect of the action recorded `measuredImpact`
+notes: '`ai.insightRaised` is published when the insight is created in `new`, once per situation through the
+  correlation key (AIP-090), as the event''s `emittedWhen` says; there is no from-state for a transition to carry
+  it. A move the lifecycle does not allow is refused (`409`).'

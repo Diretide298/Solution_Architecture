@@ -116,8 +116,8 @@ screens:
       provenance: structural — pack board 4 wiring, 11 September 2026
     - to: CMS-008
       trigger: Content Blocks
-      provenance: derived — CMS-008 declares entryState.params bannerId, promoBlockId and CMS-001 holds
-        none of them, so the edge carries nothing and CMS-008 opens cold
+      provenance: derived — CMS-008 declares entryState.params actionId, bannerId, promoBlockId and CMS-001
+        holds none of them, so the edge carries nothing and CMS-008 opens cold
     - to: CMS-009
       trigger: Navigation & Menus
       provenance: derived — CMS-009 declares entryState.params menuId and CMS-001 holds none of them,
@@ -1427,6 +1427,17 @@ screens:
     - listContentPages
     - getHomepageLayout
     - getModuleEnablement
+  - operationId: proposeMarketingContent
+    contract: ai
+    purpose: Draft subject lines, message bodies or content variants from a brief, for the author to edit
+      and apply
+    trigger: onAction
+    provenance: build, 29 September 2026
+  - operationId: decideProposedAction
+    contract: ai
+    purpose: Record which AI draft or proposal was used, or why it was refused
+    trigger: onAction
+    provenance: build, 29 September 2026
   wireframe:
     status: notStarted
     provenance: generated
@@ -1437,6 +1448,8 @@ screens:
   entryState:
     params:
     - name: pageId
+      from: navigation
+    - name: actionId
       from: navigation
   overlays:
   - id: formCreateContentPage
@@ -1705,6 +1718,17 @@ screens:
     invalidates:
     - listPromoBlocks
     - listBanners
+  - operationId: proposeMarketingContent
+    contract: ai
+    purpose: Draft subject lines, message bodies or content variants from a brief, for the author to edit
+      and apply
+    trigger: onAction
+    provenance: build, 29 September 2026
+  - operationId: decideProposedAction
+    contract: ai
+    purpose: Record which AI draft or proposal was used, or why it was refused
+    trigger: onAction
+    provenance: build, 29 September 2026
   entryState:
     preloaded:
     - PromoBlock.id
@@ -1716,6 +1740,8 @@ screens:
     - name: bannerId
       from: navigation
     - name: promoBlockId
+      from: navigation
+    - name: actionId
       from: navigation
   wireframe:
     status: notStarted
@@ -2492,6 +2518,11 @@ screens:
     trigger: onAction
     invalidates:
     - searchMedia
+  - operationId: semanticSearch
+    contract: ai
+    purpose: Natural-language search of the media library (kind media)
+    trigger: onAction
+    provenance: build, 29 September 2026
   entryState:
     params:
     - name: mediaCode
@@ -3368,6 +3399,16 @@ screens:
     contract: tenancy
     purpose: The tenant's venues, for the per-venue override picker (rev 3 CFG-11)
     trigger: onLoad
+  - operationId: listAnalyticsProviders
+    contract: white-label
+    purpose: Connected analytics platforms
+    trigger: onLoad
+    provenance: build, 29 September 2026
+  - operationId: setAnalyticsProvider
+    contract: white-label
+    purpose: Connect or change an analytics platform
+    trigger: onAction
+    provenance: build, 29 September 2026
   wireframe:
     status: notStarted
     provenance: generated
@@ -4697,6 +4738,31 @@ screens:
     contract: marketing-crm
     purpose: Cookie, Tracking & Digital Technology Registry
     trigger: onLoad
+  - operationId: setTrackingTechnology
+    contract: marketing-crm
+    purpose: Add, classify, approve or retire a technology
+    trigger: onAction
+    provenance: build, 29 September 2026
+  - operationId: recordCookieScan
+    contract: marketing-crm
+    purpose: Upload or take in a scan result
+    trigger: onAction
+    provenance: build, 29 September 2026
+  - operationId: listCookieScans
+    contract: marketing-crm
+    purpose: Scan runs and what each found
+    trigger: onLoad
+    provenance: build, 29 September 2026
+  - operationId: listCookieScanPolicies
+    contract: marketing-crm
+    purpose: Scan schedules per channel
+    trigger: onLoad
+    provenance: build, 29 September 2026
+  - operationId: setCookieScanPolicy
+    contract: marketing-crm
+    purpose: Set a scan schedule and alert recipients
+    trigger: onAction
+    provenance: build, 29 September 2026
   entryState:
     preloaded:
     - CookieTrackingDigitalTechnologyRegistryView.technologyType
@@ -4810,6 +4876,11 @@ screens:
     contract: marketing-crm
     purpose: Cookie Banner & Preference Center Designer
     trigger: onLoad
+  - operationId: setCookieBannerDesign
+    contract: marketing-crm
+    purpose: Save a banner design as a new draft version
+    trigger: onAction
+    provenance: build, 29 September 2026
   wireframe:
     status: notStarted
     provenance: generated
@@ -5811,6 +5882,11 @@ screens:
     contract: marketing-crm
     purpose: Consent Evidence, History & Withdrawal Management
     trigger: onLoad
+  - operationId: listDeviceConsents
+    contract: marketing-crm
+    purpose: Visitors' cookie decisions as evidence
+    trigger: onLoad
+    provenance: build, 29 September 2026
   entryState:
     preloaded:
     - Retry Required
@@ -6530,6 +6606,11 @@ screens:
     contract: marketing-crm
     purpose: Privacy Audit, Evidence & Compliance Reporting
     trigger: onLoad
+  - operationId: listDeviceConsents
+    contract: marketing-crm
+    purpose: Cookie consent log for compliance reports
+    trigger: onLoad
+    provenance: build, 29 September 2026
   wireframe:
     status: notStarted
     provenance: generated
@@ -9531,6 +9612,11 @@ screens:
     purpose: Collections to file into
     trigger: onLoad
     provenance: board reading, 19 September 2026
+  - operationId: semanticSearch
+    contract: ai
+    purpose: Natural-language search of the media library (kind media)
+    trigger: onAction
+    provenance: build, 29 September 2026
   entryState:
     preloaded:
     - Thumbnail
@@ -13998,11 +14084,23 @@ screens:
     contract: catalogue
     purpose: Events an answer can open
     trigger: onAction
+  - operationId: suggestGuidedChoice
+    contract: ai
+    purpose: Suggest a Help me choose set-up from the venue's catalogue
+    trigger: onAction
+    provenance: build, 29 September 2026
+  - operationId: getGuidedChoiceSuggestion
+    contract: ai
+    purpose: The reasons behind a Help me choose suggestion
+    trigger: onAction
+    provenance: build, 29 September 2026
   entryState:
     params:
     - name: venueId
       from: session
     - name: guidedChoiceId
+      from: navigation
+    - name: suggestionId
       from: navigation
     coldEntry: Resolves the venue from the session and opens on the suggestions awaiting review, or on
       the list when there are none.

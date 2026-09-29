@@ -69,16 +69,16 @@ operationsByContract:
     scope: venue
     permission: ORDER_REFUND
     offline: false
-    reads: 3
-    writes: 3
+    reads: 4
+    writes: 4
   - operation: createRetailSale
     verb: POST
     path: /retail-sales
     scope: workstation
     permission: ORDER_CREATE
     offline: false
-    reads: 3
-    writes: 3
+    reads: 4
+    writes: 4
   - operation: createShopAndDrop
     verb: POST
     path: /shop-and-drop
@@ -374,9 +374,11 @@ tables:
 readsFrom:
 - service: TenancyService
   operations: 3
-writesOutside:
 - service: InventoryService
   operations: 2
+writesOutside:
+- service: InventoryService
+  operations: 4
   rule: 'ADR-0028: the owner defines the row; a foreign writer may only append, through a path the owner
     published.'
   why: '**The lineage records these writes, not how they honour the rule.** It does not say whether
@@ -387,6 +389,12 @@ writesOutside:
     tables:
     - inventory.movement
   - operation: collectMerchandiseReservation
+    tables:
+    - inventory.movement
+  - operation: createRetailReturn
+    tables:
+    - inventory.movement
+  - operation: createRetailSale
     tables:
     - inventory.movement
 screens:

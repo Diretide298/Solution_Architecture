@@ -7,7 +7,7 @@
 | Tier | operations: What a venue does with what it sold. Licensed per module. |
 | Contracts | `fnb` |
 | Schemas owned | `fnb` |
-| Operations in the slice | 61 of 117 |
+| Operations in the slice | 67 of 120 |
 | Scale | Write-heavy during service, idle between. Two peaks a day, sharply. |
 | If it is down | Down means the kitchen falls back to paper. Offline-capable by design. |
 
@@ -19,6 +19,7 @@
 
 | Service | Tables it reads |
 |---|---|
+| [AiService](AiService.md) | `ai.suggestion` |
 | [IdentityService](IdentityService.md) | `identity.principal` |
 | [InventoryService](InventoryService.md) | `inventory.goods_receipt`, `inventory.stock_level` |
 | [OrderService](OrderService.md) | `orders.payment` |
@@ -30,6 +31,7 @@
 |---|---|---|---|---|---|---|
 | bill | [`closeTableVisit`](#closetablevisit) | POST | `/table-visits/{visitId}/close` | core | 1 | EMP-059, POS-028 |
 | fnb | [`attachModifierGroup`](#attachmodifiergroup) | PUT | `/menu-items/{menuItemId}/modifier-groups` | setup | 2 | BO-045 |
+| fnb | [`buildProductionPlan`](#buildproductionplan) | POST | `/production-plans` | setup | 2 | BO-136 |
 | fnb | [`chaseStation`](#chasestation) | POST | `/kitchen-stations/{stationId}/chase` | core | 2 | KIT-006 |
 | fnb | [`createTableReservation`](#createtablereservation) | POST | `/table-reservations` | core | 2 | EMP-055, GST-070, WEB-036 |
 | fnb | [`escalateCorrectiveAction`](#escalatecorrectiveaction) | POST | `/food-safety/corrective-actions/{actionId}/escalate` | setup | 2 | BO-044 |
@@ -50,6 +52,7 @@
 | fnb | [`rebalanceStationLoad`](#rebalancestationload) | POST | `/kitchen-stations/rebalance` | core | 2 | KIT-005 |
 | fnb | [`recallKitchenTicket`](#recallkitchenticket) | POST | `/kitchen-tickets/{ticketId}/recall` | core | 2 | KIT-002 |
 | fnb | [`refireItem`](#refireitem) | POST | `/kitchen-tickets/{ticketId}/refire` | core | 2 | KIT-002 |
+| fnb | [`releaseProductionPlan`](#releaseproductionplan) | POST | `/production-plans/{planId}/release` | setup | 2 | BO-136 |
 | fnb | [`seatTableReservation`](#seattablereservation) | POST | `/table-reservations/{reservationId}/seat` | core | 1 | EMP-058, POS-028 |
 | fnb | [`setCourseRules`](#setcourserules) | PUT | `/outlets/{outletId}/course-rules` | core | 2 | KIT-003 |
 | fnb | [`setKitchenSla`](#setkitchensla) | PUT | `/outlets/{outletId}/kitchen-sla` | core | 2 | BO-134, KIT-009 |
@@ -58,6 +61,7 @@
 | fnb | [`updateTableReservation`](#updatetablereservation) | PATCH | `/table-reservations/{reservationId}` | core | 2 | GST-070, WEB-031 |
 | guestOrdering | [`claimLocationSession`](#claimlocationsession) | POST | `/location-sessions` | core | 2 | GST-024, GST-030, WEB-036, WEB-046 |
 | guestOrdering | [`claimTableSession`](#claimtablesession) | POST | `/table-sessions` | core | 2 | GST-024, GST-025, WEB-036, WEB-038 |
+| guestOrdering | [`createDeliveryLocation`](#createdeliverylocation) | POST | `/delivery-locations` | setup | 1 | BO-065 |
 | guestOrdering | [`createGuestFnbOrder`](#createguestfnborder) | POST | `/guest-orders` | core | 2 | GST-024, GST-032, KSK-016, WEB-036 |
 | guestOrdering | [`getFnbDeliveryPolicy`](#getfnbdeliverypolicy) | GET | `/fnb-delivery-policy` | core | 2 | BO-044, GST-024, WEB-036 |
 | guestOrdering | [`getGuestBill`](#getguestbill) | GET | `/table-sessions/{sessionId}/bill` | core | 2 | GST-025, WEB-038 |
@@ -67,7 +71,9 @@
 | guestOrdering | [`listDiningOutlets`](#listdiningoutlets) | GET | `/venues/{venueId}/dining` | core | 2 | BO-062, BO-065, EMP-030, GST-024, GST-029, WEB-036 |
 | guestOrdering | [`listFulfilmentSlots`](#listfulfilmentslots) | GET | `/outlets/{outletId}/fulfilment-slots` | core | 2 | GST-024, WEB-036 |
 | guestOrdering | [`recordOrderHandover`](#recordorderhandover) | POST | `/guest-orders/{orderId}/delivery` | core | 1 | BO-021, KIT-007, POS-012 |
+| guestOrdering | [`setDeliveryLocationOutletMapping`](#setdeliverylocationoutletmapping) | PUT | `/venues/{venueId}/delivery-location-outlets` | setup | 1 | BO-044, BO-065 |
 | guestOrdering | [`setFnbDeliveryPolicy`](#setfnbdeliverypolicy) | PUT | `/fnb-delivery-policy` | setup | 2 | BO-044 |
+| guestOrdering | [`updateDeliveryLocation`](#updatedeliverylocation) | PATCH | `/delivery-locations/{locationId}` | setup | 1 | BO-065 |
 | kitchen | [`listKitchenStations`](#listkitchenstations) | GET | `/kitchen/stations` | core | 2 | BO-020, BO-046, BO-134, KIT-001, KIT-005 |
 | kitchen | [`listKitchenTickets`](#listkitchentickets) | GET | `/kitchen/tickets` | core | 1 | BO-020, BO-046, BO-731, KIT-001, KIT-002, KIT-003 … |
 | kitchen | [`prioritiseKitchenTicket`](#prioritisekitchenticket) | POST | `/kitchen/tickets/{ticketId}/prioritise` | core | 2 | BO-020, BO-046, KIT-003, KIT-009 |
@@ -84,6 +90,7 @@
 | order | [`createFnbOrder`](#createfnborder) | POST | `/fnb-orders` | core | 1 | BO-020, EMP-058, EMP-059, POS-022 |
 | order | [`getFnbOrder`](#getfnborder) | GET | `/fnb-orders/{orderId}` | core | 2 | BO-020, KIT-004 |
 | order | [`listFnbOrders`](#listfnborders) | GET | `/fnb-orders` | core | 1 | BO-020, BO-044, EMP-051, KIT-001, POS-029 |
+| production | [`setRecipe`](#setrecipe) | PUT | `/recipes` | setup | 2 | BO-110, BO-111 |
 | table | [`clearTable`](#cleartable) | POST | `/tables/{tableId}/clear` | core | 1 | POS-028 |
 | table | [`getTableMap`](#gettablemap) | GET | `/outlets/{outletId}/tables` | core | 1 | BO-044, EMP-051, EMP-052, EMP-060, POS-028 |
 | table | [`mergeTableVisits`](#mergetablevisits) | POST | `/table-visits/{visitId}/merge` | core | 1 | EMP-058, POS-028 |
@@ -249,6 +256,73 @@ Board 2E. **Attachment is separate from definition** because that is what makes 
 |---|---|---|
 | 200 |  | Attached. |
 | 409 |  | The group adds an allergen the item does not declare. |
+
+### buildProductionPlan
+
+**`POST /production-plans`**: Turn a forecast into a prep list
+
+Board 2M. **Demand forecast through recipes to quantities per item and per station.**
+**Draft, always.** The plan starts from `requestSuggestion(kind=prepPlan)` and is edited before it is released — **a forecast a chef cannot overrule is a forecast a chef ignores**, and the edit is the signal that trains the next one.
+**The suggested quantity is kept beside the planned one**, the same rule as `updateRequisitionLines`: the gap is the evidence the forecast is wrong.
+
+|  |  |
+|---|---|
+| Permission | `PRODUCT_CONFIGURE` |
+| Scope level | venue |
+| Part of slice | setup, makes `fnb.production_plan` non-empty |
+| Wave | 2 |
+| Offline | no |
+| Conflict policy | serverWins |
+| Reads | `ai.suggestion`, `cache:idempotency`, `fnb.menu_item`, `fnb.production_plan`, `fnb.production_plan_line`, `fnb.recipe`, `fnb.menu_item_modifier` |
+| Writes | `cache:idempotency`, `fnb.production_plan`, `fnb.production_plan_line` |
+| Called by | BO-136 |
+| State model | ProductionPlan ([states/production-plan.yaml](../../../states/production-plan.yaml)): created as `draft`; moves `draft` -> `cancelled` **(not settled: see the Gaps sheet)** |
+
+**Parameters**
+
+| Name | In | Required | Type | Notes |
+|---|---|---|---|---|
+| Idempotency-Key | header | yes | string | Client-generated ULID. |
+
+**Request body**: `ProductionPlan`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| id | string (uuid) | yes |  |
+| outletId | string (uuid) |  |  |
+| forDate | string (date) | yes | The trading day this prep list is for, in the Region's time zone. |
+| status | enum (draft, released, superseded, cancelled) | yes |  |
+| basedOnSuggestionId | string (uuid) |  | The forecast it started from. (nullable) |
+| lines | array of object | yes |  |
+| lines[].itemId | string (uuid) | yes |  |
+| lines[].suggestedQuantity | number |  | (nullable) |
+| lines[].plannedQuantity | number | yes |  |
+| lines[].uom | string |  |  |
+| lines[].stationId | string (uuid) |  | (nullable) |
+| releasedRunIds | array of string (uuid) |  | (read-only) |
+
+**Response**: `ProductionPlan`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| id | string (uuid) | yes |  |
+| outletId | string (uuid) |  |  |
+| forDate | string (date) | yes | The trading day this prep list is for, in the Region's time zone. |
+| status | enum (draft, released, superseded, cancelled) | yes |  |
+| basedOnSuggestionId | string (uuid) |  | The forecast it started from. (nullable) |
+| lines | array of object | yes |  |
+| lines[].itemId | string (uuid) | yes |  |
+| lines[].suggestedQuantity | number |  | (nullable) |
+| lines[].plannedQuantity | number | yes |  |
+| lines[].uom | string |  |  |
+| lines[].stationId | string (uuid) |  | (nullable) |
+| releasedRunIds | array of string (uuid) |  | (read-only) |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 201 |  | Drafted |
 
 ### chaseStation
 
@@ -1548,6 +1622,58 @@ Board 3. **A refire is not a new order and it must not be.** It is the same line
 |---|---|---|
 | 200 |  | Refired |
 
+### releaseProductionPlan
+
+**`POST /production-plans/{planId}/release`**: Make the plan real
+
+Board 2M. **A plan becomes production runs, grouped by station** (decided 28 September, audit R125 (7)). Each line becomes a run of its recipe carrying the line's `stationId`, and the kitchen works from one prep list per station rather than one task per line; lines with no station form one group of their own.
+**Separate from building it because a plan is edited before it is released.** A plan that creates runs as it is drafted creates runs nobody asked for, and a kitchen that finds yesterday's abandoned draft in today's prep list stops trusting the list.
+**Releasing calls `recordSuggestionOutcome`; it does not write the outcome itself.** ADR-0020: only the AI contract writes AI tables — **the fourth time that boundary has caught a write in this package**, and every time the operation looked reasonable.
+The label matters: planned quantities against the forecast are what make a model possible later, and the record has to exist for that to be true.
+
+|  |  |
+|---|---|
+| Permission | `PRODUCT_CONFIGURE` |
+| Scope level | venue |
+| Part of slice | setup, makes `fnb.production_plan` non-empty |
+| Wave | 2 |
+| Offline | no |
+| Conflict policy | serverWins |
+| Reads | `cache:idempotency`, `fnb.production_plan`, `fnb.production_plan_line` |
+| Writes | `cache:idempotency`, `fnb.production_plan`, `fnb.production_run` |
+| Called by | BO-136 |
+| State model | ProductionPlan ([states/production-plan.yaml](../../../states/production-plan.yaml)): moves `draft` -> `released`, `released` -> `superseded`, `released` -> `cancelled` |
+
+**Parameters**
+
+| Name | In | Required | Type | Notes |
+|---|---|---|---|---|
+| planId | path | yes | string (uuid) |  |
+| Idempotency-Key | header | yes | string | Client-generated ULID. |
+
+**Response**: `ProductionPlan`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| id | string (uuid) | yes |  |
+| outletId | string (uuid) |  |  |
+| forDate | string (date) | yes | The trading day this prep list is for, in the Region's time zone. |
+| status | enum (draft, released, superseded, cancelled) | yes |  |
+| basedOnSuggestionId | string (uuid) |  | The forecast it started from. (nullable) |
+| lines | array of object | yes |  |
+| lines[].itemId | string (uuid) | yes |  |
+| lines[].suggestedQuantity | number |  | (nullable) |
+| lines[].plannedQuantity | number | yes |  |
+| lines[].uom | string |  |  |
+| lines[].stationId | string (uuid) |  | (nullable) |
+| releasedRunIds | array of string (uuid) |  | (read-only) |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 200 |  | Released, with the runs it created |
+
 ### seatTableReservation
 
 **`POST /table-reservations/{reservationId}/seat`**: The party arrived and has been sat down
@@ -2076,6 +2202,67 @@ The code is short-lived and rotates. A static table code photographed once lets 
 |---|---|---|
 | 200 |  | Attached to the table, joining an open visit where one exists |
 | 409 |  | Code expired or unknown, the outlet is closed, or the table is out of service. |
+
+### createDeliveryLocation
+
+**`POST /delivery-locations`**: Add a place food can be delivered to
+
+4.6.26. A table, seat, cabana, sunbed or named point. A `table` location names its `tableId` so it shares the table's state; a `seat` location names its `seatId` on the seat map. Serving outlets are set with `setDeliveryLocationOutletMapping`, or given here for a new location.
+
+|  |  |
+|---|---|
+| Permission | `PRODUCT_CONFIGURE` |
+| Scope level | venue |
+| Part of slice | setup, makes `fnb.delivery_location`, `fnb.delivery_location_outlet` non-empty |
+| Wave | 1 |
+| Offline | no |
+| Conflict policy | serverWins |
+| Reads | `cache:idempotency`, `fnb.delivery_location`, `fnb.dining_table`, `platform.outlet` |
+| Writes | `cache:idempotency`, `fnb.delivery_location`, `fnb.delivery_location_outlet` |
+| Called by | BO-065 |
+
+**Parameters**
+
+| Name | In | Required | Type | Notes |
+|---|---|---|---|---|
+| Idempotency-Key | header | yes | string | Client-generated ULID. |
+
+**Request body**
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| venueId | string (uuid) | yes |  |
+| kind | DeliveryLocationKind: enum (table, seat, cabana, sunbed, poolside, box, suite, lawn, …) | yes | 4.6.26. |
+| label | string | yes | (max length 200) |
+| zone | string |  | (nullable) |
+| tableId | string (uuid) |  | (nullable) |
+| seatId | string |  | (nullable) |
+| servingOutletIds | array of string (uuid) |  |  |
+| walkTimeMinutes | integer |  | (min 0; nullable) |
+
+**Response**: `DeliveryLocation`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| id | string (uuid) | yes |  |
+| venueId | string (uuid) | yes |  |
+| kind | DeliveryLocationKind: enum (table, seat, cabana, sunbed, poolside, box, suite, lawn, …) | yes | 4.6.26. |
+| label | string | yes | What a runner is told. |
+| zone | string |  | (nullable) |
+| tableId | string (uuid) |  | Set where the location is a restaurant table, so it shares table state. (nullable) |
+| seatId | string |  | Set where the seat is the address. (nullable) |
+| servingOutletIds | array of string (uuid) |  | Which outlets deliver here. |
+| isServiceable | boolean | yes | False where the location exists but is not currently taking delivery — closed section, weather, no runner on shift. |
+| unserviceableReason | string |  | (nullable) |
+| walkTimeMinutes | integer |  | From the serving outlet. (nullable) |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 201 |  | Created |
+| 409 |  | A location with the same label already exists in the venue. |
+| 422 |  | A table location without tableId, a seat location without seatId, or a table of another venue. |
 
 ### createGuestFnbOrder
 
@@ -2633,6 +2820,48 @@ Offline-capable. A runner crossing a venue loses signal, and an order that canno
 | 409 |  | Order is not ready, or already closed |
 | 422 |  | The outcome does not close this order's service mode, or a delivery names no location (audit R125 (1)). |
 
+### setDeliveryLocationOutletMapping
+
+**`PUT /venues/{venueId}/delivery-location-outlets`**: Set which outlets deliver to which delivery locations
+
+4.6.26. **The join `listDeliveryLocations` reads and nothing wrote.** Each entry names a delivery location and the outlets that deliver to it; the set given replaces that location's serving outlets, and locations not named are left as they are. An empty `servingOutletIds` means nothing serves the location, which `listDeliveryLocations` then reports as not serviceable rather than hiding. Every outlet must be an F&B outlet of the same venue as the location.
+
+|  |  |
+|---|---|
+| Permission | `PRODUCT_CONFIGURE` |
+| Scope level | venue |
+| Part of slice | setup, makes `fnb.delivery_location_outlet` non-empty |
+| Wave | 1 |
+| Offline | no |
+| Config scope | venue |
+| Conflict policy | serverWins |
+| Reads | `cache:idempotency`, `fnb.delivery_location`, `platform.outlet` |
+| Writes | `cache:idempotency`, `cache:resolution`, `fnb.delivery_location_outlet` |
+| Called by | BO-044, BO-065 |
+
+**Parameters**
+
+| Name | In | Required | Type | Notes |
+|---|---|---|---|---|
+| venueId | path | yes | string (uuid) |  |
+| Idempotency-Key | header | yes | string | Client-generated ULID. |
+
+**Request body**
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| mappings | array of object | yes | (min items 1) |
+| mappings[].locationId | string (uuid) | yes |  |
+| mappings[].servingOutletIds | array of string (uuid) | yes |  |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 200 |  | Saved. |
+| 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
+| 422 |  | An outlet that is not an F&B outlet of this venue, or a location of another venue. |
+
 ### setFnbDeliveryPolicy
 
 **`PUT /fnb-delivery-policy`**: Set takeaway and delivery rules
@@ -2726,6 +2955,64 @@ Offline-capable. A runner crossing a venue loses signal, and an order that canno
 | 200 |  | Saved |
 | 400 | BadRequest | Validation failed |
 | 403 | Forbidden | Authenticated but not permitted at the requested scope |
+
+### updateDeliveryLocation
+
+**`PATCH /delivery-locations/{locationId}`**: Rename a delivery location, or take it out of service
+
+4.6.26. `isServiceable` false with a reason stops new orders to the location (a closed section, weather, no runner) without deleting it; orders already placed are delivered.
+
+|  |  |
+|---|---|
+| Permission | `PRODUCT_CONFIGURE` |
+| Scope level | venue |
+| Part of slice | setup, makes `fnb.delivery_location` non-empty |
+| Wave | 1 |
+| Offline | no |
+| Conflict policy | serverWins |
+| Reads | `cache:idempotency`, `fnb.delivery_location` |
+| Writes | `cache:idempotency`, `fnb.delivery_location` |
+| Called by | BO-065 |
+
+**Parameters**
+
+| Name | In | Required | Type | Notes |
+|---|---|---|---|---|
+| locationId | path | yes | string (uuid) |  |
+| Idempotency-Key | header | yes | string | Client-generated ULID. |
+
+**Request body**
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| label | string |  | (max length 200) |
+| zone | string |  | (nullable) |
+| isServiceable | boolean |  |  |
+| unserviceableReason | string |  | (nullable) |
+| walkTimeMinutes | integer |  | (min 0; nullable) |
+
+**Response**: `DeliveryLocation`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| id | string (uuid) | yes |  |
+| venueId | string (uuid) | yes |  |
+| kind | DeliveryLocationKind: enum (table, seat, cabana, sunbed, poolside, box, suite, lawn, …) | yes | 4.6.26. |
+| label | string | yes | What a runner is told. |
+| zone | string |  | (nullable) |
+| tableId | string (uuid) |  | Set where the location is a restaurant table, so it shares table state. (nullable) |
+| seatId | string |  | Set where the seat is the address. (nullable) |
+| servingOutletIds | array of string (uuid) |  | Which outlets deliver here. |
+| isServiceable | boolean | yes | False where the location exists but is not currently taking delivery — closed section, weather, no runner on shift. |
+| unserviceableReason | string |  | (nullable) |
+| walkTimeMinutes | integer |  | From the serving outlet. (nullable) |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 200 |  | Updated |
+| 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
 
 
 ## Group: kitchen
@@ -3877,6 +4164,71 @@ Offline behaviour depends on the items: an order containing only untracked items
 | 200 |  | Orders |
 
 
+## Group: production
+
+### setRecipe
+
+**`PUT /recipes`**: Define a recipe for a menu item
+
+**Saving re-runs `verifyAllergens`** for the menu item (decided 28 September, audit R241), and **recomputes `costPerPortion`** from the ingredients (audit R125 (9)). A cost sent in the body is ignored.
+
+|  |  |
+|---|---|
+| Permission | `PRODUCT_CONFIGURE` |
+| Scope level | venue |
+| Part of slice | setup, makes `fnb.recipe` non-empty |
+| Wave | 2 |
+| Offline | no |
+| Conflict policy | serverWins |
+| Reads | `cache:idempotency`, `fnb.recipe`, `fnb.recipe_ingredient` |
+| Writes | `cache:idempotency`, `fnb.recipe`, `fnb.recipe_ingredient` |
+| Called by | BO-110, BO-111 |
+
+**Parameters**
+
+| Name | In | Required | Type | Notes |
+|---|---|---|---|---|
+| Idempotency-Key | header | yes | string | Client-generated ULID. |
+
+**Request body**: `Recipe`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| menuItemId | string (uuid) | yes |  |
+| yield | number |  | Portions produced by one execution. (min 0) |
+| ingredients | array of object | yes | (min items 1) |
+| ingredients[].inventoryItemId | string (uuid) | yes |  |
+| ingredients[].quantity | number | yes | (min 0) |
+| ingredients[].unit | string | yes |  |
+| ingredients[].isOptional | boolean |  | (default False) |
+| costPerPortion | object |  | Computed, never entered (decided 28 September, audit R125 (9)): the sum of each ingredient quantity at its current inventory cost, divided by yield. (read-only) |
+| costPerPortion.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
+| costPerPortion.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
+| costPerPortion.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+
+**Response**: `Recipe`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| menuItemId | string (uuid) | yes |  |
+| yield | number |  | Portions produced by one execution. (min 0) |
+| ingredients | array of object | yes | (min items 1) |
+| ingredients[].inventoryItemId | string (uuid) | yes |  |
+| ingredients[].quantity | number | yes | (min 0) |
+| ingredients[].unit | string | yes |  |
+| ingredients[].isOptional | boolean |  | (default False) |
+| costPerPortion | object |  | Computed, never entered (decided 28 September, audit R125 (9)): the sum of each ingredient quantity at its current inventory cost, divided by yield. (read-only) |
+| costPerPortion.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
+| costPerPortion.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
+| costPerPortion.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 200 |  | Set. |
+
+
 ## Group: table
 
 ### clearTable
@@ -4546,6 +4898,65 @@ Every table this service owns that the slice reads or writes, with its columns a
 | is_cutlery | boolean | no |  |
 | scope_path | text | no | The partition key (ADR-0005). |
 
+### `fnb.production_plan`
+
+| Column | Type | Required | Notes |
+|---|---|---|---|
+| id | uuid | yes |  |
+| outlet_id | uuid | no |  |
+| for_date | date | yes | The trading day this prep list is for, in the Region's time zone. |
+| status | text | yes |  |
+| based_on_suggestion_id | uuid | no | The forecast it started from. |
+| released_run_ids | text[] | no |  |
+
+### `fnb.production_plan_line`
+
+| Column | Type | Required | Notes |
+|---|---|---|---|
+| production_plan_id | uuid | yes | The parent row. |
+| item_id | uuid | yes |  |
+| suggested_quantity | numeric | no |  |
+| planned_quantity | numeric | yes |  |
+| uom | text | no |  |
+| station_id | uuid | no |  |
+| id | uuid | yes | Synthesised key. |
+
+### `fnb.production_run`
+
+| Column | Type | Required | Notes |
+|---|---|---|---|
+| id | uuid | yes |  |
+| recipe_id | uuid | yes |  |
+| production_plan_id | uuid | no | The plan whose release created this run. |
+| station_id | uuid | no | The station whose prep list this run is on. |
+| producing_outlet_id | uuid | no |  |
+| for_outlet_ids | text[] | no | Where it goes. |
+| planned_quantity | numeric | yes |  |
+| actual_quantity | numeric | no | BL-126. |
+| scheduled_for | timestamptz | no |  |
+| status | text | yes |  |
+| variance_reason | text | no |  |
+
+### `fnb.recipe`
+
+| Column | Type | Required | Notes |
+|---|---|---|---|
+| menu_item_id | uuid | yes |  |
+| yield | numeric | no | Portions produced by one execution. |
+| cost_per_portion | numeric(18,4) | no | Computed, never entered (decided 28 September, audit R125 (9)): the sum of each ingredient quantity at its current inventory cost, divided by yield. |
+| id | uuid | yes | Synthesised key. |
+
+### `fnb.recipe_ingredient`
+
+| Column | Type | Required | Notes |
+|---|---|---|---|
+| recipe_id | uuid | yes | The parent row. |
+| inventory_item_id | uuid | yes |  |
+| quantity | numeric | yes |  |
+| unit | text | yes |  |
+| is_optional | boolean | no |  |
+| id | uuid | yes | Synthesised key. |
+
 ### `fnb.reservation_table`
 
 | Column | Type | Required | Notes |
@@ -4722,15 +5133,15 @@ Every table this service owns that the slice reads or writes, with its columns a
 
 ## Not in the first release
 
-56 operations, added to this service in later releases without changing any of the above.
+53 operations, added to this service in later releases without changing any of the above.
 
 | Group | Operations |
 |---|---|
 | bill | `getBill`, `splitBill` |
-| fnb | `applyMenuActions`, `buildProductionPlan`, `closeCorrectiveAction`, `compItem`, `completeProductionRun`, `createCombo`, `createTable`, `enterCountLine`, `getAllergenVerification`, `getFnbReservationPolicy`, `getFnbServiceChargePolicy`, `getProductionRun`, `listFnbRecommendations`, `listIngredientSubstitutes`, `listProductionRuns`, `listTemperatureCheckpoints`, `notifyWaitlistParty`, `planProductionRun`, `publishMenu`, `quoteWaitTime`, `reassignServer`, `recordCorrectiveAction`, `releaseProductionPlan`, `requestBill`, `requestRecount`, `resolveBookingConflict`, `rollbackMenu`, `scheduleMenuPublish`, `sendBookingConfirmation`, `sendOrderNotification`, `setComboSlots`, `setFnbReservationPolicy`, `setFnbServiceChargePolicy`, `setIngredientSubstitutes`, `setSectionLayout`, `setServiceStage`, `setSubstitutionRules`, `setTemperatureCheckpoint`, `transferOrderItems`, `transferTableVisit`, `updateTable`, `verifyAllergens` |
+| fnb | `applyMenuActions`, `closeCorrectiveAction`, `compItem`, `completeProductionRun`, `createCombo`, `createTable`, `enterCountLine`, `getAllergenVerification`, `getFnbReservationPolicy`, `getFnbServiceChargePolicy`, `getProductionRun`, `listFnbRecommendations`, `listIngredientSubstitutes`, `listProductionRuns`, `listTemperatureCheckpoints`, `notifyWaitlistParty`, `planProductionRun`, `publishMenu`, `quoteWaitTime`, `reassignServer`, `recordCorrectiveAction`, `requestBill`, `requestRecount`, `resolveBookingConflict`, `rollbackMenu`, `scheduleMenuPublish`, `sendBookingConfirmation`, `sendOrderNotification`, `setComboSlots`, `setFnbReservationPolicy`, `setFnbServiceChargePolicy`, `setIngredientSubstitutes`, `setSectionLayout`, `setServiceStage`, `setSubstitutionRules`, `setTemperatureCheckpoint`, `transferOrderItems`, `transferTableVisit`, `updateTable`, `verifyAllergens` |
 | menu | `listMenuSchedules`, `listMenuVersions` |
 | order | `amendFnbOrder` |
 | outlet | `listOutletTemplates`, `setOutletTemplate` |
-| production | `listRecipes`, `recordWaste`, `setRecipe` |
+| production | `listRecipes`, `recordWaste` |
 | service | `acceptFnbOrder`, `cancelFnbOrder` |
 | table | `getTableVisit`, `updateTableVisit` |

@@ -1,0 +1,42 @@
+id: LLD-AI governance policy version
+title: AI governance policy version — 3 transitions
+generatedBy: tools/derive-diagrams.py
+index: diagrams/hld/04-lifecycles.yaml
+source: states/ai-governance-policy-version.yaml
+entity: AI governance policy version
+contract: ai
+enum: AiGovernancePolicyVersion.status
+enumKind: inline
+enumSchema: AiGovernancePolicyVersion
+enumProperty: status
+owner: ai
+description: '**One version of a governance policy** (AI design 3.1 Governance, 3.8; ADM-523..528),
+  written `draft` by `createAiGovernancePolicyDraft`. **Published versions are never edited**: a change
+  is a new version (AIC-165).'
+initial:
+- draft
+terminal:
+- superseded
+transitions:
+- from: draft
+  to: simulated
+  operation: simulateAiGovernancePolicy
+  trigger: operation
+  guard: '**Replays the draft** over recorded decisions in a window and over the capability''s test
+    cases, and reports what would change (ADM-527). Runs no action'
+- from: simulated
+  to: published
+  operation: publishAiGovernancePolicy
+  trigger: operation
+  guard: '**A controlled review** (ADM-528): the version was simulated (`409 policy-not-simulated`)
+    and the publisher is not who drafted it (`409 approver-is-requester`). Every cache key carrying
+    the policy version is invalidated (design 3.6)'
+- from: published
+  to: superseded
+  operation: publishAiGovernancePolicy
+  trigger: operation
+  guard: The next version of the same policy was published; this one becomes `superseded` in the same
+    transaction (AIC-165)
+notes: A draft that is never published stays a draft; it decides nothing, because the effective policy
+  is resolved from published versions only. Simulating a `simulated` version again refreshes its results
+  and changes no status; a published or superseded version is refused (`409`).

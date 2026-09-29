@@ -118,7 +118,7 @@ BEGIN
 END
 $$;
 
--- **73 tables: 28 scoped by `scope_path`, 0 by `venue_id`, 5 through the parent that owns them, 39 with no policy.**
+-- **75 tables: 28 scoped by `scope_path`, 0 by `venue_id`, 5 through the parent that owns them, 41 with no policy.**
 -- A table with no policy is listed at the end of this file with the reason. It is not
 -- claimed to be reference data: for most of them that is a scoping decision nobody has
 -- made yet, and they stay readable by every connection to this database until it is.
@@ -178,6 +178,8 @@ SELECT platform.apply_parent_rls('control.partner_user'::regclass, 'partner_id',
 --   control.cell_instance  -- no scope column and no declared owner
 --   control.cell_job  -- its owner control.cell has no policy either
 --   control.cell_tenant  -- no scope column and no declared owner
+--   control.credit_note  -- no scope column and no declared owner
+--   control.credit_note_line  -- its owner control.credit_note has no policy either
 --   control.developer_account  -- no scope column and no declared owner
 --   control.environment  -- its owner control.cell has no policy either
 --   control.integration_listing  -- no scope column and no declared owner

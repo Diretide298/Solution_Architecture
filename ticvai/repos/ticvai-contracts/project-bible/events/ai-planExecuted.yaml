@@ -1,0 +1,54 @@
+# ai.planExecuted v1 — published by ai
+# Checked by tools/check-states.py.
+
+name: ai.planExecuted
+version: 1
+publisher: ai
+description: An approved action plan finished executing through the owning modules.
+aggregate: aiActionPlan
+emittedWhen: AiActionPlan executing to completed or partiallyCompleted
+payload:
+- field: tenantId
+  type: uuid
+- field: scopePath
+  type: string
+- field: planId
+  type: uuid
+- field: origin
+  type: string
+- field: status
+  type: string
+  notes: completed or partiallyCompleted
+- field: stepCount
+  type: integer
+- field: requestedByPrincipalId
+  type: uuid
+- field: approvalRequestId
+  type: uuid
+- field: completedAt
+  type: timestamp
+consumers:
+- context: marketing
+  purpose: Tell the requester and the approver what was applied
+  idempotencyKey: planId
+  onFailure: retry
+  isCritical: false
+- context: reporting
+  purpose: AI action analytics
+  idempotencyKey: planId
+  onFailure: retry
+  isCritical: false
+- context: cache
+  purpose: Drop cached answers under the affected scope; configuration changed
+  idempotencyKey: scopePath+planId
+  onFailure: retryThenDeadLetter
+  isCritical: true
+retention: Kept with the plan
+notes: '**Success is the owning services'' responses, not a model''s judgement** (AIC-097). The steps
+  and their results are read with `getActionPlan`.
+
+
+  **Carries ids and scope, never prompt text or personal data beyond ids** (AI design 3.2).
+
+
+  Emitted by states/ai-action-plan.yaml on `executing` to `completed` or `partiallyCompleted` (added 29 September, build pass, group OWN).'

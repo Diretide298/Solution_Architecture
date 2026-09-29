@@ -5,16 +5,16 @@
 | | |
 |---|---|
 | Screens | 96 |
-| Operations | 212 |
-| Contracts | 18 |
+| Operations | 221 |
+| Contracts | 19 |
 | Modules | 4 |
 | Undrawn | 0 |
-| Operations with no screen | 140 |
+| Operations with no screen | 135 |
 | Waves | wave1 25 · wave2 40 · wave3 31 |
 
 ## Gaps
 
-### 140 operations with no screen here
+### 135 operations with no screen here
 
 **In a contract this platform uses, callable by its audience, and reaching no screen on any platform serving that audience.** Either a screen is missing or the endpoint should not exist — and the second is worth considering first.
 
@@ -24,11 +24,11 @@
 | `listAccessChanges` | access | GET | Changes made to an entitlement's access |
 | `listEntryRulePoints` | access | GET | Which access points an admission rule covers |
 | `verifyIdentity` | access | POST | Check the person presenting against the person entitled |
+| `replaceAccreditationCredential` | accreditation | POST | Reissue after loss, damage or a name change |
 | `createKnowledgeCollection` | ai | POST | Create a collection |
 | `generateVenueLayout` | ai | POST | Draft a seat map from an uploaded plan |
 | `ingestKnowledgeDocument` | ai | POST | Add a document |
 | `listIndexSources` | ai | GET | What is indexed, and how current it is |
-| `proposeTranslations` | ai | POST |  |
 | `proposeWalkways` | ai | POST | Find walkable space in a drawing that has no vectors |
 | `reindexSource` | ai | POST | Rebuild a source |
 | `removeIndexEntry` | ai | DELETE | Remove one record from the index |
@@ -56,11 +56,11 @@
 | `getPasswordPolicy` | identity | GET | Read the password and MFA policy in force |
 | `getPrincipalModuleAccess` | identity | GET | What this person may do, as ticks |
 | `listAccessDecisions` | identity | GET | What was decided, for whom, where and why |
-| `listAccessPolicyHistory` | identity | GET | Every version, who changed it and why |
 | `listAccessPolicyTemplates` | identity | GET | Reusable policy shapes |
 | `listCapabilityTemplates` | identity | GET | Saved tick-sets |
 | `listCustomerMemberships` | identity | GET | Memberships a customer holds |
-| … | | | 100 more |
+| `listModuleCapabilities` | identity | GET | What a person can be allowed to do, per module |
+| … | | | 95 more |
 
 ### 1 modules split across waves
 
@@ -90,13 +90,13 @@
 | `EMP-007` | Handover notes | Operations | 2 | 4 | yes |
 | `EMP-008` | Shift summary | Operations | 2 | 5 | yes |
 | `EMP-009` | End shift | Operations | 1 | 13 | yes |
-| `EMP-010` | Scan — ready | Operations | 1 | 7 | yes |
+| `EMP-010` | Scan — ready | Operations | 1 | 8 | yes |
 | `EMP-014` | Ticket lookup | Operations | 1 | 14 | yes |
 | `EMP-015` | Group scan | Operations | 2 | 7 | yes |
 | `EMP-017` | Sync & reconciliation | Operations | 1 | 9 | yes |
 | `EMP-018` | Offline package | Operations | 1 | 3 | yes |
 | `EMP-019` | AI assistant — home | Operations | 1 | 3 | yes |
-| `EMP-020` | AI assistant — answer | Operations | 1 | 3 | yes |
+| `EMP-020` | AI assistant — answer | Operations | 1 | 4 | yes |
 | `EMP-021` | Roster | Operations | 1 | 2 | yes |
 | `EMP-022` | My rota | Operations | 1 | 3 | yes |
 | `EMP-023` | Swap request | Operations | 2 | 3 | yes |
@@ -107,13 +107,13 @@
 | `EMP-028` | Lost & found | Operations | 2 | 7 | yes |
 | `EMP-029` | Guest assistance | Operations | 2 | 12 | yes |
 | `EMP-030` | Venue map | Operations | 2 | 4 | yes |
-| `EMP-031` | Queue monitor | Operations | 2 | 7 | yes |
+| `EMP-031` | Queue monitor | Operations | 2 | 8 | yes |
 | `EMP-032` | Manual wait entry | Operations | 2 | 5 | yes |
 | `EMP-033` | Capacity view | Operations | 2 | 6 | yes |
 | `EMP-034` | Walk-up sale | Operations | 2 | 23 | yes |
 | `EMP-035` | Payment on device | Operations | 2 | 4 | yes |
 | `EMP-036` | Issue media | Operations | 2 | 3 | yes |
-| `EMP-037` | Notifications | Operations | 1 | 4 | yes |
+| `EMP-037` | Notifications | Operations | 1 | 8 | yes |
 | `EMP-038` | Broadcast to team | Operations | 2 | 4 | yes |
 | `EMP-039` | Announcements | Operations | 2 | 4 | yes |
 | `EMP-040` | Knowledge base | Operations | 2 | 1 | yes |
@@ -137,7 +137,7 @@
 | `EMP-058` | Live Table & Service Management | Floor Service | 2 | 17 | yes |
 | `EMP-059` | Table Order, Bill & Payment Management | Floor Service | 2 | 8 | yes |
 | `EMP-060` | Reservation & Table Performance | Floor Service | 2 | 2 | yes |
-| `EMP-061` | Retail Inventory Command Center | Stock on the Floor | 2 | 2 | yes |
+| `EMP-061` | Retail Inventory Command Center | Stock on the Floor | 2 | 6 | yes |
 | `EMP-062` | Store Stock & SKU Availability | Stock on the Floor | 2 | 4 | yes |
 | `EMP-063` | Requisition & Smart Store Replenishment | Stock on the Floor | 2 | 2 | yes |
 | `EMP-064` | Store-to-Store & Warehouse Transfers | Stock on the Floor | 2 | 2 | yes |

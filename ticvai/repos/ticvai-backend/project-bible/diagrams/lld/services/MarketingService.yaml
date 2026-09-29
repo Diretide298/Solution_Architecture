@@ -1,9 +1,9 @@
 id: LLD-MarketingService
-title: MarketingService — 253 operations, 127 tables
+title: MarketingService — 263 operations, 132 tables
 generatedBy: tools/derive-diagrams.py
 tier: engagement
 index: diagrams/hld/02-services.yaml
-why: '**253 operations and 127 tables — the biggest thing in the package, and probably two services
+why: '**263 operations and 132 tables — the biggest thing in the package, and probably two services
   eventually.** CRM and campaigns have different write patterns: a guest profile is read constantly
   and written rarely; a campaign send is a burst of millions of rows nobody reads again.
 
@@ -12,20 +12,20 @@ why: '**253 operations and 127 tables — the biggest thing in the package, and 
 scale: Bursty on send, read-heavy otherwise. **The one to watch for a split.**
 ifDown: Down stops campaigns and guest lookup. Neither stops trading.
 coverage:
-  operations: 253
+  operations: 263
   inAFlow: 102
-  percent: 40%
+  percent: 39%
   note: '**Flow coverage is how much of this service a journey has walked.** A service under 40% is
     unwalked rather than under-documented.'
 schemas:
 - schema: marketing
-  tables: 127
+  tables: 132
   stores:
   - postgres
   largestTable: marketing.waiver_requirement
 operationsByContract:
 - contract: marketing-crm
-  count: 253
+  count: 263
   operations:
   - operation: accrueLoyaltyPoints
     verb: POST
@@ -139,6 +139,14 @@ operationsByContract:
     offline: false
     reads: 5
     writes: 2
+  - operation: claimDeviceConsent
+    verb: POST
+    path: /guests/{subjectId}/consents/claim-device
+    scope: subject
+    permission: null
+    offline: false
+    reads: 6
+    writes: 5
   - operation: closeConversation
     verb: POST
     path: /conversations/{conversationId}/close
@@ -153,8 +161,8 @@ operationsByContract:
     scope: venue
     permission: MARKETING_MANAGE
     offline: false
-    reads: 3
-    writes: 4
+    reads: 4
+    writes: 5
   - operation: createCase
     verb: POST
     path: /cases
@@ -297,7 +305,7 @@ operationsByContract:
     scope: venue
     permission: MARKETING_VIEW
     offline: false
-    reads: 3
+    reads: 4
     writes: 0
   - operation: getCampaignPerformance
     verb: GET
@@ -305,7 +313,7 @@ operationsByContract:
     scope: venue
     permission: MARKETING_VIEW
     offline: false
-    reads: 3
+    reads: 5
     writes: 0
   - operation: getCase
     verb: GET
@@ -338,6 +346,22 @@ operationsByContract:
     permission: CASE_VIEW
     offline: false
     reads: 4
+    writes: 0
+  - operation: getCookieConsentRuntime
+    verb: GET
+    path: /storefront/cookie-consent
+    scope: tenant
+    permission: null
+    offline: false
+    reads: 4
+    writes: 0
+  - operation: getDeviceConsentHistory
+    verb: GET
+    path: /consent/device/history
+    scope: tenant
+    permission: null
+    offline: false
+    reads: 2
     writes: 0
   - operation: getDigitalWaiverForm
     verb: GET
@@ -593,8 +617,8 @@ operationsByContract:
     scope: venue
     permission: MARKETING_SEND
     offline: false
-    reads: 2
-    writes: 2
+    reads: 4
+    writes: 3
   - operation: listAgentWorkloadAvailability
     verb: GET
     path: /agent-workload-availability
@@ -641,7 +665,7 @@ operationsByContract:
     scope: venue
     permission: MARKETING_VIEW
     offline: false
-    reads: 2
+    reads: 3
     writes: 0
   - operation: listCaseCategories
     verb: GET
@@ -755,6 +779,22 @@ operationsByContract:
     offline: false
     reads: 1
     writes: 0
+  - operation: listCookieScanPolicies
+    verb: GET
+    path: /cookie-scan-policy
+    scope: venue
+    permission: GUEST_VIEW
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: listCookieScans
+    verb: GET
+    path: /cookie-tracking-digital/scans
+    scope: venue
+    permission: GUEST_VIEW
+    offline: false
+    reads: 1
+    writes: 0
   - operation: listCookieTrackingDigital
     verb: GET
     path: /cookie-tracking-digital
@@ -850,6 +890,14 @@ operationsByContract:
     permission: MARKETING_VIEW
     offline: false
     reads: 6
+    writes: 0
+  - operation: listDeviceConsents
+    verb: GET
+    path: /consent/device
+    scope: venue
+    permission: GUEST_VIEW
+    offline: false
+    reads: 2
     writes: 0
   - operation: listDigitalSigningCollection
     verb: GET
@@ -1041,7 +1089,7 @@ operationsByContract:
     scope: venue
     permission: MARKETING_VIEW
     offline: false
-    reads: 7
+    reads: 9
     writes: 0
   - operation: listPrivacyComplianceExceptions
     verb: GET
@@ -1090,6 +1138,14 @@ operationsByContract:
     permission: MARKETING_VIEW
     offline: false
     reads: 3
+    writes: 0
+  - operation: listPublishedTrackingTechnologies
+    verb: GET
+    path: /storefront/cookie-consent/technologies
+    scope: tenant
+    permission: null
+    offline: false
+    reads: 1
     writes: 0
   - operation: listQualityAgentEvaluation
     verb: GET
@@ -1321,7 +1377,7 @@ operationsByContract:
     scope: venue
     permission: MARKETING_MANAGE
     offline: false
-    reads: 3
+    reads: 4
     writes: 2
   - operation: previewSegment
     verb: POST
@@ -1355,6 +1411,22 @@ operationsByContract:
     offline: false
     reads: 1
     writes: 0
+  - operation: recordCookieScan
+    verb: POST
+    path: /cookie-tracking-digital/scans
+    scope: venue
+    permission: GUEST_MANAGE
+    offline: false
+    reads: 4
+    writes: 3
+  - operation: recordDeviceConsent
+    verb: POST
+    path: /consent/device
+    scope: subject
+    permission: null
+    offline: false
+    reads: 4
+    writes: 5
   - operation: recordLostItem
     verb: POST
     path: /lost-items
@@ -1611,6 +1683,14 @@ operationsByContract:
     offline: false
     reads: 1
     writes: 1
+  - operation: setCookieScanPolicy
+    verb: PUT
+    path: /cookie-scan-policy
+    scope: venue
+    permission: GUEST_MANAGE
+    offline: false
+    reads: 2
+    writes: 2
   - operation: setCustomerServiceCopilot
     verb: PUT
     path: /customer-service-copilot
@@ -1641,8 +1721,8 @@ operationsByContract:
     scope: tenant
     permission: GUEST_MANAGE
     offline: false
-    reads: 1
-    writes: 1
+    reads: 2
+    writes: 2
   - operation: setDigitalWaiverForm
     verb: PUT
     path: /digital-waiver-form
@@ -1953,7 +2033,7 @@ operationsByContract:
     scope: venue
     permission: MARKETING_SEND
     offline: false
-    reads: 3
+    reads: 4
     writes: 3
   - operation: submitForm
     verb: POST
@@ -1993,7 +2073,7 @@ operationsByContract:
     scope: venue
     permission: MARKETING_MANAGE
     offline: false
-    reads: 3
+    reads: 4
     writes: 2
   - operation: updateCampaign
     verb: PATCH
@@ -2001,7 +2081,7 @@ operationsByContract:
     scope: venue
     permission: MARKETING_MANAGE
     offline: false
-    reads: 3
+    reads: 4
     writes: 4
   - operation: updateCase
     verb: PATCH
@@ -2073,6 +2153,7 @@ tables:
   - addToWishlist
   - adjustLoyaltyPoints
   - claimConversation
+  - claimDeviceConsent
   - closeConversation
   - createCampaign
   - createCase
@@ -2099,6 +2180,8 @@ tables:
   - previewSegment
   - raiseMyCase
   - recordConsent
+  - recordCookieScan
+  - recordDeviceConsent
   - recordLostItem
   - recordPrivacyIncident
   - recordTouchPoint
@@ -2119,6 +2202,8 @@ tables:
   - setCallDisposition
   - setCaseCategoryDefinition
   - setConsentPurposes
+  - setCookieScanPolicy
+  - setDataRetentionPolicy
   - setMessageTrigger
   - setPrivacyNoticePolicyGovernance
   - setSeoMetadata
@@ -2146,6 +2231,7 @@ tables:
   - addToWishlist
   - adjustLoyaltyPoints
   - claimConversation
+  - claimDeviceConsent
   - closeConversation
   - createCampaign
   - createCase
@@ -2172,6 +2258,8 @@ tables:
   - previewSegment
   - raiseMyCase
   - recordConsent
+  - recordCookieScan
+  - recordDeviceConsent
   - recordLostItem
   - recordPrivacyIncident
   - recordTouchPoint
@@ -2192,6 +2280,7 @@ tables:
   - setCallDisposition
   - setCaseCategoryDefinition
   - setConsentPurposes
+  - setCookieScanPolicy
   - setMessageTrigger
   - setPrivacyNoticePolicyGovernance
   - setSeoMetadata
@@ -2285,7 +2374,7 @@ tables:
   - marketing-crm
   foreignWriters: null
 - table: marketing.campaign
-  columns: 19
+  columns: 22
   store: postgres
   parent: null
   writtenBy:
@@ -2293,6 +2382,13 @@ tables:
   foreignWriters: null
 - table: marketing.campaign_target
   columns: 7
+  store: postgres
+  parent: marketing.campaign
+  writtenBy:
+  - marketing-crm
+  foreignWriters: null
+- table: marketing.campaign_variant
+  columns: 10
   store: postgres
   parent: marketing.campaign
   writtenBy:
@@ -2495,7 +2591,21 @@ tables:
   - marketing-crm
   foreignWriters: null
 - table: marketing.cookie_banner_design
-  columns: 16
+  columns: 18
+  store: postgres
+  parent: null
+  writtenBy:
+  - marketing-crm
+  foreignWriters: null
+- table: marketing.cookie_scan_policy
+  columns: 11
+  store: postgres
+  parent: null
+  writtenBy:
+  - marketing-crm
+  foreignWriters: null
+- table: marketing.cookie_scan_run
+  columns: 11
   store: postgres
   parent: null
   writtenBy:
@@ -2505,6 +2615,20 @@ tables:
   columns: 9
   store: postgres
   parent: null
+  writtenBy:
+  - marketing-crm
+  foreignWriters: null
+- table: marketing.device_consent
+  columns: 16
+  store: postgres
+  parent: null
+  writtenBy:
+  - marketing-crm
+  foreignWriters: null
+- table: marketing.device_consent_category
+  columns: 4
+  store: postgres
+  parent: marketing.device_consent
   writtenBy:
   - marketing-crm
   foreignWriters: null
@@ -2659,7 +2783,7 @@ tables:
   writtenBy: []
   foreignWriters: null
 - table: marketing.journey_step
-  columns: 20
+  columns: 22
   store: postgres
   parent: marketing.journey
   writtenBy:
@@ -2728,7 +2852,7 @@ tables:
   writtenBy: []
   foreignWriters: null
 - table: marketing.message_dispatch
-  columns: 16
+  columns: 18
   store: postgres
   parent: null
   writtenBy:
@@ -2766,7 +2890,7 @@ tables:
   - marketing-crm
   foreignWriters: null
 - table: marketing.message_trigger
-  columns: 8
+  columns: 9
   store: postgres
   parent: null
   writtenBy:
@@ -3129,15 +3253,15 @@ readsFrom:
   operations: 4
 - service: PlatformService
   operations: 3
+- service: TenancyService
+  operations: 2
 - service: VenueOpsService
   operations: 2
-- service: TenancyService
-  operations: 1
 - service: WhiteLabelService
   operations: 1
 writesOutside:
 - service: IdentityService
-  operations: 2
+  operations: 3
   rule: 'ADR-0028: the owner defines the row; a foreign writer may only append, through a path the owner
     published.'
   why: '**The lineage records these writes, not how they honour the rule.** It does not say whether
@@ -3147,9 +3271,29 @@ writesOutside:
   - operation: mergeGuests
     tables:
     - pii.subject
+  - operation: recordDeviceConsent
+    tables:
+    - pii.consent_identifier
   - operation: updateMyProfile
     tables:
     - pii.subject
+- service: TenancyService
+  operations: 3
+  rule: 'ADR-0028: the owner defines the row; a foreign writer may only append, through a path the owner
+    published.'
+  why: '**The lineage records these writes, not how they honour the rule.** It does not say whether
+    each inserts or updates, or which operation or event TenancyService published for it — check each
+    against ADR-0028.'
+  writes:
+  - operation: claimDeviceConsent
+    tables:
+    - platform.outbox
+  - operation: handoverToAgent
+    tables:
+    - platform.outbox
+  - operation: recordDeviceConsent
+    tables:
+    - platform.outbox
 - service: OrderService
   operations: 2
   rule: 'ADR-0028: the owner defines the row; a foreign writer may only append, through a path the owner
@@ -3178,21 +3322,12 @@ writesOutside:
   - operation: setSeoMetadata
     tables:
     - control.seo_metadata
-- service: TenancyService
-  operations: 1
-  rule: 'ADR-0028: the owner defines the row; a foreign writer may only append, through a path the owner
-    published.'
-  why: '**The lineage records these writes, not how they honour the rule.** It does not say whether
-    each inserts or updates, or which operation or event TenancyService published for it — check each
-    against ADR-0028.'
-  writes:
-  - operation: handoverToAgent
-    tables:
-    - platform.outbox
 screens:
+- P01:WEB-001 Home / Landing
 - P01:WEB-006 Date & Performance Selection
 - P01:WEB-009 Wishlist
 - P01:WEB-011 Guest Details & Attendee Forms
+- P01:WEB-016 Login / Register
 - P01:WEB-017 My Account Dashboard
 - P01:WEB-020 Profile & Preferences
 - P01:WEB-024 Devices, Wishlist & Consent
@@ -3214,6 +3349,7 @@ screens:
 - P02:GST-036 Loyalty & Rewards
 - P02:GST-039 Profile
 - P02:GST-040 Help & Support
+- P02:GST-042 Simple Registration & OTP
 - P02:GST-065 Newsletter & Preferences
 - P02:GST-066 Privacy & My Data
 - P02:GST-067 Refunds & Resale

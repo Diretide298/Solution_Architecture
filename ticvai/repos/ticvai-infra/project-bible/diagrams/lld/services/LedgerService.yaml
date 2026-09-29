@@ -1,29 +1,29 @@
 id: LLD-LedgerService
-title: LedgerService — 57 operations, 20 tables
+title: LedgerService — 71 operations, 27 tables
 generatedBy: tools/derive-diagrams.py
 tier: commerce
 index: diagrams/hld/02-services.yaml
-why: '**Money, and it is append-only.** 57 operations over 20 tables that are never updated and never
+why: '**Money, and it is append-only.** 71 operations over 27 tables that are never updated and never
   deleted — a different discipline from everything around it, and one that should not share a deploy
   with anything that does mutate.'
 scale: Write-heavy, batch-tolerant, not latency-critical. Recognition and revaluation are jobs.
 ifDown: '**Correctness over availability.** A ledger that is briefly unavailable is recoverable; one
   that is briefly wrong is not.'
 coverage:
-  operations: 57
+  operations: 71
   inAFlow: 33
-  percent: 58%
+  percent: 46%
   note: '**Flow coverage is how much of this service a journey has walked.** A service under 40% is
     unwalked rather than under-documented.'
 schemas:
 - schema: ledger
-  tables: 20
+  tables: 27
   stores:
   - postgres
-  largestTable: ledger.journal_entry
+  largestTable: ledger.tax_invoice
 operationsByContract:
 - contract: finance
-  count: 57
+  count: 71
   operations:
   - operation: abandonPeriodClose
     verb: POST
@@ -177,6 +177,22 @@ operationsByContract:
     offline: false
     reads: 1
     writes: 0
+  - operation: getTaxDocumentRendition
+    verb: GET
+    path: /tax-documents/{documentId}/rendition
+    scope: region
+    permission: LEDGER_VIEW
+    offline: false
+    reads: 2
+    writes: 0
+  - operation: getTaxInvoice
+    verb: GET
+    path: /tax-invoices/{invoiceId}
+    scope: region
+    permission: LEDGER_VIEW
+    offline: false
+    reads: 4
+    writes: 0
   - operation: getTrialBalance
     verb: GET
     path: /ledger/trial-balance
@@ -189,6 +205,14 @@ operationsByContract:
     verb: GET
     path: /reconciliation/unified
     scope: venue
+    permission: LEDGER_VIEW
+    offline: false
+    reads: 4
+    writes: 0
+  - operation: getVatReturn
+    verb: GET
+    path: /tax/vat-returns
+    scope: region
     permission: LEDGER_VIEW
     offline: false
     reads: 4
@@ -209,6 +233,22 @@ operationsByContract:
     offline: false
     reads: 3
     writes: 3
+  - operation: issueCreditMemo
+    verb: POST
+    path: /tax-invoices/{invoiceId}/credit-memos
+    scope: venue
+    permission: LEDGER_POST
+    offline: false
+    reads: 7
+    writes: 9
+  - operation: issueTaxInvoice
+    verb: POST
+    path: /tax-invoices
+    scope: venue
+    permission: LEDGER_POST
+    offline: false
+    reads: 9
+    writes: 6
   - operation: listAccountMappings
     verb: GET
     path: /account-mappings
@@ -229,6 +269,30 @@ operationsByContract:
     verb: GET
     path: /cost-centers
     scope: region
+    permission: LEDGER_VIEW
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: listCreditMemos
+    verb: GET
+    path: /credit-memos
+    scope: region
+    permission: LEDGER_VIEW
+    offline: false
+    reads: 2
+    writes: 0
+  - operation: listEInvoiceTransmissions
+    verb: GET
+    path: /e-invoicing/transmissions
+    scope: region
+    permission: LEDGER_VIEW
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: listEInvoicingProviders
+    verb: GET
+    path: /e-invoicing/providers
+    scope: tenant
     permission: LEDGER_VIEW
     offline: false
     reads: 1
@@ -329,6 +393,22 @@ operationsByContract:
     offline: true
     reads: 1
     writes: 0
+  - operation: listTaxInvoiceTemplates
+    verb: GET
+    path: /tax-invoice-templates
+    scope: tenant
+    permission: LEDGER_VIEW
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: listTaxInvoices
+    verb: GET
+    path: /tax-invoices
+    scope: region
+    permission: LEDGER_VIEW
+    offline: false
+    reads: 2
+    writes: 0
   - operation: recordDeposit
     verb: POST
     path: /deposits
@@ -336,6 +416,14 @@ operationsByContract:
     permission: LEDGER_POST
     offline: false
     reads: 4
+    writes: 3
+  - operation: recordEInvoiceTransmissionStatus
+    verb: POST
+    path: /e-invoicing/transmissions/{transmissionId}/status
+    scope: region
+    permission: null
+    offline: false
+    reads: 2
     writes: 3
   - operation: recordSettlement
     verb: POST
@@ -425,6 +513,14 @@ operationsByContract:
     offline: false
     reads: 2
     writes: 2
+  - operation: setEInvoicingProvider
+    verb: PUT
+    path: /e-invoicing/providers
+    scope: tenant
+    permission: TAX_CONFIGURE
+    offline: false
+    reads: 4
+    writes: 4
   - operation: setFxProvider
     verb: PUT
     path: /fx-rates/providers
@@ -441,6 +537,14 @@ operationsByContract:
     offline: false
     reads: 2
     writes: 2
+  - operation: setTaxInvoiceTemplate
+    verb: PUT
+    path: /tax-invoice-templates
+    scope: tenant
+    permission: TAX_CONFIGURE
+    offline: false
+    reads: 3
+    writes: 4
   - operation: settleDeposit
     verb: POST
     path: /deposits/{depositId}/settle
@@ -448,6 +552,14 @@ operationsByContract:
     permission: LEDGER_POST
     offline: false
     reads: 3
+    writes: 3
+  - operation: transmitEInvoices
+    verb: POST
+    path: /e-invoicing/transmissions
+    scope: region
+    permission: LEDGER_POST
+    offline: false
+    reads: 7
     writes: 3
   - operation: updateAccount
     verb: PATCH
@@ -509,7 +621,10 @@ tables:
   - disputeObligation
   - ingestFxRates
   - ingestSettlementFile
+  - issueCreditMemo
+  - issueTaxInvoice
   - recordDeposit
+  - recordEInvoiceTransmissionStatus
   - recordSettlement
   - recordWriteOff
   - rejectJournal
@@ -521,9 +636,12 @@ tables:
   - runFxRevaluation
   - runRecognition
   - setAccountMappings
+  - setEInvoicingProvider
   - setFxProvider
   - setFxRate
+  - setTaxInvoiceTemplate
   - settleDeposit
+  - transmitEInvoices
   - updateAccount
   - updateTaxCode
   readBy:
@@ -541,7 +659,10 @@ tables:
   - createTaxExemption
   - disputeObligation
   - ingestSettlementFile
+  - issueCreditMemo
+  - issueTaxInvoice
   - recordDeposit
+  - recordEInvoiceTransmissionStatus
   - recordSettlement
   - recordWriteOff
   - rejectJournal
@@ -553,10 +674,31 @@ tables:
   - runFxRevaluation
   - runRecognition
   - setAccountMappings
+  - setEInvoicingProvider
   - setFxRate
+  - setTaxInvoiceTemplate
   - settleDeposit
+  - transmitEInvoices
   - updateAccount
   - updateTaxCode
+- store: cache:resolution
+  kind: cache
+  columns: 4
+  backing: redis
+  owned: false
+  why: '**Not a table and not owned by a service.** Derived from something already read, losable without
+    consequence — no migration, no backup, no owner.'
+  key: scope_path + what is being resolved — permissions, configuration, a price list
+  eviction:
+  - 'version: Bumped by the write that evicts it. **A config change nobody evicts is a stale permission**'
+  writtenBy:
+  - setEInvoicingProvider
+  - setTaxInvoiceTemplate
+  readBy: null
+  gap: '**The lineage names this store, not the key.** Which resolution entry each writer below evicts
+    or bumps — permissions, configuration, a price list, and whether child scopes under its `scope_path`
+    are affected — is not recorded for any operation, so a writer here cannot yet be implemented from
+    the package alone.'
 - table: ledger.account
   columns: 15
   store: postgres
@@ -578,8 +720,36 @@ tables:
   writtenBy:
   - finance
   foreignWriters: null
+- table: ledger.credit_memo
+  columns: 21
+  store: postgres
+  parent: null
+  writtenBy:
+  - finance
+  foreignWriters: null
+- table: ledger.credit_memo_line
+  columns: 10
+  store: postgres
+  parent: ledger.credit_memo
+  writtenBy:
+  - finance
+  foreignWriters: null
 - table: ledger.deposit
   columns: 10
+  store: postgres
+  parent: null
+  writtenBy:
+  - finance
+  foreignWriters: null
+- table: ledger.einvoice_transmission
+  columns: 17
+  store: postgres
+  parent: null
+  writtenBy:
+  - finance
+  foreignWriters: null
+- table: ledger.einvoicing_provider
+  columns: 12
   store: postgres
   parent: null
   writtenBy:
@@ -642,7 +812,9 @@ tables:
   parent: ledger.journal_entry
   writtenBy:
   - finance
-  foreignWriters: null
+  - orders
+  foreignWriters:
+  - orders
 - table: ledger.legal_entity
   columns: 11
   store: postgres
@@ -703,9 +875,30 @@ tables:
   writtenBy:
   - finance
   foreignWriters: null
+- table: ledger.tax_invoice
+  columns: 32
+  store: postgres
+  parent: null
+  writtenBy:
+  - finance
+  foreignWriters: null
+- table: ledger.tax_invoice_line
+  columns: 16
+  store: postgres
+  parent: ledger.tax_invoice
+  writtenBy:
+  - finance
+  foreignWriters: null
+- table: ledger.tax_invoice_template
+  columns: 18
+  store: postgres
+  parent: null
+  writtenBy:
+  - finance
+  foreignWriters: null
 readsFrom:
 - service: OrderService
-  operations: 6
+  operations: 8
 - service: TenancyService
   operations: 3
 - service: CatalogueService
@@ -716,7 +909,7 @@ readsFrom:
   operations: 1
 writesOutside:
 - service: TenancyService
-  operations: 3
+  operations: 8
   rule: 'ADR-0028: the owner defines the row; a foreign writer may only append, through a path the owner
     published.'
   why: '**The lineage records these writes, not how they honour the rule.** It does not say whether
@@ -729,9 +922,26 @@ writesOutside:
   - operation: closeFiscalPeriod
     tables:
     - platform.outbox
+  - operation: issueCreditMemo
+    tables:
+    - platform.audit_record
+    - platform.outbox
+  - operation: issueTaxInvoice
+    tables:
+    - platform.audit_record
+    - platform.outbox
+  - operation: setEInvoicingProvider
+    tables:
+    - platform.audit_record
   - operation: setFxProvider
     tables:
     - platform.region_settings
+  - operation: setTaxInvoiceTemplate
+    tables:
+    - platform.audit_record
+  - operation: transmitEInvoices
+    tables:
+    - platform.outbox
 - service: OrderService
   operations: 1
   rule: 'ADR-0028: the owner defines the row; a foreign writer may only append, through a path the owner
@@ -743,10 +953,27 @@ writesOutside:
   - operation: ingestSettlementFile
     tables:
     - payments.provider_cost
+- service: PlatformService
+  operations: 1
+  rule: 'ADR-0028: the owner defines the row; a foreign writer may only append, through a path the owner
+    published.'
+  why: '**The lineage records these writes, not how they honour the rule.** It does not say whether
+    each inserts or updates, or which operation or event PlatformService published for it — check each
+    against ADR-0028.'
+  writes:
+  - operation: issueCreditMemo
+    tables:
+    - control.invoice_line
 screens:
+- P01:WEB-019 Order History
 - P01:WEB-035 Multi-Currency & Pricing
+- P02:GST-019 Order History
 - P02:GST-044 Multi-Currency & Pricing
 - P04:POS-008 Reports
+- P04:POS-011 Returns, Refunds & Exchanges
+- P04:POS-026 Receipt & Reprint
+- P08:BO-022 Order Detail
+- P08:BO-023 Refunds & Exchanges
 - P08:BO-024 Payment Exceptions
 - P08:BO-025 Chargebacks & Disputes
 - P08:BO-029 Report Builder
@@ -765,6 +992,9 @@ screens:
 - P08:BO-1081 Finance Dashboard
 - P08:BO-1170 Wallet Financial Period & Closing Controls
 - P08:BO-1172 Finance Validation, Reporting & Audit Center
+- P09:ADM-068 Tax, Fee & Calculation Command Center
+- P09:ADM-069 Tax Profile & Jurisdiction Configuration
+- P09:ADM-077 Calculation Validation, Reconciliation & Service Interface
 - P09:ADM-411 Billing & Legal Entity Information
 - P09:ADM-619 Reconciliation & Settlement Command Center\t139
 - P09:ADM-620 Reconciliation Source & Import Manager\t141

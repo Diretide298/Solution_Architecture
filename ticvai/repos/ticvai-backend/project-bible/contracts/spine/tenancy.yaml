@@ -2,7 +2,7 @@ openapi: 3.1.0
 info:
   title: TICVAI Tenancy & Organisation
   version: 1.0.0
-  x-ticvai-screen-count: 37
+  x-ticvai-screen-count: 42
   x-ticvai-tier: spine
   x-ticvai-module: "Cross-cutting — organisation hierarchy"
   x-ticvai-capabilities: [C95, C20]
@@ -101,6 +101,8 @@ tags:
   - name: scope
   - name: region
   - name: workstation
+  - name: devices
+  - name: tenancy
 
 paths:
   /org-units:
@@ -1597,8 +1599,17 @@ paths:
       x-ticvai-read-routing: replica
       summary: List registered devices
       description: >
-        Physical devices bound to workstations. Distinct from Device Management, which covers
-        the full estate lifecycle — this is the binding a workstation needs at boot.
+        Physical devices bound to workstations, and staff handsets (`mobileHandset`), which are
+        bound to no workstation. Distinct from Device Management, which covers the full estate
+        lifecycle — this is the binding a workstation needs at boot.
+
+        **`platform.device` is the device register of record** (decided 29 September, build pass).
+        Every device's identity, enrolment, credential, firmware and push registration lives here,
+        whatever else refers to it. `access.access_device` (access `registerAccessDevice`) is the
+        access topology's placement of an access-control device — gate, lane, hardware model,
+        network references — and holds a second copy of serial, versions, health and lifecycle.
+        That duplication is known and recorded, not merged yet; where the two disagree, this
+        register wins.
 
         **`pushToken` is never in a row** (pull audit R164). It is `writeOnly`: a push token is a
         credential, and a list at venue level is not where a credential is read back.
@@ -1649,6 +1660,11 @@ paths:
         `lastHeartbeatAt`, `lastCheckedAt`, `pushFailureCount`, `capabilities`,
         `enrolmentState`, `retiredAt`, `configurationProfileId` — are `readOnly` and ignored on
         input. A new device starts `registered`; `enrolDevice` moves it on.
+
+        **A staff phone registers as `mobileHandset`** (18.1.5, decided 29 September, build pass).
+        It is bound to no workstation, so `workstationId` is omitted for it and required for every
+        other kind; a body that breaks either rule is `422`. With `pushToken` and `pushPlatform` it
+        is the device a staff-facing push is delivered to (reporting `AlertRule.deliverTo: push`).
       tags: [workstation]
       x-ticvai-permission: DEVICE_CONFIGURE
       x-ticvai-scope-level: venue
@@ -1673,6 +1689,13 @@ paths:
         '403': { $ref: '../shared/common.yaml#/components/responses/Forbidden' }
         '409':
           description: Identifier already bound to another workstation
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+        '422':
+          description: >
+            `workstationId` missing for a kind other than `mobileHandset`, or given for a
+            `mobileHandset` (18.1.5).
           content:
             application/problem+json:
               schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
@@ -1936,6 +1959,7 @@ paths:
       operationId: listDeviceFirmware
       x-ticvai-consumed-by:
         - "P08 BO-129 Software, Configuration & Version Management"
+        - "P09 ADM-587 Terminal Health, Maintenance & Incident Center\t57"
       summary: Firmware and software versions, and what is running where
       description: '16.6.30 and 16.6.32. **The fleet view, which is the only useful one.** *Which version
         is this scanner on* is rarely asked; *how many scanners are still on the version with the scan
@@ -1967,6 +1991,182 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/DeviceFirmware'
+    post:
+      operationId: createDeviceFirmware
+      x-ticvai-consumed-by:
+        - "P08 BO-129 Software, Configuration & Version Management"
+        - "P09 ADM-587 Terminal Health, Maintenance & Incident Center\t57"
+      x-ticvai-agreed: '29 September: re-trace 16.6.30 and 16.6.33 (nothing wrote the table the rollout
+        references); our build plan; shape follows startDeviceFirmwareRollout'
+      summary: Register a firmware or software release before it is deployed
+      description: '16.6.30 and 16.6.33. **`startDeviceFirmwareRollout` pointed at a release nothing had
+        written.** This is the write: one vendor image for one device kind, with the artefact, its
+        checksum and the version it must be applied from.
+
+
+        **A release starts `draft`** and cannot be rolled out until `setDeviceFirmwareStatus` makes it
+        `released` — registering an image and deciding the fleet may run it are two acts, and usually
+        two people.
+
+
+        The artefact is an uploaded asset (`artefactAssetId`); the device verifies `checksum` before it
+        installs, so an image altered in transit is refused on the device rather than installed. `id`,
+        `status`, `releasedAt`, `installedCount` and `scopePath` are the server''s and ignored on input.
+        A second release with the same `deviceKind` and `version` is `409`.
+
+        '
+      tags:
+      - devices
+      x-ticvai-permission: DEVICE_MANAGE
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: tenant
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DeviceFirmware'
+      responses:
+        '201':
+          description: Registered, as `draft`
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeviceFirmware'
+          headers:
+            X-Consistency-Token:
+              $ref: ../shared/common.yaml#/components/headers/ConsistencyToken
+        '400':
+          $ref: ../shared/common.yaml#/components/responses/BadRequest
+        '409':
+          description: A release with this `deviceKind` and `version` already exists
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
+  /device-firmware/{firmwareId}:
+    parameters:
+    - name: firmwareId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    get:
+      operationId: getDeviceFirmware
+      x-ticvai-consumed-by:
+        - "P08 BO-129 Software, Configuration & Version Management"
+        - "P09 ADM-587 Terminal Health, Maintenance & Incident Center\t57"
+      x-ticvai-agreed: '29 September: re-trace 16.6.30 (release read beside the new write); our build
+        plan; shape follows getDevice'
+      summary: Read one firmware release, and how much of the fleet is on it
+      description: '16.6.30. One release by id, with its status and `installedCount`, so a release opened
+        from a rollout or a device can be read without paging the fleet view.
+
+        '
+      tags:
+      - devices
+      x-ticvai-permission: DEVICE_VIEW
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: tenant
+      x-ticvai-read-routing: replica
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      responses:
+        '200':
+          description: The release
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeviceFirmware'
+        '404':
+          $ref: ../shared/common.yaml#/components/responses/NotFound
+  /device-firmware/{firmwareId}/status:
+    parameters:
+    - name: firmwareId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    post:
+      operationId: setDeviceFirmwareStatus
+      x-ticvai-consumed-by:
+        - "P08 BO-129 Software, Configuration & Version Management"
+      x-ticvai-agreed: '29 September: re-trace 16.6.30 (release and withdraw a release); our build plan;
+        shape follows public-api setApiClientStatus'
+      summary: Release, deprecate or withdraw a firmware release
+      description: '16.6.30. **The decision that the fleet may run an image.** `draft` → `released` →
+        `deprecated` → `withdrawn`, and `draft` → `withdrawn` for an image that never shipped. Nothing
+        goes back to `draft`, and `withdrawn` is terminal (409).
+
+
+        **Withdrawing is not rolling back.** A withdrawn release cannot start a new rollout, and a running
+        rollout of it is halted; devices already on it stay on it until `rollbackDeviceFirmware` or a
+        newer release moves them. `reason` is required for `deprecated` and `withdrawn` and is written to
+        the device audit.
+
+        '
+      tags:
+      - devices
+      x-ticvai-permission: DEVICE_MANAGE
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: tenant
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - status
+              properties:
+                status:
+                  type: string
+                  enum:
+                  - released
+                  - deprecated
+                  - withdrawn
+                reason:
+                  type: string
+                  maxLength: 500
+                  description: Required with `deprecated` and `withdrawn`.
+      responses:
+        '200':
+          description: Status set
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeviceFirmware'
+          headers:
+            X-Consistency-Token:
+              $ref: ../shared/common.yaml#/components/headers/ConsistencyToken
+        '404':
+          $ref: ../shared/common.yaml#/components/responses/NotFound
+        '409':
+          description: The move is not allowed from the release's current status (back to `draft`, out
+            of `withdrawn`, or `deprecated` before `released`)
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
+        '422':
+          description: '`deprecated` or `withdrawn` without a `reason`.'
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
   /device-firmware/rollouts:
     post:
       operationId: startDeviceFirmwareRollout
@@ -1980,6 +2180,11 @@ paths:
 
         **A device is updated when it is not in use.** The rollout carries a window, because pushing
         firmware to a turnstile at the top of the hour is how a queue becomes an incident.
+
+
+        **Only a `released` firmware rolls out** (29 September, build pass). `firmwareId` names a
+        release registered by `createDeviceFirmware`; one still `draft`, or `deprecated` or
+        `withdrawn`, is `409`.
 
         '
       tags:
@@ -2006,6 +2211,14 @@ paths:
           headers:
             X-Consistency-Token:
               $ref: ../shared/common.yaml#/components/headers/ConsistencyToken
+        '404':
+          $ref: ../shared/common.yaml#/components/responses/NotFound
+        '409':
+          description: The firmware named by `firmwareId` is not `released`
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
   /device-firmware/rollouts/{rolloutId}/rollback:
     parameters:
     - name: rolloutId
@@ -2269,6 +2482,146 @@ paths:
             X-Consistency-Token:
               $ref: ../shared/common.yaml#/components/headers/ConsistencyToken
 
+  /data-retention-settings:
+    get:
+      operationId: listDataRetentionSettings
+      x-ticvai-consumed-by:
+        - "P08 BO-192 Biometric Lifecycle, Retention & Deletion"
+        - "P08 BO-751 Retention & Anonymization"
+        - "P09 ADM-346 Approval Record Retention Policy"
+        - "P09 ADM-524 AI Data Access & Usage Policy"
+        - "P16 ANL-050 Retention, Archive & Governance Policy"
+      x-ticvai-agreed: '29 September: decided by Chinmay (all data retention is tenant configuration, one
+        setting per data class); AI system design section 8 decision 5; ADR-0047; shape follows listDevices'
+      summary: How long the tenant keeps each class of data
+      description: '**One row per data class, every class always present.** A class the tenant has not
+        set comes back with the platform default, marked `isDefault`, so the screen shows the period that
+        is actually applied rather than an empty field.
+
+
+        Each row carries the effective period (`effectiveAmount`, `effectiveUnit`), what it is counted
+        from (`anchor`), what happens at expiry, and — where law sets a limit — the limit and its basis.
+        See `TenantDataRetentionClass` for the classes and their defaults.
+
+        '
+      tags:
+      - tenancy
+      x-ticvai-permission: TENANT_VIEW
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: tenant
+      x-ticvai-read-routing: replica
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+      - name: dataClass
+        in: query
+        required: false
+        description: Only this class.
+        schema:
+          $ref: '#/components/schemas/TenantDataRetentionClass'
+      - $ref: ../shared/common.yaml#/components/parameters/PageSize
+      - $ref: ../shared/common.yaml#/components/parameters/PageCursor
+      responses:
+        '200':
+          description: The tenant's retention settings, one per data class
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: ../shared/common.yaml#/components/schemas/Page
+                - type: object
+                  properties:
+                    items:
+                      type: array
+                      items:
+                        $ref: '#/components/schemas/TenantDataRetentionSetting'
+  /data-retention-settings/{dataClass}:
+    parameters:
+    - name: dataClass
+      in: path
+      required: true
+      schema:
+        $ref: '#/components/schemas/TenantDataRetentionClass'
+    put:
+      operationId: setDataRetentionSetting
+      x-ticvai-consumed-by:
+        - "P08 BO-751 Retention & Anonymization"
+        - "P09 ADM-346 Approval Record Retention Policy"
+        - "P09 ADM-524 AI Data Access & Usage Policy"
+        - "P16 ANL-050 Retention, Archive & Governance Policy"
+      x-ticvai-agreed: '29 September: decided by Chinmay (all data retention moves to tenant
+        configuration, one setting per data class; the tenant may set longer or shorter, and only a legal
+        floor is refused); AI system design section 8 decision 5; ADR-0047; shape follows
+        setApprovalRetentionPolicy'
+      x-ticvai-make-or-break: 'What is the lawful retention limit for Face Pass and Face Tag biometric data
+        in each region the client operates? — why: biometric data protection law sets it and the client''s
+        counsel must confirm it (MoM 2 Sep open item; the same question as access
+        setBiometricLifecycleRetention). Until answered, the biometric classes carry no legal limit and
+        nothing is refused on them.'
+      summary: Set how long the tenant keeps one class of data
+      description: '**Decided 29 September (Chinmay): all data retention is a tenant configuration, one
+        setting per data class.** The tenant may set a period longer or shorter than the platform default.
+        **The only refusal is a legal limit** — a period below a floor the law sets (payment records, 4.3.4;
+        financial records, 6.1.78) is `422`, and so is one above a legal maximum once one is confirmed for
+        the biometric classes (make-or-break, above). Nothing else is refused, including a period shorter
+        than ADR-0047''s proposed default.
+
+
+        **PUT semantics — the path names the class; the body replaces the setting whole.** The first call
+        for a class creates the tenant''s row and later calls replace it, answered `200` either way.
+        `retainAmount: null` with no `followsDataClass` returns the class to its platform default.
+        `followsDataClass` makes the class keep whatever another class keeps — `aiDecisionRecords` follows
+        `auditRecord` by default and a tenant may break the link by sending a period. **`aiMetadataIndex`
+        always follows `aiDecisionRecords`** and takes no period of its own (`422`): the index is what
+        answers a question once the raw text has gone, so it must outlive it (AI system design section 3.9).
+        A chain of follows that loops is `422`.
+
+
+        **What reads it.** Every retention job resolves its period here: marketing `setDataRetentionPolicy`
+        rules (guest data by category and jurisdiction) and access `setBiometricLifecycleRetention` rules may
+        only shorten the tenant''s period for their class, never lengthen it; `setApprovalRetentionPolicy`
+        takes `approvalRecord` as its default; the AI service reads the four `ai*` classes.
+
+        '
+      tags:
+      - tenancy
+      x-ticvai-permission: TENANT_CONFIGURE
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: tenant
+      x-ticvai-config-scope: tenant
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TenantDataRetentionSetting'
+      responses:
+        '200':
+          description: Set — the class's setting as now applied
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TenantDataRetentionSetting'
+          headers:
+            X-Consistency-Token:
+              $ref: ../shared/common.yaml#/components/headers/ConsistencyToken
+        '400':
+          $ref: ../shared/common.yaml#/components/responses/BadRequest
+        '403':
+          $ref: ../shared/common.yaml#/components/responses/Forbidden
+        '422':
+          description: A period below the class's legal minimum or above its legal maximum, a period sent
+            for `aiMetadataIndex`, or a `followsDataClass` chain that loops
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
   /cells/{cellId}/endpoints:
     get:
       operationId: listCellEndpoints
@@ -2318,6 +2671,184 @@ components:
   # region the row sits in — except where a schema names its own zone, as `supportHours.timezone`
   # does. `format: date-time` fields are instants in UTC, as naming-and-style 5.2 says.
   schemas:
+    TenantDataRetentionClass:
+      type: string
+      description: >
+        **The data classes a tenant sets a retention period for** (decided 29 September, Chinmay: all
+        data retention is tenant configuration, one setting per class). Defaults are ADR-0047's and the
+        AI system design's (section 8, decision 5); a legal limit is the only thing the platform
+        enforces.
+
+        | Class | Default | Counted from | Legal limit (refused) |
+        |---|---|---|---|
+        | `guestProfile` | 5 years | last activity | none |
+        | `paymentRecord` | 10 years | created | at least 10 years (4.3.4) |
+        | `financialRecord` | 7 years | created | at least 7 years (6.1.78) |
+        | `auditRecord` | 2 years (authorisation and device audit) | created | none |
+        | `approvalRecord` | 7 years (approvals board 6.7) | decided | none |
+        | `complianceInspection` | 7 years | created | none |
+        | `faceTagBiometric` | 7 days | ticket expiry | make-or-break |
+        | `facePassBiometric` | follows `guestProfile` | last activity | make-or-break |
+        | `aiPrompts` | 90 days (prompts and responses) | created | none |
+        | `aiConversations` | 90 days | last activity | none |
+        | `aiDecisionRecords` | follows `auditRecord` (decision records and the approvals of AI actions) | decided | none |
+        | `aiMetadataIndex` | always follows `aiDecisionRecords` (summaries, entities, embeddings) | created | none |
+
+        **ADR-0047's floors and ceilings that are not law are defaults now, not refusals** (the audit
+        floor of one year, the proposed seven-year guest-profile ceiling, the Face Tag thirty-day
+        ceiling). Platform-owned copies — the burst environment copy, a decommissioned cell — are not
+        tenant data classes and are not here.
+      enum:
+      - guestProfile
+      - paymentRecord
+      - financialRecord
+      - auditRecord
+      - approvalRecord
+      - complianceInspection
+      - faceTagBiometric
+      - facePassBiometric
+      - aiPrompts
+      - aiConversations
+      - aiDecisionRecords
+      - aiMetadataIndex
+    TenantDataRetentionSetting:
+      type: object
+      x-ticvai-persistence: tenancy.data_retention_setting
+      description: >
+        **One tenant's retention period for one data class** (decided 29 September, Chinmay). One row
+        per tenant and class, written by `setDataRetentionSetting`; a class with no row takes the
+        platform default. The limit and default fields are the platform's catalogue, computed for the
+        response and not stored on the row.
+      required:
+      - dataClass
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        dataClass:
+          allOf:
+          - $ref: '#/components/schemas/TenantDataRetentionClass'
+          x-ticvai-unique: tenant
+          description: One row per class per tenant. On a write it comes from the path; a body value is
+            ignored.
+        retainAmount:
+          type: integer
+          nullable: true
+          minimum: 0
+          description: >
+            The tenant's period. Null with no `followsDataClass` means the platform default applies.
+            Zero means the data is not kept past the transaction that produced it.
+        retainUnit:
+          type: string
+          nullable: true
+          enum:
+          - days
+          - months
+          - years
+          description: Required with `retainAmount`.
+        followsDataClass:
+          allOf:
+          - $ref: '#/components/schemas/TenantDataRetentionClass'
+          nullable: true
+          description: >
+            Keep this class for as long as another class is kept. Set by default for
+            `aiDecisionRecords` (follows `auditRecord`), `facePassBiometric` (follows `guestProfile`)
+            and `aiMetadataIndex` (follows `aiDecisionRecords`, and cannot be changed).
+        onExpiry:
+          type: string
+          enum:
+          - archive
+          - anonymise
+          - delete
+          default: archive
+          description: >
+            ADR-0047's stages. `archive` moves the data to the archive instance, from where it is
+            erased on the class's own schedule; derived stores (the AI index, search) purge at
+            archive, not later.
+        anchor:
+          type: string
+          readOnly: true
+          x-ticvai-persisted: false
+          enum:
+          - createdAt
+          - lastActivity
+          - decidedAt
+          - ticketExpiry
+          description: What the period is counted from. Fixed per class by the platform.
+        effectiveAmount:
+          type: integer
+          readOnly: true
+          x-ticvai-persisted: false
+          description: The period actually applied, after follows and defaults are resolved.
+        effectiveUnit:
+          type: string
+          readOnly: true
+          x-ticvai-persisted: false
+          enum:
+          - days
+          - months
+          - years
+        isDefault:
+          type: boolean
+          readOnly: true
+          x-ticvai-persisted: false
+          description: True when the tenant has not set this class and the platform default applies.
+        defaultAmount:
+          type: integer
+          nullable: true
+          readOnly: true
+          x-ticvai-persisted: false
+        defaultUnit:
+          type: string
+          nullable: true
+          readOnly: true
+          x-ticvai-persisted: false
+          enum:
+          - days
+          - months
+          - years
+        legalMinimumAmount:
+          type: integer
+          nullable: true
+          readOnly: true
+          x-ticvai-persisted: false
+          description: A floor the law sets. A shorter period is refused (`422`).
+        legalMaximumAmount:
+          type: integer
+          nullable: true
+          readOnly: true
+          x-ticvai-persisted: false
+          description: A maximum the law sets. A longer period is refused (`422`). Null for every class
+            until the biometric make-or-break is answered.
+        legalLimitUnit:
+          type: string
+          nullable: true
+          readOnly: true
+          x-ticvai-persisted: false
+          enum:
+          - days
+          - months
+          - years
+        legalBasis:
+          type: string
+          nullable: true
+          readOnly: true
+          x-ticvai-persisted: false
+          description: The law or requirement the limit comes from, e.g. `4.3.4`.
+        updatedAt:
+          type: string
+          format: date-time
+          readOnly: true
+        updatedByPrincipalId:
+          type: string
+          format: uuid
+          nullable: true
+          readOnly: true
+        scopePath:
+          type: string
+          readOnly: true
+          description: The tenant. Retention is set at tenant scope only.
     AuditRecord:
       type: object
       x-ticvai-persistence: "platform.audit_record"
@@ -2534,15 +3065,33 @@ components:
     DeviceFirmware:
       type: object
       x-ticvai-persistence: tenancy.device_firmware
-      description: '16.6.30 and 16.6.32. **A release, and how much of the fleet is on it.**'
+      description: '16.6.30 and 16.6.32. **A release, and how much of the fleet is on it.** Written by
+        `createDeviceFirmware` and moved through its life by `setDeviceFirmwareStatus` (29 September,
+        build pass); `startDeviceFirmwareRollout` deploys only a `released` one.
+
+        '
+      required:
+      - deviceKind
+      - version
       properties:
         id:
           type: string
           format: uuid
+          readOnly: true
         deviceKind:
           type: string
         version:
           type: string
+        vendor:
+          type: string
+          nullable: true
+          description: Who built the image, as the device's driver names its maker.
+        checksumAlgorithm:
+          type: string
+          enum:
+          - sha256
+          - sha512
+          default: sha256
         releaseNotes:
           type: string
           nullable: true
@@ -2564,16 +3113,29 @@ components:
           type: string
           format: date-time
           nullable: true
+          readOnly: true
+          description: Set when `setDeviceFirmwareStatus` first makes the release `released`.
         installedCount:
           type: integer
           readOnly: true
         status:
           type: string
+          readOnly: true
+          default: draft
           enum:
           - draft
           - released
           - deprecated
           - withdrawn
+        statusReason:
+          type: string
+          nullable: true
+          readOnly: true
+          description: The `reason` given when the release was deprecated or withdrawn.
+        scopePath:
+          type: string
+          readOnly: true
+          description: The tenant the release belongs to. Releases are tenant-wide; rollouts narrow them.
     DeviceFirmwareRollout:
       type: object
       x-ticvai-persistence: tenancy.device_rollout
@@ -3069,7 +3631,13 @@ components:
     RegisteredDevice:
       x-ticvai-persistence: "platform.device"
       type: object
-      required: [id, kind, driver, workstationId]
+      description: >
+        **The device register of record** (decided 29 September, build pass). Identity, enrolment,
+        credential, firmware and push registration for every device in the estate live on this row.
+        `access.access_device` places access-control devices in the gate topology and repeats
+        serial, versions, health and lifecycle; the two are not merged yet, and where they disagree
+        this row wins.
+      required: [id, kind, driver]
       properties:
         id: { type: string, format: uuid, readOnly: true }
         kind: { $ref: '#/components/schemas/DeviceKind' }
@@ -3079,7 +3647,13 @@ components:
             Built to an open standard where one exists — ESC/POS, UnifiedPOS, OSDP. Adding a
             vendor is a driver plus configuration, not a core change (ADR-0015).
         identifier: { type: string, nullable: true }
-        workstationId: { type: string, format: uuid }
+        workstationId:
+          type: string
+          format: uuid
+          nullable: true
+          description: >
+            Required for every kind except `mobileHandset`, which is bound to no workstation
+            (18.1.5, 29 September); `registerDevice` refuses either mistake with `422`.
         model: { type: string, nullable: true }
         pushToken:
           type: string
@@ -3997,6 +4571,10 @@ components:
         - signaturePad
         - scale
         - camera
+        - mobileHandset
+      description: >
+        `mobileHandset` (18.1.5, added 29 September): a staff phone or tablet running the staff app,
+        registered for push and bound to no workstation.
 
     DeviceBinding:
       x-ticvai-persistence: "platform.device"

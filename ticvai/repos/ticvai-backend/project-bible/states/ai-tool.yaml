@@ -1,0 +1,37 @@
+# AI tool — state model
+# Contract: ai.AiTool.status
+# Checked by tools/check-states.py. Added 29 September (build pass, group OWN, from the AI group's handoff).
+
+entity: AI tool
+contract: ai
+enum: AiTool.status
+enumKind: inline
+enumSchema: AiTool
+enumProperty: status
+owner: ai
+description: '**The tool registry** (AI design 3.1 Registry, 3.8; AIC-088, AIC-089). The executor calls owning
+  modules only for tools registered here. Platform rows, replicated read-only into each tenant database; written
+  by `setAiTool` (`PLATFORM_AI_MANAGE`).'
+initial:
+- active
+- disabled
+terminal: []
+transitions:
+- from: active
+  to: disabled
+  operation: setAiTool
+  trigger: operation
+  guard: The platform writes the tool with `status` `disabled`; the executor stops calling it
+- from: disabled
+  to: active
+  operation: setAiTool
+  trigger: operation
+  guard: The platform writes the tool with `status` `active` again
+- from: active
+  to: disabled
+  operation: containAiIncident
+  trigger: operation
+  guard: Containment action `disableTool` on an incident, recorded on the incident
+notes: '**No terminal state, by design** (`terminal: []`): a tool is platform configuration, switched off and on
+  again. **Two initial states**: `setAiTool` creates the row in whichever `status` its body carries, so a tool can
+  be registered disabled before its owner is ready.'

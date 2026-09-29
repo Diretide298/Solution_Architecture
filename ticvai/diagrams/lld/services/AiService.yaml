@@ -1,5 +1,5 @@
 id: LLD-AiService
-title: AiService — 31 operations, 16 tables
+title: AiService — 133 operations, 69 tables
 generatedBy: tools/derive-diagrams.py
 tier: engagement
 index: diagrams/hld/02-services.yaml
@@ -10,14 +10,14 @@ why: '**Separate at any size, and not because of size.** ADR-0020 makes it a har
 scale: Latency-tolerant, cost-sensitive, token-metered. Different hardware from everything else.
 ifDown: Down degrades suggestions and the concierge. **Nothing that takes money depends on it.**
 coverage:
-  operations: 31
-  inAFlow: 16
-  percent: 52%
+  operations: 133
+  inAFlow: 17
+  percent: 13%
   note: '**Flow coverage is how much of this service a journey has walked.** A service under 40% is
     unwalked rather than under-documented.'
 schemas:
 - schema: ai
-  tables: 16
+  tables: 69
   stores:
   - postgres
   - postgres-analytical
@@ -28,8 +28,128 @@ schemas:
   largestTable: —
 operationsByContract:
 - contract: ai
-  count: 31
+  count: 133
   operations:
+  - operation: addRiskCaseEvidence
+    verb: POST
+    path: /risk/cases/{caseId}/evidence
+    scope: venue
+    permission: RISK_INVESTIGATE
+    offline: false
+    reads: 3
+    writes: 2
+  - operation: answerConfigurationQuestion
+    verb: POST
+    path: /configuration-sessions/{sessionId}/answers
+    scope: venue
+    permission: AI_USE
+    offline: false
+    reads: 6
+    writes: 5
+  - operation: attachConfigurationSource
+    verb: POST
+    path: /configuration-sessions/{sessionId}/sources
+    scope: venue
+    permission: AI_USE
+    offline: false
+    reads: 7
+    writes: 4
+  - operation: backtestRiskStrategy
+    verb: POST
+    path: /risk/strategy/backtest
+    scope: tenant
+    permission: AI_CONFIGURE
+    offline: false
+    reads: 4
+    writes: 2
+  - operation: buildConfigurationPlan
+    verb: POST
+    path: /configuration-sessions/{sessionId}/plan
+    scope: venue
+    permission: AI_USE
+    offline: false
+    reads: 9
+    writes: 6
+  - operation: cancelActionPlan
+    verb: POST
+    path: /action-plans/{planId}/cancel
+    scope: venue
+    permission: AI_USE
+    offline: false
+    reads: 3
+    writes: 5
+  - operation: closeAiIncident
+    verb: POST
+    path: /incidents/{incidentId}/close
+    scope: tenant
+    permission: AI_APPROVE
+    offline: false
+    reads: 2
+    writes: 2
+  - operation: closeRiskCase
+    verb: POST
+    path: /risk/cases/{caseId}/close
+    scope: venue
+    permission: RISK_INVESTIGATE
+    offline: false
+    reads: 3
+    writes: 4
+  - operation: compareForecastScenarios
+    verb: POST
+    path: /forecast-scenarios/compare
+    scope: venue
+    permission: AI_USE
+    offline: false
+    reads: 3
+    writes: 1
+  - operation: configureAiCapability
+    verb: PUT
+    path: /governance/capabilities/{capabilityKey}
+    scope: tenant
+    permission: AI_CONFIGURE
+    offline: false
+    reads: 2
+    writes: 3
+  - operation: configureAnomalyDetector
+    verb: PUT
+    path: /anomaly-detectors/{detectorKey}
+    scope: venue
+    permission: AI_CONFIGURE
+    offline: false
+    reads: 3
+    writes: 2
+  - operation: configureAssistantProfile
+    verb: PUT
+    path: /assistant-profiles/{profileKey}
+    scope: tenant
+    permission: AI_CONFIGURE
+    offline: false
+    reads: 3
+    writes: 2
+  - operation: configureForecastSignalSource
+    verb: PUT
+    path: /forecast-signals/{signalKey}
+    scope: tenant
+    permission: AI_CONFIGURE
+    offline: false
+    reads: 2
+    writes: 2
+  - operation: configureRiskStrategy
+    verb: PUT
+    path: /risk/strategy
+    scope: tenant
+    permission: AI_CONFIGURE
+    offline: false
+    reads: 2
+    writes: 3
+  - operation: containAiIncident
+    verb: POST
+    path: /incidents/{incidentId}/contain
+    scope: tenant
+    permission: AI_APPROVE
+    offline: false
+    reads: 2
+    writes: 7
   - operation: createAiConversation
     verb: POST
     path: /conversations
@@ -38,6 +158,30 @@ operationsByContract:
     offline: false
     reads: 2
     writes: 2
+  - operation: createAiGovernancePolicyDraft
+    verb: POST
+    path: /governance/policy-drafts
+    scope: tenant
+    permission: AI_CONFIGURE
+    offline: false
+    reads: 3
+    writes: 3
+  - operation: createAiPolicyException
+    verb: POST
+    path: /governance/policy-exceptions
+    scope: tenant
+    permission: AI_APPROVE
+    offline: false
+    reads: 3
+    writes: 3
+  - operation: createForecastScenario
+    verb: POST
+    path: /forecast-scenarios
+    scope: venue
+    permission: AI_USE
+    offline: false
+    reads: 4
+    writes: 3
   - operation: createKnowledgeCollection
     verb: POST
     path: /collections
@@ -46,22 +190,126 @@ operationsByContract:
     offline: false
     reads: 4
     writes: 3
+  - operation: createRiskCase
+    verb: POST
+    path: /risk/cases
+    scope: venue
+    permission: RISK_INVESTIGATE
+    offline: false
+    reads: 3
+    writes: 4
+  - operation: decideAiGovernanceAlert
+    verb: POST
+    path: /governance-alerts/{alertId}/decide
+    scope: venue
+    permission: AI_CONFIGURE
+    offline: false
+    reads: 2
+    writes: 3
+  - operation: decideAiInsight
+    verb: POST
+    path: /insights/{insightId}/decide
+    scope: venue
+    permission: AI_USE
+    offline: false
+    reads: 2
+    writes: 3
+  - operation: decideBlueprintRecommendation
+    verb: POST
+    path: /configuration-sessions/{sessionId}/decisions/{decisionKey}
+    scope: venue
+    permission: AI_USE
+    offline: false
+    reads: 3
+    writes: 3
+  - operation: decideOperationalRequirement
+    verb: POST
+    path: /operational-requirements/{requirementId}/decide
+    scope: venue
+    permission: AI_USE
+    offline: false
+    reads: 2
+    writes: 3
   - operation: decideProposedAction
     verb: POST
     path: /proposed-actions/{actionId}/decide
     scope: venue
     permission: AI_APPROVE
     offline: false
-    reads: 2
+    reads: 3
+    writes: 5
+  - operation: decideRecommendations
+    verb: POST
+    path: /recommendations/decide
+    scope: venue
+    permission: AI_USE
+    offline: false
+    reads: 5
     writes: 3
+  - operation: decideRiskAlert
+    verb: POST
+    path: /risk/alerts/{alertId}/decide
+    scope: venue
+    permission: RISK_REVIEW
+    offline: false
+    reads: 2
+    writes: 4
+  - operation: evaluateAiGovernance
+    verb: POST
+    path: /governance/evaluate
+    scope: venue
+    permission: null
+    offline: false
+    reads: 6
+    writes: 2
+  - operation: expandRiskNetwork
+    verb: GET
+    path: /risk/network
+    scope: venue
+    permission: RISK_INVESTIGATE
+    offline: false
+    reads: 2
+    writes: 0
+  - operation: explainMetricChange
+    verb: POST
+    path: /insights/explain-metric-change
+    scope: venue
+    permission: AI_USE
+    offline: false
+    reads: 3
+    writes: 3
+  - operation: explainRecommendationDecision
+    verb: GET
+    path: /recommendations/decisions/{decisionId}/explanation
+    scope: venue
+    permission: AI_USE
+    offline: false
+    reads: 2
+    writes: 0
+  - operation: exportAiEvidencePackage
+    verb: POST
+    path: /evidence-packages
+    scope: venue
+    permission: AI_AUDIT_VIEW
+    offline: false
+    reads: 4
+    writes: 2
+  - operation: exportForecastVersion
+    verb: POST
+    path: /forecast-versions/{versionId}/exports
+    scope: venue
+    permission: AI_USE
+    offline: false
+    reads: 6
+    writes: 2
   - operation: generateConfiguration
     verb: POST
     path: /generate/configuration
     scope: venue
     permission: AI_USE
     offline: false
-    reads: 22
-    writes: 4
+    reads: 25
+    writes: 7
   - operation: generateVenueLayout
     verb: POST
     path: /generate/venue-layout
@@ -70,6 +318,30 @@ operationsByContract:
     offline: false
     reads: 4
     writes: 3
+  - operation: getActionPlan
+    verb: GET
+    path: /action-plans/{planId}
+    scope: venue
+    permission: AI_USE
+    offline: false
+    reads: 2
+    writes: 0
+  - operation: getAiByokEnablement
+    verb: GET
+    path: /tenants/{tenantId}/byok
+    scope: tenant
+    permission: AI_CONFIGURE
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: getAiDecisionTrace
+    verb: GET
+    path: /decision-records/{decisionRecordId}/trace
+    scope: venue
+    permission: AI_AUDIT_VIEW
+    offline: false
+    reads: 5
+    writes: 0
   - operation: getAiPolicy
     verb: GET
     path: /policy
@@ -84,7 +356,79 @@ operationsByContract:
     scope: tenant
     permission: AI_AUDIT_VIEW
     offline: false
+    reads: 2
+    writes: 0
+  - operation: getApprovalRequestScore
+    verb: GET
+    path: /approval-requests/{approvalRequestId}/score
+    scope: venue
+    permission: APPROVAL_VIEW
+    offline: false
     reads: 1
+    writes: 0
+  - operation: getConfigurationBlueprint
+    verb: GET
+    path: /configuration-sessions/{sessionId}/blueprint
+    scope: venue
+    permission: AI_USE
+    offline: false
+    reads: 4
+    writes: 0
+  - operation: getCustomerRecommendationProfile
+    verb: GET
+    path: /recommendations/customers/{subjectId}/profile
+    scope: venue
+    permission: AI_USE
+    offline: false
+    reads: 4
+    writes: 0
+  - operation: getEffectiveAiPolicy
+    verb: GET
+    path: /governance/effective-policy
+    scope: venue
+    permission: AI_USE
+    offline: false
+    reads: 5
+    writes: 0
+  - operation: getEntityRisk
+    verb: GET
+    path: /risk/entities/{entityType}/{entityRef}
+    scope: tenant
+    permission: RISK_REVIEW
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: getForecast
+    verb: GET
+    path: /forecasts
+    scope: venue
+    permission: AI_USE
+    offline: false
+    reads: 3
+    writes: 0
+  - operation: getForecastAccuracy
+    verb: GET
+    path: /forecast-accuracy
+    scope: venue
+    permission: AI_USE
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: getGuidedChoiceSuggestion
+    verb: GET
+    path: /guided-choice-suggestions/{suggestionId}
+    scope: venue
+    permission: AI_USE
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: getRiskCase
+    verb: GET
+    path: /risk/cases/{caseId}
+    scope: venue
+    permission: RISK_INVESTIGATE
+    offline: false
+    reads: 4
     writes: 0
   - operation: ingestKnowledgeDocument
     verb: POST
@@ -92,11 +436,67 @@ operationsByContract:
     scope: tenant
     permission: AI_CONFIGURE
     offline: false
-    reads: 5
-    writes: 4
+    reads: 6
+    writes: 5
+  - operation: listAiCapabilities
+    verb: GET
+    path: /governance/capabilities
+    scope: venue
+    permission: AI_USE
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: listAiControls
+    verb: GET
+    path: /controls
+    scope: tenant
+    permission: AI_USE
+    offline: false
+    reads: 2
+    writes: 0
   - operation: listAiConversations
     verb: GET
     path: /conversations
+    scope: venue
+    permission: AI_USE
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: listAiEvaluations
+    verb: GET
+    path: /evaluations
+    scope: tenant
+    permission: AI_USE
+    offline: false
+    reads: 2
+    writes: 0
+  - operation: listAiGovernanceAlerts
+    verb: GET
+    path: /governance-alerts
+    scope: venue
+    permission: AI_USE
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: listAiGovernancePolicyVersions
+    verb: GET
+    path: /governance/policy-versions
+    scope: tenant
+    permission: AI_USE
+    offline: false
+    reads: 2
+    writes: 0
+  - operation: listAiIncidents
+    verb: GET
+    path: /incidents
+    scope: tenant
+    permission: AI_USE
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: listAiInsights
+    verb: GET
+    path: /insights
     scope: venue
     permission: AI_USE
     offline: false
@@ -110,11 +510,91 @@ operationsByContract:
     offline: false
     reads: 1
     writes: 0
+  - operation: listAiModels
+    verb: GET
+    path: /models
+    scope: tenant
+    permission: AI_USE
+    offline: false
+    reads: 1
+    writes: 0
   - operation: listAiProviders
     verb: GET
     path: /providers
     scope: region
     permission: AI_CONFIGURE
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: listAiRiskRegister
+    verb: GET
+    path: /risk-register
+    scope: tenant
+    permission: AI_USE
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: listAiTools
+    verb: GET
+    path: /tools
+    scope: tenant
+    permission: AI_USE
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: listAnomalyDetectors
+    verb: GET
+    path: /anomaly-detectors
+    scope: venue
+    permission: AI_USE
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: listAssistantProfiles
+    verb: GET
+    path: /assistant-profiles
+    scope: tenant
+    permission: AI_USE
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: listConfigurationSessions
+    verb: GET
+    path: /configuration-sessions
+    scope: venue
+    permission: AI_USE
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: listConfigurationSources
+    verb: GET
+    path: /configuration-sessions/{sessionId}/sources
+    scope: venue
+    permission: AI_USE
+    offline: false
+    reads: 2
+    writes: 0
+  - operation: listForecastDefinitions
+    verb: GET
+    path: /forecast-definitions
+    scope: venue
+    permission: AI_USE
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: listForecastSignals
+    verb: GET
+    path: /forecast-signals
+    scope: tenant
+    permission: AI_USE
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: listForecastVersions
+    verb: GET
+    path: /forecast-versions
+    scope: venue
+    permission: AI_USE
     offline: false
     reads: 1
     writes: 0
@@ -150,6 +630,38 @@ operationsByContract:
     offline: false
     reads: 3
     writes: 0
+  - operation: listKnowledgeGaps
+    verb: GET
+    path: /knowledge-gaps
+    scope: tenant
+    permission: AI_USE
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: listMarketingRecommendations
+    verb: GET
+    path: /marketing-recommendations
+    scope: venue
+    permission: AI_USE
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: listOperationalRequirements
+    verb: GET
+    path: /operational-requirements
+    scope: venue
+    permission: AI_USE
+    offline: false
+    reads: 2
+    writes: 0
+  - operation: listPromptTemplates
+    verb: GET
+    path: /prompt-templates
+    scope: tenant
+    permission: AI_USE
+    offline: false
+    reads: 1
+    writes: 0
   - operation: listProposedActions
     verb: GET
     path: /proposed-actions
@@ -158,13 +670,93 @@ operationsByContract:
     offline: false
     reads: 1
     writes: 0
+  - operation: listRiskAlerts
+    verb: GET
+    path: /risk/alerts
+    scope: venue
+    permission: RISK_REVIEW
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: openAiIncident
+    verb: POST
+    path: /incidents
+    scope: tenant
+    permission: AI_CONFIGURE
+    offline: false
+    reads: 3
+    writes: 3
+  - operation: overrideAiDecision
+    verb: POST
+    path: /decision-records/{decisionRecordId}/override
+    scope: venue
+    permission: AI_APPROVE
+    offline: false
+    reads: 3
+    writes: 3
+  - operation: pauseActionPlan
+    verb: POST
+    path: /action-plans/{planId}/pause
+    scope: venue
+    permission: AI_APPROVE
+    offline: false
+    reads: 2
+    writes: 4
+  - operation: pauseAiCapability
+    verb: POST
+    path: /governance/capabilities/{capabilityKey}/pause
+    scope: tenant
+    permission: AI_CONFIGURE
+    offline: false
+    reads: 2
+    writes: 5
+  - operation: promoteAiRelease
+    verb: POST
+    path: /releases/{releaseId}/promote
+    scope: tenant
+    permission: AI_APPROVE
+    offline: false
+    reads: 4
+    writes: 6
+  - operation: proposeLookalikeSegment
+    verb: POST
+    path: /ai/segment-suggestions
+    scope: venue
+    permission: AI_USE
+    offline: false
+    reads: 9
+    writes: 3
+  - operation: proposeMarketingContent
+    verb: POST
+    path: /ai/content-drafts
+    scope: venue
+    permission: AI_USE
+    offline: false
+    reads: 16
+    writes: 4
+  - operation: proposeRiskAction
+    verb: POST
+    path: /risk/cases/{caseId}/actions
+    scope: venue
+    permission: RISK_INVESTIGATE
+    offline: false
+    reads: 5
+    writes: 5
+  - operation: proposeSeatMapChanges
+    verb: POST
+    path: /ai/seat-maps/{seatMapId}/proposals
+    scope: venue
+    permission: CAPACITY_CONFIGURE
+    offline: false
+    reads: 11
+    writes: 5
   - operation: proposeTranslations
     verb: POST
     path: /ai/translate
     scope: tenant
     permission: TENANT_CONFIGURE
     offline: false
-    reads: 4
+    reads: 6
     writes: 3
   - operation: proposeVenueLabels
     verb: POST
@@ -182,6 +774,46 @@ operationsByContract:
     offline: false
     reads: 6
     writes: 3
+  - operation: publishAiGovernancePolicy
+    verb: POST
+    path: /governance/policy-versions/{versionId}/publish
+    scope: tenant
+    permission: AI_APPROVE
+    offline: false
+    reads: 2
+    writes: 5
+  - operation: publishForecastVersion
+    verb: POST
+    path: /forecast-versions/{versionId}/publish
+    scope: venue
+    permission: AI_APPROVE
+    offline: false
+    reads: 3
+    writes: 4
+  - operation: publishPromptTemplate
+    verb: POST
+    path: /prompt-templates/{templateKey}/versions
+    scope: tenant
+    permission: AI_APPROVE
+    offline: false
+    reads: 2
+    writes: 3
+  - operation: recordAnswerFeedback
+    verb: POST
+    path: /messages/{messageId}/feedback
+    scope: venue
+    permission: AI_USE
+    offline: false
+    reads: 3
+    writes: 3
+  - operation: recordRecommendationEvents
+    verb: POST
+    path: /recommendations/events
+    scope: venue
+    permission: AI_USE
+    offline: false
+    reads: 2
+    writes: 3
   - operation: recordSuggestionOutcome
     verb: POST
     path: /ai/suggestions/{suggestionId}/outcome
@@ -197,7 +829,7 @@ operationsByContract:
     permission: AI_CONFIGURE
     offline: false
     reads: 15
-    writes: 5
+    writes: 6
   - operation: removeIndexEntry
     verb: DELETE
     path: /index-sources/{sourceId}/entries/{entryId}
@@ -205,22 +837,126 @@ operationsByContract:
     permission: AI_CONFIGURE
     offline: false
     reads: 3
-    writes: 4
+    writes: 5
+  - operation: replayAiDecision
+    verb: POST
+    path: /decision-records/{decisionRecordId}/replay
+    scope: venue
+    permission: AI_AUDIT_VIEW
+    offline: false
+    reads: 2
+    writes: 2
   - operation: requestSuggestion
     verb: POST
     path: /ai/suggestions
     scope: venue
     permission: AI_USE
     offline: false
+    reads: 18
+    writes: 3
+  - operation: resumeActionPlan
+    verb: POST
+    path: /action-plans/{planId}/resume
+    scope: venue
+    permission: AI_APPROVE
+    offline: false
+    reads: 3
+    writes: 4
+  - operation: resumeAiCapability
+    verb: POST
+    path: /governance/capabilities/{capabilityKey}/resume
+    scope: tenant
+    permission: AI_APPROVE
+    offline: false
+    reads: 2
+    writes: 4
+  - operation: retryActionStep
+    verb: POST
+    path: /action-plans/{planId}/steps/{stepNumber}/retry
+    scope: venue
+    permission: AI_APPROVE
+    offline: false
+    reads: 2
+    writes: 4
+  - operation: revokeAiPolicyException
+    verb: POST
+    path: /governance/policy-exceptions/{exceptionId}/revoke
+    scope: tenant
+    permission: AI_APPROVE
+    offline: false
+    reads: 2
+    writes: 3
+  - operation: rollbackActionPlan
+    verb: POST
+    path: /action-plans/{planId}/rollback
+    scope: venue
+    permission: AI_APPROVE
+    offline: false
+    reads: 4
+    writes: 5
+  - operation: rollbackAiRelease
+    verb: POST
+    path: /releases/{releaseId}/rollback
+    scope: tenant
+    permission: AI_APPROVE
+    offline: false
+    reads: 2
+    writes: 5
+  - operation: runAiControlTest
+    verb: POST
+    path: /controls/{controlKey}/tests
+    scope: tenant
+    permission: AI_AUDIT_VIEW
+    offline: false
+    reads: 6
+    writes: 4
+  - operation: runAiEvaluation
+    verb: POST
+    path: /evaluations
+    scope: tenant
+    permission: AI_CONFIGURE
+    offline: false
     reads: 4
     writes: 3
+  - operation: runForecast
+    verb: POST
+    path: /forecast-definitions/{definitionKey}/runs
+    scope: venue
+    permission: AI_CONFIGURE
+    offline: false
+    reads: 8
+    writes: 5
+  - operation: scoreApprovalRequest
+    verb: POST
+    path: /approval-requests/{approvalRequestId}/score
+    scope: venue
+    permission: null
+    offline: false
+    reads: 5
+    writes: 3
+  - operation: scoreTransactionRisk
+    verb: POST
+    path: /risk/transaction-scores
+    scope: venue
+    permission: null
+    offline: false
+    reads: 4
+    writes: 4
+  - operation: searchAiDecisions
+    verb: GET
+    path: /decision-records
+    scope: venue
+    permission: AI_AUDIT_VIEW
+    offline: false
+    reads: 1
+    writes: 0
   - operation: semanticSearch
     verb: POST
     path: /search
     scope: venue
     permission: AI_USE
     offline: false
-    reads: 7
+    reads: 9
     writes: 4
   - operation: sendAiMessage
     verb: POST
@@ -228,13 +964,29 @@ operationsByContract:
     scope: venue
     permission: AI_USE
     offline: false
-    reads: 10
-    writes: 6
+    reads: 13
+    writes: 8
+  - operation: setAiByokEnablement
+    verb: PUT
+    path: /tenants/{tenantId}/byok
+    scope: tenant
+    permission: PLATFORM_AI_MANAGE
+    offline: false
+    reads: 2
+    writes: 2
   - operation: setAiCredential
     verb: PUT
     path: /ai-providers/{providerId}/credential
     scope: tenant
     permission: AI_CONFIGURE
+    offline: false
+    reads: 3
+    writes: 2
+  - operation: setAiModel
+    verb: PUT
+    path: /models/{modelId}
+    scope: platform
+    permission: PLATFORM_AI_MANAGE
     offline: false
     reads: 2
     writes: 2
@@ -252,7 +1004,31 @@ operationsByContract:
     scope: region
     permission: AI_CONFIGURE
     offline: false
+    reads: 4
+    writes: 2
+  - operation: setAiRiskRegisterEntry
+    verb: PUT
+    path: /risk-register/{entryId}
+    scope: tenant
+    permission: AI_CONFIGURE
+    offline: false
     reads: 2
+    writes: 2
+  - operation: setAiTool
+    verb: PUT
+    path: /tools/{toolKey}
+    scope: platform
+    permission: PLATFORM_AI_MANAGE
+    offline: false
+    reads: 2
+    writes: 2
+  - operation: setForecastDefinition
+    verb: PUT
+    path: /forecast-definitions/{definitionKey}
+    scope: venue
+    permission: AI_CONFIGURE
+    offline: false
+    reads: 3
     writes: 2
   - operation: setIndexSource
     verb: PUT
@@ -268,8 +1044,48 @@ operationsByContract:
     scope: tenant
     permission: AI_CONFIGURE
     offline: false
-    reads: 3
+    reads: 4
     writes: 3
+  - operation: simulateActionPlan
+    verb: POST
+    path: /action-plans/{planId}/simulate
+    scope: venue
+    permission: AI_USE
+    offline: false
+    reads: 4
+    writes: 3
+  - operation: simulateAiGovernancePolicy
+    verb: POST
+    path: /governance/policy-versions/{versionId}/simulate
+    scope: tenant
+    permission: AI_CONFIGURE
+    offline: false
+    reads: 3
+    writes: 2
+  - operation: simulateRecommendationDecision
+    verb: POST
+    path: /recommendations/simulate
+    scope: venue
+    permission: null
+    offline: false
+    reads: 3
+    writes: 1
+  - operation: startConfigurationSession
+    verb: POST
+    path: /configuration-sessions
+    scope: venue
+    permission: AI_USE
+    offline: false
+    reads: 4
+    writes: 3
+  - operation: suggestGuidedChoice
+    verb: POST
+    path: /venues/{venueId}/guided-choice-suggestions
+    scope: venue
+    permission: AI_USE
+    offline: false
+    reads: 4
+    writes: 4
   - operation: testAiProvider
     verb: POST
     path: /ai-providers/{providerId}/test
@@ -316,6 +1132,20 @@ tables:
   - ingestKnowledgeDocument
   - reindexSource
   - removeIndexEntry
+- store: cache:governance-policy
+  kind: cache
+  columns: 3
+  backing: redis
+  owned: false
+  why: '**Not a table and not owned by a service.** Derived from something already read, losable without
+    consequence — no migration, no backup, no owner.'
+  key: tenant id + capability
+  eviction:
+  - 'version: the policy version it was resolved from'
+  writtenBy:
+  - publishAiGovernancePolicy
+  readBy:
+  - evaluateAiGovernance
 - store: cache:idempotency
   kind: cache
   columns: 5
@@ -328,49 +1158,206 @@ tables:
   - 'expires_at: **Must exceed the longest offline window.** A scanner out for a weekend replays on
     Monday'
   writtenBy:
+  - addRiskCaseEvidence
+  - answerConfigurationQuestion
+  - attachConfigurationSource
+  - backtestRiskStrategy
+  - buildConfigurationPlan
+  - cancelActionPlan
+  - closeAiIncident
+  - closeRiskCase
+  - compareForecastScenarios
+  - configureAiCapability
+  - configureAnomalyDetector
+  - configureAssistantProfile
+  - configureForecastSignalSource
+  - configureRiskStrategy
+  - containAiIncident
   - createAiConversation
+  - createAiGovernancePolicyDraft
+  - createAiPolicyException
+  - createForecastScenario
   - createKnowledgeCollection
+  - createRiskCase
+  - decideAiGovernanceAlert
+  - decideAiInsight
+  - decideBlueprintRecommendation
+  - decideOperationalRequirement
   - decideProposedAction
+  - decideRecommendations
+  - decideRiskAlert
+  - evaluateAiGovernance
+  - explainMetricChange
+  - exportAiEvidencePackage
+  - exportForecastVersion
   - generateConfiguration
   - generateVenueLayout
   - ingestKnowledgeDocument
+  - openAiIncident
+  - overrideAiDecision
+  - pauseActionPlan
+  - pauseAiCapability
+  - promoteAiRelease
+  - proposeLookalikeSegment
+  - proposeMarketingContent
+  - proposeRiskAction
+  - proposeSeatMapChanges
   - proposeTranslations
   - proposeVenueLabels
   - proposeWalkways
+  - publishAiGovernancePolicy
+  - publishForecastVersion
+  - publishPromptTemplate
+  - recordAnswerFeedback
+  - recordRecommendationEvents
   - recordSuggestionOutcome
   - reindexSource
   - removeIndexEntry
+  - replayAiDecision
   - requestSuggestion
+  - resumeActionPlan
+  - resumeAiCapability
+  - retryActionStep
+  - revokeAiPolicyException
+  - rollbackActionPlan
+  - rollbackAiRelease
+  - runAiControlTest
+  - runAiEvaluation
+  - runForecast
+  - scoreApprovalRequest
+  - scoreTransactionRisk
   - semanticSearch
   - sendAiMessage
+  - setAiByokEnablement
   - setAiCredential
+  - setAiModel
   - setAiPolicy
   - setAiProvider
+  - setAiRiskRegisterEntry
+  - setAiTool
+  - setForecastDefinition
   - setIndexSource
   - setSuggestionProvider
+  - simulateActionPlan
+  - simulateAiGovernancePolicy
+  - simulateRecommendationDecision
+  - startConfigurationSession
+  - suggestGuidedChoice
   - testAiProvider
   readBy:
+  - addRiskCaseEvidence
+  - answerConfigurationQuestion
+  - attachConfigurationSource
+  - backtestRiskStrategy
+  - buildConfigurationPlan
+  - cancelActionPlan
+  - closeAiIncident
+  - closeRiskCase
+  - compareForecastScenarios
+  - configureAiCapability
+  - configureAnomalyDetector
+  - configureAssistantProfile
+  - configureForecastSignalSource
+  - configureRiskStrategy
+  - containAiIncident
   - createAiConversation
+  - createAiGovernancePolicyDraft
+  - createAiPolicyException
+  - createForecastScenario
   - createKnowledgeCollection
+  - createRiskCase
+  - decideAiGovernanceAlert
+  - decideAiInsight
+  - decideBlueprintRecommendation
+  - decideOperationalRequirement
   - decideProposedAction
+  - decideRecommendations
+  - decideRiskAlert
+  - evaluateAiGovernance
+  - explainMetricChange
+  - exportAiEvidencePackage
+  - exportForecastVersion
   - generateConfiguration
   - generateVenueLayout
   - ingestKnowledgeDocument
+  - openAiIncident
+  - overrideAiDecision
+  - pauseActionPlan
+  - pauseAiCapability
+  - promoteAiRelease
+  - proposeLookalikeSegment
+  - proposeMarketingContent
+  - proposeRiskAction
+  - proposeSeatMapChanges
   - proposeTranslations
   - proposeVenueLabels
   - proposeWalkways
+  - publishAiGovernancePolicy
+  - publishForecastVersion
+  - publishPromptTemplate
+  - recordAnswerFeedback
+  - recordRecommendationEvents
   - recordSuggestionOutcome
   - reindexSource
   - removeIndexEntry
+  - replayAiDecision
   - requestSuggestion
+  - resumeActionPlan
+  - resumeAiCapability
+  - retryActionStep
+  - revokeAiPolicyException
+  - rollbackActionPlan
+  - rollbackAiRelease
+  - runAiControlTest
+  - runAiEvaluation
+  - runForecast
+  - scoreApprovalRequest
+  - scoreTransactionRisk
   - semanticSearch
   - sendAiMessage
+  - setAiByokEnablement
   - setAiCredential
+  - setAiModel
   - setAiPolicy
   - setAiProvider
+  - setAiRiskRegisterEntry
+  - setAiTool
+  - setForecastDefinition
   - setIndexSource
   - setSuggestionProvider
+  - simulateActionPlan
+  - simulateAiGovernancePolicy
+  - simulateRecommendationDecision
+  - startConfigurationSession
+  - suggestGuidedChoice
   - testAiProvider
+- store: cache:rec-candidates
+  kind: cache
+  columns: 2
+  backing: redis
+  owned: false
+  why: '**Not a table and not owned by a service.** Derived from something already read, losable without
+    consequence — no migration, no backup, no owner.'
+  key: tenant id + placement + context
+  eviction: null
+  writtenBy: null
+  readBy:
+  - decideRecommendations
+  - requestSuggestion
+  - simulateRecommendationDecision
+- store: cache:rec-features
+  kind: cache
+  columns: 2
+  backing: redis
+  owned: false
+  why: '**Not a table and not owned by a service.** Derived from something already read, losable without
+    consequence — no migration, no backup, no owner.'
+  key: tenant id + subject
+  eviction: null
+  writtenBy: null
+  readBy:
+  - decideRecommendations
+  - getCustomerRecommendationProfile
 - store: cache:resolution
   kind: cache
   columns: 4
@@ -388,6 +1375,18 @@ tables:
     or bumps — permissions, configuration, a price list, and whether child scopes under its `scope_path`
     are affected — is not recorded for any operation, so a writer here cannot yet be implemented from
     the package alone.'
+- store: cache:risk-features
+  kind: cache
+  columns: 2
+  backing: redis
+  owned: false
+  why: '**Not a table and not owned by a service.** Derived from something already read, losable without
+    consequence — no migration, no backup, no owner.'
+  key: tenant id + entity
+  eviction: null
+  writtenBy: null
+  readBy:
+  - scoreTransactionRisk
 - store: qdrant:knowledge
   kind: vector
   columns: 9
@@ -413,8 +1412,22 @@ tables:
   - proposeVenueLabels
   - semanticSearch
   - sendAiMessage
+- table: ai.action_plan
+  columns: 19
+  store: postgres
+  parent: null
+  writtenBy:
+  - ai
+  foreignWriters: null
+- table: ai.action_step
+  columns: 21
+  store: postgres
+  parent: null
+  writtenBy:
+  - ai
+  foreignWriters: null
 - table: ai.activity
-  columns: 22
+  columns: 24
   store: postgres-analytical
   parent: null
   writtenBy:
@@ -422,15 +1435,231 @@ tables:
   - reporting
   foreignWriters:
   - reporting
+- table: ai.anomaly_detector
+  columns: 14
+  store: postgres
+  parent: null
+  writtenBy:
+  - ai
+  foreignWriters: null
+- table: ai.answer_feedback
+  columns: 11
+  store: postgres
+  parent: null
+  writtenBy:
+  - ai
+  foreignWriters: null
+- table: ai.approval_request_score
+  columns: 11
+  store: postgres
+  parent: null
+  writtenBy:
+  - ai
+  foreignWriters: null
+- table: ai.assistant_profile
+  columns: 14
+  store: postgres
+  parent: null
+  writtenBy:
+  - ai
+  foreignWriters: null
+- table: ai.blueprint
+  columns: 10
+  store: postgres
+  parent: null
+  writtenBy:
+  - ai
+  foreignWriters: null
+- table: ai.blueprint_decision
+  columns: 15
+  store: postgres
+  parent: ai.blueprint
+  writtenBy:
+  - ai
+  foreignWriters: null
+- table: ai.byok_enablement
+  columns: 10
+  store: postgres
+  parent: null
+  writtenBy:
+  - ai
+  foreignWriters: null
+- table: ai.capability
+  columns: 18
+  store: postgres
+  parent: null
+  writtenBy:
+  - ai
+  foreignWriters: null
+- table: ai.case_action
+  columns: 11
+  store: postgres
+  parent: null
+  writtenBy:
+  - ai
+  foreignWriters: null
+- table: ai.case_evidence
+  columns: 10
+  store: postgres
+  parent: null
+  writtenBy:
+  - ai
+  foreignWriters: null
+- table: ai.chunk_embedding
+  columns: 11
+  store: postgres
+  parent: null
+  writtenBy:
+  - ai
+  foreignWriters: null
 - table: ai.chunk_ref
   columns: 2
   store: postgres
   parent: null
   writtenBy: []
   foreignWriters: null
+- table: ai.config_session
+  columns: 14
+  store: postgres
+  parent: null
+  writtenBy:
+  - ai
+  foreignWriters: null
+- table: ai.config_source
+  columns: 12
+  store: postgres
+  parent: null
+  writtenBy:
+  - ai
+  foreignWriters: null
+- table: ai.control
+  columns: 12
+  store: postgres
+  parent: null
+  writtenBy:
+  - ai
+  foreignWriters: null
+- table: ai.control_test
+  columns: 8
+  store: postgres
+  parent: ai.control
+  writtenBy:
+  - ai
+  foreignWriters: null
 - table: ai.conversation
   columns: 8
   store: postgres-analytical
+  parent: null
+  writtenBy:
+  - ai
+  foreignWriters: null
+- table: ai.decision_record
+  columns: 25
+  store: postgres
+  parent: null
+  writtenBy:
+  - ai
+  foreignWriters: null
+- table: ai.entity_risk
+  columns: 9
+  store: postgres
+  parent: null
+  writtenBy:
+  - ai
+  foreignWriters: null
+- table: ai.eval_run
+  columns: 14
+  store: postgres
+  parent: null
+  writtenBy:
+  - ai
+  foreignWriters: null
+- table: ai.eval_suite
+  columns: 9
+  store: postgres
+  parent: null
+  writtenBy: []
+  foreignWriters: null
+- table: ai.evidence_package
+  columns: 14
+  store: postgres
+  parent: null
+  writtenBy:
+  - ai
+  foreignWriters: null
+- table: ai.forecast_accuracy
+  columns: 13
+  store: postgres
+  parent: null
+  writtenBy:
+  - ai
+  foreignWriters: null
+- table: ai.forecast_definition
+  columns: 17
+  store: postgres
+  parent: null
+  writtenBy:
+  - ai
+  foreignWriters: null
+- table: ai.forecast_export
+  columns: 16
+  store: postgres
+  parent: null
+  writtenBy:
+  - ai
+  foreignWriters: null
+- table: ai.forecast_point
+  columns: 12
+  store: postgres
+  parent: null
+  writtenBy:
+  - ai
+  foreignWriters: null
+- table: ai.forecast_scenario
+  columns: 8
+  store: postgres
+  parent: null
+  writtenBy:
+  - ai
+  foreignWriters: null
+- table: ai.forecast_version
+  columns: 16
+  store: postgres
+  parent: null
+  writtenBy:
+  - ai
+  foreignWriters: null
+- table: ai.governance_alert
+  columns: 14
+  store: postgres
+  parent: null
+  writtenBy:
+  - ai
+  foreignWriters: null
+- table: ai.governance_policy
+  columns: 9
+  store: postgres
+  parent: null
+  writtenBy:
+  - ai
+  foreignWriters: null
+- table: ai.governance_policy_version
+  columns: 12
+  store: postgres
+  parent: ai.governance_policy
+  writtenBy:
+  - ai
+  foreignWriters: null
+- table: ai.guided_choice_suggestion
+  columns: 12
+  store: postgres
+  parent: null
+  writtenBy:
+  - ai
+  foreignWriters: null
+- table: ai.incident
+  columns: 16
+  store: postgres
   parent: null
   writtenBy:
   - ai
@@ -443,7 +1672,7 @@ tables:
   - ai
   foreignWriters: null
 - table: ai.index_failure
-  columns: 8
+  columns: 9
   store: postgres
   parent: null
   writtenBy: []
@@ -462,6 +1691,20 @@ tables:
   writtenBy:
   - ai
   foreignWriters: null
+- table: ai.insight
+  columns: 22
+  store: postgres
+  parent: null
+  writtenBy:
+  - ai
+  foreignWriters: null
+- table: ai.intervention
+  columns: 11
+  store: postgres
+  parent: null
+  writtenBy:
+  - ai
+  foreignWriters: null
 - table: ai.knowledge_collection
   columns: 12
   store: postgres
@@ -470,7 +1713,14 @@ tables:
   - ai
   foreignWriters: null
 - table: ai.knowledge_document
-  columns: 10
+  columns: 11
+  store: postgres
+  parent: null
+  writtenBy:
+  - ai
+  foreignWriters: null
+- table: ai.knowledge_gap
+  columns: 13
   store: postgres
   parent: null
   writtenBy:
@@ -490,6 +1740,20 @@ tables:
   writtenBy:
   - ai
   foreignWriters: null
+- table: ai.model
+  columns: 16
+  store: postgres
+  parent: null
+  writtenBy:
+  - ai
+  foreignWriters: null
+- table: ai.operational_requirement
+  columns: 17
+  store: postgres
+  parent: null
+  writtenBy:
+  - ai
+  foreignWriters: null
 - table: ai.policy
   columns: 28
   store: postgres
@@ -497,15 +1761,111 @@ tables:
   writtenBy:
   - ai
   foreignWriters: null
+- table: ai.policy_exception
+  columns: 13
+  store: postgres
+  parent: null
+  writtenBy:
+  - ai
+  foreignWriters: null
+- table: ai.prompt_template
+  columns: 13
+  store: postgres
+  parent: null
+  writtenBy:
+  - ai
+  foreignWriters: null
 - table: ai.proposed_action
-  columns: 14
+  columns: 18
   store: postgres
   parent: null
   writtenBy:
   - ai
   foreignWriters: null
 - table: ai.provider
+  columns: 21
+  store: postgres
+  parent: null
+  writtenBy:
+  - ai
+  foreignWriters: null
+- table: ai.rec_decision
   columns: 19
+  store: postgres
+  parent: null
+  writtenBy:
+  - ai
+  foreignWriters: null
+- table: ai.rec_decline
+  columns: 10
+  store: postgres
+  parent: null
+  writtenBy:
+  - ai
+  foreignWriters: null
+- table: ai.rec_event
+  columns: 11
+  store: postgres
+  parent: null
+  writtenBy:
+  - ai
+  foreignWriters: null
+- table: ai.release
+  columns: 17
+  store: postgres
+  parent: null
+  writtenBy:
+  - ai
+  foreignWriters: null
+- table: ai.risk_alert
+  columns: 16
+  store: postgres
+  parent: null
+  writtenBy:
+  - ai
+  foreignWriters: null
+- table: ai.risk_assessment
+  columns: 15
+  store: postgres
+  parent: null
+  writtenBy:
+  - ai
+  foreignWriters: null
+- table: ai.risk_case
+  columns: 15
+  store: postgres
+  parent: null
+  writtenBy:
+  - ai
+  foreignWriters: null
+- table: ai.risk_edge
+  columns: 10
+  store: postgres
+  parent: null
+  writtenBy: []
+  foreignWriters: null
+- table: ai.risk_register
+  columns: 15
+  store: postgres
+  parent: null
+  writtenBy:
+  - ai
+  foreignWriters: null
+- table: ai.risk_strategy
+  columns: 12
+  store: postgres
+  parent: null
+  writtenBy:
+  - ai
+  foreignWriters: null
+- table: ai.signal_observation
+  columns: 7
+  store: postgres
+  parent: null
+  writtenBy: []
+  foreignWriters: null
+- table: ai.signal_source
+  columns: 10
   store: postgres
   parent: null
   writtenBy:
@@ -519,57 +1879,227 @@ tables:
   - ai
   foreignWriters: null
 - table: ai.suggestion_outcome
-  columns: 8
+  columns: 9
   store: postgres-analytical
   parent: ai.suggestion
   writtenBy:
   - ai
   foreignWriters: null
+- table: ai.tool
+  columns: 15
+  store: postgres
+  parent: null
+  writtenBy:
+  - ai
+  foreignWriters: null
 readsFrom:
-- service: VenueOpsService
-  operations: 4
-- service: CatalogueService
-  operations: 3
 - service: MarketingService
-  operations: 2
+  operations: 7
+- service: VenueOpsService
+  operations: 7
+- service: CatalogueService
+  operations: 5
+- service: OrderService
+  operations: 3
 - service: FnbService
-  operations: 1
+  operations: 2
 - service: PlatformService
+  operations: 2
+- service: TenancyService
+  operations: 2
+- service: WhiteLabelService
+  operations: 2
+- service: InventoryService
   operations: 1
 - service: ReportingService
   operations: 1
 - service: RetailService
   operations: 1
-- service: TenancyService
-  operations: 1
-- service: WhiteLabelService
-  operations: 1
 writesOutside: []
 screens:
+- P01:WEB-001 Home / Landing
+- P01:WEB-008 Add-ons & Upsell
+- P01:WEB-043 Loyalty & Rewards
 - P01:WEB-044 AI Concierge – Home
+- P02:GST-001 Home – Default
 - P02:GST-031 AI Concierge – Home
 - P02:GST-032 AI Concierge – Chat
 - P02:GST-033 AI Concierge – Contextual Help
+- P02:GST-036 Loyalty & Rewards
+- P02:GST-048 Upsell / Cross-Sell
 - P02:GST-054 AI Optimized Itinerary
 - P02:GST-068 Help & My Cases
 - P05:KSK-015 Assistant
 - P06:EMP-019 AI assistant — home
 - P06:EMP-020 AI assistant — answer
+- P06:EMP-031 Queue monitor
 - P06:EMP-040 Knowledge base
 - P06:EMP-041 Training
+- P08:BO-005 Queue Monitor
+- P08:BO-084 Approval Inbox
 - P08:BO-088 Approval Analytics
 - P08:BO-091 AI Policy & Spend
 - P08:BO-093 Map Import & Labelling
+- P08:BO-102 Sell
+- P08:BO-1048 Seat Upsell Recommendations
 - P08:BO-115 Category, Brand & Merchandise Hierarchy
+- P08:BO-1160 Fraud Alert & Investigation Case Management
 - P08:BO-117 Product Import, Governance & AI Configuration Assistant
+- P08:BO-119 Cross-Sell, Upsell & Recommendation Rules
+- P08:BO-138 Production Execution & Batch Management
+- P08:BO-139 Wastage, Spoilage, Returns & Write-Off
+- P08:BO-367 Approval Request Detail
+- P08:BO-369 High Priority & Risk Queue
 - P08:BO-597 AI Configuration Workspace
 - P08:BO-598 AI Draft Review & Approval
+- P08:BO-761 AI Audience Discovery
+- P08:BO-762 Predictive Audiences
+- P08:BO-764 Campaign Command Center
+- P08:BO-766 Campaign Builder
+- P08:BO-772 A/B & AI Optimization
+- P08:BO-782 AI Journey Optimization
+- P08:BO-785 Template Library
+- P08:BO-786 Newsletter Builder
+- P08:BO-787 Content Blocks & Product Feed
+- P08:BO-789 Transactional Notification Rules
+- P08:BO-793 AI Content, Translation & Audit
+- P08:BO-798 Intent & Knowledge Management
+- P08:BO-919 AI Event Resource Forecasting
+- P08:BO-925 AI Staff Recommendation & Workforce Matching
+- P08:BO-926 Resource Demand Forecasting
+- P08:BO-927 AI Staffing Requirement Forecast
+- P08:BO-928 AI Conflict Resolution Assistant
+- P08:BO-929 Automatic Schedule Optimization
+- P08:BO-931 Operational Scenario Simulator & Digital Twin
+- P08:BO-932 Conversational AI Resource Copilot
+- P08:BO-959 Stage & Focal Point
+- P08:BO-970 AI Numbering & Labeling
+- P08:BO-975 Event-Specific Layout
+- P08:BO-982 Approval, Publish & Rollback
 - P09:ADM-004 Platform Audit Log
 - P09:ADM-037 AI Provider & Credentials
+- P09:ADM-047 AI Delivery Optimization & Communication Platform Diagnostics
+- P09:ADM-249 Unified Approval Inbox & Decision Workspace
+- P09:ADM-366 AI Approval Intelligence Center
+- P09:ADM-469 AI Configuration Home & Start
+- P09:ADM-470 Setup Type & Business Intent Discovery
+- P09:ADM-471 Venue & Business Model Discovery
+- P09:ADM-472 Guided Question & Answer Workspace
+- P09:ADM-473 Product & Admission Model Discovery
+- P09:ADM-474 Operational Requirement Discovery
+- P09:ADM-475 Commercial Requirement Discovery
+- P09:ADM-476 Required, Recommended & Optional Decisions
+- P09:ADM-477 Missing Information & Clarification Center
+- P09:ADM-478 Configuration Blueprint & Dependency Map
+- P09:ADM-479 AI Configuration Build Command Center
+- P09:ADM-480 Venue & Organization Configuration
+- P09:ADM-481 Product Configuration Assistant
+- P09:ADM-482 Schedule, Capacity & Availability Configuration
+- P09:ADM-483 Pricing & Commercial Configuration
+- P09:ADM-484 Promotion, Bundle & Upsell Configuration
+- P09:ADM-485 Seating, Access & Operational Configuration
+- P09:ADM-486 Channel, Media & Fulfillment Configuration
+- P09:ADM-487 Cross-Module Conflict & Dependency Validation
+- P09:ADM-488 Configuration Preview & Impact Analysis
+- P09:ADM-489 AI Configuration Readiness Center
+- P09:ADM-490 Configuration Validation Results
+- P09:ADM-491 AI Recommendations & Best-Practice Review
+- P09:ADM-492 Configuration Approval Workflow
+- P09:ADM-493 AI Configuration Execution Center
+- P09:ADM-494 Execution Progress & Dependency Monitor
+- P09:ADM-495 Configuration Results & Object Mapping
+- P09:ADM-496 Configuration Change & Modification Assistant
+- P09:ADM-497 Configuration History, Versions & Rollback
+- P09:ADM-498 AI Configuration Audit & Governance
+- P09:ADM-499 Forecasting Command Center
+- P09:ADM-500 Forecast Configuration & Forecasting Strategy
+- P09:ADM-501 Forecast Data & Signal Configuration
+- P09:ADM-502 Attendance & Visitation Forecast
+- P09:ADM-503 Ticket, Product & Timeslot Demand Forecast
+- P09:ADM-504 Channel & Booking Pace Forecast
+- P09:ADM-505 Revenue & Commercial Forecast
+- P09:ADM-506 Forecast Drivers, Confidence & Explainability
+- P09:ADM-507 Forecast Scenario & What-If Simulator
+- P09:ADM-508 Forecast Accuracy, Review & Publication Center
+- P09:ADM-509 Operational Forecasting Command Center
+- P09:ADM-510 Capacity & Occupancy Forecast
+- P09:ADM-511 Attraction Utilization & Queue Forecast
+- P09:ADM-512 Entry, Access & Guest Flow Forecast
+- P09:ADM-513 Workforce Demand & Staffing Forecast
+- P09:ADM-514 POS, Kiosk & Frontline Service Forecast
+- P09:ADM-515 F&B, Retail & Inventory Demand Forecast
+- P09:ADM-516 Resource, Equipment & Facility Requirement Forecast
+- P09:ADM-517 Operational Scenario & Readiness Simulator
+- P09:ADM-518 Operational Forecast Review, Recommendations & Handover
+- P09:ADM-519 AI Governance Command Center
+- P09:ADM-520 AI Capability Registry & Ownership
+- P09:ADM-521 AI Risk Classification & Assessment
+- P09:ADM-522 AI Autonomy Level Configuration
+- P09:ADM-523 AI Action & Permission Policy Builder
+- P09:ADM-524 AI Data Access & Usage Policy
+- P09:ADM-525 Environment, Tenant & Scope Governance
+- P09:ADM-526 AI Policy Conflict, Exception & Override Management
+- P09:ADM-527 AI Policy Testing & Governance Simulation
+- P09:ADM-528 AI Governance Policy Publication & Effective Policy Map
+- P09:ADM-529 AI Human Oversight Command Center
+- P09:ADM-530 AI Approval Requirement & Routing Configuration
+- P09:ADM-531 AI Approval Review Workspace
+- P09:ADM-532 Conditional Approval & Approval Conditions
+- P09:ADM-533 Human Review, Challenge & AI Clarification Workspace
+- P09:ADM-534 Escalation, Delegation & Approval SLA Management
+- P09:ADM-535 Live AI Execution Oversight & Human Intervention
+- P09:ADM-536 Human Override & Manual Control Center
+- P09:ADM-537 Approval & Intervention History / Decision Timeline
+- P09:ADM-538 Human Oversight Workflow Simulator & Readiness Center
+- P09:ADM-539 AI Explainability & Audit Command Center
+- P09:ADM-540 AI Decision Explorer & Search
+- P09:ADM-541 AI Decision Explanation Workspace
+- P09:ADM-542 Data, Feature & Evidence Provenance
+- P09:ADM-543 Candidate, Rule & Decision Path Trace
+- P09:ADM-544 Model, Provider & AI Runtime Trace
+- P09:ADM-545 Governance, Approval & Human Decision Trace
+- P09:ADM-546 Execution & Business Outcome Trace
+- P09:ADM-547 AI Audit Record & Evidence Package
+- P09:ADM-548 AI Trace Investigation & Replay Simulator
+- P09:ADM-549 AI Governance Monitoring Command Center
+- P09:ADM-550 AI Risk Register & Risk Exposure Management
+- P09:ADM-551 AI Governance Control Library & Control Effectiveness
+- P09:ADM-552 AI Policy Compliance & Violation Monitoring
+- P09:ADM-553 AI Data, Privacy & Usage Compliance Monitoring
+- P09:ADM-554 AI Quality, Behavior & Governance Drift Monitoring
+- P09:ADM-555 AI Governance Alert & Detection Center
+- P09:ADM-556 AI Incident & Remediation Management
+- P09:ADM-557 AI Compliance, Assurance & Governance Reporting
+- P09:ADM-558 AI Governance Review, Action Plan & Continuous Improvement
+- P09:ADM-633 Fraud Alert, Investigation & Case Management\t170
+- P09:ADM-637 AI Fraud, Anomaly & Payment Intelligence Center\t175
+- P09:ADM-638 Payment Executive Intelligence, Risk Simulator & AI Advisor\t176
+- P09:ADM-678 Journey Simulator, Decision Trace & AI Optimization
+- P09:ADM-680 Customer Recommendation Profile
+- P09:ADM-683 Next-Best-Offer Decision Studio
+- P09:ADM-686 Anonymous, Known & Identity-Transition Personalization.123
+- P09:ADM-687 AI Explainability, Confidence & Model Governance
+- P09:ADM-696 AI Risk, Fairness, Explainability & Safety Center
+- P09:ADM-697 Recommendation Audit, Decision Trace & Investigation
 - P12:SUP-006 Knowledge Base Search
+- P12:SUP-018 AI Customer Service Copilot & Knowledge Workspace
+- P13:CMS-007 Page Builder
+- P13:CMS-008 Content Blocks
+- P13:CMS-010 Media Library
+- P13:CMS-062 Central Digital Asset Library
+- P13:CMS-101 Help Me Choose
 - P16:ANL-001 Executive Command Center
+- P16:ANL-006 Inventory & Waste Intelligence
+- P16:ANL-008 Demand Forecasting
 - P16:ANL-009 AI Assistant & Action Center
 - P16:ANL-010 Suggestions & Advice
+- P16:ANL-019 AI Management Insights
+- P16:ANL-055 Anomaly Detection Center
+- P16:ANL-056 Root-Cause Analysis Explorer
+- P16:ANL-057 Forecasting & Predictive Analytics Studio
+- P16:ANL-058 AI Recommendation & Next-Best-Action Center
+- P16:ANL-059 AI Insight History, Evidence & Explainability
+- P16:ANL-060 AI Analytics Governance & Model Control
 flows:
 - F100 An AI provider is configured, budgeted and audited
 - F101 A staff member asks the assistant and it answers from the venue

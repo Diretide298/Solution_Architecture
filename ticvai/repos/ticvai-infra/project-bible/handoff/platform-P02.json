@@ -11,11 +11,11 @@
  "note": "Derived by tools/derive-platform.py. **The gaps section is the point** \u2014 a page listing what exists is a directory; one listing what is missing is a worklist.",
  "counts": {
   "screens": 77,
-  "operations": 189,
+  "operations": 211,
   "contracts": 19,
   "modules": 17,
   "undrawn": 0,
-  "operationsWithNoScreen": 18
+  "operationsWithNoScreen": 19
  },
  "waves": {
   "wave1": 20,
@@ -155,16 +155,16 @@
  ],
  "contracts": [
   {
+   "contract": "marketing-crm",
+   "operations": 38
+  },
+  {
    "contract": "orders",
    "operations": 36
   },
   {
-   "contract": "marketing-crm",
-   "operations": 33
-  },
-  {
    "contract": "identity",
-   "operations": 21
+   "operations": 23
   },
   {
    "contract": "catalogue",
@@ -183,7 +183,23 @@
    "operations": 11
   },
   {
+   "contract": "wallet",
+   "operations": 8
+  },
+  {
+   "contract": "white-label",
+   "operations": 7
+  },
+  {
+   "contract": "ai",
+   "operations": 7
+  },
+  {
    "contract": "resources",
+   "operations": 6
+  },
+  {
+   "contract": "finance",
    "operations": 6
   },
   {
@@ -191,15 +207,7 @@
    "operations": 5
   },
   {
-   "contract": "white-label",
-   "operations": 5
-  },
-  {
    "contract": "promotions",
-   "operations": 5
-  },
-  {
-   "contract": "ai",
    "operations": 4
   },
   {
@@ -207,24 +215,16 @@
    "operations": 4
   },
   {
-   "contract": "seating",
+   "contract": "payments",
    "operations": 4
   },
   {
-   "contract": "wallet",
+   "contract": "seating",
    "operations": 4
   },
   {
    "contract": "venue-map",
    "operations": 3
-  },
-  {
-   "contract": "payments",
-   "operations": 2
-  },
-  {
-   "contract": "finance",
-   "operations": 1
   },
   {
    "contract": "games",
@@ -238,7 +238,7 @@
    "module": "Discovery & Browse",
    "wave": 1,
    "route": "/general/home-default",
-   "operations": 5,
+   "operations": 11,
    "drawn": true
   },
   {
@@ -328,7 +328,7 @@
    "module": "Membership, Loyalty & Value",
    "wave": 2,
    "route": "/general/wallet-overview",
-   "operations": 2,
+   "operations": 6,
    "drawn": true
   },
   {
@@ -364,7 +364,7 @@
    "module": "Membership, Loyalty & Value",
    "wave": 2,
    "route": "/general/memberships",
-   "operations": 9,
+   "operations": 11,
    "drawn": true
   },
   {
@@ -400,7 +400,7 @@
    "module": "Account & Self-Service",
    "wave": 2,
    "route": "/general/order-history-wallet",
-   "operations": 4,
+   "operations": 9,
    "drawn": true
   },
   {
@@ -517,7 +517,7 @@
    "module": "Engagement & Support",
    "wave": 2,
    "route": "/general/ai-concierge-chat",
-   "operations": 8,
+   "operations": 9,
    "drawn": true
   },
   {
@@ -553,7 +553,7 @@
    "module": "Membership, Loyalty & Value",
    "wave": 2,
    "route": "/loyalty-rewards",
-   "operations": 3,
+   "operations": 5,
    "drawn": true
   },
   {
@@ -607,7 +607,7 @@
    "module": "Account & Self-Service",
    "wave": 1,
    "route": "/general/simple-registration-and-otp",
-   "operations": 12,
+   "operations": 13,
    "drawn": true
   },
   {
@@ -661,7 +661,7 @@
    "module": "Booking & Selection",
    "wave": 2,
    "route": "/general/upsell-cross-sell",
-   "operations": 2,
+   "operations": 3,
    "drawn": true
   },
   {
@@ -805,7 +805,7 @@
    "module": "Account & Self-Service",
    "wave": 2,
    "route": "/account/privacy-my-data",
-   "operations": 5,
+   "operations": 9,
    "drawn": true
   },
   {
@@ -868,7 +868,7 @@
    "module": "Account & Self-Service",
    "wave": 2,
    "route": "/account/security-sign-in",
-   "operations": 12,
+   "operations": 14,
    "drawn": true
   },
   {
@@ -1023,6 +1023,12 @@
     "contract": "orders",
     "verb": "POST",
     "summary": "Take back a share"
+   },
+   {
+    "operation": "getUpsellSuggestions",
+    "contract": "promotions",
+    "verb": "POST",
+    "summary": "Suggestions for a cart"
    },
    {
     "operation": "recordRecommendationOutcome",

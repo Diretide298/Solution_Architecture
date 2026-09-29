@@ -2,7 +2,7 @@ openapi: 3.1.0
 info:
   title: TICVAI Access Control
   version: 1.0.0
-  x-ticvai-screen-count: 238
+  x-ticvai-screen-count: 240
   x-ticvai-tier: spine
   x-ticvai-module: 3 — Admission and Access
   x-ticvai-requirements: 201
@@ -110,6 +110,20 @@ paths:
         each boarding consumes one entry. **Proof for a reduced fare** (child, student, person of
         determination: a student card, a Sanad card) **is checked by the driver at boarding** by eye, from
         the `proofRequired` the ticket shows; the scan records the passenger type and never the document.
+
+        **Dynamic access policies are evaluated here** (stated 29 September, build pass). After the entitlement
+        is found valid, the active `AccessDynamicPolicy` rows that apply at this access point''s scope are
+        evaluated by priority; the one that decides is recorded on the scan (`ScanEvent.dynamicPolicyId`,
+        `dynamicPolicyVersion`, `dynamicPolicyResult`), which is what `listDynamicPolicyEffectiveness` reports
+        from. A device deciding offline records the same fields from its package and they arrive with the replay.
+
+        **An accreditation credential is resolved here too** (29 September, build; BL-181). A presented code that
+        is no ticket''s media is looked up in `access.accreditation_credential`, the copy `access` keeps from
+        `accreditation.credentialIssued` (a replacement stops the credential it replaces) and
+        `accreditation.holderStatusChanged` (a holder suspended, revoked, expired or archived stops admitting).
+        It admits only where the credential `admits`, today is within its validity and this access point''s zone
+        is among its `zoneIds`; the same rows travel in the offline package, so a gate without a network decides
+        the same way.
 
         '
       tags:
@@ -511,16 +525,27 @@ paths:
         - "P04 POS-005 Payment"
       x-ticvai-audience:
       - staff
-      summary: Capture a same-visit facial model that dies at close of day
+      x-ticvai-make-or-break: 'May a Face Tag be captured on a notice alone, with no affirmative act by the guest
+        (the matrix''s "does not require the customer to explicitly sign a consent form" read at its widest)? —
+        why: (a) law: PDPL Article 4 has no legitimate-interests basis for biometric data, and the form of
+        consent at a gate is CF-35, which the client''s counsel must close. Consent without a signed form
+        (onScreenAcknowledgement) is built and is the default; a notice-only method is not offered until counsel
+        says it is lawful.'
+      summary: Capture a same-visit facial model, deleted when the ticket is fully redeemed
       description: '3.2.44. **A Face Tag is not a short Face Pass.** It is taken at a ticket counter
-        or an entry gate, it is anchored to the ticket rather than to a pass, and it is purged at the
-        close of the operating day — which is the posture that makes it defensible at all.
+        or an entry gate, it is anchored to the ticket rather than to a pass, and it is deleted at the
+        venue Face Tag profile''s `deletionTrigger`: **when the ticket is fully redeemed** unless the venue
+        chose otherwise (`setFaceTagTemporaryEnrollment`; corrected 29 September, build pass, from an earlier
+        "close of the operating day" that the profile never said) — which is the posture that makes it
+        defensible at all.
 
-        **Consent is still explicit and still recorded.** PDPL Article 4 is a closed list of
-        exceptions with **no legitimate-interests basis**, so there is no route that makes a
-        short-lived biometric consent-free. What a short life changes is what the consent is *for*,
-        not whether it is needed — and a design that skipped it because the data dies at midnight
-        would be wrong about the law rather than lenient about it.
+        **No consent form to sign, and consent is still explicit and recorded.** The matrix asks that a
+        Face Tag need no signed consent form, and it does not: `consent.method` `onScreenAcknowledgement` is a
+        tap on the counter or gate screen after the notice is shown, recorded with the purpose and the time
+        (decided 29 September, build pass). PDPL Article 4 is a closed list of exceptions with **no
+        legitimate-interests basis**, so there is no route that makes a short-lived biometric consent-free;
+        what a short life changes is what the consent is *for*, not whether it is needed. Whether a notice
+        alone would do is the make-or-break question on this operation (CF-35).
 
         **Refused where `VenueSettings.biometrics.isEnabled` is false**, and that switch cannot be
         turned on without a DPIA reference and a consent-notice acknowledgement (CF-35).
@@ -588,6 +613,16 @@ paths:
                     purposeId:
                       type: string
                       format: uuid
+                    method:
+                      type: string
+                      enum:
+                      - onScreenAcknowledgement
+                      - signedForm
+                      default: onScreenAcknowledgement
+                      description: 'How the guest consented (added 29 September, build pass, 3.2.44).
+                        `onScreenAcknowledgement` is an affirmative tap after the notice, with no form;
+                        `signedForm` where the venue''s Face Tag profile asks for one (`consentCapture`). A
+                        method the profile does not allow is a `409`.'
                     givenAt:
                       type: string
                       format: date-time
@@ -601,14 +636,18 @@ paths:
                       nullable: true
       responses:
         '201':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Tagged
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/FacePassEnrolment'
         '409':
-          description: '**Biometrics are not enabled at this venue**, or this ticket type''s
-            `biometricPolicy` is `disabled`.
+          description: '**Biometrics are not enabled at this venue**, this ticket type''s
+            `biometricPolicy` is `disabled`, or `consent.method` is not the one the venue''s Face Tag
+            profile requires (`consentCapture`).
 
             '
           content:
@@ -1537,6 +1576,12 @@ paths:
         **Workstation-scoped: the access point is the session''s.** A caller whose session has no
         workstation — a back-office browser, a partner, a guest — is refused `403`, because there is no
         access point to build a package for.
+
+        **Accreditation credentials travel in the package** (29 September, build; BL-181):
+        `accreditationCredentials` carries the admitting `access.accreditation_credential` rows whose zones include
+        this access point''s, so an accredited person is admitted, and a suspended or revoked one refused, with
+        no network. A holder status change or a replacement changes the `etag`, so the next conditional refresh
+        takes it.
 
         '
       tags:
@@ -7430,6 +7475,13 @@ paths:
         A Face Pass whose active ticket has already been validated with it is not deleted by a rule change; unused
         tickets move to another method and the consent and audit record is kept.
 
+        **A rule may only shorten the tenant''s setting** (decided 29 September, Chinmay: all data retention is
+        tenant configuration, one setting per class). The tenant''s period is tenancy `setDataRetentionSetting`
+        class `faceTagBiometric` (Face Tag) or `facePassBiometric` (Face Pass and failed or abandoned capture);
+        a `retentionDays` longer than the tenant''s effective period for the category is `422`. The legal
+        maximum is the same make-or-break question on both operations; until counsel answers, the tenant
+        setting is the ceiling.
+
         '
       tags:
       - access
@@ -7457,6 +7509,13 @@ paths:
           $ref: ../shared/common.yaml#/components/responses/NotFound
         '409':
           description: A second rule for the same venue and data category
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
+        '422':
+          description: '`retentionDays` longer than the tenant''s effective `faceTagBiometric` or
+            `facePassBiometric` period (tenancy `setDataRetentionSetting`); a rule here may only shorten it'
           content:
             application/problem+json:
               schema:
@@ -10339,6 +10398,13 @@ paths:
         A new rule defaults to `alertOnly`, so switching one on cannot lock a guest out before somebody has seen
         what it fires on (our build plan).
 
+
+        **`excessiveRefunds`** (added 29 September, build pass; 5.3.33): a guest whose tickets are refunded
+        `threshold` times within `timeWindow` minutes, counted from the refund-driven revocations of their
+        credentials. It is a signal about the person, so its alert carries `subjectId`, and its `weight` adds to
+        their access risk score (`getAccessRiskScore`). Refunds of food, retail and other non-ticket sales are
+        payment-side and belong to `orders` fraud rules.
+
         '
       tags:
       - access
@@ -12620,6 +12686,11 @@ paths:
         and ignored in the body. A `serialNumber` already registered in the tenant is refused `409 duplicate-serial`.
         `deviceGroupId` is a free deployment label, not a key (decided 29 September, writers pass).
 
+        **tenancy `platform.device` (`RegisteredDevice`) is the device register of record** (29 September, build);
+        this row is the device''s placement in the access topology. `access` consumes `device.enrolmentChanged` and
+        keeps `lifecycleStatus` in step with the register, so a device retired there is refused at the gate
+        whatever this row says. Merging the two registers is an open data-model decision.
+
         '
       tags:
       - access
@@ -14657,9 +14728,351 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+  /dynamic-policy-effectiveness:
+    get:
+      operationId: listDynamicPolicyEffectiveness
+      x-ticvai-consumed-by:
+        - "P08 BO-234 Dynamic Access Policy Command Center"
+        - "P08 BO-243 Policy Approval, Audit, Analytics & AI Optimization"
+      x-ticvai-audience:
+      - staff
+      x-ticvai-agreed: '29 September: our build plan (3.3.48 "reporting on policy effectiveness"); pack ''Access
+        Control Module'' p.146 (BO-243 "continuously measure policy effectiveness"); shape follows
+        listDynamicAccessPolicy with the Page envelope'
+      summary: How each gate admission policy has behaved over a period
+      description: '3.3.48 (decided 29 September, build pass). **One row per dynamic access policy**: how often it
+        decided a scan, what it decided (allow, deny, review, a step-up), how many of its denials a supervisor
+        overrode, and a daily trend, over `from` to `to`. Computed from `access.scan_event`, which records the
+        policy and version that decided each scan (`ScanEvent.dynamicPolicyId`); an override is the override
+        row naming the denied scan (`overridesScanId`).
+
+
+        **The number that matters is the override rate.** A policy whose denials are overridden most of the time
+        is refusing people the venue then lets in, which is a policy written wrongly or a rule nobody believes;
+        `neverTriggered` is the other end, a policy that costs evaluation and decides nothing.
+
+
+        **Gate policies only.** Software-permission policies are identity''s `AccessPolicy`, reported by
+        `listAccessPolicyEffectiveness`; see `AccessDynamicPolicy` for which engine governs what.
+
+        '
+      tags:
+      - access
+      x-ticvai-permission: SCOPE_VIEW
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      x-ticvai-read-routing: replica
+      parameters:
+      - name: from
+        in: query
+        required: true
+        schema:
+          type: string
+          format: date-time
+      - name: to
+        in: query
+        required: true
+        schema:
+          type: string
+          format: date-time
+      - name: policyId
+        in: query
+        schema:
+          type: string
+          format: uuid
+      - name: policyType
+        in: query
+        schema:
+          type: string
+          enum:
+          - guestAttribute
+          - accreditation
+          - occupancy
+          - employee
+          - risk
+          - membership
+          - timeEvent
+      - name: venueId
+        in: query
+        schema:
+          type: string
+          format: uuid
+      - $ref: ../shared/common.yaml#/components/parameters/PageSize
+      - $ref: ../shared/common.yaml#/components/parameters/PageCursor
+      responses:
+        '200':
+          description: One row per policy
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: ../shared/common.yaml#/components/schemas/Page
+                - type: object
+                  properties:
+                    items:
+                      type: array
+                      items:
+                        $ref: '#/components/schemas/AccessDynamicPolicyEffectiveness'
+        '422':
+          description: '`to` is before `from`, or the range is longer than 366 days'
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
+  /access-risk-scores:
+    get:
+      operationId: getAccessRiskScore
+      x-ticvai-consumed-by:
+        - "P08 BO-244 Access Security & Fraud Command Center"
+        - "P08 BO-250 Access Risk Scoring & Decision Engine"
+      x-ticvai-audience:
+      - staff
+      x-ticvai-agreed: '29 September: our build plan (3.3.44 "System shall calculate access risk scores"); pack
+        ''Access Control Module'' (BO-250 "convert multiple security signals into a unified access risk score");
+        shape follows listAccessRiskScoring'
+      summary: The current access risk score of a person, credential or device, with its signals
+      description: '3.3.44 (decided 29 September, build pass). **The calculated score the configuration was
+        always for.** `setRiskScoringConfig` sets the bands and the context factors, `setFraudDetectionRule` the
+        weight each signal adds; this returns the result for one subject, credential or device, with every
+        signal and factor that contributed, so a steward or analyst can see *why* a guest is high risk rather
+        than a bare number.
+
+
+        **How it is calculated.** The sum of the weights of the enabled fraud rules whose alerts
+        (`access.security_alert`, not dismissed) concern the target within each rule''s `timeWindow`, plus the
+        contribution of each context factor the scope''s configuration enables, capped at 100 and banded by
+        the scope''s thresholds. An active identity lock or a blacklist entry puts it at `critical` whatever the
+        sum. **This is the same calculation a gate uses** when a dynamic policy of type `risk` tests the score,
+        so what an analyst reads here is what the gate saw.
+
+
+        Exactly one of `subjectId`, `entitlementId` and `deviceId` (`422` otherwise); `404` when it names
+        nothing in this scope.
+
+        '
+      tags:
+      - access
+      x-ticvai-permission: SCOPE_VIEW
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      x-ticvai-read-routing: primary
+      parameters:
+      - name: subjectId
+        in: query
+        schema:
+          type: string
+          format: uuid
+      - name: entitlementId
+        in: query
+        schema:
+          type: string
+          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+      - name: deviceId
+        in: query
+        schema:
+          type: string
+          format: uuid
+      - name: venueId
+        in: query
+        description: The venue whose risk configuration applies; the caller's venue when omitted.
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: The score and what produced it
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessRiskScore'
+        '404':
+          $ref: ../shared/common.yaml#/components/responses/NotFound
+        '422':
+          description: Not exactly one of subjectId, entitlementId and deviceId
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
 
 components:
   schemas:
+    AccessDynamicPolicyEffectiveness:
+      type: object
+      x-ticvai-persistence: none — computed from access.scan_event (dynamicPolicyId, dynamicPolicyResult and override
+        rows) over the requested period, joined to access.dynamic_policy
+      description: One gate admission policy over a period (3.3.48; decided 29 September, build pass).
+      required:
+      - policyId
+      - triggers
+      properties:
+        policyId:
+          type: string
+          format: uuid
+        policyName:
+          type: string
+        policyType:
+          type: string
+          enum:
+          - guestAttribute
+          - accreditation
+          - occupancy
+          - employee
+          - risk
+          - membership
+          - timeEvent
+        status:
+          type: string
+          enum:
+          - draft
+          - pendingApproval
+          - active
+          - inactive
+          - expired
+        versionsInPeriod:
+          type: array
+          items:
+            type: integer
+          description: The versions that decided a scan in the period.
+        triggers:
+          type: integer
+          minimum: 0
+          description: Scans this policy decided.
+        allowed:
+          type: integer
+          minimum: 0
+        denied:
+          type: integer
+          minimum: 0
+        sentToReview:
+          type: integer
+          minimum: 0
+        steppedUp:
+          type: integer
+          minimum: 0
+          description: Scans the policy sent to requireId, requireBiometric, requireCompanion or requireSupervisor.
+        overridden:
+          type: integer
+          minimum: 0
+          description: Denials a supervisor then admitted against (an override row naming the denied scan).
+        overrideRatePercent:
+          type: number
+          minimum: 0
+          maximum: 100
+          nullable: true
+          description: overridden over denied; null when nothing was denied.
+        lastTriggeredAt:
+          type: string
+          format: date-time
+          nullable: true
+        neverTriggered:
+          type: boolean
+          description: Active through the period and decided nothing.
+        trend:
+          type: array
+          description: One point per day in the period, in the venue's time zone.
+          items:
+            type: object
+            properties:
+              date:
+                type: string
+                format: date
+              triggers:
+                type: integer
+              denied:
+                type: integer
+              overridden:
+                type: integer
+    AccessRiskScore:
+      type: object
+      x-ticvai-persistence: none — computed at read time from access.risk_scoring_config, access.fraud_rule,
+        access.security_alert, access.identity_lock and access.blacklist
+      description: The current access risk score of one subject, credential or device, with what produced it
+        (3.3.44; decided 29 September, build pass).
+      required:
+      - score
+      - band
+      - calculatedAt
+      properties:
+        subjectId:
+          type: string
+          format: uuid
+          nullable: true
+        entitlementId:
+          type: string
+          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+          nullable: true
+        deviceId:
+          type: string
+          format: uuid
+          nullable: true
+        scopePath:
+          type: string
+          description: The scope whose risk configuration was applied.
+        score:
+          type: integer
+          minimum: 0
+          maximum: 100
+        band:
+          type: string
+          enum:
+          - low
+          - medium
+          - high
+          - critical
+          description: From the scope's mediumThreshold, highThreshold and criticalThreshold.
+        signals:
+          type: array
+          description: Every fraud signal that contributed, highest weight first.
+          items:
+            type: object
+            properties:
+              fraudRuleId:
+                type: string
+                pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+              signal:
+                type: string
+              weight:
+                type: integer
+              occurrences:
+                type: integer
+              lastDetectedAt:
+                type: string
+                format: date-time
+              alertIds:
+                type: array
+                items:
+                  type: string
+                  format: uuid
+        contextFactors:
+          type: array
+          description: The configured context factors and what each added.
+          items:
+            type: object
+            properties:
+              factor:
+                type: string
+                enum:
+                - venue
+                - product
+                - ticketValue
+                - event
+                - accessZone
+                - time
+                - credentialType
+                - historicalBehavior
+              contribution:
+                type: integer
+        identityLocked:
+          type: boolean
+          description: An active identity lock forces the critical band.
+        blacklisted:
+          type: boolean
+          description: A blacklist entry forces the critical band.
+        calculatedAt:
+          type: string
+          format: date-time
     DeviceBindingPolicyInput:
       type: object
       x-ticvai-persistence: none — request only; written as the deviceBinding row of access.credential_policy (declared
@@ -17584,7 +17997,9 @@ components:
         Merges access.gate_device and access.ble_beacon (a beacon is a device with a proximity threshold) (declared 29
         September, data-model close-out DM1) Registered with registerAccessDevice and changed with updateAccessDevice;
         provisioning stage, versions and health are reported by the device; deviceGroupId is a free deployment label,
-        not a key (decided 29 September, writers pass).'
+        not a key (decided 29 September, writers pass). **tenancy platform.device is the register of record**
+        (29 September, build): this is the topology placement, and lifecycleStatus follows the register through the
+        device.enrolmentChanged event.'
       required:
       - id
       - venueId
@@ -19218,6 +19633,13 @@ components:
           minimum: 1
           nullable: true
           description: faceTagEnrolment rows, required when deletionTrigger is operationalRetentionThreshold. No default and no maximum (client counsel's value)
+        consentCapture:
+          type: string
+          enum:
+          - onScreenAcknowledgement
+          - signedForm
+          nullable: true
+          description: faceTagEnrolment rows. How consent is taken at capture; onScreenAcknowledgement unless set, which needs no signed form (3.2.44; added 29 September, build pass)
         accessContext:
           type: string
           maxLength: 100
@@ -19935,7 +20357,10 @@ components:
     AccessDynamicPolicy:
       type: object
       x-ticvai-persistence: access.dynamic_policy
-      description: One guest-admission dynamic (attribute-based) policy with its current content - type, context or identity it tests, condition expression, result, priority, zones, validity, status and current version. Not identity.access_policy, which is staff permission (declared 29 September, data-model close-out DM1).
+      description: 'One guest-admission dynamic (attribute-based) policy with its current content - type, context or identity it tests, condition expression, result, priority, zones, validity, status and current version. Not identity.access_policy, which is staff permission (declared 29 September, data-model close-out DM1).
+
+
+        **Which of the two policy engines this is** (stated 29 September, build pass). **This one governs who may pass which gate**: admission of a guest, pass holder, accreditation holder or employee at an access point, decided in validation with results a gate acts on (allow, deny, review, requireId, requireBiometric, requireCompanion, requireSupervisor). **identity `AccessPolicy` governs who may do what in the software**: a principal''s permissions on operations and screens, decided by identity `evaluateAccess`. An employee''s badge opening a staff door is decided here; the same employee approving a refund is decided in identity. Effectiveness is reported per engine: `listDynamicPolicyEffectiveness` here, `listAccessPolicyEffectiveness` in identity.'
       required:
       - id
       - scopePath
@@ -20374,8 +20799,11 @@ components:
           - multipleIdentitiesLinked
           - suspiciousCompanionChanges
           - podNannyRelationshipAnomalies
+          - excessiveRefunds
           nullable: true
-          description: signal rules
+          description: 'signal rules. `excessiveRefunds` (added 29 September, build pass, 5.3.33) counts one
+            guest''s refund-driven credential revocations (`access.credential_event`, event refund) within
+            timeWindow against threshold: the buy, use, refund pattern of ticket abuse.'
         signalCategory:
           type: string
           enum:
@@ -21148,6 +21576,16 @@ components:
           description: 'Used only when deletionTrigger is operationalRetentionThreshold, and then required. **No
             default and no maximum here on purpose**: the longest lawful period is the client counsel''s value
             (make-or-break (a), see the operation)'
+        consentCapture:
+          type: string
+          enum:
+          - onScreenAcknowledgement
+          - signedForm
+          default: onScreenAcknowledgement
+          description: 'How consent is taken when a Face Tag is captured (3.2.44; added 29 September, build pass).
+            `onScreenAcknowledgement` is a tap on the counter or gate screen after the notice: explicit, recorded,
+            and no form to sign, which is what the matrix asks. `signedForm` for a venue that wants one. A
+            notice-only capture is not offered (make-or-break on `enrolFaceTag`, CF-35).'
         status:
           type: string
           enum:
@@ -21502,6 +21940,7 @@ components:
           - multipleIdentitiesLinked
           - suspiciousCompanionChanges
           - podNannyRelationshipAnomalies
+          - excessiveRefunds
         signalCategory:
           type: string
           enum:
@@ -22423,6 +22862,13 @@ components:
           format: date-time
           description: '**Resolved at issue from the template, then owned here.** A freeze extends it,
             a reissue replaces it, and neither reaches back to the template.
+
+            **What the pre-expiry notice is measured from** (29 September, build pass, group G2; 5.5.30). A daily
+            run in access publishes `entitlement.expiringSoon` once per entitlement and `validTo` when an
+            entitlement in `issued` or `partiallyConsumed` comes within its template''s `expiryNoticeDays`
+            (`catalogue.EntitlementTemplate`), and not for one bought inside that window. Marketing turns it into
+            the reminder (a `MessageTrigger` on the event, or a triggered campaign on `entitlementExpiring`); access
+            only says the date is near. A freeze or renewal that moves `validTo` raises the next notice once.
 
             '
         entriesUsed:
@@ -23667,6 +24113,31 @@ components:
           nullable: true
           description: The supervisor's justification, on the override row only. The overriding principal
             is that row's `operatorPrincipalId`.
+        dynamicPolicyId:
+          type: string
+          format: uuid
+          nullable: true
+          description: The dynamic access policy (`access.dynamic_policy`) whose result decided this scan; null
+            when no dynamic policy matched and the entitlement alone decided (added 29 September, build pass,
+            3.3.48). `listDynamicPolicyEffectiveness` counts from it.
+        dynamicPolicyVersion:
+          type: integer
+          minimum: 1
+          nullable: true
+          description: The version of that policy in force at the scan, so a report spanning a change counts
+            each version apart.
+        dynamicPolicyResult:
+          type: string
+          enum:
+          - allow
+          - deny
+          - review
+          - requireId
+          - requireBiometric
+          - requireCompanion
+          - requireSupervisor
+          nullable: true
+          description: What the policy decided, which for a step-up is not the same as the scan's outcome.
         quantity:
           type: integer
           minimum: 1
@@ -24086,6 +24557,83 @@ components:
                 nullable: true
               requiresExitBeforeReentry:
                 type: boolean
+        accreditationCredentials:
+          type: array
+          description: Accreditation credentials that admit at this access point, from access.accreditation_credential
+            (29 September, build; BL-181). Only rows that admit are included; a credential dropped from one package
+            to the next no longer admits.
+          items:
+            $ref: '#/components/schemas/AccessAccreditationCredential'
+    AccessAccreditationCredential:
+      type: object
+      x-ticvai-persistence: access.accreditation_credential
+      x-ticvai-agreed: '29 September: build pass (group OWN, from group RA''s handoff; BL-181); the events
+        accreditation.credentialIssued and accreditation.holderStatusChanged name access as their critical consumer'
+      description: '**What a gate needs to admit an accredited person, kept by `access`** (29 September, build).
+        Written only by the consumers of `accreditation.credentialIssued` (a row per credential; a replacement
+        sets the replaced row''s `admits` false) and `accreditation.holderStatusChanged` (every credential of
+        the holder: `admits` false unless the holder is `active`, validity taken from the event). Read by
+        `validateAccess` and shipped in the offline package. The record of truth stays in `accreditation`;
+        this is a copy shaped for the gate, never edited by a person.'
+      required:
+      - id
+      - holderId
+      - encodedIdentifier
+      - admits
+      - scopePath
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: The accreditation credential's id (`credentialId` on the events).
+        holderId:
+          type: string
+          format: uuid
+        programmeId:
+          type: string
+          format: uuid
+          nullable: true
+        kind:
+          type: string
+          description: printedBadge, mobileCredential, qr, nfcCard, rfidCard or wristband, as issued.
+        encodedIdentifier:
+          type: string
+          x-ticvai-unique: tenant
+          description: What the gate reads from the credential. Never sent to webhook subscribers.
+        validFrom:
+          type: string
+          format: date
+          nullable: true
+        validTo:
+          type: string
+          format: date
+          nullable: true
+        zoneIds:
+          type: array
+          description: The holder's effective zones, from the event (`effectiveZones`).
+          items:
+            type: string
+            format: uuid
+        holderStatus:
+          type: string
+          enum:
+          - active
+          - suspended
+          - revoked
+          - expired
+          - archived
+          description: The holder's status as last published; only `active` admits.
+        admits:
+          type: boolean
+          description: False once the credential is replaced or the holder is not active.
+        sourceChangedAt:
+          type: string
+          format: date-time
+          description: The `issuedAt` or `changedAt` of the event last applied; an older event arriving late is
+            ignored.
+        scopePath:
+          type: string
+          description: '**The partition key** (ADR-0005), the accreditation programme''s scope.'
     VirtualTicketCommandCenterView:
       type: object
       x-ticvai-drafted-shape: true
@@ -30662,6 +31210,12 @@ components:
           type: integer
           description: Used when deletionTrigger is operationalRetentionThreshold. No default (make-or-break (a),
             see `setFaceTagTemporaryEnrollment`)
+        consentCapture:
+          type: string
+          enum:
+          - onScreenAcknowledgement
+          - signedForm
+          description: How consent is taken at capture; onScreenAcknowledgement (no form to sign) unless set
     FaceMatchingVerificationThresholdsView:
       type: object
       x-ticvai-drafted-shape: true
@@ -34320,6 +34874,7 @@ components:
           - multipleIdentitiesLinked
           - suspiciousCompanionChanges
           - podNannyRelationshipAnomalies
+          - excessiveRefunds
           description: The fraud signal this rule configures
         severity:
           type: string

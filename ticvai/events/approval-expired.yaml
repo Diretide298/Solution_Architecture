@@ -1,0 +1,36 @@
+# approval.expired v1 — published by approvals
+# Checked by tools/check-states.py against states/ and the contracts.
+
+name: approval.expired
+version: 1
+publisher: approvals
+description: An approval request stopped waiting because nobody decided it before the rule's expiry.
+aggregate: approvalRequest
+emittedWhen: ApprovalStatus pending or escalated to expired (timer, ApprovalRule.expiresAfterMinutes)
+payload:
+- field: requestId
+  type: string
+- field: kind
+  type: string
+- field: subjectContract
+  type: string
+- field: subjectType
+  type: string
+- field: subjectId
+  type: string
+- field: scopePath
+  type: string
+- field: expiredAt
+  type: timestamp
+consumers:
+- context: ai
+  purpose: Close the action plan waiting on it (AI system design section 3.2)
+  idempotencyKey: requestId
+  onFailure: retry
+  isCritical: false
+- context: public-api
+  purpose: Deliver to webhook subscriptions taking approval.expired (11.1.66)
+  idempotencyKey: requestId
+  onFailure: retryThenDeadLetter
+  isCritical: false
+retention: Retained with the request. This is an audit record, not an operational message

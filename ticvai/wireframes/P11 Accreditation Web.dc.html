@@ -189,10 +189,10 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; createAccreditationApplication · submitAccreditationDocument</div>
+          <div><b>OPERATIONS</b> &middot; createAccreditationApplication · submitAccreditationDocument · updateAccreditationApplication</div>
           <div><b>STATES</b> &middot; <span class="">loading · emptyFirstRun · error · denied</span></div>
-          <div><b>ARRIVES WITH</b> &middot; applicationRef&larr;deepLink</div>
-          <div><b>GOES TO</b> &middot; <a href="#acc-001">ACC-001</a> <br><a href="#acc-003">ACC-003</a>  &mdash; <i>Application Review &amp; Submit</i> <span class="car">applicationRef</span><br><a href="#acc-007">ACC-007</a>  &mdash; <i>A reviewer checks and approves</i> <span class="car">applicationId</span></div>
+          <div><b>ARRIVES WITH</b> &middot; applicationRef&larr;deepLink, applicationId&larr;navigation</div>
+          <div><b>GOES TO</b> &middot; <a href="#acc-001">ACC-001</a> <br><a href="#acc-003">ACC-003</a>  &mdash; <i>Application Review &amp; Submit</i> <span class="car">applicationId · applicationRef</span><br><a href="#acc-007">ACC-007</a>  &mdash; <i>A reviewer checks and approves</i> <span class="car">applicationId · documentId</span></div>
           
           <div><b>OVERLAYS</b><div class="ov"><b>confirmDialog</b> saveAndExit &middot; <i>Save and finish later</i></div></div>
         </div>
@@ -221,10 +221,10 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; createAccreditationApplication</div>
+          <div><b>OPERATIONS</b> &middot; createAccreditationApplication · submitAccreditationApplication · updateAccreditationApplication</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · denied · emptyNoResults · emptyFirstRun</span></div>
-          <div><b>ARRIVES WITH</b> &middot; applicationRef&larr;ACC-002</div>
-          <div><b>GOES TO</b> &middot; <a href="#acc-002">ACC-002</a>  &mdash; <i>Registration Form</i> <span class="car">applicationRef</span><br><a href="#acc-004">ACC-004</a>  &mdash; <i>Application Status Tracking</i> <span class="car">applicationRef</span></div>
+          <div><b>ARRIVES WITH</b> &middot; applicationRef&larr;ACC-002, applicationId&larr;navigation</div>
+          <div><b>GOES TO</b> &middot; <a href="#acc-002">ACC-002</a>  &mdash; <i>Registration Form</i> <span class="car">applicationId · applicationRef</span><br><a href="#acc-004">ACC-004</a>  &mdash; <i>Application Status Tracking</i> <span class="car">applicationId · applicationRef</span></div>
           
           <div><b>OVERLAYS</b><div class="ov"><b>confirmDialog</b> submitConfirm &middot; <i>Submit application</i></div></div>
         </div>
@@ -252,10 +252,10 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; listAccreditationApplications</div>
+          <div><b>OPERATIONS</b> &middot; listMyAccreditationApplications · withdrawAccreditationApplication · submitAccreditationDocument · updateAccreditationApplication +1</div>
           <div><b>STATES</b> &middot; <span class="">loading · emptyNoResults · error · denied · emptyFirstRun</span></div>
-          <div><b>ARRIVES WITH</b> &middot; applicationRef&larr;deepLink</div>
-          <div><b>GOES TO</b> &middot; <a href="#acc-001">ACC-001</a> <br><a href="#acc-005">ACC-005</a>  &mdash; <i>Accreditation Badge</i> <span class="car">applicationRef</span></div>
+          <div><b>ARRIVES WITH</b> &middot; applicationRef&larr;deepLink, applicationId&larr;navigation</div>
+          <div><b>GOES TO</b> &middot; <a href="#acc-001">ACC-001</a> <br><a href="#acc-005">ACC-005</a>  &mdash; <i>Accreditation Badge</i> <span class="car">applicationRef · holderId</span></div>
           
           <div><b>OVERLAYS</b><div class="ov"><b>confirmDialog</b> confirmWithdraw &middot; <i>Withdraw this application</i></div></div>
         </div>
@@ -284,9 +284,9 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; listAccreditationCredentials · issueAccreditationCredential</div>
+          <div><b>OPERATIONS</b> &middot; listMyAccreditationCredentials · issueMyAccreditationWalletPass · renewAccreditation</div>
           <div><b>STATES</b> &middot; <span class="warn">loading · emptyNoResults · error · offline · emptyFirstRun</span></div>
-          <div><b>ARRIVES WITH</b> &middot; applicationRef&larr;ACC-004</div>
+          <div><b>ARRIVES WITH</b> &middot; applicationRef&larr;ACC-004, credentialId&larr;navigation, holderId&larr;navigation</div>
           <div><b>GOES TO</b> &middot; <a href="#acc-004">ACC-004</a>  &mdash; <i>Application Status Tracking</i> <span class="car">applicationRef</span></div>
           
           
@@ -318,7 +318,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           <div><b>OPERATIONS</b> &middot; listAccreditationApplications</div>
           <div><b>STATES</b> &middot; <span class="">loading · emptyFirstRun · emptyNoResults · emptyNoAccess · error</span></div>
           <div><b>ARRIVES WITH</b> &middot; programmeId&larr;session</div>
-          <div><b>GOES TO</b> &middot; <a href="#acc-007">ACC-007</a>  &mdash; <i>Reviewer Application Detail</i><br><a href="#acc-008">ACC-008</a>  &mdash; <i>Credential Register</i></div>
+          <div><b>GOES TO</b> &middot; <a href="#acc-007">ACC-007</a>  &mdash; <i>Reviewer Application Detail</i> <span class="car">documentId</span><br><a href="#acc-008">ACC-008</a>  &mdash; <i>Credential Register</i></div>
           
           
         </div>
@@ -347,10 +347,10 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; listAccreditationApplications · decideAccreditationApplication</div>
+          <div><b>OPERATIONS</b> &middot; decideAccreditationApplication · getAccreditationApplication · listAccreditationDocuments · verifyAccreditationDocument</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyNoAccess · emptyNoResults · emptyFirstRun</span></div>
-          <div><b>ARRIVES WITH</b> &middot; applicationId&larr;ACC-006</div>
-          <div><b>GOES TO</b> &middot; <a href="#acc-005">ACC-005</a>  &mdash; <i>The badge is issued</i><br><a href="#acc-006">ACC-006</a>  &mdash; <i>Reviewer Queue</i><br><a href="#acc-008">ACC-008</a>  &mdash; <i>Credential Register</i></div>
+          <div><b>ARRIVES WITH</b> &middot; applicationId&larr;ACC-006, documentId&larr;navigation</div>
+          <div><b>GOES TO</b> &middot; <a href="#acc-005">ACC-005</a>  &mdash; <i>The badge is issued</i> <span class="car">holderId</span><br><a href="#acc-006">ACC-006</a>  &mdash; <i>Reviewer Queue</i><br><a href="#acc-008">ACC-008</a>  &mdash; <i>Credential Register</i></div>
           
           <div><b>OVERLAYS</b><div class="ov"><b>confirmDialog</b> refuse &middot; <i>Refuse</i></div><div class="ov"><b>drawer</b> approveWithConditions &middot; <i>Approve</i></div></div>
         </div>

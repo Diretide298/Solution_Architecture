@@ -1,0 +1,63 @@
+# AI incident — state model
+# Contract: ai.AiIncident.status
+# Checked by tools/check-states.py. Added 29 September (build pass, group OWN, from the AI group's handoff).
+
+entity: AI incident
+contract: ai
+enum: AiIncident.status
+enumKind: inline
+enumSchema: AiIncident
+enumProperty: status
+owner: ai
+description: '**An AI governance incident** (ADM-556): detection, containment, investigation, remediation and
+  closure. Kept separate from operational incidents and linked where both apply (AIC-250).'
+initial:
+- open
+terminal:
+- closed
+transitions:
+- from: open
+  to: contained
+  operation: containAiIncident
+  trigger: operation
+  guard: '**Records containment and performs it**: pause a capability, roll back a release, revoke an exception
+    or disable a tool, each the same as its own operation and recorded on the incident. Stamps `containedAt`'
+- from: contained
+  to: investigating
+  trigger: operation
+  guard: The owner starts working out the root cause. **No operation in `ai.yaml` records this yet** (see
+    openQuestions)
+- from: investigating
+  to: remediating
+  trigger: operation
+  guard: The root cause is known and the remediation is under way. **No operation in `ai.yaml` records this
+    yet** (see openQuestions)
+- from: contained
+  to: closed
+  operation: closeAiIncident
+  trigger: operation
+  guard: Closed with a root cause and the remediation taken. An incident never contained is refused (`409
+    incident-not-contained`)
+- from: investigating
+  to: closed
+  operation: closeAiIncident
+  trigger: operation
+  guard: Closed with a root cause and the remediation taken
+- from: remediating
+  to: closed
+  operation: closeAiIncident
+  trigger: operation
+  guard: Closed with a root cause and the remediation taken
+notes: '**Created already `open`.** `openAiIncident`, and `decideAiGovernanceAlert` with decision `openIncident`,
+  create the incident in `open` and publish `ai.incidentOpened` on creation, as the event''s `emittedWhen` says,
+  because there is no from-state for a transition to carry it. So no transition here emits it.
+
+
+  `containAiIncident` may be called again on a contained or later incident to record further containment; it
+  changes no status then, and is refused only once the incident is closed (`409 incident-closed`). `closed` is
+  final: a recurrence is a new incident.'
+openQuestions:
+- '`investigating` and `remediating` are in the enum and no `ai.yaml` operation writes them: only
+  `openAiIncident`, `containAiIncident` and `closeAiIncident` exist. An operation that records progress (for
+  example `recordAiIncidentProgress` with the new status) would give those moves an operation; handed back to
+  the AI group.'

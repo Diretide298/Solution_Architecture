@@ -17,6 +17,13 @@ payload:
 - field: entitlementIds
   type: array
   notes: What was issued
+- field: lines
+  type: array
+  required: false
+  notes: 'Added 29 September (build, AI system design 2.2 A step 8), optional so older consumers are
+    unaffected: per order line `lineId`, `variantId`, `quantity`, `grossAmount` and `recommendationId`
+    (the ai `decideRecommendations` trackingId the line came from, carried from the cart line; null when
+    none)'
 consumers:
 - context: marketing
   purpose: Close the purchase journey and trigger post-visit campaigns
@@ -27,6 +34,12 @@ consumers:
   purpose: Fulfilment metrics
   idempotencyKey: orderId
   onFailure: retry
+  isCritical: false
+- context: ai
+  purpose: Recommendation attribution through the order lines' recommendationId, and forecasting actuals
+    for delivered demand (AI system design section 3.2)
+  idempotencyKey: orderId
+  onFailure: retryThenDeadLetter
   isCritical: false
 retention: 30 days after publication
 notes: 'Distinct from order.paid. Paid is money; completed is delivery, and the gap between them is

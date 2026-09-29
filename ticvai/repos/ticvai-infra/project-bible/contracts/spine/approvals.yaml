@@ -2,7 +2,7 @@ openapi: 3.1.0
 info:
   title: TICVAI — Approvals
   version: 1.0.0
-  x-ticvai-screen-count: 43
+  x-ticvai-screen-count: 46
   x-ticvai-module: 11 — Approval Workflows and Governance
   x-ticvai-platforms:
   - P04 POS
@@ -54,10 +54,24 @@ info:
 
     ## Deliberately absent
 
-    **Risk scoring and AI recommendations** (11.1.12, 11.1.72–11.1.75) need history to score against and
-    are parked with the rest of the model-dependent AI. The routing rule accepts a `riskScore` today and
-    nothing supplies one — the field exists so that adding the engine later is configuration rather than
-    a schema change.
+    **AI recommendations on the decision itself** (11.1.72). The MoM of 8 September settled that AI in
+    approvals is analytics only: **AI never recommends, influences or makes an approve or reject.**
+
+
+    ## AI context for the reviewer (29 September, build pass, group G2)
+
+    **11.1.73 to 11.1.75, inside that rule.** When a request is submitted (`createApprovalRequest` without
+    saving a draft, `submitApprovalRequest`, `resubmitApprovalRequest`) and on every SLA tick of a pending
+    request, approvals calls `ai.scoreApprovalRequest` (service audience, trigger `submitted`, `resubmitted`
+    or `slaTick`, 300 ms, fail-open) and stores what comes back on the request as `aiAssessment`: a risk score and band for
+    the request (the requester''s entity risk, the amount against the requester''s history, the subject''s
+    own signals), a priority score, a suggested escalation (`escalate`, `addBackupApprover` or `none`, with
+    the reason) and the decision record id. **It is context for the person, never an input to the
+    decision**: it is shown beside the request, it can order the inbox (`listApprovalRequests`
+    `sort=aiPriority`), and a person may act on the escalation suggestion through
+    `escalateApprovalRequest`. It does not approve, reject, route or escalate anything by itself, and
+    `ApprovalRule.riskScoreAbove` does not read it (see there). If AI is off or the call fails, the
+    request is routed and decided exactly as before, with `aiAssessment` null.
 
     '
   contact:
@@ -89,9 +103,11 @@ paths:
         - "P08 BO-365 My Approval Inbox"
         - "P08 BO-366 Team / Shared Approval Queue"
         - "P08 BO-367 Approval Request Detail"
+        - "P08 BO-368 AI Decision Support"
         - "P08 BO-369 High Priority & Risk Queue"
         - "P08 BO-371 Completed Approval History"
         - "P08 BO-375 Business Context & Evidence Viewer"
+        - "P08 BO-393 AI SLA & Escalation Advisor"
         - "P08 BO-940 Manager Mobile Approval Center"
         - "P09 ADM-145 Promotion Approval Inbox"
         - "P09 ADM-249 Unified Approval Inbox & Decision Workspace"
@@ -136,6 +152,17 @@ paths:
         description: 11.1.15. What is about to miss its SLA.
         schema:
           type: integer
+      - name: sort
+        in: query
+        description: '`slaProximity` (the default, as before) or `aiPriority`: highest `aiAssessment.priorityScore`
+          first, requests with no assessment after them in SLA order (29 September, build pass, group G2;
+          11.1.74). Ordering the inbox is the only thing the score does.'
+        schema:
+          type: string
+          enum:
+          - slaProximity
+          - aiPriority
+          default: slaProximity
       - $ref: ../shared/common.yaml#/components/parameters/PageSize
       - $ref: ../shared/common.yaml#/components/parameters/PageCursor
       responses:
@@ -251,6 +278,12 @@ paths:
         close-out).** From `returned` or `informationRequested` it resubmits the same request: routing
         resumes at the level that sent it back, on the matrix version already fixed on the request (R129),
         and the SLA clock restarts.
+
+        **Asks AI for reviewer context, after routing** (29 September, build pass, group G2; 11.1.73 to
+        11.1.75). Once the request is routed, approvals calls `ai.scoreApprovalRequest` and stores the answer
+        as `aiAssessment`; the same call is repeated on each SLA tick while the request is pending. The call is
+        outside the routing decision and the transaction: a slow or failed call leaves `aiAssessment` null
+        and changes nothing else. **Context only (MoM 8 September)**.
 
         '
       tags:
@@ -462,7 +495,8 @@ paths:
             (`insufficientPermission`), gave no step-up token where the rule requires MFA
             (`mfaRequired`) or no signature where it requires one (`signatureRequired`), is deciding
             through a delegation that has ended (`delegationExpired`), or has already decided at this
-            level (`alreadyDecidedAtThisLevel`). The shared `Forbidden`, with no `refusedReason`, is the
+            level (`alreadyDecidedAtThisLevel`), or the level is waiting on an external workflow system
+            (`levelDecidedExternally`, 11.1.65). The shared `Forbidden`, with no `refusedReason`, is the
             caller lacking `APPROVAL_DECIDE` at all.
 
             '
@@ -551,6 +585,7 @@ paths:
       x-ticvai-consumed-by:
         - "P08 BO-084 Approval Inbox"
         - "P08 BO-370 Escalated Approval Center"
+        - "P08 BO-393 AI SLA & Escalation Advisor"
         - "P08 BO-641 Escalation & Exception Management"
       x-ticvai-audience:
       - staff
@@ -3097,6 +3132,276 @@ paths:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
 
+  /approval-external-providers:
+    get:
+      operationId: listApprovalExternalProviders
+      x-ticvai-consumed-by:
+        - "P09 ADM-349 Approval Integration Command Center"
+        - "P09 ADM-354 External Workflow System Integration"
+      x-ticvai-agreed: '29 September: re-trace 11.1.65 (no registration of a third-party workflow system
+        as a step or approver); MoM 8 Sep (API/webhook/external workflow integration with data mapping and
+        retry); our build plan; shape follows listApprovalDelegations, paged as tenancy listDevices'
+      x-ticvai-audience:
+      - staff
+      summary: The external workflow systems approval levels may be sent to
+      description: '11.1.65. Every third-party workflow system registered to decide an approval level, with
+        its endpoint, mappings, timeout and status. Secrets are never returned.
+
+        '
+      tags:
+      - matrix
+      x-ticvai-permission: APPROVAL_VIEW
+      x-ticvai-scope-level: tenant
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      x-ticvai-read-routing: replica
+      parameters:
+      - name: status
+        in: query
+        required: false
+        schema:
+          type: string
+          enum:
+          - active
+          - paused
+          - disabled
+      - $ref: ../shared/common.yaml#/components/parameters/PageSize
+      - $ref: ../shared/common.yaml#/components/parameters/PageCursor
+      responses:
+        '200':
+          description: Providers
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: ../shared/common.yaml#/components/schemas/Page
+                - type: object
+                  properties:
+                    items:
+                      type: array
+                      items:
+                        $ref: '#/components/schemas/ApprovalExternalProvider'
+    put:
+      operationId: setApprovalExternalProvider
+      x-ticvai-consumed-by:
+        - "P09 ADM-354 External Workflow System Integration"
+      x-ticvai-agreed: '29 September: re-trace 11.1.65 (external workflow connector: endpoint, mapping,
+        callback into the decision); MoM 8 Sep (external workflow integration with data mapping and retry);
+        our build plan; shape follows setApprovalSlaPolicy'
+      x-ticvai-audience:
+      - staff
+      summary: Register a third-party workflow system as an approver
+      description: '11.1.65. **A client that already runs approvals in ServiceNow, SAP or its own workflow
+        tool can have a level decided there**, instead of re-keying the same decision in two systems. A rule
+        names the provider (`ApprovalRule.externalProviderId`); when a request reaches that level, TICVAI
+        sends the provider the request mapped through `requestMapping`, signed, with retry, and waits for
+        the provider to call `recordExternalApprovalDecision`.
+
+
+        **The provider decides a level; it does not replace the controls.** Segregation of duties, the
+        reason on a rejection and the immutability of a completed record hold exactly as for a person. If the
+        provider does not answer inside `timeoutMinutes`, `onTimeout` says what happens — by default the
+        level falls back to the rule''s `approverRoleIds`, so a dead integration cannot hold a refund for
+        ever.
+
+
+        **PUT semantics — an upsert keyed on `code`**, as `setApprovalSlaPolicy`. Where no provider has that
+        `code` one is created (`201`); where one does, the body replaces it whole (`200`). `id`, `status`
+        changes by the platform, and `lastSuccessAt` are the server''s. `outboundCredential` and
+        `signingSecret` are write-only; omitting them on a replace keeps the stored ones. An `endpointUrl`
+        that is not `https`, an `apiClientId` that is not an active API client of the tenant, or a
+        `decisionMapping` that maps no value to `approve` and `reject` is `422`.
+
+        '
+      tags:
+      - matrix
+      x-ticvai-permission: APPROVAL_CONFIGURE
+      x-ticvai-scope-level: tenant
+      x-ticvai-config-scope: tenant
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ApprovalExternalProvider'
+      responses:
+        '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: Set — an existing provider with this `code`, replaced
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApprovalExternalProvider'
+        '201':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: Created — no provider had this `code`
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApprovalExternalProvider'
+        '422':
+          description: The endpoint is not `https`, the API client is not an active client of the tenant, or
+            the decision mapping has no value for `approve` or for `reject`
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
+  /approval-external-dispatches:
+    get:
+      operationId: listApprovalExternalDispatches
+      x-ticvai-consumed-by:
+        - "P09 ADM-349 Approval Integration Command Center"
+        - "P09 ADM-357 Integration Monitoring, Error & Retry Center"
+      x-ticvai-agreed: '29 September: re-trace 11.1.65 (retry and failure handling of the external
+        connector); our build plan; shape follows listApprovedActionExecutions'
+      x-ticvai-audience:
+      - staff
+      summary: What was sent to external workflow systems, and what came back
+      description: '11.1.65. One row per request level sent to a provider: when, how many attempts, the
+        provider''s own reference, and whether it answered, failed or timed out. **The integration''s
+        delivery log** — without it a level stuck in somebody else''s system is a support ticket.
+
+        '
+      tags:
+      - request
+      x-ticvai-permission: APPROVAL_VIEW
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      x-ticvai-read-routing: replica
+      parameters:
+      - name: providerId
+        in: query
+        required: false
+        schema:
+          type: string
+          format: uuid
+      - name: requestId
+        in: query
+        required: false
+        schema:
+          type: string
+          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+      - name: status
+        in: query
+        required: false
+        schema:
+          type: string
+          enum:
+          - pending
+          - sent
+          - failed
+          - decided
+          - timedOut
+          - cancelled
+      - $ref: ../shared/common.yaml#/components/parameters/PageSize
+      - $ref: ../shared/common.yaml#/components/parameters/PageCursor
+      responses:
+        '200':
+          description: Dispatches
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: ../shared/common.yaml#/components/schemas/Page
+                - type: object
+                  properties:
+                    items:
+                      type: array
+                      items:
+                        $ref: '#/components/schemas/ApprovalExternalDispatch'
+  /approval-requests/{requestId}/external-decision:
+    parameters:
+    - name: requestId
+      in: path
+      required: true
+      schema:
+        type: string
+        pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+    post:
+      operationId: recordExternalApprovalDecision
+      x-ticvai-agreed: '29 September: re-trace 11.1.65 (decision callback into the approval); our build
+        plan; shape follows decideApprovalRequest'
+      x-ticvai-no-screen: machine-to-machine callback from a registered external workflow system; people
+        decide through decideApprovalRequest
+      x-ticvai-audience:
+      - partner
+      summary: An external workflow system returns its decision on a level
+      description: '11.1.65. **The callback.** The provider named on the request''s current level answers
+        here, authenticated as its API client (`ApprovalExternalProvider.apiClientId`, holding
+        `APPROVAL_DECIDE`). Its own outcome value is translated through `decisionMapping` into approve,
+        reject, return or request information, and the level is then decided exactly as
+        `decideApprovalRequest` decides it — the chain advances, completes or goes back to the requester.
+
+
+        **The same controls as a person.** A rejection needs a `reason`; a decision naming the requester as
+        approver (`externalApproverRef` matching the requester''s reference sent in the mapped payload) is
+        refused `approverIsRequester`; a caller that is not the provider for the current level is refused
+        `notExternalProvider`. The external approver is recorded on the decision, so *who approved this* has
+        an answer even when it was somebody in another system.
+
+
+        **Idempotent on `externalReference`.** A provider retrying its callback gets the same answer, not a
+        second decision.
+
+        '
+      tags:
+      - request
+      x-ticvai-permission: APPROVAL_DECIDE
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ApprovalExternalDecision'
+      responses:
+        '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: Decided. On a multi-level chain the request advances to the next level.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApprovalRequest'
+        '403':
+          description: '`notExternalProvider` (the caller is not the provider the current level was sent
+            to) or `approverIsRequester`. Carries `refusedReason`.
+
+            '
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ApprovalRefusedProblem'
+        '404':
+          $ref: ../shared/common.yaml#/components/responses/NotFound
+        '409':
+          description: The request is no longer open for a decision (`alreadyDecided`, `withdrawn`,
+            `expired`, `cancelled`), or the level already fell back to people on timeout.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ApprovalStateProblem'
+        '422':
+          description: The `outcome` is not in the provider's `decisionMapping`, or a rejection came with no
+            `reason`.
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
 components:
   securitySchemes:
     bearerAuth:
@@ -3626,6 +3931,239 @@ components:
             $ref: '#/components/schemas/ApprovalKind'
         scopePath:
           type: string
+    ApprovalExternalProvider:
+      type: object
+      x-ticvai-persistence: approvals.external_provider
+      description: '11.1.65 (29 September, build pass). **A third-party workflow system registered to decide
+        approval levels**: where TICVAI sends a request, how its fields are mapped, how the answer comes
+        back and what happens when it does not.
+
+        '
+      required:
+      - code
+      - name
+      - endpointUrl
+      - apiClientId
+      - decisionMapping
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        code:
+          type: string
+          x-ticvai-unique: tenant
+          description: The provider's stable name, and the key `setApprovalExternalProvider` upserts on.
+        name:
+          type: string
+        endpointUrl:
+          type: string
+          description: '`https` only. Where a request level is sent.'
+        outboundAuth:
+          type: string
+          enum:
+          - bearerToken
+          - basic
+          - oauthClientCredentials
+          - mutualTls
+          default: oauthClientCredentials
+        outboundCredential:
+          type: string
+          format: password
+          writeOnly: true
+          nullable: true
+          description: The credential TICVAI presents to the provider. Write-only, never returned, kept on a
+            replace that omits it.
+        signingSecret:
+          type: string
+          format: password
+          writeOnly: true
+          nullable: true
+          description: 'Signs every request TICVAI sends, as webhook deliveries are signed, so the provider
+            can tell it came from TICVAI. Write-only.
+
+            '
+        apiClientId:
+          type: string
+          format: uuid
+          description: 'The public-api client the provider calls back as. It must hold `APPROVAL_DECIDE`;
+            `recordExternalApprovalDecision` from any other client is refused.
+
+            '
+        requestMapping:
+          type: array
+          description: 'Which request fields go to the provider, under which names. **Only mapped fields
+            leave TICVAI** — a provider receives the amount and the subject it needs, not the whole
+            request.
+
+            '
+          items:
+            type: object
+            required:
+            - from
+            - to
+            properties:
+              from:
+                type: string
+                description: A field of `ApprovalRequest`, e.g. `amount`, `kind`, `subjectId`,
+                  `requestedByPrincipalId`.
+              to:
+                type: string
+                description: The provider's field name.
+        decisionMapping:
+          type: array
+          minItems: 2
+          description: The provider's outcome values and the decision each means. At least one maps to
+            `approve` and one to `reject`.
+          items:
+            type: object
+            required:
+            - externalValue
+            - decision
+            properties:
+              externalValue:
+                type: string
+              decision:
+                type: string
+                enum:
+                - approve
+                - reject
+                - return
+                - requestInformation
+        timeoutMinutes:
+          type: integer
+          default: 1440
+          description: How long a level waits for the provider before `onTimeout` applies.
+        onTimeout:
+          type: string
+          enum:
+          - fallBackToRoles
+          - escalate
+          - reject
+          default: fallBackToRoles
+        maxAttempts:
+          type: integer
+          default: 5
+          description: Delivery attempts, with backoff, before a dispatch is `failed` and the level falls
+            back as on timeout.
+        status:
+          type: string
+          enum:
+          - active
+          - paused
+          - disabled
+          default: active
+          description: '`paused` sends nothing and every level that names it falls back at once; the
+            platform sets `disabled` after repeated failures, as it disables a failing webhook.
+
+            '
+        lastSuccessAt:
+          type: string
+          format: date-time
+          nullable: true
+          readOnly: true
+        scopePath:
+          type: string
+          readOnly: true
+    ApprovalExternalDispatch:
+      type: object
+      x-ticvai-persistence: approvals.external_dispatch
+      description: '11.1.65 (29 September, build pass). **One request level sent to an external workflow
+        system**, and what became of it. Written by the platform when a level that names a provider is
+        reached, and closed by `recordExternalApprovalDecision` or by the timeout.
+
+        '
+      required:
+      - id
+      - requestId
+      - providerId
+      - level
+      - status
+      properties:
+        id:
+          type: string
+          format: uuid
+        requestId:
+          type: string
+          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+        providerId:
+          type: string
+          format: uuid
+        level:
+          type: integer
+        status:
+          type: string
+          enum:
+          - pending
+          - sent
+          - failed
+          - decided
+          - timedOut
+          - cancelled
+        attemptCount:
+          type: integer
+          default: 0
+        externalReference:
+          type: string
+          nullable: true
+          description: The provider's own id for the item, as it acknowledged or called back with.
+        lastResponseCode:
+          type: integer
+          nullable: true
+        lastError:
+          type: string
+          nullable: true
+        sentAt:
+          type: string
+          format: date-time
+          nullable: true
+        answeredAt:
+          type: string
+          format: date-time
+          nullable: true
+        externalOutcome:
+          type: string
+          nullable: true
+          description: The provider's own outcome value, before mapping.
+        externalApproverRef:
+          type: string
+          nullable: true
+          description: Who decided in the provider's system, as it named them.
+        scopePath:
+          type: string
+    ApprovalExternalDecision:
+      type: object
+      x-ticvai-persistence: none — request only; closes approvals.external_dispatch and writes approvals.decision
+      required:
+      - externalReference
+      - outcome
+      properties:
+        externalReference:
+          type: string
+          description: The provider's id for the item. What makes a retried callback the same call.
+        outcome:
+          type: string
+          description: The provider's own outcome value, translated through `decisionMapping`.
+        externalApproverRef:
+          type: string
+          nullable: true
+          description: Who decided, in the provider's terms.
+        externalApproverName:
+          type: string
+          nullable: true
+        comment:
+          type: string
+          maxLength: 1000
+          nullable: true
+        reason:
+          type: string
+          maxLength: 500
+          nullable: true
+          description: Required when the outcome maps to `reject`.
+        decidedAt:
+          type: string
+          format: date-time
+          nullable: true
     ApprovalRetentionPolicy:
       type: object
       x-ticvai-persistence: approvals.retention_policy
@@ -3640,6 +4178,13 @@ components:
             $ref: '#/components/schemas/ApprovalKind'
         retainYears:
           type: integer
+          nullable: true
+          description: '**Null takes the tenant''s `approvalRecord` retention setting** (tenancy
+            `setDataRetentionSetting`; decided 29 September, all data retention is tenant configuration).
+            A value here applies to the request kinds this policy names and may only lengthen what the tenant
+            setting keeps.
+
+            '
         retainSignatures:
           type: boolean
           default: true
@@ -3870,8 +4415,12 @@ components:
         riskScoreAbove:
           type: number
           nullable: true
-          description: '11.1.12. **Nothing supplies this yet** — risk scoring is parked with the model-dependent
-            AI. The field exists so adding the engine later is configuration rather than a schema change.
+          description: '11.1.12. **Not matched against the AI risk score** (29 September, build pass, group G2).
+            The AI assessment on a request (`ApprovalRequest.aiAssessment`, from `ai.scoreApprovalRequest`) is
+            context for the reviewer only (MoM 8 September: AI never influences approve or reject), and routing
+            a request to more approvers because of it would be influence. A rule with this set matches only a
+            `riskScore` the requesting contract passes in `attributes` from its own deterministic rules (a
+            payment''s rule score, for example). Using the AI score here needs the client to say so.
 
             '
         condition:
@@ -3932,6 +4481,16 @@ components:
           type: integer
           nullable: true
           description: 11.1.53. An unanswered request eventually stops waiting.
+        externalProviderId:
+          type: string
+          format: uuid
+          nullable: true
+          description: '11.1.65 (29 September). **This level is decided in an external workflow system**
+            (`ApprovalExternalProvider`) rather than by a person in TICVAI. `approverRoleIds` stay required:
+            they are who decides if the provider does not answer in time and its `onTimeout` is
+            `fallBackToRoles`.
+
+            '
     ApprovalMatrix:
       type: object
       x-ticvai-persistence: approvals.matrix
@@ -4253,6 +4812,69 @@ components:
           type: string
           format: date-time
           nullable: true
+        aiAssessment:
+          type: object
+          nullable: true
+          readOnly: true
+          description: '**AI context for the reviewer, never an input to the decision** (11.1.73 to 11.1.75; MoM 8
+            September; 29 September, build pass, group G2). Written by approvals from `ai.scoreApprovalRequest` on
+            submit and on each SLA tick; null where AI is off or has not answered. Shown on the request labelled as
+            AI; orders the inbox only when `sort=aiPriority` is asked for.'
+          properties:
+            riskScore:
+              type: integer
+              minimum: 0
+              maximum: 100
+            riskBand:
+              type: string
+              enum:
+              - low
+              - medium
+              - high
+              - critical
+            priorityScore:
+              type: integer
+              minimum: 0
+              maximum: 100
+            escalationSuggestion:
+              type: object
+              description: A suggestion a person may act on through `escalateApprovalRequest`, or the tenant's own
+                SLA policy may; nothing escalates because of it.
+              properties:
+                action:
+                  type: string
+                  enum:
+                  - escalate
+                  - addBackupApprover
+                  - none
+                reason:
+                  type: string
+                  nullable: true
+            signals:
+              type: array
+              maxItems: 10
+              description: The signals behind the scores, largest first, as `ai.AiApprovalRequestScore.signals`.
+              items:
+                type: object
+                properties:
+                  code:
+                    type: string
+                  contribution:
+                    type: number
+                  detail:
+                    type: string
+                    nullable: true
+            scoreId:
+              type: string
+              format: uuid
+              description: The `ai.approval_request_score` row it was copied from; `ai.getApprovalRequestScore` gives
+                the full context. Not a foreign key (the score lives in the AI service).
+            decisionRecordId:
+              type: string
+              description: The ai decision record, for the audit of what the AI said and why.
+            assessedAt:
+              type: string
+              format: date-time
     ApprovalDelegation:
       type: object
       x-ticvai-persistence: approvals.delegation
@@ -4329,6 +4951,12 @@ components:
         properties:
           refusedReason:
             type: string
+            description: '`levelDecidedExternally` (29 September): the current level waits on an external
+              workflow system and a person cannot decide it until it falls back on timeout.
+              `notExternalProvider`: `recordExternalApprovalDecision` called by a client that is not the
+              provider the level was sent to.
+
+              '
             enum:
             - approverIsRequester
             - notInApproverChain
@@ -4337,6 +4965,8 @@ components:
             - signatureRequired
             - delegationExpired
             - alreadyDecidedAtThisLevel
+            - levelDecidedExternally
+            - notExternalProvider
     ApprovalStateProblem:
       x-ticvai-persistence: none — error shape
       description: 'A request is not in a state that allows the call. Returned as `409` by

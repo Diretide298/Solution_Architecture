@@ -1468,6 +1468,10 @@ paths:
       - staff
       - partner
       summary: Create a product
+      description: '**Accepts `Prefer: validate-only`** (29 September, build): validates and answers 200
+        with the would-be result without writing, for the AI executor''s plan validation.
+
+        '
       tags:
       - product
       x-ticvai-permission: PRODUCT_CONFIGURE
@@ -1476,6 +1480,7 @@ paths:
       x-ticvai-conflict-policy: serverWins
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      - $ref: ../shared/common.yaml#/components/parameters/PreferValidateOnly
       requestBody:
         required: true
         content:
@@ -1483,6 +1488,12 @@ paths:
             schema:
               $ref: '#/components/schemas/CreateProductRequest'
       responses:
+        '200':
+          description: 'Validate-only: the would-be result, nothing written'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Product'
         '201':
           headers:
             X-Consistency-Token:
@@ -1829,6 +1840,10 @@ paths:
       - staff
       - partner
       summary: Update a product
+      description: '**Accepts `Prefer: validate-only`** (29 September, build): validates and answers 200
+        with the would-be result without writing, for the AI executor''s plan validation.
+
+        '
       tags:
       - product
       x-ticvai-permission: PRODUCT_CONFIGURE
@@ -1837,6 +1852,7 @@ paths:
       x-ticvai-conflict-policy: serverWins
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      - $ref: ../shared/common.yaml#/components/parameters/PreferValidateOnly
       requestBody:
         required: true
         content:
@@ -2167,6 +2183,10 @@ paths:
       - staff
       - partner
       summary: Create a price list
+      description: '**Accepts `Prefer: validate-only`** (29 September, build): validates and answers 200
+        with the would-be result without writing, for the AI executor''s plan validation.
+
+        '
       tags:
       - pricing
       x-ticvai-permission: PRICE_CONFIGURE
@@ -2175,6 +2195,7 @@ paths:
       x-ticvai-conflict-policy: serverWins
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      - $ref: ../shared/common.yaml#/components/parameters/PreferValidateOnly
       requestBody:
         required: true
         content:
@@ -2182,6 +2203,12 @@ paths:
             schema:
               $ref: '#/components/schemas/CreatePriceListRequest'
       responses:
+        '200':
+          description: 'Validate-only: the would-be result, nothing written'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PriceList'
         '201':
           headers:
             X-Consistency-Token:
@@ -2249,6 +2276,9 @@ paths:
       description: 'Currency must match the region''s currency and scale. A price in a currency the region
         does not use is rejected — money carries its scale, and a mismatched scale silently truncates.
 
+        **Accepts `Prefer: validate-only`** (29 September, build): validates and answers 200 with the
+        would-be result without writing, for the AI executor''s plan validation.
+
         '
       tags:
       - pricing
@@ -2258,6 +2288,7 @@ paths:
       x-ticvai-conflict-policy: serverWins
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      - $ref: ../shared/common.yaml#/components/parameters/PreferValidateOnly
       requestBody:
         required: true
         content:
@@ -2455,6 +2486,10 @@ paths:
       x-ticvai-audience:
       - staff
       summary: Create performances, singly or by schedule
+      description: '**Accepts `Prefer: validate-only`** (29 September, build): validates and answers 200
+        with the would-be result without writing, for the AI executor''s plan validation.
+
+        '
       tags:
       - event
       x-ticvai-permission: PERFORMANCE_CONFIGURE
@@ -2463,6 +2498,7 @@ paths:
       x-ticvai-conflict-policy: serverWins
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      - $ref: ../shared/common.yaml#/components/parameters/PreferValidateOnly
       requestBody:
         required: true
         content:
@@ -2470,6 +2506,19 @@ paths:
             schema:
               $ref: '#/components/schemas/CreatePerformancesRequest'
       responses:
+        '200':
+          description: 'Validate-only: the would-be result, nothing written'
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  created:
+                    type: integer
+                  performances:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Performance'
         '201':
           headers:
             X-Consistency-Token:
@@ -4169,6 +4218,7 @@ paths:
       operationId: createEntitlementTemplate
       x-ticvai-consumed-by:
         - "P08 BO-012 Membership Products"
+        - "P08 BO-288 Membership Entitlement & Admission Benefit Builder"
       x-ticvai-audience:
       - staff
       x-ticvai-config-scope: venue
@@ -11921,7 +11971,14 @@ paths:
         became an enum array; forecast outputs and error metrics typed; examples (T-7, 97%, 91%) dropped or
         renamed. Forecasts are advisory inputs to recommendations; signal contributions are explanatory, not
         literal model weights (pack p.105); the same read serves BO-1046, BO-1047, BO-1058, BO-591 and BO-946
-        by filter.'
+        by filter.
+
+
+        **The seat-map section is a granule** (29 September, build pass, group G2; 21.11.4, 1.4.27). For a seated
+        performance the forecasting job writes a row per section (`DemandForecast.sectionCode`, the
+        `seating.Section.code` of the performance''s published map) as well as per price category, so BO-1047
+        Section Revenue Forecast filters by `sectionCode` and the pricing card by `priceCategory`. Unseated products
+        have no section and are unaffected.'
       tags:
         - drafted
       x-ticvai-permission: PRODUCT_VIEW
@@ -11987,6 +12044,19 @@ paths:
             type: string
             format: date
           description: To date (inclusive)
+        - name: priceCategory
+          in: query
+          required: false
+          schema:
+            type: string
+            format: uuid
+          description: Price (seat) category id (29 September, build pass, group G2)
+        - name: sectionCode
+          in: query
+          required: false
+          schema:
+            type: string
+          description: Seat-map section (`seating.Section.code`), for the section granule (21.11.4)
         - $ref: ../shared/common.yaml#/components/parameters/PageSize
         - $ref: ../shared/common.yaml#/components/parameters/PageCursor
       responses:
@@ -12135,7 +12205,14 @@ paths:
         belongs downstream (createLiveDynamicPrice after human approval). The natural-language explanation is
         generative interpretation of the structured drivers and never the source of the price. AI output here
         is advisory: no AI recommendation changes a live price without human approval; autonomous execution
-        is off by default and bounded by Board 5 guardrails (listAutomationPolicyAutonomous).'
+        is off by default and bounded by Board 5 guardrails (listAutomationPolicyAutonomous).
+
+
+        **Typed and seat-level (29 September, build pass, group G2; 8.5.31 to 8.5.33, 8.5.37, 1.4.27).** A card says
+        what kind of price it recommends (`recommendationType`: an early-bird or last-minute window, a volume
+        discount for a quantity band, a conversion price, or a standard change), the window it applies in, the
+        quantity band, the objective, and the price (seat) category it is for; each is a filter. The producer is
+        the rules-first pricing producer until a model is promoted per tenant (AI design 3.10, 3.12).'
       tags:
         - drafted
       x-ticvai-permission: PRODUCT_VIEW
@@ -12176,6 +12253,35 @@ paths:
           schema:
             type: number
           description: Minimum confidence, percent
+        - name: recommendationType
+          in: query
+          required: false
+          schema:
+            type: string
+            enum:
+              - standard
+              - earlyBird
+              - lastMinute
+              - volumeDiscount
+              - conversion
+          description: Only cards of this kind (29 September, build pass, group G2)
+        - name: objective
+          in: query
+          required: false
+          schema:
+            type: string
+            enum:
+              - revenue
+              - occupancy
+              - conversion
+          description: Only cards optimising this
+        - name: priceCategory
+          in: query
+          required: false
+          schema:
+            type: string
+            format: uuid
+          description: Price (seat) category id (1.4.27)
         - $ref: ../shared/common.yaml#/components/parameters/PageSize
         - $ref: ../shared/common.yaml#/components/parameters/PageCursor
       responses:
@@ -13390,6 +13496,9 @@ paths:
         **Capacity is not one number.** Sellable, held, accessible provision and safe maximum are four,
         and a system that keeps one will either oversell or under-sell.
 
+        **Accepts `Prefer: validate-only`** (29 September, build): validates and answers 200 with the
+        would-be result without writing, for the AI executor''s plan validation.
+
         '
       tags:
       - events
@@ -13399,6 +13508,7 @@ paths:
       x-ticvai-scope-level: venue
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      - $ref: ../shared/common.yaml#/components/parameters/PreferValidateOnly
       requestBody:
         required: true
         content:
@@ -17806,6 +17916,15 @@ components:
           nullable: true
           description: Where `expiryAnchor` is `fixedDate`. Every pass expires the same day regardless
             of purchase.
+        expiryNoticeDays:
+          type: integer
+          minimum: 1
+          maximum: 180
+          nullable: true
+          description: '**How many days before `validTo` access raises `entitlement.expiringSoon`** for an entitlement
+            of this template still `issued` or `partiallyConsumed` (29 September, build pass, group G2; 5.5.30). What
+            a pre-expiry message or campaign is triggered by. Null, the default, means no notice: a day ticket needs
+            none, an annual pass might want 30. An entitlement bought inside its own notice period raises nothing.'
         carriesStoredValue:
           type: boolean
           default: false
@@ -31969,6 +32088,11 @@ components:
           type: string
           description: Price category
           nullable: true
+        sectionCode:
+          type: string
+          nullable: true
+          description: Seat-map section (`seating.Section.code`) the row forecasts; null for a row at price-category
+            or performance level (29 September, build pass, group G2; 21.11.4)
         channel:
           $ref: '#/components/schemas/Channel'
           description: Channel
@@ -32216,8 +32340,10 @@ components:
                   - marketTourism
                   - competitor
                   - priceElasticity
+                  - conversionRate
                   - other
-                description: Signal category behind the driver
+                description: Signal category behind the driver; `conversionRate` (carts reaching the price against
+                  orders placed) added 29 September for `objective` `conversion` (build pass, group G2; 8.5.37)
               direction:
                 type: string
                 enum:
@@ -32280,6 +32406,49 @@ components:
           type: string
           description: When the recommendation was generated
           format: date-time
+        priceCategoryId:
+          type: string
+          format: uuid
+          nullable: true
+          description: The price (seat) category the card is for, `PricingRecommendation.priceCategoryId`; null for a
+            product priced without categories (29 September, build pass, group G2; 1.4.27)
+        priceCategory:
+          type: string
+          nullable: true
+          description: The price category's name, for the card
+        recommendationType:
+          type: string
+          enum:
+            - standard
+            - earlyBird
+            - lastMinute
+            - volumeDiscount
+            - conversion
+          description: '`PricingRecommendation.recommendationType` (29 September, build pass, group G2; 8.5.31 to
+            8.5.33, 8.5.37)'
+        validFrom:
+          type: string
+          format: date-time
+          nullable: true
+        validTo:
+          type: string
+          format: date-time
+          nullable: true
+        quantityTier:
+          type: object
+          nullable: true
+          properties:
+            minQuantity:
+              type: integer
+            maxQuantity:
+              type: integer
+              nullable: true
+        objective:
+          type: string
+          enum:
+            - revenue
+            - occupancy
+            - conversion
     AiSignalRegistryDataQualityModelGovernanceView:
       type: object
       x-ticvai-drafted-shape: true
@@ -38578,6 +38747,13 @@ components:
           type: string
           format: uuid
           nullable: true
+        sectionCode:
+          type: string
+          maxLength: 40
+          nullable: true
+          description: The seat-map section (`seating.Section.code`) the slice is for; null above section level (29
+            September, build pass, group G2; 21.11.4). A code, not a foreign key, because the section belongs to the
+            seating service and to the map version the performance was published with.
         forecastDate:
           type: string
           format: date
@@ -38819,6 +38995,57 @@ components:
           type: string
           format: date-time
           nullable: true
+        recommendationType:
+          type: string
+          enum:
+          - standard
+          - earlyBird
+          - lastMinute
+          - volumeDiscount
+          - conversion
+          default: standard
+          description: '**What kind of price is recommended** (29 September, build pass, group G2; 8.5.31 to 8.5.33,
+            8.5.37). `standard` changes the price as it stands. `earlyBird` is a lower price for a window that closes
+            ahead of the event (`validTo` is N days before it), recommended where the booking curve runs behind
+            the historical curve far out. `lastMinute` is a price for a window that opens close to the event, for
+            capacity the forecast says will not sell at the current price. `volumeDiscount` is a per-unit price for
+            a quantity band (`quantityTier`), from group and multi-ticket order history. `conversion` is a price
+            aimed at the checkout conversion rate rather than revenue per sale (`objective` `conversion`), where
+            many carts reach the price and few pay. Each is carried out as the pricing rule of its kind (an
+            early-bird or last-minute window on the price list, a quantity band) by `createLiveDynamicPrice` after a
+            person accepts it; the recommendation itself changes nothing.'
+        validFrom:
+          type: string
+          format: date-time
+          nullable: true
+          description: Start of the window the recommended price applies in. Null means from acceptance.
+        validTo:
+          type: string
+          format: date-time
+          nullable: true
+          description: End of the window. Required for `earlyBird` and `lastMinute`; null otherwise means until
+            changed.
+        quantityTier:
+          type: object
+          nullable: true
+          description: For `volumeDiscount`, the quantity band the per-unit price applies to.
+          properties:
+            minQuantity:
+              type: integer
+              minimum: 2
+            maxQuantity:
+              type: integer
+              nullable: true
+              description: Null means no upper bound.
+        objective:
+          type: string
+          enum:
+          - revenue
+          - occupancy
+          - conversion
+          default: revenue
+          description: What the recommendation optimises. `conversion` weighs checkout conversion
+            (`orders.cart` against `orders.sales_order` for the product in the window) over revenue per sale.
     PricingSimulation:
       type: object
       x-ticvai-persistence: catalogue.pricing_simulation

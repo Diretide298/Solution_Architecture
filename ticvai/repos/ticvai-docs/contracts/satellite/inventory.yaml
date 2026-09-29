@@ -2,7 +2,7 @@ openapi: 3.1.0
 info:
   title: TICVAI Inventory & Procurement
   version: 0.1.0
-  x-ticvai-screen-count: 50
+  x-ticvai-screen-count: 55
   x-ticvai-tier: satellite
   x-ticvai-module: 15 — Inventory Management
   x-ticvai-requirements: 98
@@ -2910,8 +2910,362 @@ paths:
                       type: array
                       items:
                         $ref: '#/components/schemas/InventoryStockReservation'
+  /supplier-contracts:
+    get:
+      operationId: listSupplierContracts
+      x-ticvai-consumed-by:
+        - "P08 BO-083 Suppliers"
+      x-ticvai-audience:
+      - staff
+      x-ticvai-agreed: '29 September: writers pass (inventory.supplier_contract had no operation; updateSupplier was assumed to write it); shape follows listSuppliers'
+      x-ticvai-read-routing: replica
+      summary: Supplier contracts, by supplier, status or expiry
+      description: >
+        Purchasing agreements with a supplier: number, validity, currency, payment terms and the signed
+        document. Owned at tenant like the supplier and read from any venue beneath it. `expiringBefore`
+        lists the contracts somebody has to renew. Ordered by `validTo` ascending (open-ended last), `id`
+        as the tiebreak.
+      tags:
+      - supplier
+      x-ticvai-permission: PROCUREMENT_VIEW
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+      - name: supplierId
+        in: query
+        schema:
+          type: string
+          format: uuid
+      - name: status
+        in: query
+        schema:
+          type: string
+          enum:
+          - draft
+          - active
+          - expired
+          - terminated
+      - name: expiringBefore
+        in: query
+        schema:
+          type: string
+          format: date
+      - $ref: ../shared/common.yaml#/components/parameters/PageSize
+      - $ref: ../shared/common.yaml#/components/parameters/PageCursor
+      responses:
+        '200':
+          description: Contracts
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: ../shared/common.yaml#/components/schemas/Page
+                - type: object
+                  properties:
+                    items:
+                      type: array
+                      items:
+                        $ref: '#/components/schemas/InventorySupplierContract'
+  /suppliers/{supplierId}/contracts:
+    parameters:
+    - name: supplierId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    post:
+      operationId: createSupplierContract
+      x-ticvai-consumed-by:
+        - "P08 BO-083 Suppliers"
+      x-ticvai-audience:
+      - staff
+      x-ticvai-agreed: '29 September: writers pass (inventory.supplier_contract had no operation); shape follows createSupplier'
+      summary: Record a purchasing contract with a supplier
+      description: >
+        **Terms agreed with a supplier for a period**, kept as their own record so a purchase order raised in
+        March is read against March's contract. `number` is unique per supplier (409 `duplicate-code`).
+        Created in `draft`, or `active` when the signed document is attached. Owned at tenant, as suppliers
+        are (audit R183).
+      tags:
+      - supplier
+      x-ticvai-permission: PROCUREMENT_MANAGE
+      x-ticvai-scope-level: tenant
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - number
+              - name
+              - validFrom
+              properties:
+                number:
+                  type: string
+                  maxLength: 100
+                name:
+                  type: string
+                  maxLength: 200
+                validFrom:
+                  type: string
+                  format: date
+                validTo:
+                  type: string
+                  format: date
+                  nullable: true
+                currencyCode:
+                  type: string
+                  maxLength: 10
+                  nullable: true
+                paymentTermsDays:
+                  type: integer
+                  nullable: true
+                documentReference:
+                  type: string
+                  maxLength: 500
+                  nullable: true
+                status:
+                  type: string
+                  enum:
+                  - draft
+                  - active
+                  default: draft
+      responses:
+        '201':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InventorySupplierContract'
+        '404':
+          $ref: ../shared/common.yaml#/components/responses/NotFound
+        '409':
+          $ref: ../shared/common.yaml#/components/responses/DuplicateCode
+        '422':
+          description: '`validTo` before `validFrom`, or `active` without a `documentReference`.'
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
+  /supplier-contracts/{contractId}:
+    parameters:
+    - name: contractId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    patch:
+      operationId: updateSupplierContract
+      x-ticvai-consumed-by:
+        - "P08 BO-083 Suppliers"
+      x-ticvai-audience:
+      - staff
+      x-ticvai-agreed: '29 September: writers pass (inventory.supplier_contract had no operation); shape follows updateSupplier'
+      summary: Extend, activate or end a supplier contract
+      description: >
+        Changes the validity, terms or status of one contract. `status` moves `draft` to `active`, and
+        `active` to `terminated` (with a reason) or `expired` (set by the server once `validTo` has passed).
+        A `terminated` or `expired` contract is not reopened: a renewal is a new contract, so a dispute is
+        settled against the terms in force at the time.
+      tags:
+      - supplier
+      x-ticvai-permission: PROCUREMENT_MANAGE
+      x-ticvai-scope-level: tenant
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              minProperties: 1
+              properties:
+                name:
+                  type: string
+                  maxLength: 200
+                validTo:
+                  type: string
+                  format: date
+                  nullable: true
+                paymentTermsDays:
+                  type: integer
+                  nullable: true
+                documentReference:
+                  type: string
+                  maxLength: 500
+                  nullable: true
+                status:
+                  type: string
+                  enum:
+                  - active
+                  - terminated
+                statusReason:
+                  type: string
+                  maxLength: 500
+                  nullable: true
+                  description: Required with `terminated`.
+      responses:
+        '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: Updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InventorySupplierContract'
+        '404':
+          $ref: ../shared/common.yaml#/components/responses/NotFound
+        '409':
+          description: The contract is `terminated` or `expired`; a renewal is a new contract.
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
+  /inventory-items/{itemId}/kit-definition:
+    parameters:
+    - name: itemId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    get:
+      operationId: getInventoryKitDefinition
+      x-ticvai-consumed-by:
+        - "P08 BO-081 Inventory Items"
+        - "P09 ADM-189 Component Inventory & Availability Matrix"
+      x-ticvai-audience:
+      - staff
+      x-ticvai-agreed: '29 September: our build plan (retrace 4.4.20); shape follows getInventoryItem'
+      x-ticvai-read-routing: replica
+      summary: The components a kit item is made of
+      tags:
+      - item
+      x-ticvai-permission: PRODUCT_VIEW
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      responses:
+        '200':
+          description: The kit; `components` empty where the item is not a kit
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InventoryKitDefinition'
+        '404':
+          $ref: ../shared/common.yaml#/components/responses/NotFound
+    put:
+      operationId: setInventoryKitDefinition
+      x-ticvai-consumed-by:
+        - "P08 BO-081 Inventory Items"
+      x-ticvai-audience:
+      - staff
+      x-ticvai-agreed: '29 September: our build plan (retrace 4.4.20); shape follows setDailyCount'
+      summary: Make an item a kit of other stocked items
+      description: >
+        4.4.20. **A kit or retail bundle sells as one item and leaves stock as its components.** This sets the
+        bill of materials: each component item and the quantity one kit consumes. **When a kit sells, one
+        `saleDepletion` movement is posted per component, never for the kit itself**, at the location the
+        sale was made from, with the sale as its source; a return reverses the same components. The kit's
+        available quantity is the fewest whole kits its components make (`getStockPositions`). The whole list
+        is replaced in one call; an empty list makes the item an ordinary stocked item again. A component
+        cannot itself be a kit, and an item with movements of its own cannot become one.
+      tags:
+      - item
+      x-ticvai-permission: PRODUCT_CONFIGURE
+      x-ticvai-scope-level: venue
+      x-ticvai-config-scope: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/InventoryKitDefinition'
+      responses:
+        '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: Set
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InventoryKitDefinition'
+        '404':
+          $ref: ../shared/common.yaml#/components/responses/NotFound
+        '422':
+          description: A component that is itself a kit, the kit named as its own component, a component of
+            another venue, or a kit item that already has movements of its own.
+          x-ticvai-problem-types:
+          - nested-kit
+          - kit-has-movements
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
+
 components:
   schemas:
+    InventoryKitDefinition:
+      x-ticvai-persistence: none — composed of the item's inventory.kit_component rows
+      type: object
+      description: 4.4.20. Also the `setInventoryKitDefinition` body.
+      required:
+      - components
+      properties:
+        kitItemId:
+          type: string
+          format: uuid
+          readOnly: true
+        components:
+          type: array
+          items:
+            $ref: '#/components/schemas/InventoryKitComponent'
+    InventoryKitComponent:
+      x-ticvai-persistence: inventory.kit_component
+      type: object
+      description: 4.4.20. One component of a kit and the quantity one kit consumes.
+      required:
+      - componentItemId
+      - quantity
+      properties:
+        kitItemId:
+          type: string
+          format: uuid
+          readOnly: true
+        componentItemId:
+          type: string
+          format: uuid
+        quantity:
+          type: number
+          exclusiveMinimum: 0
+        unit:
+          type: string
+          nullable: true
+          description: The component's base unit where omitted.
+        scopePath:
+          type: string
+          readOnly: true
+          description: '**The partition key** (ADR-0005). Written at the kit item''s venue scope.'
     InventoryStockReservation:
       type: object
       x-ticvai-persistence: inventory.stock_reservation
@@ -3001,6 +3355,17 @@ components:
         status:
           type: string
           maxLength: 30
+          enum:
+          - draft
+          - active
+          - expired
+          - terminated
+          description: Written by `createSupplierContract` and `updateSupplierContract`; `expired` is set by the
+            server once `validTo` has passed (29 September, writers pass).
+        statusReason:
+          type: string
+          maxLength: 500
+          nullable: true
         createdByPrincipalId:
           type: string
           format: uuid

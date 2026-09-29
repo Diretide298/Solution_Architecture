@@ -11,7 +11,7 @@
  "note": "Derived by tools/derive-platform.py. **The gaps section is the point** \u2014 a page listing what exists is a directory; one listing what is missing is a worklist.",
  "counts": {
   "screens": 8,
-  "operations": 6,
+  "operations": 16,
   "contracts": 1,
   "modules": 2,
   "undrawn": 0,
@@ -39,7 +39,7 @@
  "contracts": [
   {
    "contract": "accreditation",
-   "operations": 6
+   "operations": 16
   }
  ],
  "screens": [
@@ -58,7 +58,7 @@
    "module": "Applicant Journey",
    "wave": 3,
    "route": "/applicant-journey/registration-form",
-   "operations": 2,
+   "operations": 3,
    "drawn": true
   },
   {
@@ -67,7 +67,7 @@
    "module": "Applicant Journey",
    "wave": 3,
    "route": "/applicant-journey/application-review-and-submit",
-   "operations": 1,
+   "operations": 3,
    "drawn": true
   },
   {
@@ -76,7 +76,7 @@
    "module": "Applicant Journey",
    "wave": 3,
    "route": "/applicant-journey/application-status-tracking",
-   "operations": 1,
+   "operations": 5,
    "drawn": true
   },
   {
@@ -85,7 +85,7 @@
    "module": "Applicant Journey",
    "wave": 3,
    "route": "/applicant-journey/accreditation-badge",
-   "operations": 2,
+   "operations": 3,
    "drawn": true
   },
   {
@@ -103,7 +103,7 @@
    "module": "Reviewer (Internal)",
    "wave": 3,
    "route": "/reviewer-internal/reviewer-application-detail",
-   "operations": 2,
+   "operations": 4,
    "drawn": true
   },
   {

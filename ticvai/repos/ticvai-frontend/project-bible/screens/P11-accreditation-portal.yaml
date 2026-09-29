@@ -191,6 +191,11 @@ screens:
     purpose: Each supporting document, against the requirement it satisfies
     trigger: onAction
     provenance: readiness close-out, 29 September 2026
+  - operationId: updateAccreditationApplication
+    contract: accreditation
+    purpose: Save the draft as each step is completed (Save and finish later)
+    trigger: onAction
+    provenance: build, 29 September 2026
   gaps:
   - operation: saveAccreditationDraft
     why: 'The pattern requires a draft that autosaves. **A four-step form that loses everything to a dropped
@@ -269,6 +274,8 @@ screens:
     - name: applicationRef
       from: deepLink
       optional: true
+    - name: applicationId
+      from: navigation
     preloaded:
     - programmeName
     coldEntry: '**Reached from the landing page, or resumed from a link in an acknowledgement email weeks
@@ -287,14 +294,16 @@ screens:
     - to: ACC-003
       trigger: Application Review & Submit
       carries:
+      - applicationId
       - applicationRef
-      provenance: derived — ACC-003 declares entryState.params applicationRef and ACC-002 holds applicationRef,
-        so an edge into it carries them
+      provenance: derived — ACC-003 declares entryState.params applicationId, applicationRef and ACC-002
+        holds applicationId, applicationRef, so an edge into it carries them
     - to: ACC-007
       trigger: A reviewer checks and approves
       provenance: flow F23 step 1→2
       carries:
       - applicationId
+      - documentId
   implementation:
     app: accreditation-web
     route: /applicant-journey/registration-form
@@ -331,13 +340,16 @@ screens:
     purpose: Submit the reviewed application
     trigger: onAction
     provenance: readiness close-out, 29 September 2026
-  gaps:
-  - operation: submitAccreditationApplication
-    why: '**The submit button has nothing behind it.** The screen declared no operation at all, and submit
-      is the one act it exists for.
-
-      '
-    source: frame claude-design/Accreditation Board.dc.html#acc-003
+  - operationId: submitAccreditationApplication
+    contract: accreditation
+    purpose: Submit the reviewed draft; blocking-submission requirements are checked here
+    trigger: onAction
+    provenance: build, 29 September 2026
+  - operationId: updateAccreditationApplication
+    contract: accreditation
+    purpose: Apply a change made through a Change link
+    trigger: onAction
+    provenance: build, 29 September 2026
   layout:
     template: wizard
     regions:
@@ -404,6 +416,8 @@ screens:
     params:
     - name: applicationRef
       from: ACC-002
+    - name: applicationId
+      from: navigation
     preloaded:
     - everything entered on ACC-002
     coldEntry: '**Cannot be reached cold and should not be.** Opened directly, it loads the draft behind
@@ -420,15 +434,17 @@ screens:
     - to: ACC-002
       trigger: Registration Form
       carries:
+      - applicationId
       - applicationRef
-      provenance: derived — ACC-002 declares entryState.params applicationRef and ACC-003 holds applicationRef,
-        so an edge into it carries them
+      provenance: derived — ACC-002 declares entryState.params applicationId, applicationRef and ACC-003
+        holds applicationId, applicationRef, so an edge into it carries them
     - to: ACC-004
       trigger: Application Status Tracking
       carries:
+      - applicationId
       - applicationRef
-      provenance: derived — ACC-004 declares entryState.params applicationRef and ACC-003 holds applicationRef,
-        so an edge into it carries them
+      provenance: derived — ACC-004 declares entryState.params applicationId, applicationRef and ACC-003
+        holds applicationId, applicationRef, so an edge into it carries them
   implementation:
     app: accreditation-web
     route: /applicant-journey/application-review-and-submit
@@ -460,11 +476,31 @@ screens:
 
     '
   apis:
-  - operationId: listAccreditationApplications
+  - operationId: listMyAccreditationApplications
     contract: accreditation
-    purpose: The applicant's own applications and where each one stands
+    purpose: The applicant's own applications, status, what is missing and decisionDueAt
     trigger: onLoad
-    provenance: readiness close-out, 29 September 2026
+    provenance: build, 29 September 2026
+  - operationId: withdrawAccreditationApplication
+    contract: accreditation
+    purpose: Withdraw this application
+    trigger: onAction
+    provenance: build, 29 September 2026
+  - operationId: submitAccreditationDocument
+    contract: accreditation
+    purpose: Add a document the reviewer asked for
+    trigger: onAction
+    provenance: build, 29 September 2026
+  - operationId: updateAccreditationApplication
+    contract: accreditation
+    purpose: Amend answers after a return for information
+    trigger: onAction
+    provenance: build, 29 September 2026
+  - operationId: resubmitAccreditationApplication
+    contract: accreditation
+    purpose: Send it back after a return for information or a rejection
+    trigger: onAction
+    provenance: build, 29 September 2026
   gaps:
   - operation: getAccreditationApplicationByReference
     why: '**A status screen with no status read.** The screen declared no operation. It also cannot use
@@ -473,9 +509,6 @@ screens:
       needs an operation shaped for it.
 
       '
-    source: frame claude-design/Accreditation Board.dc.html#acc-004
-  - operation: withdrawAccreditationApplication
-    why: The screen offers *Withdraw this application* and nothing performs it.
     source: frame claude-design/Accreditation Board.dc.html#acc-004
   - operation: addAccreditationDocument
     why: The screen offers *Add a document* — the common reviewer request — and nothing performs it.
@@ -538,6 +571,8 @@ screens:
     params:
     - name: applicationRef
       from: deepLink
+    - name: applicationId
+      from: navigation
     preloaded: []
     coldEntry: '**This screen is always reached cold** — from an acknowledgement email, usually weeks
       later and often on a different device. That is the design, and it is why the reference is the only
@@ -556,8 +591,9 @@ screens:
       trigger: Accreditation Badge
       carries:
       - applicationRef
-      provenance: derived — ACC-005 declares entryState.params applicationRef and ACC-004 holds applicationRef,
-        so an edge into it carries them
+      - holderId
+      provenance: derived — ACC-005 declares entryState.params applicationRef, credentialId, holderId
+        and ACC-004 holds applicationRef, holderId, so an edge into it carries them
   implementation:
     app: accreditation-web
     route: /applicant-journey/application-status-tracking
@@ -593,16 +629,21 @@ screens:
 
     '
   apis:
-  - operationId: listAccreditationCredentials
+  - operationId: listMyAccreditationCredentials
     contract: accreditation
-    purpose: The credentials issued against this application
+    purpose: The holder's own credentials with encodedIdentifier, symbology, zones and validity
     trigger: onLoad
-    provenance: readiness close-out, 29 September 2026
-  - operationId: issueAccreditationCredential
+    provenance: build, 29 September 2026
+  - operationId: issueMyAccreditationWalletPass
     contract: accreditation
-    purpose: Issue the badge or mobile credential
+    purpose: Add to Apple or Google Wallet
     trigger: onAction
-    provenance: readiness close-out, 29 September 2026
+    provenance: build, 29 September 2026
+  - operationId: renewAccreditation
+    contract: accreditation
+    purpose: Renew, shown while the renewal window is open
+    trigger: onAction
+    provenance: build, 29 September 2026
   gaps:
   - operation: getAccreditationBadge
     why: 'The screen shows one badge and the only read is a list. **A holder opening their own badge should
@@ -674,6 +715,10 @@ screens:
     - name: applicationRef
       from: ACC-004
       optional: true
+    - name: credentialId
+      from: navigation
+    - name: holderId
+      from: navigation
     preloaded:
     - holderName
     coldEntry: 'Opened from a bookmark or a wallet pass. Loads the badge behind the reference, or explains
@@ -691,12 +736,12 @@ screens:
       trigger: Application Status Tracking
       carries:
       - applicationRef
-      provenance: derived — ACC-004 declares entryState.params applicationRef and ACC-005 holds applicationRef,
-        so an edge into it carries them
+      provenance: derived — ACC-004 declares entryState.params applicationId, applicationRef and ACC-005
+        holds applicationRef, so an edge into it carries them
     - to: SCN-003
       trigger: A steward scans it at a service gate
       provenance: flow F23 step 3→4
-      operation: issueAccreditationCredential
+      operation: listMyAccreditationCredentials
       crossesDevice: true
       back: false
   implementation:
@@ -813,8 +858,10 @@ screens:
     transitions:
     - to: ACC-007
       trigger: Reviewer Application Detail
-      provenance: derived — ACC-007 declares entryState.params applicationId and ACC-006 holds none of
-        them, so the edge carries nothing and ACC-007 opens cold
+      carries:
+      - documentId
+      provenance: derived — ACC-007 declares entryState.params applicationId, documentId and ACC-006 holds
+        documentId, so an edge into it carries them
     - to: ACC-008
       trigger: Credential Register
       provenance: derived — ACC-008 declares entryState.params  and ACC-006 holds none of them, so the
@@ -850,24 +897,27 @@ screens:
 
     '
   apis:
-  - operationId: listAccreditationApplications
-    contract: accreditation
-    purpose: The application under review
-    trigger: onLoad
-    provenance: readiness close-out, 29 September 2026
   - operationId: decideAccreditationApplication
     contract: accreditation
     purpose: Approve, reject or return for information
     trigger: onAction
     provenance: readiness close-out, 29 September 2026
+  - operationId: getAccreditationApplication
+    contract: accreditation
+    purpose: The application under review
+    trigger: onLoad
+    provenance: build, 29 September 2026
+  - operationId: listAccreditationDocuments
+    contract: accreditation
+    purpose: The application's documents (applicationId), each with its state
+    trigger: onLoad
+    provenance: build, 29 September 2026
+  - operationId: verifyAccreditationDocument
+    contract: accreditation
+    purpose: Verify or refuse each document
+    trigger: onAction
+    provenance: build, 29 September 2026
   gaps:
-  - operation: listAccreditationDocuments
-    why: 'The reviewer verifies each document, and nothing reads an application''s documents back, so
-      there is no documentId to act on. `verifyAccreditationDocument` joins this screen when the read
-      exists (BL-180).
-
-      '
-    source: re-trace of 29 September, contract-backlog BL-180
   - operation: getApprovalRequest
     why: 'The screen shows one application and the only read is a list. **A detail screen that fetches
       a collection to find one row is a detail screen that gets slower as the queue grows.**
@@ -940,6 +990,8 @@ screens:
     params:
     - name: applicationId
       from: ACC-006
+    - name: documentId
+      from: navigation
     preloaded:
     - summary
     - requestedAt
@@ -960,6 +1012,8 @@ screens:
     - to: ACC-005
       trigger: The badge is issued
       provenance: flow F23 step 2→3
+      carries:
+      - holderId
     - to: ACC-006
       trigger: Reviewer Queue
       provenance: derived — ACC-006 declares entryState.params  and ACC-007 holds none of them, so the
@@ -1103,8 +1157,8 @@ screens:
         edge carries nothing and ACC-006 opens cold
     - to: ACC-007
       trigger: Reviewer Application Detail
-      provenance: derived — ACC-007 declares entryState.params applicationId and ACC-008 holds none of
-        them, so the edge carries nothing and ACC-007 opens cold
+      provenance: derived — ACC-007 declares entryState.params applicationId, documentId and ACC-008 holds
+        none of them, so the edge carries nothing and ACC-007 opens cold
   implementation:
     app: accreditation-web
     route: /reviewer-internal/credential-register

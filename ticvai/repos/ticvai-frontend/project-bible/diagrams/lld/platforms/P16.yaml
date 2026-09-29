@@ -40,15 +40,15 @@ modulesUsed:
   screens: 1
 servicesCalled:
 - service: ReportingService
-  operationCalls: 117
+  operationCalls: 118
 - service: AiService
-  operationCalls: 5
+  operationCalls: 31
+- service: TenancyService
+  operationCalls: 4
 - service: InventoryService
   operationCalls: 3
 - service: MarketingService
   operationCalls: 3
-- service: TenancyService
-  operationCalls: 2
 - service: IdentityService
   operationCalls: 2
 - service: CatalogueService
@@ -73,6 +73,7 @@ screens:
   operations:
   - getCommandCentre
   - getDashboard
+  - listAiInsights
   - listAlerts
   - recordDashboardView
   - requestSuggestion
@@ -260,6 +261,7 @@ screens:
   - getDashboard
   - listExpiringBatches
   - recordDashboardView
+  - requestSuggestion
   - runReport
   states:
   - emptyFirstRun
@@ -325,6 +327,7 @@ screens:
   operations:
   - askReportingQuestion
   - getDashboard
+  - getForecast
   - recordDashboardView
   states:
   - emptyFirstRun
@@ -354,6 +357,7 @@ screens:
   - acknowledgeAlert
   - askReportingQuestion
   - decideProposedAction
+  - getActionPlan
   - listAlerts
   - listOrders
   - listProposedActions
@@ -372,6 +376,7 @@ screens:
   - alertId<-deepLink
   - reportId<-deepLink
   - actionId<-deepLink
+  - planId<-navigation
   goesTo:
   - ANL-001
   boardFrames:
@@ -532,6 +537,7 @@ screens:
   wave: 3
   density: compact
   operations:
+  - getDashboard
   - getKpiValues
   states:
   - emptyFirstRun
@@ -540,7 +546,8 @@ screens:
   - error
   - loading
   offlineState: false
-  entryParams: []
+  entryParams:
+  - dashboardId<-navigation
   goesTo:
   - ANL-001
   - ANL-020
@@ -579,6 +586,9 @@ screens:
   density: compact
   operations:
   - askReportingQuestion
+  - decideAiInsight
+  - explainMetricChange
+  - listAiInsights
   - listAnalyticsAnomalies
   states:
   - emptyFirstRun
@@ -587,7 +597,8 @@ screens:
   - error
   - loading
   offlineState: false
-  entryParams: []
+  entryParams:
+  - insightId<-navigation
   goesTo:
   - ANL-001
   - ANL-020
@@ -1327,14 +1338,17 @@ screens:
   wave: 3
   density: compact
   operations:
+  - listDataRetentionSettings
   - setApprovalRetentionPolicy
+  - setDataRetentionSetting
   states:
   - emptyFirstRun
   - emptyNoAccess
   - error
   - loading
   offlineState: false
-  entryParams: []
+  entryParams:
+  - dataClass<-navigation
   goesTo:
   - ANL-041
   boardFrames: null
@@ -1447,7 +1461,10 @@ screens:
   wave: 3
   density: compact
   operations:
+  - configureAnomalyDetector
+  - listAiInsights
   - listAnalyticsAnomalies
+  - listAnomalyDetectors
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -1455,7 +1472,8 @@ screens:
   - error
   - loading
   offlineState: false
-  entryParams: []
+  entryParams:
+  - detectorKey<-navigation
   goesTo:
   - ANL-051
   boardFrames: null
@@ -1470,6 +1488,7 @@ screens:
   density: compact
   operations:
   - askReportingQuestion
+  - explainMetricChange
   - listAnalyticsAnomalies
   states:
   - emptyFirstRun
@@ -1492,14 +1511,19 @@ screens:
   wave: 3
   density: compact
   operations:
+  - createForecastScenario
+  - exportForecastVersion
+  - getForecast
   - getKpiValues
+  - listForecastDefinitions
   states:
   - emptyFirstRun
   - emptyNoAccess
   - error
   - loading
   offlineState: false
-  entryParams: []
+  entryParams:
+  - versionId<-navigation
   goesTo:
   - ANL-051
   boardFrames: null
@@ -1513,6 +1537,7 @@ screens:
   wave: 3
   density: compact
   operations:
+  - listAiInsights
   - listAnalyticsAnomalies
   states:
   - emptyFirstRun
@@ -1535,6 +1560,8 @@ screens:
   wave: 3
   density: compact
   operations:
+  - decideAiInsight
+  - listAiInsights
   - listAnalyticsAnomalies
   states:
   - emptyFirstRun
@@ -1542,7 +1569,8 @@ screens:
   - error
   - loading
   offlineState: false
-  entryParams: []
+  entryParams:
+  - insightId<-navigation
   goesTo:
   - ANL-051
   boardFrames: null
@@ -1555,7 +1583,15 @@ screens:
   requiresModule: analytics
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - configureAiCapability
+  - getEffectiveAiPolicy
+  - listAiCapabilities
+  - listAiEvaluations
+  - listAiModels
+  - listPromptTemplates
+  - publishPromptTemplate
+  - runAiEvaluation
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -1563,7 +1599,9 @@ screens:
   - error
   - loading
   offlineState: false
-  entryParams: []
+  entryParams:
+  - capabilityKey<-navigation
+  - templateKey<-navigation
   goesTo:
   - ANL-051
   boardFrames: null

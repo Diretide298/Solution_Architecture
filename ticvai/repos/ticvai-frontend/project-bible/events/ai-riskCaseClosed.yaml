@@ -1,0 +1,51 @@
+# ai.riskCaseClosed v1 — published by ai
+# Checked by tools/check-states.py.
+
+name: ai.riskCaseClosed
+version: 1
+publisher: ai
+description: A risk investigation was closed with an outcome.
+aggregate: aiRiskCase
+emittedWhen: AiRiskCase investigating or pendingAction to closed (closeRiskCase)
+payload:
+- field: tenantId
+  type: uuid
+- field: scopePath
+  type: string
+- field: caseId
+  type: uuid
+- field: outcome
+  type: string
+  notes: confirmedFraud, notFraud or inconclusive
+- field: entities
+  type: array
+  notes: entityType and entityRef pairs
+- field: closedByPrincipalId
+  type: uuid
+- field: closedAt
+  type: timestamp
+consumers:
+- context: orders
+  purpose: Release holds placed for review where the outcome is notFraud
+  idempotencyKey: caseId
+  onFailure: retryThenDeadLetter
+  isCritical: true
+- context: identity
+  purpose: Record the outcome against the account for step-up decisions
+  idempotencyKey: caseId
+  onFailure: retry
+  isCritical: false
+- context: reporting
+  purpose: Fraud outcome analytics and the label set for the next candidate model
+  idempotencyKey: caseId
+  onFailure: retry
+  isCritical: false
+retention: Two years, with the risk records
+notes: '**The outcome is a person''s**, and it is the label the next candidate model trains on (design
+  3.5). Confirmed fraud is kept distinct from the alert that started it (AIP-163).
+
+
+  **Carries ids and scope, never prompt text or personal data beyond ids** (AI design 3.2).
+
+
+  Emitted by states/ai-risk-case.yaml on every move into `closed` by `closeRiskCase` (added 29 September, build pass, group OWN).'

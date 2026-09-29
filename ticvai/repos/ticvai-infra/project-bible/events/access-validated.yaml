@@ -46,6 +46,12 @@ consumers:
   idempotencyKey: scanId
   onFailure: retryThenDeadLetter
   isCritical: true
+- context: ai
+  purpose: Journey state for in-venue recommendations (the guest is inside, at this access point),
+    scan-abuse signals and attendance actuals (AI system design section 3.2)
+  idempotencyKey: scanId
+  onFailure: retry
+  isCritical: false
 retention: 7 days. At scan volume the outbox becomes the largest table in the cell otherwise
 notes: '**High volume — the highest in the platform.** Most consumers are derived and none can undo
   an admission that already happened at the gate.

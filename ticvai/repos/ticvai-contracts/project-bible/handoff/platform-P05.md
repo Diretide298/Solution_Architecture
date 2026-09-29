@@ -5,16 +5,16 @@
 | | |
 |---|---|
 | Screens | 17 |
-| Operations | 22 |
+| Operations | 23 |
 | Contracts | 8 |
 | Modules | 2 |
 | Undrawn | 0 |
-| Operations with no screen | 15 |
+| Operations with no screen | 16 |
 | Waves | wave2 17 |
 
 ## Gaps
 
-### 15 operations with no screen here
+### 16 operations with no screen here
 
 **In a contract this platform uses, callable by its audience, and reaching no screen on any platform serving that audience.** Either a screen is missing or the endpoint should not exist — and the second is worth considering first.
 
@@ -34,6 +34,7 @@
 | `setLeaderboardNickname` | marketing-crm | PUT | Choose the name shown on the board |
 | `listTicketTransfers` | orders | GET | The ticket transfers this guest sent or received |
 | `revokeEntitlementShare` | orders | POST | Take back a share |
+| `getUpsellSuggestions` | promotions | POST | Suggestions for a cart |
 | `recordRecommendationOutcome` | promotions | POST | Shown, clicked, accepted or dismissed |
 
 ## Modules
@@ -61,7 +62,7 @@
 | `KSK-012` | Booking found | Sell | 2 | 1 | yes |
 | `KSK-013` | Call staff | Sell | 2 | 1 | yes |
 | `KSK-014` | Out of service | Sell | 2 | 0 | yes |
-| `KSK-015` | Assistant | AI | 2 | 4 | yes |
+| `KSK-015` | Assistant | AI | 2 | 5 | yes |
 | `KSK-016` | Order Food | Sell | 2 | 2 | yes |
 | `KSK-017` | Shop | Sell | 2 | 4 | yes |
 

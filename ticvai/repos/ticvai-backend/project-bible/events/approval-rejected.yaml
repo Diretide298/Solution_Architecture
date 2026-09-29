@@ -39,6 +39,11 @@ consumers:
   idempotencyKey: requestId
   onFailure: retry
   isCritical: false
+- context: ai
+  purpose: Close the action plan waiting on this approval, as rejected (AI system design section 3.2)
+  idempotencyKey: requestId
+  onFailure: retry
+  isCritical: false
 retention: Retained with the request. This is an audit record, not an operational message
 notes: Critical on the owning contract because **a rejected refund left in `pendingApproval` is a refund
   that neither happens nor fails**, and the guest is told nothing.

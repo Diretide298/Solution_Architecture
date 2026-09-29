@@ -11,11 +11,11 @@
  "note": "Derived by tools/derive-platform.py. **The gaps section is the point** \u2014 a page listing what exists is a directory; one listing what is missing is a worklist.",
  "counts": {
   "screens": 11,
-  "operations": 27,
-  "contracts": 5,
+  "operations": 28,
+  "contracts": 6,
   "modules": 1,
   "undrawn": 0,
-  "operationsWithNoScreen": 45
+  "operationsWithNoScreen": 43
  },
  "waves": {
   "wave1": 11
@@ -49,6 +49,10 @@
   {
    "contract": "shift",
    "operations": 1
+  },
+  {
+   "contract": "accreditation",
+   "operations": 1
   }
  ],
  "screens": [
@@ -76,7 +80,7 @@
    "module": "Access",
    "wave": 1,
    "route": "/access/ready-to-scan",
-   "operations": 9,
+   "operations": 10,
    "drawn": true
   },
   {
@@ -179,6 +183,12 @@
     "summary": "Check the person presenting against the person entitled"
    },
    {
+    "operation": "replaceAccreditationCredential",
+    "contract": "accreditation",
+    "verb": "POST",
+    "summary": "Reissue after loss, damage or a name change"
+   },
+   {
     "operation": "authoriseWalletSpend",
     "contract": "cross-region",
     "verb": "POST",
@@ -249,12 +259,6 @@
     "contract": "identity",
     "verb": "GET",
     "summary": "What was decided, for whom, where and why"
-   },
-   {
-    "operation": "listAccessPolicyHistory",
-    "contract": "identity",
-    "verb": "GET",
-    "summary": "Every version, who changed it and why"
    },
    {
     "operation": "listAccessPolicyTemplates",
@@ -347,12 +351,6 @@
     "summary": "Deposits and their authorisation state"
    },
    {
-    "operation": "listFraudRules",
-    "contract": "orders",
-    "verb": "GET",
-    "summary": ""
-   },
-   {
     "operation": "listInvitationAllowances",
     "contract": "orders",
     "verb": "GET",
@@ -411,12 +409,6 @@
     "contract": "orders",
     "verb": "POST",
     "summary": "Take back a share"
-   },
-   {
-    "operation": "setFraudRules",
-    "contract": "orders",
-    "verb": "PUT",
-    "summary": ""
    },
    {
     "operation": "approveShiftClose",

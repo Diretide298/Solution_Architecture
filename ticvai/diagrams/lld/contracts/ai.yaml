@@ -1,10 +1,264 @@
 id: LLD-ai
-title: ai — 31 operations
+title: ai — 133 operations
 generatedBy: tools/derive-diagrams.py
 index: diagrams/hld/03-contracts.yaml
 tier: satellite
 service: AiService
 operations:
+- operation: addRiskCaseEvidence
+  verb: POST
+  path: /risk/cases/{caseId}/evidence
+  scope: venue
+  permission: RISK_INVESTIGATE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - ai.case_evidence
+  - ai.risk_case
+  - cache:idempotency
+  writes:
+  - ai.case_evidence
+  - cache:idempotency
+- operation: answerConfigurationQuestion
+  verb: POST
+  path: /configuration-sessions/{sessionId}/answers
+  scope: venue
+  permission: AI_USE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - ai.blueprint
+  - ai.blueprint_decision
+  - ai.config_session
+  - ai.policy
+  - ai.provider
+  - cache:idempotency
+  writes:
+  - ai.activity
+  - ai.blueprint
+  - ai.blueprint_decision
+  - ai.config_session
+  - cache:idempotency
+- operation: attachConfigurationSource
+  verb: POST
+  path: /configuration-sessions/{sessionId}/sources
+  scope: venue
+  permission: AI_USE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - ai.config_session
+  - ai.config_source
+  - ai.governance_policy_version
+  - ai.policy
+  - ai.provider
+  - assets.media_asset
+  - cache:idempotency
+  writes:
+  - ai.activity
+  - ai.blueprint_decision
+  - ai.config_source
+  - cache:idempotency
+- operation: backtestRiskStrategy
+  verb: POST
+  path: /risk/strategy/backtest
+  scope: tenant
+  permission: AI_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - ai.risk_assessment
+  - ai.risk_case
+  - ai.risk_strategy
+  - cache:idempotency
+  writes:
+  - ai.risk_strategy
+  - cache:idempotency
+- operation: buildConfigurationPlan
+  verb: POST
+  path: /configuration-sessions/{sessionId}/plan
+  scope: venue
+  permission: AI_USE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - ai.action_plan
+  - ai.action_step
+  - ai.blueprint
+  - ai.blueprint_decision
+  - ai.capability
+  - ai.config_session
+  - ai.governance_policy_version
+  - ai.tool
+  - cache:idempotency
+  writes:
+  - ai.action_plan
+  - ai.action_step
+  - ai.config_session
+  - ai.decision_record
+  - ai.proposed_action
+  - cache:idempotency
+- operation: cancelActionPlan
+  verb: POST
+  path: /action-plans/{planId}/cancel
+  scope: venue
+  permission: AI_USE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - ai.action_plan
+  - ai.action_step
+  - cache:idempotency
+  writes:
+  - ai.action_plan
+  - ai.action_step
+  - ai.decision_record
+  - ai.intervention
+  - cache:idempotency
+- operation: closeAiIncident
+  verb: POST
+  path: /incidents/{incidentId}/close
+  scope: tenant
+  permission: AI_APPROVE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - ai.incident
+  - cache:idempotency
+  writes:
+  - ai.incident
+  - cache:idempotency
+- operation: closeRiskCase
+  verb: POST
+  path: /risk/cases/{caseId}/close
+  scope: venue
+  permission: RISK_INVESTIGATE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - ai.case_action
+  - ai.risk_case
+  - cache:idempotency
+  writes:
+  - ai.decision_record
+  - ai.entity_risk
+  - ai.risk_case
+  - cache:idempotency
+- operation: compareForecastScenarios
+  verb: POST
+  path: /forecast-scenarios/compare
+  scope: venue
+  permission: AI_USE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - ai.forecast_point
+  - ai.forecast_scenario
+  - cache:idempotency
+  writes:
+  - cache:idempotency
+- operation: configureAiCapability
+  verb: PUT
+  path: /governance/capabilities/{capabilityKey}
+  scope: tenant
+  permission: AI_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - ai.capability
+  - cache:idempotency
+  writes:
+  - ai.capability
+  - ai.decision_record
+  - cache:idempotency
+- operation: configureAnomalyDetector
+  verb: PUT
+  path: /anomaly-detectors/{detectorKey}
+  scope: venue
+  permission: AI_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - ai.anomaly_detector
+  - ai.forecast_definition
+  - cache:idempotency
+  writes:
+  - ai.anomaly_detector
+  - cache:idempotency
+- operation: configureAssistantProfile
+  verb: PUT
+  path: /assistant-profiles/{profileKey}
+  scope: tenant
+  permission: AI_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - ai.assistant_profile
+  - ai.policy
+  - cache:idempotency
+  writes:
+  - ai.assistant_profile
+  - cache:idempotency
+- operation: configureForecastSignalSource
+  verb: PUT
+  path: /forecast-signals/{signalKey}
+  scope: tenant
+  permission: AI_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - ai.signal_source
+  - cache:idempotency
+  writes:
+  - ai.signal_source
+  - cache:idempotency
+- operation: configureRiskStrategy
+  verb: PUT
+  path: /risk/strategy
+  scope: tenant
+  permission: AI_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - ai.risk_strategy
+  - cache:idempotency
+  writes:
+  - ai.decision_record
+  - ai.risk_strategy
+  - cache:idempotency
+- operation: containAiIncident
+  verb: POST
+  path: /incidents/{incidentId}/contain
+  scope: tenant
+  permission: AI_APPROVE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - ai.incident
+  - cache:idempotency
+  writes:
+  - ai.capability
+  - ai.decision_record
+  - ai.incident
+  - ai.intervention
+  - ai.policy_exception
+  - ai.release
+  - cache:idempotency
 - operation: createAiConversation
   verb: POST
   path: /conversations
@@ -19,6 +273,55 @@ operations:
   - cache:idempotency
   writes:
   - ai.conversation
+  - cache:idempotency
+- operation: createAiGovernancePolicyDraft
+  verb: POST
+  path: /governance/policy-drafts
+  scope: tenant
+  permission: AI_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - ai.governance_policy
+  - ai.governance_policy_version
+  - cache:idempotency
+  writes:
+  - ai.governance_policy
+  - ai.governance_policy_version
+  - cache:idempotency
+- operation: createAiPolicyException
+  verb: POST
+  path: /governance/policy-exceptions
+  scope: tenant
+  permission: AI_APPROVE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - ai.governance_policy
+  - ai.policy_exception
+  - cache:idempotency
+  writes:
+  - ai.decision_record
+  - ai.policy_exception
+  - cache:idempotency
+- operation: createForecastScenario
+  verb: POST
+  path: /forecast-scenarios
+  scope: venue
+  permission: AI_USE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - ai.forecast_point
+  - ai.forecast_scenario
+  - ai.forecast_version
+  - cache:idempotency
+  writes:
+  - ai.forecast_point
+  - ai.forecast_scenario
   - cache:idempotency
 - operation: createKnowledgeCollection
   verb: POST
@@ -37,6 +340,84 @@ operations:
   - ai.knowledge_collection
   - cache:idempotency
   - qdrant:knowledge
+- operation: createRiskCase
+  verb: POST
+  path: /risk/cases
+  scope: venue
+  permission: RISK_INVESTIGATE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - ai.risk_alert
+  - ai.risk_case
+  - cache:idempotency
+  writes:
+  - ai.case_evidence
+  - ai.risk_alert
+  - ai.risk_case
+  - cache:idempotency
+- operation: decideAiGovernanceAlert
+  verb: POST
+  path: /governance-alerts/{alertId}/decide
+  scope: venue
+  permission: AI_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - ai.governance_alert
+  - cache:idempotency
+  writes:
+  - ai.governance_alert
+  - ai.incident
+  - cache:idempotency
+- operation: decideAiInsight
+  verb: POST
+  path: /insights/{insightId}/decide
+  scope: venue
+  permission: AI_USE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - ai.insight
+  - cache:idempotency
+  writes:
+  - ai.anomaly_detector
+  - ai.insight
+  - cache:idempotency
+- operation: decideBlueprintRecommendation
+  verb: POST
+  path: /configuration-sessions/{sessionId}/decisions/{decisionKey}
+  scope: venue
+  permission: AI_USE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - ai.blueprint
+  - ai.blueprint_decision
+  - cache:idempotency
+  writes:
+  - ai.blueprint
+  - ai.blueprint_decision
+  - cache:idempotency
+- operation: decideOperationalRequirement
+  verb: POST
+  path: /operational-requirements/{requirementId}/decide
+  scope: venue
+  permission: AI_USE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - ai.operational_requirement
+  - cache:idempotency
+  writes:
+  - ai.decision_record
+  - ai.operational_requirement
+  - cache:idempotency
 - operation: decideProposedAction
   verb: POST
   path: /proposed-actions/{actionId}/decide
@@ -46,11 +427,142 @@ operations:
   - staff
   offline: false
   reads:
+  - ai.action_plan
   - ai.proposed_action
   - cache:idempotency
   writes:
+  - ai.action_plan
   - ai.activity
+  - ai.decision_record
   - ai.proposed_action
+  - cache:idempotency
+- operation: decideRecommendations
+  verb: POST
+  path: /recommendations/decide
+  scope: venue
+  permission: AI_USE
+  audience:
+  - staff
+  - guest
+  - anonymous
+  offline: false
+  reads:
+  - ai.rec_decline
+  - ai.release
+  - cache:idempotency
+  - cache:rec-candidates
+  - cache:rec-features
+  writes:
+  - ai.decision_record
+  - ai.rec_decision
+  - cache:idempotency
+- operation: decideRiskAlert
+  verb: POST
+  path: /risk/alerts/{alertId}/decide
+  scope: venue
+  permission: RISK_REVIEW
+  audience:
+  - staff
+  offline: false
+  reads:
+  - ai.risk_alert
+  - cache:idempotency
+  writes:
+  - ai.case_evidence
+  - ai.risk_alert
+  - ai.risk_case
+  - cache:idempotency
+- operation: evaluateAiGovernance
+  verb: POST
+  path: /governance/evaluate
+  scope: venue
+  permission: null
+  audience:
+  - service
+  offline: false
+  reads:
+  - ai.capability
+  - ai.governance_policy_version
+  - ai.policy
+  - ai.policy_exception
+  - cache:governance-policy
+  - cache:idempotency
+  writes:
+  - ai.decision_record
+  - cache:idempotency
+- operation: expandRiskNetwork
+  verb: GET
+  path: /risk/network
+  scope: venue
+  permission: RISK_INVESTIGATE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - ai.entity_risk
+  - ai.risk_edge
+  writes: []
+- operation: explainMetricChange
+  verb: POST
+  path: /insights/explain-metric-change
+  scope: venue
+  permission: AI_USE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - ai.insight
+  - ai.policy
+  - cache:idempotency
+  writes:
+  - ai.activity
+  - ai.insight
+  - cache:idempotency
+- operation: explainRecommendationDecision
+  verb: GET
+  path: /recommendations/decisions/{decisionId}/explanation
+  scope: venue
+  permission: AI_USE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - ai.decision_record
+  - ai.rec_decision
+  writes: []
+- operation: exportAiEvidencePackage
+  verb: POST
+  path: /evidence-packages
+  scope: venue
+  permission: AI_AUDIT_VIEW
+  audience:
+  - staff
+  offline: false
+  reads:
+  - ai.activity
+  - ai.decision_record
+  - ai.evidence_package
+  - cache:idempotency
+  writes:
+  - ai.evidence_package
+  - cache:idempotency
+- operation: exportForecastVersion
+  verb: POST
+  path: /forecast-versions/{versionId}/exports
+  scope: venue
+  permission: AI_USE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - ai.forecast_definition
+  - ai.forecast_export
+  - ai.forecast_point
+  - ai.forecast_scenario
+  - ai.forecast_version
+  - cache:idempotency
+  writes:
+  - ai.forecast_export
   - cache:idempotency
 - operation: generateConfiguration
   verb: POST
@@ -61,9 +573,12 @@ operations:
   - staff
   offline: false
   reads:
+  - ai.chunk_embedding
   - ai.chunk_ref
+  - ai.knowledge_document
   - ai.policy
   - ai.provider
+  - ai.tool
   - cache:idempotency
   - catalogue.channel_capacity
   - catalogue.entitlement_template
@@ -84,7 +599,10 @@ operations:
   - seating.seating_rules
   - seating.section
   writes:
+  - ai.action_plan
+  - ai.action_step
   - ai.activity
+  - ai.decision_record
   - ai.proposed_action
   - cache:idempotency
   - qdrant:knowledge
@@ -105,6 +623,44 @@ operations:
   - ai.activity
   - ai.layout_draft
   - cache:idempotency
+- operation: getActionPlan
+  verb: GET
+  path: /action-plans/{planId}
+  scope: venue
+  permission: AI_USE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - ai.action_plan
+  - ai.action_step
+  writes: []
+- operation: getAiByokEnablement
+  verb: GET
+  path: /tenants/{tenantId}/byok
+  scope: tenant
+  permission: AI_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - ai.byok_enablement
+  writes: []
+- operation: getAiDecisionTrace
+  verb: GET
+  path: /decision-records/{decisionRecordId}/trace
+  scope: venue
+  permission: AI_AUDIT_VIEW
+  audience:
+  - staff
+  offline: false
+  reads:
+  - ai.action_plan
+  - ai.action_step
+  - ai.activity
+  - ai.decision_record
+  - ai.intervention
+  writes: []
 - operation: getAiPolicy
   verb: GET
   path: /policy
@@ -126,6 +682,121 @@ operations:
   offline: false
   reads:
   - ai.activity
+  - ai.model
+  writes: []
+- operation: getApprovalRequestScore
+  verb: GET
+  path: /approval-requests/{approvalRequestId}/score
+  scope: venue
+  permission: APPROVAL_VIEW
+  audience:
+  - staff
+  offline: false
+  reads:
+  - ai.approval_request_score
+  writes: []
+- operation: getConfigurationBlueprint
+  verb: GET
+  path: /configuration-sessions/{sessionId}/blueprint
+  scope: venue
+  permission: AI_USE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - ai.blueprint
+  - ai.blueprint_decision
+  - ai.config_session
+  - ai.config_source
+  writes: []
+- operation: getCustomerRecommendationProfile
+  verb: GET
+  path: /recommendations/customers/{subjectId}/profile
+  scope: venue
+  permission: AI_USE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - ai.rec_decision
+  - ai.rec_decline
+  - ai.rec_event
+  - cache:rec-features
+  writes: []
+- operation: getEffectiveAiPolicy
+  verb: GET
+  path: /governance/effective-policy
+  scope: venue
+  permission: AI_USE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - ai.capability
+  - ai.governance_policy
+  - ai.governance_policy_version
+  - ai.policy
+  - ai.policy_exception
+  writes: []
+- operation: getEntityRisk
+  verb: GET
+  path: /risk/entities/{entityType}/{entityRef}
+  scope: tenant
+  permission: RISK_REVIEW
+  audience:
+  - staff
+  offline: false
+  reads:
+  - ai.entity_risk
+  writes: []
+- operation: getForecast
+  verb: GET
+  path: /forecasts
+  scope: venue
+  permission: AI_USE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - ai.forecast_definition
+  - ai.forecast_point
+  - ai.forecast_version
+  writes: []
+- operation: getForecastAccuracy
+  verb: GET
+  path: /forecast-accuracy
+  scope: venue
+  permission: AI_USE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - ai.forecast_accuracy
+  writes: []
+- operation: getGuidedChoiceSuggestion
+  verb: GET
+  path: /guided-choice-suggestions/{suggestionId}
+  scope: venue
+  permission: AI_USE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - ai.guided_choice_suggestion
+  writes: []
+- operation: getRiskCase
+  verb: GET
+  path: /risk/cases/{caseId}
+  scope: venue
+  permission: RISK_INVESTIGATE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - ai.case_action
+  - ai.case_evidence
+  - ai.risk_alert
+  - ai.risk_case
   writes: []
 - operation: ingestKnowledgeDocument
   verb: POST
@@ -137,15 +808,40 @@ operations:
   offline: false
   reads:
   - ai.chunk_ref
+  - ai.knowledge_collection
   - ai.knowledge_document
   - cache:embedding
   - cache:idempotency
   - qdrant:knowledge
   writes:
+  - ai.chunk_embedding
   - ai.knowledge_document
   - cache:embedding
   - cache:idempotency
   - qdrant:knowledge
+- operation: listAiCapabilities
+  verb: GET
+  path: /governance/capabilities
+  scope: venue
+  permission: AI_USE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - ai.capability
+  writes: []
+- operation: listAiControls
+  verb: GET
+  path: /controls
+  scope: tenant
+  permission: AI_USE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - ai.control
+  - ai.control_test
+  writes: []
 - operation: listAiConversations
   verb: GET
   path: /conversations
@@ -158,6 +854,63 @@ operations:
   reads:
   - ai.conversation
   writes: []
+- operation: listAiEvaluations
+  verb: GET
+  path: /evaluations
+  scope: tenant
+  permission: AI_USE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - ai.eval_run
+  - ai.eval_suite
+  writes: []
+- operation: listAiGovernanceAlerts
+  verb: GET
+  path: /governance-alerts
+  scope: venue
+  permission: AI_USE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - ai.governance_alert
+  writes: []
+- operation: listAiGovernancePolicyVersions
+  verb: GET
+  path: /governance/policy-versions
+  scope: tenant
+  permission: AI_USE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - ai.governance_policy
+  - ai.governance_policy_version
+  writes: []
+- operation: listAiIncidents
+  verb: GET
+  path: /incidents
+  scope: tenant
+  permission: AI_USE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - ai.incident
+  writes: []
+- operation: listAiInsights
+  verb: GET
+  path: /insights
+  scope: venue
+  permission: AI_USE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - ai.insight
+  writes: []
 - operation: listAiInteractions
   verb: GET
   path: /interactions
@@ -169,6 +922,17 @@ operations:
   reads:
   - ai.activity
   writes: []
+- operation: listAiModels
+  verb: GET
+  path: /models
+  scope: tenant
+  permission: AI_USE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - ai.model
+  writes: []
 - operation: listAiProviders
   verb: GET
   path: /providers
@@ -179,6 +943,106 @@ operations:
   offline: false
   reads:
   - ai.provider
+  writes: []
+- operation: listAiRiskRegister
+  verb: GET
+  path: /risk-register
+  scope: tenant
+  permission: AI_USE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - ai.risk_register
+  writes: []
+- operation: listAiTools
+  verb: GET
+  path: /tools
+  scope: tenant
+  permission: AI_USE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - ai.tool
+  writes: []
+- operation: listAnomalyDetectors
+  verb: GET
+  path: /anomaly-detectors
+  scope: venue
+  permission: AI_USE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - ai.anomaly_detector
+  writes: []
+- operation: listAssistantProfiles
+  verb: GET
+  path: /assistant-profiles
+  scope: tenant
+  permission: AI_USE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - ai.assistant_profile
+  writes: []
+- operation: listConfigurationSessions
+  verb: GET
+  path: /configuration-sessions
+  scope: venue
+  permission: AI_USE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - ai.config_session
+  writes: []
+- operation: listConfigurationSources
+  verb: GET
+  path: /configuration-sessions/{sessionId}/sources
+  scope: venue
+  permission: AI_USE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - ai.config_session
+  - ai.config_source
+  writes: []
+- operation: listForecastDefinitions
+  verb: GET
+  path: /forecast-definitions
+  scope: venue
+  permission: AI_USE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - ai.forecast_definition
+  writes: []
+- operation: listForecastSignals
+  verb: GET
+  path: /forecast-signals
+  scope: tenant
+  permission: AI_USE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - ai.signal_source
+  writes: []
+- operation: listForecastVersions
+  verb: GET
+  path: /forecast-versions
+  scope: venue
+  permission: AI_USE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - ai.forecast_version
   writes: []
 - operation: listIndexFailures
   verb: GET
@@ -227,6 +1091,51 @@ operations:
   - ai.knowledge_collection
   - qdrant:knowledge
   writes: []
+- operation: listKnowledgeGaps
+  verb: GET
+  path: /knowledge-gaps
+  scope: tenant
+  permission: AI_USE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - ai.knowledge_gap
+  writes: []
+- operation: listMarketingRecommendations
+  verb: GET
+  path: /marketing-recommendations
+  scope: venue
+  permission: AI_USE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - ai.insight
+  writes: []
+- operation: listOperationalRequirements
+  verb: GET
+  path: /operational-requirements
+  scope: venue
+  permission: AI_USE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - ai.forecast_version
+  - ai.operational_requirement
+  writes: []
+- operation: listPromptTemplates
+  verb: GET
+  path: /prompt-templates
+  scope: tenant
+  permission: AI_USE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - ai.prompt_template
+  writes: []
 - operation: listProposedActions
   verb: GET
   path: /proposed-actions
@@ -238,6 +1147,200 @@ operations:
   reads:
   - ai.proposed_action
   writes: []
+- operation: listRiskAlerts
+  verb: GET
+  path: /risk/alerts
+  scope: venue
+  permission: RISK_REVIEW
+  audience:
+  - staff
+  offline: false
+  reads:
+  - ai.risk_alert
+  writes: []
+- operation: openAiIncident
+  verb: POST
+  path: /incidents
+  scope: tenant
+  permission: AI_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - ai.governance_alert
+  - ai.incident
+  - cache:idempotency
+  writes:
+  - ai.governance_alert
+  - ai.incident
+  - cache:idempotency
+- operation: overrideAiDecision
+  verb: POST
+  path: /decision-records/{decisionRecordId}/override
+  scope: venue
+  permission: AI_APPROVE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - ai.decision_record
+  - ai.intervention
+  - cache:idempotency
+  writes:
+  - ai.decision_record
+  - ai.intervention
+  - cache:idempotency
+- operation: pauseActionPlan
+  verb: POST
+  path: /action-plans/{planId}/pause
+  scope: venue
+  permission: AI_APPROVE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - ai.action_plan
+  - cache:idempotency
+  writes:
+  - ai.action_plan
+  - ai.decision_record
+  - ai.intervention
+  - cache:idempotency
+- operation: pauseAiCapability
+  verb: POST
+  path: /governance/capabilities/{capabilityKey}/pause
+  scope: tenant
+  permission: AI_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - ai.capability
+  - cache:idempotency
+  writes:
+  - ai.action_plan
+  - ai.capability
+  - ai.decision_record
+  - ai.intervention
+  - cache:idempotency
+- operation: promoteAiRelease
+  verb: POST
+  path: /releases/{releaseId}/promote
+  scope: tenant
+  permission: AI_APPROVE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - ai.eval_run
+  - ai.governance_alert
+  - ai.release
+  - cache:idempotency
+  writes:
+  - ai.decision_record
+  - ai.forecast_definition
+  - ai.governance_alert
+  - ai.policy
+  - ai.release
+  - cache:idempotency
+- operation: proposeLookalikeSegment
+  verb: POST
+  path: /ai/segment-suggestions
+  scope: venue
+  permission: AI_USE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - ai.policy
+  - cache:idempotency
+  - marketing.audience_list
+  - marketing.consent_record
+  - marketing.guest_profile
+  - marketing.loyalty_position
+  - marketing.segment
+  - marketing.segment_criterion
+  - orders.order_line
+  writes:
+  - ai.decision_record
+  - ai.proposed_action
+  - cache:idempotency
+- operation: proposeMarketingContent
+  verb: POST
+  path: /ai/content-drafts
+  scope: venue
+  permission: AI_USE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - ai.capability
+  - ai.governance_policy_version
+  - ai.policy
+  - ai.prompt_template
+  - ai.provider
+  - cache:idempotency
+  - catalogue.event
+  - catalogue.product
+  - control.content_block
+  - marketing.campaign
+  - marketing.message_template
+  - promotions.promotion
+  - whitelabel.banner
+  - whitelabel.content_page
+  - whitelabel.homepage_section
+  - whitelabel.promo_block
+  writes:
+  - ai.activity
+  - ai.decision_record
+  - ai.proposed_action
+  - cache:idempotency
+- operation: proposeRiskAction
+  verb: POST
+  path: /risk/cases/{caseId}/actions
+  scope: venue
+  permission: RISK_INVESTIGATE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - ai.capability
+  - ai.case_action
+  - ai.risk_case
+  - ai.tool
+  - cache:idempotency
+  writes:
+  - ai.action_plan
+  - ai.action_step
+  - ai.case_action
+  - ai.decision_record
+  - cache:idempotency
+- operation: proposeSeatMapChanges
+  verb: POST
+  path: /ai/seat-maps/{seatMapId}/proposals
+  scope: venue
+  permission: CAPACITY_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - ai.capability
+  - ai.governance_policy_version
+  - ai.tool
+  - cache:idempotency
+  - orders.order_line
+  - seating.accessible
+  - seating.seat
+  - seating.seat_category
+  - seating.seat_map
+  - seating.section
+  - seating.zone
+  writes:
+  - ai.action_plan
+  - ai.action_step
+  - ai.decision_record
+  - ai.proposed_action
+  - cache:idempotency
 - operation: proposeTranslations
   verb: POST
   path: /ai/translate
@@ -251,6 +1354,8 @@ operations:
   - ai.provider
   - cache:idempotency
   - control.content_block
+  - marketing.message_template
+  - marketing.message_template_version
   writes:
   - ai.activity
   - ai.proposed_action
@@ -293,6 +1398,89 @@ operations:
   - ai.activity
   - ai.proposed_action
   - cache:idempotency
+- operation: publishAiGovernancePolicy
+  verb: POST
+  path: /governance/policy-versions/{versionId}/publish
+  scope: tenant
+  permission: AI_APPROVE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - ai.governance_policy_version
+  - cache:idempotency
+  writes:
+  - ai.decision_record
+  - ai.governance_policy
+  - ai.governance_policy_version
+  - cache:governance-policy
+  - cache:idempotency
+- operation: publishForecastVersion
+  verb: POST
+  path: /forecast-versions/{versionId}/publish
+  scope: venue
+  permission: AI_APPROVE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - ai.forecast_definition
+  - ai.forecast_version
+  - cache:idempotency
+  writes:
+  - ai.decision_record
+  - ai.forecast_version
+  - ai.operational_requirement
+  - cache:idempotency
+- operation: publishPromptTemplate
+  verb: POST
+  path: /prompt-templates/{templateKey}/versions
+  scope: tenant
+  permission: AI_APPROVE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - ai.prompt_template
+  - cache:idempotency
+  writes:
+  - ai.prompt_template
+  - ai.release
+  - cache:idempotency
+- operation: recordAnswerFeedback
+  verb: POST
+  path: /messages/{messageId}/feedback
+  scope: venue
+  permission: AI_USE
+  audience:
+  - staff
+  - guest
+  offline: false
+  reads:
+  - ai.answer_feedback
+  - ai.message
+  - cache:idempotency
+  writes:
+  - ai.answer_feedback
+  - ai.knowledge_gap
+  - cache:idempotency
+- operation: recordRecommendationEvents
+  verb: POST
+  path: /recommendations/events
+  scope: venue
+  permission: AI_USE
+  audience:
+  - staff
+  - guest
+  - anonymous
+  offline: false
+  reads:
+  - ai.rec_decision
+  - cache:idempotency
+  writes:
+  - ai.rec_decline
+  - ai.rec_event
+  - cache:idempotency
 - operation: recordSuggestionOutcome
   verb: POST
   path: /ai/suggestions/{suggestionId}/outcome
@@ -333,6 +1521,7 @@ operations:
   - whitelabel.faq_entry
   - whitelabel.policy
   writes:
+  - ai.chunk_embedding
   - ai.index_entry
   - ai.index_job
   - cache:embedding
@@ -351,10 +1540,25 @@ operations:
   - cache:embedding
   - cache:idempotency
   writes:
+  - ai.chunk_embedding
   - ai.index_entry
   - cache:embedding
   - cache:idempotency
   - qdrant:knowledge
+- operation: replayAiDecision
+  verb: POST
+  path: /decision-records/{decisionRecordId}/replay
+  scope: venue
+  permission: AI_AUDIT_VIEW
+  audience:
+  - staff
+  offline: false
+  reads:
+  - ai.decision_record
+  - cache:idempotency
+  writes:
+  - ai.activity
+  - cache:idempotency
 - operation: requestSuggestion
   verb: POST
   path: /ai/suggestions
@@ -365,14 +1569,235 @@ operations:
   - guest
   offline: false
   reads:
+  - ai.forecast_point
+  - ai.forecast_version
+  - ai.insight
+  - ai.operational_requirement
   - ai.policy
   - ai.provider
+  - ai.rec_decline
+  - ai.release
   - ai.suggestion
   - cache:idempotency
+  - cache:rec-candidates
+  - fnb.production_plan
+  - inventory.movement
+  - inventory.stock_batch
+  - marketing.attribution_touch
+  - marketing.segment
+  - queue.queue
+  - queue.reading
   writes:
   - ai.activity
   - ai.suggestion
   - cache:idempotency
+- operation: resumeActionPlan
+  verb: POST
+  path: /action-plans/{planId}/resume
+  scope: venue
+  permission: AI_APPROVE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - ai.action_plan
+  - ai.action_step
+  - cache:idempotency
+  writes:
+  - ai.action_plan
+  - ai.decision_record
+  - ai.intervention
+  - cache:idempotency
+- operation: resumeAiCapability
+  verb: POST
+  path: /governance/capabilities/{capabilityKey}/resume
+  scope: tenant
+  permission: AI_APPROVE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - ai.capability
+  - cache:idempotency
+  writes:
+  - ai.capability
+  - ai.decision_record
+  - ai.intervention
+  - cache:idempotency
+- operation: retryActionStep
+  verb: POST
+  path: /action-plans/{planId}/steps/{stepNumber}/retry
+  scope: venue
+  permission: AI_APPROVE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - ai.action_step
+  - cache:idempotency
+  writes:
+  - ai.action_step
+  - ai.decision_record
+  - ai.intervention
+  - cache:idempotency
+- operation: revokeAiPolicyException
+  verb: POST
+  path: /governance/policy-exceptions/{exceptionId}/revoke
+  scope: tenant
+  permission: AI_APPROVE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - ai.policy_exception
+  - cache:idempotency
+  writes:
+  - ai.decision_record
+  - ai.policy_exception
+  - cache:idempotency
+- operation: rollbackActionPlan
+  verb: POST
+  path: /action-plans/{planId}/rollback
+  scope: venue
+  permission: AI_APPROVE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - ai.action_plan
+  - ai.action_step
+  - ai.tool
+  - cache:idempotency
+  writes:
+  - ai.action_plan
+  - ai.action_step
+  - ai.decision_record
+  - ai.proposed_action
+  - cache:idempotency
+- operation: rollbackAiRelease
+  verb: POST
+  path: /releases/{releaseId}/rollback
+  scope: tenant
+  permission: AI_APPROVE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - ai.release
+  - cache:idempotency
+  writes:
+  - ai.decision_record
+  - ai.forecast_definition
+  - ai.policy
+  - ai.release
+  - cache:idempotency
+- operation: runAiControlTest
+  verb: POST
+  path: /controls/{controlKey}/tests
+  scope: tenant
+  permission: AI_AUDIT_VIEW
+  audience:
+  - staff
+  offline: false
+  reads:
+  - ai.activity
+  - ai.control
+  - ai.control_test
+  - ai.decision_record
+  - ai.proposed_action
+  - cache:idempotency
+  writes:
+  - ai.control
+  - ai.control_test
+  - ai.governance_alert
+  - cache:idempotency
+- operation: runAiEvaluation
+  verb: POST
+  path: /evaluations
+  scope: tenant
+  permission: AI_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - ai.eval_run
+  - ai.eval_suite
+  - ai.release
+  - cache:idempotency
+  writes:
+  - ai.eval_run
+  - ai.release
+  - cache:idempotency
+- operation: runForecast
+  verb: POST
+  path: /forecast-definitions/{definitionKey}/runs
+  scope: venue
+  permission: AI_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - ai.forecast_definition
+  - ai.forecast_version
+  - ai.release
+  - ai.signal_observation
+  - cache:idempotency
+  - marketing.guest_profile
+  - marketing.segment
+  - orders.order_line
+  writes:
+  - ai.forecast_accuracy
+  - ai.forecast_point
+  - ai.forecast_version
+  - ai.insight
+  - cache:idempotency
+- operation: scoreApprovalRequest
+  verb: POST
+  path: /approval-requests/{approvalRequestId}/score
+  scope: venue
+  permission: null
+  audience:
+  - service
+  offline: false
+  reads:
+  - ai.approval_request_score
+  - ai.entity_risk
+  - approvals.request
+  - approvals.sla_policy
+  - cache:idempotency
+  writes:
+  - ai.approval_request_score
+  - ai.decision_record
+  - cache:idempotency
+- operation: scoreTransactionRisk
+  verb: POST
+  path: /risk/transaction-scores
+  scope: venue
+  permission: null
+  audience:
+  - service
+  offline: false
+  reads:
+  - ai.entity_risk
+  - ai.risk_strategy
+  - cache:idempotency
+  - cache:risk-features
+  writes:
+  - ai.decision_record
+  - ai.risk_alert
+  - ai.risk_assessment
+  - cache:idempotency
+- operation: searchAiDecisions
+  verb: GET
+  path: /decision-records
+  scope: venue
+  permission: AI_AUDIT_VIEW
+  audience:
+  - staff
+  offline: false
+  reads:
+  - ai.decision_record
+  writes: []
 - operation: semanticSearch
   verb: POST
   path: /search
@@ -382,9 +1807,11 @@ operations:
   - staff
   offline: false
   reads:
+  - ai.chunk_embedding
   - ai.chunk_ref
   - ai.knowledge_collection
   - ai.knowledge_document
+  - assets.media_asset
   - cache:answer
   - cache:idempotency
   - catalogue.product
@@ -404,6 +1831,9 @@ operations:
   - guest
   offline: false
   reads:
+  - ai.assistant_profile
+  - ai.capability
+  - ai.chunk_embedding
   - ai.chunk_ref
   - ai.conversation
   - ai.knowledge_document
@@ -416,11 +1846,27 @@ operations:
   - qdrant:knowledge
   writes:
   - ai.activity
+  - ai.decision_record
+  - ai.knowledge_gap
   - ai.message
   - ai.proposed_action
   - cache:answer
   - cache:idempotency
   - qdrant:knowledge
+- operation: setAiByokEnablement
+  verb: PUT
+  path: /tenants/{tenantId}/byok
+  scope: tenant
+  permission: PLATFORM_AI_MANAGE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - ai.byok_enablement
+  - cache:idempotency
+  writes:
+  - ai.byok_enablement
+  - cache:idempotency
 - operation: setAiCredential
   verb: PUT
   path: /ai-providers/{providerId}/credential
@@ -430,10 +1876,25 @@ operations:
   - staff
   offline: false
   reads:
+  - ai.byok_enablement
   - ai.provider
   - cache:idempotency
   writes:
   - ai.provider
+  - cache:idempotency
+- operation: setAiModel
+  verb: PUT
+  path: /models/{modelId}
+  scope: platform
+  permission: PLATFORM_AI_MANAGE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - ai.model
+  - cache:idempotency
+  writes:
+  - ai.model
   - cache:idempotency
 - operation: setAiPolicy
   verb: PUT
@@ -458,10 +1919,55 @@ operations:
   - staff
   offline: false
   reads:
+  - ai.byok_enablement
+  - ai.model
   - ai.provider
   - cache:idempotency
   writes:
   - ai.provider
+  - cache:idempotency
+- operation: setAiRiskRegisterEntry
+  verb: PUT
+  path: /risk-register/{entryId}
+  scope: tenant
+  permission: AI_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - ai.risk_register
+  - cache:idempotency
+  writes:
+  - ai.risk_register
+  - cache:idempotency
+- operation: setAiTool
+  verb: PUT
+  path: /tools/{toolKey}
+  scope: platform
+  permission: PLATFORM_AI_MANAGE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - ai.tool
+  - cache:idempotency
+  writes:
+  - ai.tool
+  - cache:idempotency
+- operation: setForecastDefinition
+  verb: PUT
+  path: /forecast-definitions/{definitionKey}
+  scope: venue
+  permission: AI_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - ai.forecast_definition
+  - ai.signal_source
+  - cache:idempotency
+  writes:
+  - ai.forecast_definition
   - cache:idempotency
 - operation: setIndexSource
   verb: PUT
@@ -489,11 +1995,93 @@ operations:
   reads:
   - ai.policy
   - ai.provider
+  - ai.release
   - cache:idempotency
   writes:
   - ai.policy
   - cache:idempotency
   - cache:resolution
+- operation: simulateActionPlan
+  verb: POST
+  path: /action-plans/{planId}/simulate
+  scope: venue
+  permission: AI_USE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - ai.action_plan
+  - ai.action_step
+  - ai.tool
+  - cache:idempotency
+  writes:
+  - ai.action_plan
+  - ai.action_step
+  - cache:idempotency
+- operation: simulateAiGovernancePolicy
+  verb: POST
+  path: /governance/policy-versions/{versionId}/simulate
+  scope: tenant
+  permission: AI_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - ai.decision_record
+  - ai.governance_policy_version
+  - cache:idempotency
+  writes:
+  - ai.governance_policy_version
+  - cache:idempotency
+- operation: simulateRecommendationDecision
+  verb: POST
+  path: /recommendations/simulate
+  scope: venue
+  permission: null
+  audience:
+  - service
+  offline: false
+  reads:
+  - ai.rec_decision
+  - cache:idempotency
+  - cache:rec-candidates
+  writes:
+  - cache:idempotency
+- operation: startConfigurationSession
+  verb: POST
+  path: /configuration-sessions
+  scope: venue
+  permission: AI_USE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - ai.capability
+  - ai.config_session
+  - ai.policy
+  - cache:idempotency
+  writes:
+  - ai.activity
+  - ai.config_session
+  - cache:idempotency
+- operation: suggestGuidedChoice
+  verb: POST
+  path: /venues/{venueId}/guided-choice-suggestions
+  scope: venue
+  permission: AI_USE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - ai.guided_choice_suggestion
+  - ai.policy
+  - ai.prompt_template
+  - cache:idempotency
+  writes:
+  - ai.activity
+  - ai.decision_record
+  - ai.guided_choice_suggestion
+  - cache:idempotency
 - operation: testAiProvider
   verb: POST
   path: /ai-providers/{providerId}/test

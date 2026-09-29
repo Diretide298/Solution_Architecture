@@ -2,7 +2,7 @@ openapi: 3.1.0
 info:
   title: TICVAI — Accreditation
   version: 1.0.0
-  x-ticvai-screen-count: 29
+  x-ticvai-screen-count: 46
   x-ticvai-tier: satellite
   x-ticvai-module: 12 — Accreditation & Credential Management
   x-ticvai-platforms:
@@ -51,10 +51,14 @@ paths:
       operationId: listAccreditationProgrammes
       x-ticvai-consumed-by:
         - "P08 BO-619 Accreditation Category Management"
+        - "P08 BO-620 Accreditation Program Setup"
       summary: Programmes, their categories and their applicant types
       description: 'Boards 1.5, 1.6 and 1.7. **A programme is the thing an application is made
         against** — a season, a tournament, a venue''s standing contractor scheme — and it carries the
         categories within it and the applicant types eligible for each.
+
+
+        `isTemplate=true` lists the reusable templates `cloneAccreditationProgramme` starts from (12.1.56).
 
         '
       tags:
@@ -64,6 +68,11 @@ paths:
       - staff
       x-ticvai-scope-level: venue
       x-ticvai-read-routing: replica
+      parameters:
+      - name: isTemplate
+        in: query
+        schema:
+          type: boolean
       responses:
         '200':
           description: Programmes
@@ -155,9 +164,7 @@ paths:
         - "P08 BO-623 Accreditation Intake Monitor"
         - "P08 BO-635 Accreditation Review Queue"
         - "P08 BO-636 Application Review Workspace"
-        - "P11 ACC-004 Application Status Tracking"
         - "P11 ACC-006 Reviewer Queue"
-        - "P11 ACC-007 Reviewer Application Detail"
       summary: Applications, by state and programme
       tags:
       - accreditation
@@ -208,6 +215,12 @@ paths:
         `pending` `accreditation.identity_conflict` for `resolveIdentityConflict`, and a pair already `rejected`
         as two different people is not raised again. The application is accepted either way.
 
+
+        **`status: draft` saves without submitting** (29 September, build pass, 12.1.2): requirements that
+        block submission are not checked on a draft, `updateAccreditationApplication` keeps saving it and
+        `submitAccreditationApplication` sends it. Any other status in the request is ignored and the
+        application is `submitted`, checked against the requirements that block submission (`422`).
+
         '
       tags:
       - accreditation
@@ -230,11 +243,17 @@ paths:
           headers:
             X-Consistency-Token:
               $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
-          description: Submitted
+          description: Submitted, or saved as a draft
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/AccreditationApplication'
+        '422':
+          description: Submitted with a requirement that blocks submission unsatisfied
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
   /accreditation-applications/{applicationId}/decide:
     parameters:
     - name: applicationId
@@ -256,6 +275,11 @@ paths:
 
         Routes through `approvals` where the programme configures a workflow — the matrix, delegation,
         SLA and the tamper-evident record all already exist there.
+
+
+        `reason` and `missingRequirements` are kept on the application, so the applicant reads what to
+        change (`listMyAccreditationApplications`) and `resubmitAccreditationApplication` sends it back.
+        Publishes `accreditation.applicationDecided`.
 
         '
       tags:
@@ -303,6 +327,9 @@ paths:
                   nullable: true
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Decided
           content:
             application/json:
@@ -316,6 +343,7 @@ paths:
         - "P08 BO-625 Accreditation Holder Directory"
         - "P08 BO-664 Accreditation Lifecycle Command Center"
         - "P08 BO-672 Expiry Monitor & Expiration Rules"
+        - "P08 BO-673 Accreditation Renewal Workspace"
         - "P08 BO-682 Accreditation Export & Data Extract Center"
         - "P08 BO-684 Accreditation Executive Dashboard"
         - "P08 BO-685 Accreditation Status & Portfolio Reporting"
@@ -415,11 +443,86 @@ paths:
               schema:
                 $ref: '#/components/schemas/AccreditationHolder'
   /accreditation-documents:
+    get:
+      operationId: listAccreditationDocuments
+      x-ticvai-consumed-by:
+        - "P08 BO-629 Document Repository"
+        - "P08 BO-630 Document Verification Queue"
+        - "P08 BO-636 Application Review Workspace"
+        - "P11 ACC-007 Reviewer Application Detail"
+      x-ticvai-agreed: '29 September: build pass, BL-180 (12.1.18, 12.1.19); pack ACCREDITATION.pdf pages 14-15
+        (BO-629, BO-630); P11 ACC-007 listAccreditationDocuments gap; shape follows listAccreditationApplications'
+      summary: Documents supplied, by holder, application, requirement or state
+      description: '12.1.18 and 12.1.19. **Documents could be submitted and verified and never read back**, so
+        a reviewer had no `documentId` to verify and the repository had nothing to show.
+
+
+        By `applicationId` for the reviewer deciding one application, by `holderId` for the repository, and
+        `status=submitted` for the verification queue, oldest first, because a queue served newest first is
+        one where the first document in waits longest. Each carries the requirement it satisfies, its asset,
+        its own expiry and who verified or refused it and why; `expiringWithinDays` finds the insurance
+        certificates that will lapse before the accreditation does.
+
+        '
+      tags:
+      - accreditation
+      x-ticvai-permission: ACCREDITATION_VIEW
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      x-ticvai-read-routing: replica
+      parameters:
+      - name: applicationId
+        in: query
+        schema:
+          type: string
+          format: uuid
+      - name: holderId
+        in: query
+        schema:
+          type: string
+          format: uuid
+      - name: requirementCode
+        in: query
+        schema:
+          type: string
+      - name: status
+        in: query
+        schema:
+          type: string
+          enum:
+          - submitted
+          - verified
+          - rejected
+          - expired
+      - name: expiringWithinDays
+        in: query
+        schema:
+          type: integer
+          minimum: 0
+      - $ref: ../shared/common.yaml#/components/parameters/PageSize
+      - $ref: ../shared/common.yaml#/components/parameters/PageCursor
+      responses:
+        '200':
+          description: Documents — by `submittedAt` ascending for `status=submitted` (the queue), descending
+            otherwise, then `id`; the cursor is keyset on that pair
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: ../shared/common.yaml#/components/schemas/Page
+                - type: object
+                  properties:
+                    items:
+                      type: array
+                      items:
+                        $ref: '#/components/schemas/AccreditationDocument'
     post:
       operationId: submitAccreditationDocument
       x-ticvai-consumed-by:
         - "P08 BO-629 Document Repository"
         - "P11 ACC-002 Registration Form"
+        - "P11 ACC-004 Application Status Tracking"
       summary: Supply a document against a requirement
       description: 'Boards 2.5 and 2.6. **A document is submitted against a named requirement**, not
         into a folder. Otherwise a verification queue is a pile of files somebody has to open to find
@@ -467,6 +570,7 @@ paths:
       operationId: verifyAccreditationDocument
       x-ticvai-consumed-by:
         - "P08 BO-630 Document Verification Queue"
+        - "P11 ACC-007 Reviewer Application Detail"
       summary: Accept or refuse a submitted document
       description: 'Board 2.6. **The verifier is recorded and so is the refusal reason**, because a
         document refused for being unreadable and one refused for being the wrong document need
@@ -507,6 +611,9 @@ paths:
                   nullable: true
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Verified
           content:
             application/json:
@@ -546,7 +653,6 @@ paths:
       operationId: listAccreditationCredentials
       x-ticvai-consumed-by:
         - "P08 BO-645 Credential Generation Workspace"
-        - "P11 ACC-005 Accreditation Badge"
         - "P11 ACC-008 Credential Register"
       summary: Badges and digital credentials issued
       tags:
@@ -581,7 +687,6 @@ paths:
         - "P08 BO-646 Credential Media Configuration"
         - "P08 BO-650 NFC & RFID Credential Encoding"
         - "P08 BO-651 Credential Activation & Delivery"
-        - "P11 ACC-005 Accreditation Badge"
       summary: Produce a badge, a mobile credential, or both
       description: 'Boards 4.2, 4.6 and 4.7. **The credential is not the accreditation.** Issuing a
         second one because the first was lost does not re-vet anybody, and revoking one does not
@@ -589,6 +694,11 @@ paths:
 
         Encoding for NFC or RFID happens here because the encoded identifier has to be recorded
         against the credential, or a reader presents an id nothing can resolve.
+
+
+        A `qr` credential (12.1.22) or a `mobileCredential` carries its `encodedIdentifier` in the stated
+        `symbology`. Publishes `accreditation.credentialIssued`, so `access` can resolve the identifier at a
+        gate; `deliverAccreditationCredential` sends a mobile one to its holder.
 
         '
       tags:
@@ -630,6 +740,9 @@ paths:
         issued without revoking the original is two live badges for one person, and the lost one is
         the one somebody else is holding.
 
+
+        Publishes `accreditation.credentialIssued` for the new credential, with `replacesCredentialId`.
+
         '
       tags:
       - accreditation
@@ -662,6 +775,9 @@ paths:
                   default: false
       responses:
         '201':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Replaced
           content:
             application/json:
@@ -958,6 +1074,9 @@ paths:
         **Revocation invalidates every credential immediately and pushes to the gates**, because a
         badge revoked in a database and live at a turnstile is worse than no system.
 
+
+        Publishes `accreditation.holderStatusChanged`, which is how the gates and webhook subscribers hear.
+
         '
       tags:
       - accreditation
@@ -997,6 +1116,9 @@ paths:
                   nullable: true
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Changed
           content:
             application/json:
@@ -1324,9 +1446,1303 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+  /accreditation-programmes/{programmeId}:
+    parameters:
+    - name: programmeId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    put:
+      operationId: updateAccreditationProgramme
+      x-ticvai-consumed-by:
+        - "P08 BO-618 Accreditation Form Builder"
+        - "P08 BO-620 Accreditation Program Setup"
+        - "P08 BO-624 Registration Rules & Publication"
+      x-ticvai-agreed: '29 September: build pass, BL-180 (12.1.2, 12.1.56); pack ACCREDITATION.pdf pages 5 and 7
+        (BO-618, BO-620); a programme could be created and never amended; shape follows createAccreditationProgramme'
+      summary: Amend a programme, link its registration form, or mark it a template
+      description: '**A programme could be created and never changed**, so the form it collects with, its
+        window and whether it is a reusable template were all fixed at birth.
+
+
+        `formId` links the `marketing-crm` form (`createForm`, BO-618) that the applicant fills in; the
+        requirements matrix (`setAccreditationRequirements`) still decides what blocks submission and what
+        blocks approval, and its `field` rows name the form fields they check. `isTemplate: true` makes the
+        programme a template: it never opens for applications (`409` on `status: open`) and is what
+        `cloneAccreditationProgramme` copies from.
+
+        '
+      tags:
+      - accreditation
+      x-ticvai-permission: ACCREDITATION_CONFIGURE
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      x-ticvai-config-scope: venue
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AccreditationProgramme'
+      responses:
+        '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: Updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccreditationProgramme'
+        '409':
+          description: A template cannot be opened for applications
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
+  /accreditation-programmes/{programmeId}/clone:
+    parameters:
+    - name: programmeId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    post:
+      operationId: cloneAccreditationProgramme
+      x-ticvai-consumed-by:
+        - "P08 BO-620 Accreditation Program Setup"
+        - "P08 BO-667 Event & Venue Accreditation Assignment"
+      x-ticvai-agreed: '29 September: build pass, BL-180 (12.1.56 reusable programme template); pack ACCREDITATION.pdf
+        page 7 (BO-620); shape follows catalogue cloneEvent'
+      summary: Start a programme from a template or last season's programme
+      description: '12.1.56. **Most accreditation programmes are last season''s programme**, and rebuilding
+        the categories, the requirements matrix, the validity rules and the badges by hand for every event is
+        how two events end up vetting the same job differently.
+
+
+        Copies from any programme, usually one marked `isTemplate`, choosing what comes: `categories` (with
+        their default access profile, quota and badge template), `requirements` (the matrix), `validity`,
+        `notificationRules` and the `form` link. **Never the applications, holders or credentials** — a
+        clone is a programme nobody has applied to yet. The new programme is `draft`, records its source in
+        `templateProgrammeId`, and takes the new `eventIds`, `venueIds` and window from the request.
+
+        '
+      tags:
+      - accreditation
+      x-ticvai-permission: ACCREDITATION_CONFIGURE
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      x-ticvai-config-scope: venue
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - code
+              - name
+              properties:
+                code:
+                  type: string
+                name:
+                  type: string
+                include:
+                  type: array
+                  description: What comes across. Omitted means all five.
+                  items:
+                    type: string
+                    enum:
+                    - categories
+                    - requirements
+                    - validity
+                    - notificationRules
+                    - form
+                eventIds:
+                  type: array
+                  items:
+                    type: string
+                    format: uuid
+                venueIds:
+                  type: array
+                  items:
+                    type: string
+                    format: uuid
+                applicationsOpenAt:
+                  type: string
+                  format: date-time
+                  nullable: true
+                applicationsCloseAt:
+                  type: string
+                  format: date-time
+                  nullable: true
+                asTemplate:
+                  type: boolean
+                  default: false
+                  description: Save the copy as a template rather than a programme to open
+      responses:
+        '201':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: Cloned as a draft
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccreditationProgramme'
+        '409':
+          description: A programme with this code already exists at this scope
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
+  /accreditation-applications/{applicationId}:
+    parameters:
+    - name: applicationId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    get:
+      operationId: getAccreditationApplication
+      x-ticvai-consumed-by:
+        - "P08 BO-636 Application Review Workspace"
+        - "P08 BO-640 Rejection & Resubmission Management"
+        - "P11 ACC-007 Reviewer Application Detail"
+      x-ticvai-agreed: '29 September: build pass, BL-180; P11 ACC-007 fetched a list to show one application;
+        shape follows getAccreditationHolder'
+      summary: One application, with where each requirement stands
+      description: '**A detail screen that fetches a collection to find one row gets slower as the queue
+        grows.** The reviewer''s workspace reads the one application it decides, with `requirementStatus`,
+        the renewal or resubmission it continues, and the date a decision is due.
+
+        '
+      tags:
+      - accreditation
+      x-ticvai-permission: ACCREDITATION_VIEW
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      x-ticvai-read-routing: replica
+      responses:
+        '200':
+          description: The application
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccreditationApplication'
+        '404':
+          $ref: ../shared/common.yaml#/components/responses/NotFound
+    put:
+      operationId: updateAccreditationApplication
+      x-ticvai-consumed-by:
+        - "P08 BO-617 New Accreditation Application"
+        - "P08 BO-640 Rejection & Resubmission Management"
+        - "P11 ACC-002 Registration Form"
+        - "P11 ACC-003 Application Review & Submit"
+        - "P11 ACC-004 Application Status Tracking"
+      x-ticvai-agreed: '29 September: build pass, BL-180 (12.1.2 drafts, 12.1.33 amend before resubmitting);
+        P11 ACC-002 saveAccreditationDraft gap; shape follows updateAccreditationHolder'
+      summary: Save a draft, or amend an application returned for information
+      description: '12.1.2 and 12.1.33. **A four-step form that loses everything to a dropped connection is a
+        form people do not come back to.** `createAccreditationApplication` with `status: draft` starts a
+        draft; this saves it as often as the form likes, and `submitAccreditationApplication` sends it.
+
+
+        Editable only while `draft` or `informationRequested` (`409` otherwise): a submitted application is
+        what the reviewer is reading, and changing it under them is changing the evidence. A `rejected`
+        application is not edited — `resubmitAccreditationApplication` starts a new one so the rejection stays
+        in the record. `subject` is checked against the requirements matrix field rows (`fieldType`,
+        `validation`) and a field that fails is refused with `422`. A guest may amend only an application they
+        submitted.
+
+        '
+      tags:
+      - accreditation
+      x-ticvai-permission: ACCREDITATION_APPLY
+      x-ticvai-guest-callable: true
+      x-ticvai-audience:
+      - staff
+      - guest
+      x-ticvai-scope-level: venue
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AccreditationApplication'
+      responses:
+        '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: Saved
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccreditationApplication'
+        '403':
+          description: A guest amending an application somebody else submitted
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
+        '409':
+          description: The application is not draft or informationRequested
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
+        '422':
+          description: A subject field fails its requirement row's fieldType or validation
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
+  /accreditation-applications/{applicationId}/submit:
+    parameters:
+    - name: applicationId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    post:
+      operationId: submitAccreditationApplication
+      x-ticvai-consumed-by:
+        - "P08 BO-617 New Accreditation Application"
+        - "P11 ACC-003 Application Review & Submit"
+      x-ticvai-agreed: '29 September: build pass, BL-180 (12.1.2); P11 ACC-003 submitAccreditationApplication
+        gap (the submit button had nothing behind it); shape follows decideAccreditationApplication'
+      summary: Send a draft for review
+      description: '**Submission is where the blocking-submission requirements bite**, not before: a missing
+        photograph does not stop somebody saving a draft at midnight, and it does stop them sending it
+        (`422`, listing the unmet `requirementCode`s). Moves `draft` to `submitted`, stamps `submittedAt`,
+        and routes to `approvals` where the programme configures a workflow. Only a `draft` (`409`), and only
+        while the programme''s window is open (`409`).
+
+        '
+      tags:
+      - accreditation
+      x-ticvai-permission: ACCREDITATION_APPLY
+      x-ticvai-guest-callable: true
+      x-ticvai-audience:
+      - staff
+      - guest
+      x-ticvai-scope-level: venue
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      responses:
+        '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: Submitted
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccreditationApplication'
+        '409':
+          description: Not a draft, or the programme's application window is closed
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
+        '422':
+          description: A requirement that blocks submission is not satisfied
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
+  /accreditation-applications/{applicationId}/resubmit:
+    parameters:
+    - name: applicationId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    post:
+      operationId: resubmitAccreditationApplication
+      x-ticvai-consumed-by:
+        - "P08 BO-640 Rejection & Resubmission Management"
+        - "P11 ACC-004 Application Status Tracking"
+      x-ticvai-agreed: '29 September: build pass, BL-180 (12.1.33); pack ACCREDITATION.pdf page 24 (BO-640
+        Rejection & Resubmission Management); shape follows approvals resubmitApprovalRequest'
+      summary: Send an application back after a return for information or a rejection
+      description: '12.1.33. **Rejection must carry a route back, and so far it carried only the reason.**
+
+
+        - From `informationRequested`: the same application goes back to `submitted` once the missing
+        requirements are supplied (`submitAccreditationDocument`, `updateAccreditationApplication`), and the
+        reviewer sees it again with its history. `200`.
+
+        - From `rejected`: **a new application linked to the rejected one** (`resubmissionOfApplicationId`),
+        as `approvals` does, so the rejection stays in the record — refused twice and granted on the third
+        attempt is a pattern worth seeing. The new one copies the subject and documents still valid, applies
+        `subject` changes from the request, and is `submitted`. `201`.
+
+
+        `changes` says what was done in response. Anything else is `409`, as is a programme whose window has
+        closed; unmet blocking-submission requirements are `422`.
+
+        '
+      tags:
+      - accreditation
+      x-ticvai-permission: ACCREDITATION_APPLY
+      x-ticvai-guest-callable: true
+      x-ticvai-audience:
+      - staff
+      - guest
+      x-ticvai-scope-level: venue
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - changes
+              properties:
+                changes:
+                  type: string
+                  minLength: 1
+                  maxLength: 1000
+                  description: What was changed in response to the return or the rejection
+                subject:
+                  type: object
+                  additionalProperties: true
+                  nullable: true
+                  description: Amended answers, applied to the resubmitted application
+      responses:
+        '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: The same application, back to submitted
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccreditationApplication'
+        '201':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: A new application, linked to the rejected one
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccreditationApplication'
+        '403':
+          description: A guest resubmitting an application somebody else submitted
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
+        '409':
+          description: Not informationRequested or rejected, or the programme's window is closed
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
+        '422':
+          description: A requirement that blocks submission is still not satisfied
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
+  /accreditation-applications/{applicationId}/withdraw:
+    parameters:
+    - name: applicationId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    post:
+      operationId: withdrawAccreditationApplication
+      x-ticvai-consumed-by:
+        - "P08 BO-616 Accreditation Application Directory"
+        - "P11 ACC-004 Application Status Tracking"
+      x-ticvai-agreed: '29 September: build pass; P11 ACC-004 withdrawAccreditationApplication gap (the screen
+        offers Withdraw and nothing performed it); shape follows decideAccreditationApplication'
+      summary: Withdraw an application before it is decided
+      description: '**`withdrawn` was in the status list and nothing could reach it.** An applicant whose
+        assignment was cancelled should be able to say so, rather than leave a reviewer deciding an
+        application nobody needs.
+
+
+        From `draft`, `submitted`, `underReview` or `informationRequested` to `withdrawn`; any open
+        `approvals` request is cancelled with it. A decided application is not withdrawn (`409`) — an approved
+        one is ended with `setAccreditationStatus`.
+
+        '
+      tags:
+      - accreditation
+      x-ticvai-permission: ACCREDITATION_APPLY
+      x-ticvai-guest-callable: true
+      x-ticvai-audience:
+      - staff
+      - guest
+      x-ticvai-scope-level: venue
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                reason:
+                  type: string
+                  maxLength: 500
+                  nullable: true
+      responses:
+        '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: Withdrawn
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccreditationApplication'
+        '403':
+          description: A guest withdrawing an application somebody else submitted
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
+        '409':
+          description: The application is already decided, withdrawn or expired
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
+  /my/accreditation-applications:
+    get:
+      operationId: listMyAccreditationApplications
+      x-ticvai-consumed-by:
+        - "P11 ACC-004 Application Status Tracking"
+      x-ticvai-agreed: '29 September: build pass, BL-180 (12.1.21 holder-callable read); P11 ACC-004 read
+        applications through a staff-only list; shape follows marketing-crm listMyCases'
+      summary: The applications this person made, or that were made for them
+      description: '**An applicant was reading their own status through a reviewer''s list**, which carries
+        `ACCREDITATION_VIEW` and which an applicant does not hold.
+
+
+        **Scoped to the caller, not filtered by it**: the applications the signed-in guest submitted, and
+        those whose holder''s `subjectId` is the caller (an organisation applying on their behalf). Each
+        carries `status`, `requirementStatus`, `decisionReason`, `missingRequirements` and `decisionDueAt`,
+        which is the date the status screen promises. A guest-facing list that takes a subject parameter is a
+        list somebody will call with another subject.
+
+        '
+      tags:
+      - accreditation
+      x-ticvai-permission: ACCREDITATION_APPLY
+      x-ticvai-guest-callable: true
+      x-ticvai-audience:
+      - guest
+      x-ticvai-scope-level: venue
+      x-ticvai-read-routing: replica
+      parameters:
+      - name: status
+        in: query
+        schema:
+          type: string
+      - $ref: ../shared/common.yaml#/components/parameters/PageSize
+      - $ref: ../shared/common.yaml#/components/parameters/PageCursor
+      responses:
+        '200':
+          description: Applications, newest first — by `submittedAt` (or creation for a draft) descending,
+            then `id`; the cursor is keyset on that pair
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: ../shared/common.yaml#/components/schemas/Page
+                - type: object
+                  properties:
+                    items:
+                      type: array
+                      items:
+                        $ref: '#/components/schemas/AccreditationApplication'
+  /my/accreditation-credentials:
+    get:
+      operationId: listMyAccreditationCredentials
+      x-ticvai-consumed-by:
+        - "P11 ACC-005 Accreditation Badge"
+      x-ticvai-agreed: '29 September: build pass, BL-180 (12.1.21 a guest-callable read of one''s own
+        credential); P11 ACC-005 getAccreditationBadge gap; shape follows marketing-crm listMyCases'
+      summary: The credentials this person holds, with where each is valid
+      description: '12.1.21. **A holder opening their own badge should not fetch every badge issued**, and
+        `listAccreditationCredentials` carries a reviewer''s permission. This returns only credentials whose
+        holder''s `subjectId` is the caller, each with the holder''s category, validity and effective zones so
+        the badge screen can say where it is valid — and *any other door, refused*.
+
+
+        A `mobileCredential` or `qr` credential carries its `encodedIdentifier` and `symbology`, which is what
+        the badge screen renders; a revoked, replaced or expired one is returned with that status and not
+        rendered as scannable.
+
+        '
+      tags:
+      - accreditation
+      x-ticvai-permission: ACCREDITATION_APPLY
+      x-ticvai-guest-callable: true
+      x-ticvai-audience:
+      - guest
+      x-ticvai-scope-level: venue
+      x-ticvai-read-routing: replica
+      parameters:
+      - name: status
+        in: query
+        schema:
+          type: string
+      - $ref: ../shared/common.yaml#/components/parameters/PageSize
+      - $ref: ../shared/common.yaml#/components/parameters/PageCursor
+      responses:
+        '200':
+          description: Credentials, current first — by `issuedAt` descending, then `id`; the cursor is keyset
+            on that pair
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: ../shared/common.yaml#/components/schemas/Page
+                - type: object
+                  properties:
+                    items:
+                      type: array
+                      items:
+                        $ref: '#/components/schemas/AccreditationCredential'
+  /my/accreditation-credentials/{credentialId}/wallet-pass:
+    parameters:
+    - name: credentialId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    post:
+      operationId: issueMyAccreditationWalletPass
+      x-ticvai-consumed-by:
+        - "P11 ACC-005 Accreditation Badge"
+      x-ticvai-agreed: '29 September: build pass, BL-180 (12.1.21 delivery of a mobile credential to the
+        holder''s phone); shape follows orders issueWalletPass'
+      summary: Put my accreditation credential in Apple or Google Wallet
+      description: '12.1.21. **A mobile credential nobody can get onto their phone is a record, not a
+        credential.** The holder adds their own `mobileCredential` or `qr` credential to a wallet; the pass
+        carries the `encodedIdentifier` in the credential''s `symbology`, the holder''s name, photo, category
+        and validity, and is updated by push when the accreditation is suspended, revoked, renewed or the
+        credential replaced — a pass that cannot be pushed to is a screenshot.
+
+
+        Issued under the same wallet issuer accounts as `orders.issueWalletPass`. Only the caller''s own
+        credential (`403`), and only one that is `issued` or `active` (`409`). Recorded as an
+        `AccreditationCredentialDelivery` with channel `appleWallet` or `googleWallet`.
+
+        '
+      tags:
+      - accreditation
+      x-ticvai-permission: ACCREDITATION_APPLY
+      x-ticvai-guest-callable: true
+      x-ticvai-audience:
+      - guest
+      x-ticvai-scope-level: venue
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - platform
+              properties:
+                platform:
+                  type: string
+                  enum:
+                  - apple
+                  - google
+      responses:
+        '201':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: Issued; `walletPassUrl` adds it to the wallet
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccreditationCredentialDelivery'
+        '403':
+          description: The credential is not the caller's
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
+        '409':
+          description: The credential is not a mobile or QR credential, or is not issued or active
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
+  /accreditation-credentials/{credentialId}/deliver:
+    parameters:
+    - name: credentialId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    post:
+      operationId: deliverAccreditationCredential
+      x-ticvai-consumed-by:
+        - "P08 BO-649 Digital & Mobile Credential Management"
+        - "P08 BO-651 Credential Activation & Delivery"
+      x-ticvai-agreed: '29 September: build pass, BL-180 (12.1.21); pack ACCREDITATION.pdf pages 32-33
+        (BO-649, BO-651); shape follows issueAccreditationCredential'
+      summary: Send a mobile credential to its holder
+      description: '12.1.21. **Issuing a mobile credential and getting it to the person are two acts**, and
+        only the first existed. The accreditation team sends it by `email` or `sms` (a link that opens the
+        holder''s credential and offers the wallet), or pushes it to the holder''s app; the send is recorded
+        with its outcome so *"I never got it"* has an answer.
+
+
+        Only a `mobileCredential` or `qr` credential that is `issued` or `active` (`409`), and only to the
+        holder''s own `email` or `phone` on `AccreditationHolder` (`422` when the holder has none) — a
+        credential sent to an address typed at the counter is a credential somebody else can open.
+        Resending invalidates the previous link.
+
+        '
+      tags:
+      - accreditation
+      x-ticvai-permission: ACCREDITATION_ISSUE
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - channel
+              properties:
+                channel:
+                  type: string
+                  enum:
+                  - email
+                  - sms
+                  - holderApp
+                activateOnDelivery:
+                  type: boolean
+                  default: false
+                  description: Set `activatedAt` when the holder opens the credential, rather than at issue
+      responses:
+        '201':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: Queued for delivery
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccreditationCredentialDelivery'
+        '409':
+          description: Not a mobile or QR credential, or not issued or active
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
+        '422':
+          description: The holder has no email or phone for the chosen channel
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
+  /accreditation-credentials/verify:
+    get:
+      operationId: verifyAccreditationCredential
+      x-ticvai-consumed-by:
+        - "P06 EMP-010 Scan — ready"
+        - "P07 SCN-003 Ready to scan"
+      x-ticvai-agreed: '29 September: build pass, BL-181 (18.8.3 staff verifying a presented accreditation);
+        shape follows access lookupTicket'
+      summary: Who holds this credential, and where may they go
+      description: '18.8.3. **A steward handed an accreditation had nothing to check it against.**
+        `access.validateAccess` answers about tickets; this answers about the person: name, photograph,
+        organisation, category, the zones they may enter now, and whether the accreditation and this
+        credential are valid today.
+
+
+        `identifier` is what the credential presents — the `encodedIdentifier` read from a QR, NFC or RFID
+        credential, or the `serialNumber` printed on a badge and typed in. `zoneId`, when given, answers
+        whether this holder may enter that zone at this moment under their access profile schedule and any
+        exception. **Read-only, like `lookupTicket`**: it records no scan, admits nobody and changes nothing;
+        admitting at a gate stays with `access.validateAccess`. A replaced, lost, revoked or expired
+        credential is returned with that `outcome` and the holder is still shown, so the steward can see why.
+        An identifier nothing matches is `404`.
+
+        **Offline, the gate answers from the access package** (29 September, build; BL-181). `access` keeps
+        every issued credential and every holder status change it hears (`accreditation.credentialIssued`,
+        `accreditation.holderStatusChanged`) in `access.accreditation_credential` and ships the admitting ones
+        in `getOfflinePackage` (`accreditationCredentials`), so `validateAccess` admits or refuses an accredited
+        person without a network. This read, with the photograph and organisation, needs one.
+
+        '
+      tags:
+      - accreditation
+      x-ticvai-permission: ACCESS_VALIDATE
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      x-ticvai-read-routing: replica
+      parameters:
+      - name: identifier
+        in: query
+        required: true
+        schema:
+          type: string
+          maxLength: 256
+      - name: zoneId
+        in: query
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: The holder, the credential and what it permits now
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccreditationCredentialVerification'
+        '400':
+          description: No identifier supplied
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
+        '404':
+          $ref: ../shared/common.yaml#/components/responses/NotFound
+  /accreditation-holders/{holderId}/renew:
+    parameters:
+    - name: holderId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    post:
+      operationId: renewAccreditation
+      x-ticvai-consumed-by:
+        - "P08 BO-672 Expiry Monitor & Expiration Rules"
+        - "P08 BO-673 Accreditation Renewal Workspace"
+        - "P11 ACC-005 Accreditation Badge"
+      x-ticvai-agreed: '29 September: build pass, BL-180 (12.1.37); pack ACCREDITATION.pdf page 53 (BO-673
+        "without unnecessarily recreating the holder or application"); shape follows createAccreditationApplication'
+      summary: Renew a holder's accreditation for another period
+      description: '12.1.37. **Renewal keeps the holder and looks again**; it does not create a second person.
+        Opens a renewal application (`renewsHolderId`) against the holder''s programme, prefilled from the
+        holder and their documents still in date.
+
+
+        Where the programme''s `AccreditationValidity.renewalRequiresReverification` is true the application
+        is `submitted` and reviewed like any other, and approval extends the same holder''s `validTo` by the
+        programme''s validity. Where it is false the renewal is approved at once, the holder''s validity is
+        extended and the application records it — **either way there is a record of who renewed whom**.
+        Credentials stay the same; wallet passes are pushed with the new validity.
+
+
+        Only inside the renewal window (`renewalWindowDays` before `validTo`, or during a grace period) and
+        only for an `active` or `expired` holder (`409`); a `revoked` holder applies afresh. A guest may renew
+        only their own accreditation (`403`).
+
+        '
+      tags:
+      - accreditation
+      x-ticvai-permission: ACCREDITATION_APPLY
+      x-ticvai-guest-callable: true
+      x-ticvai-audience:
+      - staff
+      - guest
+      x-ticvai-scope-level: venue
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                categoryCode:
+                  type: string
+                  nullable: true
+                  description: A different category for the new period, where the programme allows it
+                subject:
+                  type: object
+                  additionalProperties: true
+                  nullable: true
+                  description: Answers that changed since the last period
+      responses:
+        '201':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: The renewal application — submitted, or approved where no reverification is required
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccreditationApplication'
+        '403':
+          description: A guest renewing an accreditation that is not theirs
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
+        '409':
+          description: Outside the renewal window, the holder is revoked, suspended or archived, or a renewal
+            is already open
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
+  /accreditation-exports:
+    get:
+      operationId: listAccreditationExports
+      x-ticvai-consumed-by:
+        - "P08 BO-682 Accreditation Export & Data Extract Center"
+      x-ticvai-agreed: '29 September: build pass, BL-180 (12.1.55); pack ACCREDITATION.pdf page 61 (BO-682
+        columns requested by, date, filters, fields, records, status); shape follows listAccreditationAudit'
+      summary: Exports taken, by whom, of what
+      description: '**A spreadsheet of accredited people leaving the platform is an event someone should own.**
+        The history BO-682 shows: who asked, when, with which filters and fields, how many records, and
+        whether personal data went with it.
+
+        '
+      tags:
+      - accreditation
+      x-ticvai-permission: ACCREDITATION_MANAGE
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      x-ticvai-read-routing: replica
+      parameters:
+      - name: status
+        in: query
+        schema:
+          type: string
+      - $ref: ../shared/common.yaml#/components/parameters/PageSize
+      - $ref: ../shared/common.yaml#/components/parameters/PageCursor
+      responses:
+        '200':
+          description: Exports, newest first — by `requestedAt` descending, then `id`; the cursor is keyset on
+            that pair
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: ../shared/common.yaml#/components/schemas/Page
+                - type: object
+                  properties:
+                    items:
+                      type: array
+                      items:
+                        $ref: '#/components/schemas/AccreditationDataExport'
+    post:
+      operationId: exportAccreditationData
+      x-ticvai-consumed-by:
+        - "P08 BO-682 Accreditation Export & Data Extract Center"
+      x-ticvai-agreed: '29 September: build pass, BL-180 (12.1.55); pack ACCREDITATION.pdf page 61 (BO-682);
+        shape follows reporting exportReportResult'
+      summary: Export holders, applications, credentials or access assignments
+      description: '12.1.55. **Asynchronous.** Returns the export `queued`; `getAccreditationExport` gives the
+        signed, expiring download link once it is `ready`.
+
+
+        One `dataset` per export, filtered by programme, status, organisation, category and the date the
+        accreditation must be valid on, as `csv` or `xlsx`. The base export carries names, accreditation
+        numbers, organisation, category, status, validity and zones — the register a security team is handed
+        before a performance. **Contact details, date of birth, nationality and document references come only
+        with `includePersonalData`**, which needs `REPORT_EXPORT_PII` (`403` without it) and a `purpose`
+        (`422` without one), and is written to the accreditation audit trail.
+
+        '
+      tags:
+      - accreditation
+      x-ticvai-permission: ACCREDITATION_MANAGE
+      x-ticvai-permission-escalated: REPORT_EXPORT_PII
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AccreditationDataExport'
+      responses:
+        '202':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: Export queued. Poll `getAccreditationExport` until it is `ready`
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccreditationDataExport'
+          links:
+            pollExport:
+              operationId: getAccreditationExport
+              parameters:
+                exportId: $response.body#/id
+              description: Export status, and the download link once ready.
+        '403':
+          description: Personal data requested without REPORT_EXPORT_PII
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
+        '422':
+          description: Personal data requested without a purpose
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
+  /accreditation-exports/{exportId}:
+    parameters:
+    - name: exportId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    get:
+      operationId: getAccreditationExport
+      x-ticvai-consumed-by:
+        - "P08 BO-682 Accreditation Export & Data Extract Center"
+      x-ticvai-agreed: '29 September: build pass, BL-180 (12.1.55); shape follows reporting getReportExport'
+      summary: One export, and its download link once ready
+      description: 'The download link is signed and expires; an `expired` export is taken again rather than
+        its file kept, so a register of personal data does not outlive the reason it was taken.
+
+        '
+      tags:
+      - accreditation
+      x-ticvai-permission: ACCREDITATION_MANAGE
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      responses:
+        '200':
+          description: The export
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccreditationDataExport'
+        '404':
+          $ref: ../shared/common.yaml#/components/responses/NotFound
 
 components:
   schemas:
+    AccreditationCredentialDelivery:
+      type: object
+      x-ticvai-persistence: accreditation.mobile_credential_delivery
+      description: '12.1.21. **Issuing a mobile credential and getting it onto a phone are two acts**, and
+        the second is recorded so *"I never got it"* has an answer. Written by `deliverAccreditationCredential`
+        (the accreditation team sends it) and `issueMyAccreditationWalletPass` (the holder adds it to a
+        wallet).
+
+        '
+      required:
+      - credentialId
+      - channel
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        credentialId:
+          type: string
+          format: uuid
+        holderId:
+          type: string
+          format: uuid
+          readOnly: true
+        channel:
+          type: string
+          enum:
+          - email
+          - sms
+          - holderApp
+          - appleWallet
+          - googleWallet
+        destinationMasked:
+          type: string
+          nullable: true
+          readOnly: true
+          description: The address or number used, masked (`j***@agency.com`). Always the holder's own
+        walletPassSerial:
+          type: string
+          nullable: true
+          readOnly: true
+        walletPassUrl:
+          type: string
+          nullable: true
+          readOnly: true
+          description: Signed and expiring; adds the pass to the wallet
+        status:
+          type: string
+          readOnly: true
+          enum:
+          - queued
+          - sent
+          - delivered
+          - opened
+          - failed
+          - superseded
+        failureReason:
+          type: string
+          nullable: true
+          readOnly: true
+        requestedByPrincipalId:
+          type: string
+          format: uuid
+          nullable: true
+          readOnly: true
+        requestedAt:
+          type: string
+          format: date-time
+          readOnly: true
+        deliveredAt:
+          type: string
+          format: date-time
+          nullable: true
+          readOnly: true
+        scopePath:
+          type: string
+    AccreditationCredentialVerification:
+      type: object
+      description: '18.8.3. **What a steward needs to believe the person in front of them**: the face, the
+        name, the category and the zones, and whether any of it is valid now. Returned by
+        `verifyAccreditationCredential`; not stored.
+
+        '
+      required:
+      - outcome
+      properties:
+        outcome:
+          type: string
+          enum:
+          - valid
+          - notYetValid
+          - expired
+          - suspended
+          - revoked
+          - credentialReplaced
+          - credentialLost
+          - credentialInactive
+          description: '`valid` only when the holder is `active`, today is inside the holder''s validity, and
+            the credential is `issued` or `active`'
+        reason:
+          type: string
+          nullable: true
+        credentialId:
+          type: string
+          format: uuid
+        credentialKind:
+          type: string
+        credentialStatus:
+          type: string
+        holderId:
+          type: string
+          format: uuid
+        accreditationNumber:
+          type: string
+        fullName:
+          type: string
+        photoAssetId:
+          type: string
+          format: uuid
+          nullable: true
+        photoUrl:
+          type: string
+          nullable: true
+          description: Signed and short-lived, so the scan screen can show the face without a second call
+        organisationName:
+          type: string
+          nullable: true
+        affiliationRole:
+          type: string
+          nullable: true
+        programmeId:
+          type: string
+          format: uuid
+        categoryCode:
+          type: string
+          nullable: true
+        categoryName:
+          type: string
+          nullable: true
+        holderStatus:
+          type: string
+        validFrom:
+          type: string
+          format: date
+          nullable: true
+        validTo:
+          type: string
+          format: date
+          nullable: true
+        effectiveZones:
+          type: array
+          description: The zones the holder may enter under their profiles and exceptions, today
+          items:
+            type: object
+            properties:
+              zoneId:
+                type: string
+                format: uuid
+              zoneName:
+                type: string
+              allowedNow:
+                type: boolean
+                description: Inside the profile schedule (date, day, time, event phase) at this moment
+        escortRequired:
+          type: boolean
+        zoneCheck:
+          type: object
+          nullable: true
+          description: Present when `zoneId` was given
+          properties:
+            zoneId:
+              type: string
+              format: uuid
+            allowed:
+              type: boolean
+            reason:
+              type: string
+              nullable: true
+        checkedAt:
+          type: string
+          format: date-time
+    AccreditationDataExport:
+      type: object
+      x-ticvai-persistence: accreditation.data_export
+      description: '12.1.55. **A spreadsheet of accredited people leaving the platform is an event someone
+        should own.** Requested by `exportAccreditationData`, listed for BO-682, and fetched once `ready`.
+
+        '
+      required:
+      - dataset
+      - format
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        dataset:
+          type: string
+          enum:
+          - holders
+          - applications
+          - credentials
+          - accessAssignments
+          - documents
+        format:
+          type: string
+          enum:
+          - csv
+          - xlsx
+        programmeId:
+          type: string
+          format: uuid
+          nullable: true
+        statusFilter:
+          type: string
+          nullable: true
+        organisationId:
+          type: string
+          format: uuid
+          nullable: true
+        categoryCode:
+          type: string
+          nullable: true
+        validOn:
+          type: string
+          format: date
+          nullable: true
+          description: Only accreditations valid on this date — the register for one performance
+        fields:
+          type: array
+          description: The columns wanted. Omitted means the dataset's standard set
+          items:
+            type: string
+        includePersonalData:
+          type: boolean
+          default: false
+          description: Contact details, date of birth, nationality and document references. Requires
+            REPORT_EXPORT_PII and a purpose; recorded in the accreditation audit trail
+        purpose:
+          type: string
+          maxLength: 500
+          nullable: true
+        requestedByPrincipalId:
+          type: string
+          format: uuid
+          readOnly: true
+        requestedAt:
+          type: string
+          format: date-time
+          readOnly: true
+        recordCount:
+          type: integer
+          nullable: true
+          readOnly: true
+        status:
+          type: string
+          readOnly: true
+          enum:
+          - queued
+          - running
+          - ready
+          - failed
+          - expired
+        downloadUrl:
+          type: string
+          nullable: true
+          readOnly: true
+          description: Signed and expiring
+        expiresAt:
+          type: string
+          format: date-time
+          nullable: true
+          readOnly: true
+        scopePath:
+          type: string
 
     AccreditationProgramme:
       type: object
@@ -1373,6 +2789,12 @@ components:
                   a category is a promise nobody counted.
 
                   '
+              badgeTemplateId:
+                type: string
+                format: uuid
+                nullable: true
+                description: The badge printed for this category; travels with the category when a programme
+                  is cloned
         applicantTypes:
           type: array
           items:
@@ -1389,6 +2811,29 @@ components:
           type: string
           format: uuid
           nullable: true
+        formId:
+          type: string
+          format: uuid
+          nullable: true
+          description: '12.1.2. The `marketing-crm` form definition (`createForm`, BO-618) the applicant
+            fills in. The requirements matrix''s `field` rows name the form fields they check, so the form
+            is configured without software development and what blocks approval stays in one place.
+
+            '
+        isTemplate:
+          type: boolean
+          default: false
+          description: '12.1.56. **A reusable programme template**: never opened for applications, and what
+            `cloneAccreditationProgramme` copies its categories, requirements, validity, notification rules
+            and form link from.
+
+            '
+        templateProgrammeId:
+          type: string
+          format: uuid
+          nullable: true
+          readOnly: true
+          description: The programme or template this one was cloned from
         status:
           type: string
           enum:
@@ -1439,6 +2884,66 @@ components:
               expiryMonths:
                 type: integer
                 nullable: true
+              formFieldKey:
+                type: string
+                nullable: true
+                description: For a `field` row, the key of the field on the programme's form that it checks
+              fieldType:
+                type: string
+                nullable: true
+                description: 12.1.2. For a `field` row, what kind of answer it takes
+                enum:
+                - text
+                - email
+                - phone
+                - date
+                - country
+                - number
+                - boolean
+                - singleChoice
+                - multipleChoice
+              visibility:
+                type: string
+                default: mandatory
+                description: Pack page 5 (BO-618) — mandatory, optional, conditional on another answer, or hidden
+                enum:
+                - mandatory
+                - optional
+                - conditional
+                - hidden
+              condition:
+                type: object
+                nullable: true
+                description: For `conditional`, the answer that makes this row apply
+                properties:
+                  requirementCode:
+                    type: string
+                  equals:
+                    type: string
+              validation:
+                type: object
+                nullable: true
+                description: Checked on save and on submit; a failing answer is refused with the row's label
+                properties:
+                  pattern:
+                    type: string
+                    nullable: true
+                  minLength:
+                    type: integer
+                    nullable: true
+                  maxLength:
+                    type: integer
+                    nullable: true
+                  minValue:
+                    type: number
+                    nullable: true
+                  maxValue:
+                    type: number
+                    nullable: true
+                  allowedValues:
+                    type: array
+                    items:
+                      type: string
         scopePath:
           type: string
     AccreditationApplication:
@@ -1501,6 +3006,19 @@ components:
         decisionReason:
           type: string
           nullable: true
+        missingRequirements:
+          type: array
+          readOnly: true
+          description: The requirement codes a reviewer returned the application for, or rejected it over —
+            what the applicant must change before resubmitting
+          items:
+            type: string
+        decisionDueAt:
+          type: string
+          format: date-time
+          nullable: true
+          readOnly: true
+          description: When a decision is due — the approvals request's SLA. **A date, not a queue position**
         approvalRequestId:
           type: string
           format: uuid
@@ -1509,6 +3027,24 @@ components:
           type: string
           format: uuid
           nullable: true
+        renewsHolderId:
+          type: string
+          format: uuid
+          nullable: true
+          readOnly: true
+          description: 12.1.37. Set by `renewAccreditation`; approval extends this holder rather than creating one
+        resubmissionOfApplicationId:
+          type: string
+          format: uuid
+          nullable: true
+          readOnly: true
+          description: 12.1.33. The rejected application this one resubmits, so the rejection stays in the record
+        resubmissionNote:
+          type: string
+          maxLength: 1000
+          nullable: true
+          readOnly: true
+          description: What the applicant changed, from `resubmitAccreditationApplication`
         submittedAt:
           type: string
           format: date-time
@@ -1552,6 +3088,15 @@ components:
         nationality:
           type: string
           nullable: true
+        email:
+          type: string
+          format: email
+          nullable: true
+          description: 12.1.16. The holder's own address — where a mobile credential and renewal notices go
+        phone:
+          type: string
+          nullable: true
+          description: 12.1.16. E.164
         identityDocumentVerified:
           type: boolean
           default: false
@@ -1729,9 +3274,27 @@ components:
           enum:
           - printedBadge
           - mobileCredential
+          - qr
           - nfcCard
           - rfidCard
           - wristband
+        symbology:
+          type: string
+          nullable: true
+          description: '12.1.22. **How `encodedIdentifier` is carried**, so a reader and a badge renderer agree:
+            `qr` for a QR credential and the default for a `mobileCredential`, a barcode where a printed badge
+            carries one, `nfcNdef` or `rfidEpc` for an encoded card, `none` where nothing is encoded.
+
+            '
+          enum:
+          - qr
+          - dataMatrix
+          - pdf417
+          - aztec
+          - code128
+          - nfcNdef
+          - rfidEpc
+          - none
         serialNumber:
           type: string
           nullable: true
@@ -2071,6 +3634,7 @@ components:
                 - rejected
                 - credentialReady
                 - expiringSoon
+                - renewalWindowOpen
                 - expired
                 - suspended
                 - revoked

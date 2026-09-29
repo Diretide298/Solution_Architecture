@@ -7,7 +7,7 @@
 | Tier | platform: Provisioning, publishing, reporting, and the one cross-region path. |
 | Contracts | `white-label` |
 | Schemas owned | `whitelabel` |
-| Operations in the slice | 56 of 60 |
+| Operations in the slice | 61 of 64 |
 | Scale | Read-heavy and heavily cached. Published, not queried. |
 | If it is down | Down freezes the current published config. Guests see the last good version. |
 
@@ -19,7 +19,9 @@ Branding, content, navigation and the tenant's own app configuration. Separate b
 
 | Service | Tables it reads |
 |---|---|
-| [PlatformService](PlatformService.md) | `control.licence_add_on`, `control.tenant`, `subscription.contract`, `subscription.plan` |
+| [IdentityService](IdentityService.md) | `identity.principal` |
+| [MarketingService](MarketingService.md) | `marketing.segment` |
+| [PlatformService](PlatformService.md) | `control.content_block`, `control.licence_add_on`, `control.tenant`, `subscription.contract`, `subscription.plan` |
 
 ## Operations in the first release
 
@@ -65,6 +67,9 @@ Branding, content, navigation and the tenant's own app configuration. Separate b
 | navigation | [`setNavigation`](#setnavigation) | PUT | `/tenant-config/navigation` | core | 2 | CMS-009 |
 | overview | [`getTenantAppStatus`](#gettenantappstatus) | GET | `/tenant-config/status` | core | 1 | CMS-001, CMS-014, GST-001, GST-029, GST-038, GST-040 … |
 | overview | [`getTenantConfig`](#gettenantconfig) | GET | `/tenant-config` | core | 1 | BO-599, BO-834, CMS-001, CMS-012, CMS-016, GST-001 … |
+| overview | [`listAnalyticsProviders`](#listanalyticsproviders) | GET | `/tenant-config/analytics-providers` | core | 1 | CMS-016, GST-001, WEB-001 |
+| overview | [`recordStorefrontSessionEvents`](#recordstorefrontsessionevents) | POST | `/storefront/session-events` | core | 1 | GST-001, WEB-001 |
+| overview | [`setAnalyticsProvider`](#setanalyticsprovider) | PUT | `/tenant-config/analytics-providers` | core | 2 | CMS-016 |
 | overview | [`setMaintenanceMode`](#setmaintenancemode) | PUT | `/tenant-config/status` | core | 2 | CMS-001 |
 | publishing | [`createPreview`](#createpreview) | POST | `/tenant-config/preview` | core | 2 | ADM-016, CMS-006 |
 | publishing | [`diffConfigVersion`](#diffconfigversion) | GET | `/tenant-config/versions/{version}/diff` | core | 2 | ADM-016, CMS-006, CMS-015 |
@@ -80,6 +85,8 @@ Branding, content, navigation and the tenant's own app configuration. Separate b
 | white-label | [`listCustomDomains`](#listcustomdomains) | GET | `/tenant-domains` | core | 2 | ADM-017, CMS-017 |
 | white-label | [`relinquishCustomDomain`](#relinquishcustomdomain) | DELETE | `/tenant-domains/{domainId}` | core | 2 | ADM-017, CMS-017 |
 | white-label | [`verifyCustomDomain`](#verifycustomdomain) | POST | `/tenant-domains/{domainId}/verify` | core | 2 | ADM-017, CMS-017 |
+| whiteLabel | [`createContentBlock`](#createcontentblock) | POST | `/content-blocks` | setup | 2 | BO-839 |
+| whiteLabel | [`publishContentBlock`](#publishcontentblock) | POST | `/content-blocks/{blockId}/publish` | setup | 2 |  |
 | whiteLabel | [`setFooter`](#setfooter) | PUT | `/footer` | core | 2 | CMS-007 |
 
 ## Group: brand
@@ -650,6 +657,7 @@ Scheduled by date window. A campaign banner set to run through a religious or na
 **`POST /tenant-config/pages`**: Create a content page
 
 Always created as a `draft`; `id`, `status`, `isReferenced` and `scopePath` are the server's and are ignored if sent.
+**Accepts `Prefer: validate-only`** (29 September, build pass, group G2): validates and answers 200 with the would-be result without writing, for the AI executor's plan validation; registered as an AI tool (`ai.AiTool`, 1.2.59, 2.6.50).
 
 |  |  |
 |---|---|
@@ -669,6 +677,7 @@ Always created as a `draft`; `id`, `status`, `isReferenced` and `scopePath` are 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
 | Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Prefer | header |  | enum (validate-only) | Validate, do not write (29 September, AI system design 2.3 and 2.2 D step 4). |
 
 **Request body**: `ContentPage`
 
@@ -706,6 +715,7 @@ Always created as a `draft`; `id`, `status`, `isReferenced` and `scopePath` are 
 
 | Code | Shape | Meaning |
 |---|---|---|
+| 200 |  | Validate-only: the would-be result, nothing written |
 | 201 |  | Created in draft |
 | 409 |  | Slug already in use |
 
@@ -1880,6 +1890,7 @@ A partial update. Only a `draft` may be edited: a `published` choice is unpublis
 
 The drag-and-drop builder. Sections are an ordered list; the order here is the order on the guest's home screen.
 **A section whose module is disabled is refused (400)**, by the mapping on `HomepageSectionKind`, which is proposed, client to correct (audit R163).
+**Accepts `Prefer: validate-only`** (29 September, build pass, group G2): validates and answers 200 with the would-be result without writing, for the AI executor's plan validation; registered as an AI tool (`ai.AiTool`, 1.2.59, 2.6.50).
 
 |  |  |
 |---|---|
@@ -1899,6 +1910,7 @@ The drag-and-drop builder. Sections are an ordered list; the order here is the o
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
 | Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Prefer | header |  | enum (validate-only) | Validate, do not write (29 September, AI system design 2.3 and 2.2 D step 4). |
 
 **Request body**: `HomepageLayout`
 
@@ -2123,6 +2135,8 @@ A disabled module is **hidden from the guest app entirely** — not shown and re
 
 **`PUT /tenant-config/header`**: Configure the header
 
+**Accepts `Prefer: validate-only`** (29 September, build pass, group G2): validates and answers 200 with the would-be result without writing, for the AI executor's plan validation; registered as an AI tool (`ai.AiTool`, 1.2.59, 2.6.50).
+
 |  |  |
 |---|---|
 | Permission | `TENANT_CONFIGURE` |
@@ -2140,6 +2154,7 @@ A disabled module is **hidden from the guest app entirely** — not shown and re
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
 | Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Prefer | header |  | enum (validate-only) | Validate, do not write (29 September, AI system design 2.3 and 2.2 D step 4). |
 
 **Request body**: `HeaderConfig`
 
@@ -2173,6 +2188,7 @@ A disabled module is **hidden from the guest app entirely** — not shown and re
 
 Items pointing at a disabled module are refused. A navigation entry that leads nowhere is worse than an absent one.
 Bottom navigation is capped at five visible items; the remainder moves to the overflow menu.
+**Accepts `Prefer: validate-only`** (29 September, build pass, group G2): validates and answers 200 with the would-be result without writing, for the AI executor's plan validation; registered as an AI tool (`ai.AiTool`, 1.2.59, 2.6.50).
 
 |  |  |
 |---|---|
@@ -2191,6 +2207,7 @@ Bottom navigation is capped at five visible items; the remainder moves to the ov
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
 | Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Prefer | header |  | enum (validate-only) | Validate, do not write (29 September, AI system design 2.3 and 2.2 D step 4). |
 
 **Request body**: `NavigationConfig`
 
@@ -2528,6 +2545,190 @@ Everything the builder edits. **A staff caller gets the working draft**, or with
 | 200 |  | Configuration |
 | 403 | Forbidden | Authenticated but not permitted at the requested scope |
 | 404 |  | version names no published version (not-found), or the tenant has no working draft yet — for a guest, nothing has been published yet (not-configured). |
+
+### listAnalyticsProviders
+
+**`GET /tenant-config/analytics-providers`**: The analytics platforms the storefront and app report to
+
+**Staff get every row as configured, guests get what the tag loader needs.** A staff caller sees each provider with its venue, surfaces, consent category and reporting link. **A guest caller gets only the enabled rows in force for the venue they are browsing** (the venue's own row, else the tenant-wide one), with `provider`, `measurementId`, `surfaces` and `consentCategory` and nothing else; `TENANT_CONFIGURE` is not needed for that, as with `getTenantConfig`. **The loader injects a provider only once marketing-crm `getCookieConsentRuntime` says its `consentCategory` is granted**; before that nothing is sent to it (2.6.58). Ordered by `venueId` (tenant-wide first) then `provider`; keyset cursor.
+
+|  |  |
+|---|---|
+| Permission | `TENANT_CONFIGURE` |
+| Scope level | venue |
+| Part of slice | core |
+| Wave | 1 |
+| Offline | no |
+| Conflict policy | serverWins |
+| Read routing | replica |
+| Reads | `whitelabel.analytics_provider` |
+| Writes | - |
+| Called by | CMS-016, GST-001, WEB-001 |
+
+**Parameters**
+
+| Name | In | Required | Type | Notes |
+|---|---|---|---|---|
+| venueId | query |  | string (uuid) | Staff, the rows of this venue only; guest, the venue being browsed, so its rows win over the tenant's |
+| pageSize | query |  | integer |  |
+| cursor | query |  | string | Opaque cursor: the nextCursor of the previous page. |
+
+**Response**: `object`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| items | array of StorefrontAnalyticsProvider | yes |  |
+| items[].id | string (uuid) |  | (read-only) |
+| items[].venueId | string (uuid) |  | (nullable) |
+| items[].provider | enum (googleAnalytics4, googleTagManager, adobeAnalytics, metaPixel, matomo, other) | yes |  |
+| items[].providerLabel | string |  | The name, when provider is other. (max length 100; nullable) |
+| items[].measurementId | string | yes | What the tag or SDK reports to (GA4 G-..., Tag Manager GTM-..., a pixel id). (max length 100) |
+| items[].surfaces | array of enum (guestWeb, guestApp) | yes | (min items 1) |
+| items[].consentCategory | enum (functional, analytics, personalisation, marketing) | yes | The cookie category the visitor must grant before this provider loads (marketing-crm CookieCategory). (default analytics) |
+| items[].isEnabled | boolean | yes | (default True) |
+| items[].reportingPropertyId | string |  | The property getStorefrontInsights asks the reporting API about (a GA4 property id). (max length 100; nullable) |
+| items[].reportingCredentialRef | string |  | The vault reference of the reporting credential. (max length 200; nullable) |
+| items[].hasReportingCredential | boolean |  | Whether a reporting credential is held, since the reference itself is never returned. (read-only) |
+| items[].scopePath | string |  | The partition key (ADR-0005). (read-only) |
+| items[].updatedAt | string (date-time) |  | (read-only) |
+| nextCursor | string |  |  |
+| hasMore | boolean | yes |  |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 200 |  | Analytics providers |
+| 403 | Forbidden | Authenticated but not permitted at the requested scope |
+
+### recordStorefrontSessionEvents
+
+**`POST /storefront/session-events`**: Report a batch of browsing behaviour for fraud prevention, hashed and without personal data
+
+8.3.40 (decided 29 September, build pass, group G2). **The storefront and guest app runtime posts this as a beacon**, every 50 interactions or 30 seconds and when the page is hidden, for every page of the session; it is part of the runtime shell, not of any one screen. Each accepted batch publishes one `storefront.sessionEvent` (ADR-0033: the outbox row is the only write) for the risk engine, which joins it to a later payment through `sessionRef`.
+
+**No personal data is accepted.** The session id and device id are identifiers the runtime minted for itself, SHA-256 hashed in the browser and hashed again with the tenant key on arrival; a page is sent as its route family, never its URL; no search text, form value or guest id is taken (a signed-in session says only `signedIn` true). A body carrying anything else is refused with 400 rather than stored, so a runtime bug cannot leak what this was built not to hold.
+
+**Cheap and lossy by design.** Answers 202 without waiting for the publish; a batch dropped by the rate limit (per session and per address, `429`) is not retried. Nothing a guest sees depends on it. The address is hashed at the edge with the same tenant key as the `ipHash` `ai.scoreTransactionRisk` receives, and added to the event; the runtime never sends it.
+
+|  |  |
+|---|---|
+| Permission | `None` |
+| Scope level | tenant |
+| Part of slice | core |
+| Wave | 1 |
+| Offline | no |
+| Conflict policy | serverWins |
+| Reads | `cache:idempotency` |
+| Writes | `cache:idempotency`, `platform.outbox` |
+| Called by | GST-001, WEB-001 |
+
+**Parameters**
+
+| Name | In | Required | Type | Notes |
+|---|---|---|---|---|
+| Idempotency-Key | header | yes | string | Client-generated ULID. |
+
+**Request body**: `WhiteLabelStorefrontSessionBatch`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| batchId | string | yes | ULID minted by the runtime; a retried beacon repeats it. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
+| sessionRef | string | yes | The runtime's own session id, SHA-256 hashed in the browser; hashed again with the tenant key on arrival and published as storefront.sessionEvent.sessionRef. (max length 128) |
+| deviceIdHash | string |  | (max length 128; nullable) |
+| surface | enum (guestWeb, guestApp) | yes |  |
+| venueId | string (uuid) |  | (nullable) |
+| sessionStartedAt | string (date-time) | yes |  |
+| interactions | array of object | yes | (min items 1; max items 50) |
+| interactions[].kind | enum (pageView, productView, seatMapOpened, addToCart, removeFromCart, checkoutStarted, paymentPageViewed, promoCodeTried, …) | yes |  |
+| interactions[].pageKind | enum (home, product, seatMap, cart, checkout, account, content, None) |  | (nullable) |
+| interactions[].productId | string (uuid) |  | (nullable) |
+| interactions[].at | string (date-time) | yes |  |
+| interactions[].dwellMs | integer |  | (min 0; nullable) |
+| automationHints | object |  | (nullable) |
+| automationHints.webdriver | boolean |  |  |
+| automationHints.headless | boolean |  |  |
+| automationHints.pointerEvents | integer |  | (min 0) |
+| automationHints.interactionsPerMinute | number |  | (min 0) |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 202 |  | Accepted for publication. |
+| 400 |  | A field outside the batch shape (a URL with a query, free text, an unhashed id), or more than 50 interactions. |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal |
+
+### setAnalyticsProvider
+
+**`PUT /tenant-config/analytics-providers`**: Connect the storefront and app to an analytics platform
+
+**An upsert keyed on `venueId` + `provider`** (22.10.29). A null `venueId` is the tenant-wide default; a venue's own row replaces it for that venue (ADR-0018, nearest wins). `measurementId` is what the page tag or app SDK reports to (a GA4 `G-` id, a Tag Manager `GTM-` container, a pixel id); it is public by nature, and the reporting credential is not: `reportingCredentialRef` names a secret in the platform vault, is write-only and is never returned.
+**Every provider waits on a consent category** (`consentCategory`, `analytics` unless set): it is not loaded, and no hit is sent, until the visitor's decision grants that category. `strictlyNecessary` is not offered: no analytics platform is necessary for the site to work. Takes effect with `publishTenantConfig`, like the rest of the storefront configuration.
+
+|  |  |
+|---|---|
+| Permission | `TENANT_CONFIGURE` |
+| Scope level | venue |
+| Part of slice | core |
+| Wave | 2 |
+| Offline | no |
+| Config scope | venue |
+| Conflict policy | serverWins |
+| Reads | `cache:idempotency`, `whitelabel.analytics_provider` |
+| Writes | `cache:idempotency`, `whitelabel.analytics_provider` |
+| Called by | CMS-016 |
+
+**Parameters**
+
+| Name | In | Required | Type | Notes |
+|---|---|---|---|---|
+| Idempotency-Key | header | yes | string | Client-generated ULID. |
+
+**Request body**: `StorefrontAnalyticsProvider`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| id | string (uuid) |  | (read-only) |
+| venueId | string (uuid) |  | (nullable) |
+| provider | enum (googleAnalytics4, googleTagManager, adobeAnalytics, metaPixel, matomo, other) | yes |  |
+| providerLabel | string |  | The name, when provider is other. (max length 100; nullable) |
+| measurementId | string | yes | What the tag or SDK reports to (GA4 G-..., Tag Manager GTM-..., a pixel id). (max length 100) |
+| surfaces | array of enum (guestWeb, guestApp) | yes | (min items 1) |
+| consentCategory | enum (functional, analytics, personalisation, marketing) | yes | The cookie category the visitor must grant before this provider loads (marketing-crm CookieCategory). (default analytics) |
+| isEnabled | boolean | yes | (default True) |
+| reportingPropertyId | string |  | The property getStorefrontInsights asks the reporting API about (a GA4 property id). (max length 100; nullable) |
+| reportingCredentialRef | string |  | The vault reference of the reporting credential. (max length 200; nullable) |
+| hasReportingCredential | boolean |  | Whether a reporting credential is held, since the reference itself is never returned. (read-only) |
+| scopePath | string |  | The partition key (ADR-0005). (read-only) |
+| updatedAt | string (date-time) |  | (read-only) |
+
+**Response**: `StorefrontAnalyticsProvider`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| id | string (uuid) |  | (read-only) |
+| venueId | string (uuid) |  | (nullable) |
+| provider | enum (googleAnalytics4, googleTagManager, adobeAnalytics, metaPixel, matomo, other) | yes |  |
+| providerLabel | string |  | The name, when provider is other. (max length 100; nullable) |
+| measurementId | string | yes | What the tag or SDK reports to (GA4 G-..., Tag Manager GTM-..., a pixel id). (max length 100) |
+| surfaces | array of enum (guestWeb, guestApp) | yes | (min items 1) |
+| consentCategory | enum (functional, analytics, personalisation, marketing) | yes | The cookie category the visitor must grant before this provider loads (marketing-crm CookieCategory). (default analytics) |
+| isEnabled | boolean | yes | (default True) |
+| reportingPropertyId | string |  | The property getStorefrontInsights asks the reporting API about (a GA4 property id). (max length 100; nullable) |
+| reportingCredentialRef | string |  | The vault reference of the reporting credential. (max length 200; nullable) |
+| hasReportingCredential | boolean |  | Whether a reporting credential is held, since the reference itself is never returned. (read-only) |
+| scopePath | string |  | The partition key (ADR-0005). (read-only) |
+| updatedAt | string (date-time) |  | (read-only) |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 200 |  | Saved |
+| 400 | BadRequest | Validation failed |
+| 403 | Forbidden | Authenticated but not permitted at the requested scope |
+| 422 |  | A measurementId that does not match the provider's format, or a venueId not among the tenant's active venues |
 
 ### setMaintenanceMode
 
@@ -3179,6 +3380,7 @@ Run before publishing. Reports missing translations, navigation pointing at disa
 
 **Every font is a pair — one Latin, one Arabic.** A Latin font selected alone leaves Arabic text rendering in a system fallback that will not match, so an Arabic face is required whenever Arabic is an enabled language.
 **"Arabic enabled" means `ar` is in the tenant's languages (`setLanguages`) (decided 28 September, audit R163).** Then `primaryArabic` is required, and **`secondaryArabic` is required whenever `secondaryLatin` is set**; either missing is a 400.
+**Accepts `Prefer: validate-only`** (29 September, build pass, group G2): validates and answers 200 with the would-be result without writing, for the AI executor's plan validation; registered as an AI tool (`ai.AiTool`, 1.2.59, 2.6.50).
 
 |  |  |
 |---|---|
@@ -3197,6 +3399,7 @@ Run before publishing. Reports missing translations, navigation pointing at disa
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
 | Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Prefer | header |  | enum (validate-only) | Validate, do not write (29 September, AI system design 2.3 and 2.2 D step 4). |
 
 **Request body**: `FontConfig`
 
@@ -3232,6 +3435,7 @@ Run before publishing. Reports missing translations, navigation pointing at disa
 **`PUT /tenant-config/theme`**: Set colour theme
 
 Runtime (reaches guests on publish, not on a store release) and written to the working draft. Contrast is checked against WCAG 2.2 AA and a failing pair is refused — accessibility is a stated target for the guest app, and a tenant picking two similar colours should be told at configuration time rather than at audit. **Refused, not warned (confirmed 28 September, audit R139)**: flow F22 is corrected to match.
+**Accepts `Prefer: validate-only`** (29 September, build pass, group G2): validates and answers 200 with the would-be result without writing, for the AI executor's plan validation; registered as an AI tool (`ai.AiTool`, 1.2.59, 2.6.50).
 
 |  |  |
 |---|---|
@@ -3250,6 +3454,7 @@ Runtime (reaches guests on publish, not on a store release) and written to the w
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
 | Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Prefer | header |  | enum (validate-only) | Validate, do not write (29 September, AI system design 2.3 and 2.2 D step 4). |
 
 **Request body**: `Theme`
 
@@ -3470,6 +3675,129 @@ Runtime (reaches guests on publish, not on a store release) and written to the w
 
 ## Group: whiteLabel
 
+### createContentBlock
+
+**`POST /content-blocks`**: Author a block of content
+
+BL-172. **The CMS modelled configuration and not authoring** — a marketer could choose between things a developer had built and could not write something new.
+**Scheduled, localised and optionally personalised.** The page builder is a frontend over this, the same way the venue map's canvas is a frontend over its graph.
+
+|  |  |
+|---|---|
+| Permission | `TENANT_CONFIGURE` |
+| Scope level | tenant |
+| Part of slice | setup, makes `control.content_block` non-empty |
+| Wave | 2 |
+| Offline | no |
+| Conflict policy | serverWins |
+| Reads | `cache:idempotency`, `control.content_block`, `marketing.segment` |
+| Writes | `cache:idempotency`, `control.content_block` |
+| Called by | BO-839 |
+| State model | Content block ([states/content-block.yaml](../../../states/content-block.yaml)): created as `draft` |
+
+**Parameters**
+
+| Name | In | Required | Type | Notes |
+|---|---|---|---|---|
+| Idempotency-Key | header | yes | string | Client-generated ULID. |
+
+**Request body**: `ContentBlock`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| id | string (uuid) | yes | (read-only) |
+| pageId | string (uuid) |  | (nullable) |
+| kind | enum (richText, image, video, gallery, cta, faq, form, embed, …) | yes |  |
+| position | integer |  |  |
+| body | object |  | Typed by kind, and validated against the block's own schema at save. |
+| localeVariants | object |  | Per-locale bodies, not per-locale pages. |
+| status | enum (draft, scheduled, published, expired, archived) | yes | Created as draft; moved by publishContentBlock and the publishAt/expireAt timer (states/content-block.yaml), never by the body of a create. (read-only) |
+| publishAt | string (date-time) |  | Content scheduling, which the configuration model had no room for. (nullable) |
+| expireAt | string (date-time) |  | (nullable) |
+| audienceSegmentId | string (uuid) |  | Personalisation, evaluated at render. (nullable) |
+| approvedByPrincipalId | string (uuid) |  | (read-only; nullable) |
+| scopePath | string |  | The partition key (ADR-0005). (read-only) |
+
+**Response**: `ContentBlock`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| id | string (uuid) | yes | (read-only) |
+| pageId | string (uuid) |  | (nullable) |
+| kind | enum (richText, image, video, gallery, cta, faq, form, embed, …) | yes |  |
+| position | integer |  |  |
+| body | object |  | Typed by kind, and validated against the block's own schema at save. |
+| localeVariants | object |  | Per-locale bodies, not per-locale pages. |
+| status | enum (draft, scheduled, published, expired, archived) | yes | Created as draft; moved by publishContentBlock and the publishAt/expireAt timer (states/content-block.yaml), never by the body of a create. (read-only) |
+| publishAt | string (date-time) |  | Content scheduling, which the configuration model had no room for. (nullable) |
+| expireAt | string (date-time) |  | (nullable) |
+| audienceSegmentId | string (uuid) |  | Personalisation, evaluated at render. (nullable) |
+| approvedByPrincipalId | string (uuid) |  | (read-only; nullable) |
+| scopePath | string |  | The partition key (ADR-0005). (read-only) |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 201 |  | Created as a draft |
+
+### publishContentBlock
+
+**`POST /content-blocks/{blockId}/publish`**: Publish now, or schedule it
+
+**A seasonal banner needing somebody awake at midnight is the same defect `Product.onSaleFrom` fixed**, and the answer is the same: a date on the object rather than a person with an alarm.
+Approval is separate from authoring where the tenant requires it — **the approver may not be the author**, following the rule already enforced on products.
+**`expireAt` must follow `publishAt`** when both are sent (decided 28 September, audit R163), or 400. A scheduled job makes the publish and the expiry at those times (audit R163).
+
+|  |  |
+|---|---|
+| Permission | `TENANT_PUBLISH` |
+| Scope level | tenant |
+| Part of slice | setup, makes `control.content_block` non-empty |
+| Wave | 2 |
+| Offline | no |
+| Conflict policy | serverWins |
+| Reads | `cache:idempotency`, `control.content_block`, `identity.principal` |
+| Writes | `cache:idempotency`, `cache:resolution`, `control.content_block` |
+| Called by | **no screen**: no screen lists it in its apis, so it is reachable only by API or import until one does (README, Known gaps) |
+
+**Parameters**
+
+| Name | In | Required | Type | Notes |
+|---|---|---|---|---|
+| blockId | path | yes | string (uuid) |  |
+| Idempotency-Key | header | yes | string | Client-generated ULID. |
+
+**Request body**
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| publishAt | string (date-time) |  | (nullable) |
+| expireAt | string (date-time) |  | (nullable) |
+
+**Response**: `ContentBlock`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| id | string (uuid) | yes | (read-only) |
+| pageId | string (uuid) |  | (nullable) |
+| kind | enum (richText, image, video, gallery, cta, faq, form, embed, …) | yes |  |
+| position | integer |  |  |
+| body | object |  | Typed by kind, and validated against the block's own schema at save. |
+| localeVariants | object |  | Per-locale bodies, not per-locale pages. |
+| status | enum (draft, scheduled, published, expired, archived) | yes | Created as draft; moved by publishContentBlock and the publishAt/expireAt timer (states/content-block.yaml), never by the body of a create. (read-only) |
+| publishAt | string (date-time) |  | Content scheduling, which the configuration model had no room for. (nullable) |
+| expireAt | string (date-time) |  | (nullable) |
+| audienceSegmentId | string (uuid) |  | Personalisation, evaluated at render. (nullable) |
+| approvedByPrincipalId | string (uuid) |  | (read-only; nullable) |
+| scopePath | string |  | The partition key (ADR-0005). (read-only) |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 200 |  | Published or scheduled |
+
 ### setFooter
 
 **`PUT /footer`**: Footer columns, legal links and social
@@ -3550,6 +3878,24 @@ BL-002. **A header is chrome and a footer is a link surface**, which is why this
 ## Tables
 
 Every table this service owns that the slice reads or writes, with its columns as derived into `backend/tenant/*.sql`.
+
+### `whitelabel.analytics_provider`
+
+| Column | Type | Required | Notes |
+|---|---|---|---|
+| id | uuid | no |  |
+| venue_id | uuid | no |  |
+| provider | text | yes |  |
+| provider_label | text | no | The name, when provider is other. |
+| measurement_id | text | yes | What the tag or SDK reports to (GA4 G-..., Tag Manager GTM-..., a pixel id). |
+| surfaces | text[] | yes |  |
+| consent_category | text | yes | The cookie category the visitor must grant before this provider loads (marketing-crm CookieCategory). |
+| is_enabled | boolean | yes |  |
+| reporting_property_id | text | no | The property getStorefrontInsights asks the reporting API about (a GA4 property id). |
+| reporting_credential_ref | text | no | The vault reference of the reporting credential. |
+| has_reporting_credential | boolean | no | Whether a reporting credential is held, since the reference itself is never returned. |
+| scope_path | text | no | The partition key (ADR-0005). |
+| updated_at | timestamptz | no |  |
 
 ### `whitelabel.banner`
 
@@ -3800,10 +4146,10 @@ Every table this service owns that the slice reads or writes, with its columns a
 
 ## Not in the first release
 
-4 operations, added to this service in later releases without changing any of the above.
+3 operations, added to this service in later releases without changing any of the above.
 
 | Group | Operations |
 |---|---|
 | content | `proposeGuidedChoice` |
 | navigation | `getNavigation` |
-| whiteLabel | `createContentBlock`, `publishContentBlock` |
+| overview | `getStorefrontInsights` |

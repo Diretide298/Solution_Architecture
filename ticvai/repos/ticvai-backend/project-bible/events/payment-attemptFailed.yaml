@@ -1,0 +1,72 @@
+# payment.attemptFailed v1 — published by payments
+# Checked by tools/check-states.py against states/ and the contracts.
+
+name: payment.attemptFailed
+version: 1
+publisher: payments
+description: A call to a payment provider was declined or errored. One event per failed attempt, whether
+  or not a payment record ever existed.
+aggregate: paymentAttempt
+emittedWhen: createPayment or capturePayment (spine/orders.yaml) writes a `payments.payment_attempt` row
+  with outcome declined or errored
+payload:
+- field: paymentAttemptRef
+  type: uuid
+  notes: '`PaymentAttempt.id`. The idempotency key for every consumer'
+- field: orderId
+  type: string
+  required: false
+  notes: Null only where the attempt was not against an order
+- field: paymentId
+  type: string
+  required: false
+  notes: Null for an attempt declined before a payment was recorded
+- field: amount
+  type: Money
+- field: channel
+  type: string
+  notes: pos, kiosk, guestApp, guestWeb, callCentre, partner, api, backOffice
+- field: paymentTokenRef
+  type: string
+  required: false
+  notes: '**The provider''s token reference only.** Never a card number, never a fingerprint the platform
+    computed from one — the risk graph links attempts on the reference and needs nothing more'
+- field: deviceIdHash
+  type: string
+  required: false
+  notes: Hashed, never the raw device id. Null at a till, where the workstation is the device
+- field: failureCode
+  type: string
+  notes: The provider's decline or error code, verbatim (`PaymentAttempt.declineCode`)
+- field: declineClass
+  type: string
+  required: false
+  notes: soft or hard (`DeclineClass`). A run of hard declines on one token is the stolen-card signal
+- field: attemptNumber
+  type: integer
+  notes: Which attempt this was against the order, from 1
+- field: scopePath
+  type: string
+- field: tenantId
+  type: uuid
+- field: failedAt
+  type: timestamp
+consumers:
+- context: ai
+  purpose: Risk velocity counters (attempts per token, device and order in a window) and entity risk on
+    the token, device and guest, in `ai-realtime` (AI system design section 3.2; AIP-111, AIP-118)
+  idempotencyKey: paymentAttemptRef
+  onFailure: retryThenDeadLetter
+  isCritical: false
+retention: 30 days after publication
+notes: '**Added 29 September (build pass, group OWN, from the AI group''s handoff).** Without this the
+  fraud requirements have no card-testing signal: a guest cycling ten cards through the guest web leaves
+  ten `payment_attempt` rows and nothing anyone is told about.
+
+
+  No state model emits this: an attempt is **created** with its outcome by the operation that calls the
+  provider — `payments.payment_attempt` has no lifecycle, and most declined attempts never produce an
+  `orders.payment` whose state could move. `createPayment` and `capturePayment` write the attempt row and
+  `platform.outbox` in the same transaction (ADR-0033), from OrderService into the `payments` schema as the
+  attempt row already is (DM6). **A decline discovered later** — `inquirePaymentStatus` finding a
+  `pendingConfirmation` payment declined — writes no attempt row today, so it does not emit this.'

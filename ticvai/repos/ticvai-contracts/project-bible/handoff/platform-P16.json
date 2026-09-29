@@ -11,11 +11,11 @@
  "note": "Derived by tools/derive-platform.py. **The gaps section is the point** \u2014 a page listing what exists is a directory; one listing what is missing is a worklist.",
  "counts": {
   "screens": 69,
-  "operations": 58,
+  "operations": 78,
   "contracts": 11,
   "modules": 1,
   "undrawn": 0,
-  "operationsWithNoScreen": 126
+  "operationsWithNoScreen": 123
  },
  "waves": {
   "wave3": 69
@@ -36,14 +36,18 @@
   },
   {
    "contract": "ai",
-   "operations": 4
+   "operations": 22
+  },
+  {
+   "contract": "inventory",
+   "operations": 3
   },
   {
    "contract": "marketing-crm",
    "operations": 3
   },
   {
-   "contract": "inventory",
+   "contract": "tenancy",
    "operations": 3
   },
   {
@@ -51,15 +55,15 @@
    "operations": 2
   },
   {
-   "contract": "catalogue",
-   "operations": 1
-  },
-  {
    "contract": "orders",
    "operations": 1
   },
   {
-   "contract": "tenancy",
+   "contract": "catalogue",
+   "operations": 1
+  },
+  {
+   "contract": "promotions",
    "operations": 1
   },
   {
@@ -68,10 +72,6 @@
   },
   {
    "contract": "access",
-   "operations": 1
-  },
-  {
-   "contract": "promotions",
    "operations": 1
   }
  ],
@@ -82,7 +82,7 @@
    "module": "Analytics",
    "wave": 3,
    "route": "/analytics/executive-command-center",
-   "operations": 6,
+   "operations": 7,
    "drawn": true
   },
   {
@@ -127,7 +127,7 @@
    "module": "Analytics",
    "wave": 3,
    "route": "/analytics/inventory-waste-intelligence",
-   "operations": 5,
+   "operations": 6,
    "drawn": true
   },
   {
@@ -145,7 +145,7 @@
    "module": "Analytics",
    "wave": 3,
    "route": "/analytics/demand-forecasting",
-   "operations": 3,
+   "operations": 4,
    "drawn": true
   },
   {
@@ -154,7 +154,7 @@
    "module": "Analytics",
    "wave": 3,
    "route": "/analytics/ai-assistant-action-center",
-   "operations": 8,
+   "operations": 9,
    "drawn": true
   },
   {
@@ -217,7 +217,7 @@
    "module": "Analytics",
    "wave": 3,
    "route": "/analytics/customer-membership-loyalty-pulse-anl-017",
-   "operations": 1,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -235,7 +235,7 @@
    "module": "Analytics",
    "wave": 3,
    "route": "/analytics/ai-management-insights-anl-019",
-   "operations": 2,
+   "operations": 5,
    "drawn": true
   },
   {
@@ -514,7 +514,7 @@
    "module": "Analytics",
    "wave": 3,
    "route": "/analytics/retention-archive-governance-policy-anl-050",
-   "operations": 1,
+   "operations": 3,
    "drawn": true
   },
   {
@@ -559,7 +559,7 @@
    "module": "Analytics",
    "wave": 3,
    "route": "/analytics/anomaly-detection-center-anl-055",
-   "operations": 1,
+   "operations": 4,
    "drawn": true
   },
   {
@@ -568,7 +568,7 @@
    "module": "Analytics",
    "wave": 3,
    "route": "/analytics/root-cause-analysis-explorer-anl-056",
-   "operations": 2,
+   "operations": 3,
    "drawn": true
   },
   {
@@ -577,7 +577,7 @@
    "module": "Analytics",
    "wave": 3,
    "route": "/analytics/forecasting-predictive-analytics-studio-anl-057",
-   "operations": 1,
+   "operations": 5,
    "drawn": true
   },
   {
@@ -586,7 +586,7 @@
    "module": "Analytics",
    "wave": 3,
    "route": "/analytics/ai-recommendation-next-best-action-center-anl-058",
-   "operations": 1,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -595,7 +595,7 @@
    "module": "Analytics",
    "wave": 3,
    "route": "/analytics/ai-insight-history-evidence-explainability-anl-059",
-   "operations": 1,
+   "operations": 3,
    "drawn": true
   },
   {
@@ -604,7 +604,7 @@
    "module": "Analytics",
    "wave": 3,
    "route": "/analytics/ai-analytics-governance-model-control-anl-060",
-   "operations": 0,
+   "operations": 8,
    "drawn": true
   },
   {
@@ -749,12 +749,6 @@
     "summary": "What is indexed, and how current it is"
    },
    {
-    "operation": "proposeTranslations",
-    "contract": "ai",
-    "verb": "POST",
-    "summary": ""
-   },
-   {
     "operation": "proposeWalkways",
     "contract": "ai",
     "verb": "POST",
@@ -885,12 +879,6 @@
     "contract": "identity",
     "verb": "GET",
     "summary": "What was decided, for whom, where and why"
-   },
-   {
-    "operation": "listAccessPolicyHistory",
-    "contract": "identity",
-    "verb": "GET",
-    "summary": "Every version, who changed it and why"
    },
    {
     "operation": "listAccessPolicyTemplates",
@@ -1151,12 +1139,6 @@
     "summary": "Create or change a governed contact-centre automation"
    },
    {
-    "operation": "setCookieBannerDesign",
-    "contract": "marketing-crm",
-    "verb": "PUT",
-    "summary": "Save a cookie banner design as a new version"
-   },
-   {
     "operation": "setDataProcessingPurpose",
     "contract": "marketing-crm",
     "verb": "PUT",
@@ -1203,12 +1185,6 @@
     "contract": "marketing-crm",
     "verb": "PUT",
     "summary": "Record or advance a quality evaluation"
-   },
-   {
-    "operation": "setTrackingTechnology",
-    "contract": "marketing-crm",
-    "verb": "PUT",
-    "summary": "Add, classify or retire a tracking technology"
    },
    {
     "operation": "setWaiverAssociation",
@@ -1277,12 +1253,6 @@
     "summary": "Deposits and their authorisation state"
    },
    {
-    "operation": "listFraudRules",
-    "contract": "orders",
-    "verb": "GET",
-    "summary": ""
-   },
-   {
     "operation": "listInvitationAllowances",
     "contract": "orders",
     "verb": "GET",
@@ -1343,16 +1313,28 @@
     "summary": "Take back a share"
    },
    {
-    "operation": "setFraudRules",
-    "contract": "orders",
-    "verb": "PUT",
-    "summary": ""
+    "operation": "explainRecommendation",
+    "contract": "promotions",
+    "verb": "POST",
+    "summary": "Why this was offered, and what was suppressed"
    },
    {
     "operation": "getCouponCodeBatch",
     "contract": "promotions",
     "verb": "GET",
     "summary": "Progress and export of a code batch"
+   },
+   {
+    "operation": "getRecommendations",
+    "contract": "promotions",
+    "verb": "POST",
+    "summary": "What else this guest might want"
+   },
+   {
+    "operation": "getUpsellSuggestions",
+    "contract": "promotions",
+    "verb": "POST",
+    "summary": "Suggestions for a cart"
    },
    {
     "operation": "listAllocationSplits",

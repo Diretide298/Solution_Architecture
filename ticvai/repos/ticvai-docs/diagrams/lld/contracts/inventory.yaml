@@ -1,5 +1,5 @@
 id: LLD-inventory
-title: inventory — 51 operations
+title: inventory — 56 operations
 generatedBy: tools/derive-diagrams.py
 index: diagrams/hld/03-contracts.yaml
 tier: satellite
@@ -262,6 +262,22 @@ operations:
   writes:
   - cache:idempotency
   - inventory.supplier
+- operation: createSupplierContract
+  verb: POST
+  path: /suppliers/{supplierId}/contracts
+  scope: tenant
+  permission: PROCUREMENT_MANAGE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - cache:idempotency
+  - inventory.supplier
+  - inventory.supplier_contract
+  writes:
+  - cache:idempotency
+  - inventory.supplier_contract
+  - platform.audit_record
 - operation: getCountVariance
   verb: GET
   path: /stock-counts/{countId}/variance
@@ -283,6 +299,18 @@ operations:
   offline: true
   reads:
   - inventory.item
+  writes: []
+- operation: getInventoryKitDefinition
+  verb: GET
+  path: /inventory-items/{itemId}/kit-definition
+  scope: venue
+  permission: PRODUCT_VIEW
+  audience:
+  - staff
+  offline: false
+  reads:
+  - inventory.item
+  - inventory.kit_component
   writes: []
 - operation: getPurchaseOrder
   verb: GET
@@ -476,6 +504,18 @@ operations:
   - inventory.transfer
   - inventory.transfer_line
   writes: []
+- operation: listSupplierContracts
+  verb: GET
+  path: /supplier-contracts
+  scope: venue
+  permission: PROCUREMENT_VIEW
+  audience:
+  - staff
+  offline: false
+  reads:
+  - inventory.supplier
+  - inventory.supplier_contract
+  writes: []
 - operation: listSuppliers
   verb: GET
   path: /suppliers
@@ -637,6 +677,23 @@ operations:
   writes:
   - cache:idempotency
   - cache:resolution
+- operation: setInventoryKitDefinition
+  verb: PUT
+  path: /inventory-items/{itemId}/kit-definition
+  scope: venue
+  permission: PRODUCT_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - cache:idempotency
+  - inventory.item
+  - inventory.kit_component
+  - inventory.movement
+  writes:
+  - cache:idempotency
+  - cache:resolution
+  - inventory.kit_component
 - operation: startStockCount
   verb: POST
   path: /stock-counts
@@ -713,5 +770,20 @@ operations:
   - cache:idempotency
   - cache:resolution
   - inventory.supplier
+  - inventory.supplier_contract
+  - platform.audit_record
+- operation: updateSupplierContract
+  verb: PATCH
+  path: /supplier-contracts/{contractId}
+  scope: tenant
+  permission: PROCUREMENT_MANAGE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - cache:idempotency
+  - inventory.supplier_contract
+  writes:
+  - cache:idempotency
   - inventory.supplier_contract
   - platform.audit_record

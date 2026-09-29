@@ -185,6 +185,9 @@
  "document:docs\\active\\screen-regeneration-plan.md": [
   "ai:names it"
  ],
+ "document:docs\\active\\six-month-plan-29-september.md": [
+  "ai:names it"
+ ],
  "document:docs\\active\\spec-coverage-19-september.md": [
   "ai:names it"
  ],
@@ -233,13 +236,55 @@
  "document:docs\\architecture\\ai-system-design.md": [
   "ai:names it"
  ],
+ "event:access.rejected": [
+  "ai:consumes"
+ ],
+ "event:access.validated": [
+  "ai:consumes"
+ ],
+ "event:ai.capabilityPaused": [
+  "ai:publishes"
+ ],
  "event:ai.ceilingApproaching": [
   "ai:publishes"
+ ],
+ "event:ai.forecastPublished": [
+  "ai:publishes"
+ ],
+ "event:ai.incidentOpened": [
+  "ai:publishes"
+ ],
+ "event:ai.insightRaised": [
+  "ai:publishes"
+ ],
+ "event:ai.operationalRequirementIssued": [
+  "ai:publishes"
+ ],
+ "event:ai.planExecuted": [
+  "ai:publishes"
+ ],
+ "event:ai.planFailed": [
+  "ai:publishes"
+ ],
+ "event:ai.riskAlertRaised": [
+  "ai:publishes"
+ ],
+ "event:ai.riskCaseClosed": [
+  "ai:publishes"
+ ],
+ "event:approval.expired": [
+  "ai:consumes"
  ],
  "event:approval.granted": [
   "ai:consumes"
  ],
+ "event:approval.rejected": [
+  "ai:consumes"
+ ],
  "event:assets.documentIndexed": [
+  "ai:consumes"
+ ],
+ "event:cart.abandoned": [
   "ai:consumes"
  ],
  "event:catalogue.productPublished": [
@@ -248,7 +293,28 @@
  "event:conversation.handedOver": [
   "ai:consumes"
  ],
+ "event:device.statusChanged": [
+  "ai:consumes"
+ ],
+ "event:entitlement.expiringSoon": [
+  "ai:consumes"
+ ],
+ "event:entitlement.issued": [
+  "ai:consumes"
+ ],
+ "event:entitlement.transferred": [
+  "ai:consumes"
+ ],
  "event:fnb.menuPublished": [
+  "ai:consumes"
+ ],
+ "event:identity.credentialResetRequested": [
+  "ai:consumes"
+ ],
+ "event:identity.loginRecorded": [
+  "ai:consumes"
+ ],
+ "event:ledger.periodClosed": [
   "ai:consumes"
  ],
  "event:maintenance.templatePublished": [
@@ -257,10 +323,52 @@
  "event:marketing.caseClosed": [
   "ai:consumes"
  ],
+ "event:order.cancelled": [
+  "ai:consumes"
+ ],
+ "event:order.chargebackRecorded": [
+  "ai:consumes"
+ ],
+ "event:order.completed": [
+  "ai:consumes"
+ ],
+ "event:order.exchanged": [
+  "ai:consumes"
+ ],
+ "event:order.paid": [
+  "ai:consumes"
+ ],
+ "event:order.refunded": [
+  "ai:consumes"
+ ],
+ "event:payment.attemptFailed": [
+  "ai:consumes"
+ ],
+ "event:performance.cancelled": [
+  "ai:consumes"
+ ],
+ "event:promotions.recommendationStrategyPublished": [
+  "ai:consumes"
+ ],
  "event:reporting.definitionPublished": [
   "ai:consumes"
  ],
  "event:retail.merchandisePublished": [
+  "ai:consumes"
+ ],
+ "event:seat.sold": [
+  "ai:consumes"
+ ],
+ "event:shift.closed": [
+  "ai:consumes"
+ ],
+ "event:stock.depleted": [
+  "ai:consumes"
+ ],
+ "event:storefront.sessionEvent": [
+  "ai:consumes"
+ ],
+ "event:tenant.suspended": [
   "ai:consumes"
  ],
  "event:whitelabel.contentPublished": [
@@ -296,16 +404,109 @@
  "flow:F90": [
   "ai:steps through"
  ],
+ "operation:addRiskCaseEvidence": [
+  "ai:seed"
+ ],
+ "operation:answerConfigurationQuestion": [
+  "ai:seed"
+ ],
  "operation:askReportingQuestion": [
   "ai:writes a domain table"
  ],
+ "operation:attachConfigurationSource": [
+  "ai:seed"
+ ],
+ "operation:backtestRiskStrategy": [
+  "ai:seed"
+ ],
+ "operation:buildConfigurationPlan": [
+  "ai:seed"
+ ],
+ "operation:cancelActionPlan": [
+  "ai:seed"
+ ],
+ "operation:closeAiIncident": [
+  "ai:seed"
+ ],
+ "operation:closeRiskCase": [
+  "ai:seed"
+ ],
+ "operation:compareForecastScenarios": [
+  "ai:seed"
+ ],
+ "operation:configureAiCapability": [
+  "ai:seed"
+ ],
+ "operation:configureAnomalyDetector": [
+  "ai:seed"
+ ],
+ "operation:configureAssistantProfile": [
+  "ai:seed"
+ ],
+ "operation:configureForecastSignalSource": [
+  "ai:seed"
+ ],
+ "operation:configureRiskStrategy": [
+  "ai:seed"
+ ],
+ "operation:containAiIncident": [
+  "ai:seed"
+ ],
  "operation:createAiConversation": [
+  "ai:seed"
+ ],
+ "operation:createAiGovernancePolicyDraft": [
+  "ai:seed"
+ ],
+ "operation:createAiPolicyException": [
+  "ai:seed"
+ ],
+ "operation:createForecastScenario": [
   "ai:seed"
  ],
  "operation:createKnowledgeCollection": [
   "ai:seed"
  ],
+ "operation:createRiskCase": [
+  "ai:seed"
+ ],
+ "operation:decideAiGovernanceAlert": [
+  "ai:seed"
+ ],
+ "operation:decideAiInsight": [
+  "ai:seed"
+ ],
+ "operation:decideBlueprintRecommendation": [
+  "ai:seed"
+ ],
+ "operation:decideOperationalRequirement": [
+  "ai:seed"
+ ],
  "operation:decideProposedAction": [
+  "ai:seed"
+ ],
+ "operation:decideRecommendations": [
+  "ai:seed"
+ ],
+ "operation:decideRiskAlert": [
+  "ai:seed"
+ ],
+ "operation:evaluateAiGovernance": [
+  "ai:seed"
+ ],
+ "operation:expandRiskNetwork": [
+  "ai:seed"
+ ],
+ "operation:explainMetricChange": [
+  "ai:seed"
+ ],
+ "operation:explainRecommendationDecision": [
+  "ai:seed"
+ ],
+ "operation:exportAiEvidencePackage": [
+  "ai:seed"
+ ],
+ "operation:exportForecastVersion": [
   "ai:seed"
  ],
  "operation:generateConfiguration": [
@@ -314,22 +515,109 @@
  "operation:generateVenueLayout": [
   "ai:seed"
  ],
+ "operation:getActionPlan": [
+  "ai:seed"
+ ],
+ "operation:getAiByokEnablement": [
+  "ai:seed"
+ ],
+ "operation:getAiDecisionTrace": [
+  "ai:seed"
+ ],
  "operation:getAiPolicy": [
   "ai:seed"
  ],
  "operation:getAiUsage": [
   "ai:seed"
  ],
+ "operation:getApprovalRequestScore": [
+  "ai:seed"
+ ],
+ "operation:getConfigurationBlueprint": [
+  "ai:seed"
+ ],
+ "operation:getCustomerRecommendationProfile": [
+  "ai:seed"
+ ],
+ "operation:getEffectiveAiPolicy": [
+  "ai:seed"
+ ],
+ "operation:getEntityRisk": [
+  "ai:seed"
+ ],
+ "operation:getForecast": [
+  "ai:seed"
+ ],
+ "operation:getForecastAccuracy": [
+  "ai:seed"
+ ],
+ "operation:getGuidedChoiceSuggestion": [
+  "ai:seed"
+ ],
+ "operation:getRiskCase": [
+  "ai:seed"
+ ],
  "operation:ingestKnowledgeDocument": [
+  "ai:seed"
+ ],
+ "operation:listAiCapabilities": [
+  "ai:seed"
+ ],
+ "operation:listAiControls": [
   "ai:seed"
  ],
  "operation:listAiConversations": [
   "ai:seed"
  ],
+ "operation:listAiEvaluations": [
+  "ai:seed"
+ ],
+ "operation:listAiGovernanceAlerts": [
+  "ai:seed"
+ ],
+ "operation:listAiGovernancePolicyVersions": [
+  "ai:seed"
+ ],
+ "operation:listAiIncidents": [
+  "ai:seed"
+ ],
+ "operation:listAiInsights": [
+  "ai:seed"
+ ],
  "operation:listAiInteractions": [
   "ai:seed"
  ],
+ "operation:listAiModels": [
+  "ai:seed"
+ ],
  "operation:listAiProviders": [
+  "ai:seed"
+ ],
+ "operation:listAiRiskRegister": [
+  "ai:seed"
+ ],
+ "operation:listAiTools": [
+  "ai:seed"
+ ],
+ "operation:listAnomalyDetectors": [
+  "ai:seed"
+ ],
+ "operation:listAssistantProfiles": [
+  "ai:seed"
+ ],
+ "operation:listConfigurationSessions": [
+  "ai:seed"
+ ],
+ "operation:listConfigurationSources": [
+  "ai:seed"
+ ],
+ "operation:listForecastDefinitions": [
+  "ai:seed"
+ ],
+ "operation:listForecastSignals": [
+  "ai:seed"
+ ],
+ "operation:listForecastVersions": [
   "ai:seed"
  ],
  "operation:listIndexFailures": [
@@ -344,7 +632,49 @@
  "operation:listKnowledgeCollections": [
   "ai:seed"
  ],
+ "operation:listKnowledgeGaps": [
+  "ai:seed"
+ ],
+ "operation:listMarketingRecommendations": [
+  "ai:seed"
+ ],
+ "operation:listOperationalRequirements": [
+  "ai:seed"
+ ],
+ "operation:listPromptTemplates": [
+  "ai:seed"
+ ],
  "operation:listProposedActions": [
+  "ai:seed"
+ ],
+ "operation:listRiskAlerts": [
+  "ai:seed"
+ ],
+ "operation:openAiIncident": [
+  "ai:seed"
+ ],
+ "operation:overrideAiDecision": [
+  "ai:seed"
+ ],
+ "operation:pauseActionPlan": [
+  "ai:seed"
+ ],
+ "operation:pauseAiCapability": [
+  "ai:seed"
+ ],
+ "operation:promoteAiRelease": [
+  "ai:seed"
+ ],
+ "operation:proposeLookalikeSegment": [
+  "ai:seed"
+ ],
+ "operation:proposeMarketingContent": [
+  "ai:seed"
+ ],
+ "operation:proposeRiskAction": [
+  "ai:seed"
+ ],
+ "operation:proposeSeatMapChanges": [
   "ai:seed"
  ],
  "operation:proposeTranslations": [
@@ -356,6 +686,21 @@
  "operation:proposeWalkways": [
   "ai:seed"
  ],
+ "operation:publishAiGovernancePolicy": [
+  "ai:seed"
+ ],
+ "operation:publishForecastVersion": [
+  "ai:seed"
+ ],
+ "operation:publishPromptTemplate": [
+  "ai:seed"
+ ],
+ "operation:recordAnswerFeedback": [
+  "ai:seed"
+ ],
+ "operation:recordRecommendationEvents": [
+  "ai:seed"
+ ],
  "operation:recordSuggestionOutcome": [
   "ai:seed"
  ],
@@ -365,11 +710,50 @@
  "operation:removeIndexEntry": [
   "ai:seed"
  ],
+ "operation:replayAiDecision": [
+  "ai:seed"
+ ],
  "operation:requestSuggestion": [
+  "ai:seed"
+ ],
+ "operation:resumeActionPlan": [
+  "ai:seed"
+ ],
+ "operation:resumeAiCapability": [
+  "ai:seed"
+ ],
+ "operation:retryActionStep": [
+  "ai:seed"
+ ],
+ "operation:revokeAiPolicyException": [
+  "ai:seed"
+ ],
+ "operation:rollbackActionPlan": [
+  "ai:seed"
+ ],
+ "operation:rollbackAiRelease": [
+  "ai:seed"
+ ],
+ "operation:runAiControlTest": [
+  "ai:seed"
+ ],
+ "operation:runAiEvaluation": [
+  "ai:seed"
+ ],
+ "operation:runForecast": [
   "ai:seed"
  ],
  "operation:saveNaturalLanguageQuery": [
   "ai:writes a domain table"
+ ],
+ "operation:scoreApprovalRequest": [
+  "ai:seed"
+ ],
+ "operation:scoreTransactionRisk": [
+  "ai:seed"
+ ],
+ "operation:searchAiDecisions": [
+  "ai:seed"
  ],
  "operation:semanticSearch": [
   "ai:seed"
@@ -377,7 +761,13 @@
  "operation:sendAiMessage": [
   "ai:seed"
  ],
+ "operation:setAiByokEnablement": [
+  "ai:seed"
+ ],
  "operation:setAiCredential": [
+  "ai:seed"
+ ],
+ "operation:setAiModel": [
   "ai:seed"
  ],
  "operation:setAiPolicy": [
@@ -386,40 +776,394 @@
  "operation:setAiProvider": [
   "ai:seed"
  ],
+ "operation:setAiRiskRegisterEntry": [
+  "ai:seed"
+ ],
+ "operation:setAiTool": [
+  "ai:seed"
+ ],
+ "operation:setForecastDefinition": [
+  "ai:seed"
+ ],
  "operation:setIndexSource": [
   "ai:seed"
  ],
  "operation:setSuggestionProvider": [
   "ai:seed"
  ],
+ "operation:simulateActionPlan": [
+  "ai:seed"
+ ],
+ "operation:simulateAiGovernancePolicy": [
+  "ai:seed"
+ ],
+ "operation:simulateRecommendationDecision": [
+  "ai:seed"
+ ],
+ "operation:startConfigurationSession": [
+  "ai:seed"
+ ],
+ "operation:suggestGuidedChoice": [
+  "ai:seed"
+ ],
  "operation:testAiProvider": [
   "ai:seed"
  ],
  "screen:ADM-004": [
-  "ai:calls 1"
+  "ai:calls 2"
  ],
  "screen:ADM-037": [
+  "ai:calls 10"
+ ],
+ "screen:ADM-047": [
+  "ai:calls 1"
+ ],
+ "screen:ADM-249": [
+  "ai:calls 1"
+ ],
+ "screen:ADM-366": [
+  "ai:calls 1"
+ ],
+ "screen:ADM-469": [
+  "ai:calls 3"
+ ],
+ "screen:ADM-470": [
   "ai:calls 4"
  ],
+ "screen:ADM-471": [
+  "ai:calls 2"
+ ],
+ "screen:ADM-472": [
+  "ai:calls 2"
+ ],
+ "screen:ADM-473": [
+  "ai:calls 2"
+ ],
+ "screen:ADM-474": [
+  "ai:calls 2"
+ ],
+ "screen:ADM-475": [
+  "ai:calls 2"
+ ],
+ "screen:ADM-476": [
+  "ai:calls 2"
+ ],
+ "screen:ADM-477": [
+  "ai:calls 5"
+ ],
+ "screen:ADM-478": [
+  "ai:calls 2"
+ ],
+ "screen:ADM-479": [
+  "ai:calls 3"
+ ],
+ "screen:ADM-480": [
+  "ai:calls 3"
+ ],
+ "screen:ADM-481": [
+  "ai:calls 3"
+ ],
+ "screen:ADM-482": [
+  "ai:calls 3"
+ ],
+ "screen:ADM-483": [
+  "ai:calls 3"
+ ],
+ "screen:ADM-484": [
+  "ai:calls 3"
+ ],
+ "screen:ADM-485": [
+  "ai:calls 3"
+ ],
+ "screen:ADM-486": [
+  "ai:calls 3"
+ ],
+ "screen:ADM-487": [
+  "ai:calls 2"
+ ],
+ "screen:ADM-488": [
+  "ai:calls 2"
+ ],
+ "screen:ADM-489": [
+  "ai:calls 2"
+ ],
+ "screen:ADM-490": [
+  "ai:calls 2"
+ ],
+ "screen:ADM-491": [
+  "ai:calls 2"
+ ],
+ "screen:ADM-492": [
+  "ai:calls 3"
+ ],
+ "screen:ADM-493": [
+  "ai:calls 3"
+ ],
+ "screen:ADM-494": [
+  "ai:calls 4"
+ ],
+ "screen:ADM-495": [
+  "ai:calls 2"
+ ],
+ "screen:ADM-496": [
+  "ai:calls 3"
+ ],
+ "screen:ADM-497": [
+  "ai:calls 3"
+ ],
+ "screen:ADM-498": [
+  "ai:calls 2"
+ ],
+ "screen:ADM-499": [
+  "ai:calls 3"
+ ],
+ "screen:ADM-500": [
+  "ai:calls 3"
+ ],
+ "screen:ADM-501": [
+  "ai:calls 3"
+ ],
+ "screen:ADM-502": [
+  "ai:calls 3"
+ ],
+ "screen:ADM-503": [
+  "ai:calls 1"
+ ],
+ "screen:ADM-504": [
+  "ai:calls 1"
+ ],
+ "screen:ADM-505": [
+  "ai:calls 1"
+ ],
+ "screen:ADM-506": [
+  "ai:calls 4"
+ ],
+ "screen:ADM-507": [
+  "ai:calls 3"
+ ],
+ "screen:ADM-508": [
+  "ai:calls 5"
+ ],
+ "screen:ADM-509": [
+  "ai:calls 2"
+ ],
+ "screen:ADM-510": [
+  "ai:calls 4"
+ ],
+ "screen:ADM-511": [
+  "ai:calls 3"
+ ],
+ "screen:ADM-512": [
+  "ai:calls 2"
+ ],
+ "screen:ADM-513": [
+  "ai:calls 2"
+ ],
+ "screen:ADM-514": [
+  "ai:calls 2"
+ ],
+ "screen:ADM-515": [
+  "ai:calls 2"
+ ],
+ "screen:ADM-516": [
+  "ai:calls 2"
+ ],
+ "screen:ADM-517": [
+  "ai:calls 3"
+ ],
+ "screen:ADM-518": [
+  "ai:calls 2"
+ ],
+ "screen:ADM-519": [
+  "ai:calls 4"
+ ],
+ "screen:ADM-520": [
+  "ai:calls 2"
+ ],
+ "screen:ADM-521": [
+  "ai:calls 2"
+ ],
+ "screen:ADM-522": [
+  "ai:calls 3"
+ ],
+ "screen:ADM-523": [
+  "ai:calls 4"
+ ],
+ "screen:ADM-524": [
+  "ai:calls 2"
+ ],
+ "screen:ADM-525": [
+  "ai:calls 2"
+ ],
+ "screen:ADM-526": [
+  "ai:calls 4"
+ ],
+ "screen:ADM-527": [
+  "ai:calls 2"
+ ],
+ "screen:ADM-528": [
+  "ai:calls 3"
+ ],
+ "screen:ADM-529": [
+  "ai:calls 2"
+ ],
+ "screen:ADM-530": [
+  "ai:calls 3"
+ ],
+ "screen:ADM-531": [
+  "ai:calls 3"
+ ],
+ "screen:ADM-532": [
+  "ai:calls 2"
+ ],
+ "screen:ADM-533": [
+  "ai:calls 3"
+ ],
+ "screen:ADM-534": [
+  "ai:calls 2"
+ ],
+ "screen:ADM-535": [
+  "ai:calls 4"
+ ],
+ "screen:ADM-536": [
+  "ai:calls 4"
+ ],
+ "screen:ADM-537": [
+  "ai:calls 2"
+ ],
+ "screen:ADM-538": [
+  "ai:calls 2"
+ ],
+ "screen:ADM-539": [
+  "ai:calls 1"
+ ],
+ "screen:ADM-540": [
+  "ai:calls 2"
+ ],
+ "screen:ADM-541": [
+  "ai:calls 1"
+ ],
+ "screen:ADM-542": [
+  "ai:calls 1"
+ ],
+ "screen:ADM-543": [
+  "ai:calls 2"
+ ],
+ "screen:ADM-544": [
+  "ai:calls 2"
+ ],
+ "screen:ADM-545": [
+  "ai:calls 1"
+ ],
+ "screen:ADM-546": [
+  "ai:calls 2"
+ ],
+ "screen:ADM-547": [
+  "ai:calls 2"
+ ],
+ "screen:ADM-548": [
+  "ai:calls 2"
+ ],
+ "screen:ADM-549": [
+  "ai:calls 2"
+ ],
+ "screen:ADM-550": [
+  "ai:calls 2"
+ ],
+ "screen:ADM-551": [
+  "ai:calls 2"
+ ],
+ "screen:ADM-552": [
+  "ai:calls 2"
+ ],
+ "screen:ADM-553": [
+  "ai:calls 2"
+ ],
+ "screen:ADM-554": [
+  "ai:calls 5"
+ ],
+ "screen:ADM-555": [
+  "ai:calls 3"
+ ],
+ "screen:ADM-556": [
+  "ai:calls 6"
+ ],
+ "screen:ADM-557": [
+  "ai:calls 3"
+ ],
+ "screen:ADM-558": [
+  "ai:calls 2"
+ ],
+ "screen:ADM-633": [
+  "ai:calls 9"
+ ],
+ "screen:ADM-637": [
+  "ai:calls 3"
+ ],
+ "screen:ADM-638": [
+  "ai:calls 1"
+ ],
+ "screen:ADM-678": [
+  "ai:calls 1"
+ ],
+ "screen:ADM-680": [
+  "ai:calls 2"
+ ],
+ "screen:ADM-683": [
+  "ai:calls 1"
+ ],
+ "screen:ADM-686": [
+  "ai:calls 1"
+ ],
+ "screen:ADM-687": [
+  "ai:calls 1"
+ ],
+ "screen:ADM-696": [
+  "ai:calls 1"
+ ],
+ "screen:ADM-697": [
+  "ai:calls 1"
+ ],
  "screen:ANL-001": [
+  "ai:calls 2"
+ ],
+ "screen:ANL-006": [
   "ai:calls 1"
  ],
  "screen:ANL-008": [
-  "ai:calls 1"
+  "ai:calls 2"
  ],
  "screen:ANL-009": [
-  "ai:calls 3"
+  "ai:calls 4"
  ],
  "screen:ANL-010": [
   "ai:calls 2"
  ],
  "screen:ANL-019": [
-  "ai:calls 1"
+  "ai:calls 4"
  ],
  "screen:ANL-052": [
   "ai:calls 2"
  ],
+ "screen:ANL-055": [
+  "ai:calls 3"
+ ],
  "screen:ANL-056": [
+  "ai:calls 2"
+ ],
+ "screen:ANL-057": [
+  "ai:calls 4"
+ ],
+ "screen:ANL-058": [
+  "ai:calls 1"
+ ],
+ "screen:ANL-059": [
+  "ai:calls 2"
+ ],
+ "screen:ANL-060": [
+  "ai:calls 8"
+ ],
+ "screen:BO-005": [
   "ai:calls 1"
  ],
  "screen:BO-029": [
@@ -434,35 +1178,152 @@
  "screen:BO-060": [
   "ai:calls 2"
  ],
+ "screen:BO-084": [
+  "ai:calls 1"
+ ],
  "screen:BO-088": [
   "ai:calls 1"
  ],
  "screen:BO-091": [
-  "ai:calls 4"
+  "ai:calls 8"
  ],
  "screen:BO-093": [
+  "ai:calls 1"
+ ],
+ "screen:BO-102": [
+  "ai:calls 2"
+ ],
+ "screen:BO-1048": [
   "ai:calls 1"
  ],
  "screen:BO-115": [
   "ai:calls 1"
  ],
+ "screen:BO-1160": [
+  "ai:calls 5"
+ ],
  "screen:BO-117": [
   "ai:calls 2"
+ ],
+ "screen:BO-119": [
+  "ai:calls 1"
+ ],
+ "screen:BO-138": [
+  "ai:calls 1"
+ ],
+ "screen:BO-139": [
+  "ai:calls 1"
+ ],
+ "screen:BO-367": [
+  "ai:calls 1"
+ ],
+ "screen:BO-369": [
+  "ai:calls 1"
  ],
  "screen:BO-593": [
   "ai:calls 1"
  ],
  "screen:BO-597": [
-  "ai:calls 1"
+  "ai:calls 2"
  ],
  "screen:BO-598": [
+  "ai:calls 2"
+ ],
+ "screen:BO-761": [
   "ai:calls 1"
+ ],
+ "screen:BO-762": [
+  "ai:calls 2"
+ ],
+ "screen:BO-764": [
+  "ai:calls 1"
+ ],
+ "screen:BO-766": [
+  "ai:calls 1"
+ ],
+ "screen:BO-772": [
+  "ai:calls 4"
+ ],
+ "screen:BO-782": [
+  "ai:calls 3"
+ ],
+ "screen:BO-785": [
+  "ai:calls 2"
+ ],
+ "screen:BO-786": [
+  "ai:calls 1"
+ ],
+ "screen:BO-787": [
+  "ai:calls 1"
+ ],
+ "screen:BO-789": [
+  "ai:calls 1"
+ ],
+ "screen:BO-793": [
+  "ai:calls 3"
+ ],
+ "screen:BO-798": [
+  "ai:calls 1"
+ ],
+ "screen:BO-919": [
+  "ai:calls 3"
+ ],
+ "screen:BO-925": [
+  "ai:calls 2"
+ ],
+ "screen:BO-926": [
+  "ai:calls 2"
+ ],
+ "screen:BO-927": [
+  "ai:calls 3"
+ ],
+ "screen:BO-928": [
+  "ai:calls 4"
+ ],
+ "screen:BO-929": [
+  "ai:calls 3"
+ ],
+ "screen:BO-931": [
+  "ai:calls 2"
+ ],
+ "screen:BO-932": [
+  "ai:calls 3"
+ ],
+ "screen:BO-959": [
+  "ai:calls 1"
+ ],
+ "screen:BO-970": [
+  "ai:calls 3"
+ ],
+ "screen:BO-975": [
+  "ai:calls 3"
+ ],
+ "screen:BO-982": [
+  "ai:calls 1"
+ ],
+ "screen:CMS-007": [
+  "ai:calls 2"
+ ],
+ "screen:CMS-008": [
+  "ai:calls 2"
+ ],
+ "screen:CMS-010": [
+  "ai:calls 1"
+ ],
+ "screen:CMS-062": [
+  "ai:calls 1"
+ ],
+ "screen:CMS-101": [
+  "ai:calls 2"
  ],
  "screen:EMP-019": [
   "ai:calls 3"
  ],
  "screen:EMP-020": [
-  "ai:calls 3"
+  "ai:calls 4"
+ ],
+ "screen:EMP-031": [
+  "ai:calls 1"
  ],
  "screen:EMP-040": [
   "ai:calls 1"
@@ -470,14 +1331,23 @@
  "screen:EMP-041": [
   "ai:calls 1"
  ],
+ "screen:GST-001": [
+  "ai:calls 2"
+ ],
  "screen:GST-031": [
   "ai:calls 3"
  ],
  "screen:GST-032": [
-  "ai:calls 1"
+  "ai:calls 2"
  ],
  "screen:GST-033": [
   "ai:calls 1"
+ ],
+ "screen:GST-036": [
+  "ai:calls 2"
+ ],
+ "screen:GST-048": [
+  "ai:calls 2"
  ],
  "screen:GST-054": [
   "ai:calls 1"
@@ -489,7 +1359,7 @@
   "ai:calls 1"
  ],
  "screen:KSK-015": [
-  "ai:calls 1"
+  "ai:calls 2"
  ],
  "screen:POS-008": [
   "ai:calls 2"
@@ -498,15 +1368,60 @@
   "ai:calls 2"
  ],
  "screen:SUP-006": [
-  "ai:calls 1"
+  "ai:calls 2"
  ],
  "screen:SUP-008": [
   "ai:calls 2"
  ],
+ "screen:SUP-018": [
+  "ai:calls 2"
+ ],
+ "screen:WEB-001": [
+  "ai:calls 2"
+ ],
+ "screen:WEB-008": [
+  "ai:calls 2"
+ ],
+ "screen:WEB-043": [
+  "ai:calls 2"
+ ],
  "screen:WEB-044": [
-  "ai:calls 4"
+  "ai:calls 5"
+ ],
+ "state:ai-action-plan.yaml": [
+  "ai:domain contract"
+ ],
+ "state:ai-capability.yaml": [
+  "ai:domain contract"
+ ],
+ "state:ai-evaluation-run.yaml": [
+  "ai:domain contract"
+ ],
+ "state:ai-evidence-package.yaml": [
+  "ai:domain contract"
+ ],
+ "state:ai-forecast-scenario.yaml": [
+  "ai:domain contract"
+ ],
+ "state:ai-forecast-version.yaml": [
+  "ai:domain contract"
+ ],
+ "state:ai-governance-alert.yaml": [
+  "ai:domain contract"
+ ],
+ "state:ai-governance-policy-version.yaml": [
+  "ai:domain contract"
+ ],
+ "state:ai-guided-choice-suggestion.yaml": [
+  "ai:domain contract"
+ ],
+ "state:ai-incident.yaml": [
+  "ai:domain contract"
  ],
  "state:ai-index-job.yaml": [
+  "ai:domain contract"
+ ],
+ "state:ai-insight.yaml": [
   "ai:domain contract"
  ],
  "state:ai-knowledge-document.yaml": [
@@ -515,14 +1430,32 @@
  "state:ai-layout-draft.yaml": [
   "ai:domain contract"
  ],
+ "state:ai-operational-requirement.yaml": [
+  "ai:domain contract"
+ ],
+ "state:ai-policy-exception.yaml": [
+  "ai:domain contract"
+ ],
  "state:ai-proposed-action.yaml": [
   "ai:domain contract"
  ],
+ "state:ai-risk-case.yaml": [
+  "ai:domain contract"
+ ],
+ "state:ai-tool.yaml": [
+  "ai:domain contract"
+ ],
  "state:approval-request.yaml": [
-  "ai:reached via approval.granted"
+  "ai:reached via approval.expired, approval.granted, approval.rejected"
+ ],
+ "state:cart.yaml": [
+  "ai:reached via cart.abandoned"
  ],
  "state:case.yaml": [
   "ai:reached via marketing.caseClosed"
+ ],
+ "state:chargeback.yaml": [
+  "ai:reached via order.chargebackRecorded"
  ],
  "state:content.yaml": [
   "ai:reached via whitelabel.contentPublished"
@@ -530,22 +1463,163 @@
  "state:conversation.yaml": [
   "ai:reached via conversation.handedOver"
  ],
+ "state:entitlement-status.yaml": [
+  "ai:reached via access.validated"
+ ],
  "state:media.yaml": [
   "ai:reached via assets.documentIndexed"
+ ],
+ "state:order.yaml": [
+  "ai:reached via order.cancelled, order.completed, order.paid, order.refunded"
+ ],
+ "state:payment.yaml": [
+  "ai:reached via order.paid"
+ ],
+ "state:performance.yaml": [
+  "ai:reached via performance.cancelled"
+ ],
+ "state:period.yaml": [
+  "ai:reached via ledger.periodClosed"
  ],
  "state:product.yaml": [
   "ai:reached via catalogue.productPublished"
  ],
+ "state:promotion.yaml": [
+  "ai:reached via promotions.recommendationStrategyPublished"
+ ],
+ "state:refund.yaml": [
+  "ai:reached via order.refunded"
+ ],
+ "state:registered-device.yaml": [
+  "ai:reached via device.statusChanged"
+ ],
+ "state:resale-listing.yaml": [
+  "ai:reached via entitlement.transferred"
+ ],
  "state:schedule.yaml": [
   "ai:reached via whitelabel.contentPublished"
  ],
+ "state:seat.yaml": [
+  "ai:reached via seat.sold"
+ ],
+ "state:shift.yaml": [
+  "ai:reached via shift.closed"
+ ],
+ "state:stock-count.yaml": [
+  "ai:reached via stock.depleted"
+ ],
+ "state:tenant.yaml": [
+  "ai:reached via tenant.suspended"
+ ],
+ "state:ticket-transfer.yaml": [
+  "ai:reached via entitlement.transferred"
+ ],
+ "table:ai.action_plan": [
+  "ai:owned"
+ ],
+ "table:ai.action_step": [
+  "ai:owned"
+ ],
  "table:ai.activity": [
+  "ai:owned"
+ ],
+ "table:ai.anomaly_detector": [
+  "ai:owned"
+ ],
+ "table:ai.answer_feedback": [
+  "ai:owned"
+ ],
+ "table:ai.approval_request_score": [
+  "ai:owned"
+ ],
+ "table:ai.assistant_profile": [
+  "ai:owned"
+ ],
+ "table:ai.blueprint": [
+  "ai:owned"
+ ],
+ "table:ai.blueprint_decision": [
+  "ai:owned"
+ ],
+ "table:ai.byok_enablement": [
+  "ai:owned"
+ ],
+ "table:ai.capability": [
+  "ai:owned"
+ ],
+ "table:ai.case_action": [
+  "ai:owned"
+ ],
+ "table:ai.case_evidence": [
+  "ai:owned"
+ ],
+ "table:ai.chunk_embedding": [
   "ai:owned"
  ],
  "table:ai.chunk_ref": [
   "ai:owned"
  ],
+ "table:ai.config_session": [
+  "ai:owned"
+ ],
+ "table:ai.config_source": [
+  "ai:owned"
+ ],
+ "table:ai.control": [
+  "ai:owned"
+ ],
+ "table:ai.control_test": [
+  "ai:owned"
+ ],
  "table:ai.conversation": [
+  "ai:owned"
+ ],
+ "table:ai.decision_record": [
+  "ai:owned"
+ ],
+ "table:ai.entity_risk": [
+  "ai:owned"
+ ],
+ "table:ai.eval_run": [
+  "ai:owned"
+ ],
+ "table:ai.eval_suite": [
+  "ai:owned"
+ ],
+ "table:ai.evidence_package": [
+  "ai:owned"
+ ],
+ "table:ai.forecast_accuracy": [
+  "ai:owned"
+ ],
+ "table:ai.forecast_definition": [
+  "ai:owned"
+ ],
+ "table:ai.forecast_export": [
+  "ai:owned"
+ ],
+ "table:ai.forecast_point": [
+  "ai:owned"
+ ],
+ "table:ai.forecast_scenario": [
+  "ai:owned"
+ ],
+ "table:ai.forecast_version": [
+  "ai:owned"
+ ],
+ "table:ai.governance_alert": [
+  "ai:owned"
+ ],
+ "table:ai.governance_policy": [
+  "ai:owned"
+ ],
+ "table:ai.governance_policy_version": [
+  "ai:owned"
+ ],
+ "table:ai.guided_choice_suggestion": [
+  "ai:owned"
+ ],
+ "table:ai.incident": [
   "ai:owned"
  ],
  "table:ai.index_entry": [
@@ -560,10 +1634,19 @@
  "table:ai.index_source": [
   "ai:owned"
  ],
+ "table:ai.insight": [
+  "ai:owned"
+ ],
+ "table:ai.intervention": [
+  "ai:owned"
+ ],
  "table:ai.knowledge_collection": [
   "ai:owned"
  ],
  "table:ai.knowledge_document": [
+  "ai:owned"
+ ],
+ "table:ai.knowledge_gap": [
   "ai:owned"
  ],
  "table:ai.layout_draft": [
@@ -572,7 +1655,19 @@
  "table:ai.message": [
   "ai:owned"
  ],
+ "table:ai.model": [
+  "ai:owned"
+ ],
+ "table:ai.operational_requirement": [
+  "ai:owned"
+ ],
  "table:ai.policy": [
+  "ai:owned"
+ ],
+ "table:ai.policy_exception": [
+  "ai:owned"
+ ],
+ "table:ai.prompt_template": [
   "ai:owned"
  ],
  "table:ai.proposed_action": [
@@ -581,11 +1676,56 @@
  "table:ai.provider": [
   "ai:owned"
  ],
+ "table:ai.rec_decision": [
+  "ai:owned"
+ ],
+ "table:ai.rec_decline": [
+  "ai:owned"
+ ],
+ "table:ai.rec_event": [
+  "ai:owned"
+ ],
+ "table:ai.release": [
+  "ai:owned"
+ ],
+ "table:ai.risk_alert": [
+  "ai:owned"
+ ],
+ "table:ai.risk_assessment": [
+  "ai:owned"
+ ],
+ "table:ai.risk_case": [
+  "ai:owned"
+ ],
+ "table:ai.risk_edge": [
+  "ai:owned"
+ ],
+ "table:ai.risk_register": [
+  "ai:owned"
+ ],
+ "table:ai.risk_strategy": [
+  "ai:owned"
+ ],
+ "table:ai.signal_observation": [
+  "ai:owned"
+ ],
+ "table:ai.signal_source": [
+  "ai:owned"
+ ],
  "table:ai.suggestion": [
   "ai:owned"
  ],
  "table:ai.suggestion_outcome": [
   "ai:owned"
+ ],
+ "table:ai.tool": [
+  "ai:owned"
+ ],
+ "table:approvals.request": [
+  "ai:read or written"
+ ],
+ "table:approvals.sla_policy": [
+  "ai:read or written"
  ],
  "table:assets.media_asset": [
   "ai:read or written"
@@ -596,10 +1736,22 @@
  "table:cache:embedding": [
   "ai:read or written"
  ],
+ "table:cache:governance-policy": [
+  "ai:read or written"
+ ],
  "table:cache:idempotency": [
   "ai:read or written"
  ],
+ "table:cache:rec-candidates": [
+  "ai:read or written"
+ ],
+ "table:cache:rec-features": [
+  "ai:read or written"
+ ],
  "table:cache:resolution": [
+  "ai:read or written"
+ ],
+ "table:cache:risk-features": [
   "ai:read or written"
  ],
  "table:catalogue.channel_capacity": [
@@ -632,13 +1784,55 @@
  "table:fnb.menu_item": [
   "ai:read or written"
  ],
+ "table:fnb.production_plan": [
+  "ai:read or written"
+ ],
+ "table:inventory.movement": [
+  "ai:read or written"
+ ],
+ "table:inventory.stock_batch": [
+  "ai:read or written"
+ ],
  "table:maintenance.inspection_template": [
+  "ai:read or written"
+ ],
+ "table:marketing.attribution_touch": [
+  "ai:read or written"
+ ],
+ "table:marketing.audience_list": [
+  "ai:read or written"
+ ],
+ "table:marketing.campaign": [
   "ai:read or written"
  ],
  "table:marketing.case": [
   "ai:read or written"
  ],
+ "table:marketing.consent_record": [
+  "ai:read or written"
+ ],
+ "table:marketing.guest_profile": [
+  "ai:read or written"
+ ],
+ "table:marketing.loyalty_position": [
+  "ai:read or written"
+ ],
  "table:marketing.loyalty_programme": [
+  "ai:read or written"
+ ],
+ "table:marketing.message_template": [
+  "ai:read or written"
+ ],
+ "table:marketing.message_template_version": [
+  "ai:read or written"
+ ],
+ "table:marketing.segment": [
+  "ai:read or written"
+ ],
+ "table:marketing.segment_criterion": [
+  "ai:read or written"
+ ],
+ "table:orders.order_line": [
   "ai:read or written"
  ],
  "table:platform.region_settings": [
@@ -653,10 +1847,19 @@
  "table:qdrant:knowledge": [
   "ai:read or written"
  ],
+ "table:queue.queue": [
+  "ai:read or written"
+ ],
+ "table:queue.reading": [
+  "ai:read or written"
+ ],
  "table:reporting.report_definition": [
   "ai:read or written"
  ],
  "table:retail.merchandise": [
+  "ai:read or written"
+ ],
+ "table:seating.accessible": [
   "ai:read or written"
  ],
  "table:seating.seat": [
@@ -674,6 +1877,9 @@
  "table:seating.section": [
   "ai:read or written"
  ],
+ "table:seating.zone": [
+  "ai:read or written"
+ ],
  "table:venuemap.import_job": [
   "ai:read or written"
  ],
@@ -683,13 +1889,22 @@
  "table:venuemap.point": [
   "ai:read or written"
  ],
+ "table:whitelabel.banner": [
+  "ai:read or written"
+ ],
  "table:whitelabel.content_page": [
   "ai:read or written"
  ],
  "table:whitelabel.faq_entry": [
   "ai:read or written"
  ],
+ "table:whitelabel.homepage_section": [
+  "ai:read or written"
+ ],
  "table:whitelabel.policy": [
+  "ai:read or written"
+ ],
+ "table:whitelabel.promo_block": [
   "ai:read or written"
  ]
 }

@@ -1,5 +1,18 @@
--- pii — 4 tables
+-- pii — 5 tables
 -- **Derived. Do not hand-edit.**
+
+-- The IP address and user agent a cookie decision was made from, kept only where the published
+-- banner design has record_ip_address on (ADR-0023). Held in pii and pointed at the decision,
+-- never beside it, so the consent log can be read and reported without reading personal data.
+-- Reached by: 0 operations read it and 1 write it.
+CREATE TABLE IF NOT EXISTS pii.consent_identifier (
+    id                                uuid PRIMARY KEY,
+    device_consent_id                 uuid NOT NULL,
+    ip_address                        text CONSTRAINT consent_identifier_ip_address_chk CHECK (char_length(ip_address) <= 45),
+    user_agent                        text CONSTRAINT consent_identifier_user_agent_chk CHECK (char_length(user_agent) <= 500),
+    captured_at                       timestamptz NOT NULL,
+    scope_path                        ltree NOT NULL
+);
 
 -- A guest, and the only table holding who they are. Name, and through its children the contacts,
 -- documents and biometrics. Isolated deliberately — erasure is a delete here and a pseudonym
@@ -52,8 +65,8 @@ CREATE TABLE IF NOT EXISTS pii.subject_contact (
 );
 
 -- A passport or ID, and its verification state. Hangs off: a child of pii.subject; reaches
--- pii.subject through its keys; references pii.subject. Reached by: 0 operations read it and 1
--- write it.
+-- pii.subject through its keys; references pii.subject. Reached by: 1 operations read it and 3
+-- write it; 1 tables reference it.
 CREATE TABLE IF NOT EXISTS pii.subject_document (
     id                                uuid PRIMARY KEY NOT NULL,
     subject_id                        uuid NOT NULL,

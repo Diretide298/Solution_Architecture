@@ -28,29 +28,46 @@ transitions:
   to: live
   trigger: timer
   guard: Start reached
+  emits:
+  - promotions.recommendationStrategyPublished
 - from: live
   to: paused
   operation: pausePromotion
   trigger: operation
   guard: Halted. **Carts already priced keep their price** — a guest mid-checkout is not repriced
+  emits:
+  - promotions.recommendationStrategyPublished
 - from: paused
   to: live
   operation: publishPromotion
   trigger: operation
   guard: Resumed within the window
+  emits:
+  - promotions.recommendationStrategyPublished
 - from: live
   to: expired
   trigger: timer
   guard: End reached
+  emits:
+  - promotions.recommendationStrategyPublished
 - from: paused
   to: ended
   operation: endPromotion
   trigger: operation
   guard: Ended early. Distinct from expired — somebody decided
+  emits:
+  - promotions.recommendationStrategyPublished
 - from: live
   to: ended
   operation: endPromotion
   trigger: operation
   guard: Ended early while running
+  emits:
+  - promotions.recommendationStrategyPublished
 notes: '`expired` and `ended` are separated so the register can answer whether a promotion ran its course
-  or was pulled, which is the question asked after a bad month.'
+  or was pulled, which is the question asked after a bad month.
+
+
+  **Moves into and out of `live` emit `promotions.recommendationStrategyPublished` (kind `offers`) for a promotion
+  marked `recommendable`** (29 September, build pass, group G2): that is how an offer enters and leaves the
+  recommendation engine''s candidate cache. A promotion not marked recommendable publishes nothing.'

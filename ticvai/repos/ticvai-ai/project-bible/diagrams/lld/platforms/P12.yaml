@@ -33,7 +33,7 @@ servicesCalled:
 - service: ReportingService
   operationCalls: 8
 - service: AiService
-  operationCalls: 1
+  operationCalls: 4
 - service: WhiteLabelService
   operationCalls: 1
 - service: LedgerService
@@ -226,6 +226,7 @@ screens:
   operations:
   - listFaqs
   - listKnowledgeCollections
+  - listKnowledgeGaps
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -514,6 +515,8 @@ screens:
   wave: 3
   density: compact
   operations:
+  - configureAssistantProfile
+  - listAssistantProfiles
   - setCustomerServiceCopilot
   states:
   - emptyFirstRun
@@ -522,7 +525,8 @@ screens:
   - error
   - loading
   offlineState: false
-  entryParams: []
+  entryParams:
+  - profileKey<-navigation
   goesTo:
   - SUP-009
   boardFrames: null

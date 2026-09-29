@@ -57,35 +57,35 @@ servicesCalled:
 - service: VenueOpsService
   operationCalls: 526
 - service: CatalogueService
-  operationCalls: 396
+  operationCalls: 393
 - service: TenancyService
-  operationCalls: 330
+  operationCalls: 364
 - service: AccessService
-  operationCalls: 307
+  operationCalls: 311
 - service: OrderService
-  operationCalls: 222
+  operationCalls: 229
 - service: MarketingService
-  operationCalls: 211
+  operationCalls: 212
 - service: WalletService
-  operationCalls: 168
+  operationCalls: 174
 - service: FnbService
-  operationCalls: 92
+  operationCalls: 96
 - service: InventoryService
-  operationCalls: 89
+  operationCalls: 94
 - service: ReportingService
+  operationCalls: 91
+- service: AiService
   operationCalls: 83
 - service: PlatformService
-  operationCalls: 72
+  operationCalls: 77
 - service: LedgerService
-  operationCalls: 63
+  operationCalls: 75
 - service: IdentityService
-  operationCalls: 24
+  operationCalls: 39
 - service: RetailService
   operationCalls: 18
-- service: AiService
-  operationCalls: 11
 - service: WhiteLabelService
-  operationCalls: 10
+  operationCalls: 12
 coverage:
   screens: 1186
   inAFlow: 1101
@@ -267,6 +267,7 @@ screens:
   - listQueueEntries
   - listQueues
   - pauseCampaign
+  - requestSuggestion
   - setQueueStatus
   - setWaitTime
   - stopCampaign
@@ -887,9 +888,14 @@ screens:
   - exchangeOrderLines
   - getOrder
   - getOrderStatement
+  - getTaxDocumentRendition
+  - getTaxInvoice
   - holdOrder
+  - issueCreditMemo
+  - issueTaxInvoice
   - listOrderRefunds
   - listOrders
+  - listTaxInvoices
   - modifyOrder
   - reprintOrder
   - rescheduleOrder
@@ -904,6 +910,8 @@ screens:
   offlineState: false
   entryParams:
   - orderId<-deepLink
+  - documentId<-navigation
+  - invoiceId<-navigation
   goesTo:
   - BO-008
   boardFrames: null
@@ -923,7 +931,10 @@ screens:
   - getOrder
   - getOrderStatement
   - getRefundPolicy
+  - getTaxDocumentRendition
   - holdOrder
+  - issueCreditMemo
+  - listCreditMemos
   - listOrderRefunds
   - listOrders
   - modifyOrder
@@ -941,6 +952,8 @@ screens:
   entryParams:
   - orderId<-deepLink
   - venueId<-session
+  - documentId<-navigation
+  - invoiceId<-navigation
   goesTo:
   - BO-004
   - BO-008
@@ -985,10 +998,15 @@ screens:
   wave: 2
   density: compact
   operations:
+  - assignChargeback
+  - getChargebackAnalytics
+  - getChargebackAnalytics
   - getSettlement
   - ingestSettlementFile
   - listSettlementExceptions
   - listSettlements
+  - recordChargeback
+  - recordChargebackOutcome
   - resolveSettlementException
   states:
   - emptyFirstRun
@@ -999,6 +1017,7 @@ screens:
   offlineState: false
   entryParams:
   - settlementId<-deepLink
+  - chargebackId<-navigation
   goesTo:
   - BO-008
   - BO-024
@@ -1580,6 +1599,7 @@ screens:
   - recordCorrectiveAction
   - recordWaste
   - reserveMerchandise
+  - setDeliveryLocationOutletMapping
   - setFnbDeliveryPolicy
   - setReturnPolicy
   - setTableLayout
@@ -1595,6 +1615,7 @@ screens:
   entryParams:
   - outletId<-deepLink
   - actionId<-deepLink
+  - venueId<-session
   goesTo: []
   boardFrames:
   - FnB Board 1.dc.html#fnb-1b
@@ -1905,6 +1926,7 @@ screens:
   - resetPrincipalCredential
   - setJobTitle
   - setWorkAssignment
+  - suggestRoleAssignment
   - updatePrincipal
   states:
   - emptyFirstRun
@@ -1928,8 +1950,12 @@ screens:
   density: compact
   operations:
   - createRole
+  - listAccessReviewCampaigns
+  - listAccessReviewItems
+  - listPermissionFindings
   - listRoles
   - setCapabilityTemplate
+  - suggestRoleAssignment
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -1937,7 +1963,8 @@ screens:
   - error
   - loading
   offlineState: false
-  entryParams: []
+  entryParams:
+  - campaignId<-navigation
   goesTo: []
   boardFrames: null
   wireframe: wireframes/P08 Venue Management.dc.html#bo-054
@@ -2246,12 +2273,15 @@ screens:
   wave: 1
   density: compact
   operations:
+  - createDeliveryLocation
   - getRefundPolicy
   - getVenueSettings
   - listDeliveryLocations
   - listDiningOutlets
+  - setDeliveryLocationOutletMapping
   - setRefundPolicy
   - setVenueSettings
+  - updateDeliveryLocation
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -2261,6 +2291,7 @@ screens:
   offlineState: false
   entryParams:
   - venueId<-session
+  - locationId<-navigation
   goesTo:
   - BO-008
   boardFrames: null
@@ -2747,9 +2778,11 @@ screens:
   - createInventoryItem
   - createStockLocation
   - getInventoryItem
+  - getInventoryKitDefinition
   - listInventoryItems
   - listStockLocations
   - lookupInventoryItem
+  - setInventoryKitDefinition
   - updateInventoryItem
   states:
   - emptyFirstRun
@@ -2815,10 +2848,13 @@ screens:
   density: compact
   operations:
   - createSupplier
+  - createSupplierContract
   - getSupplierPerformance
+  - listSupplierContracts
   - listSuppliers
   - recordQuotation
   - updateSupplier
+  - updateSupplierContract
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -2828,6 +2864,7 @@ screens:
   offlineState: false
   entryParams:
   - supplierId<-deepLink
+  - contractId<-navigation
   goesTo:
   - BO-007
   - BO-078
@@ -2851,6 +2888,7 @@ screens:
   operations:
   - decideApprovalRequest
   - escalateApprovalRequest
+  - getApprovalRequestScore
   - listApprovalRequests
   states:
   - emptyFirstRun
@@ -2861,6 +2899,7 @@ screens:
   offlineState: false
   entryParams:
   - requestId<-deepLink
+  - approvalRequestId<-navigation
   goesTo:
   - BO-052
   - BO-085
@@ -3016,6 +3055,7 @@ screens:
   - beginPeriodClose
   - closeFiscalPeriod
   - getTrialBalance
+  - getVatReturn
   - listFiscalPeriods
   - reopenPeriod
   states:
@@ -3043,8 +3083,12 @@ screens:
   wave: 1
   density: compact
   operations:
+  - configureAssistantProfile
   - getAiPolicy
   - getAiUsage
+  - getEffectiveAiPolicy
+  - listAiCapabilities
+  - listAssistantProfiles
   - listIndexFailures
   - setAiPolicy
   states:
@@ -3054,7 +3098,8 @@ screens:
   - error
   - loading
   offlineState: false
-  entryParams: []
+  entryParams:
+  - profileKey<-navigation
   goesTo: []
   boardFrames: null
   wireframe: wireframes/P08 Venue Management.dc.html#bo-091
@@ -3469,9 +3514,10 @@ screens:
   wave: 1
   density: compact
   operations:
-  - getUpsellSuggestions
+  - decideRecommendations
   - getVenueSettings
   - listUpsellRules
+  - recordRecommendationEvents
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -4031,9 +4077,8 @@ screens:
   density: compact
   operations:
   - createUpsellRule
+  - decideRecommendations
   - deleteUpsellRule
-  - getRecommendations
-  - getUpsellSuggestions
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -4285,13 +4330,16 @@ screens:
   density: compact
   operations:
   - configureWorkstation
+  - createDeviceFirmware
   - deployConfigurationProfile
+  - getDeviceFirmware
   - getWorkstationHealth
   - listDeviceFirmware
   - listWorkstations
   - rollbackDeviceFirmware
   - setConfigurationProfile
   - setConnectivityThresholds
+  - setDeviceFirmwareStatus
   - startDeviceFirmwareRollout
   states:
   - emptyFirstRun
@@ -4305,6 +4353,7 @@ screens:
   - profileId<-deepLink
   - workstationId<-deepLink
   - rolloutId<-navigation
+  - firmwareId<-navigation
   goesTo:
   - BO-037
   - BO-108
@@ -4545,6 +4594,7 @@ screens:
   - completeProductionRun
   - listExpiringBatches
   - planProductionRun
+  - requestSuggestion
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -4568,6 +4618,7 @@ screens:
   density: compact
   operations:
   - recordWaste
+  - requestSuggestion
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -5842,6 +5893,7 @@ screens:
   density: compact
   operations:
   - listBiometricLifecycleRetention
+  - listDataRetentionSettings
   - setBiometricLifecycleRetention
   states:
   - emptyFirstRun
@@ -6844,6 +6896,7 @@ screens:
   density: compact
   operations:
   - listDynamicAccessPolicy
+  - listDynamicPolicyEffectiveness
   - setVisualDynamicPolicy
   states:
   - emptyFirstRun
@@ -7060,6 +7113,7 @@ screens:
   - createApprovalRequest
   - decideApprovalRequest
   - listDynamicAccessPolicy
+  - listDynamicPolicyEffectiveness
   - listPolicies
   - rollbackAccessPolicy
   states:
@@ -7085,6 +7139,7 @@ screens:
   wave: 3
   density: compact
   operations:
+  - getAccessRiskScore
   - listAccessSecurityFraud
   - lockIdentity
   - updateSecurityAlert
@@ -7240,6 +7295,7 @@ screens:
   wave: 3
   density: compact
   operations:
+  - getAccessRiskScore
   - listAccessRiskScoring
   - setRiskScoringConfig
   states:
@@ -8142,6 +8198,7 @@ screens:
   wave: 3
   density: compact
   operations:
+  - createEntitlementTemplate
   - listEntitlementTemplates
   - setMembershipBenefit
   - setMembershipEntitlementAdmission
@@ -8965,6 +9022,8 @@ screens:
   wave: 3
   density: compact
   operations:
+  - createInstalmentPlan
+  - listInstalmentPlans
   - listPaymentOrderFinancial
   states:
   - emptyFirstRun
@@ -9983,6 +10042,7 @@ screens:
   density: compact
   operations:
   - decideApprovalRequest
+  - getApprovalRequestScore
   - listApprovalRequests
   states:
   - emptyFirstRun
@@ -9993,6 +10053,7 @@ screens:
   offlineState: false
   entryParams:
   - requestId<-navigation
+  - approvalRequestId<-navigation
   goesTo:
   - BO-364
   boardFrames: null
@@ -10007,6 +10068,7 @@ screens:
   density: compact
   operations:
   - evaluateApprovalRequirement
+  - listApprovalRequests
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -10028,6 +10090,7 @@ screens:
   wave: 3
   density: compact
   operations:
+  - getApprovalRequestScore
   - listApprovalRequests
   states:
   - emptyFirstRun
@@ -10036,7 +10099,8 @@ screens:
   - error
   - loading
   offlineState: false
-  entryParams: []
+  entryParams:
+  - approvalRequestId<-navigation
   goesTo:
   - BO-364
   boardFrames: null
@@ -10596,7 +10660,9 @@ screens:
   wave: 3
   density: compact
   operations:
+  - escalateApprovalRequest
   - getApprovalAnalytics
+  - listApprovalRequests
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -10604,7 +10670,8 @@ screens:
   - error
   - loading
   offlineState: false
-  entryParams: []
+  entryParams:
+  - requestId<-navigation
   goesTo:
   - BO-384
   boardFrames: null
@@ -11167,7 +11234,11 @@ screens:
   operations:
   - adjustWallet
   - getWallet
+  - getWalletAutoReloadSetting
+  - getWalletExitBalance
   - listCreditLots
+  - setWalletAutoReloadSetting
+  - settleWalletAtExit
   - suspendWallet
   states:
   - emptyFirstRun
@@ -12813,6 +12884,8 @@ screens:
   density: compact
   operations:
   - getWallet
+  - getWalletExitBalance
+  - settleWalletAtExit
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -12822,6 +12895,7 @@ screens:
   offlineState: false
   entryParams:
   - subjectId<-navigation
+  - walletId<-navigation
   goesTo:
   - BO-484
   boardFrames: null
@@ -15443,6 +15517,7 @@ screens:
   density: compact
   operations:
   - generateConfiguration
+  - getActionPlan
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -15450,7 +15525,8 @@ screens:
   - error
   - loading
   offlineState: false
-  entryParams: []
+  entryParams:
+  - planId<-navigation
   goesTo:
   - BO-595
   boardFrames: null
@@ -15465,6 +15541,7 @@ screens:
   density: compact
   operations:
   - generateConfiguration
+  - getActionPlan
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -15472,7 +15549,8 @@ screens:
   - error
   - loading
   offlineState: false
-  entryParams: []
+  entryParams:
+  - planId<-navigation
   goesTo:
   - BO-595
   boardFrames: null
@@ -15885,6 +15963,7 @@ screens:
   density: compact
   operations:
   - listAccreditationApplications
+  - withdrawAccreditationApplication
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -15892,7 +15971,8 @@ screens:
   - error
   - loading
   offlineState: false
-  entryParams: []
+  entryParams:
+  - applicationId<-navigation
   goesTo:
   - BO-615
   boardFrames: null
@@ -15907,6 +15987,8 @@ screens:
   density: compact
   operations:
   - createAccreditationApplication
+  - submitAccreditationApplication
+  - updateAccreditationApplication
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -15914,7 +15996,8 @@ screens:
   - error
   - loading
   offlineState: false
-  entryParams: []
+  entryParams:
+  - applicationId<-navigation
   goesTo:
   - BO-615
   boardFrames: null
@@ -15929,6 +16012,7 @@ screens:
   density: compact
   operations:
   - createForm
+  - updateAccreditationProgramme
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -15936,7 +16020,8 @@ screens:
   - error
   - loading
   offlineState: false
-  entryParams: []
+  entryParams:
+  - programmeId<-navigation
   goesTo:
   - BO-615
   boardFrames: null
@@ -15972,7 +16057,10 @@ screens:
   wave: 3
   density: compact
   operations:
+  - cloneAccreditationProgramme
   - createAccreditationProgramme
+  - listAccreditationProgrammes
+  - updateAccreditationProgramme
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -15980,7 +16068,8 @@ screens:
   - error
   - loading
   offlineState: false
-  entryParams: []
+  entryParams:
+  - programmeId<-navigation
   goesTo:
   - BO-615
   boardFrames: null
@@ -16061,6 +16150,7 @@ screens:
   density: compact
   operations:
   - createAccreditationProgramme
+  - updateAccreditationProgramme
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -16068,7 +16158,8 @@ screens:
   - error
   - loading
   offlineState: false
-  entryParams: []
+  entryParams:
+  - programmeId<-navigation
   goesTo:
   - BO-615
   boardFrames: null
@@ -16182,6 +16273,7 @@ screens:
   wave: 3
   density: compact
   operations:
+  - listAccreditationDocuments
   - submitAccreditationDocument
   states:
   - emptyFirstRun
@@ -16204,6 +16296,7 @@ screens:
   wave: 3
   density: compact
   operations:
+  - listAccreditationDocuments
   - verifyAccreditationDocument
   states:
   - emptyFirstRun
@@ -16350,7 +16443,9 @@ screens:
   density: compact
   operations:
   - decideAccreditationApplication
+  - getAccreditationApplication
   - listAccreditationApplications
+  - listAccreditationDocuments
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -16440,6 +16535,9 @@ screens:
   density: compact
   operations:
   - decideAccreditationApplication
+  - getAccreditationApplication
+  - resubmitAccreditationApplication
+  - updateAccreditationApplication
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -16650,6 +16748,7 @@ screens:
   density: compact
   operations:
   - createBadgePrintJob
+  - deliverAccreditationCredential
   - listBadgePrintJobs
   states:
   - emptyFirstRun
@@ -16658,7 +16757,8 @@ screens:
   - error
   - loading
   offlineState: false
-  entryParams: []
+  entryParams:
+  - credentialId<-navigation
   goesTo:
   - BO-644
   boardFrames: null
@@ -16694,6 +16794,7 @@ screens:
   wave: 3
   density: compact
   operations:
+  - deliverAccreditationCredential
   - issueAccreditationCredential
   states:
   - emptyFirstRun
@@ -16702,7 +16803,8 @@ screens:
   - error
   - loading
   offlineState: false
-  entryParams: []
+  entryParams:
+  - credentialId<-navigation
   goesTo:
   - BO-644
   boardFrames: null
@@ -17047,6 +17149,7 @@ screens:
   wave: 3
   density: compact
   operations:
+  - cloneAccreditationProgramme
   - createAccreditationProgramme
   states:
   - emptyFirstRun
@@ -17055,7 +17158,8 @@ screens:
   - error
   - loading
   offlineState: false
-  entryParams: []
+  entryParams:
+  - programmeId<-navigation
   goesTo:
   - BO-664
   boardFrames: null
@@ -17160,6 +17264,7 @@ screens:
   density: compact
   operations:
   - listAccreditationHolders
+  - renewAccreditation
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -17167,7 +17272,8 @@ screens:
   - error
   - loading
   offlineState: false
-  entryParams: []
+  entryParams:
+  - holderId<-navigation
   goesTo:
   - BO-664
   boardFrames: null
@@ -17181,6 +17287,8 @@ screens:
   wave: 3
   density: compact
   operations:
+  - listAccreditationHolders
+  - renewAccreditation
   - setAccreditationValidity
   states:
   - emptyFirstRun
@@ -17189,7 +17297,8 @@ screens:
   - error
   - loading
   offlineState: false
-  entryParams: []
+  entryParams:
+  - holderId<-navigation
   goesTo:
   - BO-664
   boardFrames: null
@@ -17388,7 +17497,12 @@ screens:
   wave: 3
   density: compact
   operations:
+  - exportAccreditationData
+  - exportReportResult
+  - getAccreditationExport
+  - listAccreditationExports
   - listAccreditationHolders
+  - runReport
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -17396,7 +17510,10 @@ screens:
   - error
   - loading
   offlineState: false
-  entryParams: []
+  entryParams:
+  - executionId<-navigation
+  - exportId<-navigation
+  - reportId<-navigation
   goesTo:
   - BO-674
   boardFrames: null
@@ -17432,6 +17549,7 @@ screens:
   wave: 3
   density: compact
   operations:
+  - getKpiValues
   - listAccreditationHolders
   states:
   - emptyFirstRun
@@ -17463,6 +17581,7 @@ screens:
   wave: 3
   density: compact
   operations:
+  - getKpiValues
   - listAccreditationHolders
   states:
   - emptyFirstRun
@@ -17617,7 +17736,11 @@ screens:
   wave: 3
   density: compact
   operations:
+  - createWebhookSubscription
+  - listWebhookDeliveries
+  - listWebhookEventTypes
   - listWebhookSubscriptions
+  - testWebhookSubscription
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -17625,7 +17748,8 @@ screens:
   - error
   - loading
   offlineState: false
-  entryParams: []
+  entryParams:
+  - subscriptionId<-navigation
   goesTo:
   - BO-684
   boardFrames: null
@@ -18759,7 +18883,9 @@ screens:
   wave: 3
   density: compact
   operations:
+  - decideGuestIdentityVerification
   - getGuestTimeline
+  - listGuestIdentityVerifications
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -18769,6 +18895,7 @@ screens:
   offlineState: false
   entryParams:
   - guestId<-navigation
+  - verificationId<-navigation
   goesTo:
   - BO-734
   boardFrames: null
@@ -19053,8 +19180,10 @@ screens:
   wave: 3
   density: compact
   operations:
+  - listDataRetentionSettings
   - runDataRetention
   - setDataRetentionPolicy
+  - setDataRetentionSetting
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -19062,7 +19191,8 @@ screens:
   - error
   - loading
   offlineState: false
-  entryParams: []
+  entryParams:
+  - dataClass<-navigation
   goesTo:
   - BO-744
   boardFrames: null
@@ -19289,6 +19419,7 @@ screens:
   density: compact
   operations:
   - listAudienceDiscoveryTargeting
+  - proposeLookalikeSegment
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -19311,7 +19442,9 @@ screens:
   density: compact
   operations:
   - createSegment
+  - decideProposedAction
   - previewSegment
+  - proposeLookalikeSegment
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -19321,6 +19454,7 @@ screens:
   offlineState: false
   entryParams:
   - segmentId<-navigation
+  - actionId<-navigation
   goesTo:
   - BO-754
   boardFrames: null
@@ -19358,6 +19492,7 @@ screens:
   density: compact
   operations:
   - listCampaigns
+  - listMarketingRecommendations
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -19412,6 +19547,7 @@ screens:
   operations:
   - createInvitationCampaign
   - listCampaigns
+  - proposeMarketingContent
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -19551,7 +19687,12 @@ screens:
   wave: 3
   density: compact
   operations:
+  - decideAiInsight
   - getCampaignPerformance
+  - listMarketingRecommendations
+  - proposeMarketingContent
+  - requestSuggestion
+  - updateCampaign
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -19561,6 +19702,7 @@ screens:
   offlineState: false
   entryParams:
   - campaignId<-navigation
+  - insightId<-navigation
   goesTo:
   - BO-764
   boardFrames: null
@@ -19787,7 +19929,10 @@ screens:
   wave: 3
   density: compact
   operations:
+  - decideAiInsight
   - listJourneys
+  - listMarketingRecommendations
+  - requestSuggestion
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -19795,7 +19940,8 @@ screens:
   - error
   - loading
   offlineState: false
-  entryParams: []
+  entryParams:
+  - insightId<-navigation
   goesTo:
   - BO-774
   boardFrames: null
@@ -19864,6 +20010,8 @@ screens:
   operations:
   - createMessageTemplate
   - listMessageTemplates
+  - proposeMarketingContent
+  - proposeTranslations
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -19886,6 +20034,7 @@ screens:
   density: compact
   operations:
   - createMessageTemplate
+  - proposeMarketingContent
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -19908,6 +20057,7 @@ screens:
   density: compact
   operations:
   - createMessageTemplate
+  - proposeMarketingContent
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -19954,6 +20104,7 @@ screens:
   density: compact
   operations:
   - listSystemTransactionalTemplate
+  - proposeMarketingContent
   - setMessageTrigger
   states:
   - emptyFirstRun
@@ -20044,6 +20195,9 @@ screens:
   wave: 3
   density: compact
   operations:
+  - decideProposedAction
+  - proposeMarketingContent
+  - proposeTranslations
   - setLocalizationBrandingCustomer
   states:
   - emptyFirstRun
@@ -20052,7 +20206,8 @@ screens:
   - error
   - loading
   offlineState: false
-  entryParams: []
+  entryParams:
+  - actionId<-navigation
   goesTo:
   - BO-784
   boardFrames: null
@@ -20168,6 +20323,7 @@ screens:
   wave: 3
   density: compact
   operations:
+  - listKnowledgeGaps
   - setCustomerServiceCopilot
   states:
   - emptyFirstRun
@@ -20997,6 +21153,8 @@ screens:
   wave: 3
   density: compact
   operations:
+  - getDashboard
+  - getKpiValues
   - listLoyaltyProgrammes
   states:
   - emptyFirstRun
@@ -21005,7 +21163,8 @@ screens:
   - error
   - loading
   offlineState: false
-  entryParams: []
+  entryParams:
+  - dashboardId<-navigation
   goesTo:
   - BO-824
   boardFrames: null
@@ -21019,6 +21178,7 @@ screens:
   wave: 3
   density: compact
   operations:
+  - getStorefrontInsights
   - getTenantConfig
   states:
   - emptyFirstRun
@@ -21229,6 +21389,7 @@ screens:
   wave: 3
   density: compact
   operations:
+  - getStorefrontInsights
   - publishTenantConfig
   states:
   - emptyFirstRun
@@ -22306,6 +22467,8 @@ screens:
   density: compact
   operations:
   - getStaffingCoverage
+  - listAlerts
+  - setAlertRule
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -23100,7 +23263,10 @@ screens:
   requiresModule: resources
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - createForecastScenario
+  - getForecast
+  - listOperationalRequirements
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -23244,7 +23410,9 @@ screens:
   requiresModule: resources
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - listOperationalRequirements
+  - requestSuggestion
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -23265,7 +23433,9 @@ screens:
   requiresModule: resources
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - getForecast
+  - listOperationalRequirements
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -23286,7 +23456,11 @@ screens:
   requiresModule: resources
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - decideOperationalRequirement
+  - getForecast
+  - getStaffingCoverage
+  - listOperationalRequirements
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -23294,7 +23468,8 @@ screens:
   - error
   - loading
   offlineState: false
-  entryParams: []
+  entryParams:
+  - requirementId<-navigation
   goesTo:
   - BO-923
   boardFrames: null
@@ -23307,7 +23482,11 @@ screens:
   requiresModule: resources
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - createAiConversation
+  - decideProposedAction
+  - listProposedActions
+  - sendAiMessage
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -23315,7 +23494,9 @@ screens:
   - error
   - loading
   offlineState: false
-  entryParams: []
+  entryParams:
+  - actionId<-navigation
+  - conversationId<-navigation
   goesTo:
   - BO-923
   boardFrames: null
@@ -23328,7 +23509,10 @@ screens:
   requiresModule: resources
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - decideProposedAction
+  - listProposedActions
+  - sendAiMessage
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -23336,7 +23520,9 @@ screens:
   - error
   - loading
   offlineState: false
-  entryParams: []
+  entryParams:
+  - actionId<-navigation
+  - conversationId<-navigation
   goesTo:
   - BO-923
   boardFrames: null
@@ -23371,7 +23557,9 @@ screens:
   requiresModule: resources
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - compareForecastScenarios
+  - createForecastScenario
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -23392,7 +23580,10 @@ screens:
   requiresModule: resources
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - createAiConversation
+  - listAiConversations
+  - sendAiMessage
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -23400,7 +23591,8 @@ screens:
   - error
   - loading
   offlineState: false
-  entryParams: []
+  entryParams:
+  - conversationId<-navigation
   goesTo:
   - BO-923
   boardFrames: null
@@ -24049,6 +24241,7 @@ screens:
   wave: 3
   density: compact
   operations:
+  - proposeSeatMapChanges
   - setMapZones
   states:
   - emptyFirstRun
@@ -24329,6 +24522,9 @@ screens:
   wave: 3
   density: compact
   operations:
+  - decideProposedAction
+  - getActionPlan
+  - proposeSeatMapChanges
   - updateSeats
   states:
   - emptyFirstRun
@@ -24339,6 +24535,8 @@ screens:
   offlineState: false
   entryParams:
   - seatMapId<-navigation
+  - actionId<-navigation
+  - planId<-navigation
   goesTo:
   - BO-963
   boardFrames: null
@@ -24456,7 +24654,10 @@ screens:
   wave: 3
   density: compact
   operations:
+  - decideProposedAction
+  - getActionPlan
   - getSeatMap
+  - proposeSeatMapChanges
   - publishSeatMap
   states:
   - emptyFirstRun
@@ -24467,6 +24668,8 @@ screens:
   offlineState: false
   entryParams:
   - seatMapId<-navigation
+  - actionId<-navigation
+  - planId<-navigation
   goesTo:
   - BO-973
   boardFrames: null
@@ -24620,6 +24823,7 @@ screens:
   wave: 3
   density: compact
   operations:
+  - proposeSeatMapChanges
   - publishSeatMap
   - validateSeatMap
   states:
@@ -26174,7 +26378,7 @@ screens:
   wave: 3
   density: compact
   operations:
-  - getRecommendations
+  - decideRecommendations
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -26606,8 +26810,16 @@ screens:
   density: compact
   operations:
   - createAccessPolicy
+  - createAccessReviewCampaign
   - createEmergencyAccessOverride
+  - decideAccessReviewItem
   - listAccessPolicies
+  - listAccessPolicyEffectiveness
+  - listAccessPolicyHistory
+  - listAccessReviewCampaigns
+  - listAccessReviewItems
+  - listPermissionFindings
+  - restoreAccessPolicyVersion
   - setAccessPolicyState
   - simulateAccessPolicy
   - updateAccessPolicy
@@ -26620,6 +26832,8 @@ screens:
   offlineState: false
   entryParams:
   - policyId<-navigation
+  - campaignId<-navigation
+  - itemId<-navigation
   goesTo:
   - BO-1061
   boardFrames: null
@@ -26802,6 +27016,7 @@ screens:
   density: compact
   operations:
   - createWebhookSubscription
+  - listWebhookEventTypes
   - listWebhookSubscriptions
   states:
   - emptyFirstRun
@@ -26824,7 +27039,7 @@ screens:
   wave: 3
   density: compact
   operations:
-  - listApiVersions
+  - listWebhookEventTypes
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -26959,6 +27174,9 @@ screens:
   operations:
   - getKpiValues
   - getUnifiedReconciliation
+  - listCreditMemos
+  - listEInvoiceTransmissions
+  - listTaxInvoices
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -28843,6 +29061,11 @@ screens:
   wave: 3
   density: compact
   operations:
+  - closeRiskCase
+  - createRiskCase
+  - decideRiskAlert
+  - getRiskCase
+  - listRiskAlerts
   - listWalletDisputes
   states:
   - emptyFirstRun
@@ -28851,7 +29074,9 @@ screens:
   - error
   - loading
   offlineState: false
-  entryParams: []
+  entryParams:
+  - alertId<-navigation
+  - caseId<-navigation
   goesTo:
   - BO-1153
   boardFrames: null

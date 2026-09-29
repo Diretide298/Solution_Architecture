@@ -1,0 +1,78 @@
+# accreditation.applicationDecided v1 — published by accreditation
+# Checked by tools/check-states.py against states/ and the contracts.
+
+name: accreditation.applicationDecided
+version: 1
+publisher: accreditation
+description: An accreditation application was approved, rejected, returned for information or escalated.
+aggregate: accreditationApplication
+emittedWhen: decideAccreditationApplication succeeds (submitted or underReview to approved, rejected, informationRequested, or escalated), or renewAccreditation approves a renewal at once where no reverification is required
+payload:
+- field: applicationId
+  type: uuid
+- field: reference
+  type: string
+- field: programmeId
+  type: uuid
+- field: categoryCode
+  type: string
+  required: false
+- field: applicantType
+  type: string
+- field: organisationId
+  type: uuid
+  required: false
+- field: decision
+  type: string
+  notes: One of approve, reject, returnForInformation, escalate
+- field: status
+  type: string
+  notes: The application status after the decision
+- field: reason
+  type: string
+  required: false
+  notes: '**Required on reject and returnForInformation.** What the applicant is told'
+- field: missingRequirements
+  type: array
+  required: false
+- field: holderId
+  type: uuid
+  required: false
+  notes: Set on approval — the holder created, or the holder renewed (renewsHolderId)
+- field: renewsHolderId
+  type: uuid
+  required: false
+- field: resubmissionOfApplicationId
+  type: uuid
+  required: false
+- field: decidedByPrincipalId
+  type: uuid
+- field: scopePath
+  type: string
+- field: decidedAt
+  type: timestamp
+consumers:
+- context: marketing
+  purpose: Tell the applicant and their organisation, per the programme's notification rules (approved, rejected, informationRequested)
+  idempotencyKey: applicationId + decidedAt
+  onFailure: retry
+  isCritical: false
+- context: public-api
+  purpose: Deliver to webhook subscriptions taking accreditation.applicationDecided (12.1.53)
+  idempotencyKey: applicationId + decidedAt
+  onFailure: retryThenDeadLetter
+  isCritical: false
+- context: reporting
+  purpose: Accreditation KPIs — applications decided, approval rate, time to decision (12.1.50)
+  idempotencyKey: applicationId + decidedAt
+  onFailure: retry
+  isCritical: false
+retention: 30 days after publication; the decision itself is kept in accreditation.audit
+notes: '**Added 29 September (build pass, BL-180, 12.1.53)** so an external system can hear that somebody
+  was accredited or refused without polling the application list. The name is the one the public-api
+  webhook catalogue registers.
+
+
+  Emitted by the decide transitions in `states/accreditation-application.yaml` (added the same evening), and
+  on creation by `renewAccreditation` where a renewal is approved at once. Both write `platform.outbox` in the
+  same transaction as the decision (ADR-0033).'

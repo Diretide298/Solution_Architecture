@@ -1,0 +1,47 @@
+# approval.requested v1 — published by approvals
+# Checked by tools/check-states.py against states/ and the contracts.
+
+name: approval.requested
+version: 1
+publisher: approvals
+description: An approval request entered routing and is waiting on its first level.
+aggregate: approvalRequest
+emittedWhen: ApprovalStatus draft to pending (submitApprovalRequest), or a request raised directly at pending (createApprovalRequest)
+payload:
+- field: requestId
+  type: string
+- field: kind
+  type: string
+- field: subjectContract
+  type: string
+- field: subjectType
+  type: string
+- field: subjectId
+  type: string
+- field: scopePath
+  type: string
+- field: amount
+  type: Money
+  required: false
+- field: requestedByPrincipalId
+  type: uuid
+- field: levels
+  type: integer
+- field: dueAt
+  type: timestamp
+  required: false
+  notes: The first level's SLA deadline, where the rule has one
+- field: requestedAt
+  type: timestamp
+consumers:
+- context: public-api
+  purpose: Deliver to webhook subscriptions taking approval.requested (11.1.64, 11.1.66)
+  idempotencyKey: requestId
+  onFailure: retryThenDeadLetter
+  isCritical: false
+- context: reporting
+  purpose: Approval volume and time-to-decision analytics
+  idempotencyKey: requestId
+  onFailure: retry
+  isCritical: false
+retention: Retained with the request. This is an audit record, not an operational message

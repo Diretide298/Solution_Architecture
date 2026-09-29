@@ -1,4 +1,4 @@
--- ledger — 20 tables
+-- ledger — 27 tables
 -- **Derived. Do not hand-edit.**
 
 -- A line in the chart of accounts, denominated in its own currency. One of four tables that
@@ -24,7 +24,7 @@ CREATE TABLE IF NOT EXISTS ledger.account (
 
 -- Which account a kind of transaction posts to. Configuration, not a posting
 CREATE TABLE IF NOT EXISTS ledger.account_mapping (
-    event_type                        text NOT NULL CONSTRAINT account_mapping_event_type_chk CHECK (event_type IN ('ticketRevenue', 'fnbRevenue', 'retailRevenue', 'rentalRevenue', 'taxPayable', 'cashReceived', 'cardReceived', 'walletReceived', 'refundIssued', 'voidReversal', 'deferredRevenue', 'recognisedRevenue', 'breakageRevenue', 'priceVariance', 'cashOverShort', 'settlementFee', 'settlementClearing', 'gameCreditLoaded', 'pointsAccrued')),
+    event_type                        text NOT NULL CONSTRAINT account_mapping_event_type_chk CHECK (event_type IN ('ticketRevenue', 'fnbRevenue', 'retailRevenue', 'rentalRevenue', 'taxPayable', 'cashReceived', 'cardReceived', 'walletReceived', 'refundIssued', 'voidReversal', 'deferredRevenue', 'recognisedRevenue', 'breakageRevenue', 'priceVariance', 'cashOverShort', 'settlementFee', 'settlementClearing', 'gameCreditLoaded', 'pointsAccrued', 'chargebackDebit', 'chargebackReversal', 'chargebackFee')),
     debit_account_id                  uuid NOT NULL,
     credit_account_id                 uuid NOT NULL,
     venue_id                          uuid,
@@ -42,6 +42,47 @@ CREATE TABLE IF NOT EXISTS ledger.cost_center (
     is_active                         boolean
 );
 
+-- Holds 21 columns. No description has been written for this table — the name is the only thing
+-- saying what it is. Reached by: 5 operations read it and 1 write it; 1 tables reference it.
+CREATE TABLE IF NOT EXISTS ledger.credit_memo (
+    id                                uuid PRIMARY KEY NOT NULL,
+    credit_memo_number                text NOT NULL,
+    tax_invoice_id                    uuid NOT NULL,
+    tax_invoice_number                text,
+    kind                              text NOT NULL CONSTRAINT credit_memo_kind_chk CHECK (kind IN ('full', 'partial')),
+    reason                            text NOT NULL CONSTRAINT credit_memo_reason_chk CHECK (reason IN ('refund', 'cancellation', 'priceAdjustment', 'returnOfGoods', 'billingError', 'other')),
+    refund_id                         text,
+    cancelled_order_id                text,
+    legal_entity_id                   uuid NOT NULL,
+    buyer_subject_id                  uuid,
+    issued_at                         timestamptz NOT NULL,
+    currency                          text NOT NULL,
+    net_amount                        numeric(18,4) NOT NULL,
+    tax_amount                        numeric(18,4) NOT NULL,
+    gross_amount                      numeric(18,4) NOT NULL,
+    tax_amount_in_legal_currency      numeric(18,4),
+    note                              text,
+    rendition_asset_id                uuid,
+    e_invoice_status                  text CONSTRAINT credit_memo_e_invoice_status_chk CHECK (e_invoice_status IN ('notRequired', 'queued', 'sent', 'accepted', 'rejected', 'failed')),
+    issued_by_principal_id            uuid,
+    scope_path                        ltree NOT NULL
+);
+
+-- Holds 10 columns. No description has been written for this table — the name is the only thing
+-- saying what it is
+CREATE TABLE IF NOT EXISTS ledger.credit_memo_line (
+    credit_memo_id                    uuid NOT NULL,
+    invoice_line_number               integer NOT NULL,
+    description                       text,
+    quantity                          numeric(18,4),
+    net_amount                        numeric(18,4) NOT NULL,
+    tax_rate                          numeric(18,4),
+    tax_category                      text,
+    tax_amount                        numeric(18,4) NOT NULL,
+    gross_amount                      numeric(18,4) NOT NULL,
+    id                                uuid PRIMARY KEY NOT NULL
+);
+
 -- Money taken before the sale is complete (BL-139). Not deferred revenue — that is a sold
 -- entitlement not yet consumed, and the sale happened
 CREATE TABLE IF NOT EXISTS ledger.deposit (
@@ -55,6 +96,45 @@ CREATE TABLE IF NOT EXISTS ledger.deposit (
     refundable_until                  timestamptz,
     liability_account_id              uuid,
     settled_at                        timestamptz
+);
+
+-- Holds 17 columns. No description has been written for this table — the name is the only thing
+-- saying what it is. Reached by: 5 operations read it and 2 write it.
+CREATE TABLE IF NOT EXISTS ledger.einvoice_transmission (
+    id                                uuid PRIMARY KEY NOT NULL,
+    document_kind                     text NOT NULL CONSTRAINT einvoice_transmission_document_kind_chk CHECK (document_kind IN ('taxInvoice', 'creditMemo')),
+    document_id                       uuid NOT NULL,
+    document_number                   text,
+    legal_entity_id                   uuid NOT NULL,
+    provider_id                       uuid,
+    mode                              text CONSTRAINT einvoice_transmission_mode_chk CHECK (mode IN ('test', 'live')),
+    status                            text NOT NULL CONSTRAINT einvoice_transmission_status_chk CHECK (status IN ('notRequired', 'queued', 'sent', 'accepted', 'rejected', 'failed')),
+    payload_hash                      text,
+    provider_message_id               text,
+    attempt                           integer,
+    error_codes                       text[],
+    error_message                     text,
+    sent_at                           timestamptz,
+    answered_at                       timestamptz,
+    created_at                        timestamptz NOT NULL,
+    scope_path                        ltree NOT NULL
+);
+
+-- Holds 12 columns. No description has been written for this table — the name is the only thing
+-- saying what it is. Reached by: 3 operations read it and 2 write it; 1 tables reference it.
+CREATE TABLE IF NOT EXISTS ledger.einvoicing_provider (
+    id                                uuid PRIMARY KEY,
+    legal_entity_id                   uuid NOT NULL,
+    provider_name                     text NOT NULL CONSTRAINT einvoicing_provider_provider_name_chk CHECK (char_length(provider_name) <= 200),
+    endpoint_url                      text,
+    test_endpoint_url                 text,
+    credential_ref                    text CONSTRAINT einvoicing_provider_credential_ref_chk CHECK (char_length(credential_ref) <= 300),
+    participant_id                    text CONSTRAINT einvoicing_provider_participant_id_chk CHECK (char_length(participant_id) <= 100),
+    document_format                   text DEFAULT 'pintAe' CONSTRAINT einvoicing_provider_document_format_chk CHECK (document_format IN ('pintAe')),
+    mode                              text NOT NULL CONSTRAINT einvoicing_provider_mode_chk CHECK (mode IN ('disabled', 'test', 'live')),
+    transmit_within_hours             integer,
+    last_accepted_test_at             timestamptz,
+    scope_path                        ltree NOT NULL
 );
 
 -- What an event cost against what it earned (BL-049). Profitability is revenue minus committed
@@ -150,7 +230,7 @@ CREATE TABLE IF NOT EXISTS ledger.journal_entry (
     entry_number                      text NOT NULL,
     fiscal_period_id                  uuid NOT NULL,
     status                            text NOT NULL CONSTRAINT journal_entry_status_chk CHECK (status IN ('draft', 'pendingApproval', 'posted', 'reversed')),
-    source                            text NOT NULL CONSTRAINT journal_entry_source_chk CHECK (source IN ('manual', 'order', 'refund', 'void', 'shift', 'recognition', 'settlement', 'variance', 'reversal', 'writeOff')),
+    source                            text NOT NULL CONSTRAINT journal_entry_source_chk CHECK (source IN ('manual', 'order', 'refund', 'void', 'shift', 'recognition', 'settlement', 'variance', 'reversal', 'writeOff', 'chargeback')),
     source_id                         text,
     description                       text NOT NULL,
     reference                         text,
@@ -199,7 +279,7 @@ CREATE TABLE IF NOT EXISTS ledger.legal_entity (
 -- One side of a double-entry movement. Renamed from entry, which sat beside journal_entry and
 -- journal_line — three things called entry in one schema is a schema nobody reads twice. Hangs
 -- off: reaches ledger.account through its keys; references ledger.account, ledger.cost_center,
--- ledger.journal_entry. Reached by: 13 operations read it and 11 write it; written by 3 contracts
+-- ledger.journal_entry. Reached by: 14 operations read it and 13 write it; written by 3 contracts
 -- — finance, orders, shift.
 CREATE TABLE IF NOT EXISTS ledger.posting (
     id                                text PRIMARY KEY NOT NULL,
@@ -210,7 +290,7 @@ CREATE TABLE IF NOT EXISTS ledger.posting (
     credit                            numeric(18,4) NOT NULL,
     venue_id                          uuid,
     cost_center_id                    uuid,
-    source                            text CONSTRAINT posting_source_chk CHECK (source IN ('manual', 'order', 'refund', 'void', 'shift', 'recognition', 'settlement', 'variance', 'reversal', 'writeOff')),
+    source                            text CONSTRAINT posting_source_chk CHECK (source IN ('manual', 'order', 'refund', 'void', 'shift', 'recognition', 'settlement', 'variance', 'reversal', 'writeOff', 'chargeback')),
     source_id                         text,
     description                       text,
     posted_at                         timestamptz NOT NULL
@@ -327,5 +407,86 @@ CREATE TABLE IF NOT EXISTS ledger.tax_exemption (
     verification_note                 text CONSTRAINT tax_exemption_verification_note_chk CHECK (char_length(verification_note) <= 500),
     valid_from                        date,
     valid_to                          date
+);
+
+-- Holds 32 columns. No description has been written for this table — the name is the only thing
+-- saying what it is. Reached by: 6 operations read it and 2 write it; 3 tables reference it.
+CREATE TABLE IF NOT EXISTS ledger.tax_invoice (
+    id                                uuid PRIMARY KEY NOT NULL,
+    invoice_number                    text NOT NULL,
+    invoice_type                      text NOT NULL CONSTRAINT tax_invoice_invoice_type_chk CHECK (invoice_type IN ('simplified', 'full', 'consolidated')),
+    status                            text NOT NULL CONSTRAINT tax_invoice_status_chk CHECK (status IN ('issued', 'partiallyCredited', 'fullyCredited', 'superseded')),
+    legal_entity_id                   uuid NOT NULL,
+    template_id                       uuid,
+    venue_id                          uuid,
+    order_ids                         text[],
+    supplier_name                     text,
+    supplier_address                  text,
+    supplier_tax_registration_number  text,
+    buyer_subject_id                  uuid,
+    buyer_name                        text,
+    buyer_address                     text,
+    buyer_country_code                text,
+    buyer_tax_registration_number     text,
+    customer_account_id               uuid,
+    issued_at                         timestamptz NOT NULL,
+    supply_date                       date NOT NULL,
+    currency                          text NOT NULL,
+    net_amount                        numeric(18,4) NOT NULL,
+    discount_amount                   numeric(18,4),
+    tax_amount                        numeric(18,4) NOT NULL,
+    gross_amount                      numeric(18,4) NOT NULL,
+    tax_amount_in_legal_currency      numeric(18,4),
+    credited_amount                   numeric(18,4),
+    languages                         text[],
+    supersedes_invoice_id             uuid,
+    rendition_asset_id                uuid,
+    e_invoice_status                  text CONSTRAINT tax_invoice_e_invoice_status_chk CHECK (e_invoice_status IN ('notRequired', 'queued', 'sent', 'accepted', 'rejected', 'failed')),
+    issued_by_principal_id            uuid,
+    scope_path                        ltree NOT NULL
+);
+
+-- Holds 16 columns. No description has been written for this table — the name is the only thing
+-- saying what it is
+CREATE TABLE IF NOT EXISTS ledger.tax_invoice_line (
+    tax_invoice_id                    uuid NOT NULL,
+    line_number                       integer NOT NULL,
+    order_id                          text,
+    order_line_id                     text,
+    description                       text NOT NULL,
+    quantity                          numeric(18,4) NOT NULL,
+    unit_price                        numeric(18,4),
+    discount_amount                   numeric(18,4),
+    net_amount                        numeric(18,4) NOT NULL,
+    tax_code_id                       uuid,
+    tax_rate                          numeric(18,4),
+    tax_category                      text NOT NULL,
+    tax_amount                        numeric(18,4) NOT NULL,
+    gross_amount                      numeric(18,4) NOT NULL,
+    credited_amount                   numeric(18,4),
+    id                                uuid PRIMARY KEY NOT NULL
+);
+
+-- Holds 18 columns. No description has been written for this table — the name is the only thing
+-- saying what it is. Reached by: 4 operations read it and 3 write it; 1 tables reference it.
+CREATE TABLE IF NOT EXISTS ledger.tax_invoice_template (
+    id                                uuid PRIMARY KEY,
+    legal_entity_id                   uuid NOT NULL,
+    document_kind                     text NOT NULL CONSTRAINT tax_invoice_template_document_kind_chk CHECK (document_kind IN ('taxInvoice', 'simplifiedTaxInvoice', 'creditMemo')),
+    number_prefix                     text NOT NULL CONSTRAINT tax_invoice_template_number_prefix_chk CHECK (char_length(number_prefix) <= 20),
+    resets_yearly                     boolean DEFAULT true,
+    next_number                       integer,
+    number_padding                    integer DEFAULT 6,
+    languages                         text[] NOT NULL,
+    title                             jsonb,
+    footer_text                       jsonb,
+    logo_asset_id                     uuid,
+    layout_key                        text CONSTRAINT tax_invoice_template_layout_key_chk CHECK (char_length(layout_key) <= 64),
+    is_auto_issue_on_payment          boolean DEFAULT false,
+    simplified_allowed_up_to          numeric(18,4),
+    show_legal_currency_tax           boolean DEFAULT true,
+    effective_from                    date,
+    is_active                         boolean DEFAULT true,
+    scope_path                        ltree NOT NULL
 );
 

@@ -1,4 +1,4 @@
--- marketing — 127 tables
+-- marketing — 132 tables
 -- **Derived. Do not hand-edit.**
 
 -- Available, busy, away or offline, with a concurrency limit. Expires — an agent who forgets to go
@@ -32,7 +32,7 @@ CREATE TABLE IF NOT EXISTS marketing.agent_service_profile (
 -- Every marketing touch, not just the converting one (BL-177). A platform storing only its chosen
 -- attribution model cannot answer a question asked in a different one. Hangs off: reaches
 -- marketing.guest_profile through its keys; references marketing.campaign, marketing.journey,
--- orders.sales_order. Reached by: 2 operations read it and 0 write it.
+-- orders.sales_order. Reached by: 4 operations read it and 0 write it.
 CREATE TABLE IF NOT EXISTS marketing.attribution_touch (
     id                                uuid PRIMARY KEY NOT NULL,
     subject_id                        uuid NOT NULL,
@@ -120,7 +120,7 @@ CREATE TABLE IF NOT EXISTS marketing.booking_consent_record (
     person_subject_id                 uuid,
     answered_by_subject_id            uuid,
     answered_by_principal_id          uuid,
-    source                            text NOT NULL CONSTRAINT booking_consent_record_source_chk CHECK (source IN ('guestApp', 'website', 'kiosk', 'pos', 'callCentre', 'import', 'agentRecorded')),
+    source                            text NOT NULL CONSTRAINT booking_consent_record_source_chk CHECK (source IN ('guestApp', 'website', 'kiosk', 'pos', 'callCentre', 'import', 'agentRecorded', 'cookieBanner')),
     answered_at                       timestamptz NOT NULL,
     superseded_at                     timestamptz,
     scope_path                        ltree NOT NULL
@@ -153,6 +153,9 @@ CREATE TABLE IF NOT EXISTS marketing.campaign (
     scheduled_for                     timestamptz,
     consent_purpose                   text DEFAULT 'marketing',
     send_window                       jsonb,
+    send_time_mode                    text DEFAULT 'fixed' CONSTRAINT campaign_send_time_mode_chk CHECK (send_time_mode IN ('fixed', 'optimised')),
+    optimise_channel                  boolean DEFAULT false,
+    ab_test                           jsonb,
     id                                uuid PRIMARY KEY NOT NULL,
     budget_cap                        numeric(18,4),
     budget_spent                      numeric(18,4),
@@ -174,6 +177,21 @@ CREATE TABLE IF NOT EXISTS marketing.campaign_target (
     target_id                         uuid NOT NULL,
     is_primary                        boolean NOT NULL,
     created_at                        timestamptz NOT NULL
+);
+
+-- Holds 10 columns. No description has been written for this table — the name is the only thing
+-- saying what it is. Reached by: 9 operations read it and 1 write it; 1 tables reference it.
+CREATE TABLE IF NOT EXISTS marketing.campaign_variant (
+    id                                uuid PRIMARY KEY,
+    campaign_id                       uuid,
+    label                             text NOT NULL CONSTRAINT campaign_variant_label_chk CHECK (char_length(label) <= 20),
+    subject_override                  jsonb,
+    template_id                       uuid,
+    split_percent                     integer,
+    source                            text DEFAULT 'manual' CONSTRAINT campaign_variant_source_chk CHECK (source IN ('manual', 'aiDraft')),
+    ai_decision_record_id             text,
+    is_winner                         boolean DEFAULT false,
+    scope_path                        ltree NOT NULL
 );
 
 -- A guest problem with a lifecycle — raised, assigned, answered, closed. The messages are
@@ -497,7 +515,7 @@ CREATE TABLE IF NOT EXISTS marketing.communication_routing_rule (
 -- saying what it is
 CREATE TABLE IF NOT EXISTS marketing.consent_capture_point (
     capture_point                     text NOT NULL CONSTRAINT consent_capture_point_capture_point_chk CHECK (capture_point IN ('accountRegistration', 'guestCheckout', 'ticketPurchase', 'membershipEnrolment', 'annualPassEnrolment', 'mobileAppRegistration', 'posCustomerCreation', 'kiosk', 'crmCustomerCreation', 'walletEnrolment', 'faceEnrolment', 'newsletterSignup', 'customerPortal', 'competitionPromotion', 'apiPartnerJourney')),
-    channel                           text NOT NULL CONSTRAINT consent_capture_point_channel_chk CHECK (channel IN ('guestApp', 'website', 'kiosk', 'pos', 'callCentre', 'import', 'agentRecorded')),
+    channel                           text NOT NULL CONSTRAINT consent_capture_point_channel_chk CHECK (channel IN ('guestApp', 'website', 'kiosk', 'pos', 'callCentre', 'import', 'agentRecorded', 'cookieBanner')),
     brand_id                          uuid,
     country                           text,
     customer_type                     text CONSTRAINT consent_capture_point_customer_type_chk CHECK (customer_type IN ('individual', 'member', 'corporate', 'group', 'school')),
@@ -577,7 +595,7 @@ CREATE TABLE IF NOT EXISTS marketing.consent_record (
     purpose                           text NOT NULL CONSTRAINT consent_record_purpose_chk CHECK (purpose IN ('marketing', 'personalisation', 'profiling', 'thirdPartySharing', 'aiProcessing', 'transactional')),
     decision                          text NOT NULL CONSTRAINT consent_record_decision_chk CHECK (decision IN ('granted', 'withdrawn', 'notAsked')),
     notice_version                    text NOT NULL,
-    source                            text NOT NULL CONSTRAINT consent_record_source_chk CHECK (source IN ('guestApp', 'website', 'kiosk', 'pos', 'callCentre', 'import', 'agentRecorded')),
+    source                            text NOT NULL CONSTRAINT consent_record_source_chk CHECK (source IN ('guestApp', 'website', 'kiosk', 'pos', 'callCentre', 'import', 'agentRecorded', 'cookieBanner')),
     recorded_at                       timestamptz NOT NULL,
     id                                text PRIMARY KEY NOT NULL,
     subject_id                        uuid NOT NULL,
@@ -688,11 +706,47 @@ CREATE TABLE IF NOT EXISTS marketing.cookie_banner_design (
     theme_id                          text,
     reject_is_one_click               boolean NOT NULL DEFAULT true,
     languages                         text[] NOT NULL,
+    regulatory_regimes                text[],
+    record_ip_address                 boolean DEFAULT false,
     notice_version                    text,
     version                           integer,
     status                            text CONSTRAINT cookie_banner_design_status_chk CHECK (status IN ('draft', 'published', 'superseded')),
     scope_path                        ltree NOT NULL,
     updated_at                        timestamptz
+);
+
+-- How often each channel is scanned for cookies and trackers, and who is told when a scan finds
+-- something undeclared. One row per channel; the scan runs land in marketing.cookie_scan_run.
+-- Reached by: 3 operations read it and 1 write it.
+CREATE TABLE IF NOT EXISTS marketing.cookie_scan_policy (
+    id                                uuid PRIMARY KEY,
+    channel                           text NOT NULL CONSTRAINT cookie_scan_policy_channel_chk CHECK (channel IN ('b2cWebsite', 'customerPortal', 'mobileApp', 'embeddedCheckout', 'whiteLabelSite', 'partnerMicrosite')),
+    domain_application                text CONSTRAINT cookie_scan_policy_domain_application_chk CHECK (char_length(domain_application) <= 255),
+    frequency                         text NOT NULL,
+    day_of_week                       integer,
+    day_of_month                      integer,
+    alert_recipient_principal_ids     text[],
+    last_run_at                       timestamptz,
+    next_run_at                       timestamptz,
+    scope_path                        ltree NOT NULL,
+    updated_at                        timestamptz
+);
+
+-- One cookie and tracker scan of a storefront, taken in: what was found, which trackers the banner
+-- does not declare, and when. The difference between what a site sets and what its banner admits
+-- to is the finding a regulator asks about. Reached by: 2 operations read it and 1 write it.
+CREATE TABLE IF NOT EXISTS marketing.cookie_scan_run (
+    id                                uuid PRIMARY KEY,
+    channel                           text NOT NULL CONSTRAINT cookie_scan_run_channel_chk CHECK (channel IN ('b2cWebsite', 'customerPortal', 'mobileApp', 'embeddedCheckout', 'whiteLabelSite', 'partnerMicrosite')),
+    domain_application                text CONSTRAINT cookie_scan_run_domain_application_chk CHECK (char_length(domain_application) <= 255),
+    source                            text NOT NULL CONSTRAINT cookie_scan_run_source_chk CHECK (source IN ('boughtScanner', 'ownCrawler', 'manualUpload')),
+    scanner_ref                       text CONSTRAINT cookie_scan_run_scanner_ref_chk CHECK (char_length(scanner_ref) <= 200),
+    scanned_at                        timestamptz NOT NULL,
+    findings_count                    integer NOT NULL,
+    newly_detected_count              integer NOT NULL,
+    missing_count                     integer,
+    alerted_at                        timestamptz,
+    scope_path                        ltree NOT NULL
 );
 
 -- Holds 9 columns. No description has been written for this table — the name is the only thing
@@ -707,6 +761,40 @@ CREATE TABLE IF NOT EXISTS marketing.customer_badge (
     awarded_at                        timestamptz NOT NULL,
     expires_at                        timestamptz,
     status                            text NOT NULL CONSTRAINT customer_badge_status_chk CHECK (char_length(status) <= 20)
+);
+
+-- One cookie decision by a visitor nobody has identified yet (BL-073, 29 September). Append-only:
+-- a change of mind is a new row, so the trail from first decision to last is the evidence. Keyed
+-- for the visitor by consent_key, which the platform mints; claimed_by_subject_id is set once, by
+-- the claim at sign-in, and never cleared. No IP address or user agent here — those are in
+-- pii.consent_identifier.
+CREATE TABLE IF NOT EXISTS marketing.device_consent (
+    id                                uuid PRIMARY KEY,
+    consent_key                       text NOT NULL CONSTRAINT device_consent_consent_key_chk CHECK (char_length(consent_key) <= 64),
+    channel                           text NOT NULL CONSTRAINT device_consent_channel_chk CHECK (channel IN ('b2cWebsite', 'customerPortal', 'mobileApp', 'embeddedCheckout', 'whiteLabelSite', 'partnerMicrosite')),
+    brand_id                          uuid,
+    banner_design_id                  uuid,
+    action                            text NOT NULL CONSTRAINT device_consent_action_chk CHECK (action IN ('acceptAll', 'rejectNonEssential', 'savePreferences', 'withdraw', 'doNotSellOrShare')),
+    notice_version                    text NOT NULL,
+    language                          text CONSTRAINT device_consent_language_chk CHECK (char_length(language) <= 10),
+    global_privacy_control            boolean DEFAULT false,
+    source                            text CONSTRAINT device_consent_source_chk CHECK (source IN ('guestApp', 'website', 'kiosk', 'pos', 'callCentre', 'import', 'agentRecorded', 'cookieBanner')),
+    country                           text,
+    decided_at                        timestamptz NOT NULL,
+    expires_at                        timestamptz,
+    claimed_by_subject_id             uuid,
+    claimed_at                        timestamptz,
+    scope_path                        ltree NOT NULL
+);
+
+-- The per-category decision of one marketing.device_consent row — granted or declined for each
+-- cookie category the banner offered. A row per category, so a statistic of who declined analytics
+-- is a count, not a parse of a list
+CREATE TABLE IF NOT EXISTS marketing.device_consent_category (
+    device_consent_id                 uuid NOT NULL,
+    category                          text NOT NULL,
+    decision                          text NOT NULL,
+    id                                uuid PRIMARY KEY NOT NULL
 );
 
 -- Holds 10 columns. No description has been written for this table — the name is the only thing
@@ -1072,6 +1160,8 @@ CREATE TABLE IF NOT EXISTS marketing.journey_step (
     action_config_json                text,
     next_journey_step_id              uuid,
     failure_journey_step_id           uuid,
+    send_time_mode                    text,
+    channel_mode                      text,
     is_active                         boolean NOT NULL,
     created_at                        timestamptz NOT NULL
 );
@@ -1226,6 +1316,8 @@ CREATE TABLE IF NOT EXISTS marketing.message_dispatch (
     channel                           text NOT NULL CONSTRAINT message_dispatch_channel_chk CHECK (channel IN ('email', 'sms', 'whatsapp', 'push', 'inApp', 'post')),
     template_id                       uuid,
     message_trigger_id                uuid,
+    campaign_variant_id               uuid,
+    planned_send_at                   timestamptz,
     status                            text NOT NULL CONSTRAINT message_dispatch_status_chk CHECK (status IN ('queued', 'sent', 'delivered', 'opened', 'clicked', 'bounced', 'failed', 'suppressed')),
     failure_reason                    text,
     provider_reference                text,
@@ -1304,6 +1396,7 @@ CREATE TABLE IF NOT EXISTS marketing.message_trigger (
     offset_minutes                    integer DEFAULT 0,
     anchor                            text DEFAULT 'eventTime' CONSTRAINT message_trigger_anchor_chk CHECK (anchor IN ('eventTime', 'performanceStart', 'visitEnd')),
     priority                          text DEFAULT 'transactional' CONSTRAINT message_trigger_priority_chk CHECK (priority IN ('operational', 'transactional', 'marketing')),
+    send_time_mode                    text DEFAULT 'fixed' CONSTRAINT message_trigger_send_time_mode_chk CHECK (send_time_mode IN ('fixed', 'optimised')),
     is_active                         boolean NOT NULL DEFAULT true,
     scope_path                        ltree NOT NULL
 );
@@ -1746,7 +1839,7 @@ CREATE TABLE IF NOT EXISTS marketing.segment (
 );
 
 -- One condition in a segment rule. Hangs off: a child of marketing.segment; reaches
--- marketing.guest_profile through its keys; references marketing.segment. Reached by: 10
+-- marketing.guest_profile through its keys; references marketing.segment. Reached by: 11
 -- operations read it and 4 write it.
 CREATE TABLE IF NOT EXISTS marketing.segment_criterion (
     segment_id                        uuid NOT NULL,
@@ -1875,7 +1968,7 @@ CREATE TABLE IF NOT EXISTS marketing.tracking_technology (
     name                              text NOT NULL CONSTRAINT tracking_technology_name_chk CHECK (char_length(name) <= 200),
     provider                          text NOT NULL CONSTRAINT tracking_technology_provider_chk CHECK (char_length(provider) <= 150),
     domain_application                text CONSTRAINT tracking_technology_domain_application_chk CHECK (char_length(domain_application) <= 255),
-    technology_type                   text NOT NULL CONSTRAINT tracking_technology_technology_type_chk CHECK (technology_type IN ('firstPartyCookie', 'thirdPartyCookie', 'mobileSdk', 'analyticsTracker', 'advertisingPixel', 'sessionTechnology', 'personalisationTechnology', 'embeddedService', 'other')),
+    technology_type                   text NOT NULL CONSTRAINT tracking_technology_technology_type_chk CHECK (technology_type IN ('firstPartyCookie', 'thirdPartyCookie', 'mobileSdk', 'analyticsTracker', 'advertisingPixel', 'sessionTechnology', 'personalisationTechnology', 'embeddedService', 'localStorageItem', 'other')),
     category                          text CONSTRAINT tracking_technology_category_chk CHECK (category IN ('strictlyNecessary', 'functional', 'analytics', 'personalisation', 'marketing', 'other')),
     other_category_label              text CONSTRAINT tracking_technology_other_category_label_chk CHECK (char_length(other_category_label) <= 80),
     purpose                           text CONSTRAINT tracking_technology_purpose_chk CHECK (char_length(purpose) <= 500),

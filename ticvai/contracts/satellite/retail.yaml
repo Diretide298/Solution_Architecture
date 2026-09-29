@@ -542,6 +542,12 @@ paths:
         Creates an order in the Order & Payment context and a `saleDepletion` movement in the
         inventory ledger, in one transaction. There is no second stock counter maintained by
         the till.
+
+        **A kit sells as one line and leaves stock as its components** (4.4.20, 29 September
+        build). Where the line's item has an `inventory.kit_component` bill of materials
+        (inventory `setInventoryKitDefinition`), one `saleDepletion` is posted per component,
+        quantity times the line quantity, and none for the kit; `insufficientStock` is judged on
+        the components.
       tags: [sale]
       x-ticvai-permission: ORDER_CREATE
       x-ticvai-scope-level: workstation
@@ -771,7 +777,14 @@ paths:
         policy — which is separate from the ticket refund policy.
 
         Goods returned damaged or opened are written off rather than restocked, and that
-        write-off is a movement with a reason rather than a silent absence.
+        write-off is a movement with a reason rather than a silent absence. **A returned kit
+        reverses its components** (4.4.20): each component is restocked or written off, never
+        the kit itself.
+
+        **The money goes back as a refund raised in the Order & Payment context** (`refundId`),
+        so the orders `FraudRule` refund rules (`refundCount`, `refundValue`, `refundRatio` per
+        guest or card, 5.3.33) are evaluated on retail returns as on every other refund; a held
+        refund goes to approval rather than being refused at the till.
 
 
         **A refused return is recorded** (F34 `refusedReturn`: a refused return is a guest
@@ -1339,7 +1352,16 @@ paths:
     get:
       operationId: listRetailRecommendations
       summary: Upsell and pairing suggestions for retail
+      deprecated: true
+      x-ticvai-superseded-by: decideRecommendations
       description: >
+        **Deprecated for one release, 29 September (AI system design 5.4).** Forwarded to the AI
+        recommendation engine, ai `decideRecommendations` with placement `retailBasket`, which
+        answers every placement and channel from one engine (strategy, relationship and
+        suppression configuration stay in promotions). Kept, with its path and id, for callers
+        already built on it,
+        and removed after one release; new screens call `decideRecommendations`.
+
         The retail half of the same table F&B keeps. **Separate because the merchandising is
         separate** — a coffee pairs with a pastry and a jacket pairs with a hat, and one list
         serving both would be filtered on every read.

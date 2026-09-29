@@ -1,0 +1,45 @@
+# AI guided choice suggestion — state model
+# Contract: ai.AiGuidedChoiceSuggestion.status
+# Checked by tools/check-states.py. Added 29 September (build pass, group OWN, from the AI group's handoff).
+
+entity: AI guided choice suggestion
+contract: ai
+enum: AiGuidedChoiceSuggestion.status
+enumKind: inline
+enumSchema: AiGuidedChoiceSuggestion
+enumProperty: status
+owner: ai
+description: '**One Help me choose suggestion for a venue** (AI design 3.11, decided 29 September; C7 at autonomy
+  "suggest"). Created `running` by `suggestGuidedChoice`, or by the same job when a venue''s products are uploaded
+  (`catalogue.productPublished`), a mapped product is withdrawn, or new products are left out by every answer.
+  Nothing is ever published from here.'
+initial:
+- running
+terminal:
+- noSuggestion
+- failed
+- superseded
+transitions:
+- from: running
+  to: proposed
+  trigger: job
+  guard: '**Rules first**: one or two attributes split the products and every answer leaves something bookable.
+    The draft lands through `white-label.proposeGuidedChoice` with `source: aiSuggested` and this id as
+    `suggestionRef` (`guidedChoiceId`)'
+- from: running
+  to: noSuggestion
+  trigger: job
+  guard: No attribute splits the venue's products usefully without leaving an answer with nothing bookable, so
+    no draft is proposed
+- from: running
+  to: failed
+  trigger: job
+  guard: 'The job could not read the catalogue or write the draft. A missing language model is not a failure;
+    the attribute names are used as they are (`wordingSource: attributeNames`)'
+- from: proposed
+  to: superseded
+  trigger: cascade
+  guard: A later suggestion for the same venue reached `proposed`
+notes: '`proposed` is not terminal, because the next suggestion for the venue supersedes it; it keeps its
+  reasons either way. Publishing is `white-label.publishGuidedChoice`, by a person, and is recorded there, not
+  here. Only one suggestion runs per venue at a time (`409 suggestion-in-progress`).'

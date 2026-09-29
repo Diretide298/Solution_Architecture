@@ -1,4 +1,4 @@
--- inventory — 20 tables
+-- inventory — 21 tables
 -- **Derived. Do not hand-edit.**
 
 -- A stock take. Its lines carry both the counted number and the recount, because two counts that
@@ -107,6 +107,17 @@ CREATE TABLE IF NOT EXISTS inventory.item (
     is_active                         boolean NOT NULL
 );
 
+-- Holds 6 columns. No description has been written for this table — the name is the only thing
+-- saying what it is. Reached by: 4 operations read it and 1 write it.
+CREATE TABLE IF NOT EXISTS inventory.kit_component (
+    kit_item_id                       uuid,
+    component_item_id                 uuid NOT NULL,
+    quantity                          numeric(18,4) NOT NULL,
+    unit                              text,
+    scope_path                        ltree NOT NULL,
+    id                                uuid PRIMARY KEY NOT NULL
+);
+
 -- Where stock physically is — a stockroom, a bar, a cellar
 CREATE TABLE IF NOT EXISTS inventory.location (
     id                                uuid PRIMARY KEY NOT NULL,
@@ -205,8 +216,8 @@ CREATE TABLE IF NOT EXISTS inventory.quotation (
     scope_path                        ltree NOT NULL
 );
 
--- One item quoted. Hangs off: a child of inventory.quotation; reaches inventory.location through
--- its keys; references inventory.item, inventory.quotation. Reached by: 2 operations read it and 1
+-- One item quoted. Hangs off: a child of inventory.quotation; reaches inventory.item through its
+-- keys; references inventory.item, inventory.quotation. Reached by: 2 operations read it and 1
 -- write it.
 CREATE TABLE IF NOT EXISTS inventory.quotation_line (
     quotation_id                      uuid NOT NULL,
@@ -242,9 +253,9 @@ CREATE TABLE IF NOT EXISTS inventory.requisition (
     cancelled_at                      timestamptz
 );
 
--- One item asked for. Hangs off: a child of inventory.requisition; reaches inventory.location
--- through its keys; references inventory.item, inventory.requisition. Reached by: 7 operations
--- read it and 2 write it.
+-- One item asked for. Hangs off: a child of inventory.requisition; reaches inventory.item through
+-- its keys; references inventory.item, inventory.requisition. Reached by: 7 operations read it and
+-- 2 write it.
 CREATE TABLE IF NOT EXISTS inventory.requisition_line (
     requisition_id                    text NOT NULL,
     line_id                           text,
@@ -338,7 +349,8 @@ CREATE TABLE IF NOT EXISTS inventory.supplier_contract (
     currency_code                     text CONSTRAINT supplier_contract_currency_code_chk CHECK (char_length(currency_code) <= 10),
     payment_terms_days                integer,
     document_reference                text CONSTRAINT supplier_contract_document_reference_chk CHECK (char_length(document_reference) <= 500),
-    status                            text NOT NULL CONSTRAINT supplier_contract_status_chk CHECK (char_length(status) <= 30),
+    status                            text NOT NULL CONSTRAINT supplier_contract_status_chk CHECK (status IN ('draft', 'active', 'expired', 'terminated') AND char_length(status) <= 30),
+    status_reason                     text CONSTRAINT supplier_contract_status_reason_chk CHECK (char_length(status_reason) <= 500),
     created_by_principal_id           uuid,
     created_at                        timestamptz NOT NULL
 );

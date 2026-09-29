@@ -1,9 +1,9 @@
 id: LLD-PlatformService
-title: PlatformService — 202 operations, 96 tables
+title: PlatformService — 206 operations, 98 tables
 generatedBy: tools/derive-diagrams.py
 tier: platform
 index: diagrams/hld/02-services.yaml
-why: '**Three contracts, two schemas, 96 tables.** Subscription, platform operations and the public
+why: '**Three contracts, two schemas, 98 tables.** Subscription, platform operations and the public
   API all write `control.*` — **they are one bounded context that was split into three contracts for
   API-surface reasons, not for data reasons.**
 
@@ -13,14 +13,14 @@ why: '**Three contracts, two schemas, 96 tables.** Subscription, platform operat
 scale: Low volume, high consequence. Tenant provisioning and licensing.
 ifDown: Down blocks provisioning and the developer API. **Trading is unaffected.**
 coverage:
-  operations: 202
+  operations: 206
   inAFlow: 87
-  percent: 43%
+  percent: 42%
   note: '**Flow coverage is how much of this service a journey has walked.** A service under 40% is
     unwalked rather than under-documented.'
 schemas:
 - schema: control
-  tables: 73
+  tables: 75
   stores:
   - postgres
   largestTable: control.partner_agreement
@@ -31,7 +31,7 @@ schemas:
   largestTable: subscription.membership_product
 operationsByContract:
 - contract: subscription
-  count: 145
+  count: 148
   operations:
   - operation: actOnPartnerApplicationReview
     verb: POST
@@ -183,7 +183,7 @@ operationsByContract:
     scope: tenant
     permission: PLATFORM_PLAN_MANAGE
     offline: false
-    reads: 4
+    reads: 5
     writes: 3
   - operation: createPlanVersion
     verb: POST
@@ -191,7 +191,7 @@ operationsByContract:
     scope: tenant
     permission: PLATFORM_PLAN_MANAGE
     offline: false
-    reads: 4
+    reads: 5
     writes: 3
   - operation: createTenant
     verb: POST
@@ -255,8 +255,8 @@ operationsByContract:
     scope: tenant
     permission: PLATFORM_BILLING_MANAGE
     offline: false
-    reads: 3
-    writes: 2
+    reads: 9
+    writes: 3
   - operation: getBillingReconciliation
     verb: GET
     path: /billing-reconciliation
@@ -329,6 +329,14 @@ operationsByContract:
     offline: false
     reads: 3
     writes: 0
+  - operation: getPlanRecommendations
+    verb: GET
+    path: /plan-recommendations
+    scope: platform
+    permission: PLATFORM_BILLING_VIEW
+    offline: false
+    reads: 13
+    writes: 0
   - operation: getPlanTiers
     verb: GET
     path: /plans/{planId}/tiers
@@ -377,6 +385,14 @@ operationsByContract:
     offline: false
     reads: 1
     writes: 0
+  - operation: issueCreditNote
+    verb: POST
+    path: /invoices/{invoiceId}/credit-notes
+    scope: tenant
+    permission: PLATFORM_BILLING_MANAGE
+    offline: false
+    reads: 5
+    writes: 4
   - operation: launchCellCluster
     verb: POST
     path: /cell-clusters
@@ -464,6 +480,14 @@ operationsByContract:
     permission: PLATFORM_TENANT_VIEW
     offline: false
     reads: 7
+    writes: 0
+  - operation: listCreditNotes
+    verb: GET
+    path: /tenants/{tenantId}/credit-notes
+    scope: tenant
+    permission: PLATFORM_BILLING_VIEW
+    offline: false
+    reads: 2
     writes: 0
   - operation: listDepositGuaranteeFinancial
     verb: GET
@@ -1103,7 +1127,7 @@ operationsByContract:
     scope: tenant
     permission: PLATFORM_TENANT_MANAGE
     offline: false
-    reads: 2
+    reads: 3
     writes: 2
   - operation: setTrialConfiguration
     verb: PUT
@@ -1461,7 +1485,7 @@ operationsByContract:
     reads: 2
     writes: 2
 - contract: public-api
-  count: 24
+  count: 25
   operations:
   - operation: certifyIntegration
     verb: POST
@@ -1558,6 +1582,14 @@ operationsByContract:
     permission: DEVELOPER_VIEW
     offline: false
     reads: 1
+    writes: 0
+  - operation: listWebhookEventTypes
+    verb: GET
+    path: /webhook-event-types
+    scope: tenant
+    permission: DEVELOPER_VIEW
+    offline: false
+    reads: 0
     writes: 0
   - operation: listWebhookSubscriptions
     verb: GET
@@ -1701,6 +1733,7 @@ tables:
   - executeTenantMigration
   - exportPartnerInvoice
   - generateInvoice
+  - issueCreditNote
   - launchCellCluster
   - pauseRollout
   - planMigration
@@ -1798,6 +1831,7 @@ tables:
   - executeTenantMigration
   - exportPartnerInvoice
   - generateInvoice
+  - issueCreditNote
   - launchCellCluster
   - pauseRollout
   - planMigration
@@ -1975,6 +2009,20 @@ tables:
   - white-label
   foreignWriters:
   - white-label
+- table: control.credit_note
+  columns: 13
+  store: postgres
+  parent: null
+  writtenBy:
+  - subscription
+  foreignWriters: null
+- table: control.credit_note_line
+  columns: 7
+  store: postgres
+  parent: control.credit_note
+  writtenBy:
+  - subscription
+  foreignWriters: null
 - table: control.developer_account
   columns: 8
   store: postgres
@@ -1997,18 +2045,21 @@ tables:
   - public-api
   foreignWriters: null
 - table: control.invoice
-  columns: 13
+  columns: 14
   store: postgres
   parent: null
   writtenBy:
   - subscription
   foreignWriters: null
 - table: control.invoice_line
-  columns: 8
+  columns: 10
   store: postgres
   parent: control.invoice
-  writtenBy: []
-  foreignWriters: null
+  writtenBy:
+  - finance
+  - subscription
+  foreignWriters:
+  - finance
 - table: control.licence_add_on
   columns: 7
   store: postgres
@@ -2357,7 +2408,7 @@ tables:
   foreignWriters:
   - marketing-crm
 - table: control.usage_record
-  columns: 6
+  columns: 7
   store: postgres
   parent: null
   writtenBy:
@@ -2453,7 +2504,7 @@ tables:
   - subscription
   foreignWriters: null
 - table: subscription.membership_product
-  columns: 58
+  columns: 61
   store: postgres
   parent: null
   writtenBy:
@@ -2481,7 +2532,7 @@ tables:
   - subscription
   foreignWriters: null
 - table: subscription.module_listing
-  columns: 13
+  columns: 15
   store: postgres
   parent: null
   writtenBy:
@@ -2495,7 +2546,7 @@ tables:
   - subscription
   foreignWriters: null
 - table: subscription.plan
-  columns: 13
+  columns: 15
   store: postgres
   parent: null
   writtenBy:
@@ -2762,6 +2813,7 @@ screens:
 - P09:ADM-037 AI Provider & Credentials
 - P09:ADM-048 Commercial Pricing Command Center
 - P09:ADM-318 Dead Letters
+- P09:ADM-352 Workflow Event Framework
 - P09:ADM-353 Webhook Configuration & Subscription Manager
 - P09:ADM-354 External Workflow System Integration
 - P09:ADM-369 Commercial Command Center

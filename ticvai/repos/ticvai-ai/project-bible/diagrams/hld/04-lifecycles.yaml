@@ -1,13 +1,13 @@
 id: HLD-LIFECYCLES
 sourceFiles:
   folder: states/
-  files: 187
-  drawn: 186
+  files: 207
+  drawn: 206
   skipped:
   - _schema.yaml
   why: '**`_schema.yaml` is the shape, not a model.** Every state file validates against it; it has
     no entity and no transitions.'
-title: 186 state models and 30 events
+title: 206 state models and 69 events
 generatedBy: tools/derive-diagrams.py
 index: diagrams/hld/00-platform.yaml
 about: '**What can happen to a thing, and in what order.** A state model is a lifecycle within one entity;
@@ -279,6 +279,37 @@ stateModels:
   - setRfidNfcCard
   guarded: 13
   ref: diagrams/lld/lifecycles/access-media-template.yaml
+- entity: Access review campaign
+  contract: identity
+  owner: identity
+  service: IdentityService
+  states: null
+  transitions: 2
+  initial:
+  - open
+  terminal:
+  - completed
+  - expired
+  operations:
+  - decideAccessReviewItem
+  guarded: 2
+  ref: diagrams/lld/lifecycles/access-review-campaign.yaml
+- entity: Access review item
+  contract: identity
+  owner: identity
+  service: IdentityService
+  states: null
+  transitions: 3
+  initial:
+  - pending
+  terminal:
+  - certified
+  - revoked
+  - notReviewed
+  operations:
+  - decideAccessReviewItem
+  guarded: 3
+  ref: diagrams/lld/lifecycles/access-review-item.yaml
 - entity: AccessSecurityAlert
   contract: access
   owner: access
@@ -308,6 +339,44 @@ stateModels:
   - setSecurityInvestigationEvidence
   guarded: 7
   ref: diagrams/lld/lifecycles/access-security-investigation.yaml
+- entity: Accreditation application
+  contract: accreditation
+  owner: accreditation
+  service: TenancyService
+  states: null
+  transitions: 14
+  initial:
+  - draft
+  - submitted
+  - approved
+  terminal:
+  - rejected
+  - withdrawn
+  - expired
+  operations:
+  - decideAccreditationApplication
+  - resubmitAccreditationApplication
+  - submitAccreditationApplication
+  - withdrawAccreditationApplication
+  guarded: 14
+  ref: diagrams/lld/lifecycles/accreditation-application.yaml
+- entity: Accreditation holder
+  contract: accreditation
+  owner: accreditation
+  service: TenancyService
+  states: null
+  transitions: 13
+  initial:
+  - active
+  terminal:
+  - archived
+  operations:
+  - decideAccreditationApplication
+  - renewAccreditation
+  - resolveIdentityConflict
+  - setAccreditationStatus
+  guarded: 13
+  ref: diagrams/lld/lifecycles/accreditation-holder.yaml
 - entity: Accreditation identity conflict
   contract: accreditation
   owner: accreditation
@@ -340,6 +409,42 @@ stateModels:
   - setOrderAmendment
   guarded: 7
   ref: diagrams/lld/lifecycles/after-sale-request.yaml
+- entity: AI action plan
+  contract: ai
+  owner: ai
+  service: AiService
+  states: null
+  transitions: 29
+  initial:
+  - draft
+  terminal:
+  - compensated
+  - cancelled
+  - rolledBack
+  operations:
+  - cancelActionPlan
+  - decideProposedAction
+  - pauseActionPlan
+  - resumeActionPlan
+  - retryActionStep
+  - simulateActionPlan
+  guarded: 29
+  ref: diagrams/lld/lifecycles/ai-action-plan.yaml
+- entity: AI capability
+  contract: ai
+  owner: ai
+  service: AiService
+  states: null
+  transitions: 3
+  initial:
+  - active
+  terminal: []
+  operations:
+  - containAiIncident
+  - pauseAiCapability
+  - resumeAiCapability
+  guarded: 3
+  ref: diagrams/lld/lifecycles/ai-capability.yaml
 - entity: AI catalogue builder session
   contract: catalogue
   owner: catalogue
@@ -355,6 +460,127 @@ stateModels:
   - setCatalogueReview
   guarded: 2
   ref: diagrams/lld/lifecycles/ai-catalogue-session.yaml
+- entity: AI evaluation run
+  contract: ai
+  owner: ai
+  service: null
+  states: null
+  transitions: 5
+  initial:
+  - queued
+  terminal:
+  - passed
+  - failed
+  - error
+  operations: []
+  guarded: 5
+  ref: diagrams/lld/lifecycles/ai-evaluation-run.yaml
+- entity: AI evidence package
+  contract: ai
+  owner: ai
+  service: null
+  states: null
+  transitions: 2
+  initial:
+  - building
+  terminal:
+  - ready
+  - failed
+  operations: []
+  guarded: 2
+  ref: diagrams/lld/lifecycles/ai-evidence-package.yaml
+- entity: AI forecast scenario
+  contract: ai
+  owner: ai
+  service: null
+  states: null
+  transitions: 2
+  initial:
+  - computing
+  terminal:
+  - ready
+  - failed
+  operations: []
+  guarded: 2
+  ref: diagrams/lld/lifecycles/ai-forecast-scenario.yaml
+- entity: AI forecast version
+  contract: ai
+  owner: ai
+  service: AiService
+  states: null
+  transitions: 11
+  initial:
+  - running
+  terminal:
+  - superseded
+  - rejected
+  - failed
+  operations:
+  - publishForecastVersion
+  guarded: 11
+  ref: diagrams/lld/lifecycles/ai-forecast-version.yaml
+- entity: AI governance alert
+  contract: ai
+  owner: ai
+  service: AiService
+  states: null
+  transitions: 9
+  initial:
+  - open
+  terminal:
+  - dismissed
+  - resolved
+  - incidentOpened
+  operations:
+  - decideAiGovernanceAlert
+  - promoteAiRelease
+  guarded: 9
+  ref: diagrams/lld/lifecycles/ai-governance-alert.yaml
+- entity: AI governance policy version
+  contract: ai
+  owner: ai
+  service: AiService
+  states: null
+  transitions: 3
+  initial:
+  - draft
+  terminal:
+  - superseded
+  operations:
+  - publishAiGovernancePolicy
+  - simulateAiGovernancePolicy
+  guarded: 3
+  ref: diagrams/lld/lifecycles/ai-governance-policy-version.yaml
+- entity: AI guided choice suggestion
+  contract: ai
+  owner: ai
+  service: null
+  states: null
+  transitions: 4
+  initial:
+  - running
+  terminal:
+  - noSuggestion
+  - failed
+  - superseded
+  operations: []
+  guarded: 4
+  ref: diagrams/lld/lifecycles/ai-guided-choice-suggestion.yaml
+- entity: AI incident
+  contract: ai
+  owner: ai
+  service: AiService
+  states: null
+  transitions: 6
+  initial:
+  - open
+  terminal:
+  - closed
+  operations:
+  - closeAiIncident
+  - containAiIncident
+  guarded: 6
+  ref: diagrams/lld/lifecycles/ai-incident.yaml
 - entity: AI index job
   contract: ai
   owner: ai
@@ -369,6 +595,21 @@ stateModels:
   - reindexSource
   guarded: 8
   ref: diagrams/lld/lifecycles/ai-index-job.yaml
+- entity: AI insight
+  contract: ai
+  owner: ai
+  service: AiService
+  states: null
+  transitions: 5
+  initial:
+  - new
+  terminal:
+  - rejected
+  - measured
+  operations:
+  - decideAiInsight
+  guarded: 5
+  ref: diagrams/lld/lifecycles/ai-insight.yaml
 - entity: AI knowledge document
   contract: ai
   owner: ai
@@ -397,6 +638,38 @@ stateModels:
   operations: []
   guarded: 2
   ref: diagrams/lld/lifecycles/ai-layout-draft.yaml
+- entity: AI operational requirement
+  contract: ai
+  owner: ai
+  service: AiService
+  states: null
+  transitions: 7
+  initial:
+  - issued
+  terminal:
+  - rejected
+  - handedOver
+  - expired
+  operations:
+  - decideOperationalRequirement
+  guarded: 7
+  ref: diagrams/lld/lifecycles/ai-operational-requirement.yaml
+- entity: AI policy exception
+  contract: ai
+  owner: ai
+  service: AiService
+  states: null
+  transitions: 3
+  initial:
+  - active
+  terminal:
+  - expired
+  - revoked
+  operations:
+  - containAiIncident
+  - revokeAiPolicyException
+  guarded: 3
+  ref: diagrams/lld/lifecycles/ai-policy-exception.yaml
 - entity: AI proposed action
   contract: ai
   owner: ai
@@ -413,6 +686,37 @@ stateModels:
   - decideProposedAction
   guarded: 5
   ref: diagrams/lld/lifecycles/ai-proposed-action.yaml
+- entity: AI risk case
+  contract: ai
+  owner: ai
+  service: AiService
+  states: null
+  transitions: 6
+  initial:
+  - open
+  terminal:
+  - closed
+  operations:
+  - addRiskCaseEvidence
+  - closeRiskCase
+  - proposeRiskAction
+  guarded: 6
+  ref: diagrams/lld/lifecycles/ai-risk-case.yaml
+- entity: AI tool
+  contract: ai
+  owner: ai
+  service: AiService
+  states: null
+  transitions: 3
+  initial:
+  - active
+  - disabled
+  terminal: []
+  operations:
+  - containAiIncident
+  - setAiTool
+  guarded: 3
+  ref: diagrams/lld/lifecycles/ai-tool.yaml
 - entity: Operational alert
   contract: reporting
   owner: reporting
@@ -765,6 +1069,8 @@ stateModels:
   - accepted
   - expired
   operations:
+  - assignChargeback
+  - recordChargebackOutcome
   - respondToChargeback
   guarded: 7
   ref: diagrams/lld/lifecycles/chargeback.yaml
@@ -968,6 +1274,20 @@ stateModels:
   operations: []
   guarded: 6
   ref: diagrams/lld/lifecycles/developer-account.yaml
+- entity: Device firmware release
+  contract: tenancy
+  owner: tenancy
+  service: TenancyService
+  states: null
+  transitions: 5
+  initial:
+  - draft
+  terminal:
+  - withdrawn
+  operations:
+  - setDeviceFirmwareStatus
+  guarded: 5
+  ref: diagrams/lld/lifecycles/device-firmware.yaml
 - entity: DSAR request
   contract: cross-region
   owner: cross-region
@@ -3038,30 +3358,101 @@ stateModels:
   guarded: 17
   ref: diagrams/lld/lifecycles/workflow-version.yaml
 events:
+- event: access-rejected
+  description: Media was presented at an access point and refused, with the reason the gate gave.
 - event: access-validated
   description: An entitlement was presented and admitted.
+- event: accreditation-applicationDecided
+  description: An accreditation application was approved, rejected, returned for information or escalated.
+- event: accreditation-credentialIssued
+  description: A badge, QR, mobile, NFC, RFID or wristband credential was issued to an accredited person,
+    new or as a replacement.
+- event: accreditation-holderStatusChanged
+  description: An accredited person was suspended, reactivated, revoked, expired, archived or had their
+    validity extended by a renewal.
+- event: accreditation-renewalDue
+  description: An accredited person's renewal window opened — their accreditation expires within the
+    programme's renewalWindowDays.
+- event: ai-capabilityPaused
+  description: An AI capability was paused and now answers from its degradation mode.
 - event: ai-ceilingApproaching
   description: AI spend has reached the configured warning threshold for a scope.
+- event: ai-forecastPublished
+  description: A forecast version was published and is now the one every consumer reads.
+- event: ai-incidentOpened
+  description: An AI governance incident was opened.
+- event: ai-insightRaised
+  description: An insight (an anomaly, a forecast deviation, a trend or an opportunity) was raised.
+- event: ai-operationalRequirementIssued
+  description: An operational requirement derived from a forecast was accepted and handed to the module
+    that applies it.
+- event: ai-planExecuted
+  description: An approved action plan finished executing through the owning modules.
+- event: ai-planFailed
+  description: An action plan failed and was compensated or paused for a person.
+- event: ai-riskAlertRaised
+  description: A risk alert was raised on an entity or transaction.
+- event: ai-riskCaseClosed
+  description: A risk investigation was closed with an outcome.
+- event: approval-escalated
+  description: An approval request was escalated, by a person or because its SLA was breached.
+- event: approval-expired
+  description: An approval request stopped waiting because nobody decided it before the rule's expiry.
 - event: approval-granted
   description: An approval request was granted at its final level.
 - event: approval-rejected
   description: An approval request was refused.
+- event: approval-requested
+  description: An approval request entered routing and is waiting on its first level.
+- event: approval-stepCompleted
+  description: One level of a multi-level approval chain was approved and the request moved to the next
+    level.
 - event: assets-documentIndexed
   description: Text was extracted from an uploaded document and is ready to embed.
 - event: cart-abandoned
   description: A cart lapsed without checking out.
 - event: catalogue-productPublished
   description: A product is on sale, or has returned to sale.
+- event: consent-deviceConsentClaimed
+  description: A browser's cookie decision was attached to the guest who signed in or registered on
+    it, and the guest's consent became the narrower of the two per category.
+- event: consent-deviceConsentRecorded
+  description: A visitor nobody has identified yet made a cookie decision on a banner or preference
+    centre — accepted, rejected, saved preferences, withdrew or opted out of sale and sharing.
 - event: conversation-handedOver
   description: An assistant conversation was passed to a human agent.
+- event: device-enrolmentChanged
+  description: A device moved through its lifecycle — enrolled, provisioned, activated, deactivated
+    or retired.
+- event: device-firmwareReleased
+  description: A firmware or software release was cleared for the fleet.
+- event: device-firmwareRolloutCompleted
+  description: A firmware rollout finished — completed, halted on its failure threshold, or rolled back.
+- event: device-statusChanged
+  description: A registered device's reported status changed — it went offline, came back, reported
+    a fault or ran low on a consumable.
+- event: device-tamperDetected
+  description: A device reported physical or logical interference and is now untrusted until someone
+    clears it.
+- event: entitlement-expiringSoon
+  description: A ticket or pass a guest still holds expires within its template's notice period.
 - event: entitlement-issued
   description: A right to admission, a meal, a locker or a rental now exists.
 - event: entitlement-statusChanged
   description: An entitlement was frozen, suspended, reinstated or had its validity moved by a renewal.
+- event: entitlement-transferred
+  description: An entitlement changed holder — a guest's transfer was claimed, or a resale completed.
+    The same entitlement, a new owner.
 - event: fnb-menuPublished
   description: A menu is live at an outlet.
 - event: fnb-orderReady
   description: Food is ready to hand over.
+- event: identity-credentialResetRequested
+  description: Somebody asked for a password or PIN to be reset — a guest asked for a reset code, or
+    a supervisor reset a member of staff's credential.
+- event: identity-loginRecorded
+  description: Somebody tried to sign in — a staff or partner principal, or a guest — and it succeeded,
+    failed, or was asked for a second factor.
 - event: inventory-purchaseOrderReceived
   description: A purchase order is fully received.
 - event: ledger-journalPosted
@@ -3076,25 +3467,51 @@ events:
   description: Work on an asset is finished and awaiting verification.
 - event: marketing-caseClosed
   description: A service case was resolved and closed.
+- event: order-cancelled
+  description: An order was voided before any money was captured — the whole order, with its reason
+    and who did it.
+- event: order-chargebackRecorded
+  description: A chargeback was taken in against a payment, or the provider's final answer on one was
+    recorded.
 - event: order-completed
   description: Everything an order promised has been delivered.
+- event: order-exchanged
+  description: Lines on a paid order were exchanged for different products, dates or performances, settling
+    only the difference.
 - event: order-paid
   description: An order has been paid in full. The moment revenue is recognisable and entitlements may
     be issued.
 - event: order-refunded
   description: Value has been returned to a guest, in whole or in part.
+- event: payment-attemptFailed
+  description: A call to a payment provider was declined or errored. One event per failed attempt, whether
+    or not a payment record ever existed.
 - event: performance-cancelled
   description: A performance was cancelled and everyone holding a ticket must be made whole.
+- event: promotions-recommendationStrategyPublished
+  description: What a placement may recommend changed — a recommendation strategy went live or changed
+    while live, or the product relationships or suppressions it ranks with were set.
 - event: reporting-definitionPublished
   description: A report definition is available to run.
 - event: retail-merchandisePublished
   description: Merchandise is on sale.
+- event: seat-blocked
+  description: A seat was blocked out of general sale (house seats, kills, production holds).
+- event: seat-held
+  description: A seat was held for a buyer and is not available to anyone else until the hold ends.
+- event: seat-released
+  description: A held or blocked seat became available again.
 - event: seat-sold
   description: A specific seat is no longer available for a performance.
+- event: seatMap-published
+  description: A seat map version was published and is now the layout sold against.
 - event: shift-closed
   description: A till has been counted and closed.
 - event: stock-depleted
   description: Stock left a location — sold, wasted, transferred or counted out.
+- event: storefront-sessionEvent
+  description: A batch of browsing behaviour from one storefront or guest-app session — hashed, counted,
+    and with no personal data.
 - event: tenant-suspended
   description: A tenant has been suspended, in one of three modes.
 - event: whitelabel-contentPublished

@@ -92,6 +92,7 @@ components:
         - PLATFORM_CELL_VIEW
         - PLATFORM_CELL_MANAGE
         - PLATFORM_BILLING_VIEW
+        - PLATFORM_AI_MANAGE          # the platform model catalogue, tool and prompt registries, BYOK enablement (AI design 29 September)
         - PLATFORM_BILLING_MANAGE
         - PLATFORM_RELEASE_VIEW
         - PLATFORM_RELEASE_MANAGE     # cut releases, register environments, schedule upgrades
@@ -329,6 +330,8 @@ components:
         - AI_CONFIGURE
         - AI_APPROVE
         - AI_AUDIT_VIEW               # the AI activity and decision log only
+        - RISK_REVIEW                 # fraud analysts: work alerts; not an AI user (AI design 29 September)
+        - RISK_INVESTIGATE            # fraud analysts: cases, evidence, network expansion
         - AUDIT_VIEW                  # the platform audit log: who did what, where and when
         # **`AUDIT_VIEW` is separate from `AI_AUDIT_VIEW`.** The platform audit log records every
         # principal's actions across the estate; the AI log records what an assistant did. A

@@ -1,5 +1,5 @@
 id: LLD-ReportingService
-title: ReportingService — 47 operations, 24 tables
+title: ReportingService — 48 operations, 24 tables
 generatedBy: tools/derive-diagrams.py
 tier: platform
 index: diagrams/hld/02-services.yaml
@@ -9,9 +9,9 @@ why: '**Reads almost everything and writes only its own definitions.** Separate 
 scale: Analytical. Runs against the replica and the analytical store.
 ifDown: Down stops dashboards. **Nothing operational depends on it.**
 coverage:
-  operations: 47
+  operations: 48
   inAFlow: 17
-  percent: 36%
+  percent: 35%
   note: '**Flow coverage is how much of this service a journey has walked.** A service under 40% is
     unwalked rather than under-documented.'
 schemas:
@@ -23,7 +23,7 @@ schemas:
   largestTable: reporting.alert
 operationsByContract:
 - contract: reporting
-  count: 47
+  count: 48
   operations:
   - operation: acknowledgeAlert
     verb: POST
@@ -39,7 +39,7 @@ operationsByContract:
     scope: venue
     permission: REPORT_VIEW_VENUE
     offline: false
-    reads: 5
+    reads: 8
     writes: 5
   - operation: cancelReportExecution
     verb: DELETE
@@ -159,7 +159,7 @@ operationsByContract:
     scope: venue
     permission: REPORT_VIEW_VENUE
     offline: false
-    reads: 2
+    reads: 6
     writes: 0
   - operation: getReport
     verb: GET
@@ -337,6 +337,14 @@ operationsByContract:
     offline: false
     reads: 4
     writes: 2
+  - operation: runSemanticQuery
+    verb: POST
+    path: /semantic-queries
+    scope: venue
+    permission: REPORT_VIEW_VENUE
+    offline: false
+    reads: 5
+    writes: 1
   - operation: saveNaturalLanguageQuery
     verb: POST
     path: /reports/ask/{conversationId}/save
@@ -426,6 +434,7 @@ tables:
   - exportReportResult
   - recordDashboardView
   - runReport
+  - runSemanticQuery
   - saveNaturalLanguageQuery
   - setAlertRule
   - setSiteNormalisationBasis
@@ -445,6 +454,7 @@ tables:
   - exportReportResult
   - recordDashboardView
   - runReport
+  - runSemanticQuery
   - saveNaturalLanguageQuery
   - setAlertRule
   - setSiteNormalisationBasis
@@ -527,7 +537,7 @@ tables:
   - reporting
   foreignWriters: null
 - table: reporting.natural_language_query
-  columns: 8
+  columns: 9
   store: postgres
   parent: null
   writtenBy:
@@ -624,6 +634,8 @@ readsFrom:
   operations: 1
 - service: InventoryService
   operations: 1
+- service: TenancyService
+  operations: 1
 writesOutside:
 - service: AiService
   operations: 2
@@ -644,6 +656,7 @@ screens:
 - P04:POS-009 Staff Roster
 - P04:POS-020 Shift Exceptions & Alerts
 - P04:POS-025 Till Home
+- P06:EMP-061 Retail Inventory Command Center
 - P06:EMP-070 Inventory Exceptions, AI Replenishment & Action Center
 - P08:BO-005 Queue Monitor
 - P08:BO-010 Promotions & Coupons
@@ -679,8 +692,13 @@ screens:
 - P08:BO-585 Rental Revenue & Commercial Analytics
 - P08:BO-590 Location & Channel Performance
 - P08:BO-593 AI Rental Management Copilot & Action Center
+- P08:BO-682 Accreditation Export & Data Extract Center
+- P08:BO-684 Accreditation Executive Dashboard
+- P08:BO-685 Accreditation Status & Portfolio Reporting
 - P08:BO-688 Accreditation Trend & Comparative Analysis
 - P08:BO-733 Service Channel Configuration
+- P08:BO-833 Gamification Analytics & Audit
+- P08:BO-886 Staffing Gap & Coverage Control Center
 - P08:BO-951 Resource Integration & System Health Center
 - P09:ADM-031 Security & Compliance Dashboard
 - P10:PTR-018 Reports & Sales Performance

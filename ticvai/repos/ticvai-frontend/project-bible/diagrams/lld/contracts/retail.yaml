@@ -86,10 +86,12 @@ operations:
   offline: false
   reads:
   - cache:idempotency
+  - inventory.kit_component
   - retail.return
   - retail.return_line
   writes:
   - cache:idempotency
+  - inventory.movement
   - retail.return
   - retail.return_line
 - operation: createRetailSale
@@ -102,10 +104,12 @@ operations:
   offline: false
   reads:
   - cache:idempotency
+  - inventory.kit_component
   - retail.sale
   - retail.sale_line
   writes:
   - cache:idempotency
+  - inventory.movement
   - retail.sale
   - retail.sale_line
 - operation: createShopAndDrop
