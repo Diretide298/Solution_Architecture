@@ -13,11 +13,11 @@
  * render whichever theme :root happened to carry, which is how you could set
  * night on the main view and still be handed a cream page by the review table.
  */
-// The key sequence lives in xyzzy.js. It used to live here, on the claim that
+// The key sequence lives in shortcuts.js. It used to live here, on the claim that
 // theme.js is loaded by every page in the viewer — which was not true: eight of
 // the twenty-six load no theme module, landing and login among them. Imported
 // rather than inlined so those pages can take the sequence without the theming.
-import '/xyzzy.js';
+import '/shortcuts.js';
 
 export const THEME_KEY = 'ticvai-theme';
 

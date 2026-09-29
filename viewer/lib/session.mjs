@@ -28,7 +28,7 @@ const COOKIE = 'ticvai_session';
  * The public drop, whose URL is a digest of a word this repository does not
  * contain.
  *
- * `viewer/public/xyzzy.js` derives the same path from what somebody types, so
+ * `viewer/public/shortcuts.js` derives the same path from what somebody types, so
  * the two agree without either of them holding the word or the path. It comes
  * from the environment because this file is committed to a public repository:
  * written here plainly the word would be published, and the page behind it is
@@ -46,6 +46,17 @@ const dropWord = (process.env.TICVAI_DROP_WORD ?? '').trim().toLowerCase();
 export const DROP_PATH = dropWord
   ? `/drop/${createHash('sha256').update(`adam-drop:${dropWord}`, 'utf8').digest('hex').slice(0, 16)}.html`
   : null;
+
+/**
+ * The SHA-256 of the word, for `server.mjs` to substitute into `/shortcuts.js` as it
+ * serves it. That is the whole reason the word can stay out of the repository:
+ * the running page carries this hash, the committed file carries a placeholder,
+ * and the word itself is only ever `/etc/ticvai/drop.word` on the box. Empty
+ * where no word is set, which the client reads as "nothing to match".
+ */
+export const DROP_HASH = dropWord
+  ? createHash('sha256').update(dropWord, 'utf8').digest('hex')
+  : '';
 const TTL_OK_MS = 60_000;
 const TTL_FAIL_MS = 5_000;
 
@@ -86,7 +97,7 @@ const PUBLIC = new Set([
   // is how it silently did nothing on exactly the two pages it was added for
   // — a module that 302s to the sign-in page is a module the browser
   // refuses to parse, and nothing in the console says so.
-  '/xyzzy.js',
+  '/shortcuts.js',
 ]);
 
 /**

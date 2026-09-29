@@ -43,7 +43,7 @@ import { buildSearch } from './lib/search.mjs';
 import { buildOf as connectorBuild, filesOf as connectorFiles } from './mcp/version.mjs';
 import { buildDiagrams, readDiagramDetail } from './lib/diagrams.mjs';
 import { frameDocument } from './lib/wireframes.mjs';
-import { gate, callerIp, DROP_PATH } from './lib/session.mjs';
+import { gate, callerIp, DROP_PATH, DROP_HASH } from './lib/session.mjs';
 import { mayCall, decisionFiles, isDecisionFile, layersFor, modesFor } from './lib/audience.mjs';
 import { loadProjects } from './lib/projects.mjs';
 import { buildDocument, SECTIONS } from './lib/document.mjs';
@@ -1487,7 +1487,19 @@ const server = http.createServer(async (req, res) => {
     }
 
     // app.js alone is 270 KB of text, and the boards are larger still
+    // The key-sequence loader carries a placeholder where the word's hash goes;
+    // fill it in as the file is served, from the word this process was given. The
+    // committed file has only the placeholder, so the word stays out of the
+    // repository; an installation with no word substitutes an empty string and the
+    // loader then matches nothing. Only this one file, only this token.
+    if (rel === '/shortcuts.js') {
+      const filled = body.toString('utf8').replace('__ADAM_DROP_HASH__', DROP_HASH);
+      return send(res, 200, filled, MIME['.js'], req);
+    }
+
+    // app.js alone is 270 KB of text, and the boards are larger still
     return send(res, 200, body, MIME[path.extname(file)] ?? 'application/octet-stream', req);
+
   } catch (err) {
     console.error(err);
     return send(res, 500, String(err.message ?? err));

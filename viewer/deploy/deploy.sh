@@ -87,7 +87,7 @@ PUBLIC_ORIGIN="${PUBLIC_ORIGIN-https://adam.ainfinite.ai,https://aster.ainfinite
 SECRET_FILE="${SECRET_FILE-/etc/ticvai/secret.key}"
 
 # The word that opens the portfolio drop to a signed-out visitor, if there is
-# one. Beside the key and for the same reason: `viewer/public/xyzzy.js` is
+# one. Beside the key and for the same reason: `viewer/public/shortcuts.js` is
 # committed to a public repository, so a word written into the repo is a word
 # published, and the page it opens is not behind the gate.
 #
