@@ -43,7 +43,7 @@ import { buildSearch } from './lib/search.mjs';
 import { buildOf as connectorBuild, filesOf as connectorFiles } from './mcp/version.mjs';
 import { buildDiagrams, readDiagramDetail } from './lib/diagrams.mjs';
 import { frameDocument } from './lib/wireframes.mjs';
-import { gate, callerIp } from './lib/session.mjs';
+import { gate, callerIp, DROP_PATH } from './lib/session.mjs';
 import { mayCall, decisionFiles, isDecisionFile, layersFor, modesFor } from './lib/audience.mjs';
 import { loadProjects } from './lib/projects.mjs';
 import { buildDocument, SECTIONS } from './lib/document.mjs';
@@ -1456,7 +1456,15 @@ const server = http.createServer(async (req, res) => {
     // The viewer's own files, which belong to no project — so `url.pathname`
     // and not `rest`. A project prefix in front of app.js would be one URL per
     // project for one file, and a cache that has to be told they are the same.
-    const rel = url.pathname === '/' ? '/index.html' : url.pathname;
+    // The portfolio drop is one file under two names. `/offline.html` is behind
+    // the gate and is what a signed-in reader reaches. `DROP_PATH` — a digest,
+    // derived in session.mjs from a word that is not in this repository — is on
+    // the public allowlist, so a stranger on the landing page can be sent there
+    // too. An alias rather than a second copy: 6.9 MB duplicated is 6.9 MB that
+    // drifts, and whoever drops in the next export would update one of them.
+    const rel = url.pathname === '/' ? '/index.html'
+      : (DROP_PATH !== null && url.pathname === DROP_PATH) ? '/offline.html'
+      : url.pathname;
     const file = path.join(PUBLIC, rel);
     if (!file.startsWith(PUBLIC)) return send(res, 403, 'refused');
 

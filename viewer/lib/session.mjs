@@ -20,7 +20,32 @@
  * accounts service.
  */
 
+import { createHash } from 'node:crypto';
+
 const COOKIE = 'ticvai_session';
+
+/**
+ * The public drop, whose URL is a digest of a word this repository does not
+ * contain.
+ *
+ * `viewer/public/xyzzy.js` derives the same path from what somebody types, so
+ * the two agree without either of them holding the word or the path. It comes
+ * from the environment because this file is committed to a public repository:
+ * written here plainly the word would be published, and the page behind it is
+ * not gated — the word is the only thing in front of it.
+ *
+ * Unset is off. Anybody else who clones this gets no public drop at all rather
+ * than a route that answers for a file they have never heard of, and the gated
+ * `/offline.html` is unaffected either way.
+ *
+ * Read once, at import. It is deployment configuration, not something that can
+ * change under a running process, and hashing it per request would be work done
+ * on every static file the viewer serves.
+ */
+const dropWord = (process.env.TICVAI_DROP_WORD ?? '').trim().toLowerCase();
+export const DROP_PATH = dropWord
+  ? `/drop/${createHash('sha256').update(`adam-drop:${dropWord}`, 'utf8').digest('hex').slice(0, 16)}.html`
+  : null;
 const TTL_OK_MS = 60_000;
 const TTL_FAIL_MS = 5_000;
 
@@ -107,7 +132,7 @@ const isLandingAsset = (pathname) =>
 
 export function isPublic(pathname) {
   return PUBLIC.has(pathname) || isBrandAsset(pathname) || isStylesheet(pathname)
-    || isLandingAsset(pathname);
+    || isLandingAsset(pathname) || (DROP_PATH !== null && pathname === DROP_PATH);
 }
 
 export function readCookie(header, name = COOKIE) {

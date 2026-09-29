@@ -85,6 +85,16 @@ PUBLIC_ORIGIN="${PUBLIC_ORIGIN-https://adam.ainfinite.ai,https://aster.ainfinite
 # a `git pull` cannot touch it and a clone of the repo does not carry it; 0600
 # and owned by root, so the file is as private as the database it protects.
 SECRET_FILE="${SECRET_FILE-/etc/ticvai/secret.key}"
+
+# The word that opens the portfolio drop to a signed-out visitor, if there is
+# one. Beside the key and for the same reason: `viewer/public/xyzzy.js` is
+# committed to a public repository, so a word written into the repo is a word
+# published, and the page it opens is not behind the gate.
+#
+# Absent is off, and that is the default. No file, no TICVAI_DROP_WORD, no
+# public route -- the gated /offline.html is unaffected, and a box that has
+# never heard of this keeps working exactly as it did.
+DROP_FILE="${DROP_FILE-/etc/ticvai/drop.word}"
 COOKIE_DOMAIN="${COOKIE_DOMAIN-.ainfinite.ai}"
 SECURE_COOKIE="${SECURE_COOKIE-1}"
 
@@ -406,6 +416,18 @@ else
   note "using the existing $SECRET_FILE"
 fi
 SECRET_KEY="$(cat "$SECRET_FILE")"
+
+# Optional, so no die() here: an empty value simply leaves the line out of the
+# generated config and the public route does not exist.
+DROP_WORD=""
+DROP_LINE=""
+if [[ -r "$DROP_FILE" ]]; then
+  DROP_WORD="$(tr -d "[:space:]" < "$DROP_FILE")"
+  if [[ -n "$DROP_WORD" ]]; then
+    DROP_LINE="        TICVAI_DROP_WORD: '$DROP_WORD',"
+    note "public portfolio drop is on (word read from $DROP_FILE)"
+  fi
+fi
 [[ -n "$SECRET_KEY" ]] || die "$SECRET_FILE is empty. Remove it and re-run to generate one."
 
 # ── pm2 ─────────────────────────────────────────────────────────────────────
@@ -459,6 +481,10 @@ module.exports = {
         // Loopback: the two processes are on the same machine, and this is not
         // the address a browser uses.
         TICVAI_AUTH: 'http://127.0.0.1:$API_PORT',
+        // The public portfolio drop, when /etc/ticvai/drop.word exists. The
+        // viewer hashes it into a URL nobody can read off the source; absent,
+        // this line is not written at all and there is no public route.
+$DROP_LINE
       },
       autorestart: true,
       max_restarts: 20,
